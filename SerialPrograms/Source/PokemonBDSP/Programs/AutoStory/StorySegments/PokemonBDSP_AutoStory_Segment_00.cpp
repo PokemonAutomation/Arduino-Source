@@ -162,6 +162,7 @@ namespace PokemonAutomation {
 
             pbf_mash_button(context, BUTTON_A, 2500ms);
             pbf_wait(context, 300ms);
+            context.wait_for_all_requests();
 
             pbf_move_left_joystick(context, { 0.000000, -1.000000 }, 680ms, 0ms);
 
@@ -172,6 +173,8 @@ namespace PokemonAutomation {
             pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 2763ms, 0ms);
             pbf_move_left_joystick(context, { -1.000000, 1.000000 }, 58ms, 0ms);
             pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 1364ms, 0ms);
+            pbf_wait(context, 4000ms);
+            context.wait_for_all_requests();
 
             wait_for_dialogue(stream, context, "Phase 3 (Barry 1st)");
             pbf_mash_button(context, BUTTON_A, 6000ms);
@@ -181,17 +184,14 @@ namespace PokemonAutomation {
             pbf_wait(context, 800ms);
 
             pbf_wait(context, 1306ms);
+            pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 1000ms, 0ms);
+			pbf_wait(context, 1422ms);
             pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 2722ms, 0ms);
-            pbf_wait(context, 1445ms);
-            pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 161ms, 0ms);
-            pbf_move_left_joystick(context, { -1.000000, 1.000000 }, 370ms, 0ms);
-            pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 667ms, 0ms);
-            pbf_move_left_joystick(context, { -1.000000, 1.000000 }, 130ms, 0ms);
-            pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 705ms, 0ms);
-            pbf_move_left_joystick(context, { -1.000000, 1.000000 }, 196ms, 0ms);
-            pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 684ms, 0ms);
-            pbf_move_left_joystick(context, { 1.000000, 1.000000 }, 205ms, 0ms);
-            pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 590ms, 0ms);
+            pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 1600ms, 0ms);
+            pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 501ms, 0ms);
+            pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 652ms, 0ms);
+            pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 1817ms, 0ms);
+            pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 975ms, 0ms);
             pbf_wait(context, 1422ms);
 
             wait_for_dialogue(stream, context, "Phase 8 (Barry 2nd dialog)");
@@ -200,14 +200,11 @@ namespace PokemonAutomation {
             pbf_wait(context, 856ms);
             pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 920ms, 0ms);
             pbf_wait(context, 631ms);
-            pbf_move_left_joystick(context, { 0.000000, -1.000000 }, 972ms, 0ms);
-            pbf_move_left_joystick(context, { 1.000000, -1.000000 }, 72ms, 0ms);
-            pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 1127ms, 0ms);
-            pbf_move_left_joystick(context, { 1.000000, -1.000000 }, 82ms, 0ms);
-            pbf_move_left_joystick(context, { 0.000000, -1.000000 }, 1335ms, 0ms);
-            pbf_wait(context, 1124ms);
-            pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 2513ms, 0ms);
-            pbf_move_left_joystick(context, { 1.000000, 1.000000 }, 51ms, 0ms);
+            pbf_move_left_joystick(context, { 0.000000, -1.000000 }, 2183ms, 0ms);
+            pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 1076ms, 0ms);
+            pbf_move_left_joystick(context, { 0.000000, -1.000000 }, 781ms, 0ms);
+            pbf_wait(context, 1500ms);
+            pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 2713ms, 0ms);
             pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 5861ms, 0ms);
             pbf_wait(context, 134ms);
 
@@ -232,13 +229,14 @@ namespace PokemonAutomation {
             context.wait_for_all_requests();
         }
         // ---------------------------------------------------------------------------
-         //  Segment 00-001 begins
-         //  Navigates into lake Verity to recieve starter
-         // ---------------------------------------------------------------------------
+        //  Segment 00-001 begins
+        //  Navigates into lake Verity to recieve starter
+        // ---------------------------------------------------------------------------
         static void starter_nav(VideoStream& stream, ProControllerContext& context) {
             // re-sync control
             pbf_press_button(context, BUTTON_B, 20ms, 200ms);
-            pbf_wait(context, 500ms);
+            pbf_wait(context, 2000ms);
+            context.wait_for_all_requests();
 
             // continue movement
             pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 300ms, 0ms);
@@ -281,16 +279,19 @@ namespace PokemonAutomation {
             stream.log("Mashing B for briefcase to fully open.");
             pbf_mash_button(context, BUTTON_B, 2000ms);
         }
+        static void post_starly_clenaup(VideoStream& stream, ProControllerContext& context) {
+            pbf_mash_button(context, BUTTON_B, 60000ms);
+        }
         // ---------------------------------------------------------------------------
-          //  Segment 00-002 begins
-          //  Navigates from Exit of lake Verity to receipt of the Pokedex
-          // ---------------------------------------------------------------------------
+        //  Segment 00-002 begins
+        //  Navigates from Exit of lake Verity to receipt of the Pokedex
+        // ---------------------------------------------------------------------------
 
         static void tutorial_part_2_navigation(SingleSwitchProgramEnvironment& env, 
             VideoStream& stream, ProControllerContext& context) {
+            pbf_wait(context, 2000ms);
             context.wait_for_all_requests();
 
-            context.wait_for_all_requests();
             pbf_wait(context, 563ms);
             pbf_move_left_joystick(context, { 0.000000, -1.000000 }, 1700ms, 0ms);
             pbf_move_left_joystick(context, { 1.000000, -1.000000 }, 510ms, 0ms);
@@ -298,11 +299,13 @@ namespace PokemonAutomation {
             pbf_move_left_joystick(context, { 1.000000, -1.000000 }, 310ms, 0ms);
             pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 5500ms, 0ms);
             pbf_wait(context, 3963ms);
+            context.wait_for_all_requests();
+
             wait_for_dialogue(stream, context, "Phase 10 (Professor dialog to mom)");
             pbf_mash_button(context, BUTTON_B, 40000ms);
             pbf_move_left_joystick(context, { 0.000000, -1.000000 }, 820ms, 0ms);
-            pbf_wait(context, 1483ms);
-            pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 900ms, 0ms);
+            pbf_wait(context, 4000ms);
+            pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 800ms, 0ms);
             pbf_wait(context, 555ms);
             pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 50ms, 0ms);
             pbf_wait(context, 23ms);
@@ -427,7 +430,9 @@ namespace PokemonAutomation {
             pbf_mash_button(context, BUTTON_B, 70000ms);
             context.wait_for_all_requests();
             pbf_wait(context, 2000ms);
-            catch_1_pokemon(stream, context);
+            catch_1_pokemon(env, stream, context);
+            context.wait_for_all_requests();
+            save_game(stream, context);
             context.wait_for_all_requests();
             pbf_wait(context, 1500ms);
             //--------------------------------------------------------
@@ -524,16 +529,15 @@ namespace PokemonAutomation {
             pbf_mash_button(context, BUTTON_B, 5000ms);
         }
         // ---------------------------------------------------------------------------
-            // End of Segment 00 - 003
-            // Standing in Jubilife after speaking to dawn.
-            // ---------------------------------------------------------------------------
-
-            // ---------------------------------------------------------------------------
-            // Begin Segment 00 - 004
-            // Standing at the entrance to jubilife after speaking to dawn, will navigate to the poketech challenge.
-            // Collects poketech and stands in front of the PC to end the tutorial section
-            // and send the starter to pokemon HOME.
-            // ---------------------------------------------------------------------------
+        // End of Segment 00 - 003
+        // Standing in Jubilife after speaking to dawn.
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // Begin Segment 00 - 004
+        // Standing at the entrance to jubilife after speaking to dawn, will navigate to the poketech challenge.
+        // Collects poketech and stands in front of the PC to end the tutorial section
+        // and send the starter to pokemon HOME.
+        // ---------------------------------------------------------------------------
 
         static void tutorial_part_4_navigation(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context) {
             pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 2580ms, 0ms);
@@ -779,6 +783,7 @@ namespace PokemonAutomation {
                     }
                     //Fight Starly
                     fight_starly(env.console, context);
+					post_starly_clenaup(env.console, context);
                 }
             );
         }
