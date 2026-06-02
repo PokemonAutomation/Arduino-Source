@@ -10,7 +10,7 @@
 #include <stddef.h>
 #include "StreamInterface.h"
 
-#ifdef PABB2_ENABLE
+#ifdef PABB2_FIRMWARE
 #include "PabbTime.h"
 #else
 #include "Common/Cpp/Time.h"
@@ -27,6 +27,14 @@ public:
 
 class ReliableStreamConnectionPolling{
 public:
+    virtual void lock() noexcept = 0;
+    virtual void unlock() noexcept = 0;
+
+    //
+    //  These 3 functions are not thread/IRQ safe with anything else.
+    //  If needed call these under the lock above.
+    //
+
     //  Enqueue the specified data into the uncommitted stream.
     //  On success, returns true.
     //  On fail, return false and aborts all uncommitted sends.
@@ -38,12 +46,16 @@ public:
     //  Commits all uncommitted sends to stream.
     virtual void commit_uncommitted_reliable_sends() noexcept = 0;
 
+
+public:
     virtual bool reliable_send_all_or_nothing(const void* data, size_t bytes) noexcept{
-        if (!enqueue_uncommitted_reliable_sends(data, bytes)){
-            return false;
+        lock();
+        bool success = enqueue_uncommitted_reliable_sends(data, bytes);
+        if (success){
+            commit_uncommitted_reliable_sends();
         }
-        commit_uncommitted_reliable_sends();
-        return true;
+        unlock();
+        return success;
     }
 
 
@@ -53,10 +65,10 @@ public:
     virtual bool reset_flag_set() const{ return false; }
     virtual void clear_reset_flag(){}
 
-    virtual bool run_send_events(const WallDuration& timeout){
+    virtual bool run_send_events(const WallDuration& timeout) noexcept{
         return false;
     }
-    virtual bool run_recv_events(const WallDuration& timeout){
+    virtual bool run_recv_events(const WallDuration& timeout) noexcept{
         return false;
     }
 };

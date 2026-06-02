@@ -39,7 +39,7 @@ struct SumATA2{
         vtype sum_at2 = Context::vzero();
         vtype sum_at3 = Context::vzero();
 
-        if (VECTOR_LENGTH > 1){
+        if constexpr (VECTOR_LENGTH > 1){
             size_t align = (size_t)T % (VECTOR_LENGTH * sizeof(float));
             if (align){
                 align /= sizeof(float);
@@ -95,11 +95,13 @@ struct SumATA2{
             ptrT += 1;
             length -= VECTOR_LENGTH;
         }
-        if (VECTOR_LENGTH > 1 && length){
-            vtype a0, t0;
-            Context::load2_partial_front(length, a0, ptrT, t0, ptrA);
-            sum_at0 = Context::vpma(a0, t0, sum_at0);
-            sum_as0 = Context::vpma(a0, a0, sum_as0);
+        if constexpr (VECTOR_LENGTH > 1){
+            if (length){
+                vtype a0, t0;
+                Context::load2_partial_front(length, a0, ptrT, t0, ptrA);
+                sum_at0 = Context::vpma(a0, t0, sum_at0);
+                sum_as0 = Context::vpma(a0, a0, sum_as0);
+            }
         }
 
         sum_A2 = Context::vadd(sum_A2, sum_as0);
@@ -115,7 +117,7 @@ struct SumATA2{
         vtype sum_at2 = Context::vzero();
         vtype sum_at3 = Context::vzero();
 
-        if (VECTOR_LENGTH > 1){
+        if constexpr (VECTOR_LENGTH > 1){
             size_t align = (size_t)TW % (VECTOR_LENGTH * sizeof(float));
             if (align){
                 align /= sizeof(float);
@@ -219,7 +221,7 @@ struct SumError{
         vtype sum2 = Context::vzero();
         vtype sum3 = Context::vzero();
 
-        if (VECTOR_LENGTH > 1){
+        if constexpr (VECTOR_LENGTH > 1){
             size_t align = (size_t)T % (VECTOR_LENGTH * sizeof(float));
             if (align){
                 align /= sizeof(float);
@@ -282,7 +284,7 @@ struct SumError{
         vtype sum2 = Context::vzero();
         vtype sum3 = Context::vzero();
 
-        if (VECTOR_LENGTH > 1){
+        if constexpr (VECTOR_LENGTH > 1){
             size_t align = (size_t)TW % (VECTOR_LENGTH * sizeof(float));
             if (align){
                 align /= sizeof(float);

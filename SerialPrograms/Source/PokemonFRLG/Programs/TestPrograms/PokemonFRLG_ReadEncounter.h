@@ -25,14 +25,11 @@ public:
 class ReadEncounter : public SingleSwitchProgramInstance{
 public:
     ReadEncounter();
-    virtual void program(
-        SingleSwitchProgramEnvironment &env,
-        ProControllerContext &context
-    ) override;
 
-    virtual void start_program_border_check(
-        VideoStream &stream, FeedbackType feedback_type
-    ) override{}
+    virtual void start_program_controller_check(ControllerSession& session) override{}
+    virtual void start_program_border_check(VideoStream &stream, FeedbackType feedback_type) override{}
+    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
+
 
 private:
     enum class Subset{

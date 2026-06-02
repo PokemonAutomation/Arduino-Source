@@ -36,9 +36,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
         // Locking behind dev mode for now since this program is destructive and deletes your cloud island
     }
 
+    ret.emplace_back("---- Untested/Beta/WIP ----");
+    ret.emplace_back(make_single_switch_program<CloudIslandReset_Descriptor, CloudIslandReset>());
     if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
-        ret.emplace_back("---- Untested/Beta/WIP ----");
-        ret.emplace_back(make_single_switch_program<CloudIslandReset_Descriptor, CloudIslandReset>());
     }
 
     // if (PreloadSettings::instance().DEVELOPER_MODE){

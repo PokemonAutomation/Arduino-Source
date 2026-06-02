@@ -5,6 +5,7 @@
  */
 
 
+#include "Common/Cpp/Exceptions.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.h"
@@ -102,7 +103,10 @@ void LZA_TurboMacro::program(SingleSwitchProgramEnvironment& env, CancellableSco
         run_table_stop_when_shiny_sound(env, scope);
         break;
     default:
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "TurboMacro::program(): Unknown RunUntilCallback");
+        throw InternalProgramError(
+            &env.logger(), PA_CURRENT_FUNCTION,
+            "TurboMacro::program(): Unknown RunUntilCallback"
+        );
         
     }
 

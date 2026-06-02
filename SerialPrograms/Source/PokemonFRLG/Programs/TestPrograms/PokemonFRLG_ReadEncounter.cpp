@@ -59,7 +59,7 @@ ReadEncounter::ReadEncounter()
 
 void ReadEncounter::program(
     SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context
+    CancellableScope& scope
 ){
     env.log(
         "Starting Read Encounter program..."
@@ -97,8 +97,7 @@ void ReadEncounter::program(
     env.log("Name: " + encounter.name);
 
     env.log("Finished reading encounter.", COLOR_BLUE);
-    pbf_wait(context, 10s);
-    context.wait_for_all_requests();
+    scope.wait_for(10s);
 }
 
 } // namespace PokemonFRLG

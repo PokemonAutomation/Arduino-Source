@@ -69,8 +69,7 @@ std::unique_ptr<ControllerConnection> SerialPABotBase2_Descriptor::open_connecti
 std::unique_ptr<AbstractController> SerialPABotBase2_Descriptor::make_controller(
     Logger& logger,
     ControllerConnection& connection,
-    ControllerType controller_type,
-    ControllerResetMode reset_mode
+    ControllerType controller_type
 ) const{
     switch (controller_type){
     case ControllerType::HID_Keyboard:

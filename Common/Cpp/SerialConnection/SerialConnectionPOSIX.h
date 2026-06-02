@@ -13,6 +13,7 @@
 #include <termios.h>
 #include <unistd.h>
 #include <errno.h>
+#include <sys/ioctl.h>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
@@ -49,6 +50,16 @@ public:
         }
 
         set_baud_rate(baud_rate);
+
+#if 0
+        int flags;
+        if (ioctl(m_fd, TIOCMGET, &flags) >= 0){
+            //  Set the bitmasks for DTR and RTS
+            flags |= TIOCM_DTR;
+            flags |= TIOCM_RTS;
+            ioctl(m_fd, TIOCMSET, &flags);
+        }
+#endif
 
         //  Start receiver thread.
         try{
@@ -134,6 +145,9 @@ public:
         std::cout << "ECHO    = " << (options.c_lflag & ECHO) << std::endl;
         std::cout << "ECHOE   = " << (options.c_lflag & ECHOE) << std::endl;
 #endif
+        //  Disable hangup on close.
+        options.c_lflag &= ~HUPCL;
+
         //  Configure for raw binary mode (8 bits, no parity, 1 stop bit)
         // No parity
         options.c_cflag &= ~PARENB;
@@ -205,6 +219,26 @@ public:
         if (cfgetospeed(&options) != baud){
 //            std::cout << "actual baud = " << cfgetospeed(&options) << std::endl;
             throw ConnectionException(nullptr, "Unable to set output baud rate.");
+        }
+    }
+
+    void get_control_state(bool& dtr, bool& rts){
+        int flags;
+        if (ioctl(m_fd, TIOCMGET, &flags) < 0){
+            int error = errno;
+            throw ConnectionException(nullptr, "ioctl() failed. Error = " + std::to_string(error));
+        }
+
+        dtr = flags & TIOCM_DTR;
+        rts = flags & TIOCM_RTS;
+    }
+    void set_control_state(bool dtr, bool rts){
+        int flags;
+        if (ioctl(m_fd, TIOCMGET, &flags) >= 0){
+            //  Set the bitmasks for DTR and RTS
+            flags |= dtr ? TIOCM_DTR : 0;
+            flags |= rts ? TIOCM_RTS : 0;
+            ioctl(m_fd, TIOCMSET, &flags);
         }
     }
 

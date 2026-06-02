@@ -1,11 +1,14 @@
 #ifdef PA_DPP
 
-#include <dpp/dpp.h>
 #include <Integrations/DppIntegration/DppUtility.h>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Logging/TaggedLogger.h"
 //#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/Logger.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 using namespace dpp;
 namespace PokemonAutomation{
@@ -26,7 +29,13 @@ void Utility::log(const std::string& message, const std::string& identity, const
         case ll_debug: color = COLOR_CYAN; break;
         case ll_error: color = COLOR_RED; break;
         case ll_critical: color = COLOR_MAGENTA; break;
-        default: color = COLOR_PURPLE; break;
+        default:
+            //  This one is too spammy.
+            if (log.starts_with("Internal Log: W: <binary frame> size=")){
+                return;
+            }
+            color = COLOR_PURPLE;
+            break;
     };
 
     dpp_logger().log(log, color);

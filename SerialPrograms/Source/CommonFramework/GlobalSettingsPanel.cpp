@@ -449,8 +449,6 @@ void GlobalSettings::on_press(){
 
 
 
-PanelDescriptorWrapper<GlobalSettings_Descriptor, GlobalSettingsPanel> GlobalSettings_Descriptor::INSTANCE;
-
 GlobalSettings_Descriptor::GlobalSettings_Descriptor()
     : PanelDescriptor(
         Color(),

@@ -47,8 +47,7 @@ int test_NintendoSwitch_UpdatePopupDetector(const ImageViewRGB32& image, bool ta
     SerialPABotBase::SerialPABotBase_Connection connection(logger, "", false);
     SerialPABotBase_WiredController controller(
         logger, connection,
-        ControllerType::NintendoSwitch_WiredController,
-        ControllerResetMode::DO_NOT_RESET
+        ControllerType::NintendoSwitch_WiredController
     );
     DummyVideoFeed video_feed;
     DummyVideoOverlay video_overlay;

@@ -48,7 +48,7 @@ PartyLevelUpDetector::PartyLevelUpDetector(Color color, PartyLevelUpDialog dialo
     , m_border_right_box(0.982692, 0.025923, 0.001923, 0.597115)
     , m_dialog_top_box(0.626282, 0.042492, 0.341026, 0.006175)  // white
     , m_dialog_right_box(0.967949, 0.050923, 0.003846, 0.550962)
-    , m_plus_box(0.862663, 0.051852, 0.034267, 0.553560)
+    , m_plus_box(0.862663, 0.051852, 0.017788, 0.553560)
     , m_plus_box_jpn(0.895663, 0.051852, 0.021267, 0.553560)
 {}
 void PartyLevelUpDetector::make_overlays(VideoOverlaySet& items) const{

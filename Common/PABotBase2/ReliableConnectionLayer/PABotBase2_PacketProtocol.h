@@ -32,7 +32,7 @@ namespace PABotBase2{
 //
 
 #define PABB2_CONNECTION_MAGIC_NUMBER               0x81
-#define PABB2_CONNECTION_PROTOCOL_VERSION           2026041102
+#define PABB2_CONNECTION_PROTOCOL_VERSION           2026052100
 
 
 #define PABB2_CONNECTION_RETRANSMIT_FLAG            0x80
@@ -54,12 +54,6 @@ struct PABB_PACK PacketHeader{
     uint8_t opcode;
 };
 
-struct PABB_PACK PacketHeader_u8 : PacketHeader{
-    uint8_t data;
-};
-struct PABB_PACK PacketHeader_u16 : PacketHeader{
-    uint16_t data;
-};
 struct PABB_PACK PacketHeader_u32 : PacketHeader{
     uint32_t data;
 };
@@ -85,6 +79,8 @@ struct PABB_PACK PacketHeader_u32 : PacketHeader{
 #define PABB2_CONNECTION_OPCODE_ASK_BUFFER_BYTES        0x05
 #define PABB2_CONNECTION_OPCODE_RET_BUFFER_BYTES        0x45
 
+#define PABB2_CONNECTION_OPCODE_REBOOT_TO_BOOTLOADER    0x06    //  No ack needed
+
 #define PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA         0x12
 #define PABB2_CONNECTION_OPCODE_RET_STREAM_DATA         0x52
 #define PABB2_CONNECTION_OPCODE_ASK_STREAM_REQUEST      0x13    //  Unused for now.
@@ -104,16 +100,14 @@ struct PABB_PACK PacketHeaderData : PacketHeader{
 #define PABB2_CONNECTION_OPCODE_INFO_STREAM_RECV_FULL   0x19
 
 #define PABB2_CONNECTION_OPCODE_INFO                    0x20
-#define PABB2_CONNECTION_OPCODE_INFO_U8                 0x21
-#define PABB2_CONNECTION_OPCODE_INFO_U16                0x22
-#define PABB2_CONNECTION_OPCODE_INFO_H32                0x23
-#define PABB2_CONNECTION_OPCODE_INFO_U32                0x24
-#define PABB2_CONNECTION_OPCODE_INFO_I32                0x25
-#define PABB2_CONNECTION_OPCODE_INFO_BINARY             0x26
-#define PABB2_CONNECTION_OPCODE_INFO_STR                0x27
-#define PABB2_CONNECTION_OPCODE_INFO_LABEL_H32          0x28
-#define PABB2_CONNECTION_OPCODE_INFO_LABEL_U32          0x29
-#define PABB2_CONNECTION_OPCODE_INFO_LABEL_I32          0x2a
+#define PABB2_CONNECTION_OPCODE_INFO_H32                0x21
+#define PABB2_CONNECTION_OPCODE_INFO_U32                0x22
+#define PABB2_CONNECTION_OPCODE_INFO_I32                0x23
+#define PABB2_CONNECTION_OPCODE_INFO_BINARY             0x24
+#define PABB2_CONNECTION_OPCODE_INFO_STR                0x25
+#define PABB2_CONNECTION_OPCODE_INFO_LABEL_H32          0x26
+#define PABB2_CONNECTION_OPCODE_INFO_LABEL_U32          0x27
+#define PABB2_CONNECTION_OPCODE_INFO_LABEL_I32          0x28
 
 #define PABB2_CONNECTION_OPCODE_INVALID_LENGTH          0x30
 #define PABB2_CONNECTION_OPCODE_INVALID_CHECKSUM_FAIL   0x31

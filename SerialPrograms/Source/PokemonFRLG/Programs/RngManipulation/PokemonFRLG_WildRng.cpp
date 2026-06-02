@@ -62,7 +62,22 @@ std::unique_ptr<StatsTracker> WildRng_Descriptor::make_stats() const{
 }
 
 WildRng::WildRng()
-    : LANGUAGE(
+    : m_calibration_displays(
+        "<font size=4><b>Calibration Displays</b></font> — These will update automatically as the program runs"
+    )
+    , m_game_info(
+        "<font size=4><b>Game Information</b></font>"
+    )
+    , GAME_VERSION(
+        "<b>Game Version:</b>",
+        {
+            {GameVersion::firered, "firered", "FireRed"},
+            {GameVersion::leafgreen, "leafgreen", "LeafGreen"}
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        GameVersion::firered
+    )
+    , LANGUAGE(
         "<b>Game Language:</b>",
         {
             Language::English,
@@ -75,14 +90,8 @@ WildRng::WildRng()
         LockMode::LOCK_WHILE_RUNNING,
         true
     )
-    , GAME_VERSION(
-        "<b>Game Version:</b>",
-        {
-            {GameVersion::firered, "firered", "FireRed"},
-            {GameVersion::leafgreen, "leafgreen", "LeafGreen"}
-        },
-        LockMode::LOCK_WHILE_RUNNING,
-        GameVersion::firered
+    , m_target_settings(
+        "<font size=4><b>Target Settings</b></font> — Get these from an RNG search tool"
     )
     , ENCOUNTER_TYPE(
         "<b>Encounter Type:</b>",
@@ -104,24 +113,18 @@ WildRng::WildRng()
         LockMode::LOCK_WHILE_RUNNING,
         "route_1"
     )    
-    , MAX_RESETS(
-        "<b>Max Resets:</b><br>",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        50, 0 // default, min
-    )
-    , MAX_RARE_CANDIES(
-        "<b>Max Rare Candies:</b><br>"
-        "The number of rare candies in your bag. Make sure these are at the top position of the bag.<br>"
-        "Rare candies used during calibration will be restored after resetting.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        0, 0, 999 // default, min, max
-    )
-    , MAX_BALL_THROWS(
-        "<b>Max Balls Thrown:</b><br>"
-        "The number of " + STRING_POKEBALL + "s in your bag to attempt to throw. Make sure these are at the top position of the bag.<br>"
-        "Balls thrown during calibration will be restored after resetting.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        20, 1, 999 // default, min, max
+    , RNG_METHOD(
+        "<b>RNG Method:</b><br>"
+        "This should usually be set to Method1 for Grass encounters.<br>"
+        "All RNG methods are checked during calibration regardless of this setting.",
+        {
+            {AdvRngMethod::Method1, "Method1", "Method1"},
+            {AdvRngMethod::Method2, "Method2", "Method2"},
+            {AdvRngMethod::Method4, "Method4", "Method4"},
+
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        AdvRngMethod::Method1
     )
     , SEED(
         false,
@@ -139,7 +142,7 @@ WildRng::WildRng()
         true
     )
     , SEED_BUTTON(
-        "<b>Seed Button:</b><br>",
+        "<b>Seed Button:</b>",
         {
             {SeedButton::A, "A", "A"},
             {SeedButton::Start, "Start", "Start"},
@@ -162,7 +165,8 @@ WildRng::WildRng()
     , SEED_DELAY(
         "<b>Seed Delay Time (ms):</b><br>"
         "The delay between starting the game and advancing past the title screen. Set this to match your target seed.<br>"
-        "<i>If using Ten Lines, select <b>Nintendo Switch 1</b> as your console even if using a Switch 2.</i>",
+        "<i>If using Ten Lines for seed info, select <b>Nintendo Switch 1</b> as your console even if using a Switch 2.</i><br>"
+        "<b>Warning: values close to 30500ms can sometimes cause problems, and you may need to manually increase your initial seed calibration or pick a new target.</b>",
         LockMode::LOCK_WHILE_RUNNING,
         31338, 30400 // default, min
     )
@@ -171,17 +175,34 @@ WildRng::WildRng()
         LockMode::LOCK_WHILE_RUNNING,
         10000, 700, 1000000000 // default, min
     )
-    // , CONTINUE_SCREEN_FRAMES(
-    //     "<b>Continue Screen Frames:</b><br>The number of RNG advances to pass on the continue screen.<br>This should be less than the total number of advances above.",
-    //     LockMode::LOCK_WHILE_RUNNING,
-    //     1000, 192 // default, min
-    // )
+    , m_program_settings(
+        "<font size=4><b>Program Settings</b></font>"
+    )
     , USE_TEACHY_TV(
         "<b>Use Teachy TV:</b>"
         "<br>Opens the Teachy TV to quickly advance the RNG at 313x speed.<br>"
         "<i>Warning: can result in larger misses.</i>",
         LockMode::LOCK_WHILE_RUNNING,
         false // default
+    )
+    , MAX_RESETS(
+        "<b>Max Resets:</b>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        50, 0 // default, min
+    )
+    , MAX_RARE_CANDIES(
+        "<b>Max Rare Candies:</b><br>"
+        "The number of rare candies in your bag. Make sure these are at the top position of the bag.<br>"
+        "Rare candies used during calibration will be restored after resetting.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0, 0, 98 // default, min, max
+    )
+    , MAX_BALL_THROWS(
+        "<b>Max Balls Thrown:</b><br>"
+        "The number of " + STRING_POKEBALL + "s in your bag to attempt to throw. Make sure these are at the top position of the bag.<br>"
+        "Balls thrown during calibration will be restored after resetting.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        30, 1, 999 // default, min, max
     )
     , PROFILE(
         "<b>User Profile Position:</b><br>"
@@ -208,23 +229,28 @@ WildRng::WildRng()
         &NOTIFICATION_PROGRAM_FINISH,
     })
 {
+    PA_ADD_OPTION(m_calibration_displays);
+    PA_ADD_OPTION(RNG_TARGET);
     PA_ADD_OPTION(RNG_FILTERS);
     PA_ADD_OPTION(RNG_CALIBRATION);
-    PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(m_game_info);
     PA_ADD_OPTION(GAME_VERSION);
+    PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(m_target_settings);
     PA_ADD_OPTION(ENCOUNTER_TYPE);
     PA_ADD_OPTION(GAME_LOCATION);
-    PA_ADD_OPTION(MAX_RESETS);
-    PA_ADD_OPTION(MAX_BALL_THROWS);
-    PA_ADD_OPTION(MAX_RARE_CANDIES);
+    PA_ADD_OPTION(RNG_METHOD);
     PA_ADD_OPTION(SEED);
     PA_ADD_OPTION(SEED_LIST);
     PA_ADD_OPTION(SEED_BUTTON);
     PA_ADD_OPTION(EXTRA_BUTTON);
     PA_ADD_OPTION(SEED_DELAY);
     PA_ADD_OPTION(ADVANCES);
-    // PA_ADD_OPTION(CONTINUE_SCREEN_FRAMES);
+    PA_ADD_OPTION(m_program_settings);
     PA_ADD_OPTION(USE_TEACHY_TV);
+    PA_ADD_OPTION(MAX_RESETS);
+    PA_ADD_OPTION(MAX_BALL_THROWS);
+    PA_ADD_OPTION(MAX_RARE_CANDIES);
     PA_ADD_OPTION(PROFILE);
     PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -247,7 +273,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     home_black_border_check(env.console, context);
 
     RNG_FILTERS.reset();
-    RNG_CALIBRATION.reset();
+    RNG_CALIBRATION.reset_hits();
 
     // prepare database of base stats and gender thresholds
     RngStatsDatabase STATS_DATA("PokemonFRLG/BaseStats.json");
@@ -265,11 +291,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
     std::map<std::string, std::vector<AdvEncounterSlot>> location_map = encounters_data.get_throw(enc_slug);
     if (location_map.find(loc_slug)==location_map.end()){
-        OperationFailedException::fire(
-            ErrorReport::NO_ERROR_REPORT,
-            "Invalid combination for encounter type and location.",
-            env.console
-        ); 
+        throw UserSetupError(env.console, "The target Seed is missing from the list of nearby seeds.");
     }
 
     std::vector<AdvEncounterSlot> ENCOUNTER_SLOTS = location_map.find(loc_slug)->second;
@@ -295,14 +317,8 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     const int16_t SEED_POSITION = seed_position_in_list(TARGET_SEED, SEED_VALUES);
 
     if (SEED_POSITION == -1){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "WildRng(): Target Seed is missing from the list of nearby seeds.",
-            env.console
-        ); 
+        throw UserSetupError(env.console, "The target Seed is missing from the list of nearby seeds.");
     }
-
-    env.log("Target Seed Value (base10): " + std::to_string(TARGET_SEED));
 
     PokemonFRLG_RngTarget TARGET = PokemonFRLG_RngTarget::sweetscent;
 
@@ -356,27 +372,38 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
     const uint8_t MAX_HISTORY_LENGTH = USE_TEACHY_TV ? 2 : 10;
 
+    env.log("Game Location: " + loc_slug);
+    env.log("Encounter Type: " + enc_slug);
+    env.log("Target Seed: " + to_hex_string(TARGET_SEED));
+    env.log("Target Advances: " + std::to_string(ADVANCES));
 
-    RngCalibrations calibrations = {
-        RNG_CALIBRATION.seed_calibration / FRLG_FRAME_DURATION,
-        RNG_CALIBRATION.csf_calibration,
-        RNG_CALIBRATION.advances_calibration
-    };
-
-    AdvRngWildSearcher searcher(TARGET_SEED, ADVANCES, ENCOUNTER_SLOTS, AdvRngMethod::Any);
+    AdvRngWildSearcher searcher(TARGET_SEED, ADVANCES, ENCOUNTER_SLOTS, RNG_METHOD);
     AdvWildPokemonResult target_result = searcher.generate_pokemon(SUPER_ROD);
+    RNG_TARGET.set_target(target_result, STATS_DATA.get_nothrow(target_result.species)->gender_threshold);
     env.log("Target Species: " + target_result.species);
     env.log("Target Level: " + std::to_string(target_result.level));
     env.log("Target Encounter Slot: " + std::to_string(target_result.slot));
-    env.log("Target PID (base10): " + std::to_string(target_result.pid));
+    env.log("Target PID: " + to_hex_string(target_result.pid));
     env.log("Target Nature: " + nature_to_string(target_result.nature));
-    env.log("Target IVs (assuming Method 1):");
+    env.log("Target IVs:");
     env.log("   HP: " + std::to_string(target_result.ivs.hp));
     env.log("   Atk: " + std::to_string(target_result.ivs.attack));
     env.log("   Def: " + std::to_string(target_result.ivs.defense));
     env.log("   SpA: " + std::to_string(target_result.ivs.spatk));
     env.log("   SpD: " + std::to_string(target_result.ivs.spdef));
     env.log("   Spe: " + std::to_string(target_result.ivs.speed));
+
+    RngCalibrations calibrations = {
+        RNG_CALIBRATION.seed_calibration / FRLG_FRAME_DURATION,
+        RNG_CALIBRATION.csf_calibration,
+        RNG_CALIBRATION.advances_calibration
+    };
+    env.log("Initial Seed calibration (frames): " + std::to_string(calibrations.seed_offset));
+    env.log("Initial CSF calibration (frames): " + std::to_string(calibrations.csf_offset));
+    env.log("Initial In-game calibration (frames x2): " + std::to_string(calibrations.ingame_offset));
+
+    Milliseconds launch_delay = INITIAL_LAUNCH_DELAY;
+
     RngAdvanceHistory advance_history;
     RngCalibrationHistory calibration_history; 
 
@@ -437,16 +464,20 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         reset_and_perform_blind_sequence(
             env.console, context, TARGET, 
             SEED_BUTTON, EXTRA_BUTTON, timings, 
-            safari_zone, PROFILE
+            launch_delay, safari_zone, PROFILE
         );
         stats.resets++; 
 
         RNG_FILTERS.reset();
-        RNG_CALIBRATION.reset();
+        RNG_CALIBRATION.set_calibrations(calibrations);
+        RNG_CALIBRATION.reset_hits();
 
         int ret = watch_for_shiny_encounter(env.console, context);
         if (ret < 0){
-            if (TARGET == PokemonFRLG_RngTarget::fishing || TARGET == PokemonFRLG_RngTarget::rocksmash){
+            if (   TARGET == PokemonFRLG_RngTarget::fishing 
+                || TARGET == PokemonFRLG_RngTarget::rocksmash
+                || TARGET == PokemonFRLG_RngTarget::safarizonefish
+            ){
                 env.log("No battle triggered. Resetting...");
                 continue;
             }else{
@@ -462,6 +493,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         if (shiny_found){
             env.log("Shiny found!");
             stats.shinies++;
+            RNG_CALIBRATION.hits.set("Shiny!");
             send_program_notification(
                 env,
                 NOTIFICATION_SHINY,
@@ -507,12 +539,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         RNG_FILTERS.set(filters);
 
         std::vector<AdvRngState> search_hits = get_wild_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, gender_threshold, SUPER_ROD);
-        RNG_CALIBRATION.set(
-            calibrations.seed_offset * FRLG_FRAME_DURATION,
-            calibrations.csf_offset,
-            calibrations.ingame_offset,
-            search_hits
-        );           
+        RNG_CALIBRATION.set_hits(search_hits);           
         bool finished = update_history(env.console, advance_history, calibration_history, MAX_HISTORY_LENGTH, calibrations, search_hits, 1);
         finished = finished || all_indistinguishable(search_hits, searcher, gender_threshold, SUPER_ROD);
 
@@ -530,21 +557,19 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
             }
 
             search_hits = get_wild_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, gender_threshold, SUPER_ROD);
-            RNG_CALIBRATION.set(
-                calibrations.seed_offset * FRLG_FRAME_DURATION,
-                calibrations.csf_offset,
-                calibrations.ingame_offset,
-                search_hits
-            );       
+            RNG_CALIBRATION.set_hits(search_hits);         
 
-            bool force_finish = failed || (i == (MAX_RARE_CANDIES - 1));
+            bool force_finish = (
+                   failed 
+                || (i == (MAX_RARE_CANDIES - 1))
+                || all_indistinguishable(search_hits, searcher, gender_threshold, SUPER_ROD)
+            );
             finished = update_history(
                 env.console, advance_history, 
                 calibration_history, MAX_HISTORY_LENGTH,
                 calibrations, search_hits, 
                 1, 2, force_finish
             );
-            finished = finished || all_indistinguishable(search_hits, searcher, gender_threshold, SUPER_ROD);
         }
 
         env.log("RNG search finished.");

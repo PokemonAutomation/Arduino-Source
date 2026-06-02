@@ -29,6 +29,8 @@ public:
 
 private:
     SelectionArrowDetector m_selection_arrow;
+    ImageFloatBox m_menu_top_box;
+    ImageFloatBox m_menu_left_box;
 };
 class StartMenuWatcher : public DetectorToFinder<StartMenuDetector>{
 public:

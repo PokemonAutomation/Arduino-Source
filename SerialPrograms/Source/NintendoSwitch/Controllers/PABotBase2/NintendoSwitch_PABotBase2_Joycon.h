@@ -27,6 +27,7 @@ class PABotBase2_JoyCon :
 public:
     PABotBase2_JoyCon(
         Logger& logger,
+        RecursiveThrottler& logging_throttler,
         PABotBase2::Connection& connection,
         ControllerClass controller_class,
         ControllerType controller_type,
@@ -34,7 +35,8 @@ public:
     )
         : JoyconType(logger, controller_class)
         , PABotBase2_OemController(
-            logger, connection, controller_type,
+            logger, logging_throttler,
+            connection, controller_type,
             std::move(on_rumble)
         )
         , m_controller_type(controller_type)
@@ -45,9 +47,6 @@ public:
 
     virtual Logger& logger() override{
         return m_logger;
-    }
-    virtual RecursiveThrottler& logging_throttler() override{
-        return m_logging_throttler;
     }
     virtual bool is_ready() const override{
         return PABotBase2_Controller::is_ready();
@@ -332,7 +331,8 @@ public:
         ControllerType controller_type
     )
         : PABotBase2_JoyCon<LeftJoycon>(
-            logger, connection,
+            logger, logging_throttler(),
+            connection,
             ControllerClass::NintendoSwitch_LeftJoycon,
             controller_type,
             [this](double magnitude){ on_rumble(magnitude); }
@@ -352,7 +352,8 @@ public:
         ControllerType controller_type
     )
         : PABotBase2_JoyCon<RightJoycon>(
-            logger, connection,
+            logger, logging_throttler(),
+            connection,
             ControllerClass::NintendoSwitch_RightJoycon,
             controller_type,
             [this](double magnitude){ on_rumble(magnitude); }

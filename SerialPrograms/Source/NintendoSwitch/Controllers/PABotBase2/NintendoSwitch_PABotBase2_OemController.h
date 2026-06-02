@@ -31,6 +31,7 @@ public:
 public:
     PABotBase2_OemController(
         Logger& logger,
+        RecursiveThrottler& logging_throttler,
         PABotBase2::Connection& connection,
         ControllerType controller_type,
         std::function<void(double magnitude)> on_rumble
@@ -38,7 +39,7 @@ public:
     ~PABotBase2_OemController();
     void stop();
 
-    static void run_preconnect_configure(
+    static bool run_preconnect_configure(
         Logger& logger,
         PABotBase2::Connection& connection,
         ControllerType controller_type

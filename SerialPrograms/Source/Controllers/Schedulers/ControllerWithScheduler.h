@@ -21,14 +21,14 @@ namespace PokemonAutomation{
 
 class ControllerWithScheduler{
 public:
-    ControllerWithScheduler(Logger& logger)
+    ControllerWithScheduler(
+        Logger& logger,
+        RecursiveThrottler& logging_throttler
+    )
         : m_logger(logger)
+        , m_logging_throttler(logging_throttler)
         , m_scheduler(logger, Milliseconds(4))
     {}
-
-    RecursiveThrottler& logging_throttler(){
-        return m_logging_throttler;
-    }
 
 
 public:
@@ -84,7 +84,7 @@ protected:
 protected:
     Logger& m_logger;
 //    std::atomic<size_t> m_logging_suppress;
-    RecursiveThrottler m_logging_throttler;
+    RecursiveThrottler& m_logging_throttler;
 
     SuperscalarScheduler m_scheduler;
 

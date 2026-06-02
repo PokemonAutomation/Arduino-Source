@@ -41,7 +41,7 @@ void WildEncounterReader::make_overlays(VideoOverlaySet& items) const {
 PokemonFRLG_WildEncounter WildEncounterReader::read_encounter(
     Logger& logger, Language language,
     const ImageViewRGB32& frame, 
-    std::set<std::string>& subset,
+    const std::set<std::string>& subset,
     double max_log10p
 ){
     const bool jpn = language == Language::Japanese;

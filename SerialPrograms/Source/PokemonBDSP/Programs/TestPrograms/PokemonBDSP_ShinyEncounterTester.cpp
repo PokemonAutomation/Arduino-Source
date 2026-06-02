@@ -55,11 +55,11 @@ ShinyEncounterTester::ShinyEncounterTester()
 }
 
 
-void ShinyEncounterTester::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void ShinyEncounterTester::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     DoublesShinyDetection result_wild;
     ShinyDetectionResult result_own;
     detect_shiny_battle(
-        env, env.console, context,
+        env, env.console, scope,
         result_wild, result_own,
         NOTIFICATION_ERROR_RECOVERABLE,
         ENCOUNTER_TYPE == BattleType::STARTER ? YOUR_POKEMON : WILD_POKEMON,

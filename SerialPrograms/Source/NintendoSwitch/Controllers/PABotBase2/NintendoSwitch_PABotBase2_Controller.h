@@ -19,9 +19,10 @@ class PABotBase2_Controller : public ControllerWithScheduler{
 public:
     PABotBase2_Controller(
         Logger& logger,
+        RecursiveThrottler& logging_throttler,
         PABotBase2::Connection& connection
     )
-        : ControllerWithScheduler(logger)
+        : ControllerWithScheduler(logger, logging_throttler)
         , m_connection(connection)
     {}
 

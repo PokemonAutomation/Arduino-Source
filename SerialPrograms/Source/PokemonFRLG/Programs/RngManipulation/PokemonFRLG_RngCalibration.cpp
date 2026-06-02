@@ -37,21 +37,13 @@ void check_seed_validity(ConsoleHandle& console, std::string seed_string){
     };
 
     if (seed_string.size() != 4){
-        OperationFailedException::fire(
-            ErrorReport::NO_ERROR_REPORT,
-            "GiftRng(): Invalid seed length. Seeds should be 4 characters.",
-            console
-        ); 
+        throw UserSetupError(console, "Invalid seed length. Seeds should be 4 characters.");
     }
 
     for (char ch : seed_string){
         auto iter = MAP.find(ch);
         if (iter == MAP.end()){
-            OperationFailedException::fire(
-                ErrorReport::NO_ERROR_REPORT,
-                "GiftRng(): Invalid seed character. Seeds should be hex strings (valid characters are 0-9 and A-F).",
-                console
-            ); 
+            throw UserSetupError(console, "Invalid seed character. Seeds should be valid hex strings (valid characters are 0-9 and A-F");
         }
     }
 }
@@ -82,6 +74,16 @@ int16_t seed_position_in_list(uint16_t seed, std::vector<uint16_t> list){
     return -1;
 }
 
+std::string to_hex_string(const uint16_t& val){
+    std::ostringstream s;
+    s << std::hex << val;
+    return s.str();
+}
+std::string to_hex_string(const uint32_t& val){
+    std::ostringstream s;
+    s << std::hex << val;
+    return s.str();
+}
 
 RngTimings prepare_timings(
     ConsoleHandle& console,
@@ -96,11 +98,7 @@ RngTimings prepare_timings(
 ){
     double modified_ingame_advances = INGAME_ADVANCES + calibrations.ingame_offset + FIXED_ADVANCES_OFFSET;
     if (modified_ingame_advances < 0) {
-        OperationFailedException::fire(
-            ErrorReport::NO_ERROR_REPORT,
-            "In-game advances cannot be negative. Check your in-game advances and calibration.",
-            console
-        ); 
+        throw UserSetupError(console, "In-game advances cannot be negative. Check your in-game advances and calibration.");
     }
 
     bool safari_zone = (
@@ -121,12 +119,21 @@ RngTimings prepare_timings(
         TEACHY_ADVANCES = uint64_t((int)std::floor((modified_ingame_advances - TEACHY_TV_BUFFER + 7500) / 313) * 313);
     }
 
+<<<<<<< HEAD
     double seed_delay = SEED_DELAY + calibrations.seed_offset + FIXED_SEED_OFFSET;
+=======
+    console.log("Seed calibration (frames): " + std::to_string(calibrations.seed_offset));
+    console.log("CSF calibration (frames): " + std::to_string(calibrations.csf_offset));
+    console.log("In-game calibration (frames x2): " + std::to_string(calibrations.ingame_offset));
+
+    double seed_delay = SEED_DELAY + (calibrations.seed_offset * FRLG_FRAME_DURATION) + FIXED_SEED_OFFSET;
+>>>>>>> main
     double csf_delay = (CONTINUE_SCREEN_FRAMES + calibrations.csf_offset) * FRLG_FRAME_DURATION;
     double teachy_delay = TEACHY_ADVANCES * FRLG_FRAME_DURATION / 313;
     double ingame_delay = (modified_ingame_advances - TEACHY_ADVANCES) * FRLG_FRAME_DURATION / 2 - (should_use_teachy_tv ? 14067 : 0);
 
     if (seed_delay < 0){
+<<<<<<< HEAD
         OperationFailedException::fire(
             ErrorReport::NO_ERROR_REPORT,
             "prepare_timings(): seed delay cannot be negative. Check your calibration values.",
@@ -153,6 +160,18 @@ RngTimings prepare_timings(
             "prepare_timings(): in-game duration cannot be negative. Check your calibration values.",
             console
         ); 
+=======
+        throw UserSetupError(console, "prepare_timings(): seed delay cannot be negative. Check your calibration values.");
+    }
+        if (csf_delay < 0){
+        throw UserSetupError(console, "prepare_timings(): CSF duration cannot be negative. Check your calibration values.");
+    }
+        if (teachy_delay < 0){
+        throw UserSetupError(console, "prepare_timings(): Teachy TV duration cannot be negative. Check your calibration values.");
+    }
+    if (ingame_delay < 0){
+        throw UserSetupError(console, "prepare_timings(): in-game duration cannot be negative. Check your calibration values.");
+>>>>>>> main
     }
 
     RngTimings timings;
@@ -404,14 +423,12 @@ RngCalibrations get_calibrations(
     const int16_t& seed_position,
     const uint64_t& advances
 ){
-    RngCalibrations calibrations;
+    RngCalibrations calibrations{};
 
     if (history.results.size() > 0){
         calibrations.seed_offset = get_seed_calibration_frames(history, seed_values, seed_position);
         calibrations.ingame_offset = get_advances_calibration_frames(history, advances);
-    }
-        
-    if (history.results.size() > 0){
+
         AdvRngState prev_hit = history.results.back();
         double prev_csf_offset = history.calibrations.back().csf_offset;
         int64_t prev_advance_miss = int64_t(prev_hit.advance) - int64_t(advances);
@@ -430,7 +447,7 @@ RngCalibrations get_calibrations(
 
     console.log("Seed calibration (frames): " + std::to_string(calibrations.seed_offset));
     console.log("Continue screen adjustment (frames): " + std::to_string(calibrations.csf_offset));
-    console.log("Advance calibration (frames / 2): " + std::to_string(calibrations.ingame_offset));
+    console.log("Advance calibration (frames x2): " + std::to_string(calibrations.ingame_offset));
     return calibrations;
 }
 
@@ -456,6 +473,7 @@ bool update_history(
     }
 
     if (search_hits.size() == 1){
+        console.log("Hit " + to_hex_string(search_hits[0].seed) + " / " + std::to_string(search_hits[0].advance));
         console.log("Updating calibrations...");
         calibration_history.calibrations.emplace_back(calibrations);
         calibration_history.results.emplace_back(search_hits[0]);
@@ -529,7 +547,7 @@ bool update_history(
         }
         calibration_history.calibrations.emplace_back(calibrations);
         calibration_history.results.emplace_back(most_likely_hit);
-        console.log("   " + std::to_string(most_likely_hit.seed) + " / " + std::to_string(most_likely_hit.advance));
+        console.log("   " + to_hex_string(most_likely_hit.seed) + " / " + std::to_string(most_likely_hit.advance));
     }
 
 

@@ -66,7 +66,7 @@ jobs:
         sudo apt upgrade
         sudo apt install clang-tools libopencv-dev libsystemd-dev
 
-        sudo apt install ./3rdPartyBinaries/libdpp-10.0.28-linux-x64.deb
+        sudo apt install ./3rdPartyBinaries/libdpp-10.1.5-linux-x64.deb
 
     - name: Install dependencies (Mac)
       if: startsWith(inputs.os, 'mac')
@@ -77,8 +77,8 @@ jobs:
         brew tap-new --no-git PA/libdpp
         FORMULA_DIR="$(brew --repo PA/libdpp)/Formula"
         mkdir -p "$FORMULA_DIR"
-        cp 3rdPartyBinaries/libdpp@10.0.28.rb "$FORMULA_DIR/"
-        brew install libdpp@10.0.28
+        cp 3rdPartyBinaries/libdpp@10.1.5.rb "$FORMULA_DIR/"
+        brew install libdpp@10.1.5
 
     - name: Generate binaries
       run: |

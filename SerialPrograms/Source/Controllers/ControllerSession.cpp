@@ -344,7 +344,6 @@ void ControllerSession::post_connection_ready(ControllerConnection& connection){
     ControllerType current_controller = ControllerType::None;
 
     ControllerType desired_controller;
-    ControllerResetMode reset_mode;
 
     std::unique_ptr<AbstractController> controller;
 
@@ -367,8 +366,6 @@ void ControllerSession::post_connection_ready(ControllerConnection& connection){
             desired_controller = m_connection->current_controller();
         }
 
-        reset_mode = m_next_reset_mode;
-
         supported_controllers = m_connection->controller_list();
         current_controller = m_connection->current_controller();
     }
@@ -379,8 +376,7 @@ void ControllerSession::post_connection_ready(ControllerConnection& connection){
         controller = m_descriptor->make_controller(
             m_logger,
             connection,
-            desired_controller,
-            reset_mode
+            desired_controller
         );
     }
 

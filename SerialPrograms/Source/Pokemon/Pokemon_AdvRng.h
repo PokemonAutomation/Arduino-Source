@@ -219,9 +219,10 @@ class AdvRngSearcher{
 public:
     uint16_t seed;
     AdvRngState state;
+    bool roaming;
 
-    AdvRngSearcher(uint16_t seed, AdvRngState state);
-    AdvRngSearcher(uint16_t seed, uint64_t min_advances, AdvRngMethod method = AdvRngMethod::Method1);
+    AdvRngSearcher(uint16_t seed, AdvRngState state, bool roaming = false);
+    AdvRngSearcher(uint16_t seed, uint64_t min_advances, AdvRngMethod method = AdvRngMethod::Method1, bool roaming = false);
 
     void set_seed(uint16_t seed);
     void set_state_advances(uint64_t advances);

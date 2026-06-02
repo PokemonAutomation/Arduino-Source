@@ -14,6 +14,7 @@
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "PokemonFRLG_RngCalibration.h"
 #include "Pokemon/Pokemon_AdvRng.h"
 
 
@@ -37,6 +38,25 @@ public:
     TextEditOption sids;
 };
 
+class RngTargetDisplay : public StringOption{
+public:
+    RngTargetDisplay()
+        : StringOption(
+            false,
+            "<b>Target Details:</b>",
+            LockMode::READ_ONLY,
+            "-", ""
+        )
+    {}
+
+    void set_target(const AdvPokemonResult& pokemon, const int16_t& gender_threshold);
+    void set_target(const AdvWildPokemonResult& pokemon, const int16_t& gender_threshold);
+
+private:
+    std::string result_to_string(const AdvPokemonResult& pokemon, const int16_t& gender_threshold);
+    std::string result_to_string(const AdvWildPokemonResult& pokemon, const int16_t& gender_threshold);
+};
+
 class RngFilterDisplay : public GroupOption{
 public:
     RngFilterDisplay();
@@ -48,14 +68,16 @@ private:
     static std::string get_range_string(const IvRange& range);
 
 public:
+    StringOption species;
+    StringOption gender;
+    StringOption nature;
+    StringOption level;
     StringOption hp;
     StringOption atk;
     StringOption def;
     StringOption spatk;
     StringOption spdef;
     StringOption speed;
-    StringOption gender;
-    StringOption nature;
 };
 
 
@@ -63,17 +85,12 @@ class RngCalibrationDisplay : public GroupOption{
 public:
     RngCalibrationDisplay();
 
-    void set(
-        double s_calibraiton, 
-        double c_calibration, 
-        double a_calibration, 
-        std::vector<AdvRngState>& rng_states
-    );
-    void reset();
+    void set_calibrations(const RngCalibrations& calibrations);
+    void set_hits(const std::vector<AdvRngState>& rng_states);
+    void reset_hits();
 
 private:
     static std::string get_hits_string(const std::vector<AdvRngState>& rng_states);
-    static std::string get_hits_string(const std::map<AdvRngState, AdvPokemonResult>& hits_map);
 public:
     SimpleIntegerOption<int64_t> seed_calibration;
     FloatingPointOption csf_calibration;

@@ -147,6 +147,7 @@
 #include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2FW_ReliableStreamConnection.h"
 #include "Common/Cpp/StreamConnections/MockDevice.h"
 #include "CommonTools/Random.h"
+#include "CommonTools/OCR/OCR_TextMatcher.h"
 
 
 //#include <opencv2/core.hpp>
@@ -321,7 +322,7 @@ void stress_test(Logger& logger, CancellableScope& scope){
     );
 
     //  Connect
-    connection.reset(true);
+    connection.reset();
     connection.send_request(PABB2_CONNECTION_OPCODE_ASK_VERSION);
     connection.wait_for_pending();
     connection.send_request(PABB2_CONNECTION_OPCODE_ASK_PACKET_SIZE);
@@ -383,6 +384,10 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 //    cout << random_u32(100, 115) << endl;
 
+
+    cout << OCR::random_match_probability(10, 1, 0.5) << endl;
+
+
 #if 0
     ImageRGB32 image(IMAGE_PATH);
     ImageFloatBox num_sunflora_box = {0.27, 0.02, 0.04, 0.055};
@@ -419,7 +424,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 #endif
 
-#if 1
+#if 0
     stress_test(logger, scope);
 #endif
 

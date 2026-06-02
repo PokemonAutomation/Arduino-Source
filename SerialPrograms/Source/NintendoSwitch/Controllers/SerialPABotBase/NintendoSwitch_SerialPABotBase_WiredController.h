@@ -31,17 +31,13 @@ public:
     SerialPABotBase_WiredController(
         Logger& logger,
         SerialPABotBase::SerialPABotBase_Connection& connection,
-        ControllerType controller_type,
-        ControllerResetMode reset_mode
+        ControllerType controller_type
     );
     ~SerialPABotBase_WiredController();
     void stop();
 
     virtual Logger& logger() override{
         return m_logger;
-    }
-    virtual RecursiveThrottler& logging_throttler() override{
-        return m_logging_throttler;
     }
     virtual bool is_ready() const override{
         return SerialPABotBase_Controller::is_ready();

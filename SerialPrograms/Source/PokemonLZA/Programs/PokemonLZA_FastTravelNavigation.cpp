@@ -384,7 +384,7 @@ bool set_fast_travel_menu_filter_routine(
         for (; delta > 0; delta--){
             pbf_press_dpad(context, DPAD_DOWN, 100ms, 200ms);
         }
-        for (; delta < 0; delta--){
+        for (; delta < 0; delta++){
             pbf_press_dpad(context, DPAD_UP, 100ms, 200ms);
         }
         context.wait_for_all_requests();

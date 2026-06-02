@@ -81,7 +81,8 @@ public:
         size_t min_switches,
         size_t max_switches,
         size_t default_switches,
-        bool deprecated = false
+        bool deprecated = false,
+        std::vector<std::string> required_resources = {}
     );
 
     ProgramControllerClass color_class() const{ return m_color_class; }

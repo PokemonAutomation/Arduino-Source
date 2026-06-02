@@ -179,11 +179,11 @@ private:
 
 
 
-void BoxDraw::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void BoxDraw::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
 //    update_individual_coordinates();
     DrawnBox drawn_box(*this, env.console.overlay());
     drawn_box.on_config_value_changed(this);
-    context.wait_until_cancel();
+    scope.wait_until_cancel();
 }
 
 

@@ -83,9 +83,12 @@ AdvAbility ability_from_pid(uint32_t& pid){
     return AdvAbility (pid % 2);
 }
 
-AdvIvGroup iv_group_from_state(uint32_t& state){
+AdvIvGroup iv_group_from_state(uint32_t& state, bool roaming = false){
     AdvIvGroup ivgroup;
     uint32_t remainingbits = state >> 16;
+    if (roaming){
+        remainingbits = remainingbits & 0xff;
+    }
 
     ivgroup.iv0 = remainingbits & 0x1f;
     remainingbits = remainingbits >> 5;
@@ -96,27 +99,33 @@ AdvIvGroup iv_group_from_state(uint32_t& state){
     return ivgroup;
 }
 
-AdvPokemonResult pokemon_from_state(AdvRngState& state, uint32_t pid, AdvNature nature){
+AdvPokemonResult pokemon_from_state(AdvRngState& state, uint32_t pid, AdvNature nature, bool roaming = false){
     uint8_t gender = gender_value_from_pid(pid);
     AdvAbility ability = ability_from_pid(pid);
 
     AdvIvGroup ivgroup1;
     AdvIvGroup ivgroup2;
-    switch(state.method){
 
-    case AdvRngMethod::Method2:
-        ivgroup1 = iv_group_from_state(state.s3);
-        ivgroup2 = iv_group_from_state(state.s4);
-        break;
-    case AdvRngMethod::Method4:
-        ivgroup1 = iv_group_from_state(state.s2);
-        ivgroup2 = iv_group_from_state(state.s4);
-        break;
-    case AdvRngMethod::Method1:
-    default:
-        ivgroup1 = iv_group_from_state(state.s2);
-        ivgroup2 = iv_group_from_state(state.s3);
-        break;
+    if (roaming){
+        ivgroup1 = iv_group_from_state(state.s2, roaming);
+        ivgroup2 = { 0, 0, 0 };
+    }else{
+        switch(state.method){
+
+        case AdvRngMethod::Method2:
+            ivgroup1 = iv_group_from_state(state.s3);
+            ivgroup2 = iv_group_from_state(state.s4);
+            break;
+        case AdvRngMethod::Method4:
+            ivgroup1 = iv_group_from_state(state.s2);
+            ivgroup2 = iv_group_from_state(state.s4);
+            break;
+        case AdvRngMethod::Method1:
+        default:
+            ivgroup1 = iv_group_from_state(state.s2);
+            ivgroup2 = iv_group_from_state(state.s3);
+            break;
+        }
     }
 
     AdvIVs ivs;
@@ -130,10 +139,10 @@ AdvPokemonResult pokemon_from_state(AdvRngState& state, uint32_t pid, AdvNature 
     return {pid, gender, nature, ability, ivs};
 }
 
-AdvPokemonResult pokemon_from_state(AdvRngState& state){
+AdvPokemonResult pokemon_from_state(AdvRngState& state, bool roaming = false){
     uint32_t pid = pid_from_states(state.s0, state.s1);
     AdvNature nature = nature_from_pid(pid);
-    return pokemon_from_state(state, pid, nature);
+    return pokemon_from_state(state, pid, nature, roaming);
 }
 
 AdvPokemonResult reroll_wild_pokemon(uint8_t nature, uint16_t seed, uint64_t advances, uint32_t state, AdvRngMethod method){
@@ -414,20 +423,6 @@ bool check_for_match(AdvWildPokemonResult res, AdvRngFilters target, int16_t gen
         && ((target.ivs.speed.low <= res.ivs.speed) && (target.ivs.speed.high >= res.ivs.speed));
 }
 
-// bool check_for_match(AdvEggResult res, AdvRngFilters target, int16_t gender_threshold, AdvIVs parentA_ivs, AdvIVs parentB_ivs, uint16_t tid_xor_sid){
-//     AdvIVs final_ivs = apply_inherited_ivs(res.ivs, res.inherited_ivs, parentA_ivs, parentB_ivs);
-//     return (target.nature == AdvNature::Any || (res.nature == target.nature))
-//         && (target.ability == AdvAbility::Any || (res.ability == target.ability))
-//         && (target.gender == AdvGender::Any || (gender_from_gender_value(res.gender, gender_threshold) == target.gender))
-//         && (target.shiny == AdvShinyType::Any || (shiny_type_from_pid(res.pid, tid_xor_sid) == target.shiny))
-//         && ((target.ivs.hp.low <= final_ivs.hp) && (target.ivs.hp.high >= final_ivs.hp))
-//         && ((target.ivs.attack.low <= final_ivs.attack) && (target.ivs.attack.high >= final_ivs.attack))
-//         && ((target.ivs.defense.low <= final_ivs.defense) && (target.ivs.defense.high >= final_ivs.defense))
-//         && ((target.ivs.spatk.low <= final_ivs.spatk) && (target.ivs.spatk.high >= final_ivs.spatk))
-//         && ((target.ivs.spdef.low <= final_ivs.spdef) && (target.ivs.spdef.high >= final_ivs.spdef))
-//         && ((target.ivs.speed.low <= final_ivs.speed) && (target.ivs.speed.high >= final_ivs.speed));
-// }
-
 Pokemon::NatureAdjustments nature_to_adjustment(AdvNature nature){
     NatureAdjustments ret;
     ret.attack = NatureAdjustment::NEUTRAL;
@@ -664,23 +659,25 @@ AdvRngFilters observation_to_filters(const AdvObservedPokemon& observation, cons
 std::string gender_to_string(const AdvGender& gender){
     switch (gender){
     case AdvGender::Male:
-        return "Male";
+        return "\u2642";
     case AdvGender::Female:
-        return "Female";
+        return "\u2640";
     default:
-        return "Any";
+        return "-";
     }
 }
 
 
-AdvRngSearcher::AdvRngSearcher(uint16_t seed, AdvRngState state)
+AdvRngSearcher::AdvRngSearcher(uint16_t seed, AdvRngState state, bool roaming)
     : seed(seed)
     , state(state)
+    , roaming(roaming)
 {}
 
-AdvRngSearcher::AdvRngSearcher(uint16_t seed, uint64_t min_advances, AdvRngMethod method)
+AdvRngSearcher::AdvRngSearcher(uint16_t seed, uint64_t min_advances, AdvRngMethod method, bool roaming)
     : seed(seed)
     , state(rngstate_from_seed(seed, min_advances, method))
+    , roaming(roaming)
 {}
 
 void AdvRngSearcher::advance_state(){
@@ -697,7 +694,7 @@ void AdvRngSearcher::set_state_advances(uint64_t advances){
 }
 
 AdvPokemonResult AdvRngSearcher::generate_pokemon(){
-    return pokemon_from_state(state);
+    return pokemon_from_state(state, roaming);
 }
 
 void AdvRngSearcher::search_advance_range(
@@ -732,7 +729,7 @@ void AdvRngSearcher::search_advance_range(
         }
 
         for (uint64_t a=min_advances; a<max_advances; a++){
-            AdvPokemonResult res = pokemon_from_state(state);
+            AdvPokemonResult res = pokemon_from_state(state, roaming);
             bool match = check_for_match(res, target, gender_threshold, tid_xor_sid);
             if (match){
                hits.emplace_back(state);

@@ -4,6 +4,7 @@
  * 
  */
 
+#include "Common/Cpp/Exceptions.h"
 //#include "CommonFramework/VideoPipeline/VideoFeed.h"
 //#include "Controllers/ControllerTypes.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"

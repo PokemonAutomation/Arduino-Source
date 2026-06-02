@@ -44,9 +44,9 @@ ShinyEncounterTester::ShinyEncounterTester()
 }
 
 
-void ShinyEncounterTester::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void ShinyEncounterTester::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     ShinyDetectionResult result = detect_shiny_battle(
-        env.console, context,
+        env.console, scope,
         ENCOUNTER_TYPE == EncounterType::Wild ? SHINY_BATTLE_REGULAR : SHINY_BATTLE_RAID,
         std::chrono::seconds(30)
     );

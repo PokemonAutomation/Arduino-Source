@@ -208,9 +208,6 @@ public:
     virtual Logger& logger() override{
         return m_logger;
     }
-    virtual RecursiveThrottler& logging_throttler() override{
-        return m_logging_throttler;
-    }
     virtual bool is_ready() const override{
         return m_connection.is_ready();
     }

@@ -81,6 +81,7 @@ SerialPABotBase_Connection::SerialPABotBase_Connection(
                 PABB_BAUD_RATE
             )
         );
+        connection->set_control_state(true, false);
         m_botbase.reset(
             new PABotBase(
                 m_logger,

@@ -43,12 +43,10 @@ public:
     );
     ~ReliableStreamConnection();
 
-    virtual void stop() override{
-        cancel(nullptr);
-    }
+    virtual void stop() noexcept override;
     virtual bool cancel(std::exception_ptr exception) noexcept override;
 
-    bool reset(bool random_session_id, WallDuration timeout = WallDuration::max());
+    bool reset(WallDuration timeout = WallDuration::max());
 
     bool remote_protocol_is_compatible() const{
         return m_remote_protocol_compatible;
@@ -71,7 +69,7 @@ public:
     void send_request(uint8_t opcode);
 
     void send_stream(const void* data, size_t bytes){
-        reliable_send_all_or_nothing(nullptr, data, bytes, WallDuration::max());
+        reliable_send_all_or_nothing(nullptr, data, bytes);
     }
 
 
@@ -89,17 +87,21 @@ private:
     //  Send
 
     void send_ack(uint8_t seqnum, uint8_t opcode);
-    void send_ack_u16(uint8_t seqnum, uint8_t opcode, uint16_t data);
+    void send_ack_u32(uint8_t seqnum, uint8_t opcode, uint32_t data);
 
     void retransmit_thread();
 
 
 private:
+    virtual void reliable_send_all_or_nothing(
+        Cancellable* cancellable,
+        const void* data, size_t bytes
+    ) override;
     virtual bool reliable_send_all_or_nothing(
         Cancellable* cancellable,
         const void* data, size_t bytes,
         WallDuration timeout
-    ) noexcept override;
+    ) override;
     virtual void on_recv(const void* data, size_t bytes) override;
     virtual size_t unreliable_send(const void* data, size_t bytes) noexcept override;
 

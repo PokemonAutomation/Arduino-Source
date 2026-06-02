@@ -8,7 +8,6 @@
 #define PokemonAutomation_NintendoSwitch_ConsoleHandle_H
 
 #include <memory>
-#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "Controllers/Controller.h"
 #include "NintendoSwitch_ConsoleState.h"

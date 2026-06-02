@@ -17,6 +17,7 @@
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_PartyHeldItemDetector.h"
+#include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_BattleSelectionArrowDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_PokedexRegisteredDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.h"
@@ -128,7 +129,7 @@ bool LuckyEggFarmer::navigate_to_chansey(ConsoleHandle& console, ProControllerCo
             pbf_press_dpad(context, DPAD_UP, 100ms, 0ms);
             pbf_press_dpad(context, DPAD_RIGHT, 1966ms, 0ms);
             pbf_press_dpad(context, DPAD_UP, 1800ms, 0ms);
-            pbf_press_dpad(context, DPAD_RIGHT, 450ms, 0ms);
+            pbf_press_dpad(context, DPAD_RIGHT, 600ms, 0ms);
             pbf_wait(context, 1000ms);
         },
         { zone_exit }
@@ -150,8 +151,29 @@ bool LuckyEggFarmer::navigate_to_chansey(ConsoleHandle& console, ProControllerCo
     );
 
     if (ret != 0){
-        console.log("Failed to detect overworld after first zone transition.");
-        return false;
+        pbf_wait(context, 1000ms);
+        context.wait_for_all_requests();
+
+        console.log("Failed to detect overworld after first zone transition. Attempting to open Start menu as a secondary check.");
+        StartMenuWatcher start_menu(COLOR_RED);
+
+        context.wait_for_all_requests();
+        ret = run_until<ProControllerContext>(
+            console, context,
+            [](ProControllerContext& context){
+                pbf_press_button(context, BUTTON_PLUS, 200ms, 1800ms);
+            },
+            { start_menu }
+        );
+
+        if (ret != 0){
+            console.log("Failed to open Start menu.");
+            context.wait_for_all_requests();
+            pbf_mash_button(context, BUTTON_B, 1000ms);
+            return false;
+        }
+
+        pbf_mash_button(context, BUTTON_B, 1000ms);
     }
 
     console.log("Exiting first zone...");
@@ -177,7 +199,7 @@ bool LuckyEggFarmer::navigate_to_chansey(ConsoleHandle& console, ProControllerCo
             pbf_press_dpad(context, DPAD_UP, 675ms, 0ms);
             pbf_press_dpad(context, DPAD_LEFT, 2000ms, 0ms);
             pbf_press_dpad(context, DPAD_DOWN, 130ms, 0ms);
-            pbf_press_dpad(context, DPAD_LEFT, 3000ms, 0ms);
+            pbf_press_dpad(context, DPAD_LEFT, 3300ms, 0ms);
         },
         { zone_exit }
     );
@@ -196,8 +218,29 @@ bool LuckyEggFarmer::navigate_to_chansey(ConsoleHandle& console, ProControllerCo
     );
 
     if (ret != 0){
-        console.log("Failed to detect overworld after second zone transition.");
-        return false;
+        pbf_wait(context, 1000ms);
+        context.wait_for_all_requests();
+
+        console.log("Failed to detect overworld after second zone transition. Attempting to open Start menu as a secondary check.");
+        StartMenuWatcher start_menu(COLOR_RED);
+
+        context.wait_for_all_requests();
+        ret = run_until<ProControllerContext>(
+            console, context,
+            [](ProControllerContext& context){
+                pbf_press_button(context, BUTTON_PLUS, 200ms, 1800ms);
+            },
+            { start_menu }
+        );
+
+        if (ret != 0){
+            console.log("Failed to open Start menu.");
+            context.wait_for_all_requests();
+            pbf_mash_button(context, BUTTON_B, 1000ms);
+            return false;
+        }
+
+        pbf_mash_button(context, BUTTON_B, 1000ms);
     }
 
     console.log("Exiting second zone...");

@@ -29,6 +29,7 @@
 #include "PokemonHome/Inference/PokemonHome_BallReader.h"
 #include "PokemonHome/Inference/PokemonHome_BoxGenderDetector.h"
 #include "PokemonHome/Inference/PokemonHome_GigantamaxDetector.h"
+#include "PokemonHome/Inference/PokemonHome_OriginMarkReader.h"
 #include "PokemonHome/Inference/PokemonHome_TeraTypeReader.h"
 #include "PokemonHome_BoxNavigation.h"
 
@@ -229,7 +230,7 @@ void read_summary_screen(
     ImageFloatBox national_dex_number_box(0.448, 0.245, 0.049, 0.04); //pokemon national dex number pos
     ImageFloatBox shiny_symbol_box(0.702, 0.09, 0.04, 0.06); // shiny symbol pos
     ImageFloatBox gmax_tera_symbol_box(0.463, 0.09, 0.04, 0.06); // gmax OR tera symbol pos
-    ImageFloatBox origin_symbol_box(0.623, 0.095, 0.033, 0.05); // origin symbol pos
+    ImageFloatBox origin_symbol_box(0.617, 0.084, 0.044, 0.069); // origin symbol pos
     ImageFloatBox pokemon_box(0.69, 0.18, 0.28, 0.46); // pokemon render pos
     ImageFloatBox level_box(0.546, 0.099, 0.044, 0.041); // Level
     ImageFloatBox ot_id_box(0.782, 0.719, 0.193, 0.046); // OT ID
@@ -332,6 +333,8 @@ void read_summary_screen(
         env.log("Normalized trainer name: " + normalized);
         cur_pokemon_info.ot_name = normalized;
     }
+
+    cur_pokemon_info.origin_mark = OriginMarkReader().read_mark(screen, origin_symbol_box);
 
     env.add_overlay_log(create_overlay_info(cur_pokemon_info));
     video_overlay_set.clear();

@@ -2,7 +2,6 @@
 #ifndef DPP_HANDLER_H
 #define DPP_HANDLER_H
 
-#include <dpp/dpp.h>
 #include <Integrations/DppIntegration/DppUtility.h>
 #include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
 #include "CommonFramework/Notifications/MessageAttachment.h"

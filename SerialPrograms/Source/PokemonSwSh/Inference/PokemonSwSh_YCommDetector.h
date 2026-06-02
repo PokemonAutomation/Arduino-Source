@@ -20,19 +20,23 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class YCommMenuDetector : public VisualInferenceCallback{
+class YCommMenuDetector : public StaticScreenDetector{
 public:
     YCommMenuDetector(bool is_on);
 
-    bool detect(const ImageViewRGB32& screen);
-
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override final;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
     bool m_is_on;
     ImageFloatBox m_top;
     ImageFloatBox m_bottom;
+};
+class YCommMenuWatcher : public DetectorToFinder<YCommMenuDetector>{
+public:
+    YCommMenuWatcher(bool is_on)
+         : DetectorToFinder("YCommMenuWatcher", std::chrono::milliseconds(250), is_on)
+    {}
 };
 
 // Detect the blue Y letter as the Y Comm symbol in the lower left corner of the screen on the

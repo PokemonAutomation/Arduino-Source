@@ -180,7 +180,11 @@ class GlobalSettings_Descriptor : public PanelDescriptor{
 public:
     GlobalSettings_Descriptor();
 public:
-    static PanelDescriptorWrapper<GlobalSettings_Descriptor, GlobalSettingsPanel> INSTANCE;
+    using Wrapper = PanelDescriptorWrapper<GlobalSettings_Descriptor, GlobalSettingsPanel>;
+    static Wrapper& instance(){
+        static Wrapper wrapper;
+        return wrapper;
+    }
 };
 
 

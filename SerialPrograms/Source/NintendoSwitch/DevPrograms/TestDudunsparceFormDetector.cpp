@@ -147,7 +147,7 @@ TestDudunsparceFormDetector_Descriptor::TestDudunsparceFormDetector_Descriptor()
 TestDudunsparceFormDetector::TestDudunsparceFormDetector(){}
 
 
-void TestDudunsparceFormDetector::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void TestDudunsparceFormDetector::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
 
     DudunsparceFormDetector detector(env.console.overlay());
 
@@ -162,15 +162,16 @@ void TestDudunsparceFormDetector::program(SingleSwitchProgramEnvironment& env, P
     // context.wait_until_cancel();
 
     std::string last_label = "";
-    run_until<ProControllerContext>(
-        env.console, context, [&](ProControllerContext& context){
+    run_until(
+        env.console, scope,
+        [&](CancellableScope& scope){
             while (true){
                 std::string cur_label = detector.get_label();
                 if (cur_label != last_label){
                     last_label = cur_label;
                     env.console.overlay().add_log("Detected " + last_label);
                 }
-                context.wait_for(std::chrono::milliseconds(100));
+                scope.wait_for(std::chrono::milliseconds(100));
             }
         },
         {detector},

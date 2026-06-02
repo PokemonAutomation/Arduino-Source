@@ -34,13 +34,13 @@ MountDetectionTest::MountDetectionTest(){
 }
 
 
-void MountDetectionTest::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void MountDetectionTest::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     MountTracker tracker(env.console, FAILED_ACTION);
     InferenceSession session(
-        context, env.console,
+        scope, env.console,
         {{tracker, std::chrono::seconds(1)}}
     );
-    context.wait_until_cancel();
+    scope.wait_until_cancel();
 }
 
 

@@ -13,6 +13,7 @@
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "Controllers/NullController.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_SingleSwitchProgramOption.h"
 #include "NintendoSwitch_SingleSwitchProgramSession.h"
@@ -136,11 +137,6 @@ void SingleSwitchProgramSession::internal_stop_program(){
 void SingleSwitchProgramSession::internal_run_program(){
     m_option.options().reset_state();
 
-    if (!m_system.controller_session().ready()){
-        report_error("Cannot Start: The controller is not ready.");
-        return;
-    }
-
     SleepSuppressScope sleep_scope(GlobalSettings::instance().SLEEP_SUPPRESS->PROGRAM_RUNNING);
 
     ProgramInfo program_info(
@@ -149,7 +145,11 @@ void SingleSwitchProgramSession::internal_run_program(){
         m_option.descriptor().display_name(),
         timestamp()
     );
+    NullController null_controller(m_system.logger());
     AbstractController* controller = m_system.controller_session().controller();
+    if (controller == nullptr){
+        controller = &null_controller;
+    }
     ControllerContext<AbstractController> context(*controller);
     SingleSwitchProgramEnvironment env(
         program_info,

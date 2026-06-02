@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/ListenerSet.h"
+#include "Common/Cpp/RecursiveThrottler.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Controller.h"
 
@@ -15,6 +16,7 @@ namespace PokemonAutomation{
 
 
 struct AbstractController::Data{
+    RecursiveThrottler recursive_throttler;
     ListenerSet<InputSniffer> input_sniffers;
 };
 void AbstractController::add_input_sniffer(InputSniffer& listener){
@@ -34,6 +36,9 @@ AbstractController::AbstractController()
 AbstractController::~AbstractController() = default;
 
 
+RecursiveThrottler& AbstractController::logging_throttler(){
+    return m_data->recursive_throttler;
+}
 
 
 void AbstractController::throw_bad_cast(const char* desired_typename){

@@ -31,9 +31,23 @@
 namespace dpp {
 
 /**
+ * @brief Where an app can be installed, also called its supported installation contexts.
+ */
+enum application_integration_types : uint8_t {
+	/**
+	* @brief Installable to servers
+	*/
+	ait_guild_install = 0,
+	/**
+	* @brief Installable to users
+	*/
+	ait_user_install = 1,
+};
+
+/**
  * @brief Integration types
  */
-enum integration_type {
+enum integration_type : uint8_t {
 	/**
 	 * @brief Twitch integration
 	 */
@@ -58,7 +72,7 @@ enum integration_type {
 /**
  * @brief Integration flags
  */
-enum integration_flags {
+enum integration_flags : uint8_t {
 	/**
 	 * @brief Is this integration enabled?
 	 */
@@ -335,5 +349,5 @@ typedef std::unordered_map<snowflake, integration> integration_map;
  */
 typedef std::unordered_map<snowflake, connection> connection_map;
 
-} // namespace dpp
+}
 

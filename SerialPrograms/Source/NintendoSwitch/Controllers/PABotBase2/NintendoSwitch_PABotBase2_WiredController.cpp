@@ -27,7 +27,7 @@ PABotBase2_WiredController::PABotBase2_WiredController(
     PABotBase2::Connection& connection
 )
     : ProController(logger)
-    , PABotBase2_Controller(logger, connection)
+    , PABotBase2_Controller(logger, logging_throttler(), connection)
 {
     using namespace PABotBase2;
 

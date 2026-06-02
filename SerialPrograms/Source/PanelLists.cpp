@@ -58,9 +58,7 @@ ProgramSelect::ProgramSelect(QWidget& parent, PanelHolder& holder)
 
     add(std::make_unique<NintendoSwitch::PokemonLZA::PanelListFactory>());
     add(std::make_unique<NintendoSwitch::PokemonFRLG::PanelListFactory>());
-    if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
-        add(std::make_unique<NintendoSwitch::PokemonPokopia::PanelListFactory>());
-    }
+    add(std::make_unique<NintendoSwitch::PokemonPokopia::PanelListFactory>());
     if (PreloadSettings::instance().DEVELOPER_MODE){
         add(std::make_unique<NintendoSwitch::PokemonRSE::PanelListFactory>());
     }

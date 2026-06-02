@@ -51,7 +51,26 @@ std::unique_ptr<StatsTracker> RngHelper_Descriptor::make_stats() const{
 }
 
 RngHelper::RngHelper()
-    : TARGET(
+    : m_game_info(
+        "<font size=4><b>Game Information</b></font>"
+    )
+    , LANGUAGE(
+        "<b>Game Language:</b>",
+        {
+            Language::English,
+            Language::Japanese,
+            Language::Spanish,
+            Language::French,
+            Language::German,
+            Language::Italian,
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        true
+    )
+    , m_target_settings(
+        "<font size=4><b>Target Settings</b></font> — Get these from an RNG search tool"
+    )
+    , TARGET(
         "<b>Target:</b>",
         {
             {PokemonFRLG_RngTarget::starters, "starters", "Bulbasaur / Squirtle / Charmander"},
@@ -84,17 +103,11 @@ RngHelper::RngHelper()
             {PokemonFRLG_RngTarget::safarizonewest, "safarizonewest", "Safari Zone West (Sweet Scent)"},
             {PokemonFRLG_RngTarget::safarizonesurf, "safarizonesurf", "Safari Zone Surfing"},
             {PokemonFRLG_RngTarget::safarizonefish, "safarizonefish", "Safari Zone Fishing"},
-            // {PokemonFRLG_RngTarget::roaming, "roaming", "Roaming Legendaries"}
+            {PokemonFRLG_RngTarget::roaming, "roaming", "Roaming Legendaries"}
         },
         LockMode::LOCK_WHILE_RUNNING,
         PokemonFRLG_RngTarget::starters
     )    
-    , NUM_RESETS(
-        "<b>Max Resets:</b><br>"
-        "This program requires manual calibration, so this should usually be set to 1 while calibrating.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        1, 0 // default, min
-    )
     , SEED_BUTTON(
         "<b>Seed Button:</b><br>"
         "The button to be pressed on the title screen to set the seed.",
@@ -120,9 +133,10 @@ RngHelper::RngHelper()
     , SEED_DELAY(
         "<b>Seed Delay Time (ms):</b><br>"
         "The delay between starting the game and advancing past the title screen. Set this to match your target seed.<br>"
-        "<i>If using Ten Lines for seed info, select <b>Nintendo Switch 1</b> as your console even if using a Switch 2.</i>",
+        "<i>If using Ten Lines for seed info, select <b>Nintendo Switch 1</b> as your console even if using a Switch 2.</i><br>"
+        "<b><i>Warning: values close to 30500ms can sometimes cause problems, and you may need to increase your seed calibration or pick a new target.</i></b>",
         LockMode::LOCK_WHILE_RUNNING,
-        35000, 30400 // default, min
+        31338, 30400 // default, min
     )
     , SEED_CALIBRATION(
          "<b>Seed Calibration (ms):</b>"
@@ -136,7 +150,7 @@ RngHelper::RngHelper()
         "<br>The number of RNG advances before loading the game.<br>"
         "These pass at the \"normal\" rate compared to other consoles.",
         LockMode::LOCK_WHILE_RUNNING,
-        1000, 192 // default, min
+        200, 192 // default, min
     )
     , CONTINUE_SCREEN_CALIBRATION(
         "<b>Continue Screen Frames Calibration:</b>"
@@ -151,7 +165,7 @@ RngHelper::RngHelper()
         "These pass at double the rate compared to other consoles, where every frame results in 2 advances.<br>"
         "<i>Warning: this needs to be long enough to accomodate all in-game button presses prior to the gift/encounter</i>",
         LockMode::LOCK_WHILE_RUNNING,
-        12345, 320 // default, min
+        9800, 320 // default, min
     )
     , INGAME_CALIBRATION(
         "<b>In-Game Advances Calibration:</b>"
@@ -160,12 +174,21 @@ RngHelper::RngHelper()
         LockMode::UNLOCK_WHILE_RUNNING,
         0 // default
     )
+    , m_program_settings(
+        "<font size=4><b>Program Settings</b></font>"
+    )    
     , USE_TEACHY_TV(
         "<b>Use Teachy TV:</b>"
         "<br>Opens the Teachy TV to quickly advance the RNG at 313x speed.<br>"
         "<i>Warning: can result in larger misses.</i>",
         LockMode::LOCK_WHILE_RUNNING,
         false // default
+    )
+    , NUM_RESETS(
+        "<b>Max Resets:</b><br>"
+        "This program requires manual calibration, so this should usually be set to 1 while calibrating.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        1, 0 // default, min
     )
     , PROFILE(
         "<b>User Profile Position:</b><br>"
@@ -192,8 +215,10 @@ RngHelper::RngHelper()
         &NOTIFICATION_PROGRAM_FINISH,
     })
 {
+    PA_ADD_OPTION(m_game_info);
+    PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(m_target_settings);
     PA_ADD_OPTION(TARGET);
-    PA_ADD_OPTION(NUM_RESETS);
     PA_ADD_OPTION(SEED_BUTTON);
     PA_ADD_OPTION(EXTRA_BUTTON);
     PA_ADD_OPTION(SEED_DELAY);
@@ -202,7 +227,9 @@ RngHelper::RngHelper()
     PA_ADD_OPTION(CONTINUE_SCREEN_CALIBRATION);
     PA_ADD_OPTION(INGAME_ADVANCES);
     PA_ADD_OPTION(INGAME_CALIBRATION);
+    PA_ADD_OPTION(m_program_settings);
     PA_ADD_OPTION(USE_TEACHY_TV);
+    PA_ADD_OPTION(NUM_RESETS);
     PA_ADD_OPTION(PROFILE);
     PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -240,12 +267,22 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         || TARGET == PokemonFRLG_RngTarget::safarizonesurf
         || TARGET == PokemonFRLG_RngTarget::safarizonefish 
     );
+    
+    env.log("Target: " + std::to_string(TARGET.current_value()));
+    env.log("Seed Delay: " + std::to_string(SEED_DELAY) + "ms");
+    env.log("Continue Screen Frames: " + std::to_string(CONTINUE_SCREEN_FRAMES) + " frames");
+    env.log("In-game Advances: " + std::to_string(INGAME_ADVANCES) + " advances");
 
     const RngCalibrations CALIBRATIONS = {
         static_cast<double>(SEED_CALIBRATION),
         CONTINUE_SCREEN_CALIBRATION,
         INGAME_CALIBRATION
     };
+    env.log("Seed calibration (frames): " + std::to_string(CALIBRATIONS.seed_offset));
+    env.log("CSF calibration (frames): " + std::to_string(CALIBRATIONS.csf_offset));
+    env.log("In-game calibration (frames x2): " + std::to_string(CALIBRATIONS.ingame_offset));
+
+    Milliseconds launch_delay = INITIAL_LAUNCH_DELAY;
 
     while (!shiny_found){
         RngTimings timings = prepare_timings(
@@ -259,14 +296,14 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         reset_and_perform_blind_sequence(
             env.console, context, TARGET, 
             SEED_BUTTON, EXTRA_BUTTON, 
-            timings,
+            timings, launch_delay,
             SAFARI_ZONE, PROFILE
         );
         env.log("Blind button presses complete.");
         stats.resets++;
 
         // detect shinies
-        shiny_found = check_for_shiny(env.console, context, TARGET);
+        shiny_found = check_for_shiny(env.console, context, TARGET, LANGUAGE);
         if (shiny_found){
             env.log("Shiny found!");
             stats.shinies++;

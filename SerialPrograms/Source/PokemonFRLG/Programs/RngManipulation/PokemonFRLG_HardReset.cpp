@@ -29,13 +29,12 @@ namespace PokemonFRLG{
 
 void rng_reset_and_return_home(
     ConsoleHandle& console, ProControllerContext& context,
+    Milliseconds& launch_delay,
     uint8_t user_slot
 ){
     // close the game
     go_home(console, context);
     close_game_from_home(console, context);
-
-    Milliseconds launch_delay = 950ms;
 
     bool update_popup = false;
     WallClock deadline = current_time() + std::chrono::minutes(5);
@@ -159,7 +158,7 @@ void rng_reset_and_return_home(
                     return;
                 }else{
                     console.log("Detected Home screen, but no black screen. Trying again from the beginning...", COLOR_BLUE);
-                    launch_delay += 250ms; // bump this up in case it was too short
+                    launch_delay += 50ms; // bump this up in case it was too short
                     break; // back to the outer loop
                 }
                 return;
@@ -194,10 +193,11 @@ void reset_and_perform_blind_sequence(
     const SeedButton& seed_button,
     const BlackoutButton& extra_button,
     const RngTimings& timings,
+    Milliseconds& launch_delay,
     bool safari_zone,
     uint8_t profile
 ){
-    rng_reset_and_return_home(console, context, profile); 
+    rng_reset_and_return_home(console, context, launch_delay, profile); 
     ConsoleType console_type = console.state().console_type();
 
     // attempt to resume the game and perform the blind sequence

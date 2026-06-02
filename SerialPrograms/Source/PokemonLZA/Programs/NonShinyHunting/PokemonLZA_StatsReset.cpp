@@ -289,12 +289,14 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             for (int i = 0; i < 4; ++i){
                 pbf_press_button(context, BUTTON_Y, 100ms, 1s);
             }
+            context.wait_for_all_requests();
             run_towards_gate_with_A_button(env.console, context, 0, +1, Seconds(2));
             if (POKEMON == GiftPokemon::FLOETTE){
                 pbf_mash_button(context, BUTTON_A, 30s);
             }
             if (POKEMON == GiftPokemon::MAGEARNA){
                 pbf_mash_button(context, BUTTON_A, Seconds(2));
+                context.wait_for_all_requests();
                 wait_until_overworld(env.console, context, Seconds(10));
                 run_towards_gate_with_A_button(env.console, context, +0.15, +1, Seconds(3));
                 pbf_mash_button(context, BUTTON_A, 30s);

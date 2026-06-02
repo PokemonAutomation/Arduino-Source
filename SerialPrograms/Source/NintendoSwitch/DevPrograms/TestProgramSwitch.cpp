@@ -335,7 +335,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
     auto snapshot = feed.snapshot();
+    YCommMenuDetector detector(true);
+    detector.make_overlays(overlays);
+    cout << detector.detect(snapshot) << endl;
 
+#if 0
     SelectionArrowFinder arrow(overlay, {0.462377, 0.332039, 0.388222, 0.640777});
 
     cout << arrow.detect(snapshot) << endl;
@@ -344,6 +348,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     if (!arrows.empty()){
         cout << arrows[0].y << endl;
     }
+#endif
 
 //    WhiteDialogBoxDetector detector;
 //    detector.make_overlays(overlays);

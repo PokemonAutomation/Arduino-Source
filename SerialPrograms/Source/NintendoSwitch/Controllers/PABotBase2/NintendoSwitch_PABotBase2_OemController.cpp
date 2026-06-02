@@ -23,11 +23,12 @@ using namespace std::chrono_literals;
 
 PABotBase2_OemController::PABotBase2_OemController(
     Logger& logger,
+    RecursiveThrottler& logging_throttler,
     PABotBase2::Connection& connection,
     ControllerType controller_type,
     std::function<void(double magnitude)> on_rumble
 )
-    : PABotBase2_Controller(logger, connection)
+    : PABotBase2_Controller(logger, logging_throttler, connection)
     , m_controller_type(controller_type)
     , m_on_rumble(std::move(on_rumble))
     , m_player_number(ControllerPlayerNumber::UNKNOWN)
@@ -248,7 +249,7 @@ void PABotBase2_OemController::stop(){
 }
 
 
-void PABotBase2_OemController::run_preconnect_configure(
+bool PABotBase2_OemController::run_preconnect_configure(
     Logger& logger,
     PABotBase2::Connection& connection,
     ControllerType controller_type
@@ -336,7 +337,7 @@ void PABotBase2_OemController::run_preconnect_configure(
 
     connection.message_logger().log_send(logger, true, &message.request);
 
-    connection.device().connection().reliable_send_all_or_nothing(
+    return connection.device().connection().reliable_send_all_or_nothing(
         nullptr,
         &message,
         sizeof(Message),
