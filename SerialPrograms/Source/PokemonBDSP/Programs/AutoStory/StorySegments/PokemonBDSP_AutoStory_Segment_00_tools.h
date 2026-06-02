@@ -1,5 +1,6 @@
 #pragma once
 
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "PokemonBDSP_AutoStory_Segment_00.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 
@@ -54,10 +55,17 @@ namespace PokemonAutomation {
             // ---------------------------------------------------------------------------
 
             void catch_1_pokemon(
-                SingleSwitchProgramEnvironment& env,
                 VideoStream& stream,
                 ProControllerContext& context
             );
+
+            // Burst wiggle variant of catch_1_pokemon for testing.
+            // Commented out in the .cpp - uncomment both to enable.
+            // void catch_1_pokemon_v2(
+            //     SingleSwitchProgramEnvironment& env,
+            //     VideoStream& stream,
+            //     ProControllerContext& context
+            // );
 
             void use_potion_first_pokemon(
                 VideoStream& stream,
@@ -70,27 +78,32 @@ namespace PokemonAutomation {
 
             void walk_right_until_on_path(
                 VideoStream& stream,
-                ProControllerContext& context
+                ProControllerContext& context,
+                BattleType battle_type = BattleType::STANDARD
             );
 
             void walk_up_through_grass_2(
                 VideoStream& stream,
-                ProControllerContext& context
+                ProControllerContext& context,
+                BattleType battle_type = BattleType::STANDARD
             );
 
             void walk_right_through_grass_2(
                 VideoStream& stream,
-                ProControllerContext& context
+                ProControllerContext& context,
+                BattleType battle_type = BattleType::STANDARD
             );
 
             void walk_left_through_grass_3(
                 VideoStream& stream,
-                ProControllerContext& context
+                ProControllerContext& context,
+                BattleType battle_type = BattleType::STANDARD
             );
 
             void walk_up_through_grass_3(
                 VideoStream& stream,
-                ProControllerContext& context
+                ProControllerContext& context,
+                BattleType battle_type = BattleType::STANDARD
             );
             void walk_through_grass(
                 VideoStream& stream,
@@ -98,7 +111,8 @@ namespace PokemonAutomation {
                 int8_t x,
                 int8_t y,
                 size_t steps,
-                const std::string& direction_name
+                const std::string& direction_name,
+                BattleType battle_type = BattleType::STANDARD
             );
 			// ---------------------------------------------------------------------------
 			// Helper function to navigate the poketech challenge clown dialogue.
