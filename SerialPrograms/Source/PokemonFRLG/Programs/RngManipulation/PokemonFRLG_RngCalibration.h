@@ -22,12 +22,6 @@ using namespace Pokemon;
 static const double FRLG_FRAMERATE = 59.999977; // FPS
 static const double FRLG_FRAME_DURATION = 1000.0 / FRLG_FRAMERATE;
 
-
-struct RngAdvanceHistory{
-    std::vector<double> seed_calibrations;
-    std::vector<std::vector<AdvRngState>> results;
-};
-
 struct RngCalibrations{
     double seed_offset;
     double csf_offset;
@@ -40,6 +34,11 @@ struct RngCalibrations{
             && ingame_offset == other.ingame_offset
         );
     }
+};
+
+struct RngUncertainHistory{
+    std::vector<RngCalibrations> calibrations;
+    std::vector<std::vector<AdvRngState>> results;
 };
 
 struct RngCalibrationHistory{
@@ -149,7 +148,7 @@ RngCalibrations get_calibrations(
 // infer hit seeds/advances, update the calibration history, and return whether or not the search is finished
 bool update_history(
     ConsoleHandle& console,
-    RngAdvanceHistory& advance_history,
+    RngUncertainHistory& uncertain_history,
     RngCalibrationHistory& calibration_history, 
     const uint16_t& max_history_length,
     const RngCalibrations calibrations,

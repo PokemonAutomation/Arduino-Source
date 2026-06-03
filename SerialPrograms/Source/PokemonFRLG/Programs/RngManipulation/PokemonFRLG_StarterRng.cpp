@@ -636,7 +636,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
     Milliseconds launch_delay = INITIAL_LAUNCH_DELAY;
 
-    RngAdvanceHistory advance_history;
+    RngUncertainHistory uncertain_history;
     RngCalibrationHistory calibration_history; 
 
     bool wildshiny_found = false;
@@ -687,7 +687,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         }
 
         // if previous resets had uncertain advances, slightly modify the seed delay to try to hit a different target
-        double seed_bump = SEED_BUMPS[advance_history.results.size() % 5];
+        double seed_bump = SEED_BUMPS[uncertain_history.results.size() % 5];
         calibrations.seed_offset += seed_bump;
 
         uint64_t ingame_advances = ADVANCES - CONTINUE_SCREEN_FRAMES;
@@ -740,7 +740,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         std::vector<AdvRngState> search_hits = get_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, GENDER_THRESHOLD);
         RNG_CALIBRATION.set_hits(search_hits);        
         bool finished = update_history(
-            env.console, advance_history, calibration_history, 
+            env.console, uncertain_history, calibration_history, 
             MAX_HISTORY_LENGTH, calibrations, search_hits, 1
         );
         if (finished){
@@ -770,7 +770,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             RNG_CALIBRATION.set_hits(search_hits);        
             env.log("Number of search hits: " + std::to_string(search_hits.size()));
             finished = update_history(
-                env.console, advance_history, calibration_history, 
+                env.console, uncertain_history, calibration_history, 
                 MAX_HISTORY_LENGTH, calibrations, search_hits, 5
             );            
             if (finished){
@@ -797,7 +797,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             if (num_levels > MAX_LEVELS){
                 env.log("RNG search not complete after 3 level-ups.");
                 finished = update_history(
-                    env.console, advance_history, calibration_history, 
+                    env.console, uncertain_history, calibration_history, 
                     MAX_HISTORY_LENGTH, calibrations, search_hits, 5, 2, true
                 );         
                 break;
@@ -838,7 +838,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 RNG_CALIBRATION.set_hits(search_hits);
                 env.log("Number of search hits: " + std::to_string(search_hits.size()));
                 update_history(
-                    env.console, advance_history, calibration_history, 
+                    env.console, uncertain_history, calibration_history, 
                     MAX_HISTORY_LENGTH, calibrations, search_hits, 5, 2, true
                 );
                 env.log("RNG search finished.");

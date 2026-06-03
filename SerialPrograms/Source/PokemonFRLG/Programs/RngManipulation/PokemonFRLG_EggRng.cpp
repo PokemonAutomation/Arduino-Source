@@ -112,17 +112,8 @@ std::unique_ptr<StatsTracker> EggRng_Descriptor::make_stats() const{
 }
 
 EggRng::EggRng()
-    : m_program_inputs("Target Settings")
-    , STARTING_POINT(
-        "<b>Starting Point:</b>",
-        {
-            {EggProgramState::held_prep, "held_prep", "Parents Dropped Off"},
-            {EggProgramState::held_calibration, "held_calibration", "Held Frame Calibration"},
-            {EggProgramState::pickup_calibration, "pickup_frame", "Pickup Frame Calibration"}
-        },
-        LockMode::LOCK_WHILE_RUNNING,
-        EggProgramState::held_prep
-    )
+    : m_calibration_displays("Calibration Displays")
+    , m_game_info("Game Information")
     , LANGUAGE(
         "<b>Game Language:</b>",
         {
@@ -145,6 +136,7 @@ EggRng::EggRng()
         LockMode::LOCK_WHILE_RUNNING,
         GameVersion::firered
         )
+    , m_target_settings("Target Settings")
     , EGG_SPECIES(
         "<b>Egg Species:</b>",
         "PokemonFRLG/EggSpeciesGen3.json"
@@ -158,185 +150,197 @@ EggRng::EggRng()
         },
         LockMode::LOCK_WHILE_RUNNING,
         AdvEggCompatibility::low
-    )
-    , MAX_RESETS(
-          "<b>Max Resets:</b>",
-          LockMode::UNLOCK_WHILE_RUNNING,
-          200, 0 // default, min
-          )
-    , MAX_RARE_CANDIES(
-          "<b>Max Rare Candies:</b><br>"
-          "The number of rare candies in your bag. Make sure these are at the top position of the bag.<br>"
-          "Rare candies used during calibration will be restored after resetting.",
-          LockMode::UNLOCK_WHILE_RUNNING,
-          0, 0, 999 // default, min, max
-          )
-    , MAX_BALL_THROWS(
-          "<b>Max Balls Thrown:</b><br>"
-          "The number of " + STRING_POKEBALL + "s in your bag to attempt to throw. Make sure these are at the top position of the bag.<br>"
-                                  "Balls thrown during calibration will be restored after resetting.",
-          LockMode::UNLOCK_WHILE_RUNNING,
-          20, 2, 999 // default, min, max
-          )
-    , m_held_frame("Held Frame Settings")
+        )
+    , m_held_settings("Held Frame Settings")
     , HELD_SEED(
-          false,
-          "<b>Held Seed:</b>",
-          LockMode::LOCK_WHILE_RUNNING,
-          "70FE", "70FE",
-          true
-          )
+        false,
+        "<b>Held Seed:</b>",
+        LockMode::LOCK_WHILE_RUNNING,
+        "70FE", "70FE",
+        true
+        )
     , HELD_SEED_LIST(
-          "<b>Nearby Held Seeds:</b><br>"
-          "This box should contain a list of seeds (in order) around and including your held seed, with one seed on each line",
-          LockMode::LOCK_WHILE_RUNNING,
-          "D000\n199A\n77A1\nAABC\n280C\n70FE\nB573\n02F2\n8084\nA533\nED1E",
-          "D000\n199A\n77A1\nAABC\n280C\n70FE\nB573\n02F2\n8084\nA533\nED1E",
-          true
-          )
+        "<b>Nearby Held Seeds:</b><br>"
+        "This box should contain a list of seeds (in order) around and including your held seed, with one seed on each line",
+        LockMode::LOCK_WHILE_RUNNING,
+        "D000\n199A\n77A1\nAABC\n280C\n70FE\nB573\n02F2\n8084\nA533\nED1E",
+        "D000\n199A\n77A1\nAABC\n280C\n70FE\nB573\n02F2\n8084\nA533\nED1E",
+        true
+        )
     , HELD_SEED_BUTTON(
-          "<b>Held Seed Button:</b><br>",
-          {
-           {SeedButton::A, "A", "A"},
-           {SeedButton::Start, "Start", "Start"},
-           {SeedButton::L, "L", "L (L=A)"},
-           },
-          LockMode::LOCK_WHILE_RUNNING,
-          SeedButton::A
-          )
+        "<b>Held Seed Button:</b><br>",
+        {
+            {SeedButton::A, "A", "A"},
+            {SeedButton::Start, "Start", "Start"},
+            {SeedButton::L, "L", "L (L=A)"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        SeedButton::A
+        )
     , HELD_EXTRA_BUTTON(
-          "<b>Held Seed Extra Button:</b><br>"
-          "Additional button presses that affect the seed.",
-          {
-           {BlackoutButton::None, "None", "None"},
-           {BlackoutButton::L, "L", "Blackout L"},
-           {BlackoutButton::R, "R", "Blackout R"},
-           },
-          LockMode::LOCK_WHILE_RUNNING,
-          BlackoutButton::None
-          )
+        "<b>Held Seed Extra Button:</b><br>"
+        "Additional button presses that affect the seed.",
+        {
+            {BlackoutButton::None, "None", "None"},
+            {BlackoutButton::L, "L", "Blackout L"},
+            {BlackoutButton::R, "R", "Blackout R"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        BlackoutButton::None
+        )
     , HELD_SEED_DELAY(
-          "<b>Held Seed Delay Time (ms):</b><br>"
-          "The delay between starting the game and advancing past the title screen. Set this to match your held seed.<br>"
-          "<i>If using Ten Lines, select <b>Nintendo Switch 1</b> as your console even if using a Switch 2.</i>",
-          LockMode::LOCK_WHILE_RUNNING,
-          31338, 30400 // default, min
-          )
+        "<b>Held Seed Delay Time (ms):</b><br>"
+        "The delay between starting the game and advancing past the title screen. Set this to match your held seed.<br>"
+        "<i>If using Ten Lines, select <b>Nintendo Switch 1</b> as your console even if using a Switch 2.</i>",
+        LockMode::LOCK_WHILE_RUNNING,
+        31338, 30400 // default, min
+        )
     , HELD_ADVANCES(
-          "<b>Held Advances:</b><br>The total number of RNG advances for your held target.",
-          LockMode::LOCK_WHILE_RUNNING,
-          10000, 700, 1000000000 // default, min
-          )
-    , m_pickup_frame("Pickup Frame Settings")
+        "<b>Held Advances:</b><br>The total number of RNG advances for your held target.",
+        LockMode::LOCK_WHILE_RUNNING,
+        10000, 700, 1000000000 // default, min
+        )
+    , m_pickup_settings("Pickup Frame Settings")
     , PICKUP_SEED(
-          false,
-          "<b>Pickup Seed:</b>",
-          LockMode::LOCK_WHILE_RUNNING,
-          "70FE", "70FE",
-          true
-          )
+        false,
+        "<b>Pickup Seed:</b>",
+        LockMode::LOCK_WHILE_RUNNING,
+        "70FE", "70FE",
+        true
+        )
     , PICKUP_SEED_LIST(
-          "<b>Nearby Pickup Seeds:</b><br>"
-          "This box should contain a list of seeds (in order) around and including your held seed, with one seed on each line",
-          LockMode::LOCK_WHILE_RUNNING,
-          "D000\n199A\n77A1\nAABC\n280C\n70FE\nB573\n02F2\n8084\nA533\nED1E",
-          "D000\n199A\n77A1\nAABC\n280C\n70FE\nB573\n02F2\n8084\nA533\nED1E",
-          true
-          )
+        "<b>Nearby Pickup Seeds:</b><br>"
+        "This box should contain a list of seeds (in order) around and including your held seed, with one seed on each line",
+        LockMode::LOCK_WHILE_RUNNING,
+        "D000\n199A\n77A1\nAABC\n280C\n70FE\nB573\n02F2\n8084\nA533\nED1E",
+        "D000\n199A\n77A1\nAABC\n280C\n70FE\nB573\n02F2\n8084\nA533\nED1E",
+        true
+        )
     , PICKUP_SEED_BUTTON(
-          "<b>Pickup Seed Button:</b><br>",
-          {
-           {SeedButton::A, "A", "A"},
-           {SeedButton::Start, "Start", "Start"},
-           {SeedButton::L, "L", "L (L=A)"},
-           },
-          LockMode::LOCK_WHILE_RUNNING,
-          SeedButton::A
-          )
+        "<b>Pickup Seed Button:</b><br>",
+        {
+            {SeedButton::A, "A", "A"},
+            {SeedButton::Start, "Start", "Start"},
+            {SeedButton::L, "L", "L (L=A)"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        SeedButton::A
+        )
     , PICKUP_EXTRA_BUTTON(
-          "<b>Pickup Seed Extra Button:</b><br>"
-          "Additional button presses that affect the seed.",
-          {
-           {BlackoutButton::None, "None", "None"},
-           {BlackoutButton::L, "L", "Blackout L"},
-           {BlackoutButton::R, "R", "Blackout R"},
-           },
-          LockMode::LOCK_WHILE_RUNNING,
-          BlackoutButton::None
-          )
+        "<b>Pickup Seed Extra Button:</b><br>"
+        "Additional button presses that affect the seed.",
+        {
+            {BlackoutButton::None, "None", "None"},
+            {BlackoutButton::L, "L", "Blackout L"},
+            {BlackoutButton::R, "R", "Blackout R"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        BlackoutButton::None
+        )
     , PICKUP_SEED_DELAY(
-          "<b>Pickup Seed Delay Time (ms):</b><br>"
-          "The delay between starting the game and advancing past the title screen. Set this to match your held seed.<br>"
-          "<i>If using Ten Lines, select <b>Nintendo Switch 1</b> as your console even if using a Switch 2.</i>",
-          LockMode::LOCK_WHILE_RUNNING,
-          31338, 30400 // default, min
-          )
+        "<b>Pickup Seed Delay Time (ms):</b><br>"
+        "The delay between starting the game and advancing past the title screen. Set this to match your held seed.<br>"
+        "<i>If using Ten Lines, select <b>Nintendo Switch 1</b> as your console even if using a Switch 2.</i>",
+        LockMode::LOCK_WHILE_RUNNING,
+        31338, 30400 // default, min
+        )
     , PICKUP_ADVANCES(
-          "<b>Pickup Advances:</b><br>The total number of RNG advances for your pickup target.",
-          LockMode::LOCK_WHILE_RUNNING,
-          10000, 700, 1000000000 // default, min
-          )
-    , m_other_options("Other Settings")
+        "<b>Pickup Advances:</b><br>The total number of RNG advances for your pickup target.",
+        LockMode::LOCK_WHILE_RUNNING,
+        10000, 700, 1000000000 // default, min
+        )
+    , m_program_settings("Program Settings")
+    , STARTING_POINT(
+        "<b>Starting Point:</b>",
+        {
+            {EggProgramState::held_prep, "held_prep", "Parents Dropped Off"},
+            {EggProgramState::held_calibration, "held_calibration", "Held Frame Calibration"},
+            {EggProgramState::pickup_calibration, "pickup_frame", "Pickup Frame Calibration"}
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        EggProgramState::held_prep
+        )
+    , MAX_RESETS(
+        "<b>Max Resets:</b>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        200, 0 // default, min
+        )
+    , MAX_RARE_CANDIES(
+        "<b>Max Rare Candies:</b><br>"
+        "The number of rare candies in your bag. Make sure these are at the top position of the bag.<br>"
+        "Rare candies used during calibration will be restored after resetting.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0, 0, 999 // default, min, max
+        )
+    , MAX_BALL_THROWS(
+        "<b>Max Balls Thrown:</b><br>"
+        "The number of " + STRING_POKEBALL + "s in your bag to attempt to throw. Make sure these are at the top position of the bag.<br>"
+                                "Balls thrown during calibration will be restored after resetting.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        20, 2, 999 // default, min, max
+        )
     , USE_TEACHY_TV(
-          "<b>Use Teachy TV:</b>"
-          "<br>Opens the Teachy TV to quickly advance the RNG at 313x speed.<br>"
-          "<i>Warning: can result in larger misses.</i>",
-          LockMode::LOCK_WHILE_RUNNING,
-          false // default
-          )
+        "<b>Use Teachy TV:</b>"
+        "<br>Opens the Teachy TV to quickly advance the RNG at 313x speed.<br>"
+        "<i>Warning: can result in larger misses.</i>",
+        LockMode::LOCK_WHILE_RUNNING,
+        false // default
+        )
     , PROFILE(
-          "<b>User Profile Position:</b><br>"
-          "The position, from left to right, of the Switch profile with the FRLG save you'd like to use.<br>"
-          "If this is set to 0, Switch 1 defaults to the last-used profile, while Switch 2 defaults to the first profile (position 1)",
-          LockMode::LOCK_WHILE_RUNNING,
-          0, 0, 8 // default, min, max
-          )
+        "<b>User Profile Position:</b><br>"
+        "The position, from left to right, of the Switch profile with the FRLG save you'd like to use.<br>"
+        "If this is set to 0, Switch 1 defaults to the last-used profile, while Switch 2 defaults to the first profile (position 1)",
+        LockMode::LOCK_WHILE_RUNNING,
+        0, 0, 8 // default, min, max
+        )
     , TAKE_VIDEO(
-          "<b>Take Video:</b><br>Record a video when the shiny is found.",
-          LockMode::LOCK_WHILE_RUNNING,
-          true // default
-          )
+        "<b>Take Video:</b><br>Record a video when the shiny is found.",
+        LockMode::LOCK_WHILE_RUNNING,
+        true // default
+        )
     , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_SHINY(
-          "Shiny found",
-          true, true, ImageAttachmentMode::JPG,
-          {"Notifs", "Showcase"}
-          )
+        "Shiny found",
+        true, true, ImageAttachmentMode::JPG,
+        {"Notifs", "Showcase"}
+        )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
-          &NOTIFICATION_SHINY,
-          &NOTIFICATION_STATUS_UPDATE,
-          &NOTIFICATION_PROGRAM_FINISH,
-      })
-
+        &NOTIFICATION_SHINY,
+        &NOTIFICATION_STATUS_UPDATE,
+        &NOTIFICATION_PROGRAM_FINISH,
+        })
 {
+    PA_ADD_OPTION(m_calibration_displays);
+    PA_ADD_OPTION(RNG_TARGET);
     PA_ADD_OPTION(RNG_FILTERS);
     PA_ADD_OPTION(RNG_CALIBRATION);
-    PA_ADD_OPTION(m_program_inputs);
-    PA_ADD_OPTION(STARTING_POINT);
+    PA_ADD_OPTION(m_game_info);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(GAME_VERSION);
+    PA_ADD_OPTION(m_target_settings);
     PA_ADD_OPTION(EGG_SPECIES);
     PA_ADD_OPTION(COMPATIBILITY);
     PA_ADD_OPTION(PARENT_IVS);
-    PA_ADD_OPTION(MAX_RESETS);
-    PA_ADD_OPTION(MAX_BALL_THROWS);
-    PA_ADD_OPTION(MAX_RARE_CANDIES);
-    PA_ADD_OPTION(m_held_frame);
+    PA_ADD_OPTION(m_held_settings);
     PA_ADD_OPTION(HELD_SEED);
     PA_ADD_OPTION(HELD_SEED_LIST);
     PA_ADD_OPTION(HELD_SEED_BUTTON);
     PA_ADD_OPTION(HELD_EXTRA_BUTTON);
     PA_ADD_OPTION(HELD_SEED_DELAY);
     PA_ADD_OPTION(HELD_ADVANCES);
-    PA_ADD_OPTION(m_pickup_frame);
+    PA_ADD_OPTION(m_pickup_settings);
     PA_ADD_OPTION(PICKUP_SEED);
     PA_ADD_OPTION(PICKUP_SEED_LIST);
     PA_ADD_OPTION(PICKUP_SEED_BUTTON);
     PA_ADD_OPTION(PICKUP_EXTRA_BUTTON);
     PA_ADD_OPTION(PICKUP_SEED_DELAY);
     PA_ADD_OPTION(PICKUP_ADVANCES);
-    PA_ADD_OPTION(m_other_options);
+    PA_ADD_OPTION(m_program_settings);
+    PA_ADD_OPTION(STARTING_POINT);
+    PA_ADD_OPTION(MAX_RESETS);
+    PA_ADD_OPTION(MAX_BALL_THROWS);
+    PA_ADD_OPTION(MAX_RARE_CANDIES);
     PA_ADD_OPTION(USE_TEACHY_TV);
     PA_ADD_OPTION(PROFILE);
     PA_ADD_OPTION(TAKE_VIDEO);
@@ -524,8 +528,8 @@ bool EggRng::reset_and_check_seed(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context,
     EggRng_Descriptor::Stats& stats,
-    RngAdvanceHistory& wild_advance_history,
-    RngAdvanceHistory& egg_advance_history,    
+    RngUncertainHistory& wild_uncertain_history,
+    RngUncertainHistory& egg_uncertain_history,    
     RngCalibrationHistory& wild_history,
     RngCalibrationHistory& egg_history,
     AdvRngWildSearcher& wild_searcher,
@@ -548,12 +552,11 @@ bool EggRng::reset_and_check_seed(
 ){
 
     static const int64_t FIXED_SEED_OFFSET = -845; // ms, approximate
-    static const int64_t FIXED_ADVANCES_OFFSET = pickup_frame ? -412 : 134;    // frames, approximate
+    static const int64_t FIXED_ADVANCES_OFFSET = 135;    // frames, approximate
 
     static const uint64_t CONTINUE_SCREEN_FRAMES = 200;
 
     static const double SEED_BUMPS[] = { 0, 1, -1, 2, -2 };
-    static const double ADVANCE_BUMPS[] = { 0, 1, -1, 2, -2, +3, -3, +4, -4, +5, -5, -6, +6, -7, +7, -8, +8, -9, +9, -10, +10 };
 
     const uint64_t WILD_ADVANCES_RADIUS = 4096;
     
@@ -571,15 +574,14 @@ bool EggRng::reset_and_check_seed(
 
     if (egg_history.results.size() > 0){
         calibrations = get_calibrations(env.console, egg_history, SEED_VALUES, SEED_POSITION, advances, !pickup_frame);
-    }
-    if (wild_history.results.size() > 0){ // the wild history is likely to have a better seed calibration
+    }else if (wild_history.results.size() > 0){
         calibrations.seed_offset = get_seed_calibration_frames(wild_history, SEED_VALUES, SEED_POSITION);
         env.log("Updated Seed Calibration (frames): " + std::to_string(calibrations.seed_offset));
     }
 
     // if previous resets had uncertain advances, slightly modify the seed delay to try to hit a different target
     if (pickup_frame){
-        double seed_bump = SEED_BUMPS[egg_advance_history.results.size() % 5];
+        double seed_bump = SEED_BUMPS[egg_uncertain_history.results.size() % 5];
         calibrations.seed_offset += seed_bump;
     }
 
@@ -587,15 +589,20 @@ bool EggRng::reset_and_check_seed(
     // or if there is repeated uncertainty about advances from previous resets,
     // bump the advances
     if (!pickup_frame && !previously_hit_held_frame){
-        int csf_bumps = int(std::floor(egg_advance_history.results.size() / 3) + std::floor(times_not_held / 4));
-        double advances_bump = ADVANCE_BUMPS[csf_bumps % 21];
+        if (egg_history.results.empty()){
+            // avoid cumulative bumps when there is no history
+            calibrations = {
+                RNG_CALIBRATION.seed_calibration / FRLG_FRAME_DURATION,
+                RNG_CALIBRATION.csf_calibration,
+                RNG_CALIBRATION.advances_calibration
+            };
+        }
+        double bumpval = std::floor(times_not_held / 4) + std::floor(egg_uncertain_history.results.size());
+        double advances_bump = std::pow(-1, bumpval) * bumpval / 2;
         double orig_csf_offset = calibrations.csf_offset;
         calibrations.csf_offset = fmod(orig_csf_offset + advances_bump, 2);
         calibrations.ingame_offset += advances_bump - (calibrations.csf_offset - orig_csf_offset);
     }
-    env.log("Final Seed Calibration (frames): " + std::to_string(calibrations.seed_offset));
-    env.log("Final CSF Calibration (frames): " + std::to_string(calibrations.csf_offset));
-    env.log("Final In-Game Calibration (frames): " + std::to_string(calibrations.ingame_offset));
 
     uint64_t ingame_advances = advances - CONTINUE_SCREEN_FRAMES;
 
@@ -616,7 +623,9 @@ bool EggRng::reset_and_check_seed(
     stats.resets++; 
 
     RNG_FILTERS.reset();
-    RNG_CALIBRATION.set_calibrations(calibrations);
+    if (egg_history.results.size() > 0){
+        RNG_CALIBRATION.set_calibrations(calibrations);
+    }
 
     // grab a timestamp after the blind button presses are over
     // this is used for estimating what advances wild encounters and test pickups occur on
@@ -651,7 +660,7 @@ bool EggRng::reset_and_check_seed(
     uint32_t rng_wait = 50 * random_u32(0, 20); // avoid hitting the same wild targets
     pbf_wait(context, std::chrono::milliseconds(rng_wait));
 
-    use_sweet_scent_from_overworld(env.console, context);
+    use_sweet_scent_from_overworld(env.console, context, pickup_frame ? 2 : 0);
 
     WallDuration elapsed = current_time() - timestamp;
     auto elapsed_ms = std::chrono::duration_cast<Milliseconds>(elapsed);
@@ -708,7 +717,7 @@ bool EggRng::reset_and_check_seed(
     RNG_CALIBRATION.set_hits(search_hits);
 
     bool finished = update_history(
-        env.console, wild_advance_history, wild_history, MAX_HISTORY_LENGTH, 
+        env.console, wild_uncertain_history, wild_history, MAX_HISTORY_LENGTH, 
         calibrations, search_hits, 1
     );
     bool identical = same_seeds(search_hits);
@@ -738,7 +747,7 @@ bool EggRng::reset_and_check_seed(
 
         bool force_finish = failed || (i == (MAX_RARE_CANDIES - 1));
         finished = update_history(
-            env.console, wild_advance_history, wild_history, MAX_HISTORY_LENGTH, 
+            env.console, wild_uncertain_history, wild_history, MAX_HISTORY_LENGTH, 
             calibrations, search_hits, 1, 2, force_finish
         );
         identical = same_seeds(search_hits);
@@ -771,7 +780,7 @@ bool EggRng::held_frame_check(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context,
     EggRng_Descriptor::Stats& stats,
-    RngAdvanceHistory& egg_advance_history,
+    RngUncertainHistory& egg_uncertain_history,
     RngCalibrationHistory& held_calibration_history,
     AdvRngEggSearcher& egg_searcher,
     RngCalibrations& calibrations,
@@ -789,9 +798,11 @@ bool EggRng::held_frame_check(
     static const uint64_t HELD_CHECK_ADVANCES_RADIUS = 8092;    
 
     static const uint16_t MAX_HISTORY_LENGTH = 2;
-    const uint64_t INITIAL_ADVANCES_RADIUS = USE_TEACHY_TV ? 1024 : 256;
+    const uint64_t INITIAL_ADVANCES_RADIUS = USE_TEACHY_TV ? 4096 : 1024;
 
-    uint64_t advances_radius = get_advances_radius(env.console, held_calibration_history, INITIAL_ADVANCES_RADIUS);
+    uint64_t advances_radius = 
+        previously_hit_held_frame ? 4 
+        : get_advances_radius(env.console, held_calibration_history, INITIAL_ADVANCES_RADIUS);
 
     pbf_mash_button(context, BUTTON_B, 5000ms); // return to overworld
     walk_from_pond_to_daycare_man(env.console, context);
@@ -842,7 +853,7 @@ bool EggRng::held_frame_check(
     held_hits.resize(std::distance(held_hits.begin(), iter));
     RNG_CALIBRATION.set_hits(held_hits);
 
-    bool finished = update_history(env.console, egg_advance_history, held_calibration_history, MAX_HISTORY_LENGTH, calibrations, held_hits);
+    bool finished = update_history(env.console, egg_uncertain_history, held_calibration_history, MAX_HISTORY_LENGTH, calibrations, held_hits);
     for (uint64_t i=0; i<candies_left; i++){
         if (finished){
             break;
@@ -885,7 +896,7 @@ bool EggRng::held_frame_check(
                 )
         );
         finished = update_history(
-            env.console, egg_advance_history, 
+            env.console, egg_uncertain_history, 
             held_calibration_history, MAX_HISTORY_LENGTH, 
             calibrations, held_hits, 
             1, 2, force_finish
@@ -899,12 +910,8 @@ bool EggRng::held_frame_check(
         failed_searches = 0;
     }
 
-    if (held_calibration_history.results.empty()){
-        return false;
-    }
-
     bool possibly_hit_held_frame = false;
-    if (egg_advance_history.results.size()){
+    if (egg_uncertain_history.results.size()){
         for (AdvRngState rngstate : held_hits){
             if (
                 rngstate.seed == TARGET_HELD_SEED
@@ -916,17 +923,39 @@ bool EggRng::held_frame_check(
         }
     }
 
-    auto newest_result = held_calibration_history.results.back();
-    bool definitely_hit_held_frame = (
-        egg_advance_history.results.size() == 0
-        && newest_result.seed == TARGET_HELD_SEED
-        && newest_result.advance == HELD_ADVANCES
-    );
+    if (held_calibration_history.results.empty()){
+        return false;
+    }
+
+    bool definitely_hit_held_frame = false;
+    if (egg_uncertain_history.results.size() == 0){
+        for (size_t i=0; i<held_calibration_history.results.size(); i++){
+            AdvRngState res = held_calibration_history.results[i];
+            if (   res.seed == TARGET_HELD_SEED          
+                && res.advance == HELD_ADVANCES
+            ){
+                definitely_hit_held_frame = true;
+                // keep the calibrations that resulted in hitting the target held frame
+                // and throw out the others
+                calibrations = held_calibration_history.calibrations[i];
+                RNG_CALIBRATION.set_calibrations(calibrations);
+                held_calibration_history.results.clear();
+                held_calibration_history.results.emplace_back(res);
+                held_calibration_history.calibrations.clear();
+                held_calibration_history.calibrations.emplace_back(calibrations);
+                break;
+            }
+        }
+        
+    }
+    
 
     if (definitely_hit_held_frame){
-        env.log("Hit target held frame!");
-    } else if(possibly_hit_held_frame){
+        env.log("Confirmed hit on the target held frame!");
+    }else if(possibly_hit_held_frame){
         env.log("Possibly hit target held frame.");
+    }else{
+        env.log("Missed the target held frame.");
     }
 
     if (locked_in && !(definitely_hit_held_frame || possibly_hit_held_frame)){
@@ -947,7 +976,7 @@ bool EggRng::pickup_frame_check(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context,
     EggRng_Descriptor::Stats& stats,
-    RngAdvanceHistory& egg_advance_history,
+    RngUncertainHistory& egg_uncertain_history,
     RngCalibrationHistory& pickup_calibration_history,
     AdvRngEggSearcher& egg_searcher,
     RngCalibrations& calibrations,
@@ -962,7 +991,7 @@ bool EggRng::pickup_frame_check(
 ){
 
     const uint16_t MAX_HISTORY_LENGTH = USE_TEACHY_TV ? 2 : 5;
-    const uint64_t INITIAL_ADVANCES_RADIUS = USE_TEACHY_TV ? 1024 : 256;
+    const uint64_t INITIAL_ADVANCES_RADIUS = USE_TEACHY_TV ? 4096 : 1024;
 
     uint64_t advances_radius = get_advances_radius(env.console, pickup_calibration_history, INITIAL_ADVANCES_RADIUS);
 
@@ -997,13 +1026,13 @@ bool EggRng::pickup_frame_check(
     }
     RNG_CALIBRATION.set_hits(pickup_hits);
     
-    bool finished = update_history(env.console, egg_advance_history, pickup_calibration_history, MAX_HISTORY_LENGTH, calibrations, pickup_hits, 1);
+    bool finished = update_history(env.console, egg_uncertain_history, pickup_calibration_history, MAX_HISTORY_LENGTH, calibrations, pickup_hits, 1);
     for (uint64_t i=0; i<candies_left; i++){
         if (finished){
             break;
         }
 
-        bool failed = use_rare_candy(env.console, context, LANGUAGE, observed_egg, filters, EGG_STATS.base_stats, AdvRngMethod::Any, false, i == 0);
+        bool failed = use_rare_candy(env.console, context, LANGUAGE, observed_egg, filters, EGG_STATS.base_stats, AdvRngMethod::Any, false, i == 0, 1);
         if (failed){
             stats.errors++;
             send_program_recoverable_error_notification(
@@ -1036,7 +1065,7 @@ bool EggRng::pickup_frame_check(
                 )
         );
         finished = update_history(
-            env.console, egg_advance_history, 
+            env.console, egg_uncertain_history, 
             pickup_calibration_history, MAX_HISTORY_LENGTH, 
             calibrations, pickup_hits, 
             1, 2, force_finish
@@ -1142,6 +1171,7 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     AdvIVs PARENT_B = { rowB.hp, rowB.atk, rowB.def, rowB.spa, rowB.spd, rowB.spe };
 
     AdvPokemonResult target_result = egg_searcher.generate_pokemon(PARENT_A, PARENT_B);
+    RNG_TARGET.set_target(target_result, EGG_STATS.gender_threshold);
     env.log("Target PID (base 10): " + std::to_string(target_result.pid));
     env.log("Target Nature: " + nature_to_string(target_result.nature));
     env.log("Target IVs (assuming Normal method):");
@@ -1154,8 +1184,8 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 
     Milliseconds launch_delay = INITIAL_LAUNCH_DELAY;
 
-    RngAdvanceHistory wild_advance_history;
-    RngAdvanceHistory egg_advance_history;
+    RngUncertainHistory wild_uncertain_history;
+    RngUncertainHistory egg_uncertain_history;
     RngCalibrationHistory wild_history; 
     RngCalibrationHistory held_calibration_history; 
     RngCalibrationHistory pickup_calibration_history; 
@@ -1242,10 +1272,10 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
         switch (program_state){
         case EggProgramState::held_prep:
             prep_held_resets(env, context);
-            egg_advance_history.results.clear();
-            egg_advance_history.seed_calibrations.clear();
-            wild_advance_history.results.clear();
-            wild_advance_history.seed_calibrations.clear();
+            egg_uncertain_history.results.clear();
+            egg_uncertain_history.calibrations.clear();
+            wild_uncertain_history.results.clear();
+            wild_uncertain_history.calibrations.clear();
             program_state = EggProgramState::held_calibration;
             STARTING_POINT.set(EggProgramState::held_calibration);
             continue;
@@ -1256,7 +1286,7 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
             temp_candies_left = candies_left;
             hit_seed = reset_and_check_seed(
                 env, context, stats, 
-                wild_advance_history, egg_advance_history,
+                wild_uncertain_history, egg_uncertain_history,
                 wild_history, held_calibration_history,
                 wild_searcher, calibrations,
                 timestamp, current_seed,
@@ -1272,7 +1302,7 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 
             held_finished = held_frame_check(
                 env, context, stats,
-                egg_advance_history, held_calibration_history,
+                egg_uncertain_history, held_calibration_history,
                 egg_searcher, calibrations, 
                 timestamp, current_seed,
                 candies_left, failed_searches, 
@@ -1287,10 +1317,10 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
                 stats.candies += (candies_left - temp_candies_left);
                 balls_left = temp_balls_left;
                 candies_left = temp_candies_left;
-                egg_advance_history.results.clear();
-                egg_advance_history.seed_calibrations.clear();
-                wild_advance_history.results.clear();
-                wild_advance_history.seed_calibrations.clear();
+                egg_uncertain_history.results.clear();
+                egg_uncertain_history.calibrations.clear();
+                wild_uncertain_history.results.clear();
+                wild_uncertain_history.calibrations.clear();
                 program_state = EggProgramState::pickup_calibration;
                 STARTING_POINT.set(EggProgramState::pickup_calibration);
             }
@@ -1305,23 +1335,23 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
             current_seed = 0; // unused here
             hit_seed = reset_and_check_seed(
                 env, context, stats, 
-                wild_advance_history, egg_advance_history,
-                wild_history, held_calibration_history,
+                wild_uncertain_history, egg_uncertain_history,
+                wild_history, pickup_calibration_history,
                 wild_searcher, calibrations, 
                 timestamp, current_seed,
                 balls_left, candies_left, failed_searches, 
                 times_not_held, shiny_found, previously_hit_held_frame,
                 launch_delay,
-                HELD_SEED_DELAY, HELD_SEED_VALUES, HELD_SEED_POSITION,
+                PICKUP_SEED_DELAY, PICKUP_SEED_VALUES, PICKUP_SEED_POSITION,
                 SPECIES_LIST, STATS_DATA,
-                false
+                true
             );
 
             if (!hit_seed) { continue; }
 
             pickup_finished = pickup_frame_check(
                 env, context, stats,
-                egg_advance_history, pickup_calibration_history,
+                egg_uncertain_history, pickup_calibration_history,
                 egg_searcher, calibrations,
                 candies_left, failed_searches, shiny_found,
                 TARGET_HELD_SEED, TARGET_PICKUP_SEED,

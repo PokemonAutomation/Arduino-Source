@@ -87,8 +87,8 @@ private:
         SingleSwitchProgramEnvironment& env, 
         ProControllerContext& context,
         EggRng_Descriptor::Stats& stats,
-        RngAdvanceHistory& wild_advance_history,
-        RngAdvanceHistory& egg_advance_history,    
+        RngUncertainHistory& wild_uncertain_history,
+        RngUncertainHistory& egg_uncertain_history,    
         RngCalibrationHistory& wild_history,
         RngCalibrationHistory& egg_history,
         AdvRngWildSearcher& wild_searcher,
@@ -114,7 +114,7 @@ private:
         SingleSwitchProgramEnvironment& env, 
         ProControllerContext& context,
         EggRng_Descriptor::Stats& stats,
-        RngAdvanceHistory& egg_advance_history,
+        RngUncertainHistory& egg_uncertain_history,
         RngCalibrationHistory& held_calibration_history,
         AdvRngEggSearcher& egg_searcher,
         RngCalibrations& calibrations,
@@ -134,7 +134,7 @@ private:
         SingleSwitchProgramEnvironment& env, 
         ProControllerContext& context,
         EggRng_Descriptor::Stats& stats,
-        RngAdvanceHistory& egg_advance_history,
+        RngUncertainHistory& egg_uncertain_history,
         RngCalibrationHistory& pickup_calibration_history,
         AdvRngEggSearcher& egg_searcher,
         RngCalibrations& calibrations,
@@ -149,26 +149,21 @@ private:
     );
 
 
+    SectionDividerOption m_calibration_displays;
+    RngTargetDisplay RNG_TARGET;
     RngFilterDisplay RNG_FILTERS;
     RngCalibrationDisplay RNG_CALIBRATION;
 
-    SectionDividerOption m_program_inputs;
-
-    EnumDropdownOption<EggProgramState> STARTING_POINT;
-
+    SectionDividerOption m_game_info;
     OCR::LanguageOCROption LANGUAGE;
     EnumDropdownOption<GameVersion> GAME_VERSION;
 
+    SectionDividerOption m_target_settings;
     PokemonNameSelectOption EGG_SPECIES;
     EnumDropdownOption<AdvEggCompatibility> COMPATIBILITY;
     ParentIVsTable PARENT_IVS;
 
-    SimpleIntegerOption<uint64_t> MAX_RESETS;
-    SimpleIntegerOption<uint64_t> MAX_RARE_CANDIES;
-    SimpleIntegerOption<uint64_t> MAX_BALL_THROWS;
-
-    SectionDividerOption m_held_frame;
-
+    SectionDividerOption m_held_settings;
     StringOption HELD_SEED; 
     TextEditOption HELD_SEED_LIST;
     EnumDropdownOption<SeedButton> HELD_SEED_BUTTON;
@@ -176,8 +171,7 @@ private:
     SimpleIntegerOption<uint64_t> HELD_SEED_DELAY;
     SimpleIntegerOption<uint64_t>HELD_ADVANCES;
 
-    SectionDividerOption m_pickup_frame;
-
+    SectionDividerOption m_pickup_settings;
     StringOption PICKUP_SEED; 
     TextEditOption PICKUP_SEED_LIST;
     EnumDropdownOption<SeedButton> PICKUP_SEED_BUTTON;
@@ -185,11 +179,13 @@ private:
     SimpleIntegerOption<uint64_t> PICKUP_SEED_DELAY;
     SimpleIntegerOption<uint64_t>PICKUP_ADVANCES;
 
-    SectionDividerOption m_other_options;
-
+    SectionDividerOption m_program_settings;
+    EnumDropdownOption<EggProgramState> STARTING_POINT;
+    SimpleIntegerOption<uint64_t> MAX_RESETS;
+    SimpleIntegerOption<uint64_t> MAX_RARE_CANDIES;
+    SimpleIntegerOption<uint64_t> MAX_BALL_THROWS;
     BooleanCheckBoxOption USE_TEACHY_TV;
     SimpleIntegerOption<uint8_t> PROFILE;
-
     BooleanCheckBoxOption TAKE_VIDEO;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     EventNotificationOption NOTIFICATION_SHINY;
