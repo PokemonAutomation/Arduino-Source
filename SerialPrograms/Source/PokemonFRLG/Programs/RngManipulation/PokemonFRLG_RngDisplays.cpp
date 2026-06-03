@@ -87,7 +87,7 @@ RngFilterDisplay::RngFilterDisplay()
     , spdef(false, "<b>Special Defense IV:</b>", LockMode::READ_ONLY, "-", "")
     , speed(false, "<b>Speed IV:</b>", LockMode::READ_ONLY, "-", "")
 {   
-    PA_ADD_OPTION(species);
+    PA_ADD_STATIC(species);
     PA_ADD_STATIC(gender);
     PA_ADD_STATIC(nature);
     PA_ADD_STATIC(level);
@@ -97,8 +97,6 @@ RngFilterDisplay::RngFilterDisplay()
     PA_ADD_STATIC(spatk);
     PA_ADD_STATIC(spdef);
     PA_ADD_STATIC(speed);
-
-
 }
 std::string RngFilterDisplay::get_range_string(const IvRange& range){
     if (range.low < 0 || range.high < 0){
@@ -144,9 +142,9 @@ RngCalibrationDisplay::RngCalibrationDisplay()
     , advances_calibration("<b>In-Game Advances Calibration:</b>", LockMode::LOCK_WHILE_RUNNING, 0.0)
     , hits(false, "<b>Seeds/Advances:</b>", LockMode::READ_ONLY, "-", "")
 {
-    PA_ADD_STATIC(seed_calibration);
-    PA_ADD_STATIC(csf_calibration);
-    PA_ADD_STATIC(advances_calibration);
+    PA_ADD_OPTION(seed_calibration);
+    PA_ADD_OPTION(csf_calibration);
+    PA_ADD_OPTION(advances_calibration);
     PA_ADD_STATIC(hits);
 }
 
