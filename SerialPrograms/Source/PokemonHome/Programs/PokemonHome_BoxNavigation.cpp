@@ -185,7 +185,7 @@ std::array<size_t, 2> find_occupied_slots_in_box(
     int num_empty_slots = 0;
     for (size_t row = 0; row < BOX_ROWS; row++) {
         for (size_t col = 0; col < BOX_COLS; col++) {
-            ImageFloatBox slot_box(0.06 + (0.072 * col), 0.2 + (0.1035 * row), 0.03, 0.057);
+            ImageFloatBox slot_box(0.06 + (0.072 * col), 0.2 + (0.105 * row), 0.03, 0.057);
             int current_box_value = (int)image_stddev(extract_box_reference(screen, slot_box)).sum();
 
             ss << current_box_value;
