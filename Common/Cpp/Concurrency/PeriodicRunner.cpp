@@ -39,6 +39,52 @@ void PeriodicRunner::stop(){
 }
 
 
+void PeriodicRunner::update_next(
+    std::map<Runnable*, Entry>::iterator runnable_iter,
+    std::multimap<WallClock, std::map<Runnable*, Entry>::iterator>::iterator schedule_iter,
+    WallClock next_run_time
+){
+    runnable_iter->second.next = next_run_time;
+
+    //  Move the node. This should never throw.
+    auto node = m_schedule.extract(schedule_iter);
+    node.key() = next_run_time;
+    m_schedule.insert(std::move(node));
+}
+
+
+void PeriodicRunner::run_now_nonblocking(Runnable& runnable){
+    {
+        WallClock next = current_time();
+        std::lock_guard<Mutex> lg(m_lock);
+
+        auto runnable_iter = m_runnables.find(&runnable);
+        if (runnable_iter == m_runnables.end()){
+            return;
+        }
+
+        //  Already running right now!
+        if (!runnable_iter->second.busy){
+            return;
+        }
+
+        //  Find the corresponding schedule entry.
+        auto schedule_iter = m_schedule.find(runnable_iter->second.next);
+        while (true){
+            if (schedule_iter == m_schedule.end()){
+                //  Should be impossible.
+                return;
+            }
+            if (schedule_iter->second->first == &runnable){
+                break;
+            }
+            ++schedule_iter;
+        }
+
+        update_next(runnable_iter, schedule_iter, next);
+    }
+    m_cv.notify_all();
+}
 void PeriodicRunner::add_runnable(Runnable& runnable, WallDuration period){
     {
         std::lock_guard<Mutex> lg(m_lock);
@@ -83,33 +129,28 @@ void PeriodicRunner::remove_runnable(Runnable& runnable) noexcept{
 void PeriodicRunner::thread_body(){
     std::unique_lock<Mutex> lg(m_lock);
     while (!m_stopping){
-        auto iter = m_schedule.begin();
-        if (iter == m_schedule.end()){
+        auto schedule_iter = m_schedule.begin();
+        if (schedule_iter == m_schedule.end()){
             m_cv.wait(lg);
             continue;
         }
 
-        WallClock fire_time = iter->first;
+        WallClock fire_time = schedule_iter->first;
         if (fire_time > current_time()){
             m_cv.wait_until(lg, fire_time);
             continue;
         }
 
-        auto runnable = iter->second;
+        auto runnable_iter = schedule_iter->second;
 
-        WallClock next = fire_time + runnable->second.period;
-        runnable->second.next = next;
+        WallClock next = fire_time + runnable_iter->second.period;
+        update_next(runnable_iter, schedule_iter, next);
 
-        //  Move the node. This should never throw.
-        auto node = m_schedule.extract(iter);
-        node.key() = next;
-        m_schedule.insert(std::move(node));
-
-        runnable->second.busy = true;
+        runnable_iter->second.busy = true;
         m_lock.unlock();
-        runnable->first->run();
+        runnable_iter->first->run();
         m_lock.lock();
-        runnable->second.busy = false;
+        runnable_iter->second.busy = false;
     }
 }
 

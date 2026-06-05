@@ -13,6 +13,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "Controllers/SerialPortPollerQt.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "SerialPABotBase2_Connection.h"
 
@@ -116,7 +117,8 @@ bool SerialPABotBase2_Connection::open_serial_port(){
     if (cancelled()){
         return false;
     }
-    QSerialPortInfo info(QString::fromStdString(m_device_name));
+
+    QSerialPortInfo info = SerialPortPoller::instance().get_port(m_device_name);
 
     //  Port is invalid.
     if (info.isNull()){

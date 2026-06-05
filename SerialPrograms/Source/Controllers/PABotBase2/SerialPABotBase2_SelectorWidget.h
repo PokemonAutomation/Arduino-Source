@@ -34,6 +34,8 @@ public:
         : NoWheelCompactComboBox(&parent)
         , m_parent(parent)
     {
+        SerialPortPoller::instance().begin_refresh_now();
+
 //        cout << "SerialPABotBase(): " << current << endl;
         this->setMaxVisibleItems(32);
 
@@ -73,6 +75,7 @@ public:
     }
 
     void refresh_devices(){
+        SerialPortPoller::instance().begin_refresh_now();
 //        cout << "Current = " << width() << " x " << height() << endl;
 //        cout << "sizeHint = " << sizeHint().width() << " x " << sizeHint().height() << endl;
 //        cout << "minimumContentsLength = " << this->minimumContentsLength() << endl;

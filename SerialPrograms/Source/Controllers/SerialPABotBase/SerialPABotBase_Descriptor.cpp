@@ -4,8 +4,6 @@
  *
  */
 
-#include <QSerialPortInfo>
-#include <QWidget>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Controllers/ControllerTypeStrings.h"
 #include "SerialPABotBase_Descriptor.h"

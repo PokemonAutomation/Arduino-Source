@@ -4,7 +4,6 @@
  *
  */
 
-#include <QSerialPortInfo>
 #include <QWidget>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Controllers/ControllerTypeStrings.h"
@@ -59,6 +58,7 @@ std::unique_ptr<ControllerConnection> SerialPABotBase2_Descriptor::open_connecti
     Logger& logger,
     bool set_to_null_controller
 ) const{
+    SerialPortPoller::instance().begin_refresh_now();
     if (m_name.empty()){
         return nullptr;
     }
