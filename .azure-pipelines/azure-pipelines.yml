@@ -50,17 +50,6 @@ parameters:
 stages:
 
 ###########################################
-#             WAKE-UP SIGNAL              #
-###########################################
-#- template: templates/wake-signal.yml
-#  parameters:
-#    stageName: Wake_Up_Signal
-#    displayName: 'Send Wake-Up Signal'
-#    dependsOn: []
-#    poolName: AlarmClock
-#    condition: always()
-
-###########################################
 #        SET VERSION BUILD NUMBER         #
 ###########################################
 
@@ -84,6 +73,25 @@ stages:
             echo "##vso[build.addbuildtag]${{ parameters.buildType }}"
           displayName: 'Set Build Number to Version'
 
+###########################################
+#             WAKE SIGNAL                 #
+###########################################
+- template: templates/sleep-wake-signal.yml
+  parameters:
+    stageName: Sleep_Wake_Signal
+    displayName: 'Send Wake Signal'
+    dependsOn: Set_Build_Number
+    poolName: AlarmClock
+    action: Wake
+    condition: |
+        and(
+          succeeded(),
+          or(
+            eq('${{ parameters.targetOS }}', 'Windows'),
+            eq('${{ parameters.targetOS }}', 'Linux'),
+            eq('${{ parameters.targetOS }}', 'All')
+          )
+        )
 
 ###########################################
 #         WINDOWS BUILD JOB               #
@@ -92,8 +100,7 @@ stages:
 - stage: Windows_Build_x64
   displayName: Windows Build x64
   dependsOn:
-    #- Wake_Up_Signal
-    - Set_Build_Number
+    - Sleep_Wake_Signal
   condition: and(succeeded(), or(eq('${{ parameters.targetOS }}', 'Windows'), eq('${{ parameters.targetOS }}', 'All')))
 
   jobs:
@@ -281,8 +288,7 @@ stages:
 - stage: Linux_Build_x64
   displayName: Linux Build x64
   dependsOn:
-    #- Wake_Up_Signal
-    - Set_Build_Number
+    - Sleep_Wake_Signal
   condition: and(succeeded(), or(eq('${{ parameters.targetOS }}', 'Linux'), eq('${{ parameters.targetOS }}', 'All')))
 
   jobs:
@@ -388,9 +394,26 @@ stages:
           chmod +x appimagetool-x86_64.AppImage
           chmod +x linuxdeploy-plugin-gstreamer.sh
 
+          echo "=== Copying Wayland platform plugins ==="
+          mkdir -p "$APP_DIR/usr/plugins/platforms"
+          cp /opt/Qt/$(qt_version)/gcc_64/plugins/platforms/libqwayland*.so \
+             "$APP_DIR/usr/plugins/platforms/" 2>/dev/null || true
+
+          mkdir -p "$APP_DIR/usr/plugins/wayland-decoration-client"
+          cp -a /opt/Qt/$(qt_version)/gcc_64/plugins/wayland-decoration-client/. \
+             "$APP_DIR/usr/plugins/wayland-decoration-client/" 2>/dev/null || true
+
+          mkdir -p "$APP_DIR/usr/plugins/wayland-graphics-integration-client"
+          cp -a /opt/Qt/$(qt_version)/gcc_64/plugins/wayland-graphics-integration-client/. \
+             "$APP_DIR/usr/plugins/wayland-graphics-integration-client/" 2>/dev/null || true
+
+          mkdir -p "$APP_DIR/usr/plugins/wayland-shell-integration"
+          cp -a /opt/Qt/$(qt_version)/gcc_64/plugins/wayland-shell-integration/. \
+             "$APP_DIR/usr/plugins/wayland-shell-integration/" 2>/dev/null || true
+
           echo "=== Running linuxdeploy to package AppImage ==="
           export QMAKE="/opt/Qt/$(qt_version)/gcc_64/bin/qmake"
-          export EXTRA_QT_PLUGINS="multimedia"
+          export EXTRA_QT_PLUGINS="multimedia;waylandcompositor"
           ./linuxdeploy-x86_64.AppImage \
               --appdir "$APP_DIR" \
               -d "$APP_DIR/usr/share/applications/SerialPrograms.desktop" \
@@ -407,6 +430,7 @@ stages:
           echo "=== Patching AppRun to force GStreamer backend ==="
           sed -i '2i export PA_APPIMAGE_DIR=$(cd "$(dirname "$APPIMAGE")" && pwd)' "$APP_DIR/AppRun"
           sed -i '2i export QT_MEDIA_BACKEND=gstreamer' "$APP_DIR/AppRun"
+          sed -i '2i if [ -n "$WAYLAND_DISPLAY" ] && [ -z "$QT_QPA_PLATFORM" ]; then export QT_QPA_PLATFORM=wayland; elif [ -z "$QT_QPA_PLATFORM" ]; then export QT_QPA_PLATFORM=xcb; fi' "$APP_DIR/AppRun"
 
           echo "=== Packaging AppImage ==="
           ./appimagetool-x86_64.AppImage AppDir
@@ -551,16 +575,25 @@ stages:
     condition: succeeded()
 
 ###########################################
-#                 SLEEP                   #
+#              SLEEP SIGNAL               #
 ###########################################
-#- template: templates/sleep-signal.yml
-#  parameters:
-#    stageName: Sleep_Signal
-#    displayName: 'Send Sleep Signal'
-#    dependsOn:
-#      - Upload_Debug_Symbols
-#    poolName: AlarmClock
-#    condition: always()
+- template: templates/sleep-wake-signal.yml
+  parameters:
+    stageName: Sleep_Wake_Signal2
+    displayName: 'Send Sleep Signal'
+    dependsOn:
+      - Upload_Debug_Symbols
+    poolName: AlarmClock
+    action: Sleep
+    condition: |
+        and(
+          in(dependencies.Sleep_Wake_Signal.result, 'Succeeded'),
+          or(
+            eq('${{ parameters.targetOS }}', 'Windows'),
+            eq('${{ parameters.targetOS }}', 'Linux'),
+            eq('${{ parameters.targetOS }}', 'All')
+          )
+        )
 
 ##########################################
 #          ARTIFACT VALIDATION           #

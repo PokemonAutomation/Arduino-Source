@@ -1,0 +1,78 @@
+# templates/sleep-wake-signal.yml
+# Template for putting Windows/Linux host to sleep/wake via USB relay controller
+# AT commands: AT+CH1=1 (close relay), AT+CH1=0 (open relay)
+
+parameters:
+  stageName: ''
+  displayName: ''
+  dependsOn: []
+  condition: ''
+  action: '' # 'Wake' or 'Sleep'
+
+stages:
+  - stage: ${{ parameters.stageName }}
+    displayName: ${{ parameters.displayName }}
+    dependsOn: ${{ parameters.dependsOn }}
+    condition: ${{ parameters.condition }}
+
+    jobs:
+      - job: SendSleepWakeSignal
+        displayName: Send Sleep/Wake Signal via Relay
+        pool:
+          name: ${{ parameters.poolName }}
+        timeoutInMinutes: 10
+        steps:
+          - checkout: none
+
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '3.14'
+              addToPath: true
+            name: UsePythonVersion
+            displayName: 'Use Python 3.14'
+
+          - powershell: |
+              $action = "${{ parameters.action }}"
+              $pingUrl = "http://$($env:HOST_IP):$($env:HOST_PORT)/ping/"
+              $isAwake = $false
+
+              try {
+                  $response = Invoke-WebRequest -Uri $pingUrl -Headers @{ "X-Auth" = $env:HOST_SECRET } -TimeoutSec 10 -UseBasicParsing -ErrorAction Stop
+                  if ($response.Content.Trim() -eq "ack") {
+                      Write-Host "Ping response: ack. Host is awake."
+                      $isAwake = $true
+                  } else {
+                      Write-Host "Ping response: unexpected content '$($response.Content.Trim())'. Assuming asleep."
+                  }
+              } catch {
+                  Write-Host "Ping failed or no response. Assuming host is asleep: $_"
+              }
+
+              if ($action -eq "Wake" -and $isAwake) {
+                  Write-Host "Action is 'Wake' but host is already awake. Skipping script."
+              } elseif ($action -eq "Sleep" -and -not $isAwake) {
+                  Write-Host "Action is 'Sleep' but host is already asleep. Skipping script."
+              } else {
+                  Write-Host "Running relay script for action: $action"
+                  $f = "$env:TEMP\relay.py"
+                  Set-Content  $f "import serial"
+                  Add-Content  $f "import time"
+                  Add-Content  $f "with serial.Serial('COM3', 9600, timeout=1) as ser:"
+                  Add-Content  $f "    print('Closing the relay...')"
+                  Add-Content  $f "    ser.write(b'AT+CH1=1\r\n')"
+                  Add-Content  $f "    time.sleep(0.5)"
+                  Add-Content  $f "    print('Opening the relay...')"
+                  Add-Content  $f "    ser.write(b'AT+CH1=0\r\n')"
+                  python $f
+
+                  if ($LASTEXITCODE -ne 0) {
+                      Write-Error "Relay script failed with exit code $LASTEXITCODE"
+                      exit $LASTEXITCODE
+                  }
+              }
+            displayName: 'Send ${{ parameters.action }} Signal via Relay'
+            condition: succeeded()
+            env:
+              HOST_IP: $(host_ip)
+              HOST_PORT: $(host_port)
+              HOST_SECRET: $(host_secret)
