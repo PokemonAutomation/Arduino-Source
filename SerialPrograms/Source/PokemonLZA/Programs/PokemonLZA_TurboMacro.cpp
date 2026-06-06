@@ -59,7 +59,7 @@ std::unique_ptr<StatsTracker> LZA_TurboMacro_Descriptor::make_stats() const{
 
 LZA_TurboMacro::LZA_TurboMacro()
     : LOOP(
-        "<b>Number of times to loop:</b>",
+        "<b>Number of times to loop:</b><br>(Set to zero to loop forever.)",
         LockMode::UNLOCK_WHILE_RUNNING,
         100, 0
     )
@@ -120,7 +120,7 @@ void LZA_TurboMacro::program(SingleSwitchProgramEnvironment& env, CancellableSco
 void LZA_TurboMacro::run_table(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     LZA_TurboMacro_Descriptor::Stats& stats =
         env.current_stats<LZA_TurboMacro_Descriptor::Stats>();
-    for (uint32_t c = 0; c < LOOP; c++){
+    for (uint32_t c = 0; c < LOOP || LOOP == 0; c++){
         TABLE.run(scope, env.console.controller());
         stats.loops++;
         env.update_stats();
