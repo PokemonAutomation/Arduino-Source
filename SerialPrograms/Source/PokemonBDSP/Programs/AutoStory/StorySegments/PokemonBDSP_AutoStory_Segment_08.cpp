@@ -15,9 +15,9 @@
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_MarkFinder.h"
+#include "../PokemonBDSP_AutoStory.h"
 #include "../PokemonBDSP_AutoStoryTools.h"
 #include "../Utils/PokemonBDSP_AutoStory_Battle.h"
-#include "../PokemonBDSP_AutoStoryTools.h"
 #include "PokemonBDSP_AutoStory_Segment_08.h"
 
 using namespace std::chrono_literals;
@@ -98,6 +98,14 @@ void AutoStory_Segment_08::run_segment(
     AutoStory_Checkpoint_115().run_checkpoint(env, context, options, stats);
     AutoStory_Checkpoint_116().run_checkpoint(env, context, options, stats);
     AutoStory_Checkpoint_117().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_118().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_119().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_120().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_121().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_122().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_123().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_124().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_125().run_checkpoint(env, context, options, stats);
 
     /*AutoStory_Checkpoint_021().run_checkpoint(env, context, options, stats);
     checkpoint_021_legendary(env, context, options, stats);*/
@@ -124,14 +132,12 @@ static void move_back_after_unexpected_battle(
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
 
-    if (trainerid == "route_216_ace_maria") {
-        pbf_move_left_joystick(context, {-1, 0}, 1600ms, 100ms); // 8
-    } else if (trainerid == "route_215_skier_edward") {
-        pbf_move_left_joystick(context, {-1, 0}, 8100ms, 100ms); // 27++ (snow)
-    } else if (trainerid == "route_217_skier_lexie") {
-        pbf_move_left_joystick(context, {0, +1}, 2100ms, 100ms); // 7++ (snow)
-    } else if (trainerid == "route_217_blackbelt_luke") {
-        pbf_move_left_joystick(context, {0, +1}, 5100ms, 100ms); // 17++ (snow)
+    if (trainerid == "veilstone_warehouse_warehouse_grunt_1") {
+        pbf_move_left_joystick(context, {0, +1}, 1200ms, 100ms); // 5+
+    } else if (trainerid == "galactic_hq_grunt_1") {
+        pbf_move_left_joystick(context, {-1, 0}, 800ms, 100ms); // 3+
+    } else if (trainerid == "route_207_hiker_justin") {
+        pbf_move_left_joystick(context, {+1, 0}, 800ms, 100ms); // 3+
     }
 }
 
@@ -153,25 +159,26 @@ static bool handle_battle(
     pbf_wait(context, 500ms);
 
     if (
-        trainerid == "route_216_ace_maria" or
-        trainerid == "route_216_skier_edward" or
-        trainerid == "route_217_skier_lexie" or
-        trainerid == "route_217_blackbelt_luke" or
-        trainerid == "route_217_ace_olivia" or
-        trainerid == "verity_lakefront_grunt_1" or
-        trainerid == "verity_lakefront_grunt_3"
+        trainerid == "veilstone_warehouse_warehouse_grunt_2" or
+        trainerid == "galactic_hq_grunt_4" or
+        trainerid == "galactic_hq_grunt_5"
     ) {
         // Select Bulldoze
         pbf_press_dpad(context, DPAD_DOWN, 280ms, 200ms);
     } else if (
-        trainerid == "route_217_ace_dalton"
+        trainerid == "galactic_hq_grunt_1" or
+        trainerid == "galactic_hq_double_grunts_1"
     ) {
         // Select Razor leaf
         pbf_press_dpad(context, DPAD_UP, 280ms, 200ms);
     } else if (
-        trainerid == "verity_lakefront_grunt_2" or
-        trainerid == "verity_lakefront_grunt_4" or
-        trainerid == "verity_lakefront_commander_mars"
+        trainerid == "veilstone_warehouse_warehouse_grunt_1" or
+        trainerid == "galactic_hq_scientist_fredrick" or
+        trainerid == "galactic_hq_grunt_2" or
+        trainerid == "galactic_hq_grunt_3" or
+        trainerid == "galactic_hq_cyrus" or
+        trainerid == "galactic_hq_commander_saturn" or
+        trainerid == "route_207_hiker_justin"
     ) {
         // Select Crunch
     }
@@ -450,14 +457,14 @@ static bool get_key_and_enter_warehouse(
     dpad.last_dir = DPAD_UP;
     repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 2);
 
-    pbf_move_left_joystick(context, {0, -1}, 3600ms, 100ms); // 23
-    pbf_move_left_joystick(context, {-1, 0}, 3800ms, 100ms); // 21
+    pbf_move_left_joystick(context, {0, -1}, 3200ms, 100ms); // 23
+    pbf_move_left_joystick(context, {-1, 0}, 2700ms, 100ms); // 21
     pbf_move_left_joystick(context, {0, +1}, 1800ms, 100ms); // 9+
     pbf_move_left_joystick(context, {-1, 0}, 2600ms, 100ms); // 13+
     pbf_move_left_joystick(context, {0, +1}, 2600ms, 100ms); // 13+
     pbf_move_left_joystick(context, {+1, 0}, 2600ms, 100ms); // 12+
     dpad.last_dir = DPAD_RIGHT;
-    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 2);
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 1);
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
@@ -474,6 +481,1287 @@ static bool get_key_and_enter_warehouse(
         }
         stream.log("get_key_and_enter_warehouse: entered warehouse.", COLOR_GREEN);
     };
+    return true;
+}
+
+static bool go_through_warehouse(
+    VideoStream& stream,
+    ProControllerContext& context
+){
+    DpadState dpad;
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+    context.wait_for_all_requests();
+    stream.log("go_through_warehouse: Going through the warehouse...");
+
+    dpad.last_dir = DPAD_UP;
+    repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 1);
+
+    {
+        ShortDialogWatcher open_door(COLOR_RED);
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                ssf_press_left_joystick(context, {0, +1}, 0ms, 5000ms);
+                ssf_mash1_button(context, BUTTON_A, 5000ms);
+            },
+            {{open_door}}
+        );
+        if (ret == 0){
+            stream.log("go_through_warehouse: Opened the door.", COLOR_GREEN);
+            pbf_mash_button(context, BUTTON_A, 4000ms);
+        } else if (ret < 0){
+                stream.log("go_through_warehouse: Didn't detect door dialog box!", COLOR_RED);
+                return false;
+        }
+    }
+
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {0, +1}, 1000ms, 100ms); // 4+
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_through_warehouse: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_through_warehouse: got into the warehouse's B2F.", COLOR_GREEN);
+    };
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+
+    pbf_move_left_joystick(context, {+1, 0}, 7400ms, 100ms); // 37+
+    dpad.last_dir = DPAD_RIGHT;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 1);
+
+    {
+        MarkDetector warehouse_grunt_1_fight(stream.overlay(), {0.1, 0.0, 0.8, 0.9});
+
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 1200ms, 100ms); // 5+
+                pbf_move_left_joystick(context, {0, -1}, 400ms, 100ms); // 2+
+                pbf_move_left_joystick(context, {+1, 0}, 10800ms, 100ms); // 54+
+            },
+            {{warehouse_grunt_1_fight}}
+        );
+        if (ret == 0){
+            context.wait_for_all_requests();
+            pbf_wait(context, 2000ms);
+
+            BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+            ret = run_until<ProControllerContext>(
+                stream, context,
+                [](ProControllerContext& context){
+                    pbf_mash_button(context, BUTTON_A, 200000ms);
+                },
+                {{black_screen}}
+            );
+            if (ret < 0){
+                stream.log("veilstone_warehouse_warehouse_grunt_1: black screen not detected!", COLOR_RED);
+                return false;
+            } else if (ret == 0){
+                handle_battle(stream, context, "veilstone_warehouse_warehouse_grunt_1");
+                context.wait_for_all_requests();
+                pbf_wait(context, 3000ms);
+                move_back_after_unexpected_battle(stream, context, "veilstone_warehouse_warehouse_grunt_1");
+            }
+        }
+    }
+
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {0, -1}, 200ms, 100ms); // 1
+    
+
+    {
+        MarkDetector warehouse_grunt_2_fight(stream.overlay(), {0.1, 0.0, 0.8, 0.9});
+
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 13000ms, 100ms); // 54+
+            },
+            {{warehouse_grunt_2_fight}}
+        );
+        if (ret == 0){
+            context.wait_for_all_requests();
+            pbf_wait(context, 2000ms);
+
+            BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+            ret = run_until<ProControllerContext>(
+                stream, context,
+                [](ProControllerContext& context){
+                    pbf_mash_button(context, BUTTON_A, 200000ms);
+                },
+                {{black_screen}}
+            );
+            if (ret < 0){
+                stream.log("veilstone_warehouse_warehouse_grunt_2: black screen not detected!", COLOR_RED);
+                return false;
+            } else if (ret == 0){
+                handle_battle(stream, context, "veilstone_warehouse_warehouse_grunt_2");
+                context.wait_for_all_requests();
+                pbf_wait(context, 3000ms);
+                move_back_after_unexpected_battle(stream, context, "veilstone_warehouse_warehouse_grunt_2");
+            }
+        }
+    }
+
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {+1, 0}, 1000ms, 100ms); // 4+
+    pbf_move_left_joystick(context, {0, +1}, 1600ms, 100ms); // 8+
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_through_warehouse: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_through_warehouse: got into the warehouse's B1F.", COLOR_GREEN);
+    };
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+
+    dpad.last_dir = DPAD_RIGHT;
+    repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 1);
+    repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 5);
+    pbf_move_left_joystick(context, {0, +1}, 1200ms, 100ms); // 5+
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_through_warehouse: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_through_warehouse: got into the Galactic HQ 1F, first room.", COLOR_GREEN);
+    };
+
+    pbf_move_left_joystick(context, {+1, 0}, 1400ms, 100ms); // 6+
+    dpad.last_dir = DPAD_RIGHT;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 2);
+    pbf_move_left_joystick(context, {0, -1}, 1400ms, 100ms); // 6+
+
+    {
+        BlackScreenFlashWatcher black_screen(COLOR_BLUE, {0.1, 0.1, 0.8, 0.8});
+        MarkDetector galactic_hq_grunt_1_fight(stream.overlay(), {0.1, 0.0, 0.8, 0.9});
+
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 2200ms, 100ms); // 11+
+                pbf_move_left_joystick(context, {0, +1}, 1200ms, 100ms); // 6
+            },
+            {{black_screen},{galactic_hq_grunt_1_fight}}
+        );
+        if (ret == 0) {
+            stream.log("go_through_warehouse: got into Galactic HQ 1F, second room.", COLOR_GREEN);
+        } else if (ret == 1){
+            context.wait_for_all_requests();
+            pbf_wait(context, 2000ms);
+
+            BlackScreenOverWatcher black_screen_2(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+            ret = run_until<ProControllerContext>(
+                stream, context,
+                [](ProControllerContext& context){
+                    pbf_mash_button(context, BUTTON_A, 200000ms);
+                },
+                {{black_screen_2}}
+            );
+            if (ret < 0){
+                stream.log("galactic_hq_grunt_1: black screen not detected!", COLOR_RED);
+                return false;
+            } else if (ret == 0){
+                handle_battle(stream, context, "galactic_hq_grunt_1");
+                context.wait_for_all_requests();
+                pbf_wait(context, 3000ms);
+                move_back_after_unexpected_battle(stream, context, "galactic_hq_grunt_1");
+            }
+
+            context.wait_for_all_requests();
+            pbf_wait(context, 1000ms);
+
+            {
+                BlackScreenFlashWatcher black_screen(COLOR_BLUE, {0.1, 0.1, 0.8, 0.8});
+                int ret = run_until<ProControllerContext>(
+                    stream, context,
+                    [](ProControllerContext& context){
+                        pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+                    },
+                    {{black_screen}}
+                );
+                if (ret < 0){
+                    stream.log("go_through_warehouse: black screen not detected!", COLOR_RED);
+                    return false;
+                }
+                stream.log("go_through_warehouse: got into Galactic HQ 1F, second room.", COLOR_GREEN);
+            };
+        }
+    }
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+
+    pbf_move_left_joystick(context, {+1, 0}, 1000ms, 100ms); // 4+
+
+    {
+        BlackScreenFlashWatcher black_screen(COLOR_BLUE, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_through_warehouse: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_through_warehouse: got into the Galactic HQ 1F, third room.", COLOR_GREEN);
+    };
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+
+    pbf_move_left_joystick(context, {0, +1}, 1200ms, 100ms); // 5+
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_through_warehouse: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_through_warehouse: got into the Galactic HQ 2F, first room.", COLOR_GREEN);
+    };
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+
+    pbf_move_left_joystick(context, {0, -1}, 800ms, 100ms); // 3+
+    pbf_move_left_joystick(context, {-1, 0}, 1400ms, 100ms); // 6+
+
+    {
+        BlackScreenFlashWatcher black_screen(COLOR_BLUE, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_through_warehouse: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_through_warehouse: got into the Galactic HQ 2F, second room.", COLOR_GREEN);
+    };
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+
+    pbf_move_left_joystick(context, {+1, 0}, 400ms, 100ms); // 2
+    pbf_move_left_joystick(context, {0, +1}, 600ms, 100ms); // 2+
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_through_warehouse: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_through_warehouse: got into the Galactic HQ 1F, fourth room.", COLOR_GREEN);
+    };
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+
+    dpad.last_dir = DPAD_RIGHT;
+    repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 4);
+
+    {
+        MarkDetector galactic_hq_scientist_fredrick_fight(stream.overlay(), {0.1, 0.0, 0.8, 0.9});
+
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 1000ms, 100ms); // 6
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms); // 6+
+            },
+            {{galactic_hq_scientist_fredrick_fight}}
+        );
+        if (ret == 0){
+            context.wait_for_all_requests();
+            pbf_wait(context, 2000ms);
+
+            BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+            ret = run_until<ProControllerContext>(
+                stream, context,
+                [](ProControllerContext& context){
+                    pbf_mash_button(context, BUTTON_A, 200000ms);
+                },
+                {{black_screen}}
+            );
+            if (ret < 0){
+                stream.log("galactic_hq_scientist_fredrick: black screen not detected!", COLOR_RED);
+                return false;
+            } else if (ret == 0){
+                handle_battle(stream, context, "galactic_hq_scientist_fredrick");
+            }
+        }
+    }
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 3000ms);
+
+    pbf_move_left_joystick(context, {0, +1}, 800ms, 100ms); // 3+
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_through_warehouse: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_through_warehouse: got into the Galactic Warehouse B2F.", COLOR_GREEN);
+    };
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+
+    pbf_move_left_joystick(context, {-1, 0}, 4600ms, 100ms); // 23+
+    pbf_move_left_joystick(context, {0, -1}, 1600ms, 100ms); // 8+
+
+    dpad.last_dir = DPAD_DOWN;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 7);
+
+    {
+        ShortDialogWatcher pick_up_galactic_key(COLOR_RED);
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                ssf_press_left_joystick(context, {0, +1}, 0ms, 5000ms);
+                ssf_mash1_button(context, BUTTON_A, 5000ms);
+            },
+            {{pick_up_galactic_key}}
+        );
+        if (ret == 0){
+            stream.log("go_through_warehouse: Picked up the Galactic key.", COLOR_GREEN);
+            pbf_mash_button(context, BUTTON_B, 3000ms);
+        } else if (ret < 0){
+                stream.log("go_through_warehouse: Didn't detect grunt dialog box!", COLOR_RED);
+                return false;
+        }
+    }
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {0, -1}, 1200ms, 100ms); // 5+
+    pbf_move_left_joystick(context, {-1, 0}, 1400ms, 100ms); // 6+
+
+    {
+        ShortDialogWatcher open_door(COLOR_RED);
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                ssf_press_left_joystick(context, {0, +1}, 0ms, 5000ms);
+                ssf_mash1_button(context, BUTTON_A, 5000ms);
+            },
+            {{open_door}}
+        );
+        if (ret == 0){
+            stream.log("go_through_warehouse: Opened the first door with the Galactic Key.", COLOR_GREEN);
+            pbf_mash_button(context, BUTTON_A, 4000ms);
+        } else if (ret < 0){
+                stream.log("go_through_warehouse: Didn't detect door opening dialog box!", COLOR_RED);
+                return false;
+        }
+    }
+
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {0, +1}, 1400ms, 100ms); // 6+
+    pbf_move_left_joystick(context, {-1, 0}, 1800ms, 100ms); // 8+
+    pbf_move_left_joystick(context, {0, -1}, 3200ms, 100ms); // 16+
+
+    dpad.last_dir = DPAD_DOWN;
+    repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 3);
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_through_warehouse: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_through_warehouse: got into the Galactic Warehouse entrance area.", COLOR_GREEN);
+    };
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+
+    pbf_move_left_joystick(context, {-1, 0}, 1200ms, 100ms); // 5+
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_through_warehouse: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_through_warehouse: got out of the Galactic Warehouse.", COLOR_GREEN);
+    };
+
+    return true;
+}
+
+
+static bool heal_at_veilstone_pokemon_center(
+    VideoStream& stream,
+    ProControllerContext& context
+){
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+    context.wait_for_all_requests();
+    stream.log("heal_at_veilstone_pokemon_center: Flying to Veilstone Pokemon Center and entering...");
+
+    fly_to(stream, context, FlyPoint::CurrentCity);
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 1000ms);
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("heal_at_veilstone_pokemon_center: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("heal_at_veilstone_pokemon_center: entered the Veilstone Pokemon Center.", COLOR_GREEN);
+    };
+
+    return true;
+}
+
+static bool go_to_galactic_hq(
+    VideoStream& stream,
+    ProControllerContext& context
+){
+    DpadState dpad;
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+    context.wait_for_all_requests();
+    stream.log("go_to_galactic_hq: Going through the warehouse...");
+
+    pbf_move_left_joystick(context, {0, -1}, 600ms, 100ms); // 2+
+    dpad.last_dir = DPAD_DOWN;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 6);
+    repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 4);
+    pbf_move_left_joystick(context, {+1, 0}, 3200ms, 100ms); // 16+
+    dpad.last_dir = DPAD_RIGHT;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 3);
+
+    pbf_move_left_joystick(context, {0, +1}, 4600ms, 100ms); // 23+
+    dpad.last_dir = DPAD_UP;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 7);
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_to_galactic_hq: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_to_galactic_hq: entered the Galactic HQ from the front door.", COLOR_GREEN);
+    };
+
+    return true;
+}
+
+static bool go_through_galactic_hq(
+    VideoStream& stream,
+    ProControllerContext& context,
+    AutoStoryOptions options
+){
+    DpadState dpad;
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+    context.wait_for_all_requests();
+    stream.log("go_through_galactic_hq: Going through the HQ again and battling Cyrus...");
+
+    dpad.last_dir = DPAD_UP;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 6);
+
+    {
+        ShortDialogWatcher open_door(COLOR_RED);
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                ssf_press_left_joystick(context, {0, +1}, 0ms, 5000ms);
+                ssf_mash1_button(context, BUTTON_A, 5000ms);
+            },
+            {{open_door}}
+        );
+        if (ret == 0){
+            stream.log("go_through_galactic_hq: Opened the door.", COLOR_GREEN);
+            pbf_mash_button(context, BUTTON_A, 4000ms);
+        } else if (ret < 0){
+                stream.log("go_through_galactic_hq: Didn't detect door dialog box!", COLOR_RED);
+                return false;
+        }
+    }
+
+    context.wait_for_all_requests();
+
+    pbf_move_left_joystick(context, {0, +1}, 1200ms, 100ms); // 5+
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_through_galactic_hq: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_through_galactic_hq: entered Galactic HQ's 2F, first room.", COLOR_GREEN);
+    };
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+
+    pbf_move_left_joystick(context, {0, -1}, 1000ms, 100ms); // 4+
+
+
+    bool grunt_2_done = false;
+    {
+        MarkDetector galactic_hq_grunt_2_fight(stream.overlay(), {0.1, 0.0, 0.8, 0.9});
+        // First run to the right, and see grunt 2 detects you
+
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 3200ms, 100ms); // 16+
+                context.wait_for_all_requests();
+                pbf_wait(context, 2000ms);
+                context.wait_for_all_requests();
+            },
+            {{galactic_hq_grunt_2_fight}}
+        );
+        if (ret < 0) {
+            // If it doesn't, move on, but consider that grunt_2 hasn't been done
+            stream.log("galactic_hq_grunt_2: mark not detected, moving on...");
+        } else if (ret == 0){
+            // If it does, handle the fight and consider that grunt_2 has been done
+            context.wait_for_all_requests();
+            pbf_wait(context, 2000ms);
+
+            BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+            ret = run_until<ProControllerContext>(
+                stream, context,
+                [](ProControllerContext& context){
+                    pbf_mash_button(context, BUTTON_A, 200000ms);
+                },
+                {{black_screen}}
+            );
+            if (ret < 0){
+                stream.log("galactic_hq_grunt_2: black screen not detected!", COLOR_RED);
+                return false;
+            } else if (ret == 0){
+                handle_battle(stream, context, "galactic_hq_grunt_2");
+                grunt_2_done = true;
+            }
+        }
+    }
+    
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+
+    // Move to the end against the wall
+    pbf_move_left_joystick(context, {+1, 0}, 1000ms, 100ms); // 5+
+    dpad.last_dir = DPAD_RIGHT;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 1);
+
+    if (options.help_mode == HelpMode::OUTSIDE_HELP) {
+        if (!grunt_2_done) {
+            {
+                // Now run downwards and check if either mark is detected (it should)
+                MarkDetector galactic_hq_grunt_2_3_fight(stream.overlay(), {0.1, 0.0, 0.8, 0.9});
+
+                int ret = run_until<ProControllerContext>(
+                    stream, context,
+                    [](ProControllerContext& context){
+                        pbf_move_left_joystick(context, {0, -1}, 5000ms, 100ms); // 16+
+                    },
+                    {{galactic_hq_grunt_2_3_fight}}
+                );
+
+                context.wait_for_all_requests();
+                pbf_wait(context, 2000ms);
+
+                if (ret < 0 ) {
+                    // Mark isn't detected, there is an issue
+                    stream.log("galactic_hq_grunt_2_3: mark not detected!", COLOR_RED);
+                    return false;
+                } else if (ret == 0){
+                    context.wait_for_all_requests();
+
+                    BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+                    ret = run_until<ProControllerContext>(
+                        stream, context,
+                        [](ProControllerContext& context){
+                            pbf_mash_button(context, BUTTON_A, 200000ms);
+                        },
+                        {{black_screen}}
+                    );
+                    if (ret < 0){
+                        stream.log("galactic_hq_grunt_2: black screen not detected!", COLOR_RED);
+                        return false;
+                    } else if (ret == 0) {
+                        handle_battle(stream, context, "galactic_hq_grunt_2");
+                    }
+                }
+            }
+        }
+
+        context.wait_for_all_requests();
+        
+        {
+            BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+            int ret = run_until<ProControllerContext>(
+                stream, context,
+                [](ProControllerContext& context){
+                    ssf_press_left_joystick(context, {0, -1}, 0ms, 10000ms);
+                    ssf_mash1_button(context, BUTTON_A, 10000ms);
+                },
+                {{black_screen}}
+            );
+            if (ret < 0){
+                stream.log("galactic_hq_grunt_2: black screen not detected!", COLOR_RED);
+                return false;
+            } else if (ret == 0){
+                context.wait_for_all_requests();
+
+                handle_battle(stream, context, "galactic_hq_grunt_3");
+                context.wait_for_all_requests();
+                pbf_wait(context, 2000ms);
+            }
+        }
+    }
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 3000ms);
+
+    pbf_move_left_joystick(context, {0, -1}, 1200ms, 100ms); // 5+
+    dpad.last_dir = DPAD_DOWN;
+    repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 7);
+    pbf_move_left_joystick(context, {0, +1}, 2600ms, 100ms); // 13+
+    pbf_move_left_joystick(context, {-1, 0}, 800ms, 100ms); // 3+
+
+    {
+        BlackScreenFlashWatcher black_screen(COLOR_BLUE, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_through_galactic_hq: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_through_galactic_hq: got into the Galactic HQ 2F, third room.", COLOR_GREEN);
+    };
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 3000ms);
+
+    pbf_move_left_joystick(context, {0, +1}, 800ms, 100ms); // 3+
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_through_galactic_hq: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_through_galactic_hq: entered Galactic HQ's 3F, first room.", COLOR_GREEN);
+    };
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 3000ms);
+
+    dpad.last_dir = DPAD_LEFT;
+    repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 1);
+
+    if (options.help_mode == HelpMode::OUTSIDE_HELP) {
+        {
+            MarkDetector galactic_hq_grunt_4_fight(stream.overlay(), {0.1, 0.0, 0.8, 0.9});
+
+            int ret = run_until<ProControllerContext>(
+                stream, context,
+                [](ProControllerContext& context){
+                    pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms); // 5+
+                },
+                {{galactic_hq_grunt_4_fight}}
+            );
+            if (ret == 0){
+                context.wait_for_all_requests();
+                pbf_wait(context, 3000ms);
+
+                BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+                ret = run_until<ProControllerContext>(
+                    stream, context,
+                    [](ProControllerContext& context){
+                        pbf_mash_button(context, BUTTON_A, 200000ms);
+                    },
+                    {{black_screen}}
+                );
+                if (ret < 0){
+                    stream.log("galactic_hq_grunt_4: black screen not detected!", COLOR_RED);
+                    return false;
+                } else if (ret == 0){
+                    handle_battle(stream, context, "galactic_hq_grunt_4");
+                }
+            }
+        }
+
+        {
+            BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+            int ret = run_until<ProControllerContext>(
+                stream, context,
+                [](ProControllerContext& context){
+                    pbf_mash_button(context, BUTTON_A, 10000ms);
+                },
+                {{black_screen}}
+            );
+            if (ret < 0){
+                stream.log("galactic_hq_grunt_5: black screen not detected!", COLOR_RED);
+                return false;
+            } else if (ret == 0){
+                handle_battle(stream, context, "galactic_hq_grunt_5");
+            }
+        }
+    };
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 3000ms);
+
+    pbf_move_left_joystick(context, {-1, 0}, 4400ms, 100ms); // 22+
+    pbf_move_left_joystick(context, {0, -1}, 2200ms, 100ms); // 11+
+    pbf_move_left_joystick(context, {-1, 0}, 1200ms, 100ms); // 5+
+
+    {
+        BlackScreenFlashWatcher black_screen(COLOR_BLUE, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_through_galactic_hq: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_through_galactic_hq: got into the Galactic HQ 1F, fifth room.", COLOR_GREEN);
+    };
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 3000ms);
+
+    pbf_move_left_joystick(context, {0, +1}, 800ms, 100ms); // 3+
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_through_galactic_hq: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_through_galactic_hq: entered Galactic HQ's 4F.", COLOR_GREEN);
+    };
+    
+    context.wait_for_all_requests();
+    pbf_wait(context, 3000ms);
+
+    dpad.last_dir = DPAD_RIGHT;
+    repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 5);
+
+    {
+        ShortDialogWatcher open_door(COLOR_RED);
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                ssf_press_left_joystick(context, {0, +1}, 0ms, 5000ms);
+                ssf_mash1_button(context, BUTTON_A, 5000ms);
+            },
+            {{open_door}}
+        );
+        if (ret == 0){
+            stream.log("go_through_galactic_hq: Opened the door with the Galactic Key.", COLOR_GREEN);
+            pbf_mash_button(context, BUTTON_A, 4000ms);
+        } else if (ret < 0){
+                stream.log("go_through_galactic_hq: Didn't detect door opening dialog box!", COLOR_RED);
+                return false;
+        }
+    }
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 3000ms);
+
+    {
+        ShortDialogWatcher cyrus_dialog(COLOR_RED);
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms); // 5+
+            },
+            {{cyrus_dialog}}
+        );
+        if (ret == 0){
+            stream.log("go_through_galactic_hq: Cyrus dialog box detected.", COLOR_GREEN);
+
+            BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+            ret = run_until<ProControllerContext>(
+                stream, context,
+                [](ProControllerContext& context){
+                    pbf_mash_button(context, BUTTON_A, 200000ms);
+                },
+                {{black_screen}}
+            );
+            if (ret < 0){
+                stream.log("galactic_hq_cyrus: black screen not detected!", COLOR_RED);
+                return false;
+            } else if (ret == 0){
+                handle_battle(stream, context, "galactic_hq_cyrus");
+            }
+        }
+    }
+    
+    context.wait_for_all_requests();
+    pbf_wait(context, 3000ms);
+
+    pbf_mash_button(context, BUTTON_A, 17000ms);
+
+    context.wait_for_all_requests();
+
+    pbf_move_left_joystick(context, {0, +1}, 800ms, 100ms); // 3+
+    pbf_move_left_joystick(context, {+1, 0}, 1400ms, 100ms); // 6+
+    dpad.last_dir = DPAD_RIGHT;
+    repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 2);
+    pbf_move_left_joystick(context, {+1, 0}, 1600ms, 100ms); // 8+
+
+    {
+        BlackScreenFlashWatcher black_screen(COLOR_BLUE, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_through_galactic_hq: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_through_galactic_hq: got into the Galactic HQ 4F, second room.", COLOR_GREEN);
+    };
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 3000ms);
+
+    pbf_move_left_joystick(context, {+1, 0}, 7600ms, 100ms); // 38+
+    pbf_move_left_joystick(context, {0, +1}, 1600ms, 100ms); // 8+
+    pbf_move_left_joystick(context, {-1, 0}, 1400ms, 100ms); // 6+
+
+    dpad.last_dir = DPAD_LEFT;
+    repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 3);
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_through_galactic_hq: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_through_galactic_hq: entered Galactic HQ's 4F Back.", COLOR_GREEN);
+    };
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 3000ms);
+
+    dpad.last_dir = DPAD_UP;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 2);
+    pbf_move_left_joystick(context, {0, +1}, 1600ms, 100ms); // 7+
+
+    {
+        ShortDialogWatcher talk_to_commander_saturn(COLOR_RED);
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                ssf_press_left_joystick(context, {+1, 0}, 0ms, 5000ms);
+                ssf_mash1_button(context, BUTTON_A, 5000ms);
+            },
+            {{talk_to_commander_saturn}}
+        );
+        if (ret < 0){
+            stream.log("go_through_galactic_hq: Didn't detect Commander Saturn dialog box!", COLOR_RED);
+            return false;
+        } else if (ret == 0){
+            stream.log("go_through_galactic_hq: Starting the battle with Commander Saturn.", COLOR_GREEN);
+
+            BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+            ret = run_until<ProControllerContext>(
+                stream, context,
+                [](ProControllerContext& context){
+                    pbf_mash_button(context, BUTTON_A, 200000ms);
+                },
+                {{black_screen}}
+            );
+            if (ret < 0){
+                stream.log("galactic_hq_commander_saturn: black screen not detected!", COLOR_RED);
+                return false;
+            } else if (ret == 0){
+                handle_battle(stream, context, "galactic_hq_commander_saturn");
+            }
+        }
+    }
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 3000ms);
+
+    pbf_mash_button(context, BUTTON_B, 2000ms);
+    context.wait_for_all_requests();
+
+    pbf_move_left_joystick(context, {+1, 0}, 400ms, 100ms); // 1+
+    pbf_move_left_joystick(context, {0, +1}, 400ms, 100ms); // 1+
+
+    {
+        ShortDialogWatcher unlock_guardians(COLOR_RED);
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                ssf_press_left_joystick(context, {0, +1}, 0ms, 5000ms);
+                ssf_mash1_button(context, BUTTON_A, 5000ms);
+            },
+            {{unlock_guardians}}
+        );
+        if (ret == 0){
+            stream.log("go_through_galactic_hq: Released the Lake Guardians.", COLOR_GREEN);
+            pbf_mash_button(context, BUTTON_A, 4000ms);
+            pbf_mash_button(context, BUTTON_B, 8000ms);
+        } else if (ret < 0){
+                stream.log("go_through_galactic_hq: Didn't detect button dialog box!", COLOR_RED);
+                return false;
+        }
+    }
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 3000ms);
+
+    dpad.last_dir = DPAD_RIGHT;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 2);
+    pbf_move_left_joystick(context, {0, -1}, 1600ms, 100ms); // 7+
+    repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 2);
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_through_galactic_hq: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_through_galactic_hq: exited Galactic HQ's 4F Back.", COLOR_GREEN);
+    };
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 3000ms);
+
+    dpad.last_dir = DPAD_DOWN;
+    repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 8);
+
+    {
+        BlackScreenFlashWatcher black_screen(COLOR_BLUE, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_through_galactic_hq: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_through_galactic_hq: exited Galactic HQ 4F second room, entering 4F first room.", COLOR_GREEN);
+    };
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 3000ms);
+
+    pbf_move_left_joystick(context, {0, -1}, 1400ms, 100ms); // 6+
+    dpad.last_dir = DPAD_DOWN;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 3);
+    pbf_move_left_joystick(context, {0, -1}, 1800ms, 100ms); // 9+
+    repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 1);
+
+    {
+        BlackScreenFlashWatcher black_screen(COLOR_BLUE, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_through_galactic_hq: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_through_galactic_hq: exited Galactic HQ 4F first room, entering 1F sixth room.", COLOR_GREEN);
+    };
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 3000ms);
+
+    pbf_move_left_joystick(context, {0, -1}, 1600ms, 100ms); // 8+
+    dpad.last_dir = DPAD_DOWN;
+    repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 1);
+
+    {
+        WhiteScreenOverWatcher white_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
+            },
+            {{white_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_through_galactic_hq: white screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_through_galactic_hq: exited Galactic HQ.", COLOR_GREEN);
+    };
+
+    return true;
+}
+
+
+static bool fly_and_heal_at_oreburgh(
+    VideoStream& stream,
+    ProControllerContext& context,
+    AutoStoryOptions options
+){
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+    context.wait_for_all_requests();
+    stream.log("fly_and_heal_at_oreburgh: Flying to Oreburgh City and healing pokemon...");
+
+    fly_to(stream, context, FlyPoint::OreburghCity);
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("fly_and_heal_at_oreburgh: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("fly_and_heal_at_oreburgh: entered Oreburgh City's Pokemon Center.", COLOR_GREEN);
+    };
+
+    return true;
+}
+
+static bool go_to_mount_coronet(
+    VideoStream& stream,
+    ProControllerContext& context,
+    AutoStoryOptions options
+){
+    DpadState dpad;
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+    context.wait_for_all_requests();
+    stream.log("go_to_mount_coronet: Heading towards Mount Coronet...");
+
+    dpad.last_dir = DPAD_DOWN;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 6);
+    pbf_move_left_joystick(context, {0, +1}, 6000ms, 100ms); // 30+
+    dpad.last_dir = DPAD_UP;
+    repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 3);
+    repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 2);
+    pbf_move_left_joystick(context, {+1, 0}, 1600ms, 100ms); // 7+
+    dpad.last_dir = DPAD_RIGHT;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 1);
+
+    context.wait_for_all_requests();
+    get_on_bicycle(stream, context, GearLevel::Fast);
+
+    pbf_move_left_joystick(context, {0, +1}, 1300ms, 100ms); // 9- (bike fast gear)
+    pbf_press_button(context, BUTTON_PLUS, 80ms, 300ms);
+    context.wait_for_all_requests();
+
+    pbf_move_left_joystick(context, {+1, 0}, 3400ms, 100ms); // 26
+    pbf_move_left_joystick(context, {0, +1}, 1000ms, 100ms); // 4+
+
+    {
+        MarkDetector hiker_justin_fight(stream.overlay(), {0.1, 0.0, 0.8, 0.9});
+
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 5000ms, 100ms); // 11+
+            },
+            {{hiker_justin_fight}}
+        );
+        if (ret == 0){
+            context.wait_for_all_requests();
+            pbf_wait(context, 2000ms);
+
+            BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+            ret = run_until<ProControllerContext>(
+                stream, context,
+                [](ProControllerContext& context){
+                    pbf_mash_button(context, BUTTON_A, 200000ms);
+                },
+                {{black_screen}}
+            );
+            if (ret < 0){
+                stream.log("go_to_mount_coronet, route_207_hiker_justin: black screen not detected!", COLOR_RED);
+                return false;
+            } else if (ret == 0){
+                handle_battle(stream, context, "route_207_hiker_justin");
+                context.wait_for_all_requests();
+                pbf_wait(context, 3000ms);
+                move_back_after_unexpected_battle(stream, context, "route_207_hiker_justin");
+            }
+        }
+    }
+
+    dpad.last_dir = DPAD_RIGHT;
+    repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 2);
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_to_mount_coronet: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_to_mount_coronet: entered Mt. Coronet.", COLOR_GREEN);
+    };
+
     return true;
 }
 
@@ -558,7 +1846,93 @@ void checkpoint_117(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     );
 }
 
+void checkpoint_118(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
+            if (!go_through_warehouse(env.console, context)){
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_warehouse: transition not detected.", env.console);
+            }
+        },
+        false
+    );
+}
 
+void checkpoint_119(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
+            if (!heal_at_veilstone_pokemon_center(env.console, context)){
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_at_veilstone_pokemon_center: transition not detected.", env.console);
+            }
+        },
+        false
+    );
+}
+
+void checkpoint_120(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
+            if (!heal_and_exit(env.console, context, "Veilstone City")){
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_and_exit: transition not detected.", env.console);
+            }
+        },
+        false
+    );
+}
+
+void checkpoint_121(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
+            if (!go_to_galactic_hq(env.console, context)){
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_galactic_hq: transition not detected.", env.console);
+            }
+        },
+        false
+    );
+}
+
+void checkpoint_122(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
+            if (!go_through_galactic_hq(env.console, context, options)){
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_galactic_hq: transition not detected.", env.console);
+            }
+        },
+        false
+    );
+}
+
+void checkpoint_123(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
+            if (!fly_and_heal_at_oreburgh(env.console, context, options)){
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "fly_and_heal_at_oreburgh: transition not detected.", env.console);
+            }
+        },
+        false
+    );
+}
+
+void checkpoint_124(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
+            if (!heal_and_exit(env.console, context, "Oreburgh City")){
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_and_exit: transition not detected.", env.console);
+            }
+        },
+        false
+    );
+}
+
+void checkpoint_125(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
+            if (!go_to_mount_coronet(env.console, context, options)){
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_mount_coronet: transition not detected.", env.console);
+            }
+        },
+        false
+    );
+}
 
 
 std::string AutoStory_Checkpoint_111::name()       const{ return "111 - Segment 08 - Gym badge acquired"; }
@@ -645,6 +2019,101 @@ void AutoStory_Checkpoint_117::run_checkpoint(
     checkpoint_117(env, context, options, stats);
 }
 
+std::string AutoStory_Checkpoint_118::name()       const{ return "118 - Segment 08 - Entered Team Galactic Warehouse"; }
+std::string AutoStory_Checkpoint_118::start_text() const{ return "Entered Team Galactic Warehouse."; }
+std::string AutoStory_Checkpoint_118::end_text()   const{ return "Got out of the warehouse with the key."; }
+void AutoStory_Checkpoint_118::run_checkpoint(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+) const{
+    checkpoint_118(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_119::name()       const{ return "119 - Segment 08 - Fly back to Veilstone Pokemon Center for healing"; }
+std::string AutoStory_Checkpoint_119::start_text() const{ return "Got out of the warehouse with the key."; }
+std::string AutoStory_Checkpoint_119::end_text()   const{ return "Entered Veilstone Pokemon Center for healing."; }
+void AutoStory_Checkpoint_119::run_checkpoint(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+) const{
+    checkpoint_119(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_120::name()       const{ return "120 - Segment 08 - Heal Pokemon"; }
+std::string AutoStory_Checkpoint_120::start_text() const{ return "Entered Veilstone Pokemon Center for healing."; }
+std::string AutoStory_Checkpoint_120::end_text()   const{ return "Exited Veilstone Pokemon Center."; }
+void AutoStory_Checkpoint_120::run_checkpoint(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+) const{
+    checkpoint_120(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_121::name()       const{ return "121 - Segment 08 - Go to Galactic HQ"; }
+std::string AutoStory_Checkpoint_121::start_text() const{ return "Exited Veilstone Pokemon Center."; }
+std::string AutoStory_Checkpoint_121::end_text()   const{ return "Entered Galactic HQ."; }
+void AutoStory_Checkpoint_121::run_checkpoint(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+) const{
+    checkpoint_121(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_122::name()       const{ return "122 - Segment 08 - Deal with Cyrus at the Galactic HQ"; }
+std::string AutoStory_Checkpoint_122::start_text() const{ return "Entered Galactic HQ."; }
+std::string AutoStory_Checkpoint_122::end_text()   const{ return "Dealt with Cyrus and left the Galactic HQ."; }
+void AutoStory_Checkpoint_122::run_checkpoint(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+) const{
+    checkpoint_122(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_123::name()       const{ return "123 - Segment 08 - Fly to Oreburgh City"; }
+std::string AutoStory_Checkpoint_123::start_text() const{ return "Dealt with Cyrus and left the Galactic HQ."; }
+std::string AutoStory_Checkpoint_123::end_text()   const{ return "Flew to Oreburgh city and entered Pokemon Center."; }
+void AutoStory_Checkpoint_123::run_checkpoint(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+) const{
+    checkpoint_123(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_124::name()       const{ return "124 - Segment 08 - Heal Pokemon at Oreburgh City Pokemon Center"; }
+std::string AutoStory_Checkpoint_124::start_text() const{ return "Flew to Oreburgh City and entered Pokemon Center."; }
+std::string AutoStory_Checkpoint_124::end_text()   const{ return "Healed Pokemon at Oreburgh City Pokemon Center."; }
+void AutoStory_Checkpoint_124::run_checkpoint(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+) const{
+    checkpoint_124(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_125::name()       const{ return "125 - Segment 08 - Go from Oreburgh City to Mount Coronet entrance"; }
+std::string AutoStory_Checkpoint_125::start_text() const{ return "Healed Pokemon at Oreburgh City Pokemon Center."; }
+std::string AutoStory_Checkpoint_125::end_text()   const{ return "Entered Mount Coronet."; }
+void AutoStory_Checkpoint_125::run_checkpoint(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+) const{
+    checkpoint_125(env, context, options, stats);
+}
 
 
 void AutoStory_Checkpoint_021::run_checkpoint(

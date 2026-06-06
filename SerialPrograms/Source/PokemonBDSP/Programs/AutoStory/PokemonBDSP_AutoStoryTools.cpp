@@ -18,6 +18,7 @@
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/VisualDetectors/ImageMatchDetector.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "CommonTools/Images/ImageFilter.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
 
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -429,6 +430,9 @@ bool fly_to(
             pbf_move_left_joystick(context, {-1, +1}, 4000ms, 500ms);
             break;
         case FlyPoint::HearthomeCity:
+        case FlyPoint::OreburghCity:
+            pbf_move_left_joystick(context, {-1, -1}, 4000ms, 500ms);
+            break;
         case FlyPoint::PastoriaCity:
         case FlyPoint::PokemonLeagueLower:
         case FlyPoint::PokemonLeagueUpper:
@@ -487,6 +491,9 @@ bool fly_to(
             repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 5, false);
             break;
         case FlyPoint::OreburghCity:
+            city_icon_box = {0.566000, 0.702000, 0.012000, 0.054000};
+            repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 10, false);
+            repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 5, false);
             break;
         case FlyPoint::PastoriaCity:
             break;
@@ -922,6 +929,76 @@ void use_strength(
     stream.log("[AutoStory] use_strength: selection arrow found, confirming.", COLOR_GREEN);
     pbf_press_button(context, BUTTON_A, 80ms, 200ms);
     pbf_mash_button(context, BUTTON_B, 6000ms);
+}
+
+
+bool get_on_bicycle(VideoStream& stream, ProControllerContext& context, GearLevel /*gear*/){
+    static const ImageFloatBox FRONT_BOX{0.440000, 0.470000, 0.035000, 0.054000};
+    static const ImageFloatBox BACK_BOX {0.520000, 0.470000, 0.022000, 0.054000};
+    // Spark color range: white (R=232,G=255,B=255) down to light green (R=163,G=217,B=181)
+    static const uint32_t SPARK_MIN = 0xFF000000u | (163u << 16) | (217u << 8) | 181u;
+    static const uint32_t SPARK_MAX = 0xFFFFFFFFu;
+    static const size_t SPARK_THRESHOLD = 13;
+
+    stream.log("[AutoStory] get_on_bicycle: mounting bicycle.", COLOR_WHITE);
+    pbf_press_button(context, BUTTON_PLUS, 80ms, 800ms);
+
+    // Press B, then poll up to 1 s for Fast-gear sparks.
+    // Logs the peak pixel counts in both boxes for threshold tuning.
+    // Returns true if sparks are detected (switched TO Fast gear).
+    auto toggle_and_check = [&]() -> bool {
+        context.wait_for_all_requests();
+        pbf_press_button(context, BUTTON_B, 80ms, 800ms);
+
+        size_t max_front = 0, max_back = 0;
+        auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
+        while (std::chrono::steady_clock::now() < deadline){
+            context.wait_for(50ms);
+            VideoSnapshot screen = stream.video().snapshot();
+            if (!screen) continue;
+
+            size_t front_pixels = 0, back_pixels = 0;
+            filter_rgb32_range(front_pixels, extract_box_reference(screen, FRONT_BOX), SPARK_MIN, SPARK_MAX, Color(0), false);
+            filter_rgb32_range(back_pixels,  extract_box_reference(screen, BACK_BOX),  SPARK_MIN, SPARK_MAX, Color(0), false);
+
+            if (front_pixels > max_front) max_front = front_pixels;
+            if (back_pixels  > max_back)  max_back  = back_pixels;
+
+            if (front_pixels >= SPARK_THRESHOLD || back_pixels >= SPARK_THRESHOLD){
+                stream.log(
+                    "[AutoStory] get_on_bicycle: sparks detected "
+                    "(front=" + std::to_string(front_pixels) +
+                    " back="  + std::to_string(back_pixels)  +
+                    " threshold=" + std::to_string(SPARK_THRESHOLD) + ").",
+                    COLOR_GREEN
+                );
+                return true;
+            }
+        }
+        stream.log(
+            "[AutoStory] get_on_bicycle: no sparks detected "
+            "(peak front=" + std::to_string(max_front) +
+            " back="       + std::to_string(max_back)  +
+            " threshold="  + std::to_string(SPARK_THRESHOLD) + ").",
+            COLOR_ORANGE
+        );
+        return false;
+    };
+
+    if (toggle_and_check()){
+        stream.log("[AutoStory] get_on_bicycle: Fast gear confirmed.", COLOR_GREEN);
+        return true;
+    }
+
+    // First toggle produced no sparks -> we switched to Slow gear; toggle back to Fast.
+    stream.log("[AutoStory] get_on_bicycle: Slow gear detected, toggling back to Fast.", COLOR_ORANGE);
+    if (toggle_and_check()){
+        stream.log("[AutoStory] get_on_bicycle: Fast gear confirmed after correction.", COLOR_GREEN);
+        return true;
+    }
+
+    stream.log("[AutoStory] get_on_bicycle: Failed to confirm Fast gear after two toggles.", COLOR_RED);
+    return false;
 }
 
 

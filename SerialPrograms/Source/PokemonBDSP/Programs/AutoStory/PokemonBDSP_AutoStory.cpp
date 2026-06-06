@@ -137,7 +137,6 @@ static std::vector<std::unique_ptr<AutoStory_Checkpoint>> make_checkpoint_list()
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_108>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_109>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_110>());
-    // Segment 08 (111-118)
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_111>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_112>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_113>());
@@ -145,6 +144,17 @@ static std::vector<std::unique_ptr<AutoStory_Checkpoint>> make_checkpoint_list()
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_115>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_116>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_117>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_118>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_119>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_120>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_121>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_122>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_123>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_124>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_125>());
+
+
+
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_021>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_022>());
     /*checkpoint_list.emplace_back(std::make_unique<AutoStory_checkpoint_023>());
