@@ -133,7 +133,7 @@ double get_seed_calibration_frames(
 );
 
 // get advances calibration based on average offset in the RNG calibration history
-double get_advances_calibration_frames(const RngCalibrationHistory& calibration_history, const uint64_t& advances);
+double get_advances_calibration(const RngCalibrationHistory& calibration_history, const uint64_t& advances);
 
 // get RngCalibrations from the RNG calibration history
 RngCalibrations get_calibrations(
@@ -148,7 +148,7 @@ RngCalibrations get_calibrations(
 // infer hit seeds/advances, update the calibration history, and return whether or not the search is finished
 bool update_history(
     ConsoleHandle& console,
-    RngUncertainHistory& uncertain_history,
+    RngUncertainHistory& advance_history,
     RngCalibrationHistory& calibration_history, 
     const uint16_t& max_history_length,
     const RngCalibrations calibrations,

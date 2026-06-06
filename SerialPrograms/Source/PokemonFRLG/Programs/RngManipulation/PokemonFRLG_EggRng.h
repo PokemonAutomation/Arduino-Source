@@ -54,7 +54,7 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class EggRng : public SingleSwitchProgramInstance{
+class EggRng : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
     EggRng();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
@@ -64,6 +64,8 @@ public:
     ) override{}
 
 private:
+    virtual void on_config_value_changed(void* object) override;
+
     enum class GameVersion{
         firered,
         leafgreen
@@ -72,7 +74,6 @@ private:
     enum class EggProgramState{
         held_prep,
         held_calibration,
-        // held_cleanup,
         pickup_calibration,
         finished
     };
@@ -80,8 +81,6 @@ private:
     bool have_hit_target(SingleSwitchProgramEnvironment& env, const uint32_t& TARGET_SEED, const uint64_t& TARGET_ADVANCES, const AdvRngState& hit);
 
     void prep_held_resets(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-
-    // void cleanup_bad_held_frame(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
     bool reset_and_check_seed(
         SingleSwitchProgramEnvironment& env, 
@@ -152,7 +151,8 @@ private:
     SectionDividerOption m_calibration_displays;
     RngTargetDisplay RNG_TARGET;
     RngFilterDisplay RNG_FILTERS;
-    RngCalibrationDisplay RNG_CALIBRATION;
+    RngCalibrationDisplay HELD_CALIBRATION;
+    RngCalibrationDisplay PICKUP_CALIBRATION;
 
     SectionDividerOption m_game_info;
     OCR::LanguageOCROption LANGUAGE;

@@ -364,7 +364,7 @@ double get_seed_calibration_frames(
     return average_offset;
 }
 
-double get_advances_calibration_frames(const RngCalibrationHistory& history, const uint64_t& advance_target){
+double get_advances_calibration(const RngCalibrationHistory& history, const uint64_t& advance_target){
     double sum = 0;
     uint16_t len = 0;
     for (size_t i=0; i<history.results.size(); i++){
@@ -394,36 +394,40 @@ RngCalibrations get_calibrations(
     RngCalibrations calibrations{};
 
     if (history.results.size() > 0){
+        
         calibrations.seed_offset = get_seed_calibration_frames(history, seed_values, seed_position);
-        calibrations.ingame_offset = get_advances_calibration_frames(history, advances);
 
         AdvRngState prev_hit = history.results.back();
         double prev_csf_offset = history.calibrations.back().csf_offset;
         double prev_ingame_offset = history.calibrations.back().ingame_offset;
         int64_t prev_advance_miss = int64_t(prev_hit.advance) - int64_t(advances);
-        if (csf_first){
-            // always apply changes to the CSF, while still keeping it within +/-2 frames
-            double total_diff = calibrations.ingame_offset - prev_ingame_offset - prev_csf_offset;
-            calibrations.csf_offset = fmod(prev_csf_offset + total_diff, 2);
-            double csf_diff = calibrations.csf_offset - prev_csf_offset;
-            calibrations.ingame_offset = prev_ingame_offset - csf_diff;
-        }else if(prev_advance_miss != 0 && std::abs(prev_advance_miss) < 2){
-            // only update CSF when you're close to the target
-            console.log("Attempting to correct for off-by-one miss by modifying continue screen frames.");
+
+        if (prev_advance_miss == 0){
+            // don't change anything if the advance target has been hit
+            calibrations.csf_offset = prev_csf_offset;
+            calibrations.ingame_offset = prev_ingame_offset;
+        }else if (std::abs(prev_advance_miss) < 2){
+            // when very close, take the previous calibration and bump the CSF in the right direction
             if (prev_advance_miss > 0){
                 calibrations.csf_offset = prev_csf_offset - 0.5;
             }else{
                 calibrations.csf_offset = prev_csf_offset + 0.5;
             }
             calibrations.csf_offset = fmod(calibrations.csf_offset, 2);
+            calibrations.ingame_offset = prev_ingame_offset; // leave unchanged
+        }else if(csf_first){
+            // adjust the csf, putting anything beyond +/-2 frames into the in-game calibration
+            double new_advances_calibration = get_advances_calibration(history, advances);
+            double total_diff = new_advances_calibration - prev_ingame_offset - prev_csf_offset;
+            calibrations.csf_offset = fmod(prev_csf_offset + total_diff, 2);
             double csf_diff = calibrations.csf_offset - prev_csf_offset;
-            calibrations.ingame_offset -= csf_diff;
+            calibrations.ingame_offset = prev_ingame_offset + total_diff - csf_diff;
+        }else{
+            // only adjust the in-game offset
+            calibrations.ingame_offset = get_advances_calibration(history, advances);
         }
     }
 
-    console.log("Seed calibration (frames): " + std::to_string(calibrations.seed_offset));
-    console.log("Continue screen adjustment (frames): " + std::to_string(calibrations.csf_offset));
-    console.log("Advance calibration (frames x2): " + std::to_string(calibrations.ingame_offset));
     return calibrations;
 }
 
