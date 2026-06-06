@@ -292,6 +292,21 @@ void use_potion_first_pokemon(
     ProControllerContext& context
 );
 
+enum class GearLevel {
+    Fast,
+};
+
+// Mount the bicycle (press +) and confirm it is in the requested gear.
+// Presses B to toggle gear and uses the Fast-gear spark visual effect to
+// determine which gear was entered. If the wrong gear is entered, presses B
+// again and re-checks. Player must be on foot when called.
+// Returns false if gear state cannot be confirmed after two toggles.
+bool get_on_bicycle(
+    VideoStream& stream,
+    ProControllerContext& context,
+    GearLevel gear
+);
+
 }
 }
 }

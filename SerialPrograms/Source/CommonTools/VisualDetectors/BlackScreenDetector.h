@@ -110,6 +110,22 @@ private:
     std::atomic<bool> m_black_is_over = false;
 };
 
+// Detect when a brief flash of black screen (1-2 frames) is over.
+// Use instead of BlackScreenOverWatcher when the transition is too short for the 100ms hold.
+class BlackScreenFlashWatcher : public BlackScreenOverWatcher{
+public:
+    BlackScreenFlashWatcher(
+        Color color = COLOR_RED,
+        const ImageFloatBox& box = {0.1, 0.1, 0.8, 0.8},
+        double max_rgb_sum = 100,
+        double max_stddev_sum = 10,
+        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(20),
+        std::chrono::milliseconds release_duration = std::chrono::milliseconds(100)
+    )
+        : BlackScreenOverWatcher(color, box, max_rgb_sum, max_stddev_sum, hold_duration, release_duration)
+    {}
+};
+
 
 
 
