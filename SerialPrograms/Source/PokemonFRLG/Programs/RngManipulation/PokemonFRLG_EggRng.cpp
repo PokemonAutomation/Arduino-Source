@@ -617,7 +617,7 @@ bool EggRng::reset_and_check_seed(
     RngTimings timings = prepare_timings(
         env.console, target,
         SEED_DELAY, CONTINUE_SCREEN_FRAMES, ingame_advances,
-        false, calibrations,
+        USE_TEACHY_TV, calibrations,
         FIXED_SEED_OFFSET, FIXED_ADVANCES_OFFSET
     );
 
