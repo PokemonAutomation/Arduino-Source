@@ -250,13 +250,7 @@ void ControllerCommandTable::load_json(const JsonValue& json){
         throw JsonParseException("", "ControllerClass");
     }
     const std::string& controller = value->to_string_throw();
-    if (CONTROLLER_CLASS_STRINGS().get_enum(controller) != m_type){
-        throw FileException(
-            nullptr, nullptr,
-            "Incompatible controller type.",
-            ""
-        );
-    }
+    m_type = CONTROLLER_CLASS_STRINGS().get_enum(controller);
 
     value = obj.get_value("history");
     if (value == nullptr){
@@ -342,8 +336,53 @@ ControllerCommandTables::ControllerCommandTables(
 
 
 void ControllerCommandTables::on_config_value_changed(void* object){
+    m_saved[m_table.m_type] = m_table.to_json();
+    auto iter = m_saved.find(m_type);
+
+//    for (const auto& item : m_saved){
+//        cout << item.second.dump() << endl;
+//    }
+
     m_table.clear();
     m_table.m_type = m_type;
+    if (iter == m_saved.end()){
+        return;
+    }
+    try{
+        m_table.load_json(iter->second);
+    }catch (...){}
+}
+void ControllerCommandTables::load_json(const JsonValue& json){
+    GroupOption::load_json(json);
+    const JsonObject& obj = json.to_object_throw();
+    const JsonObject* node = obj.get_object("Tables");
+    if (node == nullptr){
+        return;
+    }
+
+    for (const auto& item : *node){
+        try{
+            ControllerClass type = CONTROLLER_CLASS_STRINGS().get_enum(item.first);
+            m_saved[type] = item.second.clone();
+            if (type == m_type){
+                m_table.load_json(item.second);
+            }
+        }catch (...){}
+    }
+}
+JsonValue ControllerCommandTables::to_json() const{
+    JsonValue ret = GroupOption::to_json();
+    JsonObject& obj = ret.to_object_throw();
+    {
+        JsonObject node;
+        for (const auto& item : m_saved){
+            node[CONTROLLER_CLASS_STRINGS().get_string(item.first)] = m_type == item.first
+                ? m_table.to_json()
+                : item.second.clone();
+        }
+        obj["Tables"] = std::move(node);
+    }
+    return ret;
 }
 
 

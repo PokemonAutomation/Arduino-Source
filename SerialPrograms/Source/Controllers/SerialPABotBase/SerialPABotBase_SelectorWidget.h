@@ -13,6 +13,7 @@
 #include "Controllers/ControllerDescriptor.h"
 #include "Controllers/ControllerSelectorWidget.h"
 #include "Controllers/NullController.h"
+#include "Controllers/SerialPortPollerQt.h"
 #include "SerialPABotBase_Descriptor.h"
 
 //#include <iostream>
@@ -121,7 +122,7 @@ public:
 
 
         m_ports.emplace_back(new SerialPABotBase_Descriptor());
-        for (QSerialPortInfo& port : QSerialPortInfo::availablePorts()){
+        for (QSerialPortInfo& port : SerialPortPoller::instance().ports()){
             if (filter_serial_port(port)){
                 m_ports.emplace_back(
                     new SerialPABotBase_Descriptor(port.portName().toStdString())
