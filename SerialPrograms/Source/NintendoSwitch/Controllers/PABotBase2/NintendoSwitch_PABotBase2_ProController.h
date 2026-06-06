@@ -229,7 +229,7 @@ private:
         }
 
         //  https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md
-        pabb_NintendoSwitch_OemController_State0x30_Buttons buttons{
+        OemController_State0x30_Buttons buttons{
             .button3 = 0,
             .button4 = 0,
             .button5 = 0,
@@ -261,7 +261,7 @@ private:
             controller_state.right_joystick
         );
 
-        pabb_NintendoSwitch_OemController_State0x30_Gyro gyro{
+        OemController_State0x30_Gyro gyro{
             0x0000,
             0x0000,
             0x0000,

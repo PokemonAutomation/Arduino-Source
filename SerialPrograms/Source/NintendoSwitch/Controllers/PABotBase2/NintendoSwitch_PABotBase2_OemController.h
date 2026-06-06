@@ -50,24 +50,24 @@ public:
 
 protected:
     static Button populate_report_buttons(
-        pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons,
+        OemController_State0x30_Buttons& buttons,
         const SwitchControllerState& controller_state
     );
     static bool populate_report_gyro(
-        pabb_NintendoSwitch_OemController_State0x30_Gyro& gyro,
+        OemController_State0x30_Gyro& gyro,
         const SwitchControllerState& controller_state
     );
 
     void issue_report(
         Cancellable* cancellable,
         WallDuration duration,
-        const pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons
+        const OemController_State0x30_Buttons& buttons
     );
     void issue_report(
         Cancellable* cancellable,
         WallDuration duration,
-        const pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons,
-        const pabb_NintendoSwitch_OemController_State0x30_Gyro& gyro
+        const OemController_State0x30_Buttons& buttons,
+        const OemController_State0x30_Gyro& gyro
     );
 
 

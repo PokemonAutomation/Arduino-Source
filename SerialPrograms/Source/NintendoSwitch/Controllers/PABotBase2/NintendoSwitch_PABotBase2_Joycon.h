@@ -226,7 +226,7 @@ protected:
             static_cast<const SwitchCommand&>(*item).apply(controller_state);
         }
 
-        pabb_NintendoSwitch_OemController_State0x30_Buttons buttons{
+        OemController_State0x30_Buttons buttons{
             .button3 = 0,
             .button4 = 0,
             .button5 = 0,
@@ -251,7 +251,7 @@ protected:
             controller_state.left_joystick
         );
 
-        pabb_NintendoSwitch_OemController_State0x30_Gyro gyro{};
+        OemController_State0x30_Gyro gyro{};
         bool gyro_active = populate_report_gyro(gyro, controller_state);
 
         if (!gyro_active){
@@ -269,7 +269,7 @@ protected:
             static_cast<const SwitchCommand&>(*item).apply(controller_state);
         }
 
-        pabb_NintendoSwitch_OemController_State0x30_Buttons buttons{
+        OemController_State0x30_Buttons buttons{
             .button3 = 0,
             .button4 = 0,
             .button5 = 0,
@@ -292,7 +292,7 @@ protected:
              << std::chrono::duration_cast<Milliseconds>(entry.duration).count() << endl;
     #endif
 
-        pabb_NintendoSwitch_OemController_State0x30_Gyro gyro{};
+        OemController_State0x30_Gyro gyro{};
         bool gyro_active = populate_report_gyro(gyro, controller_state);
 
         if (!gyro_active){

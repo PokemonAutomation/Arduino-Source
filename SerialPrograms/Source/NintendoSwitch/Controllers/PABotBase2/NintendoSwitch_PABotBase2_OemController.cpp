@@ -123,7 +123,7 @@ PABotBase2_OemController::PABotBase2_OemController(
         false,
         [](const pabb2_Message_Feedback_NS1_OemController_Rumble* message){
             std::string str;
-            str += tostr_hexbytes(&message->data, sizeof(pabb_NintendoSwitch_Rumble));
+            str += tostr_hexbytes(&message->data, sizeof(OemController_RumbleState));
             return str;
         }
     );
@@ -355,7 +355,7 @@ ControllerPlayerNumber PABotBase2_OemController::get_player_number(Cancellable& 
 
 
 Button PABotBase2_OemController::populate_report_buttons(
-    pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons,
+    OemController_State0x30_Buttons& buttons,
     const SwitchControllerState& controller_state
 ){
     //  https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md
@@ -403,7 +403,7 @@ Button PABotBase2_OemController::populate_report_buttons(
     return all_buttons;
 }
 bool PABotBase2_OemController::populate_report_gyro(
-    pabb_NintendoSwitch_OemController_State0x30_Gyro& gyro,
+    OemController_State0x30_Gyro& gyro,
     const SwitchControllerState& controller_state
 ){
     gyro.accel_x = controller_state.gyro[0];
@@ -428,7 +428,7 @@ bool PABotBase2_OemController::populate_report_gyro(
 void PABotBase2_OemController::issue_report(
     Cancellable* cancellable,
     WallDuration duration,
-    const pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons
+    const OemController_State0x30_Buttons& buttons
 ){
     //  We will not do any throttling or timing adjustments here. We'll defer
     //  to the microcontroller to do that for us.
@@ -451,11 +451,11 @@ void PABotBase2_OemController::issue_report(
 void PABotBase2_OemController::issue_report(
     Cancellable* cancellable,
     WallDuration duration,
-    const pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons,
-    const pabb_NintendoSwitch_OemController_State0x30_Gyro& gyro
+    const OemController_State0x30_Buttons& buttons,
+    const OemController_State0x30_Gyro& gyro
 ){
     //  TODO: For now we duplicate the gyro data to all 3 5ms segments.
-    pabb_NintendoSwitch_OemController_State0x30_GyroX3 gyro3{
+    OemController_State0x30_GyroX3 gyro3{
         gyro, gyro, gyro
     };
 
@@ -608,7 +608,7 @@ void PABotBase2_OemController::update_status(Cancellable& cancellable){
         return;
     }
 
-    constexpr size_t EXPECTED_SIZE = sizeof(PABotBase2::Message_u32) + sizeof(pabb_NintendoSwitch_OemController_Status);
+    constexpr size_t EXPECTED_SIZE = sizeof(PABotBase2::Message_u32) + sizeof(OemController_Status);
     if (response.size() != EXPECTED_SIZE){
         throw SerialProtocolException(
             m_logger, PA_CURRENT_FUNCTION,
@@ -617,7 +617,7 @@ void PABotBase2_OemController::update_status(Cancellable& cancellable){
         );
     }
 
-    const pabb_NintendoSwitch_OemController_Status& status = *(const pabb_NintendoSwitch_OemController_Status*)(header + 1);
+    const OemController_Status& status = *(const OemController_Status*)(header + 1);
 
     str += "Paired: ";
     if (status.status & 4){

@@ -17,7 +17,7 @@ file(GLOB LIBRARY_SOURCES
     ../3rdParty/TesseractPA/TesseractPA.h
     ../Common/Compiler.h
     ../Common/ControllerStates/HID_Keyboard_State.h
-    ../Common/ControllerStates/NintendoSwitch_OemController_State.c
+    ../Common/ControllerStates/NintendoSwitch_OemController_State.cpp
     ../Common/ControllerStates/NintendoSwitch_OemController_State.h
     ../Common/ControllerStates/NintendoSwitch_WiredController_State.h
     ../Common/Cpp/BitmapConversion.cpp
