@@ -557,19 +557,20 @@ bool fly_to(
     };
     if (ret_1 == 0 and ret_2 == 0){
         stream.log("Found " + name + ", flying towards it.", COLOR_GREEN);
+        WhiteScreenOverWatcher flying_white_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8})
         BlackScreenOverWatcher flying_black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
         int ret = run_until<ProControllerContext>(
             stream, context,
             [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, 200000ms);
             },
-            {{flying_black_screen}}
+            {{flying_white_screen}, {flying_black_screen}}
         );
         if (ret < 0){
-            stream.log("Flying to " + name + ": black screen not detected!", COLOR_RED);
+            stream.log("Flying to " + name + ": white / black screen not detected!", COLOR_RED);
             return false;
-        } else if (ret == 0) {
-            stream.log("Flying to " + name + ": black screen detected!", COLOR_GREEN);
+        } else if (ret >= 0) {
+            stream.log("Flying to " + name + ": white / black screen detected!", COLOR_GREEN);
             return true;
         }
     }
