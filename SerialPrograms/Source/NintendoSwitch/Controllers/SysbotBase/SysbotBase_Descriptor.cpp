@@ -46,10 +46,7 @@ JsonValue TcpSysbotBase_Descriptor::to_json() const{
 
 
 
-std::unique_ptr<ControllerConnection> TcpSysbotBase_Descriptor::open_connection(
-    Logger& logger,
-    bool set_to_null_controller
-) const{
+std::unique_ptr<ControllerConnection> TcpSysbotBase_Descriptor::open_connection(Logger& logger) const{
     return std::unique_ptr<ControllerConnection>(
         new TcpSysbotBase_Connection(logger, m_url)
     );

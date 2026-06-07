@@ -27,7 +27,7 @@ public:
     PybindSwitchProControllerInternal(const std::string& name)
         : m_logger(global_logger_raw(), "Pybind")
         , m_descriptor(name)
-        , m_connection(m_descriptor.open_connection(m_logger, false))
+        , m_connection(m_descriptor.open_connection(m_logger))
     {
         m_connection->add_status_listener(*this);
     }

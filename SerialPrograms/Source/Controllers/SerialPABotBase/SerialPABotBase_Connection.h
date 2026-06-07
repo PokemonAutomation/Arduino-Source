@@ -27,8 +27,7 @@ class SerialPABotBase_Connection final : public ControllerConnection{
 public:
     SerialPABotBase_Connection(
         Logger& logger,
-        const std::string& name,
-        bool set_to_null_controller
+        const std::string& name
     );
     ~SerialPABotBase_Connection();
 
@@ -58,9 +57,9 @@ private:
 
     void process_queue_size();
     void throw_incompatible_protocol();
-    ControllerType process_device(bool set_to_null_controller);
+    ControllerType process_device();
 
-    void thread_body(bool set_to_null_controller);
+    void thread_body();
 
 
 private:

@@ -112,10 +112,7 @@ public:
     virtual JsonValue to_json() const = 0;
 
 public:
-    virtual std::unique_ptr<ControllerConnection> open_connection(
-        Logger& logger,
-        bool set_to_null_controller
-    ) const = 0;
+    virtual std::unique_ptr<ControllerConnection> open_connection(Logger& logger) const = 0;
     virtual std::unique_ptr<AbstractController> make_controller(
         Logger& logger,
         ControllerConnection& connection,

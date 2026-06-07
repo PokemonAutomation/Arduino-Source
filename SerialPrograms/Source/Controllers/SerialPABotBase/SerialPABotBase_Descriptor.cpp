@@ -49,15 +49,12 @@ JsonValue SerialPABotBase_Descriptor::to_json() const{
     return m_name;
 }
 
-std::unique_ptr<ControllerConnection> SerialPABotBase_Descriptor::open_connection(
-    Logger& logger,
-    bool set_to_null_controller
-) const{
+std::unique_ptr<ControllerConnection> SerialPABotBase_Descriptor::open_connection(Logger& logger) const{
     if (m_name.empty()){
         return nullptr;
     }
     return std::unique_ptr<ControllerConnection>(
-        new SerialPABotBase_Connection(logger, m_name, set_to_null_controller)
+        new SerialPABotBase_Connection(logger, m_name)
     );
 }
 std::unique_ptr<AbstractController> SerialPABotBase_Descriptor::make_controller(

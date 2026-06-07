@@ -32,10 +32,7 @@ void NullControllerDescriptor::load_json(const JsonValue& json){
 JsonValue NullControllerDescriptor::to_json() const{
     return JsonValue();
 }
-std::unique_ptr<ControllerConnection> NullControllerDescriptor::open_connection(
-    Logger& logger,
-    bool set_to_null_controller
-) const{
+std::unique_ptr<ControllerConnection> NullControllerDescriptor::open_connection(Logger& logger) const{
     return nullptr;
 }
 std::unique_ptr<AbstractController> NullControllerDescriptor::make_controller(

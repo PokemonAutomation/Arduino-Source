@@ -44,7 +44,7 @@ int test_NintendoSwitch_FailedToConnectDetector(const ImageViewRGB32& image, boo
 int test_NintendoSwitch_UpdatePopupDetector(const ImageViewRGB32& image, bool target){
     auto& logger = global_logger_command_line();
     DummyBotBase botbase(logger);
-    SerialPABotBase::SerialPABotBase_Connection connection(logger, "", false);
+    SerialPABotBase::SerialPABotBase_Connection connection(logger, "");
     SerialPABotBase_WiredController controller(
         logger, connection,
         ControllerType::NintendoSwitch_WiredController
