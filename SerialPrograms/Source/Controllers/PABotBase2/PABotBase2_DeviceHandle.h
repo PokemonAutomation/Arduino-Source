@@ -101,12 +101,21 @@ public:
     //  Returns {} if cannot send request.
     //  Throws if connection is dead.
     std::optional<uint8_t> try_send_request_with_response(
-        MessageHeader& request, WallDuration timeout
+        MessageHeader& request,
+        WallClock deadline = WallClock::min()
+    );
+    std::optional<uint8_t> try_send_request_with_response(
+        MessageHeader& request,
+        WallDuration timeout
     );
 
     std::string wait_for_request_response(
         uint8_t id,
-        WallDuration timeout = WallDuration::max()
+        WallClock deadline = WallClock::max()
+    );
+    std::string wait_for_request_response(
+        uint8_t id,
+        WallDuration timeout
     );
 
     template <typename ResponseType, uint8_t response_opcode>

@@ -267,14 +267,25 @@ bool PABotBase2_OemController::run_preconnect_configure(
 
     add_message_loggers(connection.message_logger());
 
+    WallClock deadline = current_time() + std::chrono::milliseconds(100);
+
     uint8_t controller_mac_address[6] = {};
     {
         Message_u32 request;
         request.message_bytes = sizeof(request);
         request.opcode = PABB2_MESSAGE_OPCODE_CONTROLLER_MAC_ADDRESS;
         request.data = SerialPABotBase::controller_type_to_id(controller_type);
-        uint8_t id = connection.device().send_request_with_response(request);
-        std::string response = connection.device().wait_for_request_response(id, std::chrono::milliseconds(100));
+        std::optional<uint8_t> id = connection.device().try_send_request_with_response(
+            request,
+            deadline
+        );
+        if (!id.has_value()){
+            return false;
+        }
+        std::string response = connection.device().wait_for_request_response(
+            id.value(),
+            deadline
+        );
         if (response.size() == sizeof(MessageHeader) + sizeof(controller_mac_address)){
             memcpy(
                 controller_mac_address,
@@ -282,11 +293,18 @@ bool PABotBase2_OemController::run_preconnect_configure(
                 sizeof(controller_mac_address)
             );
             logger.log("Controller MAC Address: " + tostr_hexbytes(controller_mac_address, sizeof(controller_mac_address)));
+        }else if (response.empty()){
+            logger.log(
+                "Timed out waiting for response to PABB2_MESSAGE_OPCODE_PAIRED_MAC_ADDRESS.",
+                COLOR_RED
+            );
+            return false;
         }else{
             logger.log(
                 "Invalid response size to PABB2_MESSAGE_OPCODE_PAIRED_MAC_ADDRESS: body = " + std::to_string(response.size()),
                 COLOR_RED
             );
+            return false;
         }
     }
 
@@ -352,7 +370,7 @@ bool PABotBase2_OemController::run_preconnect_configure(
         nullptr,
         &message,
         sizeof(Message),
-        Milliseconds(100)
+        deadline
     );
 }
 
