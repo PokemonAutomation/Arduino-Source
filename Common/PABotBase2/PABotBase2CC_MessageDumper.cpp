@@ -399,6 +399,26 @@ MessageLogger::MessageLogger(){
 
 
     add_message<MessageHeader>(
+        "PABB2_MESSAGE_OPCODE_REQUEST_SESSION_NUM",
+        PABB2_MESSAGE_OPCODE_REQUEST_SESSION_NUM,
+        true,
+        [](const MessageHeader* header){
+            std::string str;
+            str += "id = " + std::to_string(header->id);
+            return str;
+        }
+    );
+    add_message<MessageHeader>(
+        "PABB2_MESSAGE_OPCODE_REQUEST_STATUS",
+        PABB2_MESSAGE_OPCODE_REQUEST_STATUS,
+        false,
+        [](const MessageHeader* header){
+            std::string str;
+            str += "id = " + std::to_string(header->id);
+            return str;
+        }
+    );
+    add_message<MessageHeader>(
         "PABB2_MESSAGE_OPCODE_READ_CONTROLLER_MODE",
         PABB2_MESSAGE_OPCODE_READ_CONTROLLER_MODE,
         true,
@@ -449,16 +469,6 @@ MessageLogger::MessageLogger(){
             std::string str;
             str += "id = " + std::to_string(message->id);
             str += ", controller = " + tostr_hex(message->data);
-            return str;
-        }
-    );
-    add_message<MessageHeader>(
-        "PABB2_MESSAGE_OPCODE_REQUEST_STATUS",
-        PABB2_MESSAGE_OPCODE_REQUEST_STATUS,
-        false,
-        [](const MessageHeader* header){
-            std::string str;
-            str += "id = " + std::to_string(header->id);
             return str;
         }
     );

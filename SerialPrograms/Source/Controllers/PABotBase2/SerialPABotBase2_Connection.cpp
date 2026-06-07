@@ -9,6 +9,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/PanicDump.h"
 #include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2_PacketProtocol.h"
+#include "Common/PABotBase2/PABotBase2_MessageProtocol.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
@@ -295,21 +296,15 @@ bool SerialPABotBase2_Connection::open_device_connection(){
     }
 
     m_device->connect();
-    m_controller_list = m_device->controller_list();
 
     set_status_line0(
         m_device->device_name() + " (" + std::to_string(m_device->device_firmware_version()) + ")",
         theme_friendly_darkblue()
     );
 
-
-    //  Current Controller
+    m_controller_list = m_device->controller_list();
+    auto_select_controller_from_boot();
     refresh_controller_type();
-//    ControllerType current_controller = refresh_controller_type();
-
-//    switch (m_device->device_id()){
-//    case
-//    }
 
     return true;
 }

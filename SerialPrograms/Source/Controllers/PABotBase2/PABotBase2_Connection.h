@@ -29,8 +29,12 @@ public:
         bool clear_settings
     ) noexcept override;
 
+    void auto_select_controller_from_boot();
+
+
 private:
     void run_preconnect_configure(ControllerType controller_type);
+
 
 protected:
     std::unique_ptr<PABotBase2::DeviceHandle> m_device;

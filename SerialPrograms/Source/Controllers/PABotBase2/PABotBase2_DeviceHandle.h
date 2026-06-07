@@ -72,6 +72,9 @@ public:
     uint32_t device_firmware_version() const{
         return m_device_firmware_version;
     }
+    uint32_t device_protocol_version() const{
+        return m_device_protocol;
+    }
     const std::vector<ControllerType>& controller_list() const{
         return m_controller_list;
     }
@@ -83,6 +86,8 @@ public:
 
 public:
     ControllerType refresh_controller_type();
+    uint32_t query_u32(uint8_t opcode);
+    std::string query_data(uint8_t opcode);
 
     void send_request_with_no_response(MessageHeader& request);
 #if 0
@@ -150,10 +155,7 @@ public:
     std::string dump_pending_requests() const;
 
 
-private:
-    uint32_t query_u32(uint8_t opcode);
-    std::string query_data(uint8_t opcode);
-
+public:
     void throw_incompatible_protocol();
     void query_protocol();
     void query_controller_list();
