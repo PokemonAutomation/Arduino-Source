@@ -307,6 +307,10 @@ bool SerialPABotBase2_Connection::open_device_connection(bool set_to_null_contro
     //  Current Controller
     ControllerType current_controller = refresh_controller_type();
 
+//    switch (m_device->device_id()){
+//    case
+//    }
+
     if (set_to_null_controller && current_controller != ControllerType::None){
         PABotBase2::Message_u32 request;
         request.message_bytes = sizeof(request);

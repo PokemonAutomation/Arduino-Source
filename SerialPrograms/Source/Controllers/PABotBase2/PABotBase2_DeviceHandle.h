@@ -21,7 +21,7 @@
 #include "Common/PABotBase2/PABotBase2CC_MessageDumper.h"
 #include "Controllers/ControllerTypes.h"
 #include "PABotBase2_CommandQueueManager.h"
-#include "PABotBase2_MessageHandler.h"
+//#include "PABotBase2_MessageHandler.h"
 
 namespace PokemonAutomation{
 namespace PABotBase2{
@@ -63,11 +63,14 @@ public:
 
 
 public:
-    uint32_t device_firmware_version() const{
-        return m_device_firmware_version;
+    uint32_t device_id() const{
+        return m_device_id;
     }
     const std::string& device_name() const{
         return m_device_name;
+    }
+    uint32_t device_firmware_version() const{
+        return m_device_firmware_version;
     }
     const std::vector<ControllerType>& controller_list() const{
         return m_controller_list;

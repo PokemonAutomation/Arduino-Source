@@ -537,11 +537,13 @@ void MessageLogger::add_message(
     if (ret.second){
         return;
     }
+#if 0
     throw InternalProgramError(
         nullptr,
         PA_CURRENT_FUNCTION,
         "Duplicate opcode: " + std::to_string(opcode)
     );
+#endif
 }
 
 

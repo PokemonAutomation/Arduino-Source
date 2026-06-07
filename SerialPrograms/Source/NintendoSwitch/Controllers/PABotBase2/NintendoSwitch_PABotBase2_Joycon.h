@@ -286,11 +286,11 @@ protected:
             controller_state.right_joystick
         );
 
-    #if 0
+#if 0
         cout << (int)controller_state.right_stick_x << " - "
              << (int)controller_state.right_stick_y << ": "
              << std::chrono::duration_cast<Milliseconds>(entry.duration).count() << endl;
-    #endif
+#endif
 
         OemController_State0x30_Gyro gyro{};
         bool gyro_active = populate_report_gyro(gyro, controller_state);

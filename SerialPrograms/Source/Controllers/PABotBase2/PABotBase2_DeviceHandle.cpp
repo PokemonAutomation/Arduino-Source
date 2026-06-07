@@ -230,10 +230,6 @@ void DeviceHandle::connect(){
 
     query_controller_list();
     query_command_queue();
-
-    if (m_device_firmware_version >= 2026050100){
-        set_logging_flag(GlobalSettings::instance().DEVICE_LOGGING_FLAG);
-    }
 }
 bool DeviceHandle::try_set_controller_type(
     ControllerType controller_type,

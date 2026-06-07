@@ -26,6 +26,8 @@ class PABotBase2_WiredController final :
 public:
     using ContextType = ProControllerContext;
 
+    static void add_message_loggers(PABotBase2::MessageLogger& message_logger);
+
 
 public:
     PABotBase2_WiredController(
