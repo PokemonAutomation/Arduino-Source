@@ -138,7 +138,7 @@ void StatsReader::read_page1(
             }
         }
     }
-    if (!best_result.results.empty()){
+    if (initialized && !best_result.results.empty()){
         stats.name = best_result.results.begin()->second.token;
     }
 
