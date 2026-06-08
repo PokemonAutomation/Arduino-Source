@@ -60,7 +60,8 @@ bool use_rare_candy(
     const BaseStats& base_stats,
     AdvRngMethod method = AdvRngMethod::Method1,
     bool safari_zone = false,
-    bool first = false
+    bool first = false,
+    int from_last = 0
 );
 
 int watch_for_shiny_encounter(ConsoleHandle& console, ProControllerContext& context);

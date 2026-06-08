@@ -295,7 +295,7 @@ void SidHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         FINAL_TEXT_FRAMES = 249;
     }
 
-    static const double FIXED_ADVANCES_OFFSET = 7; // determined empirically. Probably not console/setup dependent
+    static const int64_t FIXED_ADVANCES_OFFSET = 7; // determined empirically. Probably not console/setup dependent
 
     bool extra_press_at_end = (
         LANGUAGE == Language::German ||

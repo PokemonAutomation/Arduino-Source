@@ -364,7 +364,7 @@ double get_seed_calibration_frames(
     return average_offset;
 }
 
-double get_advances_calibration_frames(const RngCalibrationHistory& history, const uint64_t& advance_target){
+double get_advances_calibration(const RngCalibrationHistory& history, const uint64_t& advance_target){
     double sum = 0;
     uint16_t len = 0;
     for (size_t i=0; i<history.results.size(); i++){
@@ -388,40 +388,53 @@ RngCalibrations get_calibrations(
     const RngCalibrationHistory& history,
     const std::vector<uint16_t>& seed_values,
     const int16_t& seed_position,
-    const uint64_t& advances
+    const uint64_t& advances,
+    bool csf_first
 ){
     RngCalibrations calibrations{};
 
     if (history.results.size() > 0){
+        
         calibrations.seed_offset = get_seed_calibration_frames(history, seed_values, seed_position);
-        calibrations.ingame_offset = get_advances_calibration_frames(history, advances);
 
         AdvRngState prev_hit = history.results.back();
         double prev_csf_offset = history.calibrations.back().csf_offset;
+        double prev_ingame_offset = history.calibrations.back().ingame_offset;
         int64_t prev_advance_miss = int64_t(prev_hit.advance) - int64_t(advances);
-        if (prev_advance_miss != 0 && std::abs(prev_advance_miss) < 2){
-            console.log("Attempting to correct for off-by-one miss by modifying continue screen frames.");
+
+        if (prev_advance_miss == 0){
+            // don't change anything if the advance target has been hit
+            calibrations.csf_offset = prev_csf_offset;
+            calibrations.ingame_offset = prev_ingame_offset;
+        }else if (std::abs(prev_advance_miss) < 2){
+            // when very close, take the previous calibration and bump the CSF in the right direction
             if (prev_advance_miss > 0){
                 calibrations.csf_offset = prev_csf_offset - 0.5;
             }else{
                 calibrations.csf_offset = prev_csf_offset + 0.5;
             }
             calibrations.csf_offset = fmod(calibrations.csf_offset, 2);
+            calibrations.ingame_offset = prev_ingame_offset; // leave unchanged
+        }else if(csf_first){
+            // adjust the csf, putting anything beyond +/-2 frames into the in-game calibration
+            double new_advances_calibration = get_advances_calibration(history, advances);
+            double total_diff = new_advances_calibration - prev_ingame_offset - prev_csf_offset;
+            calibrations.csf_offset = fmod(prev_csf_offset + total_diff, 2);
             double csf_diff = calibrations.csf_offset - prev_csf_offset;
-            calibrations.ingame_offset -= csf_diff;
+            calibrations.ingame_offset = prev_ingame_offset + total_diff - csf_diff;
+        }else{
+            // only adjust the in-game offset
+            calibrations.ingame_offset = get_advances_calibration(history, advances);
         }
     }
 
-    console.log("Seed calibration (frames): " + std::to_string(calibrations.seed_offset));
-    console.log("Continue screen adjustment (frames): " + std::to_string(calibrations.csf_offset));
-    console.log("Advance calibration (frames x2): " + std::to_string(calibrations.ingame_offset));
     return calibrations;
 }
 
 
 bool update_history(
     ConsoleHandle& console,
-    RngAdvanceHistory& advance_history,
+    RngUncertainHistory& uncertain_history,
     RngCalibrationHistory& calibration_history, 
     const uint16_t& max_history_length,
     const RngCalibrations calibrations,
@@ -448,44 +461,46 @@ bool update_history(
             calibration_history.calibrations.erase(calibration_history.calibrations.begin());
             calibration_history.results.erase(calibration_history.results.begin());
         }
-        advance_history.results.clear();
-        advance_history.seed_calibrations.clear();
+        uncertain_history.results.clear();
+        uncertain_history.calibrations.clear();
         return true;
     }
     
-    std::vector<uint64_t> advances;
+    std::vector<int64_t> uncal_advances;
     std::vector<AdvRngState> hits;
     for(auto hit : search_hits) {
-        advances.emplace_back(hit.advance);
+        uncal_advances.emplace_back(int64_t(std::round(hit.advance - calibrations.csf_offset - calibrations.ingame_offset)));
         hits.emplace_back(hit);
     }
     
     // get unique advances
-    std::sort(advances.begin(), advances.end());
-    std::vector<uint64_t>::iterator iter;
-    iter = std::unique(advances.begin(), advances.begin() + advances.size());
-    advances.resize(std::distance(advances.begin(), iter));
+    std::sort(uncal_advances.begin(), uncal_advances.end());
+    std::vector<int64_t>::iterator iter;
+    iter = std::unique(uncal_advances.begin(), uncal_advances.begin() + uncal_advances.size());
+    uncal_advances.resize(std::distance(uncal_advances.begin(), iter));
 
-    advance_history.seed_calibrations.emplace_back(calibrations.seed_offset);
-    advance_history.results.emplace_back(hits);
+    uncertain_history.calibrations.emplace_back(calibrations);
+    uncertain_history.results.emplace_back(hits);
     
     // check advance history for repeated values
     std::vector<uint64_t> counts;
     uint64_t best = 0;
-    uint64_t mode = 0;
+    int64_t mode = 0; // sum of calibration and hit advance
     bool tie = false;
-    for (uint64_t& adv : advances){
+    for (int64_t& uadv : uncal_advances){
         uint64_t count = 0;
-        for (auto& res : advance_history.results){
+        for (size_t i=0; i<uncertain_history.results.size(); i++){
+            auto& cals = uncertain_history.calibrations[i];
+            auto& res = uncertain_history.results[i];
             for (auto& state : res){
-                if (std::abs(int64_t(state.advance) - int64_t(adv)) <= advance_radius){
+                if (std::abs(int64_t(std::round(state.advance - cals.csf_offset - cals.ingame_offset)) - uadv) <= advance_radius){
                     count++;
                     break; // only count one possible hit from each attempt
                 }
             }
         }
         if (count > best){
-            mode = adv;
+            mode = uadv;
             best = count;
             tie = false;
         }else if (count == best){
@@ -500,19 +515,20 @@ bool update_history(
 
 
     // add the closest possibility to the advances mode for each attempt to the calibration history
-    console.log("Inferred hits from previous " + std::to_string(advance_history.results.size()) + " attempts: ");
-    for (size_t i=0; i<advance_history.results.size(); i++){
-        auto& res = advance_history.results[i];
+    console.log("Inferred hits from previous " + std::to_string(uncertain_history.results.size()) + " attempts: ");
+    for (size_t i=0; i<uncertain_history.results.size(); i++){
+        auto& cals = uncertain_history.calibrations[i];
+        auto& res = uncertain_history.results[i];
         AdvRngState most_likely_hit;
         int64_t lowest_dist = INTMAX_MAX;
         for (auto& state : res){
-            int64_t state_dist = std::abs(int64_t(state.advance) - int64_t(mode));
+            int64_t state_dist = std::abs(int64_t(state.advance - cals.csf_offset - cals.ingame_offset) - int64_t(mode));
             if (state_dist < lowest_dist){
                 most_likely_hit = state;
                 lowest_dist = state_dist;
             }
         }
-        calibration_history.calibrations.emplace_back(calibrations);
+        calibration_history.calibrations.emplace_back(cals);
         calibration_history.results.emplace_back(most_likely_hit);
         console.log("   " + to_hex_string(most_likely_hit.seed) + " / " + std::to_string(most_likely_hit.advance));
     }
@@ -523,8 +539,8 @@ bool update_history(
         calibration_history.results.erase(calibration_history.results.begin());
     }
 
-    advance_history.results.clear();
-    advance_history.seed_calibrations.clear();
+    uncertain_history.results.clear();
+    uncertain_history.calibrations.clear();
 
     return true;
 }
