@@ -129,16 +129,18 @@ void StatsReader::read_page1(
                 result = name_result;
             }
         }
-        if (!initialized){
-            best_result = result;
-            initialized = true;
-        }else{
-            if (result.results.begin()->first < best_result.results.begin()->first){
+        if (!result.results.empty()){
+            if (!initialized){
+                best_result = result;
+                initialized = true;
+            }else if (result.results.begin()->first < best_result.results.begin()->first){
                 best_result = result;
             }
         }
     }
-    stats.name = best_result.results.begin()->second.token;
+    if (!best_result.results.empty()){
+        stats.name = best_result.results.begin()->second.token;
+    }
 
     // Detect gender by comparing red vs blue pixels
     ImageViewRGB32 gender_box = extract_box_reference(game_screen, jpn ? m_box_gender_jpn : m_box_gender);
