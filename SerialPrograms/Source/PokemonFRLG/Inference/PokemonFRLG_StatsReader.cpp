@@ -88,47 +88,57 @@ void StatsReader::read_page1(
 
     ImageViewRGB32 name_box = extract_box_reference(game_screen, jpn ? m_box_name_jpn : m_box_name);
 
-    ImageRGB32 name_filtered(name_box.width(), name_box.height());
-    for (size_t r = 0; r < name_box.height(); r++){
-        for (size_t c = 0; c < name_box.width(); c++){
-            Color pixel(name_box.pixel(c, r));
-            // Try to detect lilac background first based on low green channel.
-            // For other pixels, if it's bright it becomes black text. 
-            // Otherwise, it becomes white background.
-            if ((pixel.blue() > pixel.green() + 25) && (pixel.red() > pixel.green() + 15)){
-                name_filtered.pixel(c, r) = (uint32_t)0xffffffff; // White
-            }else if (pixel.red() > 200 && pixel.green() > 200 && pixel.blue() > 200){
-                name_filtered.pixel(c, r) = (uint32_t)0xff000000; // Black
-            }else{
-                name_filtered.pixel(c, r) = (uint32_t)0xffffffff; // White
+
+    static const std::vector<int> WHITE_THRESHOLDS = { 180, 200, 220, 230, 240 };
+    OCR::StringMatchResult best_result;
+    bool initialized = false;
+    for (int thresh : WHITE_THRESHOLDS){
+        ImageRGB32 name_filtered(name_box.width(), name_box.height());
+        for (size_t r = 0; r < name_box.height(); r++){
+            for (size_t c = 0; c < name_box.width(); c++){
+                Color pixel(name_box.pixel(c, r));
+                if (pixel.red() > thresh && pixel.green() > thresh && pixel.blue() > thresh){
+                    name_filtered.pixel(c, r) = (uint32_t)0xff000000; // Black
+                }else{
+                    name_filtered.pixel(c, r) = (uint32_t)0xffffffff; // White
+                }
+            }
+        }
+        ImageRGB32 name_ready = preprocess_for_ocr(
+            name_filtered, "name", 7, 2, true, 
+            combine_rgb(0, 0, 0), jpn ? combine_rgb(160, 160, 160) : combine_rgb(140, 140, 140)
+        );
+
+        const std::vector<OCR::TextColorRange> name_text_color_ranges{
+            {combine_rgb(0, 0, 0), combine_rgb(120, 120, 120)}
+        };
+
+        OCR::StringMatchResult result;
+        if (subset.size() > 0){
+            auto name_result = Pokemon::PokemonNameReader(subset).read_substring(
+                    logger, language, name_ready, name_text_color_ranges
+            );
+            if (!name_result.results.empty()){
+                result = name_result;
+            }
+        }else{
+            auto name_result = Pokemon::PokemonNameReader::instance().read_substring(
+                    logger, language, name_ready, name_text_color_ranges
+            );
+            if (!name_result.results.empty()){
+                result = name_result;
+            }
+        }
+        if (!initialized){
+            best_result = result;
+            initialized = true;
+        }else{
+            if (result.results.begin()->first < best_result.results.begin()->first){
+                best_result = result;
             }
         }
     }
-
-    ImageRGB32 name_ready = preprocess_for_ocr(
-        name_filtered, "name", 7, 2, true, 
-        combine_rgb(0, 0, 0), jpn ? combine_rgb(160, 160, 160) : combine_rgb(125, 125, 125)
-    );
-
-    const std::vector<OCR::TextColorRange> name_text_color_ranges{
-        {combine_rgb(0, 0, 0), combine_rgb(120, 120, 120)}
-    };
-
-    if (subset.size() > 0){
-        auto name_result = Pokemon::PokemonNameReader(subset).read_substring(
-                logger, language, name_ready, name_text_color_ranges
-        );
-        if (!name_result.results.empty()){
-            stats.name = name_result.results.begin()->second.token;
-        }
-    }else{
-        auto name_result = Pokemon::PokemonNameReader::instance().read_substring(
-                logger, language, name_ready, name_text_color_ranges
-        );
-        if (!name_result.results.empty()){
-            stats.name = name_result.results.begin()->second.token;
-        }
-    }
+    stats.name = best_result.results.begin()->second.token;
 
     // Detect gender by comparing red vs blue pixels
     ImageViewRGB32 gender_box = extract_box_reference(game_screen, jpn ? m_box_gender_jpn : m_box_gender);
