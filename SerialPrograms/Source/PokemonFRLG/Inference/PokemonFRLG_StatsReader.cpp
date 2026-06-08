@@ -88,18 +88,26 @@ void StatsReader::read_page1(
 
     ImageViewRGB32 name_box = extract_box_reference(game_screen, jpn ? m_box_name_jpn : m_box_name);
 
-    // remove shadow
-    ImageRGB32 name_filtered = filter_rgb32_range(
-        name_box, 0xff000000, 0xffc7c7c7, Color(0xffc3c3c3), true
-    );
-    // make text black
-    name_filtered = filter_rgb32_range(
-        name_filtered, 0xffc8c8c8, 0xffffffff, Color(0xff000000), true
-    );
+    ImageRGB32 name_filtered(name_box.width(), name_box.height());
+    for (size_t r = 0; r < name_box.height(); r++){
+        for (size_t c = 0; c < name_box.width(); c++){
+            Color pixel(name_box.pixel(c, r));
+            // Try to detect lilac background first based on low green channel.
+            // For other pixels, if it's bright it becomes black text. 
+            // Otherwise, it becomes white background.
+            if ((pixel.blue() > pixel.green() + 25) && (pixel.red() > pixel.green() + 15)){
+                name_filtered.pixel(c, r) = (uint32_t)0xffffffff; // White
+            }else if (pixel.red() > 200 && pixel.green() > 200 && pixel.blue() > 200){
+                name_filtered.pixel(c, r) = (uint32_t)0xff000000; // Black
+            }else{
+                name_filtered.pixel(c, r) = (uint32_t)0xffffffff; // White
+            }
+        }
+    }
 
     ImageRGB32 name_ready = preprocess_for_ocr(
         name_filtered, "name", 7, 2, true, 
-        combine_rgb(0, 0, 0), jpn ? combine_rgb(160, 160, 160) : combine_rgb(120, 120, 120)
+        combine_rgb(0, 0, 0), jpn ? combine_rgb(160, 160, 160) : combine_rgb(125, 125, 125)
     );
 
     const std::vector<OCR::TextColorRange> name_text_color_ranges{
@@ -148,41 +156,7 @@ void StatsReader::read_page1(
         stats.gender = SummaryGender::Genderless;
     }
 
-
-
     ImageViewRGB32 level_box = extract_box_reference(game_screen, jpn ? m_box_level_jpn : m_box_level);
-
-    ImageRGB32 level_upscaled =
-            level_box.scale_to(level_box.width() * 4, level_box.height() * 4);
-    if (save_debug_images){
-        level_upscaled.save("DebugDumps/ocr_level_upscaled.png");
-    }
-
-    // The level has a colored (lilac) background. The text is white, with a
-    // gray/black shadow. To bridge the gaps and make a solid black character on a
-    // white background: We want to turn BOTH the bright white text AND the dark
-    // shadow into BLACK pixels, and turn the mid-tone lilac background into
-    // WHITE. We can do this by keeping pixels that are very bright (text) or very
-    // dark (shadow).
-
-    ImageRGB32 level_ready(level_upscaled.width(), level_upscaled.height());
-    for (size_t r = 0; r < level_upscaled.height(); r++){
-        for (size_t c = 0; c < level_upscaled.width(); c++){
-            Color pixel(level_upscaled.pixel(c, r));
-            // If it's very bright (white text) OR very dark (shadow), it becomes
-            // black text. Otherwise (lilac background), it becomes white background.
-            if ((pixel.red() > 200 && pixel.green() > 200 && pixel.blue() > 200) ||
-                    (pixel.red() < 100 && pixel.green() < 100 && pixel.blue() < 100)){
-                level_ready.pixel(c, r) = (uint32_t)0xff000000; // Black
-            }else{
-                level_ready.pixel(c, r) = (uint32_t)0xffffffff; // White
-            }
-        }
-    }
-
-    if (save_debug_images){
-        level_ready.save("DebugDumps/ocr_level_ready.png");
-    }
 
     if (!GlobalSettings::instance().USE_PADDLE_OCR){
         // The level uses white text with dark shadow on a lilac background.
@@ -191,9 +165,20 @@ void StatsReader::read_page1(
         // shadow outline fragmented into many small disconnected blobs.
         // Preprocess: convert bright-white text pixels to black so the binarizer
         // merges text + shadow into one solid connected blob per digit.
-        ImageRGB32 preprocessed = filter_rgb32_range(
-            level_box, 0xffc8c8c8, 0xffffffff, Color(0xff000000), true
-        );
+        ImageRGB32 preprocessed = level_box.scale_to(level_box.width(), level_box.height());
+        for (size_t r = 0; r < level_box.height(); r++){
+            for (size_t c = 0; c < level_box.width(); c++){
+                Color pixel(level_box.pixel(c, r));
+                // Try to detect lilac background first based on low green channel, 
+                // replacing it with a darker lilac color (for matching the template)
+                // For other pixels, if it's bright it becomes black text. 
+                if ((pixel.blue() > pixel.green() + 25) && (pixel.red() > pixel.green() + 15)){
+                    preprocessed.pixel(c, r) = (uint32_t)0xffd1b0f0; // from template
+                }else if (pixel.red() > 200 && pixel.green() > 200 && pixel.blue() > 200){
+                    preprocessed.pixel(c, r) = (uint32_t)0xff000000; // Black
+                }
+            }
+        }
         if (save_debug_images){
             preprocessed.save("DebugDumps/ocr_level_preprocessed.png");
         }
@@ -215,6 +200,37 @@ void StatsReader::read_page1(
                 logger, level_digit_view, 230.0, DigitTemplateType::LevelBox,
                 "levelDigit", 0x7F);
     }else{
+        // The level has a colored (lilac) background. The text is white, with a
+        // gray/black shadow. To bridge the gaps and make a solid black character on a
+        // white background: We want to turn BOTH the bright white text AND the dark
+        // shadow into BLACK pixels, and turn the mid-tone lilac background into
+        // WHITE. We can do this by keeping pixels that are very bright (text) or very
+        // dark (shadow).
+        ImageRGB32 level_upscaled =
+            level_box.scale_to(level_box.width() * 4, level_box.height() * 4);
+        if (save_debug_images){
+            level_upscaled.save("DebugDumps/ocr_level_upscaled.png");
+        }
+        ImageRGB32 level_ready(level_upscaled.width(), level_upscaled.height());
+        for (size_t r = 0; r < level_upscaled.height(); r++){
+            for (size_t c = 0; c < level_upscaled.width(); c++){
+                Color pixel(level_upscaled.pixel(c, r));
+                // Try to detect lilac background first based on low green channel.
+                // For other pixels, if it's very bright (white text) OR very dark (shadow),
+                // it becomes black text. Otherwise, it becomes white background.
+                if ((pixel.blue() > pixel.green() + 25) && (pixel.red() > pixel.green() + 15)){
+                    level_ready.pixel(c, r) = (uint32_t)0xffffffff; // White
+                }else if ((pixel.red() > 200 && pixel.green() > 200 && pixel.blue() > 200) ||
+                        (pixel.red() < 100 && pixel.green() < 100 && pixel.blue() < 100)){
+                    level_ready.pixel(c, r) = (uint32_t)0xff000000; // Black
+                }else{
+                    level_ready.pixel(c, r) = (uint32_t)0xffffffff; // White
+                }
+            }
+        }
+        if (save_debug_images){
+            level_ready.save("DebugDumps/ocr_level_ready.png");
+        }
         // Pass the binarized image to PaddleOCR
         stats.level = OCR::read_number(logger, level_ready, language);
     }
