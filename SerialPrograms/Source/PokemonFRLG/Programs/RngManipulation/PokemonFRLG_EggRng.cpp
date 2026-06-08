@@ -87,6 +87,8 @@ EggRng_Descriptor::EggRng_Descriptor()
 struct EggRng_Descriptor::Stats : public StatsTracker{
     Stats()
         : resets(m_stats["Resets"])
+        , heldframes(m_stats["Held Frames Checked"])
+        , pickupframes(m_stats["Pickup Frames Checked"])
         , shinies(m_stats["Shinies"])
         , nonshiny(m_stats["Non-Shiny Hits"])
         , balls(m_stats["Balls Used"])
@@ -95,12 +97,17 @@ struct EggRng_Descriptor::Stats : public StatsTracker{
     {
         m_display_order.emplace_back("Resets");
         m_display_order.emplace_back("Shinies");
+        m_display_order.emplace_back("Held Frames Checked");
+        m_display_order.emplace_back("Pickup Frames Checked");
+        m_display_order.emplace_back("Shinies");
         m_display_order.emplace_back("Non-Shiny Hits", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Balls Used", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Rare Candies Used", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& resets;
+    std::atomic<uint64_t>& heldframes;
+    std::atomic<uint64_t>& pickupframes;
     std::atomic<uint64_t>& shinies;
     std::atomic<uint64_t>& nonshiny;
     std::atomic<uint64_t>& balls;
@@ -738,7 +745,6 @@ bool EggRng::reset_and_check_seed(
     );
     bool identical = same_seeds(search_hits);
 
-    uint64_t candies_used = 0;
     for (uint64_t i=0; i<candies_left; i++){
         if (finished || identical){
             break;
@@ -753,7 +759,6 @@ bool EggRng::reset_and_check_seed(
             ); 
         }
         RNG_FILTERS.set(filters);
-        candies_used = i;
 
         search_hits = get_wild_search_results(
             env.console, wild_searcher, filters, SEED_VALUES, 
@@ -772,7 +777,7 @@ bool EggRng::reset_and_check_seed(
         );
         identical = same_seeds(search_hits);
     }
-    candies_left -= candies_used;
+    candies_left -= uint64_t(pokemon.stats.size() - 1);
 
     if (search_hits.size() == 0){
         env.log("No Wild RNG matches found. Resetting...");
@@ -806,7 +811,7 @@ bool EggRng::held_frame_check(
     RngCalibrations& calibrations,
     const WallClock& timestamp,
     const uint16_t& current_seed, 
-    const uint64_t& candies_left,
+    uint64_t& candies_left,
     uint16_t& failed_searches,
     bool& shiny_found,
     bool& previously_hit_held_frame,
@@ -923,6 +928,8 @@ bool EggRng::held_frame_check(
         );
     }
 
+    candies_left -= uint64_t(observed_egg.stats.size() - 1);
+
     env.log("RNG Search finished");
     if (search_hits.size() == 0){
         failed_searches++;
@@ -1000,7 +1007,7 @@ bool EggRng::pickup_frame_check(
     RngCalibrationHistory& pickup_calibration_history,
     AdvRngEggSearcher& egg_searcher,
     RngCalibrations& calibrations,
-    const uint64_t& candies_left,
+    uint64_t& candies_left,
     uint16_t& failed_searches,
     bool& shiny_found,
     const uint16_t& TARGET_HELD_SEED,
@@ -1091,6 +1098,7 @@ bool EggRng::pickup_frame_check(
             1, 2, force_finish
         );
     }
+    candies_left -= uint64_t(observed_egg.stats.size() - 1);
 
     env.log("RNG Search finished");
     if (search_hits.size() == 0){
@@ -1331,11 +1339,12 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
                 egg_uncertain_history, held_calibration_history,
                 egg_searcher, calibrations, 
                 timestamp, current_seed,
-                candies_left, failed_searches, 
+                temp_candies_left, failed_searches, 
                 shiny_found, previously_hit_held_frame,
                 TARGET_HELD_SEED, 
                 EGG_STATS, PARENT_A, PARENT_B
             );
+            stats.heldframes++;
 
             if (held_finished){
                 env.log("Hit held frame after saving. Moving on to pickup frame calibration...");
@@ -1354,13 +1363,15 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 
         case EggProgramState::pickup_calibration:
             current_seed = 0; // unused here
+            temp_balls_left = balls_left;
+            temp_candies_left = candies_left;
             hit_seed = reset_and_check_seed(
                 env, context, stats, 
                 wild_uncertain_history, egg_uncertain_history,
                 wild_history, pickup_calibration_history,
                 wild_searcher, calibrations, 
                 timestamp, current_seed,
-                balls_left, candies_left, failed_searches, 
+                temp_balls_left, temp_candies_left, failed_searches, 
                 times_not_held, shiny_found, previously_hit_held_frame,
                 launch_delay,
                 PICKUP_SEED_DELAY, PICKUP_SEED_VALUES, PICKUP_SEED_POSITION,
@@ -1374,12 +1385,15 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
                 env, context, stats,
                 egg_uncertain_history, pickup_calibration_history,
                 egg_searcher, calibrations,
-                candies_left, failed_searches, shiny_found,
+                temp_candies_left, failed_searches, shiny_found,
                 TARGET_HELD_SEED, TARGET_PICKUP_SEED,
                 EGG_STATS, PARENT_A, PARENT_B
             );
+            stats.pickupframes++;
 
             if (pickup_finished){
+                stats.balls += (balls_left - temp_balls_left);
+                stats.candies += (candies_left - temp_candies_left);
                 env.log("Hit pickup frame!");
                 program_state = EggProgramState::finished;
                 STARTING_POINT.set(EggProgramState::held_prep);
