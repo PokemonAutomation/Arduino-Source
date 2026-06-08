@@ -60,7 +60,7 @@ stages:
                   Add-Content  $f "with serial.Serial('COM3', 9600, timeout=1) as ser:"
                   Add-Content  $f "    print('Closing the relay...')"
                   Add-Content  $f "    ser.write(b'AT+CH1=1\r\n')"
-                  Add-Content  $f "    time.sleep(0.5)"
+                  Add-Content  $f "    time.sleep(1)"
                   Add-Content  $f "    print('Opening the relay...')"
                   Add-Content  $f "    ser.write(b'AT+CH1=0\r\n')"
                   python $f
