@@ -22,17 +22,10 @@ using namespace std::chrono_literals;
 
 
 
-PABotBase2_WiredController::PABotBase2_WiredController(
-    Logger& logger,
-    PABotBase2::Connection& connection
-)
-    : ProController(logger)
-    , PABotBase2_Controller(logger, logging_throttler(), connection)
-{
+void PABotBase2_WiredController::add_message_loggers(PABotBase2::MessageLogger& message_logger){
     using namespace PABotBase2;
 
-    //  Add controller-specific messages.
-    connection.message_logger().add_message<pabb2_Message_Command_NS_WiredController_State>(
+    message_logger.add_message<pabb2_Message_Command_NS_WiredController_State>(
         "PABB2_MESSAGE_CMD_NS_WIRED_CONTROLLER_STATE",
         PABB2_MESSAGE_CMD_NS_WIRED_CONTROLLER_STATE,
         false,
@@ -43,6 +36,19 @@ PABotBase2_WiredController::PABotBase2_WiredController(
             return str;
         }
     );
+}
+
+
+
+PABotBase2_WiredController::PABotBase2_WiredController(
+    Logger& logger,
+    PABotBase2::Connection& connection
+)
+    : ProController(logger)
+    , PABotBase2_Controller(logger, logging_throttler(), connection)
+{
+    //  Add controller-specific messages.
+    add_message_loggers(connection.message_logger());
 
     m_status_thread.reset(new ControllerStatusThread(
         connection, *this

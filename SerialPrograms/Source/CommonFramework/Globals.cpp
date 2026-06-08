@@ -35,7 +35,7 @@ namespace PokemonAutomation{
 #endif
 
 #ifndef PA_VERSION_MINOR
-#define PA_VERSION_MINOR 66
+#define PA_VERSION_MINOR 67
 #endif
 
 #ifndef PA_VERSION_PATCH

@@ -39,8 +39,7 @@ namespace SerialPABotBase{
 
 SerialPABotBase_Connection::SerialPABotBase_Connection(
     Logger& logger,
-    const std::string& name,
-    bool set_to_null_controller
+    const std::string& name
 )
     : m_logger(logger, GlobalSettings::instance().LOG_EVERYTHING)
 {
@@ -105,7 +104,7 @@ SerialPABotBase_Connection::SerialPABotBase_Connection(
     m_status_thread = GlobalThreadPools::unlimited_normal().dispatch_now_blocking([=, this]{
         run_with_catch(
             "SerialPABotBase_Connection::thread_body()",
-            [=, this]{ thread_body(set_to_null_controller); }
+            [=, this]{ thread_body(); }
         );
     });
 }
@@ -229,7 +228,7 @@ void SerialPABotBase_Connection::throw_incompatible_protocol(){
         make_text_url(ONLINE_DOC_URL_BASE + "SetupGuide/Reflash.html", "See documentation for more details.")
     );
 }
-ControllerType SerialPABotBase_Connection::process_device(bool set_to_null_controller){
+ControllerType SerialPABotBase_Connection::process_device(){
     //  Protocol Version
     const std::map<pabb_ProgramID, uint8_t>* PROGRAMS;
     {
@@ -303,20 +302,12 @@ ControllerType SerialPABotBase_Connection::process_device(bool set_to_null_contr
     //  Current Controller
     ControllerType current_controller = refresh_controller_type();
 
-    if (set_to_null_controller && current_controller != ControllerType::None){
-        m_botbase->issue_request_and_wait(
-            DeviceRequest_change_controller_mode(PABB_CID_NONE),
-            nullptr
-        );
-        current_controller = refresh_controller_type();
-    }
-
     return current_controller;
 }
 
 
 
-void SerialPABotBase_Connection::thread_body(bool set_to_null_controller){
+void SerialPABotBase_Connection::thread_body(){
     using namespace PokemonAutomation;
 
     //  Connect
@@ -345,7 +336,7 @@ void SerialPABotBase_Connection::thread_body(bool set_to_null_controller){
     {
         std::string error;
         try{
-            process_device(set_to_null_controller);
+            process_device();
 
             //  Stop pending commands.
             m_botbase->stop_all_commands();

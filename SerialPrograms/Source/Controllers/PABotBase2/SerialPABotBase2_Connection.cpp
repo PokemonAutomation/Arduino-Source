@@ -9,6 +9,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/PanicDump.h"
 #include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2_PacketProtocol.h"
+#include "Common/PABotBase2/PABotBase2_MessageProtocol.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
@@ -32,8 +33,7 @@ using namespace std::chrono_literals;
 
 SerialPABotBase2_Connection::SerialPABotBase2_Connection(
     Logger& logger,
-    std::string name,
-    bool set_to_null_controller
+    std::string name
 )
     : m_logger(logger, GlobalSettings::instance().LOG_EVERYTHING)
     , m_device_name(std::move(name))
@@ -43,7 +43,7 @@ SerialPABotBase2_Connection::SerialPABotBase2_Connection(
     m_connect_thread = GlobalThreadPools::unlimited_normal().dispatch_now_blocking([=, this]{
         run_with_catch(
             "SerialPABotBase_Connection::connect_thread_body()",
-            [=, this]{ connect_thread_body(set_to_null_controller); }
+            [=, this]{ connect_thread_body(); }
         );
     });
 };
@@ -281,7 +281,7 @@ bool SerialPABotBase2_Connection::open_serial_connection(){
 
     return true;
 }
-bool SerialPABotBase2_Connection::open_device_connection(bool set_to_null_controller){
+bool SerialPABotBase2_Connection::open_device_connection(){
     {
         std::string text = "Querying device...";
         m_logger.log(text);
@@ -296,36 +296,19 @@ bool SerialPABotBase2_Connection::open_device_connection(bool set_to_null_contro
     }
 
     m_device->connect();
-    m_controller_list = m_device->controller_list();
 
     set_status_line0(
         m_device->device_name() + " (" + std::to_string(m_device->device_firmware_version()) + ")",
         theme_friendly_darkblue()
     );
 
-
-    //  Current Controller
-    ControllerType current_controller = refresh_controller_type();
-
-    if (set_to_null_controller && current_controller != ControllerType::None){
-        PABotBase2::Message_u32 request;
-        request.message_bytes = sizeof(request);
-        request.opcode = PABB2_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE;
-        request.data = SerialPABotBase::controller_type_to_id(ControllerType::None);
-        m_device->send_request_with_no_response(request);
-
-#if 0
-        m_botbase->issue_request_and_wait(
-            DeviceRequest_change_controller_mode(PABB_CID_NONE),
-            nullptr
-        );
-#endif
-        refresh_controller_type();
-    }
+    m_controller_list = m_device->controller_list();
+    auto_select_controller_from_boot();
+    refresh_controller_type();
 
     return true;
 }
-void SerialPABotBase2_Connection::connect_thread_body(bool set_to_null_controller){
+void SerialPABotBase2_Connection::connect_thread_body(){
     try{
         if (!open_serial_port()){
             return;
@@ -333,7 +316,7 @@ void SerialPABotBase2_Connection::connect_thread_body(bool set_to_null_controlle
         if (!open_serial_connection()){
             return;
         }
-        if (!open_device_connection(set_to_null_controller)){
+        if (!open_device_connection()){
             return;
         }
         declare_ready();

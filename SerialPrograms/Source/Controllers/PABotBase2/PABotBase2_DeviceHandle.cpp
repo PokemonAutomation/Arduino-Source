@@ -230,10 +230,6 @@ void DeviceHandle::connect(){
 
     query_controller_list();
     query_command_queue();
-
-    if (m_device_firmware_version >= 2026050100){
-        set_logging_flag(GlobalSettings::instance().DEVICE_LOGGING_FLAG);
-    }
 }
 bool DeviceHandle::try_set_controller_type(
     ControllerType controller_type,
@@ -327,7 +323,8 @@ uint8_t DeviceHandle::send_request_with_response(MessageHeader& request){
     return request.id;
 }
 std::optional<uint8_t> DeviceHandle::try_send_request_with_response(
-    MessageHeader& request, WallDuration timeout
+    MessageHeader& request,
+    WallClock deadline
 ){
     std::map<uint8_t, std::string>::iterator iter;
     std::unique_lock<Mutex> lg(m_lock);
@@ -339,7 +336,9 @@ std::optional<uint8_t> DeviceHandle::try_send_request_with_response(
         //  Wait until the slot is available.
         iter = m_pending_requests.find(request.id);
         if (iter != m_pending_requests.end()){
-            m_cv.wait(lg);
+            if (m_cv.wait_until(lg, deadline) == std::cv_status::timeout){
+                return {};
+            }
             continue;
         }
 
@@ -355,7 +354,7 @@ std::optional<uint8_t> DeviceHandle::try_send_request_with_response(
             nullptr,
             &request,
             request.message_bytes,
-            timeout
+            deadline
         )){
             return request.id;
         }
@@ -369,12 +368,18 @@ std::optional<uint8_t> DeviceHandle::try_send_request_with_response(
     m_request_seqnum--;
     return {};
 }
-std::string DeviceHandle::wait_for_request_response(uint8_t id, WallDuration timeout){
-    WallClock deadline = timeout == WallDuration::max()
-        ? WallClock::max()
-        : current_time() + timeout;
+std::optional<uint8_t> DeviceHandle::try_send_request_with_response(
+    MessageHeader& request, WallDuration timeout
+){
+    WallClock deadline = current_time() + timeout;
+    return try_send_request_with_response(request, deadline);
+}
+std::string DeviceHandle::wait_for_request_response(
+    uint8_t id,
+    WallClock deadline
+){
     std::unique_lock<Mutex> lg(m_lock);
-    while (current_time() < deadline){
+    while (true){
         throw_if_cancelled();
 
         //  Request doesn't exist.
@@ -388,7 +393,9 @@ std::string DeviceHandle::wait_for_request_response(uint8_t id, WallDuration tim
         }
 
         if (iter->second.empty()){
-            m_cv.wait_until(lg, deadline);
+            if (m_cv.wait_until(lg, deadline) == std::cv_status::timeout){
+                break;
+            }
             continue;
         }
 
@@ -397,6 +404,12 @@ std::string DeviceHandle::wait_for_request_response(uint8_t id, WallDuration tim
         return str;
     }
     return "";
+}
+std::string DeviceHandle::wait_for_request_response(uint8_t id, WallDuration timeout){
+    WallClock deadline = timeout == WallDuration::max()
+        ? WallClock::max()
+        : current_time() + timeout;
+    return wait_for_request_response(id, deadline);
 }
 
 uint32_t DeviceHandle::query_u32(uint8_t opcode){

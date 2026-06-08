@@ -100,7 +100,7 @@ private:
     virtual bool reliable_send_all_or_nothing(
         Cancellable* cancellable,
         const void* data, size_t bytes,
-        WallDuration timeout
+        WallClock deadline
     ) override;
     virtual void on_recv(const void* data, size_t bytes) override;
     virtual size_t unreliable_send(const void* data, size_t bytes) noexcept override;

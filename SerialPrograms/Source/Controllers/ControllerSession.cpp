@@ -50,7 +50,7 @@ ControllerSession::ControllerSession(
     , m_desired_controller(ControllerType::None)
     , m_next_reset_mode(ControllerResetMode::DO_NOT_RESET)
     , m_descriptor(option.descriptor())
-    , m_connection(m_descriptor->open_connection(logger, false))
+    , m_connection(m_descriptor->open_connection(logger))
 {
     if (!m_connection){
         return;
@@ -176,7 +176,7 @@ void ControllerSession::make_controller(
     {
         WriteSpinLock lg(m_state_lock);
 //        cout << "clear_settings = " << clear_settings << endl;
-        m_connection = m_descriptor->open_connection(m_logger, change_controller == ControllerType::None);
+        m_connection = m_descriptor->open_connection(m_logger);
         if (m_connection){
             m_connection->add_status_listener(*this);
             ready = m_connection->is_ready();

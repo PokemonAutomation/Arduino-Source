@@ -22,8 +22,7 @@ class SerialPABotBase2_Connection final : public PABotBase2::Connection{
 public:
     SerialPABotBase2_Connection(
         Logger& logger,
-        std::string name,
-        bool set_to_null_controller
+        std::string name
     );
     ~SerialPABotBase2_Connection();
 
@@ -41,8 +40,8 @@ private:
     bool try_connect_to_device(WallDuration timeout);
     bool connect_to_device();
     bool open_serial_connection();
-    bool open_device_connection(bool set_to_null_controller);
-    void connect_thread_body(bool set_to_null_controller);
+    bool open_device_connection();
+    void connect_thread_body();
 
 
 private:
