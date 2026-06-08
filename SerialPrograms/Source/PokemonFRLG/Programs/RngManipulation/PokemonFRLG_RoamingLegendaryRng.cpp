@@ -434,7 +434,7 @@ void RoamingLegendaryRng::program(SingleSwitchProgramEnvironment& env, ProContro
         RNG_CALIBRATION.set_hits(search_hits);       
         bool finished = update_history(
             env.console, advance_history, calibration_history, MAX_HISTORY_LENGTH, 
-            calibrations, search_hits, 1
+            calibrations, search_hits, 1, 2, MAX_RARE_CANDIES == 0
         );
         finished = finished || all_indistinguishable(search_hits, searcher, GENDER_THRESHOLD);
 

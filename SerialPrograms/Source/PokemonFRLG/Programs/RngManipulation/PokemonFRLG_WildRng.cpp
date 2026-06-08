@@ -540,7 +540,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
         std::vector<AdvRngState> search_hits = get_wild_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, gender_threshold, SUPER_ROD);
         RNG_CALIBRATION.set_hits(search_hits);           
-        bool finished = update_history(env.console, advance_history, calibration_history, MAX_HISTORY_LENGTH, calibrations, search_hits, 1);
+        bool finished = update_history(env.console, advance_history, calibration_history, MAX_HISTORY_LENGTH, calibrations, search_hits, 1, 2, MAX_RARE_CANDIES == 0);
         finished = finished || all_indistinguishable(search_hits, searcher, gender_threshold, SUPER_ROD);
 
         for (uint64_t i=0; i<MAX_RARE_CANDIES; i++){

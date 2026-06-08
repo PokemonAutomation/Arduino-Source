@@ -457,7 +457,7 @@ void StaticRng::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         RNG_CALIBRATION.set_hits(search_hits);      
         bool finished = update_history(
             env.console, advance_history, calibration_history, MAX_HISTORY_LENGTH, 
-            calibrations, search_hits, 1
+            calibrations, search_hits, 1, 2, MAX_RARE_CANDIES == 0
         );
 
         for (uint64_t i=0; i<MAX_RARE_CANDIES; i++){
