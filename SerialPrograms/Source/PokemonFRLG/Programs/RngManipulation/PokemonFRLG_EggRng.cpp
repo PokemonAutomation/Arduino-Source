@@ -632,7 +632,8 @@ bool EggRng::reset_and_check_seed(
     env.log("Resetting Game...");
     reset_and_perform_blind_sequence(
         env.console, context, target, 
-        HELD_SEED_BUTTON, HELD_EXTRA_BUTTON,
+        pickup_frame ? PICKUP_SEED_BUTTON : HELD_SEED_BUTTON, 
+        pickup_frame ? PICKUP_EXTRA_BUTTON : HELD_EXTRA_BUTTON,
         timings, launch_delay, false, PROFILE
     );
     stats.resets++; 
