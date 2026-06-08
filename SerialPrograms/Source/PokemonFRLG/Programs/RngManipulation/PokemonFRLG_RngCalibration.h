@@ -22,16 +22,23 @@ using namespace Pokemon;
 static const double FRLG_FRAMERATE = 59.999977; // FPS
 static const double FRLG_FRAME_DURATION = 1000.0 / FRLG_FRAMERATE;
 
-
-struct RngAdvanceHistory{
-    std::vector<double> seed_calibrations;
-    std::vector<std::vector<AdvRngState>> results;
-};
-
 struct RngCalibrations{
     double seed_offset;
     double csf_offset;
     double ingame_offset;
+
+    bool operator==(const RngCalibrations& other) const {
+        return (
+               seed_offset   == other.seed_offset
+            && csf_offset    == other.csf_offset
+            && ingame_offset == other.ingame_offset
+        );
+    }
+};
+
+struct RngUncertainHistory{
+    std::vector<RngCalibrations> calibrations;
+    std::vector<std::vector<AdvRngState>> results;
 };
 
 struct RngCalibrationHistory{
@@ -126,7 +133,7 @@ double get_seed_calibration_frames(
 );
 
 // get advances calibration based on average offset in the RNG calibration history
-double get_advances_calibration_frames(const RngCalibrationHistory& calibration_history, const uint64_t& advances);
+double get_advances_calibration(const RngCalibrationHistory& calibration_history, const uint64_t& advances);
 
 // get RngCalibrations from the RNG calibration history
 RngCalibrations get_calibrations(
@@ -134,13 +141,14 @@ RngCalibrations get_calibrations(
     const RngCalibrationHistory& history,
     const std::vector<uint16_t>& seed_values,
     const int16_t& seed_position,
-    const uint64_t& advances
+    const uint64_t& advances,
+    bool csf_first = false
 );
 
 // infer hit seeds/advances, update the calibration history, and return whether or not the search is finished
 bool update_history(
     ConsoleHandle& console,
-    RngAdvanceHistory& advance_history,
+    RngUncertainHistory& advance_history,
     RngCalibrationHistory& calibration_history, 
     const uint16_t& max_history_length,
     const RngCalibrations calibrations,

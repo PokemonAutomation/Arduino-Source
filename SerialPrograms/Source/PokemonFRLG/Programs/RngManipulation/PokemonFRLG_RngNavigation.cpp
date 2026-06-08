@@ -292,7 +292,8 @@ bool use_rare_candy(
     const BaseStats& base_stats,
     AdvRngMethod method,
     bool safari_zone,
-    bool first
+    bool first,
+    int from_last
 ){
     // navigate to the bag (only needed for the first use)
     if (first){
@@ -327,8 +328,9 @@ bool use_rare_candy(
     // only needed on the first use
     if (first){
         context.wait_for_all_requests();
-        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
-        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+        for (int i=0; i<(2+from_last); i++){
+            pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+        }
     }
 
     // watch for level up stats
@@ -365,8 +367,8 @@ bool use_rare_candy(
     // return to the bag (possibly learning a move, but trying to prevent evolution)
     int attempts = 0;
     while (true){
-        if (attempts > 5){
-            console.log("use_rare_candy(): failed to return to bag menu in 5 attempts.");
+        if (attempts > 25){
+            console.log("use_rare_candy(): failed to return to bag menu.");
             return true;
         }
         BagWatcher bag_menu(COLOR_RED);

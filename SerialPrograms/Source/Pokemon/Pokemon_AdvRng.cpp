@@ -728,7 +728,7 @@ void AdvRngSearcher::search_advance_range(
             state.method = method;
         }
 
-        for (uint64_t a=min_advances; a<max_advances; a++){
+        for (uint64_t a=min_advances; a<=max_advances; a++){
             AdvPokemonResult res = pokemon_from_state(state, roaming);
             bool match = check_for_match(res, target, gender_threshold, tid_xor_sid);
             if (match){
@@ -818,7 +818,7 @@ void AdvRngWildSearcher::search_advance_range(
             state.method = method;
         }
 
-        for (uint64_t a=min_advances; a<max_advances; a++){
+        for (uint64_t a=min_advances; a<=max_advances; a++){
             AdvWildPokemonResult res = wild_pokemon_from_state(state, encounter_slots, super_rod);
             bool match = check_for_match(res, target, gender_threshold, tid_xor_sid);
             if (match){
@@ -941,7 +941,7 @@ void AdvRngEggSearcher::search_pickup_advances_range(
             pickup_state.method = method;
         }
 
-        for (uint64_t a=min_pickup_advances; a<max_pickup_advances; a++){
+        for (uint64_t a=min_pickup_advances; a<=max_pickup_advances; a++){
             AdvEggResult egg_res = egg_from_pickup_state(pickup_state, held_pid_half);
             AdvPokemonResult poke_res = egg_to_pokemon(egg_res, parentA_ivs, parentB_ivs);
             bool match = check_for_match(poke_res, target, gender_threshold, tid_xor_sid);
@@ -987,7 +987,7 @@ void AdvRngEggSearcher::search_held_advances_range(
     uint16_t tid_xor_sid
 ){
     set_held_state_advances(min_held_advances);
-    for (uint64_t a=min_held_advances; a<max_held_advances; a++){
+    for (uint64_t a=min_held_advances; a<=max_held_advances; a++){
         if (egg_held_at_state(held_state.s0, compatibility)){
             uint16_t held_pid_half = (((held_state.s1) >> 16) % 0xfffe) + 1;
             search_pickups(

@@ -83,7 +83,7 @@ public:
 
 class RngCalibrationDisplay : public GroupOption{
 public:
-    RngCalibrationDisplay();
+    RngCalibrationDisplay(std::string label = "RNG Calibration");
 
     void set_calibrations(const RngCalibrations& calibrations);
     void set_hits(const std::vector<AdvRngState>& rng_states);
