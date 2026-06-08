@@ -177,7 +177,7 @@ bool CommandQueueManager::try_push_pending_specials() noexcept{
         sent = m_connection.reliable_send_all_or_nothing(
             nullptr,
             &message, message.message_bytes,
-            WallDuration::zero()
+            current_time()
         );
     }catch (...){}
 

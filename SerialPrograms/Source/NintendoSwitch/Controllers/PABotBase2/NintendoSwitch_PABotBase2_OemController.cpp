@@ -21,6 +21,102 @@ using namespace std::chrono_literals;
 
 
 
+void PABotBase2_OemController::add_message_loggers(PABotBase2::MessageLogger& message_logger){
+    using namespace PABotBase2;
+
+    message_logger.add_message<Message_NS1_OemController_Spi>(
+        "PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_READ_SPI",
+        PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_READ_SPI,
+        true,
+        [](const Message_NS1_OemController_Spi* message){
+            std::string str;
+            str += "id = " + std::to_string(message->id);
+            str += ", controller_type = " + std::to_string(message->controller_type);
+            str += ", address = 0x" + tostr_hex(message->address);
+            str += ", bytes = " + std::to_string(message->bytes);
+            return str;
+        }
+    );
+    message_logger.add_message_min_length<Message_NS1_OemController_Spi>(
+        "PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_WRITE_SPI",
+        PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_WRITE_SPI,
+        true,
+        [](const Message_NS1_OemController_Spi* message){
+            std::string str;
+            str += "id = " + std::to_string(message->id);
+            str += ", controller_type = " + std::to_string(message->controller_type);
+            str += ", address = 0x" + tostr_hex(message->address);
+            str += ", bytes = " + std::to_string(message->bytes);
+            return str;
+        }
+    );
+    message_logger.add_message<MessageHeader>(
+        "PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_PLAYER_LIGHTS",
+        PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_PLAYER_LIGHTS,
+        true,
+        [](const MessageHeader* header){
+            std::string str;
+            str += "id = " + std::to_string(header->id);
+            return str;
+        }
+    );
+    message_logger.add_message<Message_u32>(
+        "PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_PLAYER_LIGHTS",
+        PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_PLAYER_LIGHTS,
+        true,
+        [](const Message_u32* message){
+            std::string str;
+            str += "id = " + std::to_string(message->id);
+            str += ", lights = 0x" + tostr_hex(message->data);
+            return str;
+        }
+    );
+    message_logger.add_message<MessageHeader>(
+        "PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_USB_DISALLOWED",
+        PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_USB_DISALLOWED,
+        true,
+        [](const MessageHeader* header){
+            std::string str;
+            str += "id = " + std::to_string(header->id);
+            return str;
+        }
+    );
+    message_logger.add_message<Message_Feedback_NS1_OemController_Rumble>(
+        "PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_RUMBLE",
+        PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_RUMBLE,
+        false,
+        [](const Message_Feedback_NS1_OemController_Rumble* message){
+            std::string str;
+            str += tostr_hexbytes(&message->data, sizeof(OemController_RumbleState));
+            return str;
+        }
+    );
+    message_logger.add_message<Message_Command_NS1_OemController_Buttons>(
+        "PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_BUTTONS",
+        PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_BUTTONS,
+        false,
+        [](const Message_Command_NS1_OemController_Buttons* message){
+            std::string str;
+            str += "id = " + std::to_string(message->id);
+            str += ", ms = " + std::to_string(message->milliseconds);
+            return str;
+        }
+    );
+    message_logger.add_message<Message_Command_NS1_OemController_FullState>(
+        "PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_FULL_STATE",
+        PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_FULL_STATE,
+        false,
+        [](const Message_Command_NS1_OemController_FullState* message){
+            std::string str;
+            str += "id = " + std::to_string(message->id);
+            str += ", ms = " + std::to_string(message->milliseconds);
+            return str;
+        }
+    );
+}
+
+
+
 PABotBase2_OemController::PABotBase2_OemController(
     Logger& logger,
     RecursiveThrottler& logging_throttler,
@@ -60,95 +156,8 @@ PABotBase2_OemController::PABotBase2_OemController(
 
 
     //  Add controller-specific messages.
-    connection.message_logger().add_message<pabb2_Message_NS1_OemController_Spi>(
-        "PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_READ_SPI",
-        PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_READ_SPI,
-        true,
-        [](const pabb2_Message_NS1_OemController_Spi* message){
-            std::string str;
-            str += "id = " + std::to_string(message->id);
-            str += ", controller_type = " + std::to_string(message->controller_type);
-            str += ", address = 0x" + tostr_hex(message->address);
-            str += ", bytes = " + std::to_string(message->bytes);
-            return str;
-        }
-    );
-    connection.message_logger().add_message_min_length<pabb2_Message_NS1_OemController_Spi>(
-        "PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_WRITE_SPI",
-        PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_WRITE_SPI,
-        true,
-        [](const pabb2_Message_NS1_OemController_Spi* message){
-            std::string str;
-            str += "id = " + std::to_string(message->id);
-            str += ", controller_type = " + std::to_string(message->controller_type);
-            str += ", address = 0x" + tostr_hex(message->address);
-            str += ", bytes = " + std::to_string(message->bytes);
-            return str;
-        }
-    );
-    connection.message_logger().add_message<MessageHeader>(
-        "PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_PLAYER_LIGHTS",
-        PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_PLAYER_LIGHTS,
-        true,
-        [](const MessageHeader* header){
-            std::string str;
-            str += "id = " + std::to_string(header->id);
-            return str;
-        }
-    );
-    connection.message_logger().add_message<Message_u32>(
-        "PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_PLAYER_LIGHTS",
-        PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_PLAYER_LIGHTS,
-        true,
-        [](const Message_u32* message){
-            std::string str;
-            str += "id = " + std::to_string(message->id);
-            str += ", lights = 0x" + tostr_hex(message->data);
-            return str;
-        }
-    );
-    connection.message_logger().add_message<MessageHeader>(
-        "PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_USB_DISALLOWED",
-        PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_USB_DISALLOWED,
-        true,
-        [](const MessageHeader* header){
-            std::string str;
-            str += "id = " + std::to_string(header->id);
-            return str;
-        }
-    );
-    connection.message_logger().add_message<pabb2_Message_Feedback_NS1_OemController_Rumble>(
-        "PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_RUMBLE",
-        PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_RUMBLE,
-        false,
-        [](const pabb2_Message_Feedback_NS1_OemController_Rumble* message){
-            std::string str;
-            str += tostr_hexbytes(&message->data, sizeof(pabb_NintendoSwitch_Rumble));
-            return str;
-        }
-    );
-    connection.message_logger().add_message<pabb2_Message_Command_NS1_OemController_Buttons>(
-        "PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_BUTTONS",
-        PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_BUTTONS,
-        false,
-        [](const pabb2_Message_Command_NS1_OemController_Buttons* message){
-            std::string str;
-            str += "id = " + std::to_string(message->id);
-            str += ", ms = " + std::to_string(message->milliseconds);
-            return str;
-        }
-    );
-    connection.message_logger().add_message<pabb2_Message_Command_NS1_OemController_FullState>(
-        "PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_FULL_STATE",
-        PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_FULL_STATE,
-        false,
-        [](const pabb2_Message_Command_NS1_OemController_FullState* message){
-            std::string str;
-            str += "id = " + std::to_string(message->id);
-            str += ", ms = " + std::to_string(message->milliseconds);
-            return str;
-        }
-    );
+
+    add_message_loggers(connection.message_logger());
 
     connection.device().add_message_handler(
         PABB2_MESSAGE_OPCODE_CONSOLE_DISCONNECT,
@@ -185,14 +194,14 @@ PABotBase2_OemController::PABotBase2_OemController(
     connection.device().add_message_handler(
         PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_RUMBLE,
         [this](const MessageHeader* header){
-            if (header->message_bytes != sizeof(pabb2_Message_Feedback_NS1_OemController_Rumble)){
+            if (header->message_bytes != sizeof(Message_Feedback_NS1_OemController_Rumble)){
                 m_logger.log(
                     "PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_RUMBLE: **(invalid size = " + std::to_string(header->message_bytes) + ")**",
                     COLOR_RED
                 );
                 return;
             }
-            const auto* message = (const pabb2_Message_Feedback_NS1_OemController_Rumble*)header;
+            const auto* message = (const Message_Feedback_NS1_OemController_Rumble*)header;
 
             RumbleData left = parse_rumble(message->data.left);
             RumbleData right = parse_rumble(message->data.right);
@@ -256,14 +265,27 @@ bool PABotBase2_OemController::run_preconnect_configure(
 ){
     using namespace PABotBase2;
 
+    add_message_loggers(connection.message_logger());
+
+    WallClock deadline = current_time() + std::chrono::milliseconds(100);
+
     uint8_t controller_mac_address[6] = {};
     {
         Message_u32 request;
         request.message_bytes = sizeof(request);
         request.opcode = PABB2_MESSAGE_OPCODE_CONTROLLER_MAC_ADDRESS;
         request.data = SerialPABotBase::controller_type_to_id(controller_type);
-        uint8_t id = connection.device().send_request_with_response(request);
-        std::string response = connection.device().wait_for_request_response(id, std::chrono::milliseconds(100));
+        std::optional<uint8_t> id = connection.device().try_send_request_with_response(
+            request,
+            deadline
+        );
+        if (!id.has_value()){
+            return false;
+        }
+        std::string response = connection.device().wait_for_request_response(
+            id.value(),
+            deadline
+        );
         if (response.size() == sizeof(MessageHeader) + sizeof(controller_mac_address)){
             memcpy(
                 controller_mac_address,
@@ -271,11 +293,18 @@ bool PABotBase2_OemController::run_preconnect_configure(
                 sizeof(controller_mac_address)
             );
             logger.log("Controller MAC Address: " + tostr_hexbytes(controller_mac_address, sizeof(controller_mac_address)));
+        }else if (response.empty()){
+            logger.log(
+                "Timed out waiting for response to PABB2_MESSAGE_OPCODE_PAIRED_MAC_ADDRESS.",
+                COLOR_RED
+            );
+            return false;
         }else{
             logger.log(
                 "Invalid response size to PABB2_MESSAGE_OPCODE_PAIRED_MAC_ADDRESS: body = " + std::to_string(response.size()),
                 COLOR_RED
             );
+            return false;
         }
     }
 
@@ -295,7 +324,7 @@ bool PABotBase2_OemController::run_preconnect_configure(
 #define PABB_PACK
 #endif
     struct Message{
-        pabb2_Message_NS1_OemController_Spi request;
+        Message_NS1_OemController_Spi request;
         PABB_NintendoSwitch_ControllerColors colors;
     };
 #if _WIN32
@@ -341,7 +370,7 @@ bool PABotBase2_OemController::run_preconnect_configure(
         nullptr,
         &message,
         sizeof(Message),
-        Milliseconds(100)
+        deadline
     );
 }
 
@@ -355,7 +384,7 @@ ControllerPlayerNumber PABotBase2_OemController::get_player_number(Cancellable& 
 
 
 Button PABotBase2_OemController::populate_report_buttons(
-    pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons,
+    OemController_State0x30_Buttons& buttons,
     const SwitchControllerState& controller_state
 ){
     //  https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md
@@ -403,7 +432,7 @@ Button PABotBase2_OemController::populate_report_buttons(
     return all_buttons;
 }
 bool PABotBase2_OemController::populate_report_gyro(
-    pabb_NintendoSwitch_OemController_State0x30_Gyro& gyro,
+    OemController_State0x30_Gyro& gyro,
     const SwitchControllerState& controller_state
 ){
     gyro.accel_x = controller_state.gyro[0];
@@ -428,7 +457,7 @@ bool PABotBase2_OemController::populate_report_gyro(
 void PABotBase2_OemController::issue_report(
     Cancellable* cancellable,
     WallDuration duration,
-    const pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons
+    const OemController_State0x30_Buttons& buttons
 ){
     //  We will not do any throttling or timing adjustments here. We'll defer
     //  to the microcontroller to do that for us.
@@ -436,7 +465,7 @@ void PABotBase2_OemController::issue_report(
     //  Divide the controller state into smaller chunks of 65535 milliseconds.
     Milliseconds time_left = std::chrono::duration_cast<Milliseconds>(duration);
 
-    PABotBase2::pabb2_Message_Command_NS1_OemController_Buttons request;
+    PABotBase2::Message_Command_NS1_OemController_Buttons request;
     request.message_bytes = sizeof(request);
     request.opcode = PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_BUTTONS;
     request.buttons = buttons;
@@ -451,11 +480,11 @@ void PABotBase2_OemController::issue_report(
 void PABotBase2_OemController::issue_report(
     Cancellable* cancellable,
     WallDuration duration,
-    const pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons,
-    const pabb_NintendoSwitch_OemController_State0x30_Gyro& gyro
+    const OemController_State0x30_Buttons& buttons,
+    const OemController_State0x30_Gyro& gyro
 ){
     //  TODO: For now we duplicate the gyro data to all 3 5ms segments.
-    pabb_NintendoSwitch_OemController_State0x30_GyroX3 gyro3{
+    OemController_State0x30_GyroX3 gyro3{
         gyro, gyro, gyro
     };
 
@@ -499,7 +528,7 @@ void PABotBase2_OemController::issue_report(
     //  Divide the controller state into smaller chunks of 65535 milliseconds.
     Milliseconds time_left = std::chrono::duration_cast<Milliseconds>(duration);
 
-    PABotBase2::pabb2_Message_Command_NS1_OemController_FullState request;
+    PABotBase2::Message_Command_NS1_OemController_FullState request;
     request.message_bytes = sizeof(request);
     request.opcode = PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_FULL_STATE;
     request.state.buttons = buttons;
@@ -525,8 +554,8 @@ void PABotBase2_OemController::update_status(Cancellable& cancellable){
 
             using ControllerColors = PABB_NintendoSwitch_ControllerColors;
 
-            pabb2_Message_NS1_OemController_Spi message;
-            message.message_bytes = sizeof(pabb2_Message_NS1_OemController_Spi);
+            Message_NS1_OemController_Spi message;
+            message.message_bytes = sizeof(Message_NS1_OemController_Spi);
             message.opcode = PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_READ_SPI;
             message.controller_type = SerialPABotBase::controller_type_to_id(m_controller_type);
             message.address = 0x00006050;
@@ -608,7 +637,7 @@ void PABotBase2_OemController::update_status(Cancellable& cancellable){
         return;
     }
 
-    constexpr size_t EXPECTED_SIZE = sizeof(PABotBase2::Message_u32) + sizeof(pabb_NintendoSwitch_OemController_Status);
+    constexpr size_t EXPECTED_SIZE = sizeof(PABotBase2::Message_u32) + sizeof(OemController_Status);
     if (response.size() != EXPECTED_SIZE){
         throw SerialProtocolException(
             m_logger, PA_CURRENT_FUNCTION,
@@ -617,7 +646,7 @@ void PABotBase2_OemController::update_status(Cancellable& cancellable){
         );
     }
 
-    const pabb_NintendoSwitch_OemController_Status& status = *(const pabb_NintendoSwitch_OemController_Status*)(header + 1);
+    const OemController_Status& status = *(const OemController_Status*)(header + 1);
 
     str += "Paired: ";
     if (status.status & 4){

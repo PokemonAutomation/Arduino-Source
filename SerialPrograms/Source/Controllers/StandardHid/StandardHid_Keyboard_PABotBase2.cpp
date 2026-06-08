@@ -16,18 +16,10 @@ using namespace std::chrono_literals;
 
 
 
-PABotBase2_Keyboard::PABotBase2_Keyboard(
-    Logger& logger,
-    PABotBase2::Connection& connection
-)
-    : Keyboard(logger)
-    , KeyboardControllerWithScheduler(logger, logging_throttler())
-    , m_connection(connection)
-{
+void PABotBase2_Keyboard::add_message_loggers(PABotBase2::MessageLogger& message_logger){
     using namespace PABotBase2;
 
-    //  Add controller-specific messages.
-    connection.message_logger().add_message<pabb2_Message_Command_HID_Keyboard_State>(
+    message_logger.add_message<pabb2_Message_Command_HID_Keyboard_State>(
         "PABB2_MESSAGE_CMD_HID_KEYBOARD_STATE",
         PABB2_MESSAGE_CMD_HID_KEYBOARD_STATE,
         false,
@@ -38,6 +30,20 @@ PABotBase2_Keyboard::PABotBase2_Keyboard(
             return str;
         }
     );
+}
+
+
+
+PABotBase2_Keyboard::PABotBase2_Keyboard(
+    Logger& logger,
+    PABotBase2::Connection& connection
+)
+    : Keyboard(logger)
+    , KeyboardControllerWithScheduler(logger, logging_throttler())
+    , m_connection(connection)
+{
+    //  Add controller-specific messages.
+    add_message_loggers(connection.message_logger());
 
     m_status_thread.reset(new ControllerStatusThread(
         connection, *this

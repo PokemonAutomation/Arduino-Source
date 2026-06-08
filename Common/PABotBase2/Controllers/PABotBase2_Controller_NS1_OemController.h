@@ -33,7 +33,7 @@ struct PABB_NintendoSwitch_ControllerColors{
 
 #define PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_READ_SPI        0x91
 #define PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_WRITE_SPI       0x92
-struct PABB_PACK pabb2_Message_NS1_OemController_Spi : MessageHeader{
+struct PABB_PACK Message_NS1_OemController_Spi : MessageHeader{
     uint32_t controller_type;
     uint32_t address;
     uint8_t bytes;
@@ -44,22 +44,22 @@ struct PABB_PACK pabb2_Message_NS1_OemController_Spi : MessageHeader{
 #define PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_PLAYER_LIGHTS     0x94
 #define PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_USB_DISALLOWED    0x95
 #define PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_RUMBLE            0x96
-struct PABB_PACK pabb2_Message_Feedback_NS1_OemController_Rumble : MessageHeader{
-    pabb_NintendoSwitch_Rumble data;
+struct PABB_PACK Message_Feedback_NS1_OemController_Rumble : MessageHeader{
+    NintendoSwitch::OemController_RumbleState data;
 };
 
 
 #define PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_BUTTONS            0x97
-struct PABB_PACK pabb2_Message_Command_NS1_OemController_Buttons : MessageHeader{
+struct PABB_PACK Message_Command_NS1_OemController_Buttons : MessageHeader{
     uint16_t milliseconds;
-    pabb_NintendoSwitch_OemController_State0x30_Buttons buttons;
+    NintendoSwitch::OemController_State0x30_Buttons buttons;
 };
 
 
 #define PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_FULL_STATE         0x98
-struct PABB_PACK pabb2_Message_Command_NS1_OemController_FullState : MessageHeader{
+struct PABB_PACK Message_Command_NS1_OemController_FullState : MessageHeader{
     uint16_t milliseconds;
-    pabb_NintendoSwitch_OemController_State0x30 state;
+    NintendoSwitch::OemController_State0x30 state;
 };
 
 

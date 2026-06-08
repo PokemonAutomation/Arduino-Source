@@ -54,7 +54,7 @@ public:
     [[nodiscard]] virtual bool reliable_send_all_or_nothing(
         Cancellable* cancellable,
         const void* data, size_t bytes,
-        WallDuration timeout
+        WallClock deadline
     ) = 0;
 
 protected:

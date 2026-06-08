@@ -10,9 +10,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+
 
 
 //
@@ -20,52 +20,67 @@ extern "C" {
 //
 
 
-typedef struct{
+struct OemController_RumbleState{
     uint8_t left[4];
     uint8_t right[4];
-} pabb_NintendoSwitch_Rumble;
+};
 
-extern const pabb_NintendoSwitch_Rumble pabb_NintendoSwitch_Rumble_NEUTRAL_STATE;
+extern const OemController_RumbleState OemController_RumbleState_NEUTRAL_STATE;
 
 
+//
+//  Report 0x3f (no longer used)
+//
 
-typedef struct{
+struct OemController_State0x3f{
+    uint8_t button0;
+    uint8_t button1;
+    uint8_t dpad;
+    uint8_t left_joystick[4];
+    uint8_t right_joystick[4];
+};
+
+extern const OemController_State0x3f OemController_State0x3f_NEUTRAL_STATE;
+
+
+//
+//  Report 0x30
+//
+
+struct OemController_State0x30_Buttons{
     uint8_t button3;
     uint8_t button4;
     uint8_t button5;
     uint8_t left_joystick[3];
     uint8_t right_joystick[3];
     uint8_t vibrator;
-} pabb_NintendoSwitch_OemController_State0x30_Buttons;
+};
 
-typedef struct{
+struct OemController_State0x30_Gyro{
     int16_t accel_x;
     int16_t accel_y;
     int16_t accel_z;
     int16_t rotation_x;
     int16_t rotation_y;
     int16_t rotation_z;
-} pabb_NintendoSwitch_OemController_State0x30_Gyro;
+};
 
-typedef struct{
-    pabb_NintendoSwitch_OemController_State0x30_Gyro time0;
-    pabb_NintendoSwitch_OemController_State0x30_Gyro time1;
-    pabb_NintendoSwitch_OemController_State0x30_Gyro time2;
-} pabb_NintendoSwitch_OemController_State0x30_GyroX3;
+struct OemController_State0x30_GyroX3{
+    OemController_State0x30_Gyro time0;
+    OemController_State0x30_Gyro time1;
+    OemController_State0x30_Gyro time2;
+};
 
-typedef struct{
-    pabb_NintendoSwitch_OemController_State0x30_Buttons buttons;
-    pabb_NintendoSwitch_OemController_State0x30_GyroX3 gyro;
-} pabb_NintendoSwitch_OemController_State0x30;
+struct OemController_State0x30{
+    OemController_State0x30_Buttons buttons;
+    OemController_State0x30_GyroX3 gyro;
+};
 
+extern const OemController_State0x30 OemController_State0x30_NEUTRAL_STATE;
 
-
-
-extern const pabb_NintendoSwitch_OemController_State0x30 pabb_NintendoSwitch_OemController_State0x30_NEUTRAL_STATE;
-
-bool pabb_NintendoSwitch_OemController_State0x30_equals(
-    const pabb_NintendoSwitch_OemController_State0x30* state0,
-    const pabb_NintendoSwitch_OemController_State0x30* state1
+bool OemController_State0x30_equals(
+    const OemController_State0x30* state0,
+    const OemController_State0x30* state1
 );
 
 
@@ -73,7 +88,7 @@ bool pabb_NintendoSwitch_OemController_State0x30_equals(
 //  Controller <-> CC
 //
 
-typedef struct{
+struct OemController_Status{
     //  Bit 0: Connected
     //  Bit 1: Ready
     //  Bit 2: Paired
@@ -82,16 +97,15 @@ typedef struct{
     uint8_t player_lights;
 
     uint8_t paired_mac_address[6];
-} pabb_NintendoSwitch_OemController_Status;
+};
 
-typedef enum{
+enum class DisconnectReason{
     HOST_SHUTDOWN,
     CONNECTION_REJECTED,
-} DisconnectReason;
+};
 
 
 
-#ifdef __cplusplus
 }
-#endif
+}
 #endif

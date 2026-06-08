@@ -128,10 +128,8 @@ void ReliableStreamConnection::reliable_send_all_or_nothing(
 bool ReliableStreamConnection::reliable_send_all_or_nothing(
     Cancellable* cancellable,
     const void* data, size_t bytes,
-    WallDuration timeout
+    WallClock deadline
 ){
-    WallClock deadline = current_time() + timeout;
-
     const char* ptr = (const char*)data;
     std::unique_lock<Mutex> lg(m_lock);
     do{

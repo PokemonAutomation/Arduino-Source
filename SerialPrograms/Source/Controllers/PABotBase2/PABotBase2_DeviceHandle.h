@@ -21,7 +21,7 @@
 #include "Common/PABotBase2/PABotBase2CC_MessageDumper.h"
 #include "Controllers/ControllerTypes.h"
 #include "PABotBase2_CommandQueueManager.h"
-#include "PABotBase2_MessageHandler.h"
+//#include "PABotBase2_MessageHandler.h"
 
 namespace PokemonAutomation{
 namespace PABotBase2{
@@ -63,11 +63,17 @@ public:
 
 
 public:
-    uint32_t device_firmware_version() const{
-        return m_device_firmware_version;
+    uint32_t device_id() const{
+        return m_device_id;
     }
     const std::string& device_name() const{
         return m_device_name;
+    }
+    uint32_t device_firmware_version() const{
+        return m_device_firmware_version;
+    }
+    uint32_t device_protocol_version() const{
+        return m_device_protocol;
     }
     const std::vector<ControllerType>& controller_list() const{
         return m_controller_list;
@@ -80,6 +86,8 @@ public:
 
 public:
     ControllerType refresh_controller_type();
+    uint32_t query_u32(uint8_t opcode);
+    std::string query_data(uint8_t opcode);
 
     void send_request_with_no_response(MessageHeader& request);
 #if 0
@@ -93,12 +101,21 @@ public:
     //  Returns {} if cannot send request.
     //  Throws if connection is dead.
     std::optional<uint8_t> try_send_request_with_response(
-        MessageHeader& request, WallDuration timeout
+        MessageHeader& request,
+        WallClock deadline = WallClock::min()
+    );
+    std::optional<uint8_t> try_send_request_with_response(
+        MessageHeader& request,
+        WallDuration timeout
     );
 
     std::string wait_for_request_response(
         uint8_t id,
-        WallDuration timeout = WallDuration::max()
+        WallClock deadline = WallClock::max()
+    );
+    std::string wait_for_request_response(
+        uint8_t id,
+        WallDuration timeout
     );
 
     template <typename ResponseType, uint8_t response_opcode>
@@ -147,10 +164,7 @@ public:
     std::string dump_pending_requests() const;
 
 
-private:
-    uint32_t query_u32(uint8_t opcode);
-    std::string query_data(uint8_t opcode);
-
+public:
     void throw_incompatible_protocol();
     void query_protocol();
     void query_controller_list();

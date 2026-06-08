@@ -13,6 +13,11 @@
 #ifdef PA_ENABLE_QT_ADOPTION_WORKAROUND
 
 #include <QWaitCondition>
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 class ConditionVariable{
@@ -47,6 +52,12 @@ public:
         const std::chrono::duration<Rep, Period>& rel_time,
         Predicate pred
     ){
+        if (rel_time == std::chrono::duration<Rep, Period>::max()){
+            while (!pred()){
+                m_cv.wait(lock.mutex());
+            }
+            return true;
+        }
         auto abs_time = std::chrono::system_clock::now() + rel_time;
         while (true){
             if (pred()){
@@ -59,20 +70,37 @@ public:
     }
 
     template <class Clock, class Duration>
-    void wait_until(
+    std::cv_status wait_until(
         std::unique_lock<QMutex>& lock,
         const std::chrono::time_point<Clock, Duration>& abs_time
     ){
-        m_cv.wait(lock.mutex(), abs_time - std::chrono::system_clock::now());
+        if (abs_time == std::chrono::time_point<Clock, Duration>::max()){
+            m_cv.wait(lock.mutex());
+            return std::cv_status::no_timeout;
+        }
+        return m_cv.wait(lock.mutex(), abs_time - std::chrono::system_clock::now())
+            ? std::cv_status::no_timeout
+            : std::cv_status::timeout;
     }
     template <class Clock, class Duration, class Predicate>
-    void wait_until(
+    bool wait_until(
         std::unique_lock<QMutex>& lock,
         const std::chrono::time_point<Clock, Duration>& abs_time,
         Predicate pred
     ){
-        while (!pred()){
-            m_cv.wait(lock.mutex(), abs_time - std::chrono::system_clock::now());
+        if (abs_time == std::chrono::time_point<Clock, Duration>::max()){
+            while (!pred()){
+                m_cv.wait(lock.mutex());
+            }
+            return true;
+        }
+        while (true){
+            if (pred()){
+                return true;
+            }
+            if (!m_cv.wait(lock.mutex(), abs_time - std::chrono::system_clock::now())){
+                return false;
+            }
         }
     }
 

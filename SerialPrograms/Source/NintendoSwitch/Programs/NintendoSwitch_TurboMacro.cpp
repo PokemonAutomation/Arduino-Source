@@ -28,7 +28,7 @@ TurboMacro_Descriptor::TurboMacro_Descriptor()
 
 TurboMacro::TurboMacro()
     : LOOP(
-        "<b>Number of times to loop:</b>",
+        "<b>Number of times to loop:</b><br>(Set to zero to loop forever.)",
         LockMode::UNLOCK_WHILE_RUNNING,
         100, 0
     )
@@ -51,7 +51,7 @@ void TurboMacro::program(SingleSwitchProgramEnvironment& env, CancellableScope& 
     //  Connect the controller.
     //pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
-    for (uint32_t c = 0; c < LOOP; c++){
+    for (uint32_t c = 0; c < LOOP || LOOP == 0; c++){
         TABLE.run(scope, env.console.controller());
     }
 }
