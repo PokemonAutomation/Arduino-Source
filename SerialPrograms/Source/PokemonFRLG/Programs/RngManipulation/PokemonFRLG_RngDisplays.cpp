@@ -135,8 +135,8 @@ void RngFilterDisplay::reset(){
 
 }
 
-RngCalibrationDisplay::RngCalibrationDisplay()
-    : GroupOption("RNG Calibration", LockMode::READ_ONLY)
+RngCalibrationDisplay::RngCalibrationDisplay(std::string label)
+    : GroupOption(label, LockMode::READ_ONLY)
     , seed_calibration("<b>Seed Calibration (ms):</b>", LockMode::LOCK_WHILE_RUNNING, 0)
     , csf_calibration("<b>Continue Screen Frames Calibration:</b>", LockMode::LOCK_WHILE_RUNNING, 0.0)
     , advances_calibration("<b>In-Game Advances Calibration:</b>", LockMode::LOCK_WHILE_RUNNING, 0.0)

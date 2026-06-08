@@ -404,7 +404,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
     Milliseconds launch_delay = INITIAL_LAUNCH_DELAY;
 
-    RngAdvanceHistory advance_history;
+    RngUncertainHistory uncertain_history;
     RngCalibrationHistory calibration_history; 
 
     uint16_t failed_searches = 0;
@@ -448,7 +448,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         }
 
         // if previous resets had uncertain advances, slightly modify the seed delay to try to hit a different target
-        double seed_bump = SEED_BUMPS[advance_history.results.size() % 5];
+        double seed_bump = SEED_BUMPS[uncertain_history.results.size() % 5];
         calibrations.seed_offset += seed_bump;
 
         uint64_t ingame_advances = ADVANCES - CONTINUE_SCREEN_FRAMES;
@@ -540,7 +540,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
         std::vector<AdvRngState> search_hits = get_wild_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, gender_threshold, SUPER_ROD);
         RNG_CALIBRATION.set_hits(search_hits);           
-        bool finished = update_history(env.console, advance_history, calibration_history, MAX_HISTORY_LENGTH, calibrations, search_hits, 1);
+        bool finished = update_history(env.console, uncertain_history, calibration_history, MAX_HISTORY_LENGTH, calibrations, search_hits, 1);
         finished = finished || all_indistinguishable(search_hits, searcher, gender_threshold, SUPER_ROD);
 
         for (uint64_t i=0; i<MAX_RARE_CANDIES; i++){
@@ -565,7 +565,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
                 || all_indistinguishable(search_hits, searcher, gender_threshold, SUPER_ROD)
             );
             finished = update_history(
-                env.console, advance_history, 
+                env.console, uncertain_history, 
                 calibration_history, MAX_HISTORY_LENGTH,
                 calibrations, search_hits, 
                 1, 2, force_finish

@@ -211,12 +211,16 @@ void trigger_held_daycare_egg_after_delay(ProControllerContext& context, const u
 }
 
 void collect_daycare_egg_after_delay(ProControllerContext& context, const uint64_t& ingame_delay){
+    // wait with the start menu open to avoid overworld stuff causing extra advances
+    pbf_press_button(context, BUTTON_PLUS, 200ms, 300ms);
+    pbf_wait(context, std::chrono::milliseconds(ingame_delay - 12000)); // 4000ms + 500ms + 500ms + 6000ms + 1000ms
+    pbf_press_button(context, BUTTON_B, 200ms, 300ms);
     // 5 dialog presses
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - 10200)); // 4000ms + 6000ms + 200ms
+    pbf_press_button(context, BUTTON_A, 200ms, 800ms);
     // accept egg
     pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
     // exit dialogue
@@ -520,16 +524,16 @@ void check_timings(
         if (timings.ingame_delay < 4000) {
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Togepi: the in-game delay cannot be less than 4000ms (320 advances). Check your in-game advances and calibration or pick a new target.",
+                "Togepi: the in-game delay cannot be less than 4000ms (350 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
         return;
     case PokemonFRLG_RngTarget::eggpickup:
-        if (timings.ingame_delay < 4000) {
+        if (timings.ingame_delay < 12000) {
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Togepi: the in-game delay cannot be less than 10500ms (1100 advances). Check your in-game advances and calibration or pick a new target.",
+                "Togepi: the in-game delay cannot be less than 12000ms (1440 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
