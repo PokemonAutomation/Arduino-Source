@@ -29,6 +29,7 @@ BattlePokemonDetector::BattlePokemonDetector(Color color)
     , m_right_box(0.948558, 0.585096, 0.000481, 0.063462) // dark teal rgb(72, 106, 98)
     , m_top_box(0.594712, 0.481971, 0.325962, 0.002163) // off-white, movement makes this unreliable
     , m_bottom_box(0.554808, 0.674519, 0.034615, 0.002163) // dark teal
+    , m_background_box(0.552564, 0.583653, 0.414103, 0.009615) // depends on in-game location. white or rgb(215, 169, 96)
 {}
 void BattlePokemonDetector::make_overlays(VideoOverlaySet& items) const{
     const BoxOption& GAME_BOX = GameSettings::instance().GAME_BOX;
@@ -44,10 +45,13 @@ bool BattlePokemonDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 right_image = extract_box_reference(game_screen, m_right_box);
     ImageViewRGB32 top_image = extract_box_reference(game_screen, m_top_box);
     ImageViewRGB32 bottom_image = extract_box_reference(game_screen, m_bottom_box);
+    ImageViewRGB32 background_image = extract_box_reference(game_screen, m_background_box);
+
     if (is_grey(left_image, 680, 770, 20)
         && is_grey(right_image, 220, 320, 20)
         && is_grey(top_image, 680, 770, 20)
         && is_grey(bottom_image, 220, 320, 20)
+        && !(is_white(background_image) || is_solid(background_image, {0.4468, 0.3528, 0.2004}, 0.25, 20))
     ){
         return true;
     }
@@ -59,6 +63,7 @@ BattleOpponentDetector::BattleOpponentDetector(Color color)
     , m_right_box(0.422596, 0.132211, 0.000481, 0.054808) // off-white 
     , m_top_box(0.085577, 0.119952, 0.329327, 0.000721) //  off-white
     , m_bottom_box(0.109615, 0.264182, 0.328365, 0.001442) // dark teal rgb(72, 106, 98)
+    , m_background_box(0.050641, 0.126923, 0.388462, 0.063462) // depends on in-game location. white or rgb(187, 149, 65)
 {}
 void BattleOpponentDetector::make_overlays(VideoOverlaySet& items) const{
     const BoxOption& GAME_BOX = GameSettings::instance().GAME_BOX;
@@ -74,11 +79,13 @@ bool BattleOpponentDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 right_image = extract_box_reference(game_screen, m_right_box);
     ImageViewRGB32 top_image = extract_box_reference(game_screen, m_top_box);
     ImageViewRGB32 bottom_image = extract_box_reference(game_screen, m_bottom_box);
+    ImageViewRGB32 background_image = extract_box_reference(game_screen, m_background_box);
 
     if (is_grey(left_image, 680, 770, 20)
         && is_grey(right_image, 680, 770, 20)
         && is_grey(top_image, 680, 770, 20)
         && is_grey(bottom_image, 220, 320, 20)
+        && !(is_white(background_image) || is_solid(background_image, {0.4663, 0.3716, 0.1621}, 0.25, 20))
     ){
         return true;
     }
