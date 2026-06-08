@@ -16,6 +16,20 @@
 using namespace PokemonAutomation;
 using namespace PokemonAutomation::NintendoSwitch;
 
+namespace PokemonAutomation{
+
+// This function is required by Common/Cpp/Logging/GlobalLogger.h:global_logger_raw() to initialize
+// the global file logger.
+// This function is called the first time `global_logger_raw()` is called to initialize the static
+// local global file logger object.
+FileLoggerConfig make_global_config(){
+    return FileLoggerConfig{
+        .file_path = "./SerialProgramsCommandLine.log"
+    };
+}
+
+}
+
 int main(int argc, char* argv[]){
 //     // Set up output redirection for logging
 //     OutputRedirector redirect_stdout(std::cout, "stdout", Color());
