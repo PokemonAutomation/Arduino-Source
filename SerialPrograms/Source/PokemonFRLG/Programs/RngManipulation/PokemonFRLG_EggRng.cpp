@@ -96,7 +96,6 @@ struct EggRng_Descriptor::Stats : public StatsTracker{
         , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Resets");
-        m_display_order.emplace_back("Shinies");
         m_display_order.emplace_back("Held Frames Checked");
         m_display_order.emplace_back("Pickup Frames Checked");
         m_display_order.emplace_back("Shinies");
