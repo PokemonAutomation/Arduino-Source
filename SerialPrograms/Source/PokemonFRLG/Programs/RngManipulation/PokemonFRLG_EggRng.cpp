@@ -611,7 +611,7 @@ bool EggRng::reset_and_check_seed(
                 };
             }
         }
-        double bumpval = std::floor(times_not_held / 4) + 2 * std::floor(egg_uncertain_history.results.size());
+        double bumpval = std::floor((times_not_held + std::floor(egg_uncertain_history.results.size())) / 4);
         double advances_bump = std::pow(-1, bumpval) * std::floor((bumpval+1) / 2); // 0, -0.5, +0.5, -1, +1, -2, +2...
         double orig_csf_offset = calibrations.csf_offset;
         calibrations.csf_offset = fmod(orig_csf_offset + advances_bump, 2);
@@ -1358,6 +1358,11 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
                 wild_uncertain_history.calibrations.clear();
                 program_state = EggProgramState::pickup_calibration;
                 STARTING_POINT.set(EggProgramState::pickup_calibration);
+                calibrations = {
+                    PICKUP_CALIBRATION.seed_calibration / FRLG_FRAME_DURATION,
+                    PICKUP_CALIBRATION.csf_calibration,
+                    PICKUP_CALIBRATION.advances_calibration
+                };
             }
             continue;
 

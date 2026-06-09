@@ -448,7 +448,7 @@ bool update_history(
         return true;
     }
 
-    if (!force_finish && search_hits.size() > max_advance_possibilities){
+    if (!force_finish && search_hits.size() > max_advance_possibilities && !all_equal(search_hits)){
         return false;
     }
     
@@ -466,14 +466,12 @@ bool update_history(
     uncal_advances.resize(std::distance(uncal_advances.begin(), iter));
 
     int64_t mode = 0;
+    uncertain_history.calibrations.emplace_back(calibrations);
+    uncertain_history.results.emplace_back(hits);
 
     if (uncal_advances.size() == 1){
-        console.log("Hit " + to_hex_string(search_hits[0].seed) + " / " + std::to_string(search_hits[0].advance));
         mode = uncal_advances[0];
-    }else {
-        uncertain_history.calibrations.emplace_back(calibrations);
-        uncertain_history.results.emplace_back(hits);
-        
+    }else {        
         // check advance history for repeated values
         std::vector<uint64_t> counts;
         uint64_t best = 0;
@@ -506,7 +504,7 @@ bool update_history(
     }
     
     // add the closest possibility to the advances mode for each attempt to the calibration history
-    console.log("Inferred hits from previous " + std::to_string(uncertain_history.results.size()) + " attempts: ");
+    console.log("Hits from previous " + std::to_string(uncertain_history.results.size()) + " attempt(s): ");
     for (size_t i=0; i<uncertain_history.results.size(); i++){
         auto& cals = uncertain_history.calibrations[i];
         auto& res = uncertain_history.results[i];
@@ -536,6 +534,18 @@ bool update_history(
     return true;
 }
 
+bool all_equal(const std::vector<AdvRngState>& search_hits){
+    if (search_hits.size() < 2){ return true; }
+    const AdvRngState& first = search_hits[0];
+    for (size_t i=1; i<search_hits.size(); i++){
+        if (search_hits[i].seed != first.seed
+         || search_hits[i].advance != first.advance
+        ){
+            return false;
+        }
+    }
+    return true;
+}
 
 
 bool are_indistinguishable(AdvPokemonResult res1, AdvPokemonResult res2, const int16_t& gender_threshold){
