@@ -271,7 +271,7 @@ EggRng::EggRng()
     , MAX_RESETS(
         "<b>Max Resets:</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
-        200, 0 // default, min
+        400, 0 // default, min
         )
     , MAX_RARE_CANDIES(
         "<b>Max Rare Candies:</b><br>"
@@ -562,7 +562,7 @@ bool EggRng::reset_and_check_seed(
 ){
 
     static const int64_t FIXED_SEED_OFFSET = -845; // ms, approximate
-    static const int64_t FIXED_ADVANCES_OFFSET = pickup_frame ? -246 : 135;    // frames, approximate
+    const int64_t FIXED_ADVANCES_OFFSET = pickup_frame ? -246 : 135;    // frames, approximate
 
     static const uint64_t CONTINUE_SCREEN_FRAMES = 200;
 
