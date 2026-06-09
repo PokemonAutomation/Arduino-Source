@@ -789,6 +789,7 @@ namespace PokemonAutomation {
                 true
 					post_starly_clenaup(env.console, context);
                 }
+                true
             );
         }
         static void checkpoint_002(

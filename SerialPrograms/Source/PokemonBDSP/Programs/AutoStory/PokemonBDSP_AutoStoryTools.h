@@ -237,6 +237,12 @@ void use_strength(
     ProControllerContext& context
 );
 
+//  Press A until the Rock Smash selection arrow appears, confirm with A, then mash B for 3 s.
+void use_rock_smash(
+    VideoStream& stream,
+    ProControllerContext& context
+);
+
 //  Walk to the nurse, heal the party, and exit the Pokemon Center.
 //  `label` names the center for log messages (e.g. "Veilstone").
 //  Returns false if the exit black screen was not detected.

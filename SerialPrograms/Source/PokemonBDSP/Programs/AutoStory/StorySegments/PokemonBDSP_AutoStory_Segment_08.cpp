@@ -107,6 +107,18 @@ void AutoStory_Segment_08::run_segment(
     AutoStory_Checkpoint_124().run_checkpoint(env, context, options, stats);
     AutoStory_Checkpoint_125().run_checkpoint(env, context, options, stats);
 
+    AutoStory_Checkpoint_126().run_checkpoint(env, context, options, stats);
+
+    AutoStory_Checkpoint_127().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_128().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_129().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_130().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_131().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_132().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_133().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_134().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_135().run_checkpoint(env, context, options, stats);
+
     /*AutoStory_Checkpoint_021().run_checkpoint(env, context, options, stats);
     checkpoint_021_legendary(env, context, options, stats);*/
 
@@ -167,7 +179,8 @@ static bool handle_battle(
         pbf_press_dpad(context, DPAD_DOWN, 280ms, 200ms);
     } else if (
         trainerid == "galactic_hq_grunt_1" or
-        trainerid == "galactic_hq_double_grunts_1"
+        trainerid == "galactic_hq_double_grunts_1" or
+        trainerid == "route_222_sailor_luther"
     ) {
         // Select Razor leaf
         pbf_press_dpad(context, DPAD_UP, 280ms, 200ms);
@@ -1034,7 +1047,7 @@ static bool go_to_galactic_hq(
             {{black_screen}}
         );
         if (ret < 0){
-            stream.log("go_to_galactic_hq: black screen not detected!", COLOR_RED);
+            stream.log("go_to_galactic_hq, entering the Galactic HQ from the front door: black screen not detected!", COLOR_RED);
             return false;
         }
         stream.log("go_to_galactic_hq: entered the Galactic HQ from the front door.", COLOR_GREEN);
@@ -1048,6 +1061,8 @@ static bool go_through_galactic_hq(
     ProControllerContext& context,
     AutoStoryOptions options
 ){
+    // ------- This has returned one error and I couldn't reproduce it. It was somewhere at the other comment I left behind ----------- //
+
     DpadState dpad;
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
@@ -1071,7 +1086,7 @@ static bool go_through_galactic_hq(
             stream.log("go_through_galactic_hq: Opened the door.", COLOR_GREEN);
             pbf_mash_button(context, BUTTON_A, 4000ms);
         } else if (ret < 0){
-                stream.log("go_through_galactic_hq: Didn't detect door dialog box!", COLOR_RED);
+                stream.log("go_through_galactic_hq, opening the door: Didn't detect door dialog box!", COLOR_RED);
                 return false;
         }
     }
@@ -1090,7 +1105,7 @@ static bool go_through_galactic_hq(
             {{black_screen}}
         );
         if (ret < 0){
-            stream.log("go_through_galactic_hq: black screen not detected!", COLOR_RED);
+            stream.log("go_through_galactic_hq, entering Galactic HQ's 2F, first room: black screen not detected!", COLOR_RED);
             return false;
         }
         stream.log("go_through_galactic_hq: entered Galactic HQ's 2F, first room.", COLOR_GREEN);
@@ -1344,6 +1359,8 @@ static bool go_through_galactic_hq(
         stream.log("go_through_galactic_hq: got into the Galactic HQ 1F, fifth room.", COLOR_GREEN);
     };
 
+    // ---------------------------------------- The error happened around here ---------------------------------------- //
+
     context.wait_for_all_requests();
     pbf_wait(context, 3000ms);
 
@@ -1364,6 +1381,8 @@ static bool go_through_galactic_hq(
         }
         stream.log("go_through_galactic_hq: entered Galactic HQ's 4F.", COLOR_GREEN);
     };
+
+    // ---------------------------------------- Until here ---------------------------------------- //
     
     context.wait_for_all_requests();
     pbf_wait(context, 3000ms);
@@ -1766,6 +1785,539 @@ static bool go_to_mount_coronet(
 }
 
 
+static bool go_through_mount_coronet(
+    VideoStream& stream,
+    ProControllerContext& context,
+    AutoStoryOptions options
+){
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+    context.wait_for_all_requests();
+    stream.log("go_through_mount_coronet: Going through Mount Coronet...");
+
+    // @GumGum: Here the code, you can add more of these if you need them, but remember to adapt the numbering.
+
+    return true;
+}
+
+static bool fly_and_heal_at_veilstone(
+    VideoStream& stream,
+    ProControllerContext& context,
+    AutoStoryOptions options
+){
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+    context.wait_for_all_requests();
+    stream.log("fly_and_heal_at_veilstone: Flying to Veilstone City and healing there...");
+
+    fly_to(stream, context, FlyPoint::VeilstoneCity);
+
+    context.wait_for_all_requests();
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("fly_and_heal_at_veilstone: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("fly_and_heal_at_veilstone: entered Veilstone City Pokemon Center.", COLOR_GREEN);
+    };
+
+    return true;
+}
+
+static bool go_to_house_south_veilstone(
+    VideoStream& stream,
+    ProControllerContext& context,
+    AutoStoryOptions options
+){
+    DpadState dpad;
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+    context.wait_for_all_requests();
+    stream.log("go_to_house_south_veilstone: heading South...");
+
+    pbf_move_left_joystick(context, {0, -1}, 600ms, 100ms); // 2+
+    pbf_move_left_joystick(context, {-1, 0}, 4000ms, 100ms); // 20+
+
+    dpad.last_dir = DPAD_LEFT;
+    repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 3);
+    pbf_move_left_joystick(context, {0, -1}, 1000ms, 100ms); // 5+
+    dpad.last_dir = DPAD_DOWN;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 9);
+
+    pbf_move_left_joystick(context, {0, -1}, 1400ms, 100ms); // 8
+    pbf_move_left_joystick(context, {-1, 0}, 1200ms, 100ms); // 6+
+    pbf_move_left_joystick(context, {0, -1}, 2000ms, 100ms); // 10+
+    pbf_move_left_joystick(context, {+1, 0}, 1800ms, 100ms); // 7+
+
+    repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 3, true);
+
+    pbf_move_left_joystick(context, {+1, 0}, 2200ms, 100ms); // 15
+    context.wait_for_all_requests();
+
+    {
+        BlackScreenOverWatcher black_screen_1(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
+            },
+            {{black_screen_1}}
+        );
+        if (ret < 0){
+            stream.log("go_to_route_214_enter_house: black screen not detected!", COLOR_RED);
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+static bool go_through_house_south_veilstone(
+    VideoStream& stream,
+    ProControllerContext& context,
+    AutoStoryOptions options
+){
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+    context.wait_for_all_requests();
+    stream.log("go_through_house_south_veilstone: moving towards exit...");
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_through_house_south_veilstone: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_through_house_south_veilstone: exited the house", COLOR_GREEN);
+    }
+    
+    return true;
+}
+
+static bool go_to_house_west_sunyshore(
+    VideoStream& stream,
+    ProControllerContext& context,
+    AutoStoryOptions options
+){
+    DpadState dpad;
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+    context.wait_for_all_requests();
+    stream.log("go_to_house_west_sunyshore: going towards Sunyshore City...");
+
+    pbf_move_left_joystick(context, {+1, 0}, 600ms, 100ms); // 2+
+    pbf_move_left_joystick(context, {0, -1}, 3800ms, 100ms); // 19+
+    dpad.last_dir = DPAD_DOWN;
+    repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 8);
+
+    activate_repel(stream, context);
+
+    pbf_move_left_joystick(context, {0, -1}, 2600ms, 100ms); // 13+
+
+    dpad.last_dir = DPAD_DOWN;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 1);
+    pbf_move_left_joystick(context, {0, -1}, 1200ms, 100ms); // 6+
+    pbf_move_left_joystick(context, {-1, 0}, 400ms, 100ms); // 2
+    pbf_move_left_joystick(context, {0, -1}, 1000ms, 100ms); // 5+
+
+    pbf_move_left_joystick(context, {+1, 0}, 1600ms, 100ms); // 8+
+    dpad.last_dir = DPAD_RIGHT;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 1);
+    pbf_move_left_joystick(context, {0, -1}, 1600ms, 100ms); // 8+
+    
+    dpad.last_dir = DPAD_DOWN;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 1);
+    pbf_move_left_joystick(context, {0, -1}, 2200ms, 100ms); // 11+
+
+    pbf_move_left_joystick(context, {-1, 0}, 800ms, 100ms); // 4+
+    pbf_move_left_joystick(context, {0, -1}, 600ms, 100ms); // 3+
+    repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 2);
+
+    pbf_move_left_joystick(context, {0, -1}, 6200ms, 100ms); // 31+
+    context.wait_for_all_requests();
+
+    {
+        ShortDialogWatcher repel_dialog(COLOR_RED);
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 2000ms, 100ms); // 10+
+                pbf_move_left_joystick(context, {+1, 0}, 2000ms, 100ms); // 10+
+            },
+            {{repel_dialog}}
+        );
+        if (ret == 0){
+            stream.log("go_to_house_west_sunyshore: Reactivating repel.", COLOR_GREEN);
+            pbf_mash_button(context, BUTTON_A, 3000ms);
+        } else if (ret < 0){
+                stream.log("go_to_house_west_sunyshore: Didn't detect repel dialog box (1)!", COLOR_RED);
+                return false;
+        }
+    }
+
+    context.wait_for_all_requests();
+
+    pbf_move_left_joystick(context, {+1, 0}, 3000ms, 100ms); // 15+
+
+    dpad.last_dir = DPAD_LEFT;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 9);
+    pbf_move_left_joystick(context, {0, -1}, 8400ms, 100ms); // 42+
+    dpad.last_dir = DPAD_DOWN;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 4);
+    repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 5);
+    pbf_move_left_joystick(context, {+1, 0}, 7400ms, 100ms); // 37+
+
+    {
+        ShortDialogWatcher repel_dialog(COLOR_RED);
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 7400ms, 100ms); // 37+
+                pbf_move_left_joystick(context, {+1, 0}, 7400ms, 100ms); // 37+
+            },
+            {{repel_dialog}}
+        );
+        if (ret == 0){
+            stream.log("go_to_house_west_sunyshore: Not reactivating repel.", COLOR_GREEN);
+            pbf_mash_button(context, BUTTON_B, 3000ms);
+        } else if (ret < 0){
+                stream.log("go_to_house_west_sunyshore: Didn't detect repel dialog box (2)!", COLOR_RED);
+                return false;
+        }
+    }
+
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {+1, 0}, 7400ms, 100ms); // 37+
+    dpad.last_dir = DPAD_RIGHT;
+    repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 3);
+    pbf_move_left_joystick(context, {+1, 0}, 1400ms, 100ms); // 7+
+    pbf_move_left_joystick(context, {0, +1}, 800ms, 100ms); // 3+
+    pbf_move_left_joystick(context, {+1, 0}, 5200ms, 100ms); // 26+
+    pbf_move_left_joystick(context, {0, -1}, 400ms, 100ms); // 1+
+
+    use_rock_smash(stream, context);
+
+    context.wait_for_all_requests();
+
+    dpad.last_dir = DPAD_DOWN;
+    repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 2);
+
+    {
+        MarkDetector route_222_sailor_luther_fight(stream.overlay(), {0.1, 0.0, 0.8, 0.9});
+
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms); // 5+
+            },
+            {{route_222_sailor_luther_fight}}
+        );
+        if (ret == 0){
+            context.wait_for_all_requests();
+            pbf_wait(context, 2000ms);
+
+            BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+            ret = run_until<ProControllerContext>(
+                stream, context,
+                [](ProControllerContext& context){
+                    pbf_mash_button(context, BUTTON_A, 200000ms);
+                },
+                {{black_screen}}
+            );
+            if (ret < 0){
+                stream.log("go_to_house_west_sunyshore_route_222_sailor_luther: black screen not detected!", COLOR_RED);
+                return false;
+            } else if (ret == 0){
+                handle_battle(stream, context, "route_222_sailor_luther");
+            }
+        }
+    }
+
+    context.wait_for_all_requests();
+
+    pbf_move_left_joystick(context, {+1, 0}, 2400ms, 100ms); // 12+
+    pbf_move_left_joystick(context, {0, -1}, 1400ms, 100ms); // 6+
+    dpad.last_dir = DPAD_DOWN;
+    repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 1);
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_to_house_west_sunyshore: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_to_house_west_sunyshore: entered the house", COLOR_GREEN);
+    }
+    
+    return true;
+}
+
+static bool go_through_house_west_sunyshore(
+    VideoStream& stream,
+    ProControllerContext& context,
+    AutoStoryOptions options
+){
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+    context.wait_for_all_requests();
+    stream.log("go_through_house_west_sunyshore: moving towards exit...");
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_through_house_south_veilstone: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_through_house_south_veilstone: exited the house", COLOR_GREEN);
+    }
+    
+    return true;
+}
+
+static bool go_to_sunyshore_lighthouse(
+    VideoStream& stream,
+    ProControllerContext& context,
+    AutoStoryOptions options
+){
+    DpadState dpad;
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+    context.wait_for_all_requests();
+    stream.log("go_to_sunyshore_lighthouse: going towards the lighthouse to talk to Volkner...");
+
+    {
+        ShortDialogWatcher listen_to_flint(COLOR_BLUE);
+        int ret = wait_until(stream, context, std::chrono::seconds(30), {{listen_to_flint}});
+        if (ret < 0){
+            stream.log("go_to_house_west_sunyshore, listen_to_flint: dialog box not detected!", COLOR_RED);
+            return false;
+        } else if (ret == 0) {
+            stream.log("go_to_house_west_sunyshore, listen_to_flint: dialog box detected.", COLOR_GREEN);
+            pbf_mash_button(context, BUTTON_B, 15000ms);
+            context.wait_for_all_requests();
+        }
+    }
+
+    context.wait_for_all_requests();
+
+    pbf_move_left_joystick(context, {+1, 0}, 2000ms, 100ms); // 10+
+    dpad.last_dir = DPAD_RIGHT;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 2);
+    pbf_move_left_joystick(context, {0, +1}, 3000ms, 100ms); // 15+
+
+    dpad.last_dir = DPAD_UP;
+    repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 8);
+    pbf_move_left_joystick(context, {0, -1}, 3400ms, 100ms); // 17+
+    pbf_move_left_joystick(context, {+1, 0}, 7600ms, 100ms); // 38+
+    dpad.last_dir = DPAD_RIGHT;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 3);
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_through_house_west_sunyshore: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_through_house_west_sunyshore: entered the lighthouse", COLOR_GREEN);
+    }
+    
+    return true;
+}
+
+static bool talk_to_volkner_at_the_lighthouse(
+    VideoStream& stream,
+    ProControllerContext& context,
+    AutoStoryOptions options
+){
+    DpadState dpad;
+    context.wait_for_all_requests();
+    pbf_wait(context, 1000ms);
+    context.wait_for_all_requests();
+    stream.log("talk_to_volkner_at_the_lighthouse: Going up and talking to Volkner...");
+
+    {
+        BlackScreenFlashWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = wait_until(stream, context, std::chrono::seconds(30), {{black_screen}});
+        if (ret < 0){
+            stream.log("talk_to_volkner_at_the_lighthouse: black screen exiting elevator not detected!", COLOR_RED);
+            return false;
+        } else if (ret == 0) {
+            stream.log("talk_to_volkner_at_the_lighthouse: exited the elevator.", COLOR_GREEN);
+        }
+    }
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+
+    dpad.last_dir = DPAD_DOWN;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 3);
+    pbf_move_left_joystick(context, {0, +1}, 1400ms, 100ms); // 7+
+    dpad.last_dir = DPAD_UP;
+    repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 1);
+
+    {
+        ShortDialogWatcher talk_to_volkner(COLOR_RED);
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                ssf_press_left_joystick(context, {+1, 0}, 0ms, 5000ms);
+                ssf_mash1_button(context, BUTTON_A, 5000ms);
+            },
+            {{talk_to_volkner}}
+        );
+        if (ret == 0){
+            stream.log("talk_to_volkner_at_the_lighthouse: Talking to Volkner.", COLOR_GREEN);
+            pbf_mash_button(context, BUTTON_B, 11000ms);
+        } else if (ret < 0){
+                stream.log("talk_to_volkner_at_the_lighthouse: Didn't detect Volkner dialog box!", COLOR_RED);
+                return false;
+        }
+    }
+
+    context.wait_for_all_requests();
+
+    pbf_move_left_joystick(context, {-1, 0}, 800ms, 100ms); // 3+
+    pbf_move_left_joystick(context, {0, -1}, 1400ms, 100ms); // 7+
+    dpad.last_dir = DPAD_DOWN;
+    repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 4);
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("talk_to_volkner_at_the_lighthouse: entering elevator to exit black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("talk_to_volkner_at_the_lighthouse: entered the elevator", COLOR_GREEN);
+    }
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 1000ms);
+
+    {
+        BlackScreenFlashWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = wait_until(stream, context, std::chrono::seconds(30), {{black_screen}});
+        if (ret < 0){
+            stream.log("talk_to_volkner_at_the_lighthouse: black screen exiting elevator not detected!", COLOR_RED);
+            return false;
+        } else if (ret == 0) {
+            stream.log("talk_to_volkner_at_the_lighthouse: exited the elevator.", COLOR_GREEN);
+        }
+    }
+
+    return true;
+}
+
+static bool go_to_sunyshore_gym(
+    VideoStream& stream,
+    ProControllerContext& context,
+    AutoStoryOptions options
+){
+    DpadState dpad;
+    context.wait_for_all_requests();
+    pbf_wait(context, 1000ms);
+    context.wait_for_all_requests();
+    stream.log("go_to_sunyshore_gym: heading towards Sunyshore City's gym...");
+
+    dpad.last_dir = DPAD_UP;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 14);
+    pbf_move_left_joystick(context, {0, +1}, 4000ms, 100ms); // 20+
+    dpad.last_dir = DPAD_UP;
+    repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 4);
+    pbf_move_left_joystick(context, {0, +1}, 5400ms, 100ms); // 27+
+    dpad.last_dir = DPAD_UP;
+    repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 6);
+    pbf_move_left_joystick(context, {-1, 0}, 6800ms, 100ms); // 34+
+    pbf_move_left_joystick(context, {0, +1}, 600ms, 100ms); // 2+
+
+    {
+        ShortDialogWatcher talk_to_flint(COLOR_RED);
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                ssf_press_left_joystick(context, {+1, 0}, 0ms, 5000ms);
+                ssf_mash1_button(context, BUTTON_A, 5000ms);
+            },
+            {{talk_to_flint}}
+        );
+        if (ret == 0){
+            stream.log("go_to_sunyshore_gym: Talking to Flint.", COLOR_GREEN);
+            pbf_mash_button(context, BUTTON_B, 9000ms);
+        } else if (ret < 0){
+                stream.log("go_to_sunyshore_gym: Didn't detect Flint dialog box!", COLOR_RED);
+                return false;
+        }
+    }
+
+    context.wait_for_all_requests();
+
+    dpad.last_dir = DPAD_RIGHT;
+    repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 1);
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_to_sunyshore_gym: black screen entering the gym not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_to_sunyshore_gym: entered the gym.", COLOR_GREEN);
+    }
+
+    return true;
+}
+
+
+
 // ------------------------------------------------------------------ Checkpoints logic --------------------------------------------------------- //
 
 
@@ -1795,7 +2347,7 @@ void checkpoint_113(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
             if (!heal_and_exit(env.console, context, "Snowpoint City")){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_and_exit: transition not detected.", env.console);
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_and_exit_snowpoint_city: transition not detected.", env.console);
             }
         },
         false
@@ -1828,7 +2380,7 @@ void checkpoint_116(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
             if (!heal_and_exit(env.console, context, "Veilstone City")){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_and_exit: transition not detected.", env.console);
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_and_exit_veilstone_city: transition not detected.", env.console);
             }
         },
         false
@@ -1872,7 +2424,7 @@ void checkpoint_120(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
             if (!heal_and_exit(env.console, context, "Veilstone City")){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_and_exit: transition not detected.", env.console);
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_and_exit_veilstone_city: transition not detected.", env.console);
             }
         },
         false
@@ -1916,7 +2468,7 @@ void checkpoint_124(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
             if (!heal_and_exit(env.console, context, "Oreburgh City")){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_and_exit: transition not detected.", env.console);
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_and_exit_oreburgh_city: transition not detected.", env.console);
             }
         },
         false
@@ -1933,6 +2485,117 @@ void checkpoint_125(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         false
     );
 }
+
+void checkpoint_126(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
+            if (!go_through_mount_coronet(env.console, context, options)){
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_mount_coronet: transition not detected.", env.console);
+            }
+        },
+        false
+    );
+}
+
+void checkpoint_127(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
+            if (!fly_and_heal_at_veilstone(env.console, context, options)){
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "fly_and_heal_at_veilstone: transition not detected.", env.console);
+            }
+        },
+        false
+    );
+}
+
+void checkpoint_128(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
+            if (!heal_and_exit(env.console, context, "Veilstone City")){
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_and_exit_veilstone_city: transition not detected.", env.console);
+            }
+        },
+        false
+    );
+}
+
+void checkpoint_129(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
+            if (!go_to_house_south_veilstone(env.console, context, options)){
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_house_south_veilstone: transition not detected.", env.console);
+            }
+        },
+        false
+    );
+}
+
+void checkpoint_130(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
+            if (!go_through_house_south_veilstone(env.console, context, options)){
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_house_south_veilstone: transition not detected.", env.console);
+            }
+        },
+        false
+    );
+}
+
+void checkpoint_131(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
+            if (!go_to_house_west_sunyshore(env.console, context, options)){
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_house_west_sunyshore: transition not detected.", env.console);
+            }
+        },
+        false
+    );
+}
+
+void checkpoint_132(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
+            if (!go_through_house_west_sunyshore(env.console, context, options)){
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_house_west_sunyshore: transition not detected.", env.console);
+            }
+        },
+        false
+    );
+}
+
+void checkpoint_133(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
+            if (!go_to_sunyshore_lighthouse(env.console, context, options)){
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_sunyshore_lighthouse: transition not detected.", env.console);
+            }
+        },
+        false
+    );
+}
+
+void checkpoint_134(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
+            if (!talk_to_volkner_at_the_lighthouse(env.console, context, options)){
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "talk_to_volkner_at_the_lighthouse: transition not detected.", env.console);
+            }
+        },
+        false
+    );
+}
+
+void checkpoint_135(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
+            if (!go_to_sunyshore_gym(env.console, context, options)){
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_sunyshore_gym: transition not detected.", env.console);
+            }
+        },
+        false
+    );
+}
+
 
 
 std::string AutoStory_Checkpoint_111::name()       const{ return "111 - Segment 08 - Gym badge acquired"; }
@@ -2114,6 +2777,127 @@ void AutoStory_Checkpoint_125::run_checkpoint(
 ) const{
     checkpoint_125(env, context, options, stats);
 }
+
+std::string AutoStory_Checkpoint_126::name()       const{ return "126 - Segment 08 - Go through Mt. Coronet to deal with Cyrus and Dialga/Palkia"; }
+std::string AutoStory_Checkpoint_126::start_text() const{ return "Entered Mount Coronet."; }
+std::string AutoStory_Checkpoint_126::end_text()   const{ return "Exited Mt. Coronet, having dealt with Cyrus."; }
+void AutoStory_Checkpoint_126::run_checkpoint(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+) const{
+    checkpoint_126(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_127::name()       const{ return "127 - Segment 08 - Fly to Veilstone City"; }
+std::string AutoStory_Checkpoint_127::start_text() const{ return "Exited Mt. Coronet, having dealt with Cyrus."; }
+std::string AutoStory_Checkpoint_127::end_text()   const{ return "Entered the Veilstone Pokemon Center."; }
+void AutoStory_Checkpoint_127::run_checkpoint(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+) const{
+    checkpoint_127(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_128::name()       const{ return "126 - Segment 08 - Heal and exit"; }
+std::string AutoStory_Checkpoint_128::start_text() const{ return "Entered the Veilstone Pokemon Center."; }
+std::string AutoStory_Checkpoint_128::end_text()   const{ return "Exited the Veilstone Pokemon Center."; }
+void AutoStory_Checkpoint_128::run_checkpoint(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+) const{
+    checkpoint_128(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_129::name()       const{ return "129 - Segment 08 - Go to house South of Veilstone City"; }
+std::string AutoStory_Checkpoint_129::start_text() const{ return "Exited the Veilstone Pokemon Center."; }
+std::string AutoStory_Checkpoint_129::end_text()   const{ return "Arrived at the house South of Veilstone City."; }
+void AutoStory_Checkpoint_129::run_checkpoint(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+) const{
+    checkpoint_129(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_130::name()       const{ return "130 - Segment 08 - Go through the house South of Veilstone City"; }
+std::string AutoStory_Checkpoint_130::start_text() const{ return "Arrived at the house South of Veilstone City."; }
+std::string AutoStory_Checkpoint_130::end_text()   const{ return "Exited the house South of Veilstone City."; }
+void AutoStory_Checkpoint_130::run_checkpoint(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+) const{
+    checkpoint_130(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_131::name()       const{ return "131 - Segment 08 - Go through routes 214 and 222 to the house West of Sunyshore City"; }
+std::string AutoStory_Checkpoint_131::start_text() const{ return "Exited house South of Veilstone City."; }
+std::string AutoStory_Checkpoint_131::end_text()   const{ return "Entered the house West of Sunyshore City."; }
+void AutoStory_Checkpoint_131::run_checkpoint(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+) const{
+    checkpoint_131(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_132::name()       const{ return "132 - Segment 08 - Go through the house West of Sunyshore City"; }
+std::string AutoStory_Checkpoint_132::start_text() const{ return "Entered the house West of Sunyshore City."; }
+std::string AutoStory_Checkpoint_132::end_text()   const{ return "Entered Sunyshore City."; }
+void AutoStory_Checkpoint_132::run_checkpoint(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+) const{
+    checkpoint_132(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_133::name()       const{ return "133 - Segment 08 - Go to Sunyshore City's lighthouse"; }
+std::string AutoStory_Checkpoint_133::start_text() const{ return "Entered Sunyshore City."; }
+std::string AutoStory_Checkpoint_133::end_text()   const{ return "Entered Sunyshore City's lighthouse."; }
+void AutoStory_Checkpoint_133::run_checkpoint(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+) const{
+    checkpoint_133(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_134::name()       const{ return "134 - Segment 08 - Talk to Volkner at the lighthouse"; }
+std::string AutoStory_Checkpoint_134::start_text() const{ return "Entered Sunyshore City's lighthouse."; }
+std::string AutoStory_Checkpoint_134::end_text()   const{ return "Exited Sunyshore City's lighthouse."; }
+void AutoStory_Checkpoint_134::run_checkpoint(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+) const{
+    checkpoint_134(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_135::name()       const{ return "135 - Segment 08 - Go to the Sunyshore City gym"; }
+std::string AutoStory_Checkpoint_135::start_text() const{ return "Exited Sunyshore City's lighthouse."; }
+std::string AutoStory_Checkpoint_135::end_text()   const{ return "Entered Sunyshore City's gym."; }
+void AutoStory_Checkpoint_135::run_checkpoint(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+) const{
+    checkpoint_135(env, context, options, stats);
+}
+
 
 
 void AutoStory_Checkpoint_021::run_checkpoint(

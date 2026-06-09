@@ -557,7 +557,7 @@ bool fly_to(
     };
     if (ret_1 == 0 and ret_2 == 0){
         stream.log("Found " + name + ", flying towards it.", COLOR_GREEN);
-        WhiteScreenOverWatcher flying_white_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8})
+        WhiteScreenOverWatcher flying_white_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
         BlackScreenOverWatcher flying_black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
         int ret = run_until<ProControllerContext>(
             stream, context,
@@ -928,6 +928,31 @@ void use_strength(
     }
 
     stream.log("[AutoStory] use_strength: selection arrow found, confirming.", COLOR_GREEN);
+    pbf_press_button(context, BUTTON_A, 80ms, 200ms);
+    pbf_mash_button(context, BUTTON_B, 6000ms);
+}
+
+void use_rock_smash(
+    VideoStream& stream,
+    ProControllerContext& context
+){
+    stream.log("[AutoStory] use_rock_smash: pressing A until selection arrow appears.");
+    const ImageFloatBox box{0.670000, 0.600000, 0.100000, 0.150000};
+    SelectionArrowFinder arrow(stream.overlay(), box, COLOR_GREEN);
+
+    int ret = run_until<ProControllerContext>(
+        stream, context,
+        [](ProControllerContext& context){
+            pbf_mash_button(context, BUTTON_A, 30000ms);
+        },
+        {{arrow}}
+    );
+    if (ret != 0){
+        stream.log("[AutoStory] use_rock_smash: selection arrow not found.", COLOR_RED);
+        return;
+    }
+
+    stream.log("[AutoStory] use_rock_smash: selection arrow found, confirming.", COLOR_GREEN);
     pbf_press_button(context, BUTTON_A, 80ms, 200ms);
     pbf_mash_button(context, BUTTON_B, 6000ms);
 }
