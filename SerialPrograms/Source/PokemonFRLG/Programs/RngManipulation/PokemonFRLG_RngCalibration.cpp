@@ -451,69 +451,60 @@ bool update_history(
     if (!force_finish && search_hits.size() > max_advance_possibilities){
         return false;
     }
-
-    if (search_hits.size() == 1){
-        console.log("Hit " + to_hex_string(search_hits[0].seed) + " / " + std::to_string(search_hits[0].advance));
-        console.log("Updating calibrations...");
-        calibration_history.calibrations.emplace_back(calibrations);
-        calibration_history.results.emplace_back(search_hits[0]);
-        if (calibration_history.results.size() > max_history_length){
-            calibration_history.calibrations.erase(calibration_history.calibrations.begin());
-            calibration_history.results.erase(calibration_history.results.begin());
-        }
-        uncertain_history.results.clear();
-        uncertain_history.calibrations.clear();
-        return true;
-    }
     
-    std::vector<int64_t> uncal_advances;
+    std::vector<int64_t> uncal_advances; // hit advance - calibrations
     std::vector<AdvRngState> hits;
     for(auto hit : search_hits) {
         uncal_advances.emplace_back(int64_t(std::round(hit.advance - calibrations.csf_offset - calibrations.ingame_offset)));
         hits.emplace_back(hit);
     }
     
-    // get unique advances
+    // get unique advances from new search results
     std::sort(uncal_advances.begin(), uncal_advances.end());
     std::vector<int64_t>::iterator iter;
     iter = std::unique(uncal_advances.begin(), uncal_advances.begin() + uncal_advances.size());
     uncal_advances.resize(std::distance(uncal_advances.begin(), iter));
 
-    uncertain_history.calibrations.emplace_back(calibrations);
-    uncertain_history.results.emplace_back(hits);
-    
-    // check advance history for repeated values
-    std::vector<uint64_t> counts;
-    uint64_t best = 0;
-    int64_t mode = 0; // sum of calibration and hit advance
-    bool tie = false;
-    for (int64_t& uadv : uncal_advances){
-        uint64_t count = 0;
-        for (size_t i=0; i<uncertain_history.results.size(); i++){
-            auto& cals = uncertain_history.calibrations[i];
-            auto& res = uncertain_history.results[i];
-            for (auto& state : res){
-                if (std::abs(int64_t(std::round(state.advance - cals.csf_offset - cals.ingame_offset)) - uadv) <= advance_radius){
-                    count++;
-                    break; // only count one possible hit from each attempt
+    int64_t mode = 0;
+
+    if (uncal_advances.size() == 1){
+        console.log("Hit " + to_hex_string(search_hits[0].seed) + " / " + std::to_string(search_hits[0].advance));
+        mode = uncal_advances[0];
+    }else {
+        uncertain_history.calibrations.emplace_back(calibrations);
+        uncertain_history.results.emplace_back(hits);
+        
+        // check advance history for repeated values
+        std::vector<uint64_t> counts;
+        uint64_t best = 0;
+        bool tie = false;
+        for (int64_t& uadv : uncal_advances){
+            uint64_t count = 0;
+            for (size_t i=0; i<uncertain_history.results.size(); i++){
+                auto& cals = uncertain_history.calibrations[i];
+                auto& res = uncertain_history.results[i];
+                for (auto& state : res){
+                    if (std::abs(int64_t(std::round(state.advance - cals.csf_offset - cals.ingame_offset)) - uadv) <= advance_radius){
+                        count++;
+                        break; // only count one possible hit from each attempt
+                    }
                 }
             }
+            if (count > best){
+                mode = uadv;
+                best = count;
+                tie = false;
+            }else if (count == best){
+                tie = true;
+            }
         }
-        if (count > best){
-            mode = uadv;
-            best = count;
-            tie = false;
-        }else if (count == best){
-            tie = true;
+
+        if (tie){
+            console.log("More than 1 possible advances value hit.");
+            return true;
         }
     }
-
-    if (tie){
-        console.log("More than 1 possible advances value hit.");
-        return true;
-    }
-
-
+    
     // add the closest possibility to the advances mode for each attempt to the calibration history
     console.log("Inferred hits from previous " + std::to_string(uncertain_history.results.size()) + " attempts: ");
     for (size_t i=0; i<uncertain_history.results.size(); i++){
