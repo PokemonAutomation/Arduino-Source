@@ -756,12 +756,20 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         // Stage 2: first search update -- post-rival-battle
         bool failed = walk_to_rival_battle(env, context);
         if (failed){
+            update_history(
+                env.console, uncertain_history, calibration_history, 
+                MAX_HISTORY_LENGTH, calibrations, search_hits, 1, 2, true
+            );
             stats.errors++;
             continue; // reset game
         }
 
         failed = auto_battle_rival(env, context, pokemon, filters, BASE_STATS);
         if (failed){
+            update_history(
+                env.console, uncertain_history, calibration_history, 
+                MAX_HISTORY_LENGTH, calibrations, search_hits, 1, 2, true
+            );
             stats.errors++;
             continue; // reset game
         }
@@ -787,6 +795,10 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         // Stage 3: subsequent search updates -- leveling up from wild encounters
         failed = walk_to_route1_from_lab(env, context);
         if (failed){
+            update_history(
+                env.console, uncertain_history, calibration_history, 
+                MAX_HISTORY_LENGTH, calibrations, search_hits, 1, 2, true
+            );
             stats.errors++;
             continue; // reset game
         }
@@ -808,6 +820,10 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
             int ret2 = autolevel_on_route1(env, context, pokemon, filters, BASE_STATS);
             if (ret2 < 0){
+                update_history(
+                    env.console, uncertain_history, calibration_history, 
+                    MAX_HISTORY_LENGTH, calibrations, search_hits, 1, 2, true
+                );
                 stats.errors++;
                 break;
             }else if(ret2 == 1){

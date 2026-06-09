@@ -540,7 +540,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
         std::vector<AdvRngState> search_hits = get_wild_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, gender_threshold, SUPER_ROD);
         RNG_CALIBRATION.set_hits(search_hits);           
-        bool finished = update_history(env.console, uncertain_history, calibration_history, MAX_HISTORY_LENGTH, calibrations, search_hits, 1);
+        bool finished = update_history(env.console, uncertain_history, calibration_history, MAX_HISTORY_LENGTH, calibrations, search_hits, 1, 2, MAX_RARE_CANDIES == 0);
         finished = finished || all_indistinguishable(search_hits, searcher, gender_threshold, SUPER_ROD);
 
         for (uint64_t i=0; i<MAX_RARE_CANDIES; i++){
@@ -549,6 +549,10 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
             }
             bool failed = use_rare_candy(env.console, context, LANGUAGE, pokemon, filters, base_stats, AdvRngMethod::Any, safari_zone, i == 0);
             if (failed) {
+                update_history(
+                    env.console, uncertain_history, calibration_history, 
+                    MAX_HISTORY_LENGTH, calibrations, search_hits, 1, 2, true
+                );
                 stats.errors++;
                 send_program_recoverable_error_notification(
                     env, NOTIFICATION_ERROR_RECOVERABLE,
