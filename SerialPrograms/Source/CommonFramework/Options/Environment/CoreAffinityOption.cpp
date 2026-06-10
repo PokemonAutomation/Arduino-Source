@@ -50,7 +50,7 @@ public:
         parent.add_listener(*this);
         m_cores.add_listener(*this);
     }
-    ~Internal(){
+    virtual ~Internal(){
         m_cores.remove_listener(*this);
         m_parent.remove_listener(*this);
     }
