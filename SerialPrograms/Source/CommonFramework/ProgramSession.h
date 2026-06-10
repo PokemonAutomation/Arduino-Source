@@ -22,6 +22,7 @@
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "CommonFramework/ResourceDownload/RequiredDownloadManager.h"
 #include "CommonFramework/Globals.h"
 //#include "CommonFramework/Logging/Logger.h"
 #include "Integrations/ProgramTrackerInterfaces.h"
@@ -59,6 +60,7 @@ public:
     const ProgramDescriptor& descriptor() const{ return m_descriptor; }
     uint64_t instance_id() const{ return m_instance_id; }
     Logger& logger(){ return m_logger; }
+    RequiredDownloadManager& get_download_manager(){ return m_download_manager; }
 
 
 public:
@@ -140,6 +142,8 @@ private:
 //    CancellableScope* m_scope = nullptr;
 
     ListenerSet<Listener> m_listeners;
+
+    RequiredDownloadManager m_download_manager;
 };
 
 

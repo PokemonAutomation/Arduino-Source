@@ -34,6 +34,7 @@ ProgramSession::ProgramSession(const ProgramDescriptor& descriptor)
     , m_logger(global_logger_raw(), "Program")
     , m_timestamp(current_time())
     , m_state(ProgramState::STOPPED)
+    , m_download_manager(descriptor.required_resources())
 {
     load_historical_stats();
 }
