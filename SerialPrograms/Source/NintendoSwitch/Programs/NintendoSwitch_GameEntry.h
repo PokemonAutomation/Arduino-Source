@@ -28,8 +28,8 @@ void require_player(
 void go_home(ConsoleHandle& console, ProControllerContext& context);
 // Press Home button to go from game to Switch Home screen
 void go_home(ConsoleHandle& console, JoyconContext& context);
-void ensure_at_home(ConsoleHandle& console, ProControllerContext& context);
-void ensure_at_home(ConsoleHandle& console, JoyconContext& context);
+void ensure_at_home(ConsoleHandle& console, ProControllerContext& context, size_t retries = 10);
+void ensure_at_home(ConsoleHandle& console, JoyconContext& context, size_t retries = 10);
 
 void close_game_from_home(ConsoleHandle& console, ProControllerContext& device);
 void close_game_from_home(ConsoleHandle& console, JoyconContext& device);
