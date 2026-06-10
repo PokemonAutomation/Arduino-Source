@@ -17,6 +17,7 @@
 #include "Common/Cpp/Options/ButtonOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 #include "CommonFramework/Panels/PanelTools.h"
+#include "CommonFramework/ResourceDownload/ResourceDownloadTable.h"
 
 //#include <iostream>
 //using std::cout;
@@ -111,6 +112,8 @@ public:
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
+    void update_resource_download_row_status(const std::string& resource_slug, bool success);
+
 private:
     virtual void on_config_value_changed(void* object) override;
     virtual void on_press() override;
@@ -124,6 +127,7 @@ public:
 
     Pimpl<ThemeSelectorOption> THEME;
     BooleanCheckBoxOption USE_PADDLE_OCR;
+    ResourceDownloadTable RESOURCE_DOWNLOAD_TABLE;
     Pimpl<ResolutionOption> WINDOW_SIZE;
     Pimpl<ResolutionOption> LOG_WINDOW_SIZE;
     BooleanCheckBoxOption LOG_WINDOW_STARTUP;

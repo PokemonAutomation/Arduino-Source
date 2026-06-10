@@ -30,7 +30,7 @@ DownloadThread RequiredDownload::initialize_download_thread(){
     DownloadThread::Hooks generic_row_hooks{
         .is_ready_to_start = [this] { return m_download_manager.is_download_ready_to_start(m_name); },
         .on_finished       = [this](bool success) { 
-            // GlobalSettings::instance().update_resource_download_row_status(m_index, success);
+            GlobalSettings::instance().update_resource_download_row_status(m_name, success);
             on_download_finished(); 
         },
         .report_failed     = [this] { report_download_failed(); },
