@@ -178,9 +178,7 @@ void ItemDuplication::program(SingleSwitchProgramEnvironment& env, ProController
 
         // Dectect "???" screen?
 
-        pbf_press_dpad(context, DPAD_UP, 200ms, 100ms);
-        pbf_press_dpad(context, DPAD_LEFT, 200ms, 100ms);
-        pbf_press_button(context, BUTTON_A, 200ms, 100ms);
+        pbf_press_button(context, BUTTON_PLUS, 200ms, 100ms);
 
         // Confirmation prompt in "???" screen
         int ret5 = wait_until(
