@@ -64,7 +64,7 @@ bool operator<(const std::optional<CollectedPokemonInfo>& lhs, const std::option
             break;
         case SortingRuleType::Alpha:
             if (lhs->alpha != rhs->alpha){
-                return lhs->gmax != preference.reverse;
+                return lhs->alpha != preference.reverse;
             }
             break;
         case SortingRuleType::Ball_Slug:
