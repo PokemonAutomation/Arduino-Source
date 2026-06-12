@@ -431,12 +431,16 @@ void RoamingLegendaryRng::program(SingleSwitchProgramEnvironment& env, ProContro
         RNG_FILTERS.set(filters);
 
         std::vector<AdvRngState> search_hits = get_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, GENDER_THRESHOLD);
-        RNG_CALIBRATION.set_hits(search_hits);       
+        RNG_CALIBRATION.set_hits(search_hits);      
+        bool force_finish = (
+               (MAX_RARE_CANDIES == 0) 
+            || all_equal(search_hits) 
+            || all_indistinguishable(search_hits, searcher, GENDER_THRESHOLD)
+        );
         bool finished = update_history(
             env.console, uncertain_history, calibration_history, MAX_HISTORY_LENGTH, 
-            calibrations, search_hits, 1, 2, MAX_RARE_CANDIES == 0
+            calibrations, search_hits, 1, 2, force_finish
         );
-        finished = finished || all_indistinguishable(search_hits, searcher, GENDER_THRESHOLD);
 
         for (uint64_t i=0; i<MAX_RARE_CANDIES; i++){
             if (finished){
@@ -460,9 +464,10 @@ void RoamingLegendaryRng::program(SingleSwitchProgramEnvironment& env, ProContro
             search_hits = get_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, GENDER_THRESHOLD);
             RNG_CALIBRATION.set_hits(search_hits);     
 
-            bool force_finish = (
+            force_finish = (
                    failed 
                 || (i == (MAX_RARE_CANDIES - 1)) 
+                || all_equal(search_hits)
                 || all_indistinguishable(search_hits, searcher, GENDER_THRESHOLD)
             );
             finished = update_history(

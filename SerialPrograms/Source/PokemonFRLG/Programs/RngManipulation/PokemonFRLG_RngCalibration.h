@@ -158,6 +158,8 @@ bool update_history(
     bool force_finish = false
 );
 
+bool all_equal(const std::vector<AdvRngState>& search_hits);
+
 bool all_indistinguishable(const std::vector<AdvRngState>& hits, AdvRngSearcher& searcher, const int16_t& gender_threshold);
 bool all_indistinguishable(const std::vector<AdvRngState>& hits, AdvRngWildSearcher& searcher, const int16_t& gender_threshold, bool super_rod);
 bool all_indistinguishable(
