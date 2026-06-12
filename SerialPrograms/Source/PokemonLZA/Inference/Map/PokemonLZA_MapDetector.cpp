@@ -16,7 +16,7 @@ namespace PokemonLZA{
 MapDetector::MapDetector(Color color, VideoOverlay* overlay)
     : m_b_button(
         color,
-        ButtonType::ButtonB,
+        ButtonType::ButtonBInterior,
         {0.760730, 0.937023, 0.241416, 0.064885},
         overlay
     )
