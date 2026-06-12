@@ -611,8 +611,8 @@ bool EggRng::reset_and_check_seed(
                 };
             }
         }
-        double bumpval = std::floor((times_not_held + std::floor(egg_uncertain_history.results.size())) / 4);
-        double advances_bump = std::pow(-1, bumpval) * std::floor((bumpval+1) / 2); // 0, -0.5, +0.5, -1, +1, -2, +2...
+        double bumpval = std::floor(times_not_held / 4) + std::floor(egg_uncertain_history.results.size() / 2);
+        double advances_bump = std::pow(-1, bumpval) * std::floor((bumpval+1) / 2); // 0, -1, +1, -2, +2...
         double orig_csf_offset = calibrations.csf_offset;
         calibrations.csf_offset = fmod(orig_csf_offset + advances_bump, 2);
         calibrations.ingame_offset += advances_bump - (calibrations.csf_offset - orig_csf_offset);
@@ -794,7 +794,7 @@ bool EggRng::reset_and_check_seed(
             return false;
         }
     }else{
-        env.log("Hit held seed.");
+        env.log("Hit target seed.");
     }
 
     current_seed = search_hits[0].seed;
@@ -822,7 +822,7 @@ bool EggRng::held_frame_check(
 ){
     static const uint64_t HELD_CHECK_ADVANCES_RADIUS = 8092;    
 
-    static const uint16_t MAX_HISTORY_LENGTH = 2;
+    static const uint16_t MAX_HISTORY_LENGTH = 10;
     const uint64_t INITIAL_ADVANCES_RADIUS = USE_TEACHY_TV ? 4096 : 1024;
 
     uint64_t advances_radius = 
@@ -878,7 +878,16 @@ bool EggRng::held_frame_check(
     held_hits.resize(std::distance(held_hits.begin(), iter));
     HELD_CALIBRATION.set_hits(held_hits);
 
-    bool finished = update_history(env.console, egg_uncertain_history, held_calibration_history, MAX_HISTORY_LENGTH, calibrations, held_hits, 1, 1);
+    bool force_finish = (
+            (candies_left == 0) 
+        || all_equal(held_hits) 
+        || all_indistinguishable(
+                search_hits, egg_searcher, 
+                EGG_STATS.gender_threshold,
+                PARENT_A, PARENT_B
+            )
+    );
+    bool finished = update_history(env.console, egg_uncertain_history, held_calibration_history, MAX_HISTORY_LENGTH, calibrations, held_hits, 1, 1, force_finish);
     for (uint64_t i=0; i<candies_left; i++){
         if (finished){
             break;
@@ -911,7 +920,7 @@ bool EggRng::held_frame_check(
         held_hits.resize(std::distance(held_hits.begin(), iter));
         HELD_CALIBRATION.set_hits(held_hits);   
 
-        bool force_finish = (
+        force_finish = (
                 failed 
             ||  (i == (candies_left - 1))
             ||  all_indistinguishable(
@@ -1053,7 +1062,15 @@ bool EggRng::pickup_frame_check(
     }
     PICKUP_CALIBRATION.set_hits(pickup_hits);
     
-    bool finished = update_history(env.console, egg_uncertain_history, pickup_calibration_history, MAX_HISTORY_LENGTH, calibrations, pickup_hits, 1);
+    bool force_finish = (
+           (candies_left == 0)
+        || all_indistinguishable(
+              search_hits, egg_searcher, 
+              EGG_STATS.gender_threshold,
+              PARENT_A, PARENT_B
+           )
+    );
+    bool finished = update_history(env.console, egg_uncertain_history, pickup_calibration_history, MAX_HISTORY_LENGTH, calibrations, pickup_hits, 1, 2, force_finish);
     for (uint64_t i=0; i<candies_left; i++){
         if (finished){
             break;
@@ -1082,7 +1099,7 @@ bool EggRng::pickup_frame_check(
         }
         PICKUP_CALIBRATION.set_hits(pickup_hits);  
 
-        bool force_finish = (
+        force_finish = (
                 failed 
             ||  (i == (candies_left - 1))
             ||  all_indistinguishable(

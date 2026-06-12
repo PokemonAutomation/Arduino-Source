@@ -539,9 +539,13 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         RNG_FILTERS.set(filters);
 
         std::vector<AdvRngState> search_hits = get_wild_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, gender_threshold, SUPER_ROD);
-        RNG_CALIBRATION.set_hits(search_hits);           
-        bool finished = update_history(env.console, uncertain_history, calibration_history, MAX_HISTORY_LENGTH, calibrations, search_hits, 1, 2, MAX_RARE_CANDIES == 0);
-        finished = finished || all_indistinguishable(search_hits, searcher, gender_threshold, SUPER_ROD);
+        RNG_CALIBRATION.set_hits(search_hits);  
+        bool force_finish = (
+               (MAX_RARE_CANDIES == 0) 
+            || all_equal(search_hits) 
+            || all_indistinguishable(search_hits, searcher, gender_threshold, SUPER_ROD)
+        );      
+        bool finished = update_history(env.console, uncertain_history, calibration_history, MAX_HISTORY_LENGTH, calibrations, search_hits, 1, 2, force_finish);
 
         for (uint64_t i=0; i<MAX_RARE_CANDIES; i++){
             if (finished){
@@ -563,9 +567,10 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
             search_hits = get_wild_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, gender_threshold, SUPER_ROD);
             RNG_CALIBRATION.set_hits(search_hits);         
 
-            bool force_finish = (
+            force_finish = (
                    failed 
                 || (i == (MAX_RARE_CANDIES - 1))
+                || all_equal(search_hits)
                 || all_indistinguishable(search_hits, searcher, gender_threshold, SUPER_ROD)
             );
             finished = update_history(

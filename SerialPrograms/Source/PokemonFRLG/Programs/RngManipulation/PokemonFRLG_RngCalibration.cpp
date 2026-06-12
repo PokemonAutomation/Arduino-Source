@@ -414,17 +414,17 @@ RngCalibrations get_calibrations(
                 calibrations.csf_offset = prev_csf_offset + 0.5;
             }
             calibrations.csf_offset = fmod(calibrations.csf_offset, 2);
-            calibrations.ingame_offset = prev_ingame_offset; // leave unchanged
+            calibrations.ingame_offset = get_advances_calibration(history, advances) - calibrations.csf_offset;
         }else if(csf_first){
             // adjust the csf, putting anything beyond +/-2 frames into the in-game calibration
             double new_advances_calibration = get_advances_calibration(history, advances);
             double total_diff = new_advances_calibration - prev_ingame_offset - prev_csf_offset;
             calibrations.csf_offset = fmod(prev_csf_offset + total_diff, 2);
-            double csf_diff = calibrations.csf_offset - prev_csf_offset;
-            calibrations.ingame_offset = prev_ingame_offset + total_diff - csf_diff;
+            calibrations.ingame_offset = new_advances_calibration - calibrations.csf_offset;
         }else{
             // only adjust the in-game offset
-            calibrations.ingame_offset = get_advances_calibration(history, advances);
+            calibrations.csf_offset = prev_csf_offset;
+            calibrations.ingame_offset = get_advances_calibration(history, advances) - prev_csf_offset;
         }
     }
 
