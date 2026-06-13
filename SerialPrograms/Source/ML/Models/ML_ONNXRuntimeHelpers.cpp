@@ -86,7 +86,7 @@ if (use_gpu){
             std::cout << "Using ROCm execution provider for GPU acceleration" << std::endl;
             rocm_available = true;
         }catch (const Ort::Exception& e){
-            std::cout << "ROCm execution provider not available, falling back to CPU: " << e.what() << std::endl;
+            std::cout << "ROCm execution provider not available: " << e.what() << std::endl;
         }
     }
 
@@ -224,7 +224,7 @@ Ort::Session create_session(
         Ort::SessionOptions cpu_options = create_session_options(model_cache_path, false);;
         
         Ort::Session session{env, onnx_path.c_str(), cpu_options};
-        
+        logger.log("Ort::Session created");
         return session;
     }
     catch (const Ort::Exception& e) {

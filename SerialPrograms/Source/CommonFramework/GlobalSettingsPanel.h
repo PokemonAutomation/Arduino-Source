@@ -124,6 +124,7 @@ public:
 
     Pimpl<ThemeSelectorOption> THEME;
     BooleanCheckBoxOption USE_PADDLE_OCR;
+    BooleanCheckBoxOption USE_GPU_FOR_ML_INFERENCE;
     Pimpl<ResolutionOption> WINDOW_SIZE;
     Pimpl<ResolutionOption> LOG_WINDOW_SIZE;
     BooleanCheckBoxOption LOG_WINDOW_STARTUP;
