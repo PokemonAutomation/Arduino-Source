@@ -287,13 +287,6 @@ EggRng::EggRng()
         LockMode::UNLOCK_WHILE_RUNNING,
         20, 2, 999 // default, min, max
         )
-    , USE_TEACHY_TV(
-        "<b>Use Teachy TV:</b>"
-        "<br>Opens the Teachy TV to quickly advance the RNG at 313x speed.<br>"
-        "<i>Warning: can result in larger misses.</i>",
-        LockMode::LOCK_WHILE_RUNNING,
-        false // default
-        )
     , PROFILE(
         "<b>User Profile Position:</b><br>"
         "The position, from left to right, of the Switch profile with the FRLG save you'd like to use.<br>"
@@ -350,7 +343,6 @@ EggRng::EggRng()
     PA_ADD_OPTION(MAX_RESETS);
     PA_ADD_OPTION(MAX_BALL_THROWS);
     PA_ADD_OPTION(MAX_RARE_CANDIES);
-    PA_ADD_OPTION(USE_TEACHY_TV);
     PA_ADD_OPTION(PROFILE);
     PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -568,9 +560,9 @@ bool EggRng::reset_and_check_seed(
 
     static const double SEED_BUMPS[] = { 0, 1, -1, 2, -2 };
 
-    const uint64_t WILD_ADVANCES_RADIUS = 4096;
+    static const uint64_t WILD_ADVANCES_RADIUS = 4096;
     
-    const uint16_t MAX_HISTORY_LENGTH = 2;
+    static const uint16_t MAX_HISTORY_LENGTH = 2;
 
     send_program_status_notification(
         env, NOTIFICATION_STATUS_UPDATE,
@@ -623,7 +615,7 @@ bool EggRng::reset_and_check_seed(
     RngTimings timings = prepare_timings(
         env.console, target,
         SEED_DELAY, CONTINUE_SCREEN_FRAMES, ingame_advances,
-        USE_TEACHY_TV, calibrations,
+        false, calibrations,
         FIXED_SEED_OFFSET, FIXED_ADVANCES_OFFSET
     );
 
@@ -823,7 +815,7 @@ bool EggRng::held_frame_check(
     static const uint64_t HELD_CHECK_ADVANCES_RADIUS = 8092;    
 
     static const uint16_t MAX_HISTORY_LENGTH = 10;
-    const uint64_t INITIAL_ADVANCES_RADIUS = USE_TEACHY_TV ? 4096 : 1024;
+    static const uint64_t INITIAL_ADVANCES_RADIUS = 128;
 
     uint64_t advances_radius = 
         previously_hit_held_frame ? 4 
@@ -964,30 +956,35 @@ bool EggRng::held_frame_check(
     }
 
     bool definitely_hit_held_frame = false;
-    if (egg_uncertain_history.results.size() == 0){
-        for (size_t i=0; i<held_calibration_history.results.size(); i++){
-            AdvRngState res = held_calibration_history.results[i];
-            if (   res.seed == TARGET_HELD_SEED          
-                && res.advance == HELD_ADVANCES
-            ){
-                definitely_hit_held_frame = true;
-                // keep the calibrations that resulted in hitting the target held frame
-                // and throw out the others
-                calibrations = held_calibration_history.calibrations[i];
-                HELD_CALIBRATION.set_calibrations(calibrations);
-                held_calibration_history.results.clear();
-                held_calibration_history.results.emplace_back(res);
-                held_calibration_history.calibrations.clear();
-                held_calibration_history.calibrations.emplace_back(calibrations);
-                break;
+    std::vector<AdvRngState> kept_results = {};
+    std::vector<RngCalibrations> kept_calibrations = {};
+    if (locked_in){
+        AdvRngState last_result = held_calibration_history.results.back();
+        definitely_hit_held_frame = (
+               last_result.seed == TARGET_HELD_SEED
+            && last_result.advance == HELD_ADVANCES
+        );
+    }else{
+        if (egg_uncertain_history.results.size() == 0){
+            for (size_t i=0; i<held_calibration_history.results.size(); i++){
+                AdvRngState res = held_calibration_history.results[i];
+                if (   res.seed == TARGET_HELD_SEED          
+                    && res.advance == HELD_ADVANCES
+                ){
+                    definitely_hit_held_frame = true;
+                    kept_results.emplace_back(res);
+                    kept_calibrations.emplace_back(held_calibration_history.calibrations[i]);
+                }
             }
-        }
-        
+        }    
     }
-    
-
-    if (definitely_hit_held_frame){
+    if (locked_in && definitely_hit_held_frame){
+        env.log("Hit the target held frame!");
+    }else if (!locked_in && definitely_hit_held_frame){
         env.log("Confirmed hit on the target held frame!");
+        // only keep calibrations that resulted in hitting the target
+        held_calibration_history.results = kept_results;
+        held_calibration_history.calibrations = kept_calibrations;
     }else if(possibly_hit_held_frame){
         env.log("Possibly hit target held frame.");
     }else{
@@ -1026,8 +1023,8 @@ bool EggRng::pickup_frame_check(
     AdvIVs& PARENT_B
 ){
 
-    const uint16_t MAX_HISTORY_LENGTH = USE_TEACHY_TV ? 2 : 5;
-    const uint64_t INITIAL_ADVANCES_RADIUS = USE_TEACHY_TV ? 4096 : 1024;
+    static const uint16_t MAX_HISTORY_LENGTH = 5;
+    static const uint64_t INITIAL_ADVANCES_RADIUS = 128;
 
     uint64_t advances_radius = get_advances_radius(env.console, pickup_calibration_history, INITIAL_ADVANCES_RADIUS);
 

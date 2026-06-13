@@ -184,7 +184,6 @@ private:
     SimpleIntegerOption<uint64_t> MAX_RESETS;
     SimpleIntegerOption<uint64_t> MAX_RARE_CANDIES;
     SimpleIntegerOption<uint64_t> MAX_BALL_THROWS;
-    BooleanCheckBoxOption USE_TEACHY_TV;
     SimpleIntegerOption<uint8_t> PROFILE;
     BooleanCheckBoxOption TAKE_VIDEO;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
