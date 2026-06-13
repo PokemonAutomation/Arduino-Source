@@ -39,7 +39,6 @@ public:
     
 private:
     Ort::Env m_env;
-    Ort::SessionOptions m_session_options;
     Ort::Session session;
     Ort::MemoryInfo memory_info;
     Ort::RunOptions run_options;
@@ -74,7 +73,6 @@ public:
         std::vector<bool>& output_boolean_mask);
 private:
     Ort::Env m_env;
-    Ort::SessionOptions m_session_options;
     Ort::Session session;
     Ort::MemoryInfo memory_info;
     Ort::RunOptions run_options;
