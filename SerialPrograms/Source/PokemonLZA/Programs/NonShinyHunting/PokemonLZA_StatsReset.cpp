@@ -77,6 +77,7 @@ StatsReset::StatsReset()
             {GiftPokemon::FLOETTE,  "floette",  "Floette" },
             {GiftPokemon::GENESECT, "genesect", "Genesect" },
             {GiftPokemon::MAGEARNA, "magearna", "Magearna"},
+            {GiftPokemon::MARSHADOW, "marshadow", "Marshadow"},
             {GiftPokemon::MELTAN,   "meltan",   "Meltan"  },
             {GiftPokemon::MELMETAL, "melmetal", "Melmetal"},
             {GiftPokemon::VOLCANION,"volcanion","Volcanion"},
@@ -152,7 +153,7 @@ StatsReset::~StatsReset(){
 }
 
 void StatsReset::on_config_value_changed(void* object){
-    ConfigOptionState state_ball  = (POKEMON == GiftPokemon::GENESECT || POKEMON == GiftPokemon::MELTAN || POKEMON == GiftPokemon::VOLCANION)
+    ConfigOptionState state_ball  = (POKEMON == GiftPokemon::GENESECT || POKEMON == GiftPokemon::MARSHADOW || POKEMON == GiftPokemon::MELTAN || POKEMON == GiftPokemon::VOLCANION)
                                     ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN;
     ConfigOptionState state_donut = (POKEMON == GiftPokemon::GENESECT || POKEMON == GiftPokemon::MELMETAL)
                                     ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN;
@@ -192,7 +193,7 @@ void StatsReset::enter_portal(SingleSwitchProgramEnvironment& env, ProController
         {
             overworld,
         }
-    );
+        );
 
     if (ret == 0){
         env.log("Detected overworld");
@@ -200,7 +201,7 @@ void StatsReset::enter_portal(SingleSwitchProgramEnvironment& env, ProController
     }
 }
 
-void StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool attempt_move, bool use_plus_move){
+void StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool attempt_move, bool use_plus_move, bool use_mega){
     RunFromBattleWatcher battle_menu(COLOR_GREEN, &env.console.overlay(), 10ms);
 
     context.wait_for_all_requests();
@@ -212,10 +213,14 @@ void StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerCo
         {
             battle_menu,
         }
-    );
+        );
 
     if (ret == 0){
         env.log("Detected battle menu");
+        if (use_mega){
+            pbf_press_button(context, BUTTON_RCLICK, 50ms, 500ms);
+            pbf_wait(context, 12s);
+        }
         if (attempt_move){
             pbf_press_button(context, BUTTON_Y, 50ms, 500ms);
             ssf_press_button(context, BUTTON_ZL, 0ms, 4s, 200ms);
@@ -247,7 +252,7 @@ void StatsReset::run_catch(SingleSwitchProgramEnvironment& env, ProControllerCon
         BUTTON_ZL | BUTTON_ZR,
         500ms, 500ms + (hold + cool) * scrolls,
         0ms
-    );
+        );
 
     while (scrolls != 0){
         pbf_press_dpad(context, direction, hold, cool);
@@ -280,7 +285,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     ErrorReport::SEND_ERROR_REPORT,
                     "Failed to travel to Quasartico Inc.",
                     env.console
-                );
+                    );
             }
             context.wait_for(100ms);
             env.log("Detected overworld. Fast traveled to Quasartico Inc.");
@@ -318,7 +323,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     ErrorReport::SEND_ERROR_REPORT,
                     "Failed to travel to Lysandre Café",
                     env.console
-                );
+                    );
             }
             context.wait_for(100ms);
             env.log("Detected overworld. Fast traveled to Lysandre Café");
@@ -375,7 +380,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     ErrorReport::SEND_ERROR_REPORT,
                     "Failed to travel to Wild Zone 13",
                     env.console
-                );
+                    );
             }
             context.wait_for(100ms);
             env.log("Detected overworld. Fast traveled to Wild Zone 13");
@@ -443,6 +448,26 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             pbf_mash_button(context, BUTTON_A, 20s);
         }
 
+        if (POKEMON == GiftPokemon::MARSHADOW){
+            // assume user is already at the nearest Pokémon Center, run towards the shadow
+            // no additional flying since this is time sensitive
+            pbf_move_left_joystick(context, {-0.3, -1}, 4500ms, 500ms);
+            pbf_press_button(context, BUTTON_L, 50ms, 500ms);
+            pbf_move_left_joystick(context, {-0.5, 1}, 100ms, 500ms);
+            pbf_press_button(context, BUTTON_L, 50ms, 500ms);
+            context.wait_for_all_requests();
+            run_towards_gate_with_A_button(env.console, context, 0, +1, Seconds(10));
+
+            pbf_mash_button(context, BUTTON_A, 20s);
+            run_battle(env, context, true, true, true);
+            // additional delay because Dragon Ascent takes longer to launch
+            pbf_wait(context, 1s);
+
+            run_catch(env, context);
+            pbf_mash_button(context, BUTTON_A, 7s);
+        }
+
+
         context.wait_for_all_requests();
         {
             BlackScreenOverWatcher detector;
@@ -464,7 +489,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     overworld,
                     battle_menu
                 }
-            );
+                );
             switch (result){
             case 0:
                 env.log(STRING_POKEMON + " dialog finished.", COLOR_PURPLE);
