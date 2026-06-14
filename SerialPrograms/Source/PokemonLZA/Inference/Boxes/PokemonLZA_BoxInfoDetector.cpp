@@ -66,6 +66,7 @@ bool BoxShinyDetector::detect(const ImageViewRGB32& screen){
         {0xff000000, 0xff646464}, // 100
         {0xff000000, 0xff8c8c8c}, // 140
         {0xff000000, 0xffb4b4b4}, // 180
+        {0xff000000, 0xffc8c8c8}, // 200
     };
 
     const double max_rsmd = 100.0;
