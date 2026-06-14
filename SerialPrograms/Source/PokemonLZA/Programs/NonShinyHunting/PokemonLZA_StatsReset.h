@@ -16,6 +16,7 @@
 #include "Pokemon/Options/Pokemon_IvJudgeOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "PokemonLZA/Options/PokemonLZA_BattleAIOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -57,6 +58,7 @@ private:
         MELTAN,
         MELMETAL,
         VOLCANION,
+        HOOPA,
     };
     EnumDropdownOption<GiftPokemon> POKEMON;
 
@@ -66,6 +68,8 @@ private:
     MillisecondsOption POST_THROW_WAIT;
 
     SimpleIntegerOption<int8_t> DOWN_SCROLLS;
+
+    BattleAIOption BATTLE_AI;
 
     IVJudgeFilterOption HP;
     IVJudgeFilterOption ATTACK;
