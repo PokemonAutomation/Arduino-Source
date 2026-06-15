@@ -75,14 +75,14 @@ StatsReset::StatsReset()
     , POKEMON(
         "<b>Gift " + STRING_POKEMON + ":</b>",
         {
-            {GiftPokemon::FLOETTE,  "floette",  "Floette" },
-            {GiftPokemon::GENESECT, "genesect", "Genesect" },
-            {GiftPokemon::MAGEARNA, "magearna", "Magearna"},
-            {GiftPokemon::MARSHADOW, "marshadow", "Marshadow"},
-            {GiftPokemon::MELTAN,   "meltan",   "Meltan"  },
-            {GiftPokemon::MELMETAL, "melmetal", "Melmetal"},
-            {GiftPokemon::VOLCANION,"volcanion","Volcanion"},
-            {GiftPokemon::HOOPA, "hoopa", "Hoopa"},
+            {GiftPokemon::FLOETTE,      "floette",      "Floette" },
+            {GiftPokemon::GENESECT,     "genesect",     "Genesect" },
+            {GiftPokemon::MAGEARNA,     "magearna",     "Magearna"},
+            {GiftPokemon::MARSHADOW,    "marshadow",    "Marshadow"},
+            {GiftPokemon::MELTAN,       "meltan",       "Meltan"  },
+            {GiftPokemon::MELMETAL,     "melmetal",     "Melmetal"},
+            {GiftPokemon::VOLCANION,    "volcanion",    "Volcanion"},
+            {GiftPokemon::HOOPA,        "hoopa",        "Hoopa"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         GiftPokemon::FLOETTE
@@ -156,12 +156,24 @@ StatsReset::~StatsReset(){
 }
 
 void StatsReset::on_config_value_changed(void* object){
-    ConfigOptionState state_ball  = (POKEMON == GiftPokemon::GENESECT || POKEMON == GiftPokemon::MARSHADOW || POKEMON == GiftPokemon::MELTAN || POKEMON == GiftPokemon::VOLCANION)
-                                    ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN;
-    ConfigOptionState state_donut = (POKEMON == GiftPokemon::GENESECT || POKEMON == GiftPokemon::MELMETAL || POKEMON == GiftPokemon::HOOPA)
-                                    ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN;
+    ConfigOptionState state_ball = (
+        POKEMON == GiftPokemon::GENESECT ||
+        POKEMON == GiftPokemon::MARSHADOW ||
+        POKEMON == GiftPokemon::MELTAN ||
+        POKEMON == GiftPokemon::VOLCANION
+    )
+        ? ConfigOptionState::ENABLED
+        : ConfigOptionState::HIDDEN;
+    ConfigOptionState state_donut = (
+        POKEMON == GiftPokemon::GENESECT ||
+        POKEMON == GiftPokemon::MELMETAL ||
+        POKEMON == GiftPokemon::HOOPA
+    )
+        ? ConfigOptionState::ENABLED
+        : ConfigOptionState::HIDDEN;
     ConfigOptionState state_battle = (POKEMON == GiftPokemon::HOOPA)
-                                     ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN;
+        ? ConfigOptionState::ENABLED
+        : ConfigOptionState::HIDDEN;
     RIGHT_SCROLLS.set_visibility(state_ball);
     SCROLL_HOLD.set_visibility(state_ball);
     SCROLL_RELEASE.set_visibility(state_ball);
@@ -199,7 +211,7 @@ void StatsReset::enter_portal(SingleSwitchProgramEnvironment& env, ProController
         {
             overworld,
         }
-        );
+    );
 
     if (ret == 0){
         env.log("Detected overworld");
@@ -207,7 +219,13 @@ void StatsReset::enter_portal(SingleSwitchProgramEnvironment& env, ProController
     }
 }
 
-void StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool attempt_move, bool use_plus_move, bool use_mega){
+void StatsReset::run_battle(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    bool attempt_move,
+    bool use_plus_move,
+    bool use_mega
+){
     RunFromBattleWatcher battle_menu(COLOR_GREEN, &env.console.overlay(), 10ms);
 
     context.wait_for_all_requests();
@@ -219,7 +237,7 @@ void StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerCo
         {
             battle_menu,
         }
-        );
+    );
 
     if (ret == 0){
         env.log("Detected battle menu");
@@ -258,7 +276,7 @@ void StatsReset::run_catch(SingleSwitchProgramEnvironment& env, ProControllerCon
         BUTTON_ZL | BUTTON_ZR,
         500ms, 500ms + (hold + cool) * scrolls,
         0ms
-        );
+    );
 
     while (scrolls != 0){
         pbf_press_dpad(context, direction, hold, cool);
@@ -291,7 +309,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     ErrorReport::SEND_ERROR_REPORT,
                     "Failed to travel to Quasartico Inc.",
                     env.console
-                    );
+                );
             }
             context.wait_for(100ms);
             env.log("Detected overworld. Fast traveled to Quasartico Inc.");
@@ -329,7 +347,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     ErrorReport::SEND_ERROR_REPORT,
                     "Failed to travel to Lysandre Café",
                     env.console
-                    );
+                );
             }
             context.wait_for(100ms);
             env.log("Detected overworld. Fast traveled to Lysandre Café");
@@ -386,7 +404,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     ErrorReport::SEND_ERROR_REPORT,
                     "Failed to travel to Wild Zone 13",
                     env.console
-                    );
+                );
             }
             context.wait_for(100ms);
             env.log("Detected overworld. Fast traveled to Wild Zone 13");
@@ -426,7 +444,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     ErrorReport::SEND_ERROR_REPORT,
                     "Failed to travel to Research Lab",
                     env.console
-                    );
+                );
             }
             context.wait_for(100ms);
             env.log("Detected overworld. Fast traveled to Research Lab");
@@ -597,7 +615,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     overworld,
                     battle_menu
                 }
-                );
+            );
             switch (result){
             case 0:
                 env.log(STRING_POKEMON + " dialog finished.", COLOR_PURPLE);
