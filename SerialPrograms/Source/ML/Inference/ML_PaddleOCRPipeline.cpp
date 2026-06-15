@@ -10,6 +10,7 @@
 #include <numeric>
 #include <limits>
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "Common/Cpp/Exceptions.h"
 #include "ML/Models/ML_ONNXRuntimeHelpers.h"
 #include "ML_PaddleOCRPipeline.h"
@@ -53,7 +54,7 @@ PaddleOCRPipeline::PaddleOCRPipeline(Language language)
 PaddleOCRPipeline::PaddleOCRPipeline(Language language, std::string rec_path, std::string dict_path)
     : m_env{create_ORT_env()}
     // , det_session(env, std::wstring(det_path.begin(), det_path.end()).c_str(), Ort::SessionOptions{})
-    , m_rec_session(create_session(m_env, Ort::SessionOptions{}, rec_path, ML_MODEL_CACHE_PATH() + "PaddleOCRPipeline/"))
+    , m_rec_session(create_session(m_env, rec_path, ML_MODEL_CACHE_PATH() + "PaddleOCRPipeline/", GlobalSettings::instance().USE_GPU_FOR_ML_INFERENCE))
     // , memory_info(Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault)) 
     , m_language(language)
     , m_input_name(m_rec_session.GetInputNameAllocated(0, Ort::AllocatorWithDefaultOptions{}).get())
