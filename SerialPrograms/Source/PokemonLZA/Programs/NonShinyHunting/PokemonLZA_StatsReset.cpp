@@ -23,6 +23,7 @@
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA/Programs/PokemonLZA_FastTravelNavigation.h"
 #include "PokemonLZA/Programs/PokemonLZA_MenuNavigation.h"
+#include "PokemonLZA/Programs/PokemonLZA_TrainerBattle.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -81,6 +82,7 @@ StatsReset::StatsReset()
             {GiftPokemon::MELTAN,   "meltan",   "Meltan"  },
             {GiftPokemon::MELMETAL, "melmetal", "Melmetal"},
             {GiftPokemon::VOLCANION,"volcanion","Volcanion"},
+            {GiftPokemon::HOOPA, "hoopa", "Hoopa"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         GiftPokemon::FLOETTE
@@ -135,6 +137,7 @@ StatsReset::StatsReset()
     PA_ADD_OPTION(SCROLL_RELEASE);
     PA_ADD_OPTION(POST_THROW_WAIT);
     PA_ADD_OPTION(DOWN_SCROLLS);
+    PA_ADD_OPTION(BATTLE_AI);
     PA_ADD_OPTION(HP);
     PA_ADD_OPTION(ATTACK);
     PA_ADD_OPTION(DEFENSE);
@@ -155,13 +158,16 @@ StatsReset::~StatsReset(){
 void StatsReset::on_config_value_changed(void* object){
     ConfigOptionState state_ball  = (POKEMON == GiftPokemon::GENESECT || POKEMON == GiftPokemon::MARSHADOW || POKEMON == GiftPokemon::MELTAN || POKEMON == GiftPokemon::VOLCANION)
                                     ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN;
-    ConfigOptionState state_donut = (POKEMON == GiftPokemon::GENESECT || POKEMON == GiftPokemon::MELMETAL)
+    ConfigOptionState state_donut = (POKEMON == GiftPokemon::GENESECT || POKEMON == GiftPokemon::MELMETAL || POKEMON == GiftPokemon::HOOPA)
                                     ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN;
+    ConfigOptionState state_battle = (POKEMON == GiftPokemon::HOOPA)
+                                     ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN;
     RIGHT_SCROLLS.set_visibility(state_ball);
     SCROLL_HOLD.set_visibility(state_ball);
     SCROLL_RELEASE.set_visibility(state_ball);
     POST_THROW_WAIT.set_visibility(state_ball);
     DOWN_SCROLLS.set_visibility(state_donut);
+    BATTLE_AI.set_visibility(state_battle);
 }
 
 void StatsReset::enter_portal(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -467,6 +473,106 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             pbf_mash_button(context, BUTTON_A, 7s);
         }
 
+        if (POKEMON == GiftPokemon::HOOPA){
+            // run to holovator from bleu pokemon center
+            pbf_move_left_joystick(context, {1, -0.5}, 200ms, 500ms);
+            pbf_press_button(context, BUTTON_Y, 100ms, 1s);
+            pbf_move_left_joystick(context, {-0.14, -1}, 200ms, 500ms);
+            pbf_press_button(context, BUTTON_L, 50ms, 500ms);
+            ssf_press_button(context, BUTTON_B, 0ms, 1s, 0ms);
+            pbf_move_left_joystick(context, {0, 1}, 6s, 0ms);
+            pbf_move_left_joystick(context, {0.05, 1}, 4800ms, 0ms);
+            pbf_mash_button(context, BUTTON_A, 1s);
+            context.wait_for_all_requests();
+            wait_until_overworld(env.console, context, 10s);
+
+            // run to the right of roof
+            pbf_press_button(context, BUTTON_Y, 100ms, 1s);
+            pbf_move_left_joystick(context, {1, 0.12}, 200ms, 500ms);
+            for (int i = 0; i < 6; ++i){
+                pbf_press_button(context, BUTTON_Y, 100ms, 1s);
+            }
+
+            ssf_press_button(context, BUTTON_B, 0ms, 1s, 0ms);
+            pbf_move_left_joystick(context, {1, 0.12}, 1s, 500ms);
+
+            // run forward to the ladder
+            pbf_move_left_joystick(context, {0, 1}, 200ms, 500ms);
+            for (int i = 0; i < 5; ++i){
+                pbf_press_button(context, BUTTON_Y, 100ms, 1s);
+            }
+
+            ssf_press_button(context, BUTTON_B, 0ms, 1s, 0ms);
+            pbf_move_left_joystick(context, {0, 1}, 1s, 500ms);
+
+            pbf_press_button(context, BUTTON_Y, 100ms, 1s);
+            pbf_press_button(context, BUTTON_Y, 100ms, 1s);
+
+            ssf_press_button(context, BUTTON_B, 0ms, 1s, 0ms);
+            pbf_move_left_joystick(context, {-0.2, 1}, 4s, 0ms);
+            ssf_press_button(context, BUTTON_B, 0ms, 1s, 0ms);
+            pbf_move_left_joystick(context, {-0.8, 1}, 1500ms, 0ms);
+
+            // climb ladder
+            pbf_mash_button(context, BUTTON_A, 500ms);
+            pbf_move_left_joystick(context, {0, 1}, 8s, 1500ms);
+
+            ssf_press_button(context, BUTTON_B, 0ms, 1s, 0ms);
+            pbf_move_left_joystick(context, {-1, 0}, 2s, 0ms);
+
+            enter_portal(env, context);
+            context.wait_for(100ms);
+
+            // run toward hoopa to start battle
+            ssf_press_button(context, BUTTON_B, 0ms, 1s, 0ms);
+            pbf_move_left_joystick(context, {0, 1}, 8s, 0ms);
+
+            RunFromBattleWatcher battle_menu(COLOR_GREEN, &env.console.overlay(), 10ms);
+            OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay(), 100ms);
+            TrainerBattleState battle_state(BATTLE_AI);
+            context.wait_for_all_requests();
+            bool has_error = false;
+            while (true){
+                int ret = run_until<ProControllerContext>(
+                    env.console, context,
+                    [](ProControllerContext& context){
+                        pbf_mash_button(context, BUTTON_B, 120s);
+                    },
+                    {
+                        battle_menu,
+                        overworld,
+                    }
+                );
+
+                switch (ret){
+                case 0:
+                    env.log("Detected battle menu.");
+                    if (!battle_state.attempt_one_attack(env, env.console, context)){
+                        pbf_press_button(context, BUTTON_UP, 500ms, 1s);
+                    }
+                    continue;
+                case 1:
+                    env.log("Detected overworld.");
+                    break;
+                default:
+                    has_error = true;
+                    break;
+                }
+                break;
+            }
+            if (has_error){
+                stats.errors++;
+                env.log("Error during battle.", COLOR_RED);
+                // fail safely and start over
+                go_home(env.console, context);
+                reset_game_from_home(env, env.console, context, true);
+                continue;
+            }
+            context.wait_for(100ms);
+            // run toward hoopa to catch
+            run_towards_gate_with_A_button(env.console, context, 0.063, 1, 2s);
+            pbf_mash_button(context, BUTTON_A, 1s);
+        }
 
         context.wait_for_all_requests();
         {
@@ -480,6 +586,8 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                         pbf_mash_button(context, BUTTON_A, 60s);
                     }else if (POKEMON == GiftPokemon::MAGEARNA){
                         pbf_mash_button(context, BUTTON_A, 60s);
+                    }else if (POKEMON == GiftPokemon::HOOPA){
+                        pbf_mash_button(context, BUTTON_A, 120s);
                     }else{
                         pbf_mash_button(context, BUTTON_A, 30s);
                     }
