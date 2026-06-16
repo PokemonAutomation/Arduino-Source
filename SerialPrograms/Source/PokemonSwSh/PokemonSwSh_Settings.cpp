@@ -212,10 +212,10 @@ GameSettings::GameSettings()
         LockMode::LOCK_WHILE_RUNNING,
         0.3, 0
     )
-    , SHINY_DIALOG_ALPHA(
+    , SHINY_DIALOG_ALPHA0(
         "<b>Shiny Dialog Alpha:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        1.2, 0
+        1.0, 0
     )
 //    , m_experimental("<font size=4><b>Experimental/Beta Features:</b></font>")
 {
@@ -272,7 +272,7 @@ GameSettings::GameSettings()
     PA_ADD_OPTION(STAR_SPARKLE_ALPHA);
     PA_ADD_OPTION(SQUARE_SPARKLE_ALPHA);
     PA_ADD_OPTION(LINE_SPARKLE_ALPHA);
-    PA_ADD_OPTION(SHINY_DIALOG_ALPHA);
+    PA_ADD_OPTION(SHINY_DIALOG_ALPHA0);
 
 //    PA_ADD_STATIC(m_experimental);
 }
