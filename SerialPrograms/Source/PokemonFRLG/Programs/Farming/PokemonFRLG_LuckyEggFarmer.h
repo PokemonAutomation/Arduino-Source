@@ -37,18 +37,31 @@ public:
     }
 
 private:
+    enum class ItemToFarm{
+        LUCKY_EGG,
+        DRAGON_FANG
+    };
+
 
     // After exiting the safari zone building navigate to grass with Chansey.
     // Currently only supports running. Should add Surf option...
     bool navigate_to_chansey(ConsoleHandle& console, ProControllerContext& context);
+    // After exiting the safari zone building navigate to water with Dragonair.
+    // Currently only supports running.
+    void navigate_to_dragonair(ConsoleHandle& console, ProControllerContext& context);
     // Swap first and second pokemon. 
     // First pokemon used to avoid encounters on the route to Chansey. Second pokemon used to improve encounter rates.
     void swap_lead_pokemon(ConsoleHandle& console, ProControllerContext& context);
-    // Reads wild encounter name and returns true if Chansey
+    // Reads wild encounter name and returns true if Chansey, uses a set list of possible names in the expected area.
     bool is_chansey(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    // Reads wild encounter name and returns true if Dragonair, uses a set list of possible names in the expected area.
+    bool is_dragonair(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     // Handles the encounter logic. Attempts to spin in place. Resets position to the top right corner of grass.
     // Returns true if transition to battle detected.
-    bool find_encounter(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    bool find_encounter_grass(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    // Handles the encounter logic. Attempts to hook pokemon using a fishing pole registered.
+    // Returns true if transition to battle detected.
+    bool find_encounter_fishing(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     // Handles the catch logic. Should be updated to throw bait for better catch rates.
     // Returns true if catch successful. Returns in the overworld.
     bool attempt_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int& balls_left);
@@ -60,6 +73,7 @@ private:
     // Returns false if we need to soft reset (out of safari balls, out of steps, caught a full party of Chansey).
     bool run_safari_zone(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
+    EnumDropdownOption<ItemToFarm> ITEM_TO_FARM;
     OCR::LanguageOCROption LANGUAGE;
 
     DeferredStopButtonOption STOP_AFTER_CURRENT;
