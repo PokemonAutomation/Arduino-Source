@@ -73,7 +73,16 @@ std::unique_ptr<StatsTracker> LuckyEggFarmer_Descriptor::make_stats() const{
 }
 
 LuckyEggFarmer::LuckyEggFarmer()
-    : LANGUAGE(
+    : ITEM_TO_FARM(
+        "<b>Item to Farm:</b>",
+        {
+            {ItemToFarm::LUCKY_EGG, "Lucky Egg", "Farm Chansey for Lucky Eggs."},
+            {ItemToFarm::DRAGON_FANG, "Dragon Fang", "Farm Dragonair for Dragon Fangs."},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        ItemToFarm::LUCKY_EGG
+    )
+    , LANGUAGE(
         "<b>Game Language:</b>",
         {
             Language::English,
@@ -111,6 +120,7 @@ LuckyEggFarmer::LuckyEggFarmer()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_OPTION(ITEM_TO_FARM);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(STOP_AFTER_CURRENT);
     PA_ADD_OPTION(TAKE_VIDEO);
@@ -257,6 +267,13 @@ bool LuckyEggFarmer::navigate_to_chansey(ConsoleHandle& console, ProControllerCo
     return true;
 }
 
+void LuckyEggFarmer::navigate_to_dragonair(ConsoleHandle& console, ProControllerContext& context){
+    ssf_press_button(context, BUTTON_B, 0ms, 2848ms);
+    pbf_press_dpad(context, DPAD_UP, 1315ms, 0ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 755ms, 0ms);
+    pbf_press_dpad(context, DPAD_UP, 580ms, 0ms);
+}
+
 void LuckyEggFarmer::swap_lead_pokemon(ConsoleHandle& console, ProControllerContext& context){
     open_party_menu_from_overworld(console, context, StartMenuContext::SAFARI_ZONE);
     pbf_press_button(context, BUTTON_A, 250ms, 100ms);
@@ -271,7 +288,7 @@ void LuckyEggFarmer::swap_lead_pokemon(ConsoleHandle& console, ProControllerCont
     context.wait_for_all_requests();
 }
 
-bool LuckyEggFarmer::find_encounter(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+bool LuckyEggFarmer::find_encounter_grass(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ssf_press_button(context, BUTTON_B, 0ms, 400ms);
     pbf_press_dpad(context, DPAD_RIGHT, 400ms, 0ms);
     pbf_wait(context, 100ms);
@@ -310,6 +327,38 @@ bool LuckyEggFarmer::find_encounter(SingleSwitchProgramEnvironment& env, ProCont
     }
 }
 
+bool LuckyEggFarmer::find_encounter_fishing(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    WhiteDialogWatcher fishing_dialog(COLOR_RED);
+    BlackScreenWatcher battle_entered(COLOR_RED);
+    AdvanceBattleDialogWatcher battle_dialog(COLOR_RED);
+    WallClock start = current_time();
+
+    while (true){
+        if (current_time() - start > std::chrono::seconds(300)){
+            env.log("No pokemon hooked after 5 minutes. Resetting.");
+            return false;
+        }
+
+        pbf_press_button(context, BUTTON_MINUS, 200ms, 200ms);
+        context.wait_for_all_requests();
+
+        int ret = wait_until(
+            env.console, context,
+            std::chrono::milliseconds(5000),
+            { fishing_dialog, battle_entered, battle_dialog }
+        );
+
+        if (ret == 0){
+            env.log("Fishing dialog detected.");
+            pbf_press_button(context, BUTTON_B, 200ms, 200ms);
+            context.wait_for_all_requests();
+        } else if (ret == 1 || ret == 2){
+            env.log("Battle entered.");
+            return true;
+        }
+    }
+}
+
 bool LuckyEggFarmer::is_chansey(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     std::set<std::string> subset = {
         "nidoran-f",
@@ -335,9 +384,31 @@ bool LuckyEggFarmer::is_chansey(SingleSwitchProgramEnvironment& env, ProControll
     return encounter.name == "chansey";
 }
 
+bool LuckyEggFarmer::is_dragonair(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    std::set<std::string> subset = {
+        "goldeen",
+        "seaking",
+        "dratini",
+        "psyduck",
+        "slowpoke",
+        "dragonair"
+    };
+
+    WildEncounterReader reader(COLOR_RED);
+    VideoOverlaySet overlays(env.console.overlay());
+    reader.make_overlays(overlays);
+
+    env.log("Reading name...");
+    VideoSnapshot screen = env.console.video().snapshot();
+    PokemonFRLG_WildEncounter encounter = reader.read_encounter(env.logger(), LANGUAGE, screen, subset);
+    env.log("Name: " + encounter.name);
+
+    return encounter.name == "dragonair";
+}
+
 bool LuckyEggFarmer::attempt_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int& balls_left){
     //TODO: Optimal bait/ball throwing
-
+    int distraction_thrown = 0;
     while (true){
         BattleSelectionArrowWatcher nickname_question_arrow(
             COLOR_RED,
@@ -345,10 +416,16 @@ bool LuckyEggFarmer::attempt_catch(SingleSwitchProgramEnvironment& env, ProContr
             BattleConfirmationOption::YES
         );
 
-        BattleSelectionArrowWatcher battle_arrow(
+        BattleSelectionArrowWatcher ball_arrow(
             COLOR_RED,
             &env.console.overlay(),
             SafariBattleMenuOption::BALL
+        );
+
+        BattleSelectionArrowWatcher bait_arrow(
+            COLOR_RED,
+            &env.console.overlay(),
+            SafariBattleMenuOption::BAIT
         );
 
         BlackScreenWatcher battle_end(COLOR_RED);
@@ -372,13 +449,13 @@ bool LuckyEggFarmer::attempt_catch(SingleSwitchProgramEnvironment& env, ProContr
             int ret = wait_until(
                 env.console, context,
                 std::chrono::milliseconds(2000),
-                { nickname_question_arrow, battle_arrow, battle_end, advance_battle_dialog }
+                { nickname_question_arrow, ball_arrow, battle_end, advance_battle_dialog, bait_arrow }
             );
 
             context.wait_for_all_requests();
 
             if (ret == 0 || ret == 3){
-                env.log("Caught a Chansey!");
+                env.log("Pokemon Caught!");
 
                 while (true){
                     int ret2 = wait_until(
@@ -402,16 +479,38 @@ bool LuckyEggFarmer::attempt_catch(SingleSwitchProgramEnvironment& env, ProContr
                 context.wait_for_all_requests();
                 return true;
             }else if (ret == 1){
+                if (distraction_thrown < 2){
+                    env.log("Throwing distraction.");
+                    pbf_press_dpad(context, DPAD_RIGHT, 200ms, 200ms);
+                    pbf_press_button(context, BUTTON_A, 200ms, 200ms);
+                    distraction_thrown++;
+                    break;
+                }
+
                 balls_left--;
                 env.log("Detected battle arrow. Balls left: " + std::to_string(balls_left));
                 pbf_press_button(context, BUTTON_A, 200ms, 200ms);
                 context.wait_for_all_requests();
                 break;
             }else if (ret == 2){
-                env.log("Failed to catch Chansey.");
+                env.log("Failed to catch pokemon.");
                 pbf_wait(context, 1000ms);
                 context.wait_for_all_requests();
                 return false;
+            } else if (ret == 4){
+                if (distraction_thrown < 2){
+                    env.log("Throwing bait...");
+                    pbf_press_button(context, BUTTON_A, 200ms, 200ms);
+                    distraction_thrown++;
+                    break;
+                }
+                env.log("Navigating to ball.");
+                balls_left--;
+                env.log("Balls left: " + std::to_string(balls_left));
+                pbf_press_dpad(context, DPAD_LEFT, 200ms, 200ms);
+                pbf_press_button(context, BUTTON_A, 200ms, 200ms);
+                context.wait_for_all_requests();
+                break;
             }
         }
     }
@@ -441,9 +540,16 @@ bool LuckyEggFarmer::run_safari_zone(SingleSwitchProgramEnvironment& env, ProCon
 
     while (chansey_count < 4){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-        if (!find_encounter(env, context)){
-            return false;
+        if (ITEM_TO_FARM == ItemToFarm::LUCKY_EGG){
+            if (!find_encounter_grass(env, context)){
+                return false;
+            }
+        }else{
+            if (!find_encounter_fishing(env, context)){
+                return false;
+            }
         }
+        
 
         bool encounter_shiny = handle_encounter(env.console, context, true);
         stats.encounters++;
@@ -467,13 +573,24 @@ bool LuckyEggFarmer::run_safari_zone(SingleSwitchProgramEnvironment& env, ProCon
             env.update_stats();
         }
 
-        if (!is_chansey(env, context)){
-            env.log("Not a Chansey. Fleeing...");
-            flee_battle(env.console, context);
-            context.wait_for_all_requests();
-            continue;
+        if (ITEM_TO_FARM == ItemToFarm::LUCKY_EGG){
+            if (!is_chansey(env, context)){
+                env.log("Not a Chansey. Fleeing...");
+                flee_battle(env.console, context);
+                context.wait_for_all_requests();
+                continue;
+            }
+        }else{
+            if (!is_dragonair(env, context)){
+                env.log("Not a Dragonair. Fleeing...");
+                flee_battle(env.console, context);
+                context.wait_for_all_requests();
+                continue;
+            }
         }
 
+        
+        //TODO: Update these now that there are two hunts
         env.log("Chansey found!");
         stats.chanseys_found++;
         env.update_stats();
@@ -581,13 +698,18 @@ void LuckyEggFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerC
         pbf_wait(context, 2000ms);
         context.wait_for_all_requests();
 
-        if (!navigate_to_chansey(env.console, context)){
-            env.console.log("Navigation failed. Resetting...");
-            soft_reset(env.console, context);
-            continue;
-        }
+        if (ITEM_TO_FARM == ItemToFarm::LUCKY_EGG){
+            if (!navigate_to_chansey(env.console, context)){
+                env.console.log("Navigation failed. Resetting...");
+                soft_reset(env.console, context);
+                continue;
+            }
 
-        swap_lead_pokemon(env.console, context);
+            swap_lead_pokemon(env.console, context);
+
+        }else{ // Dragon Fang
+            navigate_to_dragonair(env.console, context);
+        }
 
         if (run_safari_zone(env, context)){
             GO_HOME_WHEN_DONE.run_end_of_program(context);
