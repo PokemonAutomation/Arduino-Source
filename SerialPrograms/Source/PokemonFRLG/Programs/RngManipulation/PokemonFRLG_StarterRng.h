@@ -48,8 +48,6 @@ private:
         charmander
     };
 
-    bool have_hit_target(SingleSwitchProgramEnvironment& env, const uint32_t& TARGET_SEED, const AdvRngState& hit);
-
     bool walk_to_rival_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     bool auto_battle_rival(
         SingleSwitchProgramEnvironment& env, 

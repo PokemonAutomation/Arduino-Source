@@ -212,10 +212,6 @@ StarterRng::StarterRng()
 
 
 
-bool StarterRng::have_hit_target(SingleSwitchProgramEnvironment& env, const uint32_t& TARGET_SEED, const AdvRngState& hit){
-    return (hit.seed == TARGET_SEED) && (hit.advance == ADVANCES);
-}
-
 
 
 bool StarterRng::walk_to_rival_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -598,8 +594,6 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
     static const uint64_t CONTINUE_SCREEN_FRAMES = 200;
 
-    static const double SEED_BUMPS[] = {0, 1, -1, 2, -2};
-
     static const uint64_t INITIAL_ADVANCES_RADIUS = 1024;
 
     static const uint8_t MAX_HISTORY_LENGTH = 10;
@@ -615,24 +609,14 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     AdvRngSearcher searcher(TARGET_SEED, ADVANCES, AdvRngMethod::Method1);
     AdvPokemonResult target_result = searcher.generate_pokemon();
     RNG_TARGET.set_target(target_result, GENDER_THRESHOLD);
-    env.log("Target PID: " + to_hex_string(target_result.pid));
-    env.log("Target Nature: " + nature_to_string(target_result.nature));
-    env.log("Target IVs:");
-    env.log("   HP: " + std::to_string(target_result.ivs.hp));
-    env.log("   Atk: " + std::to_string(target_result.ivs.attack));
-    env.log("   Def: " + std::to_string(target_result.ivs.defense));
-    env.log("   SpA: " + std::to_string(target_result.ivs.spatk));
-    env.log("   SpD: " + std::to_string(target_result.ivs.spdef));
-    env.log("   Spe: " + std::to_string(target_result.ivs.speed));
-    
+    log_target_pokemon(env.console, target_result);
+
     RngCalibrations calibrations = {
         RNG_CALIBRATION.seed_calibration / FRLG_FRAME_DURATION,
         RNG_CALIBRATION.csf_calibration,
         RNG_CALIBRATION.advances_calibration
     };
-    env.log("Initial Seed calibration (frames): " + std::to_string(calibrations.seed_offset));
-    env.log("Initial CSF calibration (frames): " + std::to_string(calibrations.csf_offset));
-    env.log("Initial In-game calibration (frames x2): " + std::to_string(calibrations.ingame_offset));
+    log_calibrations(env.console, calibrations, true);
 
     Milliseconds launch_delay = INITIAL_LAUNCH_DELAY;
 
@@ -646,7 +630,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     while (true){
         if (calibration_history.results.size() > 0){
             env.log("Checking for nonshiny target hit...");
-            if (have_hit_target(env, TARGET_SEED, calibration_history.results.back())){
+            if (have_hit_target(TARGET_SEED, ADVANCES, calibration_history.results.back())){
                 env.log("Target Hit!");
                 stats.nonshiny++;
                 break;
@@ -687,8 +671,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         }
 
         // if previous resets had uncertain advances, slightly modify the seed delay to try to hit a different target
-        double seed_bump = SEED_BUMPS[uncertain_history.results.size() % 5];
-        calibrations.seed_offset += seed_bump;
+        apply_seed_bump(calibrations, uncertain_history);
 
         uint64_t ingame_advances = ADVANCES - CONTINUE_SCREEN_FRAMES;
 
@@ -745,11 +728,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         );
         if (finished){
             env.log("RNG search finished.");
-            if (search_hits.size() == 0){
-                failed_searches++;
-            }else{
-                failed_searches = 0;
-            }
+            update_failed_searches(failed_searches, search_hits);
             continue;
         }
 
@@ -783,11 +762,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             );            
             if (finished){
                 env.log("RNG search finished.");
-                if (search_hits.size() == 0){
-                    failed_searches++;
-                }else{
-                    failed_searches = 0;
-                }
+                update_failed_searches(failed_searches, search_hits);
                 continue;
             }
         }
@@ -858,11 +833,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     MAX_HISTORY_LENGTH, calibrations, search_hits, 5, 2, true
                 );
                 env.log("RNG search finished.");
-                if (search_hits.size() == 0){
-                    failed_searches++;
-                }else{
-                    failed_searches = 0;
-                }
+                update_failed_searches(failed_searches, search_hits);
                 break;
             }
         }

@@ -22,6 +22,7 @@
 #include "PokemonFRLG_RngCalibration.h"
 #include "PokemonFRLG_RngStatsDatabase.h"
 #include "PokemonFRLG_RngDisplays.h"
+#include "PokemonFRLG_RngLoopRoutines.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -78,47 +79,37 @@ private:
         finished
     };
 
-    bool have_hit_target(SingleSwitchProgramEnvironment& env, const uint32_t& TARGET_SEED, const uint64_t& TARGET_ADVANCES, const AdvRngState& hit);
-
     void prep_held_resets(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
     bool reset_and_check_seed(
-        SingleSwitchProgramEnvironment& env, 
+        SingleSwitchProgramEnvironment& env,
         ProControllerContext& context,
         EggRng_Descriptor::Stats& stats,
-        RngUncertainHistory& wild_uncertain_history,
-        RngUncertainHistory& egg_uncertain_history,    
-        RngCalibrationHistory& wild_history,
-        RngCalibrationHistory& egg_history,
+        EggCalibrationHistories& hist,
+        const EggFrameTargets& frame_targets,
         AdvRngWildSearcher& wild_searcher,
-        RngCalibrations& calibrations,
         WallClock& timestamp,
         uint16_t& current_seed,
-        uint64_t& balls_left, 
-        uint64_t& candies_left, 
+        uint64_t& balls_left,
+        uint64_t& candies_left,
         uint16_t& failed_searches,
         uint16_t& times_not_held,
         bool& shiny_found,
         const bool& previously_hit_held_frame,
         Milliseconds& launch_delay,
-        const uint64_t& SEED_DELAY,
-        const std::vector<uint16_t>& SEED_VALUES,
-        const int16_t& SEED_POSITION,
         const std::set<std::string>& SPECIES_LIST,
         const RngStatsDatabase& STATS_DATA,
         bool pickup_frame
     );
     
     bool held_frame_check(
-        SingleSwitchProgramEnvironment& env, 
+        SingleSwitchProgramEnvironment& env,
         ProControllerContext& context,
         EggRng_Descriptor::Stats& stats,
-        RngUncertainHistory& egg_uncertain_history,
-        RngCalibrationHistory& held_calibration_history,
+        EggCalibrationHistories& hist,
         AdvRngEggSearcher& egg_searcher,
-        RngCalibrations& calibrations,
         const WallClock& timestamp,
-        const uint16_t& current_seed, 
+        const uint16_t& current_seed,
         uint64_t& candies_left,
         uint16_t& failed_searches,
         bool& shiny_found,
@@ -130,13 +121,11 @@ private:
     );
 
     bool pickup_frame_check(
-        SingleSwitchProgramEnvironment& env, 
+        SingleSwitchProgramEnvironment& env,
         ProControllerContext& context,
         EggRng_Descriptor::Stats& stats,
-        RngUncertainHistory& egg_uncertain_history,
-        RngCalibrationHistory& pickup_calibration_history,
+        EggCalibrationHistories& hist,
         AdvRngEggSearcher& egg_searcher,
-        RngCalibrations& calibrations,
         uint64_t& candies_left,
         uint16_t& failed_searches,
         bool& shiny_found,

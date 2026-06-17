@@ -55,6 +55,31 @@ int16_t seed_position_in_list(uint16_t seed, std::vector<uint16_t> list);
 std::string to_hex_string(const uint16_t& val);
 std::string to_hex_string(const uint32_t& val);
 
+
+// true if a search hit matches the target seed and advance
+bool have_hit_target(uint32_t target_seed, uint64_t target_advances, const AdvRngState& hit);
+
+// if previous resets had uncertain advances, slightly nudge the seed offset to try
+// to land on a different target. Cycles through {0, +1, -1, +2, -2} frames.
+void apply_seed_bump(RngCalibrations& calibrations, const RngUncertainHistory& uncertain_history);
+
+// increment the failed-search counter when a search returned no hits, otherwise reset it.
+// templated so it accepts both plain hit vectors and the egg searcher's pair vectors.
+template <typename HitType>
+void update_failed_searches(uint16_t& failed_searches, const std::vector<HitType>& search_hits){
+    if (search_hits.size() == 0){
+        failed_searches++;
+    }else{
+        failed_searches = 0;
+    }
+}
+
+// log the PID, nature, and IVs of a target pokemon result
+void log_target_pokemon(ConsoleHandle& console, const AdvPokemonResult& result, bool normal_method_note = false);
+
+// log the three calibration offsets (seed/CSF/in-game), in frames
+void log_calibrations(ConsoleHandle& console, const RngCalibrations& calibrations, bool initial = false);
+
 RngTimings prepare_timings(
     ConsoleHandle& console,
     PokemonFRLG_RngTarget target,

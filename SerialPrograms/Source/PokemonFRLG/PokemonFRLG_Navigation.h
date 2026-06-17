@@ -19,6 +19,9 @@ namespace NintendoSwitch{
     using ProControllerContext = ControllerContext<ProController>;
 namespace PokemonFRLG{
 
+using namespace std::chrono_literals;
+
+
 enum class BattleResult{
     opponentfainted,
     playerfainted,
