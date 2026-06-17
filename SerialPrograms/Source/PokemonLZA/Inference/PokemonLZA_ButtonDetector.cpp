@@ -137,8 +137,6 @@ const char* template_path(ButtonType type){
     case ButtonType::ButtonDpadDown:
     case ButtonType::ButtonDpadDownInterior:
         return "PokemonLZA/Buttons/ButtonDpadDown.png";
-    case ButtonType::ButtonBInterior:
-        return "PokemonLZA/Buttons/ButtonB.png";
     default:
         return "";
     }
