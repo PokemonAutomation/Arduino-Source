@@ -844,7 +844,7 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
         HELD_CALIBRATION.advances_calibration
     };
 
-    EggCalibrationHistories hist = { initial_held_calibrations };
+    EggCalibrationHistories hist(initial_held_calibrations);
     if (STARTING_POINT == EggProgramState::pickup_calibration){
         hist.calibrations = {
             PICKUP_CALIBRATION.seed_calibration / FRLG_FRAME_DURATION,

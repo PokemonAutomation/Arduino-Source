@@ -36,6 +36,10 @@ struct EggCalibrationHistories{
     RngCalibrationHistory held;
     RngCalibrationHistory pickup;
 
+    EggCalibrationHistories(RngCalibrations calibrations)
+    : initial_calibrations(calibrations)
+    {};
+
     RngCalibrationHistory& frame(bool pickup_frame){ return pickup_frame ? pickup : held; }
 
     void clear_uncertain(){
