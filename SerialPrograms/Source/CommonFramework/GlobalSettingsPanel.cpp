@@ -146,6 +146,12 @@ GlobalSettings::GlobalSettings()
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
+    , USE_GPU_FOR_ML_INFERENCE(
+        "<b>Use GPU for Machine learning inference:</b><br>"
+        "Use the GPU by default for machine learning. Will fall-back to CPU if using the GPU fails.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
     , WINDOW_SIZE(
         CONSTRUCT_TOKEN,
         "Window Size/Position:",
@@ -261,6 +267,7 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(TEMP_FOLDER);
     PA_ADD_OPTION(THEME);
     PA_ADD_OPTION(USE_PADDLE_OCR);
+    PA_ADD_OPTION(USE_GPU_FOR_ML_INFERENCE);
     PA_ADD_OPTION(WINDOW_SIZE);
     PA_ADD_OPTION(LOG_WINDOW_SIZE);
     PA_ADD_OPTION(LOG_WINDOW_STARTUP);

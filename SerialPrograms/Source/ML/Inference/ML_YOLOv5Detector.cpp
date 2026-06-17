@@ -13,6 +13,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Filesystem.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -44,7 +45,7 @@ YOLOv5Detector::~YOLOv5Detector() = default;
 
 YOLOv5Detector::YOLOv5Detector(const std::string& model_path)
     : m_model_path(to_resource_filepath(model_path))
-    , m_use_gpu(true)
+    , m_use_gpu(GlobalSettings::instance().USE_GPU_FOR_ML_INFERENCE)
 {
     if (!model_path.ends_with(".onnx")){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, 

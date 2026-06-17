@@ -15,6 +15,7 @@
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonTools.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "ML/DataLabeling/ML_SegmentAnythingModel.h"
 #include "ML/DataLabeling/ML_AnnotationIO.h"
@@ -56,7 +57,7 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     : PanelInstance(descriptor)
     , m_display_session(m_display_option)
     , m_options(LockMode::UNLOCK_WHILE_RUNNING)
-    , m_use_gpu_for_sam_anno(true)
+    , m_use_gpu_for_sam_anno(GlobalSettings::instance().USE_GPU_FOR_ML_INFERENCE)
     , X("<b>X Coordinate:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.3, 0.0, 1.0)
     , Y("<b>Y Coordinate:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.3, 0.0, 1.0)
     , WIDTH("<b>Width:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.4, 0.0, 1.0)
@@ -67,7 +68,6 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     , CUSTOM_LABEL_DATABASE(create_string_select_database({"mc"})) // mc for "main character"
     , CUSTOM_SET_LABEL(CUSTOM_LABEL_DATABASE, LockMode::UNLOCK_WHILE_RUNNING, 0)
     , MANUAL_LABEL(false, LockMode::UNLOCK_WHILE_RUNNING, "", "Custom Label", true)
-    , USE_GPU_FOR_EMBEDDER_SESSION("<b>Enable GPU for Embedder session:</b>", LockMode::LOCK_WHILE_RUNNING, true) 
     , SELECTED_ANNO_COLOR(
         "<b>Color of selected annotation:",
         {
@@ -121,7 +121,6 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     ADD_OPTION(FORM_LABEL);
     ADD_OPTION(CUSTOM_SET_LABEL);
     ADD_OPTION(MANUAL_LABEL);
-    ADD_OPTION(USE_GPU_FOR_EMBEDDER_SESSION);
     ADD_OPTION(SELECTED_ANNO_COLOR);
     ADD_OPTION(UNSELECTED_ANNO_COLOR);
  
@@ -136,7 +135,7 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
 
 
 
-    init_sam_session(true);
+    init_sam_session(GlobalSettings::instance().USE_GPU_FOR_ML_INFERENCE);
 
     m_overlay_manager = new LabelImages_OverlayManager(*this);
 }
@@ -511,7 +510,7 @@ void LabelImages::remove_segmentation_exclusion_point(double x, double y){
 void LabelImages::compute_embeddings_for_folder(const std::string& image_folder_path){
     std::string embedding_model_path = RESOURCE_PATH() + "ML/sam_embedder_cpu.onnx";
     std::cout << "Use SAM Embedding model " << embedding_model_path << std::endl;
-    ML::compute_embeddings_for_folder(embedding_model_path, image_folder_path, USE_GPU_FOR_EMBEDDER_SESSION);
+    ML::compute_embeddings_for_folder(embedding_model_path, image_folder_path, GlobalSettings::instance().USE_GPU_FOR_ML_INFERENCE);
 }
 
 void LabelImages::delete_selected_annotation(){

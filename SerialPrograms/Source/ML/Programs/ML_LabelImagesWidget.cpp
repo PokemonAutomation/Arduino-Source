@@ -129,12 +129,12 @@ LabelImages_Widget::LabelImages_Widget(
     annotation_row->addWidget(load_custom_set_button, 2);
     annotation_row->addWidget(new QLabel(scroll_inner), 10); // an empty label to push other UIs to the left
 
-    // add GPU checkbox row
-    QHBoxLayout* use_gpu_row = new QHBoxLayout();
-    scroll_layout->addLayout(use_gpu_row);
+    // // add GPU checkbox row
+    // QHBoxLayout* use_gpu_row = new QHBoxLayout();
+    // scroll_layout->addLayout(use_gpu_row);
 
-    ConfigWidget* gpu_checkbox_widget = ConfigWidget::make_from_option(program.USE_GPU_FOR_EMBEDDER_SESSION, scroll_inner);
-    use_gpu_row->addWidget(&gpu_checkbox_widget->widget(), 2);    
+    // ConfigWidget* gpu_checkbox_widget = ConfigWidget::make_from_option(program.USE_GPU_FOR_EMBEDDER_SESSION, scroll_inner);
+    // use_gpu_row->addWidget(&gpu_checkbox_widget->widget(), 2);    
 
     // add Color selection dropdown
     QHBoxLayout* selected_color_choice_row = new QHBoxLayout();

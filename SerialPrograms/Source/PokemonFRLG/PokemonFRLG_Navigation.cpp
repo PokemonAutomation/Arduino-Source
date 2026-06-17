@@ -58,20 +58,20 @@ void home_black_border_check(ConsoleHandle& console, ProControllerContext& conte
             if (current == ControllerPlayerNumber::UNKNOWN){
                 throw UserSetupError(
                     console,
-                    "Unable to find Home menu.<br><br>"
+                    "Unable to find Home menu.\n\n"
                     "Either your controller isn't connected or your screen size to not "
-                    "set to 100% in the TV Settings on your Nintendo Switch.<br><br>"
+                    "set to 100% in the TV Settings on your Nintendo Switch.\n\n"
                     "If your Switch entered the Home screen and re-entered the game, then your "
-                    "controller is connected but your screen size is not set to 100%.<br><br>"
+                    "controller is connected but your screen size is not set to 100%.\n\n"
                     "If nothing happened at all, then your controller is not connected. "
-                    "Please disconnect all other controllers and try again.<br><br>"
+                    "Please disconnect all other controllers and try again.\n\n"
                     "We recommend changing the controller to \"NS1: Wired Pro Controller\" "
                     "as that will be able self-diagnose controller connection issues."
                 );
             }else{
                 throw UserSetupError(
                     console,
-                    "Unable to find Home menu.<br><br>"
+                    "Unable to find Home menu.\n\n"
                     "It is likely your screen size to not set to 100% in the TV Settings on your Nintendo Switch."
                 );
             }
