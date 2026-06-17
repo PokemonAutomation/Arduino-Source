@@ -59,8 +59,6 @@ private:
         superrod
     };
 
-    bool have_hit_target(SingleSwitchProgramEnvironment& env, const uint32_t& TARGET_SEED, const AdvRngState& hit);
-    
     SectionDividerOption m_calibration_displays;
     RngTargetDisplay RNG_TARGET;
     RngFilterDisplay RNG_FILTERS;
