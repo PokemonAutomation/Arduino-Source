@@ -41,7 +41,8 @@ public:
     void reset_state() override;
 
 private:
-    ButtonDetector m_b_button;
+    Color m_color;
+    VideoOverlay* m_overlay;
     ButtonDetector m_x_button;
     ButtonDetector m_y_button;
     std::vector<MapIconDetector*> m_map_icon_detectors;
