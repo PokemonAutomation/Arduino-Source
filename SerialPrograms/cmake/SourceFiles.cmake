@@ -1550,6 +1550,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_HardReset.h
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RngCalibration.cpp
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RngCalibration.h
+    Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RngLoopRoutines.cpp
+    Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RngLoopRoutines.h
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RngStatsDatabase.cpp
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RngStatsDatabase.h
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_LocationsDatabase.cpp

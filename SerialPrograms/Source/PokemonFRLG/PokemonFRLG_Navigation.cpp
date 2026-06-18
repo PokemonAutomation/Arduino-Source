@@ -797,6 +797,53 @@ void open_bag_from_overworld(ConsoleHandle& console, ProControllerContext& conte
     }
 }
 
+void use_sweet_scent_from_overworld(ConsoleHandle& console, ProControllerContext& context, int from_last){
+    uint16_t errors = 0;
+    
+    while (true){
+        if (errors > 5){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "use_teleport_from_overworld(): Failed to use Teleport 5 times in a row.",
+                console
+            );
+        }
+
+        open_party_menu_from_overworld(console, context);
+        // navigate to last party slot
+        for (int i=0; i<(2+from_last); i++){
+            pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+        }
+
+        PartySelectionWatcher sweetscent_selected(COLOR_RED);
+
+        context.wait_for_all_requests();
+        int ret = run_until<ProControllerContext>(
+            console, context,
+            [](ProControllerContext& context){
+                pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
+            },
+            { sweetscent_selected }
+        );
+
+        if (ret < 0){
+            console.log("Failed to select Sweet Scent user.");
+            errors++;
+            pbf_mash_button(context, BUTTON_B, 3000ms);
+            continue;
+        }
+        
+        // select Sweet Scent (2nd option, but maybe HMs could change this)
+        pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
+        pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
+        pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+
+        context.wait_for_all_requests();
+        console.log("Used Sweet Scent.");
+        return;
+    }
+}
+
 void use_teleport_from_overworld(ConsoleHandle& console, ProControllerContext& context){
     uint16_t errors = 0;
     

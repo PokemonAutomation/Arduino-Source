@@ -85,6 +85,35 @@ std::string to_hex_string(const uint32_t& val){
     return s.str();
 }
 
+bool have_hit_target(uint32_t target_seed, uint64_t target_advances, const AdvRngState& hit){
+    return (hit.seed == target_seed) && (hit.advance == target_advances);
+}
+
+void apply_seed_bump(RngCalibrations& calibrations, const RngUncertainHistory& uncertain_history){
+    static const double SEED_BUMPS[] = {0, 1, -1, 2, -2};
+    double seed_bump = SEED_BUMPS[uncertain_history.results.size() % 5];
+    calibrations.seed_offset += seed_bump;
+}
+
+void log_target_pokemon(ConsoleHandle& console, const AdvPokemonResult& result, bool normal_method_note){
+    console.log("Target PID: " + to_hex_string(result.pid));
+    console.log("Target Nature: " + nature_to_string(result.nature));
+    console.log(normal_method_note ? "Target IVs (assuming Normal method):" : "Target IVs:");
+    console.log("   HP: " + std::to_string(result.ivs.hp));
+    console.log("   Atk: " + std::to_string(result.ivs.attack));
+    console.log("   Def: " + std::to_string(result.ivs.defense));
+    console.log("   SpA: " + std::to_string(result.ivs.spatk));
+    console.log("   SpD: " + std::to_string(result.ivs.spdef));
+    console.log("   Spe: " + std::to_string(result.ivs.speed));
+}
+
+void log_calibrations(ConsoleHandle& console, const RngCalibrations& calibrations, bool initial){
+    std::string prefix = initial ? "Initial " : "";
+    console.log(prefix + "Seed calibration (frames): " + std::to_string(calibrations.seed_offset));
+    console.log(prefix + "CSF calibration (frames): " + std::to_string(calibrations.csf_offset));
+    console.log(prefix + "In-game calibration (frames x2): " + std::to_string(calibrations.ingame_offset));
+}
+
 RngTimings prepare_timings(
     ConsoleHandle& console,
     PokemonFRLG_RngTarget target,
