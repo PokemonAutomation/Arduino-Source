@@ -33,7 +33,6 @@ enum class ButtonType{
     ButtonDpadDown,
     ButtonDpadUpInterior,   // Used to create button detector that detects the black triangle inside the DPAD_UP button
     ButtonDpadDownInterior, // Used to create button detector that detects the black triangle inside the DPAD_DOWN button
-    ButtonBInterior,        // Used to create button detector that detects the black B inside the B button on the map screen. This is needed because the B button on the map screen is mostly white and hard to detect with a single detector.
 };
 
 class ButtonMatcher;
