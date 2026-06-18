@@ -25,7 +25,10 @@ namespace SerialPABotBase{
 
 
 
-class SerialPABotBase2_SelectorWidget : public NoWheelCompactComboBox{
+class SerialPABotBase2_SelectorWidget
+    : public NoWheelCompactComboBox
+    , public SerialPortPoller::Listener
+{
 public:
     SerialPABotBase2_SelectorWidget(
         ControllerSelectorWidget& parent,
@@ -52,7 +55,7 @@ public:
             parent.session().set_device(descriptor);
         }
 
-        refresh_devices();
+        refresh_devices(SerialPortPoller::instance().ports());
 
         connect(
             this, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
@@ -69,13 +72,18 @@ public:
                 }
 
                 parent.session().set_device(selected);
-                refresh_devices();
+                refresh_devices(SerialPortPoller::instance().ports());
             }
         );
+
+        SerialPortPoller::instance().add_listener(*this);
+    }
+    ~SerialPABotBase2_SelectorWidget(){
+        SerialPortPoller::instance().remove_listener(*this);
     }
 
-    void refresh_devices(){
-        SerialPortPoller::instance().begin_refresh_now();
+    void refresh_devices(const QList<QSerialPortInfo>& ports){
+//        SerialPortPoller::instance().begin_refresh_now();
 //        cout << "Current = " << width() << " x " << height() << endl;
 //        cout << "sizeHint = " << sizeHint().width() << " x " << sizeHint().height() << endl;
 //        cout << "minimumContentsLength = " << this->minimumContentsLength() << endl;
@@ -87,7 +95,7 @@ public:
 
 
         m_ports.emplace_back(new SerialPABotBase2_Descriptor());
-        for (QSerialPortInfo& port : SerialPortPoller::instance().ports()){
+        for (const QSerialPortInfo& port : ports){
             if (filter_serial_port(port)){
                 m_ports.emplace_back(
                     new SerialPABotBase2_Descriptor(port.portName().toStdString())
@@ -113,6 +121,10 @@ public:
         }
 //        setMinimumContentsLength((int)width);
         setCurrentIndex(index);
+    }
+
+    virtual void on_serial_ports_changed(const QList<QSerialPortInfo>& ports) override{
+        refresh_devices(ports);
     }
 
 
