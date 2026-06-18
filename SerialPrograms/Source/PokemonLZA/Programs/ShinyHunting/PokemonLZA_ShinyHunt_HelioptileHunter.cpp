@@ -242,6 +242,10 @@ void ShinyHunt_HelioptileHunter::program(SingleSwitchProgramEnvironment& env, Pr
 
         int hunt_loops = 0;
         while (hunt_loops < 65){
+            // On startup and every 65 hunt loops, force a return to the bench
+            // and re-roll/check weather conditions. This ensures the hunt does
+            // not continue indefinitely after the desired daytime sunny/clear
+            // weather has changed.
             if (!proper_weather(env,context) || (hunt_loops == 0)){
                 env.log("Not correct weather");
                 reach_bench(env, context);

@@ -85,11 +85,6 @@ public:
         static ButtonMatcher matcher(ButtonType::ButtonDpadDownInterior, 10, 10, 120, match_black_interior);
         return matcher;
     }
-    static const ButtonMatcher& BInterior() {
-        const bool match_black_interior = true;
-        static ButtonMatcher matcher(ButtonType::ButtonBInterior, 10, 10, 120, match_black_interior);
-        return matcher;
-    }
 
     virtual bool check_image(Resolution input_resolution, const ImageViewRGB32& image) const override{
         size_t min_width = m_min_width * input_resolution.width / 3840;
@@ -172,16 +167,13 @@ const ButtonMatcher& get_button_matcher(ButtonType type){
         return ButtonMatcher::DpadUpInterior();
     case ButtonType::ButtonDpadDownInterior:
         return ButtonMatcher::DpadDownInterior();
-    case ButtonType::ButtonBInterior:
-        return ButtonMatcher::BInterior();
     default:
         throw std::runtime_error("No corresponding ButtonMatcher for ButtonType");
     }
 }
 
 bool match_button_black_interior(ButtonType button_type){
-    return button_type == ButtonType::ButtonDpadUpInterior || button_type == ButtonType::ButtonDpadDownInterior ||
-        button_type == ButtonType::ButtonBInterior;
+    return button_type == ButtonType::ButtonDpadUpInterior || button_type == ButtonType::ButtonDpadDownInterior;
 }
 
 ButtonMatcher::ButtonMatcher(ButtonType type, size_t min_width, size_t min_height, double max_rmsd, bool match_black_interior)
