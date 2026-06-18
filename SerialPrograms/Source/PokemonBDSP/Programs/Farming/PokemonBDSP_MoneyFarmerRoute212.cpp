@@ -195,11 +195,8 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, ProControl
 
         default:
             stats.m_errors++;
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Timed out after 30 seconds.",
-                env.console
-            );
+            env.log("Timed out after 30 seconds. Assume battle ended.", COLOR_RED);
+            return false;
         }
     }
 

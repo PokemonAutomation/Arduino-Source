@@ -139,13 +139,9 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, ProControllerC
             pbf_mash_button(context, BUTTON_B, 2000ms);
             return false;
         default:
-            env.log("Timed out.", COLOR_RED);
             stats.add_error();
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Timed out after 2 minutes.",
-                env.console
-            );
+            env.log("Timed out after 2 minutes. Assume battle ended.", COLOR_RED);
+            return false;
         }
     }
 

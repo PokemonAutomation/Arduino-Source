@@ -334,10 +334,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+//    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "test", console);
+
+#if 0
     auto snapshot = feed.snapshot();
     YCommMenuDetector detector(true);
     detector.make_overlays(overlays);
     cout << detector.detect(snapshot) << endl;
+#endif
 
 #if 0
     SelectionArrowFinder arrow(overlay, {0.462377, 0.332039, 0.388222, 0.640777});
