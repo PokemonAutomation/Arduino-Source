@@ -45,7 +45,7 @@ public:
         Color color = COLOR_RED
     )
         : BlackScreenOverWatcher(
-            color, box, 100, 10, std::chrono::milliseconds(1000)
+            color, box, 100, 10, std::chrono::milliseconds(500)
         )
     {}
 
