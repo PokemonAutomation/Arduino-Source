@@ -47,7 +47,7 @@ jobs:
         echo "UPLOAD_FOLDER=$UPLOAD_FOLDER" >> $GITHUB_ENV
 
     - name: Checkout Arduino-Source
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         path: 'Arduino-Source'
         submodules: 'recursive'
@@ -102,7 +102,7 @@ jobs:
         path: ${{env.UPLOAD_FOLDER}}
 
     - name: Checkout CommandLineTests
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       if: inputs.run-tests
       with:
         repository: 'PokemonAutomation/CommandLineTests'
