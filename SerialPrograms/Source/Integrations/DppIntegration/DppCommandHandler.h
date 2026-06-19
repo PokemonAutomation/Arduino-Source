@@ -5,6 +5,7 @@
 #include <Integrations/DppIntegration/DppUtility.h>
 #include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
 #include "CommonFramework/Notifications/MessageAttachment.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "Integrations/DiscordSettingsOption.h"
 

@@ -30,6 +30,7 @@ Client& Client::instance(){
 
 Client::~Client(){
     disconnect();
+    GlobalSettings::instance().DISCORD->integration.register_slash_button.remove_listener(*this);
 }
 
 bool Client::is_initialized(){
@@ -48,7 +49,12 @@ void Client::connect(){
             return;
 
         std::string token = settings.integration.token;
-        uint32_t intents = intents::i_default_intents | intents::i_guild_members | intents::i_message_content;
+        auto cmd_type = GlobalSettings::instance().DISCORD->integration.command_type.get();
+        uint32_t intents = intents::i_default_intents;
+        if (cmd_type == DiscordIntegrationSettingsOption::CommandType::MessageCommands){
+            intents = intents::i_default_intents | intents::i_message_content;
+        }
+
         try{
             m_bot = std::make_unique<cluster>(token, intents);
             m_handler = std::make_unique<commandhandler>(m_bot.get(), false);
@@ -154,14 +160,8 @@ void Client::run(const std::string& token){
         Handler::initialize(*m_bot.get(), *m_handler.get());
         m_bot->set_websocket_protocol(websocket_protocol_t::ws_etf);
         m_bot->start(st_return);
-        m_bot->set_presence(
-            presence(
-                presence_status::ps_online,
-                activity_type::at_game,
-                (std::string)GlobalSettings::instance().DISCORD->integration.game_status
-            )
-        );
         m_is_connected.store(true, std::memory_order_release);
+        GlobalSettings::instance().DISCORD->integration.register_slash_button.add_listener(*this);
     }catch (std::exception& e){
         Handler::log_dpp("DPP thew an exception: " + (std::string)e.what(), "run()", ll_critical);
         m_handler.reset();

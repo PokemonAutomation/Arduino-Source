@@ -32,6 +32,10 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
         LockMode::LOCK_WHILE_RUNNING,
         false
     )
+    , register_slash_button(
+        "<b>Register Slash Commands on Start:</b><br>Only needs to be run once, or after additional commands are added.",
+        "Register Slash Commands"
+    )
     , command_type(
         "<b>Discord Integration Command Type:</b><br>Restart the program for this to take effect.",
         {
@@ -72,6 +76,7 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     )
 {
     PA_ADD_OPTION(run_on_start);
+    PA_ADD_OPTION(register_slash_button);
     PA_ADD_OPTION(command_type);
     PA_ADD_OPTION(token);
     PA_ADD_OPTION(command_prefix);
