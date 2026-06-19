@@ -343,7 +343,8 @@ void resume_game_from_home(
             if (ret == 0){
                 console.log("Detected update window.", COLOR_RED);
 
-                pbf_press_dpad(context, DPAD_UP, 40ms, 0ms);
+                pbf_press_dpad(context, DPAD_UP, 40ms, 40ms);
+                pbf_press_dpad(context, DPAD_UP, 40ms, 40ms);
                 pbf_press_button(context, BUTTON_A, 80ms, 4000ms);
                 context.wait_for_all_requests();
                 continue;
@@ -382,7 +383,8 @@ void resume_game_from_home(
             if (ret == 0){
                 console.log("Detected update window.", COLOR_RED);
 
-                pbf_move_joystick(context, {0, +1}, 10ms, 0ms);
+                pbf_move_joystick(context, {0, +1}, 40ms, 40ms);
+                pbf_move_joystick(context, {0, +1}, 40ms, 40ms);
                 pbf_press_button(context, BUTTON_A, 10ms, 500ms);
                 context.wait_for_all_requests();
                 continue;
@@ -574,7 +576,8 @@ void start_game_from_home_with_inference(
             break;
         case 2:
             console.log("Detected update menu.", COLOR_BLUE);
-            pbf_press_dpad(context, DPAD_UP, 40ms, 0ms);
+            pbf_press_dpad(context, DPAD_UP, 40ms, 40ms);
+            pbf_press_dpad(context, DPAD_UP, 40ms, 40ms);
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;
         case 3:
@@ -689,7 +692,8 @@ void start_game_from_home_with_inference(
             break;
         case 2:
             console.log("Detected update menu.", COLOR_BLUE);
-            pbf_move_joystick(context, {0, +1}, 50ms, 0ms);
+            pbf_move_joystick(context, {0, +1}, 40ms, 40ms);
+            pbf_move_joystick(context, {0, +1}, 40ms, 40ms);
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;
         case 3:
