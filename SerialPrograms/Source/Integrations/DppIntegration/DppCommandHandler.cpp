@@ -1,9 +1,9 @@
 #ifdef PA_DPP
 
 #include <format>
+#include <unordered_set>
 #include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/MessageAttachment.h"
 #include "Integrations/IntegrationsAPI.h"
 #include "Integrations/DiscordSettingsOption.h"
@@ -37,7 +37,7 @@ void Handler::initialize(cluster& bot, commandhandler& handler){
     if (cmd_type == DiscordIntegrationSettingsOption::CommandType::MessageCommands && !prefix.empty()){
         handler.add_prefix(prefix);
     }else{
-        handler.add_prefix("/").add_prefix("_cmd ");
+        handler.add_prefix("/");
     }
 
     bot.on_ready([&bot, &handler, this](const ready_t&){
@@ -53,6 +53,13 @@ void Handler::initialize(cluster& bot, commandhandler& handler){
             log_dpp("Application Name: " + app.name, "Current App", ll_info);
             log_dpp("Application ID: " + std::to_string(app.id), "Current App", ll_info);
             owner = app.owner;
+            bot.set_presence(
+                presence(
+                    presence_status::ps_online,
+                    activity_type::at_game,
+                    (std::string)GlobalSettings::instance().DISCORD->integration.game_status
+                )
+            );
         });
 #else
         log_dpp("Logged in as: " + bot.current_user_get_sync().format_username() + ".", "Ready", ll_info);
@@ -76,48 +83,18 @@ void Handler::initialize(cluster& bot, commandhandler& handler){
         }
     });
 
-    bot.on_guild_member_add([this](const guild_member_add_t& event){
-#if DPP_VERSION_LONG >= 0x00100100 // (dpp version 10.1.0)
-        std::string id = std::to_string(event.adding_guild.id);
-        if (!user_counts.empty() && user_counts.count(id)){
-            log_dpp("New member joined " + event.adding_guild.name + ". Incrementing member count.", "Guild Member Add", ll_info);
-            user_counts.at(id)++;
-        }
-#else
-        std::string id = std::to_string(event.adding_guild->id);
-        if (!user_counts.empty() && user_counts.count(id)){
-            log_dpp("New member joined " + event.adding_guild->name + ". Incrementing member count.", "Guild Member Add", ll_info);
-            user_counts.at(id)++;
-        }
-#endif
-    });
-
-    bot.on_guild_member_remove([this](const guild_member_remove_t& event){
-#if DPP_VERSION_LONG >= 0x00100100 // (dpp version 10.1.0)
-        std::string id = std::to_string(event.removing_guild.id);
-        if (!user_counts.empty() && user_counts.count(id)){
-            log_dpp("Member left " + event.removing_guild.name + ". Decrementing member count.", "Guild Member Remove", ll_info);
-            user_counts.at(id)--;
-        }
-#else
-        std::string id = std::to_string(event.removing_guild->id);
-        if (!user_counts.empty() && user_counts.count(id)){
-            log_dpp("Member left " + event.removing_guild->name + ". Decrementing member count.", "Guild Member Remove", ll_info);
-            user_counts.at(id)--;
-        }
-#endif
-    });
-
-    bot.on_message_create([&handler](const message_create_t& event){
-        std::string content = event.msg.content;
-        if (!event.msg.author.is_bot() && handler.string_has_prefix(content)){
-            auto channels = GlobalSettings::instance().DISCORD->integration.channels.command_channels();
-            auto channel = std::find(channels.begin(), channels.end(), std::to_string(event.msg.channel_id));
-            if (channel != channels.end()){
-                handler.route(event);
+    if (cmd_type == DiscordIntegrationSettingsOption::CommandType::MessageCommands){
+        bot.on_message_create([&handler](const message_create_t& event){
+            std::string content = event.msg.content;
+            if (!event.msg.author.is_bot() && handler.string_has_prefix(content)){
+                auto channels = GlobalSettings::instance().DISCORD->integration.channels.command_channels();
+                auto channel = std::find(channels.begin(), channels.end(), std::to_string(event.msg.channel_id));
+                if (channel != channels.end()){
+                    handler.route(event);
+                }
             }
-        }
-    });
+        });
+    }
 
     bot.on_slashcommand([&handler](const slashcommand_t& event){
         if (!event.command.usr.is_bot() && handler.slash_commands_enabled){
@@ -611,29 +588,55 @@ void Handler::create_unified_commands(commandhandler& handler){
             embed embed;
             embed.set_color((uint32_t)color).set_title("Command List");
 
+            static const std::unordered_set<std::string> base_commands{
+                "hi", "ping", "about", "status", "help"
+            };
+            static const std::unordered_set<std::string> button_commands{
+                "click", "joystick"
+            };
+
+            std::unordered_set<std::string> allowed = base_commands;
+            if (GlobalSettings::instance().DISCORD->integration.allow_buttons_from_users){
+                allowed.insert(button_commands.begin(), button_commands.end());
+            }
+
             auto& commands = handler.commands;
             for (auto& cmd : commands){
-                std::string name = cmd.first;
-                log_dpp(name, "help command", ll_info);
-                if (!GlobalSettings::instance().DISCORD->integration.allow_buttons_from_users &&
-                    src.issuer.id != owner.id && name != "hi" && name != "ping" && name != "about" && name != "status" && name != "help"
-                ){
+                const std::string& cmd_name = cmd.first;
+                if (src.issuer.id != owner.id && allowed.find(cmd_name) == allowed.end()){
                     continue;
                 }
 
-                std::string param_info;
-                for (auto& param : cmd.second.parameters){
-                    param_info += ("\n**- " + param.first + "** - " + param.second.description);
-                    if (!param.second.choices.empty()){
-                        param_info += " (";
-                        for (auto& choice : param.second.choices){
-                            param_info += (choice.second + ", ");
+                auto& params = cmd.second.parameters;
+                std::string signature;
+                if (!params.empty()){
+                    signature = cmd_name + "(";
+                    for (size_t i = 0; i < params.size(); ++i){
+                        signature += params[i].first;
+                        if (i + 1 < params.size()){
+                            signature += ", ";
                         }
-                        param_info = param_info.substr(0, param_info.size() - 2);
-                        param_info += ")";
+                    }
+                    signature += ")";
+                }else{
+                    signature = cmd_name;
+                }
+
+                std::string param_details;
+                for (auto& param : params){
+                    param_details += ("\n-" + param.first + ": " + param.second.description);
+                    if (!param.second.choices.empty()){
+                        std::string choices;
+                        for (auto& c : param.second.choices){
+                            choices += c.second + ", ";
+                        }
+                        if (!choices.empty()){
+                            choices = choices.substr(0, choices.size() - 2);
+                        }
+                        param_details += " (" + choices + ")";
                     }
                 }
-                embed.add_field(name, param_info);
+                embed.add_field(signature, param_details);
             }
             embed_footer footer;
             footer.set_text("Commands are case-sensitive!");
@@ -641,34 +644,8 @@ void Handler::create_unified_commands(commandhandler& handler){
             message.add_embed(embed);
             handler.reply(message, src);
         },
-        "View the command list.")
-            
-    .add_command(
-        "register",
-        {},
-        [&handler, this](const std::string& command, const parameter_list_t&, command_source src){
-            log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
-            if (src.issuer.id != owner.id){
-                handler.reply(message("You do not have permission to use this command."), src);
-                return;
-            }
-
-            if (handler.slash_commands_enabled){
-                handler.thinking(src);
-                log_dpp("Registering commands.", "Command Registration", ll_info);
-                handler.register_commands();
-
-                embed embed;
-                std::string desc = "Slash commands registered! Restart your Discord client or wait a few minutes for them to show up!";
-                embed.set_color((uint32_t)color).set_description(desc).set_title("Slash Command Registration");
-                Handler::update_response(src, embed, "", nullptr);
-            }else{
-                handler.reply(message("Enable slash commands before registering them."), src);
-            }
-        },
-        "Register global slash commands. For first-time slash command use and for updating commands.");
+        "View the command list.");
 }
-
 
 }
 }

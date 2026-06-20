@@ -12,6 +12,7 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/ButtonOption.h"
 #include "Common/Qt/Options/GroupWidget.h"
 #include "DiscordIntegrationTable.h"
 
@@ -30,6 +31,7 @@ public:
     virtual void on_config_value_changed(void* object) override;
 
     BooleanCheckBoxOption run_on_start;
+    ButtonOption register_slash_button;
 
     enum class CommandType{
         SlashCommands,
