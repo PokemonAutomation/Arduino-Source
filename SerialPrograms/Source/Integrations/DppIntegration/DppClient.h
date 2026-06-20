@@ -45,7 +45,7 @@ private:
     void run(const std::string& token);
     virtual void on_press() override{
         std::lock_guard<std::mutex> lg(m_register_lock);
-        if (m_handler && m_handler->slash_commands_enabled && GlobalSettings::instance().DISCORD->integration.register_slash_button.is_enabled()){
+        if (m_handler && m_handler->slash_commands_enabled){
             GlobalSettings::instance().DISCORD->integration.register_slash_button.set_enabled(false);
             log_dpp("Registering commands...", "Slash Command Registration", dpp::ll_info);
             m_handler->register_commands();

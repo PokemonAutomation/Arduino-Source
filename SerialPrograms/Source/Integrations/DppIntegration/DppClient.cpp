@@ -29,8 +29,8 @@ Client& Client::instance(){
 
 
 Client::~Client(){
-    disconnect();
     GlobalSettings::instance().DISCORD->integration.register_slash_button.remove_listener(*this);
+    disconnect();
 }
 
 bool Client::is_initialized(){
