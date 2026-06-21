@@ -42,7 +42,6 @@ public:
 
 private:
     Color m_color;
-    VideoOverlay* m_overlay;
     ButtonDetector m_x_button;
     ButtonDetector m_y_button;
     std::vector<MapIconDetector*> m_map_icon_detectors;

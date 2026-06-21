@@ -20,7 +20,7 @@ class TravelSpotMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
     TravelSpotMatcher()
         : WaterfillTemplateMatcher(
-            "PokemonLZA/Buttons/TravelSpotIcon.png",
+            "PokemonLZA/MapIcons/TravelSpotIcon.png",
             Color(0xff004080),
             Color(0xff80ffff),
             50
@@ -71,7 +71,6 @@ bool detect_travel_spot(const ImageViewRGB32& screen){
 
 MapDetector::MapDetector(Color color, VideoOverlay* overlay)
     : m_color(color)
-    , m_overlay(overlay)
     , m_x_button(
         color,
         ButtonType::ButtonX,
