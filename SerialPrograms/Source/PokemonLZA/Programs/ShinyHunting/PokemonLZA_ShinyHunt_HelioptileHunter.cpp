@@ -88,14 +88,15 @@ ShinyHunt_HelioptileHunter::ShinyHunt_HelioptileHunter()
 bool proper_weather(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     
     open_map(env.console, context, true, true);
-    
     context.wait_for_all_requests();
+
     // zoom fully in
     pbf_move_right_joystick(context, {0, 1}, 900ms, 120ms);
     context.wait_for_all_requests();
     // hide icons
     pbf_press_button(context, BUTTON_MINUS, 80ms, 120ms);
     context.wait_for_all_requests();
+
     VideoSnapshot screen = env.console.video().snapshot();
     WeatherIconDetector sunnyDetector(WeatherIconType::Sunny, &env.console.overlay());
     WeatherIconDetector clearDetector(WeatherIconType::Clear,&env.console.overlay());
