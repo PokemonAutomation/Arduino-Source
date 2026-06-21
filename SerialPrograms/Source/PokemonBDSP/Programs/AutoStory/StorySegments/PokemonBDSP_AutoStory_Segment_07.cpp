@@ -568,7 +568,7 @@ static bool go_through_mount_coronet(
     pbf_move_left_joystick(context, {+1, 0}, 400ms, 100ms); // 1+
     pbf_move_left_joystick(context, {0, +1}, 400ms, 100ms); // 1+
 
-    use_strength(stream, context);
+    use_HM(stream, context, "Strength");
 
     context.wait_for_all_requests();
     pbf_move_left_joystick(context, {0, +1}, 10000ms, 500ms); // 10++ (strength)
