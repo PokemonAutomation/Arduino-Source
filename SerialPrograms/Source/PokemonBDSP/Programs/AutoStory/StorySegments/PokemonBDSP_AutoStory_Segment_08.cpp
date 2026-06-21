@@ -2011,7 +2011,7 @@ static bool go_to_house_west_sunyshore(
     pbf_move_left_joystick(context, {+1, 0}, 5200ms, 100ms); // 26+
     pbf_move_left_joystick(context, {0, -1}, 400ms, 100ms); // 1+
 
-    use_rock_smash(stream, context);
+    use_HM(stream, context, "Rock Smash");
 
     context.wait_for_all_requests();
 
@@ -2585,7 +2585,12 @@ void checkpoint_134(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     );
 }
 
-void checkpoint_135(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+void checkpoint_135(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+){
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
             if (!go_to_sunyshore_gym(env.console, context, options)){
@@ -2598,7 +2603,7 @@ void checkpoint_135(SingleSwitchProgramEnvironment& env, ProControllerContext& c
 
 
 
-std::string AutoStory_Checkpoint_111::name()       const{ return "111 - Segment 08 - Gym badge acquired"; }
+std::string AutoStory_Checkpoint_111::name()       const{ return "111 - S08 - Gym badge acquired"; }
 std::string AutoStory_Checkpoint_111::start_text() const{ return "Seventh Gym Badge acquired (Snowpoint City)."; }
 std::string AutoStory_Checkpoint_111::end_text()   const{ return "Leave Snowpoint Gym."; }
 void AutoStory_Checkpoint_111::run_checkpoint(
@@ -2610,7 +2615,7 @@ void AutoStory_Checkpoint_111::run_checkpoint(
     checkpoint_111(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_112::name()       const{ return "112 - Segment 08 - Left Snowpoint Gym"; }
+std::string AutoStory_Checkpoint_112::name()       const{ return "112 - S08 - Left Snowpoint Gym"; }
 std::string AutoStory_Checkpoint_112::start_text() const{ return "Left Snowpoint Gym."; }
 std::string AutoStory_Checkpoint_112::end_text()   const{ return "Arrived at Snowpoint City Pokémon Center."; }
 void AutoStory_Checkpoint_112::run_checkpoint(
@@ -2622,7 +2627,7 @@ void AutoStory_Checkpoint_112::run_checkpoint(
     checkpoint_112(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_113::name()       const{ return "113 - Segment 08 - Arrived at Snowpoint Pokemon Center"; }
+std::string AutoStory_Checkpoint_113::name()       const{ return "113 - S08 - Arrived at Snowpoint Pokemon Center"; }
 std::string AutoStory_Checkpoint_113::start_text() const{ return "Arrived at Snowpoint City Pokémon Center."; }
 std::string AutoStory_Checkpoint_113::end_text()   const{ return "Healed at Snowpoint City Pokemon Center."; }
 void AutoStory_Checkpoint_113::run_checkpoint(
@@ -2634,7 +2639,7 @@ void AutoStory_Checkpoint_113::run_checkpoint(
     checkpoint_113(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_114::name()       const{ return "114 - Segment 08 - Healed at Snowpoint City Pokemon Center"; }
+std::string AutoStory_Checkpoint_114::name()       const{ return "114 - S08 - Healed at Snowpoint City Pokemon Center"; }
 std::string AutoStory_Checkpoint_114::start_text() const{ return "Healed at Snowpoint City Pokemon Center."; }
 std::string AutoStory_Checkpoint_114::end_text()   const{ return "Entered Lake Acuity Lakefront."; }
 void AutoStory_Checkpoint_114::run_checkpoint(
@@ -2646,7 +2651,7 @@ void AutoStory_Checkpoint_114::run_checkpoint(
     checkpoint_114(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_115::name()       const{ return "115 - Segment 08 - Entered Acuity Lakefront"; }
+std::string AutoStory_Checkpoint_115::name()       const{ return "115 - S08 - Entered Acuity Lakefront"; }
 std::string AutoStory_Checkpoint_115::start_text() const{ return "Entered Lake Acuity Lakefront."; }
 std::string AutoStory_Checkpoint_115::end_text()   const{ return "Arrived at Veilstone City Pokemon Center."; }
 void AutoStory_Checkpoint_115::run_checkpoint(
@@ -2658,7 +2663,7 @@ void AutoStory_Checkpoint_115::run_checkpoint(
     checkpoint_115(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_116::name()       const{ return "116 - Segment 08 - Arrived at Veilstone Pokemon Center"; }
+std::string AutoStory_Checkpoint_116::name()       const{ return "116 - S08 - Arrived at Veilstone Pokemon Center"; }
 std::string AutoStory_Checkpoint_116::start_text() const{ return "Arrived at Veilstone City Pokemon Center."; }
 std::string AutoStory_Checkpoint_116::end_text()   const{ return "Healed at Veilstone City Pokemon Center."; }
 void AutoStory_Checkpoint_116::run_checkpoint(
@@ -2670,7 +2675,7 @@ void AutoStory_Checkpoint_116::run_checkpoint(
     checkpoint_116(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_117::name()       const{ return "117 - Segment 08 - Healed at Veilstone Pokemon Center"; }
+std::string AutoStory_Checkpoint_117::name()       const{ return "117 - S08 - Healed at Veilstone Pokemon Center"; }
 std::string AutoStory_Checkpoint_117::start_text() const{ return "Healed at Veilstone City Pokemon Center."; }
 std::string AutoStory_Checkpoint_117::end_text()   const{ return "Entered Team Galactic Warehouse."; }
 void AutoStory_Checkpoint_117::run_checkpoint(
@@ -2682,7 +2687,7 @@ void AutoStory_Checkpoint_117::run_checkpoint(
     checkpoint_117(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_118::name()       const{ return "118 - Segment 08 - Entered Team Galactic Warehouse"; }
+std::string AutoStory_Checkpoint_118::name()       const{ return "118 - S08 - Entered Team Galactic Warehouse"; }
 std::string AutoStory_Checkpoint_118::start_text() const{ return "Entered Team Galactic Warehouse."; }
 std::string AutoStory_Checkpoint_118::end_text()   const{ return "Got out of the warehouse with the key."; }
 void AutoStory_Checkpoint_118::run_checkpoint(
@@ -2694,7 +2699,7 @@ void AutoStory_Checkpoint_118::run_checkpoint(
     checkpoint_118(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_119::name()       const{ return "119 - Segment 08 - Fly back to Veilstone Pokemon Center for healing"; }
+std::string AutoStory_Checkpoint_119::name()       const{ return "119 - S08 - Fly back to Veilstone Pokemon Center for healing"; }
 std::string AutoStory_Checkpoint_119::start_text() const{ return "Got out of the warehouse with the key."; }
 std::string AutoStory_Checkpoint_119::end_text()   const{ return "Entered Veilstone Pokemon Center for healing."; }
 void AutoStory_Checkpoint_119::run_checkpoint(
@@ -2706,7 +2711,7 @@ void AutoStory_Checkpoint_119::run_checkpoint(
     checkpoint_119(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_120::name()       const{ return "120 - Segment 08 - Heal Pokemon"; }
+std::string AutoStory_Checkpoint_120::name()       const{ return "120 - S08 - Heal Pokemon"; }
 std::string AutoStory_Checkpoint_120::start_text() const{ return "Entered Veilstone Pokemon Center for healing."; }
 std::string AutoStory_Checkpoint_120::end_text()   const{ return "Exited Veilstone Pokemon Center."; }
 void AutoStory_Checkpoint_120::run_checkpoint(
@@ -2718,7 +2723,7 @@ void AutoStory_Checkpoint_120::run_checkpoint(
     checkpoint_120(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_121::name()       const{ return "121 - Segment 08 - Go to Galactic HQ"; }
+std::string AutoStory_Checkpoint_121::name()       const{ return "121 - S08 - Go to Galactic HQ"; }
 std::string AutoStory_Checkpoint_121::start_text() const{ return "Exited Veilstone Pokemon Center."; }
 std::string AutoStory_Checkpoint_121::end_text()   const{ return "Entered Galactic HQ."; }
 void AutoStory_Checkpoint_121::run_checkpoint(
@@ -2730,7 +2735,7 @@ void AutoStory_Checkpoint_121::run_checkpoint(
     checkpoint_121(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_122::name()       const{ return "122 - Segment 08 - Deal with Cyrus at the Galactic HQ"; }
+std::string AutoStory_Checkpoint_122::name()       const{ return "122 - S08 - Deal with Cyrus at the Galactic HQ"; }
 std::string AutoStory_Checkpoint_122::start_text() const{ return "Entered Galactic HQ."; }
 std::string AutoStory_Checkpoint_122::end_text()   const{ return "Dealt with Cyrus and left the Galactic HQ."; }
 void AutoStory_Checkpoint_122::run_checkpoint(
@@ -2742,7 +2747,7 @@ void AutoStory_Checkpoint_122::run_checkpoint(
     checkpoint_122(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_123::name()       const{ return "123 - Segment 08 - Fly to Oreburgh City"; }
+std::string AutoStory_Checkpoint_123::name()       const{ return "123 - S08 - Fly to Oreburgh City"; }
 std::string AutoStory_Checkpoint_123::start_text() const{ return "Dealt with Cyrus and left the Galactic HQ."; }
 std::string AutoStory_Checkpoint_123::end_text()   const{ return "Flew to Oreburgh city and entered Pokemon Center."; }
 void AutoStory_Checkpoint_123::run_checkpoint(
@@ -2754,7 +2759,7 @@ void AutoStory_Checkpoint_123::run_checkpoint(
     checkpoint_123(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_124::name()       const{ return "124 - Segment 08 - Heal Pokemon at Oreburgh City Pokemon Center"; }
+std::string AutoStory_Checkpoint_124::name()       const{ return "124 - S08 - Heal Pokemon at Oreburgh City Pokemon Center"; }
 std::string AutoStory_Checkpoint_124::start_text() const{ return "Flew to Oreburgh City and entered Pokemon Center."; }
 std::string AutoStory_Checkpoint_124::end_text()   const{ return "Healed Pokemon at Oreburgh City Pokemon Center."; }
 void AutoStory_Checkpoint_124::run_checkpoint(
@@ -2766,7 +2771,7 @@ void AutoStory_Checkpoint_124::run_checkpoint(
     checkpoint_124(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_125::name()       const{ return "125 - Segment 08 - Go from Oreburgh City to Mount Coronet entrance"; }
+std::string AutoStory_Checkpoint_125::name()       const{ return "125 - S08 - Go from Oreburgh City to Mount Coronet entrance"; }
 std::string AutoStory_Checkpoint_125::start_text() const{ return "Healed Pokemon at Oreburgh City Pokemon Center."; }
 std::string AutoStory_Checkpoint_125::end_text()   const{ return "Entered Mount Coronet."; }
 void AutoStory_Checkpoint_125::run_checkpoint(
@@ -2778,7 +2783,7 @@ void AutoStory_Checkpoint_125::run_checkpoint(
     checkpoint_125(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_126::name()       const{ return "126 - Segment 08 - Go through Mt. Coronet to deal with Cyrus and Dialga/Palkia"; }
+std::string AutoStory_Checkpoint_126::name()       const{ return "126 - S08 - Go through Mt. Coronet to deal with Cyrus and Dialga/Palkia"; }
 std::string AutoStory_Checkpoint_126::start_text() const{ return "Entered Mount Coronet."; }
 std::string AutoStory_Checkpoint_126::end_text()   const{ return "Exited Mt. Coronet, having dealt with Cyrus."; }
 void AutoStory_Checkpoint_126::run_checkpoint(
@@ -2790,7 +2795,7 @@ void AutoStory_Checkpoint_126::run_checkpoint(
     checkpoint_126(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_127::name()       const{ return "127 - Segment 08 - Fly to Veilstone City"; }
+std::string AutoStory_Checkpoint_127::name()       const{ return "127 - S08 - Fly to Veilstone City"; }
 std::string AutoStory_Checkpoint_127::start_text() const{ return "Exited Mt. Coronet, having dealt with Cyrus."; }
 std::string AutoStory_Checkpoint_127::end_text()   const{ return "Entered the Veilstone Pokemon Center."; }
 void AutoStory_Checkpoint_127::run_checkpoint(
@@ -2802,7 +2807,7 @@ void AutoStory_Checkpoint_127::run_checkpoint(
     checkpoint_127(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_128::name()       const{ return "126 - Segment 08 - Heal and exit"; }
+std::string AutoStory_Checkpoint_128::name()       const{ return "126 - S08 - Heal and exit"; }
 std::string AutoStory_Checkpoint_128::start_text() const{ return "Entered the Veilstone Pokemon Center."; }
 std::string AutoStory_Checkpoint_128::end_text()   const{ return "Exited the Veilstone Pokemon Center."; }
 void AutoStory_Checkpoint_128::run_checkpoint(
@@ -2814,7 +2819,7 @@ void AutoStory_Checkpoint_128::run_checkpoint(
     checkpoint_128(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_129::name()       const{ return "129 - Segment 08 - Go to house South of Veilstone City"; }
+std::string AutoStory_Checkpoint_129::name()       const{ return "129 - S08 - Go to house South of Veilstone City"; }
 std::string AutoStory_Checkpoint_129::start_text() const{ return "Exited the Veilstone Pokemon Center."; }
 std::string AutoStory_Checkpoint_129::end_text()   const{ return "Arrived at the house South of Veilstone City."; }
 void AutoStory_Checkpoint_129::run_checkpoint(
@@ -2826,7 +2831,7 @@ void AutoStory_Checkpoint_129::run_checkpoint(
     checkpoint_129(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_130::name()       const{ return "130 - Segment 08 - Go through the house South of Veilstone City"; }
+std::string AutoStory_Checkpoint_130::name()       const{ return "130 - S08 - Go through the house South of Veilstone City"; }
 std::string AutoStory_Checkpoint_130::start_text() const{ return "Arrived at the house South of Veilstone City."; }
 std::string AutoStory_Checkpoint_130::end_text()   const{ return "Exited the house South of Veilstone City."; }
 void AutoStory_Checkpoint_130::run_checkpoint(
@@ -2838,7 +2843,7 @@ void AutoStory_Checkpoint_130::run_checkpoint(
     checkpoint_130(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_131::name()       const{ return "131 - Segment 08 - Go through routes 214 and 222 to the house West of Sunyshore City"; }
+std::string AutoStory_Checkpoint_131::name()       const{ return "131 - S08 - Go through routes 214 and 222 to the house West of Sunyshore City"; }
 std::string AutoStory_Checkpoint_131::start_text() const{ return "Exited house South of Veilstone City."; }
 std::string AutoStory_Checkpoint_131::end_text()   const{ return "Entered the house West of Sunyshore City."; }
 void AutoStory_Checkpoint_131::run_checkpoint(
@@ -2850,7 +2855,7 @@ void AutoStory_Checkpoint_131::run_checkpoint(
     checkpoint_131(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_132::name()       const{ return "132 - Segment 08 - Go through the house West of Sunyshore City"; }
+std::string AutoStory_Checkpoint_132::name()       const{ return "132 - S08 - Go through the house West of Sunyshore City"; }
 std::string AutoStory_Checkpoint_132::start_text() const{ return "Entered the house West of Sunyshore City."; }
 std::string AutoStory_Checkpoint_132::end_text()   const{ return "Entered Sunyshore City."; }
 void AutoStory_Checkpoint_132::run_checkpoint(
@@ -2862,7 +2867,7 @@ void AutoStory_Checkpoint_132::run_checkpoint(
     checkpoint_132(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_133::name()       const{ return "133 - Segment 08 - Go to Sunyshore City's lighthouse"; }
+std::string AutoStory_Checkpoint_133::name()       const{ return "133 - S08 - Go to Sunyshore City's lighthouse"; }
 std::string AutoStory_Checkpoint_133::start_text() const{ return "Entered Sunyshore City."; }
 std::string AutoStory_Checkpoint_133::end_text()   const{ return "Entered Sunyshore City's lighthouse."; }
 void AutoStory_Checkpoint_133::run_checkpoint(
@@ -2874,7 +2879,7 @@ void AutoStory_Checkpoint_133::run_checkpoint(
     checkpoint_133(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_134::name()       const{ return "134 - Segment 08 - Talk to Volkner at the lighthouse"; }
+std::string AutoStory_Checkpoint_134::name()       const{ return "134 - S08 - Talk to Volkner at the lighthouse"; }
 std::string AutoStory_Checkpoint_134::start_text() const{ return "Entered Sunyshore City's lighthouse."; }
 std::string AutoStory_Checkpoint_134::end_text()   const{ return "Exited Sunyshore City's lighthouse."; }
 void AutoStory_Checkpoint_134::run_checkpoint(
@@ -2886,7 +2891,7 @@ void AutoStory_Checkpoint_134::run_checkpoint(
     checkpoint_134(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_135::name()       const{ return "135 - Segment 08 - Go to the Sunyshore City gym"; }
+std::string AutoStory_Checkpoint_135::name()       const{ return "135 - S08 - Go to the Sunyshore City gym"; }
 std::string AutoStory_Checkpoint_135::start_text() const{ return "Exited Sunyshore City's lighthouse."; }
 std::string AutoStory_Checkpoint_135::end_text()   const{ return "Entered Sunyshore City's gym."; }
 void AutoStory_Checkpoint_135::run_checkpoint(

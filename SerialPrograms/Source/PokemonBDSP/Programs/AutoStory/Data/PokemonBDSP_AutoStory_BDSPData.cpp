@@ -87,6 +87,7 @@ struct BDSPMoveDatabase{
             move.base_power = (uint8_t)obj.get_integer_throw("base_power", path);
             move.pp         = (uint8_t)obj.get_integer_throw("pp", path);
             move.spread     = obj.get_boolean_throw("spread", path);
+            move.accuracy   = (uint8_t)obj.get_integer_default("accuracy", 100);
         }
     }
 };
@@ -208,6 +209,7 @@ struct BDSPTrainerDatabase{
                         };
                         parse_stat_set(tp.ivs, "ivs");
                         parse_stat_set(tp.evs, "evs");
+                        tp.has_intimidate = p_obj.get_boolean_default("intimidate", false);
 
                         trainer.pokemon.push_back(std::move(tp));
                     }

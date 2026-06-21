@@ -40,7 +40,12 @@ public:
         AutoStoryStats& stats
     ) const override;
 };
-void checkpoint_111(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats);
+void checkpoint_111(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+);
 
 class AutoStory_Checkpoint_112 : public AutoStory_Checkpoint{
 public:

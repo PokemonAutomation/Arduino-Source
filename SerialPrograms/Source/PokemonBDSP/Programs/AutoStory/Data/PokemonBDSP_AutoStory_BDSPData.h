@@ -30,6 +30,7 @@ struct BDSPMoveData{
     uint8_t      base_power;
     uint8_t      pp;
     bool         spread;
+    uint8_t      accuracy;  // 0 = never-miss (e.g. Swift); otherwise 1-100
 };
 
 //  Returns move data for the given slug (e.g. "earthquake").
@@ -79,6 +80,7 @@ struct BDSPTrainerPokemon{
     uint8_t     level;
     BDSPStatSet ivs;
     BDSPStatSet evs;
+    bool        has_intimidate = false;
 };
 
 struct BDSPTrainer{
