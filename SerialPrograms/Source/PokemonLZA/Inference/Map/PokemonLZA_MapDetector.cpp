@@ -39,15 +39,16 @@ public:
     }
 };
 
-// Search box covering the left menu strip where the Y / Travel Spots label appears.
-// Measured: icon at ~(0.044, 0.24) at both 720p and 1080p.
-const ImageFloatBox TRAVEL_SPOT_BOX(0.040000, 0.227000, 0.025000, 0.050000);
+const ImageFloatBox TRAVEL_SPOT_BOX(0.040000, 0.235000, 0.030000, 0.068500);
 
 // Progressive cyan filters to handle capture-card color variance.
 const std::vector<std::pair<uint32_t, uint32_t>> CYAN_FILTERS = {
+    // Brighter cyan/teal.
     {0xff004898, 0xff70ffff},
     {0xff003878, 0xff80ffff},
-    {0xff002858, 0xff90ffff},
+    // Darker/desaturated cyan seen in some captures (e.g. 1080p hyperspace_True).
+    {0xff002860, 0xff90ffff},
+    {0xff001c50, 0xffa0ffff},
 };
 
 bool detect_travel_spot(const ImageViewRGB32& screen){
