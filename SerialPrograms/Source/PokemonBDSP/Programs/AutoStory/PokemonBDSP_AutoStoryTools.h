@@ -10,6 +10,7 @@
 #include <functional>
 #include <string>
 #include <chrono>
+#include <vector>
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Language.h"
@@ -86,6 +87,14 @@ enum class TorterraMove{
 
 //  Returns the JSON slug for a TorterraMove (e.g. "earthquake").
 const char* torterra_move_slug(TorterraMove move);
+
+enum class Trainer {
+    Veilstone_GalacticGrunts_2v2,
+    // Extend with new trainer battle IDs as the AutoStory adds them.
+};
+
+//  Returns the trainers.json battle-ID string for a Trainer value.
+const char* trainer_slug(Trainer t);
 
 struct OutsideHelpConfig{
     OutsideHelpPokemon pokemon;
@@ -231,16 +240,11 @@ bool activate_repel(
     int num_icons = 8
 );
 
-//  Press A until the Strength selection arrow appears, confirm with A, then mash B for 3 s.
-void use_strength(
+//  Press A until the any HM selection arrow appears, confirm with A, then mash B for 3 s.
+void use_HM(
     VideoStream& stream,
-    ProControllerContext& context
-);
-
-//  Press A until the Rock Smash selection arrow appears, confirm with A, then mash B for 3 s.
-void use_rock_smash(
-    VideoStream& stream,
-    ProControllerContext& context
+    ProControllerContext& context,
+    const std::string& label
 );
 
 //  Walk to the nurse, heal the party, and exit the Pokemon Center.
@@ -301,6 +305,46 @@ void use_potion_first_pokemon(
 enum class GearLevel {
     Fast,
 };
+
+
+// ---------------------------------------------------------------------------
+//  Mart buying
+// ---------------------------------------------------------------------------
+
+enum class ShopItem {
+    FullRestore,
+    MaxPotion,
+    HyperPotion,
+    SuperPotion,
+    Potion,
+    Antidote,
+    ParalyzHeal,
+    Awakening,
+    Repel,
+    SuperRepel,
+    MaxRepel,
+    EscapeRope,
+};
+
+// Pass as the `quantity` field to buy the maximum available amount.
+static constexpr int BUY_MAX = -1;
+
+struct ItemToBuy {
+    ShopItem item;
+    int      quantity;  // positive count to buy, or BUY_MAX
+};
+
+// Walk up to a vendor (already talking to them), navigate through the Buy menu,
+// and purchase each item in `items` in order. The function presses DPAD_DOWN
+// until the matching item name is found via OCR, so items may appear in any
+// list order. Returns true on success.
+bool buy_items(
+    VideoStream& stream,
+    ProControllerContext& context,
+    const std::vector<ItemToBuy>& items,
+    Language language = Language::English
+);
+
 
 // Mount the bicycle (press +) and confirm it is in the requested gear.
 // Presses B to toggle gear and uses the Fast-gear spark visual effect to
