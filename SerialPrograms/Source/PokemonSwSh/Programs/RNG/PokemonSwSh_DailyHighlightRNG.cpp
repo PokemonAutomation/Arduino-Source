@@ -20,6 +20,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.h"
@@ -179,12 +180,17 @@ void DailyHighlightRNG::move_to_trader(SingleSwitchProgramEnvironment& env, ProC
 void DailyHighlightRNG::interact_with_trader(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     VideoOverlaySet boxes(env.console);
     SelectionArrowFinder arrow_detector(env.console, ImageFloatBox(0.5, 0.58, 0.2, 0.08));
-    arrow_detector.make_overlays(boxes);
     YCommIconWatcher y_comm_icon_detector;
+    DialogTriangleWatcher triangle_detector(COLOR_DARKGREEN);
     size_t tries = 0;
 
     while (true){
-        if (tries >= 5){
+        context.wait_for_all_requests();
+        int ret = wait_until(env.console, context, 1000ms, { y_comm_icon_detector, triangle_detector, arrow_detector });
+        if (ret == 2) {
+            return;
+        }
+        if (tries >= 10){
             DailyHighlightRNG_Descriptor::Stats& stats = env.current_stats<DailyHighlightRNG_Descriptor::Stats>();
             stats.errors++;
             OperationFailedException::fire(
@@ -193,15 +199,11 @@ void DailyHighlightRNG::interact_with_trader(SingleSwitchProgramEnvironment& env
                 env.console
             );
         }
-        context.wait_for_all_requests();
-        int ret = wait_until(env.console, context, 500ms, { y_comm_icon_detector, arrow_detector });
-        if (ret == -1 || ret == 0){
-            tries++;
+        tries++;
+        if (ret == 0 || ret == 1){
             pbf_press_button(context, BUTTON_A, 80ms, 80ms);
         }
-        else if (ret == 1){
-            return;
-        }
+        // ret == -1: probably an inbetween screen; no a press
     }
 }
 
