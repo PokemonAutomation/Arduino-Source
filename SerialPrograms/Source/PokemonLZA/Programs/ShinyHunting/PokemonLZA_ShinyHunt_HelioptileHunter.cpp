@@ -67,7 +67,7 @@ std::unique_ptr<StatsTracker> ShinyHunt_HelioptileHunter_Descriptor::make_stats(
 }
 
 ShinyHunt_HelioptileHunter::ShinyHunt_HelioptileHunter()
-    : END_AFTER_CYCLE("<b>How Many cycles before stopping. 0 for never stop.</b>",
+    : END_AFTER_CYCLE("<b>How many loops before stopping. 0 for never stop.</b>",
         LockMode::LOCK_WHILE_RUNNING,
         0, 0, 32*30
     )
@@ -85,7 +85,7 @@ ShinyHunt_HelioptileHunter::ShinyHunt_HelioptileHunter()
 
 bool proper_weather(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     
-    open_map(env.console, context, true, true);
+    open_map(env.console, context, false, true);
     context.wait_for_all_requests();
 
     // zoom fully in
@@ -125,7 +125,31 @@ void bench_loop(SingleSwitchProgramEnvironment& env, ProControllerContext& conte
     }
 }
 
-void find_weather(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool is_night_time){
+bool check_if_night_time(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    open_map(env.console, context, false, true);
+    context.wait_for_all_requests();
+
+    // zoom fully in
+    pbf_move_right_joystick(context, {0, 1}, 900ms, 120ms);
+    context.wait_for_all_requests();
+    // hide icons
+    pbf_press_button(context, BUTTON_MINUS, 80ms, 120ms);
+    context.wait_for_all_requests();
+
+    VideoSnapshot screen = env.console.video().snapshot();
+    DayNightStateDetector dayNightDetector(&env.console.overlay());
+    dayNightDetector.detect(screen);
+    bool night_time = dayNightDetector.state() == DayNightState::NIGHT;
+
+    env.log(std::string("Starting time=") + (night_time ? "Night" : "Day"));
+    pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms);
+    context.wait_for_all_requests();
+
+    return night_time;
+}
+
+void find_weather(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    bool is_night_time = check_if_night_time(env, context);
     context.wait_for_all_requests();
     env.log("Starting weather loop");
     bench_loop(env, context, (is_night_time) ? 1 : 2);
@@ -230,17 +254,28 @@ void ShinyHunt_HelioptileHunter::program(SingleSwitchProgramEnvironment& env, Pr
     require_player(env.console, context, BUTTON_L);
 
     ShinyHunt_HelioptileHunter_Descriptor::Stats& stats = env.current_stats<ShinyHunt_HelioptileHunter_Descriptor::Stats>();
-    
+   
+    auto stop_requested = [&]() {
+        return END_AFTER_CYCLE.current_value() > 0
+            && stats.loops.load() >= END_AFTER_CYCLE.current_value();
+    };
+
     while(true){
         
-        if (END_AFTER_CYCLE.current_value() > 0 && END_AFTER_CYCLE.current_value() == stats.cycles.load()){
+        if (stop_requested()) {
             go_home(env.console, context);
             send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
-            break;
+            return;
         }
 
         int hunt_loops = 0;
         while (hunt_loops < 65){
+            if (stop_requested()) {
+                go_home(env.console, context);
+                send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+                return;
+            }
+
             // On startup and every 65 hunt loops, force a return to the bench
             // and re-roll/check weather conditions. This ensures the hunt does
             // not continue indefinitely after the desired daytime sunny/clear
@@ -248,7 +283,7 @@ void ShinyHunt_HelioptileHunter::program(SingleSwitchProgramEnvironment& env, Pr
             if (!proper_weather(env,context) || (hunt_loops == 0)){
                 env.log("Not correct weather");
                 reach_bench(env, context);
-                find_weather(env, context, false);
+                find_weather(env, context);
                 warp_wild_zone_14(env, context);
                 hunt_loops = 0;
             }else{
