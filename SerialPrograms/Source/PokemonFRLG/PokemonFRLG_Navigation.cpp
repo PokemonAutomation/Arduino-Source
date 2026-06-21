@@ -7,6 +7,7 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Random.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
@@ -306,15 +307,15 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
         shiny_coefficient = error_coefficient;
         return true;
     });
-    AdvanceBattleDialogWatcher legendary_appeared(COLOR_YELLOW);
-
+    AdvanceBattleDialogWatcher battle_dialog(COLOR_YELLOW);
+    
     int res = run_until<ProControllerContext>(
         console, context,
         [&](ProControllerContext& context){
             int ret = wait_until(
                 console, context,
                 std::chrono::seconds(30), //More than enough time for shiny sound
-                {{legendary_appeared}}
+                {{battle_dialog}}
             );
             if (ret == 0){
                 console.log("Battle Advance arrow detected.");
@@ -366,24 +367,42 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
         //Send out lead, no shiny detection needed. (Or wanted.)
         BattleMenuWatcher battle_menu(COLOR_RED);
         console.log("Sending out lead Pokemon.");
-        pbf_press_button(context, BUTTON_A, 320ms, 320ms);
+        WallClock start = current_time();
+        
+        while (true){
+            if (current_time() - start > 60s){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "handle_encounter(): No battle menu detected after sixty seconds.",
+                    console
+                );
+            }
+            pbf_press_button(context, BUTTON_B, 320ms, 320ms);
 
-        int ret = wait_until(
-            console, context,
-            std::chrono::seconds(15),
-            { {battle_menu} }
-        );
-        if (ret == 0){
-            console.log("Battle menu detecteed!");
-        }else{
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "handle_encounter(): Did not detect battle menu.",
-                console
+            int ret = wait_until(
+                console, context,
+                std::chrono::seconds(15),
+                { {battle_menu, battle_dialog} }
             );
+
+            switch (ret){
+            case 0:
+                console.log("Battle menu detecteed!");
+                break;
+            case 1:
+                console.log("Battle Advance arrow detected. This is likely due to an ability triggering at the start of battle.");
+                pbf_press_button(context, BUTTON_B, 320ms, 320ms);
+                context.wait_for_all_requests();
+                continue;
+            default:
+                console.log("Did not detect battle menu or battle dialog.");
+                continue;
+            }
+
+            pbf_wait(context, 1000ms);
+            context.wait_for_all_requests();
+            break;
         }
-        pbf_wait(context, 1000ms);
-        context.wait_for_all_requests();
     }
 
     return false;
