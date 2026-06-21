@@ -69,7 +69,11 @@ std::unique_ptr<StatsTracker> ShinyHunt_HelioptileHunter_Descriptor::make_stats(
 }
 
 ShinyHunt_HelioptileHunter::ShinyHunt_HelioptileHunter()
-    : END_AFTER_CYCLE("<b>How many loops before stopping. 0 for never stop.</b>",
+    : END_AFTER_CYCLE("<b>How many cycles before stopping. 0 for never stop.</b><br>"
+        "<br>"
+        "<b>Cycle Definition:</b><br>"
+        "A cycle consists of entering Wild Zone 14 a total of 65 times. "
+        "After 65 entries, the program resets the day before continuing.",
         LockMode::LOCK_WHILE_RUNNING,
         0, 0, 32*30
     )
@@ -256,28 +260,17 @@ void ShinyHunt_HelioptileHunter::program(SingleSwitchProgramEnvironment& env, Pr
     require_player(env.console, context, BUTTON_L);
 
     ShinyHunt_HelioptileHunter_Descriptor::Stats& stats = env.current_stats<ShinyHunt_HelioptileHunter_Descriptor::Stats>();
-   
-    auto stop_requested = [&]() {
-        return END_AFTER_CYCLE.current_value() > 0
-            && stats.loops.load() >= END_AFTER_CYCLE.current_value();
-    };
-
+    
     while(true){
         
-        if (stop_requested()) {
+        if (END_AFTER_CYCLE.current_value() > 0 && END_AFTER_CYCLE.current_value() == stats.cycles.load()){
             go_home(env.console, context);
             send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
-            return;
+            break;
         }
 
         int hunt_loops = 0;
         while (hunt_loops < 65){
-            if (stop_requested()) {
-                go_home(env.console, context);
-                send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
-                return;
-            }
-
             // On startup and every 65 hunt loops, force a return to the bench
             // and re-roll/check weather conditions. This ensures the hunt does
             // not continue indefinitely after the desired daytime sunny/clear
