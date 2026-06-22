@@ -718,15 +718,15 @@ static bool go_through_warehouse(
             pbf_wait(context, 1000ms);
 
             {
-                BlackScreenFlashWatcher black_screen(COLOR_BLUE, {0.1, 0.1, 0.8, 0.8});
-                int ret = run_until<ProControllerContext>(
+                BlackScreenFlashWatcher room_transition(COLOR_BLUE, {0.1, 0.1, 0.8, 0.8});
+                int ret1 = run_until<ProControllerContext>(
                     stream, context,
                     [](ProControllerContext& context){
                         pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
                     },
-                    {{black_screen}}
+                    {{room_transition}}
                 );
-                if (ret < 0){
+                if (ret1 < 0){
                     stream.log("go_through_warehouse: black screen not detected!", COLOR_RED);
                     return false;
                 }
