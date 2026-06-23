@@ -175,7 +175,7 @@ private:
 
         size_t consecutive_errors = m_consecutive_errors.fetch_add(1);
 
-        serial_debug_log(message);
+//        serial_debug_log(message);
 
         std::string clear_error;
         DWORD comm_error;
