@@ -57,6 +57,13 @@ void DownloadThread::start_download_thread(){
         });
 
         try {
+
+            // Logger& logger = global_logger_tagged();
+            // throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
+            //         "Test");
+            // throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Test."); 
+
+
             // std::this_thread::sleep_for(std::chrono::seconds(7));
 
             run_download(m_remote_metadata);
@@ -72,12 +79,12 @@ void DownloadThread::start_download_thread(){
             success = false;
             m_hooks.report_failed();
         }catch (const std::exception& e) {
-            std::cout << "Standard exception: " << e.what() << std::endl;
+            std::string error_msg = "DownloadThread::start_download_thread: " + std::string(e.what());
             success = false;
-            m_hooks.report_exception_caught("DownloadThread::start_download_thread");
+            m_hooks.report_exception_caught(error_msg.c_str());
         } catch(...){
             success = false;
-            m_hooks.report_exception_caught("DownloadThread::start_download_thread");
+            m_hooks.report_exception_caught("DownloadThread::start_download_thread: Unknown exception. Report this as an error.");
         }
 
     }
