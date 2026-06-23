@@ -16,7 +16,6 @@
 #include "ResourceDownloadHelpers.h"
 #include "ResourceDownload.h"
 #include "SettingsResourceDownloadOptions.h"
-#include "SettingsResourceDownloadTable.h"
 // #include <mutex>
 
 namespace PokemonAutomation{
