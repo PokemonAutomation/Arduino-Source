@@ -43,7 +43,7 @@ std::vector<std::unique_ptr<SettingsResourceDownloadRow>> SettingsResourceDownlo
 
         auto [is_downloaded, version_status, current_version_num] = get_local_version_info(resource_name);
 
-        resource_rows.emplace_back(std::make_unique<SettingsResourceDownloadRow>(*this, resource_name, resource, is_downloaded, current_version_num, version_status));
+        resource_rows.emplace_back(std::make_unique<SettingsResourceDownloadRow>(resource_name, resource, is_downloaded, current_version_num, version_status));
     }
 
     return resource_rows;

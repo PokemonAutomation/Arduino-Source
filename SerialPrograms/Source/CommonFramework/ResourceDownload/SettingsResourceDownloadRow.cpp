@@ -118,7 +118,6 @@ SettingsResourceDownloadRow::~SettingsResourceDownloadRow(){
     m_delete_thread.wait_and_ignore_exceptions();
 }
 SettingsResourceDownloadRow::SettingsResourceDownloadRow(
-    SettingsResourceDownloadTable& parent_table,
     std::string resource_slug,
     DownloadedResourceMetadata local_metadata,
     bool is_downloaded,
@@ -126,7 +125,6 @@ SettingsResourceDownloadRow::SettingsResourceDownloadRow(
     ResourceVersionStatus version_status
 )
     : StaticTableRow(local_metadata.resource_name)
-    , m_parent_table(parent_table)
     , m_action_state(ActionState::READY)
     , m_resource_slug(resource_slug)
     , m_local_metadata(local_metadata)

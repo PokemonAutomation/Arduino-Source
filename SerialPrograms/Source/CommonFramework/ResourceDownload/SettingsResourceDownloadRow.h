@@ -35,7 +35,6 @@ class SettingsResourceDownloadRow : public StaticTableRow, public ResourceDownlo
 public:
     ~SettingsResourceDownloadRow();
     SettingsResourceDownloadRow(
-        SettingsResourceDownloadTable& parent_table,
         std::string resource_slug,
         DownloadedResourceMetadata local_metadata,
         bool is_downloaded,
@@ -106,8 +105,6 @@ public:
     void connect_with_download(std::shared_ptr<ResourceDownload> download_ptr);
 
 private:
-    SettingsResourceDownloadTable& m_parent_table;
-
     ActionState m_action_state;
     std::string m_resource_slug;
     DownloadedResourceMetadata m_local_metadata;
