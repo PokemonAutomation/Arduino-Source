@@ -496,12 +496,24 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Recording/StreamRecorder.h
     Source/CommonFramework/ResourceDownload/DownloadThread.cpp
     Source/CommonFramework/ResourceDownload/DownloadThread.h
-    Source/CommonFramework/ResourceDownload/RequiredDownload.cpp
-    Source/CommonFramework/ResourceDownload/RequiredDownload.h
-    Source/CommonFramework/ResourceDownload/RequiredDownloadManager.cpp
-    Source/CommonFramework/ResourceDownload/RequiredDownloadManager.h
+    Source/CommonFramework/ResourceDownload/ProgramMissingResourceTracker.cpp
+    Source/CommonFramework/ResourceDownload/ProgramMissingResourceTracker.h
+    Source/CommonFramework/ResourceDownload/ResourceDownload.cpp
+    Source/CommonFramework/ResourceDownload/ResourceDownload.h
+    Source/CommonFramework/ResourceDownload/ProgramResourceDownloadWidget.cpp
+    Source/CommonFramework/ResourceDownload/ProgramResourceDownloadWidget.h
     Source/CommonFramework/ResourceDownload/ResourceDownloadHelpers.cpp
     Source/CommonFramework/ResourceDownload/ResourceDownloadHelpers.h
+    Source/CommonFramework/ResourceDownload/GlobalResourceDownloadManager.cpp
+    Source/CommonFramework/ResourceDownload/GlobalResourceDownloadManager.h
+    Source/CommonFramework/ResourceDownload/SettingsResourceDownloadOptions.cpp
+    Source/CommonFramework/ResourceDownload/SettingsResourceDownloadOptions.h
+    Source/CommonFramework/ResourceDownload/SettingsResourceDownloadRow.cpp
+    Source/CommonFramework/ResourceDownload/SettingsResourceDownloadRow.h
+    Source/CommonFramework/ResourceDownload/SettingsResourceDownloadTable.cpp
+    Source/CommonFramework/ResourceDownload/SettingsResourceDownloadTable.h
+    Source/CommonFramework/ResourceDownload/SettingsResourceDownloadWidget.cpp
+    Source/CommonFramework/ResourceDownload/SettingsResourceDownloadWidget.h
     Source/CommonFramework/Startup/NewVersionCheck.cpp
     Source/CommonFramework/Startup/NewVersionCheck.h
     Source/CommonFramework/Startup/SetupSettings.cpp

@@ -151,6 +151,24 @@ void MultiSwitchProgramSession::internal_stop_program(){
     }
 }
 void MultiSwitchProgramSession::internal_run_program(){
+    CancellableHolder<CancellableScope> download_scope;
+    {
+        std::lock_guard<Mutex> lg(program_lock());
+        if (current_state() != ProgramState::RUNNING){
+            return;
+        }
+        m_scope.store(&download_scope, std::memory_order_release);
+    }
+
+    bool success = download_prereqs(download_scope);
+    {
+        std::lock_guard<Mutex> lg(program_lock());
+        m_scope.store(nullptr, std::memory_order_release);
+    }    
+    if (!success){
+        return;
+    }
+        
     auto ScopeCheck = m_sanitizer.check_scope();
     m_option.options().reset_state();
 

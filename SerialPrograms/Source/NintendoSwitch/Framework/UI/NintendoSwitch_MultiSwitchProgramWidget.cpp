@@ -16,6 +16,7 @@
 #include "CommonFramework/Panels/PanelTools.h"
 #include "CommonFramework/Panels/UI/PanelElements.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonFramework/ResourceDownload/ProgramResourceDownloadWidget.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h"
 #include "NintendoSwitch_MultiSwitchProgramWidget.h"
@@ -103,6 +104,10 @@ MultiSwitchProgramWidget2::MultiSwitchProgramWidget2(
     m_actions_bar = new RunnablePanelActionBar(*this, m_session.current_state());
     layout->addWidget(m_actions_bar);
 
+    m_downloads_table = new ProgramResourceDownloadTableWidget(*this);
+    m_downloads_table->setVisible(false);
+    layout->addWidget(m_downloads_table);    
+
     connect(
         m_actions_bar, &RunnablePanelActionBar::start_clicked,
         this, [&](ProgramState state){
@@ -153,6 +158,10 @@ void MultiSwitchProgramWidget2::state_change(ProgramState state){
         }else{
             m_holder.on_busy();
         }
+
+        if(state == ProgramState::STOPPING){
+            m_downloads_table->remove_all_downloads();
+        }
     });
 }
 void MultiSwitchProgramWidget2::stats_update(const StatsTracker* current_stats, const StatsTracker* historical_stats){
@@ -171,6 +180,31 @@ void MultiSwitchProgramWidget2::error(const std::string& message){
         box.critical(nullptr, "Error", QString::fromStdString(message));
     });
 }
+
+void MultiSwitchProgramWidget2::download_error(const std::string& message){
+    if (m_popup_is_open.exchange(true)){ // only show popups if one isn't already open
+        return;
+    }
+    auto ScopeCheck = m_sanitizer.check_scope();
+    QMetaObject::invokeMethod(this, [message]{
+        QMessageBox box;
+        box.critical(nullptr, "Error", QString::fromStdString(message));
+    });
+    m_popup_is_open.store(false);
+}
+
+void MultiSwitchProgramWidget2::download_added(std::shared_ptr<ResourceDownload> download_ptr){
+    QMetaObject::invokeMethod(this, [this, download_ptr]{
+        this->m_downloads_table->add_download(std::move(download_ptr));
+    });
+}
+
+void MultiSwitchProgramWidget2::all_downloads_done(){
+    QMetaObject::invokeMethod(this, [this]{
+        this->m_downloads_table->remove_all_downloads();
+    });
+}
+
 
 void MultiSwitchProgramWidget2::redraw_options(){
     auto ScopeCheck = m_sanitizer.check_scope();
