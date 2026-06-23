@@ -39,29 +39,38 @@ enum class ResourceVersionStatus{
 };
 
 
+struct ResourceVersionInfo{
+    bool is_downloaded;
+    ResourceVersionStatus version_status;
+    std::optional<uint16_t> current_version_num;
+};
+
 // there are three lists:
-// - local_resource_download_list(): List of resources with the version numbers that the programs expect. from the local ResourceDownloadList.json
-// - list of resources downloaded locally. use get_version_status() to determine ResourceVersionStatus relative to the expected resource version number in the local list.
+// - expected_resource_download_list(): List of resources with the version numbers that the programs expect. from the local ResourceDownloadList.json
+// - list of resources downloaded locally. use get_local_version_info() to determine ResourceVersionStatus relative to the expected resource version number.
 // - remote_resource_download_list(): list of remote resources. the remote version numbers may or may not match the local list. from the remote ResourceDownloadList.json
 
-const std::vector<DownloadedResourceMetadata>& local_resource_download_list();
+const std::vector<DownloadedResourceMetadata>& expected_resource_download_list();
+
 const std::vector<DownloadedResourceMetadata>& remote_resource_download_list();
-std::optional<uint16_t> get_resource_version_num(Filesystem::Path folder_path);
 
-// for the given expected_resource, it tries to find its corresponding file downloaded locally.
-// it then returns the ResourceVersionStatus, which is the result of comparing the expected version number
-// (from the expected_resource) to the actual version number (from the downloaded file).
-// expected_resource is one of the items from local_resource_download_list(), which is a list of 
-// resources with the version numbers that the programs expect (from the local ResourceDownloadList.json).
-ResourceVersionStatus get_version_status(DownloadedResourceMetadata& expected_resource);
-ResourceVersionStatus compare_version_num(uint16_t expected_version_num, std::optional<uint16_t> current_version_num);
+// - This returns the version information for a resource that has been downloaded locally.
+// - This returns a struct containing a boolean representing whether the resource has been downloaded, 
+// the resource's version status (e.g. CURRENT, OUTDATED, NOT_APPLICABLE etc.), and its version number
+// - for the version status, it compares the version of the locally downloaded file to the 
+// corresponding expected_resource from expected_resource_download_list()
+ResourceVersionInfo get_local_version_info(const std::string& target_resource_slug);
 
 
-// ASSUMES: given resource_list has every resource_type within it
-DownloadedResourceMetadata get_resource_metadata_from_resource_type(const std::string& target_resource_type, const std::vector<DownloadedResourceMetadata>& resource_list);
+// - throws OperationFailedException if target_resource_slug isn't found within remote_resource_download_list
+// this would indicate that CC is out of date.
+// - also throws OperationFailedException if Internet is not turned on.
+DownloadedResourceMetadata get_remote_resource_metadata_from_resource_slug(const std::string& target_resource_slug);
 
+// ASSUMES: given target_resource_slug is listed within expected_resource_download_list().
+// PanelInstance::validate_resource_list() should ensure that target_resource_slug is valid.
+DownloadedResourceMetadata get_expected_resource_metadata_from_resource_slug(const std::string& target_resource_slug);
 
-bool is_resource_ready_in_queue(uint16_t max_concurrent_downloads, const std::string& resource_slug, const std::vector<std::string>& download_queue);
 
 const std::unordered_set<std::string>& all_resource_names();
 
