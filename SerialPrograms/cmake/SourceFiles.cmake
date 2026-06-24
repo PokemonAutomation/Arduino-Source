@@ -1478,6 +1478,7 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_PartyHeldItemDetector.h
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_PartyMenuDetector.cpp
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_PartyMenuDetector.h
+    Source/PokemonFRLG/Inference/Menus/PokemonFRLG_PartySlot.h
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_TrainerCardDetector.cpp
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_TrainerCardDetector.h
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_DexRegistrationDetector.cpp

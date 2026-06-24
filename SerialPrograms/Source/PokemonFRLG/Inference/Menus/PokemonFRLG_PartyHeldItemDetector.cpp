@@ -37,19 +37,19 @@ public:
     }
 };
 
-ImageFloatBox PartyHeldItemDetector::box_for_slot(PartyHeldItemSlot slot){
+ImageFloatBox PartyHeldItemDetector::box_for_slot(PartySlot slot){
     switch (slot){
-    case PartyHeldItemSlot::SLOT_1:
+    case PartySlot::ONE:
         return ImageFloatBox(0.069, 0.285, 0.025, 0.050);
-    case PartyHeldItemSlot::SLOT_2:
+    case PartySlot::TWO:
         return ImageFloatBox(0.432, 0.150, 0.025, 0.050);
-    case PartyHeldItemSlot::SLOT_3:
+    case PartySlot::THREE:
         return ImageFloatBox(0.432, 0.3, 0.025, 0.050);
-    case PartyHeldItemSlot::SLOT_4:
+    case PartySlot::FOUR:
         return ImageFloatBox(0.432, 0.45, 0.025, 0.050);
-    case PartyHeldItemSlot::SLOT_5:
+    case PartySlot::FIVE:
         return ImageFloatBox(0.432, 0.6, 0.025, 0.050);
-    case PartyHeldItemSlot::SLOT_6:
+    case PartySlot::SIX:
         return ImageFloatBox(0.432, 0.725, 0.025, 0.050);
     default:
         break;
@@ -60,7 +60,7 @@ ImageFloatBox PartyHeldItemDetector::box_for_slot(PartyHeldItemSlot slot){
 PartyHeldItemDetector::PartyHeldItemDetector(
     Color color,
     VideoOverlay* overlay,
-    PartyHeldItemSlot slot
+    PartySlot slot
 )
     : m_color(color)
     , m_overlay(overlay)

@@ -7,9 +7,10 @@
 #ifndef PokemonAutomation_PokemonFRLG_PartyEmptySlotDetector_H
 #define PokemonAutomation_PokemonFRLG_PartyEmptySlotDetector_H
 
+#include <chrono>
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/VisualDetector.h"
-#include "PokemonFRLG_PartyMenuDetector.h"
+#include "PokemonFRLG_PartySlot.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

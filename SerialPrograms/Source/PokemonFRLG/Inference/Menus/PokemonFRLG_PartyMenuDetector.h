@@ -14,22 +14,13 @@
 #include "CommonTools/VisualDetector.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "PokemonFRLG/PokemonFRLG_Settings.h"
+#include "PokemonFRLG_PartySlot.h"
 
 namespace PokemonAutomation{
     class CancellableScope;
     class VideoFeed;
 namespace NintendoSwitch{
 namespace PokemonFRLG{
-
-enum class PartySlot{
-    ONE,
-    TWO,
-    THREE,
-    FOUR,
-    FIVE,
-    SIX
-    //CXL
-};
 
 // The Party menu has a white box on the bottom
 // The background around the edges is dark teal/navy

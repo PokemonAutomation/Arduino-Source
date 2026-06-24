@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG_PartyEmptySlotDetector.h"
 
 namespace PokemonAutomation{
@@ -50,6 +51,7 @@ bool PartyEmptySlotDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 game_screen = extract_box_reference(screen, GAME_BOX);
     const auto stats = image_stats(extract_box_reference(game_screen, m_box));
     return stats.stddev.sum() < 20.0;
+}
 }
 }
 }
