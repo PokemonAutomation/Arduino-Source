@@ -15,6 +15,9 @@ using std::endl;
 
 namespace PokemonAutomation{
 
+ResourceDownload::~ResourceDownload(){
+    m_download_thread.cancel();
+}
 
 ResourceDownload::ResourceDownload(GlobalResourceDownloadManager& download_manager, DownloadedResourceMetadata resource_metadata, Mutex& lock, ConditionVariable& cv)
     : m_resource_metadata(resource_metadata)

@@ -23,6 +23,7 @@ class GlobalResourceDownloadManager;
 
 class ResourceDownload {
 public:
+    ~ResourceDownload();
     ResourceDownload(GlobalResourceDownloadManager& download_manager, DownloadedResourceMetadata resource_metadata, Mutex& lock, ConditionVariable& cv);
 
 public:
