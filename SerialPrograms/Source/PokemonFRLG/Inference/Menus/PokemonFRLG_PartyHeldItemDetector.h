@@ -7,22 +7,14 @@
 #ifndef PokemonAutomation_PokemonFRLG_PartyHeldItemDetector_H
 #define PokemonAutomation_PokemonFRLG_PartyHeldItemDetector_H
 
+#include <chrono>
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/VisualDetector.h"
+#include "PokemonFRLG_PartySlot.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
-
-
-enum class PartyHeldItemSlot{
-    SLOT_1,
-    SLOT_2,
-    SLOT_3,
-    SLOT_4,
-    SLOT_5,
-    SLOT_6
-};
 
 class PartyHeldItemDetector : public StaticScreenDetector{
 public:
@@ -34,10 +26,10 @@ public:
     PartyHeldItemDetector(
         Color color,
         VideoOverlay* overlay,
-        PartyHeldItemSlot slot
+        PartySlot slot
     );
 
-    static ImageFloatBox box_for_slot(PartyHeldItemSlot slot);
+    static ImageFloatBox box_for_slot(PartySlot slot);
 
     const ImageFloatBox& last_detected() const { return m_last_detected; }
 
@@ -69,7 +61,7 @@ public:
     PartyHeldItemWatcher(
         Color color,
         VideoOverlay* overlay,
-        PartyHeldItemSlot slot,
+        PartySlot slot,
         std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
     )
         : DetectorToFinder("PartyHeldItemWatcher", hold_duration, color, overlay, box_for_slot(slot))

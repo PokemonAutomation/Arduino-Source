@@ -6,6 +6,7 @@
  *
  */
 
+#include <array>
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Random.h"
@@ -24,11 +25,12 @@
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_PartyDialogs.h"
 #include "PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.h"
+#include "PokemonFRLG/Inference/Menus/PokemonFRLG_BagDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_LoadMenuDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_SummaryDetector.h"
+#include "PokemonFRLG/Inference/Menus/PokemonFRLG_PartyEmptySlotDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_PartyMenuDetector.h"
-#include "PokemonFRLG/Inference/Menus/PokemonFRLG_BagDetector.h"
 #include "PokemonFRLG/Inference/Map/PokemonFRLG_MapDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_BattlePokemonDetector.h"
 #include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
@@ -753,6 +755,26 @@ void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext
             continue;
         }
     }
+}
+
+PartySlot detect_last_occupied_party_slot(ConsoleHandle& console){
+    const auto snapshot = console.video().snapshot();
+    constexpr std::array slots{
+        PartySlot::SIX,
+        PartySlot::FIVE,
+        PartySlot::FOUR,
+        PartySlot::THREE,
+        PartySlot::TWO,
+    };
+
+    for (PartySlot slot : slots){
+        PartyEmptySlotDetector empty_slot_detector(COLOR_RED, slot);
+        if (!empty_slot_detector.detect(snapshot)){
+            return slot;
+        }
+    }
+
+    return PartySlot::ONE;
 }
 
 void open_bag_from_overworld(ConsoleHandle& console, ProControllerContext& context, StartMenuContext menu_context){
