@@ -42,6 +42,7 @@ private:
         DRAGON_FANG
     };
 
+    static EnumDropdownDatabase<ItemToFarm> item_to_farm_options();
 
     // After exiting the safari zone building navigate to grass with Chansey.
     // Currently only supports running. Should add Surf option...

@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "Common/Cpp/Options/ButtonOption.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -77,13 +78,22 @@ std::unique_ptr<StatsTracker> HeldItemFarmerSafariZone_Descriptor::make_stats() 
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
+EnumDropdownDatabase<HeldItemFarmerSafariZone::ItemToFarm> HeldItemFarmerSafariZone::item_to_farm_options(){
+    EnumDropdownDatabase<ItemToFarm> options{
+        {ItemToFarm::LUCKY_EGG, "Lucky Egg", "Farm Chansey for Lucky Eggs."},
+    };
+
+    if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
+        options.add(ItemToFarm::DRAGON_FANG, "Dragon Fang", "Farm Dragonair for Dragon Fangs.", true);
+    }
+
+    return options;
+}
+
 HeldItemFarmerSafariZone::HeldItemFarmerSafariZone()
     : ITEM_TO_FARM(
         "<b>Item to Farm:</b>",
-        {
-            {ItemToFarm::LUCKY_EGG, "Lucky Egg", "Farm Chansey for Lucky Eggs."},
-            {ItemToFarm::DRAGON_FANG, "Dragon Fang", "Farm Dragonair for Dragon Fangs."},
-        },
+        item_to_farm_options(),
         LockMode::LOCK_WHILE_RUNNING,
         ItemToFarm::LUCKY_EGG
     )
