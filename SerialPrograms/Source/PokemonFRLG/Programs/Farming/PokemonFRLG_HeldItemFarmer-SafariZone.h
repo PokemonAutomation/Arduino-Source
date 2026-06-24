@@ -64,11 +64,11 @@ private:
     bool attempt_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int& balls_left);
     // Opens the party menu from a given overworld location (safari zone, or the main safari zone building)
     // Checks the last four party slots for held items. Returns true if item detected.
-    bool check_for_held_item(ConsoleHandle& console, ProControllerContext& context, bool returned_to_building);
+    bool check_for_held_item(ConsoleHandle& console, ProControllerContext& context, bool returned_to_building, int party_count);
     // Handles the main loop once we are in the grass ready to search for a Chansey. 
     // Returns true if a stop condition is met (lucky egg or shiny found).
     // Returns false if we need to soft reset (out of safari balls, out of steps, caught a full party of Chansey).
-    bool run_safari_zone(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    bool run_safari_zone(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int party_count);
 
     EnumDropdownOption<ItemToFarm> ITEM_TO_FARM;
     OCR::LanguageOCROption LANGUAGE;
