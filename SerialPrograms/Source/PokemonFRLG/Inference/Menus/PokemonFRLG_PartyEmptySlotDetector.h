@@ -20,7 +20,6 @@ class PartyEmptySlotDetector : public StaticScreenDetector{
 public:
     PartyEmptySlotDetector(
         Color color,
-        VideoOverlay* overlay,
         PartySlot slot
     );
     static ImageFloatBox box_for_slot(PartySlot slot);
@@ -30,19 +29,7 @@ public:
 
 private:
     Color m_color;
-    VideoOverlay* m_overlay;
     ImageFloatBox m_box;
-};
-class PartyEmptySlotWatcher : public DetectorToFinder<PartyEmptySlotDetector>{
-public:
-    PartyEmptySlotWatcher(
-        Color color,
-        VideoOverlay* overlay,
-        PartySlot slot,
-        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
-    )
-        : DetectorToFinder("PartyEmptySlotWatcher", hold_duration, color, overlay, slot)
-    {}
 };
 
 }

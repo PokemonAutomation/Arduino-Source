@@ -35,11 +35,9 @@ ImageFloatBox PartyEmptySlotDetector::box_for_slot(PartySlot slot){
 
 PartyEmptySlotDetector::PartyEmptySlotDetector(
     Color color,
-    VideoOverlay* overlay,
     PartySlot slot
 )
     : m_color(color)
-    , m_overlay(overlay)
     , m_box(box_for_slot(slot))
 {}
 void PartyEmptySlotDetector::make_overlays(VideoOverlaySet& items) const{

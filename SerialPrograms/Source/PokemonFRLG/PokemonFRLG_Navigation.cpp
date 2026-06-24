@@ -6,6 +6,7 @@
  *
  */
 
+#include <array>
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Random.h"
@@ -33,6 +34,7 @@
 #include "PokemonFRLG/Inference/PokemonFRLG_BattlePokemonDetector.h"
 #include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
 #include "PokemonFRLG_Navigation.h"
+#include "Inference/Menus/PokemonFRLG_PartyEmptySlotDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -753,6 +755,26 @@ void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext
             continue;
         }
     }
+}
+
+PartySlot detect_last_occupied_party_slot(ConsoleHandle& console){
+    const auto snapshot = console.video().snapshot();
+    constexpr std::array slots{
+        PartySlot::SIX,
+        PartySlot::FIVE,
+        PartySlot::FOUR,
+        PartySlot::THREE,
+        PartySlot::TWO,
+    };
+
+    for (PartySlot slot : slots){
+        PartyEmptySlotDetector empty_slot_detector(COLOR_RED, slot);
+        if (!empty_slot_detector.detect(snapshot)){
+            return slot;
+        }
+    }
+
+    return PartySlot::ONE;
 }
 
 void open_bag_from_overworld(ConsoleHandle& console, ProControllerContext& context, StartMenuContext menu_context){
