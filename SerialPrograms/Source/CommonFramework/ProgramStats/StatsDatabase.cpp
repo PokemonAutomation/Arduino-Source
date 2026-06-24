@@ -37,6 +37,7 @@ const std::map<std::string, std::string> STATS_DATABASE_ALIASES{
     {"PokemonSV:StatsResetBloodmoon", "PokemonSV:StatsResetEventBattle"},
     {"PokemonLZA:ShinyHunt-Bench", "PokemonLZA:ShinyHunt-BenchSit"},
     {"PokemonLZA:BerryBuyer", "PokemonLZA:StallBuyer"},
+    {"PokemonFRLG:LuckyEggFarmer", "PokemonFRLG:HeldItemFarmerSafariZone"},
 };
 
 

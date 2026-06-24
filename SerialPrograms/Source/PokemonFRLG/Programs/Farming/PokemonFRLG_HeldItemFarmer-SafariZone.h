@@ -1,11 +1,11 @@
-/*  Lucky Egg Farmer
+/*  Held Item Farmer - Safari Zone
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_PokemonFRLG_LuckyEggFarmer_H
-#define PokemonAutomation_PokemonFRLG_LuckyEggFarmer_H
+#ifndef PokemonAutomation_PokemonFRLG_HeldItemFarmer_SafariZone_H
+#define PokemonAutomation_PokemonFRLG_HeldItemFarmer_SafariZone_H
 
 #include "Common/Cpp/Options/ButtonOption.h"
 #include "CommonTools/Options/LanguageOCROption.h"
@@ -19,16 +19,16 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
 
-class LuckyEggFarmer_Descriptor : public SingleSwitchProgramDescriptor{
+class HeldItemFarmerSafariZone_Descriptor : public SingleSwitchProgramDescriptor{
 public:
-    LuckyEggFarmer_Descriptor();
+    HeldItemFarmerSafariZone_Descriptor();
     struct Stats;
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class LuckyEggFarmer : public SingleSwitchProgramInstance {
+class HeldItemFarmerSafariZone : public SingleSwitchProgramInstance {
 public:
-    LuckyEggFarmer();
+    HeldItemFarmerSafariZone();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
     virtual void start_program_border_check(
         VideoStream& stream,
@@ -67,7 +67,7 @@ private:
     bool attempt_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int& balls_left);
     // Opens the party menu from a given overworld location (safari zone, or the main safari zone building)
     // Checks the last four party slots for held items. Returns true if item detected.
-    bool check_for_lucky_egg(ConsoleHandle& console, ProControllerContext& context, bool returned_to_building);
+    bool check_for_held_item(ConsoleHandle& console, ProControllerContext& context, bool returned_to_building);
     // Handles the main loop once we are in the grass ready to search for a Chansey. 
     // Returns true if a stop condition is met (lucky egg or shiny found).
     // Returns false if we need to soft reset (out of safari balls, out of steps, caught a full party of Chansey).
@@ -81,7 +81,7 @@ private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
-    EventNotificationOption NOTIFICATION_LUCKY_EGG;
+    EventNotificationOption NOTIFICATION_HELD_ITEM;
     EventNotificationOption NOTIFICATION_SHINY;
     EventNotificationsOption NOTIFICATIONS;
 

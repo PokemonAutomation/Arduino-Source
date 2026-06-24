@@ -1,4 +1,4 @@
-/*  Lucky Egg Farmer
+/*  Held Item Farmer - Safari Zone
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -22,57 +22,59 @@
 #include "PokemonFRLG/Inference/PokemonFRLG_PokedexRegisteredDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
-#include "PokemonFRLG_LuckyEggFarmer.h"
+#include "PokemonFRLG_HeldItemFarmer-SafariZone.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
 
-LuckyEggFarmer_Descriptor::LuckyEggFarmer_Descriptor()
+HeldItemFarmerSafariZone_Descriptor::HeldItemFarmerSafariZone_Descriptor()
     : SingleSwitchProgramDescriptor(
-        "PokemonFRLG:LuckyEggFarmer",
-        Pokemon::STRING_POKEMON + " FRLG", "Lucky Egg Farmer",
-        "Programs/PokemonFRLG/LuckyEggFarmer.html",
-        "Farm the Lucky Egg from Chansey.",
+        "PokemonFRLG:HeldItemFarmerSafariZone",
+        Pokemon::STRING_POKEMON + " FRLG", "Held Item Farmer - Safari Zone",
+        "Programs/PokemonFRLG/HeldItemFarmer-SafariZone.html",
+        "Farm held items from Chansey and Dragonair in the Safari Zone.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 
-struct LuckyEggFarmer_Descriptor::Stats : public StatsTracker {
+struct HeldItemFarmerSafariZone_Descriptor::Stats : public StatsTracker {
     public:
     Stats()
         : encounters(m_stats["Encounters"])
-        , chanseys_found(m_stats["Chanseys Found"])
-        , chanseys_caught(m_stats["Chanseys Caught"])
-        , eggs(m_stats["Lucky Eggs"])
+        , target_pokemon_found(m_stats["Target Pokemon Found"])
+        , target_pokemon_caught(m_stats["Target Pokemon Caught"])
+        , items(m_stats["Items"])
         , shinies(m_stats["Shinies"])
         , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Encounters");
-        m_display_order.emplace_back("Chanseys Found");
-        m_display_order.emplace_back("Chanseys Caught");
-        m_display_order.emplace_back("Lucky Eggs");
+        m_display_order.emplace_back("Target Pokemon Found");
+        m_display_order.emplace_back("Target Pokemon Caught");
+        m_display_order.emplace_back("Items");
         m_display_order.emplace_back("Shinies", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
-//        m_aliases["Chanseys Caught"] = "Caught";
-        m_aliases["Lucky Eggs Found"] = "Lucky Eggs";
+        m_aliases["Lucky Eggs Found"] = "Items";
+        m_aliases["Lucky Eggs"] = "Items";
+        m_aliases["Chanseys Found"] = "Target Pokemon Found";
+        m_aliases["Chanseys Caught"] = "Target Pokemon Caught";
     }
 
     std::atomic<uint64_t>& encounters;
-    std::atomic<uint64_t>& chanseys_found;
-    std::atomic<uint64_t>& chanseys_caught;
-    std::atomic<uint64_t>& eggs;
+    std::atomic<uint64_t>& target_pokemon_found;
+    std::atomic<uint64_t>& target_pokemon_caught;
+    std::atomic<uint64_t>& items;
     std::atomic<uint64_t>& shinies;
     std::atomic<uint64_t>& errors;
 };
 
-std::unique_ptr<StatsTracker> LuckyEggFarmer_Descriptor::make_stats() const{
+std::unique_ptr<StatsTracker> HeldItemFarmerSafariZone_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-LuckyEggFarmer::LuckyEggFarmer()
+HeldItemFarmerSafariZone::HeldItemFarmerSafariZone()
     : ITEM_TO_FARM(
         "<b>Item to Farm:</b>",
         {
@@ -102,8 +104,8 @@ LuckyEggFarmer::LuckyEggFarmer()
     )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_LUCKY_EGG(
-        "Lucky Egg Found",
+    , NOTIFICATION_HELD_ITEM(
+        "Held Item Found",
         true, true, ImageAttachmentMode::JPG,
         { "Notifs", "Showcase" }
     )
@@ -114,7 +116,7 @@ LuckyEggFarmer::LuckyEggFarmer()
     )
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
-        &NOTIFICATION_LUCKY_EGG,
+        &NOTIFICATION_HELD_ITEM,
         &NOTIFICATION_SHINY,
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_FATAL,
@@ -129,7 +131,7 @@ LuckyEggFarmer::LuckyEggFarmer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-bool LuckyEggFarmer::navigate_to_chansey(ConsoleHandle& console, ProControllerContext& context){
+bool HeldItemFarmerSafariZone::navigate_to_chansey(ConsoleHandle& console, ProControllerContext& context){
     BlackScreenWatcher zone_exit(COLOR_RED);
 
     int ret = run_until<ProControllerContext>(
@@ -267,14 +269,14 @@ bool LuckyEggFarmer::navigate_to_chansey(ConsoleHandle& console, ProControllerCo
     return true;
 }
 
-void LuckyEggFarmer::navigate_to_dragonair(ConsoleHandle& console, ProControllerContext& context){
+void HeldItemFarmerSafariZone::navigate_to_dragonair(ConsoleHandle& console, ProControllerContext& context){
     ssf_press_button(context, BUTTON_B, 0ms, 2848ms);
     pbf_press_dpad(context, DPAD_UP, 1315ms, 0ms);
     pbf_press_dpad(context, DPAD_RIGHT, 755ms, 0ms);
     pbf_press_dpad(context, DPAD_UP, 580ms, 0ms);
 }
 
-void LuckyEggFarmer::swap_lead_pokemon(ConsoleHandle& console, ProControllerContext& context){
+void HeldItemFarmerSafariZone::swap_lead_pokemon(ConsoleHandle& console, ProControllerContext& context){
     open_party_menu_from_overworld(console, context, StartMenuContext::SAFARI_ZONE);
     pbf_press_button(context, BUTTON_A, 250ms, 100ms);
     pbf_press_dpad(context, DPAD_UP, 250ms, 100ms);
@@ -288,7 +290,7 @@ void LuckyEggFarmer::swap_lead_pokemon(ConsoleHandle& console, ProControllerCont
     context.wait_for_all_requests();
 }
 
-bool LuckyEggFarmer::find_encounter_grass(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+bool HeldItemFarmerSafariZone::find_encounter_grass(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ssf_press_button(context, BUTTON_B, 0ms, 400ms);
     pbf_press_dpad(context, DPAD_RIGHT, 400ms, 0ms);
     pbf_wait(context, 100ms);
@@ -327,7 +329,7 @@ bool LuckyEggFarmer::find_encounter_grass(SingleSwitchProgramEnvironment& env, P
     }
 }
 
-bool LuckyEggFarmer::find_encounter_fishing(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+bool HeldItemFarmerSafariZone::find_encounter_fishing(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     WhiteDialogWatcher fishing_dialog(COLOR_RED);
     BlackScreenWatcher battle_entered(COLOR_RED);
     AdvanceBattleDialogWatcher battle_dialog(COLOR_RED);
@@ -359,7 +361,7 @@ bool LuckyEggFarmer::find_encounter_fishing(SingleSwitchProgramEnvironment& env,
     }
 }
 
-bool LuckyEggFarmer::is_chansey(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+bool HeldItemFarmerSafariZone::is_chansey(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     std::set<std::string> subset = {
         "nidoran-f",
         "nidoran-m",
@@ -384,7 +386,7 @@ bool LuckyEggFarmer::is_chansey(SingleSwitchProgramEnvironment& env, ProControll
     return encounter.name == "chansey";
 }
 
-bool LuckyEggFarmer::is_dragonair(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+bool HeldItemFarmerSafariZone::is_dragonair(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     std::set<std::string> subset = {
         "goldeen",
         "seaking",
@@ -406,7 +408,7 @@ bool LuckyEggFarmer::is_dragonair(SingleSwitchProgramEnvironment& env, ProContro
     return encounter.name == "dragonair";
 }
 
-bool LuckyEggFarmer::attempt_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int& balls_left){
+bool HeldItemFarmerSafariZone::attempt_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int& balls_left){
     //TODO: Optimal bait/ball throwing
     int distraction_thrown = 0;
     while (true){
@@ -516,7 +518,7 @@ bool LuckyEggFarmer::attempt_catch(SingleSwitchProgramEnvironment& env, ProContr
     }
 }
 
-bool LuckyEggFarmer::check_for_lucky_egg(ConsoleHandle& console, ProControllerContext& context, bool returned_to_building){
+bool HeldItemFarmerSafariZone::check_for_held_item(ConsoleHandle& console, ProControllerContext& context, bool returned_to_building){
     if (returned_to_building){
         open_party_menu_from_overworld(console, context, StartMenuContext::STANDARD);
     } 
@@ -532,8 +534,8 @@ bool LuckyEggFarmer::check_for_lucky_egg(ConsoleHandle& console, ProControllerCo
     return false;
 }
 
-bool LuckyEggFarmer::run_safari_zone(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    LuckyEggFarmer_Descriptor::Stats& stats = env.current_stats<LuckyEggFarmer_Descriptor::Stats>();
+bool HeldItemFarmerSafariZone::run_safari_zone(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    HeldItemFarmerSafariZone_Descriptor::Stats& stats = env.current_stats<HeldItemFarmerSafariZone_Descriptor::Stats>();
 
     int chansey_count = 0;
     int balls_left = 30;
@@ -589,16 +591,14 @@ bool LuckyEggFarmer::run_safari_zone(SingleSwitchProgramEnvironment& env, ProCon
             }
         }
 
-        
-        //TODO: Update these now that there are two hunts
-        env.log("Chansey found!");
-        stats.chanseys_found++;
+        env.log("Target Pokemon found!");
+        stats.target_pokemon_found++;
         env.update_stats();
 
         bool caught = attempt_catch(env, context, balls_left);
 
         if (caught){
-            stats.chanseys_caught++;
+            stats.target_pokemon_caught++;
             env.update_stats();
             chansey_count++;
         }
@@ -623,25 +623,25 @@ bool LuckyEggFarmer::run_safari_zone(SingleSwitchProgramEnvironment& env, ProCon
         }
 
         if (caught){
-            if (check_for_lucky_egg(env.console, context, in_safari_zone_building)){
-                env.log("Lucky Egg found!");
-                stats.eggs++;
+            if (check_for_held_item(env.console, context, in_safari_zone_building)){
+                env.log("Held Item found!");
+                stats.items++;
                 env.update_stats();
                 if (TAKE_VIDEO){
                     pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
                 }
                 send_program_notification(
                     env,
-                    NOTIFICATION_LUCKY_EGG,
+                    NOTIFICATION_HELD_ITEM,
                     Color(0xffffc0cb),
-                    "Lucky Egg found!",
+                    "Held Item found!",
                     {}, "",
                     env.console.video().snapshot(),
                     true
                 );
                 return true;
             }
-            env.log("Lucky Egg not found. Continuing to farm...");
+            env.log("Held Item not found. Continuing to farm...");
             pbf_mash_button(context, BUTTON_B, 1500ms);
             context.wait_for_all_requests();
         }
@@ -655,7 +655,7 @@ bool LuckyEggFarmer::run_safari_zone(SingleSwitchProgramEnvironment& env, ProCon
     return false;
 }
 
-void LuckyEggFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void HeldItemFarmerSafariZone::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
 
     home_black_border_check(env.console, context);
 
