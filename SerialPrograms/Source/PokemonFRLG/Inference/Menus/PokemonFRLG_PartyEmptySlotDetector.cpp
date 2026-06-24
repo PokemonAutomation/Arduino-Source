@@ -18,15 +18,15 @@ ImageFloatBox PartyEmptySlotDetector::box_for_slot(PartySlot slot){
     case PartySlot::ONE:
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid FRLG Party Empty Slot. Slot 1 should always be occupied.");
     case PartySlot::TWO:
-        return ImageFloatBox(0.432, 0.150, 0.025, 0.050);
+        return ImageFloatBox(0.709, 0.078, 0.01, 0.018);
     case PartySlot::THREE:
-        return ImageFloatBox(0.432, 0.3, 0.025, 0.050);
+        return ImageFloatBox(0.709, 0.228, 0.01, 0.018);
     case PartySlot::FOUR:
-        return ImageFloatBox(0.432, 0.45, 0.025, 0.050);
+        return ImageFloatBox(0.709, 0.378, 0.01, 0.018);
     case PartySlot::FIVE:
-        return ImageFloatBox(0.432, 0.6, 0.025, 0.050);
+        return ImageFloatBox(0.709, 0.527, 0.01, 0.018);
     case PartySlot::SIX:
-        return ImageFloatBox(0.432, 0.725, 0.025, 0.050);
+        return ImageFloatBox(0.709, 0.677, 0.01, 0.018);
     default:
         break;
     }
@@ -48,7 +48,7 @@ bool PartyEmptySlotDetector::detect(const ImageViewRGB32& screen){
     const BoxOption& GAME_BOX = GameSettings::instance().GAME_BOX;
     ImageViewRGB32 game_screen = extract_box_reference(screen, GAME_BOX);
     const auto stats = image_stats(extract_box_reference(game_screen, m_box));
-    return stats.stddev.sum() < 20.0;
+    return stats.stddev.sum() > 20.0;
 }
 }
 }
