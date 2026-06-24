@@ -4,10 +4,14 @@
  *
  */
 
-#include "ML/Inference/ML_PaddleOCRPipeline.h"
+#include "Common/Cpp/Filesystem.h"
+#include "CommonFramework/Globals.h"
+#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "ML/Inference/ML_PaddleOCRPipeline.h"
 #include "OCR_RawOCR.h"
 
 namespace PokemonAutomation{
@@ -93,6 +97,15 @@ ML::PaddleOCRPipeline& ensure_paddle_ocr_instance(Language language){
 std::string paddle_ocr_read(Language language, const ImageViewRGB32& image){
 //    static size_t c = 0;
 //    image.save("ocr-" + std::to_string(c++) + ".png");
+
+    std::string path = ML::PaddleOCRPipeline::get_paths(language).first;
+    Filesystem::Path p{path};
+    if (!std::filesystem::exists(p)){
+        Logger& logger = global_logger_tagged();
+        throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
+            "Error: PaddleOCR file does not exist.");
+    }
+
 
     ML::PaddleOCRPipeline& paddle_instance = ensure_paddle_ocr_instance(language);
     

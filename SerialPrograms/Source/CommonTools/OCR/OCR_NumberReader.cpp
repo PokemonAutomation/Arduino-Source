@@ -18,8 +18,7 @@
 #include "CommonTools/Images/ImageManip.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
-#include "OCR_RawOCR.h"
-#include "OCR_RawPaddleOCR.h"
+#include "OCR_Routines.h"
 #include "OCR_NumberReader.h"
 
 #include <iostream>
@@ -85,13 +84,7 @@ std::string run_number_normalization(const std::string& input){
 
 
 int read_number(Logger& logger, const ImageViewRGB32& image, Language language){
-    bool use_paddle_ocr = false; // GlobalSettings::instance().USE_PADDLE_OCR;
-    std::string ocr_text;
-    if (use_paddle_ocr){
-        ocr_text = OCR::paddle_ocr_read(language, image);
-    }else{
-        ocr_text = OCR::ocr_read(language, image, OCR::PageSegMode::SINGLE_LINE);
-    }
+    std::string ocr_text = OCR::ocr_read(language, image, OCR::PageSegMode::SINGLE_LINE);
 
     std::string normalized = run_number_normalization(ocr_text);
 
@@ -179,13 +172,7 @@ std::string read_number_waterfill_no_normalization(
         }
 
         ImageRGB32 padded = pad_image(cropped, 1 * cropped.width(), 0xffffffff);
-        bool use_paddle_ocr = false; // GlobalSettings::instance().USE_PADDLE_OCR;
-        std::string ocr;
-        if (use_paddle_ocr){
-            ocr = OCR::paddle_ocr_read(Language::English, padded); 
-        }else{
-            ocr = OCR::ocr_read(Language::English, padded, OCR::PageSegMode::SINGLE_CHAR); 
-        }
+        std::string ocr = OCR::ocr_read(Language::English, padded, OCR::PageSegMode::SINGLE_CHAR);
 
 //        padded.save("zztest-cropped" + std::to_string(c) + "-" + std::to_string(i++) + ".png");
 //        std::cout << ocr[0] << std::endl;

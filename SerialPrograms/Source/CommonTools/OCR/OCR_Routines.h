@@ -30,6 +30,7 @@ struct TextColorRange{
     {}
 };
 
+std::string ocr_read(Language language, const ImageViewRGB32& image, PageSegMode psm = PageSegMode::SINGLE_LINE);
 
 // psm: Tesseract Page Segmentation mode. See
 //   SerialPrograms/Source/CommonTools/OCR/OCR_RawOCR.h:PageSegMode

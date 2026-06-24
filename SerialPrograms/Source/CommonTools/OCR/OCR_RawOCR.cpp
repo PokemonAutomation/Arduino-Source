@@ -179,7 +179,7 @@ struct OcrGlobals{
 };
 
 
-std::string ocr_read(Language language, const ImageViewRGB32& image, PageSegMode psm){
+std::string tesseract_ocr_read(Language language, const ImageViewRGB32& image, PageSegMode psm){
 //    static size_t c = 0;
 //    image.save("ocr-" + std::to_string(c++) + ".png");
 
@@ -193,7 +193,7 @@ std::string ocr_read(Language language, const ImageViewRGB32& image, PageSegMode
     // Get or create the pool for this language (lock only during map access).
     std::map<Language, TesseractPool>::iterator iter;
     {
-        WriteSpinLock lg(globals.ocr_pool_lock, "ocr_read()");
+        WriteSpinLock lg(globals.ocr_pool_lock, "tesseract_ocr_read()");
         iter = ocr_pool.find(language);
         if (iter == ocr_pool.end()){
             iter = ocr_pool.emplace(language, language).first;
@@ -219,7 +219,7 @@ void ensure_instances(Language language, size_t instances){
     // Get or create the pool for this language.
     std::map<Language, TesseractPool>::iterator iter;
     {
-        WriteSpinLock lg(globals.ocr_pool_lock, "ocr_read()");
+        WriteSpinLock lg(globals.ocr_pool_lock, "tesseract_ocr_read()");
         iter = ocr_pool.find(language);
         if (iter == ocr_pool.end()){
             iter = ocr_pool.emplace(language, language).first;

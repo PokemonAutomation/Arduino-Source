@@ -51,7 +51,7 @@ bool language_available(Language language);
 //
 //  psm: Page segmentation mode - controls how Tesseract interprets the image layout.
 //       Defaults to SINGLE_BLOCK (Tesseract C++ API's default) for best performance.
-std::string ocr_read(
+std::string tesseract_ocr_read(
     Language language,
     const ImageViewRGB32& image,
     PageSegMode psm = PageSegMode::SINGLE_BLOCK

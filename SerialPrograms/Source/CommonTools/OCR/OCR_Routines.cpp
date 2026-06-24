@@ -7,20 +7,37 @@
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "OCR_RawPaddleOCR.h"
 #include "OCR_RawOCR.h"
 #include "OCR_DictionaryMatcher.h"
 #include "OCR_Routines.h"
 
-// #include <iostream>
-// using std::cout;
-// using std::endl;
+#include <iostream>
+using std::cout;
+using std::endl;
 
 
 
 namespace PokemonAutomation{
 namespace OCR{
+
+
+std::string ocr_read(Language language, const ImageViewRGB32& image, PageSegMode psm){
+    std::string ocr_text = "";
+    if (GlobalSettings::instance().USE_PADDLE_OCR){
+        try{
+            ocr_text = OCR::paddle_ocr_read(language, image);
+        }catch(OperationFailedException&){
+            cout << "Fall back to default OCR library." << endl;
+            ocr_text = OCR::tesseract_ocr_read(language, image, OCR::PageSegMode::SINGLE_LINE);
+        }
+    }else{
+        ocr_text = OCR::tesseract_ocr_read(language, image, OCR::PageSegMode::SINGLE_LINE);
+    }
+    return ocr_text;
+}
 
 
 StringMatchResult multifiltered_OCR(
@@ -44,8 +61,6 @@ StringMatchResult multifiltered_OCR(
 
     double pixels_inv = 1. / (image.width() * image.height());
 
-    bool use_paddle_ocr = GlobalSettings::instance().USE_PADDLE_OCR;
-
     //  Run all the filters.
     SpinLock lock;
     StringMatchResult ret;
@@ -53,12 +68,7 @@ StringMatchResult multifiltered_OCR(
         [&](size_t index){
             const std::pair<ImageRGB32, size_t>& filtered = filtered_images[index];
 
-            std::string text;
-            if (use_paddle_ocr){
-                text = paddle_ocr_read(language, filtered.first);
-            }else{
-                text = ocr_read(language, filtered.first, psm);
-            }
+            std::string text = OCR::ocr_read(language, filtered.first, psm);
             
             // cout << "multifiltered_OCR: " << index << " -> " << text << endl;
             // filtered.first.save("test_" + std::to_string(index) + ".png");
@@ -110,12 +120,7 @@ StringMatchResult dictionary_OCR(
     }
 
     //  Run all the filters.
-    std::string text;
-    if (GlobalSettings::instance().USE_PADDLE_OCR){
-        text = paddle_ocr_read(language, image);
-    }else{
-        text = ocr_read(language, image, psm);
-    }
+    std::string text = OCR::ocr_read(language, image, psm);
 
     // cout << "dictionary_OCR: " << text << endl;
     // image.save("test_dictionary_OCR.png");
