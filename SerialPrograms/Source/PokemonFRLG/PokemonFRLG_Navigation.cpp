@@ -1225,6 +1225,44 @@ int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftr
     return encounter_shiny ? 1 : 0;
 }
 
+int fish_encounter(ConsoleHandle& console, ProControllerContext& context, Seconds timeout){
+    WhiteDialogWatcher fishing_dialog(COLOR_RED);
+    BlackScreenWatcher battle_entered(COLOR_RED);
+    AdvanceBattleDialogWatcher battle_dialog(COLOR_RED);
+    BattleMenuWatcher battle_menu(COLOR_RED);
+
+    context.wait_for_all_requests();
+    console.log("Starting fish encounter.");
+    WallClock start = current_time();
+
+    while (true){
+        if (current_time() - start > timeout){
+            console.log("No pokemon hooked after timeout.");
+            return -1;
+        }
+
+        pbf_press_button(context, BUTTON_MINUS, 200ms, 200ms);
+        context.wait_for_all_requests();
+
+        int ret = wait_until(
+            console, context,
+            std::chrono::milliseconds(2000),
+            { fishing_dialog, battle_entered, battle_dialog, battle_menu }
+        );
+
+        if (ret == 0){
+            console.log("Fishing dialog detected.");
+            pbf_press_button(context, BUTTON_B, 200ms, 200ms);
+            context.wait_for_all_requests();
+        } else if (ret == 1 || ret == 2 || ret == 3){
+            console.log("Battle entered.");
+            break;
+        }
+    }
+
+    bool encounter_shiny = handle_encounter(console, context, true);
+    return encounter_shiny ? 1 : 0;
+}
 
 }
 }

@@ -8,8 +8,6 @@
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
-
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 
@@ -41,12 +39,10 @@ public:
         ) override {}
 
 private:
-    SimpleIntegerOption<int> BITE_WAIT_MS;
-
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
+    EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationOption NOTIFICATION_SHINY;
-
     EventNotificationsOption NOTIFICATIONS;
 };
 

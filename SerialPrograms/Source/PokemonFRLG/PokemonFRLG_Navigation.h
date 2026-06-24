@@ -117,6 +117,10 @@ void heal_at_pokecenter(ConsoleHandle& console, ProControllerContext& context);
 // returns -1 if no encounter is triggered, 0 if a non-shiny is encounter, and 1 if a shiny is encountered
 int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftright, Seconds timeout = 60s);
 
+// Trigger encounters by fishing with a registered rod. The player must be facing water.
+// returns -1 if no encounter is triggered, 0 if a non-shiny is encounter, and 1 if a shiny is encountered
+int fish_encounter(ConsoleHandle& console, ProControllerContext& context, Seconds timeout = 300s);
+
 // Go to home to check that scaling is 100%. Then resume game.
 void home_black_border_check(ConsoleHandle& console, ProControllerContext& context);
 
