@@ -290,7 +290,7 @@ void HeldItemFarmerSafariZone::swap_lead_pokemon(ConsoleHandle& console, ProCont
     context.wait_for_all_requests();
 }
 
-bool HeldItemFarmerSafariZone::find_encounter_grass(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+int HeldItemFarmerSafariZone::find_encounter_grass(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ssf_press_button(context, BUTTON_B, 0ms, 400ms);
     pbf_press_dpad(context, DPAD_RIGHT, 400ms, 0ms);
     pbf_wait(context, 100ms);
@@ -321,42 +321,11 @@ bool HeldItemFarmerSafariZone::find_encounter_grass(SingleSwitchProgramEnvironme
         case 0:
         case 1:
             env.log("Battle entered.");
-            return true;
+            bool encounter_shiny = handle_encounter(env.console, context, true);
+            return encounter_shiny ? 1 : 0;
         case 2:
             env.log("Out of steps dialog detected. Resetting...");
-            return false;
-        }
-    }
-}
-
-bool HeldItemFarmerSafariZone::find_encounter_fishing(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    WhiteDialogWatcher fishing_dialog(COLOR_RED);
-    BlackScreenWatcher battle_entered(COLOR_RED);
-    AdvanceBattleDialogWatcher battle_dialog(COLOR_RED);
-    WallClock start = current_time();
-
-    while (true){
-        if (current_time() - start > std::chrono::seconds(300)){
-            env.log("No pokemon hooked after 5 minutes. Resetting.");
-            return false;
-        }
-
-        pbf_press_button(context, BUTTON_MINUS, 200ms, 200ms);
-        context.wait_for_all_requests();
-
-        int ret = wait_until(
-            env.console, context,
-            std::chrono::milliseconds(5000),
-            { fishing_dialog, battle_entered, battle_dialog }
-        );
-
-        if (ret == 0){
-            env.log("Fishing dialog detected.");
-            pbf_press_button(context, BUTTON_B, 200ms, 200ms);
-            context.wait_for_all_requests();
-        } else if (ret == 1 || ret == 2){
-            env.log("Battle entered.");
-            return true;
+            return -1;
         }
     }
 }
@@ -542,20 +511,20 @@ bool HeldItemFarmerSafariZone::run_safari_zone(SingleSwitchProgramEnvironment& e
 
     while (chansey_count < 4){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+        int encounter_result = -1;
         if (ITEM_TO_FARM == ItemToFarm::LUCKY_EGG){
-            if (!find_encounter_grass(env, context)){
-                return false;
-            }
+            encounter_result = find_encounter_grass(env, context);
         }else{
-            if (!find_encounter_fishing(env, context)){
-                return false;
-            }
+            encounter_result = fish_encounter(env.console, context);
         }
-        
 
-        bool encounter_shiny = handle_encounter(env.console, context, true);
-        stats.encounters++;
-        if (encounter_shiny){
+        switch (encounter_result){
+        case 0:
+            stats.encounters++;
+            env.update_stats();
+            break;
+        case 1:
+            stats.encounters++;
             stats.shinies++;
             env.update_stats();
             send_program_notification(
@@ -571,8 +540,10 @@ bool HeldItemFarmerSafariZone::run_safari_zone(SingleSwitchProgramEnvironment& e
                 pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
             }
             return true;
-        }else{
-            env.update_stats();
+        case -1:
+        default:
+            // Failed to find an encounter in the allotted time or ran out of steps in the grass. Soft Reset and try again.
+            return false;
         }
 
         if (ITEM_TO_FARM == ItemToFarm::LUCKY_EGG){
