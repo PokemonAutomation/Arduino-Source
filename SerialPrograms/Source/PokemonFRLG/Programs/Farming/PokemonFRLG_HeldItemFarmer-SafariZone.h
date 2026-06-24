@@ -56,12 +56,9 @@ private:
     bool is_chansey(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     // Reads wild encounter name and returns true if Dragonair, uses a set list of possible names in the expected area.
     bool is_dragonair(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    // Handles the encounter logic. Attempts to spin in place. Resets position to the top right corner of grass.
-    // Returns true if transition to battle detected.
-    bool find_encounter_grass(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    // Handles the encounter logic. Attempts to hook pokemon using a fishing pole registered.
-    // Returns true if transition to battle detected.
-    bool find_encounter_fishing(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    // Handles the grass encounter logic. Attempts to spin in place. Resets position to the top right corner of grass.
+    // returns -1 if no encounter is triggered, 0 if a non-shiny is encountered, and 1 if a shiny is encountered
+    int find_encounter_grass(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     // Handles the catch logic. Should be updated to throw bait for better catch rates.
     // Returns true if catch successful. Returns in the overworld.
     bool attempt_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int& balls_left);
