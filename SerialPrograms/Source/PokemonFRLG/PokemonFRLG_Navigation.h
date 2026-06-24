@@ -11,7 +11,7 @@
 
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
-#include "Inference/Menus/PokemonFRLG_PartySlot.h"
+#include "PokemonFRLG/Inference/Menus/PokemonFRLG_PartySlot.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
