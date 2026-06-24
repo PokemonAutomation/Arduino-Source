@@ -25,6 +25,9 @@ class Logger;
 class AudioStreamToFloat;
 class AudioInputFile;
 class AudioInputDevice;
+#ifdef _WIN32
+class DirectShowAudioCapture;
+#endif
 
 
 class AudioSource{
@@ -62,6 +65,9 @@ private:
 
     std::unique_ptr<AudioInputFile> m_input_file;
     std::unique_ptr<AudioInputDevice> m_input_device;
+#ifdef _WIN32
+    std::unique_ptr<DirectShowAudioCapture> m_dshow_audio_capture;
+#endif
 
     ListenerSet<AudioFloatStreamListener> m_listeners;
 

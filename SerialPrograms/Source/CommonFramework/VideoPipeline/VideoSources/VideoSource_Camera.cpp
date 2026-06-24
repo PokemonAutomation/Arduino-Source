@@ -8,6 +8,11 @@
 #include "CommonFramework/VideoPipeline/VideoSource.h"
 #include "VideoSource_Camera.h"
 
+#ifdef _WIN32
+#include "CommonFramework/VideoPipeline/Backends/DirectShowCameraList.h"
+#include "CommonFramework/VideoPipeline/Backends/CameraVideoSource_OpenCV.h"
+#endif
+
 //#include <iostream>
 //using std::cout;
 //using std::endl;
@@ -40,6 +45,13 @@ std::unique_ptr<VideoSource> VideoSourceDescriptor_Camera::make_VideoSource(
     Logger& logger,
     Resolution resolution
 ) const{
+#ifdef _WIN32
+    if (is_directshow_device(m_info)){
+        int index = get_directshow_device_index(m_info);
+        std::string name = get_directshow_display_name(m_info);
+        return std::make_unique<CameraVideoSource_OpenCV>(logger, index, name, resolution);
+    }
+#endif
     return get_camera_backend().make_video_source(logger, m_info, resolution);
 }
 
