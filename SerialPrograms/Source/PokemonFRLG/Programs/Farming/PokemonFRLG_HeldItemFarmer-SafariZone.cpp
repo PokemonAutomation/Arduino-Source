@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Options/ButtonOption.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -17,12 +18,14 @@
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_PartyHeldItemDetector.h"
+#include "PokemonFRLG/Inference/Menus/PokemonFRLG_PartyMenuDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_BattleSelectionArrowDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_PokedexRegisteredDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_HeldItemFarmer-SafariZone.h"
+#include "Common/Cpp/Exceptions.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -321,8 +324,7 @@ int HeldItemFarmerSafariZone::find_encounter_grass(SingleSwitchProgramEnvironmen
         case 0:
         case 1:
             env.log("Battle entered.");
-            bool encounter_shiny = handle_encounter(env.console, context, true);
-            return encounter_shiny ? 1 : 0;
+            return handle_encounter(env.console, context, true) ? 1 : 0;
         case 2:
             env.log("Out of steps dialog detected. Resetting...");
             return -1;
@@ -487,7 +489,7 @@ bool HeldItemFarmerSafariZone::attempt_catch(SingleSwitchProgramEnvironment& env
     }
 }
 
-bool HeldItemFarmerSafariZone::check_for_held_item(ConsoleHandle& console, ProControllerContext& context, bool returned_to_building){
+bool HeldItemFarmerSafariZone::check_for_held_item(ConsoleHandle& console, ProControllerContext& context, bool returned_to_building, int party_count){
     if (returned_to_building){
         open_party_menu_from_overworld(console, context, StartMenuContext::STANDARD);
     } 
@@ -495,7 +497,7 @@ bool HeldItemFarmerSafariZone::check_for_held_item(ConsoleHandle& console, ProCo
         open_party_menu_from_overworld(console, context, StartMenuContext::SAFARI_ZONE);
     }
 
-    PartyHeldItemDetector held_item_detector(COLOR_RED, &console.overlay(), ImageFloatBox(0.432, 0.3, 0.030, 0.485));
+    PartyHeldItemDetector held_item_detector(COLOR_RED, &console.overlay(), static_cast<PartySlot>(party_count - 1));
     if (held_item_detector.detect(console.video().snapshot())){
         return true;
     }
@@ -503,13 +505,12 @@ bool HeldItemFarmerSafariZone::check_for_held_item(ConsoleHandle& console, ProCo
     return false;
 }
 
-bool HeldItemFarmerSafariZone::run_safari_zone(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+bool HeldItemFarmerSafariZone::run_safari_zone(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int party_count){
     HeldItemFarmerSafariZone_Descriptor::Stats& stats = env.current_stats<HeldItemFarmerSafariZone_Descriptor::Stats>();
 
-    int chansey_count = 0;
     int balls_left = 30;
 
-    while (chansey_count < 4){
+    while (party_count < 6){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
         int encounter_result = -1;
         if (ITEM_TO_FARM == ItemToFarm::LUCKY_EGG){
@@ -571,7 +572,7 @@ bool HeldItemFarmerSafariZone::run_safari_zone(SingleSwitchProgramEnvironment& e
         if (caught){
             stats.target_pokemon_caught++;
             env.update_stats();
-            chansey_count++;
+            party_count++;
         }
 
         pbf_wait(context, 500ms);
@@ -594,7 +595,7 @@ bool HeldItemFarmerSafariZone::run_safari_zone(SingleSwitchProgramEnvironment& e
         }
 
         if (caught){
-            if (check_for_held_item(env.console, context, in_safari_zone_building)){
+            if (check_for_held_item(env.console, context, in_safari_zone_building, party_count)){
                 env.log("Held Item found!");
                 stats.items++;
                 env.update_stats();
@@ -631,6 +632,30 @@ void HeldItemFarmerSafariZone::program(SingleSwitchProgramEnvironment& env, ProC
     home_black_border_check(env.console, context);
 
     DeferredStopButtonOption::ResetOnExit reset_on_exit(STOP_AFTER_CURRENT);
+
+    open_party_menu_from_overworld(env.console, context, StartMenuContext::STANDARD);
+    PartySlot detected_party_slot = detect_last_occupied_party_slot(env.console);
+    int party_count = (int)detected_party_slot + 1;
+
+    if (party_count >= 6){
+        throw UserSetupError(env.console, "Party is full. Please remove some Pokemon from the party and try again.");
+    }
+
+    if (ITEM_TO_FARM == ItemToFarm::LUCKY_EGG && party_count == 1){
+        throw UserSetupError(env.console, "Farming Chansey requires at least 2 Pokemon in the party.");
+    }
+
+    StartMenuDetector start_menu_detector(COLOR_RED);
+    PartyMenuDetector party_menu_detector(COLOR_RED);
+
+    while (true){
+        pbf_mash_button(context, BUTTON_B, 1000ms);
+        context.wait_for_all_requests();
+        VideoSnapshot snapshot = env.console.video().snapshot();
+        if (!start_menu_detector.detect(snapshot) && !party_menu_detector.detect(snapshot)){
+            break;
+        } 
+    }
 
     while (true){
         pbf_press_dpad(context, DPAD_UP, 200ms, 0ms);
@@ -682,7 +707,7 @@ void HeldItemFarmerSafariZone::program(SingleSwitchProgramEnvironment& env, ProC
             navigate_to_dragonair(env.console, context);
         }
 
-        if (run_safari_zone(env, context)){
+        if (run_safari_zone(env, context, party_count)){
             GO_HOME_WHEN_DONE.run_end_of_program(context);
             return; // Already sent notification in run_safari_zone if shiny or lucky egg found.
         }
