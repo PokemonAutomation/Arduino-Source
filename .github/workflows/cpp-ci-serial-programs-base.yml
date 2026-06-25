@@ -75,7 +75,7 @@ jobs:
         brew install opencv onnxruntime
 
         brew tap-new --no-git PA/libdpp
-        brew trust pa/libdpp
+        brew trust PA/libdpp
         FORMULA_DIR="$(brew --repo PA/libdpp)/Formula"
         mkdir -p "$FORMULA_DIR"
         cp 3rdPartyBinaries/libdpp@10.1.5.rb "$FORMULA_DIR/"
