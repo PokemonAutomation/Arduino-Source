@@ -1531,6 +1531,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Programs/PokemonFRLG_BattleMenuNavigation.h
     Source/PokemonFRLG/Programs/Farming/PokemonFRLG_EvTrainer.cpp
     Source/PokemonFRLG/Programs/Farming/PokemonFRLG_EvTrainer.h
+    Source/PokemonFRLG/Programs/PokemonFRLG_SafariOptimalAction.cpp
+    Source/PokemonFRLG/Programs/PokemonFRLG_SafariOptimalAction.h
     Source/PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.cpp
     Source/PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_GiftReset.cpp
@@ -1579,6 +1581,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RoamingLegendaryRng.h
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_EggRng.cpp
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_EggRng.h
+    Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SafariOptimalActionTest.cpp
+    Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SafariOptimalActionTest.h
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.cpp
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.h
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_ReadStats.cpp
