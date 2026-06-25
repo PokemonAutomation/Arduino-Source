@@ -7,10 +7,6 @@
 #ifndef PokemonAutomation_ResourceDownloadTable_H
 #define PokemonAutomation_ResourceDownloadTable_H
 
-#include <deque>
-#include "Common/Cpp/Concurrency/AsyncTask.h"
-#include "Common/Cpp/Concurrency/Mutex.h"
-#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Options/StaticTableOption.h"
 // #include "SettingsResourceDownloadRow.h"
 
@@ -34,7 +30,8 @@ private:
 
 
 private:
-    // we need to keep a handle on each Row, so that we can edit m_is_downloaded_label later on.
+    // must use a vector of pointers to the Row, since the Row class contains a mutex 
+    // and so can't be moved
     std::vector<std::unique_ptr<SettingsResourceDownloadRow>> m_resource_rows;
 
 };

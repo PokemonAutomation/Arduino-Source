@@ -7,20 +7,16 @@
 #ifndef PokemonAutomation_SettingsResourceDownloadWidget_H
 #define PokemonAutomation_SettingsResourceDownloadWidget_H
 
-#include <QObject>
 #include <QLabel>
 #include <QProgressBar>
 #include "Common/Qt/Options/ConfigWidget.h"
-// #include "SettingsResourceDownloadTable.h"
 #include "GlobalResourceDownloadManager.h"
 #include "SettingsResourceDownloadRow.h"
 
 namespace PokemonAutomation{
 
-// class SettingsResourceDownloadButton;
 
 class SettingsDownloadButtonWidget : public QWidget, public ConfigWidget, public SettingsResourceDownloadRow::Listener{
-    // Q_OBJECT
 public:
     using ParentOption = SettingsResourceDownloadButton;
 
@@ -44,8 +40,6 @@ private:
     QPushButton* m_button;
     
 };
-
-void show_error_box(std::string function_name);
 
 
 class SettingsDeleteButtonWidget :  public QWidget, public ConfigWidget, public SettingsResourceDownloadRow::Listener{

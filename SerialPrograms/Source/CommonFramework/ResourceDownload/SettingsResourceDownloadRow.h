@@ -8,15 +8,10 @@
 #define PokemonAutomation_ResourceDownloadRow_H
 
 #include "Common/Cpp/Containers/Pimpl.h"
-#include "Common/Cpp/Concurrency/AsyncTask.h"
-// #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/LifetimeSanitizer.h"
-// #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "Common/Cpp/Options/StaticTableOption.h"
-#include "ResourceDownloadHelpers.h"
 #include "ResourceDownload.h"
 #include "SettingsResourceDownloadOptions.h"
-// #include <mutex>
 
 namespace PokemonAutomation{
 
@@ -34,7 +29,6 @@ class SettingsResourceDownloadRow : public StaticTableRow, public ResourceDownlo
 public:
     ~SettingsResourceDownloadRow();
     SettingsResourceDownloadRow(
-        std::string resource_slug,
         DownloadedResourceMetadata local_metadata,
         bool is_downloaded,
         std::optional<uint16_t> version_num,
@@ -72,7 +66,7 @@ public: // ResourceDownload::Listener
     virtual void on_download_finished(bool success, const std::string& resource_slug) override;
 
 public:
-    std::string get_resource_slug(){ return m_resource_slug; }
+    std::string get_resource_slug();
     void set_version_status(ResourceVersionStatus version_status);
     void set_is_downloaded(bool is_downloaded);
     void update_table_label(bool success);
@@ -104,9 +98,6 @@ public:
     void connect_with_download(std::shared_ptr<ResourceDownload> download_ptr);
 
 private:
-    ActionState m_action_state;
-    std::string m_resource_slug;
-    DownloadedResourceMetadata m_local_metadata;
     struct Data;
     Pimpl<Data> m_data;
 
@@ -114,15 +105,6 @@ private:
     SettingsResourceDeleteButton m_delete_button;
     SettingsResourceCancelButton m_cancel_button;
     SettingsResourceProgressBar m_progress_bar;
-
-    AsyncTask m_pre_download_thread;
-    AsyncTask m_delete_thread;
-
-    std::optional<DownloadedResourceMetadata> m_cached_metadata;
-
-    std::shared_ptr<ResourceDownload> m_download_ptr;
-
-    Mutex m_action_state_lock;
 
     LifetimeSanitizer m_lifetime_sanitizer;
 

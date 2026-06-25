@@ -5,15 +5,11 @@
  */
 
 #include <QFont>
-#include <QObject>
 #include <QPushButton>
 #include <QMessageBox>
-#include <QPointer>
 #include <QHBoxLayout>
 #include "CommonFramework/Logging/Logger.h"
 #include "Common/Cpp/Exceptions.h"
-
-#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "SettingsResourceDownloadWidget.h"
 
 #include <iostream>

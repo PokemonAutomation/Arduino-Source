@@ -1,4 +1,4 @@
-/*  Resource Download Row
+/*  Resource Download Options
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -7,10 +7,6 @@
 #ifndef PokemonAutomation_ResourceDownloadOptions_H
 #define PokemonAutomation_ResourceDownloadOptions_H
 
-// #include "Common/Cpp/Containers/Pimpl.h"
-// #include "Common/Cpp/Concurrency/AsyncTask.h"
-// #include "Common/Cpp/Options/StaticTableOption.h"
-// #include "ResourceDownloadHelpers.h"
 
 
 namespace PokemonAutomation{

@@ -8,13 +8,14 @@
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/ListenerSet.h"
-// #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Filesystem.h"
+#include "CommonFramework/Options/LabelCellOption.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ResourceDownload/GlobalResourceDownloadManager.h"
-#include "Common/Cpp/Filesystem.h"
-#include "CommonFramework/Options/LabelCellOption.h"
+#include "ResourceDownloadHelpers.h"
 // #include "SettingsResourceDownloadTable.h"
 #include "SettingsResourceDownloadRow.h"
 
@@ -58,15 +59,17 @@ std::string is_downloaded_string(bool is_downloaded){
 
 struct SettingsResourceDownloadRow::Data{
     Data(
-        std::string& resource_name,
-        size_t file_size,
+        DownloadedResourceMetadata expected_metadata,
         bool is_downloaded,
         std::optional<uint16_t> version_num,
         ResourceVersionStatus version_status
     )
-        : m_resource_name(LockMode::LOCK_WHILE_RUNNING, resource_name)
-        , m_file_size(file_size)
-        , m_file_size_label(LockMode::LOCK_WHILE_RUNNING, tostr_bytes(file_size))
+        : m_local_metadata(expected_metadata)
+        , m_action_state(ActionState::READY)
+        , m_resource_slug(expected_metadata.resource_name)
+        , m_resource_name_label(LockMode::LOCK_WHILE_RUNNING, m_resource_slug)
+        , m_file_size(expected_metadata.size_decompressed_bytes)
+        , m_file_size_label(LockMode::LOCK_WHILE_RUNNING, tostr_bytes(m_file_size))
         , m_is_downloaded(is_downloaded)
         , m_is_downloaded_label(LockMode::LOCK_WHILE_RUNNING, is_downloaded_string(is_downloaded))
         , m_version_num(version_num)
@@ -74,9 +77,14 @@ struct SettingsResourceDownloadRow::Data{
         , m_version_status_label(LockMode::LOCK_WHILE_RUNNING, resource_version_to_string(version_status))
     {}
 
-    ListenerSet<Listener> listeners;
 
-    LabelCellOption m_resource_name;
+
+    DownloadedResourceMetadata m_local_metadata;
+
+    ActionState m_action_state;
+
+    std::string m_resource_slug;
+    LabelCellOption m_resource_name_label;
 
     size_t m_file_size;
     LabelCellOption m_file_size_label;
@@ -88,6 +96,19 @@ struct SettingsResourceDownloadRow::Data{
     ResourceVersionStatus m_version_status;
     LabelCellOption m_version_status_label;
 
+    AsyncTask m_pre_download_thread;
+    AsyncTask m_delete_thread;
+
+    std::shared_ptr<ResourceDownload> m_download_ptr;
+
+    std::optional<DownloadedResourceMetadata> m_cached_metadata;
+
+    Mutex m_action_state_lock;
+
+
+    ListenerSet<Listener> listeners;
+
+
 
 };
 
@@ -96,6 +117,9 @@ void SettingsResourceDownloadRow::set_version_status(ResourceVersionStatus versi
     m_data->m_version_status_label.set_text(resource_version_to_string(version_status));
 }
 
+std::string SettingsResourceDownloadRow::get_resource_slug(){ 
+    return m_data->m_resource_slug; 
+}
 
 void SettingsResourceDownloadRow::set_is_downloaded(bool is_downloaded){
     m_data->m_is_downloaded = is_downloaded;
@@ -111,30 +135,26 @@ void SettingsResourceDownloadRow::update_table_label(bool success){
 
 SettingsResourceDownloadRow::~SettingsResourceDownloadRow(){
     // cout << "~SettingsResourceDownloadRow" << endl;
-    if (m_download_ptr) {
-        m_download_ptr->remove_listener(*this); 
+    if (m_data->m_download_ptr) {
+        m_data->m_download_ptr->remove_listener(*this); 
     }
-    m_pre_download_thread.wait_and_ignore_exceptions();
-    m_delete_thread.wait_and_ignore_exceptions();
+    m_data->m_pre_download_thread.wait_and_ignore_exceptions();
+    m_data->m_delete_thread.wait_and_ignore_exceptions();
 }
 SettingsResourceDownloadRow::SettingsResourceDownloadRow(
-    std::string resource_slug,
     DownloadedResourceMetadata local_metadata,
     bool is_downloaded,
     std::optional<uint16_t> version_num,
     ResourceVersionStatus version_status
 )
     : StaticTableRow(local_metadata.resource_name)
-    , m_action_state(ActionState::READY)
-    , m_resource_slug(resource_slug)
-    , m_local_metadata(local_metadata)
-    , m_data(CONSTRUCT_TOKEN, local_metadata.resource_name, local_metadata.size_decompressed_bytes, is_downloaded, version_num, version_status)
+    , m_data(CONSTRUCT_TOKEN, local_metadata, is_downloaded, version_num, version_status)
     , m_download_button(*this)
     , m_delete_button(*this)
     , m_cancel_button(*this)
     , m_progress_bar(*this)
 {
-    PA_ADD_STATIC(m_data->m_resource_name);
+    PA_ADD_STATIC(m_data->m_resource_name_label);
     PA_ADD_STATIC(m_data->m_file_size_label);
     PA_ADD_STATIC(m_data->m_is_downloaded_label);
     PA_ADD_STATIC(m_data->m_version_status_label);
@@ -149,8 +169,8 @@ SettingsResourceDownloadRow::SettingsResourceDownloadRow(
 
 const DownloadedResourceMetadata& SettingsResourceDownloadRow::fetch_remote_metadata(){
 
-    if (m_cached_metadata.has_value()){
-        return m_cached_metadata.value();
+    if (m_data->m_cached_metadata.has_value()){
+        return m_data->m_cached_metadata.value();
     }
 
     Logger& logger = global_logger_tagged();
@@ -164,12 +184,12 @@ const DownloadedResourceMetadata& SettingsResourceDownloadRow::fetch_remote_meta
             "Error: Download failed. Failed to fetch the list of available downloads. Check your internet connection.");
     }
 
-    std::string resource_name = m_data->m_resource_name.text();
+    std::string resource_name = m_data->m_resource_name_label.text();
 
     for (const DownloadedResourceMetadata& remote_metadata : all_remote_metadata){
         if (remote_metadata.resource_name == resource_name){
-            m_cached_metadata = remote_metadata;
-            return m_cached_metadata.value();
+            m_data->m_cached_metadata = remote_metadata;
+            return m_data->m_cached_metadata.value();
         }
     }
 
@@ -182,7 +202,7 @@ const DownloadedResourceMetadata& SettingsResourceDownloadRow::fetch_remote_meta
 
 
 void SettingsResourceDownloadRow::ensure_remote_metadata_loaded(){
-    m_pre_download_thread = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
+    m_data->m_pre_download_thread = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
     [this]{ 
         try {
             if (!is_given_action_state(ActionState::PRE_DOWNLOAD)){
@@ -209,7 +229,7 @@ void SettingsResourceDownloadRow::ensure_remote_metadata_loaded(){
             // cout << "failed" << endl;
             // update_table_label(false);
             update_action_state(ActionState::READY);
-            GlobalResourceDownloadManager::instance().report_download_failed(m_resource_slug);
+            GlobalResourceDownloadManager::instance().report_download_failed(m_data->m_resource_slug);
             return;
         }catch(...){
             // update_table_label(false);
@@ -228,7 +248,7 @@ std::string SettingsResourceDownloadRow::predownload_warning_summary(const Downl
 
     std::string predownload_warning;
 
-    uint16_t local_version_num = m_local_metadata.version_num.value();
+    uint16_t local_version_num = m_data->m_local_metadata.version_num.value();
 
     uint16_t remote_version_num = remote_metadata.version_num.value();
     size_t compressed_size = remote_metadata.size_compressed_bytes;
@@ -264,7 +284,7 @@ void SettingsResourceDownloadRow::start_download(){
     cancel_download_thread(); // cancels old download thread
 
     try{
-        std::shared_ptr<ResourceDownload> download_ptr = GlobalResourceDownloadManager::instance().add_to_download_list(m_resource_slug);
+        std::shared_ptr<ResourceDownload> download_ptr = GlobalResourceDownloadManager::instance().add_to_download_list(m_data->m_resource_slug);
 
     }catch(OperationFailedException&){
         update_action_state(ActionState::READY);
@@ -274,7 +294,7 @@ void SettingsResourceDownloadRow::start_download(){
 
 
 void SettingsResourceDownloadRow::start_delete(){
-    m_delete_thread = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
+    m_data->m_delete_thread = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
     [this]{ 
         try {
 
@@ -287,7 +307,7 @@ void SettingsResourceDownloadRow::start_delete(){
             }
             update_action_state(ActionState::DELETING);
 
-            std::string resource_name = m_local_metadata.resource_name;
+            std::string resource_name = m_data->m_local_metadata.resource_name;
 
             std::string resource_directory = DOWNLOADED_RESOURCE_PATH() + resource_name;
             // delete directory and the old resource
@@ -317,70 +337,70 @@ void SettingsResourceDownloadRow::start_delete(){
 
 
 void SettingsResourceDownloadRow::update_action_state(ActionState state){
-    std::lock_guard<Mutex> lock(m_action_state_lock);
+    std::lock_guard<Mutex> lock(m_data->m_action_state_lock);
     {
         switch (state){
         case ActionState::PRE_DOWNLOAD:
             // action state can only enter the PRE_DOWNLOAD state 
             // if going from the READY state
-            if (m_action_state == ActionState::READY){
+            if (m_data->m_action_state == ActionState::READY){
                 m_download_button.set_enabled(false);
                 m_delete_button.set_enabled(false);
                 m_cancel_button.set_enabled(true);
-                m_action_state = state;
+                m_data->m_action_state = state;
                 cout << "ActionState::PRE_DOWNLOAD" << endl;
             }
             break;
         case ActionState::DOWNLOADING:
-            if (m_action_state == ActionState::PRE_DOWNLOAD || m_action_state == ActionState::PRE_CANCEL || m_action_state == ActionState::READY){
+            if (m_data->m_action_state == ActionState::PRE_DOWNLOAD || m_data->m_action_state == ActionState::PRE_CANCEL || m_data->m_action_state == ActionState::READY){
                 m_download_button.set_enabled(false);
                 m_delete_button.set_enabled(false);
                 m_cancel_button.set_enabled(true);
-                m_action_state = state;
+                m_data->m_action_state = state;
                 cout << "ActionState::DOWNLOADING" << endl;
             }
             break;
         case ActionState::PRE_DELETE:
             // action state can only enter the PRE_DELETE state 
             // if going from the READY state
-            if (m_action_state == ActionState::READY){
+            if (m_data->m_action_state == ActionState::READY){
                 m_download_button.set_enabled(false);
                 m_delete_button.set_enabled(false);
                 m_cancel_button.set_enabled(false);
-                m_action_state = state;
+                m_data->m_action_state = state;
                 cout << "ActionState::PRE_DELETE" << endl;
             }
             break;
         case ActionState::DELETING:
             // action state can only enter the DELETING state 
             // if going from the PRE_DELETE state
-            if (m_action_state == ActionState::PRE_DELETE){
+            if (m_data->m_action_state == ActionState::PRE_DELETE){
                 m_download_button.set_enabled(false);
                 m_delete_button.set_enabled(false);
                 m_cancel_button.set_enabled(false);
-                m_action_state = state;
+                m_data->m_action_state = state;
                 cout << "ActionState::DELETING" << endl;
             }
             break;
         case ActionState::PRE_CANCEL:
             // action state can only enter the PRE_CANCEL state 
             // if going from the DOWNLOADING state
-            if (m_action_state == ActionState::DOWNLOADING){ 
+            if (m_data->m_action_state == ActionState::DOWNLOADING){ 
                 m_download_button.set_enabled(false);
                 m_delete_button.set_enabled(false);
                 m_cancel_button.set_enabled(false);
-                m_action_state = state;
+                m_data->m_action_state = state;
                 cout << "ActionState::PRE_CANCEL" << endl;
             }
             break;
         case ActionState::CANCELLING:
             // action state can only enter the CANCELLING state 
             // if going from the PRE_CANCEL state
-            if (m_action_state == ActionState::PRE_CANCEL){ 
+            if (m_data->m_action_state == ActionState::PRE_CANCEL){ 
                 m_download_button.set_enabled(false);
                 m_delete_button.set_enabled(false);
                 m_cancel_button.set_enabled(false);
-                m_action_state = state;
+                m_data->m_action_state = state;
                 cout << "ActionState::CANCELLING" << endl;
             }
             break;
@@ -388,7 +408,7 @@ void SettingsResourceDownloadRow::update_action_state(ActionState state){
             m_download_button.set_enabled(true);
             m_delete_button.set_enabled(true);
             m_cancel_button.set_enabled(true);
-            m_action_state = state;
+            m_data->m_action_state = state;
             cout << "ActionState::READY" << endl;
             break;
         default:
@@ -400,28 +420,28 @@ void SettingsResourceDownloadRow::update_action_state(ActionState state){
 }
 
 ActionState SettingsResourceDownloadRow::get_action_state(){
-    std::lock_guard<Mutex> lock(m_action_state_lock);
-    return m_action_state;
+    std::lock_guard<Mutex> lock(m_data->m_action_state_lock);
+    return m_data->m_action_state;
 }
 
 bool SettingsResourceDownloadRow::is_given_action_state(ActionState state){
-    std::lock_guard<Mutex> lock(m_action_state_lock);
-    return m_action_state == state;
+    std::lock_guard<Mutex> lock(m_data->m_action_state_lock);
+    return m_data->m_action_state == state;
 }
 
 void SettingsResourceDownloadRow::cancel_download_thread(){
-    if (m_download_ptr){ // if download is active
-        m_download_ptr->cancel_download();
+    if (m_data->m_download_ptr){ // if download is active
+        m_data->m_download_ptr->cancel_download();
     }
 }
 
 
 void SettingsResourceDownloadRow::connect_with_download(std::shared_ptr<ResourceDownload> download_ptr){
-    if (m_download_ptr){
-        m_download_ptr->remove_listener(*this);
+    if (m_data->m_download_ptr){
+        m_data->m_download_ptr->remove_listener(*this);
     }
-    m_download_ptr = std::move(download_ptr);
-    m_download_ptr->add_listener(*this);
+    m_data->m_download_ptr = std::move(download_ptr);
+    m_data->m_download_ptr->add_listener(*this);
     update_action_state(ActionState::DOWNLOADING);
 }
 
@@ -478,7 +498,7 @@ void SettingsResourceDownloadRow::on_hash_progress(uint64_t bytes_done, uint64_t
 void SettingsResourceDownloadRow::on_download_finished(bool success, const std::string& resource_slug){
     // we can't run `download_ptr->remove_listener(*this)` in this function
     // since it results in deadlock, since this function is part of the listener loop
-    m_download_ptr.reset();
+    m_data->m_download_ptr.reset();
 
     update_action_state(ActionState::READY);
     update_table_label(success);

@@ -6,12 +6,6 @@
 
 #include "CommonFramework/Globals.h"
 #include "Common/Cpp/Exceptions.h"
-// #include "CommonFramework/Logging/Logger.h"
-// #include "CommonFramework/Tools/GlobalThreadPools.h"
-// #include "CommonFramework/Tools/FileDownloader.h"
-// #include "CommonFramework/Exceptions/OperationFailedException.h"
-// #include "Common/Cpp/Json/JsonArray.h"
-// #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Filesystem.h"
 #include "ResourceDownload.h"
 #include "SettingsResourceDownloadRow.h"
@@ -43,7 +37,7 @@ std::vector<std::unique_ptr<SettingsResourceDownloadRow>> SettingsResourceDownlo
 
         auto [is_downloaded, version_status, current_version_num] = get_local_version_info(resource_name);
 
-        resource_rows.emplace_back(std::make_unique<SettingsResourceDownloadRow>(resource_name, resource, is_downloaded, current_version_num, version_status));
+        resource_rows.emplace_back(std::make_unique<SettingsResourceDownloadRow>(resource, is_downloaded, current_version_num, version_status));
     }
 
     return resource_rows;

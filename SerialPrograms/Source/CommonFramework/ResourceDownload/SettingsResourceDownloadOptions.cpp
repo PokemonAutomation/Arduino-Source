@@ -1,4 +1,4 @@
-/*  Resource Download Row
+/*  Resource Download Options
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -7,11 +7,10 @@
 #include "SettingsResourceDownloadRow.h"
 #include "SettingsResourceDownloadOptions.h"
 
-// #include <thread>
 
-#include <iostream>
-using std::cout;
-using std::endl;
+// #include <iostream>
+// using std::cout;
+// using std::endl;
 
 namespace PokemonAutomation{
 
