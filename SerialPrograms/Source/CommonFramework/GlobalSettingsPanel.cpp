@@ -268,6 +268,8 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(THEME);
     PA_ADD_OPTION(USE_PADDLE_OCR);
     PA_ADD_OPTION(USE_GPU_FOR_ML_INFERENCE);
+    PA_ADD_OPTION(RESOURCE_DOWNLOAD_TABLE);
+    PA_ADD_OPTION(DOWNLOAD_ERROR);
     PA_ADD_OPTION(WINDOW_SIZE);
     PA_ADD_OPTION(LOG_WINDOW_SIZE);
     PA_ADD_OPTION(LOG_WINDOW_STARTUP);
@@ -451,9 +453,9 @@ void GlobalSettings::on_press(){
     QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdString(RUNTIME_BASE_PATH())));
 }
 
-
-
-
+void GlobalSettings::connect_row_with_download(const std::string& resource_slug, std::shared_ptr<ResourceDownload>& download_ptr){
+    RESOURCE_DOWNLOAD_TABLE.connect_row_with_download(resource_slug, download_ptr);
+}
 
 
 GlobalSettings_Descriptor::GlobalSettings_Descriptor()
