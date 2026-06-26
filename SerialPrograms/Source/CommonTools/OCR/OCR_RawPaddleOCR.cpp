@@ -11,7 +11,7 @@
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "ML/Inference/ML_PaddleOCRPipeline.h"
-#include "OCR_RawOCR.h"
+#include "OCR_RawPaddleOCR.h"
 
 namespace PokemonAutomation{
 namespace OCR{

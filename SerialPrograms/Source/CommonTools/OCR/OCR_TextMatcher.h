@@ -11,7 +11,6 @@
 #include <set>
 #include <map>
 #include <QString>
-#include "OCR_RawOCR.h"
 #include "OCR_StringMatchResult.h"
 
 namespace PokemonAutomation{
