@@ -195,8 +195,6 @@ const MarkIconMatcher& MarkIcon_Lza(){
     return ret;
 }
 
-//TODO: GAMEBOY
-
 const std::vector<const MarkIconMatcher*>& ALL_ORIGIN_MARK_MATCHERS(){
     static const std::vector<const MarkIconMatcher*> matchers = {
         &MarkIcon_Kalos(),
