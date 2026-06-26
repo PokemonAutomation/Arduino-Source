@@ -5,8 +5,6 @@
  */
 
 #include "Common/Cpp/Filesystem.h"
-#include "CommonFramework/Globals.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
@@ -102,7 +100,6 @@ ML::PaddleOCRPipeline& ensure_paddle_ocr_instance(Language language){
 std::string paddle_ocr_read(Language language, const ImageViewRGB32& image){
 //    static size_t c = 0;
 //    image.save("ocr-" + std::to_string(c++) + ".png");
-
 
     ML::PaddleOCRPipeline& paddle_instance = ensure_paddle_ocr_instance(language);
     
