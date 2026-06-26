@@ -42,7 +42,7 @@ public:
     //   It specifies the minimum separation between the best candidate and
     //   2nd best candidate's log10p for it to not be considered ambiguous.
     // psm: Tesseract Page Segmentation mode. See
-    //   SerialPrograms/Source/CommonTools/OCR/OCR_RawOCR.h:PageSegMode
+    //   SerialPrograms/Source/CommonTools/OCR/OCR_RawTesseractOCR.h:PageSegMode
     OCR::StringMatchResult match_substring_from_image(
         Logger* logger,
         Language language,
@@ -69,7 +69,7 @@ public:
     //   even attempts to OCR. This is useful for pruning images with no appearant texts to
     //   reduce expensive OCR computation.
     // psm: Tesseract Page Segmentation mode. See
-    //   SerialPrograms/Source/CommonTools/OCR/OCR_RawOCR.h:PageSegMode
+    //   SerialPrograms/Source/CommonTools/OCR/OCR_RawTesseractOCR.h:PageSegMode
     OCR::StringMatchResult match_substring_from_image_multifiltered(
         Logger* logger,
         Language language,

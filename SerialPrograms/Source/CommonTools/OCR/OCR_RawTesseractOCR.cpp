@@ -14,7 +14,7 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "OCR_RawOCR.h"
+#include "OCR_RawTesseractOCR.h"
 
 #include <iostream>
 using std::cout;

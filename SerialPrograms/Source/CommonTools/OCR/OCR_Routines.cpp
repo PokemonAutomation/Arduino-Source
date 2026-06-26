@@ -10,7 +10,7 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "OCR_RawPaddleOCR.h"
-#include "OCR_RawOCR.h"
+#include "OCR_RawTesseractOCR.h"
 #include "OCR_DictionaryMatcher.h"
 #include "OCR_Routines.h"
 

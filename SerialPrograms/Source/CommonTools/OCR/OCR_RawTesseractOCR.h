@@ -8,8 +8,8 @@
 // This file should not be inluded in other files.
 // Use OCR_Routines.h instead
 
-#ifndef PokemonAutomation_CommonTools_OCR_RawOCR_H
-#define PokemonAutomation_CommonTools_OCR_RawOCR_H
+#ifndef PokemonAutomation_CommonTools_OCR_RawTesseractOCR_H
+#define PokemonAutomation_CommonTools_OCR_RawTesseractOCR_H
 
 #include <string>
 #include "CommonFramework/Language.h"
