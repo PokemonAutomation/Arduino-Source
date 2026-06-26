@@ -37,6 +37,8 @@ enum class BattleConfirmationOption{
     NO,
 };
 
+const ImageFloatBox BATTLE_MENU_ARROW_BOX(0.525, 0.741, 0.273, 0.212);
+
 class BattleSelectionArrowDetector : public StaticScreenDetector{
 public:
     BattleSelectionArrowDetector(
@@ -124,7 +126,7 @@ public:
         VideoOverlay* overlay,
         std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
     )
-        : DetectorToFinder("BattleSelectionArrowWatcher", hold_duration, color, overlay, ImageFloatBox(0.768, 0.868, 0.212, 0.159))
+        : DetectorToFinder("BattleSelectionArrowWatcher", hold_duration, color, overlay, BATTLE_MENU_ARROW_BOX)
     {}
 };
 
