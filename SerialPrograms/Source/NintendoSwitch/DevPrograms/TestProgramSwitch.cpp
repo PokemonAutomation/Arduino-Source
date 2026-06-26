@@ -170,7 +170,7 @@
 #include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2CC_ReliableStreamConnection.h"
 #include "Common/Cpp/StreamConnections/MockDevice.h"
 #include "ML/Inference/ML_PaddleOCRPipeline.h"
-#include "CommonTools/OCR/OCR_RawPaddleOCR.h"
+#include "CommonTools/OCR/OCR_Routines.h"
 #include "CommonTools/Images/ImageTools.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_BattleSelectionArrowDetector.h"
 #include "Controllers/RumbleListener.h"
@@ -671,7 +671,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ImageViewRGB32 cropped = extract_box_reference(image1, ImageFloatBox{BOX.x(), BOX.y(), BOX.width(), BOX.height()});
 
     // auto snapshot = feed.snapshot();
-    std::string text = OCR::paddle_ocr_read(LANGUAGE, cropped);
+    std::string text = OCR::ocr_read(LANGUAGE, cropped);
     cout << text << endl;
 
     

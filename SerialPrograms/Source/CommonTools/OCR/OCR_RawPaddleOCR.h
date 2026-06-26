@@ -17,6 +17,8 @@ namespace PokemonAutomation{
     }
 namespace OCR{
 
+bool paddle_ocr_language_available(Language language);
+
 
 //  Pre-warm the PaddleOCR instance pool for a language. Ensure one instance exists.
 //  Avoids lazy initialization delays during runtime. Thread-safe.

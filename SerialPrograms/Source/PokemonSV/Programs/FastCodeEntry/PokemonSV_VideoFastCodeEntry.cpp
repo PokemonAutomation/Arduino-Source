@@ -168,7 +168,7 @@ VideoFastCodeEntry::VideoFastCodeEntry()
 
     //  Preload
     GlobalThreadPools::computation_realtime().ensure_threads(6);
-    OCR::ensure_instances(Language::English, 6);
+    OCR::ensure_ocr_instances(Language::English, 6);
     preload_code_templates();
 }
 void VideoFastCodeEntry::update_active_consoles(size_t switch_count){

@@ -23,21 +23,48 @@ using std::endl;
 namespace PokemonAutomation{
 namespace OCR{
 
+// return true if the user enabled PaddleOCR and its resource has been downloaded
+bool use_paddle_ocr(){
+    static bool use_paddle_ocr = GlobalSettings::instance().USE_PADDLE_OCR && paddle_ocr_language_available(Language::English);
+
+    return use_paddle_ocr;
+}
+
+bool ocr_language_available(Language language){
+    if (use_paddle_ocr()){
+        return  OCR::paddle_ocr_language_available(language);
+    }else{
+        return OCR::tesseract_language_available(language);
+    }
+}
+
 
 std::string ocr_read(Language language, const ImageViewRGB32& image, PageSegMode psm){
     std::string ocr_text = "";
-    if (GlobalSettings::instance().USE_PADDLE_OCR){
-        try{
-            ocr_text = OCR::paddle_ocr_read(language, image);
-        }catch(OperationFailedException&){
-            cout << "Fall back to default OCR library." << endl;
-            ocr_text = OCR::tesseract_ocr_read(language, image, OCR::PageSegMode::SINGLE_LINE);
-        }
+    if (use_paddle_ocr()){
+        ocr_text = OCR::paddle_ocr_read(language, image);
     }else{
         ocr_text = OCR::tesseract_ocr_read(language, image, OCR::PageSegMode::SINGLE_LINE);
     }
     return ocr_text;
 }
+
+void ensure_ocr_instances(Language language, size_t instances){
+    if (use_paddle_ocr()){
+        OCR::ensure_paddle_ocr_instance(language);
+    }else{
+        OCR::ensure_tesseract_instances(language, instances);
+    }
+}
+
+void clear_ocr_cache(){
+    if (use_paddle_ocr()){
+        OCR::clear_paddle_ocr_cache();
+    }else{
+        OCR::clear_tesseract_cache();
+    }
+}
+
 
 
 StringMatchResult multifiltered_OCR(

@@ -24,7 +24,7 @@ namespace PokemonAutomation{
 namespace OCR{
 
 
-bool language_available(Language language){
+bool tesseract_language_available(Language language){
     std::string path = RESOURCE_PATH();
     path += "Tesseract/";
     path += language_data(language).code;
@@ -208,7 +208,7 @@ std::string tesseract_ocr_read(Language language, const ImageViewRGB32& image, P
 }
 
 
-void ensure_instances(Language language, size_t instances){
+void ensure_tesseract_instances(Language language, size_t instances){
     if (language == Language::None){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Attempted to call OCR without a language.");
     }
@@ -229,7 +229,7 @@ void ensure_instances(Language language, size_t instances){
     iter->second.ensure_instances(instances);
 }
 
-void clear_cache(){
+void clear_tesseract_cache(){
     OcrGlobals& globals = OcrGlobals::instance();
     std::map<Language, TesseractPool>& ocr_pool = globals.ocr_pool;
     WriteSpinLock lg(globals.ocr_pool_lock, "ocr_clear_cache()");
