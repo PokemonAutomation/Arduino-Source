@@ -55,15 +55,6 @@ SettingsDownloadButtonWidget::SettingsDownloadButtonWidget(QWidget& parent, Sett
     int minWidth = metrics.horizontalAdvance("Downloading...");
     m_button->setMinimumWidth(minWidth);
 
-    // Button should be disabled when in the middle of downloading
-    // this status is stored within SettingsResourceDownloadButton::m_enabled
-    // when the button is clicked, m_enabled is set to false
-    // when te download is done, m_enabled is set back to true
-    // the UI is updated to reflect the status of m_enabled, by using update_UI_state
-
-
-    // update the UI based on m_enabled, when the button is constructed
-    update_UI_state();
 
     // when the button is clicked, runs row.update_action_state(), which updates the button state
     // also, fetch json
@@ -83,18 +74,10 @@ SettingsDownloadButtonWidget::SettingsDownloadButtonWidget(QWidget& parent, Sett
 }
 
 
-void SettingsDownloadButtonWidget::update_UI_state(){
-    if (m_value.get_enabled()){
-        m_button->setEnabled(true);
-        m_button->setText("Download");
-    }else{
-        m_button->setEnabled(false);
-        if (m_row.is_given_action_state(ActionState::PRE_DOWNLOAD) 
-            || m_row.is_given_action_state(ActionState::DOWNLOADING))
-        {
-            m_button->setText("Downloading...");
-        }
-    }
+void SettingsDownloadButtonWidget::on_change_text(const std::string& text){
+    QMetaObject::invokeMethod(this, [this, text]{
+        m_button->setText(QString::fromStdString(text));
+    }, Qt::QueuedConnection);
 }
 
 
@@ -146,11 +129,6 @@ void SettingsDownloadButtonWidget::on_metadata_fetch_finished(const std::string&
 }
 
 
-void SettingsDownloadButtonWidget::on_action_state_updated(){
-    QMetaObject::invokeMethod(this, [this]{
-        update_UI_state();
-    }, Qt::QueuedConnection);
-}
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -186,9 +164,6 @@ SettingsDeleteButtonWidget::SettingsDeleteButtonWidget(QWidget& parent, Settings
     m_button->setMinimumWidth(minWidth);
 
 
-    // update the UI based on m_enabled, when the button is constructed
-    update_UI_state();
-
     // when the button is clicked, runs row.update_action_state(), which updates the button state
     // also, show the delete confirm box
     connect(
@@ -206,19 +181,10 @@ SettingsDeleteButtonWidget::SettingsDeleteButtonWidget(QWidget& parent, Settings
     m_row.add_listener(*this);
 }
 
-
-void SettingsDeleteButtonWidget::update_UI_state(){
-    if (m_value.get_enabled()){
-        m_button->setEnabled(true);
-        m_button->setText("Delete");
-    }else{
-        m_button->setEnabled(false);
-        if (m_row.is_given_action_state(ActionState::PRE_DELETE) 
-            || m_row.is_given_action_state(ActionState::DELETING)
-        ){
-            m_button->setText("Deleting...");
-        }
-    }
+void SettingsDeleteButtonWidget::on_change_text(const std::string& text){
+    QMetaObject::invokeMethod(this, [this, text]{
+        m_button->setText(QString::fromStdString(text));
+    }, Qt::QueuedConnection);
 }
 
 
@@ -255,13 +221,6 @@ void SettingsDeleteButtonWidget::show_delete_confirm_box(){
     }
 }
 
-// when action_state_updated, update the UI state to match
-void SettingsDeleteButtonWidget::on_action_state_updated(){
-    QMetaObject::invokeMethod(this, [this]{
-        update_UI_state();
-    }, Qt::QueuedConnection);
-    
-}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SettingsCancelButtonWidget
@@ -295,9 +254,6 @@ SettingsCancelButtonWidget::SettingsCancelButtonWidget(QWidget& parent, Settings
     int minWidth = metrics.horizontalAdvance("Cancelling...");
     m_button->setMinimumWidth(minWidth);
 
-    // update the UI based on m_enabled, when the button is constructed
-    update_UI_state();
-
     // when the button is clicked, runs row.update_action_state(), which updates the button state
     // also, set cancel state to true
     connect(
@@ -314,6 +270,12 @@ SettingsCancelButtonWidget::SettingsCancelButtonWidget(QWidget& parent, Settings
 
     m_row.add_listener(*this);
 
+}
+
+void SettingsCancelButtonWidget::on_change_text(const std::string& text){
+    QMetaObject::invokeMethod(this, [this, text]{
+        m_button->setText(QString::fromStdString(text));
+    }, Qt::QueuedConnection);
 }
 
 void SettingsCancelButtonWidget::show_cancel_confirm_box(){
@@ -363,26 +325,6 @@ void SettingsCancelButtonWidget::show_cancel_confirm_box(){
 }
 
 
-void SettingsCancelButtonWidget::update_UI_state(){
-    if (m_value.get_enabled()){
-        m_button->setEnabled(true);
-        m_button->setText("Cancel");
-    }else{
-        m_button->setEnabled(false);
-        if (m_row.is_given_action_state(ActionState::PRE_CANCEL) 
-            || m_row.is_given_action_state(ActionState::CANCELLING)
-    ){
-            m_button->setText("Cancelling...");
-        }
-    }
-}
-
-// when action_state_updated, update the UI state to match
-void SettingsCancelButtonWidget::on_action_state_updated(){
-    QMetaObject::invokeMethod(this, [this]{
-        update_UI_state();
-    }, Qt::QueuedConnection);
-}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SettingsProgressBarWidget

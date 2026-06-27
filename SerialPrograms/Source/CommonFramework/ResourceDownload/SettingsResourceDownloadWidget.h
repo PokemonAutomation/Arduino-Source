@@ -16,7 +16,7 @@
 namespace PokemonAutomation{
 
 
-class SettingsDownloadButtonWidget : public QWidget, public ConfigWidget, public SettingsResourceDownloadRow::Listener{
+class SettingsDownloadButtonWidget : public QWidget, public ConfigWidget, public SettingsResourceDownloadRow::Listener, SettingsResourceButton::Listener{
 public:
     using ParentOption = SettingsResourceDownloadButton;
 
@@ -24,11 +24,13 @@ public:
     ~SettingsDownloadButtonWidget();
     SettingsDownloadButtonWidget(QWidget& parent, SettingsResourceDownloadButton& value);
 
+public: // SettingsResourceDownloadRow::Listener
     virtual void on_metadata_fetch_finished(const std::string& popup_message) override;
-    virtual void on_action_state_updated() override;
+
+public: // SettingsResourceButton::Listener
+    virtual void on_change_text(const std::string& text) override;
 
 private:
-    void update_UI_state();
     void show_download_confirm_box(
         const std::string& title,
         const std::string& message_body
@@ -42,7 +44,7 @@ private:
 };
 
 
-class SettingsDeleteButtonWidget :  public QWidget, public ConfigWidget, public SettingsResourceDownloadRow::Listener{
+class SettingsDeleteButtonWidget :  public QWidget, public ConfigWidget, public SettingsResourceDownloadRow::Listener, SettingsResourceButton::Listener{
 public:
     using ParentOption = SettingsResourceDeleteButton;
 
@@ -50,19 +52,20 @@ public:
     ~SettingsDeleteButtonWidget();
     SettingsDeleteButtonWidget(QWidget& parent, SettingsResourceDeleteButton& value);
 
-    virtual void on_action_state_updated() override;
 
-private:
-    void update_UI_state();
+private: // SettingsResourceDownloadRow::Listener
     void show_delete_confirm_box();
+
+public: // SettingsResourceButton::Listener
+    virtual void on_change_text(const std::string& text) override;
 
 private:
     SettingsResourceDeleteButton& m_value;
     SettingsResourceDownloadRow& m_row;
-    QPushButton* m_button;    
+    QPushButton* m_button;
 };
 
-class SettingsCancelButtonWidget :  public QWidget, public ConfigWidget, public SettingsResourceDownloadRow::Listener{
+class SettingsCancelButtonWidget :  public QWidget, public ConfigWidget, public SettingsResourceDownloadRow::Listener, SettingsResourceButton::Listener{
 public:
     using ParentOption = SettingsResourceCancelButton;
 
@@ -70,16 +73,17 @@ public:
     ~SettingsCancelButtonWidget();
     SettingsCancelButtonWidget(QWidget& parent, SettingsResourceCancelButton& value);
 
-    virtual void on_action_state_updated() override;
 
-private:
-    void update_UI_state();
+private: // SettingsResourceDownloadRow::Listener
     void show_cancel_confirm_box();
+
+public: // SettingsResourceButton::Listener
+    virtual void on_change_text(const std::string& text) override;
 
 private:
     SettingsResourceCancelButton& m_value;
     SettingsResourceDownloadRow& m_row;
-    QPushButton* m_button;    
+    QPushButton* m_button;
 };
 
 class SettingsProgressBarWidget : public QWidget, public ConfigWidget, public SettingsResourceDownloadRow::Listener{
