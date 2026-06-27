@@ -32,6 +32,8 @@ public:
 
     std::string recognize(const ImageViewRGB32& image);
 
+    static std::pair<std::string, std::string> get_paths(Language language);
+
 private:
     void load_dictionary(const std::string& path);
 

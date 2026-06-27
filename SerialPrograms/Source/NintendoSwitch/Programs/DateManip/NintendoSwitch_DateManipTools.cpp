@@ -7,7 +7,6 @@
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/Images/ImageFilter.h"
-//#include "CommonTools/OCR/OCR_RawOCR.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch_DateManipTools.h"

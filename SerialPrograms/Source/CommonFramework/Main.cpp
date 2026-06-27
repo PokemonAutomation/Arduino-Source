@@ -35,7 +35,7 @@
 #include "Startup/SetupSettings.h"
 #include "Startup/NewVersionCheck.h"
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
-#include "CommonTools/OCR/OCR_RawOCR.h"
+#include "CommonTools/OCR/OCR_Routines.h"
 #include "ControllerInput/ControllerInput.h"
 #include "Controllers/SerialPortPollerQt.h"
 #include "Integrations/DiscordWebhook.h"
@@ -225,7 +225,7 @@ int main(int argc, char *argv[]){
 
     //  We must clear the OCR cache or it will crash on Linux when the library
     //  unloads before the cache is destructed from static memory.
-    OCR::clear_cache();
+    OCR::clear_ocr_cache();
 
     //  Stop the controllers.
     global_input_stop();

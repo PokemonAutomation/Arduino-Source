@@ -4,6 +4,10 @@
  *
  */
 
+// NOTE: This file should only be inluded in OCR_Routines.h
+// This file should not be inluded in other files.
+// Use OCR_Routines.h instead
+
 #ifndef PokemonAutomation_CommonTools_OCR_RawPaddleOCR_H
 #define PokemonAutomation_CommonTools_OCR_RawPaddleOCR_H
 
@@ -16,6 +20,8 @@ namespace PokemonAutomation{
         class PaddleOCRPipeline;
     }
 namespace OCR{
+
+bool paddle_ocr_language_available(Language language);
 
 
 //  Pre-warm the PaddleOCR instance pool for a language. Ensure one instance exists.

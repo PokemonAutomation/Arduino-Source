@@ -19,8 +19,8 @@ namespace PokemonAutomation{
 namespace ML{
 
 
-static std::pair<std::string, std::string> get_paths(Language language){
-    std::string base = RESOURCE_PATH() + "PaddleOCR/";
+std::pair<std::string, std::string> PaddleOCRPipeline::get_paths(Language language){
+    std::string base = DOWNLOADED_RESOURCE_PATH() + "PaddleOCR/";
     switch(language){
     case Language::None:
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Attempted to call OCR without a language.");

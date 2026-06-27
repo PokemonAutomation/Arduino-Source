@@ -4,7 +4,6 @@
  *
  */
 
-#include "CommonTools/OCR/OCR_RawOCR.h"
 #include "PokemonLZA_HyperspaceRewardNameReader.h"
 
 namespace PokemonAutomation{

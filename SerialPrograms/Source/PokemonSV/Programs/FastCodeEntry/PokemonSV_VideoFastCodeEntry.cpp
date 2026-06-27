@@ -10,7 +10,7 @@
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Images/ImageFilter.h"
-#include "CommonTools/OCR/OCR_RawOCR.h"
+#include "CommonTools/OCR/OCR_Routines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -168,7 +168,7 @@ VideoFastCodeEntry::VideoFastCodeEntry()
 
     //  Preload
     GlobalThreadPools::computation_realtime().ensure_threads(6);
-    OCR::ensure_instances(Language::English, 6);
+    OCR::ensure_ocr_instances(Language::English, 6);
     preload_code_templates();
 }
 void VideoFastCodeEntry::update_active_consoles(size_t switch_count){

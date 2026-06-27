@@ -10,7 +10,6 @@
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/ImageFilter.h"
-#include "CommonTools/OCR/OCR_RawOCR.h"
 #include "CommonTools/OCR/OCR_SmallDictionaryMatcher.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "PokemonSV_ItemPrinterPrizeReader.h"

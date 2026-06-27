@@ -35,7 +35,7 @@ public:
     uint16_t calorie_number() const { return m_calorie_number; }
 
     // How many filters this detector uses to read Calorie numbers in parallel.
-    // Call OCR::ensure_instances() in SerialPrograms/Source/CommonTools/OCR/OCR_RawOCR.h
+    // Call OCR::ensure_ocr_instances() in SerialPrograms/Source/CommonTools/OCR/OCR_Routines.h
     // to warm OCR object cache so it won't be slow the first time running the detector.
     static void warm_ocr();
 

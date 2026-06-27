@@ -7,7 +7,7 @@
 #include <regex>
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonFramework/Language.h"
-#include "CommonTools/OCR/OCR_RawOCR.h"
+#include "CommonTools/OCR/OCR_Routines.h"
 #include "PokemonSV_MoneyReader.h"
 
 //#include <iostream>

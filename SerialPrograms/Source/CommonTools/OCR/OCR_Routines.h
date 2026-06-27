@@ -10,7 +10,7 @@
 #include <cstdint>
 #include <vector>
 #include "CommonFramework/Language.h"
-#include "OCR_RawOCR.h"
+#include "OCR_RawTesseractOCR.h"
 
 namespace PokemonAutomation{
     class ImageViewRGB32;
@@ -30,9 +30,16 @@ struct TextColorRange{
     {}
 };
 
+bool ocr_language_available(Language language);
+
+std::string ocr_read(Language language, const ImageViewRGB32& image, PageSegMode psm = PageSegMode::SINGLE_LINE);
+
+void ensure_ocr_instances(Language language, size_t instances = 1);
+
+void clear_ocr_cache();
 
 // psm: Tesseract Page Segmentation mode. See
-//   SerialPrograms/Source/CommonTools/OCR/OCR_RawOCR.h:PageSegMode
+//   SerialPrograms/Source/CommonTools/OCR/OCR_RawTesseractOCR.h:PageSegMode
 StringMatchResult multifiltered_OCR(
     Language language, const DictionaryMatcher& dictionary, const ImageViewRGB32& image,
     const std::vector<TextColorRange>& text_color_ranges,

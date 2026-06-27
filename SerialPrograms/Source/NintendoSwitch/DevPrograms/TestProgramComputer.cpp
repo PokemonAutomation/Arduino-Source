@@ -28,7 +28,6 @@
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonTools/OCR/OCR_RawOCR.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
