@@ -163,6 +163,8 @@ SettingsResourceDownloadRow::SettingsResourceDownloadRow(
     PA_ADD_STATIC(m_delete_button);
     PA_ADD_STATIC(m_cancel_button);
     PA_ADD_STATIC(m_progress_bar);
+
+    update_action_state(ActionState::READY);
 }
 
 
@@ -347,6 +349,8 @@ void SettingsResourceDownloadRow::update_action_state(ActionState state){
                 m_download_button.set_enabled(false);
                 m_delete_button.set_enabled(false);
                 m_cancel_button.set_enabled(true);
+                m_progress_bar.change_text("Downloading");
+                m_progress_bar.set_visibility(ConfigOptionState::ENABLED);
                 m_data->m_action_state = state;
                 cout << "ActionState::PRE_DOWNLOAD" << endl;
             }
@@ -356,6 +360,8 @@ void SettingsResourceDownloadRow::update_action_state(ActionState state){
                 m_download_button.set_enabled(false);
                 m_delete_button.set_enabled(false);
                 m_cancel_button.set_enabled(true);
+                m_progress_bar.change_text("Downloading");
+                m_progress_bar.set_visibility(ConfigOptionState::ENABLED);
                 m_data->m_action_state = state;
                 cout << "ActionState::DOWNLOADING" << endl;
             }
@@ -367,6 +373,7 @@ void SettingsResourceDownloadRow::update_action_state(ActionState state){
                 m_download_button.set_enabled(false);
                 m_delete_button.set_enabled(false);
                 m_cancel_button.set_enabled(false);
+                m_progress_bar.reset_progress();
                 m_data->m_action_state = state;
                 cout << "ActionState::PRE_DELETE" << endl;
             }
@@ -378,6 +385,7 @@ void SettingsResourceDownloadRow::update_action_state(ActionState state){
                 m_download_button.set_enabled(false);
                 m_delete_button.set_enabled(false);
                 m_cancel_button.set_enabled(false);
+                m_progress_bar.reset_progress();
                 m_data->m_action_state = state;
                 cout << "ActionState::DELETING" << endl;
             }
@@ -389,6 +397,7 @@ void SettingsResourceDownloadRow::update_action_state(ActionState state){
                 m_download_button.set_enabled(false);
                 m_delete_button.set_enabled(false);
                 m_cancel_button.set_enabled(false);
+                m_progress_bar.reset_progress();
                 m_data->m_action_state = state;
                 cout << "ActionState::PRE_CANCEL" << endl;
             }
@@ -400,6 +409,7 @@ void SettingsResourceDownloadRow::update_action_state(ActionState state){
                 m_download_button.set_enabled(false);
                 m_delete_button.set_enabled(false);
                 m_cancel_button.set_enabled(false);
+                m_progress_bar.reset_progress();
                 m_data->m_action_state = state;
                 cout << "ActionState::CANCELLING" << endl;
             }
@@ -408,6 +418,9 @@ void SettingsResourceDownloadRow::update_action_state(ActionState state){
             m_download_button.set_enabled(true);
             m_delete_button.set_enabled(true);
             m_cancel_button.set_enabled(true);
+            m_progress_bar.change_text("");
+            m_progress_bar.set_visibility(ConfigOptionState::HIDDEN);
+            m_progress_bar.reset_progress();
             m_data->m_action_state = state;
             cout << "ActionState::READY" << endl;
             break;
@@ -442,6 +455,7 @@ void SettingsResourceDownloadRow::connect_with_download(std::shared_ptr<Resource
     }
     m_data->m_download_ptr = std::move(download_ptr);
     m_data->m_download_ptr->add_listener(*this);
+    m_data->m_download_ptr->add_listener(m_progress_bar);
     update_action_state(ActionState::DOWNLOADING);
 }
 

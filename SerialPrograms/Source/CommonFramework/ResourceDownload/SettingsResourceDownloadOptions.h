@@ -8,6 +8,7 @@
 #define PokemonAutomation_ResourceDownloadOptions_H
 
 #include "Common/Cpp/ListenerSet.h"
+#include "ResourceDownload.h"
 
 namespace PokemonAutomation{
 
@@ -20,8 +21,8 @@ public:
         virtual void on_change_text(const std::string& text){}
     };
 
-    void add_listener(Listener& listener);
-    void remove_listener(Listener& listener);
+    void add_button_listener(Listener& listener);
+    void remove_button_listener(Listener& listener);
 
     void change_text(const std::string& text);
 
@@ -79,11 +80,35 @@ private:
     bool m_enabled;    
 };
 
-class SettingsResourceProgressBar : public ConfigOptionImpl<SettingsResourceProgressBar>{
+class SettingsResourceProgressBar : public ConfigOptionImpl<SettingsResourceProgressBar>, public ResourceDownload::Listener{
 public:
     SettingsResourceProgressBar(SettingsResourceDownloadRow& p_row);
 
+public:
+    struct Listener{
+        virtual void on_change_text(const std::string& text){}
+        virtual void on_update_progress(uint64_t bytes_done, uint64_t total_bytes){}
+        virtual void on_reset_progress(){}
+    };
+
+    void add_progress_listener(Listener& listener);
+    void remove_progress_listener(Listener& listener);
+
+    void change_text(const std::string& text);
+    void update_progress(uint64_t bytes_done, uint64_t total_bytes);
+    void reset_progress();
+
+public: // ResourceDownload::Listener
+    virtual void on_download_progress(uint64_t bytes_done, uint64_t total_bytes) override;
+    virtual void on_unzip_progress(uint64_t bytes_done, uint64_t total_bytes) override;
+    virtual void on_hash_progress(uint64_t bytes_done, uint64_t total_bytes) override;
+
+public:
     SettingsResourceDownloadRow& row;
+
+private:
+    ListenerSet<Listener> m_listeners;
+
 };
 
 

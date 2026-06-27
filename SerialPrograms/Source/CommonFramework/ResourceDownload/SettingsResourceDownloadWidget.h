@@ -16,7 +16,7 @@
 namespace PokemonAutomation{
 
 
-class SettingsDownloadButtonWidget : public QWidget, public ConfigWidget, public SettingsResourceDownloadRow::Listener, SettingsResourceButton::Listener{
+class SettingsDownloadButtonWidget : public QWidget, public ConfigWidget, public SettingsResourceDownloadRow::Listener, public SettingsResourceButton::Listener{
 public:
     using ParentOption = SettingsResourceDownloadButton;
 
@@ -86,7 +86,7 @@ private:
     QPushButton* m_button;
 };
 
-class SettingsProgressBarWidget : public QWidget, public ConfigWidget, public SettingsResourceDownloadRow::Listener{
+class SettingsProgressBarWidget : public QWidget, public ConfigWidget, public SettingsResourceProgressBar::Listener{
 public:
     using ParentOption = SettingsResourceProgressBar;
 
@@ -94,19 +94,17 @@ public:
     ~SettingsProgressBarWidget();
     SettingsProgressBarWidget(QWidget& parent, SettingsResourceProgressBar& value);
 
-    virtual void on_download_progress(uint64_t bytes_done, uint64_t total_bytes) override;
-    virtual void on_unzip_progress(uint64_t bytes_done, uint64_t total_bytes) override;
-    virtual void on_hash_progress(uint64_t bytes_done, uint64_t total_bytes) override;
-
-    virtual void on_action_state_updated() override;
+public: // SettingsResourceProgressBar::Listener
+    virtual void on_change_text(const std::string& text) override;
+    virtual void on_update_progress(uint64_t bytes_done, uint64_t total_bytes) override;
+    virtual void on_reset_progress() override;
 
 private:    
-    void update_UI_state();
-    void update_progress_bar(int percentage, const std::string& text);
-    void update_progress_bar(uint64_t bytes_done, uint64_t total_bytes, const std::string& text);
+    void update_progress_bar(int percentage);
+    void update_progress_bar(uint64_t bytes_done, uint64_t total_bytes);
     
 private:
-    // SettingsResourceProgressBar& m_value;
+    SettingsResourceProgressBar& m_value;
     SettingsResourceDownloadRow& m_row;
     QLabel* m_status_label;
     QProgressBar* m_progress_bar;

@@ -28,6 +28,7 @@ SettingsDownloadButtonWidget::~SettingsDownloadButtonWidget(){
     // cout << "Destructor for SettingsDownloadButtonWidget" << endl;
     // m_value.disconnect(this);
     m_row.remove_listener(*this);
+    m_value.remove_button_listener(*this);
 }
 SettingsDownloadButtonWidget::SettingsDownloadButtonWidget(QWidget& parent, SettingsResourceDownloadButton& value)
     : QWidget(&parent)
@@ -71,6 +72,7 @@ SettingsDownloadButtonWidget::SettingsDownloadButtonWidget(QWidget& parent, Sett
 
 
     m_row.add_listener(*this);
+    value.add_button_listener(*this);
 }
 
 
@@ -138,6 +140,7 @@ void SettingsDownloadButtonWidget::on_metadata_fetch_finished(const std::string&
 template class RegisterConfigWidget<SettingsDeleteButtonWidget>;
 SettingsDeleteButtonWidget::~SettingsDeleteButtonWidget(){
     m_row.remove_listener(*this);
+    m_value.remove_button_listener(*this);
 }
 SettingsDeleteButtonWidget::SettingsDeleteButtonWidget(QWidget& parent, SettingsResourceDeleteButton& value)
     : QWidget(&parent)
@@ -179,6 +182,7 @@ SettingsDeleteButtonWidget::SettingsDeleteButtonWidget(QWidget& parent, Settings
     );
 
     m_row.add_listener(*this);
+    value.add_button_listener(*this);
 }
 
 void SettingsDeleteButtonWidget::on_change_text(const std::string& text){
@@ -229,6 +233,7 @@ void SettingsDeleteButtonWidget::show_delete_confirm_box(){
 template class RegisterConfigWidget<SettingsCancelButtonWidget>;
 SettingsCancelButtonWidget::~SettingsCancelButtonWidget(){
     m_row.remove_listener(*this);
+    m_value.remove_button_listener(*this);
 }
 SettingsCancelButtonWidget::SettingsCancelButtonWidget(QWidget& parent, SettingsResourceCancelButton& value)
     : QWidget(&parent)
@@ -269,7 +274,7 @@ SettingsCancelButtonWidget::SettingsCancelButtonWidget(QWidget& parent, Settings
     );
 
     m_row.add_listener(*this);
-
+    value.add_button_listener(*this);
 }
 
 void SettingsCancelButtonWidget::on_change_text(const std::string& text){
@@ -333,12 +338,12 @@ void SettingsCancelButtonWidget::show_cancel_confirm_box(){
 template class RegisterConfigWidget<SettingsProgressBarWidget>;
 SettingsProgressBarWidget::~SettingsProgressBarWidget(){
     // cout << "Destructor for SettingsProgressBarWidget" << endl;
-    m_row.remove_listener(*this);
+    m_value.remove_progress_listener(*this);
 }
 SettingsProgressBarWidget::SettingsProgressBarWidget(QWidget& parent, SettingsResourceProgressBar& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
-    // , m_value(value)
+    , m_value(value)
     , m_row(value.row)
 {
 
@@ -352,7 +357,6 @@ SettingsProgressBarWidget::SettingsProgressBarWidget(QWidget& parent, SettingsRe
     m_progress_bar->setRange(0, 100);
     m_progress_bar->setValue(0);
     m_progress_bar->setTextVisible(true); // Shows % inside the bar
-    m_progress_bar->hide();
 
     // 3. Create a horizontal layout to hold them
     QHBoxLayout *layout = new QHBoxLayout();
@@ -362,84 +366,46 @@ SettingsProgressBarWidget::SettingsProgressBarWidget(QWidget& parent, SettingsRe
     this->setLayout(layout);
     this->setMinimumWidth(170);
 
-    m_row.add_listener(*this);
+    value.add_progress_listener(*this);
+
+    // m_progress_bar->hide();
+    // this->hide();
+
+    // cout << "progress" << endl;
 }
 
 
-void SettingsProgressBarWidget::update_UI_state(){
-    ActionState state = m_row.get_action_state();
-    switch (state){
-    case ActionState::PRE_DOWNLOAD:
-    case ActionState::DOWNLOADING:
-        m_status_label->setText("Downloading");
-        if (m_progress_bar->isHidden()) {
-            m_progress_bar->show();
-        }
-        break;
-    case ActionState::PRE_DELETE:
-    case ActionState::DELETING:
-        // m_status_label->setText("");
-        // m_progress_bar->hide();
-        m_progress_bar->setValue(0);
-        break;
-    case ActionState::PRE_CANCEL:
-    case ActionState::CANCELLING:
-        // m_status_label->setText("");
-        // m_progress_bar->hide();
-        m_progress_bar->setValue(0);
-        break;
-    case ActionState::READY:
-        m_status_label->setText("");
-        m_progress_bar->hide();
-        m_progress_bar->setValue(0);
-        break;
-    default:
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "update_UI_state: Unknown enum.");  
-    }
-}
-
-void SettingsProgressBarWidget::update_progress_bar(int percentage, const std::string& text){
-    if (m_progress_bar->isHidden()) {
-        m_progress_bar->show(); // Make it visible when progress starts
-    }
-    m_status_label->setText(QString::fromStdString(text));
+void SettingsProgressBarWidget::update_progress_bar(int percentage){
     m_progress_bar->setValue(percentage);
 }
 
-void SettingsProgressBarWidget::update_progress_bar(uint64_t bytes_done, uint64_t total_bytes, const std::string& text){
+void SettingsProgressBarWidget::update_progress_bar(uint64_t bytes_done, uint64_t total_bytes){
     double percent = total_bytes > 0 ? (static_cast<double>(bytes_done) / total_bytes) * 100.0 : 0;
     int current_percent = static_cast<int>(percent);
     int last_percentage = m_progress_bar->value();
     // Only update UI if integer value has changed
     if (current_percent != last_percentage){
-        update_progress_bar(current_percent, text);
+        update_progress_bar(current_percent);
     }
 }
 
-void SettingsProgressBarWidget::on_download_progress(uint64_t bytes_done, uint64_t total_bytes){
-    QMetaObject::invokeMethod(this, [this, bytes_done, total_bytes]{
-        update_progress_bar(bytes_done, total_bytes, "Downloading");        
+void SettingsProgressBarWidget::on_change_text(const std::string& text){
+    QMetaObject::invokeMethod(this, [this, text]{
+        m_status_label->setText(QString::fromStdString(text));
     }, Qt::QueuedConnection);
 
 }
-void SettingsProgressBarWidget::on_unzip_progress(uint64_t bytes_done, uint64_t total_bytes){
+void SettingsProgressBarWidget::on_update_progress(uint64_t bytes_done, uint64_t total_bytes){
     QMetaObject::invokeMethod(this, [this, bytes_done, total_bytes]{
-        update_progress_bar(bytes_done, total_bytes, "Unzipping");
+        update_progress_bar(bytes_done, total_bytes);
     }, Qt::QueuedConnection);
 }
-void SettingsProgressBarWidget::on_hash_progress(uint64_t bytes_done, uint64_t total_bytes){
-    QMetaObject::invokeMethod(this, [this, bytes_done, total_bytes]{
-        update_progress_bar(bytes_done, total_bytes, "Verifying");
-    }, Qt::QueuedConnection);
-}
-// when action_state_updated, update the UI state to match
-void SettingsProgressBarWidget::on_action_state_updated(){
+
+void SettingsProgressBarWidget::on_reset_progress(){
     QMetaObject::invokeMethod(this, [this]{
-        update_UI_state();
+        m_progress_bar->setValue(0);
     }, Qt::QueuedConnection);
-    
 }
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SettingsDownloadErrorWidget
