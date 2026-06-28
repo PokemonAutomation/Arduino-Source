@@ -121,6 +121,14 @@ void SettingsResourceProgressBar::on_hash_progress(uint64_t bytes_done, uint64_t
 }
 
 //////////////////////////////////////
+// SettingsDownloadPopup
+//////////////////////////////////////
+SettingsDownloadPopup::SettingsDownloadPopup(SettingsResourceDownloadRow& p_row)
+    : ConfigOptionImpl<SettingsDownloadPopup>(LockMode::LOCK_WHILE_RUNNING)
+    , row(p_row)
+{}
+
+//////////////////////////////////////
 // SettingsDownloadError
 //////////////////////////////////////
 SettingsDownloadError::SettingsDownloadError()

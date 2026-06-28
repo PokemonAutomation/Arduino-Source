@@ -111,6 +111,13 @@ private:
 
 };
 
+class SettingsDownloadPopup : public ConfigOptionImpl<SettingsDownloadPopup>, public ResourceDownload::Listener{
+public:
+    SettingsDownloadPopup(SettingsResourceDownloadRow& p_row);
+public:
+    SettingsResourceDownloadRow& row;
+
+};
 
 class SettingsDownloadError : public ConfigOptionImpl<SettingsDownloadError>{
 public:

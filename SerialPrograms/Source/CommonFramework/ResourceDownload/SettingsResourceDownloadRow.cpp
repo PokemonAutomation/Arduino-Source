@@ -153,6 +153,7 @@ SettingsResourceDownloadRow::SettingsResourceDownloadRow(
     , m_delete_button(*this)
     , m_cancel_button(*this)
     , m_progress_bar(*this)
+    , m_popup(*this)
 {
     PA_ADD_STATIC(m_data->m_resource_name_label);
     PA_ADD_STATIC(m_data->m_file_size_label);
@@ -163,6 +164,7 @@ SettingsResourceDownloadRow::SettingsResourceDownloadRow(
     PA_ADD_STATIC(m_delete_button);
     PA_ADD_STATIC(m_cancel_button);
     PA_ADD_STATIC(m_progress_bar);
+    PA_ADD_STATIC(m_popup);
 
     update_action_state(ActionState::READY);
 }

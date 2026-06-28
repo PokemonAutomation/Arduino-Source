@@ -27,7 +27,6 @@ template class RegisterConfigWidget<SettingsDownloadButtonWidget>;
 SettingsDownloadButtonWidget::~SettingsDownloadButtonWidget(){
     // cout << "Destructor for SettingsDownloadButtonWidget" << endl;
     // m_value.disconnect(this);
-    m_row.remove_listener(*this);
     m_value.remove_button_listener(*this);
 }
 SettingsDownloadButtonWidget::SettingsDownloadButtonWidget(QWidget& parent, SettingsResourceDownloadButton& value)
@@ -71,7 +70,6 @@ SettingsDownloadButtonWidget::SettingsDownloadButtonWidget(QWidget& parent, Sett
     );
 
 
-    m_row.add_listener(*this);
     value.add_button_listener(*this);
 }
 
@@ -83,54 +81,6 @@ void SettingsDownloadButtonWidget::on_change_text(const std::string& text){
 }
 
 
-void SettingsDownloadButtonWidget::show_download_confirm_box(
-    const std::string& title,
-    const std::string& message_body
-){
-    QMessageBox box;
-    QPushButton* ok = box.addButton(QMessageBox::Ok);
-    QPushButton* cancel = box.addButton("Cancel", QMessageBox::NoRole);
-    box.setEscapeButton(cancel);
-//    cout << "ok = " << ok << endl;
-//    cout << "skip = " << skip << endl;
-
-    box.setTextFormat(Qt::RichText);
-    std::string text = message_body;
-    // text += make_text_url(link_url, link_text);
-    // text += get_changes(node);
-
-
-    box.setWindowTitle(QString::fromStdString(title));
-    box.setText(QString::fromStdString(text));
-
-//    box.open();
-
-    box.exec();
-
-    QAbstractButton* clicked = box.clickedButton();
-//    cout << "clicked = " << clicked << endl;
-    if (clicked == ok){
-        cout << "Clicked Ok to Download" << endl;
-
-        m_row.start_download();
-        return;
-    }
-    if (clicked == cancel){
-        m_row.update_action_state(ActionState::READY);
-        return;
-    }
-}
-
-// when json has been fetched, open the update box. 
-// When click Ok in update box, start the download. If click cancel, re-enable the download button
-void SettingsDownloadButtonWidget::on_metadata_fetch_finished(const std::string& popup_message){
-    QMetaObject::invokeMethod(this, [this, popup_message]{
-        show_download_confirm_box("Download", popup_message);
-    }, Qt::QueuedConnection);
-
-}
-
-
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -139,7 +89,6 @@ void SettingsDownloadButtonWidget::on_metadata_fetch_finished(const std::string&
 
 template class RegisterConfigWidget<SettingsDeleteButtonWidget>;
 SettingsDeleteButtonWidget::~SettingsDeleteButtonWidget(){
-    m_row.remove_listener(*this);
     m_value.remove_button_listener(*this);
 }
 SettingsDeleteButtonWidget::SettingsDeleteButtonWidget(QWidget& parent, SettingsResourceDeleteButton& value)
@@ -181,7 +130,6 @@ SettingsDeleteButtonWidget::SettingsDeleteButtonWidget(QWidget& parent, Settings
         }
     );
 
-    m_row.add_listener(*this);
     value.add_button_listener(*this);
 }
 
@@ -232,7 +180,6 @@ void SettingsDeleteButtonWidget::show_delete_confirm_box(){
 
 template class RegisterConfigWidget<SettingsCancelButtonWidget>;
 SettingsCancelButtonWidget::~SettingsCancelButtonWidget(){
-    m_row.remove_listener(*this);
     m_value.remove_button_listener(*this);
 }
 SettingsCancelButtonWidget::SettingsCancelButtonWidget(QWidget& parent, SettingsResourceCancelButton& value)
@@ -273,7 +220,6 @@ SettingsCancelButtonWidget::SettingsCancelButtonWidget(QWidget& parent, Settings
         }
     );
 
-    m_row.add_listener(*this);
     value.add_button_listener(*this);
 }
 
@@ -368,6 +314,8 @@ SettingsProgressBarWidget::SettingsProgressBarWidget(QWidget& parent, SettingsRe
 
     value.add_progress_listener(*this);
 
+    // value.set_visibility(ConfigOptionState::HIDDEN);
+
     // m_progress_bar->hide();
     // this->hide();
 
@@ -405,6 +353,69 @@ void SettingsProgressBarWidget::on_reset_progress(){
     QMetaObject::invokeMethod(this, [this]{
         m_progress_bar->setValue(0);
     }, Qt::QueuedConnection);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SettingsDownloadPopupWidget
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+template class RegisterConfigWidget<SettingsDownloadPopupWidget>;
+SettingsDownloadPopupWidget::~SettingsDownloadPopupWidget(){
+    m_row.remove_listener(*this);
+}
+SettingsDownloadPopupWidget::SettingsDownloadPopupWidget(QWidget& parent, SettingsDownloadPopup& value)
+    : QWidget(&parent)
+    , ConfigWidget(value, *this)
+    , m_value(value)
+    , m_row(value.row)
+{
+    m_row.add_listener(*this);
+}
+
+void SettingsDownloadPopupWidget::show_download_confirm_box(
+    const std::string& title,
+    const std::string& message_body
+){
+    QMessageBox box;
+    QPushButton* ok = box.addButton(QMessageBox::Ok);
+    QPushButton* cancel = box.addButton("Cancel", QMessageBox::NoRole);
+    box.setEscapeButton(cancel);
+//    cout << "ok = " << ok << endl;
+//    cout << "skip = " << skip << endl;
+
+    box.setTextFormat(Qt::RichText);
+    std::string text = message_body;
+    // text += make_text_url(link_url, link_text);
+    // text += get_changes(node);
+
+
+    box.setWindowTitle(QString::fromStdString(title));
+    box.setText(QString::fromStdString(text));
+
+//    box.open();
+
+    box.exec();
+
+    QAbstractButton* clicked = box.clickedButton();
+//    cout << "clicked = " << clicked << endl;
+    if (clicked == ok){
+        cout << "Clicked Ok to Download" << endl;
+
+        m_row.start_download();
+        return;
+    }
+    if (clicked == cancel){
+        m_row.update_action_state(ActionState::READY);
+        return;
+    }
+}
+
+// when json has been fetched, open the update box. 
+// When click Ok in update box, start the download. If click cancel, re-enable the download button
+void SettingsDownloadPopupWidget::on_metadata_fetch_finished(const std::string& popup_message){
+    QMetaObject::invokeMethod(this, [this, popup_message]{
+        show_download_confirm_box("Download", popup_message);
+    }, Qt::QueuedConnection);
+
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
