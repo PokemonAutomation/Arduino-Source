@@ -97,7 +97,7 @@ private:
     
 private:
     SettingsResourceProgressBar& m_value;
-    SettingsResourceDownloadRow& m_row;
+    // SettingsResourceDownloadRow& m_row;
     QLabel* m_status_label;
     QProgressBar* m_progress_bar;
 };
@@ -121,7 +121,7 @@ private:
     );
 
 private:
-    SettingsDownloadPopup& m_value;
+    // SettingsDownloadPopup& m_value;
     SettingsResourceDownloadRow& m_row;
     
 };

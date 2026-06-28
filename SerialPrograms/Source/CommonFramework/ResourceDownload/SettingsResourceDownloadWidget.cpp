@@ -290,7 +290,7 @@ SettingsProgressBarWidget::SettingsProgressBarWidget(QWidget& parent, SettingsRe
     : QWidget(&parent)
     , ConfigWidget(value, *this)
     , m_value(value)
-    , m_row(value.row)
+    // , m_row(value.row)
 {
 
     // 1. Instantiate the widgets
@@ -365,7 +365,7 @@ SettingsDownloadPopupWidget::~SettingsDownloadPopupWidget(){
 SettingsDownloadPopupWidget::SettingsDownloadPopupWidget(QWidget& parent, SettingsDownloadPopup& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
-    , m_value(value)
+    // , m_value(value)
     , m_row(value.row)
 {
     m_row.add_listener(*this);
