@@ -29,9 +29,19 @@ Client& Client::instance(){
 
 
 Client::~Client(){
+    stop();
+}
+
+void Client::stop(){
+    if (m_stopped){
+        return;
+    }
+    m_stopped = true;
     GlobalSettings::instance().DISCORD->integration.register_slash_button.remove_listener(*this);
     disconnect();
+    Handler::stop();
 }
+
 
 bool Client::is_initialized(){
     std::lock_guard<std::mutex> lg(m_client_lock);
@@ -58,7 +68,11 @@ void Client::connect(){
         try{
             m_bot = std::make_unique<cluster>(token, intents);
             m_handler = std::make_unique<commandhandler>(m_bot.get(), false);
-            m_bot->cache_policy = { cache_policy_setting_t::cp_lazy, cache_policy_setting_t::cp_lazy, cache_policy_setting_t::cp_aggressive };
+            m_bot->cache_policy = {
+                cache_policy_setting_t::cp_lazy,
+                cache_policy_setting_t::cp_lazy,
+                cache_policy_setting_t::cp_aggressive
+            };
             m_start_thread = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
                 [&, this]{ run(token); }
             );
@@ -171,6 +185,27 @@ void Client::run(const std::string& token){
 
 //    cout << "Client::run() - ending" << endl;
 }
+void Client::on_press(){
+    std::lock_guard<std::mutex> lg(m_register_lock);
+    if (m_handler && m_handler->slash_commands_enabled){
+        GlobalSettings::instance().DISCORD->integration.register_slash_button.set_enabled(false);
+        log_dpp("Registering commands...", "Slash Command Registration", dpp::ll_info);
+        m_handler->register_commands();
+        log_dpp(
+            "Registered commands with Discord. You may have to wait or restart Discord for changes to take effect.",
+            "Slash Command Registration",
+            dpp::ll_info
+        );
+        GlobalSettings::instance().DISCORD->integration.register_slash_button.set_enabled(true);
+        return;
+    }
+
+    log_dpp(
+        "Failed to register commands. Make sure the bot is connected and Slash commands are enabled.",
+        "Slash Command Registration",
+        dpp::ll_error
+    );
+};
 
 
 }

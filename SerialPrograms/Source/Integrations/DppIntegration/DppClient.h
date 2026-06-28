@@ -16,16 +16,13 @@ namespace DppClient{
 
 
 
-class Client : protected DppCommandHandler::Handler, public ButtonListener{
+class Client final : protected DppCommandHandler::Handler, public ButtonListener{
 public:
     Client() : m_is_connected(false) {}
     ~Client();
     static Client& instance();
 
-    virtual void stop() override{
-        disconnect();
-        Handler::stop();
-    }
+    virtual void stop() override;
 
 public:
     bool is_initialized();
@@ -43,24 +40,13 @@ public:
 
 private:
     void run(const std::string& token);
-    virtual void on_press() override{
-        std::lock_guard<std::mutex> lg(m_register_lock);
-        if (m_handler && m_handler->slash_commands_enabled){
-            GlobalSettings::instance().DISCORD->integration.register_slash_button.set_enabled(false);
-            log_dpp("Registering commands...", "Slash Command Registration", dpp::ll_info);
-            m_handler->register_commands();
-            log_dpp("Registered commands with Discord. You may have to wait or restart Discord for changes to take effect.", "Slash Command Registration", dpp::ll_info);
-            GlobalSettings::instance().DISCORD->integration.register_slash_button.set_enabled(true);
-            return;
-        }
-
-        log_dpp("Failed to register commands. Make sure the bot is connected and Slash commands are enabled.", "Slash Command Registration", dpp::ll_error);
-    };
+    virtual void on_press() override;
 
 private:
     std::unique_ptr<dpp::cluster> m_bot = nullptr;
     std::unique_ptr<dpp::commandhandler> m_handler = nullptr;
     std::atomic<bool> m_is_connected;
+    bool m_stopped = false;
     std::mutex m_client_lock;
     std::mutex m_register_lock;
     AsyncTask m_start_thread;
