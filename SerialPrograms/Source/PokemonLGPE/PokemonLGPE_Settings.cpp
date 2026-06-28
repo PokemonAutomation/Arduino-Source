@@ -10,7 +10,8 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLGPE{
-    using namespace Pokemon;
+
+using namespace Pokemon;
 
 
 
