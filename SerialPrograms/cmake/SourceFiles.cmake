@@ -2024,6 +2024,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonPokopia/PokemonPokopia_Panels.h
     Source/PokemonPokopia/PokemonPokopia_Settings.cpp
     Source/PokemonPokopia/PokemonPokopia_Settings.h
+    Source/PokemonPokopia/Programs/PokemonPokopia_AutoMiner.cpp
+    Source/PokemonPokopia/Programs/PokemonPokopia_AutoMiner.h
     Source/PokemonPokopia/Programs/PokemonPokopia_CloudIslandReset.cpp
     Source/PokemonPokopia/Programs/PokemonPokopia_CloudIslandReset.h
     Source/PokemonPokopia/Programs/PokemonPokopia_PCNavigation.cpp

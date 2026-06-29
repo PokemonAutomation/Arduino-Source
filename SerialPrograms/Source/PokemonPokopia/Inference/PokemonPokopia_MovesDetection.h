@@ -40,6 +40,7 @@ private:
     ImageFloatBox m_last_detected;
     std::optional<OverlayBoxScope> m_last_detected_box;
 };
+
 class OverworldWatcher : public DetectorToFinder<OverworldDetector>{
 public:
     OverworldWatcher(
@@ -50,6 +51,7 @@ public:
          : DetectorToFinder("OverworldWatcher", hold_duration, color, overlay)
     {}
 };
+
 class OverworldGoneWatcher : public DetectorToFinder<OverworldDetector>{
 public:
     OverworldGoneWatcher(
@@ -61,6 +63,37 @@ public:
     {}
 };
 
+class PPDetector : public StaticScreenDetector{
+public:
+    PPDetector(
+        Color color,
+        VideoOverlay* overlay = nullptr
+    );
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+    double get_pp_percent() const { return m_pp_percent; }
+    bool is_powered_up() const { return m_powered_up; }
+
+private:
+    Color m_color;
+    ImageFloatBox m_pp_box;
+    double m_yellow_ratio = 0.0;
+    double m_blue_ratio = 0.0;
+    double m_pp_percent = 0.0;
+    bool m_powered_up = false;
+};
+
+class PPWatcher : public DetectorToFinder<PPDetector>{
+public:
+    PPWatcher(
+        Color color,
+        VideoOverlay* overlay = nullptr,
+        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
+    )
+         : DetectorToFinder("PPWatcher", hold_duration, color, overlay)
+    {}
+};
 
 
 }
