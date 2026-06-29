@@ -12,6 +12,7 @@
 #include "CommonFramework/Options/ThreadPoolOption.h"
 #include "ProcessPriorityOption.h"
 #include "ProcessorLevelOption.h"
+#include "CoreAffinityOption.h"
 
 namespace PokemonAutomation{
 
@@ -69,6 +70,9 @@ public:
         )
     {
         PA_ADD_OPTION(PROCESSOR_LEVEL);
+#ifdef _WIN32
+        PA_ADD_OPTION(CORE_AFFINITY);
+#endif
 
         PA_ADD_OPTION(REALTIME_THREAD_PRIORITY);
         PA_ADD_OPTION(INFERENCE_PIVOT_PRIORITY);
@@ -82,6 +86,9 @@ public:
 
 public:
     ProcessorLevelOption PROCESSOR_LEVEL;
+#ifdef _WIN32
+    CoreAffinityOption CORE_AFFINITY;
+#endif
 
     ThreadPriorityOption REALTIME_THREAD_PRIORITY;
     ThreadPriorityOption INFERENCE_PIVOT_PRIORITY;

@@ -13,7 +13,6 @@
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
-#include "CommonTools/OCR/OCR_RawOCR.h"
 #include "PokemonPokopia_PCDetection.h"
 
 namespace PokemonAutomation{

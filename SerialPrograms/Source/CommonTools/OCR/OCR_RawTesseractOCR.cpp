@@ -14,7 +14,7 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "OCR_RawOCR.h"
+#include "OCR_RawTesseractOCR.h"
 
 #include <iostream>
 using std::cout;
@@ -24,7 +24,7 @@ namespace PokemonAutomation{
 namespace OCR{
 
 
-bool language_available(Language language){
+bool tesseract_language_available(Language language){
     std::string path = RESOURCE_PATH();
     path += "Tesseract/";
     path += language_data(language).code;
@@ -179,7 +179,7 @@ struct OcrGlobals{
 };
 
 
-std::string ocr_read(Language language, const ImageViewRGB32& image, PageSegMode psm){
+std::string tesseract_ocr_read(Language language, const ImageViewRGB32& image, PageSegMode psm){
 //    static size_t c = 0;
 //    image.save("ocr-" + std::to_string(c++) + ".png");
 
@@ -193,7 +193,7 @@ std::string ocr_read(Language language, const ImageViewRGB32& image, PageSegMode
     // Get or create the pool for this language (lock only during map access).
     std::map<Language, TesseractPool>::iterator iter;
     {
-        WriteSpinLock lg(globals.ocr_pool_lock, "ocr_read()");
+        WriteSpinLock lg(globals.ocr_pool_lock, "tesseract_ocr_read()");
         iter = ocr_pool.find(language);
         if (iter == ocr_pool.end()){
             iter = ocr_pool.emplace(language, language).first;
@@ -208,7 +208,7 @@ std::string ocr_read(Language language, const ImageViewRGB32& image, PageSegMode
 }
 
 
-void ensure_instances(Language language, size_t instances){
+void ensure_tesseract_instances(Language language, size_t instances){
     if (language == Language::None){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Attempted to call OCR without a language.");
     }
@@ -219,7 +219,7 @@ void ensure_instances(Language language, size_t instances){
     // Get or create the pool for this language.
     std::map<Language, TesseractPool>::iterator iter;
     {
-        WriteSpinLock lg(globals.ocr_pool_lock, "ocr_read()");
+        WriteSpinLock lg(globals.ocr_pool_lock, "tesseract_ocr_read()");
         iter = ocr_pool.find(language);
         if (iter == ocr_pool.end()){
             iter = ocr_pool.emplace(language, language).first;
@@ -229,7 +229,7 @@ void ensure_instances(Language language, size_t instances){
     iter->second.ensure_instances(instances);
 }
 
-void clear_cache(){
+void clear_tesseract_cache(){
     OcrGlobals& globals = OcrGlobals::instance();
     std::map<Language, TesseractPool>& ocr_pool = globals.ocr_pool;
     WriteSpinLock lg(globals.ocr_pool_lock, "ocr_clear_cache()");

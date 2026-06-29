@@ -203,7 +203,7 @@ bool SerialPABotBase2_Connection::connect_to_device(){
         m_unreliable_connection->set_control_state(dtr, rts);
     }
 
-    if (try_connect_to_device(5000ms)){
+    if (try_connect_to_device(3000ms)){
         return true;
     }
 

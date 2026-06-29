@@ -4,8 +4,12 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonTools_OCR_RawOCR_H
-#define PokemonAutomation_CommonTools_OCR_RawOCR_H
+// NOTE: This file should only be inluded in OCR_Routines.h
+// This file should not be inluded in other files.
+// Use OCR_Routines.h instead
+
+#ifndef PokemonAutomation_CommonTools_OCR_RawTesseractOCR_H
+#define PokemonAutomation_CommonTools_OCR_RawTesseractOCR_H
 
 #include <string>
 #include "CommonFramework/Language.h"
@@ -39,7 +43,7 @@ enum class PageSegMode : int {
 
 
 // Check if Tesseract training data exists for the given language.
-bool language_available(Language language);
+bool tesseract_language_available(Language language);
 
 
 //  OCR the image in the specified language.
@@ -47,11 +51,11 @@ bool language_available(Language language);
 //  Thread-safe: internally uses a pool of Tesseract API instances, able to accept
 //  multiple concurrent calls without delay or queueing.
 //  It creates a new Tesseract instances if no available idle instance. You can
-//  call `ensure_instances()` to pre-warm to pool with a given number of instances.
+//  call `ensure_tesseract_instances()` to pre-warm to pool with a given number of instances.
 //
 //  psm: Page segmentation mode - controls how Tesseract interprets the image layout.
 //       Defaults to SINGLE_BLOCK (Tesseract C++ API's default) for best performance.
-std::string ocr_read(
+std::string tesseract_ocr_read(
     Language language,
     const ImageViewRGB32& image,
     PageSegMode psm = PageSegMode::SINGLE_BLOCK
@@ -63,12 +67,12 @@ std::string ocr_read(
 //  Avoids lazy initialization delays during runtime. Thread-safe.
 //  Call this if you expect to need to do many OCR instances in parallel and you
 //  want to preload the OCR instances.
-void ensure_instances(Language language, size_t instances);
+void ensure_tesseract_instances(Language language, size_t instances);
 
 //  Clear all TesseractAPI instances for all languages. Used for cleanup or
 //  forcing re-initialization.
 //  This is not safe to call while in any OCR is still running!
-void clear_cache();
+void clear_tesseract_cache();
 
 
 

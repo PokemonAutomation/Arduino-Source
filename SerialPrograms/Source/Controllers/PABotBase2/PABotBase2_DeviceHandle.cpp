@@ -244,7 +244,10 @@ bool DeviceHandle::try_set_controller_type(
     bool sent = false;
     try{
         message.data = SerialPABotBase::controller_type_to_id(controller_type);
-        sent = try_send_request_with_response(message, std::chrono::milliseconds(100)).has_value();
+        sent = try_send_request_with_no_response(
+            message,
+            std::chrono::milliseconds(100)
+        );
     }catch (...){}
     return sent;
 }
@@ -272,9 +275,9 @@ void DeviceHandle::send_request_with_no_response(MessageHeader& request){
         request.message_bytes
     );
 }
-#if 0
 bool DeviceHandle::try_send_request_with_no_response(
-    MessageHeader& request, WallDuration timeout
+    MessageHeader& request,
+    WallDuration timeout
 ) noexcept{
     request.id = 0;
     std::unique_lock<Mutex> lg(m_lock);
@@ -283,10 +286,9 @@ bool DeviceHandle::try_send_request_with_no_response(
         nullptr,
         &request,
         request.message_bytes,
-        timeout
+        current_time() + timeout
     );
 }
-#endif
 uint8_t DeviceHandle::send_request_with_response(MessageHeader& request){
     std::unique_lock<Mutex> lg(m_lock);
     while (true){

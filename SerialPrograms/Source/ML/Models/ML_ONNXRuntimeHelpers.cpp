@@ -86,7 +86,7 @@ if (use_gpu){
             std::cout << "Using ROCm execution provider for GPU acceleration" << std::endl;
             rocm_available = true;
         }catch (const Ort::Exception& e){
-            std::cout << "ROCm execution provider not available, falling back to CPU: " << e.what() << std::endl;
+            std::cout << "ROCm execution provider not available: " << e.what() << std::endl;
         }
     }
 
@@ -181,24 +181,58 @@ void write_cache_flag_file(const std::string& model_cache_path, const std::strin
 }
 
 
-Ort::Session create_session(const Ort::Env& env, const Ort::SessionOptions& so,
-    const std::string& model_path, const std::string& model_cache_path)
-{
+Ort::Session create_session(
+    const Ort::Env& env, 
+    const std::string& model_path, 
+    const std::string& model_cache_path,
+    bool try_gpu
+){
     bool write_flag_file = true;
     std::string file_hash;
     std::tie(write_flag_file, file_hash) = clean_up_old_model_cache(model_cache_path, model_path);
     
+    auto onnx_path = str_to_onnx_str(model_path);
+
     auto& logger = global_logger_tagged();
     logger.log("Creating Ort::session from model " + model_path);
-    try{
-        Ort::Session session{env, str_to_onnx_str(model_path).c_str(), so};
-        logger.log("Ort::Session created");
-        // when Ort::Ssssion is created, if possible, it will create a model cache
-        if (write_flag_file){
-            write_cache_flag_file(model_cache_path, file_hash);
+
+    // Attempt 1. using GPU.
+    if (try_gpu){
+        try{
+            logger.log("Attempting to create Ort::Session with GPU acceleration...");
+            Ort::SessionOptions gpu_options = create_session_options(model_cache_path, true);
+            Ort::Session session{env, onnx_path.c_str(), gpu_options};
+            logger.log("Ort::Session created");
+            // when Ort::Ssssion is created, if possible, it will create a model cache
+            if (write_flag_file){
+                write_cache_flag_file(model_cache_path, file_hash);
+            }
+            return session;
+        }catch (const Ort::Exception& e) {
+            logger.log("GPU Session creation failed: " + std::string(e.what()));
+            logger.log("Falling back cleanly to CPU execution...");
+            // Do not throw yet. Fall through to the CPU execution block below
+        } catch (...) {
+            logger.log("Unknown GPU initialization failure. Falling back cleanly to CPU...");
         }
+    }
+
+    // Attempt 2. CPU fallback
+    try {
+        logger.log("Creating dedicated CPU-only session...");
+        
+        Ort::SessionOptions cpu_options = create_session_options(model_cache_path, false);;
+        
+        Ort::Session session{env, onnx_path.c_str(), cpu_options};
+        logger.log("Ort::Session created");
         return session;
-    }catch (...){
+    }
+    catch (const Ort::Exception& e) {
+        logger.log("CRITICAL: CPU fallback failed completely: " + std::string(e.what()));
+        throw MLModelSessionCreationError(&logger, model_path);
+    }
+    catch (...) {
+        logger.log("CRITICAL: Unknown failure during CPU session fallback.");
         throw MLModelSessionCreationError(&logger, model_path);
     }
 }

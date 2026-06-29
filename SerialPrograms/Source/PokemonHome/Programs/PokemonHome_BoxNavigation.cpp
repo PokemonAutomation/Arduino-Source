@@ -14,7 +14,6 @@
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonTools/Images/ImageFilter.h"
-#include "CommonTools/OCR/OCR_RawOCR.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "CommonTools/OCR/OCR_StringNormalization.h"
 #include "CommonFramework/Tools/ErrorDumper.h"

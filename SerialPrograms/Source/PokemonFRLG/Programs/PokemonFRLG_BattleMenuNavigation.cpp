@@ -21,8 +21,6 @@ namespace PokemonFRLG{
 
 namespace{
 
-const ImageFloatBox BATTLE_MENU_ARROW_BOX(0.768, 0.868, 0.212, 0.159);
-
 const int BATTLE_MENU_COLS = 2;
 
 bool move_cursor_2d_impl(

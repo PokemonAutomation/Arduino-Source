@@ -11,6 +11,7 @@
 
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
+#include "PokemonFRLG/Inference/Menus/PokemonFRLG_PartySlot.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -18,6 +19,9 @@ namespace NintendoSwitch{
     class ProController;
     using ProControllerContext = ControllerContext<ProController>;
 namespace PokemonFRLG{
+
+using namespace std::chrono_literals;
+
 
 enum class BattleResult{
     opponentfainted,
@@ -77,8 +81,15 @@ enum class StartMenuContext {
 };
 void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext& context, StartMenuContext menu_context = StartMenuContext::STANDARD);
 
+// Starting from the party menu, detect the last occupied party slot
+PartySlot detect_last_occupied_party_slot(ConsoleHandle& console);
+
 // Starting from the start menu, a sub-screen of the start menu, or the overworld, navigate to the bag
 void open_bag_from_overworld(ConsoleHandle& console, ProControllerContext& context, StartMenuContext menu_context = StartMenuContext::STANDARD);
+
+// Uses Sweet Scent, assuming that the specified party member has it learned
+// The last argument is the distance of the Sweet Scent user from the last party slot
+void use_sweet_scent_from_overworld(ConsoleHandle& console, ProControllerContext& context, int from_last = 0);
 
 // Uses Teleport to return to a PokeCenter. 
 // Assumes that Teleport is usable and the last party member has it learned
@@ -105,6 +116,10 @@ void heal_at_pokecenter(ConsoleHandle& console, ProControllerContext& context);
 // the same direction as the first thumbstick press.
 // returns -1 if no encounter is triggered, 0 if a non-shiny is encounter, and 1 if a shiny is encountered
 int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftright, Seconds timeout = 60s);
+
+// Trigger encounters by fishing with a registered rod. The player must be facing water.
+// returns -1 if no encounter is triggered, 0 if a non-shiny is encounter, and 1 if a shiny is encountered
+int fish_encounter(ConsoleHandle& console, ProControllerContext& context, Seconds timeout = 300s);
 
 // Go to home to check that scaling is 100%. Then resume game.
 void home_black_border_check(ConsoleHandle& console, ProControllerContext& context);

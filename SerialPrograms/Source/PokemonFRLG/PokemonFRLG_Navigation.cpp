@@ -6,7 +6,9 @@
  *
  */
 
+#include <array>
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Random.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
@@ -16,17 +18,19 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_PartyDialogs.h"
 #include "PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.h"
+#include "PokemonFRLG/Inference/Menus/PokemonFRLG_BagDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_LoadMenuDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_SummaryDetector.h"
+#include "PokemonFRLG/Inference/Menus/PokemonFRLG_PartyEmptySlotDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_PartyMenuDetector.h"
-#include "PokemonFRLG/Inference/Menus/PokemonFRLG_BagDetector.h"
 #include "PokemonFRLG/Inference/Map/PokemonFRLG_MapDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_BattlePokemonDetector.h"
 #include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
@@ -35,6 +39,60 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
+
+
+void home_black_border_check(ConsoleHandle& console, ProControllerContext& context){
+    if (GameSettings::instance().DEVICE == GameSettings::Device::switch_1_2){
+        console.log("Switch 1 or 2 selected in Settings.");
+
+        console.log("Checking for min 720p and 16:9.");
+        assert_16_9_720p_min(console, console);
+
+        console.log("Going to home to check for black border.");
+
+        //  Connect the controller.
+        require_player(console, context, BUTTON_ZL);
+
+        pbf_press_button(context, BUTTON_HOME, 120ms, 880ms);
+        try{
+            ensure_at_home(console, context, 2);
+        }catch (OperationFailedException&){
+            ControllerPlayerNumber current = context->get_player_number(context);
+            if (current == ControllerPlayerNumber::UNKNOWN){
+                throw UserSetupError(
+                    console,
+                    "Unable to find Home menu.\n\n"
+                    "Either your controller isn't connected or your screen size to not "
+                    "set to 100% in the TV Settings on your Nintendo Switch.\n\n"
+                    "If your Switch entered the Home screen and re-entered the game, then your "
+                    "controller is connected but your screen size is not set to 100%.\n\n"
+                    "If nothing happened at all, then your controller is not connected. "
+                    "Please disconnect all other controllers and try again.\n\n"
+                    "We recommend changing the controller to \"NS1: Wired Pro Controller\" "
+                    "as that will be able self-diagnose controller connection issues."
+                );
+            }else{
+                throw UserSetupError(
+                    console,
+                    "Unable to find Home menu.\n\n"
+                    "It is likely your screen size to not set to 100% in the TV Settings on your Nintendo Switch."
+                );
+            }
+        }
+
+//        context.wait_for_all_requests();
+        StartProgramChecks::check_border(console);
+        console.log("Returning to game.");
+        resume_game_from_home(console, context);
+        context.wait_for_all_requests();
+        console.log("Entered game.");
+    }else{
+        console.log("Non-Switch device selected in Settings.");
+        console.log("Skipping black border check.", COLOR_BLUE);
+    }
+}
+
+
 
 
 bool try_soft_reset(ConsoleHandle& console, ProControllerContext& context){
@@ -251,15 +309,15 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
         shiny_coefficient = error_coefficient;
         return true;
     });
-    AdvanceBattleDialogWatcher legendary_appeared(COLOR_YELLOW);
-
+    AdvanceBattleDialogWatcher battle_dialog(COLOR_YELLOW);
+    
     int res = run_until<ProControllerContext>(
         console, context,
         [&](ProControllerContext& context){
             int ret = wait_until(
                 console, context,
                 std::chrono::seconds(30), //More than enough time for shiny sound
-                {{legendary_appeared}}
+                {{battle_dialog}}
             );
             if (ret == 0){
                 console.log("Battle Advance arrow detected.");
@@ -311,24 +369,42 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
         //Send out lead, no shiny detection needed. (Or wanted.)
         BattleMenuWatcher battle_menu(COLOR_RED);
         console.log("Sending out lead Pokemon.");
-        pbf_press_button(context, BUTTON_A, 320ms, 320ms);
+        WallClock start = current_time();
+        
+        while (true){
+            if (current_time() - start > 60s){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "handle_encounter(): No battle menu detected after sixty seconds.",
+                    console
+                );
+            }
+            pbf_press_button(context, BUTTON_B, 320ms, 320ms);
 
-        int ret = wait_until(
-            console, context,
-            std::chrono::seconds(15),
-            { {battle_menu} }
-        );
-        if (ret == 0){
-            console.log("Battle menu detecteed!");
-        }else{
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "handle_encounter(): Did not detect battle menu.",
-                console
+            int ret = wait_until(
+                console, context,
+                std::chrono::seconds(15),
+                { {battle_menu, battle_dialog} }
             );
+
+            switch (ret){
+            case 0:
+                console.log("Battle menu detecteed!");
+                break;
+            case 1:
+                console.log("Battle Advance arrow detected. This is likely due to an ability triggering at the start of battle.");
+                pbf_press_button(context, BUTTON_B, 320ms, 320ms);
+                context.wait_for_all_requests();
+                continue;
+            default:
+                console.log("Did not detect battle menu or battle dialog.");
+                continue;
+            }
+
+            pbf_wait(context, 1000ms);
+            context.wait_for_all_requests();
+            break;
         }
-        pbf_wait(context, 1000ms);
-        context.wait_for_all_requests();
     }
 
     return false;
@@ -681,6 +757,26 @@ void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext
     }
 }
 
+PartySlot detect_last_occupied_party_slot(ConsoleHandle& console){
+    const auto snapshot = console.video().snapshot();
+    constexpr std::array slots{
+        PartySlot::SIX,
+        PartySlot::FIVE,
+        PartySlot::FOUR,
+        PartySlot::THREE,
+        PartySlot::TWO,
+    };
+
+    for (PartySlot slot : slots){
+        PartyEmptySlotDetector empty_slot_detector(COLOR_RED, slot);
+        if (!empty_slot_detector.detect(snapshot)){
+            return slot;
+        }
+    }
+
+    return PartySlot::ONE;
+}
+
 void open_bag_from_overworld(ConsoleHandle& console, ProControllerContext& context, StartMenuContext menu_context){
     uint16_t errors = 0;
     bool start_menu_is_open = false;
@@ -739,6 +835,53 @@ void open_bag_from_overworld(ConsoleHandle& console, ProControllerContext& conte
             start_menu_is_open = false;
             continue;
         }
+    }
+}
+
+void use_sweet_scent_from_overworld(ConsoleHandle& console, ProControllerContext& context, int from_last){
+    uint16_t errors = 0;
+    
+    while (true){
+        if (errors > 5){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "use_teleport_from_overworld(): Failed to use Teleport 5 times in a row.",
+                console
+            );
+        }
+
+        open_party_menu_from_overworld(console, context);
+        // navigate to last party slot
+        for (int i=0; i<(2+from_last); i++){
+            pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+        }
+
+        PartySelectionWatcher sweetscent_selected(COLOR_RED);
+
+        context.wait_for_all_requests();
+        int ret = run_until<ProControllerContext>(
+            console, context,
+            [](ProControllerContext& context){
+                pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
+            },
+            { sweetscent_selected }
+        );
+
+        if (ret < 0){
+            console.log("Failed to select Sweet Scent user.");
+            errors++;
+            pbf_mash_button(context, BUTTON_B, 3000ms);
+            continue;
+        }
+        
+        // select Sweet Scent (2nd option, but maybe HMs could change this)
+        pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
+        pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
+        pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+
+        context.wait_for_all_requests();
+        console.log("Used Sweet Scent.");
+        return;
     }
 }
 
@@ -1082,31 +1225,44 @@ int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftr
     return encounter_shiny ? 1 : 0;
 }
 
-void home_black_border_check(ConsoleHandle& console, ProControllerContext& context){
-    if (GameSettings::instance().DEVICE == GameSettings::Device::switch_1_2){
-        console.log("Switch 1 or 2 selected in Settings.");
+int fish_encounter(ConsoleHandle& console, ProControllerContext& context, Seconds timeout){
+    WhiteDialogWatcher fishing_dialog(COLOR_RED);
+    BlackScreenWatcher battle_entered(COLOR_RED);
+    AdvanceBattleDialogWatcher battle_dialog(COLOR_RED);
+    BattleMenuWatcher battle_menu(COLOR_RED);
 
-        console.log("Checking for min 720p and 16:9.");
-        assert_16_9_720p_min(console, console);
+    context.wait_for_all_requests();
+    console.log("Starting fish encounter.");
+    WallClock start = current_time();
 
-        console.log("Going to home to check for black border.");
+    while (true){
+        if (current_time() - start > timeout){
+            console.log("No pokemon hooked after timeout.");
+            return -1;
+        }
 
-        //  Connect the controller.
-        require_player(console, context, BUTTON_ZL);
-
-        pbf_press_button(context, BUTTON_HOME, 120ms, 880ms);
+        pbf_press_button(context, BUTTON_MINUS, 200ms, 200ms);
         context.wait_for_all_requests();
-        StartProgramChecks::check_border(console);
-        console.log("Returning to game.");
-        resume_game_from_home(console, context);
-        context.wait_for_all_requests();
-        console.log("Entered game.");
-    }else{
-        console.log("Non-Switch device selected in Settings.");
-        console.log("Skipping black border check.", COLOR_BLUE);
+
+        int ret = wait_until(
+            console, context,
+            std::chrono::milliseconds(2000),
+            { fishing_dialog, battle_entered, battle_dialog, battle_menu }
+        );
+
+        if (ret == 0){
+            console.log("Fishing dialog detected.");
+            pbf_press_button(context, BUTTON_B, 200ms, 200ms);
+            context.wait_for_all_requests();
+        } else if (ret == 1 || ret == 2 || ret == 3){
+            console.log("Battle entered.");
+            break;
+        }
     }
-}
 
+    bool encounter_shiny = handle_encounter(console, context, true);
+    return encounter_shiny ? 1 : 0;
+}
 
 }
 }

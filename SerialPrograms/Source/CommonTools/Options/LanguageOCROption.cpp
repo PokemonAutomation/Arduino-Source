@@ -7,7 +7,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonTools/OCR/OCR_RawOCR.h"
+#include "CommonTools/OCR/OCR_Routines.h"
 #include "LanguageOCROption.h"
 
 //#include <iostream>
@@ -44,7 +44,7 @@ LanguageOCRCell::LanguageOCRCell(
     for (Language language : languages){
         m_case_list.emplace_back(
             language,
-            language == Language::None || OCR::language_available(language)
+            language == Language::None || OCR::ocr_language_available(language)
         );
         m_case_map.emplace(
             std::piecewise_construct,

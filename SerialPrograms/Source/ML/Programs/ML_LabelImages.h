@@ -178,8 +178,6 @@ private:
     // source 3: editable text input
     StringCell MANUAL_LABEL;
 
-    BooleanCheckBoxOption USE_GPU_FOR_EMBEDDER_SESSION;
-
  
     EnumDropdownOption<ColorChoice> SELECTED_ANNO_COLOR;
     EnumDropdownOption<ColorChoice> UNSELECTED_ANNO_COLOR;

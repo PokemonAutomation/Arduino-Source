@@ -85,6 +85,35 @@ std::string to_hex_string(const uint32_t& val){
     return s.str();
 }
 
+bool have_hit_target(uint32_t target_seed, uint64_t target_advances, const AdvRngState& hit){
+    return (hit.seed == target_seed) && (hit.advance == target_advances);
+}
+
+void apply_seed_bump(RngCalibrations& calibrations, const RngUncertainHistory& uncertain_history){
+    static const double SEED_BUMPS[] = {0, 1, -1, 2, -2};
+    double seed_bump = SEED_BUMPS[uncertain_history.results.size() % 5];
+    calibrations.seed_offset += seed_bump;
+}
+
+void log_target_pokemon(ConsoleHandle& console, const AdvPokemonResult& result, bool normal_method_note){
+    console.log("Target PID: " + to_hex_string(result.pid));
+    console.log("Target Nature: " + nature_to_string(result.nature));
+    console.log(normal_method_note ? "Target IVs (assuming Normal method):" : "Target IVs:");
+    console.log("   HP: " + std::to_string(result.ivs.hp));
+    console.log("   Atk: " + std::to_string(result.ivs.attack));
+    console.log("   Def: " + std::to_string(result.ivs.defense));
+    console.log("   SpA: " + std::to_string(result.ivs.spatk));
+    console.log("   SpD: " + std::to_string(result.ivs.spdef));
+    console.log("   Spe: " + std::to_string(result.ivs.speed));
+}
+
+void log_calibrations(ConsoleHandle& console, const RngCalibrations& calibrations, bool initial){
+    std::string prefix = initial ? "Initial " : "";
+    console.log(prefix + "Seed calibration (frames): " + std::to_string(calibrations.seed_offset));
+    console.log(prefix + "CSF calibration (frames): " + std::to_string(calibrations.csf_offset));
+    console.log(prefix + "In-game calibration (frames x2): " + std::to_string(calibrations.ingame_offset));
+}
+
 RngTimings prepare_timings(
     ConsoleHandle& console,
     PokemonFRLG_RngTarget target,
@@ -414,17 +443,17 @@ RngCalibrations get_calibrations(
                 calibrations.csf_offset = prev_csf_offset + 0.5;
             }
             calibrations.csf_offset = fmod(calibrations.csf_offset, 2);
-            calibrations.ingame_offset = prev_ingame_offset; // leave unchanged
+            calibrations.ingame_offset = get_advances_calibration(history, advances) - calibrations.csf_offset;
         }else if(csf_first){
             // adjust the csf, putting anything beyond +/-2 frames into the in-game calibration
             double new_advances_calibration = get_advances_calibration(history, advances);
             double total_diff = new_advances_calibration - prev_ingame_offset - prev_csf_offset;
             calibrations.csf_offset = fmod(prev_csf_offset + total_diff, 2);
-            double csf_diff = calibrations.csf_offset - prev_csf_offset;
-            calibrations.ingame_offset = prev_ingame_offset + total_diff - csf_diff;
+            calibrations.ingame_offset = new_advances_calibration - calibrations.csf_offset;
         }else{
             // only adjust the in-game offset
-            calibrations.ingame_offset = get_advances_calibration(history, advances);
+            calibrations.csf_offset = prev_csf_offset;
+            calibrations.ingame_offset = get_advances_calibration(history, advances) - prev_csf_offset;
         }
     }
 
@@ -448,74 +477,63 @@ bool update_history(
         return true;
     }
 
-    if (!force_finish && search_hits.size() > max_advance_possibilities){
+    if (!force_finish && search_hits.size() > max_advance_possibilities && !all_equal(search_hits)){
         return false;
     }
-
-    if (search_hits.size() == 1){
-        console.log("Hit " + to_hex_string(search_hits[0].seed) + " / " + std::to_string(search_hits[0].advance));
-        console.log("Updating calibrations...");
-        calibration_history.calibrations.emplace_back(calibrations);
-        calibration_history.results.emplace_back(search_hits[0]);
-        if (calibration_history.results.size() > max_history_length){
-            calibration_history.calibrations.erase(calibration_history.calibrations.begin());
-            calibration_history.results.erase(calibration_history.results.begin());
-        }
-        uncertain_history.results.clear();
-        uncertain_history.calibrations.clear();
-        return true;
-    }
     
-    std::vector<int64_t> uncal_advances;
+    std::vector<int64_t> uncal_advances; // hit advance - calibrations
     std::vector<AdvRngState> hits;
     for(auto hit : search_hits) {
         uncal_advances.emplace_back(int64_t(std::round(hit.advance - calibrations.csf_offset - calibrations.ingame_offset)));
         hits.emplace_back(hit);
     }
     
-    // get unique advances
+    // get unique advances from new search results
     std::sort(uncal_advances.begin(), uncal_advances.end());
     std::vector<int64_t>::iterator iter;
     iter = std::unique(uncal_advances.begin(), uncal_advances.begin() + uncal_advances.size());
     uncal_advances.resize(std::distance(uncal_advances.begin(), iter));
 
+    int64_t mode = 0;
     uncertain_history.calibrations.emplace_back(calibrations);
     uncertain_history.results.emplace_back(hits);
-    
-    // check advance history for repeated values
-    std::vector<uint64_t> counts;
-    uint64_t best = 0;
-    int64_t mode = 0; // sum of calibration and hit advance
-    bool tie = false;
-    for (int64_t& uadv : uncal_advances){
-        uint64_t count = 0;
-        for (size_t i=0; i<uncertain_history.results.size(); i++){
-            auto& cals = uncertain_history.calibrations[i];
-            auto& res = uncertain_history.results[i];
-            for (auto& state : res){
-                if (std::abs(int64_t(std::round(state.advance - cals.csf_offset - cals.ingame_offset)) - uadv) <= advance_radius){
-                    count++;
-                    break; // only count one possible hit from each attempt
+
+    if (uncal_advances.size() == 1){
+        mode = uncal_advances[0];
+    }else {        
+        // check advance history for repeated values
+        std::vector<uint64_t> counts;
+        uint64_t best = 0;
+        bool tie = false;
+        for (int64_t& uadv : uncal_advances){
+            uint64_t count = 0;
+            for (size_t i=0; i<uncertain_history.results.size(); i++){
+                auto& cals = uncertain_history.calibrations[i];
+                auto& res = uncertain_history.results[i];
+                for (auto& state : res){
+                    if (std::abs(int64_t(std::round(state.advance - cals.csf_offset - cals.ingame_offset)) - uadv) <= advance_radius){
+                        count++;
+                        break; // only count one possible hit from each attempt
+                    }
                 }
             }
+            if (count > best){
+                mode = uadv;
+                best = count;
+                tie = false;
+            }else if (count == best){
+                tie = true;
+            }
         }
-        if (count > best){
-            mode = uadv;
-            best = count;
-            tie = false;
-        }else if (count == best){
-            tie = true;
+
+        if (tie){
+            console.log("More than 1 possible advances value hit.");
+            return true;
         }
     }
-
-    if (tie){
-        console.log("More than 1 possible advances value hit.");
-        return true;
-    }
-
-
+    
     // add the closest possibility to the advances mode for each attempt to the calibration history
-    console.log("Inferred hits from previous " + std::to_string(uncertain_history.results.size()) + " attempts: ");
+    console.log("Hits from previous " + std::to_string(uncertain_history.results.size()) + " attempt(s): ");
     for (size_t i=0; i<uncertain_history.results.size(); i++){
         auto& cals = uncertain_history.calibrations[i];
         auto& res = uncertain_history.results[i];
@@ -545,6 +563,18 @@ bool update_history(
     return true;
 }
 
+bool all_equal(const std::vector<AdvRngState>& search_hits){
+    if (search_hits.size() < 2){ return true; }
+    const AdvRngState& first = search_hits[0];
+    for (size_t i=1; i<search_hits.size(); i++){
+        if (search_hits[i].seed != first.seed
+         || search_hits[i].advance != first.advance
+        ){
+            return false;
+        }
+    }
+    return true;
+}
 
 
 bool are_indistinguishable(AdvPokemonResult res1, AdvPokemonResult res2, const int16_t& gender_threshold){

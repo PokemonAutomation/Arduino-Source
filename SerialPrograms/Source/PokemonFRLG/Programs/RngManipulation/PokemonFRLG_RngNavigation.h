@@ -10,6 +10,7 @@
 #include "CommonFramework/Language.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "Pokemon/Pokemon_AdvRng.h"
+#include "PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_BlindNavigation.h"
 
 namespace PokemonAutomation{
@@ -79,6 +80,16 @@ bool check_for_shiny(
 );
 
 void hatch_daycare_egg(ConsoleHandle& console, ProControllerContext& context);
+
+
+// Daycare (Four Island) navigation for egg RNG.
+// bool methods return true when they fail to start surfing
+void use_max_repel(ConsoleHandle& console, ProControllerContext& context);
+void daycare_steps(ConsoleHandle& console, ProControllerContext& context);
+bool walk_from_daycare_to_pond(ConsoleHandle& console, ProControllerContext& context);
+void walk_from_pond_to_daycare_man(ConsoleHandle& console, ProControllerContext& context);
+void egg_pickup(ConsoleHandle& console, ProControllerContext& context);
+bool walk_from_daycare_man_to_pond(ConsoleHandle& console, ProControllerContext& context);
 
 }
 }

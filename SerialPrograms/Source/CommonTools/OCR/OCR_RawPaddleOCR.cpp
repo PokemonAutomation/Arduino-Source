@@ -4,11 +4,12 @@
  *
  */
 
-#include "ML/Inference/ML_PaddleOCRPipeline.h"
+#include "Common/Cpp/Filesystem.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "OCR_RawOCR.h"
+#include "ML/Inference/ML_PaddleOCRPipeline.h"
+#include "OCR_RawPaddleOCR.h"
 
 namespace PokemonAutomation{
 namespace OCR{
@@ -48,6 +49,12 @@ LanguageGroup language_to_languagegroup(Language language){
     default:
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Attempted to call OCR on an unknown language.");
     }
+}
+
+bool paddle_ocr_language_available(Language language){
+    std::string path = ML::PaddleOCRPipeline::get_paths(language).first;
+    Filesystem::Path p{path};
+    return std::filesystem::exists(p);
 }
 
 

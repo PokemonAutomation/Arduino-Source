@@ -50,13 +50,13 @@ const std::map<uint32_t, std::map<pabb_ProgramID, uint8_t>>& SUPPORTED_VERSIONS(
 //  These version #'s are for the MLC layer.
 const std::map<pabb_ProgramID, uint32_t>& SUPPORTED_DEVICES2(){
     static const std::map<pabb_ProgramID, uint32_t> database{
-        {PABB_PID_UNSPECIFIED,              2026052100},
-        {PABB_PID_PABOTBASE_ESP32,          2026052100},
-        {PABB_PID_PABOTBASE_ESP32S3,        2026052100},
-        {PABB_PID_PABOTBASE_RP2040,         2026052100},
-        {PABB_PID_PABOTBASE_RP2350,         2026052100},
-        {PABB_PID_PABOTBASE_Pico1W,         2026052100},
-        {PABB_PID_PABOTBASE_Pico2W,         2026052100},
+        {PABB_PID_UNSPECIFIED,              2026061800},
+        {PABB_PID_PABOTBASE_ESP32,          2026061800},
+        {PABB_PID_PABOTBASE_ESP32S3,        2026061800},
+        {PABB_PID_PABOTBASE_RP2040,         2026061800},
+        {PABB_PID_PABOTBASE_RP2350,         2026061800},
+        {PABB_PID_PABOTBASE_Pico1W,         2026061800},
+        {PABB_PID_PABOTBASE_Pico2W,         2026061800},
     };
     return database;
 }

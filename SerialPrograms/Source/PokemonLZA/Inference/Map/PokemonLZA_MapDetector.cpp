@@ -9,6 +9,10 @@
 #include "PokemonLZA_MapDetector.h"
 #include "PokemonLZA_MapIconDetector.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLZA{
@@ -39,32 +43,7 @@ public:
     }
 };
 
-const ImageFloatBox TRAVEL_SPOT_BOX(0.040000, 0.235000, 0.030000, 0.068500);
 
-// Progressive cyan filters to handle capture-card color variance.
-const std::vector<std::pair<uint32_t, uint32_t>> CYAN_FILTERS = {
-    // Brighter cyan/teal.
-    {0xff004898, 0xff70ffff},
-    {0xff003878, 0xff80ffff},
-    // Darker/desaturated cyan seen in some captures (e.g. 1080p hyperspace_True).
-    {0xff002860, 0xff90ffff},
-    {0xff001c50, 0xffa0ffff},
-};
-
-bool detect_travel_spot(const ImageViewRGB32& screen){
-    double rel = screen.height() / 2160.0;
-    size_t min_area = size_t(50.0 * rel * rel);
-
-    return match_template_by_waterfill(
-        screen.size(),
-        extract_box_reference(screen, TRAVEL_SPOT_BOX),
-        TravelSpotMatcher::instance(),
-        CYAN_FILTERS,
-        {min_area, SIZE_MAX},
-        100.0,
-        [](Kernels::Waterfill::WaterfillObject&) -> bool{ return true; }
-    );
-}
 
 } // anonymous namespace
 
@@ -72,6 +51,7 @@ bool detect_travel_spot(const ImageViewRGB32& screen){
 
 MapDetector::MapDetector(Color color, VideoOverlay* overlay)
     : m_color(color)
+    , m_travel_icon(0.040000, 0.235000, 0.030000, 0.068500)
     , m_x_button(
         color,
         ButtonType::ButtonX,
@@ -87,12 +67,13 @@ MapDetector::MapDetector(Color color, VideoOverlay* overlay)
 {}
 
 void MapDetector::make_overlays(VideoOverlaySet& items) const{
-    items.add(m_color, TRAVEL_SPOT_BOX);
+    items.add(m_color, m_travel_icon);
     m_x_button.make_overlays(items);
     m_y_button.make_overlays(items);
 }
 
 bool MapDetector::detect(const ImageViewRGB32& screen){
+//    cout << "MapDetector::detect()" << endl;
     const bool detected = detect_travel_spot(screen)
         && m_x_button.detect(screen)
         && m_y_button.detect(screen);
@@ -105,6 +86,31 @@ bool MapDetector::detect(const ImageViewRGB32& screen){
     return detected;
 }
 
+
+bool MapDetector::detect_travel_spot(const ImageViewRGB32& screen){
+    // Progressive cyan filters to handle capture-card color variance.
+    static const std::vector<std::pair<uint32_t, uint32_t>> CYAN_FILTERS{
+        // Brighter cyan/teal.
+        {0xff004898, 0xff70ffff},
+        {0xff003878, 0xff80ffff},
+        // Darker/desaturated cyan seen in some captures (e.g. 1080p hyperspace_True).
+        {0xff002860, 0xff90ffff},
+        {0xff001c50, 0xffa0ffff},
+    };
+
+    double rel = screen.height() / 2160.0;
+    size_t min_area = size_t(50.0 * rel * rel);
+
+    return match_template_by_waterfill(
+        screen.size(),
+        extract_box_reference(screen, m_travel_icon),
+        TravelSpotMatcher::instance(),
+        CYAN_FILTERS,
+        {min_area, SIZE_MAX},
+        100.0,
+        [](Kernels::Waterfill::WaterfillObject&) -> bool{ return true; }
+    );
+}
 std::vector<DetectedBox> MapDetector::detected_map_icons() const{
     std::vector<DetectedBox> ret;
     for (MapIconDetector* detector : m_map_icon_detectors){

@@ -189,6 +189,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/RecursiveThrottler.h
     ../Common/Cpp/ScopeExit.h
     ../Common/Cpp/SIMDDebuggers.h
+    ../Common/Cpp/SparseRegion.cpp
+    ../Common/Cpp/SparseRegion.h
     ../Common/Cpp/SerialConnection/SerialConnection.cpp
     ../Common/Cpp/SerialConnection/SerialConnection.h
     ../Common/Cpp/SerialConnection/SerialConnectionPOSIX.h
@@ -434,6 +436,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Options/BoxOption.cpp
     Source/CommonFramework/Options/BoxOption.h
     Source/CommonFramework/Options/CheckForUpdatesOption.h
+    Source/CommonFramework/Options/Environment/CoreAffinityOption.cpp
+    Source/CommonFramework/Options/Environment/CoreAffinityOption.h
     Source/CommonFramework/Options/Environment/PerformanceOptions.h
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.h
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.cpp
@@ -655,8 +659,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonTools/OCR/OCR_NumberReader.h
     Source/CommonTools/OCR/OCR_RawPaddleOCR.cpp
     Source/CommonTools/OCR/OCR_RawPaddleOCR.h
-    Source/CommonTools/OCR/OCR_RawOCR.cpp
-    Source/CommonTools/OCR/OCR_RawOCR.h
+    Source/CommonTools/OCR/OCR_RawTesseractOCR.cpp
+    Source/CommonTools/OCR/OCR_RawTesseractOCR.h
     Source/CommonTools/OCR/OCR_Routines.cpp
     Source/CommonTools/OCR/OCR_Routines.h
     Source/CommonTools/OCR/OCR_SmallDictionaryMatcher.cpp
@@ -1468,10 +1472,13 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_BagDetector.h
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_LoadMenuDetector.cpp
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_LoadMenuDetector.h
+    Source/PokemonFRLG/Inference/Menus/PokemonFRLG_PartyEmptySlotDetector.cpp
+    Source/PokemonFRLG/Inference/Menus/PokemonFRLG_PartyEmptySlotDetector.h
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_PartyHeldItemDetector.cpp
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_PartyHeldItemDetector.h
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_PartyMenuDetector.cpp
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_PartyMenuDetector.h
+    Source/PokemonFRLG/Inference/Menus/PokemonFRLG_PartySlot.h
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_TrainerCardDetector.cpp
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_TrainerCardDetector.h
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_DexRegistrationDetector.cpp
@@ -1486,6 +1493,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Inference/PokemonFRLG_SelectionArrowDetector.h
     Source/PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.cpp
     Source/PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.h
+    Source/PokemonFRLG/Inference/PokemonFRLG_DaycareManDetector.cpp
+    Source/PokemonFRLG/Inference/PokemonFRLG_DaycareManDetector.h
     Source/PokemonFRLG/Inference/PokemonFRLG_DigitReader.cpp
     Source/PokemonFRLG/Inference/PokemonFRLG_DigitReader.h
     Source/PokemonFRLG/Inference/PokemonFRLG_StatsReader.cpp
@@ -1522,6 +1531,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Programs/PokemonFRLG_BattleMenuNavigation.h
     Source/PokemonFRLG/Programs/Farming/PokemonFRLG_EvTrainer.cpp
     Source/PokemonFRLG/Programs/Farming/PokemonFRLG_EvTrainer.h
+    Source/PokemonFRLG/Programs/PokemonFRLG_SafariOptimalAction.cpp
+    Source/PokemonFRLG/Programs/PokemonFRLG_SafariOptimalAction.h
     Source/PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.cpp
     Source/PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_GiftReset.cpp
@@ -1546,6 +1557,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_HardReset.h
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RngCalibration.cpp
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RngCalibration.h
+    Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RngLoopRoutines.cpp
+    Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RngLoopRoutines.h
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RngStatsDatabase.cpp
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RngStatsDatabase.h
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_LocationsDatabase.cpp
@@ -1566,6 +1579,10 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_WildRng.h
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RoamingLegendaryRng.cpp
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RoamingLegendaryRng.h
+    Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_EggRng.cpp
+    Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_EggRng.h
+    Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SafariOptimalActionTest.cpp
+    Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SafariOptimalActionTest.h
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.cpp
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.h
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_ReadStats.cpp
@@ -1606,6 +1623,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonHome/Programs/PokemonHome_GenerateNameOCR.h
     Source/PokemonHome/Programs/PokemonHome_PageSwap.cpp
     Source/PokemonHome/Programs/PokemonHome_PageSwap.h
+    Source/PokemonHome/Programs/TestPrograms/PokemonHome_ReadSummaryScreen.cpp
+    Source/PokemonHome/Programs/TestPrograms/PokemonHome_ReadSummaryScreen.h
     Source/PokemonHome/Resources/PokemonHome_PokeballSprites.cpp
     Source/PokemonHome/Resources/PokemonHome_PokeballSprites.h
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.cpp

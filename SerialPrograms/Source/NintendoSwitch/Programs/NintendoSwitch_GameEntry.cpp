@@ -134,14 +134,14 @@ void go_home(ConsoleHandle& console, JoyconContext& context){
 }
 
 template <typename ControllerContext>
-void ensure_at_home(ConsoleHandle& console, ControllerContext& context){
+void ensure_at_home(ConsoleHandle& console, ControllerContext& context, size_t retries){
     //  Feedback not available. Just assume we're already on Home.
     if (!console.video().snapshot()){
         pbf_wait(context, 640ms);
         return;
     }
 
-    for (size_t attempts = 0; attempts < 10; attempts++){
+    for (size_t attempts = 0; attempts < retries; attempts++){
         HomeMenuWatcher home_menu(console, 100ms);
         context.wait_for_all_requests();
         int ret = wait_until(
@@ -170,11 +170,11 @@ void ensure_at_home(ConsoleHandle& console, ControllerContext& context){
     );
 }
 
-void ensure_at_home(ConsoleHandle& console, ProControllerContext& context){
-    ensure_at_home<ProControllerContext>(console, context);
+void ensure_at_home(ConsoleHandle& console, ProControllerContext& context, size_t retries){
+    ensure_at_home<ProControllerContext>(console, context, retries);
 }
-void ensure_at_home(ConsoleHandle& console, JoyconContext& context){
-    ensure_at_home<JoyconContext>(console, context);
+void ensure_at_home(ConsoleHandle& console, JoyconContext& context, size_t retries){
+    ensure_at_home<JoyconContext>(console, context, retries);
 }
 
 
@@ -343,7 +343,8 @@ void resume_game_from_home(
             if (ret == 0){
                 console.log("Detected update window.", COLOR_RED);
 
-                pbf_press_dpad(context, DPAD_UP, 40ms, 0ms);
+                pbf_press_dpad(context, DPAD_UP, 40ms, 40ms);
+                pbf_press_dpad(context, DPAD_UP, 40ms, 40ms);
                 pbf_press_button(context, BUTTON_A, 80ms, 4000ms);
                 context.wait_for_all_requests();
                 continue;
@@ -382,7 +383,8 @@ void resume_game_from_home(
             if (ret == 0){
                 console.log("Detected update window.", COLOR_RED);
 
-                pbf_move_joystick(context, {0, +1}, 10ms, 0ms);
+                pbf_move_joystick(context, {0, +1}, 40ms, 40ms);
+                pbf_move_joystick(context, {0, +1}, 40ms, 40ms);
                 pbf_press_button(context, BUTTON_A, 10ms, 500ms);
                 context.wait_for_all_requests();
                 continue;
@@ -574,7 +576,8 @@ void start_game_from_home_with_inference(
             break;
         case 2:
             console.log("Detected update menu.", COLOR_BLUE);
-            pbf_press_dpad(context, DPAD_UP, 40ms, 0ms);
+            pbf_press_dpad(context, DPAD_UP, 40ms, 40ms);
+            pbf_press_dpad(context, DPAD_UP, 40ms, 40ms);
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;
         case 3:
@@ -689,7 +692,8 @@ void start_game_from_home_with_inference(
             break;
         case 2:
             console.log("Detected update menu.", COLOR_BLUE);
-            pbf_move_joystick(context, {0, +1}, 50ms, 0ms);
+            pbf_move_joystick(context, {0, +1}, 40ms, 40ms);
+            pbf_move_joystick(context, {0, +1}, 40ms, 40ms);
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;
         case 3:

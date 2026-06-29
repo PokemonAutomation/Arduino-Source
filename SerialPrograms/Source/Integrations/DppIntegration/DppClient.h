@@ -7,6 +7,7 @@
 #include <Integrations/DppIntegration/DppCommandHandler.h>
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "CommonFramework/Notifications/MessageAttachment.h"
+#include "Common/Cpp/Options/ButtonOption.h"
 
 namespace PokemonAutomation{
     class JsonObject;
@@ -15,16 +16,13 @@ namespace DppClient{
 
 
 
-class Client : protected DppCommandHandler::Handler{
+class Client final : protected DppCommandHandler::Handler, public ButtonListener{
 public:
     Client() : m_is_connected(false) {}
     ~Client();
     static Client& instance();
 
-    virtual void stop() override{
-        disconnect();
-        Handler::stop();
-    }
+    virtual void stop() override;
 
 public:
     bool is_initialized();
@@ -42,12 +40,15 @@ public:
 
 private:
     void run(const std::string& token);
+    virtual void on_press() override;
 
 private:
     std::unique_ptr<dpp::cluster> m_bot = nullptr;
     std::unique_ptr<dpp::commandhandler> m_handler = nullptr;
     std::atomic<bool> m_is_connected;
+    bool m_stopped = false;
     std::mutex m_client_lock;
+    std::mutex m_register_lock;
     AsyncTask m_start_thread;
 };
 

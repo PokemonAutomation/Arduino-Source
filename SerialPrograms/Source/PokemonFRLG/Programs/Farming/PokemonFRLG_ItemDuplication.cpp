@@ -86,7 +86,7 @@ void ItemDuplication::program(SingleSwitchProgramEnvironment& env, ProController
     ImageFloatBox mail_arrow_box{ 0.3670769231, 0.06373076639, 0.028, 0.077 };
     ImageFloatBox mail_confirmation_arrow_box{ 0.7289230769, 0.4604230588, 0.029, 0.076 };
     SelectionArrowWatcher mail_selection_arrow(COLOR_BLUE, &env.console.overlay(), mail_arrow_box);
-    PartyHeldItemWatcher farfetchd_held_item(COLOR_BLUE, &env.console.overlay(), PartyHeldItemSlot::SLOT_1);
+    PartyHeldItemWatcher farfetchd_held_item(COLOR_BLUE, &env.console.overlay(), PartySlot::ONE);
     AdvanceWhiteDialogWatcher item_description(COLOR_BLUE);
     SelectionArrowWatcher confirmation_arrow(COLOR_BLUE, &env.console.overlay(), SelectionArrowPositionConfirmationMenu::YES);
     SelectionArrowWatcher mail_confirmation_arrow(COLOR_BLUE, &env.console.overlay(), mail_confirmation_arrow_box);
@@ -178,9 +178,7 @@ void ItemDuplication::program(SingleSwitchProgramEnvironment& env, ProController
 
         // Dectect "???" screen?
 
-        pbf_press_dpad(context, DPAD_UP, 200ms, 100ms);
-        pbf_press_dpad(context, DPAD_LEFT, 200ms, 100ms);
-        pbf_press_button(context, BUTTON_A, 200ms, 100ms);
+        pbf_press_button(context, BUTTON_PLUS, 200ms, 100ms);
 
         // Confirmation prompt in "???" screen
         int ret5 = wait_until(

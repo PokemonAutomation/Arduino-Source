@@ -27,11 +27,13 @@
 #include "Programs/RngManipulation/PokemonFRLG_StaticRng.h"
 #include "Programs/RngManipulation/PokemonFRLG_WildRng.h"
 #include "Programs/RngManipulation/PokemonFRLG_RoamingLegendaryRng.h"
+#include "Programs/RngManipulation/PokemonFRLG_EggRng.h"
 #include "Programs/TestPrograms/PokemonFRLG_SoundListener.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadStats.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadBattleLevelUp.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadTrainerId.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadEncounter.h"
+#include "Programs/TestPrograms/PokemonFRLG_SafariOptimalActionTest.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -73,10 +75,11 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<GiftRng_Descriptor, GiftRng>());
     ret.emplace_back(make_single_switch_program<StaticRng_Descriptor, StaticRng>());
     ret.emplace_back(make_single_switch_program<WildRng_Descriptor, WildRng>());
+    ret.emplace_back(make_single_switch_program<RoamingLegendaryRng_Descriptor, RoamingLegendaryRng>());
 
     if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Untested/Beta/WIP ----");
-        ret.emplace_back(make_single_switch_program<RoamingLegendaryRng_Descriptor, RoamingLegendaryRng>());
+        ret.emplace_back(make_single_switch_program<EggRng_Descriptor, EggRng>());
     }
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
@@ -85,7 +88,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
         ret.emplace_back(make_single_switch_program<ReadStats_Descriptor, ReadStats>());
         ret.emplace_back(make_single_switch_program<ReadBattleLevelUp_Descriptor, ReadBattleLevelUp>());
         ret.emplace_back(make_single_switch_program<ReadTrainerId_Descriptor, ReadTrainerId>());
-        ret.emplace_back(make_single_switch_program<ReadEncounter_Descriptor, ReadEncounter>());    
+        ret.emplace_back(make_single_switch_program<ReadEncounter_Descriptor, ReadEncounter>());
+        ret.emplace_back(make_single_switch_program<SafariOptimalActionTest_Descriptor, SafariOptimalActionTest>());
     }
 
     return ret;

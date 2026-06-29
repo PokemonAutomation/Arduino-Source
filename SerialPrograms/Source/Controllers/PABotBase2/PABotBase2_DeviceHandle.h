@@ -90,11 +90,10 @@ public:
     std::string query_data(uint8_t opcode);
 
     void send_request_with_no_response(MessageHeader& request);
-#if 0
     bool try_send_request_with_no_response(
-        MessageHeader& request, WallDuration timeout
+        MessageHeader& request,
+        WallDuration timeout
     ) noexcept;
-#endif
 
     uint8_t send_request_with_response(MessageHeader& request);
 

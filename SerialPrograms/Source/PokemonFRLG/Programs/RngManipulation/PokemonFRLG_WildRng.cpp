@@ -18,6 +18,7 @@
 #include "PokemonFRLG_RngNavigation.h"
 #include "PokemonFRLG_HardReset.h"
 #include "PokemonFRLG_RngCalibration.h"
+#include "PokemonFRLG_RngLoopRoutines.h"
 #include "PokemonFRLG_LocationsDatabase.h"
 #include "PokemonFRLG_RngStatsDatabase.h"
 #include "PokemonFRLG_EncountersDatabase.h"
@@ -259,10 +260,6 @@ WildRng::WildRng()
 
 
 
-bool WildRng::have_hit_target(SingleSwitchProgramEnvironment& env, const uint32_t& TARGET_SEED, const AdvRngState& hit){
-    return (hit.seed == TARGET_SEED) && (hit.advance == ADVANCES);
-}
-
 void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     /*
     * Settings: Text Speed fast
@@ -366,8 +363,6 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
     static const uint64_t CONTINUE_SCREEN_FRAMES = 200;
 
-    static const double SEED_BUMPS[] = {0, 1, -1, 2, -2};
-
     const uint64_t INITIAL_ADVANCES_RADIUS = USE_TEACHY_TV ? 4096 : 1024;
 
     const uint8_t MAX_HISTORY_LENGTH = USE_TEACHY_TV ? 2 : 10;
@@ -398,9 +393,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         RNG_CALIBRATION.csf_calibration,
         RNG_CALIBRATION.advances_calibration
     };
-    env.log("Initial Seed calibration (frames): " + std::to_string(calibrations.seed_offset));
-    env.log("Initial CSF calibration (frames): " + std::to_string(calibrations.csf_offset));
-    env.log("Initial In-game calibration (frames x2): " + std::to_string(calibrations.ingame_offset));
+    log_calibrations(env.console, calibrations, true);
 
     Milliseconds launch_delay = INITIAL_LAUNCH_DELAY;
 
@@ -412,7 +405,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     while (true){
         if (calibration_history.results.size() > 0){
             env.log("Checking for nonshiny target hit...");
-            if (have_hit_target(env, TARGET_SEED, calibration_history.results.back())){
+            if (have_hit_target(TARGET_SEED, ADVANCES, calibration_history.results.back())){
                 env.log("Target Hit!");
                 stats.nonshiny++;
                 break;
@@ -448,8 +441,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         }
 
         // if previous resets had uncertain advances, slightly modify the seed delay to try to hit a different target
-        double seed_bump = SEED_BUMPS[uncertain_history.results.size() % 5];
-        calibrations.seed_offset += seed_bump;
+        apply_seed_bump(calibrations, uncertain_history);
 
         uint64_t ingame_advances = ADVANCES - CONTINUE_SCREEN_FRAMES;
 
@@ -538,50 +530,23 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         AdvRngFilters filters = observation_to_filters(pokemon, base_stats, AdvRngMethod::Any);
         RNG_FILTERS.set(filters);
 
-        std::vector<AdvRngState> search_hits = get_wild_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, gender_threshold, SUPER_ROD);
-        RNG_CALIBRATION.set_hits(search_hits);           
-        bool finished = update_history(env.console, uncertain_history, calibration_history, MAX_HISTORY_LENGTH, calibrations, search_hits, 1, 2, MAX_RARE_CANDIES == 0);
-        finished = finished || all_indistinguishable(search_hits, searcher, gender_threshold, SUPER_ROD);
-
-        for (uint64_t i=0; i<MAX_RARE_CANDIES; i++){
-            if (finished){
-                break;
+        std::vector<AdvRngState> search_hits = refine_calibration_with_rare_candy(
+            env, context, LANGUAGE, pokemon, filters, base_stats,
+            uncertain_history, calibration_history, calibrations,
+            MAX_HISTORY_LENGTH, MAX_RARE_CANDIES, AdvRngMethod::Any, safari_zone,
+            stats.errors, NOTIFICATION_ERROR_RECOVERABLE,
+            [&](AdvRngFilters& f){
+                return get_wild_search_results(env.console, searcher, f, SEED_VALUES, ADVANCES, advances_radius, gender_threshold, SUPER_ROD);
+            },
+            [&](const std::vector<AdvRngState>& h){ RNG_CALIBRATION.set_hits(h); },
+            [](const AdvRngFilters&){}, // WildRng intentionally does not refresh the filter display mid-loop
+            [&](const std::vector<AdvRngState>& h){
+                return all_equal(h) || all_indistinguishable(h, searcher, gender_threshold, SUPER_ROD);
             }
-            bool failed = use_rare_candy(env.console, context, LANGUAGE, pokemon, filters, base_stats, AdvRngMethod::Any, safari_zone, i == 0);
-            if (failed) {
-                update_history(
-                    env.console, uncertain_history, calibration_history, 
-                    MAX_HISTORY_LENGTH, calibrations, search_hits, 1, 2, true
-                );
-                stats.errors++;
-                send_program_recoverable_error_notification(
-                    env, NOTIFICATION_ERROR_RECOVERABLE,
-                    "Failed to use Rare Candy."
-                ); 
-            }
-
-            search_hits = get_wild_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, gender_threshold, SUPER_ROD);
-            RNG_CALIBRATION.set_hits(search_hits);         
-
-            bool force_finish = (
-                   failed 
-                || (i == (MAX_RARE_CANDIES - 1))
-                || all_indistinguishable(search_hits, searcher, gender_threshold, SUPER_ROD)
-            );
-            finished = update_history(
-                env.console, uncertain_history, 
-                calibration_history, MAX_HISTORY_LENGTH,
-                calibrations, search_hits, 
-                1, 2, force_finish
-            );
-        }
+        );
 
         env.log("RNG search finished.");
-        if (search_hits.size() == 0){
-            failed_searches++;
-        }else{
-            failed_searches = 0;
-        }
+        update_failed_searches(failed_searches, search_hits);
 
     }
 

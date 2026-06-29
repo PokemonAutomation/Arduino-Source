@@ -96,7 +96,7 @@ ShinyType determine_shiny_status(
     std::chrono::milliseconds min_delay = battle_settings.dialog_delay_when_shiny - std::chrono::milliseconds(300);
     std::chrono::milliseconds max_delay = battle_settings.dialog_delay_when_shiny + std::chrono::milliseconds(500);
     if (min_delay <= dialog_duration && dialog_duration <= max_delay){
-        alpha += GameSettings::instance().SHINY_DIALOG_ALPHA;
+        alpha += GameSettings::instance().SHINY_DIALOG_ALPHA0;
     }
 
     double best_star = sparkles.best_star();

@@ -78,7 +78,7 @@ public:
     FloatingPointOption SQUARE_SPARKLE_ALPHA;
     FloatingPointOption LINE_SPARKLE_ALPHA;
 
-    FloatingPointOption SHINY_DIALOG_ALPHA;
+    FloatingPointOption SHINY_DIALOG_ALPHA0;
 };
 
 

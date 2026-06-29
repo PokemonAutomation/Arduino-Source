@@ -712,6 +712,149 @@ bool check_for_shiny(
     }
 }
 
+
+void use_max_repel(ConsoleHandle& console, ProControllerContext& context){
+    console.log("Using a Max Repel (2nd bag slot from top)...");
+    open_bag_from_overworld(console, context);
+    pbf_move_left_joystick(context, {-1, 0}, 100ms, 900ms);
+    pbf_move_left_joystick(context, {-1, 0}, 100ms, 900ms);
+    pbf_move_left_joystick(context, {-1, 0}, 100ms, 900ms);
+    for (int i=0; i<20; i++){
+        pbf_move_left_joystick(context, {0, +1}, 100ms, 100ms);
+    }
+    pbf_move_left_joystick(context, {0, -1}, 100ms, 300ms);
+
+    pbf_mash_button(context, BUTTON_A, 3000ms);
+    pbf_mash_button(context, BUTTON_B, 5000ms);
+
+}
+
+void daycare_steps(ConsoleHandle& console, ProControllerContext& context){
+    console.log("Taking 250 steps...");
+    // walk down to the south wall
+    pbf_move_left_joystick(context, {0, -1}, 930ms, 570ms);
+    // walk to the southeast corner
+    pbf_move_left_joystick(context, {+1, 0}, 2500ms, 300ms);
+
+    WhiteDialogWatcher repel_over(COLOR_RED);
+    context.wait_for_all_requests();
+    int ret = run_until<ProControllerContext>(
+        console, context,
+        [](ProControllerContext& context) {
+            pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
+            for (int i=0; i<20; i++){
+                pbf_move_left_joystick(context, {-1, 0}, 2700ms, 300ms);
+                pbf_move_left_joystick(context, {+1, 0}, 2700ms, 300ms);
+            }
+        },
+        { repel_over }
+    );
+    if (ret < 0){
+        OperationFailedException::fire(
+            ErrorReport::NO_ERROR_REPORT,
+            "daycare_steps(): No Max Repel dialogue box detected.",
+            console
+        );
+    }
+
+    console.log("Max Repel wore off. Taking 4 more steps...");
+    pbf_mash_button(context, BUTTON_B, 1000ms);
+
+    // take 4 steps to the left
+    pbf_move_left_joystick(context, {-1, 0}, 200ms, 720ms);
+    pbf_move_left_joystick(context, {-1, 0}, 30ms, 720ms);
+    pbf_move_left_joystick(context, {-1, 0}, 30ms, 720ms);
+    pbf_move_left_joystick(context, {-1, 0}, 30ms, 720ms);
+
+    console.log("254 steps taken.");
+}
+
+bool walk_from_daycare_to_pond(ConsoleHandle& console, ProControllerContext& context){
+    console.log("Walking to the daycare pond...");
+    pbf_move_left_joystick(context, {0, -1}, 190ms, 300ms);
+    pbf_move_left_joystick(context, {+1, 0}, 2470ms, 300ms);
+    pbf_move_left_joystick(context, {0, -1}, 380ms, 300ms);
+
+    // start surfing
+    WhiteDialogWatcher surf_dialog(COLOR_RED);
+
+    context.wait_for_all_requests();
+    int ret = run_until<ProControllerContext>(
+        console, context,
+        [](ProControllerContext& context) {
+            ssf_press_left_joystick(context, {0, -1}, 0ms, 10000ms);
+            ssf_mash1_button(context, BUTTON_A, 10000ms);
+        },
+        { surf_dialog }
+    );
+    if (ret < 0){
+        console.log("Failed to detect surf dialog");
+        return true;
+    }
+    console.log("Started surfing.");
+    pbf_mash_button(context, BUTTON_A, 2000ms);
+    context.wait_for_all_requests();
+    return false;
+}
+
+void walk_from_pond_to_daycare_man(ConsoleHandle& console, ProControllerContext& context){
+    console.log("Walking to the daycare man...");
+    pbf_move_left_joystick(context, {0, +1}, 1080ms, 300ms);
+    pbf_move_left_joystick(context, {-1, 0}, 1300ms, 300ms);
+    pbf_move_left_joystick(context, {0, +1}, 300ms, 300ms);
+}
+
+void egg_pickup(ConsoleHandle& console, ProControllerContext& context){
+    console.log("Picking up egg...");
+    WhiteDialogWatcher dialogue(COLOR_RED);
+    context.wait_for_all_requests();
+    int ret = run_until<ProControllerContext>(
+        console, context,
+        [](ProControllerContext& context) {
+            pbf_mash_button(context, BUTTON_A, 5000ms);
+        },
+        { dialogue }
+    );
+    if (ret < 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "egg_pickup(): Failed to initiate dialogue.",
+            console
+        );
+    }
+
+    pbf_mash_button(context, BUTTON_A, 5000ms);
+    pbf_mash_button(context, BUTTON_B, 2500ms);
+}
+
+bool walk_from_daycare_man_to_pond(ConsoleHandle& console, ProControllerContext& context){
+    console.log("Walking to the daycare man...");
+    pbf_move_left_joystick(context, {0, -1}, 380ms, 300ms);
+    pbf_move_left_joystick(context, {+1, 0}, 1340ms, 300ms);
+    pbf_move_left_joystick(context, {0, -1}, 300ms, 300ms);
+
+    // start surfing
+    WhiteDialogWatcher surf_dialog(COLOR_RED);
+
+    context.wait_for_all_requests();
+    int ret = run_until<ProControllerContext>(
+        console, context,
+        [](ProControllerContext& context) {
+            ssf_press_left_joystick(context, {0, -1}, 0ms, 10000ms);
+            ssf_mash1_button(context, BUTTON_A, 10000ms);
+        },
+        { surf_dialog }
+    );
+    if (ret < 0){
+        console.log("Failed to detect surf dialog");
+        return true;
+    }
+    console.log("Started surfing.");
+    pbf_mash_button(context, BUTTON_A, 2000ms);
+    context.wait_for_all_requests();
+    return false;
+}
+
 }
 }
 }

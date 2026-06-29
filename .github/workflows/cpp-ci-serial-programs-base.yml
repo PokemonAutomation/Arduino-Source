@@ -47,7 +47,7 @@ jobs:
         echo "UPLOAD_FOLDER=$UPLOAD_FOLDER" >> $GITHUB_ENV
 
     - name: Checkout Arduino-Source
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         path: 'Arduino-Source'
         submodules: 'recursive'
@@ -75,6 +75,7 @@ jobs:
         brew install opencv onnxruntime
 
         brew tap-new --no-git PA/libdpp
+        brew trust PA/libdpp
         FORMULA_DIR="$(brew --repo PA/libdpp)/Formula"
         mkdir -p "$FORMULA_DIR"
         cp 3rdPartyBinaries/libdpp@10.1.5.rb "$FORMULA_DIR/"
@@ -102,7 +103,7 @@ jobs:
         path: ${{env.UPLOAD_FOLDER}}
 
     - name: Checkout CommandLineTests
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       if: inputs.run-tests
       with:
         repository: 'PokemonAutomation/CommandLineTests'

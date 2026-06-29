@@ -185,8 +185,8 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
                 {learn_move},
             }
         );
-        
-        
+
+
         switch (ret){
         case 0:
             env.log("Battle menu detected!", COLOR_BLUE);
@@ -255,11 +255,8 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
             return true;
         default:
             stats.m_errors++;
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Timed out after 2 minutes.",
-                env.console
-            );
+            env.log("Timed out after 2 minutes. Assume battle ended.", COLOR_RED);
+            return false;
         }
     }
 

@@ -10,7 +10,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
-#include "CommonTools/OCR/OCR_RawOCR.h"
+#include "CommonTools/OCR/OCR_Routines.h"
 #include "PokemonLZA_HyperspaceCalorieDetector.h"
 
 namespace PokemonAutomation{
@@ -29,7 +29,7 @@ void HyperspaceCalorieDetector::make_overlays(VideoOverlaySet& items) const{
 
 void HyperspaceCalorieDetector::warm_ocr(){
     // Ensure the number used here matches the actual filter size used in detect()
-    OCR::ensure_instances(Language::English, 5);
+    OCR::ensure_ocr_instances(Language::English, 5);
 }
 
 bool HyperspaceCalorieDetector::detect(const ImageViewRGB32& screen){

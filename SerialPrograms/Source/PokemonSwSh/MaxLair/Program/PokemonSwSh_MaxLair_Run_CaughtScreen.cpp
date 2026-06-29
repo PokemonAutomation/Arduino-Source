@@ -226,7 +226,7 @@ StateMachineAction run_caught_screen(
             pbf_press_button(context, BUTTON_A, 80ms, 920ms);
             return mash_A_to_entrance(runtime, console, context, entrance);
         }else{
-            console.log("Taking non-shiny boss and returning to entrance...", COLOR_BLUE);
+            console.log("Taking non-boss shiny and returning to entrance...", COLOR_BLUE);
             tracker.scroll_to(shinies[0]);
             tracker.enter_summary();    //  Enter summary to verify you're on the right mon.
             tracker.leave_summary();
