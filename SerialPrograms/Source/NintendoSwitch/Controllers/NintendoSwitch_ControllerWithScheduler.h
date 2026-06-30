@@ -14,6 +14,7 @@
 #include "Controllers/Joystick.h"
 #include "Controllers/Schedulers/ControllerWithScheduler.h"
 #include "NintendoSwitch_ControllerButtons.h"
+#include "NintendoSwitch_Gyro.h"
 
 //#include <iostream>
 //using std::cout;
@@ -29,7 +30,7 @@ struct SwitchControllerState{
     JoystickPosition left_joystick;
     JoystickPosition right_joystick;
 
-    uint16_t gyro[6] = {};
+    GyroState gyro;
 };
 
 
@@ -65,12 +66,7 @@ enum class SwitchResource{
     JOYSTICK_LEFT,
     JOYSTICK_RIGHT,
 
-    GYRO_ACCEL_X,
-    GYRO_ACCEL_Y,
-    GYRO_ACCEL_Z,
-    GYRO_ROTATE_X,
-    GYRO_ROTATE_Y,
-    GYRO_ROTATE_Z,
+    GYRO,
 };
 
 class SwitchCommand : public SchedulerResource{
@@ -120,16 +116,15 @@ struct SwitchCommand_RightJoystick : public SwitchCommand{
         state.right_joystick = position;
     }
 };
-struct SwitchCommand_Gyro : public SwitchCommand{
-    int16_t value;
+struct SwitchCommand_GyroState : public SwitchCommand{
+    GyroState state;
 
-    SwitchCommand_Gyro(SwitchResource id, int16_t value)
-        : SwitchCommand((size_t)id)
-        , value(value)
+    SwitchCommand_GyroState(const GyroState& state)
+        : SwitchCommand((size_t)SwitchResource::GYRO)
+        , state(state)
     {}
-    virtual void apply(SwitchControllerState& state) const override{
-        size_t index = (ButtonFlagType)id - (ButtonFlagType)SwitchResource::GYRO_ACCEL_X;
-        state.gyro[index] = value;
+    virtual void apply(SwitchControllerState& controller_state) const override{
+        controller_state.gyro = state;
     }
 };
 
@@ -198,54 +193,12 @@ public:
         const JoystickPosition& position
     );
 
-    void issue_gyro(
+    void issue_gyro_motion(
         Cancellable* cancellable,
-        SwitchResource id, const char* name,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
+        ControllerClass controller_class,
+        Milliseconds duration,
+        const GyroFunction& function
     );
-    void issue_gyro_accel_x(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ){
-        issue_gyro(cancellable, SwitchResource::GYRO_ACCEL_X, "issue_gyro_accel_x", delay, hold, cooldown, value);
-    }
-    void issue_gyro_accel_y(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ){
-        issue_gyro(cancellable, SwitchResource::GYRO_ACCEL_Y, "issue_gyro_accel_y", delay, hold, cooldown, value);
-    }
-    void issue_gyro_accel_z(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ){
-        issue_gyro(cancellable, SwitchResource::GYRO_ACCEL_Z, "issue_gyro_accel_z", delay, hold, cooldown, value);
-    }
-    void issue_gyro_rotate_x(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ){
-        issue_gyro(cancellable, SwitchResource::GYRO_ROTATE_X, "issue_gyro_rotate_x", delay, hold, cooldown, value);
-    }
-    void issue_gyro_rotate_y(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ){
-        issue_gyro(cancellable, SwitchResource::GYRO_ROTATE_Y, "issue_gyro_rotate_y", delay, hold, cooldown, value);
-    }
-    void issue_gyro_rotate_z(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ){
-        issue_gyro(cancellable, SwitchResource::GYRO_ROTATE_Z, "issue_gyro_rotate_z", delay, hold, cooldown, value);
-    }
 
     void issue_full_controller_state(
         Cancellable* cancellable,

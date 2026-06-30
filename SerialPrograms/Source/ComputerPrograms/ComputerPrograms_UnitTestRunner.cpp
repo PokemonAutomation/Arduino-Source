@@ -32,6 +32,8 @@
 #include "NintendoSwitch/Controllers/SysbotBase/SysbotBase_Connection.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_MenuDetector.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_GyroTests.h"
+#include "UnitTestRunner.h"
 
 #include "VideoGames/PokemonHome/PokemonHome_Tests.h"
 #include "VideoGames/PokemonSwSh/PokemonSwSh_Tests.h"
@@ -76,6 +78,7 @@ UnitTestDatabase make_UNIT_TESTS_ALL(){
     NintendoSwitch::Typewriter::add_tests_TypewriterTextMapping(ret);
     NintendoSwitch::PokemonBDSP::add_tests_DialogDetector(ret);
     NintendoSwitch::PokemonBDSP::add_tests_MenuDetector(ret);
+    NintendoSwitch::add_tests_Gyro(ret);
     NintendoSwitch::PokemonFRLG::add_tests(ret);
     NintendoSwitch::PokemonRSE::add_tests(ret);
     NintendoSwitch::PokemonHome::add_tests(ret);

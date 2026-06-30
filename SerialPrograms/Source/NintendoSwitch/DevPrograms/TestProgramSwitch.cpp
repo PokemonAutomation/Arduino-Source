@@ -480,7 +480,6 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-//    context->issue_gyro_accel_x(&scope, 1000ms, 1000ms, 0ms, 123);
 
 //    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "test", console);
 

@@ -56,6 +56,16 @@ struct Message_Command_NS1_OemController_FullState : MessageHeader{
 };
 
 
+#define PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_MOTION             0x99
+struct PABB_PACK Message_Command_NS1_OemController_Motion : MessageHeader{
+    uint16_t milliseconds;
+    NintendoSwitch::OemController_State0x30_Buttons buttons;
+    int32_t acceleration_ug[3];
+    int32_t angular_velocity_mdps[3];
+};
+static_assert(sizeof(Message_Command_NS1_OemController_Motion) == 40, "OEM motion message must be 40 bytes");
+
+
 
 }
 }

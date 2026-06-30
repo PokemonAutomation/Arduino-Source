@@ -12,6 +12,7 @@
 #include "Controllers/ControllerTypes.h"
 #include "Controllers/Controller.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Gyro.h"
 
 namespace PokemonAutomation{
 
@@ -96,36 +97,13 @@ public:
         const JoystickPosition& position
     ) = 0;
 
-    //  Gyro: Accelerometer (experimental - API subject to change)
-    virtual void issue_gyro_accel_x(
+    // Issue a complete physical gyro trajectory. The callback is evaluated
+    // synchronously while this command is constructed and is never retained.
+    // A non-positive duration is a no-op. 
+    virtual void issue_gyro_motion(
         Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ) = 0;
-    virtual void issue_gyro_accel_y(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ) = 0;
-    virtual void issue_gyro_accel_z(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ) = 0;
-    virtual void issue_gyro_rotate_x(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ) = 0;
-    virtual void issue_gyro_rotate_y(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ) = 0;
-    virtual void issue_gyro_rotate_z(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
+        Milliseconds duration,
+        const GyroFunction& function
     ) = 0;
 
     //

@@ -49,30 +49,23 @@ public:
 
     ControllerPlayerNumber get_player_number(Cancellable& cancellable);
 
-
 protected:
     static Button populate_report_buttons(
         OemController_State0x30_Buttons& buttons,
         const SwitchControllerState& controller_state
     );
-    static bool populate_report_gyro(
-        OemController_State0x30_Gyro& gyro,
-        const SwitchControllerState& controller_state
+    void issue_motion_report(
+        Cancellable* cancellable,
+        WallDuration duration,
+        const OemController_State0x30_Buttons& buttons,
+        const SwitchControllerState& controller_state,
+        bool has_gyro_motion
     );
-
     void issue_report(
         Cancellable* cancellable,
         WallDuration duration,
         const OemController_State0x30_Buttons& buttons
     );
-    void issue_report(
-        Cancellable* cancellable,
-        WallDuration duration,
-        const OemController_State0x30_Buttons& buttons,
-        const OemController_State0x30_Gyro& gyro
-    );
-
-
 private:
     virtual void update_status(Cancellable& cancellable) override;
     virtual void stop_with_error(std::string message) override;
@@ -172,6 +165,7 @@ protected:
 
     std::string m_color_html;
     std::atomic<ControllerPlayerNumber> m_player_number;
+
 };
 
 
