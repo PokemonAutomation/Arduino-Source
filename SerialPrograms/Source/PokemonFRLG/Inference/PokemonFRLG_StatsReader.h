@@ -85,6 +85,39 @@ private:
     ImageFloatBox m_box_sp_defense_jpn;
     ImageFloatBox m_box_speed_jpn;
 
+
+    void read_name(
+        Logger& logger, Language language,
+        const ImageViewRGB32& game_screen,
+        PokemonFRLG_Stats& stats,
+        const std::set<std::string>& subset,
+        bool save_debug_images
+    );
+
+    void read_gender(
+        Logger& logger, Language language,
+        const ImageViewRGB32& game_screen,
+        PokemonFRLG_Stats& stats,
+        const std::set<std::string>& subset,
+        bool save_debug_images
+    );
+
+    void read_level(
+        Logger& logger, Language language,
+        const ImageViewRGB32& game_screen,
+        PokemonFRLG_Stats& stats,
+        const std::set<std::string>& subset,
+        bool save_debug_images
+    );
+
+    void read_nature(
+        Logger& logger, Language language,
+        const ImageViewRGB32& game_screen,
+        PokemonFRLG_Stats& stats,
+        const std::set<std::string>& subset,
+        bool save_debug_images
+    );
+
 };
 
 } // namespace PokemonFRLG

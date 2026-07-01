@@ -73,21 +73,16 @@ void StatsReader::make_overlays(VideoOverlaySet &items) const {
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_speed_jpn));
 }
 
-void StatsReader::read_page1(
+void StatsReader::read_name(
     Logger& logger, Language language,
-    const ImageViewRGB32& frame,
+    const ImageViewRGB32& game_screen,
     PokemonFRLG_Stats& stats,
-    const std::set<std::string>& subset
+    const std::set<std::string>& subset,
+    bool save_debug_images
 ){
-    const bool save_debug_images = GlobalSettings::instance().SAVE_DEBUG_IMAGES;
-    ImageViewRGB32 game_screen =
-            extract_box_reference(frame, GameSettings::instance().GAME_BOX);
-
-
     const bool jpn = language == Language::Japanese;
 
     ImageViewRGB32 name_box = extract_box_reference(game_screen, jpn ? m_box_name_jpn : m_box_name);
-
 
     static const std::vector<int> WHITE_THRESHOLDS = { 180, 200, 220, 230, 240 };
     OCR::StringMatchResult best_result;
@@ -140,7 +135,19 @@ void StatsReader::read_page1(
     }
     if (initialized && !best_result.results.empty()){
         stats.name = best_result.results.begin()->second.token;
+    }else{
+        logger.log("Failed to read species name.", COLOR_RED);
     }
+}
+
+void StatsReader::read_gender(
+    Logger& logger, Language language,
+    const ImageViewRGB32& game_screen,
+    PokemonFRLG_Stats& stats,
+    const std::set<std::string>& subset,
+    bool save_debug_images
+){
+    const bool jpn = language == Language::Japanese;
 
     // Detect gender by comparing red vs blue pixels
     ImageViewRGB32 gender_box = extract_box_reference(game_screen, jpn ? m_box_gender_jpn : m_box_gender);
@@ -162,11 +169,24 @@ void StatsReader::read_page1(
 
     if (num_red_pixels > threshold){
         stats.gender = SummaryGender::Female;
+        logger.log("Detected female gender.", COLOR_GREEN);
     }else if (num_blue_pixels > threshold){
         stats.gender = SummaryGender::Male;
+        logger.log("Detected male gender.", COLOR_GREEN);
     } else {
         stats.gender = SummaryGender::Genderless;
+        logger.log("No gender detected.", COLOR_GREEN);
     }
+}
+
+void StatsReader::read_level(
+    Logger& logger, Language language,
+    const ImageViewRGB32& game_screen,
+    PokemonFRLG_Stats& stats,
+    const std::set<std::string>& subset,
+    bool save_debug_images
+){
+    const bool jpn = language == Language::Japanese;
 
     ImageViewRGB32 level_box = extract_box_reference(game_screen, jpn ? m_box_level_jpn : m_box_level);
 
@@ -246,6 +266,16 @@ void StatsReader::read_page1(
         // Pass the binarized image to PaddleOCR
         stats.level = OCR::read_number(logger, level_ready, language);
     }
+}
+
+void StatsReader::read_nature(
+    Logger& logger, Language language,
+    const ImageViewRGB32& game_screen,
+    PokemonFRLG_Stats& stats,
+    const std::set<std::string>& subset,
+    bool save_debug_images
+){
+    const bool jpn = language == Language::Japanese;
 
     // Read Nature (black text on white/beige).
     // Pipeline: BW -> invert -> morph close -> invert -> upscale -> smooth -> pad.
@@ -257,76 +287,7 @@ void StatsReader::read_page1(
         nature_raw.save("DebugDumps/ocr_nature_0_raw.png");
     }
 
-    // Step 1: BW at native resolution. Dark text [0..150] -> black.
-    ImageRGB32 nature_bw = to_blackwhite_rgb32_range(
-            nature_raw, true,
-            combine_rgb(0, 0, 0), combine_rgb(150, 150, 150));
-    if (save_debug_images){
-        nature_bw.save("DebugDumps/ocr_nature_1_bw.png");
-    }
 
-    // Step 2: Invert -> MORPH_CLOSE -> Invert to bridge gaps.
-    // On the inverted image, text is bright (255) and bg is dark (0).
-    // MORPH_CLOSE (dilate then erode) fills small dark holes within
-    // the bright text regions - exactly the 1px gaps we need to bridge.
-    // A 3x3 kernel bridges 1px gaps. Two iterations bridges 2px gaps.
-    {
-        cv::Mat bw_mat = nature_bw.to_opencv_Mat();
-        cv::Mat inverted;
-        cv::bitwise_not(bw_mat, inverted);
-
-        cv::Mat kernel = cv::getStructuringElement(
-                cv::MORPH_ELLIPSE, cv::Size(3, 3));
-        cv::Mat closed;
-        cv::morphologyEx(inverted, closed, cv::MORPH_CLOSE, kernel,
-                cv::Point(-1, -1), 2);  // 2 iterations for 2px gaps
-
-        cv::Mat result;
-        cv::bitwise_not(closed, result);
-
-        ImageRGB32 nature_filled(result.cols, result.rows);
-        result.copyTo(nature_filled.to_opencv_Mat());
-        nature_bw = std::move(nature_filled);
-    }
-    if (save_debug_images){
-        nature_bw.save("DebugDumps/ocr_nature_2_gapfilled.png");
-    }
-
-    // Step 3: 4x bilinear upscale.
-    int scale = 4;
-    cv::Mat filled_mat = nature_bw.to_opencv_Mat();
-    cv::Mat upscaled;
-    cv::resize(filled_mat, upscaled,
-            cv::Size(filled_mat.cols * scale, filled_mat.rows * scale),
-            0, 0, cv::INTER_LINEAR);
-    ImageRGB32 nature_up(upscaled.cols, upscaled.rows);
-    upscaled.copyTo(nature_up.to_opencv_Mat());
-    if (save_debug_images){
-        nature_up.save("DebugDumps/ocr_nature_3_upscaled.png");
-    }
-
-    // Step 4: Smooth + re-threshold (same as preprocess_for_ocr).
-    cv::Mat smoothed;
-    cv::GaussianBlur(upscaled, smoothed, cv::Size(7, 7), 2.0);
-    ImageRGB32 smoothed_img(smoothed.cols, smoothed.rows);
-    smoothed.copyTo(smoothed_img.to_opencv_Mat());
-    ImageRGB32 nature_smooth = to_blackwhite_rgb32_range(
-            smoothed_img, true,
-            combine_rgb(0, 0, 0), combine_rgb(128, 128, 128));
-    if (save_debug_images){
-        nature_smooth.save("DebugDumps/ocr_nature_4_smooth.png");
-    }
-
-    // Step 5: Pad with white border.
-    ImageRGB32 nature_padded = pad_image(
-            nature_smooth, nature_smooth.height() / 2, 0xffffffff);
-    if (save_debug_images){
-        nature_padded.save("DebugDumps/ocr_nature_5_padded.png");
-    }
-
-    // OCR left/right single-word crops and pick the best score.
-    // This handles both "RASH nature." and "Nature DOCILE." while avoiding
-    // noisy full-line matches. Fall back to full-line only if both halves fail.
     OCR::StringMatchResult best_nature_result;
     bool have_best_nature_result = false;
 
@@ -341,15 +302,25 @@ void StatsReader::read_page1(
         }
     };
 
-        // Left and right single-word attempts (silent - log final selection only).
+    ImageRGB32 nature_ready = preprocess_for_ocr(
+        nature_raw, "nature", 7, 2, true,
+        combine_rgb(0, 0, 0), combine_rgb(190, 190, 190)
+    );
+
+    // OCR left/right single-word crops and pick the best score.
+    // This handles both "RASH nature." and "Nature DOCILE." while avoiding
+    // noisy full-line matches. Fall back to full-line only if both halves fail.
+    have_best_nature_result = false;
+
+    // Left and right single-word attempts (silent - log final selection only).
     const ImageFloatBox left_word_box(0.00, 0.00, 0.56, 1.00);
     const ImageFloatBox right_word_box(0.44, 0.00, 0.56, 1.00);
 
-    ImageViewRGB32 nature_left = extract_box_reference(nature_padded, left_word_box);
-    ImageViewRGB32 nature_right = extract_box_reference(nature_padded, right_word_box);
+    ImageViewRGB32 nature_left = extract_box_reference(nature_ready, left_word_box);
+    ImageViewRGB32 nature_right = extract_box_reference(nature_ready, right_word_box);
     if (save_debug_images){
-        nature_left.save("DebugDumps/ocr_nature_6_left_word.png");
-        nature_right.save("DebugDumps/ocr_nature_7_right_word.png");
+        nature_left.save("DebugDumps/ocr_nature_left_word.png");
+        nature_right.save("DebugDumps/ocr_nature_right_word.png");
     }
 
         OCR::StringMatchResult left_result = reader.match_substring_from_image(
@@ -369,17 +340,38 @@ void StatsReader::read_page1(
         // Fallback: if both halves fail thresholding, try full-line once.
         if (!have_best_nature_result){
         OCR::StringMatchResult full_result = reader.match_substring_from_image(
-            nullptr, language, nature_padded,
+            nullptr, language, nature_ready,
             Pokemon::NatureReader::MAX_LOG10P,
             Pokemon::NatureReader::MAX_LOG10P_SPREAD,
             OCR::PageSegMode::SINGLE_LINE);
         consider_nature_result(full_result);
-        }
-
-    if (have_best_nature_result){
-        best_nature_result.log(logger, Pokemon::NatureReader::MAX_LOG10P, "Nature Final");
-        stats.nature = best_nature_result.results.begin()->second.token;
     }
+
+    best_nature_result.log(logger, Pokemon::NatureReader::MAX_LOG10P, "Nature Final");
+    if (have_best_nature_result){
+        stats.nature = best_nature_result.results.begin()->second.token;
+    }else{
+        logger.log("Unable to detect Nature.", COLOR_RED);
+    }
+}
+
+void StatsReader::read_page1(
+    Logger& logger, Language language,
+    const ImageViewRGB32& frame,
+    PokemonFRLG_Stats& stats,
+    const std::set<std::string>& subset
+){
+    const bool save_debug_images = GlobalSettings::instance().SAVE_DEBUG_IMAGES;
+    ImageViewRGB32 game_screen =
+            extract_box_reference(frame, GameSettings::instance().GAME_BOX);
+
+    read_name(logger, language, game_screen, stats, subset, save_debug_images);
+
+    read_gender(logger, language, game_screen, stats, subset, save_debug_images);
+
+    read_level(logger, language, game_screen, stats, subset, save_debug_images);
+
+    read_nature(logger, language, game_screen, stats, subset, save_debug_images);
 }
 
 void StatsReader::read_page2(
