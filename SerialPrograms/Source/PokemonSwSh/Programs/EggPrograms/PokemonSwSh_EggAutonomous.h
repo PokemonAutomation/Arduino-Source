@@ -93,6 +93,16 @@ private:
         bool need_taxi
     );
 
+    // Press X to open the Rotom phone menu and fly home. Uses a state machine to handle
+    // the race condition where an egg starts hatching just as the menu is being opened.
+    // num_eggs_hatched is updated in-place if additional hatches are detected.
+    void open_menu_to_fly(
+        SingleSwitchProgramEnvironment& env,
+        ProControllerContext& context,
+        EggAutonomous_Descriptor::Stats& stats,
+        size_t& num_eggs_hatched
+    );
+
     // Used to wait until Y-Comm icon shows up.
     // Throw error if it does not find it after 10 sec.
     void mash_B_until_y_comm_icon(
