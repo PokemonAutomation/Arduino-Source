@@ -36,7 +36,7 @@ std::shared_ptr<ResourceDownload> GlobalResourceDownloadManager::add_to_download
         auto download_ptr = m_download_queue.emplace_back(std::make_shared<ResourceDownload>(*this, std::move(resource_metadata), m_queue_lock, m_cv));
         
         download_ptr->add_listener(*this);
-        // GlobalSettings::instance().connect_row_with_download(resource_slug, download_ptr);  TODO: re-enable this
+        GlobalSettings::instance().connect_row_with_download(resource_slug, download_ptr);
         download_ptr->start_download();
 
         return download_ptr;

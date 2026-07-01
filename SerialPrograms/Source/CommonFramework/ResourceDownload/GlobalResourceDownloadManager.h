@@ -8,7 +8,6 @@
 #define PokemonAutomation_ResourceDownloadManager_H
 
 #include <vector>
-#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/ListenerSet.h"
