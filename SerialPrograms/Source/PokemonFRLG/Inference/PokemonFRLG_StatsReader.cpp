@@ -279,9 +279,6 @@ void StatsReader::read_nature(
     const bool jpn = language == Language::Japanese;
 
     // Read Nature (black text on white/beige).
-    // Pipeline: BW -> invert -> morph close -> invert -> upscale -> smooth -> pad.
-    // Morph close on the inverted image (text=white) bridges gaps in text
-    // regions by growing white->eroding back. Works per-channel on CV_8UC4.
     const static Pokemon::NatureReader reader("PokemonFRLG/NatureCheckerOCR.json");
     ImageViewRGB32 nature_raw = extract_box_reference(game_screen, jpn ? m_box_nature_jpn : m_box_nature);
     if (save_debug_images){
