@@ -62,7 +62,7 @@ void StreamCoalescer::write_buffer(
 void StreamCoalescer::read_buffer(
     void* data,
     uint16_t stream_offset, uint16_t bytes
-){
+) const{
     if (bytes == 0){
         return;
     }
@@ -224,7 +224,9 @@ size_t StreamCoalescer::read(void* data, size_t max_bytes){
     if (read > max_bytes){
         read = (uint16_t)max_bytes;
     }
-    read_buffer(data, m_stream_free, read);
+    if (data != nullptr){
+        read_buffer(data, m_stream_free, read);
+    }
     m_stream_free += read;
 
     return read;

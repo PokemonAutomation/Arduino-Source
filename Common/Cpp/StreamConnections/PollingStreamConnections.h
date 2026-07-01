@@ -60,6 +60,7 @@ public:
 
 
 public:
+    //  If (data == nullptr), throw away the data.
     virtual size_t reliable_recv(void* data, size_t max_bytes) = 0;
 
     virtual bool reset_flag_set() const{ return false; }

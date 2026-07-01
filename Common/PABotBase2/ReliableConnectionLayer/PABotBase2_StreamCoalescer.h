@@ -79,9 +79,9 @@ private:
         uint16_t stream_offset, uint8_t bytes
     );
     void read_buffer(
-        void* data,
+        void* data, //  Null means throw away the output.
         uint16_t stream_offset, uint16_t bytes
-    );
+    ) const;
     void advance_slot_head();
 
 
