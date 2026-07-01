@@ -62,6 +62,7 @@ void StatsReader::make_overlays(VideoOverlaySet &items) const {
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_sp_attack));
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_sp_defense));
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_speed));
+    items.add(m_color, GAME_BOX.inner_to_outer(m_box_nature_jpn));
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_level_jpn));
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_name_jpn));
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_gender_jpn));
@@ -281,75 +282,26 @@ void StatsReader::read_nature(
     // Pipeline: BW -> invert -> morph close -> invert -> upscale -> smooth -> pad.
     // Morph close on the inverted image (text=white) bridges gaps in text
     // regions by growing white->eroding back. Works per-channel on CV_8UC4.
-    const static Pokemon::NatureReader reader("Pokemon/NatureCheckerOCR.json");
+    const static Pokemon::NatureReader reader("PokemonFRLG/NatureCheckerOCR.json");
     ImageViewRGB32 nature_raw = extract_box_reference(game_screen, jpn ? m_box_nature_jpn : m_box_nature);
     if (save_debug_images){
         nature_raw.save("DebugDumps/ocr_nature_0_raw.png");
     }
-
-
-    OCR::StringMatchResult best_nature_result;
-    bool have_best_nature_result = false;
-
-    auto consider_nature_result = [&](const OCR::StringMatchResult& result){
-        if (result.results.empty()){
-            return;
-        }
-        if (!have_best_nature_result
-                || result.results.begin()->first < best_nature_result.results.begin()->first){
-            best_nature_result = result;
-            have_best_nature_result = true;
-        }
-    };
 
     ImageRGB32 nature_ready = preprocess_for_ocr(
         nature_raw, "nature", 7, 2, true,
         combine_rgb(0, 0, 0), combine_rgb(190, 190, 190)
     );
 
-    // OCR left/right single-word crops and pick the best score.
-    // This handles both "RASH nature." and "Nature DOCILE." while avoiding
-    // noisy full-line matches. Fall back to full-line only if both halves fail.
-    have_best_nature_result = false;
+    OCR::StringMatchResult nature_result = reader.match_substring_from_image(
+        nullptr, language, nature_ready,
+        Pokemon::NatureReader::MAX_LOG10P,
+        Pokemon::NatureReader::MAX_LOG10P_SPREAD,
+        OCR::PageSegMode::SINGLE_LINE);
 
-    // Left and right single-word attempts (silent - log final selection only).
-    const ImageFloatBox left_word_box(0.00, 0.00, 0.56, 1.00);
-    const ImageFloatBox right_word_box(0.44, 0.00, 0.56, 1.00);
-
-    ImageViewRGB32 nature_left = extract_box_reference(nature_ready, left_word_box);
-    ImageViewRGB32 nature_right = extract_box_reference(nature_ready, right_word_box);
-    if (save_debug_images){
-        nature_left.save("DebugDumps/ocr_nature_left_word.png");
-        nature_right.save("DebugDumps/ocr_nature_right_word.png");
-    }
-
-        OCR::StringMatchResult left_result = reader.match_substring_from_image(
-            nullptr, language, nature_left,
-            Pokemon::NatureReader::MAX_LOG10P,
-            Pokemon::NatureReader::MAX_LOG10P_SPREAD,
-            OCR::PageSegMode::SINGLE_WORD);
-        consider_nature_result(left_result);
-
-        OCR::StringMatchResult right_result = reader.match_substring_from_image(
-            nullptr, language, nature_right,
-            Pokemon::NatureReader::MAX_LOG10P,
-            Pokemon::NatureReader::MAX_LOG10P_SPREAD,
-            OCR::PageSegMode::SINGLE_WORD);
-        consider_nature_result(right_result);
-
-        // Fallback: if both halves fail thresholding, try full-line once.
-        if (!have_best_nature_result){
-        OCR::StringMatchResult full_result = reader.match_substring_from_image(
-            nullptr, language, nature_ready,
-            Pokemon::NatureReader::MAX_LOG10P,
-            Pokemon::NatureReader::MAX_LOG10P_SPREAD,
-            OCR::PageSegMode::SINGLE_LINE);
-        consider_nature_result(full_result);
-    }
-
-    best_nature_result.log(logger, Pokemon::NatureReader::MAX_LOG10P, "Nature Final");
-    if (have_best_nature_result){
-        stats.nature = best_nature_result.results.begin()->second.token;
+    if (!nature_result.results.empty()){
+        nature_result.log(logger, Pokemon::NatureReader::MAX_LOG10P, "Nature Final");
+        stats.nature = nature_result.results.begin()->second.token;
     }else{
         logger.log("Unable to detect Nature.", COLOR_RED);
     }
