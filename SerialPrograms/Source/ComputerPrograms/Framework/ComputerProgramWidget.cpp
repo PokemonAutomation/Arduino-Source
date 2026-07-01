@@ -13,9 +13,14 @@
 #include "CommonFramework/Panels/PanelTools.h"
 #include "CommonFramework/Panels/UI/PanelElements.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonFramework/ResourceDownload/ProgramResourceDownloadWidget.h"
 #include "ComputerPrograms/ComputerProgram.h"
 #include "ComputerPrograms/Framework/ComputerProgramOption.h"
 #include "ComputerProgramWidget.h"
+
+// #include <iostream>
+// using std::cout;
+// using std::endl;
 
 namespace PokemonAutomation{
 
@@ -72,6 +77,10 @@ ComputerProgramWidget::ComputerProgramWidget(
     m_actions_bar = new RunnablePanelActionBar(*this, m_session.current_state());
     layout->addWidget(m_actions_bar);
 
+    m_downloads_table = new ProgramResourceDownloadTableWidget(*this);
+    m_downloads_table->setVisible(false);
+    layout->addWidget(m_downloads_table);    
+
     connect(
         m_actions_bar, &RunnablePanelActionBar::start_clicked,
         this, [&](ProgramState state){
@@ -111,6 +120,10 @@ void ComputerProgramWidget::state_change(ProgramState state){
         }else{
             m_holder.on_busy();
         }
+
+        if(state == ProgramState::STOPPING){
+            m_downloads_table->remove_all_downloads();
+        }        
     });
 }
 void ComputerProgramWidget::stats_update(const StatsTracker* current_stats, const StatsTracker* historical_stats){
@@ -125,6 +138,29 @@ void ComputerProgramWidget::error(const std::string& message){
     QMetaObject::invokeMethod(this, [message]{
         QMessageBox box;
         box.critical(nullptr, "Error", QString::fromStdString(message));
+    });
+}
+
+void ComputerProgramWidget::download_error(const std::string& message){
+    if (m_popup_is_open.exchange(true)){ // only show popups if one isn't already open
+        return;
+    }
+    QMetaObject::invokeMethod(this, [message]{
+        QMessageBox box;
+        box.critical(nullptr, "Error", QString::fromStdString(message));
+    });
+    m_popup_is_open.store(false);
+}
+
+void ComputerProgramWidget::download_added(std::shared_ptr<ResourceDownload> download_ptr){
+    QMetaObject::invokeMethod(this, [this, download_ptr]{
+        this->m_downloads_table->add_download(std::move(download_ptr));
+    });
+}
+
+void ComputerProgramWidget::all_downloads_done(){
+    QMetaObject::invokeMethod(this, [this]{
+        this->m_downloads_table->remove_all_downloads();
     });
 }
 

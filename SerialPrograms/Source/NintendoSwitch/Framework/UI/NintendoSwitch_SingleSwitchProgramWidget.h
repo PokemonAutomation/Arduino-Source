@@ -25,6 +25,7 @@
 
 namespace PokemonAutomation{
     struct PanelHolder;
+    class ProgramResourceDownloadTableWidget;
 namespace NintendoSwitch{
 
 
@@ -42,6 +43,9 @@ private:
     virtual void state_change(ProgramState state) override;
     virtual void stats_update(const StatsTracker* current_stats, const StatsTracker* historical_stats) override;
     virtual void error(const std::string& message) override;
+    virtual void download_error(const std::string& message) override;
+    virtual void download_added(std::shared_ptr<ResourceDownload> download_ptr) override;
+    virtual void all_downloads_done() override;
 
 private:
     PanelHolder& m_holder;
@@ -50,6 +54,8 @@ private:
     ConfigWidget* m_options;
     StatsBar* m_stats_bar;
     RunnablePanelActionBar* m_actions_bar;
+    ProgramResourceDownloadTableWidget* m_downloads_table;
+    std::atomic<bool> m_popup_is_open{false};
 };
 
 
