@@ -323,18 +323,20 @@ void enter_safarizone(ProControllerContext& context){
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 3300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    // this last press is needed for German, but shouldn't throw off things off for other languages
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     // finish dialogue and automatically enter the Safari Zone
     pbf_press_button(context, BUTTON_A, 200ms, 4800ms);
-    // total duration: 18500ms
+    // total duration: 20000ms
 }
 
 void walk_to_safarizonefish(ProControllerContext& context){
-    enter_safarizone(context); // 18500ms
+    enter_safarizone(context); // 20000ms
     // walk from the entrance to the pond in the central area
     pbf_move_left_joystick(context, {0, +1}, 2200ms, 300ms);
     pbf_move_left_joystick(context, {+1, 0}, 1600ms, 300ms);
     pbf_move_left_joystick(context, {0, +1}, 600ms, 300ms);
-    // total duration: 23800ms
+    // total duration: 25300ms
 }
 
 void walk_to_safarizonesurf(ProControllerContext& context){
@@ -343,19 +345,19 @@ void walk_to_safarizonesurf(ProControllerContext& context){
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 3300ms);
-    // total duration: 30300ms
+    // total duration: 31800ms
 }
 
 void walk_to_safarizonecenter(ProControllerContext& context){
-    enter_safarizone(context); // 18500ms
+    enter_safarizone(context); // 20000ms
     // walk from the entrance to the nearest grass
     pbf_move_left_joystick(context, {0, +1}, 460ms, 300ms);
     pbf_move_left_joystick(context, {-1, 0}, 1110ms, 300ms);
-    // total duration: 20670ms
+    // total duration: 22170ms
 }
 
 void walk_to_safarizoneeast(ProControllerContext& context){
-    enter_safarizone(context); // 18500ms
+    enter_safarizone(context); // 20000ms
     // walk from the entrance to the east area
     pbf_move_left_joystick(context, {0, +1}, 160ms, 300ms);
     pbf_move_left_joystick(context, {+1, 0}, 4400ms, 300ms);
@@ -364,7 +366,7 @@ void walk_to_safarizoneeast(ProControllerContext& context){
     pbf_move_left_joystick(context, {+1, 0}, 3600ms, 300ms);
     pbf_move_left_joystick(context, {0, -1}, 700ms, 300ms);
     pbf_move_left_joystick(context, {+1, 0}, 3450ms, 300ms);
-    // total duration: 36160ms
+    // total duration: 37660ms
 }
 
 void walk_to_safarizonenorth(ProControllerContext& context){
@@ -373,7 +375,7 @@ void walk_to_safarizonenorth(ProControllerContext& context){
     pbf_move_left_joystick(context, {0, +1}, 2810ms, 300ms);
     pbf_move_left_joystick(context, {-1, 0}, 1530ms, 300ms);
     pbf_move_left_joystick(context, {0, +1}, 1870ms, 300ms);
-    // total duration: 37410ms
+    // total duration: 38910ms
 }
 
 void walk_to_safarizonewest(ProControllerContext& context){
@@ -392,7 +394,7 @@ void walk_to_safarizonewest(ProControllerContext& context){
     pbf_move_left_joystick(context, {0, -1}, 770ms, 300ms);
     pbf_move_left_joystick(context, {-1, 0}, 2400ms, 300ms);
     pbf_move_left_joystick(context, {0, -1}, 600ms, 300ms);
-    // total duration: 51430ms
+    // total duration: 52930ms
 }
 
 void activate_roamer(ProControllerContext& context, const uint64_t& ingame_delay){
@@ -623,55 +625,55 @@ void check_timings(
         }
         return;
     case PokemonFRLG_RngTarget::safarizonecenter:
-        if (timings.ingame_delay < 39000){
+        if (timings.ingame_delay < 40500){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Safari Zone Center: in-game delay cannot be less than 39000ms (5032 advances). Check your in-game advances and calibration or pick a new target.",
+                "Safari Zone Center: in-game delay cannot be less than 40500ms (5212 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
         return;
     case PokemonFRLG_RngTarget::safarizoneeast:
-        if (timings.ingame_delay < 45000){
+        if (timings.ingame_delay < 46500){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Safari Zone East: in-game delay cannot be less than 45000ms (5752 advances). Check your in-game advances and calibration or pick a new target.",
+                "Safari Zone East: in-game delay cannot be less than 46500ms (5932 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
         return;
     case PokemonFRLG_RngTarget::safarizonenorth:
-        if (timings.ingame_delay < 46000){
+        if (timings.ingame_delay < 47500){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Safari Zone North: in-game delay cannot be less than 46000ms (5872 advances). Check your in-game advances and calibration or pick a new target.",
+                "Safari Zone North: in-game delay cannot be less than 47500ms (6052 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
         return;
     case PokemonFRLG_RngTarget::safarizonewest:
-        if (timings.ingame_delay < 60000){
+        if (timings.ingame_delay < 61500){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Safari Zone West: in-game delay cannot be less than 60000ms (7552 advances). Check your in-game advances and calibration or pick a new target.",
+                "Safari Zone West: in-game delay cannot be less than 61500ms (7732 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
         return;
     case PokemonFRLG_RngTarget::safarizonesurf:
-        if (timings.ingame_delay < 46000){
+        if (timings.ingame_delay < 47500){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Safari Zone Surfing: in-game delay cannot be less than 46000ms (5872 advances). Check your in-game advances and calibration or pick a new target.",
+                "Safari Zone Surfing: in-game delay cannot be less than 47500ms (6052 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
         return;
     case PokemonFRLG_RngTarget::safarizonefish:
-        if (timings.ingame_delay < 35000){
+        if (timings.ingame_delay < 36500){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Safari Zone Fishing: in-game delay cannot be less than 35000ms (4040 advances). Check your in-game advances and calibration or pick a new target.",
+                "Safari Zone Fishing: in-game delay cannot be less than 36500ms (4220 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
