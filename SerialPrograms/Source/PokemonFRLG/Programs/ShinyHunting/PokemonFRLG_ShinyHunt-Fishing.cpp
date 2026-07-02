@@ -89,7 +89,8 @@ void ShinyHuntFishing::program(
     */
     env.log("FRLG Fishing shiny hunt started.");
 
-    while (true){
+    bool finished = false;
+    while (!finished){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
         int fish_result = fish_encounter(env.console, context);
 
@@ -122,6 +123,7 @@ void ShinyHuntFishing::program(
                 env.console.video().snapshot(),
                 true
             );
+            finished = true;
             break;
         }
     }
