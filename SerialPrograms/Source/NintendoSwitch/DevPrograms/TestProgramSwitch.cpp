@@ -332,7 +332,16 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
-    context->issue_gyro_accel_x(&scope, 1000ms, 1000ms, 0ms, 123);
+    YCommIconDetector detector(COLOR_RED, true);
+    detector.make_overlays(overlays);
+
+    auto snapshot = feed.snapshot();
+    cout << detector.detect(snapshot) << endl;
+
+
+
+
+//    context->issue_gyro_accel_x(&scope, 1000ms, 1000ms, 0ms, 123);
 
 //    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "test", console);
 

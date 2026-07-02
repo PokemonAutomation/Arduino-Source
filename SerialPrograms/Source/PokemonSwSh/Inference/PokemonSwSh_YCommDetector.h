@@ -53,8 +53,8 @@ public:
 private:
     Color m_color;
     ImageFloatBox m_icon;
-    ImageFloatBox m_left;
-    ImageFloatBox m_right;
+//    ImageFloatBox m_left;
+//    ImageFloatBox m_right;
 
     bool m_is_on;
 };
