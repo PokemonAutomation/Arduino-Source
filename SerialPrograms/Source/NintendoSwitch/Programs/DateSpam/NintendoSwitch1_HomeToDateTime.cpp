@@ -276,8 +276,11 @@ void home_to_date_time_Switch1_wired_feedback(
             {system_setting_selected}
         );
         if (ret < 0){  // failed to detect "System" being highlighted. press home and re-try
+            stream.log(
+                "home_to_date_time_Switch1_wired_feedback: Failed to detect 'System' being highlighted. Re-try",
+                COLOR_YELLOW
+            );
             pbf_press_button(context, BUTTON_HOME, 100ms, 2000ms);
-            stream.log("home_to_date_time_Switch1_wired_feedback: Failed to detect 'System' being highlighted. Re-try", COLOR_YELLOW);
             continue;
         }
 
@@ -322,8 +325,11 @@ void home_to_date_time_Switch1_wired_feedback(
             {sync_clock_selected}
         );
         if (ret < 0){  // failed to detect "Synchronize clock" being highlighted. press home and re-try
+            stream.log(
+                "home_to_date_time_Switch1_wired_feedback: Failed to detect 'Synchronize clock' being highlighted. Re-try",
+                COLOR_YELLOW
+            );
             pbf_press_button(context, BUTTON_HOME, 100ms, 2000ms);
-            stream.log("home_to_date_time_Switch1_wired_feedback: Failed to detect 'Synchronize clock' being highlighted. Re-try", COLOR_YELLOW);
             continue;
         }
 
@@ -415,8 +421,11 @@ void home_to_date_time_Switch1_wireless_feedback(
             {system_setting_selected}
         );
         if (ret < 0){  // failed to detect "System" being highlighted. press home and re-try
+            stream.log(
+                "home_to_date_time_Switch1_wireless_feedback: Failed to detect 'System' being highlighted. Re-try",
+                COLOR_YELLOW
+            );
             pbf_press_button(context, BUTTON_HOME, 100ms, 2000ms);
-            stream.log("home_to_date_time_Switch1_wireless_feedback: Failed to detect 'System' being highlighted. Re-try", COLOR_YELLOW);
             continue;
         }        
 
@@ -453,8 +462,11 @@ void home_to_date_time_Switch1_wireless_feedback(
             {sync_clock_selected}
         );
         if (ret < 0){  // failed to detect "Synchronize clock" being highlighted. press home and re-try
+            stream.log(
+                "home_to_date_time_Switch1_wireless_feedback: Failed to detect 'Synchronize clock' being highlighted. Re-try",
+                COLOR_YELLOW
+            );
             pbf_press_button(context, BUTTON_HOME, 100ms, 2000ms);
-            stream.log("home_to_date_time_Switch1_wireless_feedback: Failed to detect 'Synchronize clock' being highlighted. Re-try", COLOR_YELLOW);
             continue;
         }
 

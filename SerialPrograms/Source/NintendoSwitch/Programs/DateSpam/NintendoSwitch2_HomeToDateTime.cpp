@@ -12,6 +12,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -58,7 +59,7 @@ ConsoleType settings_detect_console_type(
         break;
     default:
         OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReport::NO_ERROR_REPORT,
             "Unable to detect if this Switch 2 model is international or Japan-locked.",
             console, std::move(snapshot)
         );
@@ -239,9 +240,21 @@ void home_to_date_time_Switch2_procon_feedback(
     bool to_date_change
 ){
     console.log("home_to_date_time_Switch2_procon_feedback()");
-    home_to_settings_Switch2_procon_blind(context);
-    ConsoleType console_type = settings_detect_console_type(console, context);
-    settings_to_date_time_Switch2_all_blind(console, context, console_type, to_date_change);
+    for (int c = 0; c < 5; c++){
+        try{
+            home_to_settings_Switch2_procon_blind(context);
+            ConsoleType console_type = settings_detect_console_type(console, context);
+            settings_to_date_time_Switch2_all_blind(console, context, console_type, to_date_change);
+            return;
+        }catch (OperationFailedException&){
+            go_home(console, context);
+        }
+    }
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "Unable to navigate to date/time after 5 attempts.",
+        console, console.video().snapshot_latest_blocking()
+    );
 }
 
 
@@ -252,10 +265,22 @@ void home_to_date_time_Switch2_joycon_feedback(
     ConsoleHandle& console, JoyconContext& context,
     bool to_date_change
 ){
-    console.log("home_to_date_time_Switch2_joycon_feedback()");
-    home_to_settings_Switch2_joycon_blind(context);
-    ConsoleType console_type = settings_detect_console_type(console, context);
-    settings_to_date_time_Switch2_all_blind(console, context, console_type, to_date_change);
+    console.log("home_to_date_time_Switch2_procon_feedback()");
+    for (int c = 0; c < 5; c++){
+        try{
+            home_to_settings_Switch2_joycon_blind(context);
+            ConsoleType console_type = settings_detect_console_type(console, context);
+            settings_to_date_time_Switch2_all_blind(console, context, console_type, to_date_change);
+            return;
+        }catch (OperationFailedException&){
+            go_home(console, context);
+        }
+    }
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "Unable to navigate to date/time after 5 attempts.",
+        console, console.video().snapshot_latest_blocking()
+    );
 }
 
 
