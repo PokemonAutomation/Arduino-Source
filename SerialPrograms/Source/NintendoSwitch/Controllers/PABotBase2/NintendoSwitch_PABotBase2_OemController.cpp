@@ -651,8 +651,8 @@ void PABotBase2_OemController::update_status(Cancellable& cancellable){
     str += "Paired: ";
     if (status.status & 4){
         str += html_color_text(
-            tostr_hex(status.paired_mac_address[4]) + ":" +
-            tostr_hex(status.paired_mac_address[5]),
+            tostr_hex_padded(2, status.paired_mac_address[4]) + ":" +
+            tostr_hex_padded(2, status.paired_mac_address[5]),
             theme_friendly_darkblue()
         );
     }else{

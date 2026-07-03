@@ -273,6 +273,13 @@ std::string tostr_hex(uint64_t x){
     ss << std::hex << x;
     return ss.str();
 }
+std::string tostr_hex_padded(size_t digits, uint64_t x){
+    std::string str = tostr_hex(x);
+    if (digits > str.size()){
+        str = std::string(digits - str.size(), '0') + str;
+    }
+    return str;
+}
 
 
 std::string tostr_hexbytes(const void* data, size_t length){
