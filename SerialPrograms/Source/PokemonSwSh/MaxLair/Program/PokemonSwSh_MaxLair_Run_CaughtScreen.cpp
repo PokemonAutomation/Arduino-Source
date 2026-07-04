@@ -49,7 +49,7 @@ StateMachineAction process_entrance(
             return StateMachineAction::RESET_RECOVER;
         }
 
-//        EntranceDetector entrance_detector(entrance);
+        EntranceDetector entrance_detector(entrance);
         YCommIconWatcher overworld;
         SelectionArrowFinder prompt(stream.overlay(), {0.362689, 0.282828, 0.625000, 0.580808});
         WhiteDialogBoxWatcher white_dialog;
@@ -61,6 +61,7 @@ StateMachineAction process_entrance(
             stream, context,
             std::chrono::seconds(10),
             {
+                entrance_detector,
                 overworld,
                 prompt,
                 white_dialog,
@@ -76,21 +77,22 @@ StateMachineAction process_entrance(
 
         switch (ret){
         case 0:
+        case 1:
             stream.log("Detected entrance.");
             return StateMachineAction::KEEP_GOING;
-        case 1:
+        case 2:
             stream.log("Detected prompt.");
             pbf_press_button(context, BUTTON_A, 80ms, 320ms);
             break;
-        case 2:
+        case 3:
             stream.log("Detected dialog triangle.");
             pbf_press_button(context, BUTTON_B, 80ms, 320ms);
             break;
-        case 3:
+        case 4:
             stream.log("Detected dialog box.");
             pbf_press_button(context, BUTTON_B, 80ms, 320ms);
             break;
-        case 4:
+        case 5:
             stream.log("Detected receive " + Pokemon::STRING_POKEMON + ".");
             pbf_press_button(context, BUTTON_B, 80ms, 320ms);
             break;
