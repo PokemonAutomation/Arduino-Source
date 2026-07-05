@@ -93,7 +93,10 @@ jobs:
       if: inputs.upload-build
       shell: bash
       run: |
-        echo https://github.com/${{github.repository}}/commit/${{github.sha}} > ${{env.UPLOAD_FOLDER}}/version.txt
+        {
+          echo "https://github.com/${{GITHUB_REPOSITORY_OWNER}}/Arduino-Source/commit/$(git -C Arduino-Source rev-parse HEAD)"
+          echo "https://github.com/${{GITHUB_REPOSITORY_OWNER}}/Packages/commit/$(git -C Arduino-Source/Packages rev-parse HEAD)"
+        } > ${{env.UPLOAD_FOLDER}}/version.txt
 
     - name: Upload Build
       uses: actions/upload-artifact@v7
