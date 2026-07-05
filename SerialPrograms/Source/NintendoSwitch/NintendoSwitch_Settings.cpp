@@ -80,6 +80,11 @@ ConsoleSettings::ConsoleSettings()
         LockMode::LOCK_WHILE_RUNNING,
         "2000 ms"
     )
+    , CLOSE_GAME_DELAY(
+        "<b>Close Game Delay:</b><br>Delay from closing a game to when it's actually closed.",
+        LockMode::LOCK_WHILE_RUNNING,
+        "2000 ms"
+    )
     , SETTINGS_TO_HOME_DELAY0(
         "<b>Settings to Home Delay:</b><br>Delay from pressing home anywhere in the settings to return to the home menu.",
         LockMode::LOCK_WHILE_RUNNING,
@@ -158,6 +163,7 @@ ConsoleSettings::ConsoleSettings()
     PA_ADD_OPTION(CONTROLLER_SETTINGS);
     PA_ADD_OPTION(TRUST_USER_CONSOLE_SELECTION);
     PA_ADD_OPTION(BLIND_START_GAME_MASH);
+    PA_ADD_OPTION(CLOSE_GAME_DELAY);
     PA_ADD_OPTION(SETTINGS_TO_HOME_DELAY0);
     PA_ADD_OPTION(START_GAME_REQUIRES_INTERNET);
     PA_ADD_OPTION(START_GAME_INTERNET_CHECK_DELAY0);

@@ -44,6 +44,7 @@ public:
 
     BooleanCheckBoxOption TRUST_USER_CONSOLE_SELECTION;
     MillisecondsOption BLIND_START_GAME_MASH;
+    MillisecondsOption CLOSE_GAME_DELAY;
     MillisecondsOption SETTINGS_TO_HOME_DELAY0;
     BooleanCheckBoxOption START_GAME_REQUIRES_INTERNET;
     MillisecondsOption START_GAME_INTERNET_CHECK_DELAY0;
