@@ -314,12 +314,22 @@ SettingsProgressBarWidget::SettingsProgressBarWidget(QWidget& parent, SettingsRe
 
     value.add_progress_listener(*this);
 
-    // value.set_visibility(ConfigOptionState::HIDDEN);
+    update_visibility();
+}
 
-    // m_progress_bar->hide();
-    // this->hide();
+void SettingsProgressBarWidget::update_visibility(){
+    ConfigWidget::update_visibility();
 
-    // cout << "progress" << endl;
+    switch (m_value.visibility()){
+    case ConfigOptionState::ENABLED:
+    case ConfigOptionState::DISABLED:
+        m_progress_bar->setVisible(true);
+        break;
+    case ConfigOptionState::HIDDEN:
+        m_progress_bar->setVisible(false);
+        break;
+    }
+
 }
 
 

@@ -86,6 +86,10 @@ public:
     ~SettingsProgressBarWidget();
     SettingsProgressBarWidget(QWidget& parent, SettingsResourceProgressBar& value);
 
+    // Because this widget is within a table, QT doesn't respect setVisible
+    // so we need to override update_visibility and manually hide/show the progress_bar.
+    virtual void update_visibility() override;
+
 public: // SettingsResourceProgressBar::Listener
     virtual void on_change_text(const std::string& text) override;
     virtual void on_update_progress(uint64_t bytes_done, uint64_t total_bytes) override;
