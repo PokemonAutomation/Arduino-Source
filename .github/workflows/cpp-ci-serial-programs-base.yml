@@ -94,8 +94,8 @@ jobs:
       shell: bash
       run: |
         {
-          echo "https://github.com/${{GITHUB_REPOSITORY_OWNER}}/Arduino-Source/commit/$(git -C Arduino-Source rev-parse HEAD)"
-          echo "https://github.com/${{GITHUB_REPOSITORY_OWNER}}/Packages/commit/$(git -C Arduino-Source/Packages rev-parse HEAD)"
+          echo "https://github.com/${{github.repository_owner}} /Arduino-Source/commit/$(git -C Arduino-Source rev-parse HEAD)"
+          echo "https://github.com/${{github.repository_owner}} /Packages/commit/$(git -C Arduino-Source/Packages rev-parse HEAD)"
         } > ${{env.UPLOAD_FOLDER}}/version.txt
 
     - name: Upload Build
