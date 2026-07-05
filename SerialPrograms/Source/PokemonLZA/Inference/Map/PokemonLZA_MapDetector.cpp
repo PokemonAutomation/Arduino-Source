@@ -51,7 +51,7 @@ public:
 
 MapDetector::MapDetector(Color color, VideoOverlay* overlay)
     : m_color(color)
-    , m_travel_icon(0.040000, 0.235000, 0.030000, 0.068500)
+    , m_travel_icon(0.040000, 0.235000, 0.030000, 0.100000)
     , m_x_button(
         color,
         ButtonType::ButtonX,
