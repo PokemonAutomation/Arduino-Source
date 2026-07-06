@@ -59,16 +59,25 @@ JsonValue VideoSourceDescriptor_StillImage::to_json() const{
     return m_path;
 }
 
-std::unique_ptr<VideoSource> VideoSourceDescriptor_StillImage::make_VideoSource(Logger& logger, Resolution resolution) const{
+std::unique_ptr<VideoSource> VideoSourceDescriptor_StillImage::make_VideoSource(
+    Logger& logger,
+    Resolution resolution,
+    VideoFormat format
+) const{
 //    cout << "make_VideoSource: " << m_path << endl;
-    return std::make_unique<VideoSource_StillImage>(logger, path(), resolution);
+    return std::make_unique<VideoSource_StillImage>(logger, path(), resolution, format);
 }
 
 
 
 
 
-VideoSource_StillImage::VideoSource_StillImage(Logger& logger, const std::string& path, Resolution resolution)
+VideoSource_StillImage::VideoSource_StillImage(
+    Logger& logger,
+    const std::string& path,
+    Resolution resolution,
+    VideoFormat format
+)
     : VideoSource(logger, false)
     , m_original_image(QString::fromStdString(path))
 {
@@ -84,11 +93,12 @@ VideoSource_StillImage::VideoSource_StillImage(Logger& logger, const std::string
         );
     }
     m_resolution = resolution;
-    m_resolutions = {
-        {1280, 720},
-        {1920, 1080},
-        {3840, 2160},
-        {(size_t)m_original_image.width(), (size_t)m_original_image.height()}
+    m_format = format;
+    m_formats = {
+        {{1280, 720}, {VideoFormat::OTHER}},
+        {{1920, 1080}, {VideoFormat::OTHER}},
+        {{3840, 2160}, {VideoFormat::OTHER}},
+        {{(size_t)m_original_image.width(), (size_t)m_original_image.height()}, {VideoFormat::OTHER}},
     };
 }
 

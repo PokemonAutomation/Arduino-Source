@@ -40,7 +40,8 @@ public:
     virtual std::unique_ptr<VideoSource> make_video_source(
         Logger& logger,
         const CameraInfo& info,
-        Resolution resolution
+        Resolution resolution,
+        VideoFormat format
     ) const = 0;
 };
 

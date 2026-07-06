@@ -7,8 +7,7 @@
 #include <QtGlobal>
 #if QT_VERSION_MAJOR == 6 && QT_VERSION_MINOR >= 5
 
-#include <chrono>
-#include <iostream>
+//#include <chrono>
 #include <QCamera>
 #include <QPainter>
 #include <QMediaDevices>
@@ -21,8 +20,11 @@
 #include "Common/Qt/Redispatch.h"
 #include "VideoFrameQt.h"
 #include "MediaServicesQt6.h"
+#include "CameraWidgetQt6.h"
 #include "CameraWidgetQt6.5.h"
 
+//  REMOVE
+#include <iostream>
 using std::cout;
 using std::endl;
 
@@ -57,15 +59,19 @@ std::string CameraBackend::get_camera_name(const CameraInfo& info) const{
             return camera.description().toStdString();
         }
     }
-    std::cout << "Error: no such camera for CameraInfo: " << info.device_name() << std::endl;
+    global_logger_tagged().log(
+        "Error: No such camera for CameraInfo: " + info.device_name(),
+        COLOR_RED
+    );
     return "";
 }
 std::unique_ptr<VideoSource> CameraBackend::make_video_source(
     Logger& logger,
     const CameraInfo& info,
-    Resolution resolution
+    Resolution resolution,
+    VideoFormat format
 ) const{
-    return std::make_unique<CameraVideoSource>(logger, info, resolution);
+    return std::make_unique<CameraVideoSource>(logger, info, resolution, format);
 }
 
 
@@ -91,7 +97,8 @@ CameraVideoSource::~CameraVideoSource(){
 CameraVideoSource::CameraVideoSource(
     Logger& logger,
     const CameraInfo& info,
-    Resolution desired_resolution
+    Resolution desired_resolution,
+    VideoFormat desired_format
 )
     : VideoSource(logger, true)
     , m_logger(logger)
@@ -106,10 +113,14 @@ CameraVideoSource::CameraVideoSource(
     m_logger.log("Starting Camera: Backend = CameraQt65QMediaCaptureSession");
 
     run_on_main_thread_and_wait([&]{
-        init(info, desired_resolution);
+        init(info, desired_resolution, desired_format);
     });
 }
-void CameraVideoSource::init(const CameraInfo& info, Resolution desired_resolution){
+void CameraVideoSource::init(
+    const CameraInfo& info,
+    Resolution desired_resolution,
+    VideoFormat desired_format
+){
     m_metaobject.reset(new QObject());
 
     auto cameras = QMediaDevices::videoInputs();
@@ -126,37 +137,23 @@ void CameraVideoSource::init(const CameraInfo& info, Resolution desired_resoluti
     }
     m_logger.log("Camera: " + device->description().toStdString());
 
-    QList<QCameraFormat> formats = device->videoFormats();
-    if (formats.empty()){
-        m_logger.log("No usable resolutions: " + device->description().toStdString(), COLOR_RED);
-        return;
-    }
-
-    std::map<Resolution, const QCameraFormat*> resolution_map;
-    for (const QCameraFormat& format : formats){
-        QSize resolution = format.resolution();
-        resolution_map.emplace(
-            std::piecewise_construct,
-            std::forward_as_tuple(resolution.width(), resolution.height()),
-            std::forward_as_tuple(&format)
-        );
-    }
-
-    const QCameraFormat* format = nullptr;
-    m_resolutions.clear();
-    for (const auto& res : resolution_map){
-        m_resolutions.emplace_back(res.first);
-        if (res.first == desired_resolution){
-            format = res.second;
-        }
-    }
+    const QCameraFormat* format = CameraQt6QVideoSink::build_format_set(
+        m_logger,
+        m_formats,
+        *device,
+        desired_resolution,
+        desired_format
+    );
     if (format == nullptr){
-        format = resolution_map.rbegin()->second;
+        return;
     }
 
     QSize size = format->resolution();
     m_resolution = Resolution(size.width(), size.height());
     m_logger.log("Resolution: " + m_resolution.to_string());
+
+    m_format = QVideoFrameFormat_to_VideoFormat(format->pixelFormat());
+    m_logger.log("Format: " + VideoFormat_database().find(m_format)->display);
 
     m_camera.reset(new QCameraThread(m_logger, *device, *format));
 

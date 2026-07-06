@@ -536,6 +536,7 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/VideoPipeline/Backends/QVideoFrameCache.h
     Source/CommonFramework/VideoPipeline/Backends/SnapshotManager.cpp
     Source/CommonFramework/VideoPipeline/Backends/SnapshotManager.h
+    Source/CommonFramework/VideoPipeline/Backends/VideoFrameQt.cpp
     Source/CommonFramework/VideoPipeline/Backends/VideoFrameQt.h
     Source/CommonFramework/VideoPipeline/CameraInfo.h
     Source/CommonFramework/VideoPipeline/Stats/CpuUtilizationStats.cpp
@@ -553,6 +554,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/VideoPipeline/UI/VideoSourceSelectorWidget.cpp
     Source/CommonFramework/VideoPipeline/UI/VideoSourceSelectorWidget.h
     Source/CommonFramework/VideoPipeline/VideoFeed.h
+    Source/CommonFramework/VideoPipeline/VideoFormats.cpp
+    Source/CommonFramework/VideoPipeline/VideoFormats.h
     Source/CommonFramework/VideoPipeline/VideoOverlay.cpp
     Source/CommonFramework/VideoPipeline/VideoOverlay.h
     Source/CommonFramework/VideoPipeline/VideoOverlayOption.cpp

@@ -98,10 +98,12 @@ public:
     //  This function is thread-safe. It has a lock to prevent concurrent calls
     //  of other VideoSession functions.
     Resolution current_resolution();
-    //  Return supported resolutions.
+    VideoFormat current_format();
+
+    //  Return supported formats.
     //  This function is thread-safe. It has a lock to prevent concurrent calls
     //  of other VideoSession functions.
-    std::vector<Resolution> supported_resolutions() const;
+    VideoFormatSet supported_formats() const;
 
     //  Implements VideoFeed::snapshot() to provide a snapshot from the current video stream.
     //  It will wait for a latest snapshot, blocking the current thread to wait for it.
@@ -130,6 +132,7 @@ public:
 public:
     //  Get current video source option
     void get(VideoSourceOption& option);
+
     //  Set a new video source. This will close the old video source.
     //  This equals to calling VideoSession::set_source(option.descriptor()).
     //  Change of video source and resolution will be reflected on the internal
@@ -137,6 +140,7 @@ public:
     //  VideoSession constructor).
     //  The change is dispatched to the Qt main thread to execute.
     void set(const VideoSourceOption& option);
+
     //  Implements VideoFeed::reset().
     //  Reset the current video source. This equals to close the old video source
     //  and reopen it.
@@ -144,6 +148,7 @@ public:
     //  VideoSourceOption passed to the VideoSession constructor).
     //  The change is dispatched to the Qt main thread to execute.
     virtual void reset() override;
+
     //  Set a new video source. This will close the old video source.
     //  Change of video source and resolution will be reflected on the internal
     //  referenced video source option (aka the VideoSourceOption passed to the
@@ -151,8 +156,10 @@ public:
     //  The change is dispatched to the Qt main thread to execute.
     void set_source(
         const std::shared_ptr<VideoSourceDescriptor>& device,
-        Resolution resolution = {}
+        Resolution resolution = {},
+        VideoFormat format = VideoFormat::OTHER
     );
+
     //  Change video resolution.
     //  This will trigger a video source reset.
     //  Change of resolution will be reflected on the internal referenced video
@@ -160,6 +167,14 @@ public:
     //  constructor).
     //  The change is dispatched to the Qt main thread to execute.
     void set_resolution(Resolution resolution);
+
+    //  Change video format.
+    //  This will trigger a video source reset.
+    //  Change of format will be reflected on the internal referenced video
+    //  source option (aka the VideoSourceOption passed to the VideoSession
+    //  constructor).
+    //  The change is dispatched to the Qt main thread to execute.
+    void set_format(VideoFormat format);
 
 
 private:
@@ -183,21 +198,25 @@ private:
     enum CommandType{
         RESET,
         SET_SOURCE,
-        SET_RESOLUTION
+        SET_RESOLUTION,
+        SET_FORMAT,
     };
     struct Command{
         CommandType command_type;
         std::shared_ptr<VideoSourceDescriptor> device;
         Resolution resolution;
+        VideoFormat format;
     };
     void run_commands();
 
     void internal_reset();
     void internal_set_source(
         const std::shared_ptr<VideoSourceDescriptor>& device,
-        Resolution resolution = {}
+        Resolution resolution,
+        VideoFormat format
     );
     void internal_set_resolution(Resolution resolution);
+    void internal_set_format(VideoFormat format);
 
 
 private:

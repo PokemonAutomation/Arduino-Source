@@ -40,7 +40,11 @@ public:
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
-    virtual std::unique_ptr<VideoSource> make_VideoSource(Logger& logger, Resolution resolution) const override;
+    virtual std::unique_ptr<VideoSource> make_VideoSource(
+        Logger& logger,
+        Resolution resolution,
+        VideoFormat format
+    ) const override;
 
 
 private:
@@ -52,7 +56,12 @@ private:
 
 class VideoSource_StillImage : public VideoSource{
 public:
-    VideoSource_StillImage(Logger& logger, const std::string& path, Resolution resolution);
+    VideoSource_StillImage(
+        Logger& logger,
+        const std::string& path,
+        Resolution resolution,
+        VideoFormat format
+    );
 
     const std::string path() const{
         return m_path;
@@ -61,8 +70,11 @@ public:
     virtual Resolution current_resolution() const override{
         return m_resolution;
     }
-    virtual const std::vector<Resolution>& supported_resolutions() const override{
-        return m_resolutions;
+    virtual VideoFormat current_format() const override{
+        return m_format;
+    }
+    virtual const VideoFormatSet& supported_formats() const override{
+        return m_formats;
     }
 
     virtual VideoSnapshot snapshot_latest_blocking() override{
@@ -82,7 +94,8 @@ private:
     QImage m_original_image;
     VideoSnapshot m_snapshot;
     Resolution m_resolution;
-    std::vector<Resolution> m_resolutions;
+    VideoFormat m_format;
+    VideoFormatSet m_formats;
 };
 
 
