@@ -31,7 +31,7 @@ namespace CameraQt6QVideoSink{
 
 
 
-const QCameraFormat* build_format_set(
+QCameraFormat build_format_set(
     Logger& logger,
     VideoFormatSet& format_set,
     const QCameraDevice& device,

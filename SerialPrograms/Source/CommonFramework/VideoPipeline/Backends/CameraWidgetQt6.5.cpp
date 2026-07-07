@@ -136,25 +136,25 @@ void CameraVideoSource::init(
     }
     m_logger.log("Camera: " + device->description().toStdString());
 
-    const QCameraFormat* format = CameraQt6QVideoSink::build_format_set(
+    QCameraFormat format = CameraQt6QVideoSink::build_format_set(
         m_logger,
         m_formats,
         *device,
         desired_resolution,
         desired_format
     );
-    if (format == nullptr){
+    if (format.isNull()){
         return;
     }
 
-    QSize size = format->resolution();
+    QSize size = format.resolution();
     m_resolution = Resolution(size.width(), size.height());
     m_logger.log("Resolution: " + m_resolution.to_string());
 
-    m_format = QVideoFrameFormat_to_VideoFormat(format->pixelFormat());
+    m_format = QVideoFrameFormat_to_VideoFormat(format.pixelFormat());
     m_logger.log("Format: " + VideoFormat_database().find(m_format)->display);
 
-    m_camera.reset(new QCameraThread(m_logger, *device, *format));
+    m_camera.reset(new QCameraThread(m_logger, *device, format));
 
     m_capture_session.reset(new QMediaCaptureSession());
     m_capture_session->setCamera(&m_camera->camera());

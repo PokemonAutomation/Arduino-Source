@@ -28,7 +28,7 @@ namespace CameraQt6QVideoSink{
 
 
 
-const QCameraFormat* build_format_set(
+QCameraFormat build_format_set(
     Logger& logger,
     VideoFormatSet& format_set,
     const QCameraDevice& device,
@@ -38,17 +38,17 @@ const QCameraFormat* build_format_set(
     QList<QCameraFormat> formats = device.videoFormats();
     if (formats.empty()){
         logger.log("No usable resolutions: " + device.description().toStdString(), COLOR_RED);
-        return nullptr;
+        return QCameraFormat();
     }
 
     std::map<
         Resolution,
         std::map<
             VideoFormat,
-            std::pair<QVideoFrameFormat::PixelFormat, const QCameraFormat*>
+            std::pair<QVideoFrameFormat::PixelFormat, QCameraFormat*>
         >
     > resolution_map;
-    for (const QCameraFormat& format : formats){
+    for (QCameraFormat& format : formats){
         Resolution resolution(format.resolution().width(), format.resolution().height());
 //        cout << resolution.width << " x " << resolution.height << " : " << (int)format.pixelFormat()
 //             << ", Min FPS = " << format.minFrameRate() << ", Max FPS = " << format.maxFrameRate()
@@ -74,7 +74,7 @@ const QCameraFormat* build_format_set(
 
 //    cout << "Chosen: " << resolution_map[Resolution(3840, 2160)]->maxFrameRate() << endl;
 
-    const QCameraFormat* current_qformat = nullptr;
+    QCameraFormat* current_qformat = nullptr;
     format_set.clear();
     for (const auto& res : resolution_map){
         for (const auto& entry : res.second){
@@ -97,7 +97,7 @@ const QCameraFormat* build_format_set(
         current_qformat = resolution_map.rbegin()->second.begin()->second.second;
     }
 
-    return current_qformat;
+    return std::move(*current_qformat);
 }
 
 
@@ -203,25 +203,25 @@ void CameraVideoSource::init(
         return;
     }
 
-    const QCameraFormat* format = build_format_set(
+    QCameraFormat format = build_format_set(
         m_logger,
         m_formats,
         *device,
         desired_resolution,
         desired_format
     );
-    if (format == nullptr){
+    if (format.isNull()){
         return;
     }
 
-    QSize size = format->resolution();
+    QSize size = format.resolution();
     m_resolution = Resolution(size.width(), size.height());
     m_logger.log("Resolution: " + m_resolution.to_string());
 
-    m_format = QVideoFrameFormat_to_VideoFormat(format->pixelFormat());
+    m_format = QVideoFrameFormat_to_VideoFormat(format.pixelFormat());
     m_logger.log("Format: " + VideoFormat_database().find(m_format)->display);
 
-    m_camera.reset(new QCameraThread(m_logger, *device, *format));
+    m_camera.reset(new QCameraThread(m_logger, *device, format));
     m_video_sink.reset(new QVideoSink());
     m_capture.reset(new QMediaCaptureSession());
     m_capture->setCamera(&m_camera->camera());
