@@ -4,6 +4,7 @@
  *
  */
 
+#include <future>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -12,6 +13,10 @@
 #include "CommonFramework/Panels/ProgramDescriptor.h"
 #include "CommonFramework/ProgramSession.h"
 #include "CommonFramework/ProgramStats/StatsDatabase.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/ResourceDownload/ProgramMissingResourceTracker.h"
+#include "CommonFramework/ResourceDownload/GlobalResourceDownloadManager.h"
+#include "CommonFramework/ResourceDownload/ResourceDownloadHelpers.h"
 #include "Integrations/ProgramTracker.h"
 
 namespace PokemonAutomation{
@@ -80,6 +85,20 @@ void ProgramSession::report_error(const std::string& message){
     push_error(message);
 }
 
+void ProgramSession::report_download_error(const std::string& message){
+    std::lock_guard<Mutex> lg(m_lock);
+    push_download_error(message);
+}
+
+void ProgramSession::report_download_added(std::shared_ptr<ResourceDownload> download_ptr){
+    // std::lock_guard<Mutex> lg(m_lock);
+    m_listeners.run_method(&Listener::download_added, std::move(download_ptr));
+}
+
+void ProgramSession::report_all_downloads_done(){
+    m_listeners.run_method(&Listener::all_downloads_done);
+}
+
 
 void ProgramSession::set_state(ProgramState state){
     switch (state){
@@ -109,6 +128,11 @@ void ProgramSession::push_stats(){
 void ProgramSession::push_error(const std::string& message){
     m_listeners.run_method(&Listener::error, message);
 }
+
+void ProgramSession::push_download_error(const std::string& message){
+    m_listeners.run_method(&Listener::download_error, message);
+}
+
 
 void ProgramSession::load_historical_stats(){
     //  Load historical stats.
@@ -253,9 +277,122 @@ void ProgramSession::run_program(){
 
 
 
+RequiredResourceResult ProgramSession::find_missing_resources(){
+
+    bool upgrade_warning = false;
+
+    std::vector<std::string> missing_resources;
+    for(const std::string& resource_type : m_descriptor.required_resources()){
+        ResourceVersionStatus version_status = get_local_version_info(resource_type).version_status;
+
+        switch(version_status){
+        case ResourceVersionStatus::CURRENT:
+            // we have this resource, check the next one
+            continue;
+        case ResourceVersionStatus::FUTURE_VERSION:
+            // we have this resource, check the next one
+            // however, the resource that was downloaded is more updated than what the program is expecting
+            // warn the user to upgrade CC.
+            upgrade_warning = true;
+            continue;
+        case ResourceVersionStatus::OUTDATED:
+        case ResourceVersionStatus::NOT_APPLICABLE:{
+            // we don't have the resource. check remote to see if correct version is available.
+            DownloadedResourceMetadata remote_resource = get_remote_resource_metadata_from_resource_slug(resource_type);
+            DownloadedResourceMetadata expected_resource = get_expected_resource_metadata_from_resource_slug(resource_type);
+            uint16_t expected_version_num = expected_resource.version_num.value();
+            uint16_t remote_version_num = remote_resource.version_num.value();
+
+            if (expected_version_num < remote_version_num){
+                // remote version is more updated than we expect
+                // warn the user to upgrade CC.
+                upgrade_warning = true;
+
+            }else if (expected_version_num > remote_version_num){
+                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "resources_to_download: expected_version_num > remote_version_num. This shouldn't happen."); 
+            }
+
+            missing_resources.emplace_back(remote_resource.resource_name);
+
+            break;
+        }
+        default:
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "resources_to_download: Unknown enum."); 
+        }
+    }
+
+
+    return RequiredResourceResult{std::move(missing_resources), upgrade_warning};
+
+}
 
 
 
+bool ProgramSession::download_prereqs(CancellableScope& scope){
+
+    try{
+
+        auto [missing_resources, requires_upgrade] = find_missing_resources();
+
+        if (requires_upgrade){ 
+            std::string warning_string = 
+                "The program is expecting an older version of a resource than is available. "
+                "This likely means that your version of Computer Control is out of date. "
+                "We recommend that you upgrade the Computer Control program.";
+            report_error(warning_string);
+            // cout << warning_string << endl;
+        }
+        if (missing_resources.empty()){
+            // cout << "required_download_list is empty. Start the program." << endl;
+
+            return true;
+        }
+
+        // 1. Create a C++ standard promise to hold the final boolean result
+        std::promise<bool> download_promise;
+        std::future<bool> download_future = download_promise.get_future();
+
+        // ProgramMissingResourceTracker is responsible for calling report_error() if
+        // the download fails, or if exceptions are thrown within the download.
+        ProgramMissingResourceTracker missing_resource_tracker(scope, download_promise, *this);
+
+        GlobalResourceDownloadManager& global_download_manager = GlobalResourceDownloadManager::instance();
+        for (const std::string& resource_slug : missing_resources){
+            // cout << download_ptr->get_name() << endl;
+
+            auto download_ptr = global_download_manager.add_to_download_list(resource_slug);
+            if (!download_ptr) {
+                std::cerr << "Error: Null download pointer for " << resource_slug << std::endl;
+                continue;
+            }
+            missing_resource_tracker.add_resource(download_ptr);
+            report_download_added(download_ptr);
+        }
+        missing_resource_tracker.finalize_initial_batch();
+
+        // Block until the ProgramMissingResourceTracker calls set_value(), 
+        // when the downloads all succeed, or one fails, or the user clicks "Stop Program"
+        bool success = download_future.get();
+
+        report_all_downloads_done();
+
+        return success;
+   
+            
+    }catch(OperationFailedException& e){
+        report_error(e.message());
+    }catch(InternalProgramError& e){
+        report_error(e.message());
+    }catch (const std::exception& e) {
+        std::string message = std::string(e.what()) + "Report this as an error.";
+        report_error(message);
+    }catch(...){
+        report_error("show_download_prereqs_popup: Unknown exception caught. Report this as an error.");
+    }
+
+    return false;
+
+}
 
 
 
