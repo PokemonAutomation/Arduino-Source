@@ -266,10 +266,13 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(STATS_FILE);
     PA_ADD_OPTION(TEMP_FOLDER);
     PA_ADD_OPTION(THEME);
-    PA_ADD_OPTION(USE_PADDLE_OCR);
     PA_ADD_OPTION(USE_GPU_FOR_ML_INFERENCE);
+
+    // gated behind Dev mode. see GlobalSettings::load_json
+    PA_ADD_OPTION(USE_PADDLE_OCR);
     PA_ADD_OPTION(RESOURCE_DOWNLOAD_TABLE);
     PA_ADD_OPTION(DOWNLOAD_ERROR);
+
     PA_ADD_OPTION(WINDOW_SIZE);
     PA_ADD_OPTION(LOG_WINDOW_SIZE);
     PA_ADD_OPTION(LOG_WINDOW_STARTUP);
@@ -291,6 +294,8 @@ GlobalSettings::GlobalSettings()
     PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(LOG_EVERYTHING);
     PA_ADD_OPTION(SAVE_DEBUG_IMAGES);
+
+    // gated behind Dev mode. see GlobalSettings::load_json
     PA_ADD_OPTION(SAVE_DEBUG_VIDEOS_ON_SWITCH);
 //    PA_ADD_OPTION(NAUGHTY_MODE);
 //    PA_ADD_OPTION(HIDE_NOTIF_DISCORD_LINK);
@@ -300,6 +305,8 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(AUDIO_PIPELINE);
     PA_ADD_OPTION(VIDEO_PIPELINE);
     PA_ADD_OPTION(COMMAND_QUEUE_LIMIT);
+
+    // gated behind Dev mode. see GlobalSettings::load_json
     PA_ADD_OPTION(DEVICE_LOGGING_FLAG);
 
     PA_ADD_OPTION(ENABLE_LIFETIME_SANITIZER0);
@@ -329,6 +336,8 @@ void GlobalSettings::load_json(const JsonValue& json){
         ? ConfigOptionState::ENABLED
         : ConfigOptionState::HIDDEN;
     USE_PADDLE_OCR.set_visibility(devmode_visibility);
+    RESOURCE_DOWNLOAD_TABLE.set_visibility(devmode_visibility);
+    DOWNLOAD_ERROR.set_visibility(devmode_visibility);
     SAVE_DEBUG_VIDEOS_ON_SWITCH.set_visibility(devmode_visibility);
     DEVICE_LOGGING_FLAG.set_visibility(devmode_visibility);
 
