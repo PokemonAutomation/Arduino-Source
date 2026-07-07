@@ -80,6 +80,7 @@ VideoSource_StillImage::VideoSource_StillImage(
 )
     : VideoSource(logger, false)
     , m_original_image(QString::fromStdString(path))
+    , m_format(VideoFormat::OTHER)
 {
     if (resolution){
         m_snapshot = VideoSnapshot(
@@ -92,8 +93,10 @@ VideoSource_StillImage::VideoSource_StillImage(
             current_time()
         );
     }
-    m_resolution = resolution;
-    m_format = format;
+    if (m_original_image.isNull()){
+        return;
+    }
+    m_resolution = m_snapshot.frame->size();
     m_formats = {
         {{1280, 720}, {VideoFormat::OTHER}},
         {{1920, 1080}, {VideoFormat::OTHER}},

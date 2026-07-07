@@ -23,10 +23,9 @@
 #include "CameraWidgetQt6.h"
 #include "CameraWidgetQt6.5.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace CameraQt65QMediaCaptureSession{
