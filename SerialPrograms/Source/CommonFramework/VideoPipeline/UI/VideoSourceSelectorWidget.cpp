@@ -191,11 +191,13 @@ void VideoSourceSelectorWidget::update_resolution_list(){
             index = c;
         }
     }
+    m_resolution_box->setCurrentIndex(index);
+
     if (index < 0){
         m_logger.log("Unable to find entry for this resolution.", COLOR_RED);
+        return;
     }
 
-    m_resolution_box->setCurrentIndex(index);
 
     const std::vector<VideoFormat>& format_list = m_formats[index].second;
 
@@ -213,11 +215,13 @@ void VideoSourceSelectorWidget::update_resolution_list(){
             index = c;
         }
     }
+    m_format_box->setCurrentIndex(index);
+
     if (index < 0){
         m_logger.log("Unable to find entry for this format.", COLOR_RED);
+        return;
     }
 
-    m_format_box->setCurrentIndex(index);
 
 }
 
