@@ -79,7 +79,7 @@ JsonValue fetch_resource_download_list_json_from_remote(){
     JsonValue json = 
         FileDownloader::download_json_file(
             logger,
-            "https://raw.githubusercontent.com/jw098/Packages/refs/heads/download/Resources/ResourceDownloadList.json"
+            "https://raw.githubusercontent.com/PokemonAutomation/Packages/refs/heads/master/Resources/ResourceDownloadList.json"
         );
     
     return json;

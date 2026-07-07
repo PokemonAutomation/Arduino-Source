@@ -17,6 +17,8 @@
 #include "Common/Cpp/Options/ButtonOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 #include "CommonFramework/Panels/PanelTools.h"
+#include "CommonFramework/ResourceDownload/SettingsResourceDownloadOptions.h"
+#include "CommonFramework/ResourceDownload/SettingsResourceDownloadTable.h"
 
 //#include <iostream>
 //using std::cout;
@@ -37,7 +39,7 @@ class PerformanceOptions;
 class AudioPipelineOptions;
 class VideoPipelineOptions;
 class ErrorReportOption;
-
+class ResourceDownload;
 
 
 
@@ -111,6 +113,8 @@ public:
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
+    void connect_row_with_download(const std::string& resource_slug, std::shared_ptr<ResourceDownload>& download_ptr);
+
 private:
     virtual void on_config_value_changed(void* object) override;
     virtual void on_press() override;
@@ -125,6 +129,8 @@ public:
     Pimpl<ThemeSelectorOption> THEME;
     BooleanCheckBoxOption USE_PADDLE_OCR;
     BooleanCheckBoxOption USE_GPU_FOR_ML_INFERENCE;
+    SettingsResourceDownloadTable RESOURCE_DOWNLOAD_TABLE;
+    SettingsDownloadError DOWNLOAD_ERROR;
     Pimpl<ResolutionOption> WINDOW_SIZE;
     Pimpl<ResolutionOption> LOG_WINDOW_SIZE;
     BooleanCheckBoxOption LOG_WINDOW_STARTUP;
