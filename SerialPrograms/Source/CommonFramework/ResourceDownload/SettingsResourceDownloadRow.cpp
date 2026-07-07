@@ -10,6 +10,7 @@
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Filesystem.h"
+#include "Common/Cpp/ScopeExit.h"
 #include "CommonFramework/Options/LabelCellOption.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
@@ -212,6 +213,14 @@ void SettingsResourceDownloadRow::ensure_remote_metadata_loaded(){
             if (!is_given_action_state(ActionState::PRE_DOWNLOAD)){
                 return;
             }
+
+
+            bool success = false;
+            ScopeExit on_exit([&success, this]{
+                if (!success){
+                    update_action_state(ActionState::READY);
+                }
+            });
             
             // std::this_thread::sleep_for(std::chrono::seconds(1));
             std::string predownload_warning;
@@ -226,18 +235,14 @@ void SettingsResourceDownloadRow::ensure_remote_metadata_loaded(){
             // Logger& logger = global_logger_tagged();
             // throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, "test");
 
-            // update_action_state(ActionState::READY);
             report_metadata_fetch_finished(predownload_warning);
+            success = true;
 
         }catch(OperationFailedException&){
             // cout << "failed" << endl;
-            // update_table_label(false);
-            update_action_state(ActionState::READY);
             GlobalResourceDownloadManager::instance().report_download_failed(m_data->m_resource_slug);
             return;
         }catch(...){
-            // update_table_label(false);
-            update_action_state(ActionState::READY);
             // cout << "Exception thrown in thread" << endl;
             GlobalResourceDownloadManager::instance().report_unexpected_exception_caught("Error: SettingsResourceDownloadButton::ensure_remote_metadata_loaded: Unknown exception. Report this as an error.");
             return;
@@ -301,6 +306,10 @@ void SettingsResourceDownloadRow::start_delete(){
     m_data->m_delete_thread = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
     [this]{ 
         try {
+            ScopeExit on_exit([this]{
+                update_table_label(false);
+                update_action_state(ActionState::READY);
+            });
 
             // throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "test.");
             // Logger& logger = global_logger_tagged();
@@ -317,19 +326,12 @@ void SettingsResourceDownloadRow::start_delete(){
             // delete directory and the old resource
             fs::remove_all(Filesystem::Path(resource_directory));
 
-            // update the table labels
-            set_is_downloaded(false);
-            set_version_status(ResourceVersionStatus::NOT_APPLICABLE);
-            
-            update_action_state(ActionState::READY);
         }catch(OperationFailedException& e){
             std::cerr << e.message() << endl;
-            update_action_state(ActionState::READY);
             GlobalResourceDownloadManager::instance().report_unexpected_exception_caught(
                 "Error: SettingsResourceDownloadButton::start_delete: Unexpected OperationFailedException exception. Report this as an error.");
             return;
         }catch(...){
-            update_action_state(ActionState::READY);
             GlobalResourceDownloadManager::instance().report_unexpected_exception_caught(
                 "Error: SettingsResourceDownloadButton::start_delete: Unknown exception. Report this as an error.");
             return;
