@@ -3,8 +3,8 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
-
 #include "Common/Cpp/Options/ConfigOption.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -16,10 +16,11 @@
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_DayNightStateDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_WeatherDetector.h"
-#include "PokemonLZA_ShinyHunt_HelioptileHunter.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA/Programs/PokemonLZA_FastTravelNavigation.h"
+#include "PokemonLZA_ShinyHunt_HelioptileHunter.h"
 #include <cstddef>
 #include <string>
 
