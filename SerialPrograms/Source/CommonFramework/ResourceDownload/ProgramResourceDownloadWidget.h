@@ -4,6 +4,9 @@
  *
  */
 
+// NOTE: These widgets do not inherit ConfigWidget.
+// So, they don't need to be added to StaticRegistrationQt
+
 #ifndef PokemonAutomation_ProgramResourceDownloadWidget_H
 #define PokemonAutomation_ProgramResourceDownloadWidget_H
 
