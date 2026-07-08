@@ -8,6 +8,7 @@
 #define PokemonAutomation_ResourceDownloadOptions_H
 
 #include "Common/Cpp/ListenerSet.h"
+#include "Common/Cpp/Options/ConfigOption.h"
 #include "ResourceDownload.h"
 
 namespace PokemonAutomation{

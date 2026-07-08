@@ -68,6 +68,7 @@ std::vector<std::string> SettingsResourceDownloadTable::make_header() const{
         "",
         "",
         "",
+        "",
     };
     return ret;
 }

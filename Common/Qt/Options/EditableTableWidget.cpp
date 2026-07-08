@@ -228,6 +228,12 @@ void EditableTableWidget::update_value(){
         {
             EditableTableRow& row = *latest[index_new];
             std::vector<ConfigOption*> cells = row.make_cells();
+            if (cells.size() > (size_t)m_table->columnCount()){
+                throw InternalProgramError(
+                    nullptr, PA_CURRENT_FUNCTION,
+                    "Table is wider than the header."
+                );
+            }
             int c = 0;
             int stop = (int)cells.size();
             for (; c < stop; c++){
