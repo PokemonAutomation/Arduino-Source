@@ -70,7 +70,7 @@ SettingsDownloadButtonWidget::SettingsDownloadButtonWidget(QWidget& parent, Sett
     );
 
 
-    // add QObject that manages the Downloading confirmation popup
+    // add QObject that manages the Download confirmation popup
     SettingsDownloadPopupWidget* popup = new SettingsDownloadPopupWidget(m_row);
     popup->setParent(this);
 
