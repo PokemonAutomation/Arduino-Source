@@ -258,7 +258,9 @@ void close_game_from_home(ConsoleHandle& console, ControllerContext& context){
         switch(ret){
         case 0: // close_game
             console.log("Detected close game menu.");
-            pbf_mash_button(context, BUTTON_A, ConsoleSettings::instance().CLOSE_GAME_DELAY);
+            //  Don't mash here since it might mash you back into the game.
+//            pbf_mash_button(context, BUTTON_A, ConsoleSettings::instance().CLOSE_GAME_DELAY);
+            pbf_press_button(context, BUTTON_A, 160ms, ConsoleSettings::instance().CLOSE_GAME_DELAY);
             seen_close_game = true;
             continue;
         case 1: // home
