@@ -107,13 +107,11 @@ private:
 };
 
 
-class SettingsDownloadPopupWidget : public QWidget, public ConfigWidget, public SettingsResourceDownloadRow::Listener{
-public:
-    using ParentOption = SettingsDownloadPopup;
-
+// NOTE: This does not inherit ConfigWidget, so it doesn't need to be added to StaticRegistrationQt
+class SettingsDownloadPopupWidget : public QObject, public SettingsResourceDownloadRow::Listener{
 public:
     ~SettingsDownloadPopupWidget();
-    SettingsDownloadPopupWidget(QWidget& parent, SettingsDownloadPopup& value);
+    SettingsDownloadPopupWidget(SettingsResourceDownloadRow& row);
 
 public: // SettingsResourceDownloadRow::Listener
     virtual void on_metadata_fetch_finished(const std::string& popup_message) override;

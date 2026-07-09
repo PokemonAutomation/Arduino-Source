@@ -70,6 +70,10 @@ SettingsDownloadButtonWidget::SettingsDownloadButtonWidget(QWidget& parent, Sett
     );
 
 
+    // add QObject that manages the Download confirmation popup
+    SettingsDownloadPopupWidget* popup = new SettingsDownloadPopupWidget(m_row);
+    popup->setParent(this);
+
     value.add_button_listener(*this);
 }
 
@@ -368,15 +372,11 @@ void SettingsProgressBarWidget::on_reset_progress(){
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SettingsDownloadPopupWidget
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-template class RegisterConfigWidget<SettingsDownloadPopupWidget>;
 SettingsDownloadPopupWidget::~SettingsDownloadPopupWidget(){
     m_row.remove_listener(*this);
 }
-SettingsDownloadPopupWidget::SettingsDownloadPopupWidget(QWidget& parent, SettingsDownloadPopup& value)
-    : QWidget(&parent)
-    , ConfigWidget(value, *this)
-    // , m_value(value)
-    , m_row(value.row)
+SettingsDownloadPopupWidget::SettingsDownloadPopupWidget(SettingsResourceDownloadRow& row)
+    : m_row(row)
 {
     m_row.add_listener(*this);
 }
@@ -440,6 +440,7 @@ SettingsDownloadErrorWidget::SettingsDownloadErrorWidget(QWidget& parent, Settin
     , ConfigWidget(value, *this)
 {
     GlobalResourceDownloadManager::instance().add_download_listener(*this);
+    this->hide();
 }
 
 void SettingsDownloadErrorWidget::show_download_failed_box(const std::string& resource_slug){
