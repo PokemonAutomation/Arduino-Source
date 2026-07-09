@@ -46,14 +46,22 @@ RngStatsDatabase::RngStatsDatabase(const char* json_path){
 }
 
 const RngStats& RngStatsDatabase::get_throw(const std::string& slug) const{
-    auto iter = m_database.find(slug);
+    std::string sl = slug;
+    if (slug.find("unown") != std::string::npos){
+        sl = "unown";
+    }
+    auto iter = m_database.find(sl);
     if (iter == m_database.end()){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Slug not found in database: " + slug);
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Slug not found in database: " + sl);
     }
     return iter->second;
 }
 const RngStats* RngStatsDatabase::get_nothrow(const std::string& slug) const{
-    auto iter = m_database.find(slug);
+    std::string sl = slug;
+    if (slug.find("unown") != std::string::npos){
+        sl = "unown";
+    }
+    auto iter = m_database.find(sl);
     if (iter == m_database.end()){
         return nullptr;
     }

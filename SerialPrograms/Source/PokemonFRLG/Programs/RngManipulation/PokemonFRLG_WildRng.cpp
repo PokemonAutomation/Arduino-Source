@@ -288,7 +288,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
     std::map<std::string, std::vector<AdvEncounterSlot>> location_map = encounters_data.get_throw(enc_slug);
     if (location_map.find(loc_slug)==location_map.end()){
-        throw UserSetupError(env.console, "The target Seed is missing from the list of nearby seeds.");
+        throw UserSetupError(env.console, "The target encounter type / location combination could not be found.");
     }
 
     std::vector<AdvEncounterSlot> ENCOUNTER_SLOTS = location_map.find(loc_slug)->second;
@@ -521,7 +521,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
             species_stats = STATS_DATA.get_throw(pokemon.species);        
         }catch (const InternalProgramError& err){
             env.log(err.message());
-            env.log("Failed to load base stats.");
+            env.log("Failed to load base stats.", COLOR_RED);
             continue;
         }
         BaseStats base_stats = species_stats.base_stats;
