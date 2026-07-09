@@ -2529,6 +2529,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSwSh/Inference/PokemonSwSh_FishingDetector.h
     Source/PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h
+    Source/PokemonSwSh/Inference/PokemonSwSh_MainMenuDetector.cpp
+    Source/PokemonSwSh/Inference/PokemonSwSh_MainMenuDetector.h
     Source/PokemonSwSh/Inference/PokemonSwSh_MarkFinder.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h
     Source/PokemonSwSh/Inference/PokemonSwSh_PokemonSpriteReader.cpp

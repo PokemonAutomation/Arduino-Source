@@ -173,6 +173,8 @@
 #include "PokemonFRLG/Inference/PokemonFRLG_BattleSelectionArrowDetector.h"
 #include "Controllers/RumbleListener.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_MainMenuDetector.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.h"
 
 
 
@@ -332,12 +334,28 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+
+//    menus_to_boxsystem(console, context);
+
+
+#if 1
+    PokemonSwSh::BoxMenuDetector detector;
+    detector.make_overlays(overlays);
+
+
+    auto snapshot = feed.snapshot();
+    cout << detector.detect(snapshot) << endl;
+#endif
+
+
+
+#if 0
     YCommIconDetector detector(COLOR_RED, true);
     detector.make_overlays(overlays);
 
     auto snapshot = feed.snapshot();
     cout << detector.detect(snapshot) << endl;
-
+#endif
 
 
 

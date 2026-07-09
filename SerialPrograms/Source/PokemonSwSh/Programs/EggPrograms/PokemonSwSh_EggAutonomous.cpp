@@ -41,11 +41,6 @@ namespace PokemonSwSh{
 
 namespace{
 
-// We assume Pokemon app is always at row 0, col 1
-const size_t POKEMON_APP_INDEX = 1;
-// We assume Town Map app is always at row 1, col 0
-const size_t TOWN_MAP_APP_INDEX = 5;
-
 
 }
 
@@ -361,13 +356,16 @@ bool EggAutonomous::run_batch(
                 ret = run_until<ProControllerContext>(
                     env.console, context,
                     [](ProControllerContext& context){
-                        // Try move a little to hatch more:
-                        // We move toward lower-left so that it wont hit the lady or enter the Nursory.
-                        pbf_move_left_joystick(context, {-1, -1}, 800ms, 80ms);
+                        //  Try move a little to hatch more:
+                        //  We move toward lower-left so that it wont hit the lady or enter the Nursory.
+                        //  Add 1 second of settle time to stop moving.
+                        //  We need to not be moving before trying to fly or an egg will hatch during
+                        //  that sequence when we cannot handle it.
+                        pbf_move_left_joystick(context, {-1, -1}, 800ms, 1000ms);
                     },
                     {{egg_hatching_detector}}
                 );
-            } while(ret == 0);
+            }while (ret == 0);
             // now no more hatching in this bike loop
             // We either cannot find a consecutive hatch any more or we already hatch five of them
 
@@ -394,7 +392,7 @@ bool EggAutonomous::run_batch(
             // Enter Rotom Phone menu
             pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
             // Select Pokemon App
-            navigate_to_menu_app(env, env.console, context, POKEMON_APP_INDEX, NOTIFICATION_ERROR_RECOVERABLE);
+            navigate_to_menu_app(env.console, context, POKEMON_APP_INDEX);
             // From menu enter Pokemon App
             ssf_press_button(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY0, EGG_BUTTON_HOLD_DELAY);
             context.wait_for_all_requests();
@@ -479,7 +477,7 @@ void EggAutonomous::call_flying_taxi(
         env.log("Fly from menu to reset position");
     }
 
-    navigate_to_menu_app(env, env.console, context, TOWN_MAP_APP_INDEX, NOTIFICATION_ERROR_RECOVERABLE);
+    navigate_to_menu_app(env.console, context, TOWN_MAP_APP_INDEX);
 
     fly_home(context, false);
     mash_B_until_y_comm_icon(env, context, "Cannot detect end of flying taxi animation.");
@@ -610,19 +608,11 @@ bool EggAutonomous::process_hatched_pokemon(
     env.log("Checking hatched pokemon.");
     env.console.overlay().add_log("Checking hatched pokemon", COLOR_WHITE);
 
-    // Press X to open menu
-    ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
-
-    navigate_to_menu_app(env, env.console, context, POKEMON_APP_INDEX, NOTIFICATION_ERROR_RECOVERABLE);
+    menus_to_boxsystem(env.console, context);
 
     const Milliseconds BOX_CHANGE_DELAY = GameSettings::instance().BOX_CHANGE_DELAY0;
     const Milliseconds BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY0;
 
-    // From menu enter Pokemon App
-    ssf_press_button(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY0, EGG_BUTTON_HOLD_DELAY);
-    // From Pokemon App to storage box
-    ssf_press_button(context, BUTTON_R, GameSettings::instance().POKEMON_TO_BOX_DELAY0, EGG_BUTTON_HOLD_DELAY);
-    // Move left down to the first hatched pokemon in the party
     box_scroll(context, DPAD_LEFT);
     box_scroll(context, DPAD_DOWN);
 
@@ -835,10 +825,8 @@ bool EggAutonomous::process_hatched_pokemon(
     // Press A to finish dropping the egg column 
     ssf_press_button_ptv(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
 
-    // leave pokemon box, back to pokemon app
-    ssf_press_button(context, BUTTON_B, GameSettings::instance().BOX_TO_POKEMON_DELAY0, EGG_BUTTON_HOLD_DELAY);
     //  Back out to menu.
-    ssf_press_button(context, BUTTON_B, GameSettings::instance().POKEMON_TO_MENU_DELAY0, EGG_BUTTON_HOLD_DELAY);
+    menus_to_mainmenu(env.console, context);
 
     if (need_taxi){
         bool fly_from_overworld = false; // fly from menu

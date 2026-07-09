@@ -35,23 +35,23 @@ EggHatcher_Descriptor::EggHatcher_Descriptor()
 
 
 
-void withdraw_column(ProControllerContext& context, uint8_t column){
-    menu_to_box(context, false);
+void withdraw_column(VideoStream& stream, ProControllerContext& context, uint8_t column){
+    menu_to_box(stream, context, false);
     party_to_column(context, column);
     pickup_column(context, false);
     column_to_party(context, column);
     ssf_press_button_ptv(context, BUTTON_A, GameSettings::instance().BOX_PICKUP_DROP_DELAY0);
     box_to_menu(context);
 }
-void deposit_column(ProControllerContext& context, uint8_t column){
-    menu_to_box(context, true);
+void deposit_column(VideoStream& stream, ProControllerContext& context, uint8_t column){
+    menu_to_box(stream, context, true);
     pickup_column(context, true);
     party_to_column(context, column);
     ssf_press_button_ptv(context, BUTTON_A, GameSettings::instance().BOX_PICKUP_DROP_DELAY0);
     box_to_menu(context);
 }
-uint8_t swap_party(ProControllerContext& context, uint8_t column){
-    menu_to_box(context, true);
+uint8_t swap_party(VideoStream& stream, ProControllerContext& context, uint8_t column){
+    menu_to_box(stream, context, true);
     pickup_column(context, true);
 
     Milliseconds BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY0;
@@ -139,12 +139,12 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             //  Get eggs from box.
             ssf_press_button_ptv(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
             if (party_is_empty){
-                withdraw_column(context, column);
+                withdraw_column(env.console, context, column);
                 party_is_empty = false;
             }else if (column == 0){
-                swap_party(context, 5);
+                swap_party(env.console, context, 5);
             }else{
-                swap_party(context, column - 1);
+                swap_party(env.console, context, column - 1);
             }
 
             fly_home(context, false);
@@ -170,7 +170,7 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
     if (!party_is_empty){
         ssf_press_button_ptv(context, BUTTON_X, OVERWORLD_TO_MENU_DELAY);
-        deposit_column(context, 5);
+        deposit_column(env.console, context, 5);
         ssf_press_button_ptv(context, BUTTON_X, OVERWORLD_TO_MENU_DELAY);
     }
     ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 160ms);

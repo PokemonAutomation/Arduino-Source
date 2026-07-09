@@ -68,8 +68,8 @@ struct EggCombinedSession{
 
         return block;
     }
-    void withdraw_column_shiftR(ProControllerContext& context, uint8_t column){
-        menu_to_box(context, false);
+    void withdraw_column_shiftR(VideoStream& stream, ProControllerContext& context, uint8_t column){
+        menu_to_box(stream, context, false);
         party_to_column(context, column);
         pickup_column(context, false);
         ssf_press_button(context, BUTTON_R, GameSettings::instance().BOX_CHANGE_DELAY0, EGG_BUTTON_HOLD_DELAY);
@@ -77,16 +77,16 @@ struct EggCombinedSession{
         ssf_press_button(context, BUTTON_A, GameSettings::instance().BOX_PICKUP_DROP_DELAY0, EGG_BUTTON_HOLD_DELAY);
         box_to_menu(context);
     }
-    void deposit_column_shiftL(ProControllerContext& context, uint8_t column){
-        menu_to_box(context, true);
+    void deposit_column_shiftL(VideoStream& stream, ProControllerContext& context, uint8_t column){
+        menu_to_box(stream, context, true);
         pickup_column(context, true);
         party_to_column(context, column);
         ssf_press_button(context, BUTTON_L, GameSettings::instance().BOX_CHANGE_DELAY0, EGG_BUTTON_HOLD_DELAY);
         ssf_press_button(context, BUTTON_A, GameSettings::instance().BOX_PICKUP_DROP_DELAY0, EGG_BUTTON_HOLD_DELAY);
         box_to_menu(context);
     }
-    uint8_t swap_party_shift(ProControllerContext& context, uint8_t column){
-        menu_to_box(context, true);
+    uint8_t swap_party_shift(VideoStream& stream, ProControllerContext& context, uint8_t column){
+        menu_to_box(stream, context, true);
         pickup_column(context, true);
 
         Milliseconds BOX_CHANGE_DELAY = GameSettings::instance().BOX_CHANGE_DELAY0;
@@ -126,6 +126,7 @@ struct EggCombinedSession{
 #define TRAVEL_BACK_TO_LADY_DURATION    ((30 + 260 + (620) + 120 + 120 * 0) * 8ms)
 
     void eggcombined2_run_batch(
+        VideoStream& stream,
         ProControllerContext& context,
         Milliseconds INCUBATION_DELAY_LOWER,
         Milliseconds remaining_travel_duration,
@@ -180,10 +181,10 @@ struct EggCombinedSession{
             //  Swap party.
             ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
             if (last_batch){
-                deposit_column_shiftL(context, column);
+                deposit_column_shiftL(stream, context, column);
                 ssf_press_button(context, BUTTON_B, GameSettings::instance().MENU_TO_OVERWORLD_DELAY0, 160ms);
             }else{
-                swap_party_shift(context, column);
+                swap_party_shift(stream, context, column);
                 fly_home_goto_lady(context, false);
             }
             return;
@@ -200,9 +201,9 @@ struct EggCombinedSession{
         //  Swap party.
         ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
         if (last_batch){
-            deposit_column_shiftL(context, column);
+            deposit_column_shiftL(stream, context, column);
         }else{
-            swap_party_shift(context, column);
+            swap_party_shift(stream, context, column);
         }
         ssf_press_button(context, BUTTON_B, GameSettings::instance().MENU_TO_OVERWORLD_DELAY0, 160ms);
     }
@@ -230,7 +231,7 @@ struct EggCombinedSession{
 
         //  Withdraw party.
         ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
-        withdraw_column_shiftR(context, 0);
+        withdraw_column_shiftR(console, context, 0);
         fly_home_goto_lady(context, false);
 
         for (uint8_t box = 0; box < BOXES_TO_HATCH; box++){
@@ -246,6 +247,7 @@ struct EggCombinedSession{
                 fetch_residual += fetches_per_batch;
                 uint8_t fetches = (uint8_t)fetch_residual;
                 eggcombined2_run_batch(
+                    console,
                     context,
                     INCUBATION_DELAY_LOWER,
                     INCUBATION_DELAY_UPPER + FINISH_DELAY,
