@@ -71,8 +71,8 @@ ShinyHunt_HelioptileHunter::ShinyHunt_HelioptileHunter()
     : END_AFTER_CYCLE("<b>How many cycles before stopping. 0 for never stop.</b><br>"
         "<br>"
         "<b>Cycle Definition:</b><br>"
-        "A cycle consists of entering Wild Zone 14 a total of 65 times. "
-        "After 65 entries, the program resets the day before continuing.",
+        "A cycle consists of entering Wild Zone 14 a total of at most 65 times. "
+        "After 65 entry loops, the program resets the day before continuing.",
         LockMode::LOCK_WHILE_RUNNING,
         0, 0, 32*30
     )
@@ -88,8 +88,19 @@ ShinyHunt_HelioptileHunter::ShinyHunt_HelioptileHunter()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-bool proper_weather(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    
+void bench_loop(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t quantity){
+    for (size_t i = 0; i < quantity; i++){
+        sit_on_bench(env.console, context);
+        pbf_move_left_joystick(context, {0, -1}, 500ms, 200ms);
+    }
+}
+
+struct WeatherTimeState{
+    bool correct_weather;
+    bool daytime;
+};
+
+WeatherTimeState get_weather_time_state(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool close_map){
     open_map(env.console, context, false, true);
     context.wait_for_all_requests();
 
@@ -102,64 +113,42 @@ bool proper_weather(SingleSwitchProgramEnvironment& env, ProControllerContext& c
 
     VideoSnapshot screen = env.console.video().snapshot();
     WeatherIconDetector sunnyDetector(WeatherIconType::Sunny, &env.console.overlay());
-    WeatherIconDetector clearDetector(WeatherIconType::Clear,&env.console.overlay());
+    WeatherIconDetector clearDetector(WeatherIconType::Clear, &env.console.overlay());
     DayNightStateDetector dayNightDetector(&env.console.overlay());
     dayNightDetector.detect(screen);
+    bool night_time = dayNightDetector.state() == DayNightState::NIGHT;
+    bool daytime = !night_time;
 
     bool correct_weather =
         sunnyDetector.detect(screen) ||
         clearDetector.detect(screen);
-    bool daytime =
-        dayNightDetector.state() == DayNightState::DAY;
 
     env.log(std::string("Weather=")
         + (correct_weather ? "Good" : "Bad")
         + " Time="
         + (daytime ? "Day" : "Night")
     );
-    context.wait_for_all_requests();
-    pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms);
-    context.wait_for_all_requests();
-    return correct_weather && daytime;
-}
 
-void bench_loop(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t quantity){
-    for (size_t i = 0; i < quantity; i++){
-        sit_on_bench(env.console, context);
-        pbf_move_left_joystick(context, {0, -1}, 500ms, 200ms);
+    if (close_map){
+        context.wait_for_all_requests();
+        pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms);
+        context.wait_for_all_requests();
     }
-}
 
-bool check_if_night_time(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    open_map(env.console, context, false, true);
-    context.wait_for_all_requests();
-
-    // zoom fully in
-    pbf_move_right_joystick(context, {0, 1}, 900ms, 120ms);
-    context.wait_for_all_requests();
-    // hide icons
-    pbf_press_button(context, BUTTON_MINUS, 80ms, 120ms);
-    context.wait_for_all_requests();
-
-    VideoSnapshot screen = env.console.video().snapshot();
-    DayNightStateDetector dayNightDetector(&env.console.overlay());
-    dayNightDetector.detect(screen);
-    bool night_time = dayNightDetector.state() == DayNightState::NIGHT;
-
-    env.log(std::string("Starting time=") + (night_time ? "Night" : "Day"));
-    pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms);
-    context.wait_for_all_requests();
-
-    return night_time;
+    return {correct_weather, daytime};
 }
 
 void find_weather(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    bool is_night_time = check_if_night_time(env, context);
+    WeatherTimeState state = get_weather_time_state(env, context, true);
     context.wait_for_all_requests();
     env.log("Starting weather loop");
-    bench_loop(env, context, (is_night_time) ? 1 : 2);
+    bench_loop(env, context, (state.daytime) ? 2 : 1);
 
-    while (!proper_weather(env, context)){
+    while (true){
+        state = get_weather_time_state(env, context, true);
+        if (state.correct_weather && state.daytime){
+            break;
+        }
         env.log("Incorrect weather or nighttime"); 
         bench_loop(env, context, 2);
     }
@@ -274,15 +263,32 @@ void ShinyHunt_HelioptileHunter::program(SingleSwitchProgramEnvironment& env, Pr
             // and re-roll/check weather conditions. This ensures the hunt does
             // not continue indefinitely after the desired daytime sunny/clear
             // weather has changed.
-            if (!proper_weather(env,context) || (hunt_loops == 0)){
+            if (hunt_loops == 0){
                 env.log("Not correct weather");
                 reach_bench(env, context);
                 find_weather(env, context);
                 warp_wild_zone_14(env, context);
                 hunt_loops = 0;
             }else{
-                env.log("Correct weather. Continuing");
-                warp_wild_zone_14(env, context);
+                WeatherTimeState state = get_weather_time_state(env, context, false);
+                if (state.correct_weather && state.daytime){
+                    env.log("Correct weather. Continuing");
+                    // Re-show icons before moving the map cursor to the destination.
+                    pbf_press_button(context, BUTTON_MINUS, 80ms, 120ms);
+                    //these extra waits help prevent early execution of the map move which sometimes fired early during testing
+                    context.wait_for_all_requests(); 
+                    pbf_wait(context, 100ms);
+                    move_map_cursor_from_entrance_to_zone(env.console, context, Location::WILD_ZONE_14);
+                    fly_from_map(env.console, context);
+                }else{
+                    env.log("Not correct weather");
+                    pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms);
+                    context.wait_for_all_requests();
+                    reach_bench(env, context);
+                    find_weather(env, context);
+                    warp_wild_zone_14(env, context);
+                    hunt_loops = 0;
+                }
             }  
 
             execute_fixed_routine(env,env.console, context, NOTIFICATION_STATUS);
