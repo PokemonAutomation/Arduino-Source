@@ -273,13 +273,28 @@ void ShinyHunt_HelioptileHunter::program(SingleSwitchProgramEnvironment& env, Pr
                 WeatherTimeState state = get_weather_time_state(env, context, false);
                 if (state.correct_weather && state.daytime){
                     env.log("Correct weather. Continuing");
+                    // Zoom fully out before moving map cursor for fast travel.
+                    pbf_move_right_joystick(context, {0, -1}, 900ms, 120ms);
                     // Re-show icons before moving the map cursor to the destination.
                     pbf_press_button(context, BUTTON_MINUS, 80ms, 120ms);
                     //these extra waits help prevent early execution of the map move which sometimes fired early during testing
                     context.wait_for_all_requests(); 
                     pbf_wait(context, 100ms);
                     move_map_cursor_from_entrance_to_zone(env.console, context, Location::WILD_ZONE_14);
-                    fly_from_map(env.console, context);
+                    FastTravelState result = fly_from_map(env.console, context);
+
+                    switch (result) {
+                    case FastTravelState::SUCCESS:
+                        wait_until_overworld(env.console, context);
+                        break;
+
+                    default:
+                        OperationFailedException::fire(
+                            ErrorReport::SEND_ERROR_REPORT,
+                            "Failed to fast travel back to Wild Zone 14 after weather check.",
+                            env.console
+                        );
+                    }
                 }else{
                     env.log("Not correct weather");
                     pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms);
