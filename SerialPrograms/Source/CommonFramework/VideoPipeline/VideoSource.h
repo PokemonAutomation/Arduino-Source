@@ -7,7 +7,8 @@
 #ifndef PokemonAutomation_VideoPipeline_VideoSource_H
 #define PokemonAutomation_VideoPipeline_VideoSource_H
 
-#include <vector>
+#include <set>
+#include <map>
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/ImageResolution.h"
 #include "Common/Cpp/ListenerSet.h"
@@ -18,7 +19,9 @@ class QWidget;
 
 namespace PokemonAutomation{
 
+enum class VideoFormat;
 
+using VideoFormatSet = std::map<Resolution, std::set<VideoFormat>>;
 
 
 class VideoSource{
@@ -56,7 +59,8 @@ public:
     }
 
     virtual Resolution current_resolution() const = 0;
-    virtual const std::vector<Resolution>& supported_resolutions() const = 0;
+    virtual VideoFormat current_format() const = 0;
+    virtual const VideoFormatSet& supported_formats() const = 0;
 
     virtual VideoSnapshot snapshot_latest_blocking() = 0;
     virtual VideoSnapshot snapshot_recent_nonblocking(WallClock min_time) = 0;

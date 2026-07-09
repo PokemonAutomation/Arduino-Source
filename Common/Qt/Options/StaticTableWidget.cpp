@@ -15,9 +15,9 @@
 #include "Common/Qt/AutoHeightTable.h"
 #include "StaticTableWidget.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -53,7 +53,7 @@ StaticTableWidget::StaticTableWidget(QWidget& parent, StaticTableOption& value)
     for (const std::string& name : m_value.make_header()){
         header << QString::fromStdString(name);
     }
-    m_table->setColumnCount(int(header.size()));
+    m_table->setColumnCount((int)header.size());
     m_table->setRowCount((int)table.size());
     m_table->setHorizontalHeaderLabels(header);
 
@@ -63,12 +63,21 @@ StaticTableWidget::StaticTableWidget(QWidget& parent, StaticTableOption& value)
 //    m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
 
+//    cout << "m_table: " << m_table->rowCount() << " x " << m_table->columnCount() << endl;
+
     for (size_t r = 0; r < table.size(); r++){
         std::vector<ConfigOption*> cells = table[r]->make_cells();
+        if (cells.size() > (size_t)m_table->columnCount()){
+            throw InternalProgramError(
+                nullptr, PA_CURRENT_FUNCTION,
+                "Table is wider than the header."
+            );
+        }
         for (size_t c = 0; c < cells.size(); c++){
+//            cout << "setCellWidget: " << r << ", " << c << endl;
             m_table->setCellWidget(
                 (int)r, (int)c,
-                &ConfigWidget::make_from_option(*cells[c], &parent)->widget()
+                &ConfigWidget::make_from_option(*cells[c], m_table)->widget()
             );
         }
     }

@@ -31,6 +31,7 @@ const EnumStringMap<VideoSourceType> VIDEO_TYPE_STRINGS{
 
 VideoSourceOption::VideoSourceOption()
     : m_resolution(1920, 1080)
+    , m_format(VideoFormat::OTHER)
     , m_descriptor(new VideoSourceDescriptor_Null())
 {}
 
@@ -91,6 +92,15 @@ void VideoSourceOption::load_json(const JsonValue& json){
             }while (false);
         }
 
+        const std::string* format = obj->get_string("Format");
+        if (format != nullptr){
+            const EnumEntry* entry = VideoFormat_database().find_slug(*format);
+            if (entry != nullptr){
+//                cout << "loading format: " << *format << endl;
+                m_format = (VideoFormat)entry->enum_value;
+            }
+        }
+
         const std::string* type = obj->get_string("SourceType");
         if (type == nullptr){
             break;
@@ -149,6 +159,7 @@ JsonValue VideoSourceOption::to_json() const{
         res.push_back(m_resolution.height);
         obj["Resolution"] = std::move(res);
     }
+    obj["Format"] = VideoFormat_database().find(m_format)->slug;
     obj["SourceType"] = VIDEO_TYPE_STRINGS.get_string(m_descriptor->type);
 
     for (const auto& item : m_descriptor_cache){
