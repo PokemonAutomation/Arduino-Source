@@ -94,6 +94,7 @@ MainWindow::MainWindow(QWidget* parent)
     program_layout->addWidget(m_program_list);
 #else
     m_program_list = new ProgramSelect(*this, *this);
+    m_program_list->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
     left_layout->addWidget(m_program_list, 1);
 #endif
 

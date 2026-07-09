@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonHome_Panels.h"
@@ -22,7 +23,10 @@ namespace PokemonHome{
 
 
 PanelListFactory::PanelListFactory()
-    : PanelListDescriptor(Pokemon::STRING_POKEMON + " Home")
+    : PanelListDescriptor(
+        Pokemon::STRING_POKEMON + " Home",
+        ImageRGB32(RESOURCE_PATH() + "CategoryIcons/PokemonHome.png")
+    )
 {}
 
 std::vector<PanelEntry> PanelListFactory::make_panels() const{
