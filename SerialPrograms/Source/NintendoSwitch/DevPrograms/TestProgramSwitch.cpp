@@ -317,10 +317,10 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     using namespace OCR;
     using namespace NintendoSwitch;
     using namespace Pokemon;
-    using namespace PokemonSwSh;
+//    using namespace PokemonSwSh;
 //    using namespace PokemonBDSP;
 //    using namespace PokemonLA;
-//    using namespace PokemonSV;
+    using namespace PokemonSV;
 //    using namespace PokemonLZA;
 //    using namespace PokemonFRLG;
 
@@ -334,11 +334,17 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+//    SinglesAIOption ai(false);
+//    run_singles_battle(console, context, ai, false);
+
+
 
 //    menus_to_boxsystem(console, context);
 
 
-#if 1
+
+
+#if 0
     PokemonSwSh::BoxMenuDetector detector;
     detector.make_overlays(overlays);
 

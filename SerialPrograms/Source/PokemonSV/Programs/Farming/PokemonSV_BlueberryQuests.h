@@ -125,7 +125,7 @@ void quest_wash_pokemon(
 
 //Withdraw and hatch an egg
 void quest_hatch_egg(
-    const ProgramInfo& info,
+    ProgramEnvironment& env,
     ConsoleHandle& console, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS
 );

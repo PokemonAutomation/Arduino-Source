@@ -107,7 +107,7 @@ SinglesMoveTable::SinglesMoveTable(std::string label, bool trainer_battle)
     )
 {}
 
-std::vector<SinglesMoveEntry> SinglesMoveTable::snapshot(){
+std::vector<SinglesMoveEntry> SinglesMoveTable::snapshot() const{
     return EditableTableOption_t<SinglesMoveTableRow>::snapshot<SinglesMoveEntry>();
 }
 std::vector<std::string> SinglesMoveTable::make_header() const{

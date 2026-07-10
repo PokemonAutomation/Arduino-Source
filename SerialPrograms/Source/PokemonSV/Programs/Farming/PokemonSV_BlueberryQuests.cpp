@@ -433,7 +433,7 @@ bool process_and_do_quest(
             quest_wash_pokemon(env.program_info(), console, context);
             break;
         case BBQuests::hatch_egg:
-            quest_hatch_egg(env.program_info(), console, context, BBQ_OPTIONS);
+            quest_hatch_egg(env, console, context, BBQ_OPTIONS);
             break;
         case BBQuests::bitter_sandwich:
         case BBQuests::salty_sandwich:
@@ -1057,7 +1057,7 @@ void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, ProControl
 }
 
 void quest_hatch_egg(
-    const ProgramInfo& info,
+    ProgramEnvironment& env,
     ConsoleHandle& console, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS
 ){
@@ -1074,7 +1074,7 @@ void quest_hatch_egg(
     }
 
     //Fly to Savanna Plaza and navigate to the battle court
-    central_to_savanna_plaza(info, console, context);
+    central_to_savanna_plaza(env.program_info(), console, context);
 
     pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
     pbf_move_left_joystick(context, {0, +1}, 4000ms, 400ms);
@@ -1084,7 +1084,7 @@ void quest_hatch_egg(
 
     //Do this after navigating to prevent egg from hatchining enroute
     //Enter box system, navigate to left box, find the first egg, swap it with first pokemon in party
-    enter_box_system_from_overworld(info, console, context);
+    enter_box_system_from_overworld(env.program_info(), console, context);
     context.wait_for(std::chrono::milliseconds(400));
     
     //move_to_left_box(context);
@@ -1096,7 +1096,7 @@ void quest_hatch_egg(
     for ( ; row < 5; row++){
         for (uint8_t j_col = 0; j_col < 6; j_col++){
             col = (row % 2 == 0 ? j_col : 5 - j_col);
-            move_box_cursor(info, console, context, BoxCursorLocation::SLOTS, row, col);
+            move_box_cursor(env.program_info(), console, context, BoxCursorLocation::SLOTS, row, col);
             context.wait_for_all_requests();
             auto snapshot = console.video().snapshot();
             if (sth_in_box_detector.detect(snapshot) && egg_detector.detect(snapshot)){
@@ -1113,26 +1113,26 @@ void quest_hatch_egg(
     if (!egg_found){
         console.log("No egg found during egg hatching quest!", COLOR_RED);
     }else{
-        swap_two_box_slots(info, console, context,
+        swap_two_box_slots(env.program_info(), console, context,
             BoxCursorLocation::SLOTS, row, col,
             BoxCursorLocation::PARTY, 0, 0);
 
-        leave_box_system_to_overworld(info, console, context);
+        leave_box_system_to_overworld(env.program_info(), console, context);
 
-        hatch_eggs_anywhere(info, console, context, true, 1);
+        hatch_eggs_anywhere(env, console, context, true, 1);
 
-        enter_box_system_from_overworld(info, console, context);
+        enter_box_system_from_overworld(env.program_info(), console, context);
         context.wait_for(std::chrono::milliseconds(400));
 
-        swap_two_box_slots(info, console, context,
+        swap_two_box_slots(env.program_info(), console, context,
             BoxCursorLocation::PARTY, 0, 0,
             BoxCursorLocation::SLOTS, row, col);
 
-        leave_box_system_to_overworld(info, console, context);
+        leave_box_system_to_overworld(env.program_info(), console, context);
 
         pbf_press_button(context, BUTTON_PLUS, 160ms, 400ms);
 
-        return_to_plaza(info, console, context);
+        return_to_plaza(env.program_info(), console, context);
         context.wait_for_all_requests();
     }
 }

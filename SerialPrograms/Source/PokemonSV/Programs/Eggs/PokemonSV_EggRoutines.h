@@ -10,8 +10,10 @@
 #define PokemonAutomation_PokemonSV_EggRoutines_H
 
 #include <functional>
+#include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
+#include "PokemonSV/Options/PokemonSV_SinglesAIOption.h"
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
 
 namespace PokemonAutomation{
@@ -70,8 +72,10 @@ void collect_eggs_after_sandwich(
 // Start at Zero Gate flying spot, go in circles in front of the lab to hatch eggs.
 // `egg_hatched_callback` will be called after each egg hatched, with egg index (0-indexed) 
 void hatch_eggs_at_zero_gate(
-    const ProgramInfo& info,
+    ProgramEnvironment& env,
     VideoStream& stream, ProControllerContext& context,
+    EventNotificationOption* attacked_notification,
+    const SinglesAIOption* battle_ai,
     uint8_t num_eggs_in_party,
     std::function<void(uint8_t)> egg_hatched_callback = nullptr
 );
@@ -82,8 +86,10 @@ void hatch_eggs_at_zero_gate(
 // This is a minor modification to hatch_eggs_at_zero_gate
 // `egg_hatched_callback` will be called after each egg hatched, with egg index (0-indexed)
 void hatch_eggs_at_area_three_lighthouse(
-    const ProgramInfo& info,
+    ProgramEnvironment& env,
     VideoStream& stream, ProControllerContext& context,
+    EventNotificationOption* attacked_notification,
+    const SinglesAIOption* battle_ai,
     uint8_t num_eggs_in_party,
     std::function<void(uint8_t)> egg_hatched_callback = nullptr
 );
@@ -92,7 +98,7 @@ void hatch_eggs_at_area_three_lighthouse(
 // `egg_hatched_callback` will be called after each egg hatched, with egg index (0-indexed)
 // `already_on_ride`: whether the player character is on ride when starting the function.
 void hatch_eggs_anywhere(
-    const ProgramInfo& info,
+    ProgramEnvironment& env,
     VideoStream& stream, ProControllerContext& context,
     bool already_on_ride,
     uint8_t num_eggs_in_party,

@@ -258,9 +258,8 @@ bool run_pokemon(
 
 
 bool run_singles_battle(
-    ProgramEnvironment& env,
     VideoStream& stream, ProControllerContext& context,
-    SinglesAIOption& battle_AI,
+    const SinglesAIOption& battle_AI,
     bool trainer_battle
 ){
     stream.log("Starting singles battle routine...");
@@ -270,7 +269,7 @@ bool run_singles_battle(
     while (true){
         bool win = run_pokemon(
             stream, context,
-            battle_AI.MOVE_TABLES[std::min<size_t>(faint_counter, 5)].snapshot(),
+            battle_AI.MOVE_TABLES[std::min<size_t>(faint_counter, battle_AI.MOVE_TABLES.size())].snapshot(),
             trainer_battle, terastallized
         );
 
