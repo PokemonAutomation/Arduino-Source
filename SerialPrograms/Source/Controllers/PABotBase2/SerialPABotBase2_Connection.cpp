@@ -118,30 +118,38 @@ bool SerialPABotBase2_Connection::open_serial_port(){
         return false;
     }
 
-    QSerialPortInfo info = SerialPortPoller::instance().get_port(m_device_name);
-
-    //  Port is invalid.
-    if (info.isNull()){
-        std::string text = "Serial port " + m_device_name + " is invalid.";
-        m_logger.log(text, COLOR_RED);
-        set_status_line0(text, COLOR_RED);
-        return false;
+    QSerialPortInfo info;
+    if(USE_QT_UI){
+        info = SerialPortPoller::instance().get_port(m_device_name);
+    }else{
+        info = QSerialPortInfo(QString::fromStdString(m_device_name));
     }
 
-    //  Prolific is banned
-    if (info.description().indexOf("Prolific") != -1){
-        QMessageBox box;
-        box.critical(
-            nullptr,
-            "Error",
-            "Cannot select Prolific controller.<br><br>"
-            "Prolific controllers do not work for Arduino and similar microcontrollers.<br>"
-            "You were warned of this in the setup instructions. Please buy a CP210x controller instead."
-        );
-        std::string text = "Cannot connect to Prolific controller.";
-        m_logger.log(text, COLOR_RED);
-        set_status_line0(text, COLOR_RED);
-        return false;
+
+    if(USE_QT_UI){
+        //  Port is invalid.
+        if (info.isNull()){
+            std::string text = "Serial port " + m_device_name + " is invalid.";
+            m_logger.log(text, COLOR_RED);
+            set_status_line0(text, COLOR_RED);
+            return false;
+        }
+
+        //  Prolific is banned
+        if (info.description().indexOf("Prolific") != -1){
+            QMessageBox box;
+            box.critical(
+                nullptr,
+                "Error",
+                "Cannot select Prolific controller.<br><br>"
+                "Prolific controllers do not work for Arduino and similar microcontrollers.<br>"
+                "You were warned of this in the setup instructions. Please buy a CP210x controller instead."
+            );
+            std::string text = "Cannot connect to Prolific controller.";
+            m_logger.log(text, COLOR_RED);
+            set_status_line0(text, COLOR_RED);
+            return false;
+        }
     }
 
     if (cancelled()){
