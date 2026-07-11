@@ -9,8 +9,8 @@
 #ifndef PokemonAutomation_CommonFramework_Logging_OutputRedirector_H
 #define PokemonAutomation_CommonFramework_Logging_OutputRedirector_H
 
+#include "Common/Cpp/Logging/GlobalLogger.h"
 #include "Common/Cpp/Logging/OutputRedirector.h"
-#include "Logger.h"
 
 namespace PokemonAutomation{
 

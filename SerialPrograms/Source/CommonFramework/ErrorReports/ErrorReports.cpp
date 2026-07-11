@@ -8,6 +8,7 @@
 #include <QDir>
 #include <QMessageBox>
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/Logging/GlobalLogger.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"

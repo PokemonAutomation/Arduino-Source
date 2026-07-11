@@ -2,7 +2,7 @@
 #define DISCORDPP_IMPLEMENTATION
 
 #include "Common/Cpp/Logging/TaggedLogger.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "Common/Cpp/Logging/GlobalLogger.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"

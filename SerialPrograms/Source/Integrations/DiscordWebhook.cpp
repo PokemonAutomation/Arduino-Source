@@ -11,12 +11,10 @@
 #include <QEventLoop>
 #include <QNetworkAccessManager>
 #include "Common/Cpp/PrettyPrint.h"
-//#include "Common/Cpp/PanicDump.h"
-//#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Logging/GlobalLogger.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "DiscordSettingsOption.h"

@@ -4,15 +4,16 @@
  *
  */
 
+#include "Common/Cpp/Logging/GlobalLogger.h"
 #include "CommonFramework/VideoPipeline/Stats/CpuUtilizationStats.h"
 #include "CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.h"
-#include "Integrations/ProgramTracker.h"
+//#include "Integrations/ProgramTracker.h"
 #include "ML_ImageAnnotationDisplayOption.h"
 #include "ML_ImageAnnotationDisplaySession.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace ML{

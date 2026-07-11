@@ -2,9 +2,9 @@
 
 #include <Integrations/DppIntegration/DppUtility.h>
 #include "Common/Compiler.h"
+#include "Common/Cpp/Logging/GlobalLogger.h"
 #include "Common/Cpp/Logging/TaggedLogger.h"
 //#include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Logging/Logger.h"
 
 //#include <iostream>
 //using std::cout;

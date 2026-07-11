@@ -10,7 +10,6 @@
 #define PokemonAutomation_Logging_Logger_H
 
 #include "Common/Cpp/Logging/AbstractLogger.h"
-#include "Common/Cpp/Logging/GlobalLogger.h"
 
 namespace PokemonAutomation{
 

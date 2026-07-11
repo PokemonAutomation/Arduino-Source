@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
+#include "Common/Cpp/Logging/GlobalLogger.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"

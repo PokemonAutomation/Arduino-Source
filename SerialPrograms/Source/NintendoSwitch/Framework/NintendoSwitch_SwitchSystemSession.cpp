@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/EarlyShutdown.h"
+#include "Common/Cpp/Logging/GlobalLogger.h"
 #include "CommonFramework/VideoPipeline/Stats/MemoryUtilizationStats.h"
 #include "CommonFramework/VideoPipeline/Stats/CpuUtilizationStats.h"
 #include "CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.h"
