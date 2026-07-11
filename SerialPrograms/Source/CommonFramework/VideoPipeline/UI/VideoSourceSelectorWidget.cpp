@@ -51,12 +51,12 @@ VideoSourceSelectorWidget::VideoSourceSelectorWidget(Logger& logger, VideoSessio
 
         m_resolution_box = new NoWheelCompactComboBox(this);
         m_resolution_box->setMaxVisibleItems(20);
-        layout2->addWidget(m_resolution_box);
+        layout2->addWidget(m_resolution_box, 2);
         layout2->addSpacing(5);
 
         m_format_box = new NoWheelCompactComboBox(this);
         m_format_box->setMaxVisibleItems(20);
-        layout2->addWidget(m_format_box);
+        layout2->addWidget(m_format_box, 1);
     }
     layout1->addSpacing(5);
 
