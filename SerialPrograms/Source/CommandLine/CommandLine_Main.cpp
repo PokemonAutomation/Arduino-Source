@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include "Common/Cpp/Color.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/Logging/Logger.h"
 // #include "CommonFramework/Logging/OutputRedirector.h"
 #include "Integrations/PybindSwitchController.h"
@@ -15,6 +16,10 @@
 
 using namespace PokemonAutomation;
 using namespace PokemonAutomation::NintendoSwitch;
+
+namespace PokemonAutomation{
+    bool USE_QT_UI = false;
+}
 
 int main(int argc, char* argv[]){
 //     // Set up output redirection for logging
