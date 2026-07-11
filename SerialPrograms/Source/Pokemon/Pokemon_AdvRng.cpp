@@ -28,11 +28,11 @@ void level_up_observed_pokemon(AdvObservedPokemon& pokemon, const StatReads& new
     pokemon.evs.emplace_back(new_evs);
 }
 
-uint32_t increment_internal_rng_state(const uint32_t& state){
+uint32_t increment_internal_rng_state(uint32_t state){
     return state * 0x41c64e6d + 0x6073;
 }
 
-AdvRngState rngstate_from_internal_state(uint16_t seed, uint64_t advances, uint32_t& state, AdvRngMethod method){
+AdvRngState rngstate_from_internal_state(uint16_t seed, uint64_t advances, uint32_t state, AdvRngMethod method){
     uint32_t s0 = state;
     uint32_t s1 = increment_internal_rng_state(s0);
     uint32_t s2 = increment_internal_rng_state(s1);
@@ -63,11 +63,11 @@ void advance_rng_state(AdvRngState& state){
     state.s5 = increment_internal_rng_state(state.s5);
 }
 
-uint32_t pid_from_states(const uint32_t& s0, const uint32_t& s1){
+uint32_t pid_from_states(uint32_t s0, uint32_t s1){
     return (s1 & 0xffff0000) + (s0 >> 16);
 }
 
-uint8_t gender_value_from_pid(const uint32_t& pid){
+uint8_t gender_value_from_pid(uint32_t pid){
     return pid & 0xff;
 }
 
@@ -78,15 +78,15 @@ AdvGender gender_from_gender_value(uint8_t gender_value, int16_t threshold){
     return (gender_value <= threshold) ? AdvGender::Female : AdvGender::Male;
 }
 
-AdvNature nature_from_pid(const uint32_t& pid){
+AdvNature nature_from_pid(uint32_t pid){
     return AdvNature (pid % 25);
 }
 
-AdvAbility ability_from_pid(const uint32_t& pid){
+AdvAbility ability_from_pid(uint32_t pid){
     return AdvAbility (pid % 2);
 }
 
-uint8_t unown_form_from_pid(const uint32_t& pid){
+uint8_t unown_form_from_pid(uint32_t pid){
     return (((pid & 0x3000000) >> 18) | ((pid & 0x30000) >> 12) | ((pid & 0x300) >> 6) | (pid & 0x3)) % 0x1c;
     // return (
     //     (((pid >> 24) & 0x03) << 6) | 
@@ -96,7 +96,7 @@ uint8_t unown_form_from_pid(const uint32_t& pid){
     // ) % 28;
 }
 
-AdvIvGroup iv_group_from_state(uint32_t& state, bool roaming = false){
+AdvIvGroup iv_group_from_state(uint32_t state, bool roaming = false){
     AdvIvGroup ivgroup;
     uint32_t remainingbits = state >> 16;
     if (roaming){
@@ -112,7 +112,7 @@ AdvIvGroup iv_group_from_state(uint32_t& state, bool roaming = false){
     return ivgroup;
 }
 
-AdvPokemonResult pokemon_from_state(AdvRngState& state, uint32_t pid, AdvNature nature, bool roaming = false){
+AdvPokemonResult pokemon_from_state(const AdvRngState& state, uint32_t pid, AdvNature nature, bool roaming = false){
     uint8_t gender = gender_value_from_pid(pid);
     AdvAbility ability = ability_from_pid(pid);
 
@@ -152,7 +152,7 @@ AdvPokemonResult pokemon_from_state(AdvRngState& state, uint32_t pid, AdvNature 
     return {pid, gender, nature, ability, ivs};
 }
 
-AdvPokemonResult pokemon_from_state(AdvRngState& state, bool roaming = false){
+AdvPokemonResult pokemon_from_state(const AdvRngState& state, bool roaming = false){
     uint32_t pid = pid_from_states(state.s0, state.s1);
     AdvNature nature = nature_from_pid(pid);
     return pokemon_from_state(state, pid, nature, roaming);
@@ -720,12 +720,12 @@ std::string nature_to_string(const AdvNature& nature){
 
 
 
-void shrink_iv_range(IvRange& mutated_range, IvRange& fixed_range){
+void shrink_iv_range(IvRange& mutated_range, const IvRange& fixed_range){
     mutated_range.low  = std::max(mutated_range.low,  fixed_range.low);
     mutated_range.high = std::min(mutated_range.high, fixed_range.high);
 }
 
-void shrink_iv_ranges(IvRanges& mutated_ranges, IvRanges& fixed_ranges){
+void shrink_iv_ranges(IvRanges& mutated_ranges, const IvRanges& fixed_ranges){
     shrink_iv_range(mutated_ranges.hp,      fixed_ranges.hp);
     shrink_iv_range(mutated_ranges.attack,  fixed_ranges.attack);
     shrink_iv_range(mutated_ranges.defense, fixed_ranges.defense);
