@@ -175,6 +175,7 @@
 #include "Controllers/RumbleListener.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "PokemonLZA/Inference/PokemonLZA_WeatherDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_WeatherDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_MainMenuDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.h"
 
