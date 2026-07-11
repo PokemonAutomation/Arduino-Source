@@ -9,15 +9,15 @@
 namespace PokemonAutomation{
 
 
-void LastLogTracker::operator+=(std::string line){
+void LastLogTracker::operator+=(LogLine line){
     m_lines.emplace_back(std::move(line));
     while (m_lines.size() > m_max_lines){
         m_lines.pop_front();
     }
 }
 
-std::vector<std::string> LastLogTracker::snapshot() const{
-    return std::vector<std::string>(m_lines.begin(), m_lines.end());
+std::vector<LogLine> LastLogTracker::snapshot() const{
+    return std::vector<LogLine>(m_lines.begin(), m_lines.end());
 }
 
 

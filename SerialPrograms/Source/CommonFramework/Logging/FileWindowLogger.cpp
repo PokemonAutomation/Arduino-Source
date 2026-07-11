@@ -50,7 +50,7 @@ QString FileWindowLoggerWindow::to_window_str(const std::string& msg, Color colo
 
 FileWindowLoggerWindow::FileWindowLoggerWindow(
     QWidget* parent,
-    const std::vector<std::string>& existing_logs
+    const std::vector<LogLine>& existing_logs
 )
     : QMainWindow(parent)
 {
@@ -88,8 +88,8 @@ FileWindowLoggerWindow::FileWindowLoggerWindow(
     GlobalSettings::instance().LOG_WINDOW_SIZE->X_POS.add_listener(*this);
     GlobalSettings::instance().LOG_WINDOW_SIZE->Y_POS.add_listener(*this);
 
-    for (const std::string& item : existing_logs){
-        log(item, Color());
+    for (const LogLine& item : existing_logs){
+        log(item.text, item.color);
     }
 
     internal_log("================================================================================");

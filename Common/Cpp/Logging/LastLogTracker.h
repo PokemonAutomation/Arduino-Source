@@ -12,6 +12,7 @@
 #include <string>
 #include <deque>
 #include <vector>
+#include "AbstractLogger.h"
 
 namespace PokemonAutomation{
 
@@ -27,14 +28,14 @@ public:
 
     // Add a log line to the tracker. If the tracker exceeds max_lines,
     // the oldest lines are removed.
-    void operator+=(std::string line);
+    void operator+=(LogLine line);
 
     // Return a copy of all stored log lines, oldest first.
-    std::vector<std::string> snapshot() const;
+    std::vector<LogLine> snapshot() const;
 
 private:
     size_t m_max_lines;
-    std::deque<std::string> m_lines;
+    std::deque<LogLine> m_lines;
 };
 
 

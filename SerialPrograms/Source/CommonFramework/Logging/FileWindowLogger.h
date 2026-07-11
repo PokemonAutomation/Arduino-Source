@@ -25,7 +25,7 @@ class FileWindowLoggerWindow final : public QMainWindow, public ConfigOption::Li
 public:
     FileWindowLoggerWindow(
         QWidget* parent,
-        const std::vector<std::string>& existing_logs
+        const std::vector<LogLine>& existing_logs
     );
     virtual ~FileWindowLoggerWindow();
 

@@ -42,8 +42,8 @@ public:
         );
     }
 
-    virtual std::vector<std::string> get_last(){
-        std::vector<std::string> ret;
+    virtual std::vector<LogLine> get_last(){
+        std::vector<LogLine> ret;
         m_listeners.run_on_all([&](Logger& logger){
             ret = logger.get_last();
             return !ret.empty();

@@ -14,6 +14,12 @@
 namespace PokemonAutomation{
 
 
+struct LogLine{
+    Color color;
+    std::string text;
+};
+
+
 // Abstract base class as a logger interface
 class Logger{
 public:
@@ -25,7 +31,7 @@ public:
         log(std::string(msg), color);
     }
 
-    virtual std::vector<std::string> get_last(){
+    virtual std::vector<LogLine> get_last(){
         return {};
     }
 };

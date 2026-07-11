@@ -52,7 +52,7 @@ public:
     // Logger interface implementation
     virtual void log(const std::string& msg, Color color = Color()) override;
     virtual void log(std::string&& msg, Color color = Color()) override;
-    virtual std::vector<std::string> get_last() override;
+    virtual std::vector<LogLine> get_last() override;
 
 private:
     // Normalize newlines: convert \r\n to \n, remove trailing newline.

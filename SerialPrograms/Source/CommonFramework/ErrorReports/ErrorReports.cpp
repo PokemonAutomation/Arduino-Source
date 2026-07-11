@@ -133,8 +133,8 @@ SendableErrorReport::SendableErrorReport(
     m_image = image;
     {
         std::string log;
-        for (const std::string& line : global_logger_raw().get_last()){
-            log += line;
+        for (const LogLine& line : global_logger_raw().get_last()){
+            log += line.text;
             log += "\r\n";
         }
         QFile file(QString::fromStdString(m_directory + ERROR_LOGS_NAME));
