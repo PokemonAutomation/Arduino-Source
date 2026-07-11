@@ -411,6 +411,7 @@ void RoamingLegendaryRng::program(SingleSwitchProgramEnvironment& env, ProContro
 
         go_to_summary(env.console, context);
         AdvObservedPokemon pokemon = read_summary(env.console, context, LANGUAGE, ROAMER_ROUTE1_SUBSET);
+        pokemon.level[0] = 50;
         AdvRngFilters filters = observation_to_filters(pokemon, BASE_STATS);
         RNG_FILTERS.set(filters);
 

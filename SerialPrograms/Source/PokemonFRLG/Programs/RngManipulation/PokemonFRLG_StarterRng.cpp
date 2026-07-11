@@ -717,6 +717,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
         // Stage 1: initial search -- starter received
         AdvObservedPokemon pokemon = read_summary(env.console, context, LANGUAGE, SPECIES_LIST);
+        pokemon.level[0] = 5;
         AdvRngFilters filters = observation_to_filters(pokemon, BASE_STATS);
         RNG_FILTERS.set(filters);
 
