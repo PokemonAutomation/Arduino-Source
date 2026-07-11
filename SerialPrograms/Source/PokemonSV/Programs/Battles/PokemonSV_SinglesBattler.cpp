@@ -267,9 +267,13 @@ bool run_singles_battle(
     bool terastallized = false;
     size_t faint_counter = 0;
     while (true){
+        size_t index = std::min<size_t>(
+            faint_counter,
+            battle_AI.MOVE_TABLES.size() - 1
+        );
         bool win = run_pokemon(
             stream, context,
-            battle_AI.MOVE_TABLES[std::min<size_t>(faint_counter, battle_AI.MOVE_TABLES.size())].snapshot(),
+            battle_AI.MOVE_TABLES[index].snapshot(),
             trainer_battle, terastallized
         );
 
