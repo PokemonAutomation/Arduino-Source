@@ -317,9 +317,9 @@ int slot_to_unownform(AdvEncounterSlot slot){
             return 24;
         case 'z':
             return 25;
-        case '?':
-            return 26;
         case '!':
+            return 26;
+        case '?':
             return 27;
         default:
             return -1;
@@ -510,8 +510,8 @@ bool check_for_match(AdvPokemonResult res, AdvRngFilters target, int16_t gender_
 }
 
 bool check_for_match(AdvWildPokemonResult res, AdvRngFilters target, int16_t gender_threshold, uint16_t tid_xor_sid){
-    std::string target_name = target.species.find("unown") != std::string::npos ? "unown" : target.species;
-    return (target.species == res.species)
+    std::string res_name = res.species.find("unown") != std::string::npos ? "unown" : res.species;
+    return (target.species == res_name)
         && (target.level == res.level)
         && (target.nature == AdvNature::Any || (res.nature == target.nature))
         && (target.ability == AdvAbility::Any || (res.ability == target.ability))
