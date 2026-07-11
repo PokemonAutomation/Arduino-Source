@@ -27,7 +27,12 @@ public:
         std::string message,
         VideoStream& stream
     ){
-        throw_and_log<OperationFailedException>(stream.logger(), error_report, std::move(message), stream);
+        throw_and_log<OperationFailedException>(
+            stream.logger(),
+            error_report,
+            std::move(message),
+            stream
+        );
     }
     [[noreturn]] static void fire(
         ErrorReport error_report,
@@ -35,7 +40,13 @@ public:
         VideoStream& stream,
         std::shared_ptr<const ImageRGB32> screenshot
     ){
-        throw_and_log<OperationFailedException>(stream.logger(), error_report, std::move(message), &stream, std::move(screenshot));
+        throw_and_log<OperationFailedException>(
+            stream.logger(),
+            error_report,
+            std::move(message),
+            &stream,
+            std::move(screenshot)
+        );
     }
 
     virtual const char* name() const override{ return "OperationFailedException"; }

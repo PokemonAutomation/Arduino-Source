@@ -76,6 +76,7 @@ void hatch_eggs_at_zero_gate(
     VideoStream& stream, ProControllerContext& context,
     EventNotificationOption* attacked_notification,
     const SinglesAIOption* battle_ai,
+    std::atomic<uint64_t>* attacked,
     uint8_t num_eggs_in_party,
     std::function<void(uint8_t)> egg_hatched_callback = nullptr
 );
@@ -90,6 +91,7 @@ void hatch_eggs_at_area_three_lighthouse(
     VideoStream& stream, ProControllerContext& context,
     EventNotificationOption* attacked_notification,
     const SinglesAIOption* battle_ai,
+    std::atomic<uint64_t>* attacked,
     uint8_t num_eggs_in_party,
     std::function<void(uint8_t)> egg_hatched_callback = nullptr
 );

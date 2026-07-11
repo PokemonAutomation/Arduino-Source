@@ -39,12 +39,15 @@ EggHatcher_Descriptor::EggHatcher_Descriptor()
 struct EggHatcher_Descriptor::Stats : public StatsTracker{
     Stats()
         : m_hatched(m_stats["Hatched"])
+        , m_attacked(m_stats["Attacked"])
         , m_errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Hatched");
+        m_display_order.emplace_back("Attacked", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& m_hatched;
+    std::atomic<uint64_t>& m_attacked;
     std::atomic<uint64_t>& m_errors;
 };
 std::unique_ptr<StatsTracker> EggHatcher_Descriptor::make_stats() const{
@@ -160,6 +163,7 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, ProControlle
                 context,
                 &NOTIFICATION_ERROR_RECOVERABLE,
                 &BATTLE_AI,
+                &stats.m_attacked,
                 num_eggs,
                 hatched_callback
             );
