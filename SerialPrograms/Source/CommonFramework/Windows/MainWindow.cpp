@@ -407,13 +407,13 @@ void MainWindow::load_panel(
 }
 void MainWindow::on_busy(){
     if (m_program_list){
-        m_program_list->setEnabled(false);
+        m_program_list->lock();
         m_settings->setEnabled(false);
     }
 }
 void MainWindow::on_idle(){
     if (m_program_list){
-        m_program_list->setEnabled(true);
+        m_program_list->unlock();
         m_settings->setEnabled(true);
     }
 }

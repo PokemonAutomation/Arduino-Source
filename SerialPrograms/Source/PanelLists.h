@@ -24,6 +24,9 @@ class ProgramSelect : public QGroupBox{
 public:
     ProgramSelect(QWidget& parent, PanelHolder& holder);
 
+    void lock();
+    void unlock();
+
     // Load the panel specified in the persistent setting.
     void load_persistent_panel();
 
@@ -40,6 +43,8 @@ private:
     std::map<std::string, int> m_tab_map;
 
     QComboBox* m_dropdown;
+
+    bool m_locked = false;
 
     int m_active_index = -1;
     PanelListWidget* m_active_list = nullptr;

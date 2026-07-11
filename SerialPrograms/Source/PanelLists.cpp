@@ -95,6 +95,15 @@ ProgramSelect::ProgramSelect(QWidget& parent, PanelHolder& holder)
     );
 }
 
+void ProgramSelect::lock(){
+    m_locked = true;
+    m_active_list->setEnabled(false);
+}
+void ProgramSelect::unlock(){
+    m_locked = false;
+    m_active_list->setEnabled(true);
+}
+
 void ProgramSelect::add(std::unique_ptr<PanelListDescriptor> list){
     int index = m_dropdown->count();
     const ImageViewRGB32& icon = list->icon();
@@ -152,6 +161,7 @@ void ProgramSelect::change_list(int index){
     PERSISTENT_SETTINGS().panels["ProgramCategory"] = m_lists[index]->name();
     delete m_active_list;
     m_active_list = m_lists[index]->make_QWidget(*this, m_holder);
+    m_active_list->setEnabled(!m_locked);
     layout()->addWidget(m_active_list);
 }
 
