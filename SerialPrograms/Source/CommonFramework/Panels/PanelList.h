@@ -8,6 +8,7 @@
 #define PokemonAutomation_PanelList_H
 
 #include <vector>
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Panels/PanelTools.h"
 
 class QWidget;
@@ -22,9 +23,10 @@ class PanelListDescriptor{
 
 public:
     virtual ~PanelListDescriptor() = default;
-    PanelListDescriptor(std::string name, bool enabled = true);
+    PanelListDescriptor(std::string name, ImageRGB32 icon = ImageRGB32(), bool enabled = true);
 
     const std::string& name() const{ return m_name; }
+    const ImageRGB32& icon() const{ return m_icon; }
     bool enabled() const{ return m_enabled; }
 
     PanelListWidget* make_QWidget(QWidget& parent, PanelHolder& holder) const;
@@ -34,6 +36,7 @@ protected:
 
 protected:
     std::string m_name;
+    ImageRGB32 m_icon;
     bool m_enabled;
 };
 

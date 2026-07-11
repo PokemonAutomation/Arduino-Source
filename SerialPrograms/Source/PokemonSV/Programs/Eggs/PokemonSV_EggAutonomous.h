@@ -8,12 +8,14 @@
 #define PokemonAutomation_PokemonSV_EggAutonomous_H
 
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/ButtonOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
 #include "PokemonSV/Options/PokemonSV_EggPowerSandwichOption.h"
+#include "PokemonSV/Options/PokemonSV_SinglesAIOption.h"
 
 // #include <functional>
 
@@ -96,11 +98,14 @@ private:
 
     EggPowerSandwichOption EGG_SANDWICH;
 
-    BooleanCheckBoxOption HAS_CLONE_RIDE_POKEMON;
-
     IntegerEnumDropdownOption KEEP_BOX_LOCATION;
     
     Pokemon::StatsHuntIvJudgeFilterTable FILTERS0;
+
+    StaticTextOption m_battle_ai_description;
+    SinglesAIOption BATTLE_AI;
+
+    BooleanCheckBoxOption HAS_CLONE_RIDE_POKEMON;
 
     BooleanCheckBoxOption SAVE_DEBUG_VIDEO;
 

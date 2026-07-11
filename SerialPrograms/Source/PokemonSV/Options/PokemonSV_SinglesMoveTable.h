@@ -59,7 +59,7 @@ class SinglesMoveTable : public EditableTableOption_t<SinglesMoveTableRow>{
 public:
     SinglesMoveTable(std::string label, bool trainer_battle);
 
-    std::vector<SinglesMoveEntry> snapshot();
+    std::vector<SinglesMoveEntry> snapshot() const;
 
     virtual std::vector<std::string> make_header() const;
 

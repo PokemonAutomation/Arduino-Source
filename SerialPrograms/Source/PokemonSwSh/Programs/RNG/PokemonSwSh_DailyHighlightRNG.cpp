@@ -243,7 +243,7 @@ void DailyHighlightRNG::buy_highlight(SingleSwitchProgramEnvironment& env, ProCo
 void DailyHighlightRNG::navigate_to_party(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
     pbf_wait(context, 200ms);
-    navigate_to_menu_app(env, env.console, context, 1, NOTIFICATION_ERROR_FATAL);
+    navigate_to_menu_app(env.console, context, 1);
     pbf_press_button(context, BUTTON_A, 80ms, 3000ms);
 }
 
@@ -375,7 +375,7 @@ void DailyHighlightRNG::prepare_game_state(SingleSwitchProgramEnvironment& env, 
     // Open map
     pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
     pbf_wait(context, 200ms);
-    navigate_to_menu_app(env, env.console, context, 5, NOTIFICATION_ERROR_RECOVERABLE);
+    navigate_to_menu_app(env.console, context, 5);
     pbf_wait(context, 200ms);
     pbf_press_button(context, BUTTON_A, 160ms, 4000ms);
 

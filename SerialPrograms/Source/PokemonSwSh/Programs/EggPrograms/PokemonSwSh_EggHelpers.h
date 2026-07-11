@@ -7,9 +7,12 @@
 #ifndef PokemonAutomation_PokemonSwSh_EggHelpers_H
 #define PokemonAutomation_PokemonSwSh_EggHelpers_H
 
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_BoxHelpers.h"
 
 namespace PokemonAutomation{
@@ -78,13 +81,17 @@ static const Milliseconds EGG_BUTTON_HOLD_DELAY = 80ms;
 // - From game menu to pokemon storage box
 // - Move cursor to the second pokemon in the party, aka first hatched pokemon in the party
 // - Press button Y two times to change pokemon selection to group selection
-static void menu_to_box(ProControllerContext& context, bool from_map){
-    if (from_map){
-        box_scroll(context, DPAD_UP);
-        box_scroll(context, DPAD_RIGHT);
+static void menu_to_box(VideoStream& stream, ProControllerContext& context, bool from_map){
+    if (stream.video().snapshot_latest_blocking()){
+        menus_to_boxsystem(stream, context);
+    }else{
+        if (from_map){
+            box_scroll(context, DPAD_UP);
+            box_scroll(context, DPAD_RIGHT);
+        }
+        ssf_press_button_ptv(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY0, EGG_BUTTON_HOLD_DELAY);
+        ssf_press_button_ptv(context, BUTTON_R, GameSettings::instance().POKEMON_TO_BOX_DELAY0, EGG_BUTTON_HOLD_DELAY);
     }
-    ssf_press_button_ptv(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY0, EGG_BUTTON_HOLD_DELAY);
-    ssf_press_button_ptv(context, BUTTON_R, GameSettings::instance().POKEMON_TO_BOX_DELAY0, EGG_BUTTON_HOLD_DELAY);
     box_scroll(context, DPAD_LEFT);
     box_scroll(context, DPAD_DOWN);
     ssf_press_button_ptv(context, BUTTON_Y, 240ms, EGG_BUTTON_HOLD_DELAY);

@@ -22,7 +22,10 @@ namespace NintendoSwitch{
 namespace PokemonLGPE{
 
 PanelListFactory::PanelListFactory()
-    : PanelListDescriptor(Pokemon::STRING_POKEMON + " Let's Go Pikachu and Eevee")
+    : PanelListDescriptor(
+        Pokemon::STRING_POKEMON + " Let's Go Pikachu and Eevee",
+        ImageRGB32(RESOURCE_PATH() + "CategoryIcons/PokemonLGPE.png")
+    )
 {}
 
 std::vector<PanelEntry> PanelListFactory::make_panels() const{

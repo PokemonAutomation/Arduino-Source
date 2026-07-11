@@ -126,14 +126,6 @@ EggAutonomous::EggAutonomous()
         LockMode::LOCK_WHILE_RUNNING,
         AutoSave::AfterStartAndKeep
     )
-    , HAS_CLONE_RIDE_POKEMON(
-        "<b>Cloned Ride Legendary 2nd in Party:</b><br>"
-        "Ride legendary cannot be cloned after patch 1.0.1. To preserve the existing clone while hatching eggs, "
-        "place it as second in party before starting the program.</b>"
-        "The program will skip the first row of the current box when storing and hatching eggs, so you will need "
-        "to fill the first row with " + STRING_POKEMON + " before running this program.",
-        LockMode::LOCK_WHILE_RUNNING,
-        false)
     , KEEP_BOX_LOCATION(
         "<b>Location of the Keep Box:</b><br>Which box to keep the shiny " + STRING_POKEMON + " and others that match the filters.",
         {
@@ -151,6 +143,23 @@ EggAutonomous::EggAutonomous()
             .gender = true,
             .nature = true,
         }
+    )
+    , m_battle_ai_description(
+        "<b>Battle AI if Attacked:</b><br>"
+        "Occasionally (especially on the Switch 2), you will get attacked by wild " + STRING_POKEMON + ". "
+        "If the following section is enabled, it attempt to recover by killing the wild " + STRING_POKEMON + ". "
+        "If disabled, the program will instead reset the game. "
+        "This table applies to the egg hatching " + STRING_POKEMON + " (the Flame Body one)."
+    )
+    , BATTLE_AI(false, GroupOption::EnableMode::DEFAULT_ENABLED, 1)
+    , HAS_CLONE_RIDE_POKEMON(
+        "<b>Cloned Ride Legendary 2nd in Party:</b><br>"
+        "Ride legendary cannot be cloned after patch 1.0.1. To preserve the existing clone while hatching eggs, "
+        "place it as second in party before starting the program.</b>"
+        "The program will skip the first row of the current box when storing and hatching eggs, so you will need "
+        "to fill the first row with " + STRING_POKEMON + " before running this program.",
+        LockMode::LOCK_WHILE_RUNNING,
+        false
     )
     , SAVE_DEBUG_VIDEO(
         "<b>Save debug videos to Switch:</b><br>"
@@ -191,6 +200,8 @@ EggAutonomous::EggAutonomous()
     PA_ADD_OPTION(AUTO_SAVING);
     PA_ADD_OPTION(KEEP_BOX_LOCATION);
     PA_ADD_OPTION(FILTERS0);
+    PA_ADD_OPTION(m_battle_ai_description);
+    PA_ADD_OPTION(BATTLE_AI);
     PA_ADD_OPTION(HAS_CLONE_RIDE_POKEMON);
 
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -470,10 +481,26 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
             env.update_stats();
         };
         if (LOCATION == EggAutoLocation::ZeroGate){
-            hatch_eggs_at_zero_gate(env.program_info(), env.console, context, (uint8_t)num_eggs_in_party, hatched_callback);
+            hatch_eggs_at_zero_gate(
+                env,
+                env.console,
+                context,
+                &NOTIFICATION_ERROR_RECOVERABLE,
+                &BATTLE_AI,
+                (uint8_t)num_eggs_in_party,
+                hatched_callback
+            );
             reset_position_to_flying_spot(env, context);
         }else{
-            hatch_eggs_at_area_three_lighthouse(env.program_info(), env.console, context, (uint8_t)num_eggs_in_party, hatched_callback);
+            hatch_eggs_at_area_three_lighthouse(
+                env,
+                env.console,
+                context,
+                &NOTIFICATION_ERROR_RECOVERABLE,
+                &BATTLE_AI,
+                (uint8_t)num_eggs_in_party,
+                hatched_callback
+            );
             reset_position_to_flying_spot(env, context);
             //Clear spawns - over time floette/vivillon drift over past the fence (usually aroudn the 3rd batch)
             picnic_from_overworld(env.program_info(), env.console, context);

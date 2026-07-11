@@ -32,7 +32,6 @@
 //using std::cout;
 //using std::endl;
 
-
 namespace PokemonAutomation{
 
 
@@ -45,6 +44,18 @@ ProgramSelect::ProgramSelect(QWidget& parent, PanelHolder& holder)
     layout->setAlignment(Qt::AlignTop);
     m_dropdown = new NoWheelCompactComboBox(this);
     m_dropdown->setMaxVisibleItems(20);
+    this->setStyleSheet("QComboBox QAbstractItemView::item { min-height: 24px; }");
+    {
+        QListView* list_view = new QListView(this);
+        list_view->setWordWrap(true);
+        m_dropdown->setView(list_view);
+    }
+    {
+//        QSize size = m_dropdown->iconSize();
+//        cout << "size = " << size.width() << " x " << size.height() << endl;
+//        size.setWidth(size.width() * 2);
+        m_dropdown->setIconSize(QSize(48, 24));
+    }
     layout->addWidget(m_dropdown);
 
 
@@ -86,7 +97,16 @@ ProgramSelect::ProgramSelect(QWidget& parent, PanelHolder& holder)
 
 void ProgramSelect::add(std::unique_ptr<PanelListDescriptor> list){
     int index = m_dropdown->count();
-    m_dropdown->addItem(QString::fromStdString(list->name()));
+    const ImageViewRGB32& icon = list->icon();
+    if (icon){
+        m_dropdown->addItem(
+            QIcon(QPixmap::fromImage(icon.to_QImage_ref())),
+            QString::fromStdString(list->name())
+        );
+    }else{
+        m_dropdown->addItem(QString::fromStdString(list->name()));
+    }
+
     m_lists.emplace_back(std::move(list));
     const PanelListDescriptor& back = *m_lists.back();
     if (!m_tab_map.emplace(back.name(), index).second){

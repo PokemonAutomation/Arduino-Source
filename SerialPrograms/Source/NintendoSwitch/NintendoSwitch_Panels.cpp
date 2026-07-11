@@ -41,7 +41,10 @@ namespace NintendoSwitch{
 
 
 PanelListFactory::PanelListFactory()
-    : PanelListDescriptor("Nintendo Switch")
+    : PanelListDescriptor(
+        "Nintendo Switch",
+        ImageRGB32(RESOURCE_PATH() + "CategoryIcons/NintendoSwitch.png")
+    )
 {}
 
 std::vector<PanelEntry> PanelListFactory::make_panels() const{

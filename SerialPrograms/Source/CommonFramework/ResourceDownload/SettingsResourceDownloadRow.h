@@ -105,7 +105,6 @@ private:
     SettingsResourceDeleteButton m_delete_button;
     SettingsResourceCancelButton m_cancel_button;
     SettingsResourceProgressBar m_progress_bar;
-    SettingsDownloadPopup m_popup;
 
     LifetimeSanitizer m_lifetime_sanitizer;
 

@@ -20,7 +20,10 @@ namespace PokemonPokopia{
 
 
 PanelListFactory::PanelListFactory()
-    : PanelListDescriptor(Pokemon::STRING_POKEMON + " Pokopia")
+    : PanelListDescriptor(
+        Pokemon::STRING_POKEMON + " Pokopia",
+        ImageRGB32(RESOURCE_PATH() + "CategoryIcons/PokemonPokopia.png")
+    )
 {}
 
 std::vector<PanelEntry> PanelListFactory::make_panels() const{

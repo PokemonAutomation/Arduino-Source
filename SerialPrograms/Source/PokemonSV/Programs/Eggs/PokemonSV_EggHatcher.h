@@ -11,6 +11,7 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "PokemonSV/Options/PokemonSV_SinglesAIOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -54,6 +55,10 @@ private:
     EnumDropdownOption<StartLocation> START_LOCATION;
 
     SimpleIntegerOption<uint8_t> BOXES;
+
+    StaticTextOption m_battle_ai_description;
+    SinglesAIOption BATTLE_AI;
+
     BooleanCheckBoxOption HAS_CLONE_RIDE_POKEMON;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;

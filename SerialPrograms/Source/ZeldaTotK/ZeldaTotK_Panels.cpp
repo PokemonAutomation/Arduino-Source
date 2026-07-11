@@ -22,7 +22,10 @@ namespace ZeldaTotK{
 
 
 PanelListFactory::PanelListFactory()
-    : PanelListDescriptor("Zelda: Tears of the Kingdom")
+    : PanelListDescriptor(
+        "Zelda: Tears of the Kingdom",
+        ImageRGB32(RESOURCE_PATH() + "CategoryIcons/ZeldaTotK.png")
+    )
 {}
 
 std::vector<PanelEntry> PanelListFactory::make_panels() const{

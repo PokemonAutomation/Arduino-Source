@@ -32,9 +32,8 @@ bool run_pokemon(
 
 //  Run a singles battle until it is over (for whatever reason).
 bool run_singles_battle(
-    ProgramEnvironment& env,
     VideoStream& stream, ProControllerContext& context,
-    SinglesAIOption& battle_AI,
+    const SinglesAIOption& battle_AI,
     bool trainer_battle
 );
 

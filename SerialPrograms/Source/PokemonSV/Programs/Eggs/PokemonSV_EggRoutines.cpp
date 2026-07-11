@@ -6,14 +6,15 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
-#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
@@ -30,6 +31,7 @@
 #include "PokemonSV/Programs/PokemonSV_WorldNavigation.h"
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
+#include "PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h"
 #include "PokemonSV_EggRoutines.h"
 
 namespace PokemonAutomation{
@@ -120,9 +122,11 @@ void handle_egg_hatching(
 // Turning right to do circullar motion to hatch eggs.
 // Function returns when a dialog is detected, meaning an egg is hatching.
 // Throw exception when no egg hatching detected after 10 minutes.
-void do_egg_cycle_motion(
-    const ProgramInfo& info,
-    VideoStream& stream, ProControllerContext& context
+bool do_egg_cycle_motion(
+    ProgramEnvironment& env,
+    VideoStream& stream, ProControllerContext& context,
+    EventNotificationOption* attacked_notification,
+    const SinglesAIOption* battle_ai
 ){
     AdvanceDialogWatcher dialog(COLOR_RED);
     NormalBattleMenuWatcher battle_menu(COLOR_GREEN);
@@ -145,18 +149,32 @@ void do_egg_cycle_motion(
     case 0:
         break;
     case 1:
+        stream.log("You got attacked!", COLOR_RED);
+        if (attacked_notification){
+            send_program_recoverable_error_notification(
+                env, *attacked_notification,
+                "You got attacked!",
+                *stream.video().snapshot_latest_blocking().frame,
+                false
+            );
+        }
+        if (battle_ai != nullptr && battle_ai->enabled()){
+            run_singles_battle(stream, context, *battle_ai, false);
+            return true;
+        }
         OperationFailedException::fire(
             ErrorReport::NO_ERROR_REPORT,
             "Detected battle menu. You got attacked!",
             stream
         );
-        break;
     default:
         dump_image_and_throw_recoverable_exception(
-            info, stream, "NoEggToHatch",
+            env.program_info(), stream, "NoEggToHatch",
             "hatch_eggs_at_zero_gate(): No more egg hatch after 10 minutes."
         );
     }
+
+    return false;
 }
 
 } // anonymous namespace
@@ -627,8 +645,10 @@ uint8_t check_non_eggs_count_in_party(
 }
 
 void hatch_eggs_at_zero_gate(
-    const ProgramInfo& info,
+    ProgramEnvironment& env,
     VideoStream& stream, ProControllerContext& context,
+    EventNotificationOption* attacked_notification,
+    const SinglesAIOption* battle_ai,
     uint8_t num_eggs_in_party,
     std::function<void(uint8_t)> egg_hatched_callback)
 {
@@ -665,8 +685,15 @@ void hatch_eggs_at_zero_gate(
             );
             if (ret == 0){
                 // egg hatching when going off ramp:
-                handle_egg_hatching(info, stream, context, num_eggs_in_party, egg_idx, egg_hatched_callback);
-                reset_position_at_zero_gate(info, stream, context);
+                handle_egg_hatching(
+                    env.program_info(),
+                    stream,
+                    context,
+                    num_eggs_in_party,
+                    egg_idx,
+                    egg_hatched_callback
+                );
+                reset_position_at_zero_gate(env.program_info(), stream, context);
                 continue;
             }
 
@@ -675,15 +702,26 @@ void hatch_eggs_at_zero_gate(
         }
 
         // Circular motions:
-        do_egg_cycle_motion(info, stream, context);
+        while (do_egg_cycle_motion(env, stream, context, attacked_notification, battle_ai)){
+            reset_position_at_zero_gate(env.program_info(), stream, context);
+        }
 
-        handle_egg_hatching(info, stream, context, num_eggs_in_party, egg_idx, egg_hatched_callback);
+        handle_egg_hatching(
+            env.program_info(),
+            stream,
+            context,
+            num_eggs_in_party,
+            egg_idx,
+            egg_hatched_callback
+        );
     } // end hatching each egg
 }
 
 void hatch_eggs_at_area_three_lighthouse(
-    const ProgramInfo& info,
+    ProgramEnvironment& env,
     VideoStream& stream, ProControllerContext& context,
+    EventNotificationOption* attacked_notification,
+    const SinglesAIOption* battle_ai,
     uint8_t num_eggs_in_party,
     std::function<void(uint8_t)> egg_hatched_callback)
 {
@@ -724,13 +762,20 @@ void hatch_eggs_at_area_three_lighthouse(
             );
             if (ret == 0){
                 // egg hatching when going off ramp:
-                handle_egg_hatching(info, stream, context, num_eggs_in_party, egg_idx, egg_hatched_callback);
+                handle_egg_hatching(
+                    env.program_info(),
+                    stream,
+                    context,
+                    num_eggs_in_party,
+                    egg_idx,
+                    egg_hatched_callback
+                );
 
                 stream.log("Reset location by flying back to lighthouse.");
                 // Use map to fly back to the flying spot
-                open_map_from_overworld(info, stream, context);
+                open_map_from_overworld(env.program_info(), stream, context);
                 pbf_move_left_joystick(context, {+0.567, +1}, 160ms, 400ms);
-                fly_to_overworld_from_map(info, stream, context);
+                fly_to_overworld_from_map(env.program_info(), stream, context);
                 continue;
             }
 
@@ -739,14 +784,25 @@ void hatch_eggs_at_area_three_lighthouse(
         }
 
         // Circular motions:
-        do_egg_cycle_motion(info, stream, context);
+        while (do_egg_cycle_motion(env, stream, context, attacked_notification, battle_ai)){
+            open_map_from_overworld(env.program_info(), stream, context);
+            pbf_move_left_joystick(context, {+0.567, +1}, 160ms, 400ms);
+            fly_to_overworld_from_map(env.program_info(), stream, context);
+        }
 
-        handle_egg_hatching(info, stream, context, num_eggs_in_party, egg_idx, egg_hatched_callback);
+        handle_egg_hatching(
+            env.program_info(),
+            stream,
+            context,
+            num_eggs_in_party,
+            egg_idx,
+            egg_hatched_callback
+        );
     } // end hatching each egg
 }
 
 void hatch_eggs_anywhere(
-    const ProgramInfo& info,
+    ProgramEnvironment& env,
     VideoStream& stream, ProControllerContext& context,
     bool already_on_ride,
     uint8_t num_eggs_in_party,
@@ -770,9 +826,9 @@ void hatch_eggs_anywhere(
         context.wait_for_all_requests();
 
         // Circular motions:
-        do_egg_cycle_motion(info, stream, context);
+        do_egg_cycle_motion(env, stream, context, nullptr, nullptr);
 
-        handle_egg_hatching(info, stream, context, num_eggs_in_party, egg_idx, egg_hatched_callback);
+        handle_egg_hatching(env.program_info(), stream, context, num_eggs_in_party, egg_idx, egg_hatched_callback);
     } // end hatching each egg
 }
 

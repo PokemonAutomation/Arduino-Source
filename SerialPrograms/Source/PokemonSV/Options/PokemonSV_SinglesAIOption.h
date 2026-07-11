@@ -22,7 +22,11 @@ namespace PokemonSV{
 class SinglesAIOption : public GroupOption{
 public:
     ~SinglesAIOption();
-    SinglesAIOption(bool trainer_battle);
+    SinglesAIOption(
+        bool trainer_battle,
+        EnableMode enable_mode,
+        int max_pokemon = 6
+    );
 
 public:
     StaticTextOption description;
