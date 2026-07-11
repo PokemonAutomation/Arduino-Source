@@ -28,11 +28,11 @@ void level_up_observed_pokemon(AdvObservedPokemon& pokemon, const StatReads& new
     pokemon.evs.emplace_back(new_evs);
 }
 
-uint32_t increment_internal_rng_state(uint32_t& state){
+uint32_t increment_internal_rng_state(uint32_t state){
     return state * 0x41c64e6d + 0x6073;
 }
 
-AdvRngState rngstate_from_internal_state(uint16_t seed, uint64_t advances, uint32_t& state, AdvRngMethod method){
+AdvRngState rngstate_from_internal_state(uint16_t seed, uint64_t advances, uint32_t state, AdvRngMethod method){
     uint32_t s0 = state;
     uint32_t s1 = increment_internal_rng_state(s0);
     uint32_t s2 = increment_internal_rng_state(s1);
@@ -63,27 +63,40 @@ void advance_rng_state(AdvRngState& state){
     state.s5 = increment_internal_rng_state(state.s5);
 }
 
-uint32_t pid_from_states(uint32_t& s0, uint32_t& s1){
+uint32_t pid_from_states(uint32_t s0, uint32_t s1){
     return (s1 & 0xffff0000) + (s0 >> 16);
 }
 
-uint8_t gender_value_from_pid(uint32_t& pid){
+uint8_t gender_value_from_pid(uint32_t pid){
     return pid & 0xff;
 }
 
 AdvGender gender_from_gender_value(uint8_t gender_value, int16_t threshold){
+    if (threshold < -1){ // genderless Pokemon
+        return AdvGender::Any;
+    }
     return (gender_value <= threshold) ? AdvGender::Female : AdvGender::Male;
 }
 
-AdvNature nature_from_pid(uint32_t& pid){
+AdvNature nature_from_pid(uint32_t pid){
     return AdvNature (pid % 25);
 }
 
-AdvAbility ability_from_pid(uint32_t& pid){
+AdvAbility ability_from_pid(uint32_t pid){
     return AdvAbility (pid % 2);
 }
 
-AdvIvGroup iv_group_from_state(uint32_t& state, bool roaming = false){
+uint8_t unown_form_from_pid(uint32_t pid){
+    return (((pid & 0x3000000) >> 18) | ((pid & 0x30000) >> 12) | ((pid & 0x300) >> 6) | (pid & 0x3)) % 0x1c;
+    // return (
+    //     (((pid >> 24) & 0x03) << 6) | 
+    //     (((pid >> 16) & 0x03) << 4) | 
+    //     (((pid >> 8) & 0x03) << 2) | 
+    //     (pid & 0x03)
+    // ) % 28;
+}
+
+AdvIvGroup iv_group_from_state(uint32_t state, bool roaming = false){
     AdvIvGroup ivgroup;
     uint32_t remainingbits = state >> 16;
     if (roaming){
@@ -99,7 +112,7 @@ AdvIvGroup iv_group_from_state(uint32_t& state, bool roaming = false){
     return ivgroup;
 }
 
-AdvPokemonResult pokemon_from_state(AdvRngState& state, uint32_t pid, AdvNature nature, bool roaming = false){
+AdvPokemonResult pokemon_from_state(const AdvRngState& state, uint32_t pid, AdvNature nature, bool roaming = false){
     uint8_t gender = gender_value_from_pid(pid);
     AdvAbility ability = ability_from_pid(pid);
 
@@ -139,7 +152,7 @@ AdvPokemonResult pokemon_from_state(AdvRngState& state, uint32_t pid, AdvNature 
     return {pid, gender, nature, ability, ivs};
 }
 
-AdvPokemonResult pokemon_from_state(AdvRngState& state, bool roaming = false){
+AdvPokemonResult pokemon_from_state(const AdvRngState& state, bool roaming = false){
     uint32_t pid = pid_from_states(state.s0, state.s1);
     AdvNature nature = nature_from_pid(pid);
     return pokemon_from_state(state, pid, nature, roaming);
@@ -153,10 +166,23 @@ AdvPokemonResult reroll_wild_pokemon(uint8_t nature, uint16_t seed, uint64_t adv
         if ((pid % 25) == nature){
             AdvRngState rngstate = rngstate_from_internal_state(seed, advances, lowstate, method);
             return pokemon_from_state(rngstate, pid, AdvNature(nature));
-        }else{
-            lowstate = increment_internal_rng_state(highstate);
-            highstate = increment_internal_rng_state(lowstate);
         }
+        lowstate = increment_internal_rng_state(highstate);
+        highstate = increment_internal_rng_state(lowstate);
+    }
+}
+
+AdvPokemonResult reroll_unown(uint8_t unownform, uint16_t seed, uint64_t advances, uint32_t state, AdvRngMethod method){
+    uint32_t lowstate = state;
+    uint32_t highstate = increment_internal_rng_state(state);
+    while (true){
+        uint32_t pid = pid_from_states(highstate, lowstate);
+        if (unown_form_from_pid(pid) == unownform){
+            AdvRngState rngstate = rngstate_from_internal_state(seed, advances, lowstate, method);
+            return pokemon_from_state(rngstate, pid, nature_from_pid(pid));
+        }
+        lowstate = increment_internal_rng_state(highstate);
+        highstate = increment_internal_rng_state(lowstate);
     }
 }
 
@@ -233,6 +259,74 @@ uint8_t slot_number_from_roll(uint8_t roll, size_t size, bool super_rod) {
     }
 }
 
+int slot_to_unownform(AdvEncounterSlot slot){
+    if (slot.species.find("unown") == std::string::npos){
+        return -1;
+    }else{
+        char form = slot.species.back();
+        switch (form){
+        case 'a':
+            return 0;
+        case 'b':
+            return 1;
+        case 'c':
+            return 2;
+        case 'd':
+            return 3;
+        case 'e':
+            return 4;
+        case 'f':
+            return 5;
+        case 'g':
+            return 6;
+        case 'h':
+            return 7;
+        case 'i':
+            return 8;
+        case 'j':
+            return 9;
+        case 'k':
+            return 10;
+        case 'l':
+            return 11;
+        case 'm':
+            return 12;
+        case 'n':
+            return 13;
+        case 'o':
+            return 14;
+        case 'p':
+            return 15;
+        case 'q':
+            return 16;
+        case 'r':
+            return 17;
+        case 's':
+            return 18;
+        case 't':
+            return 19;
+        case 'u':
+            return 20;
+        case 'v':
+            return 21;
+        case 'w':
+            return 22;
+        case 'x':
+            return 23;
+        case 'y':
+            return 24;
+        case 'z':
+            return 25;
+        case '!':
+            return 26;
+        case '?':
+            return 27;
+        default:
+            return -1;
+        }
+    }
+}
+
 AdvWildPokemonResult wild_pokemon_from_state(AdvRngState state, std::vector<AdvEncounterSlot> slots, bool super_rod){
 
     uint8_t slot_roll = (state.s0 >> 16) % 100;
@@ -241,6 +335,7 @@ AdvWildPokemonResult wild_pokemon_from_state(AdvRngState state, std::vector<AdvE
 
     uint8_t slot_num = slot_number_from_roll(slot_roll, slots.size(), super_rod);
     AdvEncounterSlot slot = slots[slot_num];
+    int unownform = slot_to_unownform(slot);
 
     uint8_t diff = slot.maxlevel - slot.minlevel;
     if (slot.maxlevel < slot.minlevel) {
@@ -248,7 +343,13 @@ AdvWildPokemonResult wild_pokemon_from_state(AdvRngState state, std::vector<AdvE
     }
     uint8_t level = slot.minlevel + (level_roll % (diff + 1));
 
-    AdvPokemonResult temp_poke = reroll_wild_pokemon(nature, state.seed, state.advance, state.s3, state.method);
+
+    AdvPokemonResult temp_poke;
+    if (unownform >= 0){
+        temp_poke = reroll_unown(static_cast<uint8_t>(unownform), state.seed, state.advance, state.s2, state.method);
+    }else{
+        temp_poke = reroll_wild_pokemon(nature, state.seed, state.advance, state.s3, state.method);
+    }
 
     return {
         slot.species,
@@ -409,7 +510,8 @@ bool check_for_match(AdvPokemonResult res, AdvRngFilters target, int16_t gender_
 }
 
 bool check_for_match(AdvWildPokemonResult res, AdvRngFilters target, int16_t gender_threshold, uint16_t tid_xor_sid){
-    return (target.species == res.species)
+    std::string res_name = res.species.find("unown") != std::string::npos ? "unown" : res.species;
+    return (target.species == res_name)
         && (target.level == res.level)
         && (target.nature == AdvNature::Any || (res.nature == target.nature))
         && (target.ability == AdvAbility::Any || (res.ability == target.ability))
@@ -618,12 +720,12 @@ std::string nature_to_string(const AdvNature& nature){
 
 
 
-void shrink_iv_range(IvRange& mutated_range, IvRange& fixed_range){
+void shrink_iv_range(IvRange& mutated_range, const IvRange& fixed_range){
     mutated_range.low  = std::max(mutated_range.low,  fixed_range.low);
     mutated_range.high = std::min(mutated_range.high, fixed_range.high);
 }
 
-void shrink_iv_ranges(IvRanges& mutated_ranges, IvRanges& fixed_ranges){
+void shrink_iv_ranges(IvRanges& mutated_ranges, const IvRanges& fixed_ranges){
     shrink_iv_range(mutated_ranges.hp,      fixed_ranges.hp);
     shrink_iv_range(mutated_ranges.attack,  fixed_ranges.attack);
     shrink_iv_range(mutated_ranges.defense, fixed_ranges.defense);

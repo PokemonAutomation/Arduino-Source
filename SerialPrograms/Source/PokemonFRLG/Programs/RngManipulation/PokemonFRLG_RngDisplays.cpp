@@ -52,8 +52,15 @@ std::string RngTargetDisplay::result_to_string(const AdvPokemonResult& pokemon, 
 }   
 
 std::string RngTargetDisplay::result_to_string(const AdvWildPokemonResult& pokemon, const int16_t& gender_threshold){
+    std::string name;
+    if (pokemon.species.find("unown") != std::string::npos){
+        char form = char(toupper(pokemon.species.substr(6,1)[0]));
+        name = get_pokemon_name("unown").display_name() + " (" + form + ")";
+    }else{
+        name = get_pokemon_name(pokemon.species).display_name();
+    }
     std::string out;
-    out += get_pokemon_name(pokemon.species).display_name() + " ";
+    out += name + " ";
     out += "Lv" + std::to_string(pokemon.level) + " ";
     out += gender_to_string(gender_from_gender_value(pokemon.gender, gender_threshold)) + " ";
     out += nature_to_string(pokemon.nature) + " ";

@@ -288,7 +288,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
     std::map<std::string, std::vector<AdvEncounterSlot>> location_map = encounters_data.get_throw(enc_slug);
     if (location_map.find(loc_slug)==location_map.end()){
-        throw UserSetupError(env.console, "The target Seed is missing from the list of nearby seeds.");
+        throw UserSetupError(env.console, "The target encounter type / location combination could not be found.");
     }
 
     std::vector<AdvEncounterSlot> ENCOUNTER_SLOTS = location_map.find(loc_slug)->second;
@@ -300,12 +300,17 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
     std::set<std::string> SPECIES_LIST;
     for (auto slot : ENCOUNTER_SLOTS){
-        SPECIES_LIST.emplace(slot.species);
+        if (slot.species.find("unown") != std::string::npos){
+            SPECIES_LIST.emplace("unown");
+        }else{
+            SPECIES_LIST.emplace(slot.species);
+        }
     }
 
     const bool SUPER_ROD = ENCOUNTER_TYPE == EncounterType::superrod;
 
-
+    const bool UNOWN_BUMPS = (loc_slug == "tanoby_ruins_monean_chamber" ||
+                              loc_slug == "tanoby_ruins_viapois_chamber");
 
     // prepare timings
 
@@ -388,11 +393,12 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     env.log("   SpD: " + std::to_string(target_result.ivs.spdef));
     env.log("   Spe: " + std::to_string(target_result.ivs.speed));
 
-    RngCalibrations calibrations = {
+    const RngCalibrations initial_calibrations = {
         RNG_CALIBRATION.seed_calibration / FRLG_FRAME_DURATION,
         RNG_CALIBRATION.csf_calibration,
         RNG_CALIBRATION.advances_calibration
     };
+    RngCalibrations calibrations = initial_calibrations;
     log_calibrations(env.console, calibrations, true);
 
     Milliseconds launch_delay = INITIAL_LAUNCH_DELAY;
@@ -401,6 +407,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     RngCalibrationHistory calibration_history; 
 
     uint16_t failed_searches = 0;
+    uint16_t advances_bump = 0;
 
     while (true){
         if (calibration_history.results.size() > 0){
@@ -438,10 +445,22 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
         if (calibration_history.results.size() > 0){
             calibrations = get_calibrations(env.console, calibration_history, SEED_VALUES, SEED_POSITION, ADVANCES);
+        }else{
+            calibrations = initial_calibrations;
         }
 
-        // if previous resets had uncertain advances, slightly modify the seed delay to try to hit a different target
-        apply_seed_bump(calibrations, uncertain_history);
+        // there can be long runs of identical unowns (especially for A and Z), 
+        // so a moderate offset may be needed to gain additional info about advances position
+        if (UNOWN_BUMPS){
+            if (uncertain_history.results.empty()){
+                advances_bump = 0;
+            }else{
+                calibrations.ingame_offset += advances_bump;
+            }
+        }else{
+            // if previous resets had uncertain advances, slightly modify the seed delay to try to hit a different target
+            apply_seed_bump(calibrations, uncertain_history);
+        }
 
         uint64_t ingame_advances = ADVANCES - CONTINUE_SCREEN_FRAMES;
 
@@ -521,7 +540,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
             species_stats = STATS_DATA.get_throw(pokemon.species);        
         }catch (const InternalProgramError& err){
             env.log(err.message());
-            env.log("Failed to load base stats.");
+            env.log("Failed to load base stats.", COLOR_RED);
             continue;
         }
         BaseStats base_stats = species_stats.base_stats;
@@ -548,6 +567,15 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         env.log("RNG search finished.");
         update_failed_searches(failed_searches, search_hits);
 
+        if (   UNOWN_BUMPS
+            && search_hits.size() > 0
+            && same_seeds(search_hits)
+            && search_hits[0].seed == TARGET_SEED
+        ){
+            // keep increasing advances until hitting something that provides new information (A/Z form with different nature/IVs or a !/? form)
+            // only bump advances for the target seed to ensure nothing is missed
+            advances_bump++;
+        }
     }
 
     if (GO_HOME_WHEN_DONE){
