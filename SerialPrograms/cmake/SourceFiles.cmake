@@ -116,6 +116,7 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Logging/GlobalLogger.h
     ../Common/Cpp/Logging/LastLogTracker.cpp
     ../Common/Cpp/Logging/LastLogTracker.h
+    ../Common/Cpp/Logging/MultiOutputLogger.h
     ../Common/Cpp/Logging/OutputRedirector.cpp
     ../Common/Cpp/Logging/OutputRedirector.h
     ../Common/Cpp/Logging/TaggedLogger.cpp

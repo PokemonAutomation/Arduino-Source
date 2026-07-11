@@ -31,7 +31,7 @@
 #include "Logging/OutputRedirector.h"
 #include "Common/Cpp/Logging/FileLogger.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
-#include "Logging/FileWindowLogger.h"
+#include "Common/Cpp/Logging/MultiOutputLogger.h"
 //#include "Tools/StatsDatabase.h"
 //#include "Windows/DpiScaler.h"
 #include "Startup/SetupSettings.h"
@@ -68,16 +68,16 @@ void set_working_directory(){
 
 namespace PokemonAutomation{
 
-// This function is required by Common/Cpp/Logging/GlobalLogger.h:global_logger_raw() to initialize
-// the global file logger.
-// This function is called the first time `global_logger_raw()` is called to initialize the static
-// local global file logger object.
-// Note: in order to make sure `USER_FILE_PATH()` and `QCoreApplication::applicationName()` work
-//    correctly you need to define `QApplication` before `make_global_config()` is called.
-FileLoggerConfig make_global_config(){
-    return FileLoggerConfig{
-        .file_path = USER_FILE_PATH() + QCoreApplication::applicationName().toStdString() + ".log",
-    };
+
+
+FileLogger& global_file_logger(){
+    static FileLogger logger(
+        GlobalThreadPools::unlimited_normal(),
+        FileLoggerConfig{
+            .file_path = USER_FILE_PATH() + QCoreApplication::applicationName().toStdString() + ".log",
+        }
+    );
+    return logger;
 }
 
 }
@@ -95,10 +95,19 @@ int run_program(int argc, char *argv[]){
     GlobalOutputRedirector redirect_stdout(std::cout, "stdout", Color());
     GlobalOutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);
 
+    {
+        MultiOutputLogger& logger = global_multi_logger();
+        logger.add_listener(global_file_logger());
+    }
+
     Logger& logger = global_logger_tagged();
 
     logger.log("================================================================================");
     logger.log("Starting Program...");
+    logger.log("Current path: " + QDir::currentPath().toStdString());
+    logger.log("Executable path: " + qApp->applicationDirPath().toStdString());
+    logger.log("Program setting folder: " + SETTINGS_PATH());
+    logger.log("Program resources folder: " + RESOURCE_PATH());
 
     qRegisterMetaType<size_t>("size_t");
     qRegisterMetaType<uint8_t>("uint8_t");
@@ -257,7 +266,7 @@ int main(int argc, char *argv[]){
     SystemSleepController::instance().stop();
     global_periodic_runner().stop();
     global_watchdog().stop();
-    dynamic_cast<FileLogger&>(global_logger_raw()).stop();
+    global_file_logger().stop();
 
 //
 //  Workaround Qt 6.9 thread-adoption bug on Windows.

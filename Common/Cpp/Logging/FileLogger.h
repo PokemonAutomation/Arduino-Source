@@ -17,7 +17,6 @@
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "Common/Cpp/FileIO.h"
-#include "Common/Cpp/ListenerSet.h"
 #include "LastLogTracker.h"
 
 namespace PokemonAutomation{
@@ -42,20 +41,6 @@ struct FileLoggerConfig{
 // without the core logger depending on Qt.
 class FileLogger : public Logger{
 public:
-    // Listener interface for receiving log messages.
-    // Implement this to integrate with UI components (e.g., QTextEdit).
-    struct Listener{
-        // Called when a log message is written. This is called from the
-        // logger's background thread, so implementations must handle
-        // thread safety (e.g., using Qt signals/slots for cross-thread updates).
-        //
-        // Parameters:
-        //   msg: The log message with newlines normalized (no \r\n, just \n)
-        //   color: Optional color for the message
-        virtual void on_log(const std::string& msg, Color color) = 0;
-    };
-
-public:
     // Construct a FileLogger with the given configuration.
     // The log file is created if it doesn't exist, or appended to if it does.
     // A UTF-8 BOM is written to new files.
@@ -64,16 +49,10 @@ public:
     ~FileLogger();
     void stop() noexcept;
 
-    // Add a listener to receive log messages. Thread-safe.
-    void add_listener(Listener& listener);
-
-    // Remove a listener. Thread-safe.
-    void remove_listener(Listener& listener);
-
     // Logger interface implementation
     virtual void log(const std::string& msg, Color color = Color()) override;
     virtual void log(std::string&& msg, Color color = Color()) override;
-    virtual std::vector<std::string> get_last() const override;
+    virtual std::vector<std::string> get_last() override;
 
 private:
     // Normalize newlines: convert \r\n to \n, remove trailing newline.
@@ -102,7 +81,6 @@ private:
     bool m_stopping;
     std::deque<std::pair<std::string, Color>> m_queue;
 
-    ListenerSet<Listener> m_listeners;
     AsyncTask m_thread;
 };
 

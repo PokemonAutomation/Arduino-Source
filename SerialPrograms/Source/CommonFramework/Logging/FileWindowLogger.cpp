@@ -7,7 +7,6 @@
 #include <QCoreApplication>
 #include <QMenuBar>
 #include <QDir>
-#include "Common/Cpp/Logging/GlobalLogger.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Windows/DpiScaler.h"
@@ -19,9 +18,7 @@
 namespace PokemonAutomation{
 
 
-void FileWindowLoggerWindow::on_log(const std::string& msg, Color color){
-    // This is called from FileLogger's background thread.
-    // Format the message for Qt display and send to all windows.
+void FileWindowLoggerWindow::log(const std::string& msg, Color color){
     emit signal_log(to_window_str(msg, color));
 }
 
@@ -51,11 +48,12 @@ QString FileWindowLoggerWindow::to_window_str(const std::string& msg, Color colo
 }
 
 
-FileWindowLoggerWindow::FileWindowLoggerWindow(QWidget* parent)
+FileWindowLoggerWindow::FileWindowLoggerWindow(
+    QWidget* parent,
+    const std::vector<std::string>& existing_logs
+)
     : QMainWindow(parent)
-    , m_logger(dynamic_cast<FileLogger&>(global_logger_raw()))
 {
-    m_logger.add_listener(*this);
     if (objectName().isEmpty()){
         setObjectName(QString::fromUtf8("TextWindow"));
     }
@@ -90,25 +88,24 @@ FileWindowLoggerWindow::FileWindowLoggerWindow(QWidget* parent)
     GlobalSettings::instance().LOG_WINDOW_SIZE->X_POS.add_listener(*this);
     GlobalSettings::instance().LOG_WINDOW_SIZE->Y_POS.add_listener(*this);
 
-    log("================================================================================");
-    log("<b>Window Startup...</b>");
-    log("Current path: " + QDir::currentPath());
-    log("Executable path: " + qApp->applicationDirPath());
-    log(QString::fromStdString("Program setting folder: " + SETTINGS_PATH()));
-    log(QString::fromStdString("Program resources folder: " + RESOURCE_PATH()));
+    for (const std::string& item : existing_logs){
+        log(item, Color());
+    }
+
+    internal_log("================================================================================");
+    internal_log("<b>Window Startup...</b>");
     add_window(*this);
 }
 
 FileWindowLoggerWindow::~FileWindowLoggerWindow(){
     remove_window(*this);
-    m_logger.remove_listener(*this);
     GlobalSettings::instance().LOG_WINDOW_SIZE->WIDTH.remove_listener(*this);
     GlobalSettings::instance().LOG_WINDOW_SIZE->HEIGHT.remove_listener(*this);
     GlobalSettings::instance().LOG_WINDOW_SIZE->X_POS.remove_listener(*this);
     GlobalSettings::instance().LOG_WINDOW_SIZE->Y_POS.remove_listener(*this);
 }
 
-void FileWindowLoggerWindow::log(QString msg){
+void FileWindowLoggerWindow::internal_log(QString msg){
     emit signal_log(msg);
 }
 

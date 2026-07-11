@@ -24,9 +24,9 @@
 // #include <fstream>
 #include <filesystem>
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -182,7 +182,10 @@ const DownloadedResourceMetadata& SettingsResourceDownloadRow::fetch_remote_meta
     try{
         all_remote_metadata = remote_resource_download_list();
     }catch(OperationFailedException&){
-        std::cerr << "SettingsResourceDownloadRow::fetch_remote_metadata: Error" << endl;
+        global_logger_tagged().log(
+            "SettingsResourceDownloadRow::fetch_remote_metadata(): Error",
+            COLOR_RED
+        );
         throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
             "Error: Download failed. Failed to fetch the list of available downloads. Check your internet connection.");
     }
@@ -325,7 +328,7 @@ void SettingsResourceDownloadRow::start_delete(){
             fs::remove_all(Filesystem::Path(resource_directory));
 
         }catch(OperationFailedException& e){
-            std::cerr << e.message() << endl;
+            global_logger_tagged().log(e.message(), COLOR_RED);
             GlobalResourceDownloadManager::instance().report_unexpected_exception_caught(
                 "Error: SettingsResourceDownloadButton::start_delete: Unexpected OperationFailedException exception. Report this as an error.");
             return;
@@ -354,7 +357,10 @@ void SettingsResourceDownloadRow::update_action_state(ActionState state){
                 m_progress_bar.change_text("Downloading");
                 m_progress_bar.set_visibility(ConfigOptionState::ENABLED);
                 m_data->m_action_state = state;
-                cout << "ActionState::PRE_DOWNLOAD" << endl;
+                global_logger_tagged().log(
+                    "ActionState::PRE_DOWNLOAD",
+                    COLOR_PURPLE
+                );
             }
             break;
         case ActionState::DOWNLOADING:
@@ -365,7 +371,10 @@ void SettingsResourceDownloadRow::update_action_state(ActionState state){
                 m_progress_bar.change_text("Downloading");
                 m_progress_bar.set_visibility(ConfigOptionState::ENABLED);
                 m_data->m_action_state = state;
-                cout << "ActionState::DOWNLOADING" << endl;
+                global_logger_tagged().log(
+                    "ActionState::DOWNLOADING",
+                    COLOR_PURPLE
+                );
             }
             break;
         case ActionState::PRE_DELETE:
@@ -377,7 +386,10 @@ void SettingsResourceDownloadRow::update_action_state(ActionState state){
                 m_cancel_button.set_enabled(false);
                 m_progress_bar.reset_progress();
                 m_data->m_action_state = state;
-                cout << "ActionState::PRE_DELETE" << endl;
+                global_logger_tagged().log(
+                    "ActionState::PRE_DELETE",
+                    COLOR_PURPLE
+                );
             }
             break;
         case ActionState::DELETING:
@@ -389,7 +401,10 @@ void SettingsResourceDownloadRow::update_action_state(ActionState state){
                 m_cancel_button.set_enabled(false);
                 m_progress_bar.reset_progress();
                 m_data->m_action_state = state;
-                cout << "ActionState::DELETING" << endl;
+                global_logger_tagged().log(
+                    "ActionState::DELETING",
+                    COLOR_PURPLE
+                );
             }
             break;
         case ActionState::PRE_CANCEL:
@@ -401,7 +416,10 @@ void SettingsResourceDownloadRow::update_action_state(ActionState state){
                 m_cancel_button.set_enabled(false);
                 m_progress_bar.reset_progress();
                 m_data->m_action_state = state;
-                cout << "ActionState::PRE_CANCEL" << endl;
+                global_logger_tagged().log(
+                    "ActionState::PRE_CANCEL",
+                    COLOR_PURPLE
+                );
             }
             break;
         case ActionState::CANCELLING:
@@ -413,7 +431,10 @@ void SettingsResourceDownloadRow::update_action_state(ActionState state){
                 m_cancel_button.set_enabled(false);
                 m_progress_bar.reset_progress();
                 m_data->m_action_state = state;
-                cout << "ActionState::CANCELLING" << endl;
+                global_logger_tagged().log(
+                    "ActionState::CANCELLING",
+                    COLOR_PURPLE
+                );
             }
             break;
         case ActionState::READY:
@@ -424,7 +445,10 @@ void SettingsResourceDownloadRow::update_action_state(ActionState state){
             m_progress_bar.set_visibility(ConfigOptionState::HIDDEN);
             m_progress_bar.reset_progress();
             m_data->m_action_state = state;
-            cout << "ActionState::READY" << endl;
+            global_logger_tagged().log(
+                "ActionState::READY",
+                COLOR_PURPLE
+            );
             break;
         default:
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "update_action_state: Unknown enum.");  

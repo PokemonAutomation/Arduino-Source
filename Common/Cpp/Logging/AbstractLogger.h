@@ -25,7 +25,7 @@ public:
         log(std::string(msg), color);
     }
 
-    virtual std::vector<std::string> get_last() const{
+    virtual std::vector<std::string> get_last(){
         return {};
     }
 };

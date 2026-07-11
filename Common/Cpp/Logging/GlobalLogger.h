@@ -9,7 +9,7 @@
 #ifndef PokemonAutomation_Logging_GlobalLogger_H
 #define PokemonAutomation_Logging_GlobalLogger_H
 
-#include "FileLogger.h"
+#include "AbstractLogger.h"
 
 namespace PokemonAutomation{
 
@@ -21,6 +21,12 @@ namespace PokemonAutomation{
 // Main.cpp to return the config for the global logger. If this function is not implemented,
 // the program will not compile.
 Logger& global_logger_raw();
+
+
+//  This is the same as above, but is pre-casted to the actual type.
+//  Use this during setup to add all the logger listeners.
+class MultiOutputLogger;
+MultiOutputLogger& global_multi_logger();
 
 
 }

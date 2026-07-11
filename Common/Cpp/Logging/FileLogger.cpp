@@ -53,13 +53,6 @@ void FileLogger::stop() noexcept{
 }
 
 
-void FileLogger::add_listener(Listener& listener){
-    m_listeners.add(listener);
-}
-
-void FileLogger::remove_listener(Listener& listener){
-    m_listeners.remove(listener);
-}
 
 void FileLogger::log(const std::string& msg, Color color){
     std::unique_lock<Mutex> lg(m_lock);
@@ -77,7 +70,7 @@ void FileLogger::log(std::string&& msg, Color color){
     m_cv.notify_all();
 }
 
-std::vector<std::string> FileLogger::get_last() const{
+std::vector<std::string> FileLogger::get_last(){
     std::unique_lock<Mutex> lg(m_lock);
     return m_last_log_tracker.snapshot();
 }
@@ -121,9 +114,6 @@ std::string FileLogger::to_file_str(const std::string& msg){
 
 void FileLogger::internal_log(const std::string& msg, Color color){
     std::string line = normalize_newlines(msg);
-
-    // Notify all listeners (e.g., UI windows)
-    m_listeners.run_method(&Listener::on_log, line, color);
 
     // Write to file
     if (m_file.is_open()){

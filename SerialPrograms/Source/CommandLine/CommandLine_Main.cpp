@@ -8,9 +8,13 @@
 
 #include <iostream>
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/Logging/MultiOutputLogger.h"
+#include "Common/Cpp/Logging/FileLogger.h"
+#include "Common/Cpp/Logging/GlobalLogger.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Logging/Logger.h"
 // #include "CommonFramework/Logging/OutputRedirector.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "Integrations/PybindSwitchController.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 
@@ -21,14 +25,15 @@ namespace PokemonAutomation{
 
 bool USE_QT_UI = false;
 
-// This function is required by Common/Cpp/Logging/GlobalLogger.h:global_logger_raw() to initialize
-// the global file logger.
-// This function is called the first time `global_logger_raw()` is called to initialize the static
-// local global file logger object.
-FileLoggerConfig make_global_config(){
-    return FileLoggerConfig{
-        .file_path = "./SerialProgramsCommandLine.log"
-    };
+
+FileLogger& global_file_logger(){
+    static FileLogger logger(
+        GlobalThreadPools::unlimited_normal(),
+        FileLoggerConfig{
+            .file_path = "./SerialProgramsCommandLine.log"
+        }
+    );
+    return logger;
 }
 
 
@@ -38,6 +43,11 @@ int main(int argc, char* argv[]){
 //     // Set up output redirection for logging
 //     OutputRedirector redirect_stdout(std::cout, "stdout", Color());
 //     OutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);
+
+    {
+        MultiOutputLogger& logger = global_multi_logger();
+        logger.add_listener(global_file_logger());
+    }
 
     // Get the global command-line logger (suitable for command-line tools)
     Logger& logger = global_logger_command_line();
@@ -95,6 +105,8 @@ int main(int argc, char* argv[]){
     logger.log("================================================================================");
     logger.log("Program completed successfully.");
     logger.log("================================================================================");
+
+    global_file_logger().stop();
 
     return 0;
 }

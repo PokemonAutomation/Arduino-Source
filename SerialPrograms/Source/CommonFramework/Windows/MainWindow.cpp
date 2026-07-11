@@ -13,6 +13,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QMessageBox>
+#include "Common/Cpp/Logging/MultiOutputLogger.h"
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -219,7 +220,14 @@ MainWindow::MainWindow(QWidget* parent)
         );
     }
     {
-        m_output_window.reset(new FileWindowLoggerWindow);
+        m_output_window.reset(
+            new FileWindowLoggerWindow(
+                nullptr,
+                global_logger_raw().get_last()
+            )
+        );
+        global_multi_logger().add_listener(*m_output_window);
+
         QPushButton* output = new QPushButton("Output Window", support_box);
         buttons->addWidget(output);
         connect(
@@ -281,7 +289,10 @@ MainWindow::~MainWindow(){
     GlobalSettings::instance().WINDOW_SIZE->WIDTH.remove_listener(*this);
     GlobalSettings::instance().WINDOW_SIZE->HEIGHT.remove_listener(*this);
     GlobalSettings::instance().WINDOW_SIZE->X_POS.remove_listener(*this);
-    GlobalSettings::instance().WINDOW_SIZE->Y_POS.remove_listener(*this);    
+    GlobalSettings::instance().WINDOW_SIZE->Y_POS.remove_listener(*this);
+    if (m_output_window){
+        global_multi_logger().remove_listener(*m_output_window);
+    }
 }
 
 int32_t move_x_within_screen_bounds(int32_t x_pos){

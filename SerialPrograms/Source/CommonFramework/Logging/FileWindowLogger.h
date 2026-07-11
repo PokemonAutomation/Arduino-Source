@@ -19,21 +19,22 @@ namespace PokemonAutomation{
 
 // A Qt window that displays log output from a FileWindowLogger.
 // Uses Qt signals/slots for thread-safe updates from the logger's background thread.
-class FileWindowLoggerWindow : public QMainWindow, public ConfigOption::Listener, public FileLogger::Listener{
+class FileWindowLoggerWindow final : public QMainWindow, public ConfigOption::Listener, public Logger{
     Q_OBJECT
 
 public:
-    FileWindowLoggerWindow(QWidget* parent = nullptr);
+    FileWindowLoggerWindow(
+        QWidget* parent,
+        const std::vector<std::string>& existing_logs
+    );
     virtual ~FileWindowLoggerWindow();
 
     // Called by FileWindowLogger to display a log message.
-    
-    void log(QString msg);
 
     // Callback function registered to the global logger.
     // The global logger's background thread call it to display a log to the window.
     // Thread-safe: emits a signal that is handled on the UI thread.
-    void on_log(const std::string& msg, Color color) override;
+    void log(const std::string& msg, Color color) override;
 
     virtual void resizeEvent(QResizeEvent* event) override;
     virtual void moveEvent(QMoveEvent* event) override;
@@ -42,11 +43,11 @@ signals:
     void signal_log(QString msg);
 
 private:
+    void internal_log(QString msg);
     virtual void on_config_value_changed(void* object) override;
 
     static QString to_window_str(const std::string& msg, Color color);
 
-    FileLogger& m_logger;
     QMenuBar* m_menubar;
     QTextEdit* m_text;
     bool m_pending_resize = false;

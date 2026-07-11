@@ -333,6 +333,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     // JoyconContext context(scope, console.controller<JoyconController>());
     VideoOverlaySet overlays(overlay);
 
+    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "asdf", console);
+
 
 //    SinglesAIOption ai(false);
 //    run_singles_battle(console, context, ai, false);

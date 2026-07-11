@@ -56,8 +56,14 @@ public:
 
 
 public:
+    //  Run the method on every listener.
     template <typename Function, class... Args>
     void run_method(Function function, Args&&... args);
+
+    //  Run lambda on every listener.
+    //  If lambda returns true, stop immediately.
+    template <typename Lambda>
+    void run_on_all(Lambda&& lambda);
 
 
 private:
@@ -291,6 +297,52 @@ void ListenerSet<ListenerType>::run_method(Function function, Args&&... args){
 }
 
 
+template <typename ListenerType>
+template <typename Lambda>
+void ListenerSet<ListenerType>::run_on_all(Lambda&& lambda){
+#ifdef PA_DEBUG_ListenerSet
+    auto scope = m_sanitizer.check_scope();
+#endif
+    if (empty()){
+        return;
+    }
+    std::exception_ptr err;
+
+    m_lock.acquire_read();
+
+    Node* node = m_list;
+    while (node){
+        bool return_now = false;
+        {
+            ReadSpinLock lg(node->lock, "ListenerSet::run_on_all()");
+
+#ifdef PA_DEBUG_ListenerSet
+            node->sanitizer.check_usage();
+#endif
+            m_lock.unlock_read();
+            try{
+                return_now = lambda(node->listener);
+            }catch (...){
+                if (!err){
+                    err = std::current_exception();
+                }
+            }
+            m_lock.acquire_read();
+        }
+        if (return_now){
+            break;
+        }
+#ifdef PA_DEBUG_ListenerSet
+        node->sanitizer.check_usage();
+#endif
+        node = node->next;
+    }
+
+    m_lock.unlock_read();
+    if (err){
+        std::rethrow_exception(err);
+    }
+}
 
 
 
