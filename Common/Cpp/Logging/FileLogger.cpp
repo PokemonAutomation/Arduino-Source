@@ -9,6 +9,9 @@
 #include "FileLogger.h"
 #include <iostream>
 
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -138,7 +141,8 @@ void FileLogger::thread_loop(){
         m_cv.wait(lg, [&]{
             return m_stopping || !m_queue.empty();
         });
-        if (m_stopping){
+//        cout << "m_stopping = " << m_stopping << ", m_queue.size() = " << m_queue.size() << endl;
+        if (m_stopping && m_queue.empty()){
             break;
         }
         auto& item = m_queue.front();
