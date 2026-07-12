@@ -27,15 +27,15 @@ public:
     // - min_height: candidate image min height if video stream is 1080p
     ButtonMatcher(ButtonType type, size_t min_width, size_t min_height, double max_rmsd);
     static const ButtonMatcher& A(){
-        static ButtonMatcher matcher(ButtonType::ButtonA, 40, 40, 70);
+        static ButtonMatcher matcher(ButtonType::ButtonA, 40, 40, 100);
         return matcher;
     }
     static const ButtonMatcher& DpadLeft(){
-        static ButtonMatcher matcher(ButtonType::ButtonDpadLeft, 30, 30, 120);
+        static ButtonMatcher matcher(ButtonType::ButtonDpadLeft, 25, 25, 120);
         return matcher;
     }
     static const ButtonMatcher& DpadRight(){
-        static ButtonMatcher matcher(ButtonType::ButtonDpadRight, 30, 30, 120);
+        static ButtonMatcher matcher(ButtonType::ButtonDpadRight, 25, 25, 120);
         return matcher;
     }
 

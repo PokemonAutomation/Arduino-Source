@@ -72,7 +72,7 @@ bool SelectionArrowDetector::detect(const ImageViewRGB32& screen){
     double screen_rel_size_2 = screen_rel_size * screen_rel_size;
 
     double min_area_1080p = 400;
-    double rmsd_threshold = 80;
+    double rmsd_threshold = 100;
     size_t min_area = size_t(screen_rel_size_2 * min_area_1080p);
 
     const std::vector<std::pair<uint32_t, uint32_t>> FILTERS = {
