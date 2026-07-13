@@ -8,6 +8,7 @@
 #define PokemonAutomation_SettingsResourceDownloadWidget_H
 
 #include <QLabel>
+#include <QPushButton>
 #include <QProgressBar>
 #include "Common/Qt/Options/ConfigWidget.h"
 #include "GlobalResourceDownloadManager.h"
