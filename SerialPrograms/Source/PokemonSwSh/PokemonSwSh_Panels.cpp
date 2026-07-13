@@ -94,7 +94,7 @@ namespace PokemonSwSh{
 PanelListFactory::PanelListFactory()
     : PanelListDescriptor(
         Pokemon::STRING_POKEMON + " Sword and Shield",
-        ImageRGB32(RESOURCE_PATH() + "CategoryIcons/PokemonSwSh.png")
+        RESOURCE_PATH() + "CategoryIcons/PokemonSwSh.png"
     )
 {}
 

@@ -50,7 +50,7 @@ namespace PokemonBDSP{
 PanelListFactory::PanelListFactory()
     : PanelListDescriptor(
         Pokemon::STRING_POKEMON + " Brilliant Diamond and Shining Pearl",
-        ImageRGB32(RESOURCE_PATH() + "CategoryIcons/PokemonBDSP.png")
+        RESOURCE_PATH() + "CategoryIcons/PokemonBDSP.png"
     )
 {}
 

@@ -43,7 +43,7 @@ namespace NintendoSwitch{
 PanelListFactory::PanelListFactory()
     : PanelListDescriptor(
         "Nintendo Switch",
-        ImageRGB32(RESOURCE_PATH() + "CategoryIcons/NintendoSwitch.png")
+        RESOURCE_PATH() + "CategoryIcons/NintendoSwitch.png"
     )
 {}
 

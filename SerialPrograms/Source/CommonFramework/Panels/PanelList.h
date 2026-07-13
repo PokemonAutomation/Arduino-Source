@@ -23,7 +23,11 @@ class PanelListDescriptor{
 
 public:
     virtual ~PanelListDescriptor() = default;
-    PanelListDescriptor(std::string name, ImageRGB32 icon = ImageRGB32(), bool enabled = true);
+    PanelListDescriptor(
+        std::string name,
+        const std::string& icon_path = "",
+        bool enabled = true
+    );
 
     const std::string& name() const{ return m_name; }
     const ImageRGB32& icon() const{ return m_icon; }

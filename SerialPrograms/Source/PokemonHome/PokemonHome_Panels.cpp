@@ -25,7 +25,7 @@ namespace PokemonHome{
 PanelListFactory::PanelListFactory()
     : PanelListDescriptor(
         Pokemon::STRING_POKEMON + " Home",
-        ImageRGB32(RESOURCE_PATH() + "CategoryIcons/PokemonHome.png")
+        RESOURCE_PATH() + "CategoryIcons/PokemonHome.png"
     )
 {}
 

@@ -4,6 +4,8 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "PanelList.h"
 
 //#include <iostream>
@@ -16,13 +18,20 @@ namespace PokemonAutomation{
 
 PanelListDescriptor::PanelListDescriptor(
     std::string name,
-    ImageRGB32 icon,
+    const std::string& icon_path,
     bool enabled
 )
     : m_name(std::move(name))
-    , m_icon(std::move(icon))
     , m_enabled(enabled)
-{}
+{
+    if (!icon_path.empty()){
+        try{
+            m_icon = ImageRGB32(icon_path);
+        }catch (FileException& e){
+            e.log(global_logger_tagged());
+        }
+    }
+}
 
 
 
