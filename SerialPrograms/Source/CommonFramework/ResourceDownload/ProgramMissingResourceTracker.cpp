@@ -5,6 +5,7 @@
  */
 
 
+// #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/ProgramSession.h"
 #include "ProgramMissingResourceTracker.h"
 
@@ -32,8 +33,18 @@ ProgramMissingResourceTracker::ProgramMissingResourceTracker(CancellableScope& s
 }
 
 void ProgramMissingResourceTracker::add_resource(const std::shared_ptr<ResourceDownload>& resource){
-    m_missing_resources.insert(resource);
-    resource->add_listener(*this);
+    std::lock_guard<Mutex> lg(m_lock);
+    
+    try {
+        m_missing_resources.insert(resource);
+        // throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "test."); 
+        resource->add_listener(*this);
+    }catch(...){
+        m_missing_resources.erase(resource);
+        resource->cancel_download();
+        throw;
+    }
+
 }
 
 

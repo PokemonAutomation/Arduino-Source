@@ -194,7 +194,7 @@ void MultiSwitchProgramWidget2::download_error(const std::string& message){
 }
 
 void MultiSwitchProgramWidget2::download_added(std::shared_ptr<ResourceDownload> download_ptr){
-    QMetaObject::invokeMethod(this, [this, download_ptr]{
+    QMetaObject::invokeMethod(this, [this, download_ptr = std::move(download_ptr)]() mutable{
         this->m_downloads_table->add_download(std::move(download_ptr));
     });
 }
