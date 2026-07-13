@@ -107,7 +107,6 @@ void register_all_statics(){
     RegisterConfigWidget<SettingsDeleteButtonWidget>();
     RegisterConfigWidget<SettingsCancelButtonWidget>();
     RegisterConfigWidget<SettingsProgressBarWidget>();
-    RegisterConfigWidget<SettingsDownloadPopupWidget>();
     RegisterConfigWidget<SettingsDownloadErrorWidget>();
 
     //  Integrations
