@@ -24,6 +24,7 @@
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "CommonFramework/Globals.h"
 //#include "CommonFramework/Logging/Logger.h"
+// #include "CommonFramework/ResourceDownload/ProgramMissingResourceTracker.h"
 #include "Integrations/ProgramTrackerInterfaces.h"
 
 namespace PokemonAutomation{
@@ -31,7 +32,12 @@ namespace PokemonAutomation{
 class StatsTracker;
 class CancellableScope;
 class ProgramDescriptor;
+class ResourceDownload;
 
+struct RequiredResourceResult {
+    std::vector<std::string> missing_resources;
+    bool requires_upgrade = false;
+};
 
 
 class ProgramSession : public TrackableProgram{
@@ -40,6 +46,9 @@ public:
         virtual void state_change(ProgramState state) = 0;
         virtual void stats_update(const StatsTracker* current_stats, const StatsTracker* historical_stats) = 0;
         virtual void error(const std::string& message) = 0;
+        virtual void download_error(const std::string& message) = 0;
+        virtual void download_added(std::shared_ptr<ResourceDownload> download_ptr) = 0;
+        virtual void all_downloads_done() = 0;
     };
 
     void add_listener(Listener& listener);
@@ -59,6 +68,16 @@ public:
     const ProgramDescriptor& descriptor() const{ return m_descriptor; }
     uint64_t instance_id() const{ return m_instance_id; }
     Logger& logger(){ return m_logger; }
+
+
+    // - return struct that contains the list of missing resources and boolean upgrade_warning.
+    // - upgrade_warning: is true if we need to warn the user to upgrade CC. 
+    // i.e. the resource that was/will be downloaded is more updated than what the program is expecting
+    // - a resource is considered to be missing if its ResourceVersionStatus is OUTDATED or NOT_APPLICABLE.
+    // - throw OperationFailedException if one of the required_resources isn't found within remote_resource_download_list
+    RequiredResourceResult find_missing_resources();
+
+    bool download_prereqs(CancellableScope& scope);
 
 
 public:
@@ -100,6 +119,9 @@ protected:
 public:
     void report_stats_changed();
     void report_error(const std::string& message);
+    void report_download_error(const std::string& message);
+    void report_download_added(std::shared_ptr<ResourceDownload> download_ptr);
+    void report_all_downloads_done();
 
 
 protected:
@@ -114,6 +136,7 @@ private:
     void set_state(ProgramState state);
     void push_stats();
     void push_error(const std::string& message);
+    void push_download_error(const std::string& message);
     void load_historical_stats();
     void update_historical_stats_with_current();
 
@@ -132,6 +155,9 @@ private:
 
     std::atomic<WallClock> m_timestamp;
     std::atomic<ProgramState> m_state;
+
+    // ProgramMissingResourceTracker m_missing_resource_tracker;
+
     AsyncTask m_program_thread;
 
 //    Mutex m_stats_lock;

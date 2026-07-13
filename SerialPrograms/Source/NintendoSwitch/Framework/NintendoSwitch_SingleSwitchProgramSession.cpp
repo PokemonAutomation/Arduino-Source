@@ -135,6 +135,24 @@ void SingleSwitchProgramSession::internal_stop_program(){
     }
 }
 void SingleSwitchProgramSession::internal_run_program(){
+    CancellableHolder<CancellableScope> scope;
+    {
+        std::lock_guard<Mutex> lg(program_lock());
+        if (current_state() != ProgramState::RUNNING){
+            return;
+        }
+        m_scope.store(&scope, std::memory_order_release);
+    }
+    bool success = download_prereqs(scope);
+    {
+        std::lock_guard<Mutex> lg(program_lock());
+        m_scope.store(nullptr, std::memory_order_release);
+    }
+
+    if (!success){
+        return;
+    }
+
     m_option.options().reset_state();
 
     SleepSuppressScope sleep_scope(GlobalSettings::instance().SLEEP_SUPPRESS->PROGRAM_RUNNING);

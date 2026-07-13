@@ -501,6 +501,10 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/ResourceDownload/DownloadThread.h
     Source/CommonFramework/ResourceDownload/GlobalResourceDownloadManager.cpp
     Source/CommonFramework/ResourceDownload/GlobalResourceDownloadManager.h
+    Source/CommonFramework/ResourceDownload/ProgramMissingResourceTracker.cpp
+    Source/CommonFramework/ResourceDownload/ProgramMissingResourceTracker.h
+    Source/CommonFramework/ResourceDownload/ProgramResourceDownloadWidget.cpp
+    Source/CommonFramework/ResourceDownload/ProgramResourceDownloadWidget.h
     Source/CommonFramework/ResourceDownload/ResourceDownload.cpp
     Source/CommonFramework/ResourceDownload/ResourceDownload.h
     Source/CommonFramework/ResourceDownload/ResourceDownloadHelpers.cpp
