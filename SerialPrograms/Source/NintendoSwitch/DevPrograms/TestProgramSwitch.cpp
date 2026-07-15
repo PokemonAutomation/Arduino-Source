@@ -14,6 +14,7 @@
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Cpp/Concurrency/BusyPeriodicRunner.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -173,9 +174,10 @@
 #include "PokemonFRLG/Inference/PokemonFRLG_BattleSelectionArrowDetector.h"
 #include "Controllers/RumbleListener.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
+#include "PokemonLZA/Inference/PokemonLZA_WeatherDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_WeatherDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_MainMenuDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.h"
-
 
 
 #include <QPixmap>
@@ -335,6 +337,69 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
     OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "asdf", console);
 
+
+#if 0
+    YCommIconDetector detector(COLOR_RED, true);
+    detector.make_overlays(overlays);
+
+    auto snapshot = feed.snapshot();
+    cout << detector.detect(snapshot) << endl;
+#endif
+    auto snapshot = feed.snapshot();
+#if 1
+
+    using namespace PokemonLZA;
+
+    const bool old_image_template_matching = PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING;
+    PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING = true;
+    cout << "Weather detector waterfill debug enabled (dump + stats)." << endl;
+
+    const struct {
+        WeatherIconType type;
+        const char* name;
+    } weather[] = {
+        {WeatherIconType::Clear,   "Clear"},
+        {WeatherIconType::Sunny,   "Sunny"},
+        {WeatherIconType::Rain,    "Rain"},
+        {WeatherIconType::Cloudy,  "Cloudy"},
+        {WeatherIconType::Foggy,   "Foggy"},
+        {WeatherIconType::Rainbow, "Rainbow"},
+    };
+    bool weather_detected[sizeof(weather)/sizeof(weather[0])] = {};
+
+    for (size_t i = 0; i < sizeof(weather)/sizeof(weather[0]); i++) {
+        const auto& entry = weather[i];
+        WeatherIconDetector detector(entry.type, &overlay);
+
+        detector.make_overlays(overlays);
+
+        bool detected = detector.detect(snapshot);
+        weather_detected[i] = detected;
+
+        cout << entry.name
+            << ": "
+            << (detected ? "MATCH" : "NO MATCH")
+            << endl;
+    }
+
+    PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING = old_image_template_matching;
+    cout << "Weather detector waterfill debug restored." << endl;
+
+    cout << endl;
+    cout << "Weather Summary:" << endl;
+    for (size_t i = 0; i < sizeof(weather)/sizeof(weather[0]); i++) {
+        cout << weather[i].name
+            << ": "
+            << (weather_detected[i] ? "MATCH" : "NO MATCH")
+            << endl;
+    }
+
+    scope.wait_for(std::chrono::seconds(30));
+#endif
+
+
+
+//    context->issue_gyro_accel_x(&scope, 1000ms, 1000ms, 0ms, 123);
 
 //    SinglesAIOption ai(false);
 //    run_singles_battle(console, context, ai, false);
