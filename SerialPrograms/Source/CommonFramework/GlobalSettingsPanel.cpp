@@ -317,6 +317,12 @@ GlobalSettings::GlobalSettings()
 
     PA_ADD_OPTION(DEVELOPER_TOKEN);
 
+    USE_PADDLE_OCR.set_visibility(ConfigOptionState::HIDDEN);
+    RESOURCE_DOWNLOAD_TABLE.set_visibility(ConfigOptionState::HIDDEN);
+    DOWNLOAD_ERROR.set_visibility(ConfigOptionState::HIDDEN);
+    SAVE_DEBUG_VIDEOS_ON_SWITCH.set_visibility(ConfigOptionState::HIDDEN);
+    DEVICE_LOGGING_FLAG.set_visibility(ConfigOptionState::HIDDEN);
+
     GlobalSettings::on_config_value_changed(this);
     ENABLE_LIFETIME_SANITIZER0.add_listener(*this);
     OPEN_BASE_FOLDER_BUTTON.add_listener(static_cast<ButtonListener&>(*this));

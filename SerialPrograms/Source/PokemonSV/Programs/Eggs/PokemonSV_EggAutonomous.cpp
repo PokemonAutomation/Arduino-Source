@@ -55,22 +55,25 @@ EggAutonomous_Descriptor::EggAutonomous_Descriptor()
 struct EggAutonomous_Descriptor::Stats : public StatsTracker{
     Stats()
         : m_sandwiches(m_stats["Sandwiches"])
-        , m_fetch_attempts(m_stats["Fetch Attempts"])
+        , m_fetch_attempts(m_stats["Fetches"])
         , m_eggs(m_stats["Eggs"])
         , m_hatched(m_stats["Hatched"])
         , m_shinies(m_stats["Shinies"])
         , m_kept(m_stats["Kept"])
+        , m_attacked(m_stats["Attacked"])
         , m_errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Sandwiches");
-        m_display_order.emplace_back("Fetch Attempts");
+        m_display_order.emplace_back("Fetches", ALWAYS_HIDDEN);
         m_display_order.emplace_back("Eggs");
         m_display_order.emplace_back("Hatched");
         m_display_order.emplace_back("Shinies");
         m_display_order.emplace_back("Kept");
+        m_display_order.emplace_back("Attacked", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
 
         m_aliases.emplace(STRING_POKEMON + " Kept", "Kept");
+        m_aliases.emplace(STRING_POKEMON + "Fetch Attempts", "Fetches");
     }
 
     std::atomic<uint64_t>& m_sandwiches;
@@ -79,6 +82,7 @@ struct EggAutonomous_Descriptor::Stats : public StatsTracker{
     std::atomic<uint64_t>& m_hatched;
     std::atomic<uint64_t>& m_shinies;
     std::atomic<uint64_t>& m_kept;
+    std::atomic<uint64_t>& m_attacked;
     std::atomic<uint64_t>& m_errors;
 };
 std::unique_ptr<StatsTracker> EggAutonomous_Descriptor::make_stats() const{
@@ -487,6 +491,7 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
                 context,
                 &NOTIFICATION_ERROR_RECOVERABLE,
                 &BATTLE_AI,
+                &stats.m_attacked,
                 (uint8_t)num_eggs_in_party,
                 hatched_callback
             );
@@ -498,6 +503,7 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
                 context,
                 &NOTIFICATION_ERROR_RECOVERABLE,
                 &BATTLE_AI,
+                &stats.m_attacked,
                 (uint8_t)num_eggs_in_party,
                 hatched_callback
             );

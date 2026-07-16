@@ -24,7 +24,7 @@ namespace PokemonLGPE{
 PanelListFactory::PanelListFactory()
     : PanelListDescriptor(
         Pokemon::STRING_POKEMON + " Let's Go Pikachu and Eevee",
-        ImageRGB32(RESOURCE_PATH() + "CategoryIcons/PokemonLGPE.png")
+        RESOURCE_PATH() + "CategoryIcons/PokemonLGPE.png"
     )
 {}
 

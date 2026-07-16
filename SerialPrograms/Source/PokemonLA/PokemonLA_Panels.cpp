@@ -56,7 +56,7 @@ namespace PokemonLA{
 PanelListFactory::PanelListFactory()
     : PanelListDescriptor(
         Pokemon::STRING_POKEMON + " Legends: Arceus",
-        ImageRGB32(RESOURCE_PATH() + "CategoryIcons/PokemonLA.png")
+        RESOURCE_PATH() + "CategoryIcons/PokemonLA.png"
     )
 {}
 

@@ -78,7 +78,7 @@ namespace PokemonSV{
 PanelListFactory::PanelListFactory()
     : PanelListDescriptor(
         Pokemon::STRING_POKEMON + " Scarlet and Violet",
-        ImageRGB32(RESOURCE_PATH() + "CategoryIcons/PokemonSV.png")
+        RESOURCE_PATH() + "CategoryIcons/PokemonSV.png"
     )
 {}
 

@@ -48,7 +48,7 @@ void rng_reset_and_return_home(
         }
 
         StartGameUserSelectWatcher user_select(console, COLOR_GREEN);
-        HomeMenuWatcher home(console, std::chrono::milliseconds(2000));
+        HomeMenuWatcher home(console, false, COLOR_RED, std::chrono::milliseconds(2000));
         UpdateMenuWatcher update_menu(console, COLOR_PURPLE);
         CheckOnlineWatcher check_online(COLOR_CYAN);
         BlackScreenWatcher black_screen(COLOR_BLUE, {0.1, 0.15, 0.8, 0.7});

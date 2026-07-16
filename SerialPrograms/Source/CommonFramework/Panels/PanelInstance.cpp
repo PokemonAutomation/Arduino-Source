@@ -21,7 +21,11 @@ namespace PokemonAutomation{
 PanelInstance::PanelInstance(const PanelDescriptor& descriptor)
     : m_descriptor(descriptor)
 {
-    validate_resource_list();
+    try{
+        validate_resource_list();
+    }catch (FileException& e){
+        e.log(global_logger_tagged());
+    }
 }
 
 void PanelInstance::from_json(){
@@ -45,12 +49,15 @@ void PanelInstance::save_settings() const{
 
 
 void PanelInstance::validate_resource_list(){
-
     const std::unordered_set<std::string>& master_list = all_resource_names();
 
-    for (std::string resource_string : m_descriptor.required_resources()){
+    for (const std::string& resource_string : m_descriptor.required_resources()){
         if (!master_list.contains(resource_string)){
-            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "validate_resource_list: Invalid resource in descriptor."); 
+            throw InternalProgramError(
+                nullptr,
+                PA_CURRENT_FUNCTION,
+                "validate_resource_list: Invalid resource in descriptor."
+            );
         }
     }
 }

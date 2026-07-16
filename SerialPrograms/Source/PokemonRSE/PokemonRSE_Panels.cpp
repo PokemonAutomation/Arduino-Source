@@ -27,7 +27,7 @@ namespace PokemonRSE{
 PanelListFactory::PanelListFactory()
     : PanelListDescriptor(
         Pokemon::STRING_POKEMON + " Ruby, Sapphire, and Emerald",
-        ImageRGB32(RESOURCE_PATH() + "CategoryIcons/PokemonRS.png")
+        RESOURCE_PATH() + "CategoryIcons/PokemonRS.png"
     )
 {}
 

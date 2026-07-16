@@ -81,6 +81,20 @@ void ComputerProgramSession::internal_stop_program(){
     }
 }
 void ComputerProgramSession::internal_run_program(){
+    CancellableHolder<CancellableScope> download_scope;
+    {
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
+        m_scope = &download_scope;
+    }
+    bool success = download_prereqs(download_scope);
+    {
+        std::lock_guard<Mutex> lg(program_lock());
+        m_scope = nullptr;
+    }    
+    if (!success){
+        return;
+    }
+        
     GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread(logger());
     m_option.options().reset_state();
 

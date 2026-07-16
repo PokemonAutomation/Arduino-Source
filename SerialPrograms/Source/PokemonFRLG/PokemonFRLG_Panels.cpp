@@ -44,7 +44,7 @@ namespace PokemonFRLG{
 PanelListFactory::PanelListFactory()
     : PanelListDescriptor(
         Pokemon::STRING_POKEMON + " FireRed and LeafGreen",
-        ImageRGB32(RESOURCE_PATH() + "CategoryIcons/PokemonFRLG.png")
+        RESOURCE_PATH() + "CategoryIcons/PokemonFRLG.png"
     )
 {}
 

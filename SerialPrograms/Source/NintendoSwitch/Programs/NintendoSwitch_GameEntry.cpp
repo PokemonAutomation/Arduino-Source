@@ -142,7 +142,7 @@ void ensure_at_home(ConsoleHandle& console, ControllerContext& context, size_t r
     }
 
     for (size_t attempts = 0; attempts < retries; attempts++){
-        HomeMenuWatcher home_menu(console, 100ms);
+        HomeMenuWatcher home_menu(console, false, COLOR_RED, 100ms);
         context.wait_for_all_requests();
         int ret = wait_until(
             console, context, 5000ms,
@@ -335,33 +335,37 @@ void resume_game_from_home(
     context.wait_for_all_requests();
 
     while (true){
-        {
-            UpdateMenuWatcher update_detector(console);
-            int ret = wait_until(
-                console, context,
-                std::chrono::milliseconds(1000),
-                { update_detector }
-            );
-            if (ret == 0){
-                console.log("Detected update window.", COLOR_RED);
-
-                pbf_press_dpad(context, DPAD_UP, 40ms, 40ms);
-                pbf_press_dpad(context, DPAD_UP, 40ms, 40ms);
-                pbf_press_button(context, BUTTON_A, 80ms, 4000ms);
-                context.wait_for_all_requests();
-                continue;
+        UpdateMenuWatcher update_detector(console);
+        HomeMenuWatcher home_menu(console, false, COLOR_RED, std::chrono::milliseconds(5000));
+        HomeMenuWatcher no_home_menu(console, true, COLOR_RED, std::chrono::milliseconds(1000));
+        int ret = wait_until(
+            console, context,
+            std::chrono::milliseconds(30000),
+            {
+                update_detector,
+                home_menu,
+                no_home_menu,
             }
-        }
-
-        //  In case we failed to enter the game.
-        HomeMenuWatcher home_detector(console);
-        auto snapshot = console.video().snapshot();
-        if (home_detector.detect(snapshot)){
-            console.log("Failed to re-enter game. Trying again...", COLOR_RED);
-            pbf_press_button(context, BUTTON_HOME, 80ms, 80ms);
+        );
+        switch (ret){
+        case 0:
+            console.log("Detected update window.", COLOR_RED);
+            pbf_press_dpad(context, DPAD_UP, 40ms, 40ms);
+            pbf_press_dpad(context, DPAD_UP, 40ms, 40ms);
+            pbf_press_button(context, BUTTON_A, 80ms, 4000ms);
+            context.wait_for_all_requests();
             continue;
-        }else{
-            break;
+        case 1:
+            console.log("Detected HOME menu. (unexpected)", COLOR_RED);
+            pbf_press_button(context, BUTTON_HOME, 160ms, 5000ms);
+            context.wait_for_all_requests();
+            continue;
+        case 2:
+            console.log("No HOME detected. Assume entered game.", COLOR_BLUE);
+            return;
+        default:
+            console.log("resume_game_from_home(): No recognized state after 30 seconds. Assume entered game.", COLOR_RED);
+            return;
         }
     }
 }
@@ -555,7 +559,7 @@ void start_game_from_home_with_inference(
 
             WallClock deadline = current_time() + std::chrono::minutes(5);
             while (current_time() < deadline){
-                HomeMenuWatcher home(console, std::chrono::milliseconds(2000));
+                HomeMenuWatcher home(console, false, COLOR_RED, std::chrono::milliseconds(2000));
                 StartGameUserSelectWatcher user_select(console, COLOR_GREEN);
                 UpdateMenuWatcher update_menu(console, COLOR_PURPLE);
                 CheckOnlineWatcher check_online(COLOR_CYAN);

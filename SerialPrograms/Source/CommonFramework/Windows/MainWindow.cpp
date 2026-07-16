@@ -13,8 +13,10 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QMessageBox>
+#include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/Logging/MultiOutputLogger.h"
 #include "Common/Cpp/CpuId/CpuId.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/FileWindowLogger.h"
@@ -386,6 +388,9 @@ void MainWindow::load_panel(
     }
 
     m_panel_transition = true;
+    ScopeExit cleanup([&]{
+        m_panel_transition = false;
+    });
     close_panel();
 
     //  Make new widget.
@@ -396,14 +401,17 @@ void MainWindow::load_panel(
         m_current_panel_descriptor = std::move(descriptor);
         m_current_panel = std::move(panel);
         m_right_panel_layout->addWidget(m_current_panel_widget);
+        return;
+    }catch (Exception& e){
+        e.log(global_logger_tagged());
+    }catch (std::exception& e){
+        global_logger_tagged().log(std::string("MainWindow::load_panel() - Exception: ") + e.what(), COLOR_RED);
     }catch (...){
-        if (m_current_panel_widget != nullptr){
-            delete m_current_panel_widget;
-        }
-        m_panel_transition = false;
-        throw;
+        global_logger_tagged().log("MainWindow::load_panel() - Unknown Exception", COLOR_RED);
     }
-    m_panel_transition = false;
+    if (m_current_panel_widget != nullptr){
+        delete m_current_panel_widget;
+    }
 }
 void MainWindow::on_busy(){
     if (m_program_list){

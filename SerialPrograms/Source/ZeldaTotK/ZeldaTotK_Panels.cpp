@@ -24,7 +24,7 @@ namespace ZeldaTotK{
 PanelListFactory::PanelListFactory()
     : PanelListDescriptor(
         "Zelda: Tears of the Kingdom",
-        ImageRGB32(RESOURCE_PATH() + "CategoryIcons/ZeldaTotK.png")
+        RESOURCE_PATH() + "CategoryIcons/ZeldaTotK.png"
     )
 {}
 

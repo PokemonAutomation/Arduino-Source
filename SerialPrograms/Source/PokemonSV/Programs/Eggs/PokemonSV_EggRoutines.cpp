@@ -126,7 +126,8 @@ bool do_egg_cycle_motion(
     ProgramEnvironment& env,
     VideoStream& stream, ProControllerContext& context,
     EventNotificationOption* attacked_notification,
-    const SinglesAIOption* battle_ai
+    const SinglesAIOption* battle_ai,
+    std::atomic<uint64_t>* attacked
 ){
     AdvanceDialogWatcher dialog(COLOR_RED);
     NormalBattleMenuWatcher battle_menu(COLOR_GREEN);
@@ -150,6 +151,10 @@ bool do_egg_cycle_motion(
         break;
     case 1:
         stream.log("You got attacked!", COLOR_RED);
+        if (attacked){
+            (*attacked)++;
+            env.update_stats();
+        }
         if (attacked_notification){
             send_program_recoverable_error_notification(
                 env, *attacked_notification,
@@ -649,6 +654,7 @@ void hatch_eggs_at_zero_gate(
     VideoStream& stream, ProControllerContext& context,
     EventNotificationOption* attacked_notification,
     const SinglesAIOption* battle_ai,
+    std::atomic<uint64_t>* attacked,
     uint8_t num_eggs_in_party,
     std::function<void(uint8_t)> egg_hatched_callback)
 {
@@ -702,7 +708,14 @@ void hatch_eggs_at_zero_gate(
         }
 
         // Circular motions:
-        while (do_egg_cycle_motion(env, stream, context, attacked_notification, battle_ai)){
+        while (do_egg_cycle_motion(
+            env,
+            stream,
+            context,
+            attacked_notification,
+            battle_ai,
+            attacked
+        )){
             reset_position_at_zero_gate(env.program_info(), stream, context);
         }
 
@@ -722,6 +735,7 @@ void hatch_eggs_at_area_three_lighthouse(
     VideoStream& stream, ProControllerContext& context,
     EventNotificationOption* attacked_notification,
     const SinglesAIOption* battle_ai,
+    std::atomic<uint64_t>* attacked,
     uint8_t num_eggs_in_party,
     std::function<void(uint8_t)> egg_hatched_callback)
 {
@@ -784,7 +798,14 @@ void hatch_eggs_at_area_three_lighthouse(
         }
 
         // Circular motions:
-        while (do_egg_cycle_motion(env, stream, context, attacked_notification, battle_ai)){
+        while (do_egg_cycle_motion(
+            env,
+            stream,
+            context,
+            attacked_notification,
+            battle_ai,
+            attacked
+        )){
             open_map_from_overworld(env.program_info(), stream, context);
             pbf_move_left_joystick(context, {+0.567, +1}, 160ms, 400ms);
             fly_to_overworld_from_map(env.program_info(), stream, context);
@@ -826,7 +847,7 @@ void hatch_eggs_anywhere(
         context.wait_for_all_requests();
 
         // Circular motions:
-        do_egg_cycle_motion(env, stream, context, nullptr, nullptr);
+        do_egg_cycle_motion(env, stream, context, nullptr, nullptr, nullptr);
 
         handle_egg_hatching(env.program_info(), stream, context, num_eggs_in_party, egg_idx, egg_hatched_callback);
     } // end hatching each egg

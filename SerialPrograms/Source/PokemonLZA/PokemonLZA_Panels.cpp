@@ -63,7 +63,7 @@ namespace PokemonLZA{
 PanelListFactory::PanelListFactory()
     : PanelListDescriptor(
         Pokemon::STRING_POKEMON + " Legends: Z-A",
-        ImageRGB32(RESOURCE_PATH() + "CategoryIcons/PokemonLZA.png")
+        RESOURCE_PATH() + "CategoryIcons/PokemonLZA.png"
     )
 {}
 

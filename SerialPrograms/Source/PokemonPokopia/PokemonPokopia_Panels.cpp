@@ -22,7 +22,7 @@ namespace PokemonPokopia{
 PanelListFactory::PanelListFactory()
     : PanelListDescriptor(
         Pokemon::STRING_POKEMON + " Pokopia",
-        ImageRGB32(RESOURCE_PATH() + "CategoryIcons/PokemonPokopia.png")
+        RESOURCE_PATH() + "CategoryIcons/PokemonPokopia.png"
     )
 {}
 
