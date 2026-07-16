@@ -22,6 +22,19 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
+enum class EggAutoPhase{
+    BIKE_LOOP,
+    HATCHING,
+    FLY_RESET,
+    FETCH_EGG,
+
+};
+
+struct EggFetchResult{
+    size_t num_eggs_retrieved;
+    bool hatch_detected;
+};
+
 
 class EggAutonomous_Descriptor : public SingleSwitchProgramDescriptor{
 public:
@@ -50,12 +63,34 @@ private:
         EggAutonomous_Descriptor::Stats& stats
     );
 
+
+    // return true if egg hatching detected during the bike loop
+    bool run_bike_loop(
+        SingleSwitchProgramEnvironment& env,
+        ProControllerContext& context
+    );
+
+    void exceed_bike_loop_limit(
+        SingleSwitchProgramEnvironment& env,
+        ProControllerContext& context,
+        size_t max_bike_loop_count
+    );
+
+    // Return updated `num_eggs_hatched` to reflect change in hatched eggs.
+    size_t hatch_routine(
+        SingleSwitchProgramEnvironment& env,
+        ProControllerContext& context,
+        EggAutonomous_Descriptor::Stats& stats,
+        size_t num_eggs_hatched
+    );
+
     void save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
     // Call flying taxi to reset player character position to Nursery front door.
     // fly_from_overworld: if true, the game is in the overworld while calling this function. If false, the game is in the menu.
     // Note: the cursor in the menu must already be at Town Map.
-    void call_flying_taxi(
+    // return true if egg hatching detected while trying to open Rotom phone menu
+    bool call_flying_taxi(
         SingleSwitchProgramEnvironment& env,
         ProControllerContext& context,
         bool fly_from_overworld
@@ -71,8 +106,10 @@ private:
     );
 
     // Call this function when standing in front of the lady to fetch one egg.
-    // Return updated `num_eggs_retrieved` to reflect change in fetched eggs.
-    size_t talk_to_lady_to_fetch_egg(
+    // return EggFetchResult, which is a struct of the following:
+    //  - num_eggs_retrieved: updated `num_eggs_retrieved` that reflects the change in fetched eggs.
+    //  - hatch_detected: boolean that is true if hatch was detected.
+    EggFetchResult talk_to_lady_to_fetch_egg(
         SingleSwitchProgramEnvironment& env,
         ProControllerContext& context,
         EggAutonomous_Descriptor::Stats& stats,

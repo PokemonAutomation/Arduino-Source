@@ -299,119 +299,88 @@ bool EggAutonomous::run_batch(
     env.update_stats();
     send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
+    EggAutoPhase phase = EggAutoPhase::BIKE_LOOP;
     if (m_player_at_loop_start == false){ // reset position
-        const bool fly_from_overworld = true; // fly from menu
-        call_flying_taxi(env, context, fly_from_overworld);
+        phase = EggAutoPhase::FLY_RESET;
     }
 
-    size_t bike_loop_count = 0;
+    size_t total_bike_loop_count = 0;
     const size_t MAX_BIKE_LOOP_COUNT = 100;
+    size_t num_loops_since_last_fetch_attempt = 0;
+
     size_t num_eggs_hatched = 0;
     m_player_at_loop_start = false;
-
+    
     // Each iteration in the while-loop is made by:
     // - bike loops of LOOPS_PER_FETCH times. Bike loops begin at lady or nursery front door, end at lady.
     // - if not enough eggs fetched, talk to lady to try fetching an egg.
     while (num_eggs_hatched < 5 || m_num_eggs_retrieved < 5){
-        // Detect when Y-Comm icon disappears. This is the time an egg is hatching
-        const bool y_comm_visible_when_egg_hatching = false;
-        YCommIconWatcher egg_hatching_detector(COLOR_RED, y_comm_visible_when_egg_hatching);
 
-        bool restart_bike_loop = false;
-        for (size_t i_bike_loop = 0; i_bike_loop < this->LOOPS_PER_FETCH && bike_loop_count < MAX_BIKE_LOOP_COUNT;){
-            context.wait_for_all_requests();
-            // +1 here because video overlay is for general users. General users start counts at 1, while us programmers start count at 0.
-            if (restart_bike_loop){
-                env.console.overlay().add_log("Restart loop " + std::to_string(bike_loop_count+1), COLOR_WHITE);
-                restart_bike_loop = false;
-            }else{
-                env.console.overlay().add_log("Loop " + std::to_string(bike_loop_count+1), COLOR_WHITE);
-            }
-            int ret = run_until<ProControllerContext>(
-                env.console, context,
-                [](ProControllerContext& context){
-                    travel_to_spin_location(context);
-                    travel_back_to_lady(context);
-                },
-                {{egg_hatching_detector}}
-            );
+        // NOTE: the egg hatching detector cannot be constantly running, 
+        // since it only detects the black dialog box, and speaking to the lady will also produce a black dialog box.
+        // therefore, each phase has its own egg hatching detector, so it can be more easily turned on and off.
 
-            if (ret < 0){ // we are at nursery lady; no egg hatching detected
-                ++i_bike_loop;
-                ++bike_loop_count;
+        switch(phase){
+        case EggAutoPhase::BIKE_LOOP:{
+            env.console.overlay().add_log("Loop " + std::to_string(total_bike_loop_count+1), COLOR_WHITE);
+            env.console.log("Bike Loop " + std::to_string(total_bike_loop_count+1));
+            bool hatch_detected = run_bike_loop(env, context);
+            if (hatch_detected){
+                phase = EggAutoPhase::HATCHING;
                 continue;
             }
 
-            // Egg hatching
-            do{
-                ++num_eggs_hatched;
-                stats.m_hatched++;
-                env.update_stats();
-                wait_for_egg_hatched(env, context, stats, num_eggs_hatched);
-                if (num_eggs_hatched == 5){
-                    // We hatched all five eggs. No more eggs can hatch. Go to next loop
-                    break;
+            // done Bike loop
+            ++num_loops_since_last_fetch_attempt;
+            ++total_bike_loop_count;
+            if (total_bike_loop_count >= MAX_BIKE_LOOP_COUNT){
+                exceed_bike_loop_limit(env, context, MAX_BIKE_LOOP_COUNT);
+            }
+
+            if (num_loops_since_last_fetch_attempt < LOOPS_PER_FETCH){
+                phase = EggAutoPhase::BIKE_LOOP; // repeat bike loop
+            }else{
+                if (m_num_eggs_retrieved < 5){
+                    phase = EggAutoPhase::FETCH_EGG;
+                }else{
+                    // done retrieving eggs
+                    // resume hatching eggs if needed
+                    phase = EggAutoPhase::BIKE_LOOP;
                 }
-                // Now we see if we can hatch one more egg.
-                ret = run_until<ProControllerContext>(
-                    env.console, context,
-                    [](ProControllerContext& context){
-                        //  Try move a little to hatch more:
-                        //  We move toward lower-left so that it wont hit the lady or enter the Nursory.
-                        //  Add 1 second of settle time to stop moving.
-                        //  We need to not be moving before trying to fly or an egg will hatch during
-                        //  that sequence when we cannot handle it.
-                        pbf_move_left_joystick(context, {-1, -1}, 800ms, 1000ms);
-                    },
-                    {{egg_hatching_detector}}
-                );
-            }while (ret == 0);
-            // now no more hatching in this bike loop
-            // We either cannot find a consecutive hatch any more or we already hatch five of them
-
-            if (num_eggs_hatched == 5 && m_num_eggs_retrieved == 5){
-                m_player_at_loop_start = false;
-                break;
             }
-
-            // Now we either cannot find a consecutive hatch any more, or we already hatch five for them, but
-            // we still need to fetch more eggs
-
-            // Use fly to reset the location because now we don't know where the player character is.
-            const bool fly_from_overworld = true;
-            call_flying_taxi(env, context, fly_from_overworld);
-            restart_bike_loop = true;
-            // We don't update i_bike_loop here because we haven't finished one full bike loop due to egg hatching
-        } // end one bike loop
-
-        if (bike_loop_count >= MAX_BIKE_LOOP_COUNT){
-            env.log("Reached max number of bike loops " + std::to_string(MAX_BIKE_LOOP_COUNT));
-            env.console.overlay().add_log("Error: max loops " + std::to_string(MAX_BIKE_LOOP_COUNT), COLOR_WHITE);
-            env.log("Take a screenshot of party to debug.");
-            // Now take a photo at the player's party for dumping debug info:
-            // Enter Rotom Phone menu
-            pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
-            // Select Pokemon App
-            navigate_to_menu_app(env.console, context, POKEMON_APP_INDEX);
-            // From menu enter Pokemon App
-            ssf_press_button(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY0, EGG_BUTTON_HOLD_DELAY);
-            context.wait_for_all_requests();
-
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Max number of loops reached. Not enough eggs in party?",
-                env.console
-            );
+            continue;
         }
-        
-        context.wait_for_all_requests();
-        if (m_num_eggs_retrieved < 5){
-            // Update num_eggs_retrieved
-            m_num_eggs_retrieved = talk_to_lady_to_fetch_egg(env, context, stats, m_num_eggs_retrieved);
-            if (num_eggs_hatched == 5 && m_num_eggs_retrieved == 5){
-                m_player_at_loop_start = true;
-                break;
+        case EggAutoPhase::HATCHING:{
+            env.console.log("Hatching egg.");
+            num_eggs_hatched = hatch_routine(env, context, stats, num_eggs_hatched);
+            phase = EggAutoPhase::FLY_RESET;
+            continue;
+        }
+        case EggAutoPhase::FLY_RESET:{
+            env.console.log("Call flying taxi to reset position.");
+            const bool fly_from_overworld = true;
+            bool hatch_detected = call_flying_taxi(env, context, fly_from_overworld);
+            if (hatch_detected){
+                phase = EggAutoPhase::HATCHING;
+            }else{
+                phase = EggAutoPhase::BIKE_LOOP;
             }
+            continue;
+        }
+        case EggAutoPhase::FETCH_EGG:{
+            env.console.log("Talk to lady to fetch egg.");
+            EggFetchResult fetch_result = talk_to_lady_to_fetch_egg(env, context, stats, m_num_eggs_retrieved);
+            if (fetch_result.hatch_detected){
+                phase = EggAutoPhase::HATCHING;
+            }else{
+                m_num_eggs_retrieved = fetch_result.num_eggs_retrieved;
+
+                // if spoke to lady, back to the bike loop regardless of the success of the egg fetch
+                num_loops_since_last_fetch_attempt = 0;
+                phase = EggAutoPhase::BIKE_LOOP;
+            }
+            continue;
+        }
         }
     }
 
@@ -452,6 +421,88 @@ bool EggAutonomous::run_batch(
     return false;
 }
 
+bool EggAutonomous::run_bike_loop(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context
+){
+
+    // use Black dialog box detector as proxy for detecting when an egg is hatching
+    BlackDialogBoxWatcher2 egg_hatching_detector;
+    int ret = run_until<ProControllerContext>(
+        env.console, context,
+        [](ProControllerContext& context){
+            travel_to_spin_location(context);
+            travel_back_to_lady(context);
+        },
+        {{egg_hatching_detector}}
+    );
+
+    bool hatch_detected = ret == 0;
+    if (hatch_detected){
+        env.console.log("Hatching detected during bike loop.");
+    }
+    return hatch_detected;
+}
+
+void EggAutonomous::exceed_bike_loop_limit(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    size_t max_bike_loop_count
+){
+    env.console.log("Reached max number of bike loops " + std::to_string(max_bike_loop_count));
+    env.console.overlay().add_log("Error: max loops " + std::to_string(max_bike_loop_count), COLOR_WHITE);
+    env.console.log("Take a screenshot of party to debug.");
+    // Now take a photo at the player's party for dumping debug info:
+    // Enter Rotom Phone menu
+    pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
+    // Select Pokemon App
+    navigate_to_menu_app(env.console, context, POKEMON_APP_INDEX);
+    // From menu enter Pokemon App
+    ssf_press_button(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY0, EGG_BUTTON_HOLD_DELAY);
+    context.wait_for_all_requests();
+
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "Max number of loops reached. Not enough eggs in party?",
+        env.console
+    );
+
+}
+
+size_t EggAutonomous::hatch_routine(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EggAutonomous_Descriptor::Stats& stats,
+    size_t num_eggs_hatched
+){
+    // use Black dialog box detector as proxy for detecting when an egg is hatching    
+    BlackDialogBoxWatcher2 egg_hatching_detector;
+
+    int ret = -1;
+    do{
+        ++num_eggs_hatched;
+        stats.m_hatched++;
+        env.update_stats();
+        wait_for_egg_hatched(env, context, stats, num_eggs_hatched);
+
+        // Now we see if we can hatch one more egg.
+        ret = run_until<ProControllerContext>(
+            env.console, context,
+            [](ProControllerContext& context){
+                //  Try move a little to hatch more:
+                //  We move toward lower-left so that it wont hit the lady or enter the Nursory.
+                //  Add 1 second of settle time to stop moving.
+                //  We need to not be moving before trying to fly or an egg will hatch during
+                //  that sequence when we cannot handle it.
+                pbf_move_left_joystick(context, {-1, -1}, 800ms, 1000ms);
+            },
+            {{egg_hatching_detector}}
+        );
+    }while (ret == 0);
+
+    return num_eggs_hatched;
+}
+
 void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     context.wait_for_all_requests();
     env.log("Save game.");
@@ -462,25 +513,40 @@ void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, ProController
     mash_B_until_y_comm_icon(env, context, "Cannot detect end of saving game.");
 }
 
-void EggAutonomous::call_flying_taxi(
+bool EggAutonomous::call_flying_taxi(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     bool fly_from_overworld
 ){
-    context.wait_for_all_requests();
-    env.console.overlay().add_log("Call Flying Taxi", COLOR_WHITE);
-    if (fly_from_overworld){
-        // Open menu
-        env.log("Fly from overworld to reset position");
-        ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
-    }else{
-        env.log("Fly from menu to reset position");
+
+    BlackDialogBoxWatcher2 egg_hatching_detector;
+    int ret = run_until<ProControllerContext>(
+        env.console, context,
+        [&](ProControllerContext& context){
+            context.wait_for_all_requests();
+            env.console.overlay().add_log("Call Flying Taxi", COLOR_WHITE);
+            if (fly_from_overworld){
+                // Open menu
+                env.log("Fly from overworld to reset position");
+                ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
+            }else{
+                env.log("Fly from menu to reset position");
+            }
+
+            navigate_to_menu_app(env.console, context, TOWN_MAP_APP_INDEX);            
+        },
+        {{egg_hatching_detector}}
+    );
+
+    bool hatch_detected = ret == 0;
+    if (hatch_detected){
+        env.console.log("Hatching detected while trying to call flying taxi.");
+    }else {
+        fly_home(context, false);
+        mash_B_until_y_comm_icon(env, context, "Cannot detect end of flying taxi animation.");
     }
 
-    navigate_to_menu_app(env.console, context, TOWN_MAP_APP_INDEX);
-
-    fly_home(context, false);
-    mash_B_until_y_comm_icon(env, context, "Cannot detect end of flying taxi animation.");
+    return hatch_detected;
 }
 
 void EggAutonomous::wait_for_egg_hatched(
@@ -508,7 +574,7 @@ void EggAutonomous::wait_for_egg_hatched(
     }
 }
 
-size_t EggAutonomous::talk_to_lady_to_fetch_egg(
+EggFetchResult EggAutonomous::talk_to_lady_to_fetch_egg(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EggAutonomous_Descriptor::Stats& stats,
@@ -520,6 +586,7 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
     // collect_egg(context);
     RetrieveEggArrowFinder egg_arrow_detector(env.console);
     CheckNurseryArrowFinder no_egg_arrow_detector(env.console);
+    BlackDialogBoxWatcher2 egg_hatching_detector;
 
     int ret = run_until<ProControllerContext>(
         env.console, context,
@@ -532,6 +599,7 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
         {
             egg_arrow_detector,
             no_egg_arrow_detector,
+            egg_hatching_detector,
         }
     );
     
@@ -566,13 +634,26 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
             },
             {{dialog_over_detector}}
         );
-        return num_eggs_retrieved;
+        return EggFetchResult{ 
+            .num_eggs_retrieved = num_eggs_retrieved,
+            .hatch_detected = false
+        };
 //        break;
+    case 2:
+        env.log("Hatching detected while trying to talk to lady to fetch egg.");
+
+        return EggFetchResult{ 
+            .num_eggs_retrieved = num_eggs_retrieved,
+            .hatch_detected = true
+        };
 
     default:
         env.log("Daycare lady not found.");
         env.console.overlay().add_log("No daycare lady", COLOR_WHITE);
-        return num_eggs_retrieved;
+        return EggFetchResult{ 
+            .num_eggs_retrieved = num_eggs_retrieved,
+            .hatch_detected = false
+        };
 //        OperationFailedException::fire(
 //            ErrorReport::SEND_ERROR_REPORT,
 //            "Cannot detect dialog selection arrow when talking to Nursery lady.",
@@ -589,7 +670,10 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
         );
     }
 
-    return num_eggs_retrieved;
+    return EggFetchResult{ 
+        .num_eggs_retrieved = num_eggs_retrieved,
+        .hatch_detected = false
+    };
 }
 
 // After all five eggs hatched and another five eggs deposit into the first column of the box,
