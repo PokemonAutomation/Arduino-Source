@@ -550,6 +550,12 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         bool bad_stats = validate_level(filters, pokemon, ENCOUNTER_SLOTS, base_stats);
         RNG_FILTERS.set(filters);
 
+        if (bad_stats){
+            env.log("Invalid encounter stats. Resetting...", COLOR_RED);
+            failed_searches++;
+            continue;
+        }
+
         std::vector<AdvRngState> search_hits = refine_calibration_with_rare_candy(
             env, context, LANGUAGE, pokemon, filters, base_stats,
             uncertain_history, calibration_history, calibrations,
