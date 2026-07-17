@@ -353,6 +353,7 @@ bool EggAutonomous::run_batch(
             ++num_loops_since_last_fetch_attempt;
             ++total_bike_loop_count;
             if (total_bike_loop_count >= MAX_BIKE_LOOP_COUNT){
+                // throw exception
                 exceed_bike_loop_limit(env, context, MAX_BIKE_LOOP_COUNT);
             }
 
@@ -446,9 +447,30 @@ bool EggAutonomous::run_bike_loop(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context
 ){
-
-    // use Black dialog box detector as proxy for detecting when an egg is hatching
+    // confirm we are starting in the overworld
     BlackDialogBoxWatcher2 egg_hatching_detector;
+    YCommIconWatcher y_comm_detector(COLOR_RED, true);
+    int ret0 = wait_until(
+        env.console, context,
+        std::chrono::seconds(5),
+        {
+            egg_hatching_detector,
+            y_comm_detector,
+        }
+    );
+    if (ret0 == 0){
+        env.console.log("Hatching detected at start of bike loop.");
+        return true;
+    }
+    if (ret0 < 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "run_bike_loop: We expected to start in the overworld, but overworld not detected.",
+            env.console
+        );
+    }
+
+
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
@@ -496,8 +518,22 @@ size_t EggAutonomous::hatch_routine(
     EggAutonomous_Descriptor::Stats& stats,
     size_t num_eggs_hatched
 ){
-    // use Black dialog box detector as proxy for detecting when an egg is hatching    
+    // confirm we are starting with the hatching screen
     BlackDialogBoxWatcher2 egg_hatching_detector;
+    int ret0 = wait_until(
+        env.console, context,
+        std::chrono::seconds(5),
+        {
+            egg_hatching_detector,
+        }
+    );
+    if (ret0 < 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "hatch_routine: We expected to see a hatching egg, but no hatching detected.",
+            env.console
+        );
+    }
 
     int ret = -1;
     do{
@@ -596,10 +632,35 @@ EggFetchResult EggAutonomous::talk_to_lady_to_fetch_egg(
     env.log("Fetching egg");
     stats.m_fetch_attempts++;
     env.update_stats();
-    // collect_egg(context);
+
+    // confirm we are starting in the overworld
+    BlackDialogBoxWatcher2 egg_hatching_detector;
+    YCommIconWatcher y_comm_detector(COLOR_RED, true);
+    int ret0 = wait_until(
+        env.console, context,
+        std::chrono::seconds(5),
+        {
+            egg_hatching_detector,
+            y_comm_detector,
+        }
+    );
+    if (ret0 == 0){
+        env.console.log("Hatching detected at start of talking to lady.");
+        EggFetchResult{ 
+            .num_eggs_retrieved = num_eggs_retrieved,
+            .hatch_detected = true
+        };
+    }
+    if (ret0 < 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "talk_to_lady_to_fetch_egg: We expected to start in the overworld, but overworld not detected.",
+            env.console
+        );
+    }
+
     RetrieveEggArrowFinder egg_arrow_detector(env.console);
     CheckNurseryArrowFinder no_egg_arrow_detector(env.console);
-    BlackDialogBoxWatcher2 egg_hatching_detector;
 
     int ret = run_until<ProControllerContext>(
         env.console, context,
