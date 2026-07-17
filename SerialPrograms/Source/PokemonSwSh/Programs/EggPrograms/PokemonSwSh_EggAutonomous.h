@@ -84,8 +84,6 @@ private:
         size_t num_eggs_hatched
     );
 
-    void save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-
     // Call flying taxi to reset player character position to Nursery front door.
     // fly_from_overworld: if true, the game is in the overworld while calling this function. If false, the game is in the menu.
     // Note: the cursor in the menu must already be at Town Map.
@@ -131,13 +129,7 @@ private:
         bool need_taxi
     );
 
-    // Used to wait until Y-Comm icon shows up.
-    // Throw error if it does not find it after 10 sec.
-    void mash_B_until_y_comm_icon(
-        SingleSwitchProgramEnvironment& env,
-        ProControllerContext& context,
-        const std::string& error_msg
-    );
+
 
     StartInGripOrGameOption START_LOCATION;
     TouchDateIntervalOption TOUCH_DATE_INTERVAL;

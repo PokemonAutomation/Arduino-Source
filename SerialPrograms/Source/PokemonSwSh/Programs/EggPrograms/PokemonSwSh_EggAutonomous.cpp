@@ -229,7 +229,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
 
 
     if (AUTO_SAVING == AutoSave::AfterStartAndKeep){
-        save_game(env, context);
+        save_game(env.console, context);
         m_num_eggs_in_storage_when_game_saved = static_cast<uint8_t>(NUM_EGGS_IN_COLUMN.current_value());
         m_num_eggs_in_party_when_game_saved = static_cast<uint8_t>(NUM_EGGS_IN_PARTY.current_value());
     }
@@ -248,7 +248,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             if (TOUCH_DATE_INTERVAL.ok_to_touch_now()){
                 env.log("Touching date to prevent rollover.");
                 env.console.overlay().add_log("Touching date", COLOR_WHITE);
-                pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+                go_home(env.console, context);
                 touch_date_from_home(env.console, context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
                 resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             }
@@ -285,7 +285,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
                     env.console
                 );
             }
-            ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 160ms);
+            go_home(env.console, context);
             env.console.overlay().add_log("Reset game", COLOR_WHITE);
             reset_game_from_home_with_inference(
                 env.console, context,
@@ -433,7 +433,7 @@ bool EggAutonomous::run_batch(
     }
 
     if (save){
-        save_game(env, context);
+        save_game(env.console, context);
         m_num_eggs_in_storage_when_game_saved = 0;
         m_num_eggs_in_party_when_game_saved = 5;
     }
@@ -475,7 +475,7 @@ void EggAutonomous::exceed_bike_loop_limit(
     env.console.log("Take a screenshot of party to debug.");
     // Now take a photo at the player's party for dumping debug info:
     // Enter Rotom Phone menu
-    pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
+    menus_to_mainmenu(env.console, context);
     // Select Pokemon App
     navigate_to_menu_app(env.console, context, POKEMON_APP_INDEX);
     // From menu enter Pokemon App
@@ -524,15 +524,6 @@ size_t EggAutonomous::hatch_routine(
     return num_eggs_hatched;
 }
 
-void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    context.wait_for_all_requests();
-    env.log("Save game.");
-    env.console.overlay().add_log("Save game", COLOR_WHITE);
-    pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
-    pbf_press_button(context, BUTTON_R, 80ms, 2000ms);
-    pbf_mash_button(context, BUTTON_A, 500ms);
-    mash_B_until_y_comm_icon(env, context, "Cannot detect end of saving game.");
-}
 
 bool EggAutonomous::call_flying_taxi(
     SingleSwitchProgramEnvironment& env,
@@ -549,7 +540,7 @@ bool EggAutonomous::call_flying_taxi(
             if (fly_from_overworld){
                 // Open menu
                 env.log("Fly from overworld to reset position");
-                ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
+                menus_to_mainmenu(env.console, context);
             }else{
                 env.log("Fly from menu to reset position");
             }
@@ -564,7 +555,7 @@ bool EggAutonomous::call_flying_taxi(
         env.console.log("Hatching detected while trying to call flying taxi.");
     }else {
         fly_home(context, false);
-        mash_B_until_y_comm_icon(env, context, "Cannot detect end of flying taxi animation.");
+        mash_B_until_y_comm_icon(env.console, context, "Cannot detect end of flying taxi animation.");
     }
 
     return hatch_detected;
@@ -960,29 +951,6 @@ bool EggAutonomous::process_hatched_pokemon(
     return false;
 }
 
-void EggAutonomous::mash_B_until_y_comm_icon(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    const std::string& error_msg
-){
-    context.wait_for_all_requests();
-    const bool y_comm_visible = true;
-    YCommIconWatcher y_comm_detector(COLOR_RED, y_comm_visible);
-    int ret = run_until<ProControllerContext>(
-        env.console, context,
-        [](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_B, 10s);
-        },
-        {y_comm_detector}
-    );
-    if (ret != 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            error_msg + " No Y-Comm mark found.",
-            env.console
-        );
-    }
-}
 
 
 
