@@ -113,7 +113,8 @@ private:
         SingleSwitchProgramEnvironment& env,
         ProControllerContext& context,
         EggAutonomous_Descriptor::Stats& stats,
-        size_t num_eggs_retrieved
+        size_t num_eggs_retrieved,
+        size_t num_eggs_to_fetch
     );
 
     // After all five eggs hatched and another five eggs deposit into the first column of the box,
@@ -149,6 +150,7 @@ private:
     SimpleIntegerOption<uint8_t> MAX_KEEPERS;
     SimpleIntegerOption<uint8_t> LOOPS_PER_FETCH;
     IntegerEnumDropdownOption NUM_EGGS_IN_COLUMN;
+    IntegerEnumDropdownOption NUM_EGGS_IN_PARTY;
 
     enum class AutoSave{
         NoAutoSave,
@@ -174,8 +176,15 @@ private:
     // How many eggs have been placed behind a game save.
     // This is used so that if we recover from an error, we know how many eggs are in storage.
     size_t m_num_eggs_in_storage_when_game_saved = 0;
+
+    // This is used so that if we recover from an error, we know how many eggs are in the party
+    size_t m_num_eggs_in_party_when_game_saved = 0;
+
     // How many eggs are already deposited to storage so far.
     size_t m_num_eggs_retrieved = 0;
+
+    // number of eggs in party at the start of run_batch()
+    size_t m_num_eggs_in_party_at_batch_start = 0;
 
     // Is player's location at the bike loop start
     bool m_player_at_loop_start = false;
