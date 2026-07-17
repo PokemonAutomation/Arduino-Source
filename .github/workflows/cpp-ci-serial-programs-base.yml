@@ -72,7 +72,7 @@ jobs:
       if: startsWith(inputs.os, 'mac')
       run: |
         cd Arduino-Source
-        brew install opencv onnxruntime
+        brew install opencv@4 onnxruntime
 
         brew tap-new --no-git PA/libdpp
         brew trust PA/libdpp
