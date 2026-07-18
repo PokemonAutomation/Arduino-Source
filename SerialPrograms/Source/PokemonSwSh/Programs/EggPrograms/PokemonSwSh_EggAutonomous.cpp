@@ -457,8 +457,8 @@ bool EggAutonomous::run_bike_loop(
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            travel_to_spin_location(context);
-            travel_back_to_lady(context);
+            travel_to_spin_location2(context);
+            travel_back_to_lady2(context);
         },
         {{no_overworld}}
     );
