@@ -47,7 +47,7 @@ std::string ocr_read(Language language, const ImageViewRGB32& image, PageSegMode
     if (use_paddle_ocr()){
         ocr_text = OCR::paddle_ocr_read(language, image);
     }else{
-        ocr_text = OCR::tesseract_ocr_read(language, image, OCR::PageSegMode::SINGLE_LINE);
+        ocr_text = OCR::tesseract_ocr_read(language, image, psm);
     }
     return ocr_text;
 }
