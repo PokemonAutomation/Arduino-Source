@@ -4,12 +4,12 @@
  *
  */
 
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
-#include "CommonTools/ImageMatch/ExactImageMatcher.h"
+#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "PokemonLGPE_BattleArrowDetector.h"
 
 //#include <iostream>
@@ -20,8 +20,23 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLGPE{
 
-const ImageMatch::ExactImageMatcher& BATTLE_ARROW(){
-    static ImageMatch::ExactImageMatcher matcher(RESOURCE_PATH() + "PokemonLGPE/BattleArrow.png");
+
+FixedLimitVector<ImageMatch::WaterfillTemplateMatcher> make_battle_arrow_template(){
+    static constexpr size_t TOTAL_IMAGES = 8;
+    FixedLimitVector<ImageMatch::WaterfillTemplateMatcher> ret(TOTAL_IMAGES);
+    for (size_t c = 0; c < TOTAL_IMAGES; c++){
+        ret.emplace_back(
+            ("PokemonLGPE/BattleArrow-" + std::to_string(c) + ".png").c_str(),
+            Color(0xffc0c0c0), Color(0xffffffff),
+            100
+        );
+    }
+    return ret;
+}
+
+
+const FixedLimitVector<ImageMatch::WaterfillTemplateMatcher>& BATTLE_ARROWS(){
+    static FixedLimitVector<ImageMatch::WaterfillTemplateMatcher> matcher = make_battle_arrow_template();
     return matcher;
 }
 
@@ -37,25 +52,28 @@ bool BattleArrowDetector::detect(const ImageViewRGB32& screen){
 
     ImageViewRGB32 region = extract_box_reference(screen, m_box);
 
-    const ImageMatch::ExactImageMatcher& matcher = BATTLE_ARROW();
+//    cout << "------------" << endl;
+    for (const ImageMatch::WaterfillTemplateMatcher& matcher : BATTLE_ARROWS()){
+        auto matrix = compress_rgb32_to_binary_range(region, 0xffc0c0c0, 0xffffffff);
+        auto session = make_WaterfillSession(matrix);
+        auto iter = session->make_iterator(100);
+        WaterfillObject object;
 
-    auto matrix = compress_rgb32_to_binary_range(region, 0xffc0c0c0, 0xffffffff);
-    auto session = make_WaterfillSession(matrix);
-    auto iter = session->make_iterator(100);
-    WaterfillObject object;
-
-    //static int c = 0;
-    while (iter->find_next(object, false)){
-        double aspect_ratio = object.aspect_ratio();
-        if (aspect_ratio < 1.0 || aspect_ratio > 1.3){
-            continue;
-        }
-        ImageViewRGB32 cropped = extract_box_reference(region, object);
-        //cropped.save("test-object-" + std::to_string(c++) + ".png");
-        double rmsd = matcher.rmsd(cropped);
-//        cout << rmsd << endl;
-        if (rmsd < 116){
-            return true;
+        //static int c = 0;
+        while (iter->find_next(object, false)){
+            double aspect_ratio = object.aspect_ratio();
+            if (aspect_ratio < 0.8 || aspect_ratio > 1.3){
+                continue;
+            }
+            ImageViewRGB32 cropped = extract_box_reference(region, object);
+            //cropped.save("test-object-" + std::to_string(c++) + ".png");
+            cropped.save("testT.png");
+            matcher.image_template().save("test0.png");
+            double rmsd = matcher.rmsd(Resolution(screen.width(), screen.height()), cropped);
+//            cout << rmsd << endl;
+            if (rmsd < 60){
+                return true;
+            }
         }
     }
 
@@ -63,6 +81,7 @@ bool BattleArrowDetector::detect(const ImageViewRGB32& screen){
 }
 
 
+#if 0
 bool BattleArrowWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     if (!detect(frame)){
         return false;
@@ -78,7 +97,7 @@ bool BattleArrowWatcher::process_frame(const ImageViewRGB32& frame, WallClock ti
 
     return m_detections.size() >= 3;
 }
-
+#endif
 
 
 

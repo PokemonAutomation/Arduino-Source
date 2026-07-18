@@ -123,4 +123,35 @@ void ColorCell::restore_defaults(){
 
 
 
+
+
+ColorOption::ColorOption(
+    std::string label,
+    LockMode lock_while_running,
+    bool has_alpha,
+    uint32_t default_value, uint32_t current_value
+)
+    : ConfigOptionImpl(lock_while_running, has_alpha, default_value, current_value)
+    , m_label(std::move(label))
+{}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

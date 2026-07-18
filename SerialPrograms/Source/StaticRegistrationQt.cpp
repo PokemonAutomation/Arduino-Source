@@ -72,6 +72,7 @@ void register_all_statics(){
     RegisterConfigWidget<ButtonOptionWidget>();
     RegisterConfigWidget<CheckboxDropdownCellWidget>();
     RegisterConfigWidget<ColorCellWidget>();
+    RegisterConfigWidget<ColorOptionWidget>();
     RegisterConfigWidget<DateTimeCellWidget>();
     RegisterConfigWidget<DateTimeOptionWidget>();
     RegisterConfigWidget<EditableTableWidget>();

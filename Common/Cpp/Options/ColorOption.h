@@ -43,6 +43,23 @@ private:
 };
 
 
+class ColorOption : public ConfigOptionImpl<ColorOption, ColorCell>{
+public:
+    ColorOption(
+        std::string label,
+        LockMode lock_while_running,
+        bool has_alpha,
+        uint32_t default_value, uint32_t current_value
+    );
+
+    const std::string& label() const{ return m_label; }
+
+
+private:
+    const std::string m_label;
+};
+
+
 
 }
 #endif
