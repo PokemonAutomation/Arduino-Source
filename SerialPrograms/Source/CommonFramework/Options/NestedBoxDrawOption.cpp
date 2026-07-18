@@ -175,7 +175,7 @@ Pimpl<NestedBoxDrawOption::DrawnBox> NestedBoxDrawOption::make_session(VideoOver
 }
 
 
-template Pimpl<NintendoSwitch::NestedBoxDrawOption::DrawnBox>::Pimpl();
+//template Pimpl<NintendoSwitch::NestedBoxDrawOption::DrawnBox>::Pimpl();
 template Pimpl<NintendoSwitch::NestedBoxDrawOption::DrawnBox>::~Pimpl();
 
 
