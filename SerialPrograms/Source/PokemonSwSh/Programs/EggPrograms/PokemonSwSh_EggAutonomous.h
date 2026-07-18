@@ -31,7 +31,7 @@ enum class EggAutoPhase{
 };
 
 struct EggFetchResult{
-    size_t num_eggs_retrieved;
+    bool found_egg;
     bool hatch_detected;
 };
 
@@ -110,9 +110,7 @@ private:
     EggFetchResult talk_to_lady_to_fetch_egg(
         SingleSwitchProgramEnvironment& env,
         ProControllerContext& context,
-        EggAutonomous_Descriptor::Stats& stats,
-        size_t num_eggs_retrieved,
-        size_t num_eggs_to_fetch
+        EggAutonomous_Descriptor::Stats& stats
     );
 
     // After all five eggs hatched and another five eggs deposit into the first column of the box,

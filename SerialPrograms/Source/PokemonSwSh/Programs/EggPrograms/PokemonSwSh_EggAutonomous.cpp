@@ -389,11 +389,17 @@ bool EggAutonomous::run_batch(
         }
         case EggAutoPhase::FETCH_EGG:{
             env.console.log("Talk to lady to fetch egg.");
-            EggFetchResult fetch_result = talk_to_lady_to_fetch_egg(env, context, stats, m_num_eggs_retrieved, total_eggs_to_fetch);
+            EggFetchResult fetch_result = talk_to_lady_to_fetch_egg(env, context, stats);
             if (fetch_result.hatch_detected){
                 phase = EggAutoPhase::HATCHING;
             }else{
-                m_num_eggs_retrieved = fetch_result.num_eggs_retrieved;
+                if(fetch_result.found_egg){ 
+                    m_num_eggs_retrieved++; 
+                    env.log("Found egg " + std::to_string(m_num_eggs_retrieved) + "/" + std::to_string(total_eggs_to_fetch), COLOR_WHITE);
+                    env.console.overlay().add_log("Found egg " + std::to_string(m_num_eggs_retrieved) + "/" + std::to_string(total_eggs_to_fetch), COLOR_WHITE);
+                    stats.m_fetch_success++;
+                    env.update_stats();
+                }
 
                 // if spoke to lady, back to the bike loop regardless of the success of the egg fetch
                 num_loops_since_last_fetch_attempt = 0;
@@ -625,118 +631,106 @@ void EggAutonomous::wait_for_egg_hatched(
 EggFetchResult EggAutonomous::talk_to_lady_to_fetch_egg(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    EggAutonomous_Descriptor::Stats& stats,
-    size_t num_eggs_retrieved, 
-    size_t total_eggs_to_fetch
+    EggAutonomous_Descriptor::Stats& stats
 ){
     env.log("Fetching egg");
     stats.m_fetch_attempts++;
     env.update_stats();
 
-    // confirm we are starting in the overworld
-    BlackDialogBoxWatcher2 egg_hatching_detector;
-    YCommIconWatcher y_comm_detector(COLOR_RED, true);
-    int ret0 = wait_until(
-        env.console, context,
-        std::chrono::seconds(5),
-        {
-            egg_hatching_detector,
-            y_comm_detector,
+    YCommIconWatcher overworld;
+    RetrieveEggArrowFinder egg_arrow_detector(env.console);
+    CheckNurseryArrowFinder no_egg_arrow_detector(env.console);
+    WhiteDialogBoxWatcher white_dialog;
+    BlackDialogBoxWatcher2 black_dialog;
+
+    size_t seen_overworld = 0;
+    bool egg_status_known = false;
+    bool found_egg = false;
+
+    WallClock deadline = current_time() + std::chrono::minutes(2);
+    while(!egg_status_known && current_time() < deadline){
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            env.console, context,
+            std::chrono::seconds(30),
+            {
+                overworld,
+                egg_arrow_detector,
+                black_dialog,
+                white_dialog,
+                no_egg_arrow_detector,
+            }
+        );
+        switch (ret){
+        case 0: // overworld
+            env.log("Detected Overworld...", COLOR_BLUE);
+            seen_overworld++;
+            if (seen_overworld > 10){
+                // No NPC found
+                env.log("Stuck in Overworld. Daycare lady not found.", COLOR_BLUE);
+                return EggFetchResult{
+                    .found_egg = false,
+                    .hatch_detected = false
+                };
+            }
+            pbf_press_button(context, BUTTON_A, 160ms, 100ms);
+            continue;            
+        case 1: // egg_arrow_detector
+            env.log("Found egg");            
+            found_egg = true;
+            // Press A to get the egg
+            ssf_press_button(context, BUTTON_A, 320ms, 160ms);
+            continue;        
+        case 2: // black_dialog
+            if (found_egg){
+                env.log("Received egg");
+                egg_status_known = true;  // break the loop. then mash B
+
+            }else{ // this black dialog might actually be a hatching egg.
+                env.log("Hatching detected while trying to talk to lady to fetch egg.");
+                return EggFetchResult{
+                    .found_egg = false,
+                    .hatch_detected = true
+                };
+            }
+            continue;
+        case 3: // white_dialog
+            env.log("Detected dialog box...", COLOR_BLUE);
+            pbf_press_button(context, BUTTON_A, 160ms, 40ms);
+            continue;            
+        case 4: // no_egg_arrow_detector
+            env.log("No egg");
+            env.console.overlay().add_log("No egg", COLOR_WHITE);
+            found_egg = false;
+            egg_status_known = true;  // break the loop. then mash B
+            continue;     
+        default:
+           OperationFailedException::fire(
+               ErrorReport::SEND_ERROR_REPORT,
+               "talk_to_lady_to_fetch_egg(): No recognized state after 30 seconds.",
+               env.console
+           );
         }
-    );
-    if (ret0 == 0){
-        env.console.log("Hatching detected at start of talking to lady.");
-        EggFetchResult{ 
-            .num_eggs_retrieved = num_eggs_retrieved,
-            .hatch_detected = true
-        };
     }
-    if (ret0 < 0){
+
+    if (!egg_status_known){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "talk_to_lady_to_fetch_egg: We expected to start in the overworld, but overworld not detected.",
+            "talk_to_lady_to_fetch_egg(): Unable to speak to lady after 2 minutes.",
             env.console
         );
     }
 
-    RetrieveEggArrowFinder egg_arrow_detector(env.console);
-    CheckNurseryArrowFinder no_egg_arrow_detector(env.console);
-
-    int ret = run_until<ProControllerContext>(
+    // we know if the egg was found or not
+    // mash b to return to overworld
+    int ret2 = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            for (size_t i_hatched = 0; i_hatched < 2; i_hatched++){
-                pbf_press_button(context, BUTTON_A, 160ms, 1200ms);
-            }
-            pbf_wait(context, 1600ms);
+            pbf_mash_button(context, BUTTON_B, 30s);
         },
-        {
-            egg_arrow_detector,
-            no_egg_arrow_detector,
-            egg_hatching_detector,
-        }
+        {{overworld}}
     );
-    
-    const bool y_comm_visible_at_end_of_dialog = true;
-    YCommIconWatcher dialog_over_detector(COLOR_RED, y_comm_visible_at_end_of_dialog);
-    switch (ret){
-    case 0:
-        ++num_eggs_retrieved;
-        env.log("Found egg");
-        env.console.overlay().add_log("Found egg " + std::to_string(num_eggs_retrieved) + "/" + std::to_string(total_eggs_to_fetch), COLOR_WHITE);
-        stats.m_fetch_success++;
-        env.update_stats();
-        // Press A to get the egg
-        ssf_press_button(context, BUTTON_A, 320ms, 160ms);
-
-        ret = run_until<ProControllerContext>(
-            env.console, context,
-            [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, 30s);
-            },
-            {{dialog_over_detector}}
-        );
-        break;
-
-    case 1:
-        env.log("No egg");
-        env.console.overlay().add_log("No egg", COLOR_WHITE);
-        run_until<ProControllerContext>(
-            env.console, context,
-            [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, 5s);
-            },
-            {{dialog_over_detector}}
-        );
-        return EggFetchResult{ 
-            .num_eggs_retrieved = num_eggs_retrieved,
-            .hatch_detected = false
-        };
-//        break;
-    case 2:
-        env.log("Hatching detected while trying to talk to lady to fetch egg.");
-
-        return EggFetchResult{ 
-            .num_eggs_retrieved = num_eggs_retrieved,
-            .hatch_detected = true
-        };
-
-    default:
-        env.log("Daycare lady not found.");
-        env.console.overlay().add_log("No daycare lady", COLOR_WHITE);
-        return EggFetchResult{ 
-            .num_eggs_retrieved = num_eggs_retrieved,
-            .hatch_detected = false
-        };
-//        OperationFailedException::fire(
-//            ErrorReport::SEND_ERROR_REPORT,
-//            "Cannot detect dialog selection arrow when talking to Nursery lady.",
-//            env.console
-//        );
-    }
-
-    // If dialog over is not detected:
-    if (ret < 0){
+    if (ret2 < 0){ // If dialog over is not detected:
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Cannot detect end of Nursery lady dialog. No Y-Comm mark found.",
@@ -745,7 +739,7 @@ EggFetchResult EggAutonomous::talk_to_lady_to_fetch_egg(
     }
 
     return EggFetchResult{ 
-        .num_eggs_retrieved = num_eggs_retrieved,
+        .found_egg = found_egg,
         .hatch_detected = false
     };
 }
