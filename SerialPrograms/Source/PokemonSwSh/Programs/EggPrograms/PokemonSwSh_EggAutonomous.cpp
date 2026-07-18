@@ -453,44 +453,38 @@ bool EggAutonomous::run_bike_loop(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context
 ){
-    // confirm we are starting in the overworld
-    BlackDialogBoxWatcher2 egg_hatching_detector;
-    YCommIconWatcher y_comm_detector(COLOR_RED, true);
-    int ret0 = wait_until(
-        env.console, context,
-        std::chrono::seconds(5),
-        {
-            egg_hatching_detector,
-            y_comm_detector,
-        }
-    );
-    if (ret0 == 0){
-        env.console.log("Hatching detected at start of bike loop.");
-        return true;
-    }
-    if (ret0 < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "run_bike_loop: We expected to start in the overworld, but overworld not detected.",
-            env.console
-        );
-    }
-
-
+    YCommIconWatcher no_overworld(COLOR_RED, false);
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
             travel_to_spin_location(context);
             travel_back_to_lady(context);
         },
-        {{egg_hatching_detector}}
+        {{no_overworld}}
     );
 
-    bool hatch_detected = ret == 0;
-    if (hatch_detected){
-        env.console.log("Hatching detected during bike loop.");
+    if (ret == 0){ // no overworld detected. Check if we find egg hatching.
+        BlackDialogBoxWatcher2 egg_hatching_detector;
+        int ret2 = wait_until(
+            env.console, context,
+            std::chrono::seconds(10),
+            {
+                egg_hatching_detector,
+            }
+        );
+        if (ret2 == 0){
+            env.console.log("Hatching detected during bike loop.");
+            return true;
+        }else{
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "run_bike_loop: No recognized state after 10 seconds.",
+                env.console
+            );
+        }
     }
-    return hatch_detected;
+
+    return false;
 }
 
 void EggAutonomous::exceed_bike_loop_limit(
