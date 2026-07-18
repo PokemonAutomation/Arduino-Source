@@ -32,7 +32,7 @@ struct TextColorRange{
 
 bool ocr_language_available(Language language);
 
-std::string ocr_read(Language language, const ImageViewRGB32& image, PageSegMode psm = PageSegMode::SINGLE_LINE);
+std::string ocr_read(Language language, const ImageViewRGB32& image, PageSegMode psm = PageSegMode::SINGLE_BLOCK);
 
 void ensure_ocr_instances(Language language, size_t instances = 1);
 
