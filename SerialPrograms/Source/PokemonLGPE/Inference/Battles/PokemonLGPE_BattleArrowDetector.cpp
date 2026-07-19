@@ -53,22 +53,22 @@ bool BattleArrowDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 region = extract_box_reference(screen, m_box);
 
 //    cout << "------------" << endl;
-    for (const ImageMatch::WaterfillTemplateMatcher& matcher : BATTLE_ARROWS()){
-        auto matrix = compress_rgb32_to_binary_range(region, 0xffc0c0c0, 0xffffffff);
-        auto session = make_WaterfillSession(matrix);
-        auto iter = session->make_iterator(100);
-        WaterfillObject object;
+    auto matrix = compress_rgb32_to_binary_range(region, 0xffc0c0c0, 0xffffffff);
+    auto session = make_WaterfillSession(matrix);
+    auto iter = session->make_iterator(100);
+    WaterfillObject object;
 
-        //static int c = 0;
-        while (iter->find_next(object, false)){
-            double aspect_ratio = object.aspect_ratio();
-            if (aspect_ratio < 0.8 || aspect_ratio > 1.3){
-                continue;
-            }
-            ImageViewRGB32 cropped = extract_box_reference(region, object);
-            //cropped.save("test-object-" + std::to_string(c++) + ".png");
-            cropped.save("testT.png");
-            matcher.image_template().save("test0.png");
+    //static int c = 0;
+    while (iter->find_next(object, false)){
+        double aspect_ratio = object.aspect_ratio();
+        if (aspect_ratio < 0.8 || aspect_ratio > 1.3){
+            continue;
+        }
+        ImageViewRGB32 cropped = extract_box_reference(region, object);
+//        cropped.save("test-object-" + std::to_string(c++) + ".png");
+//        cropped.save("testT.png");
+        for (const ImageMatch::WaterfillTemplateMatcher& matcher : BATTLE_ARROWS()){
+ //           matcher.image_template().save("test0.png");
             double rmsd = matcher.rmsd(Resolution(screen.width(), screen.height()), cropped);
 //            cout << rmsd << endl;
             if (rmsd < 60){
