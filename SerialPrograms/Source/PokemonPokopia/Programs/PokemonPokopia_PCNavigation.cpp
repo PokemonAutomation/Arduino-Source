@@ -131,6 +131,7 @@ PCOpenStatus wait_for_pc_open(ConsoleHandle& console, ProControllerContext& cont
         SelectionArrowType::RIGHT,
         ADD_STAMP_BOX
     );
+    BlueDialogWatcher stamp_redeem_dialog(COLOR_YELLOW);
     // TODO: Handle environment change menu
 
     int ret = wait_until(
@@ -138,7 +139,8 @@ PCOpenStatus wait_for_pc_open(ConsoleHandle& console, ProControllerContext& cont
         30s,
         {
             challenges_selector,
-            add_stamp_selector
+            add_stamp_selector,
+            stamp_redeem_dialog,
         }
     );
     switch (ret){
@@ -148,6 +150,9 @@ PCOpenStatus wait_for_pc_open(ConsoleHandle& console, ProControllerContext& cont
         case 1:
             console.log("Detected stamp card open");
             return PCOpenStatus::STAMP_CARD;
+        case 2:
+            console.log("Detected stamp redeem dialog open");
+            return PCOpenStatus::STAMP_REDEEM;
         default:
             console.log("Failed to detect PC menu open");
             return PCOpenStatus::FAILURE;
@@ -378,6 +383,28 @@ void wait_for_overworld(ConsoleHandle& console, ProControllerContext& context){
     console.log("Detected overworld");
 }
 
+void mash_until_overworld(ConsoleHandle& console, ProControllerContext& context){
+    OverworldWatcher overworld_watcher(
+        COLOR_GREEN, &console.overlay()
+    );
+    int ret = run_until<ProControllerContext>(
+        console, context,
+        [&](ProControllerContext& context){
+            pbf_mash_button(context, BUTTON_B, 30s);
+        },
+        {overworld_watcher}
+    );
+    if (ret != 0){
+        console.log("Failed to detect overworld");
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "mash_until_overworld() failed to detect overworld",
+            console
+        );
+    }
+    console.log("Detected overworld");
+}
+
 std::vector<ImageFloatBox> get_generic_options_boxes(size_t option_count){
     std::vector<ImageFloatBox> boxes;
     for (size_t i = 0; i < option_count; i++){
@@ -394,7 +421,8 @@ std::vector<ImageFloatBox> get_generic_options_boxes(size_t option_count){
 }
 
 void access_pc_from_overworld(ConsoleHandle& console, ProControllerContext& context, bool stop_on_stamp_card){
-    wait_for_overworld(console, context);
+    // Mash out of any possible event dialogs
+    mash_until_overworld(console, context);
 
     // Need to physically face PC for PC open prompt
     ButtonWatcher button_a_watcher(
@@ -407,6 +435,12 @@ void access_pc_from_overworld(ConsoleHandle& console, ProControllerContext& cont
         SelectionArrowType::DOWN,
         get_pc_menu_option_box(PCMenuOption::CHALLENGES)
     );
+    SelectionArrowWatcher add_stamp_selector(
+        COLOR_YELLOW, &console.overlay(),
+        SelectionArrowType::RIGHT,
+        ADD_STAMP_BOX
+    );
+    WallClock deadline;
 
     // Wandering Pokemon can trigger the same prompt, retry a few times
     for (int i = 0; i < 5; i++){
@@ -454,6 +488,39 @@ void access_pc_from_overworld(ConsoleHandle& console, ProControllerContext& cont
                         pbf_mash_button(context, BUTTON_B, 10s);
                         break;
                     }
+                case PCOpenStatus::STAMP_REDEEM:
+                    console.log("Opened stamp redeem prompt instead of main PC menu");
+                    // Redeem stamps
+                    deadline = current_time() + 60s;
+                    while (current_time() < deadline){
+                        context.wait_for_all_requests();
+                        ret = wait_until(
+                            console, context,
+                            1s,
+                            {
+                                challenges_watcher,
+                                add_stamp_selector
+                            }
+                        );
+                        if (ret == 0){
+                            console.log("Successfully navigated up to main PC menu from stamp redeem prompt");
+                            if (stop_on_stamp_card){
+                                OperationFailedException::fire(
+                                    ErrorReport::SEND_ERROR_REPORT,
+                                    "access_pc_from_overworld() failed to find stamp card menu after redeeming stamps",
+                                    console
+                                );
+                            }
+                            return;
+                        } else if (ret == 1){
+                            console.log("Successfully redeemed stamps and navigated up to stamp card menu");
+                            if (stop_on_stamp_card){
+                                return;
+                            }
+                        }
+                        pbf_press_button(context, BUTTON_B, 160ms, 240ms);
+                    }
+                    break;
                 // Not sure how to handle this case, can't test it. Attempt to back out and try again for now
                 // Currently not being detected
                 case PCOpenStatus::ENVIRONMENT_CHANGE:

@@ -67,6 +67,31 @@ public:
     {}
 };
 
+class BlueDialogDetector : public StaticScreenDetector{
+public:
+    BlueDialogDetector(Color color = COLOR_RED);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+
+    //  This is not const so that detectors can save/cache state.
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+private:
+    friend class BlueDialogWatcher;
+
+    const Color m_color;
+    const ImageFloatBox m_box;
+};
+class BlueDialogWatcher : public DetectorToFinder<BlueDialogDetector>{
+public:
+    BlueDialogWatcher(
+        Color color = COLOR_RED,
+        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
+    )
+         : DetectorToFinder("BlueDialogWatcher", hold_duration, color)
+    {}
+};
+
 class StampMatcher;
 
 class StampDetector : public StaticScreenDetector{

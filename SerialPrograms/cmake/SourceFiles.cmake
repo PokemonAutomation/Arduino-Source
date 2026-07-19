@@ -2044,6 +2044,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonPokopia/PokemonPokopia_Settings.h
     Source/PokemonPokopia/Programs/PokemonPokopia_CloudIslandReset.cpp
     Source/PokemonPokopia/Programs/PokemonPokopia_CloudIslandReset.h
+    Source/PokemonPokopia/Programs/PokemonPokopia_DailyFarmer.cpp
+    Source/PokemonPokopia/Programs/PokemonPokopia_DailyFarmer.h    
     Source/PokemonPokopia/Programs/PokemonPokopia_PCNavigation.cpp
     Source/PokemonPokopia/Programs/PokemonPokopia_PCNavigation.h
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp
