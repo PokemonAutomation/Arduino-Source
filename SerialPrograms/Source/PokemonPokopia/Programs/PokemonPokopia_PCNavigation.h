@@ -80,6 +80,7 @@ const std::pair<double, double> SELECTION_BOX_TO_STAMP_BOX_OFFSET(-0.071, .033);
 enum class PCOpenStatus{
     MAIN,
     STAMP_CARD,
+    STAMP_REDEEM,
     ENVIRONMENT_CHANGE,
     FAILURE
 };
@@ -95,6 +96,9 @@ enum class PCMenuOption{
 
 // Wait until the overworld is fully loaded
 void wait_for_overworld(ConsoleHandle& console, ProControllerContext& context);
+
+// Mash to exit dialog until overworld is fully loaded and actionable
+void mash_until_overworld(ConsoleHandle& console, ProControllerContext& context);
 
 // Get locations of generic PC menu options for menus with "option_count" number of equal and minimal height boxes
 std::vector<ImageFloatBox> get_generic_options_boxes(size_t option_count);
