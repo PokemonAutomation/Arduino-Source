@@ -7,12 +7,10 @@
 #ifndef PokemonAutomation_PokemonSwSh_BoxEggDetector_H
 #define PokemonAutomation_PokemonSwSh_BoxEggDetector_H
 
-#include <set>
+#include <vector>
 #include "Common/Cpp/Color.h"
 #include "CommonTools/VisualDetector.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-// #include "CommonTools/ImageMatch/ExactImageDictionaryMatcher.h"
-// #include "CommonTools/ImageMatch/CroppedImageDictionaryMatcher.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -2524,6 +2524,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSwSh/Inference/Dens/PokemonSwSh_RaidLobbyReader.h
     Source/PokemonSwSh/Inference/PokemonSwSh_BoxEggDetector.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_BoxEggDetector.h
+    Source/PokemonSwSh/Inference/PokemonSwSh_BoxEmptySlotDetector.cpp
+    Source/PokemonSwSh/Inference/PokemonSwSh_BoxEmptySlotDetector.h
     Source/PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.h
     Source/PokemonSwSh/Inference/PokemonSwSh_BoxNatureDetector.cpp
