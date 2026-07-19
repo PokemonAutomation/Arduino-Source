@@ -105,32 +105,6 @@ EggAutonomous::EggAutonomous()
         LockMode::LOCK_WHILE_RUNNING,
         1, 1
     )
-    , NUM_EGGS_IN_COLUMN(
-        "<b>Num Eggs in Column 1:</b><br>How many eggs already deposited in the first column in Box 1.",
-        {
-            {0, "0", "0"},
-            {1, "1", "1"},
-            {2, "2", "2"},
-            {3, "3", "3"},
-            {4, "4", "4"},
-            {5, "5", "5"},
-        },
-        LockMode::LOCK_WHILE_RUNNING,
-        0
-    )
-    , NUM_EGGS_IN_PARTY(
-        "<b>Num Eggs in Party:</b><br>Number of eggs in your party.",
-        {
-            {0, "0", "0"},
-            {1, "1", "1"},
-            {2, "2", "2"},
-            {3, "3", "3"},
-            {4, "4", "4"},
-            {5, "5", "5"},
-        },
-        LockMode::LOCK_WHILE_RUNNING,
-        0
-    )
     , AUTO_SAVING(
         "<b>Auto-Saving:</b><br>Automatically save the game to recover from crashes and allow eggs to be unhatched.<br>"
         "(Unhatching eggs can be useful for obtaining breeding parents by rehatching a perfect egg in a game with a different language.)<br><br>"
@@ -193,8 +167,6 @@ EggAutonomous::EggAutonomous()
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(MAX_KEEPERS);
     PA_ADD_OPTION(LOOPS_PER_FETCH);
-    PA_ADD_OPTION(NUM_EGGS_IN_COLUMN);
-    PA_ADD_OPTION(NUM_EGGS_IN_PARTY);
     PA_ADD_OPTION(AUTO_SAVING);
     PA_ADD_OPTION(FILTERS0);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -228,14 +200,20 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         return;
     }
 
+    menus_to_boxsystem(env.console, context);
+    EggQuantity egg_quantity = check_box(env.console, context);
+    size_t num_eggs_in_column_0 = egg_quantity.eggs_in_column_0;
+    size_t num_eggs_in_party = egg_quantity.eggs_in_party;
+    env.log("Starting with " + std::to_string(num_eggs_in_party) + " eggs in the party and " + 
+        std::to_string(num_eggs_in_column_0) + " eggs in the first box column.");
 
     if (AUTO_SAVING == AutoSave::AfterStartAndKeep){
         save_game(env.console, context);
-        m_num_eggs_in_storage_when_game_saved = static_cast<uint8_t>(NUM_EGGS_IN_COLUMN.current_value());
-        m_num_eggs_in_party_when_game_saved = static_cast<uint8_t>(NUM_EGGS_IN_PARTY.current_value());
+        m_num_eggs_in_storage_when_game_saved = num_eggs_in_column_0;
+        m_num_eggs_in_party_when_game_saved = num_eggs_in_party;
     }
-    m_num_eggs_retrieved = static_cast<uint8_t>(NUM_EGGS_IN_COLUMN.current_value());
-    m_num_eggs_in_party_at_batch_start = static_cast<uint8_t>(NUM_EGGS_IN_PARTY.current_value());
+    m_num_eggs_retrieved = num_eggs_in_column_0;
+    m_num_eggs_in_party_at_batch_start = num_eggs_in_party;
 
     m_num_pokemon_kept = 0;
 
@@ -972,6 +950,28 @@ bool EggAutonomous::process_hatched_pokemon(
     // Press A to finish dropping the egg column 
     ssf_press_button_ptv(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
 
+    // After processing the box:
+    // Confirm that Box Column 0 is empty, and the party is full of eggs
+    EggQuantity egg_quantity = check_box(env.console, context);
+    size_t num_eggs_in_column_0 = egg_quantity.eggs_in_column_0;
+    size_t num_eggs_in_party = egg_quantity.eggs_in_party;
+
+    if (num_eggs_in_column_0 != 0 ){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "process_hatched_pokemon: Did not end up with an empty first box column, after processing.",
+            env.console
+        );
+    }
+
+    if (num_eggs_in_party != 5){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "process_hatched_pokemon: Did not end up with a party full of 5 eggs, after processing.",
+            env.console
+        );        
+    }
+
     //  Back out to menu.
     menus_to_mainmenu(env.console, context);
 
@@ -1003,7 +1003,7 @@ bool EggAutonomous::process_hatched_pokemon(
 
 
 
-size_t check_box(VideoStream& stream, ProControllerContext& context){
+EggQuantity EggAutonomous::check_box(VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
     context.wait_for(500ms);
     
@@ -1014,11 +1014,11 @@ size_t check_box(VideoStream& stream, ProControllerContext& context){
     size_t eggs_in_col_0_box = count_eggs_in_first_box_column(stream, screen);
 
 
-    return eggs_in_party + eggs_in_col_0_box;
+    return {eggs_in_party, eggs_in_col_0_box};
 }
 
 
-void check_box_filled(VideoStream& stream, const ImageViewRGB32& screen){
+void EggAutonomous::check_box_filled(VideoStream& stream, const ImageViewRGB32& screen){
     for (uint8_t row = 0; row < 5; row++){
         for (uint8_t column = 1; column < 6; column++){
             BoxEmptySlotDetector slot(SlotLocation::BOX, row, column);
@@ -1036,7 +1036,7 @@ void check_box_filled(VideoStream& stream, const ImageViewRGB32& screen){
     }
 }
 
-void check_non_egg_lead(VideoStream& stream, const ImageViewRGB32& screen){
+void EggAutonomous::check_non_egg_lead(VideoStream& stream, const ImageViewRGB32& screen){
     BoxEmptySlotDetector slot(SlotLocation::PARTY, 0, 0);
     bool is_empty = slot.detect(screen);
     if (is_empty){
@@ -1058,7 +1058,7 @@ void check_non_egg_lead(VideoStream& stream, const ImageViewRGB32& screen){
     }
 }
 
-size_t count_eggs_in_party(VideoStream& stream, const ImageViewRGB32& screen){
+size_t EggAutonomous::count_eggs_in_party(VideoStream& stream, const ImageViewRGB32& screen){
     size_t num_empty = 0;
     size_t num_eggs = 0;
     for (uint8_t row = 1; row < 6; row++){
@@ -1084,7 +1084,7 @@ size_t count_eggs_in_party(VideoStream& stream, const ImageViewRGB32& screen){
     return num_eggs;
 }
 
-size_t count_eggs_in_first_box_column(VideoStream& stream, const ImageViewRGB32& screen){
+size_t EggAutonomous::count_eggs_in_first_box_column(VideoStream& stream, const ImageViewRGB32& screen){
 
     size_t num_empty = 0;
     size_t num_eggs = 0;
