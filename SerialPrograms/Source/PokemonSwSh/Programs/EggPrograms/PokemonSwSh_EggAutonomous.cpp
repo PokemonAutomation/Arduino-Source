@@ -18,6 +18,7 @@
 #include "Pokemon/Pokemon_Notification.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_BoxEmptySlotDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h"
@@ -998,6 +999,115 @@ bool EggAutonomous::process_hatched_pokemon(
     }
 
     return false;
+}
+
+
+
+size_t check_box(VideoStream& stream, ProControllerContext& context){
+    context.wait_for_all_requests();
+    context.wait_for(500ms);
+    
+    auto screen = stream.video().snapshot();
+    check_box_filled(stream, screen);
+    check_non_egg_lead(stream, screen);
+    size_t eggs_in_party = count_eggs_in_party(stream, screen);
+    size_t eggs_in_col_0_box = count_eggs_in_first_box_column(stream, screen);
+
+
+    return eggs_in_party + eggs_in_col_0_box;
+}
+
+
+void check_box_filled(VideoStream& stream, const ImageViewRGB32& screen){
+    for (uint8_t row = 0; row < 5; row++){
+        for (uint8_t column = 1; column < 6; column++){
+            BoxEmptySlotDetector slot(SlotLocation::BOX, row, column);
+            bool is_empty = slot.detect(screen);
+            // stream.log("row " + std::to_string(row) + " col " + std::to_string(column) + (is_empty ? " is_empty" : " not empty"));
+            if (is_empty){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "check_box_filled: Box is not filled.",
+                    stream
+                );
+            }
+
+        }
+    }
+}
+
+void check_non_egg_lead(VideoStream& stream, const ImageViewRGB32& screen){
+    BoxEmptySlotDetector slot(SlotLocation::PARTY, 0, 0);
+    bool is_empty = slot.detect(screen);
+    if (is_empty){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "check_non_egg_lead: Detected an empty lead slot in party. This shouldn't be possible.",
+            stream
+        );
+    }
+
+    BoxEggDetector egg(SlotLocation::PARTY, 0);
+    bool is_egg = egg.detect(screen);
+    if (is_egg){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "check_non_egg_lead: Detected an egg in lead slot of party.",
+            stream
+        );
+    }
+}
+
+size_t count_eggs_in_party(VideoStream& stream, const ImageViewRGB32& screen){
+    size_t num_empty = 0;
+    size_t num_eggs = 0;
+    for (uint8_t row = 1; row < 6; row++){
+        BoxEmptySlotDetector slot(SlotLocation::PARTY, row, 0);
+        bool is_empty = slot.detect(screen);
+        if (is_empty) { num_empty++; }
+
+        BoxEggDetector egg(SlotLocation::PARTY, row);
+        bool is_egg = egg.detect(screen);
+        if (is_egg) { num_eggs++; }
+    }
+
+    if (num_empty + num_eggs != 5){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "count_eggs_in_party: Total number of eggs and empty slots in the party don't add up to 5. "
+            "Ensure your only non-egg Pokemon is in the lead. "
+            "The rest of the slots in the team should either be empty or an egg.",
+            stream
+        );
+    }
+
+    return num_eggs;
+}
+
+size_t count_eggs_in_first_box_column(VideoStream& stream, const ImageViewRGB32& screen){
+
+    size_t num_empty = 0;
+    size_t num_eggs = 0;
+    for (uint8_t row = 0; row < 5; row++){
+        BoxEmptySlotDetector slot(SlotLocation::BOX, row, 0);
+        bool is_empty = slot.detect(screen);
+        if (is_empty) { num_empty++; }
+
+        BoxEggDetector egg(SlotLocation::BOX, row);
+        bool is_egg = egg.detect(screen);
+        if (is_egg) { num_eggs++; }
+    }
+
+    if (num_empty + num_eggs != 5){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "count_eggs_in_first_box_column: Total number of eggs and empty slots in the first box column don't add up to 5. "
+            "Ensure thre are no non-egg Pokemon in the first box column.",
+            stream
+        );
+    }
+
+    return num_eggs;
 }
 
 

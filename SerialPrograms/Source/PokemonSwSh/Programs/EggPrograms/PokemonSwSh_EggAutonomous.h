@@ -180,6 +180,23 @@ private:
     bool m_player_at_loop_start = false;
 };
 
+    
+// Starting within the box, confirm that the lead is not an egg, and that the box is full except for the first column
+// return number of eggs in both the party and the first box column
+size_t check_box(VideoStream& stream, ProControllerContext& context);
+
+// ensure that all rows/columns are filled except the first column
+// ASSUMES: the cursor should NOT be on the box, with the exception that it can be at the top row. 
+// This is because it pop-up text otherwise covers up the box slot, preventing proper detection
+void check_box_filled(VideoStream& stream, const ImageViewRGB32& screen);
+
+// ensure that the lead pokemon in the party is not an egg
+void check_non_egg_lead(VideoStream& stream, const ImageViewRGB32& screen);
+
+size_t count_eggs_in_party(VideoStream& stream, const ImageViewRGB32& screen);
+
+size_t count_eggs_in_first_box_column(VideoStream& stream, const ImageViewRGB32& screen);
+
 
 }
 }
