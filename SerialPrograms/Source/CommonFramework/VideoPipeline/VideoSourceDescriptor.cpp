@@ -159,7 +159,10 @@ JsonValue VideoSourceOption::to_json() const{
         res.push_back(m_resolution.height);
         obj["Resolution"] = std::move(res);
     }
-    obj["Format"] = VideoFormat_database().find(m_format)->slug;
+    const EnumEntry* entry = VideoFormat_database().find(m_format);
+    if (entry){
+        obj["Format"] = entry->slug;
+    }
     obj["SourceType"] = VIDEO_TYPE_STRINGS.get_string(m_descriptor->type);
 
     for (const auto& item : m_descriptor_cache){
