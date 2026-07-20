@@ -190,8 +190,8 @@ private:
     // This is used so that if we recover from an error, we know how many eggs are in the party
     size_t m_num_eggs_in_party_when_game_saved = 0;
 
-    // How many eggs are already deposited to storage so far.
-    size_t m_num_eggs_retrieved = 0;
+    // number of eggs in box column 0 at the start of run_batch()
+    size_t num_eggs_in_column_0_at_batch_start = 0;
 
     // number of eggs in party at the start of run_batch()
     size_t m_num_eggs_in_party_at_batch_start = 0;

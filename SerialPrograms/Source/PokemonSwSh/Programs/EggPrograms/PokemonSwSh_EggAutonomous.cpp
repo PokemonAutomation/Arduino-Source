@@ -212,7 +212,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         m_num_eggs_in_storage_when_game_saved = num_eggs_in_column_0;
         m_num_eggs_in_party_when_game_saved = num_eggs_in_party;
     }
-    m_num_eggs_retrieved = num_eggs_in_column_0;
+    num_eggs_in_column_0_at_batch_start = num_eggs_in_column_0;
     m_num_eggs_in_party_at_batch_start = num_eggs_in_party;
 
     m_num_pokemon_kept = 0;
@@ -272,7 +272,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             );
 
             m_player_at_loop_start = false;
-            m_num_eggs_retrieved = m_num_eggs_in_storage_when_game_saved;
+            num_eggs_in_column_0_at_batch_start = m_num_eggs_in_storage_when_game_saved;
             m_num_eggs_in_party_at_batch_start = m_num_eggs_in_party_when_game_saved;
         }
     }
@@ -295,7 +295,8 @@ bool EggAutonomous::run_batch(
     env.update_stats();
     send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
-    size_t total_eggs_to_fetch = 10 - m_num_eggs_retrieved - m_num_eggs_in_party_at_batch_start;
+    size_t total_eggs_to_fetch = 10 - num_eggs_in_column_0_at_batch_start - m_num_eggs_in_party_at_batch_start;
+    size_t num_eggs_retrieved = 0;
 
     EggAutoPhase phase = EggAutoPhase::BIKE_LOOP;
     if (m_player_at_loop_start == false){ // reset position
@@ -312,7 +313,9 @@ bool EggAutonomous::run_batch(
     // Each iteration in the while-loop is made by:
     // - bike loops of LOOPS_PER_FETCH times. Bike loops begin at lady or nursery front door, end at lady.
     // - if not enough eggs fetched, talk to lady to try fetching an egg.
-    while (num_eggs_hatched < 5 || m_num_eggs_retrieved < total_eggs_to_fetch){
+    while (num_eggs_hatched < 5 || num_eggs_retrieved < total_eggs_to_fetch){
+        env.log("Eggs hatched: " + std::to_string(num_eggs_hatched) +
+            ". Eggs fetched: " + std::to_string(num_eggs_retrieved));
 
         // NOTE: the egg hatching detector cannot be constantly running, 
         // since it only detects the black dialog box, and speaking to the lady will also produce a black dialog box.
@@ -339,7 +342,7 @@ bool EggAutonomous::run_batch(
             if (num_loops_since_last_fetch_attempt < LOOPS_PER_FETCH){
                 phase = EggAutoPhase::BIKE_LOOP; // repeat bike loop
             }else{
-                if (m_num_eggs_retrieved < total_eggs_to_fetch){
+                if (num_eggs_retrieved < total_eggs_to_fetch){
                     phase = EggAutoPhase::FETCH_EGG;
                 }else{
                     // done retrieving eggs
@@ -352,6 +355,8 @@ bool EggAutonomous::run_batch(
         case EggAutoPhase::HATCHING:{
             env.console.log("Hatching egg.");
             num_eggs_hatched = hatch_routine(env, context, stats, num_eggs_hatched);
+            env.log("Hatched eggs " + std::to_string(num_eggs_hatched) + "/5", COLOR_WHITE);
+            env.console.overlay().add_log("Found egg " + std::to_string(num_eggs_retrieved) + "/" + std::to_string(total_eggs_to_fetch), COLOR_WHITE);
             phase = EggAutoPhase::FLY_RESET;
             continue;
         }
@@ -373,9 +378,9 @@ bool EggAutonomous::run_batch(
                 phase = EggAutoPhase::HATCHING;
             }else{
                 if(fetch_result.found_egg){ 
-                    m_num_eggs_retrieved++; 
-                    env.log("Found egg " + std::to_string(m_num_eggs_retrieved) + "/" + std::to_string(total_eggs_to_fetch), COLOR_WHITE);
-                    env.console.overlay().add_log("Found egg " + std::to_string(m_num_eggs_retrieved) + "/" + std::to_string(total_eggs_to_fetch), COLOR_WHITE);
+                    num_eggs_retrieved++; 
+                    env.log("Found egg " + std::to_string(num_eggs_retrieved) + "/" + std::to_string(total_eggs_to_fetch), COLOR_WHITE);
+                    env.console.overlay().add_log("Found egg " + std::to_string(num_eggs_retrieved) + "/" + std::to_string(total_eggs_to_fetch), COLOR_WHITE);
                     stats.m_fetch_success++;
                     env.update_stats();
                 }
@@ -399,7 +404,7 @@ bool EggAutonomous::run_batch(
         // While checking hatched pokemon, we find that We need to stop the program:
         return true;
     }
-    m_num_eggs_retrieved = 0;
+    num_eggs_in_column_0_at_batch_start = 0;
     m_num_eggs_in_party_at_batch_start = 5;
     // after process_hatched_pokemon(), the player location is at the start of bike loop
     m_player_at_loop_start = true;
