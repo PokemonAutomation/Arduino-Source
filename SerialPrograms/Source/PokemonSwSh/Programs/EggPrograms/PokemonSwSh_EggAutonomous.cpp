@@ -385,9 +385,14 @@ bool EggAutonomous::run_batch(
                     env.update_stats();
                 }
 
-                // if spoke to lady, back to the bike loop regardless of the success of the egg fetch
-                num_loops_since_last_fetch_attempt = 0;
-                phase = EggAutoPhase::BIKE_LOOP;
+                if (!fetch_result.spoke_to_lady){ // never spoke to lady
+                    phase = EggAutoPhase::FLY_RESET;
+                }else{
+                    // if spoke to lady, back to the bike loop regardless of the success of the egg fetch
+                    num_loops_since_last_fetch_attempt = 0;
+                    phase = EggAutoPhase::BIKE_LOOP;
+                }
+
             }
             continue;
         }
@@ -648,7 +653,8 @@ EggFetchResult EggAutonomous::talk_to_lady_to_fetch_egg(
                 env.log("Stuck in Overworld. Daycare lady not found.", COLOR_BLUE);
                 return EggFetchResult{
                     .found_egg = false,
-                    .hatch_detected = false
+                    .hatch_detected = false,
+                    .spoke_to_lady = false
                 };
             }
             pbf_press_button(context, BUTTON_A, 160ms, 100ms);
@@ -668,7 +674,8 @@ EggFetchResult EggAutonomous::talk_to_lady_to_fetch_egg(
                 env.log("Hatching detected while trying to talk to lady to fetch egg.");
                 return EggFetchResult{
                     .found_egg = false,
-                    .hatch_detected = true
+                    .hatch_detected = true,
+                    .spoke_to_lady = true
                 };
             }
             continue;
@@ -694,7 +701,7 @@ EggFetchResult EggAutonomous::talk_to_lady_to_fetch_egg(
     if (!egg_status_known){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "talk_to_lady_to_fetch_egg(): Unable to speak to lady after 2 minutes.",
+            "talk_to_lady_to_fetch_egg(): Caught in loop. Unable to speak to lady after 2 minutes.",
             env.console
         );
     }
@@ -718,7 +725,8 @@ EggFetchResult EggAutonomous::talk_to_lady_to_fetch_egg(
 
     return EggFetchResult{ 
         .found_egg = found_egg,
-        .hatch_detected = false
+        .hatch_detected = false,
+        .spoke_to_lady = true
     };
 }
 
