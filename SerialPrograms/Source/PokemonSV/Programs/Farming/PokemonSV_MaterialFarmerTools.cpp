@@ -539,19 +539,11 @@ void move_to_start_position_for_letsgo1(
     // move toward clearing besides the pokecenter
     pbf_move_left_joystick(context, {0, +1}, 2400ms, 80ms);
 
-    // look right, towards the start position. handle unexpected battles
+    // look right, towards the start position.
+    // don't throw error if caught in unexpected battle
+    // instead, allow the battle detector that wraps the parent function to trigger.
     DirectionDetector direction;
-    do_action_and_run_from_battle(
-        info, stream, context,
-        [&](const ProgramInfo& info, VideoStream& stream,ProControllerContext& context){
-            try{
-                direction.change_direction(info, stream, context, 5.76);
-            }catch (OperationFailedException&){
-                context.wait_for(Seconds(5));
-            }
-        }
-    );
-
+    direction.change_direction(info, stream, context, 5.76, false);
     
 
     // pbf_move_right_joystick(context, {+1, 0}, 1040ms, 80ms);
@@ -583,18 +575,10 @@ void move_to_start_position_for_letsgo1(
     pbf_press_button(context, BUTTON_B, 400ms, 80ms);
     pbf_press_button(context, BUTTON_B, 400ms, 80ms);
 
-    // look right. handle unexpected battles
+    // look right.
+    // don't throw error if caught in unexpected battle
     // pbf_move_right_joystick(context, {+1, 0}, 160ms, 80ms);
-    do_action_and_run_from_battle(
-        info, stream, context,
-        [&](const ProgramInfo& info, VideoStream& stream,ProControllerContext& context){
-            try{
-                direction.change_direction(info, stream, context, 5.3);
-            }catch (OperationFailedException&){
-                context.wait_for(Seconds(5));
-            }
-        }
-    );
+    direction.change_direction(info, stream, context, 5.3, false);
 
     // move forward slightly
     pbf_move_left_joystick(context, {0, +1}, 400ms, 80ms);
