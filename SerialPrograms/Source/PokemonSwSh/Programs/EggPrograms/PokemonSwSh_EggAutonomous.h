@@ -33,6 +33,7 @@ enum class EggAutoPhase{
 struct EggFetchResult{
     bool found_egg;
     bool hatch_detected;
+    bool spoke_to_lady;
 };
 
 struct EggQuantity{
