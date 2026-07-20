@@ -748,6 +748,31 @@ bool EggAutonomous::process_hatched_pokemon(
 
     menus_to_boxsystem(env.console, context);
 
+    // Before processing the box:
+    // Confirm that Box Column 0 has 5 eggs, and the party has no eggs
+    context.wait_for_all_requests();
+    context.wait_for(500ms);
+    auto screen0 = env.console.video().snapshot();
+    size_t num_eggs_in_column_0_before = count_eggs_in_first_box_column(env.console, screen0);
+    size_t num_eggs_in_party_before = count_eggs_in_party(env.console, screen0);
+
+    if (num_eggs_in_column_0_before != 5){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "process_hatched_pokemon: Did not start with an 5 eggs in the first box column, before processing.",
+            env.console
+        );
+    }
+
+    if (num_eggs_in_party_before != 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "process_hatched_pokemon: Did not start with a party without eggs, before processing, since they should all be hatched.",
+            env.console
+        );        
+    }
+
+
     const Milliseconds BOX_CHANGE_DELAY = GameSettings::instance().BOX_CHANGE_DELAY0;
     const Milliseconds BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY0;
 
@@ -966,10 +991,10 @@ bool EggAutonomous::process_hatched_pokemon(
     // After processing the box:
     // Confirm that Box Column 0 is empty, and the party is full of eggs
     EggQuantity egg_quantity = check_box(env.console, context);
-    size_t num_eggs_in_column_0 = egg_quantity.eggs_in_column_0;
-    size_t num_eggs_in_party = egg_quantity.eggs_in_party;
+    size_t num_eggs_in_column_0_after = egg_quantity.eggs_in_column_0;
+    size_t num_eggs_in_party_after = egg_quantity.eggs_in_party;
 
-    if (num_eggs_in_column_0 != 0 ){
+    if (num_eggs_in_column_0_after != 0 ){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "process_hatched_pokemon: Did not end up with an empty first box column, after processing.",
@@ -977,7 +1002,7 @@ bool EggAutonomous::process_hatched_pokemon(
         );
     }
 
-    if (num_eggs_in_party != 5){
+    if (num_eggs_in_party_after != 5){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "process_hatched_pokemon: Did not end up with a party full of 5 eggs, after processing.",
