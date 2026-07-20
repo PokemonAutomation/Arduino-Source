@@ -316,7 +316,12 @@ void VideoSession::internal_set_resolution(Resolution resolution){
         source.reset();
     }
 
-    source = m_descriptor->make_VideoSource(m_logger, resolution, m_option.m_format, m_option.m_fps);
+    source = m_descriptor->make_VideoSource(
+        m_logger,
+        resolution,
+        m_option.m_format,
+        0   //  Intentionally force the default FPS.
+    );
     VideoFormat format = VideoFormat::OTHER;
     FramesPerSecond fps = 0;
     if (source){
