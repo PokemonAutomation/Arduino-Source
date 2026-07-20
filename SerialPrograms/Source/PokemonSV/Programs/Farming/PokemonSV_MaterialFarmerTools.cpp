@@ -478,6 +478,33 @@ void do_action_and_run_from_battle(
     size_t max_attempts = 5;
     for (size_t i = 0; i < max_attempts; i++){
         try{
+            do_action_and_monitor_for_battles(info, stream, context,
+                [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                    action(info, stream, context);
+                }
+            );
+            break;
+        }catch (UnexpectedBattleException&){
+            stream.log("Detected battle. Now running away.", COLOR_PURPLE);
+            run_from_battle(stream, context);
+        }
+    }
+
+}
+
+void do_action_and_run_from_battle2(
+    const ProgramInfo& info, 
+    VideoStream& stream,
+    ProControllerContext& context,
+    std::function<
+        void(const ProgramInfo& info, 
+        VideoStream& stream,
+        ProControllerContext& context)
+    >&& action
+){
+    size_t max_attempts = 5;
+    for (size_t i = 0; i < max_attempts; i++){
+        try{
             do_action_and_monitor_for_battles_early(info, stream, context,
                 [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                     action(info, stream, context);
