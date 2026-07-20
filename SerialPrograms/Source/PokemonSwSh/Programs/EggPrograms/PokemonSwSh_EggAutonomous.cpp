@@ -355,7 +355,7 @@ bool EggAutonomous::run_batch(
         case EggAutoPhase::HATCHING:{
             env.console.log("Hatching egg.");
             num_eggs_hatched = hatch_routine(env, context, stats, num_eggs_hatched);
-            env.log("Hatched eggs " + std::to_string(num_eggs_hatched) + "/5", COLOR_WHITE);
+            env.log("Hatched eggs " + std::to_string(num_eggs_hatched) + "/5");
             env.console.overlay().add_log("Found egg " + std::to_string(num_eggs_retrieved) + "/" + std::to_string(total_eggs_to_fetch), COLOR_WHITE);
             phase = EggAutoPhase::FLY_RESET;
             continue;
@@ -379,7 +379,7 @@ bool EggAutonomous::run_batch(
             }else{
                 if(fetch_result.found_egg){ 
                     num_eggs_retrieved++; 
-                    env.log("Found egg " + std::to_string(num_eggs_retrieved) + "/" + std::to_string(total_eggs_to_fetch), COLOR_WHITE);
+                    env.log("Found egg " + std::to_string(num_eggs_retrieved) + "/" + std::to_string(total_eggs_to_fetch));
                     env.console.overlay().add_log("Found egg " + std::to_string(num_eggs_retrieved) + "/" + std::to_string(total_eggs_to_fetch), COLOR_WHITE);
                     stats.m_fetch_success++;
                     env.update_stats();
