@@ -12,6 +12,7 @@
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/ImageResolution.h"
 #include "Common/Cpp/ListenerSet.h"
+#include "CommonFramework/VideoPipeline/VideoFormats.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/StatAccumulator.h"
 
@@ -19,9 +20,12 @@ class QWidget;
 
 namespace PokemonAutomation{
 
-enum class VideoFormat;
+//enum class VideoFormat;
 
-using VideoFormatSet = std::map<Resolution, std::set<VideoFormat>>;
+using VideoFormatSet = std::map<
+    Resolution,
+    std::map<VideoFormat, std::set<size_t, std::greater<size_t>>>
+>;
 
 
 class VideoSource{
@@ -60,6 +64,7 @@ public:
 
     virtual Resolution current_resolution() const = 0;
     virtual VideoFormat current_format() const = 0;
+    virtual FramesPerSecond current_fps() const = 0;
     virtual const VideoFormatSet& supported_formats() const = 0;
 
     virtual VideoSnapshot snapshot_latest_blocking() = 0;

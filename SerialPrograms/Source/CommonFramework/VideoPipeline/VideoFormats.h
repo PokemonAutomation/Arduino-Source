@@ -22,8 +22,11 @@ enum class VideoFormat{
     OTHER,
 };
 
-
 const EnumDropdownDatabase<VideoFormat>& VideoFormat_database();
+
+
+using FramesPerSecond = size_t;
+
 
 
 }

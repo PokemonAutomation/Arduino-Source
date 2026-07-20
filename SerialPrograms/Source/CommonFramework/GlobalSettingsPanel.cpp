@@ -17,6 +17,7 @@
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Options/KeyboardLayoutOption.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Options/CheckForUpdatesOption.h"
 #include "CommonFramework/Options/ResolutionOption.h"
 #include "CommonFramework/Options/Environment/SleepSuppressOption.h"
@@ -210,6 +211,11 @@ GlobalSettings::GlobalSettings()
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
+    , DUMP_VIDEO_FORMATS(
+        "<b>Dump Video Formats:</b><br>Log all video formats supported by your capture card.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    )
     , SAVE_DEBUG_IMAGES(
         "<b>Save Debug Images:</b><br>"
         "If the program fails to read something when it should succeed, save the image for debugging purposes.",
@@ -293,6 +299,7 @@ GlobalSettings::GlobalSettings()
 
     PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(LOG_EVERYTHING);
+    PA_ADD_OPTION(DUMP_VIDEO_FORMATS);
     PA_ADD_OPTION(SAVE_DEBUG_IMAGES);
 
     // gated behind Dev mode. see GlobalSettings::load_json

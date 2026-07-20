@@ -9,6 +9,8 @@
 #include <QComboBox>
 #include <QPushButton>
 #include "Common/Qt/NoWheelComboBox.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/VideoPipeline/VideoPipelineOptions.h"
 #include "CommonFramework/Panels/ConsoleSettingsStretch.h"
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "VideoSourceSelectorWidget.h"
@@ -99,12 +101,12 @@ VideoSourceSelectorWidget::VideoSourceSelectorWidget(Logger& logger, VideoSessio
             if (resolution_index < 0 || resolution_index > (int)m_formats.size()){
                 return;
             }
-            const std::vector<VideoFormat>& format_list = m_formats[resolution_index].second;
+            const std::vector<std::pair<VideoFormat, size_t>>& format_list = m_formats[resolution_index].second;
             if (index < 0 || index >= (int)format_list.size()){
                 return;
             }
-            VideoFormat format = format_list[index];
-            m_session.set_format(format);
+            const std::pair<VideoFormat, size_t>& format = format_list[index];
+            m_session.set_format(format.first, format.second);
         }
     );
 
@@ -161,63 +163,79 @@ void VideoSourceSelectorWidget::update_resolution_list(){
     m_format_box->clear();
     m_formats.clear();
 
-    Resolution current_resolution = m_session.current_resolution();
-    VideoFormat current_format = m_session.current_format();
+    Resolution current_resolution;
+    VideoFormat current_format;
+    FramesPerSecond current_fps;
+    m_session.current_stream_format(current_resolution, current_format, current_fps);
+
     VideoFormatSet format_set = m_session.supported_formats();
 
-    for (auto& format : format_set){
-        if (format.second.empty()){
+    for (auto& resolution : format_set){
+        if (resolution.second.empty()){
             continue;
         }
-        std::pair<Resolution, std::vector<VideoFormat>>& formats = m_formats.emplace_back();
-        formats.first = format.first;
-        for (VideoFormat item : format.second){
-            formats.second.emplace_back(item);
+        std::pair<
+            Resolution,
+            std::vector<std::pair<VideoFormat, size_t>>
+        >& entry = m_formats.emplace_back();
+        entry.first = resolution.first;
+        for (auto& format : resolution.second){
+            for (size_t fps : format.second){
+                entry.second.emplace_back(format.first, fps);
+                if (!GlobalSettings::instance().VIDEO_PIPELINE->SHOW_ALL_FPS){
+                    break;
+                }
+            }
         }
     }
 
+    //  Make resolution box.
+    int resolution_index = -1;
+    {
+        for (int c = 0; c < (int)m_formats.size(); c++){
+            Resolution res = m_formats[c].first;
+            m_resolution_box->addItem(
+                QString::fromStdString(
+                    std::to_string(res.width) + " x " +
+                    std::to_string(res.height) + " " +
+                    aspect_ratio_as_string(res)
+                )
+            );
+            if (res == current_resolution){
+                resolution_index = c;
+            }
+        }
+        m_resolution_box->setCurrentIndex(resolution_index);
 
-    int index = -1;
-    for (int c = 0; c < (int)m_formats.size(); c++){
-        Resolution res = m_formats[c].first;
-        m_resolution_box->addItem(
-            QString::fromStdString(
-                std::to_string(res.width) + " x " +
-                std::to_string(res.height) + " " +
-                aspect_ratio_as_string(res)
-            )
-        );
-        if (res == current_resolution){
-            index = c;
+        if (resolution_index < 0){
+            m_logger.log("Unable to find entry for this resolution.", COLOR_RED);
+            return;
         }
     }
-    m_resolution_box->setCurrentIndex(index);
 
-    if (index < 0){
-        m_logger.log("Unable to find entry for this resolution.", COLOR_RED);
-        return;
-    }
+    //  Make format box.
 
-
-    const std::vector<VideoFormat>& format_list = m_formats[index].second;
+    const std::vector<std::pair<VideoFormat, size_t>>& format_list = m_formats[resolution_index].second;
 
 //    cout << "current_format = " << (int)current_format << endl;
 
-    index = -1;
+    int format_index = -1;
     for (int c = 0; c < (int)format_list.size(); c++){
-        VideoFormat format = format_list[c];
-        m_format_box->addItem(
-            QString::fromStdString(
-                VideoFormat_database().find(format)->display
-            )
-        );
-        if (format == current_format){
-            index = c;
+        const std::pair<VideoFormat, size_t>& format = format_list[c];
+
+        std::string label = VideoFormat_database().find(format.first)->display;
+        if (format.second != 0){
+            label += " (" + std::to_string(format.second) + " fps)";
+        }
+
+        m_format_box->addItem(QString::fromStdString(label));
+        if (format.first == current_format && format.second == current_fps){
+            format_index = c;
         }
     }
-    m_format_box->setCurrentIndex(index);
+    m_format_box->setCurrentIndex(format_index);
 
-    if (index < 0){
+    if (format_index < 0){
         m_logger.log("Unable to find entry for this format.", COLOR_RED);
         return;
     }

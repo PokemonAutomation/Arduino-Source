@@ -14,6 +14,7 @@
 //#include "Common/Cpp/Exceptions.h"
 //#include "Common/Cpp/Time.h"
 #include "Common/Qt/Redispatch.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "VideoFrameQt.h"
 #include "MediaServicesQt6.h"
 #include "CameraWidgetQt6.h"
@@ -27,13 +28,77 @@ namespace CameraQt6QVideoSink{
 
 
 
+void get_format(
+    const QCameraFormat& qformat,
+    Resolution& resolution,
+    VideoFormat& format,
+    FramesPerSecond& fps
+){
+    resolution.width = qformat.resolution().width();
+    resolution.height = qformat.resolution().height();
+    format = QVideoFrameFormat_to_VideoFormat(qformat.pixelFormat());
+    float fps_f = qformat.maxFrameRate();
+    fps_f = std::max<float>(fps_f, 0);
+    fps = (size_t)(fps_f + 0.5);
+}
+
+
+struct FormatAggregator{
+    std::string m_format_dump_str;
+    std::map<
+        Resolution,
+        std::map<
+            VideoFormat,
+            std::map<size_t, QCameraFormat, std::greater<size_t>>
+        >
+    > m_formats;
+
+    void add_format(QCameraFormat qformat){
+        Resolution resolution;
+        VideoFormat oformat;
+        FramesPerSecond fps;
+        get_format(qformat, resolution, oformat, fps);
+
+        m_format_dump_str += "\n    ";
+        m_format_dump_str += std::to_string(resolution.width) + "x" + std::to_string(resolution.height);
+        m_format_dump_str += ": Format = " + std::to_string((int)qformat.pixelFormat());
+        m_format_dump_str += ", FPS Range = [" + std::to_string(qformat.minFrameRate()) + "," + std::to_string(qformat.maxFrameRate()) + "]";
+
+        auto& resolution_entry = m_formats[resolution];
+        auto iter0 = resolution_entry.find(oformat);
+
+        //  Format doesn't exist. Add it.
+        if (iter0 == resolution_entry.end()){
+            auto& entry = resolution_entry[oformat];
+            entry[fps] = std::move(qformat);
+            return;
+        }
+
+        //  Format already exists.
+
+        auto& oformat_node = iter0->second;
+
+        auto iter1 = oformat_node.find(fps);
+        if (iter1 == oformat_node.end()){
+            oformat_node[fps] = std::move(qformat);
+            return;
+        }
+
+        if (iter1->second.minFrameRate() < qformat.minFrameRate()){
+            iter1->second = std::move(qformat);
+        }
+    }
+};
+
+
 
 QCameraFormat build_format_set(
     Logger& logger,
     VideoFormatSet& format_set,
     const QCameraDevice& device,
     Resolution desired_resolution,
-    VideoFormat desired_format
+    VideoFormat desired_format,
+    FramesPerSecond desired_fps
 ){
     QList<QCameraFormat> formats = device.videoFormats();
     if (formats.empty()){
@@ -41,63 +106,48 @@ QCameraFormat build_format_set(
         return QCameraFormat();
     }
 
-    std::map<
-        Resolution,
-        std::map<
-            VideoFormat,
-            std::pair<QVideoFrameFormat::PixelFormat, QCameraFormat*>
-        >
-    > resolution_map;
+    FormatAggregator aggregator;
     for (QCameraFormat& format : formats){
-        Resolution resolution(format.resolution().width(), format.resolution().height());
-//        cout << resolution.width << " x " << resolution.height << " : " << (int)format.pixelFormat()
-//             << ", Min FPS = " << format.minFrameRate() << ", Max FPS = " << format.maxFrameRate()
-//             << endl;
+        aggregator.add_format(std::move(format));
+    }
 
-        QVideoFrameFormat::PixelFormat qformat = format.pixelFormat();
-        VideoFormat oformat = QVideoFrameFormat_to_VideoFormat(qformat);
-
-        auto& resolution_entry = resolution_map[resolution];
-        auto iter = resolution_entry.find(oformat);
-
-        //  Format doesn't exist. Add it.
-        if (iter == resolution_entry.end()){
-            resolution_entry[oformat] = {qformat, &format};
-            continue;
-        }
-
-        //  Format already exists. Take it if it has higher frame rate.
-        if (iter->second.second->maxFrameRate() < format.maxFrameRate()){
-            iter->second.second = &format;
-        }
+    if (GlobalSettings::instance().DUMP_VIDEO_FORMATS){
+        logger.log("Video Formats:" + aggregator.m_format_dump_str);
     }
 
 //    cout << "Chosen: " << resolution_map[Resolution(3840, 2160)]->maxFrameRate() << endl;
 
-    QCameraFormat* current_qformat = nullptr;
-    format_set.clear();
-    for (const auto& res : resolution_map){
-        for (const auto& entry : res.second){
-            format_set[res.first].insert(entry.first);
+    //  Set a default.
+    const QCameraFormat* current_qformat = &aggregator.m_formats.begin()->second.begin()->second.begin()->second;
 
-            //  Matches what we want. Take it.
-            if (res.first == desired_resolution && entry.first == desired_format){
-                current_qformat = entry.second.second;
+    format_set.clear();
+    for (const auto& res : aggregator.m_formats){
+        //  Resolution matches. Pick the first one as the default.
+        if (res.first == desired_resolution){
+            current_qformat = &res.second.begin()->second.begin()->second;
+        }
+
+        for (const auto& format : res.second){
+            //  Format matches. Pick the first one as the default.
+            if (res.first == desired_resolution && format.first == desired_format){
+                current_qformat = &format.second.begin()->second;
+            }
+
+            for (const auto& fps : format.second){
+                //  FPS matches. Pick it.
+                if (res.first == desired_resolution &&
+                    format.first == desired_format &&
+                    fps.first == desired_fps
+                ){
+                    current_qformat = &fps.second;
+                }
+
+                format_set[res.first][format.first].insert(fps.first);
             }
         }
-
-        //  Resolution matches, but format does not. Pick the first format.
-        if (current_qformat == nullptr && res.first == desired_resolution){
-            current_qformat = res.second.begin()->second.second;
-        }
     }
 
-    //  Nothing matches. Pick the largest resolution and its first format.
-    if (current_qformat == nullptr){
-        current_qformat = resolution_map.rbegin()->second.begin()->second.second;
-    }
-
-    return std::move(*current_qformat);
+    return *current_qformat;
 }
 
 
@@ -135,9 +185,10 @@ std::unique_ptr<VideoSource> CameraBackend::make_video_source(
     Logger& logger,
     const CameraInfo& info,
     Resolution resolution,
-    VideoFormat format
+    VideoFormat format,
+    FramesPerSecond fps
 ) const{
-    return std::make_unique<CameraVideoSource>(logger, info, resolution, format);
+    return std::make_unique<CameraVideoSource>(logger, info, resolution, format, fps);
 }
 
 
@@ -167,7 +218,8 @@ CameraVideoSource::CameraVideoSource(
     Logger& logger,
     const CameraInfo& info,
     Resolution desired_resolution,
-    VideoFormat desired_format
+    VideoFormat desired_format,
+    FramesPerSecond desired_fps
 )
     : VideoSource(logger, true)
     , m_logger(logger)
@@ -180,13 +232,14 @@ CameraVideoSource::CameraVideoSource(
     m_logger.log("Starting Camera: Backend = CameraQt6QVideoSink");
 
     run_on_main_thread_and_wait([&]{
-        init(info, desired_resolution, desired_format);
+        init(info, desired_resolution, desired_format, desired_fps);
     });
 }
 void CameraVideoSource::init(
     const CameraInfo& info,
     Resolution desired_resolution,
-    VideoFormat desired_format
+    VideoFormat desired_format,
+    FramesPerSecond desired_fps
 ){
     m_metaobject.reset(new QObject());
 
@@ -208,18 +261,19 @@ void CameraVideoSource::init(
         m_formats,
         *device,
         desired_resolution,
-        desired_format
+        desired_format,
+        desired_fps
     );
     if (format.isNull()){
         return;
     }
 
-    QSize size = format.resolution();
-    m_resolution = Resolution(size.width(), size.height());
-    m_logger.log("Resolution: " + m_resolution.to_string());
-
-    m_format = QVideoFrameFormat_to_VideoFormat(format.pixelFormat());
-    m_logger.log("Format: " + VideoFormat_database().find(m_format)->display);
+    get_format(format, m_resolution, m_format, m_fps);
+    m_logger.log(
+        "Resolution: " + m_resolution.to_string() +
+        ", Format: " + VideoFormat_database().find(m_format)->display +
+        ", FPS: " + std::to_string(m_fps)
+    );
 
     m_camera.reset(new QCameraThread(m_logger, *device, format));
     m_video_sink.reset(new QVideoSink());

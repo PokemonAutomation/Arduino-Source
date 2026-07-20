@@ -9,7 +9,6 @@
 
 #include <memory>
 #include <deque>
-#include <mutex>
 #include "Common/Cpp/EventRateTracker.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/Watchdog.h"
@@ -97,8 +96,16 @@ public:
     //  Return current resolution.
     //  This function is thread-safe. It has a lock to prevent concurrent calls
     //  of other VideoSession functions.
+    void current_stream_format(
+        Resolution& resolution,
+        VideoFormat& format,
+        FramesPerSecond& fps
+    );
     Resolution current_resolution();
+#if 0
     VideoFormat current_format();
+    FramesPerSecond current_fps();
+#endif
 
     //  Return supported formats.
     //  This function is thread-safe. It has a lock to prevent concurrent calls
@@ -157,7 +164,8 @@ public:
     void set_source(
         const std::shared_ptr<VideoSourceDescriptor>& device,
         Resolution resolution = {},
-        VideoFormat format = VideoFormat::OTHER
+        VideoFormat format = VideoFormat::OTHER,
+        size_t fps = 0
     );
 
     //  Change video resolution.
@@ -174,7 +182,7 @@ public:
     //  source option (aka the VideoSourceOption passed to the VideoSession
     //  constructor).
     //  The change is dispatched to the Qt main thread to execute.
-    void set_format(VideoFormat format);
+    void set_format(VideoFormat format, size_t fps);
 
 
 private:
@@ -206,6 +214,7 @@ private:
         std::shared_ptr<VideoSourceDescriptor> device;
         Resolution resolution;
         VideoFormat format;
+        size_t fps;
     };
     void run_commands();
 
@@ -213,10 +222,11 @@ private:
     void internal_set_source(
         const std::shared_ptr<VideoSourceDescriptor>& device,
         Resolution resolution,
-        VideoFormat format
+        VideoFormat format,
+        FramesPerSecond fps
     );
     void internal_set_resolution(Resolution resolution);
-    void internal_set_format(VideoFormat format);
+    void internal_set_format(VideoFormat format, FramesPerSecond fps);
 
 
 private:

@@ -18,6 +18,7 @@
 //#include "Common/Cpp/Time.h"
 //#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Qt/Redispatch.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "VideoFrameQt.h"
 #include "MediaServicesQt6.h"
 #include "CameraWidgetQt6.h"
@@ -68,9 +69,10 @@ std::unique_ptr<VideoSource> CameraBackend::make_video_source(
     Logger& logger,
     const CameraInfo& info,
     Resolution resolution,
-    VideoFormat format
+    VideoFormat format,
+    FramesPerSecond fps
 ) const{
-    return std::make_unique<CameraVideoSource>(logger, info, resolution, format);
+    return std::make_unique<CameraVideoSource>(logger, info, resolution, format, fps);
 }
 
 
@@ -97,7 +99,8 @@ CameraVideoSource::CameraVideoSource(
     Logger& logger,
     const CameraInfo& info,
     Resolution desired_resolution,
-    VideoFormat desired_format
+    VideoFormat desired_format,
+    FramesPerSecond desired_fps
 )
     : VideoSource(logger, true)
     , m_logger(logger)
@@ -105,6 +108,7 @@ CameraVideoSource::CameraVideoSource(
     , m_snapshot_manager(logger, m_last_frame)
 {
 //    cout << "desired_resolution = " << desired_resolution.width << " x " << desired_resolution.height << endl;
+//    cout << "desired_fps = " << desired_fps << endl;
 
     if (!info){
         return;
@@ -112,13 +116,14 @@ CameraVideoSource::CameraVideoSource(
     m_logger.log("Starting Camera: Backend = CameraQt65QMediaCaptureSession");
 
     run_on_main_thread_and_wait([&]{
-        init(info, desired_resolution, desired_format);
+        init(info, desired_resolution, desired_format, desired_fps);
     });
 }
 void CameraVideoSource::init(
     const CameraInfo& info,
     Resolution desired_resolution,
-    VideoFormat desired_format
+    VideoFormat desired_format,
+    FramesPerSecond desired_fps
 ){
     m_metaobject.reset(new QObject());
 
@@ -141,18 +146,19 @@ void CameraVideoSource::init(
         m_formats,
         *device,
         desired_resolution,
-        desired_format
+        desired_format,
+        desired_fps
     );
     if (format.isNull()){
         return;
     }
 
-    QSize size = format.resolution();
-    m_resolution = Resolution(size.width(), size.height());
-    m_logger.log("Resolution: " + m_resolution.to_string());
-
-    m_format = QVideoFrameFormat_to_VideoFormat(format.pixelFormat());
-    m_logger.log("Format: " + VideoFormat_database().find(m_format)->display);
+    CameraQt6QVideoSink::get_format(format, m_resolution, m_format, m_fps);
+    m_logger.log(
+        "Resolution: " + m_resolution.to_string() +
+        ", Format: " + VideoFormat_database().find(m_format)->display +
+        ", FPS: " + std::to_string(m_fps)
+    );
 
     m_camera.reset(new QCameraThread(m_logger, *device, format));
 

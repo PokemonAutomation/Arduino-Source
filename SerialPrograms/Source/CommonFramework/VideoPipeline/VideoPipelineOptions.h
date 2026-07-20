@@ -23,14 +23,12 @@ public:
             LockMode::LOCK_WHILE_RUNNING,
             GroupOption::EnableMode::ALWAYS_ENABLED, true
         )
-#if QT_VERSION_MAJOR == 5
-        , ENABLE_FRAME_SCREENSHOTS(
-            "<b>Enable Frame Screenshots:</b><br>"
-            "Attempt to use QVideoProbe and QVideoFrame for screenshots.",
-            LockMode::UNLOCK_WHILE_RUNNING,
-            true
-        )
-#endif
+    , SHOW_ALL_FPS(
+        "<b>Show all FPS Options:</b><br>"
+        "Show all video format/FPS combinations. This is hidden by default since Qt usually ignores the FPS.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    )
         , AUTO_RESET_SECONDS(
             "<b>Video Auto-Reset:</b><br>"
             "Attempt to reset the video if this many seconds has elapsed since the last video frame (in order to fix issues with RDP disconnection, etc).<br>"
@@ -43,19 +41,15 @@ public:
 #endif
         )
     {
+        PA_ADD_OPTION(SHOW_ALL_FPS);
         PA_ADD_OPTION(VIDEO_BACKEND);
-#if QT_VERSION_MAJOR == 5
-        PA_ADD_OPTION(ENABLE_FRAME_SCREENSHOTS);
-#endif
 
         PA_ADD_OPTION(AUTO_RESET_SECONDS);
     }
 
 public:
+    BooleanCheckBoxOption SHOW_ALL_FPS;
     VideoBackendOption VIDEO_BACKEND;
-#if QT_VERSION_MAJOR == 5
-    BooleanCheckBoxOption ENABLE_FRAME_SCREENSHOTS;
-#endif
 
     SimpleIntegerOption<uint8_t> AUTO_RESET_SECONDS;
 };

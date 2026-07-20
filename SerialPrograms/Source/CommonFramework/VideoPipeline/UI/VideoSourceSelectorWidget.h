@@ -50,7 +50,12 @@ private:
     QPushButton* m_reset_button;
 
     std::vector<std::shared_ptr<VideoSourceDescriptor>> m_sources;
-    std::vector<std::pair<Resolution, std::vector<VideoFormat>>> m_formats;
+    std::vector<
+        std::pair<
+            Resolution,
+            std::vector<std::pair<VideoFormat, size_t>>
+        >
+    > m_formats;
 
 };
 

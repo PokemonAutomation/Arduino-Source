@@ -39,14 +39,16 @@ JsonValue VideoSourceDescriptor_Camera::to_json() const{
 std::unique_ptr<VideoSource> VideoSourceDescriptor_Camera::make_VideoSource(
     Logger& logger,
     Resolution resolution,
-    VideoFormat format
+    VideoFormat format,
+    FramesPerSecond fps
 ) const{
 //    cout << "format = " << (int)format << endl;
     return get_camera_backend().make_video_source(
         logger,
         m_info,
         resolution,
-        format
+        format,
+        fps
     );
 }
 

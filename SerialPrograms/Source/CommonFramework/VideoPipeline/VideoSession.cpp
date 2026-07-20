@@ -64,7 +64,7 @@ VideoSession::VideoSession(Logger& logger, VideoSourceOption& option)
     if (watchdog_timeout != 0){
         global_watchdog().add(*this, std::chrono::seconds(watchdog_timeout));
     }
-    set_source(option.descriptor(), option.m_resolution, option.m_format);
+    set_source(option.descriptor(), option.m_resolution, option.m_format, option.m_fps);
 }
 
 
@@ -74,6 +74,22 @@ std::shared_ptr<const VideoSourceDescriptor> VideoSession::descriptor() const{
     ReadSpinLock lg(m_state_lock);
     return m_descriptor;
 }
+void VideoSession::current_stream_format(
+    Resolution& resolution,
+    VideoFormat& format,
+    FramesPerSecond& fps
+){
+    ReadSpinLock lg(m_state_lock);
+    if (m_video_source){
+        resolution = m_video_source->current_resolution();
+        format = m_video_source->current_format();
+        fps = m_video_source->current_fps();
+    }else{
+        resolution = Resolution();
+        format = VideoFormat::OTHER;
+        fps =0;
+    }
+}
 Resolution VideoSession::current_resolution(){
     ReadSpinLock lg(m_state_lock);
     if (m_video_source){
@@ -82,6 +98,7 @@ Resolution VideoSession::current_resolution(){
         return Resolution();
     }
 }
+#if 0
 VideoFormat VideoSession::current_format(){
     ReadSpinLock lg(m_state_lock);
     if (m_video_source){
@@ -90,6 +107,15 @@ VideoFormat VideoSession::current_format(){
         return VideoFormat::OTHER;
     }
 }
+FramesPerSecond VideoSession::current_fps(){
+    ReadSpinLock lg(m_state_lock);
+    if (m_video_source){
+        return m_video_source->current_fps();
+    }else{
+        return 0;
+    }
+}
+#endif
 VideoFormatSet VideoSession::supported_formats() const{
     ReadSpinLock lg(m_state_lock);
     if (m_video_source){
@@ -106,7 +132,7 @@ void VideoSession::get(VideoSourceOption& option){
     option = m_option;
 }
 void VideoSession::set(const VideoSourceOption& option){
-    set_source(option.descriptor(), option.m_resolution, option.m_format);
+    set_source(option.descriptor(), option.m_resolution, option.m_format, option.m_fps);
 }
 
 void VideoSession::reset(){
@@ -118,7 +144,8 @@ void VideoSession::reset(){
                 CommandType::RESET,
                 nullptr,
                 Resolution{},
-                VideoFormat::OTHER
+                VideoFormat::OTHER,
+                0
             }
         );
     }
@@ -127,7 +154,8 @@ void VideoSession::reset(){
 void VideoSession::set_source(
     const std::shared_ptr<VideoSourceDescriptor>& device,
     Resolution resolution,
-    VideoFormat format
+    VideoFormat format,
+    size_t fps
 ){
     {
         WriteSpinLock lg(m_queue_lock);
@@ -137,7 +165,8 @@ void VideoSession::set_source(
                 CommandType::SET_SOURCE,
                 device,
                 resolution,
-                format
+                format,
+                fps
             }
         );
     }
@@ -152,13 +181,14 @@ void VideoSession::set_resolution(Resolution resolution){
                 CommandType::SET_RESOLUTION,
                 nullptr,
                 resolution,
-                VideoFormat::OTHER
+                VideoFormat::OTHER,
+                0
             }
         );
     }
     run_commands();
 }
-void VideoSession::set_format(VideoFormat format){
+void VideoSession::set_format(VideoFormat format, size_t fps){
     {
         WriteSpinLock lg(m_queue_lock);
 //        cout << "VideoSession::set_resolution(): " << m_queued_commands.size() << endl;
@@ -167,7 +197,8 @@ void VideoSession::set_format(VideoFormat format){
                 CommandType::SET_FORMAT,
                 nullptr,
                 {},
-                format
+                format,
+                fps
             }
         );
     }
@@ -180,6 +211,7 @@ void VideoSession::internal_reset(){
 
     Resolution resolution = m_option.m_resolution;
     VideoFormat format = m_option.m_format;
+    FramesPerSecond fps = m_option.m_fps;
     std::unique_ptr<VideoSource> source;
     {
         WriteSpinLock lg(m_state_lock);
@@ -191,10 +223,11 @@ void VideoSession::internal_reset(){
         source.reset();
     }
 
-    source = m_descriptor->make_VideoSource(m_logger, resolution, format);
+    source = m_descriptor->make_VideoSource(m_logger, resolution, format, fps);
     if (source){
         resolution = source->current_resolution();
         format = source->current_format();
+        fps = source->current_fps();
         source->add_source_frame_listener(*this);
         source->add_rendered_frame_listener(*this);
     }
@@ -203,6 +236,7 @@ void VideoSession::internal_reset(){
         WriteSpinLock lg(m_state_lock);
         m_option.m_resolution = resolution;
         m_option.m_format = format;
+        m_option.m_fps = fps;
         m_video_source = std::move(source);
     }
 
@@ -214,7 +248,8 @@ void VideoSession::internal_reset(){
 void VideoSession::internal_set_source(
     const std::shared_ptr<VideoSourceDescriptor>& device,
     Resolution resolution,
-    VideoFormat format
+    VideoFormat format,
+    FramesPerSecond fps
 ){
     m_logger.log("Changing video...", COLOR_GREEN);
     if (*m_descriptor == *device && !m_descriptor->should_reload()){
@@ -240,9 +275,11 @@ void VideoSession::internal_set_source(
     }
 
     Resolution desired_resolution = resolution ? resolution : m_option.m_resolution;
-    source = device->make_VideoSource(m_logger, desired_resolution, format);
+    source = device->make_VideoSource(m_logger, desired_resolution, format, fps);
     if (source){
         resolution = source->current_resolution();
+        format = source->current_format();
+        fps = source->current_fps();
         source->add_source_frame_listener(*this);
         source->add_rendered_frame_listener(*this);
     }
@@ -251,6 +288,7 @@ void VideoSession::internal_set_source(
         WriteSpinLock lg(m_state_lock);
         m_option.m_resolution = resolution;
         m_option.m_format = format;
+        m_option.m_fps = fps;
         m_video_source = std::move(source);
     }
 
@@ -278,9 +316,13 @@ void VideoSession::internal_set_resolution(Resolution resolution){
         source.reset();
     }
 
-    source = m_descriptor->make_VideoSource(m_logger, resolution, m_option.m_format);
+    source = m_descriptor->make_VideoSource(m_logger, resolution, m_option.m_format, m_option.m_fps);
+    VideoFormat format = VideoFormat::OTHER;
+    FramesPerSecond fps = 0;
     if (source){
         resolution = source->current_resolution();
+        format = source->current_format();
+        fps = source->current_fps();
         source->add_source_frame_listener(*this);
         source->add_rendered_frame_listener(*this);
     }
@@ -288,6 +330,8 @@ void VideoSession::internal_set_resolution(Resolution resolution){
     {
         WriteSpinLock lg(m_state_lock);
         m_option.m_resolution = resolution;
+        m_option.m_format = format;
+        m_option.m_fps = fps;
         m_video_source = std::move(source);
     }
 
@@ -296,9 +340,9 @@ void VideoSession::internal_set_resolution(Resolution resolution){
         m_video_source.get()
     );
 }
-void VideoSession::internal_set_format(VideoFormat format){
+void VideoSession::internal_set_format(VideoFormat format, FramesPerSecond fps){
     m_logger.log("Changing format...", COLOR_GREEN);
-    if (m_option.m_format == format){
+    if (m_option.m_format == format && m_option.m_fps == fps){
         return;
     }
 
@@ -315,9 +359,10 @@ void VideoSession::internal_set_format(VideoFormat format){
         source.reset();
     }
 
-    source = m_descriptor->make_VideoSource(m_logger, m_option.m_resolution, format);
+    source = m_descriptor->make_VideoSource(m_logger, m_option.m_resolution, format, fps);
     if (source){
         format = source->current_format();
+        fps = source->current_fps();
         source->add_source_frame_listener(*this);
         source->add_rendered_frame_listener(*this);
     }
@@ -325,6 +370,7 @@ void VideoSession::internal_set_format(VideoFormat format){
     {
         WriteSpinLock lg(m_state_lock);
         m_option.m_format = format;
+        m_option.m_fps = fps;
         m_video_source = std::move(source);
     }
 
@@ -359,7 +405,7 @@ void VideoSession::run_commands(){
                 break;
 
             case CommandType::SET_SOURCE:
-                internal_set_source(command.device, command.resolution, command.format);
+                internal_set_source(command.device, command.resolution, command.format, command.fps);
                 break;
 
             case CommandType::SET_RESOLUTION:
@@ -367,7 +413,7 @@ void VideoSession::run_commands(){
                 break;
 
             case CommandType::SET_FORMAT:
-                internal_set_format(command.format);
+                internal_set_format(command.format, command.fps);
                 break;
             }
         }
