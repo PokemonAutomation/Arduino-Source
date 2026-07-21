@@ -48,7 +48,7 @@ public:
         Language language,
         const ImageViewRGB32& image,
         double max_log10p, double log10p_spread = 0.5,
-        OCR::PageSegMode psm = OCR::PageSegMode::SINGLE_BLOCK
+        OCR::PageSegMode psm = OCR::PageSegMode::SINGLE_LINE
     ) const;
 
     // Match a substring from `image` using multiple black-white filters.
@@ -77,7 +77,7 @@ public:
         const std::vector<OCR::TextColorRange>& text_color_ranges,
         double max_log10p, double log10p_spread = 0.5,
         double min_text_ratio = 0.01, double max_text_ratio = 0.50,
-        OCR::PageSegMode psm = OCR::PageSegMode::SINGLE_BLOCK
+        OCR::PageSegMode psm = OCR::PageSegMode::SINGLE_LINE
     ) const;
 
 

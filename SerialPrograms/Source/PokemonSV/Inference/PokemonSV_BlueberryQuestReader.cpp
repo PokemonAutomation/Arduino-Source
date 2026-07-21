@@ -29,7 +29,8 @@ OCR::StringMatchResult BlueberryQuestReader::read_substring(
 ) const{
     return match_substring_from_image_multifiltered(
         &logger, language, image, text_color_ranges,
-        MAX_LOG10P, MAX_LOG10P_SPREAD, min_text_ratio, max_text_ratio
+        MAX_LOG10P, MAX_LOG10P_SPREAD, min_text_ratio, max_text_ratio,
+        OCR::PageSegMode::SINGLE_BLOCK
     );
 }
 
