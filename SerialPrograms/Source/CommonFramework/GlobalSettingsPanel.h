@@ -127,7 +127,7 @@ public:
     FolderInputOption TEMP_FOLDER;
 
     Pimpl<ThemeSelectorOption> THEME;
-    BooleanCheckBoxOption USE_PADDLE_OCR;
+    BooleanCheckBoxOption USE_PADDLE_OCR0;
     BooleanCheckBoxOption USE_GPU_FOR_ML_INFERENCE;
     SettingsResourceDownloadTable RESOURCE_DOWNLOAD_TABLE;
     SettingsDownloadError DOWNLOAD_ERROR;

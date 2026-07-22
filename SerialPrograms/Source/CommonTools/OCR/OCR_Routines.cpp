@@ -28,7 +28,7 @@ namespace OCR{
 // that all the other languages are downloaded too, since they're all downloaded
 // as a bundle.
 bool use_paddle_ocr(){
-    static bool use_paddle_ocr = GlobalSettings::instance().USE_PADDLE_OCR && paddle_ocr_language_available(Language::English);
+    static bool use_paddle_ocr = GlobalSettings::instance().USE_PADDLE_OCR0 && paddle_ocr_language_available(Language::English);
 
     return use_paddle_ocr;
 }

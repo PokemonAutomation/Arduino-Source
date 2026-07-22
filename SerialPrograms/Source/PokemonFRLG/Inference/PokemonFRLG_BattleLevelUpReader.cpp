@@ -55,7 +55,7 @@ StatReads BattleLevelUpReader::read_stats(Logger &logger, const ImageViewRGB32& 
     auto read_stat = [&](const ImageFloatBox &box, const std::string &name){
         ImageViewRGB32 stat_region = extract_box_reference(game_screen, box);
 
-        if (!GlobalSettings::instance().USE_PADDLE_OCR){
+        if (!GlobalSettings::instance().USE_PADDLE_OCR0){
             // Tesseract-free path: waterfill segmentation + template matching
             // against the PokemonFRLG/Digits/0-9.png templates.
             return read_digits_waterfill_template(logger, stat_region);

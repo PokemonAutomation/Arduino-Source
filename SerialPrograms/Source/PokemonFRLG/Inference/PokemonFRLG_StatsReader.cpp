@@ -191,7 +191,7 @@ void StatsReader::read_level(
 
     ImageViewRGB32 level_box = extract_box_reference(game_screen, jpn ? m_box_level_jpn : m_box_level);
 
-    if (!GlobalSettings::instance().USE_PADDLE_OCR){
+    if (!GlobalSettings::instance().USE_PADDLE_OCR0){
         // The level uses white text with dark shadow on a lilac background.
         // The digit reader's binarizer captures dark pixels (<=190 on all channels)
         // but NOT the white text (all channels 255 -> excluded). This leaves the
@@ -335,7 +335,7 @@ void StatsReader::read_page2(
     auto read_stat = [&](const ImageFloatBox& box, const std::string& name){
         ImageViewRGB32 stat_region = extract_box_reference(game_screen, box);
 
-        if (!GlobalSettings::instance().USE_PADDLE_OCR){
+        if (!GlobalSettings::instance().USE_PADDLE_OCR0){
             // Tesseract-free path: waterfill segmentation + template matching
             // against the PokemonFRLG/Digits/0-9.png templates.
             return read_digits_waterfill_template(logger, stat_region);
