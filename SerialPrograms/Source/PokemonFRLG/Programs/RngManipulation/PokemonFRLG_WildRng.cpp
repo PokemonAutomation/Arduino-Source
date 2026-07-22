@@ -6,14 +6,18 @@
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonFramework/Language.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.h"
+#include "PokemonFRLG/Programs/PokemonFRLG_SafariOptimalAction.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_RngNavigation.h"
 #include "PokemonFRLG_HardReset.h"
@@ -520,15 +524,32 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
             break;
         }
 
-        int balls_thrown = auto_catch(env.console, context, MAX_BALL_THROWS, safari_zone);
-        if (balls_thrown < 0){
+        int catch_result = 0;
+        if (safari_zone){
+            int safari_balls_remaining = 30;
+
+            pbf_press_button(context, BUTTON_B, 100ms, 500ms);
+            context.wait_for_all_requests();
+
+            WildEncounterReader reader(COLOR_RED);
+            VideoOverlaySet overlays(env.console.overlay());
+            reader.make_overlays(overlays);
+            VideoSnapshot screen = env.console.video().snapshot();
+            PokemonFRLG_WildEncounter encounter = reader.read_encounter(env.logger(), LANGUAGE, screen, SAFARI_ZONE_POKEMON_SUBSET);
+
+            catch_result = auto_catch_safari(env.console, context, LANGUAGE, safari_balls_remaining, encounter.name);
+        } else{
+            catch_result = auto_catch(env.console, context, MAX_BALL_THROWS);
+        }
+
+        if (catch_result < 0){
             stats.errors++;
             send_program_recoverable_error_notification(
                 env, NOTIFICATION_ERROR_RECOVERABLE,
-                "auto_catch() encountered an error."
-            ); 
+                safari_zone ? "auto_catch_safari() encountered an error." : "auto_catch() encountered an error."
+            );
             continue;
-        }else if(balls_thrown == 0){
+        } else if (catch_result == 0){
             env.log("Failed catch.");
             continue;
         }

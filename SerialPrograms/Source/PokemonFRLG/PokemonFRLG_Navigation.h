@@ -9,6 +9,7 @@
 #ifndef PokemonAutomation_PokemonFRLG_Navigation_H
 #define PokemonAutomation_PokemonFRLG_Navigation_H
 
+#include "CommonFramework/Language.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_PartySlot.h"
@@ -120,6 +121,26 @@ int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftr
 // Trigger encounters by fishing with a registered rod. The player must be facing water.
 // returns -1 if no encounter is triggered, 0 if a non-shiny is encounter, and 1 if a shiny is encountered
 int fish_encounter(ConsoleHandle& console, ProControllerContext& context, Seconds timeout = 300s);
+
+// Automatically catch a Pokemon.
+// Returns -1 if there are detection issues, 0 if the Pokemon was not caught, and 1 if it was caught.
+int auto_catch(
+    ConsoleHandle& console,
+    ProControllerContext& context,
+    const uint64_t& max_ball_throws
+);
+
+// Automatically catch a Pokemon encountered in the Safari Zone. 
+// uses optimal Safari Zone catching strategy.
+// safari_balls_remaining is updated to reflect the number of balls remaining after the encounter.
+// Returns -1 if there are detection issues, 0 if the Pokemon was not caught, and 1 if it was caught.
+int auto_catch_safari(
+    ConsoleHandle& console,
+    ProControllerContext& context,
+    Language game_language,
+    int& safari_balls_remaining, 
+    std::string encounter_name
+);
 
 // Go to home to check that scaling is 100%. Then resume game.
 void home_black_border_check(ConsoleHandle& console, ProControllerContext& context);

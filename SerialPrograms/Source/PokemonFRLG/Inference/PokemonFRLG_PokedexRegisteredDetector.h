@@ -18,12 +18,12 @@ namespace PokemonFRLG{
 
 // Detects the white "A" button prompt that appears in the bottom right of the
 // screen when a Pokémon is registered in the Pokédex.
+// If that fails, detect the various colors of the Pokédex registration screen.
 class PokedexRegisteredDetector : public StaticScreenDetector{
 public:
     PokedexRegisteredDetector(
         Color color,
-        VideoOverlay* overlay,
-        const ImageFloatBox& box = ImageFloatBox(0.85, 0.923, 0.082, 0.070)
+        VideoOverlay* overlay
     );
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
@@ -35,6 +35,11 @@ private:
     Color m_color;
     VideoOverlay* m_overlay;
     const ImageFloatBox m_box;
+    const ImageFloatBox m_top_box;
+    const ImageFloatBox m_header_box;
+    const ImageFloatBox m_divider_box;
+    const ImageFloatBox m_body_box;
+    const ImageFloatBox m_bottom_box;
 
     ImageFloatBox m_last_detected;
     std::optional<OverlayBoxScope> m_last_detected_box;
@@ -45,10 +50,9 @@ public:
     PokedexRegisteredWatcher(
         Color color,
         VideoOverlay* overlay,
-        const ImageFloatBox& box = ImageFloatBox(0.85, 0.923, 0.082, 0.070),
         std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
     )
-        : DetectorToFinder("PokedexRegisteredWatcher", hold_duration, color, overlay, box)
+        : DetectorToFinder("PokedexRegisteredWatcher", hold_duration, color, overlay)
     {}
 };
 

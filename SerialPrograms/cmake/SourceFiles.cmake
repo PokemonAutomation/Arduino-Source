@@ -1503,8 +1503,6 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_PartySlot.h
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_TrainerCardDetector.cpp
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_TrainerCardDetector.h
-    Source/PokemonFRLG/Inference/Menus/PokemonFRLG_DexRegistrationDetector.cpp
-    Source/PokemonFRLG/Inference/Menus/PokemonFRLG_DexRegistrationDetector.h
     Source/PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.cpp
     Source/PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.h
     Source/PokemonFRLG/Inference/Sounds/PokemonFRLG_CatchFanfareDetector.cpp

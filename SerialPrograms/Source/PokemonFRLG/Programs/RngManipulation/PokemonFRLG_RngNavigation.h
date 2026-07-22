@@ -45,13 +45,6 @@ AdvObservedPokemon read_summary(
     std::set<std::string> species = {}
 );
 
-int auto_catch(
-    ConsoleHandle& console, 
-    ProControllerContext& context, 
-    const uint64_t& max_ball_throws,
-    bool safari_zone = false
-);
-
 bool use_rare_candy(
     ConsoleHandle& console, 
     ProControllerContext& context,
