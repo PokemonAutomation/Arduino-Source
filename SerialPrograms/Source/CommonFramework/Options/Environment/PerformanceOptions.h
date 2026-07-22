@@ -23,7 +23,9 @@ public:
         : GroupOption(
             "Performance",
             LockMode::LOCK_WHILE_RUNNING,
-            GroupOption::EnableMode::ALWAYS_ENABLED, true
+            GroupOption::EnableMode::ALWAYS_ENABLED,
+            true,
+            false
         )
         , REALTIME_THREAD_PRIORITY(
             "<b>Realtime Thread Priority:</b><br>"
@@ -81,7 +83,8 @@ public:
         PA_ADD_OPTION(REALTIME_THREAD_POOL);
         PA_ADD_OPTION(NORMAL_THREAD_POOL);
 
-        PA_ADD_OPTION(PRECISE_WAKE_MARGIN);
+        //  Used only by sys-botbase 2 which has been removed.
+//        PA_ADD_OPTION(PRECISE_WAKE_MARGIN);
     }
 
 public:

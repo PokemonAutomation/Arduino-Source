@@ -194,7 +194,6 @@ ProControllerFromKeyboardTable::ProControllerFromKeyboardTable()
     : EditableTableOption_t<ProControllerFromKeyboardTableRow>(
         "<b>Pro Controller:</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
-        true,
         make_defaults()
     )
     , m_advanced_mode(false)

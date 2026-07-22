@@ -21,7 +21,9 @@ public:
         : GroupOption(
             "Video Pipeline",
             LockMode::LOCK_WHILE_RUNNING,
-            GroupOption::EnableMode::ALWAYS_ENABLED, true
+            GroupOption::EnableMode::ALWAYS_ENABLED,
+            true,
+            false
         )
     , SHOW_ALL_FPS(
         "<b>Show all FPS Options:</b><br>"

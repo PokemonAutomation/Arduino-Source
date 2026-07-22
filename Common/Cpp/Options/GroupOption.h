@@ -26,12 +26,15 @@ public:
         std::string label,
         LockMode lock_while_program_is_running,
         EnableMode enable_mode = EnableMode::ALWAYS_ENABLED,
-        bool show_restore_defaults_button = false
+        bool show_restore_defaults_button = false,
+        bool default_expanded = true
     );
 
     const std::string label() const;
 
     bool toggleable() const;
+    bool default_expanded() const;
+
     bool enabled() const;
     void set_enabled(bool enabled);
 

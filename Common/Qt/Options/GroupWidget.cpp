@@ -33,6 +33,7 @@ GroupWidget::GroupWidget(QWidget& parent, GroupOption& value)
     , ConfigWidget(value, *this)
     , m_value(value)
     , m_restore_defaults_button(nullptr)
+    , m_expanded(value.default_expanded())
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
 //    layout->setAlignment(Qt::AlignTop);
@@ -58,17 +59,22 @@ GroupWidget::GroupWidget(QWidget& parent, GroupOption& value)
     group_layout->setAlignment(Qt::AlignTop);
     group_layout->setContentsMargins(0, 10, 0, 0);
 
-    m_expand_text = new QWidget(m_group_box);
-    m_expand_text->setLayout(new QVBoxLayout());
-    m_expand_text->layout()->addWidget(new QLabel("(double click to expand)", this));
-    m_expand_text->setVisible(false);
-    group_layout->addWidget(m_expand_text);
+    {
+        m_expand_text = new QWidget(m_group_box);
+        m_expand_text->setLayout(new QVBoxLayout());
+        m_expand_text->layout()->addWidget(new QLabel("<font color=\"orange\">(double click to expand)</font>", this));
+        m_expand_text->setVisible(false);
+        group_layout->addWidget(m_expand_text);
+    }
 
 
     m_options_holder = new QWidget(m_group_box);
     group_layout->addWidget(m_options_holder);
     m_options_layout = new QVBoxLayout(m_options_holder);
     m_options_layout->setContentsMargins(0, 0, 0, 0);
+
+    m_expand_text->setVisible(!m_expanded);
+    m_options_holder->setVisible(m_expanded);
 
     for (auto& item : value.options()){
         m_options.emplace_back(ConfigWidget::make_from_option(*item, &parent));

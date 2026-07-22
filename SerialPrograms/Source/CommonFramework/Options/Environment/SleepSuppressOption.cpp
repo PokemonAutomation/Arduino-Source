@@ -33,7 +33,9 @@ SleepSuppressOptions::SleepSuppressOptions()
     : GroupOption(
         "Suppress Screensaver/Sleep:",
         LockMode::UNLOCK_WHILE_RUNNING,
-        GroupOption::EnableMode::ALWAYS_ENABLED, true
+        GroupOption::EnableMode::ALWAYS_ENABLED,
+        true,
+        false
     )
     , IDLE("No Program Running:", SleepSuppress::NONE)
 #ifdef PA_ENABLE_SLEEP_SUPPRESS_NO_SLEEP

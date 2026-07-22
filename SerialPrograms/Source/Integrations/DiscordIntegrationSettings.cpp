@@ -24,7 +24,9 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     : ConfigOptionImpl<DiscordIntegrationSettingsOption, GroupOption>(
         "Discord Integration Settings",
         LockMode::LOCK_WHILE_RUNNING,
-        GroupOption::EnableMode::DEFAULT_DISABLED
+        GroupOption::EnableMode::DEFAULT_DISABLED,
+        false,
+        false
     )
 //    , m_integration_enabled(integration_enabled)
     , run_on_start(

@@ -159,14 +159,16 @@ GlobalSettings::GlobalSettings()
         "Set the size/position of the window. Takes effect immediately.<br>"
         "Use this to easily set the window to a specific resolution for streaming alignment.",
         1280, 1000,
-        0, 0
+        0, 0,
+        false
     )
     , LOG_WINDOW_SIZE(
         CONSTRUCT_TOKEN,
         "Output Window Size/Position:",
         "Set the size/position of the output window. Takes effect immediately.<br>",
         600, 1200,
-        0, 0
+        0, 0,
+        false
     )
     , LOG_WINDOW_STARTUP(
         "<b>Open Output Window at startup:</b>",

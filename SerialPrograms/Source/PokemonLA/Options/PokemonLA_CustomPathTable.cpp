@@ -305,6 +305,7 @@ CustomPathTable::CustomPathTable()
         "<font color=\"red\">If you wish to ignore enroute shinies, make sure you set \"Enroute Shiny Action\" to ignore shinies.</font>",
         LockMode::LOCK_WHILE_RUNNING,
         false,  //  Disable the save/load buttons since we have our own.
+        20,
         make_defaults()
     )
 {}

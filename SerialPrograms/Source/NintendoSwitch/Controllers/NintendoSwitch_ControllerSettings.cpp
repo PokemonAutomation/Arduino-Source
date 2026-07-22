@@ -394,8 +394,7 @@ ControllerSettingsTable::ControllerSettingsTable()
         "Changing it will not actually change the MAC address of the device."
         "<br><br>"
         "Changes take effect after resetting the device.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        true
+        LockMode::UNLOCK_WHILE_RUNNING
     )
 {}
 std::vector<std::string> ControllerSettingsTable::make_header() const{

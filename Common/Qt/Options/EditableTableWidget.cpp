@@ -26,6 +26,12 @@ template class RegisterConfigWidget<EditableTableWidget>;
 
 
 
+void EditableTableWidget::Label::mouseDoubleClickEvent(QMouseEvent* event){
+    m_parent->mouseDoubleClickEvent(event);
+}
+
+
+
 EditableTableWidget::~EditableTableWidget(){
     m_value.remove_listener(*this);
     delete m_table;
@@ -35,12 +41,14 @@ EditableTableWidget::EditableTableWidget(QWidget& parent, EditableTableOption& v
     , ConfigWidget(value, *this)
     , m_value(value)
     , m_table(nullptr)
+    , m_expanded(value.expand_by_default())
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
 
     if (!value.label().empty()){
-        QLabel* label = new QLabel(QString::fromStdString(value.label()), this);
+        Label* label = new Label(QString::fromStdString(value.label()), this);
+        label->m_parent = this;
         label->setWordWrap(true);
         label->setTextFormat(Qt::RichText);
         label->setTextInteractionFlags(Qt::TextBrowserInteraction);
@@ -48,9 +56,20 @@ EditableTableWidget::EditableTableWidget(QWidget& parent, EditableTableOption& v
         layout->addWidget(label);
     }
 
+    {
+        m_expand_text = new QWidget(this);
+        m_expand_text->setLayout(new QVBoxLayout());
+        m_expand_text->layout()->addWidget(new QLabel("<font color=\"orange\">(double click to expand table)</font>", this));
+        m_expand_text->setVisible(false);
+        layout->addWidget(m_expand_text);
+    }
+
     m_table = new AutoHeightTableWidget(this);
     layout->addWidget(m_table, 0, Qt::AlignTop);
 //    m_table->setMouseTracking(false);
+
+    m_expand_text->setVisible(!m_expanded);
+    m_table->setVisible(m_expanded);
 
     QStringList header;
     for (const std::string& name : m_value.make_header()){
@@ -299,6 +318,12 @@ void EditableTableWidget::update_sizes(){
     }, Qt::QueuedConnection);
 }
 
+
+void EditableTableWidget::mouseDoubleClickEvent(QMouseEvent* event){
+    m_expand_text->setVisible(m_expanded);
+    m_expanded = !m_expanded;
+    m_table->setVisible(m_expanded);
+}
 
 
 QWidget* EditableTableWidget::make_clone_button(EditableTableRow& row){

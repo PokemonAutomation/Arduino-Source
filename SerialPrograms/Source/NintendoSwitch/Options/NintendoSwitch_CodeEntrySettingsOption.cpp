@@ -55,7 +55,9 @@ CodeboardTimingsOption::CodeboardTimingsOption(
     : GroupOption(
         std::move(label),
         LockMode::UNLOCK_WHILE_RUNNING,
-        GroupOption::EnableMode::ALWAYS_ENABLED, true
+        GroupOption::EnableMode::ALWAYS_ENABLED,
+        true,
+        false
     )
     , unit(get_unit_timing(performance_class))
     , REORDERING(
@@ -133,7 +135,9 @@ KeyboardControllerTimingsOption::KeyboardControllerTimingsOption()
     : GroupOption(
         "Keyboard Controller Timings",
         LockMode::UNLOCK_WHILE_RUNNING,
-        GroupOption::EnableMode::ALWAYS_ENABLED, true
+        GroupOption::EnableMode::ALWAYS_ENABLED,
+        true,
+        false
     )
     , PARLLELIZE(
         "<b>Parallel Entry:</b><br>Allow characters to be entered in parallel if possible.",
