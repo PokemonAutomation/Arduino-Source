@@ -117,7 +117,7 @@ public:
 
 private:
     virtual void on_config_value_changed(void* object) override;
-    virtual void on_press() override;
+    virtual void on_press(ButtonCell& button) override;
 
 public:
     Pimpl<CheckForUpdatesOption> CHECK_FOR_UPDATES;

@@ -34,8 +34,7 @@ public:
     virtual void start_program_controller_check(ControllerSession& session) override{}
     virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
-
-    virtual void on_press() override;
+    virtual void on_press(ButtonCell& button) override;
 
 private:
     ButtonOption BUTTON;

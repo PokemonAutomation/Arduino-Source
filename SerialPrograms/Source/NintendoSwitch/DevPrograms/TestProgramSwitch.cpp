@@ -295,7 +295,7 @@ using namespace PABotBase2;
 
 
 
-void TestProgram::on_press(){
+void TestProgram::on_press(ButtonCell& button){
     global_logger_tagged().log("Button Pressed");
 //    BUTTON.set_enabled(false);
     BUTTON0.set_text("Button Pressed");

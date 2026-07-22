@@ -32,8 +32,6 @@ GroupWidget::GroupWidget(QWidget& parent, GroupOption& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
     , m_value(value)
-    , m_restore_defaults_button(nullptr)
-    , m_expanded(value.default_expanded())
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
 //    layout->setAlignment(Qt::AlignTop);
@@ -67,26 +65,43 @@ GroupWidget::GroupWidget(QWidget& parent, GroupOption& value)
         group_layout->addWidget(m_expand_text);
     }
 
+    if (value.default_expanded()){
+        m_expand_text->setVisible(false);
+        make_options();
+    }else{
+        m_expand_text->setVisible(true);
+    }
+
+    connect(
+        m_group_box, &QGroupBox::toggled,
+        this, [this](bool on){
+            m_value.set_enabled(on);
+//            m_value.on_set_enabled(on);
+        }
+    );
+
+    value.add_listener(*this);
+}
+
+void GroupWidget::make_options(){
+    QVBoxLayout* group_layout = static_cast<QVBoxLayout*>(m_group_box->layout());
 
     m_options_holder = new QWidget(m_group_box);
     group_layout->addWidget(m_options_holder);
-    m_options_layout = new QVBoxLayout(m_options_holder);
-    m_options_layout->setContentsMargins(0, 0, 0, 0);
+    QVBoxLayout* options_layout = new QVBoxLayout(m_options_holder);
+    options_layout->setContentsMargins(0, 0, 0, 0);
 
-    m_expand_text->setVisible(!m_expanded);
-    m_options_holder->setVisible(m_expanded);
-
-    for (auto& item : value.options()){
-        m_options.emplace_back(ConfigWidget::make_from_option(*item, &parent));
+    for (auto& item : m_value.options()){
+        m_options.emplace_back(ConfigWidget::make_from_option(*item, this));
         m_options.back()->widget().setContentsMargins(5, 5, 5, 5);
-        m_options_layout->addWidget(&m_options.back()->widget());
+        options_layout->addWidget(&m_options.back()->widget());
     }
 
-    if (value.restore_defaults_button_enabled()){
+    if (m_value.restore_defaults_button_enabled()){
         m_restore_defaults_button = new QPushButton("Restore Defaults", this);
         m_restore_defaults_button->setContentsMargins(5, 5, 5, 5);
         QHBoxLayout* row = new QHBoxLayout();
-        m_options_layout->addLayout(row);
+        options_layout->addLayout(row);
         row->addWidget(m_restore_defaults_button, 1);
         row->addStretch(3);
         connect(
@@ -105,16 +120,9 @@ GroupWidget::GroupWidget(QWidget& parent, GroupOption& value)
         );
     }
 
-    connect(
-        m_group_box, &QGroupBox::toggled,
-        this, [this](bool on){
-            m_value.set_enabled(on);
-//            m_value.on_set_enabled(on);
-        }
-    );
-
-    value.add_listener(*this);
 }
+
+
 
 #if 0
 void GroupWidget::set_options_enabled(bool enabled){
@@ -138,9 +146,15 @@ void GroupWidget::on_config_value_changed(void* object){
     }, Qt::QueuedConnection);
 }
 void GroupWidget::mouseDoubleClickEvent(QMouseEvent*){
-    m_expand_text->setVisible(m_expanded);
-    m_expanded = !m_expanded;
-    m_options_holder->setVisible(m_expanded);
+    if (m_options_holder){
+        m_expand_text->setVisible(true);
+        delete m_options_holder;
+        m_options_holder = nullptr;
+        return;
+    }
+
+    m_expand_text->setVisible(false);
+    make_options();
 }
 
 

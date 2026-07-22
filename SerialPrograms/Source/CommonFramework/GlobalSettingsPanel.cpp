@@ -472,7 +472,7 @@ void GlobalSettings::on_config_value_changed(void* object){
     }
 }
 
-void GlobalSettings::on_press(){
+void GlobalSettings::on_press(ButtonCell& button){
     // Open the runtime base folder in the system file manager
     QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdString(RUNTIME_BASE_PATH())));
 }

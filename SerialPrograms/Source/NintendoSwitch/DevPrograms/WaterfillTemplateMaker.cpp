@@ -68,7 +68,7 @@ void WaterfillTemplateMaker::program(SingleSwitchProgramEnvironment& env, Cancel
 }
 
 
-void WaterfillTemplateMaker::on_press(){
+void WaterfillTemplateMaker::on_press(ButtonCell& button){
 
     using namespace Kernels;
     using namespace Kernels::Waterfill;

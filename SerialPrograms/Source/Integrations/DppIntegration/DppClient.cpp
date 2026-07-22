@@ -185,7 +185,7 @@ void Client::run(const std::string& token){
 
 //    cout << "Client::run() - ending" << endl;
 }
-void Client::on_press(){
+void Client::on_press(ButtonCell& button){
     std::lock_guard<std::mutex> lg(m_register_lock);
     if (m_handler && m_handler->slash_commands_enabled){
         GlobalSettings::instance().DISCORD->integration.register_slash_button.set_enabled(false);

@@ -39,9 +39,6 @@
 // Resource Download
 #include "CommonFramework/ResourceDownload/SettingsResourceDownloadWidget.h"
 
-//  Integrations
-#include "Integrations/DiscordIntegrationSettingsWidget.h"
-
 //  Common Tools
 #include "CommonTools/Options/QtWidgets/StringSelectWidget.h"
 #include "CommonTools/Options/QtWidgets/ScreenWatchWidget.h"
@@ -109,9 +106,6 @@ void register_all_statics(){
     RegisterConfigWidget<SettingsCancelButtonWidget>();
     RegisterConfigWidget<SettingsProgressBarWidget>();
     RegisterConfigWidget<SettingsDownloadErrorWidget>();
-
-    //  Integrations
-    RegisterConfigWidget<Integration::DiscordIntegrationSettingsWidget>();
 
     //  Common Tools
     RegisterConfigWidget<StringSelectCellWidget>();

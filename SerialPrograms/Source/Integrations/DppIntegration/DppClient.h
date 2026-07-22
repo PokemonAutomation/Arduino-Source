@@ -40,7 +40,7 @@ public:
 
 private:
     void run(const std::string& token);
-    virtual void on_press() override;
+    virtual void on_press(ButtonCell& button) override;
 
 private:
     std::unique_ptr<dpp::cluster> m_bot = nullptr;

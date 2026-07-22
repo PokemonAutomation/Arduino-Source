@@ -17,18 +17,27 @@ namespace PokemonAutomation{
 namespace Integration{
 
 
+
+
+
+
+
+
 DiscordIntegrationSettingsOption::~DiscordIntegrationSettingsOption(){
+    m_start_button.remove_listener(static_cast<ButtonListener&>(*this));
+    m_stop_button.remove_listener(static_cast<ButtonListener&>(*this));
     this->remove_listener(*this);
 }
 DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
-    : ConfigOptionImpl<DiscordIntegrationSettingsOption, GroupOption>(
+    : GroupOption(
         "Discord Integration Settings",
         LockMode::LOCK_WHILE_RUNNING,
         GroupOption::EnableMode::DEFAULT_DISABLED,
         false,
         false
     )
-//    , m_integration_enabled(integration_enabled)
+    , m_start_button("<b>Bot Control:</b>", "Start Bot")
+    , m_stop_button("", "Stop Bot")
     , run_on_start(
         "<b>Run Discord Integration on Launch:</b><br>Automatically connect to Discord as soon as the program is launched.",
         LockMode::LOCK_WHILE_RUNNING,
@@ -77,6 +86,8 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
         false
     )
 {
+    PA_ADD_OPTION(m_start_button);
+    PA_ADD_OPTION(m_stop_button);
     PA_ADD_OPTION(run_on_start);
     PA_ADD_OPTION(register_slash_button);
     PA_ADD_OPTION(command_type);
@@ -90,6 +101,8 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     DiscordIntegrationSettingsOption::on_config_value_changed(this);
 
     this->add_listener(*this);
+    m_start_button.add_listener(static_cast<ButtonListener&>(*this));
+    m_stop_button.add_listener(static_cast<ButtonListener&>(*this));
 }
 void DiscordIntegrationSettingsOption::on_config_value_changed([[maybe_unused]] void* object){
 //    cout << this->enabled() << endl;
@@ -106,6 +119,19 @@ void DiscordIntegrationSettingsOption::on_config_value_changed([[maybe_unused]] 
 
     command_prefix.set_visibility(state);
 #endif
+}
+
+void DiscordIntegrationSettingsOption::on_press(ButtonCell& button){
+    if (&button == &m_start_button){
+        DppClient::Client::instance().connect();
+        on_config_value_changed(this);
+        return;
+    }
+    if (&button == &m_stop_button){
+        DppClient::Client::instance().disconnect();
+        on_config_value_changed(this);
+        return;
+    }
 }
 
 

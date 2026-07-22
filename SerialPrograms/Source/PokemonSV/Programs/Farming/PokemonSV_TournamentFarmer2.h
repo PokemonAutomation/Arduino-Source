@@ -31,7 +31,7 @@ public:
     ~TournamentFarmer2();
     TournamentFarmer2();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
-    virtual void on_press() override;
+    virtual void on_press(ButtonCell& button) override;
 
 private:
     class StopButton : public ButtonOption{

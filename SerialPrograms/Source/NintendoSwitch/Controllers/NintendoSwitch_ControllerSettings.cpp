@@ -374,7 +374,7 @@ void ControllerSettingsRow::on_config_value_changed(void* object){
     }
 
 }
-void ControllerSettingsRow::on_press(){
+void ControllerSettingsRow::on_press(ButtonCell& button){
     set_profile(ControllerSettingsTable::random_profile(controller, nullptr));
 }
 

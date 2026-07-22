@@ -33,6 +33,7 @@ public:
 private:
     virtual void mouseDoubleClickEvent(QMouseEvent* event) override;
 
+    void make_table();
     QWidget* make_clone_button(EditableTableRow& row);
     QWidget* make_insert_button(EditableTableRow& row);
     QWidget* make_delete_button(EditableTableRow& row);
@@ -47,10 +48,9 @@ private:
 
 private:
     EditableTableOption& m_value;
-    AutoHeightTableWidget* m_table;
-    QWidget* m_expand_text;
+    AutoHeightTableWidget* m_table = nullptr;
+    QWidget* m_expand_text = nullptr;
     std::vector<std::shared_ptr<EditableTableRow>> m_current;
-    bool m_expanded = true;
 };
 
 

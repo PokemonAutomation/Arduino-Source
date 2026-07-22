@@ -115,7 +115,7 @@ void ButtonCell::set_text(std::string text){
 void ButtonCell::press_button(){
     ReadSpinLock lg(m_data->m_listener_lock);
     for (ButtonListener* listener : m_data->m_listeners){
-        listener->on_press();
+        listener->on_press(*this);
     }
 }
 
