@@ -22,6 +22,10 @@
 #include "CameraWidgetQt6_QML.h"
 #endif
 
+#if defined(__linux__) || defined(__APPLE__)
+#include "CameraWidgetOpenCV.h"
+#endif
+
 
 namespace PokemonAutomation{
 
@@ -50,6 +54,12 @@ struct CameraBackends{
     }
 
     CameraBackends(){
+#if defined(__linux__) || defined(__APPLE__)
+        m_backends.emplace_back(
+            "opencv-v4l2", "Linux: OpenCV V4L2",
+            std::make_unique<CameraOpenCV::CameraBackend>()
+        );
+#endif
 #if QT_VERSION_MAJOR == 6
         m_backends.emplace_back(
             "qt6-QVideoSink", "Qt6: QVideoSink",
