@@ -4,6 +4,7 @@
  *
  */
 
+#include <thread>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/MemoryUtilization/MemoryUtilization.h"
