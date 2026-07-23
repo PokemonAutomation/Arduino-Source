@@ -523,6 +523,9 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Startup/NewVersionCheck.h
     Source/CommonFramework/Startup/SetupSettings.cpp
     Source/CommonFramework/Startup/SetupSettings.h
+    Source/CommonFramework/TestRunners/UnitTest.h
+    Source/CommonFramework/TestRunners/UnitTestRunner.cpp
+    Source/CommonFramework/TestRunners/UnitTestRunner.h
     Source/CommonFramework/Tools/DebugDumper.cpp
     Source/CommonFramework/Tools/DebugDumper.h
     Source/CommonFramework/Tools/ErrorDumper.cpp

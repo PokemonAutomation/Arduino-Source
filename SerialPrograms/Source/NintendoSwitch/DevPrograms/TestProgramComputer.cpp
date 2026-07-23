@@ -148,6 +148,7 @@
 #include "CommonTools/Random.h"
 #include "CommonTools/OCR/OCR_TextMatcher.h"
 #include "Integrations/PybindSwitchController.h"
+#include "CommonFramework/TestRunners/UnitTestRunner.h"
 
 //#include <opencv2/core.hpp>
 #include <onnxruntime_cxx_api.h>
@@ -369,6 +370,37 @@ void stress_test(Logger& logger, CancellableScope& scope){
 std::mutex print_lock;
 
 
+
+
+
+
+
+
+class SampleTest : public UnitTest{
+public:
+    SampleTest(std::string name)
+        : UnitTest(std::move(name))
+    {}
+
+    virtual std::pair<UnitTestResult, std::string> run(CancellableScope& scope) override{
+        scope.wait_for(Milliseconds(1000));
+        return {UnitTestResult::PASSED, ""};
+    }
+
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace NintendoSwitch;
@@ -381,10 +413,22 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
     [[maybe_unused]] Logger& logger = env.logger();
 
+
+    UnitTestRunner runner(scope, logger);
+
+    runner.add_test<SampleTest>("test0");
+    runner.add_test<SampleTest>("test1");
+    runner.add_test<SampleTest>("test2");
+    runner.add_test<SampleTest>("test3");
+    runner.add_test<SampleTest>("test4");
+
+    runner.wait_for_all();
+
+
 //    cout << random_u32(100, 115) << endl;
 
 
-    cout << OCR::random_match_probability(10, 1, 0.5) << endl;
+//    cout << OCR::random_match_probability(10, 1, 0.5) << endl;
 
 #if 0
     PybindSwitchProController controller("COM3");
