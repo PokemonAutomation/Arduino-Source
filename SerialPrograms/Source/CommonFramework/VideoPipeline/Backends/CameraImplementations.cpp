@@ -17,9 +17,9 @@
 #if 0
 #elif QT_VERSION_MAJOR == 6
 #include "CameraWidgetQt6.h"
-#if QT_VERSION_MINOR >= 5
 #include "CameraWidgetQt6.5.h"
-#endif
+#include "CameraWidgetQt6_QVideoWidget.h"
+#include "CameraWidgetQt6_QML.h"
 #endif
 
 
@@ -54,6 +54,14 @@ struct CameraBackends{
         m_backends.emplace_back(
             "qt6-QVideoSink", "Qt6: QVideoSink",
             std::make_unique<CameraQt6QVideoSink::CameraBackend>()
+        );
+        m_backends.emplace_back(
+            "qt6-qvideowidget", "Qt6: GPU Offloaded (QOpenGLWidget)",
+            std::make_unique<CameraQt6QVideoWidget::CameraBackend>()
+        );
+        m_backends.emplace_back(
+            "qt6-qml", "Qt6: GPU Offloaded (QML QQuickWidget)",
+            std::make_unique<CameraQt6QML::CameraBackend>()
         );
 #endif
 #if QT_VERSION_MAJOR == 6 && QT_VERSION_MINOR >= 5

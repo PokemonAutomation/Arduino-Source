@@ -78,10 +78,10 @@ if(WIN32 AND QT_DEPLOY_FILES)
     if(QT_CANDIDATE_DIR AND EXISTS "${QT_CANDIDATE_DIR}")
         message(STATUS "Using preferred Qt directory for Qt${QT_MAJOR} ${PREFERRED_QT_VER}: ${QT_CANDIDATE_DIR}")
         list(APPEND CMAKE_PREFIX_PATH "${QT_CANDIDATE_DIR}")
-        find_package(Qt${QT_MAJOR} ${PREFERRED_QT_VER} COMPONENTS Widgets SerialPort Multimedia MultimediaWidgets REQUIRED)
+        find_package(Qt${QT_MAJOR} ${PREFERRED_QT_VER} COMPONENTS Widgets SerialPort Multimedia MultimediaWidgets OpenGLWidgets Qml Quick QuickWidgets REQUIRED)
     else()
         # Find all subdirectories in the Qt base directory
-        find_package(Qt${QT_MAJOR} COMPONENTS Widgets SerialPort Multimedia MultimediaWidgets REQUIRED)
+        find_package(Qt${QT_MAJOR} COMPONENTS Widgets SerialPort Multimedia MultimediaWidgets OpenGLWidgets Qml Quick QuickWidgets REQUIRED)
         file(GLOB QT_SUBDIRS LIST_DIRECTORIES true "${QT_BASE_DIR}/${QT_MAJOR}*")
 
         # Filter and sort the directories to find the latest version
@@ -109,7 +109,7 @@ if(WIN32 AND QT_DEPLOY_FILES)
         REQUIRED
     )
 else()
-    find_package(Qt${QT_MAJOR} COMPONENTS Widgets SerialPort Multimedia MultimediaWidgets REQUIRED)
+    find_package(Qt${QT_MAJOR} COMPONENTS Widgets SerialPort Multimedia MultimediaWidgets OpenGLWidgets Qml Quick QuickWidgets REQUIRED)
 endif()
 
 # disable deprecated Qt APIs
@@ -188,7 +188,7 @@ endif()
 # Function to apply common properties to both library and executable targets
 function(apply_common_target_properties target_name)
     set_target_properties(${target_name} PROPERTIES LINKER_LANGUAGE CXX)
-    target_link_libraries(${target_name} PRIVATE Qt${QT_MAJOR}::Widgets Qt${QT_MAJOR}::SerialPort Qt${QT_MAJOR}::Multimedia Qt${QT_MAJOR}::MultimediaWidgets)
+    target_link_libraries(${target_name} PRIVATE Qt${QT_MAJOR}::Widgets Qt${QT_MAJOR}::SerialPort Qt${QT_MAJOR}::Multimedia Qt${QT_MAJOR}::MultimediaWidgets Qt${QT_MAJOR}::OpenGLWidgets Qt${QT_MAJOR}::Qml Qt${QT_MAJOR}::Quick Qt${QT_MAJOR}::QuickWidgets)
     target_link_libraries(${target_name} PRIVATE Threads::Threads)
 
     #add defines
@@ -468,10 +468,9 @@ else() # macOS and Linux
     endif() # end Linux
 
     # Find OpenCV
-    pkg_search_module(OpenCV REQUIRED opencv4 opencv)
-    target_include_directories(SerialProgramsLib SYSTEM PRIVATE ${OpenCV_INCLUDE_DIRS}) # "SYSTEM" to suppress warnings
-    target_link_directories(SerialProgramsLib PUBLIC ${OpenCV_LIBRARY_DIRS})
-    target_link_libraries(SerialProgramsLib PUBLIC ${OpenCV_LINK_LIBRARIES})
+    find_package(OpenCV REQUIRED)
+    target_include_directories(SerialProgramsLib SYSTEM PUBLIC ${OpenCV_INCLUDE_DIRS}) # "SYSTEM" to suppress warnings
+    target_link_libraries(SerialProgramsLib PUBLIC ${OpenCV_LIBS})
 
     #we hope to use our own Tesseract build in future so we can rid that dependency
     #but right now to run on Linux and Mac we need to use external Tesseract library

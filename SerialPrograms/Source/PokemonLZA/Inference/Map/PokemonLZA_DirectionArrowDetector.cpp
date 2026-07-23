@@ -8,6 +8,9 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include <opencv2/opencv.hpp>
+#if __has_include(<opencv2/geometry/2d.hpp>)
+#include <opencv2/geometry/2d.hpp>
+#endif
 #include <cmath>
 
 // #define DEBUG_DIRECTION_ARROW

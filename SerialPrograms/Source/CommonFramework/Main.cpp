@@ -227,11 +227,18 @@ int main(int argc, char *argv[]){
 #endif
 
 #if defined(__linux__)
-    // Qt multimedia, default to gstreamer to prevent flickering
-    // Easier than the alternative which is compiling qt6multimedia with QT_DEFAULT_MEDIA_BACKEND
+    // Enable libv4l2 for GStreamer by default to fix issues with cheap capture cards
+    // This helps prevent "Invalid argument (22)" buffer allocation errors on v4l2src.
+    if (qEnvironmentVariableIsEmpty("GST_V4L2_USE_LIBV4L2")) {
+        qputenv("GST_V4L2_USE_LIBV4L2", "1");
+    }
+
+    // Qt multimedia, default to ffmpeg to prevent GStreamer capture drops.
+    // GStreamer used to be preferred to prevent flickering but causes fatal 
+    // crashes (buffer allocation errors) with cheap capture cards on Linux.
     // See: https://doc.qt.io/qt-6.5/qtmultimedia-index.html
     if (qEnvironmentVariableIsEmpty("QT_MEDIA_BACKEND"))
-        qputenv("QT_MEDIA_BACKEND", "gstreamer");
+        qputenv("QT_MEDIA_BACKEND", "ffmpeg");
 #endif
 
     //  So far, this is only needed on Mac where static initialization is fucked up.

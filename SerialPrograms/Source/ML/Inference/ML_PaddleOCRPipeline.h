@@ -13,6 +13,9 @@
 #include <vector>
 #include <onnxruntime_cxx_api.h>
 #include <opencv2/opencv.hpp>
+#if __has_include(<opencv2/geometry/2d.hpp>)
+#include <opencv2/geometry/2d.hpp>
+#endif
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"

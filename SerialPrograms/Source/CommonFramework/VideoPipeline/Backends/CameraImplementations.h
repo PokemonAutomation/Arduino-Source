@@ -23,7 +23,7 @@ public:
 
 // Abstract base class for camera backend implementation.
 // Call `get_camera_backend()` to get the camera backend singleton.
-// Current camera backend is implemented in CameraWidgetQt6.h/cpp.
+// Qt6 camera backends are implemented in CameraWidgetQt6*.h/cpp.
 class CameraBackend{
 public:
     virtual ~CameraBackend() = default;
@@ -47,7 +47,7 @@ public:
 
 
 // Get the camera backend singleton.
-// Current camera backend is implemented in CameraWidgetQt6.h/cpp.
+// Qt6 camera backends are implemented in CameraWidgetQt6*.h/cpp.
 const CameraBackend& get_camera_backend();
 
 // Call `get_camera_backend()` to get camera backend reference and get all cameras' info.

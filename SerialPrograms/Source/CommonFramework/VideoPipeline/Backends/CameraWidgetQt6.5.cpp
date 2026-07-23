@@ -1,4 +1,4 @@
-﻿/*  Camera Widget (Qt6.5)
+/*  Camera Widget (Qt6.5)
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -7,163 +7,135 @@
 #include <QtGlobal>
 #if QT_VERSION_MAJOR == 6 && QT_VERSION_MINOR >= 5
 
-//#include <chrono>
+// #include <chrono>
 #include <QCamera>
-#include <QPainter>
+#include <QImageCapture>
 #include <QMediaDevices>
+#include <QOpenGLWidget>
+#include <QPainter>
 #include <QVBoxLayout>
 #include <QVideoSink>
-#include <QImageCapture>
-//#include "Common/Cpp/Exceptions.h"
-//#include "Common/Cpp/Time.h"
-//#include "Common/Cpp/PrettyPrint.h"
+// #include "Common/Cpp/Exceptions.h"
+// #include "Common/Cpp/Time.h"
+// #include "Common/Cpp/PrettyPrint.h"
+#include "CameraWidgetQt6.5.h"
+#include "CameraWidgetQt6.h"
 #include "Common/Qt/Redispatch.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "VideoFrameQt.h"
 #include "MediaServicesQt6.h"
-#include "CameraWidgetQt6.h"
-#include "CameraWidgetQt6.5.h"
+#include "VideoFrameQt.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+// #include <iostream>
+// using std::cout;
+// using std::endl;
 
-namespace PokemonAutomation{
-namespace CameraQt65QMediaCaptureSession{
+namespace PokemonAutomation {
+namespace CameraQt65QMediaCaptureSession {
 
-
-
-
-
-
-std::vector<CameraInfo> CameraBackend::get_all_cameras() const{
+std::vector<CameraInfo> CameraBackend::get_all_cameras() const {
 #if 1
-    const auto cameras = GlobalMediaServices::instance().get_all_cameras();
+  const auto cameras = GlobalMediaServices::instance().get_all_cameras();
 #else
-    const auto cameras = QMediaDevices::videoInputs();
+  const auto cameras = QMediaDevices::videoInputs();
 #endif
-    std::vector<CameraInfo> ret;
-    for (const auto& info : cameras){
-        ret.emplace_back(info.id().toStdString());
-    }
-    return ret;
+  std::vector<CameraInfo> ret;
+  for (const auto &info : cameras) {
+    ret.emplace_back(info.id().toStdString());
+  }
+  return ret;
 }
-std::string CameraBackend::get_camera_name(const CameraInfo& info) const{
+std::string CameraBackend::get_camera_name(const CameraInfo &info) const {
 #if 1
-    const auto cameras = GlobalMediaServices::instance().get_all_cameras();
+  const auto cameras = GlobalMediaServices::instance().get_all_cameras();
 #else
-    const auto cameras = QMediaDevices::videoInputs();
+  const auto cameras = QMediaDevices::videoInputs();
 #endif
-    for (const auto& camera : cameras){
-        if (camera.id().toStdString() == info.device_name()){
-            return camera.description().toStdString();
-        }
+  for (const auto &camera : cameras) {
+    if (camera.id().toStdString() == info.device_name()) {
+      return camera.description().toStdString();
     }
-    global_logger_tagged().log(
-        "Error: No such camera for CameraInfo: " + info.device_name(),
-        COLOR_RED
-    );
-    return "";
+  }
+  global_logger_tagged().log(
+      "Error: No such camera for CameraInfo: " + info.device_name(), COLOR_RED);
+  return "";
 }
-std::unique_ptr<VideoSource> CameraBackend::make_video_source(
-    Logger& logger,
-    const CameraInfo& info,
-    Resolution resolution,
-    VideoFormat format,
-    FramesPerSecond fps
-) const{
-    return std::make_unique<CameraVideoSource>(logger, info, resolution, format, fps);
+std::unique_ptr<VideoSource>
+CameraBackend::make_video_source(Logger &logger, const CameraInfo &info,
+                                 Resolution resolution, VideoFormat format,
+                                 FramesPerSecond fps) const {
+  return std::make_unique<CameraVideoSource>(logger, info, resolution, format,
+                                             fps);
 }
 
+CameraVideoSource::~CameraVideoSource() {
+  if (!m_capture_session) {
+    return;
+  }
+  try {
+    m_logger.log("Stopping Camera...");
+  } catch (...) {
+  }
 
-
-
-
-
-
-CameraVideoSource::~CameraVideoSource(){
-    if (!m_capture_session){
-        return;
-    }
-    try{
-        m_logger.log("Stopping Camera...");
-    }catch (...){}
-
-    run_on_main_thread_and_wait([&]{
-//        m_camera->stop();
-        m_capture_session.reset();
-        m_camera.reset();
-    });
+  run_on_main_thread_and_wait([&] {
+    //        m_camera->stop();
+    m_capture_session.reset();
+    m_camera.reset();
+  });
 }
-CameraVideoSource::CameraVideoSource(
-    Logger& logger,
-    const CameraInfo& info,
-    Resolution desired_resolution,
-    VideoFormat desired_format,
-    FramesPerSecond desired_fps
-)
-    : VideoSource(logger, true)
-    , m_logger(logger)
-    , m_last_frame(logger)
-    , m_snapshot_manager(logger, m_last_frame)
-{
-//    cout << "desired_resolution = " << desired_resolution.width << " x " << desired_resolution.height << endl;
-//    cout << "desired_fps = " << desired_fps << endl;
+CameraVideoSource::CameraVideoSource(Logger &logger, const CameraInfo &info,
+                                     Resolution desired_resolution,
+                                     VideoFormat desired_format,
+                                     FramesPerSecond desired_fps)
+    : VideoSource(logger, true), m_logger(logger), m_last_frame(logger),
+      m_snapshot_manager(logger, m_last_frame) {
+  //    cout << "desired_resolution = " << desired_resolution.width << " x " <<
+  //    desired_resolution.height << endl; cout << "desired_fps = " <<
+  //    desired_fps << endl;
 
-    if (!info){
-        return;
-    }
-    m_logger.log("Starting Camera: Backend = CameraQt65QMediaCaptureSession");
+  if (!info) {
+    return;
+  }
+  m_logger.log("Starting Camera: Backend = CameraQt65QMediaCaptureSession");
 
-    run_on_main_thread_and_wait([&]{
-        init(info, desired_resolution, desired_format, desired_fps);
-    });
+  run_on_main_thread_and_wait(
+      [&] { init(info, desired_resolution, desired_format, desired_fps); });
 }
-void CameraVideoSource::init(
-    const CameraInfo& info,
-    Resolution desired_resolution,
-    VideoFormat desired_format,
-    FramesPerSecond desired_fps
-){
-    m_metaobject.reset(new QObject());
+void CameraVideoSource::init(const CameraInfo &info,
+                             Resolution desired_resolution,
+                             VideoFormat desired_format,
+                             FramesPerSecond desired_fps) {
+  m_metaobject.reset(new QObject());
 
-    auto cameras = QMediaDevices::videoInputs();
-    const QCameraDevice* device = nullptr;
-    for (const auto& camera : cameras){
-        if (camera.id().toStdString() == info.device_name()){
-            device = &camera;
-            break;
-        }
+  auto cameras = QMediaDevices::videoInputs();
+  const QCameraDevice *device = nullptr;
+  for (const auto &camera : cameras) {
+    if (camera.id().toStdString() == info.device_name()) {
+      device = &camera;
+      break;
     }
-    if (device == nullptr){
-        m_logger.log("Camera not found: " + info.device_name(), COLOR_RED);
-        return;
-    }
-    m_logger.log("Camera: " + device->description().toStdString());
+  }
+  if (device == nullptr) {
+    m_logger.log("Camera not found: " + info.device_name(), COLOR_RED);
+    return;
+  }
+  m_logger.log("Camera: " + device->description().toStdString());
 
-    QCameraFormat format = CameraQt6QVideoSink::build_format_set(
-        m_logger,
-        m_formats,
-        *device,
-        desired_resolution,
-        desired_format,
-        desired_fps
-    );
-    if (format.isNull()){
-        return;
-    }
+  QCameraFormat format = CameraQt6QVideoSink::build_format_set(
+      m_logger, m_formats, *device, desired_resolution, desired_format,
+      desired_fps);
+  if (format.isNull()) {
+    return;
+  }
 
-    CameraQt6QVideoSink::get_format(format, m_resolution, m_format, m_fps);
-    m_logger.log(
-        "Resolution: " + m_resolution.to_string() +
-        ", Format: " + VideoFormat_database().find(m_format)->display +
-        ", FPS: " + std::to_string(m_fps)
-    );
+  CameraQt6QVideoSink::get_format(format, m_resolution, m_format, m_fps);
+  m_logger.log("Resolution: " + m_resolution.to_string() +
+               ", Format: " + VideoFormat_database().find(m_format)->display +
+               ", FPS: " + std::to_string(m_fps));
 
-    m_camera.reset(new QCameraThread(m_logger, *device, format));
+  m_camera.reset(new QCameraThread(m_logger, *device, format));
 
-    m_capture_session.reset(new QMediaCaptureSession());
-    m_capture_session->setCamera(&m_camera->camera());
+  m_capture_session.reset(new QMediaCaptureSession());
+  m_capture_session->setCamera(&m_camera->camera());
 
 #if 0
     connect(m_camera.get(), &QCamera::errorOccurred, this, [&](){
@@ -177,89 +149,60 @@ void CameraVideoSource::init(
 #endif
 }
 
+void CameraVideoSource::set_video_output(QGraphicsVideoItem &item) {
+  if (m_capture_session == nullptr) {
+    return;
+  }
+  if (m_capture_session->videoSink() == item.videoSink()) {
+    return;
+  }
+  m_capture_session->setVideoOutput(&item);
 
-void CameraVideoSource::set_video_output(QGraphicsVideoItem& item){
-    if (m_capture_session == nullptr){
-        return;
-    }
-    if (m_capture_session->videoSink() == item.videoSink()){
-        return;
-    }
-    m_capture_session->setVideoOutput(&item);
+  m_metaobject->connect(item.videoSink(), &QVideoSink::videoFrameChanged,
+                        &m_camera->camera(), [&](const QVideoFrame &frame) {
+                          //  This runs on the QCamera's thread. So it is off
+                          //  the critical path.
 
-    m_metaobject->connect(
-        item.videoSink(), &QVideoSink::videoFrameChanged,
-        &m_camera->camera(), [&](const QVideoFrame& frame){
-            //  This runs on the QCamera's thread. So it is off the critical path.
-
-            WallClock now = current_time();
-            if (!m_last_frame.push_frame(frame, now)){
-                return;
-            }
-            report_source_frame(std::make_shared<VideoFrame>(now, frame));
-        }
-    );
+                          WallClock now = current_time();
+                          if (!m_last_frame.push_frame(frame, now)) {
+                            return;
+                          }
+                          report_source_frame(
+                              std::make_shared<VideoFrame>(now, frame));
+                        });
 }
 
-
-
-
-
-
-QWidget* CameraVideoSource::make_display_QtWidget(QWidget* parent){
-    return new CameraVideoDisplay(parent, *this);
+QWidget *CameraVideoSource::make_display_QtWidget(QWidget *parent) {
+  return new CameraVideoDisplay(parent, *this);
 }
 
+CameraVideoDisplay::CameraVideoDisplay(QWidget *parent,
+                                       CameraVideoSource &source)
+    : QWidget(parent), m_source(source), m_view(new StaticQGraphicsView(this)),
+      m_sanitizer("CameraVideoDisplay") {
+  this->setMinimumSize(80, 45);
 
+  // m_view->setViewport(new QOpenGLWidget());
 
+  m_view->setFixedSize(this->size());
+  m_view->setScene(&m_scene);
+  m_video.setSize(this->size());
+  m_scene.setSceneRect(QRectF(QPointF(0, 0), this->size()));
+  m_scene.addItem(&m_video);
+  source.set_video_output(m_video);
 
-
-
-
-
-CameraVideoDisplay::CameraVideoDisplay(QWidget* parent, CameraVideoSource& source)
-    : QWidget(parent)
-    , m_source(source)
-    , m_view(new StaticQGraphicsView(this))
-    , m_sanitizer("CameraVideoDisplay")
-{
-    this->setMinimumSize(80, 45);
-    m_view->setFixedSize(this->size());
-    m_view->setScene(&m_scene);
-    m_video.setSize(this->size());
-    m_scene.setSceneRect(QRectF(QPointF(0, 0), this->size()));
-    m_scene.addItem(&m_video);
-    source.set_video_output(m_video);
-
-    connect(
-        &m_scene, &QGraphicsScene::changed,
-        this, [&](const QList<QRectF>&){
-            auto scope_check = m_sanitizer.check_scope();
-            m_source.report_rendered_frame(current_time());
-        }
-    );
-}
-void CameraVideoDisplay::resizeEvent(QResizeEvent* event){
+  connect(&m_scene, &QGraphicsScene::changed, this, [&](const QList<QRectF> &) {
     auto scope_check = m_sanitizer.check_scope();
-    m_view->setFixedSize(this->size());
-    m_scene.setSceneRect(QRectF(QPointF(0, 0), this->size()));
-    m_video.setSize(this->size());
+    m_source.report_rendered_frame(current_time());
+  });
+}
+void CameraVideoDisplay::resizeEvent(QResizeEvent *event) {
+  auto scope_check = m_sanitizer.check_scope();
+  m_view->setFixedSize(this->size());
+  m_scene.setSceneRect(QRectF(QPointF(0, 0), this->size()));
+  m_video.setSize(this->size());
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
-}
+} // namespace CameraQt65QMediaCaptureSession
+} // namespace PokemonAutomation
 #endif

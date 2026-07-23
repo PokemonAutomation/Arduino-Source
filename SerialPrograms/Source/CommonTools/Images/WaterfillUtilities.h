@@ -8,6 +8,7 @@
 #ifndef PokemonAutomation_CommonTools_WaterfillUtilities_H
 #define PokemonAutomation_CommonTools_WaterfillUtilities_H
 
+#include <cstdint>
 #include <functional>
 #include <utility>
 #include "Common/Cpp/ImageResolution.h"
