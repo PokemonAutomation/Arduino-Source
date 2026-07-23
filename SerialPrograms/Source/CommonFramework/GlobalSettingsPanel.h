@@ -9,6 +9,7 @@
 
 #include <vector>
 #include "Common/Cpp/Containers/Pimpl.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/ConfigOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
@@ -42,6 +43,10 @@ class ErrorReportOption;
 class ResourceDownload;
 
 
+enum class OcrLibrary{
+    PADDLE_OCR,
+    TESSERACT,
+};
 
 class FolderInputOption : public StringOption{
 public:
@@ -127,7 +132,7 @@ public:
     FolderInputOption TEMP_FOLDER;
 
     Pimpl<ThemeSelectorOption> THEME;
-    BooleanCheckBoxOption USE_PADDLE_OCR;
+    EnumDropdownOption<OcrLibrary> OCR_LIBRARY;
     BooleanCheckBoxOption USE_GPU_FOR_ML_INFERENCE;
     SettingsResourceDownloadTable RESOURCE_DOWNLOAD_TABLE;
     SettingsDownloadError DOWNLOAD_ERROR;

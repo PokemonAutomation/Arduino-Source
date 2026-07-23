@@ -25,7 +25,7 @@ namespace OCR{
 
 
 bool ocr_language_available(Language language){
-    if (GlobalSettings::instance().USE_PADDLE_OCR){
+    if (GlobalSettings::instance().OCR_LIBRARY == OcrLibrary::PADDLE_OCR){
         return  OCR::paddle_ocr_language_available(language);
     }else{
         return OCR::tesseract_language_available(language);
@@ -39,7 +39,7 @@ std::string ocr_read(Language language, const ImageViewRGB32& image, PageSegMode
         // if using multiline detection, force Tesseract
         ocr_text = OCR::tesseract_ocr_read(language, image, psm);
     }else{
-        if (GlobalSettings::instance().USE_PADDLE_OCR){
+        if (GlobalSettings::instance().OCR_LIBRARY == OcrLibrary::PADDLE_OCR){
             ocr_text = OCR::paddle_ocr_read(language, image);
         }else{
             ocr_text = OCR::tesseract_ocr_read(language, image, psm);
@@ -49,7 +49,7 @@ std::string ocr_read(Language language, const ImageViewRGB32& image, PageSegMode
 }
 
 void ensure_ocr_instances(Language language, size_t instances){
-    if (GlobalSettings::instance().USE_PADDLE_OCR){
+    if (GlobalSettings::instance().OCR_LIBRARY == OcrLibrary::PADDLE_OCR){
         OCR::ensure_paddle_ocr_instance(language);
     }else{
         OCR::ensure_tesseract_instances(language, instances);
@@ -57,7 +57,7 @@ void ensure_ocr_instances(Language language, size_t instances){
 }
 
 void clear_ocr_cache(){
-    if (GlobalSettings::instance().USE_PADDLE_OCR){
+    if (GlobalSettings::instance().OCR_LIBRARY == OcrLibrary::PADDLE_OCR){
         OCR::clear_paddle_ocr_cache();
     }else{
         OCR::clear_tesseract_cache();
