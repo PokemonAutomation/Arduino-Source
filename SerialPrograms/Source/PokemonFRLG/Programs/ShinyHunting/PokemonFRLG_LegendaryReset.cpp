@@ -123,8 +123,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
             env.console, context,
             [](ProControllerContext& context){
                 //Long mash + wait for cases like Deoxys
-                pbf_mash_button(context, BUTTON_B, 10000ms);
-                pbf_wait(context, 10000ms);
+                pbf_mash_button(context, BUTTON_B, 120s);
                 context.wait_for_all_requests();
             },
             {battle_entered}
