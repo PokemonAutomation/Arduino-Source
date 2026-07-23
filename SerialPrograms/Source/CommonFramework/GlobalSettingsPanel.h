@@ -133,6 +133,7 @@ public:
 
     Pimpl<ThemeSelectorOption> THEME;
     EnumDropdownOption<OcrLibrary> OCR_LIBRARY;
+    StaticTextOption OCR_WARNING;
     BooleanCheckBoxOption USE_GPU_FOR_ML_INFERENCE;
     SettingsResourceDownloadTable RESOURCE_DOWNLOAD_TABLE;
     SettingsDownloadError DOWNLOAD_ERROR;

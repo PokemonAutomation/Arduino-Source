@@ -32,6 +32,9 @@ struct TextColorRange{
 
 bool ocr_language_available(Language language);
 
+// will use the OCR library as per the dropdown in GlobalSettings
+// if the preferred library's resource is missing (i.e. it has not been downloaded),
+// an error will be thrown within OCR initialization infra.
 std::string ocr_read(Language language, const ImageViewRGB32& image, PageSegMode psm = PageSegMode::SINGLE_LINE);
 
 void ensure_ocr_instances(Language language, size_t instances = 1);

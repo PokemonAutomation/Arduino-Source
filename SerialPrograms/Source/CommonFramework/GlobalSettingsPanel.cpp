@@ -150,6 +150,10 @@ GlobalSettings::GlobalSettings()
         LockMode::LOCK_WHILE_RUNNING,
         OcrLibrary::PADDLE_OCR
     )
+    , OCR_WARNING(
+        "WARNING: If you change the OCR library away from the default (PaddleOCR), you must ensure that you have the necessary resource downloaded. "
+        "Otherwise, the programs that use OCR will throw an error."
+    )
     , USE_GPU_FOR_ML_INFERENCE(
         "<b>Use GPU for Machine learning inference:</b><br>"
         "Use the GPU by default for machine learning. Will fall-back to CPU if using the GPU fails.",
@@ -279,6 +283,7 @@ GlobalSettings::GlobalSettings()
 
     // gated behind Dev mode. see GlobalSettings::load_json
     PA_ADD_OPTION(OCR_LIBRARY);
+    // PA_ADD_OPTION(OCR_WARNING); // TODO: enable this when Tesseract is no longer a default resource.
     PA_ADD_OPTION(RESOURCE_DOWNLOAD_TABLE);
     PA_ADD_OPTION(DOWNLOAD_ERROR);
 
