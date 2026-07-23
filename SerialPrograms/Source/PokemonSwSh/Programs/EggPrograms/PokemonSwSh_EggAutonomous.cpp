@@ -378,8 +378,14 @@ bool EggAutonomous::run_batch(
             // we still need to fetch more eggs
 
             // Use fly to reset the location because now we don't know where the player character is.
-            const bool fly_from_overworld = true;
-            call_flying_taxi(env, context, fly_from_overworld);
+            // open_menu_to_fly handles the race where an egg starts hatching during the X press.
+            open_menu_to_fly(env, context, stats, num_eggs_hatched);
+            // open_menu_to_fly may have hatched the 5th egg during the X press race condition.
+            // After it returns the player is at loop start (flew back), so check if we're done.
+            if (num_eggs_hatched == 5 && m_num_eggs_retrieved == 5){
+                m_player_at_loop_start = true;
+                break;
+            }
             restart_bike_loop = true;
             // We don't update i_bike_loop here because we haven't finished one full bike loop due to egg hatching
         } // end one bike loop
@@ -460,6 +466,56 @@ void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, ProController
     pbf_press_button(context, BUTTON_R, 80ms, 2000ms);
     pbf_mash_button(context, BUTTON_A, 500ms);
     mash_B_until_y_comm_icon(env, context, "Cannot detect end of saving game.");
+}
+
+void EggAutonomous::open_menu_to_fly(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EggAutonomous_Descriptor::Stats& stats,
+    size_t& num_eggs_hatched
+){
+    const size_t MAX_RETRIES = 5;
+    for (size_t retry = 0; retry < MAX_RETRIES; ++retry){
+        RotomPhoneMenuArrowWatcher menu_arrow(env.console.overlay());
+        EggHatchBlackDialogBoxDetector black_dialog(true);
+
+        int ret = run_until<ProControllerContext>(
+            env.console, context,
+            [](ProControllerContext& context){
+                // Press X then wait for the menu animation to complete.
+                // Do NOT press anything after X — the menu must stay open for the detector.
+                pbf_press_button(context, BUTTON_X, 160ms,
+                    GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
+                ssf_do_nothing(context, 3000ms);
+            },
+            {{menu_arrow, black_dialog}}
+        );
+
+        switch (ret){
+        case 0:  // Menu is open — navigate and fly (already in menu, skip X press)
+            call_flying_taxi(env, context, false);
+            return;
+        case 1:  // Egg started hatching in the transition window — handle it then retry
+            ++num_eggs_hatched;
+            stats.m_hatched++;
+            env.update_stats();
+            wait_for_egg_hatched(env, context, stats, num_eggs_hatched);
+            if (num_eggs_hatched < 5){
+                pbf_move_left_joystick(context, {-1.0, -1.0}, 800ms, 80ms);
+                context.wait_for_all_requests();
+            }
+            break;
+        default:  // Lambda timed out without detecting menu or egg — recover to overworld as last resort
+            env.log("open_menu_to_fly: no state detected, recovering to overworld via B mash.");
+            mash_B_until_y_comm_icon(env, context, "Cannot recover to overworld after failed menu open.");
+            break;
+        }
+    }
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "Cannot open Rotom phone menu after multiple retries.",
+        env.console
+    );
 }
 
 void EggAutonomous::call_flying_taxi(

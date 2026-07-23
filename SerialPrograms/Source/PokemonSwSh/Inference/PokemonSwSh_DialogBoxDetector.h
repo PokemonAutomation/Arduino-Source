@@ -38,6 +38,25 @@ private:
 };
 
 
+// Detects the semi-transparent dark dialog that appears when an egg begins hatching.
+// Checks two horizontal bands inside the dialog that are uniformly near-black (~RGB 20-30).
+class EggHatchBlackDialogBoxDetector : public VisualInferenceCallback{
+public:
+    EggHatchBlackDialogBoxDetector(bool stop_on_detected);
+
+    bool detected() const{
+        return m_detected.load(std::memory_order_acquire);
+    }
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+
+private:
+    bool m_stop_on_detected;
+    std::atomic<bool> m_detected;
+};
+
+
 class WhiteDialogBoxDetector : public StaticScreenDetector{
 public:
     WhiteDialogBoxDetector(Color color = COLOR_RED);
