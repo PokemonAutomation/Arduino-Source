@@ -1,4 +1,4 @@
-/*  Unit Test
+/*  Parallel Unit Test
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -9,8 +9,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/MemoryUtilization/MemoryUtilization.h"
 #include "Common/Cpp/Concurrency/ReverseLockGuard.h"
-#include "CommonFramework/Tools/GlobalThreadPools.h"
-#include "UnitTestRunner.h"
+#include "ParallelUnitTestRunner.h"
 
 //#include <iostream>
 //using std::cout;
@@ -23,22 +22,16 @@ namespace PokemonAutomation{
 
 UnitTestRunner::~UnitTestRunner(){
     detach();
-    UnitTestRunner::cancel(nullptr);
-    m_dispatcher.wait_and_ignore_exceptions();
-
-
-    std::unique_lock<Mutex> lg(m_lock);
-    m_cv.wait(lg, [this]{
-        return m_currently_running.empty();
-    });
 }
 UnitTestRunner::UnitTestRunner(
     CancellableScope* parent,
     Logger& logger,
+    ThreadPool& thread_pool,
     uint64_t max_memory,
     size_t max_threads
 )
     : m_logger(logger)
+    , m_thread_pool(thread_pool)
     , m_max_memory(max_memory)
     , m_max_threads(max_threads)
 {
@@ -49,16 +42,13 @@ UnitTestRunner::UnitTestRunner(
     if (m_max_threads == 0){
         m_max_threads = std::thread::hardware_concurrency() * 2;
     }
-    m_dispatcher = GlobalThreadPools::unlimited_normal().dispatch_now_blocking([this]{
-        thread_loop();
-    });
     if (parent){
         attach(*parent);
     }
 }
 
 
-void UnitTestRunner::add_test(std::unique_ptr<UnitTest> test){
+void UnitTestRunner::add_test(std::shared_ptr<const UnitTest> test){
     throw_if_cancelled();
 
     if (test->name().empty()){
@@ -97,29 +87,7 @@ void UnitTestRunner::add_test(std::unique_ptr<UnitTest> test){
     m_cv.notify_all();
 }
 
-void UnitTestRunner::wait_for_all(){
-    std::unique_lock<Mutex> lg(m_lock);
-    while (!cancelled()){
-        if (m_currently_running.empty() && m_test_by_name.empty()){
-            return;
-        }
-        m_cv.wait(lg);
-    }
-}
-
-bool UnitTestRunner::cancel(std::exception_ptr reason) noexcept{
-    if (CancellableScope::cancel(reason)){
-        return true;
-    }
-    {
-        std::lock_guard<Mutex> lg(m_lock);
-    }
-    m_cv.notify_all();
-    return false;
-}
-
-
-void UnitTestRunner::thread_loop(){
+void UnitTestRunner::run(){
     m_logger.log(
         "Starting UnitTestRunner with:"
         "\n    Max Memory: " + tostr_bytes(m_max_memory) +
@@ -129,8 +97,7 @@ void UnitTestRunner::thread_loop(){
     std::unique_lock<Mutex> lg(m_lock);
     while (!cancelled()){
         if (m_test_by_name.empty()){
-            m_cv.wait(lg);
-            continue;
+            break;
         }
 
         //  If nothing is running, always run the thing that uses the most memory.
@@ -172,8 +139,32 @@ void UnitTestRunner::thread_loop(){
         //  Can't run anything.
         m_cv.wait(lg);
     }
-//    cout << "thread_loop() - end" << endl;
+
+    //  Wait for everything running to finish.
+    m_cv.wait(lg, [this]{
+        if (!m_currently_running.empty()){
+            return false;
+        }
+        if (!cancelled() && !m_test_by_name.empty()){
+            return false;
+        }
+        return true;
+    });
+    m_completed.clear();
 }
+
+bool UnitTestRunner::cancel(std::exception_ptr reason) noexcept{
+    if (CancellableScope::cancel(reason)){
+        return true;
+    }
+    {
+        std::lock_guard<Mutex> lg(m_lock);
+    }
+    m_cv.notify_all();
+    return false;
+}
+
+
 
 
 void UnitTestRunner::dispatch_test(const std::string& name){
@@ -186,37 +177,35 @@ void UnitTestRunner::dispatch_test(const std::string& name){
     auto iter_current = m_currently_running.emplace(name, std::move(entry.test)).first;
     DispatchedEntry& node = iter_current->second;
 
-    UnitTest& test = *iter_current->second.test;
-    m_current_memory += test.m_memory;
-    m_current_threads += test.m_threads;
+    const UnitTest& test = *iter_current->second.test;
+    m_current_memory += test.memory();
+    m_current_threads += test.threads();
 
     {
         ReverseLockGuard<Mutex> lg(m_lock);
-        node.task = GlobalThreadPools::computation_normal().dispatch_now_blocking([this, iter_current]{
-            UnitTest& test = *iter_current->second.test;
-            test.m_result = UnitTestResult::FAILED;
+        node.task = m_thread_pool.dispatch_now_blocking([this, iter_current]{
+            const UnitTest& test = *iter_current->second.test;
+            UnitTestResult result;
             try{
                 m_logger.log("Starting: " + test.name());
-                auto ret = test.run(*this);
-                test.m_result = ret.first;
-                test.m_message = std::move(ret.second);
+                result = test.run(*this);
             }catch (Exception& e){
-                test.m_message = e.to_str();
+                result = UnitTestResult(UnitTestResult::FAILED, e.to_str());
             }catch (std::bad_alloc&){
-                test.m_result = UnitTestResult::OOM;
+                result = UnitTestResult::OOM;
             }catch (std::exception& e){
-                test.m_message = e.what();
+                result = UnitTestResult(UnitTestResult::FAILED, e.what());
             }catch (...){
-                test.m_message = "Unknown exception.";
+                result = UnitTestResult(UnitTestResult::FAILED, "Unknown exception.");
             }
 
-            switch (test.result()){
+            switch (result.result){
             case UnitTestResult::NOT_RUN:
             case UnitTestResult::PASSED:
                 m_logger.log("Passed: " + test.name(), COLOR_BLUE);
                 break;
             case UnitTestResult::FAILED:
-                m_logger.log("Failed: " + test.name() + ", Message: " + test.message(), COLOR_RED);
+                m_logger.log("Failed: " + test.name() + ", Message: " + result.message, COLOR_RED);
                 break;
             case UnitTestResult::SKIPPED:
                 m_logger.log("Skipped: " + test.name(), COLOR_ORANGE);
@@ -226,12 +215,18 @@ void UnitTestRunner::dispatch_test(const std::string& name){
                 break;
             }
 
+            m_listeners.run_method(
+                &Listener::on_test_finished,
+                std::move(iter_current->second.test),
+                std::move(result)
+            );
+
             {
                 std::lock_guard<Mutex> lg(m_lock);
                 auto node = m_currently_running.extract(iter_current);
                 m_completed.insert(std::move(node));
-                m_current_memory -= test.m_memory;
-                m_current_threads -= test.m_threads;
+                m_current_memory -= test.memory();
+                m_current_threads -= test.threads();
             }
             m_cv.notify_all();
         });

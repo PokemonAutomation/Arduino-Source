@@ -148,7 +148,7 @@
 #include "CommonTools/Random.h"
 #include "CommonTools/OCR/OCR_TextMatcher.h"
 #include "Integrations/PybindSwitchController.h"
-#include "CommonFramework/TestRunners/UnitTestRunner.h"
+#include "Common/Cpp/TestRunners/ParallelUnitTestRunner.h"
 
 //#include <opencv2/core.hpp>
 #include <onnxruntime_cxx_api.h>
@@ -382,9 +382,9 @@ public:
         : UnitTest(std::move(name))
     {}
 
-    virtual std::pair<UnitTestResult, std::string> run(CancellableScope& scope) override{
+    virtual UnitTestResult run(CancellableScope& scope) const override{
         scope.wait_for(Milliseconds(1000));
-        return {UnitTestResult::PASSED, ""};
+        return true;
     }
 
 
@@ -414,7 +414,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     [[maybe_unused]] Logger& logger = env.logger();
 
 
-    UnitTestRunner runner(scope, logger);
+    UnitTestRunner runner(scope, logger, GlobalThreadPools::computation_normal());
 
     runner.add_test<SampleTest>("test0");
     runner.add_test<SampleTest>("test1");
@@ -422,7 +422,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     runner.add_test<SampleTest>("test3");
     runner.add_test<SampleTest>("test4");
 
-    runner.wait_for_all();
+    runner.run();
 
 
 //    cout << random_u32(100, 115) << endl;

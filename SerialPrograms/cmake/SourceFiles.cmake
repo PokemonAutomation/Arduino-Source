@@ -216,6 +216,9 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Strings/StringTools.h
     ../Common/Cpp/Strings/Unicode.cpp
     ../Common/Cpp/Strings/Unicode.h
+    ../Common/Cpp/TestRunners/UnitTest.h
+    ../Common/Cpp/TestRunners/ParallelUnitTestRunner.cpp
+    ../Common/Cpp/TestRunners/ParallelUnitTestRunner.h
     ../Common/Cpp/Time.cpp
     ../Common/Cpp/Time.h
     ../Common/Cpp/UiWrapper.h
@@ -523,9 +526,6 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Startup/NewVersionCheck.h
     Source/CommonFramework/Startup/SetupSettings.cpp
     Source/CommonFramework/Startup/SetupSettings.h
-    Source/CommonFramework/TestRunners/UnitTest.h
-    Source/CommonFramework/TestRunners/UnitTestRunner.cpp
-    Source/CommonFramework/TestRunners/UnitTestRunner.h
     Source/CommonFramework/Tools/DebugDumper.cpp
     Source/CommonFramework/Tools/DebugDumper.h
     Source/CommonFramework/Tools/ErrorDumper.cpp
@@ -732,6 +732,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonTools/VisualDetectors/ImageMatchDetector.h
     Source/ComputerPrograms/ComputerProgram.cpp
     Source/ComputerPrograms/ComputerProgram.h
+    Source/ComputerPrograms/UnitTestRunner.cpp
+    Source/ComputerPrograms/UnitTestRunner.h
     Source/ComputerPrograms/Framework/ComputerProgramOption.cpp
     Source/ComputerPrograms/Framework/ComputerProgramOption.h
     Source/ComputerPrograms/Framework/ComputerProgramSession.cpp

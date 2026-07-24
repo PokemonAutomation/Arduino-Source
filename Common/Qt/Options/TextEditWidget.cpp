@@ -83,6 +83,7 @@ TextEditWidget::TextEditWidget(QWidget& parent, TextEditOption& value)
     , ConfigWidget(value, *this)
     , m_value(value)
 {
+
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     QLabel* label = new QLabel(QString::fromStdString(value.label()), this);
@@ -90,6 +91,9 @@ TextEditWidget::TextEditWidget(QWidget& parent, TextEditOption& value)
     layout->addWidget(label);
     m_box = new Box(*this);
     m_box->setText(QString::fromStdString(value));
+    if (value.lock_mode() == LockMode::READ_ONLY){
+        m_box->setReadOnly(true);
+    }
     layout->addWidget(m_box);
 
     m_value.ConfigOption::add_listener(*this);
@@ -103,8 +107,22 @@ void TextEditWidget::update_value(){
     m_box->setText(QString::fromStdString(m_value));
 }
 void TextEditWidget::on_config_value_changed(void* object){
+    //  This function gets called every time the contents changes.
+    //  For large contents where the only update is an incremental append,
+    //  this is very efficient. Thus we supporess the full update if the
+    //  previous update is an append.
     QMetaObject::invokeMethod(m_box, [this]{
+        if (m_pending_append){
+            m_pending_append = false;
+            return;
+        }
         update_value();
+    }, Qt::QueuedConnection);
+}
+void TextEditWidget::on_append(std::string text){
+    QMetaObject::invokeMethod(m_box, [this, text = std::move(text)]{
+        m_box->append(QString::fromStdString(text));
+        m_pending_append = true;
     }, Qt::QueuedConnection);
 }
 

@@ -148,7 +148,7 @@ public:
     //  nothing goes in.
     //
     //  This lets you incrementally construct a large message and not worry
-    //  about it being half-sent if you sender runs out of space.
+    //  about it being half-sent if the sender runs out of space.
     //
 
     bool enqueue_uncommitted_send_stream(const void* data, size_t bytes) noexcept;

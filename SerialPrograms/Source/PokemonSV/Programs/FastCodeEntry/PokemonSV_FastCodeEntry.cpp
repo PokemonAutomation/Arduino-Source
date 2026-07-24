@@ -69,7 +69,7 @@ void FastCodeEntry::update_active_consoles(size_t switch_count){
 
 
 
-class FceCodeListener : public ConfigOption::Listener, public TextEditOption::FocusListener{
+class FceCodeListener : public ConfigOption::Listener{
 public:
     FceCodeListener(TextEditOption& code_box)
         : m_code_box(code_box)

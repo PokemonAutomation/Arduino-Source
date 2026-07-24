@@ -164,6 +164,102 @@ bool YCommIconDetector::detect(const ImageViewRGB32& screen){
 
 
 
+
+
+
+
+
+class Test_YCommIconDetector : public UnitTest{
+public:
+    Test_YCommIconDetector(
+        const std::string& resource_path,
+        const std::string& image,
+        bool expected_result
+    )
+        : UnitTest("NintendoSwitch::PokemonSwSh::YCommIconDetector - " + image)
+        , m_image(resource_path + image)
+        , m_expected_result(expected_result)
+    {}
+
+    template <class... Args>
+    static std::unique_ptr<UnitTest> make(Args&&... args){
+        return std::make_unique<Test_YCommIconDetector>(std::forward<Args>(args)...);
+    }
+
+    virtual UnitTestResult run(CancellableScope& scope) const override{
+        YCommIconDetector detector(COLOR_RED, true);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected_result;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected_result;
+};
+
+class Test_YCommMenuDetector : public UnitTest{
+public:
+    Test_YCommMenuDetector(
+        const std::string& resource_path,
+        const std::string& image,
+        bool expected_result
+    )
+        : UnitTest("NintendoSwitch::PokemonSwSh::YCommMenuDetector - " + image)
+        , m_image(resource_path + image)
+        , m_expected_result(expected_result)
+    {}
+
+    template <class... Args>
+    static std::unique_ptr<UnitTest> make(Args&&... args){
+        return std::make_unique<Test_YCommMenuDetector>(std::forward<Args>(args)...);
+    }
+
+    virtual UnitTestResult run(CancellableScope& scope) const override{
+        YCommMenuDetector detector(true);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected_result;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected_result;
+};
+
+
+
+
+const std::vector<std::shared_ptr<const UnitTest>>& get_tests_YCommDetector(const std::string& resource_path){
+    static std::vector<std::shared_ptr<const UnitTest>> TESTS{
+        Test_YCommIconDetector::make(resource_path, "PokemonSwSh/YCommIconDetector/Front_Door_2_True.png", true),
+        Test_YCommIconDetector::make(resource_path, "PokemonSwSh/YCommIconDetector/Front_Door_3_True.png", true),
+        Test_YCommIconDetector::make(resource_path, "PokemonSwSh/YCommIconDetector/Front_Door_True.png", true),
+        Test_YCommIconDetector::make(resource_path, "PokemonSwSh/YCommIconDetector/macOS_bright/Nursery_False.png", false),
+        Test_YCommIconDetector::make(resource_path, "PokemonSwSh/YCommIconDetector/macOS_bright/Nursery_True.png", true),
+
+        Test_YCommMenuDetector::make(resource_path, "PokemonSwSh/YCommMenuDetector/Avermedia_Qt5_True.jpg", true),
+        Test_YCommMenuDetector::make(resource_path, "PokemonSwSh/YCommMenuDetector/MiraBox_Qt6_True.jpg", true),
+        Test_YCommMenuDetector::make(resource_path, "PokemonSwSh/YCommMenuDetector/MyPin_Qt5_True.jpg", true),
+        Test_YCommMenuDetector::make(resource_path, "PokemonSwSh/YCommMenuDetector/MyPin_Qt6_True.jpg", true),
+        Test_YCommMenuDetector::make(resource_path, "PokemonSwSh/YCommMenuDetector/NoBrand_Qt6_True.jpg", true),
+        Test_YCommMenuDetector::make(resource_path, "PokemonSwSh/YCommMenuDetector/ShadowCast_Qt6_True.jpg", true),
+    };
+    return TESTS;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 }
 }
