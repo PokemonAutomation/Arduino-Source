@@ -23,6 +23,7 @@
 #include "PokemonFRLG_RngStatsDatabase.h"
 #include "PokemonFRLG_RngDisplays.h"
 #include "PokemonFRLG_RngLoopRoutines.h"
+#include "PokemonFRLG_SeedsDatabase.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -146,6 +147,7 @@ private:
     SectionDividerOption m_game_info;
     OCR::LanguageOCROption LANGUAGE;
     EnumDropdownOption<GameVersion> GAME_VERSION;
+    EnumDropdownOption<SoundSetting> SOUND;
 
     SectionDividerOption m_target_settings;
     PokemonNameSelectOption EGG_SPECIES;
@@ -153,22 +155,15 @@ private:
     ParentIVsTable PARENT_IVS;
 
     SectionDividerOption m_held_settings;
-    StringOption HELD_SEED; 
-    TextEditOption HELD_SEED_LIST;
-    EnumDropdownOption<SeedButton> HELD_SEED_BUTTON;
-    EnumDropdownOption<BlackoutButton> HELD_EXTRA_BUTTON;
-    SimpleIntegerOption<uint64_t> HELD_SEED_DELAY;
+    StringOption HELD_SEED;
     SimpleIntegerOption<uint64_t>HELD_ADVANCES;
 
     SectionDividerOption m_pickup_settings;
-    StringOption PICKUP_SEED; 
-    TextEditOption PICKUP_SEED_LIST;
-    EnumDropdownOption<SeedButton> PICKUP_SEED_BUTTON;
-    EnumDropdownOption<BlackoutButton> PICKUP_EXTRA_BUTTON;
-    SimpleIntegerOption<uint64_t> PICKUP_SEED_DELAY;
+    StringOption PICKUP_SEED;
     SimpleIntegerOption<uint64_t>PICKUP_ADVANCES;
 
     SectionDividerOption m_program_settings;
+    SimpleIntegerOption<uint16_t> SEED_RADIUS;
     EnumDropdownOption<EggProgramState> STARTING_POINT;
     SimpleIntegerOption<uint64_t> MAX_RESETS;
     SimpleIntegerOption<uint64_t> MAX_RARE_CANDIES;
