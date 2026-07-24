@@ -133,6 +133,16 @@ std::vector<std::pair<AdvRngState,AdvRngState>> get_egg_search_results(
     uint16_t tid_xor_sid
 );
 
+// double-check read level against possible encounter slots for the observed species and return true if valid
+// if stats from the original read are invalid, this tries all possible levels and checks whether IVs are valid,
+// returning true if exactly one level produces valid IV ranges
+bool validate_level(
+    AdvRngFilters& filters, 
+    AdvObservedPokemon& pokemon, 
+    const std::vector<AdvEncounterSlot>& ENCOUNTER_SLOTS, 
+    const BaseStats& BASE_STATS
+);
+
 // update IV ranges for RNG search filters with new stats/EVs after leveling up
 void update_filters(
     AdvRngFilters& filters, 

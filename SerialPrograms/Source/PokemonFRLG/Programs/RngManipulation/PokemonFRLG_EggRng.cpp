@@ -595,6 +595,7 @@ bool EggRng::held_frame_check(
 
     // read stats
     AdvObservedPokemon observed_egg = read_summary(env.console, context, LANGUAGE);
+    observed_egg.level[0] = 5;
     AdvRngFilters filters = observation_to_filters(observed_egg, EGG_STATS.base_stats, AdvRngMethod::Any);
     RNG_FILTERS.set(filters);
 
@@ -709,6 +710,7 @@ bool EggRng::pickup_frame_check(
 
     // ... read ...
     AdvObservedPokemon observed_egg = read_summary(env.console, context, LANGUAGE);
+    observed_egg.level[0] = 5;
     AdvRngFilters filters = observation_to_filters(observed_egg, EGG_STATS.base_stats, AdvRngMethod::Any);
     RNG_FILTERS.set(filters);
 

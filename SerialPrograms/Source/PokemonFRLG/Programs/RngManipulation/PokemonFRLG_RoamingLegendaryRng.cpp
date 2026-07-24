@@ -411,7 +411,12 @@ void RoamingLegendaryRng::program(SingleSwitchProgramEnvironment& env, ProContro
 
         go_to_summary(env.console, context);
         AdvObservedPokemon pokemon = read_summary(env.console, context, LANGUAGE, ROAMER_ROUTE1_SUBSET);
+        pokemon.level[0] = 50;
         AdvRngFilters filters = observation_to_filters(pokemon, BASE_STATS);
+        filters.ivs.defense = {0,0};
+        filters.ivs.spatk   = {0,0};
+        filters.ivs.spdef   = {0,0};
+        filters.ivs.speed   = {0,0};
         RNG_FILTERS.set(filters);
 
         std::vector<AdvRngState> search_hits = refine_calibration_with_rare_candy(
@@ -420,6 +425,10 @@ void RoamingLegendaryRng::program(SingleSwitchProgramEnvironment& env, ProContro
             MAX_HISTORY_LENGTH, MAX_RARE_CANDIES, AdvRngMethod::Method1, false,
             stats.errors, NOTIFICATION_ERROR_RECOVERABLE,
             [&](AdvRngFilters& f){
+                f.ivs.defense = {0,0};
+                f.ivs.spatk   = {0,0};
+                f.ivs.spdef   = {0,0};
+                f.ivs.speed   = {0,0};
                 return get_search_results(env.console, searcher, f, SEED_VALUES, ADVANCES, advances_radius, GENDER_THRESHOLD);
             },
             [&](const std::vector<AdvRngState>& h){ RNG_CALIBRATION.set_hits(h); },

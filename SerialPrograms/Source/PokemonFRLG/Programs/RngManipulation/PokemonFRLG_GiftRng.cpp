@@ -250,38 +250,47 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
     BaseStats BASE_STATS;
     int16_t GENDER_THRESHOLD = -1;
+    uint8_t LEVEL = 0;
     switch (TARGET){
     case PokemonFRLG_RngTarget::magikarp:
         BASE_STATS = { 20, 10, 55, 15, 20, 80 };
         GENDER_THRESHOLD = 126;
+        LEVEL = 5;
         break;
     case PokemonFRLG_RngTarget::hitmonchan:
         BASE_STATS = { 50, 105, 79, 35, 110, 76 };
         GENDER_THRESHOLD = -1;
+        LEVEL = 25;
         break;
     case PokemonFRLG_RngTarget::hitmonlee:
         BASE_STATS = { 50, 120, 53, 35, 110, 87 };
         GENDER_THRESHOLD = -1;
+        LEVEL = 25;
         break;
     case PokemonFRLG_RngTarget::eevee:
         BASE_STATS = { 55, 55, 50, 45, 65, 55 };
         GENDER_THRESHOLD = 30;
+        LEVEL = 25;
         break;
     case PokemonFRLG_RngTarget::lapras:
         BASE_STATS = { 130, 85, 80, 85, 95, 60 };
         GENDER_THRESHOLD = 126;
+        LEVEL = 25;
         break;
     case PokemonFRLG_RngTarget::omanyte:
         BASE_STATS = { 35, 40, 100, 90, 55, 35 };
         GENDER_THRESHOLD = 30;
+        LEVEL = 5;
         break;
     case PokemonFRLG_RngTarget::kabuto:
         BASE_STATS = { 30, 80, 90, 55, 45, 55 };
         GENDER_THRESHOLD = 30;
+        LEVEL = 5;
         break;
     case PokemonFRLG_RngTarget::aerodactyl:
         BASE_STATS = { 80, 105, 65, 60, 75, 130 };
         GENDER_THRESHOLD = 30;
+        LEVEL = 5;
         break;
     case PokemonFRLG_RngTarget::gamecornerabra:
         BASE_STATS = { 25, 20, 15, 105, 55, 90 };
@@ -299,10 +308,12 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     case PokemonFRLG_RngTarget::gamecornerscyther:
         BASE_STATS = { 70, 110, 80, 55, 80, 105 };
         GENDER_THRESHOLD = 126;
+        LEVEL = 25;
         break;
     case PokemonFRLG_RngTarget::gamecornerpinsir:
         BASE_STATS = { 65, 125, 100, 55, 70, 85 };
         GENDER_THRESHOLD = 126;
+        LEVEL = 18;
         break;
     case PokemonFRLG_RngTarget::gamecornerporygon:
         BASE_STATS = { 65, 60, 70, 85, 75, 40 };
@@ -311,6 +322,7 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     case PokemonFRLG_RngTarget::togepi:
         BASE_STATS = { 35, 20, 65, 40, 65, 20 };
         GENDER_THRESHOLD = 30;
+        LEVEL = 5;
         break; 
     default:
         break;
@@ -440,6 +452,9 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         }
 
         AdvObservedPokemon pokemon = read_summary(env.console, context, LANGUAGE, SPECIES_LIST);
+        if (LEVEL > 0){
+            pokemon.level[0] = LEVEL;
+        }
         AdvRngFilters filters = observation_to_filters(pokemon, BASE_STATS);
         RNG_FILTERS.set(filters);
 

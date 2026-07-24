@@ -300,6 +300,48 @@ bool ranges_are_valid(IvRanges ivs){
     );
 }
 
+// reading raw stats is more reliable than reading the level
+bool validate_level(
+    AdvRngFilters& filters, 
+    AdvObservedPokemon& pokemon, 
+    const std::vector<AdvEncounterSlot>& ENCOUNTER_SLOTS, 
+    const BaseStats& BASE_STATS
+){
+    std::vector<AdvEncounterSlot> valid_slots;
+    for (const AdvEncounterSlot& slot : ENCOUNTER_SLOTS){
+        if (filters.species == slot.species
+
+        ){
+            valid_slots.push_back(slot);
+        }
+    }
+    for (const AdvEncounterSlot& slot : valid_slots){
+        if (   filters.level >= slot.minlevel
+            && filters.level <= slot.maxlevel
+            && ranges_are_valid(filters.ivs)
+        ){
+            return true;
+        }
+    }
+    // try all levels within the encounter slots for the observed species if there was no valid match
+    std::vector<uint8_t> levels;
+    for (const AdvEncounterSlot& slot : valid_slots){
+        for (uint8_t level = slot.minlevel; level <= slot.maxlevel; level++){
+            pokemon.level[0] = level;
+            filters = observation_to_filters(pokemon, BASE_STATS, filters.method);
+            if (ranges_are_valid(filters.ivs)){
+                levels.push_back(level);
+            }
+        }
+    }
+    if (levels.size() == 1){
+        pokemon.level[0] = levels[0];
+        filters = observation_to_filters(pokemon, BASE_STATS, filters.method);
+        return true;
+    }
+    return false;
+}
+
 void update_filters(
     AdvRngFilters& filters, 
     AdvObservedPokemon& pokemon, 
