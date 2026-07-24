@@ -18,6 +18,7 @@
 #include "Pokemon/Pokemon_Notification.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_BoxEmptySlotDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h"
@@ -104,19 +105,6 @@ EggAutonomous::EggAutonomous()
         LockMode::LOCK_WHILE_RUNNING,
         1, 1
     )
-    , NUM_EGGS_IN_COLUMN(
-        "<b>Num Eggs in Column:</b><br>How many eggs already deposited in the first column in Box 1.",
-        {
-            {0, "0", "0"},
-            {1, "1", "1"},
-            {2, "2", "2"},
-            {3, "3", "3"},
-            {4, "4", "4"},
-            {5, "5", "5"},
-        },
-        LockMode::LOCK_WHILE_RUNNING,
-        0
-    )
     , AUTO_SAVING(
         "<b>Auto-Saving:</b><br>Automatically save the game to recover from crashes and allow eggs to be unhatched.<br>"
         "(Unhatching eggs can be useful for obtaining breeding parents by rehatching a perfect egg in a game with a different language.)<br><br>"
@@ -179,7 +167,6 @@ EggAutonomous::EggAutonomous()
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(MAX_KEEPERS);
     PA_ADD_OPTION(LOOPS_PER_FETCH);
-    PA_ADD_OPTION(NUM_EGGS_IN_COLUMN);
     PA_ADD_OPTION(AUTO_SAVING);
     PA_ADD_OPTION(FILTERS0);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -213,12 +200,20 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         return;
     }
 
+    menus_to_boxsystem(env.console, context);
+    EggQuantity egg_quantity = check_box(env.console, context);
+    size_t num_eggs_in_column_0 = egg_quantity.eggs_in_column_0;
+    size_t num_eggs_in_party = egg_quantity.eggs_in_party;
+    env.log("Starting with " + std::to_string(num_eggs_in_party) + " eggs in the party and " + 
+        std::to_string(num_eggs_in_column_0) + " eggs in the first box column.");
 
     if (AUTO_SAVING == AutoSave::AfterStartAndKeep){
-        save_game(env, context);
-        m_num_eggs_in_storage_when_game_saved = static_cast<uint8_t>(NUM_EGGS_IN_COLUMN.current_value());
+        save_game(env.console, context);
+        m_num_eggs_in_storage_when_game_saved = num_eggs_in_column_0;
+        m_num_eggs_in_party_when_game_saved = num_eggs_in_party;
     }
-    m_num_eggs_retrieved = static_cast<uint8_t>(NUM_EGGS_IN_COLUMN.current_value());
+    num_eggs_in_column_0_at_batch_start = num_eggs_in_column_0;
+    m_num_eggs_in_party_at_batch_start = num_eggs_in_party;
 
     m_num_pokemon_kept = 0;
 
@@ -232,7 +227,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             if (TOUCH_DATE_INTERVAL.ok_to_touch_now()){
                 env.log("Touching date to prevent rollover.");
                 env.console.overlay().add_log("Touching date", COLOR_WHITE);
-                pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+                go_home(env.console, context);
                 touch_date_from_home(env.console, context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
                 resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             }
@@ -269,7 +264,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
                     env.console
                 );
             }
-            ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 160ms);
+            go_home(env.console, context);
             env.console.overlay().add_log("Reset game", COLOR_WHITE);
             reset_game_from_home_with_inference(
                 env.console, context,
@@ -277,7 +272,8 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             );
 
             m_player_at_loop_start = false;
-            m_num_eggs_retrieved = m_num_eggs_in_storage_when_game_saved;
+            num_eggs_in_column_0_at_batch_start = m_num_eggs_in_storage_when_game_saved;
+            m_num_eggs_in_party_at_batch_start = m_num_eggs_in_party_when_game_saved;
         }
     }
 
@@ -299,119 +295,108 @@ bool EggAutonomous::run_batch(
     env.update_stats();
     send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
+    size_t total_eggs_to_fetch = 10 - num_eggs_in_column_0_at_batch_start - m_num_eggs_in_party_at_batch_start;
+    size_t num_eggs_retrieved = 0;
+
+    EggAutoPhase phase = EggAutoPhase::BIKE_LOOP;
     if (m_player_at_loop_start == false){ // reset position
-        const bool fly_from_overworld = true; // fly from menu
-        call_flying_taxi(env, context, fly_from_overworld);
+        phase = EggAutoPhase::FLY_RESET;
     }
 
-    size_t bike_loop_count = 0;
+    size_t total_bike_loop_count = 0;
     const size_t MAX_BIKE_LOOP_COUNT = 100;
+    size_t num_loops_since_last_fetch_attempt = 0;
+
     size_t num_eggs_hatched = 0;
     m_player_at_loop_start = false;
-
+    
     // Each iteration in the while-loop is made by:
     // - bike loops of LOOPS_PER_FETCH times. Bike loops begin at lady or nursery front door, end at lady.
     // - if not enough eggs fetched, talk to lady to try fetching an egg.
-    while (num_eggs_hatched < 5 || m_num_eggs_retrieved < 5){
-        // Detect when Y-Comm icon disappears. This is the time an egg is hatching
-        const bool y_comm_visible_when_egg_hatching = false;
-        YCommIconWatcher egg_hatching_detector(COLOR_RED, y_comm_visible_when_egg_hatching);
+    while (num_eggs_hatched < 5 || num_eggs_retrieved < total_eggs_to_fetch){
+        env.log("Eggs hatched: " + std::to_string(num_eggs_hatched) +
+            "/5. Eggs fetched: " + std::to_string(num_eggs_retrieved) + "/" + std::to_string(total_eggs_to_fetch));
 
-        bool restart_bike_loop = false;
-        for (size_t i_bike_loop = 0; i_bike_loop < this->LOOPS_PER_FETCH && bike_loop_count < MAX_BIKE_LOOP_COUNT;){
-            context.wait_for_all_requests();
-            // +1 here because video overlay is for general users. General users start counts at 1, while us programmers start count at 0.
-            if (restart_bike_loop){
-                env.console.overlay().add_log("Restart loop " + std::to_string(bike_loop_count+1), COLOR_WHITE);
-                restart_bike_loop = false;
-            }else{
-                env.console.overlay().add_log("Loop " + std::to_string(bike_loop_count+1), COLOR_WHITE);
-            }
-            int ret = run_until<ProControllerContext>(
-                env.console, context,
-                [](ProControllerContext& context){
-                    travel_to_spin_location(context);
-                    travel_back_to_lady(context);
-                },
-                {{egg_hatching_detector}}
-            );
+        // NOTE: the egg hatching detector cannot be constantly running, 
+        // since it only detects the black dialog box, and speaking to the lady will also produce a black dialog box.
+        // therefore, each phase has its own egg hatching detector, so it can be more easily turned on and off.
 
-            if (ret < 0){ // we are at nursery lady; no egg hatching detected
-                ++i_bike_loop;
-                ++bike_loop_count;
+        switch(phase){
+        case EggAutoPhase::BIKE_LOOP:{
+            env.console.overlay().add_log("Loop " + std::to_string(total_bike_loop_count+1), COLOR_WHITE);
+            env.console.log("Bike Loop " + std::to_string(total_bike_loop_count+1));
+            bool hatch_detected = run_bike_loop(env, context);
+            if (hatch_detected){
+                phase = EggAutoPhase::HATCHING;
                 continue;
             }
 
-            // Egg hatching
-            do{
-                ++num_eggs_hatched;
-                stats.m_hatched++;
-                env.update_stats();
-                wait_for_egg_hatched(env, context, stats, num_eggs_hatched);
-                if (num_eggs_hatched == 5){
-                    // We hatched all five eggs. No more eggs can hatch. Go to next loop
-                    break;
+            // done Bike loop
+            ++num_loops_since_last_fetch_attempt;
+            ++total_bike_loop_count;
+            if (total_bike_loop_count >= MAX_BIKE_LOOP_COUNT){
+                // throw exception
+                exceed_bike_loop_limit(env, context, MAX_BIKE_LOOP_COUNT);
+            }
+
+            if (num_loops_since_last_fetch_attempt < LOOPS_PER_FETCH){
+                phase = EggAutoPhase::BIKE_LOOP; // repeat bike loop
+            }else{
+                if (num_eggs_retrieved < total_eggs_to_fetch){
+                    phase = EggAutoPhase::FETCH_EGG;
+                }else{
+                    env.log("Done retrieving eggs. Resume bike loop to hatch eggs.");
+                    // done retrieving eggs
+                    // resume hatching eggs if needed
+                    phase = EggAutoPhase::BIKE_LOOP;
                 }
-                // Now we see if we can hatch one more egg.
-                ret = run_until<ProControllerContext>(
-                    env.console, context,
-                    [](ProControllerContext& context){
-                        //  Try move a little to hatch more:
-                        //  We move toward lower-left so that it wont hit the lady or enter the Nursory.
-                        //  Add 1 second of settle time to stop moving.
-                        //  We need to not be moving before trying to fly or an egg will hatch during
-                        //  that sequence when we cannot handle it.
-                        pbf_move_left_joystick(context, {-1, -1}, 800ms, 1000ms);
-                    },
-                    {{egg_hatching_detector}}
-                );
-            }while (ret == 0);
-            // now no more hatching in this bike loop
-            // We either cannot find a consecutive hatch any more or we already hatch five of them
-
-            if (num_eggs_hatched == 5 && m_num_eggs_retrieved == 5){
-                m_player_at_loop_start = false;
-                break;
             }
-
-            // Now we either cannot find a consecutive hatch any more, or we already hatch five for them, but
-            // we still need to fetch more eggs
-
-            // Use fly to reset the location because now we don't know where the player character is.
-            const bool fly_from_overworld = true;
-            call_flying_taxi(env, context, fly_from_overworld);
-            restart_bike_loop = true;
-            // We don't update i_bike_loop here because we haven't finished one full bike loop due to egg hatching
-        } // end one bike loop
-
-        if (bike_loop_count >= MAX_BIKE_LOOP_COUNT){
-            env.log("Reached max number of bike loops " + std::to_string(MAX_BIKE_LOOP_COUNT));
-            env.console.overlay().add_log("Error: max loops " + std::to_string(MAX_BIKE_LOOP_COUNT), COLOR_WHITE);
-            env.log("Take a screenshot of party to debug.");
-            // Now take a photo at the player's party for dumping debug info:
-            // Enter Rotom Phone menu
-            pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
-            // Select Pokemon App
-            navigate_to_menu_app(env.console, context, POKEMON_APP_INDEX);
-            // From menu enter Pokemon App
-            ssf_press_button(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY0, EGG_BUTTON_HOLD_DELAY);
-            context.wait_for_all_requests();
-
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Max number of loops reached. Not enough eggs in party?",
-                env.console
-            );
+            continue;
         }
-        
-        context.wait_for_all_requests();
-        if (m_num_eggs_retrieved < 5){
-            // Update num_eggs_retrieved
-            m_num_eggs_retrieved = talk_to_lady_to_fetch_egg(env, context, stats, m_num_eggs_retrieved);
-            if (num_eggs_hatched == 5 && m_num_eggs_retrieved == 5){
-                m_player_at_loop_start = true;
-                break;
+        case EggAutoPhase::HATCHING:{
+            env.console.log("Hatching egg.");
+            num_eggs_hatched = hatch_routine(env, context, stats, num_eggs_hatched);
+            // env.log("Hatched eggs " + std::to_string(num_eggs_hatched) + "/5");
+            env.console.overlay().add_log("Found egg " + std::to_string(num_eggs_retrieved) + "/" + std::to_string(total_eggs_to_fetch), COLOR_WHITE);
+            phase = EggAutoPhase::FLY_RESET;
+            continue;
+        }
+        case EggAutoPhase::FLY_RESET:{
+            env.console.log("Call flying taxi to reset position.");
+            const bool fly_from_overworld = true;
+            bool hatch_detected = call_flying_taxi(env, context, fly_from_overworld);
+            if (hatch_detected){
+                phase = EggAutoPhase::HATCHING;
+            }else{
+                phase = EggAutoPhase::BIKE_LOOP;
             }
+            continue;
+        }
+        case EggAutoPhase::FETCH_EGG:{
+            env.console.log("Talk to lady to fetch egg.");
+            EggFetchResult fetch_result = talk_to_lady_to_fetch_egg(env, context, stats);
+            if (fetch_result.hatch_detected){
+                phase = EggAutoPhase::HATCHING;
+            }else{
+                if(fetch_result.found_egg){ 
+                    num_eggs_retrieved++; 
+                    // env.log("Found egg " + std::to_string(num_eggs_retrieved) + "/" + std::to_string(total_eggs_to_fetch));
+                    env.console.overlay().add_log("Found egg " + std::to_string(num_eggs_retrieved) + "/" + std::to_string(total_eggs_to_fetch), COLOR_WHITE);
+                    stats.m_fetch_success++;
+                    env.update_stats();
+                }
+
+                if (!fetch_result.spoke_to_lady){ // never spoke to lady
+                    phase = EggAutoPhase::FLY_RESET;
+                }else{
+                    // if spoke to lady, back to the bike loop regardless of the success of the egg fetch
+                    num_loops_since_last_fetch_attempt = 0;
+                    phase = EggAutoPhase::BIKE_LOOP;
+                }
+
+            }
+            continue;
+        }
         }
     }
 
@@ -425,7 +410,8 @@ bool EggAutonomous::run_batch(
         // While checking hatched pokemon, we find that We need to stop the program:
         return true;
     }
-    m_num_eggs_retrieved = 0;
+    num_eggs_in_column_0_at_batch_start = 0;
+    m_num_eggs_in_party_at_batch_start = 5;
     // after process_hatched_pokemon(), the player location is at the start of bike loop
     m_player_at_loop_start = true;
 
@@ -444,43 +430,161 @@ bool EggAutonomous::run_batch(
     }
 
     if (save){
-        save_game(env, context);
+        save_game(env.console, context);
         m_num_eggs_in_storage_when_game_saved = 0;
+        m_num_eggs_in_party_when_game_saved = 5;
     }
     
     context.wait_for_all_requests();
     return false;
 }
 
-void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    context.wait_for_all_requests();
-    env.log("Save game.");
-    env.console.overlay().add_log("Save game", COLOR_WHITE);
-    pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
-    pbf_press_button(context, BUTTON_R, 80ms, 2000ms);
-    pbf_mash_button(context, BUTTON_A, 500ms);
-    mash_B_until_y_comm_icon(env, context, "Cannot detect end of saving game.");
+bool EggAutonomous::run_bike_loop(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context
+){
+    YCommIconWatcher no_overworld(COLOR_RED, false);
+    int ret = run_until<ProControllerContext>(
+        env.console, context,
+        [](ProControllerContext& context){
+            travel_to_spin_location2(context);
+            travel_back_to_lady2(context);
+        },
+        {{no_overworld}}
+    );
+
+    if (ret == 0){ // no overworld detected. Check if we find egg hatching.
+        BlackDialogBoxWatcher2 egg_hatching_detector;
+        int ret2 = wait_until(
+            env.console, context,
+            std::chrono::seconds(10),
+            {
+                egg_hatching_detector,
+            }
+        );
+        if (ret2 == 0){
+            env.console.log("Hatching detected during bike loop.");
+            return true;
+        }else{
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "run_bike_loop: No recognized state after 10 seconds.",
+                env.console
+            );
+        }
+    }
+
+    return false;
 }
 
-void EggAutonomous::call_flying_taxi(
+void EggAutonomous::exceed_bike_loop_limit(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    size_t max_bike_loop_count
+){
+    env.console.log("Reached max number of bike loops " + std::to_string(max_bike_loop_count));
+    env.console.overlay().add_log("Error: max loops " + std::to_string(max_bike_loop_count), COLOR_WHITE);
+    env.console.log("Take a screenshot of party to debug.");
+    // Now take a photo at the player's party for dumping debug info:
+    // Enter Rotom Phone menu
+    menus_to_mainmenu(env.console, context);
+    // Select Pokemon App
+    navigate_to_menu_app(env.console, context, POKEMON_APP_INDEX);
+    // From menu enter Pokemon App
+    ssf_press_button(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY0, EGG_BUTTON_HOLD_DELAY);
+    context.wait_for_all_requests();
+
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "Max number of loops reached. Not enough eggs in party?",
+        env.console
+    );
+
+}
+
+size_t EggAutonomous::hatch_routine(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EggAutonomous_Descriptor::Stats& stats,
+    size_t num_eggs_hatched
+){
+    // confirm we are starting with the hatching screen
+    BlackDialogBoxWatcher2 egg_hatching_detector;
+    int ret0 = wait_until(
+        env.console, context,
+        std::chrono::seconds(5),
+        {
+            egg_hatching_detector,
+        }
+    );
+    if (ret0 < 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "hatch_routine: We expected to see a hatching egg, but no hatching detected.",
+            env.console
+        );
+    }
+
+    int ret = -1;
+    do{
+        ++num_eggs_hatched;
+        stats.m_hatched++;
+        env.update_stats();
+        wait_for_egg_hatched(env, context, stats, num_eggs_hatched);
+
+        // Now we see if we can hatch one more egg.
+        ret = run_until<ProControllerContext>(
+            env.console, context,
+            [](ProControllerContext& context){
+                //  Try move a little to hatch more:
+                //  We move toward lower-left so that it wont hit the lady or enter the Nursory.
+                //  Add 1 second of settle time to stop moving.
+                //  We need to not be moving before trying to fly or an egg will hatch during
+                //  that sequence when we cannot handle it.
+                pbf_move_left_joystick(context, {-1, -1}, 800ms, 1000ms);
+            },
+            {{egg_hatching_detector}}
+        );
+    }while (ret == 0);
+
+    return num_eggs_hatched;
+}
+
+
+bool EggAutonomous::call_flying_taxi(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     bool fly_from_overworld
 ){
-    context.wait_for_all_requests();
-    env.console.overlay().add_log("Call Flying Taxi", COLOR_WHITE);
-    if (fly_from_overworld){
-        // Open menu
-        env.log("Fly from overworld to reset position");
-        ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
-    }else{
-        env.log("Fly from menu to reset position");
+
+    BlackDialogBoxWatcher2 egg_hatching_detector;
+    int ret = run_until<ProControllerContext>(
+        env.console, context,
+        [&](ProControllerContext& context){
+            context.wait_for_all_requests();
+            env.console.overlay().add_log("Call Flying Taxi", COLOR_WHITE);
+            if (fly_from_overworld){
+                // Open menu
+                env.log("Fly from overworld to reset position");
+                menus_to_mainmenu(env.console, context);
+            }else{
+                env.log("Fly from menu to reset position");
+            }
+
+            navigate_to_menu_app(env.console, context, TOWN_MAP_APP_INDEX);            
+        },
+        {{egg_hatching_detector}}
+    );
+
+    bool hatch_detected = ret == 0;
+    if (hatch_detected){
+        env.console.log("Hatching detected while trying to call flying taxi.");
+    }else {
+        fly_home(context, false);
+        mash_B_until_y_comm_icon(env.console, context, "Cannot detect end of flying taxi animation.");
     }
 
-    navigate_to_menu_app(env.console, context, TOWN_MAP_APP_INDEX);
-
-    fly_home(context, false);
-    mash_B_until_y_comm_icon(env, context, "Cannot detect end of flying taxi animation.");
+    return hatch_detected;
 }
 
 void EggAutonomous::wait_for_egg_hatched(
@@ -508,80 +612,111 @@ void EggAutonomous::wait_for_egg_hatched(
     }
 }
 
-size_t EggAutonomous::talk_to_lady_to_fetch_egg(
+EggFetchResult EggAutonomous::talk_to_lady_to_fetch_egg(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    EggAutonomous_Descriptor::Stats& stats,
-    size_t num_eggs_retrieved
+    EggAutonomous_Descriptor::Stats& stats
 ){
     env.log("Fetching egg");
     stats.m_fetch_attempts++;
     env.update_stats();
-    // collect_egg(context);
+
+    YCommIconWatcher overworld;
     RetrieveEggArrowFinder egg_arrow_detector(env.console);
     CheckNurseryArrowFinder no_egg_arrow_detector(env.console);
+    WhiteDialogBoxWatcher white_dialog;
+    BlackDialogBoxWatcher2 black_dialog;
 
-    int ret = run_until<ProControllerContext>(
-        env.console, context,
-        [](ProControllerContext& context){
-            for (size_t i_hatched = 0; i_hatched < 2; i_hatched++){
-                pbf_press_button(context, BUTTON_A, 160ms, 1200ms);
+    size_t seen_overworld = 0;
+    bool egg_status_known = false;
+    bool found_egg = false;
+
+    WallClock deadline = current_time() + std::chrono::minutes(2);
+    while(!egg_status_known && current_time() < deadline){
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            env.console, context,
+            std::chrono::seconds(30),
+            {
+                overworld,
+                egg_arrow_detector,
+                black_dialog,
+                white_dialog,
+                no_egg_arrow_detector,
             }
-            pbf_wait(context, 1600ms);
-        },
-        {
-            egg_arrow_detector,
-            no_egg_arrow_detector,
+        );
+        switch (ret){
+        case 0: // overworld
+            env.log("Detected Overworld...", COLOR_BLUE);
+            seen_overworld++;
+            if (seen_overworld > 10){
+                // No NPC found
+                env.log("Stuck in Overworld. Daycare lady not found.", COLOR_BLUE);
+                return EggFetchResult{
+                    .found_egg = false,
+                    .hatch_detected = false,
+                    .spoke_to_lady = false
+                };
+            }
+            pbf_press_button(context, BUTTON_A, 160ms, 100ms);
+            continue;            
+        case 1: // egg_arrow_detector
+            env.log("Found egg");            
+            found_egg = true;
+            // Press A to get the egg
+            ssf_press_button(context, BUTTON_A, 320ms, 160ms);
+            continue;        
+        case 2: // black_dialog
+            if (found_egg){
+                env.log("Received egg");
+                egg_status_known = true;  // break the loop. then mash B
+
+            }else{ // this black dialog might actually be a hatching egg.
+                env.log("Hatching detected while trying to talk to lady to fetch egg.");
+                return EggFetchResult{
+                    .found_egg = false,
+                    .hatch_detected = true,
+                    .spoke_to_lady = true
+                };
+            }
+            continue;
+        case 3: // white_dialog
+            env.log("Detected dialog box...", COLOR_BLUE);
+            pbf_press_button(context, BUTTON_A, 160ms, 40ms);
+            continue;            
+        case 4: // no_egg_arrow_detector
+            env.log("No egg");
+            env.console.overlay().add_log("No egg", COLOR_WHITE);
+            found_egg = false;
+            egg_status_known = true;  // break the loop. then mash B
+            continue;     
+        default:
+           OperationFailedException::fire(
+               ErrorReport::SEND_ERROR_REPORT,
+               "talk_to_lady_to_fetch_egg(): No recognized state after 30 seconds.",
+               env.console
+           );
         }
-    );
-    
-    const bool y_comm_visible_at_end_of_dialog = true;
-    YCommIconWatcher dialog_over_detector(COLOR_RED, y_comm_visible_at_end_of_dialog);
-    switch (ret){
-    case 0:
-        ++num_eggs_retrieved;
-        env.log("Found egg");
-        env.console.overlay().add_log("Found egg " + std::to_string(num_eggs_retrieved) + "/5", COLOR_WHITE);
-        stats.m_fetch_success++;
-        env.update_stats();
-        // Press A to get the egg
-        ssf_press_button(context, BUTTON_A, 320ms, 160ms);
-
-        ret = run_until<ProControllerContext>(
-            env.console, context,
-            [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, 30s);
-            },
-            {{dialog_over_detector}}
-        );
-        break;
-
-    case 1:
-        env.log("No egg");
-        env.console.overlay().add_log("No egg", COLOR_WHITE);
-        run_until<ProControllerContext>(
-            env.console, context,
-            [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, 5s);
-            },
-            {{dialog_over_detector}}
-        );
-        return num_eggs_retrieved;
-//        break;
-
-    default:
-        env.log("Daycare lady not found.");
-        env.console.overlay().add_log("No daycare lady", COLOR_WHITE);
-        return num_eggs_retrieved;
-//        OperationFailedException::fire(
-//            ErrorReport::SEND_ERROR_REPORT,
-//            "Cannot detect dialog selection arrow when talking to Nursery lady.",
-//            env.console
-//        );
     }
 
-    // If dialog over is not detected:
-    if (ret < 0){
+    if (!egg_status_known){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "talk_to_lady_to_fetch_egg(): Caught in loop. Unable to speak to lady after 2 minutes.",
+            env.console
+        );
+    }
+
+    // we know if the egg was found or not
+    // mash b to return to overworld
+    int ret2 = run_until<ProControllerContext>(
+        env.console, context,
+        [](ProControllerContext& context){
+            pbf_mash_button(context, BUTTON_B, 30s);
+        },
+        {{overworld}}
+    );
+    if (ret2 < 0){ // If dialog over is not detected:
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Cannot detect end of Nursery lady dialog. No Y-Comm mark found.",
@@ -589,7 +724,11 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
         );
     }
 
-    return num_eggs_retrieved;
+    return EggFetchResult{ 
+        .found_egg = found_egg,
+        .hatch_detected = false,
+        .spoke_to_lady = true
+    };
 }
 
 // After all five eggs hatched and another five eggs deposit into the first column of the box,
@@ -610,10 +749,46 @@ bool EggAutonomous::process_hatched_pokemon(
 
     menus_to_boxsystem(env.console, context);
 
+    // Before processing the box:
+    // Confirm that Box Column 0 has 5 eggs, and the party has no eggs
+    context.wait_for_all_requests();
+    context.wait_for(500ms);
+    auto screen0 = env.console.video().snapshot();
+    size_t num_eggs_in_column_0_before = count_eggs_in_first_box_column(env.console, screen0, 5);
+    size_t num_eggs_in_party_before = count_eggs_in_party(env.console, screen0, 0);
+
+    if (num_eggs_in_column_0_before != 5){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "process_hatched_pokemon: Did not start with an 5 eggs in the first box column, before processing.",
+            env.console
+        );
+    }
+
+    if (num_eggs_in_party_before != 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "process_hatched_pokemon: Did not start with a party without eggs, before processing, since they should all be hatched.",
+            env.console
+        );        
+    }
+
+
     const Milliseconds BOX_CHANGE_DELAY = GameSettings::instance().BOX_CHANGE_DELAY0;
     const Milliseconds BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY0;
 
+    // select top Pokemon in party
     box_scroll(context, DPAD_LEFT);
+
+    // Change box view to judge or stats
+    Language language = LANGUAGE;
+    if (language == Language::None){
+        change_view_to_stats_or_judge(env.console, context);
+    }else{
+        change_view_to_judge(env.console, context, language);
+    }
+
+    // select the first egg
     box_scroll(context, DPAD_DOWN);
 
     context.wait_for_all_requests();
@@ -825,6 +1000,28 @@ bool EggAutonomous::process_hatched_pokemon(
     // Press A to finish dropping the egg column 
     ssf_press_button_ptv(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
 
+    // After processing the box:
+    // Confirm that Box Column 0 is empty, and the party is full of eggs
+    EggQuantity egg_quantity = check_box(env.console, context);
+    size_t num_eggs_in_column_0_after = egg_quantity.eggs_in_column_0;
+    size_t num_eggs_in_party_after = egg_quantity.eggs_in_party;
+
+    if (num_eggs_in_column_0_after != 0 ){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "process_hatched_pokemon: Did not end up with an empty first box column, after processing.",
+            env.console
+        );
+    }
+
+    if (num_eggs_in_party_after != 5){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "process_hatched_pokemon: Did not end up with a party full of 5 eggs, after processing.",
+            env.console
+        );        
+    }
+
     //  Back out to menu.
     menus_to_mainmenu(env.console, context);
 
@@ -854,29 +1051,122 @@ bool EggAutonomous::process_hatched_pokemon(
     return false;
 }
 
-void EggAutonomous::mash_B_until_y_comm_icon(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    const std::string& error_msg
-){
+
+
+EggQuantity EggAutonomous::check_box(VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
-    const bool y_comm_visible = true;
-    YCommIconWatcher y_comm_detector(COLOR_RED, y_comm_visible);
-    int ret = run_until<ProControllerContext>(
-        env.console, context,
-        [](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_B, 10s);
-        },
-        {y_comm_detector}
-    );
-    if (ret != 0){
+    context.wait_for(500ms);
+    
+    auto screen = stream.video().snapshot();
+    check_box_filled(stream, screen);
+    check_non_egg_lead(stream, screen);
+    size_t eggs_in_party = count_eggs_in_party(stream, screen, 5);
+    size_t eggs_in_col_0_box = count_eggs_in_first_box_column(stream, screen, 5);
+
+
+    return {eggs_in_party, eggs_in_col_0_box};
+}
+
+
+void EggAutonomous::check_box_filled(VideoStream& stream, const ImageViewRGB32& screen){
+    for (uint8_t row = 0; row < 5; row++){
+        for (uint8_t column = 1; column < 6; column++){
+            BoxEmptySlotDetector slot(SlotLocation::BOX, row, column);
+            bool is_empty = slot.detect(screen);
+            // stream.log("row " + std::to_string(row) + " col " + std::to_string(column) + (is_empty ? " is_empty" : " not empty"));
+            if (is_empty){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "check_box_filled: Box is not filled.",
+                    stream
+                );
+            }
+
+        }
+    }
+}
+
+void EggAutonomous::check_non_egg_lead(VideoStream& stream, const ImageViewRGB32& screen){
+    BoxEmptySlotDetector slot(SlotLocation::PARTY, 0, 0);
+    bool is_empty = slot.detect(screen);
+    if (is_empty){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            error_msg + " No Y-Comm mark found.",
-            env.console
+            "check_non_egg_lead: Detected an empty lead slot in party. This shouldn't be possible.",
+            stream
+        );
+    }
+
+    BoxEggDetector egg(SlotLocation::PARTY, 0);
+    bool is_egg = egg.detect(screen);
+    if (is_egg){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "check_non_egg_lead: Detected an egg in lead slot of party.",
+            stream
         );
     }
 }
+
+size_t EggAutonomous::count_eggs_in_party(VideoStream& stream, const ImageViewRGB32& screen, std::optional<size_t> expected_eggs_plus_empty){
+    size_t num_empty = 0;
+    size_t num_eggs = 0;
+    for (uint8_t row = 1; row < 6; row++){
+        BoxEmptySlotDetector slot(SlotLocation::PARTY, row, 0);
+        bool is_empty = slot.detect(screen);
+        if (is_empty) { num_empty++; }
+
+        BoxEggDetector egg(SlotLocation::PARTY, row);
+        bool is_egg = egg.detect(screen);
+        if (is_egg) { num_eggs++; }
+    }
+
+    if (expected_eggs_plus_empty.has_value()){
+        size_t expected = expected_eggs_plus_empty.value();
+        if (num_empty + num_eggs != expected){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "count_eggs_in_party: Total number of eggs and empty slots in the party don't add up to the expected number. "
+                "During setup, ensure your only non-egg Pokemon is in the lead. "
+                "The rest of the slots in the team should either be empty or an egg.",
+                stream
+            );
+        }
+    }
+
+
+    return num_eggs;
+}
+
+size_t EggAutonomous::count_eggs_in_first_box_column(VideoStream& stream, const ImageViewRGB32& screen, std::optional<size_t> expected_eggs_plus_empty){
+
+    size_t num_empty = 0;
+    size_t num_eggs = 0;
+    for (uint8_t row = 0; row < 5; row++){
+        BoxEmptySlotDetector slot(SlotLocation::BOX, row, 0);
+        bool is_empty = slot.detect(screen);
+        if (is_empty) { num_empty++; }
+
+        BoxEggDetector egg(SlotLocation::BOX, row);
+        bool is_egg = egg.detect(screen);
+        if (is_egg) { num_eggs++; }
+    }
+
+    if (expected_eggs_plus_empty.has_value()){
+        size_t expected = expected_eggs_plus_empty.value();    
+        if (num_empty + num_eggs != expected){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "count_eggs_in_first_box_column: Total number of eggs and empty slots in the first box column don't add up to the expected number. "
+                "During setup, ensure there are no non-egg Pokemon in the first box column.",
+                stream
+            );
+        }
+    }
+
+    return num_eggs;
+}
+
 
 
 

@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_EggAutonomous_H
 #define PokemonAutomation_PokemonSwSh_EggAutonomous_H
 
+#include <optional>
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
@@ -21,6 +22,25 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+
+enum class EggAutoPhase{
+    BIKE_LOOP,
+    HATCHING,
+    FLY_RESET,
+    FETCH_EGG,
+
+};
+
+struct EggFetchResult{
+    bool found_egg;
+    bool hatch_detected;
+    bool spoke_to_lady;
+};
+
+struct EggQuantity{
+    size_t eggs_in_party;
+    size_t eggs_in_column_0;
+};
 
 
 class EggAutonomous_Descriptor : public SingleSwitchProgramDescriptor{
@@ -50,12 +70,32 @@ private:
         EggAutonomous_Descriptor::Stats& stats
     );
 
-    void save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
+    // return true if egg hatching detected during the bike loop
+    bool run_bike_loop(
+        SingleSwitchProgramEnvironment& env,
+        ProControllerContext& context
+    );
+
+    void exceed_bike_loop_limit(
+        SingleSwitchProgramEnvironment& env,
+        ProControllerContext& context,
+        size_t max_bike_loop_count
+    );
+
+    // Return updated `num_eggs_hatched` to reflect change in hatched eggs.
+    size_t hatch_routine(
+        SingleSwitchProgramEnvironment& env,
+        ProControllerContext& context,
+        EggAutonomous_Descriptor::Stats& stats,
+        size_t num_eggs_hatched
+    );
 
     // Call flying taxi to reset player character position to Nursery front door.
     // fly_from_overworld: if true, the game is in the overworld while calling this function. If false, the game is in the menu.
     // Note: the cursor in the menu must already be at Town Map.
-    void call_flying_taxi(
+    // return true if egg hatching detected while trying to open Rotom phone menu
+    bool call_flying_taxi(
         SingleSwitchProgramEnvironment& env,
         ProControllerContext& context,
         bool fly_from_overworld
@@ -71,12 +111,14 @@ private:
     );
 
     // Call this function when standing in front of the lady to fetch one egg.
-    // Return updated `num_eggs_retrieved` to reflect change in fetched eggs.
-    size_t talk_to_lady_to_fetch_egg(
+    // return EggFetchResult, which is a struct of the following:
+    //  - found_egg: boolean that is true if an egg was retrieved from the lady
+    //  - hatch_detected: boolean that is true if hatch was detected.
+    //  - spoke_to_lady: boolean that is true if we spoke to the lady
+    EggFetchResult talk_to_lady_to_fetch_egg(
         SingleSwitchProgramEnvironment& env,
         ProControllerContext& context,
-        EggAutonomous_Descriptor::Stats& stats,
-        size_t num_eggs_retrieved
+        EggAutonomous_Descriptor::Stats& stats
     );
 
     // After all five eggs hatched and another five eggs deposit into the first column of the box,
@@ -93,13 +135,25 @@ private:
         bool need_taxi
     );
 
-    // Used to wait until Y-Comm icon shows up.
-    // Throw error if it does not find it after 10 sec.
-    void mash_B_until_y_comm_icon(
-        SingleSwitchProgramEnvironment& env,
-        ProControllerContext& context,
-        const std::string& error_msg
-    );
+    // Starting within the box, confirm that the lead is not an egg, and that the box is full except for the first column
+    // this is run before each batch
+    // return quantity of eggs in both the party and the first box column
+    EggQuantity check_box(VideoStream& stream, ProControllerContext& context);
+
+    // ensure that all rows/columns are filled except the first column
+    // ASSUMES: the cursor should NOT be on the box, with the exception that it can be at the top row. 
+    // This is because it pop-up text otherwise covers up the box slot, preventing proper detection
+    void check_box_filled(VideoStream& stream, const ImageViewRGB32& screen);
+
+    // ensure that the lead pokemon in the party is not an egg
+    void check_non_egg_lead(VideoStream& stream, const ImageViewRGB32& screen);
+
+    size_t count_eggs_in_party(VideoStream& stream, const ImageViewRGB32& screen, std::optional<size_t> expected_eggs_plus_empty);
+
+    size_t count_eggs_in_first_box_column(VideoStream& stream, const ImageViewRGB32& screen, std::optional<size_t> expected_eggs_plus_empty);
+
+
+
 
     StartInGripOrGameOption START_LOCATION;
     TouchDateIntervalOption TOUCH_DATE_INTERVAL;
@@ -111,7 +165,6 @@ private:
 
     SimpleIntegerOption<uint8_t> MAX_KEEPERS;
     SimpleIntegerOption<uint8_t> LOOPS_PER_FETCH;
-    IntegerEnumDropdownOption NUM_EGGS_IN_COLUMN;
 
     enum class AutoSave{
         NoAutoSave,
@@ -137,12 +190,21 @@ private:
     // How many eggs have been placed behind a game save.
     // This is used so that if we recover from an error, we know how many eggs are in storage.
     size_t m_num_eggs_in_storage_when_game_saved = 0;
-    // How many eggs are already deposited to storage so far.
-    size_t m_num_eggs_retrieved = 0;
+
+    // This is used so that if we recover from an error, we know how many eggs are in the party
+    size_t m_num_eggs_in_party_when_game_saved = 0;
+
+    // number of eggs in box column 0 at the start of run_batch()
+    size_t num_eggs_in_column_0_at_batch_start = 0;
+
+    // number of eggs in party at the start of run_batch()
+    size_t m_num_eggs_in_party_at_batch_start = 0;
 
     // Is player's location at the bike loop start
     bool m_player_at_loop_start = false;
 };
+
+    
 
 
 }

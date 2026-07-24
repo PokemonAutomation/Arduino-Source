@@ -36,9 +36,20 @@ void navigate_to_menu_app(
     size_t app_index
 );
 
-
+// Move to Main Menu, starting from Overworld, Party menu, or Box menu
 void menus_to_mainmenu(VideoStream& stream, ProControllerContext& context);
 void menus_to_boxsystem(VideoStream& stream, ProControllerContext& context);
+
+
+void save_game(VideoStream& stream, ProControllerContext& context);
+
+// Used to wait until Y-Comm icon shows up.
+// Throw error if it does not find it after 10 sec.
+void mash_B_until_y_comm_icon(
+    VideoStream& stream,
+    ProControllerContext& context,
+    const std::string& error_msg
+);
 
 
 
