@@ -22,7 +22,7 @@ void add_tests(PokemonAutomation::UnitTestRunner& runner, const std::string& res
 
 
     for (auto& test : NintendoSwitch::PokemonSwSh::get_tests_YCommDetector(resource_path)){
-        runner.add_test(std::move(test));
+        runner.add_test(test);
     }
 
 
