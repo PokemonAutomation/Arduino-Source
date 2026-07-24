@@ -32,9 +32,9 @@ public:
     std::vector<ImageViewRGB32> get_crop_candidates(const ImageViewRGB32& image) const;
 
 private:
+    double m_min_euclidean_distance_squared;
     Color m_color;
     ImageFloatBox m_box;
-    double m_min_euclidean_distance_squared;
 };
 
 
