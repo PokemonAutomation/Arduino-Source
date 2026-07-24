@@ -753,8 +753,8 @@ bool EggAutonomous::process_hatched_pokemon(
     context.wait_for_all_requests();
     context.wait_for(500ms);
     auto screen0 = env.console.video().snapshot();
-    size_t num_eggs_in_column_0_before = count_eggs_in_first_box_column(env.console, screen0);
-    size_t num_eggs_in_party_before = count_eggs_in_party(env.console, screen0);
+    size_t num_eggs_in_column_0_before = count_eggs_in_first_box_column(env.console, screen0, 5);
+    size_t num_eggs_in_party_before = count_eggs_in_party(env.console, screen0, 0);
 
     if (num_eggs_in_column_0_before != 5){
         OperationFailedException::fire(
@@ -1059,8 +1059,8 @@ EggQuantity EggAutonomous::check_box(VideoStream& stream, ProControllerContext& 
     auto screen = stream.video().snapshot();
     check_box_filled(stream, screen);
     check_non_egg_lead(stream, screen);
-    size_t eggs_in_party = count_eggs_in_party(stream, screen);
-    size_t eggs_in_col_0_box = count_eggs_in_first_box_column(stream, screen);
+    size_t eggs_in_party = count_eggs_in_party(stream, screen, 5);
+    size_t eggs_in_col_0_box = count_eggs_in_first_box_column(stream, screen, 5);
 
 
     return {eggs_in_party, eggs_in_col_0_box};
@@ -1107,7 +1107,7 @@ void EggAutonomous::check_non_egg_lead(VideoStream& stream, const ImageViewRGB32
     }
 }
 
-size_t EggAutonomous::count_eggs_in_party(VideoStream& stream, const ImageViewRGB32& screen){
+size_t EggAutonomous::count_eggs_in_party(VideoStream& stream, const ImageViewRGB32& screen, std::optional<size_t> expected_eggs_plus_empty){
     size_t num_empty = 0;
     size_t num_eggs = 0;
     for (uint8_t row = 1; row < 6; row++){
@@ -1120,20 +1120,24 @@ size_t EggAutonomous::count_eggs_in_party(VideoStream& stream, const ImageViewRG
         if (is_egg) { num_eggs++; }
     }
 
-    if (num_empty + num_eggs != 5){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "count_eggs_in_party: Total number of eggs and empty slots in the party don't add up to 5. "
-            "Ensure your only non-egg Pokemon is in the lead. "
-            "The rest of the slots in the team should either be empty or an egg.",
-            stream
-        );
+    if (expected_eggs_plus_empty.has_value()){
+        size_t expected = expected_eggs_plus_empty.value();
+        if (num_empty + num_eggs != expected){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "count_eggs_in_party: Total number of eggs and empty slots in the party don't add up to the expected number. "
+                "During setup, ensure your only non-egg Pokemon is in the lead. "
+                "The rest of the slots in the team should either be empty or an egg.",
+                stream
+            );
+        }
     }
+
 
     return num_eggs;
 }
 
-size_t EggAutonomous::count_eggs_in_first_box_column(VideoStream& stream, const ImageViewRGB32& screen){
+size_t EggAutonomous::count_eggs_in_first_box_column(VideoStream& stream, const ImageViewRGB32& screen, std::optional<size_t> expected_eggs_plus_empty){
 
     size_t num_empty = 0;
     size_t num_eggs = 0;
@@ -1147,13 +1151,16 @@ size_t EggAutonomous::count_eggs_in_first_box_column(VideoStream& stream, const 
         if (is_egg) { num_eggs++; }
     }
 
-    if (num_empty + num_eggs != 5){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "count_eggs_in_first_box_column: Total number of eggs and empty slots in the first box column don't add up to 5. "
-            "Ensure thre are no non-egg Pokemon in the first box column.",
-            stream
-        );
+    if (expected_eggs_plus_empty.has_value()){
+        size_t expected = expected_eggs_plus_empty.value();    
+        if (num_empty + num_eggs != expected){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "count_eggs_in_first_box_column: Total number of eggs and empty slots in the first box column don't add up to the expected number. "
+                "During setup, ensure there are no non-egg Pokemon in the first box column.",
+                stream
+            );
+        }
     }
 
     return num_eggs;
