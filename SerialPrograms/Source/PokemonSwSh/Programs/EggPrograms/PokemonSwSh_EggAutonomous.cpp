@@ -315,7 +315,7 @@ bool EggAutonomous::run_batch(
     // - if not enough eggs fetched, talk to lady to try fetching an egg.
     while (num_eggs_hatched < 5 || num_eggs_retrieved < total_eggs_to_fetch){
         env.log("Eggs hatched: " + std::to_string(num_eggs_hatched) +
-            ". Eggs fetched: " + std::to_string(num_eggs_retrieved));
+            "/5. Eggs fetched: " + std::to_string(num_eggs_retrieved) + "/" + std::to_string(total_eggs_to_fetch));
 
         // NOTE: the egg hatching detector cannot be constantly running, 
         // since it only detects the black dialog box, and speaking to the lady will also produce a black dialog box.
@@ -345,6 +345,7 @@ bool EggAutonomous::run_batch(
                 if (num_eggs_retrieved < total_eggs_to_fetch){
                     phase = EggAutoPhase::FETCH_EGG;
                 }else{
+                    env.log("Done retrieving eggs. Resume bike loop to hatch eggs.");
                     // done retrieving eggs
                     // resume hatching eggs if needed
                     phase = EggAutoPhase::BIKE_LOOP;
@@ -355,7 +356,7 @@ bool EggAutonomous::run_batch(
         case EggAutoPhase::HATCHING:{
             env.console.log("Hatching egg.");
             num_eggs_hatched = hatch_routine(env, context, stats, num_eggs_hatched);
-            env.log("Hatched eggs " + std::to_string(num_eggs_hatched) + "/5");
+            // env.log("Hatched eggs " + std::to_string(num_eggs_hatched) + "/5");
             env.console.overlay().add_log("Found egg " + std::to_string(num_eggs_retrieved) + "/" + std::to_string(total_eggs_to_fetch), COLOR_WHITE);
             phase = EggAutoPhase::FLY_RESET;
             continue;
@@ -379,7 +380,7 @@ bool EggAutonomous::run_batch(
             }else{
                 if(fetch_result.found_egg){ 
                     num_eggs_retrieved++; 
-                    env.log("Found egg " + std::to_string(num_eggs_retrieved) + "/" + std::to_string(total_eggs_to_fetch));
+                    // env.log("Found egg " + std::to_string(num_eggs_retrieved) + "/" + std::to_string(total_eggs_to_fetch));
                     env.console.overlay().add_log("Found egg " + std::to_string(num_eggs_retrieved) + "/" + std::to_string(total_eggs_to_fetch), COLOR_WHITE);
                     stats.m_fetch_success++;
                     env.update_stats();
