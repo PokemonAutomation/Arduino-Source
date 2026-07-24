@@ -112,8 +112,9 @@ private:
 
     // Call this function when standing in front of the lady to fetch one egg.
     // return EggFetchResult, which is a struct of the following:
-    //  - num_eggs_retrieved: updated `num_eggs_retrieved` that reflects the change in fetched eggs.
+    //  - found_egg: boolean that is true if an egg was retrieved from the lady
     //  - hatch_detected: boolean that is true if hatch was detected.
+    //  - spoke_to_lady: boolean that is true if we spoke to the lady
     EggFetchResult talk_to_lady_to_fetch_egg(
         SingleSwitchProgramEnvironment& env,
         ProControllerContext& context,
