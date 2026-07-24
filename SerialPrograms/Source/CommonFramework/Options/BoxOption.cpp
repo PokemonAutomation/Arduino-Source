@@ -5,6 +5,7 @@
  */
 
 #include <vector>
+#include <charconv>
 #include "Common/Cpp/Strings/StringTools.h"
 #include "BoxOption.h"
 
@@ -65,15 +66,19 @@ void BoxOption::on_config_value_changed(void* object){
         std::string box_coord_string = BOX_COORDINATES;
         std::vector<std::string> all_coords = StringTools::split(box_coord_string, ", ");
 
-        std::string x_string = all_coords[0];
-        std::string y_string = all_coords[1];
-        std::string width_string = all_coords[2];
-        std::string height_string = all_coords[3];
+        double x_coord = 0.0;
+        double y_coord = 0.0;
+        double width_coord = 0.0;
+        double height_coord = 0.0;
 
-        double x_coord = std::stod(x_string);
-        double y_coord = std::stod(y_string);
-        double width_coord = std::stod(width_string);
-        double height_coord = std::stod(height_string);
+        double* targets[] = { &x_coord, &y_coord, &width_coord, &height_coord };
+        size_t limit = std::min(all_coords.size(), size_t(4));
+
+        for (size_t i = 0; i < limit; ++i) {
+            const auto& s = all_coords[i];
+            // Pure numeric parsing directly from the character buffer without locale overhead or exceptions
+            std::from_chars(s.data(), s.data() + s.size(), *targets[i]);
+        }
 
         // cout << box_coord_string << endl;
         // cout << std::to_string(x_coord) << endl;
