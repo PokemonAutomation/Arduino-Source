@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_EggAutonomous_H
 #define PokemonAutomation_PokemonSwSh_EggAutonomous_H
 
+#include <optional>
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
@@ -134,6 +135,7 @@ private:
     );
 
     // Starting within the box, confirm that the lead is not an egg, and that the box is full except for the first column
+    // this is run before each batch
     // return quantity of eggs in both the party and the first box column
     EggQuantity check_box(VideoStream& stream, ProControllerContext& context);
 
@@ -145,9 +147,9 @@ private:
     // ensure that the lead pokemon in the party is not an egg
     void check_non_egg_lead(VideoStream& stream, const ImageViewRGB32& screen);
 
-    size_t count_eggs_in_party(VideoStream& stream, const ImageViewRGB32& screen);
+    size_t count_eggs_in_party(VideoStream& stream, const ImageViewRGB32& screen, std::optional<size_t> expected_eggs_plus_empty);
 
-    size_t count_eggs_in_first_box_column(VideoStream& stream, const ImageViewRGB32& screen);
+    size_t count_eggs_in_first_box_column(VideoStream& stream, const ImageViewRGB32& screen, std::optional<size_t> expected_eggs_plus_empty);
 
 
 
