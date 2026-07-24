@@ -37,6 +37,28 @@ private:
     std::atomic<bool> m_detected;
 };
 
+// Detect the bigger black dialog box. It is used in places such as egg hatching detection
+class BlackDialogBoxDetector2 : public StaticScreenDetector{
+public:
+    BlackDialogBoxDetector2(Color color = COLOR_RED);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+
+protected:
+    Color m_color;
+    ImageFloatBox m_bottom;
+    ImageFloatBox m_left;
+    ImageFloatBox m_right;
+};
+class BlackDialogBoxWatcher2 : public DetectorToFinder<BlackDialogBoxDetector2>{
+public:
+    BlackDialogBoxWatcher2(Color color = COLOR_RED)
+         : DetectorToFinder("BlackDialogBoxWatcher2", std::chrono::milliseconds(250), color)
+    {}
+};
+
 
 class WhiteDialogBoxDetector : public StaticScreenDetector{
 public:
