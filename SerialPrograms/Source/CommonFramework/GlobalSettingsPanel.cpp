@@ -148,7 +148,7 @@ GlobalSettings::GlobalSettings()
             {OcrLibrary::TESSERACT,            "tesseract",              "Tesseract"},
         },
         LockMode::LOCK_WHILE_RUNNING,
-        OcrLibrary::TESSERACT
+        OcrLibrary::PADDLE_OCR
     )
     , OCR_WARNING(
         "WARNING: If you change the OCR library away from the default (PaddleOCR), you must ensure that you have the necessary resource downloaded. "
