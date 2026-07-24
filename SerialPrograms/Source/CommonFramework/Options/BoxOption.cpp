@@ -5,7 +5,6 @@
  */
 
 #include <vector>
-#include <charconv>
 #include "Common/Cpp/Strings/StringTools.h"
 #include "BoxOption.h"
 
@@ -76,8 +75,14 @@ void BoxOption::on_config_value_changed(void* object){
 
         for (size_t i = 0; i < limit; ++i) {
             const auto& s = all_coords[i];
-            // Pure numeric parsing directly from the character buffer without locale overhead or exceptions
-            std::from_chars(s.data(), s.data() + s.size(), *targets[i]);
+            char* endptr;
+            // Parses directly from the buffer without locale or exception overhead
+            double value = std::strtod(s.data(), &endptr);
+            
+            // Validate that at least some characters were parsed successfully
+            if (endptr != s.data()) {
+                *targets[i] = value;
+            }
         }
 
         // cout << box_coord_string << endl;
