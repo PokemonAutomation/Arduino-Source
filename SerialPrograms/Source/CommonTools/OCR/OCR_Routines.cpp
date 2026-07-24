@@ -23,18 +23,9 @@ using std::endl;
 namespace PokemonAutomation{
 namespace OCR{
 
-// return true if the user enabled PaddleOCR and its resource has been downloaded
-// NOTE: we are making the assumption that if English is downloaded, 
-// that all the other languages are downloaded too, since they're all downloaded
-// as a bundle.
-bool use_paddle_ocr(){
-    static bool use_paddle_ocr = GlobalSettings::instance().USE_PADDLE_OCR && paddle_ocr_language_available(Language::English);
-
-    return use_paddle_ocr;
-}
 
 bool ocr_language_available(Language language){
-    if (use_paddle_ocr()){
+    if (GlobalSettings::instance().OCR_LIBRARY == OcrLibrary::PADDLE_OCR){
         return  OCR::paddle_ocr_language_available(language);
     }else{
         return OCR::tesseract_language_available(language);
@@ -44,16 +35,21 @@ bool ocr_language_available(Language language){
 
 std::string ocr_read(Language language, const ImageViewRGB32& image, PageSegMode psm){
     std::string ocr_text = "";
-    if (use_paddle_ocr()){
-        ocr_text = OCR::paddle_ocr_read(language, image);
-    }else{
+    if (psm == PageSegMode::AUTO || psm == PageSegMode::SINGLE_BLOCK || psm == PageSegMode::SINGLE_COLUMN){
+        // if using multiline detection, force Tesseract
         ocr_text = OCR::tesseract_ocr_read(language, image, psm);
+    }else{
+        if (GlobalSettings::instance().OCR_LIBRARY == OcrLibrary::PADDLE_OCR){
+            ocr_text = OCR::paddle_ocr_read(language, image);
+        }else{
+            ocr_text = OCR::tesseract_ocr_read(language, image, psm);
+        }
     }
     return ocr_text;
 }
 
 void ensure_ocr_instances(Language language, size_t instances){
-    if (use_paddle_ocr()){
+    if (GlobalSettings::instance().OCR_LIBRARY == OcrLibrary::PADDLE_OCR){
         OCR::ensure_paddle_ocr_instance(language);
     }else{
         OCR::ensure_tesseract_instances(language, instances);
@@ -61,7 +57,7 @@ void ensure_ocr_instances(Language language, size_t instances){
 }
 
 void clear_ocr_cache(){
-    if (use_paddle_ocr()){
+    if (GlobalSettings::instance().OCR_LIBRARY == OcrLibrary::PADDLE_OCR){
         OCR::clear_paddle_ocr_cache();
     }else{
         OCR::clear_tesseract_cache();

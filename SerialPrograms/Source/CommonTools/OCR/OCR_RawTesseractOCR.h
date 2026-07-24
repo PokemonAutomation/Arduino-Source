@@ -54,11 +54,11 @@ bool tesseract_language_available(Language language);
 //  call `ensure_tesseract_instances()` to pre-warm to pool with a given number of instances.
 //
 //  psm: Page segmentation mode - controls how Tesseract interprets the image layout.
-//       Defaults to SINGLE_BLOCK (Tesseract C++ API's default) for best performance.
+//       Defaults to SINGLE_LINE
 std::string tesseract_ocr_read(
     Language language,
     const ImageViewRGB32& image,
-    PageSegMode psm = PageSegMode::SINGLE_BLOCK
+    PageSegMode psm = PageSegMode::SINGLE_LINE
 );
 
 

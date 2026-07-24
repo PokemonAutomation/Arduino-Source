@@ -111,7 +111,7 @@ public:
             new TesseractAPI(m_training_data_path.c_str(), m_language_code.c_str())
         );
         if (!api->valid()){
-            throw InternalSystemError(nullptr, PA_CURRENT_FUNCTION, "Could not initialize TesseractAPI.");
+            throw InternalSystemError(nullptr, PA_CURRENT_FUNCTION, "Could not initialize TesseractAPI. Ensure that Tesseract has been downloaded.");
         }
 
         // Add to pool under lock.
