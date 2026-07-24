@@ -776,7 +776,18 @@ bool EggAutonomous::process_hatched_pokemon(
     const Milliseconds BOX_CHANGE_DELAY = GameSettings::instance().BOX_CHANGE_DELAY0;
     const Milliseconds BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY0;
 
+    // select top Pokemon in party
     box_scroll(context, DPAD_LEFT);
+
+    // Change box view to judge or stats
+    Language language = LANGUAGE;
+    if (language == Language::None){
+        change_view_to_stats_or_judge(env.console, context);
+    }else{
+        change_view_to_judge(env.console, context, language);
+    }
+
+    // select the first egg
     box_scroll(context, DPAD_DOWN);
 
     context.wait_for_all_requests();
