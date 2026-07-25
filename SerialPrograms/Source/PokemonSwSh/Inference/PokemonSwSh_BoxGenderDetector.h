@@ -26,7 +26,7 @@ public:
 
 
 
-const std::vector<std::shared_ptr<const UnitTest>>& get_tests_BoxGenderDetector();
+void add_tests_BoxGenderDetector(UnitTestDatabase& database);
 
 
 

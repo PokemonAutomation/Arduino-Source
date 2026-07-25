@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/ScopeExit.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
@@ -19,25 +20,35 @@ namespace ComputerPrograms{
 
 
 
-void add_tests(PokemonAutomation::UnitTestRunner& runner){
 
 
+UnitTestDatabase make_UNIT_TESTS_ALL(){
+    UnitTestDatabase ret;
 
-    for (auto& test : NintendoSwitch::PokemonSwSh::get_tests_BoxGenderDetector()){
-        runner.add_test(test);
-    }
-    for (auto& test : NintendoSwitch::PokemonSwSh::get_tests_YCommDetector()){
-        runner.add_test(test);
-    }
+    NintendoSwitch::PokemonSwSh::add_tests_BoxGenderDetector(ret);
+    NintendoSwitch::PokemonSwSh::add_tests_YCommDetector(ret);
 
-
-
+    return ret;
 }
 
 
 
 
-
+const UnitTestDatabase& UNIT_TESTS_ALL(){
+    static UnitTestDatabase database = make_UNIT_TESTS_ALL();
+    return database;
+}
+StringSelectDatabase make_TEST_DATABASE(){
+    StringSelectDatabase database;
+    for (auto& test : UNIT_TESTS_ALL()){
+        database.add_entry(StringSelectEntry(test.first, test.first));
+    }
+    return database;
+}
+const StringSelectDatabase& TEST_DATABASE(){
+    static StringSelectDatabase DATABASE = make_TEST_DATABASE();
+    return DATABASE;
+}
 
 
 
@@ -80,6 +91,10 @@ std::unique_ptr<StatsTracker> UnitTestRunner_Descriptor::make_stats() const{
 
 
 
+
+UnitTestRunner::~UnitTestRunner(){
+    RUN_MODE.remove_listener(*this);
+}
 UnitTestRunner::UnitTestRunner()
     : RESOURCE_LABEL("<b>Test Resources Path:</b>")
     , RESOURCE_PATH(
@@ -87,6 +102,21 @@ UnitTestRunner::UnitTestRunner()
         LockMode::READ_ONLY,
         UNIT_TEST_RESOURCE_PATH(),
         ""
+    )
+    , RUN_MODE(
+        "<b>Run Mode:</b>",
+        {
+            {RunMode::RUN_ALL, "run-all", "Run All Tests"},
+            {RunMode::RUN_ONE, "run-one", "Run One Test"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        RunMode::RUN_ALL
+    )
+    , SINGLE_TEST_LABEL("<b>Test Name:</b>")
+    , SINGLE_TEST(
+        TEST_DATABASE(),
+        LockMode::LOCK_WHILE_RUNNING,
+        0
     )
     , PASSED_TESTS(
         "<b>Passing Tests</b>",
@@ -101,9 +131,26 @@ UnitTestRunner::UnitTestRunner()
 {
     PA_ADD_STATIC(RESOURCE_LABEL);
     PA_ADD_STATIC(RESOURCE_PATH);
+    PA_ADD_OPTION(RUN_MODE);
+    PA_ADD_STATIC(SINGLE_TEST_LABEL);
+    PA_ADD_OPTION(SINGLE_TEST);
     PA_ADD_OPTION(PASSED_TESTS);
     PA_ADD_OPTION(FAILED_TESTS);
+
+    UnitTestRunner::on_config_value_changed(this);
+
+    RUN_MODE.add_listener(*this);
 }
+void UnitTestRunner::on_config_value_changed(void* object){
+    if ((RunMode)RUN_MODE == RunMode::RUN_ONE){
+        SINGLE_TEST_LABEL.set_visibility(ConfigOptionState::ENABLED);
+        SINGLE_TEST.set_visibility(ConfigOptionState::ENABLED);
+    }else{
+        SINGLE_TEST_LABEL.set_visibility(ConfigOptionState::HIDDEN);
+        SINGLE_TEST.set_visibility(ConfigOptionState::HIDDEN);
+    }
+}
+
 void UnitTestRunner::program(ProgramEnvironment& env, CancellableScope& scope){
     PASSED_TESTS.set("");
     FAILED_TESTS.set("");
@@ -116,7 +163,24 @@ void UnitTestRunner::program(ProgramEnvironment& env, CancellableScope& scope){
     PokemonAutomation::UnitTestRunner runner(env.logger(), GlobalThreadPools::computation_normal());
     runner.add_listener(*this);
 
-    add_tests(runner);
+
+    const UnitTestDatabase& all_tests = UNIT_TESTS_ALL();
+
+    if ((RunMode)RUN_MODE == RunMode::RUN_ALL){
+        for (const auto& test : all_tests){
+            runner.add_test(test.second);
+        }
+    }else{
+        auto iter = all_tests.find(SINGLE_TEST.slug());
+        if (iter == all_tests.end()){
+            throw InternalProgramError(
+                &env.logger(),
+                PA_CURRENT_FUNCTION,
+                "Test does not exist: " + SINGLE_TEST.display_name()
+            );
+        }
+        runner.add_test(iter->second);
+    }
 
     runner.run();
 }

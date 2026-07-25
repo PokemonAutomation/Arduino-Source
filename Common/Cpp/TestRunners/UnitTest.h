@@ -81,6 +81,14 @@ protected:
 
 
 
+//  Forward Declaration
+class UnitTestDatabase;
+
+
+
+
+
+
 
 }
 #endif

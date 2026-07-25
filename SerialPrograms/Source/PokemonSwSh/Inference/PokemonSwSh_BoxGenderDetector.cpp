@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/Globals.h"
 #include "PokemonSwSh_BoxGenderDetector.h"
 
@@ -53,21 +54,18 @@ private:
 
 
 
-const std::vector<std::shared_ptr<const UnitTest>>& get_tests_BoxGenderDetector(){
-    static std::vector<std::shared_ptr<const UnitTest>> TESTS{
-        std::make_shared<Test_BoxGenderDetector>("PokemonSwSh/BoxGenderDetector/macOS_bright/Female_2.png", StatsHuntGenderFilter::Female),
-        std::make_shared<Test_BoxGenderDetector>("PokemonSwSh/BoxGenderDetector/macOS_bright/Genderless_3.png", StatsHuntGenderFilter::Genderless),
-        std::make_shared<Test_BoxGenderDetector>("PokemonSwSh/BoxGenderDetector/macOS_bright/Male_1.png", StatsHuntGenderFilter::Male),
-        std::make_shared<Test_BoxGenderDetector>("PokemonSwSh/BoxGenderDetector/Switch/Centiskorch_2.jpg", StatsHuntGenderFilter::Female),
-        std::make_shared<Test_BoxGenderDetector>("PokemonSwSh/BoxGenderDetector/Switch/Claydol_3.jpg", StatsHuntGenderFilter::Genderless),
-        std::make_shared<Test_BoxGenderDetector>("PokemonSwSh/BoxGenderDetector/Switch/Nuzleaf_1.jpg", StatsHuntGenderFilter::Male),
-        std::make_shared<Test_BoxGenderDetector>("PokemonSwSh/BoxGenderDetector/WinMyPin/Gardevoir_2.png", StatsHuntGenderFilter::Female),
-        std::make_shared<Test_BoxGenderDetector>("PokemonSwSh/BoxGenderDetector/WinNoNameBrand/Gardevoir_2.png", StatsHuntGenderFilter::Female),
-        std::make_shared<Test_BoxGenderDetector>("PokemonSwSh/BoxGenderDetector/WinNoNameBrand/Thwackey_1.png", StatsHuntGenderFilter::Male),
-        std::make_shared<Test_BoxGenderDetector>("PokemonSwSh/BoxGenderDetector/WinNoNameBrand/Urshifu_1.png", StatsHuntGenderFilter::Male),
-        std::make_shared<Test_BoxGenderDetector>("PokemonSwSh/BoxGenderDetector/WinNoNameBrand/Zigzagoon_2.png", StatsHuntGenderFilter::Female),
-    };
-    return TESTS;
+void add_tests_BoxGenderDetector(UnitTestDatabase& database){
+    database.add<Test_BoxGenderDetector>("PokemonSwSh/BoxGenderDetector/macOS_bright/Female_2.png", StatsHuntGenderFilter::Female);
+    database.add<Test_BoxGenderDetector>("PokemonSwSh/BoxGenderDetector/macOS_bright/Genderless_3.png", StatsHuntGenderFilter::Genderless);
+    database.add<Test_BoxGenderDetector>("PokemonSwSh/BoxGenderDetector/macOS_bright/Male_1.png", StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonSwSh/BoxGenderDetector/Switch/Centiskorch_2.jpg", StatsHuntGenderFilter::Female);
+    database.add<Test_BoxGenderDetector>("PokemonSwSh/BoxGenderDetector/Switch/Claydol_3.jpg", StatsHuntGenderFilter::Genderless);
+    database.add<Test_BoxGenderDetector>("PokemonSwSh/BoxGenderDetector/Switch/Nuzleaf_1.jpg", StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonSwSh/BoxGenderDetector/WinMyPin/Gardevoir_2.png", StatsHuntGenderFilter::Female);
+    database.add<Test_BoxGenderDetector>("PokemonSwSh/BoxGenderDetector/WinNoNameBrand/Gardevoir_2.png", StatsHuntGenderFilter::Female);
+    database.add<Test_BoxGenderDetector>("PokemonSwSh/BoxGenderDetector/WinNoNameBrand/Thwackey_1.png", StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonSwSh/BoxGenderDetector/WinNoNameBrand/Urshifu_1.png", StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonSwSh/BoxGenderDetector/WinNoNameBrand/Zigzagoon_2.png", StatsHuntGenderFilter::Female);
 }
 
 

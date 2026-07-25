@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
@@ -217,22 +218,22 @@ private:
 
 
 
-const std::vector<std::shared_ptr<const UnitTest>>& get_tests_YCommDetector(){
-    static std::vector<std::shared_ptr<const UnitTest>> TESTS{
-        std::make_shared<Test_YCommIconDetector>("PokemonSwSh/YCommIconDetector/Front_Door_2_True.png", true),
-        std::make_shared<Test_YCommIconDetector>("PokemonSwSh/YCommIconDetector/Front_Door_3_True.png", true),
-        std::make_shared<Test_YCommIconDetector>("PokemonSwSh/YCommIconDetector/Front_Door_True.png", true),
-        std::make_shared<Test_YCommIconDetector>("PokemonSwSh/YCommIconDetector/macOS_bright/Nursery_False.png", false),
-        std::make_shared<Test_YCommIconDetector>("PokemonSwSh/YCommIconDetector/macOS_bright/Nursery_True.png", true),
 
-        std::make_shared<Test_YCommMenuDetector>("PokemonSwSh/YCommMenuDetector/Avermedia_Qt5_True.jpg", true),
-        std::make_shared<Test_YCommMenuDetector>("PokemonSwSh/YCommMenuDetector/MiraBox_Qt6_True.jpg", true),
-        std::make_shared<Test_YCommMenuDetector>("PokemonSwSh/YCommMenuDetector/MyPin_Qt5_True.jpg", true),
-        std::make_shared<Test_YCommMenuDetector>("PokemonSwSh/YCommMenuDetector/MyPin_Qt6_True.jpg", true),
-        std::make_shared<Test_YCommMenuDetector>("PokemonSwSh/YCommMenuDetector/NoBrand_Qt6_True.jpg", true),
-        std::make_shared<Test_YCommMenuDetector>("PokemonSwSh/YCommMenuDetector/ShadowCast_Qt6_True.jpg", true),
-    };
-    return TESTS;
+
+
+void add_tests_YCommDetector(UnitTestDatabase& database){
+    database.add<Test_YCommIconDetector>("PokemonSwSh/YCommIconDetector/Front_Door_2_True.png", true);
+    database.add<Test_YCommIconDetector>("PokemonSwSh/YCommIconDetector/Front_Door_3_True.png", true);
+    database.add<Test_YCommIconDetector>("PokemonSwSh/YCommIconDetector/Front_Door_True.png", true);
+    database.add<Test_YCommIconDetector>("PokemonSwSh/YCommIconDetector/macOS_bright/Nursery_False.png", false);
+    database.add<Test_YCommIconDetector>("PokemonSwSh/YCommIconDetector/macOS_bright/Nursery_True.png", true);
+
+    database.add<Test_YCommMenuDetector>("PokemonSwSh/YCommMenuDetector/Avermedia_Qt5_True.jpg", true);
+    database.add<Test_YCommMenuDetector>("PokemonSwSh/YCommMenuDetector/MiraBox_Qt6_True.jpg", true);
+    database.add<Test_YCommMenuDetector>("PokemonSwSh/YCommMenuDetector/MyPin_Qt5_True.jpg", true);
+    database.add<Test_YCommMenuDetector>("PokemonSwSh/YCommMenuDetector/MyPin_Qt6_True.jpg", true);
+    database.add<Test_YCommMenuDetector>("PokemonSwSh/YCommMenuDetector/NoBrand_Qt6_True.jpg", true);
+    database.add<Test_YCommMenuDetector>("PokemonSwSh/YCommMenuDetector/ShadowCast_Qt6_True.jpg", true);
 }
 
 

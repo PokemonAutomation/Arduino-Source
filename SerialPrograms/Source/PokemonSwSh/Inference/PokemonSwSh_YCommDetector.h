@@ -68,7 +68,7 @@ public:
 
 
 
-const std::vector<std::shared_ptr<const UnitTest>>& get_tests_YCommDetector();
+void add_tests_YCommDetector(UnitTestDatabase& database);
 
 
 
