@@ -158,7 +158,7 @@ GlobalSettings::GlobalSettings()
         "<b>Use GPU for Machine learning inference:</b><br>"
         "Use the GPU by default for machine learning. Will fall-back to CPU if using the GPU fails.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        true
+        false
     )
     , WINDOW_SIZE(
         CONSTRUCT_TOKEN,
