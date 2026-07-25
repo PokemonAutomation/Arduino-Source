@@ -174,44 +174,44 @@ class Test_YCommIconDetector : public UnitTest{
 public:
     Test_YCommIconDetector(
         const std::string& image,
-        bool expected_result
+        bool expected
     )
         : UnitTest("NintendoSwitch::PokemonSwSh::YCommIconDetector - " + image)
         , m_image(UNIT_TEST_RESOURCE_PATH() + image)
-        , m_expected_result(expected_result)
+        , m_expected(expected)
     {}
 
     virtual UnitTestResult run(CancellableScope& scope) const override{
         YCommIconDetector detector(COLOR_RED, true);
         ImageRGB32 image(m_image);
-        return detector.detect(image) == m_expected_result;
+        return detector.detect(image) == m_expected;
     };
 
 private:
     std::string m_image;
-    bool m_expected_result;
+    bool m_expected;
 };
 
 class Test_YCommMenuDetector : public UnitTest{
 public:
     Test_YCommMenuDetector(
         const std::string& image,
-        bool expected_result
+        bool expected
     )
         : UnitTest("NintendoSwitch::PokemonSwSh::YCommMenuDetector - " + image)
         , m_image(UNIT_TEST_RESOURCE_PATH() + image)
-        , m_expected_result(expected_result)
+        , m_expected(expected)
     {}
 
     virtual UnitTestResult run(CancellableScope& scope) const override{
         YCommMenuDetector detector(true);
         ImageRGB32 image(m_image);
-        return detector.detect(image) == m_expected_result;
+        return detector.detect(image) == m_expected;
     };
 
 private:
     std::string m_image;
-    bool m_expected_result;
+    bool m_expected;
 };
 
 

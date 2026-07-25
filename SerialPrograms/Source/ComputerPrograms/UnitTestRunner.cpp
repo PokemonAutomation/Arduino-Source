@@ -10,6 +10,7 @@
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "UnitTestRunner.h"
 
+#include "PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 
 namespace PokemonAutomation{
@@ -22,6 +23,9 @@ void add_tests(PokemonAutomation::UnitTestRunner& runner){
 
 
 
+    for (auto& test : NintendoSwitch::PokemonSwSh::get_tests_BoxGenderDetector()){
+        runner.add_test(test);
+    }
     for (auto& test : NintendoSwitch::PokemonSwSh::get_tests_YCommDetector()){
         runner.add_test(test);
     }
@@ -102,6 +106,7 @@ UnitTestRunner::UnitTestRunner()
 }
 void UnitTestRunner::program(ProgramEnvironment& env, CancellableScope& scope){
     PASSED_TESTS.set("");
+    FAILED_TESTS.set("");
 
     m_env = &env;
     ScopeExit run_on_exit([this]{

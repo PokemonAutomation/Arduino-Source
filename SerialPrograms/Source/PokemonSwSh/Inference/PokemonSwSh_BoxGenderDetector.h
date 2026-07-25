@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_BoxGenderDetector_H
 #define PokemonAutomation_PokemonSwSh_BoxGenderDetector_H
 
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "Pokemon/Inference/Pokemon_BoxGenderDetector.h"
 
@@ -21,6 +22,12 @@ public:
     BoxGenderDetector(Color color = COLOR_RED);
 
 };
+
+
+
+
+const std::vector<std::shared_ptr<const UnitTest>>& get_tests_BoxGenderDetector();
+
 
 
 }
