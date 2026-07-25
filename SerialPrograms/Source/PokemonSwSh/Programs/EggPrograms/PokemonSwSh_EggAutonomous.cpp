@@ -239,6 +239,9 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         change_view_to_judge(env.console, context, language);
     }
 
+    // go back to overworld
+    mash_B_until_y_comm_icon(env.console, context, "Cannot return to overworld.");
+
     if (AUTO_SAVING == AutoSave::AfterStartAndKeep){
         save_game(env.console, context);
         m_num_eggs_in_storage_when_game_saved = num_eggs_in_column_0;

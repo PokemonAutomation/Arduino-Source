@@ -40,7 +40,7 @@ void navigate_to_menu_app(
 void menus_to_mainmenu(VideoStream& stream, ProControllerContext& context);
 void menus_to_boxsystem(VideoStream& stream, ProControllerContext& context);
 
-
+// saves the game. starting from the menu or overworld
 void save_game(VideoStream& stream, ProControllerContext& context);
 
 // Used to wait until Y-Comm icon shows up.
