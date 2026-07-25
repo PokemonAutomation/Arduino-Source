@@ -7,6 +7,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include "Common/Cpp/PrettyPrint.h"
 #include "ConfigWidget.h"
 #include "FloatingPointWidget.h"
 
@@ -69,7 +70,7 @@ FloatingPointCellWidget::FloatingPointCellWidget(QWidget& parent, FloatingPointC
     value.add_listener(*this);
 }
 void FloatingPointCellWidget::update_value(){
-    this->setText(QString::number(m_value, 'f'));
+    this->setText(QString::fromStdString(tostr_fixed_no_trailing_zero(m_value, 6)));
 }
 void FloatingPointCellWidget::on_config_value_changed(void* object){
     QMetaObject::invokeMethod(this, [this]{
