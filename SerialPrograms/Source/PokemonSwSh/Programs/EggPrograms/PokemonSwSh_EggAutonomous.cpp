@@ -800,7 +800,7 @@ bool EggAutonomous::process_hatched_pokemon(
     if (num_eggs_in_party_before != 0 || num_empty_slots_in_party_before != 0){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "process_hatched_pokemon: Before processing, we expected a party without eggs, since they should all be hatched.",
+            "process_hatched_pokemon: Before processing, we expected a party without eggs (and no empty slots), since they should all be hatched.",
             env.console
         );        
     }
