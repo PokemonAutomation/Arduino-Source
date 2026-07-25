@@ -67,6 +67,15 @@ GiftRng::GiftRng()
     , m_game_info(
         "<font size=4><b>Game Information</b></font>"
     )
+    , GAME_VERSION(
+        "<b>Game Version:</b>",
+        {
+            {GameVersion::firered, "firered", "FireRed"},
+            {GameVersion::leafgreen, "leafgreen", "LeafGreen"}
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        GameVersion::firered
+    )
     , LANGUAGE(
         "<b>Game Language:</b>",
         {
@@ -79,6 +88,16 @@ GiftRng::GiftRng()
         },
         LockMode::LOCK_WHILE_RUNNING,
         true
+    )
+    , SOUND(
+        "<b>Sound:</b><br>"
+        "Your in-game sound setting. This affects the possible seeds.",
+        {
+            {SoundSetting::Mono, "mono", "Mono"},
+            {SoundSetting::Stereo, "stereo", "Stereo"}
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        SoundSetting::Mono
     )
     , m_target_settings(
         "<font size=4><b>Target Settings</b></font> — Get these from an RNG search tool"
@@ -113,43 +132,6 @@ GiftRng::GiftRng()
         "70FE", "70FE",
         true
     )
-    , SEED_LIST(
-        "<b>Nearby Seeds:</b><br>"
-        "This box should contain a list of seeds (in order) around and including your target seed, with one seed on each line",
-        LockMode::LOCK_WHILE_RUNNING,
-        "D000\n199A\n77A1\nAABC\n280C\n70FE\nB573\n02F2\n8084\nA533\nED1E", 
-        "D000\n199A\n77A1\nAABC\n280C\n70FE\nB573\n02F2\n8084\nA533\nED1E",
-        true
-    )
-    , SEED_BUTTON(
-        "<b>Seed Button:</b>",
-        {
-            {SeedButton::A, "A", "A"},
-            {SeedButton::Start, "Start", "Start"},
-            {SeedButton::L, "L", "L (L=A)"},
-        },
-        LockMode::LOCK_WHILE_RUNNING,
-        SeedButton::A
-    )
-    , EXTRA_BUTTON(
-        "<b>Extra Button:</b><br>"
-        "Additional button presses that affect the seed.",
-        {
-            {BlackoutButton::None, "None", "None"},
-            {BlackoutButton::L, "L", "Blackout L"},
-            {BlackoutButton::R, "R", "Blackout R"},
-        },
-        LockMode::LOCK_WHILE_RUNNING,
-        BlackoutButton::None
-    )
-    , SEED_DELAY(
-        "<b>Seed Delay Time (ms):</b><br>"
-        "The delay between starting the game and advancing past the title screen. Set this to match your target seed.<br>"
-        "<i>If using Ten Lines for seed info, select <b>Nintendo Switch 1</b> as your console even if using a Switch 2.</i><br>"
-        "<b>Warning: values close to 30500ms can sometimes cause problems, and you may need to manually increase your initial seed calibration or pick a new target.</b>",
-        LockMode::LOCK_WHILE_RUNNING,
-        31338, 30400 // default, min
-    )
     , ADVANCES(
         "<b>Advances:</b><br>The total number of RNG advances for your target.",
         LockMode::LOCK_WHILE_RUNNING,
@@ -164,6 +146,12 @@ GiftRng::GiftRng()
         "<i>Warning: can result in larger misses.</i>",
         LockMode::LOCK_WHILE_RUNNING,
         false // default
+    )
+    , SEED_RADIUS(
+        "<b>Nearby Seed Radius:</b><br>"
+        "The number of nearby seeds on each side of the target to search when identifying which seed was hit.",
+        LockMode::LOCK_WHILE_RUNNING,
+        5, 1 // default, min
     )
     , MAX_RESETS(
         "<b>Max Resets:</b>",
@@ -207,17 +195,16 @@ GiftRng::GiftRng()
     PA_ADD_OPTION(RNG_FILTERS);
     PA_ADD_OPTION(RNG_CALIBRATION);
     PA_ADD_OPTION(m_game_info);
+    PA_ADD_OPTION(GAME_VERSION);
     PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(SOUND);
     PA_ADD_OPTION(m_target_settings);
     PA_ADD_OPTION(TARGET);
     PA_ADD_OPTION(SEED);
-    PA_ADD_OPTION(SEED_LIST);
-    PA_ADD_OPTION(SEED_BUTTON);
-    PA_ADD_OPTION(EXTRA_BUTTON);
-    PA_ADD_OPTION(SEED_DELAY);
     PA_ADD_OPTION(ADVANCES);
     PA_ADD_OPTION(m_program_settings);
     PA_ADD_OPTION(USE_TEACHY_TV);
+    PA_ADD_OPTION(SEED_RADIUS);
     PA_ADD_OPTION(MAX_RESETS);
     PA_ADD_OPTION(MAX_RARE_CANDIES);
     PA_ADD_OPTION(PROFILE);
@@ -241,12 +228,18 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     RNG_CALIBRATION.reset_hits();
 
     const uint16_t TARGET_SEED = parse_seed(env.console, SEED);
-    const std::vector<uint16_t> SEED_VALUES = parse_seed_list(env.console, SEED_LIST);
-    const int16_t SEED_POSITION = seed_position_in_list(TARGET_SEED, SEED_VALUES);
-
-    if (SEED_POSITION == -1){
-        throw UserSetupError(env.console, "The target Seed is missing from the list of nearby seeds.");
+    SeedsDatabase seeds_db(seeds_json_path(GAME_VERSION == GameVersion::firered, LANGUAGE));
+    const SeedMatch seed_match = seeds_db.find_seed(TARGET_SEED, SOUND, SEED_RADIUS);
+    if (!seed_match.found){
+        throw UserSetupError(env.console, "The target Seed was not found in the seed database for this game version, language, and sound setting.");
     }
+    const std::vector<uint16_t> SEED_VALUES = seed_match.seed_values;
+    const int16_t SEED_POSITION = seed_match.seed_position;
+    const uint64_t SEED_DELAY = seed_match.seed_delay;
+    const SeedButton SEED_BUTTON = seed_match.seed_button;
+    const BlackoutButton EXTRA_BUTTON = seed_match.extra_button;
+    env.log("Seed delay: " + std::to_string(SEED_DELAY) + "ms, button mode: " + seed_match.button_mode
+        + ", column: " + seed_match.column_name);
 
     BaseStats BASE_STATS;
     int16_t GENDER_THRESHOLD = -1;

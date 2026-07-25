@@ -1590,6 +1590,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_LocationsDatabase.h
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_EncountersDatabase.cpp
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_EncountersDatabase.h
+    Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_SeedsDatabase.cpp
+    Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_SeedsDatabase.h
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_SidHelper.cpp
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_SidHelper.h
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RngHelper.cpp

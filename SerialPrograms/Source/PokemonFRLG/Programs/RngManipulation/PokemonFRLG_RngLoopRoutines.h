@@ -17,6 +17,7 @@
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Pokemon_AdvRng.h"
+#include "PokemonFRLG_BlindNavigation.h"
 #include "PokemonFRLG_RngCalibration.h"
 #include "PokemonFRLG_RngStatsDatabase.h"
 
@@ -50,11 +51,14 @@ struct EggCalibrationHistories{
     }
 };
 
-// Per-frame seed configuration: the nearby-seed list, the target's position in it, and the seed delay.
+// Per-frame seed configuration: the nearby-seed list, the target's position in it, the seed
+// delay, and the button combination (derived from the seed database) that reaches the seed.
 struct EggFrameTarget{
     uint64_t seed_delay;
     std::vector<uint16_t> seed_values;
     int16_t seed_position;
+    SeedButton seed_button;
+    BlackoutButton extra_button;
 };
 struct EggFrameTargets{
     EggFrameTarget held;
