@@ -201,9 +201,31 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     }
 
     menus_to_boxsystem(env.console, context);
-    EggQuantity egg_quantity = check_box(env.console, context);
-    size_t num_eggs_in_column_0 = egg_quantity.eggs_in_column_0;
-    size_t num_eggs_in_party = egg_quantity.eggs_in_party;
+    check_box(env.console, context);
+    context.wait_for_all_requests();
+    context.wait_for(500ms);
+    auto screen = env.console.video().snapshot();
+    size_t num_eggs_in_column_0 = count_eggs_in_first_box_column(env.console, screen);
+    size_t num_empty_slots_in_column_0 = count_empty_slots_in_first_box_column(env.console, screen);
+    size_t num_eggs_in_party = count_eggs_in_party(env.console, screen);
+    size_t num_empty_slots_in_party = count_empty_slots_in_party(env.console, screen);
+    if (num_eggs_in_column_0 + num_empty_slots_in_column_0 != 5){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Total number of eggs and empty slots in the first box column don't add up to 5. "
+            "During setup, ensure there are no non-egg Pokemon in the first box column.",
+            env.console
+        );
+    }
+    if (num_eggs_in_party + num_empty_slots_in_party != 5){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Total number of eggs and empty slots in the party don't add up to 5. "
+            "During setup, ensure there is only one Pokemon in the lead slot, and no other Pokemon.",
+            env.console
+        );
+    }
+
     env.log("Starting with " + std::to_string(num_eggs_in_party) + " eggs in the party and " + 
         std::to_string(num_eggs_in_column_0) + " eggs in the first box column.");
 
@@ -764,21 +786,21 @@ bool EggAutonomous::process_hatched_pokemon(
     context.wait_for_all_requests();
     context.wait_for(500ms);
     auto screen0 = env.console.video().snapshot();
-    size_t num_eggs_in_column_0_before = count_eggs_in_first_box_column(env.console, screen0, 5);
-    size_t num_eggs_in_party_before = count_eggs_in_party(env.console, screen0, 0);
-
-    if (num_eggs_in_column_0_before != 5){
+    size_t num_eggs_in_column_0_before = count_eggs_in_first_box_column(env.console, screen0);
+    size_t num_empty_slots_in_column_0_before = count_empty_slots_in_first_box_column(env.console, screen0);
+    size_t num_eggs_in_party_before = count_eggs_in_party(env.console, screen0);
+    size_t num_empty_slots_in_party_before = count_empty_slots_in_party(env.console, screen0);
+    if (num_eggs_in_column_0_before != 5 || num_empty_slots_in_column_0_before != 0){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "process_hatched_pokemon: Did not start with an 5 eggs in the first box column, before processing.",
+            "process_hatched_pokemon: Before processing, we expected 5 eggs in the first box column.",
             env.console
         );
     }
-
-    if (num_eggs_in_party_before != 0){
+    if (num_eggs_in_party_before != 0 || num_empty_slots_in_party_before != 0){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "process_hatched_pokemon: Did not start with a party without eggs, before processing, since they should all be hatched.",
+            "process_hatched_pokemon: Before processing, we expected a party without eggs, since they should all be hatched.",
             env.console
         );        
     }
@@ -1003,22 +1025,26 @@ bool EggAutonomous::process_hatched_pokemon(
 
     // After processing the box:
     // Confirm that Box Column 0 is empty, and the party is full of eggs
-    EggQuantity egg_quantity = check_box(env.console, context);
-    size_t num_eggs_in_column_0_after = egg_quantity.eggs_in_column_0;
-    size_t num_eggs_in_party_after = egg_quantity.eggs_in_party;
-
-    if (num_eggs_in_column_0_after != 0 ){
+    check_box(env.console, context);
+    context.wait_for_all_requests();
+    context.wait_for(500ms);
+    auto screen = env.console.video().snapshot();
+    size_t num_eggs_in_column_0_after = count_eggs_in_first_box_column(env.console, screen);
+    size_t num_empty_slots_in_column_0_after = count_empty_slots_in_first_box_column(env.console, screen);
+    size_t num_eggs_in_party_after = count_eggs_in_party(env.console, screen);
+    size_t num_empty_slots_in_party_after = count_empty_slots_in_party(env.console, screen);
+    if (num_eggs_in_column_0_after != 0 || num_empty_slots_in_column_0_after != 5){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "process_hatched_pokemon: Did not end up with an empty first box column, after processing.",
+            "process_hatched_pokemon: After processing, we expected an empty first box column.",
             env.console
         );
     }
 
-    if (num_eggs_in_party_after != 5){
+    if (num_eggs_in_party_after != 5 || num_empty_slots_in_party_after != 0){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "process_hatched_pokemon: Did not end up with a party full of 5 eggs, after processing.",
+            "process_hatched_pokemon: After processing, we expected a party full of 5 eggs.",
             env.console
         );        
     }
@@ -1054,18 +1080,13 @@ bool EggAutonomous::process_hatched_pokemon(
 
 
 
-EggQuantity EggAutonomous::check_box(VideoStream& stream, ProControllerContext& context){
+void EggAutonomous::check_box(VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
     context.wait_for(500ms);
     
     auto screen = stream.video().snapshot();
     check_box_filled(stream, screen);
     check_non_egg_lead(stream, screen);
-    size_t eggs_in_party = count_eggs_in_party(stream, screen, 5);
-    size_t eggs_in_col_0_box = count_eggs_in_first_box_column(stream, screen, 5);
-
-
-    return {eggs_in_party, eggs_in_col_0_box};
 }
 
 
@@ -1109,63 +1130,50 @@ void EggAutonomous::check_non_egg_lead(VideoStream& stream, const ImageViewRGB32
     }
 }
 
-size_t EggAutonomous::count_eggs_in_party(VideoStream& stream, const ImageViewRGB32& screen, std::optional<size_t> expected_eggs_plus_empty){
-    size_t num_empty = 0;
+size_t EggAutonomous::count_eggs_in_party(VideoStream& stream, const ImageViewRGB32& screen){
     size_t num_eggs = 0;
-    for (uint8_t row = 1; row < 6; row++){
-        BoxEmptySlotDetector slot(SlotLocation::PARTY, row, 0);
-        bool is_empty = slot.detect(screen);
-        if (is_empty) { num_empty++; }
-
+    for (uint8_t row = 0; row < 6; row++){
         BoxEggDetector egg(SlotLocation::PARTY, row);
         bool is_egg = egg.detect(screen);
         if (is_egg) { num_eggs++; }
     }
 
-    if (expected_eggs_plus_empty.has_value()){
-        size_t expected = expected_eggs_plus_empty.value();
-        if (num_empty + num_eggs != expected){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "count_eggs_in_party: Total number of eggs and empty slots in the party don't add up to the expected number. "
-                "During setup, ensure your only non-egg Pokemon is in the lead. "
-                "The rest of the slots in the team should either be empty or an egg.",
-                stream
-            );
-        }
-    }
-
-
     return num_eggs;
 }
 
-size_t EggAutonomous::count_eggs_in_first_box_column(VideoStream& stream, const ImageViewRGB32& screen, std::optional<size_t> expected_eggs_plus_empty){
-
+size_t EggAutonomous::count_empty_slots_in_party(VideoStream& stream, const ImageViewRGB32& screen){
     size_t num_empty = 0;
-    size_t num_eggs = 0;
-    for (uint8_t row = 0; row < 5; row++){
-        BoxEmptySlotDetector slot(SlotLocation::BOX, row, 0);
+    for (uint8_t row = 0; row < 6; row++){
+        BoxEmptySlotDetector slot(SlotLocation::PARTY, row, 0);
         bool is_empty = slot.detect(screen);
         if (is_empty) { num_empty++; }
+    }
 
+    return num_empty;
+}
+
+size_t EggAutonomous::count_eggs_in_first_box_column(VideoStream& stream, const ImageViewRGB32& screen){
+
+    size_t num_eggs = 0;
+    for (uint8_t row = 0; row < 5; row++){
         BoxEggDetector egg(SlotLocation::BOX, row);
         bool is_egg = egg.detect(screen);
         if (is_egg) { num_eggs++; }
     }
 
-    if (expected_eggs_plus_empty.has_value()){
-        size_t expected = expected_eggs_plus_empty.value();    
-        if (num_empty + num_eggs != expected){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "count_eggs_in_first_box_column: Total number of eggs and empty slots in the first box column don't add up to the expected number. "
-                "During setup, ensure there are no non-egg Pokemon in the first box column.",
-                stream
-            );
-        }
+    return num_eggs;
+}
+
+size_t EggAutonomous::count_empty_slots_in_first_box_column(VideoStream& stream, const ImageViewRGB32& screen){
+
+    size_t num_empty = 0;
+    for (uint8_t row = 0; row < 5; row++){
+        BoxEmptySlotDetector slot(SlotLocation::BOX, row, 0);
+        bool is_empty = slot.detect(screen);
+        if (is_empty) { num_empty++; }
     }
 
-    return num_eggs;
+    return num_empty;
 }
 
 
