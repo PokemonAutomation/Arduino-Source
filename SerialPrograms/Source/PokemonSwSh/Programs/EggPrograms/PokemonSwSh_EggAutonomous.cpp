@@ -207,6 +207,16 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     env.log("Starting with " + std::to_string(num_eggs_in_party) + " eggs in the party and " + 
         std::to_string(num_eggs_in_column_0) + " eggs in the first box column.");
 
+    // select top Pokemon in party
+    box_scroll(context, DPAD_LEFT);
+    // Change box view to judge or stats
+    Language language = LANGUAGE;
+    if (language == Language::None){
+        change_view_to_stats_or_judge(env.console, context);
+    }else{
+        change_view_to_judge(env.console, context, language);
+    }
+
     if (AUTO_SAVING == AutoSave::AfterStartAndKeep){
         save_game(env.console, context);
         m_num_eggs_in_storage_when_game_saved = num_eggs_in_column_0;
@@ -779,15 +789,6 @@ bool EggAutonomous::process_hatched_pokemon(
 
     // select top Pokemon in party
     box_scroll(context, DPAD_LEFT);
-
-    // Change box view to judge or stats
-    Language language = LANGUAGE;
-    if (language == Language::None){
-        change_view_to_stats_or_judge(env.console, context);
-    }else{
-        change_view_to_judge(env.console, context, language);
-    }
-
     // select the first egg
     box_scroll(context, DPAD_DOWN);
 
