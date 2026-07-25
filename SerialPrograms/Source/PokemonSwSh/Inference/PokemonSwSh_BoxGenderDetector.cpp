@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "PokemonSwSh_BoxGenderDetector.h"
 
 namespace PokemonAutomation{
@@ -31,7 +32,7 @@ public:
         const std::string& image,
         StatsHuntGenderFilter expected
     )
-        : UnitTest("NintendoSwitch::PokemonSwSh::BoxGenderDetector - " + image)
+        : UnitTest("PokemonSwSh::BoxGenderDetector - " + image)
         , m_image(UNIT_TEST_RESOURCE_PATH() + image)
         , m_expected(expected)
     {}

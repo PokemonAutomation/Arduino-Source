@@ -113,7 +113,8 @@ int test_pokemonSwSh_BlackDialogBoxDetector(const ImageViewRGB32& image, bool ta
 }
 
 int test_pokemonSwSh_BoxShinySymbolDetector(const ImageViewRGB32& image, bool target){
-    const bool result = BoxShinySymbolDetector::detect(image);
+    BoxShinySymbolDetector detector;
+    const bool result = detector.detect(image);
     TEST_RESULT_EQUAL(result, target);
     return 0;
 }

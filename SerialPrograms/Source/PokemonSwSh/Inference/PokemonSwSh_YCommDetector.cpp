@@ -177,7 +177,7 @@ public:
         const std::string& image,
         bool expected
     )
-        : UnitTest("NintendoSwitch::PokemonSwSh::YCommIconDetector - " + image)
+        : UnitTest("PokemonSwSh::YCommIconDetector - " + image)
         , m_image(UNIT_TEST_RESOURCE_PATH() + image)
         , m_expected(expected)
     {}
@@ -199,7 +199,7 @@ public:
         const std::string& image,
         bool expected
     )
-        : UnitTest("NintendoSwitch::PokemonSwSh::YCommMenuDetector - " + image)
+        : UnitTest("PokemonSwSh::YCommMenuDetector - " + image)
         , m_image(UNIT_TEST_RESOURCE_PATH() + image)
         , m_expected(expected)
     {}

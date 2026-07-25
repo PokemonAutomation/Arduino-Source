@@ -12,6 +12,7 @@
 #include "UnitTestRunner.h"
 
 #include "PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 
 namespace PokemonAutomation{
@@ -26,6 +27,7 @@ UnitTestDatabase make_UNIT_TESTS_ALL(){
     UnitTestDatabase ret;
 
     NintendoSwitch::PokemonSwSh::add_tests_BoxGenderDetector(ret);
+    NintendoSwitch::PokemonSwSh::add_tests_BoxShinySymbolDetector(ret);
     NintendoSwitch::PokemonSwSh::add_tests_YCommDetector(ret);
 
     return ret;
@@ -202,7 +204,7 @@ void UnitTestRunner::on_test_finished(
         break;
     case UnitTestResult::PASSED:
         stats.passed++;
-        PASSED_TESTS.append("PASSED: " + test->name() + "\n");
+        PASSED_TESTS.append(test->name() + "\n");
         break;
     case UnitTestResult::FAILED:
         stats.failed++;

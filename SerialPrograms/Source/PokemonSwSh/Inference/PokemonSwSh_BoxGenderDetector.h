@@ -8,7 +8,6 @@
 #define PokemonAutomation_PokemonSwSh_BoxGenderDetector_H
 
 #include "Common/Cpp/TestRunners/UnitTest.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "Pokemon/Inference/Pokemon_BoxGenderDetector.h"
 
 namespace PokemonAutomation{

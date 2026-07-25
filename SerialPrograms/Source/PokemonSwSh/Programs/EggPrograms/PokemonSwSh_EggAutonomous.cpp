@@ -821,7 +821,8 @@ bool EggAutonomous::process_hatched_pokemon(
     {
         // Define the scope of video overlay rendering for various checks:
         VideoOverlaySet overlay_set(env.console.overlay());
-        BoxShinySymbolDetector::make_overlays(overlay_set);
+        BoxShinySymbolDetector shiny_symbol;
+        shiny_symbol.make_overlays(overlay_set);
         BoxGenderDetector gender_detector;
         gender_detector.make_overlays(overlay_set);
         IvJudgeReaderScope iv_reader(env.console.overlay(), LANGUAGE);
@@ -832,7 +833,7 @@ bool EggAutonomous::process_hatched_pokemon(
             context.wait_for_all_requests();
             auto screen = env.console.video().snapshot();
 
-            bool shiny = BoxShinySymbolDetector::detect(screen);
+            bool shiny = shiny_symbol.detect(screen);
             if (shiny){
                 env.log("Pokemon " + std::to_string(i_hatched) + " is shiny!", COLOR_BLUE);
                 env.console.overlay().add_log("Pokemon " + std::to_string(i_hatched+1) + "/5 is shiny!", COLOR_YELLOW);
