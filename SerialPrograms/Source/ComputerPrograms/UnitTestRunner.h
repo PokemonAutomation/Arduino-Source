@@ -8,6 +8,7 @@
 #define PokemonAutomation_ComputerPrograms_UnitTestRunner_H
 
 #include "Common/Cpp/TestRunners/ParallelUnitTestRunner.h"
+#include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/TextEditOption.h"
 #include "ComputerPrograms/ComputerProgram.h"
@@ -40,7 +41,8 @@ private:
 
 
 private:
-    StringOption RESOURCE_PATH;
+    StaticTextOption RESOURCE_LABEL;
+    StringCell RESOURCE_PATH;
     TextEditOption PASSED_TESTS;
     TextEditOption FAILED_TESTS;
 

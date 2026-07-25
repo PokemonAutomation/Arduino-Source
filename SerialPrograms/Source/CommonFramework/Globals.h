@@ -90,6 +90,9 @@ const std::string& RESOURCE_PATH();
 // Folder path that holds Downloaded resources
 const std::string& DOWNLOADED_RESOURCE_PATH();
 
+// Folder path that holds the unit test resources.
+const std::string& UNIT_TEST_RESOURCE_PATH();
+
 // Hold ML training data.
 const std::string& TRAINING_PATH();
 

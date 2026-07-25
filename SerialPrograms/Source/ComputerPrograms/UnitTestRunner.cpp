@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/ScopeExit.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "UnitTestRunner.h"
@@ -17,11 +18,11 @@ namespace ComputerPrograms{
 
 
 
-void add_tests(PokemonAutomation::UnitTestRunner& runner, const std::string& resource_path){
+void add_tests(PokemonAutomation::UnitTestRunner& runner){
 
 
 
-    for (auto& test : NintendoSwitch::PokemonSwSh::get_tests_YCommDetector(resource_path)){
+    for (auto& test : NintendoSwitch::PokemonSwSh::get_tests_YCommDetector()){
         runner.add_test(test);
     }
 
@@ -76,12 +77,12 @@ std::unique_ptr<StatsTracker> UnitTestRunner_Descriptor::make_stats() const{
 
 
 UnitTestRunner::UnitTestRunner()
-    : RESOURCE_PATH(
+    : RESOURCE_LABEL("<b>Test Resources Path:</b>")
+    , RESOURCE_PATH(
         false,
-        "<b>Test Resources Path:</b>",
         LockMode::READ_ONLY,
-        "CommandLineTests/",
-        "CommandLineTests/"
+        UNIT_TEST_RESOURCE_PATH(),
+        ""
     )
     , PASSED_TESTS(
         "<b>Passing Tests</b>",
@@ -94,18 +95,12 @@ UnitTestRunner::UnitTestRunner()
         "", ""
     )
 {
-    PA_ADD_OPTION(RESOURCE_PATH);
+    PA_ADD_STATIC(RESOURCE_LABEL);
+    PA_ADD_STATIC(RESOURCE_PATH);
     PA_ADD_OPTION(PASSED_TESTS);
     PA_ADD_OPTION(FAILED_TESTS);
 }
 void UnitTestRunner::program(ProgramEnvironment& env, CancellableScope& scope){
-    std::string resource_path = RESOURCE_PATH;
-    if (!resource_path.empty()){
-        if (resource_path.back() != '/' && resource_path.back() != '\\'){
-            resource_path += "/";
-        }
-    }
-
     PASSED_TESTS.set("");
 
     m_env = &env;
@@ -116,7 +111,7 @@ void UnitTestRunner::program(ProgramEnvironment& env, CancellableScope& scope){
     PokemonAutomation::UnitTestRunner runner(env.logger(), GlobalThreadPools::computation_normal());
     runner.add_listener(*this);
 
-    add_tests(runner, resource_path);
+    add_tests(runner);
 
     runner.run();
 }

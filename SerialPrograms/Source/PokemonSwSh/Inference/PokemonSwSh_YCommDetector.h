@@ -68,7 +68,7 @@ public:
 
 
 
-const std::vector<std::shared_ptr<const UnitTest>>& get_tests_YCommDetector(const std::string& resource_path);
+const std::vector<std::shared_ptr<const UnitTest>>& get_tests_YCommDetector();
 
 
 
