@@ -7,7 +7,6 @@
 #include <opencv2/imgproc.hpp>
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -57,7 +56,7 @@ void SandwichRecipeNumberDetector::detect_recipes(const ImageViewRGB32& screen, 
 
         ImageRGB32 dilated_image(filterd_image.width(), filterd_image.height());
 
-        if (screen.width() >= 1280 && GlobalSettings::instance().OCR_LIBRARY == OcrLibrary::TESSERACT){
+        if (screen.width() >= 1280){
             const int dilation_type = cv::MORPH_ELLIPSE;
             const int dilation_size = 1;
 
