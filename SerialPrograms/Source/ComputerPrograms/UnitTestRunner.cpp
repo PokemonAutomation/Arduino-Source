@@ -7,6 +7,7 @@
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "UnitTestRunner.h"
@@ -149,6 +150,7 @@ void UnitTestRunner::on_config_value_changed(void* object){
     }
 }
 
+
 void UnitTestRunner::program(ProgramEnvironment& env, CancellableScope& scope){
     PASSED_TESTS.set("");
     FAILED_TESTS.set("");
@@ -158,7 +160,11 @@ void UnitTestRunner::program(ProgramEnvironment& env, CancellableScope& scope){
         m_env = nullptr;
     });
 
-    PokemonAutomation::UnitTestRunner runner(env.logger(), GlobalThreadPools::computation_normal());
+    PokemonAutomation::UnitTestRunner runner(
+        &scope,
+        env.logger(),
+        GlobalThreadPools::computation_normal()
+    );
     runner.add_listener(*this);
 
 
@@ -220,6 +226,41 @@ void UnitTestRunner::on_test_finished(
 
 
 
+
+
+void CommandLineUnitTestRunner::run(){
+    PokemonAutomation::UnitTestRunner runner(
+        m_logger,
+        GlobalThreadPools::computation_normal()
+    );
+    runner.add_listener(*this);
+    for (const auto& test : UNIT_TESTS_ALL()){
+        runner.add_test(test.second);
+    }
+    runner.run();
+}
+void CommandLineUnitTestRunner::on_test_finished(
+    std::shared_ptr<const UnitTest> test,
+    UnitTestResult result
+){
+    switch (result.result){
+    case UnitTestResult::NOT_RUN:
+        m_logger.log("NOT RUN: " + test->name(), COLOR_ORANGE);
+        break;
+    case UnitTestResult::PASSED:
+        m_logger.log("PASSED: " + test->name(), COLOR_BLUE);
+        break;
+    case UnitTestResult::FAILED:
+        m_logger.log("FAILED: " + test->name(), COLOR_RED);
+        break;
+    case UnitTestResult::SKIPPED:
+        m_logger.log("SKIPPED: " + test->name(), COLOR_ORANGE);
+        break;
+    case UnitTestResult::OOM:
+        m_logger.log("OOM: " + test->name(), COLOR_RED);
+        break;
+    }
+}
 
 
 

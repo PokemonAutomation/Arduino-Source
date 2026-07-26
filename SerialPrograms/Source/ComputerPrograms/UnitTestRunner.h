@@ -37,6 +37,7 @@ class UnitTestRunner
 public:
     ~UnitTestRunner();
     UnitTestRunner();
+
     virtual void program(ProgramEnvironment& env, CancellableScope& scope) override;
 
 
@@ -67,6 +68,26 @@ private:
 
     ProgramEnvironment* m_env = nullptr;
 };
+
+
+
+class CommandLineUnitTestRunner : public PokemonAutomation::UnitTestRunner::Listener{
+public:
+    CommandLineUnitTestRunner(Logger& logger)
+        : m_logger(logger)
+    {}
+
+    void run();
+
+    virtual void on_test_finished(
+        std::shared_ptr<const UnitTest> test,
+        UnitTestResult result
+    ) override;
+
+private:
+    Logger& m_logger;
+};
+
 
 
 
