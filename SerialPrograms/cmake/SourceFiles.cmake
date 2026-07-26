@@ -1697,10 +1697,10 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.h
     Source/PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.cpp
     Source/PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h
-    Source/PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.cpp
-    Source/PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.h
-    Source/PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.cpp
-    Source/PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.h
+    Source/PokemonLA/Inference/Objects/PokemonLA_DialogEllipseDetector.cpp
+    Source/PokemonLA/Inference/Objects/PokemonLA_DialogEllipseDetector.h
+    Source/PokemonLA/Inference/Objects/PokemonLA_DialogYellowArrowDetector.cpp
+    Source/PokemonLA/Inference/Objects/PokemonLA_DialogYellowArrowDetector.h
     Source/PokemonLA/Inference/Objects/PokemonLA_FlagDetector.cpp
     Source/PokemonLA/Inference/Objects/PokemonLA_FlagDetector.h
     Source/PokemonLA/Inference/Objects/PokemonLA_FlagTracker.cpp

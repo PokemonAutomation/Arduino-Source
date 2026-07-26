@@ -15,7 +15,7 @@
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_DialogEllipseDetector.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 #include "PokemonLA/Programs/PokemonLA_BattleRoutines.h"
 #include "PokemonLA_IngoMoveGrinder.h"

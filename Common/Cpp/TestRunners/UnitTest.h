@@ -34,6 +34,10 @@ struct UnitTestResult{
     UnitTestResult(bool pass)
         : result(pass ? PASSED : FAILED)
     {}
+    UnitTestResult(const char* p_message)
+        : result(FAILED)
+        , message(p_message)
+    {}
     UnitTestResult(std::string p_message)
         : result(FAILED)
         , message(std::move(p_message))

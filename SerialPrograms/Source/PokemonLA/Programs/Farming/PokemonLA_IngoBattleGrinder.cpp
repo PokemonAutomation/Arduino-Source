@@ -18,7 +18,7 @@
 #include "PokemonLA/Programs/PokemonLA_BattleRoutines.h"
 #include "PokemonLA_IngoBattleGrinder.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_DialogEllipseDetector.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 
 

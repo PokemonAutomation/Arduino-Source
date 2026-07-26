@@ -5,16 +5,20 @@
  */
 
 #include <sstream>
+#include <iostream>
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "Tests/TestUtils.h"
 #include "PokemonLA_MMOQuestionMarkDetector.h"
 #include "PokemonLA/PokemonLA_Locations.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+using std::cout;
+using std::cerr;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -210,6 +214,163 @@ void add_hisui_MMO_detection_to_overlay(const std::array<bool, 5>& detection_res
         }
     }
 }
+
+
+
+
+
+
+class Test_MMOQuestionMarkDetector : public UnitTest{
+public:
+    Test_MMOQuestionMarkDetector(
+        const std::string& image,
+        std::vector<std::string> keywords
+    )
+        : UnitTest("PokemonLA::MMOQuestionMarkDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_keywords(std::move(keywords))
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        bool hisui_kw_found = false;
+        std::array<bool, 5> target_hisui_region_has_MMO = {false};
+
+        bool region_kw_found = false;
+        int target_num_MMOs_on_region_map = -1;
+        int target_region_index = -1;
+
+        for (size_t keyword_index = 0; keyword_index < m_keywords.size(); keyword_index++){
+            const std::string& word = m_keywords[keyword_index];
+            if (hisui_kw_found == false && word == "Hisui"){
+                hisui_kw_found = true;
+                continue;
+            }
+            if (region_kw_found == false && word == "Region"){
+                region_kw_found = true;
+                continue;
+            }
+
+            if (hisui_kw_found){
+                // We have found the "Hisui" keyword. So the next words will be the index of the region on the Hisui map
+                // that has MMO.
+                try{
+                    int region = std::stoi(word);
+                    if (region < 0 || region > 4){
+                        cerr << "Error: wrong region number, must be [0, 4] but got " << region << endl;
+                        return "Error: wrong region number, must be [0, 4] but got " + std::to_string(region);
+                    }
+                    target_hisui_region_has_MMO[region] = true;
+                }catch (std::exception&){
+                    cerr << "Error: keyword must be a region number, ranging in [0, 4], but got " << word << endl;
+                    return "Error: keyword must be a region number, ranging in [0, 4], but got " + word;
+                }
+            }else if (region_kw_found){
+                // Found "Region" keyword, read a number as how many MMOs on the region map, and a region name.
+                if (target_region_index < 0){
+                    for (size_t index = 0; index < 5; index++){
+                        if (word == WILD_REGION_SHORT_NAMES[index]){
+                            target_region_index = (int)index;
+                            break;
+                        }
+                    }
+                    if (target_region_index >= 0){
+                        continue;
+                    }
+                }
+                if (target_num_MMOs_on_region_map < 0){
+                    try{
+                        int num_MMOs = std::stoi(word);
+                        if (num_MMOs < 0){
+                            cerr << "Error: wrong number " << num_MMOs << ", must be non-negative" << endl;
+                            return "Error: wrong number " + std::to_string(num_MMOs) + ", must be non-negative";
+                        }
+                        target_num_MMOs_on_region_map = num_MMOs;
+                    }catch (std::exception&){}
+                }
+            }
+        }
+
+        if (hisui_kw_found == false && region_kw_found == false){
+            cerr << "Error: need keyword \"Hisui\" or \"Region\" in filename/" << endl;
+            return "Error: need keyword \"Hisui\" or \"Region\" in filename/";
+        }
+
+        MMOQuestionMarkDetector detector(logger);
+        ImageRGB32 image(m_image);
+
+        if (hisui_kw_found){
+            const auto region_has_MMO = detector.detect_MMO_on_hisui_map(image);
+
+            for (size_t i = 0; i < 5; i++){
+                const bool result = region_has_MMO[i];
+                const bool target = target_hisui_region_has_MMO[i];
+                if (result != target){
+                    cerr << "Error: " << __func__ << " result on region " << i << " is " << result << " but should be " << target << "." << endl;
+                    return std::string("Error: ") + __func__ +
+                    " result on region " + std::to_string(i) +
+                    " is " + std::to_string(result) +
+                    " but should be " + std::to_string(target) + ".";
+                }
+            }
+        }else{ // Region keyword found
+            if (target_region_index < 0 || target_num_MMOs_on_region_map < 0){
+                cerr << "Error: need a region name and a number of MMOs in the filename (e.g. image-Fieldlands_5.png)." << endl;
+            }
+            const auto results = detector.detect_MMOs_on_region_map(image);
+            TEST_RESULT_EQUAL((int)results.size(), target_num_MMOs_on_region_map);
+        }
+
+        return true;
+    };
+
+private:
+    std::string m_image;
+    std::vector<std::string> m_keywords;
+};
+
+
+
+
+void add_tests_MMOQuestionMarkDetector(UnitTestDatabase& database){
+    database.add<Test_MMOQuestionMarkDetector>(
+        "PokemonLA/MMOQuestionMarkDetector/macOS_bright/All_Hisui_0_1_2_3_4.png",
+        std::vector<std::string>{"All", "Hisui", "0", "1", "2", "3", "4"}
+    );
+    database.add<Test_MMOQuestionMarkDetector>(
+        "PokemonLA/MMOQuestionMarkDetector/macOS_bright/MMO_Whiscash_Hisui_0_3.png",
+        std::vector<std::string>{"MMO", "Whiscash", "Hisui", "0", "3"}
+    );
+    database.add<Test_MMOQuestionMarkDetector>(
+        "PokemonLA/MMOQuestionMarkDetector/WinElgato/MMO_Barboach_Hisui_0_3.png",
+        std::vector<std::string>{"MMO", "Barboach", "Hisui", "0", "3"}
+    );
+    database.add<Test_MMOQuestionMarkDetector>(
+        "PokemonLA/MMOQuestionMarkDetector/WinElgato/MMO_Hisui_3_4.png",
+        std::vector<std::string>{"MMO", "Hisui", "3", "4"}
+    );
+    database.add<Test_MMOQuestionMarkDetector>(
+        "PokemonLA/MMOQuestionMarkDetector/WinHD60S/MMO_Hisui_3_4.png",
+        std::vector<std::string>{"MMO", "Hisui", "3", "4"}
+    );
+    database.add<Test_MMOQuestionMarkDetector>(
+        "PokemonLA/MMOQuestionMarkDetector/WinHD60S/MMO_Yanmega_Hisui_3_4.png",
+        std::vector<std::string>{"MMO", "Yanmega", "Hisui", "3", "4"}
+    );
+    database.add<Test_MMOQuestionMarkDetector>(
+        "PokemonLA/MMOQuestionMarkDetector/WinMirabox/MMO_Hisui_0_1_3.png",
+        std::vector<std::string>{"MMO", "Hisui", "0", "1", "3"}
+    );
+    database.add<Test_MMOQuestionMarkDetector>(
+        "PokemonLA/MMOQuestionMarkDetector/WinMirabox/MMO_Hisui_3_4.png",
+        std::vector<std::string>{"MMO", "Hisui", "3", "4"}
+    );
+}
+
+
+
+
+
+
 
 
 

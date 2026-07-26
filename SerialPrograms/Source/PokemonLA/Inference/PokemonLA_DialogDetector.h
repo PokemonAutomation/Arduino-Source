@@ -10,7 +10,7 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_DialogYellowArrowDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -83,8 +83,22 @@ private:
     std::atomic<bool> m_detected;
     ImageFloatBox m_left_blue;
     ImageFloatBox m_right_blue;
-    DialogueYellowArrowDetector m_yellow_arrow_detector;
+    DialogYellowArrowDetector m_yellow_arrow_detector;
 };
+
+
+
+
+
+
+
+
+
+
+void add_tests_DialogDetector(UnitTestDatabase& database);
+
+
+
 
 }
 }

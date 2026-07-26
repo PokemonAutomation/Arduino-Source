@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <map>
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonTools/ImageMatch/ExactImageDictionaryMatcher.h"
 #include "PokemonLA/PokemonLA_Locations.h"
 
@@ -54,6 +55,13 @@ MapSpriteMatchResult match_sprite_on_map(
     MapRegion region,
     bool debug_mode = false
 );
+
+
+
+
+void add_tests_PokemonMapSpriteReader(UnitTestDatabase& database);
+
+
 
 
 }

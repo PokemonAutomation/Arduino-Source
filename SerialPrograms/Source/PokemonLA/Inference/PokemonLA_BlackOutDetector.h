@@ -8,9 +8,10 @@
 #ifndef PokemonAutomation_PokemonLA_BlackOutDetector_H
 #define PokemonAutomation_PokemonLA_BlackOutDetector_H
 
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_DialogYellowArrowDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -30,12 +31,18 @@ private:
     // The black screen when the dialog of "Everything went black!" appears
     ImageFloatBox m_black_screen;
     // The yellow arrow pointing to the white button on the "Everything went black!" dialog box.
-    DialogueYellowArrowDetector m_yellow_arrow_detector;
+    DialogYellowArrowDetector m_yellow_arrow_detector;
     // The bottom white space of the "Return to Base Camp" button.
     // ImageFloatBox m_return_camp_bottom;
 
     // ButtonDetector m_button_Y_detector;
 };
+
+
+
+void add_tests_BlackOutDetector(UnitTestDatabase& database);
+
+
 
 
 }

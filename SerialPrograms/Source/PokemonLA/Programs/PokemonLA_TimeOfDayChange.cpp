@@ -8,7 +8,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_DialogYellowArrowDetector.h"
 #include "PokemonLA_TimeOfDayChange.h"
 
 #include <iostream>
@@ -79,7 +79,7 @@ void change_time_of_day_at_tent(
     context.wait_for_all_requests();
 
     const bool stop_on_detected = true;
-    DialogueYellowArrowDetector yellow_arrow_detector(stream.logger(), stream.overlay(), stop_on_detected);
+    DialogYellowArrowDetector yellow_arrow_detector(stream.logger(), stream.overlay(), stop_on_detected);
 
     context.wait_for_all_requests();
     // Wait for the dialog box to show up

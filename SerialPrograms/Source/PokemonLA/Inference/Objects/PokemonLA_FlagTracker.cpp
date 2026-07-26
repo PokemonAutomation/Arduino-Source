@@ -6,7 +6,10 @@
 
 #include <cmath>
 #include <map>
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "Tests/TestUtils.h"
 #include "PokemonLA_FlagTracker.h"
 
 #include <iostream>
@@ -123,6 +126,50 @@ bool FlagTracker::process_frame(const ImageViewRGB32& frame, WallClock timestamp
     }
 
     return false;
+}
+
+
+
+
+
+
+
+class Test_FlagTrackerPerformance : public UnitTest{
+public:
+    Test_FlagTrackerPerformance(
+        const std::string& image,
+        size_t num_iterations
+    )
+        : UnitTest("PokemonLA::FlagTrackerPerformance - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_num_iterations(num_iterations)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyVideoOverlay overlay;
+        FlagTracker tracker(logger, overlay);
+        ImageRGB32 image(m_image);
+
+        auto time_start = current_time();
+        for (size_t i = 0; i < m_num_iterations; i++){
+            tracker.process_frame(image, current_time());
+        }
+        auto time_end = current_time();
+        const double ms = std::chrono::duration_cast<Milliseconds>(time_end - time_start).count() / (double)m_num_iterations;
+        cout << "Time: " << ms << " ms, " << ms / 1000. << " s" << endl;
+
+        return true;
+    };
+
+private:
+    std::string m_image;
+    size_t m_num_iterations;
+};
+
+
+
+void add_tests_FlagTracker(UnitTestDatabase& database){
+    database.add<Test_FlagTrackerPerformance>("PokemonLA/FlagTrackerPerformance/Braviary_Fly_10.png", 10);
 }
 
 

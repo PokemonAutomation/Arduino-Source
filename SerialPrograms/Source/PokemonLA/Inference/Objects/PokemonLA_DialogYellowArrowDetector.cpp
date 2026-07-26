@@ -7,11 +7,14 @@
 #include <stdint.h>
 #include <vector>
 #include "Common/Cpp/Logging/AbstractLogger.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
-#include "PokemonLA_DialogueYellowArrowDetector.h"
+#include "Tests/TestUtils.h"
+#include "PokemonLA_DialogYellowArrowDetector.h"
 
 //#include <iostream>
 //using std::cout;
@@ -52,20 +55,20 @@ const DialogueYellowArrowMatcher& DialogueYellowArrowMatcher::instance(){
 
 
 
-DialogueYellowArrowDetector::DialogueYellowArrowDetector(
+DialogYellowArrowDetector::DialogYellowArrowDetector(
     Logger& logger, VideoOverlay& overlay,
     bool stop_on_detected
 )
-    : VisualInferenceCallback("DialogueYellowArrowDetector")
+    : VisualInferenceCallback("DialogYellowArrowDetector")
     , m_logger(logger)
     , m_stop_on_detected(stop_on_detected)
 {}
 
 
-void DialogueYellowArrowDetector::make_overlays(VideoOverlaySet& items) const{
+void DialogYellowArrowDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, YELLOW_ARROW_BOX);
 }
-bool DialogueYellowArrowDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+bool DialogYellowArrowDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     const std::vector<std::pair<uint32_t, uint32_t>> filters = {
         {combine_rgb(160, 160, 0), combine_rgb(255, 255, 255)},
         {combine_rgb(200, 200, 0), combine_rgb(255, 255, 255)},
@@ -103,6 +106,39 @@ bool DialogueYellowArrowDetector::process_frame(const ImageViewRGB32& frame, Wal
 }
 
 
+
+
+
+class Test_DialogYellowArrowDetector : public UnitTest{
+public:
+    Test_DialogYellowArrowDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonLA::DialogYellowArrowDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyVideoOverlay overlay;
+        DialogYellowArrowDetector detector(logger, overlay, true);
+        ImageRGB32 image(m_image);
+        return detector.process_frame(image, current_time()) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+
+void add_tests_DialogYellowArrowDetector(UnitTestDatabase& database){
+    database.add<Test_DialogYellowArrowDetector>("PokemonLA/DialogueYellowArrowDetector/macOS_bright/MirelandsMai_True.png", true);
+    database.add<Test_DialogYellowArrowDetector>("PokemonLA/DialogueYellowArrowDetector/WinMyPin/ProfessorNight_True.png", true);
+    database.add<Test_DialogYellowArrowDetector>("PokemonLA/DialogueYellowArrowDetector/WinShadowCast/ProfessorNight_True.png", true);
+
+}
 
 
 

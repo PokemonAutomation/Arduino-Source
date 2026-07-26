@@ -17,8 +17,14 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <iostream>
+#include <QString>
+#include <QFileInfo>
+#include <QDir>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageHSV32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
@@ -27,11 +33,13 @@
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonTools/Resources/SpriteDatabase.h"
 #include "CommonTools/Images/ImageFilter.h"
-#include "PokemonLA_PokemonMapSpriteReader.h"
+#include "Tests/TestUtils.h"
 #include "PokemonLA/Resources/PokemonLA_AvailablePokemon.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_MMOQuestionMarkDetector.h"
+#include "PokemonLA_PokemonMapSpriteReader.h"
 
-#include <iostream>
 using std::cout;
+using std::cerr;
 using std::endl;
 
 namespace PokemonAutomation{
@@ -994,6 +1002,223 @@ MapSpriteMatchResult match_sprite_on_map(Logger& logger, const ImageViewRGB32& s
     save_debug_image_if_required(result);
     return result;
 }
+
+
+
+
+
+
+
+
+class Test_MMOSpriteMatcher : public UnitTest{
+public:
+    Test_MMOSpriteMatcher(
+        const std::string& image
+    )
+        : UnitTest("PokemonLA::MMOSpriteMatcher - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        const QString full_path(QString::fromStdString(m_image));
+        const QFileInfo fileinfo(full_path);
+        const QString filename = fileinfo.fileName();
+        const QDir parent_dir = fileinfo.dir();
+
+        const std::string base_name = fileinfo.baseName().toStdString();
+
+        const std::vector<std::string> filename_words = parse_words(base_name);
+        MapRegion region = MapRegion::NONE;
+        for (const std::string& word : filename_words){
+            if (word == "Fieldlands"){
+                region = MapRegion::FIELDLANDS;
+                break;
+            }else if (word == "Mirelands"){
+                region = MapRegion::MIRELANDS;
+                break;
+            }else if (word == "Coastlands"){
+                region = MapRegion::COASTLANDS;
+                break;
+            }else if (word == "Highlands"){
+                region = MapRegion::HIGHLANDS;
+                break;
+            }else if (word == "Icelands"){
+                region = MapRegion::ICELANDS;
+                break;
+            }
+        }
+        if (region == MapRegion::NONE){
+            cout << "Error: filename should contain a region name (e.g. \"Fieldlands\")." << endl;
+            return 1;
+        }
+
+        const QString mmo_revealed_image_path = parent_dir.filePath("_" + filename);
+        const QString mmo_revealed_txt_path = parent_dir.filePath("_" + fileinfo.baseName() + ".txt");
+
+        ImageRGB32 question_mark_image(m_image);
+        ImageRGB32 sprite_image(mmo_revealed_image_path.toStdString());
+
+        if (!question_mark_image){
+            cerr << "Error: cannot load MMO question mark image file " << m_image << endl;
+            return "Error: cannot load MMO question mark image file " + m_image;
+        }
+        if (!sprite_image){
+            cerr << "Error: cannot load MMO revealed sprites image file " << mmo_revealed_image_path.toStdString() << endl;
+            return "Error: cannot load MMO revealed sprites image file " + mmo_revealed_image_path.toStdString();
+        }
+
+        std::vector<std::string> target_sprites;
+        if (load_slug_list(mmo_revealed_txt_path.toStdString(), target_sprites) == false){
+            return false;
+        }
+
+        cout << "Target sprites: " << target_sprites.size() << " total" << endl;
+        for (const auto& slug : target_sprites){
+            cout << "- " << slug << endl;
+        }
+
+        MMOQuestionMarkDetector detector(logger);
+
+        std::vector<ImagePixelBox> quest_results = detector.detect_MMOs_on_region_map(question_mark_image);
+        std::sort(quest_results.begin(), quest_results.end(), [](const ImagePixelBox& a, const ImagePixelBox& b) -> bool {
+            if (a.center_y() < b.center_y()){
+                return true;
+            }
+            if (a.center_y() > b.center_y()){
+                return false;
+            }
+            return a.center_x() < b.center_x();
+        });
+
+        cout << "Detect MMO question marks:" << endl;
+        for (const auto& box : quest_results){
+            cout << "- " << box.center_x() << ", " << box.center_y() << " " << box.width() << " x " << box.height() << endl;
+        }
+
+        if (quest_results.size() != target_sprites.size()){
+            cerr << "Error: the number of MMO question marks detected is not correct: " << quest_results.size() << " should be " <<
+                target_sprites.size() << endl;
+            return "Error: the number of MMO question marks detected is not correct: " + std::to_string(quest_results.size()) +
+            " should be " + std::to_string(target_sprites.size());
+        }
+
+        // static int count = 0;
+        ImageRGB32 output_sprite = sprite_image.copy();
+        ImageRGB32 output_quest = question_mark_image.copy();
+        std::vector<ImagePixelBox> new_boxes;
+        for (size_t i = 0; i < quest_results.size(); i++){
+            auto box = quest_results[i];
+            draw_box(output_quest, box, combine_rgb(255, 0, 0));
+            draw_box(output_sprite, box, combine_rgb(255, 0, 0));
+
+            pxint_t radius = (pxint_t)((box.width() + box.height()) / 4 + 0.5);
+            pxint_t center_x = (pxint_t)box.center_x();
+            pxint_t center_y = (pxint_t)box.center_y();
+            auto new_box = ImagePixelBox(center_x - radius, center_y - radius, center_x + radius, center_y + radius);
+            new_boxes.push_back(new_box);
+
+            // std::ostringstream os;
+            // os << "test_sprite_" << count << "_" << std::setfill('0') << std::setw(2) << i << ".png";
+            // std::string sprite_filename = os.str();
+            // extract_box_reference(sprite_image, new_box).save(sprite_filename);
+        }
+        // output_quest.save("test_MMO_question_mark_detection_" + std::to_string(count) + ".png");
+        // output_sprite.save("test_sprite_detection_" + std::to_string(count) + ".png");
+
+        size_t success_count = 0;
+        for (size_t i = 0; i < quest_results.size(); i++){
+            // XXX
+            // if (i != 9){
+                // continue;
+            // }
+            cout << "--------------------------------------------------------------------" << endl;
+            cout << i << ": Target slug: " << target_sprites[i] << endl;
+
+            bool debug_mode = false;
+            auto result = match_sprite_on_map(logger, sprite_image, new_boxes[i], region, debug_mode);
+            if (result.slug == target_sprites[i]){
+                success_count++;
+                cout << "Match SUCCESS" << endl;
+            }else{
+                cout << "Match FAILURE" << endl;
+            }
+        }
+
+        if (success_count == target_sprites.size()){
+            cout << "ALL SUCCESS" << endl;
+        }else{
+            cout << "FAILURE: " << target_sprites.size() - success_count << "/" << target_sprites.size() << endl;
+            return "FAILURE: " + std::to_string(target_sprites.size() - success_count) + "/" + std::to_string(target_sprites.size());
+        }
+        // count++;
+
+        return true;
+    };
+
+private:
+    std::string m_image;
+};
+
+
+
+
+
+
+
+void add_tests_PokemonMapSpriteReader(UnitTestDatabase& database){
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Coastlands/MMO_Region_Coastlands_01.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Coastlands/MMO_Region_Coastlands_02.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Coastlands/MMO_Region_Coastlands_03.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Coastlands/MMO_Region_Coastlands_04.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Coastlands/MMO_Region_Coastlands_05.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Coastlands/MMO_Region_Coastlands_06.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Fieldlands/MMO_Region_Fieldlands_01.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Fieldlands/MMO_Region_Fieldlands_02.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Fieldlands/MMO_Region_Fieldlands_03.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Fieldlands/MMO_Region_Fieldlands_04.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Fieldlands/MMO_Region_Fieldlands_05.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Fieldlands/MMO_Region_Fieldlands_06.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Fieldlands/MMO_Region_Fieldlands_07.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Fieldlands/MMO_Region_Fieldlands_08.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Fieldlands/MMO_Region_Fieldlands_09.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Fieldlands/MMO_Region_Fieldlands_10.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Highlands/MMO_Region_Highlands_01.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Highlands/MMO_Region_Highlands_02.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Highlands/MMO_Region_Highlands_03.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Highlands/MMO_Region_Highlands_04.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Highlands/MMO_Region_Highlands_05.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Highlands/MMO_Region_Highlands_06.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Highlands/MMO_Region_Highlands_07.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Highlands/MMO_Region_Highlands_08.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Highlands/MMO_Region_Highlands_09.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Highlands/MMO_Region_Highlands_10.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Highlands/MMO_Region_Highlands_11.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Highlands/MMO_Region_Highlands_12.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Icelands/MMO_Region_Icelands_01.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Icelands/MMO_Region_Icelands_02.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Icelands/MMO_Region_Icelands_03.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Icelands/MMO_Region_Icelands_04.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Icelands/MMO_Region_Icelands_05.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Icelands/MMO_Region_Icelands_06.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Icelands/MMO_Region_Icelands_07.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Icelands/MMO_Region_Icelands_08.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Icelands/MMO_Region_Icelands_09.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Icelands/MMO_Region_Icelands_10.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Mirelands/MMO_Region_Mirelands_01.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Mirelands/MMO_Region_Mirelands_02.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Mirelands/MMO_Region_Mirelands_03.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Mirelands/MMO_Region_Mirelands_04.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Mirelands/MMO_Region_Mirelands_05.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Mirelands/MMO_Region_Mirelands_06.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Mirelands/MMO_Region_Mirelands_07.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Mirelands/MMO_Region_Mirelands_08.png");
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/macOS_bright/Mirelands/MMO_Region_Mirelands_09.png");
+
+    database.add<Test_MMOSpriteMatcher>("PokemonLA/MMOSpriteMatcher/WinShadowCast/MMO_Region_Fieldlands.png");
+
+}
+
+
 
 
 

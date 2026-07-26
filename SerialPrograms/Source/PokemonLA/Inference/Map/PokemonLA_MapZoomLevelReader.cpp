@@ -5,10 +5,13 @@
  */
 
 #include <cmath>
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/Images/ImageFilter.h"
+#include "Tests/TestUtils.h"
 #include "PokemonLA_MapZoomLevelReader.h"
 
 //#include <iostream>
@@ -64,6 +67,51 @@ int read_map_zoom_level(const ImageViewRGB32& screen){
 
     return max_yellow_index;
 }
+
+
+
+
+
+
+
+
+class Test_MapZoomLevelReader : public UnitTest{
+public:
+    Test_MapZoomLevelReader(
+        const std::string& image,
+        int expected
+    )
+        : UnitTest("PokemonLA::MapZoomLevelReader - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        ImageRGB32 image(m_image);
+        int zoom = read_map_zoom_level(image);
+        return zoom == m_expected;
+    };
+
+private:
+    std::string m_image;
+    int m_expected;
+};
+
+
+
+void add_tests_MapZoomLevelReader(UnitTestDatabase& database){
+    database.add<Test_MapZoomLevelReader>("PokemonLA/MapZoomLevelReader/macOS_bright/Icelands_1.png", 1);
+    database.add<Test_MapZoomLevelReader>("PokemonLA/MapZoomLevelReader/macOS_bright/Icelands_2.png", 2);
+    database.add<Test_MapZoomLevelReader>("PokemonLA/MapZoomLevelReader/macOS_bright/IcelandsBerryIconLeft_2.png", 2);
+    database.add<Test_MapZoomLevelReader>("PokemonLA/MapZoomLevelReader/macOS_bright/IcelandsBerryIconMiddle_2.png", 2);
+    database.add<Test_MapZoomLevelReader>("PokemonLA/MapZoomLevelReader/macOS_bright/Village_0.png", 0);
+
+}
+
+
+
+
+
 
 
 }

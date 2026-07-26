@@ -9,9 +9,10 @@
 #ifndef PokemonAutomation_PokemonLA_TransparentDialogueDetector_H
 #define PokemonAutomation_PokemonLA_TransparentDialogueDetector_H
 
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_DialogEllipseDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_DialogYellowArrowDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -34,10 +35,14 @@ public:
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 private:
-    DialogueYellowArrowDetector m_arrow_detector;
+    DialogYellowArrowDetector m_arrow_detector;
     DialogueEllipseDetector m_ellipse_detector;
     std::atomic<bool> m_detected;
 };
+
+
+
+void add_tests_TransparentDialogueDetector(UnitTestDatabase& database);
 
 
 

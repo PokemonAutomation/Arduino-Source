@@ -7,10 +7,11 @@
  *  This detector covers all possible locations of the yellow arrow.
  */
 
-#ifndef PokemonAutomation_PokemonLA_DialogueYellowArrowDetector_H
-#define PokemonAutomation_PokemonLA_DialogueYellowArrowDetector_H
+#ifndef PokemonAutomation_PokemonLA_DialogYellowArrowDetector_H
+#define PokemonAutomation_PokemonLA_DialogYellowArrowDetector_H
 
 #include <atomic>
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
@@ -21,9 +22,9 @@ namespace PokemonLA{
 
 
 
-class DialogueYellowArrowDetector : public VisualInferenceCallback{
+class DialogYellowArrowDetector : public VisualInferenceCallback{
 public:
-    DialogueYellowArrowDetector(
+    DialogYellowArrowDetector(
         Logger& logger, VideoOverlay& overlay,
         bool stop_on_detected
     );
@@ -43,6 +44,10 @@ private:
     std::atomic<bool> m_detected;
 };
 
+
+
+
+void add_tests_DialogYellowArrowDetector(UnitTestDatabase& database);
 
 
 }
