@@ -103,44 +103,79 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
 
     // Invert image for findNonZero: text becomes white (255), background black (0)
     cv::Mat binary_inv;
-    cv::threshold(gray, binary_inv, 254, 255, cv::THRESH_BINARY_INV);
+    cv::threshold(gray, binary_inv, 250, 255, cv::THRESH_BINARY_INV);
 
     // Find coordinates of all text pixels
     std::vector<cv::Point> nonZeroCoords;
     cv::findNonZero(binary_inv, nonZeroCoords);
 
     cv::Mat cropped_image;
-    if (!nonZeroCoords.empty()){
-        // Get the minimal bounding rectangle for the text
-        cv::Rect boundingBox = cv::boundingRect(nonZeroCoords);
-        
-        // Add a small buffer/padding around the box if needed (optional)
-        boundingBox.x = std::max(0, boundingBox.x - 2);
-        boundingBox.y = std::max(0, boundingBox.y - 2);
-        boundingBox.width = std::min(cv_image_rgb.cols - boundingBox.x, boundingBox.width + 4);
-        boundingBox.height = std::min(cv_image_rgb.rows - boundingBox.y, boundingBox.height + 4);
-
-        // Crop the original color image
-        cropped_image = cv_image_rgb(boundingBox);
-        // static int i = 0;
-        // cv::imwrite("output" + std::to_string(i) + ".png", cropped_image);
-        // i++;
-    }else{
-        return ""; // Return empty string if no text is detected in the region
+    if (nonZeroCoords.empty()){
+        return "";
     }
-    
+    cv::Rect bbox = cv::boundingRect(nonZeroCoords);
+
+    // Small safety margin (NOT 20 pixels)
+    int pad_x = std::max(1, bbox.width / 20);   // ~5%
+    int pad_y = std::max(1, bbox.height / 20);  // ~5%
+
+    bbox.x = std::max(0, bbox.x - pad_x);
+    bbox.y = std::max(0, bbox.y - pad_y);
+
+    bbox.width = std::min(
+        cv_image_rgb.cols - bbox.x,
+        bbox.width + 2 * pad_x
+    );
+
+    bbox.height = std::min(
+        cv_image_rgb.rows - bbox.y,
+        bbox.height + 2 * pad_y
+    );
+
+    cropped_image = cv_image_rgb(bbox).clone();
+
+    int h = cropped_image.rows;
+    int w = cropped_image.cols;
+
+    constexpr float min_ratio = 0.5f;
+
+    if ((float)w / h < min_ratio) { // handle tall/narrow characters
+        int target_w = static_cast<int>(std::ceil(min_ratio * h));
+
+        int left = (target_w - w) / 2;
+        int right = target_w - w - left;
+
+        cv::copyMakeBorder(
+            cropped_image,
+            cropped_image,
+            0, 0,              // no vertical padding
+            left, right,
+            cv::BORDER_CONSTANT,
+            cv::Scalar(255,255,255)
+        );
+    }
+
     // 2a. Calculate dynamic width (maintain aspect ratio)
     // the model shape is {1, 3, 48, dynamic_width}. Note that the height is fixed at 48 pixels
     // the input image must be scaled to match the height of 48, for the neural network
     int target_h = 48;
-    float aspect_ratio = (float)cropped_image.cols / (float)cropped_image.rows;
-    int target_w = static_cast<int>(target_h * aspect_ratio);
+    float aspect_ratio = (float)cropped_image.cols / cropped_image.rows;
 
-    if (target_w <= 0) return "";
-    
-    // 2b. Resize
+    int target_w = std::max(
+        1,
+        (int)std::round(target_h * aspect_ratio)
+    );
+
     cv::Mat resized;
-    cv::resize(cropped_image, resized, cv::Size(target_w, target_h));
+    cv::resize(
+        cropped_image,
+        resized,
+        cv::Size(target_w, target_h),
+        0,
+        0,
+        cv::INTER_LINEAR
+    );
+
 
     // 3. Normalize
     // convert UC3 8-bit [0,255] to 32FC3 float [0,1], then use ImageNet Normalization
