@@ -172,7 +172,9 @@ int run_test_space(const QFileInfo& space_info, size_t& num_passed, const std::v
 
 int run_command_line_tests(){
     {
-        ComputerPrograms::CommandLineUnitTestRunner runner(global_logger_tagged());
+        cout << "Running parallel unit tests..." << endl;
+        ComputerPrograms::CommandLineUnitTestRunner runner(global_logger_command_line());
+        cout << "Running parallel unit tests... Done!" << endl;
         if (runner.run()){
             return 1;
         }
