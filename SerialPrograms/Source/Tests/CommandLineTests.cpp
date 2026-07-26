@@ -8,7 +8,8 @@
 #include "CommandLineTests.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "PokemonLA_Tests_Old.h"
+#include "CommonFramework/Logging/Logger.h"
+#include "ComputerPrograms/UnitTestRunner.h"
 #include "TestMap.h"
 #include <QDir>
 #include <QDirIterator>
@@ -170,6 +171,16 @@ int run_test_space(const QFileInfo& space_info, size_t& num_passed, const std::v
 
 
 int run_command_line_tests(){
+    {
+        cout << "Running parallel unit tests..." << endl;
+        ComputerPrograms::CommandLineUnitTestRunner runner(global_logger_command_line());
+        cout << "Running parallel unit tests... Done!" << endl;
+        if (runner.run()){
+            return 1;
+        }
+    }
+
+
     const auto& root_folder_name = GlobalSettings::instance().COMMAND_LINE_TEST_FOLDER;
 
     QDir test_root_dir(root_folder_name.c_str());
