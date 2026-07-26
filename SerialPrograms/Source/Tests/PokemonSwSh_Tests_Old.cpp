@@ -6,7 +6,7 @@
 
 
 #include "Common/Compiler.h"
-#include "PokemonSwSh_Tests.h"
+#include "PokemonSwSh_Tests_Old.h"
 #include "TestUtils.h"
 
 #include "PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.h"

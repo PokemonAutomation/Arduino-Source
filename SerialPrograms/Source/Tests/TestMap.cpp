@@ -13,7 +13,7 @@
 #include "PokemonHome_Tests.h"
 #include "PokemonLA_Tests.h"
 #include "PokemonLZA_Tests.h"
-#include "PokemonSwSh_Tests.h"
+#include "PokemonSwSh_Tests_Old.h"
 #include "PokemonSV_Tests.h"
 #include "TestMap.h"
 #include "TestUtils.h"

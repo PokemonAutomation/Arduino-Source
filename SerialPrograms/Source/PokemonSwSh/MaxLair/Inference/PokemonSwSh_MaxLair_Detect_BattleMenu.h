@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Detect_BattleMenu_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Detect_BattleMenu_H
 
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/FailureWatchdog.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
@@ -103,6 +103,10 @@ private:
     OverlayBoxScope m_pp3;
     OverlayBoxScope m_dmax;
 };
+
+
+
+void add_tests_MaxLairBattleMenuDetector(UnitTestDatabase& database);
 
 
 

@@ -7,6 +7,8 @@
 #include <cmath>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/CancellableScope.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
@@ -546,6 +548,27 @@ bool BattleMenuReader::can_dmax(const ImageViewRGB32& screen) const{
 
 
 
+class Test_MaxLairBattleMenuDetector : public UnitTest{
+public:
+    Test_MaxLairBattleMenuDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonSwSh::MaxLairBattleMenuDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(CancellableScope& scope) const override{
+        BattleMenuDetector detector;
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
 
 
 
@@ -553,6 +576,9 @@ bool BattleMenuReader::can_dmax(const ImageViewRGB32& screen) const{
 
 
 
+void add_tests_MaxLairBattleMenuDetector(UnitTestDatabase& database){
+    database.add<Test_MaxLairBattleMenuDetector>("PokemonSwSh/MaxLair_BattleMenuDetector/MyPin_Q6g_BattleMenuDA_True.jpg", true);
+}
 
 
 

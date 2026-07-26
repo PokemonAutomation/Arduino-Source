@@ -11,9 +11,7 @@
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "UnitTestRunner.h"
 
-#include "PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
+#include "PokemonSwSh/PokemonSwSh_Tests.h"
 
 namespace PokemonAutomation{
 namespace ComputerPrograms{
@@ -26,9 +24,7 @@ namespace ComputerPrograms{
 UnitTestDatabase make_UNIT_TESTS_ALL(){
     UnitTestDatabase ret;
 
-    NintendoSwitch::PokemonSwSh::add_tests_BoxGenderDetector(ret);
-    NintendoSwitch::PokemonSwSh::add_tests_BoxShinySymbolDetector(ret);
-    NintendoSwitch::PokemonSwSh::add_tests_YCommDetector(ret);
+    NintendoSwitch::PokemonSwSh::add_tests(ret);
 
     return ret;
 }
