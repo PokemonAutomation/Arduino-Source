@@ -79,10 +79,13 @@ public:
 
     void run();
 
+
+private:
     virtual void on_test_finished(
         std::shared_ptr<const UnitTest> test,
         UnitTestResult result
     ) override;
+
 
 private:
     Logger& m_logger;
