@@ -98,9 +98,12 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     cv::Mat cv_image_rgb = imageviewrgb32_to_cv_mat_rgb(image);
     
     // 1b. Whitespace Trimming Logic
+    // crop tightly around the text, with small safety margin
     cv::Mat gray;
     cv::cvtColor(cv_image_rgb, gray, cv::COLOR_BGR2GRAY);
 
+    // we are assuming that pre-processing already done on image so the text is black,
+    // and background is white.
     // Invert image for findNonZero: text becomes white (255), background black (0)
     cv::Mat binary_inv;
     cv::threshold(gray, binary_inv, 250, 255, cv::THRESH_BINARY_INV);
@@ -115,9 +118,9 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     }
     cv::Rect bbox = cv::boundingRect(nonZeroCoords);
 
-    // Small safety margin (NOT 20 pixels)
-    int pad_x = std::max(1, bbox.width / 20);   // ~5%
-    int pad_y = std::max(1, bbox.height / 20);  // ~5%
+    // Small safety margin around the crop
+    int pad_x = std::max(4, bbox.height / 10);  // ~10% of text height. use height to account for cases of a single narrow character
+    int pad_y = std::max(2, bbox.height / 20);  // ~5%
 
     bbox.x = std::max(0, bbox.x - pad_x);
     bbox.y = std::max(0, bbox.y - pad_y);
@@ -139,7 +142,8 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
 
     constexpr float min_ratio = 0.5f;
 
-    if ((float)w / h < min_ratio) { // handle tall/narrow characters
+    // add more horizontal padding to tall/narrow characters
+    if ((float)w / h < min_ratio) {
         int target_w = static_cast<int>(std::ceil(min_ratio * h));
 
         int left = (target_w - w) / 2;
