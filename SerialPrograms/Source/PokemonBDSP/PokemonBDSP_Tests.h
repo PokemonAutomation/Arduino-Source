@@ -1,17 +1,17 @@
-/*  Pokemon Sword/Shield Tests
+/*  Pokemon BDSP Tests
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_PokemonSwSh_Tests_H
-#define PokemonAutomation_PokemonSwSh_Tests_H
+#ifndef PokemonAutomation_PokemonBDSP_Tests_H
+#define PokemonAutomation_PokemonBDSP_Tests_H
 
 #include "Common/Cpp/TestRunners/UnitTest.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-namespace PokemonSwSh{
+namespace PokemonBDSP{
 
 
 

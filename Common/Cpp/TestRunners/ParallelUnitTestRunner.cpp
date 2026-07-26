@@ -188,7 +188,7 @@ void UnitTestRunner::dispatch_test(const std::string& name){
             UnitTestResult result;
             try{
                 m_logger.log("Starting: " + test.name());
-                result = test.run(*this);
+                result = test.run(m_logger, *this);
             }catch (Exception& e){
                 result = UnitTestResult(UnitTestResult::FAILED, e.to_str());
             }catch (std::bad_alloc&){

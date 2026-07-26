@@ -37,7 +37,7 @@ public:
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(CancellableScope& scope) const override{
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         BoxGenderDetector detector;
         ImageRGB32 image(m_image);
         return detector.detect(image) == m_expected;

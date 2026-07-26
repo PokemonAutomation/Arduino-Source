@@ -382,7 +382,7 @@ public:
         : UnitTest(std::move(name))
     {}
 
-    virtual UnitTestResult run(CancellableScope& scope) const override{
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         scope.wait_for(Milliseconds(1000));
         return true;
     }

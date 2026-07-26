@@ -182,7 +182,7 @@ public:
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(CancellableScope& scope) const override{
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         YCommIconDetector detector(COLOR_RED, true);
         ImageRGB32 image(m_image);
         return detector.detect(image) == m_expected;
@@ -204,7 +204,7 @@ public:
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(CancellableScope& scope) const override{
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         YCommMenuDetector detector(true);
         ImageRGB32 image(m_image);
         return detector.detect(image) == m_expected;
@@ -214,9 +214,6 @@ private:
     std::string m_image;
     bool m_expected;
 };
-
-
-
 
 
 

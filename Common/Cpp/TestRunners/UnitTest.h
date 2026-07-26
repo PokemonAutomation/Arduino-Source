@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <string>
+#include "Common/Cpp/Logging/AbstractLogger.h"
 
 namespace PokemonAutomation{
 
@@ -68,7 +69,7 @@ public:
         return m_threads;
     }
 
-    virtual UnitTestResult run(CancellableScope& scope) const = 0;
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const = 0;
 
 
 protected:

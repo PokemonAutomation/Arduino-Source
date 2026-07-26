@@ -1,17 +1,17 @@
-/*  Pokemon Sword/Shield Tests
+/*  Pokemon LA Tests
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_PokemonSwSh_Tests_H
-#define PokemonAutomation_PokemonSwSh_Tests_H
+#ifndef PokemonAutomation_PokemonLA_Tests_H
+#define PokemonAutomation_PokemonLA_Tests_H
 
 #include "Common/Cpp/TestRunners/UnitTest.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-namespace PokemonSwSh{
+namespace PokemonLA{
 
 
 

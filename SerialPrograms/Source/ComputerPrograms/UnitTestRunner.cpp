@@ -7,12 +7,12 @@
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "UnitTestRunner.h"
 
 #include "PokemonSwSh/PokemonSwSh_Tests.h"
+#include "PokemonLA/PokemonLA_Tests.h"
 
 namespace PokemonAutomation{
 namespace ComputerPrograms{
@@ -26,6 +26,7 @@ UnitTestDatabase make_UNIT_TESTS_ALL(){
     UnitTestDatabase ret;
 
     NintendoSwitch::PokemonSwSh::add_tests(ret);
+    NintendoSwitch::PokemonLA::add_tests(ret);
 
     return ret;
 }

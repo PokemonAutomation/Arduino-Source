@@ -6,7 +6,7 @@
 
 
 #include "Common/Compiler.h"
-#include "PokemonLA_Tests.h"
+#include "PokemonLA_Tests_Old.h"
 #include "TestUtils.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"

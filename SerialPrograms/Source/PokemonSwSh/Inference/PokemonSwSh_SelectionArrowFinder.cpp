@@ -246,7 +246,7 @@ public:
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(CancellableScope& scope) const override{
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         ImageRGB32 image(m_image);
         std::vector<ImagePixelBox> boxes = find_selection_arrows(image, 10);
         for (const auto& box : boxes){
@@ -270,7 +270,7 @@ public:
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(CancellableScope& scope) const override{
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         DummyVideoOverlay overlay;
         RetrieveEggArrowFinder detector(overlay);
         ImageRGB32 image(m_image);
@@ -292,7 +292,7 @@ public:
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(CancellableScope& scope) const override{
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         DummyVideoOverlay overlay;
         StoragePokemonMenuArrowFinder detector(overlay);
         ImageRGB32 image(m_image);
@@ -314,7 +314,7 @@ public:
         , m_index(index)
     {}
 
-    virtual UnitTestResult run(CancellableScope& scope) const override{
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         DummyVideoOverlay overlay;
         RotomPhoneMenuArrowFinder detector(overlay);
         ImageRGB32 image(m_image);

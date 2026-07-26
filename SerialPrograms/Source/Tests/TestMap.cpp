@@ -11,7 +11,7 @@
 #include "NintendoSwitch_Tests.h"
 #include "PokemonFRLG_Tests.h"
 #include "PokemonHome_Tests.h"
-#include "PokemonLA_Tests.h"
+#include "PokemonLA_Tests_Old.h"
 #include "PokemonLZA_Tests.h"
 #include "PokemonSwSh_Tests_Old.h"
 #include "PokemonSV_Tests.h"

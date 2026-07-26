@@ -8,7 +8,7 @@
 #include "CommandLineTests.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "PokemonLA_Tests.h"
+#include "PokemonLA_Tests_Old.h"
 #include "TestMap.h"
 #include <QDir>
 #include <QDirIterator>
