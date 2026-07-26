@@ -605,11 +605,9 @@ void start_game_from_home_with_inference(
                     pbf_press_button(context, BUTTON_A, 160ms, 40ms);
                     break;
                 default:
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
-                        "start_game_from_home_with_inference(): No recognizable state after 30 seconds.",
-                        console
-                    );
+                    console.log("start_game_from_home_with_inference(): No recognizable state after 30 seconds.", COLOR_RED);
+                    go_home(console, context);
+                    break;
                 }
             }
         },
