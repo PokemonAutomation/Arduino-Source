@@ -75,9 +75,13 @@ class CommandLineUnitTestRunner : public PokemonAutomation::UnitTestRunner::List
 public:
     CommandLineUnitTestRunner(Logger& logger)
         : m_logger(logger)
+        , m_skipped_tests(0)
+        , m_passed_tests(0)
+        , m_failed_tests(0)
     {}
 
-    void run();
+    //  Returns true if tests failed.
+    bool run();
 
 
 private:
@@ -89,6 +93,9 @@ private:
 
 private:
     Logger& m_logger;
+    std::atomic<size_t> m_skipped_tests;
+    std::atomic<size_t> m_passed_tests;
+    std::atomic<size_t> m_failed_tests;
 };
 
 

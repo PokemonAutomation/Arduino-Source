@@ -211,6 +211,8 @@ std::string get_resource_path(){
 }
 std::string get_unittest_resource_path(){
     //  Find the resource directory.
+
+    //  Try the intended folder name first.
     QString base = get_application_base_dir_path();
     QString path = base;
     for (size_t c = 0; c < 5; c++){
@@ -221,6 +223,18 @@ std::string get_unittest_resource_path(){
         }
         path += "/..";
     }
+
+    //  Now try with the old command-line folder.
+    path = base;
+    for (size_t c = 0; c < 5; c++){
+        QString try_path = path + "/CommandLineTests/";
+        QFile file(try_path);
+        if (file.exists()){
+            return try_path.toStdString();
+        }
+        path += "/..";
+    }
+
     return (base + "/UnitTestResources/").toStdString();
 }
 std::string get_training_path(){

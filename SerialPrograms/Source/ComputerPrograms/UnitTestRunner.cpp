@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/ScopeExit.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -229,7 +230,7 @@ void UnitTestRunner::on_test_finished(
 
 
 
-void CommandLineUnitTestRunner::run(){
+bool CommandLineUnitTestRunner::run(){
     PokemonAutomation::UnitTestRunner runner(
         m_logger,
         GlobalThreadPools::computation_normal()
@@ -239,6 +240,14 @@ void CommandLineUnitTestRunner::run(){
         runner.add_test(test.second);
     }
     runner.run();
+
+    m_logger.log(
+        "Tests Finished:"
+        "\n    Passed:  " + tostr_u_commas(m_passed_tests.load(std::memory_order_acquire)) +
+        "\n    Failed:  " + tostr_u_commas(m_failed_tests.load(std::memory_order_acquire)) +
+        "\n    Skipped: " + tostr_u_commas(m_skipped_tests.load(std::memory_order_acquire))
+    );
+    return m_failed_tests.load(std::memory_order_acquire) != 0;
 }
 void CommandLineUnitTestRunner::on_test_finished(
     std::shared_ptr<const UnitTest> test,
@@ -247,18 +256,23 @@ void CommandLineUnitTestRunner::on_test_finished(
     switch (result.result){
     case UnitTestResult::NOT_RUN:
         m_logger.log("NOT RUN: " + test->name(), COLOR_ORANGE);
+        m_skipped_tests++;
         break;
     case UnitTestResult::PASSED:
         m_logger.log("PASSED: " + test->name(), COLOR_BLUE);
+        m_passed_tests++;
         break;
     case UnitTestResult::FAILED:
         m_logger.log("FAILED: " + test->name(), COLOR_RED);
+        m_failed_tests++;
         break;
     case UnitTestResult::SKIPPED:
         m_logger.log("SKIPPED: " + test->name(), COLOR_ORANGE);
+        m_skipped_tests++;
         break;
     case UnitTestResult::OOM:
         m_logger.log("OOM: " + test->name(), COLOR_RED);
+        m_failed_tests++;
         break;
     }
 }
