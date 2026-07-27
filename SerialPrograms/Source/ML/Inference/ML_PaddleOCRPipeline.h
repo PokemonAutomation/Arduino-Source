@@ -48,6 +48,12 @@ private:
 
 };
 
+cv::Mat crop_to_text_region(const cv::Mat& image);
+
+// if the image is narrow/tall, add horizontal padding
+// modifies the input image
+void add_horizontal_padding(cv::Mat& image);
+
 // convert HCW (height, width, channels) to NCHW (batch N, channels C, height H, width W)
 std::vector<float> preprocess_NCHW(cv::Mat& img);
 

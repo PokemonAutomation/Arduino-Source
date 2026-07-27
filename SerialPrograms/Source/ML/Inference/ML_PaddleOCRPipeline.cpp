@@ -106,82 +106,13 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
 
     
     // 2. Crop tightly around the text, with small safety margin
-    // first convert to grayscale
-    cv::Mat gray;
-    cv::cvtColor(cv_image_rgb, gray, cv::COLOR_BGR2GRAY);
-
-    // get a binary image, for cropping purposes
-    cv::Mat binary;
-    cv::threshold(gray, binary, 0, 255,
-                cv::THRESH_BINARY_INV | cv::THRESH_OTSU);
-
-    double ratio = cv::countNonZero(binary) /
-                static_cast<double>(binary.total());
-
-    // If most pixels are white, we actually segmented the background.
-    // Flip it so text becomes white again.
-    if (ratio > 0.5){
-        cv::bitwise_not(binary, binary);
-    }                
-
-    // Find coordinates of all non-zero pixels (the text)
-    std::vector<cv::Point> nonZeroCoords;
-    cv::findNonZero(binary, nonZeroCoords);
-    if (nonZeroCoords.empty()){
+    cv::Mat cropped_image = crop_to_text_region(cv_image_rgb);
+    if (cropped_image.empty()){
         return "";
     }
 
-    // create bounding box for crop
-    cv::Rect bbox = cv::boundingRect(nonZeroCoords);
-
-    // increase bounding box slightly to add small safety margin
-    int pad_x = std::max(4, bbox.width / 20);  // ~5%
-    int pad_y = std::max(2, bbox.height / 20);  // ~5%
-
-    bbox.x = std::max(0, bbox.x - pad_x);
-    bbox.y = std::max(0, bbox.y - pad_y);
-
-    bbox.width = std::min(
-        cv_image_rgb.cols - bbox.x,
-        bbox.width + 2 * pad_x
-    );
-
-    bbox.height = std::min(
-        cv_image_rgb.rows - bbox.y,
-        bbox.height + 2 * pad_y
-    );
-
-    // crop the original image based on the bounding box
-    cv::Mat cropped_image;
-    cropped_image = cv_image_rgb(bbox).clone();
-
-    int h = cropped_image.rows;
-    int w = cropped_image.cols;
-
-    constexpr float min_ratio = 0.5f;
-
-    // add horizontal padding (white pixels) to tall/narrow characters
-    if ((float)w / h < min_ratio) {
-        int target_w = static_cast<int>(std::ceil(min_ratio * h));
-
-        int left = (target_w - w) / 2;
-        int right = target_w - w - left;
-
-        cv::copyMakeBorder(
-            cropped_image,
-            cropped_image,
-            0, 0,              // no vertical padding
-            left, right,
-            cv::BORDER_CONSTANT,
-            cv::Scalar(255,255,255) // add white pixels
-        );
-    }
-
-    // static int i = 0;
-    // i++;
-    // cv::imwrite("aabinary" + std::to_string(i) + ".png", binary);
-    // cv::imwrite("aacropped_image" + std::to_string(i) + ".png", cropped_image);
-
+    // add horizontal padding to tall/narrow characters
+    add_horizontal_padding(cropped_image);
 
     // 3. Calculate dynamic width (maintain aspect ratio)
     // the model shape is {1, 3, 48, dynamic_width}. Note that the height is fixed at 48 pixels
@@ -262,6 +193,91 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "PaddleOCRPipeline::recognize(): Failed." + std::string(e.what()));
     }
     
+}
+
+cv::Mat crop_to_text_region(const cv::Mat& image) {
+    // first convert to grayscale
+    cv::Mat gray;
+    cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+
+    // get a binary image, for cropping purposes
+    cv::Mat binary;
+    cv::threshold(gray, binary, 0, 255,
+                cv::THRESH_BINARY_INV | cv::THRESH_OTSU);
+
+    double ratio = cv::countNonZero(binary) /
+                static_cast<double>(binary.total());
+
+    // we want text pixels to be white for the next step
+    // If most pixels are white, Otsu likely classified the background as foreground.
+    // Flip it so text becomes white again.
+    if (ratio > 0.5){
+        cv::bitwise_not(binary, binary);
+    }                
+
+    // Find coordinates of all non-zero pixels (the text)
+    std::vector<cv::Point> nonZeroCoords;
+    cv::findNonZero(binary, nonZeroCoords);
+    if (nonZeroCoords.empty()){
+        return {};
+    }
+
+    // create bounding box for crop
+    cv::Rect bbox = cv::boundingRect(nonZeroCoords);
+
+    // increase bounding box slightly to add small safety margin
+    int pad_x = std::max(4, bbox.width / 20);  // ~5%
+    int pad_y = std::max(2, bbox.height / 20);  // ~5%
+
+    bbox.x = std::max(0, bbox.x - pad_x);
+    bbox.y = std::max(0, bbox.y - pad_y);
+
+    bbox.width = std::min(
+        image.cols - bbox.x,
+        bbox.width + 2 * pad_x
+    );
+
+    bbox.height = std::min(
+        image.rows - bbox.y,
+        bbox.height + 2 * pad_y
+    );
+
+    // crop the original image based on the bounding box
+    // the crop should be within bounds.
+    cv::Mat cropped_image;
+    cropped_image = image(bbox).clone();
+
+    // static int i = 0;
+    // i++;
+    // cv::imwrite("aabinary" + std::to_string(i) + ".png", binary);
+    // cv::imwrite("aacropped_image" + std::to_string(i) + ".png", cropped_image);
+
+    return cropped_image;
+}
+
+void add_horizontal_padding(cv::Mat& image){
+
+    int h = image.rows;
+    int w = image.cols;
+    constexpr float min_ratio = 0.5f;
+
+    // add horizontal padding (white pixels) to tall/narrow characters
+    if (h > 0 && (float)w / h < min_ratio) {
+        int target_w = static_cast<int>(std::ceil(min_ratio * h));
+
+        int left = (target_w - w) / 2;
+        int right = target_w - w - left;
+
+        cv::copyMakeBorder(
+            image,
+            image,
+            0, 0,              // no vertical padding
+            left, right,
+            cv::BORDER_CONSTANT,
+            cv::Scalar(255,255,255) // add white pixels
+        );
+    }
+
 }
 
 
