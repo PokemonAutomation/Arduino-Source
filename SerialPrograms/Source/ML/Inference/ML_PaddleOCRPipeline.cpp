@@ -256,29 +256,66 @@ cv::Mat crop_to_text_region(const cv::Mat& image) {
 }
 
 void add_horizontal_padding(cv::Mat& image){
+    if (image.empty()) {
+        return;
+    }
 
     int h = image.rows;
     int w = image.cols;
     constexpr float min_ratio = 0.5f;
 
-    // add horizontal padding (white pixels) to tall/narrow characters
+    // add horizontal padding to tall/narrow characters
     if (h > 0 && (float)w / h < min_ratio) {
         int target_w = static_cast<int>(std::ceil(min_ratio * h));
 
         int left = (target_w - w) / 2;
         int right = target_w - w - left;
 
+        cv::Scalar bg = estimate_background_color(image);
+        cv::Mat padded_image;
         cv::copyMakeBorder(
             image,
-            image,
+            padded_image,
             0, 0,              // no vertical padding
             left, right,
             cv::BORDER_CONSTANT,
-            cv::Scalar(255,255,255) // add white pixels
+            bg
         );
+        image = padded_image;
     }
 
+    // static int i = 0;
+    // i++;
+    // cv::imwrite("aapadded" + std::to_string(i) + ".png", image);
+
 }
+
+cv::Scalar estimate_background_color(const cv::Mat& image) {
+    if (image.empty() || image.type() != CV_8UC3) {
+        return cv::Scalar(255, 255, 255);
+    }
+
+    cv::Vec3b tl = image.at<cv::Vec3b>(0, 0);
+    cv::Vec3b tr = image.at<cv::Vec3b>(0, image.cols - 1);
+    cv::Vec3b bl = image.at<cv::Vec3b>(image.rows - 1, 0);
+    cv::Vec3b br = image.at<cv::Vec3b>(image.rows - 1, image.cols - 1);
+
+    // optimization due to the fact that most input images have a white background
+    if (tl[0] >= 240 && tl[1] >= 240 && tl[2] >= 240 &&
+        tr[0] >= 240 && tr[1] >= 240 && tr[2] >= 240 &&
+        bl[0] >= 240 && bl[1] >= 240 && bl[2] >= 240 &&
+        br[0] >= 240 && br[1] >= 240 && br[2] >= 240) {
+        return cv::Scalar(255, 255, 255);
+    }
+
+    return cv::Scalar(
+        (static_cast<int>(tl[0]) + tr[0] + bl[0] + br[0]) * 0.25, // Blue (or Red if RGB). cast to int to avoid overflow
+        (static_cast<int>(tl[1]) + tr[1] + bl[1] + br[1]) * 0.25, // Green
+        (static_cast<int>(tl[2]) + tr[2] + bl[2] + br[2]) * 0.25  // Red (or Blue if RGB)
+    );
+}
+
+
 
 
 std::vector<float> preprocess_NCHW(cv::Mat& img){
