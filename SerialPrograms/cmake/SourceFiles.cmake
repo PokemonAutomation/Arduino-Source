@@ -693,6 +693,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonTools/OCR/OCR_StringMatchResult.h
     Source/CommonTools/OCR/OCR_StringNormalization.cpp
     Source/CommonTools/OCR/OCR_StringNormalization.h
+    Source/CommonTools/OCR/OCR_Tests.cpp
+    Source/CommonTools/OCR/OCR_Tests.h
     Source/CommonTools/OCR/OCR_TextMatcher.cpp
     Source/CommonTools/OCR/OCR_TextMatcher.h
     Source/CommonTools/OCR/OCR_TrainingTools.cpp
