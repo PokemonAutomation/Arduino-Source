@@ -27,6 +27,8 @@ PokemonDetails read_status_info(
 
 
 
+std::string read_pokemon_info_from_words(const std::vector<std::string>& keywords, Language& language, PokemonDetails& details);
+std::string test_pokemon_details(const PokemonDetails& details, const PokemonDetails& target);
 
 void add_tests_StatusInfoScreenDetector(UnitTestDatabase& database);
 

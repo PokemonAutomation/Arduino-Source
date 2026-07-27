@@ -7,11 +7,14 @@
 #include <iostream>
 #include <sstream>
 #include "Common/Cpp/Logging/AbstractLogger.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
 #include "CommonTools/ImageMatch/SilhouetteDictionaryMatcher.h"
+#include "Tests/TestUtils.h"
 #include "PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h"
 #include "PokemonLA_MapWeatherAndTimeReader.h"
 
@@ -123,6 +126,62 @@ TimeOfDay detect_time_of_day_on_map(Logger& logger, const ImageViewRGB32& screen
 
     return get_time_of_day(match_result.results.begin()->second);
 }
+
+
+
+
+
+
+
+class Test_MapWeatherAndTimeReader : public UnitTest{
+public:
+    Test_MapWeatherAndTimeReader(
+        const std::string& image,
+        std::vector<std::string> keywords
+    )
+        : UnitTest("PokemonLA::MapWeatherAndTimeReader - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_keywords(std::move(keywords))
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        // two keywords: <Weather name> <Time of day name>
+        if (m_keywords.size() < 2){
+            std::stringstream ss;
+            ss << "Error: not enough number of keywords in the filename. Found only " << m_keywords.size() << "." << std::endl;
+            return ss.str();
+        }
+
+        const auto& target_weather = m_keywords[m_keywords.size()-2];
+        const auto& target_time = m_keywords[m_keywords.size()-1];
+
+        ImageRGB32 image(m_image);
+        const std::string weather_result = WEATHER_NAMES[(int)detect_weather_on_map(logger, image)];
+        const std::string time_result = TIME_OF_DAY_NAMES[(int)detect_time_of_day_on_map(logger, image)];
+
+        TEST_RESULT_COMPONENT_EQUAL_STR(weather_result, target_weather, "weather");
+        TEST_RESULT_COMPONENT_EQUAL_STR(time_result, target_time, "time of day");
+
+        return true;
+    };
+
+private:
+    std::string m_image;
+    std::vector<std::string> m_keywords;
+};
+
+
+
+
+
+
+void add_tests_MapWeatherAndTimeReader(UnitTestDatabase& database){
+
+}
+
+
+
+
 
 
 }

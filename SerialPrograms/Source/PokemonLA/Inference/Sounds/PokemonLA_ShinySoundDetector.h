@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_ShinySoundDetector_H
 #define PokemonAutomation_PokemonLA_ShinySoundDetector_H
 
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonTools/Audio/AudioPerSpectrumDetectorBase.h"
 
 namespace PokemonAutomation{
@@ -28,6 +29,9 @@ protected:
 };
 
 
+
+
+void add_tests_ShinySoundDetector(UnitTestDatabase& database);
 
 
 }

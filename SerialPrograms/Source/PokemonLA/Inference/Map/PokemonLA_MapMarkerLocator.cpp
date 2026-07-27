@@ -6,12 +6,15 @@
 
 #include <cfloat>
 #include <cmath>
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
+#include "Tests/TestUtils.h"
 #include "PokemonLA_MapMarkerLocator.h"
 
 #include <iostream>
@@ -130,6 +133,48 @@ double get_orientation_on_map(const ImageViewRGB32& screen, bool avoid_lava_area
 
     return red_marker_direction;
 }
+
+
+
+
+
+
+
+
+
+
+class Test_MapMarkerLocator : public UnitTest{
+public:
+    Test_MapMarkerLocator(
+        const std::string& image,
+        float target_angle, float threshold
+    )
+        : UnitTest("PokemonLA::MapMarkerLocator - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_target_angle(target_angle)
+        , m_threshold(threshold)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        ImageRGB32 image(m_image);
+        float angle = get_orientation_on_map(image);
+        TEST_RESULT_APPROXIMATE(angle, m_target_angle, m_threshold);
+        return true;
+    };
+
+private:
+    std::string m_image;
+    float m_target_angle;
+    float m_threshold;
+};
+
+
+
+
+void add_tests_MapMarkerLocator(UnitTestDatabase& database){
+
+}
+
 
 
 

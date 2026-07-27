@@ -185,6 +185,15 @@ public:
 
 
 
+#define TEST_RESULT_EQUAL_STR(result, target) \
+    do { \
+        if ((result) != (target)){\
+            std::stringstream ss;   \
+            ss << "Error: " << __func__ << ":" << __LINE__ << " result is " << (result) << " but should be " << (target) << "." << std::endl; \
+            return ss.str(); \
+        } \
+    } while (0)
+
 #define TEST_RESULT_COMPONENT_EQUAL_STR(result, target, component_name) \
     do { \
         if ((result) != (target)){\
@@ -201,6 +210,16 @@ public:
             std::stringstream ss;   \
             ss << "Error: " << __func__ << ":" << __LINE__ << " " << component_name << " result is " << print_func(result) << " but should be " << \
                 print_func(target) << "." << std::endl; \
+            return ss.str(); \
+        } \
+    } while (0)
+
+#define TEST_RESULT_APPROXIMATE_STR(result, target, threshold) \
+    do { \
+        if (std::fabs((result) - (target)) > (threshold)){\
+            std::stringstream ss;   \
+            ss << "Error: " << __func__ << ":" << __LINE__ << " result is " << (result) << " but should be close to " << (target) << \
+                " with threshold: " << (threshold) << "." << std::endl; \
             return ss.str(); \
         } \
     } while (0)

@@ -11,7 +11,6 @@
 #include "NintendoSwitch_Tests.h"
 #include "PokemonFRLG_Tests.h"
 #include "PokemonHome_Tests.h"
-#include "PokemonLA_Tests_Old.h"
 #include "PokemonLZA_Tests.h"
 #include "PokemonSV_Tests.h"
 #include "TestMap.h"
@@ -233,27 +232,6 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"NintendoSwitch_CheckOnlineDetector", std::bind(image_bool_detector_helper, test_NintendoSwitch_CheckOnlineDetector, _1)},
     {"NintendoSwitch_FailedToConnectDetector", std::bind(image_bool_detector_helper, test_NintendoSwitch_FailedToConnectDetector, _1)},
     {"NintendoSwitch_UpdatePopupDetector", std::bind(image_bool_detector_helper, test_NintendoSwitch_UpdatePopupDetector, _1)},
-    {"PokemonLA_BattleMenuDetector", std::bind(image_bool_detector_helper, test_pokemonLA_BattleMenuDetector, _1)},
-    {"PokemonLA_BattlePokemonSwitchDetector", std::bind(image_bool_detector_helper, test_pokemonLA_BattlePokemonSwitchDetector, _1)},
-    {"PokemonLA_TransparentDialogueDetector", std::bind(image_bool_detector_helper, test_pokemonLA_TransparentDialogueDetector, _1)},
-    {"PokemonLA_EventDialogDetector", std::bind(image_bool_detector_helper, test_pokemonLA_EventDialogDetector, _1)},
-    {"PokemonLA_DialogYellowArrowDetector", std::bind(image_bool_detector_helper, test_pokemonLA_DialogYellowArrowDetector, _1)},
-    {"PokemonLA_BlackOutDetector", std::bind(image_bool_detector_helper, test_pokemonLA_BlackOutDetector, _1)},
-    {"PokemonLA_BattleStartDetector", std::bind(image_bool_detector_helper, test_pokemonLA_BattleStartDetector, _1)},
-    {"PokemonLA_BerryTreeDetector", std::bind(image_void_detector_helper, test_pokemonLA_BerryTreeDetector, _1)},
-    {"PokemonLA_MMOQuestionMarkDetector", std::bind(image_words_detector_helper, test_pokemonLA_MMOQuestionMarkDetector, _1)},
-    {"PokemonLA_StatusInfoScreenDetector", std::bind(image_words_detector_helper, test_pokemonLA_StatusInfoScreenDetector, _1)},
-    {"PokemonLA_WildPokemonFocusDetector", std::bind(image_words_detector_helper, test_pokemonLA_WildPokemonFocusDetector, _1)},
-    {"PokemonLA_BattleSpriteWatcher", std::bind(image_words_detector_helper, test_pokemonLA_BattleSpriteWatcher, _1)},
-    {"PokemonLA_SaveScreenDetector", std::bind(image_words_detector_helper, test_pokemonLA_SaveScreenDetector, _1)},
-    {"PokemonLA_MapMarkerLocator", std::bind(image_non_negative_float_detector_helper, test_pokemonLA_MapMarkerLocator, _1)},
-    {"PokemonLA_MapZoomLevelReader", std::bind(image_int_detector_helper, test_pokemonLA_MapZoomLevelReader, _1)},
-    {"PokemonLA_BattleSpriteArrowDetector", std::bind(image_int_detector_helper, test_pokemonLA_BattleSpriteArrowDetector, _1)},
-    {"PokemonLA_MapMissionTabReader", std::bind(image_bool_detector_helper, test_pokemonLA_MapMissionTabReader, _1)},
-    {"PokemonLA_ShinySoundDetector", std::bind(sound_bool_detector_helper, test_pokemonLA_shinySoundDetector, _1)},
-    {"PokemonLA_MMOSpriteMatcher", test_pokemonLA_MMOSpriteMatcher},
-    {"PokemonLA_MapWeatherAndTimeReader", std::bind(image_words_detector_helper, test_pokemonLA_MapWeatherAndTimeReader, _1)},
-    {"PokemonLA_FlagTrackerPerformance", std::bind(image_int_detector_helper, test_pokemonLA_FlagTracker_performance, _1)},
     {"PokemonHome_BoxView", std::bind(image_words_detector_helper, test_pokemonHome_BoxView, _1)},
     {"PokemonHome_SummaryScreen", std::bind(image_words_detector_helper, test_pokemonHome_SummaryScreen, _1)},
     {"PokemonSV_MapDetector", std::bind(image_words_detector_helper, test_pokemonSV_MapDetector, _1)},

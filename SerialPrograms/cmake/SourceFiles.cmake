@@ -2904,8 +2904,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Tests/PokemonFRLG_Tests.h
     Source/Tests/PokemonHome_Tests.cpp
     Source/Tests/PokemonHome_Tests.h
-    Source/Tests/PokemonLA_Tests_Old.cpp
-    Source/Tests/PokemonLA_Tests_Old.h
     Source/Tests/PokemonLZA_Tests.cpp
     Source/Tests/PokemonLZA_Tests.h
     Source/Tests/PokemonSV_Tests.cpp

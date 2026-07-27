@@ -4,6 +4,8 @@
  *
  */
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
@@ -13,6 +15,7 @@
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Async/InferenceRoutines.h"
+#include "Tests/TestUtils.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 #include "PokemonLA_GameSave.h"
@@ -120,6 +123,60 @@ bool save_game_from_overworld(
 }
 
 
+
+
+
+class Test_GameSave : public UnitTest{
+public:
+    Test_GameSave(
+        const std::string& image,
+        std::vector<std::string> keywords
+    )
+        : UnitTest("PokemonLA::GameSave - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_keywords(std::move(keywords))
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+
+        // two keywords: <True/False> <True/False>
+        if (m_keywords.size() < 2){
+            std::stringstream ss;
+            ss << "Error: not enough number of keywords in the filename. Found only " << m_keywords.size() << "." << std::endl;
+            return ss.str();
+        }
+
+        bool target_save_tab = false;
+        if (parse_bool(m_keywords[m_keywords.size()-2], target_save_tab) == false){
+            std::stringstream ss;
+            ss << "Error: True/False keyword " << m_keywords[m_keywords.size()-2] << " is wrong. Must be \"True\" or \"False\"." << std::endl;
+            return ss.str();
+        }
+        bool target_save_disabled = false;
+        if (parse_bool(m_keywords[m_keywords.size()-1], target_save_disabled) == false){
+            std::stringstream ss;
+            ss << "Error: True/False keyword " << m_keywords[m_keywords.size()-1] << " is wrong. Must be \"True\" or \"False\"." << std::endl;
+            return ss.str();
+        }
+
+        ImageRGB32 image(m_image);
+        bool save_tab = save_tab_selected(image);
+        bool save_disabled = save_tab_disabled(image);
+
+        TEST_RESULT_COMPONENT_EQUAL_STR(save_tab, target_save_tab, "save tab");
+        TEST_RESULT_COMPONENT_EQUAL_STR(save_disabled, target_save_disabled, "save disabled");
+
+        return true;
+    };
+
+private:
+    std::string m_image;
+    std::vector<std::string> m_keywords;
+};
+
+void add_tests_GameSave(UnitTestDatabase& database){
+
+}
 
 
 

@@ -4,13 +4,17 @@
  *
  */
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/ImageGradient.h"
 #include "CommonTools/OCR/OCR_Routines.h"
+#include "Tests/TestUtils.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
+#include "PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.h"
 #include "PokemonLA_WildPokemonFocusDetector.h"
@@ -155,6 +159,106 @@ bool detect_change_focus(Logger& logger, VideoOverlay& overlay, const ImageViewR
     
     return button.process_frame(frame, current_time());
 }
+
+
+
+
+
+
+
+
+class Test_WildPokemonFocusDetector : public UnitTest{
+public:
+    Test_WildPokemonFocusDetector(
+        const std::string& image,
+        std::vector<std::string> keywords
+    )
+        : UnitTest("PokemonLA::WildPokemonFocusDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_keywords(std::move(keywords))
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        std::stringstream ss;
+
+        // two keywords: <True/False> <True/False>
+        if (m_keywords.size() < 2){
+            ss << "Error: not enough number of keywords in the filename. Found only " << m_keywords.size() << "." << std::endl;
+            return ss.str();
+        }
+
+        DummyVideoOverlay overlay;
+
+        WildPokemonFocusDetector detector(logger, overlay);
+        ImageRGB32 image(m_image);
+        bool result_has_focus = detector.process_frame(image, current_time());
+
+        auto check_can_change_focus = [&](const std::string& word) -> std::string {
+            bool result_can_change = detect_change_focus(logger, overlay, image);
+            bool target_can_change = false;
+            if (parse_bool(word, target_can_change) == false){
+                ss << "Error: True/False keyword " << word << " is wrong. Must be \"True\" or \"False\"." << std::endl;
+                return ss.str();
+            }
+            TEST_RESULT_EQUAL_STR(result_can_change, target_can_change);
+            return "";
+        };
+
+        bool target_has_focus = false;
+        if (parse_bool(m_keywords[m_keywords.size()-2], target_has_focus) == true){
+            TEST_RESULT_EQUAL(result_has_focus, target_has_focus);
+
+            return check_can_change_focus(m_keywords[m_keywords.size()-1]);
+        }
+
+        // Or seven keywords:
+        // the last seven keywords should be: <True/False> <True/False> <language> <pokemon name slug> <Shiny/NotShiny> <Alpha/NotAlpha> <Male/Female/Genderless>
+        if (m_keywords.size() < 7){
+            ss << "Error: not enough number of keywords in the filename. Found only " << m_keywords.size() << "." << std::endl;
+            return ss.str();
+        }
+
+        if (parse_bool(m_keywords[m_keywords.size()-7], target_has_focus) == false){
+            ss << "Error: True/False keyword " << m_keywords[m_keywords.size()-7] << " is wrong. Must be \"True\" or \"False\"." << std::endl;
+            return ss.str();
+        }
+
+        TEST_RESULT_EQUAL(result_has_focus, target_has_focus);
+
+        if (result_has_focus){
+            std::string ret = check_can_change_focus(m_keywords[m_keywords.size()-6]);
+            if (!ret.empty()){
+                return ret;
+            }
+
+            Language language = Language::None;
+            PokemonDetails target_info;
+            ret = read_pokemon_info_from_words(m_keywords, language, target_info);
+            if (!ret.empty()){
+                return ret;
+            }
+
+            const auto info = read_focused_wild_pokemon_info(logger, overlay, image, language);
+
+            return test_pokemon_details(info, target_info);
+        }
+
+        return true;
+    };
+
+private:
+    std::string m_image;
+    std::vector<std::string> m_keywords;
+};
+
+
+
+
+
+void add_tests_WildPokemonFocusDetector(UnitTestDatabase& database){
+
+}
+
 
 
 

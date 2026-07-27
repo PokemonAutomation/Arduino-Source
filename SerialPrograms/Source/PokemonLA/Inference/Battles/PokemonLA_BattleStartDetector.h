@@ -9,8 +9,8 @@
 #ifndef PokemonAutomation_PokemonLA_BattleStartDetector_H
 #define PokemonAutomation_PokemonLA_BattleStartDetector_H
 
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 
@@ -33,6 +33,14 @@ private:
     // Record whether a battle start has been detected. This is used for logging.
     bool m_started = false;
 };
+
+
+
+
+
+void add_tests_BattleStartDetector(UnitTestDatabase& database);
+
+
 
 
 }

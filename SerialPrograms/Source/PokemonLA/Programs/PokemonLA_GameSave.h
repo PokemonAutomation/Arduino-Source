@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_GameSave_H
 #define PokemonAutomation_PokemonLA_GameSave_H
 
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 
@@ -30,6 +31,10 @@ bool save_game_from_overworld(
     VideoStream& stream, ProControllerContext& context
 );
 
+
+
+
+void add_tests_GameSave(UnitTestDatabase& database);
 
 
 

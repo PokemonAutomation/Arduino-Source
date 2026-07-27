@@ -9,6 +9,7 @@
 #ifndef PokemonAutomation_PokemonLA_MapWeatherAndTimeReader_H
 #define PokemonAutomation_PokemonLA_MapWeatherAndTimeReader_H
 
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "PokemonLA/PokemonLA_WeatherAndTime.h"
 
 namespace PokemonAutomation{
@@ -22,6 +23,11 @@ Weather detect_weather_on_map(Logger& logger, const ImageViewRGB32& screen);
 
 
 TimeOfDay detect_time_of_day_on_map(Logger& logger, const ImageViewRGB32& screen);
+
+
+
+
+void add_tests_MapWeatherAndTimeReader(UnitTestDatabase& database);
 
 
 

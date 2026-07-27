@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_BerryTreeDetector_H
 #define PokemonAutomation_PokemonLA_BerryTreeDetector_H
 
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 
@@ -26,6 +27,11 @@ public:
 
 private:
 };
+
+
+
+
+void add_tests_BerryTreeDetector(UnitTestDatabase& database);
 
 
 }

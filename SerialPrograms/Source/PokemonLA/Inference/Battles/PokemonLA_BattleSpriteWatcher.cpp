@@ -6,11 +6,14 @@
 
 #include <vector>
 #include "Common/Cpp/Logging/AbstractLogger.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "Tests/TestUtils.h"
 #include "PokemonLA_BattleSpriteWatcher.h"
 
 #include <iostream>
@@ -78,6 +81,49 @@ bool BattleSpriteWatcher::set_detected_sprites(const ImageViewRGB32& frame, std:
 
     return ret;
 }
+
+
+
+
+
+
+
+class Test_BattleSpriteWatcher : public UnitTest{
+public:
+    Test_BattleSpriteWatcher(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonLA::BattleSpriteWatcher - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyVideoOverlay overlay;
+        BattleSpriteWatcher detector(logger, overlay);
+        ImageRGB32 image(m_image);
+        return detector.process_frame(image, current_time()) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+
+
+void add_tests_BattleSpriteWatcher(UnitTestDatabase& database){
+
+}
+
+
+
+
+
+
+
+
 
 
 }

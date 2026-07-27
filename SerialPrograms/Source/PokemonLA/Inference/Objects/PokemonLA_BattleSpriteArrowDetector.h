@@ -9,6 +9,7 @@
 #ifndef PokemonAutomation_PokemonLA_BattleSpriteArrowDetector_H
 #define PokemonAutomation_PokemonLA_BattleSpriteArrowDetector_H
 
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/DetectionDebouncer.h"
@@ -72,6 +73,9 @@ private:
     DetectionDebouncer<bool> m_debouncer;
 };
 
+
+
+void add_tests_BattleSpriteArrowDetector(UnitTestDatabase& database);
 
 
 }

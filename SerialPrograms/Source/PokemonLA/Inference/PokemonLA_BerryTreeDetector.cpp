@@ -10,6 +10,8 @@
 #include <map>
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Time.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "Kernels/Algorithm/Kernels_Algorithm_DisjointSet.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
@@ -384,6 +386,44 @@ bool BerryTreeDetector::process_frame(const ImageViewRGB32& frame, WallClock tim
 
     return true;
 }
+
+
+
+
+
+
+
+
+class Test_BerryTreeDetector : public UnitTest{
+public:
+    Test_BerryTreeDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonLA::BerryTreeDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        BerryTreeDetector detector;
+        ImageRGB32 image(m_image);
+        return detector.process_frame(image, current_time()) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+
+void add_tests_BerryTreeDetector(UnitTestDatabase& database){
+
+}
+
+
+
+
 
 
 

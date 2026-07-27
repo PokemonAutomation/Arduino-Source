@@ -5,7 +5,11 @@
  */
 
 #include "Common/Cpp/Logging/AbstractLogger.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "CommonTools/DetectedBoxes.h"
+#include "Tests/TestUtils.h"
+#include "PokemonLA/Inference/Battles/PokemonLA_BattleSpriteWatcher.h"
 #include "PokemonLA_BattleSpriteArrowDetector.h"
 
 namespace PokemonAutomation{
@@ -96,6 +100,63 @@ bool BattleSpriteArrowDetector::process_frame(const ImageViewRGB32& frame, WallC
     bool detected = m_debouncer.push_value(!m_tracker.detections().empty(), timestamp);
     return detected && m_stop_on_detected;
 }
+
+
+
+
+
+
+
+
+
+class Test_BattleSpriteArrowDetector : public UnitTest{
+public:
+    Test_BattleSpriteArrowDetector(
+        const std::string& image,
+        int target
+    )
+        : UnitTest("PokemonLA::BattleSpriteArrowDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_target(target)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyVideoOverlay overlay;
+        ImageRGB32 image(m_image);
+
+        const size_t target_index = m_target;
+        for (size_t sprite_index = 0; sprite_index < MAX_WILD_POKEMON_IN_MULTI_BATTLE; sprite_index++){
+            BattleSpriteArrowDetector detector(logger, overlay, sprite_index, std::chrono::milliseconds(0), true);
+            bool result = detector.process_frame(image, current_time());
+            if (sprite_index != target_index && result){
+                std::stringstream ss;
+                ss << "Error: in test_pokemonLA_BattleSpriteArrowDetector detected arrow at sprite index " << sprite_index
+                     << " but should be at sprite index " << m_target << std::endl;
+                return ss.str();
+            }else if (sprite_index == target_index && result == false){
+                std::stringstream ss;
+                ss << "Error: in test_pokemonLA_BattleSpriteArrowDetector failed to detect arrow at sprite index " << sprite_index << std::endl;
+                return ss.str();
+            }
+        }
+
+        return true;
+    };
+
+private:
+    std::string m_image;
+    int m_target;
+};
+
+
+
+
+
+void add_tests_BattleSpriteArrowDetector(UnitTestDatabase& database){
+
+}
+
+
 
 
 

@@ -8,6 +8,8 @@
 #ifndef PokemonAutomation_PokemonLA_MapLocation_H
 #define PokemonAutomation_PokemonLA_MapLocation_H
 
+#include "Common/Cpp/TestRunners/UnitTest.h"
+
 namespace PokemonAutomation{
     class ImageViewRGB32;
 namespace NintendoSwitch{
@@ -29,6 +31,11 @@ enum class MapRegion;
 //   2 (local area view). If `avoid_lava_area` is true, skip the red pixels that are in the upper right
 //   area of the map, which is well the lava area is on the coastlands map at zoom level 1.
 double get_orientation_on_map(const ImageViewRGB32& screen, bool avoid_lava_area = false);
+
+
+
+
+void add_tests_MapMarkerLocator(UnitTestDatabase& database);
 
 
 }

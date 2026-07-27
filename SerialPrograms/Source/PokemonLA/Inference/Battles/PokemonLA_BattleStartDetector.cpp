@@ -4,11 +4,14 @@
  *
  */
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/ImageGradient.h"
+#include "Tests/TestUtils.h"
 #include "PokemonLA_BattleStartDetector.h"
 
 //#include <iostream>
@@ -59,6 +62,50 @@ bool BattleStartDetector::process_frame(const ImageViewRGB32& frame, WallClock t
 
     return detected;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+class Test_BattleStartDetector : public UnitTest{
+public:
+    Test_BattleStartDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonLA::BattleStartDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyVideoOverlay overlay;
+        BattleStartDetector detector(logger, overlay);
+        ImageRGB32 image(m_image);
+        return detector.process_frame(image, current_time()) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+
+
+
+void add_tests_BattleStartDetector(UnitTestDatabase& database){
+
+}
+
+
+
 
 
 

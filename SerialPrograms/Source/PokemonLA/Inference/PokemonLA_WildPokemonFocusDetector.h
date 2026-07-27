@@ -8,8 +8,8 @@
 #ifndef PokemonAutomation_PokemonLA_WildPokemonFocusDetector_H
 #define PokemonAutomation_PokemonLA_WildPokemonFocusDetector_H
 
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -52,6 +52,13 @@ PokemonDetails read_focused_wild_pokemon_info(
 
 // Detect the A button to know whether you can press A to change focus.
 bool detect_change_focus(Logger& logger, VideoOverlay& overlay, const ImageViewRGB32& frame);
+
+
+
+
+
+void add_tests_WildPokemonFocusDetector(UnitTestDatabase& database);
+
 
 
 }

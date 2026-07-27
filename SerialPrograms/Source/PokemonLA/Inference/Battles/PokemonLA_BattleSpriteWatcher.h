@@ -62,6 +62,13 @@ private:
 };
 
 
+
+
+
+void add_tests_BattleSpriteWatcher(UnitTestDatabase& database);
+
+
+
 }
 }
 }
