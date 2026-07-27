@@ -6,7 +6,7 @@
 
 
 #include "Common/Compiler.h"
-#include "PokemonLA_Tests.h"
+#include "PokemonLA_Tests_Old.h"
 #include "TestUtils.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -16,7 +16,7 @@
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleSpriteWatcher.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_DialogYellowArrowDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_MMOQuestionMarkDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_TransparentDialogueDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleStartDetector.h"
@@ -98,11 +98,11 @@ int test_pokemonLA_EventDialogDetector(const ImageViewRGB32& image, bool target)
     return 0;
 }
 
-int test_pokemonLA_DialogueYellowArrowDetector(const ImageViewRGB32& image, bool target){
+int test_pokemonLA_DialogYellowArrowDetector(const ImageViewRGB32& image, bool target){
     auto& logger = global_logger_command_line();
     auto overlay = DummyVideoOverlay();
     const bool stop_on_detected = true;
-    DialogueYellowArrowDetector detector(logger, overlay, stop_on_detected);
+    DialogYellowArrowDetector detector(logger, overlay, stop_on_detected);
 
     bool result = detector.process_frame(image, current_time());
     TEST_RESULT_EQUAL(result, target);

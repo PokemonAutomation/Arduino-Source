@@ -58,7 +58,7 @@ public:
     ) override{}
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
-    virtual void on_press() override;
+    virtual void on_press(ButtonCell& button) override;
 
 private:
     struct Stats : public StatsTracker{

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_BoxDraw_H
 #define PokemonAutomation_NintendoSwitch_BoxDraw_H
 
-#include "CommonFramework/Options/BoxOption.h"
+#include "CommonFramework/Options/NestedBoxDrawOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -31,11 +31,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
-    class DrawnBox;
-
-private:
-    BoxOption INFERENCE_BOX;
-    BoxOption CONTENT_BOX;
+    NestedBoxDrawOption BOX_DRAW;
 };
 
 

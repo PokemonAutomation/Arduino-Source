@@ -4,9 +4,10 @@
  *
  */
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "PokemonLA_TransparentDialogueDetector.h"
-
-#include <chrono>
+#include "Tests/TestUtils.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -44,6 +45,46 @@ bool TransparentDialogueDetector::process_frame(const ImageViewRGB32& frame, Wal
 
 
 
+
+
+
+class Test_TransparentDialogueDetector : public UnitTest{
+public:
+    Test_TransparentDialogueDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonLA::TransparentDialogueDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyVideoOverlay overlay;
+        TransparentDialogueDetector detector(logger, overlay, true);
+        ImageRGB32 image(m_image);
+        return detector.process_frame(image, current_time()) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+
+void add_tests_TransparentDialogueDetector(UnitTestDatabase& database){
+    database.add<Test_TransparentDialogueDetector>("PokemonLA/TransparentDialogueDetector/macOS_bright/Avalugg_1_False.png", false);
+    database.add<Test_TransparentDialogueDetector>("PokemonLA/TransparentDialogueDetector/macOS_bright/Avalugg_2_False.png", false);
+    database.add<Test_TransparentDialogueDetector>("PokemonLA/TransparentDialogueDetector/macOS_bright/BrenDay_True.png", true);
+    database.add<Test_TransparentDialogueDetector>("PokemonLA/TransparentDialogueDetector/macOS_bright/BrenEvening_1_True.png", true);
+    database.add<Test_TransparentDialogueDetector>("PokemonLA/TransparentDialogueDetector/macOS_bright/BrenEvening_2_True.png", true);
+    database.add<Test_TransparentDialogueDetector>("PokemonLA/TransparentDialogueDetector/macOS_bright/BrenMorning_True.png", true);
+    database.add<Test_TransparentDialogueDetector>("PokemonLA/TransparentDialogueDetector/macOS_bright/BrenNight_True.png", true);
+    database.add<Test_TransparentDialogueDetector>("PokemonLA/TransparentDialogueDetector/macOS_bright/FieldlandsCoinDay_True.png", true);
+    database.add<Test_TransparentDialogueDetector>("PokemonLA/TransparentDialogueDetector/macOS_bright/MirelandsCoinEvening_True.png", true);
+    database.add<Test_TransparentDialogueDetector>("PokemonLA/TransparentDialogueDetector/macOS_bright/WendyNight_True.png", true);
+
+}
 
 
 }

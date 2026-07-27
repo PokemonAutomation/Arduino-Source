@@ -4,8 +4,11 @@
  *
  */
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "Tests/TestUtils.h"
 #include "PokemonLA_BlackOutDetector.h"
 
 #include <iostream>
@@ -85,6 +88,52 @@ bool BlackOutDetector::process_frame(const ImageViewRGB32& frame, WallClock time
     // save_image();
     // return true;
 }
+
+
+
+
+
+
+class Test_BlackOutDetector : public UnitTest{
+public:
+    Test_BlackOutDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonLA::BlackOutDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyVideoOverlay overlay;
+        BlackOutDetector detector(logger, overlay);
+        ImageRGB32 image(m_image);
+        return detector.process_frame(image, current_time()) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+
+
+
+
+void add_tests_BlackOutDetector(UnitTestDatabase& database){
+    database.add<Test_BlackOutDetector>("PokemonLA/BlackOutDetector/macOS_bright/BlackOut1_True.png", true);
+    database.add<Test_BlackOutDetector>("PokemonLA/BlackOutDetector/macOS_bright/BlackOut2_True.png", true);
+    database.add<Test_BlackOutDetector>("PokemonLA/BlackOutDetector/macOS_bright/Coastlands_False.png", false);
+    database.add<Test_BlackOutDetector>("PokemonLA/BlackOutDetector/macOS_bright/Fieldlands_False.jpg", false);
+    database.add<Test_BlackOutDetector>("PokemonLA/BlackOutDetector/macOS_bright/Mirelands_False.png", false);
+    database.add<Test_BlackOutDetector>("PokemonLA/BlackOutDetector/macOS_bright/Village_False.png", false);
+
+    database.add<Test_BlackOutDetector>("PokemonLA/BlackOutDetector/WinPowcxy/BlackOut_True.png", true);
+
+}
+
+
 
 
 

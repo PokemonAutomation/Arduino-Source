@@ -35,15 +35,15 @@ public:
 private:
     virtual void mouseDoubleClickEvent(QMouseEvent* event) override;
 
+    void make_options();
+
 protected:
     GroupOption& m_value;
     QGroupBox* m_group_box;
-    QWidget* m_expand_text;
-    QWidget* m_options_holder;
+    QWidget* m_expand_text = nullptr;
+    QWidget* m_options_holder = nullptr;
     std::vector<ConfigWidget*> m_options;
-    QPushButton* m_restore_defaults_button;
-    bool m_expanded = true;
-    QVBoxLayout* m_options_layout;
+    QPushButton* m_restore_defaults_button = nullptr;
 };
 
 

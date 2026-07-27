@@ -144,7 +144,7 @@ MLModelSessionCreationError::MLModelSessionCreationError(Logger* logger, std::st
 std::string MLModelSessionCreationError::message() const{
     return std::format(
         "Failed to create a model session from {}. "
-        "Probably failure loading the model or not enough GPU memory",
+        "Probably failure loading the model or not enough GPU memory. Also, ensure that the corresponding ONNX model has been downloaded.",
         m_model_path
     );
 }

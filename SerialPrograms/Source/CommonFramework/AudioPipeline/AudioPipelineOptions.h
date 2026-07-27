@@ -22,7 +22,9 @@ public:
         : GroupOption(
             "Audio Pipeline",
             LockMode::LOCK_WHILE_RUNNING,
-            GroupOption::EnableMode::ALWAYS_ENABLED, true
+            GroupOption::EnableMode::ALWAYS_ENABLED,
+            true,
+            false
         )
         , FILE_VOLUME_SCALE(
             "<b>Audio File Input Volume Scale:</b><br>"

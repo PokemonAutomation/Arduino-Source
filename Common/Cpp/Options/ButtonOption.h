@@ -12,9 +12,10 @@
 
 namespace PokemonAutomation{
 
+class ButtonCell;
 
 struct ButtonListener{
-    virtual void on_press() = 0;
+    virtual void on_press(ButtonCell& button) = 0;
 };
 
 

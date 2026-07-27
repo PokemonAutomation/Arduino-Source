@@ -9,6 +9,7 @@
 
 #include <vector>
 #include "Common/Cpp/Containers/Pimpl.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/ConfigOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
@@ -42,6 +43,10 @@ class ErrorReportOption;
 class ResourceDownload;
 
 
+enum class OcrLibrary{
+    PADDLE_OCR,
+    TESSERACT,
+};
 
 class FolderInputOption : public StringOption{
 public:
@@ -117,7 +122,7 @@ public:
 
 private:
     virtual void on_config_value_changed(void* object) override;
-    virtual void on_press() override;
+    virtual void on_press(ButtonCell& button) override;
 
 public:
     Pimpl<CheckForUpdatesOption> CHECK_FOR_UPDATES;
@@ -127,7 +132,8 @@ public:
     FolderInputOption TEMP_FOLDER;
 
     Pimpl<ThemeSelectorOption> THEME;
-    BooleanCheckBoxOption USE_PADDLE_OCR;
+    EnumDropdownOption<OcrLibrary> OCR_LIBRARY;
+    StaticTextOption OCR_WARNING;
     BooleanCheckBoxOption USE_GPU_FOR_ML_INFERENCE;
     SettingsResourceDownloadTable RESOURCE_DOWNLOAD_TABLE;
     SettingsDownloadError DOWNLOAD_ERROR;
@@ -148,6 +154,7 @@ public:
     SectionDividerOption m_advanced_options;
 
     BooleanCheckBoxOption LOG_EVERYTHING;
+    BooleanCheckBoxOption DUMP_VIDEO_FORMATS;
     BooleanCheckBoxOption SAVE_DEBUG_IMAGES;
     BooleanCheckBoxOption SAVE_DEBUG_VIDEOS_ON_SWITCH;
 //    BooleanCheckBoxOption NAUGHTY_MODE_OPTION;

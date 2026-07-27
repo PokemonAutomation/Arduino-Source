@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_BoxOption_H
 #define PokemonAutomation_BoxOption_H
 
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/StringOption.h"
@@ -38,10 +39,10 @@ public:
 private:
     std::string make_full_str() const{
         return
-            std::to_string(X) + ", " +
-            std::to_string(Y) + ", " +
-            std::to_string(WIDTH) + ", " +
-            std::to_string(HEIGHT);
+            tostr_fixed_no_trailing_zero(double(X), 6) + ", " +
+            tostr_fixed_no_trailing_zero(double(Y), 6) + ", " +
+            tostr_fixed_no_trailing_zero(double(WIDTH), 6) + ", " +
+            tostr_fixed_no_trailing_zero(double(HEIGHT), 6);
     }
 
 public:

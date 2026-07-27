@@ -48,6 +48,7 @@ public:
 
     size_t width() const{ return max_x - min_x; }
     size_t height() const{ return max_y - min_y; }
+    size_t box_area() const{ return width() * height(); }
 
     double center_of_gravity_x() const{ return (double)sum_x / area; }
     double center_of_gravity_y() const{ return (double)sum_y / area; }

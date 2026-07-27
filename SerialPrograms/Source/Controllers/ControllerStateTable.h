@@ -54,7 +54,12 @@ public:
         std::string label,
         LockMode lock_while_running
     )
-        : EditableTableOption(std::move(label), lock_while_running)
+        : EditableTableOption(
+            std::move(label),
+            lock_while_running,
+            true,
+            50
+        )
         , m_type(type)
     {}
 

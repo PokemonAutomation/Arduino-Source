@@ -7,8 +7,8 @@
  *  Ingo's battles or Fortune Sisters'.
  */
 
-#ifndef PokemonAutomation_PokemonLA_DialogueEllipseDetector_H
-#define PokemonAutomation_PokemonLA_DialogueEllipseDetector_H
+#ifndef PokemonAutomation_PokemonLA_DialogEllipseDetector_H
+#define PokemonAutomation_PokemonLA_DialogEllipseDetector_H
 
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"

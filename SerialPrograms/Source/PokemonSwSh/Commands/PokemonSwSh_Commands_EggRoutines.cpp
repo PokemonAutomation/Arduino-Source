@@ -67,6 +67,20 @@ void travel_back_to_lady(ProControllerContext& context){
     ssf_press_left_joystick(context, {+1, +1}, 960ms, 960ms);
 }
 
+void travel_to_spin_location2(ProControllerContext& context){
+    ssf_press_left_joystick(context, {+1, -0.126}, 800ms, 2000ms);
+    ssf_press_left_joystick(context, {+1, -1}, 400ms, 400ms);
+}
+void travel_back_to_lady2(ProControllerContext& context){
+    ssf_press_left_joystick(context, {0, -1}, 240ms, 240ms);
+    ssf_press_left_joystick(context, {+1, -0.126}, 2080ms, 2080ms);
+    ssf_press_left_joystick(context, {-1, 0}, 400ms, 3200ms);
+    ssf_mash1_button(context, BUTTON_R, 800ms); // bike boost
+    ssf_do_nothing(context, 2400ms);
+    ssf_press_left_joystick(context, {+0.5, +1}, 960ms, 960ms);
+    ssf_press_left_joystick(context, {+1, +1}, 960ms, 960ms);
+}
+
 
 
 }

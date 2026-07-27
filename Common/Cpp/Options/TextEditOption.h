@@ -17,12 +17,18 @@ class TextEditOption : public ConfigOptionImpl<TextEditOption>{
 public:
     //  Listeners for when the user focuses on this box.
     struct FocusListener{
-        virtual void focus_in(){}
+        virtual void focus_in() = 0;
     };
     void add_focus_listener(FocusListener& listener);
     void remove_focus_listener(FocusListener& listener);
-
     void report_focus_in();
+
+    struct AppendListener{
+        virtual void on_append(std::string text) = 0;
+    };
+    void add_append_listener(AppendListener& listener);
+    void remove_append_listener(AppendListener& listener);
+
 
 public:
     ~TextEditOption();
@@ -42,6 +48,10 @@ public:
     operator std::string() const;
     void set(std::string x);
 
+    void append(std::string x);
+
+
+public:
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 

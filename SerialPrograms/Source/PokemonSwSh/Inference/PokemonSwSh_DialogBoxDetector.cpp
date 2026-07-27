@@ -8,6 +8,8 @@
 #include <array>
 
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
@@ -62,6 +64,24 @@ bool BlackDialogBoxDetector::process_frame(const ImageViewRGB32& frame, WallCloc
     return detected && m_stop_on_detected;
 }
 
+BlackDialogBoxDetector2::BlackDialogBoxDetector2(Color color)
+    : m_color(color)
+    , m_bottom(0.184009, 0.945419, 0.554217, 0.021442)
+    , m_left(0.175246, 0.807018, 0.019715, 0.064327)
+    , m_right(0.808324, 0.810916, 0.014239, 0.146199)
+{}
+void BlackDialogBoxDetector2::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_bottom);
+    items.add(m_color, m_left);
+    items.add(m_color, m_right);
+}
+
+bool BlackDialogBoxDetector2::detect(const ImageViewRGB32& screen){
+    return is_grey(extract_box_reference(screen, m_bottom), 50, 300)
+            && is_black(extract_box_reference(screen, m_left), 200, 50)
+            && is_black(extract_box_reference(screen, m_right), 200, 50);
+}
+
 
 
 
@@ -90,6 +110,36 @@ bool WhiteDialogBoxDetector::detect(const ImageViewRGB32& screen){
 
 
 
+
+
+
+
+class Test_BlackDialogBoxDetector : public UnitTest{
+public:
+    Test_BlackDialogBoxDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonSwSh::BlackDialogBoxDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        BlackDialogBoxDetector detector(true);
+        ImageRGB32 image(m_image);
+        return detector.process_frame(image, current_time()) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+
+void add_tests_DialogBoxDetector(UnitTestDatabase& database){
+
+}
 
 
 

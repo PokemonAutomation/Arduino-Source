@@ -34,7 +34,8 @@ public:
     virtual std::unique_ptr<VideoSource> make_VideoSource(
         Logger& logger,
         Resolution resolution,
-        VideoFormat format
+        VideoFormat format,
+        FramesPerSecond fps
     ) const override;
 
 

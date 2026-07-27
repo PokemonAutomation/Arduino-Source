@@ -5,6 +5,7 @@
  */
 
 #include <set>
+#include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Json/JsonValue.h"
@@ -22,7 +23,8 @@ struct TextEditOption::Data{
 
     mutable SpinLock m_lock;
     std::string m_current;
-    std::set<FocusListener*> listeners;
+    ListenerSet<FocusListener> focus_listeners;
+    ListenerSet<AppendListener> append_listeners;
 
     Data(
         std::string label,
@@ -40,20 +42,23 @@ struct TextEditOption::Data{
 
 void TextEditOption::add_focus_listener(FocusListener& listener){
     Data& data = *m_data;
-    WriteSpinLock lg(data.m_lock);
-    data.listeners.insert(&listener);
+    data.focus_listeners.add(listener);
 }
 void TextEditOption::remove_focus_listener(FocusListener& listener){
     Data& data = *m_data;
-    WriteSpinLock lg(data.m_lock);
-    data.listeners.erase(&listener);
+    data.focus_listeners.remove(listener);
 }
 void TextEditOption::report_focus_in(){
     Data& data = *m_data;
-    ReadSpinLock lg(data.m_lock);
-    for (FocusListener* listener : data.listeners){
-        listener->focus_in();
-    }
+    data.focus_listeners.run_method(&FocusListener::focus_in);
+}
+void TextEditOption::add_append_listener(AppendListener& listener){
+    Data& data = *m_data;
+    data.append_listeners.add(listener);
+}
+void TextEditOption::remove_append_listener(AppendListener& listener){
+    Data& data = *m_data;
+    data.append_listeners.remove(listener);
 }
 
 TextEditOption::~TextEditOption() = default;
@@ -97,6 +102,14 @@ void TextEditOption::set(std::string x){
         }
         m_data->m_current = std::move(x);
     }
+    report_value_changed(this);
+}
+void TextEditOption::append(std::string x){
+    if (x.empty()){
+        return;
+    }
+    m_data->m_current += x;
+    m_data->append_listeners.run_method(&AppendListener::on_append, std::move(x));
     report_value_changed(this);
 }
 

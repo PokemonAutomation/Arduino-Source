@@ -9,7 +9,6 @@
 
 #include <vector>
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/VideoPipeline/VideoSourceDescriptor.h"
 #include "CommonFramework/VideoPipeline/CameraInfo.h"
 
@@ -41,7 +40,8 @@ public:
         Logger& logger,
         const CameraInfo& info,
         Resolution resolution,
-        VideoFormat format
+        VideoFormat format,
+        FramesPerSecond fps
     ) const = 0;
 };
 

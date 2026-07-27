@@ -26,6 +26,12 @@ template class RegisterConfigWidget<EditableTableWidget>;
 
 
 
+void EditableTableWidget::Label::mouseDoubleClickEvent(QMouseEvent* event){
+    m_parent->mouseDoubleClickEvent(event);
+}
+
+
+
 EditableTableWidget::~EditableTableWidget(){
     m_value.remove_listener(*this);
     delete m_table;
@@ -34,13 +40,13 @@ EditableTableWidget::EditableTableWidget(QWidget& parent, EditableTableOption& v
     : QWidget(&parent)
     , ConfigWidget(value, *this)
     , m_value(value)
-    , m_table(nullptr)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
 
     if (!value.label().empty()){
-        QLabel* label = new QLabel(QString::fromStdString(value.label()), this);
+        Label* label = new Label(QString::fromStdString(value.label()), this);
+        label->m_parent = this;
         label->setWordWrap(true);
         label->setTextFormat(Qt::RichText);
         label->setTextInteractionFlags(Qt::TextBrowserInteraction);
@@ -48,48 +54,20 @@ EditableTableWidget::EditableTableWidget(QWidget& parent, EditableTableOption& v
         layout->addWidget(label);
     }
 
-    m_table = new AutoHeightTableWidget(this);
-    layout->addWidget(m_table, 0, Qt::AlignTop);
-//    m_table->setMouseTracking(false);
-
-    QStringList header;
-    for (const std::string& name : m_value.make_header()){
-        header << QString::fromStdString(name);
-    }
-    header << "" << "" << "";
-    m_table->setColumnCount(int(header.size()));
-    m_table->setHorizontalHeaderLabels(header);
-
-    QFont font;
-    font.setBold(true);
-    m_table->horizontalHeader()->setFont(font);
-//    m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
-
-    //  Add row button.
     {
-        int row = m_table->rowCount();
-        m_table->insertRow(row);
-
-        QPushButton* button = new QPushButton(m_table);
-        button->setText("Add Row");
-        m_table->setCellWidget(row, 0, button);
-        connect(
-            button, &QPushButton::clicked,
-            this, [this](bool){
-                int index = (int)m_current.size();
-                m_value.insert_row(index, m_value.make_row());
-            }
-        );
+        m_expand_text = new QWidget(this);
+        m_expand_text->setLayout(new QVBoxLayout());
+        m_expand_text->layout()->addWidget(new QLabel("<font color=\"orange\">(double click to expand table)</font>", this));
+        m_expand_text->setVisible(false);
+        layout->addWidget(m_expand_text);
     }
 
-    EditableTableWidget::update_value();
-//    EditableTableWidget2::value_changed();
-
-//    m_table->resizeColumnsToContents();
-//    m_table->resizeRowsToContents();
-    m_table->update_height();
-
+    if (value.expand_by_default()){
+        m_expand_text->setVisible(false);
+        make_table();
+    }else{
+        m_expand_text->setVisible(true);
+    }
 
     if (value.saveload_enabled()){
         QHBoxLayout* buttons = new QHBoxLayout();
@@ -168,18 +146,24 @@ EditableTableWidget::EditableTableWidget(QWidget& parent, EditableTableOption& v
 }
 
 void EditableTableWidget::update_value(){
+    if (m_table == nullptr){
+        m_current.clear();
+        return;
+    }
+
     //  Refresh the header in case that changed.
     QStringList header;
     for (const std::string& name : m_value.make_header()){
         header << QString::fromStdString(name);
     }
     header << "" << "" << "";
+
     m_table->setColumnCount(int(header.size()));
     m_table->setHorizontalHeaderLabels(header);
 
     //  Now update the table.
     std::vector<std::shared_ptr<EditableTableRow>> latest = m_value.current_refs();
-//    cout << "latest.size() = " << latest.size() << endl;
+//    cout << "m_current.size() = " << m_current.size() << ", latest.size() = " << latest.size() << endl;
 
 //    //  Adding cells to a table overwrites their visibility. Store all the cells
 //    //  here so we can correct their visibility later.
@@ -221,8 +205,8 @@ void EditableTableWidget::update_value(){
             continue;
         }
 
-        //  Add the row from the new list.
-        m_table->insertRow((int)index_new);
+            //  Add the row from the new list.
+            m_table->insertRow((int)index_new);
 
         //  Populate widgets.
         {
@@ -284,25 +268,82 @@ void EditableTableWidget::update_value(){
 #endif
 }
 void EditableTableWidget::on_config_value_changed(void* object){
-    QMetaObject::invokeMethod(m_table, [this]{
+    QMetaObject::invokeMethod(this, [this]{
         update_value();
     }, Qt::QueuedConnection);
 }
 void EditableTableWidget::update_sizes(){
 //    cout << "update_sizes()" << endl;
-    QMetaObject::invokeMethod(m_table, [this]{
-//        cout << "before = " << m_table->cellWidget(0, 1)->width() << endl;
-        m_table->resizeColumnsToContents();
-        m_table->resizeRowsToContents();
-        m_table->update_height();
-//        cout << "after = " << m_table->cellWidget(0, 1)->width() << endl;
+    QMetaObject::invokeMethod(this, [this]{
+        if (m_table != nullptr){
+            m_table->resizeColumnsToContents();
+            m_table->resizeRowsToContents();
+            m_table->update_height();
+        }
     }, Qt::QueuedConnection);
 }
 
 
+void EditableTableWidget::mouseDoubleClickEvent(QMouseEvent* event){
+    if (m_table){
+        m_expand_text->setVisible(true);
+        delete m_table;
+        m_table = nullptr;
+        m_current.clear();
+        return;
+    }
 
+    m_expand_text->setVisible(false);
+    make_table();
+}
+
+
+void EditableTableWidget::make_table(){
+    m_table = new AutoHeightTableWidget(this);
+    QVBoxLayout* layout = static_cast<QVBoxLayout*>(this->layout());
+    layout->insertWidget(layout->count() - 1, m_table, 0, Qt::AlignTop);
+//    m_table->setMouseTracking(false);
+
+    QStringList header;
+    for (const std::string& name : m_value.make_header()){
+        header << QString::fromStdString(name);
+    }
+    header << "" << "" << "";
+    m_table->setColumnCount(int(header.size()));
+    m_table->setHorizontalHeaderLabels(header);
+
+    QFont font;
+    font.setBold(true);
+    m_table->horizontalHeader()->setFont(font);
+//    m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+
+    //  Add row button.
+    {
+        int row = m_table->rowCount();
+        m_table->insertRow(row);
+
+        QPushButton* button = new QPushButton(m_table);
+        button->setText("Add Row");
+        m_table->setCellWidget(row, 0, button);
+        connect(
+            button, &QPushButton::clicked,
+            this, [this](bool){
+                int index = (int)m_current.size();
+                m_value.insert_row(index, m_value.make_row());
+            }
+        );
+    }
+
+    EditableTableWidget::update_value();
+//    EditableTableWidget2::value_changed();
+
+//    m_table->resizeColumnsToContents();
+//    m_table->resizeRowsToContents();
+    m_table->update_height();
+}
 QWidget* EditableTableWidget::make_clone_button(EditableTableRow& row){
-    QPushButton* button = new QPushButton(m_table);
+    QPushButton* button = new QPushButton(this);
 
     QFont font;
     font.setBold(true);
@@ -320,7 +361,7 @@ QWidget* EditableTableWidget::make_clone_button(EditableTableRow& row){
     return button;
 }
 QWidget* EditableTableWidget::make_insert_button(EditableTableRow& row){
-    QPushButton* button = new QPushButton(m_table);
+    QPushButton* button = new QPushButton(this);
 
     QFont font;
     font.setBold(true);
@@ -338,7 +379,7 @@ QWidget* EditableTableWidget::make_insert_button(EditableTableRow& row){
     return button;
 }
 QWidget* EditableTableWidget::make_delete_button(EditableTableRow& row){
-    QPushButton* button = new QPushButton(m_table);
+    QPushButton* button = new QPushButton(this);
 
     QFont font;
     font.setBold(true);

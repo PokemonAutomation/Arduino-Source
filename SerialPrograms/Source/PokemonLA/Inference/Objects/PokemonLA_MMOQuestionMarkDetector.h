@@ -11,6 +11,7 @@
 #include <array>
 #include <vector>
 #include "Common/Cpp/Logging/AbstractLogger.h"
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 
 namespace PokemonAutomation{
@@ -43,6 +44,11 @@ private:
 
 // Show output of `MMOQuestionMarkDetector::detect_MMO_on_hisui_map()` to video overlay.
 void add_hisui_MMO_detection_to_overlay(const std::array<bool, 5>& detection_result, VideoOverlaySet& items);
+
+
+
+
+void add_tests_MMOQuestionMarkDetector(UnitTestDatabase& database);
 
 
 }

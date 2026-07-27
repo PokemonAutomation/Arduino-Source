@@ -4,7 +4,9 @@
  *
  */
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
@@ -161,6 +163,87 @@ bool YCommIconDetector::detect(const ImageViewRGB32& screen){
 //    cout << "end" << endl;
     return !m_is_on;
 }
+
+
+
+
+
+
+
+
+class Test_YCommIconDetector : public UnitTest{
+public:
+    Test_YCommIconDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonSwSh::YCommIconDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        YCommIconDetector detector(COLOR_RED, true);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+class Test_YCommMenuDetector : public UnitTest{
+public:
+    Test_YCommMenuDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonSwSh::YCommMenuDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        YCommMenuDetector detector(true);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+
+
+
+void add_tests_YCommDetector(UnitTestDatabase& database){
+    database.add<Test_YCommIconDetector>("PokemonSwSh/YCommIconDetector/Front_Door_2_True.png", true);
+    database.add<Test_YCommIconDetector>("PokemonSwSh/YCommIconDetector/Front_Door_3_True.png", true);
+    database.add<Test_YCommIconDetector>("PokemonSwSh/YCommIconDetector/Front_Door_True.png", true);
+    database.add<Test_YCommIconDetector>("PokemonSwSh/YCommIconDetector/macOS_bright/Nursery_False.png", false);
+    database.add<Test_YCommIconDetector>("PokemonSwSh/YCommIconDetector/macOS_bright/Nursery_True.png", true);
+
+    database.add<Test_YCommMenuDetector>("PokemonSwSh/YCommMenuDetector/Avermedia_Qt5_True.jpg", true);
+    database.add<Test_YCommMenuDetector>("PokemonSwSh/YCommMenuDetector/MiraBox_Qt6_True.jpg", true);
+    database.add<Test_YCommMenuDetector>("PokemonSwSh/YCommMenuDetector/MyPin_Qt5_True.jpg", true);
+    database.add<Test_YCommMenuDetector>("PokemonSwSh/YCommMenuDetector/MyPin_Qt6_True.jpg", true);
+    database.add<Test_YCommMenuDetector>("PokemonSwSh/YCommMenuDetector/NoBrand_Qt6_True.jpg", true);
+    database.add<Test_YCommMenuDetector>("PokemonSwSh/YCommMenuDetector/ShadowCast_Qt6_True.jpg", true);
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

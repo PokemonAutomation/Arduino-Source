@@ -10,6 +10,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_BoxShinySymbolDetector_H
 #define PokemonAutomation_PokemonSwSh_BoxShinySymbolDetector_H
 
+#include "Common/Cpp/TestRunners/UnitTest.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 
 namespace PokemonAutomation{
 
@@ -22,10 +24,21 @@ namespace PokemonSwSh{
 
 class BoxShinySymbolDetector{
 public:
-    static void make_overlays(VideoOverlaySet& items);
+    BoxShinySymbolDetector()
+        : m_box(0.969, 0.145, 0.024, 0.040)
+    {}
 
-    static bool detect(const ImageViewRGB32& screen);
+    void make_overlays(VideoOverlaySet& items);
+    bool detect(const ImageViewRGB32& screen);
+
+private:
+    ImageFloatBox m_box;
 };
+
+
+
+
+void add_tests_BoxShinySymbolDetector(UnitTestDatabase& database);
 
 
 

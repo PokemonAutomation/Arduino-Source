@@ -45,9 +45,9 @@ SnapshotDumper::SnapshotDumper()
     , SNAPSHOT_MODE(
         "<b>Snapshot trigger:",
         {
-            {SnapshotMode::KEYPRESS,         "key-press",           "Key Press. Press 'Page Down', while the screen is focused."},
-            {SnapshotMode::MOUSE_CLICK,            "mouse-click",              "Mouse click on the screen."},
-            {SnapshotMode::PERIODIC,            "periodic",              "Periodic: every X milliseconds as defined below."},
+            {SnapshotMode::KEYPRESS,    "key-press",    "Key Press. Press 'Page Down', while the screen is focused."},
+            {SnapshotMode::MOUSE_CLICK, "mouse-click",  "Mouse click on the screen."},
+            {SnapshotMode::PERIODIC,    "periodic",     "Periodic: every X milliseconds as defined below."},
         },
         LockMode::LOCK_WHILE_RUNNING,
         SnapshotMode::KEYPRESS

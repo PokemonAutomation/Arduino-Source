@@ -9,6 +9,7 @@
 #ifndef PokemonAutomation_PokemonLA_BattleMenuDetector_H
 #define PokemonAutomation_PokemonLA_BattleMenuDetector_H
 
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
@@ -42,6 +43,11 @@ private:
     ButtonDetector m_button_A_detector;
     // ButtonDetector m_button_B_detector;
 };
+
+
+
+void add_tests_BattleMenuDetector(UnitTestDatabase& database);
+
 
 
 }

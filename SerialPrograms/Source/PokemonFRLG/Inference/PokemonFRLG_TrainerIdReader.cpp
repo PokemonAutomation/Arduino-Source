@@ -43,7 +43,7 @@ uint16_t TrainerIdReader::read_tid(
     
     ImageViewRGB32 tid_region = extract_box_reference(game_screen, language == Language::Japanese ? m_box_tid_jpn : m_box_tid);
 
-    if (!GlobalSettings::instance().USE_PADDLE_OCR){
+    if (GlobalSettings::instance().OCR_LIBRARY != OcrLibrary::PADDLE_OCR){
         // Tesseract-free path: waterfill segmentation + template matching
         // against the PokemonFRLG/Digits/0-9.png templates.
         return uint16_t(read_digits_waterfill_template(logger, tid_region));

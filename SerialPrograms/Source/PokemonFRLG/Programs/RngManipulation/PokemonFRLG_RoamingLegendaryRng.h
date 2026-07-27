@@ -21,6 +21,7 @@
 #include "PokemonFRLG_BlindNavigation.h"
 #include "PokemonFRLG_RngCalibration.h"
 #include "PokemonFRLG_RngDisplays.h"
+#include "PokemonFRLG_SeedsDatabase.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -43,6 +44,10 @@ public:
     ) override{}
 
 private:
+    enum class GameVersion{
+        firered,
+        leafgreen
+    };
 
     SectionDividerOption m_calibration_displays;
     RngTargetDisplay RNG_TARGET;
@@ -50,19 +55,18 @@ private:
     RngCalibrationDisplay RNG_CALIBRATION;
 
     SectionDividerOption m_game_info;
+    EnumDropdownOption<GameVersion> GAME_VERSION;
     OCR::LanguageOCROption LANGUAGE;
+    EnumDropdownOption<SoundSetting> SOUND;
 
     SectionDividerOption m_target_settings;
     EnumDropdownOption<PokemonFRLG_RngTarget> TARGET;
-    StringOption SEED; 
-    TextEditOption SEED_LIST;
-    EnumDropdownOption<SeedButton> SEED_BUTTON;
-    EnumDropdownOption<BlackoutButton> EXTRA_BUTTON;
-    SimpleIntegerOption<uint64_t> SEED_DELAY;
+    StringOption SEED;
     SimpleIntegerOption<uint64_t>ADVANCES;
 
     SectionDividerOption m_program_settings;
     BooleanCheckBoxOption USE_TEACHY_TV;
+    SimpleIntegerOption<uint16_t> SEED_RADIUS;
     SimpleIntegerOption<uint64_t> MAX_RESETS;
     SimpleIntegerOption<uint64_t> MAX_RARE_CANDIES;
     SimpleIntegerOption<uint64_t> MAX_BALL_THROWS;

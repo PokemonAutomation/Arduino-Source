@@ -27,7 +27,7 @@ int test_pokemonLA_TransparentDialogueDetector(const ImageViewRGB32& image, bool
 
 int test_pokemonLA_EventDialogDetector(const ImageViewRGB32& image, bool target);
 
-int test_pokemonLA_DialogueYellowArrowDetector(const ImageViewRGB32& image, bool target);
+int test_pokemonLA_DialogYellowArrowDetector(const ImageViewRGB32& image, bool target);
 
 int test_pokemonLA_BlackOutDetector(const ImageViewRGB32& image, bool target);
 

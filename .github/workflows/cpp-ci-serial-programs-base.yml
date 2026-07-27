@@ -55,7 +55,9 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.10.2'
+        # Delete aqtsource once https://github.com/miurahr/aqtinstall/issues/1007 is fixed and released
+        aqtsource: 'git+https://github.com/miurahr/aqtinstall'
+        version: '6.11.1'
         modules: 'qtmultimedia qtserialport'
 
     - name: Install dependencies (Ubuntu)
@@ -72,7 +74,7 @@ jobs:
       if: startsWith(inputs.os, 'mac')
       run: |
         cd Arduino-Source
-        brew install opencv onnxruntime
+        brew install opencv@4 onnxruntime
 
         brew tap-new --no-git PA/libdpp
         brew trust PA/libdpp

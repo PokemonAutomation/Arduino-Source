@@ -20,6 +20,8 @@ void move_while_mashing_B   (ProControllerContext& context, Milliseconds duratio
 void spin_and_mash_A        (ProControllerContext& context, Milliseconds duration);
 void travel_to_spin_location(ProControllerContext& context);
 void travel_back_to_lady    (ProControllerContext& context);
+void travel_to_spin_location2(ProControllerContext& context);
+void travel_back_to_lady2    (ProControllerContext& context);
 
 
 

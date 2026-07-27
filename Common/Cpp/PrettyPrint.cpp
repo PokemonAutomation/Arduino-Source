@@ -174,6 +174,18 @@ std::string tostr_fixed(double x, int precision){
     return std::format("{:.{}f}", x, precision);
 }
 
+std::string tostr_fixed_no_trailing_zero(double x, int precision){
+    std::string str = std::format("{:.{}f}", x, precision);
+    if (str.find('.') != std::string::npos) {
+        str.erase(str.find_last_not_of('0') + 1, std::string::npos);
+        if (str.back() == '.') {
+            str.pop_back();
+        }
+    }
+    return str;
+}
+
+
 
 std::string now_to_filestring(){
 #if _WIN32 && _MSC_VER

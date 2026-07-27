@@ -9,7 +9,6 @@
 
 #include <QVideoFrame>
 #include "Common/Cpp/Time.h"
-#include "Common/Cpp/Options/EnumDropdownDatabase.h"
 #include "CommonFramework/VideoPipeline/VideoFormats.h"
 
 namespace PokemonAutomation{

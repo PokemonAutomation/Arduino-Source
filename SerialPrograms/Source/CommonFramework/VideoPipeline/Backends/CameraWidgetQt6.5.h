@@ -50,7 +50,8 @@ public:
         Logger& logger,
         const CameraInfo& info,
         Resolution resolution,
-        VideoFormat format
+        VideoFormat format,
+        FramesPerSecond fps
     ) const override;
 };
 
@@ -100,7 +101,8 @@ public:
         Logger& logger,
         const CameraInfo& info,
         Resolution desired_resolution,
-        VideoFormat desired_format
+        VideoFormat desired_format,
+        FramesPerSecond desired_fps
     );
 
     virtual Resolution current_resolution() const override{
@@ -108,6 +110,9 @@ public:
     }
     virtual VideoFormat current_format() const override{
         return m_format;
+    }
+    virtual FramesPerSecond current_fps() const override{
+        return m_fps;
     }
     virtual const VideoFormatSet& supported_formats() const override{
         return m_formats;
@@ -126,7 +131,8 @@ private:
     void init(
         const CameraInfo& info,
         Resolution desired_resolution,
-        VideoFormat desired_format
+        VideoFormat desired_format,
+        FramesPerSecond desired_fps
     );
     void set_video_output(QGraphicsVideoItem& item);
 
@@ -139,6 +145,7 @@ private:
     Logger& m_logger;
     Resolution m_resolution;
     VideoFormat m_format;
+    FramesPerSecond m_fps;
 
     std::unique_ptr<QCameraThread> m_camera;
     std::unique_ptr<QVideoSink> m_video_sink;

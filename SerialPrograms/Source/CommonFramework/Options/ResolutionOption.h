@@ -19,7 +19,8 @@ public:
     ResolutionOption(
         std::string label, std::string description,
         int default_width, int default_height,
-        int initial_x_pos, int initial_y_pos
+        int initial_x_pos, int initial_y_pos,
+        bool default_expanded
     );
 
     StaticTextOption DESCRIPTION;

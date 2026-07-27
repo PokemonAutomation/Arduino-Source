@@ -165,8 +165,84 @@ void menus_to_boxsystem(VideoStream& stream, ProControllerContext& context){
 }
 
 
+void save_game(VideoStream& stream, ProControllerContext& context){
+    context.wait_for_all_requests();
+    stream.log("Save game.");
+    stream.overlay().add_log("Save game", COLOR_WHITE);
 
+    WallClock deadline = current_time() + std::chrono::minutes(2);
+    bool seen_save_menu = false;
+    do{
+        YCommIconWatcher overworld;
+        MainMenuWatcher main_menu;
+        SelectionArrowFinder save_arrow(stream.overlay(), {0.475, 0.688, 0.060, 0.089});
+        context.wait_for_all_requests();
 
+        int ret = wait_until(
+            stream, context,
+            std::chrono::seconds(30),
+            {
+                overworld,
+                main_menu,
+                save_arrow,
+            }
+        );
+        switch (ret){
+        case 0:
+            stream.log("Detected Overworld...", COLOR_BLUE);
+            if (seen_save_menu){
+                stream.log("Detected Overworld. Successfully saved.", COLOR_BLUE);
+                return;
+            }
+
+            pbf_press_button(context, BUTTON_X, 160ms, 40ms);
+            continue;
+        case 1:
+            stream.log("Detected Main Menu...", COLOR_BLUE);
+            pbf_press_button(context, BUTTON_R, 80ms, 2000ms);
+            continue;
+        case 2:
+            stream.log("Detected Save Menu...", COLOR_BLUE);
+            seen_save_menu = true;
+            pbf_mash_button(context, BUTTON_A, 500ms);
+            continue;
+        default:
+            stream.log("save_game(): No recognized state after 30 seconds.", COLOR_RED);
+            pbf_mash_button(context, BUTTON_B, 5000ms);
+        }
+    }while (current_time() < deadline);
+
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "Unable to save game after 2 minutes.",
+        stream
+    );
+
+}
+
+void mash_B_until_y_comm_icon(
+    VideoStream& stream,
+    ProControllerContext& context,
+    const std::string& error_msg
+){
+    context.wait_for_all_requests();
+    const bool y_comm_visible = true;
+    YCommIconWatcher y_comm_detector(COLOR_RED, y_comm_visible);
+    int ret = run_until<ProControllerContext>(
+        stream, context,
+        [](ProControllerContext& context){
+            pbf_mash_button(context, BUTTON_B, 10s);
+        },
+        {y_comm_detector}
+    );
+    if (ret != 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            error_msg + " No Y-Comm mark found.",
+            stream
+        );
+    }
+}
 
 
 

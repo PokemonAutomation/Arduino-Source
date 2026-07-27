@@ -26,7 +26,8 @@ TimingOptions::TimingOptions()
         "Controller Timing Options",
         LockMode::UNLOCK_WHILE_RUNNING,
         EnableMode::ALWAYS_ENABLED,
-        true
+        true,
+        false
     )
     , WIRED(
         "<b>Wired Controller Timing Variation:</b><br>"

@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 
 
 
-class TextEditWidget : public QWidget, public ConfigWidget{
+class TextEditWidget : public QWidget, public ConfigWidget, public TextEditOption::AppendListener{
 public:
     using ParentOption = TextEditOption;
 
@@ -27,12 +27,15 @@ public:
 
     virtual void update_value() override;
     virtual void on_config_value_changed(void* object) override;
+    virtual void on_append(std::string text) override;
 
 private:
     class Box;
 
     TextEditOption& m_value;
     QTextEdit* m_box;
+
+    bool m_pending_append = false;
 };
 
 

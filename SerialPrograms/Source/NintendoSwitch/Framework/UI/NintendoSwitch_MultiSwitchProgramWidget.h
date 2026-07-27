@@ -23,6 +23,7 @@
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h"
 #include "NintendoSwitch_MultiSwitchSystemWidget.h"
 
+QT_FORWARD_DECLARE_CLASS(QVBoxLayout)
 namespace PokemonAutomation{
     struct PanelHolder;
     class ProgramResourceDownloadTableWidget;
@@ -49,14 +50,19 @@ private:
 
     virtual void redraw_options() override;
 
+    ProgramResourceDownloadTableWidget* ensure_downloads_table();
+
 private:
     PanelHolder& m_holder;
     MultiSwitchProgramSession m_session;
+    QVBoxLayout* m_layout;
     MultiSwitchSystemWidget* m_system;
     ConfigWidget* m_options;
     StatsBar* m_stats_bar;
     RunnablePanelActionBar* m_actions_bar;
-    ProgramResourceDownloadTableWidget* m_downloads_table;
+    
+    // WARNING: Do not use directly. Always use ensure_downloads_table().
+    ProgramResourceDownloadTableWidget* m_internal_lazy_downloads_table = nullptr;
     std::atomic<bool> m_popup_is_open{false};
 
     LifetimeSanitizer m_sanitizer;

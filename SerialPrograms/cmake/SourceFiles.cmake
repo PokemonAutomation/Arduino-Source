@@ -216,6 +216,10 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Strings/StringTools.h
     ../Common/Cpp/Strings/Unicode.cpp
     ../Common/Cpp/Strings/Unicode.h
+    ../Common/Cpp/TestRunners/UnitTest.h
+    ../Common/Cpp/TestRunners/UnitTestDatabase.h
+    ../Common/Cpp/TestRunners/ParallelUnitTestRunner.cpp
+    ../Common/Cpp/TestRunners/ParallelUnitTestRunner.h
     ../Common/Cpp/Time.cpp
     ../Common/Cpp/Time.h
     ../Common/Cpp/UiWrapper.h
@@ -451,6 +455,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.h
     Source/CommonFramework/Options/LabelCellOption.cpp
     Source/CommonFramework/Options/LabelCellOption.h
+    Source/CommonFramework/Options/NestedBoxDrawOption.cpp
+    Source/CommonFramework/Options/NestedBoxDrawOption.h
     Source/CommonFramework/Options/QtWidget/LabelCellWidget.cpp
     Source/CommonFramework/Options/QtWidget/LabelCellWidget.h
     Source/CommonFramework/Options/ResolutionOption.cpp
@@ -727,6 +733,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonTools/VisualDetectors/ImageMatchDetector.h
     Source/ComputerPrograms/ComputerProgram.cpp
     Source/ComputerPrograms/ComputerProgram.h
+    Source/ComputerPrograms/UnitTestRunner.cpp
+    Source/ComputerPrograms/UnitTestRunner.h
     Source/ComputerPrograms/Framework/ComputerProgramOption.cpp
     Source/ComputerPrograms/Framework/ComputerProgramOption.h
     Source/ComputerPrograms/Framework/ComputerProgramSession.cpp
@@ -832,8 +840,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/StandardHid/StandardHid_Keyboard_PABotBase2.h
     Source/Integrations/DiscordIntegrationSettings.cpp
     Source/Integrations/DiscordIntegrationSettings.h
-    Source/Integrations/DiscordIntegrationSettingsWidget.cpp
-    Source/Integrations/DiscordIntegrationSettingsWidget.h
     Source/Integrations/DiscordIntegrationTable.cpp
     Source/Integrations/DiscordIntegrationTable.h
     Source/Integrations/DiscordSettingsOption.cpp
@@ -1127,6 +1133,8 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.h
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.cpp
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.h
+    Source/NintendoSwitch/DevPrograms/WaterfillTemplateMaker.cpp
+    Source/NintendoSwitch/DevPrograms/WaterfillTemplateMaker.h
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.h
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.cpp
@@ -1398,6 +1406,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonBDSP/PokemonBDSP_Panels.h
     Source/PokemonBDSP/PokemonBDSP_Settings.cpp
     Source/PokemonBDSP/PokemonBDSP_Settings.h
+    Source/PokemonBDSP/PokemonBDSP_Tests.cpp
+    Source/PokemonBDSP/PokemonBDSP_Tests.h
     Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggAutonomous.cpp
     Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggAutonomous.h
     Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggAutonomousState.cpp
@@ -1583,6 +1593,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_LocationsDatabase.h
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_EncountersDatabase.cpp
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_EncountersDatabase.h
+    Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_SeedsDatabase.cpp
+    Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_SeedsDatabase.h
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_SidHelper.cpp
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_SidHelper.h
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RngHelper.cpp
@@ -1685,10 +1697,10 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.h
     Source/PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.cpp
     Source/PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h
-    Source/PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.cpp
-    Source/PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.h
-    Source/PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.cpp
-    Source/PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.h
+    Source/PokemonLA/Inference/Objects/PokemonLA_DialogEllipseDetector.cpp
+    Source/PokemonLA/Inference/Objects/PokemonLA_DialogEllipseDetector.h
+    Source/PokemonLA/Inference/Objects/PokemonLA_DialogYellowArrowDetector.cpp
+    Source/PokemonLA/Inference/Objects/PokemonLA_DialogYellowArrowDetector.h
     Source/PokemonLA/Inference/Objects/PokemonLA_FlagDetector.cpp
     Source/PokemonLA/Inference/Objects/PokemonLA_FlagDetector.h
     Source/PokemonLA/Inference/Objects/PokemonLA_FlagTracker.cpp
@@ -1758,6 +1770,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLA/PokemonLA_TravelLocations.h
     Source/PokemonLA/PokemonLA_WeatherAndTime.cpp
     Source/PokemonLA/PokemonLA_WeatherAndTime.h
+    Source/PokemonLA/PokemonLA_Tests.cpp
+    Source/PokemonLA/PokemonLA_Tests.h
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.cpp
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.h
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoMoveGrinder.cpp
@@ -2044,6 +2058,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonPokopia/PokemonPokopia_Settings.h
     Source/PokemonPokopia/Programs/PokemonPokopia_CloudIslandReset.cpp
     Source/PokemonPokopia/Programs/PokemonPokopia_CloudIslandReset.h
+    Source/PokemonPokopia/Programs/PokemonPokopia_DailyFarmer.cpp
+    Source/PokemonPokopia/Programs/PokemonPokopia_DailyFarmer.h    
     Source/PokemonPokopia/Programs/PokemonPokopia_PCNavigation.cpp
     Source/PokemonPokopia/Programs/PokemonPokopia_PCNavigation.h
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp
@@ -2522,6 +2538,10 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSwSh/Inference/Dens/PokemonSwSh_RaidCatchDetector.h
     Source/PokemonSwSh/Inference/Dens/PokemonSwSh_RaidLobbyReader.cpp
     Source/PokemonSwSh/Inference/Dens/PokemonSwSh_RaidLobbyReader.h
+    Source/PokemonSwSh/Inference/PokemonSwSh_BoxEggDetector.cpp
+    Source/PokemonSwSh/Inference/PokemonSwSh_BoxEggDetector.h
+    Source/PokemonSwSh/Inference/PokemonSwSh_BoxEmptySlotDetector.cpp
+    Source/PokemonSwSh/Inference/PokemonSwSh_BoxEmptySlotDetector.h
     Source/PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.h
     Source/PokemonSwSh/Inference/PokemonSwSh_BoxNatureDetector.cpp
@@ -2797,6 +2817,7 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSwSh/Programs/OverworldBot/PokemonSwSh_ShinyHuntAutonomous-Overworld.h
     Source/PokemonSwSh/Programs/PokemonSwSh_BasicCatcher.cpp
     Source/PokemonSwSh/Programs/PokemonSwSh_BasicCatcher.h
+    Source/PokemonSwSh/Programs/PokemonSwSh_BoxHelpers.cpp
     Source/PokemonSwSh/Programs/PokemonSwSh_BoxHelpers.h
     Source/PokemonSwSh/Programs/PokemonSwSh_EncounterDetection.cpp
     Source/PokemonSwSh/Programs/PokemonSwSh_EncounterDetection.h
@@ -2865,6 +2886,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeMatchup.h
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeSprites.cpp
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeSprites.h
+    Source/PokemonSwSh/PokemonSwSh_Tests.cpp
+    Source/PokemonSwSh/PokemonSwSh_Tests.h
     Source/PokemonSwSh/ShinyHuntTracker.cpp
     Source/PokemonSwSh/ShinyHuntTracker.h
     Source/StaticRegistration.h
@@ -2881,14 +2904,12 @@ file(GLOB LIBRARY_SOURCES
     Source/Tests/PokemonFRLG_Tests.h
     Source/Tests/PokemonHome_Tests.cpp
     Source/Tests/PokemonHome_Tests.h
-    Source/Tests/PokemonLA_Tests.cpp
-    Source/Tests/PokemonLA_Tests.h
+    Source/Tests/PokemonLA_Tests_Old.cpp
+    Source/Tests/PokemonLA_Tests_Old.h
     Source/Tests/PokemonLZA_Tests.cpp
     Source/Tests/PokemonLZA_Tests.h
     Source/Tests/PokemonSV_Tests.cpp
     Source/Tests/PokemonSV_Tests.h
-    Source/Tests/PokemonSwSh_Tests.cpp
-    Source/Tests/PokemonSwSh_Tests.h
     Source/Tests/TestMap.cpp
     Source/Tests/TestMap.h
     Source/Tests/TestUtils.cpp

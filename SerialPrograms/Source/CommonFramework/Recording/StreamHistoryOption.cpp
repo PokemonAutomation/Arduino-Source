@@ -14,7 +14,8 @@ StreamHistoryOption::StreamHistoryOption()
         "Stream History",
         LockMode::LOCK_WHILE_RUNNING,
         IS_BETA_VERSION ? GroupOption::EnableMode::DEFAULT_ENABLED : GroupOption::EnableMode::DEFAULT_DISABLED,
-        true
+        true,
+        false
     )
     , DESCRIPTION(
         "Keep a record of the recent video streams. This will allow video capture "

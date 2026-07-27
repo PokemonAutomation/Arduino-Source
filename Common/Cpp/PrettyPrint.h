@@ -23,6 +23,9 @@ std::string tostr_default(double x);
 // The precision specifies the number of digits after the decimal point.
 std::string tostr_fixed(double x, int precision);
 
+// Convert double to string with fixed precision, without trailing zeros.
+std::string tostr_fixed_no_trailing_zero(double x, int precision);
+
 // Format current time to a string to be used as filenames.
 // e.g. "20220320-044444408355"
 std::string now_to_filestring();

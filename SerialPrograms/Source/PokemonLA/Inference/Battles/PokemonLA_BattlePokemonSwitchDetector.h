@@ -8,7 +8,7 @@
 #ifndef PokemonAutomation_PokemonLA_BattlePokemonSwitchDetector_H
 #define PokemonAutomation_PokemonLA_BattlePokemonSwitchDetector_H
 
-#include "CommonFramework/Logging/Logger.h"
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
@@ -44,6 +44,13 @@ private:
 
     ButtonDetector m_button_plus_detector;
 };
+
+
+
+
+void add_tests_BattlePokemonSwitchDetector(UnitTestDatabase& database);
+
+
 
 
 }

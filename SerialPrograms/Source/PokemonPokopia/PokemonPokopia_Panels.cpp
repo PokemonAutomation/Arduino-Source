@@ -12,6 +12,7 @@
 
 // General
 #include "Programs/PokemonPokopia_CloudIslandReset.h"
+#include "Programs/PokemonPokopia_DailyFarmer.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -42,6 +43,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- Untested/Beta/WIP ----");
     ret.emplace_back(make_single_switch_program<CloudIslandReset_Descriptor, CloudIslandReset>());
     if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back(make_single_switch_program<DailyFarmer_Descriptor, DailyFarmer>());
     }
 
     // if (PreloadSettings::instance().DEVELOPER_MODE){

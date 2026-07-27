@@ -61,9 +61,10 @@ const MarkIconMatcher& MarkIcon_Kalos(){
         "kalos",
         Color(0xff61645c), Color(0xff646664),
         10,
-        40.0,
+        60.0,
         {
             {0xff61645c, 0xff646664},
+            {0xff49523f, 0xff898e7e}
         }
     );
     return ret;
@@ -78,6 +79,7 @@ const MarkIconMatcher& MarkIcon_Alola(){
         35.0,
         {
             {0xff5f6456, 0xff6d706b},
+            {0xff3e4733, 0xffa5ae99}
         }
     );
     return ret;
@@ -89,9 +91,10 @@ const MarkIconMatcher& MarkIcon_GameBoy(){
         "gameboy",
         Color(0xff61645b), Color(0xff646664),
         10,
-        30.0,
+        60.0,
         {
             {0xff61645b, 0xff646664},
+            {0xff424c3c, 0xffb7c6a9}
         }
         );
     return ret;
@@ -103,9 +106,10 @@ const MarkIconMatcher& MarkIcon_Go(){
         "go",
         Color(0xff5c644e), Color(0xff798073),
         10,
-        45.0,
+        110.0,
         {
             {0xff5c644e, 0xff798073},
+            {0xff364029, 0xffc5d5b5}
         }
     );
     return ret;
@@ -117,9 +121,10 @@ const MarkIconMatcher& MarkIcon_Lgpe(){
         "lgpe",
         Color(0xff616459), Color(0xff676d64),
         10,
-        20.0,
+        45.0,
         {
             {0xff616459, 0xff676d64},
+            {0xff3e4832, 0xff85907c}
         }
     );
     return ret;
@@ -134,6 +139,7 @@ const MarkIconMatcher& MarkIcon_Galar(){
         45.0,
         {
             {0xff5e6453, 0xff757870},
+            {0xff47503d, 0xfffffff8}
         }
     );
     return ret;
@@ -145,9 +151,10 @@ const MarkIconMatcher& MarkIcon_Bdsp(){
         "bdsp",
         Color(0xff5f6457), Color(0xff767972),
         10,
-        45.0,
+        60.0,
         {
             {0xff5f6457, 0xff767972},
+            {0xff3d4731, 0xffb6c6ad}
         }
     );
     return ret;
@@ -159,9 +166,10 @@ const MarkIconMatcher& MarkIcon_La(){
         "la",
         Color(0xff606459), Color(0xff686a65),
         10,
-        30.0,
+        90.0,
         {
             {0xff606459, 0xff686a65},
+            {0xff3a462e, 0xffe4f4ce}
         }
     );
     return ret;
@@ -173,9 +181,10 @@ const MarkIconMatcher& MarkIcon_Sv(){
         "sv",
         Color(0xff5d6450), Color(0xff747771),
         10,
-        50.0,
+        90,
         {
             {0xff5d6450, 0xff747771},
+            {0xff38422c, 0xfff7ffd7}
         }
     );
     return ret;
@@ -187,9 +196,10 @@ const MarkIconMatcher& MarkIcon_Lza(){
         "lza",
         Color(0xff61645b), Color(0xff646764),
         10,
-        20.0,
+        70.0,
         {
             {0xff61645b, 0xff646764},
+            {0xff424c3c, 0xffb7c6a9}
         }
     );
     return ret;

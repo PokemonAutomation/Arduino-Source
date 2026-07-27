@@ -14,9 +14,16 @@ namespace PokemonAutomation{
 ResolutionOption::ResolutionOption(
     std::string label, std::string description,
     int default_width, int default_height,
-    int initial_x_pos, int initial_y_pos
+    int initial_x_pos, int initial_y_pos,
+    bool default_expanded
 )
-    : GroupOption(std::move(label), LockMode::LOCK_WHILE_RUNNING)
+    : GroupOption(
+        std::move(label),
+        LockMode::LOCK_WHILE_RUNNING,
+        EnableMode::ALWAYS_ENABLED,
+        false,
+        default_expanded
+    )
     , DESCRIPTION(std::move(description))
     , WIDTH("<b>Width:</b>", LockMode::LOCK_WHILE_RUNNING, scale_dpi_width(default_width))
     , HEIGHT("<b>Height:</b>", LockMode::LOCK_WHILE_RUNNING, scale_dpi_height(default_height))

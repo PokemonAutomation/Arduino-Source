@@ -22,17 +22,20 @@ struct GroupOption::Data{
     const std::string m_label;
     const EnableMode m_enable_mode;
     const bool m_show_restore_defaults_button;
+    const bool m_default_expanded;
 
     std::atomic<bool> m_enabled;
 
     Data(
         std::string label,
         EnableMode enable_mode,
-        bool show_restore_defaults_button
+        bool show_restore_defaults_button,
+        bool default_expanded
     )
         : m_label(std::move(label))
         , m_enable_mode(enable_mode)
         , m_show_restore_defaults_button(show_restore_defaults_button)
+        , m_default_expanded(default_expanded)
         , m_enabled(enable_mode != EnableMode::DEFAULT_DISABLED)
     {}
 };
@@ -43,10 +46,17 @@ GroupOption::GroupOption(
     std::string label,
     LockMode lock_while_program_is_running,
     EnableMode enable_mode,
-    bool show_restore_defaults_button
+    bool show_restore_defaults_button,
+    bool default_expanded
 )
     : ConfigOptionImpl<GroupOption, BatchOption>(lock_while_program_is_running)
-    , m_data(CONSTRUCT_TOKEN, std::move(label), enable_mode, show_restore_defaults_button)
+    , m_data(
+        CONSTRUCT_TOKEN,
+        std::move(label),
+        enable_mode,
+        show_restore_defaults_button,
+        default_expanded
+    )
 {}
 
 const std::string GroupOption::label() const{
@@ -54,6 +64,9 @@ const std::string GroupOption::label() const{
 }
 bool GroupOption::toggleable() const{
     return m_data->m_enable_mode != EnableMode::ALWAYS_ENABLED;
+}
+bool GroupOption::default_expanded() const{
+    return m_data->m_default_expanded;
 }
 bool GroupOption::enabled() const{
     return m_data->m_enabled.load(std::memory_order_relaxed);

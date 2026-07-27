@@ -35,11 +35,11 @@ namespace PokemonAutomation{
 #endif
 
 #ifndef PA_VERSION_MINOR
-#define PA_VERSION_MINOR 68
+#define PA_VERSION_MINOR 69
 #endif
 
 #ifndef PA_VERSION_PATCH
-#define PA_VERSION_PATCH 7
+#define PA_VERSION_PATCH 3
 #endif
 
 const bool IS_BETA_VERSION = PA_IS_BETA;
@@ -209,6 +209,34 @@ std::string get_resource_path(){
     }
     return (base + "/Resources/").toStdString();
 }
+std::string get_unittest_resource_path(){
+    //  Find the resource directory.
+
+    //  Try the intended folder name first.
+    QString base = get_application_base_dir_path();
+    QString path = base;
+    for (size_t c = 0; c < 5; c++){
+        QString try_path = path + "/UnitTestResources/";
+        QFile file(try_path);
+        if (file.exists()){
+            return try_path.toStdString();
+        }
+        path += "/..";
+    }
+
+    //  Now try with the old command-line folder.
+    path = base;
+    for (size_t c = 0; c < 5; c++){
+        QString try_path = path + "/CommandLineTests/";
+        QFile file(try_path);
+        if (file.exists()){
+            return try_path.toStdString();
+        }
+        path += "/..";
+    }
+
+    return (base + "/UnitTestResources/").toStdString();
+}
 std::string get_training_path(){
     //  Find the training data directory.
     QString base = get_application_base_dir_path();
@@ -292,6 +320,10 @@ const std::string& RESOURCE_PATH(){
 }
 const std::string& DOWNLOADED_RESOURCE_PATH(){
     static std::string path = RUNTIME_BASE_PATH() + "DownloadedResources/";
+    return path;
+}
+const std::string& UNIT_TEST_RESOURCE_PATH(){
+    static std::string path = get_unittest_resource_path();
     return path;
 }
 const std::string& TRAINING_PATH(){

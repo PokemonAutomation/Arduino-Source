@@ -4,9 +4,11 @@
  *
  */
 
-#include "Common/Cpp/Logging/AbstractLogger.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "Tests/TestUtils.h"
 #include "PokemonLA_BattleMenuDetector.h"
 
 //#include <iostream>
@@ -59,6 +61,50 @@ bool BattleMenuDetector::process_frame(const ImageViewRGB32& frame, WallClock ti
 
     return detected && m_stop_on_detected;
 }
+
+
+
+
+
+
+class Test_BattleMenuDetector : public UnitTest{
+public:
+    Test_BattleMenuDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonLA::BattleMenuDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyVideoOverlay overlay;
+        BattleMenuDetector detector(logger, overlay, true);
+        ImageRGB32 image(m_image);
+        return detector.process_frame(image, current_time()) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+
+void add_tests_BattleMenuDetector(UnitTestDatabase& database){
+    database.add<Test_BattleMenuDetector>("PokemonLA/BattleMenuDetector/CoastlandsMidday_True.png", true);
+    database.add<Test_BattleMenuDetector>("PokemonLA/BattleMenuDetector/CoastlandsSeaMidday_True.jpg", true);
+}
+
+
+
+
+
+
+
+
+
+
 
 
 

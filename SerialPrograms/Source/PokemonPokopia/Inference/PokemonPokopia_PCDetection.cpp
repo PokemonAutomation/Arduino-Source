@@ -89,6 +89,22 @@ bool InfoIconDetector::detect(const ImageViewRGB32& screen){
     return found;
 }
 
+BlueDialogDetector::BlueDialogDetector(Color color)
+    : m_color(color)
+    , m_box(0.195000, 0.830000, 0.022500, 0.130000)
+{}
+void BlueDialogDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_box);
+}
+bool BlueDialogDetector::detect(const ImageViewRGB32& screen){
+    const bool found = is_solid(
+        extract_box_reference(screen, m_box),
+        {0, 0.333333, 0.666667},
+        0.25
+    );
+    return found;
+}
+
 class StampMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
     // image template matcher for stamps

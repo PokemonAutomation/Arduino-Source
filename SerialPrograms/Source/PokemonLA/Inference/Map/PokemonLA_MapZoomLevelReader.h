@@ -8,6 +8,8 @@
 #ifndef PokemonAutomation_PokemonLA_MapZoomLevelReader_H
 #define PokemonAutomation_PokemonLA_MapZoomLevelReader_H
 
+#include "Common/Cpp/TestRunners/UnitTest.h"
+
 namespace PokemonAutomation{
     class ImageViewRGB32;
 namespace NintendoSwitch{
@@ -21,6 +23,10 @@ namespace PokemonLA{
 // zoom level 2: local view
 // Return -1 if the reading fails.
 int read_map_zoom_level(const ImageViewRGB32& screen);
+
+
+
+void add_tests_MapZoomLevelReader(UnitTestDatabase& database);
 
 
 }

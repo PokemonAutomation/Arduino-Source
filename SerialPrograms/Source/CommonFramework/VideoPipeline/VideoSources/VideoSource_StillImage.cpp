@@ -62,7 +62,8 @@ JsonValue VideoSourceDescriptor_StillImage::to_json() const{
 std::unique_ptr<VideoSource> VideoSourceDescriptor_StillImage::make_VideoSource(
     Logger& logger,
     Resolution resolution,
-    VideoFormat format
+    VideoFormat format,
+    FramesPerSecond fps
 ) const{
 //    cout << "make_VideoSource: " << m_path << endl;
     return std::make_unique<VideoSource_StillImage>(logger, path(), resolution, format);
@@ -97,12 +98,11 @@ VideoSource_StillImage::VideoSource_StillImage(
         return;
     }
     m_resolution = m_snapshot.frame->size();
-    m_formats = {
-        {{1280, 720}, {VideoFormat::OTHER}},
-        {{1920, 1080}, {VideoFormat::OTHER}},
-        {{3840, 2160}, {VideoFormat::OTHER}},
-        {{(size_t)m_original_image.width(), (size_t)m_original_image.height()}, {VideoFormat::OTHER}},
-    };
+
+    m_formats[{1280, 720}][VideoFormat::OTHER] = {0};
+    m_formats[{1920, 1080}][VideoFormat::OTHER] = {0};
+    m_formats[{3840, 2160}][VideoFormat::OTHER] = {0};
+    m_formats[{(size_t)m_original_image.width(), (size_t)m_original_image.height()}][VideoFormat::OTHER] = {0};
 }
 
 

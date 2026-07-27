@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonTools/DetectedBoxes.h"
-#include "PokemonLA_DialogueEllipseDetector.h"
+#include "PokemonLA_DialogEllipseDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

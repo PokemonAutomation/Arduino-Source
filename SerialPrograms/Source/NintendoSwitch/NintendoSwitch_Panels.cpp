@@ -23,13 +23,17 @@
 
 #include "DevPrograms/BoxDraw.h"
 #include "Programs/NintendoSwitch_SnapshotDumper.h"
+
 #include "Programs/NintendoSwitch_MenuStabilityTester.h"
 #include "DevPrograms/TestProgramComputer.h"
 #include "DevPrograms/TestProgramSwitch.h"
 #include "DevPrograms/JoyconProgram.h"
+#include "DevPrograms/WaterfillTemplateMaker.h"
 #include "DevPrograms/TestDudunsparceFormDetector.h"
 #include "Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h"
 #include "Pokemon/Inference/Pokemon_TrainPokemonOCR.h"
+
+#include "ComputerPrograms/UnitTestRunner.h"
 
 #ifdef PA_OFFICIAL
 #include "../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.h"
@@ -73,13 +77,15 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
-    ret.emplace_back(make_single_switch_program<MenuStabilityTester_Descriptor, MenuStabilityTester>());
+        ret.emplace_back(make_single_switch_program<MenuStabilityTester_Descriptor, MenuStabilityTester>());
         ret.emplace_back(make_computer_program<TestProgramComputer_Descriptor, TestProgramComputer>());
         ret.emplace_back(make_multi_switch_program<TestProgram_Descriptor, TestProgram>());
         ret.emplace_back(make_single_switch_program<JoyconProgram_Descriptor, JoyconProgram>());
+        ret.emplace_back(make_single_switch_program<WaterfillTemplateMaker_Descriptor, WaterfillTemplateMaker>());
         ret.emplace_back(make_computer_program<Pokemon::TrainIVCheckerOCR_Descriptor, Pokemon::TrainIVCheckerOCR>());
         ret.emplace_back(make_computer_program<Pokemon::TrainPokemonOCR_Descriptor, Pokemon::TrainPokemonOCR>());
         ret.emplace_back(make_single_switch_program<TestDudunsparceFormDetector_Descriptor, TestDudunsparceFormDetector>());
+        ret.emplace_back(make_computer_program<ComputerPrograms::UnitTestRunner_Descriptor, ComputerPrograms::UnitTestRunner>());
 #ifdef PA_OFFICIAL
         add_panels(ret);
 #endif

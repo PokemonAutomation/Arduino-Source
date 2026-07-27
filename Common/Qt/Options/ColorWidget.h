@@ -37,6 +37,22 @@ private:
 };
 
 
+class ColorOptionWidget : public QWidget, public ConfigWidget{
+public:
+    using ParentOption = ColorOption;
+
+public:
+    ~ColorOptionWidget();
+    ColorOptionWidget(QWidget& parent, ColorOption& value);
+
+    virtual void update_value() override;
+    virtual void on_config_value_changed(void* object) override;
+
+private:
+    ColorCellWidget* m_cell;
+};
+
+
 
 
 }

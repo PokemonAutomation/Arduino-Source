@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -17,6 +18,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/ImageMatch/ExactImageMatcher.h"
+#include "Tests/TestUtils.h"
 #include "PokemonSwSh_SelectionArrowFinder.h"
 
 //#include <iostream>
@@ -225,6 +227,166 @@ int RotomPhoneMenuArrowFinder::detect_index(const ImageViewRGB32& screen){
     }
     return -1;
 }
+
+
+
+
+
+
+
+
+class Test_SelectionArrowFinder : public UnitTest{
+public:
+    Test_SelectionArrowFinder(
+        const std::string& image,
+        size_t expected
+    )
+        : UnitTest("PokemonSwSh::SelectionArrowFinder - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        ImageRGB32 image(m_image);
+        std::vector<ImagePixelBox> boxes = find_selection_arrows(image, 10);
+        for (const auto& box : boxes){
+            std::cout << "Found box: " << box.min_x << " " << box.max_x << " " << box.min_y << " " << box.max_y << std::endl;
+        }
+        return boxes.size() == m_expected;
+    };
+
+private:
+    std::string m_image;
+    size_t m_expected;
+};
+class Test_RetrieveEggArrowFinder : public UnitTest{
+public:
+    Test_RetrieveEggArrowFinder(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonSwSh::RetrieveEggArrowFinder - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyVideoOverlay overlay;
+        RetrieveEggArrowFinder detector(overlay);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+class Test_CheckNurseryArrowFinder : public UnitTest{
+public:
+    Test_CheckNurseryArrowFinder(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonSwSh::CheckNurseryArrowFinder - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyVideoOverlay overlay;
+        CheckNurseryArrowFinder detector(overlay);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+class Test_StoragePokemonMenuArrowFinder : public UnitTest{
+public:
+    Test_StoragePokemonMenuArrowFinder(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonSwSh::StoragePokemonMenuArrowFinder - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyVideoOverlay overlay;
+        StoragePokemonMenuArrowFinder detector(overlay);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+class Test_RotomPhoneMenuArrowFinder : public UnitTest{
+public:
+    Test_RotomPhoneMenuArrowFinder(
+        const std::string& image,
+        int index
+    )
+        : UnitTest("PokemonSwSh::RotomPhoneMenuArrowFinder - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_index(index)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyVideoOverlay overlay;
+        RotomPhoneMenuArrowFinder detector(overlay);
+        ImageRGB32 image(m_image);
+        return detector.detect_index(image) == m_index;
+    };
+
+private:
+    std::string m_image;
+    int m_index;
+};
+
+
+
+
+
+
+
+
+void add_tests_SelectionArrowFinder(UnitTestDatabase& database){
+    database.add<Test_SelectionArrowFinder>("PokemonSwSh/SelectionArrowFinder/mac_neon_error_1.png", 1);
+
+    database.add<Test_RetrieveEggArrowFinder>("PokemonSwSh/RetrieveEggArrowFinder/German_False.png", false);
+    database.add<Test_RetrieveEggArrowFinder>("PokemonSwSh/RetrieveEggArrowFinder/JPN_False.png", false);
+    database.add<Test_RetrieveEggArrowFinder>("PokemonSwSh/RetrieveEggArrowFinder/JPN_True.png", true);
+    database.add<Test_RetrieveEggArrowFinder>("PokemonSwSh/RetrieveEggArrowFinder/macOS_bright/No_Dialog_False.png", false);
+    database.add<Test_RetrieveEggArrowFinder>("PokemonSwSh/RetrieveEggArrowFinder/macOS_bright/Take_Back_False.png", false);
+    database.add<Test_RetrieveEggArrowFinder>("PokemonSwSh/RetrieveEggArrowFinder/macOS_bright/Take_Egg_True.png", true);
+
+    database.add<Test_StoragePokemonMenuArrowFinder>("PokemonSwSh/StoragePokemonMenuArrowFinder/French_False.png", false);
+
+    database.add<Test_RotomPhoneMenuArrowFinder>("PokemonSwSh/RotomPhoneMenuArrowFinder/Map_5.png", 5);
+    database.add<Test_RotomPhoneMenuArrowFinder>("PokemonSwSh/RotomPhoneMenuArrowFinder/Pokemon_1.png", 1);
+    database.add<Test_RotomPhoneMenuArrowFinder>("PokemonSwSh/RotomPhoneMenuArrowFinder/macOS_bright/Pokedex_0.png", 0);
+    database.add<Test_RotomPhoneMenuArrowFinder>("PokemonSwSh/RotomPhoneMenuArrowFinder/macOS_bright/Pokemon_1.png", 1);
+    database.add<Test_RotomPhoneMenuArrowFinder>("PokemonSwSh/RotomPhoneMenuArrowFinder/macOS_bright/Town_Map_5.png", 5);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
 }

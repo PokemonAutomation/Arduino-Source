@@ -10,6 +10,7 @@
 #include <atomic>
 #include <vector>
 #include <deque>
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/VisualDetector.h"
@@ -110,6 +111,22 @@ public:
          : DetectorToFinder("RotomPhoneMenuArrowWatcher", std::chrono::milliseconds(250), overlay)
     {}
 };
+
+
+
+
+
+
+
+
+
+
+
+void add_tests_SelectionArrowFinder(UnitTestDatabase& database);
+
+
+
+
 
 
 

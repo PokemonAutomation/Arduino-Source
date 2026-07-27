@@ -5,6 +5,6 @@ jobs:
   build:
     uses: ./.github/workflows/cpp-ci-serial-programs-base.yml
     with:
-      os: ubuntu-24.04
+      os: ubuntu-26.04
       compiler: clang
       run-clang-query: true

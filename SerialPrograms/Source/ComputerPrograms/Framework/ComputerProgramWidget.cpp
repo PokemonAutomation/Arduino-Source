@@ -40,8 +40,8 @@ ComputerProgramWidget::ComputerProgramWidget(
     , m_holder(holder)
     , m_session(option)
 {
-    QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
+    m_layout = new QVBoxLayout(this);
+    m_layout->setContentsMargins(0, 0, 0, 0);
 
     const ComputerProgramDescriptor& descriptor = option.descriptor();
 
@@ -51,12 +51,12 @@ ComputerProgramWidget::ComputerProgramWidget(
         descriptor.doc_link(),
         descriptor.description()
     );
-    layout->addWidget(header);
+    m_layout->addWidget(header);
 
 
     {
         QScrollArea* scroll_outer = new QScrollArea(this);
-        layout->addWidget(scroll_outer);
+        m_layout->addWidget(scroll_outer);
         scroll_outer->setWidgetResizable(true);
 
         QWidget* scroll_inner = new QWidget(scroll_outer);
@@ -72,14 +72,11 @@ ComputerProgramWidget::ComputerProgramWidget(
 
     m_stats_bar = new StatsBar(*this);
     m_stats_bar->set_stats("", m_session.historical_stats());
-    layout->addWidget(m_stats_bar);
+    m_layout->addWidget(m_stats_bar);
 
     m_actions_bar = new RunnablePanelActionBar(*this, m_session.current_state());
-    layout->addWidget(m_actions_bar);
+    m_layout->addWidget(m_actions_bar);
 
-    m_downloads_table = new ProgramResourceDownloadTableWidget(*this);
-    m_downloads_table->setVisible(false);
-    layout->addWidget(m_downloads_table);    
 
     connect(
         m_actions_bar, &RunnablePanelActionBar::start_clicked,
@@ -122,9 +119,9 @@ void ComputerProgramWidget::state_change(ProgramState state){
         }
 
         if(state == ProgramState::STOPPING){
-            m_downloads_table->remove_all_downloads();
+            ensure_downloads_table()->remove_all_downloads();
         }        
-    });
+    }, Qt::QueuedConnection);
 }
 void ComputerProgramWidget::stats_update(const StatsTracker* current_stats, const StatsTracker* historical_stats){
     QMetaObject::invokeMethod(this, [this, current_stats, historical_stats]{
@@ -132,13 +129,13 @@ void ComputerProgramWidget::stats_update(const StatsTracker* current_stats, cons
             current_stats == nullptr ? "" : current_stats->to_str(StatsTracker::DISPLAY_ON_SCREEN),
             historical_stats == nullptr ? "" : historical_stats->to_str(StatsTracker::DISPLAY_ON_SCREEN)
         );
-    });
+    }, Qt::QueuedConnection);
 }
 void ComputerProgramWidget::error(const std::string& message){
     QMetaObject::invokeMethod(this, [message]{
         QMessageBox box;
         box.critical(nullptr, "Error", QString::fromStdString(message));
-    });
+    }, Qt::QueuedConnection);
 }
 
 void ComputerProgramWidget::download_error(const std::string& message){
@@ -148,20 +145,29 @@ void ComputerProgramWidget::download_error(const std::string& message){
     QMetaObject::invokeMethod(this, [message]{
         QMessageBox box;
         box.critical(nullptr, "Error", QString::fromStdString(message));
-    });
+    }, Qt::QueuedConnection);
     m_popup_is_open.store(false);
 }
 
 void ComputerProgramWidget::download_added(std::shared_ptr<ResourceDownload> download_ptr){
     QMetaObject::invokeMethod(this, [this, download_ptr = std::move(download_ptr)]() mutable{
-        this->m_downloads_table->add_download(std::move(download_ptr));
-    });
+        this->ensure_downloads_table()->add_download(std::move(download_ptr));
+    }, Qt::QueuedConnection);
 }
 
 void ComputerProgramWidget::all_downloads_done(){
     QMetaObject::invokeMethod(this, [this]{
-        this->m_downloads_table->remove_all_downloads();
-    });
+        this->ensure_downloads_table()->remove_all_downloads();
+    }, Qt::QueuedConnection);
+}
+
+ProgramResourceDownloadTableWidget* ComputerProgramWidget::ensure_downloads_table() {
+    if (!m_internal_lazy_downloads_table) {
+        m_internal_lazy_downloads_table = new ProgramResourceDownloadTableWidget(*this);
+        m_internal_lazy_downloads_table->setVisible(false);
+        m_layout->addWidget(m_internal_lazy_downloads_table);
+    }
+    return m_internal_lazy_downloads_table;
 }
 
 

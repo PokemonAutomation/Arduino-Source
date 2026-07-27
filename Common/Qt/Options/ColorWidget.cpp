@@ -13,6 +13,7 @@ namespace PokemonAutomation{
 
 
 template class RegisterConfigWidget<ColorCellWidget>;
+template class RegisterConfigWidget<ColorOptionWidget>;
 
 
 
@@ -61,6 +62,38 @@ void ColorCellWidget::on_config_value_changed(void* object){
         update_value();
     }, Qt::QueuedConnection);
 }
+
+
+
+
+
+
+ColorOptionWidget::~ColorOptionWidget(){
+    m_value.remove_listener(*this);
+}
+ColorOptionWidget::ColorOptionWidget(QWidget& parent, ColorOption& value)
+    : QWidget(&parent)
+    , ConfigWidget(value, *this)
+    , m_cell(new ColorCellWidget(*this, value))
+{
+    QHBoxLayout* layout = new QHBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    QLabel* text = new QLabel(QString::fromStdString(value.label()), this);
+    text->setWordWrap(true);
+    text->setTextFormat(Qt::RichText);
+    text->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    text->setOpenExternalLinks(true);
+    layout->addWidget(text, 1);
+    layout->addWidget(m_cell, 1);
+    value.add_listener(*this);
+}
+void ColorOptionWidget::update_value(){
+    m_cell->update_value();
+}
+void ColorOptionWidget::on_config_value_changed(void* object){
+    m_cell->on_config_value_changed(object);
+}
+
 
 
 

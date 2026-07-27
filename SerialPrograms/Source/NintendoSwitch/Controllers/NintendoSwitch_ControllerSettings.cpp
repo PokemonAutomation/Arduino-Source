@@ -374,7 +374,7 @@ void ControllerSettingsRow::on_config_value_changed(void* object){
     }
 
 }
-void ControllerSettingsRow::on_press(){
+void ControllerSettingsRow::on_press(ButtonCell& button){
     set_profile(ControllerSettingsTable::random_profile(controller, nullptr));
 }
 
@@ -394,8 +394,7 @@ ControllerSettingsTable::ControllerSettingsTable()
         "Changing it will not actually change the MAC address of the device."
         "<br><br>"
         "Changes take effect after resetting the device.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        true
+        LockMode::UNLOCK_WHILE_RUNNING
     )
 {}
 std::vector<std::string> ControllerSettingsTable::make_header() const{

@@ -38,8 +38,22 @@ protected:
     Color m_color;
     ImageFloatBox m_box;
 };
+class BattleArrowWatcher : public DetectorToFinder<BattleArrowDetector>{
+public:
+    BattleArrowWatcher(Color color = COLOR_RED, ImageFloatBox box = {0.546, 0.863, 0.045, 0.068})
+         : DetectorToFinder(
+            "BattleArrowWatcher",
+            FinderType::PRESENT,
+            std::chrono::milliseconds(250),
+            color,
+            box
+        )
+    {}
+};
 
 
+
+#if 0
 //
 //  We use a custom watcher because the arrow wiggles and thus is less likely to
 //  maintain consecutive detections.
@@ -61,6 +75,7 @@ public:
 private:
     std::deque<WallClock> m_detections;
 };
+#endif
 
 
 

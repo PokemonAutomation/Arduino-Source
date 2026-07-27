@@ -4,8 +4,11 @@
  *
  */
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "Tests/TestUtils.h"
 #include "PokemonLA_CommonColorCheck.h"
 #include "PokemonLA_DialogDetector.h"
 
@@ -192,6 +195,65 @@ bool EventDialogDetector::process_frame(const ImageViewRGB32& frame, WallClock t
 
     return detected && m_stop_on_detected;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+class Test_EventDialogDetector : public UnitTest{
+public:
+    Test_EventDialogDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonLA::EventDialogDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyVideoOverlay overlay;
+        EventDialogDetector detector(logger, overlay, true);
+        ImageRGB32 image(m_image);
+        return detector.process_frame(image, current_time()) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+
+
+
+
+
+void add_tests_DialogDetector(UnitTestDatabase& database){
+    database.add<Test_EventDialogDetector>("PokemonLA/EventDialogDetector/French_Fieldlands_720P_True.jpeg", true);
+    database.add<Test_EventDialogDetector>("PokemonLA/EventDialogDetector/macOS_bright/MMO_Coastlands_True.png", true);
+    database.add<Test_EventDialogDetector>("PokemonLA/EventDialogDetector/macOS_bright/MMO_Mirelands_True.png", true);
+    database.add<Test_EventDialogDetector>("PokemonLA/EventDialogDetector/macOS_bright/Tent_True.png", true);
+    database.add<Test_EventDialogDetector>("PokemonLA/EventDialogDetector/WinMyPin/MyPin_BlackDialog_True.png", true);
+    database.add<Test_EventDialogDetector>("PokemonLA/EventDialogDetector/WinShadowCast/Icelands_True.png", true);
+    database.add<Test_EventDialogDetector>("PokemonLA/EventDialogDetector/WinShadowCast/Mirelands_True.png", true);
+
+}
+
+
+
+
+
+
+
+
 }
 }
 }

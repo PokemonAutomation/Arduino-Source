@@ -9,6 +9,7 @@
 
 #include <deque>
 #include "Common/Cpp/Logging/AbstractLogger.h"
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "PokemonLA_WhiteObjectDetector.h"
 #include "PokemonLA_FlagDetector.h"
@@ -48,6 +49,12 @@ private:
 
     std::deque<Sample> m_history;
 };
+
+
+
+
+void add_tests_FlagTracker(UnitTestDatabase& database);
+
 
 
 

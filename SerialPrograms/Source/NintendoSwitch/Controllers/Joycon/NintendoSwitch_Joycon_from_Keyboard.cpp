@@ -185,7 +185,6 @@ JoyconFromKeyboardTable::JoyconFromKeyboardTable(bool left)
     : EditableTableOption_t<JoyconFromKeyboardTableRow>(
         left ? "<b>Left Joycon:</b>" : "<b>Right Joycon:</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
-        true,
         make_defaults(left)
     )
     , m_advanced_mode(false)

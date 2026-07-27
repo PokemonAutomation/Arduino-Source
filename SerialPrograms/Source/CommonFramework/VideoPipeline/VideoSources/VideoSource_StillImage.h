@@ -43,7 +43,8 @@ public:
     virtual std::unique_ptr<VideoSource> make_VideoSource(
         Logger& logger,
         Resolution resolution,
-        VideoFormat format
+        VideoFormat format,
+        FramesPerSecond fps
     ) const override;
 
 
@@ -72,6 +73,9 @@ public:
     }
     virtual VideoFormat current_format() const override{
         return m_format;
+    }
+    virtual FramesPerSecond current_fps() const override{
+        return 0;
     }
     virtual const VideoFormatSet& supported_formats() const override{
         return m_formats;

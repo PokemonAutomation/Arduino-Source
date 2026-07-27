@@ -8,6 +8,7 @@
 #define PokemonAutomation_Options_EditableTableWidget_H
 
 #include <QWidget>
+#include <QLabel>
 #include "Common/Cpp/Options/EditableTableOption.h"
 #include "ConfigWidget.h"
 
@@ -30,13 +31,25 @@ public:
     void update_sizes();
 
 private:
+    virtual void mouseDoubleClickEvent(QMouseEvent* event) override;
+
+    void make_table();
     QWidget* make_clone_button(EditableTableRow& row);
     QWidget* make_insert_button(EditableTableRow& row);
     QWidget* make_delete_button(EditableTableRow& row);
 
+    class Label : public QLabel{
+    public:
+        using QLabel::QLabel;
+        virtual void mouseDoubleClickEvent(QMouseEvent* event) override;
+
+        EditableTableWidget* m_parent;
+    };
+
 private:
     EditableTableOption& m_value;
-    AutoHeightTableWidget* m_table;
+    AutoHeightTableWidget* m_table = nullptr;
+    QWidget* m_expand_text = nullptr;
     std::vector<std::shared_ptr<EditableTableRow>> m_current;
 };
 

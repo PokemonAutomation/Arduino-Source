@@ -143,6 +143,16 @@ EggRng::EggRng()
         LockMode::LOCK_WHILE_RUNNING,
         GameVersion::firered
         )
+    , SOUND(
+        "<b>Sound:</b><br>"
+        "Your in-game sound setting. This affects the possible seeds.",
+        {
+            {SoundSetting::Mono, "mono", "Mono"},
+            {SoundSetting::Stereo, "stereo", "Stereo"}
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        SoundSetting::Mono
+        )
     , m_target_settings("Target Settings")
     , EGG_SPECIES(
         "<b>Egg Species:</b>",
@@ -166,42 +176,6 @@ EggRng::EggRng()
         "70FE", "70FE",
         true
         )
-    , HELD_SEED_LIST(
-        "<b>Nearby Held Seeds:</b><br>"
-        "This box should contain a list of seeds (in order) around and including your held seed, with one seed on each line",
-        LockMode::LOCK_WHILE_RUNNING,
-        "D000\n199A\n77A1\nAABC\n280C\n70FE\nB573\n02F2\n8084\nA533\nED1E",
-        "D000\n199A\n77A1\nAABC\n280C\n70FE\nB573\n02F2\n8084\nA533\nED1E",
-        true
-        )
-    , HELD_SEED_BUTTON(
-        "<b>Held Seed Button:</b><br>",
-        {
-            {SeedButton::A, "A", "A"},
-            {SeedButton::Start, "Start", "Start"},
-            {SeedButton::L, "L", "L (L=A)"},
-        },
-        LockMode::LOCK_WHILE_RUNNING,
-        SeedButton::A
-        )
-    , HELD_EXTRA_BUTTON(
-        "<b>Held Seed Extra Button:</b><br>"
-        "Additional button presses that affect the seed.",
-        {
-            {BlackoutButton::None, "None", "None"},
-            {BlackoutButton::L, "L", "Blackout L"},
-            {BlackoutButton::R, "R", "Blackout R"},
-        },
-        LockMode::LOCK_WHILE_RUNNING,
-        BlackoutButton::None
-        )
-    , HELD_SEED_DELAY(
-        "<b>Held Seed Delay Time (ms):</b><br>"
-        "The delay between starting the game and advancing past the title screen. Set this to match your held seed.<br>"
-        "<i>If using Ten Lines, select <b>Nintendo Switch 1</b> as your console even if using a Switch 2.</i>",
-        LockMode::LOCK_WHILE_RUNNING,
-        31338, 30400 // default, min
-        )
     , HELD_ADVANCES(
         "<b>Held Advances:</b><br>The total number of RNG advances for your held target.",
         LockMode::LOCK_WHILE_RUNNING,
@@ -215,48 +189,18 @@ EggRng::EggRng()
         "70FE", "70FE",
         true
         )
-    , PICKUP_SEED_LIST(
-        "<b>Nearby Pickup Seeds:</b><br>"
-        "This box should contain a list of seeds (in order) around and including your held seed, with one seed on each line",
-        LockMode::LOCK_WHILE_RUNNING,
-        "D000\n199A\n77A1\nAABC\n280C\n70FE\nB573\n02F2\n8084\nA533\nED1E",
-        "D000\n199A\n77A1\nAABC\n280C\n70FE\nB573\n02F2\n8084\nA533\nED1E",
-        true
-        )
-    , PICKUP_SEED_BUTTON(
-        "<b>Pickup Seed Button:</b><br>",
-        {
-            {SeedButton::A, "A", "A"},
-            {SeedButton::Start, "Start", "Start"},
-            {SeedButton::L, "L", "L (L=A)"},
-        },
-        LockMode::LOCK_WHILE_RUNNING,
-        SeedButton::A
-        )
-    , PICKUP_EXTRA_BUTTON(
-        "<b>Pickup Seed Extra Button:</b><br>"
-        "Additional button presses that affect the seed.",
-        {
-            {BlackoutButton::None, "None", "None"},
-            {BlackoutButton::L, "L", "Blackout L"},
-            {BlackoutButton::R, "R", "Blackout R"},
-        },
-        LockMode::LOCK_WHILE_RUNNING,
-        BlackoutButton::None
-        )
-    , PICKUP_SEED_DELAY(
-        "<b>Pickup Seed Delay Time (ms):</b><br>"
-        "The delay between starting the game and advancing past the title screen. Set this to match your held seed.<br>"
-        "<i>If using Ten Lines, select <b>Nintendo Switch 1</b> as your console even if using a Switch 2.</i>",
-        LockMode::LOCK_WHILE_RUNNING,
-        31338, 30400 // default, min
-        )
     , PICKUP_ADVANCES(
         "<b>Pickup Advances:</b><br>The total number of RNG advances for your pickup target.",
         LockMode::LOCK_WHILE_RUNNING,
         10000, 700, 1000000000 // default, min
         )
     , m_program_settings("Program Settings")
+    , SEED_RADIUS(
+        "<b>Nearby Seed Radius:</b><br>"
+        "The number of nearby seeds on each side of the target to search when identifying which seed was hit.",
+        LockMode::LOCK_WHILE_RUNNING,
+        5, 1 // default, min
+        )
     , STARTING_POINT(
         "<b>Starting Point:</b>",
         {
@@ -319,25 +263,19 @@ EggRng::EggRng()
     PA_ADD_OPTION(m_game_info);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(GAME_VERSION);
+    PA_ADD_OPTION(SOUND);
     PA_ADD_OPTION(m_target_settings);
     PA_ADD_OPTION(EGG_SPECIES);
     PA_ADD_OPTION(COMPATIBILITY);
     PA_ADD_OPTION(PARENT_IVS);
     PA_ADD_OPTION(m_held_settings);
     PA_ADD_OPTION(HELD_SEED);
-    PA_ADD_OPTION(HELD_SEED_LIST);
-    PA_ADD_OPTION(HELD_SEED_BUTTON);
-    PA_ADD_OPTION(HELD_EXTRA_BUTTON);
-    PA_ADD_OPTION(HELD_SEED_DELAY);
     PA_ADD_OPTION(HELD_ADVANCES);
     PA_ADD_OPTION(m_pickup_settings);
     PA_ADD_OPTION(PICKUP_SEED);
-    PA_ADD_OPTION(PICKUP_SEED_LIST);
-    PA_ADD_OPTION(PICKUP_SEED_BUTTON);
-    PA_ADD_OPTION(PICKUP_EXTRA_BUTTON);
-    PA_ADD_OPTION(PICKUP_SEED_DELAY);
     PA_ADD_OPTION(PICKUP_ADVANCES);
     PA_ADD_OPTION(m_program_settings);
+    PA_ADD_OPTION(SEED_RADIUS);
     PA_ADD_OPTION(STARTING_POINT);
     PA_ADD_OPTION(MAX_RESETS);
     PA_ADD_OPTION(MAX_BALL_THROWS);
@@ -404,6 +342,8 @@ bool EggRng::reset_and_check_seed(
     const uint64_t& SEED_DELAY = frame_target.seed_delay;
     const std::vector<uint16_t>& SEED_VALUES = frame_target.seed_values;
     const int16_t& SEED_POSITION = frame_target.seed_position;
+    const SeedButton& SEED_BUTTON = frame_target.seed_button;
+    const BlackoutButton& EXTRA_BUTTON = frame_target.extra_button;
 
     static const int64_t FIXED_SEED_OFFSET = -845; // ms, approximate
     const int64_t FIXED_ADVANCES_OFFSET = pickup_frame ? -246 : 135;    // frames, approximate
@@ -439,9 +379,8 @@ bool EggRng::reset_and_check_seed(
     // Step 1: reset and perform blind sequence
     env.log("Resetting Game...");
     reset_and_perform_blind_sequence(
-        env.console, context, target, 
-        pickup_frame ? PICKUP_SEED_BUTTON : HELD_SEED_BUTTON, 
-        pickup_frame ? PICKUP_EXTRA_BUTTON : HELD_EXTRA_BUTTON,
+        env.console, context, target,
+        SEED_BUTTON, EXTRA_BUTTON,
         timings, launch_delay, false, PROFILE
     );
     stats.resets++; 
@@ -794,35 +733,37 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
         SPECIES_LIST.emplace(slot.species);
     }
 
+    const SeedsDatabase seeds_db(seeds_json_path(GAME_VERSION == GameVersion::firered, LANGUAGE));
+
     // held timings
     const uint16_t TARGET_HELD_SEED = parse_seed(env.console, HELD_SEED);
-    const std::vector<uint16_t> HELD_SEED_VALUES = parse_seed_list(env.console, HELD_SEED_LIST);
-    const int16_t HELD_SEED_POSITION = seed_position_in_list(TARGET_HELD_SEED, HELD_SEED_VALUES);
-    if (HELD_SEED_POSITION == -1){
+    const SeedMatch held_match = seeds_db.find_seed(TARGET_HELD_SEED, SOUND, SEED_RADIUS);
+    if (!held_match.found){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "EggRng(): Held Seed is missing from the list of nearby seeds.",
+            "EggRng(): Held Seed was not found in the seed database for this game version, language, and sound setting.",
             env.console
-        ); 
+        );
     }
-    env.log("Target Held Seed Value: " + to_hex_string(TARGET_HELD_SEED));
+    env.log("Target Held Seed Value: " + to_hex_string(TARGET_HELD_SEED)
+        + " (delay " + std::to_string(held_match.seed_delay) + "ms, button mode " + held_match.button_mode + ")");
 
     // pickup timings
     const uint16_t TARGET_PICKUP_SEED = parse_seed(env.console, PICKUP_SEED);
-    const std::vector<uint16_t> PICKUP_SEED_VALUES = parse_seed_list(env.console, PICKUP_SEED_LIST);
-    const int16_t PICKUP_SEED_POSITION = seed_position_in_list(TARGET_PICKUP_SEED, PICKUP_SEED_VALUES);
-    if (PICKUP_SEED_POSITION == -1){
+    const SeedMatch pickup_match = seeds_db.find_seed(TARGET_PICKUP_SEED, SOUND, SEED_RADIUS);
+    if (!pickup_match.found){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "EggRng(): Pickup Seed is missing from the list of nearby seeds.",
+            "EggRng(): Pickup Seed was not found in the seed database for this game version, language, and sound setting.",
             env.console
-        ); 
+        );
     }
-    env.log("Target Pickup Seed Value: " + to_hex_string(TARGET_PICKUP_SEED));
+    env.log("Target Pickup Seed Value: " + to_hex_string(TARGET_PICKUP_SEED)
+        + " (delay " + std::to_string(pickup_match.seed_delay) + "ms, button mode " + pickup_match.button_mode + ")");
 
     EggFrameTargets frame_targets{
-        { HELD_SEED_DELAY, HELD_SEED_VALUES, HELD_SEED_POSITION },
-        { PICKUP_SEED_DELAY, PICKUP_SEED_VALUES, PICKUP_SEED_POSITION }
+        { held_match.seed_delay, held_match.seed_values, held_match.seed_position, held_match.seed_button, held_match.extra_button },
+        { pickup_match.seed_delay, pickup_match.seed_values, pickup_match.seed_position, pickup_match.seed_button, pickup_match.extra_button }
     };
 
     // searchers

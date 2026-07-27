@@ -123,6 +123,19 @@ void do_action_and_run_from_battle(
     >&& action
 );
 
+// same as do_action_and_run_from_battle, but will 
+// stop the action once the overworld disappears
+void do_action_and_run_from_battle2(
+    const ProgramInfo& info, 
+    VideoStream& stream,
+    ProControllerContext& context,
+    std::function<
+        void(const ProgramInfo& info, 
+        VideoStream& stream,
+        ProControllerContext& context)
+    >&& action
+);
+
 void move_to_start_position_for_letsgo0(VideoStream& stream, ProControllerContext& context);
 
 void move_to_start_position_for_letsgo1(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);

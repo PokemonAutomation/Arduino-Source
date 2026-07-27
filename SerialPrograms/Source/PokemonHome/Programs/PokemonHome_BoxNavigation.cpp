@@ -13,6 +13,7 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "CommonTools/OCR/OCR_StringNormalization.h"
@@ -262,7 +263,20 @@ void read_summary_screen(
 
     VideoSnapshot screen = env.console.video().snapshot();
 
-    const int dex_number = OCR::read_number_waterfill(env.console, extract_box_reference(screen, national_dex_number_box), 0xff808080, 0xffffffff);
+    const std::vector<std::pair<uint32_t, uint32_t>> white_number_filters = {
+        {0xff808080, 0xffffffff},
+        {0xff909090, 0xffffffff},
+    };
+
+    const int dex_number = OCR::read_number_waterfill_multifilter(
+        env.console, 
+        GlobalThreadPools::computation_normal(), 
+        extract_box_reference(screen, national_dex_number_box), 
+        white_number_filters,
+        true,
+        true,
+        20
+    );
     if (dex_number <= 0 || dex_number > static_cast<int>(NATIONAL_DEX_SLUGS().size())) {
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -295,7 +309,12 @@ void read_summary_screen(
     env.console.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
     cur_pokemon_info.gender = gender;
 
-    const int ot_id = OCR::read_number_waterfill(env.console, extract_box_reference(screen, ot_id_box), 0xff808080, 0xffffffff);
+    const int ot_id = OCR::read_number_waterfill_multifilter(
+        env.console, 
+        GlobalThreadPools::computation_normal(),
+        extract_box_reference(screen, ot_id_box), 
+        white_number_filters
+    );
     if (ot_id < 0 || ot_id > 999'999) {
         dump_image(env.console, ProgramInfo(), "ReadSummary_OT", screen);
     }

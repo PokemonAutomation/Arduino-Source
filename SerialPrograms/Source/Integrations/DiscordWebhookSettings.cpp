@@ -75,7 +75,9 @@ void DiscordWebhookUrl::load_json(const JsonValue& json){
 DiscordWebhookSettingsTable::DiscordWebhookSettingsTable()
     : EditableTableOption_t<DiscordWebhookUrl>(
         "<b>Discord Webhook URLs:</b> Notifications are sent to all enabled URLs that share a tag with the event.",
-        LockMode::LOCK_WHILE_RUNNING
+        LockMode::LOCK_WHILE_RUNNING,
+        true,
+        10
     )
 {}
 std::vector<std::string> DiscordWebhookSettingsTable::make_header() const{
@@ -96,7 +98,9 @@ DiscordWebhookSettingsOption::DiscordWebhookSettingsOption()
     : GroupOption(
         "Discord Webhook Settings",
         LockMode::LOCK_WHILE_RUNNING,
-        GroupOption::EnableMode::DEFAULT_ENABLED, false
+        GroupOption::EnableMode::DEFAULT_ENABLED,
+        false,
+        false
     )
     , sends_per_second(
         "<b>Rate Limit:</b><br>Maximum number of sends per second.",

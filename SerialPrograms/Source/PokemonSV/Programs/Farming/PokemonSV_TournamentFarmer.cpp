@@ -155,7 +155,7 @@ TournamentFarmer::TournamentFarmer()
     STOP_AFTER_CURRENT.add_listener(*this);
 }
 
-void TournamentFarmer::on_press(){
+void TournamentFarmer::on_press(ButtonCell& button){
     global_logger_tagged().log("Stop after current requested...");
     m_stop_after_current.store(true, std::memory_order_relaxed);
     STOP_AFTER_CURRENT.set_pressed();

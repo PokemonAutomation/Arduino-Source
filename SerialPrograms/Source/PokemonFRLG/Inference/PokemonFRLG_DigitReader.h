@@ -7,7 +7,7 @@
  *  then template-matches each cropped digit against the pre-stored digit
  *  templates (Resources/PokemonFRLG/Digits/0-9.png) on the unblurred original.
  *
- *  This is the Tesseract/PaddleOCR-free fallback path for USE_PADDLE_OCR=false.
+ *  This is the Tesseract (PaddleOCR-free) fallback path.
  */
 
 #ifndef PokemonAutomation_PokemonFRLG_DigitReader_H
