@@ -53,6 +53,17 @@ private:
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 
+    //For easier testing after release
+    //regis are up/down only and don't really need
+    SectionDividerOption m_advanced_options;
+    MillisecondsOption KYOGRE_RIGHT_FIRST;
+    MillisecondsOption KYOGRE_UP_FIRST;
+    MillisecondsOption KYOGRE_RIGHT_SECOND;
+    MillisecondsOption HOOH_UP_DOWN;
+    MillisecondsOption HOOH_LEFT_RIGHT;
+    MillisecondsOption LUGIA_UP_DOWN0;
+    MillisecondsOption LUGIA_LEFT_RIGHT0;
+
     void reset_regi(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void reset_groudon(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void reset_kyogre(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
