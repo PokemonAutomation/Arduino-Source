@@ -198,7 +198,7 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
 cv::Mat crop_to_text_region(const cv::Mat& image) {
     // first convert to grayscale
     cv::Mat gray;
-    cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+    cv::cvtColor(image, gray, cv::COLOR_RGB2GRAY);
 
     // get a binary image, for cropping purposes
     cv::Mat binary;
