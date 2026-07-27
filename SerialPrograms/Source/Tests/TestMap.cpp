@@ -13,7 +13,6 @@
 #include "PokemonHome_Tests.h"
 #include "PokemonLA_Tests_Old.h"
 #include "PokemonLZA_Tests.h"
-#include "PokemonSwSh_Tests_Old.h"
 #include "PokemonSV_Tests.h"
 #include "TestMap.h"
 #include "TestUtils.h"
@@ -234,18 +233,6 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"NintendoSwitch_CheckOnlineDetector", std::bind(image_bool_detector_helper, test_NintendoSwitch_CheckOnlineDetector, _1)},
     {"NintendoSwitch_FailedToConnectDetector", std::bind(image_bool_detector_helper, test_NintendoSwitch_FailedToConnectDetector, _1)},
     {"NintendoSwitch_UpdatePopupDetector", std::bind(image_bool_detector_helper, test_NintendoSwitch_UpdatePopupDetector, _1)},
-    {"PokemonSwSh_YCommMenuDetector", std::bind(image_bool_detector_helper, test_pokemonSwSh_YCommMenuDetector, _1)},
-    {"PokemonSwSh_MaxLair_BattleMenuDetector", std::bind(image_bool_detector_helper, test_pokemonSwSh_MaxLair_BattleMenuDetector, _1)},
-    {"PokemonSwSh_DialogTriangleDetector", std::bind(image_bool_detector_helper, test_pokemonSwSh_DialogTriangleDetector, _1)},
-    {"PokemonSwSh_RetrieveEggArrowFinder", std::bind(image_bool_detector_helper, test_pokemonSwSh_RetrieveEggArrowFinder, _1)},
-    {"PokemonSwSh_YCommIconDetector", std::bind(image_bool_detector_helper, test_pokemonSwSh_YCommIconDetector, _1)},
-    {"PokemonSwSh_RotomPhoneMenuArrowFinder", std::bind(image_int_detector_helper, test_pokemonSwSh_RotomPhoneMenuArrowFinder, _1)},
-    {"PokemonSwSh_StoragePokemonMenuArrowFinder", std::bind(image_bool_detector_helper, test_pokemonSwSh_StoragePokemonMenuArrowFinder, _1)},
-    {"PokemonSwSh_CheckNurseryArrowFinder", std::bind(image_bool_detector_helper, test_pokemonSwSh_CheckNurseryArrowFinder, _1)},
-    {"PokemonSwSh_BlackDialogBoxDetector", std::bind(image_bool_detector_helper, test_pokemonSwSh_BlackDialogBoxDetector, _1)},
-    {"PokemonSwSh_BoxShinySymbolDetector", std::bind(image_bool_detector_helper, test_pokemonSwSh_BoxShinySymbolDetector, _1)},
-    {"PokemonSwSh_BoxGenderDetector", std::bind(image_int_detector_helper, test_pokemonSwSh_BoxGenderDetector, _1)},
-    {"PokemonSwSh_SelectionArrowFinder", std::bind(image_int_detector_helper, test_pokemonSwSh_SelectionArrowFinder, _1)},
     {"PokemonLA_BattleMenuDetector", std::bind(image_bool_detector_helper, test_pokemonLA_BattleMenuDetector, _1)},
     {"PokemonLA_BattlePokemonSwitchDetector", std::bind(image_bool_detector_helper, test_pokemonLA_BattlePokemonSwitchDetector, _1)},
     {"PokemonLA_TransparentDialogueDetector", std::bind(image_bool_detector_helper, test_pokemonLA_TransparentDialogueDetector, _1)},

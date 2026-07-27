@@ -281,6 +281,28 @@ private:
     std::string m_image;
     bool m_expected;
 };
+class Test_CheckNurseryArrowFinder : public UnitTest{
+public:
+    Test_CheckNurseryArrowFinder(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonSwSh::CheckNurseryArrowFinder - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyVideoOverlay overlay;
+        CheckNurseryArrowFinder detector(overlay);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
 class Test_StoragePokemonMenuArrowFinder : public UnitTest{
 public:
     Test_StoragePokemonMenuArrowFinder(

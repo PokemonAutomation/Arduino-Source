@@ -5,6 +5,8 @@
  */
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
@@ -19,6 +21,8 @@ namespace PokemonSwSh{
 
 
 void add_tests(UnitTestDatabase& database){
+    NintendoSwitch::PokemonSwSh::add_tests_DialogBoxDetector(database);
+    NintendoSwitch::PokemonSwSh::add_tests_DialogTriangleDetector(database);
     NintendoSwitch::PokemonSwSh::add_tests_BoxGenderDetector(database);
     NintendoSwitch::PokemonSwSh::add_tests_BoxShinySymbolDetector(database);
     NintendoSwitch::PokemonSwSh::add_tests_YCommDetector(database);

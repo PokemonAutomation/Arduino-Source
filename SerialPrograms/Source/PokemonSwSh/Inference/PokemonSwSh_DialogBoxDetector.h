@@ -83,6 +83,10 @@ public:
 
 
 
+void add_tests_DialogBoxDetector(UnitTestDatabase& database);
+
+
+
 }
 }
 }

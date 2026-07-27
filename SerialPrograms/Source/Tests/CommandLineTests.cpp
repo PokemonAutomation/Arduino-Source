@@ -175,7 +175,6 @@ int run_command_line_tests(){
         cout << "Running parallel unit tests..." << endl;
         ComputerPrograms::CommandLineUnitTestRunner runner(global_logger_command_line());
         if (runner.run()){
-			cout << "Running parallel unit tests... Failed!" << endl;
             return 1;
         }
         cout << "Running parallel unit tests... Done!" << endl;

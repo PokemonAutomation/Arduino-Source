@@ -2910,8 +2910,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Tests/PokemonLZA_Tests.h
     Source/Tests/PokemonSV_Tests.cpp
     Source/Tests/PokemonSV_Tests.h
-    Source/Tests/PokemonSwSh_Tests_Old.cpp
-    Source/Tests/PokemonSwSh_Tests_Old.h
     Source/Tests/TestMap.cpp
     Source/Tests/TestMap.h
     Source/Tests/TestUtils.cpp

@@ -8,6 +8,8 @@
 #include <array>
 
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
@@ -108,6 +110,36 @@ bool WhiteDialogBoxDetector::detect(const ImageViewRGB32& screen){
 
 
 
+
+
+
+
+class Test_BlackDialogBoxDetector : public UnitTest{
+public:
+    Test_BlackDialogBoxDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonSwSh::BlackDialogBoxDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        BlackDialogBoxDetector detector(true);
+        ImageRGB32 image(m_image);
+        return detector.process_frame(image, current_time()) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+
+void add_tests_DialogBoxDetector(UnitTestDatabase& database){
+
+}
 
 
 
