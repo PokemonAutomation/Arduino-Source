@@ -295,24 +295,16 @@ cv::Scalar estimate_background_color(const cv::Mat& image) {
         return cv::Scalar(255, 255, 255);
     }
 
-    cv::Vec3b tl = image.at<cv::Vec3b>(0, 0);
-    cv::Vec3b tr = image.at<cv::Vec3b>(0, image.cols - 1);
-    cv::Vec3b bl = image.at<cv::Vec3b>(image.rows - 1, 0);
-    cv::Vec3b br = image.at<cv::Vec3b>(image.rows - 1, image.cols - 1);
+    // use the corner pixels to estimate the background color
+    const cv::Vec3b* top = image.ptr<cv::Vec3b>(0);
+    const cv::Vec3b* bottom = image.ptr<cv::Vec3b>(image.rows - 1);
 
-    // optimization due to the fact that most input images have a white background
-    if (tl[0] >= 240 && tl[1] >= 240 && tl[2] >= 240 &&
-        tr[0] >= 240 && tr[1] >= 240 && tr[2] >= 240 &&
-        bl[0] >= 240 && bl[1] >= 240 && bl[2] >= 240 &&
-        br[0] >= 240 && br[1] >= 240 && br[2] >= 240) {
-        return cv::Scalar(255, 255, 255);
-    }
+    cv::Scalar tl(top[0]);
+    cv::Scalar tr(top[image.cols - 1]);
+    cv::Scalar bl(bottom[0]);
+    cv::Scalar br(bottom[image.cols - 1]);
 
-    return cv::Scalar(
-        (static_cast<int>(tl[0]) + tr[0] + bl[0] + br[0]) * 0.25, // Blue (or Red if RGB). cast to int to avoid overflow
-        (static_cast<int>(tl[1]) + tr[1] + bl[1] + br[1]) * 0.25, // Green
-        (static_cast<int>(tl[2]) + tr[2] + bl[2] + br[2]) * 0.25  // Red (or Blue if RGB)
-    );
+    return (tl + tr + bl + br) * 0.25;
 }
 
 
