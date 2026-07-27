@@ -530,7 +530,14 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         int16_t gender_threshold = species_stats.gender_threshold;
 
         AdvRngFilters filters = observation_to_filters(pokemon, base_stats, AdvRngMethod::Any);
+        bool valid_stats = validate_level(filters, pokemon, ENCOUNTER_SLOTS, base_stats);
         RNG_FILTERS.set(filters);
+
+        if (!valid_stats){
+            env.log("Invalid encounter stats. Resetting...", COLOR_RED);
+            failed_searches++;
+            continue;
+        }
 
         std::vector<AdvRngState> search_hits = refine_calibration_with_rare_candy(
             env, context, LANGUAGE, pokemon, filters, base_stats,

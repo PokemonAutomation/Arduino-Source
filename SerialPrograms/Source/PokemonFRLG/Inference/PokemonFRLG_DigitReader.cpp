@@ -251,8 +251,8 @@ int read_digits_waterfill_template(
         auto iter = session->make_iterator(min_area);
         WaterfillObject obj;
         while (blobs.size() < 8 && iter->find_next(obj, false)){
-            // Require at least 3px wide AND 3px tall to discard noise fragments.
-            if (obj.max_x - obj.min_x < 3 || obj.max_y - obj.min_y < 3){
+            // Require at least 5px wide AND 15px tall to discard noise fragments.
+            if (obj.max_x - obj.min_x < 5 || obj.max_y - obj.min_y < 15){
                 continue;
             }
             // Use min_x as key so the map is automatically sorted left-to-right.
