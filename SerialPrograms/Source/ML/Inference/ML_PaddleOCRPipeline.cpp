@@ -15,6 +15,10 @@
 #include "ML/Models/ML_ONNXRuntimeHelpers.h"
 #include "ML_PaddleOCRPipeline.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace ML{
 
@@ -96,30 +100,42 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
 
     // 1. Convert Image to OpenCV image (cv::mat)
     cv::Mat cv_image_rgb = imageviewrgb32_to_cv_mat_rgb(image);
+    if (cv_image_rgb.empty()) {
+        return "";
+    }
+
     
-    // 1b. Whitespace Trimming Logic
-    // crop tightly around the text, with small safety margin
+    // 2. Crop tightly around the text, with small safety margin
+    // first convert to grayscale
     cv::Mat gray;
     cv::cvtColor(cv_image_rgb, gray, cv::COLOR_BGR2GRAY);
 
-    // we are assuming that pre-processing already done on image so the text is black,
-    // and background is white.
-    // Invert image for findNonZero: text becomes white (255), background black (0)
-    cv::Mat binary_inv;
-    cv::threshold(gray, binary_inv, 250, 255, cv::THRESH_BINARY_INV);
+    // get a binary image, for cropping purposes
+    cv::Mat binary;
+    cv::threshold(gray, binary, 0, 255,
+                cv::THRESH_BINARY_INV | cv::THRESH_OTSU);
 
-    // Find coordinates of all text pixels
+    double ratio = cv::countNonZero(binary) /
+                static_cast<double>(binary.total());
+
+    // If most pixels are white, we actually segmented the background.
+    // Flip it so text becomes white again.
+    if (ratio > 0.5){
+        cv::bitwise_not(binary, binary);
+    }                
+
+    // Find coordinates of all non-zero pixels (the text)
     std::vector<cv::Point> nonZeroCoords;
-    cv::findNonZero(binary_inv, nonZeroCoords);
-
-    cv::Mat cropped_image;
+    cv::findNonZero(binary, nonZeroCoords);
     if (nonZeroCoords.empty()){
         return "";
     }
+
+    // create bounding box for crop
     cv::Rect bbox = cv::boundingRect(nonZeroCoords);
 
-    // Small safety margin around the crop
-    int pad_x = std::max(4, bbox.height / 10);  // ~10% of text height. use height to account for cases of a single narrow character
+    // increase bounding box slightly to add small safety margin
+    int pad_x = std::max(4, bbox.width / 20);  // ~5%
     int pad_y = std::max(2, bbox.height / 20);  // ~5%
 
     bbox.x = std::max(0, bbox.x - pad_x);
@@ -135,6 +151,8 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
         bbox.height + 2 * pad_y
     );
 
+    // crop the original image based on the bounding box
+    cv::Mat cropped_image;
     cropped_image = cv_image_rgb(bbox).clone();
 
     int h = cropped_image.rows;
@@ -142,7 +160,7 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
 
     constexpr float min_ratio = 0.5f;
 
-    // add more horizontal padding to tall/narrow characters
+    // add horizontal padding (white pixels) to tall/narrow characters
     if ((float)w / h < min_ratio) {
         int target_w = static_cast<int>(std::ceil(min_ratio * h));
 
@@ -155,11 +173,17 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
             0, 0,              // no vertical padding
             left, right,
             cv::BORDER_CONSTANT,
-            cv::Scalar(255,255,255)
+            cv::Scalar(255,255,255) // add white pixels
         );
     }
 
-    // 2a. Calculate dynamic width (maintain aspect ratio)
+    // static int i = 0;
+    // i++;
+    // cv::imwrite("aabinary" + std::to_string(i) + ".png", binary);
+    // cv::imwrite("aacropped_image" + std::to_string(i) + ".png", cropped_image);
+
+
+    // 3. Calculate dynamic width (maintain aspect ratio)
     // the model shape is {1, 3, 48, dynamic_width}. Note that the height is fixed at 48 pixels
     // the input image must be scaled to match the height of 48, for the neural network
     int target_h = 48;
@@ -181,13 +205,13 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     );
 
 
-    // 3. Normalize
+    // 4. Normalize
     // convert UC3 8-bit [0,255] to 32FC3 float [0,1], then use ImageNet Normalization
     // output = (Input * Scale) = (old_pixel * 1/255). This transforms [0,255] to range [0, 1]
     // TODO: determine if normalizing to [-1,1] is preferred or to perform ImageNet normalization (mean = [0.485, 0.456, 0.406] and std = [0.229, 0.224, 0.225])
     resized.convertTo(resized, CV_32FC3, 1.0 / 255.0);
     
-    // 3b. Apply Mean/Std (Standard for PaddleOCR). except for Chinese
+    // 4b. Apply Mean/Std (Standard for PaddleOCR). except for Chinese
     // Mean: [0.485, 0.456, 0.406], Std: [0.229, 0.224, 0.225]
     if (!(m_language == Language::ChineseSimplified || 
         m_language == Language::ChineseTraditional ||
@@ -203,13 +227,13 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     }
     
     
-    // 3. Convert HWC to NCHW
+    // 5. Convert HWC to NCHW
     std::vector<float> input_tensor_values = preprocess_NCHW(resized);
 
-    // 4. Define Dynamic Shape
+    // 6. Define Dynamic Shape
     std::vector<int64_t> input_shape = {1, 3, target_h, target_w};
 
-    // 5. Create tensor with its own managed memory
+    // 7. Create tensor with its own managed memory
     Ort::AllocatorWithDefaultOptions allocator;    
     auto input_tensor = Ort::Value::CreateTensor<float>(
         allocator, input_shape.data(), input_shape.size()
@@ -224,7 +248,7 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     const char* output_names[] = {m_output_name.c_str()};  
 
     try{
-        // 7. Run the recognition session
+        // 8. Run the recognition session
         auto outputs = m_rec_session.Run(
             Ort::RunOptions{nullptr}, 
             input_names,   // char** 
