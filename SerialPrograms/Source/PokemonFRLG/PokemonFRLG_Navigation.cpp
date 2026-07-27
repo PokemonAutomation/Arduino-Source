@@ -1195,7 +1195,7 @@ void heal_at_pokecenter(ConsoleHandle& console, ProControllerContext& context){
 
 int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftright, Seconds timeout){
     BlackScreenWatcher battle_triggered(COLOR_RED);
-    BattleDialogWatcher battle_entered(COLOR_RED);
+    AdvanceBattleDialogWatcher battle_entered(COLOR_RED);
 
     context.wait_for_all_requests();
     console.log("Starting grass spin.");
