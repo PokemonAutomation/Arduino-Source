@@ -284,9 +284,9 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(STATS_FILE);
     PA_ADD_OPTION(TEMP_FOLDER);
     PA_ADD_OPTION(THEME);
+    PA_ADD_OPTION(OCR_LIBRARY);
 
     // gated behind Dev mode. see GlobalSettings::load_json
-    PA_ADD_OPTION(OCR_LIBRARY);
     PA_ADD_OPTION(USE_GPU_FOR_ML_INFERENCE0);
     // PA_ADD_OPTION(OCR_WARNING); // TODO: enable this when Tesseract is no longer a default resource.
     PA_ADD_OPTION(RESOURCE_DOWNLOAD_TABLE);
@@ -337,7 +337,6 @@ GlobalSettings::GlobalSettings()
 
     PA_ADD_OPTION(DEVELOPER_TOKEN);
 
-    OCR_LIBRARY.set_visibility(ConfigOptionState::HIDDEN);
     USE_GPU_FOR_ML_INFERENCE0.set_visibility(ConfigOptionState::HIDDEN);
     RESOURCE_DOWNLOAD_TABLE.set_visibility(ConfigOptionState::HIDDEN);
     DOWNLOAD_ERROR.set_visibility(ConfigOptionState::HIDDEN);
@@ -362,7 +361,6 @@ void GlobalSettings::load_json(const JsonValue& json){
     ConfigOptionState devmode_visibility = developer_mode
         ? ConfigOptionState::ENABLED
         : ConfigOptionState::HIDDEN;
-    OCR_LIBRARY.set_visibility(devmode_visibility);
     USE_GPU_FOR_ML_INFERENCE0.set_visibility(devmode_visibility);
     RESOURCE_DOWNLOAD_TABLE.set_visibility(devmode_visibility);
     DOWNLOAD_ERROR.set_visibility(devmode_visibility);
