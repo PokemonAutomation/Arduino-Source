@@ -45,7 +45,7 @@ YOLOv5Detector::~YOLOv5Detector() = default;
 
 YOLOv5Detector::YOLOv5Detector(const std::string& model_path)
     : m_model_path(to_resource_filepath(model_path))
-    , m_use_gpu(GlobalSettings::instance().USE_GPU_FOR_ML_INFERENCE)
+    , m_use_gpu(GlobalSettings::instance().USE_GPU_FOR_ML_INFERENCE0)
 {
     if (!model_path.ends_with(".onnx")){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, 

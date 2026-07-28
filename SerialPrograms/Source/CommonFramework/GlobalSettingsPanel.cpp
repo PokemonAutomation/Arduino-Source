@@ -154,9 +154,12 @@ GlobalSettings::GlobalSettings()
         "WARNING: If you change the OCR library away from the default (PaddleOCR), you must ensure that you have the necessary resource downloaded. "
         "Otherwise, the programs that use OCR will throw an error."
     )
-    , USE_GPU_FOR_ML_INFERENCE(
+    , USE_GPU_FOR_ML_INFERENCE0(
         "<b>Use GPU for Machine learning inference:</b><br>"
-        "Use the GPU by default for machine learning. Will fall-back to CPU if using the GPU fails.",
+        "Use the GPU by default for machine learning. Will fall-back to CPU if using the GPU fails.<br>"
+        "<font color=\"red\">WARNING: DirectML ONNX on Windows is not threadsafe. Using multithreaded PaddleOCR with DirectML will cause a crash with our current infra. "
+        "Furthermore, with PaddleOCR, DirectML is slower than using the CPU. With other models, such as SAM, DirectML seems to be ~10% "
+        "faster than the CPU. Cuda has not been tested.</font>",
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
@@ -281,10 +284,10 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(STATS_FILE);
     PA_ADD_OPTION(TEMP_FOLDER);
     PA_ADD_OPTION(THEME);
-    PA_ADD_OPTION(USE_GPU_FOR_ML_INFERENCE);
 
     // gated behind Dev mode. see GlobalSettings::load_json
     PA_ADD_OPTION(OCR_LIBRARY);
+    PA_ADD_OPTION(USE_GPU_FOR_ML_INFERENCE0);
     // PA_ADD_OPTION(OCR_WARNING); // TODO: enable this when Tesseract is no longer a default resource.
     PA_ADD_OPTION(RESOURCE_DOWNLOAD_TABLE);
     PA_ADD_OPTION(DOWNLOAD_ERROR);
@@ -335,6 +338,7 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(DEVELOPER_TOKEN);
 
     OCR_LIBRARY.set_visibility(ConfigOptionState::HIDDEN);
+    USE_GPU_FOR_ML_INFERENCE0.set_visibility(ConfigOptionState::HIDDEN);
     RESOURCE_DOWNLOAD_TABLE.set_visibility(ConfigOptionState::HIDDEN);
     DOWNLOAD_ERROR.set_visibility(ConfigOptionState::HIDDEN);
     SAVE_DEBUG_VIDEOS_ON_SWITCH.set_visibility(ConfigOptionState::HIDDEN);
@@ -359,6 +363,7 @@ void GlobalSettings::load_json(const JsonValue& json){
         ? ConfigOptionState::ENABLED
         : ConfigOptionState::HIDDEN;
     OCR_LIBRARY.set_visibility(devmode_visibility);
+    USE_GPU_FOR_ML_INFERENCE0.set_visibility(devmode_visibility);
     RESOURCE_DOWNLOAD_TABLE.set_visibility(devmode_visibility);
     DOWNLOAD_ERROR.set_visibility(devmode_visibility);
     SAVE_DEBUG_VIDEOS_ON_SWITCH.set_visibility(devmode_visibility);
