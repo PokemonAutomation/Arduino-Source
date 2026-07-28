@@ -15,6 +15,10 @@ namespace PokemonAutomation{
 
 class MultiOutputLogger : public Logger{
 public:
+    MultiOutputLogger()
+        : m_listeners(true)
+    {}
+
     void add_listener(Logger& logger){
         m_listeners.add(logger);
     }
@@ -29,26 +33,11 @@ public:
             msg, color
         );
     }
-    virtual void log(std::string&& msg, Color color = Color()){
-        m_listeners.run_method(
-            (void (Logger::*)(std::string&&, Color))&Logger::log,
-            std::move(msg), color
-        );
-    }
     virtual void log(const char* msg, Color color = Color()){
         m_listeners.run_method(
             (void (Logger::*)(const char* msg, Color))&Logger::log,
             msg, color
         );
-    }
-
-    virtual std::vector<LogLine> get_last(){
-        std::vector<LogLine> ret;
-        m_listeners.run_on_all([&](Logger& logger){
-            ret = logger.get_last();
-            return !ret.empty();
-        });
-        return ret;
     }
 
 

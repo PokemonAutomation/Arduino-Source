@@ -14,6 +14,9 @@
 namespace PokemonAutomation{
 
 
+class LastLogTracker;
+
+
 // Return a global raw `FileLogger`. `FileLogger` is defined in FileLogger.h.
 // "raw" here means the logger does not add any timestamp or tags to the incoming log lines.
 //
@@ -21,6 +24,9 @@ namespace PokemonAutomation{
 // Main.cpp to return the config for the global logger. If this function is not implemented,
 // the program will not compile.
 Logger& global_logger_raw();
+
+
+LastLogTracker& global_last_log_history();
 
 
 //  This is the same as above, but is pre-casted to the actual type.

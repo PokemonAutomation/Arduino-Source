@@ -5,6 +5,7 @@
  */
 
 #include <string.h>
+#include <vector>
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Json/JsonValue.h"

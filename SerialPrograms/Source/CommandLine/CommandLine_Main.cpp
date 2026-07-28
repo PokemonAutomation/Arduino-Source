@@ -6,9 +6,10 @@
  *  GUI-free tool for tasks like camera stream checks, debugging, etc.
  */
 
-#include <iostream>
+//#include <iostream>
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Logging/MultiOutputLogger.h"
+#include "Common/Cpp/Logging/LastLogTracker.h"
 #include "Common/Cpp/Logging/FileLogger.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
 #include "CommonFramework/Globals.h"
@@ -46,6 +47,7 @@ int main(int argc, char* argv[]){
 
     {
         MultiOutputLogger& logger = global_multi_logger();
+        logger.add_listener(global_last_log_history());
         logger.add_listener(global_file_logger());
     }
 

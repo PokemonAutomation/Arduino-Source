@@ -17,7 +17,6 @@
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "Common/Cpp/FileIO.h"
-#include "LastLogTracker.h"
 
 namespace PokemonAutomation{
 
@@ -52,7 +51,6 @@ public:
     // Logger interface implementation
     virtual void log(const std::string& msg, Color color = Color()) override;
     virtual void log(std::string&& msg, Color color = Color()) override;
-    virtual std::vector<LogLine> get_last() override;
 
 private:
     // Normalize newlines: convert \r\n to \n, remove trailing newline.
@@ -77,7 +75,6 @@ private:
 
     mutable Mutex m_lock;
     ConditionVariable m_cv;
-    LastLogTracker m_last_log_tracker;
     bool m_stopping;
     std::deque<std::pair<std::string, Color>> m_queue;
 

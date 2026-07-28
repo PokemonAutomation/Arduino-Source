@@ -9,6 +9,7 @@
 #include <QMessageBox>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
+#include "Common/Cpp/Logging/LastLogTracker.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
@@ -136,7 +137,7 @@ SendableErrorReport::SendableErrorReport(
     m_image = image;
     {
         std::string log;
-        for (const LogLine& line : global_logger_raw().get_last()){
+        for (const LogLine& line : global_last_log_history().get_recent((size_t)-1)){
             log += line.text;
             log += "\r\n";
         }

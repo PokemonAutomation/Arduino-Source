@@ -5,8 +5,10 @@
  */
 
 #include <QCoreApplication>
+#include <QTimer>
 #include <QMenuBar>
 #include <QDir>
+#include "Common/Cpp/Logging/LastLogTracker.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Windows/DpiScaler.h"
@@ -19,7 +21,39 @@ namespace PokemonAutomation{
 
 
 void FileWindowLoggerWindow::log(const std::string& msg, Color color){
-    emit signal_log(to_window_str(msg, color));
+    QString new_lines = to_window_str(msg, color);
+
+    bool pending_update = false;
+    {
+        WriteSpinLock lg(m_lock, nullptr);
+        pending_update = m_pending_update;
+        m_pending_update = true;
+
+        QString* qstr = m_pending.try_push_back();
+        if (qstr == nullptr){
+            m_pending.pop_front();
+            qstr = &m_pending.push_back();
+        }
+        *qstr = std::move(new_lines);
+
+        WallClock now = current_time();
+        WallClock threshold = now - WINDOW_SIZE;
+        while (!m_timestamps.empty() && m_timestamps.front() < threshold){
+            m_timestamps.pop_front();
+        }
+
+        m_timestamps.try_push_back(now);
+
+//        printf("Pending = %d, Later = %d\n", pending_update, update_later);
+    }
+
+    if (pending_update){
+        return;
+    }
+
+    QMetaObject::invokeMethod(this, [this]{
+        update();
+    }, Qt::QueuedConnection);
 }
 
 QString FileWindowLoggerWindow::to_window_str(const std::string& msg, Color color){
@@ -48,11 +82,10 @@ QString FileWindowLoggerWindow::to_window_str(const std::string& msg, Color colo
 }
 
 
-FileWindowLoggerWindow::FileWindowLoggerWindow(
-    QWidget* parent,
-    const std::vector<LogLine>& existing_logs
-)
+FileWindowLoggerWindow::FileWindowLoggerWindow(QWidget* parent)
     : QMainWindow(parent)
+    , m_timestamps(MAX_LOGS_PER_WINDOW)
+    , m_pending(MAX_LINES)
 {
     if (objectName().isEmpty()){
         setObjectName(QString::fromUtf8("TextWindow"));
@@ -74,12 +107,12 @@ FileWindowLoggerWindow::FileWindowLoggerWindow(
 
     m_text->setReadOnly(true);
     m_text->setAcceptRichText(true);
-    m_text->document()->setMaximumBlockCount(1000);
+    m_text->document()->setMaximumBlockCount(MAX_LINES);
 
     connect(
         this, &FileWindowLoggerWindow::signal_log,
-        m_text, [this](QString msg){
-            m_text->append(msg);
+        m_text, [this](){
+            update();
         }
     );
 
@@ -88,12 +121,12 @@ FileWindowLoggerWindow::FileWindowLoggerWindow(
     GlobalSettings::instance().LOG_WINDOW_SIZE->X_POS.add_listener(*this);
     GlobalSettings::instance().LOG_WINDOW_SIZE->Y_POS.add_listener(*this);
 
-    for (const LogLine& item : existing_logs){
+    for (const LogLine& item : global_last_log_history().get_recent(MAX_LINES)){
         log(item.text, item.color);
     }
 
-    internal_log("================================================================================");
-    internal_log("<b>Window Startup...</b>");
+    log("================================================================================");
+    log("<b>Window Startup...</b>");
     add_window(*this);
 }
 
@@ -105,9 +138,30 @@ FileWindowLoggerWindow::~FileWindowLoggerWindow(){
     GlobalSettings::instance().LOG_WINDOW_SIZE->Y_POS.remove_listener(*this);
 }
 
-void FileWindowLoggerWindow::internal_log(QString msg){
-    emit signal_log(msg);
+void FileWindowLoggerWindow::update(){
+    for (size_t c = 0; c < MAX_LOGS_PER_WINDOW; c++){
+        QString line;
+        bool full;
+        {
+            WriteSpinLock lg(m_lock, nullptr);
+            if (m_pending.empty()){
+                m_pending_update = false;
+                return;
+            }
+            full = m_pending.full();
+            line = std::move(m_pending.front());
+            m_pending.pop_front();
+        }
+        if (full){
+            m_text->clear();
+        }
+        m_text->append(line);
+    }
+    QTimer::singleShot(WINDOW_SIZE.count(), this, [this](){
+        emit signal_log();
+    });
 }
+
 
 void FileWindowLoggerWindow::resizeEvent(QResizeEvent* event){
     m_pending_resize = true;

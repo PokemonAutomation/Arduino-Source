@@ -33,6 +33,8 @@ namespace PokemonAutomation{
 template <typename ListenerType>
 class ListenerSet{
 public:
+    ListenerSet(bool suppress_lock_prints = false);
+
     bool empty() const{
         return m_count.load(std::memory_order_acquire) == 0;
     }
@@ -71,6 +73,7 @@ private:
     //  skip the lock when there are no listeners.
     std::atomic<size_t> m_count;
 
+    const bool m_suppress_lock_prints;
     mutable SpinLock m_lock;
 
     //  The data structure here is an intrusive map where the nodes form a
@@ -126,13 +129,17 @@ private:
 
 
 
+template <typename ListenerType>
+ListenerSet<ListenerType>::ListenerSet(bool suppress_lock_prints)
+    : m_suppress_lock_prints(suppress_lock_prints)
+{}
 
 template <typename ListenerType>
 void ListenerSet<ListenerType>::add(ListenerType& listener){
 #ifdef PA_DEBUG_ListenerSet
     auto scope = m_sanitizer.check_scope();
 #endif
-    WriteSpinLock lg(m_lock, "ListenerSet::add()");
+    WriteSpinLock lg(m_lock, m_suppress_lock_prints ? nullptr : "ListenerSet::add()");
     auto ret = m_listeners.emplace(
         std::piecewise_construct,
         std::forward_as_tuple(&listener),
@@ -161,7 +168,7 @@ void ListenerSet<ListenerType>::remove(ListenerType& listener) noexcept{
 //    bool printed = false;
 
     while (true){
-        WriteSpinLock lg(m_lock, "ListenerSet::remove()");
+        WriteSpinLock lg(m_lock, m_suppress_lock_prints ? nullptr : "ListenerSet::remove()");
         auto iter = m_listeners.find(&listener);
         if (iter == m_listeners.end()){
             return;
@@ -269,7 +276,7 @@ void ListenerSet<ListenerType>::run_method(Function function, Args&&... args){
     Node* node = m_list;
     while (node){
         {
-            ReadSpinLock lg(node->lock, "ListenerSet::run_method()");
+            ReadSpinLock lg(node->lock, m_suppress_lock_prints ? nullptr : "ListenerSet::run_method()");
 
 #ifdef PA_DEBUG_ListenerSet
             node->sanitizer.check_usage();
@@ -314,7 +321,7 @@ void ListenerSet<ListenerType>::run_on_all(Lambda&& lambda){
     while (node){
         bool return_now = false;
         {
-            ReadSpinLock lg(node->lock, "ListenerSet::run_on_all()");
+            ReadSpinLock lg(node->lock, m_suppress_lock_prints ? nullptr : "ListenerSet::run_on_all()");
 
 #ifdef PA_DEBUG_ListenerSet
             node->sanitizer.check_usage();
