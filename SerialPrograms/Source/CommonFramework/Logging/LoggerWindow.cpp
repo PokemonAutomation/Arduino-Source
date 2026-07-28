@@ -15,12 +15,12 @@
 #include "CommonFramework/Windows/WindowTracker.h"
 #include "CommonFramework/Windows/MainWindow.h"
 #include "CommonFramework/Options/ResolutionOption.h"
-#include "FileWindowLogger.h"
+#include "LoggerWindow.h"
 
 namespace PokemonAutomation{
 
 
-void FileWindowLoggerWindow::log(const std::string& msg, Color color){
+void LoggerWindow::log(const std::string& msg, Color color){
     QString new_lines = to_window_str(msg, color);
 
     bool pending_update = false;
@@ -56,7 +56,7 @@ void FileWindowLoggerWindow::log(const std::string& msg, Color color){
     }, Qt::QueuedConnection);
 }
 
-QString FileWindowLoggerWindow::to_window_str(const std::string& msg, Color color){
+QString LoggerWindow::to_window_str(const std::string& msg, Color color){
     // Convert message to HTML for display in QTextEdit.
     // Replace spaces with &nbsp; and newlines with <br>.
     std::string str;
@@ -82,7 +82,7 @@ QString FileWindowLoggerWindow::to_window_str(const std::string& msg, Color colo
 }
 
 
-FileWindowLoggerWindow::FileWindowLoggerWindow(QWidget* parent)
+LoggerWindow::LoggerWindow(QWidget* parent)
     : QMainWindow(parent)
     , m_timestamps(MAX_LOGS_PER_WINDOW)
     , m_pending(MAX_LINES)
@@ -110,7 +110,7 @@ FileWindowLoggerWindow::FileWindowLoggerWindow(QWidget* parent)
     m_text->document()->setMaximumBlockCount(MAX_LINES);
 
     connect(
-        this, &FileWindowLoggerWindow::signal_log,
+        this, &LoggerWindow::signal_log,
         m_text, [this](){
             update();
         }
@@ -130,7 +130,7 @@ FileWindowLoggerWindow::FileWindowLoggerWindow(QWidget* parent)
     add_window(*this);
 }
 
-FileWindowLoggerWindow::~FileWindowLoggerWindow(){
+LoggerWindow::~LoggerWindow(){
     remove_window(*this);
     GlobalSettings::instance().LOG_WINDOW_SIZE->WIDTH.remove_listener(*this);
     GlobalSettings::instance().LOG_WINDOW_SIZE->HEIGHT.remove_listener(*this);
@@ -138,7 +138,7 @@ FileWindowLoggerWindow::~FileWindowLoggerWindow(){
     GlobalSettings::instance().LOG_WINDOW_SIZE->Y_POS.remove_listener(*this);
 }
 
-void FileWindowLoggerWindow::update(){
+void LoggerWindow::update(){
     for (size_t c = 0; c < MAX_LOGS_PER_WINDOW; c++){
         QString line;
         bool full;
@@ -163,21 +163,21 @@ void FileWindowLoggerWindow::update(){
 }
 
 
-void FileWindowLoggerWindow::resizeEvent(QResizeEvent* event){
+void LoggerWindow::resizeEvent(QResizeEvent* event){
     m_pending_resize = true;
     GlobalSettings::instance().LOG_WINDOW_SIZE->WIDTH.set(width());
     GlobalSettings::instance().LOG_WINDOW_SIZE->HEIGHT.set(height());
     m_pending_resize = false;
 }
 
-void FileWindowLoggerWindow::moveEvent(QMoveEvent* event){
+void LoggerWindow::moveEvent(QMoveEvent* event){
     m_pending_move = true;
     GlobalSettings::instance().LOG_WINDOW_SIZE->X_POS.set(x());
     GlobalSettings::instance().LOG_WINDOW_SIZE->Y_POS.set(y());
     m_pending_move = false;
 }
 
-void FileWindowLoggerWindow::on_config_value_changed(void* object){
+void LoggerWindow::on_config_value_changed(void* object){
     if (object == &GlobalSettings::instance().LOG_WINDOW_SIZE->WIDTH || object == &GlobalSettings::instance().LOG_WINDOW_SIZE->HEIGHT){
         QMetaObject::invokeMethod(this, [this]{
             if (!m_pending_resize){

@@ -420,8 +420,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/ImageTypes/ImageViewRGB32.h
     Source/CommonFramework/Language.cpp
     Source/CommonFramework/Language.h
-    Source/CommonFramework/Logging/FileWindowLogger.cpp
-    Source/CommonFramework/Logging/FileWindowLogger.h
+    Source/CommonFramework/Logging/LoggerWindow.cpp
+    Source/CommonFramework/Logging/LoggerWindow.h
     Source/CommonFramework/Logging/Logger.cpp
     Source/CommonFramework/Logging/Logger.h
     Source/CommonFramework/Logging/OutputRedirector.h

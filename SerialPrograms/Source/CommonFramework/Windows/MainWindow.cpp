@@ -19,7 +19,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Logging/FileWindowLogger.h"
+#include "CommonFramework/Logging/LoggerWindow.h"
 #include "CommonFramework/Startup/NewVersionCheck.h"
 #include "CommonFramework/Options/ResolutionOption.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
@@ -222,7 +222,7 @@ MainWindow::MainWindow(QWidget* parent)
         );
     }
     {
-        m_output_window.reset(new FileWindowLoggerWindow(nullptr));
+        m_output_window.reset(new LoggerWindow(nullptr));
         global_multi_logger().add_listener(*m_output_window);
 
         QPushButton* output = new QPushButton("Output Window", support_box);

@@ -22,7 +22,7 @@ namespace PokemonAutomation{
 
 // A Qt window that displays log output from a FileWindowLogger.
 // Uses Qt signals/slots for thread-safe updates from the logger's background thread.
-class FileWindowLoggerWindow final : public QMainWindow, public ConfigOption::Listener, public Logger{
+class LoggerWindow final : public QMainWindow, public ConfigOption::Listener, public Logger{
     Q_OBJECT
 
 public:
@@ -35,8 +35,8 @@ public:
     static constexpr Milliseconds WINDOW_SIZE = Milliseconds(50);
 
 public:
-    FileWindowLoggerWindow(QWidget* parent);
-    virtual ~FileWindowLoggerWindow();
+    LoggerWindow(QWidget* parent);
+    virtual ~LoggerWindow();
 
     // Called by FileWindowLogger to display a log message.
 

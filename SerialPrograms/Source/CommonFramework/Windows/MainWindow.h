@@ -21,7 +21,7 @@ class QCheckBox;
 namespace PokemonAutomation{
 
 class ButtonDiagram;
-class FileWindowLoggerWindow;
+class LoggerWindow;
 
 
 class MainWindow :
@@ -80,7 +80,7 @@ private:
     QWidget* m_current_panel_widget;
 
     std::unique_ptr<ButtonDiagram> m_button_diagram;
-    std::unique_ptr<FileWindowLoggerWindow> m_output_window;
+    std::unique_ptr<LoggerWindow> m_output_window;
 
     QLabel* m_sleep_text;
     QCheckBox* m_sleep_box;
