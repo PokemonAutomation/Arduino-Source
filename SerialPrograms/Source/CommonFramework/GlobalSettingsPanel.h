@@ -154,11 +154,11 @@ public:
     SectionDividerOption m_advanced_options;
 
     BooleanCheckBoxOption LOG_EVERYTHING;
+    BooleanCheckBoxOption ENABLE_PABOTBASE1;
     BooleanCheckBoxOption DUMP_VIDEO_FORMATS;
     BooleanCheckBoxOption SAVE_DEBUG_IMAGES;
     BooleanCheckBoxOption SAVE_DEBUG_VIDEOS_ON_SWITCH;
 //    BooleanCheckBoxOption NAUGHTY_MODE_OPTION;
-    BooleanCheckBoxOption HIDE_NOTIF_DISCORD_LINK;
 
     Pimpl<PerformanceOptions> PERFORMANCE;
     Pimpl<AudioPipelineOptions> AUDIO_PIPELINE;

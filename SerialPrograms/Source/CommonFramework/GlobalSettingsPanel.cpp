@@ -223,6 +223,13 @@ GlobalSettings::GlobalSettings()
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
+    , ENABLE_PABOTBASE1(
+        "<b>Enable PABotBase1:</b><br>Enable support for the legacy PABotBase 1 protocol.<br>"
+        "Turn this on if you are still using Arduino Uno R3, Arduino Leonardo, Teensy, or Pro Micro. "
+        "Note that this feature is slated to be removed in September 2026.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    )
     , DUMP_VIDEO_FORMATS(
         "<b>Dump Video Formats:</b><br>Log all video formats supported by your capture card.",
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -241,13 +248,6 @@ GlobalSettings::GlobalSettings()
         false
     )
 //    , NAUGHTY_MODE_OPTION("<b>Naughty Mode:</b>", false)
-    , HIDE_NOTIF_DISCORD_LINK(
-        "<b>Hide Discord Link in Notifications:</b><br>"
-        "Many Discord servers have rules forbidding links to other Discord servers. "
-        "Checking this box will hide the support link that appears in the footer of every Discord notification.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false
-    )
     , PERFORMANCE(CONSTRUCT_TOKEN)
     , AUDIO_PIPELINE(CONSTRUCT_TOKEN)
     , VIDEO_PIPELINE(CONSTRUCT_TOKEN)
@@ -312,13 +312,13 @@ GlobalSettings::GlobalSettings()
 
     PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(LOG_EVERYTHING);
+    PA_ADD_OPTION(ENABLE_PABOTBASE1);
     PA_ADD_OPTION(DUMP_VIDEO_FORMATS);
     PA_ADD_OPTION(SAVE_DEBUG_IMAGES);
 
     // gated behind Dev mode. see GlobalSettings::load_json
     PA_ADD_OPTION(SAVE_DEBUG_VIDEOS_ON_SWITCH);
 //    PA_ADD_OPTION(NAUGHTY_MODE);
-//    PA_ADD_OPTION(HIDE_NOTIF_DISCORD_LINK);
 
     PA_ADD_OPTION(PERFORMANCE);
 

@@ -41,11 +41,7 @@ JsonObject make_credits_field(const ProgramInfo& info){
     std::string text = PreloadSettings::instance().DEVELOPER_MODE
         ? PROGRAM_NAME + " CC " + PROGRAM_VERSION + "-dev"
         : PROGRAM_NAME + " CC " + PROGRAM_VERSION + "";
-    if (GlobalSettings::instance().HIDE_NOTIF_DISCORD_LINK){
-        text += " ([GitHub](" + GITHUB_LINK_URL + "))";
-    }else{
-        text += " ([GitHub](" + GITHUB_LINK_URL + ")/[Discord](" + DISCORD_LINK_URL_EMBED + "))";
-    }
+    text += " ([GitHub](" + GITHUB_LINK_URL + ")/[Discord](" + DISCORD_LINK_URL_EMBED + "))";
     field["value"] = std::move(text);
     return field;
 }

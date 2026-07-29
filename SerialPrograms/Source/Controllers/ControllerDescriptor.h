@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_Controllers_ControllerDescriptor_H
 #define PokemonAutomation_Controllers_ControllerDescriptor_H
 
-#include <optional>
 #include <string>
 #include <memory>
 #include <map>

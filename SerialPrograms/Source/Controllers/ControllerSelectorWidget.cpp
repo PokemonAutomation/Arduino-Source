@@ -54,7 +54,9 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
 
     //  Add all the supported interfaces.
     {
-        m_interface_list.emplace_back(ControllerInterface::SerialPABotBase);
+        if (GlobalSettings::instance().ENABLE_PABOTBASE1){
+            m_interface_list.emplace_back(ControllerInterface::SerialPABotBase);
+        }
         m_interface_list.emplace_back(ControllerInterface::SerialPABotBase2);
         m_interface_list.emplace_back(ControllerInterface::TcpSysbotBase);
 //        m_interface_list.emplace_back(ControllerInterface::UsbSysbotBase);
