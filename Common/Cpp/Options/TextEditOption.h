@@ -41,7 +41,9 @@ public:
     );
 //    virtual std::unique_ptr<ConfigOption> clone() const override;
 
-    const std::string& label() const;
+    std::string label() const;
+    void set_label(std::string label);
+
     const std::string& placeholder_text() const;
     bool signal_all_text_changes() const;
 

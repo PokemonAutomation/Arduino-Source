@@ -98,6 +98,7 @@ std::unique_ptr<StatsTracker> UnitTestRunner_Descriptor::make_stats() const{
 
 
 UnitTestRunner::~UnitTestRunner(){
+    SUBSTRING_TEST.remove_listener(*this);
     RUN_MODE.remove_listener(*this);
 }
 UnitTestRunner::UnitTestRunner()
@@ -111,11 +112,12 @@ UnitTestRunner::UnitTestRunner()
     , RUN_MODE(
         "<b>Run Mode:</b>",
         {
-            {RunMode::RUN_ALL, "run-all", "Run All Tests"},
-            {RunMode::RUN_ONE, "run-one", "Run One Test"},
+            {RunMode::RUN_ONE,              "run-one",              "Run One Test"},
+            {RunMode::RUN_SUBSTRING_MATCH,  "run-substring-match",  "Run Matching Substrings"},
+            {RunMode::RUN_ALL,              "run-all",              "Run All Tests"},
         },
         LockMode::LOCK_WHILE_RUNNING,
-        RunMode::RUN_ALL
+        RunMode::RUN_SUBSTRING_MATCH
     )
     , SINGLE_TEST_LABEL("<b>Test Name:</b>")
     , SINGLE_TEST(
@@ -123,13 +125,20 @@ UnitTestRunner::UnitTestRunner()
         LockMode::LOCK_WHILE_RUNNING,
         0
     )
+    , SUBSTRING_TEST_LABEL("<b>Run All Tests Containing This Substring:</b>")
+    , SUBSTRING_TEST(false, LockMode::LOCK_WHILE_RUNNING, "", "PokemonSwSh")
+    , TESTS_TO_RUN(
+        "<b>Tests to Run:</b>",
+        LockMode::READ_ONLY,
+        "", ""
+    )
     , PASSED_TESTS(
-        "<b>Passing Tests</b>",
+        "<b>Passing Tests:</b>",
         LockMode::READ_ONLY,
         "", ""
     )
     , FAILED_TESTS(
-        "<b>Failing Tests</b>",
+        "<b>Failing Tests:</b>",
         LockMode::READ_ONLY,
         "", ""
     )
@@ -139,20 +148,51 @@ UnitTestRunner::UnitTestRunner()
     PA_ADD_OPTION(RUN_MODE);
     PA_ADD_STATIC(SINGLE_TEST_LABEL);
     PA_ADD_OPTION(SINGLE_TEST);
+    PA_ADD_STATIC(SUBSTRING_TEST_LABEL);
+    PA_ADD_OPTION(SUBSTRING_TEST);
+    PA_ADD_OPTION(TESTS_TO_RUN);
     PA_ADD_OPTION(PASSED_TESTS);
     PA_ADD_OPTION(FAILED_TESTS);
 
     UnitTestRunner::on_config_value_changed(this);
 
     RUN_MODE.add_listener(*this);
+    SUBSTRING_TEST.add_listener(*this);
 }
 void UnitTestRunner::on_config_value_changed(void* object){
-    if ((RunMode)RUN_MODE == RunMode::RUN_ONE){
-        SINGLE_TEST_LABEL.set_visibility(ConfigOptionState::ENABLED);
-        SINGLE_TEST.set_visibility(ConfigOptionState::ENABLED);
-    }else{
+    if (object == &RUN_MODE){
         SINGLE_TEST_LABEL.set_visibility(ConfigOptionState::HIDDEN);
         SINGLE_TEST.set_visibility(ConfigOptionState::HIDDEN);
+        SUBSTRING_TEST_LABEL.set_visibility(ConfigOptionState::HIDDEN);
+        SUBSTRING_TEST.set_visibility(ConfigOptionState::HIDDEN);
+        TESTS_TO_RUN.set_visibility(ConfigOptionState::HIDDEN);
+
+        switch ((RunMode)RUN_MODE){
+        case RunMode::RUN_ONE:
+            SINGLE_TEST_LABEL.set_visibility(ConfigOptionState::ENABLED);
+            SINGLE_TEST.set_visibility(ConfigOptionState::ENABLED);
+            break;
+        case RunMode::RUN_SUBSTRING_MATCH:
+            SUBSTRING_TEST_LABEL.set_visibility(ConfigOptionState::ENABLED);
+            SUBSTRING_TEST.set_visibility(ConfigOptionState::ENABLED);
+            TESTS_TO_RUN.set_visibility(ConfigOptionState::ENABLED);
+            break;
+        case RunMode::RUN_ALL:
+            break;
+        }
+        return;
+    }
+    if (object == &SUBSTRING_TEST){
+        std::string name = SUBSTRING_TEST;
+        TESTS_TO_RUN.set("");
+        size_t count = 0;
+        for (const auto& test : UNIT_TESTS_ALL()){
+            if (test.first.contains(name)){
+                count++;
+                TESTS_TO_RUN.append(test.first + "\n");
+            }
+        }
+        TESTS_TO_RUN.set_label("<b>Tests to Run: " + tostr_u_commas(count) + "</b>");
     }
 }
 
@@ -176,11 +216,8 @@ void UnitTestRunner::program(ProgramEnvironment& env, CancellableScope& scope){
 
     const UnitTestDatabase& all_tests = UNIT_TESTS_ALL();
 
-    if ((RunMode)RUN_MODE == RunMode::RUN_ALL){
-        for (const auto& test : all_tests){
-            runner.add_test(test.second);
-        }
-    }else{
+    switch ((RunMode)RUN_MODE){
+    case RunMode::RUN_ONE:{
         auto iter = all_tests.find(SINGLE_TEST.slug());
         if (iter == all_tests.end()){
             throw InternalProgramError(
@@ -190,6 +227,23 @@ void UnitTestRunner::program(ProgramEnvironment& env, CancellableScope& scope){
             );
         }
         runner.add_test(iter->second);
+        break;
+    }
+    case RunMode::RUN_SUBSTRING_MATCH:{
+        std::string name = SUBSTRING_TEST;
+        for (const auto& test : all_tests){
+            if (test.first.contains(name)){
+                runner.add_test(test.second);
+            }
+        }
+        break;
+    }
+    case RunMode::RUN_ALL:{
+        for (const auto& test : all_tests){
+            runner.add_test(test.second);
+        }
+        break;
+    }
     }
 
     runner.run();

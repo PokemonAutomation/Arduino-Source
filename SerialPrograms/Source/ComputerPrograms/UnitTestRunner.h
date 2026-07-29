@@ -55,14 +55,19 @@ private:
     StringCell RESOURCE_PATH;
 
     enum class RunMode{
-        RUN_ALL,
         RUN_ONE,
+        RUN_SUBSTRING_MATCH,
+        RUN_ALL,
     };
     EnumDropdownOption<RunMode> RUN_MODE;
 
     StaticTextOption SINGLE_TEST_LABEL;
     StringSelectCell SINGLE_TEST;
 
+    StaticTextOption SUBSTRING_TEST_LABEL;
+    StringCell SUBSTRING_TEST;
+
+    TextEditOption TESTS_TO_RUN;
     TextEditOption PASSED_TESTS;
     TextEditOption FAILED_TESTS;
 

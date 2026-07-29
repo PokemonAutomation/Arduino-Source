@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSV_PicnicDetector_H
 
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/VisualDetector.h"
@@ -38,6 +39,14 @@ public:
          : DetectorToFinder("PicnicWatcher", std::chrono::milliseconds(1000), color)
     {}
 };
+
+
+
+
+
+
+void add_tests_PicnicDetector(UnitTestDatabase& database);
+
 
 
 
