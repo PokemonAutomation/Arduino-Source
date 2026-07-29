@@ -2076,8 +2076,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonRSE/PokemonRSE_Settings.h
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_AudioStarterReset.cpp
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_AudioStarterReset.h
-    Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_LegendaryHunt-Emerald.cpp
-    Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_LegendaryHunt-Emerald.h
+    Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_LegendaryRunAway-Emerald.cpp
+    Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_LegendaryRunAway-Emerald.h
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_ShinyHunt-Deoxys.cpp
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_ShinyHunt-Deoxys.h
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_ShinyHunt-Mew.cpp

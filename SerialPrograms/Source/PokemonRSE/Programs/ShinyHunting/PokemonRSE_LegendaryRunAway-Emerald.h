@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PokemonRSE_LegendaryHuntEmerald_H
-#define PokemonAutomation_PokemonRSE_LegendaryHuntEmerald_H
+#ifndef PokemonAutomation_PokemonRSE_LegendaryRunAwayEmerald_H
+#define PokemonAutomation_PokemonRSE_LegendaryRunAwayEmerald_H
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -17,16 +17,16 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonRSE{
 
-class LegendaryHuntEmerald_Descriptor : public SingleSwitchProgramDescriptor{
+class LegendaryRunAwayEmerald_Descriptor : public SingleSwitchProgramDescriptor{
 public:
-    LegendaryHuntEmerald_Descriptor();
+    LegendaryRunAwayEmerald_Descriptor();
     struct Stats;
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class LegendaryHuntEmerald : public SingleSwitchProgramInstance{
+class LegendaryRunAwayEmerald : public SingleSwitchProgramInstance{
 public:
-    LegendaryHuntEmerald();
+    LegendaryRunAwayEmerald();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
     virtual void start_program_border_check(
@@ -56,6 +56,9 @@ private:
     //For easier testing after release
     //regis are up/down only and don't really need
     SectionDividerOption m_advanced_options;
+    MillisecondsOption GROUDON_LEFT_FIRST;
+    MillisecondsOption GROUDON_RIGHT_FIRST;
+    MillisecondsOption GROUDON_LEFT_SECOND;
     MillisecondsOption KYOGRE_RIGHT_FIRST;
     MillisecondsOption KYOGRE_UP_FIRST;
     MillisecondsOption KYOGRE_RIGHT_SECOND;
