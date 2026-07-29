@@ -12,7 +12,7 @@
 #include "PokemonFRLG_Tests.h"
 #include "PokemonHome_Tests.h"
 #include "PokemonLZA_Tests.h"
-#include "PokemonSV_Tests.h"
+#include "PokemonSV_Tests_Old.h"
 #include "TestMap.h"
 #include "TestUtils.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
@@ -234,7 +234,6 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"NintendoSwitch_UpdatePopupDetector", std::bind(image_bool_detector_helper, test_NintendoSwitch_UpdatePopupDetector, _1)},
     {"PokemonHome_BoxView", std::bind(image_words_detector_helper, test_pokemonHome_BoxView, _1)},
     {"PokemonHome_SummaryScreen", std::bind(image_words_detector_helper, test_pokemonHome_SummaryScreen, _1)},
-    {"PokemonSV_MapDetector", std::bind(image_words_detector_helper, test_pokemonSV_MapDetector, _1)},
     {"PokemonSV_PicnicDetector", std::bind(image_bool_detector_helper, test_pokemonSV_PicnicDetector, _1)},
     {"PokemonSV_TeraCardFinder", std::bind(image_bool_detector_helper, test_pokemonSV_TeraCardFinder, _1)},
     {"PokemonSV_TerastallizingDetector", std::bind(image_bool_detector_helper, test_pokemonSV_TerastallizingDetector, _1)},

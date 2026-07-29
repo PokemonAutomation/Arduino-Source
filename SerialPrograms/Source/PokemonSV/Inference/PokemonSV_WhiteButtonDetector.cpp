@@ -5,11 +5,13 @@
  */
 
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
-//#include "CommonFramework/Globals.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
+#include "Tests/TestUtils.h"
 #include "PokemonSV_WhiteButtonDetector.h"
 
 //#include <iostream>
@@ -173,43 +175,42 @@ std::vector<ImageFloatBox> WhiteButtonDetector::detect_all(const ImageViewRGB32&
 
 
 
-#if 0
-WhiteButtonWatcher::~WhiteButtonWatcher() = default;
-WhiteButtonWatcher::WhiteButtonWatcher(
-    Color color,
-    WhiteButton button, size_t consecutive_detections,
-    VideoOverlay& overlay,
-    const ImageFloatBox& box
-)
-    : VisualInferenceCallback("GradientArrowFinder")
-    , m_overlay(overlay)
-    , m_detector(color, button, box)
-    , m_consecutive_detections(consecutive_detections)
-{}
 
-void WhiteButtonWatcher::make_overlays(VideoOverlaySet& items) const{
-    m_detector.make_overlays(items);
+
+
+class Test_WhiteButtonDetector : public UnitTest{
+public:
+    Test_WhiteButtonDetector(
+        const std::string& image,
+        WhiteButton button,
+        const ImageFloatBox& box,
+        bool expected
+    )
+        : UnitTest("PokemonSV::WhiteButtonDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_button(button)
+        , m_box(box)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        WhiteButtonDetector detector(COLOR_RED, m_button, m_box);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    WhiteButton m_button;
+    ImageFloatBox m_box;
+    bool m_expected;
+};
+
+
+
+void add_tests_WhiteButtonDetector(UnitTestDatabase& database){
+
 }
-bool WhiteButtonWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    std::vector<ImageFloatBox> hits = m_detector.detect_all(frame);
-//    cout << "arrows = " << arrows.size() << endl;
-    m_arrows.reset(hits.size());
-    for (const ImageFloatBox& hit : hits){
-        m_arrows.emplace_back(m_overlay, hit, COLOR_MAGENTA);
-    }
-//    if (!hits.empty()){
-//        frame.save("test.png");
-//    }
-
-    if (hits.empty()){
-        m_trigger_count = 0;
-        return false;
-    }
-
-    m_trigger_count++;
-    return m_trigger_count >= m_consecutive_detections;
-}
-#endif
 
 
 

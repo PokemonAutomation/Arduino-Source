@@ -2262,6 +2262,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSV/PokemonSV_Panels.h
     Source/PokemonSV/PokemonSV_Settings.cpp
     Source/PokemonSV/PokemonSV_Settings.h
+    Source/PokemonSV/PokemonSV_Tests.cpp
+    Source/PokemonSV/PokemonSV_Tests.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.cpp
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.cpp
@@ -2908,8 +2910,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Tests/PokemonHome_Tests.h
     Source/Tests/PokemonLZA_Tests.cpp
     Source/Tests/PokemonLZA_Tests.h
-    Source/Tests/PokemonSV_Tests.cpp
-    Source/Tests/PokemonSV_Tests.h
+    Source/Tests/PokemonSV_Tests_Old.cpp
+    Source/Tests/PokemonSV_Tests_Old.h
     Source/Tests/TestMap.cpp
     Source/Tests/TestMap.h
     Source/Tests/TestUtils.cpp
