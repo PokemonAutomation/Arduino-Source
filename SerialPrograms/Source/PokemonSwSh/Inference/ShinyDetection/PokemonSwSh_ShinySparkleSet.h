@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_ShinySparkleSet_H
 
 #include <memory>
+#include <vector>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "Pokemon/Pokemon_ShinySparkleSet.h"
 
