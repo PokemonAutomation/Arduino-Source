@@ -64,49 +64,6 @@ public:
 };
 
 
-class BoxViewDetector : public StaticScreenDetector{
-public:
-    BoxViewDetector(VideoOverlay* overlay = nullptr);
-
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) override;
-
-    virtual void reset_state() override { m_button_plus_detector.reset_state(); }
-
-private:
-    ButtonDetector m_button_plus_detector;
-
-};
-class BoxViewWatcher : public DetectorToFinder<BoxViewDetector>{
-public:
-    BoxViewWatcher(VideoOverlay* overlay = nullptr)
-        : DetectorToFinder("BoxViewWatcher", Milliseconds(100), overlay)
-    {}
-};
-
-
-class SummaryScreenDetector : public StaticScreenDetector{
-public:
-    SummaryScreenDetector(VideoOverlay* overlay = nullptr);
-
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) override;
-
-    virtual void reset_state() override { m_button_B_detector.reset_state(); }
-
-private:
-    ButtonDetector m_button_B_detector;
-
-};
-class SummaryScreenWatcher : public DetectorToFinder<SummaryScreenDetector>{
-public:
-    SummaryScreenWatcher(VideoOverlay* overlay = nullptr)
-        : DetectorToFinder("SummaryScreenWatcher", Milliseconds(100), overlay)
-    {}
-};
-
-
-
 }
 }
 }

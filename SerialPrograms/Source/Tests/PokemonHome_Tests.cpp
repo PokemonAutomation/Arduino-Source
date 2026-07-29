@@ -5,7 +5,11 @@
  */
 
 
-#include "PokemonHome/Inference/PokemonHome_ButtonDetector.h"
+#include <string>
+#include <vector>
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "PokemonHome/Inference/PokemonHome_BoxViewDetector.h"
+#include "PokemonHome/Inference/PokemonHome_SummaryScreenDetector.h"
 #include "PokemonHome_Tests.h"
 #include "TestUtils.h"
 
