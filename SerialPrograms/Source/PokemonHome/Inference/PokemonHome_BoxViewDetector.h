@@ -7,10 +7,9 @@
 #ifndef PokemonAutomation_PokemonHome_BoxViewDetector_H
 #define PokemonAutomation_PokemonHome_BoxViewDetector_H
 
-#include <optional>
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/VisualDetector.h"
-#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "PokemonHome/Inference/PokemonHome_ButtonDetector.h"
 
 namespace PokemonAutomation{
@@ -38,6 +37,7 @@ public:
     {}
 };
 
+void add_tests_BoxViewDetector(UnitTestDatabase& database);
 
 }
 }

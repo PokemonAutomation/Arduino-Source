@@ -1649,6 +1649,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonHome/PokemonHome_Panels.h
     Source/PokemonHome/PokemonHome_Settings.cpp
     Source/PokemonHome/PokemonHome_Settings.h
+    Source/PokemonHome/PokemonHome_Tests.cpp
+    Source/PokemonHome/PokemonHome_Tests.h
     Source/PokemonHome/Programs/PokemonHome_BoxNavigation.cpp
     Source/PokemonHome/Programs/PokemonHome_BoxNavigation.h
     Source/PokemonHome/Programs/PokemonHome_BoxSorter.cpp
