@@ -57,7 +57,7 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     : PanelInstance(descriptor)
     , m_display_session(m_display_option)
     , m_options(LockMode::UNLOCK_WHILE_RUNNING)
-    , m_use_gpu_for_sam_anno(GlobalSettings::instance().USE_GPU_FOR_ML_INFERENCE)
+    , m_use_gpu_for_sam_anno(GlobalSettings::instance().USE_GPU_FOR_ML_INFERENCE0)
     , X("<b>X Coordinate:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.3, 0.0, 1.0)
     , Y("<b>Y Coordinate:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.3, 0.0, 1.0)
     , WIDTH("<b>Width:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.4, 0.0, 1.0)
@@ -135,7 +135,7 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
 
 
 
-    init_sam_session(GlobalSettings::instance().USE_GPU_FOR_ML_INFERENCE);
+    init_sam_session(GlobalSettings::instance().USE_GPU_FOR_ML_INFERENCE0);
 
     m_overlay_manager = new LabelImages_OverlayManager(*this);
 }
@@ -510,7 +510,7 @@ void LabelImages::remove_segmentation_exclusion_point(double x, double y){
 void LabelImages::compute_embeddings_for_folder(const std::string& image_folder_path){
     std::string embedding_model_path = RESOURCE_PATH() + "ML/sam_embedder_cpu.onnx";
     std::cout << "Use SAM Embedding model " << embedding_model_path << std::endl;
-    ML::compute_embeddings_for_folder(embedding_model_path, image_folder_path, GlobalSettings::instance().USE_GPU_FOR_ML_INFERENCE);
+    ML::compute_embeddings_for_folder(embedding_model_path, image_folder_path, GlobalSettings::instance().USE_GPU_FOR_ML_INFERENCE0);
 }
 
 void LabelImages::delete_selected_annotation(){
