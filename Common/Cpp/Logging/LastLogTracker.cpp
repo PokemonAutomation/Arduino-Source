@@ -9,14 +9,8 @@
 namespace PokemonAutomation{
 
 
-std::atomic<int> count(0);
-
-
 void LastLogTracker::log(const std::string& msg, Color color){
     WriteSpinLock lg(m_lock);
-    if (msg.empty()){
-        count++;
-    }
     m_lines.emplace_back(color, msg);
     while (m_lines.size() > m_max_lines){
         m_lines.pop_front();
@@ -24,9 +18,6 @@ void LastLogTracker::log(const std::string& msg, Color color){
 }
 void LastLogTracker::log(std::string&& msg, Color color){
     WriteSpinLock lg(m_lock);
-    if (msg.empty()){
-        count++;
-    }
     m_lines.emplace_back(color, std::move(msg));
     while (m_lines.size() > m_max_lines){
         m_lines.pop_front();
@@ -34,9 +25,6 @@ void LastLogTracker::log(std::string&& msg, Color color){
 }
 void LastLogTracker::log(const char* msg, Color color){
     WriteSpinLock lg(m_lock);
-    if (strlen(msg) == 0){
-        count++;
-    }
     m_lines.emplace_back(color, msg);
     while (m_lines.size() > m_max_lines){
         m_lines.pop_front();
