@@ -3,6 +3,7 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
+
 #include "LastLogTracker.h"
 
 namespace PokemonAutomation{
