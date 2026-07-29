@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_Controllers_ControllerConnection_H
 #define PokemonAutomation_Controllers_ControllerConnection_H
 
+#include <vector>
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "ControllerDescriptor.h"
