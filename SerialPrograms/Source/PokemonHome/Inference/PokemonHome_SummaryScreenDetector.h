@@ -7,10 +7,9 @@
 #ifndef PokemonAutomation_PokemonHome_SummaryScreenDetector_H
 #define PokemonAutomation_PokemonHome_SummaryScreenDetector_H
 
-#include <optional>
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/VisualDetector.h"
-#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "PokemonHome/Inference/PokemonHome_ButtonDetector.h"
 
 namespace PokemonAutomation{
@@ -37,6 +36,8 @@ public:
         : DetectorToFinder("SummaryScreenWatcher", Milliseconds(100), overlay)
     {}
 };
+
+void add_tests_SummaryScreenDetector(UnitTestDatabase& database);
 
 }
 }
