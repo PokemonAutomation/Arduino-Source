@@ -1631,6 +1631,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonHome/Inference/PokemonHome_BallReader.h
     Source/PokemonHome/Inference/PokemonHome_BoxGenderDetector.cpp
     Source/PokemonHome/Inference/PokemonHome_BoxGenderDetector.h
+    Source/PokemonHome/Inference/PokemonHome_BoxViewDetector.cpp
+    Source/PokemonHome/Inference/PokemonHome_BoxViewDetector.h
     Source/PokemonHome/Inference/PokemonHome_ButtonDetector.cpp
     Source/PokemonHome/Inference/PokemonHome_ButtonDetector.h
     Source/PokemonHome/Inference/PokemonHome_GigantamaxDetector.cpp
@@ -1639,12 +1641,16 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonHome/Inference/PokemonHome_OriginMarkReader.h
     Source/PokemonHome/Inference/PokemonHome_SelectionArrowDetector.cpp
     Source/PokemonHome/Inference/PokemonHome_SelectionArrowDetector.h
+    Source/PokemonHome/Inference/PokemonHome_SummaryScreenDetector.cpp
+    Source/PokemonHome/Inference/PokemonHome_SummaryScreenDetector.h
     Source/PokemonHome/Inference/PokemonHome_TeraTypeReader.cpp
     Source/PokemonHome/Inference/PokemonHome_TeraTypeReader.h
     Source/PokemonHome/PokemonHome_Panels.cpp
     Source/PokemonHome/PokemonHome_Panels.h
     Source/PokemonHome/PokemonHome_Settings.cpp
     Source/PokemonHome/PokemonHome_Settings.h
+    Source/PokemonHome/PokemonHome_Tests.cpp
+    Source/PokemonHome/PokemonHome_Tests.h
     Source/PokemonHome/Programs/PokemonHome_BoxNavigation.cpp
     Source/PokemonHome/Programs/PokemonHome_BoxNavigation.h
     Source/PokemonHome/Programs/PokemonHome_BoxSorter.cpp
@@ -2906,8 +2912,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Tests/NintendoSwitch_Tests.h
     Source/Tests/PokemonFRLG_Tests.cpp
     Source/Tests/PokemonFRLG_Tests.h
-    Source/Tests/PokemonHome_Tests.cpp
-    Source/Tests/PokemonHome_Tests.h
     Source/Tests/PokemonLZA_Tests.cpp
     Source/Tests/PokemonLZA_Tests.h
     Source/Tests/PokemonSV_Tests_Old.cpp

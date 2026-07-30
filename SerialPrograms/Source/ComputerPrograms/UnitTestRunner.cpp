@@ -12,6 +12,7 @@
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "UnitTestRunner.h"
 
+#include "PokemonHome/PokemonHome_Tests.h"
 #include "PokemonSwSh/PokemonSwSh_Tests.h"
 #include "PokemonLA/PokemonLA_Tests.h"
 #include "PokemonSV/PokemonSV_Tests.h"
@@ -29,6 +30,7 @@ UnitTestDatabase make_UNIT_TESTS_ALL(){
     UnitTestDatabase ret;
 
     OCR::add_tests(ret);
+    NintendoSwitch::PokemonHome::add_tests(ret);
     NintendoSwitch::PokemonSwSh::add_tests(ret);
     NintendoSwitch::PokemonLA::add_tests(ret);
     NintendoSwitch::PokemonSV::add_tests(ret);
