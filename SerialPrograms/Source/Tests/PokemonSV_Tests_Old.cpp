@@ -41,53 +41,6 @@ namespace PokemonAutomation{
 
 using namespace NintendoSwitch::PokemonSV;
 
-int test_pokemonSV_PicnicDetector(const ImageViewRGB32& image, bool target){
-    PicnicDetector detector;
-
-    const bool result = detector.detect(image);
-    TEST_RESULT_EQUAL(result, target);
-
-    return 0;
-}
-
-int test_pokemonSV_TeraCardFinder(const ImageViewRGB32& image, bool target){
-    TeraCardWatcher detector(COLOR_RED);
-
-    bool result = detector.process_frame(image, current_time());
-    TEST_RESULT_EQUAL(result, false);
-
-    result = detector.process_frame(image, current_time() + std::chrono::milliseconds(250));
-    TEST_RESULT_EQUAL(result, target);
-    return 0;
-}
-
-int test_pokemonSV_TerastallizingDetector(const ImageViewRGB32& image, bool target){
-    TerastallizingDetector detector(COLOR_RED);
-
-    bool result = detector.detect(image);
-    TEST_RESULT_EQUAL(result, target);
-    return 0;
-}
-
-int test_pokemonSV_TeraSilhouetteReader(const ImageViewRGB32& image, const std::vector<std::string>& keywords){
-    TeraSilhouetteReader reader(COLOR_RED);
-    
-    ImageMatch::ImageMatchResult slugs = reader.read(image);
-    if (slugs.results.empty()){
-        cerr << "No silhouette detected" << endl;
-        return 1;
-    }
-    std::string best_match = slugs.results.begin()->second;
-
-    if (keywords.empty()){
-        cerr << "Must provide a pokemon silhouette slug" << endl;
-        return 1;
-    }
-    TEST_RESULT_EQUAL(best_match, keywords[keywords.size() - 1]);
-
-    return 0;
-}
-
 int test_pokemonSV_TeraTypeReader(const ImageViewRGB32& image, const std::vector<std::string>& keywords){
     TeraTypeReader reader(COLOR_RED);
 
