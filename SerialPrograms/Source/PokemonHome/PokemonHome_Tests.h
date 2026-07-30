@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonHome_Tests_H
 #define PokemonAutomation_PokemonHome_Tests_H
 
-#include "Common/Cpp/TestRunners/UnitTest.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

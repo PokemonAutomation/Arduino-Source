@@ -10,7 +10,6 @@
 #include "Kernels_Tests.h"
 #include "NintendoSwitch_Tests.h"
 #include "PokemonFRLG_Tests.h"
-#include "PokemonHome_Tests.h"
 #include "PokemonLZA_Tests.h"
 #include "PokemonSV_Tests_Old.h"
 #include "TestMap.h"
@@ -232,8 +231,6 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"NintendoSwitch_CheckOnlineDetector", std::bind(image_bool_detector_helper, test_NintendoSwitch_CheckOnlineDetector, _1)},
     {"NintendoSwitch_FailedToConnectDetector", std::bind(image_bool_detector_helper, test_NintendoSwitch_FailedToConnectDetector, _1)},
     {"NintendoSwitch_UpdatePopupDetector", std::bind(image_bool_detector_helper, test_NintendoSwitch_UpdatePopupDetector, _1)},
-    {"PokemonHome_BoxView", std::bind(image_words_detector_helper, test_pokemonHome_BoxView, _1)},
-    {"PokemonHome_SummaryScreen", std::bind(image_words_detector_helper, test_pokemonHome_SummaryScreen, _1)},
     {"PokemonSV_TeraTypeReader", std::bind(image_words_detector_helper, test_pokemonSV_TeraTypeReader, _1)},
     {"PokemonSV_SandwichRecipeDetector", std::bind(image_words_detector_helper, test_pokemonSV_SandwichRecipeDetector, _1)},
     {"PokemonSV_SandwichHandDetector", std::bind(image_words_detector_helper, test_pokemonSV_SandwichHandDetector, _1)},

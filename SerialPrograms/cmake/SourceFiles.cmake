@@ -2912,8 +2912,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Tests/NintendoSwitch_Tests.h
     Source/Tests/PokemonFRLG_Tests.cpp
     Source/Tests/PokemonFRLG_Tests.h
-    Source/Tests/PokemonHome_Tests.cpp
-    Source/Tests/PokemonHome_Tests.h
     Source/Tests/PokemonLZA_Tests.cpp
     Source/Tests/PokemonLZA_Tests.h
     Source/Tests/PokemonSV_Tests_Old.cpp
