@@ -34,7 +34,7 @@ bool BoxViewDetector::detect(const ImageViewRGB32& screen){
 class Test_BoxViewDetector : public UnitTest{
 public:
 
-	Test_BoxViewDetector(
+    Test_BoxViewDetector(
         const std::string& image,
         bool expected
     )
