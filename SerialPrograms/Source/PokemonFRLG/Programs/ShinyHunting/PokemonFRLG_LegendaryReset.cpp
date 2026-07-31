@@ -133,11 +133,15 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
             stats.errors++;
             env.update_stats();
             env.log("Failed to enter battle.", COLOR_RED);
+            stats.errors += soft_reset(env.console, context);
+            continue;
+#if 0
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to enter battle.",
                 env.console
             );
+#endif
         }else{
             env.log("Battle started.");
         }
