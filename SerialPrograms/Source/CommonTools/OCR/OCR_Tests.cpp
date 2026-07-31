@@ -42,7 +42,7 @@ public:
         ImageRGB32 image(m_image);
 
         std::string result = ocr_read(m_language, image);
-        // cout << result << endl;
+        logger.log("Raw OCR read: " + result);
 
         return normalize_utf32(result) == normalize_utf32(m_expected);
     };
@@ -58,6 +58,15 @@ void add_tests_raw_OCR(UnitTestDatabase& database){
     database.add<Test_RawOCR>("OCR/letter-i-tall-2", Language::English, "I");
     database.add<Test_RawOCR>("OCR/letter-i-wide-1", Language::English, "I");
     database.add<Test_RawOCR>("OCR/letter-i-wide-2", Language::English, "I");
+    database.add<Test_RawOCR>("OCR/sentence-1-1", Language::English, "You hurry to the Pokemon Center, shielding your");
+    database.add<Test_RawOCR>("OCR/sentence-1-1-wide", Language::English, "You hurry to the Pokemon Center, shielding your");
+    database.add<Test_RawOCR>("OCR/sentence-1-1-tall", Language::English, "You hurry to the Pokemon Center, shielding your");
+    database.add<Test_RawOCR>("OCR/sentence-1-2", Language::English, "You hurry to the Pokemon Center, shielding your");
+    database.add<Test_RawOCR>("OCR/sentence-1-2-wide", Language::English, "You hurry to the Pokemon Center, shielding your");
+    database.add<Test_RawOCR>("OCR/sentence-1-2-tall", Language::English, "You hurry to the Pokemon Center, shielding your");
+    database.add<Test_RawOCR>("OCR/sentence-1-3", Language::English, "You hurry to the Pokemon Center, shielding your");
+    database.add<Test_RawOCR>("OCR/sentence-1-3-wide", Language::English, "You hurry to the Pokemon Center, shielding your");
+    database.add<Test_RawOCR>("OCR/sentence-1-3-tall", Language::English, "You hurry to the Pokemon Center, shielding your");        
 }
 
 
