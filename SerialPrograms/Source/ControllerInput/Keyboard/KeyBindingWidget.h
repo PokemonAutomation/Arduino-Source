@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 
 class KeyboardHidBindingCellWidget : public QLineEdit, public ConfigWidget{
 public:
-    using ParentOption = KeyboardHidBindingCell;
+    using ParentState = KeyboardHidBindingCell;
 
 public:
     ~KeyboardHidBindingCellWidget();

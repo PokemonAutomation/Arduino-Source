@@ -23,7 +23,7 @@ namespace PokemonAutomation{
 // SettingsDownloadButtonWidget
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template class RegisterConfigWidget<SettingsDownloadButtonWidget>;
+template class RegisterUiStateQtWidget<SettingsDownloadButtonWidget>;
 SettingsDownloadButtonWidget::~SettingsDownloadButtonWidget(){
     // cout << "Destructor for SettingsDownloadButtonWidget" << endl;
     // m_value.disconnect(this);
@@ -91,7 +91,7 @@ void SettingsDownloadButtonWidget::on_change_text(const std::string& text){
 // SettingsDeleteButtonWidget
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template class RegisterConfigWidget<SettingsDeleteButtonWidget>;
+template class RegisterUiStateQtWidget<SettingsDeleteButtonWidget>;
 SettingsDeleteButtonWidget::~SettingsDeleteButtonWidget(){
     m_value.remove_button_listener(*this);
 }
@@ -182,7 +182,7 @@ void SettingsDeleteButtonWidget::show_delete_confirm_box(){
 // SettingsCancelButtonWidget
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template class RegisterConfigWidget<SettingsCancelButtonWidget>;
+template class RegisterUiStateQtWidget<SettingsCancelButtonWidget>;
 SettingsCancelButtonWidget::~SettingsCancelButtonWidget(){
     m_value.remove_button_listener(*this);
 }
@@ -285,7 +285,7 @@ void SettingsCancelButtonWidget::show_cancel_confirm_box(){
 // SettingsProgressBarWidget
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template class RegisterConfigWidget<SettingsProgressBarWidget>;
+template class RegisterUiStateQtWidget<SettingsProgressBarWidget>;
 SettingsProgressBarWidget::~SettingsProgressBarWidget(){
     // cout << "Destructor for SettingsProgressBarWidget" << endl;
     m_value.remove_progress_listener(*this);
@@ -431,7 +431,7 @@ void SettingsDownloadPopupWidget::on_metadata_fetch_finished(const std::string& 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SettingsDownloadErrorWidget
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-template class RegisterConfigWidget<SettingsDownloadErrorWidget>;
+template class RegisterUiStateQtWidget<SettingsDownloadErrorWidget>;
 SettingsDownloadErrorWidget::~SettingsDownloadErrorWidget(){
     GlobalResourceDownloadManager::instance().remove_download_listener(*this);
 }

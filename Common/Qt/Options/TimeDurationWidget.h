@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 template <typename Type>
 class TimeDurationCellWidget : public QLineEdit, public ConfigWidget{
 public:
-    using ParentOption = TimeDurationCell<Type>;
+    using ParentState = TimeDurationCell<Type>;
 
 public:
     ~TimeDurationCellWidget();
@@ -38,7 +38,7 @@ private:
 template <typename Type>
 class TimeDurationOptionWidget : public QWidget, public ConfigWidget{
 public:
-    using ParentOption = TimeDurationOption<Type>;
+    using ParentState = TimeDurationOption<Type>;
 
 public:
     ~TimeDurationOptionWidget();

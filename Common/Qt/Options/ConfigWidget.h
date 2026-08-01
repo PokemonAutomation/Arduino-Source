@@ -8,8 +8,7 @@
 #define PokemonAutomation_ConfigWidget_H
 
 #include "Common/Cpp/Options/ConfigOption.h"
-
-class QWidget;
+#include "Common/Qt/UiStateQtWidget.h"
 
 namespace PokemonAutomation{
 
@@ -25,7 +24,7 @@ namespace PokemonAutomation{
 //  ConfigWidget's derived classes need to inherit a QWidget or its derived class
 //  and pass *this as the widget in ConfigWidget(m_valuie, widget) so a ConfigWidget
 //  pointer can get the actual QWidget.
-class ConfigWidget : public UiComponent, protected ConfigOption::Listener{
+class ConfigWidget : public UiComponentQtWidget, protected ConfigOption::Listener{
 public:
     static ConfigWidget* make_from_option(ConfigOption& option, QWidget* parent);
 
@@ -38,7 +37,7 @@ public:
     const ConfigOption& option() const{ return m_value; }
     ConfigOption& option(){ return m_value; }
 
-    QWidget& widget(){ return *m_widget; }
+    QWidget& widget() override{ return *m_widget; }
 
     //  Needs to be called on the UI thread.
     virtual void update_value(){}
@@ -69,33 +68,6 @@ protected:
     QWidget* m_widget = nullptr;
     bool m_program_is_running = false;
 };
-
-
-
-
-
-//
-//  Helpers for implementations.
-//
-
-template <typename ConfigWidgetType>
-class RegisterConfigWidget{
-    using ConfigOptionType = typename ConfigWidgetType::ParentOption;
-
-public:
-    RegisterConfigWidget(){
-        ConfigOptionType::m_ui_factory = [](ConfigOptionType& option, void* params){
-            QWidget* parent = (QWidget*)params;
-            return UiWrapper(parent == nullptr, new ConfigWidgetType(*parent, option));
-        };
-    }
-
-    static RegisterConfigWidget initializer;
-};
-
-template <typename ConfigWidgetType>
-RegisterConfigWidget<ConfigWidgetType> RegisterConfigWidget<ConfigWidgetType>::initializer;
-
 
 
 

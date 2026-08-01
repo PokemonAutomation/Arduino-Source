@@ -15,7 +15,7 @@
 namespace PokemonAutomation{
 
 
-template class RegisterConfigWidget<MacAddressCellWidget>;
+template class RegisterUiStateQtWidget<MacAddressCellWidget>;
 
 
 

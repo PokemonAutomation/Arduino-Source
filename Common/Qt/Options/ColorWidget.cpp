@@ -12,8 +12,8 @@
 namespace PokemonAutomation{
 
 
-template class RegisterConfigWidget<ColorCellWidget>;
-template class RegisterConfigWidget<ColorOptionWidget>;
+template class RegisterUiStateQtWidget<ColorCellWidget>;
+template class RegisterUiStateQtWidget<ColorOptionWidget>;
 
 
 

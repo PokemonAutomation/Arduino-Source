@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 
 class TextEditWidget : public QWidget, public ConfigWidget, public TextEditOption::AppendListener{
 public:
-    using ParentOption = TextEditOption;
+    using ParentState = TextEditOption;
 
 public:
     ~TextEditWidget();

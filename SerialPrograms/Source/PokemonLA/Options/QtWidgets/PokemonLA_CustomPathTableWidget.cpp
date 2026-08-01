@@ -17,7 +17,7 @@
 
 namespace PokemonAutomation{
 
-template class RegisterConfigWidget<NintendoSwitch::PokemonLA::CustomPathTableWidget>;
+template class RegisterUiStateQtWidget<NintendoSwitch::PokemonLA::CustomPathTableWidget>;
 
 namespace NintendoSwitch{
 namespace PokemonLA{

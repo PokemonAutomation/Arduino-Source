@@ -18,8 +18,8 @@
 namespace PokemonAutomation{
 
 
-template class RegisterConfigWidget<FloatingPointCellWidget>;
-template class RegisterConfigWidget<FloatingPointOptionWidget>;
+template class RegisterUiStateQtWidget<FloatingPointCellWidget>;
+template class RegisterUiStateQtWidget<FloatingPointOptionWidget>;
 
 
 

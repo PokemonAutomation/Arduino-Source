@@ -14,7 +14,7 @@
 namespace PokemonAutomation{
 
 
-template class RegisterConfigWidget<FixedCodeWidget>;
+template class RegisterUiStateQtWidget<FixedCodeWidget>;
 
 
 

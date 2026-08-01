@@ -17,7 +17,7 @@
 namespace PokemonAutomation{
 
 
-template class RegisterConfigWidget<KeyboardHidBindingCellWidget>;
+template class RegisterUiStateQtWidget<KeyboardHidBindingCellWidget>;
 
 
 

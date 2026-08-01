@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 
 class StringSelectCellWidget : public NoWheelCompactComboBox, public ConfigWidget{
 public:
-    using ParentOption = StringSelectCell;
+    using ParentState = StringSelectCell;
 
 public:
     ~StringSelectCellWidget();
@@ -42,7 +42,7 @@ private:
 
 class StringSelectOptionWidget : public QWidget, public ConfigWidget{
 public:
-    using ParentOption = StringSelectOption;
+    using ParentState = StringSelectOption;
 
 public:
     StringSelectOptionWidget(QWidget& parent, StringSelectOption& value);

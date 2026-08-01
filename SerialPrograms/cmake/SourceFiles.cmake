@@ -296,6 +296,7 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/StringToolsQt.h
     ../Common/Qt/TimeQt.cpp
     ../Common/Qt/TimeQt.h
+    ../Common/Qt/UiStateQtWidget.h
     ../Common/Qt/WidgetStackFixedAspectRatio.cpp
     ../Common/Qt/WidgetStackFixedAspectRatio.h
     ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_ConnectionDebug.cpp

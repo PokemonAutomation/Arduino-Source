@@ -88,7 +88,7 @@ void IntegerRangeCellWidget<Type>::on_config_value_changed(void* object){
 
 template class IntegerRangeCellWidget<uint8_t>;
 
-template class RegisterConfigWidget<IntegerRangeCellWidget<uint8_t>>;
+template class RegisterUiStateQtWidget<IntegerRangeCellWidget<uint8_t>>;
 
 
 

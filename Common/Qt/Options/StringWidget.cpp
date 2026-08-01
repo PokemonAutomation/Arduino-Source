@@ -16,8 +16,8 @@
 namespace PokemonAutomation{
 
 
-template class RegisterConfigWidget<StringCellWidget>;
-template class RegisterConfigWidget<StringOptionWidget>;
+template class RegisterUiStateQtWidget<StringCellWidget>;
+template class RegisterUiStateQtWidget<StringOptionWidget>;
 
 
 

@@ -13,7 +13,7 @@
 namespace PokemonAutomation{
 
 
-template class RegisterConfigWidget<TestButtonWidget>;
+template class RegisterUiStateQtWidget<TestButtonWidget>;
 
 
 TestButtonWidget::TestButtonWidget(QWidget& parent, TestMessageButton& value)

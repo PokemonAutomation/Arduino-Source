@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 
 class RandomCodeWidget : public QWidget, public ConfigWidget{
 public:
-    using ParentOption = RandomCodeOption;
+    using ParentState = RandomCodeOption;
 
 public:
     ~RandomCodeWidget();

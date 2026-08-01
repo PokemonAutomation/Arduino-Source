@@ -16,8 +16,8 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-template class RegisterConfigWidget<ButtonCellWidget>;
-template class RegisterConfigWidget<ButtonOptionWidget>;
+template class RegisterUiStateQtWidget<ButtonCellWidget>;
+template class RegisterUiStateQtWidget<ButtonOptionWidget>;
 
 
 

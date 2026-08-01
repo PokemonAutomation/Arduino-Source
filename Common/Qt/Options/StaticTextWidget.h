@@ -19,7 +19,7 @@ namespace PokemonAutomation{
 
 class StaticTextWidget : public QWidget, public ConfigWidget{
 public:
-    using ParentOption = StaticTextOption;
+    using ParentState = StaticTextOption;
 
 public:
     ~StaticTextWidget();
@@ -36,7 +36,7 @@ private:
 
 class SectionDividerWidget : public QWidget, public ConfigWidget{
 public:
-    using ParentOption = SectionDividerOption;
+    using ParentState = SectionDividerOption;
 
 public:
     ~SectionDividerWidget();

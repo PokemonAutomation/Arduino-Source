@@ -22,7 +22,7 @@
 namespace PokemonAutomation{
 
 
-template class RegisterConfigWidget<EditableTableWidget>;
+template class RegisterUiStateQtWidget<EditableTableWidget>;
 
 
 

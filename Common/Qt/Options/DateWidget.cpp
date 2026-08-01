@@ -17,8 +17,8 @@ namespace PokemonAutomation{
 
 
 
-template class RegisterConfigWidget<DateTimeCellWidget>;
-template class RegisterConfigWidget<DateTimeOptionWidget>;
+template class RegisterUiStateQtWidget<DateTimeCellWidget>;
+template class RegisterUiStateQtWidget<DateTimeOptionWidget>;
 
 
 

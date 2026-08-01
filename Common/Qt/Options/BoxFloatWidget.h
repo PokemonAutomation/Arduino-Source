@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 
 class BoxFloatWidget : public QWidget, public ConfigWidget{
 public:
-    using ParentOption = BoxFloatOption;
+    using ParentState = BoxFloatOption;
 
 public:
     ~BoxFloatWidget();

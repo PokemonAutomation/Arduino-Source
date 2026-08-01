@@ -17,7 +17,7 @@
 namespace PokemonAutomation{
 
 
-template class RegisterConfigWidget<TextEditWidget>;
+template class RegisterUiStateQtWidget<TextEditWidget>;
 
 
 

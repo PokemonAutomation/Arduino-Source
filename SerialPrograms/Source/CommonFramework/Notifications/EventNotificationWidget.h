@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 
 class TestButtonWidget : public ConfigWidget{
 public:
-    using ParentOption = TestMessageButton;
+    using ParentState = TestMessageButton;
 
 public:
     TestButtonWidget(QWidget& parent, TestMessageButton& value);

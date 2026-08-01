@@ -13,8 +13,8 @@
 namespace PokemonAutomation{
 
 
-template class RegisterConfigWidget<EnumDropdownCellWidget>;
-template class RegisterConfigWidget<EnumDropdownOptionWidget>;
+template class RegisterUiStateQtWidget<EnumDropdownCellWidget>;
+template class RegisterUiStateQtWidget<EnumDropdownOptionWidget>;
 
 
 

@@ -19,7 +19,7 @@ class AutoHeightTableWidget;
 
 class EditableTableWidget : public QWidget, public ConfigWidget{
 public:
-    using ParentOption = EditableTableOption;
+    using ParentState = EditableTableOption;
 
 public:
     ~EditableTableWidget();

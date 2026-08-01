@@ -15,7 +15,7 @@
 namespace PokemonAutomation{
 
 
-template class RegisterConfigWidget<RandomCodeWidget>;
+template class RegisterUiStateQtWidget<RandomCodeWidget>;
 
 
 

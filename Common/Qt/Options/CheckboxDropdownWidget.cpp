@@ -9,7 +9,7 @@
 namespace PokemonAutomation{
 
 
-template class RegisterConfigWidget<CheckboxDropdownCellWidget>;
+template class RegisterUiStateQtWidget<CheckboxDropdownCellWidget>;
 
 
 
