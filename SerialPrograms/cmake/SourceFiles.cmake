@@ -2066,6 +2066,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h
     Source/PokemonRSE/Inference/Menus/PokemonRSE_LoadMenuDetector.cpp
     Source/PokemonRSE/Inference/Menus/PokemonRSE_LoadMenuDetector.h
+    Source/PokemonRSE/Inference/Menus/PokemonRSE_PartyMenuDetector.cpp
+    Source/PokemonRSE/Inference/Menus/PokemonRSE_PartyMenuDetector.h
     Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.cpp
     Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.h
     Source/PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.cpp
