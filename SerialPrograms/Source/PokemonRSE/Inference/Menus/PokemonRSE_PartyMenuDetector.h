@@ -22,6 +22,18 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonRSE{
 
+
+enum class PartySlot{
+    ONE,
+    TWO,
+    THREE,
+    FOUR,
+    FIVE,
+    SIX
+    //CXL
+};
+
+
 // Detect the Party Menu (Start Menu -> Pokemon).
 class PartyMenuDetector : public StaticScreenDetector{
 public:
@@ -42,7 +54,9 @@ public:
     {}
 };
 
-/*
+
+//Detect the highlighted slot.
+//Looks for the red outline
 class PartySlotDetector : public StaticScreenDetector{
 public:
     PartySlotDetector(
@@ -76,7 +90,6 @@ public:
     }
 };
 
-*/
 
 }
 }

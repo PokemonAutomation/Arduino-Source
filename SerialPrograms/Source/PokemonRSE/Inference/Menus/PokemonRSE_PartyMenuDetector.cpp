@@ -55,25 +55,27 @@ bool PartyMenuDetector::detect(const ImageViewRGB32& screen){
     return false;
 }
 
-/*
+
+
 ImageFloatBox PartySlotDetector::party_slot_boxes(PartySlot position){
+    //These positions should work for RSE all languages
     switch (position){
     case PartySlot::ONE:
-        return ImageFloatBox(0.035000, 0.376617, 0.003280, 0.070000);
+        return ImageFloatBox(0.35185, 0.271083, 0.003546, 0.138731);
     case PartySlot::TWO:
-        return ImageFloatBox(0.985000, 0.080000, 0.003280, 0.099663);
+        return ImageFloatBox(0.987, 0.085, 0.003, 0.09966);
     case PartySlot::THREE:
-        return ImageFloatBox(0.985000, 0.230000, 0.003280, 0.099663);
+        return ImageFloatBox(0.987, 0.235, 0.003, 0.09966);
     case PartySlot::FOUR:
-        return ImageFloatBox(0.985000, 0.380000, 0.003280, 0.099663);
+        return ImageFloatBox(0.987, 0.385, 0.003, 0.09966);
     case PartySlot::FIVE:
-        return ImageFloatBox(0.985000, 0.530000, 0.003280, 0.099663);
+        return ImageFloatBox(0.987, 0.535, 0.003, 0.09966);
     case PartySlot::SIX:
-        return ImageFloatBox(0.985000, 0.675000, 0.003280, 0.099663);
+        return ImageFloatBox(0.987, 0.685, 0.003, 0.09966);
     default:
         break;
     }
-    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid FRLG Party Slot Position");
+    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid RSE Party Slot Position");
 }
 PartySlotDetector::PartySlotDetector(
     Color color,
@@ -98,14 +100,16 @@ bool PartySlotDetector::detect(const ImageViewRGB32& screen){
 
     ImageViewRGB32 target_box_party = extract_box_reference(game_screen, m_party_box);
 
-    //orange FF701C border. light/dark blues in the selected box are close to each other.
-    if (is_solid(target_box_party, { 0.6455696, 0.2835, 0.070886 }, 0.25, 20)
+    //orange border FD7132 for emerald
+    //FD7132 AND EB712D for rs, the background is faintly striped, so it may require a wider range?
+    //FD7132 - 253, 113, 50
+    if (is_solid(target_box_party, { 0.608173, 0.2716346, 0.1201923 }, 0.25, 20)
     ){
         return true;
     }
     return false;
 }
-*/
+
 
 
 }
