@@ -15,7 +15,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
-#include "PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h"
+#include "PokemonRSE/Inference/Dialogs/PokemonRSE_BattleDialogs.h"
 #include "PokemonRSE/PokemonRSE_Navigation.h"
 #include "PokemonRSE_ShinyHunt-Deoxys.h"
 

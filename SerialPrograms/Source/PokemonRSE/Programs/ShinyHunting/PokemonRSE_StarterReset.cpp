@@ -14,6 +14,7 @@
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "PokemonRSE/Inference/Dialogs/PokemonRSE_BattleDialogs.h"
 #include "PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h"
 #include "PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.h"
 #include "PokemonRSE/PokemonRSE_Navigation.h"

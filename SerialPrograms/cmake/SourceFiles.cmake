@@ -2076,6 +2076,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonPokopia/Programs/PokemonPokopia_DailyFarmer.h    
     Source/PokemonPokopia/Programs/PokemonPokopia_PCNavigation.cpp
     Source/PokemonPokopia/Programs/PokemonPokopia_PCNavigation.h
+    Source/PokemonRSE/Inference/Dialogs/PokemonRSE_BattleDialogs.cpp
+    Source/PokemonRSE/Inference/Dialogs/PokemonRSE_BattleDialogs.h
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h
     Source/PokemonRSE/Inference/Menus/PokemonRSE_LoadMenuDetector.cpp
