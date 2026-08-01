@@ -14,17 +14,17 @@ namespace SysbotBase{
 
 
 
-class TcpSysbotBase_Descriptor : public ControllerDescriptor{
+class TcpSysbotBase_Descriptor : public UiState<const TcpSysbotBase_Descriptor, ControllerDescriptor>{
 public:
     static constexpr ControllerInterface INTERFACE_NAME = ControllerInterface::TcpSysbotBase;
 
 
 public:
     TcpSysbotBase_Descriptor()
-        : ControllerDescriptor(INTERFACE_NAME)
+        : UiState<const TcpSysbotBase_Descriptor, ControllerDescriptor>(INTERFACE_NAME)
     {}
     TcpSysbotBase_Descriptor(std::string url)
-        : ControllerDescriptor(INTERFACE_NAME)
+        : UiState<const TcpSysbotBase_Descriptor, ControllerDescriptor>(INTERFACE_NAME)
         , m_url(std::move(url))
     {}
 
@@ -45,7 +45,6 @@ public:
         ControllerType controller_type
     ) const override;
 
-    virtual QWidget* make_selector_QtWidget(ControllerSelectorWidget& parent) const override;
 
 private:
     std::string m_url;

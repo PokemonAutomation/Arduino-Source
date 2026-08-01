@@ -8,12 +8,13 @@
 #include <QHBoxLayout>
 #include <QMessageBox>
 #include "Common/Qt/NoWheelComboBox.h"
-#include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Panels/ConsoleSettingsStretch.h"
 #include "Controllers/ControllerTypeStrings.h"
 #include "ControllerSelectorWidget.h"
 //#include "NintendoSwitch/NintendoSwitch_Settings.h"
+
+#include "PABotBase2/SerialPABotBase2_Descriptor.h"
 
 #include "SerialPABotBase/SerialPABotBase_SelectorWidget.h"
 #include "PABotBase2/SerialPABotBase2_SelectorWidget.h"
@@ -75,7 +76,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
         session.set_device(std::move(current));
     }
     update_interface_dropdown(current->interface_type);
-    m_selector = current->make_selector_QtWidget(*this);
+    m_selector = &static_cast<UiComponentQtWidget&>(*current->make_ui_component(this)).widget();
     m_dropdowns->addWidget(m_selector, 1);
 
 

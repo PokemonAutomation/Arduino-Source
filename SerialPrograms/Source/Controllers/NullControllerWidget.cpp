@@ -4,14 +4,15 @@
  *
  */
 
-#include "Common/Qt/UiStateQtWidget.h"
 #include "NullControllerWidget.h"
 
 namespace PokemonAutomation{
 
 
 
+
 template class RegisterUiStateQtWidget<NullControllerWidget>;
+
 
 
 

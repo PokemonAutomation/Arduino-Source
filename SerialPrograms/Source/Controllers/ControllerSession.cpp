@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "ControllerTypeStrings.h"
+//#include "ControllerTypeStrings.h"
 #include "ControllerSession.h"
 
 //#include <iostream>
@@ -97,7 +97,7 @@ bool ControllerSession::ready() const{
     }
     return m_controller->is_ready();
 }
-std::shared_ptr<const ControllerDescriptor> ControllerSession::descriptor() const{
+std::shared_ptr<ControllerDescriptor> ControllerSession::descriptor() const{
     ReadSpinLock lg(m_state_lock);
     return m_descriptor;
 }
@@ -203,7 +203,7 @@ void ControllerSession::make_controller(
 
 
 
-bool ControllerSession::set_device(const std::shared_ptr<const ControllerDescriptor>& device){
+bool ControllerSession::set_device(const std::shared_ptr<ControllerDescriptor>& device){
 //    cout << "ControllerSession::set_device() = " << device->display_name() << endl;
     {
         std::lock_guard<Mutex> lg0(m_reset_lock);

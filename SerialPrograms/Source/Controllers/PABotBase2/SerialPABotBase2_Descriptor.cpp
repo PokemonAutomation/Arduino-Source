@@ -4,11 +4,12 @@
  *
  */
 
-#include <QWidget>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Controllers/ControllerTypeStrings.h"
+#ifdef QT_CORE_LIB
+#include "Controllers/SerialPortPollerQt.h"
+#endif
 #include "SerialPABotBase2_Connection.h"
-#include "SerialPABotBase2_SelectorWidget.h"
 #include "SerialPABotBase2_Descriptor.h"
 
 #include "Controllers/StandardHid/StandardHid_Keyboard_PABotBase2.h"
@@ -55,7 +56,9 @@ JsonValue SerialPABotBase2_Descriptor::to_json() const{
 }
 
 std::unique_ptr<ControllerConnection> SerialPABotBase2_Descriptor::open_connection(Logger& logger) const{
+#ifdef QT_CORE_LIB
     SerialPortPoller::instance().begin_refresh_now();
+#endif
     if (m_name.empty()){
         return nullptr;
     }
@@ -127,9 +130,6 @@ std::unique_ptr<AbstractController> SerialPABotBase2_Descriptor::make_controller
 
 
 
-QWidget* SerialPABotBase2_Descriptor::make_selector_QtWidget(ControllerSelectorWidget& parent) const{
-    return new SerialPABotBase2_SelectorWidget(parent, this);
-}
 
 
 

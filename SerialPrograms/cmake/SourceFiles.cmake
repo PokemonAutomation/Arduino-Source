@@ -786,6 +786,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/JoystickTools.h
     Source/Controllers/NullController.cpp
     Source/Controllers/NullController.h
+    Source/Controllers/NullControllerWidget.cpp
+    Source/Controllers/NullControllerWidget.h
     Source/Controllers/RumbleListener.h
     Source/Controllers/PABotBase2/PABotBase2_CommandQueueManager.cpp
     Source/Controllers/PABotBase2/PABotBase2_CommandQueueManager.h
@@ -799,6 +801,7 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/PABotBase2/SerialPABotBase2_Connection.h
     Source/Controllers/PABotBase2/SerialPABotBase2_Descriptor.cpp
     Source/Controllers/PABotBase2/SerialPABotBase2_Descriptor.h
+    Source/Controllers/PABotBase2/SerialPABotBase2_SelectorWidget.cpp
     Source/Controllers/PABotBase2/SerialPABotBase2_SelectorWidget.h
     Source/Controllers/PABotBase2/SerialPABotBase_StatusThread.h
     Source/Controllers/Schedulers/ControllerWithScheduler.h
@@ -832,6 +835,7 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h
+    Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h
     Source/Controllers/SerialPortPollerQt.cpp
     Source/Controllers/SerialPortPollerQt.h
@@ -1125,6 +1129,7 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Connection.h
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Descriptor.cpp
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Descriptor.h
+    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.cpp
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp
     Source/NintendoSwitch/DevPrograms/BoxDraw.h

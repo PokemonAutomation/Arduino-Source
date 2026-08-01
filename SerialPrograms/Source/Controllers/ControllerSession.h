@@ -55,7 +55,7 @@ public:
     void set(const ControllerOption& option);
 
     bool ready() const;
-    std::shared_ptr<const ControllerDescriptor> descriptor() const;
+    std::shared_ptr<ControllerDescriptor> descriptor() const;
     ControllerType controller_type() const;
     std::string status_text() const;
 
@@ -77,7 +77,7 @@ public:
 
 
 public:
-    bool set_device(const std::shared_ptr<const ControllerDescriptor>& device);
+    bool set_device(const std::shared_ptr<ControllerDescriptor>& device);
     bool set_controller(ControllerType controller_type);
 
 
@@ -159,7 +159,7 @@ private:
     ControllerType m_desired_controller;
     ControllerResetMode m_next_reset_mode;
 
-    std::shared_ptr<const ControllerDescriptor> m_descriptor;
+    std::shared_ptr<ControllerDescriptor> m_descriptor;
     std::unique_ptr<ControllerConnection> m_connection;
     std::unique_ptr<AbstractController> m_controller;
 

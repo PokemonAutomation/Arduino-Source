@@ -15,19 +15,17 @@ namespace PokemonAutomation{
 
 
 
-
 class NullControllerWidget : public QWidget, public UiComponentQtWidget{
 public:
-    using ParentOption = const ControllerDescriptor;
+    using ParentState = const NullControllerDescriptor;
 
-    NullControllerWidget(QWidget& parent, const ControllerDescriptor& descriptor)
+    NullControllerWidget(QWidget& parent, const ParentState& descriptor)
         : QWidget(&parent)
     {}
     virtual QWidget& widget() override{
         return *this;
     }
 };
-
 
 
 

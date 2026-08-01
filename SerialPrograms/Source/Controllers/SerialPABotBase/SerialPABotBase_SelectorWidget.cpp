@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Qt/UiStateQtWidget.h"
 #include "Controllers/SerialPortPollerQt.h"
 #include "SerialPABotBase_Descriptor.h"
 #include "SerialPABotBase_SelectorWidget.h"
@@ -54,6 +53,8 @@ bool filter_serial_port(const QSerialPortInfo& port){
 
 
 
+
+
 SerialPABotBase_SelectorWidget::SerialPABotBase_SelectorWidget(
     ControllerSelectorWidget& parent,
     const ControllerDescriptor* current
@@ -69,7 +70,7 @@ SerialPABotBase_SelectorWidget::SerialPABotBase_SelectorWidget(
             current->interface_type != ControllerInterface::SerialPABotBase
         )
     ){
-        std::shared_ptr<const ControllerDescriptor> descriptor =
+        std::shared_ptr<ControllerDescriptor> descriptor =
             parent.session().option().get_descriptor_from_cache(ControllerInterface::SerialPABotBase);
         if (!descriptor){
             descriptor.reset(new SerialPABotBase_Descriptor());
@@ -86,9 +87,9 @@ SerialPABotBase_SelectorWidget::SerialPABotBase_SelectorWidget(
                 return;
             }
             index = std::min(index, (int)m_ports.size() - 1);
-            std::shared_ptr<const ControllerDescriptor>& selected = m_ports[index];
+            std::shared_ptr<ControllerDescriptor>& selected = m_ports[index];
 
-            std::shared_ptr<const ControllerDescriptor> current = parent.session().descriptor();
+            std::shared_ptr<ControllerDescriptor> current = parent.session().descriptor();
             if (*current == *selected){
                 return;
             }

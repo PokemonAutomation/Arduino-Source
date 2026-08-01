@@ -14,17 +14,17 @@ namespace SerialPABotBase{
 
 
 
-class SerialPABotBase2_Descriptor : public ControllerDescriptor{
+class SerialPABotBase2_Descriptor : public UiState<const SerialPABotBase2_Descriptor&, ControllerDescriptor>{
 public:
     static constexpr ControllerInterface INTERFACE_NAME = ControllerInterface::SerialPABotBase2;
 
 
 public:
     SerialPABotBase2_Descriptor()
-        : ControllerDescriptor(INTERFACE_NAME)
+        : UiState<const SerialPABotBase2_Descriptor&, ControllerDescriptor>(INTERFACE_NAME)
     {}
     SerialPABotBase2_Descriptor(std::string name)
-        : ControllerDescriptor(INTERFACE_NAME)
+        : UiState<const SerialPABotBase2_Descriptor&, ControllerDescriptor>(INTERFACE_NAME)
         , m_name(std::move(name))
     {}
 
@@ -44,8 +44,6 @@ public:
         ControllerConnection& connection,
         ControllerType controller_type
     ) const override;
-
-    virtual QWidget* make_selector_QtWidget(ControllerSelectorWidget& parent) const override;
 
 private:
     std::string m_name;

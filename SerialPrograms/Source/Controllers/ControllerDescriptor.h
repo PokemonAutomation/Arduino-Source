@@ -11,7 +11,7 @@
 #include <memory>
 #include <map>
 #include "Common/Cpp/Logging/AbstractLogger.h"
-//#include "Common/Cpp/Json/JsonObject.h"
+#include "Common/Cpp/UiWrapper.h"
 #include "ControllerTypes.h"
 #include "Controller.h"
 
@@ -93,7 +93,7 @@ int InterfaceType_t<DescriptorType>::initializer = register_class();
 //  "Controller" dropdown, every item in that list corresponds to an instance
 //  of this class.
 //
-class ControllerDescriptor{
+class ControllerDescriptor : public UiState<>{
 public:
     const ControllerInterface interface_type;
 
@@ -117,8 +117,6 @@ public:
         ControllerConnection& connection,
         ControllerType controller_type
     ) const = 0;
-
-    virtual QWidget* make_selector_QtWidget(ControllerSelectorWidget& parent) const = 0;
 };
 
 
@@ -135,15 +133,15 @@ class ControllerOption{
 public:
     ControllerOption();
 
-    std::shared_ptr<const ControllerDescriptor> descriptor() const{
+    std::shared_ptr<ControllerDescriptor> descriptor() const{
         return m_descriptor;
     }
-    void set_descriptor(std::shared_ptr<const ControllerDescriptor> descriptor);
+    void set_descriptor(std::shared_ptr<ControllerDescriptor> descriptor);
 
     //  Remember the last used descriptor for each interface type. That way when
     //  the user switches back-and-forth between two interfaces, it will reload
     //  the previous one.
-    std::shared_ptr<const ControllerDescriptor> get_descriptor_from_cache(ControllerInterface interface_type) const;
+    std::shared_ptr<ControllerDescriptor> get_descriptor_from_cache(ControllerInterface interface_type) const;
 
 
 public:
@@ -152,8 +150,8 @@ public:
 
 
 private:
-    std::shared_ptr<const ControllerDescriptor> m_descriptor;
-    std::map<ControllerInterface, std::shared_ptr<const ControllerDescriptor>> m_descriptor_cache;
+    std::shared_ptr<ControllerDescriptor> m_descriptor;
+    std::map<ControllerInterface, std::shared_ptr<ControllerDescriptor>> m_descriptor_cache;
 };
 
 

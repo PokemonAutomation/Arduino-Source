@@ -4,7 +4,8 @@
  *
  */
 
-#include "Common/Qt/UiStateQtWidget.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h"
+#include "SerialPABotBase2_Descriptor.h"
 #include "SerialPABotBase2_SelectorWidget.h"
 
 namespace PokemonAutomation{
@@ -31,7 +32,7 @@ SerialPABotBase2_SelectorWidget::SerialPABotBase2_SelectorWidget(
             current->interface_type != ControllerInterface::SerialPABotBase2
         )
     ){
-        std::shared_ptr<const ControllerDescriptor> descriptor =
+        std::shared_ptr<ControllerDescriptor> descriptor =
             parent.session().option().get_descriptor_from_cache(ControllerInterface::SerialPABotBase2);
         if (!descriptor){
             descriptor.reset(new SerialPABotBase2_Descriptor());
@@ -48,9 +49,9 @@ SerialPABotBase2_SelectorWidget::SerialPABotBase2_SelectorWidget(
                 return;
             }
             index = std::min(index, (int)m_ports.size() - 1);
-            std::shared_ptr<const ControllerDescriptor>& selected = m_ports[index];
+            std::shared_ptr<ControllerDescriptor>& selected = m_ports[index];
 
-            std::shared_ptr<const ControllerDescriptor> current = parent.session().descriptor();
+            std::shared_ptr<ControllerDescriptor> current = parent.session().descriptor();
             if (*current == *selected){
                 return;
             }

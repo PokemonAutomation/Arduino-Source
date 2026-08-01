@@ -44,10 +44,14 @@
 #include "CommonTools/Options/QtWidgets/ScreenWatchWidget.h"
 #include "CommonTools/Options/QtWidgets/LanguageOCRWidget.h"
 
-//  Controller Input
+//  Controllers
+#include "Controllers/NullControllerWidget.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h"
+#include "Controllers/PABotBase2/SerialPABotBase2_SelectorWidget.h"
 #include "ControllerInput/Keyboard/KeyBindingWidget.h"
 
 //  Nintendo Switch
+#include "NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h"
 #include "NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.h"
 
 //  Pokemon LA
@@ -114,10 +118,14 @@ void register_all_statics(){
     RegisterUiStateQtWidget<OCR::LanguageOCRCellWidget>();
     RegisterUiStateQtWidget<OCR::LanguageOCROptionWidget>();
 
-    //  Controller Input
+    //  Controllers
+    RegisterUiStateQtWidget<NullControllerWidget>();
+    RegisterUiStateQtWidget<SerialPABotBase::SerialPABotBase_SelectorWidget>();
+    RegisterUiStateQtWidget<SerialPABotBase::SerialPABotBase2_SelectorWidget>();
     RegisterUiStateQtWidget<KeyboardHidBindingCellWidget>();
 
     //  Nintendo Switch
+    RegisterUiStateQtWidget<SysbotBase::TcpSysbotBase_SelectorWidget>();
     RegisterUiStateQtWidget<NintendoSwitch::FriendCodeListWidget>();
 
     //  Pokemon LA
