@@ -45,7 +45,88 @@ public:
     {}
 };
 
-// Future note: when given a choice popup, there is no advance arrow.
+
+// Dialog box without advance arrow.
+// Positions are different between japan and ROW, but are the same across games.
+class DialogDetector : public StaticScreenDetector{
+public:
+    DialogDetector(Color color);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+private:
+    //Position for non-JPN
+    ImageFloatBox m_top_box;
+    ImageFloatBox m_inner_box;
+
+    //Position for JPN
+    ImageFloatBox m_side_box_jpn;
+    ImageFloatBox m_inner_box_jpn;
+};
+class DialogWatcher : public DetectorToFinder<DialogDetector>{
+public:
+    DialogWatcher(Color color)
+        : DetectorToFinder("DialogWatcher", std::chrono::milliseconds(250), color)
+    {}
+};
+
+
+
+// Dialog box, now with arrow!
+class AdvanceDialogDetector : public StaticScreenDetector{
+public:
+    AdvanceDialogDetector(Color color);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+private:
+    //Position for non-JPN
+    ImageFloatBox m_top_box;
+    ImageFloatBox m_inner_box;
+    ImageFloatBox m_dialog_box;
+
+    //Position for JPN
+    ImageFloatBox m_side_box_jpn;
+    ImageFloatBox m_inner_box_jpn;
+    ImageFloatBox m_dialog_jpn_box;
+};
+class AdvanceDialogWatcher : public DetectorToFinder<AdvanceDialogDetector>{
+public:
+    AdvanceDialogWatcher(Color color)
+        : DetectorToFinder("AdvanceDialogWatcher", std::chrono::milliseconds(250), color)
+    {}
+};
+
+
+
+// Detection for the Yes/No prompt
+class SelectionDialogDetector : public StaticScreenDetector{
+public:
+    SelectionDialogDetector(Color color);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+private:
+    //Position for non-JPN
+    ImageFloatBox m_top_box;
+    ImageFloatBox m_inner_box;
+
+    //Position for JPN
+    ImageFloatBox m_side_box_jpn;
+    ImageFloatBox m_inner_box_jpn;
+
+    ImageFloatBox m_yes_box;
+    ImageFloatBox m_no_box;
+};
+class SelectionDialogWatcher : public DetectorToFinder<SelectionDialogDetector>{
+public:
+    SelectionDialogWatcher(Color color)
+        : DetectorToFinder("SelectionDialogWatcher", std::chrono::milliseconds(250), color)
+    {}
+};
 
 
 }

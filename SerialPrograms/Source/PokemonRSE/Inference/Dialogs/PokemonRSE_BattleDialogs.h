@@ -106,7 +106,6 @@ public:
 
 
 
-// Future note: when given a choice popup, there is no advance arrow.
 
 
 }
