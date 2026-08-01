@@ -30,9 +30,11 @@ public:
 
     void stop();
 
-    void run_now_nonblocking(Runnable& runnable);
+    void bump(Runnable& runnable, bool run_it) noexcept;
+
     void add_runnable(Runnable& runnable, WallDuration period);
     void remove_runnable(Runnable& runnable) noexcept;
+    void edit_duration(Runnable& runnable, WallDuration period) noexcept;
 
 
 private:
@@ -52,10 +54,9 @@ private:
         {}
     };
     void update_next(
-        std::map<Runnable*, Entry>::iterator runnable_iter,
         std::multimap<WallClock, std::map<Runnable*, Entry>::iterator>::iterator schedule_iter,
         WallClock next_run_time
-    );
+    ) noexcept;
 
     Mutex m_lock;
     ConditionVariable m_cv;

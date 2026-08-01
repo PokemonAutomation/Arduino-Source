@@ -4,6 +4,8 @@
  *
  */
 
+#include "Common/Cpp/PrettyPrint.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/GlobalServices.h"
 #include "SerialPortPollerQt.h"
@@ -23,8 +25,9 @@ SerialPortPoller& SerialPortPoller::instance(){
 
 SerialPortPoller::SerialPortPoller()
     : m_last_change(current_time())
+    , m_highest(WallDuration(0))
 {
-    global_periodic_runner().add_runnable(*this, std::chrono::seconds(10));
+    global_periodic_runner().add_runnable(*this, std::chrono::seconds(1));
 }
 SerialPortPoller::~SerialPortPoller(){
     stop();
@@ -35,7 +38,7 @@ void SerialPortPoller::stop(){
 
 
 void SerialPortPoller::begin_refresh_now(){
-    global_periodic_runner().run_now_nonblocking(*this);
+    global_periodic_runner().bump(*this, true);
 }
 WallClock SerialPortPoller::last_changed() const{
     ReadSpinLock lg(m_lock);
@@ -58,7 +61,10 @@ QSerialPortInfo SerialPortPoller::get_port(const std::string& name) const{
 void SerialPortPoller::run() noexcept{
 //    global_logger_tagged().log("Refreshing serial ports...");
 //    cout << "SerialPortPoller::run() - start" << endl;
+
     try{
+        WallClock start = current_time();
+
         QList<QSerialPortInfo> list = QSerialPortInfo::availablePorts();
         std::map<std::string, QSerialPortInfo> current;
         for (auto& port : list){
@@ -100,6 +106,29 @@ void SerialPortPoller::run() noexcept{
             m_last_change = now;
             m_listeners.run_method(&Listener::on_serial_ports_changed, m_list);
         }
+
+        WallClock end = current_time();
+
+        //  Throttle the next call.
+        WallDuration duration = end - start;
+        WallDuration next_delay = duration * 10;
+        if (next_delay < std::chrono::seconds(1)){
+            next_delay = std::chrono::seconds(1);
+        }
+        if (GlobalSettings::instance().LOG_EVERYTHING){
+            global_logger_tagged().log(
+                "Serial port refresh took " + tostr_u_commas(std::chrono::duration_cast<Milliseconds>(duration).count()) + " ms.",
+                COLOR_ORANGE
+            );
+        }else if (m_highest < duration){
+            m_highest = duration;
+            global_logger_tagged().log(
+                "Serial port refresh took " + tostr_u_commas(std::chrono::duration_cast<Milliseconds>(duration).count()) + " ms. "
+                "Further updates shorter than this will be suppressed.",
+                COLOR_ORANGE
+            );
+        }
+        global_periodic_runner().edit_duration(*this, next_delay);
 
     }catch (...){}
 //    cout << "SerialPortPoller::run() - end" << endl;

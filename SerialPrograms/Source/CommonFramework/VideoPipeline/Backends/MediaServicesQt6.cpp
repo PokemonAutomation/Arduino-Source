@@ -68,7 +68,7 @@ void GlobalMediaServices::thread_body(){
     std::unique_lock<Mutex> lg(m_sleep_lock);
 
     while (!m_stopping){
-//            global_logger_tagged().log("GlobalMediaServices::thread_body() iteration", COLOR_CYAN);
+//        global_logger_tagged().log("GlobalMediaServices::thread_body() iteration", COLOR_CYAN);
 
         // Check if camera refresh was requested
         if (m_refresh_cameras){

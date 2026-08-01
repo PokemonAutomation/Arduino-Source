@@ -53,6 +53,7 @@ private:
     WallClock m_last_change;
     std::map<std::string, QSerialPortInfo> m_last;
     QList<QSerialPortInfo> m_list;
+    WallDuration m_highest;
 
     ListenerSet<Listener> m_listeners;
 };
