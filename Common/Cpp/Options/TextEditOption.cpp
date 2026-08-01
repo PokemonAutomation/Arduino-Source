@@ -69,7 +69,7 @@ TextEditOption::TextEditOption(
     std::string placeholder_text,
     bool signal_all_text_changes
 )
-    : ConfigOptionImpl<TextEditOption>(lock_while_program_is_running)
+    : UiState<TextEditOption, ConfigOption>(lock_while_program_is_running)
     , m_data(CONSTRUCT_TOKEN, std::move(label), std::move(default_value), std::move(placeholder_text), signal_all_text_changes)
 {}
 #if 0

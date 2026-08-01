@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class FriendCodeListOption : public ConfigOptionImpl<FriendCodeListOption>{
+class FriendCodeListOption : public UiState<FriendCodeListOption, ConfigOption>{
 public:
     FriendCodeListOption(std::string label, std::vector<std::string> default_lines);
 

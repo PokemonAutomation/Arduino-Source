@@ -13,7 +13,7 @@
 namespace PokemonAutomation{
 
 
-class TextEditOption : public ConfigOptionImpl<TextEditOption>{
+class TextEditOption : public UiState<TextEditOption, ConfigOption>{
 public:
     //  Listeners for when the user focuses on this box.
     struct FocusListener{

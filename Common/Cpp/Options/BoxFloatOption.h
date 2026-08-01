@@ -13,7 +13,7 @@
 namespace PokemonAutomation{
 
 
-class BoxFloatOption : public ConfigOptionImpl<BoxFloatOption>{
+class BoxFloatOption : public UiState<BoxFloatOption, ConfigOption>{
 public:
     ~BoxFloatOption();
     BoxFloatOption(

@@ -42,7 +42,7 @@ struct FloatingPointCell::Data{
 
 FloatingPointCell::~FloatingPointCell() = default;
 FloatingPointCell::FloatingPointCell(const FloatingPointCell& x)
-    : ConfigOptionImpl<FloatingPointCell>(x)
+    : UiState<FloatingPointCell, ConfigOption>(x)
     , m_data(CONSTRUCT_TOKEN, x.min_value(), x.max_value(), x.default_value(), x)
 {}
 FloatingPointCell::FloatingPointCell(
@@ -50,7 +50,7 @@ FloatingPointCell::FloatingPointCell(
     double min_value, double max_value,
     double default_value, double current_value
 )
-    : ConfigOptionImpl<FloatingPointCell>(lock_while_running)
+    : UiState<FloatingPointCell, ConfigOption>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, min_value, max_value, default_value, current_value)
 {}
 
@@ -61,7 +61,7 @@ FloatingPointCell::FloatingPointCell(
     double min_value,
     double max_value
 )
-    : ConfigOptionImpl<FloatingPointCell>(lock_while_running)
+    : UiState<FloatingPointCell, ConfigOption>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, min_value, max_value, default_value, default_value)
 {}
 
@@ -153,7 +153,7 @@ FloatingPointOption::FloatingPointOption(
     double min_value,
     double max_value
 )
-    : ConfigOptionImpl<FloatingPointOption, FloatingPointCell>(
+    : UiState<FloatingPointOption, FloatingPointCell>(
         lock_while_running,
         default_value,
         min_value,

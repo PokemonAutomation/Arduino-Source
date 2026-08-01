@@ -108,7 +108,7 @@ private:
 
 
 // A program option to build a custom path to navigate the map
-class CustomPathTableFromJubilife : public ConfigOptionImpl<CustomPathTableFromJubilife, BatchOption>{
+class CustomPathTableFromJubilife : public UiState<CustomPathTableFromJubilife, BatchOption>{
 public:
     CustomPathTableFromJubilife();
 

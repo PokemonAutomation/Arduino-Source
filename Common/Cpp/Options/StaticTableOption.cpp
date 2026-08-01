@@ -218,7 +218,7 @@ StaticTableOption::StaticTableOption(
     LockMode lock_while_program_is_running,
     bool enable_saveload
 )
-    : ConfigOptionImpl<StaticTableOption>(lock_while_program_is_running)
+    : UiState<StaticTableOption, ConfigOption>(lock_while_program_is_running)
     , m_data(CONSTRUCT_TOKEN, std::move(label), enable_saveload)
 {}
 void StaticTableOption::add_row(std::unique_ptr<StaticTableRow> row){

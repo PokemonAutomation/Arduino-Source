@@ -30,21 +30,21 @@ struct BooleanCheckBoxCell::Data{
 
 BooleanCheckBoxCell::~BooleanCheckBoxCell() = default;
 BooleanCheckBoxCell::BooleanCheckBoxCell(const BooleanCheckBoxCell& x)
-    : ConfigOptionImpl<BooleanCheckBoxCell>(x)
+    : UiState<BooleanCheckBoxCell, ConfigOption>(x)
     , m_data(CONSTRUCT_TOKEN, x.default_value(), x.current_value())
 {}
 BooleanCheckBoxCell::BooleanCheckBoxCell(
     LockMode lock_while_running,
     bool default_value, bool current_value
 )
-    : ConfigOptionImpl<BooleanCheckBoxCell>(lock_while_running)
+    : UiState<BooleanCheckBoxCell, ConfigOption>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, default_value, current_value)
 {}
 BooleanCheckBoxCell::BooleanCheckBoxCell(
     LockMode lock_while_running,
     bool default_value
 )
-    : ConfigOptionImpl<BooleanCheckBoxCell>(lock_while_running)
+    : UiState<BooleanCheckBoxCell, ConfigOption>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, default_value, default_value)
 {}
 
@@ -83,7 +83,7 @@ BooleanCheckBoxOption::BooleanCheckBoxOption(
     LockMode lock_while_running,
     bool default_value
 )
-    : ConfigOptionImpl<BooleanCheckBoxOption, BooleanCheckBoxCell>(lock_while_running, default_value)
+    : UiState<BooleanCheckBoxOption, BooleanCheckBoxCell>(lock_while_running, default_value)
     , m_label(std::move(label))
 {}
 BooleanCheckBoxOption::BooleanCheckBoxOption(
@@ -91,7 +91,7 @@ BooleanCheckBoxOption::BooleanCheckBoxOption(
     LockMode lock_while_running,
     bool default_value, bool value
 )
-    : ConfigOptionImpl<BooleanCheckBoxOption, BooleanCheckBoxCell>(lock_while_running, default_value, value)
+    : UiState<BooleanCheckBoxOption, BooleanCheckBoxCell>(lock_while_running, default_value, value)
     , m_label(std::move(label))
 {}
 

@@ -32,7 +32,7 @@ KeyboardHidBindingCell::~KeyboardHidBindingCell(){
 
 }
 KeyboardHidBindingCell::KeyboardHidBindingCell(LockMode lock_while_program_is_running)
-    : ConfigOptionImpl<KeyboardHidBindingCell>(lock_while_program_is_running)
+    : UiState<KeyboardHidBindingCell, ConfigOption>(lock_while_program_is_running)
     , m_data(CONSTRUCT_TOKEN, (KeyboardKey)0)
 {}
 

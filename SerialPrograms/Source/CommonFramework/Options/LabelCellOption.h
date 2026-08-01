@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 
 
 
-class LabelCellOption : public ConfigOptionImpl<LabelCellOption>{
+class LabelCellOption : public UiState<LabelCellOption, ConfigOption>{
 public:
     ~LabelCellOption();
 

@@ -43,7 +43,7 @@ PathCell::PathCell(
     std::string filter_string,
     std::string placeholder_text
 )
-    : ConfigOptionImpl<PathCell>(lock_while_program_is_running)
+    : UiState<PathCell, ConfigOption>(lock_while_program_is_running)
     , m_data(CONSTRUCT_TOKEN, std::move(default_value), std::move(filter_string), std::move(placeholder_text))
 {}
 
@@ -111,7 +111,7 @@ PathOption::PathOption(
     std::string filter_string,
     std::string placeholder_text
 )
-     : ConfigOptionImpl<PathOption, PathCell>(
+     : UiState<PathOption, PathCell>(
         lock_while_program_is_running,
         default_value,
         filter_string,

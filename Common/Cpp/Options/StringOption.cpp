@@ -47,7 +47,7 @@ StringCell::StringCell(
     std::string placeholder_text,
     bool signal_all_text_changes
 )
-    : ConfigOptionImpl<StringCell>(lock_while_program_is_running)
+    : UiState<StringCell, ConfigOption>(lock_while_program_is_running)
     , m_data(CONSTRUCT_TOKEN, is_password, std::move(default_value), std::move(placeholder_text), signal_all_text_changes)
 {}
 
@@ -119,7 +119,7 @@ StringOption::StringOption(
     std::string placeholder_text,
     bool signal_all_text_changes
 )
-     : ConfigOptionImpl<StringOption, StringCell>(
+     : UiState<StringOption, StringCell>(
         is_password,
         lock_while_program_is_running,
         default_value,

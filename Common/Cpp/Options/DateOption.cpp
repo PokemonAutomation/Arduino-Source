@@ -54,7 +54,7 @@ DateTimeCell::DateTimeCell(
     const DateTime& min_value, const DateTime& max_value,
     const DateTime& default_value
 )
-    : ConfigOptionImpl<DateTimeCell>(lock_while_running)
+    : UiState<DateTimeCell, ConfigOption>(lock_while_running)
     , m_level(level)
     , m_min_value(min_value)
     , m_max_value(max_value)
@@ -167,7 +167,7 @@ DateTimeOption::DateTimeOption(
     const DateTime& min_value, const DateTime& max_value,
     const DateTime& default_value
 )
-    : ConfigOptionImpl<DateTimeOption, DateTimeCell>(
+    : UiState<DateTimeOption, DateTimeCell>(
         lock_while_running,
         level,
         min_value,

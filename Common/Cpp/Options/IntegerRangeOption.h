@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 
 
 template <typename Type>
-class IntegerRangeCell : public ConfigOptionImpl<IntegerRangeCell<Type>>{
+class IntegerRangeCell : public UiState<IntegerRangeCell<Type>, ConfigOption>{
 public:
     ~IntegerRangeCell();
     IntegerRangeCell(const IntegerRangeCell& x);

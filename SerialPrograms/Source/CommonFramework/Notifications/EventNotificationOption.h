@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 class EventNotificationOption;
 
 
-class TestMessageButton : public ConfigOptionImpl<TestMessageButton>{
+class TestMessageButton : public UiState<TestMessageButton, ConfigOption>{
 public:
     TestMessageButton(EventNotificationOption& p_option);
 

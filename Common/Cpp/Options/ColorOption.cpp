@@ -11,7 +11,7 @@ namespace PokemonAutomation{
 
 
 ColorCell::ColorCell(const ColorCell& x)
-    : ConfigOptionImpl<ColorCell>(x)
+    : UiState<ColorCell, ConfigOption>(x)
     , m_default_value(x.m_default_value)
     , m_current_value(x)
 {}
@@ -20,7 +20,7 @@ ColorCell::ColorCell(
     bool has_alpha,
     uint32_t default_value, uint32_t current_value
 )
-    : ConfigOptionImpl<ColorCell>(lock_while_running)
+    : UiState<ColorCell, ConfigOption>(lock_while_running)
     , m_has_alpha(has_alpha)
     , m_default_value(default_value)
     , m_current_value(current_value)
@@ -131,7 +131,7 @@ ColorOption::ColorOption(
     bool has_alpha,
     uint32_t default_value, uint32_t current_value
 )
-    : ConfigOptionImpl(lock_while_running, has_alpha, default_value, current_value)
+    : UiState<ColorOption, ColorCell>(lock_while_running, has_alpha, default_value, current_value)
     , m_label(std::move(label))
 {}
 

@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 
 
 ConfigWidget* ConfigWidget::make_from_option(ConfigOption& option, QWidget* parent){
-    UiWrapper wrapper = option.make_UiComponent(parent);
+    UiWrapper wrapper = option.make_ui_component(parent);
     if (!wrapper){
         throw InternalProgramError(
             nullptr,

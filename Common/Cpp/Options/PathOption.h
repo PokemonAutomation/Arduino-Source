@@ -13,7 +13,7 @@
 namespace PokemonAutomation{
 
 
-class PathCell : public ConfigOptionImpl<PathCell>{
+class PathCell : public UiState<PathCell, ConfigOption>{
 public:
     ~PathCell();
     PathCell(
@@ -50,7 +50,7 @@ private:
 };
 
 
-class PathOption : public ConfigOptionImpl<PathOption, PathCell>{
+class PathOption : public UiState<PathOption, PathCell>{
 public:
     PathOption(
         std::string label,

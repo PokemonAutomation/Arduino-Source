@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 class SettingsResourceDownloadRow;
 
 
-class SettingsResourceButton {
+class SettingsResourceButton{
 public:
     struct Listener{
         virtual void on_change_text(const std::string& text){}
@@ -32,7 +32,10 @@ private:
 
 };
 
-class SettingsResourceDownloadButton : public ConfigOptionImpl<SettingsResourceDownloadButton>, public SettingsResourceButton{
+class SettingsResourceDownloadButton
+    : public UiState<SettingsResourceDownloadButton, ConfigOption>
+    , public SettingsResourceButton
+{
 public:
     // ~SettingsResourceDownloadButton();
     SettingsResourceDownloadButton(SettingsResourceDownloadRow& p_row);
@@ -51,7 +54,10 @@ private:
 
 };
 
-class SettingsResourceDeleteButton : public ConfigOptionImpl<SettingsResourceDeleteButton>, public SettingsResourceButton{
+class SettingsResourceDeleteButton
+    : public UiState<SettingsResourceDeleteButton, ConfigOption>
+    , public SettingsResourceButton
+{
 public:
     SettingsResourceDeleteButton(SettingsResourceDownloadRow& p_row);
 
@@ -66,7 +72,10 @@ private:
     bool m_enabled;
 };
 
-class SettingsResourceCancelButton : public ConfigOptionImpl<SettingsResourceCancelButton>, public SettingsResourceButton{
+class SettingsResourceCancelButton
+    : public UiState<SettingsResourceCancelButton, ConfigOption>
+    , public SettingsResourceButton
+{
 public:
     SettingsResourceCancelButton(SettingsResourceDownloadRow& p_row);
 
@@ -81,7 +90,10 @@ private:
     bool m_enabled;    
 };
 
-class SettingsResourceProgressBar : public ConfigOptionImpl<SettingsResourceProgressBar>, public ResourceDownload::Listener{
+class SettingsResourceProgressBar
+    : public UiState<SettingsResourceProgressBar, ConfigOption>
+    , public ResourceDownload::Listener
+{
 public:
     SettingsResourceProgressBar(SettingsResourceDownloadRow& p_row);
 
@@ -112,7 +124,10 @@ private:
 
 };
 
-class SettingsDownloadPopup : public ConfigOptionImpl<SettingsDownloadPopup>, public ResourceDownload::Listener{
+class SettingsDownloadPopup
+    : public UiState<SettingsDownloadPopup, ConfigOption>
+    , public ResourceDownload::Listener
+{
 public:
     SettingsDownloadPopup(SettingsResourceDownloadRow& p_row);
 public:
@@ -120,7 +135,7 @@ public:
 
 };
 
-class SettingsDownloadError : public ConfigOptionImpl<SettingsDownloadError>{
+class SettingsDownloadError : public UiState<SettingsDownloadError, ConfigOption>{
 public:
     SettingsDownloadError();
 

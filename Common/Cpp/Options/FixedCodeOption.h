@@ -13,7 +13,7 @@
 namespace PokemonAutomation{
 
 
-class FixedCodeOption : public ConfigOptionImpl<FixedCodeOption>{
+class FixedCodeOption : public UiState<FixedCodeOption, ConfigOption>{
 public:
     ~FixedCodeOption();
     FixedCodeOption(

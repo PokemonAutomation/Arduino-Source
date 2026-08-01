@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 
 
 
-class KeyboardHidBindingCell : public ConfigOptionImpl<KeyboardHidBindingCell>{
+class KeyboardHidBindingCell : public UiState<KeyboardHidBindingCell, ConfigOption>{
 public:
     ~KeyboardHidBindingCell();
     KeyboardHidBindingCell(LockMode lock_while_program_is_running);

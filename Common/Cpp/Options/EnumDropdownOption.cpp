@@ -35,7 +35,7 @@ struct IntegerEnumDropdownCell::Data{
 
 IntegerEnumDropdownCell::~IntegerEnumDropdownCell() = default;
 IntegerEnumDropdownCell::IntegerEnumDropdownCell(const IntegerEnumDropdownCell& x)
-    : ConfigOptionImpl<IntegerEnumDropdownCell>(x)
+    : UiState<IntegerEnumDropdownCell, ConfigOption>(x)
     , m_data(CONSTRUCT_TOKEN, x.database(), x.default_value(), x.current_value())
 {}
 IntegerEnumDropdownCell::IntegerEnumDropdownCell(
@@ -43,7 +43,7 @@ IntegerEnumDropdownCell::IntegerEnumDropdownCell(
     LockMode lock_while_running,
     size_t default_value, size_t current_value
 )
-    : ConfigOptionImpl<IntegerEnumDropdownCell>(lock_while_running)
+    : UiState<IntegerEnumDropdownCell, ConfigOption>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, database, default_value, current_value)
 {
     if (database.find(default_value) == nullptr){
@@ -58,7 +58,7 @@ IntegerEnumDropdownCell::IntegerEnumDropdownCell(
     LockMode lock_while_running,
     size_t default_value
 )
-    : ConfigOptionImpl<IntegerEnumDropdownCell>(lock_while_running)
+    : UiState<IntegerEnumDropdownCell, ConfigOption>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, database, default_value, default_value)
 {
     if (database.find(default_value) == nullptr){

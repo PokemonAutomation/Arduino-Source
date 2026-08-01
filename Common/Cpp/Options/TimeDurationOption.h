@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 
 
 template <typename Type>
-class TimeDurationCell : public ConfigOptionImpl<TimeDurationCell<Type>>{
+class TimeDurationCell : public UiState<TimeDurationCell<Type>, ConfigOption>{
 public:
     ~TimeDurationCell();
     TimeDurationCell(const TimeDurationCell& x) = delete;
@@ -87,11 +87,11 @@ protected:
 
 
 template <typename Type>
-class TimeDurationOption : public ConfigOptionImpl<TimeDurationOption<Type>, TimeDurationCell<Type>>{
+class TimeDurationOption : public UiState<TimeDurationOption<Type>, TimeDurationCell<Type>>{
 public:
     template <class... Args>
     TimeDurationOption(std::string label, Args&&... args)
-        : ConfigOptionImpl<TimeDurationOption<Type>, TimeDurationCell<Type>>(
+        : UiState<TimeDurationOption<Type>, TimeDurationCell<Type>>(
             std::forward<Args>(args)...
         )
         , m_label(std::move(label))

@@ -13,7 +13,7 @@
 namespace PokemonAutomation{
 
 
-class GroupOption : public ConfigOptionImpl<GroupOption, BatchOption>{
+class GroupOption : public UiState<GroupOption, BatchOption>{
 public:
     enum class EnableMode{
         ALWAYS_ENABLED,

@@ -14,7 +14,7 @@ namespace PokemonAutomation{
 
 
 
-class StaticTextOption : public ConfigOptionImpl<StaticTextOption>{
+class StaticTextOption : public UiState<StaticTextOption, ConfigOption>{
 public:
     ~StaticTextOption();
     StaticTextOption(std::string label, bool text_wrapping = true);
@@ -36,7 +36,7 @@ private:
 
 
 
-class SectionDividerOption : public ConfigOptionImpl<SectionDividerOption>{
+class SectionDividerOption : public UiState<SectionDividerOption, ConfigOption>{
 public:
     ~SectionDividerOption();
     SectionDividerOption(std::string label, bool text_wrapping = true);

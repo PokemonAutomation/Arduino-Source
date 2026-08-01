@@ -129,7 +129,7 @@ TimeDurationCell<Type>::TimeDurationCell(
     Type min_value, Type max_value,
     std::string default_value
 )
-    : ConfigOptionImpl<TimeDurationCell<Type>>(lock_while_running)
+    : UiState<TimeDurationCell<Type>, ConfigOption>(lock_while_running)
     , m_data(
         CONSTRUCT_TOKEN,
         std::move(units), show_summary,
@@ -144,7 +144,7 @@ TimeDurationCell<Type>::TimeDurationCell(
     LockMode lock_while_running,
     std::string default_value
 )
-    : ConfigOptionImpl<TimeDurationCell<Type>>(lock_while_running)
+    : UiState<TimeDurationCell<Type>, ConfigOption>(lock_while_running)
     , m_data(
         CONSTRUCT_TOKEN,
         std::move(units), true,
@@ -159,7 +159,7 @@ TimeDurationCell<Type>::TimeDurationCell(
     Type min_value,
     std::string default_value
 )
-    : ConfigOptionImpl<TimeDurationCell<Type>>(lock_while_running)
+    : UiState<TimeDurationCell<Type>, ConfigOption>(lock_while_running)
     , m_data(
         CONSTRUCT_TOKEN,
         std::move(units), true,
@@ -175,7 +175,7 @@ TimeDurationCell<Type>::TimeDurationCell(
     Type min_value, Type max_value,
     std::string default_value
 )
-    : ConfigOptionImpl<TimeDurationCell<Type>>(lock_while_running)
+    : UiState<TimeDurationCell<Type>, ConfigOption>(lock_while_running)
     , m_data(
         CONSTRUCT_TOKEN,
         std::move(units), true,

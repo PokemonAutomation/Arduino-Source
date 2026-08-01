@@ -33,7 +33,7 @@ void SettingsResourceButton::change_text(const std::string& text){
 //////////////////////////////////////
 // SettingsResourceDownloadButton::~SettingsResourceDownloadButton(){}
 SettingsResourceDownloadButton::SettingsResourceDownloadButton(SettingsResourceDownloadRow& p_row)
-    : ConfigOptionImpl<SettingsResourceDownloadButton>(LockMode::UNLOCK_WHILE_RUNNING)
+    : UiState<SettingsResourceDownloadButton, ConfigOption>(LockMode::UNLOCK_WHILE_RUNNING)
     , row(p_row)
     , m_enabled(true)
 {}
@@ -49,7 +49,7 @@ void SettingsResourceDownloadButton::set_enabled(bool enabled){
 // SettingsResourceDeleteButton
 //////////////////////////////////////
 SettingsResourceDeleteButton::SettingsResourceDeleteButton(SettingsResourceDownloadRow& p_row)
-    : ConfigOptionImpl<SettingsResourceDeleteButton>(LockMode::UNLOCK_WHILE_RUNNING)
+    : UiState<SettingsResourceDeleteButton, ConfigOption>(LockMode::UNLOCK_WHILE_RUNNING)
     , row(p_row)
     , m_enabled(true)
 {}
@@ -64,7 +64,7 @@ void SettingsResourceDeleteButton::set_enabled(bool enabled){
 // SettingsResourceCancelButton
 //////////////////////////////////////
 SettingsResourceCancelButton::SettingsResourceCancelButton(SettingsResourceDownloadRow& p_row)
-    : ConfigOptionImpl<SettingsResourceCancelButton>(LockMode::UNLOCK_WHILE_RUNNING)
+    : UiState<SettingsResourceCancelButton, ConfigOption>(LockMode::UNLOCK_WHILE_RUNNING)
     , row(p_row)
     , m_enabled(true)
 {}
@@ -78,7 +78,7 @@ void SettingsResourceCancelButton::set_enabled(bool enabled){
 // SettingsResourceProgressBar
 //////////////////////////////////////
 SettingsResourceProgressBar::SettingsResourceProgressBar(SettingsResourceDownloadRow& p_row)
-    : ConfigOptionImpl<SettingsResourceProgressBar>(LockMode::UNLOCK_WHILE_RUNNING)
+    : UiState<SettingsResourceProgressBar, ConfigOption>(LockMode::UNLOCK_WHILE_RUNNING)
     , row(p_row)
 {}
 
@@ -124,7 +124,7 @@ void SettingsResourceProgressBar::on_hash_progress(uint64_t bytes_done, uint64_t
 // SettingsDownloadPopup
 //////////////////////////////////////
 SettingsDownloadPopup::SettingsDownloadPopup(SettingsResourceDownloadRow& p_row)
-    : ConfigOptionImpl<SettingsDownloadPopup>(LockMode::LOCK_WHILE_RUNNING)
+    : UiState<SettingsDownloadPopup, ConfigOption>(LockMode::LOCK_WHILE_RUNNING)
     , row(p_row)
 {}
 
@@ -132,7 +132,7 @@ SettingsDownloadPopup::SettingsDownloadPopup(SettingsResourceDownloadRow& p_row)
 // SettingsDownloadError
 //////////////////////////////////////
 SettingsDownloadError::SettingsDownloadError()
-    : ConfigOptionImpl<SettingsDownloadError>(LockMode::LOCK_WHILE_RUNNING)
+    : UiState<SettingsDownloadError, ConfigOption>(LockMode::LOCK_WHILE_RUNNING)
 {}
 
 }

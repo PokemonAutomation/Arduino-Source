@@ -72,7 +72,7 @@ struct MacAddressCell::Data{
 
 MacAddressCell::~MacAddressCell() = default;
 MacAddressCell::MacAddressCell(const MacAddressCell& x)
-    : ConfigOptionImpl<MacAddressCell>(x)
+    : UiState<MacAddressCell, ConfigOption>(x)
     , m_data(CONSTRUCT_TOKEN, x.m_data->m_current.size(), x.m_data->m_current.data())
 {}
 void MacAddressCell::operator=(const MacAddressCell& x){
@@ -93,7 +93,7 @@ MacAddressCell::MacAddressCell(
     size_t bytes,
     uint8_t* current_value
 )
-    : ConfigOptionImpl<MacAddressCell>(lock_while_running)
+    : UiState<MacAddressCell, ConfigOption>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, bytes, current_value)
 {}
 

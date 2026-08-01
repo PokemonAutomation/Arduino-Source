@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 namespace OCR{
 
 
-class LanguageOCRCell : public ConfigOptionImpl<LanguageOCRCell>{
+class LanguageOCRCell : public UiState<LanguageOCRCell, ConfigOption>{
 public:
     LanguageOCRCell(
         const LanguageSet& languages,
@@ -50,7 +50,7 @@ private:
 
 
 
-class LanguageOCROption : public ConfigOptionImpl<LanguageOCROption, LanguageOCRCell>{
+class LanguageOCROption : public UiState<LanguageOCROption, LanguageOCRCell>{
 public:
     LanguageOCROption(
         std::string label,

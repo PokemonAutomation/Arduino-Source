@@ -13,7 +13,7 @@
 namespace PokemonAutomation{
 
 
-class StringCell : public ConfigOptionImpl<StringCell>{
+class StringCell : public UiState<StringCell, ConfigOption>{
 public:
     ~StringCell();
     StringCell(
@@ -51,7 +51,7 @@ private:
 };
 
 
-class StringOption : public ConfigOptionImpl<StringOption, StringCell>{
+class StringOption : public UiState<StringOption, StringCell>{
 public:
     StringOption(
         bool is_password,
