@@ -39,7 +39,7 @@ BoxFloatOption::BoxFloatOption(
     double default_width,
     double default_height
 )
-    : ConfigOptionImpl<BoxFloatOption>(lock_while_running)
+    : UiState<BoxFloatOption, ConfigOption>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN)
 {
     Data& self = *m_data;

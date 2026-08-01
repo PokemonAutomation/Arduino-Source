@@ -4,12 +4,14 @@
  *
  */
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
+#include "Tests/TestUtils.h"
 #include "PokemonSV/Resources/PokemonSV_PokemonSprites.h"
 #include "PokemonSV_TeraTypeReader.h"
 
-#include "CommonFramework/Logging/Logger.h"
 //#include <iostream>
 //using std::cout;
 //using std::endl;
@@ -94,6 +96,73 @@ ImageMatch::ImageMatchResult TeraTypeReader::read(const ImageViewRGB32& screen) 
 
     return ImageMatch::ImageMatchResult();
 }
+
+
+
+
+
+
+
+
+class Test_TeraTypeReader : public UnitTest{
+public:
+    Test_TeraTypeReader(
+        const std::string& image,
+        std::string expected
+    )
+        : UnitTest("PokemonSV::TeraTypeReader - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(std::move(expected))
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        TeraTypeReader reader(COLOR_RED);
+
+        ImageRGB32 image(m_image);
+        ImageMatch::ImageMatchResult types = reader.read(image);
+        if (types.results.empty()){
+            return false;
+        }
+        std::string best_match = types.results.begin()->second;
+
+        TEST_RESULT_EQUAL_STR(best_match, m_expected);
+
+        return true;
+    };
+
+private:
+    std::string m_image;
+    std::string m_expected;
+};
+
+
+
+
+void add_tests_TeraTypeReader(UnitTestDatabase& database){
+    database.add<Test_TeraTypeReader>("PokemonSV/TeraTypeReader/Bug.jpg", "Bug");
+    database.add<Test_TeraTypeReader>("PokemonSV/TeraTypeReader/Dark.jpg", "Dark");
+    database.add<Test_TeraTypeReader>("PokemonSV/TeraTypeReader/Dragon.jpg", "Dragon");
+    database.add<Test_TeraTypeReader>("PokemonSV/TeraTypeReader/Electric.jpg", "Electric");
+    database.add<Test_TeraTypeReader>("PokemonSV/TeraTypeReader/Fairy.jpg", "Fairy");
+    database.add<Test_TeraTypeReader>("PokemonSV/TeraTypeReader/Fighting.jpg", "Fighting");
+    database.add<Test_TeraTypeReader>("PokemonSV/TeraTypeReader/Fire.jpg", "Fire");
+    database.add<Test_TeraTypeReader>("PokemonSV/TeraTypeReader/Flying.jpg", "Flying");
+    database.add<Test_TeraTypeReader>("PokemonSV/TeraTypeReader/Ghost.jpg", "Ghost");
+    database.add<Test_TeraTypeReader>("PokemonSV/TeraTypeReader/Grass.jpg", "Grass");
+    database.add<Test_TeraTypeReader>("PokemonSV/TeraTypeReader/Ground.jpg", "Ground");
+    database.add<Test_TeraTypeReader>("PokemonSV/TeraTypeReader/Ice.jpg", "Ice");
+    database.add<Test_TeraTypeReader>("PokemonSV/TeraTypeReader/Normal.jpg", "Normal");
+    database.add<Test_TeraTypeReader>("PokemonSV/TeraTypeReader/Poison.jpg", "Poison");
+    database.add<Test_TeraTypeReader>("PokemonSV/TeraTypeReader/Psychic.jpg", "Psychic");
+    database.add<Test_TeraTypeReader>("PokemonSV/TeraTypeReader/Rock.jpg", "Rock");
+    database.add<Test_TeraTypeReader>("PokemonSV/TeraTypeReader/Steel.jpg", "Steel");
+    database.add<Test_TeraTypeReader>("PokemonSV/TeraTypeReader/Water.jpg", "Water");
+    database.add<Test_TeraTypeReader>("PokemonSV/TeraTypeReader/Kuro_Bug.png", "Bug");
+    database.add<Test_TeraTypeReader>("PokemonSV/TeraTypeReader/Kuro2_Bug.png", "Bug");
+}
+
+
+
 
 
 

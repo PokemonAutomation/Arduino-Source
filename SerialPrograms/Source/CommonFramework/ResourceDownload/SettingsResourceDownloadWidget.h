@@ -19,7 +19,7 @@ namespace PokemonAutomation{
 
 class SettingsDownloadButtonWidget : public QWidget, public ConfigWidget, public SettingsResourceButton::Listener{
 public:
-    using ParentOption = SettingsResourceDownloadButton;
+    using ParentState = SettingsResourceDownloadButton;
 
 public:
     ~SettingsDownloadButtonWidget();
@@ -40,7 +40,7 @@ private:
 
 class SettingsDeleteButtonWidget :  public QWidget, public ConfigWidget, SettingsResourceButton::Listener{
 public:
-    using ParentOption = SettingsResourceDeleteButton;
+    using ParentState = SettingsResourceDeleteButton;
 
 public:
     ~SettingsDeleteButtonWidget();
@@ -61,7 +61,7 @@ private:
 
 class SettingsCancelButtonWidget :  public QWidget, public ConfigWidget, SettingsResourceButton::Listener{
 public:
-    using ParentOption = SettingsResourceCancelButton;
+    using ParentState = SettingsResourceCancelButton;
 
 public:
     ~SettingsCancelButtonWidget();
@@ -81,7 +81,7 @@ private:
 
 class SettingsProgressBarWidget : public QWidget, public ConfigWidget, public SettingsResourceProgressBar::Listener{
 public:
-    using ParentOption = SettingsResourceProgressBar;
+    using ParentState = SettingsResourceProgressBar;
 
 public:
     ~SettingsProgressBarWidget();
@@ -130,7 +130,7 @@ private:
 };
 class SettingsDownloadErrorWidget : public QWidget, public ConfigWidget, public GlobalResourceDownloadManager::Listener{
 public:
-    using ParentOption = SettingsDownloadError;
+    using ParentState = SettingsDownloadError;
 
 public:
     ~SettingsDownloadErrorWidget();

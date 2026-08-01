@@ -19,7 +19,7 @@ std::string write_MAC_address(size_t length, const uint8_t* address);
 void parse_MAC_address(size_t length, uint8_t* address, const std::string& str);
 
 
-class MacAddressCell : public ConfigOptionImpl<MacAddressCell>{
+class MacAddressCell : public UiState<MacAddressCell, ConfigOption>{
 public:
     ~MacAddressCell();
     MacAddressCell(const MacAddressCell& x);

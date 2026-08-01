@@ -43,7 +43,7 @@ private:
 
 class ScreenWatchWidget : public WidgetStackFixedAspectRatio, public ConfigWidget{
 public:
-    using ParentOption = ScreenWatchDisplay;
+    using ParentState = ScreenWatchDisplay;
 
 public:
     ScreenWatchWidget(QWidget& parent, ScreenWatchDisplay& option);
@@ -55,7 +55,7 @@ private:
 
 class ScreenWatchButtonWidget : public QWidget, public ConfigWidget{
 public:
-    using ParentOption = ScreenWatchButtons;
+    using ParentState = ScreenWatchButtons;
 
 public:
     ScreenWatchButtonWidget(QWidget& parent, ScreenWatchButtons& option);

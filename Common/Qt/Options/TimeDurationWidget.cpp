@@ -164,10 +164,10 @@ template class TimeDurationOptionWidget<std::chrono::milliseconds>;
 template class TimeDurationOptionWidget<std::chrono::microseconds>;
 
 
-template class RegisterConfigWidget<TimeDurationCellWidget<std::chrono::milliseconds>>;
-template class RegisterConfigWidget<TimeDurationCellWidget<std::chrono::microseconds>>;
-template class RegisterConfigWidget<TimeDurationOptionWidget<std::chrono::milliseconds>>;
-template class RegisterConfigWidget<TimeDurationOptionWidget<std::chrono::microseconds>>;
+template class RegisterUiStateQtWidget<TimeDurationCellWidget<std::chrono::milliseconds>>;
+template class RegisterUiStateQtWidget<TimeDurationCellWidget<std::chrono::microseconds>>;
+template class RegisterUiStateQtWidget<TimeDurationOptionWidget<std::chrono::milliseconds>>;
+template class RegisterUiStateQtWidget<TimeDurationOptionWidget<std::chrono::microseconds>>;
 
 
 

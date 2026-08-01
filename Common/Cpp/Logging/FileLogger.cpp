@@ -17,7 +17,6 @@ namespace PokemonAutomation{
 
 FileLogger::FileLogger(ThreadPool& thread_pool, FileLoggerConfig config)
     : m_config(std::move(config))
-    , m_last_log_tracker(m_config.last_log_max_lines)
     , m_stopping(false)
 {
     Filesystem::Path file_path(m_config.file_path);
@@ -56,7 +55,6 @@ void FileLogger::stop() noexcept{
 
 void FileLogger::log(const std::string& msg, Color color){
     std::unique_lock<Mutex> lg(m_lock);
-    m_last_log_tracker += LogLine{color, msg};
     m_cv.wait(lg, [this]{ return m_queue.size() < m_config.max_queue_size; });
     m_queue.emplace_back(msg, color);
     m_cv.notify_all();
@@ -64,15 +62,9 @@ void FileLogger::log(const std::string& msg, Color color){
 
 void FileLogger::log(std::string&& msg, Color color){
     std::unique_lock<Mutex> lg(m_lock);
-    m_last_log_tracker += LogLine{color, msg};
     m_cv.wait(lg, [this]{ return m_queue.size() < m_config.max_queue_size; });
     m_queue.emplace_back(std::move(msg), color);
     m_cv.notify_all();
-}
-
-std::vector<LogLine> FileLogger::get_last(){
-    std::unique_lock<Mutex> lg(m_lock);
-    return m_last_log_tracker.snapshot();
 }
 
 std::string FileLogger::normalize_newlines(const std::string& msg){

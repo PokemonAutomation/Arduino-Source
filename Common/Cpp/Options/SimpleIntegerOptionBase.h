@@ -15,7 +15,7 @@
 namespace PokemonAutomation{
 
 
-class SimpleIntegerCellBase : public ConfigOptionImpl<SimpleIntegerCellBase>{
+class SimpleIntegerCellBase : public UiState<SimpleIntegerCellBase, ConfigOption>{
 public:
     using NativeType = int64_t;
 
@@ -76,7 +76,7 @@ protected:
 
 
 
-class SimpleIntegerOptionBase : public ConfigOptionImpl<SimpleIntegerOptionBase, SimpleIntegerCellBase>{
+class SimpleIntegerOptionBase : public UiState<SimpleIntegerOptionBase, SimpleIntegerCellBase>{
 public:
     SimpleIntegerOptionBase(const SimpleIntegerOptionBase& x) = delete;
     SimpleIntegerOptionBase(

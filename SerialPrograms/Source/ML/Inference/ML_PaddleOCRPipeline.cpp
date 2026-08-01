@@ -15,6 +15,10 @@
 #include "ML/Models/ML_ONNXRuntimeHelpers.h"
 #include "ML_PaddleOCRPipeline.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace ML{
 
@@ -54,7 +58,7 @@ PaddleOCRPipeline::PaddleOCRPipeline(Language language)
 PaddleOCRPipeline::PaddleOCRPipeline(Language language, std::string rec_path, std::string dict_path)
     : m_env{create_ORT_env()}
     // , det_session(env, std::wstring(det_path.begin(), det_path.end()).c_str(), Ort::SessionOptions{})
-    , m_rec_session(create_session(m_env, rec_path, ML_MODEL_CACHE_PATH() + "PaddleOCRPipeline/", GlobalSettings::instance().USE_GPU_FOR_ML_INFERENCE))
+    , m_rec_session(create_session(m_env, rec_path, ML_MODEL_CACHE_PATH() + "PaddleOCRPipeline/", GlobalSettings::instance().USE_GPU_FOR_ML_INFERENCE0))
     // , memory_info(Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault)) 
     , m_language(language)
     , m_input_name(m_rec_session.GetInputNameAllocated(0, Ort::AllocatorWithDefaultOptions{}).get())
@@ -96,59 +100,49 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
 
     // 1. Convert Image to OpenCV image (cv::mat)
     cv::Mat cv_image_rgb = imageviewrgb32_to_cv_mat_rgb(image);
-    
-    // 1b. Whitespace Trimming Logic
-    cv::Mat gray;
-    cv::cvtColor(cv_image_rgb, gray, cv::COLOR_BGR2GRAY);
-
-    // Invert image for findNonZero: text becomes white (255), background black (0)
-    cv::Mat binary_inv;
-    cv::threshold(gray, binary_inv, 254, 255, cv::THRESH_BINARY_INV);
-
-    // Find coordinates of all text pixels
-    std::vector<cv::Point> nonZeroCoords;
-    cv::findNonZero(binary_inv, nonZeroCoords);
-
-    cv::Mat cropped_image;
-    if (!nonZeroCoords.empty()){
-        // Get the minimal bounding rectangle for the text
-        cv::Rect boundingBox = cv::boundingRect(nonZeroCoords);
-        
-        // Add a small buffer/padding around the box if needed (optional)
-        boundingBox.x = std::max(0, boundingBox.x - 2);
-        boundingBox.y = std::max(0, boundingBox.y - 2);
-        boundingBox.width = std::min(cv_image_rgb.cols - boundingBox.x, boundingBox.width + 4);
-        boundingBox.height = std::min(cv_image_rgb.rows - boundingBox.y, boundingBox.height + 4);
-
-        // Crop the original color image
-        cropped_image = cv_image_rgb(boundingBox);
-        // static int i = 0;
-        // cv::imwrite("output" + std::to_string(i) + ".png", cropped_image);
-        // i++;
-    }else{
-        return ""; // Return empty string if no text is detected in the region
+    if (cv_image_rgb.empty()) {
+        return "";
     }
+
     
-    // 2a. Calculate dynamic width (maintain aspect ratio)
+    // 2. Crop tightly around the text, with small safety margin
+    cv::Mat cropped_image = crop_to_text_region(cv_image_rgb);
+    if (cropped_image.empty()){
+        return "";
+    }
+
+    // add horizontal padding to tall/narrow characters
+    add_horizontal_padding(cropped_image);
+
+    // 3. Calculate dynamic width (maintain aspect ratio)
     // the model shape is {1, 3, 48, dynamic_width}. Note that the height is fixed at 48 pixels
     // the input image must be scaled to match the height of 48, for the neural network
     int target_h = 48;
-    float aspect_ratio = (float)cropped_image.cols / (float)cropped_image.rows;
-    int target_w = static_cast<int>(target_h * aspect_ratio);
+    float aspect_ratio = (float)cropped_image.cols / cropped_image.rows;
 
-    if (target_w <= 0) return "";
-    
-    // 2b. Resize
+    int target_w = std::max(
+        1,
+        (int)std::round(target_h * aspect_ratio)
+    );
+
     cv::Mat resized;
-    cv::resize(cropped_image, resized, cv::Size(target_w, target_h));
+    cv::resize(
+        cropped_image,
+        resized,
+        cv::Size(target_w, target_h),
+        0,
+        0,
+        cv::INTER_LINEAR
+    );
 
-    // 3. Normalize
+
+    // 4. Normalize
     // convert UC3 8-bit [0,255] to 32FC3 float [0,1], then use ImageNet Normalization
     // output = (Input * Scale) = (old_pixel * 1/255). This transforms [0,255] to range [0, 1]
     // TODO: determine if normalizing to [-1,1] is preferred or to perform ImageNet normalization (mean = [0.485, 0.456, 0.406] and std = [0.229, 0.224, 0.225])
     resized.convertTo(resized, CV_32FC3, 1.0 / 255.0);
     
-    // 3b. Apply Mean/Std (Standard for PaddleOCR). except for Chinese
+    // 4b. Apply Mean/Std (Standard for PaddleOCR). except for Chinese
     // Mean: [0.485, 0.456, 0.406], Std: [0.229, 0.224, 0.225]
     if (!(m_language == Language::ChineseSimplified || 
         m_language == Language::ChineseTraditional ||
@@ -164,13 +158,13 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     }
     
     
-    // 3. Convert HWC to NCHW
+    // 5. Convert HWC to NCHW
     std::vector<float> input_tensor_values = preprocess_NCHW(resized);
 
-    // 4. Define Dynamic Shape
+    // 6. Define Dynamic Shape
     std::vector<int64_t> input_shape = {1, 3, target_h, target_w};
 
-    // 5. Create tensor with its own managed memory
+    // 7. Create tensor with its own managed memory
     Ort::AllocatorWithDefaultOptions allocator;    
     auto input_tensor = Ort::Value::CreateTensor<float>(
         allocator, input_shape.data(), input_shape.size()
@@ -185,7 +179,7 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     const char* output_names[] = {m_output_name.c_str()};  
 
     try{
-        // 7. Run the recognition session
+        // 8. Run the recognition session
         auto outputs = m_rec_session.Run(
             Ort::RunOptions{nullptr}, 
             input_names,   // char** 
@@ -200,6 +194,120 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     }
     
 }
+
+cv::Mat crop_to_text_region(const cv::Mat& image) {
+    // first convert to grayscale
+    cv::Mat gray;
+    cv::cvtColor(image, gray, cv::COLOR_RGB2GRAY);
+
+    // get a binary image, for cropping purposes
+    cv::Mat binary;
+    cv::threshold(gray, binary, 0, 255,
+                cv::THRESH_BINARY_INV | cv::THRESH_OTSU);
+
+    double ratio = cv::countNonZero(binary) /
+                static_cast<double>(binary.total());
+
+    // we want text pixels to be white for the next step
+    // If most pixels are white, Otsu likely classified the background as foreground.
+    // Flip it so text becomes white again.
+    if (ratio > 0.5){
+        cv::bitwise_not(binary, binary);
+    }                
+
+    // Find coordinates of all non-zero pixels (the text)
+    std::vector<cv::Point> nonZeroCoords;
+    cv::findNonZero(binary, nonZeroCoords);
+    if (nonZeroCoords.empty()){
+        return {};
+    }
+
+    // create bounding box for crop
+    cv::Rect bbox = cv::boundingRect(nonZeroCoords);
+
+    // increase bounding box slightly to add small safety margin
+    int pad_x = std::max(4, bbox.width / 20);  // ~5%
+    int pad_y = std::max(2, bbox.height / 20);  // ~5%
+
+    bbox.x = std::max(0, bbox.x - pad_x);
+    bbox.y = std::max(0, bbox.y - pad_y);
+
+    bbox.width = std::min(
+        image.cols - bbox.x,
+        bbox.width + 2 * pad_x
+    );
+
+    bbox.height = std::min(
+        image.rows - bbox.y,
+        bbox.height + 2 * pad_y
+    );
+
+    // crop the original image based on the bounding box
+    // the crop should be within bounds.
+    cv::Mat cropped_image;
+    cropped_image = image(bbox).clone();
+
+    // static int i = 0;
+    // i++;
+    // cv::imwrite("aabinary" + std::to_string(i) + ".png", binary);
+    // cv::imwrite("aacropped_image" + std::to_string(i) + ".png", cropped_image);
+
+    return cropped_image;
+}
+
+void add_horizontal_padding(cv::Mat& image){
+    if (image.empty()) {
+        return;
+    }
+
+    int h = image.rows;
+    int w = image.cols;
+    constexpr float min_ratio = 0.5f;
+
+    // add horizontal padding to tall/narrow characters
+    if (h > 0 && (float)w / h < min_ratio) {
+        int target_w = static_cast<int>(std::ceil(min_ratio * h));
+
+        int left = (target_w - w) / 2;
+        int right = target_w - w - left;
+
+        cv::Scalar bg = estimate_background_color(image);
+        cv::Mat padded_image;
+        cv::copyMakeBorder(
+            image,
+            padded_image,
+            0, 0,              // no vertical padding
+            left, right,
+            cv::BORDER_CONSTANT,
+            bg
+        );
+        image = padded_image;
+    }
+
+    // static int i = 0;
+    // i++;
+    // cv::imwrite("aapadded" + std::to_string(i) + ".png", image);
+
+}
+
+cv::Scalar estimate_background_color(const cv::Mat& image) {
+    if (image.empty() || image.type() != CV_8UC3) {
+        return cv::Scalar(255, 255, 255);
+    }
+
+    // use the corner pixels to estimate the background color
+    const cv::Vec3b* top = image.ptr<cv::Vec3b>(0);
+    const cv::Vec3b* bottom = image.ptr<cv::Vec3b>(image.rows - 1);
+
+    cv::Scalar tl(top[0]);
+    cv::Scalar tr(top[image.cols - 1]);
+    cv::Scalar bl(bottom[0]);
+    cv::Scalar br(bottom[image.cols - 1]);
+
+    return (tl + tr + bl + br) * 0.25;
+}
+
+
 
 
 std::vector<float> preprocess_NCHW(cv::Mat& img){

@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSV_TeraSilhouetteReader_H
 
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/ImageMatch/ImageMatchResult.h"
@@ -31,6 +32,10 @@ private:
     Color m_color;
     ImageFloatBox m_box;
 };
+
+
+
+void add_tests_TeraSilhouetteReader(UnitTestDatabase& database);
 
 
 

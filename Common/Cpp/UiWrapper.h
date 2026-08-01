@@ -105,5 +105,68 @@ private:
 
 
 
+
+template <typename UiStateType>
+using UiFactory = UiWrapper (*)(UiStateType& state, void* params);
+
+
+
+//
+//  This is a convenience class that implementations should inherit from instead
+//  of directly inheriting from ConfigOption or another option type.
+//
+//  This provides the per-type UI factory as well as the "make_ui_component"
+//  override. This saves a ton of copy-paste as those are the same eveywhere.
+//
+
+template <typename... Args>
+class UiState;
+
+
+template <>
+class UiState<>{
+public:
+    virtual UiWrapper make_ui_component(void* params) = 0;
+};
+
+
+template <typename Type>
+class UiState<Type>{
+public:
+    virtual UiWrapper make_ui_component(void* params){
+        if (m_ui_factory){
+            return m_ui_factory(static_cast<Type&>(*this), params);
+        }
+        return UiWrapper();
+    }
+
+    static UiFactory<Type> m_ui_factory;
+};
+
+template <typename Type>
+UiFactory<Type> UiState<Type>::m_ui_factory;
+
+
+
+template <typename Type, typename ParentType>
+class UiState<Type, ParentType> : public ParentType{
+public:
+    using ParentType::ParentType;
+
+    virtual UiWrapper make_ui_component(void* params) override{
+        if (m_ui_factory){
+            return m_ui_factory(static_cast<Type&>(*this), params);
+        }
+        return UiWrapper();
+    }
+
+    static UiFactory<Type> m_ui_factory;
+};
+
+template <typename Type, typename ParentType>
+UiFactory<Type> UiState<Type, ParentType>::m_ui_factory;
+
+
+
 }
 #endif

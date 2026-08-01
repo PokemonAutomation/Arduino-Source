@@ -4,13 +4,14 @@
  *
  */
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonSV_PicnicDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -35,6 +36,44 @@ bool PicnicDetector::detect(const ImageViewRGB32& frame){
         && m_button_minus.detect(frame)
         && m_button_y.detect(frame);
 }
+
+
+
+
+
+
+class Test_PicnicDetector : public UnitTest{
+public:
+    Test_PicnicDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonSV::PicnicDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        PicnicDetector detector;
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+
+
+
+void add_tests_PicnicDetector(UnitTestDatabase& database){
+    database.add<Test_PicnicDetector>("PokemonSV/PicnicDetector/macOS/Picinic_1_True.png", true);
+    database.add<Test_PicnicDetector>("PokemonSV/PicnicDetector/macOS/Picnic_0_True.png", true);
+}
+
+
+
 
 
 }

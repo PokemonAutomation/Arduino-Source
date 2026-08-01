@@ -85,7 +85,7 @@ EditableTableOption::EditableTableOption(
     LockMode lock_while_running,
     std::vector<std::unique_ptr<EditableTableRow>> default_value
 )
-    : ConfigOptionImpl<EditableTableOption>(lock_while_running)
+    : UiState<EditableTableOption, ConfigOption>(lock_while_running)
     , m_label(std::move(label))
     , m_enable_saveload(true)
     , m_max_rows_before_hiding_by_default(10)
@@ -100,7 +100,7 @@ EditableTableOption::EditableTableOption(
     size_t max_rows_before_hiding_by_default,
     std::vector<std::unique_ptr<EditableTableRow>> default_value
 )
-    : ConfigOptionImpl<EditableTableOption>(lock_while_running)
+    : UiState<EditableTableOption, ConfigOption>(lock_while_running)
     , m_label(std::move(label))
     , m_enable_saveload(enable_saveload)
     , m_max_rows_before_hiding_by_default(max_rows_before_hiding_by_default)

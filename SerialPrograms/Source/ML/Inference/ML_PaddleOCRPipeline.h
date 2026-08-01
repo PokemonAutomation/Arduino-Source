@@ -48,6 +48,17 @@ private:
 
 };
 
+// assumes the input image is RGB
+cv::Mat crop_to_text_region(const cv::Mat& image);
+
+// if the image is narrow/tall, add horizontal padding
+// modifies the input image
+// assumes input image is RGB
+void add_horizontal_padding(cv::Mat& image);
+
+// assumes input image is RGB
+cv::Scalar estimate_background_color(const cv::Mat& image);
+
 // convert HCW (height, width, channels) to NCHW (batch N, channels C, height H, width W)
 std::vector<float> preprocess_NCHW(cv::Mat& img);
 

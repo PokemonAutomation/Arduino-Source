@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 
 class CheckboxDropdownCellWidget : public CheckboxDropdown, public ConfigWidget{
 public:
-    using ParentOption = CheckboxDropdownBase;
+    using ParentState = CheckboxDropdownBase;
 
 public:
     ~CheckboxDropdownCellWidget();

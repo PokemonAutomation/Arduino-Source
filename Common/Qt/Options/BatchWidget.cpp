@@ -11,7 +11,7 @@
 namespace PokemonAutomation{
 
 
-template class RegisterConfigWidget<BatchWidget>;
+template class RegisterUiStateQtWidget<BatchWidget>;
 
 
 

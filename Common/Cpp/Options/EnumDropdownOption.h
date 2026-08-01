@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 
 
 //  This is the typeless class that uses an integer for the enum value.
-class IntegerEnumDropdownCell : public ConfigOptionImpl<IntegerEnumDropdownCell>{
+class IntegerEnumDropdownCell : public UiState<IntegerEnumDropdownCell, ConfigOption>{
 public:
     ~IntegerEnumDropdownCell();
     IntegerEnumDropdownCell(const IntegerEnumDropdownCell& x);
@@ -106,7 +106,9 @@ public:
 
 
 
-class IntegerEnumDropdownOption : private IntegerEnumDropdownDatabase, public ConfigOptionImpl<IntegerEnumDropdownOption, IntegerEnumDropdownCell>{
+class IntegerEnumDropdownOption
+    : private IntegerEnumDropdownDatabase
+    , public UiState<IntegerEnumDropdownOption, IntegerEnumDropdownCell>{
 public:
     IntegerEnumDropdownOption(const IntegerEnumDropdownOption& x) = delete;
     IntegerEnumDropdownOption(
@@ -116,7 +118,7 @@ public:
         size_t default_value
     )
         : IntegerEnumDropdownDatabase(nullptr)
-        , ConfigOptionImpl<IntegerEnumDropdownOption, IntegerEnumDropdownCell>(database, lock_while_running, default_value)
+        , UiState<IntegerEnumDropdownOption, IntegerEnumDropdownCell>(database, lock_while_running, default_value)
         , m_label(std::move(label))
     {}
     // you can construct IntegerEnumDropdownDatabase using initializer list:
@@ -132,7 +134,7 @@ public:
         size_t default_value
     )
         : IntegerEnumDropdownDatabase(std::move(database))
-        , ConfigOptionImpl<IntegerEnumDropdownOption, IntegerEnumDropdownCell>(*this, lock_while_running, default_value)
+        , UiState<IntegerEnumDropdownOption, IntegerEnumDropdownCell>(*this, lock_while_running, default_value)
         , m_label(std::move(label))
     {}
 

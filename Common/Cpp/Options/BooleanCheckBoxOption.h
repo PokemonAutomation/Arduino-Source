@@ -14,7 +14,7 @@ namespace PokemonAutomation{
 
 
 
-class BooleanCheckBoxCell : public ConfigOptionImpl<BooleanCheckBoxCell>{
+class BooleanCheckBoxCell : public UiState<BooleanCheckBoxCell, ConfigOption>{
 public:
     ~BooleanCheckBoxCell();
     BooleanCheckBoxCell(const BooleanCheckBoxCell& x);
@@ -50,7 +50,7 @@ protected:
 
 
 
-class BooleanCheckBoxOption : public ConfigOptionImpl<BooleanCheckBoxOption, BooleanCheckBoxCell>{
+class BooleanCheckBoxOption : public UiState<BooleanCheckBoxOption, BooleanCheckBoxCell>{
 public:
     BooleanCheckBoxOption(const BooleanCheckBoxOption& x) = delete;
     BooleanCheckBoxOption(

@@ -5,9 +5,11 @@
  */
 
 #include <opencv2/imgproc.hpp>
-#include "CommonFramework/Logging/Logger.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
+#include "Tests/TestUtils.h"
 #include "PokemonSV/Resources/PokemonSV_PokemonSprites.h"
 #include "PokemonSV_TeraSilhouetteReader.h"
 
@@ -119,6 +121,70 @@ ImageMatch::ImageMatchResult TeraSilhouetteReader::read(const ImageViewRGB32& sc
 
     return slugs;
 }
+
+
+
+
+
+
+
+
+
+class Test_TeraSilhouetteReader : public UnitTest{
+public:
+    Test_TeraSilhouetteReader(
+        const std::string& image,
+        std::string expected
+    )
+        : UnitTest("PokemonSV::TeraSilhouetteReader - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(std::move(expected))
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        TeraSilhouetteReader reader(COLOR_RED);
+
+        ImageRGB32 image(m_image);
+        ImageMatch::ImageMatchResult slugs = reader.read(image);
+        if (slugs.results.empty()){
+            std::stringstream ss;
+            ss << "No silhouette detected" << std::endl;
+            return ss.str();
+        }
+        std::string best_match = slugs.results.begin()->second;
+
+        TEST_RESULT_EQUAL_STR(best_match, m_expected);
+
+        return true;
+    };
+
+private:
+    std::string m_image;
+    std::string m_expected;
+};
+
+
+
+
+void add_tests_TeraSilhouetteReader(UnitTestDatabase& database){
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/applin.png", "applin");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/arboliva.png", "arboliva");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/axew.jpg", "axew");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/clodsire.jpg", "clodsire");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/donphan.jpg", "donphan");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/girafarig.jpg", "girafarig");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/lurantis.jpg", "lurantis");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/mimikyu-disguised.jpg", "mimikyu-disguised");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/noivern.jpg", "noivern");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/pineco.png", "pineco");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/raichu.jpg", "raichu");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/Scarlet_1star_applin.png", "applin");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/seviper.jpg", "seviper");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/staraptor.jpg", "staraptor");
+}
+
+
+
 
 
 

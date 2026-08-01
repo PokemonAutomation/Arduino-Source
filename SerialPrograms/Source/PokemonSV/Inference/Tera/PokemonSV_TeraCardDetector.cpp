@@ -8,7 +8,9 @@
 #include <list>
 #include <map>
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
@@ -457,10 +459,36 @@ std::array<std::map<Language, std::string>, 4> TeraLobbyReader::read_names(
 
 
 
+class Test_TeraCardDetector : public UnitTest{
+public:
+    Test_TeraCardDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonSV::TeraCardDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        TeraCardReader detector;
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
 
 
 
 
+
+void add_tests_TeraCardDetector(UnitTestDatabase& database){
+    database.add<Test_TeraCardDetector>("PokemonSV/TeraCardFinder/Violet_French_True.png", true);
+
+}
 
 
 

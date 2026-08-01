@@ -60,21 +60,21 @@ LabelCellOption::LabelCellOption(
     LockMode lock_while_running,
     std::string text
 )
-    : ConfigOptionImpl<LabelCellOption>(lock_while_running)
+    : UiState<LabelCellOption, ConfigOption>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, std::move(text))
 {}
 LabelCellOption::LabelCellOption(
     LockMode lock_while_running,
     std::string text, const ImageViewRGB32& icon
 )
-    : ConfigOptionImpl<LabelCellOption>(lock_while_running)
+    : UiState<LabelCellOption, ConfigOption>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, std::move(text), icon)
 {}
 LabelCellOption::LabelCellOption(
     LockMode lock_while_running,
     std::string text, const ImageViewRGB32& icon, size_t icon_size
 )
-    : ConfigOptionImpl<LabelCellOption>(lock_while_running)
+    : UiState<LabelCellOption, ConfigOption>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, std::move(text), icon, icon_size)
 {}
 //LabelCellOption::LabelCellOption(std::string text, ImageRGB32 icon)

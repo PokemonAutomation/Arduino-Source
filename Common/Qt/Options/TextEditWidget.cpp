@@ -17,7 +17,7 @@
 namespace PokemonAutomation{
 
 
-template class RegisterConfigWidget<TextEditWidget>;
+template class RegisterUiStateQtWidget<TextEditWidget>;
 
 
 
@@ -86,9 +86,9 @@ TextEditWidget::TextEditWidget(QWidget& parent, TextEditOption& value)
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
-    QLabel* label = new QLabel(QString::fromStdString(value.label()), this);
-    label->setWordWrap(true);
-    layout->addWidget(label);
+    m_label = new QLabel(QString::fromStdString(value.label()), this);
+    m_label->setWordWrap(true);
+    layout->addWidget(m_label);
     m_box = new Box(*this);
     m_box->setText(QString::fromStdString(value));
     if (value.lock_mode() == LockMode::READ_ONLY){
@@ -99,12 +99,20 @@ TextEditWidget::TextEditWidget(QWidget& parent, TextEditOption& value)
     m_value.ConfigOption::add_listener(*this);
 }
 void TextEditWidget::update_value(){
-    std::string new_value = (std::string)m_value;
-    std::string text = m_box->toPlainText().toStdString();
-    if (new_value == text){
-        return;
+    {
+        std::string new_value = m_value.label();
+        std::string text = m_label->text().toStdString();
+        if (new_value != text){
+            m_label->setText(QString::fromStdString(new_value));
+        }
     }
-    m_box->setText(QString::fromStdString(m_value));
+    {
+        std::string new_value = (std::string)m_value;
+        std::string text = m_box->toPlainText().toStdString();
+        if (new_value != text){
+            m_box->setText(QString::fromStdString(new_value));
+        }
+    }
 }
 void TextEditWidget::on_config_value_changed(void* object){
     //  This function gets called every time the contents changes.

@@ -44,10 +44,14 @@
 #include "CommonTools/Options/QtWidgets/ScreenWatchWidget.h"
 #include "CommonTools/Options/QtWidgets/LanguageOCRWidget.h"
 
-//  Controller Input
+//  Controllers
+#include "Controllers/NullControllerWidget.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h"
+#include "Controllers/PABotBase2/SerialPABotBase2_SelectorWidget.h"
 #include "ControllerInput/Keyboard/KeyBindingWidget.h"
 
 //  Nintendo Switch
+#include "NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h"
 #include "NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.h"
 
 //  Pokemon LA
@@ -59,69 +63,73 @@ namespace PokemonAutomation{
 
 void register_all_statics(){
     //  Basic Options
-    RegisterConfigWidget<BatchWidget>();
-    RegisterConfigWidget<BooleanCheckBoxCellWidget>();
-    RegisterConfigWidget<BooleanCheckBoxOptionWidget>();
-    RegisterConfigWidget<BooleanCheckBoxCellWidget>();
-    RegisterConfigWidget<BooleanCheckBoxOptionWidget>();
-    RegisterConfigWidget<BoxFloatWidget>();
-    RegisterConfigWidget<ButtonCellWidget>();
-    RegisterConfigWidget<ButtonOptionWidget>();
-    RegisterConfigWidget<CheckboxDropdownCellWidget>();
-    RegisterConfigWidget<ColorCellWidget>();
-    RegisterConfigWidget<ColorOptionWidget>();
-    RegisterConfigWidget<DateTimeCellWidget>();
-    RegisterConfigWidget<DateTimeOptionWidget>();
-    RegisterConfigWidget<EditableTableWidget>();
-    RegisterConfigWidget<EnumDropdownCellWidget>();
-    RegisterConfigWidget<EnumDropdownOptionWidget>();
-    RegisterConfigWidget<FixedCodeWidget>();
-    RegisterConfigWidget<FloatingPointCellWidget>();
-    RegisterConfigWidget<FloatingPointOptionWidget>();
-    RegisterConfigWidget<GroupWidget>();
-    RegisterConfigWidget<IntegerRangeCellWidget<uint8_t>>();
-    RegisterConfigWidget<MacAddressCellWidget>();
-    RegisterConfigWidget<PathCellWidget>();
-    RegisterConfigWidget<PathOptionWidget>();
-    RegisterConfigWidget<RandomCodeWidget>();
-    RegisterConfigWidget<SimpleIntegerCellWidget>();
-    RegisterConfigWidget<SimpleIntegerOptionWidget>();
-    RegisterConfigWidget<StaticTableWidget>();
-    RegisterConfigWidget<StaticTextWidget>();
-    RegisterConfigWidget<StringCellWidget>();
-    RegisterConfigWidget<StringOptionWidget>();
-    RegisterConfigWidget<TextEditWidget>();
-    RegisterConfigWidget<TimeDurationCellWidget<std::chrono::milliseconds>>();
-    RegisterConfigWidget<TimeDurationCellWidget<std::chrono::microseconds>>();
-    RegisterConfigWidget<TimeDurationOptionWidget<std::chrono::milliseconds>>();
-    RegisterConfigWidget<TimeDurationOptionWidget<std::chrono::microseconds>>();
+    RegisterUiStateQtWidget<BatchWidget>();
+    RegisterUiStateQtWidget<BooleanCheckBoxCellWidget>();
+    RegisterUiStateQtWidget<BooleanCheckBoxOptionWidget>();
+    RegisterUiStateQtWidget<BooleanCheckBoxCellWidget>();
+    RegisterUiStateQtWidget<BooleanCheckBoxOptionWidget>();
+    RegisterUiStateQtWidget<BoxFloatWidget>();
+    RegisterUiStateQtWidget<ButtonCellWidget>();
+    RegisterUiStateQtWidget<ButtonOptionWidget>();
+    RegisterUiStateQtWidget<CheckboxDropdownCellWidget>();
+    RegisterUiStateQtWidget<ColorCellWidget>();
+    RegisterUiStateQtWidget<ColorOptionWidget>();
+    RegisterUiStateQtWidget<DateTimeCellWidget>();
+    RegisterUiStateQtWidget<DateTimeOptionWidget>();
+    RegisterUiStateQtWidget<EditableTableWidget>();
+    RegisterUiStateQtWidget<EnumDropdownCellWidget>();
+    RegisterUiStateQtWidget<EnumDropdownOptionWidget>();
+    RegisterUiStateQtWidget<FixedCodeWidget>();
+    RegisterUiStateQtWidget<FloatingPointCellWidget>();
+    RegisterUiStateQtWidget<FloatingPointOptionWidget>();
+    RegisterUiStateQtWidget<GroupWidget>();
+    RegisterUiStateQtWidget<IntegerRangeCellWidget<uint8_t>>();
+    RegisterUiStateQtWidget<MacAddressCellWidget>();
+    RegisterUiStateQtWidget<PathCellWidget>();
+    RegisterUiStateQtWidget<PathOptionWidget>();
+    RegisterUiStateQtWidget<RandomCodeWidget>();
+    RegisterUiStateQtWidget<SimpleIntegerCellWidget>();
+    RegisterUiStateQtWidget<SimpleIntegerOptionWidget>();
+    RegisterUiStateQtWidget<StaticTableWidget>();
+    RegisterUiStateQtWidget<StaticTextWidget>();
+    RegisterUiStateQtWidget<StringCellWidget>();
+    RegisterUiStateQtWidget<StringOptionWidget>();
+    RegisterUiStateQtWidget<TextEditWidget>();
+    RegisterUiStateQtWidget<TimeDurationCellWidget<std::chrono::milliseconds>>();
+    RegisterUiStateQtWidget<TimeDurationCellWidget<std::chrono::microseconds>>();
+    RegisterUiStateQtWidget<TimeDurationOptionWidget<std::chrono::milliseconds>>();
+    RegisterUiStateQtWidget<TimeDurationOptionWidget<std::chrono::microseconds>>();
 
     //  Common Framework
-    RegisterConfigWidget<LabelCellWidget>();
-    RegisterConfigWidget<TestButtonWidget>();
+    RegisterUiStateQtWidget<LabelCellWidget>();
+    RegisterUiStateQtWidget<TestButtonWidget>();
 
     // Resource Download
-    RegisterConfigWidget<SettingsDownloadButtonWidget>();
-    RegisterConfigWidget<SettingsDeleteButtonWidget>();
-    RegisterConfigWidget<SettingsCancelButtonWidget>();
-    RegisterConfigWidget<SettingsProgressBarWidget>();
-    RegisterConfigWidget<SettingsDownloadErrorWidget>();
+    RegisterUiStateQtWidget<SettingsDownloadButtonWidget>();
+    RegisterUiStateQtWidget<SettingsDeleteButtonWidget>();
+    RegisterUiStateQtWidget<SettingsCancelButtonWidget>();
+    RegisterUiStateQtWidget<SettingsProgressBarWidget>();
+    RegisterUiStateQtWidget<SettingsDownloadErrorWidget>();
 
     //  Common Tools
-    RegisterConfigWidget<StringSelectCellWidget>();
-    RegisterConfigWidget<StringSelectOptionWidget>();
-    RegisterConfigWidget<ScreenWatchWidget>();
-    RegisterConfigWidget<OCR::LanguageOCRCellWidget>();
-    RegisterConfigWidget<OCR::LanguageOCROptionWidget>();
+    RegisterUiStateQtWidget<StringSelectCellWidget>();
+    RegisterUiStateQtWidget<StringSelectOptionWidget>();
+    RegisterUiStateQtWidget<ScreenWatchWidget>();
+    RegisterUiStateQtWidget<OCR::LanguageOCRCellWidget>();
+    RegisterUiStateQtWidget<OCR::LanguageOCROptionWidget>();
 
-    //  Controller Input
-    RegisterConfigWidget<KeyboardHidBindingCellWidget>();
+    //  Controllers
+    RegisterUiStateQtWidget<NullControllerWidget>();
+    RegisterUiStateQtWidget<SerialPABotBase::SerialPABotBase_SelectorWidget>();
+    RegisterUiStateQtWidget<SerialPABotBase::SerialPABotBase2_SelectorWidget>();
+    RegisterUiStateQtWidget<KeyboardHidBindingCellWidget>();
 
     //  Nintendo Switch
-    RegisterConfigWidget<NintendoSwitch::FriendCodeListWidget>();
+    RegisterUiStateQtWidget<SysbotBase::TcpSysbotBase_SelectorWidget>();
+    RegisterUiStateQtWidget<NintendoSwitch::FriendCodeListWidget>();
 
     //  Pokemon LA
-    RegisterConfigWidget<NintendoSwitch::PokemonLA::CustomPathTableWidget>();
+    RegisterUiStateQtWidget<NintendoSwitch::PokemonLA::CustomPathTableWidget>();
 }
 
 

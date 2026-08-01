@@ -4,10 +4,8 @@
  *
  */
 
-#include <QWidget>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "ControllerConnection.h"
-#include "ControllerSelectorWidget.h"
 #include "NullController.h"
 
 //#include <iostream>
@@ -18,6 +16,10 @@ namespace PokemonAutomation{
 
 
 template class InterfaceType_t<NullControllerDescriptor>;
+
+
+const char NullController::NAME[] = "(none)";
+
 
 
 bool NullControllerDescriptor::operator==(const ControllerDescriptor& x) const{
@@ -42,14 +44,9 @@ std::unique_ptr<AbstractController> NullControllerDescriptor::make_controller(
 ) const{
     return nullptr;
 }
-QWidget* NullControllerDescriptor::make_selector_QtWidget(ControllerSelectorWidget& parent) const{
-    return new QWidget(&parent);
-}
 
 
 
-
-const char NullController::NAME[] = "(none)";
 
 
 

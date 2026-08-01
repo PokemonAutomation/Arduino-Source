@@ -17,7 +17,7 @@
 namespace PokemonAutomation{
 
 
-template class RegisterConfigWidget<BoxFloatWidget>;
+template class RegisterUiStateQtWidget<BoxFloatWidget>;
 
 
 

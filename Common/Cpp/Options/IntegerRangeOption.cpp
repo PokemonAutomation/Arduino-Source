@@ -76,7 +76,7 @@ template <typename Type>
 IntegerRangeCell<Type>::~IntegerRangeCell() = default;
 template <typename Type>
 IntegerRangeCell<Type>::IntegerRangeCell(const IntegerRangeCell& x)
-    : ConfigOptionImpl<IntegerRangeCell<Type>>(x)
+    : UiState<IntegerRangeCell<Type>, ConfigOption>(x)
     , m_data(
         CONSTRUCT_TOKEN,
         x.lo_min_value(), x.lo_max_value(), x.lo_default_value(), x.lo_current_value(),
@@ -89,7 +89,7 @@ IntegerRangeCell<Type>::IntegerRangeCell(
     Type lo_min_value, Type lo_max_value, Type lo_default_value, Type lo_current_value,
     Type hi_min_value, Type hi_max_value, Type hi_default_value, Type hi_current_value
 )
-    : ConfigOptionImpl<IntegerRangeCell<Type>>(lock_while_running)
+    : UiState<IntegerRangeCell<Type>, ConfigOption>(lock_while_running)
     , m_data(
         CONSTRUCT_TOKEN,
         lo_min_value, lo_max_value, lo_default_value, lo_current_value,

@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 
 
 struct TextEditOption::Data{
-    const std::string m_label;
+    std::string m_label;
     const std::string m_default;
     const std::string m_placeholder_text;
     const bool m_report_all_text_changes;
@@ -69,7 +69,7 @@ TextEditOption::TextEditOption(
     std::string placeholder_text,
     bool signal_all_text_changes
 )
-    : ConfigOptionImpl<TextEditOption>(lock_while_program_is_running)
+    : UiState<TextEditOption, ConfigOption>(lock_while_program_is_running)
     , m_data(CONSTRUCT_TOKEN, std::move(label), std::move(default_value), std::move(placeholder_text), signal_all_text_changes)
 {}
 #if 0
@@ -80,8 +80,16 @@ std::unique_ptr<ConfigOption> TextEditOption::clone() const{
 }
 #endif
 
-const std::string& TextEditOption::label() const{
+std::string TextEditOption::label() const{
+    ReadSpinLock lg(m_data->m_lock);
     return m_data->m_label;
+}
+void TextEditOption::set_label(std::string label){
+    {
+        ReadSpinLock lg(m_data->m_lock);
+        m_data->m_label = std::move(label);
+    }
+    report_value_changed(this);
 }
 const std::string& TextEditOption::placeholder_text() const{
     return m_data->m_placeholder_text;

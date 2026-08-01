@@ -13,6 +13,7 @@
 
 #include <vector>
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
@@ -92,29 +93,10 @@ public:
 };
 
 
-#if 0
-class WhiteButtonWatcher : public VisualInferenceCallback{
-public:
-    ~WhiteButtonWatcher();
-    WhiteButtonWatcher(
-        Color color,
-        WhiteButton button, size_t consecutive_detections,
-        VideoOverlay& overlay,
-        const ImageFloatBox& box
-    );
-
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 
-protected:
-    VideoOverlay& m_overlay;
-    WhiteButtonDetector m_detector;
-    FixedLimitVector<OverlayBoxScope> m_arrows;
-    size_t m_consecutive_detections;
-    size_t m_trigger_count = 0;
-};
-#endif
+void add_tests_WhiteButtonDetector(UnitTestDatabase& database);
+
 
 
 

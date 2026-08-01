@@ -19,8 +19,8 @@
 
 namespace PokemonAutomation{
 
-template class RegisterConfigWidget<OCR::LanguageOCRCellWidget>;
-template class RegisterConfigWidget<OCR::LanguageOCROptionWidget>;
+template class RegisterUiStateQtWidget<OCR::LanguageOCRCellWidget>;
+template class RegisterUiStateQtWidget<OCR::LanguageOCROptionWidget>;
 
 namespace OCR{
 

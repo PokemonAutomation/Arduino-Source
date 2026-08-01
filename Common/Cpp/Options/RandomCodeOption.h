@@ -37,7 +37,7 @@ public:
 
 
 
-class RandomCodeOption : public ConfigOptionImpl<RandomCodeOption>{
+class RandomCodeOption : public UiState<RandomCodeOption, ConfigOption>{
 public:
     ~RandomCodeOption();
     RandomCodeOption(size_t total_digits);

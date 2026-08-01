@@ -14,8 +14,8 @@
 namespace PokemonAutomation{
 
 
-template class RegisterConfigWidget<PathCellWidget>;
-template class RegisterConfigWidget<PathOptionWidget>;
+template class RegisterUiStateQtWidget<PathCellWidget>;
+template class RegisterUiStateQtWidget<PathOptionWidget>;
 
 
 

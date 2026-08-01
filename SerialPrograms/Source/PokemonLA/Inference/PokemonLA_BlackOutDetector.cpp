@@ -11,9 +11,9 @@
 #include "Tests/TestUtils.h"
 #include "PokemonLA_BlackOutDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

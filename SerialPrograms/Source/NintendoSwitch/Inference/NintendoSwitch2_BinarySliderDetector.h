@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch2_BinarySliderDetector_H
 #define PokemonAutomation_NintendoSwitch2_BinarySliderDetector_H
 
+#include <vector>
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/VisualDetector.h"

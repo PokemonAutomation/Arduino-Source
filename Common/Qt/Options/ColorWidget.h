@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 
 class ColorCellWidget : public QWidget, public ConfigWidget{
 public:
-    using ParentOption = ColorCell;
+    using ParentState = ColorCell;
 
 public:
     ~ColorCellWidget();
@@ -39,7 +39,7 @@ private:
 
 class ColorOptionWidget : public QWidget, public ConfigWidget{
 public:
-    using ParentOption = ColorOption;
+    using ParentState = ColorOption;
 
 public:
     ~ColorOptionWidget();

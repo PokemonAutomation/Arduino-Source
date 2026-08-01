@@ -14,7 +14,7 @@
 namespace PokemonAutomation{
 
 // A ConfigOption that groups one or more options.
-class BatchOption : public ConfigOptionImpl<BatchOption>{
+class BatchOption : public UiState<BatchOption, ConfigOption>{
 public:
     ~BatchOption();
     BatchOption(LockMode lock_while_program_is_running, bool horizontal = false);

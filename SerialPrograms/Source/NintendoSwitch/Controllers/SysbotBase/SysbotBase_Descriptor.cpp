@@ -8,7 +8,6 @@
 #include "SysbotBase_Descriptor.h"
 #include "SysbotBase_Connection.h"
 #include "SysbotBase3_ProController.h"
-#include "SysbotBase_SelectorWidget.h"
 
 //#include <iostream>
 //using std::cout;
@@ -63,10 +62,6 @@ std::unique_ptr<AbstractController> TcpSysbotBase_Descriptor::make_controller(
 }
 
 
-
-QWidget* TcpSysbotBase_Descriptor::make_selector_QtWidget(ControllerSelectorWidget& parent) const{
-    return new TcpSysbotBase_SelectorWidget(parent, this);
-}
 
 
 

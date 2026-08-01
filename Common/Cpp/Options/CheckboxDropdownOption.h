@@ -19,7 +19,7 @@ template <typename FlagEnum>
 class CheckboxDropdownDatabase;
 
 
-class CheckboxDropdownBase : public ConfigOptionImpl<CheckboxDropdownBase>{
+class CheckboxDropdownBase : public UiState<CheckboxDropdownBase, ConfigOption>{
 public:
     CheckboxDropdownBase(std::string label)
         : m_label(std::move(label))

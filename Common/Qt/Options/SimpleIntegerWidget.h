@@ -17,8 +17,8 @@ namespace PokemonAutomation{
 
 class SimpleIntegerCellWidget : public QLineEdit, public ConfigWidget{
 public:
-    using ParentOption = SimpleIntegerCellBase;
-    using NativeType = ParentOption::NativeType;
+    using ParentState = SimpleIntegerCellBase;
+    using NativeType = ParentState::NativeType;
 
 public:
     ~SimpleIntegerCellWidget();
@@ -35,8 +35,8 @@ private:
 
 class SimpleIntegerOptionWidget : public QWidget, public ConfigWidget{
 public:
-    using ParentOption = SimpleIntegerOptionBase;
-    using NativeType = ParentOption::NativeType;
+    using ParentState = SimpleIntegerOptionBase;
+    using NativeType = ParentState::NativeType;
 
 public:
     ~SimpleIntegerOptionWidget();

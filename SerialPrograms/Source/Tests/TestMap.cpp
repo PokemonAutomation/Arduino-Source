@@ -10,9 +10,8 @@
 #include "Kernels_Tests.h"
 #include "NintendoSwitch_Tests.h"
 #include "PokemonFRLG_Tests.h"
-#include "PokemonHome_Tests.h"
 #include "PokemonLZA_Tests.h"
-#include "PokemonSV_Tests.h"
+#include "PokemonSV_Tests_Old.h"
 #include "TestMap.h"
 #include "TestUtils.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
@@ -232,15 +231,6 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"NintendoSwitch_CheckOnlineDetector", std::bind(image_bool_detector_helper, test_NintendoSwitch_CheckOnlineDetector, _1)},
     {"NintendoSwitch_FailedToConnectDetector", std::bind(image_bool_detector_helper, test_NintendoSwitch_FailedToConnectDetector, _1)},
     {"NintendoSwitch_UpdatePopupDetector", std::bind(image_bool_detector_helper, test_NintendoSwitch_UpdatePopupDetector, _1)},
-    {"PokemonHome_BoxView", std::bind(image_words_detector_helper, test_pokemonHome_BoxView, _1)},
-    {"PokemonHome_SummaryScreen", std::bind(image_words_detector_helper, test_pokemonHome_SummaryScreen, _1)},
-    {"PokemonSV_MapDetector", std::bind(image_words_detector_helper, test_pokemonSV_MapDetector, _1)},
-    {"PokemonSV_PicnicDetector", std::bind(image_bool_detector_helper, test_pokemonSV_PicnicDetector, _1)},
-    {"PokemonSV_TeraCardFinder", std::bind(image_bool_detector_helper, test_pokemonSV_TeraCardFinder, _1)},
-    {"PokemonSV_TerastallizingDetector", std::bind(image_bool_detector_helper, test_pokemonSV_TerastallizingDetector, _1)},
-    {"PokemonSV_TeraSilhouetteReader", std::bind(image_words_detector_helper, test_pokemonSV_TeraSilhouetteReader, _1)},
-    {"PokemonSV_TeraTypeReader", std::bind(image_words_detector_helper, test_pokemonSV_TeraTypeReader, _1)},
-    {"PokemonSV_SandwichRecipeDetector", std::bind(image_words_detector_helper, test_pokemonSV_SandwichRecipeDetector, _1)},
     {"PokemonSV_SandwichHandDetector", std::bind(image_words_detector_helper, test_pokemonSV_SandwichHandDetector, _1)},
     {"PokemonSV_BoxPokemonInfoDetector", std::bind(image_words_detector_helper, test_pokemonSV_BoxPokemonInfoDetector, _1)},
     {"PokemonSV_SomethingInBoxSlotDetector", std::bind(image_bool_detector_helper, test_pokemonSV_SomethingInBoxSlotDetector, _1)},

@@ -36,7 +36,7 @@ enum class ConfigOptionState{
 // It is responsible for setting the UI (by calling make_QtWidget()) of this option.
 // It also uses load_json() and to_json() to load and save the option to
 // a json file, so that the program can remember what user has selected.
-class ConfigOption{
+class ConfigOption : public UiState<>{
 public:
     // the objects that listen to changes on the ConfigOption should inherit
     // this Listener struct and call ConfigOption::add_listener() to add themselves
@@ -129,14 +129,12 @@ public:
     //  the user while the program is running.
     virtual void report_program_state(bool program_is_running);
 
+
 protected:
     //  Report that the value of this config has changed. This will be pushed to
     //  all listeners.
     void report_value_changed(void* object);
 
-
-public:
-    virtual UiWrapper make_UiComponent(void* params) = 0;
 
 private:
     struct Data;
@@ -145,41 +143,6 @@ private:
     LifetimeSanitizer m_lifetime_sanitizer;
 };
 
-
-
-
-
-//
-//  Helpers for implementations.
-//
-
-template <typename OptionType>
-using ConfigUiFactory = UiWrapper (*)(OptionType& option, void* params);
-
-//
-//  This is a convenience class that implementations should inherit from instead
-//  of directly inheriting from ConfigOption or another option type.
-//
-//  This provides the per-type UI factory as well as the "make_UiComponent"
-//  override. This saves a ton of copy-paste as those are the same eveywhere.
-//
-template <typename ConfigType, typename ParentType = ConfigOption>
-class ConfigOptionImpl : public ParentType{
-public:
-    using ParentType::ParentType;
-
-    virtual UiWrapper make_UiComponent(void* params) override{
-        if (m_ui_factory){
-            return m_ui_factory(static_cast<ConfigType&>(*this), params);
-        }
-        return UiWrapper();
-    }
-
-    static ConfigUiFactory<ConfigType> m_ui_factory;
-};
-
-template <typename ConfigType, typename ParentType>
-ConfigUiFactory<ConfigType> ConfigOptionImpl<ConfigType, ParentType>::m_ui_factory;
 
 
 

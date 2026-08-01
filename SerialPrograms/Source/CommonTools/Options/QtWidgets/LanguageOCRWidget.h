@@ -20,7 +20,7 @@ namespace OCR{
 
 class LanguageOCRCellWidget : public QWidget, public ConfigWidget{
 public:
-    using ParentOption = LanguageOCRCell;
+    using ParentState = LanguageOCRCell;
 
 public:
     LanguageOCRCellWidget(QWidget& parent, LanguageOCRCell& value);
@@ -40,7 +40,7 @@ private:
 
 class LanguageOCROptionWidget : public QWidget, public ConfigWidget{
 public:
-    using ParentOption = LanguageOCROption;
+    using ParentState = LanguageOCROption;
 
 public:
     ~LanguageOCROptionWidget();

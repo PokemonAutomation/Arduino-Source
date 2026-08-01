@@ -296,6 +296,7 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/StringToolsQt.h
     ../Common/Qt/TimeQt.cpp
     ../Common/Qt/TimeQt.h
+    ../Common/Qt/UiStateQtWidget.h
     ../Common/Qt/WidgetStackFixedAspectRatio.cpp
     ../Common/Qt/WidgetStackFixedAspectRatio.h
     ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_ConnectionDebug.cpp
@@ -420,8 +421,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/ImageTypes/ImageViewRGB32.h
     Source/CommonFramework/Language.cpp
     Source/CommonFramework/Language.h
-    Source/CommonFramework/Logging/FileWindowLogger.cpp
-    Source/CommonFramework/Logging/FileWindowLogger.h
+    Source/CommonFramework/Logging/LoggerWindow.cpp
+    Source/CommonFramework/Logging/LoggerWindow.h
     Source/CommonFramework/Logging/Logger.cpp
     Source/CommonFramework/Logging/Logger.h
     Source/CommonFramework/Logging/OutputRedirector.h
@@ -693,6 +694,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonTools/OCR/OCR_StringMatchResult.h
     Source/CommonTools/OCR/OCR_StringNormalization.cpp
     Source/CommonTools/OCR/OCR_StringNormalization.h
+    Source/CommonTools/OCR/OCR_Tests.cpp
+    Source/CommonTools/OCR/OCR_Tests.h
     Source/CommonTools/OCR/OCR_TextMatcher.cpp
     Source/CommonTools/OCR/OCR_TextMatcher.h
     Source/CommonTools/OCR/OCR_TrainingTools.cpp
@@ -783,6 +786,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/JoystickTools.h
     Source/Controllers/NullController.cpp
     Source/Controllers/NullController.h
+    Source/Controllers/NullControllerWidget.cpp
+    Source/Controllers/NullControllerWidget.h
     Source/Controllers/RumbleListener.h
     Source/Controllers/PABotBase2/PABotBase2_CommandQueueManager.cpp
     Source/Controllers/PABotBase2/PABotBase2_CommandQueueManager.h
@@ -796,6 +801,7 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/PABotBase2/SerialPABotBase2_Connection.h
     Source/Controllers/PABotBase2/SerialPABotBase2_Descriptor.cpp
     Source/Controllers/PABotBase2/SerialPABotBase2_Descriptor.h
+    Source/Controllers/PABotBase2/SerialPABotBase2_SelectorWidget.cpp
     Source/Controllers/PABotBase2/SerialPABotBase2_SelectorWidget.h
     Source/Controllers/PABotBase2/SerialPABotBase_StatusThread.h
     Source/Controllers/Schedulers/ControllerWithScheduler.h
@@ -829,6 +835,7 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h
+    Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h
     Source/Controllers/SerialPortPollerQt.cpp
     Source/Controllers/SerialPortPollerQt.h
@@ -1122,6 +1129,7 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Connection.h
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Descriptor.cpp
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Descriptor.h
+    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.cpp
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp
     Source/NintendoSwitch/DevPrograms/BoxDraw.h
@@ -1629,6 +1637,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonHome/Inference/PokemonHome_BallReader.h
     Source/PokemonHome/Inference/PokemonHome_BoxGenderDetector.cpp
     Source/PokemonHome/Inference/PokemonHome_BoxGenderDetector.h
+    Source/PokemonHome/Inference/PokemonHome_BoxViewDetector.cpp
+    Source/PokemonHome/Inference/PokemonHome_BoxViewDetector.h
     Source/PokemonHome/Inference/PokemonHome_ButtonDetector.cpp
     Source/PokemonHome/Inference/PokemonHome_ButtonDetector.h
     Source/PokemonHome/Inference/PokemonHome_GigantamaxDetector.cpp
@@ -1637,12 +1647,16 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonHome/Inference/PokemonHome_OriginMarkReader.h
     Source/PokemonHome/Inference/PokemonHome_SelectionArrowDetector.cpp
     Source/PokemonHome/Inference/PokemonHome_SelectionArrowDetector.h
+    Source/PokemonHome/Inference/PokemonHome_SummaryScreenDetector.cpp
+    Source/PokemonHome/Inference/PokemonHome_SummaryScreenDetector.h
     Source/PokemonHome/Inference/PokemonHome_TeraTypeReader.cpp
     Source/PokemonHome/Inference/PokemonHome_TeraTypeReader.h
     Source/PokemonHome/PokemonHome_Panels.cpp
     Source/PokemonHome/PokemonHome_Panels.h
     Source/PokemonHome/PokemonHome_Settings.cpp
     Source/PokemonHome/PokemonHome_Settings.h
+    Source/PokemonHome/PokemonHome_Tests.cpp
+    Source/PokemonHome/PokemonHome_Tests.h
     Source/PokemonHome/Programs/PokemonHome_BoxNavigation.cpp
     Source/PokemonHome/Programs/PokemonHome_BoxNavigation.h
     Source/PokemonHome/Programs/PokemonHome_BoxSorter.cpp
@@ -2264,6 +2278,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSV/PokemonSV_Panels.h
     Source/PokemonSV/PokemonSV_Settings.cpp
     Source/PokemonSV/PokemonSV_Settings.h
+    Source/PokemonSV/PokemonSV_Tests.cpp
+    Source/PokemonSV/PokemonSV_Tests.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.cpp
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.cpp
@@ -2906,12 +2922,10 @@ file(GLOB LIBRARY_SOURCES
     Source/Tests/NintendoSwitch_Tests.h
     Source/Tests/PokemonFRLG_Tests.cpp
     Source/Tests/PokemonFRLG_Tests.h
-    Source/Tests/PokemonHome_Tests.cpp
-    Source/Tests/PokemonHome_Tests.h
     Source/Tests/PokemonLZA_Tests.cpp
     Source/Tests/PokemonLZA_Tests.h
-    Source/Tests/PokemonSV_Tests.cpp
-    Source/Tests/PokemonSV_Tests.h
+    Source/Tests/PokemonSV_Tests_Old.cpp
+    Source/Tests/PokemonSV_Tests_Old.h
     Source/Tests/TestMap.cpp
     Source/Tests/TestMap.h
     Source/Tests/TestUtils.cpp

@@ -19,7 +19,7 @@ namespace PokemonLA{
 
 class CustomPathTableWidget : public QWidget, public ConfigWidget{
 public:
-    using ParentOption = CustomPathTableFromJubilife;
+    using ParentState = CustomPathTableFromJubilife;
 
 public:
     CustomPathTableWidget(QWidget& parent, CustomPathTableFromJubilife& value);

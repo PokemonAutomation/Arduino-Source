@@ -14,7 +14,7 @@ namespace PokemonAutomation{
 
 
 
-class ColorCell : public ConfigOptionImpl<ColorCell>{
+class ColorCell : public UiState<ColorCell, ConfigOption>{
 public:
     ColorCell(const ColorCell& x);
     ColorCell(
@@ -43,7 +43,7 @@ private:
 };
 
 
-class ColorOption : public ConfigOptionImpl<ColorOption, ColorCell>{
+class ColorOption : public UiState<ColorOption, ColorCell>{
 public:
     ColorOption(
         std::string label,

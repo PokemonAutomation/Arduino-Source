@@ -4,6 +4,10 @@
 #include <QFileInfo>
 //#include <QTextStream>
 #include <QMessageBox>
+#include "Common/Cpp/Logging/LastLogTracker.h"
+#include "Common/Cpp/Logging/FileLogger.h"
+#include "Common/Cpp/Logging/GlobalLogger.h"
+#include "Common/Cpp/Logging/MultiOutputLogger.h"
 #include "Common/Cpp/Concurrency/Qt6.9ThreadBugWorkaround.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/FireForgetDispatcher.h"
@@ -29,9 +33,6 @@
 #include "Integrations/DppIntegration/DppClient.h"
 #include "Logging/Logger.h"
 #include "Logging/OutputRedirector.h"
-#include "Common/Cpp/Logging/FileLogger.h"
-#include "Common/Cpp/Logging/GlobalLogger.h"
-#include "Common/Cpp/Logging/MultiOutputLogger.h"
 //#include "Tools/StatsDatabase.h"
 //#include "Windows/DpiScaler.h"
 #include "Startup/SetupSettings.h"
@@ -97,6 +98,7 @@ int run_program(int argc, char *argv[]){
 
     {
         MultiOutputLogger& logger = global_multi_logger();
+        logger.add_listener(global_last_log_history());
         logger.add_listener(global_file_logger());
     }
 

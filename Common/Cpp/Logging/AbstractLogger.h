@@ -8,7 +8,6 @@
 #define PokemonAutomation_AbstractLogger_H
 
 #include <string>
-#include <vector>
 #include "Common/Cpp/Color.h"
 
 namespace PokemonAutomation{
@@ -29,10 +28,6 @@ public:
     }
     virtual void log(const char* msg, Color color = Color()){
         log(std::string(msg), color);
-    }
-
-    virtual std::vector<LogLine> get_last(){
-        return {};
     }
 };
 

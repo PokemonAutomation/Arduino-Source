@@ -19,7 +19,7 @@
 namespace PokemonAutomation{
 
 
-template class RegisterConfigWidget<GroupWidget>;
+template class RegisterUiStateQtWidget<GroupWidget>;
 
 
 

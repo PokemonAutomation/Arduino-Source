@@ -49,7 +49,7 @@ struct SimpleIntegerCellBase::Data{
 
 SimpleIntegerCellBase::~SimpleIntegerCellBase() = default;
 SimpleIntegerCellBase::SimpleIntegerCellBase(const SimpleIntegerCellBase& x)
-    : ConfigOptionImpl<SimpleIntegerCellBase>(x)
+    : UiState<SimpleIntegerCellBase, ConfigOption>(x)
     , m_data(CONSTRUCT_TOKEN, x.min_value(), x.max_value(), x.default_value(), x.current_value())
 {}
 SimpleIntegerCellBase::SimpleIntegerCellBase(
@@ -57,7 +57,7 @@ SimpleIntegerCellBase::SimpleIntegerCellBase(
     NativeType min_value, NativeType max_value,
     NativeType default_value, NativeType current_value
 )
-    : ConfigOptionImpl<SimpleIntegerCellBase>(lock_while_running)
+    : UiState<SimpleIntegerCellBase, ConfigOption>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, min_value, max_value, default_value, current_value)
 {}
 
@@ -65,7 +65,7 @@ SimpleIntegerCellBase::SimpleIntegerCellBase(
     LockMode lock_while_running,
     NativeType default_value
 )
-    : ConfigOptionImpl<SimpleIntegerCellBase>(lock_while_running)
+    : UiState<SimpleIntegerCellBase, ConfigOption>(lock_while_running)
     , m_data(
         CONSTRUCT_TOKEN,
         std::numeric_limits<NativeType>::min(),
@@ -78,7 +78,7 @@ SimpleIntegerCellBase::SimpleIntegerCellBase(
     LockMode lock_while_running,
     NativeType default_value, NativeType min_value
 )
-    : ConfigOptionImpl<SimpleIntegerCellBase>(lock_while_running)
+    : UiState<SimpleIntegerCellBase, ConfigOption>(lock_while_running)
     , m_data(
         CONSTRUCT_TOKEN,
         min_value,
@@ -91,7 +91,7 @@ SimpleIntegerCellBase::SimpleIntegerCellBase(
     LockMode lock_while_running,
     NativeType default_value, NativeType min_value, NativeType max_value
 )
-    : ConfigOptionImpl<SimpleIntegerCellBase>(lock_while_running)
+    : UiState<SimpleIntegerCellBase, ConfigOption>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, min_value, max_value, default_value, default_value)
 {}
 
@@ -161,7 +161,7 @@ SimpleIntegerOptionBase::SimpleIntegerOptionBase(
     NativeType min_value, NativeType max_value,
     NativeType default_value, NativeType current_value
 )
-    : ConfigOptionImpl<SimpleIntegerOptionBase, SimpleIntegerCellBase>(
+    : UiState<SimpleIntegerOptionBase, SimpleIntegerCellBase>(
         lock_while_running,
         min_value,
         max_value,
@@ -175,7 +175,7 @@ SimpleIntegerOptionBase::SimpleIntegerOptionBase(
     LockMode lock_while_running,
     NativeType default_value
 )
-    : ConfigOptionImpl<SimpleIntegerOptionBase, SimpleIntegerCellBase>(
+    : UiState<SimpleIntegerOptionBase, SimpleIntegerCellBase>(
         lock_while_running,
         default_value
     )
@@ -186,7 +186,7 @@ SimpleIntegerOptionBase::SimpleIntegerOptionBase(
     LockMode lock_while_running,
     NativeType default_value, NativeType min_value
 )
-    : ConfigOptionImpl<SimpleIntegerOptionBase, SimpleIntegerCellBase>(
+    : UiState<SimpleIntegerOptionBase, SimpleIntegerCellBase>(
         lock_while_running,
         default_value,
         min_value
@@ -198,7 +198,7 @@ SimpleIntegerOptionBase::SimpleIntegerOptionBase(
     LockMode lock_while_running,
     NativeType default_value, NativeType min_value, NativeType max_value
 )
-    : ConfigOptionImpl<SimpleIntegerOptionBase, SimpleIntegerCellBase>(
+    : UiState<SimpleIntegerOptionBase, SimpleIntegerCellBase>(
         lock_while_running,
         default_value,
         min_value,

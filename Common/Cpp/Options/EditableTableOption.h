@@ -70,7 +70,7 @@ private:
 
 
 //  This is the table itself.
-class EditableTableOption : public ConfigOptionImpl<EditableTableOption>{
+class EditableTableOption : public UiState<EditableTableOption, ConfigOption>{
 public:
     EditableTableOption(
         std::string label,

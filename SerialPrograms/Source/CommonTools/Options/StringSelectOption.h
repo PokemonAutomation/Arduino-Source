@@ -80,7 +80,7 @@ bool load_json_to_string_select_database(const JsonValue& json, StringSelectData
 
 //  Config option that creates a cell where users can select a string from
 //  its dropdown menu. It is best to put this cell in a table widget.
-class StringSelectCell : public ConfigOptionImpl<StringSelectCell>{
+class StringSelectCell : public UiState<StringSelectCell, ConfigOption>{
 public:
     ~StringSelectCell();
     StringSelectCell(const StringSelectCell&) = delete;
@@ -133,7 +133,7 @@ private:
 //  a sring. Different from StringSelectCell which is typically used 
 //  in a table, StringSelectOption is considered a standalone option
 //  that comes with its own label.
-class StringSelectOption : public ConfigOptionImpl<StringSelectOption, StringSelectCell>{
+class StringSelectOption : public UiState<StringSelectOption, StringSelectCell>{
 public:
     StringSelectOption(
         std::string label,
@@ -141,7 +141,7 @@ public:
         LockMode lock_while_running,
         size_t default_index
     )
-        : ConfigOptionImpl<StringSelectOption, StringSelectCell>(
+        : UiState<StringSelectOption, StringSelectCell>(
             database,
             lock_while_running,
             default_index
@@ -154,7 +154,7 @@ public:
         LockMode lock_while_running,
         const std::string& default_slug
     )
-        : ConfigOptionImpl<StringSelectOption, StringSelectCell>(
+        : UiState<StringSelectOption, StringSelectCell>(
             database,
             lock_while_running,
             default_slug

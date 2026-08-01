@@ -118,7 +118,23 @@ QCameraFormat build_format_set(
 //    cout << "Chosen: " << resolution_map[Resolution(3840, 2160)]->maxFrameRate() << endl;
 
     //  Set a default.
-    const QCameraFormat* current_qformat = &aggregator.m_formats.begin()->second.begin()->second.begin()->second;
+    const QCameraFormat* current_qformat = nullptr;
+    const std::vector<Resolution> RESOLUTION_PRIORITIES{
+        {3840, 2160},
+        {1920, 1080},
+        {2560, 1440},
+        {1280, 720},
+    };
+    for (const Resolution& res : RESOLUTION_PRIORITIES){
+        auto iter = aggregator.m_formats.find(res);
+        if (iter != aggregator.m_formats.end()){
+            current_qformat = &iter->second.begin()->second.begin()->second;
+            break;
+        }
+    }
+    if (current_qformat == nullptr){
+        current_qformat = &aggregator.m_formats.rbegin()->second.begin()->second.begin()->second;
+    }
 
     format_set.clear();
     for (const auto& res : aggregator.m_formats){

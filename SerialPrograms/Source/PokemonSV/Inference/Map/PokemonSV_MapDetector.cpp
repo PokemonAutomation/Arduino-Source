@@ -5,9 +5,12 @@
  */
 
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "Tests/TestUtils.h"
 #include "PokemonSV_MapDetector.h"
 
 //#include <iostream>
@@ -149,6 +152,129 @@ bool MapWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp)
 
     return false;
 }
+
+
+
+
+
+
+
+class Test_MapDetector : public UnitTest{
+public:
+    Test_MapDetector(
+        const std::string& image,
+        std::vector<std::string> words
+    )
+        : UnitTest("PokemonSV::MapDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_words(std::move(words))
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        // two words: <Map ready to exit> <In fixed view (instead of the rotated view)>
+        if (m_words.size() < 2){
+            std::stringstream ss;
+            ss << "Error: not enough number of words in the filename. Found only " << m_words.size() << "." << std::endl;
+            return ss.str();
+        }
+
+        bool target_map_existence = false;
+        if (parse_bool(m_words[m_words.size()-2], target_map_existence) == false){
+            std::stringstream ss;
+            ss << "Error: True/False word " << m_words[m_words.size()-2] << " is wrong. Must be \"True\" or \"False\"." << std::endl;
+            return ss.str();
+        }
+
+        bool target_is_fixed_view = false;
+        if (parse_bool(m_words[m_words.size()-1], target_is_fixed_view) == false){
+            std::stringstream ss;
+            ss << "Error: True/False word " << m_words[m_words.size()-1] << " is wrong. Must be \"True\" or \"False\"." << std::endl;
+            return ss.str();
+        }
+
+        WhiteButtonDetector map_exit_detector(COLOR_RED, WhiteButton::ButtonY, {0.800, 0.118, 0.030, 0.060});
+        ImageRGB32 image(m_image);
+        bool result_map = map_exit_detector.detect(image);
+
+        TEST_RESULT_EQUAL(result_map, target_map_existence);
+
+        if (result_map){
+
+            MapFixedViewDetector map_fixed_view_detector;
+            MapRotatedViewDetector map_rotated_view_detected;
+
+            bool result_fixed = map_fixed_view_detector.detect(image);
+            bool result_rotated = map_rotated_view_detected.detect(image);
+
+            TEST_RESULT_EQUAL(result_fixed, target_is_fixed_view);
+            TEST_RESULT_EQUAL(result_rotated, !target_is_fixed_view);
+        }
+
+        return true;
+    };
+
+private:
+    std::string m_image;
+    const std::vector<std::string> m_words;
+};
+
+
+
+void add_tests_MapDetector(UnitTestDatabase& database){
+    database.add<Test_MapDetector>(
+        "PokemonSV/MapDetector/BugTypeCase_False_False.png",
+        std::vector<std::string>{"BugTypeCase", "False", "False"}
+    );
+    database.add<Test_MapDetector>(
+        "PokemonSV/MapDetector/EastAreaWatchTowerAfterDLC1_True_True.png",
+        std::vector<std::string>{"EastAreaWatchTowerAfterDLC1", "True", "True"}
+    );
+    database.add<Test_MapDetector>(
+        "PokemonSV/MapDetector/EeveeCase_True_True.png",
+        std::vector<std::string>{"EeveeCase", "True", "True"}
+    );
+    database.add<Test_MapDetector>(
+        "PokemonSV/MapDetector/FuecocoCase_True_True.png",
+        std::vector<std::string>{"FuecocoCase", "True", "True"}
+    );
+    database.add<Test_MapDetector>(
+        "PokemonSV/MapDetector/GlitteratiCase_True_True.png",
+        std::vector<std::string>{"GlitteratiCase", "True", "True"}
+    );
+    database.add<Test_MapDetector>(
+        "PokemonSV/MapDetector/PoketchCase_False_True.png",
+        std::vector<std::string>{"PoketchCase", "False", "True"}
+    );
+    database.add<Test_MapDetector>(
+        "PokemonSV/MapDetector/PortoMarinada_True_False.png",
+        std::vector<std::string>{"PortoMarinada", "True", "False"}
+    );
+    database.add<Test_MapDetector>(
+        "PokemonSV/MapDetector/ZeroGate_True_True.png",
+        std::vector<std::string>{"ZeroGate", "True", "True"}
+    );
+    database.add<Test_MapDetector>(
+        "PokemonSV/MapDetector/macOS/Cascarraf_Restaurant_True_True.png",
+        std::vector<std::string>{"Cascarraf_Restaurant", "True", "True"}
+    );
+    database.add<Test_MapDetector>(
+        "PokemonSV/MapDetector/macOS/cascarrafa_True_True.png",
+        std::vector<std::string>{"cascarrafa", "True", "True"}
+    );
+    database.add<Test_MapDetector>(
+        "PokemonSV/MapDetector/macOS/cascarrafa_Zooming_False_False.png",
+        std::vector<std::string>{"cascarrafa", "Zooming", "False", "False"}
+    );
+    database.add<Test_MapDetector>(
+        "PokemonSV/MapDetector/macOS/KitakamiOniMountain_True_False.png",
+        std::vector<std::string>{"KitakamiOniMountain", "True", "False"}
+    );
+}
+
+
+
+
+
 
 
 }

@@ -48,12 +48,12 @@ ControllerOption::ControllerOption()
 {}
 
 
-void ControllerOption::set_descriptor(std::shared_ptr<const ControllerDescriptor> descriptor){
+void ControllerOption::set_descriptor(std::shared_ptr<ControllerDescriptor> descriptor){
     m_descriptor_cache[descriptor->interface_type] = descriptor;
     m_descriptor = std::move(descriptor);
 }
 
-std::shared_ptr<const ControllerDescriptor> ControllerOption::get_descriptor_from_cache(ControllerInterface interface_type) const{
+std::shared_ptr<ControllerDescriptor> ControllerOption::get_descriptor_from_cache(ControllerInterface interface_type) const{
     auto iter = m_descriptor_cache.find(interface_type);
     if (iter == m_descriptor_cache.end()){
         return nullptr;
@@ -64,7 +64,7 @@ std::shared_ptr<const ControllerDescriptor> ControllerOption::get_descriptor_fro
 
 
 void ControllerOption::load_json(const JsonValue& json){
-    std::shared_ptr<const ControllerDescriptor> descriptor;
+    std::shared_ptr<ControllerDescriptor> descriptor;
     do{
         if (json.is_null()){
             break;

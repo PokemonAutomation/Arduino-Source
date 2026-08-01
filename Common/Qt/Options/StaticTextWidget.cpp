@@ -12,8 +12,8 @@
 namespace PokemonAutomation{
 
 
-template class RegisterConfigWidget<StaticTextWidget>;
-template class RegisterConfigWidget<SectionDividerWidget>;
+template class RegisterUiStateQtWidget<StaticTextWidget>;
+template class RegisterUiStateQtWidget<SectionDividerWidget>;
 
 
 

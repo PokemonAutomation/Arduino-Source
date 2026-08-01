@@ -57,7 +57,7 @@ private:
 
 
 //  This is the table itself.
-class StaticTableOption : public ConfigOptionImpl<StaticTableOption>{
+class StaticTableOption : public UiState<StaticTableOption, ConfigOption>{
 public:
     ~StaticTableOption();
     StaticTableOption(

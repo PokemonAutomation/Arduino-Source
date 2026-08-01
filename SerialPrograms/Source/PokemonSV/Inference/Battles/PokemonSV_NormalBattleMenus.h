@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_NormalBattleMenus_H
 #define PokemonAutomation_PokemonSV_NormalBattleMenus_H
 
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/VisualDetector.h"
@@ -135,6 +136,11 @@ public:
 };
 
 
+
+
+
+
+void add_tests_NormalBattleMenus(UnitTestDatabase& database);
 
 
 

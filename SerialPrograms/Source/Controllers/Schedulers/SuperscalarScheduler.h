@@ -10,6 +10,7 @@
 #include <memory>
 #include <set>
 #include <map>
+#include <vector>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"

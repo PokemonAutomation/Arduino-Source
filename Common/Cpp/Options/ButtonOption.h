@@ -19,7 +19,7 @@ struct ButtonListener{
 };
 
 
-class ButtonCell : public ConfigOptionImpl<ButtonCell>{
+class ButtonCell : public UiState<ButtonCell, ConfigOption>{
 public:
     enum Enabled : bool{
         DISABLED,
@@ -74,7 +74,7 @@ protected:
 
 
 
-class ButtonOption : public ConfigOptionImpl<ButtonOption, ButtonCell>{
+class ButtonOption : public UiState<ButtonOption, ButtonCell>{
 public:
     virtual ~ButtonOption();
     ButtonOption(const ButtonOption& x) = delete;

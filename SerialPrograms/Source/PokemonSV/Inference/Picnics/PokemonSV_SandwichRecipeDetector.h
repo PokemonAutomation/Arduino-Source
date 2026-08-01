@@ -4,11 +4,12 @@
  *
  */
 
-#ifndef PokemonAutomation_PokemonSV_SandwichRecipeNumberDetector_H
-#define PokemonAutomation_PokemonSV_SandwichRecipeNumberDetector_H
+#ifndef PokemonAutomation_PokemonSV_SandwichRecipeDetector_H
+#define PokemonAutomation_PokemonSV_SandwichRecipeDetector_H
 
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Containers/FixedLimitVector.h"
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/VisualDetector.h"
@@ -69,6 +70,13 @@ private:
     int m_selected_recipe = -1;
 };
 
+
+
+
+
+
+
+void add_tests_SandwichRecipeDetector(UnitTestDatabase& database);
 
 
 

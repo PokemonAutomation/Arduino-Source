@@ -7,11 +7,14 @@
 #include <opencv2/imgproc.hpp>
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
+#include "Tests/TestUtils.h"
 #include "PokemonSV_SandwichRecipeDetector.h"
 
 //#include <iostream>
@@ -141,6 +144,172 @@ bool SandwichRecipeSelectionWatcher::detect(const ImageViewRGB32& frame){
     }
     return num_arrows_found == 1;
 }
+
+
+
+
+
+
+
+class Test_SandwichRecipeDetector : public UnitTest{
+public:
+    Test_SandwichRecipeDetector(
+        const std::string& image,
+        std::vector<std::string> words
+    )
+        : UnitTest("PokemonSV::Test_SandwichRecipeDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_words(std::move(words))
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        // seven words: the sandwich recipe IDs on the screen. Order:
+        // --------------------------------------
+        // recipe_IDs[0]  |   recipe_IDs[1]
+        // recipe_IDs[2]  |   recipe_IDs[3]
+        // recipe_IDs[4]  |   recipe_IDs[5]
+        // --------------------------------------
+        // plus the current selected cell ID (range [0, 5]).
+        if (m_words.size() < 7){
+            std::stringstream ss;
+            ss << "Error: not enough number of words in the filename. Found only " << m_words.size() << "." << std::endl;
+            return ss.str();
+        }
+
+        int target_IDs[6] = {0, 0, 0, 0, 0, 0};
+        for (int i = 0; i < 6; i++){
+            const auto& word = m_words[m_words.size() + i - 7];
+            if (parse_int(word, target_IDs[i]) == false || target_IDs[i] > 151){
+                std::stringstream ss;
+                ss << "Error: word " << m_words[m_words.size() + i - 7] << " is wrong. Must be an integer < 151. " << std::endl;
+                return ss.str();
+            }
+        }
+
+        SandwichRecipeNumberDetector detector(logger);
+
+        size_t detected_IDs[6] = {0, 0, 0, 0, 0, 0};
+        ImageRGB32 image(m_image);
+        detector.detect_recipes(image, detected_IDs);
+
+        for (int i = 0; i < 6; i++){
+            if (target_IDs[i] < 0){
+                continue;
+            }
+            TEST_RESULT_COMPONENT_EQUAL_STR(detected_IDs[i], (size_t)target_IDs[i], "recipe at cell " + std::to_string(i));
+        }
+
+        int target_selection = 0;
+        if (parse_int(m_words[m_words.size()-1], target_selection) == false || target_selection < 0 || target_selection >= 6){
+            std::stringstream ss;
+            ss << "Error: word " << m_words[m_words.size()-1] << " is wrong. Must be an integer in range [0, 6). " << std::endl;
+            return ss.str();
+        }
+        SandwichRecipeSelectionWatcher selection_watcher;
+        bool result = selection_watcher.detect(image);
+
+        TEST_RESULT_COMPONENT_EQUAL_STR(result, true, "SandwichRecipeSelectionWatcher::process_frame() result");
+
+        int selected_cell = selection_watcher.selected_recipe_cell();
+
+        TEST_RESULT_COMPONENT_EQUAL_STR(selected_cell, target_selection, "selected cell");
+
+        return true;
+    };
+
+private:
+    std::string m_image;
+    std::vector<std::string> m_words;
+};
+
+
+
+void add_tests_SandwichRecipeDetector(UnitTestDatabase& database){
+    database.add<Test_SandwichRecipeDetector>(
+        "PokemonSV/SandwichRecipeDetector/Korean_NewAccount_1_0_0_0_0_0_0.png",
+        std::vector<std::string>{"1", "0", "0", "0", "0", "0", "0"}
+    );
+    database.add<Test_SandwichRecipeDetector>(
+        "PokemonSV/SandwichRecipeDetector/NewAccount_1_12_20_0_84_0_0.png",
+        std::vector<std::string>{"1", "12", "20", "0", "84", "0", "0"}
+    );
+    database.add<Test_SandwichRecipeDetector>(
+        "PokemonSV/SandwichRecipeDetector/Nix_Sandwich_15_16_17_18_19_20_2.png",
+        std::vector<std::string>{"15", "16", "17", "18", "19", "20", "2"}
+    );
+    database.add<Test_SandwichRecipeDetector>(
+        "PokemonSV/SandwichRecipeDetector/Sandwich_1_4_8_12_13_14_0.png",
+        std::vector<std::string>{"1", "4", "8", "12", "13", "14", "0"}
+    );
+    database.add<Test_SandwichRecipeDetector>(
+        "PokemonSV/SandwichRecipeDetector/Sandwich_-1_16_17_-1_-1_20_2.png",
+        std::vector<std::string>{"-1", "16", "17", "-1", "-1", "20", "2"}
+    );
+//    database.add<Test_SandwichRecipeDetector>(
+//        "PokemonSV/SandwichRecipeDetector/macOS/_Recipe_No_Ingredient_1_2_3_4_5_6_0.png",
+//        std::vector<std::string>{"1", "2", "3", "4", "5", "6", "0"}
+//    );
+    database.add<Test_SandwichRecipeDetector>(
+        "PokemonSV/SandwichRecipeDetector/macOS/Recipe_1_2_3_4_5_6_0.png",
+        std::vector<std::string>{"1", "2", "3", "4", "5", "6", "0"}
+    );
+    database.add<Test_SandwichRecipeDetector>(
+        "PokemonSV/SandwichRecipeDetector/macOS/Recipe_1_2_3_4_5_6_1.png",
+        std::vector<std::string>{"1", "2", "3", "4", "5", "6", "1"}
+    );
+    database.add<Test_SandwichRecipeDetector>(
+        "PokemonSV/SandwichRecipeDetector/macOS/Recipe_1_2_3_4_5_6_2.png",
+        std::vector<std::string>{"1", "2", "3", "4", "5", "6", "2"}
+    );
+    database.add<Test_SandwichRecipeDetector>(
+        "PokemonSV/SandwichRecipeDetector/macOS/Recipe_1_2_3_4_5_6_3.png",
+        std::vector<std::string>{"1", "2", "3", "4", "5", "6", "3"}
+    );
+    database.add<Test_SandwichRecipeDetector>(
+        "PokemonSV/SandwichRecipeDetector/macOS/Recipe_3_4_5_6_7_8_2.png",
+        std::vector<std::string>{"3", "4", "5", "6", "7", "8", "2"}
+    );
+    database.add<Test_SandwichRecipeDetector>(
+        "PokemonSV/SandwichRecipeDetector/macOS/Recipe_7_8_9_10_11_12_2.png",
+        std::vector<std::string>{"7", "8", "9", "10", "11", "12", "2"}
+    );
+    database.add<Test_SandwichRecipeDetector>(
+        "PokemonSV/SandwichRecipeDetector/macOS/Recipe_15_16_17_18_19_20_2.png",
+        std::vector<std::string>{"15", "16", "17", "18", "19", "20", "2"}
+    );
+    database.add<Test_SandwichRecipeDetector>(
+        "PokemonSV/SandwichRecipeDetector/macOS/Recipe_41_42_43_44_45_46_2.png",
+        std::vector<std::string>{"41", "42", "43", "44", "45", "46", "2"}
+    );
+    database.add<Test_SandwichRecipeDetector>(
+        "PokemonSV/SandwichRecipeDetector/macOS/Recipe_75_76_77_78_79_80_2.png",
+        std::vector<std::string>{"75", "76", "77", "78", "79", "80", "2"}
+    );
+    database.add<Test_SandwichRecipeDetector>(
+        "PokemonSV/SandwichRecipeDetector/macOS/Recipe_147_148_149_150_151_0_0.png",
+        std::vector<std::string>{"147", "148", "149", "150", "151", "0", "0"}
+    );
+    database.add<Test_SandwichRecipeDetector>(
+        "PokemonSV/SandwichRecipeDetector/macOS/Recipe_147_148_149_150_151_0_2.png",
+        std::vector<std::string>{"147", "148", "149", "150", "151", "0", "2"}
+    );
+    database.add<Test_SandwichRecipeDetector>(
+        "PokemonSV/SandwichRecipeDetector/macOS/Recipe_147_148_149_150_151_0_3.png",
+        std::vector<std::string>{"147", "148", "149", "150", "151", "0", "3"}
+    );
+    database.add<Test_SandwichRecipeDetector>(
+        "PokemonSV/SandwichRecipeDetector/macOS/Recipe_149_150_151_0_0_0_1.png",
+        std::vector<std::string>{"149", "150", "151", "0", "0", "0", "1"}
+    );
+    database.add<Test_SandwichRecipeDetector>(
+        "PokemonSV/SandwichRecipeDetector/macOS/Recipe_149_150_151_0_0_0_2.png",
+        std::vector<std::string>{"149", "150", "151", "0", "0", "0", "2"}
+    );
+
+}
+
+
+
 
 }
 }

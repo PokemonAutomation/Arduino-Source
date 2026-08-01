@@ -14,7 +14,7 @@
 namespace PokemonAutomation{
 
 
-class FloatingPointCell : public ConfigOptionImpl<FloatingPointCell>{
+class FloatingPointCell : public UiState<FloatingPointCell, ConfigOption>{
 public:
     ~FloatingPointCell();
     FloatingPointCell(const FloatingPointCell& x);
@@ -54,7 +54,7 @@ private:
 };
 
 
-class FloatingPointOption : public ConfigOptionImpl<FloatingPointOption, FloatingPointCell>{
+class FloatingPointOption : public UiState<FloatingPointOption, FloatingPointCell>{
 public:
     FloatingPointOption(const FloatingPointOption& x) = delete;
 

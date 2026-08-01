@@ -23,8 +23,8 @@
 namespace PokemonAutomation{
 
 
-template class RegisterConfigWidget<ScreenWatchWidget>;
-template class RegisterConfigWidget<ScreenWatchButtonWidget>;
+template class RegisterUiStateQtWidget<ScreenWatchWidget>;
+template class RegisterUiStateQtWidget<ScreenWatchButtonWidget>;
 
 
 ScreenWatchDisplayWidget::ScreenWatchDisplayWidget(ScreenWatchWidget& parent, ScreenWatchOption& option)

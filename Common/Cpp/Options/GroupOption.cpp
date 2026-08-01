@@ -49,7 +49,7 @@ GroupOption::GroupOption(
     bool show_restore_defaults_button,
     bool default_expanded
 )
-    : ConfigOptionImpl<GroupOption, BatchOption>(lock_while_program_is_running)
+    : UiState<GroupOption, BatchOption>(lock_while_program_is_running)
     , m_data(
         CONSTRUCT_TOKEN,
         std::move(label),

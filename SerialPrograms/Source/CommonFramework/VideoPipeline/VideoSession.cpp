@@ -159,7 +159,7 @@ void VideoSession::set_source(
 ){
     {
         WriteSpinLock lg(m_queue_lock);
-//        cout << "VideoSession::set_source(): " << m_queued_commands.size() << endl;
+//        cout << "VideoSession::set_source(): " << resolution.to_string() << endl;
         m_queued_commands.emplace_back(
             Command{
                 CommandType::SET_SOURCE,
@@ -275,6 +275,7 @@ void VideoSession::internal_set_source(
     }
 
     Resolution desired_resolution = resolution ? resolution : m_option.m_resolution;
+//    cout << "desired_resolution = " << desired_resolution.to_string() << endl;
     source = device->make_VideoSource(m_logger, desired_resolution, format, fps);
     if (source){
         resolution = source->current_resolution();

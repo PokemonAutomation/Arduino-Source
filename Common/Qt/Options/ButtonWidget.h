@@ -19,7 +19,7 @@ namespace PokemonAutomation{
 
 class ButtonCellWidget : public QPushButton, public ConfigWidget{
 public:
-    using ParentOption = ButtonCell;
+    using ParentState = ButtonCell;
 
 public:
     ~ButtonCellWidget();
@@ -38,7 +38,7 @@ private:
 
 class ButtonOptionWidget : public QWidget, public ConfigWidget{
 public:
-    using ParentOption = ButtonOption;
+    using ParentState = ButtonOption;
 
 public:
     ~ButtonOptionWidget();

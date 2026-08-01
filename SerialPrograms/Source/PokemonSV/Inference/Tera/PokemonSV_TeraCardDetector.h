@@ -9,6 +9,7 @@
 
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/VisualDetector.h"
 #include "PokemonSV/Options/PokemonSV_PlayerList.h"
@@ -133,6 +134,12 @@ public:
          : DetectorToFinder("TeraLobbyFinder", duration, logger, color)
     {}
 };
+
+
+
+
+
+void add_tests_TeraCardDetector(UnitTestDatabase& database);
 
 
 

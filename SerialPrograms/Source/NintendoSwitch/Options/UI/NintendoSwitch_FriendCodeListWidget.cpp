@@ -11,7 +11,7 @@
 
 namespace PokemonAutomation{
 
-template class RegisterConfigWidget<NintendoSwitch::FriendCodeListWidget>;
+template class RegisterUiStateQtWidget<NintendoSwitch::FriendCodeListWidget>;
 
 namespace NintendoSwitch{
 

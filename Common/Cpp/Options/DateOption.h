@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 
 
 
-class DateTimeCell : public ConfigOptionImpl<DateTimeCell>{
+class DateTimeCell : public UiState<DateTimeCell, ConfigOption>{
 public:
     enum Level{
         DATE,
@@ -68,7 +68,7 @@ private:
 };
 
 
-class DateTimeOption : public ConfigOptionImpl<DateTimeOption, DateTimeCell>{
+class DateTimeOption : public UiState<DateTimeOption, DateTimeCell>{
 public:
     DateTimeOption(
         std::string label,

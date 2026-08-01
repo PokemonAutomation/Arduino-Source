@@ -14,13 +14,13 @@ namespace PokemonAutomation{
 
 
 
-class NullControllerDescriptor : public ControllerDescriptor{
+class NullControllerDescriptor : public UiState<const NullControllerDescriptor&, ControllerDescriptor>{
 public:
     static constexpr ControllerInterface INTERFACE_NAME = ControllerInterface::None;
 
 public:
     NullControllerDescriptor()
-        : ControllerDescriptor(ControllerInterface::None)
+        : UiState<const NullControllerDescriptor&, ControllerDescriptor>(ControllerInterface::None)
     {}
     virtual bool operator==(const ControllerDescriptor& x) const override;
     virtual std::string display_name() const override;
@@ -33,8 +33,6 @@ public:
         ControllerConnection& connection,
         ControllerType controller_type
     ) const override;
-
-    virtual QWidget* make_selector_QtWidget(ControllerSelectorWidget& parent) const override;
 };
 
 

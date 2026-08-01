@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 
 
 TestMessageButton::TestMessageButton(EventNotificationOption& p_option)
-    : ConfigOptionImpl<TestMessageButton>(LockMode::UNLOCK_WHILE_RUNNING)
+    : UiState<TestMessageButton, ConfigOption>(LockMode::UNLOCK_WHILE_RUNNING)
     , option(p_option)
 {}
 

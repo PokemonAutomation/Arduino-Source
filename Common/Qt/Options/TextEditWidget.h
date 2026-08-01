@@ -11,6 +11,7 @@
 #include "Common/Cpp/Options/TextEditOption.h"
 #include "ConfigWidget.h"
 
+class QLabel;
 class QTextEdit;
 
 namespace PokemonAutomation{
@@ -19,7 +20,7 @@ namespace PokemonAutomation{
 
 class TextEditWidget : public QWidget, public ConfigWidget, public TextEditOption::AppendListener{
 public:
-    using ParentOption = TextEditOption;
+    using ParentState = TextEditOption;
 
 public:
     ~TextEditWidget();
@@ -33,6 +34,7 @@ private:
     class Box;
 
     TextEditOption& m_value;
+    QLabel* m_label;
     QTextEdit* m_box;
 
     bool m_pending_append = false;

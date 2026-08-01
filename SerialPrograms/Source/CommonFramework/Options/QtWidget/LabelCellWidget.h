@@ -19,7 +19,7 @@ namespace PokemonAutomation{
 
 class LabelCellWidget : public QWidget, public ConfigWidget{
 public:
-    using ParentOption = LabelCellOption;
+    using ParentState = LabelCellOption;
 
 public:
     ~LabelCellWidget();

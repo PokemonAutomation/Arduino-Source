@@ -7,7 +7,6 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Controllers/ControllerTypeStrings.h"
 #include "SerialPABotBase_Descriptor.h"
-#include "SerialPABotBase_SelectorWidget.h"
 
 #include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WiredController.h"
 
@@ -84,10 +83,6 @@ std::unique_ptr<AbstractController> SerialPABotBase_Descriptor::make_controller(
 }
 
 
-
-QWidget* SerialPABotBase_Descriptor::make_selector_QtWidget(ControllerSelectorWidget& parent) const{
-    return new SerialPABotBase_SelectorWidget(parent, this);
-}
 
 
 

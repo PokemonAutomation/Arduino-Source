@@ -22,7 +22,7 @@ struct VideoSnapshot;
 class ScreenWatchOption;
 
 
-class ScreenWatchDisplay : public ConfigOptionImpl<ScreenWatchDisplay>{
+class ScreenWatchDisplay : public UiState<ScreenWatchDisplay, ConfigOption>{
 public:
     ScreenWatchDisplay(ScreenWatchOption& option)
         : m_option(option)
@@ -30,7 +30,7 @@ public:
 
     ScreenWatchOption& m_option;
 };
-class ScreenWatchButtons : public ConfigOptionImpl<ScreenWatchButtons>{
+class ScreenWatchButtons : public UiState<ScreenWatchButtons, ConfigOption>{
 public:
     ScreenWatchButtons(ScreenWatchOption& option)
         : m_option(option)

@@ -352,7 +352,7 @@ std::vector<std::unique_ptr<EditableTableRow>> CustomPathTable::make_defaults(){
 
 
 CustomPathTableFromJubilife::CustomPathTableFromJubilife()
-    : ConfigOptionImpl<CustomPathTableFromJubilife, BatchOption>(LockMode::LOCK_WHILE_RUNNING)
+    : UiState<CustomPathTableFromJubilife, BatchOption>(LockMode::LOCK_WHILE_RUNNING)
 //    : PATH(
 //        "<b>Custom Path Table:</b><br>"
 //        "Set a sequence of actions to navigate the map. By default, the shiny detected behavior is \"Enroute Shiny Action\".<br>"

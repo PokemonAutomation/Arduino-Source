@@ -16,7 +16,7 @@
 namespace PokemonAutomation{
 
 
-template class RegisterConfigWidget<LabelCellWidget>;
+template class RegisterUiStateQtWidget<LabelCellWidget>;
 
 
 LabelCellWidget::~LabelCellWidget(){
