@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSV_SandwichHandLocator_H
 
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
@@ -78,6 +79,12 @@ private:
     std::pair<double, double> m_location;
     VideoSnapshot m_last_snapshot;
 };
+
+
+
+
+
+void add_tests_SandwichHandDetector(UnitTestDatabase& database);
 
 
 

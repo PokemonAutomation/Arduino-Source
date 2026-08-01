@@ -13,6 +13,7 @@
 #include "Inference/Tera/PokemonSV_TeraSilhouetteReader.h"
 #include "Inference/Tera/PokemonSV_TeraTypeReader.h"
 #include "Inference/Picnics/PokemonSV_SandwichRecipeDetector.h"
+#include "Inference/Picnics/PokemonSV_SandwichHandDetector.h"
 #include "PokemonSV_Tests.h"
 
 namespace PokemonAutomation{
@@ -26,6 +27,7 @@ void add_tests(UnitTestDatabase& database){
     add_tests_MapDetector(database);
     add_tests_PicnicDetector(database);
     add_tests_SandwichRecipeDetector(database);
+    add_tests_SandwichHandDetector(database);
     add_tests_TeraCardDetector(database);
     add_tests_TeraSilhouetteReader(database);
     add_tests_TeraTypeReader(database);

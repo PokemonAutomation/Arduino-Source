@@ -42,54 +42,6 @@ namespace PokemonAutomation{
 using namespace NintendoSwitch::PokemonSV;
 
 
-// - the last 4 words should be the coordinates for the FloatBox, that the detector will search
-// - the 5th word from last should be the Hand type (Free or Grabbing)
-// - optional: if the image should not detect the hand, the 6th word from last should "False"
-int test_pokemonSV_SandwichHandDetector(const ImageViewRGB32& image, const std::vector<std::string>& words){
-    // five words: hand_type("Free"/"Grabbing"), <image float box (four words total)>
-    if (words.size() < 5){
-        cerr << "Error: not enough number of words in the filename. Found only " << words.size() << "." << endl;
-        return 1;
-    }
-
-    const auto& hand_type_word = words[words.size() - 5];
-    SandwichHandLocator::HandType hand_type = SandwichHandLocator::HandType::FREE;
-    if (hand_type_word == "Free"){
-        hand_type = SandwichHandLocator::HandType::FREE;
-    }else if (hand_type_word == "Grabbing"){
-        hand_type = SandwichHandLocator::HandType::GRABBING;
-    }else{
-        cerr << "Error: word " << hand_type_word << " should be \"Free\" or \"Grabbing\"." << endl;
-        return 1;
-    }
-
-    float box_values[4] = {0.0f};
-    for (int i = 0; i < 4; i++){
-        if (parse_float(words[words.size() - 4 + i], box_values[i]) == false){
-            cerr << "Error: word " << words[words.size() - 4 + i] << " should be a float, range [0.0, 1.0]" << endl;
-            return 1;
-        }
-    }
-
-    ImageFloatBox box(box_values[0], box_values[1], box_values[2], box_values[3]);
-
-    SandwichHandLocator detector(hand_type, box);
-
-    bool hand_expected = true;
-    if (words.size() >= 6){
-        auto hand_expected_word = words[words.size() - 6];
-        if(hand_expected_word == "False"){
-            hand_expected = false;
-        }
-    }
-
-    auto result = detector.detect(image);
-    bool has_hand = result.first >= 0.0;
-
-    TEST_RESULT_EQUAL(has_hand, hand_expected);
-
-    return 0;
-}
 
 int test_pokemonSV_BoxPokemonInfoDetector(const ImageViewRGB32& image, const std::vector<std::string>& words){
     // two words: <shiny or not> <gender (1: male, 2: female, 3: genderless)
