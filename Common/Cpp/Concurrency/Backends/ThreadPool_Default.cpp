@@ -202,8 +202,9 @@ void ThreadPool_Default::run_in_parallel(
         }
         spawn_threads();
 
-        //  Don't do this since this thread might be of a different priority.
-#if 0
+//        //  Don't do this since this thread might be of a different priority.
+//        //  Nevermind: Recursive calls can deadlock if every thread is waiting.
+#if 1
         //  Use this thread to process the queue until our tasks are done.
         while (!m_queue.empty() && !tasks.back().is_finished()){
             AsyncTaskCore* task = m_queue.front();
