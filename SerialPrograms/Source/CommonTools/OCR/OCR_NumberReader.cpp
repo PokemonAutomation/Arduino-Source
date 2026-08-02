@@ -280,7 +280,8 @@ int read_number_waterfill_multifilter(
             candidates[candidate] += weight;
 
         },
-        0, filters.size(), 1
+        0, filters.size(),
+        allow_parallel_ocr() ? 1 : (size_t)-1
     );
 
     if (candidates.empty()){
