@@ -94,7 +94,7 @@ bool try_soft_reset(ConsoleHandle& console, ProControllerContext& context){
     context.wait_for_all_requests();
 
     //Wait for save file select screen
-    WhiteScreenOverWatcher whitescreen(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    WhiteScreenOverWatcher whitescreen(COLOR_RED);
     LoadMenuWatcher load_menu(COLOR_RED);
 
     int ls = run_until<ProControllerContext>(
@@ -123,7 +123,7 @@ bool try_soft_reset(ConsoleHandle& console, ProControllerContext& context){
     pbf_press_button(context, BUTTON_A, 160ms, 320ms);
 
     //Wait for game to load in
-    BlackScreenOverWatcher detector2(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher detector2(COLOR_RED);
     int ret = wait_until(
         console, context,
         GameSettings::instance().ENTER_GAME_WAIT0,
@@ -185,7 +185,7 @@ void flee_battle(VideoStream& stream, ProControllerContext& context){
         );
     }
 
-    BlackScreenOverWatcher battle_over(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher battle_over(COLOR_RED);
     int ret3 = run_until<ProControllerContext>(
         stream, context,
         [&](ProControllerContext& context){

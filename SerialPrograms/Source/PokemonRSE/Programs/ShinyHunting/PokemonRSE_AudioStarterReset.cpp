@@ -118,7 +118,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
 
         //Pressing A opens the bag so the screen goes black
         env.log("Opening bag and selecting starter.");
-        BlackScreenOverWatcher bag_opened(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+        BlackScreenOverWatcher bag_opened(COLOR_RED);
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [](ProControllerContext& context){
@@ -172,7 +172,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
         }
 
         //Mash A to select starter. Stop once black screen is detected to start listening for shiny pooch.
-        BlackScreenWatcher starter_battle_start(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+        BlackScreenWatcher starter_battle_start(COLOR_RED);
         int ret3 = run_until<ProControllerContext>(
             env.console, context,
             [](ProControllerContext& context){

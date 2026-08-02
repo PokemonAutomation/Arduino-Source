@@ -154,7 +154,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         pbf_press_dpad(context, DPAD_DOWN, 320ms, 640ms);
         pbf_press_button(context, BUTTON_A, 320ms, 640ms);
 
-        BlackScreenOverWatcher detector(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+        BlackScreenOverWatcher detector(COLOR_RED);
         int ret2 = wait_until(
             env.console, context,
             std::chrono::milliseconds(3000),
