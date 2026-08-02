@@ -59,6 +59,7 @@ QSerialPortInfo SerialPortPoller::get_port(const std::string& name) const{
 }
 
 void SerialPortPoller::run() noexcept{
+//    cout << "SerialPortPoller::run() - start" << endl;
 //    global_logger_tagged().log("Refreshing serial ports...");
 //    cout << "SerialPortPoller::run() - start" << endl;
 

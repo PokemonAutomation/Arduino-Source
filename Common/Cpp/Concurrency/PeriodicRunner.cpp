@@ -167,8 +167,8 @@ void PeriodicRunner::edit_duration(Runnable& runnable, WallDuration period) noex
 }
 
 void PeriodicRunner::thread_body(){
-    std::unique_lock<Mutex> lg(m_lock);
     while (!m_stopping){
+        std::unique_lock<Mutex> lg(m_lock);
         auto schedule_iter = m_schedule.begin();
         if (schedule_iter == m_schedule.end()){
             m_cv.wait(lg);
@@ -176,6 +176,7 @@ void PeriodicRunner::thread_body(){
         }
 
         WallClock fire_time = schedule_iter->first;
+//        cout << std::chrono::duration_cast<Milliseconds>(current_time() - fire_time).count() << endl;
         if (fire_time > current_time()){
             m_cv.wait_until(lg, fire_time);
             continue;
@@ -184,6 +185,8 @@ void PeriodicRunner::thread_body(){
         auto runnable_iter = schedule_iter->second;
 
         WallClock next = fire_time + runnable_iter->second.period;
+//        cout << "Period = " << std::chrono::duration_cast<Milliseconds>(runnable_iter->second.period).count() << endl;
+//        cout << "Next = " << std::chrono::duration_cast<Milliseconds>(next - current_time()).count() << endl;
         update_next(schedule_iter, next);
 
         runnable_iter->second.busy = true;
