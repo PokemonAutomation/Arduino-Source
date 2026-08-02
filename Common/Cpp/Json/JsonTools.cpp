@@ -4,8 +4,8 @@
  *
  */
 
-#include <QFile>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/FileIO.h"
 #include "JsonTools.h"
 #include "JsonArray.h"
 #include "JsonObject.h"
@@ -26,11 +26,11 @@ void string_to_file(const std::string& filename, const std::string& str){
         previous = ch;
     }
 
-    QFile file(QString::fromStdString(filename));
-    if (!file.open(QFile::WriteOnly)){
+    FileIO file;
+    if (!file.open(filename, FileMode::WRITE)){
         throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to create file.", filename);
     }
-    if (file.write(json_out.c_str(), json_out.size()) != (int)json_out.size()){
+    if (file.write(json_out.c_str(), json_out.size()) != json_out.size()){
         throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to write file.", filename);
     }
     file.close();
@@ -38,20 +38,31 @@ void string_to_file(const std::string& filename, const std::string& str){
 
 
 std::string file_to_string(const std::string& filename){
-    QFile file(QString::fromStdString(filename));
-    if (!file.open(QFile::ReadOnly)){
+    std::string ret;
+    if (!file_to_string(filename, ret)){
         throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to open file.", filename);
     }
-    return file.readAll().toStdString();
+    return ret;
 }
 
 
 bool file_to_string(const std::string& filename, std::string& content){
-    QFile file(QString::fromStdString(filename));
-    if (!file.open(QFile::ReadOnly)){
+    FileIO file;
+    if (!file.open(filename, FileMode::READ)){
         return false;
     }
-    content = file.readAll().toStdString();
+
+    char buffer[4096];
+
+    std::string ret;
+    while (true){
+        size_t actual = file.read(buffer, sizeof(buffer));
+        ret += std::string(buffer, actual);
+        if (actual < sizeof(buffer)){
+            break;
+        }
+    }
+    content = std::move(ret);
     return true;
 }
 
