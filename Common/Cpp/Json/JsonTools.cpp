@@ -4,9 +4,6 @@
  *
  */
 
-#include <QJsonValue>
-#include <QJsonArray>
-#include <QJsonObject>
 #include <QFile>
 #include "Common/Cpp/Exceptions.h"
 #include "JsonTools.h"
@@ -139,84 +136,6 @@ nlohmann::json to_nlohmann(const JsonValue& json){
     return nlohmann::json();
 }
 
-
-JsonValue from_QJson(const QJsonValue& json){
-    if (json.isNull()){
-        return JsonValue();
-    }
-    if (json.isBool()){
-        return JsonValue(json.toBool());
-    }
-    if (json.isDouble()){
-        double value = json.toDouble();
-        return value == (int64_t)value
-            ? JsonValue(json.toInt())
-            : JsonValue(value);
-    }
-    if (json.isString()){
-        return JsonValue(json.toString().toStdString());
-    }
-    if (json.isArray()){
-        JsonArray array;
-        for (QJsonValueRef item : json.toArray()){
-            array.push_back(from_QJson(item));
-        }
-        return array;
-    }
-    if (json.isObject()){
-        QJsonObject obj = json.toObject();
-        JsonObject object;
-        for (auto it = obj.begin(); it != obj.end(); ++it){
-            object[it.key().toStdString()] = from_QJson(it.value());
-        }
-        return object;
-    }
-    return JsonValue();
-}
-QJsonValue to_QJson(const JsonValue& json){
-    if (json.is_null()){
-        return QJsonValue();
-    }
-    {
-        bool value;
-        if (json.read_boolean(value)){
-            return value;
-        }
-    }
-    {
-        qint64 value;
-        if (json.read_integer(value)){
-            return value;
-        }
-    }
-    {
-        double value;
-        if (json.read_float(value)){
-            return value;
-        }
-    }
-    {
-        std::string value;
-        if (json.read_string(value)){
-            return QString::fromStdString(value);
-        }
-    }
-    if (json.is_array()){
-        QJsonArray ret;
-        for (const auto& item : *json.to_array()){
-            ret.append(to_QJson(item));
-        }
-        return ret;
-    }
-    if (json.is_object()){
-        QJsonObject ret;
-        for (const auto& item : *json.to_object()){
-            ret.insert(QString::fromStdString(item.first), to_QJson(item.second));
-        }
-        return ret;
-    }
-    return QJsonValue();
-}
 
 
 

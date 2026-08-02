@@ -8,7 +8,6 @@
 #include <QObject>
 #include <QByteArray>
 #include <QEventLoop>
-#include <QJsonDocument>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>

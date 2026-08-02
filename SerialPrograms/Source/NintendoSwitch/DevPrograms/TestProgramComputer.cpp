@@ -15,7 +15,6 @@
 #include <fstream>
 #include <condition_variable>
 #include <QImage>
-#include <QJsonObject>
 #include <QDir>
 #include <QDateTime>
 #include <QGuiApplication>
@@ -1680,62 +1679,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     select_move(env.logger(), state, 1);
 #endif
 
-#if 0
-    using namespace nlohmann;
 
-    json j2 = {
-      {"pi", 3.141},
-      {"happy", true},
-      {"name", "Niels"},
-      {"nothing", nullptr},
-      {"answer", {
-        {"everything", 42}
-      }},
-      {"list", {1, 0, 2}},
-      {"object", {
-        {"currency", "USD"},
-        {"value", 42.99}
-      }}
-    };
-
-//    cout << "str = " << 123 << endl;
-//    std::string str = j2.get<std::string>();
-//    cout << "str = " << str << endl;
-
-    cout << json((int8_t)1).dump() << endl;
-    cout << json((int16_t)1).dump() << endl;
-    cout << json((int32_t)1).dump() << endl;
-    cout << json((int64_t)1).dump() << endl;
-
-    {
-        cout << j2.dump() << endl;
-        JsonValue2 value = from_nlohmann(j2);
-        json j3 = to_nlohmann(value);
-        cout << j3.dump() << endl;
-    }
-    QJsonObject obj = QJsonDocument::fromJson(j2.dump().c_str()).object();
-    {
-        cout << j2.dump() << endl;
-        JsonValue2 value = from_QJson(obj);
-        QJsonValue obj2 = to_QJson(value);
-//        cout << QJson_to_nlohmann(obj2).dump() << endl;
-    }
-
-//    cout << QDir::current().relativeFilePath(RESOURCE_PATH()).toStdString() << endl;
-#endif
-
-#if 0
-    std::string str;
-
-
-    cout << j2.dump(4) << endl;
-
-    json j3 = "asdf";
-    cout << j3.dump(4) << endl;
-
-    QJsonDocument doc(QJsonDocument::fromJson("asdf"));
-    cout << doc.toJson().data() << endl;
-#endif
 
 #if 0
     int16_t in[4] = {1, 1, 2, -2};

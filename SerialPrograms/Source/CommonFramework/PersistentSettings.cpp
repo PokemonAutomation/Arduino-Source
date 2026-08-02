@@ -76,7 +76,6 @@ void PersistentSettings::read(){
     {
         JsonObject* value = obj->get_object("99-Panels");
         if (value){
-//            panels = to_QJson(*value).toObject();
             panels = std::move(*value);
         }
     }
