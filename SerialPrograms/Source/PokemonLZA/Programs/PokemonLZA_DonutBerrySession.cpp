@@ -86,7 +86,8 @@ PageIngredients BerrySession::read_screen(std::shared_ptr<const ImageRGB32> scre
                 image_result.clear_beyond_alpha(DonutBerriesReader::MAX_ALPHA);
             }
         },
-        0, DonutBerriesReader::BERRY_PAGE_LINES + 1
+        0, DonutBerriesReader::BERRY_PAGE_LINES + 1,
+        OCR::allow_parallel_ocr() ? 1 : (size_t)-1
     );
 
 #if 0 //Todo: Image match isn't the best since quantity covers it

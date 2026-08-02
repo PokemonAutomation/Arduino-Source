@@ -37,6 +37,18 @@ bool ocr_language_available(Language language);
 // an error will be thrown within OCR initialization infra.
 std::string ocr_read(Language language, const ImageViewRGB32& image, PageSegMode psm = PageSegMode::SINGLE_LINE);
 
+//
+//  Return if we should allow multiple OCRs are run in parallel.
+//  The reason why this may return false is if the OCR backend is already
+//  parallelizing - in which case parallelizing on top may oversubscribe and
+//  lag the computer.
+//
+//  This is merely a performance hint. You are free to parallelize even if this
+//  returns false.
+//
+bool allow_parallel_ocr(PageSegMode psm = PageSegMode::SINGLE_LINE);
+
+
 void ensure_ocr_instances(Language language, size_t instances = 1);
 
 void clear_ocr_cache();

@@ -173,6 +173,8 @@ void ThreadPool_Default::run_in_parallel(
             block_size = 1;
         }
     }
+    block_size = std::min(block_size, total);
+//    cout << "block_size = " << block_size << endl;
 
     size_t blocks = (total + block_size - 1) / block_size;
 

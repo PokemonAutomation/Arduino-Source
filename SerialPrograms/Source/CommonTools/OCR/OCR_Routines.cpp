@@ -48,6 +48,19 @@ std::string ocr_read(Language language, const ImageViewRGB32& image, PageSegMode
     return ocr_text;
 }
 
+bool allow_parallel_ocr(PageSegMode psm){
+    if (psm == PageSegMode::AUTO || psm == PageSegMode::SINGLE_BLOCK || psm == PageSegMode::SINGLE_COLUMN){
+        // if using multiline detection, force Tesseract
+        return true;
+    }else{
+        if (GlobalSettings::instance().OCR_LIBRARY == OcrLibrary::PADDLE_OCR){
+            return false;
+        }else{
+            return true;
+        }
+    }
+}
+
 void ensure_ocr_instances(Language language, size_t instances){
     if (GlobalSettings::instance().OCR_LIBRARY == OcrLibrary::PADDLE_OCR){
         OCR::ensure_paddle_ocr_instance(language);
@@ -95,7 +108,7 @@ StringMatchResult multifiltered_OCR(
             const std::pair<ImageRGB32, size_t>& filtered = filtered_images[index];
 
             std::string text = OCR::ocr_read(language, filtered.first, psm);
-            
+
             // cout << "multifiltered_OCR: " << index << " -> " << text << endl;
             // filtered.first.save("test_" + std::to_string(index) + ".png");
 
@@ -111,9 +124,9 @@ StringMatchResult multifiltered_OCR(
             WriteSpinLock lg(lock);
             ret.exact_match |= current.exact_match;
             ret.results.insert(current.results.begin(), current.results.end());
-
         },
-        0, filtered_images.size(), 1
+        0, filtered_images.size(),
+        allow_parallel_ocr(psm) ? 1 : (size_t)-1
     );
 //    int c = 0;
 //    for (const auto& filtered : filtered_images){
