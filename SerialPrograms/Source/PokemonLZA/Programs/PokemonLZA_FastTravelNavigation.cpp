@@ -236,9 +236,9 @@ bool navigate_to_lumiose_sewers_location(
     context.wait_for_all_requests();
 
     WallClock deadline = current_time() + 60s;
-    do {
+    do{
         // Set selector to second to last spot
-        do {
+        do{
             int current_selector_index = get_current_selector_index(console, FAST_TRAVEL_ARROW_BOX(), FAST_TRAVEL_SPACING);
             if (current_selector_index == -1){
                 return false;
@@ -260,7 +260,12 @@ bool navigate_to_lumiose_sewers_location(
 
         // Read second to last spot only
         LocationItem second_to_last_location;
-        OCR::StringMatchResult result = location_name_reader.read_location_name(console.video().snapshot(), console.logger(), language, LocationNameReader::PAGE_SIZE - 2);
+        OCR::StringMatchResult result = location_name_reader.read_location_name(
+            console.video().snapshot(),
+            console.logger(),
+            language,
+            LocationNameReader::PAGE_SIZE - 2
+        );
         result.clear_beyond_log10p(LocationNameOCR::MAX_LOG10P);
         result.clear_beyond_spread(LocationNameOCR::MAX_LOG10P_SPREAD);
         for (auto& item : result.results){
@@ -301,7 +306,7 @@ bool navigate_to_lumiose_sewers_location(
         }
         pbf_press_dpad(context, DPAD_DOWN, 100ms, 200ms);
         context.wait_for_all_requests();
-    } while (current_time() < deadline);
+    }while (current_time() < deadline);
     console.log("Timeout navigating to sewers location: " + target_destination.slug);
     return false;
 }
@@ -489,7 +494,8 @@ std::vector<LocationItem> read_current_page_location_items(ConsoleHandle& consol
                 console.log("Fast Travel Menu Item " + std::to_string(index) + ": " + item.second.token);
             }
         },
-        0, LocationNameReader::PAGE_SIZE
+        0, LocationNameReader::PAGE_SIZE,
+        OCR::allow_parallel_ocr() ? 1 : (size_t)-1
     );
     if (locations.size() != LocationNameReader::PAGE_SIZE){
         console.log("Unable to read all location names in fast travel menu.");

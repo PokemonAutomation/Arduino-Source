@@ -202,6 +202,8 @@ void ThreadPool_Default::run_in_parallel(
         }
         spawn_threads();
 
+        //  Don't do this since this thread might be of a different priority.
+#if 0
         //  Use this thread to process the queue until our tasks are done.
         while (!m_queue.empty() && !tasks.back().is_finished()){
             AsyncTaskCore* task = m_queue.front();
@@ -210,6 +212,7 @@ void ThreadPool_Default::run_in_parallel(
             ReverseLockGuard<Mutex> lg0(m_lock);
             task->run();
         }
+#endif
     }
 
     //  Wait for everything to finish.
