@@ -11,7 +11,7 @@
 #include "Common/PABotBase2/PABotBase2CC_MessageDumper.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "Common/Cpp/ColoredText.h"
 #include "Controllers/ControllerTypeStrings.h"
 #include "Controllers/ControllerSettings.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"

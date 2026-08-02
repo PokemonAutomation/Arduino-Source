@@ -10,6 +10,7 @@
 #include <QCryptographicHash>
 #include <QDesktopServices>
 #include <QUrl>
+#include "Common/Cpp/ColoredText.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/Json/JsonValue.h"

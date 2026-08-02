@@ -19,7 +19,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/Recording/StreamHistorySession.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "ProgramDumper.h"

@@ -7,6 +7,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QApplication>
+#include "Common/Cpp/ColoredText.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "ThemeSelectorOption.h"
@@ -14,11 +15,9 @@
 namespace PokemonAutomation{
 
 
-size_t current_theme = 0;
-
 
 void set_theme(size_t index){
-    if (index == current_theme){
+    if (index == CURRENT_THEME){
         return;
     }
     QString stylesheet;
@@ -42,7 +41,7 @@ void set_theme(size_t index){
     QApplication* app = static_cast<QApplication*>(QApplication::instance());
     app->setStyleSheet(stylesheet);
 
-    current_theme = index;
+    CURRENT_THEME = index;
 }
 
 
@@ -69,46 +68,6 @@ void ThemeSelectorOption::load_json(const JsonValue& json){
     IntegerEnumDropdownOption::load_json(json);
     set_theme(current_value());
 }
-
-
-
-#if 1
-Color theme_friendly_darkblue(){
-    if (current_theme == 1){
-        return Color(0xff0080ff);
-    }
-    return COLOR_DARK_BLUE;
-}
-#endif
-std::string html_color_text(const std::string& text, Color color){
-    if (color == Color()){
-        return text;
-    }
-    const char HEX[] = "0123456789abcdef";
-    uint32_t rgb = (uint32_t)color;
-    std::string str;
-    str += HEX[(rgb >> 20) & 15];
-    str += HEX[(rgb >> 16) & 15];
-    str += HEX[(rgb >> 12) & 15];
-    str += HEX[(rgb >>  8) & 15];
-    str += HEX[(rgb >>  4) & 15];
-    str += HEX[(rgb >>  0) & 15];
-    return "<font color=#" + str + ">" + text + "</font>";
-}
-std::string make_text_url(const std::string& url, const std::string& text){
-#if 0
-    switch (current_theme){
-    case 0:
-        return "<a href=\"" + url + "\">" + text + "</a>";
-    case 1:
-        return "<a href=\"" + url + "\" style=\"color: #0080ff\">" + text + "</a>";
-    }
-    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid theme #.");
-#endif
-    return "<a href=\"" + url + "\" style=\"color: #0080ff\">" + text + "</a>";
-}
-
-
 
 
 

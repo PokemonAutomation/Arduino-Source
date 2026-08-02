@@ -8,7 +8,7 @@
 #include "Common/Qt/Options/ConfigWidget.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/Panels/ConsoleSettingsStretch.h"
 #include "CommonFramework/Recording/StreamHistoryOption.h"
 #include "ControllerInput/ControllerInput.h"

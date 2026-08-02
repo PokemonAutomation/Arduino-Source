@@ -26,6 +26,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/CancellableScope.h
     ../Common/Cpp/Color.cpp
     ../Common/Cpp/Color.h
+    ../Common/Cpp/ColoredText.cpp
+    ../Common/Cpp/ColoredText.h
     ../Common/Cpp/Concurrency/AsyncTask.h
     ../Common/Cpp/Concurrency/Backends/AsyncTask_Default.h
     ../Common/Cpp/Concurrency/Backends/Thread_Qt.tpp

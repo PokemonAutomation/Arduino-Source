@@ -12,7 +12,7 @@
 #include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2_PacketProtocol.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "Controllers/SerialPortPollerQt.h"
 #include "SerialPABotBase2_Connection.h"

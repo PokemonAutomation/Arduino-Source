@@ -6,7 +6,7 @@
 
 #include <QHBoxLayout>
 #include "CommonFramework/StaticGlobals.h"
-#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "Common/Cpp/ColoredText.h"
 #include "ML_ImageAnnotationCommandRow.h"
 
 //#include <iostream>
