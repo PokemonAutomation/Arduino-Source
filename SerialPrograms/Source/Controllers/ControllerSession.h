@@ -13,6 +13,7 @@
 //#include "Common/Cpp/Exceptions.h"
 #include "Controller.h"
 #include "ControllerDescriptor.h"
+#include "ControllerOption.h"
 #include "ControllerConnection.h"
 
 namespace PokemonAutomation{

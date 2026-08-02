@@ -769,6 +769,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/ControllerConnection.h
     Source/Controllers/ControllerDescriptor.cpp
     Source/Controllers/ControllerDescriptor.h
+    Source/Controllers/ControllerOption.cpp
+    Source/Controllers/ControllerOption.h
     Source/Controllers/ControllerSelectorWidget.cpp
     Source/Controllers/ControllerSelectorWidget.h
     Source/Controllers/ControllerSession.cpp
