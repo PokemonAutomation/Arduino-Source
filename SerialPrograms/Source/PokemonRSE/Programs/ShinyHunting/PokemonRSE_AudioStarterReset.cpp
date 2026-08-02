@@ -147,7 +147,8 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
         switch (TARGET){
         case Target::treecko:
             env.log("Treecko selected. Moving left.");
-            pbf_press_dpad(context, DPAD_LEFT, 320ms, 800ms);
+            pbf_press_dpad(context, DPAD_LEFT, 120ms, 100ms); //Double up in case
+            pbf_press_dpad(context, DPAD_LEFT, 120ms, 100ms); //of dropped press
             break;
         case Target::torchic:
             //Default cursor position, do nothing.
@@ -155,7 +156,8 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
             break;
         case Target::mudkip:
             env.log("Mudkip selected. Moving right.");
-            pbf_press_dpad(context, DPAD_RIGHT, 320ms, 800ms);
+            pbf_press_dpad(context, DPAD_RIGHT, 120ms, 100ms);
+            pbf_press_dpad(context, DPAD_RIGHT, 120ms, 100ms);
             break;
         default:
             env.log("Invalid target selected.");

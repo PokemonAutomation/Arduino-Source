@@ -20,6 +20,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonRSE/Inference/Dialogs/PokemonRSE_BattleDialogs.h"
 #include "PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h"
+#include "PokemonRSE/Inference/Menus/PokemonRSE_LoadMenuDetector.h"
 #include "PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.h"
 #include "PokemonRSE/PokemonRSE_Settings.h"
 #include "PokemonRSE_Navigation.h"
@@ -88,11 +89,13 @@ bool try_soft_reset(ConsoleHandle& console, ProControllerContext& context){
     // A + B + Select + Start
     pbf_press_button(context, BUTTON_B | BUTTON_A | BUTTON_MINUS | BUTTON_PLUS, 360ms, 1440ms);
 
+    //Mash select to get to "Push Start Button" with Kyogre/Groudon/Rayquaza background
     pbf_mash_button(context, BUTTON_MINUS, GameSettings::instance().SELECT_BUTTON_MASH0);
     context.wait_for_all_requests();
 
     //Wait for save file select screen
     WhiteScreenOverWatcher whitescreen(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    LoadMenuWatcher load_menu(COLOR_RED);
 
     int ls = run_until<ProControllerContext>(
         console, context,
@@ -101,11 +104,13 @@ bool try_soft_reset(ConsoleHandle& console, ProControllerContext& context){
             pbf_wait(context, 5000ms);
             context.wait_for_all_requests();
         },
-        { whitescreen }
+        { whitescreen, load_menu }
     );
     context.wait_for_all_requests();
     if (ls == 0){
-        console.log("Entered load menu.");
+        console.log("Entered load menu. (WhiteScreenOver)");
+    }else if (ls == 1){
+        console.log("Entered load menu. (LoadMenu)");
     }else{
         console.log("soft_reset(): Unable to enter load menu.", COLOR_RED);
         return false;

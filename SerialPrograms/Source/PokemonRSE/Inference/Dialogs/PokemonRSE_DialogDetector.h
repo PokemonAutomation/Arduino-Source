@@ -101,7 +101,8 @@ public:
 
 
 
-// Detection for the Yes/No prompt
+// Detection for the Yes/No prompt. (Poke Center, Move Deleter)
+// Does not work for starter selection, dialog box and prompt are different.
 class SelectionDialogDetector : public StaticScreenDetector{
 public:
     SelectionDialogDetector(Color color);
