@@ -6,10 +6,15 @@
 
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "Tests/TestUtils.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "PokemonSV_BoxGenderDetector.h"
+#include "PokemonSV_BoxShinyDetector.h"
 #include "PokemonSV_BoxDetection.h"
 
 #include <iostream>
@@ -425,6 +430,103 @@ bool BoxSelectionBoxModeWatcher::process_frame(const ImageViewRGB32& frame, Wall
 bool BoxSelectionBoxModeWatcher::in_box_selection_mode() const{
     // If we have button Y detected, then we are NOT in box selection mode
     return !button_y_watcher.consistent_result();
+}
+
+
+
+
+
+
+
+class Test_BoxInfoDetector : public UnitTest{
+public:
+    Test_BoxInfoDetector(
+        const std::string& image,
+        std::vector<std::string> words
+    )
+        : UnitTest("PokemonSV::BoxInfoDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_words(std::move(words))
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        // two words: <shiny or not> <gender (1: male, 2: female, 3: genderless)
+        if (m_words.size() < 2){
+            std::stringstream ss;
+            ss << "Error: not enough number of words in the filename. Found only " << m_words.size() << "." << std::endl;
+            return ss.str();
+        }
+
+        bool target_shiny = false;
+        int target_gender = 0;
+        if (parse_bool(m_words[m_words.size()-2], target_shiny) == false){
+            std::stringstream ss;
+            ss << "Error: word " << m_words[m_words.size()-2] << " is wrong. Must be True or False. " << std::endl;
+            return ss.str();
+        }
+        if (parse_int(m_words[m_words.size()-1], target_gender) == false){
+            std::stringstream ss;
+            ss << "Error: word " << m_words[m_words.size()-1] << " is wrong. Must be int (1: male, 2: female, 3: genderless). " << std::endl;
+            return ss.str();
+        }
+
+        SomethingInBoxSlotDetector sth_detector(COLOR_RED);
+        ImageRGB32 image(m_image);
+        bool sth = sth_detector.detect(image);
+        TEST_RESULT_EQUAL(sth, true);
+
+        BoxShinyDetector shiny_detector;
+        bool shiny_result = shiny_detector.detect(image);
+
+        TEST_RESULT_EQUAL(shiny_result, target_shiny);
+
+        BoxGenderDetector gender_detector;
+        int gender_result = (int)gender_detector.detect(image);
+        TEST_RESULT_EQUAL(gender_result, target_gender);
+
+        return true;
+    };
+
+private:
+    std::string m_image;
+    const std::vector<std::string> m_words;
+};
+
+
+
+void add_tests_BoxInfoDetector(UnitTestDatabase& database){
+    database.add<Test_BoxInfoDetector>(
+        "PokemonSV/BoxPokemonInfoDetector/Deerling_True_1.png",
+        std::vector<std::string>{"Deerling", "True", "1"}
+    );
+    database.add<Test_BoxInfoDetector>(
+        "PokemonSV/BoxPokemonInfoDetector/Dragapult_2_False_2.png",
+        std::vector<std::string>{"Dragapult", "2", "False", "2"}
+    );
+    database.add<Test_BoxInfoDetector>(
+        "PokemonSV/BoxPokemonInfoDetector/Dragapult_False_2.png",
+        std::vector<std::string>{"Dragapult", "False", "2"}
+    );
+    database.add<Test_BoxInfoDetector>(
+        "PokemonSV/BoxPokemonInfoDetector/Egg_False_3.png",
+        std::vector<std::string>{"Egg", "False", "3"}
+    );
+    database.add<Test_BoxInfoDetector>(
+        "PokemonSV/BoxPokemonInfoDetector/Lachonk_Korean_True_2.png",
+        std::vector<std::string>{"Lachonk", "Korean", "True", "2"}
+    );
+    database.add<Test_BoxInfoDetector>(
+        "PokemonSV/BoxPokemonInfoDetector/Magnemite_False_3.png",
+        std::vector<std::string>{"Magnemite", "False", "3"}
+    );
+    database.add<Test_BoxInfoDetector>(
+        "PokemonSV/BoxPokemonInfoDetector/Salamence_False_2.png",
+        std::vector<std::string>{"Salamence", "False", "2"}
+    );
+    database.add<Test_BoxInfoDetector>(
+        "PokemonSV/BoxPokemonInfoDetector/Tauros_False_1.png",
+        std::vector<std::string>{"Tauros", "False", "1"}
+    );
 }
 
 

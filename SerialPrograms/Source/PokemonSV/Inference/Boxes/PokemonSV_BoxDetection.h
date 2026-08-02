@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSV_BoxDetection_H
 
 #include "Common/Cpp/Containers/FixedLimitVector.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
@@ -195,6 +196,11 @@ public:
 private:
     WhiteButtonWatcher button_y_watcher;
 };
+
+
+
+
+void add_tests_BoxInfoDetector(UnitTestDatabase& database);
 
 
 

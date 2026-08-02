@@ -43,40 +43,6 @@ using namespace NintendoSwitch::PokemonSV;
 
 
 
-int test_pokemonSV_BoxPokemonInfoDetector(const ImageViewRGB32& image, const std::vector<std::string>& words){
-    // two words: <shiny or not> <gender (1: male, 2: female, 3: genderless)
-    if (words.size() < 2){
-        cerr << "Error: not enough number of words in the filename. Found only " << words.size() << "." << endl;
-        return 1;
-    }
-
-    bool target_shiny = false;
-    int target_gender = 0;
-    if (parse_bool(words[words.size()-2], target_shiny) == false){
-        cerr << "Error: word " << words[words.size()-2] << " is wrong. Must be True or False. " << endl;
-        return 1;
-    }
-    if (parse_int(words[words.size()-1], target_gender) == false){
-        cerr << "Error: word " << words[words.size()-1] << " is wrong. Must be int (1: male, 2: female, 3: genderless). " << endl;
-        return 1;
-    }
-
-    SomethingInBoxSlotDetector sth_detector(COLOR_RED);
-    bool sth = sth_detector.detect(image);
-    TEST_RESULT_EQUAL(sth, true);
-
-    BoxShinyDetector shiny_detector;
-    bool shiny_result = shiny_detector.detect(image);
-
-    TEST_RESULT_EQUAL(shiny_result, target_shiny);
-
-    BoxGenderDetector gender_detector;
-    int gender_result = (int)gender_detector.detect(image);
-    TEST_RESULT_EQUAL(gender_result, target_gender);
-
-    return 0;
-}
-
 int test_pokemonSV_SomethingInBoxSlotDetector(const ImageViewRGB32& image, bool target){
     SomethingInBoxSlotDetector sth_detector(COLOR_RED);
     bool sth = sth_detector.detect(image);
