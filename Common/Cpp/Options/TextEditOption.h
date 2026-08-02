@@ -50,7 +50,7 @@ public:
     operator std::string() const;
     void set(std::string x);
 
-    void append(std::string x);
+    void append(const std::string& x);
 
 
 public:

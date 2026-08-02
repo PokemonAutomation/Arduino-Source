@@ -112,12 +112,15 @@ void TextEditOption::set(std::string x){
     }
     report_value_changed(this);
 }
-void TextEditOption::append(std::string x){
+void TextEditOption::append(const std::string& x){
     if (x.empty()){
         return;
     }
-    m_data->m_current += x;
-    m_data->append_listeners.run_method(&AppendListener::on_append, std::move(x));
+    {
+        WriteSpinLock lg(m_data->m_lock);
+        m_data->m_current += x;
+    }
+    m_data->append_listeners.run_method(&AppendListener::on_append, x);
     report_value_changed(this);
 }
 
