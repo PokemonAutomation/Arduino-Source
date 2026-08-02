@@ -38,7 +38,7 @@ void SerialPortPoller::stop(){
 
 
 void SerialPortPoller::begin_refresh_now(){
-    global_periodic_runner().bump(*this, true);
+    global_periodic_runner().trigger_run_now(*this);
 }
 WallClock SerialPortPoller::last_changed() const{
     ReadSpinLock lg(m_lock);

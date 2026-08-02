@@ -30,7 +30,7 @@ public:
 
     void stop();
 
-    void bump(Runnable& runnable, bool run_it) noexcept;
+    void trigger_run_now(Runnable& runnable) noexcept;
 
     void add_runnable(Runnable& runnable, WallDuration period);
     void remove_runnable(Runnable& runnable) noexcept;

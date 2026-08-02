@@ -51,7 +51,7 @@ void PeriodicRunner::update_next(
 }
 
 
-void PeriodicRunner::bump(Runnable& runnable, bool run_it) noexcept{
+void PeriodicRunner::trigger_run_now(Runnable& runnable) noexcept{
     {
         WallClock next = current_time();
         std::lock_guard<Mutex> lg(m_lock);
@@ -77,14 +77,6 @@ void PeriodicRunner::bump(Runnable& runnable, bool run_it) noexcept{
                 break;
             }
             ++schedule_iter;
-        }
-
-        if (run_it){
-            runnable_iter->second.busy = true;
-            m_lock.unlock();
-            runnable_iter->first->run();
-            m_lock.lock();
-            runnable_iter->second.busy = false;
         }
 
         update_next(schedule_iter, next);
