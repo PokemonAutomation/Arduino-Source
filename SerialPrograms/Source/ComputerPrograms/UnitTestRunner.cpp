@@ -12,11 +12,12 @@
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "UnitTestRunner.h"
 
+#include "CommonTools/OCR/OCR_Tests.h"
 #include "PokemonHome/PokemonHome_Tests.h"
 #include "PokemonSwSh/PokemonSwSh_Tests.h"
 #include "PokemonLA/PokemonLA_Tests.h"
 #include "PokemonSV/PokemonSV_Tests.h"
-#include "CommonTools/OCR/OCR_Tests.h"
+#include "PokemonLZA/PokemonLZA_Tests.h"
 
 namespace PokemonAutomation{
 namespace ComputerPrograms{
@@ -34,6 +35,7 @@ UnitTestDatabase make_UNIT_TESTS_ALL(){
     NintendoSwitch::PokemonSwSh::add_tests(ret);
     NintendoSwitch::PokemonLA::add_tests(ret);
     NintendoSwitch::PokemonSV::add_tests(ret);
+    NintendoSwitch::PokemonLZA::add_tests(ret);
 
     return ret;
 }

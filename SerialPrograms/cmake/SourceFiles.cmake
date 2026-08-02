@@ -1970,6 +1970,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/PokemonLZA_Panels.h
     Source/PokemonLZA/PokemonLZA_Settings.cpp
     Source/PokemonLZA/PokemonLZA_Settings.h
+    Source/PokemonLZA/PokemonLZA_Tests.cpp
+    Source/PokemonLZA/PokemonLZA_Tests.h
     Source/PokemonLZA/Programs/Farming/PokemonLZA_DonutMaker.cpp
     Source/PokemonLZA/Programs/Farming/PokemonLZA_DonutMaker.h
     Source/PokemonLZA/Programs/Farming/PokemonLZA_FriendshipFarmer.cpp
@@ -2920,8 +2922,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Tests/NintendoSwitch_Tests.h
     Source/Tests/PokemonFRLG_Tests.cpp
     Source/Tests/PokemonFRLG_Tests.h
-    Source/Tests/PokemonLZA_Tests.cpp
-    Source/Tests/PokemonLZA_Tests.h
+    Source/Tests/PokemonLZA_Tests_Old.cpp
+    Source/Tests/PokemonLZA_Tests_Old.h
     Source/Tests/PokemonSV_Tests_Old.cpp
     Source/Tests/PokemonSV_Tests_Old.h
     Source/Tests/TestMap.cpp

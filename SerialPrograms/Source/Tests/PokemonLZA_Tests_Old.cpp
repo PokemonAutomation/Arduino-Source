@@ -24,7 +24,7 @@
 #include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "SerialPrograms/Source/CommonFramework/GlobalSettingsPanel.h"
-#include "PokemonLZA_Tests.h"
+#include "PokemonLZA_Tests_Old.h"
 #include "TestUtils.h"
 #include <iostream>
 #include <fstream>
@@ -43,13 +43,6 @@ using namespace NintendoSwitch::PokemonLZA;
 
 
 
-int test_pokemonLZA_FlatWhiteDialogDetector(const ImageViewRGB32& image, bool target){
-    auto overlay = DummyVideoOverlay();
-    FlatWhiteDialogDetector detector(COLOR_RED, &overlay);
-    bool result = detector.detect(image);
-    TEST_RESULT_EQUAL(result, target);
-    return 0;
-}
 
 int test_pokemonLZA_BlueDialogDetector(const ImageViewRGB32& image, bool target){
     auto overlay = DummyVideoOverlay();

@@ -10,7 +10,7 @@
 #include <optional>
 //#include <atomic>
 #include "Common/Cpp/Color.h"
-//#include "Common/Cpp/Logging/AbstractLogger.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/VisualDetector.h"
@@ -211,6 +211,18 @@ public:
          : DetectorToFinder("BlueDialogWatcher", hold_duration, color, overlay)
     {}
 };
+
+
+
+
+
+
+
+
+void add_tests_DialogDetector(UnitTestDatabase& database);
+
+
+
 
 
 }

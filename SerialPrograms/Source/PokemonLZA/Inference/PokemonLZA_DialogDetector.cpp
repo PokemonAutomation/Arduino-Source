@@ -4,15 +4,17 @@
  *
  */
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-//#include "CommonTools/Images/SolidColorTest.h"
-#include "PokemonLZA_DialogDetector.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "Tests/TestUtils.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "PokemonLZA_DialogDetector.h"
 
 //#include <iostream>
 //using std::cout;
@@ -467,6 +469,55 @@ bool LightBlueDialogDetector::detect(const ImageViewRGB32& screen){
 
     return found;
 }
+
+
+
+
+
+class Test_FlatWhiteDialogDetector : public UnitTest{
+public:
+    Test_FlatWhiteDialogDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonPLZA::FlatWhiteDialogDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyVideoOverlay overlay;
+        FlatWhiteDialogDetector detector(COLOR_RED, &overlay);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+
+
+void add_tests_DialogDetector(UnitTestDatabase& database){
+    database.add<Test_FlatWhiteDialogDetector>("PokemonLZA/FlatWhiteDialogDetector/chao_fossil_True.png", true);
+    database.add<Test_FlatWhiteDialogDetector>("PokemonLZA/FlatWhiteDialogDetector/french_fossil_1_True.png", true);
+    database.add<Test_FlatWhiteDialogDetector>("PokemonLZA/FlatWhiteDialogDetector/french_fossil_2_True.png", true);
+    database.add<Test_FlatWhiteDialogDetector>("PokemonLZA/FlatWhiteDialogDetector/french_fossil_3_True.png", true);
+    database.add<Test_FlatWhiteDialogDetector>("PokemonLZA/FlatWhiteDialogDetector/french_fossil_4_True.png", true);
+    database.add<Test_FlatWhiteDialogDetector>("PokemonLZA/FlatWhiteDialogDetector/french_fossil_5_True.png", true);
+    database.add<Test_FlatWhiteDialogDetector>("PokemonLZA/FlatWhiteDialogDetector/french_fossil_6_True.png", true);
+    database.add<Test_FlatWhiteDialogDetector>("PokemonLZA/FlatWhiteDialogDetector/french_jacinthe_2_True.png", true);
+    database.add<Test_FlatWhiteDialogDetector>("PokemonLZA/FlatWhiteDialogDetector/french_jacinthe_3_True.png", true);
+    database.add<Test_FlatWhiteDialogDetector>("PokemonLZA/FlatWhiteDialogDetector/french_jacinthe_True.png", true);
+    database.add<Test_FlatWhiteDialogDetector>("PokemonLZA/FlatWhiteDialogDetector/mac_fossil_True.png", true);
+    database.add<Test_FlatWhiteDialogDetector>("PokemonLZA/FlatWhiteDialogDetector/mac_jacinthe_excited_True.png", true);
+    database.add<Test_FlatWhiteDialogDetector>("PokemonLZA/FlatWhiteDialogDetector/mac_jacinthe_pre_battle_transparent_False.png", false);
+    database.add<Test_FlatWhiteDialogDetector>("PokemonLZA/FlatWhiteDialogDetector/mac_restaurant_True.png", true);
+    database.add<Test_FlatWhiteDialogDetector>("PokemonLZA/FlatWhiteDialogDetector/mac_seven_wonder_leftout_True.png", true);
+}
+
+
 
 
 
