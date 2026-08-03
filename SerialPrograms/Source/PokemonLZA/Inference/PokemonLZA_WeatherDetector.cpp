@@ -4,13 +4,22 @@
  *
  */
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageDiff.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "Tests/TestUtils.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonLZA_WeatherDetector.h"
+#include <array>
 #include <algorithm>
+#include <cctype>
+#include <limits>
+#include <sstream>
 #include <stdexcept>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -36,8 +45,8 @@ const std::vector<SupplementalTemplateCheck>& supplemental_template_checks(Weath
         {"PokemonLZA/Weather/rain_drop.png",  ImageFloatBox(0.8885, 0.0525, 0.0050, 0.0150), COLOR_BLUE,  90.0},
     };
     static const std::vector<SupplementalTemplateCheck> CLOUDY = {
-        {"PokemonLZA/Weather/cloudy_cloud.png", ImageFloatBox(0.8895, 0.0430, 0.0210, 0.0265), COLOR_GREEN, 90.0},
-        {"PokemonLZA/Weather/cloudy_drop.png",  ImageFloatBox(0.8915, 0.0255, 0.0050, 0.0100), COLOR_BLUE,  90.0},
+        {"PokemonLZA/Weather/cloudy_cloud.png", ImageFloatBox(0.8895, 0.0430, 0.0210, 0.0265), COLOR_GREEN, 100.0},
+        {"PokemonLZA/Weather/cloudy_drop.png",  ImageFloatBox(0.8915, 0.0255, 0.0050, 0.0100), COLOR_BLUE,  100.0},
     };
     static const std::vector<SupplementalTemplateCheck> RAINBOW = {
         {"PokemonLZA/Weather/rainbow_cloud.png", ImageFloatBox(0.8840, 0.0465, 0.0140, 0.0165), COLOR_GREEN, 90.0},
@@ -62,6 +71,131 @@ const std::vector<SupplementalTemplateCheck>& supplemental_template_checks(Weath
     }
 }
 
+const char* weather_full_template_path(WeatherIconType type){
+    switch (type){
+    case WeatherIconType::Clear:   return "PokemonLZA/Weather/clear_full.png";
+    case WeatherIconType::Sunny:   return "PokemonLZA/Weather/sunny_full.png";
+    case WeatherIconType::Rain:    return "PokemonLZA/Weather/rain_full.png";
+    case WeatherIconType::Cloudy:  return "PokemonLZA/Weather/cloudy_full.png";
+    case WeatherIconType::Foggy:   return "PokemonLZA/Weather/foggy_full.png";
+    case WeatherIconType::Rainbow: return "PokemonLZA/Weather/rainbow_full.png";
+    default:                       return nullptr;
+    }
+}
+
+const ImageRGB32& weather_full_template_image(WeatherIconType type){
+    static const ImageRGB32 CLEAR(RESOURCE_PATH() + std::string(weather_full_template_path(WeatherIconType::Clear)));
+    static const ImageRGB32 SUNNY(RESOURCE_PATH() + std::string(weather_full_template_path(WeatherIconType::Sunny)));
+    static const ImageRGB32 RAIN(RESOURCE_PATH() + std::string(weather_full_template_path(WeatherIconType::Rain)));
+    static const ImageRGB32 CLOUDY(RESOURCE_PATH() + std::string(weather_full_template_path(WeatherIconType::Cloudy)));
+    static const ImageRGB32 FOGGY(RESOURCE_PATH() + std::string(weather_full_template_path(WeatherIconType::Foggy)));
+    static const ImageRGB32 RAINBOW(RESOURCE_PATH() + std::string(weather_full_template_path(WeatherIconType::Rainbow)));
+
+    switch (type){
+    case WeatherIconType::Clear:   return CLEAR;
+    case WeatherIconType::Sunny:   return SUNNY;
+    case WeatherIconType::Rain:    return RAIN;
+    case WeatherIconType::Cloudy:  return CLOUDY;
+    case WeatherIconType::Foggy:   return FOGGY;
+    case WeatherIconType::Rainbow: return RAINBOW;
+    default:                       return CLEAR;
+    }
+}
+
+double full_template_rmsd(const ImageViewRGB32& screen, WeatherIconType type){
+    ImageViewRGB32 candidate = extract_box_reference(screen, WEATHER_ICON_ROI);
+    const ImageRGB32& templ = weather_full_template_image(type);
+    if (templ.width() == 0 || templ.height() == 0 || candidate.width() == 0 || candidate.height() == 0){
+        return std::numeric_limits<double>::infinity();
+    }
+    return candidate.width() == templ.width() && candidate.height() == templ.height()
+        ? ImageMatch::pixel_RMSD(candidate, templ)
+        : ImageMatch::pixel_RMSD(candidate, templ.scale_to(candidate.width(), candidate.height()));
+}
+}
+
+const std::array<WeatherIconType, 6>& weather_test_types(){
+    static const std::array<WeatherIconType, 6> TYPES = {
+        WeatherIconType::Clear,
+        WeatherIconType::Sunny,
+        WeatherIconType::Rain,
+        WeatherIconType::Cloudy,
+        WeatherIconType::Foggy,
+        WeatherIconType::Rainbow,
+    };
+    return TYPES;
+}
+
+std::string weather_name(WeatherIconType type){
+    switch (type){
+    case WeatherIconType::Clear:   return "Clear";
+    case WeatherIconType::Sunny:   return "Sunny";
+    case WeatherIconType::Rain:    return "Rain";
+    case WeatherIconType::Cloudy:  return "Cloudy";
+    case WeatherIconType::Foggy:   return "Foggy";
+    case WeatherIconType::Rainbow: return "Rainbow";
+    default:                       return "Unknown";
+    }
+}
+
+std::string weather_detection_status_string(const std::vector<std::pair<WeatherIconType, bool>>& statuses){
+    std::ostringstream ss;
+    ss << "Detection map: ";
+    for (size_t c = 0; c < statuses.size(); c++){
+        if (c > 0){
+            ss << ", ";
+        }
+        ss << weather_name(statuses[c].first) << "=" << (statuses[c].second ? "true" : "false");
+    }
+    return ss.str();
+}
+
+WeatherIconType weather_from_filename(const std::string& image){
+    std::string lower = image;
+    std::transform(lower.begin(), lower.end(), lower.begin(), [](unsigned char c){ return (char)std::tolower(c); });
+
+    if (lower.find("rainbow") != std::string::npos){
+        return WeatherIconType::Rainbow;
+    }
+    if (lower.find("sunny") != std::string::npos){
+        return WeatherIconType::Sunny;
+    }
+    if (lower.find("cloud") != std::string::npos){
+        return WeatherIconType::Cloudy;
+    }
+    if (lower.find("clear") != std::string::npos){
+        return WeatherIconType::Clear;
+    }
+    if (lower.find("fog") != std::string::npos){
+        return WeatherIconType::Foggy;
+    }
+    if (lower.find("rain") != std::string::npos){
+        return WeatherIconType::Rain;
+    }
+    return WeatherIconType::Unknown;
+}
+
+bool expected_result_from_filename(const std::string& image){
+    std::string lower = image;
+    std::transform(lower.begin(), lower.end(), lower.begin(), [](unsigned char c){ return (char)std::tolower(c); });
+
+    if (lower.find("_false") != std::string::npos){
+        return false;
+    }
+    return true;
+}
+
+std::string weather_list_string(const std::vector<WeatherIconType>& weathers){
+    std::ostringstream ss;
+    for (size_t c = 0; c < weathers.size(); c++){
+        if (c > 0){
+            ss << ", ";
+        }
+        ss << weather_name(weathers[c]);
+    }
+    return ss.str();
+}
+
 class WeatherFullMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
     WeatherFullMatcher(const char* path, double max_rmsd)
@@ -75,11 +209,11 @@ public:
     }
 
     static const WeatherFullMatcher& clear(){
-        static const WeatherFullMatcher matcher("PokemonLZA/Weather/clear_full.png", 100.0);
+        static const WeatherFullMatcher matcher("PokemonLZA/Weather/clear_full.png", 115.0);
         return matcher;
     }
     static const WeatherFullMatcher& sunny(){
-        static const WeatherFullMatcher matcher("PokemonLZA/Weather/sunny_full.png", 100.0);
+        static const WeatherFullMatcher matcher("PokemonLZA/Weather/sunny_full.png", 120.0);
         return matcher;
     }
     static const WeatherFullMatcher& rain(){
@@ -87,7 +221,7 @@ public:
         return matcher;
     }
     static const WeatherFullMatcher& cloudy(){
-        static const WeatherFullMatcher matcher("PokemonLZA/Weather/cloudy_full.png", 100.0);
+        static const WeatherFullMatcher matcher("PokemonLZA/Weather/cloudy_full.png", 110.0);
         return matcher;
     }
     static const WeatherFullMatcher& foggy(){
@@ -120,8 +254,6 @@ const WeatherFullMatcher& weather_full_matcher(WeatherIconType type){
         throw std::runtime_error("No weather full matcher for requested WeatherIconType");
     }
 }
-}
-
 //-----------------------------------------------------
 //  Detector
 //-----------------------------------------------------
@@ -168,6 +300,32 @@ bool WeatherIconDetector::detect(const ImageViewRGB32& screen){
         return false;
     }
 
+    if (m_type == WeatherIconType::Clear || m_type == WeatherIconType::Sunny || m_type == WeatherIconType::Cloudy){
+        const double clear_rmsd = full_template_rmsd(screen, WeatherIconType::Clear);
+        const double sunny_rmsd = full_template_rmsd(screen, WeatherIconType::Sunny);
+        const double cloudy_rmsd = full_template_rmsd(screen, WeatherIconType::Cloudy);
+
+        switch (m_type){
+        case WeatherIconType::Clear:
+            if (clear_rmsd + 4.0 >= sunny_rmsd || clear_rmsd > cloudy_rmsd + 5.0){
+                return false;
+            }
+            break;
+        case WeatherIconType::Sunny:
+            if (sunny_rmsd > clear_rmsd + 12.0 || sunny_rmsd > cloudy_rmsd + 6.0){
+                return false;
+            }
+            break;
+        case WeatherIconType::Cloudy:
+            if (cloudy_rmsd > sunny_rmsd || cloudy_rmsd > clear_rmsd + 5.0){
+                return false;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
     for (const auto& check : supplemental_template_checks(m_type)){
         ImageViewRGB32 candidate = extract_box_reference(screen, check.box);
         ImageRGB32 templ(RESOURCE_PATH() + check.path);
@@ -205,6 +363,136 @@ bool WeatherIconDetector::detect(const ImageViewRGB32& screen){
     }
 
     return true;
+}
+
+
+
+class Test_WeatherIconDetector : public UnitTest{
+public:
+    Test_WeatherIconDetector(
+        const std::string& image,
+        WeatherIconType expected_weather,
+        bool expected_result
+    )
+        : UnitTest("PokemonPLZA::WeatherIconDetector - " + image + " [" + weather_name(expected_weather) + "]")
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected_weather(expected_weather)
+        , m_expected_result(expected_result)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        (void)scope;
+
+        DummyVideoOverlay overlay;
+        ImageRGB32 image(m_image);
+        if (image.width() == 0 || image.height() == 0){
+            return "Failed to load test image: " + m_image;
+        }
+
+        std::vector<WeatherIconType> detected_weathers;
+        std::vector<std::pair<WeatherIconType, bool>> statuses;
+        for (WeatherIconType type : weather_test_types()){
+            WeatherIconDetector detector(type, &overlay);
+            const bool matched = detector.detect(image);
+            statuses.emplace_back(type, matched);
+            if (matched){
+                detected_weathers.push_back(type);
+            }
+        }
+        const std::string status_string = weather_detection_status_string(statuses);
+        logger.log(status_string, COLOR_BLUE);
+
+        if (!m_expected_result){
+            bool expected_found = false;
+            for (WeatherIconType weather : detected_weathers){
+                if (weather == m_expected_weather){
+                    expected_found = true;
+                    break;
+                }
+            }
+            TEST_RESULT_COMPONENT_EQUAL(expected_found, false, "expected weather present");
+            if (expected_found){
+                return "Expected weather should be absent, but " + weather_name(m_expected_weather) + " was detected. " + status_string;
+            }
+            return !expected_found;
+        }
+
+        TEST_RESULT_COMPONENT_EQUAL(detected_weathers.size(), (size_t)1, "num detected weather types");
+
+        if (detected_weathers.empty()){
+            if (m_expected_weather != WeatherIconType::Unknown){
+                return "Expected " + weather_name(m_expected_weather) + ", but detected no weather. " + status_string;
+            }
+            return "Detected no weather. " + status_string;
+        }
+
+        if (detected_weathers.size() > 1){
+            return "Detected multiple weather types: " + weather_list_string(detected_weathers) + ". " + status_string;
+        }
+
+        const WeatherIconType detected = detected_weathers[0];
+
+        if (m_expected_weather != WeatherIconType::Unknown){
+            if (detected != m_expected_weather){
+                return "Expected " + weather_name(m_expected_weather) + ", but detected " + weather_name(detected) + ". " + status_string;
+            }
+            TEST_RESULT_COMPONENT_EQUAL_STR(weather_name(detected), weather_name(m_expected_weather), "weather type");
+            return true;
+        }
+
+        return true;
+    }
+
+private:
+    std::string m_image;
+    WeatherIconType m_expected_weather;
+    bool m_expected_result;
+};
+
+
+
+void add_tests_WeatherDetector(UnitTestDatabase& database){
+    auto add = [&](const char* filename){
+        const std::string image = "PokemonLZA/WeatherDetector/" + std::string(filename);
+        database.add<Test_WeatherIconDetector>(image, weather_from_filename(filename), expected_result_from_filename(filename));
+    };
+
+    add("clear_1_True.png");
+    add("clear_2_True.png");
+    add("clear_dark_1_True.png");
+    add("clear_dark_2_True.png");
+    add("clear_dark_map_True.png");
+    add("clear_overview_True.png");
+    add("clear_wild_zone_1_2_True.png");
+    add("clear_wild_zone_20_1_True.png");
+    add("cloudy_1_True.png");
+    add("cloudy_hyperspace_rogue_mega_arena_True.png");
+    add("cloudy_zoomed_1_True.png");
+    add("cloudy_zoomed_2_True.png");
+    add("fog_1_True.png");
+    add("fog_wild_zone_1_True.png");
+    add("fog_wild_zone_20_True.png");
+    add("french_clear_place_centrale_True.png");
+    add("french_clear_wild_zone_20_2_True.png");
+    add("french_cloudy_wild_zone_20_True.png");
+    add("french_rainbow_wild_zone_20_True.png");
+    add("french_rain_wild_zone_20_True.png");
+    add("french_sunny_wild_zone_20_1_True.png");
+    add("japanese_clear_1_True.jpg");
+    add("japanese_clear_2_True.jpg");
+    add("japanese_sunny_True.png");
+    add("japanese_sunny_wild_zone_17_True.png");
+    add("rainbow_1_True.png");
+    add("rainbow_True.png");
+    add("rain_1_True.png");
+    add("rain_hyperspace_wild_zone_True.png");
+    add("rain_wild_zone_1_True.png");
+    add("rain_wild_zone_6_True.png");
+    add("sunny_3_True.png");
+    add("sunny_wild_zone_1_True.png");
+    add("sunny_wild_zone_8_True.png");
+    add("sunny_zoomed_1_True.jpg");
+    add("sunny_zoomed_2_True.jpg");
 }
 
 

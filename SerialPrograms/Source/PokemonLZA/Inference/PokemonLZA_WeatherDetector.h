@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonLZA_WeatherDetector_H
 
 #include <optional>
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/VisualDetector.h"
 
@@ -42,6 +43,9 @@ private:
 
     std::optional<OverlayBoxScope> m_overlay1;
 };
+
+
+void add_tests_WeatherDetector(UnitTestDatabase& database);
 
 
 }
