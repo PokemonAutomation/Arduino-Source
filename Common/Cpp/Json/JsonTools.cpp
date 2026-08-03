@@ -27,7 +27,7 @@ void string_to_file(const std::string& filename, const std::string& str){
     }
 
     FileIO file;
-    if (!file.open(filename, FileMode::WRITE)){
+    if (!file.open(filename, FileMode::WRITE | FileMode::BINARY)){
         throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to create file.", filename);
     }
     if (file.write(json_out.c_str(), json_out.size()) != json_out.size()){
@@ -48,7 +48,7 @@ std::string file_to_string(const std::string& filename){
 
 bool file_to_string(const std::string& filename, std::string& content){
     FileIO file;
-    if (!file.open(filename, FileMode::READ)){
+    if (!file.open(filename, FileMode::READ | FileMode::BINARY)){
         return false;
     }
 
