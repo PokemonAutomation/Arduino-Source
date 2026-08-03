@@ -46,12 +46,12 @@ private:
 
     SectionDividerOption m_advanced_options;
 
-    MillisecondsOption MEW_WAIT_TIME;
-    MillisecondsOption DOOR_TO_GRASS_TIME;
-    MillisecondsOption RIGHT_GRASS_1_TIME;
-    MillisecondsOption UP_GRASS_1_TIME;
-    MillisecondsOption RIGHT_GRASS_2_TIME;
-    MillisecondsOption FACE_UP_TIME;
+    MillisecondsOption MEW_WAIT_TIME0;
+    MillisecondsOption DOOR_TO_GRASS_TIME0;
+    MillisecondsOption RIGHT_GRASS_1_TIME0;
+    MillisecondsOption UP_GRASS_1_TIME0;
+    MillisecondsOption RIGHT_GRASS_2_TIME0;
+    MillisecondsOption FACE_UP_TIME0;
 
     void enter_mew(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void exit_mew(SingleSwitchProgramEnvironment& env, ProControllerContext& context);

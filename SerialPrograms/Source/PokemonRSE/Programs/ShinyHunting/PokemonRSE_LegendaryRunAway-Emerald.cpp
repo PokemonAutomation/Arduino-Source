@@ -7,7 +7,6 @@
 //#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -16,6 +15,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "PokemonRSE/Inference/Dialogs/PokemonRSE_BattleDialogs.h"
+#include "PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h"
 #include "PokemonRSE/PokemonRSE_Navigation.h"
 #include "PokemonRSE_LegendaryRunAway-Emerald.h"
 
@@ -155,8 +155,8 @@ void LegendaryRunAwayEmerald::reset_regi(SingleSwitchProgramEnvironment& env, Pr
     LegendaryRunAwayEmerald_Descriptor::Stats& stats = env.current_stats<LegendaryRunAwayEmerald_Descriptor::Stats>();
 
     //turn around, walk down 4/until black screen over
-    BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
-    BlackScreenOverWatcher enter_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher exit_area(COLOR_RED);
+    BlackScreenOverWatcher enter_area(COLOR_RED);
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
@@ -243,7 +243,7 @@ void LegendaryRunAwayEmerald::reset_groudon(SingleSwitchProgramEnvironment& env,
     context.wait_for_all_requests();
 
     //Turn down. Exit. Black screen over.
-    BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher exit_area(COLOR_RED);
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
@@ -270,7 +270,7 @@ void LegendaryRunAwayEmerald::reset_groudon(SingleSwitchProgramEnvironment& env,
     context.wait_for_all_requests();
 
     //Reverse above steps.
-    BlackScreenOverWatcher enter_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher enter_area(COLOR_RED);
     int ret2 = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
@@ -351,7 +351,7 @@ void LegendaryRunAwayEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, 
     context.wait_for_all_requests();
 
     //Turn down. Exit. Black screen over.
-    BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher exit_area(COLOR_RED);
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
@@ -377,7 +377,7 @@ void LegendaryRunAwayEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, 
     pbf_wait(context, 1000ms);
     context.wait_for_all_requests();
 
-    BlackScreenOverWatcher enter_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher enter_area(COLOR_RED);
     int ret2 = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
@@ -432,7 +432,7 @@ void LegendaryRunAwayEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, 
 void LegendaryRunAwayEmerald::reset_hooh(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     LegendaryRunAwayEmerald_Descriptor::Stats& stats = env.current_stats<LegendaryRunAwayEmerald_Descriptor::Stats>();
 
-    BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher exit_area(COLOR_RED);
     //Turn around, 10 steps down
     ssf_press_button(context, BUTTON_B, 0ms, HOOH_UP_DOWN);
     pbf_press_dpad(context, DPAD_DOWN, HOOH_UP_DOWN, 0ms);
@@ -464,7 +464,7 @@ void LegendaryRunAwayEmerald::reset_hooh(SingleSwitchProgramEnvironment& env, Pr
     pbf_wait(context, 500ms);
     context.wait_for_all_requests();
 
-    BlackScreenOverWatcher enter_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher enter_area(COLOR_RED);
     //turn left, take one step. now turn back right and take a step. wait for black screen over.
     int ret2 = run_until<ProControllerContext>(
         env.console, context,
@@ -507,7 +507,7 @@ void LegendaryRunAwayEmerald::reset_hooh(SingleSwitchProgramEnvironment& env, Pr
 void LegendaryRunAwayEmerald::reset_lugia(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     LegendaryRunAwayEmerald_Descriptor::Stats& stats = env.current_stats<LegendaryRunAwayEmerald_Descriptor::Stats>();
 
-    BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher exit_area(COLOR_RED);
     //Turn around, 5 steps down
     ssf_press_button(context, BUTTON_B, 0ms, LUGIA_UP_DOWN0);
     pbf_press_dpad(context, DPAD_DOWN, LUGIA_UP_DOWN0, 0ms);
@@ -539,7 +539,7 @@ void LegendaryRunAwayEmerald::reset_lugia(SingleSwitchProgramEnvironment& env, P
     pbf_wait(context, 500ms);
     context.wait_for_all_requests();
 
-    BlackScreenOverWatcher enter_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher enter_area(COLOR_RED);
     //turn up, take one step. then turn back down and take a step. wait for black screen over.
     int ret2 = run_until<ProControllerContext>(
         env.console, context,
@@ -594,7 +594,7 @@ void LegendaryRunAwayEmerald::program(SingleSwitchProgramEnvironment& env, ProCo
     */
 
     while (true){
-        BlackScreenWatcher legendary_battle_start(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+        BlackScreenWatcher legendary_battle_start(COLOR_RED);
         int ret3 = run_until<ProControllerContext>(
             env.console, context,
             [&](ProControllerContext& context){
