@@ -7,7 +7,6 @@
 #include <QFile>
 #include <QTextStream>
 #include <QApplication>
-#include "Common/Cpp/ColoredText.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "ThemeSelectorOption.h"
@@ -16,15 +15,15 @@ namespace PokemonAutomation{
 
 
 
-void set_theme(size_t index){
-    if (index == CURRENT_THEME){
+void set_theme(UiThemeMode theme_mode){
+    if (theme_mode == CURRENT_THEME){
         return;
     }
     QString stylesheet;
-    switch (index){
-    case 0:
+    switch (theme_mode){
+    case UiThemeMode::DEFAULT_MODE:
         break;
-    case 1:
+    case UiThemeMode::DARK_MODE:
         stylesheet = ":qdarkstyle/dark/darkstyle.qss";
         break;
     }
@@ -41,19 +40,19 @@ void set_theme(size_t index){
     QApplication* app = static_cast<QApplication*>(QApplication::instance());
     app->setStyleSheet(stylesheet);
 
-    CURRENT_THEME = index;
+    CURRENT_THEME = theme_mode;
 }
 
 
 ThemeSelectorOption::ThemeSelectorOption()
-    : IntegerEnumDropdownOption(
+    : EnumDropdownOption<UiThemeMode>(
         "<b>Theme:</b>",
         {
-            {0, "default", "Default"},
-            {1, "dark", "Dark Mode"},
+            {UiThemeMode::DEFAULT_MODE, "default", "Default"},
+            {UiThemeMode::DARK_MODE, "dark", "Dark Mode"},
         },
         LockMode::LOCK_WHILE_RUNNING,
-        0
+        UiThemeMode::DEFAULT_MODE
     )
 {}
 
@@ -61,12 +60,12 @@ bool ThemeSelectorOption::set_value(size_t index){
     if (!IntegerEnumDropdownOption::set_value(index)){
         return false;
     }
-    set_theme(index);
+    set_theme(static_cast<UiThemeMode>(index));
     return true;
 }
 void ThemeSelectorOption::load_json(const JsonValue& json){
     IntegerEnumDropdownOption::load_json(json);
-    set_theme(current_value());
+    set_theme(static_cast<UiThemeMode>(current_value()));
 }
 
 

@@ -11,7 +11,7 @@ namespace PokemonAutomation{
 
 #if 1
 Color theme_friendly_darkblue(){
-    if (CURRENT_THEME == 1){
+    if (CURRENT_THEME == UiThemeMode::DARK_MODE){
         return Color(0xff0080ff);
     }
     return COLOR_DARK_BLUE;

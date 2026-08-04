@@ -7,12 +7,13 @@
 #ifndef PokemonAutomation_ThemeSelectorOption_H
 #define PokemonAutomation_ThemeSelectorOption_H
 
+#include "Common/Cpp/ColoredText.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 
 namespace PokemonAutomation{
 
 
-class ThemeSelectorOption : public IntegerEnumDropdownOption{
+class ThemeSelectorOption : public EnumDropdownOption<UiThemeMode>{
 public:
     ThemeSelectorOption();
 

@@ -12,7 +12,12 @@
 
 namespace PokemonAutomation{
 
-inline size_t CURRENT_THEME = 0;
+enum class UiThemeMode{
+    DEFAULT_MODE,
+    DARK_MODE,
+};
+
+inline UiThemeMode CURRENT_THEME = UiThemeMode::DEFAULT_MODE;
 
 Color theme_friendly_darkblue();
 std::string html_color_text(const std::string& text, Color color);
