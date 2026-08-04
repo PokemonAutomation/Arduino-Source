@@ -13,7 +13,7 @@
 #include "Common/Cpp/SerialConnection/SerialConnection.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "Controllers/ControllerTypeStrings.h"
 #include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_Errors.h"

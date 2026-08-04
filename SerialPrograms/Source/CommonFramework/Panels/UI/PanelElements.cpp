@@ -9,7 +9,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "Common/Cpp/ColoredText.h"
 #include "PanelElements.h"
 
 namespace PokemonAutomation{

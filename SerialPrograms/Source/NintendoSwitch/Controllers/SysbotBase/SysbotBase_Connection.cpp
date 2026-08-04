@@ -7,7 +7,7 @@
 #include <QEventLoop>
 #include "Common/Cpp/Time.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "SysbotBase_Connection.h"

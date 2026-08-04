@@ -22,7 +22,7 @@
 #include "CommonFramework/Logging/LoggerWindow.h"
 #include "CommonFramework/Startup/NewVersionCheck.h"
 #include "CommonFramework/Options/ResolutionOption.h"
-#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "PanelLists.h"
 #include "WindowTracker.h"

@@ -6,7 +6,7 @@
 
 #include <sstream>
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
-#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
