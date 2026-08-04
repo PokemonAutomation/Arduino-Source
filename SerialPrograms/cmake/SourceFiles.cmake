@@ -612,8 +612,10 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonTools/Async/InferenceRoutines.h
     Source/CommonTools/Async/InferenceSession.cpp
     Source/CommonTools/Async/InferenceSession.h
+    Source/CommonTools/Async/InterruptableCommands.cpp
     Source/CommonTools/Async/InterruptableCommands.h
     Source/CommonTools/Async/InterruptableCommands.tpp
+    Source/CommonTools/Async/SuperControlSession.cpp
     Source/CommonTools/Async/SuperControlSession.h
     Source/CommonTools/Async/SuperControlSession.tpp
     Source/CommonTools/Audio/AudioPerSpectrumDetectorBase.cpp

@@ -13,7 +13,6 @@
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/CancellableScope.h"
 
-
 namespace PokemonAutomation{
 
 class Logger;

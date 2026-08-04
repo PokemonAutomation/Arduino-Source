@@ -5,8 +5,6 @@
  */
 
 #include "Common/Cpp/Containers/Pimpl.tpp"
-#include "CommonTools/Async/InterruptableCommands.tpp"
-#include "CommonTools/Async/SuperControlSession.tpp"
 #include "ControllerInput/ControllerInput.h"
 #include "ControllerInput/Keyboard/KeyboardInput_State.h"
 #include "Controllers/ControllerTypes.h"
@@ -21,11 +19,6 @@
 //using std::endl;
 
 namespace PokemonAutomation{
-
-//  Instantiate some template helper classes.
-template class AsyncCommandSession<NintendoSwitch::JoyconController>;
-template class SuperControlSession<NintendoSwitch::JoyconController>;
-
 namespace NintendoSwitch{
 
 using namespace std::chrono_literals;
