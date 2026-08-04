@@ -10,13 +10,17 @@
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
+#include "Pokemon/Pokemon_Types.h"
 #include "PokemonHome_TeraTypeReader.h"
 
 namespace PokemonAutomation {
-namespace Pokemon {
+namespace NintendoSwitch {
+namespace PokemonHome {
 
 using namespace Kernels;
 using namespace Kernels::Waterfill;
+using Pokemon::PokemonTeraType;
+using Pokemon::POKEMON_TERA_TYPE_SLUGS;
 
 namespace {
 
@@ -243,7 +247,7 @@ std::multimap<double, std::pair<PokemonTeraType, ImagePixelBox>> find_tera_type_
                 {0xffd0d0d0, 0xffffffff},
                 {0xffe0e0e0, 0xffffffff},
             }
-        );
+            );
         for (PackedBinaryMatrix& matrix : matrices){
             find_tera_type_symbol_candidates(candidates, original_screen, image, matrix, max_area_ratio);
         }
@@ -285,5 +289,80 @@ PokemonTeraType read_pokemon_tera_type(
     return filtered.begin()->second.first;
 }
 
+class Test_TeraTypeReader : public UnitTest{
+public:
+
+    Test_TeraTypeReader(
+        const std::string& image,
+        PokemonTeraType expected
+    )
+        : UnitTest("PokemonHome::TeraTypeReader - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        ImageRGB32 image(m_image);
+        PokemonTeraType result = read_pokemon_tera_type(image, ImageFloatBox(0.463, 0.09, 0.04, 0.06));
+        
+        if (result == m_expected)
+            return true;
+
+        return "Expected: " + POKEMON_TERA_TYPE_SLUGS().get_string(m_expected) + ", received: " + POKEMON_TERA_TYPE_SLUGS().get_string(result);
+    };
+
+private:
+    std::string m_image;
+    PokemonTeraType m_expected;
+};
+
+//TODO: Missing multiple positive test cases for TeraTypeReader.
+void add_tests_TeraTypeReader(UnitTestDatabase& database){
+    database.add<Test_TeraTypeReader>("PokemonHome/BoxView/BoxView-1.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/annihilape_Regular.png", PokemonTeraType::ICE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/bidoof_Regular.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/bulbasaur_Regular.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Go.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Lza.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/capskid_Regular.png", PokemonTeraType::GRASS);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/castform_Regular.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/cyclizar_Regular.png", PokemonTeraType::FAIRY);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/dudunsparce_Regular.png", PokemonTeraType::DARK);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/dudunsparce_Regular_Sv.png", PokemonTeraType::NORMAL);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/enamorus_Shiny.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/gimmighoul_Regular.png", PokemonTeraType::GHOST);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/glimmet_Regular.png", PokemonTeraType::ELECTRIC);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/gogoat_Regular.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/greatTusk_Shiny.png", PokemonTeraType::STEEL);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/hatterne_Regular.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/houndstone_Regular.png", PokemonTeraType::GROUND);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/ironBunde_Regular.png", PokemonTeraType::WATER);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/ironBundle_Regular_Sv.png", PokemonTeraType::WATER);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/ironJugulis_Regular.png", PokemonTeraType::FLYING);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/ironThorns_Regular.png", PokemonTeraType::ROCK);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/kilowattrel_Regular.png", PokemonTeraType::POISON);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/kingler_Shiny.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/komala_Regular.png", PokemonTeraType::PSYCHIC);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/krabby_Shiny.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/machamp_Regular.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/pancham_Shiny.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/rapidash_Regular.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/rellor_Regular.png", PokemonTeraType::BUG);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/riolu_Regular.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/rowlet_ShinyAlpha.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/scovillain_Regular.png", PokemonTeraType::FIRE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/slitherWing_Shiny.png", PokemonTeraType::FIGHTING);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/squirtle_Shiny.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/tapuLele_Shiny.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/tatsugiri_Regular.png", PokemonTeraType::DRAGON);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/teddiursa_Regular.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/terapagos_regular.png", PokemonTeraType::STELLAR);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/vulpix_Regular.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/vulpix_Shiny.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/wartortle_Regular.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/wurmple_Regular.png", PokemonTeraType::NONE);
+}
+
+}
 }
 }
