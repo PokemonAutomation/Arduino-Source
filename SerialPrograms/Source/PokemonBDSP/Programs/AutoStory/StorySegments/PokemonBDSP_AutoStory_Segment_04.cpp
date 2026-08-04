@@ -42,146 +42,146 @@ void AutoStory_Segment_04::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    AutoStory_Checkpoint_050().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_051().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_052().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_053().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_054().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_055().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_056().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_057().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_058().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_059().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_060().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_061().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_062().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_063().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_064().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_065().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_066().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0401().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0402().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0403().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0404().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0405().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0406().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0407().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0408().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0409().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0410().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0411().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0412().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0413().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0414().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0415().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0416().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0417().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
 }
 
 
-std::string AutoStory_Checkpoint_050::name()       const{ return "004.01 - leave_gym"; }
-std::string AutoStory_Checkpoint_050::start_text() const{ return "Inside Hearthome City gym after third badge."; }
-std::string AutoStory_Checkpoint_050::end_text()   const{ return "Exited Hearthome City gym."; }
-void AutoStory_Checkpoint_050::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_050(env, context, options, stats);
+std::string AutoStory_Checkpoint_0401::name()       const{ return "04.01 - leave_gym"; }
+std::string AutoStory_Checkpoint_0401::start_text() const{ return "Inside Hearthome City gym after third badge."; }
+std::string AutoStory_Checkpoint_0401::end_text()   const{ return "Exited Hearthome City gym."; }
+void AutoStory_Checkpoint_0401::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_0401(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_051::name()       const{ return "004.02 - go_to_veilstone_pokemon_center"; }
-std::string AutoStory_Checkpoint_051::start_text() const{ return "Outside Hearthome City gym."; }
-std::string AutoStory_Checkpoint_051::end_text()   const{ return "Entered Veilstone City Pokemon Center."; }
-void AutoStory_Checkpoint_051::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_051(env, context, options, stats);
+std::string AutoStory_Checkpoint_0402::name()       const{ return "04.02 - go_to_veilstone_pokemon_center"; }
+std::string AutoStory_Checkpoint_0402::start_text() const{ return "Outside Hearthome City gym."; }
+std::string AutoStory_Checkpoint_0402::end_text()   const{ return "Entered Veilstone City Pokemon Center."; }
+void AutoStory_Checkpoint_0402::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_0402(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_052::name()       const{ return "004.03 - heal_at_pokemon_center (Veilstone)"; }
-std::string AutoStory_Checkpoint_052::start_text() const{ return "Inside Veilstone City Pokemon Center."; }
-std::string AutoStory_Checkpoint_052::end_text()   const{ return "Healed and exited Veilstone City Pokemon Center."; }
-void AutoStory_Checkpoint_052::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_052(env, context, options, stats);
+std::string AutoStory_Checkpoint_0403::name()       const{ return "04.03 - heal_at_pokemon_center (Veilstone)"; }
+std::string AutoStory_Checkpoint_0403::start_text() const{ return "Inside Veilstone City Pokemon Center."; }
+std::string AutoStory_Checkpoint_0403::end_text()   const{ return "Healed and exited Veilstone City Pokemon Center."; }
+void AutoStory_Checkpoint_0403::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_0403(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_053::name()       const{ return "004.04 - go_to_galactic_warehouse"; }
-std::string AutoStory_Checkpoint_053::start_text() const{ return "Outside Veilstone City Pokemon Center."; }
-std::string AutoStory_Checkpoint_053::end_text()   const{ return "Reached Galactic Warehouse, battle started."; }
-void AutoStory_Checkpoint_053::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_053(env, context, options, stats);
+std::string AutoStory_Checkpoint_0404::name()       const{ return "04.04 - go_to_galactic_warehouse"; }
+std::string AutoStory_Checkpoint_0404::start_text() const{ return "Outside Veilstone City Pokemon Center."; }
+std::string AutoStory_Checkpoint_0404::end_text()   const{ return "Reached Galactic Warehouse, battle started."; }
+void AutoStory_Checkpoint_0404::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_0404(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_054::name()       const{ return "004.05 - handle_battle (veilstone_galactic_grunts_1)"; }
-std::string AutoStory_Checkpoint_054::start_text() const{ return "In battle against Galactic Grunt at Veilstone."; }
-std::string AutoStory_Checkpoint_054::end_text()   const{ return "Defeated Galactic Grunt at Veilstone."; }
-void AutoStory_Checkpoint_054::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_054(env, context, options, stats);
+std::string AutoStory_Checkpoint_0405::name()       const{ return "04.05 - handle_battle (veilstone_galactic_grunts_1)"; }
+std::string AutoStory_Checkpoint_0405::start_text() const{ return "In battle against Galactic Grunt at Veilstone."; }
+std::string AutoStory_Checkpoint_0405::end_text()   const{ return "Defeated Galactic Grunt at Veilstone."; }
+void AutoStory_Checkpoint_0405::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_0405(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_055::name()       const{ return "004.06 - enter_galactic_warehouse"; }
-std::string AutoStory_Checkpoint_055::start_text() const{ return "Outside Galactic Warehouse."; }
-std::string AutoStory_Checkpoint_055::end_text()   const{ return "Entered Galactic Warehouse."; }
-void AutoStory_Checkpoint_055::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_055(env, context, options, stats);
+std::string AutoStory_Checkpoint_0406::name()       const{ return "04.06 - enter_galactic_warehouse"; }
+std::string AutoStory_Checkpoint_0406::start_text() const{ return "Outside Galactic Warehouse."; }
+std::string AutoStory_Checkpoint_0406::end_text()   const{ return "Entered Galactic Warehouse."; }
+void AutoStory_Checkpoint_0406::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_0406(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_056::name()       const{ return "004.07 - exit_galactic_warehouse"; }
-std::string AutoStory_Checkpoint_056::start_text() const{ return "Inside Galactic Warehouse."; }
-std::string AutoStory_Checkpoint_056::end_text()   const{ return "Exited Galactic Warehouse with TM Fly."; }
-void AutoStory_Checkpoint_056::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_056(env, context, options, stats);
+std::string AutoStory_Checkpoint_0407::name()       const{ return "04.07 - exit_galactic_warehouse"; }
+std::string AutoStory_Checkpoint_0407::start_text() const{ return "Inside Galactic Warehouse."; }
+std::string AutoStory_Checkpoint_0407::end_text()   const{ return "Exited Galactic Warehouse with TM Fly."; }
+void AutoStory_Checkpoint_0407::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_0407(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_057::name()       const{ return "004.08 - go_to_route_214"; }
-std::string AutoStory_Checkpoint_057::start_text() const{ return "Outside Galactic Warehouse."; }
-std::string AutoStory_Checkpoint_057::end_text()   const{ return "Arrived at Route 214, battle started."; }
-void AutoStory_Checkpoint_057::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_057(env, context, options, stats);
+std::string AutoStory_Checkpoint_0408::name()       const{ return "04.08 - go_to_route_214"; }
+std::string AutoStory_Checkpoint_0408::start_text() const{ return "Outside Galactic Warehouse."; }
+std::string AutoStory_Checkpoint_0408::end_text()   const{ return "Arrived at Route 214, battle started."; }
+void AutoStory_Checkpoint_0408::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_0408(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_058::name()       const{ return "004.09 - handle_battle (route_214_psychic_abigail)"; }
-std::string AutoStory_Checkpoint_058::start_text() const{ return "In battle against Psychic Abigail on Route 214."; }
-std::string AutoStory_Checkpoint_058::end_text()   const{ return "Defeated Psychic Abigail on Route 214."; }
-void AutoStory_Checkpoint_058::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_058(env, context, options, stats);
+std::string AutoStory_Checkpoint_0409::name()       const{ return "04.09 - handle_battle (route_214_psychic_abigail)"; }
+std::string AutoStory_Checkpoint_0409::start_text() const{ return "In battle against Psychic Abigail on Route 214."; }
+std::string AutoStory_Checkpoint_0409::end_text()   const{ return "Defeated Psychic Abigail on Route 214."; }
+void AutoStory_Checkpoint_0409::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_0409(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_059::name()       const{ return "004.10 - walk_through_route_214"; }
-std::string AutoStory_Checkpoint_059::start_text() const{ return "On Route 214 after Psychic Abigail."; }
-std::string AutoStory_Checkpoint_059::end_text()   const{ return "Walked through Route 214."; }
-void AutoStory_Checkpoint_059::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_059(env, context, options, stats);
+std::string AutoStory_Checkpoint_0410::name()       const{ return "04.10 - walk_through_route_214"; }
+std::string AutoStory_Checkpoint_0410::start_text() const{ return "On Route 214 after Psychic Abigail."; }
+std::string AutoStory_Checkpoint_0410::end_text()   const{ return "Walked through Route 214."; }
+void AutoStory_Checkpoint_0410::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_0410(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_060::name()       const{ return "004.11 - pass_by_valor_lakefront"; }
-std::string AutoStory_Checkpoint_060::start_text() const{ return "End of Route 214."; }
-std::string AutoStory_Checkpoint_060::end_text()   const{ return "Passed Valor Lakefront, entered building."; }
-void AutoStory_Checkpoint_060::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_060(env, context, options, stats);
+std::string AutoStory_Checkpoint_0411::name()       const{ return "04.11 - pass_by_valor_lakefront"; }
+std::string AutoStory_Checkpoint_0411::start_text() const{ return "End of Route 214."; }
+std::string AutoStory_Checkpoint_0411::end_text()   const{ return "Passed Valor Lakefront, entered building."; }
+void AutoStory_Checkpoint_0411::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_0411(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_061::name()       const{ return "004.12 - go_through_building_route_213"; }
-std::string AutoStory_Checkpoint_061::start_text() const{ return "Inside building between Route 214 and Route 213."; }
-std::string AutoStory_Checkpoint_061::end_text()   const{ return "Exited building onto Route 213."; }
-void AutoStory_Checkpoint_061::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_061(env, context, options, stats);
+std::string AutoStory_Checkpoint_0412::name()       const{ return "04.12 - go_through_building_route_213"; }
+std::string AutoStory_Checkpoint_0412::start_text() const{ return "Inside building between Route 214 and Route 213."; }
+std::string AutoStory_Checkpoint_0412::end_text()   const{ return "Exited building onto Route 213."; }
+void AutoStory_Checkpoint_0412::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_0412(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_062::name()       const{ return "004.13 - go_through_route_213"; }
-std::string AutoStory_Checkpoint_062::start_text() const{ return "On Route 213."; }
-std::string AutoStory_Checkpoint_062::end_text()   const{ return "Walked through Route 213, entered east Pastoria building."; }
-void AutoStory_Checkpoint_062::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_062(env, context, options, stats);
+std::string AutoStory_Checkpoint_0413::name()       const{ return "04.13 - go_through_route_213"; }
+std::string AutoStory_Checkpoint_0413::start_text() const{ return "On Route 213."; }
+std::string AutoStory_Checkpoint_0413::end_text()   const{ return "Walked through Route 213, entered east Pastoria building."; }
+void AutoStory_Checkpoint_0413::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_0413(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_063::name()       const{ return "004.14 - go_through_house_east_pastoria"; }
-std::string AutoStory_Checkpoint_063::start_text() const{ return "Inside east Pastoria building."; }
-std::string AutoStory_Checkpoint_063::end_text()   const{ return "Exited east Pastoria building into Pastoria City."; }
-void AutoStory_Checkpoint_063::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_063(env, context, options, stats);
+std::string AutoStory_Checkpoint_0414::name()       const{ return "04.14 - go_through_house_east_pastoria"; }
+std::string AutoStory_Checkpoint_0414::start_text() const{ return "Inside east Pastoria building."; }
+std::string AutoStory_Checkpoint_0414::end_text()   const{ return "Exited east Pastoria building into Pastoria City."; }
+void AutoStory_Checkpoint_0414::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_0414(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_064::name()       const{ return "004.15 - go_through_pastoria"; }
-std::string AutoStory_Checkpoint_064::start_text() const{ return "In Pastoria City."; }
-std::string AutoStory_Checkpoint_064::end_text()   const{ return "Entered Pastoria City Pokemon Center."; }
-void AutoStory_Checkpoint_064::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_064(env, context, options, stats);
+std::string AutoStory_Checkpoint_0415::name()       const{ return "04.15 - go_through_pastoria"; }
+std::string AutoStory_Checkpoint_0415::start_text() const{ return "In Pastoria City."; }
+std::string AutoStory_Checkpoint_0415::end_text()   const{ return "Entered Pastoria City Pokemon Center."; }
+void AutoStory_Checkpoint_0415::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_0415(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_065::name()       const{ return "004.16 - heal_at_pokemon_center (Pastoria)"; }
-std::string AutoStory_Checkpoint_065::start_text() const{ return "Inside Pastoria City Pokemon Center."; }
-std::string AutoStory_Checkpoint_065::end_text()   const{ return "Healed and exited Pastoria City Pokemon Center."; }
-void AutoStory_Checkpoint_065::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_065(env, context, options, stats);
+std::string AutoStory_Checkpoint_0416::name()       const{ return "04.16 - heal_at_pokemon_center (Pastoria)"; }
+std::string AutoStory_Checkpoint_0416::start_text() const{ return "Inside Pastoria City Pokemon Center."; }
+std::string AutoStory_Checkpoint_0416::end_text()   const{ return "Healed and exited Pastoria City Pokemon Center."; }
+void AutoStory_Checkpoint_0416::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_0416(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_066::name()       const{ return "004.17 - go_to_pastoria_gym"; }
-std::string AutoStory_Checkpoint_066::start_text() const{ return "Outside Pastoria City Pokemon Center."; }
-std::string AutoStory_Checkpoint_066::end_text()   const{ return "Fourth Gym Badge acquired (Pastoria City)."; }
-void AutoStory_Checkpoint_066::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_066(env, context, options, stats);
+std::string AutoStory_Checkpoint_0417::name()       const{ return "04.17 - go_to_pastoria_gym"; }
+std::string AutoStory_Checkpoint_0417::start_text() const{ return "Outside Pastoria City Pokemon Center."; }
+std::string AutoStory_Checkpoint_0417::end_text()   const{ return "Fourth Gym Badge acquired (Pastoria City)."; }
+void AutoStory_Checkpoint_0417::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_0417(env, context, options, stats);
 }
 
 static void move_back_after_unexpected_battle(
@@ -1005,7 +1005,7 @@ static bool go_to_pastoria_gym(
     return true;
 }
 
-void checkpoint_050(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+void checkpoint_0401(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
             if (!leave_gym(env.console, context)){
@@ -1016,7 +1016,7 @@ void checkpoint_050(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     );
 }
 
-void checkpoint_051(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+void checkpoint_0402(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
             if (!go_to_veilstone_pokemon_center(env.console, context)){
@@ -1027,7 +1027,7 @@ void checkpoint_051(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     );
 }
 
-void checkpoint_052(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+void checkpoint_0403(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
             if (!heal_at_pokemon_center(env.console, context)){
@@ -1038,7 +1038,7 @@ void checkpoint_052(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     );
 }
 
-void checkpoint_053(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+void checkpoint_0404(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
             if (!go_to_galactic_warehouse(env.console, context)){
@@ -1049,7 +1049,7 @@ void checkpoint_053(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     );
 }
 
-void checkpoint_054(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+void checkpoint_0405(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
             if (!handle_battle(env.console, context, "veilstone_galactic_grunts_1")){
@@ -1060,7 +1060,7 @@ void checkpoint_054(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     );
 }
 
-void checkpoint_055(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+void checkpoint_0406(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
             if (!enter_galactic_warehouse(env.console, context)){
@@ -1071,7 +1071,7 @@ void checkpoint_055(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     );
 }
 
-void checkpoint_056(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+void checkpoint_0407(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
             if (!exit_galactic_warehouse(env.console, context)){
@@ -1082,7 +1082,7 @@ void checkpoint_056(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     );
 }
 
-void checkpoint_057(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+void checkpoint_0408(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
             if (!go_to_route_214(env.console, context)){
@@ -1093,7 +1093,7 @@ void checkpoint_057(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     );
 }
 
-void checkpoint_058(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+void checkpoint_0409(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
             if (!handle_battle(env.console, context, "route_214_psychic_abigail")){
@@ -1104,7 +1104,7 @@ void checkpoint_058(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     );
 }
 
-void checkpoint_059(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+void checkpoint_0410(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
             if (!walk_through_route_214(env.console, context)){
@@ -1115,7 +1115,7 @@ void checkpoint_059(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     );
 }
 
-void checkpoint_060(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+void checkpoint_0411(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
             if (!pass_by_valor_lakefront(env.console, context)){
@@ -1126,7 +1126,7 @@ void checkpoint_060(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     );
 }
 
-void checkpoint_061(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+void checkpoint_0412(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
             if (!go_through_building_route_213(env.console, context)){
@@ -1137,7 +1137,7 @@ void checkpoint_061(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     );
 }
 
-void checkpoint_062(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+void checkpoint_0413(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
             if (!go_through_route_213(env.console, context)){
@@ -1148,7 +1148,7 @@ void checkpoint_062(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     );
 }
 
-void checkpoint_063(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+void checkpoint_0414(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
             if (!go_through_house_east_pastoria(env.console, context)){
@@ -1159,7 +1159,7 @@ void checkpoint_063(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     );
 }
 
-void checkpoint_064(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+void checkpoint_0415(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
             if (!go_through_pastoria(env.console, context)){
@@ -1170,7 +1170,7 @@ void checkpoint_064(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     );
 }
 
-void checkpoint_065(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+void checkpoint_0416(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
             if (!heal_at_pokemon_center(env.console, context)){
@@ -1181,7 +1181,7 @@ void checkpoint_065(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     );
 }
 
-void checkpoint_066(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+void checkpoint_0417(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
             if (!go_to_pastoria_gym(env.console, context)){
