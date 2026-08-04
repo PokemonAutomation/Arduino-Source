@@ -153,7 +153,9 @@ public:
 
     SectionDividerOption m_advanced_options;
 
-    BooleanCheckBoxOption LOG_EVERYTHING;
+private:
+    BooleanCheckBoxOption& LOG_EVERYTHING;
+public:
     BooleanCheckBoxOption ENABLE_PABOTBASE1;
     BooleanCheckBoxOption DUMP_VIDEO_FORMATS;
     BooleanCheckBoxOption SAVE_DEBUG_IMAGES;

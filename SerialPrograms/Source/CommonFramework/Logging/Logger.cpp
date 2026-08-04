@@ -7,6 +7,7 @@
 #include <iostream>
 #include "Common/Cpp/Logging/TaggedLogger.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Logger.h"
 
 namespace PokemonAutomation{
@@ -49,6 +50,27 @@ Logger& global_logger_command_line(){
     static CommandLineLogger logger(global_logger_raw());
     return logger;
 }
+
+
+
+
+
+BooleanCheckBoxOption& LOG_EVERYTHING(){
+    static BooleanCheckBoxOption option(
+        "<b>Log Everything:</b><br>Log everything to the output window and output log. Will be very spammy.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    );
+    return option;
+}
+
+
+
+
+
+
+
+
 
 
 }

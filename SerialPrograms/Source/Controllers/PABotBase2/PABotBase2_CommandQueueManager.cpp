@@ -6,7 +6,8 @@
 
 #include <string.h>
 #include "Common/PABotBase2/PABotBase2CC_MessageDumper.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "PABotBase2_CommandQueueManager.h"
 
 //#include <iostream>
@@ -132,7 +133,7 @@ uint8_t CommandQueueManager::send_command(Cancellable* cancellable, MessageHeade
         }
     }
 //    cout << "Post send 0: " << (unsigned)command.id << endl;
-    m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &command);
+    m_message_loggers.log_send(m_logger, LOG_EVERYTHING(), &command);
 //    cout << "Post send 1: " << (unsigned)command.id << endl;
     m_cv.notify_all();
     return command.id;
@@ -190,7 +191,7 @@ bool CommandQueueManager::try_push_pending_specials() noexcept{
     m_pending_special = PABB2_MESSAGE_OPCODE_INVALID;
     m_pending_commands.clear();
 
-    m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &message);
+    m_message_loggers.log_send(m_logger, LOG_EVERYTHING(), &message);
     return true;
 }
 

@@ -218,11 +218,7 @@ GlobalSettings::GlobalSettings()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , LOG_EVERYTHING(
-        "<b>Log Everything:</b><br>Log everything to the output window and output log. Will be very spammy.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false
-    )
+    , LOG_EVERYTHING(PokemonAutomation::LOG_EVERYTHING())
     , ENABLE_PABOTBASE1(
         "<b>Enable PABotBase1:</b><br>Enable support for the legacy PABotBase 1 protocol.<br>"
         "Turn this on if you are still using Arduino Uno R3, Arduino Leonardo, Teensy, or Pro Micro. "

@@ -64,7 +64,7 @@ public:
         )
     {}
     virtual bool should_print(const std::string& body) const override{
-        return GlobalSettings::instance().LOG_EVERYTHING;
+        return LOG_EVERYTHING();
     }
     virtual std::string tostr(const std::string& body) const override{
         std::string ret = BotBaseMessageType::tostr(body);
@@ -141,7 +141,7 @@ public:
         )
     {}
     virtual bool should_print(const std::string& body) const override{
-        return GlobalSettings::instance().LOG_EVERYTHING;
+        return LOG_EVERYTHING();
     }
     virtual std::string tostr(const std::string& body) const override{
         std::string ret = BotBaseMessageType::tostr(body);

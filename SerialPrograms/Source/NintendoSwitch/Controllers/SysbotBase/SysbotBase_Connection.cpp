@@ -6,8 +6,7 @@
 
 #include <QEventLoop>
 #include "Common/Cpp/Time.h"
-//#include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -195,7 +194,7 @@ void TcpSysbotBase_Connection::on_receive_data(const void* data, size_t bytes){
     }catch (...){}
 }
 void TcpSysbotBase_Connection::process_message(const std::string& message, WallClock timestamp){
-    if (GlobalSettings::instance().LOG_EVERYTHING){
+    if (LOG_EVERYTHING()){
         m_logger.log("Received: " + message, COLOR_DARKGREEN);
     }
 

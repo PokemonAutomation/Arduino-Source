@@ -41,7 +41,7 @@ SerialPABotBase_Connection::SerialPABotBase_Connection(
     Logger& logger,
     const std::string& name
 )
-    : m_logger(logger, GlobalSettings::instance().LOG_EVERYTHING)
+    : m_logger(logger, LOG_EVERYTHING())
 {
     set_status_line0("Not Connected", COLOR_RED);
 

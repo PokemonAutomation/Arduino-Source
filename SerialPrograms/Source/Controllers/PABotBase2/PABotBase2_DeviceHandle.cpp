@@ -7,10 +7,12 @@
 #include <string.h>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/PABotBase2/PABotBase2CC_MessageDumper.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/ControllerTypeStrings.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "PABotBase2_DeviceHandle.h"
@@ -268,7 +270,7 @@ ControllerType DeviceHandle::refresh_controller_type(){
 void DeviceHandle::send_request_with_no_response(MessageHeader& request){
     request.id = 0;
     std::unique_lock<Mutex> lg(m_lock);
-    m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &request);
+    m_message_loggers.log_send(m_logger, LOG_EVERYTHING(), &request);
     m_connection.reliable_send_all_or_nothing(
         nullptr,
         &request,
@@ -281,7 +283,7 @@ bool DeviceHandle::try_send_request_with_no_response(
 ) noexcept{
     request.id = 0;
     std::unique_lock<Mutex> lg(m_lock);
-    m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &request);
+    m_message_loggers.log_send(m_logger, LOG_EVERYTHING(), &request);
     return m_connection.reliable_send_all_or_nothing(
         nullptr,
         &request,
@@ -308,7 +310,7 @@ uint8_t DeviceHandle::send_request_with_response(MessageHeader& request){
         break;
     }
 
-    m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &request);
+    m_message_loggers.log_send(m_logger, LOG_EVERYTHING(), &request);
 
     try{
         m_connection.reliable_send_all_or_nothing(
@@ -349,7 +351,7 @@ std::optional<uint8_t> DeviceHandle::try_send_request_with_response(
         break;
     }
 
-    m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &request);
+    m_message_loggers.log_send(m_logger, LOG_EVERYTHING(), &request);
 
     try{
         if (m_connection.reliable_send_all_or_nothing(
@@ -491,7 +493,7 @@ void DeviceHandle::on_recv(const void* data, size_t bytes){
 
         const MessageHeader* header = (const MessageHeader*)message.c_str();
 
-        m_message_loggers.log_recv(m_logger, GlobalSettings::instance().LOG_EVERYTHING, header);
+        m_message_loggers.log_recv(m_logger, LOG_EVERYTHING(), header);
 
         //  Now we can process the message.
         switch (header->opcode){

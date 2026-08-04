@@ -13,8 +13,9 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/LifetimeSanitizer.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Logging/Logger.h"
 
 namespace PokemonAutomation{
 
@@ -101,7 +102,7 @@ public:
 
 public:
     virtual bool should_print(const std::string& body) const{
-        if (GlobalSettings::instance().LOG_EVERYTHING){
+        if (LOG_EVERYTHING()){
             return true;
         }
         if (PABB_MSG_IS_ACK(m_type)){

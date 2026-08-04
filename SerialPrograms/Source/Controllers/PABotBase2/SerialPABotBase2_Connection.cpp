@@ -8,14 +8,13 @@
 #include <QMessageBox>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/PanicDump.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2_PacketProtocol.h"
-#include "Common/PABotBase2/PABotBase2_MessageProtocol.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "Controllers/SerialPortPollerQt.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "SerialPABotBase2_Connection.h"
 
 //#include <iostream>
@@ -35,7 +34,7 @@ SerialPABotBase2_Connection::SerialPABotBase2_Connection(
     Logger& logger,
     std::string name
 )
-    : m_logger(logger, GlobalSettings::instance().LOG_EVERYTHING)
+    : m_logger(logger, LOG_EVERYTHING())
     , m_device_name(std::move(name))
 {
     set_status_line0("Not Connected", COLOR_RED);
@@ -248,7 +247,7 @@ bool SerialPABotBase2_Connection::open_serial_connection(){
     }
     m_stream_connection = std::make_unique<PABotBase2::ReliableStreamConnection>(
         static_cast<CancellableScope*>(this),
-        m_logger, GlobalSettings::instance().LOG_EVERYTHING,
+        m_logger, LOG_EVERYTHING(),
         GlobalThreadPools::unlimited_realtime(),
         *m_unreliable_connection,
         std::chrono::milliseconds(80),

@@ -5,8 +5,8 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-//#include "Common/Cpp/Concurrency/ReverseLockGuard.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "Controllers/JoystickTools.h"
 #include "SysbotBase3_ControllerState.h"
 #include "SysbotBase3_ProController.h"
@@ -51,7 +51,7 @@ void ProController_SysbotBase3::cancel_all_commands(){
     m_next_expected_seqnum_ack = m_next_seqnum;
 
     m_connection.write_data("cqCancel\r\n");
-    if (GlobalSettings::instance().LOG_EVERYTHING){
+    if (LOG_EVERYTHING()){
         m_logger.log("sys-botbase3: cqCancel");
     }
 
@@ -72,7 +72,7 @@ void ProController_SysbotBase3::replace_on_next_command(){
 
 #if 0
     m_connection.write_data("cqReplaceOnNext\r\n");
-    if (GlobalSettings::instance().LOG_EVERYTHING){
+    if (LOG_EVERYTHING()){
         m_logger.log("sys-botbase3: cqReplaceOnNext");
     }
 #endif
@@ -145,7 +145,7 @@ void ProController_SysbotBase3::on_message(const std::string& message){
 //    cout << "m_next_seqnum = " << m_next_seqnum << endl;
 //    cout << "m_next_expected_seqnum_ack = " << m_next_expected_seqnum_ack << endl;
 
-    if (GlobalSettings::instance().LOG_EVERYTHING){
+    if (LOG_EVERYTHING()){
         m_logger.log(
             "Command Finished: " + std::to_string(parsed) +
             " (queue size = " + std::to_string(m_next_seqnum - m_next_expected_seqnum_ack) + ")"
@@ -289,7 +289,7 @@ void ProController_SysbotBase3::execute_state(
     //  Do not log the contents of the command due to privacy concerns.
     //  (people entering passwords)
 #if 0
-    if (GlobalSettings::instance().LOG_EVERYTHING){
+    if (LOG_EVERYTHING()){
         m_logger.log("sys-botbase3: " + message);
     }
 #endif

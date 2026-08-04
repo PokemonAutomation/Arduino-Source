@@ -157,7 +157,7 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         ImageRGB32 image(m_image);
-        float angle = get_orientation_on_map(image);
+        double angle = get_orientation_on_map(image);
         TEST_RESULT_APPROXIMATE(angle, m_target_angle, m_threshold);
         return true;
     };

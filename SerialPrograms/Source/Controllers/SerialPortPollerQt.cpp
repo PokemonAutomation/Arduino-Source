@@ -116,7 +116,7 @@ void SerialPortPoller::run() noexcept{
         if (next_delay < std::chrono::seconds(1)){
             next_delay = std::chrono::seconds(1);
         }
-        if (GlobalSettings::instance().LOG_EVERYTHING){
+        if (LOG_EVERYTHING()){
             global_logger_tagged().log(
                 "Serial port refresh took " + tostr_u_commas(std::chrono::duration_cast<Milliseconds>(duration).count()) + " ms.",
                 COLOR_ORANGE
