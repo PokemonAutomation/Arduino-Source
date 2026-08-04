@@ -6,7 +6,7 @@
 
 #include <atomic>
 #include "Common/Cpp/PrettyPrint.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
@@ -151,7 +151,7 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(MODE);
     PA_ADD_OPTION(FLYING_UNLOCKED);
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         PA_ADD_OPTION(PATH0);
     }
     PA_ADD_OPTION(SANDWICH_RESET_IN_MINUTES);

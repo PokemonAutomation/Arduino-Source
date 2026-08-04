@@ -5,7 +5,7 @@
  */
 
 #include <cmath>
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
@@ -192,7 +192,7 @@ EggAutonomous::EggAutonomous()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
     }
     PA_ADD_OPTION(STOP_AFTER_CURRENT);

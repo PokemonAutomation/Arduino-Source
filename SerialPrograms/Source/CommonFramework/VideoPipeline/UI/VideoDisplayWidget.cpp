@@ -209,7 +209,7 @@ void VideoDisplayWidget::move_back_from_window(){
 
 
 void VideoDisplayWidget::mouseDoubleClickEvent(QMouseEvent* event){
-//    if (!PreloadSettings::instance().DEVELOPER_MODE){
+//    if (!STATIC_GLOBALS.DEVELOPER_MODE){
 //        return;
 //    }
     // If this widget is not already inside a VideoDisplayWindow, move it

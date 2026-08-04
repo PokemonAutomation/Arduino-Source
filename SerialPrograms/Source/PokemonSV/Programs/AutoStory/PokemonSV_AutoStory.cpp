@@ -7,14 +7,14 @@
 
 #include "ML/Inference/ML_YOLOv5Detector.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/Exceptions/UnexpectedBattleException.h"
+//#include "CommonFramework/Exceptions/UnexpectedBattleException.h"
 
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonTools/Async/InferenceRoutines.h"
+//#include "CommonFramework/Exceptions/OperationFailedException.h"
+//#include "CommonTools/Async/InferenceRoutines.h"
 
 
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -706,7 +706,7 @@ AutoStory::AutoStory()
     )
 {
 
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         PA_ADD_OPTION(m_advanced_options);
 
         PA_ADD_OPTION(TEST_YOLO_BOX);

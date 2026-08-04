@@ -6,7 +6,7 @@
 
 //#include <iostream>
 #include <unordered_map>
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
@@ -98,7 +98,7 @@ AuctionFarmer::AuctionFarmer()
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(TARGET_ITEMS);
     PA_ADD_OPTION(NOTIFICATIONS);
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         PA_ADD_STATIC(m_advanced_options);
         PA_ADD_OPTION(ONE_NPC);
     }

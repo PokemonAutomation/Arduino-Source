@@ -44,7 +44,7 @@ DiscordMessageSettingsOption::DiscordMessageSettingsOption()
 {
     PA_ADD_OPTION(instance_name);
     PA_ADD_OPTION(user_id);
-//    if (PreloadSettings::instance().DEVELOPER_MODE){
+//    if (STATIC_GLOBALS.DEVELOPER_MODE){
 //        PA_ADD_OPTION(message);
 //    }
 }

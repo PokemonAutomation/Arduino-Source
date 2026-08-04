@@ -5,7 +5,7 @@
  */
 
 #include <cmath>
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -171,7 +171,7 @@ EggAutonomous::EggAutonomous()
     PA_ADD_OPTION(FILTERS0);
     PA_ADD_OPTION(NOTIFICATIONS);
 
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         PA_ADD_OPTION(DEBUG_PROCESSING_HATCHED);
         PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
     }

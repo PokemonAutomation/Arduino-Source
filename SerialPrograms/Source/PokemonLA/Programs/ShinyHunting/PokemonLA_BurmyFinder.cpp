@@ -7,6 +7,7 @@
 #include <array>
 #include <sstream>
 #include "Common/Cpp/PrettyPrint.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -27,7 +28,6 @@
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/Programs/ShinyHunting/PokemonLA_BurmyFinder.h"
 #include "PokemonLA/Programs/PokemonLA_LeapPokemonActions.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable:4244)   //  double -> int precision loss
@@ -135,7 +135,7 @@ BurmyFinder::BurmyFinder()
     PA_ADD_OPTION(SHINY_DETECTED_ENROUTE);
     PA_ADD_OPTION(MATCH_DETECTED_OPTIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
     }
 }

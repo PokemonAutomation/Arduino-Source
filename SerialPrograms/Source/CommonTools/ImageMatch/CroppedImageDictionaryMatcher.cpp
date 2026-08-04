@@ -4,11 +4,10 @@
  *
  */
 
-#include <cmath>
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "ImageCropper.h"
 //#include "ImageDiff.h"
@@ -63,14 +62,14 @@ ImageMatchResult CroppedImageDictionaryMatcher::match(
         return results;
     }
 
-    if (PreloadSettings::debug().IMAGE_DICTIONARY_MATCHING){
+    if (STATIC_GLOBALS.IMAGE_DICTIONARY_MATCHING){
         std::cout << "CroppedImageDictionaryMatcher: match input image: " << std::endl;
         dump_debug_image(global_logger_command_line(), "CommonFramework/CroppedImageDictionaryMatcher", "match_input", image);
     }
 
     std::vector<ImageViewRGB32> crops = get_crop_candidates(image);
 
-    if (PreloadSettings::debug().IMAGE_DICTIONARY_MATCHING){
+    if (STATIC_GLOBALS.IMAGE_DICTIONARY_MATCHING){
 //        size_t c = 0;
         for (const ImageViewRGB32& crop : crops){
 //            std::cout << "CroppedImageDictionaryMatcher: process input" << c << "image with background " << crop.background.to_string() << std::endl;
@@ -93,7 +92,7 @@ ImageMatchResult CroppedImageDictionaryMatcher::match(
     background = cropped[0].background;
 
 //    ImageRGB32 processed = process_image(image, background);
-    if (PreloadSettings::debug().IMAGE_DICTIONARY_MATCHING){
+    if (STATIC_GLOBALS.IMAGE_DICTIONARY_MATCHING){
         std::cout << "CroppedImageDictionaryMatcher: process input image with background " << background.to_string() << std::endl;
         dump_debug_image(global_logger_command_line(), "CommonFramework/CroppedImageDictionaryMatcher", "match_input_processed", processed);
     }
@@ -112,7 +111,7 @@ ImageMatchResult CroppedImageDictionaryMatcher::match(
     }
 #endif
 
-    if (PreloadSettings::debug().IMAGE_DICTIONARY_MATCHING){
+    if (STATIC_GLOBALS.IMAGE_DICTIONARY_MATCHING){
         std::cout << "CroppedImageDictionaryMatcher: results: " << std::endl;
         size_t count = 0;
         for (const auto& result : results.results){

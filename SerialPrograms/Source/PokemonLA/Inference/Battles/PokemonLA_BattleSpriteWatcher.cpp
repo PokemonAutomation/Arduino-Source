@@ -8,7 +8,7 @@
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Tools/DebugDumper.h"
@@ -52,7 +52,7 @@ bool BattleSpriteWatcher::process_frame(const ImageViewRGB32& frame, WallClock t
     }
 
     const bool found_new_sprites = set_detected_sprites(frame, m_sprite_appeared);
-    if (found_new_sprites && PreloadSettings::instance().DEVELOPER_MODE){
+    if (found_new_sprites && STATIC_GLOBALS.DEVELOPER_MODE){
         dump_debug_image(m_logger, "PokemonLA/BattleSpriteWatcher", "SpriteDetected", frame);
     }
 

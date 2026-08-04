@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/Color.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
@@ -48,7 +48,7 @@ Pokemon::StatsHuntGenderFilter BoxGenderDetector::detect(const ImageViewRGB32& s
     );
     const size_t num_blue_pixels = image_stats(blue_region).count;
 
-    if (PreloadSettings::debug().COLOR_CHECK){
+    if (STATIC_GLOBALS.COLOR_CHECK){
         cout << "num_red_pixels: " << num_red_pixels << ", num_blue_pixels: " << num_blue_pixels
              << ", region " << region.width() << " x " << region.height() << endl;
 

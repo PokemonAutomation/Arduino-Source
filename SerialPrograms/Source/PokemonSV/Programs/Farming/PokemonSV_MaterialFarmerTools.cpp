@@ -7,7 +7,7 @@
 #include <atomic>
 #include <array>
 #include "Common/Cpp/PrettyPrint.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/UnexpectedBattleException.h"
@@ -15,7 +15,6 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
@@ -140,7 +139,7 @@ MaterialFarmerOptions::MaterialFarmerOptions(
     PA_ADD_OPTION(SANDWICH_OPTIONS);
     PA_ADD_OPTION(AUTO_HEAL_PERCENT);
 
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         PA_ADD_OPTION(m_advanced_options);
         PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
         PA_ADD_OPTION(SKIP_WARP_TO_POKECENTER);

@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLGPE_Panels.h"
 #include "PokemonLGPE_Settings.h"
@@ -43,7 +43,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<GiftReset_Descriptor, GiftReset>());
     ret.emplace_back(make_single_switch_program<LegendaryReset_Descriptor, LegendaryReset>());
 
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
         ret.emplace_back(make_single_switch_program<SoundListener_Descriptor, SoundListener>());
     }

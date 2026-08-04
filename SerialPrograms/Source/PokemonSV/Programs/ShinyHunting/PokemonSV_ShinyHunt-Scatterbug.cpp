@@ -6,7 +6,7 @@
 
 #include <atomic>
 #include "Common/Cpp/PrettyPrint.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -18,7 +18,6 @@
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
-#include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoHpReader.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldSensors.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -139,7 +138,7 @@ ShinyHuntScatterbug::ShinyHuntScatterbug()
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(AUTO_HEAL_PERCENT);
 
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
         PA_ADD_OPTION(DEBUG_WARP_TO_POKECENTER);
         PA_ADD_OPTION(SKIP_SANDWICH);

@@ -4,9 +4,8 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Panels/PanelTools.h"
-#include "Pokemon/Pokemon_Strings.h"
 #include "Programs/ML_LabelImages.h"
 #include "Programs/ML_RunYOLO.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -24,7 +23,7 @@ PanelListFactory::PanelListFactory()
 
 std::vector<PanelEntry> PanelListFactory::make_panels() const{
     std::vector<PanelEntry> ret;
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
         ret.emplace_back(make_panel<LabelImages_Descriptor, LabelImages>());
         // ret.emplace_back(make_panel<RunYOLO_Descriptor, RunYOLO>());

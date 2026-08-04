@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonHome_Panels.h"
 
@@ -38,7 +38,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<PokemonHome::PageSwap_Descriptor, PokemonHome::PageSwap>());
     ret.emplace_back(make_single_switch_program<PokemonHome::BoxSorter_Descriptor, PokemonHome::BoxSorter>());
     ret.emplace_back(make_single_switch_program<PokemonHome::BoxSorterLivingDex_Descriptor, PokemonHome::BoxSorterLivingDex>());
-    if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
+    if (IS_BETA_VERSION || STATIC_GLOBALS.DEVELOPER_MODE){
     }
 //    ret.emplace_back("---- Trading ----");
 
@@ -46,7 +46,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
 //    ret.emplace_back("---- Shiny Hunting ----");
 
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
         ret.emplace_back(make_single_switch_program<PokemonHome::GenerateNameOCRData_Descriptor, PokemonHome::GenerateNameOCRData>());
         ret.emplace_back(make_single_switch_program<PokemonHome::ReadSummaryScreen_Descriptor, PokemonHome::ReadSummaryScreen>());

@@ -6,8 +6,9 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Time.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Globals.h"
@@ -15,13 +16,10 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_AlertEyeDetector.h"
-#include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
-#include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "PokemonLZA_WildZoneCafe.h"
@@ -158,7 +156,7 @@ void do_one_cafe_trip(
             // else: travel_status == FastTravelState::PURSUED
         }
 
-        // if (PreloadSettings::instance().DEVELOPER_MODE){
+        // if (STATIC_GLOBALS.DEVELOPER_MODE){
         //     dump_debug_image(env.console, "AlertEyeDetector", "FalseNegative", latest_frame);
         // }
     }
@@ -333,7 +331,7 @@ void ShinyHunt_WildZoneCafe::program(SingleSwitchProgramEnvironment& env, ProCon
                     consecutive_failures++;
                     env.log("Consecutive failures: " + std::to_string(consecutive_failures), COLOR_RED);
                     if (consecutive_failures >= 3){
-                        if (PreloadSettings::instance().DEVELOPER_MODE && GlobalSettings::instance().SAVE_DEBUG_VIDEOS_ON_SWITCH){
+                        if (STATIC_GLOBALS.DEVELOPER_MODE && GlobalSettings::instance().SAVE_DEBUG_VIDEOS_ON_SWITCH){
                             env.log("Saving debug video on Switch...");
                             env.console.overlay().add_log("Save Debug Video on Switch");
                             pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);

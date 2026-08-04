@@ -4,8 +4,8 @@
 *
 */
 
-#include "Common/Cpp/Time.h"
 #include "Common/Cpp/Filesystem.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "PokemonLZA/Inference/Donuts/PokemonLZA_DonutBerriesDetector.h"
 #include "PokemonLZA/Inference/Donuts/PokemonLZA_FlavorPowerDetector.h"
@@ -23,13 +23,12 @@
 #include "PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "SerialPrograms/Source/CommonFramework/GlobalSettingsPanel.h"
 #include "PokemonLZA_Tests_Old.h"
 #include "TestUtils.h"
 #include <iostream>
 #include <fstream>
 #include <map>
-#include <filesystem>
+//#include <filesystem>
 using std::cout;
 using std::cerr;
 using std::endl;
@@ -667,7 +666,7 @@ int test_pokemonLZA_FlavorPowerScreenDetector(const std::string& filepath){
         return 1;
     }
 
-    if (PreloadSettings::debug().GENERATE_TEST_GOLDEN_FILES){
+    if (STATIC_GLOBALS.GENERATE_TEST_GOLDEN_FILES){
         // Golden file generation mode: detect all powers and write to file
         cout << "Generating golden file for: " << filepath << endl;
 
@@ -793,7 +792,7 @@ int test_pokemonLZA_DonutBerriesReader(const std::string& filepath){
 
     ImageRGB32 image(filepath);
 
-    if (PreloadSettings::debug().GENERATE_TEST_GOLDEN_FILES){
+    if (STATIC_GLOBALS.GENERATE_TEST_GOLDEN_FILES){
         // Golden file generation mode: read berry names and write to file
         cout << "Generating golden file for: " << filepath << endl;
 

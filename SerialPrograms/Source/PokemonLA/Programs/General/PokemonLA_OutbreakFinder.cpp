@@ -6,7 +6,7 @@
 
 #include <iterator>
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -197,7 +197,7 @@ OutbreakFinder::OutbreakFinder()
     PA_ADD_OPTION(DESIRED_STAR_MMO_SLUGS);
     PA_ADD_OPTION(NOTIFICATIONS);
 
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         PA_ADD_OPTION(DEBUG_MODE);
     }
 }

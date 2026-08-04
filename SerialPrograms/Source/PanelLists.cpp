@@ -8,11 +8,10 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include "Common/Qt/NoWheelComboBox.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "CommonFramework/Panels/UI/PanelListWidget.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "ML/ML_Panels.h"
 #include "NintendoSwitch/NintendoSwitch_Panels.h"
 #include "PokemonSwSh/PokemonSwSh_Panels.h"
@@ -70,13 +69,13 @@ ProgramSelect::ProgramSelect(QWidget& parent, PanelHolder& holder)
     add(std::make_unique<NintendoSwitch::PokemonLZA::PanelListFactory>());
     add(std::make_unique<NintendoSwitch::PokemonFRLG::PanelListFactory>());
     add(std::make_unique<NintendoSwitch::PokemonPokopia::PanelListFactory>());
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         add(std::make_unique<NintendoSwitch::PokemonRSE::PanelListFactory>());
     }
 
     add(std::make_unique<NintendoSwitch::ZeldaTotK::PanelListFactory>());
 
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         add(std::make_unique<ML::PanelListFactory>());
     }
 

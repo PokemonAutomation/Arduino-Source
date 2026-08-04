@@ -9,7 +9,7 @@
 #include <sstream>
 #include <unordered_map>
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -429,7 +429,7 @@ HandMoveData move_sandwich_hand_and_check_if_plates_empty(
     WallClock cur_time, last_time;
     VideoOverlaySet overlay_set(stream.overlay());
 
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         #if 0
             // to intentionally trigger failures in hand detection, for testing recovery
             if (SandwichHandType::FREE == hand_type){

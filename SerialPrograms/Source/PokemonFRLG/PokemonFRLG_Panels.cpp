@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonFRLG_Panels.h"
 
@@ -80,12 +80,12 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<WildRng_Descriptor, WildRng>());
     ret.emplace_back(make_single_switch_program<RoamingLegendaryRng_Descriptor, RoamingLegendaryRng>());
 
-    if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
+    if (IS_BETA_VERSION || STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Untested/Beta/WIP ----");
         ret.emplace_back(make_single_switch_program<EggRng_Descriptor, EggRng>());
     }
 
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
         ret.emplace_back(make_single_switch_program<SoundListener_Descriptor, SoundListener>());
         ret.emplace_back(make_single_switch_program<ReadStats_Descriptor, ReadStats>());

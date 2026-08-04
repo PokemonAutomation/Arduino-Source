@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "PokemonBDSP_Panels.h"
 
 #include "PokemonBDSP_Settings.h"
@@ -95,10 +95,10 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- Glitches (v1.1.2) ----");
     ret.emplace_back(make_single_switch_program<ActivateMenuGlitch112_Descriptor, ActivateMenuGlitch112>());
 
-    if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
+    if (IS_BETA_VERSION || STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Untested/Beta/WIP ----");
     }
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
         ret.emplace_back(make_single_switch_program<ShinyEncounterTester_Descriptor, ShinyEncounterTester>());
         ret.emplace_back(make_single_switch_program<SoundListener_Descriptor, SoundListener>());

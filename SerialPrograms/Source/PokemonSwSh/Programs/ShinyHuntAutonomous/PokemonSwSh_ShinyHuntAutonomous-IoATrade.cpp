@@ -5,7 +5,7 @@
  */
 
 #include <cmath>
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -90,7 +90,7 @@ ShinyHuntAutonomousIoATrade::ShinyHuntAutonomousIoATrade()
 
     PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(MASH_TO_TRADE_DELAY0);
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         PA_ADD_OPTION(RUN_FROM_EVERYTHING);
     }
 }

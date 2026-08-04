@@ -15,6 +15,7 @@
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Hardware/Hardware.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -94,7 +95,7 @@ ErrorReportOption::ErrorReportOption()
     PA_ADD_OPTION(VIDEO);
     PA_ADD_OPTION(LOGS);
     PA_ADD_OPTION(DUMPS);
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         PA_ADD_OPTION(FILES);
     }
 }
@@ -104,7 +105,7 @@ SendableErrorReport::SendableErrorReport()
     : m_timestamp(now_to_filestring())
     , m_directory(RUNTIME_BASE_PATH() + ERROR_PATH_UNSENT + "/" + m_timestamp + "/")
     , m_processor(get_processor_name())
-    , m_program(PreloadSettings::instance().DEVELOPER_MODE
+    , m_program(STATIC_GLOBALS.DEVELOPER_MODE
         ? PROGRAM_NAME + " (" + PROGRAM_VERSION + "-dev)"
         : PROGRAM_NAME + " (" + PROGRAM_VERSION + ")"
     )

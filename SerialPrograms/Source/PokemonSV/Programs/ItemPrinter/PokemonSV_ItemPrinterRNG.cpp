@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Qt/TimeQt.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -21,7 +21,6 @@
 #include "NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
-#include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
@@ -224,7 +223,7 @@ ItemPrinterRNG::ItemPrinterRNG()
     PA_ADD_OPTION(MIN_HAPPINY_DUST);
     PA_ADD_OPTION(MATERIAL_FARMER_OPTIONS);
     PA_ADD_OPTION(AVOID_STRING_OCR);
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         PA_ADD_OPTION(ENABLE_SEED_CALC);
     }
 

@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA_Panels.h"
 
@@ -99,11 +99,11 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<PostMMOSpawnReset_Descriptor, PostMMOSpawnReset>());
     ret.emplace_back(make_single_switch_program<ShinyHuntCustomPath_Descriptor, ShinyHuntCustomPath>());
 
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Untested/Beta/WIP ----");
         ret.emplace_back(make_single_switch_program<AutoMultiSpawn_Descriptor, AutoMultiSpawn>());
     }
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Machine Learning ----");
         ret.emplace_back(make_single_switch_program<GeneratePokemonImageTrainingData_Descriptor, GeneratePokemonImageTrainingData>());
 

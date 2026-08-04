@@ -11,7 +11,7 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 
 namespace PokemonAutomation{
 
@@ -61,7 +61,7 @@ public:
         PA_ADD_OPTION(FILE_VOLUME_SCALE);
         PA_ADD_OPTION(DEVICE_VOLUME_SCALE);
         PA_ADD_OPTION(SHOW_ALL_DEVICES);
-        if (PreloadSettings::instance().DEVELOPER_MODE){
+        if (STATIC_GLOBALS.DEVELOPER_MODE){
             PA_ADD_OPTION(SHOW_RECORD_FREQUENCIES);
         }
         PA_ADD_OPTION(AUTO_RESET_SECONDS);

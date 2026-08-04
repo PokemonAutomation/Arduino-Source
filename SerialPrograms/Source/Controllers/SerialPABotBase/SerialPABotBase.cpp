@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "SerialPABotBase.h"
 
 namespace PokemonAutomation{
@@ -92,14 +92,14 @@ bool controller_is_valid(uint32_t id){
     case PABB_CID_NintendoSwitch_WiredLeftJoycon:
     case PABB_CID_NintendoSwitch_WiredRightJoycon:
         return true;
-//        return IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE;
+//        return IS_BETA_VERSION || STATIC_GLOBALS.DEVELOPER_MODE;
     case PABB_CID_NintendoSwitch2_WiredProController:
     case PABB_CID_NintendoSwitch2_WiredLeftJoycon:
     case PABB_CID_NintendoSwitch2_WiredRightJoycon:
     case PABB_CID_NintendoSwitch2_WirelessProController:
     case PABB_CID_NintendoSwitch2_WirelessLeftJoycon:
     case PABB_CID_NintendoSwitch2_WirelessRightJoycon:
-        return PreloadSettings::instance().DEVELOPER_MODE;
+        return STATIC_GLOBALS.DEVELOPER_MODE;
     }
     return false;
 }

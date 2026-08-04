@@ -10,6 +10,7 @@
 //#include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
@@ -58,7 +59,7 @@ void PersistentSettings::read(){
     //  "GlobalSettings" is constructed.
     const JsonValue* settings = obj->get_value("20-GlobalSettings");
     if (settings){
-        PreloadSettings::instance().load(*settings);
+        STATIC_GLOBALS.load_json(*settings);
         GlobalSettings::instance().load_json(*settings);
     }
 

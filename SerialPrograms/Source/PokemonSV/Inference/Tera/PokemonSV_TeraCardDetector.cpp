@@ -11,7 +11,7 @@
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -214,7 +214,7 @@ std::string TeraCardReader::tera_type(
     }
     if (best_type.empty()){
         dump_image(logger, info, "ReadTypeFailed", screen);
-    }else if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+    }else if (STATIC_GLOBALS.IMAGE_TEMPLATE_MATCHING){
         dump_debug_image(logger, "PokemonSV/TeraRoller/" + best_type, "", screen);
     }
 
@@ -232,7 +232,7 @@ std::set<std::string> TeraCardReader::pokemon_slug(
     if (silhouette.results.empty()){
         dump_image(logger, info, "ReadSilhouetteFailed", screen);
     }
-//    else if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+//    else if (STATIC_GLOBALS.IMAGE_TEMPLATE_MATCHING){
 //        dump_debug_image(logger, "PokemonSV/TeraRoller/" + best_silhouette, "", screen);
 //    }
 

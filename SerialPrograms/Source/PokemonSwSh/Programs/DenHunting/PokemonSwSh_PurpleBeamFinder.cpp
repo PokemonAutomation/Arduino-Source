@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -119,7 +119,7 @@ PurpleBeamFinder::PurpleBeamFinder()
 {
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(NOTIFICATIONS);
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         PA_ADD_STATIC(m_advanced_options);
         PA_ADD_OPTION(TIMEOUT_DELAY0);
         PA_ADD_OPTION(MIN_BRIGHTNESS);

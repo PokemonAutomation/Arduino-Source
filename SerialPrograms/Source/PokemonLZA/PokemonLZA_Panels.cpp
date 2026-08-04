@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA_Panels.h"
 
@@ -109,7 +109,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     if (IS_BETA_VERSION){
         ret.emplace_back(make_single_switch_program<ShinyHunt_ShuttleRun_Descriptor, ShinyHunt_ShuttleRun>());
     }
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<ShinyHunt_HyperspaceHunter_Descriptor, ShinyHunt_HyperspaceHunter>());
         ret.emplace_back(make_single_switch_program<BeldumHunter_Descriptor, BeldumHunter>());
     }
@@ -121,7 +121,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- Public Betas ----");
     ret.emplace_back(make_single_switch_program<StatsReset_Descriptor, StatsReset>());
 
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
         ret.emplace_back(make_single_switch_program<OverworldWatcher_Descriptor, OverworldWatcher>());
         ret.emplace_back(make_single_switch_program<MoveBoxArrow_Descriptor, MoveBoxArrow>());

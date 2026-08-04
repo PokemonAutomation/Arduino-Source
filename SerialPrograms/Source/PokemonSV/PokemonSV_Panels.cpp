@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV_Panels.h"
 
@@ -157,20 +157,20 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- Deprecated Programs ----");
     ret.emplace_back(make_single_switch_program<AutoItemPrinter_Descriptor, AutoItemPrinter>());
 
-//    if (PreloadSettings::instance().DEVELOPER_MODE || IS_BETA_VERSION){
+//    if (STATIC_GLOBALS.DEVELOPER_MODE || IS_BETA_VERSION){
 //        ret.emplace_back("---- Untested/Beta/WIP ----");
 //    }
 //    if (IS_BETA_VERSION){
 //        ret.emplace_back("---- Story Automation ----");
 //    }
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
         ret.emplace_back(make_single_switch_program<SoundListener_Descriptor, SoundListener>());
         ret.emplace_back(make_single_switch_program<ThreeSegmentDudunsparceFinder_Descriptor, ThreeSegmentDudunsparceFinder>());
     }
 
 #ifdef PA_OFFICIAL
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Research ----");
         add_panels(ret);
     }

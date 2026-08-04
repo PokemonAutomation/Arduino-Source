@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -24,7 +25,6 @@
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/Programs/General/PokemonLA_RamanasIslandCombee.h"
 #include "PokemonLA/Programs/PokemonLA_LeapPokemonActions.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -104,7 +104,7 @@ RamanasCombeeFinder:: RamanasCombeeFinder()
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(SHINY_DETECTED_ENROUTE);
     PA_ADD_OPTION(NOTIFICATIONS);
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
     }
 }

@@ -5,10 +5,8 @@
  */
 
 #include <QHBoxLayout>
-#include "Common/Qt/Options/ConfigWidget.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
-#include "CommonFramework/Recording/StreamHistoryOption.h"
 #include "ML_ImageAnnotationCommandRow.h"
 
 //#include <iostream>
@@ -60,7 +58,7 @@ ImageAnnotationCommandRow::ImageAnnotationCommandRow(
     m_overlay_text->setChecked(session.enabled_text());
     row->addWidget(m_overlay_text);
 
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         m_overlay_images = new QCheckBox("Masks", this);
         m_overlay_images->setChecked(session.enabled_images());
         row->addWidget(m_overlay_images);
@@ -107,7 +105,7 @@ ImageAnnotationCommandRow::ImageAnnotationCommandRow(
         m_overlay_text, &QCheckBox::checkStateChanged,
         this, [this](Qt::CheckState state){ m_session.set_enabled_text(state == Qt::Checked); }
     );
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         connect(
             m_overlay_images, &QCheckBox::checkStateChanged,
             this, [this](Qt::CheckState state){ m_session.set_enabled_images(state == Qt::Checked); }

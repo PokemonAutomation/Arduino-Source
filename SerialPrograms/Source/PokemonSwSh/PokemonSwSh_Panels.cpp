@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "PokemonSwSh_Panels.h"
 
 #include "PokemonSwSh_Settings.h"
@@ -16,7 +16,7 @@
 #include "Programs/General/PokemonSwSh_SurpriseTrade.h"
 #include "Programs/General/PokemonSwSh_TradeBot.h"
 #include "Programs/General/PokemonSwSh_ClothingBuyer.h"
-#include "Programs/General/PokemonSwSh_BallThrower.h"
+//#include "Programs/General/PokemonSwSh_BallThrower.h"
 #include "Programs/General/PokemonSwSh_AutonomousBallThrower.h"
 #include "Programs/General/PokemonSwSh_DexRecFinder.h"
 #include "Programs/General/PokemonSwSh_BoxReorderNationalDex.h"
@@ -50,8 +50,8 @@
 #include "Programs/EggPrograms/PokemonSwSh_EggFetcher2.h"
 #include "Programs/EggPrograms/PokemonSwSh_EggFetcherMultiple.h"
 #include "Programs/EggPrograms/PokemonSwSh_EggHatcher.h"
-#include "Programs/EggPrograms/PokemonSwSh_EggCombined2.h"
-#include "Programs/EggPrograms/PokemonSwSh_EggSuperCombined2.h"
+//#include "Programs/EggPrograms/PokemonSwSh_EggCombined2.h"
+//#include "Programs/EggPrograms/PokemonSwSh_EggSuperCombined2.h"
 #include "Programs/EggPrograms/PokemonSwSh_GodEggDuplication.h"
 #include "Programs/EggPrograms/PokemonSwSh_GodEggItemDupe.h"
 
@@ -125,7 +125,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<StowOnSideFarmer_Descriptor, StowOnSideFarmer>());
     ret.emplace_back(make_single_switch_program<DailyHighlightFarmer_Descriptor, DailyHighlightFarmer>());
     ret.emplace_back(make_single_switch_program<PokeJobsFarmer_Descriptor, PokeJobsFarmer>());
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<WattTraderFarmer_Descriptor, WattTraderFarmer>());
     }
 
@@ -148,7 +148,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<EggHatcher_Descriptor, EggHatcher>());
     ret.emplace_back(make_single_switch_program<EggAutonomous_Descriptor, EggAutonomous>());
     ret.emplace_back(make_single_switch_program<GodEggItemDupe_Descriptor, GodEggItemDupe>());
-    if (PreloadSettings::instance().NAUGHTY_MODE || PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.NAUGHTY_MODE || STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<GodEggDuplication_Descriptor, GodEggDuplication>());
     }
 
@@ -194,10 +194,10 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<EggSuperCombined2_Descriptor, EggSuperCombined2>());
 #endif
 
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Untested/Beta/WIP ----");
     }
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
         ret.emplace_back(make_single_switch_program<ShinyEncounterTester_Descriptor, ShinyEncounterTester>());
         ret.emplace_back(make_single_switch_program<GenerateIVCheckerOCR_Descriptor, GenerateIVCheckerOCR>());

@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonRSE_Panels.h"
 
@@ -48,7 +48,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<ShinyHuntMew_Descriptor, ShinyHuntMew>());
     
 
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Test ----");
         ret.emplace_back(make_single_switch_program<StarterReset_Descriptor, StarterReset>()); //outdated early test program
 

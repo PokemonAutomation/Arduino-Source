@@ -4,8 +4,8 @@
  *
  */
 
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
@@ -64,7 +64,7 @@ MegaShardFarmer::MegaShardFarmer()
         false
     )
 {
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         PA_ADD_OPTION(SKIP_SHARDS);
     }
 }

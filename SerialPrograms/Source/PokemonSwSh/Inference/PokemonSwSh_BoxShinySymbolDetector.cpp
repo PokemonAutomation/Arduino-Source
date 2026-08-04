@@ -8,7 +8,7 @@
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
@@ -30,7 +30,7 @@ void BoxShinySymbolDetector::make_overlays(VideoOverlaySet& items){
 
 bool BoxShinySymbolDetector::detect(const ImageViewRGB32& screen){
     const ImageStats symbol = image_stats(extract_box_reference(screen, m_box));
-    if (PreloadSettings::debug().COLOR_CHECK){
+    if (STATIC_GLOBALS.COLOR_CHECK){
         cout << "Symbol region stddev " << symbol.stddev.to_string() << " (sum " << symbol.stddev.sum() << "), threshold: 50" << endl;
     }
     return symbol.stddev.sum() > 50;

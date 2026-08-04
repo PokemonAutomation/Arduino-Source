@@ -9,7 +9,7 @@
 #include "Common/Cpp/Strings/Unicode.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonTools/OCR/OCR_StringNormalization.h"
 #include "CommonTools/OCR/OCR_TextMatcher.h"
 #include "PokemonSV_JoinTracker.h"
@@ -84,7 +84,7 @@ bool check_ban_for_name(
             );
             double w_log10p = std::log10(w_probability);
             if (w_log10p <= entry.log10p){
-                if (PreloadSettings::instance().DEVELOPER_MODE){
+                if (STATIC_GLOBALS.DEVELOPER_MODE){
                     logger.log("Cannot ban whitelisted user: " + name + " (log10p = " + tostr_default(w_log10p) + ")", COLOR_RED);
                 }
                 return false;

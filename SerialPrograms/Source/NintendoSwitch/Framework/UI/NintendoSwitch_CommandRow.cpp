@@ -6,12 +6,12 @@
 
 #include <QHBoxLayout>
 #include "Common/Qt/Options/ConfigWidget.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/Panels/ConsoleSettingsStretch.h"
 #include "CommonFramework/Recording/StreamHistoryOption.h"
 #include "ControllerInput/ControllerInput.h"
-#include "ControllerInput/Keyboard/GlobalKeyboardHidTracker.h"
 #include "NintendoSwitch_CommandRow.h"
 
 //#include <iostream>
@@ -76,11 +76,11 @@ CommandRow::CommandRow(
         m_overlay_boxes = overlays->addItem("Boxes");
         m_overlay_boxes->setChecked(session.enabled_boxes());
     }
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         m_overlay_text = overlays->addItem("Text");  //  Nothing uses text overlay yet.
         m_overlay_text->setChecked(session.enabled_text());
     }
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         m_overlay_images = overlays->addItem("Masks");
         m_overlay_images->setChecked(session.enabled_images());
     }

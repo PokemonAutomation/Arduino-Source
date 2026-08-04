@@ -8,7 +8,7 @@
 #include "Common/Cpp/Color.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
@@ -128,7 +128,7 @@ bool match_template_by_waterfill(
     double rmsd_threshold,
     std::function<bool(WaterfillObject& object)> check_matched_object)
 {
-    const bool debug_mode = PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING;
+    const bool debug_mode = STATIC_GLOBALS.IMAGE_TEMPLATE_MATCHING;
     if (debug_mode){
         cout << "============ match_template_by_waterfill ============" << endl;
         dump_inputs(image, filters, area_thresholds, rmsd_threshold);

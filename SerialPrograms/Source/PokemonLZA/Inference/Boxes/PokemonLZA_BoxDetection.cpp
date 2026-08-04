@@ -6,10 +6,8 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
-#include "CommonFramework/Globals.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageHSV32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -28,7 +26,7 @@
 #include "PokemonLZA_BoxDetection.h"
 
 #include <iostream>
-#include <sstream>
+//#include <sstream>
 using std::cout;
 using std::endl;
 
@@ -352,17 +350,17 @@ bool BoxDetector::detect(const ImageViewRGB32& screen){
             cout << "row = " << (int)row << ", col = " << (int)col << endl;
 #endif
             // image_crop.save("cell_" + std::to_string(row) + "_" + std::to_string(col) + ".png");
-            const uint8_t debug_cell_row = PreloadSettings::debug().BOX_SYSTEM_CELL_ROW;
-            const uint8_t debug_cell_col = PreloadSettings::debug().BOX_SYSTEM_CELL_COL;
+            const uint8_t debug_cell_row = STATIC_GLOBALS.BOX_SYSTEM_CELL_ROW;
+            const uint8_t debug_cell_col = STATIC_GLOBALS.BOX_SYSTEM_CELL_COL;
             if (row == debug_cell_row && col == debug_cell_col){
                 debug_switch = true;
                 cout << "start debugging switch at " << int(row) << ", " << int(col) << endl;
-                PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING = true;
+                STATIC_GLOBALS.IMAGE_TEMPLATE_MATCHING = true;
             }
             const bool detected = detect_at_cell(cell_idx, screen);
             if (row == debug_cell_row && col == debug_cell_col){
                 debug_switch = false;
-                PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING = false;
+                STATIC_GLOBALS.IMAGE_TEMPLATE_MATCHING = false;
             }
             if (detected){
                 if (arrow_found && m_debug_mode){

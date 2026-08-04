@@ -9,7 +9,7 @@
 #include <chrono>
 #include <iterator>
 #include <sstream>
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -517,7 +517,7 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
         }
         num_removed_pokemon = num_initial_sprites - num_sprites_remain;
 
-        if (PreloadSettings::instance().DEVELOPER_MODE){
+        if (STATIC_GLOBALS.DEVELOPER_MODE){
             dump_debug_image(env.logger(), "PokemonLA/AutoMultiSpawn", "battle_sprite_" + std::to_string(num_sprites_remain), *sprite_detection_frame);
         }
         env.log("Found battle menu, num sprites removed: " + std::to_string(num_removed_pokemon));

@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonPokopia_Panels.h"
 
@@ -36,17 +36,17 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     // ret.emplace_back("---- Farming ----");
 
     ret.emplace_back("---- General ----");
-    if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
+    if (IS_BETA_VERSION || STATIC_GLOBALS.DEVELOPER_MODE){
         // Locking behind dev mode for now since this program is destructive and deletes your cloud island
     }
 
     ret.emplace_back("---- Untested/Beta/WIP ----");
     ret.emplace_back(make_single_switch_program<CloudIslandReset_Descriptor, CloudIslandReset>());
-    if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
+    if (IS_BETA_VERSION || STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<DailyFarmer_Descriptor, DailyFarmer>());
     }
 
-    // if (PreloadSettings::instance().DEVELOPER_MODE){
+    // if (STATIC_GLOBALS.DEVELOPER_MODE){
     //     ret.emplace_back("---- Developer Tools ----");
     // }
 

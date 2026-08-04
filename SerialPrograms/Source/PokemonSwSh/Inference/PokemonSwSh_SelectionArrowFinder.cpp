@@ -9,7 +9,7 @@
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -40,7 +40,7 @@ const ImageMatch::ExactImageMatcher& SELECTION_ARROW(){
 
 bool is_selection_arrow(const ImageViewRGB32& image, const WaterfillObject& object){
     double area_ratio = (double)object.area_ratio();
-    if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+    if (STATIC_GLOBALS.IMAGE_TEMPLATE_MATCHING){
         std::cout << "Object area: " << object.area << ", area ratio: " << area_ratio
                   << " bound [0.4, 0.5]" << std::endl;
         dump_debug_image(global_logger_command_line(), "PokemonSwSh/SelectionArrowFinder", "is_selection_arrow", extract_box_reference(image, object));
@@ -78,13 +78,13 @@ bool is_selection_arrow(const ImageViewRGB32& image, const WaterfillObject& obje
 
     double rmsd = SELECTION_ARROW().rmsd(cropped);
     
-    if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+    if (STATIC_GLOBALS.IMAGE_TEMPLATE_MATCHING){
         std::cout << "rmsd: " << rmsd << ", threshold 130" << std::endl;
     }
     return rmsd <= 130;
 }
 std::vector<ImagePixelBox> find_selection_arrows(const ImageViewRGB32& image, size_t min_area){
-    if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+    if (STATIC_GLOBALS.IMAGE_TEMPLATE_MATCHING){
         std::cout << "Match SwSh selection arrow by waterfill, size range (" << min_area << ", SIZE_MAX) " 
                   << "input image size " << image.width() << " x " << image.height() << std::endl;
     }
@@ -94,7 +94,7 @@ std::vector<ImagePixelBox> find_selection_arrows(const ImageViewRGB32& image, si
     std::vector<ImagePixelBox> ret;
     WaterfillObject object;
     while (finder->find_next(object, true)){
-        if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+        if (STATIC_GLOBALS.IMAGE_TEMPLATE_MATCHING){
             std::cout << "Found object: " << object.min_x << "-" << object.max_x << ", " << object.min_y << "-" << object.max_y << std::endl;
         }
         if (is_selection_arrow(image, object)){

@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -103,7 +103,7 @@ FlyingTrialFarmer::FlyingTrialFarmer()
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NUM_TRIALS);
     PA_ADD_OPTION(SAVE_NUM_ROUNDS);
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         PA_ADD_OPTION(FLIGHT_PATH);
     }
     PA_ADD_OPTION(INVERT_CONTROLS_WHILE_FLYING);

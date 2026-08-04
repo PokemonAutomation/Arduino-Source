@@ -10,6 +10,7 @@
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -38,7 +39,7 @@ void append_body_fields(JsonArray& fields, const std::vector<std::pair<std::stri
 JsonObject make_credits_field(const ProgramInfo& info){
     JsonObject field;
     field["name"] = "Powered By:";
-    std::string text = PreloadSettings::instance().DEVELOPER_MODE
+    std::string text = STATIC_GLOBALS.DEVELOPER_MODE
         ? PROGRAM_NAME + " CC " + PROGRAM_VERSION + "-dev"
         : PROGRAM_NAME + " CC " + PROGRAM_VERSION + "";
     text += " ([GitHub](" + GITHUB_LINK_URL + ")/[Discord](" + DISCORD_LINK_URL_EMBED + "))";

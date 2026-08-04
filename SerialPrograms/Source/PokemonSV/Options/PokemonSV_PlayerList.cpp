@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Tools/FileDownloader.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
@@ -126,7 +126,7 @@ RaidPlayerBanList::RaidPlayerBanList()
     PA_ADD_OPTION(text);
     PA_ADD_OPTION(local_table);
     PA_ADD_OPTION(online_table_url);
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         PA_ADD_OPTION(ignore_whitelist);
     }
 }

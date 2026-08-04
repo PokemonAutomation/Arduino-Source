@@ -6,7 +6,7 @@
 
 #include <iostream>
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
@@ -90,7 +90,7 @@ public:
         size_t min_width = m_min_width * input_resolution.width / 3840;
         size_t min_height = m_min_height * input_resolution.height / 2160;
 
-        if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+        if (STATIC_GLOBALS.IMAGE_TEMPLATE_MATCHING){
             const double stddev_sum = image_stats(image).stddev.sum();
             std::cout << "???? ButtonMatcher::check_image() ???? min size " << min_width << " x " << min_height
                  << " got " << image.width() << " x " << image.height() << " stddev_sum: " << stddev_sum << std::endl;
@@ -239,7 +239,7 @@ bool ButtonDetector::detect(const ImageViewRGB32& screen){
 
     // if (m_button_type == ButtonType::ButtonDpadUpInterior){
     //     cout << "Start debugging ButtonDpadUpInterior" << endl;
-    //     PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING = true;
+    //     STATIC_GLOBALS.IMAGE_TEMPLATE_MATCHING = true;
     // }
 
     bool found = match_template_by_waterfill(
@@ -266,7 +266,7 @@ bool ButtonDetector::detect(const ImageViewRGB32& screen){
 
     // if (m_button_type == ButtonType::ButtonDpadUpInterior){
     //     cout << "End debugging ButtonDpadUpInterior" << endl;
-    //     PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING = false;
+    //     STATIC_GLOBALS.IMAGE_TEMPLATE_MATCHING = false;
     // }
 
     return found;

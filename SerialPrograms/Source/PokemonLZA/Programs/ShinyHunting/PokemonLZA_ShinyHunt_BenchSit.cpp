@@ -4,8 +4,8 @@
  *
  */
 
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -132,7 +132,7 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
     })
 {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         PA_ADD_OPTION(WALK_DIRECTION);
     }
     PA_ADD_OPTION(WALK_FORWARD_DURATION);

@@ -6,8 +6,9 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Time.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Globals.h"
@@ -20,8 +21,6 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_AlertEyeDetector.h"
-#include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
-#include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "PokemonLZA_WildZoneEntrance.h"
@@ -307,7 +306,7 @@ void leave_zone_and_reset_spawns(
         // travel_status == FastTravelState::PURSUED, we are being attacked by wild pokemon.
         // mash B to close map and return to overworld
         map_to_overworld(env.console, context);
-        // if (PreloadSettings::instance().DEVELOPER_MODE){
+        // if (STATIC_GLOBALS.DEVELOPER_MODE){
         //     dump_debug_image(env.console, "AlertEyeDetector", "FalseNegative", latest_frame);
         // }
     }
@@ -552,7 +551,7 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
                     consecutive_failures++;
                     env.log("Consecutive failures: " + std::to_string(consecutive_failures), COLOR_RED);
                     if (consecutive_failures >= 3){
-                        if (PreloadSettings::instance().DEVELOPER_MODE && GlobalSettings::instance().SAVE_DEBUG_VIDEOS_ON_SWITCH){
+                        if (STATIC_GLOBALS.DEVELOPER_MODE && GlobalSettings::instance().SAVE_DEBUG_VIDEOS_ON_SWITCH){
                             env.log("Saving debug video on Switch...");
                             env.console.overlay().add_log("Save Debug Video on Switch");
                             pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
