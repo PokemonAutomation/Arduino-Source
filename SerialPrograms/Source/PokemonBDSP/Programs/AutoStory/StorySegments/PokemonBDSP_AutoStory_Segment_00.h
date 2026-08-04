@@ -28,7 +28,7 @@ public:
     ) const override;
 };
 
-class AutoStory_Checkpoint_000 : public AutoStory_Checkpoint{
+class AutoStory_Checkpoint_0001 : public AutoStory_Checkpoint{
 public:
     virtual std::string name()       const override;
     virtual std::string start_text() const override;
@@ -41,7 +41,7 @@ public:
     ) const override;
 };
 
-class AutoStory_Checkpoint_001 : public AutoStory_Checkpoint{
+class AutoStory_Checkpoint_0002 : public AutoStory_Checkpoint{
 public:
     virtual std::string name() const override;
     virtual std::string start_text() const override;
@@ -54,7 +54,7 @@ public:
     ) const override;
 };
 
-class AutoStory_Checkpoint_002 : public AutoStory_Checkpoint{
+class AutoStory_Checkpoint_0003 : public AutoStory_Checkpoint{
 public:
     virtual std::string name() const override;
     virtual std::string start_text() const override;
@@ -67,7 +67,7 @@ public:
     ) const override;
 };
 
-class AutoStory_Checkpoint_003 : public AutoStory_Checkpoint{
+class AutoStory_Checkpoint_0004 : public AutoStory_Checkpoint{
 public:
     virtual std::string name() const override;
     virtual std::string start_text() const override;
@@ -80,7 +80,7 @@ public:
     ) const override;
 };
 
-class AutoStory_Checkpoint_004 : public AutoStory_Checkpoint {
+class AutoStory_Checkpoint_0005 : public AutoStory_Checkpoint {
 public:
     virtual std::string name() const override;
     virtual std::string start_text() const override;

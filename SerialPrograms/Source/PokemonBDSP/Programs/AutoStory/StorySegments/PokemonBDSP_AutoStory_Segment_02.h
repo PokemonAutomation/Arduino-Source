@@ -28,7 +28,7 @@ public:
     ) const override;
 };
 
-class AutoStory_checkpoint_007 : public AutoStory_Checkpoint{
+class AutoStory_checkpoint_0201 : public AutoStory_Checkpoint{
 public:
     virtual std::string name()       const override;
     virtual std::string start_text() const override;
@@ -43,22 +43,14 @@ public:
 
 // start: first badge acquired
 // end:   second Gym Badge acquired (Eterna City)
-void checkpoint_007(
+void checkpoint_0201(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats
 );
 
-// start: first badge acquired
-// end:   second Gym Badge acquired (Eterna City)
-void checkpoint_008(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats
-);
-class AutoStory_checkpoint_008 : public AutoStory_Checkpoint {
+class AutoStory_checkpoint_0202 : public AutoStory_Checkpoint {
 public:
     virtual std::string name()       const override;
     virtual std::string start_text() const override;
@@ -73,13 +65,13 @@ public:
 
 // start: first badge acquired
 // end:   second Gym Badge acquired (Eterna City)
-void checkpoint_008(
+void checkpoint_0202(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats
 );
-class AutoStory_checkpoint_009 : public AutoStory_Checkpoint {
+class AutoStory_checkpoint_0203 : public AutoStory_Checkpoint {
 public:
     virtual std::string name()       const override;
     virtual std::string start_text() const override;
@@ -94,14 +86,14 @@ public:
 
 // start: first badge acquired
 // end:   second Gym Badge acquired (Eterna City)
-void checkpoint_009(
+void checkpoint_0203(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats
 );
 
-class AutoStory_checkpoint_010 : public AutoStory_Checkpoint {
+class AutoStory_checkpoint_0204 : public AutoStory_Checkpoint {
 public:
     virtual std::string name()       const override;
     virtual std::string start_text() const override;
@@ -116,7 +108,29 @@ public:
 
 // start: first badge acquired
 // end:   second Gym Badge acquired (Eterna City)
-void checkpoint_010(
+void checkpoint_0204(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+);
+
+class AutoStory_checkpoint_0205 : public AutoStory_Checkpoint {
+public:
+    virtual std::string name()       const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text()   const override;
+    virtual void run_checkpoint(
+        SingleSwitchProgramEnvironment& env,
+        ProControllerContext& context,
+        AutoStoryOptions options,
+        AutoStoryStats& stats
+    ) const override;
+};
+
+// start: first badge acquired
+// end:   second Gym Badge acquired (Eterna City)
+void checkpoint_0205(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
