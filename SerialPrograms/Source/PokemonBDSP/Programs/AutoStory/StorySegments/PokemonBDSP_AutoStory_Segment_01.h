@@ -28,7 +28,7 @@ public:
     ) const override;
 };
 
-class AutoStory_checkpoint_005 : public AutoStory_Checkpoint{
+class AutoStory_checkpoint_0101 : public AutoStory_Checkpoint{
 public:
     virtual std::string name()       const override;
     virtual std::string start_text() const override;
@@ -43,13 +43,13 @@ public:
 
 // start: starter Pokemon taken out of PC at level 100 and ready to be used in battle
 // end:   first Gym Badge acquired (Oreburgh City)
-void checkpoint_005(
+void checkpoint_0101(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats
 );
-class AutoStory_checkpoint_006 : public AutoStory_Checkpoint {
+class AutoStory_checkpoint_0102 : public AutoStory_Checkpoint {
 public:
     virtual std::string name()       const override;
     virtual std::string start_text() const override;
@@ -64,7 +64,29 @@ public:
 
 // start: starter Pokemon taken out of PC at level 100 and ready to be used in battle
 // end:   first Gym Badge acquired (Oreburgh City)
-void checkpoint_006(
+void checkpoint_0102(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+);
+
+class AutoStory_checkpoint_0103 : public AutoStory_Checkpoint {
+public:
+    virtual std::string name()       const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text()   const override;
+    virtual void run_checkpoint(
+        SingleSwitchProgramEnvironment& env,
+        ProControllerContext& context,
+        AutoStoryOptions options,
+        AutoStoryStats& stats
+    ) const override;
+};
+
+// start: starter Pokemon taken out of PC at level 100 and ready to be used in battle
+// end:   first Gym Badge acquired (Oreburgh City)
+void checkpoint_0103(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,

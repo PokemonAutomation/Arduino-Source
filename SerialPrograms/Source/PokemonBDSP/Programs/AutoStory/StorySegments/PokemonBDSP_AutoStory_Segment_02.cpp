@@ -217,28 +217,29 @@ void AutoStory_Segment_02::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    AutoStory_checkpoint_007().run_checkpoint(env, context, options, stats);
-    AutoStory_checkpoint_008().run_checkpoint(env, context, options, stats);
-    AutoStory_checkpoint_009().run_checkpoint(env, context, options, stats);
+    AutoStory_checkpoint_0201().run_checkpoint(env, context, options, stats);
+    AutoStory_checkpoint_0202().run_checkpoint(env, context, options, stats);
+    AutoStory_checkpoint_0203().run_checkpoint(env, context, options, stats);
+    AutoStory_checkpoint_0204().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
 }
-std::string AutoStory_checkpoint_007::name()       const { return "007 - " + AutoStory_Segment_02().name(); }
-std::string AutoStory_checkpoint_007::start_text() const { return "First Gym Badge acquired (Oreburgh City)."; }
-std::string AutoStory_checkpoint_007::end_text()   const { return "Standing in front of the scientist in Valley windworks after beating Mars."; }
+std::string AutoStory_checkpoint_0201::name()       const { return "02.01 - Outside Gym 1"; }
+std::string AutoStory_checkpoint_0201::start_text() const { return "First Gym Badge acquired (Oreburgh City)."; }
+std::string AutoStory_checkpoint_0201::end_text()   const { return "Standing in front of the scientist in Valley windworks after beating Mars."; }
 
-void AutoStory_checkpoint_007::run_checkpoint(
+void AutoStory_checkpoint_0201::run_checkpoint(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats
 ) const {
-    checkpoint_007(env, context, options, stats);
+    checkpoint_0201(env, context, options, stats);
 }
 
 
-void checkpoint_007(
+void checkpoint_0201(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
@@ -254,21 +255,21 @@ void checkpoint_007(
         true
     );
 }
-std::string AutoStory_checkpoint_008::name()       const { return "008 - " + AutoStory_Segment_02().name(); }
-std::string AutoStory_checkpoint_008::start_text() const { return "First Gym Badge acquired (Oreburgh City)."; }
-std::string AutoStory_checkpoint_008::end_text()   const { return "Second Gym Badge acquired (Eterna City)."; }
+std::string AutoStory_checkpoint_0202::name()       const { return "02.02 - TBC"; }
+std::string AutoStory_checkpoint_0202::start_text() const { return "First Gym Badge acquired (Oreburgh City)."; }
+std::string AutoStory_checkpoint_0202::end_text()   const { return "Second Gym Badge acquired (Eterna City)."; }
 
-void AutoStory_checkpoint_008::run_checkpoint(
+void AutoStory_checkpoint_0202::run_checkpoint(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats
 ) const {
-    checkpoint_008(env, context, options, stats);
+    checkpoint_0202(env, context, options, stats);
 }
 
 
-void checkpoint_008(
+void checkpoint_0202(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
@@ -285,21 +286,21 @@ void checkpoint_008(
     );
 }
 
-std::string AutoStory_checkpoint_009::name()       const{ return "009 - " + AutoStory_Segment_02().name(); }
-std::string AutoStory_checkpoint_009::start_text() const{ return "First Gym Badge acquired (Oreburgh City)."; }
-std::string AutoStory_checkpoint_009::end_text()   const{ return "Second Gym Badge acquired (Eterna City)."; }
+std::string AutoStory_checkpoint_0203::name()       const{ return "02.03 - TBC"; }
+std::string AutoStory_checkpoint_0203::start_text() const{ return "First Gym Badge acquired (Oreburgh City)."; }
+std::string AutoStory_checkpoint_0203::end_text()   const{ return "Second Gym Badge acquired (Eterna City)."; }
 
-void AutoStory_checkpoint_009::run_checkpoint(
+void AutoStory_checkpoint_0203::run_checkpoint(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats
 ) const{
-    checkpoint_009(env, context, options, stats);
+    checkpoint_0203(env, context, options, stats);
 }
 
 
-void checkpoint_009(
+void checkpoint_0203(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
@@ -315,21 +316,22 @@ void checkpoint_009(
         true
     );
 }
-std::string AutoStory_checkpoint_010::name()       const { return "010 - " + AutoStory_Segment_02().name(); }
-std::string AutoStory_checkpoint_010::start_text() const { return "First Gym Badge acquired (Oreburgh City)."; }
-std::string AutoStory_checkpoint_010::end_text()   const { return "Second Gym Badge acquired (Eterna City)."; }
 
-void AutoStory_checkpoint_010::run_checkpoint(
+std::string AutoStory_checkpoint_0204::name()       const { return "02.04 - TBC"; }
+std::string AutoStory_checkpoint_0204::start_text() const { return "First Gym Badge acquired (Oreburgh City)."; }
+std::string AutoStory_checkpoint_0204::end_text()   const { return "Second Gym Badge acquired (Eterna City)."; }
+
+void AutoStory_checkpoint_0204::run_checkpoint(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats
 ) const {
-    checkpoint_010(env, context, options, stats);
+    checkpoint_0204(env, context, options, stats);
 }
 
 
-void checkpoint_010(
+void checkpoint_0204(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
@@ -339,6 +341,35 @@ void checkpoint_010(
         [&](size_t /*attempt*/) {
             // TODO: implement Segment 02 gameplay logic
             eterna_forest_exit_to_gym(env.console, context);
+
+        },
+        true
+    );
+}
+
+std::string AutoStory_checkpoint_0205::name()       const { return "02.05 - Inside Gym"; }
+std::string AutoStory_checkpoint_0205::start_text() const { return "First Gym Badge acquired (Oreburgh City)."; }
+std::string AutoStory_checkpoint_0205::end_text()   const { return "Second Gym Badge acquired (Eterna City)."; }
+
+void AutoStory_checkpoint_0205::run_checkpoint(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+) const {
+    checkpoint_0205(env, context, options, stats);
+}
+
+
+void checkpoint_0205(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+) {
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/) {
+
             //#. Eterna Gym navigation and battle
             gym_Puzzle_02(env.console, context);
         },

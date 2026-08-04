@@ -42,20 +42,20 @@ void AutoStory_Segment_09::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    AutoStory_Checkpoint_137().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_138().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_139().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_140().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_141().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_142().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_143().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_144().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_145().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_146().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_147().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_148().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_149().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_150().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0901().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0902().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0903().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0904().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0905().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0906().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0907().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0908().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0909().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0910().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0911().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0912().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0913().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0914().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
@@ -1427,7 +1427,7 @@ static bool deal_with_cynthia_and_finish(
     return true;
 }
 
-void checkpoint_137(
+void checkpoint_0901(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
@@ -1443,7 +1443,7 @@ void checkpoint_137(
     );
 }
 
-void checkpoint_138(
+void checkpoint_0902(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
@@ -1459,7 +1459,7 @@ void checkpoint_138(
     );
 }
 
-void checkpoint_139(
+void checkpoint_0903(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
@@ -1475,7 +1475,7 @@ void checkpoint_139(
     );
 }
 
-void checkpoint_140(
+void checkpoint_0904(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
@@ -1491,7 +1491,7 @@ void checkpoint_140(
     );
 }
 
-void checkpoint_141(
+void checkpoint_0905(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
@@ -1507,7 +1507,7 @@ void checkpoint_141(
     );
 }
 
-void checkpoint_142(
+void checkpoint_0906(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
@@ -1523,7 +1523,7 @@ void checkpoint_142(
     );
 }
 
-void checkpoint_143(
+void checkpoint_0907(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
@@ -1539,7 +1539,7 @@ void checkpoint_143(
     );
 }
 
-void checkpoint_144(
+void checkpoint_0908(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
@@ -1555,7 +1555,7 @@ void checkpoint_144(
     );
 }
 
-void checkpoint_145(
+void checkpoint_0909(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
@@ -1571,7 +1571,7 @@ void checkpoint_145(
     );
 }
 
-void checkpoint_146(
+void checkpoint_0910(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
@@ -1587,7 +1587,7 @@ void checkpoint_146(
     );
 }
 
-void checkpoint_147(
+void checkpoint_0911(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
@@ -1603,7 +1603,7 @@ void checkpoint_147(
     );
 }
 
-void checkpoint_148(
+void checkpoint_0912(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
@@ -1619,7 +1619,7 @@ void checkpoint_148(
     );
 }
 
-void checkpoint_149(
+void checkpoint_0913(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
@@ -1635,7 +1635,7 @@ void checkpoint_149(
     );
 }
 
-void checkpoint_150(
+void checkpoint_0914(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
@@ -1651,173 +1651,173 @@ void checkpoint_150(
     );
 }
 
-std::string AutoStory_Checkpoint_137::name()       const{ return "137 - S09 - Leave the gym and fly to the Sunyshore Pokemon Center."; }
-std::string AutoStory_Checkpoint_137::start_text() const{ return "Eighth Gym Badge acquired (Sunyshore City)."; }
-std::string AutoStory_Checkpoint_137::end_text()   const{ return "Enter the Sunyshore Pokemon Center."; }
-void AutoStory_Checkpoint_137::run_checkpoint(
+std::string AutoStory_Checkpoint_0901::name()       const{ return "09.01 - Leave the gym and fly to the Sunyshore Pokemon Center."; }
+std::string AutoStory_Checkpoint_0901::start_text() const{ return "Eighth Gym Badge acquired (Sunyshore City)."; }
+std::string AutoStory_Checkpoint_0901::end_text()   const{ return "Enter the Sunyshore Pokemon Center."; }
+void AutoStory_Checkpoint_0901::run_checkpoint(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats
 ) const{
-    checkpoint_137(env, context, options, stats);
+    checkpoint_0901(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_138::name()       const{ return "138 - S09 - Heal the Pokemon at the Sunyshore Pokemon Center."; }
-std::string AutoStory_Checkpoint_138::start_text() const{ return "Entered the Sunyshore Pokemon Center."; }
-std::string AutoStory_Checkpoint_138::end_text()   const{ return "Exit the Sunyshore Pokemon Center."; }
-void AutoStory_Checkpoint_138::run_checkpoint(
+std::string AutoStory_Checkpoint_0902::name()       const{ return "09.02 - Heal the Pokemon at the Sunyshore Pokemon Center."; }
+std::string AutoStory_Checkpoint_0902::start_text() const{ return "Entered the Sunyshore Pokemon Center."; }
+std::string AutoStory_Checkpoint_0902::end_text()   const{ return "Exit the Sunyshore Pokemon Center."; }
+void AutoStory_Checkpoint_0902::run_checkpoint(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats
 ) const{
-    checkpoint_138(env, context, options, stats);
+    checkpoint_0902(env, context, options, stats);
 }
 
 
-std::string AutoStory_Checkpoint_139::name()       const{ return "139 - S09 - Start at the Sunyshore Pokemon Center and go to the Victory Road Pokemon Center."; }
-std::string AutoStory_Checkpoint_139::start_text() const{ return "Exited the Sunyshore Pokemon Center."; }
-std::string AutoStory_Checkpoint_139::end_text()   const{ return "Enter the Victory Road Pokemon Center."; }
-void AutoStory_Checkpoint_139::run_checkpoint(
+std::string AutoStory_Checkpoint_0903::name()       const{ return "09.03 - Start at the Sunyshore Pokemon Center and go to the Victory Road Pokemon Center."; }
+std::string AutoStory_Checkpoint_0903::start_text() const{ return "Exited the Sunyshore Pokemon Center."; }
+std::string AutoStory_Checkpoint_0903::end_text()   const{ return "Enter the Victory Road Pokemon Center."; }
+void AutoStory_Checkpoint_0903::run_checkpoint(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats
 ) const{
-    checkpoint_139(env, context, options, stats);
+    checkpoint_0903(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_140::name()       const{ return "140 - S09 - Heal at the Victory Road Pokemon Center."; }
-std::string AutoStory_Checkpoint_140::start_text() const{ return "Entered Victory Road Pokemon Center."; }
-std::string AutoStory_Checkpoint_140::end_text()   const{ return "Exit Victory Road Pokemon Center."; }
-void AutoStory_Checkpoint_140::run_checkpoint(
+std::string AutoStory_Checkpoint_0904::name()       const{ return "09.04 - Heal at the Victory Road Pokemon Center."; }
+std::string AutoStory_Checkpoint_0904::start_text() const{ return "Entered Victory Road Pokemon Center."; }
+std::string AutoStory_Checkpoint_0904::end_text()   const{ return "Exit Victory Road Pokemon Center."; }
+void AutoStory_Checkpoint_0904::run_checkpoint(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats
 ) const{
-    checkpoint_140(env, context, options, stats);
+    checkpoint_0904(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_141::name()       const{ return "141 - S09 - Enter the Victory Road cave."; }
-std::string AutoStory_Checkpoint_141::start_text() const{ return "Exited Victory Road Pokemon Center."; }
-std::string AutoStory_Checkpoint_141::end_text()   const{ return "Enter the Victory Road cave."; }
-void AutoStory_Checkpoint_141::run_checkpoint(
+std::string AutoStory_Checkpoint_0905::name()       const{ return "09.05 - Enter the Victory Road cave."; }
+std::string AutoStory_Checkpoint_0905::start_text() const{ return "Exited Victory Road Pokemon Center."; }
+std::string AutoStory_Checkpoint_0905::end_text()   const{ return "Enter the Victory Road cave."; }
+void AutoStory_Checkpoint_0905::run_checkpoint(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats
 ) const{
-    checkpoint_141(env, context, options, stats);
+    checkpoint_0905(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_142::name()       const{ return "142 - S09 - Go through the Victory Road cave."; }
-std::string AutoStory_Checkpoint_142::start_text() const{ return "Entered Victory Road cave."; }
-std::string AutoStory_Checkpoint_142::end_text()   const{ return "Exit Victory Road cave."; }
-void AutoStory_Checkpoint_142::run_checkpoint(
+std::string AutoStory_Checkpoint_0906::name()       const{ return "09.06 - Go through the Victory Road cave."; }
+std::string AutoStory_Checkpoint_0906::start_text() const{ return "Entered Victory Road cave."; }
+std::string AutoStory_Checkpoint_0906::end_text()   const{ return "Exit Victory Road cave."; }
+void AutoStory_Checkpoint_0906::run_checkpoint(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats
 ) const{
-    checkpoint_142(env, context, options, stats);
+    checkpoint_0906(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_143::name()       const{ return "143 - S09 - Go through the end of Victory Road into the Elite 4 building"; }
-std::string AutoStory_Checkpoint_143::start_text() const{ return "Exited Victory Road cave."; }
-std::string AutoStory_Checkpoint_143::end_text()   const{ return "Enter the Elite 4 building."; }
-void AutoStory_Checkpoint_143::run_checkpoint(
+std::string AutoStory_Checkpoint_0907::name()       const{ return "09.07 - Go through the end of Victory Road into the Elite 4 building"; }
+std::string AutoStory_Checkpoint_0907::start_text() const{ return "Exited Victory Road cave."; }
+std::string AutoStory_Checkpoint_0907::end_text()   const{ return "Enter the Elite 4 building."; }
+void AutoStory_Checkpoint_0907::run_checkpoint(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats
 ) const{
-    checkpoint_143(env, context, options, stats);
+    checkpoint_0907(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_144::name()       const{ return "144 - S09 - Enter the Elite 4 building and get ready to enter."; }
-std::string AutoStory_Checkpoint_144::start_text() const{ return "Entered the Elite 4 building."; }
-std::string AutoStory_Checkpoint_144::end_text()   const{ return "Ready in front of the Elite 4."; }
-void AutoStory_Checkpoint_144::run_checkpoint(
+std::string AutoStory_Checkpoint_0908::name()       const{ return "09.08 - Enter the Elite 4 building and get ready to enter."; }
+std::string AutoStory_Checkpoint_0908::start_text() const{ return "Entered the Elite 4 building."; }
+std::string AutoStory_Checkpoint_0908::end_text()   const{ return "Ready in front of the Elite 4."; }
+void AutoStory_Checkpoint_0908::run_checkpoint(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats
 ) const{
-    checkpoint_144(env, context, options, stats);
+    checkpoint_0908(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_145::name()       const{ return "145 - S09 - Enter the first room of the Elite 4."; }
-std::string AutoStory_Checkpoint_145::start_text() const{ return "Readied in front of the Elite 4."; }
-std::string AutoStory_Checkpoint_145::end_text()   const{ return "Enter the Elite 4's first room."; }
-void AutoStory_Checkpoint_145::run_checkpoint(
+std::string AutoStory_Checkpoint_0909::name()       const{ return "09.09 - Enter the first room of the Elite 4."; }
+std::string AutoStory_Checkpoint_0909::start_text() const{ return "Readied in front of the Elite 4."; }
+std::string AutoStory_Checkpoint_0909::end_text()   const{ return "Enter the Elite 4's first room."; }
+void AutoStory_Checkpoint_0909::run_checkpoint(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats
 ) const{
-    checkpoint_145(env, context, options, stats);
+    checkpoint_0909(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_146::name()       const{ return "146 - S09 - Deal with Aaron and go to the second room."; }
-std::string AutoStory_Checkpoint_146::start_text() const{ return "Entered the Elite 4's first room."; }
-std::string AutoStory_Checkpoint_146::end_text()   const{ return "Deal with Aaron and enter the second room."; }
-void AutoStory_Checkpoint_146::run_checkpoint(
+std::string AutoStory_Checkpoint_0910::name()       const{ return "09.10 - Deal with Aaron and go to the second room."; }
+std::string AutoStory_Checkpoint_0910::start_text() const{ return "Entered the Elite 4's first room."; }
+std::string AutoStory_Checkpoint_0910::end_text()   const{ return "Deal with Aaron and enter the second room."; }
+void AutoStory_Checkpoint_0910::run_checkpoint(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats
 ) const{
-    checkpoint_146(env, context, options, stats);
+    checkpoint_0910(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_147::name()       const{ return "147 - S09 - Deal with Bertha and go to the third room."; }
-std::string AutoStory_Checkpoint_147::start_text() const{ return "Dealt with Aaron and entered the second room."; }
-std::string AutoStory_Checkpoint_147::end_text()   const{ return "Deal with Bertha and enter the third room."; }
-void AutoStory_Checkpoint_147::run_checkpoint(
+std::string AutoStory_Checkpoint_0911::name()       const{ return "09.11 - Deal with Bertha and go to the third room."; }
+std::string AutoStory_Checkpoint_0911::start_text() const{ return "Dealt with Aaron and entered the second room."; }
+std::string AutoStory_Checkpoint_0911::end_text()   const{ return "Deal with Bertha and enter the third room."; }
+void AutoStory_Checkpoint_0911::run_checkpoint(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats
 ) const{
-    checkpoint_147(env, context, options, stats);
+    checkpoint_0911(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_148::name()       const{ return "148 - S09 - Deal with Flint and go to the fourth room."; }
-std::string AutoStory_Checkpoint_148::start_text() const{ return "Dealt with Bertha and entered the third room."; }
-std::string AutoStory_Checkpoint_148::end_text()   const{ return "Deal with Flint and enter the fourth room."; }
-void AutoStory_Checkpoint_148::run_checkpoint(
+std::string AutoStory_Checkpoint_0912::name()       const{ return "09.12 - Deal with Flint and go to the fourth room."; }
+std::string AutoStory_Checkpoint_0912::start_text() const{ return "Dealt with Bertha and entered the third room."; }
+std::string AutoStory_Checkpoint_0912::end_text()   const{ return "Deal with Flint and enter the fourth room."; }
+void AutoStory_Checkpoint_0912::run_checkpoint(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats
 ) const{
-    checkpoint_148(env, context, options, stats);
+    checkpoint_0912(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_149::name()       const{ return "149 - S09 - Deal with Lucian and go to the last room."; }
-std::string AutoStory_Checkpoint_149::start_text() const{ return "Dealt with Flint and entered the fourth room."; }
-std::string AutoStory_Checkpoint_149::end_text()   const{ return "Deal with Lucian and enter the last room."; }
-void AutoStory_Checkpoint_149::run_checkpoint(
+std::string AutoStory_Checkpoint_0913::name()       const{ return "09.13 - Deal with Lucian and go to the last room."; }
+std::string AutoStory_Checkpoint_0913::start_text() const{ return "Dealt with Flint and entered the fourth room."; }
+std::string AutoStory_Checkpoint_0913::end_text()   const{ return "Deal with Lucian and enter the last room."; }
+void AutoStory_Checkpoint_0913::run_checkpoint(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats
 ) const{
-    checkpoint_149(env, context, options, stats);
+    checkpoint_0913(env, context, options, stats);
 }
 
-std::string AutoStory_Checkpoint_150::name()       const{ return "150 - S09 - Deal with Cynthia and finish the game."; }
-std::string AutoStory_Checkpoint_150::start_text() const{ return "Dealt with Lucian and entered the last room."; }
-std::string AutoStory_Checkpoint_150::end_text()   const{ return "Deal with Cynthia and finish the game."; }
-void AutoStory_Checkpoint_150::run_checkpoint(
+std::string AutoStory_Checkpoint_0914::name()       const{ return "09.14 - Deal with Cynthia and finish the game."; }
+std::string AutoStory_Checkpoint_0914::start_text() const{ return "Dealt with Lucian and entered the last room."; }
+std::string AutoStory_Checkpoint_0914::end_text()   const{ return "Deal with Cynthia and finish the game."; }
+void AutoStory_Checkpoint_0914::run_checkpoint(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats
 ) const{
-    checkpoint_150(env, context, options, stats);
+    checkpoint_0914(env, context, options, stats);
 }
 
 
