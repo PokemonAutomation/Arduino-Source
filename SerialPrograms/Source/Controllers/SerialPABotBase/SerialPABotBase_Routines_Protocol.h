@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_SerialPABotBase_Routines_Protocol_H
 #define PokemonAutomation_SerialPABotBase_Routines_Protocol_H
 
+#include <vector>
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
 #include "Controllers/SerialPABotBase/Connection/BotBase.h"
 
