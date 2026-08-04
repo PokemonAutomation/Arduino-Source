@@ -244,7 +244,7 @@ GlobalSettings::GlobalSettings()
         false
     )
 //    , NAUGHTY_MODE_OPTION("<b>Naughty Mode:</b>", false)
-    , PERFORMANCE(CONSTRUCT_TOKEN)
+    , PERFORMANCE(PerformanceOptions::instance())
     , AUDIO_PIPELINE(CONSTRUCT_TOKEN)
     , VIDEO_PIPELINE(CONSTRUCT_TOKEN)
     , COMMAND_QUEUE_LIMIT(

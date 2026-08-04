@@ -6,7 +6,6 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/CancellableScope.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
@@ -95,7 +94,7 @@ void ComputerProgramSession::internal_run_program(){
         return;
     }
         
-    GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread(logger());
+    PerformanceOptions::instance().REALTIME_THREAD_PRIORITY.set_on_this_thread(logger());
     m_option.options().reset_state();
 
     ProgramInfo program_info(

@@ -162,7 +162,9 @@ public:
     BooleanCheckBoxOption SAVE_DEBUG_VIDEOS_ON_SWITCH;
 //    BooleanCheckBoxOption NAUGHTY_MODE_OPTION;
 
-    Pimpl<PerformanceOptions> PERFORMANCE;
+private:
+    PerformanceOptions& PERFORMANCE;
+public:
     Pimpl<AudioPipelineOptions> AUDIO_PIPELINE;
     Pimpl<VideoPipelineOptions> VIDEO_PIPELINE;
     SimpleIntegerOption<uint8_t> COMMAND_QUEUE_LIMIT;

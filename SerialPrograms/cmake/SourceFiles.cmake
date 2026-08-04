@@ -446,6 +446,7 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Options/CheckForUpdatesOption.h
     Source/CommonFramework/Options/Environment/CoreAffinityOption.cpp
     Source/CommonFramework/Options/Environment/CoreAffinityOption.h
+    Source/CommonFramework/Options/Environment/PerformanceOptions.cpp
     Source/CommonFramework/Options/Environment/PerformanceOptions.h
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.h
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.cpp

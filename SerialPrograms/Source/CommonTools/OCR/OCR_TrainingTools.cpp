@@ -8,7 +8,6 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Concurrency/Backends/ThreadPool_Default.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "OCR_SmallDictionaryMatcher.h"
@@ -111,7 +110,7 @@ void TrainingSession::generate_small_dictionary(
     OCR::SmallDictionaryMatcher trained(ocr_json_file, !incremental);
 
     ThreadPool_Default task_runner(
-        [&](){ GlobalSettings::instance().PERFORMANCE->COMPUTE_PRIORITY.set_on_this_thread(m_logger); },
+        [&](){ PerformanceOptions::instance().COMPUTE_PRIORITY.set_on_this_thread(m_logger); },
         0, threads
     );
 
@@ -198,7 +197,7 @@ void TrainingSession::generate_large_dictionary(
     OCR::LargeDictionaryMatcher trained(ocr_json_directory + output_prefix, nullptr, !incremental);
 
     ThreadPool_Default task_runner(
-        [&](){ GlobalSettings::instance().PERFORMANCE->COMPUTE_PRIORITY.set_on_this_thread(m_logger); },
+        [&](){ PerformanceOptions::instance().COMPUTE_PRIORITY.set_on_this_thread(m_logger); },
         0, threads
     );
 
