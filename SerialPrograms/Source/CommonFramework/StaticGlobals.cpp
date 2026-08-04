@@ -5,10 +5,9 @@
  */
 
 #include <set>
-#include <QCryptographicHash>
 #include "Common/Cpp/Json/JsonValue.h"
-#include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
+#include "Common/Cpp/Cryptography/SHA256.h"
 #include "StaticGlobals.h"
 
 namespace PokemonAutomation{
@@ -44,14 +43,11 @@ void StaticGlobals::load_json(const JsonValue& json){
     //  Developer mode stuff.
     const std::string* dev_token = obj->get_string("DEVELOPER_TOKEN");
     if (dev_token){
-        QCryptographicHash hash(QCryptographicHash::Algorithm::Sha256);
-#if QT_VERSION < 0x060700
-        hash.addData(dev_token->c_str(), (int)dev_token->size());
-#else
-        QByteArrayView dataView(dev_token->data(), dev_token->size());
-        hash.addData(dataView);
-#endif
-        DEVELOPER_MODE = TOKENS.find(hash.result().toHex().toStdString()) != TOKENS.end();
+        SHA256 hash;
+        hash.push(dev_token->c_str(), dev_token->size());
+        hash.finish();
+        hash.get_hash_hex();
+        DEVELOPER_MODE = TOKENS.find(hash.get_hash_hex()) != TOKENS.end();
     }
 
     const JsonObject* debug_obj = obj->get_object("DEBUG");

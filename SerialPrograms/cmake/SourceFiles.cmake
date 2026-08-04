@@ -78,6 +78,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/CpuUtilization/CpuUtilization_Linux.tpp
     ../Common/Cpp/CpuUtilization/CpuUtilization_Windows.h
     ../Common/Cpp/CpuUtilization/CpuUtilization_Windows.tpp
+    ../Common/Cpp/Cryptography/SHA256.cpp
+    ../Common/Cpp/Cryptography/SHA256.h
     ../Common/Cpp/DateTime.h
     ../Common/Cpp/EarlyShutdown.h
     ../Common/Cpp/EnumStringMap.h
