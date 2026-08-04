@@ -10,10 +10,10 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/PABotBase2/PABotBase2CC_MessageDumper.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/ControllerTypeStrings.h"
+#include "Controllers/ControllerSettings.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "PABotBase2_DeviceHandle.h"
 
@@ -208,7 +208,7 @@ void DeviceHandle::query_command_queue(){
     //  Don't let it get too large since we don't need it.
     command_queue_size = std::min<uint8_t>(
         command_queue_size,
-        GlobalSettings::instance().COMMAND_QUEUE_LIMIT
+        ControllerSettings::instance().COMMAND_QUEUE_LIMIT
     );
 
     m_logger.Logger::log("Setting queue size to: " + std::to_string(command_queue_size));
@@ -230,6 +230,7 @@ void DeviceHandle::connect(){
     m_device_name = query_data(PABB2_MESSAGE_OPCODE_DEVICE_NAME);
     m_logger.log("[MLC]: Device Name: " + m_device_name, COLOR_BLUE);
 
+    set_logging_flag(ControllerSettings::instance().DEVICE_LOGGING_FLAG);
     query_controller_list();
     query_command_queue();
 }

@@ -29,6 +29,7 @@
 #include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "Integrations/DiscordSettingsOption.h"
 //#include "CommonFramework/Environment/Environment.h"
+#include "Controllers/ControllerSettings.h"
 #include "GlobalSettingsPanel.h"
 
 // #include <iostream>
@@ -218,7 +219,6 @@ GlobalSettings::GlobalSettings()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , LOG_EVERYTHING(PokemonAutomation::LOG_EVERYTHING())
     , ENABLE_PABOTBASE1(
         "<b>Enable PABotBase1:</b><br>Enable support for the legacy PABotBase 1 protocol.<br>"
         "Turn this on if you are still using Arduino Uno R3, Arduino Leonardo, Teensy, or Pro Micro. "
@@ -244,21 +244,8 @@ GlobalSettings::GlobalSettings()
         false
     )
 //    , NAUGHTY_MODE_OPTION("<b>Naughty Mode:</b>", false)
-    , PERFORMANCE(PerformanceOptions::instance())
     , AUDIO_PIPELINE(CONSTRUCT_TOKEN)
     , VIDEO_PIPELINE(CONSTRUCT_TOKEN)
-    , COMMAND_QUEUE_LIMIT(
-        "<b>Maximum Command Queue Size:</b><br>"
-        "Do not queue more than this many commands to the controller at once. "
-        "Larger values will tolerate longer connection interrupts, but may increase cancellation latency after a burst of commands.",
-        LockMode::LOCK_WHILE_RUNNING,
-        64, 4, 255
-    )
-    , DEVICE_LOGGING_FLAG(
-        "<b>Configure Device-Specific Debug Logging:</b>",
-        LockMode::LOCK_WHILE_RUNNING,
-        0
-    )
     , ENABLE_LIFETIME_SANITIZER0(
         "<b>Enable Lifetime Sanitizer: (for debugging)</b><br>"
         "Check for C++ object lifetime violations. Terminate program with stack dump if violations are found. "
@@ -307,7 +294,7 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(DISCORD);
 
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(LOG_EVERYTHING);
+    add_option(PokemonAutomation::LOG_EVERYTHING(), "LOG_EVERYTHING");
     PA_ADD_OPTION(ENABLE_PABOTBASE1);
     PA_ADD_OPTION(DUMP_VIDEO_FORMATS);
     PA_ADD_OPTION(SAVE_DEBUG_IMAGES);
@@ -316,14 +303,15 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(SAVE_DEBUG_VIDEOS_ON_SWITCH);
 //    PA_ADD_OPTION(NAUGHTY_MODE);
 
-    PA_ADD_OPTION(PERFORMANCE);
+    add_option(PerformanceOptions::instance(), "PERFORMANCE");
 
     PA_ADD_OPTION(AUDIO_PIPELINE);
     PA_ADD_OPTION(VIDEO_PIPELINE);
-    PA_ADD_OPTION(COMMAND_QUEUE_LIMIT);
 
+    add_option(ControllerSettings::instance().COMMAND_QUEUE_LIMIT, "COMMAND_QUEUE_LIMIT");
     // gated behind Dev mode. see GlobalSettings::load_json
-    PA_ADD_OPTION(DEVICE_LOGGING_FLAG);
+    add_option(ControllerSettings::instance().DEVICE_LOGGING_FLAG, "DEVICE_LOGGING_FLAG");
+
 
     PA_ADD_OPTION(ENABLE_LIFETIME_SANITIZER0);
 
@@ -337,7 +325,7 @@ GlobalSettings::GlobalSettings()
     RESOURCE_DOWNLOAD_TABLE.set_visibility(ConfigOptionState::HIDDEN);
     DOWNLOAD_ERROR.set_visibility(ConfigOptionState::HIDDEN);
     SAVE_DEBUG_VIDEOS_ON_SWITCH.set_visibility(ConfigOptionState::HIDDEN);
-    DEVICE_LOGGING_FLAG.set_visibility(ConfigOptionState::HIDDEN);
+    ControllerSettings::instance().DEVICE_LOGGING_FLAG.set_visibility(ConfigOptionState::HIDDEN);
 
     GlobalSettings::on_config_value_changed(this);
     ENABLE_LIFETIME_SANITIZER0.add_listener(*this);
@@ -361,7 +349,7 @@ void GlobalSettings::load_json(const JsonValue& json){
     RESOURCE_DOWNLOAD_TABLE.set_visibility(devmode_visibility);
     DOWNLOAD_ERROR.set_visibility(devmode_visibility);
     SAVE_DEBUG_VIDEOS_ON_SWITCH.set_visibility(devmode_visibility);
-    DEVICE_LOGGING_FLAG.set_visibility(devmode_visibility);
+    ControllerSettings::instance().DEVICE_LOGGING_FLAG.set_visibility(devmode_visibility);
 
     //  Remake this to update the color.
     m_discord_settings.set_text(

@@ -778,6 +778,7 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/ControllerSelectorWidget.h
     Source/Controllers/ControllerSession.cpp
     Source/Controllers/ControllerSession.h
+    Source/Controllers/ControllerSettings.h
     Source/Controllers/ControllerState.cpp
     Source/Controllers/ControllerState.h
     Source/Controllers/ControllerStateTable.cpp

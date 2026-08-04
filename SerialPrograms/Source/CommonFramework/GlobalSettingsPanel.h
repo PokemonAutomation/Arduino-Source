@@ -36,7 +36,6 @@ class SleepSuppressOptions;
 namespace Integration{
     class DiscordSettingsOption;
 }
-class PerformanceOptions;
 class AudioPipelineOptions;
 class VideoPipelineOptions;
 class ErrorReportOption;
@@ -153,22 +152,14 @@ public:
 
     SectionDividerOption m_advanced_options;
 
-private:
-    BooleanCheckBoxOption& LOG_EVERYTHING;
-public:
     BooleanCheckBoxOption ENABLE_PABOTBASE1;
     BooleanCheckBoxOption DUMP_VIDEO_FORMATS;
     BooleanCheckBoxOption SAVE_DEBUG_IMAGES;
     BooleanCheckBoxOption SAVE_DEBUG_VIDEOS_ON_SWITCH;
 //    BooleanCheckBoxOption NAUGHTY_MODE_OPTION;
 
-private:
-    PerformanceOptions& PERFORMANCE;
-public:
     Pimpl<AudioPipelineOptions> AUDIO_PIPELINE;
     Pimpl<VideoPipelineOptions> VIDEO_PIPELINE;
-    SimpleIntegerOption<uint8_t> COMMAND_QUEUE_LIMIT;
-    SimpleIntegerOption<uint32_t> DEVICE_LOGGING_FLAG;
 
     BooleanCheckBoxOption ENABLE_LIFETIME_SANITIZER0;
 
