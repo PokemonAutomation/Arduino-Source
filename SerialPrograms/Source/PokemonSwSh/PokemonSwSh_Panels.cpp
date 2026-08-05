@@ -16,7 +16,6 @@
 #include "Programs/General/PokemonSwSh_SurpriseTrade.h"
 #include "Programs/General/PokemonSwSh_TradeBot.h"
 #include "Programs/General/PokemonSwSh_ClothingBuyer.h"
-//#include "Programs/General/PokemonSwSh_BallThrower.h"
 #include "Programs/General/PokemonSwSh_AutonomousBallThrower.h"
 #include "Programs/General/PokemonSwSh_DexRecFinder.h"
 #include "Programs/General/PokemonSwSh_BoxReorderNationalDex.h"
@@ -50,8 +49,6 @@
 #include "Programs/EggPrograms/PokemonSwSh_EggFetcher2.h"
 #include "Programs/EggPrograms/PokemonSwSh_EggFetcherMultiple.h"
 #include "Programs/EggPrograms/PokemonSwSh_EggHatcher.h"
-//#include "Programs/EggPrograms/PokemonSwSh_EggCombined2.h"
-//#include "Programs/EggPrograms/PokemonSwSh_EggSuperCombined2.h"
 #include "Programs/EggPrograms/PokemonSwSh_GodEggDuplication.h"
 #include "Programs/EggPrograms/PokemonSwSh_GodEggItemDupe.h"
 
@@ -189,9 +186,6 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
 #if 0
     ret.emplace_back("---- Deprecated Programs ----");
-    ret.emplace_back(make_single_switch_program<BallThrower_Descriptor, BallThrower>());
-    ret.emplace_back(make_single_switch_program<EggCombined2_Descriptor, EggCombined2>());
-    ret.emplace_back(make_single_switch_program<EggSuperCombined2_Descriptor, EggSuperCombined2>());
 #endif
 
     if (STATIC_GLOBALS.DEVELOPER_MODE){

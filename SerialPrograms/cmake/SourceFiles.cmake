@@ -2782,8 +2782,6 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_PurpleBeamFinder.h
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggAutonomous.cpp
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggAutonomous.h
-    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggCombined2.cpp
-    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggCombined2.h
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggCombinedShared.h
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggFetcher2.cpp
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggFetcher2.h
@@ -2792,16 +2790,12 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggHatcher.cpp
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggHatcher.h
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggHelpers.h
-    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggSuperCombined2.cpp
-    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggSuperCombined2.h
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_GodEggDuplication.cpp
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_GodEggDuplication.h
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_GodEggItemDupe.cpp
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_GodEggItemDupe.h
     Source/PokemonSwSh/Programs/General/PokemonSwSh_AutonomousBallThrower.cpp
     Source/PokemonSwSh/Programs/General/PokemonSwSh_AutonomousBallThrower.h
-    Source/PokemonSwSh/Programs/General/PokemonSwSh_BallThrower.cpp
-    Source/PokemonSwSh/Programs/General/PokemonSwSh_BallThrower.h
     Source/PokemonSwSh/Programs/General/PokemonSwSh_BoxReorderNationalDex.cpp
     Source/PokemonSwSh/Programs/General/PokemonSwSh_BoxReorderNationalDex.h
     Source/PokemonSwSh/Programs/General/PokemonSwSh_ClothingBuyer.cpp
