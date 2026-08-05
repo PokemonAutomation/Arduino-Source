@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "NintendoSwitch_CheckOnlineDetector.h"
@@ -97,6 +98,34 @@ bool CheckOnlineDetector::detect(const ImageViewRGB32& screen){
     }
 
     return !m_invert;
+}
+
+
+class Test_CheckOnlineDetector : public UnitTest{
+public:
+    Test_CheckOnlineDetector(const std::string& image, bool expected)
+        : UnitTest("NintendoSwitch::CheckOnlineDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        CheckOnlineDetector detector{};
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    }
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+
+void add_tests_CheckOnlineDetector(UnitTestDatabase& database){
+    database.add<Test_CheckOnlineDetector>("NintendoSwitch/CheckOnlineDetector/French_blackBackground_False.png", false);
+    database.add<Test_CheckOnlineDetector>("NintendoSwitch/CheckOnlineDetector/French_blackBackground_True.png", true);
+    database.add<Test_CheckOnlineDetector>("NintendoSwitch/CheckOnlineDetector/French_whiteBackground_False.png", false);
+    database.add<Test_CheckOnlineDetector>("NintendoSwitch/CheckOnlineDetector/French_whiteBackground_True.png", true);
 }
 
 

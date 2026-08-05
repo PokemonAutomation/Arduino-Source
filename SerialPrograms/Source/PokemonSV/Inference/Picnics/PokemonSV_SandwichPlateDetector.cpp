@@ -5,12 +5,15 @@
  */
 
 
+#include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "PokemonSV_SandwichPlateDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h"
+#include "Tests/TestUtils.h"
 // #include "CommonFramework/Tools/DebugDumper.h"
 
 //#include <iostream>
@@ -125,6 +128,61 @@ bool SandwichPlateWatcher::process_frame(const ImageViewRGB32& screen, WallClock
     }
 
     return true;
+}
+
+
+class Test_SandwichPlateDetector : public UnitTest{
+public:
+    Test_SandwichPlateDetector(const std::string& image, std::vector<std::string> words)
+        : UnitTest("PokemonSV::SandwichPlateDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_words(std::move(words))
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        if (m_words.size() < 4){
+            return "Error: not enough number of words in the filename.";
+        }
+
+        Language language = language_code_to_enum(m_words[m_words.size() - 4]);
+        if (language == Language::None || language == Language::EndOfList){
+            return "Error: invalid language word in filename.";
+        }
+
+        auto& unit_logger = global_logger_command_line();
+        FixedLimitVector<SandwichPlateDetector> detectors(3);
+        detectors.emplace_back(unit_logger, COLOR_RED, language, SandwichPlateDetector::Side::LEFT);
+        detectors.emplace_back(unit_logger, COLOR_RED, language, SandwichPlateDetector::Side::MIDDLE);
+        detectors.emplace_back(unit_logger, COLOR_RED, language, SandwichPlateDetector::Side::RIGHT);
+
+        std::string sides[3] = {"left", "middle", "right"};
+        ImageRGB32 image(m_image);
+        for (int i = 0; i < 3; i++){
+            bool is_yellow = detectors[i].is_label_yellow(image);
+            std::string target = m_words[m_words.size() - 3 + i];
+            if (target == "Yellow"){
+                TEST_RESULT_COMPONENT_EQUAL(is_yellow, true, "yellow label detection at side: " + sides[i]);
+            }else{
+                std::string filling = detectors[i].detect_filling_name(image);
+                if (target == "none"){
+                    target.clear();
+                }
+                TEST_RESULT_COMPONENT_EQUAL(filling, target, "side: " + sides[i]);
+            }
+        }
+
+        return true;
+    }
+
+private:
+    std::string m_image;
+    std::vector<std::string> m_words;
+};
+
+
+void add_tests_SandwichPlateDetector(UnitTestDatabase& database){
+    database.add<Test_SandwichPlateDetector>("PokemonSV/SandwichPlateDetector/Violet_eng_cucumber_cherry-tomatoes_pickle.png", std::vector<std::string>{"Violet", "eng", "cucumber", "cherry-tomatoes", "pickle"});
+    database.add<Test_SandwichPlateDetector>("PokemonSV/SandwichPlateDetector/Violet_eng_Yellow_lettuce_lettuce.png", std::vector<std::string>{"Violet", "eng", "Yellow", "lettuce", "lettuce"});
 }
 
 

@@ -9,6 +9,7 @@
 
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Containers/FixedLimitVector.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/VisualDetector.h"
@@ -74,6 +75,7 @@ private:
 };
 
 
+void add_tests_BoxEggDetector(UnitTestDatabase& database);
 
 }
 }

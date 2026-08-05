@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSV_ESPEmotionDetector_H
 
 #include <atomic>
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
@@ -100,6 +101,9 @@ private:
     ImageFloatBox m_top_box;
     ImageFloatBox m_bottom_box;
 };
+
+
+void add_tests_ESPEmotionDetector(UnitTestDatabase& database);
 
 
 }

@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "NintendoSwitch_FailedToConnectDetector.h"
@@ -54,6 +55,34 @@ bool FailedToConnectDetector::detect(const ImageViewRGB32& screen){
     }
 
     return true;
+}
+
+
+class Test_FailedToConnectDetector : public UnitTest{
+public:
+    Test_FailedToConnectDetector(const std::string& image, bool expected)
+        : UnitTest("NintendoSwitch::FailedToConnectDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        FailedToConnectDetector detector{};
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    }
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+
+void add_tests_FailedToConnectDetector(UnitTestDatabase& database){
+    database.add<Test_FailedToConnectDetector>("NintendoSwitch/FailedToConnectDetector/French_blackBackground_False.png", false);
+    database.add<Test_FailedToConnectDetector>("NintendoSwitch/FailedToConnectDetector/French_blackBackground_True.png", true);
+    database.add<Test_FailedToConnectDetector>("NintendoSwitch/FailedToConnectDetector/French_whiteBackground_False.png", false);
+    database.add<Test_FailedToConnectDetector>("NintendoSwitch/FailedToConnectDetector/French_whiteBackground_True.png", true);
 }
 
 

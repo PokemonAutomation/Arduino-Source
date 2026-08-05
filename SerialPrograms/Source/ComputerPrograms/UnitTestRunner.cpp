@@ -10,6 +10,10 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "CommonTools/VisualDetectors/BlackBorderDetector.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_CheckOnlineDetector.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_FailedToConnectDetector.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h"
 #include "UnitTestRunner.h"
 
 #include "CommonTools/OCR/OCR_Tests.h"
@@ -32,6 +36,10 @@ UnitTestDatabase make_UNIT_TESTS_ALL(){
     UnitTestDatabase ret;
 
     OCR::add_tests(ret);
+    add_tests_BlackBorderDetector(ret);
+    NintendoSwitch::add_tests_CheckOnlineDetector(ret);
+    NintendoSwitch::add_tests_FailedToConnectDetector(ret);
+    NintendoSwitch::add_tests_UpdatePopupDetector(ret);
     NintendoSwitch::PokemonFRLG::add_tests(ret);
     NintendoSwitch::PokemonHome::add_tests(ret);
     NintendoSwitch::PokemonSwSh::add_tests(ret);

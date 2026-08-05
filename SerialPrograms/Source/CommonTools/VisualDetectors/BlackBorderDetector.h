@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_CommonTools_BlackBorderDetector_H
 #define PokemonAutomation_CommonTools_BlackBorderDetector_H
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/VisualDetector.h"
 
@@ -27,6 +28,9 @@ private:
     ImageFloatBox m_right;
 //    ImageFloatBox m_body;
 };
+
+
+void add_tests_BlackBorderDetector(UnitTestDatabase& database);
 
 
 

@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSV_SandwichIngredientDetector_H
 
 #include <array>
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/ImageMatch/ImageMatchResult.h"
@@ -214,6 +215,9 @@ public:
     std::array<ImageFloatBox, INGREDIENT_PAGE_LINES> m_box_ingred_icon;
     std::array<ImageFloatBox, 6> m_box_confirmed;
 };
+
+
+void add_tests_SandwichIngredientDetector(UnitTestDatabase& database);
 
 }
 }

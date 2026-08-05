@@ -492,6 +492,50 @@ private:
     const std::vector<std::string> m_words;
 };
 
+class Test_SomethingInBoxSlotDetector : public UnitTest{
+public:
+    Test_SomethingInBoxSlotDetector(const std::string& image, bool expected)
+        : UnitTest("PokemonSV::SomethingInBoxSlotDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        SomethingInBoxSlotDetector detector(COLOR_RED);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    }
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+class Test_BoxBottomButtonDetector : public UnitTest{
+public:
+    Test_BoxBottomButtonDetector(const std::string& image, bool target_y, bool target_b)
+        : UnitTest("PokemonSV::BoxBottomButtonDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_target_y(target_y)
+        , m_target_b(target_b)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        ImageRGB32 image(m_image);
+        BoxBottomButtonYDetector y_detector;
+        TEST_RESULT_COMPONENT_EQUAL(y_detector.detect(image), m_target_y, "button Y");
+
+        BoxBottomButtonBDetector b_detector;
+        TEST_RESULT_COMPONENT_EQUAL(b_detector.detect(image), m_target_b, "button B");
+        return true;
+    }
+
+private:
+    std::string m_image;
+    bool m_target_y;
+    bool m_target_b;
+};
+
 
 
 void add_tests_BoxInfoDetector(UnitTestDatabase& database){
@@ -527,6 +571,16 @@ void add_tests_BoxInfoDetector(UnitTestDatabase& database){
         "PokemonSV/BoxPokemonInfoDetector/Tauros_False_1.png",
         std::vector<std::string>{"Tauros", "False", "1"}
     );
+    database.add<Test_SomethingInBoxSlotDetector>("PokemonSV/SomethingInBoxSlotDetector/Yellow_Background_2_False.png", false);
+    database.add<Test_SomethingInBoxSlotDetector>("PokemonSV/SomethingInBoxSlotDetector/Yellow_Background_False.png", false);
+    database.add<Test_BoxBottomButtonDetector>("PokemonSV/BoxBottomButtonDetector/Empty_True_True.png", true, true);
+    database.add<Test_BoxBottomButtonDetector>("PokemonSV/BoxBottomButtonDetector/Korean_Flamingo_False_True.png", false, true);
+    database.add<Test_BoxBottomButtonDetector>("PokemonSV/BoxBottomButtonDetector/Korean_Flamingo_True_True.png", true, true);
+    database.add<Test_BoxBottomButtonDetector>("PokemonSV/BoxBottomButtonDetector/Talonflame_box_selection_2_False_True.png", false, true);
+    database.add<Test_BoxBottomButtonDetector>("PokemonSV/BoxBottomButtonDetector/Talonflame_box_selection_False_True.png", false, true);
+    database.add<Test_BoxBottomButtonDetector>("PokemonSV/BoxBottomButtonDetector/Talonflame_True_True.png", true, true);
+    database.add<Test_BoxBottomButtonDetector>("PokemonSV/BoxBottomButtonDetector/Volcarona_False_True.png", false, true);
+    database.add<Test_BoxBottomButtonDetector>("PokemonSV/BoxBottomButtonDetector/Volcarona_True_True.png", true, true);
 }
 
 

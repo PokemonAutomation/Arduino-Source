@@ -210,6 +210,37 @@ bool LetsGoKillWatcher::process_frame(const ImageViewRGB32& frame, WallClock tim
 }
 
 
+class Test_LetsGoKillDetector : public UnitTest{
+public:
+    Test_LetsGoKillDetector(const std::string& image, bool expected)
+        : UnitTest("PokemonSV::LetsGoKillDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        LetsGoKillDetector detector(COLOR_RED, {0.23, 0.23, 0.04, 0.20});
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    }
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+
+void add_tests_LetsGoKillDetector(UnitTestDatabase& database){
+    database.add<Test_LetsGoKillDetector>("PokemonSV/RecentlyBattledDetector/Complete_True.png", true);
+    database.add<Test_LetsGoKillDetector>("PokemonSV/RecentlyBattledDetector/Error_Report_231017_True.png", true);
+    database.add<Test_LetsGoKillDetector>("PokemonSV/RecentlyBattledDetector/Error_Report_240811_True.png", true);
+    database.add<Test_LetsGoKillDetector>("PokemonSV/RecentlyBattledDetector/Error_Report_240819_True.png", true);
+    database.add<Test_LetsGoKillDetector>("PokemonSV/RecentlyBattledDetector/Incomplete_Bottom_False.png", false);
+    database.add<Test_LetsGoKillDetector>("PokemonSV/RecentlyBattledDetector/Incomplete_False.png", false);
+    database.add<Test_LetsGoKillDetector>("PokemonSV/RecentlyBattledDetector/Incomplete_True.png", true);
+}
+
+
 
 
 LetsGoKillSoundDetector::LetsGoKillSoundDetector(Logger& logger, DetectedCallback detected_callback)
