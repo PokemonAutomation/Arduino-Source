@@ -52,7 +52,7 @@ private:
 class SnapshotKeyTrigger : public ControllerInputListener{
 public:
     ~SnapshotKeyTrigger();
-    SnapshotKeyTrigger(VideoStream& stream, VideoOverlay& overlay, Format format);
+    SnapshotKeyTrigger(VideoStream& stream, Format format);
 
 private:
     void detach();
@@ -61,7 +61,6 @@ private:
 
 private:
     VideoStream& m_stream;
-    VideoOverlay& m_overlay;
     Format m_format;
 };
 

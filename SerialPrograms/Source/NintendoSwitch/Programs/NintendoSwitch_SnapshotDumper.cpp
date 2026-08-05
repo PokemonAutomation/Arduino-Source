@@ -114,9 +114,8 @@ private:
 SnapshotKeyTrigger::~SnapshotKeyTrigger(){
     detach();
 }
-SnapshotKeyTrigger::SnapshotKeyTrigger(VideoStream& stream, VideoOverlay& overlay, Format format)
+SnapshotKeyTrigger::SnapshotKeyTrigger(VideoStream& stream, Format format)
     : m_stream(stream)
-    , m_overlay(overlay)
     , m_format(format)
 {
     global_keyboard_tracker().add_listener(*this);
@@ -142,7 +141,7 @@ void SnapshotDumper::program(SingleSwitchProgramEnvironment& env, CancellableSco
     QDir().mkpath(folder_path.c_str());
 
     if (SNAPSHOT_MODE == SnapshotMode::KEYPRESS){
-        SnapshotKeyTrigger key_trigger(env.console, env.console.overlay(), FORMAT);
+        SnapshotKeyTrigger key_trigger(env.console, FORMAT);
         scope.wait_until_cancel();
     }else if (SNAPSHOT_MODE == SnapshotMode::MOUSE_CLICK){
         SnapshotClickTrigger click_trigger(env.console, env.console.overlay(), FORMAT);
