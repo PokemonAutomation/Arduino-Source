@@ -9,6 +9,7 @@
 
 #include <array>
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/ImageMatch/ImageMatchResult.h"
 #include "CommonTools/ImageMatch/CroppedImageDictionaryMatcher.h"
@@ -111,6 +112,9 @@ public:
     std::array<ImageFloatBox, BERRY_PAGE_LINES> m_box_berry_text;
     std::array<ImageFloatBox, BERRY_PAGE_LINES> m_box_berry_icon;
 };
+
+
+void add_tests_DonutBerriesReader(UnitTestDatabase& database);
 
 }
 }

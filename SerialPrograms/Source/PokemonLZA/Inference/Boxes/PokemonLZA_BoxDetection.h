@@ -113,7 +113,7 @@ public:
     {}
 };
 
-
+void add_tests_BoxCellInfoDetector(UnitTestDatabase& database);
 
 }
 }

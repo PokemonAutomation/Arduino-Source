@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonLZA_OverworldPartySelectionDetector_H
 #define PokemonAutomation_PokemonLZA_OverworldPartySelectionDetector_H
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
@@ -118,6 +119,9 @@ public:
          : DetectorToFinder("OverworldPartySelectionOverWatcher", FinderType::GONE, hold_duration, color, overlay)
     {}
 };
+
+
+void add_tests_OverworldPartySelectionDetector(UnitTestDatabase& database);
 
 
 

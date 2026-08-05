@@ -47,6 +47,7 @@ public:
 };
 
 
+void add_tests_MainMenuDetector(UnitTestDatabase& database);
 
 
 }

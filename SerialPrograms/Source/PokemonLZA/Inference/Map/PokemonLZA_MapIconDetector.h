@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonLZA_MapIconDetector_H
 #define PokemonAutomation_PokemonLZA_MapIconDetector_H
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/DetectedBoxes.h"
 #include "CommonTools/VisualDetector.h"
@@ -70,6 +71,9 @@ private:
     std::vector<DetectedBox> m_last_detected;
     std::deque<OverlayBoxScope> m_last_detected_box;
 };
+
+
+void add_tests_MapIconDetector(UnitTestDatabase& database);
 
 
 

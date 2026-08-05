@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonLZA_HyperspaceCalorieDetector_H
 
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonTools/VisualDetector.h"
@@ -78,6 +79,9 @@ private:
     
     std::list<std::pair<uint16_t, ImageRGB32>> m_last_calorie_images;
 };
+
+
+void add_tests_HyperspaceCalorieDetector(UnitTestDatabase& database);
 
 
 

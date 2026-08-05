@@ -5,12 +5,17 @@
  */
 
 #include <vector>
+#include <fstream>
+#include <map>
+#include "Common/Cpp/Filesystem.h"
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Globals.h"
 //#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA_MapIconDetector.h"
+#include "Tests/TestUtils.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -396,6 +401,77 @@ bool MapIconDetector::detect(const ImageViewRGB32& screen){
 const std::vector<DetectedBox>& MapIconDetector::last_detected(){
     merge_overlapping_boxes(m_last_detected);
     return m_last_detected;
+}
+
+
+
+class Test_MapIconDetector : public UnitTest{
+public:
+    Test_MapIconDetector(const std::string& image)
+        : UnitTest("PokemonPLZA::MapIconDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        Filesystem::Path file_path(m_image);
+        Filesystem::Path parent_dir = file_path.parent_path();
+        std::string base_name = file_path.stem().string();
+        Filesystem::Path target_detections_path = parent_dir / ("_" + base_name + ".txt");
+
+        std::map<MapIconType, int> expected_counts;
+        std::ifstream file(target_detections_path.stdpath());
+        if (!file.is_open()){
+            return "Error: cannot open target detection file " + target_detections_path.string();
+        }
+
+        std::string line;
+        while (std::getline(file, line)){
+            if (line.empty()){
+                continue;
+            }
+
+            size_t space_pos = line.find(' ');
+            if (space_pos == std::string::npos){
+                return "Error: invalid line format in " + target_detections_path.string() + ": " + line;
+            }
+
+            std::string type_str = line.substr(0, space_pos);
+            std::string count_str = line.substr(space_pos + 1);
+
+            int count = 0;
+            if (!parse_int(count_str, count)){
+                return "Error: invalid count in " + target_detections_path.string() + ": " + count_str;
+            }
+
+            try{
+                expected_counts[string_to_map_icon_type(type_str)] = count;
+            }catch (const std::exception&){
+                return "Error: unknown MapIconType in " + target_detections_path.string() + ": " + type_str;
+            }
+        }
+
+        ImageRGB32 image(m_image);
+        std::map<MapIconType, std::vector<DetectedBox>> detected_boxes;
+        for (const auto& pair : expected_counts){
+            MapIconDetector detector(COLOR_RED, pair.first, ImageFloatBox(0.0, 0.0, 1.0, 1.0));
+            detector.detect(image);
+            detected_boxes[pair.first] = detector.last_detected();
+        }
+
+        for (const auto& pair : expected_counts){
+            const auto& detections = detected_boxes[pair.first];
+            TEST_RESULT_COMPONENT_EQUAL((int)detections.size(), pair.second, map_icon_type_to_string(pair.first));
+        }
+
+        return true;
+    }
+
+private:
+    std::string m_image;
+};
+
+
+void add_tests_MapIconDetector(UnitTestDatabase& database){
 }
 
 
