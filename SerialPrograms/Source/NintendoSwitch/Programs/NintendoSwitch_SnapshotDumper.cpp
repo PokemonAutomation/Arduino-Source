@@ -6,14 +6,17 @@
 
 #include <QDir>
 #include <QKeyEvent>
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "ControllerInput/Keyboard/GlobalKeyboardHidTracker.h"
 #include "NintendoSwitch_SnapshotDumper.h"
-// #include <iostream>
-// using std::cout;
-// using std::endl;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -116,24 +119,21 @@ SnapshotKeyTrigger::SnapshotKeyTrigger(VideoStream& stream, VideoOverlay& overla
     , m_overlay(overlay)
     , m_format(format)
 {
-    try{
-        overlay.add_keyevent_listener(*this);
-    }catch (...){
-        detach();
-        throw;
-    }
+    global_keyboard_tracker().add_listener(*this);
 }
 
 void SnapshotKeyTrigger::detach(){
-    m_overlay.remove_keyevent_listener(*this);
+    global_keyboard_tracker().remove_listener(*this);
 }
-
-void SnapshotKeyTrigger::on_key_press(QKeyEvent* event){
-    if (event->key() == Qt::Key::Key_PageDown){
-        dump_snapshot(m_stream, "ScreenshotDumper", to_format_string(m_format));
-    } 
-}
-void SnapshotKeyTrigger::on_key_release(QKeyEvent* event){
+void SnapshotKeyTrigger::run_controller_input(ControllerInputState& state){
+    KeyboardInputState* keyboard_state = dynamic_cast<KeyboardInputState*>(&state);
+    if (keyboard_state == nullptr){
+        return;
+    }
+    if (!keyboard_state->keys().contains(KeyboardKey::KEY_PAGE_DOWN)){
+        return;
+    }
+    dump_snapshot(m_stream, "ScreenshotDumper", to_format_string(m_format));
 }
 
 
