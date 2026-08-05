@@ -305,8 +305,8 @@ public:
 
 private:
     std::string m_image;
-    bool m_expected;
     ButtonType m_expected_button;
+    bool m_expected;
 };
 
 
