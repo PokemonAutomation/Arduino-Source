@@ -13,6 +13,7 @@
 #include "UnitTestRunner.h"
 
 #include "CommonTools/OCR/OCR_Tests.h"
+#include "PokemonFRLG/PokemonFRLG_Tests.h"
 #include "PokemonHome/PokemonHome_Tests.h"
 #include "PokemonSwSh/PokemonSwSh_Tests.h"
 #include "PokemonLA/PokemonLA_Tests.h"
@@ -31,6 +32,7 @@ UnitTestDatabase make_UNIT_TESTS_ALL(){
     UnitTestDatabase ret;
 
     OCR::add_tests(ret);
+    NintendoSwitch::PokemonFRLG::add_tests(ret);
     NintendoSwitch::PokemonHome::add_tests(ret);
     NintendoSwitch::PokemonSwSh::add_tests(ret);
     NintendoSwitch::PokemonLA::add_tests(ret);

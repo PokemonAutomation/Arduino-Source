@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Globals.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "PokemonFRLG/PokemonFRLG_Settings.h"
@@ -282,7 +283,59 @@ bool BattleLevelUpDetector::detect(const ImageViewRGB32& screen){
     return false;
 }
 
+class Test_AdvanceBattleDialogDetector : public UnitTest{
+public:
 
+    Test_AdvanceBattleDialogDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonFRLG::AdvanceBattleDialogDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        AdvanceBattleDialogDetector detector(COLOR_RED);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+void add_tests_AdvanceBattleDialogDetector(UnitTestDatabase& database){
+    //todo: gather test images for this detector
+}
+
+class Test_BattleMenuDetector : public UnitTest{
+public:
+
+    Test_BattleMenuDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonFRLG::BattleMenuDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        BattleMenuDetector detector(COLOR_RED);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+void add_tests_BattleMenuDetector(UnitTestDatabase& database){
+    //todo: gather test images for this detector
+}
 
 }
 }

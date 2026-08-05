@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
@@ -11,7 +12,6 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Images/ImageFilter.h"
-#include "CommonTools/Images/WaterfillUtilities.h"
 //#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 //#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonFRLG_DialogDetector.h"
@@ -127,7 +127,73 @@ bool SelectionDialogDetector::detect(const ImageViewRGB32& screen){
     return false;
 }
 
+class Test_AdvanceWhiteDialogDetector : public UnitTest{
+public:
 
+    Test_AdvanceWhiteDialogDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonFRLG::AdvanceWhiteDialogDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        AdvanceWhiteDialogDetector detector(COLOR_RED);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+void add_tests_AdvanceWhiteDialogDetector(UnitTestDatabase& database){
+    database.add<Test_AdvanceWhiteDialogDetector>("PokemonFRLG/AdvanceWhiteDialogDetector/Eng-Select_False.png", false);
+    database.add<Test_AdvanceWhiteDialogDetector>("PokemonFRLG/AdvanceWhiteDialogDetector/English-Bulba_True.png", true);
+    database.add<Test_AdvanceWhiteDialogDetector>("PokemonFRLG/AdvanceWhiteDialogDetector/Ger-KennyExile-Bulba_True.png", true);
+    database.add<Test_AdvanceWhiteDialogDetector>("PokemonFRLG/AdvanceWhiteDialogDetector/Ger-KennyExile-Char_True.png", true);
+    database.add<Test_AdvanceWhiteDialogDetector>("PokemonFRLG/AdvanceWhiteDialogDetector/Ger-KennyExile-Sq_True.png", true);
+    database.add<Test_AdvanceWhiteDialogDetector>("PokemonFRLG/AdvanceWhiteDialogDetector/MacOS-not-ili-Char_False.png", false);
+    database.add<Test_AdvanceWhiteDialogDetector>("PokemonFRLG/AdvanceWhiteDialogDetector/MacOS-not-ili-Char_True.png", true);
+    database.add<Test_AdvanceWhiteDialogDetector>("PokemonFRLG/AdvanceWhiteDialogDetector/Spanish-AlejaKaiser-Bulba_True.png", true);
+    database.add<Test_AdvanceWhiteDialogDetector>("PokemonFRLG/AdvanceWhiteDialogDetector/Spanish-AlejaKaiser-Char_True.png", true);
+    database.add<Test_AdvanceWhiteDialogDetector>("PokemonFRLG/AdvanceWhiteDialogDetector/Spanish-AlejaKaiser-Squirtl_True.png", true);
+}
+
+class Test_SelectionDialogDetector : public UnitTest{
+public:
+
+    Test_SelectionDialogDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonFRLG::SelectionDialogDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        SelectionDialogDetector detector(COLOR_RED);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+void add_tests_SelectionDialogDetector(UnitTestDatabase& database){
+    database.add<Test_SelectionDialogDetector>("PokemonFRLG/SelectionDialogDetector/Eng-Select_True.png", true);
+    database.add<Test_SelectionDialogDetector>("PokemonFRLG/SelectionDialogDetector/English-Bulba-720p_True.png", true);
+    database.add<Test_SelectionDialogDetector>("PokemonFRLG/SelectionDialogDetector/English-Bulba_False.png", false);
+    database.add<Test_SelectionDialogDetector>("PokemonFRLG/SelectionDialogDetector/Ger-KennyExile-Sq_False.png", false);
+    database.add<Test_SelectionDialogDetector>("PokemonFRLG/SelectionDialogDetector/MacOS-not-ili-Char_False.png", false);
+    database.add<Test_SelectionDialogDetector>("PokemonFRLG/SelectionDialogDetector/MacOS-not-ili-Char_True.png", true);
+}
 
 }
 }

@@ -1567,6 +1567,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/PokemonFRLG_Panels.h
     Source/PokemonFRLG/PokemonFRLG_Settings.cpp
     Source/PokemonFRLG/PokemonFRLG_Settings.h
+    Source/PokemonFRLG/PokemonFRLG_Tests.cpp
+    Source/PokemonFRLG/PokemonFRLG_Tests.h
     Source/PokemonFRLG/Programs/Farming/PokemonFRLG_ItemDuplication.cpp
     Source/PokemonFRLG/Programs/Farming/PokemonFRLG_ItemDuplication.h
     Source/PokemonFRLG/Programs/Farming/PokemonFRLG_LuckyEggFarmer.cpp
@@ -2930,8 +2932,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Tests/Kernels_Tests.h
     Source/Tests/NintendoSwitch_Tests.cpp
     Source/Tests/NintendoSwitch_Tests.h
-    Source/Tests/PokemonFRLG_Tests.cpp
-    Source/Tests/PokemonFRLG_Tests.h
     Source/Tests/PokemonLZA_Tests_Old.cpp
     Source/Tests/PokemonLZA_Tests_Old.h
     Source/Tests/PokemonSV_Tests_Old.cpp
