@@ -205,9 +205,6 @@ apply_common_target_properties(SerialProgramsLib)
 apply_common_target_properties(SerialPrograms)
 
 if(MSVC)
-    if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        add_compile_options(/lowpriority)
-    endif()
     set_source_files_properties("../3rdParty/miniz-3.1.1/miniz.c" PROPERTIES COMPILE_FLAGS "/W0")
 else()
     # For GCC/Clang
