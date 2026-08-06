@@ -925,6 +925,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/BinaryImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Tests.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Tests.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x16_x64_AVX2.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x32_x64_AVX512.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x4_Default.h
@@ -966,6 +968,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Green_Default.cpp
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Tests.cpp
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Tests.h
     Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness.cpp
     Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness.h
     Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness_Default.cpp
@@ -988,6 +992,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range_x64_SSE42.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h
+    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_Tests.cpp
+    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_Tests.h
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_Default.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_arm64_NEON.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.cpp
@@ -1009,6 +1015,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/Kernels_BitScan.h
     Source/Kernels/Kernels_BitSet.h
     Source/Kernels/Kernels_arm64_NEON.h
+    Source/Kernels/Kernels_Tests.cpp
+    Source/Kernels/Kernels_Tests.h
     Source/Kernels/Kernels_x64_AVX2.h
     Source/Kernels/Kernels_x64_AVX512.h
     Source/Kernels/Kernels_x64_SSE41.h
@@ -1054,6 +1062,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.tpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Tests.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Tests.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Types.h
     Source/ML/DataLabeling/ML_AnnotationIO.cpp
     Source/ML/DataLabeling/ML_AnnotationIO.h

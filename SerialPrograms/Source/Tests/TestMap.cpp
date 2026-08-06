@@ -6,8 +6,6 @@
 
 
 #include "Common/Cpp/Containers/AlignedVector.tpp"
-#include "Kernels_Tests.h"
-#include "PokemonSV_Tests_Old.h"
 #include "TestMap.h"
 #include "TestUtils.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
@@ -215,14 +213,7 @@ int sound_bool_detector_helper(SoundBoolDetectorFunction test_func, const std::s
 
 
 const std::map<std::string, TestFunction> TEST_MAP = {
-    {"Kernels_ImageScaleBrightness", std::bind(image_void_detector_helper, test_kernels_ImageScaleBrightness, _1)},
-    {"Kernels_BinaryMatrix", std::bind(image_void_detector_helper, test_kernels_BinaryMatrix, _1)},
-    {"Kernels_FilterRGB32Range", std::bind(image_void_detector_helper, test_kernels_FilterRGB32Range, _1)},
-    {"Kernels_FilterRGB32Euclidean", std::bind(image_void_detector_helper, test_kernels_FilterRGB32Euclidean, _1)},
-    {"Kernels_ToBlackWhiteRGB32Range", std::bind(image_void_detector_helper, test_kernels_ToBlackWhiteRGB32Range, _1)},
-    {"Kernels_FilterByMask", std::bind(image_void_detector_helper, test_kernels_FilterByMask, _1)},
-    {"Kernels_CompressRGB32ToBinaryEuclidean", std::bind(image_void_detector_helper, test_kernels_CompressRGB32ToBinaryEuclidean, _1)},
-    {"Kernels_Waterfill", std::bind(image_void_detector_helper, test_kernels_Waterfill, _1)},
+
 };
 
 TestFunction find_test_function(const std::string& test_space, const std::string& test_name){
