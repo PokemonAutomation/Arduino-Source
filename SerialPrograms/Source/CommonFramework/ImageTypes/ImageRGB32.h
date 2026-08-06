@@ -9,7 +9,7 @@
 
 #include <memory>
 #include <string>
-#include "Common/Cpp/Containers/Pimpl.h"
+#include "Common/Cpp/Containers/AlignedVector.h"
 #include "ImageViewRGB32.h"
 
 namespace PokemonAutomation{
@@ -75,8 +75,8 @@ public:
 
 
 private:
-    struct Data;
-    Pimpl<Data> m_data;
+    AlignedVector<uint32_t> m_data;
+    std::unique_ptr<CustomImageRGB32Owner> m_custom_owner;
 };
 
 

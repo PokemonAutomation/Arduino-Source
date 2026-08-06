@@ -5,7 +5,6 @@
  */
 
 #include <utility>
-#include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "ImageViewRGB32.h"
@@ -18,16 +17,6 @@
 
 namespace PokemonAutomation{
 
-struct ImageRGB32::Data{
-    AlignedVector<uint32_t> self;
-    std::unique_ptr<CustomImageRGB32Owner> custom_owner;
-
-    Data(size_t items) : self(items) {}
-    Data(std::unique_ptr<CustomImageRGB32Owner> image)
-        : custom_owner(std::move(image))
-    {}
-};
-
 
 
 ImageRGB32::~ImageRGB32() = default;
@@ -38,6 +27,7 @@ ImageRGB32& ImageRGB32::operator=(ImageRGB32&& x) noexcept{
     if (this != &x){
         ImageViewRGB32::operator=(x);
         m_data = std::move(x.m_data);
+        m_custom_owner = std::move(x.m_custom_owner);
         x.m_bytes_per_row = 0;
         x.m_ptr = nullptr;
         x.m_width = 0;
@@ -58,9 +48,9 @@ ImageRGB32::ImageRGB32() = default;
 
 ImageRGB32::ImageRGB32(size_t width, size_t height)
     : ImageViewRGB32(width, height)
-    , m_data(CONSTRUCT_TOKEN, m_bytes_per_row / sizeof(uint32_t) * height)
+    , m_data(m_bytes_per_row / sizeof(uint32_t) * height)
 {
-    m_ptr = m_data->self.data();
+    m_ptr = m_data.data();
 }
 
 #ifdef QT_CORE_LIB
@@ -77,9 +67,9 @@ ImageRGB32::ImageRGB32(const std::string& filename){
 #endif
 
 ImageRGB32::ImageRGB32(std::unique_ptr<CustomImageRGB32Owner> image)
-    : m_data(CONSTRUCT_TOKEN, std::move(image))
+    : m_custom_owner(std::move(image))
 {
-    ImageViewRGB32::operator=(m_data->custom_owner->get_view());
+    ImageViewRGB32::operator=(m_custom_owner->get_view());
 }
 
 
