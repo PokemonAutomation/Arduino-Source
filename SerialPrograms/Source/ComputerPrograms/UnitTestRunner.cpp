@@ -17,6 +17,7 @@
 #include "UnitTestRunner.h"
 
 #include "CommonTools/OCR/OCR_Tests.h"
+#include "Kernels/Kernels_Tests.h"
 #include "PokemonFRLG/PokemonFRLG_Tests.h"
 #include "PokemonHome/PokemonHome_Tests.h"
 #include "PokemonSwSh/PokemonSwSh_Tests.h"
@@ -35,8 +36,9 @@ namespace ComputerPrograms{
 UnitTestDatabase make_UNIT_TESTS_ALL(){
     UnitTestDatabase ret;
 
-    OCR::add_tests(ret);
     add_tests_BlackBorderDetector(ret);
+    OCR::add_tests(ret);
+    Kernels::add_tests(ret);
     NintendoSwitch::add_tests_CheckOnlineDetector(ret);
     NintendoSwitch::add_tests_FailedToConnectDetector(ret);
     NintendoSwitch::add_tests_UpdatePopupDetector(ret);
