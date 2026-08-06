@@ -223,8 +223,6 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"Kernels_FilterByMask", std::bind(image_void_detector_helper, test_kernels_FilterByMask, _1)},
     {"Kernels_CompressRGB32ToBinaryEuclidean", std::bind(image_void_detector_helper, test_kernels_CompressRGB32ToBinaryEuclidean, _1)},
     {"Kernels_Waterfill", std::bind(image_void_detector_helper, test_kernels_Waterfill, _1)},
-    {"PokemonSV_AdvanceDialogDetector", std::bind(image_bool_detector_helper, test_pokemonSV_AdvanceDialogDetector, _1)},
-    {"PokemonSV_SwapMenuDetector", std::bind(image_bool_detector_helper, test_pokemonSV_SwapMenuDetector, _1)},
 };
 
 TestFunction find_test_function(const std::string& test_space, const std::string& test_name){

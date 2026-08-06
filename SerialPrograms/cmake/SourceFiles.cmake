@@ -2932,8 +2932,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Tests/Kernels_Tests.h
     Source/Tests/NintendoSwitch_Tests.cpp
     Source/Tests/NintendoSwitch_Tests.h
-    Source/Tests/PokemonSV_Tests_Old.cpp
-    Source/Tests/PokemonSV_Tests_Old.h
     Source/Tests/TestMap.cpp
     Source/Tests/TestMap.h
     Source/Tests/TestUtils.cpp
