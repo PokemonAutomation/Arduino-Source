@@ -1,4 +1,4 @@
-/*  Image (RGB 32)
+/*  Image (RGB32)
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -7,11 +7,21 @@
 #ifndef PokemonAutomation_CommonFramework_ImageRGB32_H
 #define PokemonAutomation_CommonFramework_ImageRGB32_H
 
+#include <memory>
 #include <string>
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "ImageViewRGB32.h"
 
 namespace PokemonAutomation{
+
+
+class CustomImageRGB32Owner{
+public:
+    virtual ~CustomImageRGB32Owner() = default;
+    virtual ImageViewRGB32 get_view() const = 0;
+};
+
+
 
 
 class ImageRGB32 : public ImageViewRGB32{
@@ -27,9 +37,14 @@ private:
 
 public:
     ImageRGB32();
+
     //  Create an ARGB32 image of shape width x height with uninitialized pixels.
     ImageRGB32(size_t width, size_t height);
+
     explicit ImageRGB32(const std::string& filename);
+
+    ImageRGB32(std::unique_ptr<CustomImageRGB32Owner> image);
+
 
     //  Fill the entire image with the specified pixel.
     using ImageViewPlanar32::fill;
@@ -56,25 +71,20 @@ public:
 
 public:
     using ImageViewRGB32::sub_image;
-
-
-public:
     using ImageViewRGB32::save;
-
-
-public:
-    //  QImage
-
-    ImageRGB32(QImage image);
-    using ImageViewRGB32::to_QImage_ref;
-    using ImageViewRGB32::to_QImage_owning;
-    using ImageViewRGB32::scaled_to_QImage;
 
 
 private:
     struct Data;
     Pimpl<Data> m_data;
 };
+
+
+
+
+
+
+
 
 
 

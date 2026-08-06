@@ -52,13 +52,6 @@ public:
     ImageRGB32 scale_to(size_t width, size_t height) const;
 
 public:
-    //  QImage
-
-    ImageViewRGB32(const QImage& image);
-    QImage to_QImage_ref() const;       //  Return a shallow copy-on-write reference that points to this buffer. (fast)
-    QImage to_QImage_owning() const;    //  Return a copy that owns its own buffer. (slow)
-    QImage scaled_to_QImage(size_t width, size_t height) const;
-
     // convert to cv::Mat with BGRA color channel order
     cv::Mat to_opencv_Mat() const;
 

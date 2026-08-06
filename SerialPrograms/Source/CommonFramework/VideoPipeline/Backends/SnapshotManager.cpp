@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Concurrency/ReverseLockGuard.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "CommonFramework/ImageTypes/ImageRGB32Qt.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "SnapshotManager.h"
 
@@ -45,7 +46,9 @@ VideoSnapshot SnapshotManager::convert(QVideoFrame frame, WallClock timestamp) n
     snapshot.timestamp = timestamp;
     try{
         WallClock time0 = current_time();
-        snapshot.frame = std::make_shared<const ImageRGB32>(frame_to_image(frame));
+        snapshot.frame = std::make_shared<const ImageRGB32>(
+            QImage_to_ImageRGB32(frame_to_image(frame))
+        );
         WallClock time1 = current_time();
         WriteSpinLock lg(m_stats_lock);
         m_stats_conversion.report_data(

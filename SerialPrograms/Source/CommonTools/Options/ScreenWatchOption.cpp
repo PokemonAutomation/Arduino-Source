@@ -11,6 +11,7 @@
 #include <QPainter>
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/ImageTypes/ImageRGB32Qt.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "ScreenWatchOption.h"
 
@@ -109,7 +110,7 @@ VideoSnapshot ScreenWatchOption::screenshot(){
     int height = (int)(size.height() * HEIGHT + 0.5);
     WallClock now = current_time();
     QPixmap pm = screen.grabWindow(0, min_x, min_y, width, height);
-    return VideoSnapshot(pm.toImage(), now);
+    return VideoSnapshot(QImage_to_ImageRGB32(pm.toImage()), now);
 }
 
 

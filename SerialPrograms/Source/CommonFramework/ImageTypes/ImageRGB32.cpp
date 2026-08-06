@@ -1,28 +1,31 @@
-/*  Image (RGB 32)
+/*  Image (RGB32)
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
 #include <utility>
-#include <QImage>
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "ImageViewRGB32.h"
 #include "ImageRGB32.h"
 
-#include <iostream>
-
+#ifdef QT_CORE_LIB
+#include <QImage>
+#include "ImageRGB32Qt.h"
+#endif
 
 namespace PokemonAutomation{
 
 struct ImageRGB32::Data{
     AlignedVector<uint32_t> self;
-    QImage qimage;
+    std::unique_ptr<CustomImageRGB32Owner> custom_owner;
 
     Data(size_t items) : self(items) {}
-    Data(QImage image) : qimage(std::move(image)) {}
+    Data(std::unique_ptr<CustomImageRGB32Owner> image)
+        : custom_owner(std::move(image))
+    {}
 };
 
 
@@ -59,6 +62,8 @@ ImageRGB32::ImageRGB32(size_t width, size_t height)
 {
     m_ptr = m_data->self.data();
 }
+
+#ifdef QT_CORE_LIB
 ImageRGB32::ImageRGB32(const std::string& filename){
     QImage image(QString::fromStdString(filename));
     if (image.isNull()){
@@ -67,30 +72,18 @@ ImageRGB32::ImageRGB32(const std::string& filename){
     if (image.format() != QImage::Format_RGB32 && image.format() != QImage::Format_ARGB32){
         image = image.convertToFormat(QImage::Format_ARGB32);
     }
-    *this = std::move(image);
+    *this = ImageRGB32(std::make_unique<ImageRGB32Qt>(std::move(image)));
+}
+#endif
+
+ImageRGB32::ImageRGB32(std::unique_ptr<CustomImageRGB32Owner> image)
+    : m_data(CONSTRUCT_TOKEN, std::move(image))
+{
+    ImageViewRGB32::operator=(m_data->custom_owner->get_view());
 }
 
 
 
-
-ImageRGB32::ImageRGB32(QImage image){
-    if (image.isNull()){
-        return;
-    }
-    QImage::Format format = image.format();
-    if (format == QImage::Format_ARGB32_Premultiplied){
-        image = image.convertToFormat(QImage::Format_ARGB32);
-    }else if (format != QImage::Format_ARGB32 && format != QImage::Format_RGB32){
-        std::cout << "Non standard QImage format: " + std::to_string((int)format) << std::endl;
-        // image = image.convertToFormat(QImage::Format_ARGB32);
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid QImage format: " + std::to_string((int)format));
-    }
-    m_width = image.width();
-    m_height = image.height();
-    m_bytes_per_row = image.bytesPerLine();
-    m_ptr = (uint32_t*)image.bits();
-    m_data.reset(std::move(image));
-}
 
 
 

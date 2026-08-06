@@ -10,6 +10,7 @@
 #include "Common/Qt/NoWheelComboBox.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/PersistentSettings.h"
+#include "CommonFramework/ImageTypes/ImageRGB32Qt.h"
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "CommonFramework/Panels/UI/PanelListWidget.h"
 #include "ML/ML_Panels.h"
@@ -108,7 +109,7 @@ void ProgramSelect::add(std::unique_ptr<PanelListDescriptor> list){
     const ImageViewRGB32& icon = list->icon();
     if (icon){
         m_dropdown->addItem(
-            QIcon(QPixmap::fromImage(icon.to_QImage_ref())),
+            QIcon(QPixmap::fromImage(to_QImage_ref(icon))),
             QString::fromStdString(list->name())
         );
     }else{

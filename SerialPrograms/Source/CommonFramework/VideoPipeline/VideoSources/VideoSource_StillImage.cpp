@@ -7,6 +7,7 @@
 #include <QWidget>
 #include <QPainter>
 #include <QFileDialog>
+#include "CommonFramework/ImageTypes/ImageRGB32Qt.h"
 #include "VideoSource_StillImage.h"
 
 //#include <iostream>
@@ -85,12 +86,17 @@ VideoSource_StillImage::VideoSource_StillImage(
 {
     if (resolution){
         m_snapshot = VideoSnapshot(
-            ImageRGB32(m_original_image).scale_to(resolution.width, resolution.height),
+            QImage_to_ImageRGB32(
+                m_original_image.scaled(
+                    (int)resolution.width,
+                    (int)resolution.height
+                )
+            ),
             current_time()
         );
     }else{
         m_snapshot = VideoSnapshot(
-            m_original_image,
+            QImage_to_ImageRGB32(m_original_image),
             current_time()
         );
     }

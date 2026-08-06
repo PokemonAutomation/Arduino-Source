@@ -13,6 +13,7 @@
 #include <QMouseEvent>
 #include <QApplication>
 #include <QGuiApplication>
+#include "CommonFramework/ImageTypes/ImageRGB32Qt.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "ScreenWatchWidget.h"
 
@@ -65,7 +66,7 @@ void ScreenWatchDisplayWidget::paintEvent(QPaintEvent* event){
 
     QRect rect(0, 0, this->width(), this->height());
     QPainter painter(this);
-    painter.drawImage(rect, snapshot.frame->to_QImage_ref());
+    painter.drawImage(rect, to_QImage_ref(*snapshot.frame));
 }
 
 
