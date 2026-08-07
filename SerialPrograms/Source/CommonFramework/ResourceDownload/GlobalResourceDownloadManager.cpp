@@ -8,6 +8,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ResourceDownload/ResourceDownloadHelpers.h"
+#include "CommonFramework/ResourceDownload/ResourceDownloadHelpersQt.h"
 #include "CommonFramework/ResourceDownload/ResourceDownload.h"
 #include "GlobalResourceDownloadManager.h"
 

@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 #include <unordered_set>
-
+#include "Common/Cpp/Json/JsonValue.h"
 
 namespace PokemonAutomation{
 
@@ -45,6 +45,8 @@ struct ResourceVersionInfo{
     std::optional<uint16_t> current_version_num;
 };
 
+std::vector<DownloadedResourceMetadata> deserialize_resource_list_json(const JsonValue& json);
+
 // there are three lists:
 // - expected_resource_download_list(): List of resources with the version numbers that the programs expect. from the local ResourceDownloadList.json
 // - list of resources downloaded locally. use get_local_version_info() to determine ResourceVersionStatus relative to the expected resource version number.
@@ -52,7 +54,6 @@ struct ResourceVersionInfo{
 
 const std::vector<DownloadedResourceMetadata>& expected_resource_download_list();
 
-const std::vector<DownloadedResourceMetadata>& remote_resource_download_list();
 
 // - This returns the version information for a resource that has been downloaded locally.
 // - This returns a struct containing a boolean representing whether the resource has been downloaded, 
@@ -61,11 +62,8 @@ const std::vector<DownloadedResourceMetadata>& remote_resource_download_list();
 // corresponding expected_resource from expected_resource_download_list()
 ResourceVersionInfo get_local_version_info(const std::string& target_resource_slug);
 
+DownloadedResourceMetadata get_resource_metadata_from_resource_type(const std::string& target_resource_slug, const std::vector<DownloadedResourceMetadata>& resource_list);
 
-// - throws OperationFailedException if target_resource_slug isn't found within remote_resource_download_list
-// this would indicate that CC is out of date.
-// - also throws OperationFailedException if Internet is not turned on.
-DownloadedResourceMetadata get_remote_resource_metadata_from_resource_slug(const std::string& target_resource_slug);
 
 // ASSUMES: given target_resource_slug is listed within expected_resource_download_list().
 // PanelInstance::validate_resource_list() should ensure that target_resource_slug is valid.
