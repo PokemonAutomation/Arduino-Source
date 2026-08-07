@@ -12,7 +12,10 @@
 #include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WiredController.h"
 #include "NintendoSwitch_UpdatePopupDetector.h"
 #include "Tests/TestUtils.h"
-
+#include "Controllers/NullController.h"
+#include "Common/Compiler.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 //#include <iostream>
 //using std::cout;
 //using std::endl;
@@ -271,12 +274,7 @@ public:
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        DummyBotBase botbase(logger);
-        SerialPABotBase::SerialPABotBase_Connection connection(logger, "");
-        SerialPABotBase_WiredController controller(
-            logger, connection,
-            ControllerType::NintendoSwitch_WiredController
-        );
+        NullController controller(logger);
         DummyVideoFeed video_feed;
         DummyVideoOverlay video_overlay;
         DummyAudioFeed audio_feed;
