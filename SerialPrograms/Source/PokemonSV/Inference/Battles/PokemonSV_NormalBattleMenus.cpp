@@ -377,7 +377,27 @@ bool WipeoutDetector::detect(const ImageViewRGB32& screen){
 
 
 
+class Test_SwapMenuDetector : public UnitTest{
+public:
+    Test_SwapMenuDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonSV::SwapMenuDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
 
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        SwapMenuDetector detector(COLOR_RED);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
 
 class Test_TerastallizingDetector : public UnitTest{
 public:
@@ -404,11 +424,6 @@ private:
 
 
 
-
-
-
-
-
 void add_tests_NormalBattleMenus(UnitTestDatabase& database){
     database.add<Test_TerastallizingDetector>("PokemonSV/TerastallizingDetector/720p_tera_eleTerrainOverlap2_True.png", true);
     database.add<Test_TerastallizingDetector>("PokemonSV/TerastallizingDetector/French_Already_Did_False.jpg", false);
@@ -417,8 +432,6 @@ void add_tests_NormalBattleMenus(UnitTestDatabase& database){
     database.add<Test_TerastallizingDetector>("PokemonSV/TerastallizingDetector/tera_eleTerrainOverlap_Sandstorm_True.png", true);
     database.add<Test_TerastallizingDetector>("PokemonSV/TerastallizingDetector/tera_eleTerrainOverlap1_False.png", false);
     database.add<Test_TerastallizingDetector>("PokemonSV/TerastallizingDetector/tera_eleTerrainOverlap2_False.png", false);
-
-
 }
 
 

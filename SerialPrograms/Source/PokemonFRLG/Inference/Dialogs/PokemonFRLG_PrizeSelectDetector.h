@@ -9,6 +9,7 @@
 
 #include <chrono>
 #include <atomic>
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -46,7 +47,7 @@ public:
     {}
 };
 
-
+void add_tests_PrizeSelectDetector(UnitTestDatabase& database);
 
 
 }

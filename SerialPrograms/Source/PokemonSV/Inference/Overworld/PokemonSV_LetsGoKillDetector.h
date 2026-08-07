@@ -10,6 +10,7 @@
 #include <functional>
 #include <atomic>
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/Audio/AudioPerSpectrumDetectorBase.h"
 #include "CommonTools/VisualDetector.h"
@@ -79,6 +80,9 @@ private:
     DetectedCallback m_detected_callback;
     std::atomic<WallClock> m_last_detected;
 };
+
+
+void add_tests_LetsGoKillDetector(UnitTestDatabase& database);
 
 
 

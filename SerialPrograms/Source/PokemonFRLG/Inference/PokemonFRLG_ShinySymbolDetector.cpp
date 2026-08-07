@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Color.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
@@ -59,6 +60,34 @@ bool ShinySymbolDetector::read(Logger& logger, const ImageViewRGB32& frame){
     return false;
 }
 
+class Test_ShinySymbolDetector : public UnitTest{
+public:
+
+    Test_ShinySymbolDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonHome::ShinySymbolDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        ShinySymbolDetector detector(COLOR_RED);
+        ImageRGB32 image(m_image);
+        return detector.read(logger, image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+void add_tests_ShinySymbolDetector(UnitTestDatabase& database){
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/ShinySymbolDetector/Char_False.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/ShinySymbolDetector/Karp-coloredited_True.png", true);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/ShinySymbolDetector/Karp-snotyak_True.png", true);
+}
 
 }
 }

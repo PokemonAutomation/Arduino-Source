@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
@@ -133,6 +134,38 @@ bool FastTravelWatcher::process_frame(const ImageViewRGB32& screen, WallClock ti
 }
 
 
+class Test_FastTravelDetector : public UnitTest{
+public:
+    Test_FastTravelDetector(const std::string& image, bool expected)
+        : UnitTest("PokemonSV::FastTravelDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        FastTravelDetector detector(COLOR_RED, MINIMAP_AREA);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    }
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+
+void add_tests_FastTravelDetector(UnitTestDatabase& database){
+    database.add<Test_FastTravelDetector>("PokemonSV/FastTravelDetector/720p_fastTravel_NorthDown_True.jpg", true);
+    database.add<Test_FastTravelDetector>("PokemonSV/FastTravelDetector/720p_radarbeam_fastTravel_NorthDown_False.jpg", false);
+    database.add<Test_FastTravelDetector>("PokemonSV/FastTravelDetector/fastTravel_blueberry1_True.png", true);
+    database.add<Test_FastTravelDetector>("PokemonSV/FastTravelDetector/fastTravel_blueberry2_True.png", true);
+    database.add<Test_FastTravelDetector>("PokemonSV/FastTravelDetector/fastTravel_map1_blueberry_False.png", false);
+    database.add<Test_FastTravelDetector>("PokemonSV/FastTravelDetector/fastTravel_map2_blueberry_True.png", true);
+    database.add<Test_FastTravelDetector>("PokemonSV/FastTravelDetector/fasttravel_northLeft_True.png", true);
+    database.add<Test_FastTravelDetector>("PokemonSV/FastTravelDetector/fastTravel_partialRadarBeam1_False.png", false);
+    database.add<Test_FastTravelDetector>("PokemonSV/FastTravelDetector/pokeCenter1_False.png", false);
+    database.add<Test_FastTravelDetector>("PokemonSV/FastTravelDetector/pokeCenter2_False.png", false);
+}
 
 
 

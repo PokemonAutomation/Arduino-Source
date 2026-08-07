@@ -4,6 +4,9 @@
  *
  */
 
+#include "Common/Cpp/Filesystem.h"
+#include "CommonFramework/Globals.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -13,6 +16,8 @@
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "PokemonSV/Resources/PokemonSV_Ingredients.h"
 #include "PokemonSV_SandwichIngredientDetector.h"
+
+#include "Tests/TestUtils.h"
 
 //#include <iostream>
 //using std::cout;
@@ -407,6 +412,148 @@ OCR::StringMatchResult SandwichIngredientReader::read_with_ocr(
     }
 
     return results;
+}
+
+
+class Test_SandwichIngredientsDetector : public UnitTest{
+public:
+    Test_SandwichIngredientsDetector(const std::string& image, std::vector<std::string> words)
+        : UnitTest("PokemonSV::SandwichIngredientsDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_words(std::move(words))
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        if (m_words.size() < 3){
+            return "Error: not enough number of words in the filename.";
+        }
+
+        std::string target_type = m_words[m_words.size() - 3];
+        bool is_condiments = target_type == "Condiments";
+        bool is_picks = target_type == "Picks";
+        if (!is_condiments && !is_picks && target_type != "Fillings"){
+            return "Error: invalid ingredient page type.";
+        }
+
+        int num_fillings = 0;
+        int num_condiments = 0;
+        if (!parse_int(m_words[m_words.size() - 2], num_fillings)){
+            return "Error: invalid fillings count.";
+        }
+        if (!parse_int(m_words[m_words.size() - 1], num_condiments)){
+            return "Error: invalid condiments count.";
+        }
+
+        ImageRGB32 image(m_image);
+        SandwichCondimentsPageDetector condiments_detector;
+        SandwichPicksPageDetector picks_detector;
+
+        TEST_RESULT_COMPONENT_EQUAL(condiments_detector.detect(image), is_condiments, "condiments Page");
+        TEST_RESULT_COMPONENT_EQUAL(picks_detector.detect(image), is_picks, "picks Page");
+
+        for (int i = 0; i < 10; i++){
+            auto type = (i < 6 ? SandwichIngredientType::FILLING : SandwichIngredientType::CONDIMENT);
+            size_t index = (i < 6 ? i : i - 6);
+            DeterminedSandwichIngredientDetector determined_detector(type, index);
+            bool target = (i < 6 ? i < num_fillings : i - 6 < num_condiments);
+            TEST_RESULT_COMPONENT_EQUAL(determined_detector.detect(image), target, "ingredient slot " + std::to_string(i));
+        }
+        return true;
+    }
+
+private:
+    std::string m_image;
+    std::vector<std::string> m_words;
+};
+
+class Test_SandwichIngredientReader : public UnitTest{
+public:
+    Test_SandwichIngredientReader(const std::string& image)
+        : UnitTest("PokemonSV::SandwichIngredientReader - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        Filesystem::Path file_path(m_image);
+        Filesystem::Path parent_dir = file_path.parent_path();
+        std::string base_name = file_path.stem().string();
+        const std::vector<std::string> words = parse_words(base_name);
+
+        if (words.size() < 3){
+            return "Error: not enough number of words in the filename.";
+        }
+
+        SandwichIngredientType sandwich_type;
+        if (words[words.size() - 3] == "Fillings"){
+            sandwich_type = SandwichIngredientType::FILLING;
+        }else if (words[words.size() - 3] == "Condiments"){
+            sandwich_type = SandwichIngredientType::CONDIMENT;
+        }else{
+            return "Error: invalid sandwich type in filename.";
+        }
+
+        Language language = language_code_to_enum(words[words.size() - 2]);
+        if (language == Language::None || language == Language::EndOfList){
+            return "Error: invalid language word in filename.";
+        }
+
+        size_t selected_ingredient = 0;
+        if (!parse_size_t(words[words.size() - 1], selected_ingredient)){
+            return "Error: invalid selected ingredient index.";
+        }
+
+        Filesystem::Path target_ingredients_path = parent_dir / ("_" + base_name + ".txt");
+        std::vector<std::string> target_ingredients;
+        if (!load_slug_list(target_ingredients_path.string(), target_ingredients)){
+            return "Error: failed to load target ingredients.";
+        }
+        if (target_ingredients.size() != 10){
+            return "Error: need exactly 10 ingredients in golden file.";
+        }
+
+        ImageRGB32 image(m_image);
+        SandwichIngredientReader reader(sandwich_type);
+        for (size_t i = 0; i < 10; ++i){
+            if (selected_ingredient == i){
+                ImageMatch::ImageMatchResult results = reader.read_ingredient_page_with_icon_matcher(image, i);
+                if (results.results.empty()){
+                    return "No ingredient detected via icon matcher";
+                }
+                TEST_RESULT_COMPONENT_EQUAL(results.results.begin()->second, target_ingredients[i], "image matcher : ingredient slot " + std::to_string(i));
+            }
+
+            OCR::StringMatchResult results = reader.read_ingredient_page_with_ocr(image, global_logger_command_line(), language, i);
+            if (results.results.empty()){
+                return "No ingredient detected via text";
+            }
+            TEST_RESULT_COMPONENT_EQUAL(results.results.begin()->second.token, target_ingredients[i], "ocr : ingredient slot " + std::to_string(i));
+        }
+
+        return true;
+    }
+
+private:
+    std::string m_image;
+};
+
+
+void add_tests_SandwichIngredientDetector(UnitTestDatabase& database){
+    database.add<Test_SandwichIngredientsDetector>("PokemonSV/SandwichIngredientsDetector/Scarlet_Lettuce_Fillings_0_0.png", std::vector<std::string>{"Scarlet", "Lettuce", "Fillings", "0", "0"});
+    database.add<Test_SandwichIngredientsDetector>("PokemonSV/SandwichIngredientsDetector/Scarlet_Silver_Picks_1_1.png", std::vector<std::string>{"Scarlet", "Silver", "Picks", "1", "1"});
+    database.add<Test_SandwichIngredientsDetector>("PokemonSV/SandwichIngredientsDetector/Scarlet_Sweet_Herb_Condiments_1_0.png", std::vector<std::string>{"Scarlet", "Sweet", "Herb", "Condiments", "1", "0"});
+    database.add<Test_SandwichIngredientsDetector>("PokemonSV/SandwichIngredientsDetector/Scarlet_Vinegar_Condiments_1_0.png", std::vector<std::string>{"Scarlet", "Vinegar", "Condiments", "1", "0"});
+    database.add<Test_SandwichIngredientsDetector>("PokemonSV/SandwichIngredientsDetector/Scarlet_Vinegar_Condiments_1_1.png", std::vector<std::string>{"Scarlet", "Vinegar", "Condiments", "1", "1"});
+    database.add<Test_SandwichIngredientsDetector>("PokemonSV/SandwichIngredientsDetector/Violet_Silver_Picks_1_1.png", std::vector<std::string>{"Violet", "Silver", "Picks", "1", "1"});
+    database.add<Test_SandwichIngredientsDetector>("PokemonSV/SandwichIngredientsDetector/Violet_Silver_Picks_6_4.png", std::vector<std::string>{"Violet", "Silver", "Picks", "6", "4"});
+    database.add<Test_SandwichIngredientsDetector>("PokemonSV/SandwichIngredientsDetector/Violet_Sweet_Herb_Condiments_1_2.png", std::vector<std::string>{"Violet", "Sweet", "Herb", "Condiments", "1", "2"});
+    database.add<Test_SandwichIngredientsDetector>("PokemonSV/SandwichIngredientsDetector/Violet_Sweet_Herb_Condiments_1_3.png", std::vector<std::string>{"Violet", "Sweet", "Herb", "Condiments", "1", "3"});
+
+    database.add<Test_SandwichIngredientReader>("PokemonSV/SandwichIngredientReader/Brighter_Condiments_eng_5.png");
+    database.add<Test_SandwichIngredientReader>("PokemonSV/SandwichIngredientReader/Condiments_eng_9.png");
+    database.add<Test_SandwichIngredientReader>("PokemonSV/SandwichIngredientReader/Condiments_fra_0.png");
+    database.add<Test_SandwichIngredientReader>("PokemonSV/SandwichIngredientReader/Darker_Condiments_eng_5.png");
+    database.add<Test_SandwichIngredientReader>("PokemonSV/SandwichIngredientReader/Fillings_eng_8.png");
+    database.add<Test_SandwichIngredientReader>("PokemonSV/SandwichIngredientReader/Fillings_fra_0.png");
 }
 
 }

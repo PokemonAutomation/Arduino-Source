@@ -4,8 +4,11 @@
  *
  */
 
+#include "Common/Cpp/Filesystem.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
@@ -15,7 +18,9 @@
 #include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonLZA/Resources/PokemonLZA_DonutBerries.h"
 #include "PokemonLZA_DonutBerriesDetector.h"
+#include "Tests/TestUtils.h"
 
+#include <fstream>
 //#include <iostream>
 //using std::cout;
 //using std::endl;
@@ -169,6 +174,101 @@ OCR::StringMatchResult DonutBerriesReader::read_with_ocr(
     results = DonutBerriesOCR::instance().read_substring(logger, language, image);
 
     return results;
+}
+
+
+class Test_DonutBerriesReader : public UnitTest{
+public:
+    Test_DonutBerriesReader(const std::string& image)
+        : UnitTest("PokemonPLZA::DonutBerriesReader - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        Filesystem::Path file_path(m_image);
+        Filesystem::Path parent_dir = file_path.parent_path();
+        std::string base_name = file_path.stem().string();
+
+        const std::vector<std::string> words = parse_words(base_name);
+        if (words.size() < 2){
+            return "Error: not enough number of words in the filename.";
+        }
+
+        std::string code = words[words.size() - 2];
+        if (code == "chiSim"){
+            code = "chi_sim";
+        }else if (code == "chiTra"){
+            code = "chi_tra";
+        }
+        Language language = language_code_to_enum(code);
+        if (language == Language::None || language == Language::EndOfList){
+            return "Error: invalid language word in filename.";
+        }
+
+        size_t selected_berry = 0;
+        if (!parse_size_t(words.back(), selected_berry)){
+            return "Error: selected berry word must be int of range [0, 7].";
+        }
+        if (selected_berry >= DonutBerriesReader::BERRY_PAGE_LINES){
+            return "Error: selected_berry must be in range [0, 7].";
+        }
+
+        ImageRGB32 image(m_image);
+        Filesystem::Path target_berries_path = parent_dir / ("_" + base_name + ".txt");
+
+        if (STATIC_GLOBALS.GENERATE_TEST_GOLDEN_FILES){
+            std::ofstream output_file(target_berries_path.stdpath());
+            if (!output_file.is_open()){
+                return "Error: cannot open output file " + target_berries_path.string() + " for writing";
+            }
+
+            DonutBerriesReader reader;
+            for (size_t i = 0; i < DonutBerriesReader::BERRY_PAGE_LINES; ++i){
+                OCR::StringMatchResult results = reader.read_berry_page_with_ocr(image, global_logger_command_line(), language, i);
+                output_file << (results.results.empty() ? "unknown-berry" : results.results.begin()->second.token) << std::endl;
+            }
+            return true;
+        }
+
+        std::vector<std::string> target_berries;
+        if (!load_slug_list(target_berries_path.string(), target_berries)){
+            return "Cannot load slug list from " + target_berries_path.string();
+        }
+        if (target_berries.size() != DonutBerriesReader::BERRY_PAGE_LINES){
+            return "Error: need to have exactly 8 berries in " + target_berries_path.string();
+        }
+
+        DonutBerriesReader reader;
+        for (size_t i = 0; i < DonutBerriesReader::BERRY_PAGE_LINES; ++i){
+            DonutBerriesSelectionDetector selection_detector(i);
+            TEST_RESULT_COMPONENT_EQUAL(selection_detector.detect(image), i == selected_berry, "selection detector : berry slot " + std::to_string(i));
+
+            OCR::StringMatchResult results = reader.read_berry_page_with_ocr(image, global_logger_command_line(), language, i);
+            if (results.results.empty()){
+                return "No berry detected via OCR";
+            }
+            TEST_RESULT_COMPONENT_EQUAL(results.results.begin()->second.token, target_berries[i], "ocr : berry slot " + std::to_string(i));
+        }
+
+        return true;
+    }
+
+private:
+    std::string m_image;
+};
+
+
+void add_tests_DonutBerriesReader(UnitTestDatabase& database){
+    database.add<Test_DonutBerriesReader>("PokemonLZA/DonutBerriesReader/20260102_01_chiSim_7.jpg");
+    database.add<Test_DonutBerriesReader>("PokemonLZA/DonutBerriesReader/20260102_01_eng_6.jpg");
+    database.add<Test_DonutBerriesReader>("PokemonLZA/DonutBerriesReader/20260102_02_chiSim_5.jpg");
+    database.add<Test_DonutBerriesReader>("PokemonLZA/DonutBerriesReader/20260102_02_eng_6.jpg");
+    database.add<Test_DonutBerriesReader>("PokemonLZA/DonutBerriesReader/20260102_03_eng_0.jpg");
+    database.add<Test_DonutBerriesReader>("PokemonLZA/DonutBerriesReader/20260102_04_eng_7.jpg");
+    database.add<Test_DonutBerriesReader>("PokemonLZA/DonutBerriesReader/20260102_05_eng_3.jpg");
+    database.add<Test_DonutBerriesReader>("PokemonLZA/DonutBerriesReader/20260120_01_kor_0.jpg");
+    database.add<Test_DonutBerriesReader>("PokemonLZA/DonutBerriesReader/20260120_02_kor_0.jpg");
+    database.add<Test_DonutBerriesReader>("PokemonLZA/DonutBerriesReader/20260122_01_eng_0.jpg");
 }
 
 }

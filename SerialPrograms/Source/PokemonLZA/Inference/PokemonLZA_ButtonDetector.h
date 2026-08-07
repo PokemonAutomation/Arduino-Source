@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonLZA_ButtonDetector_H
 
 #include <optional>
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/VisualDetector.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
@@ -91,6 +92,7 @@ public:
 };
 
 
+void add_tests_ButtonDetector(UnitTestDatabase& database);
 
 
 }

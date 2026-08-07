@@ -5,10 +5,12 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Globals.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "PokemonLZA_SelectionArrowDetector.h"
+#include "Tests/TestUtils.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -113,7 +115,44 @@ bool SelectionArrowDetector::detect(const ImageViewRGB32& screen){
 
 
 
+class Test_SelectionArrowDetector : public UnitTest{
+public:
+    Test_SelectionArrowDetector(
+        const std::string& image,
+        SelectionArrowType expected_arrow,
+        bool expected
+    )
+        : UnitTest("PokemonPLZA::SelectionArrowDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected_arrow(expected_arrow)
+        , m_expected(expected)
+    {}
 
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyVideoOverlay overlay;
+        SelectionArrowDetector detector(COLOR_RED, &overlay, m_expected_arrow, ImageFloatBox(0, 0, 1, 1));
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    SelectionArrowType m_expected_arrow;
+    bool m_expected;
+};
+
+
+void add_tests_SelectionArrowDetector(UnitTestDatabase& database){
+    database.add<Test_SelectionArrowDetector>("PokemonLZA/SelectionArrowDetector/french_1_Fossil_True.png", SelectionArrowType::RIGHT, true);
+    database.add<Test_SelectionArrowDetector>("PokemonLZA/SelectionArrowDetector/french_2_Fossil_True.png", SelectionArrowType::RIGHT, true);
+    database.add<Test_SelectionArrowDetector>("PokemonLZA/SelectionArrowDetector/french_3_Fossil_True.png", SelectionArrowType::RIGHT, true);
+    database.add<Test_SelectionArrowDetector>("PokemonLZA/SelectionArrowDetector/french_4_Fossil_True.png", SelectionArrowType::RIGHT, true);
+    database.add<Test_SelectionArrowDetector>("PokemonLZA/SelectionArrowDetector/french_5_Fossil_True.png", SelectionArrowType::RIGHT, true);
+    database.add<Test_SelectionArrowDetector>("PokemonLZA/SelectionArrowDetector/french_6_Fossil_True.png", SelectionArrowType::RIGHT, true);
+    database.add<Test_SelectionArrowDetector>("PokemonLZA/SelectionArrowDetector/french_7_Fossil_True.png", SelectionArrowType::RIGHT, true);
+    database.add<Test_SelectionArrowDetector>("PokemonLZA/SelectionArrowDetector/french_8_Fossil_True.png", SelectionArrowType::RIGHT, true);
+    database.add<Test_SelectionArrowDetector>("PokemonLZA/SelectionArrowDetector/french_9_Fossil_True.png", SelectionArrowType::RIGHT, true);
+}
 
 
 }

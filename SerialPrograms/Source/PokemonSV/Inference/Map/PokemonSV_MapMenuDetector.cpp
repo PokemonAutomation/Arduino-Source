@@ -5,10 +5,12 @@
  */
 
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonSV_MapMenuDetector.h"
+#include "Tests/TestUtils.h"
 
 //#include <iostream>
 //using std::cout;
@@ -97,6 +99,40 @@ void MapDestinationMenuWatcher::make_overlays(VideoOverlaySet& items) const{
 
 bool MapDestinationMenuWatcher::process_frame(const ImageViewRGB32& screen, WallClock timestamp){
     return m_detector.detect(screen);
+}
+
+
+class Test_MapFlyMenuDetector : public UnitTest{
+public:
+    Test_MapFlyMenuDetector(const std::string& image, bool expected)
+        : UnitTest("PokemonSV::MapFlyMenuDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        MapFlyMenuDetector fly_menu(COLOR_RED);
+        MapDestinationMenuDetector dest_menu(COLOR_RED);
+        ImageRGB32 image(m_image);
+        TEST_RESULT_EQUAL(fly_menu.detect(image), m_expected);
+        TEST_RESULT_EQUAL(dest_menu.detect(image), !m_expected);
+        return true;
+    }
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+
+void add_tests_MapMenuDetector(UnitTestDatabase& database){
+    database.add<Test_MapFlyMenuDetector>("PokemonSV/MapFlyMenuDetector/ABitOutsideSouthGate_True.png", true);
+    database.add<Test_MapFlyMenuDetector>("PokemonSV/MapFlyMenuDetector/AtSouthGate_True.png", true);
+    database.add<Test_MapFlyMenuDetector>("PokemonSV/MapFlyMenuDetector/FraKitakamiForest_False.png", false);
+    database.add<Test_MapFlyMenuDetector>("PokemonSV/MapFlyMenuDetector/FraKitakamiTown_True.png", true);
+    database.add<Test_MapFlyMenuDetector>("PokemonSV/MapFlyMenuDetector/SouthGate_False.png", false);
+    database.add<Test_MapFlyMenuDetector>("PokemonSV/MapFlyMenuDetector/SouthGate_True.png", true);
+    database.add<Test_MapFlyMenuDetector>("PokemonSV/MapFlyMenuDetector/WestOfSouthGate_False.png", false);
 }
 
 

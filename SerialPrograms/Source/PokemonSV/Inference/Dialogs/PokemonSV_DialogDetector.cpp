@@ -5,6 +5,7 @@
  */
 
 #include "CommonTools/Images/SolidColorTest.h"
+#include "CommonFramework/Globals.h"
 #include "PokemonSV_DialogArrowDetector.h"
 #include "PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV_DialogDetector.h"
@@ -121,6 +122,50 @@ bool PromptDialogDetector::detect(const ImageViewRGB32& screen){
 
     GradientArrowDetector gradiant_detector(COLOR_RED, GradientArrowType::RIGHT, m_gradient);
     return gradiant_detector.detect(screen);
+}
+
+
+class Test_AdvanceDialogDetector : public UnitTest{
+public:
+    Test_AdvanceDialogDetector(const std::string& image, bool expected)
+        : UnitTest("PokemonSV::AdvanceDialogDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        AdvanceDialogDetector detector(COLOR_RED);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    }
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+class Test_DialogBoxDetector : public UnitTest{
+public:
+    Test_DialogBoxDetector(const std::string& image, bool expected)
+        : UnitTest("PokemonSV::DialogBoxDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DialogBoxDetector detector(COLOR_RED);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    }
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+
+void add_tests_DialogDetector(UnitTestDatabase& database){
+    database.add<Test_DialogBoxDetector>("PokemonSV/DialogBoxDetector/French_True.png", true);
 }
 
 

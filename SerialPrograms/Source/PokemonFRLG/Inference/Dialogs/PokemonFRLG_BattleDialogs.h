@@ -9,6 +9,7 @@
 
 #include <chrono>
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Language.h"
@@ -171,7 +172,8 @@ public:
     {}
 };
 
-
+void add_tests_AdvanceBattleDialogDetector(UnitTestDatabase& database);
+void add_tests_BattleMenuDetector(UnitTestDatabase& database);
 
 
 }

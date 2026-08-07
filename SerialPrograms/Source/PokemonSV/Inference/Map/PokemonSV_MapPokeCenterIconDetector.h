@@ -10,6 +10,7 @@
 #include <vector>
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Containers/FixedLimitVector.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/VisualDetector.h"
@@ -58,6 +59,9 @@ protected:
     FixedLimitVector<OverlayBoxScope> m_hit_boxes;
     
 };
+
+
+void add_tests_MapPokeCenterIconDetector(UnitTestDatabase& database);
 
 
 

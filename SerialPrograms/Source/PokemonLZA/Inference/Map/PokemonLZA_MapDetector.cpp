@@ -4,10 +4,12 @@
  *
  */
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "CommonFramework/Globals.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "PokemonLZA_MapDetector.h"
 #include "PokemonLZA_MapIconDetector.h"
+#include "Tests/TestUtils.h"
 
 //#include <iostream>
 //using std::cout;
@@ -128,6 +130,33 @@ void MapDetector::reset_state(){
     for (MapIconDetector* detector : m_map_icon_detectors){
         detector->reset_state();
     }
+}
+
+
+class Test_MapDetector : public UnitTest{
+public:
+    Test_MapDetector(const std::string& image, bool expected)
+        : UnitTest("PokemonPLZA::MapDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyVideoOverlay overlay;
+        MapDetector detector(COLOR_RED, &overlay);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    }
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+
+void add_tests_MapDetector(UnitTestDatabase& database){
+    database.add<Test_MapDetector>("PokemonLZA/MapDetector/hyperspace_2_True.png", true);
+    database.add<Test_MapDetector>("PokemonLZA/MapDetector/hyperspace_True.png", true);
 }
 
 

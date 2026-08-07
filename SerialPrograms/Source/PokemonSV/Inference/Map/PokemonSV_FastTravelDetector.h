@@ -16,6 +16,7 @@
 #include <vector>
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Containers/FixedLimitVector.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
@@ -68,6 +69,7 @@ protected:
 };
 
 
+void add_tests_FastTravelDetector(UnitTestDatabase& database);
 
 
 }
