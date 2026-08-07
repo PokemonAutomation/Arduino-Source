@@ -4,12 +4,10 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_ImageRGB32Qt_H
-#define PokemonAutomation_CommonFramework_ImageRGB32Qt_H
+#ifndef PokemonAutomation_CommonFramework_ImageRGB32_Qt_H
+#define PokemonAutomation_CommonFramework_ImageRGB32_Qt_H
 
-#include <iostream>
 #include <QImage>
-#include "Common/Cpp/Exceptions.h"
 #include "ImageRGB32.h"
 
 namespace PokemonAutomation{
@@ -24,6 +22,9 @@ QImage to_QImage_owning(const ImageViewRGB32& image);
 QImage scaled_to_QImage(const ImageViewRGB32& image, size_t width, size_t height);
 
 ImageRGB32 QImage_to_ImageRGB32(QImage image);
+
+ImageRGB32 QImage_load_image(const std::string& filename);
+bool QImage_save_image(const ImageViewRGB32& image, const std::string& filename);
 
 
 

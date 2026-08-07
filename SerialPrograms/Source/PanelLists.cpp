@@ -10,7 +10,7 @@
 #include "Common/Qt/NoWheelComboBox.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/PersistentSettings.h"
-#include "CommonFramework/ImageTypes/ImageRGB32Qt.h"
+#include "CommonFramework/ImageTypes/ImageRGB32_Qt.h"
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "CommonFramework/Panels/UI/PanelListWidget.h"
 #include "ML/ML_Panels.h"

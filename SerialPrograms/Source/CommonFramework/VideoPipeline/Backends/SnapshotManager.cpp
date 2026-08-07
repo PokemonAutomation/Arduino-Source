@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/Concurrency/ReverseLockGuard.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
-#include "CommonFramework/ImageTypes/ImageRGB32Qt.h"
+#include "CommonFramework/ImageTypes/ImageRGB32_Qt.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "SnapshotManager.h"
 

@@ -5,18 +5,26 @@
  */
 
 
-#include <opencv2/core/mat.hpp>
-//#include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Filesystem.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "ImageRGB32.h"
 #include "ImageViewRGB32.h"
 
-#ifdef QT_CORE_LIB
-#include <QDir>
-#include <QFileInfo>
-#include <QImage>
-#include "ImageRGB32Qt.h"
+//#define PA_IMAGE_BACKEND_Qt
+#define PA_IMAGE_BACKEND_OpenCV
+
+#if 0
+#elif defined PA_IMAGE_BACKEND_Qt
+#include "ImageRGB32_Qt.h"
+#elif defined PA_IMAGE_BACKEND_OpenCV
+#include "ImageRGB32_OpenCV.h"
+#else
+#error "No image backend specified."
 #endif
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -32,30 +40,38 @@ ImageRGB32 ImageViewRGB32::copy() const{
     return ret;
 }
 
-#ifdef QT_CORE_LIB
 bool ImageViewRGB32::save(const std::string& path) const{
-    QString filepath = QString::fromStdString(path);
-    QFileInfo fileInfo(filepath);
-    QDir dir = fileInfo.dir();
+    Filesystem::Path folder = Filesystem::Path(path).parent_path();
 
-    if (!dir.exists()){
-        if (!dir.mkpath(".")){ // Create the path (the "." refers to the dir path itself)
-            global_logger_tagged().log("Failed to create directory for saving image:" + dir.absolutePath().toStdString());
-            return false;
-        }
+    try{
+        Filesystem::create_directories(folder);
+    }catch (...){}
+
+    if (!folder.empty() && !Filesystem::exists(folder)){
+        global_logger_tagged().log("Failed to create directory for saving image:" + folder.string());
+        return false;
     }
-    const bool success = to_QImage_ref(*this).save(QString::fromStdString(path));
-    if (!success){
-        global_logger_tagged().log("Failed to save image to:" + path);
-    }
-    return success;
+
+#ifdef PA_IMAGE_BACKEND_Qt
+    return QImage_save_image(*this, path);
+#endif
+#ifdef PA_IMAGE_BACKEND_OpenCV
+    return OpenCV_save_image(*this, path);
 }
 
+#endif
+
+
+#ifdef PA_IMAGE_BACKEND_Qt
 ImageRGB32 ImageViewRGB32::scale_to(size_t width, size_t height) const{
     return QImage_to_ImageRGB32(scaled_to_QImage(*this, width, height));
 }
 #endif
-
+#ifdef PA_IMAGE_BACKEND_OpenCV
+ImageRGB32 ImageViewRGB32::scale_to(size_t width, size_t height) const{
+    return OpenCV_scale_image(*this, width, height);
+}
+#endif
 
 
 

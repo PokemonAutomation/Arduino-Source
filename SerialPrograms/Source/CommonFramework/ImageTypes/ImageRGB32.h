@@ -15,6 +15,7 @@
 namespace PokemonAutomation{
 
 
+
 class CustomImageRGB32Owner{
 public:
     virtual ~CustomImageRGB32Owner() = default;

@@ -54,19 +54,19 @@ private:
 };
 
 void add_tests_raw_OCR(UnitTestDatabase& database){
-    database.add<Test_RawOCR>("OCR/letter-i-tall-1", Language::English, "I");
-    database.add<Test_RawOCR>("OCR/letter-i-tall-2", Language::English, "I");
-    database.add<Test_RawOCR>("OCR/letter-i-wide-1", Language::English, "I");
-    database.add<Test_RawOCR>("OCR/letter-i-wide-2", Language::English, "I");
-    database.add<Test_RawOCR>("OCR/sentence-1-1", Language::English, "You hurry to the Pokemon Center, shielding your");
-    database.add<Test_RawOCR>("OCR/sentence-1-1-wide", Language::English, "You hurry to the Pokemon Center, shielding your");
-    database.add<Test_RawOCR>("OCR/sentence-1-1-tall", Language::English, "You hurry to the Pokemon Center, shielding your");
-    database.add<Test_RawOCR>("OCR/sentence-1-2", Language::English, "You hurry to the Pokemon Center, shielding your");
-    database.add<Test_RawOCR>("OCR/sentence-1-2-wide", Language::English, "You hurry to the Pokemon Center, shielding your");
-    database.add<Test_RawOCR>("OCR/sentence-1-2-tall", Language::English, "You hurry to the Pokemon Center, shielding your");
-    database.add<Test_RawOCR>("OCR/sentence-1-3", Language::English, "You hurry to the Pokemon Center, shielding your");
-    database.add<Test_RawOCR>("OCR/sentence-1-3-wide", Language::English, "You hurry to the Pokemon Center, shielding your");
-    database.add<Test_RawOCR>("OCR/sentence-1-3-tall", Language::English, "You hurry to the Pokemon Center, shielding your");        
+    database.add<Test_RawOCR>("OCR/letter-i-tall-1.jpg", Language::English, "I");
+    database.add<Test_RawOCR>("OCR/letter-i-tall-2.jpg", Language::English, "I");
+    database.add<Test_RawOCR>("OCR/letter-i-wide-1.jpg", Language::English, "I");
+    database.add<Test_RawOCR>("OCR/letter-i-wide-2.jpg", Language::English, "I");
+    database.add<Test_RawOCR>("OCR/sentence-1-1.jpg", Language::English, "You hurry to the Pokemon Center, shielding your");
+    database.add<Test_RawOCR>("OCR/sentence-1-1-wide.jpg", Language::English, "You hurry to the Pokemon Center, shielding your");
+    database.add<Test_RawOCR>("OCR/sentence-1-1-tall.jpg", Language::English, "You hurry to the Pokemon Center, shielding your");
+    database.add<Test_RawOCR>("OCR/sentence-1-2.jpg", Language::English, "You hurry to the Pokemon Center, shielding your");
+    database.add<Test_RawOCR>("OCR/sentence-1-2-wide.jpg", Language::English, "You hurry to the Pokemon Center, shielding your");
+    database.add<Test_RawOCR>("OCR/sentence-1-2-tall.jpg", Language::English, "You hurry to the Pokemon Center, shielding your");
+    database.add<Test_RawOCR>("OCR/sentence-1-3.jpg", Language::English, "You hurry to the Pokemon Center, shielding your");
+    database.add<Test_RawOCR>("OCR/sentence-1-3-wide.jpg", Language::English, "You hurry to the Pokemon Center, shielding your");
+    database.add<Test_RawOCR>("OCR/sentence-1-3-tall.jpg", Language::English, "You hurry to the Pokemon Center, shielding your");
 }
 
 

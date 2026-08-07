@@ -13,7 +13,7 @@
 #include <QMouseEvent>
 #include <QApplication>
 #include <QGuiApplication>
-#include "CommonFramework/ImageTypes/ImageRGB32Qt.h"
+#include "CommonFramework/ImageTypes/ImageRGB32_Qt.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "ScreenWatchWidget.h"
 

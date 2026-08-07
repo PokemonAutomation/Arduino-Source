@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/FileIO.h"
 #include "JsonObject.h"
 #include "JsonTools.h"
 

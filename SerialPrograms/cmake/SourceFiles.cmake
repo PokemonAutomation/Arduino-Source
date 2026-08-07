@@ -419,8 +419,10 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/ImageTypes/ImageHSV32.h
     Source/CommonFramework/ImageTypes/ImageRGB32.cpp
     Source/CommonFramework/ImageTypes/ImageRGB32.h
-    Source/CommonFramework/ImageTypes/ImageRGB32Qt.cpp
-    Source/CommonFramework/ImageTypes/ImageRGB32Qt.h
+    Source/CommonFramework/ImageTypes/ImageRGB32_OpenCV.cpp
+    Source/CommonFramework/ImageTypes/ImageRGB32_OpenCV.h
+    Source/CommonFramework/ImageTypes/ImageRGB32_Qt.cpp
+    Source/CommonFramework/ImageTypes/ImageRGB32_Qt.h
     Source/CommonFramework/ImageTypes/ImageViewHSV32.cpp
     Source/CommonFramework/ImageTypes/ImageViewHSV32.h
     Source/CommonFramework/ImageTypes/ImageViewPlanar32.cpp

@@ -11,7 +11,7 @@
 #include <QLineEdit>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/ImageTypes/ImageRGB32Qt.h"
+#include "CommonFramework/ImageTypes/ImageRGB32_Qt.h"
 #include "StringSelectWidget.h"
 
 //#include <iostream>

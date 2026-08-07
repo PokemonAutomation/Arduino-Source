@@ -11,7 +11,7 @@
 #include <QPainter>
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/ImageTypes/ImageRGB32Qt.h"
+#include "CommonFramework/ImageTypes/ImageRGB32_Qt.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "ScreenWatchOption.h"
 

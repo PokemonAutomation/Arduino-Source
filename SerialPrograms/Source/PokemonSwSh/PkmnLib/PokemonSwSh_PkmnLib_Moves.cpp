@@ -4,6 +4,7 @@
  *
  */
 
+#include <cstdlib>
 #include <deque>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"

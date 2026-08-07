@@ -114,5 +114,26 @@ private:
 };
 
 
+
+
+
+void string_to_file(const std::string& filename, const std::string& str);
+
+//  Load file from `filename` into a string
+//  If unable to open the file, FileException is thrown
+std::string file_to_string(const std::string& filename);
+
+//  Load file from `filename` into a string. Return true if the file can be read successfully
+bool file_to_string(const std::string& filename, std::string& content);
+
+
+
+
+
+
+
+
+
+
 }
 #endif

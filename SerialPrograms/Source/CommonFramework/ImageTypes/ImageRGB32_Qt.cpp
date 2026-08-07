@@ -4,7 +4,10 @@
  *
  */
 
-#include "ImageRGB32Qt.h"
+#include <iostream>
+#include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Logging/Logger.h"
+#include "ImageRGB32_Qt.h"
 
 namespace PokemonAutomation{
 
@@ -41,6 +44,27 @@ QImage scaled_to_QImage(const ImageViewRGB32& image, size_t width, size_t height
 ImageRGB32 QImage_to_ImageRGB32(QImage image){
     return ImageRGB32(std::make_unique<ImageRGB32Qt>(std::move(image)));
 }
+
+
+ImageRGB32 QImage_load_image(const std::string& filename){
+    QImage image(QString::fromStdString(filename));
+    if (image.isNull()){
+        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to open image.", filename);
+    }
+    if (image.format() != QImage::Format_RGB32 && image.format() != QImage::Format_ARGB32){
+        image = image.convertToFormat(QImage::Format_ARGB32);
+    }
+    return ImageRGB32(std::make_unique<ImageRGB32Qt>(std::move(image)));
+}
+bool QImage_save_image(const ImageViewRGB32& image, const std::string& filename){
+    const bool success = to_QImage_ref(image).save(QString::fromStdString(filename));
+    if (!success){
+        global_logger_tagged().log("Failed to save image to:" + filename);
+    }
+    return success;
+}
+
+
 
 
 ImageRGB32Qt::ImageRGB32Qt(QImage image)

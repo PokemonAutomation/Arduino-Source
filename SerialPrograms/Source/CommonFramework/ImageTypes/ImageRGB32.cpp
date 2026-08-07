@@ -5,14 +5,20 @@
  */
 
 #include <utility>
-#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "ImageViewRGB32.h"
 #include "ImageRGB32.h"
 
-#ifdef QT_CORE_LIB
-#include <QImage>
-#include "ImageRGB32Qt.h"
+//#define PA_IMAGE_BACKEND_Qt
+#define PA_IMAGE_BACKEND_OpenCV
+
+#if 0
+#elif defined PA_IMAGE_BACKEND_Qt
+#include "ImageRGB32_Qt.h"
+#elif defined PA_IMAGE_BACKEND_OpenCV
+#include "ImageRGB32_OpenCV.h"
+#else
+#error "No image backend specified."
 #endif
 
 namespace PokemonAutomation{
@@ -53,16 +59,14 @@ ImageRGB32::ImageRGB32(size_t width, size_t height)
     m_ptr = m_data.data();
 }
 
-#ifdef QT_CORE_LIB
+#ifdef PA_IMAGE_BACKEND_Qt
 ImageRGB32::ImageRGB32(const std::string& filename){
-    QImage image(QString::fromStdString(filename));
-    if (image.isNull()){
-        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to open image.", filename);
-    }
-    if (image.format() != QImage::Format_RGB32 && image.format() != QImage::Format_ARGB32){
-        image = image.convertToFormat(QImage::Format_ARGB32);
-    }
-    *this = ImageRGB32(std::make_unique<ImageRGB32Qt>(std::move(image)));
+    *this = QImage_load_image(filename);
+}
+#endif
+#ifdef PA_IMAGE_BACKEND_OpenCV
+ImageRGB32::ImageRGB32(const std::string& filename){
+    *this = OpenCV_load_image(filename);
 }
 #endif
 

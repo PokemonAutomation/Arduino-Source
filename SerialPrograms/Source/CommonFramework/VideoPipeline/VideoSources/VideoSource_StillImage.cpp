@@ -7,7 +7,7 @@
 #include <QWidget>
 #include <QPainter>
 #include <QFileDialog>
-#include "CommonFramework/ImageTypes/ImageRGB32Qt.h"
+#include "CommonFramework/ImageTypes/ImageRGB32_Qt.h"
 #include "VideoSource_StillImage.h"
 
 //#include <iostream>
