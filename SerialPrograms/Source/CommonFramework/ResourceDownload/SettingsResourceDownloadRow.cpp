@@ -17,6 +17,7 @@
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ResourceDownload/GlobalResourceDownloadManager.h"
 #include "ResourceDownloadHelpers.h"
+#include "ResourceDownloadHelpersQt.h"
 // #include "SettingsResourceDownloadTable.h"
 #include "SettingsResourceDownloadRow.h"
 

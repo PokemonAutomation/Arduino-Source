@@ -525,6 +525,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/ResourceDownload/ResourceDownload.h
     Source/CommonFramework/ResourceDownload/ResourceDownloadHelpers.cpp
     Source/CommonFramework/ResourceDownload/ResourceDownloadHelpers.h
+    Source/CommonFramework/ResourceDownload/ResourceDownloadHelpersQt.cpp
+    Source/CommonFramework/ResourceDownload/ResourceDownloadHelpersQt.h
     Source/CommonFramework/ResourceDownload/SettingsResourceDownloadOptions.cpp
     Source/CommonFramework/ResourceDownload/SettingsResourceDownloadOptions.h
     Source/CommonFramework/ResourceDownload/SettingsResourceDownloadRow.cpp
