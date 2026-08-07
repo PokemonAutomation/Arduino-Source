@@ -5,10 +5,7 @@
  */
 
 #include <map>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QComboBox>
-#include <QCompleter>
+#include <atomic>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Json/JsonValue.h"

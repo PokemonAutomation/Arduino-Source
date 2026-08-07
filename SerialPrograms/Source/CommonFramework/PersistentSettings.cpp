@@ -4,7 +4,6 @@
  *
  */
 
-#include <QCoreApplication>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 //#include "Common/Cpp/Json/JsonArray.h"
