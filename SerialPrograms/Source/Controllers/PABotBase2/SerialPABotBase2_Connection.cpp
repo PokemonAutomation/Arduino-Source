@@ -7,6 +7,7 @@
 #ifdef QT_CORE_LIB
 #include <QSerialPortInfo>
 #include <QMessageBox>
+#include "Controllers/SerialPortPollerQt.h"
 #endif
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/PanicDump.h"
@@ -16,7 +17,6 @@
 #include "CommonFramework/Logging/Logger.h"
 #include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
-#include "Controllers/SerialPortPollerQt.h"
 #include "SerialPABotBase2_Connection.h"
 
 //#include <iostream>
