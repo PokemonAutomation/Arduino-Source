@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/ImageMatch/ExactImageMatcher.h"
 #include "CommonTools/Images/ImageFilter.h"

@@ -8,7 +8,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 //#include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"

@@ -8,7 +8,7 @@
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"

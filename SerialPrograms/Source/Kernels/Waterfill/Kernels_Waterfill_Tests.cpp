@@ -7,7 +7,7 @@
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "Common/Cpp/Time.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"

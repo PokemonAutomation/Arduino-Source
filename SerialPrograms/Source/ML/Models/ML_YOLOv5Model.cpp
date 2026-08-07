@@ -13,7 +13,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/dnn.hpp>
 #include "3rdParty/ONNX/OnnxToolsPA.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "ML/Models/ML_ONNXRuntimeHelpers.h"
 #include "ML_YOLOv5Model.h"

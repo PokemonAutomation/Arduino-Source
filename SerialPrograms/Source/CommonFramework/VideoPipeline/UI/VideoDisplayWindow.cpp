@@ -7,7 +7,7 @@
 #include <QLayout>
 #include <QMainWindow>
 #include <QResizeEvent>
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Windows/WindowTracker.h"
 #include "VideoDisplayWidget.h"
 #include "VideoDisplayWindow.h"

@@ -4,10 +4,8 @@
  *
  */
 
-#include "Common/Cpp/CancellableScope.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/ImageMatch/ExactImageMatcher.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"

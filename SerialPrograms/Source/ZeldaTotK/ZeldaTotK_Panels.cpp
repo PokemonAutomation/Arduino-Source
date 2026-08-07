@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/GlobalAutoPaths.h"
 //#include "CommonFramework/GlobalSettingsPanel.h"
 #include "ZeldaTotK_Panels.h"
 

@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"

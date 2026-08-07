@@ -6,8 +6,8 @@
 
 #include <iostream>
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/Globals.h"
 #include "CommonFramework/StaticGlobals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"

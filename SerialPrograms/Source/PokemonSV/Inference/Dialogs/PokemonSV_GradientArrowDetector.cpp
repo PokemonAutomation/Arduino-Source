@@ -6,7 +6,7 @@
 
 #include <array>
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"

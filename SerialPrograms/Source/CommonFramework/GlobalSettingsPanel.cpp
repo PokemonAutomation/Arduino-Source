@@ -19,6 +19,7 @@
 #include "Common/Cpp/Options/KeyboardLayoutOption.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/StaticGlobals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Options/CheckForUpdatesOption.h"
 #include "CommonFramework/Options/ResolutionOption.h"

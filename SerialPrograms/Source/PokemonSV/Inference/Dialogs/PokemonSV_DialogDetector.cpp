@@ -4,8 +4,8 @@
  *
  */
 
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/Images/SolidColorTest.h"
-#include "CommonFramework/Globals.h"
 #include "PokemonSV_DialogArrowDetector.h"
 #include "PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV_DialogDetector.h"

@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "PokemonFRLG/PokemonFRLG_Settings.h"

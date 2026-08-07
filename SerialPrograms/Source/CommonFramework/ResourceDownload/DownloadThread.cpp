@@ -4,11 +4,11 @@
  *
  */
 
-#include "CommonFramework/Tools/GlobalThreadPools.h"
-#include "CommonFramework/Globals.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "Common/Cpp/Filesystem.h"
 #include "Common/Cpp/ScopeExit.h"
+#include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Tools/FileDownloader.h"
 #include "CommonFramework/Tools/FileUnzip.h"
 #include "CommonFramework/Tools/FileHash.h"

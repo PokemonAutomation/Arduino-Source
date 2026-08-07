@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonFRLG/Programs/PokemonFRLG_SafariOptimalAction.h"
 

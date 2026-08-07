@@ -11,7 +11,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/StringToolsQt.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "OCR_StringNormalization.h"
 
 namespace PokemonAutomation{

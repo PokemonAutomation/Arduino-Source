@@ -5,10 +5,10 @@
  */
 
 #include "PokemonLZA_DirectionArrowDetector.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "Tests/TestUtils.h"
+//#include "Tests/TestUtils.h"
 #include <opencv2/opencv.hpp>
 #include <cmath>
 #include <sstream>

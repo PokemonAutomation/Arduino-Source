@@ -16,6 +16,7 @@
 #include "Common/Cpp/Hardware/Hardware.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/StaticGlobals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"

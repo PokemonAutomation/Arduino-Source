@@ -4,13 +4,13 @@
  *
  */
 
-#include "CommonFramework/Globals.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Filesystem.h"
 #include "Common/Cpp/ScopeExit.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Options/LabelCellOption.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"

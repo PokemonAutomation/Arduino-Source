@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/StaticGlobals.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"

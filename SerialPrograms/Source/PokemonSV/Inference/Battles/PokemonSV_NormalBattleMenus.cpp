@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"

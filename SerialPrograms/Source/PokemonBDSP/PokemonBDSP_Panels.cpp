@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/StaticGlobals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "PokemonBDSP_Panels.h"
 
 #include "PokemonBDSP_Settings.h"

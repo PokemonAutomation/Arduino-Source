@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Time.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
@@ -16,7 +16,7 @@
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_arm64_NEON.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Core_64x8_arm64_NEON.h"
 #endif
-#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64xH_Default.h"
+//#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64xH_Default.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
 #include "Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range.h"
 #include "Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean.h"

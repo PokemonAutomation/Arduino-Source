@@ -4,8 +4,8 @@
  *
  */
 
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/Images/SolidColorTest.h"

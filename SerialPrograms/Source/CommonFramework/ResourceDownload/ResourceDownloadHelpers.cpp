@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "Common/Cpp/Json/JsonArray.h"

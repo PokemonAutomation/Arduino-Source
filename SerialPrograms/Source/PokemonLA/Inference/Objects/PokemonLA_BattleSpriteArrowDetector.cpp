@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/DetectedBoxes.h"
 #include "Tests/TestUtils.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleSpriteWatcher.h"

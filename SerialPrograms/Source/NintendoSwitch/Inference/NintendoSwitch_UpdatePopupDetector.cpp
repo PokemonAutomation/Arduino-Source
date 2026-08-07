@@ -4,18 +4,17 @@
  *
  */
 
+#include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Recording/StreamHistorySession.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
-#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WiredController.h"
-#include "NintendoSwitch_UpdatePopupDetector.h"
 #include "Tests/TestUtils.h"
 #include "Controllers/NullController.h"
-#include "Common/Compiler.h"
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "NintendoSwitch_UpdatePopupDetector.h"
 //#include <iostream>
 //using std::cout;
 //using std::endl;

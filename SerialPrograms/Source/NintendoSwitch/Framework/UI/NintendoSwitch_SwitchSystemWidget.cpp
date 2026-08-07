@@ -13,6 +13,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/AudioPipeline/UI/AudioSelectorWidget.h"
 #include "CommonFramework/AudioPipeline/UI/AudioDisplayWidget.h"
 #include "CommonFramework/VideoPipeline/UI/VideoSourceSelectorWidget.h"

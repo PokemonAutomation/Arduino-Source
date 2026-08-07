@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/StaticGlobals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "PokemonSwSh_Panels.h"
 
 #include "PokemonSwSh_Settings.h"

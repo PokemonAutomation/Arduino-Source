@@ -4,16 +4,16 @@
  *
  */
 
-#include "Common/Cpp/Color.h"
+//#include "Common/Cpp/Color.h"
 #include "Common/Cpp/Time.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64xH_Default.h"
+//#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64xH_Default.h"
 #include "Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h"
 #include "Kernels_ImageScaleBrightness_Tests.h"
 
 #include <iostream>
-#include "CommonFramework/Globals.h"
 using std::cout;
 using std::endl;
 

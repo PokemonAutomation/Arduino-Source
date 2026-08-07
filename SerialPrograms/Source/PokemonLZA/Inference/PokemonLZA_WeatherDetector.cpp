@@ -1,4 +1,10 @@
-#include "CommonFramework/Globals.h"
+/*  Weather Detector
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageDiff.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "PokemonLZA_WeatherDetector.h"

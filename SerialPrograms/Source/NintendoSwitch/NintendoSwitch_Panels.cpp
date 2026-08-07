@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/StaticGlobals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "NintendoSwitch_Panels.h"
 
 #include "NintendoSwitch_Settings.h"

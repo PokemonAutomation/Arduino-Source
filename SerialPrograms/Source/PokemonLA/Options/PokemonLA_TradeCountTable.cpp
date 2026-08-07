@@ -7,7 +7,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "PokemonLA/Resources/PokemonLA_AvailablePokemon.h"

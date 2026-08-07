@@ -4,22 +4,18 @@
  *
  */
 
-
-#include "ML/Inference/ML_YOLOv5Detector.h"
+#include "CommonFramework/StaticGlobals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 //#include "CommonFramework/Exceptions/UnexpectedBattleException.h"
-
-
 //#include "CommonFramework/Exceptions/OperationFailedException.h"
-//#include "CommonTools/Async/InferenceRoutines.h"
-
-
-#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
+//#include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
+#include "ML/Inference/ML_YOLOv5Detector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"

@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/Color.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"

@@ -18,6 +18,7 @@
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Qt/GlobalThreadPoolsQt.h"
 #include "StaticRegistration.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "VideoPipeline/Backends/MediaServicesQt6.h"
 #include "Globals.h"

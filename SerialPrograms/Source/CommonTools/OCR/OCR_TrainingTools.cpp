@@ -7,7 +7,7 @@
 #include <QDirIterator>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Concurrency/Backends/ThreadPool_Default.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "OCR_SmallDictionaryMatcher.h"

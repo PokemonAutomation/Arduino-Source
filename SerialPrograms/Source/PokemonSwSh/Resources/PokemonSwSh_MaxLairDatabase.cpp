@@ -10,9 +10,8 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
-#include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "PokemonSwSh_MaxLairDatabase.h"
 
 namespace PokemonAutomation{

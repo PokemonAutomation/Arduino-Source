@@ -5,11 +5,10 @@
  */
 
 #include <deque>
-#include <fstream>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "PokemonSwSh_PkmnLib_Types.h"
 #include "PokemonSwSh_PkmnLib_Moves.h"
 

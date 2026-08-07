@@ -4,8 +4,8 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Globals.h"
+//#include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"

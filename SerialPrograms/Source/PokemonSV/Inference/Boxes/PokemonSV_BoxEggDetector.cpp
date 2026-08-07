@@ -6,8 +6,8 @@
 
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Globals.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"

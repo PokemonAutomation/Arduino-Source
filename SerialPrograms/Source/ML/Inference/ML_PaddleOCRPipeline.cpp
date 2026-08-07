@@ -10,6 +10,7 @@
 #include <numeric>
 #include <limits>
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "Common/Cpp/Exceptions.h"
 #include "ML/Models/ML_ONNXRuntimeHelpers.h"

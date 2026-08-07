@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonSV_PicnicDetector.h"
 

@@ -397,6 +397,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Exceptions/ScreenshotException.cpp
     Source/CommonFramework/Exceptions/ScreenshotException.h
     Source/CommonFramework/Exceptions/UnexpectedBattleException.h
+    Source/CommonFramework/GlobalAutoPaths.cpp
+    Source/CommonFramework/GlobalAutoPaths.h
     Source/CommonFramework/GlobalServices.cpp
     Source/CommonFramework/GlobalServices.h
     Source/CommonFramework/GlobalSettingsPanel.cpp
@@ -2934,8 +2936,6 @@ file(GLOB LIBRARY_SOURCES
     Source/StaticRegistrationQt.cpp
     Source/Tests/CommandLineTests.cpp
     Source/Tests/CommandLineTests.h
-    Source/Tests/CommonFramework_Tests.cpp
-    Source/Tests/CommonFramework_Tests.h
     Source/Tests/Kernels_Tests.cpp
     Source/Tests/Kernels_Tests.h
     Source/Tests/NintendoSwitch_Tests.cpp

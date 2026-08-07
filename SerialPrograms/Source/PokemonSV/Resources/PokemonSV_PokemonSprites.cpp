@@ -5,7 +5,7 @@
  */
 
 #include <QImageReader>
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
 #include "PokemonSV_PokemonSprites.h"
 

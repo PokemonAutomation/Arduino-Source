@@ -1,3 +1,9 @@
+/*  Weather Detector
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
 #ifndef PokemonAutomation_PokemonLZA_WeatherDetector_H
 #define PokemonAutomation_PokemonLZA_WeatherDetector_H
 

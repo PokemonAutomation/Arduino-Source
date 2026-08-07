@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
 #include "Tests/TestUtils.h"

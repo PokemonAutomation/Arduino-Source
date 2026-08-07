@@ -7,7 +7,7 @@
 #include <QDir>
 #include <QFile>
 #include "Common/Cpp/PrettyPrint.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "MessageAttachment.h"
 

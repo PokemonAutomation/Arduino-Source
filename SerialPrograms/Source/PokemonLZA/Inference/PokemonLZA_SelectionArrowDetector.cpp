@@ -5,8 +5,8 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Globals.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "PokemonLZA_SelectionArrowDetector.h"

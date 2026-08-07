@@ -6,21 +6,21 @@
 
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Time.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
 #ifdef PA_AutoDispatch_arm64_20_M1
-    #include "Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x8_arm64_NEON.h"
-    #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_arm64_NEON.h"
-    #include "Kernels/Waterfill/Kernels_Waterfill_Core_64x8_arm64_NEON.h"
+#include "Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x8_arm64_NEON.h"
+#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_arm64_NEON.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Core_64x8_arm64_NEON.h"
 #endif
-#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64xH_Default.h"
+//#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64xH_Default.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
 #include "Kernels_BinaryMatrix_Tests.h"
 
 #include <functional>
 #include <iostream>
-#include "CommonFramework/Globals.h"
 using std::cout;
 using std::cerr;
 using std::endl;

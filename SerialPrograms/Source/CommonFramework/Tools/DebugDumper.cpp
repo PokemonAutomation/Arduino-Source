@@ -7,9 +7,9 @@
 #include <QDir>
 #include "DebugDumper.h"
 #include "Common/Cpp/PrettyPrint.h"
-#include "CommonFramework/Globals.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 
 namespace PokemonAutomation{
 

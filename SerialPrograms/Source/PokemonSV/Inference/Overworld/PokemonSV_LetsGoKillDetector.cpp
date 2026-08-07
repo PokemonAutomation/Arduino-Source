@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/ImageMatch/ExactImageMatcher.h"

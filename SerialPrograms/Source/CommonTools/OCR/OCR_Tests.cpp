@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 // #include "Common/Cpp/Strings/Unicode.h"

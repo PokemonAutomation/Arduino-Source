@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/Filesystem.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"

@@ -7,7 +7,7 @@
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/VisualDetectors/BlackBorderDetector.h"
