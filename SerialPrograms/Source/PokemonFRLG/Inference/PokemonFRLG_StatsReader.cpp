@@ -76,6 +76,7 @@ void StatsReader::make_overlays(VideoOverlaySet &items) const {
 
 void StatsReader::read_name(
     Logger& logger, Language language,
+    const ImageViewRGB32& frame,
     const ImageViewRGB32& game_screen,
     PokemonFRLG_Stats& stats,
     const std::set<std::string>& subset,
@@ -138,15 +139,19 @@ void StatsReader::read_name(
         stats.name = best_result.results.begin()->second.token;
     }else{
         logger.log("Failed to read species name.", COLOR_RED);
+        if (save_debug_images){
+            frame.save("DebugDumps/ocr_name_failed_frame.png");
+            name_box.save("DebugDumps/ocr_name_box.png");
+        }
     }
 }
 
 void StatsReader::read_gender(
     Logger& logger, Language language,
+    const ImageViewRGB32& frame,
     const ImageViewRGB32& game_screen,
     PokemonFRLG_Stats& stats,
-    const std::set<std::string>& subset,
-    bool save_debug_images
+    const std::set<std::string>& subset
 ){
     const bool jpn = language == Language::Japanese;
 
@@ -182,6 +187,7 @@ void StatsReader::read_gender(
 
 void StatsReader::read_level(
     Logger& logger, Language language,
+    const ImageViewRGB32& frame,
     const ImageViewRGB32& game_screen,
     PokemonFRLG_Stats& stats,
     const std::set<std::string>& subset,
@@ -212,9 +218,6 @@ void StatsReader::read_level(
                 }
             }
         }
-        if (save_debug_images){
-            preprocessed.save("DebugDumps/ocr_level_preprocessed.png");
-        }
         // Trim left 7% to exclude the "L" glyph blob (always at x~0).
         // The actual level digits start at ~13%+ of the box width.
         size_t lv_skip = preprocessed.width() * 7 / 100;
@@ -224,14 +227,20 @@ void StatsReader::read_level(
         );
         ImageViewRGB32 level_digit_view =
                 extract_box_reference(preprocessed, digits_bbox);
-        if (save_debug_images){
-            level_digit_view.save("DebugDumps/ocr_level_digits_trimmed.png");
-        }
         // Use threshold 230 (not 175): lilac-background blob crops inherently
         // give higher RMSD than yellow stat-box crops due to background colour.
         stats.level = read_digits_waterfill_template(
                 logger, level_digit_view, 230.0, DigitTemplateType::LevelBox,
                 "levelDigit", 0x7F);
+        // log if it's an obviously bad read
+        if (!stats.level.has_value() || stats.level < 2 || stats.level > 100){
+            logger.log("Level OCR result out of range", COLOR_RED);
+            if (save_debug_images){
+                frame.save("DebugDumps/ocr_level_failed_frame.png");
+                preprocessed.save("DebugDumps/ocr_level_preprocessed.png");
+                level_digit_view.save("DebugDumps/ocr_level_digits_trimmed.png");
+            }
+        }
     }else{
         // The level has a colored (lilac) background. The text is white, with a
         // gray/black shadow. To bridge the gaps and make a solid black character on a
@@ -241,9 +250,6 @@ void StatsReader::read_level(
         // dark (shadow).
         ImageRGB32 level_upscaled =
             level_box.scale_to(level_box.width() * 4, level_box.height() * 4);
-        if (save_debug_images){
-            level_upscaled.save("DebugDumps/ocr_level_upscaled.png");
-        }
         ImageRGB32 level_ready(level_upscaled.width(), level_upscaled.height());
         for (size_t r = 0; r < level_upscaled.height(); r++){
             for (size_t c = 0; c < level_upscaled.width(); c++){
@@ -261,16 +267,23 @@ void StatsReader::read_level(
                 }
             }
         }
-        if (save_debug_images){
-            level_ready.save("DebugDumps/ocr_level_ready.png");
-        }
         // Pass the binarized image to PaddleOCR
         stats.level = OCR::read_number(logger, level_ready, language);
+        // log if it's an obviously bad read
+        if (!stats.level.has_value() || stats.level < 2 || stats.level > 100){
+            logger.log("Level OCR result out of range", COLOR_RED);
+            if (save_debug_images){
+                frame.save("DebugDumps/ocr_level_failed_frame.png");
+                level_upscaled.save("DebugDumps/ocr_level_upscaled.png");
+                level_ready.save("DebugDumps/ocr_level_ready.png");
+            }
+        }
     }
 }
 
 void StatsReader::read_nature(
     Logger& logger, Language language,
+    const ImageViewRGB32& frame,
     const ImageViewRGB32& game_screen,
     PokemonFRLG_Stats& stats,
     const std::set<std::string>& subset,
@@ -281,9 +294,6 @@ void StatsReader::read_nature(
     // Read Nature (black text on white/beige).
     const static Pokemon::NatureReader reader("PokemonFRLG/NatureCheckerOCR.json");
     ImageViewRGB32 nature_raw = extract_box_reference(game_screen, jpn ? m_box_nature_jpn : m_box_nature);
-    if (save_debug_images){
-        nature_raw.save("DebugDumps/ocr_nature_0_raw.png");
-    }
 
     ImageRGB32 nature_ready = preprocess_for_ocr(
         nature_raw, "nature", 7, 2, true,
@@ -301,6 +311,11 @@ void StatsReader::read_nature(
         stats.nature = nature_result.results.begin()->second.token;
     }else{
         logger.log("Unable to detect Nature.", COLOR_RED);
+        if (save_debug_images){
+            frame.save("DebugDumps/ocr_nature_failed_frame.png");
+            nature_raw.save("DebugDumps/ocr_nature_failed_raw.png");
+            nature_ready.save("DebugDumps/ocr_nature_failed.png");
+        }
     }
 }
 
@@ -314,13 +329,13 @@ void StatsReader::read_page1(
     ImageViewRGB32 game_screen =
             extract_box_reference(frame, GameSettings::instance().GAME_BOX);
 
-    read_name(logger, language, game_screen, stats, subset, save_debug_images);
+    read_name(logger, language, frame, game_screen, stats, subset, save_debug_images);
 
-    read_gender(logger, language, game_screen, stats, subset, save_debug_images);
+    read_gender(logger, language, frame, game_screen, stats, subset);
 
-    read_level(logger, language, game_screen, stats, subset, save_debug_images);
+    read_level(logger, language, frame, game_screen, stats, subset, save_debug_images);
 
-    read_nature(logger, language, game_screen, stats, subset, save_debug_images);
+    read_nature(logger, language, frame, game_screen, stats, subset, save_debug_images);
 }
 
 void StatsReader::read_page2(
@@ -351,10 +366,20 @@ void StatsReader::read_page2(
         );
 
         // Waterfill isolates each digit -> per-char SINGLE_CHAR OCR.
-        return OCR::read_number_waterfill(
+        int stat = OCR::read_number_waterfill(
             logger, ocr_ready, 0xff000000,
             0xff808080
         );
+        // log impossible values or failed reads
+        if (stat < 1 || stat > 614){ // 614 comes from a max Def Shuckle
+            logger.log("OCR result for " + name + " out of range: " + std::to_string(stat), COLOR_RED);
+            if (GlobalSettings::instance().SAVE_DEBUG_IMAGES){
+                frame.save("DebugDumps/ocr_" + name + "_failed_frame.png");
+                stat_region.save("DebugDumps/ocr_" + name + "_failed_region.png");
+                ocr_ready.save("DebugDumps/ocr_" + name + "_failed_ready.png");
+            }
+        }
+        return stat;
     };
 
     auto read_hp = [&](const ImageFloatBox& box){
@@ -376,10 +401,19 @@ void StatsReader::read_page2(
         //      case 4: a 2-digit total where the "/" is dropped and the current HP is two digits   (4 digits read)
         // This will assume a 2-digit HP total in case of ambiguity, consistent with a Pokemon at full HP
         if (res_str.size() > 5){ 
-            return std::stoi(res_str.substr(res_str.size() - 3));
+            res = std::stoi(res_str.substr(res_str.size() - 3));
         }
         if (res_str.size() > 2){ 
-            return std::stoi(res_str.substr(res_str.size() - 2));
+            res = std::stoi(res_str.substr(res_str.size() - 2));
+        }
+        // log impossible values or failed reads
+        if (res < 1 || res > 714){ // 714 comes from a max HP Blissey
+            logger.log("OCR result for HP out of range: " + std::to_string(res), COLOR_RED);
+            if (GlobalSettings::instance().SAVE_DEBUG_IMAGES){
+                frame.save("DebugDumps/ocr_hp_failed_frame.png");
+                ImageViewRGB32 stat_region = extract_box_reference(game_screen, box);
+                stat_region.save("DebugDumps/ocr_hp_failed_region.png");
+            }
         }
         return res;
     };

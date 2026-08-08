@@ -48,9 +48,9 @@ ImageRGB32 preprocess_for_ocr(
     const std::string &label,
     int blur_kernel_size, int blur_passes,
     bool in_range_black, uint32_t bw_min,
-    uint32_t bw_max
+    uint32_t bw_max,
+    bool save_debug_images
 ){
-    const bool save_debug_images = GlobalSettings::instance().SAVE_DEBUG_IMAGES;
     int id = debug_counter++;
     std::string prefix = "DebugDumps/ocr_" + label + "_" + std::to_string(id);
 

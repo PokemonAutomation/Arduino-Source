@@ -88,6 +88,7 @@ private:
 
     void read_name(
         Logger& logger, Language language,
+        const ImageViewRGB32& frame,
         const ImageViewRGB32& game_screen,
         PokemonFRLG_Stats& stats,
         const std::set<std::string>& subset,
@@ -96,14 +97,15 @@ private:
 
     void read_gender(
         Logger& logger, Language language,
+        const ImageViewRGB32& frame,
         const ImageViewRGB32& game_screen,
         PokemonFRLG_Stats& stats,
-        const std::set<std::string>& subset,
-        bool save_debug_images
+        const std::set<std::string>& subset
     );
 
     void read_level(
         Logger& logger, Language language,
+        const ImageViewRGB32& frame,
         const ImageViewRGB32& game_screen,
         PokemonFRLG_Stats& stats,
         const std::set<std::string>& subset,
@@ -112,6 +114,7 @@ private:
 
     void read_nature(
         Logger& logger, Language language,
+        const ImageViewRGB32& frame,
         const ImageViewRGB32& game_screen,
         PokemonFRLG_Stats& stats,
         const std::set<std::string>& subset,

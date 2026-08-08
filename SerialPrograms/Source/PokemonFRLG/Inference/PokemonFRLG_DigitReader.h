@@ -38,7 +38,8 @@ ImageRGB32 preprocess_for_ocr(
     const std::string &label,
     int blur_kernel_size, int blur_passes,
     bool in_range_black, uint32_t bw_min,
-    uint32_t bw_max
+    uint32_t bw_max,
+    bool save_debug_images = false
 );
 
 // Read a string of decimal digits from `stat_region`.
