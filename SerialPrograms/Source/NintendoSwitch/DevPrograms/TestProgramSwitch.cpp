@@ -14,6 +14,7 @@
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Cpp/Concurrency/BusyPeriodicRunner.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
@@ -355,8 +356,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
     using namespace PokemonLZA;
 
-    const bool old_image_template_matching = PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING;
-    PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING = true;
+    const bool old_image_template_matching = STATIC_GLOBALS.IMAGE_TEMPLATE_MATCHING;
+    STATIC_GLOBALS.IMAGE_TEMPLATE_MATCHING = true;
     cout << "Weather detector waterfill debug enabled (dump + stats)." << endl;
 
     const struct {
@@ -387,7 +388,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
             << endl;
     }
 
-    PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING = old_image_template_matching;
+    STATIC_GLOBALS.IMAGE_TEMPLATE_MATCHING = old_image_template_matching;
     cout << "Weather detector waterfill debug restored." << endl;
 
     cout << endl;
