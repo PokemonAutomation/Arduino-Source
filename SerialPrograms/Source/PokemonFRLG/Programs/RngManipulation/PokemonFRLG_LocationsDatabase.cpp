@@ -4,11 +4,8 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "Common/Cpp/Json/JsonValue.h"
-#include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "PokemonFRLG_LocationsDatabase.h"
 

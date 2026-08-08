@@ -397,6 +397,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Exceptions/ScreenshotException.cpp
     Source/CommonFramework/Exceptions/ScreenshotException.h
     Source/CommonFramework/Exceptions/UnexpectedBattleException.h
+    Source/CommonFramework/GlobalAutoPaths.cpp
+    Source/CommonFramework/GlobalAutoPaths.h
     Source/CommonFramework/GlobalServices.cpp
     Source/CommonFramework/GlobalServices.h
     Source/CommonFramework/GlobalSettingsPanel.cpp
@@ -417,6 +419,10 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/ImageTypes/ImageHSV32.h
     Source/CommonFramework/ImageTypes/ImageRGB32.cpp
     Source/CommonFramework/ImageTypes/ImageRGB32.h
+    Source/CommonFramework/ImageTypes/ImageRGB32_OpenCV.cpp
+    Source/CommonFramework/ImageTypes/ImageRGB32_OpenCV.h
+    Source/CommonFramework/ImageTypes/ImageRGB32_Qt.cpp
+    Source/CommonFramework/ImageTypes/ImageRGB32_Qt.h
     Source/CommonFramework/ImageTypes/ImageViewHSV32.cpp
     Source/CommonFramework/ImageTypes/ImageViewHSV32.h
     Source/CommonFramework/ImageTypes/ImageViewPlanar32.cpp
@@ -523,6 +529,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/ResourceDownload/ResourceDownload.h
     Source/CommonFramework/ResourceDownload/ResourceDownloadHelpers.cpp
     Source/CommonFramework/ResourceDownload/ResourceDownloadHelpers.h
+    Source/CommonFramework/ResourceDownload/ResourceDownloadHelpersQt.cpp
+    Source/CommonFramework/ResourceDownload/ResourceDownloadHelpersQt.h
     Source/CommonFramework/ResourceDownload/SettingsResourceDownloadOptions.cpp
     Source/CommonFramework/ResourceDownload/SettingsResourceDownloadOptions.h
     Source/CommonFramework/ResourceDownload/SettingsResourceDownloadRow.cpp
@@ -925,6 +933,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/BinaryImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Tests.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Tests.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x16_x64_AVX2.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x32_x64_AVX512.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x4_Default.h
@@ -966,6 +976,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Green_Default.cpp
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Tests.cpp
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Tests.h
     Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness.cpp
     Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness.h
     Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness_Default.cpp
@@ -988,6 +1000,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range_x64_SSE42.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h
+    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_Tests.cpp
+    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_Tests.h
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_Default.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_arm64_NEON.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.cpp
@@ -1009,6 +1023,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/Kernels_BitScan.h
     Source/Kernels/Kernels_BitSet.h
     Source/Kernels/Kernels_arm64_NEON.h
+    Source/Kernels/Kernels_Tests.cpp
+    Source/Kernels/Kernels_Tests.h
     Source/Kernels/Kernels_x64_AVX2.h
     Source/Kernels/Kernels_x64_AVX512.h
     Source/Kernels/Kernels_x64_SSE41.h
@@ -1054,6 +1070,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.tpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Tests.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Tests.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Types.h
     Source/ML/DataLabeling/ML_AnnotationIO.cpp
     Source/ML/DataLabeling/ML_AnnotationIO.h
@@ -1211,6 +1229,8 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/NintendoSwitch_Panels.h
     Source/NintendoSwitch/NintendoSwitch_Settings.cpp
     Source/NintendoSwitch/NintendoSwitch_Settings.h
+    Source/NintendoSwitch/NintendoSwitch_SettingsPanel.cpp
+    Source/NintendoSwitch/NintendoSwitch_SettingsPanel.h
     Source/NintendoSwitch/NintendoSwitch_SingleSwitchProgram.cpp
     Source/NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h
     Source/NintendoSwitch/Options/NintendoSwitch_CodeEntrySettingsOption.cpp
@@ -1282,6 +1302,7 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboMacro.h
     Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.h
+    Source/CompileTimeBackends.h
     Source/PanelLists.cpp
     Source/PanelLists.h
     Source/Pokemon/Inference/Pokemon_BerryNameReader.cpp
@@ -1611,6 +1632,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/PokemonFRLG_Panels.h
     Source/PokemonFRLG/PokemonFRLG_Settings.cpp
     Source/PokemonFRLG/PokemonFRLG_Settings.h
+    Source/PokemonFRLG/PokemonFRLG_Tests.cpp
+    Source/PokemonFRLG/PokemonFRLG_Tests.h
     Source/PokemonFRLG/Programs/Farming/PokemonFRLG_ItemDuplication.cpp
     Source/PokemonFRLG/Programs/Farming/PokemonFRLG_ItemDuplication.h
     Source/PokemonFRLG/Programs/Farming/PokemonFRLG_LuckyEggFarmer.cpp
@@ -2826,8 +2849,6 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_PurpleBeamFinder.h
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggAutonomous.cpp
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggAutonomous.h
-    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggCombined2.cpp
-    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggCombined2.h
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggCombinedShared.h
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggFetcher2.cpp
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggFetcher2.h
@@ -2836,16 +2857,12 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggHatcher.cpp
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggHatcher.h
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggHelpers.h
-    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggSuperCombined2.cpp
-    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggSuperCombined2.h
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_GodEggDuplication.cpp
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_GodEggDuplication.h
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_GodEggItemDupe.cpp
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_GodEggItemDupe.h
     Source/PokemonSwSh/Programs/General/PokemonSwSh_AutonomousBallThrower.cpp
     Source/PokemonSwSh/Programs/General/PokemonSwSh_AutonomousBallThrower.h
-    Source/PokemonSwSh/Programs/General/PokemonSwSh_BallThrower.cpp
-    Source/PokemonSwSh/Programs/General/PokemonSwSh_BallThrower.h
     Source/PokemonSwSh/Programs/General/PokemonSwSh_BoxReorderNationalDex.cpp
     Source/PokemonSwSh/Programs/General/PokemonSwSh_BoxReorderNationalDex.h
     Source/PokemonSwSh/Programs/General/PokemonSwSh_ClothingBuyer.cpp
@@ -2968,18 +2985,10 @@ file(GLOB LIBRARY_SOURCES
     Source/StaticRegistrationQt.cpp
     Source/Tests/CommandLineTests.cpp
     Source/Tests/CommandLineTests.h
-    Source/Tests/CommonFramework_Tests.cpp
-    Source/Tests/CommonFramework_Tests.h
     Source/Tests/Kernels_Tests.cpp
     Source/Tests/Kernels_Tests.h
     Source/Tests/NintendoSwitch_Tests.cpp
     Source/Tests/NintendoSwitch_Tests.h
-    Source/Tests/PokemonFRLG_Tests.cpp
-    Source/Tests/PokemonFRLG_Tests.h
-    Source/Tests/PokemonLZA_Tests_Old.cpp
-    Source/Tests/PokemonLZA_Tests_Old.h
-    Source/Tests/PokemonSV_Tests_Old.cpp
-    Source/Tests/PokemonSV_Tests_Old.h
     Source/Tests/TestMap.cpp
     Source/Tests/TestMap.h
     Source/Tests/TestUtils.cpp

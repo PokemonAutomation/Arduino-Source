@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -12,6 +12,7 @@
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "PokemonLZA_HyperspaceCalorieDetector.h"
+#include "Tests/TestUtils.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -125,6 +126,46 @@ bool HyperspaceCalorieLimitWatcher::process_frame(const ImageViewRGB32& frame, W
     }
 
     return false;
+}
+
+
+class Test_HyperspaceCalorieDetector : public UnitTest{
+public:
+    Test_HyperspaceCalorieDetector(const std::string& image, int expected_calorie)
+        : UnitTest("PokemonPLZA::HyperspaceCalorieDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected_calorie(expected_calorie)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        if (m_expected_calorie <= 0 || m_expected_calorie > 9999){
+            return "Error: expected calorie must be in range [1, 9999].";
+        }
+
+        HyperspaceCalorieDetector detector(global_logger_command_line());
+        ImageRGB32 image(m_image);
+        if (!detector.detect(image)){
+            return "Error: detector failed to detect calorie number in image.";
+        }
+
+        TEST_RESULT_EQUAL((int)detector.calorie_number(), m_expected_calorie);
+        return true;
+    }
+
+private:
+    std::string m_image;
+    int m_expected_calorie;
+};
+
+
+void add_tests_HyperspaceCalorieDetector(UnitTestDatabase& database){
+    database.add<Test_HyperspaceCalorieDetector>("PokemonLZA/HyperspaceCalorieDetector/dhruv_1000.jpg", 1000);
+    database.add<Test_HyperspaceCalorieDetector>("PokemonLZA/HyperspaceCalorieDetector/dhruv_874.jpg", 874);
+    database.add<Test_HyperspaceCalorieDetector>("PokemonLZA/HyperspaceCalorieDetector/dhruv_902.jpg", 902);
+    database.add<Test_HyperspaceCalorieDetector>("PokemonLZA/HyperspaceCalorieDetector/dhruv_915.jpg", 915);
+    database.add<Test_HyperspaceCalorieDetector>("PokemonLZA/HyperspaceCalorieDetector/dhruv_923.jpg", 923);
+    database.add<Test_HyperspaceCalorieDetector>("PokemonLZA/HyperspaceCalorieDetector/dhruv_956.jpg", 956);
+    database.add<Test_HyperspaceCalorieDetector>("PokemonLZA/HyperspaceCalorieDetector/dhruv_999.jpg", 999);
 }
 
 

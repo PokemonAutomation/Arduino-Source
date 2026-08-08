@@ -7,12 +7,9 @@
 #ifndef PokemonAutomation_NintendoSwitch_SnapshotDumper_H
 #define PokemonAutomation_NintendoSwitch_SnapshotDumper_H
 
-#include "CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "CommonFramework/Panels/UI/PanelWidget.h"
-#include "CommonFramework/Panels/PanelInstance.h"
+#include "ControllerInput/ControllerInput.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -52,21 +49,18 @@ private:
 };
 
 
-class SnapshotKeyTrigger : public VideoOverlay::KeyEventListener{
+class SnapshotKeyTrigger : public ControllerInputListener{
 public:
     ~SnapshotKeyTrigger();
-    SnapshotKeyTrigger(VideoStream& stream, VideoOverlay& overlay, Format format);
-
+    SnapshotKeyTrigger(VideoStream& stream, Format format);
 
 private:
     void detach();
 
-    virtual void on_key_press(QKeyEvent* event) override;
-    virtual void on_key_release(QKeyEvent* event) override;
+    virtual void run_controller_input(ControllerInputState& state) override;
 
 private:
     VideoStream& m_stream;
-    VideoOverlay& m_overlay;
     Format m_format;
 };
 
@@ -74,7 +68,11 @@ private:
 std::string to_format_string(Format format);
 
 // takes a snapshot of the screen and saves it to the given folder_name
-void dump_snapshot(VideoStream& stream, std::string folder_name = "ScreenshotDumper", std::string format = ".png");
+void dump_snapshot(
+    VideoStream& stream,
+    std::string folder_name = "ScreenshotDumper",
+    std::string format = ".png"
+);
 
 }
 }

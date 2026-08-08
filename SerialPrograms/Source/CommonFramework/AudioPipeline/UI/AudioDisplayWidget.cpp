@@ -7,7 +7,7 @@
 
 #include <QPaintEvent>
 #include <QPainter>
-#include "Common/Qt/Redispatch.h"
+#include "CommonFramework/ImageTypes/ImageRGB32_Qt.h"
 #include "AudioDisplayWidget.h"
 
 #include <iostream>
@@ -133,7 +133,7 @@ void AudioDisplayWidget::render_spectrograph(){
 
     AudioSpectrumHolder::SpectrographSnapshot snapshot = m_session.spectrums().get_spectrograph();
     {
-        QImage graph_image = snapshot.image.to_QImage_ref();
+        QImage graph_image = to_QImage_ref(snapshot.image);
         graph_image = graph_image.scaled(
             widgetWidth, widgetHeight,
             Qt::IgnoreAspectRatio,

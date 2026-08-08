@@ -18,6 +18,7 @@
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Qt/GlobalThreadPoolsQt.h"
 #include "StaticRegistration.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "VideoPipeline/Backends/MediaServicesQt6.h"
 #include "Globals.h"
@@ -218,7 +219,12 @@ int run_program(int argc, char *argv[]){
     w.raise(); // bring the window to front on macOS
     set_permissions(w);
 
-    return application.exec();
+    int ret = application.exec();
+
+    //  Write program settings back to the json file.
+    PERSISTENT_SETTINGS().write();
+
+    return ret;
 }
 
 
@@ -242,10 +248,6 @@ int main(int argc, char *argv[]){
     setup_crash_handler();
 
     int ret = run_program(argc, argv);
-
-
-    //  Write program settings back to the json file.
-    PERSISTENT_SETTINGS().write();
 
 
 #ifdef PA_SOCIAL_SDK

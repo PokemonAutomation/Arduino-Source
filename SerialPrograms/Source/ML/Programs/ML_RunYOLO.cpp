@@ -5,16 +5,17 @@
  *  Test YOLO detection model on Switch streams.
  */
 
-#include <iostream>
-#include <filesystem>
+//#include <iostream>
+//#include <filesystem>
 #include <QMessageBox>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
-#include "Common/Cpp/PrettyPrint.h"
+//#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
+//#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+//#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "ML/Inference/ML_YOLOv5Detector.h"
 #include "ML_RunYOLO.h"
 

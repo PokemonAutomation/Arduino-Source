@@ -5,7 +5,7 @@
  */
 
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
@@ -213,6 +213,35 @@ bool OverworldWatcher::process_frame(const VideoSnapshot& frame){
 
     //  Make sure radar map held for long enough.
     return frame.timestamp - m_start_of_detection.timestamp >= m_map_hold_duration;
+}
+
+
+class Test_OverworldDetector : public UnitTest{
+public:
+    Test_OverworldDetector(const std::string& image, bool expected)
+        : UnitTest("PokemonSV::OverworldDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        OverworldDetector detector;
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    }
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+
+void add_tests_OverworldDetector(UnitTestDatabase& database){
+    database.add<Test_OverworldDetector>("PokemonSV/OverworldDetector/ZeroGateDay_2_True.png", true);
+    database.add<Test_OverworldDetector>("PokemonSV/OverworldDetector/ZeroGateDay_True.png", true);
+    database.add<Test_OverworldDetector>("PokemonSV/OverworldDetector/ZeroGateNight_True.png", true);
+    database.add<Test_OverworldDetector>("PokemonSV/OverworldDetector/ZeroGateNightBike_1_True.png", true);
+    database.add<Test_OverworldDetector>("PokemonSV/OverworldDetector/ZeroGateNightBike_2_True.png", true);
 }
 
 

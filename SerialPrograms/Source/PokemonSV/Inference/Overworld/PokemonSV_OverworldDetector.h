@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSV_OverworldDetector_H
 
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
@@ -56,6 +57,9 @@ private:
     VideoSnapshot m_start_of_detection;
     DirectionDetector m_direction_detector;
 };
+
+
+void add_tests_OverworldDetector(UnitTestDatabase& database);
 
 
 }

@@ -5,10 +5,14 @@
  */
 
 #include "PokemonLZA_DirectionArrowDetector.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+//#include "Tests/TestUtils.h"
 #include <opencv2/opencv.hpp>
 #include <cmath>
+#include <sstream>
 
 // #define DEBUG_DIRECTION_ARROW
 
@@ -40,7 +44,7 @@ bool DirectionArrowDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 image_crop = extract_box_reference(screen, m_search_box);
 
     // Convert to OpenCV Mat (BGRA format)
-    cv::Mat image = image_crop.to_opencv_Mat();
+    cv::Mat image = to_OpenCV_ref(image_crop);
     if (image.empty()){
         return false;
     }
@@ -332,6 +336,51 @@ bool DirectionArrowDetector::detect(const ImageViewRGB32& screen){
     m_detected_angle = eigenvec_angle_deg;
 
     return true;
+}
+
+
+class Test_DirectionArrowDetector : public UnitTest{
+public:
+    Test_DirectionArrowDetector(const std::string& image, int target_angle)
+        : UnitTest("PokemonPLZA::DirectionArrowDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_target_angle(target_angle)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        if (m_target_angle < 0 || m_target_angle >= 360){
+            return "Error: target angle must be in range [0, 360).";
+        }
+
+        DirectionArrowDetector detector(COLOR_RED);
+        ImageRGB32 image(m_image);
+        if (!detector.detect(image)){
+            return "Error: detector failed to detect arrow in image.";
+        }
+
+        double diff = std::abs(detector.detected_angle_deg() - m_target_angle);
+        if (diff > 180.0){
+            diff = 360.0 - diff;
+        }
+        if (diff > 10.0){
+            std::ostringstream ss;
+            ss << "Error: detected angle " << detector.detected_angle_deg()
+               << " differs from target angle " << m_target_angle
+               << " by " << diff << " degrees.";
+            return ss.str();
+        }
+
+        return true;
+    }
+
+private:
+    std::string m_image;
+    int m_target_angle;
+};
+
+
+void add_tests_DirectionArrowDetector(UnitTestDatabase& database){
+    //todo: Gather test images for the direction arrow detector
 }
 
 

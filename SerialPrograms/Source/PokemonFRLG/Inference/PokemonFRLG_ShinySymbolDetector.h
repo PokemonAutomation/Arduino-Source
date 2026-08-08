@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonFRLG_ShinySymbolDetector_H
 
 #include "Common/Cpp/Logging/AbstractLogger.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 
 namespace PokemonAutomation{
@@ -27,7 +28,7 @@ private:
     ImageFloatBox m_box_symbol;
 };
 
-
+void add_tests_ShinySymbolDetector(UnitTestDatabase& database);
 
 }
 }

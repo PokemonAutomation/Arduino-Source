@@ -4,8 +4,8 @@
  *
  */
 
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "CommonFramework/Globals.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
 #include "PokemonLA_WeatherAndTimeIcons.h"
 

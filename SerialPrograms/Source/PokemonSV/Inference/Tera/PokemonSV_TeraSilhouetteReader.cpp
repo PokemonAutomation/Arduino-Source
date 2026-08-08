@@ -6,7 +6,8 @@
 
 #include <opencv2/imgproc.hpp>
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
 #include "Tests/TestUtils.h"
@@ -77,7 +78,7 @@ ImageMatch::ImageMatchResult TeraSilhouetteReader::read(const ImageViewRGB32& sc
 
 //        cout << "check1" << endl;
         ImageRGB32 preprocessed_image(cropped_image.width(), cropped_image.height());
-        cv::medianBlur(cropped_image.to_opencv_Mat(), preprocessed_image.to_opencv_Mat(), 5);
+        cv::medianBlur(to_OpenCV_ref(cropped_image), to_OpenCV_ref(preprocessed_image), 5);
 //        preprocessed_image.save("tera_blurred_image.png");
 
         //  Get a tight crop

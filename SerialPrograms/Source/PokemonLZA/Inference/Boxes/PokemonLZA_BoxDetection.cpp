@@ -5,8 +5,9 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/StaticGlobals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageHSV32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -23,10 +24,12 @@
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
+#include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.h"
 #include "PokemonLZA_BoxDetection.h"
+#include "Tests/TestUtils.h"
 
 #include <iostream>
-//#include <sstream>
+ //#include <sstream>
 using std::cout;
 using std::endl;
 
@@ -37,7 +40,7 @@ namespace PokemonLZA{
 using namespace Kernels::Waterfill;
 
 namespace{
-    bool debug_switch = false;
+bool debug_switch = false;
 }
 
 
@@ -119,9 +122,9 @@ public:
             input_image.save("check_image_input_" + std::to_string(counter++) + ".png");
             cout << "check_image() HSV validation:" << endl;
             cout << "  Green pixels found: " << green_pixel_count << " / " << total_pixels
-                 << " (" << (100.0 * green_pixel_count / total_pixels) << "%)" << endl;
+                << " (" << (100.0 * green_pixel_count / total_pixels) << "%)" << endl;
             cout << "  Required minimum: " << min_required_green_pixels
-                 << " (" << (100.0 * min_required_green_pixels / total_pixels) << "%)" << endl;
+                << " (" << (100.0 * min_required_green_pixels / total_pixels) << "%)" << endl;
             cout << "  Hue range: [" << min_hue << ", " << max_hue << "]" << endl;
             cout << "  Result: " << (has_green ? "PASS" : "FAIL") << endl;
         }
@@ -266,7 +269,7 @@ bool BoxDetector::detect_at_cell(uint8_t cell_idx, const ImageViewRGB32& screen)
         cout << "Saving image_crop to input_image_crop.png" << endl;
         image_crop.save("input_image_crop.png");
     }
-    
+
     bool detected = false;
     auto& matcher = BoxCellSelectionArrowMatcher::matcher();
     for (size_t i_matrix = 0; i_matrix < matrices.size(); i_matrix++){
@@ -284,11 +287,11 @@ bool BoxDetector::detect_at_cell(uint8_t cell_idx, const ImageViewRGB32& screen)
                 object.min_y == 0 ||
                 object.max_x >= image_crop.width() ||
                 object.max_y >= image_crop.height()
-            ){
+                ){
 #if 0
                 cout << "object.min_x = " << object.min_x << ", object.min_y = " << object.min_y
-                     << ", object.max_x = " << object.max_x << ", object.max_y = " << object.max_y
-                     << " : " << image_crop.width() << " x " << image_crop.height() << endl;
+                    << ", object.max_x = " << object.max_x << ", object.max_y = " << object.max_y
+                    << " : " << image_crop.width() << " x " << image_crop.height() << endl;
 #endif
                 continue;
             }
@@ -303,20 +306,20 @@ bool BoxDetector::detect_at_cell(uint8_t cell_idx, const ImageViewRGB32& screen)
             }
 
             ImagePixelBox found_arrow_box;
-            
+
             if (debug_switch){
                 double rmsd_value = matcher.rmsd(found_arrow_box, image_crop, object);
                 cout << "rmsd_value: " << rmsd_value << endl;
 #if 0
                 if (!matcher.check_aspect_ratio(object.width(), object.height())){
-                     cout << "aspect ratio check failed" << endl;
+                    cout << "aspect ratio check failed" << endl;
                 }
                 if (!matcher.check_area_ratio(object.area_ratio())){
                     cout << "area ratio check failed: candidate object " << object.area_ratio() << " template " << matcher.m_subobject_area_ratio << endl;
                 }
 #endif
             }
-            
+
             if (matcher.matches(found_arrow_box, image_crop, object)){
                 if (debug_switch){
                     cout << "detected!!!!!" << endl;
@@ -365,7 +368,7 @@ bool BoxDetector::detect(const ImageViewRGB32& screen){
             if (detected){
                 if (arrow_found && m_debug_mode){
                     cout << "Multiple box selection arrows detected! First detection (" << int(m_found_row) << ", " << int(m_found_col) << ")"
-                         << " second detection (" << int(row) << ", " << int(col) << ")" << endl;
+                        << " second detection (" << int(row) << ", " << int(col) << ")" << endl;
                     throw FatalProgramException(ErrorReport::NO_ERROR_REPORT,
                         "Multiple box selection arrows detected!", nullptr, screen.copy());
                 }
@@ -423,7 +426,7 @@ void BoxDetector::move_cursor(
         }
 
         if (current.row == row && current.col == col){
-//            cout << "done!" << endl;
+            //            cout << "done!" << endl;
             return;
         }
 
@@ -490,6 +493,275 @@ bool SomethingInBoxCellDetector::detect(const ImageViewRGB32& screen){
     }
     return m_right_stick_up_down_detector.detect(screen);
 }
+
+
+
+
+
+
+class Test_BoxCellInfoDetector : public UnitTest{
+public:
+    Test_BoxCellInfoDetector(
+        const std::string& image,
+        std::vector<std::string> words
+    )
+        : UnitTest("PokemonPLZA::BoxCellInfoDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_words(std::move(words))
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        // Expected filename format: <...>_<row>_<col>_<status>_<dex_info>.png
+    // Where status is one of: Empty, Shiny, Alpha, ShinyAlpha and can be followed by "Held"
+    // Where dex_info is one of: "None", "L<number>" (Lumiose dex), or "H<number>" (Hyperspace dex)
+    // Examples:
+    //   test_2_3_Empty_None.png -> row 2, col 3, empty cell, no dex number
+    //   test_2_3_Regular_L25.png -> row 2, col 3, non-shiny, non-alpha pokemon, Lumiose dex #25
+    //   test_2_3_Shiny_H100.png -> row 2, col 3, shiny (non-alpha), Hyperspace dex #100
+    //   test_2_3_Alpha_L50.png -> row 2, col 3, alpha (non-shiny), Lumiose dex #50
+    //   test_2_3_ShinyAlphaHeld_H75.png -> row 2, col 3, shiny alpha and holding a pokemon, Hyperspace dex #75
+
+        if (m_words.size() < 4){
+            std::stringstream ss;
+            ss << "Error: filename must have at least 4 words (row, col, status, dex_info)." << endl;
+            return ss.str();
+        }
+
+        // Parse row from fourth-to-last word
+        int expected_row;
+        if (parse_int(m_words[m_words.size() - 4], expected_row) == false){
+            std::stringstream ss;
+            ss << "Error: fourth-to-last word in filename should be row number (0-5)." << endl;
+            return ss.str();
+        }
+        if (expected_row < 0 || expected_row > 5){
+            std::stringstream ss;
+            ss << "Error: row must be between 0 and 5, got " << expected_row << "." << endl;
+            return ss.str();
+        }
+
+        // Parse col from third-to-last word
+        int expected_col;
+        if (parse_int(m_words[m_words.size() - 3], expected_col) == false){
+            std::stringstream ss;
+            ss << "Error: third-to-last word in filename should be col number (0-5)." << endl;
+            return ss.str();
+        }
+        if (expected_col < 0 || expected_col > 5){
+            std::stringstream ss;
+            ss << "Error: col must be between 0 and 5, got " << expected_col << "." << endl;
+            return ss.str();
+        }
+
+        // Parse status from second-to-last word
+        std::string status_word = m_words[m_words.size() - 2];
+        bool holding_pokemon = false;
+        if (status_word.ends_with("Held")){
+            holding_pokemon = true;
+            status_word = status_word.substr(0, status_word.size() - 4);
+        }
+        bool expected_something_in_cell;
+        bool expected_shiny;
+        bool expected_alpha;
+
+        if (status_word == "Empty"){
+            expected_something_in_cell = false;
+            expected_shiny = false;
+            expected_alpha = false;
+        } else if (status_word == "Regular"){
+            expected_something_in_cell = true;
+            expected_shiny = false;
+            expected_alpha = false;
+        } else if (status_word == "Shiny"){
+            expected_something_in_cell = true;
+            expected_shiny = true;
+            expected_alpha = false;
+        } else if (status_word == "Alpha"){
+            expected_something_in_cell = true;
+            expected_shiny = false;
+            expected_alpha = true;
+        } else if (status_word == "ShinyAlpha"){
+            expected_something_in_cell = true;
+            expected_shiny = true;
+            expected_alpha = true;
+        } else{
+            std::stringstream ss;
+            ss << "Error: second-to-last word must be 'Empty', 'Shiny', 'Alpha', or 'ShinyAlpha', got '" << status_word << "'." << endl;
+            return ss.str();
+        }
+
+        // Parse dex info from last word
+        std::string dex_info_word = m_words[m_words.size() - 1];
+        bool expect_dex_detection = false;
+        DexType expected_dex_type = DexType::LUMIOSE;
+        uint16_t expected_dex_number = 0;
+
+        if (dex_info_word == "None"){
+            expect_dex_detection = false;
+        } else if (dex_info_word.size() >= 2 && (dex_info_word[0] == 'L' || dex_info_word[0] == 'H')){
+            expect_dex_detection = true;
+            expected_dex_type = (dex_info_word[0] == 'L') ? DexType::LUMIOSE : DexType::HYPERSPACE;
+
+            std::string number_str = dex_info_word.substr(1);
+            int dex_num_int;
+            if (parse_int(number_str, dex_num_int) == false || dex_num_int <= 0){
+                std::stringstream ss;
+                ss << "Error: invalid dex number in '" << dex_info_word << "'. Expected format: L<number> or H<number>." << endl;
+                return ss.str();
+            }
+            expected_dex_number = static_cast<uint16_t>(dex_num_int);
+        } else{
+            std::stringstream ss;
+            ss << "Error: last word must be 'None', 'L<number>', or 'H<number>', got '" << dex_info_word << "'." << endl;
+            return ss.str();
+        }
+
+        // Run detectors
+        auto overlay = DummyVideoOverlay();
+        ImageRGB32 image(m_image);
+
+        // Test BoxDetector for row and col
+        BoxDetector box_detector(COLOR_RED, &overlay);
+        box_detector.set_debug_mode(true);
+        box_detector.holding_pokemon(holding_pokemon);
+
+        // #define PROFILE_BOX_DETECTION
+#ifdef PROFILE_BOX_DETECTION
+    // Profile the template matching performance
+        const int num_iterations = 100;
+        auto time_start = current_time();
+        bool in_box_system = false;
+        for (int i = 0; i < num_iterations; i++){
+            in_box_system = box_detector.detect(image);
+        }
+        auto time_end = current_time();
+
+        const auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(time_end - time_start).count();
+        const double ms_total = ns / 1000000.0;
+        const double ms_per_iteration = ms_total / num_iterations;
+
+        cout << "BoxDetector::detect() performance:" << endl;
+        cout << "  Total time for " << num_iterations << " iterations: " << ms_total << " ms" << endl;
+        cout << "  Average time per iteration: " << ms_per_iteration << " ms" << endl;
+        cout << "  Throughput: " << (1000.0 / ms_per_iteration) << " detections/second" << endl;
+#else
+        bool in_box_system = box_detector.detect(image);
+#endif
+
+        if (!in_box_system){
+            std::stringstream ss;
+            ss << "Error: BoxDetector did not detect box system view." << endl;
+            return ss.str();
+        }
+
+        BoxCursorCoordinates coords = box_detector.detected_location();
+        if (coords.row == BoxCursorCoordinates::INVALID || coords.col == BoxCursorCoordinates::INVALID){
+            std::stringstream ss;
+            ss << "Error: detect_location() returned INVALID coordinates." << endl;
+            return ss.str();
+        }
+
+        TEST_RESULT_COMPONENT_EQUAL((int)coords.row, expected_row, "row");
+        TEST_RESULT_COMPONENT_EQUAL((int)coords.col, expected_col, "col");
+
+        // Test SomethingInBoxCellDetector
+        SomethingInBoxCellDetector something_detector(COLOR_RED, &overlay);
+        bool detected_something = something_detector.detect(image);
+        TEST_RESULT_COMPONENT_EQUAL(detected_something, expected_something_in_cell, "something_in_cell");
+
+        // Test BoxShinyDetector
+        BoxShinyDetector shiny_detector(COLOR_RED, &overlay);
+        bool detected_shiny = shiny_detector.detect(image);
+        TEST_RESULT_COMPONENT_EQUAL(detected_shiny, expected_shiny, "shiny");
+
+        // Test BoxAlphaDetector
+        BoxAlphaDetector alpha_detector(COLOR_RED, &overlay);
+        bool detected_alpha = alpha_detector.detect(image);
+        TEST_RESULT_COMPONENT_EQUAL(detected_alpha, expected_alpha, "alpha");
+
+        // Test BoxDexNumberDetector
+        if (expect_dex_detection){
+            BoxDexNumberDetector dex_detector(global_logger_command_line());
+            bool detected_dex = dex_detector.detect(image);
+
+            if (!detected_dex){
+                std::stringstream ss;
+                ss << "Error: BoxDexNumberDetector failed to detect dex number." << endl;
+                return ss.str();
+            }
+
+            DexType detected_dex_type = dex_detector.dex_type();
+            uint16_t detected_dex_number = dex_detector.dex_number();
+
+            std::string expected_dex_type_str = (expected_dex_type == DexType::LUMIOSE) ? "Lumiose" : "Hyperspace";
+            std::string detected_dex_type_str = (detected_dex_type == DexType::LUMIOSE) ? "Lumiose" : "Hyperspace";
+
+            if (detected_dex_type != expected_dex_type){
+                std::stringstream ss;
+                ss << "Error: dex type mismatch. Expected " << expected_dex_type_str
+                    << " but detected " << detected_dex_type_str << "." << endl;
+                return ss.str();
+            }
+
+            TEST_RESULT_COMPONENT_EQUAL((int)detected_dex_number, (int)expected_dex_number, "dex_number");
+        }
+
+        return true;
+    };
+
+private:
+    std::string m_image;
+    std::vector<std::string> m_words;
+
+};
+
+
+void add_tests_BoxCellInfoDetector(UnitTestDatabase& database){
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/french_box_gyarados_2_1_Regular_L033.jpg", std::vector<std::string>{"2", "1", "Regular", "L033"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/french_box_haunter_1_4_Shiny_L066.jpg", std::vector<std::string>{"1", "4", "Shiny", "L066"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/french_box_lopunny_1_1_Alpha_L110.jpg", std::vector<std::string>{"1", "1", "Alpha", "L110"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/french_box_ralts_1_0_ShinyAlpha_L087.jpg", std::vector<std::string>{"1", "0", "ShinyAlpha", "L087"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/mac_box_0_0_Empty_None.jpg", std::vector<std::string>{"0", "0", "Empty", "None"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/mac_box_0_4_Empty_None.jpg", std::vector<std::string>{"0", "4", "Empty", "None"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/mac_box_1_0_Empty_None.jpg", std::vector<std::string>{"1", "0", "Empty", "None"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/mac_box_1_0_Regular_H014.jpg", std::vector<std::string>{"1", "0", "Regular", "H014"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/mac_box_2_5_Empty_None.jpg", std::vector<std::string>{"2", "5", "Empty", "None"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/mac_box_4_4_Empty_None.jpg", std::vector<std::string>{"4", "4", "Empty", "None"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/mac_box_clauncher_3_2_Shiny_L163.jpg", std::vector<std::string>{"3", "2", "Shiny", "L163"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/mac_box_dragonite_0_5_Regular_L147.jpg", std::vector<std::string>{"0", "5", "Regular", "L147"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/mac_box_flabebe_1_0_Alpha_L038.jpg", std::vector<std::string>{"1", "0", "Alpha", "L038"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/mac_box_fletchling_1_5_ShinyAlpha_L010.jpg", std::vector<std::string>{"1", "5", "ShinyAlpha", "L010"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/mac_box_florges_5_5_Regular_L040.jpg", std::vector<std::string>{"5", "5", "Regular", "L040"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/mac_box_furfrou_4_2_Regular_L158.jpg", std::vector<std::string>{"4", "2", "Regular", "L158"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/mac_box_gardevoir_0_0_Regular_L089.jpg", std::vector<std::string>{"0", "0", "Regular", "L089"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/mac_box_greninja_1_5_ShinyAlpha_L211.jpg", std::vector<std::string>{"1", "5", "ShinyAlpha", "L211"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/mac_box_hippopotas_3_3_Alpha_L118.jpg", std::vector<std::string>{"3", "3", "Alpha", "L118"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/mac_box_igglybuff_2_3_Regular_H076.jpg", std::vector<std::string>{"2", "3", "Regular", "H076"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/mac_box_magikarp_2_0_Regular_L032.jpg", std::vector<std::string>{"2", "0", "Regular", "L032"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/mac_box_mareep_3_4_Shiny_L024.jpg", std::vector<std::string>{"3", "4", "Shiny", "L024"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/mac_box_pyroar_0_5_ShinyAlpha_L046.jpg", std::vector<std::string>{"0", "5", "ShinyAlpha", "L046"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/mac_box_pyroar_1_0_ShinyAlpha_L046.jpg", std::vector<std::string>{"1", "0", "ShinyAlpha", "L046"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/mac_box_tyrunt_1_0_Regular_L193.jpg", std::vector<std::string>{"1", "0", "Regular", "L193"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/mac_box_victreebel_1_3_Alpha_L076.jpg", std::vector<std::string>{"1", "3", "Alpha", "L076"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/Bug/box_dragalge_0_5_Alpha_L162.jpg", std::vector<std::string>{"0", "5", "Alpha", "L162"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/Bug/box_greninja_0_4_ShinyAlpha_L211.jpg", std::vector<std::string>{"0", "4", "ShinyAlpha", "L211"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/Bug/box_scolipede_0_3_Shiny_L070.jpg", std::vector<std::string>{"0", "3", "Shiny", "L070"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/dhruv/box_2_2_ShinyHeld_H067.jpg", std::vector<std::string>{"2", "2", "ShinyHeld", "H067"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/dhruv/box_tinkatonAbove_2_2_ShinyHeld_H067.jpg", std::vector<std::string>{"2", "2", "ShinyHeld", "H067"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/dolphincurry/box_tyrunt_no1_1_0_Regular_L193.jpg", std::vector<std::string>{"1", "0", "Regular", "L193"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/dolphincurry/box_tyrunt_no2_1_0_Regular_L193.jpg", std::vector<std::string>{"1", "0", "Regular", "L193"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/dolphincurry/box_tyrunt_no3_1_0_Regular_L193.jpg", std::vector<std::string>{"1", "0", "Regular", "L193"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/held/mac_box_0_0_AlphaHeld_L227.jpg", std::vector<std::string>{"0", "0", "AlphaHeld", "L227"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/held/mac_box_1_5_RegularHeld_H050.jpg", std::vector<std::string>{"1", "5", "RegularHeld", "H050"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/held/mac_box_2_1_ShinyHeld_L111.jpg", std::vector<std::string>{"2", "1", "ShinyHeld", "L111"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/held/mac_box_2_4_EmptyHeld_None.jpg", std::vector<std::string>{"2", "4", "EmptyHeld", "None"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/held/mac_box_5_5_EmptyHeld_None.jpg", std::vector<std::string>{"5", "5", "EmptyHeld", "None"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/k3lpoke/bright_box_gourgeist_4_2_ShinyAlpha_L205.jpg", std::vector<std::string>{"4", "2", "ShinyAlpha", "L205"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/k3lpoke/bright_box_pangoro_1_2_Alpha_L048.jpg", std::vector<std::string>{"1", "2", "Alpha", "L048"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/k3lpoke/bright_box_pumpkaboo_4_3_Shiny_L204.jpg", std::vector<std::string>{"4", "3", "Shiny", "L204"});
+    database.add<Test_BoxCellInfoDetector>("PokemonLZA/BoxCellInfoDetector/Quantum/box_2_3_ShinyHeld_L172.jpg", std::vector<std::string>{"2", "3", "ShinyHeld", "L172"});
+}
+
 
 
 }

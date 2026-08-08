@@ -5,11 +5,13 @@
  */
 
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "PokemonSV_MapDetector.h"
 #include "PokemonSV_MapPokeCenterIconDetector.h"
 
 //#include <iostream>
@@ -110,6 +112,41 @@ bool MapPokeCenterIconWatcher::process_frame(const ImageViewRGB32& screen, WallC
         m_hit_boxes.emplace_back(m_overlay, hit, COLOR_MAGENTA);
     }
     return !m_hits.empty();
+}
+
+
+class Test_MapPokeCenterIconDetector : public UnitTest{
+public:
+    Test_MapPokeCenterIconDetector(const std::string& image, int target)
+        : UnitTest("PokemonSV::MapPokeCenterIconDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_target(target)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        MapPokeCenterIconDetector detector(COLOR_RED, MAP_READABLE_AREA);
+        ImageRGB32 image(m_image);
+        const auto result = detector.detect_all(image);
+        return (int)result.size() == m_target;
+    }
+
+private:
+    std::string m_image;
+    int m_target;
+};
+
+
+void add_tests_MapPokeCenterIconDetector(UnitTestDatabase& database){
+    database.add<Test_MapPokeCenterIconDetector>("PokemonSV/MapPokeCenterIconDetector/CursorOnMesagoza_7.png", 7);
+    database.add<Test_MapPokeCenterIconDetector>("PokemonSV/MapPokeCenterIconDetector/dark-capture-card_1.png", 1);
+    database.add<Test_MapPokeCenterIconDetector>("PokemonSV/MapPokeCenterIconDetector/FraMesagozaSouthGate_7.png", 7);
+    database.add<Test_MapPokeCenterIconDetector>("PokemonSV/MapPokeCenterIconDetector/PortoMarinada_1.png", 1);
+    database.add<Test_MapPokeCenterIconDetector>("PokemonSV/MapPokeCenterIconDetector/ZeroGate_2.png", 2);
+    database.add<Test_MapPokeCenterIconDetector>("PokemonSV/MapPokeCenterIconDetector/macOS_bright/Cascarraf_1.png", 1);
+    database.add<Test_MapPokeCenterIconDetector>("PokemonSV/MapPokeCenterIconDetector/macOS_bright/MesagozaSouthGate_5.png", 5);
+    database.add<Test_MapPokeCenterIconDetector>("PokemonSV/MapPokeCenterIconDetector/macOS_bright/SouthEastOfSouthGate_1.png", 1);
+    database.add<Test_MapPokeCenterIconDetector>("PokemonSV/MapPokeCenterIconDetector/macOS_bright/West2OfSouthGate_1.png", 1);
+    database.add<Test_MapPokeCenterIconDetector>("PokemonSV/MapPokeCenterIconDetector/macOS_bright/WestOfSouthGate_1.png", 1);
 }
 
 

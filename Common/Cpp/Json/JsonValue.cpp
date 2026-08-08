@@ -5,6 +5,7 @@
  */
 
 #include "3rdParty/nlohmann/json.hpp"
+#include "Common/Cpp/FileIO.h"
 #include "JsonValue.h"
 #include "JsonArray.h"
 #include "JsonObject.h"

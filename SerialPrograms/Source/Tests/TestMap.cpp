@@ -6,12 +6,6 @@
 
 
 #include "Common/Cpp/Containers/AlignedVector.tpp"
-#include "CommonFramework_Tests.h"
-#include "Kernels_Tests.h"
-#include "NintendoSwitch_Tests.h"
-#include "PokemonFRLG_Tests.h"
-#include "PokemonLZA_Tests_Old.h"
-#include "PokemonSV_Tests_Old.h"
 #include "TestMap.h"
 #include "TestUtils.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
@@ -219,54 +213,7 @@ int sound_bool_detector_helper(SoundBoolDetectorFunction test_func, const std::s
 
 
 const std::map<std::string, TestFunction> TEST_MAP = {
-    {"Kernels_ImageScaleBrightness", std::bind(image_void_detector_helper, test_kernels_ImageScaleBrightness, _1)},
-    {"Kernels_BinaryMatrix", std::bind(image_void_detector_helper, test_kernels_BinaryMatrix, _1)},
-    {"Kernels_FilterRGB32Range", std::bind(image_void_detector_helper, test_kernels_FilterRGB32Range, _1)},
-    {"Kernels_FilterRGB32Euclidean", std::bind(image_void_detector_helper, test_kernels_FilterRGB32Euclidean, _1)},
-    {"Kernels_ToBlackWhiteRGB32Range", std::bind(image_void_detector_helper, test_kernels_ToBlackWhiteRGB32Range, _1)},
-    {"Kernels_FilterByMask", std::bind(image_void_detector_helper, test_kernels_FilterByMask, _1)},
-    {"Kernels_CompressRGB32ToBinaryEuclidean", std::bind(image_void_detector_helper, test_kernels_CompressRGB32ToBinaryEuclidean, _1)},
-    {"Kernels_Waterfill", std::bind(image_void_detector_helper, test_kernels_Waterfill, _1)},
-    {"CommonFramework_BlackBorderDetector", std::bind(image_bool_detector_helper, test_CommonFramework_BlackBorderDetector, _1)},
-    {"NintendoSwitch_CheckOnlineDetector", std::bind(image_bool_detector_helper, test_NintendoSwitch_CheckOnlineDetector, _1)},
-    {"NintendoSwitch_FailedToConnectDetector", std::bind(image_bool_detector_helper, test_NintendoSwitch_FailedToConnectDetector, _1)},
-    {"NintendoSwitch_UpdatePopupDetector", std::bind(image_bool_detector_helper, test_NintendoSwitch_UpdatePopupDetector, _1)},
-    {"PokemonSV_SomethingInBoxSlotDetector", std::bind(image_bool_detector_helper, test_pokemonSV_SomethingInBoxSlotDetector, _1)},
-    {"PokemonSV_BoxEggDetector", std::bind(image_bool_detector_helper, test_pokemonSV_BoxEggDetector, _1)},
-    {"PokemonSV_BoxPartyEggDetector", std::bind(image_int_detector_helper, test_pokemonSV_BoxPartyEggDetector, _1)},
-    {"PokemonSV_OverworldDetector", std::bind(image_bool_detector_helper, test_pokemonSV_OverworldDetector, _1)},
-    {"PokemonSV_BoxBottomButtonDetector", std::bind(image_words_detector_helper, test_pokemonSV_BoxBottomButtonDetector, _1)},
-    {"PokemonSV_SandwichIngredientsDetector", std::bind(image_words_detector_helper, test_pokemonSV_SandwichIngredientsDetector, _1)},
-    {"PokemonSV_SandwichIngredientReader", test_pokemonSV_SandwichIngredientReader},
-    {"PokemonSV_AdvanceDialogDetector", std::bind(image_bool_detector_helper, test_pokemonSV_AdvanceDialogDetector, _1)},
-    {"PokemonSV_SwapMenuDetector", std::bind(image_bool_detector_helper, test_pokemonSV_SwapMenuDetector, _1)},
-    {"PokemonSV_DialogBoxDetector", std::bind(image_bool_detector_helper, test_pokemonSV_DialogBoxDetector, _1)},
-    {"PokemonSV_FastTravelDetector", std::bind(image_bool_detector_helper, test_pokemonSV_FastTravelDetector, _1)},
-    {"PokemonSV_MapPokeCenterIconDetector", std::bind(image_int_detector_helper, test_pokemonSV_MapPokeCenterIconDetector, _1)},
-    {"PokemonSV_ESPPressedEmotionDetector", std::bind(image_bool_detector_helper, test_pokemonSV_ESPPressedEmotionDetector, _1)},
-    {"PokemonSV_MapFlyMenuDetector", std::bind(image_bool_detector_helper, test_pokemonSV_MapFlyMenuDetector, _1)},
-    {"PokemonSV_SandwichPlateDetector", std::bind(image_words_detector_helper, test_pokemonSV_SandwichPlateDetector, _1)},
-    {"PokemonSV_RecentlyBattledDetector", std::bind(image_bool_detector_helper, test_pokemonSV_RecentlyBattledDetector, _1)},
-    {"PokemonLZA_BlueDialogDetector", std::bind(image_bool_detector_helper, test_pokemonLZA_BlueDialogDetector, _1)},
-    {"PokemonLZA_TransparentBattleDialogDetector", std::bind(image_bool_detector_helper, test_pokemonLZA_TransparentBattleDialogDetector, _1)},
-    {"PokemonLZA_ButtonDetector", std::bind(image_words_detector_helper, test_pokemonLZA_ButtonDetector, _1)},
-    {"PokemonLZA_MainMenuDetector", std::bind(image_bool_detector_helper, test_pokemonLZA_MainMenuDetector, _1)},
-    {"PokemonLZA_AlertEyeDetector", std::bind(image_bool_detector_helper, test_pokemonLZA_AlertEyeDetector, _1)},
-    {"PokemonLZA_BoxCellInfoDetector", std::bind(image_words_detector_helper, test_pokemonLZA_BoxCellInfoDetector, _1)},
-    {"PokemonLZA_SelectionArrowDetector", std::bind(image_words_detector_helper, test_pokemonLZA_SelectionArrowDetector, _1)},
-    {"PokemonLZA_MapIconDetector", test_pokemonLZA_MapIconDetector},
-    {"PokemonLZA_OverworldPartySelectionDetector", std::bind(image_words_detector_helper, test_pokemonLZA_OverworldPartySelectionDetector, _1)},
-    {"PokemonLZA_DirectionArrowDetector", std::bind(image_int_detector_helper, test_pokemonLZA_DirectionArrowDetector, _1)},
-    {"PokemonLZA_MapDetector", std::bind(image_bool_detector_helper, test_pokemonLZA_MapDetector, _1)},
-    {"PokemonLZA_HyperspaceCalorieDetector", std::bind(image_int_detector_helper, test_pokemonLZA_HyperspaceCalorieDetector, _1)},
-    {"PokemonLZA_FlavorPowerScreenDetector", test_pokemonLZA_FlavorPowerScreenDetector},
-    {"PokemonLZA_DonutBerriesReader", test_pokemonLZA_DonutBerriesReader},
-    {"PokemonFRLG_AdvanceWhiteDialogDetector", std::bind(image_bool_detector_helper, test_pokemonFRLG_AdvanceWhiteDialogDetector, _1)},
-    {"PokemonFRLG_ShinySymbolDetector", std::bind(image_bool_detector_helper, test_pokemonFRLG_ShinySymbolDetector, _1)},
-    {"PokemonFRLG_SelectionDialogDetector", std::bind(image_bool_detector_helper, test_pokemonFRLG_SelectionDialogDetector, _1)},
-    {"PokemonFRLG_AdvanceBattleDialogDetector", std::bind(image_bool_detector_helper, test_pokemonFRLG_AdvanceBattleDialogDetector, _1)},
-    {"PokemonFRLG_BattleMenuDetector", std::bind(image_bool_detector_helper, test_pokemonFRLG_BattleMenuDetector, _1)},
-    {"PokemonFRLG_PrizeSelectDetector", std::bind(image_bool_detector_helper, test_pokemonFRLG_PrizeSelectDetector, _1)},
+
 };
 
 TestFunction find_test_function(const std::string& test_space, const std::string& test_name){

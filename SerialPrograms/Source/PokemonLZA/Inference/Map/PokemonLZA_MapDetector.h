@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonLZA_MapDetector_H
 #define PokemonAutomation_PokemonLZA_MapDetector_H
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonTools/VisualDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "CommonTools/DetectedBoxes.h"
@@ -71,6 +72,9 @@ public:
          : DetectorToFinder("MapWatcher", FinderType::GONE, hold_duration, color, overlay)
     {}
 };
+
+
+void add_tests_MapDetector(UnitTestDatabase& database);
 
 
 

@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
@@ -46,6 +47,33 @@ bool PrizeSelectDetector::detect(const ImageViewRGB32& screen){
         return true;
     }
     return false;
+}
+
+class Test_PrizeSelectDetector : public UnitTest{
+public:
+
+    Test_PrizeSelectDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonFRLG::PrizeSelectDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        PrizeSelectDetector detector(COLOR_RED);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+void add_tests_PrizeSelectDetector(UnitTestDatabase& database){
+    //todo: gather test images for this detector
 }
 
 

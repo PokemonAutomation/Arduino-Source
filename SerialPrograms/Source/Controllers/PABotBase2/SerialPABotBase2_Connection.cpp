@@ -4,8 +4,11 @@
  *
  */
 
+#ifdef QT_CORE_LIB
 #include <QSerialPortInfo>
 #include <QMessageBox>
+#include "Controllers/SerialPortPollerQt.h"
+#endif
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
@@ -14,7 +17,6 @@
 #include "CommonFramework/Logging/Logger.h"
 #include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
-#include "Controllers/SerialPortPollerQt.h"
 #include "SerialPABotBase2_Connection.h"
 
 //#include <iostream>
@@ -117,6 +119,9 @@ bool SerialPABotBase2_Connection::open_serial_port(){
         return false;
     }
 
+
+    //  Validate the serial port.
+#ifdef QT_CORE_LIB
     QSerialPortInfo info;
     if(USE_QT_UI){
         info = SerialPortPoller::instance().get_port(m_device_name);
@@ -150,6 +155,7 @@ bool SerialPABotBase2_Connection::open_serial_port(){
             return false;
         }
     }
+#endif
 
     if (cancelled()){
         return false;
@@ -157,7 +163,7 @@ bool SerialPABotBase2_Connection::open_serial_port(){
 
     m_unreliable_connection = std::make_unique<SerialConnection>(
         GlobalThreadPools::unlimited_realtime(),
-        info.systemLocation().toStdString(),
+        m_device_name,
         115200
     );
 

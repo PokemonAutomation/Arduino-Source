@@ -18,6 +18,7 @@
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/LoggerWindow.h"
 #include "CommonFramework/Startup/NewVersionCheck.h"

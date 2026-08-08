@@ -7,6 +7,7 @@
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
@@ -156,6 +157,61 @@ uint8_t BoxEggPartyColumnWatcher::num_non_egg_pokemon_found() const{
         }
     }
     return num_pokemon;
+}
+
+
+class Test_BoxCurrentEggDetector : public UnitTest{
+public:
+    Test_BoxCurrentEggDetector(const std::string& image, bool expected)
+        : UnitTest("PokemonSV::BoxCurrentEggDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        BoxCurrentEggDetector detector(COLOR_RED);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    }
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+class Test_BoxPartyEggDetector : public UnitTest{
+public:
+    Test_BoxPartyEggDetector(const std::string& image, int target)
+        : UnitTest("PokemonSV::BoxPartyEggDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_target(target)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        uint8_t num_eggs = 0;
+        ImageRGB32 image(m_image);
+        for (uint8_t i = 0; i < 5; i++){
+            BoxEggDetector detector(BoxCursorLocation::PARTY, i + 1, 0);
+            if (detector.detect(image)){
+                num_eggs++;
+            }
+        }
+        return (int)num_eggs == m_target;
+    }
+
+private:
+    std::string m_image;
+    int m_target;
+};
+
+
+void add_tests_BoxEggDetector(UnitTestDatabase& database){
+    database.add<Test_BoxCurrentEggDetector>("PokemonSV/BoxEggDetector/default_False.png", false);
+    database.add<Test_BoxCurrentEggDetector>("PokemonSV/BoxEggDetector/default_True.png", true);
+    database.add<Test_BoxPartyEggDetector>("PokemonSV/BoxPartyEggDetector/Cursor_1_Eggs_5.png", 5);
+    database.add<Test_BoxPartyEggDetector>("PokemonSV/BoxPartyEggDetector/Dark_screen_5.png", 5);
+    database.add<Test_BoxPartyEggDetector>("PokemonSV/BoxPartyEggDetector/Ditto_Sprigatito_Egg_1.png", 1);
+    database.add<Test_BoxPartyEggDetector>("PokemonSV/BoxPartyEggDetector/Talonflame_egg_5.png", 5);
 }
 
 

@@ -7,10 +7,12 @@
 #include <iostream>
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/StaticGlobals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "PokemonLZA_ButtonDetector.h"
+#include "Tests/TestUtils.h"
 
 // using std::cout;
 // using std::endl;
@@ -281,7 +283,46 @@ bool ButtonDetector::detect(const ImageViewRGB32& screen){
 
 
 
+class Test_ButtonDetector : public UnitTest{
+public:
+    Test_ButtonDetector(
+        const std::string& image,
+        ButtonType expected_button,
+        bool expected
+    )
+        : UnitTest("PokemonPLZA::ButtonDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected_button(expected_button)
+        , m_expected(expected)
+    {}
 
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyVideoOverlay overlay;
+        ButtonDetector detector(COLOR_RED, m_expected_button, ImageFloatBox(0.0, 0.0, 1.0, 1.0), &overlay);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    ButtonType m_expected_button;
+    bool m_expected;
+};
+
+
+void add_tests_ButtonDetector(UnitTestDatabase& database){
+    database.add<Test_ButtonDetector>("PokemonLZA/ButtonDetector/french_fossil_1_ButtonA_True.png", ButtonType::ButtonA, true);
+    database.add<Test_ButtonDetector>("PokemonLZA/ButtonDetector/french_fossil_2_ButtonA_True.png", ButtonType::ButtonA, true);
+    database.add<Test_ButtonDetector>("PokemonLZA/ButtonDetector/french_fossil_3_ButtonA_True.png", ButtonType::ButtonA, true);
+    database.add<Test_ButtonDetector>("PokemonLZA/ButtonDetector/french_fossil_4_ButtonA_True.png", ButtonType::ButtonA, true);
+    database.add<Test_ButtonDetector>("PokemonLZA/ButtonDetector/french_fossil_5_ButtonA_True.png", ButtonType::ButtonA, true);
+    database.add<Test_ButtonDetector>("PokemonLZA/ButtonDetector/mac_fossil_1_ButtonA_True.png", ButtonType::ButtonA, true);
+    database.add<Test_ButtonDetector>("PokemonLZA/ButtonDetector/mac_fossil_2_ButtonA_True.png", ButtonType::ButtonA, true);
+    database.add<Test_ButtonDetector>("PokemonLZA/ButtonDetector/mac_fossil_3_ButtonA_True.png", ButtonType::ButtonA, true);
+    database.add<Test_ButtonDetector>("PokemonLZA/ButtonDetector/mac_fossil_4_ButtonA_True.png", ButtonType::ButtonA, true);
+    database.add<Test_ButtonDetector>("PokemonLZA/ButtonDetector/mac_fossil_5_ButtonA_True.png", ButtonType::ButtonA, true);
+    database.add<Test_ButtonDetector>("PokemonLZA/ButtonDetector/mac_fossil_6_ButtonA_True.png", ButtonType::ButtonA, true);
+}
 
 
 

@@ -7,6 +7,7 @@
 #include <QCompleter>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/ImageTypes/ImageRGB32_Qt.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "Pokemon_NameSelectWidget.h"
 
@@ -80,7 +81,7 @@ NameSelectWidget::NameSelectWidget(
         if (sprite == nullptr){
             global_logger_tagged().log("Missing sprite for: " + slug, COLOR_RED);
         }else{
-            QPixmap pixmap = QPixmap::fromImage(sprite->icon.to_QImage_ref());
+            QPixmap pixmap = QPixmap::fromImage(to_QImage_ref(sprite->icon));
             this->setItemIcon((int)index, pixmap);
         }
 

@@ -9,6 +9,7 @@
 #define PokemonAutomation_ML_YOLOv5Model_H
 
 
+#include <opencv2/core/mat.hpp>
 #include <onnxruntime_cxx_api.h>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 

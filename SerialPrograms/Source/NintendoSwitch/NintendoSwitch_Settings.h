@@ -11,7 +11,7 @@
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
-#include "CommonFramework/Panels/SettingsPanel.h"
+// #include "CommonFramework/Panels/SettingsPanel.h"
 #include "Options/NintendoSwitch_CodeEntrySettingsOption.h"
 #include "Controllers/NintendoSwitch_ControllerSettings.h"
 #include "Controllers/NintendoSwitch_KeyboardMapping.h"
@@ -76,18 +76,6 @@ private:
 
 
 
-class ConsoleSettings_Descriptor : public PanelDescriptor{
-public:
-    ConsoleSettings_Descriptor();
-};
-
-
-class ConsoleSettingsPanel : public SettingsPanelInstance{
-public:
-    ConsoleSettingsPanel(const ConsoleSettings_Descriptor& descriptor);
-private:
-    ConsoleSettings& settings;
-};
 
 
 

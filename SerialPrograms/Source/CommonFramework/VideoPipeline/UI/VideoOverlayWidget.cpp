@@ -6,6 +6,7 @@
 
 #include <QPainter>
 #include <QResizeEvent>
+#include "CommonFramework/ImageTypes/ImageRGB32_Qt.h"
 #include "CommonFramework/GlobalServices.h"
 #include "VideoOverlayWidget.h"
 
@@ -265,7 +266,7 @@ void VideoOverlayWidget::render_images(QPainter& painter){
     const double height = static_cast<double>(this->height());
 
     for (const auto& image_overlay: *m_images){
-        QImage q_image = image_overlay.image.to_QImage_ref();
+        QImage q_image = to_QImage_ref(image_overlay.image);
         // source rect is the entire portion of the q_image, in pixel units
         QRectF source_rect(0.0, 0.0, static_cast<double>(q_image.width()), static_cast<double>(q_image.height()));
         // build a target_rect. target_rect is what region the overlay image should appear inside the overlay viewport.

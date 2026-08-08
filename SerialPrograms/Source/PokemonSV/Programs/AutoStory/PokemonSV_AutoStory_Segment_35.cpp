@@ -4,11 +4,11 @@
  *
  */
 
+#include "CommonFramework/GlobalAutoPaths.h"
+//#include "CommonFramework/Exceptions/OperationFailedException.h"
+//#include "CommonFramework/VideoPipeline/VideoFeed.h"
+//#include "CommonTools/Async/InferenceRoutines.h"
 #include "ML/Inference/ML_YOLOv5Detector.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
-
-#include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"

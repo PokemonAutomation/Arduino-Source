@@ -9,11 +9,11 @@
 
 #include <chrono>
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/VisualDetector.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
-#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "PokemonFRLG/PokemonFRLG_Settings.h"
 
 namespace PokemonAutomation{
@@ -127,7 +127,8 @@ public:
     {}
 };
 
-
+void add_tests_AdvanceWhiteDialogDetector(UnitTestDatabase& database);
+void add_tests_SelectionDialogDetector(UnitTestDatabase& database);
 
 }
 }

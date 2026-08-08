@@ -4,8 +4,9 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonFramework/GlobalAutoPaths.h"
+//#include "CommonFramework/Exceptions/OperationFailedException.h"
+//#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"

@@ -7,9 +7,10 @@
 #include <atomic>
 #include "3rdParty/ONNX/OnnxToolsPA.h"
 #include "Common/Cpp/Time.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 //#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -80,7 +81,7 @@ bool DudunsparceFormDetector::process_frame(const ImageViewRGB32& frame, WallClo
 
     ImageViewRGB32 cropped_frame = (frame.height() == 1080) ? extract_box_reference(frame, m_pixel_box_1080p)
         : extract_box_reference(frame, m_float_box);
-    cv::Mat cropped_mat = cropped_frame.to_opencv_Mat();
+    cv::Mat cropped_mat = to_OpenCV_ref(cropped_frame);
     cv::Mat resized_mat;  // resize to the shape for the ML model input
     cv::resize(cropped_mat, resized_mat, cv::Size(25, 25));
     cv::Mat resized_mat_gray;

@@ -6,14 +6,14 @@
 
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Globals.h"
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/GlobalAutoPaths.h"
+//#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
 #include "CommonTools/ImageMatch/ExactImageMatcher.h"
-#include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
+//#include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
 #include "PokemonSwSh_BoxEggDetector.h"
 
 // #include <iostream>

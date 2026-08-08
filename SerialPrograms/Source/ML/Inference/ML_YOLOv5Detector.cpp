@@ -4,7 +4,6 @@
  *
  */
 
-#include <filesystem>
 #include <iostream>
 #include <QMessageBox>
 #include <opencv2/imgproc.hpp>
@@ -13,11 +12,12 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Filesystem.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/Globals.h"
 #include "ML_YOLOv5Detector.h"
 
 //#include <iostream>
@@ -61,7 +61,7 @@ bool YOLOv5Detector::detect(const ImageViewRGB32& screen){
         return false;
     }
 
-    cv::Mat frame_mat_bgra = screen.to_opencv_Mat();
+    cv::Mat frame_mat_bgra = to_OpenCV_ref(screen);
     cv::Mat frame_mat_rgb;
     cv::cvtColor(frame_mat_bgra, frame_mat_rgb, cv::COLOR_BGRA2RGB);
 

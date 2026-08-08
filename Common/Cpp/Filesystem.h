@@ -67,6 +67,10 @@ public:
     }
 
 public:
+    bool empty() const{
+        return m_path.empty();
+    }
+
     //  Return path string as UTF-8.
     std::string string() const{
         return utf8_to_str(m_path.u8string());

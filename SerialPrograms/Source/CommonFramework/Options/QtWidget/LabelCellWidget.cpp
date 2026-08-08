@@ -7,6 +7,7 @@
 #include <QHBoxLayout>
 #include <QFrame>
 #include <QLabel>
+#include "CommonFramework/ImageTypes/ImageRGB32_Qt.h"
 #include "LabelCellWidget.h"
 
 //#include <iostream>
@@ -37,9 +38,9 @@ LabelCellWidget::LabelCellWidget(QWidget& parent, LabelCellOption& value)
 //        cout << resolution.width << " x " << resolution.height << endl;
         QPixmap pixmap;
         if (resolution.width == 0 || resolution.height == 0){
-            pixmap = QPixmap::fromImage(value.icon().to_QImage_ref());
+            pixmap = QPixmap::fromImage(to_QImage_ref(value.icon()));
         }else{
-            pixmap = QPixmap::fromImage(value.icon().scaled_to_QImage(resolution.width, resolution.height));
+            pixmap = QPixmap::fromImage(scaled_to_QImage(value.icon(), resolution.width, resolution.height));
         }
         m_icon->setPixmap(pixmap);
         m_icon->setAlignment(Qt::AlignCenter);

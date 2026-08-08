@@ -5,13 +5,12 @@
  */
 
 #include <memory>
-#include <deque>
 #include <QFile>
 #include <QDir>
 #include "3rdParty/TesseractPA/TesseractPA.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "OCR_RawTesseractOCR.h"

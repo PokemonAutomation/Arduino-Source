@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonSV_ESPEmotionDetector.h"
@@ -123,6 +124,32 @@ bool ESPPressedEmotionDetector::detect(const ImageViewRGB32& frame){
 }
 bool ESPPressedEmotionDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     return detect(frame);
+}
+
+
+class Test_ESPPressedEmotionDetector : public UnitTest{
+public:
+    Test_ESPPressedEmotionDetector(const std::string& image, bool expected)
+        : UnitTest("PokemonSV::ESPPressedEmotionDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        ESPPressedEmotionDetector detector;
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    }
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+
+void add_tests_ESPEmotionDetector(UnitTestDatabase& database){
+    database.add<Test_ESPPressedEmotionDetector>("PokemonSV/ESPPressedEmotionDetector/ESPPressedEmotionDetector_False.png", false);
+    database.add<Test_ESPPressedEmotionDetector>("PokemonSV/ESPPressedEmotionDetector/ESPPressedEmotionDetector_True.png", true);
 }
 
 }

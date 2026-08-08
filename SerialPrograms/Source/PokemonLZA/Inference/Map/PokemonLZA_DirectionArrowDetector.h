@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonLZA_DirectionArrowDetector_H
 
 #include <chrono>
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -49,6 +50,9 @@ public:
          : DetectorToFinder("DirectionArrowWatcher", hold_duration, color)
     {}
 };
+
+
+void add_tests_DirectionArrowDetector(UnitTestDatabase& database);
 
 
 

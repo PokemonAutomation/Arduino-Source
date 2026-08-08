@@ -4,11 +4,13 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
+//#include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "PokemonLZA_AlertEyeDetector.h"
+#include "Tests/TestUtils.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -145,7 +147,53 @@ bool AlertEyeTracker::process_frame(const ImageViewRGB32& frame, WallClock times
 
 
 
+class Test_AlertEyeDetector : public UnitTest{
+public:
+    Test_AlertEyeDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonPLZA::AlertEyeDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
 
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyVideoOverlay overlay;
+        AlertEyeDetector detector(COLOR_RED, &overlay);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+
+void add_tests_AlertEyeDetector(UnitTestDatabase& database){
+    database.add<Test_AlertEyeDetector>("PokemonLZA/AlertEyeDetector/lab_beldum_alpha_alert_True.png", true);
+    database.add<Test_AlertEyeDetector>("PokemonLZA/AlertEyeDetector/lab_beldum_x2_alpha_alert_True.png", true);
+    database.add<Test_AlertEyeDetector>("PokemonLZA/AlertEyeDetector/zone_15_gourgeist_alert_True.png", true);
+    database.add<Test_AlertEyeDetector>("PokemonLZA/AlertEyeDetector/zone_15_gourgeist_pumpkaboo_alert_True.png", true);
+    database.add<Test_AlertEyeDetector>("PokemonLZA/AlertEyeDetector/zone_15_green_gate_alert_True.png", true);
+    database.add<Test_AlertEyeDetector>("PokemonLZA/AlertEyeDetector/zone_15_pumpkaboo_alpha_alert_True.png", true);
+    database.add<Test_AlertEyeDetector>("PokemonLZA/AlertEyeDetector/zone_15_pumpkaboo_alpha_x2_alert_True.png", true);
+    database.add<Test_AlertEyeDetector>("PokemonLZA/AlertEyeDetector/zone_17_burrow_alert_True.png", true);
+    database.add<Test_AlertEyeDetector>("PokemonLZA/AlertEyeDetector/zone_17_burrow_chespin_alert_True.png", true);
+    database.add<Test_AlertEyeDetector>("PokemonLZA/AlertEyeDetector/zone_17_chespin_alert_True.png", true);
+    database.add<Test_AlertEyeDetector>("PokemonLZA/AlertEyeDetector/zone_20_carbink_barbaracle_alert_True.png", true);
+    database.add<Test_AlertEyeDetector>("PokemonLZA/AlertEyeDetector/zone_20_chandelure_drampa_True.png", true);
+    database.add<Test_AlertEyeDetector>("PokemonLZA/AlertEyeDetector/zone_20_dedenne_alakazam_alert_True.png", true);
+    database.add<Test_AlertEyeDetector>("PokemonLZA/AlertEyeDetector/zone_20_gallade_simipour_alert_True.png", true);
+    database.add<Test_AlertEyeDetector>("PokemonLZA/AlertEyeDetector/zone_6_alpha_houndour_1_True.png", true);
+    database.add<Test_AlertEyeDetector>("PokemonLZA/AlertEyeDetector/zone_6_alpha_houndour_2_True.png", true);
+    database.add<Test_AlertEyeDetector>("PokemonLZA/AlertEyeDetector/zone_6_houndour_1_True.png", true);
+    database.add<Test_AlertEyeDetector>("PokemonLZA/AlertEyeDetector/zone_6_houndour_2_True.png", true);
+    database.add<Test_AlertEyeDetector>("PokemonLZA/AlertEyeDetector/zone_6_houndour_3_True.png", true);
+    database.add<Test_AlertEyeDetector>("PokemonLZA/AlertEyeDetector/zone_6_houndour_4_True.png", true);
+    database.add<Test_AlertEyeDetector>("PokemonLZA/AlertEyeDetector/zone_6_houndour_5_True.png", true);
+}
 
 
 }

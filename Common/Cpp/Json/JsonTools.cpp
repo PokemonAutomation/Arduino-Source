@@ -14,59 +14,6 @@ namespace PokemonAutomation{
 
 
 
-void string_to_file(const std::string& filename, const std::string& str){
-    std::string json_out = "\xef\xbb\xbf";
-    //  Convert to CRLF.
-    char previous = 0;
-    for (char ch : str){
-        if (ch == '\n' && previous != '\r'){
-            json_out += '\r';
-        }
-        json_out += ch;
-        previous = ch;
-    }
-
-    FileIO file;
-    if (!file.open(filename, FileMode::WRITE | FileMode::BINARY)){
-        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to create file.", filename);
-    }
-    if (file.write(json_out.c_str(), json_out.size()) != json_out.size()){
-        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to write file.", filename);
-    }
-    file.close();
-}
-
-
-std::string file_to_string(const std::string& filename){
-    std::string ret;
-    if (!file_to_string(filename, ret)){
-        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to open file.", filename);
-    }
-    return ret;
-}
-
-
-bool file_to_string(const std::string& filename, std::string& content){
-    FileIO file;
-    if (!file.open(filename, FileMode::READ | FileMode::BINARY)){
-        return false;
-    }
-
-    char buffer[4096];
-
-    std::string ret;
-    while (true){
-        size_t actual = file.read(buffer, sizeof(buffer));
-        ret += std::string(buffer, actual);
-        if (actual < sizeof(buffer)){
-            break;
-        }
-    }
-    content = std::move(ret);
-    return true;
-}
-
-
 
 
 JsonValue from_nlohmann(const nlohmann::json& json){

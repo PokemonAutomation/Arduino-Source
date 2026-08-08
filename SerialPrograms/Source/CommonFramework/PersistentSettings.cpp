@@ -4,13 +4,12 @@
  *
  */
 
-#include <QCoreApplication>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 //#include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "CommonFramework/Globals.h"
 #include "CommonFramework/StaticGlobals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
@@ -64,7 +63,7 @@ void PersistentSettings::read(){
     }
 
 //    GlobalSettings::instance().PROCESS_PRIORITY0.update_priority_to_option();
-    PerformanceOptions::instance().REALTIME_THREAD_PRIORITY.set_on_this_thread(global_logger_tagged());
+    PerformanceOptions::instance().UI_THREAD_PRIORITY.set_on_this_thread(global_logger_tagged());
 
 #if 0
     {

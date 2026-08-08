@@ -5,7 +5,7 @@
  */
 
 #include <string>
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonHome/Inference/PokemonHome_ButtonDetector.h"
 #include "PokemonHome_SummaryScreenDetector.h"

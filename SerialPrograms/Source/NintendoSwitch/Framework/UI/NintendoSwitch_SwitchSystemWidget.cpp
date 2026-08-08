@@ -13,6 +13,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/AudioPipeline/UI/AudioSelectorWidget.h"
 #include "CommonFramework/AudioPipeline/UI/AudioDisplayWidget.h"
 #include "CommonFramework/VideoPipeline/UI/VideoSourceSelectorWidget.h"
@@ -204,13 +205,11 @@ void SwitchSystemWidget::update_ui(ProgramState state){
 void SwitchSystemWidget::key_press(QKeyEvent* event){
 //    cout << "press:   " << event->nativeVirtualKey() << endl;
     global_keyboard_tracker().on_key_press(*event);
-    m_video_display->on_key_press(event);
 }
 
 void SwitchSystemWidget::key_release(QKeyEvent* event){
 //    cout << "release: " << event->nativeVirtualKey() << endl;
     global_keyboard_tracker().on_key_release(*event);
-    m_video_display->on_key_release(event);
 }
 
 void SwitchSystemWidget::focus_in(QFocusEvent* event){

@@ -5,8 +5,7 @@
  */
 
 #include "Common/Cpp/Json/JsonObject.h"
-#include "CommonFramework/Globals.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "PokemonSwSh_DailyHighlightDatabase.h"
 
 namespace PokemonAutomation {

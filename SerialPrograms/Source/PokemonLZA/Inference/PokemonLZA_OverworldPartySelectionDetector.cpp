@@ -5,12 +5,14 @@
  */
 
 #include "CommonFramework/StaticGlobals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonLZA_OverworldPartySelectionDetector.h"
+#include "Tests/TestUtils.h"
 
 #include <iostream>
 using std::cout;
@@ -133,6 +135,62 @@ bool OverworldPartySelectionWatcher::process_frame(const VideoSnapshot& frame){
         m_last_detected_frame = frame.frame;
     }
     return detected;
+}
+
+
+class Test_OverworldPartySelectionDetector : public UnitTest{
+public:
+    Test_OverworldPartySelectionDetector(
+        const std::string& image,
+        int expected_up_idx,
+        int expected_down_idx
+    )
+        : UnitTest("PokemonPLZA::OverworldPartySelectionDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected_up_idx(expected_up_idx)
+        , m_expected_down_idx(expected_down_idx)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        if (m_expected_up_idx < 0 || m_expected_up_idx > 6){
+            return "Error: dpad_up_idx must be between 0 and 6.";
+        }
+        if (m_expected_down_idx < 0 || m_expected_down_idx > 6){
+            return "Error: dpad_down_idx must be between 0 and 6.";
+        }
+
+        DummyVideoOverlay overlay;
+        OverworldPartySelectionDetector detector(COLOR_RED, &overlay);
+        detector.set_debug_mode(true);
+        ImageRGB32 image(m_image);
+        bool detected = detector.detect(image);
+
+        if (m_expected_up_idx == 6 && m_expected_down_idx == 6){
+            return detected == false;
+        }
+
+        if (!detected){
+            return "Error: detector failed to detect party selection screen.";
+        }
+
+        TEST_RESULT_COMPONENT_EQUAL((int)detector.dpad_up_idx(), m_expected_up_idx, "dpad_up_idx");
+        TEST_RESULT_COMPONENT_EQUAL((int)detector.dpad_down_idx(), m_expected_down_idx, "dpad_down_idx");
+        return true;
+    }
+
+private:
+    std::string m_image;
+    int m_expected_up_idx;
+    int m_expected_down_idx;
+};
+
+
+void add_tests_OverworldPartySelectionDetector(UnitTestDatabase& database){
+    database.add<Test_OverworldPartySelectionDetector>("PokemonLZA/OverworldPartySelectionDetector/mac_zone_10_0_5.png", 0, 5);
+    database.add<Test_OverworldPartySelectionDetector>("PokemonLZA/OverworldPartySelectionDetector/mac_zone_10_1_3.png", 1, 3);
+    database.add<Test_OverworldPartySelectionDetector>("PokemonLZA/OverworldPartySelectionDetector/mac_zone_10_2_6.png", 2, 6);
+    database.add<Test_OverworldPartySelectionDetector>("PokemonLZA/OverworldPartySelectionDetector/mac_zone_10_6_2.png", 6, 2);
+    database.add<Test_OverworldPartySelectionDetector>("PokemonLZA/OverworldPartySelectionDetector/mac_zone_10_6_5.png", 6, 5);
 }
 
 }

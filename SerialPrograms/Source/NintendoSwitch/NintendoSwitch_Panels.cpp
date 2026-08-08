@@ -5,9 +5,10 @@
  */
 
 #include "CommonFramework/StaticGlobals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "NintendoSwitch_Panels.h"
 
-#include "NintendoSwitch_Settings.h"
+#include "NintendoSwitch_SettingsPanel.h"
 
 #include "Programs/NintendoSwitch_VirtualConsole.h"
 #include "Programs/NintendoSwitch_SwitchViewer.h"
