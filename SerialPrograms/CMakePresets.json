@@ -78,27 +78,27 @@
     {
       "name": "default",
       "hidden": true,
-      "configurePreset": "default",
+      "configurePreset": "default"
     },
     {
       "name": "Debug",
-      "configurePreset": "Debug",
+      "configurePreset": "Debug"
     },
     {
       "name": "Release",
-      "configurePreset": "Release",
+      "configurePreset": "Release"
     },
     {
       "name": "RelWithDebInfo",
-      "configurePreset": "RelWithDebInfo",
+      "configurePreset": "RelWithDebInfo"
     },
     {
       "name": "MinSizeRel",
-      "configurePreset": "MinSizeRel",
+      "configurePreset": "MinSizeRel"
     },
     {
       "name": "Publish",
-      "configurePreset": "Publish",
+      "configurePreset": "Publish"
     }
   ]
 }
