@@ -2111,8 +2111,18 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonPokopia/Programs/PokemonPokopia_DailyFarmer.h    
     Source/PokemonPokopia/Programs/PokemonPokopia_PCNavigation.cpp
     Source/PokemonPokopia/Programs/PokemonPokopia_PCNavigation.h
+    Source/PokemonRSE/Inference/Dialogs/PokemonRSE_BattleDialogs.cpp
+    Source/PokemonRSE/Inference/Dialogs/PokemonRSE_BattleDialogs.h
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h
+    Source/PokemonRSE/Inference/Menus/PokemonRSE_LoadMenuDetector.cpp
+    Source/PokemonRSE/Inference/Menus/PokemonRSE_LoadMenuDetector.h
+    Source/PokemonRSE/Inference/Menus/PokemonRSE_PartyMenuDetector.cpp
+    Source/PokemonRSE/Inference/Menus/PokemonRSE_PartyMenuDetector.h
+    Source/PokemonRSE/Inference/Menus/PokemonRSE_StartMenuDetector.cpp
+    Source/PokemonRSE/Inference/Menus/PokemonRSE_StartMenuDetector.h
+    Source/PokemonRSE/Inference/Menus/PokemonRSE_SummaryDetector.cpp
+    Source/PokemonRSE/Inference/Menus/PokemonRSE_SummaryDetector.h
     Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.cpp
     Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.h
     Source/PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.cpp
@@ -2125,8 +2135,10 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonRSE/PokemonRSE_Settings.h
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_AudioStarterReset.cpp
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_AudioStarterReset.h
-    Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_LegendaryHunt-Emerald.cpp
-    Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_LegendaryHunt-Emerald.h
+    Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_LegendaryReset.cpp
+    Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_LegendaryReset.h
+    Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_LegendaryRunAway-Emerald.cpp
+    Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_LegendaryRunAway-Emerald.h
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_ShinyHunt-Deoxys.cpp
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_ShinyHunt-Deoxys.h
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_ShinyHunt-Mew.cpp

@@ -18,7 +18,9 @@
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonRSE/Inference/Dialogs/PokemonRSE_BattleDialogs.h"
 #include "PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h"
+#include "PokemonRSE/Inference/Menus/PokemonRSE_LoadMenuDetector.h"
 #include "PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.h"
 #include "PokemonRSE/PokemonRSE_Settings.h"
 #include "PokemonRSE_Navigation.h"
@@ -28,15 +30,72 @@ namespace NintendoSwitch{
 namespace PokemonRSE{
 
 
+
+void home_black_border_check(ConsoleHandle& console, ProControllerContext& context){
+    if (GameSettings::instance().DEVICE == GameSettings::Device::switch_1_2){
+        console.log("Switch 1 or 2 selected in Settings.");
+
+        console.log("Checking for min 720p and 16:9.");
+        assert_16_9_720p_min(console, console);
+
+        console.log("Going to home to check for black border.");
+
+        //  Connect the controller.
+        require_player(console, context, BUTTON_ZL);
+
+        pbf_press_button(context, BUTTON_HOME, 120ms, 880ms);
+        try{
+            ensure_at_home(console, context, 2);
+        }catch (OperationFailedException&){
+            ControllerPlayerNumber current = context->get_player_number(context);
+            if (current == ControllerPlayerNumber::UNKNOWN){
+                throw UserSetupError(
+                    console,
+                    "Unable to find Home menu.\n\n"
+                    "Either your controller isn't connected or your screen size to not "
+                    "set to 100% in the TV Settings on your Nintendo Switch.\n\n"
+                    "If your Switch entered the Home screen and re-entered the game, then your "
+                    "controller is connected but your screen size is not set to 100%.\n\n"
+                    "If nothing happened at all, then your controller is not connected. "
+                    "Please disconnect all other controllers and try again.\n\n"
+                    "We recommend changing the controller to \"NS1: Wired Pro Controller\" "
+                    "as that will be able self-diagnose controller connection issues."
+                );
+            }else{
+                throw UserSetupError(
+                    console,
+                    "Unable to find Home menu.\n\n"
+                    "It is likely your screen size to not set to 100% in the TV Settings on your Nintendo Switch."
+                );
+            }
+        }
+
+//        context.wait_for_all_requests();
+        StartProgramChecks::check_border(console);
+        console.log("Returning to game.");
+        resume_game_from_home(console, context);
+        context.wait_for_all_requests();
+        console.log("Entered game.");
+    }else{
+        console.log("Non-Switch device selected in Settings.");
+        console.log("Skipping black border check.", COLOR_BLUE);
+    }
+}
+
+
+
+
 bool try_soft_reset(ConsoleHandle& console, ProControllerContext& context){
     // A + B + Select + Start
     pbf_press_button(context, BUTTON_B | BUTTON_A | BUTTON_MINUS | BUTTON_PLUS, 360ms, 1440ms);
 
+    //Mash select to get to "Push Start Button" with Kyogre/Groudon/Rayquaza background
     pbf_mash_button(context, BUTTON_MINUS, GameSettings::instance().SELECT_BUTTON_MASH0);
     context.wait_for_all_requests();
 
     //Wait for save file select screen
-    WhiteScreenOverWatcher whitescreen(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    WhiteScreenOverWatcher whitescreen(COLOR_RED);
+    LoadMenuWatcher load_menu(COLOR_RED);
 
     int ls = run_until<ProControllerContext>(
         console, context,
@@ -45,11 +104,13 @@ bool try_soft_reset(ConsoleHandle& console, ProControllerContext& context){
             pbf_wait(context, 5000ms);
             context.wait_for_all_requests();
         },
-        { whitescreen }
+        { whitescreen, load_menu }
     );
     context.wait_for_all_requests();
     if (ls == 0){
-        console.log("Entered load menu.");
+        console.log("Entered load menu. (WhiteScreenOver)");
+    }else if (ls == 1){
+        console.log("Entered load menu. (LoadMenu)");
     }else{
         console.log("soft_reset(): Unable to enter load menu.", COLOR_RED);
         return false;
@@ -62,7 +123,7 @@ bool try_soft_reset(ConsoleHandle& console, ProControllerContext& context){
     pbf_press_button(context, BUTTON_A, 160ms, 320ms);
 
     //Wait for game to load in
-    BlackScreenOverWatcher detector2(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher detector2(COLOR_RED);
     int ret = wait_until(
         console, context,
         GameSettings::instance().ENTER_GAME_WAIT0,
@@ -124,7 +185,7 @@ void flee_battle(VideoStream& stream, ProControllerContext& context){
         );
     }
 
-    BlackScreenOverWatcher battle_over(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher battle_over(COLOR_RED);
     int ret3 = run_until<ProControllerContext>(
         stream, context,
         [&](ProControllerContext& context){
@@ -208,28 +269,6 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
     }
 
     return false;
-}
-
-void home_black_border_check(ConsoleHandle& console, ProControllerContext& context){
-    if (GameSettings::instance().DEVICE == GameSettings::Device::switch_1_2){
-        console.log("Switch 1 or 2 selected in Settings.");
-
-        console.log("Checking for min 720p and 16:9.");
-        assert_16_9_720p_min(console, console);
-
-        console.log("Going to home to check for black border.");
-        pbf_press_button(context, BUTTON_ZL, 120ms, 880ms); //  Connect the controller.
-        pbf_press_button(context, BUTTON_HOME, 120ms, 880ms);
-        context.wait_for_all_requests();
-        StartProgramChecks::check_border(console);
-        console.log("Returning to game.");
-        resume_game_from_home(console, context);
-        context.wait_for_all_requests();
-        console.log("Entered game.");
-    }else{
-        console.log("Non-Switch device selected in Settings.");
-        console.log("Skipping black border and aspect ratio checks.", COLOR_BLUE);
-    }
 }
 
 

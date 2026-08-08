@@ -22,87 +22,25 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonRSE{
 
-/*
-BattleDialogDetector::BattleDialogDetector(Color color)
-    : m_dialog_top_box(0.049224, 0.738530, 0.901359, 0.008023)
-    , m_dialog_right_box(0.943471, 0.746553, 0.007111, 0.212602)
-    , m_dialog_top_jpn_box(0.068780, 0.738530, 0.856913, 0.012034)
-    , m_dialog_right_jpn_box(0.918582, 0.747890, 0.007111, 0.208590)
+
+
+PokenavDialogDetector::PokenavDialogDetector(Color color)
+    : m_dialog_border_box(0.04, 0.717, 0.926425, 0.002033) //Very narrow, not many places to detect
+    , m_dialog_main_box(0.039784, 0.759311, 0.039008, 0.010672)
 {}
-void BattleDialogDetector::make_overlays(VideoOverlaySet& items) const{
+void PokenavDialogDetector::make_overlays(VideoOverlaySet& items) const{
     const BoxOption& GAME_BOX = GameSettings::instance().GAME_BOX;
-    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_dialog_top_box));
-    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_dialog_right_box));
-    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_dialog_top_jpn_box));
-    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_dialog_right_jpn_box));
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_dialog_border_box));
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_dialog_main_box));
 }
-bool BattleDialogDetector::detect(const ImageViewRGB32& screen){
+bool PokenavDialogDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 game_screen = extract_box_reference(screen, GameSettings::instance().GAME_BOX);
 
-    ImageViewRGB32 dialog_top_image = extract_box_reference(game_screen, m_dialog_top_box);
-    ImageViewRGB32 dialog_right_image = extract_box_reference(game_screen, m_dialog_right_box);
-    ImageViewRGB32 dialog_top_jpn_image = extract_box_reference(game_screen, m_dialog_top_jpn_box);
-    ImageViewRGB32 dialog_right_jpn_image = extract_box_reference(game_screen, m_dialog_right_jpn_box);
+    ImageViewRGB32 dialog_border_image = extract_box_reference(game_screen, m_dialog_border_box);
+    ImageViewRGB32 dialog_main_image = extract_box_reference(game_screen, m_dialog_main_box);
 
-    if ((is_solid(dialog_top_image, { 0.176, 0.357, 0.467 }, 0.25, 20)
-        && is_solid(dialog_right_image, { 0.176, 0.357, 0.467 }, 0.25, 20))
-        ||
-        (is_solid(dialog_top_jpn_image, { 0.176, 0.357, 0.467 }, 0.25, 20)
-        && is_solid(dialog_right_jpn_image, { 0.176, 0.357, 0.467 }, 0.25, 20))
-    ){
-        return true;
-    }
-    return false;
-}
-*/
-
-BattleMenuDetector::BattleMenuDetector(Color color)
-    : m_menu_top_box(0.599462, 0.738530, 0.366233, 0.004011) //top of the white box
-    , m_menu_bottom_box(0.602128, 0.947120, 0.368010, 0.006686)
-    , m_dialog_top_box(0.068780, 0.739867, 0.488903, 0.008023) //teal boxes
-    , m_dialog_right_box(0.553238, 0.739867, 0.006222, 0.215276)
-
-    , m_menu_top_eme_box(0.534571, 0.746553, 0.434679, 0.008023)
-    , m_menu_right_eme_box(0.962138, 0.747890, 0.007111, 0.205916)
-    , m_dialog_top_eme_box(0.046557, 0.741204, 0.442679, 0.008023)
-    , m_dialog_right_eme_box(0.487458, 0.742541, 0.004445, 0.216613)
-{}
-void BattleMenuDetector::make_overlays(VideoOverlaySet& items) const{
-    const BoxOption& GAME_BOX = GameSettings::instance().GAME_BOX;
-    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_menu_top_box));
-    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_menu_bottom_box));
-    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_dialog_top_box));
-    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_dialog_right_box));
-
-    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_menu_top_eme_box));
-    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_menu_right_eme_box));
-    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_dialog_top_eme_box));
-    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_dialog_right_eme_box));
-}
-bool BattleMenuDetector::detect(const ImageViewRGB32& screen){
-    ImageViewRGB32 game_screen = extract_box_reference(screen, GameSettings::instance().GAME_BOX);
-
-    //Menu is white
-    ImageViewRGB32 menu_top_image = extract_box_reference(game_screen, m_menu_top_box);
-    ImageViewRGB32 menu_bottom_image = extract_box_reference(game_screen, m_menu_bottom_box);
-    ImageViewRGB32 menu_top_jpn_image = extract_box_reference(game_screen, m_menu_top_eme_box);
-    ImageViewRGB32 menu_right_jpn_image = extract_box_reference(game_screen, m_menu_right_eme_box);
-
-    //Background dialog is teal
-    ImageViewRGB32 dialog_top_image = extract_box_reference(game_screen, m_dialog_top_box);
-    ImageViewRGB32 dialog_right_image = extract_box_reference(game_screen, m_dialog_right_box);
-    ImageViewRGB32 dialog_top_jpn_image = extract_box_reference(game_screen, m_dialog_top_eme_box);
-    ImageViewRGB32 dialog_right_jpn_image = extract_box_reference(game_screen, m_dialog_right_eme_box);
-
-    if ((is_white(menu_top_image) //Ruby/Sapphire, all languages. Emerald Japan.
-        && is_white(menu_bottom_image)
-        && is_solid(dialog_top_image, { 0.176, 0.357, 0.467 }, 0.25, 20)
-        && is_solid(dialog_right_image, { 0.176, 0.357, 0.467 }, 0.25, 20))
-        ||
-        (is_white(menu_top_jpn_image) //Emerald, all languages except Japan.
-        && is_white(menu_right_jpn_image)
-        && is_solid(dialog_top_jpn_image, { 0.176, 0.357, 0.467 }, 0.25, 20)
-        && is_solid(dialog_right_jpn_image, { 0.176, 0.357, 0.467 }, 0.25, 20))
+    if (is_solid(dialog_border_image, { 0.20498, 0.45, 0.3448 }, 0.25, 20) //mint green 107, 235, 180
+        && is_white(dialog_main_image)
     ){
         return true;
     }
@@ -110,25 +48,71 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen){
 }
 
 
-AdvanceBattleDialogDetector::AdvanceBattleDialogDetector(Color color)
-    : m_dialog_box(0.043890, 0.737193, 0.913804, 0.227310)
-    , m_dialog_top_box(0.049224, 0.738530, 0.901359, 0.008023)
-    , m_dialog_right_box(0.943471, 0.746553, 0.007111, 0.212602)
-    , m_dialog_jpn_box(0.059891, 0.742541, 0.872914, 0.216613)
-    , m_dialog_top_jpn_box(0.068780, 0.738530, 0.856913, 0.012034)
-    , m_dialog_right_jpn_box(0.918582, 0.747890, 0.007111, 0.208590)
+DialogDetector::DialogDetector(Color color)
+    : m_top_box(0.13, 0.745, 0.7, 0.005)
+    , m_inner_box(0.044217, 0.756643, 0.007092, 0.17875)
+
+    , m_side_box_jpn(0.067267, 0.763312, 0.018618, 0.170746)
+    , m_inner_box_jpn(0.114254, 0.771316, 0.007092, 0.161409) //white
 {}
-void AdvanceBattleDialogDetector::make_overlays(VideoOverlaySet& items) const{
+void DialogDetector::make_overlays(VideoOverlaySet& items) const{
     const BoxOption& GAME_BOX = GameSettings::instance().GAME_BOX;
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_top_box));
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_inner_box));
+
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_side_box_jpn));
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_inner_box_jpn));
+}
+bool DialogDetector::detect(const ImageViewRGB32& screen){
+    ImageViewRGB32 game_screen = extract_box_reference(screen, GameSettings::instance().GAME_BOX);
+
+    ImageViewRGB32 dialog_top_image = extract_box_reference(game_screen, m_top_box);
+    ImageViewRGB32 dialog_inner_image = extract_box_reference(game_screen, m_inner_box);
+
+    ImageViewRGB32 dialog_side_image_jpn = extract_box_reference(game_screen, m_side_box_jpn);
+    ImageViewRGB32 dialog_inner_image_jpn = extract_box_reference(game_screen, m_inner_box_jpn);
+
+    if ((is_white(dialog_inner_image)
+        && is_white(dialog_top_image))
+        ||
+        (is_white(dialog_side_image_jpn)
+        && (is_solid(dialog_side_image_jpn, { 0.2300556, 0.34508, 0.42486 }, 0.25, 20) //RS - blue - 124 186 229
+            || is_solid(dialog_side_image_jpn, { 0.0025575, 0.516624, 0.4808184 }, 0.25, 20))) //E - green - 1 202 188
+    ){
+        return true;
+    }
+    return false;
+}
+
+
+
+AdvanceDialogDetector::AdvanceDialogDetector(Color color)
+    : m_top_box(0.13, 0.745, 0.7, 0.005)
+    , m_inner_box(0.044217, 0.756643, 0.007092, 0.17875)
+    , m_dialog_box(0.041557, 0.748639, 0.918467, 0.205429)
+
+    , m_side_box_jpn(0.067267, 0.763312, 0.018618, 0.170746)
+    , m_inner_box_jpn(0.114254, 0.771316, 0.007092, 0.161409)
+    , m_dialog_jpn_box(0.116914, 0.747305, 0.765094, 0.209431)
+{}
+void AdvanceDialogDetector::make_overlays(VideoOverlaySet& items) const{
+    const BoxOption& GAME_BOX = GameSettings::instance().GAME_BOX;
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_top_box));
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_inner_box));
     items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_dialog_box));
-    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_dialog_top_box));
-    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_dialog_right_box));
+
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_side_box_jpn));
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_inner_box_jpn));
     items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_dialog_jpn_box));
-    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_dialog_top_jpn_box));
-    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_dialog_right_jpn_box));
 }
-bool AdvanceBattleDialogDetector::detect(const ImageViewRGB32& screen){
+bool AdvanceDialogDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 game_screen = extract_box_reference(screen, GameSettings::instance().GAME_BOX);
+
+    ImageViewRGB32 dialog_top_image = extract_box_reference(game_screen, m_top_box);
+    ImageViewRGB32 dialog_inner_image = extract_box_reference(game_screen, m_inner_box);
+
+    ImageViewRGB32 dialog_side_image_jpn = extract_box_reference(game_screen, m_side_box_jpn);
+    ImageViewRGB32 dialog_inner_image_jpn = extract_box_reference(game_screen, m_inner_box_jpn);
 
     const bool replace_color_within_range = false;
 
@@ -153,20 +137,63 @@ bool AdvanceBattleDialogDetector::detect(const ImageViewRGB32& screen){
     );
     ImageStats stats2 = image_stats(filtered_region_jpn);
 
-    ImageViewRGB32 dialog_top_image = extract_box_reference(game_screen, m_dialog_top_box);
-    ImageViewRGB32 dialog_right_image = extract_box_reference(game_screen, m_dialog_right_box);
-    ImageViewRGB32 dialog_top_jpn_image = extract_box_reference(game_screen, m_dialog_top_jpn_box);
-    ImageViewRGB32 dialog_right_jpn_image = extract_box_reference(game_screen, m_dialog_right_jpn_box);
-
-    if ((is_solid(dialog_top_image, { 0.176, 0.357, 0.467 }, 0.25, 20)
-        && is_solid(dialog_right_image, { 0.176, 0.357, 0.467 }, 0.25, 20)
+    if ((is_white(dialog_inner_image)
+        && is_white(dialog_top_image)
         && (stats.average.r > stats.average.b + 180)
         && (stats.average.r > stats.average.g + 180))
         ||
-        (is_solid(dialog_top_jpn_image, { 0.176, 0.357, 0.467 }, 0.25, 20)
-        && is_solid(dialog_right_jpn_image, { 0.176, 0.357, 0.467 }, 0.25, 20)
+        (is_white(dialog_side_image_jpn)
+        && (is_solid(dialog_side_image_jpn, { 0.2300556, 0.34508, 0.42486 }, 0.25, 20) //RS - blue - 124 186 229
+            || is_solid(dialog_side_image_jpn, { 0.0025575, 0.516624, 0.4808184 }, 0.25, 20)) //E - green - 1 202 188
         && (stats2.average.r > stats2.average.b + 180)
         && (stats2.average.r > stats2.average.g + 180))
+    ){
+        return true;
+    }
+    return false;
+}
+
+
+
+SelectionDialogDetector::SelectionDialogDetector(Color color)
+    : m_top_box(0.13, 0.745, 0.7, 0.005)
+    , m_inner_box(0.044217, 0.756643, 0.007092, 0.17875)
+
+    , m_side_box_jpn(0.067267, 0.763312, 0.018618, 0.170746)
+    , m_inner_box_jpn(0.114254, 0.771316, 0.007092, 0.161409) //white
+
+    , m_yes_box(0.85, 0.46, 0.007, 0.069)
+    , m_no_box(0.85, 0.57, 0.007, 0.069)
+{}
+void SelectionDialogDetector::make_overlays(VideoOverlaySet& items) const{
+    const BoxOption& GAME_BOX = GameSettings::instance().GAME_BOX;
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_top_box));
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_inner_box));
+
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_side_box_jpn));
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_inner_box_jpn));
+
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_yes_box));
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_no_box));
+}
+bool SelectionDialogDetector::detect(const ImageViewRGB32& screen){
+    ImageViewRGB32 game_screen = extract_box_reference(screen, GameSettings::instance().GAME_BOX);
+
+    ImageViewRGB32 dialog_top_image = extract_box_reference(game_screen, m_top_box);
+    ImageViewRGB32 dialog_inner_image = extract_box_reference(game_screen, m_inner_box);
+
+    ImageViewRGB32 dialog_side_image_jpn = extract_box_reference(game_screen, m_side_box_jpn);
+    ImageViewRGB32 dialog_inner_image_jpn = extract_box_reference(game_screen, m_inner_box_jpn);
+
+    ImageViewRGB32 dialog_yes_image = extract_box_reference(game_screen, m_yes_box);
+    ImageViewRGB32 dialog_no_image = extract_box_reference(game_screen, m_no_box);
+
+    if ((is_white(dialog_yes_image) && is_white(dialog_no_image))
+        && ((is_white(dialog_inner_image) && is_white(dialog_top_image))
+            ||
+            (is_white(dialog_side_image_jpn)
+            && (is_solid(dialog_side_image_jpn, { 0.2300556, 0.34508, 0.42486 }, 0.25, 20) //RS - blue - 124 186 229
+                || is_solid(dialog_side_image_jpn, { 0.0025575, 0.516624, 0.4808184 }, 0.25, 20)))) //E - green - 1 202 188
     ){
         return true;
     }

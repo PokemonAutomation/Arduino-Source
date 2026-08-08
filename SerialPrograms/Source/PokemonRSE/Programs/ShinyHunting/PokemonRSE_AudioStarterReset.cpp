@@ -9,9 +9,9 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonRSE/Inference/Dialogs/PokemonRSE_BattleDialogs.h"
 #include "PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h"
 #include "PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.h"
 #include "PokemonRSE/PokemonRSE_Navigation.h"
@@ -117,7 +117,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
 
         //Pressing A opens the bag so the screen goes black
         env.log("Opening bag and selecting starter.");
-        BlackScreenOverWatcher bag_opened(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+        BlackScreenOverWatcher bag_opened(COLOR_RED);
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [](ProControllerContext& context){
@@ -146,7 +146,8 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
         switch (TARGET){
         case Target::treecko:
             env.log("Treecko selected. Moving left.");
-            pbf_press_dpad(context, DPAD_LEFT, 320ms, 800ms);
+            pbf_press_dpad(context, DPAD_LEFT, 120ms, 100ms); //Double up in case
+            pbf_press_dpad(context, DPAD_LEFT, 120ms, 100ms); //of dropped press
             break;
         case Target::torchic:
             //Default cursor position, do nothing.
@@ -154,7 +155,8 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
             break;
         case Target::mudkip:
             env.log("Mudkip selected. Moving right.");
-            pbf_press_dpad(context, DPAD_RIGHT, 320ms, 800ms);
+            pbf_press_dpad(context, DPAD_RIGHT, 120ms, 100ms);
+            pbf_press_dpad(context, DPAD_RIGHT, 120ms, 100ms);
             break;
         default:
             env.log("Invalid target selected.");
@@ -169,7 +171,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
         }
 
         //Mash A to select starter. Stop once black screen is detected to start listening for shiny pooch.
-        BlackScreenWatcher starter_battle_start(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+        BlackScreenWatcher starter_battle_start(COLOR_RED);
         int ret3 = run_until<ProControllerContext>(
             env.console, context,
             [](ProControllerContext& context){
