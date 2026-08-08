@@ -38,6 +38,7 @@ void SerialPortPoller::stop(){
 
 
 void SerialPortPoller::begin_refresh_now(){
+//    cout << "begin_refresh_now()" << endl;
     global_periodic_runner().trigger_run_now(*this);
 }
 WallClock SerialPortPoller::last_changed() const{
@@ -116,6 +117,7 @@ void SerialPortPoller::run() noexcept{
         if (next_delay < std::chrono::seconds(1)){
             next_delay = std::chrono::seconds(1);
         }
+//        cout << tostr_u_commas(std::chrono::duration_cast<Milliseconds>(duration).count()) << endl;
         if (LOG_EVERYTHING()){
             global_logger_tagged().log(
                 "Serial port refresh took " + tostr_u_commas(std::chrono::duration_cast<Milliseconds>(duration).count()) + " ms.",

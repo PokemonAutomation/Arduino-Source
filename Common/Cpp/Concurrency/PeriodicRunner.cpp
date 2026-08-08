@@ -125,7 +125,7 @@ void PeriodicRunner::remove_runnable(Runnable& runnable) noexcept{
 }
 void PeriodicRunner::edit_duration(Runnable& runnable, WallDuration period) noexcept{
     {
-        WallClock next = current_time();
+        WallClock next = current_time() + period;
         std::lock_guard<Mutex> lg(m_lock);
 
         auto runnable_iter = m_runnables.find(&runnable);
@@ -142,6 +142,7 @@ void PeriodicRunner::edit_duration(Runnable& runnable, WallDuration period) noex
 
         //  Find the corresponding schedule entry.
         auto schedule_iter = m_schedule.find(runnable_iter->second.next);
+//        cout << "Edit - Next = " << std::chrono::duration_cast<Milliseconds>(runnable_iter->second.next - current_time()).count() << endl;
         while (true){
             if (schedule_iter == m_schedule.end()){
                 //  Should be impossible.
@@ -154,6 +155,7 @@ void PeriodicRunner::edit_duration(Runnable& runnable, WallDuration period) noex
         }
 
         update_next(schedule_iter, next);
+//        cout << "Edit - Next = " << std::chrono::duration_cast<Milliseconds>(runnable_iter->second.next - current_time()).count() << endl;
     }
     m_cv.notify_all();
 }
