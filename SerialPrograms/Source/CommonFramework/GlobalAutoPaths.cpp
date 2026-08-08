@@ -14,7 +14,12 @@
 #if defined(__APPLE__)
 #include <CoreFoundation/CFBundle.h>
 #endif
+#include "Common/Cpp/Filesystem.h"
 #include "GlobalAutoPaths.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -103,60 +108,56 @@ QString get_application_base_dir_path(){
 }
 std::string get_resource_path(){
     //  Find the resource directory.
-    QString base = get_application_base_dir_path();
-    QString path = base;
+    Filesystem::Path base = get_application_base_dir_path().toStdString();
+    Filesystem::Path path = base;
     for (size_t c = 0; c < 5; c++){
-        QString try_path = path + "/Resources/";
-        QFile file(try_path);
-        if (file.exists()){
-            return try_path.toStdString();
+        Filesystem::Path try_path = path / "Resources/";
+        if (exists(try_path)){
+            return try_path.string();
         }
-        path += "/..";
+        path = path / "..";
     }
-    return (base + "/Resources/").toStdString();
+    return (base / "Resources/").string();
 }
 std::string get_unittest_resource_path(){
-    //  Find the resource directory.
+    //  Find the unit test resource directory.
 
     //  Try the intended folder name first.
-    QString base = get_application_base_dir_path();
-    QString path = base;
+    Filesystem::Path base = get_application_base_dir_path().toStdString();
+    Filesystem::Path path = base;
     for (size_t c = 0; c < 5; c++){
-        QString try_path = path + "/UnitTestResources/";
-        QFile file(try_path);
-        if (file.exists()){
-            return try_path.toStdString();
+        Filesystem::Path try_path = path / "UnitTestResources/";
+        if (exists(try_path)){
+            return try_path.string();
         }
-        path += "/..";
+        path = path / "..";
     }
 
     //  Now try with the old command-line folder.
     path = base;
     for (size_t c = 0; c < 5; c++){
-        QString try_path = path + "/CommandLineTests/";
-        QFile file(try_path);
-        if (file.exists()){
-            return try_path.toStdString();
+        Filesystem::Path try_path = path / "CommandLineTests/";
+        if (exists(try_path)){
+            return try_path.string();
         }
-        path += "/..";
+        path = path / "..";
     }
 
-    return (base + "/UnitTestResources/").toStdString();
+    return (base / "UnitTestResources/").string();
 }
 
 std::string get_training_path(){
     //  Find the training data directory.
-    QString base = get_application_base_dir_path();
-    QString path = base;
+    Filesystem::Path base = get_application_base_dir_path().toStdString();
+    Filesystem::Path path = base;
     for (size_t c = 0; c < 5; c++){
-        QString try_path = path + "/TrainingData/";
-        QFile file(try_path);
-        if (file.exists()){
-            return try_path.toStdString();
+        Filesystem::Path try_path = path / "TrainingData/";
+        if (exists(try_path)){
+            return try_path.string();
         }
-        path += "/..";
+        path = path / "..";
     }
-    return (base + "/TrainingData/").toStdString();
+    return (base / "TrainingData/").string();
 }
 
 std::string get_runtime_base_path(){
