@@ -403,8 +403,7 @@ void StatsReader::read_page2(
         // This will assume a 2-digit HP total in case of ambiguity, consistent with a Pokemon at full HP
         if (res_str.size() > 5){ 
             res = std::stoi(res_str.substr(res_str.size() - 3));
-        }
-        if (res_str.size() > 2){ 
+        }else if (res_str.size() > 2){ 
             res = std::stoi(res_str.substr(res_str.size() - 2));
         }
         // log impossible values or failed reads
