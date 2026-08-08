@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageDiff.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
@@ -23,12 +22,11 @@
 #include <utility>
 #include <vector>
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonLZA {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonLZA{
 
 namespace{
-const ImageFloatBox WEATHER_ICON_ROI(0.880000, 0.010000, 0.035800, 0.068000);
 
 struct SupplementalTemplateCheck{
     const char* path;
@@ -102,15 +100,14 @@ const ImageRGB32& weather_full_template_image(WeatherIconType type){
     }
 }
 
-double full_template_rmsd(const ImageViewRGB32& screen, WeatherIconType type){
-    ImageViewRGB32 candidate = extract_box_reference(screen, WEATHER_ICON_ROI);
+double full_template_rmsd(const ImageViewRGB32& image, WeatherIconType type){
     const ImageRGB32& templ = weather_full_template_image(type);
-    if (templ.width() == 0 || templ.height() == 0 || candidate.width() == 0 || candidate.height() == 0){
+    if (templ.width() == 0 || templ.height() == 0 || image.width() == 0 || image.height() == 0){
         return std::numeric_limits<double>::infinity();
     }
-    return candidate.width() == templ.width() && candidate.height() == templ.height()
-        ? ImageMatch::pixel_RMSD(candidate, templ)
-        : ImageMatch::pixel_RMSD(candidate, templ.scale_to(candidate.width(), candidate.height()));
+    return image.width() == templ.width() && image.height() == templ.height()
+        ? ImageMatch::pixel_RMSD(image, templ)
+        : ImageMatch::pixel_RMSD(image, templ.scale_to(image.width(), image.height()));
 }
 }
 
@@ -259,15 +256,16 @@ const WeatherFullMatcher& weather_full_matcher(WeatherIconType type){
 //-----------------------------------------------------
 
 WeatherIconDetector::WeatherIconDetector(WeatherIconType type, VideoOverlay* overlay)
+    : m_box(0.880000, 0.010000, 0.035800, 0.068000)
 {
     m_type = type;
     if (overlay){
-        m_overlay1.emplace(*overlay, WEATHER_ICON_ROI, COLOR_RED);
+        m_overlay1.emplace(*overlay, m_box, COLOR_RED);
     }
 }
 
-void WeatherIconDetector::make_overlays(VideoOverlaySet& items) const {
-    items.add(COLOR_RED, WEATHER_ICON_ROI);
+void WeatherIconDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(COLOR_RED, m_box);
     for (const auto& check : supplemental_template_checks(m_type)){
         items.add(check.color, check.box);
     }
@@ -283,9 +281,10 @@ bool WeatherIconDetector::detect(const ImageViewRGB32& screen){
         {0xff707070, 0xffffffff},
     };
 
+    ImageViewRGB32 cropped = extract_box_reference(screen, m_box);
     const bool full_match = match_template_by_waterfill(
         screen.size(),
-        extract_box_reference(screen, WEATHER_ICON_ROI),
+        cropped,
         matcher,
         FILTERS,
         {min_area, SIZE_MAX},
@@ -301,9 +300,9 @@ bool WeatherIconDetector::detect(const ImageViewRGB32& screen){
     }
 
     if (m_type == WeatherIconType::Clear || m_type == WeatherIconType::Sunny || m_type == WeatherIconType::Cloudy){
-        const double clear_rmsd = full_template_rmsd(screen, WeatherIconType::Clear);
-        const double sunny_rmsd = full_template_rmsd(screen, WeatherIconType::Sunny);
-        const double cloudy_rmsd = full_template_rmsd(screen, WeatherIconType::Cloudy);
+        const double clear_rmsd = full_template_rmsd(cropped, WeatherIconType::Clear);
+        const double sunny_rmsd = full_template_rmsd(cropped, WeatherIconType::Sunny);
+        const double cloudy_rmsd = full_template_rmsd(cropped, WeatherIconType::Cloudy);
 
         switch (m_type){
         case WeatherIconType::Clear:
@@ -410,14 +409,14 @@ public:
                     break;
                 }
             }
-            TEST_RESULT_COMPONENT_EQUAL(expected_found, false, "expected weather present");
+            TEST_RESULT_COMPONENT_EQUAL_STR(expected_found, false, "expected weather present");
             if (expected_found){
                 return "Expected weather should be absent, but " + weather_name(m_expected_weather) + " was detected. " + status_string;
             }
             return !expected_found;
         }
 
-        TEST_RESULT_COMPONENT_EQUAL(detected_weathers.size(), (size_t)1, "num detected weather types");
+        TEST_RESULT_COMPONENT_EQUAL_STR(detected_weathers.size(), (size_t)1, "num detected weather types");
 
         if (detected_weathers.empty()){
             if (m_expected_weather != WeatherIconType::Unknown){
@@ -454,7 +453,11 @@ private:
 void add_tests_WeatherDetector(UnitTestDatabase& database){
     auto add = [&](const char* filename){
         const std::string image = "PokemonLZA/WeatherDetector/" + std::string(filename);
-        database.add<Test_WeatherIconDetector>(image, weather_from_filename(filename), expected_result_from_filename(filename));
+        database.add<Test_WeatherIconDetector>(
+            image,
+            weather_from_filename(filename),
+            expected_result_from_filename(filename)
+        );
     };
 
     add("clear_1_True.png");

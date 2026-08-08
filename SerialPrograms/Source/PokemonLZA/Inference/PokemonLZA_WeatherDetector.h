@@ -12,12 +12,12 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/VisualDetector.h"
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonLZA {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonLZA{
 
 
-enum class WeatherIconType {
+enum class WeatherIconType{
     Clear,
     Sunny,
     Rain,
@@ -30,7 +30,7 @@ enum class WeatherIconType {
 //-----------------------------------------------------
 //  Detector
 //-----------------------------------------------------
-class WeatherIconDetector : public StaticScreenDetector {
+class WeatherIconDetector : public StaticScreenDetector{
 public:
     WeatherIconDetector(WeatherIconType type, VideoOverlay* overlay = nullptr);
 
@@ -39,6 +39,7 @@ public:
     virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
+    ImageFloatBox m_box;
     WeatherIconType m_type;
 
     std::optional<OverlayBoxScope> m_overlay1;
