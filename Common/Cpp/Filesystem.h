@@ -124,10 +124,26 @@ public:
         return x.m_path == y.m_path;
     }
 
+    //  Connect two path components.
+    Path& operator+=(const Path& x){
+        m_path += x.m_path;
+        return *this;
+    }
+    friend Path operator+(const Path& x, const Path& y){
+        std::filesystem::path ret = x;
+        ret += y.m_path;
+        return ret;
+    }
+
     //  Connect two path components with "/"
+    Path& operator/=(const Path& x){
+        m_path /= x.m_path;
+        return *this;
+    }
     friend Path operator/(const Path& x, const Path& y){
         return x.m_path / y.m_path;
     }
+
     friend std::ostream& operator<<(std::ostream& stream, const Path& x);
 
 private:
@@ -179,6 +195,10 @@ inline void rename(const Path& old_path, const Path& new_path){
 //  If an error occurs, set `ec`. Execute `ec.clear()` if no errors occur.
 inline void rename(const Path& old_path, const Path& new_path, std::error_code& ec){
     std::filesystem::rename(old_path.stdpath(), new_path.stdpath(), ec);
+}
+
+inline Path current_path(){
+    return std::filesystem::current_path();
 }
 
 
