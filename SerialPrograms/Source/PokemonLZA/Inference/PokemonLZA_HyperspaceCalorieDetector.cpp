@@ -148,7 +148,7 @@ public:
             return "Error: detector failed to detect calorie number in image.";
         }
 
-        TEST_RESULT_EQUAL((int)detector.calorie_number(), m_expected_calorie);
+        TEST_RESULT_EQUAL_STR((int)detector.calorie_number(), m_expected_calorie);
         return true;
     }
 

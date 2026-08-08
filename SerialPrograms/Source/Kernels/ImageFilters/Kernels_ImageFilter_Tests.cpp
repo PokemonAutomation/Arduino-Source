@@ -78,7 +78,7 @@ public:
             mins, maxs
         );
 
-        TEST_RESULT_EQUAL(pixels_in_range, pixels_in_range_2);
+        TEST_RESULT_EQUAL_STR(pixels_in_range, pixels_in_range_2);
 
         size_t actual_num_pixels_in_range = 0;
         size_t error_count = 0;
@@ -195,7 +195,7 @@ public:
             uint32_t(middle_color), max_dist
         );
 
-        TEST_RESULT_EQUAL(pixels_in_range, pixels_in_range_2);
+        TEST_RESULT_EQUAL_STR(pixels_in_range, pixels_in_range_2);
 
         size_t actual_num_pixels_in_range = 0;
         size_t error_count = 0;
@@ -328,7 +328,7 @@ public:
             mins, maxs
         );
 
-        TEST_RESULT_EQUAL(pixels_in_range, pixels_in_range_2);
+        TEST_RESULT_EQUAL_STR(pixels_in_range, pixels_in_range_2);
 
         size_t actual_num_pixels_in_range = 0;
         size_t error_count = 0;

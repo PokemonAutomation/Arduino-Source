@@ -162,13 +162,13 @@ public:
             bool is_yellow = detectors[i].is_label_yellow(image);
             std::string target = m_words[m_words.size() - 3 + i];
             if (target == "Yellow"){
-                TEST_RESULT_COMPONENT_EQUAL(is_yellow, true, "yellow label detection at side: " + sides[i]);
+                TEST_RESULT_COMPONENT_EQUAL_STR(is_yellow, true, "yellow label detection at side: " + sides[i]);
             }else{
                 std::string filling = detectors[i].detect_filling_name(image);
                 if (target == "none"){
                     target.clear();
                 }
-                TEST_RESULT_COMPONENT_EQUAL(filling, target, "side: " + sides[i]);
+                TEST_RESULT_COMPONENT_EQUAL_STR(filling, target, "side: " + sides[i]);
             }
         }
 

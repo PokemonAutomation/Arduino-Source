@@ -460,7 +460,7 @@ public:
 
         for (const auto& pair : expected_counts){
             const auto& detections = detected_boxes[pair.first];
-            TEST_RESULT_COMPONENT_EQUAL((int)detections.size(), pair.second, map_icon_type_to_string(pair.first));
+            TEST_RESULT_COMPONENT_EQUAL_STR((int)detections.size(), pair.second, map_icon_type_to_string(pair.first));
         }
 
         return true;

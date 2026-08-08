@@ -206,7 +206,7 @@ public:
 
         bool target_has_focus = false;
         if (parse_bool(m_keywords[m_keywords.size()-2], target_has_focus) == true){
-            TEST_RESULT_EQUAL(result_has_focus, target_has_focus);
+            TEST_RESULT_EQUAL_STR(result_has_focus, target_has_focus);
 
             return check_can_change_focus(m_keywords[m_keywords.size()-1]);
         }
@@ -223,7 +223,7 @@ public:
             return ss.str();
         }
 
-        TEST_RESULT_EQUAL(result_has_focus, target_has_focus);
+        TEST_RESULT_EQUAL_STR(result_has_focus, target_has_focus);
 
         if (result_has_focus){
             std::string ret = check_can_change_focus(m_keywords[m_keywords.size()-6]);

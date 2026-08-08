@@ -131,7 +131,7 @@ public:
                 continue;
             }
 
-            TEST_RESULT_COMPONENT_EQUAL(detected_power_slug, expected_power, "power slug for slot " + std::to_string(i));
+            TEST_RESULT_COMPONENT_EQUAL_STR(detected_power_slug, expected_power, "power slug for slot " + std::to_string(i));
             if (detected_power_slug.empty()){
                 return "Error: OCR detected empty but expected a power.";
             }

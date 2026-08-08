@@ -114,8 +114,8 @@ public:
         MapFlyMenuDetector fly_menu(COLOR_RED);
         MapDestinationMenuDetector dest_menu(COLOR_RED);
         ImageRGB32 image(m_image);
-        TEST_RESULT_EQUAL(fly_menu.detect(image), m_expected);
-        TEST_RESULT_EQUAL(dest_menu.detect(image), !m_expected);
+        TEST_RESULT_EQUAL_STR(fly_menu.detect(image), m_expected);
+        TEST_RESULT_EQUAL_STR(dest_menu.detect(image), !m_expected);
         return true;
     }
 

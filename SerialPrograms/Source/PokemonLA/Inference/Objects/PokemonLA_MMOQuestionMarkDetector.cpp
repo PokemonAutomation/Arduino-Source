@@ -317,7 +317,7 @@ public:
                 cerr << "Error: need a region name and a number of MMOs in the filename (e.g. image-Fieldlands_5.png)." << endl;
             }
             const auto results = detector.detect_MMOs_on_region_map(image);
-            TEST_RESULT_EQUAL((int)results.size(), target_num_MMOs_on_region_map);
+            TEST_RESULT_EQUAL_STR((int)results.size(), target_num_MMOs_on_region_map);
         }
 
         return true;

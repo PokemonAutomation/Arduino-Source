@@ -661,23 +661,23 @@ public:
             return ss.str();
         }
 
-        TEST_RESULT_COMPONENT_EQUAL((int)coords.row, expected_row, "row");
-        TEST_RESULT_COMPONENT_EQUAL((int)coords.col, expected_col, "col");
+        TEST_RESULT_COMPONENT_EQUAL_STR((int)coords.row, expected_row, "row");
+        TEST_RESULT_COMPONENT_EQUAL_STR((int)coords.col, expected_col, "col");
 
         // Test SomethingInBoxCellDetector
         SomethingInBoxCellDetector something_detector(COLOR_RED, &overlay);
         bool detected_something = something_detector.detect(image);
-        TEST_RESULT_COMPONENT_EQUAL(detected_something, expected_something_in_cell, "something_in_cell");
+        TEST_RESULT_COMPONENT_EQUAL_STR(detected_something, expected_something_in_cell, "something_in_cell");
 
         // Test BoxShinyDetector
         BoxShinyDetector shiny_detector(COLOR_RED, &overlay);
         bool detected_shiny = shiny_detector.detect(image);
-        TEST_RESULT_COMPONENT_EQUAL(detected_shiny, expected_shiny, "shiny");
+        TEST_RESULT_COMPONENT_EQUAL_STR(detected_shiny, expected_shiny, "shiny");
 
         // Test BoxAlphaDetector
         BoxAlphaDetector alpha_detector(COLOR_RED, &overlay);
         bool detected_alpha = alpha_detector.detect(image);
-        TEST_RESULT_COMPONENT_EQUAL(detected_alpha, expected_alpha, "alpha");
+        TEST_RESULT_COMPONENT_EQUAL_STR(detected_alpha, expected_alpha, "alpha");
 
         // Test BoxDexNumberDetector
         if (expect_dex_detection){
@@ -703,7 +703,7 @@ public:
                 return ss.str();
             }
 
-            TEST_RESULT_COMPONENT_EQUAL((int)detected_dex_number, (int)expected_dex_number, "dex_number");
+            TEST_RESULT_COMPONENT_EQUAL_STR((int)detected_dex_number, (int)expected_dex_number, "dex_number");
         }
 
         return true;

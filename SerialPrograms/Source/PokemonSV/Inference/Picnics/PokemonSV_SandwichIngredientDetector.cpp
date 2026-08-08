@@ -448,15 +448,15 @@ public:
         SandwichCondimentsPageDetector condiments_detector;
         SandwichPicksPageDetector picks_detector;
 
-        TEST_RESULT_COMPONENT_EQUAL(condiments_detector.detect(image), is_condiments, "condiments Page");
-        TEST_RESULT_COMPONENT_EQUAL(picks_detector.detect(image), is_picks, "picks Page");
+        TEST_RESULT_COMPONENT_EQUAL_STR(condiments_detector.detect(image), is_condiments, "condiments Page");
+        TEST_RESULT_COMPONENT_EQUAL_STR(picks_detector.detect(image), is_picks, "picks Page");
 
         for (int i = 0; i < 10; i++){
             auto type = (i < 6 ? SandwichIngredientType::FILLING : SandwichIngredientType::CONDIMENT);
             size_t index = (i < 6 ? i : i - 6);
             DeterminedSandwichIngredientDetector determined_detector(type, index);
             bool target = (i < 6 ? i < num_fillings : i - 6 < num_condiments);
-            TEST_RESULT_COMPONENT_EQUAL(determined_detector.detect(image), target, "ingredient slot " + std::to_string(i));
+            TEST_RESULT_COMPONENT_EQUAL_STR(determined_detector.detect(image), target, "ingredient slot " + std::to_string(i));
         }
         return true;
     }
@@ -519,14 +519,14 @@ public:
                 if (results.results.empty()){
                     return "No ingredient detected via icon matcher";
                 }
-                TEST_RESULT_COMPONENT_EQUAL(results.results.begin()->second, target_ingredients[i], "image matcher : ingredient slot " + std::to_string(i));
+                TEST_RESULT_COMPONENT_EQUAL_STR(results.results.begin()->second, target_ingredients[i], "image matcher : ingredient slot " + std::to_string(i));
             }
 
             OCR::StringMatchResult results = reader.read_ingredient_page_with_ocr(image, global_logger_command_line(), language, i);
             if (results.results.empty()){
                 return "No ingredient detected via text";
             }
-            TEST_RESULT_COMPONENT_EQUAL(results.results.begin()->second.token, target_ingredients[i], "ocr : ingredient slot " + std::to_string(i));
+            TEST_RESULT_COMPONENT_EQUAL_STR(results.results.begin()->second.token, target_ingredients[i], "ocr : ingredient slot " + std::to_string(i));
         }
 
         return true;

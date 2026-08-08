@@ -95,11 +95,11 @@ public:
         cout << "One waterfill time: " << ms << " ms" << endl;
 
         for (size_t i = 0; i < objects.size(); ++i){
-            TEST_RESULT_COMPONENT_EQUAL(objects[i].area, gt_objects[i].area, "object " + std::to_string(i) + " area");
-            TEST_RESULT_COMPONENT_EQUAL(objects[i].min_x, gt_objects[i].min_x, "object " + std::to_string(i) + " min_x");
-            TEST_RESULT_COMPONENT_EQUAL(objects[i].min_y, gt_objects[i].min_y, "object " + std::to_string(i) + " min_y");
-            TEST_RESULT_COMPONENT_EQUAL(objects[i].max_x, gt_objects[i].max_x, "object " + std::to_string(i) + " max_x");
-            TEST_RESULT_COMPONENT_EQUAL(objects[i].max_y, gt_objects[i].max_y, "object " + std::to_string(i) + " max_y");
+            TEST_RESULT_COMPONENT_EQUAL_STR(objects[i].area, gt_objects[i].area, "object " + std::to_string(i) + " area");
+            TEST_RESULT_COMPONENT_EQUAL_STR(objects[i].min_x, gt_objects[i].min_x, "object " + std::to_string(i) + " min_x");
+            TEST_RESULT_COMPONENT_EQUAL_STR(objects[i].min_y, gt_objects[i].min_y, "object " + std::to_string(i) + " min_y");
+            TEST_RESULT_COMPONENT_EQUAL_STR(objects[i].max_x, gt_objects[i].max_x, "object " + std::to_string(i) + " max_x");
+            TEST_RESULT_COMPONENT_EQUAL_STR(objects[i].max_y, gt_objects[i].max_y, "object " + std::to_string(i) + " max_y");
         }
 
         // We try to wait for three seconds:

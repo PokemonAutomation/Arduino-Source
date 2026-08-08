@@ -173,8 +173,8 @@ public:
             return "Error: detector failed to detect party selection screen.";
         }
 
-        TEST_RESULT_COMPONENT_EQUAL((int)detector.dpad_up_idx(), m_expected_up_idx, "dpad_up_idx");
-        TEST_RESULT_COMPONENT_EQUAL((int)detector.dpad_down_idx(), m_expected_down_idx, "dpad_down_idx");
+        TEST_RESULT_COMPONENT_EQUAL_STR((int)detector.dpad_up_idx(), m_expected_up_idx, "dpad_up_idx");
+        TEST_RESULT_COMPONENT_EQUAL_STR((int)detector.dpad_down_idx(), m_expected_down_idx, "dpad_down_idx");
         return true;
     }
 

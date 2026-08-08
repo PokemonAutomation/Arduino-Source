@@ -473,16 +473,16 @@ public:
         SomethingInBoxSlotDetector sth_detector(COLOR_RED);
         ImageRGB32 image(m_image);
         bool sth = sth_detector.detect(image);
-        TEST_RESULT_EQUAL(sth, true);
+        TEST_RESULT_EQUAL_STR(sth, true);
 
         BoxShinyDetector shiny_detector;
         bool shiny_result = shiny_detector.detect(image);
 
-        TEST_RESULT_EQUAL(shiny_result, target_shiny);
+        TEST_RESULT_EQUAL_STR(shiny_result, target_shiny);
 
         BoxGenderDetector gender_detector;
         int gender_result = (int)gender_detector.detect(image);
-        TEST_RESULT_EQUAL(gender_result, target_gender);
+        TEST_RESULT_EQUAL_STR(gender_result, target_gender);
 
         return true;
     };
@@ -523,10 +523,10 @@ public:
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         ImageRGB32 image(m_image);
         BoxBottomButtonYDetector y_detector;
-        TEST_RESULT_COMPONENT_EQUAL(y_detector.detect(image), m_target_y, "button Y");
+        TEST_RESULT_COMPONENT_EQUAL_STR(y_detector.detect(image), m_target_y, "button Y");
 
         BoxBottomButtonBDetector b_detector;
-        TEST_RESULT_COMPONENT_EQUAL(b_detector.detect(image), m_target_b, "button B");
+        TEST_RESULT_COMPONENT_EQUAL_STR(b_detector.detect(image), m_target_b, "button B");
         return true;
     }
 

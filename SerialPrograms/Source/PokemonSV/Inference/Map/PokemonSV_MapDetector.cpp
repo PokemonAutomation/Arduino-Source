@@ -196,7 +196,7 @@ public:
         ImageRGB32 image(m_image);
         bool result_map = map_exit_detector.detect(image);
 
-        TEST_RESULT_EQUAL(result_map, target_map_existence);
+        TEST_RESULT_EQUAL_STR(result_map, target_map_existence);
 
         if (result_map){
 
@@ -206,8 +206,8 @@ public:
             bool result_fixed = map_fixed_view_detector.detect(image);
             bool result_rotated = map_rotated_view_detected.detect(image);
 
-            TEST_RESULT_EQUAL(result_fixed, target_is_fixed_view);
-            TEST_RESULT_EQUAL(result_rotated, !target_is_fixed_view);
+            TEST_RESULT_EQUAL_STR(result_fixed, target_is_fixed_view);
+            TEST_RESULT_EQUAL_STR(result_rotated, !target_is_fixed_view);
         }
 
         return true;

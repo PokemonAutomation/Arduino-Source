@@ -241,13 +241,13 @@ public:
         DonutBerriesReader reader;
         for (size_t i = 0; i < DonutBerriesReader::BERRY_PAGE_LINES; ++i){
             DonutBerriesSelectionDetector selection_detector(i);
-            TEST_RESULT_COMPONENT_EQUAL(selection_detector.detect(image), i == selected_berry, "selection detector : berry slot " + std::to_string(i));
+            TEST_RESULT_COMPONENT_EQUAL_STR(selection_detector.detect(image), i == selected_berry, "selection detector : berry slot " + std::to_string(i));
 
             OCR::StringMatchResult results = reader.read_berry_page_with_ocr(image, global_logger_command_line(), language, i);
             if (results.results.empty()){
                 return "No berry detected via OCR";
             }
-            TEST_RESULT_COMPONENT_EQUAL(results.results.begin()->second.token, target_berries[i], "ocr : berry slot " + std::to_string(i));
+            TEST_RESULT_COMPONENT_EQUAL_STR(results.results.begin()->second.token, target_berries[i], "ocr : berry slot " + std::to_string(i));
         }
 
         return true;
