@@ -291,7 +291,7 @@ void StatsReader::read_nature(
     );
 
     OCR::StringMatchResult nature_result = reader.match_substring_from_image(
-        nullptr, language, nature_ready,
+        &logger, language, nature_ready,
         Pokemon::NatureReader::MAX_LOG10P,
         Pokemon::NatureReader::MAX_LOG10P_SPREAD,
         OCR::PageSegMode::SINGLE_LINE);
