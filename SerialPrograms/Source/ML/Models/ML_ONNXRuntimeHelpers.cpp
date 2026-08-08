@@ -50,14 +50,19 @@ if (use_gpu){
 #if __APPLE__
     // create session using Apple ML acceleration library CoreML
     std::unordered_map<std::string, std::string> provider_options;
-    // See for provider options: https://onnxruntime.ai/docs/execution-providers/CoreML-ExecutionProvider.html
-    // "NeuralNetwork" is a faster ModelFormat than "MLProgram".
-    provider_options["ModelFormat"] = std::string("NeuralNetwork");
+
+    // 1. MLProgram format to support dynamic layouts natively
+    provider_options["ModelFormat"] = std::string("MLProgram");
     provider_options["ModelCacheDirectory"] = model_cache_path;
 
-    // provider_options["MLComputeUnits"] = "ALL";
-    // provider_options["RequireStaticInputShapes"] = "0";
-    // provider_options["EnableOnSubgraphs"] = "0";
+    // 2. Explicitly bind processing to the GPU and Neural Engine hardware
+    provider_options["MLComputeUnits"] = "ALL";
+
+    // 3. Force the provider to accept varying sequence widths
+    provider_options["RequireStaticInputShapes"] = "0";
+    provider_options["EnableOnSubgraphs"] = "0";
+
+
     so.AppendExecutionProvider("CoreML", provider_options);
     std::cout << "Using CoreML execution provider for GPU acceleration" << std::endl;
 #elif _WIN32
