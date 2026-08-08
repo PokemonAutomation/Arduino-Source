@@ -181,6 +181,10 @@ inline void rename(const Path& old_path, const Path& new_path, std::error_code& 
     std::filesystem::rename(old_path.stdpath(), new_path.stdpath(), ec);
 }
 
+inline Path current_path(){
+    return std::filesystem::current_path();
+}
+
 
 
 }
