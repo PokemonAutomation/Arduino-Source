@@ -47,14 +47,14 @@ bool ImageViewRGB32::save(const std::string& path) const{
         return false;
     }
 
+#ifdef PA_IMAGE_BACKEND_None
+    return false;
+#endif
 #ifdef PA_IMAGE_BACKEND_Qt
     return QImage_save_image(*this, path);
 #endif
 #ifdef PA_IMAGE_BACKEND_OpenCV
     return OpenCV_save_image(*this, path);
-#endif
-#ifdef PA_IMAGE_BACKEND_None
-    return false;
 #endif
 
 }

@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/Containers/Pimpl.tpp"
-#include "CommonTools/Async/InterruptableCommands.tpp"
 #include "ControllerInput/ControllerInput.h"
 #include "ControllerInput/Keyboard/KeyboardInput_State.h"
 #include "Controllers/ControllerState.h"
@@ -16,10 +15,6 @@
 //using std::endl;
 
 namespace PokemonAutomation{
-
-//  Instantiate some template helper classes.
-template class AsyncCommandSession<StandardHid::Keyboard>;
-
 namespace StandardHid{
 
 using namespace std::chrono_literals;
