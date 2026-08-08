@@ -79,32 +79,26 @@
       "name": "default",
       "hidden": true,
       "configurePreset": "default",
-      "buildArgs": ["--", "-lowpriority"]
     },
     {
       "name": "Debug",
       "configurePreset": "Debug",
-      "buildArgs": ["--", "-lowpriority"]
     },
     {
       "name": "Release",
       "configurePreset": "Release",
-      "buildArgs": ["--", "-lowpriority"]
     },
     {
       "name": "RelWithDebInfo",
       "configurePreset": "RelWithDebInfo",
-      "buildArgs": ["--", "-lowpriority"]
     },
     {
       "name": "MinSizeRel",
       "configurePreset": "MinSizeRel",
-      "buildArgs": ["--", "-lowpriority"]
     },
     {
       "name": "Publish",
       "configurePreset": "Publish",
-      "buildArgs": ["--", "-lowpriority"]
     }
   ]
 }
