@@ -233,7 +233,7 @@ void StatsReader::read_level(
                 logger, level_digit_view, 230.0, DigitTemplateType::LevelBox,
                 "levelDigit", 0x7F);
         // log if it's an obviously bad read
-        if (!stats.level.has_value() || stats.level < 2 || stats.level > 100){
+        if (!stats.level.has_value() || stats.level.value_or(-1) < 2 || stats.level.value_or(-1) > 100){
             logger.log("Level OCR result out of range", COLOR_RED);
             if (save_debug_images){
                 frame.save("DebugDumps/ocr_level_failed_frame.png");
@@ -270,7 +270,7 @@ void StatsReader::read_level(
         // Pass the binarized image to PaddleOCR
         stats.level = OCR::read_number(logger, level_ready, language);
         // log if it's an obviously bad read
-        if (!stats.level.has_value() || stats.level < 2 || stats.level > 100){
+        if (!stats.level.has_value() || stats.level.value_or(-1) < 2 || stats.level.value_or(-1) > 100){
             logger.log("Level OCR result out of range", COLOR_RED);
             if (save_debug_images){
                 frame.save("DebugDumps/ocr_level_failed_frame.png");
