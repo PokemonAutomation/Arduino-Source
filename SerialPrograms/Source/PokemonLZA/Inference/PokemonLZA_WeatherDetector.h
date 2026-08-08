@@ -8,11 +8,9 @@
 #define PokemonAutomation_PokemonLZA_WeatherDetector_H
 
 #include <optional>
-#include "Common/Cpp/Color.h"
-#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/VisualDetector.h"
-#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {
@@ -29,23 +27,6 @@ enum class WeatherIconType {
     Unknown,
 };
 
-
-//-----------------------------------------------------
-//  Template Info Struct
-//-----------------------------------------------------
-struct WeatherTemplateInfo{
-    const char* path1;          // template for box1
-    const char* path2;          // template for box2
-    ImageFloatBox box1;
-    ImageFloatBox box2;
-    Color color1;
-    Color color2;
-};
-
-
-const WeatherTemplateInfo& weather_template_info(WeatherIconType icon);
-
-
 //-----------------------------------------------------
 //  Detector
 //-----------------------------------------------------
@@ -58,11 +39,13 @@ public:
     virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
-    const WeatherTemplateInfo* m_info;
+    WeatherIconType m_type;
 
     std::optional<OverlayBoxScope> m_overlay1;
-    std::optional<OverlayBoxScope> m_overlay2;
 };
+
+
+void add_tests_WeatherDetector(UnitTestDatabase& database);
 
 
 }
