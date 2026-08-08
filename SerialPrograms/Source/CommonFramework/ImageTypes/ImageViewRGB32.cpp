@@ -52,7 +52,8 @@ bool ImageViewRGB32::save(const std::string& path) const{
 #endif
 #ifdef PA_IMAGE_BACKEND_OpenCV
     return OpenCV_save_image(*this, path);
-#else
+#endif
+#ifdef PA_IMAGE_BACKEND_None
     return false;
 #endif
 
