@@ -74,9 +74,8 @@ void StatsReader::make_overlays(VideoOverlaySet &items) const {
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_speed_jpn));
 }
 
-void StatsReader::read_name(
+bool StatsReader::read_name(
     Logger& logger, Language language,
-    const ImageViewRGB32& frame,
     const ImageViewRGB32& game_screen,
     PokemonFRLG_Stats& stats,
     const std::set<std::string>& subset,
@@ -137,18 +136,17 @@ void StatsReader::read_name(
     }
     if (initialized && !best_result.results.empty()){
         stats.name = best_result.results.begin()->second.token;
-    }else{
-        logger.log("Failed to read species name.", COLOR_RED);
-        if (save_debug_images){
-            frame.save("DebugDumps/ocr_name_failed_frame.png");
-            name_box.save("DebugDumps/ocr_name_box.png");
-        }
+        return true;
     }
+    logger.log("Failed to read species name.", COLOR_RED);
+    if (save_debug_images){
+        name_box.save("DebugDumps/ocr_name_box.png");
+    }
+    return false;
 }
 
 void StatsReader::read_gender(
     Logger& logger, Language language,
-    const ImageViewRGB32& frame,
     const ImageViewRGB32& game_screen,
     PokemonFRLG_Stats& stats,
     const std::set<std::string>& subset
@@ -185,9 +183,8 @@ void StatsReader::read_gender(
     }
 }
 
-void StatsReader::read_level(
+bool StatsReader::read_level(
     Logger& logger, Language language,
-    const ImageViewRGB32& frame,
     const ImageViewRGB32& game_screen,
     PokemonFRLG_Stats& stats,
     const std::set<std::string>& subset,
@@ -196,94 +193,89 @@ void StatsReader::read_level(
     const bool jpn = language == Language::Japanese;
 
     ImageViewRGB32 level_box = extract_box_reference(game_screen, jpn ? m_box_level_jpn : m_box_level);
-
-    if (GlobalSettings::instance().OCR_LIBRARY != OcrLibrary::PADDLE_OCR){
-        // The level uses white text with dark shadow on a lilac background.
-        // The digit reader's binarizer captures dark pixels (<=190 on all channels)
-        // but NOT the white text (all channels 255 -> excluded). This leaves the
-        // shadow outline fragmented into many small disconnected blobs.
-        // Preprocess: convert bright-white text pixels to black so the binarizer
-        // merges text + shadow into one solid connected blob per digit.
-        ImageRGB32 preprocessed = level_box.scale_to(level_box.width(), level_box.height());
-        for (size_t r = 0; r < level_box.height(); r++){
-            for (size_t c = 0; c < level_box.width(); c++){
-                Color pixel(level_box.pixel(c, r));
-                // Try to detect lilac background first based on low green channel, 
-                // replacing it with a darker lilac color (for matching the template)
-                // For other pixels, if it's bright it becomes black text. 
-                if ((pixel.blue() > pixel.green() + 25) && (pixel.red() > pixel.green() + 15)){
-                    preprocessed.pixel(c, r) = (uint32_t)0xffd1b0f0; // from template
-                }else if (pixel.red() > 200 && pixel.green() > 200 && pixel.blue() > 200){
-                    preprocessed.pixel(c, r) = (uint32_t)0xff000000; // Black
-                }
-            }
-        }
-        // Trim left 7% to exclude the "L" glyph blob (always at x~0).
-        // The actual level digits start at ~13%+ of the box width.
-        size_t lv_skip = preprocessed.width() * 7 / 100;
-        ImagePixelBox digits_bbox(
-            lv_skip, 0, preprocessed.width(),
-            preprocessed.height()
-        );
-        ImageViewRGB32 level_digit_view =
-                extract_box_reference(preprocessed, digits_bbox);
-        // Use threshold 230 (not 175): lilac-background blob crops inherently
-        // give higher RMSD than yellow stat-box crops due to background colour.
-        stats.level = read_digits_waterfill_template(
-                logger, level_digit_view, 230.0, DigitTemplateType::LevelBox,
-                "levelDigit", 0x7F);
-        // log if it's an obviously bad read
-        if (!stats.level.has_value() || stats.level.value_or(-1) < 2 || stats.level.value_or(-1) > 100){
-            logger.log("Level OCR result out of range", COLOR_RED);
-            if (save_debug_images){
-                frame.save("DebugDumps/ocr_level_failed_frame.png");
-                preprocessed.save("DebugDumps/ocr_level_preprocessed.png");
-                level_digit_view.save("DebugDumps/ocr_level_digits_trimmed.png");
-            }
-        }
-    }else{
-        // The level has a colored (lilac) background. The text is white, with a
-        // gray/black shadow. To bridge the gaps and make a solid black character on a
-        // white background: We want to turn BOTH the bright white text AND the dark
-        // shadow into BLACK pixels, and turn the mid-tone lilac background into
-        // WHITE. We can do this by keeping pixels that are very bright (text) or very
-        // dark (shadow).
-        ImageRGB32 level_upscaled =
-            level_box.scale_to(level_box.width() * 4, level_box.height() * 4);
-        ImageRGB32 level_ready(level_upscaled.width(), level_upscaled.height());
-        for (size_t r = 0; r < level_upscaled.height(); r++){
-            for (size_t c = 0; c < level_upscaled.width(); c++){
-                Color pixel(level_upscaled.pixel(c, r));
-                // Try to detect lilac background first based on low green channel.
-                // For other pixels, if it's very bright (white text) OR very dark (shadow),
-                // it becomes black text. Otherwise, it becomes white background.
-                if ((pixel.blue() > pixel.green() + 25) && (pixel.red() > pixel.green() + 15)){
-                    level_ready.pixel(c, r) = (uint32_t)0xffffffff; // White
-                }else if ((pixel.red() > 200 && pixel.green() > 200 && pixel.blue() > 200) ||
-                        (pixel.red() < 100 && pixel.green() < 100 && pixel.blue() < 100)){
-                    level_ready.pixel(c, r) = (uint32_t)0xff000000; // Black
-                }else{
-                    level_ready.pixel(c, r) = (uint32_t)0xffffffff; // White
-                }
-            }
-        }
-        // Pass the binarized image to PaddleOCR
-        stats.level = OCR::read_number(logger, level_ready, language);
-        // log if it's an obviously bad read
-        if (!stats.level.has_value() || stats.level.value_or(-1) < 2 || stats.level.value_or(-1) > 100){
-            logger.log("Level OCR result out of range", COLOR_RED);
-            if (save_debug_images){
-                frame.save("DebugDumps/ocr_level_failed_frame.png");
-                level_upscaled.save("DebugDumps/ocr_level_upscaled.png");
-                level_ready.save("DebugDumps/ocr_level_ready.png");
+    
+    // The level uses white text with dark shadow on a lilac background.
+    // The digit reader's binarizer captures dark pixels (<=190 on all channels)
+    // but NOT the white text (all channels 255 -> excluded). This leaves the
+    // shadow outline fragmented into many small disconnected blobs.
+    // Preprocess: convert bright-white text pixels to black so the binarizer
+    // merges text + shadow into one solid connected blob per digit.
+    ImageRGB32 preprocessed = level_box.scale_to(level_box.width(), level_box.height());
+    for (size_t r = 0; r < level_box.height(); r++){
+        for (size_t c = 0; c < level_box.width(); c++){
+            Color pixel(level_box.pixel(c, r));
+            // Try to detect lilac background first based on low green channel, 
+            // replacing it with a darker lilac color (for matching the template)
+            // For other pixels, if it's bright it becomes black text. 
+            if ((pixel.blue() > pixel.green() + 25) && (pixel.red() > pixel.green() + 15)){
+                preprocessed.pixel(c, r) = (uint32_t)0xffd1b0f0; // from template
+            }else if (pixel.red() > 200 && pixel.green() > 200 && pixel.blue() > 200){
+                preprocessed.pixel(c, r) = (uint32_t)0xff000000; // Black
             }
         }
     }
+    // Trim left 7% to exclude the "L" glyph blob (always at x~0).
+    // The actual level digits start at ~13%+ of the box width.
+    size_t lv_skip = preprocessed.width() * 7 / 100;
+    ImagePixelBox digits_bbox(
+        lv_skip, 0, preprocessed.width(),
+        preprocessed.height()
+    );
+    ImageViewRGB32 level_digit_view =
+            extract_box_reference(preprocessed, digits_bbox);
+    // Use threshold 230 (not 175): lilac-background blob crops inherently
+    // give higher RMSD than yellow stat-box crops due to background colour.
+    stats.level = read_digits_waterfill_template(
+            logger, level_digit_view, 230.0, DigitTemplateType::LevelBox,
+            "levelDigit", 0x7F);
+    // log if it's an obviously bad read
+    if (!stats.level.has_value() || stats.level.value_or(-1) < 2 || stats.level.value_or(-1) > 100){
+        logger.log("Level OCR result out of range", COLOR_RED);
+        if (save_debug_images){
+            preprocessed.save("DebugDumps/ocr_level_preprocessed.png");
+            level_digit_view.save("DebugDumps/ocr_level_digits_trimmed.png");
+        }
+        return false;
+    }
+    return true;
+
+    //  Old approach: PaddleOCR
+
+    // ImageRGB32 level_upscaled =
+    //     level_box.scale_to(level_box.width() * 4, level_box.height() * 4);
+    // ImageRGB32 level_ready(level_upscaled.width(), level_upscaled.height());
+    // for (size_t r = 0; r < level_upscaled.height(); r++){
+    //     for (size_t c = 0; c < level_upscaled.width(); c++){
+    //         Color pixel(level_upscaled.pixel(c, r));
+    //         // Try to detect lilac background first based on low green channel.
+    //         // For other pixels, if it's very bright (white text) OR very dark (shadow),
+    //         // it becomes black text. Otherwise, it becomes white background.
+    //         if ((pixel.blue() > pixel.green() + 25) && (pixel.red() > pixel.green() + 15)){
+    //             level_ready.pixel(c, r) = (uint32_t)0xffffffff; // White
+    //         }else if ((pixel.red() > 200 && pixel.green() > 200 && pixel.blue() > 200) ||
+    //                 (pixel.red() < 100 && pixel.green() < 100 && pixel.blue() < 100)){
+    //             level_ready.pixel(c, r) = (uint32_t)0xff000000; // Black
+    //         }else{
+    //             level_ready.pixel(c, r) = (uint32_t)0xffffffff; // White
+    //         }
+    //     }
+    // }
+    // // Pass the binarized image to PaddleOCR
+    // stats.level = OCR::read_number(logger, level_ready, language);
+    // // log if it's an obviously bad read
+    // if (!stats.level.has_value() || stats.level.value_or(-1) < 2 || stats.level.value_or(-1) > 100){
+    //     logger.log("Level OCR result out of range", COLOR_RED);
+    //     if (save_debug_images){
+    //         level_upscaled.save("DebugDumps/ocr_level_upscaled.png");
+    //         level_ready.save("DebugDumps/ocr_level_ready.png");
+    //     }
+    //     return false;
+    // }
+    // return true;
 }
 
-void StatsReader::read_nature(
+bool StatsReader::read_nature(
     Logger& logger, Language language,
-    const ImageViewRGB32& frame,
     const ImageViewRGB32& game_screen,
     PokemonFRLG_Stats& stats,
     const std::set<std::string>& subset,
@@ -309,14 +301,14 @@ void StatsReader::read_nature(
     if (!nature_result.results.empty()){
         nature_result.log(logger, Pokemon::NatureReader::MAX_LOG10P, "Nature Final");
         stats.nature = nature_result.results.begin()->second.token;
-    }else{
-        logger.log("Unable to detect Nature.", COLOR_RED);
-        if (save_debug_images){
-            frame.save("DebugDumps/ocr_nature_failed_frame.png");
-            nature_raw.save("DebugDumps/ocr_nature_failed_raw.png");
-            nature_ready.save("DebugDumps/ocr_nature_failed.png");
-        }
+        return true;
     }
+    logger.log("Unable to detect Nature.", COLOR_RED);
+    if (save_debug_images){
+        nature_raw.save("DebugDumps/ocr_nature_failed_raw.png");
+        nature_ready.save("DebugDumps/ocr_nature_failed_ready.png");
+    }
+    return false;
 }
 
 void StatsReader::read_page1(
@@ -329,13 +321,15 @@ void StatsReader::read_page1(
     ImageViewRGB32 game_screen =
             extract_box_reference(frame, GameSettings::instance().GAME_BOX);
 
-    read_name(logger, language, frame, game_screen, stats, subset, save_debug_images);
+    bool success = read_name(logger, language, game_screen, stats, subset, save_debug_images)
+                && read_level(logger, language, game_screen, stats, subset, save_debug_images)
+                && read_nature(logger, language, game_screen, stats, subset, save_debug_images);
 
-    read_gender(logger, language, frame, game_screen, stats, subset);
+    read_gender(logger, language, game_screen, stats, subset);
 
-    read_level(logger, language, frame, game_screen, stats, subset, save_debug_images);
-
-    read_nature(logger, language, frame, game_screen, stats, subset, save_debug_images);
+    if (!success && save_debug_images){
+        frame.save("DebugDumps/ocr_page1_failed_frame.png");
+    }
 }
 
 void StatsReader::read_page2(
@@ -347,44 +341,51 @@ void StatsReader::read_page2(
     ImageViewRGB32 game_screen =
             extract_box_reference(frame, GameSettings::instance().GAME_BOX);
 
-    auto read_stat = [&](const ImageFloatBox& box, const std::string& name){
+    auto read_stat = [&](const ImageFloatBox& box, const std::string& name, bool& failed){
         ImageViewRGB32 stat_region = extract_box_reference(game_screen, box);
 
-        if (GlobalSettings::instance().OCR_LIBRARY != OcrLibrary::PADDLE_OCR){
-            // Tesseract-free path: waterfill segmentation + template matching
-            // against the PokemonFRLG/Digits/0-9.png templates.
-            return read_digits_waterfill_template(logger, stat_region);
-        }
-
-        // PaddleOCR path (original): preprocess then per-digit waterfill OCR.
-        // Dark text [0..190] -> black. Threshold at 190 captures the
-        // blurred gap pixels between segments, making bridges thicker.
-        // Not higher than 190 to avoid capturing yellow bg edge noise.
-        ImageRGB32 ocr_ready = preprocess_for_ocr(
-            stat_region, name, 7, 2, true,
-            combine_rgb(0, 0, 0), combine_rgb(190, 190, 190)
-        );
-
-        // Waterfill isolates each digit -> per-char SINGLE_CHAR OCR.
-        int stat = OCR::read_number_waterfill(
-            logger, ocr_ready, 0xff000000,
-            0xff808080
-        );
+        // waterfill segmentation + template matching against the PokemonFRLG/Digits/0-9.png templates.
+        int stat = read_digits_waterfill_template(logger, stat_region);
         // log impossible values or failed reads
-        if (stat < 1 || stat > 614){ // 614 comes from a max Def Shuckle
+        if (name != "hp" && (stat < 1 || stat > 614)){ // 614 comes from a max Def Shuckle
             logger.log("OCR result for " + name + " out of range: " + std::to_string(stat), COLOR_RED);
             if (GlobalSettings::instance().SAVE_DEBUG_IMAGES){
-                frame.save("DebugDumps/ocr_" + name + "_failed_frame.png");
-                stat_region.save("DebugDumps/ocr_" + name + "_failed_region.png");
-                ocr_ready.save("DebugDumps/ocr_" + name + "_failed_ready.png");
+                stat_region.save("DebugDumps/ocr_" + name + "_failed_raw.png");
             }
+            failed = true;
         }
         return stat;
+
+
+        // // PaddleOCR path (original): preprocess then per-digit waterfill OCR.
+        // // Dark text [0..190] -> black. Threshold at 190 captures the
+        // // blurred gap pixels between segments, making bridges thicker.
+        // // Not higher than 190 to avoid capturing yellow bg edge noise.
+        // ImageRGB32 ocr_ready = preprocess_for_ocr(
+        //     stat_region, name, 7, 2, true,
+        //     combine_rgb(0, 0, 0), combine_rgb(190, 190, 190)
+        // );
+
+        // // Waterfill isolates each digit -> per-char SINGLE_CHAR OCR.
+        // int stat = OCR::read_number_waterfill(
+        //     logger, ocr_ready, 0xff000000,
+        //     0xff808080
+        // );
+        // // log impossible values or failed reads
+        // if (name != "hp" && (stat < 1 || stat > 614)){ // 614 comes from a max Def Shuckle
+        //     logger.log("OCR result for " + name + " out of range: " + std::to_string(stat), COLOR_RED);
+        //     if (GlobalSettings::instance().SAVE_DEBUG_IMAGES){
+        //         stat_region.save("DebugDumps/ocr_" + name + "_failed_raw.png");
+        //         ocr_ready.save("DebugDumps/ocr_" + name + "_failed_ready.png");
+        //     }
+        //     failed = true;
+        // }
+        // return stat;
     };
 
-    auto read_hp = [&](const ImageFloatBox& box){
+    auto read_hp = [&](const ImageFloatBox& box, bool& failed){
         // this captures the current HP, "/", and total HP
-        int res = read_stat(box, "hp");
+        int res = read_stat(box, "hp", failed);
 
         // check for wrong numbers of digits to remove the "/"
         // since hp will always be a 2 or 3 digit number.
@@ -410,10 +411,10 @@ void StatsReader::read_page2(
         if (res < 1 || res > 714){ // 714 comes from a max HP Blissey
             logger.log("OCR result for HP out of range: " + std::to_string(res), COLOR_RED);
             if (GlobalSettings::instance().SAVE_DEBUG_IMAGES){
-                frame.save("DebugDumps/ocr_hp_failed_frame.png");
                 ImageViewRGB32 stat_region = extract_box_reference(game_screen, box);
-                stat_region.save("DebugDumps/ocr_hp_failed_region.png");
+                stat_region.save("DebugDumps/ocr_hp_failed_raw.png");
             }
+            failed = true;
         }
         return res;
     };
@@ -424,12 +425,17 @@ void StatsReader::read_page2(
         }
     };
 
-    assign_stat(stats.hp, read_hp(jpn ? m_box_hp_jpn : m_box_hp));
-    assign_stat(stats.attack, read_stat(jpn ? m_box_attack_jpn : m_box_attack, "attack"));
-    assign_stat(stats.defense, read_stat(jpn ? m_box_defense_jpn : m_box_defense, "defense"));
-    assign_stat(stats.sp_attack, read_stat(jpn ? m_box_sp_attack_jpn : m_box_sp_attack, "spatk"));
-    assign_stat(stats.sp_defense, read_stat(jpn ? m_box_sp_defense_jpn : m_box_sp_defense, "spdef"));
-    assign_stat(stats.speed, read_stat(jpn ? m_box_speed_jpn : m_box_speed, "speed"));
+    bool failed = false;
+    assign_stat(stats.hp, read_hp(jpn ? m_box_hp_jpn : m_box_hp, failed));
+    assign_stat(stats.attack, read_stat(jpn ? m_box_attack_jpn : m_box_attack, "attack", failed));
+    assign_stat(stats.defense, read_stat(jpn ? m_box_defense_jpn : m_box_defense, "defense", failed));
+    assign_stat(stats.sp_attack, read_stat(jpn ? m_box_sp_attack_jpn : m_box_sp_attack, "spatk", failed));
+    assign_stat(stats.sp_defense, read_stat(jpn ? m_box_sp_defense_jpn : m_box_sp_defense, "spdef", failed));
+    assign_stat(stats.speed, read_stat(jpn ? m_box_speed_jpn : m_box_speed, "speed", failed));
+
+    if (failed && GlobalSettings::instance().SAVE_DEBUG_IMAGES){
+        frame.save("DebugDumps/ocr_page2_failed_frame.png");
+    }
 }
 
 } // namespace PokemonFRLG

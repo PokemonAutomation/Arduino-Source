@@ -85,36 +85,33 @@ private:
     ImageFloatBox m_box_sp_defense_jpn;
     ImageFloatBox m_box_speed_jpn;
 
+    // return false if the read failed
 
-    void read_name(
+    bool read_name(
         Logger& logger, Language language,
-        const ImageViewRGB32& frame,
         const ImageViewRGB32& game_screen,
         PokemonFRLG_Stats& stats,
         const std::set<std::string>& subset,
         bool save_debug_images
     );
 
-    void read_gender(
+    void read_gender( // there are no checks that indicate failure
         Logger& logger, Language language,
-        const ImageViewRGB32& frame,
         const ImageViewRGB32& game_screen,
         PokemonFRLG_Stats& stats,
         const std::set<std::string>& subset
     );
 
-    void read_level(
+    bool read_level(
         Logger& logger, Language language,
-        const ImageViewRGB32& frame,
         const ImageViewRGB32& game_screen,
         PokemonFRLG_Stats& stats,
         const std::set<std::string>& subset,
         bool save_debug_images
     );
 
-    void read_nature(
+    bool read_nature(
         Logger& logger, Language language,
-        const ImageViewRGB32& frame,
         const ImageViewRGB32& game_screen,
         PokemonFRLG_Stats& stats,
         const std::set<std::string>& subset,
