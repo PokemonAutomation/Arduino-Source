@@ -203,7 +203,8 @@ int read_digits_waterfill_template(
     double rmsd_threshold,
     DigitTemplateType template_type,
     const std::string& dump_prefix,
-    uint8_t binarize_high
+    uint8_t binarize_high,
+    bool save_debug_images
 ){
     using namespace Kernels::Waterfill;
 
@@ -305,7 +306,7 @@ int read_digits_waterfill_template(
             ImagePixelBox bbox(min_x, obj.min_y, max_x, obj.max_y);
             ImageViewRGB32 crop = extract_box_reference(stat_region, bbox);
 
-            if (dump_prefix == "levelDigit"){
+            if (save_debug_images && dump_prefix == "levelDigit"){
                 crop.save("DebugDumps/" + dump_prefix + "_x" + std::to_string(min_x) + "_split_raw.png");
             }
 
@@ -327,9 +328,11 @@ int read_digits_waterfill_template(
 
             if (best_rmsd > rmsd_threshold){
                 // Always save the raw crop for user inspection / template extraction.
-                crop.save(
-                    "DebugDumps/" + dump_prefix + "_x" + std::to_string(min_x) + "_raw.png"
-                );
+                if (save_debug_images){
+                    crop.save(
+                        "DebugDumps/" + dump_prefix + "_x" + std::to_string(min_x) + "_raw.png"
+                    );
+                }
                 logger.log(
                     "DigitReader: blob at x=" + std::to_string(min_x) +
                     " skipped (best RMSD=" + std::to_string(best_rmsd) +
@@ -345,10 +348,12 @@ int read_digits_waterfill_template(
                 " (RMSD=" + std::to_string(best_rmsd) + ")"
             );
             // Save crop with prefix so level and stat crops are distinguishable.
-            crop.save(
-                "DebugDumps/" + dump_prefix + "_x" + std::to_string(min_x) +
-                "_match" + std::to_string(best_digit) + ".png"
-            );
+            if (save_debug_images){
+                crop.save(
+                    "DebugDumps/" + dump_prefix + "_x" + std::to_string(min_x) +
+                    "_match" + std::to_string(best_digit) + ".png"
+                );
+            }
             result_str += static_cast<char>('0' + best_digit);
         }
     }
