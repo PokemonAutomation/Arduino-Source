@@ -194,22 +194,6 @@ void ConsoleSettings::load_json(const JsonValue& json){
 }
 
 
-ConsoleSettings_Descriptor::ConsoleSettings_Descriptor()
-    : PanelDescriptor(
-        Color(),
-        "NintendoSwitch:GlobalSettings",
-        "Nintendo Switch", "Framework Settings",
-        "Programs/NintendoSwitch/FrameworkSettings.html",
-        "Switch Framework Settings"
-    )
-{}
-
-ConsoleSettingsPanel::ConsoleSettingsPanel(const ConsoleSettings_Descriptor& descriptor)
-    : SettingsPanelInstance(descriptor)
-    , settings(ConsoleSettings::instance())
-{
-    PA_ADD_OPTION(settings);
-}
 
 
 

@@ -10,7 +10,7 @@
 #include "CommonFramework/Logging/Logger.h"
 //#include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Panels/PanelTools.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/NintendoSwitch_SettingsPanel.h"
 #include "NintendoSwitch_ControllerSettings.h"
 
 //#include <iostream>

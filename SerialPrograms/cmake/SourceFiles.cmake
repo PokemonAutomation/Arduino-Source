@@ -1229,6 +1229,8 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/NintendoSwitch_Panels.h
     Source/NintendoSwitch/NintendoSwitch_Settings.cpp
     Source/NintendoSwitch/NintendoSwitch_Settings.h
+    Source/NintendoSwitch/NintendoSwitch_SettingsPanel.cpp
+    Source/NintendoSwitch/NintendoSwitch_SettingsPanel.h
     Source/NintendoSwitch/NintendoSwitch_SingleSwitchProgram.cpp
     Source/NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h
     Source/NintendoSwitch/Options/NintendoSwitch_CodeEntrySettingsOption.cpp
