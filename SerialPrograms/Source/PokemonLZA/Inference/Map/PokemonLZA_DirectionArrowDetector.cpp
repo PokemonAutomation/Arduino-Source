@@ -7,6 +7,7 @@
 #include "PokemonLZA_DirectionArrowDetector.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 //#include "Tests/TestUtils.h"
 #include <opencv2/opencv.hpp>
@@ -43,7 +44,7 @@ bool DirectionArrowDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 image_crop = extract_box_reference(screen, m_search_box);
 
     // Convert to OpenCV Mat (BGRA format)
-    cv::Mat image = image_crop.to_opencv_Mat();
+    cv::Mat image = to_OpenCV_ref(image_crop);
     if (image.empty()){
         return false;
     }

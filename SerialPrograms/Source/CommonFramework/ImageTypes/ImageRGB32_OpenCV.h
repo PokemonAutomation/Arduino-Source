@@ -13,6 +13,7 @@
 namespace PokemonAutomation{
 
 
+cv::Mat to_OpenCV_ref(const ImageViewRGB32& image);
 ImageRGB32 OpenCV_scale_image(const ImageViewRGB32& image, size_t width, size_t height);
 
 ImageRGB32 OpenCV_load_image(const std::string& filename);

@@ -7,12 +7,11 @@
 
 #include <iostream>
 #include <fstream>
-#include <numeric>
 #include <limits>
-#include "CommonFramework/Globals.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
 #include "ML/Models/ML_ONNXRuntimeHelpers.h"
 #include "ML_PaddleOCRPipeline.h"
 
@@ -358,7 +357,7 @@ _Tp safe_convert(size_t value){
 // Convert ImageViewRGB32 (ARGB) to CV Mat (RGB). Create a new copy of the image.
 cv::Mat imageviewrgb32_to_cv_mat_rgb(const ImageViewRGB32& image){
     // 1. Wrap the existing 4-channel data without copying memory
-    cv::Mat bgra_wrap = image.to_opencv_Mat();
+    cv::Mat bgra_wrap = to_OpenCV_ref(image);
 
     // 2. Convert and copy to a new 3-channel RGB Mat
     cv::Mat rgb;

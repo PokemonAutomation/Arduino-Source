@@ -4,22 +4,17 @@
  *
  */
 
-
+#include "CompileTimeBackends.h"
 #include "Common/Cpp/Filesystem.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "ImageRGB32.h"
 #include "ImageViewRGB32.h"
 
-//#define PA_IMAGE_BACKEND_Qt
-#define PA_IMAGE_BACKEND_OpenCV
-
-#if 0
-#elif defined PA_IMAGE_BACKEND_Qt
+#ifdef PA_IMAGE_BACKEND_Qt
 #include "ImageRGB32_Qt.h"
-#elif defined PA_IMAGE_BACKEND_OpenCV
+#endif
+#ifdef PA_IMAGE_BACKEND_OpenCV
 #include "ImageRGB32_OpenCV.h"
-#else
-#error "No image backend specified."
 #endif
 
 //#include <iostream>
@@ -73,17 +68,6 @@ ImageRGB32 ImageViewRGB32::scale_to(size_t width, size_t height) const{
 }
 #endif
 
-
-
-cv::Mat ImageViewRGB32::to_opencv_Mat() const{
-    return cv::Mat{
-        static_cast<int>(m_height),
-        static_cast<int>(m_width),
-        CV_8UC4,
-        (cv::Scalar*)m_ptr,
-        m_bytes_per_row
-    };
-}
 
 
 

@@ -51,10 +51,6 @@ public:
     bool save(const std::string& path) const;
     ImageRGB32 scale_to(size_t width, size_t height) const;
 
-public:
-    // convert to cv::Mat with BGRA color channel order
-    cv::Mat to_opencv_Mat() const;
-
 private:
     PA_FORCE_INLINE ImageViewRGB32(const ImageViewPlanar32& x)
         : ImageViewPlanar32(x)

@@ -17,6 +17,15 @@ namespace PokemonAutomation{
 
 
 
+cv::Mat to_OpenCV_ref(const ImageViewRGB32& image){
+    return cv::Mat(
+        (int)image.height(),
+        (int)image.width(),
+        CV_8UC4,
+        (uint8_t*)image.data(),
+        image.bytes_per_row()
+    );
+}
 ImageRGB32 OpenCV_scale_image(const ImageViewRGB32& image, size_t width, size_t height){
     ImageRGB32 ret(width, height);
 

@@ -5,20 +5,16 @@
  */
 
 #include <utility>
+#include "CompileTimeBackends.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "ImageViewRGB32.h"
 #include "ImageRGB32.h"
 
-//#define PA_IMAGE_BACKEND_Qt
-#define PA_IMAGE_BACKEND_OpenCV
-
-#if 0
-#elif defined PA_IMAGE_BACKEND_Qt
+#ifdef PA_IMAGE_BACKEND_Qt
 #include "ImageRGB32_Qt.h"
-#elif defined PA_IMAGE_BACKEND_OpenCV
+#endif
+#ifdef PA_IMAGE_BACKEND_OpenCV
 #include "ImageRGB32_OpenCV.h"
-#else
-#error "No image backend specified."
 #endif
 
 namespace PokemonAutomation{

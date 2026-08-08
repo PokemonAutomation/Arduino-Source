@@ -18,6 +18,7 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
 #include "CommonTools/ImageMatch/ExactImageMatcher.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/Images/ImageFilter.h"
@@ -58,7 +59,7 @@ ImageRGB32 preprocess_for_ocr(
         image.save(prefix + "_0_raw.png");
     }
 
-    cv::Mat src = image.to_opencv_Mat();
+    cv::Mat src = to_OpenCV_ref(image);
 
     // Step 1: Gaussian blur at NATIVE resolution with 5x5 kernel.
     // The 5x5 kernel reaches 2 pixels away (vs 1px for 3x3), bridging
@@ -76,7 +77,7 @@ ImageRGB32 preprocess_for_ocr(
 
     // Save blurred at native res
     ImageRGB32 blurred_native_img(blurred_native.cols, blurred_native.rows);
-    blurred_native.copyTo(blurred_native_img.to_opencv_Mat());
+    blurred_native.copyTo(to_OpenCV_ref(blurred_native_img));
     if (save_debug_images){
         blurred_native_img.save(prefix + "_1_blurred_native.png");
     }
@@ -93,7 +94,7 @@ ImageRGB32 preprocess_for_ocr(
 
     // Save upscaled
     ImageRGB32 resized_img(resized.cols, resized.rows);
-    resized.copyTo(resized_img.to_opencv_Mat());
+    resized.copyTo(to_OpenCV_ref(resized_img));
     if (save_debug_images){
         resized_img.save(prefix + "_2_upscaled.png");
     }
@@ -110,7 +111,7 @@ ImageRGB32 preprocess_for_ocr(
     // binary image creates gray anti-aliased edges. Re-thresholding at 128
     // rounds the corners into natural smooth digit shapes that Tesseract
     // recognizes much better. This is equivalent to morphological closing.
-    cv::Mat bw_mat = bw.to_opencv_Mat();
+    cv::Mat bw_mat = to_OpenCV_ref(bw);
     cv::Mat smoothed;
     cv::GaussianBlur(bw_mat, smoothed, cv::Size(7, 7), 2.0);
 
@@ -119,7 +120,7 @@ ImageRGB32 preprocess_for_ocr(
     // light gray (~192-255), edge zones are mid-gray (~64-192).
     // Threshold at [0..128] captures text + expanded edges -> BLACK.
     ImageRGB32 smoothed_img(smoothed.cols, smoothed.rows);
-    smoothed.copyTo(smoothed_img.to_opencv_Mat());
+    smoothed.copyTo(to_OpenCV_ref(smoothed_img));
     ImageRGB32 smooth_bw = to_blackwhite_rgb32_range(
             smoothed_img, true, combine_rgb(0, 0, 0), combine_rgb(128, 128, 128));
     if (save_debug_images){
@@ -217,14 +218,14 @@ int read_digits_waterfill_template(
     //   A 5x5 kernel applied twice bridges those gaps so that waterfill
     //   sees each digit as a single connected component.
     // ------------------------------------------------------------------
-    cv::Mat src = stat_region.to_opencv_Mat();
+    cv::Mat src = to_OpenCV_ref(stat_region);
     cv::Mat blurred;
     src.copyTo(blurred);
     cv::GaussianBlur(blurred, blurred, cv::Size(5, 5), 1.5);
     cv::GaussianBlur(blurred, blurred, cv::Size(5, 5), 1.5);
 
     ImageRGB32 blurred_img(blurred.cols, blurred.rows);
-    blurred.copyTo(blurred_img.to_opencv_Mat());
+    blurred.copyTo(to_OpenCV_ref(blurred_img));
 
     // ------------------------------------------------------------------
     // Step 2: Binarise the blurred image.

@@ -1300,6 +1300,7 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboMacro.h
     Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.h
+    Source/CompileTimeBackends.h
     Source/PanelLists.cpp
     Source/PanelLists.h
     Source/Pokemon/Inference/Pokemon_BerryNameReader.cpp
