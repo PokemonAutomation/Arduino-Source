@@ -10,7 +10,6 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Options/Environment/SleepSuppressOption.h"
-#include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "Controllers/NullController.h"

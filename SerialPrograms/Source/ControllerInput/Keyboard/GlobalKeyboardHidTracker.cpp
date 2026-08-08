@@ -8,7 +8,6 @@
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "KeyboardInput_State.h"
 #include "KeyboardInput_KeyMappings.h"
@@ -115,8 +114,6 @@ KeyboardInputState KeyboardHidTracker::keys_to_state(const std::set<uint32_t>& p
 
 
 void KeyboardHidTracker::thread_loop(){
-    PerformanceOptions::instance().REALTIME_THREAD_PRIORITY.set_on_this_thread(m_logger);
-
     KeyboardInputState last;
     KeyboardInputState current;
 

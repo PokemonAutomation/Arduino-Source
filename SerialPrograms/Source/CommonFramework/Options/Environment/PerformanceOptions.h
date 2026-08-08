@@ -33,11 +33,12 @@ public:
     CoreAffinityOption CORE_AFFINITY;
 #endif
 
-    ThreadPriorityOption REALTIME_THREAD_PRIORITY;
-    ThreadPriorityOption INFERENCE_PIVOT_PRIORITY;
+    ThreadPriorityOption UI_THREAD_PRIORITY;
+    ThreadPriorityOption REALTIME_THREAD_PRIORITY0;
+    ThreadPriorityOption INFERENCE_PIVOT_PRIORITY0;
     ThreadPriorityOption COMPUTE_PRIORITY;
 
-    ThreadPoolOption REALTIME_THREAD_POOL;
+    ThreadPoolOption REALTIME_THREAD_POOL0;
     ThreadPoolOption NORMAL_THREAD_POOL;
 
     MicrosecondsOption PRECISE_WAKE_MARGIN;

@@ -13,7 +13,6 @@
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Options/Environment/SleepSuppressOption.h"
-#include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "Controllers/NullController.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_MultiSwitchProgramOption.h"

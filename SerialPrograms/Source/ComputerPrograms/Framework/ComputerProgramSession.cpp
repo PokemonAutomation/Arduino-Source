@@ -93,8 +93,7 @@ void ComputerProgramSession::internal_run_program(){
     if (!success){
         return;
     }
-        
-    PerformanceOptions::instance().REALTIME_THREAD_PRIORITY.set_on_this_thread(logger());
+
     m_option.options().reset_state();
 
     ProgramInfo program_info(

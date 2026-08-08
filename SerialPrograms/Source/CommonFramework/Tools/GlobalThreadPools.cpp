@@ -17,9 +17,9 @@ namespace GlobalThreadPools{
 ThreadPool& computation_realtime(){
     static ThreadPool_Default runner(
         [](){
-            PerformanceOptions::instance().REALTIME_THREAD_POOL.PRIORITY.set_on_this_thread(global_logger_tagged());
+            PerformanceOptions::instance().REALTIME_THREAD_POOL0.PRIORITY.set_on_this_thread(global_logger_tagged());
         },
-        0, PerformanceOptions::instance().REALTIME_THREAD_POOL.MAX_THREADS
+        0, PerformanceOptions::instance().REALTIME_THREAD_POOL0.MAX_THREADS
     );
     return runner;
 }
@@ -36,7 +36,7 @@ ThreadPool& computation_normal(){
 ThreadPool& unlimited_realtime(){
     static ThreadPool_Default runner(
         [](){
-            PerformanceOptions::instance().REALTIME_THREAD_PRIORITY.set_on_this_thread(global_logger_tagged());
+            PerformanceOptions::instance().REALTIME_THREAD_PRIORITY0.set_on_this_thread(global_logger_tagged());
         },
         0
     );
@@ -45,7 +45,7 @@ ThreadPool& unlimited_realtime(){
 ThreadPool& unlimited_pivot(){
     static ThreadPool_Default runner(
         [](){
-            PerformanceOptions::instance().INFERENCE_PIVOT_PRIORITY.set_on_this_thread(global_logger_tagged());
+            PerformanceOptions::instance().INFERENCE_PIVOT_PRIORITY0.set_on_this_thread(global_logger_tagged());
         },
         0
     );

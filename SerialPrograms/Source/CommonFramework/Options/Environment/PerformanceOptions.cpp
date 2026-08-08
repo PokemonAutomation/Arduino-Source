@@ -18,13 +18,19 @@ PerformanceOptions::PerformanceOptions()
         true,
         false
     )
-    , REALTIME_THREAD_PRIORITY(
+    , UI_THREAD_PRIORITY(
+        "<b>UI Thread Priority:</b><br>"
+        "Thread priority of the UI thread. This affects the responsiveness of the UI under load.<br>"
+        "Restart the program for this to fully take effect.",
+        DEFAULT_PRIORITY_UI
+    )
+    , REALTIME_THREAD_PRIORITY0(
         "<b>Realtime Thread Priority:</b><br>"
-        "Thread priority of real-time threads. (UI thread, audio threads)<br>"
+        "Thread priority of real-time threads. (program/controller threads)<br>"
         "Restart the program for this to fully take effect.",
         DEFAULT_PRIORITY_REALTIME
     )
-    , INFERENCE_PIVOT_PRIORITY(
+    , INFERENCE_PIVOT_PRIORITY0(
         "<b>Inference Pivot Priority:</b><br>"
         "Thread priority of inference dispatcher threads.",
         DEFAULT_PRIORITY_REALTIME_INFERENCE
@@ -34,7 +40,7 @@ PerformanceOptions::PerformanceOptions()
         "Thread priority of computation threads.",
         DEFAULT_PRIORITY_COMPUTE
     )
-    , REALTIME_THREAD_POOL(
+    , REALTIME_THREAD_POOL0(
         "Real-time Thread Pool",
         "Thread pool for tasks that must run fast enough to keep a "
         "program running properly.<br>"
@@ -67,11 +73,12 @@ PerformanceOptions::PerformanceOptions()
     PA_ADD_OPTION(CORE_AFFINITY);
 #endif
 
-    PA_ADD_OPTION(REALTIME_THREAD_PRIORITY);
-    PA_ADD_OPTION(INFERENCE_PIVOT_PRIORITY);
+    PA_ADD_OPTION(UI_THREAD_PRIORITY);
+    PA_ADD_OPTION(REALTIME_THREAD_PRIORITY0);
+    PA_ADD_OPTION(INFERENCE_PIVOT_PRIORITY0);
     PA_ADD_OPTION(COMPUTE_PRIORITY);
 
-    PA_ADD_OPTION(REALTIME_THREAD_POOL);
+    PA_ADD_OPTION(REALTIME_THREAD_POOL0);
     PA_ADD_OPTION(NORMAL_THREAD_POOL);
 
     //  Used only by sys-botbase 2 which has been removed.

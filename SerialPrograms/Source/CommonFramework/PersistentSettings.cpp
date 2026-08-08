@@ -63,7 +63,7 @@ void PersistentSettings::read(){
     }
 
 //    GlobalSettings::instance().PROCESS_PRIORITY0.update_priority_to_option();
-    PerformanceOptions::instance().REALTIME_THREAD_PRIORITY.set_on_this_thread(global_logger_tagged());
+    PerformanceOptions::instance().UI_THREAD_PRIORITY.set_on_this_thread(global_logger_tagged());
 
 #if 0
     {
