@@ -10,11 +10,6 @@
 #include <string>
 #include "ImageViewPlanar32.h"
 
-class QImage;
-namespace cv{
-    class Mat;
-}
-
 namespace PokemonAutomation{
 
 
