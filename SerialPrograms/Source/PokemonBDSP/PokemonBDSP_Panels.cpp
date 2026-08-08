@@ -38,8 +38,12 @@
 //#include "Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy.h"
 //#include "Programs/Glitches/PokemonBDSP_CloneItemsMenuOverlap.h"
 
+#include "Programs/RngManipulation/PokemonBDSP_IntroSeedFinder.h"
+#include "Programs/RngManipulation/PokemonBDSP_StarterRng.h"
+
 #include "Programs/TestPrograms/PokemonBDSP_ShinyEncounterTester.h"
 #include "Programs/TestPrograms/PokemonBDSP_SoundListener.h"
+#include "Programs/TestPrograms/PokemonBDSP_SummaryReaderTester.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -97,11 +101,14 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     if (IS_BETA_VERSION || STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Untested/Beta/WIP ----");
+        ret.emplace_back(make_single_switch_program<IntroSeedFinder_Descriptor, IntroSeedFinder>());
+        ret.emplace_back(make_single_switch_program<StarterRng_Descriptor, StarterRng>());
     }
     if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
         ret.emplace_back(make_single_switch_program<ShinyEncounterTester_Descriptor, ShinyEncounterTester>());
         ret.emplace_back(make_single_switch_program<SoundListener_Descriptor, SoundListener>());
+        ret.emplace_back(make_single_switch_program<SummaryReaderTester_Descriptor, SummaryReaderTester>());
     }
 
     return ret;
