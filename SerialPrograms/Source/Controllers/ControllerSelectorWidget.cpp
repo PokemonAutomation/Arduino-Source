@@ -196,10 +196,11 @@ void ControllerSelectorWidget::update_interface_dropdown(ControllerInterface int
     for (size_t index = 0; index < m_interface_list.size(); index++){
         if (interface_type == m_interface_list[index]){
             m_interface_dropdown->setCurrentIndex((int)index);
-            break;
+            return;
         }
     }
-
+    m_session.set_controller(ControllerType::None);
+    m_interface_dropdown->setCurrentIndex(-1);
 }
 void ControllerSelectorWidget::refresh_selection(ControllerInterface interface_type){
 //    cout << "refresh_selection(): "<< endl;

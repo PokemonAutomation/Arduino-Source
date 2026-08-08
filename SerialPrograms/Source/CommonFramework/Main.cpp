@@ -222,6 +222,7 @@ int run_program(int argc, char *argv[]){
     int ret = application.exec();
 
     //  Write program settings back to the json file.
+    std::cout << "Saving Settings..." << std::endl;
     PERSISTENT_SETTINGS().write();
 
     return ret;
