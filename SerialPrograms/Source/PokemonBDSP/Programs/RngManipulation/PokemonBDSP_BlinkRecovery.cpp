@@ -9,7 +9,7 @@
 #include <cmath>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"

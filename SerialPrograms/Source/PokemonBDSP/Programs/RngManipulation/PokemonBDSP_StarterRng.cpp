@@ -20,6 +20,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameEntry.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
+#include "PokemonBDSP/Inference/Rng/PokemonBDSP_SummaryReader.h"
 #include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h"
 #include "PokemonBDSP_BlinkRecovery.h"
 #include "PokemonBDSP_RngCalibration.h"
