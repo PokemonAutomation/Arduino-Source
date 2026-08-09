@@ -171,7 +171,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     }
 
 #ifdef PA_OFFICIAL
-    if (STATIC_GLOBALS.DEVELOPER_MODE){
+    if (STATIC_GLOBALS.INTERNAL_DEVELOPER_MODE){
         ret.emplace_back("---- Research ----");
         add_panels(ret);
     }

@@ -27,6 +27,7 @@ public:
 public:
     bool NAUGHTY_MODE = false;
     bool DEVELOPER_MODE = false;
+    bool INTERNAL_DEVELOPER_MODE = false;
 
 
     // Debug color stats like those in:

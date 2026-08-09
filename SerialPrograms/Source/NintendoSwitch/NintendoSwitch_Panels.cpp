@@ -88,7 +88,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
         ret.emplace_back(make_single_switch_program<TestDudunsparceFormDetector_Descriptor, TestDudunsparceFormDetector>());
         ret.emplace_back(make_computer_program<ComputerPrograms::UnitTestRunner_Descriptor, ComputerPrograms::UnitTestRunner>());
 #ifdef PA_OFFICIAL
-        add_panels(ret);
+        if (STATIC_GLOBALS.INTERNAL_DEVELOPER_MODE){
+            add_panels(ret);
+        }
 #endif
     }
 

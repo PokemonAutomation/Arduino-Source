@@ -281,8 +281,11 @@ void GlobalSettings::load_json(const JsonValue& json){
     }
 
     STATIC_GLOBALS.load_json(json);
-    const bool developer_mode = STATIC_GLOBALS.DEVELOPER_MODE;
     BatchOption::load_json(json);
+
+    // cout << "DEVELOPER_MODE: " << STATIC_GLOBALS.DEVELOPER_MODE << endl;
+    // cout << "INTERNAL_DEVELOPER_MODE: " << STATIC_GLOBALS.INTERNAL_DEVELOPER_MODE << endl;
+    const bool developer_mode = STATIC_GLOBALS.DEVELOPER_MODE;
 
     ConfigOptionState devmode_visibility = developer_mode
         ? ConfigOptionState::ENABLED
