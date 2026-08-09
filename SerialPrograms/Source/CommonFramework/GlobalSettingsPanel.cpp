@@ -199,13 +199,7 @@ GlobalSettings::GlobalSettings()
     , ERROR_REPORTS(CONSTRUCT_TOKEN)
     , DEVELOPER_TOKEN(
         true,
-        "<b>Developer Token for Regular Dev mode:</b><br>Restart application to take full effect after changing this.",
-        LockMode::LOCK_WHILE_RUNNING,
-        "", ""
-    )
-    , INTERNAL_DEVELOPER_TOKEN(
-        true,
-        "<b>Developer Token for Internal Dev mode:</b><br>Restart application to take full effect after changing this.",
+        "<b>Developer Token:</b><br>Restart application to take full effect after changing this.",
         LockMode::LOCK_WHILE_RUNNING,
         "", ""
     )
@@ -268,7 +262,6 @@ GlobalSettings::GlobalSettings()
 #endif
 
     PA_ADD_OPTION(DEVELOPER_TOKEN);
-    PA_ADD_OPTION(INTERNAL_DEVELOPER_TOKEN);
 
     USE_GPU_FOR_ML_INFERENCE0.set_visibility(ConfigOptionState::HIDDEN);
     RESOURCE_DOWNLOAD_TABLE.set_visibility(ConfigOptionState::HIDDEN);

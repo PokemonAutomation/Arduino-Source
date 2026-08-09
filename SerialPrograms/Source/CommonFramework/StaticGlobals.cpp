@@ -54,21 +54,7 @@ void StaticGlobals::load_json(const JsonValue& json){
         bool internal_dev = INTERNAL_TOKENS.find(hash.get_hash_hex()) != INTERNAL_TOKENS.end();
         bool regular_dev = TOKENS.find(hash.get_hash_hex()) != TOKENS.end();
         DEVELOPER_MODE = regular_dev || internal_dev;
-    }
-
-    const std::string* internal_dev_token = obj->get_string("INTERNAL_DEVELOPER_TOKEN");
-    if (internal_dev_token){
-        SHA256 hash;
-        hash.push(internal_dev_token->c_str(), internal_dev_token->size());
-        hash.finish();
-        hash.get_hash_hex();
-
-        bool internal_dev = INTERNAL_TOKENS.find(hash.get_hash_hex()) != INTERNAL_TOKENS.end();
-        if (internal_dev){
-            INTERNAL_DEVELOPER_MODE = true;
-            DEVELOPER_MODE = true;
-        }
-            
+        INTERNAL_DEVELOPER_MODE = internal_dev;
     }
 
     const JsonObject* debug_obj = obj->get_object("DEBUG");
