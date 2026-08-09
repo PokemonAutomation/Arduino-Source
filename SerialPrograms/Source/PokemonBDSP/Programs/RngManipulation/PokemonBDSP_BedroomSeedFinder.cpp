@@ -59,10 +59,13 @@ BedroomSeedFinder_Descriptor::BedroomSeedFinder_Descriptor()
 {}
 
 
-BedroomSeedFinder::BedroomSeedFinder(){
+BedroomSeedFinder::BedroomSeedFinder()
+    : GO_HOME_WHEN_DONE(false)
+{
     PA_ADD_OPTION(PLAYER_MODEL);
     PA_ADD_OPTION(COLLECTION_DISPLAY);
     PA_ADD_OPTION(STATE_DISPLAY);
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
 }
 
 
@@ -108,6 +111,8 @@ void BedroomSeedFinder::program(SingleSwitchProgramEnvironment& env, ProControll
 
     STATE_DISPLAY.set_state(recovery.state, recovery.events);
     STATE_DISPLAY.set_confidence_unique();
+
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

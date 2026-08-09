@@ -90,7 +90,6 @@ std::unique_ptr<StatsTracker> StarterRng_Descriptor::make_stats() const{
 
 StarterRng::StarterRng()
     : m_aim(CALIBRATION_MIN_SAMPLES, CALIBRATION_THRESHOLD)
-    , GO_HOME_WHEN_DONE(false)
     , STARTER(
         "<b>Starter:</b><br>",
         {
@@ -109,6 +108,7 @@ StarterRng::StarterRng()
             /*action*/ false, /*shiny*/ true, /*gender*/ true, /*nature*/ true
         }
     )
+    , COLLECTION_DISPLAY(true)
     , MAX_RESETS(
         "<b>Maximum resets:</b><br>"
         "Set this to zero to keep going until a shiny is caught.",
@@ -117,29 +117,33 @@ StarterRng::StarterRng()
     )
     , MAX_TARGET_WAIT_MINUTES(
         "<b>Wait at most (minutes) for a target:</b><br>"
-        "Rarer targets, will require longer wait times.",
+        "Rarer targets will require longer wait times.",
         LockMode::LOCK_WHILE_RUNNING,
         20, 1, 1440
     )
     , AUTO_CALIBRATE(
         "<b>Correct the timing automatically:</b><br>"
-        "Shift the aim when several attempts agree the scene is spending a different "
-        "number of advances than the model says. Ordinary one-advance scatter is "
-        "ignored.",
+        "Shift the target advances when several attempts miss.",
         LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , LANGUAGE(
-        "<b>Game Language:</b><br>Needed to read the nature off the summary.",
+        "<b>Game Language:</b>",
         summary_nature_languages(),
         LockMode::LOCK_WHILE_RUNNING, true
     )
     , USE_SOUND_DETECTION(
-        "<b>Use sound detection:</b><br>Improves shiny detection in the battle that follows.",
+        "<b>Use sound detection:</b>",
         LockMode::LOCK_WHILE_RUNNING,
         true
     )
-    , COLLECTION_DISPLAY(true)
+    , TAKE_VIDEO(
+        "<b>Take Video:</b><br>"
+        "Record a video when the shiny is found.",
+        LockMode::LOCK_WHILE_RUNNING,
+        true
+    )
+    , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_SHINY(
         "Shiny Starter",
         true, true, ImageAttachmentMode::JPG,
@@ -160,18 +164,19 @@ StarterRng::StarterRng()
         FILTERS.restore_defaults();
     }
 
-    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(STARTER);
     PA_ADD_OPTION(PLAYER_MODEL);
     PA_ADD_OPTION(FILTERS);
+    PA_ADD_OPTION(COLLECTION_DISPLAY);
+    PA_ADD_OPTION(STATE_DISPLAY);
+    PA_ADD_OPTION(TARGET_DISPLAY);
     PA_ADD_OPTION(MAX_RESETS);
     PA_ADD_OPTION(MAX_TARGET_WAIT_MINUTES);
     PA_ADD_OPTION(AUTO_CALIBRATE);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(USE_SOUND_DETECTION);
-    PA_ADD_OPTION(COLLECTION_DISPLAY);
-    PA_ADD_OPTION(STATE_DISPLAY);
-    PA_ADD_OPTION(TARGET_DISPLAY);
+    PA_ADD_OPTION(TAKE_VIDEO);
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -388,9 +393,11 @@ BdspAttemptOutcome StarterRng::run_attempt(
             {{"Advance", std::to_string(target_advance)}, {"Details", target.to_string()}},
             "", own.get_best_screenshot()
         );
-        pbf_wait(context, 5000ms);
-        pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 5000ms);
-        context.wait_for_all_requests();
+        if (TAKE_VIDEO){
+            pbf_wait(context, 5000ms);
+            pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 5000ms);
+            context.wait_for_all_requests();
+        }
         return BdspAttemptOutcome::Hit;
     }
 

@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonBDSP_BedroomSeedFinder_H
 
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "PokemonBDSP/Options/PokemonBDSP_PlayerModelOption.h"
 #include "PokemonBDSP_RngDisplays.h"
 
@@ -29,10 +30,13 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
+
     PlayerModelOption PLAYER_MODEL;
 
     BlinkCollectionDisplay COLLECTION_DISPLAY;
     RngStateDisplay STATE_DISPLAY;
+
+    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 };
 
 

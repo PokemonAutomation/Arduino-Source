@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonBDSP_IntroSeedFinder_H
 
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "PokemonBDSP_RngDisplays.h"
 
 namespace PokemonAutomation{
@@ -30,6 +31,8 @@ public:
 private:
     BlinkCollectionDisplay COLLECTION_DISPLAY;
     RngStateDisplay STATE_DISPLAY;
+
+    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 };
 
 

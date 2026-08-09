@@ -35,7 +35,7 @@ struct BlinkRecoveryConfig{
     uint8_t npcs = 2;
     size_t min_rolls_to_try = 44;
     size_t confirmation_events = 6;
-    Seconds poll_interval = std::chrono::seconds(10);
+    Seconds poll_interval = std::chrono::seconds(1);
     Seconds keep_awake_interval = std::chrono::seconds(180);
     Seconds blink_retention = std::chrono::seconds(180);
     size_t reanchor_blinks = 6;

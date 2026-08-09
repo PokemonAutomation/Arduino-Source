@@ -14,7 +14,7 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/Async/InferenceSession.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP/Inference/Rng/PokemonBDSP_BlinkExtraction.h"
@@ -55,9 +55,12 @@ IntroSeedFinder_Descriptor::IntroSeedFinder_Descriptor()
 {}
 
 
-IntroSeedFinder::IntroSeedFinder(){
+IntroSeedFinder::IntroSeedFinder()
+    : GO_HOME_WHEN_DONE(false)
+{
     PA_ADD_OPTION(COLLECTION_DISPLAY);
     PA_ADD_OPTION(STATE_DISPLAY);
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
 }
 
 
@@ -110,6 +113,10 @@ void IntroSeedFinder::program(SingleSwitchProgramEnvironment& env, ProController
     std::vector<PeriodicInferenceCallback> callbacks;
     callbacks.emplace_back(watcher, 16ms);
 
+    //  Held across the whole run
+    CancellableHolder<CancellableScope> subcontext(static_cast<CancellableScope&>(context));
+    InferenceSession session(subcontext, env.console, callbacks);
+
     size_t expected = recommended_pokemon_blink_count(TOLERANCE_SECONDS);
     env.log("Watching Munchlax. Around " + std::to_string(expected)
         + " blinks are usually enough, but this stops when the answer is confirmed rather "
@@ -124,9 +131,12 @@ void IntroSeedFinder::program(SingleSwitchProgramEnvironment& env, ProController
     size_t candidate_blinks = 0;
     double frozen_threshold = -1;
 
+    double estimated_threshold = -1;
+    size_t estimated_from = 0;
+
     PokemonBlinkSolveResult confirmed;
     size_t confirmed_blinks = 0;
-
+    size_t blink_count = 0;
     while (true){
         if (current_time() >= deadline){
             throw UserSetupError(env.logger(),
@@ -136,11 +146,11 @@ void IntroSeedFinder::program(SingleSwitchProgramEnvironment& env, ProController
             );
         }
 
-        wait_until(
-            env.console, context,
-            std::min(deadline, current_time() + 10s),
-            callbacks
-        );
+        try{
+            subcontext.wait_until(std::min(deadline, current_time() + 1s));
+        }catch (OperationCancelledException&){}
+        subcontext.throw_if_cancelled_with_exception();
+        context.throw_if_cancelled();
 
         if (current_time() >= next_nudge){
             pbf_move_right_joystick(context, {1.0, 0.0}, 80ms, 0ms);
@@ -152,12 +162,24 @@ void IntroSeedFinder::program(SingleSwitchProgramEnvironment& env, ProController
         if (samples.empty()){
             continue;
         }
-        double threshold = frozen_threshold > 0 ? frozen_threshold : auto_blink_threshold(samples);
+        double threshold = frozen_threshold;
+        if (threshold <= 0){
+            if (estimated_threshold <= 0 || samples.size() >= estimated_from + estimated_from / 4){
+                estimated_threshold = auto_blink_threshold(samples);
+                estimated_from = samples.size();
+            }
+            threshold = estimated_threshold;
+        }
         if (!(threshold > 0)){
-            COLLECTION_DISPLAY.set_progress(0, expected);
+            COLLECTION_DISPLAY.set_note("Determining blink threshold...");
             continue;
         }
         std::vector<Blink> blinks = extract_blinks(samples, threshold);
+        if (blinks.size() <= blink_count){
+            continue;
+        }
+        blink_count = blinks.size();
+
         std::vector<double> intervals = intervals_of(blinks);
         size_t usable = count_usable(intervals, TOLERANCE_SECONDS);
 
@@ -243,6 +265,8 @@ void IntroSeedFinder::program(SingleSwitchProgramEnvironment& env, ProController
     STATE_DISPLAY.set_state(confirmed.state, confirmed_blinks);
     STATE_DISPLAY.set_confidence_unique();
     COLLECTION_DISPLAY.set_progress(confirmed_blinks, confirmed_blinks);
+
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

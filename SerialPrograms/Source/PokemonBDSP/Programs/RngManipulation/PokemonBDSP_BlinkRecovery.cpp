@@ -12,7 +12,7 @@
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/Async/InferenceSession.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP_BlinkModel.h"
 #include "PokemonBDSP_BlinkRecovery.h"
@@ -178,11 +178,19 @@ BlinkRecovery recover_state_from_blinks(
 
     std::vector<double> frozen_thresholds(watchers.size(), -1);
 
+    std::vector<double> estimated_thresholds(watchers.size(), -1);
+    std::vector<size_t> estimated_from(watchers.size(), 0);
+
     bool have_candidate = false;
     Xorshift128State candidate;
     size_t candidate_events = 0;
+    size_t event_count = 0;
 
     WallClock next_nudge = current_time() + config.keep_awake_interval;
+
+    //  Held across the whole loop
+    CancellableHolder<CancellableScope> subcontext(static_cast<CancellableScope&>(context));
+    InferenceSession session(subcontext, env.console, callbacks);
 
     while (true){
         if (current_time() >= deadline){
@@ -190,11 +198,11 @@ BlinkRecovery recover_state_from_blinks(
                 + std::to_string((int)timeout_seconds / 60) + " minutes";
             return ret;
         }
-        wait_until(
-            env.console, context,
-            std::min(deadline, current_time() + config.poll_interval),
-            callbacks
-        );
+        try{
+            subcontext.wait_until(std::min(deadline, current_time() + config.poll_interval));
+        }catch (OperationCancelledException&){}
+        subcontext.throw_if_cancelled_with_exception();
+        context.throw_if_cancelled();
 
         keep_awake_if_due(context, next_nudge, config.keep_awake_interval);
 
@@ -206,9 +214,15 @@ BlinkRecovery recover_state_from_blinks(
 
         std::vector<double> thresholds;
         for (size_t w = 0; w < watchers.size(); w++){
-            double threshold = frozen_thresholds[w] > 0
-                ? frozen_thresholds[w]
-                : auto_blink_threshold(matches[w]);
+            double threshold = frozen_thresholds[w];
+            if (threshold <= 0){
+                size_t counted = estimated_from[w];
+                if (estimated_thresholds[w] <= 0 || matches[w].size() >= counted + counted / 4){
+                    estimated_thresholds[w] = auto_blink_threshold(matches[w]);
+                    estimated_from[w] = matches[w].size();
+                }
+                threshold = estimated_thresholds[w];
+            }
             if (!(threshold > 0)){
                 display.set_note("Determining blink threshold...");
                 break;
@@ -230,6 +244,13 @@ BlinkRecovery recover_state_from_blinks(
             }
         }
         display.set_progress(events, config.min_rolls_to_try + config.confirmation_events);
+
+        //  No need to go further until another blink is recorded
+        if (events <= event_count){
+            continue;
+        }
+        event_count = events;
+
         if (longest->size() < 3){
             continue;
         }
@@ -424,6 +445,9 @@ void hold_and_reanchor(
     size_t reanchors = 0;
     size_t consecutive_failures = 0;
 
+    CancellableHolder<CancellableScope> subcontext(static_cast<CancellableScope&>(context));
+    InferenceSession session(subcontext, env.console, callbacks);
+
     while (true){
         //  Recomputed every pass, because re-anchoring is exactly what changes it.
         WallClock leave_at = clock.time_of_advance(press_advance)
@@ -433,11 +457,11 @@ void hold_and_reanchor(
         // the press is timed off this anchor, so this is the most valuable check
         bool leaving = current_time() >= leave_at;
         if (!leaving){
-            wait_until(
-                env.console, context,
-                std::min(leave_at, current_time() + config.poll_interval),
-                callbacks
-            );
+            try{
+                subcontext.wait_until(std::min(leave_at, current_time() + config.poll_interval));
+            }catch (OperationCancelledException&){}
+            subcontext.throw_if_cancelled_with_exception();
+            context.throw_if_cancelled();
             keep_awake_if_due(context, next_nudge, config.keep_awake_interval);
         }
 

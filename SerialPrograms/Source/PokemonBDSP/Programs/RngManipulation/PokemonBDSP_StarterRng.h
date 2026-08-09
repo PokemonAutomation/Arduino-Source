@@ -65,24 +65,24 @@ private:
     RngAim m_aim;
 
 private:
-    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
-
     EnumDropdownOption<BdspStarter> STARTER;
     PlayerModelOption PLAYER_MODEL;
+    OCR::LanguageOCROption LANGUAGE;
 
     Pokemon::StatsHuntIvRangeFilterTable FILTERS;
+
+    BlinkCollectionDisplay COLLECTION_DISPLAY;
+    RngStateDisplay STATE_DISPLAY;
+    RngTargetDisplay TARGET_DISPLAY;
 
     SimpleIntegerOption<uint16_t> MAX_RESETS;
     SimpleIntegerOption<uint16_t> MAX_TARGET_WAIT_MINUTES;
 
     BooleanCheckBoxOption AUTO_CALIBRATE;
 
-    OCR::LanguageOCROption LANGUAGE;
     BooleanCheckBoxOption USE_SOUND_DETECTION;
-
-    BlinkCollectionDisplay COLLECTION_DISPLAY;
-    RngStateDisplay STATE_DISPLAY;
-    RngTargetDisplay TARGET_DISPLAY;
+    BooleanCheckBoxOption TAKE_VIDEO;
+    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     EventNotificationOption NOTIFICATION_SHINY;
     EventNotificationsOption NOTIFICATIONS;

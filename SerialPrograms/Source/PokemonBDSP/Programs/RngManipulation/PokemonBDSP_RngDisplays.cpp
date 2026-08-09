@@ -79,13 +79,11 @@ BlinkCollectionDisplay::BlinkCollectionDisplay(bool blinks_only)
     : GroupOption("Blink Collection", LockMode::READ_ONLY)
     , progress(false, "<b>Blinks:</b>", LockMode::READ_ONLY, NOT_SET, "")
     , last_blink(false, "<b>Last Blink:</b>", LockMode::READ_ONLY, NOT_SET, "")
-    , timing(false, "<b>Tick Period:</b>", LockMode::READ_ONLY, NOT_SET, "")
     , remaining(false, "<b>Estimated Remaining:</b>", LockMode::READ_ONLY, NOT_SET, "")
 {
     PA_ADD_STATIC(progress);
     if (!blinks_only){
         PA_ADD_STATIC(last_blink);
-        PA_ADD_STATIC(timing);
         PA_ADD_STATIC(remaining);
     }
 }
@@ -99,13 +97,6 @@ void BlinkCollectionDisplay::set_note(const std::string& text){
 void BlinkCollectionDisplay::set_last_interval(double seconds){
     last_blink.set(std::to_string(seconds) + "s");
 }
-
-void BlinkCollectionDisplay::set_timing(double fitted_tick_seconds, double worst_residual_seconds){
-    timing.set(
-        std::to_string(fitted_tick_seconds) + "s"
-        + " (worst residual " + milliseconds_to_string(worst_residual_seconds) + ")"
-    );
-}
 void BlinkCollectionDisplay::set_estimated_remaining(double seconds){
     remaining.set(duration_to_string(seconds));
 }
@@ -113,7 +104,6 @@ void BlinkCollectionDisplay::set_estimated_remaining(double seconds){
 void BlinkCollectionDisplay::reset(){
     progress.set(NOT_SET);
     last_blink.set(NOT_SET);
-    timing.set(NOT_SET);
     remaining.set(NOT_SET);
 }
 

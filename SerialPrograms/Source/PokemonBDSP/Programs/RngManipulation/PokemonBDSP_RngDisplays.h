@@ -46,7 +46,6 @@ public:
     void set_progress(size_t collected, size_t wanted);
     void set_note(const std::string& text);
     void set_last_interval(double seconds);
-    void set_timing(double fitted_tick_seconds, double worst_residual_seconds);
 
     void set_estimated_remaining(double seconds);
     void reset();
@@ -54,7 +53,6 @@ public:
 public:
     StringOption progress;
     StringOption last_blink;
-    StringOption timing;
     StringOption remaining;
 };
 
