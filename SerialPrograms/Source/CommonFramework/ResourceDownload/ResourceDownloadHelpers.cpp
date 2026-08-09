@@ -4,12 +4,12 @@
  *
  */
 
-#include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
+#include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "ResourceDownloadHelpers.h"
 
 // #include <filesystem>

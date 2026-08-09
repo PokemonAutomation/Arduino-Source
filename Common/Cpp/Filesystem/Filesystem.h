@@ -22,6 +22,7 @@
 #ifndef PokemonAutomation_Filesystem_Filesystem_H
 #define PokemonAutomation_Filesystem_Filesystem_H
 
+#include <cstdint>
 #include "FilePath.h"
 
 namespace PokemonAutomation{
@@ -29,54 +30,36 @@ namespace Filesystem{
 
 
 //  Whether a path exists.
-inline bool exists(const Path& path){
-    return std::filesystem::exists(path.stdpath());
-}
+bool exists(const Path& path);
 
 //  Create every missing directory along the path.
 //  If all related directories already exist, return false. Otherwise return true.
-inline bool create_directories(const Path& path){
-    return std::filesystem::create_directories(path.stdpath());
-}
+bool create_directories(const Path& path);
 
 //  Delete the contents of the path (if it is a directory) and the contents of all its subdirectories, recursively.
 //  Then delete the file/directory of path itself. Symlinks are not followed (symlink is removed, not its target).
-inline auto remove_all(const Path& path){
-    return std::filesystem::remove_all(path.stdpath());
-}
+std::uintmax_t remove_all(const Path& path);
 
 //  Copy a file.
-inline bool copy_file(const Path& from, const Path& to){
-    return std::filesystem::copy_file(from.stdpath(), to.stdpath());
-}
+bool copy_file(const Path& from, const Path& to);
 
 //  Return the size of a file in bytes.
 //  Throw std::filesystem::filesystem_error on underlying OS API errors
-inline std::uintmax_t file_size(const Path& path){
-    return std::filesystem::file_size(path.stdpath());
-}
+std::uintmax_t file_size(const Path& path);
 
 //  Return the size of a file in bytes.
 //  If an error occurs, set `ec`. Execute `ec.clear()` if no errors occur.
-inline std::uintmax_t file_size(const Path& path, std::error_code& ec){
-    return std::filesystem::file_size(path.stdpath(), ec);
-}
+std::uintmax_t file_size(const Path& path, std::error_code& ec);
 
 //  Rename a file or directory.
 //  Throw std::filesystem::filesystem_error on underlying OS API errors
-inline void rename(const Path& old_path, const Path& new_path){
-    std::filesystem::rename(old_path.stdpath(), new_path.stdpath());
-}
+void rename(const Path& old_path, const Path& new_path);
 
 //  Rename a file or directory.
 //  If an error occurs, set `ec`. Execute `ec.clear()` if no errors occur.
-inline void rename(const Path& old_path, const Path& new_path, std::error_code& ec){
-    std::filesystem::rename(old_path.stdpath(), new_path.stdpath(), ec);
-}
+void rename(const Path& old_path, const Path& new_path, std::error_code& ec);
 
-inline Path current_path(){
-    return std::filesystem::current_path();
-}
+Path current_path();
 
 
 
