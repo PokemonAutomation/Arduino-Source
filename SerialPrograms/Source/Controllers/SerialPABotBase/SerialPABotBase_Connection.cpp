@@ -109,7 +109,7 @@ SerialPABotBase_Connection::SerialPABotBase_Connection(
     });
 }
 SerialPABotBase_Connection::~SerialPABotBase_Connection(){
-    m_ready.store(false, std::memory_order_release);
+    m_status.store(Status::NOT_CONNECTED, std::memory_order_release);
 //    signal_pre_not_ready();
     if (m_botbase == nullptr){
         return;

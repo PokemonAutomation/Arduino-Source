@@ -18,6 +18,13 @@ namespace PokemonAutomation{
 
 class ControllerConnection : public CancellableScope{
 public:
+    enum class Status{
+        NOT_CONNECTED,
+        READY,
+        FAILED_TO_CONNECT,
+    };
+
+public:
     struct StatusListener{
 //        virtual void pre_connection_not_ready(ControllerConnection& connection){}
         virtual void post_connection_ready(ControllerConnection& connection){}
@@ -36,7 +43,7 @@ public:
 protected:
     ControllerConnection()
         : m_current_controller(ControllerType::None)
-        , m_ready(false)
+        , m_status(Status::NOT_CONNECTED)
     {}
 public:
     virtual ~ControllerConnection() = default;
@@ -51,14 +58,14 @@ public:
     ControllerType current_controller() const{
         return m_current_controller.load(std::memory_order_acquire);
     }
-    bool is_ready() const{ return m_ready.load(std::memory_order_acquire); }
+    bool is_ready() const{ return status() == Status::READY; }
+    Status status() const{ return m_status.load(std::memory_order_acquire); }
     std::string status_text() const;
 
     //  It it not safe to call this until "is_ready()" is true.
     const std::vector<ControllerType>& controller_list(){
         return m_controller_list;
     }
-
 
 
 public:
@@ -68,6 +75,7 @@ public:
 
 protected:
     void declare_ready();
+    void declare_failed();
 
 
 private:
@@ -82,7 +90,7 @@ protected:
     std::vector<ControllerType> m_controller_list;
 
     std::atomic<ControllerType> m_current_controller;
-    std::atomic<bool> m_ready;
+    std::atomic<Status> m_status;
 
 
 private:

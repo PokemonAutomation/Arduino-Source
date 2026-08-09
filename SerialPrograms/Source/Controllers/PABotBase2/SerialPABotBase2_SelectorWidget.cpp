@@ -8,6 +8,10 @@
 #include "SerialPABotBase2_Descriptor.h"
 #include "SerialPABotBase2_SelectorWidget.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 template class RegisterUiStateQtWidget<SerialPABotBase::SerialPABotBase2_SelectorWidget>;
@@ -26,6 +30,7 @@ SerialPABotBase2_SelectorWidget::SerialPABotBase2_SelectorWidget(
 
 //        cout << "SerialPABotBase(): " << current << endl;
     this->setMaxVisibleItems(32);
+    this->setPlaceholderText("(invalid or still loading...)");
 
     if (current == nullptr || (
             current->interface_type != ControllerInterface::None &&
@@ -86,7 +91,7 @@ void SerialPABotBase2_SelectorWidget::refresh_devices(const QList<QSerialPortInf
     }
 
 //    size_t width = 6;
-    int index = 0;
+    int index = -1;
     int c = 0;
     for (const auto& port : m_ports){
         QString display_name = QString::fromStdString(port->display_name());
@@ -103,6 +108,19 @@ void SerialPABotBase2_SelectorWidget::refresh_devices(const QList<QSerialPortInf
     }
 //    setMinimumContentsLength((int)width);
     setCurrentIndex(index);
+
+    if (index < 0){
+        return;
+    }
+
+    //  If the program boots up faster than it can read the serial ports, we
+    //  the controller will fail to connect. Once the serial poller finishes
+    //  and pushes a refresh, we return here.
+    //  If the port is now valid, but failed to connect before, reset it.
+    ControllerSession& session = m_parent.session();
+    if (session.connection().status() == ControllerConnection::Status::FAILED_TO_CONNECT){
+        session.reset(false);
+    }
 }
 
 

@@ -68,6 +68,10 @@ void SerialPortPoller::run() noexcept{
         WallClock start = current_time();
 
         QList<QSerialPortInfo> list = QSerialPortInfo::availablePorts();
+
+//        //  Test code to test delayed UI behavior.
+//        std::this_thread::sleep_for(std::chrono::seconds(5));
+
         std::map<std::string, QSerialPortInfo> current;
         for (auto& port : list){
             current.emplace(port.portName().toStdString(), port);

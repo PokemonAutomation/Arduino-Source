@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 
 void ControllerConnection::add_status_listener(StatusListener& listener){
     m_status_listeners.add(listener);
-    if (m_ready.load(std::memory_order_acquire)){
+    if (m_status.load(std::memory_order_acquire) == Status::READY){
         listener.post_connection_ready(*this);
     }
 }
@@ -51,8 +51,11 @@ void ControllerConnection::set_status_line1(const std::string& text, Color color
     signal_status_text_changed(status_text());
 }
 void ControllerConnection::declare_ready(){
-    m_ready.store(true, std::memory_order_release);
+    m_status.store(Status::READY, std::memory_order_release);
     signal_post_ready();
+}
+void ControllerConnection::declare_failed(){
+    m_status.store(Status::FAILED_TO_CONNECT, std::memory_order_release);
 }
 
 
