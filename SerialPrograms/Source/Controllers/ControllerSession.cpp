@@ -47,8 +47,6 @@ ControllerSession::ControllerSession(
     : m_logger(logger)
     , m_option(option)
     , m_options_locked(false)
-    , m_desired_controller(ControllerType::None)
-    , m_next_reset_mode(ControllerResetMode::DO_NOT_RESET)
     , m_descriptor(option.descriptor())
     , m_connection(m_descriptor->open_connection(logger))
 {
@@ -62,7 +60,7 @@ ControllerSession::ControllerSession(
         //  If we already missed it, run it ourselves.
         if (m_connection->is_ready()){
 //            cout << "ControllerSession::ControllerSession() - early ready" << endl;
-            m_desired_controller = m_connection->current_controller();
+            m_change_controller_on_ready = m_connection->current_controller();
             ControllerSession::post_connection_ready(*m_connection);
         }
     }catch (...){
@@ -183,15 +181,7 @@ void ControllerSession::make_controller(
         }
     }
 
-//    m_desired_controller = m_connection->current_controller();
-    m_next_reset_mode = ControllerResetMode::DO_NOT_RESET;
-    if (change_controller.has_value()){
-        m_desired_controller = change_controller.value();
-        m_next_reset_mode = ControllerResetMode::SIMPLE_RESET;
-    }
-    if (clear_settings){
-        m_next_reset_mode = ControllerResetMode::RESET_AND_CLEAR_STATE;
-    }
+    m_change_controller_on_ready = change_controller;
 
     //  If we already missed it, run it ourselves.
     if (ready){
@@ -306,9 +296,7 @@ std::string ControllerSession::reset(bool clear_settings){
 
 //            cout << "Checking readiness... " << (int)m_desired_controller << endl;
             if (m_connection && m_connection->is_ready()){
-                m_desired_controller = m_connection->current_controller();
-//                cout << "Ready! - " << (int)m_desired_controller << endl;
-                m_connection->try_set_controller_type(m_desired_controller, clear_settings);
+                m_connection->try_set_controller_type(m_connection->current_controller(), clear_settings);
             }
 
             //  Move these out to indicate that we should no longer access them.
@@ -322,7 +310,7 @@ std::string ControllerSession::reset(bool clear_settings){
         controller.reset();
         connection.reset();
 
-        make_controller(m_desired_controller, clear_settings);
+        make_controller({}, clear_settings);
     }
     signal_status_text_changed(status_text());
     return "";
@@ -343,7 +331,7 @@ void ControllerSession::post_connection_ready(ControllerConnection& connection){
     std::vector<ControllerType> supported_controllers;
     ControllerType current_controller = ControllerType::None;
 
-    ControllerType desired_controller;
+    ControllerType controller_type;
 
     std::unique_ptr<AbstractController> controller;
 
@@ -361,9 +349,10 @@ void ControllerSession::post_connection_ready(ControllerConnection& connection){
             return;
         }
 
-        desired_controller = m_desired_controller;
-        if (m_next_reset_mode == ControllerResetMode::DO_NOT_RESET){
-            desired_controller = m_connection->current_controller();
+        if (m_change_controller_on_ready.has_value()){
+            controller_type = m_change_controller_on_ready.value();
+        }else{
+            controller_type = m_connection->current_controller();
         }
 
         supported_controllers = m_connection->controller_list();
@@ -372,11 +361,11 @@ void ControllerSession::post_connection_ready(ControllerConnection& connection){
     signal_controller_changed(current_controller, supported_controllers);
 
     //  Construct the controller.
-    if (desired_controller != ControllerType::None){
+    if (controller_type != ControllerType::None){
         controller = m_descriptor->make_controller(
             m_logger,
             connection,
-            desired_controller
+            controller_type
         );
     }
 
@@ -389,8 +378,7 @@ void ControllerSession::post_connection_ready(ControllerConnection& connection){
         }
 
         m_controller = std::move(controller);
-        m_desired_controller = desired_controller;
-        m_next_reset_mode = ControllerResetMode::DO_NOT_RESET;
+        m_change_controller_on_ready.reset();
 
         supported_controllers = m_connection->controller_list();
         current_controller = m_connection->current_controller();

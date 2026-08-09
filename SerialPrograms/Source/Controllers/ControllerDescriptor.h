@@ -24,13 +24,6 @@ class ControllerSelectorWidget;
 
 
 
-enum class ControllerResetMode{
-    DO_NOT_RESET,
-    SIMPLE_RESET,
-    RESET_AND_CLEAR_STATE,
-};
-
-
 
 //
 //  Represents an entire controller interface.

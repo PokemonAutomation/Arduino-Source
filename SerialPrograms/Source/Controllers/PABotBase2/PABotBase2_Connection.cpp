@@ -69,11 +69,6 @@ void Connection::auto_select_controller_from_boot(){
         return;
     }
 
-    //  Firmware doesn't support querying session #.
-    if (m_device->device_protocol_version() < 2026052101){
-        return;
-    }
-
     //  Not the first session.
     uint32_t session_num = m_device->query_u32(PABB2_MESSAGE_OPCODE_REQUEST_SESSION_NUM);
     m_device->logger().log("Session: " + tostr_u_commas(session_num));
@@ -84,7 +79,6 @@ void Connection::auto_select_controller_from_boot(){
     //  Now we can try to set the controller to NS1 procon.
     run_preconnect_configure(controller_type);
     m_device->try_set_controller_type(controller_type, false);
-
 }
 
 

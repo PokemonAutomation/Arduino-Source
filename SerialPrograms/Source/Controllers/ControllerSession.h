@@ -157,8 +157,7 @@ private:
     std::string m_controller_error;
 
     //  Next Reset
-    ControllerType m_desired_controller;
-    ControllerResetMode m_next_reset_mode;
+    std::optional<ControllerType> m_change_controller_on_ready;
 
     std::shared_ptr<ControllerDescriptor> m_descriptor;
     std::unique_ptr<ControllerConnection> m_connection;
