@@ -9,6 +9,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_EndBattleDetector.h"
+#include "PokemonBDSP/Options/PokemonBDSP_PlayerModelOption.h"
 #include "PokemonBDSP_StarterNavigation.h"
 
 namespace PokemonAutomation{
@@ -22,14 +23,24 @@ const Milliseconds PROMPT_ANIMATION = 1000ms;
 const Milliseconds SCHEDULING_SLACK = 100ms;
 
 
-std::vector<BdspEyeTemplate> lake_eye_templates(BdspPlayerModel model){
+std::vector<BdspEyeTemplate> lake_eye_templates(uint8_t player_model){
+    if (player_model < 1 || player_model > BDSP_PLAYER_MODEL_COUNT){
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION,
+            "Unknown player model: " + std::to_string(player_model)
+        );
+    }
     return {
-        model == BdspPlayerModel::Model1
-            ? BdspEyeTemplate{"PlayerEye-Lake-Model1.png",
-                {0.5047, 0.4472, 0.0214, 0.0380}, "Player"}
-            : BdspEyeTemplate{"PlayerEye-Lake-Model4.png",
-                {0.5042, 0.4528, 0.0208, 0.0370}, "Player"},
-        BdspEyeTemplate{"BarryEye-Lake.png", {0.5521, 0.4528, 0.0214, 0.0380}, "Barry"},
+        BdspEyeTemplate{
+            "lake_templates/model" + std::to_string(player_model) + ".png",
+            {0.5026, 0.4472, 0.0240, 0.0426},
+            "Player"
+        },
+        BdspEyeTemplate{
+            "lake_templates/barry.png",
+            {0.5521, 0.4528, 0.0214, 0.0380},
+            "Barry"
+        },
     };
 }
 

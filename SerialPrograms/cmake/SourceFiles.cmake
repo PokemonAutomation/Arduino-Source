@@ -1451,6 +1451,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonBDSP/Options/PokemonBDSP_EggStepOption.h
     Source/PokemonBDSP/Options/PokemonBDSP_EncounterBotCommon.h
     Source/PokemonBDSP/Options/PokemonBDSP_LearnMove.h
+    Source/PokemonBDSP/Options/PokemonBDSP_PlayerModelOption.cpp
+    Source/PokemonBDSP/Options/PokemonBDSP_PlayerModelOption.h
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.cpp
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h
     Source/PokemonBDSP/Panels_PokemonBDSP.cpp

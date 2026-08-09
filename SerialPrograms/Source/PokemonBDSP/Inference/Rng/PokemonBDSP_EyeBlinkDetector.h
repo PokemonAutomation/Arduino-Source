@@ -49,9 +49,10 @@ struct BlinkMatchSample{
 };
 
 struct BdspEyeTemplate{
-    const char* asset;
+    //  Path under the PokemonBDSP/Rng resource folder, scene subfolder included.
+    std::string asset;
     ImageFloatBox box;
-    const char* label;
+    std::string label;
 };
 
 

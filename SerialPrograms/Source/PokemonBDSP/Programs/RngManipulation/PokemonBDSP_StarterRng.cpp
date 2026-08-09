@@ -101,15 +101,6 @@ StarterRng::StarterRng()
         LockMode::LOCK_WHILE_RUNNING,
         BdspStarter::Turtwig
     )
-    , PLAYER_MODEL(
-        "<b>Character model:</b><br>",
-        {
-            {BdspPlayerModel::Model1, "model-1", "Model 1"},
-            {BdspPlayerModel::Model4, "model-4", "Model 4"},
-        },
-        LockMode::LOCK_WHILE_RUNNING,
-        BdspPlayerModel::Model1
-    )
     , FILTERS(
         "<b>Stop Conditions:</b><br>"
         "If the " + STRING_POKEMON + " matches any one of these filters, the program will "
@@ -230,7 +221,7 @@ BdspAttemptOutcome StarterRng::run_attempt(
 
     navigate_to_lake_blinks(env.logger(), context);
 
-    std::vector<BdspEyeTemplate> setups = lake_eye_templates(PLAYER_MODEL);
+    std::vector<BdspEyeTemplate> setups = lake_eye_templates(PLAYER_MODEL.model_number());
     std::vector<std::shared_ptr<const ImageRGB32>> eyes = load_eye_templates(setups);
 
     //  The rival's dialogue box being up is what says the pair have stopped walking.

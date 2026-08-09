@@ -120,7 +120,7 @@ void IntroSeedFinder::program(SingleSwitchProgramEnvironment& env, ProController
     }
 
     std::shared_ptr<const ImageRGB32> eye = std::make_shared<const ImageRGB32>(
-        RESOURCE_PATH() + "PokemonBDSP/Rng/MunchlaxEye-Intro.png"
+        RESOURCE_PATH() + "PokemonBDSP/Rng/munchlax.png"
     );
     EyeBlinkWatcher watcher("Munchlax", eye, {0.3828, 0.6306, 0.0208, 0.0481}, COLOR_CYAN);
     std::vector<PeriodicInferenceCallback> callbacks;

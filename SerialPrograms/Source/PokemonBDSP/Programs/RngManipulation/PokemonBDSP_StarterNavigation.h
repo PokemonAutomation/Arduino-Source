@@ -28,15 +28,11 @@ enum class BdspStarter{
     Piplup,
 };
 
-enum class BdspPlayerModel{
-    Model1,
-    Model4,
-};
-
-
 //  BdspEyeTemplate lives in PokemonBDSP_EyeBlinkDetector.h, since every blink scene
 //  supplies one and the recovery machinery does not care which scene it came from.
-std::vector<BdspEyeTemplate> lake_eye_templates(BdspPlayerModel model);
+//
+//  "player_model" is 1 through BDSP_PLAYER_MODEL_COUNT.
+std::vector<BdspEyeTemplate> lake_eye_templates(uint8_t player_model);
 
 uint8_t starter_cursor_steps(BdspStarter starter);
 const char* starter_slug(BdspStarter starter);
@@ -58,11 +54,6 @@ bool issue_starter_sequence(
 
 
 //  Mash A until the battle with the wild Starly is over.
-//
-//  It cannot realistically be lost — a level 5 starter against a level 2 Starly,
-//  with the rival's Pokemon alongside — so there is no losing branch to handle.
-//  Returns false if the battle never ended, which means something other than a
-//  battle was on screen.
 bool clear_starter_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 double seconds_to_move_to_starter(BdspStarter starter);

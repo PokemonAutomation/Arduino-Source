@@ -19,6 +19,7 @@
 #include "Pokemon/Pokemon_BdspRng.h"
 #include "Pokemon/Pokemon_NatureChecker.h"
 #include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
+#include "PokemonBDSP/Options/PokemonBDSP_PlayerModelOption.h"
 #include "PokemonBDSP_RngAim.h"
 #include "PokemonBDSP_RngDisplays.h"
 #include "PokemonBDSP_StarterNavigation.h"
@@ -67,7 +68,7 @@ private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     EnumDropdownOption<BdspStarter> STARTER;
-    EnumDropdownOption<BdspPlayerModel> PLAYER_MODEL;
+    PlayerModelOption PLAYER_MODEL;
 
     Pokemon::StatsHuntIvRangeFilterTable FILTERS;
 
