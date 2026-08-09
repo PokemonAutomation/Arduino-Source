@@ -47,7 +47,7 @@ void StaticGlobals::load_json(const JsonValue& json){
         hash.push(dev_token->c_str(), dev_token->size());
         hash.finish();
         hash.get_hash_hex();
-        DEVELOPER_MODE = TOKENS.find(hash.get_hash_hex()) != TOKENS.end();
+        INTERNAL_DEVELOPER_MODE = TOKENS.find(hash.get_hash_hex()) != TOKENS.end();
     }
 
     const JsonObject* debug_obj = obj->get_object("DEBUG");
