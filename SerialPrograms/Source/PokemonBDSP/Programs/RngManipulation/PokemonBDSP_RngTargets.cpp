@@ -36,25 +36,6 @@ static BdspStaticTemplate legendary_template(const char* species, uint8_t level)
 
 
 static const BdspRngTargetInfo& target_table(BdspRngTarget target){
-    //  advances_after_accept is 65 rather than the 62 the scene was originally
-    //  measured spending. The extra 3 is an end-to-end correction measured on
-    //  hardware, not a second mechanic: nine attempts read back off the starter's
-    //  own summary landed late by 2/2/2/3/3/3/3/4/4, mean 3.0, 95% CI 2.4-3.6.
-    //
-    //  It is folded in here deliberately rather than charged to any particular
-    //  button press. Several presses in the scene are unmodelled -- the briefcase
-    //  dialogue press, the one that opens the briefcase, the cursor moves -- and
-    //  the data cannot say which of them costs an advance, only what the total is.
-    //  Inventing an attribution would look like knowledge we do not have.
-    //
-    //  What the same runs establish is that it is genuinely constant: it held
-    //  across blinks_before_confirm of 1, 2, 3 and 4, spans 165 to 168, and waits
-    //  from 33 s to 412 s. The residual +-1 is sub-advance press phase.
-    //
-    //  Measured with the clock's own error held near zero by keeping the waits
-    //  short. It is not a substitute for anchoring correctly over a long wait --
-    //  see step_blink_anchor() -- and calibrating it on long-wait runs would fold
-    //  that separate error into this constant.
     static const BdspRngTargetInfo STARTER{
         "starter", "Starter",
         starter_template(),
