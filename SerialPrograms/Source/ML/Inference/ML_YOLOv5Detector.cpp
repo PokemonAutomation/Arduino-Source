@@ -10,7 +10,7 @@
 #include <opencv2/imgcodecs.hpp>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/Filesystem.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"

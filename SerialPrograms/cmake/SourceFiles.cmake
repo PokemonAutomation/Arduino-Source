@@ -90,10 +90,12 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Exceptions.h
     ../Common/Cpp/ExpressionEvaluator.cpp
     ../Common/Cpp/ExpressionEvaluator.h
-    ../Common/Cpp/Filesystem.cpp
-    ../Common/Cpp/Filesystem.h
-    ../Common/Cpp/FileIO.cpp
-    ../Common/Cpp/FileIO.h
+    ../Common/Cpp/Filesystem/FileIO.cpp
+    ../Common/Cpp/Filesystem/FileIO.h
+    ../Common/Cpp/Filesystem/FilePath.cpp
+    ../Common/Cpp/Filesystem/FilePath.h
+    ../Common/Cpp/Filesystem/Filesystem.cpp
+    ../Common/Cpp/Filesystem/Filesystem.h
     ../Common/Cpp/Hardware/Hardware.cpp
     ../Common/Cpp/Hardware/Hardware.h
     ../Common/Cpp/Hardware/Hardware_arm64_Linux.tpp

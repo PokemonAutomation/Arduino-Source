@@ -1,4 +1,4 @@
-/*  Filesystem
+/*  File Path
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -19,15 +19,15 @@
  *
  */
 
-#ifndef PokemonAutomation_Filesystem_H
-#define PokemonAutomation_Filesystem_H
+#ifndef PokemonAutomation_Filesystem_FilePath_H
+#define PokemonAutomation_Filesystem_FilePath_H
 
 #include <filesystem>
 #include <iosfwd>
-#include "Common/Cpp/Strings/Unicode.h"
 
 namespace PokemonAutomation{
 namespace Filesystem{
+
 
 
 class Path{
@@ -38,13 +38,9 @@ public:
     {}
 
     //  Construct assuming input path is UTF-8 encoding.
-    Path(const char* path)
-        : m_path(utf8_to_utf8(path))
-    {}
+    Path(const char* path);
     //  Construct assuming input path is UTF-8 encoding.
-    Path(const std::string& path)
-        : m_path(utf8_to_utf8(path))
-    {}
+    Path(const std::string& path);
 
     //  Construct from UTF-8 string.
     Path(std::u8string path)
@@ -72,13 +68,13 @@ public:
     }
 
     //  Return path string as UTF-8.
-    std::string string() const{
-        return utf8_to_str(m_path.u8string());
-    }
+    std::string string() const;
+    std::string string_slash_normalized() const;
     //  Return path string as UTF-8.
     std::u8string u8string() const{
         return m_path.u8string();
     }
+    std::u8string u8string_slash_normalized() const;
 
     //  Return the generic-format filename component of the path.
     Path filename() const{
@@ -125,24 +121,12 @@ public:
     }
 
     //  Connect two path components.
-    Path& operator+=(const Path& x){
-        m_path += x.m_path;
-        return *this;
-    }
-    friend Path operator+(const Path& x, const Path& y){
-        std::filesystem::path ret = x;
-        ret += y.m_path;
-        return ret;
-    }
+    Path& operator+=(const Path& x);
+    friend Path operator+(const Path& x, const Path& y);
 
     //  Connect two path components with "/"
-    Path& operator/=(const Path& x){
-        m_path /= x.m_path;
-        return *this;
-    }
-    friend Path operator/(const Path& x, const Path& y){
-        return x.m_path / y.m_path;
-    }
+    Path& operator/=(const Path& x);
+    friend Path operator/(const Path& x, const Path& y);
 
     friend std::ostream& operator<<(std::ostream& stream, const Path& x);
 
@@ -151,55 +135,6 @@ private:
 };
 
 
-//  Whether a path exists.
-inline bool exists(const Path& path){
-    return std::filesystem::exists(path.stdpath());
-}
-
-//  Create every missing directory along the path.
-//  If all related directories already exist, return false. Otherwise return true.
-inline bool create_directories(const Path& path){
-    return std::filesystem::create_directories(path.stdpath());
-}
-
-//  Delete the contents of the path (if it is a directory) and the contents of all its subdirectories, recursively.
-//  Then delete the file/directory of path itself. Symlinks are not followed (symlink is removed, not its target).
-inline auto remove_all(const Path& path){
-    return std::filesystem::remove_all(path.stdpath());
-}
-
-//  Copy a file.
-inline bool copy_file(const Path& from, const Path& to){
-    return std::filesystem::copy_file(from.stdpath(), to.stdpath());
-}
-
-//  Return the size of a file in bytes.
-//  Throw std::filesystem::filesystem_error on underlying OS API errors
-inline std::uintmax_t file_size(const Path& path){
-    return std::filesystem::file_size(path.stdpath());
-}
-
-//  Return the size of a file in bytes.
-//  If an error occurs, set `ec`. Execute `ec.clear()` if no errors occur.
-inline std::uintmax_t file_size(const Path& path, std::error_code& ec){
-    return std::filesystem::file_size(path.stdpath(), ec);
-}
-
-//  Rename a file or directory.
-//  Throw std::filesystem::filesystem_error on underlying OS API errors
-inline void rename(const Path& old_path, const Path& new_path){
-    std::filesystem::rename(old_path.stdpath(), new_path.stdpath());
-}
-
-//  Rename a file or directory.
-//  If an error occurs, set `ec`. Execute `ec.clear()` if no errors occur.
-inline void rename(const Path& old_path, const Path& new_path, std::error_code& ec){
-    std::filesystem::rename(old_path.stdpath(), new_path.stdpath(), ec);
-}
-
-inline Path current_path(){
-    return std::filesystem::current_path();
-}
 
 
 

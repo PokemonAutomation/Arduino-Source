@@ -10,11 +10,11 @@
  *  On POSIX systems (macOS, Linux), uses fopen() with UTF-8 paths.
  */
 
-#ifndef PokemonAutomation_FileIO_H
-#define PokemonAutomation_FileIO_H
+#ifndef PokemonAutomation_Filesystem_FileIO_H
+#define PokemonAutomation_Filesystem_FileIO_H
 
 #include <string>
-#include "Common/Cpp/Filesystem.h"
+#include "Filesystem.h"
 
 namespace PokemonAutomation{
 
