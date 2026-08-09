@@ -14,8 +14,6 @@ namespace PokemonBDSP{
 
 using namespace Pokemon;
 
-const uint64_t CANCEL_CHECK_INTERVAL = 65536;
-
 const size_t MAX_MATCHES_TRACKED = 8;
 
 

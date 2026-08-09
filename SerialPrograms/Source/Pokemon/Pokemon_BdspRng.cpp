@@ -82,13 +82,13 @@ std::string BdspIVs::to_string() const{
 
 std::string BdspPokemonResult::to_string() const{
     std::string ret;
-    ret += "IVs: " + ivs.to_string();
-    ret += ", Nature: " + std::string(bdsp_nature_name(nature));
-    ret += ", Ability: " + std::to_string(ability);
+    ret += std::string(bdsp_shiny_name(shiny));
     ret += ", " + std::string(bdsp_gender_name(gender));
-    ret += ", " + std::string(bdsp_shiny_name(shiny));
-    ret += ", PID: 0x" + tostr_hex_padded(8, pid);
-    ret += ", EC: 0x" + tostr_hex_padded(8, ec);
+    ret += ", Nature: " + std::string(bdsp_nature_name(nature));
+    // ret += ", Ability: " + std::to_string(ability);
+    ret += ", IVs: " + ivs.to_string();
+    // ret += ", PID: 0x" + tostr_hex_padded(8, pid);
+    // ret += ", EC: 0x" + tostr_hex_padded(8, ec);
     return ret;
 }
 

@@ -8,6 +8,7 @@
 #include <cmath>
 #include <memory>
 #include <vector>
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -47,6 +48,9 @@ const double GAP_GUARD_SECONDS = 0.30;
 const uint64_t HIT_SEARCH_RADIUS = 20;
 const size_t MAX_SCHEDULES = 8;
 
+const uint64_t SKIP_ARRIVAL_OVERSHOOT_ALLOWANCE = 200000;
+
+
 const size_t CALIBRATION_MIN_SAMPLES = 3;
 const double CALIBRATION_THRESHOLD = 1.0;
 
@@ -56,7 +60,7 @@ StarterRng_Descriptor::StarterRng_Descriptor()
         "PokemonBDSP:StarterRng",
         STRING_POKEMON + " BDSP", "Starter RNG",
         "",
-        "Manipulate the Lake Verity starter by working out the RNG state from character blinks.",
+        "Starter RNG manipulation using blinks.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
@@ -90,6 +94,21 @@ std::unique_ptr<StatsTracker> StarterRng_Descriptor::make_stats() const{
 
 StarterRng::StarterRng()
     : m_aim(CALIBRATION_MIN_SAMPLES, CALIBRATION_THRESHOLD)
+    , LANGUAGE(
+        "<b>Game Language:</b>",
+        summary_nature_languages(),
+        LockMode::LOCK_WHILE_RUNNING, true
+    )
+    , START_POINT(
+        "<b>Start point:</b><br>"
+        "Where you have saved your game. Starting from the bedroom allows the possibility to skip advances quickly.",
+        {
+            {BdspStartPoint::Lakefront, "lakefront", "Verity Lakefront"},
+            {BdspStartPoint::Bedroom,   "bedroom",   "Bedroom"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        BdspStartPoint::Lakefront
+    )
     , STARTER(
         "<b>Starter:</b><br>",
         {
@@ -117,20 +136,22 @@ StarterRng::StarterRng()
     )
     , MAX_TARGET_WAIT_MINUTES(
         "<b>Wait at most (minutes) for a target:</b><br>"
-        "Rarer targets will require longer wait times.",
+        "Time limit for waiting at Verity Lake. Rarer targets will require longer "
+        "wait times.",
         LockMode::LOCK_WHILE_RUNNING,
-        20, 1, 1440
+        30, 5, 1440
+    )
+    , MAX_SKIP_MINUTES(
+        "<b>Skip at most (minutes):</b><br>"
+        "Time limit for skipping advances in Twinleaf Town.",
+        LockMode::LOCK_WHILE_RUNNING,
+        30, 5, 1440
     )
     , AUTO_CALIBRATE(
         "<b>Correct the timing automatically:</b><br>"
         "Shift the target advances when several attempts miss.",
         LockMode::LOCK_WHILE_RUNNING,
         true
-    )
-    , LANGUAGE(
-        "<b>Game Language:</b>",
-        summary_nature_languages(),
-        LockMode::LOCK_WHILE_RUNNING, true
     )
     , USE_SOUND_DETECTION(
         "<b>Use sound detection:</b>",
@@ -157,31 +178,47 @@ StarterRng::StarterRng()
 {
     {
         std::vector<std::unique_ptr<EditableTableRow>> defaults;
-        auto row = std::make_unique<StatsHuntIvRangeFilterRow>(FILTERS);
+        auto row = std::make_unique<BdspRngFilterRow>(FILTERS);
         row->misc.shiny.set(StatsHuntShinyFilter::Shiny);
         defaults.emplace_back(std::move(row));
         FILTERS.set_default(std::move(defaults));
         FILTERS.restore_defaults();
     }
 
-    PA_ADD_OPTION(STARTER);
+    PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(PLAYER_MODEL);
+    PA_ADD_OPTION(START_POINT);
+    PA_ADD_OPTION(STARTER);
     PA_ADD_OPTION(FILTERS);
     PA_ADD_OPTION(COLLECTION_DISPLAY);
     PA_ADD_OPTION(STATE_DISPLAY);
     PA_ADD_OPTION(TARGET_DISPLAY);
     PA_ADD_OPTION(MAX_RESETS);
     PA_ADD_OPTION(MAX_TARGET_WAIT_MINUTES);
+    PA_ADD_OPTION(MAX_SKIP_MINUTES);
     PA_ADD_OPTION(AUTO_CALIBRATE);
-    PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(USE_SOUND_DETECTION);
     PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
+
+    START_POINT.add_listener(*this);
+    StarterRng::on_config_value_changed(this);
 }
 
 
-bool StarterRng::wanted(const BdspPokemonResult& pokemon) const{
+void StarterRng::on_config_value_changed(void*){
+    MAX_SKIP_MINUTES.set_visibility(
+        START_POINT == BdspStartPoint::Bedroom
+            ? ConfigOptionState::ENABLED
+            : ConfigOptionState::HIDDEN
+    );
+}
+
+
+bool StarterRng::wanted(
+    const BdspRngFilterSnapshot& filters, const BdspPokemonResult& pokemon
+){
     auto exactly = [](uint8_t iv){ return IvRange{(int8_t)iv, (int8_t)iv}; };
     IvRanges ivs;
     ivs.hp      = exactly(pokemon.ivs.hp);
@@ -198,12 +235,159 @@ bool StarterRng::wanted(const BdspPokemonResult& pokemon) const{
     default: break;
     }
 
-    return FILTERS.get_action(
+    return filters.get_action(
         pokemon.shiny != BdspShiny::None,
         gender,
         bdsp_nature_to_checker_value(pokemon.nature),
+        pokemon.height,
         ivs
     ) != StatsHuntAction::Discard;
+}
+
+
+BdspSkipResult StarterRng::skip_advances_from_bedroom(
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context
+){
+    BdspSkipResult skip;
+    const BdspRngTargetInfo& target_info = bdsp_rng_target_info(BdspRngTarget::Starter);
+
+    //  Expected wait duration at the lake after a long skip
+    double longest_skip = MAX_SKIP_MINUTES * BDSP_SKIP_ADVANCES_PER_MINUTE;
+    double lake_minutes = bdsp_lake_advances_needed(longest_skip)
+        * BDSP_NPC_TICK_SECONDS / (target_info.observation_npcs * 60.0);
+    if (lake_minutes > MAX_TARGET_WAIT_MINUTES){
+        throw UserSetupError(env.logger(),
+            "A skip of up to " + std::to_string((uint16_t)MAX_SKIP_MINUTES)
+            + " minutes can leave up to "
+            + tostr_fixed(lake_minutes, 1) + " minutes of waiting at the lake, but the target "
+            "wait is capped at " + std::to_string((uint16_t)MAX_TARGET_WAIT_MINUTES)
+            + ". Raise the target wait to at least "
+            + std::to_string((uint16_t)std::ceil(lake_minutes))
+            + " minutes, or lower the skip limit."
+        );
+    }
+
+    env.log("Starting in the bedroom.");
+    pbf_press_button(context, BUTTON_A, 100ms, 2000ms); // open dialogue box
+    context.wait_for_all_requests();
+
+    std::vector<BdspEyeTemplate> setups = bedroom_eye_templates(PLAYER_MODEL.model_number());
+    std::vector<std::shared_ptr<const ImageRGB32>> eyes = load_eye_templates(setups);
+
+    std::vector<std::unique_ptr<EyeBlinkWatcher>> watchers;
+    std::vector<PeriodicInferenceCallback> callbacks;
+    make_blink_watchers(setups, eyes, watchers, callbacks);
+
+    BlinkRecoveryConfig bedroom_config;
+    bedroom_config.npcs = 1;
+
+    BlinkRecovery recovery = recover_state_from_blinks(
+        env, context, watchers, callbacks, COLLECTION_DISPLAY, bedroom_config,
+        RECOVERY_TIMEOUT_SECONDS
+    );
+    if (!recovery.success){
+        skip.failure_reason = "could not determine the RNG state in the bedroom: "
+            + recovery.failure_reason;
+        return skip;
+    }
+    skip.state = recovery.state;
+    env.log("Bedroom RNG state: " + recovery.state.to_string(), COLOR_BLUE);
+    STATE_DISPLAY.set_state(recovery.state, recovery.clock.anchor_advance);
+    STATE_DISPLAY.set_confidence_unique();
+
+    //  take into account remaning navigation time and the desired buffer
+    uint64_t soonest = recovery.clock.advance_at(current_time())
+        + (uint64_t)BDSP_SKIP_NAVIGATION_ADVANCES + bdsp_skip_buffer(0);
+    uint64_t furthest = soonest
+        + (uint64_t)(MAX_SKIP_MINUTES * BDSP_SKIP_ADVANCES_PER_MINUTE);
+
+    BdspStaticSearcher searcher(recovery.state, target_info.pokemon, 0);
+    BdspRngFilterSnapshot filters = FILTERS.make_snapshot();
+    std::vector<BdspRngHit> hits = searcher.scan(
+        soonest, furthest,
+        [&filters](const BdspPokemonResult& result){ return wanted(filters, result); },
+        true, &context
+    );
+    if (hits.empty()){
+        skip.failure_reason = "no target within " + std::to_string((uint16_t)MAX_SKIP_MINUTES)
+            + " minutes of skipping";
+        return skip;
+    }
+    const BdspRngHit& hit = hits[0];
+    skip.target_advance = hit.advances;
+    TARGET_DISPLAY.set_target(hit.result, hit.advances);
+
+    uint64_t start = recovery.clock.advance_at(current_time());
+    
+    //  The buffer depends on how far the skip runs, so size it from the raw distance.
+    double raw_skip = (double)hit.advances - (double)start - BDSP_SKIP_NAVIGATION_ADVANCES;
+    uint64_t buffer = bdsp_skip_buffer(raw_skip);
+    double to_skip = raw_skip - (double)buffer;
+    if (to_skip < 0){
+        to_skip = 0;
+    }
+    double wait_seconds = to_skip * 60 / BDSP_SKIP_ADVANCES_PER_MINUTE;
+    skip.buffer = buffer;
+
+    env.log("Target advance " + std::to_string(hit.advances) + ": " + hit.result.to_string(),
+        COLOR_BLUE);
+    env.log("Skipping " + std::to_string((uint64_t)to_skip) + " advances from "
+        + std::to_string(start) + ", which is " + tostr_fixed(wait_seconds, 1)
+        + "s on the spot, stopping " + std::to_string(buffer)
+        + " advances short to avoid overshooting.", COLOR_BLUE);
+
+    navigate_bedroom_to_skip_spot(env.logger(), context);
+
+
+    WallClock leave_at = current_time() + std::chrono::duration_cast<WallDuration>(
+        std::chrono::duration<double>(wait_seconds)
+    );
+
+    while (current_time() + 2s < leave_at){
+        WallClock now = current_time();
+        WallClock until = std::min(leave_at - 2s, now + 180s);
+        pbf_wait(context, std::chrono::duration_cast<Milliseconds>(until - now));
+        context.wait_for_all_requests();
+    }
+    WallClock now = current_time();
+    if (now < leave_at){
+        pbf_wait(context, std::chrono::duration_cast<Milliseconds>(leave_at - now));
+        context.wait_for_all_requests();
+    }
+
+    navigate_skip_spot_to_lakefront(env.logger(), context);
+    skip.success = true;
+    return skip;
+}
+
+
+void StarterRng::report_skip_arrival(
+    SingleSwitchProgramEnvironment& env,
+    const BdspSkipResult& skip,
+    const BlinkRecovery& arrival
+) const{
+    //  Generous enough to catch an overshoot, and a match is unique anyway.
+    uint64_t search_max = skip.target_advance + SKIP_ARRIVAL_OVERSHOOT_ALLOWANCE;
+    uint64_t travelled = 0;
+    if (!advances_between(skip.state, arrival.state, search_max, travelled)){
+        env.log(
+            "Could not place the lake state against the bedroom one, so the skip "
+            "cannot be measured this attempt.",
+            COLOR_ORANGE
+        );
+        return;
+    }
+
+    uint64_t here = travelled + arrival.clock.advance_at(current_time());
+    int64_t short_by = (int64_t)skip.target_advance - (int64_t)here;
+    env.log(
+        "Skip landed on advance " + std::to_string(here) + " of "
+        + std::to_string(skip.target_advance) + ": "
+        + (short_by >= 0
+            ? std::to_string(short_by) + " short, aimed for " + std::to_string(skip.buffer)
+            : "OVERSHOT by " + std::to_string(-short_by)),
+        short_by >= 0 ? COLOR_BLUE : COLOR_ORANGE
+    );
 }
 
 
@@ -222,6 +406,14 @@ BdspAttemptOutcome StarterRng::run_attempt(
     };
 
     const BdspRngTargetInfo& target_info = bdsp_rng_target_info(BdspRngTarget::Starter);
+
+    BdspSkipResult skip;
+    if (START_POINT == BdspStartPoint::Bedroom){
+        skip = skip_advances_from_bedroom(env, context);
+        if (!skip.success){
+            return abandon(skip.failure_reason);
+        }
+    }
 
     navigate_to_lake_blinks(env.logger(), context);
 
@@ -268,6 +460,10 @@ BdspAttemptOutcome StarterRng::run_attempt(
     STATE_DISPLAY.set_state(recovery.state, recovery.clock.anchor_advance);
     STATE_DISPLAY.set_confidence_unique();
 
+    if (skip.success){
+        report_skip_arrival(env, skip, recovery);
+    }
+
 
     const BdspTimelineContext& timeline = target_info.timeline;
 
@@ -298,7 +494,8 @@ BdspAttemptOutcome StarterRng::run_attempt(
         (double)MAX_TARGET_WAIT_MINUTES * 60 * recovery.clock.npcs / recovery.clock.tick_seconds
     );
     search.max_schedules = MAX_SCHEDULES;
-    search.wanted = [this](const BdspPokemonResult& result){ return wanted(result); };
+    BdspRngFilterSnapshot filters = FILTERS.make_snapshot();
+    search.wanted = [&filters](const BdspPokemonResult& result){ return wanted(filters, result); };
 
     TargetSelectionResult selection = select_target(search);
 
@@ -445,7 +642,7 @@ BdspAttemptOutcome StarterRng::run_attempt(
     );
     stats.missed++;
 
-    if (wanted(searcher.generate(hit.advance))){
+    if (wanted(filters, searcher.generate(hit.advance))){
         env.log("It passes the filter anyway, so this one will do. Stopping.", COLOR_BLUE);
         return BdspAttemptOutcome::Hit;
     }

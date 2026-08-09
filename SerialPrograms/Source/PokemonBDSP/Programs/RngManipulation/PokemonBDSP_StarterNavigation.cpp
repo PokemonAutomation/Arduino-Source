@@ -45,6 +45,23 @@ std::vector<BdspEyeTemplate> lake_eye_templates(uint8_t player_model){
 }
 
 
+std::vector<BdspEyeTemplate> bedroom_eye_templates(uint8_t player_model){
+    if (player_model < 1 || player_model > BDSP_PLAYER_MODEL_COUNT){
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION,
+            "Unknown player model: " + std::to_string(player_model)
+        );
+    }
+    return {
+        BdspEyeTemplate{
+            "bedroom_templates/model" + std::to_string(player_model) + ".png",
+            {0.4708, 0.4500, 0.0214, 0.0491},
+            "Player"
+        },
+    };
+}
+
+
 uint8_t starter_cursor_steps(BdspStarter starter){
     switch (starter){
     case BdspStarter::Turtwig:  return 0;
@@ -61,6 +78,37 @@ const char* starter_slug(BdspStarter starter){
     case BdspStarter::Piplup:   return "piplup";
     }
     throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unknown starter.");
+}
+
+//  behind the house to the north
+void navigate_bedroom_to_skip_spot(Logger& logger, ProControllerContext& context){
+    logger.log("Leaving the bedroom for the spot where advances pass quickly.");
+    pbf_mash_button(context, BUTTON_B, 1000ms); // exit dialogue with the Switch
+    pbf_wait(context, 1000ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 1200ms, 1500ms);
+    pbf_press_dpad(context, DPAD_DOWN, 2300ms, 500ms);
+    pbf_press_dpad(context, DPAD_LEFT, 1100ms, 1000ms);
+    pbf_press_dpad(context, DPAD_DOWN, 750ms, 4000ms);
+    pbf_press_dpad(context, DPAD_LEFT, 850ms, 1000ms);
+    pbf_press_dpad(context, DPAD_UP, 4100ms, 1000ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 950ms, 500ms);
+    context.wait_for_all_requests();
+}
+
+
+void navigate_skip_spot_to_lakefront(Logger& logger, ProControllerContext& context){
+    logger.log("Walking from the skip spot to the lakefront.");
+    pbf_press_dpad(context, DPAD_LEFT, 1350ms, 500ms);
+    pbf_press_dpad(context, DPAD_UP, 5000ms, 0ms);
+
+    //  Clearing the dialogue with Barry
+    pbf_mash_button(context, BUTTON_B, 5000ms);
+    pbf_wait(context, 1000ms);
+
+    pbf_press_dpad(context, DPAD_UP, 600ms, 1000ms);
+    pbf_press_dpad(context, DPAD_LEFT, 8500ms, 1000ms);
+    pbf_press_dpad(context, DPAD_UP, 1950ms, 1000ms);
+    context.wait_for_all_requests();
 }
 
 
@@ -89,7 +137,7 @@ void navigate_to_lake_blinks(Logger& logger, ProControllerContext& context){
 void navigate_to_pre_briefcase(Logger& logger, ProControllerContext& context){
     logger.log("Advancing to the pre-briefcase position.");
 
-    //  Seven presses with a total duration equal to PRE_BRIEFCASE_DURATION (above)
+    //  total duration equal to PRE_BRIEFCASE_DURATION (above)
     pbf_wait(context, 1500ms);
     pbf_press_button(context, BUTTON_A, 100ms, 3500ms);
     pbf_press_button(context, BUTTON_A, 100ms, 2000ms);
@@ -113,7 +161,7 @@ static Milliseconds starly_press_to_select_ready(BdspStarter starter){
 }
 
 
-//  The whole blind run, from the briefcase press to the confirming press.
+//  The whole blind button press sequence
 bool issue_starter_sequence(
     ProControllerContext& context,
     BdspStarter starter,
@@ -128,8 +176,8 @@ bool issue_starter_sequence(
         );
     };
 
-    //  Where the run stands after each fixed stretch, measured from the moment the
-    //  briefcase press is issued.
+    //  Where the run stands after each fixed stretch, 
+    //  measured from the moment the briefcase press is completed
     Milliseconds starly_at = to_ms(starly_seconds);
     Milliseconds select_at = to_ms(select_seconds);
     Milliseconds confirm_at = to_ms(confirm_seconds);

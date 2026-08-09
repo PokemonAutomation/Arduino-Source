@@ -16,6 +16,7 @@
 #include "PokemonBDSP/Inference/Rng/PokemonBDSP_EyeBlinkDetector.h"
 #include "PokemonBDSP_BedroomSeedFinder.h"
 #include "PokemonBDSP_BlinkRecovery.h"
+#include "PokemonBDSP_StarterNavigation.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -23,26 +24,7 @@ namespace PokemonBDSP{
     using namespace Pokemon;
 
 
-const ImageFloatBox BEDROOM_PLAYER_EYE_BOX{0.4708, 0.4500, 0.0214, 0.0491};
-
 const uint16_t GIVE_UP_SECONDS = 1500;
-
-
-static std::vector<BdspEyeTemplate> bedroom_eye_templates(uint8_t player_model){
-    if (player_model < 1 || player_model > BDSP_PLAYER_MODEL_COUNT){
-        throw InternalProgramError(
-            nullptr, PA_CURRENT_FUNCTION,
-            "Unknown player model: " + std::to_string(player_model)
-        );
-    }
-    return {
-        BdspEyeTemplate{
-            "bedroom_templates/model" + std::to_string(player_model) + ".png",
-            BEDROOM_PLAYER_EYE_BOX,
-            "Player"
-        },
-    };
-}
 
 
 BedroomSeedFinder_Descriptor::BedroomSeedFinder_Descriptor()
@@ -50,7 +32,7 @@ BedroomSeedFinder_Descriptor::BedroomSeedFinder_Descriptor()
         "PokemonBDSP:BedroomSeedFinder",
         STRING_POKEMON + " BDSP", "Bedroom Seed Finder",
         "",
-        "Recover the RNG seed by watching the player blink in the bedroom.",
+        "Recover the RNG seed by watching the player character's blinks in their bedroom.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::ENABLE_COMMANDS,
@@ -81,8 +63,7 @@ void BedroomSeedFinder::program(SingleSwitchProgramEnvironment& env, ProControll
     make_blink_watchers(setups, eyes, watchers, callbacks);
 
     env.log(
-        "Watching the player blink. Stand still in the bedroom and leave the camera alone. "
-        "The overlay box should be sitting on the player's eye."
+        "Watching the player blink. The overlay box should be sitting on the player's eye."
     );
 
     BlinkRecoveryConfig config;

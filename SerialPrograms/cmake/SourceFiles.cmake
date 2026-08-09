@@ -1453,6 +1453,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonBDSP/Options/PokemonBDSP_LearnMove.h
     Source/PokemonBDSP/Options/PokemonBDSP_PlayerModelOption.cpp
     Source/PokemonBDSP/Options/PokemonBDSP_PlayerModelOption.h
+    Source/PokemonBDSP/Options/PokemonBDSP_RngFilter.cpp
+    Source/PokemonBDSP/Options/PokemonBDSP_RngFilter.h
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.cpp
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h
     Source/PokemonBDSP/Panels_PokemonBDSP.cpp

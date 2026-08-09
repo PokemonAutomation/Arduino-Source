@@ -73,6 +73,24 @@ StatReads bdsp_expected_stats(
 }
 
 
+bool advances_between(
+    const Xorshift128State& from,
+    const Xorshift128State& to,
+    uint64_t search_max,
+    uint64_t& advances
+){
+    Xorshift128 rng(from);
+    for (uint64_t c = 0; c <= search_max; c++){
+        if (rng.state() == to){
+            advances = c;
+            return true;
+        }
+        rng.next();
+    }
+    return false;
+}
+
+
 const BaseStats& starter_base_stats(BdspStarter starter){
     //  Order: HP, Atk, Def, SpA, SpD, Spe.
     static const BaseStats TURTWIG {55, 68, 64, 45, 55, 31};

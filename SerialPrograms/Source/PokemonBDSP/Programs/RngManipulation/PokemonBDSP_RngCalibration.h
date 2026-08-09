@@ -57,6 +57,14 @@ BdspHitIdentification identify_hit_advance(
 );
 
 
+bool advances_between(
+    const Pokemon::Xorshift128State& from,
+    const Pokemon::Xorshift128State& to,
+    uint64_t search_max,
+    uint64_t& advances
+);
+
+
 const Pokemon::BaseStats& starter_base_stats(BdspStarter starter);
 
 bool consistent_with(
