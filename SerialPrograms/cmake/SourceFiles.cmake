@@ -1515,6 +1515,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonBDSP/Programs/PokemonBDSP_OverworldTrigger.h
     Source/PokemonBDSP/Programs/PokemonBDSP_RunFromBattle.cpp
     Source/PokemonBDSP/Programs/PokemonBDSP_RunFromBattle.h
+    Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_BedroomSeedFinder.cpp
+    Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_BedroomSeedFinder.h
     Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_BlinkModel.cpp
     Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_BlinkModel.h
     Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_BlinkRecovery.cpp

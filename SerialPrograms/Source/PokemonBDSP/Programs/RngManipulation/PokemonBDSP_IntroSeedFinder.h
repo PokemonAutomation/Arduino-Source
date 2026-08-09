@@ -7,8 +7,6 @@
 #ifndef PokemonAutomation_PokemonBDSP_IntroSeedFinder_H
 #define PokemonAutomation_PokemonBDSP_IntroSeedFinder_H
 
-#include "Common/Cpp/Options/FloatingPointOption.h"
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonBDSP_RngDisplays.h"
 
@@ -30,9 +28,6 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    FloatingPointOption TOLERANCE_SECONDS;
-    SimpleIntegerOption<uint16_t> GIVE_UP_SECONDS;
-
     BlinkCollectionDisplay COLLECTION_DISPLAY;
     RngStateDisplay STATE_DISPLAY;
 };

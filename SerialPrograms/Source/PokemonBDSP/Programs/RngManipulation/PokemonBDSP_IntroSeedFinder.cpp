@@ -4,6 +4,7 @@
  *
  */
 
+#include <stdint.h>
 #include <algorithm>
 #include <chrono>
 #include <memory>
@@ -34,6 +35,10 @@ const size_t MIN_USABLE_TO_TRY = 32;
 
 const size_t CONFIRMATION_BLINKS = 6;
 
+const uint16_t GIVE_UP_SECONDS = 1500;
+
+const double TOLERANCE_SECONDS = 0.10;
+
 
 IntroSeedFinder_Descriptor::IntroSeedFinder_Descriptor()
     : SingleSwitchProgramDescriptor(
@@ -50,28 +55,7 @@ IntroSeedFinder_Descriptor::IntroSeedFinder_Descriptor()
 {}
 
 
-IntroSeedFinder::IntroSeedFinder()
-    : TOLERANCE_SECONDS(
-        "<b>Timing tolerance (seconds):</b><br>"
-        "How far off a measured gap might be. Here the gap itself is the value being read, "
-        "so this decides which readings are trusted. Measured error end to end on real "
-        "hardware is about 0.05 s, which makes 0.05 too tight to be safe and 0.07 roughly "
-        "the floor.",
-        LockMode::LOCK_WHILE_RUNNING,
-        0.10, 0.02, 0.30
-    )
-    , GIVE_UP_SECONDS(
-        "<b>Give up after (seconds):</b><br>"
-        "A backstop, not a target. The program stops as soon as it has recovered the seed and "
-        "confirmed it, which usually takes eight to ten minutes. This is how long it waits "
-        "before concluding that something is wrong with the capture rather than that it needs "
-        "more of it.",
-        LockMode::LOCK_WHILE_RUNNING,
-        1500, 120, 5400
-    )
-{
-    PA_ADD_OPTION(TOLERANCE_SECONDS);
-    PA_ADD_OPTION(GIVE_UP_SECONDS);
+IntroSeedFinder::IntroSeedFinder(){
     PA_ADD_OPTION(COLLECTION_DISPLAY);
     PA_ADD_OPTION(STATE_DISPLAY);
 }
@@ -259,25 +243,6 @@ void IntroSeedFinder::program(SingleSwitchProgramEnvironment& env, ProController
     STATE_DISPLAY.set_state(confirmed.state, confirmed_blinks);
     STATE_DISPLAY.set_confidence_unique();
     COLLECTION_DISPLAY.set_progress(confirmed_blinks, confirmed_blinks);
-
-
-    env.log("--------");
-    env.log(
-        "Now finish the intro however you like — the timing no longer matters. Then open the "
-        "trainer card and note the ID No.",
-        COLOR_BLUE
-    );
-    env.log(
-        "Put the two seeds above into PokeFinder's Gen 8 ID search and look for the advance "
-        "whose displayed TID matches your card. That row gives your SID, and TID xor SID is "
-        "the TSV you will want for shiny hunting afterwards.",
-        COLOR_BLUE
-    );
-    env.log(
-        "If two advances in range share your displayed TID, search a narrower range or check "
-        "which one matches a Pokemon you have caught.",
-        COLOR_BLUE
-    );
 }
 
 

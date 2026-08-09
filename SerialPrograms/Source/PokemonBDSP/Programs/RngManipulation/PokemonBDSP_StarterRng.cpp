@@ -206,7 +206,6 @@ BdspAttemptOutcome StarterRng::run_attempt(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context
 ){
     StarterRng_Descriptor::Stats& stats = env.current_stats<StarterRng_Descriptor::Stats>();
-    WallClock attempt_started = current_time();
     COLLECTION_DISPLAY.reset();
     STATE_DISPLAY.reset();
     TARGET_DISPLAY.reset();
@@ -299,20 +298,9 @@ BdspAttemptOutcome StarterRng::run_attempt(
     TargetSelectionResult selection = select_target(search);
 
     if (selection.matches_found != 0){
-        double scanned = (double)selection.advances_scanned;
-        double overhead_minutes = std::chrono::duration_cast<std::chrono::duration<double>>(
-            current_time() - attempt_started
-        ).count() / 60;
-        double gap_minutes = scanned * recovery.clock.tick_seconds
-            / ((double)selection.matches_found * 60.0 * recovery.clock.npcs);
         env.log(
             std::to_string(selection.matches_found) + " matching advance(s) in "
-            + std::to_string(selection.advances_scanned) + " here — one in "
-            + std::to_string((uint64_t)(scanned / (double)selection.matches_found))
-            + " on this seed. At " + tostr_fixed(overhead_minutes, 1)
-            + " min to reach this point, a wait of at least "
-            + tostr_fixed(std::sqrt(2 * overhead_minutes * gap_minutes), 0)
-            + " min is worth allowing for a filter this rare.",
+            + std::to_string(selection.advances_scanned),
             COLOR_BLUE
         );
     }

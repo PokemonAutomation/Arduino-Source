@@ -96,7 +96,7 @@ bool wait_for_blink_scene(
         if (blink_scene_ready(env, context, detectors, config)){
             return true;
         }
-        env.log(scene_name + " position not reached — a press was probably dropped. "
+        env.log(scene_name + " position not reached. A press was probably dropped. "
             "Pressing again (" + std::to_string(attempt + 1) + " of "
             + std::to_string(config.press_retries) + ").", COLOR_ORANGE);
         pbf_press_button(context, config.retry_button, 100ms, 1200ms);

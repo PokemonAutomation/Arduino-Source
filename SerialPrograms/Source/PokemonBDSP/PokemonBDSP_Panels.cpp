@@ -39,6 +39,7 @@
 //#include "Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy.h"
 //#include "Programs/Glitches/PokemonBDSP_CloneItemsMenuOverlap.h"
 
+#include "Programs/RngManipulation/PokemonBDSP_BedroomSeedFinder.h"
 #include "Programs/RngManipulation/PokemonBDSP_IntroSeedFinder.h"
 #include "Programs/RngManipulation/PokemonBDSP_StarterRng.h"
 
@@ -103,6 +104,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     if (IS_BETA_VERSION || STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Untested/Beta/WIP ----");
         ret.emplace_back(make_single_switch_program<IntroSeedFinder_Descriptor, IntroSeedFinder>());
+        ret.emplace_back(make_single_switch_program<BedroomSeedFinder_Descriptor, BedroomSeedFinder>());
         ret.emplace_back(make_single_switch_program<StarterRng_Descriptor, StarterRng>());
     }
     if (STATIC_GLOBALS.DEVELOPER_MODE){
