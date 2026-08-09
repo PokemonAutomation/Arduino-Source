@@ -118,8 +118,8 @@ public:
 
     Pimpl<ErrorReportOption> ERROR_REPORTS;
 
-    BooleanCheckBoxOption DEVELOPER_MODE_CHECKBOX;
     StringOption DEVELOPER_TOKEN;
+    StringOption INTERNAL_DEVELOPER_TOKEN;
 
     // The mode that does not run Qt GUI, but instead runs some tests for
     // debugging, unit testing and developing purposes.

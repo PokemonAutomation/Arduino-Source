@@ -197,13 +197,13 @@ GlobalSettings::GlobalSettings()
 //        IS_BETA_VERSION
     )
     , ERROR_REPORTS(CONSTRUCT_TOKEN)
-    , DEVELOPER_MODE_CHECKBOX(
-        "<b>Enable Developer mode:</b><br>Enable features for testing/development."
-        "<br>Restart application to take full effect after changing this.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false
-    )
     , DEVELOPER_TOKEN(
+        true,
+        "<b>Developer Token for Regular Dev mode:</b><br>Restart application to take full effect after changing this.",
+        LockMode::LOCK_WHILE_RUNNING,
+        "", ""
+    )
+    , INTERNAL_DEVELOPER_TOKEN(
         true,
         "<b>Developer Token for Internal Dev mode:</b><br>Restart application to take full effect after changing this.",
         LockMode::LOCK_WHILE_RUNNING,
@@ -267,8 +267,8 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(ERROR_REPORTS);
 #endif
 
-    PA_ADD_OPTION(DEVELOPER_MODE_CHECKBOX);
     PA_ADD_OPTION(DEVELOPER_TOKEN);
+    PA_ADD_OPTION(INTERNAL_DEVELOPER_TOKEN);
 
     USE_GPU_FOR_ML_INFERENCE0.set_visibility(ConfigOptionState::HIDDEN);
     RESOURCE_DOWNLOAD_TABLE.set_visibility(ConfigOptionState::HIDDEN);
@@ -290,7 +290,6 @@ void GlobalSettings::load_json(const JsonValue& json){
     STATIC_GLOBALS.load_json(json);
     BatchOption::load_json(json);
 
-    STATIC_GLOBALS.DEVELOPER_MODE = DEVELOPER_MODE_CHECKBOX.current_value();
     const bool developer_mode = STATIC_GLOBALS.DEVELOPER_MODE;
 
     ConfigOptionState devmode_visibility = developer_mode
