@@ -243,11 +243,11 @@ BdspAttemptOutcome StarterRng::run_attempt(
     std::vector<PeriodicInferenceCallback> callbacks;
     make_blink_watchers(setups, eyes, watchers, callbacks);
 
-    BlinkRecoveryConfig recovery_config;
-    recovery_config.npcs = target_info.observation_npcs;
+    BlinkRecoveryConfig blink_config;
+    blink_config.npcs = target_info.observation_npcs;
 
     BlinkRecovery recovery = recover_state_from_blinks(
-        env, context, watchers, callbacks, COLLECTION_DISPLAY, recovery_config,
+        env, context, watchers, callbacks, COLLECTION_DISPLAY, blink_config,
         RECOVERY_TIMEOUT_SECONDS
     );
     if (!recovery.success){
@@ -332,7 +332,7 @@ BdspAttemptOutcome StarterRng::run_attempt(
     TARGET_DISPLAY.set_target(target, target_advance);
 
     hold_and_reanchor(
-        env, context, watchers, callbacks, recovery, recovery_config,
+        env, context, watchers, callbacks, recovery, blink_config,
         press_advance, lead_seconds, STATE_DISPLAY
     );
 

@@ -175,7 +175,8 @@ void IntroSeedFinder::program(SingleSwitchProgramEnvironment& env, ProController
             continue;
         }
         std::vector<Blink> blinks = extract_blinks(samples, threshold);
-        if (blinks.size() <= blink_count){
+        //  No need to go further until another blink is recorded
+        if (blinks.size() == blink_count){
             continue;
         }
         blink_count = blinks.size();

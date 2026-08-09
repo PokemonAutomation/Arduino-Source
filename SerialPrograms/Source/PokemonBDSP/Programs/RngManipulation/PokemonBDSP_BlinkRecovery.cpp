@@ -246,7 +246,7 @@ BlinkRecovery recover_state_from_blinks(
         display.set_progress(events, config.min_rolls_to_try + config.confirmation_events);
 
         //  No need to go further until another blink is recorded
-        if (events <= event_count){
+        if (events == event_count){
             continue;
         }
         event_count = events;
@@ -444,6 +444,7 @@ void hold_and_reanchor(
     const WallClock entry_time = clock.anchor_time;
     size_t reanchors = 0;
     size_t consecutive_failures = 0;
+    WallClock next_reanchor = current_time();
 
     CancellableHolder<CancellableScope> subcontext(static_cast<CancellableScope&>(context));
     InferenceSession session(subcontext, env.console, callbacks);
@@ -458,12 +459,20 @@ void hold_and_reanchor(
         bool leaving = current_time() >= leave_at;
         if (!leaving){
             try{
-                subcontext.wait_until(std::min(leave_at, current_time() + config.poll_interval));
+                subcontext.wait_until(std::min({
+                    leave_at, next_reanchor, current_time() + config.poll_interval
+                }));
             }catch (OperationCancelledException&){}
             subcontext.throw_if_cancelled_with_exception();
             context.throw_if_cancelled();
             keep_awake_if_due(context, next_nudge, config.keep_awake_interval);
         }
+
+        display.set_advances(clock.advance_at(current_time()));
+        if (!leaving && current_time() < next_reanchor){
+            continue;
+        }
+        next_reanchor = current_time() + config.reanchor_interval;
 
         bool reanchored = false;
         std::vector<std::vector<BlinkMatchSample>> matches;
@@ -483,7 +492,6 @@ void hold_and_reanchor(
         if (reanchored){
             reanchors++;
             consecutive_failures = 0;
-            display.set_advances(clock.advance_at(current_time()));
         }else{
             consecutive_failures++;
             if (consecutive_failures >= config.max_reanchor_failures){
