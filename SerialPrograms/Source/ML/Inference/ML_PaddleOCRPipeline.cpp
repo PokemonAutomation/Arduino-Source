@@ -12,6 +12,7 @@
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/StaticGlobals.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
 #include "ML/Models/ML_ONNXRuntimeHelpers.h"
 #include "ML_PaddleOCRPipeline.h"
@@ -106,12 +107,14 @@ void PaddleOCRPipeline::load_dictionary(const std::string& path){
 
 std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
 
+    Logger& logger = global_logger_tagged();
+
     bool debugging = true; //STATIC_GLOBALS.PADDLE_OCR_DEBUG;
 
     // 1. Convert Image to OpenCV image (cv::mat)
     cv::Mat cv_image_rgb = imageviewrgb32_to_cv_mat_rgb(image);
     if (cv_image_rgb.empty()) {
-        std::clog << "[OCR-DEBUG] Input was an empty image.\n";
+        logger.log("[OCR-DEBUG] Input was an empty image.");
         return "";
     }
 
@@ -119,7 +122,7 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     // 2. Crop tightly around the text, with small safety margin
     cv::Mat cropped_image = crop_to_text_region(cv_image_rgb);
     if (cropped_image.empty()){
-        std::clog << "[OCR-DEBUG] Crop to text region returned empty image.\n";
+        logger.log("[OCR-DEBUG] Crop to text region returned empty image.");
         return "";
     }
 
@@ -138,7 +141,7 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     );
 
     if (target_w <= 0 || target_w > 8192){
-        std::clog << "[OCR-ERROR] Abnormally scaled target width calculated: " << target_w << "\n";
+        logger.log("[OCR-ERROR] Abnormally scaled target width calculated: " + std::to_string(target_w));
         return "";
     }
 
@@ -186,10 +189,10 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
 
     size_t expected_elements = 1 * 3 * target_h * target_w;
     if (debugging){
-        std::clog << "[OCR-DEBUG] Cropped image constraints - Width: " << cropped_image.cols 
-            << ", Height: " << cropped_image.rows 
-            << ", Channels: " << cropped_image.channels() 
-            << ", Total Pixels: " << cropped_image.total() << "\n";
+        logger.log("[OCR-DEBUG] Cropped image constraints - Width: " + std::to_string(cropped_image.cols) 
+            + ", Height: " + std::to_string(cropped_image.rows) 
+            + ", Channels: " + std::to_string(cropped_image.channels()) 
+            + ", Total Pixels: " + std::to_string(cropped_image.total()));
 
         size_t nan_count = 0;
         size_t subnormal_count = 0;
@@ -200,21 +203,20 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
                 subnormal_count++;
             }
         }
-        std::clog << "[OCR-DEBUG] Tensor payload validation - Total Floats: " << input_tensor_values.size()
-                << ", NaNs detected: " << nan_count 
-                << ", Subnormal (denormal) values: " << subnormal_count << "\n";
+        logger.log("[OCR-DEBUG] Tensor payload validation - Total Floats: " + std::to_string(input_tensor_values.size())
+                + ", NaNs detected: " + std::to_string(nan_count) 
+                + ", Subnormal (denormal) values: " + std::to_string(subnormal_count));
     
         // Validate expected payload sizing matches matrix dimensionality
-        std::clog << "[OCR-DEBUG] Shape Definition - NCHW: [" << input_shape[0] << "," << input_shape[1] 
-                << "," << input_shape[2] << "," << input_shape[3] << "]. Expected Elements: " << expected_elements << "\n";
+        logger.log("[OCR-DEBUG] Shape Definition - NCHW: [" + std::to_string(input_shape[0]) + "," + std::to_string(input_shape[1]) 
+                + "," + std::to_string(input_shape[2]) + "," + std::to_string(input_shape[3]) + "]. Expected Elements: " + std::to_string(expected_elements));
 
-        std::clog.flush();
     }
 
     if (input_tensor_values.size() != static_cast<size_t>(expected_elements)) {
-        std::clog << "[OCR-ERROR] Vector length vs input_shape calculation mismatch!\n";
-        std::clog << "[OCR-ERROR] Fatal memory stride mismatch. Vector size (" << input_tensor_values.size() 
-                    << ") does not match shape requirement (" << expected_elements << ")\n";
+        logger.log("[OCR-ERROR] Vector length vs input_shape calculation mismatch!");
+        logger.log("[OCR-ERROR] Fatal memory stride mismatch. Vector size (" + std::to_string(input_tensor_values.size())
+                    + ") does not match shape requirement (" + std::to_string(expected_elements));
         return "";
     }
 
@@ -238,8 +240,7 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
 
     try{
         if (debugging) {
-            std::clog << "[OCR-DEBUG] Calling m_rec_session.Run() now...\n";
-            std::clog.flush(); // Critical: Forces log file save before potential hardware crash
+            logger.log("[OCR-DEBUG] Calling m_rec_session.Run() now...");
         }
 
         // 8. Run the recognition session
