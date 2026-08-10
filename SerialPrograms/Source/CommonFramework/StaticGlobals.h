@@ -56,6 +56,8 @@ public:
     // then manually inspect to fix any errors.
     bool GENERATE_TEST_GOLDEN_FILES = false;
 
+    bool PADDLE_OCR_DEBUG = false;
+
 
 };
 
