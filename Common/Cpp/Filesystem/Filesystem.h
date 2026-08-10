@@ -61,7 +61,8 @@ void rename(const Path& old_path, const Path& new_path, std::error_code& ec);
 
 Path current_path();
 
-Path application_path();
+Path application_binary_path();
+Path application_working_path();
 
 
 
