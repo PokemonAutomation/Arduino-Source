@@ -393,10 +393,26 @@ std::vector<float> preprocess_NCHW(cv::Mat& img){
 }
 
 std::string decode_CTC(float* data, const std::vector<int64_t>& shape, const std::vector<std::string>& dict){
+
+    Logger& logger = global_logger_tagged();
+    bool debugging = true; //STATIC_GLOBALS.PADDLE_OCR_DEBUG;
+
     std::string text = "";
     size_t seq_len = static_cast<size_t>(shape[1]);
     int64_t num_cls = shape[2];
     size_t last_index = 0; 
+
+    // Initial boundary logging configuration
+    if (debugging){
+        logger.log("[OCR-CTC-DEBUG] Starting decode_CTC. Sequence Length: " + std::to_string(seq_len) + 
+                ", Total Classes: " + std::to_string(num_cls) + 
+                ", Dictionary Size: " + std::to_string(dict.size()));
+    }
+
+    if (dict.empty()) {
+        logger.log("[OCR-CTC-ERROR] FATAL: Dictionary payload array is empty! Parsing loops will fail to resolve text indicators.");
+    }
+
     for (size_t i = 0; i < seq_len; ++i){
         float* row = data + i * num_cls;
         // 1. Get the character index with highest probability (Argmax)
@@ -409,11 +425,27 @@ std::string decode_CTC(float* data, const std::vector<int64_t>& shape, const std
             // Index 1 from the model maps to the 1st line of your .txt file (Vector index 0)
             size_t dict_idx = argmax - 1; 
             if (dict_idx < dict.size()){
+                if (debugging) {
+                    logger.log("[OCR-CTC-DEBUG] Step " + std::to_string(i) + 
+                               ": Predicted Argmax = " + std::to_string(argmax) + 
+                               " -> Target Dict Index = " + std::to_string(dict_idx) +
+                               " (Character resolved: '" + dict[dict_idx] + "')");
+                }
                 text += dict[dict_idx];
+            }else {
+                logger.log("[OCR-CTC-ERROR] Step " + std::to_string(i) + 
+                            ": Predicted Argmax = " + std::to_string(argmax) + 
+                            " -> Target Dict Index = " + std::to_string(dict_idx) + 
+                            " (ERROR: Calculated index is out of bounds for the dictionary memory layout!)");
             }
         }
         last_index = argmax;
     }
+
+    if (debugging) {
+        logger.log("[OCR-CTC-DEBUG] Complete loop execution tracking finish. Resulting string extraction: '" + text + "'");
+    }
+
     return text;
 }
 
