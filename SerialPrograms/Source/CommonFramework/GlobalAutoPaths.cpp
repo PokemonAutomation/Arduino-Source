@@ -14,6 +14,10 @@
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "GlobalAutoPaths.h"
 
+#ifdef __linux__
+#include <cstdlib>
+#endif
+
 //#include <iostream>
 //using std::cout;
 //using std::endl;
@@ -58,13 +62,17 @@ Filesystem::Path get_application_base_dir_path(){
 #if defined(__linux__)
     // Check for AppImage environment variables to find the root directory, if running as an AppImage.
     // PA_APPIMAGE_DIR is set by Azure via a patched AppRun script.
-    QByteArray dir = qgetenv("PA_APPIMAGE_DIR");
-    if (!dir.isEmpty()){
-        return QString::fromUtf8(dir).toStdString();
+    {
+        char* dir = std::getenv("PA_APPIMAGE_DIR");
+        if (dir != nullptr){
+            return dir;
+        }
     }
-    QByteArray path = qgetenv("APPIMAGE");
-    if (!path.isEmpty()){
-        return QDir::cleanPath(QFileInfo(QString::fromUtf8(path)).dir().absolutePath()).toStdString();
+    {
+        char* path = std::getenv("APPIMAGE");
+        if (path != nullptr){
+            return std::filesystem::absolute(path).parent_path().lexically_normal();
+        }
     }
     QByteArray appDirBytes = qgetenv("APPDIR");
     if (!appDirBytes.isEmpty()){
