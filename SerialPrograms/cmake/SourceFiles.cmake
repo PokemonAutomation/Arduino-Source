@@ -1344,6 +1344,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Pokemon/Options/Pokemon_NameSelectWidget.h
     Source/Pokemon/Options/Pokemon_StatsHuntFilter.cpp
     Source/Pokemon/Options/Pokemon_StatsHuntFilter.h
+    Source/Pokemon/Pokemon_BdspRng.cpp
+    Source/Pokemon/Pokemon_BdspRng.h
     Source/Pokemon/Pokemon_BoxCursor.cpp
     Source/Pokemon/Pokemon_BoxCursor.h
     Source/Pokemon/Pokemon_CollectedPokemonInfo.cpp
