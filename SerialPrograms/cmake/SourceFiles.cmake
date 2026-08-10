@@ -2951,10 +2951,6 @@ file(GLOB LIBRARY_SOURCES
     Source/StaticRegistrationQt.cpp
     Source/Tests/CommandLineTests.cpp
     Source/Tests/CommandLineTests.h
-    Source/Tests/Kernels_Tests.cpp
-    Source/Tests/Kernels_Tests.h
-    Source/Tests/NintendoSwitch_Tests.cpp
-    Source/Tests/NintendoSwitch_Tests.h
     Source/Tests/TestMap.cpp
     Source/Tests/TestMap.h
     Source/Tests/TestUtils.cpp

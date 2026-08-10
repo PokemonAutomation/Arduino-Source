@@ -12,7 +12,7 @@ namespace PokemonAutomation{
 namespace Filesystem{
 
 
-Path application_directory(){
+Path application_path(){
     char buffer[PATH_MAX];
     uint32_t size = sizeof(buffer);
     if (_NSGetExecutablePath(buffer, &size) == 0) {

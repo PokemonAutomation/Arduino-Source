@@ -11,7 +11,7 @@ namespace PokemonAutomation{
 namespace Filesystem{
 
 
-Path application_directory(){
+Path application_path(){
     QString application_dir_path = qApp->applicationDirPath();
     return Path(application_dir_path.toStdString());
 }

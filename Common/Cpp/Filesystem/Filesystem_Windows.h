@@ -11,7 +11,7 @@ namespace PokemonAutomation{
 namespace Filesystem{
 
 
-Path application_directory(){
+Path application_path(){
     wchar_t buffer[MAX_PATH];
     GetModuleFileNameW(nullptr, buffer, MAX_PATH);
     return std::filesystem::path(buffer).parent_path();
