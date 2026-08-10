@@ -10,6 +10,7 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreFoundation/CFBundle.h>
 #include "FilePath.h"
+#include "Filesystem.h"
 
 namespace PokemonAutomation{
 namespace Filesystem{
@@ -53,7 +54,7 @@ std::filesystem::path CFString_to_path(CFStringRef cfString) {
 
     return {};
 }
-Path application_working_path(){
+Path application_install_path(){
     //  Use CFBundle to find the .app bundle path.
     //  Change working directory to the folder that hosts the .app bundle.
     CFURLRef bundleURL = CFBundleCopyBundleURL(CFBundleGetMainBundle());
@@ -71,6 +72,10 @@ Path application_working_path(){
 
     //  Fallback
     return application_binary_path();
+}
+Path application_scratch_path(){
+    //  TODO: This is just a placeholder.
+    return current_path();
 }
 
 

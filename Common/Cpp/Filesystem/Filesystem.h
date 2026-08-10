@@ -59,10 +59,19 @@ void rename(const Path& old_path, const Path& new_path);
 //  If an error occurs, set `ec`. Execute `ec.clear()` if no errors occur.
 void rename(const Path& old_path, const Path& new_path, std::error_code& ec);
 
+
+//  The current working directory.
 Path current_path();
 
+//  The path to the actual binary that is running.
 Path application_binary_path();
-Path application_working_path();
+
+//  Path to where the application is installed.
+//  All immutable resources are relative to this.
+Path application_install_path();
+
+//  Path to where the application saves its output/settings.
+Path application_scratch_path();
 
 
 
