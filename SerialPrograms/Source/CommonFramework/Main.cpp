@@ -8,6 +8,7 @@
 #include "Common/Cpp/Logging/FileLogger.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
 #include "Common/Cpp/Logging/MultiOutputLogger.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Concurrency/Qt6.9ThreadBugWorkaround.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/FireForgetDispatcher.h"
@@ -107,8 +108,8 @@ int run_program(int argc, char *argv[]){
 
     logger.log("================================================================================");
     logger.log("Starting Program...");
-    logger.log("Current path: " + QDir::currentPath().toStdString());
-    logger.log("Executable path: " + qApp->applicationDirPath().toStdString());
+    logger.log("Current path: " + Filesystem::current_path().string_slash_normalized());
+    logger.log("Executable path: " + Filesystem::application_path().string_slash_normalized());
     logger.log("Program setting folder: " + SETTINGS_PATH());
     logger.log("Program resources folder: " + RESOURCE_PATH());
 
