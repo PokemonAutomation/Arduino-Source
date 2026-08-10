@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <limits.h>
 #include "FilePath.h"
+#include "Filesystem.h"
 
 namespace PokemonAutomation{
 namespace Filesystem{
@@ -20,8 +21,12 @@ Path application_binary_path(){
     }
     return Path();
 }
-Path application_working_path(){
+Path application_install_path(){
+    //  TODO: This is just a placeholder.
     return application_binary_path();
+}
+Path application_scratch_path(){
+    return current_path();
 }
 
 
