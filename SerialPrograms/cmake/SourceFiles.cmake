@@ -1413,6 +1413,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.h
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IvJudgeReader.cpp
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IvJudgeReader.h
+    Source/PokemonBDSP/Inference/Rng/PokemonBDSP_SummaryReader.cpp
+    Source/PokemonBDSP/Inference/Rng/PokemonBDSP_SummaryReader.h
     Source/PokemonBDSP/Inference/PokemonBDSP_DialogDetector.cpp
     Source/PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h
     Source/PokemonBDSP/Inference/PokemonBDSP_MapDetector.cpp
@@ -1527,6 +1529,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonBDSP/Programs/TestPrograms/PokemonBDSP_ShinyEncounterTester.h
     Source/PokemonBDSP/Programs/TestPrograms/PokemonBDSP_SoundListener.cpp
     Source/PokemonBDSP/Programs/TestPrograms/PokemonBDSP_SoundListener.h
+    Source/PokemonBDSP/Programs/TestPrograms/PokemonBDSP_SummaryReaderTester.cpp
+    Source/PokemonBDSP/Programs/TestPrograms/PokemonBDSP_SummaryReaderTester.h
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfBoxTrade.cpp
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfBoxTrade.h
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfTouchTrade.cpp
