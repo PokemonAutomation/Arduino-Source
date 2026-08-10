@@ -91,7 +91,7 @@ Filesystem::Path get_application_base_dir_path(){
         }
     }
 #endif
-    return Filesystem::application_binary_path();
+    return Filesystem::application_working_path();
 }
 std::string get_resource_path(){
     //  Find the resource directory.
