@@ -24,17 +24,20 @@
 namespace PokemonAutomation{
 
 
+
+
+
 #if defined(__APPLE__)
 static std::string g_startup_profile;
 
 void set_startup_profile(int& argc, char* argv[]){
     for (int i = 1; i + 1 < argc; i++){
         if (strcmp(argv[i], "--profile") == 0){
-            QString profile = QString::fromUtf8(argv[i + 1]);
-            for (QChar& c : profile){
-                if (!c.isLetterOrNumber() && c != u'_' && c != u'-') c = u'_';
+            std::string profile = argv[i + 1];
+            for (char c : profile){
+                if (!(std::isalpha(c) || std::isdigit(c)) && c != u'_' && c != u'-') c = u'_';
             }
-            g_startup_profile = profile.toStdString();
+            g_startup_profile = std::move(profile);
             // Shift everything after --profile <name> down by 2.
             for (int j = i; j + 2 < argc; j++){
                 argv[j] = argv[j + 2];
@@ -52,8 +55,9 @@ const std::string& STARTUP_PROFILE(){
 
 namespace{
 
-QString get_application_base_dir_path(){
-    QString application_dir_path = qApp->applicationDirPath();
+
+
+Filesystem::Path get_application_base_dir_path(){
 #if defined(__APPLE__)
     //  Use CFBundle to find the .app bundle path. Change working directory to the folder that hosts the .app bundle.
     CFURLRef bundleURL = CFBundleCopyBundleURL(CFBundleGetMainBundle());
@@ -64,7 +68,7 @@ QString get_application_base_dir_path(){
             QString bundlePath = QDir::cleanPath(QString::fromCFString(cfPath));
             CFRelease(cfPath);
             if (bundlePath.endsWith(".app")){
-                return QFileInfo(bundlePath).dir().absolutePath();
+                return QFileInfo(bundlePath).dir().absolutePath().toStdString();
             }
         }
     }
@@ -73,11 +77,11 @@ QString get_application_base_dir_path(){
     // PA_APPIMAGE_DIR is set by Azure via a patched AppRun script.
     QByteArray dir = qgetenv("PA_APPIMAGE_DIR");
     if (!dir.isEmpty()){
-        return QString::fromUtf8(dir);
+        return QString::fromUtf8(dir).toStdString();
     }
     QByteArray path = qgetenv("APPIMAGE");
     if (!path.isEmpty()){
-        return QDir::cleanPath(QFileInfo(QString::fromUtf8(path)).dir().absolutePath());
+        return QDir::cleanPath(QFileInfo(QString::fromUtf8(path)).dir().absolutePath()).toStdString();
     }
     QByteArray appDirBytes = qgetenv("APPDIR");
     if (!appDirBytes.isEmpty()){
@@ -98,37 +102,37 @@ QString get_application_base_dir_path(){
                 QString mountPoint = pre[4].replace(QStringLiteral("\\040"), QStringLiteral(" "));
                 QString source = post[1].replace(QStringLiteral("\\040"), QStringLiteral(" "));
                 if (mountPoint == appDir && source.endsWith(QStringLiteral(".AppImage"))){
-                    return QDir::cleanPath(QFileInfo(source).dir().absolutePath());
+                    return QDir::cleanPath(QFileInfo(source).dir().absolutePath()).toStdString();
                 }
             }
         }
     }
 #endif
-    return application_dir_path;
+    return Filesystem::application_path();
 }
 std::string get_resource_path(){
     //  Find the resource directory.
-    Filesystem::Path base = get_application_base_dir_path().toStdString();
+    Filesystem::Path base = get_application_base_dir_path();
     Filesystem::Path path = base;
     for (size_t c = 0; c < 5; c++){
         Filesystem::Path try_path = path / "Resources/";
         if (exists(try_path)){
-            return try_path.string();
+            return try_path.string_slash_normalized();
         }
         path = path / "..";
     }
-    return (base / "Resources/").string();
+    return (base / "Resources/").string_slash_normalized();
 }
 std::string get_unittest_resource_path(){
     //  Find the unit test resource directory.
 
     //  Try the intended folder name first.
-    Filesystem::Path base = get_application_base_dir_path().toStdString();
+    Filesystem::Path base = get_application_base_dir_path();
     Filesystem::Path path = base;
     for (size_t c = 0; c < 5; c++){
         Filesystem::Path try_path = path / "UnitTestResources/";
         if (exists(try_path)){
-            return try_path.string();
+            return try_path.string_slash_normalized();
         }
         path = path / "..";
     }
@@ -138,26 +142,27 @@ std::string get_unittest_resource_path(){
     for (size_t c = 0; c < 5; c++){
         Filesystem::Path try_path = path / "CommandLineTests/";
         if (exists(try_path)){
-            return try_path.string();
+            return try_path.string_slash_normalized();
         }
         path = path / "..";
     }
 
-    return (base / "UnitTestResources/").string();
+    return (base / "UnitTestResources/").string_slash_normalized();
 }
 
 std::string get_training_path(){
     //  Find the training data directory.
-    Filesystem::Path base = get_application_base_dir_path().toStdString();
+    Filesystem::Path base = get_application_base_dir_path();
     Filesystem::Path path = base;
     for (size_t c = 0; c < 5; c++){
         Filesystem::Path try_path = path / "TrainingData/";
         if (exists(try_path)){
-            return try_path.string();
+            return try_path.string_slash_normalized();
         }
         path = path / "..";
     }
-    return (base / "TrainingData/").string();
+
+    return (base / "TrainingData/").string_slash_normalized();
 }
 
 std::string get_runtime_base_path(){
