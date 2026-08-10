@@ -99,7 +99,7 @@ Filesystem::Path get_application_base_dir_path(){
         }
     }
 #endif
-    return Filesystem::application_working_path();
+    return Filesystem::application_install_path();
 }
 std::string get_resource_path(){
     //  Find the resource directory.
@@ -167,7 +167,7 @@ std::string get_runtime_base_path(){
     QDir().mkpath(appSupportPath);
     return appSupportPath.toStdString() + "/";
 #else
-    return "./";
+    return Filesystem::application_scratch_path().string_slash_normalized() + "/";
 #endif
 }
 
