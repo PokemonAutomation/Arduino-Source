@@ -4,8 +4,26 @@
  *
  */
 
+#include "CompileTimeBackends.h"
 #include "FilePath.h"
 #include "Filesystem.h"
+
+#ifdef PA_FILE_SYSTEM_BACKEND_OS_SPECIFIC
+#if 0
+#elif _WIN32
+#include "Filesystem_Windows.h"
+#elif __linux__
+#include "Filesystem_Linux.h"
+#elif __APPLE__
+#include "Filesystem_Mac.h"
+#else
+#error "No file backend specified."
+#endif
+#endif
+
+#ifdef PA_FILE_SYSTEM_BACKEND_Qt
+#include "Filesystem_Qt.h"
+#endif
 
 namespace PokemonAutomation{
 namespace Filesystem{
@@ -47,6 +65,8 @@ void rename(const Path& old_path, const Path& new_path, std::error_code& ec){
 Path current_path(){
     return std::filesystem::current_path();
 }
+
+
 
 
 

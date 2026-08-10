@@ -113,9 +113,9 @@ void SerialPABotBase2_SelectorWidget::refresh_devices(const QList<QSerialPortInf
         return;
     }
 
-    //  If the program boots up faster than it can read the serial ports, we
-    //  the controller will fail to connect. Once the serial poller finishes
-    //  and pushes a refresh, we return here.
+    //  If the program boots up faster than it can read the serial ports, the
+    //  controller will fail to connect. Once the serial poller finishes and
+    //  pushes a refresh, we return here.
     //  If the port is now valid, but failed to connect before, reset it.
     ControllerSession& session = m_parent.session();
     if (session.connection().status() == ControllerConnection::Status::FAILED_TO_CONNECT){

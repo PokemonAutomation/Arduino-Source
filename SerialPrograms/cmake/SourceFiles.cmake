@@ -96,6 +96,10 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Filesystem/FilePath.h
     ../Common/Cpp/Filesystem/Filesystem.cpp
     ../Common/Cpp/Filesystem/Filesystem.h
+    ../Common/Cpp/Filesystem/Filesystem_Linux.h
+    ../Common/Cpp/Filesystem/Filesystem_Mac.h
+    ../Common/Cpp/Filesystem/Filesystem_Qt.h
+    ../Common/Cpp/Filesystem/Filesystem_Windows.h
     ../Common/Cpp/Hardware/Hardware.cpp
     ../Common/Cpp/Hardware/Hardware.h
     ../Common/Cpp/Hardware/Hardware_arm64_Linux.tpp
