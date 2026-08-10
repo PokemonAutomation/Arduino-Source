@@ -1347,6 +1347,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Pokemon/Pokemon_DataTypes.h
     Source/Pokemon/Pokemon_EncounterStats.cpp
     Source/Pokemon/Pokemon_EncounterStats.h
+    Source/Pokemon/Pokemon_Gf2Matrix.cpp
+    Source/Pokemon/Pokemon_Gf2Matrix.h
     Source/Pokemon/Pokemon_IvJudge.cpp
     Source/Pokemon/Pokemon_IvJudge.h
     Source/Pokemon/Pokemon_NatureChecker.cpp
@@ -1365,6 +1367,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Pokemon/Pokemon_Types.h
     Source/Pokemon/Pokemon_Xoroshiro128Plus.cpp
     Source/Pokemon/Pokemon_Xoroshiro128Plus.h
+    Source/Pokemon/Pokemon_Xorshift128.cpp
+    Source/Pokemon/Pokemon_Xorshift128.h
     Source/Pokemon/Pokemon_AdvRng.cpp
     Source/Pokemon/Pokemon_AdvRng.h
     Source/Pokemon/Resources/Pokemon_BerryNames.cpp
