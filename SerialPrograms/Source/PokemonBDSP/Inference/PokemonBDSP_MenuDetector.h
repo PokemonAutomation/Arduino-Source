@@ -19,19 +19,6 @@ namespace PokemonBDSP{
 
 class MenuDetector : public StaticScreenDetector{
 public:
-    //  The menu is recognised by the white gaps between its entries. BDSP tags an
-    //  entry with a red "NEW" banner the first time its contents change -- on the
-    //  POKEMON entry once a starter is in hand, for instance -- and that banner sits
-    //  directly over the second gap. is_white() allows a summed stddev of only 10 and
-    //  the banner's edge takes it to 15, so the whole detector goes blind while the
-    //  tag is present.
-    //
-    //  "skip_new_banner" starts the gaps below the banner instead. It costs the top
-    //  ~12% of the panel, which is white either way, so it only ever makes detection
-    //  easier -- it cannot turn a screen the default accepts into one it rejects.
-    //
-    //  Off by default so existing callers are unchanged. Any BDSP program that opens
-    //  the menu while a NEW tag is showing wants it on.
     MenuDetector(Color color = COLOR_RED, bool skip_new_banner = false);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
