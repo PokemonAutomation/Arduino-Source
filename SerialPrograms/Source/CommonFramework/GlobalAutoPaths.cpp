@@ -11,9 +11,6 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QDir>
-#if defined(__APPLE__)
-#include <CoreFoundation/CFBundle.h>
-#endif
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "GlobalAutoPaths.h"
 
@@ -58,21 +55,7 @@ namespace{
 
 
 Filesystem::Path get_application_base_dir_path(){
-#if defined(__APPLE__)
-    //  Use CFBundle to find the .app bundle path. Change working directory to the folder that hosts the .app bundle.
-    CFURLRef bundleURL = CFBundleCopyBundleURL(CFBundleGetMainBundle());
-    if (bundleURL){
-        CFStringRef cfPath = CFURLCopyFileSystemPath(bundleURL, kCFURLPOSIXPathStyle);
-        CFRelease(bundleURL);
-        if (cfPath){
-            QString bundlePath = QDir::cleanPath(QString::fromCFString(cfPath));
-            CFRelease(cfPath);
-            if (bundlePath.endsWith(".app")){
-                return QFileInfo(bundlePath).dir().absolutePath().toStdString();
-            }
-        }
-    }
-#elif defined(__linux__)
+#if defined(__linux__)
     // Check for AppImage environment variables to find the root directory, if running as an AppImage.
     // PA_APPIMAGE_DIR is set by Azure via a patched AppRun script.
     QByteArray dir = qgetenv("PA_APPIMAGE_DIR");
@@ -108,7 +91,7 @@ Filesystem::Path get_application_base_dir_path(){
         }
     }
 #endif
-    return Filesystem::application_path();
+    return Filesystem::application_working_path();
 }
 std::string get_resource_path(){
     //  Find the resource directory.
