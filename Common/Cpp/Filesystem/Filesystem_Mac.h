@@ -64,7 +64,7 @@ Path application_working_path(){
             std::filesystem::path bundlePath = CFString_to_path(cfPath);
             CFRelease(cfPath);
             if (bundlePath.extension() == ".app"){
-                return std::filesystem::absolute(bundlePath).lexically_normal();
+                return std::filesystem::absolute(bundlePath).parent_path().lexically_normal();
             }
         }
     }
