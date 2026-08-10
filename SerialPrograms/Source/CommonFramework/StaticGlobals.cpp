@@ -10,6 +10,10 @@
 #include "Common/Cpp/Cryptography/SHA256.h"
 #include "StaticGlobals.h"
 
+#ifdef PA_OFFICIAL
+#include "../../Internal/SerialPrograms/InternalDeveloper.h"
+#endif
+
 namespace PokemonAutomation{
 
 
@@ -24,12 +28,6 @@ const std::set<std::string> TOKENS{
     "e8d168bc482e96553ea9f9ecaea5a817474dbccc2a6a228a6bde67f2b2aa2889", //  James' token.
 };
 
-const std::set<std::string> INTERNAL_TOKENS{
-    "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", //  jw's token.
-    "7555b7c63481cad42306718c67e7f9def5bfd1da8f6cd299ccd3d7dc95f307ae", //  Kuro's token.
-    "3d475b46d121fc24559d100de2426feaa53cd6578aac2817c4857a610ccde2dd", //  kichi's token.
-    "9b41db8175b5f248a78e738c7bd63a36e33b57953cb4e80ccdd13c2a7e892eec", //  Dalton's token.
-};
 
 
 
@@ -51,10 +49,11 @@ void StaticGlobals::load_json(const JsonValue& json){
         hash.finish();
         hash.get_hash_hex();
 
-        bool internal_dev = INTERNAL_TOKENS.find(hash.get_hash_hex()) != INTERNAL_TOKENS.end();
-        bool regular_dev = TOKENS.find(hash.get_hash_hex()) != TOKENS.end();
-        DEVELOPER_MODE = regular_dev || internal_dev;
-        INTERNAL_DEVELOPER_MODE = internal_dev;
+        std::string str = hash.get_hash_hex();
+        DEVELOPER_MODE = TOKENS.find(str) != TOKENS.end();
+#ifdef PA_OFFICIAL
+        process_internal_dev(str);
+#endif
     }
 
     const JsonObject* debug_obj = obj->get_object("DEBUG");
