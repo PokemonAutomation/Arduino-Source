@@ -19,7 +19,7 @@ namespace PokemonBDSP{
 
 class MenuDetector : public StaticScreenDetector{
 public:
-    MenuDetector(Color color = COLOR_RED);
+    MenuDetector(Color color = COLOR_RED, bool skip_new_banner = false);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) override;
@@ -37,7 +37,7 @@ private:
 
 class MenuWatcher : public MenuDetector, public VisualInferenceCallback{
 public:
-    MenuWatcher(Color color = COLOR_RED);
+    MenuWatcher(Color color = COLOR_RED, bool skip_new_banner = false);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
