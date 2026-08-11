@@ -77,16 +77,17 @@ Filesystem::Path get_application_base_dir_path(){
     {
         char* app_dir = std::getenv("APPDIR");
         if (app_dir != nullptr){
-            QFile mountinfo(QStringLiteral("/proc/self/mountinfo"));
-            if (mountinfo.open(QIODevice::ReadOnly | QIODevice::Text)){
-                while (!mountinfo.atEnd()){
-                    QString line = QString::fromUtf8(mountinfo.readLine()).trimmed();
-                    int dashSep = line.indexOf(QStringLiteral(" - "));
+            std::ifstream mount_info(Filesystem::Path("/proc/self/mountinfo").stdpath());
+            if (mount_info.is_open()){
+                std::string line;
+                while (std::getline(mount_info, line)){
+                    QString qline = QString::fromStdString(line);
+                    int dashSep = qline.indexOf(QStringLiteral(" - "));
                     if (dashSep < 0){
                         continue;
                     }
-                    QStringList pre = line.left(dashSep).split(u' ', Qt::SkipEmptyParts);
-                    QStringList post = line.mid(dashSep + 3).split(u' ', Qt::SkipEmptyParts);
+                    QStringList pre = qline.left(dashSep).split(u' ', Qt::SkipEmptyParts);
+                    QStringList post = qline.mid(dashSep + 3).split(u' ', Qt::SkipEmptyParts);
                     if (pre.size() < 5 || post.size() < 2){
                         continue;
                     }
