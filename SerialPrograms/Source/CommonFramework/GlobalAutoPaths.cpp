@@ -74,26 +74,27 @@ Filesystem::Path get_application_base_dir_path(){
             return std::filesystem::absolute(path).parent_path().lexically_normal();
         }
     }
-    QByteArray appDirBytes = qgetenv("APPDIR");
-    if (!appDirBytes.isEmpty()){
-        QString appDir = QString::fromUtf8(appDirBytes);
-        QFile mountinfo(QStringLiteral("/proc/self/mountinfo"));
-        if (mountinfo.open(QIODevice::ReadOnly | QIODevice::Text)){
-            while (!mountinfo.atEnd()){
-                QString line = QString::fromUtf8(mountinfo.readLine()).trimmed();
-                int dashSep = line.indexOf(QStringLiteral(" - "));
-                if (dashSep < 0){
-                    continue;
-                }
-                QStringList pre = line.left(dashSep).split(u' ', Qt::SkipEmptyParts);
-                QStringList post = line.mid(dashSep + 3).split(u' ', Qt::SkipEmptyParts);
-                if (pre.size() < 5 || post.size() < 2){
-                    continue;
-                }
-                QString mountPoint = pre[4].replace(QStringLiteral("\\040"), QStringLiteral(" "));
-                QString source = post[1].replace(QStringLiteral("\\040"), QStringLiteral(" "));
-                if (mountPoint == appDir && source.endsWith(QStringLiteral(".AppImage"))){
-                    return QDir::cleanPath(QFileInfo(source).dir().absolutePath()).toStdString();
+    {
+        char* app_dir = std::getenv("APPDIR");
+        if (app_dir != nullptr){
+            QFile mountinfo(QStringLiteral("/proc/self/mountinfo"));
+            if (mountinfo.open(QIODevice::ReadOnly | QIODevice::Text)){
+                while (!mountinfo.atEnd()){
+                    QString line = QString::fromUtf8(mountinfo.readLine()).trimmed();
+                    int dashSep = line.indexOf(QStringLiteral(" - "));
+                    if (dashSep < 0){
+                        continue;
+                    }
+                    QStringList pre = line.left(dashSep).split(u' ', Qt::SkipEmptyParts);
+                    QStringList post = line.mid(dashSep + 3).split(u' ', Qt::SkipEmptyParts);
+                    if (pre.size() < 5 || post.size() < 2){
+                        continue;
+                    }
+                    QString mountPoint = pre[4].replace(QStringLiteral("\\040"), QStringLiteral(" "));
+                    QString source = post[1].replace(QStringLiteral("\\040"), QStringLiteral(" "));
+                    if (mountPoint == QString::fromUtf8(app_dir) && source.endsWith(QStringLiteral(".AppImage"))){
+                        return QDir::cleanPath(QFileInfo(source).dir().absolutePath()).toStdString();
+                    }
                 }
             }
         }
