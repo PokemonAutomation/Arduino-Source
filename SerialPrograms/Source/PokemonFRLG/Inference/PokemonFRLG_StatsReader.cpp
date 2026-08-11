@@ -88,6 +88,10 @@ bool StatsReader::read_name(
     static const std::vector<int> WHITE_THRESHOLDS = { 180, 200, 220, 230, 240 };
     OCR::StringMatchResult best_result;
     bool initialized = false;
+    std::vector<ImageRGB32> debug_images;
+    if (save_debug_images){
+        debug_images.reserve(WHITE_THRESHOLDS.size());
+    }
     for (int thresh : WHITE_THRESHOLDS){
         ImageRGB32 name_filtered(name_box.width(), name_box.height());
         for (size_t r = 0; r < name_box.height(); r++){
@@ -126,12 +130,13 @@ bool StatsReader::read_name(
             }
         }
         if (!result.results.empty()){
-            if (!initialized){
+            if (!initialized || result.results.begin()->first < best_result.results.begin()->first){
                 best_result = result;
                 initialized = true;
-            }else if (result.results.begin()->first < best_result.results.begin()->first){
-                best_result = result;
             }
+        }
+        if (save_debug_images){
+            debug_images.emplace_back(std::move(name_ready));
         }
     }
     if (initialized && !best_result.results.empty()){
@@ -141,6 +146,11 @@ bool StatsReader::read_name(
     logger.log("Failed to read species name.", COLOR_RED);
     if (save_debug_images){
         name_box.save("DebugDumps/ocr_name_box.png");
+        for (size_t c = 0; c < debug_images.size(); c++){
+            debug_images[c].save(
+                "DebugDumps/ocr_name_ready_" + std::to_string(WHITE_THRESHOLDS[c]) + ".png"
+            );
+        }
     }
     return false;
 }
