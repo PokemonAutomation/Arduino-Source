@@ -92,7 +92,7 @@ Filesystem::Path get_application_base_dir_path(){
                     }
                     QString mountPoint = pre[4].replace(QStringLiteral("\\040"), QStringLiteral(" "));
                     QString source = post[1].replace(QStringLiteral("\\040"), QStringLiteral(" "));
-                    if (mountPoint == QString::fromUtf8(appDir) && source.endsWith(QStringLiteral(".AppImage"))){
+                    if (mountPoint == QString::fromUtf8(app_dir) && source.endsWith(QStringLiteral(".AppImage"))){
                         return QDir::cleanPath(QFileInfo(source).dir().absolutePath()).toStdString();
                     }
                 }
