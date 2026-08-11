@@ -12,11 +12,12 @@
 #include <QFileInfo>
 #include <QDir>
 #include "Common/Cpp/Filesystem/Filesystem.h"
-#include "Common/Cpp/Filesystem/FileIO.h"
 #include "GlobalAutoPaths.h"
 
 #ifdef __linux__
 #include <cstdlib>
+#include <fstream>
+#include "Common/Cpp/Filesystem/FileIO.h"
 #endif
 
 //#include <iostream>
