@@ -380,17 +380,37 @@ cv::Scalar estimate_background_color(const cv::Mat& image) {
 }
 
 
-
-
 std::vector<float> preprocess_NCHW(cv::Mat& img){
-    std::vector<float> dst(img.rows * img.cols * 3);
-    for (int c = 0; c < 3; ++c){
-        for (int i = 0; i < img.rows * img.cols; ++i){
-            dst[c * img.rows * img.cols + i] = ((float*)img.data)[i * 3 + c];
+    const int rows = img.rows;
+    const int cols = img.cols;
+    const int channels = 3;
+    
+    // Allocate a flat memory buffer big enough for all channels
+    std::vector<float> dst(rows * cols * channels);
+
+    // Define the size of one complete "color plane" (channel)
+    const int plane_size = rows * cols;
+
+    // Loop through the image row-by-row
+    for (int y = 0; y < rows; ++y) {
+        // Safely locate the exact memory address for the start of row 'y'
+        const float* row_ptr = img.ptr<float>(y);
+        
+        // Loop through every pixel column in the current row
+        for (int x = 0; x < cols; ++x) {
+            // Calculate the 1D coordinate of the pixel inside a flat 2D plane
+            int linear_idx = y * cols + x;
+            
+            // Extract the interleaved BGR channels explicitly
+            dst[0 * plane_size + linear_idx] = row_ptr[x * channels + 0]; // Channel 0
+            dst[1 * plane_size + linear_idx] = row_ptr[x * channels + 1]; // Channel 1
+            dst[2 * plane_size + linear_idx] = row_ptr[x * channels + 2]; // Channel 2
         }
     }
     return dst;
 }
+
+
 
 std::string decode_CTC(float* data, const std::vector<int64_t>& shape, const std::vector<std::string>& dict){
 

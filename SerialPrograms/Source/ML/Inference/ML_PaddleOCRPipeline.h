@@ -56,7 +56,9 @@ void add_horizontal_padding(cv::Mat& image);
 // assumes input image is RGB
 cv::Scalar estimate_background_color(const cv::Mat& image);
 
-// convert HCW (height, width, channels) to NCHW (batch N, channels C, height H, width W)
+// convert HWC (height, width, channels) to NCHW (batch N, channels C, height H, width W)
+// HWC: pixels are interleaved. [B,G,R] [B,G,R] [B,G,R] ...
+// NCHW: [All Blue Pixels...] [All Green Pixels...] [All Red Pixels...]
 std::vector<float> preprocess_NCHW(cv::Mat& img);
 
 std::string decode_CTC(float* data, const std::vector<int64_t>& shape, const std::vector<std::string>& dict);
