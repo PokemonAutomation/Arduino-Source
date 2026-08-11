@@ -118,7 +118,7 @@ void SerialPABotBase2_SelectorWidget::refresh_devices(const QList<QSerialPortInf
     //  pushes a refresh, we return here.
     //  If the port is now valid, but failed to connect before, reset it.
     ControllerSession& session = m_parent.session();
-    if (session.connection().status() == ControllerConnection::Status::FAILED_TO_CONNECT){
+    if (session.connection_status() == ControllerConnection::Status::FAILED_TO_CONNECT){
         session.reset(false);
     }
 }

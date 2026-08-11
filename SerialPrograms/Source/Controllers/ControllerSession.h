@@ -56,6 +56,7 @@ public:
     void set(const ControllerOption& option);
 
     bool ready() const;
+    ControllerConnection::Status connection_status() const;
     std::shared_ptr<ControllerDescriptor> descriptor() const;
     ControllerType controller_type() const;
     std::string status_text() const;
@@ -63,7 +64,6 @@ public:
     const ControllerOption& option() const{
         return m_option;
     }
-    ControllerConnection& connection() const;
     AbstractController* controller() const;
 
 

@@ -95,6 +95,13 @@ bool ControllerSession::ready() const{
     }
     return m_controller->is_ready();
 }
+ControllerConnection::Status ControllerSession::connection_status() const{
+    ReadSpinLock lg(m_state_lock);
+    if (!m_connection){
+        return ControllerConnection::Status::NOT_CONNECTED;
+    }
+    return m_connection->status();
+}
 std::shared_ptr<ControllerDescriptor> ControllerSession::descriptor() const{
     ReadSpinLock lg(m_state_lock);
     return m_descriptor;
@@ -112,12 +119,6 @@ std::string ControllerSession::status_text() const{
         return "<font color=\"red\">No controller selected.</font>";
     }
     return m_connection->status_text();
-}
-ControllerConnection& ControllerSession::connection() const{
-    if (m_connection){
-        return *m_connection;
-    }
-    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Connection is null.");
 }
 AbstractController* ControllerSession::controller() const{
     return m_controller.get();
