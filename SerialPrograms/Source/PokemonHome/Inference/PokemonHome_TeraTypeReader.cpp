@@ -245,9 +245,10 @@ std::multimap<double, std::pair<PokemonTeraType, ImagePixelBox>> find_tera_type_
                 {0xffb0b0b0, 0xffffffff},
                 {0xffc0c0c0, 0xffffffff},
                 {0xffd0d0d0, 0xffffffff},
+                {0xffd8d8d8, 0xffffffff},
                 {0xffe0e0e0, 0xffffffff},
             }
-            );
+                );
         for (PackedBinaryMatrix& matrix : matrices){
             find_tera_type_symbol_candidates(candidates, original_screen, image, matrix, max_area_ratio);
         }
