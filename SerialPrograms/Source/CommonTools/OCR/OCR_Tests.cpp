@@ -67,6 +67,7 @@ void add_tests_raw_OCR(UnitTestDatabase& database){
     database.add<Test_RawOCR>("OCR/sentence-1-3.jpg", Language::English, "You hurry to the Pokemon Center, shielding your");
     database.add<Test_RawOCR>("OCR/sentence-1-3-wide.jpg", Language::English, "You hurry to the Pokemon Center, shielding your");
     database.add<Test_RawOCR>("OCR/sentence-1-3-tall.jpg", Language::English, "You hurry to the Pokemon Center, shielding your");
+    database.add<Test_RawOCR>("OCR/german-nature-sanft.png", Language::German, "Wesen: SANFT");
 }
 
 
