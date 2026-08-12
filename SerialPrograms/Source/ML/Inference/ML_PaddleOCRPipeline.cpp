@@ -8,11 +8,13 @@
 #include <iostream>
 #include <fstream>
 #include <limits>
+#include <filesystem>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
+#include "Common/Cpp/Logging/GlobalLogger.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/StaticGlobals.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
 #include "ML/Models/ML_ONNXRuntimeHelpers.h"
 #include "ML_PaddleOCRPipeline.h"
@@ -72,9 +74,9 @@ PaddleOCRPipeline::PaddleOCRPipeline(Language language, std::string rec_path, st
     , m_language(language)
     , m_input_name(m_rec_session.GetInputNameAllocated(0, Ort::AllocatorWithDefaultOptions{}).get())
     , m_output_name(m_rec_session.GetOutputNameAllocated(0, Ort::AllocatorWithDefaultOptions{}).get())
+    , m_logger(global_logger_raw(), "OCR")
 {
-    load_dictionary(dict_path);
-    
+    load_dictionary(Filesystem::Path(dict_path));
 }
 
 void PaddleOCRPipeline::run(const std::string& img_path){
@@ -96,25 +98,68 @@ void PaddleOCRPipeline::run(const std::string& img_path){
 
 
 
-void PaddleOCRPipeline::load_dictionary(const std::string& path){
-    std::ifstream fs(path);
+void PaddleOCRPipeline::load_dictionary(const Filesystem::Path& path){
+
+    const bool debugging = true; //STATIC_GLOBALS.PADDLE_OCR_DEBUG;
+
+    if (debugging){
+        m_logger.log("[OCR-INFO] Loading dictionary from: " + path.string());
+        m_logger.log("[OCR-INFO] Current working directory: " +
+                    Filesystem::current_path().string());
+
+        std::error_code ec;
+        const auto absolute_path = std::filesystem::absolute(path, ec);
+
+        if (!ec) {
+            m_logger.log("[OCR-INFO] Absolute dictionary path: " +
+                        absolute_path.string());
+
+            m_logger.log("[OCR-INFO] Dictionary exists: " +
+                        std::string(Filesystem::exists(absolute_path) ? "true" : "false"));
+
+            if (Filesystem::exists(absolute_path)) {
+                const auto file_size = Filesystem::file_size(Filesystem::Path(absolute_path), ec);
+
+                if (!ec) {
+                    m_logger.log("[OCR-INFO] Dictionary file size: " +
+                                std::to_string(file_size) + " bytes");
+                }
+            }
+        }
+    }
+
+    std::ifstream fs_file(path.stdpath());
+
+    if (!fs_file.is_open()) {
+        m_logger.log("[OCR-ERROR] Failed to open dictionary: " + path.string());
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "PaddleOCRPipeline::load_dictionary(): Failed to open dictionary: " + path.string());
+    }
+
     std::string line;
-    // m_dictionary.push_back("blank"); // CTC blank index
-    while (std::getline(fs, line)){
+    while (std::getline(fs_file, line)) {
         m_dictionary.push_back(line);
+    }
+
+    if (fs_file.bad()) {
+        m_logger.log("[OCR-ERROR] I/O error while reading dictionary: " + path.string());
+    }
+
+    if (debugging){
+        m_logger.log("[OCR-INFO] Loaded " +
+                    std::to_string(m_dictionary.size()) +
+                    " dictionary entries");
     }
 }
 
+
 std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
 
-    Logger& logger = global_logger_tagged();
-
-    bool debugging = true; //STATIC_GLOBALS.PADDLE_OCR_DEBUG;
+    const bool debugging = true; //STATIC_GLOBALS.PADDLE_OCR_DEBUG;
 
     // 1. Convert Image to OpenCV image (cv::mat)
     cv::Mat cv_image_rgb = imageviewrgb32_to_cv_mat_rgb(image);
     if (cv_image_rgb.empty()) {
-        logger.log("[OCR-DEBUG] Input was an empty image.");
+        m_logger.log("[OCR-DEBUG] Input was an empty image.");
         return "";
     }
 
@@ -122,7 +167,7 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     // 2. Crop tightly around the text, with small safety margin
     cv::Mat cropped_image = crop_to_text_region(cv_image_rgb);
     if (cropped_image.empty()){
-        logger.log("[OCR-DEBUG] Crop to text region returned empty image.");
+        m_logger.log("[OCR-DEBUG] Crop to text region returned empty image.");
         return "";
     }
 
@@ -141,7 +186,7 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     );
 
     if (target_w <= 0 || target_w > 8192){
-        logger.log("[OCR-ERROR] Abnormally scaled target width calculated: " + std::to_string(target_w));
+        m_logger.log("[OCR-ERROR] Abnormally scaled target width calculated: " + std::to_string(target_w));
         return "";
     }
 
@@ -189,7 +234,7 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
 
     size_t expected_elements = 1 * 3 * target_h * target_w;
     if (debugging){
-        logger.log("[OCR-DEBUG] Cropped image constraints - Width: " + std::to_string(cropped_image.cols) 
+        m_logger.log("[OCR-DEBUG] Cropped image constraints - Width: " + std::to_string(cropped_image.cols) 
             + ", Height: " + std::to_string(cropped_image.rows) 
             + ", Channels: " + std::to_string(cropped_image.channels()) 
             + ", Total Pixels: " + std::to_string(cropped_image.total()));
@@ -203,19 +248,19 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
                 subnormal_count++;
             }
         }
-        logger.log("[OCR-DEBUG] Tensor payload validation - Total Floats: " + std::to_string(input_tensor_values.size())
+        m_logger.log("[OCR-DEBUG] Tensor payload validation - Total Floats: " + std::to_string(input_tensor_values.size())
                 + ", NaNs detected: " + std::to_string(nan_count) 
                 + ", Subnormal (denormal) values: " + std::to_string(subnormal_count));
     
         // Validate expected payload sizing matches matrix dimensionality
-        logger.log("[OCR-DEBUG] Shape Definition - NCHW: [" + std::to_string(input_shape[0]) + "," + std::to_string(input_shape[1]) 
+        m_logger.log("[OCR-DEBUG] Shape Definition - NCHW: [" + std::to_string(input_shape[0]) + "," + std::to_string(input_shape[1]) 
                 + "," + std::to_string(input_shape[2]) + "," + std::to_string(input_shape[3]) + "]. Expected Elements: " + std::to_string(expected_elements));
 
     }
 
     if (input_tensor_values.size() != static_cast<size_t>(expected_elements)) {
-        logger.log("[OCR-ERROR] Vector length vs input_shape calculation mismatch!");
-        logger.log("[OCR-ERROR] Fatal memory stride mismatch. Vector size (" + std::to_string(input_tensor_values.size())
+        m_logger.log("[OCR-ERROR] Vector length vs input_shape calculation mismatch!");
+        m_logger.log("[OCR-ERROR] Fatal memory stride mismatch. Vector size (" + std::to_string(input_tensor_values.size())
                     + ") does not match shape requirement (" + std::to_string(expected_elements));
         return "";
     }
@@ -240,7 +285,7 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
 
     try{
         if (debugging) {
-            logger.log("[OCR-DEBUG] Calling m_rec_session.Run() now...");
+            m_logger.log("[OCR-DEBUG] Calling m_rec_session.Run() now...");
         }
 
         // 8. Run the recognition session
@@ -412,10 +457,9 @@ std::vector<float> preprocess_NCHW(cv::Mat& img){
 
 
 
-std::string decode_CTC(float* data, const std::vector<int64_t>& shape, const std::vector<std::string>& dict){
+std::string PaddleOCRPipeline::decode_CTC(float* data, const std::vector<int64_t>& shape, const std::vector<std::string>& dict){
 
-    Logger& logger = global_logger_tagged();
-    bool debugging = true; //STATIC_GLOBALS.PADDLE_OCR_DEBUG;
+    const bool debugging = true; //STATIC_GLOBALS.PADDLE_OCR_DEBUG;
 
     std::string text = "";
     size_t seq_len = static_cast<size_t>(shape[1]);
@@ -424,13 +468,13 @@ std::string decode_CTC(float* data, const std::vector<int64_t>& shape, const std
 
     // Initial boundary logging configuration
     if (debugging){
-        logger.log("[OCR-CTC-DEBUG] Starting decode_CTC. Sequence Length: " + std::to_string(seq_len) + 
+        m_logger.log("[OCR-CTC-DEBUG] Starting decode_CTC. Sequence Length: " + std::to_string(seq_len) + 
                 ", Total Classes: " + std::to_string(num_cls) + 
                 ", Dictionary Size: " + std::to_string(dict.size()));
     }
 
     if (dict.empty()) {
-        logger.log("[OCR-CTC-ERROR] FATAL: Dictionary payload array is empty! Parsing loops will fail to resolve text indicators.");
+        m_logger.log("[OCR-CTC-ERROR] FATAL: Dictionary payload array is empty! Parsing loops will fail to resolve text indicators.");
     }
 
     for (size_t i = 0; i < seq_len; ++i){
@@ -446,14 +490,14 @@ std::string decode_CTC(float* data, const std::vector<int64_t>& shape, const std
             size_t dict_idx = argmax - 1; 
             if (dict_idx < dict.size()){
                 if (debugging) {
-                    logger.log("[OCR-CTC-DEBUG] Step " + std::to_string(i) + 
+                    m_logger.log("[OCR-CTC-DEBUG] Step " + std::to_string(i) + 
                                ": Predicted Argmax = " + std::to_string(argmax) + 
                                " -> Target Dict Index = " + std::to_string(dict_idx) +
                                " (Character resolved: '" + dict[dict_idx] + "')");
                 }
                 text += dict[dict_idx];
             }else {
-                logger.log("[OCR-CTC-ERROR] Step " + std::to_string(i) + 
+                m_logger.log("[OCR-CTC-ERROR] Step " + std::to_string(i) + 
                             ": Predicted Argmax = " + std::to_string(argmax) + 
                             " -> Target Dict Index = " + std::to_string(dict_idx) + 
                             " (ERROR: Calculated index is out of bounds for the dictionary memory layout!)");
@@ -463,7 +507,7 @@ std::string decode_CTC(float* data, const std::vector<int64_t>& shape, const std
     }
 
     if (debugging) {
-        logger.log("[OCR-CTC-DEBUG] Complete loop execution tracking finish. Resulting string extraction: '" + text + "'");
+        m_logger.log("[OCR-CTC-DEBUG] Complete loop execution tracking finish. Resulting string extraction: '" + text + "'");
     }
 
     return text;
