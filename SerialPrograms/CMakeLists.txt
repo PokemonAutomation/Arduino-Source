@@ -145,15 +145,24 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
 # add current directory to find tesseractPA.lib
 link_directories(${CMAKE_CURRENT_LIST_DIR})
 
-# add the list of all code file paths as ${LIBRARY_SOURCES} and ${EXECUTABLE_SOURCES}
+# add the list of all code file paths as ${CORE_LIBRARY_SOURCES}, ${LIBRARY_SOURCES} and ${EXECUTABLE_SOURCES}
 include(cmake/SourceFiles.cmake)
 
 # Organize source files in IDE project view
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../../ FILES ${CORE_LIBRARY_SOURCES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../../ FILES ${LIBRARY_SOURCES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../../ FILES ${EXECUTABLE_SOURCES})
 
-# Create library target first
-add_library(SerialProgramsLib STATIC ${LIBRARY_SOURCES})
+# Create GUI-free Controller library
+add_library(CoreLib STATIC ${CORE_LIBRARY_SOURCES})
+
+# see apply_common_target_properties() for target_include_directories, set_target_properties, target_compile_definitions
+
+
+
+# Create the GUI library
+add_library(SerialProgramsLib STATIC ${CORE_LIBRARY_SOURCES} ${LIBRARY_SOURCES})
+
 
 # Create binary target
 if (APPLE)
@@ -231,12 +240,22 @@ function(apply_common_target_properties target_name)
     target_compile_definitions(${target_name} PRIVATE NOMINMAX DPP_NO_DEPRECATED)
 
     #add include directory
-    target_include_directories(${target_name} SYSTEM PRIVATE ../3rdParty/)
+    target_include_directories(${target_name} SYSTEM PRIVATE ../3rdParty-Core)
     target_include_directories(${target_name} PRIVATE ../ ../../Internal/ Source/)
+
+    if("NO_GUI" IN_LIST ARGN)
+        target_compile_definitions(${target_name} PRIVATE PA_IMAGE_BACKEND_None)
+        return()
+    endif()
+
+    # more include directories
+    target_include_directories(${target_name} SYSTEM PRIVATE ../3rdParty/)
     target_link_directories(${target_name} PRIVATE ../3rdPartyBinaries/)
+
 endfunction()
 
 # Apply common properties to both targets
+apply_common_target_properties(CoreLib NO_GUI)
 apply_common_target_properties(SerialProgramsLib)
 apply_common_target_properties(SerialPrograms)
 

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_Common_Json_JsonTools_H
 #define PokemonAutomation_Common_Json_JsonTools_H
 
-#include "3rdParty/nlohmann/json.hpp"
+#include "3rdParty-Core/nlohmann/json.hpp"
 #include "JsonValue.h"
 
 namespace PokemonAutomation{
