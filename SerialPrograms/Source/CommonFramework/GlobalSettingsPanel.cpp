@@ -104,7 +104,7 @@ GlobalSettings::GlobalSettings()
         "Furthermore, with PaddleOCR, DirectML is slower than using the CPU. With other models, such as SAM, DirectML seems to be ~10% "
         "faster than the CPU. Cuda has not been tested.</font>",
         LockMode::UNLOCK_WHILE_RUNNING,
-        false
+        true
     )
     , WINDOW_SIZE(
         CONSTRUCT_TOKEN,
