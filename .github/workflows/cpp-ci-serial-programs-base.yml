@@ -57,7 +57,7 @@ jobs:
       with:
         # Delete aqtsource once https://github.com/miurahr/aqtinstall/issues/1007 is fixed and released
         aqtsource: 'git+https://github.com/miurahr/aqtinstall'
-        version: '6.10.2'
+        version: '6.11.1'
         modules: 'qtmultimedia qtserialport'
 
     - name: Install dependencies (Ubuntu)
@@ -106,13 +106,6 @@ jobs:
       with:
         name: Serial Programs (os=${{inputs.os}} - compiler=${{inputs.compiler}})
         path: ${{env.UPLOAD_FOLDER}}
-
-    - name: Upload Executable Only
-      uses: actions/upload-artifact@v7
-      if: inputs.upload-build && startsWith(inputs.os, 'windows')
-      with:
-        name: Standalone Executable (os=${{inputs.os}})
-        path: ${{env.UPLOAD_FOLDER}}/SerialPrograms.exe
 
     - name: Checkout CommandLineTests
       uses: actions/checkout@v7
