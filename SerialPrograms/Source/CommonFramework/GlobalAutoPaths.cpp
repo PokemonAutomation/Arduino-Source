@@ -98,8 +98,8 @@ Filesystem::Path get_application_base_dir_path(){
                     std::string mount_point = StringTools::replace(pre[4].toStdString(), "\\040", " ");
                     std::string source = StringTools::replace(post[1].toStdString(), "\\040", " ");
                     if (mount_point == app_dir && source.ends_with(".AppImage")){
-                        std::filesystem::path dir_path = std::filesystem::path(source).parent_path();
-                        std::filesystem::path abs_path = std::filesystem::absolute(dir_path);
+                        Filesystem::Path dir_path = Filesystem::Path(source).parent_path();
+                        Filesystem::Path abs_path = Filesystem::absolute(dir_path);
                         return abs_path.lexically_normal();
                     }
                 }
