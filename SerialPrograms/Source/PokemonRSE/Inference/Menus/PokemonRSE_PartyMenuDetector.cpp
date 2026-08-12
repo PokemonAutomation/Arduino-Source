@@ -101,9 +101,9 @@ bool PartySlotDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 target_box_party = extract_box_reference(game_screen, m_party_box);
 
     //orange border FD7132 for emerald
-    //FD7132 AND EB712D for rs, the background is faintly striped, so it may require a wider range?
+    //FD7132 AND EB712D for rs, the background is faintly striped, so it requires a wider range
     //FD7132 - 253, 113, 50
-    if (is_solid(target_box_party, { 0.608173, 0.2716346, 0.1201923 }, 0.25, 20)
+    if (is_solid(target_box_party, { 0.608173, 0.2716346, 0.1201923 }, 0.25, 50)
     ){
         return true;
     }

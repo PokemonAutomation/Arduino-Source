@@ -11,6 +11,7 @@
 #include "PokemonRSE_Settings.h"
 
 #include "Programs/ShinyHunting/PokemonRSE_AudioStarterReset.h"
+#include "Programs/ShinyHunting/PokemonRSE_GiftReset.h"
 #include "Programs/ShinyHunting/PokemonRSE_LegendaryReset.h"
 #include "Programs/ShinyHunting/PokemonRSE_LegendaryRunAway-Emerald.h"
 #include "Programs/ShinyHunting/PokemonRSE_ShinyHunt-Deoxys.h"
@@ -43,6 +44,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- Shiny Hunting (Ruby/Sapphire) ----"); //Remove RS only if E is fixed
     ret.emplace_back(make_single_switch_program<AudioStarterReset_Descriptor, AudioStarterReset>());
     ret.emplace_back(make_single_switch_program<LegendaryReset_Descriptor, LegendaryReset>());
+    ret.emplace_back(make_single_switch_program<GiftReset_Descriptor, GiftReset>());
 
     ret.emplace_back("---- Shiny Hunting (Emerald only) ----");
     ret.emplace_back(make_single_switch_program<LegendaryRunAwayEmerald_Descriptor, LegendaryRunAwayEmerald>());

@@ -76,8 +76,8 @@ bool DialogDetector::detect(const ImageViewRGB32& screen){
         && is_white(dialog_top_image))
         ||
         (is_white(dialog_side_image_jpn)
-        && (is_solid(dialog_side_image_jpn, { 0.2300556, 0.34508, 0.42486 }, 0.25, 20) //RS - blue - 124 186 229
-            || is_solid(dialog_side_image_jpn, { 0.0025575, 0.516624, 0.4808184 }, 0.25, 20))) //E - green - 1 202 188
+        && (is_solid(dialog_inner_image_jpn, { 0.2300556, 0.34508, 0.42486 }, 0.25, 20) //RS - blue - 124 186 229
+            || is_solid(dialog_inner_image_jpn, { 0.0025575, 0.516624, 0.4808184 }, 0.25, 20))) //E - green - 1 202 188
     ){
         return true;
     }
@@ -143,8 +143,8 @@ bool AdvanceDialogDetector::detect(const ImageViewRGB32& screen){
         && (stats.average.r > stats.average.g + 180))
         ||
         (is_white(dialog_side_image_jpn)
-        && (is_solid(dialog_side_image_jpn, { 0.2300556, 0.34508, 0.42486 }, 0.25, 20) //RS - blue - 124 186 229
-            || is_solid(dialog_side_image_jpn, { 0.0025575, 0.516624, 0.4808184 }, 0.25, 20)) //E - green - 1 202 188
+        && (is_solid(dialog_inner_image_jpn, { 0.2300556, 0.34508, 0.42486 }, 0.25, 20) //RS - blue - 124 186 229
+            || is_solid(dialog_inner_image_jpn, { 0.0025575, 0.516624, 0.4808184 }, 0.25, 20)) //E - green - 1 202 188
         && (stats2.average.r > stats2.average.b + 180)
         && (stats2.average.r > stats2.average.g + 180))
     ){
@@ -192,8 +192,8 @@ bool SelectionDialogDetector::detect(const ImageViewRGB32& screen){
         && ((is_white(dialog_inner_image) && is_white(dialog_top_image))
             ||
             (is_white(dialog_side_image_jpn)
-            && (is_solid(dialog_side_image_jpn, { 0.2300556, 0.34508, 0.42486 }, 0.25, 20) //RS - blue - 124 186 229
-                || is_solid(dialog_side_image_jpn, { 0.0025575, 0.516624, 0.4808184 }, 0.25, 20)))) //E - green - 1 202 188
+            && (is_solid(dialog_inner_image_jpn, { 0.2300556, 0.34508, 0.42486 }, 0.25, 20) //RS - blue - 124 186 229
+                || is_solid(dialog_inner_image_jpn, { 0.0025575, 0.516624, 0.4808184 }, 0.25, 20)))) //E - green - 1 202 188
     ){
         return true;
     }
