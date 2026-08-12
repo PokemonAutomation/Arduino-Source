@@ -85,18 +85,42 @@ Filesystem::Path get_application_base_dir_path(){
             if (mount_info.is_open()){
                 std::string line;
                 while (std::getline(mount_info, line)){
-                    QString qline = QString::fromStdString(line);
-                    int dashSep = qline.indexOf(QStringLiteral(" - "));
-                    if (dashSep < 0){
+                    size_t dash_sep = line.find(" - ");
+                    if (dash_sep == std::string::npos) {
                         continue;
                     }
-                    QStringList pre = qline.left(dashSep).split(u' ', Qt::SkipEmptyParts);
-                    QStringList post = qline.mid(dashSep + 3).split(u' ', Qt::SkipEmptyParts);
+
+                    // 1. Extract and tokenize the "pre" segment (before " - ")
+                    std::vector<std::string> pre;
+                    {
+                        std::string pre_str = line.substr(0, dash_sep);
+                        std::stringstream ss(pre_str);
+                        std::string token;
+                        while (ss >> token) {
+                            pre.push_back(token);
+                        }
+                    }
+
+                    // 2. Extract and tokenize the "post" segment (after " - ")
+                    std::vector<std::string> post;
+                    {
+                        std::string post_str = line.substr(dash_sep + 3);
+                        std::stringstream ss(post_str);
+                        std::string token;
+                        while (ss >> token) {
+                            post.push_back(token);
+                        }
+                    }
+
+                    // 3. Validation bounds check
                     if (pre.size() < 5 || post.size() < 2){
                         continue;
                     }
-                    std::string mount_point = StringTools::replace(pre[4].toStdString(), "\\040", " ");
-                    std::string source = StringTools::replace(post[1].toStdString(), "\\040", " ");
+
+                    // 4. Clean out octal space encodings using standard string operations
+                    std::string mount_point = StringTools::replace(pre[4], "\\040", " ");
+                    std::string source = StringTools::replace(post[1], "\\040", " ");
+
                     if (mount_point == app_dir && source.ends_with(".AppImage")){
                         Filesystem::Path dir_path = Filesystem::Path(source).parent_path();
                         Filesystem::Path abs_path = Filesystem::absolute(dir_path);
