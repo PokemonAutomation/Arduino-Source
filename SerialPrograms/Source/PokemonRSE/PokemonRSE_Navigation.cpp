@@ -94,7 +94,7 @@ bool try_soft_reset(ConsoleHandle& console, ProControllerContext& context){
     context.wait_for_all_requests();
 
     //Wait for save file select screen
-    WhiteScreenOverWatcher whitescreen(COLOR_RED);
+    //WhiteScreenOverWatcher whitescreen(COLOR_RED);
     LoadMenuWatcher load_menu(COLOR_RED);
 
     int ls = run_until<ProControllerContext>(
@@ -104,12 +104,11 @@ bool try_soft_reset(ConsoleHandle& console, ProControllerContext& context){
             pbf_wait(context, 5000ms);
             context.wait_for_all_requests();
         },
-        { whitescreen, load_menu }
+        { load_menu }
     );
     context.wait_for_all_requests();
     if (ls == 0){
-        console.log("Entered load menu. (WhiteScreenOver)");
-    }else if (ls == 1){
+        //console.log("Entered load menu. (WhiteScreenOver)");
         console.log("Entered load menu. (LoadMenu)");
     }else{
         console.log("soft_reset(): Unable to enter load menu.", COLOR_RED);

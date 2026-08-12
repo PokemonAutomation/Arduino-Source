@@ -9,6 +9,7 @@
 
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "PokemonRSE/PokemonRSE_Settings.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -17,6 +18,7 @@ namespace PokemonRSE{
 // In the summary screen, the dex number will be yellow if a shiny, white if not.
 // Additionally, the background behind the sprite will be white if shiny, grey if not.
 // Number is easier to check as the background is scan lines.
+// Warning: In Emerald, the moving sprite may cover the number!
 class ShinyNumberDetector{
 public:
     ShinyNumberDetector(Color color);
