@@ -100,7 +100,7 @@ void PaddleOCRPipeline::run(const std::string& img_path){
 
 void PaddleOCRPipeline::load_dictionary(const Filesystem::Path& path){
 
-    const bool debugging = true; //STATIC_GLOBALS.PADDLE_OCR_DEBUG;
+    const bool debugging = STATIC_GLOBALS.PADDLE_OCR_DEBUG;
 
     if (debugging){
         m_logger.log("[OCR-INFO] Loading dictionary from: " + path.string());
@@ -154,7 +154,7 @@ void PaddleOCRPipeline::load_dictionary(const Filesystem::Path& path){
 
 std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
 
-    const bool debugging = true; //STATIC_GLOBALS.PADDLE_OCR_DEBUG;
+    const bool debugging = STATIC_GLOBALS.PADDLE_OCR_DEBUG;
 
     // 1. Convert Image to OpenCV image (cv::mat)
     cv::Mat cv_image_rgb = imageviewrgb32_to_cv_mat_rgb(image);
@@ -459,7 +459,7 @@ std::vector<float> preprocess_NCHW(cv::Mat& img){
 
 std::string PaddleOCRPipeline::decode_CTC(float* data, const std::vector<int64_t>& shape, const std::vector<std::string>& dict){
 
-    const bool debugging = true; //STATIC_GLOBALS.PADDLE_OCR_DEBUG;
+    const bool debugging = STATIC_GLOBALS.PADDLE_OCR_DEBUG;
 
     std::string text = "";
     size_t seq_len = static_cast<size_t>(shape[1]);
