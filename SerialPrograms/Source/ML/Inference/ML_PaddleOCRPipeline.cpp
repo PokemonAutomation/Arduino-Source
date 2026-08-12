@@ -132,7 +132,7 @@ void PaddleOCRPipeline::load_dictionary(const Filesystem::Path& path){
 
     if (!fs_file.is_open()) {
         m_logger.log("[OCR-ERROR] Failed to open dictionary: " + path.string());
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "PaddleOCRPipeline::load_dictionary(): Failed to open dictionary: " + path.string());
+        throw FileException(nullptr, PA_CURRENT_FUNCTION, "PaddleOCRPipeline::load_dictionary(): Failed to open dictionary.", path.string());
     }
 
     std::string line;
