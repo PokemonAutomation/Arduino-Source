@@ -29,6 +29,8 @@ namespace PokemonAutomation{
 namespace Filesystem{
 
 
+Path absolute(const Path& path);
+
 //  Whether a path exists.
 bool exists(const Path& path);
 

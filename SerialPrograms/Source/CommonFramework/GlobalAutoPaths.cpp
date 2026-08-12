@@ -17,6 +17,7 @@
 #ifdef __linux__
 #include <cstdlib>
 #include <fstream>
+#include "Common/Cpp/Strings/StringTools.h"
 #include "Common/Cpp/Filesystem/FileIO.h"
 #endif
 
@@ -60,6 +61,7 @@ namespace{
 
 
 
+
 Filesystem::Path get_application_base_dir_path(){
 #if defined(__linux__)
     // Check for AppImage environment variables to find the root directory, if running as an AppImage.
@@ -93,10 +95,12 @@ Filesystem::Path get_application_base_dir_path(){
                     if (pre.size() < 5 || post.size() < 2){
                         continue;
                     }
-                    QString mountPoint = pre[4].replace(QStringLiteral("\\040"), QStringLiteral(" "));
-                    QString source = post[1].replace(QStringLiteral("\\040"), QStringLiteral(" "));
-                    if (mountPoint == QString::fromUtf8(app_dir) && source.endsWith(QStringLiteral(".AppImage"))){
-                        return QDir::cleanPath(QFileInfo(source).dir().absolutePath()).toStdString();
+                    std::string mount_point = StringTools::replace(pre[4].toStdString(), "\\040", " ");
+                    std::string source = StringTools::replace(post[1].toStdString(), "\\040", " ");
+                    if (mount_point == app_dir && source.ends_with(".AppImage")){
+                        Filesystem::Path dir_path = Filesystem::Path(source).parent_path();
+                        Filesystem::Path abs_path = Filesystem::absolute(dir_path);
+                        return abs_path.lexically_normal();
                     }
                 }
             }
