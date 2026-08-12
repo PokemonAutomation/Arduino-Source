@@ -5,10 +5,8 @@
  *  
  */
 
-#include <iostream>
 #include <fstream>
 #include <limits>
-#include <filesystem>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
@@ -108,7 +106,7 @@ void PaddleOCRPipeline::load_dictionary(const Filesystem::Path& path){
                     Filesystem::current_path().string());
 
         std::error_code ec;
-        const auto absolute_path = std::filesystem::absolute(path, ec);
+        const auto absolute_path = Filesystem::absolute(path);
 
         if (!ec) {
             m_logger.log("[OCR-INFO] Absolute dictionary path: " +
@@ -118,7 +116,7 @@ void PaddleOCRPipeline::load_dictionary(const Filesystem::Path& path){
                         std::string(Filesystem::exists(absolute_path) ? "true" : "false"));
 
             if (Filesystem::exists(absolute_path)) {
-                const auto file_size = Filesystem::file_size(Filesystem::Path(absolute_path), ec);
+                const auto file_size = Filesystem::file_size(absolute_path, ec);
 
                 if (!ec) {
                     m_logger.log("[OCR-INFO] Dictionary file size: " +
