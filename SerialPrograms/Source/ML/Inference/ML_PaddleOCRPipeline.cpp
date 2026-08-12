@@ -58,7 +58,14 @@ PaddleOCRPipeline::PaddleOCRPipeline(Language language)
 PaddleOCRPipeline::PaddleOCRPipeline(Language language, std::string rec_path, std::string dict_path)
     : m_env{create_ORT_env()}
     // , det_session(env, std::wstring(det_path.begin(), det_path.end()).c_str(), Ort::SessionOptions{})
-    , m_rec_session(create_session(m_env, rec_path, ML_MODEL_CACHE_PATH() + "PaddleOCRPipeline/", GlobalSettings::instance().USE_GPU_FOR_ML_INFERENCE0))
+    , m_rec_session(
+        create_session(
+            m_env,
+            rec_path,
+            ML_MODEL_CACHE_PATH() + "PaddleOCRPipeline/",
+            GlobalSettings::instance().USE_GPU_FOR_ML_INFERENCE0
+        )
+    )
     // , memory_info(Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault)) 
     , m_language(language)
     , m_input_name(m_rec_session.GetInputNameAllocated(0, Ort::AllocatorWithDefaultOptions{}).get())
@@ -69,7 +76,7 @@ PaddleOCRPipeline::PaddleOCRPipeline(Language language, std::string rec_path, st
 }
 
 void PaddleOCRPipeline::run(const std::string& img_path){
-    #if 0
+#if 0
     cv::Mat img = cv::imread(img_path);
     if (img.empty()) return;
 
@@ -82,7 +89,7 @@ void PaddleOCRPipeline::run(const std::string& img_path){
         std::string text = recognize(cropped);
         std::cout << "Detected Text: " << text << std::endl;
     }
-    #endif
+#endif
 }
 
 
@@ -144,17 +151,19 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     
     // 4b. Apply Mean/Std (Standard for PaddleOCR). except for Chinese
     // Mean: [0.485, 0.456, 0.406], Std: [0.229, 0.224, 0.225]
-    if (!(m_language == Language::ChineseSimplified || 
-        m_language == Language::ChineseTraditional ||
-        m_language == Language::Japanese ||
-        m_language == Language::Korean))
-    {
-        #if 0
+    switch (m_language){
+    case Language::ChineseSimplified:
+    case Language::ChineseTraditional:
+    case Language::Japanese:
+    case Language::Korean:
+        break;
+    default:;
+#if 0
         cv::Scalar mean(0.485, 0.456, 0.406);
         cv::Scalar std(0.229, 0.224, 0.225);
         cv::subtract(resized, mean, resized);
         cv::divide(resized, std, resized);
-        #endif
+#endif
     }
     
     
@@ -167,13 +176,17 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     // 7. Create tensor with its own managed memory
     Ort::AllocatorWithDefaultOptions allocator;    
     auto input_tensor = Ort::Value::CreateTensor<float>(
-        allocator, input_shape.data(), input_shape.size()
+        allocator,
+        input_shape.data(),
+        input_shape.size()
     );
 
     // Copy your processed data into that memory
-    std::memcpy(input_tensor.GetTensorMutableData<float>(), 
-                input_tensor_values.data(), 
-                input_tensor_values.size() * sizeof(float));
+    std::memcpy(
+        input_tensor.GetTensorMutableData<float>(),
+        input_tensor_values.data(),
+        input_tensor_values.size() * sizeof(float)
+    );
 
     const char* input_names[] = {m_input_name.c_str()};
     const char* output_names[] = {m_output_name.c_str()};  
@@ -188,9 +201,17 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
             output_names,  // char**
             1              // output_count
         );
-        return decode_CTC(outputs[0].GetTensorMutableData<float>(), outputs[0].GetTensorTypeAndShapeInfo().GetShape(), m_dictionary);
+        return decode_CTC(
+            outputs[0].GetTensorMutableData<float>(),
+            outputs[0].GetTensorTypeAndShapeInfo().GetShape(),
+            m_dictionary
+        );
     }catch (Ort::Exception& e){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "PaddleOCRPipeline::recognize(): Failed." + std::string(e.what()));
+        throw InternalProgramError(
+            nullptr,
+            PA_CURRENT_FUNCTION,
+            "PaddleOCRPipeline::recognize(): Failed." + std::string(e.what())
+        );
     }
     
 }
@@ -369,10 +390,12 @@ cv::Mat imageviewrgb32_to_cv_mat_rgb(const ImageViewRGB32& image){
 cv::Rect ImageFloatBox_to_cv_Rect(size_t width, size_t height, const ImageFloatBox& box){
     ImagePixelBox pixelbox = floatbox_to_pixelbox(width, height, box);
     
-    return cv::Rect(safe_convert<int>(pixelbox.min_x), 
-                    safe_convert<int>(pixelbox.min_y), 
-                    safe_convert<int>(pixelbox.width()), 
-                    safe_convert<int>(pixelbox.height()));
+    return cv::Rect(
+        safe_convert<int>(pixelbox.min_x),
+        safe_convert<int>(pixelbox.min_y),
+        safe_convert<int>(pixelbox.width()),
+        safe_convert<int>(pixelbox.height())
+    );
 }
 
 

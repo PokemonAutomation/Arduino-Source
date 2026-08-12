@@ -8,7 +8,6 @@
 #ifndef PokemonAutomation_ML_PaddleOCRPipeline_H
 #define PokemonAutomation_ML_PaddleOCRPipeline_H
 
-
 #include <string>
 #include <vector>
 #include <onnxruntime_cxx_api.h>
@@ -17,13 +16,11 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 
-
-
 namespace PokemonAutomation{
 namespace ML{
 
 
-class PaddleOCRPipeline {
+class PaddleOCRPipeline{
 public:
     PaddleOCRPipeline(Language language);
     PaddleOCRPipeline(Language language, std::string rec_path, std::string dict_path);
