@@ -18,6 +18,7 @@ namespace PokemonRSE{
 // In the summary screen, the dex number will be yellow if a shiny, white if not.
 // Additionally, the background behind the sprite will be white if shiny, grey if not.
 // Number is easier to check as the background is scan lines.
+// Number might be cut off a bit for japan, but as long as most of it is in its fine
 // Warning: In Emerald, the moving sprite may cover the number!
 class ShinyNumberDetector{
 public:

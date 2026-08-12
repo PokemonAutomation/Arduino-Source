@@ -13,9 +13,9 @@
 #include "CommonTools/Images/ImageFilter.h"
 #include "PokemonRSE_ShinyNumberDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -45,12 +45,12 @@ bool ShinyNumberDetector::read(Logger& logger, const ImageViewRGB32& frame){
     );
     ImageStats stats = image_stats(filtered_region2);
 
-    
+    /*
     filtered_region2.save("./filtered_only.png");
     cout << stats.average.r << endl;
     cout << stats.average.g << endl;
     cout << stats.average.b << endl;
-    
+    */
 
     /*
     Shiny:
