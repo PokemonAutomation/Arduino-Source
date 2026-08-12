@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <limits.h>
 #include <sstream>
+#include <fstream>
 #include "FilePath.h"
 #include "Filesystem.h"
 
