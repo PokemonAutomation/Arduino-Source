@@ -14,7 +14,11 @@ namespace PokemonAutomation{
 namespace StringTools{
 
 
-std::string replace(const std::string& str, const std::string& desired, const std::string& replace_with);
+std::string replace(
+    const std::string& str,
+    const std::string& desired,
+    const std::string& replace_with
+);
 
 // Trim leading and trailing white spaces
 std::string strip(const std::string& str);

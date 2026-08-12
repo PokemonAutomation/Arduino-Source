@@ -30,6 +30,10 @@ namespace Filesystem{
 
 
 
+Path absolute(const Path& path){
+    return std::filesystem::absolute(path.stdpath());
+}
+
 bool exists(const Path& path){
     return std::filesystem::exists(path.stdpath());
 }
