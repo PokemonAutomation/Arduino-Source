@@ -6,6 +6,7 @@
 
 #include <unistd.h>
 #include <limits.h>
+#include <vector>
 #include <sstream>
 #include <fstream>
 #include "FilePath.h"
