@@ -92,6 +92,9 @@ Path application_install_path(){
             }
         }
     }
+
+    //  Fallback
+    return application_binary_path();
 }
 Path application_scratch_path(){
     return current_path();
