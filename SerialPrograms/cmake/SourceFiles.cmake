@@ -1413,6 +1413,10 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.h
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IvJudgeReader.cpp
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IvJudgeReader.h
+    Source/PokemonBDSP/Inference/Rng/PokemonBDSP_BlinkScenes.cpp
+    Source/PokemonBDSP/Inference/Rng/PokemonBDSP_BlinkScenes.h
+    Source/PokemonBDSP/Inference/Rng/PokemonBDSP_EyeBlinkDetector.cpp
+    Source/PokemonBDSP/Inference/Rng/PokemonBDSP_EyeBlinkDetector.h
     Source/PokemonBDSP/Inference/Rng/PokemonBDSP_SummaryReader.cpp
     Source/PokemonBDSP/Inference/Rng/PokemonBDSP_SummaryReader.h
     Source/PokemonBDSP/Inference/PokemonBDSP_DialogDetector.cpp
@@ -1453,6 +1457,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonBDSP/Options/PokemonBDSP_EggStepOption.h
     Source/PokemonBDSP/Options/PokemonBDSP_EncounterBotCommon.h
     Source/PokemonBDSP/Options/PokemonBDSP_LearnMove.h
+    Source/PokemonBDSP/Options/PokemonBDSP_PlayerModelOption.cpp
+    Source/PokemonBDSP/Options/PokemonBDSP_PlayerModelOption.h
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.cpp
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h
     Source/PokemonBDSP/Panels_PokemonBDSP.cpp
