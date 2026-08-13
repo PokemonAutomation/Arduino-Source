@@ -8,14 +8,14 @@
 #define PokemonAutomation_PokemonBDSP_EyeBlinkDetector_H
 
 #include <stddef.h>
-#include <memory>
 #include <string>
 #include <vector>
+#include <opencv2/core/mat.hpp>
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Time.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
@@ -23,22 +23,24 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
+//  Rescale a search region to the equivalent from a 1080p capture
+const size_t BDSP_TEMPLATE_REFERENCE_HEIGHT = 1080;
+
+
 class EyeBlinkDetector{
 public:
-    EyeBlinkDetector(std::shared_ptr<const ImageRGB32> open_eye, ImageFloatBox search_box);
+    EyeBlinkDetector(const ImageViewRGB32& open_eye, ImageFloatBox search_box);
 
+    //  Best normalized cross-correlation of the eye template
+    //  https://en.wikipedia.org/wiki/Cross-correlation#Terminology_in_image_processing
     double match(const ImageViewRGB32& frame) const;
 
     const ImageFloatBox& search_box() const{ return m_search_box; }
-    size_t template_width() const{ return m_width; }
-    size_t template_height() const{ return m_height; }
+    size_t template_width() const{ return (size_t)m_template.cols; }
+    size_t template_height() const{ return (size_t)m_template.rows; }
 
 private:
-    std::shared_ptr<const ImageRGB32> m_template;
-    size_t m_width;
-    size_t m_height;
-    std::vector<float> m_centered;
-    double m_norm;
+    cv::Mat m_template;
     ImageFloatBox m_search_box;
 };
 
@@ -60,7 +62,7 @@ class EyeBlinkWatcher : public VisualInferenceCallback{
 public:
     EyeBlinkWatcher(
         std::string label,
-        std::shared_ptr<const ImageRGB32> open_eye,
+        const ImageViewRGB32& open_eye,
         ImageFloatBox search_box,
         Color color = COLOR_RED
     );

@@ -6,8 +6,10 @@
 
 #include <algorithm>
 #include <cmath>
+#include <opencv2/imgproc.hpp>
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonBDSP_EyeBlinkDetector.h"
 
@@ -16,46 +18,27 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-static float to_grey(uint32_t pixel){
-    float r = (float)((pixel >> 16) & 0xff);
-    float g = (float)((pixel >> 8) & 0xff);
-    float b = (float)(pixel & 0xff);
-    return 0.299f * r + 0.587f * g + 0.114f * b;
-}
+//  Returned when the frame cannot be matched at all. Callers read a high score
+//  as "eye open", so a frame we can't measure never gets counted as a blink.
+const double NO_MATCH = 1.0;
 
 
-EyeBlinkDetector::EyeBlinkDetector(std::shared_ptr<const ImageRGB32> open_eye, ImageFloatBox search_box)
-    : m_template(std::move(open_eye))
-    , m_width(0)
-    , m_height(0)
-    , m_norm(0)
-    , m_search_box(search_box)
+EyeBlinkDetector::EyeBlinkDetector(const ImageViewRGB32& open_eye, ImageFloatBox search_box)
+    : m_search_box(search_box)
 {
-    if (m_template == nullptr || !*m_template){
+    if (!open_eye){
         throw InternalProgramError(
             nullptr, PA_CURRENT_FUNCTION,
             "EyeBlinkDetector: No eye template was supplied."
         );
     }
-    m_width = m_template->width();
-    m_height = m_template->height();
 
-    m_centered.resize(m_width * m_height);
-    double sum = 0;
-    for (size_t y = 0; y < m_height; y++){
-        for (size_t x = 0; x < m_width; x++){
-            float value = to_grey(m_template->pixel(x, y));
-            m_centered[y * m_width + x] = value;
-            sum += value;
-        }
-    }
-    double mean = sum / (double)m_centered.size();
-    for (float& value : m_centered){
-        value = (float)(value - mean);
-        m_norm += (double)value * value;
-    }
+    cv::cvtColor(to_OpenCV_ref(open_eye), m_template, cv::COLOR_BGRA2GRAY);
 
-    if (m_norm <= 0){
+    cv::Scalar mean;
+    cv::Scalar stddev;
+    cv::meanStdDev(m_template, mean, stddev);
+    if (stddev[0] <= 0){
         //  A flat template correlates with everything equally and can never see a blink
         throw InternalProgramError(
             nullptr, PA_CURRENT_FUNCTION,
@@ -65,51 +48,42 @@ EyeBlinkDetector::EyeBlinkDetector(std::shared_ptr<const ImageRGB32> open_eye, I
 }
 
 double EyeBlinkDetector::match(const ImageViewRGB32& frame) const{
+    if (!frame || frame.height() == 0){
+        return NO_MATCH;
+    }
+
     ImageViewRGB32 region = extract_box_reference(frame, m_search_box);
-    size_t region_width = region.width();
-    size_t region_height = region.height();
-    if (region_width < m_width || region_height < m_height){
-        return 1.0;
+    if (!region){
+        return NO_MATCH;
     }
 
-    std::vector<float> grey(region_width * region_height);
-    for (size_t y = 0; y < region_height; y++){
-        for (size_t x = 0; x < region_width; x++){
-            grey[y * region_width + x] = to_grey(region.pixel(x, y));
+    //  Rescale the region to the resolution the template was cropped at
+    //  based on the capture height
+    ImageRGB32 rescaled;
+    if (frame.height() != BDSP_TEMPLATE_REFERENCE_HEIGHT){
+        double scale = (double)BDSP_TEMPLATE_REFERENCE_HEIGHT / (double)frame.height();
+        size_t width = (size_t)std::llround(region.width() * scale);
+        size_t height = (size_t)std::llround(region.height() * scale);
+        if (width == 0 || height == 0){
+            return NO_MATCH;
         }
+        rescaled = region.scale_to(width, height);
+        region = rescaled;
     }
 
-    const double count = (double)(m_width * m_height);
-    double best = -1.0;
-
-    for (size_t dy = 0; dy + m_height <= region_height; dy++){
-        for (size_t dx = 0; dx + m_width <= region_width; dx++){
-            double sum = 0;
-            double sum_squares = 0;
-            double cross = 0;
-            for (size_t y = 0; y < m_height; y++){
-                const float* row = grey.data() + (dy + y) * region_width + dx;
-                const float* tpl = m_centered.data() + y * m_width;
-                for (size_t x = 0; x < m_width; x++){
-                    double value = row[x];
-                    sum += value;
-                    sum_squares += value * value;
-                    cross += tpl[x] * value;
-                }
-            }
-            //  The template already has its mean removed, so the window's mean
-            //  drops out of the numerator and only its variance is needed.
-            double variance = sum_squares - sum * sum / count;
-            if (variance <= 0){
-                continue;
-            }
-            double score = cross / std::sqrt(variance * m_norm);
-            if (score > best){
-                best = score;
-            }
-        }
+    if (region.width() < template_width() || region.height() < template_height()){
+        return NO_MATCH;
     }
 
+    //  Match the greyscale image to the template by zero-normalized cross correlation
+    cv::Mat grey;
+    cv::cvtColor(to_OpenCV_ref(region), grey, cv::COLOR_BGRA2GRAY);
+
+    cv::Mat scores;
+    cv::matchTemplate(grey, m_template, scores, cv::TM_CCOEFF_NORMED);
+
+    double best = NO_MATCH;
+    cv::minMaxLoc(scores, nullptr, &best);
     return best;
 }
 
@@ -117,14 +91,14 @@ double EyeBlinkDetector::match(const ImageViewRGB32& frame) const{
 
 EyeBlinkWatcher::EyeBlinkWatcher(
     std::string label,
-    std::shared_ptr<const ImageRGB32> open_eye,
+    const ImageViewRGB32& open_eye,
     ImageFloatBox search_box,
     Color color
 )
     : VisualInferenceCallback(label)
     , m_label(std::move(label))
     , m_color(color)
-    , m_detector(std::move(open_eye), search_box)
+    , m_detector(open_eye, search_box)
     , m_last_match(1.0)
 {}
 
