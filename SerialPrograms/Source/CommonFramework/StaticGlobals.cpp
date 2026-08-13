@@ -73,6 +73,7 @@ void StaticGlobals::load_json(const JsonValue& json){
         debug_obj->read_integer(BOX_SYSTEM_CELL_ROW, "BOX_SYSTEM_CELL_ROW");
         debug_obj->read_integer(BOX_SYSTEM_CELL_COL, "BOX_SYSTEM_CELL_COL");
         debug_obj->read_boolean(GENERATE_TEST_GOLDEN_FILES, "GENERATE_TEST_GOLDEN_FILES");
+        debug_obj->read_boolean(PADDLE_OCR_DEBUG, "PADDLE_OCR_DEBUG");
     }
 }
 JsonValue StaticGlobals::to_json_debug() const{
@@ -83,6 +84,7 @@ JsonValue StaticGlobals::to_json_debug() const{
     debug_obj["BOX_SYSTEM_CELL_ROW"] = BOX_SYSTEM_CELL_ROW;
     debug_obj["BOX_SYSTEM_CELL_COL"] = BOX_SYSTEM_CELL_COL;
     debug_obj["GENERATE_TEST_GOLDEN_FILES"] = GENERATE_TEST_GOLDEN_FILES;
+    debug_obj["PADDLE_OCR_DEBUG"] = PADDLE_OCR_DEBUG;
     return debug_obj;
 }
 
