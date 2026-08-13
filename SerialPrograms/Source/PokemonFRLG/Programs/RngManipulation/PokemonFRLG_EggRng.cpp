@@ -834,7 +834,7 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 
         if (hist.pickup.results.size() > 0){
             env.log("Checking for nonshiny target hit...");
-            if (have_hit_target(TARGET_HELD_SEED, HELD_ADVANCES, hist.pickup.results.back())){
+            if (have_hit_target(TARGET_PICKUP_SEED, PICKUP_ADVANCES, hist.pickup.results.back())){
                 env.log("Target Hit!");
                 stats.nonshiny++;
                 break;
@@ -958,14 +958,10 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 
         case EggProgramState::finished:
         default:
-            if (GO_HOME_WHEN_DONE){
-                pbf_press_button(context, BUTTON_HOME, 200ms, 1000ms);
-            }
-            send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+            break;
         }
     }
 
-    // just in case
     if (GO_HOME_WHEN_DONE){
         pbf_press_button(context, BUTTON_HOME, 200ms, 1000ms);
     }
