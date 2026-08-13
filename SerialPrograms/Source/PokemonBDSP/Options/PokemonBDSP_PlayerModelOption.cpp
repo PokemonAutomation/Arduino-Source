@@ -26,7 +26,7 @@ struct PlayerModelIcons{
         for (uint8_t model = 1; model <= BDSP_PLAYER_MODEL_COUNT; model++){
             std::string number = std::to_string(model);
             icons.emplace_back(
-                RESOURCE_PATH() + "PokemonBDSP/Rng/model_icons/model" + number + ".png"
+                RESOURCE_PATH() + "PokemonBDSP/Rng/ModelIcons/Model-" + number + ".png"
             );
             database.add_entry(StringSelectEntry(
                 "model-" + number, "Model " + number, icons.back()
