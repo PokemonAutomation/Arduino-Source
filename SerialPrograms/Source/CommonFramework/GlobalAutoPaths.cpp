@@ -14,13 +14,6 @@
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "GlobalAutoPaths.h"
 
-#ifdef __linux__
-#include <cstdlib>
-#include <fstream>
-#include "Common/Cpp/Strings/StringTools.h"
-#include "Common/Cpp/Filesystem/FileIO.h"
-#endif
-
 //#include <iostream>
 //using std::cout;
 //using std::endl;
