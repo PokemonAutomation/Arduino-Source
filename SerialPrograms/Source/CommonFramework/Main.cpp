@@ -89,7 +89,7 @@ FileLogger& global_file_logger(){
 
 int run_program(int argc, char *argv[]){
 #if defined(__APPLE__)
-    PokemonAutomation::set_startup_profile(argc, argv);
+    Filesystem::set_startup_profile(argc, argv);
     QApplication application(argc, argv);
 #else
     QApplication application(argc, argv);
@@ -240,8 +240,9 @@ int main(int argc, char *argv[]){
     // Qt multimedia, default to gstreamer to prevent flickering
     // Easier than the alternative which is compiling qt6multimedia with QT_DEFAULT_MEDIA_BACKEND
     // See: https://doc.qt.io/qt-6.5/qtmultimedia-index.html
-    if (qEnvironmentVariableIsEmpty("QT_MEDIA_BACKEND"))
+    if (qEnvironmentVariableIsEmpty("QT_MEDIA_BACKEND")){
         qputenv("QT_MEDIA_BACKEND", "gstreamer");
+    }
 #endif
 
     //  So far, this is only needed on Mac where static initialization is fucked up.
