@@ -1413,6 +1413,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.h
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IvJudgeReader.cpp
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IvJudgeReader.h
+    Source/PokemonBDSP/Inference/Rng/PokemonBDSP_BlinkExtraction.cpp
+    Source/PokemonBDSP/Inference/Rng/PokemonBDSP_BlinkExtraction.h
     Source/PokemonBDSP/Inference/Rng/PokemonBDSP_BlinkScenes.cpp
     Source/PokemonBDSP/Inference/Rng/PokemonBDSP_BlinkScenes.h
     Source/PokemonBDSP/Inference/Rng/PokemonBDSP_EyeBlinkDetector.cpp
@@ -1521,6 +1523,12 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonBDSP/Programs/PokemonBDSP_OverworldTrigger.h
     Source/PokemonBDSP/Programs/PokemonBDSP_RunFromBattle.cpp
     Source/PokemonBDSP/Programs/PokemonBDSP_RunFromBattle.h
+    Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_BlinkModel.cpp
+    Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_BlinkModel.h
+    Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_StateReidentifier.cpp
+    Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_StateReidentifier.h
+    Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_StateSolver.cpp
+    Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_StateSolver.h
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_LegendaryReset.cpp
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_LegendaryReset.h
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Fishing.cpp
