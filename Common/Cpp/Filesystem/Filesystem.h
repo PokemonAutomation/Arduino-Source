@@ -78,6 +78,15 @@ Path application_install_path();
 Path application_scratch_path();
 
 
+// Set a profile for program settings (/UserSettings/PROFILE_NAME/) on MacOS.
+// Have to run the program with command-line argument "open -n PATH_TO_APP --args --profile PROFILE_NAME" to set the profile and launch a new window.
+// This allows multiple instances of the program to run since settings are no longer shared.
+#if defined(__APPLE__)
+void set_startup_profile(int& argc, char* argv[]);
+const std::string& STARTUP_PROFILE();
+#endif
+
+
 
 }
 }

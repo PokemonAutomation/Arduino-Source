@@ -14,9 +14,10 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include "Common/Cpp/ScopeExit.h"
-#include "Common/Cpp/Logging/MultiOutputLogger.h"
-#include "Common/Cpp/CpuId/CpuId.h"
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Logging/MultiOutputLogger.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
+#include "Common/Cpp/CpuId/CpuId.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
