@@ -39,7 +39,11 @@ public:
     {
 //        std::cout << "desired baud = " << baud << std::endl;
 
-        m_fd = open(name.c_str(), O_RDWR | O_NOCTTY);
+        if (name.starts_with("/dev/")){
+            m_fd = open(name.c_str(), O_RDWR | O_NOCTTY);
+        } else{
+            m_fd = open(("/dev/"+name).c_str(), O_RDWR | O_NOCTTY);
+        }
         if (m_fd == -1){
             int error = errno;
             std::string str = "Unable to open serial connection. Error = " + std::to_string(error);
