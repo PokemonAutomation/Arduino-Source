@@ -70,6 +70,12 @@ Path current_path(){
     return std::filesystem::current_path();
 }
 
+Path application_binary_name(){
+    return application_binary_path().filename();
+}
+Path application_binary_directory(){
+    return application_binary_path().parent_path();
+}
 
 
 

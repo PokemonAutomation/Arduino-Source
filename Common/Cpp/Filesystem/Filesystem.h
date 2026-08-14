@@ -66,7 +66,9 @@ void rename(const Path& old_path, const Path& new_path, std::error_code& ec);
 Path current_path();
 
 //  The path to the actual binary that is running.
+Path application_binary_name();
 Path application_binary_path();
+Path application_binary_directory();
 
 //  Path to where the application is installed.
 //  All immutable resources are relative to this.
@@ -74,6 +76,15 @@ Path application_install_path();
 
 //  Path to where the application saves its output/settings.
 Path application_scratch_path();
+
+
+// Set a profile for program settings (/UserSettings/PROFILE_NAME/) on MacOS.
+// Have to run the program with command-line argument "open -n PATH_TO_APP --args --profile PROFILE_NAME" to set the profile and launch a new window.
+// This allows multiple instances of the program to run since settings are no longer shared.
+#if defined(__APPLE__)
+void set_startup_profile(int& argc, char* argv[]);
+const std::string& STARTUP_PROFILE();
+#endif
 
 
 

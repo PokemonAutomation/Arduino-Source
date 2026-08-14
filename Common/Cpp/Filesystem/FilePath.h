@@ -117,7 +117,7 @@ public:
 
 
 public:
-    Path& replace_extension(const Path& replacement){
+    Path& replace_extension(const Path& replacement = Path()){
         m_path.replace_extension(replacement);
         return *this;
     }
