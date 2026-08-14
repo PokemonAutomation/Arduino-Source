@@ -1,34 +1,35 @@
-/*  E Shiny Mew
+/*  Legendary Reset
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_PokemonRSE_ShinyHuntMew_H
-#define PokemonAutomation_PokemonRSE_ShinyHuntMew_H
+#ifndef PokemonAutomation_PokemonRSE_LegendaryReset_H
+#define PokemonAutomation_PokemonRSE_LegendaryReset_H
 
-#include "Common/Cpp/Options/StaticTextOption.h"
-#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonRSE{
 
-class ShinyHuntMew_Descriptor : public SingleSwitchProgramDescriptor{
+class LegendaryReset_Descriptor : public SingleSwitchProgramDescriptor{
 public:
-    ShinyHuntMew_Descriptor();
+    LegendaryReset_Descriptor();
     struct Stats;
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class ShinyHuntMew : public SingleSwitchProgramInstance{
+class LegendaryReset : public SingleSwitchProgramInstance{
 public:
-    ShinyHuntMew();
-    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
+    LegendaryReset();
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
 
     virtual void start_program_border_check(
         VideoStream& stream,
@@ -37,29 +38,26 @@ public:
 
 private:
     PokemonLA::ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
+
+    enum class Target{
+        press_a,
+        walk_left,
+        walk_right,
+    };
+    EnumDropdownOption<Target> TARGET;
+
     BooleanCheckBoxOption TAKE_VIDEO;
+
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     EventNotificationOption NOTIFICATION_SHINY;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
-
-    SectionDividerOption m_advanced_options;
-
-    MillisecondsOption MEW_WAIT_TIME0;
-    MillisecondsOption DOOR_TO_GRASS_TIME0;
-    MillisecondsOption RIGHT_GRASS_1_TIME0;
-    MillisecondsOption UP_GRASS_1_TIME0;
-    MillisecondsOption RIGHT_GRASS_2_TIME0;
-    MillisecondsOption FACE_UP_TIME0;
-
-    void enter_mew(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    void exit_mew(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-
 };
 
 }
 }
 }
 #endif
+
 

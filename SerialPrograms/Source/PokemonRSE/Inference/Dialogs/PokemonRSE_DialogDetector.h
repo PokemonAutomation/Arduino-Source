@@ -13,7 +13,9 @@
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/VisualDetector.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
+#include "PokemonRSE/PokemonRSE_Settings.h"
 
 namespace PokemonAutomation{
     class CancellableScope;
@@ -21,90 +23,142 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonRSE{
 
-// Battle dialog boxes are teal
-// This is unused right now so isn't tested well
-/*
-class BattleDialogDetector : public StaticScreenDetector{
+
+class WhiteScreenOverWatcher : public PokemonAutomation::WhiteScreenOverWatcher{
 public:
-    BattleDialogDetector(Color color);
-
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) override;
-
-private:
-    ImageFloatBox m_dialog_top_box;
-    ImageFloatBox m_dialog_right_box;
-
-    ImageFloatBox m_dialog_top_jpn_box;
-    ImageFloatBox m_dialog_right_jpn_box;
-};
-class BattleDialogWatcher : public DetectorToFinder<BattleDialogDetector>{
-public:
-    BattleDialogWatcher(Color color)
-        : DetectorToFinder("BattleDialogWatcher", std::chrono::milliseconds(250), color)
+    WhiteScreenOverWatcher(Color color = COLOR_RED)
+        : PokemonAutomation::WhiteScreenOverWatcher(
+            color,
+            GameSettings::instance().GAME_BOX.inner_to_outer({0.231692, 0.0616538, 0.551385, 0.9045})
+        )
     {}
 };
-*/
-
-// Battle menu is a white box on the right
-// Teal dialog box remains on the left
-// For R/S, the selection arrow is only in JPN ver, other languages use a box
-// Positions slightly different on non-JPN Emerald but all langs use an arrow
-class BattleMenuDetector : public StaticScreenDetector{
+class BlackScreenWatcher : public PokemonAutomation::BlackScreenWatcher{
 public:
-    BattleMenuDetector(Color color);
-
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) override;
-
-private:
-    //R/S both JPN and ENG, E for JPN
-    ImageFloatBox m_menu_top_box;
-    ImageFloatBox m_menu_bottom_box;
-    ImageFloatBox m_dialog_top_box;
-    ImageFloatBox m_dialog_right_box;
-
-    //Emerald for non-JPN
-    ImageFloatBox m_menu_top_eme_box;
-    ImageFloatBox m_menu_right_eme_box;
-    ImageFloatBox m_dialog_top_eme_box;
-    ImageFloatBox m_dialog_right_eme_box;
+    BlackScreenWatcher(Color color = COLOR_RED)
+        : PokemonAutomation::BlackScreenWatcher(
+            color,
+            GameSettings::instance().GAME_BOX.inner_to_outer({0.231692, 0.0616538, 0.551385, 0.9045})
+        )
+    {}
 };
-class BattleMenuWatcher : public DetectorToFinder<BattleMenuDetector>{
+class BlackScreenOverWatcher : public PokemonAutomation::BlackScreenOverWatcher{
 public:
-    BattleMenuWatcher(Color color)
-        : DetectorToFinder("BattleMenuWatcher", std::chrono::milliseconds(250), color)
+    BlackScreenOverWatcher(Color color = COLOR_RED)
+        : PokemonAutomation::BlackScreenOverWatcher(
+            color,
+            GameSettings::instance().GAME_BOX.inner_to_outer({0.231692, 0.0616538, 0.551385, 0.9045})
+        )
     {}
 };
 
 
-
-// Detect the red advancement arrow by filtering for red.
-// This is the same as BattleDialogDetector apart from the arrow
-class AdvanceBattleDialogDetector : public StaticScreenDetector{
+// Detect the Pokenav dialog box that appears when being called on the overworld
+// This does not work for calls from the Pokenav menu itself, as the position is different
+// Emerald only, Ruby and Sapphire don't have to worry about randomly being interrupted.
+// Advance arrow appears on all but the last box of dialog. No detection for this since
+// most interaction will be to mash B to get rid of the call.
+class PokenavDialogDetector : public StaticScreenDetector{
 public:
-    AdvanceBattleDialogDetector(Color color);
+    PokenavDialogDetector(Color color);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
+    ImageFloatBox m_dialog_border_box;
+    ImageFloatBox m_dialog_main_box;
+};
+class PokenavDialogWatcher : public DetectorToFinder<PokenavDialogDetector>{
+public:
+    PokenavDialogWatcher(Color color)
+        : DetectorToFinder("PokenavDialogWatcher", std::chrono::milliseconds(250), color)
+    {}
+};
+
+
+// Dialog box without advance arrow.
+// Positions are different between japan and ROW, but are the same across games.
+class DialogDetector : public StaticScreenDetector{
+public:
+    DialogDetector(Color color);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+private:
+    //Position for non-JPN
+    ImageFloatBox m_top_box;
+    ImageFloatBox m_inner_box;
+
+    //Position for JPN
+    ImageFloatBox m_side_box_jpn;
+    ImageFloatBox m_inner_box_jpn;
+};
+class DialogWatcher : public DetectorToFinder<DialogDetector>{
+public:
+    DialogWatcher(Color color)
+        : DetectorToFinder("DialogWatcher", std::chrono::milliseconds(250), color)
+    {}
+};
+
+
+
+// Dialog box, now with arrow!
+class AdvanceDialogDetector : public StaticScreenDetector{
+public:
+    AdvanceDialogDetector(Color color);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+private:
+    //Position for non-JPN
+    ImageFloatBox m_top_box;
+    ImageFloatBox m_inner_box;
     ImageFloatBox m_dialog_box;
-    ImageFloatBox m_dialog_top_box;
-    ImageFloatBox m_dialog_right_box;
 
+    //Position for JPN
+    ImageFloatBox m_side_box_jpn;
+    ImageFloatBox m_inner_box_jpn;
     ImageFloatBox m_dialog_jpn_box;
-    ImageFloatBox m_dialog_top_jpn_box;
-    ImageFloatBox m_dialog_right_jpn_box;
 };
-class AdvanceBattleDialogWatcher : public DetectorToFinder<AdvanceBattleDialogDetector>{
+class AdvanceDialogWatcher : public DetectorToFinder<AdvanceDialogDetector>{
 public:
-    AdvanceBattleDialogWatcher(Color color)
-        : DetectorToFinder("AdvanceBattleDialogWatcher", std::chrono::milliseconds(250), color)
+    AdvanceDialogWatcher(Color color)
+        : DetectorToFinder("AdvanceDialogWatcher", std::chrono::milliseconds(250), color)
     {}
 };
 
-// Future note: when given a choice popup, there is no advance arrow.
+
+
+// Detection for the Yes/No prompt. (Poke Center, Move Deleter)
+// Does not work for starter selection, dialog box and prompt are different.
+class SelectionDialogDetector : public StaticScreenDetector{
+public:
+    SelectionDialogDetector(Color color);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+private:
+    //Position for non-JPN
+    ImageFloatBox m_top_box;
+    ImageFloatBox m_inner_box;
+
+    //Position for JPN
+    ImageFloatBox m_side_box_jpn;
+    ImageFloatBox m_inner_box_jpn;
+
+    ImageFloatBox m_yes_box;
+    ImageFloatBox m_no_box;
+};
+class SelectionDialogWatcher : public DetectorToFinder<SelectionDialogDetector>{
+public:
+    SelectionDialogWatcher(Color color)
+        : DetectorToFinder("SelectionDialogWatcher", std::chrono::milliseconds(250), color)
+    {}
+};
 
 
 }
