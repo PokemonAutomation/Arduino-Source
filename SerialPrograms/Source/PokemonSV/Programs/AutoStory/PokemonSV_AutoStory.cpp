@@ -375,7 +375,7 @@ AutoStory_Descriptor::AutoStory_Descriptor()
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         false,
         { 
-            "PokemonSV/AreaZero",
+            // "PokemonSV/AreaZero",
             // "PaddleOCR" // not needed since an OCR library is bundled with this program
         }
     )
@@ -1245,6 +1245,8 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
         //     128, 0, 60, 10, false);
 
         DirectionDetector direction;
+
+        
 
 
         // YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/A0-station-2.onnx");
