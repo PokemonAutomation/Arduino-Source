@@ -5,6 +5,7 @@
  */
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
@@ -143,13 +144,30 @@ void checkpoint_86(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         pbf_move_left_joystick(context, {0, +1}, 8800ms, 400ms);
 
         get_on_ride(env.program_info(), env.console, context);
-        direction.change_direction(env.program_info(), env.console, context, 1.484555);
+        direction.change_direction(env.program_info(), env.console, context, 1.761373);
 
-        pbf_move_left_joystick(context, {0, +1}, 1506ms, 0ms);
+        pbf_move_left_joystick(context, {0, +1}, 1300ms, 0ms);
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 703ms);
         pbf_move_left_joystick(context, {0, +1}, 233ms, 0ms);
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 5098ms);
-        pbf_move_left_joystick(context, {0, +1}, 1000ms, 0ms);
+
+        BlackScreenWatcher black_screen(COLOR_RED);
+        int ret = run_until<ProControllerContext>(
+            env.console, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 0ms);
+            },
+            { black_screen }
+        );
+        if (ret < 0){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Never detected black screen. Failed to glide from the Academy to the route leading to the Pokemon League.",
+                env.console
+            );
+        }
+
+        env.console.log("Detected black screen. Likely successful glide from the Academy to the route leading to the Pokemon League.");
 
         wait_for_overworld(env.program_info(), env.console, context);
 
