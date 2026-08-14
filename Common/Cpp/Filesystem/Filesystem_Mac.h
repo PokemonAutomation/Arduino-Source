@@ -6,6 +6,8 @@
 
 #include <limits.h>
 #include <vector>
+#include <unistd.h>
+#include <libproc.h>
 #include <mach-o/dyld.h>
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreFoundation/CFBundle.h>
@@ -16,11 +18,58 @@ namespace PokemonAutomation{
 namespace Filesystem{
 
 
+
+static std::string g_startup_profile;
+
+void set_startup_profile(int& argc, char* argv[]){
+    for (int i = 1; i + 1 < argc; i++){
+        if (strcmp(argv[i], "--profile") == 0){
+            std::string profile = argv[i + 1];
+            for (char c : profile){
+                if (!(std::isalpha(c) || std::isdigit(c)) && c != u'_' && c != u'-') c = u'_';
+            }
+            g_startup_profile = std::move(profile);
+            // Shift everything after --profile <name> down by 2.
+            for (int j = i; j + 2 < argc; j++){
+                argv[j] = argv[j + 2];
+            }
+            argc -= 2;
+            return;
+        }
+    }
+}
+
+const std::string& STARTUP_PROFILE(){
+    return g_startup_profile;
+}
+
+
+// Helper function to safely get the current executable's name on macOS
+std::string get_macos_executable_name() {
+    char path_buffer[PROC_PIDPATHINFO_MAXSIZE];
+    pid_t pid = getpid();
+
+    if (proc_pidpath(pid, path_buffer, sizeof(path_buffer)) > 0) {
+        Filesystem::Path full_path(path_buffer);
+        return full_path.filename().string(); // Returns the binary name (e.g., "SerialPrograms")
+    }
+
+    return "UnknownApp"; // Worst-case fallback
+}
+
+
+
+
+
+
+
+
+
 Path application_binary_path(){
     char buffer[PATH_MAX];
     uint32_t size = sizeof(buffer);
     if (_NSGetExecutablePath(buffer, &size) == 0) {
-        return std::filesystem::canonical(std::filesystem::path(buffer)).parent_path();
+        return std::filesystem::canonical(std::filesystem::path(buffer));
     }
     return Path();
 }
@@ -71,11 +120,33 @@ Path application_install_path(){
     }
 
     //  Fallback
-    return application_binary_path();
+    return application_binary_directory();
 }
 Path application_scratch_path(){
-    //  TODO: This is just a placeholder.
-    return current_path();
+    // 1. Replicate Home folder resolution (~/)
+    const char* home_env = std::getenv("HOME");
+    Filesystem::Path app_support_path;
+
+    if (home_env != nullptr) {
+        app_support_path = Filesystem::Path(home_env);
+    } else {
+        app_support_path = Filesystem::current_path();
+    }
+
+    // 2. Replicate standard macOS AppDataLocation structure programmatically
+    std::string app_name = get_macos_executable_name();
+    app_support_path = app_support_path / "Library" / "Application Support" / app_name;
+
+    // 3. Append your profile path
+    if (!g_startup_profile.empty()) {
+        app_support_path /= "Profiles";
+        app_support_path /= g_startup_profile;
+    }
+
+    // 4. Create directory structure
+    Filesystem::create_directories(app_support_path);
+
+    return app_support_path.string() + "/";
 }
 
 

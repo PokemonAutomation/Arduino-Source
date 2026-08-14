@@ -4,13 +4,6 @@
  *
  */
 
-#include <QCoreApplication>
-#include <QString>
-#include <QFile>
-#include <QStandardPaths>
-#include <QFile>
-#include <QFileInfo>
-#include <QDir>
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "GlobalAutoPaths.h"
 
@@ -21,38 +14,7 @@
 namespace PokemonAutomation{
 
 
-
-
-
-#if defined(__APPLE__)
-static std::string g_startup_profile;
-
-void set_startup_profile(int& argc, char* argv[]){
-    for (int i = 1; i + 1 < argc; i++){
-        if (strcmp(argv[i], "--profile") == 0){
-            std::string profile = argv[i + 1];
-            for (char c : profile){
-                if (!(std::isalpha(c) || std::isdigit(c)) && c != u'_' && c != u'-') c = u'_';
-            }
-            g_startup_profile = std::move(profile);
-            // Shift everything after --profile <name> down by 2.
-            for (int j = i; j + 2 < argc; j++){
-                argv[j] = argv[j + 2];
-            }
-            argc -= 2;
-            return;
-        }
-    }
-}
-
-const std::string& STARTUP_PROFILE(){
-    return g_startup_profile;
-}
-#endif
-
 namespace{
-
-
 
 
 std::string get_resource_path(){
@@ -110,21 +72,6 @@ std::string get_training_path(){
     return (base / "TrainingData/").string_slash_normalized();
 }
 
-std::string get_runtime_base_path(){
-#if defined(__APPLE__)
-    // QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) returns
-    // "/Users/$USERNAME/Library/Application Support/SerialPrograms"
-    QString appSupportPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    if (!g_startup_profile.empty()){
-        appSupportPath += "/Profiles/" + QString::fromStdString(g_startup_profile);
-    }
-    QDir().mkpath(appSupportPath);
-    return appSupportPath.toStdString() + "/";
-#else
-    return Filesystem::application_scratch_path().string_slash_normalized() + "/";
-#endif
-}
-
 std::string get_setting_path(){
     return RUNTIME_BASE_PATH() + "UserSettings/";
 }
@@ -143,8 +90,11 @@ std::string get_user_file_path(){
 
 } // anonymous namespace
 
+
+
+
 const std::string& RUNTIME_BASE_PATH(){
-    static std::string path = get_runtime_base_path();
+    static std::string path = Filesystem::application_scratch_path().string();
     return path;
 }
 
@@ -153,7 +103,7 @@ const std::string& SETTINGS_PATH(){
     return path;
 }
 const std::string& PROGRAM_SETTING_JSON_PATH(){
-    static std::string path = SETTINGS_PATH() + QCoreApplication::applicationName().toStdString() + "-Settings.json";
+    static std::string path = SETTINGS_PATH() + Filesystem::application_binary_name().replace_extension().string() + "-Settings.json";
     return path;
 }
 const std::string& SCREENSHOTS_PATH(){

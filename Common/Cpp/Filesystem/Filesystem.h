@@ -66,7 +66,9 @@ void rename(const Path& old_path, const Path& new_path, std::error_code& ec);
 Path current_path();
 
 //  The path to the actual binary that is running.
+Path application_binary_name();
 Path application_binary_path();
+Path application_binary_directory();
 
 //  Path to where the application is installed.
 //  All immutable resources are relative to this.
