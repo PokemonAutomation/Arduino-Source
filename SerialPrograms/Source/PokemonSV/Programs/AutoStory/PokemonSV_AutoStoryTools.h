@@ -118,7 +118,7 @@ public:
         AutoStoryStats& stats) const = 0;
 
     std::string checkpoint_text() const { 
-        return "Checkpoint " + name() + ". Start point:" + start_text(); 
+        return "Checkpoint: " + name() + ". Start point:" + start_text(); 
     }
 };
 

@@ -1433,7 +1433,7 @@ void checkpoint_reattempt_loop(
             save_game_from_overworld(env.program_info(), env.console, context);
         }
 
-        env.console.log(checkpoint_text);
+        env.console.log(checkpoint_text + " Num attempts: " + std::to_string(i));
 
         context.wait_for_all_requests();
         action(i);
@@ -1479,8 +1479,8 @@ void checkpoint_reattempt_loop_tutorial(
             send_program_status_notification(env, notif_status_update, "Saved at checkpoint.");     
         }
         
-        env.console.log(checkpoint_text);
-        
+        env.console.log(checkpoint_text + " Num attempts: " + std::to_string(i));
+
         context.wait_for_all_requests();
         action(i);
 
