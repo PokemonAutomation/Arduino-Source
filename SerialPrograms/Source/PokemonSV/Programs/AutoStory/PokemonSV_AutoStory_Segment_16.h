@@ -50,7 +50,8 @@ void checkpoint_35(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 // start: At Cascarrafa Gym. Received Kofu's wallet.
@@ -59,7 +60,8 @@ void checkpoint_36(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 

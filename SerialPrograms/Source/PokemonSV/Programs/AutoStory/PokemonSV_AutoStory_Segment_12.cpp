@@ -70,18 +70,19 @@ std::string AutoStory_Checkpoint_28::name() const{ return "028 - " + AutoStory_S
 std::string AutoStory_Checkpoint_28::start_text() const{ return "At Cortondo East Pokecenter.";}
 std::string AutoStory_Checkpoint_28::end_text() const{ return "Beat Cortondo Gym. At Cortondo West Pokecenter.";}
 void AutoStory_Checkpoint_28::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_28(env, context, options.notif_status_update, stats);
+    checkpoint_28(env, context, options.notif_status_update, stats, checkpoint_text());
 }
 
 
 void checkpoint_28(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 ){
     
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
         DirectionDetector direction;

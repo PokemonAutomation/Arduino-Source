@@ -71,32 +71,33 @@ std::string AutoStory_Checkpoint_01::name() const{ return "001 - " + AutoStory_S
 std::string AutoStory_Checkpoint_01::start_text() const{ return "Done cutscene. Stood up from chair. Walked to left side of room.";}
 std::string AutoStory_Checkpoint_01::end_text() const{ return "Standing in room. Updated settings";}
 void AutoStory_Checkpoint_01::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_01(env, context, options.notif_status_update, stats, options.language);
+    checkpoint_01(env, context, options.notif_status_update, stats, checkpoint_text(), options.language);
 }
 
 std::string AutoStory_Checkpoint_02::name() const{ return "002 - " + AutoStory_Segment_01().name(); }
 std::string AutoStory_Checkpoint_02::start_text() const{ return AutoStory_Checkpoint_01().end_text();}
 std::string AutoStory_Checkpoint_02::end_text() const{ return "Standing in front of the 'power of science' NPC. Cleared map tutorial.";}
 void AutoStory_Checkpoint_02::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_02(env, context, options.notif_status_update, stats);
+    checkpoint_02(env, context, options.notif_status_update, stats, checkpoint_text());
 }
 
 std::string AutoStory_Checkpoint_03::name() const{ return "003 - " + AutoStory_Segment_01().name(); }
 std::string AutoStory_Checkpoint_03::start_text() const{ return  AutoStory_Checkpoint_02().end_text();}
 std::string AutoStory_Checkpoint_03::end_text() const{ return "Received starter Pokemon. Changed move order. Cleared autoheal tutorial.";}
 void AutoStory_Checkpoint_03::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_03(env, context, options.notif_status_update, stats, options.language, options.starter_choice);
+    checkpoint_03(env, context, options.notif_status_update, stats, checkpoint_text(), options.language, options.starter_choice);
 }
 
 
 void checkpoint_01(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats, 
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text, 
     Language language
 ){
-    checkpoint_reattempt_loop_tutorial(env, context, notif_status_update, stats,
+    checkpoint_reattempt_loop_tutorial(env, context, notif_status_update, stats, checkpoint_text,
     [&](size_t attempt_number){
         
         context.wait_for_all_requests();
@@ -110,12 +111,13 @@ void checkpoint_01(
 }
 
 void checkpoint_02(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 ){
-    checkpoint_reattempt_loop_tutorial(env, context, notif_status_update, stats,
+    checkpoint_reattempt_loop_tutorial(env, context, notif_status_update, stats, checkpoint_text,
     [&](size_t attempt_number){
         
         context.wait_for_all_requests();
@@ -184,14 +186,15 @@ void checkpoint_02(
 }
 
 void checkpoint_03(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats,
+    const std::string& checkpoint_text,
     Language language,
     StarterChoice starter_choice
 ){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
     [&](size_t attempt_number){
         
         context.wait_for_all_requests();

@@ -58,7 +58,8 @@ void checkpoint_55(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 // start: Beat Orthworm phase 1 and 2
@@ -67,7 +68,8 @@ void checkpoint_56(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 // start: At East Province (Area Three) Pokecenter.
@@ -76,7 +78,8 @@ void checkpoint_57(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 

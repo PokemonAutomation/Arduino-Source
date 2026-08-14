@@ -46,11 +46,11 @@ public:
 
 // start: Entered Zero Lab. Spoke to AI Professor.
 // end: Battled the AI Professor. Completed the game.
-void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text);
 
 // // start: 
 // // end: 
-// void checkpoint_105(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+// void checkpoint_105(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text);
 
 
 

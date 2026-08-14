@@ -47,11 +47,11 @@ public:
 
 // start: At Alfornada Pokecenter.
 // end: At Alfornada Pokecenter.
-void checkpoint_83(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+void checkpoint_83(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text);
 
 // start: At Alfornada Pokecenter.
 // end: Beat Alfornada gym challenge. Beat Alfornada gym. At Alfronada Pokecenter.
-void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text);
 
 
 

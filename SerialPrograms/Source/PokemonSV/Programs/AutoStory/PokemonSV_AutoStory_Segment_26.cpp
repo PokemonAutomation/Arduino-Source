@@ -69,7 +69,7 @@ std::string AutoStory_Checkpoint_61::name() const{ return "061 - " + AutoStory_S
 std::string AutoStory_Checkpoint_61::start_text() const{ return "At Medali Pokecenter.";}
 std::string AutoStory_Checkpoint_61::end_text() const{ return "At Medali Gym";}
 void AutoStory_Checkpoint_61::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_61(env, context, options.notif_status_update, stats);
+    checkpoint_61(env, context, options.notif_status_update, stats, checkpoint_text());
 }
 
 
@@ -77,26 +77,27 @@ std::string AutoStory_Checkpoint_62::name() const{ return "062 - " + AutoStory_S
 std::string AutoStory_Checkpoint_62::start_text() const{ return AutoStory_Checkpoint_61().end_text();}
 std::string AutoStory_Checkpoint_62::end_text() const{ return "Beat Medali Gym";}
 void AutoStory_Checkpoint_62::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_62(env, context, options.notif_status_update, stats);
+    checkpoint_62(env, context, options.notif_status_update, stats, checkpoint_text());
 }
 
 std::string AutoStory_Checkpoint_63::name() const{ return "063 - " + AutoStory_Segment_26().name(); }
 std::string AutoStory_Checkpoint_63::start_text() const{ return AutoStory_Checkpoint_62().end_text();}
 std::string AutoStory_Checkpoint_63::end_text() const{ return "At Glaseado Mountain Pokecenter";}
 void AutoStory_Checkpoint_63::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_63(env, context, options.notif_status_update, stats);
+    checkpoint_63(env, context, options.notif_status_update, stats, checkpoint_text());
 }
 
 
 
 
 void checkpoint_61(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 ){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats, 
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text, 
     [&](size_t attempt_number){
 
         // first, clear Pokemon in Minimap.
@@ -157,12 +158,13 @@ void checkpoint_61(
 }
 
 void checkpoint_62(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 ){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
     [&](size_t attempt_number){
 
         pbf_move_left_joystick(context, {0, -1}, 2400ms, 800ms);
@@ -240,12 +242,13 @@ void checkpoint_62(
 }
 
 void checkpoint_63(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 ){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
     [&](size_t attempt_number){
 
         // Gym leader defeated. Standing in Gym building

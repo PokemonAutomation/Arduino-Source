@@ -116,6 +116,10 @@ public:
         ProControllerContext& context,
         AutoStoryOptions options,
         AutoStoryStats& stats) const = 0;
+
+    std::string checkpoint_text() const { 
+        return "Checkpoint " + name() + ". Start point:" + start_text(); 
+    }
 };
 
 
@@ -372,19 +376,21 @@ void check_num_sunflora_found(SingleSwitchProgramEnvironment& env, ProController
 // save prior to first attempt
 // throw exception if we try to exceed max_attempts.
 void checkpoint_reattempt_loop(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats,
+    const std::string& checkpoint_text,
     std::function<void(size_t attempt_number)>&& action,
     bool day_skip = true
 );
 
 void checkpoint_reattempt_loop_tutorial(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats,
+    const std::string& checkpoint_text,
     std::function<void(size_t attempt_number)>&& action
 );
 

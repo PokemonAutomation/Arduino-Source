@@ -67,26 +67,26 @@ std::string AutoStory_Checkpoint_93::name() const{ return "093 - " + AutoStory_S
 std::string AutoStory_Checkpoint_93::start_text() const{ return "Beat Arven. At Los Platos Pokecenter.";}
 std::string AutoStory_Checkpoint_93::end_text() const{ return "Entered Area Zero Gate. Flew down to Area Zero from the platform.";}
 void AutoStory_Checkpoint_93::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_93(env, context, options.notif_status_update, stats);
+    checkpoint_93(env, context, options.notif_status_update, stats, checkpoint_text());
 }
 
 std::string AutoStory_Checkpoint_94::name() const{ return "094 - " + AutoStory_Segment_35().name(); }
 std::string AutoStory_Checkpoint_94::start_text() const{ return AutoStory_Checkpoint_93().end_text();}
 std::string AutoStory_Checkpoint_94::end_text() const{ return "Inside Area Zero Station 1. Deactivated the locks.";}
 void AutoStory_Checkpoint_94::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_94(env, context, options.notif_status_update, stats);
+    checkpoint_94(env, context, options.notif_status_update, stats, checkpoint_text());
 }
 
 std::string AutoStory_Checkpoint_95::name() const{ return "095 - " + AutoStory_Segment_35().name(); }
 std::string AutoStory_Checkpoint_95::start_text() const{ return AutoStory_Checkpoint_94().end_text();}
 std::string AutoStory_Checkpoint_95::end_text() const{ return "Inside Area Zero Station 1. Deactivated the locks.";}
 void AutoStory_Checkpoint_95::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_95(env, context, options.notif_status_update, stats);
+    checkpoint_95(env, context, options.notif_status_update, stats, checkpoint_text());
 }
 
 
-void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
     [&](size_t attempt_number){
         // fly to Medali West from Los Platos Pokecenter
         // this clears Pokemon in minimap
@@ -229,8 +229,8 @@ void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 }
 
-void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
     [&](size_t attempt_number){
 
 
@@ -635,8 +635,8 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     }, false);
 }
 
-void checkpoint_95(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+void checkpoint_95(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
     [&](size_t attempt_number){
         // empty checkpoint
         

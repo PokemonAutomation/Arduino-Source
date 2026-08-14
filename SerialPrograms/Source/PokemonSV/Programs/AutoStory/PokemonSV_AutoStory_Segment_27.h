@@ -62,19 +62,19 @@ public:
 
 // start: At Glaseado Mountain Pokecenter
 // end: At Glaseado Mountain Pokecenter
-void checkpoint_64(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+void checkpoint_64(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text);
 
 // start: At Glaseado Mountain Pokecenter
 // end: Defeat Dondozo Titan phase 1.
-void checkpoint_65(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+void checkpoint_65(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text);
 
 // start: Defeat Dondozo Titan phase 1.
 // end: Defeat Dondozo Titan phase 2-3.
-void checkpoint_66(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+void checkpoint_66(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text);
 
 // start: Defeat Dondozo Titan phase 2-3.
 // end: At North Province Area Three Pokecenter
-void checkpoint_67(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+void checkpoint_67(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text);
 
 
 

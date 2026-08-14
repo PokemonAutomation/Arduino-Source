@@ -58,7 +58,8 @@ void checkpoint_32(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 // start: At West Province Area One North Pokecenter
@@ -67,7 +68,8 @@ void checkpoint_33(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 // start: Defeated Team Star (Dark) boss
@@ -76,7 +78,8 @@ void checkpoint_34(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 

@@ -46,11 +46,11 @@ public:
 
 // start: Inside Area Zero Station 4. Deactivated the locks.
 // end: Opened Zero lab. Defeated Paradox Pokemon.
-void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text);
 
 // start: Opened Zero lab. Defeated Paradox Pokemon.
 // end: Entered Zero Lab. Spoke to AI Professor.
-void checkpoint_103(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+void checkpoint_103(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text);
 
 
 

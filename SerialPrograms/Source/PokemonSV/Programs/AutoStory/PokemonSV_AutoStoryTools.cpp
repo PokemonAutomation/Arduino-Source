@@ -1413,10 +1413,11 @@ void check_num_sunflora_found(SingleSwitchProgramEnvironment& env, ProController
 }
 
 void checkpoint_reattempt_loop(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats,
+    const std::string& checkpoint_text,
     std::function<void(size_t attempt_number)>&& action,
     bool day_skip
 ){
@@ -1431,6 +1432,8 @@ void checkpoint_reattempt_loop(
             day_skip_from_overworld(env.console, context);
             save_game_from_overworld(env.program_info(), env.console, context);
         }
+
+        env.console.log(checkpoint_text);
 
         context.wait_for_all_requests();
         action(i);
@@ -1459,10 +1462,11 @@ void checkpoint_reattempt_loop(
 }
 
 void checkpoint_reattempt_loop_tutorial(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats,
+    const std::string& checkpoint_text,
     std::function<void(size_t attempt_number)>&& action
 ){
     size_t max_attempts = 100;
@@ -1474,6 +1478,8 @@ void checkpoint_reattempt_loop_tutorial(
             env.update_stats();
             send_program_status_notification(env, notif_status_update, "Saved at checkpoint.");     
         }
+        
+        env.console.log(checkpoint_text);
         
         context.wait_for_all_requests();
         action(i);

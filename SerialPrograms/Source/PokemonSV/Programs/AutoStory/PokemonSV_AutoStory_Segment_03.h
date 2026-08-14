@@ -56,7 +56,8 @@ void checkpoint_05(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 // start: Met mom at gate. Received mom's sandwich.
@@ -65,7 +66,8 @@ void checkpoint_06(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 // start: Cleared catch tutorial.
@@ -74,7 +76,8 @@ void checkpoint_07(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 

@@ -55,15 +55,15 @@ public:
 
 // start: At Glaseado Gym Pokecenter
 // end: Battled Nemona. Spoke to Glaseado Gym receptionist
-void checkpoint_75(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+void checkpoint_75(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text);
 
 // start: Spoke to Glaseado Gym receptionist. 
 // end: Beat Glaseado Gym Challenge. Beat Glaseado Gym (Ice).
-void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text);
 
 // start: Beat Glaseado Gym Challenge. Beat Glaseado Gym (Ice). 
 // end: At North Province Area One Pokecenter
-void checkpoint_77(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+void checkpoint_77(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text);
 
 
 
