@@ -41,7 +41,7 @@ public:
 
         if (name.starts_with("/dev/")){
             m_fd = open(name.c_str(), O_RDWR | O_NOCTTY);
-        } else{
+        }else{
             m_fd = open(("/dev/"+name).c_str(), O_RDWR | O_NOCTTY);
         }
         if (m_fd == -1){
