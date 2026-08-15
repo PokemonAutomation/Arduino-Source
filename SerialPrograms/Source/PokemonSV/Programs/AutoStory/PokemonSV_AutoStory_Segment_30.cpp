@@ -68,7 +68,7 @@ void AutoStory_Segment_30::run_segment(
 
 std::string AutoStory_Checkpoint_75::name() const{ return "075 - " + AutoStory_Segment_30().name(); }
 std::string AutoStory_Checkpoint_75::start_text() const{ return "At Glaseado gym Pokecenter.";}
-std::string AutoStory_Checkpoint_75::end_text() const{ return "Battled Nemona. Spoke to Glaseado Gym receptionist";}
+std::string AutoStory_Checkpoint_75::end_text() const{ return "Battled Nemona. Spoke to Glaseado Gym receptionist. Inside Glaseado Gym building.";}
 void AutoStory_Checkpoint_75::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_75(env, context, options.notif_status_update, stats, checkpoint_text());
 }
@@ -76,7 +76,7 @@ void AutoStory_Checkpoint_75::run_checkpoint(SingleSwitchProgramEnvironment& env
 
 std::string AutoStory_Checkpoint_76::name() const{ return "076 - " + AutoStory_Segment_30().name(); }
 std::string AutoStory_Checkpoint_76::start_text() const{ return AutoStory_Checkpoint_75().end_text();}
-std::string AutoStory_Checkpoint_76::end_text() const{ return "Beat Glaseado Gym Challenge. Beat Glaseado Gym (Ice).";}
+std::string AutoStory_Checkpoint_76::end_text() const{ return "Beat Glaseado Gym Challenge. Beat Glaseado Gym (Ice). Inside Glaseado Gym building.";}
 void AutoStory_Checkpoint_76::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_76(env, context, options.notif_status_update, stats, checkpoint_text());
 }

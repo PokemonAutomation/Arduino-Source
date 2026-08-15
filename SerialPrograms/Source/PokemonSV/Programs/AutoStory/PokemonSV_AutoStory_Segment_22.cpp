@@ -74,7 +74,7 @@ void AutoStory_Checkpoint_50::run_checkpoint(SingleSwitchProgramEnvironment& env
 
 std::string AutoStory_Checkpoint_51::name() const{ return "051 - " + AutoStory_Segment_22().name(); }
 std::string AutoStory_Checkpoint_51::start_text() const{ return AutoStory_Checkpoint_50().end_text();}
-std::string AutoStory_Checkpoint_51::end_text() const{ return "At Levincia gym building. Talked to Hassel, met Rika.";}
+std::string AutoStory_Checkpoint_51::end_text() const{ return "Inside Levincia gym building. Talked to Hassel, met Rika.";}
 void AutoStory_Checkpoint_51::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_51(env, context, options.notif_status_update, stats, checkpoint_text());
 }
@@ -82,7 +82,7 @@ void AutoStory_Checkpoint_51::run_checkpoint(SingleSwitchProgramEnvironment& env
 
 std::string AutoStory_Checkpoint_52::name() const{ return "052 - " + AutoStory_Segment_22().name(); }
 std::string AutoStory_Checkpoint_52::start_text() const{ return AutoStory_Checkpoint_51().end_text();}
-std::string AutoStory_Checkpoint_52::end_text() const{ return "Finished Levincia gym challenge.";}
+std::string AutoStory_Checkpoint_52::end_text() const{ return "Finished Levincia gym challenge. Outside Levincia gym building.";}
 void AutoStory_Checkpoint_52::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_52(env, context, options.notif_status_update, stats, checkpoint_text());
 }

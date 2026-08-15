@@ -65,7 +65,7 @@ void AutoStory_Segment_16::run_segment(
 
 std::string AutoStory_Checkpoint_35::name() const{ return "035 - " + AutoStory_Segment_16().name(); }
 std::string AutoStory_Checkpoint_35::start_text() const{ return "At Cascarrafa (West) Pokecenter.";}
-std::string AutoStory_Checkpoint_35::end_text() const{ return "At Cascarrafa Gym. Received Kofu's wallet.";}
+std::string AutoStory_Checkpoint_35::end_text() const{ return "Outside Cascarrafa Gym. Received Kofu's wallet.";}
 void AutoStory_Checkpoint_35::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_35(env, context, options.notif_status_update, stats, checkpoint_text());
 }

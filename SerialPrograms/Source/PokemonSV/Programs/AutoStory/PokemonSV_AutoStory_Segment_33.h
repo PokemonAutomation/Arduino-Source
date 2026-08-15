@@ -86,10 +86,10 @@ void checkpoint_86(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 void checkpoint_87(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text, Language language, StarterChoice starter_choice);
 
 // start: Finished the Entrance quiz. Standing in front of Rika.
-// end: Beat Elite Four.
+// end: Beat the Elite Four. Door to Geeta up ahead.
 void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text);
 
-// start: Beat Elite Four.
+// start: Beat the Elite Four. Door to Geeta up ahead.
 // end: Beat Geeta. At Pokemon League Pokecenter.
 void checkpoint_89(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text);
 

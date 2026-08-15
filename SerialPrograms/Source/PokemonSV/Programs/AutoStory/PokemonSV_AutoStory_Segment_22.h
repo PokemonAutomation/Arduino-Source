@@ -72,7 +72,7 @@ void checkpoint_50(
 );
 
 // start: At Levincia (South) Pokecenter.
-// end: At Levincia gym building. Talked to Hassel, met Rika.
+// end: Inside Levincia gym building. Talked to Hassel, met Rika.
 void checkpoint_51(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
@@ -82,8 +82,8 @@ void checkpoint_51(
 );
 
 
-// start: At Levincia gym building. Talked to Hassel, met Rika.
-// end: Finished Levincia gym challenge.
+// start: Inside Levincia gym building. Talked to Hassel, met Rika.
+// end: Finished Levincia gym challenge. Outside Levincia gym building.
 void checkpoint_52(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
@@ -93,7 +93,7 @@ void checkpoint_52(
 );
 
 
-// start: Finished Levincia gym challenge. Standing outside Levincia gym.
+// start: Finished Levincia gym challenge. Outside Levincia gym building.
 // end: Defeated Levincia Gym (Electric). At Levincia (North) Pokecenter.
 void checkpoint_53(
     SingleSwitchProgramEnvironment& env,
