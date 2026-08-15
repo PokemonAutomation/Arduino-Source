@@ -27,8 +27,7 @@ namespace ML{
 
 
 SAMEmbedderSession::SAMEmbedderSession(const std::string& model_path, bool use_gpu)
-    : m_env{create_ORT_env()}
-    , session{create_session(m_env, model_path, ML_MODEL_CACHE_PATH() + "SAMEmbedder/", use_gpu)}
+    : session{create_session(model_path, ML_MODEL_CACHE_PATH() + "SAMEmbedder/", use_gpu)}
     , memory_info{Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU)}
     , input_names{session.GetInputNames()}
     , output_names{session.GetOutputNames()}
@@ -67,8 +66,7 @@ void SAMEmbedderSession::run(cv::Mat& input_image, std::vector<float>& model_out
 
 
 SAMSession::SAMSession(const std::string& model_path, bool use_gpu)
-    : m_env{create_ORT_env()}
-    , session{create_session(m_env, model_path, ML_MODEL_CACHE_PATH() + "SAM/", use_gpu)}
+    : session{create_session(model_path, ML_MODEL_CACHE_PATH() + "SAM/", use_gpu)}
     , memory_info{Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU)}
     , input_names{session.GetInputNames()}
     , output_names{session.GetOutputNames()}

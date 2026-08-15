@@ -13,6 +13,7 @@
 #include <onnxruntime_cxx_api.h>
 #include <opencv2/opencv.hpp>
 #include "Common/Cpp/Logging/TaggedLogger.h"
+#include "Common/Cpp/Filesystem/FilePath.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -37,7 +38,6 @@ public:
 private:
     void load_dictionary(const Filesystem::Path& path);
 
-    Ort::Env m_env;
     // Ort::Session det_session;
     Ort::Session m_rec_session;
     // Ort::MemoryInfo memory_info;

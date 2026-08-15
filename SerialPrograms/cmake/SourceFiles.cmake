@@ -1096,6 +1096,8 @@ file(GLOB LIBRARY_SOURCES
     Source/ML/ML_Panels.h
     Source/ML/Models/ML_ONNXRuntimeHelpers.cpp
     Source/ML/Models/ML_ONNXRuntimeHelpers.h
+    Source/ML/Models/ML_OrtEnv.cpp
+    Source/ML/Models/ML_OrtEnv.h
     Source/ML/Models/ML_YOLOv5Model.cpp
     Source/ML/Models/ML_YOLOv5Model.h
     Source/ML/Programs/ML_LabelImages.cpp

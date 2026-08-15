@@ -38,7 +38,6 @@ public:
     void run(cv::Mat& input_image, std::vector<float>& output_image_embedding);
     
 private:
-    Ort::Env m_env;
     Ort::Session session;
     Ort::MemoryInfo memory_info;
     Ort::RunOptions run_options;
@@ -72,7 +71,6 @@ public:
         const std::vector<int>& input_box,
         std::vector<bool>& output_boolean_mask);
 private:
-    Ort::Env m_env;
     Ort::Session session;
     Ort::MemoryInfo memory_info;
     Ort::RunOptions run_options;

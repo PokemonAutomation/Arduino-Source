@@ -44,7 +44,6 @@ private:
 
     std::vector<std::string> m_label_names;
 
-    Ort::Env m_env;
     Ort::Session m_session;
     Ort::MemoryInfo m_memory_info;
     Ort::RunOptions m_run_options;
