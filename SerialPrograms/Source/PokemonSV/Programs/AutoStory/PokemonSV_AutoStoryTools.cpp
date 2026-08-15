@@ -1413,10 +1413,11 @@ void check_num_sunflora_found(SingleSwitchProgramEnvironment& env, ProController
 }
 
 void checkpoint_reattempt_loop(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats,
+    const std::string& checkpoint_text,
     std::function<void(size_t attempt_number)>&& action,
     bool day_skip
 ){
@@ -1432,6 +1433,8 @@ void checkpoint_reattempt_loop(
             save_game_from_overworld(env.program_info(), env.console, context);
         }
 
+        env.console.log(checkpoint_text + " Num attempts: " + std::to_string(i));
+
         context.wait_for_all_requests();
         action(i);
 
@@ -1439,6 +1442,15 @@ void checkpoint_reattempt_loop(
        
         break;
     }catch (OperationFailedException& e){
+        if (i == 10){  // send an error report for debugging if 10 failed attempts for a given checkpoint.
+            OperationFailedException exception(
+                ErrorReport::SEND_ERROR_REPORT,
+                "10 failed attempts. " + checkpoint_text,
+                env.console
+            );
+            exception.send_recoverable_notification(env);
+        }
+
         if (i > max_attempts){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
@@ -1459,10 +1471,11 @@ void checkpoint_reattempt_loop(
 }
 
 void checkpoint_reattempt_loop_tutorial(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats,
+    const std::string& checkpoint_text,
     std::function<void(size_t attempt_number)>&& action
 ){
     size_t max_attempts = 100;
@@ -1475,6 +1488,8 @@ void checkpoint_reattempt_loop_tutorial(
             send_program_status_notification(env, notif_status_update, "Saved at checkpoint.");     
         }
         
+        env.console.log(checkpoint_text + " Num attempts: " + std::to_string(i));
+
         context.wait_for_all_requests();
         action(i);
 

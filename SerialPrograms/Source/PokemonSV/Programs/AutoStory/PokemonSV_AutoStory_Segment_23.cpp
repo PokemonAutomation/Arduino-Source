@@ -66,17 +66,18 @@ std::string AutoStory_Checkpoint_54::name() const{ return "054 - " + AutoStory_S
 std::string AutoStory_Checkpoint_54::start_text() const{ return "Defeated Levincia Gym (Electric). At Levincia (North) Pokecenter.";}
 std::string AutoStory_Checkpoint_54::end_text() const{ return "Defeated Levincia Gym (Electric). At Levincia (North) Pokecenter.";}
 void AutoStory_Checkpoint_54::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_54(env, context, options.notif_status_update, stats);
+    checkpoint_54(env, context, options.notif_status_update, stats, checkpoint_text());
 }
 
 
 void checkpoint_54(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 ){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
     [&](size_t attempt_number){
         // empty checkpoint
 

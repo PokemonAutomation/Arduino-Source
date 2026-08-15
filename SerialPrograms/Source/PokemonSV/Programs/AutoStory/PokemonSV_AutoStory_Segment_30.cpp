@@ -70,7 +70,7 @@ std::string AutoStory_Checkpoint_75::name() const{ return "075 - " + AutoStory_S
 std::string AutoStory_Checkpoint_75::start_text() const{ return "At Glaseado gym Pokecenter.";}
 std::string AutoStory_Checkpoint_75::end_text() const{ return "Battled Nemona. Spoke to Glaseado Gym receptionist";}
 void AutoStory_Checkpoint_75::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_75(env, context, options.notif_status_update, stats);
+    checkpoint_75(env, context, options.notif_status_update, stats, checkpoint_text());
 }
 
 
@@ -78,7 +78,7 @@ std::string AutoStory_Checkpoint_76::name() const{ return "076 - " + AutoStory_S
 std::string AutoStory_Checkpoint_76::start_text() const{ return AutoStory_Checkpoint_75().end_text();}
 std::string AutoStory_Checkpoint_76::end_text() const{ return "Beat Glaseado Gym Challenge. Beat Glaseado Gym (Ice).";}
 void AutoStory_Checkpoint_76::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_76(env, context, options.notif_status_update, stats);
+    checkpoint_76(env, context, options.notif_status_update, stats, checkpoint_text());
 }
 
 
@@ -86,13 +86,13 @@ std::string AutoStory_Checkpoint_77::name() const{ return "077 - " + AutoStory_S
 std::string AutoStory_Checkpoint_77::start_text() const{ return AutoStory_Checkpoint_76().end_text();}
 std::string AutoStory_Checkpoint_77::end_text() const{ return "At North Province Area One Pokecenter";}
 void AutoStory_Checkpoint_77::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_77(env, context, options.notif_status_update, stats);
+    checkpoint_77(env, context, options.notif_status_update, stats, checkpoint_text());
 }
 
 
 
-void checkpoint_75(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+void checkpoint_75(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
     [&](size_t attempt_number){
 
         DirectionDetector direction;
@@ -156,8 +156,8 @@ void checkpoint_75(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     });   
 }
 
-void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
     [&](size_t attempt_number){
 
         pbf_move_left_joystick(context, {0, -1}, 2400ms, 800ms);
@@ -276,8 +276,8 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     });   
 }
 
-void checkpoint_77(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+void checkpoint_77(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
     [&](size_t attempt_number){
 
         pbf_move_left_joystick(context, {0, -1}, 2400ms, 800ms);

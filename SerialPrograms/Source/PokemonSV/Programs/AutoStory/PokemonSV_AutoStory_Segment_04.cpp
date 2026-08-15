@@ -65,18 +65,19 @@ std::string AutoStory_Checkpoint_08::name() const{ return "008 - " + AutoStory_S
 std::string AutoStory_Checkpoint_08::start_text() const{ return "Moved to cliff. Heard mystery cry. Standing in front of Nemona near the cliff.";}
 std::string AutoStory_Checkpoint_08::end_text() const{ return "Rescued Koraidon/Miraidon and escaped from the Houndoom Cave. Standing next to Koraidon/Miraidon just outside the cave exit.";}
 void AutoStory_Checkpoint_08::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_08(env, context, options.notif_status_update, stats);
+    checkpoint_08(env, context, options.notif_status_update, stats, checkpoint_text());
 }
 
 
 
 void checkpoint_08(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 ){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
     [&](size_t attempt_number){
 
         context.wait_for_all_requests();

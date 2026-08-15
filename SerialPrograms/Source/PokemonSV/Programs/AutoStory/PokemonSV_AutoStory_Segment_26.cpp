@@ -6,6 +6,7 @@
 
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -69,7 +70,7 @@ std::string AutoStory_Checkpoint_61::name() const{ return "061 - " + AutoStory_S
 std::string AutoStory_Checkpoint_61::start_text() const{ return "At Medali Pokecenter.";}
 std::string AutoStory_Checkpoint_61::end_text() const{ return "At Medali Gym";}
 void AutoStory_Checkpoint_61::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_61(env, context, options.notif_status_update, stats);
+    checkpoint_61(env, context, options.notif_status_update, stats, checkpoint_text());
 }
 
 
@@ -77,26 +78,27 @@ std::string AutoStory_Checkpoint_62::name() const{ return "062 - " + AutoStory_S
 std::string AutoStory_Checkpoint_62::start_text() const{ return AutoStory_Checkpoint_61().end_text();}
 std::string AutoStory_Checkpoint_62::end_text() const{ return "Beat Medali Gym";}
 void AutoStory_Checkpoint_62::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_62(env, context, options.notif_status_update, stats);
+    checkpoint_62(env, context, options.notif_status_update, stats, checkpoint_text());
 }
 
 std::string AutoStory_Checkpoint_63::name() const{ return "063 - " + AutoStory_Segment_26().name(); }
 std::string AutoStory_Checkpoint_63::start_text() const{ return AutoStory_Checkpoint_62().end_text();}
 std::string AutoStory_Checkpoint_63::end_text() const{ return "At Glaseado Mountain Pokecenter";}
 void AutoStory_Checkpoint_63::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_63(env, context, options.notif_status_update, stats);
+    checkpoint_63(env, context, options.notif_status_update, stats, checkpoint_text());
 }
 
 
 
 
 void checkpoint_61(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 ){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats, 
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text, 
     [&](size_t attempt_number){
 
         // first, clear Pokemon in Minimap.
@@ -157,12 +159,13 @@ void checkpoint_61(
 }
 
 void checkpoint_62(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 ){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
     [&](size_t attempt_number){
 
         pbf_move_left_joystick(context, {0, -1}, 2400ms, 800ms);
@@ -190,7 +193,35 @@ void checkpoint_62(
 
          
         direction.change_direction(env.program_info(), env.console, context, 5.114177);  // old 4.975295
-        pbf_move_left_joystick(context, {0, +1}, 2400ms, 400ms);
+
+        
+        env.console.log("Attempt to enter Eatery.");
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                BlackScreenWatcher black_screen(COLOR_RED);
+                int ret = run_until<ProControllerContext>(
+                    env.console, context,
+                    [](ProControllerContext& context){
+                        pbf_move_left_joystick(context, {0, +1}, 10000ms, 0ms);
+                    },
+                    { black_screen }
+                );
+                if (ret == 0){
+                    env.console.log("Detected black screen. Assume entered Eatery.");
+                }
+                if (ret < 0){
+                    OperationFailedException::fire(
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Never detected black screen. Failed to enter Eatery.",
+                        env.console
+                    );
+                }
+            }, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, +1}, 800ms, 400ms);
+            },
+            5, 5
+        ); 
 
         pbf_wait(context, 3000ms);
         // wait for overworld after entering Eatery
@@ -240,12 +271,13 @@ void checkpoint_62(
 }
 
 void checkpoint_63(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 ){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
     [&](size_t attempt_number){
 
         // Gym leader defeated. Standing in Gym building

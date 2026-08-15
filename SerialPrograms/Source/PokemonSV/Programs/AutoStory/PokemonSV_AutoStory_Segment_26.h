@@ -59,7 +59,8 @@ void checkpoint_61(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 // start: At Medali Gym
@@ -68,7 +69,8 @@ void checkpoint_62(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 
@@ -78,7 +80,8 @@ void checkpoint_63(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 // moves player from Medali East Pokecenter to Glaseado Mountain Pokecenter

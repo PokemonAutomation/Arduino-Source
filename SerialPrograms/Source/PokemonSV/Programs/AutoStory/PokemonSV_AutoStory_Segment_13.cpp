@@ -63,17 +63,18 @@ std::string AutoStory_Checkpoint_29::name() const{ return "029 - " + AutoStory_S
 std::string AutoStory_Checkpoint_29::start_text() const{ return "At Cortondo West Pokecenter.";}
 std::string AutoStory_Checkpoint_29::end_text() const{ return "At West Province Area One Central Pokecenter.";}
 void AutoStory_Checkpoint_29::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_29(env, context, options.notif_status_update, stats);
+    checkpoint_29(env, context, options.notif_status_update, stats, checkpoint_text());
 }
 
 void checkpoint_29(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 ){
     
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
 

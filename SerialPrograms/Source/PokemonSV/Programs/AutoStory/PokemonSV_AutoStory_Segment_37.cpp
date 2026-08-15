@@ -65,18 +65,18 @@ std::string AutoStory_Checkpoint_98::name() const{ return "098 - " + AutoStory_S
 std::string AutoStory_Checkpoint_98::start_text() const{ return "Inside Area Zero Station 2. Deactivated the locks.";}
 std::string AutoStory_Checkpoint_98::end_text() const{ return "Inside Area Zero Station 3. Deactivated the locks.";}
 void AutoStory_Checkpoint_98::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_98(env, context, options.notif_status_update, stats);
+    checkpoint_98(env, context, options.notif_status_update, stats, checkpoint_text());
 }
 
 std::string AutoStory_Checkpoint_99::name() const{ return "099 - " + AutoStory_Segment_37().name(); }
 std::string AutoStory_Checkpoint_99::start_text() const{ return AutoStory_Checkpoint_98().end_text();}
 std::string AutoStory_Checkpoint_99::end_text() const{ return "Inside Area Zero Station 3. Deactivated the locks.";}
 void AutoStory_Checkpoint_99::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_99(env, context, options.notif_status_update, stats);
+    checkpoint_99(env, context, options.notif_status_update, stats, checkpoint_text());
 }
 
-void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
     [&](size_t attempt_number){
 
         YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/A0-station-3.onnx");
@@ -348,8 +348,8 @@ void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     }, false);   
 }
 
-void checkpoint_99(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+void checkpoint_99(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
     [&](size_t attempt_number){
         // empty checkpoint
 

@@ -67,14 +67,14 @@ std::string AutoStory_Checkpoint_41::name() const{ return "041 - " + AutoStory_S
 std::string AutoStory_Checkpoint_41::start_text() const{ return "At South Province (Area Three) Pokecenter.";}
 std::string AutoStory_Checkpoint_41::end_text() const{ return "Defeated Klawf.";}
 void AutoStory_Checkpoint_41::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_41(env, context, options.notif_status_update, stats);
+    checkpoint_41(env, context, options.notif_status_update, stats, checkpoint_text());
 }
 
 std::string AutoStory_Checkpoint_42::name() const{ return "042 - " + AutoStory_Segment_19().name(); }
 std::string AutoStory_Checkpoint_42::start_text() const{ return AutoStory_Checkpoint_41().end_text();}
 std::string AutoStory_Checkpoint_42::end_text() const{ return "Defeated Klawf. At Artazon (West) Pokecenter.";}
 void AutoStory_Checkpoint_42::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_42(env, context, options.notif_status_update, stats);
+    checkpoint_42(env, context, options.notif_status_update, stats, checkpoint_text());
 }
 
 
@@ -82,13 +82,14 @@ void AutoStory_Checkpoint_42::run_checkpoint(SingleSwitchProgramEnvironment& env
 
 
 void checkpoint_41(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 ){
     
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
 
@@ -290,13 +291,14 @@ void checkpoint_41(
 }
 
 void checkpoint_42(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 ){
     
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
 

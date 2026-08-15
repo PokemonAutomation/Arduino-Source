@@ -58,7 +58,8 @@ void checkpoint_58(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 // start: Beat Orthworm. At East Province (Area Three) Pokecenter.
@@ -67,7 +68,8 @@ void checkpoint_59(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 // start: Beat Team Star (Poison)
@@ -76,7 +78,8 @@ void checkpoint_60(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 // moves player from Porto Marinada Pokecenter to Medali West Pokecenter
