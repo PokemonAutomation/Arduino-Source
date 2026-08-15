@@ -19,7 +19,7 @@ namespace PokemonAutomation{
 
 
 std::string hash_file(
-    CancellableScope& scope,
+    CancellableScope* scope,
     const std::string& file_path,
     std::function<void(uint64_t bytes_done, uint64_t total_bytes)> hash_progress
 ){
@@ -34,7 +34,9 @@ std::string hash_file(
 
     QByteArray buffer(1024 * 1024, 0); // Pre-allocate 1MB once
     while (!file.atEnd()){
-        scope.throw_if_cancelled();
+        if (scope != nullptr){
+            scope->throw_if_cancelled();
+        }
         
         qint64 num_bytes_in_chunk = file.read(buffer.data(), buffer.size());
         if (num_bytes_in_chunk == -1){
@@ -44,7 +46,9 @@ std::string hash_file(
         hash.addData(QByteArrayView(buffer.data(), num_bytes_in_chunk));
         total_bytes_read += num_bytes_in_chunk;
 
-        hash_progress(total_bytes_read, file_size);
+        if (hash_progress != nullptr){
+            hash_progress(total_bytes_read, file_size);
+        }
     }
 
     return hash.result().toHex().toStdString(); 
