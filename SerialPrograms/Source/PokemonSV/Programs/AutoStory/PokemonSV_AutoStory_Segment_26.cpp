@@ -6,6 +6,7 @@
 
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -192,7 +193,27 @@ void checkpoint_62(
 
          
         direction.change_direction(env.program_info(), env.console, context, 5.114177);  // old 4.975295
-        pbf_move_left_joystick(context, {0, +1}, 2400ms, 400ms);
+
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                BlackScreenWatcher black_screen(COLOR_RED);
+                int ret = run_until<ProControllerContext>(
+                    env.console, context,
+                    [](ProControllerContext& context){
+                        pbf_move_left_joystick(context, {0, +1}, 10000ms, 0ms);
+                    },
+                    { black_screen }
+                );
+                if (ret == 0){
+                    env.console.log("Detected black screen. Assume entered Eatery.");
+                    return;
+                }
+            }, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, +1}, 800ms, 400ms);
+            },
+            5, 5
+        ); 
 
         pbf_wait(context, 3000ms);
         // wait for overworld after entering Eatery
