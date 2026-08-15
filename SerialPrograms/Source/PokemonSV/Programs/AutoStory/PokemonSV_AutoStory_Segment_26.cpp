@@ -194,6 +194,8 @@ void checkpoint_62(
          
         direction.change_direction(env.program_info(), env.console, context, 5.114177);  // old 4.975295
 
+        
+        env.console.log("Attempt to enter Eatery.");
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 BlackScreenWatcher black_screen(COLOR_RED);
@@ -206,7 +208,13 @@ void checkpoint_62(
                 );
                 if (ret == 0){
                     env.console.log("Detected black screen. Assume entered Eatery.");
-                    return;
+                }
+                if (ret < 0){
+                    OperationFailedException::fire(
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Never detected black screen. Failed to enter Eatery.",
+                        env.console
+                    );
                 }
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
