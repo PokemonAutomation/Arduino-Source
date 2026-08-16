@@ -5,6 +5,8 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/PrettyPrint.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "ML_OrtEnv.h"
 
@@ -14,7 +16,17 @@ namespace PokemonAutomation{
 
 Ort::ThreadingOptions make_ort_threading_options(){
     Ort::ThreadingOptions ret;
-    ret.SetGlobalIntraOpNumThreads((int)PerformanceOptions::instance().NORMAL_THREAD_POOL.MAX_THREADS);
+    {
+        int threads = (int)PerformanceOptions::instance().ONNX_OPTIONS.MAX_INTRA_OP_THREADS;
+        global_logger_tagged().log("Setting ONNX Intra-Op Threads: " + tostr_u_commas(threads));
+        ret.SetGlobalIntraOpNumThreads(threads);
+    }
+    {
+        int threads = (int)PerformanceOptions::instance().ONNX_OPTIONS.MAX_INTER_OP_THREADS;
+        global_logger_tagged().log("Setting ONNX Inter-Op Threads: " + tostr_u_commas(threads));
+        ret.SetGlobalInterOpNumThreads(threads);
+    }
+    ret.SetGlobalSpinControl(0);
     return ret;
 }
 

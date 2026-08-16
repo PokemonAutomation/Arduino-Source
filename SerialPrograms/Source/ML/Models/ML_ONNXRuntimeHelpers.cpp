@@ -200,6 +200,7 @@ Ort::Session create_session(
         try{
             logger.log("Attempting to create Ort::Session with GPU acceleration...");
             Ort::SessionOptions gpu_options = create_session_options(model_cache_path, true);
+            gpu_options.DisablePerSessionThreads();
             Ort::Session session{global_ort_env(), onnx_path.c_str(), gpu_options};
             logger.log("Ort::Session created");
             // when Ort::Ssssion is created, if possible, it will create a model cache
@@ -221,6 +222,7 @@ Ort::Session create_session(
         logger.log("Creating dedicated CPU-only session...");
         
         Ort::SessionOptions cpu_options = create_session_options(model_cache_path, false);
+        cpu_options.DisablePerSessionThreads();
         
         Ort::Session session{global_ort_env(), onnx_path.c_str(), cpu_options};
         logger.log("Ort::Session created");
