@@ -5,9 +5,11 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include <QFile>
-#include <QCryptographicHash>
-#include <QDebug>
+#include "Common/Cpp/ScopeExit.h"
+#include "Common/Cpp/Containers/AlignedMalloc.h"
+#include "Common/Cpp/Filesystem/FileIO.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
+#include "Common/Cpp/Cryptography/SHA256.h"
 #include "FileHash.h"
 
 //#include <iostream>
@@ -23,35 +25,41 @@ std::string hash_file(
     const std::string& file_path,
     std::function<void(uint64_t bytes_done, uint64_t total_bytes)> hash_progress
 ){
-    QFile file(QString::fromStdString(file_path));
-    if (!file.open(QIODevice::ReadOnly)){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "hash_file: Could not open file.");
+    Filesystem::Path path(file_path);
+    FileIO file(path, FileMode::READ | FileMode::BINARY);
+    if (!file.is_open()){
+        throw InternalProgramError(
+            nullptr,
+            PA_CURRENT_FUNCTION,
+            "hash_file: Could not open file."
+        );
     }
 
-    QCryptographicHash hash(QCryptographicHash::Sha256);
-    qint64 file_size = file.size();
-    qint64 total_bytes_read = 0;
+    SHA256 hash;
+    uint64_t file_size = Filesystem::file_size(path);
+    uint64_t total_bytes_read = 0;
 
-    QByteArray buffer(1024 * 1024, 0); // Pre-allocate 1MB once
-    while (!file.atEnd()){
+    constexpr size_t BUFFER_SIZE = 1024 * 1024;
+    void* buffer = aligned_malloc(BUFFER_SIZE, 4096);   // Pre-allocate 1MB once
+    ScopeExit sg([&]{ aligned_free(buffer); });
+
+    size_t bytes_read;
+    do{
         if (scope != nullptr){
             scope->throw_if_cancelled();
         }
-        
-        qint64 num_bytes_in_chunk = file.read(buffer.data(), buffer.size());
-        if (num_bytes_in_chunk == -1){
-            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "hash_file: Read error:" + file.errorString().toStdString());
-        }
 
-        hash.addData(QByteArrayView(buffer.data(), num_bytes_in_chunk));
-        total_bytes_read += num_bytes_in_chunk;
+        bytes_read = file.read(buffer, BUFFER_SIZE);
+        hash.push(buffer, bytes_read);
+        total_bytes_read += bytes_read;
 
         if (hash_progress != nullptr){
             hash_progress(total_bytes_read, file_size);
         }
-    }
+    }while (bytes_read == BUFFER_SIZE);
 
-    return hash.result().toHex().toStdString(); 
+    hash.finish();
+    return hash.get_hash_hex();
 }
 
 }
