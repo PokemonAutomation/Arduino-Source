@@ -31,7 +31,6 @@ Ort::SessionOptions create_session_options(const std::string& model_cache_path, 
 //   used in `create_session_options()` to construct the passed-in session options so.
 // NOTE: it may throw `MLModelSessionCreationError` if failed to create session.
 Ort::Session create_session(
-    const Ort::Env& env, 
     const std::string& model_path, 
     const std::string& model_cache_path,
     bool try_gpu
@@ -59,7 +58,6 @@ std::string to_string(std::vector<T>& vec){
 //  Print model input and output types and shapes to cout. Useful for debugging.
 void print_model_input_output_info(const Ort::Session& session);
 
-Ort::Env create_ORT_env();
 
 
 }

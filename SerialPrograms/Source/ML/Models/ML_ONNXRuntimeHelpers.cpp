@@ -19,6 +19,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "CommonFramework/Logging/Logger.h"
+#include "ML_OrtEnv.h"
 #include "ML_ONNXRuntimeHelpers.h"
 
 namespace PokemonAutomation{
@@ -181,7 +182,6 @@ void write_cache_flag_file(const std::string& model_cache_path, const std::strin
 
 
 Ort::Session create_session(
-    const Ort::Env& env, 
     const std::string& model_path, 
     const std::string& model_cache_path,
     bool try_gpu
@@ -200,7 +200,7 @@ Ort::Session create_session(
         try{
             logger.log("Attempting to create Ort::Session with GPU acceleration...");
             Ort::SessionOptions gpu_options = create_session_options(model_cache_path, true);
-            Ort::Session session{env, onnx_path.c_str(), gpu_options};
+            Ort::Session session{global_ort_env(), onnx_path.c_str(), gpu_options};
             logger.log("Ort::Session created");
             // when Ort::Ssssion is created, if possible, it will create a model cache
             if (write_flag_file){
@@ -222,7 +222,7 @@ Ort::Session create_session(
         
         Ort::SessionOptions cpu_options = create_session_options(model_cache_path, false);
         
-        Ort::Session session{env, onnx_path.c_str(), cpu_options};
+        Ort::Session session{global_ort_env(), onnx_path.c_str(), cpu_options};
         logger.log("Ort::Session created");
         return session;
     }
@@ -272,14 +272,8 @@ void print_model_input_output_info(const Ort::Session& session){
     }
 }
 
-Ort::Env create_ORT_env(){
-#if ORT_API_VERSION < 24 // Removed in ONNX Runtime 1.24.0
-    if (Ort::Global<void>::api_ == nullptr){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Onnx API returned a null pointer.");
-    }
-#endif
-    return Ort::Env();
-}
+
+
 
 }
 }

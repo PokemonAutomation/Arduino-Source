@@ -59,11 +59,9 @@ PaddleOCRPipeline::PaddleOCRPipeline(Language language)
 {}
 
 PaddleOCRPipeline::PaddleOCRPipeline(Language language, std::string rec_path, std::string dict_path)
-    : m_env{create_ORT_env()}
     // , det_session(env, std::wstring(det_path.begin(), det_path.end()).c_str(), Ort::SessionOptions{})
-    , m_rec_session(
+    : m_rec_session(
         create_session(
-            m_env,
             rec_path,
             ML_MODEL_CACHE_PATH() + "PaddleOCRPipeline/",
             PerformanceOptions::instance().ONNX_OPTIONS.USE_GPU
