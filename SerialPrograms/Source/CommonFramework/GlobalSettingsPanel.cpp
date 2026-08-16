@@ -6,8 +6,6 @@
 
 #include <iostream>
 #include <set>
-#include <QStandardPaths>
-#include <QCryptographicHash>
 #include <QDesktopServices>
 #include <QUrl>
 #include "Common/Cpp/ColoredText.h"
@@ -64,8 +62,8 @@ GlobalSettings::GlobalSettings()
         "<b>Stats File:</b><br>Use the stats file here. Multiple instances of the program can use the same file.",
         LockMode::LOCK_WHILE_RUNNING,
 #if defined(__APPLE__)
-        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/UserSettings/PA-Stats.txt",
-        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/UserSettings/PA-Stats.txt"
+        Filesystem::application_scratch_path().string() + "/UserSettings/PA-Stats.txt",
+        Filesystem::application_scratch_path().string() + "/UserSettings/PA-Stats.txt"
 #else
         "UserSettings/PA-Stats.txt",
         "UserSettings/PA-Stats.txt"
@@ -76,8 +74,8 @@ GlobalSettings::GlobalSettings()
         "<b>Temp Folder:</b><br>Place temporary files in this directory.",
         LockMode::LOCK_WHILE_RUNNING,
 #if defined(__APPLE__)
-        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/TempFiles/",
-        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/TempFiles/"
+        Filesystem::application_scratch_path().string() + "/TempFiles/",
+        Filesystem::application_scratch_path().string() + "/TempFiles/"
 #else
         "TempFiles/",
         "TempFiles/"
