@@ -16,10 +16,16 @@ namespace PokemonAutomation{
 
 Ort::ThreadingOptions make_ort_threading_options(){
     Ort::ThreadingOptions ret;
-    int threads = (int)PerformanceOptions::instance().NORMAL_THREAD_POOL.MAX_THREADS;
-    global_logger_tagged().log("Setting ONNX Threads: " + tostr_u_commas(threads));
-    ret.SetGlobalIntraOpNumThreads(threads);
-    ret.SetGlobalInterOpNumThreads(1);
+    {
+        int threads = (int)PerformanceOptions::instance().ONNX_OPTIONS.MAX_INTRA_OP_THREADS;
+        global_logger_tagged().log("Setting ONNX Intra-Op Threads: " + tostr_u_commas(threads));
+        ret.SetGlobalIntraOpNumThreads(threads);
+    }
+    {
+        int threads = (int)PerformanceOptions::instance().ONNX_OPTIONS.MAX_INTER_OP_THREADS;
+        global_logger_tagged().log("Setting ONNX Inter-Op Threads: " + tostr_u_commas(threads));
+        ret.SetGlobalInterOpNumThreads(threads);
+    }
     ret.SetGlobalSpinControl(0);
     return ret;
 }
