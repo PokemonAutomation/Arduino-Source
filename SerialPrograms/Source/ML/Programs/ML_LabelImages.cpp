@@ -17,6 +17,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "ML/DataLabeling/ML_SegmentAnythingModel.h"
 #include "ML/DataLabeling/ML_AnnotationIO.h"
@@ -58,7 +59,7 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     : PanelInstance(descriptor)
     , m_display_session(m_display_option)
     , m_options(LockMode::UNLOCK_WHILE_RUNNING)
-    , m_use_gpu_for_sam_anno(GlobalSettings::instance().USE_GPU_FOR_ML_INFERENCE0)
+    , m_use_gpu_for_sam_anno(PerformanceOptions::instance().ONNX_OPTIONS.USE_GPU)
     , X("<b>X Coordinate:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.3, 0.0, 1.0)
     , Y("<b>Y Coordinate:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.3, 0.0, 1.0)
     , WIDTH("<b>Width:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.4, 0.0, 1.0)
@@ -136,7 +137,7 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
 
 
 
-    init_sam_session(GlobalSettings::instance().USE_GPU_FOR_ML_INFERENCE0);
+    init_sam_session(PerformanceOptions::instance().ONNX_OPTIONS.USE_GPU);
 
     m_overlay_manager = new LabelImages_OverlayManager(*this);
 }
@@ -511,7 +512,11 @@ void LabelImages::remove_segmentation_exclusion_point(double x, double y){
 void LabelImages::compute_embeddings_for_folder(const std::string& image_folder_path){
     std::string embedding_model_path = RESOURCE_PATH() + "ML/sam_embedder_cpu.onnx";
     std::cout << "Use SAM Embedding model " << embedding_model_path << std::endl;
-    ML::compute_embeddings_for_folder(embedding_model_path, image_folder_path, GlobalSettings::instance().USE_GPU_FOR_ML_INFERENCE0);
+    ML::compute_embeddings_for_folder(
+        embedding_model_path,
+        image_folder_path,
+        PerformanceOptions::instance().ONNX_OPTIONS.USE_GPU
+    );
 }
 
 void LabelImages::delete_selected_annotation(){

@@ -13,7 +13,7 @@
 #include "Common/Cpp/Options/ConfigOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
+//#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/ButtonOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
@@ -86,7 +86,6 @@ public:
     Pimpl<ThemeSelectorOption> THEME;
     EnumDropdownOption<OcrLibrary> OCR_LIBRARY;
     StaticTextOption OCR_WARNING;
-    BooleanCheckBoxOption USE_GPU_FOR_ML_INFERENCE0;
     SettingsResourceDownloadTable RESOURCE_DOWNLOAD_TABLE;
     SettingsDownloadError DOWNLOAD_ERROR;
     Pimpl<ResolutionOption> WINDOW_SIZE;

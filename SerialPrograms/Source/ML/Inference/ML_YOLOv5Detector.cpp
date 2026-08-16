@@ -14,6 +14,7 @@
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -45,7 +46,7 @@ YOLOv5Detector::~YOLOv5Detector() = default;
 
 YOLOv5Detector::YOLOv5Detector(const std::string& model_path)
     : m_model_path(to_resource_filepath(model_path))
-    , m_use_gpu(GlobalSettings::instance().USE_GPU_FOR_ML_INFERENCE0)
+    , m_use_gpu(PerformanceOptions::instance().ONNX_OPTIONS.USE_GPU)
 {
     if (!model_path.ends_with(".onnx")){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, 

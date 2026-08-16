@@ -13,6 +13,7 @@
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/StaticGlobals.h"
+#include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
 #include "ML/Models/ML_ONNXRuntimeHelpers.h"
 #include "ML_PaddleOCRPipeline.h"
@@ -65,7 +66,7 @@ PaddleOCRPipeline::PaddleOCRPipeline(Language language, std::string rec_path, st
             m_env,
             rec_path,
             ML_MODEL_CACHE_PATH() + "PaddleOCRPipeline/",
-            GlobalSettings::instance().USE_GPU_FOR_ML_INFERENCE0
+            PerformanceOptions::instance().ONNX_OPTIONS.USE_GPU
         )
     )
     // , memory_info(Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault)) 

@@ -13,6 +13,7 @@
 #include "ProcessPriorityOption.h"
 #include "ProcessorLevelOption.h"
 #include "CoreAffinityOption.h"
+#include "OnnxOptions.h"
 
 namespace PokemonAutomation{
 
@@ -42,6 +43,8 @@ public:
     ThreadPoolOption NORMAL_THREAD_POOL;
 
     MicrosecondsOption PRECISE_WAKE_MARGIN;
+
+    OnnxOptions ONNX_OPTIONS;
 };
 
 
