@@ -1339,7 +1339,7 @@ int auto_catch_safari(
         encounter_name,
         safari_balls_remaining
     );
-    int action_count = 0;
+    size_t action_count = 0;
 
     std::vector<SafariBattleMenuOption> action_list;
     if (actions.has_value())
