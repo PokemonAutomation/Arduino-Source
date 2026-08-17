@@ -417,20 +417,27 @@ void DonutMaker::open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env,
 }
 
 // Exit the game and load the backup save
-void load_backup_save(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void load_backup_save(
+    SingleSwitchProgramEnvironment& env,
+    EventNotificationOption& recoverable_error,
+    ProControllerContext& context
+){
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
     env.log("Loading backup save.");
 
-    go_home(env.console, context);
-    const bool backup_save = true;
-    if (!reset_game_from_home(env, env.console, context, backup_save)){
+    while (true){
+        go_home(env.console, context);
+        if (reset_game_from_home(env, env.console, context, true)){
+            break;
+        }
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "donut_maker(): Cannot reset game from Switch Home screen.",
-            env.console
+        send_program_recoverable_error_notification(
+            env,
+            recoverable_error,
+            "Failed to reset game from home.",
+            env.console.video().snapshot_latest_blocking()
         );
     }
 }
@@ -505,7 +512,7 @@ void DonutMaker::move_to_ansha(SingleSwitchProgramEnvironment& env, ProControlle
             );
             // overworld.last_detected_frame()->save("debug_overworld_detection.png");
         }
-    } else if (ret != 0){
+    }else if (ret != 0){
         stats.errors++;
         env.update_stats();
         OperationFailedException::fire(
@@ -581,36 +588,37 @@ bool DonutMaker::donut_iteration(
 ){
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
-    move_to_ansha(env, context);
-
-    const ImageFloatBox button_A_box{0.3, 0.2, 0.4, 0.7};
-    ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, button_A_box, &env.console.overlay());
-    int ret = wait_until(env.console, context, std::chrono::seconds(3), {buttonA});
-    if (ret != 0){
-        stats.errors++;
-        env.update_stats();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "donut_maker(): Unable to find button A facing Ansha.",
-            env.console
-        );
-    }
-
-    open_berry_menu_from_ansha(env, context);
-    // Add berries from menu and make a donut. Stop at flavor power screen.
-    add_berries_and_make_donut(env, context);
-
-    // Read flavor power and check if they match user requirement and should be kept:
     try{
+        move_to_ansha(env, context);
+
+        const ImageFloatBox button_A_box{0.3, 0.2, 0.4, 0.7};
+        ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, button_A_box, &env.console.overlay());
+        int ret = wait_until(env.console, context, std::chrono::seconds(3), {buttonA});
+        if (ret != 0){
+            env.log("donut_maker(): Unable to find button A facing Ansha.", COLOR_RED);
+        }
+
+        open_berry_menu_from_ansha(env, context);
+        // Add berries from menu and make a donut. Stop at flavor power screen.
+        add_berries_and_make_donut(env, context);
+
+        // Read flavor power and check if they match user requirement and should be kept:
         if (match_powers(env, context, kept_counts)){
             return true;
         }
     }catch (OperationFailedException&){
-        env.log("Encountered error... SR'ing...", COLOR_RED);
+        stats.errors++;
+        env.update_stats();
+        send_program_recoverable_error_notification(
+            env,
+            NOTIFICATION_ERROR_RECOVERABLE,
+            "Encountered error... SR'ing...",
+            env.console.video().snapshot_latest_blocking()
+        );
     }
 
 
-    load_backup_save(env, context);
+    load_backup_save(env, NOTIFICATION_ERROR_RECOVERABLE, context);
     return false;
 }
 
