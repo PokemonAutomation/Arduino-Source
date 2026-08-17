@@ -13,3 +13,4 @@ jobs:
       os: ubuntu-26.04
       compiler: clang
       run-clang-query: true
+      run-tests: true
