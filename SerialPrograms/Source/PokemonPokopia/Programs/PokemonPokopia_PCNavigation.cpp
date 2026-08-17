@@ -390,7 +390,7 @@ void mash_until_overworld(ConsoleHandle& console, ProControllerContext& context)
     int ret = run_until<ProControllerContext>(
         console, context,
         [&](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_B, 30s);
+            pbf_mash_button(context, BUTTON_B, 120s);
         },
         {overworld_watcher}
     );
