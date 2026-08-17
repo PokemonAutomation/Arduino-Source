@@ -54,27 +54,7 @@ StatReads BattleLevelUpReader::read_stats(Logger &logger, const ImageViewRGB32& 
     
     auto read_stat = [&](const ImageFloatBox &box, const std::string &name){
         ImageViewRGB32 stat_region = extract_box_reference(game_screen, box);
-
-        if (GlobalSettings::instance().OCR_LIBRARY != OcrLibrary::PADDLE_OCR){
-            // Tesseract-free path: waterfill segmentation + template matching
-            // against the PokemonFRLG/Digits/0-9.png templates.
-            return read_digits_waterfill_template(logger, stat_region);
-        }
-
-        // PaddleOCR path (original): preprocess then per-digit waterfill OCR.
-        // Dark text [0..190] -> black. Threshold at 190 captures the
-        // blurred gap pixels between segments, making bridges thicker.
-        // Not higher than 190 to avoid capturing yellow bg edge noise.
-        ImageRGB32 ocr_ready = preprocess_for_ocr(
-            stat_region, name, 7, 2, true,
-            combine_rgb(0, 0, 0), combine_rgb(190, 190, 190)
-        );
-
-        // Waterfill isolates each digit -> per-char SINGLE_CHAR OCR.
-        return OCR::read_number_waterfill(
-            logger, ocr_ready, 0xff000000,
-            0xff808080
-        );
+        return read_digits_waterfill_template(logger, stat_region);
     };
 
     StatReads stats;
