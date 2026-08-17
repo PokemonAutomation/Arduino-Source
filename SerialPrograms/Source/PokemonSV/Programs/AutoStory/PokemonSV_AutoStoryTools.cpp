@@ -1496,6 +1496,15 @@ void checkpoint_reattempt_loop_tutorial(
 
         break;  
     }catch (OperationFailedException& e){
+        if (i == 10){  // send an error report for debugging if 10 failed attempts for a given checkpoint.
+            OperationFailedException exception(
+                ErrorReport::SEND_ERROR_REPORT,
+                "10 failed attempts. " + checkpoint_text,
+                env.console
+            );
+            exception.send_recoverable_notification(env);
+        }
+
         if (i > max_attempts){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
