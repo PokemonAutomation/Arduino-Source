@@ -599,6 +599,7 @@ bool EggRng::held_frame_check(
     }
 
     if (locked_in && !(definitely_hit_held_frame || possibly_hit_held_frame)){
+        STARTING_POINT.set(EggProgramState::held_prep);
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "EggRng(): Missed held frame after saving. Restart the program after repeating the manual in-game setup.",

@@ -677,25 +677,69 @@ void walk_from_pond_to_daycare_man(ConsoleHandle& console, ProControllerContext&
 
 void egg_pickup(ConsoleHandle& console, ProControllerContext& context){
     console.log("Picking up egg...");
-    WhiteDialogWatcher dialogue(COLOR_RED);
+
+    // Clear the save dialogue, if it is open
+    WhiteDialogOverWatcher dialogue_cleared(COLOR_RED);
     context.wait_for_all_requests();
     int ret = run_until<ProControllerContext>(
         console, context,
         [](ProControllerContext& context) {
-            pbf_mash_button(context, BUTTON_A, 5000ms);
+            pbf_mash_button(context, BUTTON_B, 5000ms);
         },
-        { dialogue }
+        { dialogue_cleared }
     );
     if (ret < 0){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "egg_pickup(): Failed to initiate dialogue.",
+            "egg_pickup(): Failed to clear dialogue before talking to the daycare man.",
             console
         );
     }
 
-    pbf_mash_button(context, BUTTON_A, 5000ms);
-    pbf_mash_button(context, BUTTON_B, 2500ms);
+    // Talk to the daycare man and wait for the egg prompt.
+    SelectionDialogWatcher egg_prompt(COLOR_RED);
+    context.wait_for_all_requests();
+    ret = run_until<ProControllerContext>(
+        console, context,
+        [](ProControllerContext& context) {
+            for (int i=0; i<12; i++){
+                pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+            }
+        },
+        { egg_prompt }
+    );
+    if (ret < 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "egg_pickup(): Failed to detect the egg selection dialogue.",
+            console
+        );
+    }
+    console.log("Egg selection dialogue detected. Taking the egg...");
+
+    // accept the egg
+    pbf_mash_button(context, BUTTON_A, 1000ms);
+
+    // clear the rest of the dialogue
+    WhiteDialogOverWatcher dialogue_over(COLOR_RED);
+    context.wait_for_all_requests();
+    ret = run_until<ProControllerContext>(
+        console, context,
+        [](ProControllerContext& context) {
+            pbf_mash_button(context, BUTTON_B, 10000ms);
+        },
+        { dialogue_over }
+    );
+    if (ret < 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "egg_pickup(): Failed to return to the overworld after taking the egg.",
+            console
+        );
+    }
+    context.wait_for_all_requests();
+
+    console.log("Egg picked up.");
 }
 
 bool walk_from_daycare_man_to_pond(ConsoleHandle& console, ProControllerContext& context){
