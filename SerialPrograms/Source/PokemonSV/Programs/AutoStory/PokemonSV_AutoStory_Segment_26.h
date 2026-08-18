@@ -54,7 +54,7 @@ public:
 
 
 // start: At Medali Pokecenter.
-// end: At Medali Gym
+// end: Inside Medali Gym building
 void checkpoint_61(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
@@ -63,8 +63,8 @@ void checkpoint_61(
     const std::string& checkpoint_text
 );
 
-// start: At Medali Gym
-// end: Beat Medali Gym
+// start: Inside Medali Gym building
+// end: Beat Medali Gym. Inside Medali Gym building.
 void checkpoint_62(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
@@ -74,7 +74,7 @@ void checkpoint_62(
 );
 
 
-// start: Beat Medali Gym
+// start: Beat Medali Gym. Inside Medali Gym building.
 // end: At Glaseado Mountain Pokecenter
 void checkpoint_63(
     SingleSwitchProgramEnvironment& env,

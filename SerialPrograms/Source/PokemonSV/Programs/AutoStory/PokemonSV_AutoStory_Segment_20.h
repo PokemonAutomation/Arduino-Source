@@ -60,7 +60,7 @@ public:
 
 
 // start: Defeated Klawf. At Artazon (West) Pokecenter.
-// end: At Artazon Gym building. Battled Nemona. Received Sunflora gym challenge.
+// end: Battled Nemona. Inside Artazon Gym building.
 void checkpoint_43(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
@@ -69,7 +69,7 @@ void checkpoint_43(
     const std::string& checkpoint_text
 );
 
-// start: At Artazon Gym building. Battled Nemona. Received Sunflora gym challenge.
+// start: Battled Nemona. Inside Artazon Gym building.
 // end: Finished Sunflora gym challenge.
 void checkpoint_44(
     SingleSwitchProgramEnvironment& env,

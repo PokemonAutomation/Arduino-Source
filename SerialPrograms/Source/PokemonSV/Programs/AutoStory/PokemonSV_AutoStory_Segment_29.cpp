@@ -68,7 +68,7 @@ void AutoStory_Segment_29::run_segment(
 
 std::string AutoStory_Checkpoint_71::name() const{ return "071 - " + AutoStory_Segment_29().name(); }
 std::string AutoStory_Checkpoint_71::start_text() const{ return "At Montenevera Pokecenter";}
-std::string AutoStory_Checkpoint_71::end_text() const{ return "Spoke to Montenevera gym receptionist";}
+std::string AutoStory_Checkpoint_71::end_text() const{ return "Spoke to Montenevera gym receptionist. Inside Montenevera gym building.";}
 void AutoStory_Checkpoint_71::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_71(env, context, options.notif_status_update, stats, checkpoint_text());
 }
@@ -76,7 +76,7 @@ void AutoStory_Checkpoint_71::run_checkpoint(SingleSwitchProgramEnvironment& env
 
 std::string AutoStory_Checkpoint_72::name() const{ return "072 - " + AutoStory_Segment_29().name(); }
 std::string AutoStory_Checkpoint_72::start_text() const{ return AutoStory_Checkpoint_71().end_text();}
-std::string AutoStory_Checkpoint_72::end_text() const{ return "Passed gym test with MC Sledge.";}
+std::string AutoStory_Checkpoint_72::end_text() const{ return "Passed gym test with MC Sledge. Standing in front of MC Sledge, outside the Montenevera gym building.";}
 void AutoStory_Checkpoint_72::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_72(env, context, options.notif_status_update, stats, checkpoint_text());
 }
@@ -84,7 +84,7 @@ void AutoStory_Checkpoint_72::run_checkpoint(SingleSwitchProgramEnvironment& env
 
 std::string AutoStory_Checkpoint_73::name() const{ return "073 - " + AutoStory_Segment_29().name(); }
 std::string AutoStory_Checkpoint_73::start_text() const{ return AutoStory_Checkpoint_72().end_text();}
-std::string AutoStory_Checkpoint_73::end_text() const{ return "Beat Montenevera Gym. Inside gym building.";}
+std::string AutoStory_Checkpoint_73::end_text() const{ return "Beat Montenevera Gym. Inside Montenevera gym building.";}
 void AutoStory_Checkpoint_73::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_73(env, context, options.notif_status_update, stats, checkpoint_text());
 }

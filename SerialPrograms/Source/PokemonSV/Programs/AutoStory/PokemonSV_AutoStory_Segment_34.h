@@ -56,7 +56,7 @@ public:
 // end: Beat Nemona. At dormitory room, next to bed.
 void checkpoint_90(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text);
 
-// start: Beat Nemona. At dormitory room, next to bed."
+// start: Beat Nemona. At dormitory room, next to bed.
 // end: Beat Penny. At Academy fly point.
 void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text);
 

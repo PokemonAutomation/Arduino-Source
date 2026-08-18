@@ -69,7 +69,7 @@ void AutoStory_Segment_20::run_segment(
 
 std::string AutoStory_Checkpoint_43::name() const{ return "043 - " + AutoStory_Segment_20().name(); }
 std::string AutoStory_Checkpoint_43::start_text() const{ return "Defeated Klawf. At Artazon (West) Pokecenter.";}
-std::string AutoStory_Checkpoint_43::end_text() const{ return "At Artazon Gym building. Battled Nemona. Received Sunflora gym challenge.";}
+std::string AutoStory_Checkpoint_43::end_text() const{ return "Battled Nemona. Inside Artazon Gym building.";}
 void AutoStory_Checkpoint_43::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_43(env, context, options.notif_status_update, stats, checkpoint_text());
 }

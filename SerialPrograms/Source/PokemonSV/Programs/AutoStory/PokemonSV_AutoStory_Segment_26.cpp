@@ -68,7 +68,7 @@ void AutoStory_Segment_26::run_segment(
 
 std::string AutoStory_Checkpoint_61::name() const{ return "061 - " + AutoStory_Segment_26().name(); }
 std::string AutoStory_Checkpoint_61::start_text() const{ return "At Medali Pokecenter.";}
-std::string AutoStory_Checkpoint_61::end_text() const{ return "At Medali Gym";}
+std::string AutoStory_Checkpoint_61::end_text() const{ return "Inside Medali Gym building.";}
 void AutoStory_Checkpoint_61::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_61(env, context, options.notif_status_update, stats, checkpoint_text());
 }
@@ -76,14 +76,14 @@ void AutoStory_Checkpoint_61::run_checkpoint(SingleSwitchProgramEnvironment& env
 
 std::string AutoStory_Checkpoint_62::name() const{ return "062 - " + AutoStory_Segment_26().name(); }
 std::string AutoStory_Checkpoint_62::start_text() const{ return AutoStory_Checkpoint_61().end_text();}
-std::string AutoStory_Checkpoint_62::end_text() const{ return "Beat Medali Gym";}
+std::string AutoStory_Checkpoint_62::end_text() const{ return "Beat Medali Gym. Inside Medali Gym building.";}
 void AutoStory_Checkpoint_62::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_62(env, context, options.notif_status_update, stats, checkpoint_text());
 }
 
 std::string AutoStory_Checkpoint_63::name() const{ return "063 - " + AutoStory_Segment_26().name(); }
 std::string AutoStory_Checkpoint_63::start_text() const{ return AutoStory_Checkpoint_62().end_text();}
-std::string AutoStory_Checkpoint_63::end_text() const{ return "At Glaseado Mountain Pokecenter";}
+std::string AutoStory_Checkpoint_63::end_text() const{ return "At Glaseado Mountain Pokecenter.";}
 void AutoStory_Checkpoint_63::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_63(env, context, options.notif_status_update, stats, checkpoint_text());
 }

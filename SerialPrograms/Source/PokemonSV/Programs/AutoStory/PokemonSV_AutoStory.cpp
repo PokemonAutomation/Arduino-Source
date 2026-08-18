@@ -10,9 +10,10 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonFramework/Exceptions/UnexpectedBattleException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
 #endif
 
+
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -1342,8 +1343,27 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     }
 
     if (ENSURE_MINIMAP_UNLOCKED && STORY_SECTION == StorySection::MAIN_STORY){
-        env.console.log("Ensure the minimap is unlocked.");
-        confirm_minimap_unlocked(env, context);
+        env.console.log("Ensure the N symbol on minimap is visible.");
+        context.wait_for_all_requests();
+        
+        DirectionDetector direction;
+        double current = direction.get_current_direction(env.console, env.console.video().snapshot());
+        if (current < 0){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "change_direction(): Unable to detect current direction. Something (e.g. a marker) is covering the N symbol on the minimap. "
+                "Try moving the marker on the map.",
+                env.console
+            );
+        }
+
+        if (is_main_story_start_point_indoors()){
+            env.console.log("Can't confirm if minimap unlocked while indoors.");
+        }else{
+            env.console.log("Ensure the minimap is unlocked.");
+            confirm_minimap_unlocked(env, context);
+        }
+
     }
 
     run_autostory(env, context);
@@ -1352,7 +1372,36 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
+bool AutoStory::is_main_story_start_point_indoors(){
 
+    bool start_indoors = false;
+    if (ENABLE_ADVANCED_MODE){  // checkpoint mode
+        size_t checkpoint_index = get_start_checkpoint_index();
+
+        start_indoors = 
+            checkpoint_index == 44 ||
+            checkpoint_index == 46 ||
+            checkpoint_index == 52 ||
+            checkpoint_index == 62 ||
+            checkpoint_index == 63 ||
+            checkpoint_index == 72 ||
+            checkpoint_index == 74 ||
+            checkpoint_index == 76 ||
+            checkpoint_index == 77 ||
+            checkpoint_index == 88 ||
+            checkpoint_index == 89 ||
+            checkpoint_index == 91 ||
+            checkpoint_index >= 94;  // all of area zero is considered indoors
+    }else{  // segment mode
+        size_t segment_index = get_start_segment_index();
+
+        start_indoors = segment_index >= 35; // all of area zero is considered indoors
+        // all previous main story segments start outdoors
+    }
+
+    return start_indoors;
+
+}
 
 
 

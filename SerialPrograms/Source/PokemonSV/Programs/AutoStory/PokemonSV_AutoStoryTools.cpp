@@ -1454,7 +1454,8 @@ void checkpoint_reattempt_loop(
         if (i > max_attempts){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Autostory checkpoint failed " + std::to_string(max_attempts) + " times.\n"
+                "Autostory checkpoint failed " + std::to_string(max_attempts) + " times.\n" +
+                checkpoint_text + "\n"
                 "Make sure you selected the correct Start Point, and your character is in the exactly correct starting position."
                 "Also, make sure you have set the correct Language.\n" + e.message(),
                 env.console
@@ -1495,6 +1496,15 @@ void checkpoint_reattempt_loop_tutorial(
 
         break;  
     }catch (OperationFailedException& e){
+        if (i == 10){  // send an error report for debugging if 10 failed attempts for a given checkpoint.
+            OperationFailedException exception(
+                ErrorReport::SEND_ERROR_REPORT,
+                "10 failed attempts. " + checkpoint_text,
+                env.console
+            );
+            exception.send_recoverable_notification(env);
+        }
+
         if (i > max_attempts){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,

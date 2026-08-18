@@ -98,7 +98,7 @@ void AutoStory_Checkpoint_87::run_checkpoint(SingleSwitchProgramEnvironment& env
 
 std::string AutoStory_Checkpoint_88::name() const{ return "088 - " + AutoStory_Segment_33().name(); }
 std::string AutoStory_Checkpoint_88::start_text() const{ return AutoStory_Checkpoint_87().end_text();}
-std::string AutoStory_Checkpoint_88::end_text() const{ return "Beat Elite Four.";}
+std::string AutoStory_Checkpoint_88::end_text() const{ return "Beat the Elite Four. Door to Geeta up ahead.";}
 void AutoStory_Checkpoint_88::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_88(env, context, options.notif_status_update, stats, checkpoint_text());
 }
