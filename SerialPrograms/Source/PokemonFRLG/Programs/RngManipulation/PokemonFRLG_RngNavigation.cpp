@@ -528,6 +528,7 @@ bool check_for_shiny(
     case PokemonFRLG_RngTarget::starters:
         return shiny_check_summary(console, context, -2, StartMenuContext::NO_DEX);
     case PokemonFRLG_RngTarget::togepi:
+    case PokemonFRLG_RngTarget::togepifast:
         hatch_togepi_egg(console, context);
     case PokemonFRLG_RngTarget::magikarp:
     case PokemonFRLG_RngTarget::hitmonlee:

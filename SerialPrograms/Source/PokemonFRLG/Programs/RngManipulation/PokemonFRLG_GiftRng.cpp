@@ -121,6 +121,7 @@ GiftRng::GiftRng()
             {PokemonFRLG_RngTarget::gamecornerpinsir, "gamecornerpinsir", "Game Corner Pinsir"},
             {PokemonFRLG_RngTarget::gamecornerporygon, "gamecornerporygon", "Game Corner Porygon"},
             {PokemonFRLG_RngTarget::togepi, "togepi", "Togepi"},
+            {PokemonFRLG_RngTarget::togepifast, "togepifast", "Togepi (pre-approved)"}
         },
         LockMode::LOCK_WHILE_RUNNING,
         PokemonFRLG_RngTarget::magikarp
@@ -313,6 +314,7 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         GENDER_THRESHOLD = -1;
         break;
     case PokemonFRLG_RngTarget::togepi:
+    case PokemonFRLG_RngTarget::togepifast:
         BASE_STATS = { 35, 20, 65, 40, 65, 20 };
         GENDER_THRESHOLD = 30;
         LEVEL = 5;
