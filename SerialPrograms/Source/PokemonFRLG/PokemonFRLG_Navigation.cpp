@@ -1221,6 +1221,11 @@ int auto_catch(
                 catch_coefficient = error_coefficient;
                 return true;
                 });
+            BattleSelectionArrowWatcher nickname_question_arrow(
+                COLOR_RED,
+                &console.overlay(),
+                BattleConfirmationOption::YES
+            );
             context.wait_for_all_requests();
             int ret = run_until<ProControllerContext>(
                 console, context,
@@ -1229,7 +1234,7 @@ int auto_catch(
                         pbf_press_button(context, BUTTON_B, 200ms, 300ms);
                     }
                 },
-                { battle_menu, party_menu, dex_registration, black_screen, catch_detector },
+                { battle_menu, party_menu, dex_registration, black_screen, catch_detector, nickname_question_arrow },
                 10ms
             );
 
@@ -1246,12 +1251,13 @@ int auto_catch(
             case 2:
                 console.log("Dex registration detected. Exiting battle...");
                 pbf_mash_button(context, BUTTON_B, 5000ms);
-                return catch_detected ? static_cast<int>(i) : 0;
+                return 1;
             case 3:
                 console.log("Black screen detected. Battle exited.");
                 pbf_mash_button(context, BUTTON_B, 2500ms);
                 return catch_detected ? static_cast<int>(i) : 0;
             case 4:
+            case 5:
                 console.log("Catch detected!", COLOR_BLUE);
                 catch_detected = true;
                 pbf_wait(context, 2000ms);
