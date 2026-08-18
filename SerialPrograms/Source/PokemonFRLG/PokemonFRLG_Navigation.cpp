@@ -1251,7 +1251,7 @@ int auto_catch(
             case 2:
                 console.log("Dex registration detected. Exiting battle...");
                 pbf_mash_button(context, BUTTON_B, 5000ms);
-                return 1;
+                return static_cast<int>(i);
             case 3:
                 console.log("Black screen detected. Battle exited.");
                 pbf_mash_button(context, BUTTON_B, 2500ms);
