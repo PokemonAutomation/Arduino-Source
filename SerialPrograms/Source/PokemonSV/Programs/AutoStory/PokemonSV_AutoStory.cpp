@@ -1359,11 +1359,10 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
         if (is_main_story_start_point_indoors()){
             env.console.log("Can't confirm if minimap unlocked while indoors.");
-            return;
+        }else{
+            env.console.log("Ensure the minimap is unlocked.");
+            confirm_minimap_unlocked(env, context);
         }
-
-        env.console.log("Ensure the minimap is unlocked.");
-        confirm_minimap_unlocked(env, context);
 
     }
 
