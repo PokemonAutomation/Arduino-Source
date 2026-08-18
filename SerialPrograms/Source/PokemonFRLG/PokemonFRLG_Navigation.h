@@ -123,7 +123,7 @@ int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftr
 int fish_encounter(ConsoleHandle& console, ProControllerContext& context, Seconds timeout = 300s);
 
 // Automatically catch a Pokemon.
-// Returns -1 if there are detection issues, 0 if the Pokemon was not caught, and 1 if it was caught.
+// Returns -1 if there are detection issues, 0 if the Pokemon was not caught, and the number of balls thrown if it was caught.
 int auto_catch(
     ConsoleHandle& console,
     ProControllerContext& context,
