@@ -606,13 +606,13 @@ bool DonutMaker::donut_iteration(
         if (match_powers(env, context, kept_counts)){
             return true;
         }
-    }catch (OperationFailedException&){
+    }catch (OperationFailedException& e){
         stats.errors++;
         env.update_stats();
         send_program_recoverable_error_notification(
             env,
             NOTIFICATION_ERROR_RECOVERABLE,
-            "Encountered error... SR'ing...",
+            e.message(),
             env.console.video().snapshot_latest_blocking()
         );
     }
