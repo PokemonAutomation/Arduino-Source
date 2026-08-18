@@ -61,11 +61,22 @@ ImageRGB32 preprocess_for_ocr(
 
     cv::Mat src = to_OpenCV_ref(image);
 
-    // Step 1: Gaussian blur at NATIVE resolution with 5x5 kernel.
+    // Step 0: Rescale the image to match the expected height at 1080p
+    // so that the Gaussian blur size works across resolutions
+    double scale_factor = image.height() / 69; 
+    int new_w = static_cast<int>((image.width()) * scale_factor);
+    int new_h = static_cast<int>((image.height()) * scale_factor);
+    cv::Mat rescaled;
+    cv::resize(
+        src, rescaled, cv::Size(new_w, new_h), 0, 0,
+        cv::INTER_LINEAR
+    );
+
+    // Step 1: Gaussian blur at with 5x5 kernel.
     // The 5x5 kernel reaches 2 pixels away (vs 1px for 3x3), bridging
     // wider gaps in the seven-segment font. Two passes for heavy smoothing.
     cv::Mat blurred_native;
-    src.copyTo(blurred_native);
+    rescaled.copyTo(blurred_native);
     if (blur_kernel_size > 0 && blur_passes > 0){
         for (int i = 0; i < blur_passes; i++){
             cv::GaussianBlur(
@@ -75,7 +86,7 @@ ImageRGB32 preprocess_for_ocr(
         }
     }
 
-    // Save blurred at native res
+    // Save blurred at rescaled res
     ImageRGB32 blurred_native_img(blurred_native.cols, blurred_native.rows);
     blurred_native.copyTo(to_OpenCV_ref(blurred_native_img));
     if (save_debug_images){
@@ -83,9 +94,9 @@ ImageRGB32 preprocess_for_ocr(
     }
 
     // Step 2: Smooth upscale 4x with bilinear interpolation.
-    int scale_factor = 4;
-    int new_w = static_cast<int>(image.width()) * scale_factor;
-    int new_h = static_cast<int>(image.height()) * scale_factor;
+    scale_factor = 4;
+    new_w = static_cast<int>(image.width()) * scale_factor;
+    new_h = static_cast<int>(image.height()) * scale_factor;
     cv::Mat resized;
     cv::resize(
         blurred_native, resized, cv::Size(new_w, new_h), 0, 0,
