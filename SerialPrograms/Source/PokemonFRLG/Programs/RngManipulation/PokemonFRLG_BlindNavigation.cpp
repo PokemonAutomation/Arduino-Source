@@ -202,6 +202,17 @@ void collect_togepi_egg_after_delay(ProControllerContext& context, const uint64_
     context.wait_for_all_requests();    
 }
 
+void collect_preapproved_togepi_egg_after_delay(ProControllerContext& context, const uint64_t& ingame_delay){
+    // wait with the start menu open to avoid overworld stuff causing extra advances
+    pbf_press_button(context, BUTTON_PLUS, 200ms, 300ms);
+    pbf_wait(context, std::chrono::milliseconds(ingame_delay - 5200)); // 4000ms + 500ms + 500ms + 200ms
+    pbf_press_button(context, BUTTON_B, 200ms, 300ms);
+    // accept egg
+    pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
+    // exit dialogue
+    pbf_mash_button(context, BUTTON_B, 2500ms);
+}
+
 void trigger_held_daycare_egg_after_delay(ProControllerContext& context, const uint64_t& ingame_delay){
     // No dialogue to advance through -- just wait
     pbf_wait(context, std::chrono::milliseconds(ingame_delay - 4000));
@@ -522,11 +533,20 @@ void check_timings(
             );
         }
         return;
+    case PokemonFRLG_RngTarget::togepifast:
+        if (timings.ingame_delay < 5500){
+            OperationFailedException::fire(
+                ErrorReport::NO_ERROR_REPORT,
+                "Togepi (pre-approved): the in-game delay cannot be less than 5500ms (500 advances). Check your in-game advances and calibration or pick a new target.",
+                console
+            );
+        }
+        return;
     case PokemonFRLG_RngTarget::eggheld:
         if (timings.ingame_delay < 4000) {
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Togepi: the in-game delay cannot be less than 4000ms (350 advances). Check your in-game advances and calibration or pick a new target.",
+                "Held Frame: the in-game delay cannot be less than 4000ms (350 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
@@ -535,7 +555,7 @@ void check_timings(
         if (timings.ingame_delay < 12000) {
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Togepi: the in-game delay cannot be less than 12000ms (1440 advances). Check your in-game advances and calibration or pick a new target.",
+                "Pickup Frame: the in-game delay cannot be less than 12000ms (1440 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
@@ -759,6 +779,9 @@ void perform_blind_sequence(
         return;
     case PokemonFRLG_RngTarget::togepi:
         collect_togepi_egg_after_delay(context, timings.ingame_delay);
+        return;
+    case PokemonFRLG_RngTarget::togepifast:
+        collect_preapproved_togepi_egg_after_delay(context, timings.ingame_delay);
         return;
     case PokemonFRLG_RngTarget::eggheld:
         trigger_held_daycare_egg_after_delay(context, timings.ingame_delay);

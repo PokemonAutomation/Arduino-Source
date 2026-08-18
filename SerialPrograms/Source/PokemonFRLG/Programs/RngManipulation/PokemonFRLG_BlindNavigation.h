@@ -39,6 +39,7 @@ namespace PokemonFRLG{
         gamecornerpinsir,
         gamecornerporygon,
         togepi,
+        togepifast,
         eggheld,
         eggpickup,
         electrode,
