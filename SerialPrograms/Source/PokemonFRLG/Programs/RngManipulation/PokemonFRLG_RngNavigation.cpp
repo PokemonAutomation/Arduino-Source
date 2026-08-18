@@ -807,8 +807,7 @@ void walk_from_pond_to_daycare_man(ConsoleHandle& console, ProControllerContext&
 void egg_pickup(ConsoleHandle& console, ProControllerContext& context){
     console.log("Picking up egg...");
 
-    // This may be called right after saving the game, in which case the save dialogue is
-    // still on screen. Clear it first so that it isn't mistaken for the daycare man's dialogue.
+    // Clear the save dialogue, if it is open
     WhiteDialogOverWatcher dialogue_cleared(COLOR_RED);
     context.wait_for_all_requests();
     int ret = run_until<ProControllerContext>(
@@ -826,9 +825,7 @@ void egg_pickup(ConsoleHandle& console, ProControllerContext& context){
         );
     }
 
-    // Talk to the daycare man and wait for the egg prompt. The selection box always appears in
-    // response to an A press, so press A slowly rather than mashing. That leaves enough time to
-    // detect the box before the next press accepts the egg.
+    // Talk to the daycare man and wait for the egg prompt.
     SelectionDialogWatcher egg_prompt(COLOR_RED);
     context.wait_for_all_requests();
     ret = run_until<ProControllerContext>(
