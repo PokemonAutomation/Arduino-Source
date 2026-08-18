@@ -76,7 +76,7 @@ void VideoOverlaySession::stats_thread(){
     while (!m_stopping){
         {
             std::vector<OverlayStatSnapshot> lines;
-            WriteSpinLock lg0(m_lock);
+            WriteSpinLock lg0(m_lock, PA_CURRENT_FUNCTION);
             for (const auto& stat : m_stats_order){
                 OverlayStatSnapshot snapshot = stat->get_current();
                 if (!snapshot.text.empty()){
@@ -157,7 +157,7 @@ std::vector<OverlayStatSnapshot> VideoOverlaySession::stats() const{
 void VideoOverlaySession::add_box(const OverlayBox& box){
     std::shared_ptr<std::vector<OverlayBox>> ptr = std::make_shared<std::vector<OverlayBox>>();
     {
-        WriteSpinLock lg(m_lock, "VideoOverlaySession::add_box()");
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_boxes.insert(&box);
 
         //  We create a newly allocated Box vector to avoid listener accessing
@@ -171,7 +171,7 @@ void VideoOverlaySession::add_box(const OverlayBox& box){
 void VideoOverlaySession::remove_box(const OverlayBox& box){
     std::shared_ptr<std::vector<OverlayBox>> ptr = std::make_shared<std::vector<OverlayBox>>();
     {
-        WriteSpinLock lg(m_lock, "VideoOverlaySession::remove_box()");
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_boxes.erase(&box);
 
         //  We create a newly allocated Box vector to avoid listener accessing
@@ -199,7 +199,7 @@ std::vector<OverlayBox> VideoOverlaySession::boxes() const{
 void VideoOverlaySession::add_text(const OverlayText& text){
     std::shared_ptr<std::vector<OverlayText>> ptr = std::make_shared<std::vector<OverlayText>>();
     {
-        WriteSpinLock lg(m_lock, "VideoOverlaySession::add_text()");
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_texts.insert(&text);
 
         //  We create a newly allocated Box vector to avoid listener accessing
@@ -213,7 +213,7 @@ void VideoOverlaySession::add_text(const OverlayText& text){
 void VideoOverlaySession::remove_text(const OverlayText& text){
     std::shared_ptr<std::vector<OverlayText>> ptr = std::make_shared<std::vector<OverlayText>>();
     {
-        WriteSpinLock lg(m_lock, "VideoOverlaySession::remove_text()");
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_texts.erase(&text);
 
         //  We create a newly allocated Box vector to avoid listener accessing
@@ -241,7 +241,7 @@ std::vector<OverlayText> VideoOverlaySession::texts() const{
 void VideoOverlaySession::add_image(const OverlayImage& image){
     std::shared_ptr<std::vector<OverlayImage>> ptr = std::make_shared<std::vector<OverlayImage>>();
     {
-        WriteSpinLock lg(m_lock, "VideoOverlaySession::add_image()");
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_images.insert(&image);
 
         //  We create a newly allocated Box vector to avoid listener accessing
@@ -255,7 +255,7 @@ void VideoOverlaySession::add_image(const OverlayImage& image){
 void VideoOverlaySession::remove_image(const OverlayImage& image){
     std::shared_ptr<std::vector<OverlayImage>> ptr = std::make_shared<std::vector<OverlayImage>>();
     {
-        WriteSpinLock lg(m_lock, "VideoOverlaySession::remove_image()");
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_images.erase(&image);
 
         //  We create a newly allocated Box vector to avoid listener accessing
@@ -283,7 +283,7 @@ std::vector<OverlayImage> VideoOverlaySession::images() const{
 void VideoOverlaySession::add_log(std::string message, Color color){
     std::shared_ptr<std::vector<OverlayLogLine>> ptr = std::make_shared<std::vector<OverlayLogLine>>();
     {
-        WriteSpinLock lg(m_lock, "VideoOverlaySession::add_log_text()");
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_log_texts.emplace_front(color, std::move(message));
 
         if (m_log_texts.size() > LOG_MAX_LINES){
@@ -301,7 +301,7 @@ void VideoOverlaySession::add_log(std::string message, Color color){
 void VideoOverlaySession::clear_log(){
     std::shared_ptr<std::vector<OverlayLogLine>> ptr = std::make_shared<std::vector<OverlayLogLine>>();
     {
-        WriteSpinLock lg(m_lock, "VideoOverlaySession::clear_log_texts()");
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_log_texts.clear();
 
         //  We create a newly allocated log text vector to avoid listener accessing

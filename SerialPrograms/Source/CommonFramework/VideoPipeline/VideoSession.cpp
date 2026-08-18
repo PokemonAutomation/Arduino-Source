@@ -71,7 +71,7 @@ VideoSession::VideoSession(Logger& logger, VideoSourceOption& option)
 
 
 std::shared_ptr<const VideoSourceDescriptor> VideoSession::descriptor() const{
-    ReadSpinLock lg(m_state_lock);
+    ReadSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
     return m_descriptor;
 }
 void VideoSession::current_stream_format(
@@ -79,7 +79,7 @@ void VideoSession::current_stream_format(
     VideoFormat& format,
     FramesPerSecond& fps
 ){
-    ReadSpinLock lg(m_state_lock);
+    ReadSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
     if (m_video_source){
         resolution = m_video_source->current_resolution();
         format = m_video_source->current_format();
@@ -91,7 +91,7 @@ void VideoSession::current_stream_format(
     }
 }
 Resolution VideoSession::current_resolution(){
-    ReadSpinLock lg(m_state_lock);
+    ReadSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
     if (m_video_source){
         return m_video_source->current_resolution();
     }else{
@@ -100,7 +100,7 @@ Resolution VideoSession::current_resolution(){
 }
 #if 0
 VideoFormat VideoSession::current_format(){
-    ReadSpinLock lg(m_state_lock);
+    ReadSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
     if (m_video_source){
         return m_video_source->current_format();
     }else{
@@ -108,7 +108,7 @@ VideoFormat VideoSession::current_format(){
     }
 }
 FramesPerSecond VideoSession::current_fps(){
-    ReadSpinLock lg(m_state_lock);
+    ReadSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
     if (m_video_source){
         return m_video_source->current_fps();
     }else{
@@ -117,7 +117,7 @@ FramesPerSecond VideoSession::current_fps(){
 }
 #endif
 VideoFormatSet VideoSession::supported_formats() const{
-    ReadSpinLock lg(m_state_lock);
+    ReadSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
     if (m_video_source){
         return m_video_source->supported_formats();
     }else{
@@ -128,7 +128,7 @@ VideoFormatSet VideoSession::supported_formats() const{
 
 
 void VideoSession::get(VideoSourceOption& option){
-    ReadSpinLock lg(m_state_lock);
+    ReadSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
     option = m_option;
 }
 void VideoSession::set(const VideoSourceOption& option){
@@ -137,7 +137,7 @@ void VideoSession::set(const VideoSourceOption& option){
 
 void VideoSession::reset(){
     {
-        WriteSpinLock lg(m_queue_lock);
+        WriteSpinLock lg(m_queue_lock, PA_CURRENT_FUNCTION);
 //        cout << "VideoSession::reset(): " << m_queued_commands.size() << endl;
         m_queued_commands.emplace_back(
             Command{
@@ -158,7 +158,7 @@ void VideoSession::set_source(
     size_t fps
 ){
     {
-        WriteSpinLock lg(m_queue_lock);
+        WriteSpinLock lg(m_queue_lock, PA_CURRENT_FUNCTION);
 //        cout << "VideoSession::set_source(): " << resolution.to_string() << endl;
         m_queued_commands.emplace_back(
             Command{
@@ -174,7 +174,7 @@ void VideoSession::set_source(
 }
 void VideoSession::set_resolution(Resolution resolution){
     {
-        WriteSpinLock lg(m_queue_lock);
+        WriteSpinLock lg(m_queue_lock, PA_CURRENT_FUNCTION);
 //        cout << "VideoSession::set_resolution(): " << m_queued_commands.size() << endl;
         m_queued_commands.emplace_back(
             Command{
@@ -190,7 +190,7 @@ void VideoSession::set_resolution(Resolution resolution){
 }
 void VideoSession::set_format(VideoFormat format, size_t fps){
     {
-        WriteSpinLock lg(m_queue_lock);
+        WriteSpinLock lg(m_queue_lock, PA_CURRENT_FUNCTION);
 //        cout << "VideoSession::set_resolution(): " << m_queued_commands.size() << endl;
         m_queued_commands.emplace_back(
             Command{
@@ -214,7 +214,7 @@ void VideoSession::internal_reset(){
     FramesPerSecond fps = m_option.m_fps;
     std::unique_ptr<VideoSource> source;
     {
-        WriteSpinLock lg(m_state_lock);
+        WriteSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
         source = std::move(m_video_source);
     }
     if (source){
@@ -233,7 +233,7 @@ void VideoSession::internal_reset(){
     }
 
     {
-        WriteSpinLock lg(m_state_lock);
+        WriteSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
         m_option.m_resolution = resolution;
         m_option.m_format = format;
         m_option.m_fps = fps;
@@ -260,7 +260,7 @@ void VideoSession::internal_set_source(
 
     std::unique_ptr<VideoSource> source;
     {
-        WriteSpinLock lg(m_state_lock);
+        WriteSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
         source = std::move(m_video_source);
     }
     if (source){
@@ -269,7 +269,7 @@ void VideoSession::internal_set_source(
         source.reset();
     }
     {
-        WriteSpinLock lg(m_state_lock);
+        WriteSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
         m_option.set_descriptor(device);
         m_descriptor = device;
     }
@@ -286,7 +286,7 @@ void VideoSession::internal_set_source(
     }
 
     {
-        WriteSpinLock lg(m_state_lock);
+        WriteSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
         m_option.m_resolution = resolution;
         m_option.m_format = format;
         m_option.m_fps = fps;
@@ -308,7 +308,7 @@ void VideoSession::internal_set_resolution(Resolution resolution){
 
     std::unique_ptr<VideoSource> source;
     {
-        WriteSpinLock lg(m_state_lock);
+        WriteSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
         source = std::move(m_video_source);
     }
     if (source){
@@ -334,7 +334,7 @@ void VideoSession::internal_set_resolution(Resolution resolution){
     }
 
     {
-        WriteSpinLock lg(m_state_lock);
+        WriteSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
         m_option.m_resolution = resolution;
         m_option.m_format = format;
         m_option.m_fps = fps;
@@ -356,7 +356,7 @@ void VideoSession::internal_set_format(VideoFormat format, FramesPerSecond fps){
 
     std::unique_ptr<VideoSource> source;
     {
-        WriteSpinLock lg(m_state_lock);
+        WriteSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
         source = std::move(m_video_source);
     }
     if (source){
@@ -374,7 +374,7 @@ void VideoSession::internal_set_format(VideoFormat format, FramesPerSecond fps){
     }
 
     {
-        WriteSpinLock lg(m_state_lock);
+        WriteSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
         m_option.m_format = format;
         m_option.m_fps = fps;
         m_video_source = std::move(source);
@@ -396,7 +396,7 @@ void VideoSession::run_commands(){
         while (true){
             Command command;
             {
-                WriteSpinLock lg1(m_queue_lock);
+                WriteSpinLock lg1(m_queue_lock, PA_CURRENT_FUNCTION);
 //                cout << "VideoSession::run_commands(): " << m_queued_commands.size() << endl;
                 if (m_queued_commands.empty()){
                     break;
@@ -432,7 +432,7 @@ void VideoSession::run_commands(){
 
 
 VideoSnapshot VideoSession::snapshot_latest_blocking(){
-    ReadSpinLock lg(m_state_lock);
+    ReadSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
     if (m_video_source){
         return m_video_source->snapshot_latest_blocking();
     }else{
@@ -440,7 +440,7 @@ VideoSnapshot VideoSession::snapshot_latest_blocking(){
     }
 }
 VideoSnapshot VideoSession::snapshot_recent_nonblocking(WallClock min_time){
-    ReadSpinLock lg(m_state_lock);
+    ReadSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
     if (m_video_source){
         return m_video_source->snapshot_recent_nonblocking(min_time);
     }else{
@@ -449,30 +449,30 @@ VideoSnapshot VideoSession::snapshot_recent_nonblocking(WallClock min_time){
 }
 
 double VideoSession::fps_source() const{
-    ReadSpinLock lg(m_fps_lock);
+    ReadSpinLock lg(m_fps_lock, PA_CURRENT_FUNCTION);
     return m_fps_tracker_source.events_per_second();
 }
 double VideoSession::fps_display() const{
-    ReadSpinLock lg(m_fps_lock);
+    ReadSpinLock lg(m_fps_lock, PA_CURRENT_FUNCTION);
     return m_fps_tracker_rendered.events_per_second();
 }
 void VideoSession::on_frame(std::shared_ptr<const VideoFrame> frame){
     m_frame_listeners.run_method(&VideoFrameListener::on_frame, frame);
     {
-        WriteSpinLock lg(m_fps_lock);
+        WriteSpinLock lg(m_fps_lock, PA_CURRENT_FUNCTION);
         m_fps_tracker_source.push_event(frame->timestamp);
     }
     global_watchdog().delay(*this);
 }
 void VideoSession::on_rendered_frame(WallClock timestamp){
-    WriteSpinLock lg(m_fps_lock);
+    WriteSpinLock lg(m_fps_lock, PA_CURRENT_FUNCTION);
     m_fps_tracker_rendered.push_event(timestamp);
 }
 
 
 void VideoSession::on_watchdog_timeout(){
     {
-        ReadSpinLock lg(m_state_lock);
+        ReadSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
         if (!m_video_source || !m_video_source->allow_watchdog_reset()){
             return;
         }

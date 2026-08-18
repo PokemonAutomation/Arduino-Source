@@ -332,8 +332,8 @@ void StatsReader::read_page1(
             extract_box_reference(frame, GameSettings::instance().GAME_BOX);
 
     bool success = read_name(logger, language, game_screen, stats, subset, save_debug_images);
-    success = success && read_level(logger, language, game_screen, stats, subset, save_debug_images);
-    success = success && read_nature(logger, language, game_screen, stats, subset, save_debug_images);
+    success = read_level(logger, language, game_screen, stats, subset, save_debug_images) && success;
+    success = read_nature(logger, language, game_screen, stats, subset, save_debug_images) && success;
 
     read_gender(logger, language, game_screen, stats, subset);
 

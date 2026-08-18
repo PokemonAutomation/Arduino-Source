@@ -5,11 +5,6 @@
  *  Helper functions to work with ONNX Runtime library
  */
 
-#include <QString>
-#include <QFile>
-#include <QCryptographicHash>
-#include <QByteArray>
-
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -19,6 +14,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Tools/FileHash.h"
 #include "ML_OrtEnv.h"
 #include "ML_ONNXRuntimeHelpers.h"
 
@@ -26,20 +22,6 @@ namespace PokemonAutomation{
 namespace ML{
 
 
-// Computes the cryptographic hash of a file.
-std::string create_file_hash(const std::string& filepath){
-    QFile file(QString::fromStdString(filepath));
-    if (!file.open(QIODevice::ReadOnly)){
-        return "";
-    }
-
-    QCryptographicHash hash(QCryptographicHash::Sha256);
-    if (hash.addData(&file)){
-        return hash.result().toHex(0).toStdString();
-    }else{
-        return "";
-    }
-}
 
 
 Ort::SessionOptions create_session_options(const std::string& model_cache_path, bool use_gpu){
@@ -143,7 +125,7 @@ Ort::SessionOptions create_session_options(const std::string& model_cache_path, 
 // model_path: the model path to load the ML model. This is needed to ensure we delete the old model cache
 //   when a new model
 std::pair<bool, std::string> clean_up_old_model_cache(const std::string& model_cache_path, const std::string& model_path){
-    std::string file_hash = create_file_hash(model_path);
+    std::string file_hash = hash_file(model_path);
     if (file_hash.size() == 0){
         // the model file cannot be loaded
         return {true, ""};
