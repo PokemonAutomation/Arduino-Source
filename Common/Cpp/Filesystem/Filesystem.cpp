@@ -42,6 +42,9 @@ bool create_directories(const Path& path){
     return std::filesystem::create_directories(path.stdpath());
 }
 
+bool remove(const Path& path){
+    return std::filesystem::remove(path);
+}
 std::uintmax_t remove_all(const Path& path){
     return std::filesystem::remove_all(path.stdpath());
 }

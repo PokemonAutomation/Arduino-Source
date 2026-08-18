@@ -40,6 +40,7 @@ bool create_directories(const Path& path);
 
 //  Delete the contents of the path (if it is a directory) and the contents of all its subdirectories, recursively.
 //  Then delete the file/directory of path itself. Symlinks are not followed (symlink is removed, not its target).
+bool remove(const Path& path);
 std::uintmax_t remove_all(const Path& path);
 
 //  Copy a file.
