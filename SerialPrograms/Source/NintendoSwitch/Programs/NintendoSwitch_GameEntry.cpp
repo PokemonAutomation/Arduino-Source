@@ -559,8 +559,13 @@ void start_game_from_home_with_inference(
 
             WallClock last_online_check = current_time();
             WallClock master_deadline = current_time() + std::chrono::minutes(60 * 5);
-            WallClock online_check_deadline = last_online_check + std::chrono::minutes(2);
-            while (current_time() < std::min(master_deadline, online_check_deadline)){
+            while (true){
+                WallClock online_check_deadline = last_online_check + std::chrono::minutes(2);
+                WallClock deadline = std::min(master_deadline, online_check_deadline);
+                if (current_time() > deadline){
+                    break;
+                }
+
                 HomeMenuWatcher home(console, false, COLOR_RED, std::chrono::milliseconds(2000));
                 StartGameUserSelectWatcher user_select(console, COLOR_GREEN);
                 UpdateMenuWatcher update_menu(console, COLOR_PURPLE);
