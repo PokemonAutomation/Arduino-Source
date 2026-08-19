@@ -1,5 +1,9 @@
 name: C++ CI Serial Programs Mac Intel
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
   build:
