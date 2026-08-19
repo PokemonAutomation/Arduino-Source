@@ -584,7 +584,8 @@ bool DonutMaker::should_stop(
 bool DonutMaker::donut_iteration(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    std::vector<uint16_t>& kept_counts
+    std::vector<uint16_t>& kept_counts,
+    size_t& consecutive_ingredient_fails
 ){
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
@@ -601,11 +602,26 @@ bool DonutMaker::donut_iteration(
         open_berry_menu_from_ansha(env, context);
         // Add berries from menu and make a donut. Stop at flavor power screen.
         add_berries_and_make_donut(env, context);
+        consecutive_ingredient_fails = 0;
 
         // Read flavor power and check if they match user requirement and should be kept:
         if (match_powers(env, context, kept_counts)){
             return true;
         }
+    }catch (BerryNotFoundException& e){
+        stats.errors++;
+        env.update_stats();
+        consecutive_ingredient_fails++;
+        if (consecutive_ingredient_fails >= 3){
+            throw e;
+        }
+        send_program_recoverable_error_notification(
+            env,
+            NOTIFICATION_ERROR_RECOVERABLE,
+            e.message(),
+            env.console.video().snapshot_latest_blocking()
+        );
+
     }catch (OperationFailedException& e){
         stats.errors++;
         env.update_stats();
@@ -646,9 +662,10 @@ void DonutMaker::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     reset_map_filter_state(env, context);
 
     std::vector<uint16_t> kept_counts(FLAVOR_POWERS.snapshot().size(), 0);
+    size_t consecutive_ingredient_fails = 0;
     uint16_t total_kept = 0;
-    while(true){
-        const bool should_keep = donut_iteration(env, context, kept_counts);
+    while (true){
+        const bool should_keep = donut_iteration(env, context, kept_counts, consecutive_ingredient_fails);
         stats.resets++;
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS);

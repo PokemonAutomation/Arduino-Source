@@ -6,14 +6,12 @@
 
 #include <algorithm>
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLZA/Resources/PokemonLZA_DonutBerries.h"
 #include "PokemonLZA_DonutBerrySession.h"
-#include "CommonTools/Async/InferenceRoutines.h"
-#include "Common/Cpp/PrettyPrint.h"
 
 //#include <iostream>
 //using std::cout;
@@ -308,8 +306,9 @@ void BerrySession::add_berries(
         const auto& back = ordered_berries.back();
         std::string found = this->move_to_ingredient(back.first, move_topdown);
         if (found.empty()){
-            const DonutBerries& name = get_berry_name(berries.begin()->first);
-            OperationFailedException::fire(
+            const DonutBerries& name = get_berry_name(back.first);
+            throw_and_log<BerryNotFoundException>(
+                stream.logger(),
                 ErrorReport::NO_ERROR_REPORT,
                 "Unable to find Berry: \"" + name.display_name() + "\" - Did you run out?",
                 stream

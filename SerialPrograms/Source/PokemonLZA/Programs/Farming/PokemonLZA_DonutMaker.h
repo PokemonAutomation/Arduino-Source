@@ -52,7 +52,12 @@ private:
     void open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void move_to_ansha(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void save_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    bool donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::vector<uint16_t>& kept_counts);
+    bool donut_iteration(
+        SingleSwitchProgramEnvironment& env,
+        ProControllerContext& context,
+        std::vector<uint16_t>& kept_counts,
+        size_t& consecutive_ingredient_fails
+    );
 
 private:
 

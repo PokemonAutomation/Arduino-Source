@@ -9,6 +9,7 @@
 
 #include <map>
 #include <memory>
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/VideoStream.h"
@@ -25,6 +26,12 @@ struct PageIngredients{
     // the line index of the current selected berry, < BERRY_PAGE_LINES
     int8_t selected = -1;
     std::set<std::string> item[DonutBerriesReader::BERRY_PAGE_LINES];
+};
+
+
+class BerryNotFoundException : public OperationFailedException{
+public:
+    using OperationFailedException::OperationFailedException;
 };
 
 

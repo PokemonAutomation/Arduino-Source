@@ -557,8 +557,10 @@ void start_game_from_home_with_inference(
         [&](ControllerContext& context){
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
 
-            WallClock deadline = current_time() + std::chrono::minutes(60 * 5);
-            while (current_time() < deadline){
+            WallClock last_online_check = current_time();
+            WallClock master_deadline = current_time() + std::chrono::minutes(60 * 5);
+            WallClock online_check_deadline = last_online_check + std::chrono::minutes(2);
+            while (current_time() < std::min(master_deadline, online_check_deadline)){
                 HomeMenuWatcher home(console, false, COLOR_RED, std::chrono::milliseconds(2000));
                 StartGameUserSelectWatcher user_select(console, COLOR_GREEN);
                 UpdateMenuWatcher update_menu(console, COLOR_PURPLE);
@@ -599,6 +601,7 @@ void start_game_from_home_with_inference(
                 case 3:
                     console.log("Detected check online.", COLOR_BLUE);
                     context.wait_for(std::chrono::seconds(1));
+                    last_online_check = current_time();
                     break;
                 case 4:
                     console.log("Detected failed to connect.", COLOR_BLUE);
@@ -622,7 +625,7 @@ void start_game_from_home_with_inference(
     if (ret < 0){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "start_game_from_home_with_inference(): Failed to start game after 5 hours.",
+            "start_game_from_home_with_inference(): Failed to start game after multiple attempts.",
             console
         );
     }
