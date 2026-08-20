@@ -17,7 +17,7 @@
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonFRLG/PokemonFRLG_Settings.h"
-#include "PokemonFRLG_DigitReader.h"
+#include "PokemonFRLG_OcrPreprocessing.h"
 #include <opencv2/imgproc.hpp>
 
 namespace PokemonAutomation {
@@ -52,22 +52,23 @@ PokemonFRLG_WildEncounter WildEncounterReader::read_encounter(
 
     ImageViewRGB32 name_box = extract_box_reference(game_screen, jpn ? m_box_name_jpn : m_box_name);
 
-    ImageRGB32 name_ready = preprocess_for_ocr(
-        name_box, "name", 7, 2, true, 
-        combine_rgb(0, 0, 0), combine_rgb(190, 190, 190)
-    );
+    //  Dark text on the light battle HP bar. Blur to close the gaps in the GBA
+    //  font, then let the matcher try each threshold in turn.
+    ImageRGB32 name_ready = preprocess_for_ocr(name_box);
 
-    const std::vector<OCR::TextColorRange> name_text_color_ranges{
-        {combine_rgb(0, 0, 0), combine_rgb(120, 120, 120)}
-    };
-
-    // auto name_result = Pokemon::PokemonNameReader::instance().read_substring(    
     auto name_result = Pokemon::PokemonNameReader(subset).read_substring(
             logger, language, name_ready,
-            name_text_color_ranges,
+            DARK_TEXT_FILTERS(),
             0.01, 0.50, max_log10p);
     if (!name_result.results.empty()){
         encounter.name = name_result.results.begin()->second.token;
+    }else{
+    logger.log("Failed to read species name.", COLOR_RED);
+        if (GlobalSettings::instance().SAVE_DEBUG_IMAGES){
+            name_box.save("DebugDumps/ocr_encounter_box.png");
+            name_ready.save("DebugDumps/ocr_encounter_ready.png");
+            game_screen.save("DebugDumps/ocr_encounter_frame.png");
+        }
     }
     return encounter;
 }

@@ -20,6 +20,7 @@
 #include "Pokemon/Inference/Pokemon_NatureReader.h"
 #include "PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG_DigitReader.h"
+#include "PokemonFRLG_OcrPreprocessing.h"
 #include <opencv2/imgproc.hpp>
 
 namespace PokemonAutomation {
@@ -85,72 +86,24 @@ bool StatsReader::read_name(
 
     ImageViewRGB32 name_box = extract_box_reference(game_screen, jpn ? m_box_name_jpn : m_box_name);
 
-    static const std::vector<int> WHITE_THRESHOLDS = { 180, 200, 220, 230, 240 };
-    OCR::StringMatchResult best_result;
-    bool initialized = false;
-    std::vector<ImageRGB32> debug_images;
-    if (save_debug_images){
-        debug_images.reserve(WHITE_THRESHOLDS.size());
-    }
-    for (int thresh : WHITE_THRESHOLDS){
-        ImageRGB32 name_filtered(name_box.width(), name_box.height());
-        for (size_t r = 0; r < name_box.height(); r++){
-            for (size_t c = 0; c < name_box.width(); c++){
-                Color pixel(name_box.pixel(c, r));
-                if (pixel.red() > thresh && pixel.green() > thresh && pixel.blue() > thresh){
-                    name_filtered.pixel(c, r) = (uint32_t)0xff000000; // Black
-                }else{
-                    name_filtered.pixel(c, r) = (uint32_t)0xffffffff; // White
-                }
-            }
-        }
-        ImageRGB32 name_ready = preprocess_for_ocr(
-            name_filtered, "name", 7, 2, true, 
-            combine_rgb(0, 0, 0), jpn ? combine_rgb(160, 160, 160) : combine_rgb(140, 140, 140)
+    ImageRGB32 name_ready = preprocess_for_ocr(name_box);
+
+    OCR::StringMatchResult result = subset.empty()
+        ? Pokemon::PokemonNameReader::instance().read_substring(
+            logger, language, name_ready, BRIGHT_TEXT_FILTERS()
+        )
+        : Pokemon::PokemonNameReader(subset).read_substring(
+            logger, language, name_ready, BRIGHT_TEXT_FILTERS()
         );
 
-        const std::vector<OCR::TextColorRange> name_text_color_ranges{
-            {combine_rgb(0, 0, 0), combine_rgb(120, 120, 120)}
-        };
-
-        OCR::StringMatchResult result;
-        if (subset.size() > 0){
-            auto name_result = Pokemon::PokemonNameReader(subset).read_substring(
-                    logger, language, name_ready, name_text_color_ranges
-            );
-            if (!name_result.results.empty()){
-                result = name_result;
-            }
-        }else{
-            auto name_result = Pokemon::PokemonNameReader::instance().read_substring(
-                    logger, language, name_ready, name_text_color_ranges
-            );
-            if (!name_result.results.empty()){
-                result = name_result;
-            }
-        }
-        if (!result.results.empty()){
-            if (!initialized || result.results.begin()->first < best_result.results.begin()->first){
-                best_result = result;
-                initialized = true;
-            }
-        }
-        if (save_debug_images){
-            debug_images.emplace_back(std::move(name_ready));
-        }
-    }
-    if (initialized && !best_result.results.empty()){
-        stats.name = best_result.results.begin()->second.token;
+    if (!result.results.empty()){
+        stats.name = result.results.begin()->second.token;
         return true;
     }
     logger.log("Failed to read species name.", COLOR_RED);
     if (save_debug_images){
         name_box.save("DebugDumps/ocr_name_box.png");
-        for (size_t c = 0; c < debug_images.size(); c++){
-            debug_images[c].save(
-                "DebugDumps/ocr_name_ready_" + std::to_string(WHITE_THRESHOLDS[c]) + ".png"
-            );
-        }
+        name_ready.save("DebugDumps/ocr_name_ready.png");
     }
     return false;
 }
@@ -297,19 +250,13 @@ bool StatsReader::read_nature(
     const static Pokemon::NatureReader reader("PokemonFRLG/NatureCheckerOCR.json");
     ImageViewRGB32 nature_raw = extract_box_reference(game_screen, jpn ? m_box_nature_jpn : m_box_nature);
 
-    ImageRGB32 nature_ready = preprocess_for_ocr(
-        nature_raw, "nature", 7, 2, true,
-        combine_rgb(0, 0, 0), combine_rgb(190, 190, 190)
+    ImageRGB32 nature_ready = preprocess_for_ocr(nature_raw);
+
+    OCR::StringMatchResult nature_result = reader.read_substring(
+        logger, language, nature_ready, DARK_TEXT_FILTERS()
     );
 
-    OCR::StringMatchResult nature_result = reader.match_substring_from_image(
-        &logger, language, nature_ready,
-        Pokemon::NatureReader::MAX_LOG10P,
-        Pokemon::NatureReader::MAX_LOG10P_SPREAD,
-        OCR::PageSegMode::SINGLE_LINE);
-
     if (!nature_result.results.empty()){
-        nature_result.log(logger, Pokemon::NatureReader::MAX_LOG10P, "Nature Final");
         stats.nature = nature_result.results.begin()->second.token;
         return true;
     }

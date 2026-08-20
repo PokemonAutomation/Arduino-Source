@@ -14,15 +14,12 @@
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
 #include "CommonTools/ImageMatch/ExactImageMatcher.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
-#include "CommonTools/Images/ImageFilter.h"
-#include "CommonTools/Images/ImageManip.h"
 
 #include "PokemonFRLG_DigitReader.h"
 
@@ -33,128 +30,6 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
-
-// Debug counter for unique filenames
-static int debug_counter = 0;
-
-// Full OCR preprocessing pipeline for GBA pixel fonts.
-//
-// GBA fonts are seven-segment-like with 1-pixel gaps between segments.
-// Pipeline: blur at native -> smooth upscale -> BW -> smooth BW -> re-BW -> pad
-//
-// The native blur connects gaps. Post-BW padding provides margins.
-ImageRGB32 preprocess_for_ocr(
-    const ImageViewRGB32 &image,
-    const std::string &label,
-    int blur_kernel_size, int blur_passes,
-    bool in_range_black, uint32_t bw_min,
-    uint32_t bw_max,
-    bool save_debug_images
-){
-    int id = debug_counter++;
-    std::string prefix = "DebugDumps/ocr_" + label + "_" + std::to_string(id);
-
-    // Save raw input
-    if (save_debug_images){
-        image.save(prefix + "_0_raw.png");
-    }
-
-    cv::Mat src = to_OpenCV_ref(image);
-
-    // Step 0: Rescale the image to match the expected height at 1080p
-    // so that the Gaussian blur size works across resolutions
-    constexpr int expected_height = 69;
-
-    double scale_factor = static_cast<double>(expected_height) / static_cast<double>(image.height());
-
-    int new_w = std::max(
-        1, cvRound(static_cast<int>(image.width() * scale_factor))
-    );
-
-    int new_h = std::max(
-        1, cvRound(static_cast<int>(image.height() * scale_factor))
-    );
-
-    cv::Mat rescaled;
-    cv::resize(
-        src, rescaled, cv::Size(new_w, new_h), 0, 0,
-        cv::INTER_LINEAR
-    );
-
-    // Step 1: Gaussian blur at with 5x5 kernel.
-    // The 5x5 kernel reaches 2 pixels away (vs 1px for 3x3), bridging
-    // wider gaps in the seven-segment font. Two passes for heavy smoothing.
-    cv::Mat blurred_native;
-    rescaled.copyTo(blurred_native);
-    if (blur_kernel_size > 0 && blur_passes > 0){
-        for (int i = 0; i < blur_passes; i++){
-            cv::GaussianBlur(
-                blurred_native, blurred_native,
-                cv::Size(blur_kernel_size, blur_kernel_size), 1.5
-            );
-        }
-    }
-
-    // Save blurred at rescaled res
-    ImageRGB32 blurred_native_img(blurred_native.cols, blurred_native.rows);
-    blurred_native.copyTo(to_OpenCV_ref(blurred_native_img));
-    if (save_debug_images){
-        blurred_native_img.save(prefix + "_1_blurred_native.png");
-    }
-
-    // Step 2: Smooth upscale 4x with bilinear interpolation.
-    scale_factor = 4;
-    new_w = static_cast<int>(image.width()) * scale_factor;
-    new_h = static_cast<int>(image.height()) * scale_factor;
-    cv::Mat resized;
-    cv::resize(
-        blurred_native, resized, cv::Size(new_w, new_h), 0, 0,
-        cv::INTER_LINEAR
-    );
-
-    // Save upscaled
-    ImageRGB32 resized_img(resized.cols, resized.rows);
-    resized.copyTo(to_OpenCV_ref(resized_img));
-    if (save_debug_images){
-        resized_img.save(prefix + "_2_upscaled.png");
-    }
-
-    // Step 3: BW threshold on the smooth upscaled image.
-    ImageRGB32 bw =
-            to_blackwhite_rgb32_range(resized_img, in_range_black, bw_min, bw_max);
-    if (save_debug_images){
-        bw.save(prefix + "_3_bw.png");
-    }
-
-    // Step 4: Post-BW smoothing -> re-threshold.
-    // The BW image has angular seven-segment shapes. GaussianBlur on the
-    // binary image creates gray anti-aliased edges. Re-thresholding at 128
-    // rounds the corners into natural smooth digit shapes that Tesseract
-    // recognizes much better. This is equivalent to morphological closing.
-    cv::Mat bw_mat = to_OpenCV_ref(bw);
-    cv::Mat smoothed;
-    cv::GaussianBlur(bw_mat, smoothed, cv::Size(7, 7), 2.0);
-
-    // Re-threshold: convert smoothed back to ImageRGB32 and BW threshold.
-    // After blur on BW: text areas are dark gray (~0-64), bg areas are
-    // light gray (~192-255), edge zones are mid-gray (~64-192).
-    // Threshold at [0..128] captures text + expanded edges -> BLACK.
-    ImageRGB32 smoothed_img(smoothed.cols, smoothed.rows);
-    smoothed.copyTo(to_OpenCV_ref(smoothed_img));
-    ImageRGB32 smooth_bw = to_blackwhite_rgb32_range(
-            smoothed_img, true, combine_rgb(0, 0, 0), combine_rgb(128, 128, 128));
-    if (save_debug_images){
-        smooth_bw.save(prefix + "_4_smooth_bw.png");
-    }
-
-    // Step 5: Pad with white border (Tesseract needs margins).
-    ImageRGB32 padded = pad_image(smooth_bw, smooth_bw.height() / 2, 0xffffffff);
-    if (save_debug_images){
-        padded.save(prefix + "_5_padded.png");
-    }
-
-    return padded;
-}
 
 // ---------------------------------------------------------------------------
 // Template store: loads 10 digit matchers from a resource sub-directory.
