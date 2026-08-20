@@ -7,9 +7,6 @@
 #ifndef PokemonAutomation_VideoPipeline_Qt6VideoWidget_H
 #define PokemonAutomation_VideoPipeline_Qt6VideoWidget_H
 
-#include <QtGlobal>
-#if QT_VERSION_MAJOR == 6
-
 #include <QWidget>
 #include <QCameraDevice>
 #include <QMediaCaptureSession>
@@ -30,25 +27,6 @@ namespace PokemonAutomation{
 namespace CameraQt6QVideoSink{
 
 
-void get_format(
-    const QCameraFormat& qformat,
-    Resolution& resolution,
-    VideoFormat& format,
-    FramesPerSecond& fps
-);
-
-QCameraFormat build_format_set(
-    Logger& logger,
-    VideoFormatSet& format_set,
-    const QCameraDevice& device,
-    Resolution desired_resolution,
-    VideoFormat desired_format,
-    FramesPerSecond desired_fps
-);
-
-
-
-
 class CameraBackend : public PokemonAutomation::CameraBackend{
 public:
     // Get all cameras' info.
@@ -67,11 +45,6 @@ public:
         FramesPerSecond fps
     ) const override;
 };
-
-
-
-
-
 
 
 
@@ -176,5 +149,4 @@ private:
 
 }
 }
-#endif
 #endif

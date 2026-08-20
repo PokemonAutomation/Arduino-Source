@@ -7,19 +7,12 @@
 #ifndef PokemonAutomation_VideoPipeline_Qt65VideoWidget_H
 #define PokemonAutomation_VideoPipeline_Qt65VideoWidget_H
 
-#include <QtGlobal>
-#if QT_VERSION_MAJOR == 6
-
-//#include <set>
-//#include <mutex>
 #include <QCameraDevice>
 #include <QMediaCaptureSession>
 #include <QVideoFrame>
-#include <QVBoxLayout>
 #include <QVideoWidget>
 #include <QGraphicsView>
 #include <QGraphicsVideoItem>
-#include <QKeyEvent>
 #include "CommonFramework/Tools/StatAccumulator.h"
 #include "CommonFramework/VideoPipeline/VideoSource.h"
 #include "CommonFramework/VideoPipeline/CameraInfo.h"
@@ -184,5 +177,4 @@ private:
 
 }
 }
-#endif
 #endif
