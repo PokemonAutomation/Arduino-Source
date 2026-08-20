@@ -11,6 +11,7 @@
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Pokemon/Pokemon_Types.h"
+#include "PokemonHome_GigantamaxDetector.h"
 #include "PokemonHome_TeraTypeReader.h"
 
 namespace PokemonAutomation {
@@ -275,6 +276,11 @@ PokemonTeraType read_pokemon_tera_type(
     const ImageViewRGB32& original_screen,
     const ImageFloatBox& box
 ){
+    GigantamaxDetector gmax_detector(COLOR_RED, nullptr, box);
+    if (gmax_detector.detect(original_screen)){
+        return PokemonTeraType::NONE;
+    }
+
     ImageViewRGB32 image = extract_box_reference(original_screen, box);
 
     std::multimap<double, std::pair<PokemonTeraType, ImagePixelBox>> filtered = find_tera_type_symbols(
