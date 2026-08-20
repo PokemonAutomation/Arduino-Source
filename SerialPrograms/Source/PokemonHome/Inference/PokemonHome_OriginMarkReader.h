@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonHome_OriginMarkReader_H
 
 #include <vector>
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/DetectedBoxes.h"
@@ -31,6 +32,8 @@ private:
     std::vector<DetectedBox> m_last_detected;
 
 };
+
+void add_tests_OriginMarkReader(UnitTestDatabase& database);
 
 }
 }
