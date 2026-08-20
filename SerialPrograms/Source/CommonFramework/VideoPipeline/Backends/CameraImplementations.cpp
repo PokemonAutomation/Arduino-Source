@@ -24,6 +24,7 @@
 
 #if defined(__linux__) || defined(__APPLE__)
 #include "CameraWidgetOpenCV.h"
+#include "CameraWidgetOpenCV_QOpenGLWidget.h"
 #endif
 
 
@@ -58,6 +59,10 @@ struct CameraBackends{
         m_backends.emplace_back(
             "opencv-v4l2", "Linux: OpenCV V4L2",
             std::make_unique<CameraOpenCV::CameraBackend>()
+        );
+        m_backends.emplace_back(
+            "opencv-v4l2-gl", "Linux: OpenCV V4L2 (GPU Offloaded)",
+            std::make_unique<CameraOpenCV_QOpenGLWidget::CameraBackend>()
         );
 #endif
 #if QT_VERSION_MAJOR == 6

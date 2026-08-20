@@ -4,13 +4,14 @@
  *
  */
 
-#ifndef PokemonAutomation_VideoPipeline_OpenCV_H
-#define PokemonAutomation_VideoPipeline_OpenCV_H
+#ifndef PokemonAutomation_CameraWidgetOpenCV_QOpenGLWidget_H
+#define PokemonAutomation_CameraWidgetOpenCV_QOpenGLWidget_H
 
 #include <QtGlobal>
 #if defined(__linux__) || defined(__APPLE__)
 
 #include <QWidget>
+#include <QOpenGLWidget>
 #include <thread>
 #include <atomic>
 #include "Common/Cpp/Concurrency/Mutex.h"
@@ -27,7 +28,7 @@ namespace cv {
 }
 
 namespace PokemonAutomation{
-namespace CameraOpenCV{
+namespace CameraOpenCV_QOpenGLWidget{
 
 class CameraBackend : public PokemonAutomation::CameraBackend{
 public:
@@ -99,18 +100,24 @@ private:
     SnapshotManager m_snapshot_manager;
 };
 
-class CameraVideoDisplay : public QWidget, private VideoFrameListener{
+class CameraVideoDisplay : public QOpenGLWidget, private VideoFrameListener{
 public:
     ~CameraVideoDisplay();
     CameraVideoDisplay(QWidget* parent, CameraVideoSource& source);
 
 private:
     virtual void on_frame(std::shared_ptr<const VideoFrame> frame) override;
+
+protected:
+    virtual void resizeEvent(QResizeEvent* event) override;
     virtual void paintEvent(QPaintEvent* event) override;
 
 private:
     CameraVideoSource& m_source;
     std::shared_ptr<const VideoFrame> m_last_frame;
+
+    std::atomic<int> m_width;
+    std::atomic<int> m_height;
 
     LifetimeSanitizer m_sanitizer;
 };

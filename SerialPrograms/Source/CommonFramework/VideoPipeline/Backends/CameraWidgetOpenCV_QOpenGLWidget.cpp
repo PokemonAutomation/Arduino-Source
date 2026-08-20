@@ -8,6 +8,8 @@
 #if defined(__linux__) || defined(__APPLE__)
 
 #include <QPainter>
+#include <QVideoSink>
+#include <QResizeEvent>
 #include <QMediaDevices>
 #include <QVideoFrameFormat>
 #include <opencv2/opencv.hpp>
@@ -21,10 +23,10 @@
 #include "CommonFramework/Logging/Logger.h"
 #include "VideoFrameQt.h"
 #include "MediaServicesQt6.h"
-#include "CameraWidgetOpenCV.h"
+#include "CameraWidgetOpenCV_QOpenGLWidget.h"
 
 namespace PokemonAutomation{
-namespace CameraOpenCV{
+namespace CameraOpenCV_QOpenGLWidget{
 
 std::vector<CameraInfo> CameraBackend::get_all_cameras() const{
     const auto cameras = GlobalMediaServices::instance().get_all_cameras();
@@ -261,19 +263,45 @@ CameraVideoDisplay::~CameraVideoDisplay(){
     m_source.remove_source_frame_listener(*this);
 }
 CameraVideoDisplay::CameraVideoDisplay(QWidget* parent, CameraVideoSource& source)
-    : QWidget(parent)
+    : QOpenGLWidget(parent)
     , m_source(source)
+    , m_width(80)
+    , m_height(45)
+    , m_sanitizer("CameraVideoDisplay")
 {
+    this->setMinimumSize(80, 45);
     source.add_source_frame_listener(*this);
 }
-void CameraVideoDisplay::on_frame(std::shared_ptr<const VideoFrame> frame){
-    m_last_frame = std::move(frame);
-    queue_on_main_thread([this]{
-        this->update();
-    });
+void CameraVideoDisplay::resizeEvent(QResizeEvent* event){
+    QOpenGLWidget::resizeEvent(event);
+    m_width.store(event->size().width(), std::memory_order_relaxed);
+    m_height.store(event->size().height(), std::memory_order_relaxed);
 }
+
+void CameraVideoDisplay::on_frame(std::shared_ptr<const VideoFrame> frame){
+    int w = m_width.load(std::memory_order_relaxed);
+    int h = m_height.load(std::memory_order_relaxed);
+    
+    std::shared_ptr<const VideoFrame> scaled_frame = frame;
+    
+    if (w > 0 && h > 0 && frame && frame->frame.isValid()){
+        QSize target_size(w, h);
+        if (frame->frame.size() != target_size){
+            QImage img = frame->frame.toImage();
+            QImage scaled = img.scaled(target_size, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+            QVideoFrame out(scaled);
+            scaled_frame = std::make_shared<VideoFrame>(frame->timestamp, out);
+        }
+    }
+
+    QMetaObject::invokeMethod(this, [this, frame = std::move(scaled_frame)]() mutable {
+        m_last_frame = std::move(frame);
+        this->update();
+    }, Qt::QueuedConnection);
+}
+
 void CameraVideoDisplay::paintEvent(QPaintEvent* event){
-    QWidget::paintEvent(event);
+    QOpenGLWidget::paintEvent(event);
 
     if (!m_last_frame){
         return;
