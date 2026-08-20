@@ -60,9 +60,6 @@ private:
     // Handles the grass encounter logic. Attempts to spin in place. Resets position to the top right corner of grass.
     // returns -1 if no encounter is triggered, 0 if a non-shiny is encountered, and 1 if a shiny is encountered
     int find_encounter_grass(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    // Handles the catch logic. Should be updated to throw bait for better catch rates.
-    // Returns true if catch successful. Returns in the overworld.
-    bool attempt_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int& balls_left);
     // Opens the party menu from a given overworld location (safari zone, or the main safari zone building)
     // Checks the last four party slots for held items. Returns true if item detected.
     bool check_for_held_item(ConsoleHandle& console, ProControllerContext& context, bool returned_to_building, int party_count);

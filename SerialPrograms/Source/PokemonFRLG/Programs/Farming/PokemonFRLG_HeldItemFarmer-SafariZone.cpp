@@ -27,6 +27,9 @@
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_HeldItemFarmer-SafariZone.h"
 #include "Common/Cpp/Exceptions.h"
+#include "PokemonFRLG/Programs/PokemonFRLG_SafariOptimalAction.h"
+#include "PokemonFRLG/Programs/PokemonFRLG_BattleMenuNavigation.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -81,11 +84,8 @@ std::unique_ptr<StatsTracker> HeldItemFarmerSafariZone_Descriptor::make_stats() 
 EnumDropdownDatabase<HeldItemFarmerSafariZone::ItemToFarm> HeldItemFarmerSafariZone::item_to_farm_options(){
     EnumDropdownDatabase<ItemToFarm> options{
         {ItemToFarm::LUCKY_EGG, "Lucky Egg", "Farm Chansey for Lucky Eggs."},
+        {ItemToFarm::DRAGON_FANG, "Dragon Fang", "Farm Dragonair for Dragon Fangs."}
     };
-
-    if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
-        options.add(ItemToFarm::DRAGON_FANG, "Dragon Fang", "Farm Dragonair for Dragon Fangs.", true);
-    }
 
     return options;
 }
@@ -389,116 +389,6 @@ bool HeldItemFarmerSafariZone::is_dragonair(SingleSwitchProgramEnvironment& env,
     return encounter.name == "dragonair";
 }
 
-bool HeldItemFarmerSafariZone::attempt_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int& balls_left){
-    //TODO: Optimal bait/ball throwing
-    int distraction_thrown = 0;
-    while (true){
-        BattleSelectionArrowWatcher nickname_question_arrow(
-            COLOR_RED,
-            &env.console.overlay(),
-            BattleConfirmationOption::YES
-        );
-
-        BattleSelectionArrowWatcher ball_arrow(
-            COLOR_RED,
-            &env.console.overlay(),
-            SafariBattleMenuOption::BALL
-        );
-
-        BattleSelectionArrowWatcher bait_arrow(
-            COLOR_RED,
-            &env.console.overlay(),
-            SafariBattleMenuOption::BAIT
-        );
-
-        BlackScreenWatcher battle_end(COLOR_RED);
-
-        AdvanceBattleDialogWatcher advance_battle_dialog(COLOR_RED);
-
-        PokedexRegisteredWatcher pokedex_registered(COLOR_RED, &env.console.overlay());
-
-        WhiteDialogWatcher in_safari_zone_building(COLOR_RED);
-
-        WallClock start = current_time();
-        while (true){
-            if (current_time() - start > std::chrono::seconds(20)){
-                env.log("No battle activity detected for 20 seconds. Assuming battle ended and in the overworld.");
-
-                //Check for safari zone building dialog?
-
-                return false;
-            }
-
-            int ret = wait_until(
-                env.console, context,
-                std::chrono::milliseconds(2000),
-                { nickname_question_arrow, ball_arrow, battle_end, advance_battle_dialog, bait_arrow }
-            );
-
-            context.wait_for_all_requests();
-
-            if (ret == 0 || ret == 3){
-                env.log("Pokemon Caught!");
-
-                while (true){
-                    int ret2 = wait_until(
-                        env.console, context,
-                        std::chrono::milliseconds(2000),
-                        { nickname_question_arrow, advance_battle_dialog, pokedex_registered, in_safari_zone_building }
-                    );
-
-                    if (ret2 == 0 || ret2 == 3){
-                        pbf_mash_button(context, BUTTON_B, 2000ms);
-                        context.wait_for_all_requests();
-                        break;
-                    }
-                    else if (ret2 == 1 || ret2 == 2){
-                        pbf_press_button(context, BUTTON_B, 200ms, 0ms);
-                        context.wait_for_all_requests();
-                    }
-                }
-
-                pbf_mash_button(context, BUTTON_B, 1500ms);
-                context.wait_for_all_requests();
-                return true;
-            }else if (ret == 1){
-                if (distraction_thrown < 2){
-                    env.log("Throwing distraction.");
-                    pbf_press_dpad(context, DPAD_RIGHT, 200ms, 200ms);
-                    pbf_press_button(context, BUTTON_A, 200ms, 200ms);
-                    distraction_thrown++;
-                    break;
-                }
-
-                balls_left--;
-                env.log("Detected battle arrow. Balls left: " + std::to_string(balls_left));
-                pbf_press_button(context, BUTTON_A, 200ms, 200ms);
-                context.wait_for_all_requests();
-                break;
-            }else if (ret == 2){
-                env.log("Failed to catch pokemon.");
-                pbf_wait(context, 1000ms);
-                context.wait_for_all_requests();
-                return false;
-            } else if (ret == 4){
-                if (distraction_thrown < 2){
-                    env.log("Throwing bait...");
-                    pbf_press_button(context, BUTTON_A, 200ms, 200ms);
-                    distraction_thrown++;
-                    break;
-                }
-                env.log("Navigating to ball.");
-                balls_left--;
-                env.log("Balls left: " + std::to_string(balls_left));
-                pbf_press_dpad(context, DPAD_LEFT, 200ms, 200ms);
-                pbf_press_button(context, BUTTON_A, 200ms, 200ms);
-                context.wait_for_all_requests();
-                break;
-            }
-        }
-    }
-}
-
 bool HeldItemFarmerSafariZone::check_for_held_item(ConsoleHandle& console, ProControllerContext& context, bool returned_to_building, int party_count){
     if (returned_to_building){
         open_party_menu_from_overworld(console, context, StartMenuContext::STANDARD);
@@ -577,9 +467,21 @@ bool HeldItemFarmerSafariZone::run_safari_zone(SingleSwitchProgramEnvironment& e
         stats.target_pokemon_found++;
         env.update_stats();
 
-        bool caught = attempt_catch(env, context, balls_left);
+        std::string encounter_name = (ITEM_TO_FARM == ItemToFarm::LUCKY_EGG) ? "chansey" : "dragonair";
 
-        if (caught){
+        int catch_result = auto_catch_safari(env.console, context, LANGUAGE, balls_left, encounter_name);
+
+        bool caught = false;
+        if (catch_result < 0){
+            stats.errors++;
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "auto_catch_safari() encountered an error.",
+                env.console
+            );
+        } else if (catch_result == 1){
+            env.log("Target Pokemon caught!");
+            caught = true;
             stats.target_pokemon_caught++;
             env.update_stats();
             party_count++;
