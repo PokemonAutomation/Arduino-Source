@@ -111,10 +111,10 @@ bool image_validation(const ImageViewRGB32& image){
     if (width * height < 100){
         return false;
     }
-    if (width > 2 * height){
+    if (width > 3 * height){
         return false;
     }
-    if (height > 2 * width){
+    if (height > 3 * width){
         return false;
     }
     ImageStats stats = image_stats(image);
