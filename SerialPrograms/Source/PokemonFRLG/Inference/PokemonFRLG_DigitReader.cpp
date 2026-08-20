@@ -63,9 +63,18 @@ ImageRGB32 preprocess_for_ocr(
 
     // Step 0: Rescale the image to match the expected height at 1080p
     // so that the Gaussian blur size works across resolutions
-    double scale_factor = image.height() / 69; 
-    int new_w = static_cast<int>((image.width()) * scale_factor);
-    int new_h = static_cast<int>((image.height()) * scale_factor);
+    constexpr int expected_height = 69;
+
+    double scale_factor = static_cast<double>(expected_height) / static_cast<double>(image.height());
+
+    int new_w = std::max(
+        1, cvRound(static_cast<int>(image.width() * scale_factor))
+    );
+
+    int new_h = std::max(
+        1, cvRound(static_cast<int>(image.height() * scale_factor))
+    );
+
     cv::Mat rescaled;
     cv::resize(
         src, rescaled, cv::Size(new_w, new_h), 0, 0,
