@@ -678,6 +678,7 @@ if (WIN32)
                 TARGET SerialPrograms POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E echo "[Deploy] Running windeployqt"
                 COMMAND "${WINDEPLOYQT_EXECUTABLE}"
+                    --qmldir "${CMAKE_CURRENT_SOURCE_DIR}/Source/CommonFramework/VideoPipeline/Backends"
                     --dir "${WIN_DEPLOY_DIR}"
                     $<IF:$<CONFIG:Debug>,--debug,--release>
                     $<TARGET_FILE:SerialPrograms>
@@ -702,7 +703,6 @@ if (WIN32)
         COMMAND ${CMAKE_COMMAND} -E make_directory "${_local_qml_dest_dir}"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${_qt_qml_source_dir}" "${_local_qml_dest_dir}"
         COMMENT "Syncing local dev environment QML bindings..."
-        COMMAND ${WINDEPLOYQT_EXECUTABLE} --qmldir "${CMAKE_CURRENT_SOURCE_DIR}/Source/CommonFramework/VideoPipeline/Backends" "${WIN_DEPLOY_DIR}/${TARGET_NAME}.exe"
     )
 
     # Copy Discord SDK DLL
