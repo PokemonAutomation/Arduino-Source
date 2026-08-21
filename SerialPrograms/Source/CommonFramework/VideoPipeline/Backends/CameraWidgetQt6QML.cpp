@@ -172,16 +172,19 @@ QWidget* CameraVideoSource::make_display_QtWidget(QWidget* parent){
 
     QObject* root = display->rootObject();
     if (root == nullptr){
+        m_logger.log("make_display_QtWidget(): display->rootObject() == nullptr", COLOR_RED);
         return display;
     }
 
     QObject* vo = root->findChild<QObject*>("videoOutput");
     if (vo == nullptr){
+        m_logger.log("make_display_QtWidget(): videoOutput == nullptr", COLOR_RED);
         return display;
     }
 
     QVideoSink* qml_sink = vo->property("videoSink").value<QVideoSink*>();
     if (qml_sink == nullptr){
+        m_logger.log("make_display_QtWidget(): videoSink == nullptr", COLOR_RED);
         return display;
     }
 
