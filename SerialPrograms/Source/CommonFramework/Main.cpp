@@ -88,12 +88,20 @@ FileLogger& global_file_logger(){
 
 
 int run_program(int argc, char *argv[]){
+//    qputenv("QT_RHI_BACKEND", "opengl");
+
 #if defined(__APPLE__)
     Filesystem::set_startup_profile(argc, argv);
     QApplication application(argc, argv);
 #else
     QApplication application(argc, argv);
 #endif
+
+    {
+        QString bin_dir = QCoreApplication::applicationDirPath();
+        QString qml_import_path = QDir(bin_dir).filePath("qml");
+        qputenv("QML_IMPORT_PATH", qml_import_path.toLocal8Bit());
+    }
 
     GlobalOutputRedirector redirect_stdout(std::cout, "stdout", Color());
     GlobalOutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);
