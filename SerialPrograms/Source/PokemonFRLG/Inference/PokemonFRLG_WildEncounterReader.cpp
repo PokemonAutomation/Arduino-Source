@@ -101,9 +101,8 @@ public:
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         const std::vector<std::string> words =
                 parse_words(Filesystem::Path(m_image).stem().string());
-        if (words.size() < 5){
-            return "Error: filename must be "
-                   "<location slug>_<version>_<encounter type>_<language>_<species>.";
+        if (words.size() < 2){
+            return "Error: filename must be <anything>_<language>_<species>.";
         }
 
         std::string language_word = words[words.size() - 2];
@@ -129,7 +128,15 @@ private:
 
 
 void add_tests_WildEncounterReader(UnitTestDatabase& database){
-//    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/route1_eng_pidgey.png");
+    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_chansey.jpg");
+    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_machop.jpg");
+    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_kakuna.jpg");
+    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_ho-oh.jpg");
+    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_heracross.jpg");
+    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_dragonair.jpg");
+    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_articuno.jpg");
+    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/fra_snorlax.jpg");
+    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/dark_eng_chansey.png");
 }
 
 

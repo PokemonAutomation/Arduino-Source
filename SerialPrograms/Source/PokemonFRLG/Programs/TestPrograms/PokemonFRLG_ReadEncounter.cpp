@@ -40,21 +40,8 @@ ReadEncounter::ReadEncounter()
         Pokemon::PokemonNameReader::instance().languages(),
         LockMode::LOCK_WHILE_RUNNING, true
     )
-    , SUBSET(
-        "<b>Possible Encounters:</b>",
-        {
-            {Subset::route1, "route1", "Route 1 (Pidgey / Rattata)"},
-            {Subset::route22, "route22", "Route 22 (Rattata / Spearow / Mankey"},
-            {Subset::viridianforest, "viridianforest", "Viridian Forest (Caterpie / Metapod / Weedle / Kakuna / Pikachu)"},
-            {Subset::rocktunnel, "rocktunnel", "Rock Tunnel (Geodude / Machop / Mankey / Onix / Zubat)"},
-            {Subset::pokemontower, "pokemontower", "Pokemon Tower (Gastly, Haunter, Cubone)"},
-        },
-        LockMode::LOCK_WHILE_RUNNING,
-        Subset::route1
-    )
 {
     PA_ADD_OPTION(LANGUAGE);
-    PA_ADD_OPTION(SUBSET);
 }
 
 void ReadEncounter::program(
@@ -65,34 +52,13 @@ void ReadEncounter::program(
         "Starting Read Encounter program..."
     );
 
-    std::set<std::string> subset;
-    switch (SUBSET){
-    case Subset::route1:
-        subset = std::set<std::string>{"pidgey","rattata"};
-        break;
-    case Subset::route22:
-        subset = std::set<std::string>{"rattata", "spearow", "mankey"};
-        break;
-    case Subset::viridianforest:
-        subset = std::set<std::string>{"caterpie", "metapod", "weedle", "kakuna", "pikachu"};
-        break;
-    case Subset::rocktunnel:
-        subset = std::set<std::string>{"geodude", "zubat", "mankey", "machop", "onix"};
-        break;
-    case Subset::pokemontower:
-        subset = std::set<std::string>{"gastly", "haunter", "cubone"};
-        break;
-    default:
-        subset = std::set<std::string>{};
-    }
-
     WildEncounterReader reader(COLOR_RED);
     VideoOverlaySet overlays(env.console.overlay());
     reader.make_overlays(overlays);
 
     env.log("Reading name and level...");
     VideoSnapshot screen = env.console.video().snapshot();
-    PokemonFRLG_WildEncounter encounter = reader.read_encounter(env.logger(), LANGUAGE, screen, subset);
+    PokemonFRLG_WildEncounter encounter = reader.read_encounter(env.logger(), LANGUAGE, screen, {});
 
     env.log("Name: " + encounter.name);
 
