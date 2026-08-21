@@ -1,4 +1,4 @@
-/*  Camera Widget (Qt6 OpenGL)
+/*  Camera Widget (Qt6 QML)
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -15,10 +15,9 @@
 #include "MediaServicesQt6.h"
 #include "CameraWidgetQt6QML.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace CameraQt6QML{
@@ -169,7 +168,7 @@ void CameraVideoSource::init(
 
 
 QWidget* CameraVideoSource::make_display_QtWidget(QWidget* parent){
-    CameraVideoDisplay* display = new CameraVideoDisplay(parent, *this);
+    CameraVideoDisplay* display = new CameraVideoDisplay(parent);
 
     QObject* root = display->rootObject();
     if (root == nullptr){
@@ -214,9 +213,8 @@ QWidget* CameraVideoSource::make_display_QtWidget(QWidget* parent){
 
 CameraVideoDisplay::~CameraVideoDisplay(){
 }
-CameraVideoDisplay::CameraVideoDisplay(QWidget* parent, CameraVideoSource& source)
+CameraVideoDisplay::CameraVideoDisplay(QWidget* parent)
     : QQuickWidget(parent)
-    , m_source(source)
     , m_sanitizer("CameraVideoDisplay")
 {
     this->setMinimumSize(80, 45);

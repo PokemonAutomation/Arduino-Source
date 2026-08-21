@@ -688,7 +688,21 @@ if (WIN32)
         endif()
     else()
         add_custom_target(run_windeployqt COMMENT "Skipping windeployqt (CI environment)")
+
     endif()
+
+    # Copy QML library dependencies.
+    get_target_property(_qt_widgets_location Qt6::Widgets LOCATION)
+    get_filename_component(_qt_bin_dir "${_qt_widgets_location}" DIRECTORY)
+    set(_qt_qml_source_dir "${_qt_bin_dir}/../qml/QtMultimedia")
+    set(_local_qml_dest_dir "${WIN_DEPLOY_DIR}/qml/QtMultimedia")
+    add_custom_command(
+        TARGET SerialPrograms POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "[Deploy-Local] Auto-copying QML Multimedia modules from ${_qt_qml_source_dir}"
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${_local_qml_dest_dir}"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${_qt_qml_source_dir}" "${_local_qml_dest_dir}"
+        COMMENT "Syncing local dev environment QML bindings..."
+    )
 
     # Copy Discord SDK DLL
     add_custom_command(

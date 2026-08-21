@@ -119,10 +119,9 @@ private:
 class CameraVideoDisplay : public QQuickWidget{
 public:
     virtual ~CameraVideoDisplay();
-    CameraVideoDisplay(QWidget* parent, CameraVideoSource& source);
+    CameraVideoDisplay(QWidget* parent);
 
 private:
-    CameraVideoSource& m_source;
     LifetimeSanitizer m_sanitizer;
 };
 
