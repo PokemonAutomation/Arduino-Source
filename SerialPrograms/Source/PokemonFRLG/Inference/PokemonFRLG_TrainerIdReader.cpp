@@ -15,9 +15,15 @@
 #include "CommonTools/Images/ImageManip.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "CommonTools/OCR/OCR_Routines.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
+#include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "PokemonFRLG/PokemonFRLG_Settings.h"
+#include "PokemonFRLG/PokemonFRLG_Tests.h"
+#include "Tests/TestUtils.h"
 #include "PokemonFRLG_DigitReader.h"
 #include <opencv2/imgproc.hpp>
+#include <sstream>
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {
@@ -47,6 +53,49 @@ uint16_t TrainerIdReader::read_tid(
     // against the PokemonFRLG/Digits/0-9.png templates.
     return uint16_t(read_digits_waterfill_template(logger, tid_region));
 }
+
+
+class Test_TrainerIdReader : public UnitTest{
+public:
+    Test_TrainerIdReader(const std::string& image)
+        : UnitTest("PokemonFRLG::TrainerIdReader - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        const std::vector<std::string> words =
+                parse_words(Filesystem::Path(m_image).stem().string());
+        if (words.size() < 2){
+            return "Error: filename must be <anything>_<language code>_<trainer id>.";
+        }
+
+        const std::string& language_word = words[words.size() - 2];
+        Language language = language_code_to_enum(language_word);
+        if (language == Language::None || language == Language::EndOfList){
+            return "Error: invalid language word in filename: " + language_word;
+        }
+        int target_tid = 0;
+        if (!parse_int(words.back(), target_tid)){
+            return "Error: filename must end with the trainer ID: " + words.back();
+        }
+
+        ImageRGB32 image(m_image);
+        TrainerIdReader reader;
+        int tid = reader.read_tid(logger, language, image);
+
+        TEST_RESULT_COMPONENT_EQUAL_STR(tid, target_tid, "trainer id");
+        return true;
+    };
+
+private:
+    std::string m_image;
+};
+
+
+void add_tests_TrainerIdReader(UnitTestDatabase& database){
+//    database.add<Test_TrainerIdReader>("PokemonFRLG/TrainerIdReader/trainer_card_eng_23456.png");
+}
+
 
 } // namespace PokemonFRLG
 } // namespace NintendoSwitch

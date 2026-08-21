@@ -16,9 +16,17 @@
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
+#include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG_OcrPreprocessing.h"
+#include "PokemonFRLG/PokemonFRLG_Tests.h"
+#include "PokemonFRLG/Programs/RngManipulation/PokemonFRLG_EncountersDatabase.h"
+#include "Tests/TestUtils.h"
+#include "PokemonFRLG_DigitReader.h"
 #include <opencv2/imgproc.hpp>
+#include <sstream>
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {
@@ -56,10 +64,19 @@ PokemonFRLG_WildEncounter WildEncounterReader::read_encounter(
     //  font, then let the matcher try each threshold in turn.
     ImageRGB32 name_ready = preprocess_for_ocr(name_box);
 
-    auto name_result = Pokemon::PokemonNameReader(subset).read_substring(
+    OCR::StringMatchResult name_result;
+    if (subset.size() == 0){
+        name_result = Pokemon::PokemonNameReader::instance().read_substring(
             logger, language, name_ready,
             DARK_TEXT_FILTERS(),
             0.01, 0.50, max_log10p);
+    }else{
+        name_result = Pokemon::PokemonNameReader(subset).read_substring(
+            logger, language, name_ready,
+            DARK_TEXT_FILTERS(),
+            0.01, 0.50, max_log10p);
+    }
+   
     if (!name_result.results.empty()){
         encounter.name = name_result.results.begin()->second.token;
     }else{
@@ -72,6 +89,49 @@ PokemonFRLG_WildEncounter WildEncounterReader::read_encounter(
     }
     return encounter;
 }
+
+
+class Test_WildEncounterReader : public UnitTest{
+public:
+    Test_WildEncounterReader(const std::string& image)
+        : UnitTest("PokemonFRLG::WildEncounterReader - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        const std::vector<std::string> words =
+                parse_words(Filesystem::Path(m_image).stem().string());
+        if (words.size() < 5){
+            return "Error: filename must be "
+                   "<location slug>_<version>_<encounter type>_<language>_<species>.";
+        }
+
+        std::string language_word = words[words.size() - 2];
+        const std::string& target_species = words[words.size() - 1];
+
+        Language language = language_code_to_enum(language_word);
+        if (language == Language::None || language == Language::EndOfList){
+            return "Error: invalid language word in filename: " + language_word;
+        }
+
+        ImageRGB32 image(m_image);
+        WildEncounterReader reader;
+        PokemonFRLG_WildEncounter encounter =
+                reader.read_encounter(logger, language, image, {});
+
+        TEST_RESULT_COMPONENT_EQUAL_STR(encounter.name, target_species, "species");
+        return true;
+    };
+
+private:
+    std::string m_image;
+};
+
+
+void add_tests_WildEncounterReader(UnitTestDatabase& database){
+//    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/route1_eng_pidgey.png");
+}
+
 
 } // namespace PokemonFRLG
 } // namespace NintendoSwitch

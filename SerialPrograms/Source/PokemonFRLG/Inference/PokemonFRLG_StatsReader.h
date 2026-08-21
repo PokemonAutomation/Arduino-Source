@@ -10,6 +10,7 @@
 #include <optional>
 #include <string>
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Language.h"
 
@@ -119,6 +120,9 @@ private:
     );
 
 };
+
+
+void add_tests_StatsReader(UnitTestDatabase& database);
 
 } // namespace PokemonFRLG
 } // namespace NintendoSwitch
