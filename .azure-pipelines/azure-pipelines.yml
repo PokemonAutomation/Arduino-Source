@@ -156,7 +156,7 @@ stages:
           $BUILD_CACHE = "$BUILD_DIR/cache-build/Binaries64"
           $SYMBOLS_CACHE = "$BUILD_DIR/cache-symbols"
           New-Item -ItemType Directory -Force -Path $BUILD_CACHE | Out-Null
-          & "C:/Qt/$(qt_version)/msvc2022_64/bin/windeployqt.exe" --dir "$BUILD_CACHE" --qmldir "$BUILD_DIR/qml" --release "$APP_EXE"
+          & "C:/Qt/$(qt_version)/msvc2022_64/bin/windeployqt.exe" --dir "$BUILD_CACHE" --release "$APP_EXE"
           New-Item -ItemType Directory -Force -Path $SYMBOLS_CACHE | Out-Null
 
           Write-Host "=== windeployqt complete ==="
@@ -178,6 +178,7 @@ stages:
 
           Invoke-Robocopy $PACKAGES_DIR/Resources $BUILD_DIR/cache-build/Resources /s
           Invoke-Robocopy $PACKAGES_DIR/Firmware  $BUILD_DIR/cache-build/Firmware  /s
+          Invoke-Robocopy $BUILD_DIR/qml          $BINARIES_DIR/qml                /s
           Invoke-Robocopy $BUILD_DIR              $BINARIES_DIR                    *.dll
           Invoke-Robocopy $BUILD_DIR              $BINARIES_DIR                    SerialPrograms.exe
           Invoke-Robocopy $BUILD_DIR              $BUILD_DIR/cache-symbols/        SerialPrograms.pdb
