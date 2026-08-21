@@ -702,6 +702,7 @@ if (WIN32)
         COMMAND ${CMAKE_COMMAND} -E make_directory "${_local_qml_dest_dir}"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${_qt_qml_source_dir}" "${_local_qml_dest_dir}"
         COMMENT "Syncing local dev environment QML bindings..."
+        COMMAND ${WIN_DEPLOY_QT} --qmldir "${CMAKE_CURRENT_SOURCE_DIR}/Source/CommonFramework/VideoPipeline/Backends" "${WIN_DEPLOY_DIR}/${TARGET_NAME}.exe"
     )
 
     # Copy Discord SDK DLL
@@ -776,6 +777,10 @@ if (WIN32)
 endif() # end WIN32
 
 set_target_properties(SerialPrograms PROPERTIES QT_QML_IMPORT_DEPENDENCIES "QtMultimedia")
+set_target_properties(SerialPrograms PROPERTIES
+    QT_QML_IMPORT_DEPENDENCIES "QtMultimedia"
+    QT_QML_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Source/CommonFramework/VideoPipeline/Backends"
+)
 
 if (QT_MAJOR GREATER_EQUAL 6)
     qt_finalize_target(SerialPrograms)

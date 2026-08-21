@@ -90,6 +90,9 @@ FileLogger& global_file_logger(){
 int run_program(int argc, char *argv[]){
 //    qputenv("QT_RHI_BACKEND", "opengl");
 
+//    qputenv("QT_MULTIMEDIA_FORCE_MEDIATYPE", "1");
+//    qputenv("MF_LOW_LATENCY", "1");
+
 #if defined(__APPLE__)
     Filesystem::set_startup_profile(argc, argv);
     QApplication application(argc, argv);
