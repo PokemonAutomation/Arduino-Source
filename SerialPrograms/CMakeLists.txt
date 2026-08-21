@@ -78,10 +78,28 @@ if(WIN32 AND QT_DEPLOY_FILES)
     if(QT_CANDIDATE_DIR AND EXISTS "${QT_CANDIDATE_DIR}")
         message(STATUS "Using preferred Qt directory for Qt${QT_MAJOR} ${PREFERRED_QT_VER}: ${QT_CANDIDATE_DIR}")
         list(APPEND CMAKE_PREFIX_PATH "${QT_CANDIDATE_DIR}")
-        find_package(Qt${QT_MAJOR} ${PREFERRED_QT_VER} COMPONENTS Widgets SerialPort Multimedia MultimediaWidgets REQUIRED)
+        find_package(Qt${QT_MAJOR} ${PREFERRED_QT_VER} REQUIRED COMPONENTS
+            Widgets
+            SerialPort
+            Multimedia
+            MultimediaWidgets
+            OpenGLWidgets
+            Qml
+            Quick
+            QuickWidgets
+        )
     else()
         # Find all subdirectories in the Qt base directory
-        find_package(Qt${QT_MAJOR} COMPONENTS Widgets SerialPort Multimedia MultimediaWidgets REQUIRED)
+        find_package(Qt${QT_MAJOR} REQUIRED COMPONENTS
+            Widgets
+            SerialPort
+            Multimedia
+            MultimediaWidgets
+            OpenGLWidgets
+            Qml
+            Quick
+            QuickWidgets
+        )
         file(GLOB QT_SUBDIRS LIST_DIRECTORIES true "${QT_BASE_DIR}/${QT_MAJOR}*")
 
         # Filter and sort the directories to find the latest version
@@ -109,7 +127,16 @@ if(WIN32 AND QT_DEPLOY_FILES)
         REQUIRED
     )
 else()
-    find_package(Qt${QT_MAJOR} COMPONENTS Widgets SerialPort Multimedia MultimediaWidgets REQUIRED)
+    find_package(Qt${QT_MAJOR} REQUIRED COMPONENTS
+        Widgets
+        SerialPort
+        Multimedia
+        MultimediaWidgets
+        OpenGLWidgets
+        Qml
+        Quick
+        QuickWidgets
+    )
 endif()
 
 # disable deprecated Qt APIs
@@ -188,7 +215,16 @@ endif()
 # Function to apply common properties to both library and executable targets
 function(apply_common_target_properties target_name)
     set_target_properties(${target_name} PROPERTIES LINKER_LANGUAGE CXX)
-    target_link_libraries(${target_name} PRIVATE Qt${QT_MAJOR}::Widgets Qt${QT_MAJOR}::SerialPort Qt${QT_MAJOR}::Multimedia Qt${QT_MAJOR}::MultimediaWidgets)
+    target_link_libraries(${target_name} PRIVATE
+        Qt${QT_MAJOR}::Widgets
+        Qt${QT_MAJOR}::SerialPort
+        Qt${QT_MAJOR}::Multimedia
+        Qt${QT_MAJOR}::MultimediaWidgets
+        Qt${QT_MAJOR}::OpenGLWidgets
+        Qt${QT_MAJOR}::Qml
+        Qt${QT_MAJOR}::Quick
+        Qt${QT_MAJOR}::QuickWidgets
+    )
     target_link_libraries(${target_name} PRIVATE Threads::Threads)
 
     #add defines
@@ -724,6 +760,8 @@ if (WIN32)
         VERBATIM
     )
 endif() # end WIN32
+
+set_target_properties(SerialPrograms PROPERTIES QT_QML_IMPORT_DEPENDENCIES "QtMultimedia")
 
 if (QT_MAJOR GREATER_EQUAL 6)
     qt_finalize_target(SerialPrograms)

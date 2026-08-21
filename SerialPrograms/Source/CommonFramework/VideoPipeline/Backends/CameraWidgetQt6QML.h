@@ -1,16 +1,18 @@
-/*  Camera Widget (Qt6)
+/*  Camera Widget (Qt6 OpenGL)
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_VideoPipeline_Qt6VideoWidget_H
-#define PokemonAutomation_VideoPipeline_Qt6VideoWidget_H
+#ifndef PokemonAutomation_VideoPipeline_Qt6OpenGL_H
+#define PokemonAutomation_VideoPipeline_Qt6OpenGL_H
 
 #include <QWidget>
+#include <QVideoWidget>
 #include <QCameraDevice>
 #include <QMediaCaptureSession>
 #include <QVideoFrame>
+#include <QQuickWidget>
 #include "CommonFramework/Tools/StatAccumulator.h"
 #include "CommonFramework/VideoPipeline/VideoSource.h"
 #include "CommonFramework/VideoPipeline/CameraInfo.h"
@@ -23,7 +25,7 @@ class QCamera;
 class QVideoSink;
 
 namespace PokemonAutomation{
-namespace CameraQt6QVideoSink{
+namespace CameraQt6QML{
 
 
 class CameraBackend : public PokemonAutomation::CameraBackend{
@@ -113,19 +115,14 @@ private:
 };
 
 
-class CameraVideoDisplay : public QWidget, private VideoFrameListener{
+
+class CameraVideoDisplay : public QQuickWidget{
 public:
-    ~CameraVideoDisplay();
+    virtual ~CameraVideoDisplay();
     CameraVideoDisplay(QWidget* parent, CameraVideoSource& source);
 
 private:
-    virtual void on_frame(std::shared_ptr<const VideoFrame> frame) override;
-    virtual void paintEvent(QPaintEvent* event) override;
-
-private:
     CameraVideoSource& m_source;
-    std::shared_ptr<const VideoFrame> m_last_frame;
-
     LifetimeSanitizer m_sanitizer;
 };
 

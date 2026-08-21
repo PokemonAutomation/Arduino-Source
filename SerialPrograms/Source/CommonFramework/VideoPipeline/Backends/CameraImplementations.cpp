@@ -19,6 +19,7 @@
 #include "CameraWidgetQt6.h"
 #if QT_VERSION_MINOR >= 5
 #include "CameraWidgetQt6.5.h"
+#include "CameraWidgetQt6QML.h"
 #endif
 #endif
 
@@ -60,6 +61,12 @@ struct CameraBackends{
         m_backends.emplace_back(
             "qt6.5-QGraphicsScene", "Qt6.5: QGraphicsScene",
             std::make_unique<CameraQt65QMediaCaptureSession::CameraBackend>()
+        );
+#endif
+#if QT_VERSION_MAJOR == 6
+        m_backends.emplace_back(
+            "qt6-QQuickWidget", "Qt6: QML QQuickWidget",
+            std::make_unique<CameraQt6QML::CameraBackend>()
         );
 #endif
 
