@@ -1599,6 +1599,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Inference/PokemonFRLG_DaycareManDetector.h
     Source/PokemonFRLG/Inference/PokemonFRLG_DigitReader.cpp
     Source/PokemonFRLG/Inference/PokemonFRLG_DigitReader.h
+    Source/PokemonFRLG/Inference/PokemonFRLG_OcrPreprocessing.cpp
+    Source/PokemonFRLG/Inference/PokemonFRLG_OcrPreprocessing.h
     Source/PokemonFRLG/Inference/PokemonFRLG_StatsReader.cpp
     Source/PokemonFRLG/Inference/PokemonFRLG_StatsReader.h
     Source/PokemonFRLG/Inference/PokemonFRLG_PokemonSpriteReader.cpp

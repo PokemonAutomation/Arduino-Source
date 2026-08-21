@@ -43,23 +43,9 @@ uint16_t TrainerIdReader::read_tid(
     
     ImageViewRGB32 tid_region = extract_box_reference(game_screen, language == Language::Japanese ? m_box_tid_jpn : m_box_tid);
 
-    if (GlobalSettings::instance().OCR_LIBRARY != OcrLibrary::PADDLE_OCR){
-        // Tesseract-free path: waterfill segmentation + template matching
-        // against the PokemonFRLG/Digits/0-9.png templates.
-        return uint16_t(read_digits_waterfill_template(logger, tid_region));
-    }
-
-    // PaddleOCR path (original): preprocess then per-digit waterfill OCR.
-    ImageRGB32 ocr_ready = preprocess_for_ocr(
-        tid_region, "TID", 7, 2, true,
-        combine_rgb(0, 0, 0), combine_rgb(190, 190, 190)
-    );
-
-    // Waterfill isolates each digit -> per-char SINGLE_CHAR OCR.
-    return uint16_t(OCR::read_number_waterfill(
-        logger, ocr_ready, 0xff000000,
-        0xff808080
-    ));
+    // waterfill segmentation + template matching
+    // against the PokemonFRLG/Digits/0-9.png templates.
+    return uint16_t(read_digits_waterfill_template(logger, tid_region));
 }
 
 } // namespace PokemonFRLG
