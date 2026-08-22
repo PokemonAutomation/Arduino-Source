@@ -2,6 +2,9 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
+ *  Intercept video frames and directly paint them to the screen.
+ *  There is no hardware acceleration.
+ *
  */
 
 #ifndef PokemonAutomation_VideoPipeline_Qt6VideoWidget_H

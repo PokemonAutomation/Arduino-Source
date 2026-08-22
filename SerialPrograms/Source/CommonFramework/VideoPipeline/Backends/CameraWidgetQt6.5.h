@@ -2,6 +2,11 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
+ *  Use QGraphicsScene to display the video.
+ *
+ *  This is a failed attempt to get hardware acceleration.
+ *  QGraphicsScene does not do hardware acceleration.
+ *
  */
 
 #ifndef PokemonAutomation_VideoPipeline_Qt65VideoWidget_H
