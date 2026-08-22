@@ -18,6 +18,7 @@
 #include "CameraWidgetQt6.h"
 #include "CameraWidgetQt6.5.h"
 #include "CameraWidgetQt6_QQuickWidget.h"
+#include "CameraWidgetQt6_QQuickView.h"
 
 
 namespace PokemonAutomation{
@@ -59,6 +60,10 @@ struct CameraBackends{
             m_backends.emplace_back(
                 "qt6-QQuickWidget", "Qt6: QQuickWidget",
                 std::make_unique<CameraQt6_QQuickWidget::CameraBackend>()
+            );
+            m_backends.emplace_back(
+                "qt6-QQuickView", "Qt6: QQuickView",
+                std::make_unique<CameraQt6_QQuickView::CameraBackend>()
             );
         }
 
