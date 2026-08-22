@@ -52,26 +52,22 @@ struct CameraBackends{
     }
 
     CameraBackends(){
-#if QT_VERSION_MAJOR == 6
         m_backends.emplace_back(
             "qt6-QVideoSink", "Qt6: QVideoSink",
             std::make_unique<CameraQt6QVideoSink::CameraBackend>()
         );
-#endif
-#if QT_VERSION_MAJOR == 6 && QT_VERSION_MINOR >= 5
+#if QT_VERSION_MAJOR > 6 || (QT_VERSION_MAJOR == 6 && QT_VERSION_MINOR >= 5)
         m_backends.emplace_back(
             "qt6.5-QGraphicsScene", "Qt6.5: QGraphicsScene",
             std::make_unique<CameraQt65QMediaCaptureSession::CameraBackend>()
         );
 #endif
-#if QT_VERSION_MAJOR == 6
         if (STATIC_GLOBALS.DEVELOPER_MODE){
             m_backends.emplace_back(
                 "qt6-QQuickWidget", "Qt6: QQuickWidget",
                 std::make_unique<CameraQt6_QQuickWidget::CameraBackend>()
             );
         }
-#endif
 
         size_t items = 0;
         for (const auto& item : m_backends){

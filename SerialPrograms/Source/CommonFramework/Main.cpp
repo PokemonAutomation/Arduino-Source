@@ -147,14 +147,6 @@ int run_program(int argc, char *argv[]){
         GlobalMediaServices::instance().stop();
     });
 
-    //  Preload a bunch of stuff now so they are ready later.
-    SerialPortPoller::instance().ports();
-    get_all_cameras();
-
-    //  Force all the Qt thread pools to be constructed now on the main thread.
-    GlobalThreadPools::qt_worker_threadpool();
-    GlobalThreadPools::qt_event_threadpool();
-
     //  Several novice developers struggled to build and run the program due to missing Resources folder.
     //  Add this check to pop a message box when Resources folder is missing.
     if (!check_resource_folder(logger)){
@@ -177,6 +169,14 @@ int run_program(int argc, char *argv[]){
     }catch (const ParseException& error){
         logger.log(error.message(), COLOR_RED);
     }
+
+    //  Preload a bunch of stuff now so they are ready later.
+    SerialPortPoller::instance().ports();
+    get_all_cameras();
+
+    //  Force all the Qt thread pools to be constructed now on the main thread.
+    GlobalThreadPools::qt_worker_threadpool();
+    GlobalThreadPools::qt_event_threadpool();
 
     for (size_t i = 0; i < argc; i++){
         constexpr const char* force_run_tests = "--command-line-test-mode";
