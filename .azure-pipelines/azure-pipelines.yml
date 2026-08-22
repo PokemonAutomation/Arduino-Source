@@ -119,7 +119,7 @@ stages:
           qt_version: '6.10.2'
           qt_version_major: '6'
           qt_modules: 'qtserialport qtmultimedia'
-          cmake_preset: 'RelWithDebInfo'
+          cmake_preset: 'Publish'
           cmake_version_params: '-DVERSION_MAJOR=${{ parameters.versionMajor }} -DVERSION_MINOR=${{ parameters.versionMinor }} -DVERSION_PATCH=${{ parameters.versionPatch }} -DIS_BETA=${{ lower(eq(parameters.buildType, ''PrivateBeta'')) }}'
           cmake_additional_param: '-DCMAKE_PREFIX_PATH=C:/Qt/$(qt_version)/msvc2022_64/lib/cmake -DIS_AZURE_BUILD=TRUE'
 
@@ -150,51 +150,7 @@ stages:
         condition: succeeded()
 
       - powershell: |
-          Write-Host "=== Running windeployqt ==="
-          $BUILD_DIR = "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)"
-          $APP_EXE   = "$BUILD_DIR/SerialPrograms.exe"
-          $BUILD_CACHE = "$BUILD_DIR/cache-build/Binaries64"
-          $SYMBOLS_CACHE = "$BUILD_DIR/cache-symbols"
-          New-Item -ItemType Directory -Force -Path $BUILD_CACHE | Out-Null
-          & "C:/Qt/$(qt_version)/msvc2022_64/bin/windeployqt.exe" --dir "$BUILD_CACHE" --release "$APP_EXE"
-          New-Item -ItemType Directory -Force -Path $SYMBOLS_CACHE | Out-Null
-
-          Write-Host "=== windeployqt complete ==="
-        displayName: 'Deploy app'
-        condition: succeeded()
-
-      - powershell: |
-          echo "=== Copying resources==="
-          $PACKAGES_DIR = "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/Packages" 
-          $BUILD_DIR = "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)"
-          $BINARIES_DIR = "$BUILD_DIR/cache-build/Binaries64"
-
-          function Invoke-Robocopy {
-              robocopy @args
-              if ($LASTEXITCODE -ge 8) {
-                  throw "Robocopy failed with exit code: $LASTEXITCODE"
-              }
-          }
-
-          Invoke-Robocopy $PACKAGES_DIR/Resources $BUILD_DIR/cache-build/Resources /s
-          Invoke-Robocopy $PACKAGES_DIR/Firmware  $BUILD_DIR/cache-build/Firmware  /s
-          Invoke-Robocopy $BUILD_DIR/qml          $BINARIES_DIR/qml                /s
-          Invoke-Robocopy $BUILD_DIR              $BINARIES_DIR                    *.dll
-          Invoke-Robocopy $BUILD_DIR              $BINARIES_DIR                    SerialPrograms.exe
-          Invoke-Robocopy $BUILD_DIR              $BUILD_DIR/cache-symbols/        SerialPrograms.pdb
-
-          Write-Host "=== Excluding unnecessary files from deployment ==="
-          Remove-Item -Path "$BINARIES_DIR/opencv_world4120d.dll" -ErrorAction SilentlyContinue
-          Remove-Item -Path "$BINARIES_DIR/translations"          -Recurse -Force -ErrorAction SilentlyContinue
-          Remove-Item -Path "$BINARIES_DIR/generic"               -Recurse -Force -ErrorAction SilentlyContinue
-
-          exit 0
-        displayName: 'Copy resources'
-        condition: succeeded()
-
-      - powershell: |
-          $BUILD_DIR = "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)"
-          $BUILD_CACHE = "$BUILD_DIR/cache-build"
+          $BUILD_DIR = "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/Output"
 
           $cmdContent = @'
           cd %~dp0
@@ -218,9 +174,38 @@ stages:
           start "" Binaries64\SerialPrograms.exe
           '@
 
-          Set-Content -Path "$BUILD_CACHE/SerialPrograms-Windows.cmd" -Value $cmdContent -Encoding ASCII
+          Set-Content -Path "$BUILD_DIR/SerialPrograms-Windows.cmd" -Value $cmdContent -Encoding ASCII
           Write-Host "=== Created SerialPrograms-Windows.cmd launcher ==="
         displayName: 'Create launcher script'
+        condition: succeeded()
+
+      - powershell: |
+          echo "=== Cleaning up and moving to build cache ==="
+          $BUILD_DIR = "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/Output"
+          $BUILD_CACHE = "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build"
+          $SYMBOLS_CACHE = "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-symbols"
+
+          New-Item -ItemType Directory -Force -Path $BUILD_CACHE | Out-Null
+          New-Item -ItemType Directory -Force -Path $SYMBOLS_CACHE | Out-Null
+
+          function Invoke-Robocopy {
+              robocopy @args
+              if ($LASTEXITCODE -ge 8) {
+                  throw "Robocopy failed with exit code: $LASTEXITCODE"
+              }
+          }
+
+          Write-Host "=== Excluding unnecessary files from deployment ==="
+          Remove-Item -Path "$BUILD_DIR/Binaries64/opencv_world4120d.dll" -ErrorAction SilentlyContinue
+          Remove-Item -Path "$BUILD_DIR/Binaries64/translations"          -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item -Path "$BUILD_DIR/Binaries64/generic"               -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item -Path "$BUILD_DIR/Scripts"                          -Recurse -Force -ErrorAction SilentlyContinue
+          Invoke-Robocopy    $BUILD_DIR/Binaries64   $SYMBOLS_CACHE        SerialPrograms.pdb
+          Remove-Item -Path "$BUILD_DIR/Binaries64/SerialPrograms.pdb"    -ErrorAction SilentlyContinue
+          Invoke-Robocopy    $BUILD_DIR              $BUILD_CACHE          /s
+
+          exit 0
+        displayName: 'Clean up, move to build cache'
         condition: succeeded()
 
       - powershell: |
@@ -524,7 +509,7 @@ stages:
     versionMajor: ${{ parameters.versionMajor }}
     versionMinor: ${{ parameters.versionMinor }}
     versionPatch: ${{ parameters.versionPatch }}
-    condition: or(eq('${{ parameters.targetOS }}', 'MacOS'), eq('${{ parameters.targetOS }}', 'All'))
+    condition: and(succeeded(), or(eq('${{ parameters.targetOS }}', 'MacOS'), eq('${{ parameters.targetOS }}', 'All')))
 
 - template: templates/macos-build.yml
   parameters:
@@ -548,7 +533,7 @@ stages:
     versionMajor: ${{ parameters.versionMajor }}
     versionMinor: ${{ parameters.versionMinor }}
     versionPatch: ${{ parameters.versionPatch }}
-    condition: or(eq('${{ parameters.targetOS }}', 'MacOS'), eq('${{ parameters.targetOS }}', 'All'))
+    condition: and(succeeded(), or(eq('${{ parameters.targetOS }}', 'MacOS'), eq('${{ parameters.targetOS }}', 'All')))
 
 ##########################################
 #          UPLOAD DEBUG SYMBOLS          #

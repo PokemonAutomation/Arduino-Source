@@ -38,7 +38,7 @@ add_custom_target(build-time-make-directory ALL
 set(REPO_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../")
 
 # Determine environment
-if(DEFINED ENV{GITHUB_ACTIONS} OR DEFINED IS_AZURE_BUILD)
+if(DEFINED ENV{GITHUB_ACTIONS})
     message(STATUS "Detected CI environment, skipping qt deployment")
     set(QT_DEPLOY_FILES FALSE)
 else()
@@ -671,26 +671,6 @@ if (WIN32)
     set(DPP_DEBUG_DLL "${REPO_ROOT_DIR}/3rdPartyBinaries/dpp_debug/dpp.dll")
     set(DPP_RELEASE_DLL "${REPO_ROOT_DIR}/3rdPartyBinaries/dpp_release/dpp.dll")
 
-    if(QT_DEPLOY_FILES)
-        # Run windeployqt if Qt DLLs are missing
-        if(WINDEPLOYQT_EXECUTABLE AND NOT EXISTS "${WIN_DEPLOY_DIR}/Qt6Core.dll")
-            add_custom_command(
-                TARGET SerialPrograms POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E echo "[Deploy] Running windeployqt"
-                COMMAND "${WINDEPLOYQT_EXECUTABLE}"
-                    --dir "${WIN_DEPLOY_DIR}"
-                    $<IF:$<CONFIG:Debug>,--debug,--release>
-                    $<TARGET_FILE:SerialPrograms>
-            )
-            add_custom_target(run_windeployqt DEPENDS $<TARGET_FILE:SerialPrograms>)
-        else()
-            add_custom_target(run_windeployqt COMMENT "Skipping windeployqt (not found)")
-        endif()
-    else()
-        add_custom_target(run_windeployqt COMMENT "Skipping windeployqt (CI environment)")
-
-    endif()
-
     # Copy QML library dependencies.
     get_target_property(_qt_widgets_location Qt6::Widgets LOCATION)
     get_filename_component(_qt_bin_dir "${_qt_widgets_location}" DIRECTORY)
@@ -703,6 +683,26 @@ if (WIN32)
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${_qt_qml_source_dir}" "${_local_qml_dest_dir}"
         COMMENT "Syncing local dev environment QML bindings..."
     )
+
+    if(QT_DEPLOY_FILES)
+        # Run windeployqt if Qt DLLs are missing
+        if(WINDEPLOYQT_EXECUTABLE AND NOT EXISTS "${WIN_DEPLOY_DIR}/Qt6Core.dll")
+            add_custom_command(
+                TARGET SerialPrograms POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E echo "[Deploy] Running windeployqt"
+                COMMAND "${WINDEPLOYQT_EXECUTABLE}"
+                    --dir "${WIN_DEPLOY_DIR}"
+                    $<IF:$<CONFIG:Debug>,--debug,--release>
+                    $<TARGET_FILE:SerialPrograms>
+            )
+            add_custom_target(run_windeployqt DEPENDS $<TARGET_FILE:SerialPrograms> COMMENT "Running windeployqt")
+        else()
+            add_custom_target(run_windeployqt COMMENT "Skipping windeployqt (not found)")
+        endif()
+    else()
+        add_custom_target(run_windeployqt COMMENT "Skipping windeployqt (CI environment)")
+
+    endif()
 
     # Copy Discord SDK DLL
     add_custom_command(
