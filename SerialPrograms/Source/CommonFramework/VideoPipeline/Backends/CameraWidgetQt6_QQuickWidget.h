@@ -1,11 +1,11 @@
-/*  Camera Widget (Qt6 OpenGL)
+/*  Camera Widget (Qt6 QQuickWidget)
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_VideoPipeline_Qt6OpenGL_H
-#define PokemonAutomation_VideoPipeline_Qt6OpenGL_H
+#ifndef PokemonAutomation_VideoPipeline_Qt6_QQuickWidget_H
+#define PokemonAutomation_VideoPipeline_Qt6_QQuickWidget_H
 
 #include <QWidget>
 #include <QVideoWidget>
@@ -25,7 +25,7 @@ class QCamera;
 class QVideoSink;
 
 namespace PokemonAutomation{
-namespace CameraQt6QML{
+namespace CameraQt6_QQuickWidget{
 
 
 class CameraBackend : public PokemonAutomation::CameraBackend{

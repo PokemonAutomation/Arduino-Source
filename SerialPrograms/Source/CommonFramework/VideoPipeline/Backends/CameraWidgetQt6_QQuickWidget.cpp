@@ -1,4 +1,4 @@
-/*  Camera Widget (Qt6 QML)
+/*  Camera Widget (Qt6 QQuickWidget)
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -13,14 +13,14 @@
 #include "VideoFrameQt.h"
 #include "QFormatAggregator.h"
 #include "MediaServicesQt6.h"
-#include "CameraWidgetQt6QML.h"
+#include "CameraWidgetQt6_QQuickWidget.h"
 
 //#include <iostream>
 //using std::cout;
 //using std::endl;
 
 namespace PokemonAutomation{
-namespace CameraQt6QML{
+namespace CameraQt6_QQuickWidget{
 
 
 

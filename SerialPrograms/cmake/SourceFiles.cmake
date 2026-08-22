@@ -574,8 +574,10 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.5.h
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.cpp
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.h
-    Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6QML.cpp
-    Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6QML.h
+    Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6_QQuickView.cpp
+    Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6_QQuickView.h
+    Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6_QQuickWidget.cpp
+    Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6_QQuickWidget.h
     Source/CommonFramework/VideoPipeline/Backends/MediaServicesQt6.cpp
     Source/CommonFramework/VideoPipeline/Backends/MediaServicesQt6.h
     Source/CommonFramework/VideoPipeline/Backends/QCameraThread.h
