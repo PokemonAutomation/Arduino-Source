@@ -1196,22 +1196,102 @@ void heal_at_pokecenter(ConsoleHandle& console, ProControllerContext& context){
     }
 }
 
+// tries to pull up the start menu to check if currently in the overworld
+bool in_overworld(
+    ConsoleHandle& console,
+    ProControllerContext& context
+){
+    StartMenuWatcher start_menu;
+    context.wait_for_all_requests();
+    int ret = run_until<ProControllerContext>(
+        console, context,
+        [](ProControllerContext& context) {
+            for (int i = 0; i < 3; i++){
+                pbf_press_button(context, BUTTON_PLUS, 200ms, 1800ms);
+                pbf_mash_button(context, BUTTON_B, 500ms);
+            }
+        },
+        { start_menu }
+    );
+    bool overworld = (ret == 0);
+    if (overworld){
+        pbf_mash_button(context, BUTTON_B, 500ms);
+    }
+    context.wait_for_all_requests();
+    return overworld;
+}
+
+
+void exit_battle_after_catch(
+    ConsoleHandle& console,
+    ProControllerContext& context
+){
+    AdvanceBattleDialogWatcher advance_battle_dialog(COLOR_RED);
+    WhiteDialogWatcher white_dialog(COLOR_RED);
+    PokedexRegisteredWatcher dex_registration(COLOR_RED, &console.overlay());
+    BattleSelectionArrowWatcher nickname_question_arrow(
+        COLOR_RED,
+        &console.overlay(),
+        BattleConfirmationOption::YES
+    );
+
+    bool exiting_menus = true;
+    int attempts = 0;
+    while (exiting_menus){
+        int ret = wait_until(
+            console, context,
+            std::chrono::milliseconds(5000),
+            { nickname_question_arrow, white_dialog, advance_battle_dialog, dex_registration }
+        );
+
+        switch (ret){
+        case 0:
+        case 1:
+            pbf_mash_button(context, BUTTON_B, 2000ms);
+            context.wait_for_all_requests();
+            exiting_menus = false;
+            break;
+        case 2:
+        case 3:
+            pbf_press_button(context, BUTTON_B, 200ms, 0ms);
+            context.wait_for_all_requests();
+            break;
+        default:
+            pbf_press_button(context, BUTTON_B, 200ms, 0ms);
+            context.wait_for_all_requests();
+            attempts++;
+            if (attempts > 3){
+                if (in_overworld(console, context)){
+                    return;
+                }
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "exit_battle_after_catch(): Failed to exit the battle.",
+                    console
+                );
+            }
+            break;
+        }
+    }
+    pbf_mash_button(context, BUTTON_B, 1500ms);
+    context.wait_for_all_requests();
+    return;
+}
+
 int auto_catch(
     ConsoleHandle& console,
     ProControllerContext& context,
     const uint64_t& max_ball_throws
 ){
     float catch_coefficient = 1.0;
-    bool catch_detected = false;
 
     for (uint64_t i = 0; i <= max_ball_throws; i++){
-        int count = 0;
+        WallClock last_detected_time = current_time();
         while (true){
-            if (count >= 10){
-                console.log("auto_catch(): failed to detect battle menu");
+            if (current_time() - last_detected_time > std::chrono::seconds(20)){
+                console.log("auto_catch(): no battle activity detected for 20 seconds");
                 return -1;
             }
-            count++;
 
             BattleMenuWatcher battle_menu(COLOR_RED);
             PartyMenuWatcher party_menu(COLOR_RED);
@@ -1220,12 +1300,8 @@ int auto_catch(
             CatchFanfareDetector catch_detector(console.logger(), [&](float error_coefficient) -> bool{
                 catch_coefficient = error_coefficient;
                 return true;
-                });
-            BattleSelectionArrowWatcher nickname_question_arrow(
-                COLOR_RED,
-                &console.overlay(),
-                BattleConfirmationOption::YES
-            );
+            });
+
             context.wait_for_all_requests();
             int ret = run_until<ProControllerContext>(
                 console, context,
@@ -1234,58 +1310,36 @@ int auto_catch(
                         pbf_press_button(context, BUTTON_B, 200ms, 300ms);
                     }
                 },
-                { battle_menu, party_menu, dex_registration, black_screen, catch_detector, nickname_question_arrow },
+                { battle_menu, party_menu, black_screen, dex_registration, catch_detector },
                 10ms
             );
 
-            int start_ret;
             switch (ret){
             case 0:
                 console.log("Battle menu detected");
                 break;
             case 1:
                 console.log("Party menu detected. Attempting to send out next Pokemon");
+                pbf_mash_button(context, BUTTON_B, 1000ms);
                 pbf_move_left_joystick(context, { 0, -1 }, 200ms, 300ms);
                 pbf_mash_button(context, BUTTON_A, 1000ms);
+                context.wait_for_all_requests();
                 continue;
-            case 2:
-                console.log("Dex registration detected. Exiting battle...");
-                pbf_mash_button(context, BUTTON_B, 5000ms);
-                return static_cast<int>(i);
+            case 2: // either failed catch or fainting -> party menu
+                pbf_wait(context, 200ms);
+                continue;
             case 3:
-                console.log("Black screen detected. Battle exited.");
-                pbf_mash_button(context, BUTTON_B, 2500ms);
-                return catch_detected ? static_cast<int>(i) : 0;
             case 4:
-            case 5:
-                console.log("Catch detected!", COLOR_BLUE);
-                catch_detected = true;
-                pbf_wait(context, 2000ms);
-                continue;
+                console.log("Pokemon Caught!", COLOR_BLUE);
+                exit_battle_after_catch(console, context);
+                return static_cast<int>(i);
             default:
                 console.log("No recognized state. Try checking if in the overworld...");
-                StartMenuWatcher start_menu;
-                context.wait_for_all_requests();
-                start_ret = run_until<ProControllerContext>(
-                    console, context,
-                    [](ProControllerContext& context) {
-                        for (int i = 0; i < 3; i++){
-                            pbf_press_button(context, BUTTON_PLUS, 200ms, 2800ms);
-                            pbf_mash_button(context, BUTTON_B, 500ms);
-                        }
-                    },
-                    { start_menu }
-                );
-                if (start_ret < 0){
-                    console.log("auto_catch(): no recognized state after 30 seconds.");
-                    return true;
+                if (in_overworld(console, context)){
+                    console.log("Overworld detected.");
+                    return 0; // no catch detected
                 }
-                console.log("Overworld detected.");
-                pbf_mash_button(context, BUTTON_B, 500ms);
-                context.wait_for_all_requests();
-                return catch_detected ? static_cast<int>(i) : 0;
             }
-
             break;
         }
 
@@ -1354,7 +1408,6 @@ int auto_catch_safari(
     AdvanceBattleDialogWatcher advance_battle_dialog(COLOR_RED);
     WhiteDialogWatcher white_dialog(COLOR_RED);
     BattleMenuWatcher battle_menu(COLOR_RED);
-    PartyMenuWatcher party_menu(COLOR_RED);
     PokedexRegisteredWatcher dex_registration(COLOR_RED, &console.overlay());
     BlackScreenWatcher battle_end(COLOR_RED);
     CatchFanfareDetector catch_detector(console.logger(), [&](float error_coefficient) -> bool{
@@ -1377,19 +1430,7 @@ int auto_catch_safari(
                 return -1;
             }
 
-            StartMenuWatcher start_menu;
-            context.wait_for_all_requests();
-            int start_ret = run_until<ProControllerContext>(
-                console, context,
-                [](ProControllerContext& context) {
-                    for (int i = 0; i < 3; i++){
-                        pbf_press_button(context, BUTTON_PLUS, 200ms, 2800ms);
-                        pbf_mash_button(context, BUTTON_B, 500ms);
-                    }
-                },
-                { start_menu }
-            );
-            if (start_ret < 0){
+            if (!in_overworld(console, context)){
                 console.log("auto_catch_safari(): no recognized state after 30 seconds.");
                 return -1;
             }
@@ -1439,35 +1480,10 @@ int auto_catch_safari(
         }
         case 2: // Various catch indicators
         case 3:
-        case 4: {
+        case 4: 
             console.log("Pokemon Caught!");
-
-            bool exiting_menus = true;
-            while (exiting_menus){
-                int ret2 = wait_until(
-                    console, context,
-                    std::chrono::milliseconds(5000),
-                    { nickname_question_arrow, white_dialog, advance_battle_dialog, dex_registration }
-                );
-
-                switch (ret2){
-                case 0:
-                case 1:
-                    pbf_mash_button(context, BUTTON_B, 2000ms);
-                    context.wait_for_all_requests();
-                    exiting_menus = false;
-                    break;
-                case 2:
-                case 3:
-                    pbf_press_button(context, BUTTON_B, 200ms, 0ms);
-                    context.wait_for_all_requests();
-                }
-            }
-
-            pbf_mash_button(context, BUTTON_B, 1500ms);
-            context.wait_for_all_requests();
+            exit_battle_after_catch(console, context);
             return 1;
-        }
         }
     }
 
