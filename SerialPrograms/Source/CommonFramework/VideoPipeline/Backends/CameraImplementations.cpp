@@ -6,6 +6,7 @@
 
 #include <QtGlobal>
 //#include "Common/Cpp/PrettyPrint.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/VideoPipeline/VideoPipelineOptions.h"
 #include "CameraImplementations.h"
@@ -64,10 +65,12 @@ struct CameraBackends{
         );
 #endif
 #if QT_VERSION_MAJOR == 6
-        m_backends.emplace_back(
-            "qt6-QQuickWidget", "Qt6: QQuickWidget",
-            std::make_unique<CameraQt6_QQuickWidget::CameraBackend>()
-        );
+        if (STATIC_GLOBALS.DEVELOPER_MODE){
+            m_backends.emplace_back(
+                "qt6-QQuickWidget", "Qt6: QQuickWidget",
+                std::make_unique<CameraQt6_QQuickWidget::CameraBackend>()
+            );
+        }
 #endif
 
         size_t items = 0;
@@ -88,14 +91,7 @@ VideoBackendOption::VideoBackendOption()
         "<b>Video Pipeline Backend:</b>",
         CameraBackends::instance().m_database,
         LockMode::LOCK_WHILE_RUNNING,
-#if 0
-#elif QT_VERSION_MAJOR == 6
-#if QT_VERSION_MINOR >= 5
         1
-#else
-        0
-#endif
-#endif
     )
 {}
 
@@ -105,7 +101,11 @@ VideoBackendOption::VideoBackendOption()
 
 const CameraBackend& get_camera_backend(){
     size_t index = GlobalSettings::instance().VIDEO_PIPELINE->VIDEO_BACKEND.current_value();
-    return *CameraBackends::instance().m_backends[index].backend;
+    const CameraBackends& backends = CameraBackends::instance();
+    if (index >= backends.m_backends.size()){
+        index = 1;
+    }
+    return *backends.m_backends[index].backend;
 }
 
 
