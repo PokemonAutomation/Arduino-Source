@@ -163,7 +163,7 @@ jobs:
           EOF
 
           files=$(jq -r '.[].file' SerialPrograms/bin/compile_commands.json)
-          echo "$files" | xargs --max-args=150 clang-query -p SerialPrograms/bin/ -f query.txt >> output.txt
+          echo "$files" | xargs --max-args=100 clang-query -p SerialPrograms/bin/ -f query.txt >> output.txt
           cat output.txt
           if grep --silent "Match #" output.txt; then
             echo "::error Forbidden std::filesystem::path construction detected!"
