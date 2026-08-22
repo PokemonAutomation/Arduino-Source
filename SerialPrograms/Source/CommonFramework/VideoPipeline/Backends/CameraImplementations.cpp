@@ -15,14 +15,9 @@
 //using std::cout;
 //using std::endl;
 
-#if 0
-#elif QT_VERSION_MAJOR == 6
 #include "CameraWidgetQt6.h"
-#if QT_VERSION_MINOR >= 5
 #include "CameraWidgetQt6.5.h"
 #include "CameraWidgetQt6_QQuickWidget.h"
-#endif
-#endif
 
 
 namespace PokemonAutomation{
@@ -56,12 +51,10 @@ struct CameraBackends{
             "qt6-QVideoSink", "Qt6: QVideoSink",
             std::make_unique<CameraQt6QVideoSink::CameraBackend>()
         );
-#if QT_VERSION_MAJOR > 6 || (QT_VERSION_MAJOR == 6 && QT_VERSION_MINOR >= 5)
         m_backends.emplace_back(
             "qt6.5-QGraphicsScene", "Qt6.5: QGraphicsScene",
             std::make_unique<CameraQt65QMediaCaptureSession::CameraBackend>()
         );
-#endif
         if (STATIC_GLOBALS.DEVELOPER_MODE){
             m_backends.emplace_back(
                 "qt6-QQuickWidget", "Qt6: QQuickWidget",
