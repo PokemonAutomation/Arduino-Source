@@ -252,7 +252,11 @@ void VideoSession::internal_set_source(
     FramesPerSecond fps
 ){
     m_logger.log("Changing video...", COLOR_GREEN);
-    if (*m_descriptor == *device && !m_descriptor->should_reload()){
+    if (*m_descriptor == *device && !m_descriptor->should_reload() &&
+        m_option.m_resolution == resolution &&
+        m_option.m_format == format &&
+        m_option.m_fps == fps
+    ){
         return;
     }
 
