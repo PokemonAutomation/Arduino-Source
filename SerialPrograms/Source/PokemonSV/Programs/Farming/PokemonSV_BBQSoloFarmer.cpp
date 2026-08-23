@@ -36,7 +36,11 @@ BBQSoloFarmer_Descriptor::BBQSoloFarmer_Descriptor()
         "Farm Blueberry Quests in the Terarium for BP.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
+        false,
+        {
+            "Tesseract",
+        }
     )
 {}
 struct BBQSoloFarmer_Descriptor::Stats : public StatsTracker{

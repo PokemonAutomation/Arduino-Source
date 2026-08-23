@@ -24,7 +24,7 @@ namespace OCR{
 
 
 bool tesseract_language_available(Language language){
-    std::string path = RESOURCE_PATH();
+    std::string path = DOWNLOADED_RESOURCE_PATH();
     path += "Tesseract/";
     path += language_data(language).code;
     path += ".traineddata";
@@ -41,7 +41,9 @@ public:
     TesseractPool(Language language)
         : m_language_code(language_data(language).code)
         , m_training_data_path(
-            QDir::current().relativeFilePath(QString::fromStdString(RESOURCE_PATH() + "Tesseract/")).toStdString()
+            QDir::current().relativeFilePath(
+                QString::fromStdString(DOWNLOADED_RESOURCE_PATH() + "Tesseract/")
+            ).toStdString()
         )
     {}
 
