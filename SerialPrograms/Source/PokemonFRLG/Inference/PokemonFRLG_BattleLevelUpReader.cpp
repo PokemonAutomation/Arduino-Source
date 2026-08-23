@@ -18,7 +18,12 @@
 #include "Pokemon/Pokemon_StatsCalculation.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Pokemon/Inference/Pokemon_NatureReader.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
+#include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "PokemonFRLG/PokemonFRLG_Settings.h"
+#include "PokemonFRLG/PokemonFRLG_Tests.h"
+#include "Tests/TestUtils.h"
 #include "PokemonFRLG_DigitReader.h"
 #include "PokemonFRLG_BattleLevelUpReader.h"
 
@@ -65,6 +70,42 @@ StatReads BattleLevelUpReader::read_stats(Logger &logger, const ImageViewRGB32& 
     stats.spdef = uint16_t(read_stat(m_box_sp_defense, "spdef"));
     stats.speed = uint16_t(read_stat(m_box_speed, "speed"));
     return stats;
+}
+
+
+class Test_BattleLevelUpReader : public UnitTest{
+public:
+    Test_BattleLevelUpReader(const std::string& image)
+        : UnitTest("PokemonFRLG::BattleLevelUpReader - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        ImageRGB32 image(m_image);
+        BattleLevelUpReader reader;
+        StatReads stats = reader.read_stats(logger, image);
+
+        return check_against_golden_file(
+            m_image,
+            {"hp", "attack", "defense", "spatk", "spdef", "speed"},
+            {
+                std::to_string(stats.hp),
+                std::to_string(stats.attack),
+                std::to_string(stats.defense),
+                std::to_string(stats.spatk),
+                std::to_string(stats.spdef),
+                std::to_string(stats.speed),
+            }
+        );
+    };
+
+private:
+    std::string m_image;
+};
+
+
+void add_tests_BattleLevelUpReader(UnitTestDatabase& database){
+    // to do
 }
 
 

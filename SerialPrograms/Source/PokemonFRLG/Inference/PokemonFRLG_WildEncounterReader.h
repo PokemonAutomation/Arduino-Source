@@ -10,6 +10,7 @@
 #include <optional>
 #include <string>
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Language.h"
 
@@ -52,6 +53,9 @@ private:
     ImageFloatBox m_box_name_jpn;
     // ImageFloatBox m_box_level;
 };
+
+
+void add_tests_WildEncounterReader(UnitTestDatabase& database);
 
 } // namespace PokemonFRLG
 } // namespace NintendoSwitch
