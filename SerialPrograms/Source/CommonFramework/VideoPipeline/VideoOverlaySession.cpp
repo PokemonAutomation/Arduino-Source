@@ -74,17 +74,15 @@ void VideoOverlaySession::set(const VideoOverlayOption& option){
 void VideoOverlaySession::stats_thread(){
     std::unique_lock<Mutex> lg(m_stats_lock);
     while (!m_stopping){
-        {
-            std::vector<OverlayStatSnapshot> lines;
-            WriteSpinLock lg0(m_lock, PA_CURRENT_FUNCTION);
-            for (const auto& stat : m_stats_order){
-                OverlayStatSnapshot snapshot = stat->get_current();
-                if (!snapshot.text.empty()){
-                    lines.emplace_back(std::move(snapshot));
-                }
+        std::vector<OverlayStatSnapshot> lines;
+        m_stats.run_on_all([&](OverlayStat& stat){
+            OverlayStatSnapshot snapshot = stat.get_current();
+            if (!snapshot.text.empty()){
+                lines.emplace_back(std::move(snapshot));
             }
-            m_stat_lines = std::move(lines);
-        }
+            return false;
+        });
+        m_stat_lines = std::move(lines);
         m_stats_cv.wait_for(lg, std::chrono::milliseconds(100));
     }
 }
@@ -117,31 +115,10 @@ void VideoOverlaySession::set_enabled_log(bool enabled){
 //
 
 void VideoOverlaySession::add_stat(OverlayStat& stat){
-    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-    auto map_iter = m_stats.find(&stat);
-    if (map_iter != m_stats.end()){
-        return;
-    }
-
-    m_stats_order.emplace_back(&stat);
-    auto list_iter = m_stats_order.end();
-    --list_iter;
-    try{
-        m_stats.emplace(&stat, list_iter);
-    }catch (...){
-        m_stats_order.pop_back();
-        throw;
-    }
+    m_stats.add(stat);
 }
 void VideoOverlaySession::remove_stat(OverlayStat& stat){
-    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-    auto iter = m_stats.find(&stat);
-    if (iter == m_stats.end()){
-        return;
-    }
-
-    m_stats_order.erase(iter->second);
-    m_stats.erase(iter);
+    m_stats.remove(stat);
 }
 
 std::vector<OverlayStatSnapshot> VideoOverlaySession::stats() const{
