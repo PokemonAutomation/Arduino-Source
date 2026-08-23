@@ -470,6 +470,7 @@ bool HeldItemFarmerSafariZone::run_safari_zone(SingleSwitchProgramEnvironment& e
         std::string encounter_name = (ITEM_TO_FARM == ItemToFarm::LUCKY_EGG) ? "chansey" : "dragonair";
 
         int catch_result = auto_catch_safari(env.console, context, LANGUAGE, balls_left, encounter_name);
+        env.log("Catch result: " + std::to_string(catch_result));
 
         bool caught = false;
         if (catch_result < 0){
@@ -492,12 +493,17 @@ bool HeldItemFarmerSafariZone::run_safari_zone(SingleSwitchProgramEnvironment& e
 
         WhiteDialogDetector dialog(COLOR_RED);
         bool in_safari_zone_building = dialog.detect(env.console.video().snapshot());
+        if (in_safari_zone_building){
+            env.log("Detected Safari Zone building.");
+        }
 
         if (balls_left <= 0){
+            env.log("Out of Safari balls.");
             in_safari_zone_building = true;
         }
 
         if (in_safari_zone_building && !caught){
+            env.log("In Safari Zone building and target Pokemon not caught. Resetting.");
             return false;
         }
 
@@ -570,8 +576,10 @@ void HeldItemFarmerSafariZone::program(SingleSwitchProgramEnvironment& env, ProC
     }
 
     while (true){
+        env.log("Walking forward to start Safari Zone dialog.");
         pbf_press_dpad(context, DPAD_UP, 200ms, 0ms);
 
+        WallClock start_time = current_time();
         while (true){
             BlackScreenWatcher safari_zone_exit(COLOR_RED);
 
@@ -584,10 +592,17 @@ void HeldItemFarmerSafariZone::program(SingleSwitchProgramEnvironment& env, ProC
             );
 
             if (ret == 0){
+                env.log("Detected Safari Zone transition.");
+                break;
+            }
+
+            if (current_time() - start_time > std::chrono::seconds(60)){
+                env.log("Didn't detect Safari Zone transition after 60 seconds. Assuming entered safari zone.");
                 break;
             }
         }
 
+        start_time = current_time();
         while (true){
             BlackScreenOverWatcher overworld_entered(COLOR_RED);
 
@@ -598,6 +613,13 @@ void HeldItemFarmerSafariZone::program(SingleSwitchProgramEnvironment& env, ProC
             );
 
             if (ret == 0){
+                env.log("Detected overworld entered.");
+                break;
+            }
+
+            if (current_time() - start_time > std::chrono::seconds(20)){
+                env.log("Didn't detect overworld entered after 20 seconds. Checking if in overworld.");
+                
                 break;
             }
         }
@@ -621,7 +643,7 @@ void HeldItemFarmerSafariZone::program(SingleSwitchProgramEnvironment& env, ProC
 
         if (run_safari_zone(env, context, party_count)){
             GO_HOME_WHEN_DONE.run_end_of_program(context);
-            return; // Already sent notification in run_safari_zone if shiny or lucky egg found.
+            return; // Already sent notification in run_safari_zone if shiny or held item found.
         }
 
         soft_reset(env.console, context);
