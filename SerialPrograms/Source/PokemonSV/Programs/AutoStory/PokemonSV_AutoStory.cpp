@@ -381,9 +381,8 @@ AutoStory_Descriptor::AutoStory_Descriptor()
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         false,
-        { 
-            // "PokemonSV/AreaZero",
-            // "PaddleOCR" // not needed since an OCR library is bundled with this program
+        {
+            "PokemonSV/AreaZero",
         }
     )
 {}
@@ -418,8 +417,8 @@ AutoStory::AutoStory()
     , STORY_SECTION(
         "<b>Story Section:",
         {
-            {StorySection::TUTORIAL,         "tutorial",           "Tutorial"},
-            {StorySection::MAIN_STORY,            "main-story",              "Main Story"},
+            {StorySection::TUTORIAL,    "tutorial",           "Tutorial"},
+            {StorySection::MAIN_STORY,  "main-story",              "Main Story"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         StorySection::TUTORIAL
@@ -697,7 +696,7 @@ AutoStory::AutoStory()
         false,
         "<b>YOLO Path:</b>", 
         LockMode::LOCK_WHILE_RUNNING, 
-        "PokemonSV/YOLO/A0-station-2.onnx",
+        "PokemonSV/AreaZero/A0-station-2.onnx",
         "<.onnx file>"
     )
     , TARGET_LABEL(
@@ -1265,7 +1264,7 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
         
 
 
-        // YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/A0-station-2.onnx");
+        // YOLOv5Detector yolo_detector(DOWNLOADED_RESOURCE_PATH() + "PokemonSV/AreaZero/A0-station-2.onnx");
         // move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "tree-tera", 0.294444);
         // move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "tree-tera", 0.604688);
         direction.change_direction(env.program_info(), env.console, context, 3.855289);

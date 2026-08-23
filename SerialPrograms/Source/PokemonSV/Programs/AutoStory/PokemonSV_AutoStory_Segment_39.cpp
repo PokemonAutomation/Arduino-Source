@@ -80,7 +80,7 @@ void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
     [&](size_t attempt_number){
 
-        YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/A0-lab.onnx");
+        YOLOv5Detector yolo_detector(DOWNLOADED_RESOURCE_PATH() + "PokemonSV/AreaZero/A0-lab.onnx");
 
         pbf_move_left_joystick(context, {0, -1}, 1600ms, 800ms);
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 10000ms, +1, 0);

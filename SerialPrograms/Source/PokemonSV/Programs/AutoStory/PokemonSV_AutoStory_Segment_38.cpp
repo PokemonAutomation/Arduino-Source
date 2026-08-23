@@ -80,7 +80,7 @@ void checkpoint_100(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
     [&](size_t attempt_number){
 
-        YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/A0-station-4a.onnx");
+        YOLOv5Detector yolo_detector(DOWNLOADED_RESOURCE_PATH() + "PokemonSV/AreaZero/A0-station-4a.onnx");
 
         pbf_move_left_joystick(context, {0, -1}, 3200ms, 800ms);
         pbf_wait(context, 3000ms);
@@ -248,7 +248,7 @@ void checkpoint_101(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     [&](size_t attempt_number){
 
 
-        YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/A0-station-4b.onnx");
+        YOLOv5Detector yolo_detector(DOWNLOADED_RESOURCE_PATH() + "PokemonSV/AreaZero/A0-station-4b.onnx");
 
         // align to crystal-4-1.  
         // center before: X: 0.84

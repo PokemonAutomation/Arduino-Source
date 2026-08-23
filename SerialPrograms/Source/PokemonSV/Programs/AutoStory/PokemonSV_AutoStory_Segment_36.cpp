@@ -82,7 +82,7 @@ void checkpoint_96(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
     [&](size_t attempt_number){
 
-        YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/A0-station-2.onnx");
+        YOLOv5Detector yolo_detector(DOWNLOADED_RESOURCE_PATH() + "PokemonSV/AreaZero/A0-station-2.onnx");
         
 
         pbf_move_left_joystick(context, {0, -1}, 3200ms, 800ms);
@@ -276,7 +276,7 @@ void checkpoint_96(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         run_trainer_double_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
-        YOLOv5Detector yolo_detector2(RESOURCE_PATH() + "PokemonSV/YOLO/station-door-1.onnx");  // we can reuse the detector for station door 1.
+        YOLOv5Detector yolo_detector2(DOWNLOADED_RESOURCE_PATH() + "PokemonSV/AreaZero/station-door-1.onnx");  // we can reuse the detector for station door 1.
 
         do_action_until_dialog(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
