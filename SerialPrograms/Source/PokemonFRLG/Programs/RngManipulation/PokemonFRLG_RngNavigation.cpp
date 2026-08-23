@@ -676,6 +676,44 @@ void walk_from_pond_to_daycare_man(ConsoleHandle& console, ProControllerContext&
     pbf_move_left_joystick(context, {0, +1}, 300ms, 300ms);
 }
 
+bool smash_daycare_rock(ConsoleHandle& console, ProControllerContext& context){
+    // run to the smashable rock on the beach
+    ssf_press_button(context, BUTTON_B, 200ms, 6400ms);
+    pbf_move_left_joystick(context, {-1, 0}, 1250ms, 200ms);
+    pbf_move_left_joystick(context, {0, -1}, 1350ms, 200ms);
+    pbf_move_left_joystick(context, {-1, 0}, 750ms,  200ms);
+    pbf_move_left_joystick(context, {0, +1}, 2250ms, 300ms);
+
+    // smash rock
+    WhiteDialogWatcher rock_dialog(COLOR_RED);
+    context.wait_for_all_requests();
+    int ret = run_until<ProControllerContext>(
+        console, context,
+        [](ProControllerContext& context) {
+            ssf_mash1_button(context, BUTTON_A, 10000ms);
+        },
+        { rock_dialog }
+    );
+    if (ret < 0){
+        console.log("Failed to detect rock smash dialog");
+        return true;
+    }
+    pbf_mash_button(context, BUTTON_A, 2000ms);
+    pbf_mash_button(context, BUTTON_B, 4000ms);
+
+    // run back to the day care man
+    ssf_press_button(context, BUTTON_B, 200ms, 6750ms);
+    pbf_move_left_joystick(context, {0, -1}, 2250ms, 200ms);
+    pbf_move_left_joystick(context, {+1, 0}, 600ms,  200ms);
+    pbf_move_left_joystick(context, {0, +1}, 2000ms, 200ms);
+    pbf_move_left_joystick(context, {+1, 0}, 1000ms, 500ms);
+    
+    pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
+    pbf_move_left_joystick(context, {+1, 0}, 200ms, 300ms);
+    pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+    return false;
+}
+
 void egg_pickup(ConsoleHandle& console, ProControllerContext& context){
     console.log("Picking up egg...");
 

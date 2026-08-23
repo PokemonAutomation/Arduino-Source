@@ -517,6 +517,8 @@ bool EggRng::held_frame_check(
     // decide if it's a good idea to save and commit to this held frame
     bool locked_in = false;
     if (previously_hit_held_frame && (current_seed == TARGET_HELD_SEED)){
+        env.log("Smashing rock on the beach...");
+        smash_daycare_rock(env.console, context);
         env.log("Committing to this Held Frame and saving the game...");
         save_game_to_overworld(env.console, context);
         locked_in = true;
