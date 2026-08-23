@@ -3,11 +3,7 @@
  *  From: https://github.com/PokemonAutomation/
  *
  *  Use QML QQuickWidget.
- *
- *  This is hardware accelerated and works perfectly on Qt 6.8.3.
- *
- *  But it drops frames on Qt 6.10.2. According to Gemini, this is due to
- *  double-buffering and synchronization with the UI thread.
+ *  This is hardware accelerated.
  *
  */
 

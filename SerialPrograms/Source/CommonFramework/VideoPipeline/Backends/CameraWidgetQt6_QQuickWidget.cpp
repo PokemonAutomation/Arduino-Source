@@ -193,11 +193,6 @@ QWidget* CameraVideoSource::make_display_QtWidget(QWidget* parent){
         m_video_sink.get(), &QVideoSink::videoFrameChanged,
         qml_sink, [this, qml_sink](const QVideoFrame& frame){
             WallClock now = current_time();
-            if (!m_last_frame.push_frame(frame, now)){
-                return;
-            }
-
-            report_source_frame(std::make_shared<VideoFrame>(now, frame));
 
             QMetaObject::invokeMethod(qml_sink, [qml_sink, frame]() {
                 qml_sink->setVideoFrame(frame);

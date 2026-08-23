@@ -7,6 +7,7 @@
 #ifdef PA_SOCIAL_SDK
 #define DISCORDPP_IMPLEMENTATION
 
+#include <thread>
 #include "Common/Cpp/Logging/TaggedLogger.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
 #include "CommonFramework/Globals.h"
