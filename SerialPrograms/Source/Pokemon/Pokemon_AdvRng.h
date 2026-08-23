@@ -202,6 +202,11 @@ Pokemon::NatureAdjustments nature_to_adjustment(AdvNature nature);
 Pokemon::AdvNature string_to_nature(const std::string& nature_string);
 std::string nature_to_string(const AdvNature& nature);
 
+// Forms that cannot be told apart from an observation (e.g. Unown letters) share a base slug.
+// Encounter slots carry the form-specific slug, while an observed species only ever carries
+// the base slug, so both sides must be folded before they are compared.
+std::string base_species_slug(const std::string& species);
+
 std::string gender_to_string(const AdvGender& gender);
 
 AdvGender gender_from_gender_value(uint8_t gender_value, int16_t threshold);

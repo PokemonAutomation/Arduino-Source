@@ -259,6 +259,13 @@ uint8_t slot_number_from_roll(uint8_t roll, size_t size, bool super_rod) {
     }
 }
 
+std::string base_species_slug(const std::string& species){
+    if (species.find("unown") != std::string::npos){
+        return "unown";
+    }
+    return species;
+}
+
 int slot_to_unownform(AdvEncounterSlot slot){
     if (slot.species.find("unown") == std::string::npos){
         return -1;
@@ -510,8 +517,7 @@ bool check_for_match(AdvPokemonResult res, AdvRngFilters target, int16_t gender_
 }
 
 bool check_for_match(AdvWildPokemonResult res, AdvRngFilters target, int16_t gender_threshold, uint16_t tid_xor_sid){
-    std::string res_name = res.species.find("unown") != std::string::npos ? "unown" : res.species;
-    return (target.species == res_name)
+    return (base_species_slug(target.species) == base_species_slug(res.species))
         && (target.level == res.level)
         && (target.nature == AdvNature::Any || (res.nature == target.nature))
         && (target.ability == AdvAbility::Any || (res.ability == target.ability))
