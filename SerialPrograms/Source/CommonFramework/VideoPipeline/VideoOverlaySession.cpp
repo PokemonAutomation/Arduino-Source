@@ -82,7 +82,10 @@ void VideoOverlaySession::stats_thread(){
             }
             return false;
         });
-        m_stat_lines = std::move(lines);
+        {
+            WriteSpinLock lg0(m_lock, PA_CURRENT_FUNCTION);
+            m_stat_lines = std::move(lines);
+        }
         m_stats_cv.wait_for(lg, std::chrono::milliseconds(100));
     }
 }
