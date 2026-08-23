@@ -26,7 +26,6 @@
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
-#include "Common/Cpp/Concurrency/Thread.h"
 #include "VideoOverlay.h"
 #include "VideoOverlayOption.h"
 
@@ -146,8 +145,7 @@ private:
     std::set<const OverlayImage*> m_images;
     std::deque<OverlayLogLine> m_log_texts;
 
-    std::list<OverlayStat*> m_stats_order;
-    std::map<OverlayStat*, std::list<OverlayStat*>::iterator> m_stats;
+    ListenerSet<OverlayStat> m_stats;
 
     ListenerSet<ContentListener> m_listeners;
 
