@@ -252,7 +252,6 @@ GlobalSettings::GlobalSettings()
 
     PA_ADD_OPTION(DEVELOPER_TOKEN);
 
-    RESOURCE_DOWNLOAD_TABLE.set_visibility(ConfigOptionState::HIDDEN);
     DOWNLOAD_ERROR.set_visibility(ConfigOptionState::HIDDEN);
     SAVE_DEBUG_VIDEOS_ON_SWITCH.set_visibility(ConfigOptionState::HIDDEN);
     ControllerSettings::instance().DEVICE_LOGGING_FLAG.set_visibility(ConfigOptionState::HIDDEN);
@@ -278,7 +277,6 @@ void GlobalSettings::load_json(const JsonValue& json){
     ConfigOptionState devmode_visibility = developer_mode
         ? ConfigOptionState::ENABLED
         : ConfigOptionState::HIDDEN;
-    RESOURCE_DOWNLOAD_TABLE.set_visibility(devmode_visibility);
     DOWNLOAD_ERROR.set_visibility(devmode_visibility);
     SAVE_DEBUG_VIDEOS_ON_SWITCH.set_visibility(devmode_visibility);
     PerformanceOptions::instance().ONNX_OPTIONS.USE_GPU.set_visibility(devmode_visibility);
