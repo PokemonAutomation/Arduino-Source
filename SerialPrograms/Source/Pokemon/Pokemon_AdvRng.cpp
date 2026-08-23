@@ -12,6 +12,10 @@ namespace PokemonAutomation{
 namespace Pokemon{
 
 void level_up_observed_pokemon(AdvObservedPokemon& pokemon, const StatReads& newstats, const EVs& evyield){
+    if (pokemon.level.empty() || pokemon.stats.empty() || pokemon.evs.empty()){
+        return;
+    }
+
     uint8_t newlevel = pokemon.level.back() + 1;
     pokemon.level.emplace_back(newlevel);
 

@@ -360,9 +360,19 @@ void update_filters(
 ){
     level_up_observed_pokemon(pokemon, stats, evyield);
 
+    if (pokemon.level.empty() || pokemon.stats.empty() || pokemon.evs.empty()){
+        filters.ivs = { {0,31}, {0,31}, {0,31}, {0,31}, {0,31}, {0,31} };
+        return;
+    }
+
+    const uint8_t new_level = pokemon.level.back();
+    const EVs new_evs = pokemon.evs.back();
+
     while (true){
-        // in the worst case (the new stats are the problem), start over
         if (pokemon.level.size() == 0){
+            pokemon.level = { new_level };
+            pokemon.stats = { stats };
+            pokemon.evs = { new_evs };
             filters.ivs = { {0,31}, {0,31}, {0,31}, {0,31}, {0,31}, {0,31} };
             return;
         }
@@ -372,15 +382,17 @@ void update_filters(
         if (!ranges_are_valid(new_filters.ivs)){
             IvRanges new_stat_ivs = calc_iv_ranges(BASE_STATS, pokemon.level.back(), pokemon.evs.back(), pokemon.stats.back(), nature_to_adjustment(pokemon.nature));
             if (!ranges_are_valid(new_stat_ivs)){
-                // remove newest stats first if they aren't valid
-                pokemon.level.erase(pokemon.level.begin());
-                pokemon.stats.erase(pokemon.stats.begin());
-                pokemon.evs.erase(pokemon.evs.begin());
-            }else{
-                // remove oldest stats first
+                // the newest reading is impossible on its own. 
+                // don't keep it
                 pokemon.level.pop_back();
                 pokemon.stats.pop_back();
                 pokemon.evs.pop_back();
+            }else{
+                // the newest reading is self-consistent but conflicts with an older one.
+                // discard the oldest reading until things are consistent again
+                pokemon.level.erase(pokemon.level.begin());
+                pokemon.stats.erase(pokemon.stats.begin());
+                pokemon.evs.erase(pokemon.evs.begin());
             }
             continue;
         }
