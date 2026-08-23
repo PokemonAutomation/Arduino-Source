@@ -1,6 +1,11 @@
-#pragma once
-#ifndef DPP_UTILITY_H
-#define DPP_UTILITY_H
+/*  DPP Utility
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#ifndef PokemonAutomation_Integrations_DppUtility_H
+#define PokemonAutomation_Integrations_DppUtility_H
 
 #if defined(__clang__)
     #pragma clang diagnostic push
@@ -29,7 +34,12 @@ protected:
 protected:
     void log(const std::string& message, const std::string& identity, const dpp::loglevel& ll);
     void get_user_counts(dpp::cluster& bot, const dpp::guild_create_t& event);
-    int64_t get_value_from_input(const dpp::commandhandler& handler, const std::string& cmd, const std::string& input, std::string& out);
+    int64_t get_value_from_input(
+        const dpp::commandhandler& handler,
+        const std::string& cmd,
+        const std::string& input,
+        std::string& out
+    );
     int64_t sanitize_integer_input(const dpp::parameter_list_t& params, const uint8_t& index);
     uint16_t get_button(const uint16_t& bt);
 

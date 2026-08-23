@@ -1,6 +1,11 @@
-#pragma once
-#ifndef DPP_HANDLER_H
-#define DPP_HANDLER_H
+/*  DPP Command Handler
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#ifndef PokemonAutomation_Integrations_DppCommandHandler_H
+#define PokemonAutomation_Integrations_DppCommandHandler_H
 
 #include <Integrations/DppIntegration/DppUtility.h>
 #include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"

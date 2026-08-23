@@ -1,3 +1,9 @@
+/*  Discord Social
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
 #ifdef PA_SOCIAL_SDK
 #define DISCORDPP_IMPLEMENTATION
 

@@ -1,3 +1,9 @@
+/*  DPP Utility
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
 #ifdef PA_DPP
 
 #include <Integrations/DppIntegration/DppUtility.h>
@@ -81,7 +87,12 @@ uint16_t Utility::get_button(const uint16_t& bt){
     return 1 << bt;
 }
 
-int64_t Utility::get_value_from_input(const commandhandler& handler, const std::string& command_name, const std::string& input, std::string& out){
+int64_t Utility::get_value_from_input(
+    const commandhandler& handler,
+    const std::string& command_name,
+    const std::string& input,
+    std::string& out
+){
     auto cmd = handler.commands.find(command_name);
     auto& choices = cmd->second.parameters[1].second.choices;
     for (auto& choice : choices){
