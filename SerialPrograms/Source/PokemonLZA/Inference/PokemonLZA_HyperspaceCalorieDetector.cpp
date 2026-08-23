@@ -142,7 +142,7 @@ public:
             return "Error: expected calorie must be in range [1, 9999].";
         }
 
-        HyperspaceCalorieDetector detector(global_logger_command_line());
+        HyperspaceCalorieDetector detector(logger);
         ImageRGB32 image(m_image);
         if (!detector.detect(image)){
             return "Error: detector failed to detect calorie number in image.";

@@ -7,7 +7,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Controllers/ControllerTypeStrings.h"
 #ifdef QT_CORE_LIB
-#include "Controllers/SerialPortPollerQt.h"
+#include "Controllers/SerialPort/SerialPortPollerQt.h"
 #endif
 #include "SerialPABotBase2_Connection.h"
 #include "SerialPABotBase2_Descriptor.h"

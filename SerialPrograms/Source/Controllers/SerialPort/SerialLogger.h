@@ -1,11 +1,11 @@
-/*  Message Logger
+/*  Serial Logger
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_MessageLogger_H
-#define PokemonAutomation_MessageLogger_H
+#ifndef PokemonAutomation_SerialLogger_H
+#define PokemonAutomation_SerialLogger_H
 
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Time.h"

@@ -42,7 +42,7 @@
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "ControllerInput/ControllerInput.h"
-#include "Controllers/SerialPortPollerQt.h"
+#include "Controllers/SerialPort/SerialPortPollerQt.h"
 #include "Integrations/DiscordWebhook.h"
 #include "Windows/MainWindow.h"
 

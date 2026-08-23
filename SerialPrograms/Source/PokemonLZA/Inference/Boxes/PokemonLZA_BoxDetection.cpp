@@ -681,7 +681,7 @@ public:
 
         // Test BoxDexNumberDetector
         if (expect_dex_detection){
-            BoxDexNumberDetector dex_detector(global_logger_command_line());
+            BoxDexNumberDetector dex_detector(logger);
             bool detected_dex = dex_detector.detect(image);
 
             if (!detected_dex){

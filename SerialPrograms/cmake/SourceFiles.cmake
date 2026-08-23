@@ -840,38 +840,12 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/Schedulers/ControllerWithScheduler.h
     Source/Controllers/Schedulers/SuperscalarScheduler.cpp
     Source/Controllers/Schedulers/SuperscalarScheduler.h
-    Source/Controllers/SerialPABotBase/Connection/BotBase.cpp
-    Source/Controllers/SerialPABotBase/Connection/BotBase.h
-    Source/Controllers/SerialPABotBase/Connection/BotBaseMessage.h
-    Source/Controllers/SerialPABotBase/Connection/MessageLogger.cpp
-    Source/Controllers/SerialPABotBase/Connection/MessageLogger.h
-    Source/Controllers/SerialPABotBase/Connection/MessageSniffer.h
-    Source/Controllers/SerialPABotBase/Connection/PABotBase.cpp
-    Source/Controllers/SerialPABotBase/Connection/PABotBase.h
-    Source/Controllers/SerialPABotBase/Connection/PABotBaseConnection.cpp
-    Source/Controllers/SerialPABotBase/Connection/PABotBaseConnection.h
-    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_Acks.h
-    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_CommandQueue.h
-    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_ControllerMode.h
-    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_Errors.h
-    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_Info.h
-    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_Misc.h
-    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_StaticRequests.h
-    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_HID_Keyboard.h
-    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_NS_WiredController.h
-    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_NS1_OemControllers.h
-    Source/Controllers/SerialPABotBase/SerialPABotBase.cpp
-    Source/Controllers/SerialPABotBase/SerialPABotBase.h
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.cpp
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.h
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.cpp
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.cpp
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h
-    Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.cpp
-    Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h
-    Source/Controllers/SerialPortPollerQt.cpp
-    Source/Controllers/SerialPortPollerQt.h
+    Source/Controllers/SerialPort/SerialLogger.cpp
+    Source/Controllers/SerialPort/SerialLogger.h
+    Source/Controllers/SerialPort/SerialPABotBase.cpp
+    Source/Controllers/SerialPort/SerialPABotBase.h
+    Source/Controllers/SerialPort/SerialPortPollerQt.cpp
+    Source/Controllers/SerialPort/SerialPortPollerQt.h
     Source/Controllers/StandardHid/StandardHid_Keyboard.cpp
     Source/Controllers/StandardHid/StandardHid_Keyboard.h
     Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.cpp
@@ -1163,10 +1137,6 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_ProController.h
     Source/NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_WiredController.cpp
     Source/NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_WiredController.h
-    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Controller.cpp
-    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Controller.h
-    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WiredController.cpp
-    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WiredController.h
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase3_ControllerState.h
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase3_ProController.cpp
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase3_ProController.h

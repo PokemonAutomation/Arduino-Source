@@ -4,7 +4,7 @@
  *
  */
 
-#include "Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h"
+#include <QFileInfo>
 #include "SerialPABotBase2_Descriptor.h"
 #include "SerialPABotBase2_SelectorWidget.h"
 
@@ -17,6 +17,45 @@ namespace PokemonAutomation{
 template class RegisterUiStateQtWidget<SerialPABotBase::SerialPABotBase2_SelectorWidget>;
 
 namespace SerialPABotBase{
+
+
+
+bool filter_serial_port(const QSerialPortInfo& port){
+#ifdef _WIN32
+    //  COM1 is never the correct port on Windows.
+    if (port.portName() == "COM1"){
+        return false;
+    }
+#endif
+
+#if defined(__APPLE__)
+    // exlude tty
+    if (port.portName().startsWith("tty.")){
+        return false;
+    }
+    // exclude system builtin serial ports
+    if (port.portName() == "cu.debug-console" ||
+        port.portName() == "cu.Bluetooth-Incoming-Port"
+    ){
+        return false;
+    }
+#endif
+
+#if defined(__linux__)
+    const QString path = port.systemLocation();
+
+    QFileInfo file(path);
+    // Exclude devices that don't have Read/Write access
+    if (!(file.isReadable() && file.isWritable()))
+    {
+        return false;
+    }
+#endif
+
+    return true;
+}
+
+
 
 
 SerialPABotBase2_SelectorWidget::SerialPABotBase2_SelectorWidget(

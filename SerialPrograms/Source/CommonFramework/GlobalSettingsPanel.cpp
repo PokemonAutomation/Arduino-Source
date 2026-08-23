@@ -151,13 +151,6 @@ GlobalSettings::GlobalSettings()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , ENABLE_PABOTBASE1(
-        "<b>Enable PABotBase1:</b><br>Enable support for the legacy PABotBase 1 protocol.<br>"
-        "Turn this on if you are still using Arduino Uno R3, Arduino Leonardo, Teensy, or Pro Micro. "
-        "Note that this feature is slated to be removed in September 2026.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false
-    )
     , DUMP_VIDEO_FORMATS(
         "<b>Dump Video Formats:</b><br>Log all video formats supported by your capture card.",
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -226,7 +219,6 @@ GlobalSettings::GlobalSettings()
 
     PA_ADD_STATIC(m_advanced_options);
     add_option(PokemonAutomation::LOG_EVERYTHING(), "LOG_EVERYTHING");
-    PA_ADD_OPTION(ENABLE_PABOTBASE1);
     PA_ADD_OPTION(DUMP_VIDEO_FORMATS);
     PA_ADD_OPTION(SAVE_DEBUG_IMAGES);
 

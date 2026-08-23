@@ -104,7 +104,6 @@ public:
 
     SectionDividerOption m_advanced_options;
 
-    BooleanCheckBoxOption ENABLE_PABOTBASE1;
     BooleanCheckBoxOption DUMP_VIDEO_FORMATS;
     BooleanCheckBoxOption SAVE_DEBUG_IMAGES;
     BooleanCheckBoxOption SAVE_DEBUG_VIDEOS_ON_SWITCH;

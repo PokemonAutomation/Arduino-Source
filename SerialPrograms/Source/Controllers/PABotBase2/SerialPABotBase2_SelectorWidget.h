@@ -12,7 +12,7 @@
 #include "Common/Qt/NoWheelComboBox.h"
 #include "Controllers/ControllerDescriptor.h"
 #include "Controllers/ControllerSelectorWidget.h"
-#include "Controllers/SerialPortPollerQt.h"
+#include "Controllers/SerialPort/SerialPortPollerQt.h"
 #include "SerialPABotBase2_Descriptor.h"
 
 //#include <iostream>

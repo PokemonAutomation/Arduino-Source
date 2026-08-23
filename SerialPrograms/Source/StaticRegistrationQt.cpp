@@ -46,7 +46,6 @@
 
 //  Controllers
 #include "Controllers/NullControllerWidget.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h"
 #include "Controllers/PABotBase2/SerialPABotBase2_SelectorWidget.h"
 #include "ControllerInput/Keyboard/KeyBindingWidget.h"
 
@@ -120,7 +119,6 @@ void register_all_statics(){
 
     //  Controllers
     RegisterUiStateQtWidget<NullControllerWidget>();
-    RegisterUiStateQtWidget<SerialPABotBase::SerialPABotBase_SelectorWidget>();
     RegisterUiStateQtWidget<SerialPABotBase::SerialPABotBase2_SelectorWidget>();
     RegisterUiStateQtWidget<KeyboardHidBindingCellWidget>();
 

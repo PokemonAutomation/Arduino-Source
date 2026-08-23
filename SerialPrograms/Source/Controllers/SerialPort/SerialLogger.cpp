@@ -1,11 +1,11 @@
-/*  Message Logger
+/*  Serial Logger
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "MessageLogger.h"
+#include "SerialLogger.h"
 
 namespace PokemonAutomation{
 

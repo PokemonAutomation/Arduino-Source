@@ -16,7 +16,6 @@
 
 #include "PABotBase2/SerialPABotBase2_Descriptor.h"
 
-#include "SerialPABotBase/SerialPABotBase_SelectorWidget.h"
 #include "PABotBase2/SerialPABotBase2_SelectorWidget.h"
 #include "NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h"
 
@@ -55,9 +54,6 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
 
     //  Add all the supported interfaces.
     {
-        if (GlobalSettings::instance().ENABLE_PABOTBASE1){
-            m_interface_list.emplace_back(ControllerInterface::SerialPABotBase);
-        }
         m_interface_list.emplace_back(ControllerInterface::SerialPABotBase2);
         m_interface_list.emplace_back(ControllerInterface::TcpSysbotBase);
 //        m_interface_list.emplace_back(ControllerInterface::UsbSysbotBase);
@@ -212,11 +208,6 @@ void ControllerSelectorWidget::refresh_selection(ControllerInterface interface_t
 //    m_status_text->setText(QString::fromStdString(html_color_text("Not Connected", COLOR_RED)));
 
     switch (interface_type){
-    case ControllerInterface::SerialPABotBase:
-        m_selector = new SerialPABotBase::SerialPABotBase_SelectorWidget(*this, m_session.descriptor().get());
-        m_dropdowns->insertWidget(1, m_selector, 1);
-        break;
-
     case ControllerInterface::SerialPABotBase2:
         m_selector = new SerialPABotBase::SerialPABotBase2_SelectorWidget(*this, m_session.descriptor().get());
         m_dropdowns->insertWidget(1, m_selector, 1);
