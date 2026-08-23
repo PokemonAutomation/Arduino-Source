@@ -32,16 +32,7 @@ public:
 
 
 private:
-    enum class Subset{
-        route1,
-        route22,
-        viridianforest,
-        rocktunnel,
-        pokemontower
-    };
-
     OCR::LanguageOCROption LANGUAGE;
-    EnumDropdownOption<Subset> SUBSET;
 
 };
 

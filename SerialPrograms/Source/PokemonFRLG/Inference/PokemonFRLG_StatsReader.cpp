@@ -19,6 +19,11 @@
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Pokemon/Inference/Pokemon_NatureReader.h"
 #include "PokemonFRLG/PokemonFRLG_Settings.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
+#include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "PokemonFRLG/PokemonFRLG_Tests.h"
+#include "Tests/TestUtils.h"
 #include "PokemonFRLG_DigitReader.h"
 #include "PokemonFRLG_OcrPreprocessing.h"
 #include <opencv2/imgproc.hpp>
@@ -393,6 +398,144 @@ void StatsReader::read_page2(
         frame.save("DebugDumps/ocr_page2_failed_frame.png");
     }
 }
+
+
+namespace{
+
+std::string number_slug(const std::optional<unsigned>& value){
+    return value.has_value() ? std::to_string(*value) : "none";
+}
+std::string text_slug(const std::string& value){
+    return value.empty() ? "none" : value;
+}
+std::string gender_slug(const std::optional<SummaryGender>& gender){
+    if (!gender.has_value()){
+        return "none";
+    }
+    switch (*gender){
+    case SummaryGender::Male:
+        return "male";
+    case SummaryGender::Female:
+        return "female";
+    case SummaryGender::Genderless:
+        return "genderless";
+    }
+    return "none";
+}
+
+UnitTestResult language_from_filename(const std::string& image_path, Language& language){
+    const std::vector<std::string> words = parse_words(Filesystem::Path(image_path).stem().string());
+    if (words.empty()){
+        return "Error: filename must end with a language code.";
+    }
+    language = language_code_to_enum(words.back());
+    if (language == Language::None || language == Language::EndOfList){
+        return "Error: invalid language word in filename: " + words.back();
+    }
+    return true;
+}
+
+}
+
+
+class Test_StatsReaderPage1 : public UnitTest{
+public:
+    Test_StatsReaderPage1(const std::string& image)
+        : UnitTest("PokemonFRLG::StatsReader - page1 - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        Language language = Language::None;
+        UnitTestResult parsed = language_from_filename(m_image, language);
+        if (parsed.result != UnitTestResult::PASSED){
+            return parsed;
+        }
+
+        ImageRGB32 image(m_image);
+        StatsReader reader;
+        PokemonFRLG_Stats stats;
+        reader.read_page1(logger, language, image, stats);
+
+        return check_against_golden_file(
+            m_image,
+            {"name", "level", "gender", "nature"},
+            {
+                text_slug(stats.name),
+                number_slug(stats.level),
+                gender_slug(stats.gender),
+                text_slug(stats.nature),
+            }
+        );
+    };
+
+private:
+    std::string m_image;
+};
+
+
+class Test_StatsReaderPage2 : public UnitTest{
+public:
+    Test_StatsReaderPage2(const std::string& image)
+        : UnitTest("PokemonFRLG::StatsReader - page2 - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        Language language = Language::None;
+        UnitTestResult parsed = language_from_filename(m_image, language);
+        if (parsed.result != UnitTestResult::PASSED){
+            return parsed;
+        }
+
+        ImageRGB32 image(m_image);
+        StatsReader reader;
+        PokemonFRLG_Stats stats;
+        reader.read_page2(logger, language, image, stats);
+
+        return check_against_golden_file(
+            m_image,
+            {"hp", "attack", "defense", "spatk", "spdef", "speed"},
+            {
+                number_slug(stats.hp),
+                number_slug(stats.attack),
+                number_slug(stats.defense),
+                number_slug(stats.sp_attack),
+                number_slug(stats.sp_defense),
+                number_slug(stats.speed),
+            }
+        );
+    };
+
+private:
+    std::string m_image;
+};
+
+
+void add_tests_StatsReader(UnitTestDatabase& database){
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/bulbasaur_1_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/bulbasaur_2_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/bulbasaur_3_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/bulbasaur_4_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/bulbasaur_1_fra.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/bulbasaur_1_jpn.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/abra_1_deu.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/deoxys_1_jpn.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/horsea_1_deu.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/horsea_2_deu.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/horsea_3_deu.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/magikarp_1_spa.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/moltres_1_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/pidgey_1_ita.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/venonat_4k_eng.png");
+    database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/abra_1_deu.png");
+    database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/deoxys_1_jpn.png");
+    database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/mewtwo_1_spa.png");
+    database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/nidoranf_1_eng.jpg");
+    database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/raikou_1_eng.png");
+    database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/venonat_1_eng.jpg");
+}
+
 
 } // namespace PokemonFRLG
 } // namespace NintendoSwitch
