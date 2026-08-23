@@ -122,6 +122,9 @@ int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftr
 // returns -1 if no encounter is triggered, 0 if a non-shiny is encounter, and 1 if a shiny is encountered
 int fish_encounter(ConsoleHandle& console, ProControllerContext& context, Seconds timeout = 300s);
 
+// tries to pull up the start menu to check if currently in the overworld
+bool in_overworld(ConsoleHandle& console, ProControllerContext& context);
+
 // Automatically catch a Pokemon.
 // Returns -1 if there are detection issues, 0 if the Pokemon was not caught, and the number of balls thrown if it was caught.
 int auto_catch(

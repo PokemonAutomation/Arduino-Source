@@ -603,6 +603,7 @@ void HeldItemFarmerSafariZone::program(SingleSwitchProgramEnvironment& env, ProC
         }
 
         start_time = current_time();
+        bool detected_overworld = false;
         while (true){
             BlackScreenOverWatcher overworld_entered(COLOR_RED);
 
@@ -614,14 +615,24 @@ void HeldItemFarmerSafariZone::program(SingleSwitchProgramEnvironment& env, ProC
 
             if (ret == 0){
                 env.log("Detected overworld entered.");
+                detected_overworld = true;
                 break;
             }
 
             if (current_time() - start_time > std::chrono::seconds(20)){
                 env.log("Didn't detect overworld entered after 20 seconds. Checking if in overworld.");
-                
+                if (!in_overworld(env.console, context)){
+                    env.log("Couldn't detect overworld. Resetting.");
+                    soft_reset(env.console, context);
+                    break;
+                }
+                detected_overworld = true;
                 break;
             }
+        }
+
+        if (!detected_overworld){
+            continue;
         }
 
         // There is a small delay from seeing the overworld to being able to actually move.
