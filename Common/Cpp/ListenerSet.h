@@ -8,6 +8,7 @@
 #define PokemonAutomation_ListenerSet_H
 
 #include <exception>
+#include <list>
 #include <map>
 #include <atomic>
 //#include "Common/Cpp/PrettyPrint.h"
@@ -97,8 +98,6 @@ private:
     struct Node{
         SpinLock lock;
         ListenerType& listener;
-        Node* next = nullptr;
-        Node** prevs_next = nullptr;
 
 #ifdef PA_DEBUG_ListenerSet
         LifetimeSanitizer sanitizer;
@@ -106,14 +105,13 @@ private:
 
         Node(ListenerSet& parent, ListenerType& p_listener)
             : listener(p_listener)
-            , prevs_next(&parent.m_list)
 #ifdef PA_DEBUG_ListenerSet
             , sanitizer("Node")
 #endif
         {}
     };
-    Node* m_list = nullptr;
-    std::map<ListenerType*, Node> m_listeners;
+    std::list<Node> m_list;
+    std::map<ListenerType*, typename std::list<Node>::iterator> m_listeners;
 
 #ifdef PA_DEBUG_ListenerSet
     LifetimeSanitizer m_sanitizer;
@@ -140,23 +138,22 @@ void ListenerSet<ListenerType>::add(ListenerType& listener){
     auto scope = m_sanitizer.check_scope();
 #endif
     WriteSpinLock lg(m_lock, m_suppress_lock_prints ? nullptr : "ListenerSet::add()");
-    auto ret = m_listeners.emplace(
-        std::piecewise_construct,
-        std::forward_as_tuple(&listener),
-        std::forward_as_tuple(*this, listener)
-    );
-    if (!ret.second){
-        return;
+
+    auto iter = m_list.emplace(m_list.end(), *this, listener);
+    try{
+        auto ret = m_listeners.emplace(
+            std::piecewise_construct,
+            std::forward_as_tuple(&listener),
+            std::forward_as_tuple(iter)
+        );
+        if (!ret.second){
+            m_list.erase(iter);
+            return;
+        }
+    }catch (...){
+        m_list.erase(iter);
+        throw;
     }
-    Node& node = ret.first->second;
-#ifdef PA_DEBUG_ListenerSet
-    node.sanitizer.check_usage();
-#endif
-    if (m_list != nullptr){
-        m_list->prevs_next = &node.next;
-    }
-    node.next = m_list;
-    m_list = &node;
     m_count.store(m_listeners.size(), std::memory_order_release);
 }
 template <typename ListenerType>
@@ -174,13 +171,13 @@ void ListenerSet<ListenerType>::remove(ListenerType& listener) noexcept{
             return;
         }
 
-        Node& node = iter->second;
+        typename std::list<Node>::iterator node = iter->second;
 
 #ifdef PA_DEBUG_ListenerSet
-        node.sanitizer.check_usage();
+        node->sanitizer.check_usage();
 #endif
 
-        if (!node.lock.try_acquire_write()){
+        if (!node->lock.try_acquire_write()){
 #if 0
             if (!printed){
                 try{
@@ -194,18 +191,7 @@ void ListenerSet<ListenerType>::remove(ListenerType& listener) noexcept{
 
 //        std::cout << "node = " << &node.sanitizer << " : " << &node.prev->sanitizer << " : " << &node.next->sanitizer << std::endl;
 
-        *node.prevs_next = node.next;
-        if (node.next){
-#ifdef PA_DEBUG_ListenerSet
-            node.next->sanitizer.check_usage();
-#endif
-            node.next->prevs_next = node.prevs_next;
-        }
-
-#ifdef PA_DEBUG_ListenerSet
-        node.sanitizer.check_usage();
-#endif
-
+        m_list.erase(node);
         m_listeners.erase(iter);
         m_count.store(m_listeners.size(), std::memory_order_release);
         return;
@@ -228,8 +214,8 @@ bool ListenerSet<ListenerType>::try_remove(ListenerType& listener) noexcept{
         return true;
     }
 
-    Node& node = iter->second;
-    if (!node.lock.try_acquire_write()){
+    typename std::list<Node>::iterator node = iter->second;
+    if (!node->lock.try_acquire_write()){
         try{
             std::cout << "ListenerSet::try_remove(): Fail inner." << std::endl;
         }catch (...){}
@@ -237,21 +223,10 @@ bool ListenerSet<ListenerType>::try_remove(ListenerType& listener) noexcept{
     }
 
 #ifdef PA_DEBUG_ListenerSet
-    node.sanitizer.check_usage();
+    node->sanitizer.check_usage();
 #endif
 
-    *node.prevs_next = node.next;
-    if (node.next){
-#ifdef PA_DEBUG_ListenerSet
-        node.next->sanitizer.check_usage();
-#endif
-        node.next->prevs_next = node.prevs_next;
-    }
-
-#ifdef PA_DEBUG_ListenerSet
-    node.sanitizer.check_usage();
-#endif
-
+    m_list.erase(node);
     m_listeners.erase(iter);
     m_count.store(m_listeners.size(), std::memory_order_release);
     m_lock.unlock_write();
@@ -273,17 +248,16 @@ void ListenerSet<ListenerType>::run_method(Function function, Args&&... args){
 
     m_lock.acquire_read();
 
-    Node* node = m_list;
-    while (node){
+    for (Node& node : m_list){
         {
-            ReadSpinLock lg(node->lock, m_suppress_lock_prints ? nullptr : "ListenerSet::run_method()");
+            ReadSpinLock lg(node.lock, m_suppress_lock_prints ? nullptr : "ListenerSet::run_method()");
 
 #ifdef PA_DEBUG_ListenerSet
-            node->sanitizer.check_usage();
+            node.sanitizer.check_usage();
 #endif
             m_lock.unlock_read();
             try{
-                (node->listener.*function)(std::forward<Args>(args)...);
+                (node.listener.*function)(std::forward<Args>(args)...);
             }catch (...){
                 if (!err){
                     err = std::current_exception();
@@ -291,10 +265,6 @@ void ListenerSet<ListenerType>::run_method(Function function, Args&&... args){
             }
             m_lock.acquire_read();
         }
-#ifdef PA_DEBUG_ListenerSet
-        node->sanitizer.check_usage();
-#endif
-        node = node->next;
     }
 
     m_lock.unlock_read();
@@ -317,18 +287,17 @@ void ListenerSet<ListenerType>::run_on_all(Lambda&& lambda){
 
     m_lock.acquire_read();
 
-    Node* node = m_list;
-    while (node){
+    for (Node& node : m_list){
         bool return_now = false;
         {
-            ReadSpinLock lg(node->lock, m_suppress_lock_prints ? nullptr : "ListenerSet::run_on_all()");
+            ReadSpinLock lg(node.lock, m_suppress_lock_prints ? nullptr : "ListenerSet::run_on_all()");
 
 #ifdef PA_DEBUG_ListenerSet
-            node->sanitizer.check_usage();
+            node.sanitizer.check_usage();
 #endif
             m_lock.unlock_read();
             try{
-                return_now = lambda(node->listener);
+                return_now = lambda(node.listener);
             }catch (...){
                 if (!err){
                     err = std::current_exception();
@@ -340,9 +309,8 @@ void ListenerSet<ListenerType>::run_on_all(Lambda&& lambda){
             break;
         }
 #ifdef PA_DEBUG_ListenerSet
-        node->sanitizer.check_usage();
+        node.sanitizer.check_usage();
 #endif
-        node = node->next;
     }
 
     m_lock.unlock_read();
