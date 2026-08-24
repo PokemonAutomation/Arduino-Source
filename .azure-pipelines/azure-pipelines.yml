@@ -11,6 +11,11 @@ resources:
       name: PokemonAutomation/Arduino-Source-Internal
       endpoint: PokemonAutomation
 
+    - repository: Packages
+      type: github
+      name: PokemonAutomation/Packages
+      endpoint: PokemonAutomation
+
 variables:
   - group: apple-signing
   - group: github
