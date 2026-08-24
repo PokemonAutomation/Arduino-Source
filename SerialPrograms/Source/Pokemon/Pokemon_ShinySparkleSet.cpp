@@ -4,8 +4,8 @@
  *
  */
 
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "Pokemon_ShinySparkleSet.h"
 
 namespace PokemonAutomation{
