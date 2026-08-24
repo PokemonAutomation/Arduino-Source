@@ -7,6 +7,7 @@
 #include <QtGlobal>
 //#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/StaticGlobals.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/VideoPipeline/VideoPipelineOptions.h"
 #include "CameraImplementations.h"
@@ -55,7 +56,7 @@ struct CameraBackends{
             "qt6.5-QGraphicsScene", "Qt6.5: QGraphicsScene",
             std::make_unique<CameraQt65QMediaCaptureSession::CameraBackend>()
         );
-        if (STATIC_GLOBALS.DEVELOPER_MODE){
+        if (IS_BETA_VERSION || STATIC_GLOBALS.DEVELOPER_MODE){
             m_backends.emplace_back(
                 "qt6-QQuickWidget", "Qt6: QQuickWidget",
                 std::make_unique<CameraQt6_QQuickWidget::CameraBackend>()
