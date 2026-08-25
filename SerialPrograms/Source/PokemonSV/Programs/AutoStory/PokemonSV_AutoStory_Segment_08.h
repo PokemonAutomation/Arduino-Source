@@ -56,6 +56,7 @@ void checkpoint_13(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
     AutoStoryStats& stats,
     const std::string& checkpoint_text
 );
@@ -66,6 +67,7 @@ void checkpoint_14(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
     AutoStoryStats& stats,
     const std::string& checkpoint_text
 );
@@ -76,6 +78,7 @@ void checkpoint_15(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
     AutoStoryStats& stats,
     const std::string& checkpoint_text
 );

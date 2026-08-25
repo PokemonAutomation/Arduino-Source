@@ -65,19 +65,19 @@ std::string AutoStory_Checkpoint_102::name() const{ return "102 - " + AutoStory_
 std::string AutoStory_Checkpoint_102::start_text() const{ return "Inside Area Zero Station 4. Deactivated the locks.";}
 std::string AutoStory_Checkpoint_102::end_text() const{ return "Opened Zero lab. Defeated Paradox Pokemon.";}
 void AutoStory_Checkpoint_102::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_102(env, context, options.notif_status_update, stats, checkpoint_text());
+    checkpoint_102(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 std::string AutoStory_Checkpoint_103::name() const{ return "103 - " + AutoStory_Segment_39().name(); }
 std::string AutoStory_Checkpoint_103::start_text() const{ return AutoStory_Checkpoint_102().end_text();}
 std::string AutoStory_Checkpoint_103::end_text() const{ return "";}
 void AutoStory_Checkpoint_103::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_103(env, context, options.notif_status_update, stats, checkpoint_text());
+    checkpoint_103(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 
-void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
+void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
 
         YOLOv5Detector yolo_detector(DOWNLOADED_RESOURCE_PATH() + "PokemonSV/AreaZero/A0-lab.onnx");
@@ -274,8 +274,8 @@ void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     }, false);
 }
 
-void checkpoint_103(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
+void checkpoint_103(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
 
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,

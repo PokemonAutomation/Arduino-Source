@@ -70,7 +70,7 @@ std::string AutoStory_Checkpoint_83::name() const{ return "083 - " + AutoStory_S
 std::string AutoStory_Checkpoint_83::start_text() const{ return "At Alfornada Pokecenter.";}
 std::string AutoStory_Checkpoint_83::end_text() const{ return "At Alfornada Pokecenter.";}
 void AutoStory_Checkpoint_83::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_83(env, context, options.notif_status_update, stats, checkpoint_text());
+    checkpoint_83(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 
@@ -78,13 +78,13 @@ std::string AutoStory_Checkpoint_84::name() const{ return "084 - " + AutoStory_S
 std::string AutoStory_Checkpoint_84::start_text() const{ return AutoStory_Checkpoint_83().end_text();}
 std::string AutoStory_Checkpoint_84::end_text() const{ return "Beat Alfornada gym challenge. Beat Alfornada gym. At Alfronada Pokecenter.";}
 void AutoStory_Checkpoint_84::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_84(env, context, options.notif_status_update, stats, checkpoint_text());
+    checkpoint_84(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 
 
-void checkpoint_83(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
+void checkpoint_83(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
         // empty checkpoint
 
@@ -92,8 +92,8 @@ void checkpoint_83(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     }, false);  
 }
 
-void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
+void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
         DirectionDetector direction;
 

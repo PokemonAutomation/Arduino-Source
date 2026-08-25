@@ -67,21 +67,21 @@ std::string AutoStory_Checkpoint_47::name() const{ return "047 - " + AutoStory_S
 std::string AutoStory_Checkpoint_47::start_text() const{ return "At East Province (Area One) Pokecenter.";}
 std::string AutoStory_Checkpoint_47::end_text() const{ return "At East Province (Area One) Pokecenter.";}
 void AutoStory_Checkpoint_47::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_47(env, context, options.notif_status_update, stats, checkpoint_text());
+    checkpoint_47(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 std::string AutoStory_Checkpoint_48::name() const{ return "048 - " + AutoStory_Segment_21().name(); }
 std::string AutoStory_Checkpoint_48::start_text() const{ return AutoStory_Checkpoint_47().end_text();}
 std::string AutoStory_Checkpoint_48::end_text() const{ return "Beat Team Star (Fire)";}
 void AutoStory_Checkpoint_48::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_48(env, context, options.notif_status_update, stats, checkpoint_text());
+    checkpoint_48(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 std::string AutoStory_Checkpoint_49::name() const{ return "049 - " + AutoStory_Segment_21().name(); }
 std::string AutoStory_Checkpoint_49::start_text() const{ return AutoStory_Checkpoint_48().end_text();}
 std::string AutoStory_Checkpoint_49::end_text() const{ return "At East Province (Area Two) Pokecenter.";}
 void AutoStory_Checkpoint_49::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_49(env, context, options.notif_status_update, stats, checkpoint_text());
+    checkpoint_49(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 
@@ -90,11 +90,12 @@ void checkpoint_47(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
     AutoStoryStats& stats,
     const std::string& checkpoint_text
 ){
     
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
         // empty checkpoint, to preserve ordering
        
@@ -107,11 +108,12 @@ void checkpoint_48(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
     AutoStoryStats& stats,
     const std::string& checkpoint_text
 ){
     
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
 
         context.wait_for_all_requests();
@@ -294,11 +296,12 @@ void checkpoint_49(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
     AutoStoryStats& stats,
     const std::string& checkpoint_text
 ){
     
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
 
         // the landmark Pokecenter is far enough away from current location, that the map Pokemon don't cover it.

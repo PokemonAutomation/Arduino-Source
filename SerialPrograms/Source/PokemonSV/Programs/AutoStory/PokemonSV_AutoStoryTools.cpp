@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h" 
+#include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/UnexpectedBattleException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -463,7 +464,12 @@ void config_option(ProControllerContext& context, int change_option_value){
     pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
 }
 
-void swap_starter_moves(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Language language){
+void swap_starter_moves(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    Language language, 
+    EventNotificationOption& notif_error_recoverable)
+{
     const ProgramInfo& info = env.program_info();
     VideoStream& stream = env.console;
 
@@ -497,12 +503,18 @@ void swap_starter_moves(SingleSwitchProgramEnvironment& env, ProControllerContex
     stream.log("Current top move: " + top_move);
     if (top_move != "ember" && top_move != "leafage" && top_move != "water-gun"){
         stream.log("Unable to confirm that the moves actually swapped.");
-        OperationFailedException exception(
-            ErrorReport::SEND_ERROR_REPORT,
-            "swap_starter_moves: Unable to confirm that the moves actually swapped.\n" + language_warning(language),
-            stream
+
+        auto snapshot = stream.video().snapshot().frame;
+        std::string message = "swap_starter_moves: Unable to confirm that the moves actually swapped.\n" + language_warning(language);
+        send_program_recoverable_error_notification(env, notif_error_recoverable, message, *snapshot);
+        report_error(
+            &env.logger(),
+            env.program_info(),
+            "Recoverable: OperationFailedExceptionWithScreenshot",
+            {{"Message:", message}},
+            *snapshot,
+            &stream.history()
         );
-        exception.send_recoverable_notification(env);
     }   
 
 }
@@ -1416,6 +1428,7 @@ void checkpoint_reattempt_loop(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
     AutoStoryStats& stats,
     const std::string& checkpoint_text,
     std::function<void(size_t attempt_number)>&& action,
@@ -1443,12 +1456,17 @@ void checkpoint_reattempt_loop(
         break;
     }catch (OperationFailedException& e){
         if (i == 10){  // send an error report for debugging if 10 failed attempts for a given checkpoint.
-            OperationFailedException exception(
-                ErrorReport::SEND_ERROR_REPORT,
-                "10 failed attempts. " + checkpoint_text,
-                env.console
+            auto snapshot = env.console.video().snapshot().frame;
+            std::string message = "10 failed attempts. " + checkpoint_text;
+            send_program_recoverable_error_notification(env, notif_error_recoverable, message, *snapshot);
+            report_error(
+                &env.logger(),
+                env.program_info(),
+                "Recoverable: OperationFailedExceptionWithScreenshot",
+                {{"Message:", message}},
+                *snapshot,
+                &env.console.history()
             );
-            exception.send_recoverable_notification(env);
         }
 
         if (i > max_attempts){
@@ -1475,6 +1493,7 @@ void checkpoint_reattempt_loop_tutorial(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
     AutoStoryStats& stats,
     const std::string& checkpoint_text,
     std::function<void(size_t attempt_number)>&& action
@@ -1497,12 +1516,17 @@ void checkpoint_reattempt_loop_tutorial(
         break;  
     }catch (OperationFailedException& e){
         if (i == 10){  // send an error report for debugging if 10 failed attempts for a given checkpoint.
-            OperationFailedException exception(
-                ErrorReport::SEND_ERROR_REPORT,
-                "10 failed attempts. " + checkpoint_text,
-                env.console
+            auto snapshot = env.console.video().snapshot().frame;
+            std::string message = "10 failed attempts. " + checkpoint_text;
+            send_program_recoverable_error_notification(env, notif_error_recoverable, message, *snapshot);
+            report_error(
+                &env.logger(),
+                env.program_info(),
+                "Recoverable: OperationFailedExceptionWithScreenshot",
+                {{"Message:", message}},
+                *snapshot,
+                &env.console.history()
             );
-            exception.send_recoverable_notification(env);
         }
 
         if (i > max_attempts){

@@ -67,25 +67,26 @@ std::string AutoStory_Checkpoint_37::name() const{ return "037 - " + AutoStory_S
 std::string AutoStory_Checkpoint_37::start_text() const{ return "At Porto Marinada Pokecenter.";}
 std::string AutoStory_Checkpoint_37::end_text() const{ return "Won auction at Porto Marinada, passed Gym challenge.";}
 void AutoStory_Checkpoint_37::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_37(env, context, options.notif_status_update, stats, checkpoint_text());
+    checkpoint_37(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 std::string AutoStory_Checkpoint_38::name() const{ return "038 - " + AutoStory_Segment_17().name(); }
 std::string AutoStory_Checkpoint_38::start_text() const{ return AutoStory_Checkpoint_37().end_text();}
 std::string AutoStory_Checkpoint_38::end_text() const{ return "Defeat Cascarrafa Gym. At Porto Marinada Pokecenter.";}
 void AutoStory_Checkpoint_38::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_38(env, context, options.notif_status_update, stats, checkpoint_text());
+    checkpoint_38(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 void checkpoint_37(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
     AutoStoryStats& stats,
     const std::string& checkpoint_text
 ){
     
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
         DirectionDetector direction;
@@ -130,11 +131,12 @@ void checkpoint_38(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
     AutoStoryStats& stats,
     const std::string& checkpoint_text
 ){
     
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, +1, -0.409, 1360ms});
