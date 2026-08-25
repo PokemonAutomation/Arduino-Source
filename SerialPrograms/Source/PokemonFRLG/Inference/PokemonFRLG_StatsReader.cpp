@@ -35,7 +35,7 @@ namespace PokemonFRLG {
 StatsReader::StatsReader(Color color)
     : m_color(color), 
     m_box_nature(0.028976, 0.729610, 0.502487, 0.066639),
-    m_box_level(0.052000, 0.120140, 0.099000, 0.069416),
+    m_box_level(0.058333, 0.120140, 0.092308, 0.069416),
     m_box_name(0.163158, 0.122917, 0.262811, 0.066639),
     m_box_gender(0.430769, 0.114423, 0.034615, 0.081731),
     m_box_hp(0.805274, 0.131247, 0.183790, 0.066639),
@@ -53,7 +53,8 @@ StatsReader::StatsReader(Color color)
     m_box_defense_jpn(0.859615, 0.323792, 0.121795, 0.068269),
     m_box_sp_attack_jpn(0.859615, 0.404315, 0.121795, 0.068269),
     m_box_sp_defense_jpn(0.859615, 0.484838, 0.121795, 0.068269),
-    m_box_speed_jpn(0.859615, 0.565361, 0.121795, 0.068269)   
+    m_box_speed_jpn(0.859615, 0.565361, 0.121795, 0.068269),
+    m_box_level_spa(0.062179, 0.120140, 0.088462, 0.069416)
 {}
 
 void StatsReader::make_overlays(VideoOverlaySet &items) const {
@@ -78,6 +79,7 @@ void StatsReader::make_overlays(VideoOverlaySet &items) const {
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_sp_attack_jpn));
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_sp_defense_jpn));
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_speed_jpn));
+    items.add(m_color, GAME_BOX.inner_to_outer(m_box_level_spa));
 }
 
 bool StatsReader::read_name(
@@ -158,9 +160,11 @@ bool StatsReader::read_level(
     const std::set<std::string>& subset,
     bool save_debug_images
 ){
-    const bool jpn = language == Language::Japanese;
-
-    ImageViewRGB32 level_box = extract_box_reference(game_screen, jpn ? m_box_level_jpn : m_box_level);
+    ImageViewRGB32 level_box = extract_box_reference(game_screen, 
+        language == Language::Japanese ? m_box_level_jpn :
+        language == Language::Spanish  ? m_box_level_spa :
+                                         m_box_level
+    );
     
     // The level uses white text with dark shadow on a lilac background.
     // The digit reader's binarizer captures dark pixels (<=190 on all channels)
@@ -182,26 +186,16 @@ bool StatsReader::read_level(
             }
         }
     }
-    // Trim left 7% to exclude the "L" glyph blob (always at x~0).
-    // The actual level digits start at ~13%+ of the box width.
-    size_t lv_skip = preprocessed.width() * 7 / 100;
-    ImagePixelBox digits_bbox(
-        lv_skip, 0, preprocessed.width(),
-        preprocessed.height()
-    );
-    ImageViewRGB32 level_digit_view =
-            extract_box_reference(preprocessed, digits_bbox);
     // Use threshold 230 (not 175): lilac-background blob crops inherently
     // give higher RMSD than yellow stat-box crops due to background colour.
     stats.level = read_digits_waterfill_template(
-            logger, level_digit_view, DigitTemplateType::LevelBox, 230,
+            logger, preprocessed, DigitTemplateType::LevelBox, 230,
             "levelDigit", 0x7F);
     // log if it's an obviously bad read
     if (!stats.level.has_value() || stats.level.value_or(-1) < 2 || stats.level.value_or(-1) > 100){
         logger.log("Level OCR result out of range", COLOR_RED);
         if (save_debug_images){
             preprocessed.save("DebugDumps/ocr_level_preprocessed.png");
-            level_digit_view.save("DebugDumps/ocr_level_digits_trimmed.png");
         }
         return false;
     }
@@ -533,6 +527,7 @@ void add_tests_StatsReader(UnitTestDatabase& database){
     database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/mewtwo_1_spa.png");
     database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/nidoranf_1_eng.jpg");
     database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/raikou_1_eng.png");
+    database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/raikou_2_eng.png");
     database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/venonat_1_eng.jpg");
 }
 
