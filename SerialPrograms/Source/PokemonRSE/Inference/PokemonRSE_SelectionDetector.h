@@ -50,7 +50,6 @@ class SelectionArrowDetector : public StaticScreenDetector{
 public:
     SelectionArrowDetector(
         Color color,
-        VideoOverlay* overlay,
         const ImageFloatBox& box
     );
 
@@ -59,7 +58,6 @@ public:
 
 private:
     const Color m_color;
-    VideoOverlay* m_overlay;
     const ImageFloatBox m_box;
 };
 class SelectionArrowWatcher : public DetectorToFinder<SelectionArrowDetector>{
@@ -70,7 +68,7 @@ public:
         const ImageFloatBox& box,
         std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
     )
-         : DetectorToFinder("SelectionArrowWatcher", hold_duration, color, overlay, box)
+         : DetectorToFinder("SelectionArrowWatcher", hold_duration, color, box)
     {}
 };
 
@@ -80,7 +78,6 @@ class SelectionBorderDetector : public StaticScreenDetector {
 public:
     SelectionBorderDetector(
         Color color,
-        VideoOverlay* overlay,
         const ImageFloatBox& box
     );
     virtual void make_overlays(VideoOverlaySet& items) const override;
@@ -88,18 +85,16 @@ public:
 
 private:
     Color m_color;
-    VideoOverlay* m_overlay;
     const ImageFloatBox m_box;
 };
 class SelectionBorderWatcher : public DetectorToFinder<SelectionBorderDetector> {
 public:
     SelectionBorderWatcher(
         Color color,
-        VideoOverlay* overlay,
         const ImageFloatBox& box,
         std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
     )
-        : DetectorToFinder("SelectionBorderWatcher", hold_duration, color, overlay, box)
+        : DetectorToFinder("SelectionBorderWatcher", hold_duration, color, box)
     {}
 };
 
@@ -110,7 +105,6 @@ class SelectionSlotDetector : public StaticScreenDetector {
 public: 
     SelectionSlotDetector(
         Color color,
-        VideoOverlay* overlay,
         const std::vector<SlotCandidate>& candidates
         );
     virtual void make_overlays(VideoOverlaySet& items) const override;
@@ -118,7 +112,6 @@ public:
 
 private:
     Color m_color;
-    VideoOverlay* m_overlay;
 	std::vector<std::unique_ptr<StaticScreenDetector>> m_detectors;
 };
 class SelectionWatcher : public DetectorToFinder<SelectionSlotDetector> {
@@ -129,7 +122,7 @@ public:
 		const std::vector<SlotCandidate>& candidates,
         std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
     )
-        : DetectorToFinder("SelectionWatcher", hold_duration, color, overlay, candidates)
+        : DetectorToFinder("SelectionWatcher", hold_duration, color, candidates)
     {
     }
 };

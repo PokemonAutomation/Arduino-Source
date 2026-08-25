@@ -56,14 +56,13 @@ public:
     }
 };
 
-SelectionArrowDetector::SelectionArrowDetector(Color color, VideoOverlay* overlay, const ImageFloatBox& box)
+SelectionArrowDetector::SelectionArrowDetector(Color color, const ImageFloatBox& box)
     : m_color(color)
-    , m_overlay(overlay)
     , m_box(box)
 {}
 void SelectionArrowDetector::make_overlays(VideoOverlaySet& items) const {
     const BoxOption& GAME_BOX = GameSettings::instance().GAME_BOX;
-	items.add(m_color, GAME_BOX.inner_to_outer(m_box));
+    items.add(m_color, GAME_BOX.inner_to_outer(m_box));
 }
 bool SelectionArrowDetector::detect(const ImageViewRGB32& screen) {
     const BoxOption& GAME_BOX = GameSettings::instance().GAME_BOX;
@@ -105,9 +104,8 @@ bool SelectionArrowDetector::detect(const ImageViewRGB32& screen) {
 }
 
 
-SelectionBorderDetector::SelectionBorderDetector(Color color, VideoOverlay* overlay, const ImageFloatBox& box)
+SelectionBorderDetector::SelectionBorderDetector(Color color, const ImageFloatBox& box)
     : m_color(color)
-    , m_overlay(overlay)
     , m_box(box)
 {}
 void SelectionBorderDetector::make_overlays(VideoOverlaySet& items) const {
@@ -140,34 +138,33 @@ bool SelectionBorderDetector::detect(const ImageViewRGB32& screen) {
 }
 
 
-SelectionSlotDetector::SelectionSlotDetector(Color color, VideoOverlay* overlay, const std::vector<SlotCandidate>& candidates) 
+SelectionSlotDetector::SelectionSlotDetector(Color color, const std::vector<SlotCandidate>& candidates) 
     : m_color(color)
-    , m_overlay(overlay)
 {
-	for (const auto& candidate : candidates) {
+    for (const auto& candidate : candidates) {
         double slot_y = candidate.y;
-		double width = (candidate.indicator == SelectionIndicator::ARROW) ? SELECTION_ARROW_BOX_WIDTH : SELECTION_BORDER_BOX_WIDTH;
-		double height = (candidate.indicator == SelectionIndicator::BORDER) ? SELECTION_BORDER_BOX_HEIGHT : SELECTION_ARROW_BOX_HEIGHT;
-		ImageFloatBox box(candidate.x, slot_y, width, height);
+        double width = (candidate.indicator == SelectionIndicator::ARROW) ? SELECTION_ARROW_BOX_WIDTH : SELECTION_BORDER_BOX_WIDTH;
+        double height = (candidate.indicator == SelectionIndicator::BORDER) ? SELECTION_BORDER_BOX_HEIGHT : SELECTION_ARROW_BOX_HEIGHT;
+        ImageFloatBox box(candidate.x, slot_y, width, height);
 
         if (candidate.indicator == SelectionIndicator::ARROW) {
-			m_detectors.emplace_back(std::make_unique<SelectionArrowDetector>(color, overlay, box));
-		} else if (candidate.indicator == SelectionIndicator::BORDER) {
-			m_detectors.emplace_back(std::make_unique<SelectionBorderDetector>(color, overlay, box));
-		}
-	}
+            m_detectors.emplace_back(std::make_unique<SelectionArrowDetector>(color, box));
+        } else if (candidate.indicator == SelectionIndicator::BORDER) {
+            m_detectors.emplace_back(std::make_unique<SelectionBorderDetector>(color, box));
+        }
+    }
 }
 void SelectionSlotDetector::make_overlays(VideoOverlaySet& items) const {
-	for (const auto& detector : m_detectors) {
-		detector->make_overlays(items);
-	}
+    for (const auto& detector : m_detectors) {
+        detector->make_overlays(items);
+    }
 }
 bool SelectionSlotDetector::detect(const ImageViewRGB32& screen) {
-	for (auto& detector : m_detectors) {
-		if (detector->detect(screen)) {
-			return true;
-		}
-	}
+    for (auto& detector : m_detectors) {
+        if (detector->detect(screen)) {
+            return true;
+        }
+    }
     return false;
 }
 

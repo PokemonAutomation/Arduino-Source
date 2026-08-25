@@ -2168,6 +2168,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonRSE/PokemonRSE_Panels.h
     Source/PokemonRSE/PokemonRSE_Settings.cpp
     Source/PokemonRSE/PokemonRSE_Settings.h
+    Source/PokemonRSE/PokemonRSE_Tests.cpp
+    Source/PokemonRSE/PokemonRSE_Tests.h
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_AudioStarterReset.cpp
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_AudioStarterReset.h
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_GiftReset.cpp

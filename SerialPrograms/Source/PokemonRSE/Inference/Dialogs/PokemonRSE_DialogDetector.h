@@ -9,9 +9,10 @@
 
 #include <chrono>
 #include <atomic>
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/VisualDetector.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
@@ -169,16 +170,19 @@ enum class ConfirmSlot {
 
 class ConfirmSlotDetector : public SelectionSlotDetector {
 public:
-	ConfirmSlotDetector(Color color, VideoOverlay* overlay, ConfirmSlot slot);
+	ConfirmSlotDetector(Color color, ConfirmSlot slot);
 };
 class ConfirmSlotWatcher : public DetectorToFinder<ConfirmSlotDetector> {
 public:
-    ConfirmSlotWatcher(Color color, VideoOverlay* overlay, ConfirmSlot slot, Milliseconds hold_duration = Milliseconds(250))
-        : DetectorToFinder("ConfirmSlotWatcher", hold_duration , color, overlay, slot)
+    ConfirmSlotWatcher(Color color, ConfirmSlot slot, Milliseconds hold_duration = Milliseconds(250))
+        : DetectorToFinder("ConfirmSlotWatcher", hold_duration , color, slot)
     {}
 };
 
 
+
+void add_tests_SelectionDialogDetector(UnitTestDatabase& database);
+void add_tests_ConfirmSlotDetector(UnitTestDatabase& database);
 
 }
 }
