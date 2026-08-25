@@ -95,6 +95,7 @@ private:
 void add_tests_TrainerIdReader(UnitTestDatabase& database){
     database.add<Test_TrainerIdReader>("PokemonFRLG/TrainerIdReader/tom_eng_60895.jpg");
     database.add<Test_TrainerIdReader>("PokemonFRLG/TrainerIdReader/nyash_jpn_45345.png");
+    database.add<Test_TrainerIdReader>("PokemonFRLG/TrainerIdReader/alberto_spa_65385.png");
 }
 
 
