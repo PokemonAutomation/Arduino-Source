@@ -15,6 +15,7 @@
 #include "CommonTools/VisualDetector.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
+#include "PokemonRSE/Inference/PokemonRSE_SelectionDetector.h"
 #include "PokemonRSE/PokemonRSE_Settings.h"
 
 namespace PokemonAutomation{
@@ -159,6 +160,24 @@ public:
         : DetectorToFinder("SelectionDialogWatcher", std::chrono::milliseconds(250), color)
     {}
 };
+
+
+enum class ConfirmSlot {
+    YES,
+    NO
+};
+
+class ConfirmSlotDetector : public SelectionSlotDetector {
+public:
+	ConfirmSlotDetector(Color color, VideoOverlay* overlay, ConfirmSlot slot);
+};
+class ConfirmSlotWatcher : public DetectorToFinder<ConfirmSlotDetector> {
+public:
+    ConfirmSlotWatcher(Color color, VideoOverlay* overlay, ConfirmSlot slot, Milliseconds hold_duration = Milliseconds(250))
+        : DetectorToFinder("ConfirmSlotWatcher", hold_duration , color, overlay, slot)
+    {}
+};
+
 
 
 }

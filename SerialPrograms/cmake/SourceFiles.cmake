@@ -2156,6 +2156,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonRSE/Inference/Menus/PokemonRSE_StartMenuDetector.h
     Source/PokemonRSE/Inference/Menus/PokemonRSE_SummaryDetector.cpp
     Source/PokemonRSE/Inference/Menus/PokemonRSE_SummaryDetector.h
+    Source/PokemonRSE/Inference/PokemonRSE_SelectionDetector.cpp
+    Source/PokemonRSE/Inference/PokemonRSE_SelectionDetector.h
     Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.cpp
     Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.h
     Source/PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.cpp

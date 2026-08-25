@@ -201,6 +201,15 @@ bool SelectionDialogDetector::detect(const ImageViewRGB32& screen){
 }
 
 
+ConfirmSlotDetector::ConfirmSlotDetector(Color color, VideoOverlay* overlay, ConfirmSlot slot)
+    : SelectionSlotDetector(color, overlay
+    , {
+        { 0.69, 0.45 + SELECTION_SLOT_OFFSETS[(int)slot], SelectionIndicator::ARROW  },
+        { 0.685, 0.458 + SELECTION_SLOT_OFFSETS[(int)slot], SelectionIndicator::BORDER }
+    })
+{}
+
+
 
 }
 }
