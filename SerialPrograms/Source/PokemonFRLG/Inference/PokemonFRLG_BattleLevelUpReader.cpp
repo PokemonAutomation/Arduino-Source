@@ -59,7 +59,7 @@ StatReads BattleLevelUpReader::read_stats(Logger &logger, const ImageViewRGB32& 
     
     auto read_stat = [&](const ImageFloatBox &box, const std::string &name){
         ImageViewRGB32 stat_region = extract_box_reference(game_screen, box);
-        return read_digits_waterfill_template(logger, stat_region);
+        return read_digits_waterfill_template(logger, stat_region, DigitTemplateType::DialogBox);
     };
 
     StatReads stats;
@@ -105,7 +105,11 @@ private:
 
 
 void add_tests_BattleLevelUpReader(UnitTestDatabase& database){
-    // to do
+    database.add<Test_BattleLevelUpReader>("PokemonFRLG/BattleLevelUpReader/charizard_1.png");
+    database.add<Test_BattleLevelUpReader>("PokemonFRLG/BattleLevelUpReader/horsea_1.png");
+    database.add<Test_BattleLevelUpReader>("PokemonFRLG/BattleLevelUpReader/horsea_2.png");
+    database.add<Test_BattleLevelUpReader>("PokemonFRLG/BattleLevelUpReader/horsea_3.png");
+    database.add<Test_BattleLevelUpReader>("PokemonFRLG/BattleLevelUpReader/deoxys_1_jpn.jpg");
 }
 
 

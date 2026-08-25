@@ -20,7 +20,7 @@ namespace NintendoSwitch{
 namespace PokemonFRLG{
 
 TrainerCardDetector::TrainerCardDetector(Color color)
-    : m_box_tid_top(0.581250, 0.108413, 0.332692, 0.007212) // light blue (227, 255, 255)
+    : m_box_tid_top(0.68125, 0.108413, 0.232692, 0.007212) // light blue (227, 255, 255)
     , m_box_tid_right(0.914904, 0.117067, 0.005769, 0.064904) 
     , m_box_stripe_top(0.038942, 0.090384, 0.918269, 0.002885) // blue  (94, 177, 255)
     , m_box_stripe_right(0.954808, 0.095432, 0.002885, 0.109615)

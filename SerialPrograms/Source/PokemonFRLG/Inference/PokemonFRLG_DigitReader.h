@@ -27,6 +27,7 @@ namespace PokemonFRLG{
 enum class DigitTemplateType{
     StatBox,      // Yellow stat boxes (default): PokemonFRLG/Digits/
     LevelBox,     // Lilac level box: PokemonFRLG/LevelDigits/
+    DialogBox,    // White dialog box: PokemonFRLG/DialogDigits/
 };
 
 // Read a string of decimal digits from `stat_region`.
@@ -38,8 +39,8 @@ enum class DigitTemplateType{
 int read_digits_waterfill_template(
     Logger& logger,
     const ImageViewRGB32& stat_region,
-    double rmsd_threshold = 175.0,
     DigitTemplateType template_type = DigitTemplateType::StatBox,
+    double rmsd_threshold = 175.0,
     const std::string& dump_prefix = "digit",
     uint8_t binarize_high = 0xBE,  // 0xBE=190 for yellow stat boxes;
     bool save_debug_images = false
