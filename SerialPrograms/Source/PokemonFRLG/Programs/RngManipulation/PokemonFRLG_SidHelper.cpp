@@ -299,7 +299,8 @@ void SidHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     bool extra_press_at_end = (
         LANGUAGE == Language::German ||
-        LANGUAGE == Language::Japanese
+        LANGUAGE == Language::Japanese ||
+        LANGUAGE == Language:: Spanish
     );
 
     const uint64_t SID_DELAY = uint64_t((TARGET_ADVANCES - 2*FINAL_TEXT_FRAMES + FIXED_ADVANCES_OFFSET) * FRLG_FRAME_DURATION / 2); // advances pass 2 by 2
