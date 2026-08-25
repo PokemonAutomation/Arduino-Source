@@ -59,7 +59,7 @@ StatReads PartyLevelUpReader::read_stats(Logger &logger, const ImageViewRGB32& f
     
     auto read_stat = [&](const ImageFloatBox &box, const std::string &name){
         ImageViewRGB32 stat_region = extract_box_reference(game_screen, box);
-        return read_digits_waterfill_template(logger, stat_region);
+        return read_digits_waterfill_template(logger, stat_region, DigitTemplateType::DialogBox);
     };
 
     StatReads stats;

@@ -194,7 +194,7 @@ bool StatsReader::read_level(
     // Use threshold 230 (not 175): lilac-background blob crops inherently
     // give higher RMSD than yellow stat-box crops due to background colour.
     stats.level = read_digits_waterfill_template(
-            logger, level_digit_view, 230.0, DigitTemplateType::LevelBox,
+            logger, level_digit_view, DigitTemplateType::LevelBox, 230,
             "levelDigit", 0x7F);
     // log if it's an obviously bad read
     if (!stats.level.has_value() || stats.level.value_or(-1) < 2 || stats.level.value_or(-1) > 100){
@@ -307,7 +307,7 @@ void StatsReader::read_page2(
         ImageViewRGB32 stat_region = extract_box_reference(game_screen, box);
 
         // waterfill segmentation + template matching against the PokemonFRLG/Digits/0-9.png templates.
-        int stat = read_digits_waterfill_template(logger, stat_region);
+        int stat = read_digits_waterfill_template(logger, stat_region, DigitTemplateType::StatBox);
         // log impossible values or failed reads
         if (name != "hp" && (stat < 1 || stat > 614)){ // 614 comes from a max Def Shuckle
             logger.log("OCR result for " + name + " out of range: " + std::to_string(stat), COLOR_RED);

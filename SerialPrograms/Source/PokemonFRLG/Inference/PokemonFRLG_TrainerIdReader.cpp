@@ -51,7 +51,7 @@ uint16_t TrainerIdReader::read_tid(
 
     // waterfill segmentation + template matching
     // against the PokemonFRLG/Digits/0-9.png templates.
-    return uint16_t(read_digits_waterfill_template(logger, tid_region));
+    return uint16_t(read_digits_waterfill_template(logger, tid_region, DigitTemplateType::DialogBox));
 }
 
 
