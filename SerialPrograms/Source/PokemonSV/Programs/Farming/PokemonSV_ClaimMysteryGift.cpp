@@ -372,7 +372,8 @@ void ClaimMysteryGift::run_autostory_until_pokeportal_unlocked(SingleSwitchProgr
     AutoStoryOptions options{
         LANGUAGE,
         StarterChoice::FUECOCO,
-        NOTIFICATION_STATUS_UPDATE
+        NOTIFICATION_STATUS_UPDATE,
+        NOTIFICATION_ERROR_RECOVERABLE
     };    
     AutoStoryStats stats;  // unused
     for (size_t segment_index = 0; segment_index <= 6; segment_index++){

@@ -90,6 +90,7 @@ struct AutoStoryOptions{
     Language language;
     StarterChoice starter_choice;
     EventNotificationOption& notif_status_update;
+    EventNotificationOption& notif_error_recoverable;
 };
 
 class AutoStory_Segment {
@@ -183,7 +184,12 @@ void overworld_navigation(const ProgramInfo& info, VideoStream& stream, ProContr
 void config_option(ProControllerContext& context, int change_option_value);
 
 // enter menu and swap the first and third moves for your starter
-void swap_starter_moves(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Language language);
+void swap_starter_moves(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    Language language, 
+    EventNotificationOption& notif_error_recoverable
+);
 
 // confirm the moves for the Lead pokemon: Moonblast, Mystical Fire, Psychic, Misty Terrain
 // start and end in the overworld
@@ -379,6 +385,7 @@ void checkpoint_reattempt_loop(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
     AutoStoryStats& stats,
     const std::string& checkpoint_text,
     std::function<void(size_t attempt_number)>&& action,
@@ -389,6 +396,7 @@ void checkpoint_reattempt_loop_tutorial(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
     AutoStoryStats& stats,
     const std::string& checkpoint_text,
     std::function<void(size_t attempt_number)>&& action

@@ -66,14 +66,14 @@ std::string AutoStory_Checkpoint_39::name() const{ return "039 - " + AutoStory_S
 std::string AutoStory_Checkpoint_39::start_text() const{ return "Defeated Cascarrafa Gym (Water). At Porto Marinada Pokecenter.";}
 std::string AutoStory_Checkpoint_39::end_text() const{ return "Defeated Great Tusk/Iron Treads.";}
 void AutoStory_Checkpoint_39::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_39(env, context, options.notif_status_update, stats, checkpoint_text());
+    checkpoint_39(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 std::string AutoStory_Checkpoint_40::name() const{ return "040 - " + AutoStory_Segment_18().name(); }
 std::string AutoStory_Checkpoint_40::start_text() const{ return AutoStory_Checkpoint_39().end_text();}
 std::string AutoStory_Checkpoint_40::end_text() const{ return "At South Province (Area Three) Pokecenter.";}
 void AutoStory_Checkpoint_40::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_40(env, context, options.notif_status_update, stats, checkpoint_text());
+    checkpoint_40(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 
@@ -83,11 +83,12 @@ void checkpoint_39(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
     AutoStoryStats& stats,
     const std::string& checkpoint_text
 ){
     
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
 
@@ -252,11 +253,12 @@ void checkpoint_40(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
     AutoStoryStats& stats,
     const std::string& checkpoint_text
 ){
     
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
         // fly to Mesagoza East from Great Tusk/Iron Treads

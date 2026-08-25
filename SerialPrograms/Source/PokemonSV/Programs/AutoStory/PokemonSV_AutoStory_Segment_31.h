@@ -70,25 +70,25 @@ public:
 
 // start: At North Province Area One Pokecenter.
 // end: At North Province Area Two Pokecenter
-void checkpoint_78(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text);
+void checkpoint_78(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text);
 
 // start: At North Province Area Two Pokecenter
 // end: At North Province Area Two Pokecenter
-void checkpoint_79(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text);
+void checkpoint_79(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text);
 
 
 // start: At North Province Area Two Pokecenter
 // end: Beat Team Star (Fighting)
-void checkpoint_80(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text);
+void checkpoint_80(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text);
 
 // start: Beat Team Star (Fighting)
 // end: At Alfornada Pokecenter.
-void checkpoint_81(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text);
+void checkpoint_81(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text);
 
 
 // start: At Alfornada Pokecenter.
 // end: At Alfornada Pokecenter.
-void checkpoint_82(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text);
+void checkpoint_82(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text);
 
 
 

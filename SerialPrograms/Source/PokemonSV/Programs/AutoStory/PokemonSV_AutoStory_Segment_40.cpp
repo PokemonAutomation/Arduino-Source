@@ -66,18 +66,18 @@ std::string AutoStory_Checkpoint_104::name() const{ return "104 - " + AutoStory_
 std::string AutoStory_Checkpoint_104::start_text() const{ return "Entered Zero Lab. Spoke to AI Professor.";}
 std::string AutoStory_Checkpoint_104::end_text() const{ return "Battled the AI Professor. Completed the game.";}
 void AutoStory_Checkpoint_104::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_104(env, context, options.notif_status_update, stats, checkpoint_text());
+    checkpoint_104(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 // std::string AutoStory_Checkpoint_105::name() const{ return "105 - " + AutoStory_Segment_40().name(); }
 // std::string AutoStory_Checkpoint_105::start_text() const{ return "";}
 // std::string AutoStory_Checkpoint_105::end_text() const{ return "";}
 // void AutoStory_Checkpoint_105::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-//     checkpoint_105(env, context, options.notif_status_update, stats, checkpoint_text());
+//     checkpoint_105(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 // }
 
-void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
+void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
 
         pbf_press_button(context, BUTTON_L, 240ms, 80ms);
@@ -174,7 +174,7 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     }, false);
 }
 
-// void checkpoint_105(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text){
+// void checkpoint_105(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text){
 // }
 
 

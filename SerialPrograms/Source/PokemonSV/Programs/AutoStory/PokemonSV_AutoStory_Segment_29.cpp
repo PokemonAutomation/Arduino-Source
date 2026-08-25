@@ -70,7 +70,7 @@ std::string AutoStory_Checkpoint_71::name() const{ return "071 - " + AutoStory_S
 std::string AutoStory_Checkpoint_71::start_text() const{ return "At Montenevera Pokecenter";}
 std::string AutoStory_Checkpoint_71::end_text() const{ return "Spoke to Montenevera gym receptionist. Inside Montenevera gym building.";}
 void AutoStory_Checkpoint_71::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_71(env, context, options.notif_status_update, stats, checkpoint_text());
+    checkpoint_71(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 
@@ -78,7 +78,7 @@ std::string AutoStory_Checkpoint_72::name() const{ return "072 - " + AutoStory_S
 std::string AutoStory_Checkpoint_72::start_text() const{ return AutoStory_Checkpoint_71().end_text();}
 std::string AutoStory_Checkpoint_72::end_text() const{ return "Passed gym test with MC Sledge. Standing in front of MC Sledge, outside the Montenevera gym building.";}
 void AutoStory_Checkpoint_72::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_72(env, context, options.notif_status_update, stats, checkpoint_text());
+    checkpoint_72(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 
@@ -86,7 +86,7 @@ std::string AutoStory_Checkpoint_73::name() const{ return "073 - " + AutoStory_S
 std::string AutoStory_Checkpoint_73::start_text() const{ return AutoStory_Checkpoint_72().end_text();}
 std::string AutoStory_Checkpoint_73::end_text() const{ return "Beat Montenevera Gym. Inside Montenevera gym building.";}
 void AutoStory_Checkpoint_73::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_73(env, context, options.notif_status_update, stats, checkpoint_text());
+    checkpoint_73(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 
@@ -94,13 +94,13 @@ std::string AutoStory_Checkpoint_74::name() const{ return "074 - " + AutoStory_S
 std::string AutoStory_Checkpoint_74::start_text() const{ return AutoStory_Checkpoint_73().end_text();}
 std::string AutoStory_Checkpoint_74::end_text() const{ return "At Glaseado gym Pokecenter.";}
 void AutoStory_Checkpoint_74::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_74(env, context, options.notif_status_update, stats, checkpoint_text());
+    checkpoint_74(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 
 
-void checkpoint_71(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
+void checkpoint_71(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
         DirectionDetector direction;
 
@@ -155,8 +155,8 @@ void checkpoint_71(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     });  
 }
 
-void checkpoint_72(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
+void checkpoint_72(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
 
         pbf_move_left_joystick(context, {0, -1}, 2400ms, 800ms);
@@ -187,8 +187,8 @@ void checkpoint_72(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     });  
 }
 
-void checkpoint_73(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
+void checkpoint_73(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
 
         DirectionDetector direction;
@@ -210,8 +210,8 @@ void checkpoint_73(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     });  
 }
 
-void checkpoint_74(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, const std::string& checkpoint_text){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
+void checkpoint_74(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
         pbf_move_left_joystick(context, {0, -1}, 2400ms, 800ms);
         pbf_wait(context, 3000ms);

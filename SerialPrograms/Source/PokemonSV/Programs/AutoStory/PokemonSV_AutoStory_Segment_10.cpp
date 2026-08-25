@@ -67,21 +67,21 @@ std::string AutoStory_Checkpoint_21::name() const{ return "021 - " + AutoStory_S
 std::string AutoStory_Checkpoint_21::start_text() const{ return "After the break, with level 100 Gardevoir. At Mesagoza West pokecenter.";}
 std::string AutoStory_Checkpoint_21::end_text() const{ return "At Mesagoza West gate flypoint.";}
 void AutoStory_Checkpoint_21::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_21(env, context, options.notif_status_update, stats, checkpoint_text());
+    checkpoint_21(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 std::string AutoStory_Checkpoint_22::name() const{ return "022 - " + AutoStory_Segment_10().name(); }
 std::string AutoStory_Checkpoint_22::start_text() const{ return AutoStory_Checkpoint_21().end_text();}
 std::string AutoStory_Checkpoint_22::end_text() const{ return "At South Province Area Two Pokecenter.";}
 void AutoStory_Checkpoint_22::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_22(env, context, options.notif_status_update, stats, checkpoint_text());
+    checkpoint_22(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 std::string AutoStory_Checkpoint_23::name() const{ return "023 - " + AutoStory_Segment_10().name(); }
 std::string AutoStory_Checkpoint_23::start_text() const{ return AutoStory_Checkpoint_22().end_text();}
 std::string AutoStory_Checkpoint_23::end_text() const{ return "At Cortondo East Pokecenter";}
 void AutoStory_Checkpoint_23::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_23(env, context, options.notif_status_update, stats, checkpoint_text());
+    checkpoint_23(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 
@@ -90,11 +90,12 @@ void checkpoint_21(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
     AutoStoryStats& stats,
     const std::string& checkpoint_text
 ){
     
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){         
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);
 
@@ -145,11 +146,12 @@ void checkpoint_22(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
     AutoStoryStats& stats,
     const std::string& checkpoint_text
 ){
     
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
 
@@ -208,11 +210,12 @@ void checkpoint_23(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
     AutoStoryStats& stats,
     const std::string& checkpoint_text
 ){
     
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats, checkpoint_text,
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
 
