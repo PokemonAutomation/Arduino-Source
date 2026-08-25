@@ -345,8 +345,42 @@ void hatch_daycare_egg(ConsoleHandle& console, ProControllerContext& context){
 
 
 void travel_from_celio_to_kanto(ConsoleHandle& console, ProControllerContext& context){
-    // assumes the player is standing on Celio's left (west) side
-    pbf_move_left_joystick(context, {-1, 0}, 1280ms, 300ms);
+    // assumes the player is standing on Celio's left (west) side.
+    //
+    // Confirmed by testing: the character never even turns left -- it goes
+    // straight into the "walk down" phase of leave_pokecenter(). Blind waiting
+    // (tried up to 30s) does not fix it, but blindly mashing A does have an
+    // effect (it re-opens Celio's dialogue), proving the game is responsive
+    // and a leftover dialogue box is the blocker, not an unresponsive game.
+    // So: check via screenshot whether a dialogue box is actually on screen,
+    // and only press A once if so, re-checking after each single press.
+    // Never press A when no dialogue is detected, to avoid re-triggering a
+    // fresh conversation with Celio.
+    {
+        WhiteDialogDetector dialog_detector(COLOR_RED);
+        bool cleared = false;
+        for (int attempts = 0; attempts < 10; attempts++){
+            context.wait_for_all_requests();
+            VideoSnapshot screen = console.video().snapshot();
+            if (!dialog_detector.detect(screen)){
+                cleared = true;
+                break;
+            }
+            pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+        }
+        if (!cleared){
+            console.log("travel_from_celio_to_kanto(): Dialogue box did not clear after 10 checks. Continuing anyway.", COLOR_RED);
+        }
+        context.wait_for_all_requests();
+    }
+    // 5 discrete steps left (matches manual testing), instead of one continuous
+    // hold, so a single dropped input doesn't eat the whole movement.
+    // 400ms/step measured as ~9 tiles for 5 iterations; scaled down to land on
+    // ~5 tiles for 5 iterations (400 * 5/9 ~= 220ms).
+    for (int i = 0; i < 5; i++){
+        pbf_move_left_joystick(context, {-1, 0}, 220ms, 200ms);
+    }
+    context.wait_for_all_requests();
     leave_pokecenter(console, context);
     // walk down to the One Island sign
     WhiteDialogWatcher dialog_detected(COLOR_RED);
