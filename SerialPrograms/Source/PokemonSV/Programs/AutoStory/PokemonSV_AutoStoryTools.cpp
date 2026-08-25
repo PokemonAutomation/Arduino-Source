@@ -1456,12 +1456,17 @@ void checkpoint_reattempt_loop(
         break;
     }catch (OperationFailedException& e){
         if (i == 10){  // send an error report for debugging if 10 failed attempts for a given checkpoint.
-            OperationFailedException exception(
-                ErrorReport::SEND_ERROR_REPORT,
-                "10 failed attempts. " + checkpoint_text,
-                env.console
+            auto snapshot = env.console.video().snapshot().frame;
+            std::string message = "10 failed attempts. " + checkpoint_text;
+            send_program_recoverable_error_notification(env, notif_error_recoverable, message, *snapshot);
+            report_error(
+                &env.logger(),
+                env.program_info(),
+                "Recoverable: OperationFailedExceptionWithScreenshot",
+                {{"Message:", message}},
+                *snapshot,
+                &env.console.history()
             );
-            exception.send_recoverable_notification(env);
         }
 
         if (i > max_attempts){
@@ -1511,12 +1516,17 @@ void checkpoint_reattempt_loop_tutorial(
         break;  
     }catch (OperationFailedException& e){
         if (i == 10){  // send an error report for debugging if 10 failed attempts for a given checkpoint.
-            OperationFailedException exception(
-                ErrorReport::SEND_ERROR_REPORT,
-                "10 failed attempts. " + checkpoint_text,
-                env.console
+            auto snapshot = env.console.video().snapshot().frame;
+            std::string message = "10 failed attempts. " + checkpoint_text;
+            send_program_recoverable_error_notification(env, notif_error_recoverable, message, *snapshot);
+            report_error(
+                &env.logger(),
+                env.program_info(),
+                "Recoverable: OperationFailedExceptionWithScreenshot",
+                {{"Message:", message}},
+                *snapshot,
+                &env.console.history()
             );
-            exception.send_recoverable_notification(env);
         }
 
         if (i > max_attempts){
