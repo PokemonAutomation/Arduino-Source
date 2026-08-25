@@ -59,7 +59,7 @@ StatReads PartyLevelUpReader::read_stats(Logger &logger, const ImageViewRGB32& f
     
     auto read_stat = [&](const ImageFloatBox &box, const std::string &name){
         ImageViewRGB32 stat_region = extract_box_reference(game_screen, box);
-        return read_digits_waterfill_template(logger, stat_region);
+        return read_digits_waterfill_template(logger, stat_region, DigitTemplateType::DialogBox);
     };
 
     StatReads stats;
@@ -105,7 +105,20 @@ private:
 
 
 void add_tests_PartyLevelUpReader(UnitTestDatabase& database){
-    // to do
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/raikou_1.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/raikou_2.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/raikou_3.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/raikou_4.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/raikou_5.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/raikou_6.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/deoxys_1.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/deoxys_2.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/deoxys_3.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/dratini_1.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/dratini_2.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/dratini_3.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/dratini_4.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/dratini_5.png");
 }
 
 

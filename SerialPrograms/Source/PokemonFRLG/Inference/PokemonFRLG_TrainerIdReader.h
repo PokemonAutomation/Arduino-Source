@@ -38,6 +38,7 @@ public:
 private:
     Color m_color;
     ImageFloatBox m_box_tid;
+    ImageFloatBox m_box_tid_spa;
     ImageFloatBox m_box_tid_jpn;
 };
 

@@ -32,12 +32,15 @@ namespace PokemonFRLG {
 TrainerIdReader::TrainerIdReader(Color color)
     : m_color(color)
     , m_box_tid(0.742683, 0.117314, 0.129734, 0.076006)
+    , m_box_tid_spa(0.766667, 0.112286, 0.129345, 0.076068)
     , m_box_tid_jpn(0.712981, 0.118836, 0.207212, 0.077373)
 {}
 
 void TrainerIdReader::make_overlays(VideoOverlaySet &items) const {
     const BoxOption &GAME_BOX = GameSettings::instance().GAME_BOX;
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_tid));
+    items.add(m_color, GAME_BOX.inner_to_outer(m_box_tid_spa));
+    items.add(m_color, GAME_BOX.inner_to_outer(m_box_tid_jpn));
 }
 
 uint16_t TrainerIdReader::read_tid(
@@ -47,11 +50,13 @@ uint16_t TrainerIdReader::read_tid(
             extract_box_reference(frame, GameSettings::instance().GAME_BOX);
 
     
-    ImageViewRGB32 tid_region = extract_box_reference(game_screen, language == Language::Japanese ? m_box_tid_jpn : m_box_tid);
+    ImageViewRGB32 tid_region = extract_box_reference(game_screen, language == Language::Japanese ? m_box_tid_jpn :
+                                                                   language == Language::Spanish  ? m_box_tid_spa :
+                                                                   m_box_tid);
 
     // waterfill segmentation + template matching
     // against the PokemonFRLG/Digits/0-9.png templates.
-    return uint16_t(read_digits_waterfill_template(logger, tid_region));
+    return uint16_t(read_digits_waterfill_template(logger, tid_region, DigitTemplateType::DialogBox));
 }
 
 
@@ -95,6 +100,7 @@ private:
 void add_tests_TrainerIdReader(UnitTestDatabase& database){
     database.add<Test_TrainerIdReader>("PokemonFRLG/TrainerIdReader/tom_eng_60895.jpg");
     database.add<Test_TrainerIdReader>("PokemonFRLG/TrainerIdReader/nyash_jpn_45345.png");
+    database.add<Test_TrainerIdReader>("PokemonFRLG/TrainerIdReader/alberto_spa_65385.png");
 }
 
 
