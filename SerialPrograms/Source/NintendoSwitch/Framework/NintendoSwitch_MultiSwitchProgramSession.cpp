@@ -8,7 +8,9 @@
 #include "Common/Cpp/EarlyShutdown.h"
 #include "Common/Cpp/Concurrency/SpinPause.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
+#include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -247,6 +249,25 @@ void MultiSwitchProgramSession::internal_run_program(){
             message = e.name();
         }
         report_error(message);
+    }catch (OperationFailedExceptionWithScreenshot& e){
+        logger().log("Program stopped with an exception!", COLOR_RED);
+        env.add_overlay_log_to_all_consoles("- Program Error -", COLOR_RED);
+
+        std::string message = e.message();
+        if (message.empty()){
+            message = e.name();
+        }
+        report_error(message);
+        send_program_fatal_error_notification(env, m_option.instance().NOTIFICATION_ERROR_FATAL, e.message(), *e.screenshot());
+        PokemonAutomation::report_error(
+            &env.logger(),
+            env.program_info(),
+            "Recoverable: OperationFailedExceptionWithScreenshot",
+            {{"Message:", e.message()}},
+            *e.screenshot(),
+            &e.video_stream()->history()
+        );
+
     }catch (ScreenshotException& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
         env.add_overlay_log_to_all_consoles("- Program Error -", COLOR_RED);
