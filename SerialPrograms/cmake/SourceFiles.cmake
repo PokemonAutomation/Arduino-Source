@@ -1532,8 +1532,14 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonBDSP/Programs/PokemonBDSP_OverworldTrigger.h
     Source/PokemonBDSP/Programs/PokemonBDSP_RunFromBattle.cpp
     Source/PokemonBDSP/Programs/PokemonBDSP_RunFromBattle.h
+    Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_AdvanceClock.cpp
+    Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_AdvanceClock.h
     Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_BlinkModel.cpp
     Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_BlinkModel.h
+    Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_BlinkRecovery.cpp
+    Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_BlinkRecovery.h
+    Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_RngDisplays.cpp
+    Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_RngDisplays.h
     Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_StateReidentifier.cpp
     Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_StateReidentifier.h
     Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_StateSolver.cpp
