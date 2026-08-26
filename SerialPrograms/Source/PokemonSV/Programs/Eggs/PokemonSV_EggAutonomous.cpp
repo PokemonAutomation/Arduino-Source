@@ -6,6 +6,7 @@
 
 #include <cmath>
 #include "CommonFramework/StaticGlobals.h"
+#include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
@@ -840,7 +841,18 @@ bool EggAutonomous::handle_recoverable_error(
             env.console
         );
     }
-    e.send_recoverable_notification(env);
+
+    auto snapshot = env.console.video().snapshot().frame;
+    std::string message = fail_message;
+    send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, message, *snapshot);
+    report_error(
+        &env.logger(),
+        env.program_info(),
+        "Recoverable: OperationFailedExceptionWithScreenshot",
+        {{"Message:", message}},
+        *snapshot,
+        &env.console.history()
+    );
 
     env.log("Reset game to handle recoverable error");
     reset_game(env.program_info(), env.console, context);
