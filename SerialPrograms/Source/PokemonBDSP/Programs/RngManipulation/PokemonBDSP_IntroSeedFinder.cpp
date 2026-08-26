@@ -143,11 +143,7 @@ void IntroSeedFinder::program(SingleSwitchProgramEnvironment& env, ProController
             );
         }
 
-        try{
-            subcontext.wait_until(std::min(deadline, current_time() + 1s));
-        }catch (OperationCancelledException&){}
-        subcontext.throw_if_cancelled_with_exception();
-        context.throw_if_cancelled();
+        subcontext.wait_until(std::min(deadline, current_time() + 1s));
 
         if (current_time() >= next_nudge){
             pbf_move_right_joystick(context, {1.0, 0.0}, 80ms, 0ms);
