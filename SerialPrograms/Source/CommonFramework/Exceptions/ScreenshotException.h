@@ -20,10 +20,6 @@ struct ProgramInfo;
 class ProgramEnvironment;
 
 
-enum class ErrorReport{
-    NO_ERROR_REPORT,
-    SEND_ERROR_REPORT,
-};
 
 
 //  Base class for program exception holding a screenshot.

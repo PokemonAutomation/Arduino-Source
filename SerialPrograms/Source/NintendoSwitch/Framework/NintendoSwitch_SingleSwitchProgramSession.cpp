@@ -223,14 +223,16 @@ void SingleSwitchProgramSession::internal_run_program(){
         }
         report_error(message);
         send_program_fatal_error_notification(env, m_option.instance().NOTIFICATION_ERROR_FATAL, e.message(), *e.screenshot());
-        PokemonAutomation::report_error(
-            &env.logger(),
-            env.program_info(),
-            "Recoverable: OperationFailedExceptionWithScreenshot",
-            {{"Message:", e.message()}},
-            *e.screenshot(),
-            &e.video_stream()->history()
-        );
+        if (e.error_report_mode() == ErrorReport::SEND_ERROR_REPORT){
+            PokemonAutomation::report_error(
+                &env.logger(),
+                env.program_info(),
+                "Recoverable: OperationFailedExceptionWithScreenshot",
+                {{"Message:", e.message()}},
+                *e.screenshot(),
+                &e.video_stream()->history()
+            );
+        }
 
     }catch (ScreenshotException& e){
         logger().log("Program stopped with an exception!", COLOR_RED);

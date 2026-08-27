@@ -26,6 +26,7 @@ class ImageRGB32;
 class OperationFailedExceptionWithScreenshot : public Exception{
 public:
     OperationFailedExceptionWithScreenshot(
+        ErrorReport error_report,
         std::string message,
         VideoStream& stream
     );
@@ -34,11 +35,13 @@ public:
     //  Use the provided screenshot instead of taking one with the console.
     //  Store the console information (if provided) for stream history if requested later.
     OperationFailedExceptionWithScreenshot(
+        ErrorReport error_report,
         std::string message,
         VideoStream* stream,
         ImageRGB32 screenshot
     );
     OperationFailedExceptionWithScreenshot(
+        ErrorReport error_report,
         std::string message,
         VideoStream* stream,
         std::shared_ptr<const ImageRGB32> screenshot
@@ -47,22 +50,26 @@ public:
     //  This is the most common use case. Throw and log exception.
     //  Include console information for screenshot and stream history.
     [[noreturn]] static void fire(
+        ErrorReport error_report,
         std::string message,
         VideoStream& stream
     ){
         throw_and_log<OperationFailedExceptionWithScreenshot>(
             stream.logger(),
+            error_report,
             std::move(message),
             stream
         );
     }
     [[noreturn]] static void fire(
+        ErrorReport error_report,
         std::string message,
         VideoStream& stream,
         std::shared_ptr<const ImageRGB32> screenshot
     ){
         throw_and_log<OperationFailedExceptionWithScreenshot>(
             stream.logger(),
+            error_report,
             std::move(message),
             &stream,
             std::move(screenshot)
@@ -73,8 +80,10 @@ public:
     ImageViewRGB32 screenshot_view() const;
     std::shared_ptr<const ImageRGB32> screenshot() const;
     VideoStream* video_stream() const;
+    ErrorReport error_report_mode() const { return m_send_error_report; };
 
 public:
+    ErrorReport m_send_error_report;
     std::string m_message;
     VideoStream* m_stream = nullptr;
     std::shared_ptr<const ImageRGB32> m_screenshot;

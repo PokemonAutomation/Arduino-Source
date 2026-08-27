@@ -21,10 +21,12 @@ namespace PokemonAutomation{
 
 
 OperationFailedExceptionWithScreenshot::OperationFailedExceptionWithScreenshot(
+    ErrorReport error_report,
     std::string message,
     VideoStream& stream
 )
-    : m_message(std::move(message))
+    : m_send_error_report(error_report)
+    , m_message(std::move(message))
     , m_stream(&stream)
     , m_screenshot(stream.video().snapshot().frame)
 {
@@ -33,20 +35,24 @@ OperationFailedExceptionWithScreenshot::OperationFailedExceptionWithScreenshot(
     }
 }
 OperationFailedExceptionWithScreenshot::OperationFailedExceptionWithScreenshot(
+    ErrorReport error_report,
     std::string message,
     VideoStream* stream,
     ImageRGB32 screenshot
 )
-    : m_message(std::move(message))
+    : m_send_error_report(error_report)
+    , m_message(std::move(message))
     , m_stream(stream)
     , m_screenshot(std::make_shared<ImageRGB32>(std::move(screenshot)))
 {}
 OperationFailedExceptionWithScreenshot::OperationFailedExceptionWithScreenshot(
+    ErrorReport error_report,
     std::string message,
     VideoStream* stream,
     std::shared_ptr<const ImageRGB32> screenshot
 )
-    : m_message(std::move(message))
+    : m_send_error_report(error_report)
+    , m_message(std::move(message))
     , m_stream(stream)
     , m_screenshot(std::move(screenshot))
 {}
