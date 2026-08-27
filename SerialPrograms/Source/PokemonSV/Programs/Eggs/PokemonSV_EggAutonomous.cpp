@@ -264,7 +264,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             try{
                 num_party_eggs = fetch_eggs_full_routine(env, context);
                 break;
-            }catch (ScreenshotException& e){
+            }catch (OperationFailedException& e){
                 if (handle_recoverable_error(
                     env, context,
                     NOTIFICATION_ERROR_RECOVERABLE,
@@ -288,7 +288,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
                 GO_HOME_WHEN_DONE.run_end_of_program(context);
                 send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
                 return;
-            }catch (ScreenshotException& e){
+            }catch (OperationFailedException& e){
                 if (handle_recoverable_error(
                     env, context,
                     NOTIFICATION_ERROR_RECOVERABLE,
@@ -806,7 +806,7 @@ void change_settings_egg_program(SingleSwitchProgramEnvironment& env, ProControl
 bool EggAutonomous::handle_recoverable_error(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context,
     EventNotificationOption& notification,
-    const ScreenshotException& e,
+    const OperationFailedException& e,
     size_t& consecutive_failures
 ){
     auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();

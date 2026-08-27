@@ -9,6 +9,7 @@
 #include "Common/Cpp/Concurrency/SpinPause.h"
 #include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Options/Environment/SleepSuppressOption.h"
