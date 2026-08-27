@@ -9,7 +9,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_NoMinimapDetector.h"
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -572,7 +572,7 @@ void beat_team_star_fighting2(SingleSwitchProgramEnvironment& env, ProController
     );
     context.wait_for(std::chrono::milliseconds(100));
     if (ret < 0){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "checkpoint_48(): Failed to kill 30 pokemon with Let's go.",
             env.console

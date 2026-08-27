@@ -7,7 +7,7 @@
 #include <map>
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
@@ -137,7 +137,7 @@ void ItemPrinterJobsDetector::set_print_jobs(
         pbf_press_button(context, BUTTON_R, 160ms, 240ms);
     }
 
-    throw_and_log<OperationFailedException>(
+    throw_and_log<OperationFailedExceptionWithScreenshot>(
         stream.logger(), ErrorReport::SEND_ERROR_REPORT,
         "Failed to set jobs after 10 tries.",
         &stream,

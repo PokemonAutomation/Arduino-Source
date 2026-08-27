@@ -5,7 +5,8 @@
  */
 
 #include "Common/Compiler.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/ErrorReports/ErrorReports.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -218,16 +219,26 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
                 break;
             }
             consecutive_failures = 0;
-        }catch (OperationFailedException& e){
+        }catch (OperationFailedExceptionWithScreenshot& e){
             // If there is no auto save, then we shouldn't reset to game to lose previous progress.
             if (AUTO_SAVING == AutoSave::NoAutoSave){
                 throw;
             }
-            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, e.message(), *e.screenshot());
+            if (e.error_report_mode() == ErrorReport::SEND_ERROR_REPORT){
+                PokemonAutomation::report_error(
+                    &env.logger(),
+                    env.program_info(),
+                    "Recoverable: OperationFailedExceptionWithScreenshot",
+                    {{"Message:", e.message()}},
+                    *e.screenshot(),
+                    &e.video_stream()->history()
+                );
+            }
 
             consecutive_failures++;
             if (consecutive_failures >= 3){
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "Failed 3 batches in the row.",
                     env.console

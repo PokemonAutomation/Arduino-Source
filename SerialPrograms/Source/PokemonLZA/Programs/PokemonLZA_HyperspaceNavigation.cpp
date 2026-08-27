@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -33,7 +33,7 @@ bool check_calorie(
         console, context, std::chrono::seconds(5), {calorie_watcher}
     );
     if (ret < 0){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "check_calorie(): does not detect Calorie number after waiting for five seconds",
             console
@@ -75,7 +75,7 @@ void detect_interactable(
         {ButtonA}
     );
     if (ret < 0){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "detect_interactable_pad(): Cannot detect interactable after 5 seconds",
             console

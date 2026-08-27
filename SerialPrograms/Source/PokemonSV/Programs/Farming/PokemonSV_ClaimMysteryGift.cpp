@@ -6,7 +6,7 @@
 
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 //#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 //#include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -193,7 +193,7 @@ void ClaimMysteryGift::enter_mystery_gift_via_internet_window(SingleSwitchProgra
         return;
     }
 
-    OperationFailedException::fire(
+    OperationFailedExceptionWithScreenshot::fire(
         ErrorReport::SEND_ERROR_REPORT,
         "enter_mystery_gift_code_window(): Failed to reach Mystery Gift code window after several attempts.",
         env.console
@@ -215,7 +215,7 @@ void ClaimMysteryGift::claim_internet_mystery_gift(SingleSwitchProgramEnvironmen
     if (ret == 0){
         env.console.log("Gradient arrow detected.");
     }else{
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to detect gradient arrow. We might not be in the Mystery Gift via Internet screen.",
             env.console
@@ -281,7 +281,7 @@ void ClaimMysteryGift::claim_internet_mystery_gift(SingleSwitchProgramEnvironmen
             {arrow}
         );
         if (ret < 0){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to detect gradient arrow. We might not be in the Mystery Gift via Internet screen.",
                 env.console
@@ -361,7 +361,7 @@ void ClaimMysteryGift::enter_mystery_gift_code_window(SingleSwitchProgramEnviron
         return;
     }
 
-    OperationFailedException::fire(
+    OperationFailedExceptionWithScreenshot::fire(
         ErrorReport::SEND_ERROR_REPORT,
         "enter_mystery_gift_code_window(): Failed to reach Mystery Gift code window after several attempts.",
         env.console

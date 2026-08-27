@@ -13,7 +13,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Cpp/Concurrency/BusyPeriodicRunner.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -396,7 +396,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-//    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "asdf", console);
+//    OperationFailedExceptionWithScreenshot::fire(ErrorReport::SEND_ERROR_REPORT, "asdf", console);
 
 
 //    SinglesAIOption ai(false);
@@ -432,7 +432,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    context->issue_gyro_accel_x(&scope, 1000ms, 1000ms, 0ms, 123);
 
-//    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "test", console);
+//    OperationFailedExceptionWithScreenshot::fire(ErrorReport::SEND_ERROR_REPORT, "test", console);
 
 #if 0
     auto snapshot = feed.snapshot();

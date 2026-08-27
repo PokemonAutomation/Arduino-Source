@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Tools/DebugDumper.h"
@@ -177,7 +177,7 @@ void DirectionDetector::change_direction(
         double current = get_current_direction(stream, screen);
         if (current < 0){
             if (throw_if_fail){
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "change_direction(): Unable to detect current direction.",
                     stream

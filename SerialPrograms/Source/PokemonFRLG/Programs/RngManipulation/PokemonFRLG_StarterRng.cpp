@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -634,7 +634,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
         if (failed_searches >= 5){
             env.log("Failed to find any matches 5 times in a row");
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::NO_ERROR_REPORT,
                 "Failed to find any matches 5 times in a row. Check your seed and advances settings.",
                 env.console

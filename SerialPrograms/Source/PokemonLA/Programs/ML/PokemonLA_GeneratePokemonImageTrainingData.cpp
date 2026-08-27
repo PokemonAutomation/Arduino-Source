@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/ScreenshotException.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
@@ -129,7 +129,7 @@ void GeneratePokemonImageTrainingData::program(SingleSwitchProgramEnvironment& e
         throw;
     }catch (ScreenshotException& e){
         std::string fail_message = e.message();
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             fail_message,
             env.console

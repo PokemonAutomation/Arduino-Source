@@ -6,7 +6,7 @@
 
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "Common/Cpp/Options/ButtonOption.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -475,7 +475,7 @@ bool HeldItemFarmerSafariZone::run_safari_zone(SingleSwitchProgramEnvironment& e
         bool caught = false;
         if (catch_result < 0){
             stats.errors++;
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "auto_catch_safari() encountered an error.",
                 env.console

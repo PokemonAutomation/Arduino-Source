@@ -8,7 +8,7 @@
 #include "Common/Cpp/Time.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Globals.h"
@@ -147,7 +147,7 @@ void do_one_cafe_trip(
             } else if (travel_status == FastTravelState::NOT_AT_FLY_SPOT){
                 stats.errors++;
                 env.update_stats();
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "do_one_cafe_trip: Cannot fast travel after moving map cursor.",
                     env.console
@@ -207,7 +207,7 @@ void do_one_cafe_trip(
             if (ret != 0){
                 stats.errors++;
                 env.update_stats();
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "do_one_cafe_trip: Cannot reach wild zone gate after day/night change.",
                     env.console
@@ -218,7 +218,7 @@ void do_one_cafe_trip(
     default:
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "do_one_cafe_trip: Cannot reach wild zone gate after being chased by wild pokemon.",
             env.console
@@ -241,7 +241,7 @@ void do_one_cafe_trip(
         // cannot fast travel outside zone. Chased by wild pokemon that used Dig?
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "do_one_cafe_trip: Cannot fast travel outside gate.",
             env.console
@@ -271,7 +271,7 @@ void do_one_cafe_trip(
     if (travel_status != FastTravelState::SUCCESS){
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "do_one_cafe_trip: Cannot fast travel to cafe.",
             env.console

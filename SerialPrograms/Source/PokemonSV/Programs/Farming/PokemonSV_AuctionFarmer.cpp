@@ -8,7 +8,8 @@
 #include <unordered_map>
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/ErrorReports/ErrorReports.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -192,11 +193,11 @@ void AuctionFarmer::reset_auctions(SingleSwitchProgramEnvironment& env, ProContr
         go_home(env.console, context);
         context.wait_for_all_requests();
         reset_game_from_home(env.program_info(), env.console, context, 1000ms);
-    }catch (OperationFailedException& e){
+    }catch (OperationFailedExceptionWithScreenshot& e){
         AuctionFarmer_Descriptor::Stats& stats = env.current_stats<AuctionFarmer_Descriptor::Stats>();
         stats.m_errors++;
         env.update_stats();
-        throw FatalProgramException(std::move(e));
+        throw FatalProgramException(e.error_report_mode(), e.message(), e.video_stream(), e.screenshot());
     }
 }
 
@@ -310,7 +311,7 @@ void AuctionFarmer::move_to_auctioneer(SingleSwitchProgramEnvironment& env, ProC
         }
         tries++;
     }
-    OperationFailedException::fire(
+    OperationFailedExceptionWithScreenshot::fire(
         ErrorReport::SEND_ERROR_REPORT,
         "Too many attempts to talk to the NPC.",
         env.console
@@ -354,7 +355,7 @@ void AuctionFarmer::move_dialog_to_center(SingleSwitchProgramEnvironment& env, P
         }
 
         if (!offer_visible){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Lost offer dialog for wanted item.",
                 env.console
@@ -568,9 +569,19 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
                 if (is_good_offer(offer)){
                     try{
                         move_to_auctioneer(env, context, offer);
-                    }catch (OperationFailedException& e){
+                    }catch (OperationFailedExceptionWithScreenshot& e){
                         stats.m_errors++;
-                        e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+                        send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, e.message(), *e.screenshot());
+                        if (e.error_report_mode() == ErrorReport::SEND_ERROR_REPORT){
+                            PokemonAutomation::report_error(
+                                &env.logger(),
+                                env.program_info(),
+                                "Recoverable: OperationFailedExceptionWithScreenshot",
+                                {{"Message:", e.message()}},
+                                *e.screenshot(),
+                                &e.video_stream()->history()
+                            );
+                        }
 
                         npc_tries++;
                         // if ONE_NPC the program already tries multiple times without change to compensate for dropped inputs
@@ -581,7 +592,7 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
                             VideoSnapshot screen = env.console.video().snapshot();
                             send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, e.message(), screen);
                         }else{
-                            OperationFailedException::fire(
+                            OperationFailedExceptionWithScreenshot::fire(
                                 ErrorReport::SEND_ERROR_REPORT,
                                 "Failed to talk to the NPC!",
                                 env.console

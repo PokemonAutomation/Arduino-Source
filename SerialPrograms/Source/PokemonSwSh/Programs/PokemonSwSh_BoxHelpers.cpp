@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/Tools/VideoStream.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -28,7 +28,7 @@ bool change_view_to_stats_or_judge(
     for (size_t attempts = 0;; attempts++){
         if (throw_exception){
             if (attempts == 10){
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "Unable to change Pokemon view after 10 tries.",
                     stream
@@ -79,7 +79,7 @@ void change_view_to_judge(
     OverlayBoxScope name_bar_overlay(stream.overlay(), name_bar);
     for (size_t attempts = 0;; attempts++){
         if (attempts == 10){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Unable to change Pokemon view to judge after 10 tries. Have you unlocked it?",
                 stream

@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -96,7 +96,7 @@ void AlolanTrade::run_trade(SingleSwitchProgramEnvironment& env, JoyconContext& 
         env.log("Failed to start trade.", COLOR_RED);
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to start trade.",
             env.console
@@ -117,7 +117,7 @@ void AlolanTrade::run_trade(SingleSwitchProgramEnvironment& env, JoyconContext& 
         stats.errors++;
         env.update_stats();
         env.log("Did not detect end of trade.", COLOR_RED);
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Did not detect end of trade.",
             env.console

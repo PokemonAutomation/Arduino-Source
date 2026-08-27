@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA_MountChange.h"
@@ -100,7 +100,7 @@ void change_mount(VideoStream& stream, ProControllerContext& context, MountState
         }
     }
 
-    OperationFailedException::fire(
+    OperationFailedExceptionWithScreenshot::fire(
         ErrorReport::SEND_ERROR_REPORT,
         std::string("Unable to find ") + MOUNT_STATE_STRINGS[(size_t)mount] + " after 10 attempts.",
         stream
@@ -134,7 +134,7 @@ void dismount(VideoStream& stream, ProControllerContext& context){
         pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
     }
 
-    OperationFailedException::fire(
+    OperationFailedExceptionWithScreenshot::fire(
         ErrorReport::SEND_ERROR_REPORT,
         "Unable to dismount after 10 attempts.",
         stream

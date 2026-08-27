@@ -8,7 +8,7 @@
 #include "Common/Qt/TimeQt.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -325,7 +325,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
     std::chrono::seconds next_wait_time = std::chrono::seconds(120);
     while (true){
         if (failures >= 5){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Unable to print after 5 attempts.",
                 env.console
@@ -456,7 +456,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
             env.update_stats();
             env.console.log("No state detected after 2 minutes.", COLOR_RED);
 #if 0
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "No state detected after 2 minutes.",
                 env.console
@@ -632,7 +632,7 @@ void ItemPrinterRNG::print_again(
         default:
             stats.errors++;
             env.update_stats();
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "No state detected after 2 minutes.",
                 env.console
@@ -1020,7 +1020,7 @@ uint32_t ItemPrinterRNG::check_num_happiny_dust(
         default:
             stats.errors++;
             env.update_stats();
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "No state detected after 2 minutes.",
                 env.console

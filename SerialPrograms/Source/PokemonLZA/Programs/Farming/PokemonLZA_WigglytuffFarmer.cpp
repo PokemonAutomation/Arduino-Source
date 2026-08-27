@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -154,7 +154,7 @@ bool WigglytuffFarmer::run_lobby(SingleSwitchProgramEnvironment& env, ProControl
         default:
             stats.errors++;
             env.update_stats();
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "run_lobby(): No recognized state after 30 seconds.",
                 env.console
@@ -205,7 +205,7 @@ void WigglytuffFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
         default:
             stats.errors++;
             env.update_stats();
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "run_round(): No state detected for 2 minutes.",
                 env.console

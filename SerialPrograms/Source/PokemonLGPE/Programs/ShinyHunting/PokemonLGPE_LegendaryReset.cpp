@@ -4,7 +4,8 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/ErrorReports/ErrorReports.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -127,7 +128,7 @@ bool LegendaryReset::run_encounter(SingleSwitchProgramEnvironment& env, JoyconCo
             }else{
                 stats.errors++;
                 env.update_stats();
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "run_battle(): Did not detect battle start.",
                     env.console
@@ -173,7 +174,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
         env.update_stats();
 
         if (consecutive_failures >= 3){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed 3 times in the row.",
                 env.console
@@ -196,8 +197,18 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
             );
             context.wait_for_all_requests();
             consecutive_failures = 0;
-        }catch (OperationFailedException& e){
-            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+        }catch (OperationFailedExceptionWithScreenshot& e){
+            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, e.message(), *e.screenshot());
+            if (e.error_report_mode() == ErrorReport::SEND_ERROR_REPORT){
+                PokemonAutomation::report_error(
+                    &env.logger(),
+                    env.program_info(),
+                    "Recoverable: OperationFailedExceptionWithScreenshot",
+                    {{"Message:", e.message()}},
+                    *e.screenshot(),
+                    &e.video_stream()->history()
+                );
+            }
             consecutive_failures++;
         }
 
@@ -215,7 +226,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
                     stats.errors++;
                     env.update_stats();
                     env.log("Timed out during battle after 5 minutes.", COLOR_RED);
-                    OperationFailedException::fire(
+                    OperationFailedExceptionWithScreenshot::fire(
                         ErrorReport::SEND_ERROR_REPORT,
                         "Timed out during battle after 5 minutes.",
                         env.console
@@ -239,7 +250,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
                     stats.errors++;
                     env.update_stats();
                     env.log("Timed out during battle. Stuck, crashed, or took more than 30 seconds for a turn.", COLOR_RED);
-                    OperationFailedException::fire(
+                    OperationFailedExceptionWithScreenshot::fire(
                         ErrorReport::SEND_ERROR_REPORT,
                         "Timed out during battle. Stuck, crashed, or took more than 30 seconds for a turn.",
                         env.console
@@ -260,7 +271,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
     default:
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to detect catching menu.",
             env.console

@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/Concurrency/Mutex.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -345,7 +345,7 @@ bool run_tera_battle(
         default:
             consecutive_timeouts++;
             if (consecutive_timeouts == 3){
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "No state detected after 6 minutes.",
                     stream

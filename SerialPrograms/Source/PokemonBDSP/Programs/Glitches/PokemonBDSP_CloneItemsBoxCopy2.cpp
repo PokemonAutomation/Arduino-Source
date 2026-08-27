@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -178,7 +178,7 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, ProControl
         context.wait_for(std::chrono::milliseconds(500));
         if (!matcher.detect(env.console.video().snapshot())){
             stats.m_errors++;
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to return to starting position. Something is wrong.",
                 env.console

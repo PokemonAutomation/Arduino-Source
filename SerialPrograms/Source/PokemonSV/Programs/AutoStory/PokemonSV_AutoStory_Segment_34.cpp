@@ -5,7 +5,7 @@
  */
 #include "PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h"
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -141,7 +141,7 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         bool terastallized = false;
         bool is_won = run_pokemon(env.console, context, move_table1, true, terastallized);
         if (!is_won){// throw exception if we lose
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to beat the Penny. Reset.",
                 env.console

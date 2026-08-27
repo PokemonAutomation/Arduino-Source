@@ -5,7 +5,7 @@
  */
 
 #include <QtGlobal>
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -105,7 +105,7 @@ bool StandardEncounterHandler::handle_standard_encounter(const DoublesShinyDetec
         m_session_stats.add_error();
         m_consecutive_failures++;
         if (m_consecutive_failures >= 3){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "3 consecutive failed encounter detections.",
                 m_stream
@@ -168,7 +168,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         m_session_stats.add_error();
         m_consecutive_failures++;
         if (m_consecutive_failures >= 3){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "3 consecutive failed encounter detections.",
                 m_stream

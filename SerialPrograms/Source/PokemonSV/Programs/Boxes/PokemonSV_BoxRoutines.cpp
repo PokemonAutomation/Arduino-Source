@@ -7,7 +7,9 @@
 //#include <cmath>
 //#include <algorithm>
 //#include <sstream>
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/ErrorReports/ErrorReports.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -40,7 +42,7 @@ bool change_view_to_stats_or_judge(
     for (size_t attempts = 0;; attempts++){
         if (throw_exception){
             if (attempts == 10){
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "Unable to change Pokemon view after 10 tries.",
                     stream
@@ -91,7 +93,7 @@ void change_view_to_judge(
     OverlayBoxScope name_bar_overlay(stream.overlay(), name_bar);
     for (size_t attempts = 0;; attempts++){
         if (attempts == 10){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Unable to change Pokemon view to judge after 10 tries. Have you unlocked it?",
                 stream
@@ -287,8 +289,18 @@ void load_one_column_to_party(
         try{
             // Move the held column to party
             move_box_cursor(env.program_info(), stream, context, BoxCursorLocation::PARTY, has_clone_ride_pokemon ? 2 : 1, 0);
-        }catch (OperationFailedException& e){
-            e.send_notification(env, notification);
+        }catch (OperationFailedExceptionWithScreenshot& e){
+            send_program_recoverable_error_notification(env, notification, e.message(), *e.screenshot());
+            if (e.error_report_mode() == ErrorReport::SEND_ERROR_REPORT){
+                PokemonAutomation::report_error(
+                    &env.logger(),
+                    env.program_info(),
+                    "Recoverable: OperationFailedExceptionWithScreenshot",
+                    {{"Message:", e.message()}},
+                    *e.screenshot(),
+                    &e.video_stream()->history()
+                );
+            }
 
             if (++fail_count == 10){
                 dump_image_and_throw_recoverable_exception(
@@ -331,8 +343,18 @@ void unload_one_column_from_party(
         try{
             // Move the held column to target
             move_box_cursor(env.program_info(), stream, context, BoxCursorLocation::SLOTS, has_clone_ride_pokemon ? 1 : 0, column_index);
-        }catch (OperationFailedException& e){
-            e.send_notification(env, notification);
+        }catch (OperationFailedExceptionWithScreenshot& e){
+            send_program_recoverable_error_notification(env, notification, e.message(), *e.screenshot());
+            if (e.error_report_mode() == ErrorReport::SEND_ERROR_REPORT){
+                PokemonAutomation::report_error(
+                    &env.logger(),
+                    env.program_info(),
+                    "Recoverable: OperationFailedExceptionWithScreenshot",
+                    {{"Message:", e.message()}},
+                    *e.screenshot(),
+                    &e.video_stream()->history()
+                );
+            }
 
             if (++fail_count == 10){
                 dump_image_and_throw_recoverable_exception(

@@ -16,7 +16,7 @@
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -277,7 +277,7 @@ bool BoxSorterLivingDex::is_viable_for_dex(
             context.wait_for_all_requests();
             int ret = wait_until(env.console, context, Seconds(5), { summary_screen_watcher });
             if (ret != 0){
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT, "HomeBoxSorter(): does not find summary screen after 5 sec", env.console
                 );
             }
@@ -310,7 +310,7 @@ bool BoxSorterLivingDex::is_viable_for_dex(
             context.wait_for_all_requests();
             ret = wait_until(env.console, context, Seconds(5), { box_view_watcher });
             if (ret != 0){
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT, "BoxSorterLivingDex(): does not find box view after 5 sec", env.console
                 );
             }

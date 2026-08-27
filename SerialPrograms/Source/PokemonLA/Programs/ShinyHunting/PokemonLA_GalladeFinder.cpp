@@ -4,7 +4,8 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/ErrorReports/ErrorReports.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -180,9 +181,19 @@ void GalladeFinder::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         send_program_status_notification(env, NOTIFICATION_STATUS);
         try{
             run_iteration(env, context);
-        }catch (OperationFailedException& e){
+        }catch (OperationFailedExceptionWithScreenshot& e){
             stats.errors++;
-            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, e.message(), *e.screenshot());
+            if (e.error_report_mode() == ErrorReport::SEND_ERROR_REPORT){
+                PokemonAutomation::report_error(
+                    &env.logger(),
+                    env.program_info(),
+                    "Recoverable: OperationFailedExceptionWithScreenshot",
+                    {{"Message:", e.message()}},
+                    *e.screenshot(),
+                    &e.video_stream()->history()
+                );
+            }
 
             pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
             reset_game_from_home(env, env.console, context);

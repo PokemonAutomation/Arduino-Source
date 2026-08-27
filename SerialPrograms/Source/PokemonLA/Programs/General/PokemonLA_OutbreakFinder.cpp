@@ -8,7 +8,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -342,7 +342,7 @@ void OutbreakFinder::goto_region_and_return(
     }
     if (is_wild_land(current_region) == false){
         dump_image(env.console.logger(), env.program_info(), "FindRegion", env.console.video().snapshot());
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Unable to find a wild land.",
             env.console

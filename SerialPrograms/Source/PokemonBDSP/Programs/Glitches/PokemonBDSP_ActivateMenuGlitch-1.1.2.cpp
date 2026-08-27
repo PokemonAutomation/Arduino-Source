@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
@@ -68,7 +68,7 @@ void trigger_menu(VideoStream& stream, ProControllerContext& context){
         {{detector}}
     );
     if (ret < 0){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Map not detected after 60 seconds.",
             stream
@@ -103,7 +103,7 @@ void trigger_map_overlap(VideoStream& stream, ProControllerContext& context){
         pbf_mash_button(context, BUTTON_B, 3000ms);
         pbf_press_button(context, BUTTON_R, 160ms, 1840ms);
     }
-    OperationFailedException::fire(
+    OperationFailedExceptionWithScreenshot::fire(
         ErrorReport::SEND_ERROR_REPORT,
         "Failed to trigger map overlap after 10 attempts.",
         stream
@@ -146,7 +146,7 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, ProCont
             {{detector}}
         );
         if (ret < 0){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Unable to leave " + STRING_POKEMON + " center.",
                 stream

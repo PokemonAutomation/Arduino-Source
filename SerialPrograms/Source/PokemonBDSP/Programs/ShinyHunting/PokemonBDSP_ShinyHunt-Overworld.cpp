@@ -4,7 +4,8 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/ErrorReports/ErrorReports.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -148,11 +149,21 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, ProControl
             }
             lead_tracker.report_result(result_own.shiny_type);
 
-        }catch (OperationFailedException& e){
+        }catch (OperationFailedExceptionWithScreenshot& e){
             if (!RESET_GAME_WHEN_ERROR){
                 throw;
             }
-            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, e.message(), *e.screenshot());
+            if (e.error_report_mode() == ErrorReport::SEND_ERROR_REPORT){
+                PokemonAutomation::report_error(
+                    &env.logger(),
+                    env.program_info(),
+                    "Recoverable: OperationFailedExceptionWithScreenshot",
+                    {{"Message:", e.message()}},
+                    *e.screenshot(),
+                    &e.video_stream()->history()
+                );
+            }
 
             stats.add_error();
             go_home(env.console, context);

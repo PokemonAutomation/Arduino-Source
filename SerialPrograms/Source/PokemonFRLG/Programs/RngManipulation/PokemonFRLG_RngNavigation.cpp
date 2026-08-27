@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -94,7 +94,7 @@ AdvObservedPokemon read_summary(
     );
 
     if (ret2 < 0){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "read_summary(): Failed to detect second summary screen.",
             console
@@ -299,7 +299,7 @@ void hatch_togepi_egg(ConsoleHandle& console, ProControllerContext& context){
         { egg_dialog }
     );
     if (ret < 0){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Togepi: failed to hatch egg within 10 minutes. Check your in-game setup.",
             console
@@ -331,7 +331,7 @@ void hatch_daycare_egg(ConsoleHandle& console, ProControllerContext& context){
         { egg_dialog }
     );
     if (ret < 0){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Daycare Egg: failed to hatch egg within 45 minutes. Check your in-game setup.",
             console
@@ -360,7 +360,7 @@ void travel_from_celio_to_kanto(ConsoleHandle& console, ProControllerContext& co
         { dialog_detected }
     );
     if (ret < 0){        
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "travel_from_celio_to_route2(): Failed to detect One Island sign.",
             console
@@ -382,7 +382,7 @@ void travel_from_celio_to_kanto(ConsoleHandle& console, ProControllerContext& co
         { dialog_detected }
     );
     if (ret2 < 0){        
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "travel_from_celio_to_route2(): Failed to initiate Seagallop ferry dialogue.",
             console
@@ -400,7 +400,7 @@ void travel_from_celio_to_kanto(ConsoleHandle& console, ProControllerContext& co
         { black_screen }
     );
     if (ret3 < 0){        
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "travel_from_celio_to_kanto(): Failed to initiate Seagallop ferry travel.",
             console
@@ -454,7 +454,7 @@ int watch_for_shiny_encounter(ConsoleHandle& console, ProControllerContext& cont
         {battle_entered}
     );
     if (ret < 0){
-        // OperationFailedException::fire(
+        // OperationFailedExceptionWithScreenshot::fire(
         //     ErrorReport::SEND_ERROR_REPORT,
         //     "Failed to initiate encounter.",
         //     console
@@ -576,7 +576,7 @@ bool check_for_shiny(
     case PokemonFRLG_RngTarget::roaming:
         return encounter_roamer(console, context, language, subset) == 1;
     default:
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "RNG target not recognized. Please report this as a bug.",
             console
@@ -622,7 +622,7 @@ void daycare_steps(ConsoleHandle& console, ProControllerContext& context){
         { repel_over }
     );
     if (ret < 0){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::NO_ERROR_REPORT,
             "daycare_steps(): No Max Repel dialogue box detected.",
             console
@@ -690,7 +690,7 @@ void egg_pickup(ConsoleHandle& console, ProControllerContext& context){
         { dialogue_cleared }
     );
     if (ret < 0){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "egg_pickup(): Failed to clear dialogue before talking to the daycare man.",
             console
@@ -710,7 +710,7 @@ void egg_pickup(ConsoleHandle& console, ProControllerContext& context){
         { egg_prompt }
     );
     if (ret < 0){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "egg_pickup(): Failed to detect the egg selection dialogue.",
             console
@@ -732,7 +732,7 @@ void egg_pickup(ConsoleHandle& console, ProControllerContext& context){
         { dialogue_over }
     );
     if (ret < 0){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "egg_pickup(): Failed to return to the overworld after taking the egg.",
             console

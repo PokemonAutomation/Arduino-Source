@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/StaticGlobals.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
@@ -165,7 +165,7 @@ void MegaShardFarmer::fly_back(SingleSwitchProgramEnvironment& env, ProControlle
     MegaShardFarmer_Descriptor::Stats& stats = env.current_stats<MegaShardFarmer_Descriptor::Stats>();
     stats.errors++;
     env.update_stats();
-    OperationFailedException::fire(
+    OperationFailedExceptionWithScreenshot::fire(
         ErrorReport::SEND_ERROR_REPORT,
         "Failed to fly 3 times in the row.",
         env.console

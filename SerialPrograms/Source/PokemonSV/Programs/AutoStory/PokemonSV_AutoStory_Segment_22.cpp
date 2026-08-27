@@ -9,7 +9,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "PokemonSV/Programs/PokemonSV_MenuNavigation.h"
@@ -251,7 +251,7 @@ void checkpoint_52(
             {white_triangle}
         );
         if (ret < 0){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to detect white triangle in top right, which is an indicator of the Levincia Hide-and-Seek gym challenge.",
                 env.console
@@ -274,7 +274,7 @@ void checkpoint_52(
             {battle}
         );
         if (ret < 0){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to detect white triangle in top right, which is an indicator of the Levincia Hide-and-Seek gym challenge.",
                 env.console
@@ -292,7 +292,7 @@ void checkpoint_52(
             {white_triangle}
         );
         if (ret < 0){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to detect white triangle in top right, which is an indicator of the Levincia Hide-and-Seek gym challenge.",
                 env.console
@@ -317,7 +317,7 @@ void checkpoint_52(
             {battle}
         );
         if (ret < 0){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to detect white triangle in top right, which is an indicator of the Levincia Hide-and-Seek gym challenge.",
                 env.console
@@ -335,7 +335,7 @@ void checkpoint_52(
             {white_triangle}
         );
         if (ret < 0){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to detect white triangle in top right, which is an indicator of the Levincia Hide-and-Seek gym challenge.",
                 env.console

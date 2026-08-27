@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -305,7 +305,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             if (travel_status != FastTravelState::SUCCESS){
                 stats.errors++;
                 env.update_stats();
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "Failed to travel to Quasartico Inc.",
                     env.console
@@ -343,7 +343,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             if (travel_status != FastTravelState::SUCCESS){
                 stats.errors++;
                 env.update_stats();
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "Failed to travel to Lysandre Café",
                     env.console
@@ -400,7 +400,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             if (travel_status != FastTravelState::SUCCESS){
                 stats.errors++;
                 env.update_stats();
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "Failed to travel to Wild Zone 13",
                     env.console
@@ -440,7 +440,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             if (travel_status != FastTravelState::SUCCESS){
                 stats.errors++;
                 env.update_stats();
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "Failed to travel to Research Lab",
                     env.console

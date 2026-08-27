@@ -9,7 +9,7 @@
 #include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 //#include "CommonFramework/Exceptions/UnexpectedBattleException.h"
 #include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -775,10 +775,10 @@ void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, ProController
         }else{
             save_game_from_menu(env.program_info(), env.console, context);
         }
-    }catch (OperationFailedException& e){
+    }catch (OperationFailedExceptionWithScreenshot& e){
         // To be safe: avoid interrupting or corrupting game saving,
         // make game saving non error recoverable
-        throw FatalProgramException(std::move(e));
+        throw FatalProgramException(e.error_report_mode(), e.message(), e.video_stream(), e.screenshot());
     }
 }
 
@@ -835,7 +835,7 @@ bool EggAutonomous::handle_recoverable_error(
     std::string fail_message = e.message();
     consecutive_failures++;
     if (consecutive_failures >= 3){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed 3 times in the row.\n" + fail_message,
             env.console

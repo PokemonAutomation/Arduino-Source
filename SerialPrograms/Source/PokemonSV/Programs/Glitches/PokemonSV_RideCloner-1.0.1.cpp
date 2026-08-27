@@ -5,7 +5,8 @@
  */
 
 #include "CommonFramework/Exceptions/FatalProgramException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/ErrorReports/ErrorReports.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -386,8 +387,18 @@ bool RideCloner101::run_post_win(
                     ssf_press_button(context, BUTTON_A, A_TO_B_DELAY0, 160ms);
                     pbf_press_button(context, BUTTON_B, 160ms, 1840ms);
                 }
-            }catch (OperationFailedException& e){
-                e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+            }catch (OperationFailedExceptionWithScreenshot& e){
+                send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, e.message(), *e.screenshot());
+                if (e.error_report_mode() == ErrorReport::SEND_ERROR_REPORT){
+                    PokemonAutomation::report_error(
+                        &env.logger(),
+                        env.program_info(),
+                        "Recoverable: OperationFailedExceptionWithScreenshot",
+                        {{"Message:", e.message()}},
+                        *e.screenshot(),
+                        &e.video_stream()->history()
+                    );
+                }
             }
             continue;
         case 7:

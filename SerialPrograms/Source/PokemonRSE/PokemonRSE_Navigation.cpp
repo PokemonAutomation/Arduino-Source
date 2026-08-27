@@ -6,7 +6,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/Random.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
@@ -152,7 +152,7 @@ uint64_t soft_reset(ConsoleHandle& console, ProControllerContext& context){
             return errors;
         }
     }
-    OperationFailedException::fire(
+    OperationFailedExceptionWithScreenshot::fire(
         ErrorReport::SEND_ERROR_REPORT,
         "soft_reset(): Failed to reset after 5 attempts.",
         console
@@ -177,7 +177,7 @@ void flee_battle(VideoStream& stream, ProControllerContext& context){
     if (ret2 == 0){
         stream.log("Running away...");
     }else{
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "handle_encounter(): Unable to navigate to flee button.",
             stream
@@ -198,7 +198,7 @@ void flee_battle(VideoStream& stream, ProControllerContext& context){
     if (ret3 == 0){
         stream.log("Successfully ran from battle.");
     }else{
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "handle_encounter(): Unable to flee from battle.",
             stream
@@ -225,7 +225,7 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
             if (ret == 0){
                 console.log("Advance arrow detected.");
             }else{
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "handle_encounter(): Did not detect battle start.",
                     console
@@ -257,7 +257,7 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
         if (ret == 0){
             console.log("Battle menu detecteed!");
         }else{
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "handle_encounter(): Did not detect battle menu.",
                 console

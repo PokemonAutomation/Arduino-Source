@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
@@ -74,7 +74,7 @@ void overworld_to_menu(VideoStream& stream, ProControllerContext& context){
             {{detector}}
         );
         if (ret < 0){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Menu not detected after 10 seconds.",
                 stream
@@ -109,7 +109,7 @@ void overworld_to_box(VideoStream& stream, ProControllerContext& context){
             {{detector}}
         );
         if (ret < 0){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Box system not detected after 10 seconds.",
                 stream
@@ -144,7 +144,7 @@ void box_to_overworld(VideoStream& stream, ProControllerContext& context){
             {{detector}}
         );
         if (ret < 0){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Menu not detected after 10 seconds.",
                 stream

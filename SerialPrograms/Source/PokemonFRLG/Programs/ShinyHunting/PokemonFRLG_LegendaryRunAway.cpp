@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -133,7 +133,7 @@ void LegendaryRunAway::reset_hooh(SingleSwitchProgramEnvironment& env, ProContro
     context.wait_for_all_requests();
     if (ret != 0){
         env.log("Failed to exit area.", COLOR_RED);
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "reset_hooh(): Failed to exit area.",
             env.console
@@ -167,7 +167,7 @@ void LegendaryRunAway::reset_hooh(SingleSwitchProgramEnvironment& env, ProContro
     context.wait_for_all_requests();
     if (ret2 != 0){
         env.log("Failed to enter area.", COLOR_RED);
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "reset_hooh(): Failed to enter area.",
             env.console
@@ -213,7 +213,7 @@ void LegendaryRunAway::reset_lugia(SingleSwitchProgramEnvironment& env, ProContr
     context.wait_for_all_requests();
     if (ret != 0){
         env.log("Failed to exit area.", COLOR_RED);
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "reset_lugia(): Failed to exit area.",
             env.console
@@ -246,7 +246,7 @@ void LegendaryRunAway::reset_lugia(SingleSwitchProgramEnvironment& env, ProContr
     context.wait_for_all_requests();
     if (ret2 != 0){
         env.log("Failed to enter area.", COLOR_RED);
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "reset_lugia(): Failed to enter area.",
             env.console
@@ -335,7 +335,7 @@ void LegendaryRunAway::program(SingleSwitchProgramEnvironment& env, ProControlle
             reset_lugia(env, context);
             break;
         default:
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Invalid target!",
                 env.console

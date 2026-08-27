@@ -9,6 +9,7 @@
 
 #include <memory>
 #include "CommonFramework/Tools/VideoStream.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "Common/Cpp/Exceptions.h"
 
 namespace PokemonAutomation{
@@ -23,7 +24,7 @@ class ImageRGB32;
 
 //  Thrown by subroutines if they fail for an in-game reason.
 //  These include recoverable errors which can be consumed by the program.
-class OperationFailedExceptionWithScreenshot : public Exception{
+class OperationFailedExceptionWithScreenshot : public OperationFailedException{
 public:
     OperationFailedExceptionWithScreenshot(
         ErrorReport error_report,
@@ -80,11 +81,8 @@ public:
     ImageViewRGB32 screenshot_view() const;
     std::shared_ptr<const ImageRGB32> screenshot() const;
     VideoStream* video_stream() const;
-    ErrorReport error_report_mode() const { return m_send_error_report; };
 
-public:
-    ErrorReport m_send_error_report;
-    std::string m_message;
+private:
     VideoStream* m_stream = nullptr;
     std::shared_ptr<const ImageRGB32> m_screenshot;
 };

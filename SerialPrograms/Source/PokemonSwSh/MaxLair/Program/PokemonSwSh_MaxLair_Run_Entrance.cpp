@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -100,7 +100,7 @@ void run_entrance(
 
             // List of bosses is full, stop the program
             stream.log("Cannot save path – saved list is full. Stopping program.", COLOR_RED);
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::NO_ERROR_REPORT,
                 "Paths list is full. Program stopped.",
                 stream
@@ -110,7 +110,7 @@ void run_entrance(
             stream.log("Detected overworld.");
             return;
         default:
-            throw OperationFailedException(
+            throw OperationFailedExceptionWithScreenshot(
                 ErrorReport::SEND_ERROR_REPORT,
                 "No recognized state after 10 seconds.",
                 stream

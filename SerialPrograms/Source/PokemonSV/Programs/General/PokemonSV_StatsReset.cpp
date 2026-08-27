@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Options/LanguageOCROption.h"
@@ -189,7 +189,7 @@ bool StatsReset::enter_battle(SingleSwitchProgramEnvironment& env, ProController
 
         return false;
         /*
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             env.console, ErrorReport::SEND_ERROR_REPORT,
             "Failed to enter battle. Are you facing the Pokemon or in a menu?",
             true
@@ -213,7 +213,7 @@ void StatsReset::open_ball_menu(SingleSwitchProgramEnvironment& env, ProControll
             stats.errors++;
             env.update_stats();
             send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Timed out trying to read ball after 2 minutes.",
                 env.console
@@ -265,7 +265,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerCo
                     env.console.log("Unable to find menu_before_throw.");
                     stats.errors++;
                     env.update_stats();
-                    OperationFailedException::fire(
+                    OperationFailedExceptionWithScreenshot::fire(
                         ErrorReport::SEND_ERROR_REPORT,
                         "Unable to find menu_before_throw.",
                         env.console
@@ -286,7 +286,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerCo
                         env.console.log("Unable to find Quick Ball on turn 1.");
                         stats.errors++;
                         env.update_stats();
-                        OperationFailedException::fire(
+                        OperationFailedExceptionWithScreenshot::fire(
                             ErrorReport::SEND_ERROR_REPORT,
                             "Unable to find Quick Ball on turn 1.",
                             env.console
@@ -371,7 +371,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerCo
                         env.console.log("Battle menu detected early. Out of PP, please check your setup.");
                         stats.errors++;
                         env.update_stats();
-                        OperationFailedException::fire(
+                        OperationFailedExceptionWithScreenshot::fire(
                             ErrorReport::SEND_ERROR_REPORT,
                             "Battle menu detected early. Out of PP, please check your setup.",
                             env.console
@@ -454,7 +454,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerCo
                     env.console.log("Invalid state ret2 run_battle.");
                     stats.errors++;
                     env.update_stats();
-                    OperationFailedException::fire(
+                    OperationFailedExceptionWithScreenshot::fire(
                         ErrorReport::SEND_ERROR_REPORT,
                         "Invalid state ret2 run_battle.",
                         env.console
@@ -496,7 +496,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerCo
         env.console.log("Invalid state in run_battle().");
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Invalid state in run_battle().",
             env.console
@@ -554,7 +554,7 @@ bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, ProControllerC
             env.console.log("Invalid state.");
             stats.errors++;
             env.update_stats();
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Invalid state.",
                 env.console
@@ -595,7 +595,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
             //  Try to start battle 3 times.
             if (c > 2){
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "Failed to enter battle after 3 attempts.",
                     env.console

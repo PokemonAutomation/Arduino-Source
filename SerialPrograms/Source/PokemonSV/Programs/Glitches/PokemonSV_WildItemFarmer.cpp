@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Images/SolidColorTest.h"
@@ -184,7 +184,7 @@ void WildItemFarmer::refresh_pp(SingleSwitchProgramEnvironment& env, ProControll
             continue;
 
         default:
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "No state detected while changing moves after 10 seconds.",
                 env.console
@@ -218,7 +218,7 @@ bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, ProCo
             break;
 
         default:
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Unable to detect " + Pokemon::STRING_POKEMON + " select menu.",
                 env.console
@@ -242,7 +242,7 @@ bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, ProCo
             {battle_menu}
         );
         if (ret < 0){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Unable to back out to battle menu.",
                 env.console
@@ -320,7 +320,7 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, ProControl
             if (consecutive_throw_attempts >= MANUVERS.size()){
                 stats.errors++;
                 env.update_stats();
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::NO_ERROR_REPORT,
                     "Failed to start battle after " + std::to_string(MANUVERS.size()) + " attempts.",
                     env.console
@@ -363,7 +363,7 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, ProControl
                 }else{
                     stats.failed++;
                     env.update_stats();
-                    OperationFailedException::fire(
+                    OperationFailedExceptionWithScreenshot::fire(
                         ErrorReport::NO_ERROR_REPORT,
                         "Failed to clone item. Possible incorrect encounter.",
                         env.console
@@ -452,7 +452,7 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, ProControl
             continue;
 
         default:
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "No state detected after 120 seconds.",
                 env.console

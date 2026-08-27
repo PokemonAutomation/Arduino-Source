@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
@@ -75,7 +75,7 @@ bool DateReader::detect(const ImageViewRGB32& screen){
 
 std::pair<DateFormat, DateTime> DateReader::read_date(Logger& logger, std::shared_ptr<const ImageRGB32> screen){
     if (!detect(*screen)){
-        throw_and_log<OperationFailedException>(
+        throw_and_log<OperationFailedExceptionWithScreenshot>(
             logger, ErrorReport::SEND_ERROR_REPORT,
             "Not on date change screen.",
             nullptr,
@@ -125,7 +125,7 @@ void DateReader::set_date(
     {
         auto snapshot = console.video().snapshot();
         if (!detect(snapshot)){
-            throw_and_log<OperationFailedException>(
+            throw_and_log<OperationFailedExceptionWithScreenshot>(
                 console.logger(), ErrorReport::SEND_ERROR_REPORT,
                 "Expected date change menu.",
                 &console,
@@ -138,7 +138,7 @@ void DateReader::set_date(
     auto snapshot = console.video().snapshot();
 
     if (!detect(snapshot)){
-        throw_and_log<OperationFailedException>(
+        throw_and_log<OperationFailedExceptionWithScreenshot>(
             console, ErrorReport::SEND_ERROR_REPORT,
             "Not on date change screen.",
             nullptr,
@@ -225,7 +225,7 @@ void change_date(
             return;
         }
         default:
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to set date",
                 env.console
@@ -251,7 +251,7 @@ void ensure_time_unsynced(SingleSwitchProgramEnvironment& env, ProControllerCont
     );
 
     if (ret < 0){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to enter Date Change window. Ensure that System Time is not synced to the internet.",
             env.console

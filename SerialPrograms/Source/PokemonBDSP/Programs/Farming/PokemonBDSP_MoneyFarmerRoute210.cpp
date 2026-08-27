@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -201,7 +201,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
                     }
                 }
                 if (slot == 4){
-                    OperationFailedException::fire(
+                    OperationFailedExceptionWithScreenshot::fire(
                         ErrorReport::SEND_ERROR_REPORT,
                         "Ran out of PP in a battle.",
                         env.console
@@ -225,7 +225,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
                     }
                 }
                 if (slot == 4){
-                    OperationFailedException::fire(
+                    OperationFailedExceptionWithScreenshot::fire(
                         ErrorReport::SEND_ERROR_REPORT,
                         "Ran out of PP in a battle.",
                         env.console
@@ -260,7 +260,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
         }
     }
 
-    OperationFailedException::fire(
+    OperationFailedExceptionWithScreenshot::fire(
         ErrorReport::SEND_ERROR_REPORT,
         "No progress detected after 5 battle menus. Are you out of PP?",
         env.console

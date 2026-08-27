@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -140,7 +140,7 @@ int16_t throw_ball(
                 return 0;
             }
             if (attempts >= 3){
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "Unable to find desired ball after multiple attempts. Did you run out?",
                     stream
@@ -278,7 +278,7 @@ CatchResults basic_catcher(
             pbf_press_button(context, BUTTON_B, 160ms, 1840ms);
             break;
         default:
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "basic_catcher(): No state detected after 2 minutes.",
                 stream

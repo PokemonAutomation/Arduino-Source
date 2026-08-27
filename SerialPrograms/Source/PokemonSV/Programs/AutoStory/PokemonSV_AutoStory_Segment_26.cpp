@@ -8,7 +8,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -212,7 +212,7 @@ void checkpoint_62(
                     env.console.log("Detected black screen. Assume entered Eatery.");
                 }
                 if (ret < 0){
-                    OperationFailedException::fire(
+                    OperationFailedExceptionWithScreenshot::fire(
                         ErrorReport::SEND_ERROR_REPORT,
                         "Never detected black screen. Failed to enter Eatery.",
                         env.console

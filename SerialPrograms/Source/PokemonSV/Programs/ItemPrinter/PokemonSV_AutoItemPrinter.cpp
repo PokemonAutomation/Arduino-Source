@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -112,7 +112,7 @@ void AutoItemPrinter::enter_printing_mode(SingleSwitchProgramEnvironment& env, P
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             continue;
         default:
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "enter_printing_mode(): No recognized state after 120 seconds.",
                 env.console

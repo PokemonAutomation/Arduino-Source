@@ -5,7 +5,7 @@
  */
 
 #include <sstream>
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonTools/Async/InterruptableCommands.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -305,28 +305,28 @@ void FlagNavigationAir::set_distance_callback(std::function<void(double distance
 
 bool FlagNavigationAir::run_state(AsyncCommandSession<ProController>& commands, WallClock timestamp){
     if (last_state_change() + std::chrono::seconds(60) < timestamp){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "No state change detected after 60 seconds.",
             m_stream
         );
     }
     if (start_time() + m_navigate_timeout < timestamp){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Unable to reach flag after timeout period.",
             m_stream
         );
     }
     if (m_dialog_detector.detected()){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::NO_ERROR_REPORT,
             "Potential ambush by Miss Fortune sister.",
             m_stream
         );
     }
     if (m_find_flag_failed.load(std::memory_order_acquire)){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::NO_ERROR_REPORT,
             "Unable to find flag.",
             m_stream
@@ -449,7 +449,7 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession<ProController>& commands,
 #endif
 
 //    if (m_last_flag_detection + std::chrono::seconds(20) < timestamp){
-//        OperationFailedException::fire(m_console, "Flag not detected after 20 seconds.", true);
+//        OperationFailedExceptionWithScreenshot::fire(m_console, "Flag not detected after 20 seconds.", true);
 //    }
 //    double flag_age = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - m_last_flag_detection).count() / 1000.;
 //    if (flag_age > 0){

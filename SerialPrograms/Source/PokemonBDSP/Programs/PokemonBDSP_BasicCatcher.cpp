@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -244,7 +244,7 @@ CatchResults basic_catcher(
             return results;
         case 1:
             if (results.result == CatchResult::POKEMON_CAUGHT){
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "BasicCatcher: Found receive pokemon screen two times.",
                     stream
@@ -258,7 +258,7 @@ CatchResults basic_catcher(
             stream.log("BasicCatcher: Detected move learn! Don't learn the new move.", COLOR_BLUE);
             num_learned_moves++;
             if (num_learned_moves == 100){
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "BasicCatcher: Learn new move attempts reach 100.",
                     stream

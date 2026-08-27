@@ -13,7 +13,7 @@
 #endif
 
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -1350,7 +1350,7 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         DirectionDetector direction;
         double current = direction.get_current_direction(env.console, env.console.video().snapshot());
         if (current < 0){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "change_direction(): Unable to detect current direction. Something (e.g. a marker) is covering the N symbol on the minimap. "
                 "Try moving the marker on the map.",

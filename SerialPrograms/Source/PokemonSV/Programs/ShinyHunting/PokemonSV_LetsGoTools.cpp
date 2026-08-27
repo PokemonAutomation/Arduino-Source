@@ -8,7 +8,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
-//#include "CommonFramework/Exceptions/OperationFailedException.h"
+//#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 //#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonTools/Async/InferenceRoutines.h"

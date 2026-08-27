@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_OliveActionFailedException_H
 #define PokemonAutomation_OliveActionFailedException_H
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -26,7 +26,7 @@ enum class OliveFail{
 
 //  Thrown by subroutines if they fail for an in-game reason.
 //  These include recoverable errors which can be consumed by the program.
-class OliveActionFailedException : public OperationFailedException{
+class OliveActionFailedException : public OperationFailedExceptionWithScreenshot{
 public:
     OliveActionFailedException(
         ErrorReport error_report,
@@ -34,7 +34,7 @@ public:
         VideoStream& stream,
         OliveFail fail_reason = OliveFail::NONE
     )
-        : OperationFailedException(error_report, std::move(message), stream)
+        : OperationFailedExceptionWithScreenshot(error_report, std::move(message), stream)
         , m_fail_reason(fail_reason)
     {}
     virtual const char* name() const override{ return "OliveActionFailedException"; }

@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -163,7 +163,7 @@ void ensure_at_home(ConsoleHandle& console, ControllerContext& context, size_t r
         console.log("Unable to detect Home. Pressing Home button...", COLOR_RED);
         pbf_press_button(context, BUTTON_HOME, 160ms, 160ms);
     }
-    OperationFailedException::fire(
+    OperationFailedExceptionWithScreenshot::fire(
         ErrorReport::SEND_ERROR_REPORT,
         "Unable to find Switch Home",
         console
@@ -533,7 +533,7 @@ void start_game_from_home_with_inference(
         if (ret == 0){
             console.log("Detected Home screen.");
         }else{
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "start_game_from_home_with_inference(): Failed to detect Home screen after 10 seconds.",
                 console
@@ -628,7 +628,7 @@ void start_game_from_home_with_inference(
     }
 
     if (ret < 0){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "start_game_from_home_with_inference(): Failed to start game after multiple attempts.",
             console

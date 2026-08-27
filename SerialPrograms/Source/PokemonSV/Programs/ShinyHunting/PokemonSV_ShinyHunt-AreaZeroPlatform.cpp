@@ -7,8 +7,9 @@
 #include <atomic>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/StaticGlobals.h"
+#include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -458,11 +459,21 @@ void ShinyHuntAreaZeroPlatform::set_flags_and_run_state(
 
     try{
         run_state(env, context);
-    }catch (OperationFailedException& e){
+    }catch (OperationFailedExceptionWithScreenshot& e){
         stats.m_errors++;
         m_env->update_stats();
         m_consecutive_failures++;
-        e.send_notification(*m_env, NOTIFICATION_ERROR_RECOVERABLE);
+        send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, e.message(), *e.screenshot());
+        if (e.error_report_mode() == ErrorReport::SEND_ERROR_REPORT){
+            PokemonAutomation::report_error(
+                &env.logger(),
+                env.program_info(),
+                "Recoverable: OperationFailedExceptionWithScreenshot",
+                {{"Message:", e.message()}},
+                *e.screenshot(),
+                &e.video_stream()->history()
+            );
+        }        
         if (m_consecutive_failures >= 3){
             throw_and_log<FatalProgramException>(
                 stream.logger(),

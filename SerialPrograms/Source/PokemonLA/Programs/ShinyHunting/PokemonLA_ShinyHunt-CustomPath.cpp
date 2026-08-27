@@ -4,7 +4,8 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/ErrorReports/ErrorReports.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -310,9 +311,19 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, ProContro
                 from_professor_return_to_jubilife(env, env.console, context);
             }
 
-        }catch (OperationFailedException& e){
+        }catch (OperationFailedExceptionWithScreenshot& e){
             stats.errors++;
-            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, e.message(), *e.screenshot());
+            if (e.error_report_mode() == ErrorReport::SEND_ERROR_REPORT){
+                PokemonAutomation::report_error(
+                    &env.logger(),
+                    env.program_info(),
+                    "Recoverable: OperationFailedExceptionWithScreenshot",
+                    {{"Message:", e.message()}},
+                    *e.screenshot(),
+                    &e.video_stream()->history()
+                );
+            }
 
             time_reset_run_count = 0;
             pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);

@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -108,7 +108,7 @@ void GiftReset::obtain_pokemon(SingleSwitchProgramEnvironment& env, ProControlle
         stats.errors++;
         env.update_stats();
         env.log("obtain_pokemon(): Unable to start starter dialog after 10 attempts.", COLOR_RED);
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "obtain_pokemon(): Unable to start starter dialog after 10 attempts.",
             env.console
@@ -165,7 +165,7 @@ void GiftReset::obtain_pokemon(SingleSwitchProgramEnvironment& env, ProControlle
         default:
             stats.errors++;
             env.update_stats();
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "obtain_starter(): No recognized state after 10 seconds.",
                 env.console
@@ -343,7 +343,7 @@ uint64_t GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControl
             pbf_mash_button(context, BUTTON_B, 10000ms);
         }
     }
-    OperationFailedException::fire(
+    OperationFailedExceptionWithScreenshot::fire(
         ErrorReport::SEND_ERROR_REPORT,
         "open_summary(): Failed to open party summary after 5 attempts.",
         env.console
@@ -377,7 +377,7 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     default:
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "GiftReset: Invalid target selection.",
             env.console
