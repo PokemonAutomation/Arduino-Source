@@ -606,13 +606,13 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, VideoStream& stre
                     stream
                 );
             }
-        }catch (OperationFailedException& e){ 
+        }catch (OperationFailedException&){ 
             try_count++;
             if (try_count >= MAX_TRY_COUNT){
                 // either: 
                 // - pokecenter was detected, but failed to fly there. 
                 // - could not find pokecenter icon.
-                throw e;
+                throw;
             }
             stream.log("Failed to find the fly menuitem. Restart the closest Pokecenter travel process.");
             press_Bs_to_back_to_overworld(info, stream, context);

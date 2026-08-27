@@ -289,7 +289,7 @@ void checkpoint_26(
                 }
 
                 if (i >= MAX_ATTEMPTS_SECTION_1-1){
-                    throw e;
+                    throw;
                 }                
                 if (e.m_fail_reason == OliveFail::NO_OLIVE_DETECTED || e.m_fail_reason == OliveFail::FAILED_WALK_TO_OLIVE){
                     // may have walked past olive
@@ -299,7 +299,7 @@ void checkpoint_26(
                     duration_to_walk_for_section1 = 800ms;
                     push_strength_section_1 = 400ms;
                 }else{ // FAILED_PUSH_OLIVE_TOTAL_DISTANCE
-                    throw e;
+                    throw;
                 }
 
             }
@@ -325,7 +325,7 @@ void checkpoint_26(
                 break;
             }catch (OliveActionFailedException& e){
                 if (i >= MAX_ATTEMPTS_SECTION_2_1-1){
-                    throw e;
+                    throw;
                 }
 
                 if (e.m_fail_reason == OliveFail::NO_OLIVE_DETECTED){
@@ -341,7 +341,7 @@ void checkpoint_26(
                     context.wait_for_all_requests();
                     break; // then move on to next section
                 }else{ // FAILED_PUSH_OLIVE_TOTAL_DISTANCE, 
-                    throw e;
+                    throw;
                 }                
                 
             }
@@ -360,7 +360,7 @@ void checkpoint_26(
                 break;
             }catch (OliveActionFailedException& e){
                 if (i >= MAX_ATTEMPTS_SECTION_2_2-1){
-                    throw e;
+                    throw;
                 }
 
                 if (e.m_fail_reason == OliveFail::OLIVE_STUCK){  // olive possibly stuck on fence
@@ -420,7 +420,7 @@ void checkpoint_26(
                 }
 
                 if (i >= MAX_ATTEMPTS-1){
-                    throw e;
+                    throw;
                 }                
                 if (e.m_fail_reason == OliveFail::NO_OLIVE_DETECTED || e.m_fail_reason == OliveFail::FAILED_WALK_TO_OLIVE){
                     // may have walked past olive
@@ -429,7 +429,7 @@ void checkpoint_26(
                     context.wait_for_all_requests();                    
                     // ticks_to_walk_for_section2_3 = 500;                    
                 }else{ // FAILED_PUSH_OLIVE_TOTAL_DISTANCE
-                    throw e;
+                    throw;
                 }
 
             }
@@ -460,7 +460,7 @@ void checkpoint_26(
             }catch (OliveActionFailedException& e){
                 // may have failed to push the olive past the hump. and walked past it
                 if (i >= MAX_ATTEMPTS-1){
-                    throw e;
+                    throw;
                 }
 
                 if (e.m_fail_reason == OliveFail::NO_OLIVE_DETECTED){
@@ -477,7 +477,7 @@ void checkpoint_26(
                     context.wait_for_all_requests();
                     duration_to_walk_for_section3_1 = 1600ms;
                 }else{ // FAILED_PUSH_OLIVE_TOTAL_DISTANCE, 
-                    throw e;
+                    throw;
                 }
                 
             }
@@ -500,7 +500,7 @@ void checkpoint_26(
             }catch (OliveActionFailedException& e){
                 // may have failed to push the olive past the hump. and walked past it
                 if (i >= MAX_ATTEMPTS-1){
-                    throw e;
+                    throw;
                 }
                 if (e.m_fail_reason == OliveFail::NO_OLIVE_DETECTED){
                     pbf_move_left_joystick(context, {0, -1}, 1600ms, 400ms);
@@ -514,7 +514,7 @@ void checkpoint_26(
                     pbf_wait(context, 7000ms);
                     context.wait_for_all_requests();
                 }else{ // FAILED_PUSH_OLIVE_TOTAL_DISTANCE, 
-                    throw e;
+                    throw;
                 }
 
             }
@@ -547,7 +547,7 @@ void checkpoint_26(
                     pbf_wait(context, 7000ms);
                     context.wait_for_all_requests();
                 }else{ // FAILED_PUSH_OLIVE_TOTAL_DISTANCE, 
-                    throw e;
+                    throw;
                 }
             }
         }
@@ -580,7 +580,7 @@ void checkpoint_26(
                             // then push angled towards the right
                             green.push_olive_forward(env.program_info(), env.console, context, 5.8, 800ms, 600ms, 20, {0, 0.3, 1.0, 0.40}, false);
                         }else{ // FAILED_PUSH_OLIVE_TOTAL_DISTANCE, 
-                            throw e;
+                            throw;
                         }
                     }
                 }                

@@ -613,7 +613,7 @@ bool DonutMaker::donut_iteration(
         env.update_stats();
         consecutive_ingredient_fails++;
         if (consecutive_ingredient_fails >= 3){
-            throw e;
+            throw;
         }
         send_program_recoverable_error_notification(
             env,

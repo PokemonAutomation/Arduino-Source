@@ -1035,10 +1035,10 @@ void handle_failed_action(
             context.wait_for_all_requests();
             action(info, stream, context);
             return;
-        }catch (OperationFailedException& e){
+        }catch (OperationFailedException&){
             num_failures++;
             if (num_failures > max_failures){
-                throw e;
+                throw;
             }
             recovery_action(info, stream, context);
         }

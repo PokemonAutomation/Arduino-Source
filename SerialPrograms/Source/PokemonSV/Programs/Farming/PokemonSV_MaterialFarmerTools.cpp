@@ -319,7 +319,7 @@ void run_material_farmer(
 
         consecutive_failures++;
         if (consecutive_failures >= max_consecutive_failures){
-            throw e;
+            throw;
         }
 
         env.log("Reset game to handle recoverable error.");
