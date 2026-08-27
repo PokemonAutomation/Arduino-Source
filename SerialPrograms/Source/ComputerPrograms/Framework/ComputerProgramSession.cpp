@@ -134,10 +134,26 @@ void ComputerProgramSession::internal_run_program(){
             PokemonAutomation::report_error(
                 &env.logger(),
                 env.program_info(),
-                "Recoverable: OperationFailedExceptionWithScreenshot",
+                "Fatal: OperationFailedExceptionWithScreenshot",
                 {{"Message:", e.message()}},
                 *e.screenshot(),
                 &e.video_stream()->history()
+            );
+        }
+    }catch (OperationFailedException& e){ // no screenshot
+        logger().log("Program stopped with an exception!", COLOR_RED);
+        std::string message = e.message();
+        if (message.empty()){
+            message = e.name();
+        }
+        report_error(message);
+        send_program_fatal_error_notification(env, m_option.instance().NOTIFICATION_ERROR_FATAL, e.message());
+        if (e.error_report_mode() == ErrorReport::SEND_ERROR_REPORT){
+            PokemonAutomation::report_error(
+                &env.logger(),
+                env.program_info(),
+                "Fatal: OperationFailedException",
+                {{"Message:", e.message()}}
             );
         }
     }catch (FatalProgramException& e){
@@ -152,7 +168,7 @@ void ComputerProgramSession::internal_run_program(){
             PokemonAutomation::report_error(
                 &env.logger(),
                 env.program_info(),
-                "Recoverable: OperationFailedExceptionWithScreenshot",
+                "FatalProgramException",
                 {{"Message:", e.message()}},
                 *e.screenshot(),
                 &e.video_stream()->history()
