@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonHome_BallReader_H
 
 #include <string>
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/VideoStream.h"
@@ -50,6 +51,7 @@ private:
     OverlayBoxScope m_box_sprite;
 };
 
+void add_tests_BallReader(UnitTestDatabase& database);
 
 
 
