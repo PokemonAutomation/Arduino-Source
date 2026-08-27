@@ -7,6 +7,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "CommonFramework/ErrorReports/ErrorReports.h"
+#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
@@ -119,9 +120,27 @@ void ComputerProgramSession::internal_run_program(){
     }catch (ProgramCancelledException&){
     }catch (ProgramFinishedException& e){
         logger().log("Program finished early!", COLOR_BLUE);
-        e.send_notification(env, m_option.instance().NOTIFICATION_PROGRAM_FINISH);
+        send_program_finished_notification(env, m_option.instance().NOTIFICATION_PROGRAM_FINISH, e.message(), *e.screenshot());
     }catch (InvalidConnectionStateException&){
     }catch (OperationFailedExceptionWithScreenshot& e){
+        logger().log("Program stopped with an exception!", COLOR_RED);
+        std::string message = e.message();
+        if (message.empty()){
+            message = e.name();
+        }
+        report_error(message);
+        send_program_fatal_error_notification(env, m_option.instance().NOTIFICATION_ERROR_FATAL, e.message(), *e.screenshot());
+        if (e.error_report_mode() == ErrorReport::SEND_ERROR_REPORT){
+            PokemonAutomation::report_error(
+                &env.logger(),
+                env.program_info(),
+                "Recoverable: OperationFailedExceptionWithScreenshot",
+                {{"Message:", e.message()}},
+                *e.screenshot(),
+                &e.video_stream()->history()
+            );
+        }
+    }catch (FatalProgramException& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
         std::string message = e.message();
         if (message.empty()){

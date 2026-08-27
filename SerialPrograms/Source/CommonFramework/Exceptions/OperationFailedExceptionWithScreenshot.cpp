@@ -55,17 +55,6 @@ OperationFailedExceptionWithScreenshot::OperationFailedExceptionWithScreenshot(
 {}
 
 
-// void ScreenshotException::add_stream_if_needed(VideoStream& stream){
-//     if (m_stream == nullptr){
-//         m_stream = &stream;
-//     }
-//     if (!m_screenshot){
-//         m_screenshot = stream.video().snapshot();
-//         if (m_screenshot == nullptr || !*m_screenshot){
-//             stream.log("Camera returned empty screenshot. Is the camera frozen?", COLOR_RED);
-//         }
-//     }
-// }
 
 ImageViewRGB32 OperationFailedExceptionWithScreenshot::screenshot_view() const{
     if (m_screenshot){

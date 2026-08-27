@@ -205,7 +205,7 @@ void SingleSwitchProgramSession::internal_run_program(){
     }catch (ProgramFinishedException& e){
         logger().log("Program finished early!", COLOR_BLUE);
         env.console.overlay().add_log("- Program Finished -");
-        e.send_notification(env, m_option.instance().NOTIFICATION_PROGRAM_FINISH);
+        send_program_finished_notification(env, m_option.instance().NOTIFICATION_PROGRAM_FINISH, e.message(), *e.screenshot());
     }catch (InvalidConnectionStateException& e){
         logger().log("Program stopped due to connection issue.", COLOR_RED);
         env.console.overlay().add_log("- Invalid Connection -", COLOR_RED);
@@ -235,16 +235,26 @@ void SingleSwitchProgramSession::internal_run_program(){
             );
         }
 
-    }catch (ScreenshotException& e){
+    }catch (FatalProgramException& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
         env.console.overlay().add_log("- Program Error -", COLOR_RED);
-        e.add_stream_if_needed(env.console);
+
         std::string message = e.message();
         if (message.empty()){
             message = e.name();
         }
         report_error(message);
-        e.send_fatal_notification(env);
+        send_program_fatal_error_notification(env, m_option.instance().NOTIFICATION_ERROR_FATAL, e.message(), *e.screenshot());
+        if (e.error_report_mode() == ErrorReport::SEND_ERROR_REPORT){
+            PokemonAutomation::report_error(
+                &env.logger(),
+                env.program_info(),
+                "Recoverable: OperationFailedExceptionWithScreenshot",
+                {{"Message:", e.message()}},
+                *e.screenshot(),
+                &e.video_stream()->history()
+            );
+        }
     }catch (Exception& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
         env.console.overlay().add_log("- Program Error -", COLOR_RED);

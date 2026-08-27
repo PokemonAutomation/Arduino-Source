@@ -10,6 +10,7 @@
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
@@ -240,7 +241,7 @@ void MultiSwitchProgramSession::internal_run_program(){
     }catch (ProgramFinishedException& e){
         logger().log("Program finished early!", COLOR_BLUE);
         env.add_overlay_log_to_all_consoles("- Program Finished -");
-        e.send_notification(env, m_option.instance().NOTIFICATION_PROGRAM_FINISH);
+        send_program_finished_notification(env, m_option.instance().NOTIFICATION_PROGRAM_FINISH, e.message(), *e.screenshot());
     }catch (InvalidConnectionStateException& e){
         logger().log("Program stopped due to connection issue.", COLOR_RED);
         env.add_overlay_log_to_all_consoles("- Invalid Connection -", COLOR_RED);
@@ -270,19 +271,26 @@ void MultiSwitchProgramSession::internal_run_program(){
             );
         }
 
-    }catch (ScreenshotException& e){
+    }catch (FatalProgramException& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
         env.add_overlay_log_to_all_consoles("- Program Error -", COLOR_RED);
-        //  If the exception doesn't already have console information,
-        //  attach the 1st console here.
-        e.add_stream_if_needed(env.consoles[0]);
 
         std::string message = e.message();
         if (message.empty()){
             message = e.name();
         }
         report_error(message);
-        e.send_fatal_notification(env);
+        send_program_fatal_error_notification(env, m_option.instance().NOTIFICATION_ERROR_FATAL, e.message(), *e.screenshot());
+        if (e.error_report_mode() == ErrorReport::SEND_ERROR_REPORT){
+            PokemonAutomation::report_error(
+                &env.logger(),
+                env.program_info(),
+                "Recoverable: OperationFailedExceptionWithScreenshot",
+                {{"Message:", e.message()}},
+                *e.screenshot(),
+                &e.video_stream()->history()
+            );
+        }
     }catch (Exception& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
         env.add_overlay_log_to_all_consoles("- Program Error -", COLOR_RED);

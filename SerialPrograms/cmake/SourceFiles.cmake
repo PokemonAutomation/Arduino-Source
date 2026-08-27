@@ -402,8 +402,6 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h
     Source/CommonFramework/Exceptions/ProgramFinishedException.cpp
     Source/CommonFramework/Exceptions/ProgramFinishedException.h
-    Source/CommonFramework/Exceptions/ScreenshotException.cpp
-    Source/CommonFramework/Exceptions/ScreenshotException.h
     Source/CommonFramework/Exceptions/UnexpectedBattleException.h
     Source/CommonFramework/GlobalAutoPaths.cpp
     Source/CommonFramework/GlobalAutoPaths.h
