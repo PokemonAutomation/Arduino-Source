@@ -10,7 +10,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceSession.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -546,7 +546,7 @@ void hold_and_reanchor(
         }else{
             consecutive_failures++;
             if (consecutive_failures >= config.max_reanchor_failures){
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::NO_ERROR_REPORT,
                     std::to_string(consecutive_failures)
                     + " consecutive re-anchor failures: the blinks can no longer be read, "
