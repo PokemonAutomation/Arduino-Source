@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h" 
-#include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Exceptions/UnexpectedBattleException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -506,12 +505,12 @@ void swap_starter_moves(
 
         auto snapshot = stream.video().snapshot().frame;
         std::string message = "swap_starter_moves: Unable to confirm that the moves actually swapped.\n" + language_warning(language);
-        send_program_recoverable_error_notification(env, notif_error_recoverable, message, *snapshot);
-        report_error(
-            &env.logger(),
-            env.program_info(),
-            "Recoverable: OperationFailedExceptionWithScreenshot",
-            {{"Message:", message}},
+        send_program_recoverable_error_notification_and_telemetry_report(
+            env, &env.logger(), env.program_info(), 
+            notif_error_recoverable, 
+            ErrorReport::SEND_ERROR_REPORT,
+            message,
+            "OperationFailedExceptionWithScreenshot",
             *snapshot,
             &stream.history()
         );
@@ -1458,12 +1457,12 @@ void checkpoint_reattempt_loop(
         if (i == 10){  // send an error report for debugging if 10 failed attempts for a given checkpoint.
             auto snapshot = env.console.video().snapshot().frame;
             std::string message = "10 failed attempts. " + checkpoint_text;
-            send_program_recoverable_error_notification(env, notif_error_recoverable, message, *snapshot);
-            report_error(
-                &env.logger(),
-                env.program_info(),
-                "Recoverable: OperationFailedExceptionWithScreenshot",
-                {{"Message:", message}},
+            send_program_recoverable_error_notification_and_telemetry_report(
+                env, &env.logger(), env.program_info(), 
+                notif_error_recoverable, 
+                ErrorReport::SEND_ERROR_REPORT,
+                message,
+                "OperationFailedExceptionWithScreenshot",
                 *snapshot,
                 &env.console.history()
             );
@@ -1518,12 +1517,12 @@ void checkpoint_reattempt_loop_tutorial(
         if (i == 10){  // send an error report for debugging if 10 failed attempts for a given checkpoint.
             auto snapshot = env.console.video().snapshot().frame;
             std::string message = "10 failed attempts. " + checkpoint_text;
-            send_program_recoverable_error_notification(env, notif_error_recoverable, message, *snapshot);
-            report_error(
-                &env.logger(),
-                env.program_info(),
-                "Recoverable: OperationFailedExceptionWithScreenshot",
-                {{"Message:", message}},
+            send_program_recoverable_error_notification_and_telemetry_report(
+                env, &env.logger(), env.program_info(), 
+                notif_error_recoverable, 
+                ErrorReport::SEND_ERROR_REPORT,
+                message,
+                "OperationFailedExceptionWithScreenshot",
                 *snapshot,
                 &env.console.history()
             );

@@ -8,7 +8,6 @@
 #include <unordered_map>
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
-#include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"

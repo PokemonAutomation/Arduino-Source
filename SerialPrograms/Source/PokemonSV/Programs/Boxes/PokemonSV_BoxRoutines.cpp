@@ -7,7 +7,6 @@
 //#include <cmath>
 //#include <algorithm>
 //#include <sstream>
-#include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTools/ImageStats.h"

@@ -6,7 +6,6 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/CancellableScope.h"
-#include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"

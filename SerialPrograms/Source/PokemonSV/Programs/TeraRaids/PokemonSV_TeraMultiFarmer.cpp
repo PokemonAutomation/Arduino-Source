@@ -6,7 +6,6 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 //#include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"

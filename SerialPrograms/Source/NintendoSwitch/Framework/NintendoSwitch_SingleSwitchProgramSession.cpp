@@ -7,7 +7,6 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/EarlyShutdown.h"
 #include "Common/Cpp/Concurrency/SpinPause.h"
-#include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
