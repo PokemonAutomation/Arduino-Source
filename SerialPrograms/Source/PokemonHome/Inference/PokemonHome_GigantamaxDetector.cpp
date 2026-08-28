@@ -5,9 +5,11 @@
  */
 
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "PokemonHome_GigantamaxDetector.h"
+#include "Tests/TestUtils.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -82,6 +84,39 @@ bool GigantamaxDetector::detect(const ImageViewRGB32& screen){
     }
 
     return found;
+}
+
+class Test_GigantamaxDetector : public UnitTest{
+public:
+
+    Test_GigantamaxDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonHome::GigantamaxDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyVideoOverlay video_overlay;
+        ImageRGB32 image(m_image);
+        GigantamaxDetector detector(COLOR_BLACK, &video_overlay, ImageFloatBox(0.463, 0.09, 0.04, 0.06));
+        bool result = detector.detect(image);
+
+        if (result == m_expected)
+            return true;
+
+        return "Expected: " + std::to_string(m_expected) + ", received: " + std::to_string(result);
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+void add_tests_GigantamaxDetector(UnitTestDatabase& database){
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/annihilape_Regular.png", false);
 }
 
 

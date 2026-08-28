@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Color.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
@@ -66,6 +67,38 @@ Pokemon::StatsHuntGenderFilter BoxGenderDetector::detect(const ImageViewRGB32& s
     }
     return Pokemon::StatsHuntGenderFilter::Genderless;
 }
+
+class Test_BoxGenderDetector : public UnitTest{
+public:
+
+    Test_BoxGenderDetector(
+        const std::string& image,
+        Pokemon::StatsHuntGenderFilter expected
+    )
+        : UnitTest("PokemonHome::BoxGenderDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        ImageRGB32 image(m_image);
+        Pokemon::StatsHuntGenderFilter result = BoxGenderDetector::detect(image);
+
+        if (result == m_expected)
+            return true;
+
+        return "Expected: " + Pokemon::gender_to_string(m_expected) + ", received: " + Pokemon::gender_to_string(result);
+    };
+
+private:
+    std::string m_image;
+    Pokemon::StatsHuntGenderFilter m_expected;
+};
+
+void add_tests_BoxGenderDetector(UnitTestDatabase& database){
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/annihilape_Regular.png", Pokemon::StatsHuntGenderFilter::Male);
+}
+
 
 }
 }

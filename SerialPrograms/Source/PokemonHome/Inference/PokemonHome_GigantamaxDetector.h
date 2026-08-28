@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonHome_GigantamaxDetector_H
 
 #include <optional>
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/VisualDetector.h"
@@ -50,6 +51,7 @@ public:
     {}
 };
 
+void add_tests_GigantamaxDetector(UnitTestDatabase& database);
 
 }
 }

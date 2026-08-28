@@ -5,10 +5,12 @@
  */
 
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "PokemonHome_ButtonDetector.h"
+#include "Tests/TestUtils.h"
 
 //#include <iostream>
 //using std::cout;
@@ -155,6 +157,56 @@ bool ButtonDetector::detect(const ImageViewRGB32& screen){
     return found;
 }
 
+class Test_ButtonDetector : public UnitTest{
+public:
+
+    Test_ButtonDetector(
+        const std::string& image,
+        std::optional<ButtonType> expected
+    )
+        : UnitTest("PokemonHome::ButtonDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyVideoOverlay video_overlay;
+        ImageRGB32 image(m_image);
+        ImageFloatBox box(0.100, 0.956, 0.107, 0.041);
+        ButtonDetector b_detector(COLOR_RED, ButtonType::ButtonB, box, &video_overlay);
+        ButtonDetector plus_detector(COLOR_RED, ButtonType::ButtonPlus, box, &video_overlay);
+
+        const bool b_detected = b_detector.detect(image);
+        const bool plus_detected = plus_detector.detect(image);
+        const bool expected_b = m_expected && *m_expected == ButtonType::ButtonB;
+        const bool expected_plus = m_expected && *m_expected == ButtonType::ButtonPlus;
+
+        if (b_detected == expected_b && plus_detected == expected_plus)
+            return true;
+
+        std::string received;
+        if (b_detected && plus_detected){
+            received = "ButtonB and ButtonPlus";
+        }else if (b_detected){
+            received = button_name(ButtonType::ButtonB);
+        }else if (plus_detected){
+            received = button_name(ButtonType::ButtonPlus);
+        }else{
+            received = "none";
+        }
+
+        return std::string("Expected: ") + (m_expected ? button_name(*m_expected) : "none")
+            + ", received: " + received;
+    };
+
+private:
+    std::string m_image;
+    std::optional<ButtonType> m_expected;
+};
+
+void add_tests_ButtonDetector(UnitTestDatabase& database){
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/annihilape_Regular.png", ButtonType::ButtonB);
+}
 
 }
 }

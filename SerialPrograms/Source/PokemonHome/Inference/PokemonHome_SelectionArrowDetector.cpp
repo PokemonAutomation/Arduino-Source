@@ -5,9 +5,11 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "Tests/TestUtils.h"
 #include "PokemonHome_SelectionArrowDetector.h"
 
 namespace PokemonAutomation{
@@ -101,6 +103,62 @@ bool SelectionArrowDetector::detect(const ImageViewRGB32& screen){
     }
 
     return found;
+}
+
+class Test_SelectionArrowDetector : public UnitTest{
+public:
+
+    Test_SelectionArrowDetector(
+        const std::string& image,
+        std::optional<SelectionArrowType> expected
+    )
+        : UnitTest("PokemonHome::SelectionArrowDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyVideoOverlay video_overlay;
+        ImageRGB32 image(m_image);
+        SelectionArrowDetector right_detector(COLOR_BLACK, &video_overlay, SelectionArrowType::RIGHT, ImageFloatBox(0.463, 0.09, 0.04, 0.06));
+        SelectionArrowDetector down_detector(COLOR_BLACK, &video_overlay, SelectionArrowType::DOWN, ImageFloatBox(0.463, 0.09, 0.04, 0.06));
+
+        const bool right_detected = right_detector.detect(image);
+        const bool down_detected = down_detector.detect(image);
+
+        const bool expected_right = m_expected && *m_expected == SelectionArrowType::RIGHT;
+        const bool expected_down = m_expected && *m_expected == SelectionArrowType::DOWN;
+
+        if (right_detected == expected_right && down_detected == expected_down)
+            return true;
+
+        auto arrow_name = [](std::optional<SelectionArrowType> arrow){
+            if (!arrow)
+                return std::string("none");
+            return *arrow == SelectionArrowType::RIGHT
+                ? std::string("RIGHT")
+                : std::string("DOWN");
+        };
+
+        std::optional<SelectionArrowType> result;
+        if (right_detected && down_detected){
+            return "Expected: " + arrow_name(m_expected) + ", received: RIGHT and DOWN";
+        }else if (right_detected){
+            result = SelectionArrowType::RIGHT;
+        }else if (down_detected){
+            result = SelectionArrowType::DOWN;
+        }
+
+        return "Expected: " + arrow_name(m_expected) + ", received: " + arrow_name(result);
+    };
+
+private:
+    std::string m_image;
+    std::optional<SelectionArrowType> m_expected;
+};
+
+void add_tests_SelectionArrowDetector(UnitTestDatabase& database){
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/annihilape_Regular.png", std::nullopt);
 }
 
 }
