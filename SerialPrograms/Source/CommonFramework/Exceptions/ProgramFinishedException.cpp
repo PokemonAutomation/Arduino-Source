@@ -26,7 +26,6 @@ ProgramFinishedException::ProgramFinishedException(
     , m_screenshot(stream.video().snapshot().frame)
 {}
 ProgramFinishedException::ProgramFinishedException(
-    ErrorReport error_report,
     std::string message,
     VideoStream* stream,
     ImageRGB32 screenshot

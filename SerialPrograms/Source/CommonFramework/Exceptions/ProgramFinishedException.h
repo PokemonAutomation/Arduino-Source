@@ -41,7 +41,6 @@ public:
     //  Use the provided screenshot instead of taking one with the console.
     //  Store the console information (if provided) for stream history if requested later.
     explicit ProgramFinishedException(
-        ErrorReport error_report,
         std::string message,
         VideoStream* stream,
         ImageRGB32 screenshot
