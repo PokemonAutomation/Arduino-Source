@@ -158,6 +158,47 @@ private:
 
 void add_tests_BallReader(UnitTestDatabase& database){
     database.add<Test_BallReader>("PokemonHome/SummaryScreen/annihilape_Regular.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/bidoof_Regular.png", "ultra-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/bulbasaur_Regular.png", "ultra-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Go.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Lza.png", "repeat-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/capskid_Regular.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/castform_Regular.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/cyclizar_Regular.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/dudunsparce_Regular.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/dudunsparce_Regular_Sv.png", "quick-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/enamorus_Shiny.png", "cherish-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/gimmighoul_Regular.png", "ultra-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/glimmet_Regular.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/gogoat_Regular.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/greatTusk_Shiny.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/hatterne_Regular.png", "ultra-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/houndstone_Regular.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/ironBunde_Regular.png", "dive-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/ironBundle_Regular_Sv.png", "quick-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/ironJugulis_Regular.png", "quick-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/ironThorns_Regular.png", "ultra-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/kilowattrel_Regular.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/kingler_Shiny.png", "net-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/komala_Regular.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/krabby_Shiny.png", "ultra-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/machamp_Regular.png", "repeat-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/pancham_Shiny.png", "luxury-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/rapidash_Regular.png", "ultra-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/rellor_Regular.png", "great-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/riolu_Regular.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/rowlet_ShinyAlpha.png", "jet-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/scovillain_Regular.png", "great-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/slitherWing_Shiny.png", "beast-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/squirtle_Shiny.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/tapuLele_Shiny.png", "cherish-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/tatsugiri_Regular.png", "quick-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/teddiursa_Regular.png", "wing-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/terapagos_regular.png", "luxury-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/vulpix_Regular.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/vulpix_Shiny.png", "luxury-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/wartortle_Regular.png", "ultra-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/wurmple_Regular.png", "premier-ball");
 }
 
 

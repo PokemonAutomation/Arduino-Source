@@ -225,24 +225,23 @@ void read_summary_screen(
 ) {
     VideoOverlaySet video_overlay_set(env.console);
 
-    ImageFloatBox gmax_tera_symbol_box(0.463, 0.09, 0.04, 0.06); // gmax OR tera symbol pos
-    ImageFloatBox origin_symbol_box(0.617, 0.084, 0.044, 0.069); // origin symbol pos
     ImageFloatBox pokemon_box(0.69, 0.18, 0.28, 0.46); // pokemon render pos
     ImageFloatBox type_box(0.615, 0.240, 0.071, 0.057); // Type symbols
-
-
-    video_overlay_set.add(COLOR_RED, gmax_tera_symbol_box);
-    ShinyDetector shiny_detector(COLOR_RED, &env.console.overlay());
-    AlphaDetector alpha_detector(COLOR_RED, &env.console.overlay());
-    shiny_detector.make_overlays(video_overlay_set);
-    alpha_detector.make_overlays(video_overlay_set);
-    video_overlay_set.add(COLOR_DARKGREEN, origin_symbol_box);
     video_overlay_set.add(COLOR_DARK_BLUE, pokemon_box);
     video_overlay_set.add(COLOR_RED, type_box);
-    BoxGenderDetector::make_overlays(video_overlay_set);
-    SummaryReader summary_reader(COLOR_RED);
-    summary_reader.make_overlays(video_overlay_set);
 
+    GigantamaxDetector gmax_detector(COLOR_RED, &env.console.overlay());
+    ShinyDetector shiny_detector(COLOR_RED, &env.console.overlay());
+    AlphaDetector alpha_detector(COLOR_RED, &env.console.overlay());
+    OriginMarkReader origin_mark_reader(COLOR_RED, &env.console.overlay());
+    SummaryReader summary_reader(COLOR_RED);
+
+    gmax_detector.make_overlays(video_overlay_set);
+    shiny_detector.make_overlays(video_overlay_set);
+    alpha_detector.make_overlays(video_overlay_set);
+    origin_mark_reader.make_overlays(video_overlay_set);
+    summary_reader.make_overlays(video_overlay_set);
+    BoxGenderDetector::make_overlays(video_overlay_set);
 
     // Wait for the summary screen transition to end
     FrozenImageDetector frozen_image_detector(COLOR_GREEN, { 0.388, 0.238, 0.109, 0.062 }, Milliseconds(80), 20);
@@ -265,10 +264,9 @@ void read_summary_screen(
     const bool is_shiny = shiny_detector.detect(screen);
     cur_pokemon_info.shiny = is_shiny;
 
-    GigantamaxDetector gmax_detector(COLOR_RED, &env.console.overlay(), gmax_tera_symbol_box);
     cur_pokemon_info.gmax = gmax_detector.detect(screen);
 
-    cur_pokemon_info.tera_type = read_pokemon_tera_type(screen, gmax_tera_symbol_box);
+    cur_pokemon_info.tera_type = read_pokemon_tera_type(screen);
 
     const bool is_alpha = alpha_detector.detect(screen);
     cur_pokemon_info.alpha = is_alpha;
@@ -295,7 +293,7 @@ void read_summary_screen(
         ot_name_language, screen
     );
 
-    cur_pokemon_info.origin_mark = OriginMarkReader().read_mark(screen, origin_symbol_box);
+    cur_pokemon_info.origin_mark = origin_mark_reader.read_mark(screen);
 
     env.add_overlay_log(create_overlay_info(cur_pokemon_info));
     video_overlay_set.clear();
