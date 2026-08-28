@@ -571,17 +571,15 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
                         move_to_auctioneer(env, context, offer);
                     }catch (OperationFailedExceptionWithScreenshot& e){
                         stats.m_errors++;
-                        send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, e.message(), *e.screenshot());
-                        if (e.error_report_mode() == ErrorReport::SEND_ERROR_REPORT){
-                            PokemonAutomation::report_error(
-                                &env.logger(),
-                                env.program_info(),
-                                "Recoverable: OperationFailedExceptionWithScreenshot",
-                                {{"Message:", e.message()}},
-                                *e.screenshot(),
-                                &e.video_stream()->history()
-                            );
-                        }
+                        send_program_recoverable_error_notification_and_telemetry_report(
+                            env, &env.logger(), env.program_info(), 
+                            NOTIFICATION_ERROR_RECOVERABLE, 
+                            e.error_report_mode(),
+                            e.message(),
+                            "OperationFailedExceptionWithScreenshot",
+                            *e.screenshot(),
+                            &e.video_stream()->history()
+                        );
 
                         npc_tries++;
                         // if ONE_NPC the program already tries multiple times without change to compensate for dropped inputs

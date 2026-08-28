@@ -223,17 +223,15 @@ void SingleSwitchProgramSession::internal_run_program(){
             message = e.name();
         }
         report_error(message);
-        send_program_fatal_error_notification(env, m_option.instance().NOTIFICATION_ERROR_FATAL, e.message(), *e.screenshot());
-        if (e.error_report_mode() == ErrorReport::SEND_ERROR_REPORT){
-            PokemonAutomation::report_error(
-                &env.logger(),
-                env.program_info(),
-                "Fatal: OperationFailedExceptionWithScreenshot",
-                {{"Message:", e.message()}},
-                *e.screenshot(),
-                &e.video_stream()->history()
-            );
-        }
+        send_program_fatal_error_notification_and_telemetry_report(
+            env, &env.logger(), env.program_info(), 
+            m_option.instance().NOTIFICATION_ERROR_FATAL, 
+            e.error_report_mode(),
+            e.message(),
+            "OperationFailedExceptionWithScreenshot",
+            *e.screenshot(),
+            &e.video_stream()->history()
+        );
     }catch (OperationFailedException& e){ // no screenshot
         logger().log("Program stopped with an exception!", COLOR_RED);
         env.console.overlay().add_log("- Program Error -", COLOR_RED);
@@ -243,15 +241,13 @@ void SingleSwitchProgramSession::internal_run_program(){
             message = e.name();
         }
         report_error(message);
-        send_program_fatal_error_notification(env, m_option.instance().NOTIFICATION_ERROR_FATAL, e.message());
-        if (e.error_report_mode() == ErrorReport::SEND_ERROR_REPORT){
-            PokemonAutomation::report_error(
-                &env.logger(),
-                env.program_info(),
-                "Fatal: OperationFailedException",
-                {{"Message:", e.message()}}
-            );
-        }
+        send_program_fatal_error_notification_and_telemetry_report(
+            env, &env.logger(), env.program_info(), 
+            m_option.instance().NOTIFICATION_ERROR_FATAL, 
+            e.error_report_mode(),
+            e.message(),
+            "OperationFailedException"
+        );
     }catch (FatalProgramException& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
         env.console.overlay().add_log("- Program Error -", COLOR_RED);
@@ -261,17 +257,15 @@ void SingleSwitchProgramSession::internal_run_program(){
             message = e.name();
         }
         report_error(message);
-        send_program_fatal_error_notification(env, m_option.instance().NOTIFICATION_ERROR_FATAL, e.message(), *e.screenshot());
-        if (e.error_report_mode() == ErrorReport::SEND_ERROR_REPORT){
-            PokemonAutomation::report_error(
-                &env.logger(),
-                env.program_info(),
-                "FatalProgramException",
-                {{"Message:", e.message()}},
-                *e.screenshot(),
-                &e.video_stream()->history()
-            );
-        }
+        send_program_fatal_error_notification_and_telemetry_report(
+            env, &env.logger(), env.program_info(), 
+            m_option.instance().NOTIFICATION_ERROR_FATAL, 
+            e.error_report_mode(),
+            e.message(),
+            "FatalProgramException",
+            *e.screenshot(),
+            &e.video_stream()->history()
+        );
     }catch (Exception& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
         env.console.overlay().add_log("- Program Error -", COLOR_RED);

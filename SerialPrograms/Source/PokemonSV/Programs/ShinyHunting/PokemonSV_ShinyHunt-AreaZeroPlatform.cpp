@@ -463,17 +463,15 @@ void ShinyHuntAreaZeroPlatform::set_flags_and_run_state(
         stats.m_errors++;
         m_env->update_stats();
         m_consecutive_failures++;
-        send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, e.message(), *e.screenshot());
-        if (e.error_report_mode() == ErrorReport::SEND_ERROR_REPORT){
-            PokemonAutomation::report_error(
-                &env.logger(),
-                env.program_info(),
-                "Recoverable: OperationFailedExceptionWithScreenshot",
-                {{"Message:", e.message()}},
-                *e.screenshot(),
-                &e.video_stream()->history()
-            );
-        }        
+        send_program_recoverable_error_notification_and_telemetry_report(
+            env, &env.logger(), env.program_info(), 
+            NOTIFICATION_ERROR_RECOVERABLE, 
+            e.error_report_mode(),
+            e.message(),
+            "OperationFailedExceptionWithScreenshot",
+            *e.screenshot(),
+            &e.video_stream()->history()
+        );       
         if (m_consecutive_failures >= 3){
             throw_and_log<FatalProgramException>(
                 stream.logger(),

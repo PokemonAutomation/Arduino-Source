@@ -313,17 +313,15 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, ProContro
 
         }catch (OperationFailedExceptionWithScreenshot& e){
             stats.errors++;
-            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, e.message(), *e.screenshot());
-            if (e.error_report_mode() == ErrorReport::SEND_ERROR_REPORT){
-                PokemonAutomation::report_error(
-                    &env.logger(),
-                    env.program_info(),
-                    "Recoverable: OperationFailedExceptionWithScreenshot",
-                    {{"Message:", e.message()}},
-                    *e.screenshot(),
-                    &e.video_stream()->history()
-                );
-            }
+            send_program_recoverable_error_notification_and_telemetry_report(
+                env, &env.logger(), env.program_info(), 
+                NOTIFICATION_ERROR_RECOVERABLE, 
+                e.error_report_mode(),
+                e.message(),
+                "OperationFailedExceptionWithScreenshot",
+                *e.screenshot(),
+                &e.video_stream()->history()
+            );
 
             time_reset_run_count = 0;
             pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);

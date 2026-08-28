@@ -154,17 +154,15 @@ void PostMMOSpawnReset::program(SingleSwitchProgramEnvironment& env, ProControll
             run_iteration(env, context);
         }catch (OperationFailedExceptionWithScreenshot& e){
             stats.errors++;
-            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, e.message(), *e.screenshot());
-            if (e.error_report_mode() == ErrorReport::SEND_ERROR_REPORT){
-                PokemonAutomation::report_error(
-                    &env.logger(),
-                    env.program_info(),
-                    "Recoverable: OperationFailedExceptionWithScreenshot",
-                    {{"Message:", e.message()}},
-                    *e.screenshot(),
-                    &e.video_stream()->history()
-                );
-            }
+            send_program_recoverable_error_notification_and_telemetry_report(
+                env, &env.logger(), env.program_info(), 
+                NOTIFICATION_ERROR_RECOVERABLE, 
+                e.error_report_mode(),
+                e.message(),
+                "OperationFailedExceptionWithScreenshot",
+                *e.screenshot(),
+                &e.video_stream()->history()
+            );
 
             // run_iteration() restarts the game first then listens to shiny sound.
             // If there is any error generated when the game is running and is caught here,

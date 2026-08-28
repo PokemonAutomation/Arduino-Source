@@ -621,17 +621,15 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
         }catch (OperationFailedExceptionWithScreenshot& e){
 //            cout << "caught: TeraMultiFarmer::program" << endl;
 
-            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, e.message(), *e.screenshot());
-            if (e.error_report_mode() == ErrorReport::SEND_ERROR_REPORT){
-                PokemonAutomation::report_error(
-                    &env.logger(),
-                    env.program_info(),
-                    "Recoverable: OperationFailedExceptionWithScreenshot",
-                    {{"Message:", e.message()}},
-                    *e.screenshot(),
-                    &e.video_stream()->history()
-                );
-            }
+            send_program_recoverable_error_notification_and_telemetry_report(
+                env, &env.logger(), env.program_info(), 
+                NOTIFICATION_ERROR_RECOVERABLE, 
+                e.error_report_mode(),
+                e.message(),
+                "OperationFailedExceptionWithScreenshot",
+                *e.screenshot(),
+                &e.video_stream()->history()
+            );
             if (RECOVERY_MODE != RecoveryMode::SAVE_AND_RESET){
                 //  Iterate the errored Switches. If a non-host has errored,
                 //  rethrow the exception to stop the program.
