@@ -6,8 +6,10 @@
 
 #include <iostream>
 #include <set>
+#ifdef QT_CORE_LIB
 #include <QDesktopServices>
 #include <QUrl>
+#endif
 #include "Common/Cpp/ColoredText.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/LifetimeSanitizer.h"
@@ -382,8 +384,10 @@ void GlobalSettings::on_config_value_changed(void* object){
 }
 
 void GlobalSettings::on_press(ButtonCell& button){
+#ifdef QT_CORE_LIB
     // Open the runtime base folder in the system file manager
     QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdString(RUNTIME_BASE_PATH())));
+#endif
 }
 
 void GlobalSettings::connect_row_with_download(const std::string& resource_slug, std::shared_ptr<ResourceDownload>& download_ptr){
