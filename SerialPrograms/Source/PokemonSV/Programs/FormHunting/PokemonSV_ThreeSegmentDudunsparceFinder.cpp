@@ -85,7 +85,8 @@ void ThreeSegmentDudunsparceFinder::check_one_column(
     if (check_empty_slots_in_party(env.program_info(), env.console, context) != expected_empty_slots_in_party){
         throw_and_log<FatalProgramException>(
             env.console, ErrorReport::SEND_ERROR_REPORT,
-            "Your party should have " + std::to_string(expected_empty_slots_in_party) + " " + STRING_POKEMON + ".",
+            "Your party should have " + std::to_string(6 - expected_empty_slots_in_party) + " " + STRING_POKEMON +
+            " and " + std::to_string(expected_empty_slots_in_party) + " empty slots.",
             env.console
         );
     }

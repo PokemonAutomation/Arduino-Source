@@ -108,7 +108,7 @@ void handle_egg_hatching(
     if (ret < 0){
         dump_image_and_throw_recoverable_exception(
             info, stream, "NoHatchingEnd",
-            "hatch_eggs_at_zero_gate(): No end of egg hatching detected after one minute."
+            "No end of egg hatching detected after one minute."
         );
     }
     stream.log("Finished hatching animation and dialog.");
@@ -175,7 +175,7 @@ bool do_egg_cycle_motion(
     default:
         dump_image_and_throw_recoverable_exception(
             env.program_info(), stream, "NoEggToHatch",
-            "hatch_eggs_at_zero_gate(): No more egg hatch after 10 minutes."
+            "No more egg hatch after 10 minutes."
         );
     }
 
@@ -552,7 +552,7 @@ void check_basket_to_collect_eggs(
             if (consecutive_nothing >= 10){
                 dump_image_and_throw_recoverable_exception(
                     info, stream, "BasketNotFound",
-                    "collect_eggs_from_basket(): Basket not found after 10 attempts.\n"
+                    "check_basket_to_collect_eggs(): Basket not found after 10 attempts.\n"
                     "Please make sure that the \"Camera Support\" option is set to \"On\"."
                 );
             }
@@ -643,7 +643,7 @@ uint8_t check_non_eggs_count_in_party(
     if (counts.second != expected_non_eggs_count_in_party){
         dump_image_and_throw_recoverable_exception(
             info, stream, "NonEggPokemonInParty",
-            "check_non_eggs_count_in_party: Found non-egg pokemon in party"
+            "check_non_eggs_count_in_party(): Found non-egg " + STRING_POKEMON + " in party"
         );
     }
     return counts.first;
