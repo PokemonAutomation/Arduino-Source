@@ -168,14 +168,22 @@ enum class ConfirmSlot {
     NO
 };
 
+enum class ConfirmPosition {
+	STANDARD, // e.g. save menu
+	SPECIAL, // e.g. clock in your room, replace move; not starter selection: ruby/sapphire is different
+	STARTER, // starter selection
+    MART, // confirm purchase
+    TOP_LEFT // e.g. player name
+};
+
 class ConfirmSlotDetector : public SelectionSlotDetector {
 public:
-	ConfirmSlotDetector(Color color, ConfirmSlot slot);
+	ConfirmSlotDetector(Color color, ConfirmSlot slot, ConfirmPosition position = ConfirmPosition::STANDARD);
 };
 class ConfirmSlotWatcher : public DetectorToFinder<ConfirmSlotDetector> {
 public:
-    ConfirmSlotWatcher(Color color, ConfirmSlot slot, Milliseconds hold_duration = Milliseconds(250))
-        : DetectorToFinder("ConfirmSlotWatcher", hold_duration , color, slot)
+    ConfirmSlotWatcher(Color color, ConfirmSlot slot, ConfirmPosition position = ConfirmPosition::STANDARD, Milliseconds hold_duration = Milliseconds(250))
+        : DetectorToFinder("ConfirmSlotWatcher", hold_duration , color, slot, position)
     {}
 };
 

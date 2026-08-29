@@ -202,12 +202,49 @@ bool SelectionDialogDetector::detect(const ImageViewRGB32& screen){
 }
 
 
-ConfirmSlotDetector::ConfirmSlotDetector(Color color, ConfirmSlot slot)
+static std::vector<SlotCandidate> confirm_candidates(ConfirmSlot slot, ConfirmPosition position) {
+    std::vector<SlotCandidate> candidates;
+	double offset = SELECTION_SLOT_OFFSETS[(int)slot];
+
+	switch (position) {
+	case ConfirmPosition::STANDARD:
+        return {
+            { 0.69, 0.45 + offset, SelectionIndicator::ARROW  },
+            { 0.685, 0.458 + offset, SelectionIndicator::BORDER }
+        };
+	case ConfirmPosition::SPECIAL:
+		return {
+			{ 0.79, 0.45 + offset, SelectionIndicator::ARROW  },
+			{ 0.785, 0.458 + offset, SelectionIndicator::BORDER }
+        };
+	case ConfirmPosition::STARTER:
+        return {
+            { 0.79, 0.45 + offset, SelectionIndicator::ARROW  },
+            { 0.725, 0.397 + offset, SelectionIndicator::ARROW  }, // jpn rs
+            { 0.72, 0.405 + offset, SelectionIndicator::BORDER }
+        };
+	case ConfirmPosition::MART:
+        return {
+            { 0.69, 0.45 + offset, SelectionIndicator::ARROW  },
+            { 0.255, 0.45 + offset, SelectionIndicator::ARROW  }, // jpn rs
+            { 0.25, 0.458 + offset, SelectionIndicator::BORDER }
+        };
+	case ConfirmPosition::TOP_LEFT:
+        return {
+            { 0.094, 0.115 + offset, SelectionIndicator::ARROW  },
+            { 0.089, 0.123 + offset, SelectionIndicator::BORDER }
+        };
+	default:
+        return {
+            { 0.69, 0.45 + offset, SelectionIndicator::ARROW  },
+            { 0.685, 0.458 + offset, SelectionIndicator::BORDER }
+        };
+	}
+}
+
+ConfirmSlotDetector::ConfirmSlotDetector(Color color, ConfirmSlot slot, ConfirmPosition position)
     : SelectionSlotDetector(color
-    , {
-        { 0.69, 0.45 + SELECTION_SLOT_OFFSETS[(int)slot], SelectionIndicator::ARROW  },
-        { 0.685, 0.458 + SELECTION_SLOT_OFFSETS[(int)slot], SelectionIndicator::BORDER }
-    })
+    , confirm_candidates(slot, position))
 {}
 
 
@@ -254,17 +291,19 @@ public:
     Test_ConfirmSlotDetector(
         const std::string& image,
 		ConfirmSlot slot,
+		ConfirmPosition position,
         bool expected
     )
         : UnitTest("PokemonRSE::ConfirmSlotDetector - " + std::to_string((int)slot) + " - " + image)
         , m_image(UNIT_TEST_RESOURCE_PATH() + image)
 		, m_slot(slot)
+		, m_position(position)
         , m_expected(expected)
     {
     }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override {
-        ConfirmSlotDetector detector(COLOR_RED, m_slot);
+        ConfirmSlotDetector detector(COLOR_RED, m_slot, m_position);
         ImageRGB32 image(m_image);
         return detector.detect(image) == m_expected;
     };
@@ -272,6 +311,7 @@ public:
 private:
     std::string m_image;
 	ConfirmSlot m_slot;
+    ConfirmPosition m_position;
     bool m_expected;
 };
 
@@ -279,22 +319,51 @@ void add_tests_ConfirmSlotDetector(UnitTestDatabase& database) {
     // Switch 1/2
 
     // Original GBA resolution {0.0, 0.0, 1.0, 1.0}
-    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBA-Eng-Ruby_yes.png", ConfirmSlot::YES, true);
-    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBA-Eng-Ruby_yes.png", ConfirmSlot::NO, false);
-    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBA-Ger-Emerald_yes.png", ConfirmSlot::YES, true);
-    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBA-Ger-Emerald_yes.png", ConfirmSlot::NO, false);
-    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBA-Ger-Ruby_yes.png", ConfirmSlot::YES, true);
-    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBA-Ger-Ruby_yes.png", ConfirmSlot::NO, false);
+    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBA-Eng-Ruby_yes.png", ConfirmSlot::YES, ConfirmPosition::STANDARD, true);
+    //database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBA-Eng-Ruby_yes.png", ConfirmSlot::NO, ConfirmPosition::STANDARD, false);
+    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBA-Ger-Emerald_yes.png", ConfirmSlot::YES, ConfirmPosition::STANDARD, true);
+    //database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBA-Ger-Emerald_yes.png", ConfirmSlot::NO, ConfirmPosition::STANDARD, false);
+    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBA-Ger-Ruby_yes.png", ConfirmSlot::YES, ConfirmPosition::STANDARD, true);
+    //database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBA-Ger-Ruby_yes.png", ConfirmSlot::NO, ConfirmPosition::STANDARD, false);
+
+    // GBA SPECIAL
+    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBA-Eng-Emerald-Special_no.png", ConfirmSlot::NO, ConfirmPosition::SPECIAL, true);
+    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBA-Eng-Ruby-Special_yes.png", ConfirmSlot::YES, ConfirmPosition::SPECIAL, true);
+
+    // GBA TOP_LEFT
+    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBA-Eng-Emerald-Top_no.png", ConfirmSlot::NO, ConfirmPosition::TOP_LEFT, true);
+    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBA-Eng-Ruby-Top_no.png", ConfirmSlot::NO, ConfirmPosition::TOP_LEFT, true);
+
+    // GBA MART
+    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBA-Ger-Emerald-Mart_yes.png", ConfirmSlot::YES, ConfirmPosition::MART, true);
+    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBA-Ger-Ruby-Mart_no.png", ConfirmSlot::NO, ConfirmPosition::MART, true);
+    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBA-Jpn-Ruby-Mart_yes.png", ConfirmSlot::YES, ConfirmPosition::MART, true);
+
+    // GBA STARTER
+    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBA-Ger-Emerald-Starter_yes.png", ConfirmSlot::YES, ConfirmPosition::STARTER, true);
+    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBA-Ger-Ruby-Starter_no.png", ConfirmSlot::NO, ConfirmPosition::STARTER, true);
+    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBA-Jpn-Ruby-Starter_yes.png", ConfirmSlot::YES, ConfirmPosition::STARTER, true);
 
     // Game Boy Player {0.064217, 0.107667, 0.86413, 0.787928}
-    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBP-Ger-Emerald_no.png", ConfirmSlot::NO, true);
-    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBP-Ger-Emerald_no.png", ConfirmSlot::YES, false);
-    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBP-Ger-Emerald_yes.png", ConfirmSlot::YES, true);
-    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBP-Ger-Emerald_yes.png", ConfirmSlot::NO, false);
-    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBP-Ger-Ruby_no.png", ConfirmSlot::NO, true);
-    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBP-Ger-Ruby_no.png", ConfirmSlot::YES, false);
-    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBP-Ger-Ruby_yes.png", ConfirmSlot::YES, true);
-    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBP-Ger-Ruby_yes.png", ConfirmSlot::NO, false);
+    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBP-Ger-Emerald_no.png", ConfirmSlot::NO, ConfirmPosition::STANDARD, true);
+    //database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBP-Ger-Emerald_no.png", ConfirmSlot::YES, ConfirmPosition::STANDARD, false);
+    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBP-Ger-Emerald_yes.png", ConfirmSlot::YES, ConfirmPosition::STANDARD, true);
+    //database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBP-Ger-Emerald_yes.png", ConfirmSlot::NO, ConfirmPosition::STANDARD, false);
+    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBP-Ger-Ruby_no.png", ConfirmSlot::NO, ConfirmPosition::STANDARD, true);
+    //database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBP-Ger-Ruby_no.png", ConfirmSlot::YES, ConfirmPosition::STANDARD, false);
+    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBP-Ger-Ruby_yes.png", ConfirmSlot::YES, ConfirmPosition::STANDARD, true);
+    //database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBP-Ger-Ruby_yes.png", ConfirmSlot::NO, ConfirmPosition::STANDARD, false);
+
+    // GBP SPECIAL
+    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBP-Ger-Emerald-Special_yes.png", ConfirmSlot::YES, ConfirmPosition::SPECIAL, true);
+    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBP-Ger-Ruby-Special_no.png", ConfirmSlot::NO, ConfirmPosition::SPECIAL, true);
+
+    // GBP MART
+    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBP-Ger-Emerald-Mart_yes.png", ConfirmSlot::YES, ConfirmPosition::MART, true);
+    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBP-Ger-Ruby-Mart_yes.png", ConfirmSlot::YES, ConfirmPosition::MART, true);
+
+    // GBP STARTER
+    database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBP-Ger-Emerald-Starter_yes.png", ConfirmSlot::YES, ConfirmPosition::STARTER, true);
 }
 
 
