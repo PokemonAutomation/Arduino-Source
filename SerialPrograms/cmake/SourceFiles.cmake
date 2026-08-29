@@ -1713,6 +1713,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_ReadBattleLevelUp.h
     Source/PokemonFRLG/Resources/PokemonFRLG_PokemonSprites.cpp
     Source/PokemonFRLG/Resources/PokemonFRLG_PokemonSprites.h
+    Source/PokemonHome/Inference/PokemonHome_AlphaDetector.cpp
+    Source/PokemonHome/Inference/PokemonHome_AlphaDetector.h
     Source/PokemonHome/Inference/PokemonHome_BallReader.cpp
     Source/PokemonHome/Inference/PokemonHome_BallReader.h
     Source/PokemonHome/Inference/PokemonHome_BoxGenderDetector.cpp
@@ -1727,6 +1729,10 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonHome/Inference/PokemonHome_OriginMarkReader.h
     Source/PokemonHome/Inference/PokemonHome_SelectionArrowDetector.cpp
     Source/PokemonHome/Inference/PokemonHome_SelectionArrowDetector.h
+    Source/PokemonHome/Inference/PokemonHome_ShinyDetector.cpp
+    Source/PokemonHome/Inference/PokemonHome_ShinyDetector.h
+    Source/PokemonHome/Inference/PokemonHome_SummaryReader.cpp
+    Source/PokemonHome/Inference/PokemonHome_SummaryReader.h
     Source/PokemonHome/Inference/PokemonHome_SummaryScreenDetector.cpp
     Source/PokemonHome/Inference/PokemonHome_SummaryScreenDetector.h
     Source/PokemonHome/Inference/PokemonHome_TeraTypeReader.cpp
