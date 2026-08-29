@@ -21,10 +21,10 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayOption.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
 #include "Controllers/ControllerOption.h"
+#include "ConsoleInfra/ConsoleSystemOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_ModelType.h"
 
 namespace PokemonAutomation{
-    class ControllerRequirements;
 namespace NintendoSwitch{
 
 
@@ -34,12 +34,7 @@ Color pick_color(ProgramControllerClass color_class);
 // options to control and monitor a Switch. It inlcudes
 // what micro-controller and what video source to use and
 // what video overlay display option to set.
-class SwitchSystemOption{
-    static const std::string JSON_CONTROLLER;
-    static const std::string JSON_CAMERA;
-    static const std::string JSON_VIDEO;
-    static const std::string JSON_AUDIO;
-    static const std::string JSON_OVERLAY;
+class SwitchSystemOption : public ConsoleInfra::ConsoleSystemOption{
     static const std::string JSON_CONSOLE_TYPE;
 
 public:
@@ -51,17 +46,11 @@ public:
         const JsonValue& json
     );
 
-    void load_json(const JsonValue& json);
-    JsonValue to_json() const;
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
 
 
 public:
-    const bool m_allow_commands_while_running;
-
-    ControllerOption m_controller;
-    VideoSourceOption m_video;
-    AudioOption m_audio;
-    VideoOverlayOption m_overlay;
     ConsoleModelCell m_console_type;
 };
 

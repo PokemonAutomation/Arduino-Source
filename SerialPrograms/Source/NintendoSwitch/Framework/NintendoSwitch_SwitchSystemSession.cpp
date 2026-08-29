@@ -55,7 +55,7 @@ SwitchSystemSession::SwitchSystemSession(
     : m_console_number(console_number)
     , m_logger(global_logger_raw(), "Console " + std::to_string(console_number))
     , m_option(option)
-    , m_controller(m_logger, option.m_controller)
+    , m_controller(m_logger, option.m_controllers[0])
     , m_video(m_logger, option.m_video)
     , m_audio(m_logger, option.m_audio)
     , m_overlay(m_logger, option.m_overlay)
@@ -80,13 +80,13 @@ SwitchSystemSession::SwitchSystemSession(
 
 
 void SwitchSystemSession::get(SwitchSystemOption& option){
-    m_controller.get(option.m_controller);
+    m_controller.get(option.m_controllers[0]);
     m_video.get(option.m_video);
     m_audio.get(option.m_audio);
     m_overlay.get(option.m_overlay);
 }
 void SwitchSystemSession::set(const SwitchSystemOption& option){
-    m_controller.set(option.m_controller);
+    m_controller.set(option.m_controllers[0]);
     m_video.set(option.m_video);
     m_audio.set(option.m_audio);
     m_overlay.set(option.m_overlay);
