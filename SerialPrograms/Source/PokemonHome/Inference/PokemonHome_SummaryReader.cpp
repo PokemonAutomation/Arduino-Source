@@ -26,13 +26,15 @@ const std::vector<std::pair<uint32_t, uint32_t>>& white_number_filters(){
     static const std::vector<std::pair<uint32_t, uint32_t>> filters = {
         {0xff808080, 0xffffffff},
         {0xff909090, 0xffffffff},
+        {0xffa0a0a0, 0xffffffff},
+        {0xffc0c0c0, 0xffffffff},
     };
     return filters;
 }
 
 const std::vector<std::pair<uint32_t, uint32_t>>& gray_number_filters(){
     static const std::vector<std::pair<uint32_t, uint32_t>> filters = {
-        {0xff5c6460, 0xffe1e8e4},
+        {0x323232, 0xffe1e8e4},
     };
     return filters;
 }
@@ -49,7 +51,7 @@ const std::vector<BlackWhiteRgb32Range>& white_text_filters(){
 
 const std::vector<BlackWhiteRgb32Range>& gray_text_filters(){
     static const std::vector<BlackWhiteRgb32Range> filters = {
-        {true, 0xff5c6460, 0xffe1e8e4},
+        {true, 0x323232, 0xffe1e8e4},
     };
     return filters;
 }
@@ -100,12 +102,12 @@ SummaryReader::SummaryReader(Color color)
 {}
 
 void SummaryReader::make_overlays(VideoOverlaySet& items) const{
-    items.add(m_color, m_national_dex_number_box, "national dex");
-    items.add(m_color, m_level_box, "level");
-    items.add(m_color, m_original_trainer_id_box, "original trainer id");
-    items.add(m_color, m_original_trainer_name_box, "original trainer name");
-    items.add(m_color, m_nature_box, "nature");
-    items.add(m_color, m_ability_box, "ability");
+    items.add(m_color, m_national_dex_number_box);
+    items.add(m_color, m_level_box);
+    items.add(m_color, m_original_trainer_id_box);
+    items.add(m_color, m_original_trainer_name_box);
+    items.add(m_color, m_nature_box);
+    items.add(m_color, m_ability_box);
 }
 
 int SummaryReader::read_national_dex(Logger& logger, const ImageViewRGB32& screen) const{
