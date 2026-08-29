@@ -1536,10 +1536,14 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonBDSP/Programs/PokemonBDSP_RunFromBattle.h
     Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_AdvanceClock.cpp
     Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_AdvanceClock.h
+    Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_BedroomSeedFinder.cpp
+    Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_BedroomSeedFinder.h
     Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_BlinkModel.cpp
     Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_BlinkModel.h
     Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_BlinkRecovery.cpp
     Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_BlinkRecovery.h
+    Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_IntroSeedFinder.cpp
+    Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_IntroSeedFinder.h
     Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_RngDisplays.cpp
     Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_RngDisplays.h
     Source/PokemonBDSP/Programs/RngManipulation/PokemonBDSP_StateReidentifier.cpp
