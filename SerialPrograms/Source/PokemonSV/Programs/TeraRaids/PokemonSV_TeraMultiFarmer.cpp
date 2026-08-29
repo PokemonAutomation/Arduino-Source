@@ -620,15 +620,7 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
         }catch (OperationFailedExceptionWithScreenshot& e){
 //            cout << "caught: TeraMultiFarmer::program" << endl;
 
-            send_program_recoverable_error_notification_and_telemetry_report(
-                env, &env.logger(), env.program_info(), 
-                NOTIFICATION_ERROR_RECOVERABLE, 
-                e.error_report_mode(),
-                e.message(),
-                "OperationFailedExceptionWithScreenshot",
-                *e.screenshot(),
-                &e.video_stream()->history()
-            );
+            e.send_recoverable_error_notif_and_telemetry_report(env, NOTIFICATION_ERROR_RECOVERABLE);
             if (RECOVERY_MODE != RecoveryMode::SAVE_AND_RESET){
                 //  Iterate the errored Switches. If a non-host has errored,
                 //  rethrow the exception to stop the program.

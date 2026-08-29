@@ -322,15 +322,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, ProControllerContext
                 connect_to_internet_from_overworld(env.program_info(), env.console, context);
             }catch (OperationFailedExceptionWithScreenshot& e){
                 stats.m_errors++;
-                send_program_recoverable_error_notification_and_telemetry_report(
-                    env, &env.logger(), env.program_info(), 
-                    NOTIFICATION_ERROR_RECOVERABLE, 
-                    e.error_report_mode(),
-                    e.message(),
-                    "OperationFailedExceptionWithScreenshot",
-                    *e.screenshot(),
-                    &e.video_stream()->history()
-                );
+                e.send_recoverable_error_notif_and_telemetry_report(env, NOTIFICATION_ERROR_RECOVERABLE);
                 fail_tracker.report_raid_error();
                 continue;
             }
@@ -351,15 +343,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, ProControllerContext
             open_hosting_lobby(env, env.console, context, mode);
         }catch (OperationFailedExceptionWithScreenshot& e){
             stats.m_errors++;
-            send_program_recoverable_error_notification_and_telemetry_report(
-                env, &env.logger(), env.program_info(), 
-                NOTIFICATION_ERROR_RECOVERABLE, 
-                e.error_report_mode(),
-                e.message(),
-                "OperationFailedExceptionWithScreenshot",
-                *e.screenshot(),
-                &e.video_stream()->history()
-            );
+            e.send_recoverable_error_notif_and_telemetry_report(env, NOTIFICATION_ERROR_RECOVERABLE);
             fail_tracker.report_raid_error();
             continue;
         }
@@ -399,15 +383,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, ProControllerContext
             fail_tracker.report_successful_raid();
         }catch (OperationFailedExceptionWithScreenshot& e){
             stats.m_errors++;
-            send_program_recoverable_error_notification_and_telemetry_report(
-                env, &env.logger(), env.program_info(), 
-                NOTIFICATION_ERROR_RECOVERABLE, 
-                e.error_report_mode(),
-                e.message(),
-                "OperationFailedExceptionWithScreenshot",
-                *e.screenshot(),
-                &e.video_stream()->history()
-            );
+            e.send_recoverable_error_notif_and_telemetry_report(env, NOTIFICATION_ERROR_RECOVERABLE);
             fail_tracker.report_raid_error();
             continue;
         }

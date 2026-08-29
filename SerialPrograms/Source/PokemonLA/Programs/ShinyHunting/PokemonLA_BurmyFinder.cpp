@@ -840,15 +840,7 @@ void BurmyFinder::program(SingleSwitchProgramEnvironment& env, ProControllerCont
             run_iteration(env, context, counters, fresh_from_reset);
         }catch (OperationFailedExceptionWithScreenshot& e){
             stats.errors++;
-            send_program_recoverable_error_notification_and_telemetry_report(
-                env, &env.logger(), env.program_info(), 
-                NOTIFICATION_ERROR_RECOVERABLE, 
-                e.error_report_mode(),
-                e.message(),
-                "OperationFailedExceptionWithScreenshot",
-                *e.screenshot(),
-                &e.video_stream()->history()
-            );
+            e.send_recoverable_error_notif_and_telemetry_report(env, NOTIFICATION_ERROR_RECOVERABLE);
 
             pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
             fresh_from_reset = reset_game_from_home(

@@ -387,15 +387,7 @@ bool RideCloner101::run_post_win(
                     pbf_press_button(context, BUTTON_B, 160ms, 1840ms);
                 }
             }catch (OperationFailedExceptionWithScreenshot& e){
-                send_program_recoverable_error_notification_and_telemetry_report(
-                    env, &env.logger(), env.program_info(), 
-                    NOTIFICATION_ERROR_RECOVERABLE, 
-                    e.error_report_mode(),
-                    e.message(),
-                    "OperationFailedExceptionWithScreenshot",
-                    *e.screenshot(),
-                    &e.video_stream()->history()
-                );
+                e.send_recoverable_error_notif_and_telemetry_report(env, NOTIFICATION_ERROR_RECOVERABLE);
             }
             continue;
         case 7:

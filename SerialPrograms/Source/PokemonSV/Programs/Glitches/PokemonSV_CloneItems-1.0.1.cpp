@@ -184,15 +184,7 @@ bool CloneItems101::clone_item(ProgramEnvironment& env, VideoStream& stream, Pro
                     pbf_press_button(context, BUTTON_A, 160ms, 160ms);
                 }
             }catch (OperationFailedExceptionWithScreenshot& e){
-                send_program_recoverable_error_notification_and_telemetry_report(
-                    env, &env.logger(), env.program_info(), 
-                    NOTIFICATION_ERROR_RECOVERABLE, 
-                    e.error_report_mode(),
-                    e.message(),
-                    "OperationFailedExceptionWithScreenshot",
-                    *e.screenshot(),
-                    &e.video_stream()->history()
-                );
+                e.send_recoverable_error_notif_and_telemetry_report(env, NOTIFICATION_ERROR_RECOVERABLE);
             }
             continue;
         case 2:
@@ -294,15 +286,7 @@ void CloneItems101::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             stats.m_cloned++;
             continue;
         }catch (OperationFailedExceptionWithScreenshot& e){
-            send_program_recoverable_error_notification_and_telemetry_report(
-                env, &env.logger(), env.program_info(), 
-                NOTIFICATION_ERROR_RECOVERABLE, 
-                e.error_report_mode(),
-                e.message(),
-                "OperationFailedExceptionWithScreenshot",
-                *e.screenshot(),
-                &e.video_stream()->history()
-            );
+            e.send_recoverable_error_notif_and_telemetry_report(env, NOTIFICATION_ERROR_RECOVERABLE);
         }
 #endif
 

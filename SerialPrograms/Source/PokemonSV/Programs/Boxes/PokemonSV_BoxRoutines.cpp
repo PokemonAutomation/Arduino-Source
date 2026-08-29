@@ -289,15 +289,7 @@ void load_one_column_to_party(
             // Move the held column to party
             move_box_cursor(env.program_info(), stream, context, BoxCursorLocation::PARTY, has_clone_ride_pokemon ? 2 : 1, 0);
         }catch (OperationFailedExceptionWithScreenshot& e){
-            send_program_recoverable_error_notification_and_telemetry_report(
-                env, &env.logger(), env.program_info(), 
-                notification, 
-                e.error_report_mode(),
-                e.message(),
-                "OperationFailedExceptionWithScreenshot",
-                *e.screenshot(),
-                &e.video_stream()->history()
-            );
+            e.send_recoverable_error_notif_and_telemetry_report(env, notification);
 
             if (++fail_count == 10){
                 dump_image_and_throw_recoverable_exception(
@@ -341,15 +333,7 @@ void unload_one_column_from_party(
             // Move the held column to target
             move_box_cursor(env.program_info(), stream, context, BoxCursorLocation::SLOTS, has_clone_ride_pokemon ? 1 : 0, column_index);
         }catch (OperationFailedExceptionWithScreenshot& e){
-            send_program_recoverable_error_notification_and_telemetry_report(
-                env, &env.logger(), env.program_info(), 
-                notification, 
-                e.error_report_mode(),
-                e.message(),
-                "OperationFailedExceptionWithScreenshot",
-                *e.screenshot(),
-                &e.video_stream()->history()
-            );
+            e.send_recoverable_error_notif_and_telemetry_report(env, notification);
 
             if (++fail_count == 10){
                 dump_image_and_throw_recoverable_exception(

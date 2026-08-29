@@ -197,15 +197,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
             context.wait_for_all_requests();
             consecutive_failures = 0;
         }catch (OperationFailedExceptionWithScreenshot& e){
-            send_program_recoverable_error_notification_and_telemetry_report(
-                env, &env.logger(), env.program_info(), 
-                NOTIFICATION_ERROR_RECOVERABLE, 
-                e.error_report_mode(),
-                e.message(),
-                "OperationFailedExceptionWithScreenshot",
-                *e.screenshot(),
-                &e.video_stream()->history()
-            );
+            e.send_recoverable_error_notif_and_telemetry_report(env, NOTIFICATION_ERROR_RECOVERABLE);
             consecutive_failures++;
         }
 

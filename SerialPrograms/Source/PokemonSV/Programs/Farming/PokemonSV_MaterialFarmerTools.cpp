@@ -295,15 +295,7 @@ void run_material_farmer(
     }catch (OperationFailedExceptionWithScreenshot& e){
         stats.m_errors++;
         env.update_stats();
-        send_program_recoverable_error_notification_and_telemetry_report(
-            env, &env.logger(), env.program_info(), 
-            options.NOTIFICATION_ERROR_RECOVERABLE, 
-            e.error_report_mode(),
-            e.message(),
-            "OperationFailedExceptionWithScreenshot",
-            *e.screenshot(),
-            &e.video_stream()->history()
-        );       
+        e.send_recoverable_error_notif_and_telemetry_report(env, options.NOTIFICATION_ERROR_RECOVERABLE);
 
         // save screenshot after operation failed, 
         // dump_snapshot(console);

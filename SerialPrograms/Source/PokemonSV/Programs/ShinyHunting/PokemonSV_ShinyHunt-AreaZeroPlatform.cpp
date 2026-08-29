@@ -462,15 +462,8 @@ void ShinyHuntAreaZeroPlatform::set_flags_and_run_state(
         stats.m_errors++;
         m_env->update_stats();
         m_consecutive_failures++;
-        send_program_recoverable_error_notification_and_telemetry_report(
-            env, &env.logger(), env.program_info(), 
-            NOTIFICATION_ERROR_RECOVERABLE, 
-            e.error_report_mode(),
-            e.message(),
-            "OperationFailedExceptionWithScreenshot",
-            *e.screenshot(),
-            &e.video_stream()->history()
-        );       
+        e.send_recoverable_error_notif_and_telemetry_report(env, NOTIFICATION_ERROR_RECOVERABLE);
+
         if (m_consecutive_failures >= 3){
             throw_and_log<FatalProgramException>(
                 stream.logger(),

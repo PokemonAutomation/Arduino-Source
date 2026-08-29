@@ -152,15 +152,7 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, ProControl
             if (!RESET_GAME_WHEN_ERROR){
                 throw;
             }
-            send_program_recoverable_error_notification_and_telemetry_report(
-                env, &env.logger(), env.program_info(), 
-                NOTIFICATION_ERROR_RECOVERABLE, 
-                e.error_report_mode(),
-                e.message(),
-                "OperationFailedExceptionWithScreenshot",
-                *e.screenshot(),
-                &e.video_stream()->history()
-            );
+            e.send_recoverable_error_notif_and_telemetry_report(env, NOTIFICATION_ERROR_RECOVERABLE);
 
             stats.add_error();
             go_home(env.console, context);
