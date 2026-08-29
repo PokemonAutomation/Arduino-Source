@@ -151,7 +151,7 @@ EggAutonomous::EggAutonomous()
     , m_battle_ai_description(
         "<b>Battle AI if Attacked:</b><br>"
         "Occasionally (especially on the Switch 2), you will get attacked by wild " + STRING_POKEMON + ". "
-        "If the following section is enabled, it attempt to recover by killing the wild " + STRING_POKEMON + ". "
+        "If the following section is enabled, it attempts to recover by killing the wild " + STRING_POKEMON + ". "
         "If disabled, the program will instead reset the game. "
         "This table applies to the egg hatching " + STRING_POKEMON + " (the Flame Body one)."
     )
@@ -159,7 +159,7 @@ EggAutonomous::EggAutonomous()
     , HAS_CLONE_RIDE_POKEMON(
         "<b>Cloned Ride Legendary 2nd in Party:</b><br>"
         "Ride legendary cannot be cloned after patch 1.0.1. To preserve the existing clone while hatching eggs, "
-        "place it as second in party before starting the program.</b>"
+        "place it as second in party before starting the program. "
         "The program will skip the first row of the current box when storing and hatching eggs, so you will need "
         "to fill the first row with " + STRING_POKEMON + " before running this program.",
         LockMode::LOCK_WHILE_RUNNING,
@@ -856,7 +856,7 @@ bool EggAutonomous::handle_recoverable_error(
     env.log("Reset game to handle recoverable error");
     reset_game(env.program_info(), env.console, context);
 
-    if (e.message().find("collect_eggs_from_basket") != std::string::npos){
+    if (e.message().find("check_basket_to_collect_eggs") != std::string::npos){
         change_settings_egg_program(env, context, LANGUAGE);
     }
 
