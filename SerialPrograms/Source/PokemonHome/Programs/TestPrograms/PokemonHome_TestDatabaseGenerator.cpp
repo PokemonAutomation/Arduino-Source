@@ -7,8 +7,10 @@
 #include <algorithm>
 #include <cctype>
 #include <filesystem>
+#include <format>
 #include <fstream>
 #include <sstream>
+#include <string>
 #include <vector>
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
@@ -79,28 +81,47 @@ TestDatabaseGenerator::TestDatabaseGenerator()
 
 namespace{
 
-std::string optional_arrow_name(std::optional<SelectionArrowType> arrow){
-    if (!arrow)
+[[nodiscard]] std::string optional_arrow_name(std::optional<SelectionArrowType> arrow){
+    if (!arrow){
         return "none";
+    }
     return *arrow == SelectionArrowType::RIGHT ? "right" : "down";
 }
 
-std::string uppercase(std::string value){
+[[nodiscard]] std::string to_uppercase(std::string value){
     std::transform(value.begin(), value.end(), value.begin(), [](unsigned char c){
-        return (char)std::toupper(c);
+        return static_cast<char>(std::toupper(c));
     });
     return value;
 }
 
-std::string quoted(const std::string& value){
+[[nodiscard]] std::string quote_string(std::string value){
     return "\"" + value + "\"";
 }
 
-std::string boolean(bool value){
+[[nodiscard]] std::string boolean(bool value){
     return value ? "true" : "false";
 }
 
 }
+
+struct TestEntry{
+    std::string box_view;
+    std::string summary;
+    std::string shiny;
+    std::string alpha;
+    std::string gigantamax;
+    std::string selection_arrow;
+    std::string button;
+    std::string ball;
+    std::string gender;
+    std::string tera_type;
+    std::string origin_mark;
+    std::string summary_numbers;
+    std::string summary_text;
+    std::string summary_ot_name;
+};
+
 
 void TestDatabaseGenerator::program(
     SingleSwitchProgramEnvironment& env,
@@ -108,20 +129,6 @@ void TestDatabaseGenerator::program(
 ){
     const Filesystem::Path directory = Filesystem::Path((std::string)DIRECTORY);
     std::vector<Filesystem::Path> screenshots;
-    std::vector<std::string> summary_reader_numbers_tests;
-    std::vector<std::string> summary_reader_text_tests;
-    std::vector<std::string> summary_reader_ot_name_tests;
-    std::vector<std::string> box_view_tests;
-    std::vector<std::string> summary_tests;
-    std::vector<std::string> shiny_tests;
-    std::vector<std::string> alpha_tests;
-    std::vector<std::string> gigantamax_tests;
-    std::vector<std::string> selection_arrow_tests;
-    std::vector<std::string> button_tests;
-    std::vector<std::string> ball_tests;
-    std::vector<std::string> gender_tests;
-    std::vector<std::string> tera_type_tests;
-    std::vector<std::string> origin_mark_tests;
 
     try{
         for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(directory.stdpath())){
@@ -144,6 +151,9 @@ void TestDatabaseGenerator::program(
     std::sort(screenshots.begin(), screenshots.end(), [](const Filesystem::Path& x, const Filesystem::Path& y){
         return x.string() < y.string();
     });
+
+    std::vector<TestEntry> entries;
+    entries.reserve(screenshots.size());
 
     for (const Filesystem::Path& path : screenshots){
         try{
@@ -185,7 +195,7 @@ void TestDatabaseGenerator::program(
 
             std::string renamed_path;
             if (RENAME_FILES){
-                if (dex_number <= 0 || dex_number > (int)NATIONAL_DEX_SLUGS().size()){
+                if (dex_number <= 0 || dex_number > static_cast<int>(NATIONAL_DEX_SLUGS().size())){
                     env.log(path.string() + " | unable to rename: invalid dex number " + std::to_string(dex_number), COLOR_RED);
                 }else{
                     const std::string new_name = NATIONAL_DEX_SLUGS()[dex_number - 1]
@@ -233,90 +243,115 @@ void TestDatabaseGenerator::program(
                    << ", gender=" << gender_to_string(gender)
                    << ", tera=" << POKEMON_TERA_TYPE_SLUGS().get_string(tera_type)
                    << ", origin=" << ORIGIN_MARK_SLUGS().get_string(origin)
-                   << " | OT=" << quoted(original_trainer_name)
+                   << " | OT=" << quote_string(original_trainer_name)
                    << ", OT-ID=" << original_trainer_id
-                   << ", nature=" << quoted(nature)
-                   << ", ability=" << quoted(ability)
+                   << ", nature=" << quote_string(nature)
+                   << ", ability=" << quote_string(ability)
                    << ", level=" << level;
             if (!renamed_path.empty())
                 output << " | renamed-to=" << renamed_path;
             env.log(output.str());
 
-            summary_reader_numbers_tests.emplace_back(
-                "database.add<Test_SummaryReader_Numbers>(" + quoted(database_path) + ", "
-                + std::to_string(dex_number) + ", " + std::to_string(original_trainer_id) + ", "
-                + std::to_string(level) + ");"
+            TestEntry entry;
+            entry.summary_numbers = std::format(
+                "database.add<Test_SummaryReader_Numbers>({}, {}, {}, {});",
+                quote_string(database_path), dex_number, original_trainer_id, level
             );
-            summary_reader_text_tests.emplace_back(
-                "database.add<Test_SummaryReader_Text>(" + quoted(database_path) + ", "
-                + quoted(nature) + ", " + quoted(ability) + ", Language::English);"
+
+            entry.summary_text = std::format(
+                "database.add<Test_SummaryReader_Text>({}, {}, {}, Language::English);",
+                quote_string(database_path), quote_string(nature), quote_string(ability)
             );
-            summary_reader_ot_name_tests.emplace_back(
-                "database.add<Test_SummaryReader_OtName>(" + quoted(database_path) + ", "
-                + quoted(original_trainer_name) + ", Language::English);"
+
+            entry.summary_ot_name = std::format(
+                "database.add<Test_SummaryReader_OtName>({}, {}, Language::English);",
+                quote_string(database_path), quote_string(original_trainer_name)
             );
-            box_view_tests.emplace_back(
-                "database.add<Test_BoxViewDetector>(" + quoted(database_path) + ", " + boolean(box_view) + ");"
+
+            entry.box_view = std::format(
+                "database.add<Test_BoxViewDetector>({}, {});", quote_string(database_path), boolean(box_view)
             );
-            summary_tests.emplace_back(
-                "database.add<Test_SummaryScreenDetector>(" + quoted(database_path) + ", " + boolean(summary) + ");"
+
+            entry.summary = std::format(
+                "database.add<Test_SummaryScreenDetector>({}, {});", quote_string(database_path), boolean(summary)
             );
-            shiny_tests.emplace_back(
-                "database.add<Test_ShinyDetector>(" + quoted(database_path) + ", " + boolean(shiny) + ");"
+
+            entry.shiny = std::format(
+                "database.add<Test_ShinyDetector>({}, {});", quote_string(database_path), boolean(shiny)
             );
-            alpha_tests.emplace_back(
-                "database.add<Test_AlphaDetector>(" + quoted(database_path) + ", " + boolean(alpha) + ");"
+
+            entry.alpha = std::format(
+                "database.add<Test_AlphaDetector>({}, {});", quote_string(database_path), boolean(alpha)
             );
-            gigantamax_tests.emplace_back(
-                "database.add<Test_GigantamaxDetector>(" + quoted(database_path) + ", " + boolean(gigantamax) + ");"
+
+            entry.gigantamax = std::format(
+                "database.add<Test_GigantamaxDetector>({}, {});", quote_string(database_path), boolean(gigantamax)
             );
-            selection_arrow_tests.emplace_back(
-                "database.add<Test_SelectionArrowDetector>(" + quoted(database_path) + ", "
-                + (arrow ? "SelectionArrowType::" + uppercase(optional_arrow_name(arrow)) : "std::nullopt") + ");"
+
+            entry.selection_arrow = std::format(
+                "database.add<Test_SelectionArrowDetector>({}, {});",
+                quote_string(database_path),
+                arrow ? "SelectionArrowType::" + to_uppercase(optional_arrow_name(arrow)) : "std::nullopt"
             );
-            button_tests.emplace_back(
-                "database.add<Test_ButtonDetector>(" + quoted(database_path) + ", "
-                + (button_b ? "ButtonType::ButtonB" : button_plus ? "ButtonType::ButtonPlus" : "std::nullopt") + ");"
+
+            entry.button = std::format(
+                "database.add<Test_ButtonDetector>({}, {});",
+                quote_string(database_path),
+                button_b ? "ButtonType::ButtonB" : button_plus ? "ButtonType::ButtonPlus" : "std::nullopt"
             );
-            ball_tests.emplace_back(
-                "database.add<Test_BallReader>(" + quoted(database_path) + ", " + quoted(ball) + ");"
+
+            entry.ball = std::format(
+                "database.add<Test_BallReader>({}, {});", quote_string(database_path), quote_string(ball)
             );
-            gender_tests.emplace_back(
-                "database.add<Test_BoxGenderDetector>(" + quoted(database_path) + ", Pokemon::StatsHuntGenderFilter::"
-                + gender_to_string(gender) + ");"
+
+            entry.gender = std::format(
+                "database.add<Test_BoxGenderDetector>({}, Pokemon::StatsHuntGenderFilter::{});",
+                quote_string(database_path), gender_to_string(gender)
             );
-            tera_type_tests.emplace_back(
-                "database.add<Test_TeraTypeReader>(" + quoted(database_path) + ", PokemonTeraType::"
-                + uppercase(POKEMON_TERA_TYPE_SLUGS().get_string(tera_type)) + ");"
+
+            entry.tera_type = std::format(
+                "database.add<Test_TeraTypeReader>({}, PokemonTeraType::{});",
+                quote_string(database_path), to_uppercase(POKEMON_TERA_TYPE_SLUGS().get_string(tera_type))
             );
-            origin_mark_tests.emplace_back(
-                "database.add<Test_OriginMarkReader>(" + quoted(database_path) + ", OriginMark::"
-                + uppercase(ORIGIN_MARK_SLUGS().get_string(origin)) + ");"
+
+            entry.origin_mark = std::format(
+                "database.add<Test_OriginMarkReader>({}, OriginMark::{});",
+                quote_string(database_path), to_uppercase(ORIGIN_MARK_SLUGS().get_string(origin))
             );
+
+            entries.push_back(std::move(entry));
         }catch (const std::exception& error){
             env.log(path.string() + " | error: " + error.what(), COLOR_RED);
         }
     }
 
-    auto log_database = [&](const char* name, const std::vector<std::string>& entries){
-        env.log(std::string("\n") + name + ":");
-        for (const std::string& entry : entries)
-            env.log(entry);
+    struct Section{
+        const char* name;
+        std::string TestEntry::* member;
     };
-    log_database("BoxViewDetector", box_view_tests);
-    log_database("SummaryScreenDetector", summary_tests);
-    log_database("ShinyDetector", shiny_tests);
-    log_database("AlphaDetector", alpha_tests);
-    log_database("GigantamaxDetector", gigantamax_tests);
-    log_database("SelectionArrowDetector", selection_arrow_tests);
-    log_database("ButtonDetector", button_tests);
-    log_database("BallReader", ball_tests);
-    log_database("BoxGenderDetector", gender_tests);
-    log_database("TeraTypeReader", tera_type_tests);
-    log_database("OriginMarkReader", origin_mark_tests);
-    log_database("SummaryReader_Numbers", summary_reader_numbers_tests);
-    log_database("SummaryReader_Text", summary_reader_text_tests);
-    log_database("SummaryReader_OtName", summary_reader_ot_name_tests);
+    static constexpr Section SECTIONS[] = {
+        {"BoxViewDetector",         &TestEntry::box_view},
+        {"SummaryScreenDetector",   &TestEntry::summary},
+        {"ShinyDetector",           &TestEntry::shiny},
+        {"AlphaDetector",           &TestEntry::alpha},
+        {"GigantamaxDetector",      &TestEntry::gigantamax},
+        {"SelectionArrowDetector",  &TestEntry::selection_arrow},
+        {"ButtonDetector",          &TestEntry::button},
+        {"BallReader",              &TestEntry::ball},
+        {"BoxGenderDetector",       &TestEntry::gender},
+        {"TeraTypeReader",          &TestEntry::tera_type},
+        {"OriginMarkReader",        &TestEntry::origin_mark},
+        {"SummaryReader_Numbers",   &TestEntry::summary_numbers},
+        {"SummaryReader_Text",      &TestEntry::summary_text},
+        {"SummaryReader_OtName",    &TestEntry::summary_ot_name},
+    };
+
+    for (const Section& section : SECTIONS){
+        env.log(std::string("\n") + section.name + ":");
+        for (const TestEntry& entry : entries){
+            env.log(entry.*section.member);
+        }
+    }
 
     const Filesystem::Path output_path = directory / "PokemonHome_TestDatabase.txt";
     std::ofstream output_file(output_path.string());
@@ -325,25 +360,12 @@ void TestDatabaseGenerator::program(
         return;
     }
 
-    auto write_database = [&](const char* name, const std::vector<std::string>& entries){
-        output_file << name << ":\n";
-        for (const std::string& entry : entries)
-            output_file << entry << "\n";
-    };
-    write_database("BoxViewDetector", box_view_tests);
-    write_database("SummaryScreenDetector", summary_tests);
-    write_database("ShinyDetector", shiny_tests);
-    write_database("AlphaDetector", alpha_tests);
-    write_database("GigantamaxDetector", gigantamax_tests);
-    write_database("SelectionArrowDetector", selection_arrow_tests);
-    write_database("ButtonDetector", button_tests);
-    write_database("BallReader", ball_tests);
-    write_database("BoxGenderDetector", gender_tests);
-    write_database("TeraTypeReader", tera_type_tests);
-    write_database("OriginMarkReader", origin_mark_tests);
-    write_database("SummaryReader_Numbers", summary_reader_numbers_tests);
-    write_database("SummaryReader_Text", summary_reader_text_tests);
-    write_database("SummaryReader_OtName", summary_reader_ot_name_tests);
+    for (const Section& section : SECTIONS){
+        output_file << section.name << ":\n";
+        for (const TestEntry& entry : entries){
+            output_file << entry.*section.member << "\n";
+        }
+    }
 }
 
 }
