@@ -8,8 +8,8 @@
 #include "CommonTools/Audio/SpectrogramMatcher.h"
 #include "CommonTools/Audio/AudioTemplateCache.h"
 #include "Tests/TestUtils.h"
+#include "Controllers/NullController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
-#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WiredController.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA_ShinySoundDetector.h"
 
@@ -55,12 +55,7 @@ public:
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        DummyBotBase botbase(logger);
-        SerialPABotBase::SerialPABotBase_Connection connection(logger, "");
-        SerialPABotBase_WiredController controller(
-            logger, connection,
-            ControllerType::NintendoSwitch_WiredController
-        );
+        NullController controller(logger);
         DummyVideoFeed video_feed;
         DummyVideoOverlay video_overlay;
         DummyAudioFeed audio_feed;

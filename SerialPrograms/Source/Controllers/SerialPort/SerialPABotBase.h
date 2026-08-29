@@ -18,19 +18,6 @@ namespace SerialPABotBase{
 
 
 //
-//  PABotBase 1
-//
-const std::map<pabb_ProgramID, uint32_t>& SUPPORTED_DEVICES();
-const std::map<
-    uint32_t,   //  Major protocol version. (version # / 100)
-    std::map<
-        pabb_ProgramID,
-        uint8_t //  Minimum minor protocol version (version # % 100)
-    >
->& SUPPORTED_VERSIONS();
-
-
-//
 //  PABotBase 2
 //
 const std::map<pabb_ProgramID, uint32_t>& SUPPORTED_DEVICES2();

@@ -14,7 +14,7 @@
 #include "Common/Cpp/ColoredText.h"
 #include "Controllers/ControllerTypeStrings.h"
 #include "Controllers/ControllerSettings.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase.h"
+#include "Controllers/SerialPort/SerialPABotBase.h"
 #include "PABotBase2_DeviceHandle.h"
 
 //#include <iostream>

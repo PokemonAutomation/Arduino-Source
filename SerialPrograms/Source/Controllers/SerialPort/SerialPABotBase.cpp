@@ -13,35 +13,6 @@ namespace PokemonAutomation{
 namespace SerialPABotBase{
 
 
-//
-//  PABotBase 1
-//
-
-const std::map<pabb_ProgramID, uint32_t>& SUPPORTED_DEVICES(){
-    static const std::map<pabb_ProgramID, uint32_t> database{
-        {PABB_PID_UNSPECIFIED,                  2025120815},
-        {PABB_PID_PABOTBASE_ArduinoUnoR3,       2025090303},
-        {PABB_PID_PABOTBASE_ArduinoLeonardo,    2025090303},
-        {PABB_PID_PABOTBASE_ProMicro,           2025090303},
-        {PABB_PID_PABOTBASE_Teensy2,            2025090303},
-        {PABB_PID_PABOTBASE_TeensyPP2,          2025090303},
-    };
-    return database;
-}
-
-std::map<uint32_t, std::map<pabb_ProgramID, uint8_t>> make_SUPPORTED_VERSIONS(){
-    std::map<uint32_t, std::map<pabb_ProgramID, uint8_t>> ret;
-    for (const auto& item : SUPPORTED_DEVICES()){
-        ret[item.second / 100][item.first] = (uint8_t)(item.second % 100);
-    }
-    return ret;
-}
-const std::map<uint32_t, std::map<pabb_ProgramID, uint8_t>>& SUPPORTED_VERSIONS(){
-    static const std::map<uint32_t, std::map<pabb_ProgramID, uint8_t>> database = make_SUPPORTED_VERSIONS();
-    return database;
-}
-
-
 
 //
 //  PABotBase 2

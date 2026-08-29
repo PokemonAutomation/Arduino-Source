@@ -5,6 +5,7 @@
  */
 
 
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "TestMap.h"
 #include "TestUtils.h"

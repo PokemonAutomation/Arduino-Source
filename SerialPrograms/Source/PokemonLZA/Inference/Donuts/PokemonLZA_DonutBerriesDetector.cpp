@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Filesystem/Filesystem.h"
+#include "Common/Cpp/Filesystem/FilePath.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
@@ -224,7 +224,7 @@ public:
 
             DonutBerriesReader reader;
             for (size_t i = 0; i < DonutBerriesReader::BERRY_PAGE_LINES; ++i){
-                OCR::StringMatchResult results = reader.read_berry_page_with_ocr(image, global_logger_command_line(), language, i);
+                OCR::StringMatchResult results = reader.read_berry_page_with_ocr(image, logger, language, i);
                 output_file << (results.results.empty() ? "unknown-berry" : results.results.begin()->second.token) << std::endl;
             }
             return true;
@@ -243,7 +243,7 @@ public:
             DonutBerriesSelectionDetector selection_detector(i);
             TEST_RESULT_COMPONENT_EQUAL_STR(selection_detector.detect(image), i == selected_berry, "selection detector : berry slot " + std::to_string(i));
 
-            OCR::StringMatchResult results = reader.read_berry_page_with_ocr(image, global_logger_command_line(), language, i);
+            OCR::StringMatchResult results = reader.read_berry_page_with_ocr(image, logger, language, i);
             if (results.results.empty()){
                 return "No berry detected via OCR";
             }
