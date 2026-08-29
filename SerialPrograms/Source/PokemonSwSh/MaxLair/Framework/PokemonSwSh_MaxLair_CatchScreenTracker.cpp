@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -90,7 +90,7 @@ void CaughtPokemonScreen::leave_summary(){
     default:
 //        auto snapshot = m_stream.video().snapshot();
 //        dump_image(m_stream, m_env.program_info(), "CaughtMenu", snapshot);
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to detect caught menu.",
             m_stream
@@ -126,7 +126,7 @@ void CaughtPokemonScreen::process_detection(Detection detection){
     CaughtPokemon& mon = m_mons[m_current_position];
     switch (detection){
     case SummaryShinySymbolDetector::Detection::NO_DETECTION:
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to detect summary screen.",
             m_stream
@@ -137,7 +137,7 @@ void CaughtPokemonScreen::process_detection(Detection detection){
             mon.shiny = false;
             mon.read = true;
         }else if (mon.shiny){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Fatal Inconsistency: Expected to see a non-shiny.",
                 m_stream
@@ -150,7 +150,7 @@ void CaughtPokemonScreen::process_detection(Detection detection){
             mon.shiny = true;
             mon.read = true;
         }else if (!mon.shiny){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Fatal Inconsistency: Expected to see a shiny.",
                 m_stream

@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/Exceptions/FatalProgramException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -183,8 +183,8 @@ bool CloneItems101::clone_item(ProgramEnvironment& env, VideoStream& stream, Pro
                     pbf_press_dpad(context, DPAD_UP, 160ms, 80ms);
                     pbf_press_button(context, BUTTON_A, 160ms, 160ms);
                 }
-            }catch (OperationFailedException& e){
-                e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+            }catch (OperationFailedExceptionWithScreenshot& e){
+                e.send_recoverable_error_notif_and_telemetry_report(env, NOTIFICATION_ERROR_RECOVERABLE);
             }
             continue;
         case 2:
@@ -285,8 +285,8 @@ void CloneItems101::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             cloned++;
             stats.m_cloned++;
             continue;
-        }catch (OperationFailedException& e){
-            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+        }catch (OperationFailedExceptionWithScreenshot& e){
+            e.send_recoverable_error_notif_and_telemetry_report(env, NOTIFICATION_ERROR_RECOVERABLE);
         }
 #endif
 

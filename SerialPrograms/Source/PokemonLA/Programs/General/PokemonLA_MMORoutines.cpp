@@ -6,7 +6,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -124,7 +124,7 @@ std::set<std::string> enter_region_and_read_MMO(
     // Fix zoom level:
     const int zoom_level = read_map_zoom_level(question_mark_image);
     if (zoom_level < 0){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Canot read map zoom level.",
             env.console
@@ -188,7 +188,7 @@ std::set<std::string> enter_region_and_read_MMO(
         EventDialogDetector event_dialog_detector(env.logger(), env.console.overlay(), true);
         int ret = wait_until(env.console, context, std::chrono::seconds(10), {{event_dialog_detector}});
         if (ret < 0){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Dialog box not detected when waiting for MMO map.",
                 env.console
@@ -214,7 +214,7 @@ std::set<std::string> enter_region_and_read_MMO(
             env.console.log("Found revealed map thanks to Munchlax!");
             break;
         default:
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Map not detected after talking to Mai.",
                 env.console
@@ -227,7 +227,7 @@ std::set<std::string> enter_region_and_read_MMO(
     MapDetector map_detector;
     ret = wait_until(env.console, context, std::chrono::seconds(5), {{map_detector}});
     if (ret < 0){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             env.console, ErrorReport::SEND_ERROR_REPORT,
             "Map not detected after talking to Mai.",
             true

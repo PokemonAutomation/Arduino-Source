@@ -50,7 +50,7 @@ void dump_image(
 );
 
 // Throw an OperationFailedException that will trigger error report creation.
-// Check OperationFailedException::fire() for more details.
+// Check OperationFailedExceptionWithScreenshot::fire() for more details.
 [[noreturn]] void dump_image_and_throw_recoverable_exception(
     const ProgramInfo& program_info,
     VideoStream& stream,

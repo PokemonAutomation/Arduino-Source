@@ -8,7 +8,9 @@
 #define PokemonAutomation_ProgramFinishedException_H
 
 #include <memory>
-#include "ScreenshotException.h"
+#include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Tools/VideoStream.h"
 
 namespace PokemonAutomation{
 
@@ -23,7 +25,7 @@ class ProgramEnvironment;
 //  Thrown when the program requests a normal stop to the program.
 //    - This should not be consumed except by the infra.
 //    - Non-infra are allowed to catch and rethrow this exception.
-class ProgramFinishedException : public ScreenshotException{
+class ProgramFinishedException : public Exception{
 public:
     ProgramFinishedException();
     explicit ProgramFinishedException(std::string message);
@@ -39,7 +41,6 @@ public:
     //  Use the provided screenshot instead of taking one with the console.
     //  Store the console information (if provided) for stream history if requested later.
     explicit ProgramFinishedException(
-        ErrorReport error_report,
         std::string message,
         VideoStream* stream,
         ImageRGB32 screenshot
@@ -50,11 +51,20 @@ public:
         std::shared_ptr<const ImageRGB32> screenshot
     );
 
-    virtual Color color() const override{ return COLOR_GREEN; }
+    Color color() const{ return COLOR_GREEN; }
 
 public:
     virtual void log(Logger& logger) const override;
     virtual const char* name() const override{ return "ProgramFinishedException"; }
+    ImageViewRGB32 screenshot_view() const;
+    std::shared_ptr<const ImageRGB32> screenshot() const;
+    VideoStream* video_stream() const;
+
+
+private:
+    std::string m_message;
+    VideoStream* m_stream = nullptr;
+    std::shared_ptr<const ImageRGB32> m_screenshot;
 };
 
 

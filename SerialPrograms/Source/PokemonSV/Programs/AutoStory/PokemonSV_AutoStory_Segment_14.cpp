@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
@@ -231,8 +231,7 @@ void checkpoint_30(
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_BATTLE, NavigationMovementMode::DIRECTIONAL_ONLY, 
                 0, +1, 40, 5, false);   
-        }catch (OperationFailedException& e){ 
-            (void) e;
+        }catch (OperationFailedException&){ 
             // likely attempted to open/close phone to realign, but failed
             // likely already reached cutscene to battle Bombirdeier.
 

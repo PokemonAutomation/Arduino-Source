@@ -25,7 +25,7 @@
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.h"
@@ -1002,8 +1002,8 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     OCR::read_number(env.logger(), filtered);
 #endif
 
-//    OperationFailedException::fire(env.logger(), "asdf");
-//    OperationFailedException::fire(env.logger(), "asdf", std::make_shared<ImageRGB32>("20221118-024539201323.jpg"));
+//    OperationFailedExceptionWithScreenshot::fire(env.logger(), "asdf");
+//    OperationFailedExceptionWithScreenshot::fire(env.logger(), "asdf", std::make_shared<ImageRGB32>("20221118-024539201323.jpg"));
 //    throw ProgramFinishedException();
 //    throw FatalProgramException(env.logger(), "test");
 

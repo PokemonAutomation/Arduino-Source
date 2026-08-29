@@ -5,7 +5,7 @@
  */
 
 //#include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -141,7 +141,7 @@ void CloudIslandReset::delete_cloud_island_save(SingleSwitchProgramEnvironment& 
         env.console.log("Failed to detect settings menu loaded");
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "delete_cloud_island_save() failed to detect settings menu loaded",
             env.console
@@ -160,7 +160,7 @@ void CloudIslandReset::delete_cloud_island_save(SingleSwitchProgramEnvironment& 
         env.console.log("Failed to navigate to delete save option");
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "delete_cloud_island_save() failed to navigate to delete save option",
             env.console
@@ -225,7 +225,7 @@ void CloudIslandReset::create_cloud_island_after_delete(SingleSwitchProgramEnvir
         env.console.log("Failed to navigate through create island menu");
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "create_cloud_island_after_delete() failed to navigate through create island menu",
             env.console
@@ -249,7 +249,7 @@ void CloudIslandReset::create_cloud_island_after_delete(SingleSwitchProgramEnvir
         env.console.log("Failed to detect travelling to new cloud island");
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "create_cloud_island_after_delete() failed to detect travelling to new cloud island",
             env.console
@@ -346,7 +346,7 @@ bool CloudIslandReset::buy_recipes(SingleSwitchProgramEnvironment& env, ProContr
             );
             if (ret != 0){
                 env.console.log("Failed to read coin count in shop menu");
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "buy_recipes() failed to read coin count in shop menu",
                     env.console
@@ -401,7 +401,7 @@ void CloudIslandReset::leave_cloud_island(SingleSwitchProgramEnvironment& env, P
         env.console.log("Failed to detect leaving cloud island");
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "leave_cloud_island() failed to detect leaving cloud island",
             env.console

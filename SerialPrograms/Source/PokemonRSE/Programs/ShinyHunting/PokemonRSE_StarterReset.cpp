@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -121,7 +121,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
             pbf_press_dpad(context, DPAD_RIGHT, 320ms, 800ms);
             break;
         default:
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "StarterReset: Invalid target.",
                 env.console
@@ -163,7 +163,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
             env.log("Entered party menu.");
         }else{
             env.log("Timed out waiting to enter party menu.", COLOR_RED);
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "StarterReset: Timed out waiting to enter party menu.",
                 env.console

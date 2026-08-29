@@ -7,7 +7,7 @@
 #include "PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h"
 #include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -112,7 +112,7 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         // start with Psychic to defeat Iron Moth for Violet, which quad resists Moonblast.
         bool is_won = run_pokemon(env.console, context, move_table1, true, terastallized);
         if (!is_won){// throw exception if we lose
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to beat the AI Professor. Reset.",
                 env.console
@@ -140,7 +140,7 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         std::vector<SinglesMoveEntry> move_table2 = {move4, move4, move4, move4, move4, move4_tera};
         is_won = run_pokemon(env.console, context, move_table2, true, terastallized);
         if (!is_won){// throw exception if we lose
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to beat the AI Professor, round 2. This shouldn't be possible. Reset.",
                 env.console
@@ -162,7 +162,7 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
             {tutorial}
         );
         if (ret < 0){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Stuck trying to clear the Koraidon/Miraidon form change tutorial.",
                 env.console

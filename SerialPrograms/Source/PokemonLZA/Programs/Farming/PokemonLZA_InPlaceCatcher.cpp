@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 //#include "CommonTools/Async/InferenceSession.h"
@@ -135,7 +135,7 @@ void InPlaceCatcher::day_night_handler(SingleSwitchProgramEnvironment& env, ProC
     default:
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Unable to detect end of day/night change after 2 minutes.",
             env.console

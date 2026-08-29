@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -343,7 +343,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
             TARGET = safari_zone ? PokemonFRLG_RngTarget::safarizonefish : PokemonFRLG_RngTarget::fishing;
             break;
         default:
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "WildRng(): Unrecognized encounter type",
                 env.console
@@ -409,7 +409,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
         if (failed_searches >= 5){
             env.log("Failed to find any matches 5 times in a row");
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::NO_ERROR_REPORT,
                 "Failed to find any matches 5 times in a row. Check your seed and advances settings.",
                 env.console
@@ -479,7 +479,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
                 env.log("No battle triggered. Resetting...");
                 continue;
             }else{
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "WildRng(): Failed to trigger battle",
                     env.console

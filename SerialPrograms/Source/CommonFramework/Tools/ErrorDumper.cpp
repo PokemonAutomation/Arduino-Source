@@ -7,7 +7,7 @@
 #include <QDir>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 //#include "CommonFramework/Notifications/EventNotificationOption.h"
@@ -72,7 +72,7 @@ void dump_image_and_throw_recoverable_exception(
     const std::string& error_message,
     const ImageViewRGB32& screenshot
 ){
-    OperationFailedException::fire(
+    OperationFailedExceptionWithScreenshot::fire(
         ErrorReport::SEND_ERROR_REPORT,
         error_message,
         stream

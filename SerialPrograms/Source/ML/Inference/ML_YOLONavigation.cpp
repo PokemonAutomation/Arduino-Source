@@ -8,7 +8,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Exceptions/UnexpectedBattleException.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -186,7 +186,7 @@ void move_camera_yolo(
     }
 
     if (!seen_object){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "move_camera_yolo(): Never detected the yolo object.",
             env.console

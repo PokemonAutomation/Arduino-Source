@@ -55,7 +55,7 @@ PageIngredients BerrySession::read_screen(std::shared_ptr<const ImageRGB32> scre
     ret.selected = (int8_t)slot;
     //cout << "selected slot = " << (int)ret.selected << endl;
     if (ret.selected < 0 || ret.selected >= 8){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "BerrySession::read_current_page(): Invalid cursor slot.",
             m_stream,
@@ -112,7 +112,7 @@ PageIngredients BerrySession::read_screen(std::shared_ptr<const ImageRGB32> scre
             for (const auto& p : image_result.results){
                 sprite_result.insert(p.second);
             }
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "BerrySession::read_current_page(): Unable to read selected item. OCR and sprite do not agree on any match: ocr "
                 + set_to_str(ocr_result) + ", sprite " + set_to_str(sprite_result),
@@ -125,7 +125,7 @@ PageIngredients BerrySession::read_screen(std::shared_ptr<const ImageRGB32> scre
             for (const auto& p : image_result.results){
                 sprite_result.insert(p.second);
             }
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "BerrySession::read_current_page(): Unable to read selected item. Ambiguous result: "
                 + set_to_str(ocr_result) + ", " + set_to_str(sprite_result) + "\n" + language_warning(m_language),
@@ -345,7 +345,7 @@ void BerrySession::add_berries(
             }
 
             if (!ingredient_added){
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::NO_ERROR_REPORT,
                     "Unable to add ingredient: \"" + name.display_name() + "\" - Did you run out?",
                     stream

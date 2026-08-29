@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/RecursiveThrottler.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -58,7 +58,7 @@ ConsoleType settings_detect_console_type(
         console.state().set_console_type(console, ConsoleType::Switch2_FW20_JapanLocked);
         break;
     default:
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::NO_ERROR_REPORT,
             "Unable to detect if this Switch 2 model is international or Japan-locked.",
             console, std::move(snapshot)
@@ -250,7 +250,7 @@ void home_to_date_time_Switch2_procon_feedback(
             go_home(console, context);
         }
     }
-    OperationFailedException::fire(
+    OperationFailedExceptionWithScreenshot::fire(
         ErrorReport::SEND_ERROR_REPORT,
         "Unable to navigate to date/time after 5 attempts.",
         console, console.video().snapshot_latest_blocking()
@@ -276,7 +276,7 @@ void home_to_date_time_Switch2_joycon_feedback(
             go_home(console, context);
         }
     }
-    OperationFailedException::fire(
+    OperationFailedExceptionWithScreenshot::fire(
         ErrorReport::SEND_ERROR_REPORT,
         "Unable to navigate to date/time after 5 attempts.",
         console, console.video().snapshot_latest_blocking()

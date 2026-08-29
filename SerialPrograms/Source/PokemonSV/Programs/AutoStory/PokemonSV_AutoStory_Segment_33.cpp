@@ -12,7 +12,7 @@
 #include "PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h"
 #include "PokemonSV/Programs/Battles/PokemonSV_Battles.h"
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -160,7 +160,7 @@ void checkpoint_86(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             { black_screen }
         );
         if (ret < 0){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Never detected black screen. Failed to glide from the Academy to the route leading to the Pokemon League.",
                 env.console
@@ -368,7 +368,7 @@ void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // We don't setup Misty Terrain on the Whiscash since Muddy Water can lower our accuracy.
         bool is_won = run_pokemon(env.console, context, move_table1, true, terastallized);
         if (!is_won){// throw exception if we lose
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to beat the Ground trainer. Reset.",
                 env.console
@@ -389,7 +389,7 @@ void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         std::vector<SinglesMoveEntry> move_table2 = {move2};
         is_won = run_pokemon(env.console, context, move_table2, true, terastallized);
         if (!is_won){// throw exception if we lose
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to beat the Steel trainer. Reset.",
                 env.console
@@ -479,7 +479,7 @@ GameTitle get_game_title(SingleSwitchProgramEnvironment& env, ProControllerConte
     }
 
     if (game_title == GameTitle::UNKNOWN){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "get_game_title(): Unable to determine what game we are playing. "
             "The color of the bottom bar in the Pokemon Summary page doesn't match any of the expected colors.",
@@ -510,7 +510,7 @@ std::string get_ride_pokemon_name(SingleSwitchProgramEnvironment& env, ProContro
     }
 
     if (results.empty()){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "AutoStory_Segment_34::checkpoint_86(): Unable to read selected item. No valid results.\n" + language_warning(language),
             env.console
@@ -518,7 +518,7 @@ std::string get_ride_pokemon_name(SingleSwitchProgramEnvironment& env, ProContro
     }
 
     if (results.size() > 1){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "AutoStory_Segment_34::checkpoint_86(): Unable to read selected item. Ambiguous or multiple results.\n" + language_warning(language),
             env.console

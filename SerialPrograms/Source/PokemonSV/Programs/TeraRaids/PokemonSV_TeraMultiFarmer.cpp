@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 //#include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -359,7 +359,7 @@ bool TeraMultiFarmer::start_sequence_host(
 
         const char* error = normalize_code(lobby_code, code);
         if (error){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Unable to read raid code.",
                 console
@@ -617,10 +617,10 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
                 );
             }
             fail_tracker.report_successful_raid();
-        }catch (OperationFailedException& e){
+        }catch (OperationFailedExceptionWithScreenshot& e){
 //            cout << "caught: TeraMultiFarmer::program" << endl;
 
-            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+            e.send_recoverable_error_notif_and_telemetry_report(env, NOTIFICATION_ERROR_RECOVERABLE);
             if (RECOVERY_MODE != RecoveryMode::SAVE_AND_RESET){
                 //  Iterate the errored Switches. If a non-host has errored,
                 //  rethrow the exception to stop the program.

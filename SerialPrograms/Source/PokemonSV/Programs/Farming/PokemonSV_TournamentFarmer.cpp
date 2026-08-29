@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Images/ImageFilter.h"
@@ -288,7 +288,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
                 stats.errors++;
                 env.update_stats();
                 send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "Took more than 6 turns to use Memento. Was Zoroark able to faint?",
                     env.console
@@ -302,7 +302,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
             stats.errors++;
             env.update_stats();
             send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Timed out after Happy Hour.",
                 env.console
@@ -328,7 +328,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
             stats.errors++;
             env.update_stats();
             send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Could not find battle menu.",
                 env.console
@@ -362,7 +362,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
                     stats.errors++;
                     env.update_stats();
                     send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-                    OperationFailedException::fire(
+                    OperationFailedExceptionWithScreenshot::fire(
                         ErrorReport::SEND_ERROR_REPORT,
                         "Timed out during battle after 5 minutes.",
                         env.console
@@ -410,7 +410,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
                     env.log("Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.", COLOR_RED);
                     stats.errors++;
                     env.update_stats();
-                    OperationFailedException::fire(
+                    OperationFailedExceptionWithScreenshot::fire(
                         ErrorReport::SEND_ERROR_REPORT,
                         "Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.",
                         env.console
@@ -441,7 +441,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
         stats.errors++;
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Timed out during battle. Stuck, crashed, or took over 30 turns.",
             env.console
@@ -626,7 +626,7 @@ void go_to_academy_fly_point(ProgramEnvironment& env, VideoStream& stream, ProCo
     }
 
     if(!isFlySuccessful){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to fly back to academy!",
             stream
@@ -740,7 +740,7 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
                 stats.errors++;
                 env.update_stats();
                 send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "Failed to detect battle menu or dialog prompt!",
                     env.console

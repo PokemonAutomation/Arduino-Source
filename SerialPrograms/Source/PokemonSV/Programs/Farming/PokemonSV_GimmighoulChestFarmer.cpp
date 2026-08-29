@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -203,7 +203,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, ProCont
                 if (ret2 != 0){
                     stats.errors++;
                     env.update_stats();
-                    OperationFailedException::fire(
+                    OperationFailedExceptionWithScreenshot::fire(
                         ErrorReport::SEND_ERROR_REPORT,
                         "Failed to return to Overworld after two minutes. Did your attack miss or fail to defeat Gimmighoul in one hit?",
                         env.console
@@ -237,7 +237,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, ProCont
                     if (ret2 != 0){
                         stats.errors++;
                         env.update_stats();
-                        OperationFailedException::fire(
+                        OperationFailedExceptionWithScreenshot::fire(
                             ErrorReport::SEND_ERROR_REPORT,
                             "Failed to return to Overworld after two minutes.",
                             env.console

@@ -7,7 +7,7 @@
 #include <cmath>
 #include <algorithm>
 #include "CommonTools/Random.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -600,7 +600,7 @@ bool EggRng::held_frame_check(
 
     if (locked_in && !(definitely_hit_held_frame || possibly_hit_held_frame)){
         STARTING_POINT.set(EggProgramState::held_prep);
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "EggRng(): Missed held frame after saving. Restart the program after repeating the manual in-game setup.",
             env.console
@@ -712,7 +712,7 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     }catch (const InternalProgramError& err){
         env.log(err.message());
         env.log(EGG_SPECIES.slug());
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             err.message(),
             env.console
@@ -740,7 +740,7 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     const uint16_t TARGET_HELD_SEED = parse_seed(env.console, HELD_SEED);
     const SeedMatch held_match = seeds_db.find_seed(TARGET_HELD_SEED, SOUND, SEED_RADIUS);
     if (!held_match.found){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "EggRng(): Held Seed was not found in the seed database for this game version, language, and sound setting.",
             env.console
@@ -753,7 +753,7 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     const uint16_t TARGET_PICKUP_SEED = parse_seed(env.console, PICKUP_SEED);
     const SeedMatch pickup_match = seeds_db.find_seed(TARGET_PICKUP_SEED, SOUND, SEED_RADIUS);
     if (!pickup_match.found){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "EggRng(): Pickup Seed was not found in the seed database for this game version, language, and sound setting.",
             env.console
@@ -845,7 +845,7 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 
         if (failed_searches >= 5){
             env.log("Failed to find any matches 5 times in a row");
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::NO_ERROR_REPORT,
                 "Failed to find any matches 5 times in a row. Check your seed and advances settings.",
                 env.console

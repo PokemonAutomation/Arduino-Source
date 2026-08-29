@@ -4,7 +4,8 @@
 *
 */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -186,9 +187,9 @@ void FroslassFinder::program(SingleSwitchProgramEnvironment& env, ProControllerC
         send_program_status_notification(env, NOTIFICATION_STATUS);
         try{
             run_iteration(env, context, fresh_from_reset);
-        }catch (OperationFailedException& e){
+        }catch (OperationFailedExceptionWithScreenshot& e){
             stats.errors++;
-            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+            e.send_recoverable_error_notif_and_telemetry_report(env, NOTIFICATION_ERROR_RECOVERABLE);
 
             pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
             fresh_from_reset = reset_game_from_home(

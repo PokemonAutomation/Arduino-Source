@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -117,7 +117,7 @@ std::shared_ptr<const ImageRGB32> enter_lobby(
             ore.update_with_ocr(stream.logger(), filtered);
 
             if (ore.quantity < 20){
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::NO_ERROR_REPORT,
                     "You have less than 20 ore. Program stopped. (Quantity: " + ore.to_str() + ")",
                     stream
@@ -126,7 +126,7 @@ std::shared_ptr<const ImageRGB32> enter_lobby(
 
             ore_dialog_count++;
             if (ore_dialog_count >= 2){
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::NO_ERROR_REPORT,
                     "Unable to start adventure. Are you out of ore? (Quantity: " + ore.to_str() + ")",
                     stream

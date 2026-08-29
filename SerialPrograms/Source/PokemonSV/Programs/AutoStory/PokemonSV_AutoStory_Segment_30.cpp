@@ -8,7 +8,7 @@
 #include "PokemonSV/Inference/Overworld/PokemonSV_NoMinimapDetector.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -221,7 +221,7 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             {no_minimap}
         );
         if (ret < 0){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "checkpoint_76(): Failed to Snow Slope Run.",
                 env.console

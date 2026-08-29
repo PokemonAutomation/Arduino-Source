@@ -9,7 +9,7 @@
 
 #include <map>
 #include <memory>
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/VideoStream.h"
@@ -29,9 +29,9 @@ struct PageIngredients{
 };
 
 
-class BerryNotFoundException : public OperationFailedException{
+class BerryNotFoundException : public OperationFailedExceptionWithScreenshot{
 public:
-    using OperationFailedException::OperationFailedException;
+    using OperationFailedExceptionWithScreenshot::OperationFailedExceptionWithScreenshot;
 };
 
 

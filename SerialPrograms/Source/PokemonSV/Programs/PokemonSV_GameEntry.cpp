@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/Exceptions/FatalProgramException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
@@ -160,16 +160,16 @@ void reset_game(
         pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
         context.wait_for_all_requests();
         if (!reset_game_from_home(info, console, context, 5000ms)){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to start game.",
                 console
             );
         }
-    }catch (OperationFailedException& e){
+    }catch (OperationFailedExceptionWithScreenshot& e){
         // To be safe: avoid doing anything outside of game on Switch,
         // make game resetting non error recoverable
-        throw FatalProgramException(std::move(e));
+        throw FatalProgramException(e.error_report_mode(), e.message(), e.video_stream(), e.screenshot());
     }
 }
 

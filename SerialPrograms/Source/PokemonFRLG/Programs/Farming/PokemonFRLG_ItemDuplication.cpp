@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/Color.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -107,7 +107,7 @@ void ItemDuplication::program(SingleSwitchProgramEnvironment& env, ProController
         if (ret < 0) {
             stats.errors++;
             env.update_stats();
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "program(): Unable to detect selection arrow for Retro Mail. Please ensure Retro Mail is the top slot.",
                 env.console
@@ -128,7 +128,7 @@ void ItemDuplication::program(SingleSwitchProgramEnvironment& env, ProController
         if (ret2 < 0) {
             stats.errors++;
             env.update_stats();
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "program(): Unable to detect farfetchd held item. Please ensure farfetchd is holding an item to duplicate.",
                 env.console
@@ -147,7 +147,7 @@ void ItemDuplication::program(SingleSwitchProgramEnvironment& env, ProController
         if (ret3 < 0) {
             stats.errors++;
             env.update_stats();
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "program(): Unable to detect item description.",
                 env.console
@@ -166,7 +166,7 @@ void ItemDuplication::program(SingleSwitchProgramEnvironment& env, ProController
         if (ret4 < 0) {
             stats.errors++;
             env.update_stats();
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "program(): Unable to detect confirmation prompt.",
                 env.console
@@ -190,7 +190,7 @@ void ItemDuplication::program(SingleSwitchProgramEnvironment& env, ProController
         if (ret5 < 0) {
             stats.errors++;
             env.update_stats();
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "program(): Unable to detect confirmation prompt on mail screen.",
                 env.console

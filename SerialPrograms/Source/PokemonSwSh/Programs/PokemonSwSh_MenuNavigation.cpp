@@ -5,7 +5,7 @@
  */
 
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 //#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -35,7 +35,7 @@ void navigate_to_menu_app(
     );
     const int cur_app_index = menu_arrow.current_index();
     if (cur_app_index < 0){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Cannot detect Rotom phone menu.",
             stream
@@ -108,7 +108,7 @@ void menus_to_mainmenu(VideoStream& stream, ProControllerContext& context){
         }
     }while (current_time() < deadline);
 
-    OperationFailedException::fire(
+    OperationFailedExceptionWithScreenshot::fire(
         ErrorReport::SEND_ERROR_REPORT,
         "Unable to reach Main Menu after 2 minutes.",
         stream
@@ -157,7 +157,7 @@ void menus_to_boxsystem(VideoStream& stream, ProControllerContext& context){
         }
     }while (current_time() < deadline);
 
-    OperationFailedException::fire(
+    OperationFailedExceptionWithScreenshot::fire(
         ErrorReport::SEND_ERROR_REPORT,
         "Unable to reach Box System after 2 minutes.",
         stream
@@ -212,7 +212,7 @@ void save_game(VideoStream& stream, ProControllerContext& context){
         }
     }while (current_time() < deadline);
 
-    OperationFailedException::fire(
+    OperationFailedExceptionWithScreenshot::fire(
         ErrorReport::SEND_ERROR_REPORT,
         "Unable to save game after 2 minutes.",
         stream
@@ -236,7 +236,7 @@ void mash_B_until_y_comm_icon(
         {y_comm_detector}
     );
     if (ret != 0){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             error_msg + " No Y-Comm mark found.",
             stream

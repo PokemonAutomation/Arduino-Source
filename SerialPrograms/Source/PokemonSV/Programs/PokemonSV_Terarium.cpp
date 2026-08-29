@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -101,7 +101,7 @@ void return_to_plaza(const ProgramInfo& info, VideoStream& stream, ProController
                     pbf_press_button(context, BUTTON_A, 80ms, 400ms);
                 }catch (...){
                     stream.log("Unable to flee.");
-                    OperationFailedException::fire(
+                    OperationFailedExceptionWithScreenshot::fire(
                         ErrorReport::SEND_ERROR_REPORT,
                         "Unable to flee!",
                         stream
@@ -134,7 +134,7 @@ void map_move_cursor_fly(
             stream.log("Failed to fly! Closing map and retrying.");
             press_Bs_to_back_to_overworld(info, stream, context);
             if (i == 2){
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "Unable to fly to " + location + "!",
                     stream

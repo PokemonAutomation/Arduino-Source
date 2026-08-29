@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -148,11 +148,11 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, ProControl
             }
             lead_tracker.report_result(result_own.shiny_type);
 
-        }catch (OperationFailedException& e){
+        }catch (OperationFailedExceptionWithScreenshot& e){
             if (!RESET_GAME_WHEN_ERROR){
                 throw;
             }
-            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+            e.send_recoverable_error_notif_and_telemetry_report(env, NOTIFICATION_ERROR_RECOVERABLE);
 
             stats.add_error();
             go_home(env.console, context);

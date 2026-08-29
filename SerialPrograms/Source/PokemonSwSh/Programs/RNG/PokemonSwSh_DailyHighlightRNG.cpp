@@ -7,7 +7,7 @@
  */
 
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -193,7 +193,7 @@ void DailyHighlightRNG::interact_with_trader(SingleSwitchProgramEnvironment& env
         if (tries >= 10){
             DailyHighlightRNG_Descriptor::Stats& stats = env.current_stats<DailyHighlightRNG_Descriptor::Stats>();
             stats.errors++;
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to talk to the trader.",
                 env.console
@@ -232,7 +232,7 @@ void DailyHighlightRNG::buy_highlight(SingleSwitchProgramEnvironment& env, ProCo
     if (ret < 0){
         DailyHighlightRNG_Descriptor::Stats& stats = env.current_stats<DailyHighlightRNG_Descriptor::Stats>();
         stats.errors++;
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Could not detect dialog.",
             env.console
@@ -327,7 +327,7 @@ uint8_t DailyHighlightRNG::calibrate_num_npc_from_party(SingleSwitchProgramEnvir
         }
     }
 
-    OperationFailedException::fire(
+    OperationFailedExceptionWithScreenshot::fire(
         ErrorReport::SEND_ERROR_REPORT,
         "NPC is in the wrong state or an unexpected number of NPCs is in the area.",
         env.console
@@ -400,7 +400,7 @@ void DailyHighlightRNG::return_to_overworld(SingleSwitchProgramEnvironment& env,
     if (ret != 0){
         DailyHighlightRNG_Descriptor::Stats& stats = env.current_stats<DailyHighlightRNG_Descriptor::Stats>();
         stats.errors++;
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Cannot detect the Y-Comm icon.",
             env.console
@@ -518,7 +518,7 @@ void DailyHighlightRNG::program(SingleSwitchProgramEnvironment& env, ProControll
 
             state_errors++;
             if (state_errors >= 3){
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "Detected invalid RNG state three times in a row.",
                     env.console
@@ -535,12 +535,12 @@ void DailyHighlightRNG::program(SingleSwitchProgramEnvironment& env, ProControll
             try{
                 num_npcs = calibrate_num_npc_from_party(env, context, rng);
             }
-            catch (OperationFailedException& exception){
+            catch (OperationFailedExceptionWithScreenshot& exception){
                 send_program_recoverable_error_notification(
                     env,
                     NOTIFICATION_ERROR_RECOVERABLE,
                     exception.message(),
-                    exception.screenshot_view()
+                    *exception.screenshot()
                 );
                 assumed_successful_iterations = 0;
                 stats.errors++;

@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -114,7 +114,7 @@ bool run_battle_menu(
             return false;
         }
     }
-    OperationFailedException::fire(
+    OperationFailedExceptionWithScreenshot::fire(
         ErrorReport::SEND_ERROR_REPORT,
         "Invalid SinglesMoveType: " + std::to_string((int)move.type),
         stream
@@ -234,7 +234,7 @@ bool run_pokemon(
         default:
             consecutive_timeouts++;
             if (consecutive_timeouts == 3){
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "No state detected after 6 minutes.",
                     stream
@@ -311,7 +311,7 @@ bool run_singles_battle(
                 pbf_wait(context, 400ms);
                 continue;
             default:
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "Unable to send in a " + STRING_POKEMON + ".",
                     stream

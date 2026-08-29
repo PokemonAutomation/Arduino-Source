@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/FrozenImageDetector.h"
@@ -47,13 +47,13 @@ void hatch_egg(VideoStream& stream, ProControllerContext& context){
             stream.log("Egg is hatching!");
             break;
         case 1:
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Frozen screen detected!",
                 stream
             );
         default:
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "No hatch detected after 8 minutes of spinning.",
                 stream
@@ -75,7 +75,7 @@ void hatch_egg(VideoStream& stream, ProControllerContext& context){
             {{dialog}}
         );
         if (ret < 0){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "End of hatch not detected after 30 seconds.",
                 stream
@@ -149,7 +149,7 @@ void release(VideoStream& stream, ProControllerContext& context){
         }
         pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
     }
-    OperationFailedException::fire(
+    OperationFailedExceptionWithScreenshot::fire(
         ErrorReport::SEND_ERROR_REPORT,
         "Unexpected dialogs when releasing.",
         stream

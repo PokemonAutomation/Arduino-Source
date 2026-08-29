@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -134,7 +134,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
             env.log("Failed to open bag after 10 attempts.", COLOR_RED);
             stats.errors++;
             env.update_stats();
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to open bag after 10 attempts.",
                 env.console
@@ -162,7 +162,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
             env.log("Invalid target selected.");
             stats.errors++;
             env.update_stats();
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "AudioStarterReset: Invalid target.",
                 env.console
@@ -188,7 +188,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
             env.log("Failed to start battle after 10 attempts.", COLOR_RED);
             stats.errors++;
             env.update_stats();
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to start battle after 10 attempts.",
                 env.console
@@ -215,7 +215,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
                     env.log("Battle Advance arrow was not detected.");
                     stats.errors++;
                     env.update_stats();
-                    OperationFailedException::fire(
+                    OperationFailedExceptionWithScreenshot::fire(
                         ErrorReport::SEND_ERROR_REPORT,
                         "Battle Advance arrow was not detected.",
                         env.console
@@ -268,7 +268,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
                     env.log("Battle menu was not detected.");
                     stats.errors++;
                     env.update_stats();
-                    OperationFailedException::fire(
+                    OperationFailedExceptionWithScreenshot::fire(
                         ErrorReport::SEND_ERROR_REPORT,
                         "Battle menu was not detected.",
                         env.console

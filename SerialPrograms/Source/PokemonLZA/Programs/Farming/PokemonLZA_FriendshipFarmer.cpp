@@ -6,8 +6,7 @@
 
 #include "PokemonLZA_FriendshipFarmer.h"
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/Exceptions/ScreenshotException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -202,7 +201,7 @@ void FriendshipFarmer::enter_cafe(SingleSwitchProgramEnvironment& env, ProContro
 
             ++stats.errors;
             env.update_stats();
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "enter_cafe(): Unable to detect overworld after day/night change.",
                 env.console
@@ -210,7 +209,7 @@ void FriendshipFarmer::enter_cafe(SingleSwitchProgramEnvironment& env, ProContro
         default:
             ++stats.errors;
             env.update_stats();
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "enter_cafe(): No recognized state after 10 seconds.",
                 env.console
@@ -290,7 +289,7 @@ void FriendshipFarmer::exit_bench(SingleSwitchProgramEnvironment& env, ProContro
 
             ++stats.errors;
             env.update_stats();
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "exit_bench(): Unable to detect overworld after day/night change.",
                 env.console
@@ -304,7 +303,7 @@ void FriendshipFarmer::exit_bench(SingleSwitchProgramEnvironment& env, ProContro
 
             ++stats.errors;
             env.update_stats();
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "exit_bench(): No recognized state after 10 seconds.",
                 env.console
@@ -379,7 +378,7 @@ void FriendshipFarmer::exit_cafe(SingleSwitchProgramEnvironment& env, ProControl
 
             ++stats.errors;
             env.update_stats();
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "exit_cafe(): Unable to detect overworld after day/night change.",
                 env.console
@@ -387,7 +386,7 @@ void FriendshipFarmer::exit_cafe(SingleSwitchProgramEnvironment& env, ProControl
         default:
             ++stats.errors;
             env.update_stats();
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "exit_cafe(): No recognized state after 10 seconds.",
                 env.console
@@ -484,7 +483,7 @@ void FriendshipFarmer::hang_out_bench(SingleSwitchProgramEnvironment& env, ProCo
 
             ++stats.errors;
             env.update_stats();
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "hang_out_bench(): Unable to detect overworld after day/night change.",
                 env.console
@@ -492,7 +491,7 @@ void FriendshipFarmer::hang_out_bench(SingleSwitchProgramEnvironment& env, ProCo
         default:
             ++stats.errors;
             env.update_stats();
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "hang_out_bench(): No recognized state after 10 seconds.",
                 env.console

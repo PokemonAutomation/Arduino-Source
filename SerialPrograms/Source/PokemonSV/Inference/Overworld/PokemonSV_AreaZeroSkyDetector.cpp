@@ -5,7 +5,7 @@
  */
 
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/Async/InterruptableCommands.h"
@@ -118,7 +118,7 @@ void find_and_center_on_sky(
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::minutes(1)){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::NO_ERROR_REPORT,
                 "Failed to find the sky after 1 minute. (state = " + std::to_string((int)state) + ")",
                 stream

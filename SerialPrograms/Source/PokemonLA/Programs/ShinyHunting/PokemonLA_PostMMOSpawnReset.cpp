@@ -4,7 +4,8 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -151,9 +152,9 @@ void PostMMOSpawnReset::program(SingleSwitchProgramEnvironment& env, ProControll
         send_program_status_notification(env, NOTIFICATION_STATUS);
         try{
             run_iteration(env, context);
-        }catch (OperationFailedException& e){
+        }catch (OperationFailedExceptionWithScreenshot& e){
             stats.errors++;
-            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+            e.send_recoverable_error_notif_and_telemetry_report(env, NOTIFICATION_ERROR_RECOVERABLE);
 
             // run_iteration() restarts the game first then listens to shiny sound.
             // If there is any error generated when the game is running and is caught here,

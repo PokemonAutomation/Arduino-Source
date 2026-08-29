@@ -7,7 +7,7 @@
  */
 
 #include <array>
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Random.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -175,7 +175,7 @@ uint64_t soft_reset(ConsoleHandle& console, ProControllerContext& context){
             return errors;
         }
     }
-    OperationFailedException::fire(
+    OperationFailedExceptionWithScreenshot::fire(
         ErrorReport::SEND_ERROR_REPORT,
         "soft_reset(): Failed to reset after 5 attempts.",
         console
@@ -299,7 +299,7 @@ uint64_t open_slot_six(ConsoleHandle& console, ProControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 10000ms);
         }
     }
-    OperationFailedException::fire(
+    OperationFailedExceptionWithScreenshot::fire(
         ErrorReport::SEND_ERROR_REPORT,
         "open_slot_six(): Failed to open party summary after 5 attempts.",
         console
@@ -325,7 +325,7 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
             if (ret == 0){
                 console.log("Battle Advance arrow detected.");
             }else{
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "handle_encounter(): Did not detect battle advance arrow.",
                     console
@@ -348,7 +348,7 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
             if (ret2 == 0){
                 console.log("Battle menu detecteed!");
             }else{
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "handle_encounter(): Did not detect battle menu.",
                     console
@@ -376,7 +376,7 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
         
         while (true){
             if (current_time() - start > 60s){
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "handle_encounter(): No battle menu detected after sixty seconds.",
                     console
@@ -418,13 +418,13 @@ BattleResult spam_first_move(ConsoleHandle& console, ProControllerContext& conte
     uint16_t times_moved = 0;
     while (true){
         if (errors > 5) {
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "spam_first_move(): Failed to use move 5 times.",
                 console
             );  
         } else if (times_moved > 50){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "spam_first_move(): More than 50 move uses detected.",
                 console
@@ -502,7 +502,7 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context){
     while (true)
     {
         if (errors > 5){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "flee_battle(): Failed to flee battle after 5 attempts.",
                 console
@@ -584,7 +584,7 @@ bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, boo
     bool move_learned = false;
     while (true){
         if (errors > 5 || loops > 5){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "exit_wild_battle(): Failed to exit battle.",
                 console
@@ -704,7 +704,7 @@ void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext
     bool start_menu_is_open = false;
     while (true){
         if (errors > 5){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "open_party_menu_from_overworld(): Failed to open party menu 5 times in a row.",
                 console
@@ -785,7 +785,7 @@ void open_bag_from_overworld(ConsoleHandle& console, ProControllerContext& conte
     bool start_menu_is_open = false;
     while (true){
         if (errors > 5){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "open_party_menu_from_overworld(): Failed to open party menu 5 times in a row.",
                 console
@@ -846,7 +846,7 @@ void use_sweet_scent_from_overworld(ConsoleHandle& console, ProControllerContext
     
     while (true){
         if (errors > 5){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "use_teleport_from_overworld(): Failed to use Teleport 5 times in a row.",
                 console
@@ -893,7 +893,7 @@ void use_teleport_from_overworld(ConsoleHandle& console, ProControllerContext& c
     
     while (true){
         if (errors > 5){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "use_teleport_from_overworld(): Failed to use Teleport 5 times in a row.",
                 console
@@ -954,7 +954,7 @@ void open_fly_map_from_overworld(ConsoleHandle& console, ProControllerContext& c
     uint16_t errors = 0;
     while (true){
         if (errors > 5){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "open_fly_map_from_overworld(): Failed to open Fly map 5 times in a row.",
                 console
@@ -1013,7 +1013,7 @@ void fly_from_kanto_map(ConsoleHandle& console, ProControllerContext& context, K
     
     while (true){
         if (errors > 5){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "fly_from_kanto_map(): Failed to inititate Fly five times in a row.",
                 console
@@ -1078,7 +1078,7 @@ void fly_from_kanto_map(ConsoleHandle& console, ProControllerContext& context, K
             pbf_move_left_joystick(context, {+1, 0}, 150ms, 100ms);
             break;
         default:
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "fly_from_kanto_map(): Unimplemented Kanto fly target.",
                 console
@@ -1117,7 +1117,7 @@ void enter_leave_pokecenter(ConsoleHandle& console, ProControllerContext& contex
 
     while (true){
         if (errors > 5){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 leave ? "leave_pokecenter(): Failed to exit PokeCenter." : "enter_pokecenter(): Failed to enter PokeCenter.",
                 console
@@ -1161,7 +1161,7 @@ void heal_at_pokecenter(ConsoleHandle& console, ProControllerContext& context){
 
     while (true){
         if (errors > 5){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "heal_at_pokecenter(): Failed to initiate PokeCenter dialog.",
                 console
@@ -1264,7 +1264,7 @@ void exit_battle_after_catch(
                 if (in_overworld(console, context)){
                     return;
                 }
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "exit_battle_after_catch(): Failed to exit the battle.",
                     console

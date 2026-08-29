@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
@@ -282,7 +282,7 @@ std::vector<BBQuests> process_quest_list(
                 default:
                     //This case is handled in BBQSoloFarmer.
                     stream.log("OOEggs is Stop in process_quest_list().");
-                    OperationFailedException::fire(
+                    OperationFailedExceptionWithScreenshot::fire(
                         ErrorReport::SEND_ERROR_REPORT,
                         "OOEggs is Stop in process_quest_list().",
                         stream
@@ -392,7 +392,7 @@ std::vector<BBQuests> process_quest_list(
     }
     /*
     if (!rerolled && quests_to_do.size() == 0){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "No possible quests! Check language selection.",
             stream
@@ -503,7 +503,7 @@ bool process_and_do_quest(
             quest_catch(env.program_info(), console, context, BBQ_OPTIONS, current_quest);
             break;
         default:
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Unknown quest selection.",
                 console
@@ -819,7 +819,7 @@ void quest_sneak_up(
                             break;
                         default:
                             console.log("Invalid state quest_sneak_up(). Smoke Ball equipped?");
-                            OperationFailedException::fire(
+                            OperationFailedExceptionWithScreenshot::fire(
                                 ErrorReport::SEND_ERROR_REPORT,
                                 "Invalid state quest_sneak_up(). Smoke Ball equipped?",
                                 console
@@ -836,7 +836,7 @@ void quest_sneak_up(
                 break;
             default:
                 console.log("Invalid state in run_battle().");
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "Invalid state in run_battle().",
                     console
@@ -1192,7 +1192,7 @@ void quest_sandwich(
         condiments = {{"chili-sauce", (uint8_t)1}};
         break;
     default:
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Invalid sandwich selection.",
             stream
@@ -1267,7 +1267,7 @@ void quest_tera_raid(
                     return_to_plaza(env.program_info(), console, context);
                 }catch (...){
                     console.log("Unable to flee.");
-                    OperationFailedException::fire(
+                    OperationFailedExceptionWithScreenshot::fire(
                         ErrorReport::SEND_ERROR_REPORT,
                         "Unable to flee!",
                         console

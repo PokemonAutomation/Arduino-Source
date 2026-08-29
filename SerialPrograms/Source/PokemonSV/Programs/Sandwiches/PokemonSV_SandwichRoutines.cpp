@@ -10,7 +10,7 @@
 #include <unordered_map>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/StaticGlobals.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
@@ -1100,7 +1100,7 @@ void run_sandwich_maker(
                     continue;
                 }else{
                     stream.log("Read nothing on center plate label.");
-                    OperationFailedException::fire(
+                    OperationFailedExceptionWithScreenshot::fire(
                         ErrorReport::SEND_ERROR_REPORT,
                         "run_sandwich_maker: No ingredient found on center plate label.\n" + language_warning(language),
                         stream,
@@ -1150,7 +1150,7 @@ void run_sandwich_maker(
             left_filling = left_plate_detector.detect_filling_name(screen);
 
             if (left_filling.empty()){
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "No ingredient label found on remaining plate " + std::to_string(i) + ".",
                     stream,
@@ -1172,7 +1172,7 @@ void run_sandwich_maker(
         //If a label fails to read it'll cause issues down the line
         if ((int)plate_order.size() != plates){
             env.log("Found # plate labels " + std::to_string(plate_order.size()) + ", not same as desired # plates " + std::to_string(plates));
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Number of plate labels did not match number of plates.",
                 stream,
@@ -1238,7 +1238,7 @@ void run_sandwich_maker(
                 stream.log("There's only one plate, so we assume it's the expected filling.");
                 plate_index.push_back(0);
             }else{
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "run_sandwich_maker(): Did not detect the expected ingredients on the plate(s).",
                     stream
@@ -1341,7 +1341,7 @@ void run_sandwich_maker(
     SandwichHandWatcher grabbing_hand(SandwichHandType::GRABBING, { 0, 0, 1.0, 1.0 });
     int ret = wait_until(stream, context, std::chrono::seconds(30), { grabbing_hand });
     if (ret < 0){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "SandwichMaker: Cannot detect grabbing hand when waiting for upper bread.",
             stream,

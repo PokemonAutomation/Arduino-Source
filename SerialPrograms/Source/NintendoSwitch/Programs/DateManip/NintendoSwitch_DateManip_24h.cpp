@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -123,7 +123,7 @@ void DateReader_EU::set_date(
         move_horizontal(context, cursor_position, 5);
     }
 
-    throw_and_log<OperationFailedException>(
+    throw_and_log<OperationFailedExceptionWithScreenshot>(
         stream.logger(), ErrorReport::SEND_ERROR_REPORT,
         "Failed to set the hour after 10 attempts.",
         stream
@@ -197,7 +197,7 @@ void DateReader_JP::set_date(
         move_horizontal(context, cursor_position, 5);
     }
 
-    throw_and_log<OperationFailedException>(
+    throw_and_log<OperationFailedExceptionWithScreenshot>(
         stream.logger(), ErrorReport::SEND_ERROR_REPORT,
         "Failed to set the hour after 10 attempts.",
         stream

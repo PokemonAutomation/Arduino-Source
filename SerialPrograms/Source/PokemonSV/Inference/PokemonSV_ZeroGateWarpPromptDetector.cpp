@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV_ZeroGateWarpPromptDetector.h"
@@ -61,7 +61,7 @@ bool ZeroGateWarpPromptDetector::move_cursor(
         if (current < 0){
             consecutive_detection_fails++;
             if (consecutive_detection_fails > 10){
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "ZeroGateWarpPromptDetector::move_cursor(): Unable to detect cursor.",
                     stream,
@@ -74,7 +74,7 @@ bool ZeroGateWarpPromptDetector::move_cursor(
         consecutive_detection_fails = 0;
 
         if (moves >= 10){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Unable to move to target after 10 moves.",
                 stream,

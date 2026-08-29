@@ -8,6 +8,8 @@
 #include "Common/Cpp/EarlyShutdown.h"
 #include "Common/Cpp/Concurrency/SpinPause.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Exceptions/FatalProgramException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Options/Environment/SleepSuppressOption.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
@@ -202,7 +204,7 @@ void SingleSwitchProgramSession::internal_run_program(){
     }catch (ProgramFinishedException& e){
         logger().log("Program finished early!", COLOR_BLUE);
         env.console.overlay().add_log("- Program Finished -");
-        e.send_notification(env, m_option.instance().NOTIFICATION_PROGRAM_FINISH);
+        send_program_finished_notification(env, m_option.instance().NOTIFICATION_PROGRAM_FINISH, e.message(), *e.screenshot());
     }catch (InvalidConnectionStateException& e){
         logger().log("Program stopped due to connection issue.", COLOR_RED);
         env.console.overlay().add_log("- Invalid Connection -", COLOR_RED);
@@ -211,16 +213,36 @@ void SingleSwitchProgramSession::internal_run_program(){
             message = e.name();
         }
         report_error(message);
-    }catch (ScreenshotException& e){
+    }catch (OperationFailedExceptionWithScreenshot& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
         env.console.overlay().add_log("- Program Error -", COLOR_RED);
-        e.add_stream_if_needed(env.console);
+
         std::string message = e.message();
         if (message.empty()){
             message = e.name();
         }
         report_error(message);
-        e.send_fatal_notification(env);
+        e.send_fatal_error_notif_and_telemetry_report(env, m_option.instance().NOTIFICATION_ERROR_FATAL);
+    }catch (OperationFailedException& e){ // no screenshot
+        logger().log("Program stopped with an exception!", COLOR_RED);
+        env.console.overlay().add_log("- Program Error -", COLOR_RED);
+
+        std::string message = e.message();
+        if (message.empty()){
+            message = e.name();
+        }
+        report_error(message);
+        e.send_fatal_error_notif_and_telemetry_report(env, m_option.instance().NOTIFICATION_ERROR_FATAL);
+    }catch (FatalProgramException& e){
+        logger().log("Program stopped with an exception!", COLOR_RED);
+        env.console.overlay().add_log("- Program Error -", COLOR_RED);
+
+        std::string message = e.message();
+        if (message.empty()){
+            message = e.name();
+        }
+        report_error(message);
+        e.send_fatal_error_notif_and_telemetry_report(env, m_option.instance().NOTIFICATION_ERROR_FATAL);
     }catch (Exception& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
         env.console.overlay().add_log("- Program Error -", COLOR_RED);

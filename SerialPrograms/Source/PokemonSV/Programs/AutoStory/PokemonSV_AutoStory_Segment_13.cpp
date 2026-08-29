@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -265,7 +265,7 @@ void checkpoint_29(
         WallClock start_to_cross_bridge = current_time();
         while (true){
             if (current_time() - start_to_cross_bridge > std::chrono::minutes(6)){
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "checkpoint_26(): Failed to cross bridge after 6 minutes.",
                     env.console

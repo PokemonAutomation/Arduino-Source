@@ -8,7 +8,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -458,11 +458,12 @@ void ShinyHuntAreaZeroPlatform::set_flags_and_run_state(
 
     try{
         run_state(env, context);
-    }catch (OperationFailedException& e){
+    }catch (OperationFailedExceptionWithScreenshot& e){
         stats.m_errors++;
         m_env->update_stats();
         m_consecutive_failures++;
-        e.send_notification(*m_env, NOTIFICATION_ERROR_RECOVERABLE);
+        e.send_recoverable_error_notif_and_telemetry_report(env, NOTIFICATION_ERROR_RECOVERABLE);
+
         if (m_consecutive_failures >= 3){
             throw_and_log<FatalProgramException>(
                 stream.logger(),

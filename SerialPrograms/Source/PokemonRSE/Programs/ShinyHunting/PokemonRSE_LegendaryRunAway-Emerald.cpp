@@ -5,7 +5,7 @@
  */
 
 //#include "Common/Cpp/PrettyPrint.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -171,7 +171,7 @@ void LegendaryRunAwayEmerald::reset_regi(SingleSwitchProgramEnvironment& env, Pr
         env.log("Failed to exit area.", COLOR_RED);
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to exit area.",
             env.console
@@ -196,7 +196,7 @@ void LegendaryRunAwayEmerald::reset_regi(SingleSwitchProgramEnvironment& env, Pr
         env.log("Failed to enter area.", COLOR_RED);
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to enter area.",
             env.console
@@ -258,7 +258,7 @@ void LegendaryRunAwayEmerald::reset_groudon(SingleSwitchProgramEnvironment& env,
         env.log("Failed to exit area.", COLOR_RED);
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to exit area.",
             env.console
@@ -285,7 +285,7 @@ void LegendaryRunAwayEmerald::reset_groudon(SingleSwitchProgramEnvironment& env,
         stats.errors++;
         env.update_stats();
         env.log("Failed to enter area.", COLOR_RED);
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to enter area.",
             env.console
@@ -366,7 +366,7 @@ void LegendaryRunAwayEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, 
         env.log("Failed to exit area.", COLOR_RED);
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to exit area.",
             env.console
@@ -393,7 +393,7 @@ void LegendaryRunAwayEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, 
         env.log("Failed to enter area.", COLOR_RED);
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to enter area.",
             env.console
@@ -453,7 +453,7 @@ void LegendaryRunAwayEmerald::reset_hooh(SingleSwitchProgramEnvironment& env, Pr
         env.log("Failed to exit area.", COLOR_RED);
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to exit area.",
             env.console
@@ -483,7 +483,7 @@ void LegendaryRunAwayEmerald::reset_hooh(SingleSwitchProgramEnvironment& env, Pr
         env.log("Failed to enter area.", COLOR_RED);
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to enter area.",
             env.console
@@ -528,7 +528,7 @@ void LegendaryRunAwayEmerald::reset_lugia(SingleSwitchProgramEnvironment& env, P
         env.log("Failed to exit area.", COLOR_RED);
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to exit area.",
             env.console
@@ -558,7 +558,7 @@ void LegendaryRunAwayEmerald::reset_lugia(SingleSwitchProgramEnvironment& env, P
         env.log("Failed to enter area.", COLOR_RED);
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to enter area.",
             env.console
@@ -629,7 +629,7 @@ void LegendaryRunAwayEmerald::program(SingleSwitchProgramEnvironment& env, ProCo
             env.log("Failed to start battle after 5 attempts.", COLOR_RED);
             stats.errors++;
             env.update_stats();
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to start battle after 5 attempts.",
                 env.console
@@ -683,7 +683,7 @@ void LegendaryRunAwayEmerald::program(SingleSwitchProgramEnvironment& env, ProCo
             reset_lugia(env, context);
             break;
         default:
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Invalid target!",
                 env.console

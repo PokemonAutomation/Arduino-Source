@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -186,7 +186,7 @@ void take_pickup_items(SingleSwitchProgramEnvironment& env, ProControllerContext
             { selection_open }
         );
         if (ret < 0){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to detect selection menu.",
                 env.console
@@ -237,7 +237,7 @@ void PickupFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCon
                     use_teleport_from_overworld(env.console, context);
                     break;
                 default:
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "Travel option not recognized. Please report this as a bug.",
                     env.console
@@ -255,7 +255,7 @@ void PickupFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCon
                     walk_to_route22(env, context);
                     break;
                 default:
-                    OperationFailedException::fire(
+                    OperationFailedExceptionWithScreenshot::fire(
                         ErrorReport::SEND_ERROR_REPORT,
                         "Game location not recognized. Please report this as a bug.",
                         env.console
@@ -275,7 +275,7 @@ void PickupFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCon
                 env.log("Failed to trigger encounter: traveling back to PokeCenter");
                 errors++;
                 if (errors >= 5){
-                    OperationFailedException::fire(
+                    OperationFailedExceptionWithScreenshot::fire(
                         ErrorReport::SEND_ERROR_REPORT,
                         "Failed 5 times to trigger a wild encounter within 60 seconds",
                         env.console

@@ -6,7 +6,7 @@
 
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -261,7 +261,7 @@ void RamanasCombeeFinder::run_iteration(
             break;
         }
         if (c >= 5){
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to switch to Pokemon selection after 5 attempts.",
                 env.console
@@ -314,7 +314,7 @@ void RamanasCombeeFinder::run_iteration(
             pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 2000ms);
             context.wait_for_all_requests();
         }
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Black out.",
             env.console
@@ -336,9 +336,9 @@ void RamanasCombeeFinder::program(SingleSwitchProgramEnvironment& env, ProContro
         send_program_status_notification(env, NOTIFICATION_STATUS);
         try{
             run_iteration(env, context, fresh_from_reset);
-        }catch (OperationFailedException& e){
+        }catch (OperationFailedExceptionWithScreenshot& e){
             stats.errors++;
-            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+            e.send_recoverable_error_notif_and_telemetry_report(env, NOTIFICATION_ERROR_RECOVERABLE);
 
             pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
             fresh_from_reset = reset_game_from_home(env, env.console, context);

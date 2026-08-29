@@ -5,7 +5,7 @@
  */
 
 #include <chrono>
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -139,7 +139,7 @@ bool IngoBattleGrinder::start_dialog(VideoStream& stream, ProControllerContext& 
             //  Version 1.1 with new options unlocked.
             break;
         default:
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Unable to detect options after 10 A presses.",
                 stream
@@ -170,7 +170,7 @@ bool IngoBattleGrinder::start_dialog(VideoStream& stream, ProControllerContext& 
     case 0:
         return false;
     default:
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Unable to find opponent list options after 5 A presses.",
             stream
@@ -268,7 +268,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ProCo
         );
         if (ret < 0){
             env.console.log("Error: Failed to find battle menu after 2 minutes.");
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to find battle menu after 2 minutes.",
                 env.console
@@ -314,7 +314,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ProCo
                         // Pokemon has zero PP on all moves. This should not happen as it will just use
                         // Struggle.
                         env.console.log("No PP on all moves. Abort program.", COLOR_RED);
-                        OperationFailedException::fire(
+                        OperationFailedExceptionWithScreenshot::fire(
                             ErrorReport::SEND_ERROR_REPORT,
                             "No PP on all moves.",
                             env.console

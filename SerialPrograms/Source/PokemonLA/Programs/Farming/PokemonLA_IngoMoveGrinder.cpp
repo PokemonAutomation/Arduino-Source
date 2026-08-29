@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -134,7 +134,7 @@ bool IngoMoveGrinder::start_dialog(VideoStream& stream, ProControllerContext& co
             //  Version 1.1 with new options unlocked.
             break;
         default:
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Unable to detect options after 10 A presses.",
                 stream
@@ -165,7 +165,7 @@ bool IngoMoveGrinder::start_dialog(VideoStream& stream, ProControllerContext& co
     case 0:
         return false;
     default:
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Unable to find opponent list options after 5 A presses.",
             stream
@@ -237,7 +237,7 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ProCont
             env.console.log("Error: Failed to find battle menu after 2 minutes.");
 //            auto snapshot = env.console.video().snapshot();
 //            dump_image(env.logger(), env.program_info(), "BattleMenuNotFound", snapshot);
-            OperationFailedException::fire(
+            OperationFailedExceptionWithScreenshot::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to find battle menu after 2 minutes.",
                 env.console
@@ -378,7 +378,7 @@ void IngoMoveGrinder::go_to_next_move(SingleSwitchProgramEnvironment& env, ProCo
 void IngoMoveGrinder::go_to_next_pokemon(SingleSwitchProgramEnvironment& env, ProControllerContext& context)
 {
     if (cur_pokemon == 4){
-        OperationFailedException::fire(
+        OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Abort program. Your 4 first pokemons are done grinding moves, dead or without PP. "
             "Your fifth pokemon (Arceus) died so no other choice than stopping the program.",
