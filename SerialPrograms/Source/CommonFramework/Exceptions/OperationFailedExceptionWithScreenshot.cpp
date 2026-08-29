@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "OperationFailedExceptionWithScreenshot.h"
@@ -67,6 +68,38 @@ std::shared_ptr<const ImageRGB32> OperationFailedExceptionWithScreenshot::screen
 VideoStream* OperationFailedExceptionWithScreenshot::video_stream() const{
     return m_stream;
 }
+
+void OperationFailedExceptionWithScreenshot::send_recoverable_error_notif_and_telemetry_report(
+    ProgramEnvironment& env,
+    EventNotificationOption& notif_settings
+){
+    send_program_recoverable_error_notification_and_telemetry_report(
+        env, &env.logger(), env.program_info(), 
+        notif_settings, 
+        error_report_mode(),
+        message(),
+        name(),
+        *m_screenshot,
+        &m_stream->history()
+    );
+}
+
+void OperationFailedExceptionWithScreenshot::send_fatal_error_notif_and_telemetry_report(
+    ProgramEnvironment& env,
+    EventNotificationOption& notif_settings
+){
+    send_program_fatal_error_notification_and_telemetry_report(
+        env, &env.logger(), env.program_info(),
+        notif_settings,
+        error_report_mode(),
+        message(),
+        name(),
+        *m_screenshot,
+        &m_stream->history()
+    );
+}
+
+
 
 
 

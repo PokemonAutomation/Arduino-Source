@@ -396,7 +396,9 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/ErrorReports/ProgramDumper.cpp
     Source/CommonFramework/ErrorReports/ProgramDumper.h
     Source/CommonFramework/ErrorReports/ProgramDumper_Windows.tpp
+    Source/CommonFramework/Exceptions/FatalProgramException.cpp
     Source/CommonFramework/Exceptions/FatalProgramException.h
+    Source/CommonFramework/Exceptions/OperationFailedException.cpp
     Source/CommonFramework/Exceptions/OperationFailedException.h
     Source/CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.cpp
     Source/CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h

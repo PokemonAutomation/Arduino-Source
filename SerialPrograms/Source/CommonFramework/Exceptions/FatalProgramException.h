@@ -10,6 +10,8 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/VideoStream.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "CommonFramework/Notifications/EventNotificationOption.h"
 
 namespace PokemonAutomation{
 
@@ -21,21 +23,13 @@ public:
     explicit FatalProgramException(
         ErrorReport error_report,
         std::string message
-    )
-        : m_error_report_mode(error_report)
-        , m_message(message)
-    {}
+    );
 
     explicit FatalProgramException(
         ErrorReport error_report,
         std::string message,
         VideoStream& stream
-    )
-        : m_error_report_mode(error_report)
-        , m_message(message)
-        , m_stream(&stream)
-        , m_screenshot(stream.video().snapshot().frame)
-    {}
+    );
 
     //  Construct exception with message with screenshot and (optionally) console information.
     //  Use the provided screenshot instead of taking one with the console.
@@ -45,26 +39,16 @@ public:
         std::string message,
         VideoStream* stream,
         ImageRGB32 screenshot
-    )
-        : m_error_report_mode(error_report)
-        , m_message(message)
-        , m_stream(stream)
-        , m_screenshot(std::make_shared<ImageRGB32>(std::move(screenshot)))
-    {}
+    );
 
     explicit FatalProgramException(
         ErrorReport error_report,
         std::string message,
         VideoStream* stream,
         std::shared_ptr<const ImageRGB32> screenshot
-    )
-        : m_error_report_mode(error_report)
-        , m_message(message)
-        , m_stream(stream)
-        , m_screenshot(std::move(screenshot))
-    {}
+    );
 
-    ErrorReport error_report_mode() const { return m_error_report_mode; };
+    ErrorReport error_report_mode() const { return m_error_report_mode; }
     virtual const char* name() const override{ return "FatalProgramException"; }
     ImageViewRGB32 screenshot_view() const {
         if (m_screenshot){
@@ -74,7 +58,12 @@ public:
         }
     }
     std::shared_ptr<const ImageRGB32> screenshot() const {return m_screenshot;}
-    VideoStream* video_stream() const{return m_stream;};
+    VideoStream* video_stream() const{return m_stream;}
+
+    void send_fatal_error_notif_and_telemetry_report(
+        ProgramEnvironment& env,
+        EventNotificationOption& notif_settings
+    );
 
 private:
     ErrorReport m_error_report_mode;

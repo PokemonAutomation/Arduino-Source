@@ -128,15 +128,7 @@ void ComputerProgramSession::internal_run_program(){
             message = e.name();
         }
         report_error(message);
-        send_program_fatal_error_notification_and_telemetry_report(
-            env, &env.logger(), env.program_info(), 
-            m_option.instance().NOTIFICATION_ERROR_FATAL, 
-            e.error_report_mode(),
-            e.message(),
-            "OperationFailedExceptionWithScreenshot",
-            *e.screenshot(),
-            &e.video_stream()->history()
-        );        
+        e.send_fatal_error_notif_and_telemetry_report(env, m_option.instance().NOTIFICATION_ERROR_FATAL);
     }catch (OperationFailedException& e){ // no screenshot
         logger().log("Program stopped with an exception!", COLOR_RED);
         std::string message = e.message();
@@ -144,13 +136,7 @@ void ComputerProgramSession::internal_run_program(){
             message = e.name();
         }
         report_error(message);
-        send_program_fatal_error_notification_and_telemetry_report(
-            env, &env.logger(), env.program_info(), 
-            m_option.instance().NOTIFICATION_ERROR_FATAL, 
-            e.error_report_mode(),
-            e.message(),
-            "OperationFailedException"
-        );
+        e.send_fatal_error_notif_and_telemetry_report(env, m_option.instance().NOTIFICATION_ERROR_FATAL);
     }catch (FatalProgramException& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
         std::string message = e.message();
@@ -158,15 +144,7 @@ void ComputerProgramSession::internal_run_program(){
             message = e.name();
         }
         report_error(message);
-        send_program_fatal_error_notification_and_telemetry_report(
-            env, &env.logger(), env.program_info(), 
-            m_option.instance().NOTIFICATION_ERROR_FATAL, 
-            e.error_report_mode(),
-            e.message(),
-            "FatalProgramException",
-            *e.screenshot(),
-            &e.video_stream()->history()
-        );
+        e.send_fatal_error_notif_and_telemetry_report(env, m_option.instance().NOTIFICATION_ERROR_FATAL);
     }catch (Exception& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
         std::string message = e.message();

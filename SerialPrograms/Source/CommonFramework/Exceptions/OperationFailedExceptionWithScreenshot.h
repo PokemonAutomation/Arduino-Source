@@ -9,6 +9,8 @@
 
 #include <memory>
 #include "CommonFramework/Tools/VideoStream.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "Common/Cpp/Exceptions.h"
 
@@ -81,6 +83,16 @@ public:
     ImageViewRGB32 screenshot_view() const;
     std::shared_ptr<const ImageRGB32> screenshot() const;
     VideoStream* video_stream() const;
+
+    void send_recoverable_error_notif_and_telemetry_report(
+        ProgramEnvironment& env,
+        EventNotificationOption& notif_settings
+    ) override;
+
+    void send_fatal_error_notif_and_telemetry_report(
+        ProgramEnvironment& env,
+        EventNotificationOption& notif_settings
+    ) override;
 
 private:
     VideoStream* m_stream = nullptr;
