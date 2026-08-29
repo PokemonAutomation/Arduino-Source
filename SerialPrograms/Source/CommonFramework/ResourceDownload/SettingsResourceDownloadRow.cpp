@@ -537,7 +537,7 @@ void SettingsResourceDownloadRow::on_hash_progress(uint64_t bytes_done, uint64_t
 void SettingsResourceDownloadRow::on_download_finished(bool success, const std::string& resource_slug){
     // we can't run `download_ptr->remove_listener(*this)` in this function
     // since it results in deadlock, since this function is part of the listener loop
-    m_data->m_download_ptr.reset();
+//    m_data->m_download_ptr.reset();
 
     update_action_state(ActionState::READY);
     update_table_label(success);
