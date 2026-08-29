@@ -7,14 +7,17 @@
 #ifndef PokemonAutomation_FatalProgramException_H
 #define PokemonAutomation_FatalProgramException_H
 
+#include <memory>
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/Tools/VideoStream.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/Notifications/EventNotificationOption.h"
 
 namespace PokemonAutomation{
 
+class VideoStream;
+class ProgramEnvironment;
+class EventNotificationOption;
+class ImageViewRGB32;
+class ImageRGB32;
 
 //  A generic exception that should not be caught outside of infra.
 class FatalProgramException : public Exception{

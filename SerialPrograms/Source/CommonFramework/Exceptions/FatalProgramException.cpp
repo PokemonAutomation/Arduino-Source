@@ -4,6 +4,11 @@
  *
  */
 
+
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "FatalProgramException.h"
 

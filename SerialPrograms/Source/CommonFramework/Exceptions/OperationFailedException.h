@@ -8,11 +8,11 @@
 #define PokemonAutomation_OperationFailedException_H
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/Notifications/EventNotificationOption.h"
 
 namespace PokemonAutomation{
 
+class ProgramEnvironment;
+class EventNotificationOption;
 
 //  Thrown by subroutines if they fail for an in-game reason.
 //  These include recoverable errors which can be consumed by the program.

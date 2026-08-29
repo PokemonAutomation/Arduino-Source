@@ -9,19 +9,15 @@
 
 #include <memory>
 #include "CommonFramework/Tools/VideoStream.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "Common/Cpp/Exceptions.h"
 
 namespace PokemonAutomation{
 
 class ImageViewRGB32;
 class ImageRGB32;
-// class EventNotificationOption;
-// class VideoStream;
-// struct ProgramInfo;
-// class ProgramEnvironment;
+class EventNotificationOption;
+class VideoStream;
+class ProgramEnvironment;
 
 
 //  Thrown by subroutines if they fail for an in-game reason.
@@ -56,28 +52,13 @@ public:
         ErrorReport error_report,
         std::string message,
         VideoStream& stream
-    ){
-        throw_and_log<OperationFailedExceptionWithScreenshot>(
-            stream.logger(),
-            error_report,
-            std::move(message),
-            stream
-        );
-    }
+    );
     [[noreturn]] static void fire(
         ErrorReport error_report,
         std::string message,
         VideoStream& stream,
         std::shared_ptr<const ImageRGB32> screenshot
-    ){
-        throw_and_log<OperationFailedExceptionWithScreenshot>(
-            stream.logger(),
-            error_report,
-            std::move(message),
-            &stream,
-            std::move(screenshot)
-        );
-    }
+    );
 
     virtual const char* name() const override{ return "OperationFailedExceptionWithScreenshot"; }
     ImageViewRGB32 screenshot_view() const;

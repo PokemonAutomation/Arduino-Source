@@ -5,9 +5,10 @@
  */
 
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/Tools/VideoStream.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "CommonFramework/Notifications/EventNotificationOption.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "OperationFailedExceptionWithScreenshot.h"
 
 //#include <iostream>
@@ -51,6 +52,34 @@ OperationFailedExceptionWithScreenshot::OperationFailedExceptionWithScreenshot(
     , m_stream(stream)
     , m_screenshot(std::move(screenshot))
 {}
+
+
+[[noreturn]] void OperationFailedExceptionWithScreenshot::fire(
+    ErrorReport error_report,
+    std::string message,
+    VideoStream& stream
+){
+    throw_and_log<OperationFailedExceptionWithScreenshot>(
+        stream.logger(),
+        error_report,
+        std::move(message),
+        stream
+    );
+}
+[[noreturn]] void OperationFailedExceptionWithScreenshot::fire(
+    ErrorReport error_report,
+    std::string message,
+    VideoStream& stream,
+    std::shared_ptr<const ImageRGB32> screenshot
+){
+    throw_and_log<OperationFailedExceptionWithScreenshot>(
+        stream.logger(),
+        error_report,
+        std::move(message),
+        &stream,
+        std::move(screenshot)
+    );
+}
 
 
 

@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
+#include "CommonFramework/Tools/VideoStream.h"
 #include "MultiConsoleErrors.h"
 
 namespace PokemonAutomation{
