@@ -460,18 +460,6 @@ double VideoSession::fps_display() const{
     ReadSpinLock lg(m_fps_lock, PA_CURRENT_FUNCTION);
     return m_fps_tracker_rendered.events_per_second();
 }
-void VideoSession::on_frame(std::shared_ptr<const VideoFrame> frame){
-    m_frame_listeners.run_method(&VideoFrameListener::on_frame, frame);
-    {
-        WriteSpinLock lg(m_fps_lock, PA_CURRENT_FUNCTION);
-        m_fps_tracker_source.push_event(frame->timestamp);
-    }
-    global_watchdog().delay(*this);
-}
-void VideoSession::on_rendered_frame(WallClock timestamp){
-    WriteSpinLock lg(m_fps_lock, PA_CURRENT_FUNCTION);
-    m_fps_tracker_rendered.push_event(timestamp);
-}
 
 
 void VideoSession::on_watchdog_timeout(){
@@ -490,6 +478,20 @@ void VideoSession::on_watchdog_timeout(){
     }
 
     reset();
+}
+
+
+void VideoSession::on_frame(std::shared_ptr<const VideoFrame> frame){
+    m_frame_listeners.run_method(&VideoFrameListener::on_frame, frame);
+    {
+        WriteSpinLock lg(m_fps_lock, PA_CURRENT_FUNCTION);
+        m_fps_tracker_source.push_event(frame->timestamp);
+    }
+    global_watchdog().delay(*this);
+}
+void VideoSession::on_rendered_frame(WallClock timestamp){
+    WriteSpinLock lg(m_fps_lock, PA_CURRENT_FUNCTION);
+    m_fps_tracker_rendered.push_event(timestamp);
 }
 
 

@@ -41,7 +41,7 @@ QWidget* LabelImages::make_widget(QWidget& parent, PanelHolder& holder){
 
 
 LabelImages_Widget::~LabelImages_Widget(){
-    m_display_session.overlay().remove_mouse_listener(*this);
+    m_display_session.overlay().remove_hid_listener(*this);
     m_display_session.video_session().remove_state_listener(*this);
 
     delete m_image_display_widget;
@@ -55,7 +55,7 @@ LabelImages_Widget::LabelImages_Widget(
     , m_program(program)
     , m_display_session(m_program.m_display_session)
 {
-    m_display_session.overlay().add_mouse_listener(*this);
+    m_display_session.overlay().add_hid_listener(*this);
     m_display_session.video_session().add_state_listener(*this);
 
     m_embedding_info_label = new QLabel(this);
@@ -291,14 +291,14 @@ void LabelImages_Widget::key_press(QKeyEvent* event){
         m_shift_pressed = true;
         break;
     case Qt::Key::Key_Control:
-        #ifndef __APPLE__
+#ifndef __APPLE__
         m_control_pressed = true;
-        #endif
+#endif
         break;
     case Qt::Key::Key_Meta:
-        #if defined(__APPLE__)
+#if defined(__APPLE__)
         m_control_pressed = true;
-        #endif
+#endif
         break;
     default:;
     }
@@ -311,14 +311,14 @@ void LabelImages_Widget::key_release(QKeyEvent* event){
         m_shift_pressed = false;
         break;
     case Qt::Key::Key_Control:
-        #ifndef __APPLE__
+#ifndef __APPLE__
         m_control_pressed = false;
-        #endif
+#endif
         break;
     case Qt::Key::Key_Meta:
-        #if defined(__APPLE__)
+#if defined(__APPLE__)
         m_control_pressed = false;
-        #endif
+#endif
         break;
     case Qt::Key::Key_Delete:
     case Qt::Key::Key_Backspace:

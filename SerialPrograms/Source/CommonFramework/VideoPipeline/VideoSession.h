@@ -22,7 +22,7 @@ class VideoSession
     : public VideoFeed  // interface class the automation programs have access to to query video snapshots
                         // and reset the video source
     , private VideoFrameListener  // listens to incoming frames from video source
-    , private VideoSource::RenderedFrameListener  // listens to newly rendered frame from video source
+    , private VideoSource::RenderedFrameListener  // listens to frames rendered to the screen.
     , private WatchdogCallback
 {
 public:
@@ -186,6 +186,8 @@ public:
 
 
 private:
+    virtual void on_watchdog_timeout() override;
+
     //  Overwrites VideoFrameListener::on_frame()
     //  When this function is called, the VideoSession will update its internal fps record
     //  and call frame listeners added by VideoSession::add_frame_listener().
@@ -198,8 +200,6 @@ private:
     //  VideoSession can update its internal fps record.
     //  This function is thread-safe as it has a lock to prevent concurrent fps calls.
     virtual void on_rendered_frame(WallClock timestamp) override;
-
-    virtual void on_watchdog_timeout() override;
 
 
 private:

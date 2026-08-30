@@ -17,15 +17,38 @@ class QKeyEvent;
 
 namespace PokemonAutomation{
 
+
+
+class VideoDisplayHidListener{
+public:
+    virtual void on_focus_in(){}
+    virtual void on_focus_out(){}
+
+    virtual void on_mouse_press(double x, double y){}
+    virtual void on_mouse_release(double x, double y){}
+    virtual void on_mouse_move(double x, double y){}
+
+    virtual void on_key_press(void* key){}
+    virtual void on_key_release(void* key){}
+};
+
+
+
 // Interface to add overlay objects (e.g. bounding boxes and texts) on top of rendered
 // video stream
 // The implementation is in CommonFramework/VideoPipeline/VideoOverlaySession.h:VideoOverlaySession
 // The reason to create this interface is to reduce the header dependency on other code that relies
 // on the overlay.
-class VideoOverlay{
+class VideoOverlay : public VideoDisplayHidListener{
 public:
-    VideoOverlay();
-    virtual ~VideoOverlay();
+    virtual void add_hid_listener(VideoDisplayHidListener& listener) = 0;
+    virtual void remove_hid_listener(VideoDisplayHidListener& listener) = 0;
+
+
+public:
+//    VideoOverlay();
+    virtual ~VideoOverlay() = default;
+
 
 public:
     // Asychronously, add an inference box as part of the video overlay.
@@ -76,27 +99,6 @@ public:
 
     virtual void add_stat(OverlayStat& stat) = 0;
     virtual void remove_stat(OverlayStat& stat) = 0;
-
-
-public:
-    struct MouseListener{
-        virtual void on_mouse_press(double x, double y){}
-        virtual void on_mouse_release(double x, double y){}
-        virtual void on_mouse_move(double x, double y){}
-    };
-    void add_mouse_listener(MouseListener& listener);
-    void remove_mouse_listener(MouseListener& listener);
-    // Called by VideoDisplayWidget to call attached mouse listeners' on_mouse_press().
-    void issue_mouse_press(double x, double y);
-    // Called by VideoDisplayWidget to call attached mouse listeners' on_mouse_release().
-    void issue_mouse_release(double x, double y);
-    // Called by VideoDisplayWidget to call attached mouse listeners' on_mouse_move().
-    void issue_mouse_move(double x, double y);
-
-
-private:
-    struct Data;
-    Pimpl<Data> m_data;
 };
 
 

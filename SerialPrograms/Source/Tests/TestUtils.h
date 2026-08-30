@@ -86,6 +86,9 @@ public:
 
     virtual void add_stat(OverlayStat& stat) override{}
     virtual void remove_stat(OverlayStat& stat) override{}
+
+    virtual void add_hid_listener(VideoDisplayHidListener& listener) override{}
+    virtual void remove_hid_listener(VideoDisplayHidListener& listener) override{}
 };
 
 // Implement the dummy interface of AudioFeed so that we can test

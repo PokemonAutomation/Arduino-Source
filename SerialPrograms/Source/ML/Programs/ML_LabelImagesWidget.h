@@ -33,11 +33,13 @@ class ImageAnnotationDisplayWidget;
 class ImageAnnotationDisplaySession;
 
 
-class LabelImages_Widget : public PanelWidget,
-                           public ConfigOption::Listener,
-                           public VideoSession::StateListener,
-                           public CommandReceiver,
-                           public VideoOverlay::MouseListener{
+class LabelImages_Widget
+    : public PanelWidget
+    , public ConfigOption::Listener
+    , public VideoSession::StateListener
+    , public CommandReceiver
+    , public VideoDisplayHidListener
+{
 public:
     ~LabelImages_Widget();
     LabelImages_Widget(

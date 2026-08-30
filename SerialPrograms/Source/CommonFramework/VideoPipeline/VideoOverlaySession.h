@@ -35,7 +35,8 @@ namespace PokemonAutomation{
 //  asychronously add/remove objects to it.
 //  This class is not responsible for any UI. However, any changes made to this
 //  class will be forwarded to any UI components that are attached to it.
-class VideoOverlaySession : public VideoOverlay{
+class VideoOverlaySession : public VideoOverlay
+{
 public:
     static constexpr size_t LOG_MAX_LINES = 20;
 
@@ -68,9 +69,9 @@ public:
 
     //  Add a UI class to listen to any overlay change. The UI class needs to inherit Listener.
     //  Must call `remove_listener()` before listener is destroyed.
-    void add_listener(ContentListener& listener);
+    void add_content_listener(ContentListener& listener);
     //  Remove a UI class that listens to the overlay change, added by `add_listener()`.
-    void remove_listener(ContentListener& listener);
+    void remove_content_listener(ContentListener& listener);
 
 
 public:
@@ -130,6 +131,43 @@ public:
     virtual void remove_stat(OverlayStat& stat) override;
 
 
+public:
+    virtual void add_hid_listener(VideoDisplayHidListener& listener) override;
+    virtual void remove_hid_listener(VideoDisplayHidListener& listener) override;
+
+    virtual void on_focus_in() override;
+    virtual void on_focus_out() override;
+
+    virtual void on_mouse_press(double x, double y) override;
+    virtual void on_mouse_release(double x, double y) override;
+    virtual void on_mouse_move(double x, double y) override;
+
+    virtual void on_key_press(void* key) override;
+    virtual void on_key_release(void* key) override;
+
+    void report_focus_in(){
+        m_hid_listeners.run_method(&VideoDisplayHidListener::on_focus_in);
+    }
+    void report_focus_out(){
+        m_hid_listeners.run_method(&VideoDisplayHidListener::on_focus_out);
+    }
+    void report_mouse_press(double x, double y){
+        m_hid_listeners.run_method(&VideoDisplayHidListener::on_mouse_press, x, y);
+    }
+    void report_mouse_release(double x, double y){
+        m_hid_listeners.run_method(&VideoDisplayHidListener::on_mouse_release, x, y);
+    }
+    void report_mouse_move(double x, double y){
+        m_hid_listeners.run_method(&VideoDisplayHidListener::on_mouse_move, x, y);
+    }
+    void report_key_press(void* key){
+        m_hid_listeners.run_method(&VideoDisplayHidListener::on_key_press, key);
+    }
+    void report_key_release(void* key){
+        m_hid_listeners.run_method(&VideoDisplayHidListener::on_key_release, key);
+    }
+
+
 private:
     void stats_thread();
 
@@ -147,7 +185,8 @@ private:
 
     ListenerSet<OverlayStat> m_stats;
 
-    ListenerSet<ContentListener> m_listeners;
+    ListenerSet<ContentListener> m_content_listeners;
+    ListenerSet<VideoDisplayHidListener> m_hid_listeners;
 
     bool m_stopping = false;
     std::vector<OverlayStatSnapshot> m_stat_lines;

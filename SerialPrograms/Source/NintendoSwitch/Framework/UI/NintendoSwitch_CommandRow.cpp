@@ -27,7 +27,7 @@ namespace NintendoSwitch{
 CommandRow::~CommandRow(){
     global_input_remove_listener(*this);
     m_controller.remove_listener(*this);
-    m_session.remove_listener(*this);
+    m_session.remove_content_listener(*this);
 }
 CommandRow::CommandRow(
     QWidget& parent,
@@ -173,7 +173,7 @@ CommandRow::CommandRow(
         m_video_button->setToolTip("Please turn on Stream History to enable video capture.");
     }
 
-    m_session.add_listener(*this);
+    m_session.add_content_listener(*this);
     m_controller.add_listener(*this);
 //    global_input_add_listener(*this);
 }
@@ -201,8 +201,8 @@ void CommandRow::run_controller_input(ControllerInputState& state){
 void CommandRow::set_focus(bool focused){
     if (focused){
         global_input_add_listener(*this);
-        if (allow_controller_input()){
-        }
+//        if (allow_controller_input()){
+//        }
     }else{
         global_input_clear_state();
         global_input_remove_listener(*this);

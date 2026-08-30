@@ -25,9 +25,11 @@ public:
     static constexpr bool DEFAULT_ENABLE_LOG    = false;
     static constexpr bool DEFAULT_ENABLE_STATS  = true;
 
+
 public:
     ~VideoOverlayWidget();
     VideoOverlayWidget(QWidget& parent, VideoOverlaySession& session);
+
 
 private:
     void detach();
@@ -60,6 +62,13 @@ private:
     // render video overlay, override QWidget::paintEvent()
     virtual void paintEvent(QPaintEvent*) override;
 
+
+private:
+//    virtual void mousePressEvent(QMouseEvent* event) override;
+//    virtual void mouseReleaseEvent(QMouseEvent* event) override;
+//    virtual void mouseMoveEvent(QMouseEvent* event) override;
+
+
 private:
     // Call QWidget::update() to notify Qt to schedule a re-rendering of the overlay widget.
     //
@@ -79,6 +88,7 @@ private:
     void render_images (QPainter& painter);
     // render overlay log lines
     void render_log    (QPainter& painter);
+
 
 private:
     VideoOverlaySession& m_session;

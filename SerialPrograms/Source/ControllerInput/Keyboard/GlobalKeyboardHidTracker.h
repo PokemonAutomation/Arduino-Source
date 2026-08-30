@@ -29,7 +29,6 @@ public:
     KeyboardHidTracker();
 
     virtual void stop() noexcept override;
-
     virtual void clear_state() override;
 
     void on_key_press(const QKeyEvent& key);

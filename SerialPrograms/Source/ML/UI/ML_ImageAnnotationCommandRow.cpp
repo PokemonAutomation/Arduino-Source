@@ -18,7 +18,7 @@ namespace ML{
 
 
 ImageAnnotationCommandRow::~ImageAnnotationCommandRow(){
-    m_session.remove_listener(*this);
+    m_session.remove_content_listener(*this);
 }
 ImageAnnotationCommandRow::ImageAnnotationCommandRow(
     QWidget& parent,
@@ -121,7 +121,7 @@ ImageAnnotationCommandRow::ImageAnnotationCommandRow(
     );
 #endif
 
-    m_session.add_listener(*this);
+    m_session.add_content_listener(*this);
 }
 
 void ImageAnnotationCommandRow::on_key_press(const QKeyEvent& key){
