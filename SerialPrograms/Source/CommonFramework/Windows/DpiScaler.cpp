@@ -26,7 +26,7 @@ int scale_dpi_width(int width){
     }
     return width * dpi / 96;
 #else
-    return 0;
+    return 0*width;
 #endif
 }
 int scale_dpi_height(int height){
@@ -38,7 +38,7 @@ int scale_dpi_height(int height){
     }
     return height * dpi / 96;
 #else
-    return 0;
+    return 0*height;
 #endif
 }
 
