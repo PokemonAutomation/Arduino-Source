@@ -30,6 +30,10 @@ public:
     ~VideoOverlayWidget();
     VideoOverlayWidget(QWidget& parent, VideoOverlaySession& session);
 
+    VideoOverlaySession& session(){
+        return m_session;
+    }
+
 
 private:
     void detach();

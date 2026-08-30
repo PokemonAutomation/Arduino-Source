@@ -35,7 +35,7 @@ SwitchSystemSession::SwitchSystemSession(
     uint64_t program_id,
     size_t console_number
 )
-    : ConsoleSystemSession(global_logger_raw(), option, console_number)
+    : ConsoleSystemSession(global_logger_raw(), option, console_number, 1)
     , m_option(option)
 {
     m_console_id = ProgramTracker::instance().add_console(program_id, *this);

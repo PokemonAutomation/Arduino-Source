@@ -21,10 +21,12 @@
 #define PokemonAutomation_ConsoleInfra_ConsoleSystemSession_H
 
 #include "Common/Cpp/Logging/TaggedLogger.h"
+#include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
 #include "CommonFramework/VideoPipeline/VideoSession.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
 #include "CommonFramework/Recording/StreamHistorySession.h"
+#include "ControllerInput/ControllerInput.h"
 #include "Controllers/ControllerSession.h"
 #include "ConsoleSystemOption.h"
 
@@ -35,14 +37,18 @@ namespace PokemonAutomation{
 namespace ConsoleInfra{
 
 
-class ConsoleSystemSession{
+class ConsoleSystemSession
+    : private VideoDisplayHidListener
+    , private ControllerInputListener
+{
 public:
     virtual bool try_shutdown() noexcept;
     virtual ~ConsoleSystemSession();
     ConsoleSystemSession(
         Logger& logger,
         ConsoleSystemOption& option,
-        size_t console_number
+        size_t console_number,
+        size_t num_controllers
     );
 
 
@@ -58,7 +64,7 @@ public:
     const StreamHistorySession& stream_history() const{ return m_history; }
 
     size_t controllers() const{ return m_controllers.size(); }
-    ControllerSession& controller(size_t index) const{ return *m_controllers[index]; }
+    ControllerSession& controller(size_t index){ return m_controllers[index]; }
 
 
 public:
@@ -69,6 +75,16 @@ public:
 public:
     void set_allow_user_commands(const std::string& disallow_reason);
     void save_history(const std::string& filename);
+
+    void enable_global_input();
+    void disable_global_input();
+
+
+private:
+    virtual void on_focus_in() override;
+    virtual void on_focus_out() override;
+
+    virtual void run_controller_input(ControllerInputState& state) override;
 
 
 private:
@@ -81,9 +97,12 @@ private:
     VideoSession m_video;
     AudioSession m_audio;
     VideoOverlaySession m_overlay;
-    std::vector<std::unique_ptr<ControllerSession>> m_controllers;
+    FixedLimitVector<ControllerSession> m_controllers;
 
     StreamHistorySession m_history;
+
+    SpinLock m_lock;
+    bool m_enable_global_input;
 
     std::unique_ptr<MemoryUtilizationStats> m_memory_usage;
     std::unique_ptr<CpuUtilizationStat> m_cpu_utilization;

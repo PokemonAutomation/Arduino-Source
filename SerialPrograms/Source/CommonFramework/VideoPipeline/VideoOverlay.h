@@ -28,8 +28,8 @@ public:
     virtual void on_mouse_release(double x, double y){}
     virtual void on_mouse_move(double x, double y){}
 
-    virtual void on_key_press(void* key){}
-    virtual void on_key_release(void* key){}
+    virtual void on_key_press(const void* key){}
+    virtual void on_key_release(const void* key){}
 };
 
 

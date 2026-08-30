@@ -69,7 +69,6 @@ SwitchSystemWidget::SwitchSystemWidget(
         m_video_display = new VideoDisplayWidget(
             *this, *video_holder,
             m_session.console_number(),
-            *this,
             m_session.video(),
             m_session.overlay()
         );
@@ -202,43 +201,26 @@ void SwitchSystemWidget::update_ui(ProgramState state){
     m_command->on_state_changed(state);
 }
 
-void SwitchSystemWidget::key_press(QKeyEvent* event){
-//    cout << "press:   " << event->nativeVirtualKey() << endl;
-    global_keyboard_tracker().on_key_press(*event);
-}
 
-void SwitchSystemWidget::key_release(QKeyEvent* event){
-//    cout << "release: " << event->nativeVirtualKey() << endl;
-    global_keyboard_tracker().on_key_release(*event);
+void SwitchSystemWidget::focusInEvent(QFocusEvent* event){
+//    cout << "focusInEvent" << endl;
+    QWidget::focusInEvent(event);
+    m_session.overlay().report_focus_in();
 }
-
-void SwitchSystemWidget::focus_in(QFocusEvent* event){
-    m_command->set_focus(true);
+void SwitchSystemWidget::focusOutEvent(QFocusEvent* event){
+//    cout << "focusOutEvent" << endl;
+    QWidget::focusOutEvent(event);
+    m_session.overlay().report_focus_out();
 }
-
-void SwitchSystemWidget::focus_out(QFocusEvent* event){
-    m_command->set_focus(false);
-}
-
 void SwitchSystemWidget::keyPressEvent(QKeyEvent* event){
 //    cout << "SwitchSystemWidget::keyPressEvent()" << endl;
-    key_press(event);
+    m_session.overlay().report_key_press(event);
 //    QWidget::keyPressEvent(event);
 }
 void SwitchSystemWidget::keyReleaseEvent(QKeyEvent* event){
 //    cout << "SwitchSystemWidget::keyReleaseEvent()" << endl;
-    key_release(event);
+    m_session.overlay().report_key_release(event);
 //    QWidget::keyReleaseEvent(event);
-}
-void SwitchSystemWidget::focusInEvent(QFocusEvent* event){
-//    cout << "focusInEvent" << endl;
-    focus_in(event);
-    QWidget::focusInEvent(event);
-}
-void SwitchSystemWidget::focusOutEvent(QFocusEvent* event){
-//    cout << "focusOutEvent" << endl;
-    focus_out(event);
-    QWidget::focusOutEvent(event);
 }
 
 

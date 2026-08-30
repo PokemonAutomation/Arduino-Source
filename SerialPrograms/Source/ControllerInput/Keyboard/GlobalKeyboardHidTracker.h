@@ -18,8 +18,6 @@
 #include "KeyboardInput_State.h"
 #include "KeyboardInput_StateTracker.h"
 
-class QKeyEvent;
-
 namespace PokemonAutomation{
 
 
@@ -31,8 +29,8 @@ public:
     virtual void stop() noexcept override;
     virtual void clear_state() override;
 
-    void on_key_press(const QKeyEvent& key);
-    void on_key_release(const QKeyEvent& key);
+    void on_key_press(const void* key);
+    void on_key_release(const void* key);
 
 
 private:

@@ -17,9 +17,9 @@
 #include "CommonFramework/Panels/UI/PanelWidget.h"
 #include "CommonFramework/Panels/PanelTools.h"
 #include "CommonFramework/VideoPipeline/VideoSource.h"
-#include "CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h"
 #include "CommonFramework/VideoPipeline/VideoSession.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "ML/UI/ML_ImageAnnotationDisplayWidget.h"
 
 class QLabel;
 class QPushButton;
@@ -31,6 +31,7 @@ namespace ML{
 class LabelImages;
 class ImageAnnotationDisplayWidget;
 class ImageAnnotationDisplaySession;
+
 
 
 class LabelImages_Widget

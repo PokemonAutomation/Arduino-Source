@@ -174,6 +174,7 @@ CommandRow::CommandRow(
     }
 
     m_session.add_content_listener(*this);
+    m_session.add_hid_listener(*this);
     m_controller.add_listener(*this);
 //    global_input_add_listener(*this);
 }
@@ -198,26 +199,19 @@ void CommandRow::run_controller_input(ControllerInputState& state){
     }
     controller->run_controller_input(state);
 }
-void CommandRow::set_focus(bool focused){
-    if (focused){
-        global_input_add_listener(*this);
-//        if (allow_controller_input()){
-//        }
-    }else{
-        global_input_clear_state();
-        global_input_remove_listener(*this);
 
-        AbstractController* controller = m_controller.controller();
-        if (controller != nullptr && allow_controller_input()){
-            try{
-                controller->cancel_all_commands();
-            }catch (...){}
-        }
-    }
-    if (m_last_known_focus == focused){
+void CommandRow::on_focus_in(){
+    if (m_last_known_focus){
         return;
     }
-    m_last_known_focus = focused;
+    m_last_known_focus = true;
+    update_ui();
+}
+void CommandRow::on_focus_out(){
+    if (!m_last_known_focus){
+        return;
+    }
+    m_last_known_focus = false;
     update_ui();
 }
 

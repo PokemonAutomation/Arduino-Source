@@ -70,21 +70,23 @@ void KeyboardHidTracker::clear_state(){
     m_cv.notify_all();
 }
 
-void KeyboardHidTracker::on_key_press(const QKeyEvent& key){
-    QtKeyMap::instance().record(key);
+void KeyboardHidTracker::on_key_press(const void* key){
+    const QKeyEvent& qkey = *(const QKeyEvent*)key;
+    QtKeyMap::instance().record(qkey);
     {
         WriteSpinLock lg(m_state_lock);
-        m_state_tracker.press(key.nativeVirtualKey());
+        m_state_tracker.press(qkey.nativeVirtualKey());
     }
 
     std::lock_guard<Mutex> lg(m_sleep_lock);
     m_cv.notify_all();
 }
-void KeyboardHidTracker::on_key_release(const QKeyEvent& key){
-    QtKeyMap::instance().record(key);
+void KeyboardHidTracker::on_key_release(const void* key){
+    const QKeyEvent& qkey = *(const QKeyEvent*)key;
+    QtKeyMap::instance().record(qkey);
     {
         WriteSpinLock lg(m_state_lock);
-        m_state_tracker.release(key.nativeVirtualKey());
+        m_state_tracker.release(qkey.nativeVirtualKey());
     }
 
     std::lock_guard<Mutex> lg(m_sleep_lock);

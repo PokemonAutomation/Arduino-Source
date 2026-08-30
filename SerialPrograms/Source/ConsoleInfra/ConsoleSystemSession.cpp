@@ -5,10 +5,16 @@
  */
 
 #include "Common/Cpp/EarlyShutdown.h"
+#include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "CommonFramework/VideoPipeline/Stats/MemoryUtilizationStats.h"
 #include "CommonFramework/VideoPipeline/Stats/CpuUtilizationStats.h"
 #include "CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.h"
+#include "Controllers/NullController.h"
 #include "ConsoleSystemSession.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace ConsoleInfra{
@@ -41,7 +47,8 @@ ConsoleSystemSession::~ConsoleSystemSession(){
 ConsoleSystemSession::ConsoleSystemSession(
     Logger& logger,
     ConsoleSystemOption& option,
-    size_t console_number
+    size_t console_number,
+    size_t num_controllers
 )
     : m_console_number(console_number)
     , m_logger(logger, "Console " + std::to_string(console_number))
@@ -49,13 +56,15 @@ ConsoleSystemSession::ConsoleSystemSession(
     , m_video(m_logger, option.m_video)
     , m_audio(m_logger, option.m_audio)
     , m_overlay(m_logger, option.m_overlay)
+    , m_controllers(num_controllers)
     , m_history(m_logger)
+    , m_enable_global_input(false)
     , m_memory_usage(new MemoryUtilizationStats())
     , m_cpu_utilization(new CpuUtilizationStat())
     , m_main_thread_utilization(new ThreadUtilizationStat(current_thread_handle(), "Main Qt Thread:"))
 {
     for (ControllerOption& controller : option.m_controllers){
-        m_controllers.emplace_back(std::make_unique<ControllerSession>(m_logger, controller));
+        m_controllers.emplace_back(m_logger, controller);
     }
 
     m_history.start(m_audio.input_format(), m_video.current_source() != nullptr);
@@ -70,6 +79,8 @@ ConsoleSystemSession::ConsoleSystemSession(
         m_audio.add_stream_listener(m_history);
         m_video.add_state_listener(m_history);
         m_video.add_frame_listener(m_history);
+
+        m_overlay.add_hid_listener(*this);
     }catch (...){
         ConsoleSystemSession::try_shutdown();
         throw;
@@ -84,7 +95,7 @@ void ConsoleSystemSession::get(ConsoleSystemOption& option) const{
 
     option.m_controllers.resize(m_controllers.size());
     for (size_t c = 0; c < m_controllers.size(); c++){
-        m_controllers[c]->get(option.m_controllers[c]);
+        m_controllers[c].get(option.m_controllers[c]);
     }
 }
 void ConsoleSystemSession::set(const ConsoleSystemOption& option){
@@ -93,24 +104,80 @@ void ConsoleSystemSession::set(const ConsoleSystemOption& option){
     m_overlay.set(option.m_overlay);
 
     m_option.m_controllers.resize(option.m_controllers.size());
-    m_controllers.resize(option.m_controllers.size());
-    for (size_t c = 0; c < m_controllers.size(); c++){
-        std::unique_ptr<ControllerSession>& controller = m_controllers[c];
-        if (controller == nullptr){
-            controller = std::make_unique<ControllerSession>(m_logger, m_option.m_controllers[c]);
-        }else{
-            m_controllers[c]->set(option.m_controllers[c]);
+    size_t c = 0;
+    for (; c < option.m_controllers.size(); c++){
+        if (c >= m_controllers.size()){
+            return;
         }
+        m_controllers[c].set(option.m_controllers[c]);
+    }
+    for (; c < m_controllers.size(); c++){
+        m_controllers[c].set_device(std::make_shared<NullControllerDescriptor>());
     }
 }
 
 void ConsoleSystemSession::set_allow_user_commands(const std::string& disallow_reason){
-    for (std::unique_ptr<ControllerSession>& controller : m_controllers){
-        controller->set_user_input_blocked(disallow_reason);
+    for (ControllerSession& controller : m_controllers){
+        controller.set_user_input_blocked(disallow_reason);
     }
 }
 void ConsoleSystemSession::save_history(const std::string& filename){
     m_history.save(filename);
+}
+
+
+void ConsoleSystemSession::enable_global_input(){
+    WriteSpinLock lg(m_lock);
+    if (m_enable_global_input){
+        return;
+    }
+    m_enable_global_input = true;
+
+    global_input_add_listener(*this);
+}
+void ConsoleSystemSession::disable_global_input(){
+    WriteSpinLock lg(m_lock);
+    if (!m_enable_global_input){
+        return;
+    }
+    m_enable_global_input = false;
+
+    global_input_clear_state();
+    global_input_remove_listener(*this);
+
+    for (ControllerSession& controller : m_controllers){
+        std::string error = controller.try_run<AbstractController>([](AbstractController& controller){
+            controller.cancel_all_commands();
+        });
+        if (!error.empty()){
+            m_logger.log(error, COLOR_RED);
+        }
+    }
+}
+void ConsoleSystemSession::on_focus_in(){
+//    cout << "ConsoleSystemSession::on_focus_in()" << endl;
+    enable_global_input();
+}
+void ConsoleSystemSession::on_focus_out(){
+//    cout << "ConsoleSystemSession::on_focus_out()" << endl;
+    disable_global_input();
+}
+void ConsoleSystemSession::run_controller_input(ControllerInputState& state){
+    WriteSpinLock lg(m_lock);
+    if (!m_enable_global_input){
+        m_logger.log("Keyboard Command Suppressed: Not in focus.", COLOR_RED);
+        return;
+    }
+
+//    cout << "ConsoleSystemSession::run_controller_input()" << endl;
+    for (ControllerSession& controller : m_controllers){
+        std::string error = controller.try_run<AbstractController>([&](AbstractController& controller){
+            controller.run_controller_input(state);
+        });
+        if (!error.empty()){
+            m_logger.log(error, COLOR_RED);
+        }
+    }
 }
 
 

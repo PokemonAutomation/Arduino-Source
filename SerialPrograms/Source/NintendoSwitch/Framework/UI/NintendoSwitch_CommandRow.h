@@ -24,11 +24,12 @@ namespace NintendoSwitch{
 
 // UI that shows the checkerboxes to control whether to show video overlay elements.
 // e.g. checkerbox to toggle on/off overlay boxes
-class CommandRow :
-    public QWidget,
-    public VideoOverlaySession::ContentListener,
-    public ControllerSession::Listener,
-    public ControllerInputListener
+class CommandRow
+    : public QWidget
+    , public VideoOverlaySession::ContentListener
+    , public VideoDisplayHidListener
+    , public ControllerSession::Listener
+    , public ControllerInputListener
 {
     Q_OBJECT
 
@@ -49,7 +50,6 @@ signals:
     void video_requested();
 
 public:
-    void set_focus(bool focused);
     void update_ui();
     void on_state_changed(ProgramState state);
 
@@ -64,6 +64,9 @@ private:
     virtual void on_overlay_enabled_images (bool enabled) override;
     virtual void on_overlay_enabled_log    (bool enabled) override;
     virtual void ready_changed(bool ready) override;
+
+    virtual void on_focus_in() override;
+    virtual void on_focus_out() override;
 
 private:
     ControllerSession& m_controller;

@@ -25,14 +25,12 @@ namespace PokemonAutomation{
 VideoDisplayWidget::VideoDisplayWidget(
     QWidget& parent, QLayout& holder,
     size_t id,
-    CommandReceiver& command_receiver,
     VideoSession& video_session,
     VideoOverlaySession& overlay
 )
     : WidgetStackFixedAspectRatio(parent, WidgetStackFixedAspectRatio::ADJUST_HEIGHT_TO_WIDTH)
     , m_holder(holder)
     , m_id(id)
-    , m_command_receiver(command_receiver)
     , m_video_session(video_session)
     , m_overlay_session(overlay)
     , m_overlay(new VideoOverlayWidget(*this, overlay))

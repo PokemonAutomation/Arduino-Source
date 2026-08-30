@@ -88,27 +88,27 @@ void VideoDisplayWindow::keyPressEvent(QKeyEvent* event){
         return;
     }
     if (m_display_widget){
-        m_display_widget->command_receiver().key_press(event);
+        m_display_widget->overlay().session().report_key_press(event);
         return;
     }
     QWidget::keyPressEvent(event);
 }
 void VideoDisplayWindow::keyReleaseEvent(QKeyEvent* event){
     if (m_display_widget){
-        m_display_widget->command_receiver().key_release(event);
+        m_display_widget->overlay().session().report_key_release(event);
         return;
     }
     QWidget::keyReleaseEvent(event);
 }
 void VideoDisplayWindow::focusInEvent(QFocusEvent* event){
     if (m_display_widget){
-        m_display_widget->command_receiver().focus_in(event);
+        m_display_widget->overlay().session().report_focus_in();
     }
     QWidget::focusInEvent(event);
 }
 void VideoDisplayWindow::focusOutEvent(QFocusEvent* event){
     if (m_display_widget){
-        m_display_widget->command_receiver().focus_out(event);
+        m_display_widget->overlay().session().report_focus_out();
     }
     QWidget::focusOutEvent(event);
 }

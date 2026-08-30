@@ -35,8 +35,7 @@ namespace PokemonAutomation{
 //  asychronously add/remove objects to it.
 //  This class is not responsible for any UI. However, any changes made to this
 //  class will be forwarded to any UI components that are attached to it.
-class VideoOverlaySession : public VideoOverlay
-{
+class VideoOverlaySession : public VideoOverlay{
 public:
     static constexpr size_t LOG_MAX_LINES = 20;
 
@@ -135,16 +134,6 @@ public:
     virtual void add_hid_listener(VideoDisplayHidListener& listener) override;
     virtual void remove_hid_listener(VideoDisplayHidListener& listener) override;
 
-    virtual void on_focus_in() override;
-    virtual void on_focus_out() override;
-
-    virtual void on_mouse_press(double x, double y) override;
-    virtual void on_mouse_release(double x, double y) override;
-    virtual void on_mouse_move(double x, double y) override;
-
-    virtual void on_key_press(void* key) override;
-    virtual void on_key_release(void* key) override;
-
     void report_focus_in(){
         m_hid_listeners.run_method(&VideoDisplayHidListener::on_focus_in);
     }
@@ -160,12 +149,20 @@ public:
     void report_mouse_move(double x, double y){
         m_hid_listeners.run_method(&VideoDisplayHidListener::on_mouse_move, x, y);
     }
-    void report_key_press(void* key){
-        m_hid_listeners.run_method(&VideoDisplayHidListener::on_key_press, key);
-    }
-    void report_key_release(void* key){
-        m_hid_listeners.run_method(&VideoDisplayHidListener::on_key_release, key);
-    }
+    void report_key_press(const void* key);
+    void report_key_release(const void* key);
+
+
+private:
+    virtual void on_focus_in() override;
+    virtual void on_focus_out() override;
+
+    virtual void on_mouse_press(double x, double y) override;
+    virtual void on_mouse_release(double x, double y) override;
+    virtual void on_mouse_move(double x, double y) override;
+
+    virtual void on_key_press(const void* key) override;
+    virtual void on_key_release(const void* key) override;
 
 
 private:

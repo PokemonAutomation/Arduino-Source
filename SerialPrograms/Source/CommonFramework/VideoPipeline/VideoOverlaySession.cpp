@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "ControllerInput/Keyboard/GlobalKeyboardHidTracker.h"
 #include "VideoOverlaySession.h"
 
 //#include <iostream>
@@ -303,6 +304,17 @@ std::vector<OverlayLogLine> VideoOverlaySession::log_texts() const{
 
 
 
+
+void VideoOverlaySession::report_key_press(const void* key){
+    global_keyboard_tracker().on_key_press(key);
+    m_hid_listeners.run_method(&VideoDisplayHidListener::on_key_press, key);
+}
+void VideoOverlaySession::report_key_release(const void* key){
+    global_keyboard_tracker().on_key_release(key);
+    m_hid_listeners.run_method(&VideoDisplayHidListener::on_key_release, key);
+}
+
+
 void VideoOverlaySession::add_hid_listener(VideoDisplayHidListener& listener){
     m_hid_listeners.add(listener);
 }
@@ -324,10 +336,10 @@ void VideoOverlaySession::on_mouse_release(double x, double y){
 void VideoOverlaySession::on_mouse_move(double x, double y){
     m_hid_listeners.run_method(&VideoDisplayHidListener::on_mouse_move, x, y);
 }
-void VideoOverlaySession::on_key_press(void* key){
+void VideoOverlaySession::on_key_press(const void* key){
     m_hid_listeners.run_method(&VideoDisplayHidListener::on_key_press, key);
 }
-void VideoOverlaySession::on_key_release(void* key){
+void VideoOverlaySession::on_key_release(const void* key){
     m_hid_listeners.run_method(&VideoDisplayHidListener::on_key_release, key);
 }
 
