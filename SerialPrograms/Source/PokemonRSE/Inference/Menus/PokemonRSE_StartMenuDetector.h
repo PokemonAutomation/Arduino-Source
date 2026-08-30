@@ -21,23 +21,23 @@ namespace NintendoSwitch{
 namespace PokemonRSE{
 
 enum class StartMenuState {
-	PRE_POKEMON = 0,
-	PRE_POKEDEX = 1,
-	PRE_POKENAV = 2,
+    PRE_POKEMON = 0,
+    PRE_POKEDEX = 1,
+    PRE_POKENAV = 2,
     FULL = 3,
     SAFARI = 4,
 };
 
 enum class StartMenuSlot {
-	POKEDEX = 0,
-	POKEMON = 1,
-	BAG = 2,
-	POKENAV = 3,
-	TRAINER = 4,
-	SAVE = 5,
-	OPTION = 6,
-	EXIT = 7,
-	RETIRE = 8,
+    POKEDEX = 0,
+    POKEMON = 1,
+    BAG = 2,
+    POKENAV = 3,
+    TRAINER = 4,
+    SAVE = 5,
+    OPTION = 6,
+    EXIT = 7,
+    RETIRE = 8,
 };
 
 // Detect the full start menu by looking for empty white sections on the top and bottom
@@ -65,13 +65,13 @@ public:
 // Detect whether a specified slot is selected
 class StartMenuSlotDetector : public SelectionSlotDetector {
 public:
-	StartMenuSlotDetector(Color color, StartMenuSlot slot, StartMenuState state = StartMenuState::FULL);
+    StartMenuSlotDetector(Color color, StartMenuSlot slot, StartMenuState state = StartMenuState::FULL);
 };
 class StartMenuSlotWatcher : public DetectorToFinder<StartMenuSlotDetector> {
 public:
-	StartMenuSlotWatcher(Color color, StartMenuSlot slot, StartMenuState state = StartMenuState::FULL)
+    StartMenuSlotWatcher(Color color, StartMenuSlot slot, StartMenuState state = StartMenuState::FULL)
         : DetectorToFinder("StartMenuSlotWatcher", std::chrono::milliseconds(250), color, slot, state)
-	{}
+    {}
 };
 
 

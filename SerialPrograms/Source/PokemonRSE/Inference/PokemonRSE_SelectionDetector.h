@@ -34,8 +34,8 @@ constexpr double SELECTION_SLOT_OFFSETS[] = {
 };
 
 enum class SelectionIndicator {
-	ARROW,
-	BORDER,
+    ARROW,
+    BORDER,
 };
 
 struct SlotCandidate {
@@ -112,14 +112,14 @@ public:
 
 private:
     Color m_color;
-	std::vector<std::unique_ptr<StaticScreenDetector>> m_detectors;
+    std::vector<std::unique_ptr<StaticScreenDetector>> m_detectors;
 };
 class SelectionWatcher : public DetectorToFinder<SelectionSlotDetector> {
 public:
     SelectionWatcher(
         Color color,
         VideoOverlay* overlay,
-		const std::vector<SlotCandidate>& candidates,
+        const std::vector<SlotCandidate>& candidates,
         std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
     )
         : DetectorToFinder("SelectionWatcher", hold_duration, color, candidates)
