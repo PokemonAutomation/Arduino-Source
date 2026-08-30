@@ -23,9 +23,7 @@ public:
         m_options.add_option(option, std::move(serialization_string));
     }
 
-#ifdef QT_CORE_LIB
     virtual QWidget* make_widget(QWidget& parent, PanelHolder& holder) override;
-#endif
 
 public:
     //  Serialization

@@ -31,9 +31,8 @@ public:
 
 public:
     virtual void on_samples(const float* data, size_t frames) override;
-#ifdef QT_CORE_LIB
     virtual void on_frame(std::shared_ptr<const VideoFrame> frame) override;
-#endif
+
 public:
     virtual void pre_input_change() override;
     virtual void post_input_change(const std::string& file, const AudioDeviceInfo& device, AudioChannelFormat format) override;

@@ -4,10 +4,8 @@
  *
  */
 
-#ifdef QT_CORE_LIB
 #include <QDir>
 #include <QFile>
-#endif
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -40,22 +38,17 @@ PendingFileSend::~PendingFileSend(){
     if (m_extend_lifetime.load(std::memory_order_acquire)){
         return;
     }
-#ifdef QT_CORE_LIB
+
     QFile file(QString::fromStdString(m_filepath));
     file.remove();
-#endif
 }
 PendingFileSend::PendingFileSend(const std::string& file, bool keep_file)
     : m_keep_file(keep_file)
     , m_extend_lifetime(false)
     , m_filepath(file)
 {
-    #ifdef QT_CORE_LIB
     QFileInfo info(QString::fromStdString(file));
     m_filename = info.fileName().toStdString();
-    #else
-    m_filename = "";
-    #endif
 }
 PendingFileSend::PendingFileSend(Logger& logger, const ImageAttachment& image)
     : m_keep_file(image.keep_file)
@@ -87,9 +80,7 @@ PendingFileSend::PendingFileSend(Logger& logger, const ImageAttachment& image)
         m_filepath = SCREENSHOTS_PATH() + m_filename;
     }else{
         m_filepath = GlobalSettings::instance().TEMP_FOLDER;
-        #ifdef QT_CORE_LIB
         QDir().mkdir(QString::fromStdString(m_filepath));
-        #endif
         m_filepath += m_filename;
     }
 

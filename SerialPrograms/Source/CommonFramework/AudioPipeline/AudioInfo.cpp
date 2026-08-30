@@ -5,9 +5,7 @@
  */
 
 #include <map>
-#ifdef QT_CORE_LIB
 #include <QtGlobal>
-#endif
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/PrettyPrint.h"
@@ -21,7 +19,7 @@
 //using std::cout;
 //using std::endl;
 
-#ifdef QT_CORE_LIB
+
 #if QT_VERSION_MAJOR == 5
 #include <QAudioDeviceInfo>
 #elif QT_VERSION_MAJOR == 6
@@ -29,7 +27,6 @@
 #include <QMediaDevices>
 #else
 #error "Unsupported Qt version."
-#endif
 #endif
 
 
@@ -52,7 +49,6 @@ const char* AUDIO_FORMAT_LABELS[] = {
     "1 x 96,000 Hz (Interleaved Stereo R/L)",
 };
 
-#ifdef QT_CORE_LIB
 void set_format(QAudioFormat& native_format, AudioChannelFormat format){
     switch (format){
     case AudioChannelFormat::MONO_48000:
@@ -305,7 +301,7 @@ std::vector<AudioChannelFormat> supported_output_formats(int& preferred_index, c
 
     return ret;
 }
-#endif
+
 
 
 
@@ -528,7 +524,6 @@ const std::vector<AudioChannelFormat>& AudioDeviceInfo::supported_formats() cons
 int AudioDeviceInfo::preferred_format_index() const{
     return m_body->preferred_format_index;
 }
-#ifdef QT_CORE_LIB
 QAudioFormat AudioDeviceInfo::preferred_format() const{
     QAudioFormat format = native_info().preferredFormat();
     int index = preferred_format_index();
@@ -540,7 +535,6 @@ QAudioFormat AudioDeviceInfo::preferred_format() const{
 const NativeAudioInfo& AudioDeviceInfo::native_info() const{
     return m_body->info;
 }
-#endif
 bool AudioDeviceInfo::operator==(const AudioDeviceInfo& info) const{
     return device_name() == info.device_name();
 }

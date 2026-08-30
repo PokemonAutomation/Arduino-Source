@@ -4,10 +4,8 @@
  *
  */
 
-#ifdef QT_CORE_LIB
 #include <QFile>
 #include <QSaveFile>
-#endif
 #include "Common/Cpp/Time.h"
 #include "StatsDatabase.h"
 
@@ -137,16 +135,13 @@ std::string StatSet::to_str() const{
 }
 
 void StatSet::save_to_file(const std::string& filepath){
-    #ifdef QT_CORE_LIB
     QFile file(QString::fromStdString(filepath));
     if (file.open(QIODevice::WriteOnly)){
         std::string data = to_str();
         file.write(data.c_str(), data.size());
     }
-    #endif
 }
 void StatSet::open_from_file(const std::string& filepath){
-    #ifdef QT_CORE_LIB
     QFile file(QString::fromStdString(filepath));
     if (!file.open(QIODevice::ReadOnly)){
         return;
@@ -154,7 +149,6 @@ void StatSet::open_from_file(const std::string& filepath){
 
     std::string str = file.readAll().data();
     load_from_string(str.c_str());
-    #endif
 }
 
 bool StatSet::update_file(
@@ -162,7 +156,6 @@ bool StatSet::update_file(
     const std::string& identifier,
     StatsTracker& tracker
 ){
-    #ifdef QT_CORE_LIB
     QFile file(QString::fromStdString(filepath));
     while (!file.open(QIODevice::ReadWrite)){
         return false;
@@ -178,7 +171,6 @@ bool StatSet::update_file(
     file.seek(0);
     file.write(data.c_str(), data.size());
     file.resize(data.size());
-    #endif
 
     return true;
 }

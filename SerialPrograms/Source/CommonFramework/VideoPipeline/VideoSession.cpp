@@ -8,9 +8,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/GlobalServices.h"
 #include "CommonFramework/VideoPipeline/VideoPipelineOptions.h"
-#ifdef QT_CORE_LIB
 #include "Backends/VideoFrameQt.h"
-#endif
 #include "VideoSources/VideoSource_Null.h"
 #include "VideoSession.h"
 
@@ -487,7 +485,7 @@ void VideoSession::on_watchdog_timeout(){
     reset();
 }
 
-#ifdef QT_CORE_LIB
+
 void VideoSession::on_frame(std::shared_ptr<const VideoFrame> frame){
     m_frame_listeners.run_method(&VideoFrameListener::on_frame, frame);
     {
@@ -496,7 +494,6 @@ void VideoSession::on_frame(std::shared_ptr<const VideoFrame> frame){
     }
     global_watchdog().delay(*this);
 }
-#endif
 void VideoSession::on_rendered_frame(WallClock timestamp){
     WriteSpinLock lg(m_fps_lock, PA_CURRENT_FUNCTION);
     m_fps_tracker_rendered.push_event(timestamp);

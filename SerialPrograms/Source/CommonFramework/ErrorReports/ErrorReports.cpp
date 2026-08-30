@@ -5,10 +5,8 @@
  */
 
 #include <iostream>
-#ifdef QT_CORE_LIB
 #include <QDir>
 #include <QMessageBox>
-#endif
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
 #include "Common/Cpp/Logging/LastLogTracker.h"
@@ -115,9 +113,7 @@ SendableErrorReport::SendableErrorReport()
     , m_program_runtime_millis(0)
     , m_dump_name(ERROR_DUMP_NAME)
 {
-#ifdef QT_CORE_LIB
     QDir().mkpath(QString::fromStdString(m_directory));
-#endif
 }
 SendableErrorReport::SendableErrorReport(
     Logger* logger,
@@ -147,7 +143,6 @@ SendableErrorReport::SendableErrorReport(
             log += line.text;
             log += "\r\n";
         }
-    #ifdef QT_CORE_LIB
         QFile file(QString::fromStdString(m_directory + ERROR_LOGS_NAME));
         bool exists = file.exists();
         if (file.open(QIODevice::WriteOnly)){
@@ -158,7 +153,6 @@ SendableErrorReport::SendableErrorReport(
             file.write(log.c_str());
             file.flush();
         }
-    #endif
         m_logs_name = ERROR_LOGS_NAME;
     }
     if (stream_history){
@@ -299,7 +293,6 @@ void SendableErrorReport::save_report_json(Logger* logger) const{
 
 void SendableErrorReport::move_to_sent(){
 //    cout << "move_to_sent()" << endl;
-#ifdef QT_CORE_LIB
     QDir().mkdir(QString::fromStdString(ERROR_PATH_SENT));
 
     std::string new_directory = ERROR_PATH_SENT + "/" + m_timestamp + "/";
@@ -315,13 +308,11 @@ void SendableErrorReport::move_to_sent(){
         global_logger_tagged().log("Unable to move error report " + m_timestamp + ".", COLOR_RED);
     }
     m_directory = std::move(new_directory);
-#endif
 }
 
 
 std::vector<std::string> SendableErrorReport::get_pending_reports(){
     std::vector<std::string> ret;
-#ifdef QT_CORE_LIB
     QDir dir(QString::fromStdString(ERROR_PATH_UNSENT));
     dir.setFilter(QDir::Filter::AllDirs);
     QFileInfoList list = dir.entryInfoList();
@@ -332,7 +323,6 @@ std::vector<std::string> SendableErrorReport::get_pending_reports(){
         }
         ret.emplace_back(std::move(path));
     }
-#endif
     return ret;
 }
 

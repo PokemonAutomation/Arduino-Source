@@ -95,7 +95,7 @@ void DownloadThread::run_download(DownloadedResourceMetadata resource_metadata){
 
     std::string url = resource_metadata.url;
     std::string resource_name = resource_metadata.resource_name;
-    [[maybe_unused]] uint64_t expected_size = resource_metadata.size_compressed_bytes;
+    uint64_t expected_size = resource_metadata.size_compressed_bytes;
 
     std::string resource_directory = DOWNLOADED_RESOURCE_PATH() + resource_name;
     try{
@@ -105,7 +105,6 @@ void DownloadThread::run_download(DownloadedResourceMetadata resource_metadata){
 
         // download
         std::string zip_path = resource_directory + "/temp.zip";
-        #ifdef QT_CORE_LIB
         FileDownloader::download_file_to_disk(
             *this,
             logger, 
@@ -116,7 +115,6 @@ void DownloadThread::run_download(DownloadedResourceMetadata resource_metadata){
                 m_hooks.report_download_progress(bytes_done, total_bytes);
             }
         );
-        #endif
 
         // hash
         std::string hash = 

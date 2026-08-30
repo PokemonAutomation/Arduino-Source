@@ -7,9 +7,7 @@
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonFramework/GlobalServices.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#ifdef QT_CORE_LIB
 #include "Backends/AudioPassthroughPairQtThread.h"
-#endif
 #include "AudioPipelineOptions.h"
 #include "AudioSession.h"
 
@@ -48,11 +46,7 @@ void AudioSession::remove_spectrum_listener(AudioSpectrumHolder::Listener& liste
 AudioSession::AudioSession(Logger& logger, AudioOption& option)
      : m_logger(logger)
      , m_option(option)
-    #ifdef QT_CORE_LIB
      , m_devices(new AudioPassthroughPairQtThread(logger))
-    #else
-     , m_devices(new AudioPassthroughPair())
-    #endif
 {
     AudioSession::reset();
     m_devices->add_listener(*this);

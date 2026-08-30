@@ -11,9 +11,7 @@
 #include "VideoSourceDescriptor.h"
 
 #include "VideoSources/VideoSource_Null.h"
-#ifdef QT_CORE_LIB
 #include "VideoSources/VideoSource_StillImage.h"
-#endif
 #include "VideoSources/VideoSource_Camera.h"
 
 //#include <iostream>
@@ -54,9 +52,7 @@ std::shared_ptr<VideoSourceDescriptor> VideoSourceOption::get_descriptor_from_ca
         descriptor.reset(new VideoSourceDescriptor_Null());
         break;
     case VideoSourceType::StillImage:
-    #ifdef QT_CORE_LIB
         descriptor.reset(new VideoSourceDescriptor_StillImage());
-    #endif
         break;
     case VideoSourceType::Camera:
         descriptor.reset(new VideoSourceDescriptor_Camera());
@@ -126,11 +122,9 @@ void VideoSourceOption::load_json(const JsonValue& json){
         const JsonValue* params;
         params = obj->get_value(VIDEO_TYPE_STRINGS.get_string(VideoSourceType::StillImage));
         if (params != nullptr){
-            #ifdef QT_CORE_LIB
             auto x = std::make_unique<VideoSourceDescriptor_StillImage>();
             x->load_json(*params);
             m_descriptor_cache[VideoSourceType::StillImage] = std::move(x);
-            #endif
         }
         params = obj->get_value(VIDEO_TYPE_STRINGS.get_string(VideoSourceType::VideoPlayback));
         if (params != nullptr){

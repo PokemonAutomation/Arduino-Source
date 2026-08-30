@@ -297,13 +297,8 @@ RequiredResourceResult ProgramSession::find_missing_resources(){
             continue;
         case ResourceVersionStatus::OUTDATED:
         case ResourceVersionStatus::NOT_APPLICABLE:{
-        
             // we don't have the resource. check remote to see if correct version is available.
-            #ifdef QT_CORE_LIB
             DownloadedResourceMetadata remote_resource = get_remote_resource_metadata_from_resource_slug(resource_type);
-            #else
-            DownloadedResourceMetadata remote_resource = DownloadedResourceMetadata{};  // placeholder when no Qt
-            #endif
             DownloadedResourceMetadata expected_resource = get_expected_resource_metadata_from_resource_slug(resource_type);
             uint16_t expected_version_num = expected_resource.version_num.value();
             uint16_t remote_version_num = remote_resource.version_num.value();

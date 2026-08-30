@@ -5,13 +5,11 @@
  */
 
 #include <deque>
-#ifdef QT_CORE_LIB
 #include <QString>
 #include <QFile>
 #include <QHttpMultiPart>
 #include <QEventLoop>
 #include <QNetworkAccessManager>
-#endif
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
 #include "Common/Cpp/Json/JsonArray.h"
@@ -31,7 +29,7 @@ namespace Integration{
 namespace DiscordWebhook{
 
 
-#ifdef QT_CORE_LIB
+
 DiscordWebhookSender::DiscordWebhookSender()
     : m_logger(global_logger_raw(), "DiscordWebhookSender")
     , m_stopping(false)
@@ -258,7 +256,7 @@ void DiscordWebhookSender::internal_send(
     std::lock_guard<Mutex> lg(m_send_lock);
     m_event_loop.reset();
 }
-#endif
+
 
 
 void send_embed(
@@ -297,7 +295,7 @@ void send_embed(
         if (!embeds.empty()){
             json["embeds"] = embeds.clone();
         }
-        #ifdef QT_CORE_LIB
+
         DiscordWebhookSender::instance().send(
             logger,
             QString::fromStdString(url.url),
@@ -305,7 +303,6 @@ void send_embed(
             std::move(json),
             file
         );
-        #endif
     }
 }
 
@@ -345,7 +342,7 @@ void send_embed(
         if (!embeds.empty()){
             json["embeds"] = embeds.clone();
         }
-        #ifdef QT_CORE_LIB
+
         DiscordWebhookSender::instance().send(
             logger,
             QString::fromStdString(url.url),
@@ -353,7 +350,6 @@ void send_embed(
             std::move(json),
             files
         );
-        #endif
     }
 }
 

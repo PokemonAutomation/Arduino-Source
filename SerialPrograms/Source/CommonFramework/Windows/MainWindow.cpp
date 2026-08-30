@@ -5,7 +5,6 @@
  */
 
 #include <QMenuBar>
-#include <QScreen>
 //#include <QStatusBar>
 #include <QHBoxLayout>
 #include <QVBoxLayout>

@@ -8,9 +8,7 @@
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#ifdef QT_CORE_LIB
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
-#endif
 #include "CommonFramework/Recording/StreamHistoryOption.h"
 
 #if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
@@ -100,8 +98,6 @@ void StreamHistorySession::on_samples(const float* samples, size_t frames){
         data.m_current->on_samples(samples, frames);
     }
 }
-
-#ifdef QT_CORE_LIB
 void StreamHistorySession::on_frame(std::shared_ptr<const VideoFrame> frame){
     Data& data = *m_data;
     WriteSpinLock lg(data.m_lock);
@@ -109,7 +105,6 @@ void StreamHistorySession::on_frame(std::shared_ptr<const VideoFrame> frame){
         data.m_current->on_frame(std::move(frame));
     }
 }
-#endif
 
 
 void StreamHistorySession::clear(){
