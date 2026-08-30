@@ -158,7 +158,8 @@ void TestDatabaseGenerator::program(
     for (const Filesystem::Path& path : screenshots){
         try{
             ImageRGB32 image(path.string());
-            ImageFloatBox box(0.463, 0.09, 0.04, 0.06);
+            ImageFloatBox arrow_box(0.021, 0.073, 0.47, 0.72);
+            ImageFloatBox button_box(0.100, 0.956, 0.107, 0.041);
 
             SummaryReader summary_reader;
             const int dex_number = summary_reader.read_national_dex(env.console, image);
@@ -171,11 +172,11 @@ void TestDatabaseGenerator::program(
             SummaryScreenDetector summary_detector(&env.console.overlay());
             ShinyDetector shiny_detector(COLOR_RED, &env.console.overlay());
             AlphaDetector alpha_detector(COLOR_RED, &env.console.overlay());
-            GigantamaxDetector gigantamax_detector(COLOR_RED, &env.console.overlay(), box);
-            SelectionArrowDetector right_arrow_detector(COLOR_RED, &env.console.overlay(), SelectionArrowType::RIGHT, box);
-            SelectionArrowDetector down_arrow_detector(COLOR_RED, &env.console.overlay(), SelectionArrowType::DOWN, box);
-            ButtonDetector b_detector(COLOR_RED, ButtonType::ButtonB, ImageFloatBox(0.100, 0.956, 0.107, 0.041), &env.console.overlay());
-            ButtonDetector plus_detector(COLOR_RED, ButtonType::ButtonPlus, ImageFloatBox(0.100, 0.956, 0.107, 0.041), &env.console.overlay());
+            GigantamaxDetector gigantamax_detector(COLOR_RED, &env.console.overlay());
+            SelectionArrowDetector right_arrow_detector(COLOR_RED, &env.console.overlay(), SelectionArrowType::RIGHT, arrow_box);
+            SelectionArrowDetector down_arrow_detector(COLOR_RED, &env.console.overlay(), SelectionArrowType::DOWN, arrow_box);
+            ButtonDetector b_detector(COLOR_RED, ButtonType::ButtonB, button_box, &env.console.overlay());
+            ButtonDetector plus_detector(COLOR_RED, ButtonType::ButtonPlus, button_box, &env.console.overlay());
             BallReader ball_reader(env.console);
             OriginMarkReader origin_reader;
 
@@ -190,7 +191,7 @@ void TestDatabaseGenerator::program(
             const bool button_plus = plus_detector.detect(image);
             const std::string ball = ball_reader.read_ball(image);
             const Pokemon::StatsHuntGenderFilter gender = BoxGenderDetector::detect(image);
-            const Pokemon::PokemonTeraType tera_type = read_pokemon_tera_type(image, box);
+            const Pokemon::PokemonTeraType tera_type = read_pokemon_tera_type(image, { 0.463, 0.09, 0.04, 0.06 });
             const Pokemon::OriginMark origin = origin_reader.read_mark(image);
 
             std::string renamed_path;

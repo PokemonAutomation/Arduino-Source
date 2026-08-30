@@ -133,15 +133,21 @@ std::string SummaryReader::read_ability(Language language, const ImageViewRGB32&
 
 // Due to the position of the level changing slightly depending on digits and language. The box contains the "Lv" text and the level number.
 int SummaryReader::read_level(Logger& logger, const ImageViewRGB32& screen) const{
-    std::string text = read_text(Language::English, screen, m_level_box, gray_text_filters());
-    size_t pos = text.find('v');
+    try{
+        std::string text = read_text(Language::English, screen, m_level_box, gray_text_filters());
+        size_t pos = text.find('v');
 
-    if (pos != std::string::npos){
-        std::string level = text.substr(pos + 1);
-        return std::stoi(level);
+        if (pos != std::string::npos){
+            std::string level = text.substr(pos + 1);
+            return std::stoi(level);
+        }
+
+        return std::stoi(text.c_str());
     }
-
-    return std::stoi(text.c_str());
+    catch (const std::exception&){
+        logger.log("Failed to read level from summary screen.", COLOR_RED);
+        return -1;
+    }
 }
 
 class Test_SummaryReader_Numbers : public UnitTest{
