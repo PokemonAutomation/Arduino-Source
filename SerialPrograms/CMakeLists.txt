@@ -522,6 +522,14 @@ else() # macOS and Linux
             ${REPO_ROOT_DIR}/3rdParty/sdbus-cpp/lib/libsdbus-c++.a
             systemd #sdbus-c++ relies on libsystemd, almost all distros should have this
         )
+
+        target_include_directories(CoreLib PRIVATE
+            ${REPO_ROOT_DIR}/3rdParty/sdbus-cpp/include
+        )
+        target_link_libraries(CoreLib PRIVATE
+            ${REPO_ROOT_DIR}/3rdParty/sdbus-cpp/lib/libsdbus-c++.a
+            systemd #sdbus-c++ relies on libsystemd, almost all distros should have this
+        )
     endif() # end Linux
 
     # Find OpenCV
