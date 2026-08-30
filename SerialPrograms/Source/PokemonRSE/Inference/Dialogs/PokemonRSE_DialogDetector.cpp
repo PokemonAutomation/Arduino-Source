@@ -203,7 +203,6 @@ bool SelectionDialogDetector::detect(const ImageViewRGB32& screen){
 
 
 static std::vector<SlotCandidate> confirm_candidates(ConfirmSlot slot, ConfirmPosition position) {
-    std::vector<SlotCandidate> candidates;
 	double offset = SELECTION_SLOT_OFFSETS[(int)slot];
 
 	switch (position) {
