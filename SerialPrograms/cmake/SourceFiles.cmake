@@ -776,6 +776,8 @@ file(GLOB LIBRARY_SOURCES
     Source/ComputerPrograms/Framework/ComputerProgramSession.h
     Source/ComputerPrograms/Framework/ComputerProgramWidget.cpp
     Source/ComputerPrograms/Framework/ComputerProgramWidget.h
+    Source/ConsoleInfra/CommandRowWidget.cpp
+    Source/ConsoleInfra/CommandRowWidget.h
     Source/ConsoleInfra/ConsoleSystemOption.cpp
     Source/ConsoleInfra/ConsoleSystemOption.h
     Source/ConsoleInfra/ConsoleSystemSession.cpp

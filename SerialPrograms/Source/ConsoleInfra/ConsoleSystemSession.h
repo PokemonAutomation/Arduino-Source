@@ -42,6 +42,20 @@ class ConsoleSystemSession
     , private ControllerInputListener
 {
 public:
+    struct Listener{
+        virtual void on_lock_controllers(){}
+        virtual void on_unlock_controllers(){}
+    };
+
+    void add_listener(Listener& listener){
+        m_listeners.add(listener);
+    }
+    void remove_listener(Listener& listener){
+        m_listeners.remove(listener);
+    }
+
+
+public:
     virtual bool try_shutdown() noexcept;
     virtual ~ConsoleSystemSession();
     ConsoleSystemSession(
@@ -68,16 +82,14 @@ public:
 
 
 public:
-    virtual void get(ConsoleSystemOption& option) const;
-    virtual void set(const ConsoleSystemOption& option);
+    virtual void save(ConsoleSystemOption& option) const;
+    virtual void load(const ConsoleSystemOption& option);
 
 
 public:
-    void set_allow_user_commands(const std::string& disallow_reason);
+    void lock_controllers(std::string reason);
+    void unlock_controllers();
     void save_history(const std::string& filename);
-
-    void enable_global_input();
-    void disable_global_input();
 
 
 private:
@@ -101,12 +113,15 @@ private:
 
     StreamHistorySession m_history;
 
-    SpinLock m_lock;
-    bool m_enable_global_input;
+    mutable Mutex m_lock;
+    std::string m_lock_controllers_reason;
+    bool m_focused = false;
 
     std::unique_ptr<MemoryUtilizationStats> m_memory_usage;
     std::unique_ptr<CpuUtilizationStat> m_cpu_utilization;
     std::unique_ptr<ThreadUtilizationStat> m_main_thread_utilization;
+
+    ListenerSet<Listener> m_listeners;
 };
 
 

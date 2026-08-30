@@ -41,7 +41,7 @@ VideoOverlaySession::VideoOverlaySession(Logger& logger, VideoOverlayOption& opt
 {}
 
 
-void VideoOverlaySession::get(VideoOverlayOption& option) const{
+void VideoOverlaySession::save(VideoOverlayOption& option) const{
     bool stats = m_option.stats.load(std::memory_order_relaxed);
     bool boxes = m_option.boxes.load(std::memory_order_relaxed);
     bool text = m_option.text.load(std::memory_order_relaxed);
@@ -53,7 +53,7 @@ void VideoOverlaySession::get(VideoOverlayOption& option) const{
     option.log.store(log, std::memory_order_relaxed);
     option.stats.store(stats, std::memory_order_relaxed);
 }
-void VideoOverlaySession::set(const VideoOverlayOption& option){
+void VideoOverlaySession::load(const VideoOverlayOption& option){
     bool stats = option.stats.load(std::memory_order_relaxed);
     bool boxes = option.boxes.load(std::memory_order_relaxed);
     bool text = option.text.load(std::memory_order_relaxed);

@@ -58,7 +58,6 @@ ConsoleSystemSession::ConsoleSystemSession(
     , m_overlay(m_logger, option.m_overlay)
     , m_controllers(num_controllers)
     , m_history(m_logger)
-    , m_enable_global_input(false)
     , m_memory_usage(new MemoryUtilizationStats())
     , m_cpu_utilization(new CpuUtilizationStat())
     , m_main_thread_utilization(new ThreadUtilizationStat(current_thread_handle(), "Main Qt Thread:"))
@@ -88,20 +87,24 @@ ConsoleSystemSession::ConsoleSystemSession(
 }
 
 
-void ConsoleSystemSession::get(ConsoleSystemOption& option) const{
-    m_video.get(option.m_video);
-    m_audio.get(option.m_audio);
-    m_overlay.get(option.m_overlay);
+void ConsoleSystemSession::save(ConsoleSystemOption& option) const{
+    std::lock_guard<Mutex> lg(m_lock);
+
+    m_video.save(option.m_video);
+    m_audio.save(option.m_audio);
+    m_overlay.save(option.m_overlay);
 
     option.m_controllers.resize(m_controllers.size());
     for (size_t c = 0; c < m_controllers.size(); c++){
-        m_controllers[c].get(option.m_controllers[c]);
+        m_controllers[c].save(option.m_controllers[c]);
     }
 }
-void ConsoleSystemSession::set(const ConsoleSystemOption& option){
-    m_video.set(option.m_video);
-    m_audio.set(option.m_audio);
-    m_overlay.set(option.m_overlay);
+void ConsoleSystemSession::load(const ConsoleSystemOption& option){
+    std::lock_guard<Mutex> lg(m_lock);
+
+    m_video.load(option.m_video);
+    m_audio.load(option.m_audio);
+    m_overlay.load(option.m_overlay);
 
     m_option.m_controllers.resize(option.m_controllers.size());
     size_t c = 0;
@@ -109,38 +112,60 @@ void ConsoleSystemSession::set(const ConsoleSystemOption& option){
         if (c >= m_controllers.size()){
             return;
         }
-        m_controllers[c].set(option.m_controllers[c]);
+        m_controllers[c].load(option.m_controllers[c]);
     }
     for (; c < m_controllers.size(); c++){
         m_controllers[c].set_device(std::make_shared<NullControllerDescriptor>());
     }
 }
 
-void ConsoleSystemSession::set_allow_user_commands(const std::string& disallow_reason){
-    for (ControllerSession& controller : m_controllers){
-        controller.set_user_input_blocked(disallow_reason);
+
+void ConsoleSystemSession::lock_controllers(std::string reason){
+    {
+        std::lock_guard<Mutex> lg(m_lock);
+        m_lock_controllers_reason = std::move(reason);
+        for (ControllerSession& controller : m_controllers){
+            controller.set_options_locked(true);
+        }
     }
+    m_listeners.run_method(&Listener::on_lock_controllers);
+}
+void ConsoleSystemSession::unlock_controllers(){
+    {
+        std::lock_guard<Mutex> lg(m_lock);
+        m_lock_controllers_reason.clear();
+        global_input_clear_state();
+        for (ControllerSession& controller : m_controllers){
+            controller.set_options_locked(false);
+        }
+    }
+    m_listeners.run_method(&Listener::on_unlock_controllers);
 }
 void ConsoleSystemSession::save_history(const std::string& filename){
     m_history.save(filename);
 }
 
 
-void ConsoleSystemSession::enable_global_input(){
-    WriteSpinLock lg(m_lock);
-    if (m_enable_global_input){
+void ConsoleSystemSession::on_focus_in(){
+//    cout << "ConsoleSystemSession::on_focus_in()" << endl;
+    std::lock_guard<Mutex> lg(m_lock);
+    if (m_focused){
         return;
     }
-    m_enable_global_input = true;
+    m_focused = true;
 
     global_input_add_listener(*this);
 }
-void ConsoleSystemSession::disable_global_input(){
-    WriteSpinLock lg(m_lock);
-    if (!m_enable_global_input){
+void ConsoleSystemSession::on_focus_out(){
+//    cout << "ConsoleSystemSession::on_focus_out()" << endl;
+    std::lock_guard<Mutex> lg(m_lock);
+    if (!m_focused){
         return;
     }
-    m_enable_global_input = false;
+    m_focused = false;
+    if (!m_lock_controllers_reason.empty() && !allow_commands_while_running()){
+        return;
+    }
 
     global_input_clear_state();
     global_input_remove_listener(*this);
@@ -154,18 +179,14 @@ void ConsoleSystemSession::disable_global_input(){
         }
     }
 }
-void ConsoleSystemSession::on_focus_in(){
-//    cout << "ConsoleSystemSession::on_focus_in()" << endl;
-    enable_global_input();
-}
-void ConsoleSystemSession::on_focus_out(){
-//    cout << "ConsoleSystemSession::on_focus_out()" << endl;
-    disable_global_input();
-}
 void ConsoleSystemSession::run_controller_input(ControllerInputState& state){
-    WriteSpinLock lg(m_lock);
-    if (!m_enable_global_input){
+    std::lock_guard<Mutex> lg(m_lock);
+    if (!m_focused){
         m_logger.log("Keyboard Command Suppressed: Not in focus.", COLOR_RED);
+        return;
+    }
+    if (!m_lock_controllers_reason.empty() && !allow_commands_while_running()){
+        m_logger.log("Keyboard Command Suppressed: " + m_lock_controllers_reason, COLOR_RED);
         return;
     }
 
@@ -175,7 +196,7 @@ void ConsoleSystemSession::run_controller_input(ControllerInputState& state){
             controller.run_controller_input(state);
         });
         if (!error.empty()){
-            m_logger.log(error, COLOR_RED);
+            m_logger.log("Keyboard Command Failed: " + error, COLOR_RED);
         }
     }
 }

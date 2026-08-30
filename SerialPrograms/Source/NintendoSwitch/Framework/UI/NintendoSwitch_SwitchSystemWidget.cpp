@@ -8,17 +8,12 @@
 #include <QVBoxLayout>
 #include <QGroupBox>
 #include <QFileDialog>
-#include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/Concurrency/FireForgetDispatcher.h"
-#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/AudioPipeline/UI/AudioSelectorWidget.h"
 #include "CommonFramework/AudioPipeline/UI/AudioDisplayWidget.h"
 #include "CommonFramework/VideoPipeline/UI/VideoSourceSelectorWidget.h"
 #include "CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h"
-#include "ControllerInput/Keyboard/GlobalKeyboardHidTracker.h"
 #include "Controllers/ControllerSelectorWidget.h"
 #include "NintendoSwitch_CommandRow.h"
 #include "NintendoSwitch_SwitchSystemWidget.h"
@@ -104,8 +99,7 @@ SwitchSystemWidget::SwitchSystemWidget(
 
         m_command = new CommandRow(
             *widget,
-            m_session.controller(),
-            m_session.overlay(),
+            m_session,
             m_session.console_type(),
             m_session.allow_commands_while_running()
         );
@@ -121,82 +115,14 @@ SwitchSystemWidget::SwitchSystemWidget(
 //            m_command->update_ui();
 //        }
 //    );
-    connect(
-        m_command, &CommandRow::load_profile,
-        m_command, [this](){
-            std::string path = QFileDialog::getOpenFileName(this, tr("Choose the name of your profile file"), "", tr("JSON files (*.json)")).toStdString();
-            if (path.empty()){
-                return;
-            }
-
-            SwitchSystemOption option(m_session.allow_commands_while_running());
-
-            //  Deserialize into this local option instance.
-            option.load_json(load_json_file(path));
-
-            m_session.set(option);
-        }
-    );
-    connect(
-        m_command, &CommandRow::save_profile,
-        m_command, [this](){
-            std::string path = QFileDialog::getSaveFileName(this, tr("Choose the name of your profile file"), "", tr("JSON files (*.json)")).toStdString();
-            if (path.empty()){
-                return;
-            }
-
-            //  Create a copy of option, to be able to serialize it later on
-            SwitchSystemOption option(m_session.allow_commands_while_running());
-
-            m_session.get(option);
-
-            option.to_json().dump(path);
-        }
-    );
-    connect(
-        m_command, &CommandRow::screenshot_requested,
-        m_video_display, [this](){
-            global_dispatcher.dispatch([this]{
-                VideoSnapshot image = m_session.video().snapshot();
-                if (!image){
-                    return;
-                }
-                std::string filename = SCREENSHOTS_PATH() + "screenshot-" + now_to_filestring() + ".png";
-                m_session.logger().log("Saving screenshot to: " + filename, COLOR_PURPLE);
-                image->save(filename);
-            });
-        }
-    );
-    connect(
-        m_command, &CommandRow::video_requested,
-        m_video_display, [this](){
-            global_dispatcher.dispatch([this]{
-                std::string filename = SCREENSHOTS_PATH() + "video-" + now_to_filestring() + ".mp4";
-                m_session.logger().log("Saving screenshot to: " + filename, COLOR_PURPLE);
-                m_session.save_history(filename);
-            });
-        }
-    );
 }
 
 
 void SwitchSystemWidget::update_ui(ProgramState state){
-    m_session.controller().set_options_locked(state != ProgramState::STOPPED);
-    if (m_session.allow_commands_while_running()){
-        m_session.set_allow_user_commands("");
+    if (state != ProgramState::STOPPED){
+        m_session.lock_controllers("Program is Running");
     }else{
-        switch (state){
-        case ProgramState::NOT_READY:
-            m_session.set_allow_user_commands("Program is not ready.");
-            break;
-        case ProgramState::STOPPED:
-            m_session.set_allow_user_commands("");
-            break;
-        case ProgramState::RUNNING:
-        case ProgramState::STOPPING:
-            m_session.set_allow_user_commands("Program is running.");
-            break;
-        }
+        m_session.unlock_controllers();
     }
     m_command->on_state_changed(state);
 }

@@ -138,7 +138,7 @@ public:
 
 public:
     //  Get current video source option
-    void get(VideoSourceOption& option) const;
+    void save(VideoSourceOption& option) const;
 
     //  Set a new video source. This will close the old video source.
     //  This equals to calling VideoSession::set_source(option.descriptor()).
@@ -146,7 +146,7 @@ public:
     //  referenced video source option (aka the VideoSourceOption passed to the
     //  VideoSession constructor).
     //  The change is dispatched to the Qt main thread to execute.
-    void set(const VideoSourceOption& option);
+    void load(const VideoSourceOption& option);
 
     //  Implements VideoFeed::reset().
     //  Reset the current video source. This equals to close the old video source

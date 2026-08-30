@@ -62,7 +62,7 @@ AudioSession::~AudioSession(){
 }
 
 
-void AudioSession::get(AudioOption& option) const{
+void AudioSession::save(AudioOption& option) const{
     std::lock_guard<Mutex> lg(m_lock);
     option.m_input_file     = m_option.m_input_file;
     option.m_input_device   = m_option.m_input_device;
@@ -71,7 +71,7 @@ void AudioSession::get(AudioOption& option) const{
     option.m_volume         = m_option.m_volume;
     option.m_display_type   = m_option.m_display_type;
 }
-void AudioSession::set(const AudioOption& option){
+void AudioSession::load(const AudioOption& option){
     {
         std::lock_guard<Mutex> lg(m_lock);
         signal_pre_input_change();

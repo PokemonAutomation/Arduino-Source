@@ -78,11 +78,11 @@ std::vector<ControllerType> ControllerSession::available_controllers() const{
     return m_connection->controller_list();
 }
 
-void ControllerSession::get(ControllerOption& option) const{
+void ControllerSession::save(ControllerOption& option) const{
     ReadSpinLock lg(m_state_lock);
     option = m_option;
 }
-void ControllerSession::set(const ControllerOption& option){
+void ControllerSession::load(const ControllerOption& option){
     set_device(option.descriptor());
 }
 

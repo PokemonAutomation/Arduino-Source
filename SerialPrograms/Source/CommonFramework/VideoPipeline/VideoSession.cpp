@@ -127,12 +127,17 @@ VideoFormatSet VideoSession::supported_formats() const{
 
 
 
-void VideoSession::get(VideoSourceOption& option) const{
+void VideoSession::save(VideoSourceOption& option) const{
     ReadSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
     option = m_option;
 }
-void VideoSession::set(const VideoSourceOption& option){
-    set_source(option.descriptor(), option.m_resolution, option.m_format, option.m_fps);
+void VideoSession::load(const VideoSourceOption& option){
+    set_source(
+        option.descriptor(),
+        option.m_resolution,
+        option.m_format,
+        option.m_fps
+    );
 }
 
 void VideoSession::reset(){

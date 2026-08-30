@@ -134,7 +134,7 @@ void VideoSourceSelectorWidget::update_source_list(){
     //  Add all the static options.
     {
         VideoSourceOption option;
-        m_session.get(option);
+        m_session.save(option);
         m_sources.emplace_back(option.get_descriptor_from_cache(VideoSourceType::None));
         m_sources.emplace_back(option.get_descriptor_from_cache(VideoSourceType::StillImage));
     }

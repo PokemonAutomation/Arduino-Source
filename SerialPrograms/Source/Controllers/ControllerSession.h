@@ -52,8 +52,8 @@ public:
     }
     std::vector<ControllerType> available_controllers() const;
 
-    void get(ControllerOption& option) const;
-    void set(const ControllerOption& option);
+    void save(ControllerOption& option) const;
+    void load(const ControllerOption& option);
 
     bool ready() const;
     ControllerConnection::Status connection_status() const;
