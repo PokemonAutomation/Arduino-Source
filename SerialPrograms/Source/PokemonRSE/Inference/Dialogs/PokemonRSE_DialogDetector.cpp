@@ -203,42 +203,42 @@ bool SelectionDialogDetector::detect(const ImageViewRGB32& screen){
 
 
 static std::vector<SlotCandidate> confirm_candidates(ConfirmSlot slot, ConfirmPosition position) {
-	double offset = SELECTION_SLOT_OFFSETS[(int)slot];
+    double offset = SELECTION_SLOT_OFFSETS[(int)slot];
 
-	switch (position) {
-	case ConfirmPosition::STANDARD:
+    switch (position) {
+    case ConfirmPosition::STANDARD:
         return {
             { 0.69, 0.45 + offset, SelectionIndicator::ARROW  },
             { 0.685, 0.458 + offset, SelectionIndicator::BORDER }
         };
-	case ConfirmPosition::SPECIAL:
-		return {
-			{ 0.79, 0.45 + offset, SelectionIndicator::ARROW  },
-			{ 0.785, 0.458 + offset, SelectionIndicator::BORDER }
+    case ConfirmPosition::SPECIAL:
+        return {
+            { 0.79, 0.45 + offset, SelectionIndicator::ARROW  },
+            { 0.785, 0.458 + offset, SelectionIndicator::BORDER }
         };
-	case ConfirmPosition::STARTER:
+    case ConfirmPosition::STARTER:
         return {
             { 0.79, 0.45 + offset, SelectionIndicator::ARROW  },
             { 0.725, 0.397 + offset, SelectionIndicator::ARROW  }, // jpn rs
             { 0.72, 0.405 + offset, SelectionIndicator::BORDER }
         };
-	case ConfirmPosition::MART:
+    case ConfirmPosition::MART:
         return {
             { 0.69, 0.45 + offset, SelectionIndicator::ARROW  },
             { 0.255, 0.45 + offset, SelectionIndicator::ARROW  }, // jpn rs
             { 0.25, 0.458 + offset, SelectionIndicator::BORDER }
         };
-	case ConfirmPosition::TOP_LEFT:
+    case ConfirmPosition::TOP_LEFT:
         return {
             { 0.094, 0.115 + offset, SelectionIndicator::ARROW  },
             { 0.089, 0.123 + offset, SelectionIndicator::BORDER }
         };
-	default:
+    default:
         return {
             { 0.69, 0.45 + offset, SelectionIndicator::ARROW  },
             { 0.685, 0.458 + offset, SelectionIndicator::BORDER }
         };
-	}
+    }
 }
 
 ConfirmSlotDetector::ConfirmSlotDetector(Color color, ConfirmSlot slot, ConfirmPosition position)
@@ -289,14 +289,14 @@ public:
 
     Test_ConfirmSlotDetector(
         const std::string& image,
-		ConfirmSlot slot,
-		ConfirmPosition position,
+        ConfirmSlot slot,
+        ConfirmPosition position,
         bool expected
     )
         : UnitTest("PokemonRSE::ConfirmSlotDetector - " + std::to_string((int)slot) + " - " + image)
         , m_image(UNIT_TEST_RESOURCE_PATH() + image)
-		, m_slot(slot)
-		, m_position(position)
+        , m_slot(slot)
+        , m_position(position)
         , m_expected(expected)
     {
     }
@@ -309,7 +309,7 @@ public:
 
 private:
     std::string m_image;
-	ConfirmSlot m_slot;
+    ConfirmSlot m_slot;
     ConfirmPosition m_position;
     bool m_expected;
 };

@@ -15,10 +15,10 @@ namespace PokemonRSE{
 
 
 void add_tests(UnitTestDatabase& database){
-	add_tests_SelectionDialogDetector(database);
-	add_tests_ConfirmSlotDetector(database);
-	add_tests_StartMenuDetector(database);
-	add_tests_StartMenuSlotDetector(database);
+    add_tests_SelectionDialogDetector(database);
+    add_tests_ConfirmSlotDetector(database);
+    add_tests_StartMenuDetector(database);
+    add_tests_StartMenuSlotDetector(database);
 }
 
 

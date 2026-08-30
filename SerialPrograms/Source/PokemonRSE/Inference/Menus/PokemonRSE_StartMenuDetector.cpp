@@ -68,10 +68,10 @@ constexpr int8_t START_MENU_ROWS[5][9] = {
 };
 
 static std::vector<SlotCandidate> start_menu_slot_candidates(StartMenuSlot slot, StartMenuState state) {
-	int8_t row = START_MENU_ROWS[(int)state][(int)slot];
-	if (row == -1) {
-		throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid StartMenuSlot for StartMenuState");
-	}
+    int8_t row = START_MENU_ROWS[(int)state][(int)slot];
+    if (row == -1) {
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid StartMenuSlot for StartMenuState");
+    }
     double offset = SELECTION_SLOT_OFFSETS[row];
     return {
         { 0.725, 0.098 + offset, SelectionIndicator::ARROW  },
@@ -92,7 +92,7 @@ public:
 
     Test_StartMenuDetector(
         const std::string& image,
-		StartMenuState state,
+        StartMenuState state,
         bool expected
     )
         : UnitTest("PokemonRSE::StartMenuDetector - " + image)
@@ -110,7 +110,7 @@ public:
 
 private:
     std::string m_image;
-	StartMenuState m_state;
+    StartMenuState m_state;
     bool m_expected;
 };
 
