@@ -308,12 +308,14 @@ bool PABotBase2_OemController::run_preconnect_configure(
         }
     }
 
+#ifdef QT_CORE_LIB
     NintendoSwitch::ControllerProfile profile =
         PokemonAutomation::NintendoSwitch::ConsoleSettings::instance().CONTROLLER_SETTINGS.get_or_make_profile(
             controller_mac_address,
             "",
             controller_type
         );
+#endif
 
 #if _WIN32
 #pragma pack(push, 1)
@@ -330,8 +332,9 @@ bool PABotBase2_OemController::run_preconnect_configure(
 #if _WIN32
 #pragma pack(pop)
 #endif
-    Message message;
+    Message message{};
 
+    #ifdef QT_CORE_LIB
     {
         Color color(profile.body_color);
         message.colors.body[0] = color.red();
@@ -356,6 +359,7 @@ bool PABotBase2_OemController::run_preconnect_configure(
         message.colors.right_grip[1] = color.green();
         message.colors.right_grip[2] = color.blue();
     }
+    #endif
 
 
     message.request.message_bytes = sizeof(message);
@@ -472,7 +476,7 @@ void PABotBase2_OemController::issue_report(
 
     while (time_left > Milliseconds::zero()){
         Milliseconds current = std::min(time_left, 65535ms);
-        request.milliseconds = current.count();
+        request.milliseconds = (uint16_t)current.count();
         m_connection.device().command_queue().send_command(cancellable, request);
         time_left -= current;
     }
@@ -536,7 +540,7 @@ void PABotBase2_OemController::issue_report(
 
     while (time_left > Milliseconds::zero()){
         Milliseconds current = std::min(time_left, 65535ms);
-        request.milliseconds = current.count();
+        request.milliseconds = (uint16_t)current.count();
         m_connection.device().command_queue().send_command(cancellable, request);
         time_left -= current;
     }
@@ -743,7 +747,7 @@ PABotBase2_OemController::RumbleData PABotBase2_OemController::parse_rumble(cons
 
     return RumbleData{
         rumble_index_to_freq(lo_freq_i),
-        rumble_index_to_amp(lo_amp_i),
+        rumble_index_to_amp((uint8_t)lo_amp_i),
         rumble_index_to_freq(hi_freq_i * 0.25 + 32),
         rumble_index_to_amp(hi_amp_i)
     };

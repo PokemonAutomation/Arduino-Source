@@ -17,7 +17,6 @@
 #include "CommonFramework/ResourceDownload/ProgramMissingResourceTracker.h"
 #include "CommonFramework/ResourceDownload/GlobalResourceDownloadManager.h"
 #include "CommonFramework/ResourceDownload/ResourceDownloadHelpers.h"
-#include "CommonFramework/ResourceDownload/ResourceDownloadHelpersQt.h"
 #include "Integrations/ProgramTracker.h"
 
 namespace PokemonAutomation{

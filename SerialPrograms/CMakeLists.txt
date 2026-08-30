@@ -145,15 +145,24 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
 # add current directory to find tesseractPA.lib
 link_directories(${CMAKE_CURRENT_LIST_DIR})
 
-# add the list of all code file paths as ${LIBRARY_SOURCES} and ${EXECUTABLE_SOURCES}
+# add the list of all code file paths as ${CORE_LIBRARY_SOURCES}, ${LIBRARY_SOURCES} and ${EXECUTABLE_SOURCES}
 include(cmake/SourceFiles.cmake)
 
 # Organize source files in IDE project view
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../../ FILES ${CORE_LIBRARY_SOURCES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../../ FILES ${LIBRARY_SOURCES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../../ FILES ${EXECUTABLE_SOURCES})
 
-# Create library target first
-add_library(SerialProgramsLib STATIC ${LIBRARY_SOURCES})
+# Create GUI-free Controller library
+add_library(CoreLib STATIC ${CORE_LIBRARY_SOURCES})
+
+# see apply_common_target_properties() for target_include_directories, set_target_properties, target_compile_definitions
+
+
+
+# Create the GUI library
+add_library(SerialProgramsLib STATIC ${CORE_LIBRARY_SOURCES} ${LIBRARY_SOURCES})
+
 
 # Create binary target
 if (APPLE)
@@ -215,6 +224,21 @@ endif()
 # Function to apply common properties to both library and executable targets
 function(apply_common_target_properties target_name)
     set_target_properties(${target_name} PROPERTIES LINKER_LANGUAGE CXX)
+    target_link_libraries(${target_name} PRIVATE Threads::Threads)
+
+    #add defines
+    target_compile_definitions(${target_name} PRIVATE NOMINMAX DPP_NO_DEPRECATED)
+
+    #add include directory
+    target_include_directories(${target_name} SYSTEM PRIVATE ../3rdParty-Core)
+    target_include_directories(${target_name} PRIVATE ../ ../../Internal/ Source/)
+
+    if("NO_GUI" IN_LIST ARGN)
+        target_compile_definitions(${target_name} PRIVATE PA_IMAGE_BACKEND_None)
+        return()
+    endif()
+
+    # include Qt headers
     target_link_libraries(${target_name} PRIVATE
         Qt${QT_MAJOR}::Widgets
         Qt${QT_MAJOR}::SerialPort
@@ -224,27 +248,24 @@ function(apply_common_target_properties target_name)
         Qt${QT_MAJOR}::Qml
         Qt${QT_MAJOR}::Quick
         Qt${QT_MAJOR}::QuickWidgets
-    )
-    target_link_libraries(${target_name} PRIVATE Threads::Threads)
+    )    
 
-    #add defines
-    target_compile_definitions(${target_name} PRIVATE NOMINMAX DPP_NO_DEPRECATED)
-
-    #add include directory
+    # more include directories
     target_include_directories(${target_name} SYSTEM PRIVATE ../3rdParty/)
-    target_include_directories(${target_name} PRIVATE ../ ../../Internal/ Source/)
     target_link_directories(${target_name} PRIVATE ../3rdPartyBinaries/)
+
 endfunction()
 
 # Apply common properties to both targets
+apply_common_target_properties(CoreLib NO_GUI)
 apply_common_target_properties(SerialProgramsLib)
 apply_common_target_properties(SerialPrograms)
 
 if(MSVC)
-    set_source_files_properties("../3rdParty/miniz-3.1.1/miniz.c" PROPERTIES COMPILE_FLAGS "/W0")
+    set_source_files_properties("../3rdParty-Core/miniz-3.1.1/miniz.c" PROPERTIES COMPILE_FLAGS "/W0")
 else()
     # For GCC/Clang
-    set_source_files_properties("../3rdParty/miniz-3.1.1/miniz.c" PROPERTIES COMPILE_FLAGS "-w")
+    set_source_files_properties("../3rdParty-Core/miniz-3.1.1/miniz.c" PROPERTIES COMPILE_FLAGS "-w")
 endif()
 
 # REPO_ROOT_DIR: the root folder of the git repository, "Arduino-Source/"
@@ -355,6 +376,10 @@ if (WIN32)
     target_compile_options(SerialProgramsLib PRIVATE /wd5054)  # Deprecated enum arithemtic
     target_compile_options(SerialProgramsLib PRIVATE /wd4505)  # unreferenced local function has been removed
 
+    target_compile_options(CoreLib PRIVATE /FAs /FaAssembly/ /MP /W4 /WX /external:anglebrackets /external:W0 /utf-8)
+    target_compile_options(CoreLib PRIVATE /wd5054)  # Deprecated enum arithemtic
+    target_compile_options(CoreLib PRIVATE /wd4505)  # unreferenced local function has been removed
+
     set(ARCH_FLAGS_09_Nehalem       /W4)    # Dummy parameter
     set(ARCH_FLAGS_13_Haswell       /arch:AVX2)
     set(ARCH_FLAGS_17_Skylake       /arch:AVX512)
@@ -363,6 +388,8 @@ if (WIN32)
     if(CMAKE_GENERATOR_TOOLSET MATCHES "ClangCL")
         target_compile_options(SerialProgramsLib PRIVATE -Wno-unused-function)
         target_compile_options(SerialProgramsLib PRIVATE -march=nehalem)
+        target_compile_options(CoreLib PRIVATE -Wno-unused-function)
+        target_compile_options(CoreLib PRIVATE -march=nehalem)
         set(ARCH_FLAGS_09_Nehalem       -march=nehalem)
         set(ARCH_FLAGS_13_Haswell       -march=haswell)
         set(ARCH_FLAGS_17_Skylake       -march=skylake-avx512)
@@ -501,6 +528,14 @@ else() # macOS and Linux
             ${REPO_ROOT_DIR}/3rdParty/sdbus-cpp/lib/libsdbus-c++.a
             systemd #sdbus-c++ relies on libsystemd, almost all distros should have this
         )
+
+        target_include_directories(CoreLib PRIVATE
+            ${REPO_ROOT_DIR}/3rdParty/sdbus-cpp/include
+        )
+        target_link_libraries(CoreLib PRIVATE
+            ${REPO_ROOT_DIR}/3rdParty/sdbus-cpp/lib/libsdbus-c++.a
+            systemd #sdbus-c++ relies on libsystemd, almost all distros should have this
+        )
     endif() # end Linux
 
     # Find OpenCV
@@ -562,9 +597,13 @@ else() # macOS and Linux
         target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -Wshorten-64-to-32)
         # on macOS, need this framework to query OS API to control display sleep and system sleep behavior
         target_link_libraries(SerialProgramsLib PRIVATE "-framework IOKit -framework CoreFoundation")
+
+        target_compile_options(CoreLib PRIVATE -Wall -Wextra -Wpedantic -Werror -Wshorten-64-to-32)
+        target_link_libraries(CoreLib PRIVATE "-framework IOKit -framework CoreFoundation")
     else() # Linux
         # Assume GCC
         target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -fno-strict-aliasing)
+        target_compile_options(CoreLib PRIVATE -Wall -Wextra -Wpedantic -Werror -fno-strict-aliasing)
     endif()
 
     if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")

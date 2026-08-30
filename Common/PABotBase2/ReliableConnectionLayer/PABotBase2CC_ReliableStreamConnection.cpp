@@ -524,7 +524,7 @@ void ReliableStreamConnection::process_RET_BUFFER_SLOTS(const PacketHeader* pack
     {
         std::lock_guard<Mutex> lg(m_lock);
         m_reliable_sender.remove(packet->seqnum);
-        m_max_unacked_packets = std::min<uint8_t>(message->data, PABB2_PacketSender_REORDER_WINDOW);
+        m_max_unacked_packets = std::min<uint8_t>((uint8_t)message->data, PABB2_PacketSender_REORDER_WINDOW);
     }
     m_logger.log(
         "[RSC]: Setting Reorder Window: " + std::to_string(m_max_unacked_packets) + " slots",
@@ -544,7 +544,7 @@ void ReliableStreamConnection::process_RET_BUFFER_BYTES(const PacketHeader* pack
     {
         std::lock_guard<Mutex> lg(m_lock);
         m_reliable_sender.remove(packet->seqnum);
-        m_max_unacked_bytes = std::min<uint16_t>(message->data, PABB2_PacketSender_BUFFER_SIZE);
+        m_max_unacked_bytes = std::min<uint16_t>((uint16_t)message->data, PABB2_PacketSender_BUFFER_SIZE);
     }
     m_logger.log(
         "[RSC]: Setting Reorder Window: " + std::to_string(m_max_unacked_bytes) + " bytes",

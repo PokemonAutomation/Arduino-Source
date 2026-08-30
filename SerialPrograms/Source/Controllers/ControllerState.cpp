@@ -5,7 +5,8 @@
  */
 
 #include "Common/Cpp/Json/JsonObject.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+// #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "Common/Cpp/Exceptions.h"
 #include "ControllerState.h"
 
 namespace PokemonAutomation{
@@ -14,14 +15,12 @@ namespace PokemonAutomation{
 
 
 void ControllerState::load_json(const JsonObject& json){
-    throw OperationFailedException(
-        ErrorReport::NO_ERROR_REPORT,
+    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION,
         "This controller does not support serialization."
     );
 }
 JsonObject ControllerState::to_json() const{
-    throw OperationFailedException(
-        ErrorReport::NO_ERROR_REPORT,
+    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION,
         "This controller does not support serialization."
     );
 }
@@ -31,14 +30,12 @@ void ControllerState::execute(
     AbstractController& controller,
     Milliseconds duration
 ) const{
-    throw OperationFailedException(
-        ErrorReport::NO_ERROR_REPORT,
+    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION,
         "This controller does not support execution."
     );
 }
 std::string ControllerState::to_cpp(Milliseconds hold, Milliseconds release) const{
-    throw OperationFailedException(
-        ErrorReport::NO_ERROR_REPORT,
+    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION,
         "This controller does not support cpp conversion."
     );
 }
