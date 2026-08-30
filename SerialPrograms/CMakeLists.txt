@@ -591,9 +591,13 @@ else() # macOS and Linux
         target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -Wshorten-64-to-32)
         # on macOS, need this framework to query OS API to control display sleep and system sleep behavior
         target_link_libraries(SerialProgramsLib PRIVATE "-framework IOKit -framework CoreFoundation")
+
+        target_compile_options(CoreLib PRIVATE -Wall -Wextra -Wpedantic -Werror -Wshorten-64-to-32)
+        target_link_libraries(CoreLib PRIVATE "-framework IOKit -framework CoreFoundation")
     else() # Linux
         # Assume GCC
         target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -fno-strict-aliasing)
+        target_compile_options(CoreLib PRIVATE -Wall -Wextra -Wpedantic -Werror -fno-strict-aliasing)
     endif()
 
     if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
