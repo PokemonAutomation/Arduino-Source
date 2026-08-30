@@ -40,7 +40,7 @@ VideoOverlaySession::VideoOverlaySession(Logger& logger, VideoOverlayOption& opt
 {}
 
 
-void VideoOverlaySession::get(VideoOverlayOption& option){
+void VideoOverlaySession::get(VideoOverlayOption& option) const{
     bool stats = m_option.stats.load(std::memory_order_relaxed);
     bool boxes = m_option.boxes.load(std::memory_order_relaxed);
     bool text = m_option.text.load(std::memory_order_relaxed);

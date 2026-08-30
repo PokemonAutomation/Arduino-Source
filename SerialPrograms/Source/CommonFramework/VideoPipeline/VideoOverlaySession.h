@@ -79,7 +79,7 @@ public:
 
     Logger& logger() const{ return m_logger; }
 
-    void get(VideoOverlayOption& option);
+    void get(VideoOverlayOption& option) const;
     void set(const VideoOverlayOption& option);
 
     bool enabled_boxes () const{ return m_option.boxes.load(std::memory_order_relaxed); }

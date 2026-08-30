@@ -78,7 +78,7 @@ std::vector<ControllerType> ControllerSession::available_controllers() const{
     return m_connection->controller_list();
 }
 
-void ControllerSession::get(ControllerOption& option){
+void ControllerSession::get(ControllerOption& option) const{
     ReadSpinLock lg(m_state_lock);
     option = m_option;
 }

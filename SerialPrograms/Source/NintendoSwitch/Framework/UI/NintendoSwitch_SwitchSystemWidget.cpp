@@ -59,7 +59,7 @@ SwitchSystemWidget::SwitchSystemWidget(
     QWidget* widget = new QWidget(m_group_box);
     m_group_box->set_widget(widget);
     {
-        m_audio_display = new AudioDisplayWidget(*this, m_session.logger(), m_session.audio_session());
+        m_audio_display = new AudioDisplayWidget(*this, m_session.logger(), m_session.audio());
         layout->addWidget(m_audio_display);
 
         QVBoxLayout* video_holder = new QVBoxLayout();
@@ -70,8 +70,8 @@ SwitchSystemWidget::SwitchSystemWidget(
             *this, *video_holder,
             m_session.console_number(),
             *this,
-            m_session.video_session(),
-            m_session.overlay_session()
+            m_session.video(),
+            m_session.overlay()
         );
         video_holder->addWidget(m_video_display);
     }
@@ -80,33 +80,33 @@ SwitchSystemWidget::SwitchSystemWidget(
         group_layout->setAlignment(Qt::AlignTop);
         group_layout->setContentsMargins(0, 0, 0, 0);
 
-        m_controller = new ControllerSelectorWidget(*this, m_session.controller_session());
+        m_controller = new ControllerSelectorWidget(*this, m_session.controller());
         group_layout->addWidget(m_controller);
 
-        m_video_selector = new VideoSourceSelectorWidget(m_session.logger(), m_session.video_session());
+        m_video_selector = new VideoSourceSelectorWidget(m_session.logger(), m_session.video());
         group_layout->addWidget(m_video_selector);
 
-        m_audio_widget = new AudioSelectorWidget(*widget, m_session.audio_session());
+        m_audio_widget = new AudioSelectorWidget(*widget, m_session.audio());
         group_layout->addWidget(m_audio_widget);
 
 #if 0
         //  Experiment with multiple controller layouts.
-        m_controller = new ControllerSelectorWidget(*this, m_session.controller_session());
+        m_controller = new ControllerSelectorWidget(*this, m_session.controller());
         group_layout->addWidget(m_controller);
 
-        group_layout->addWidget(new ControllerSelectorWidget(*this, m_session.controller_session()));
-        group_layout->addWidget(new ControllerSelectorWidget(*this, m_session.controller_session()));
-        group_layout->addWidget(new ControllerSelectorWidget(*this, m_session.controller_session()));
-        group_layout->addWidget(new ControllerSelectorWidget(*this, m_session.controller_session()));
-        group_layout->addWidget(new ControllerSelectorWidget(*this, m_session.controller_session()));
-        group_layout->addWidget(new ControllerSelectorWidget(*this, m_session.controller_session()));
-        group_layout->addWidget(new ControllerSelectorWidget(*this, m_session.controller_session()));
+        group_layout->addWidget(new ControllerSelectorWidget(*this, m_session.controller()));
+        group_layout->addWidget(new ControllerSelectorWidget(*this, m_session.controller()));
+        group_layout->addWidget(new ControllerSelectorWidget(*this, m_session.controller()));
+        group_layout->addWidget(new ControllerSelectorWidget(*this, m_session.controller()));
+        group_layout->addWidget(new ControllerSelectorWidget(*this, m_session.controller()));
+        group_layout->addWidget(new ControllerSelectorWidget(*this, m_session.controller()));
+        group_layout->addWidget(new ControllerSelectorWidget(*this, m_session.controller()));
 #endif
 
         m_command = new CommandRow(
             *widget,
-            m_session.controller_session(),
-            m_session.overlay_session(),
+            m_session.controller(),
+            m_session.overlay(),
             m_session.console_type(),
             m_session.allow_commands_while_running()
         );
@@ -158,7 +158,7 @@ SwitchSystemWidget::SwitchSystemWidget(
         m_command, &CommandRow::screenshot_requested,
         m_video_display, [this](){
             global_dispatcher.dispatch([this]{
-                VideoSnapshot image = m_session.video_session().snapshot();
+                VideoSnapshot image = m_session.video().snapshot();
                 if (!image){
                     return;
                 }
@@ -182,7 +182,7 @@ SwitchSystemWidget::SwitchSystemWidget(
 
 
 void SwitchSystemWidget::update_ui(ProgramState state){
-    m_session.controller_session().set_options_locked(state != ProgramState::STOPPED);
+    m_session.controller().set_options_locked(state != ProgramState::STOPPED);
     if (m_session.allow_commands_while_running()){
         m_session.set_allow_user_commands("");
     }else{

@@ -23,8 +23,8 @@ class BotBaseHandle;
 
 class TrackableConsole{
 public:
-    virtual VideoFeed& video() = 0;
-    virtual AudioFeed& audio() = 0;
+    virtual VideoFeed& video_feed() = 0;
+    virtual AudioFeed& audio_feed() = 0;
     virtual ControllerSession& controller() = 0;
 };
 

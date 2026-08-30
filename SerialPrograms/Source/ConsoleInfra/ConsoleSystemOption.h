@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef PokemonAutomation_ConsoleSystemOption_H
-#define PokemonAutomation_ConsoleSystemOption_H
+#ifndef PokemonAutomation_ConsoleInfra_ConsoleSystemOption_H
+#define PokemonAutomation_ConsoleInfra_ConsoleSystemOption_H
 
 #include <vector>
 #include "CommonFramework/AudioPipeline/AudioOption.h"

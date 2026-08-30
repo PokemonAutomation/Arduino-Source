@@ -41,7 +41,7 @@ void VideoSession::remove_frame_listener(VideoFrameListener& listener){
 
 
 
-bool VideoSession::try_shutdown(){
+bool VideoSession::try_shutdown() noexcept{
     if (m_video_source){
         m_video_source->remove_source_frame_listener(*this);
         m_video_source->remove_rendered_frame_listener(*this);
@@ -127,7 +127,7 @@ VideoFormatSet VideoSession::supported_formats() const{
 
 
 
-void VideoSession::get(VideoSourceOption& option){
+void VideoSession::get(VideoSourceOption& option) const{
     ReadSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
     option = m_option;
 }

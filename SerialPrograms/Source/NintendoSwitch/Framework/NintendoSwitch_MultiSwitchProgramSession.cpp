@@ -96,7 +96,7 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
     size_t consoles = m_system.count();
     for (size_t c = 0; c < consoles; c++){
         m_option.instance().start_program_controller_check(
-            m_system[c].controller_session(), c
+            m_system[c].controller(), c
         );
         m_option.instance().start_program_feedback_check(
             env.consoles[c], c,
@@ -190,7 +190,7 @@ void MultiSwitchProgramSession::internal_run_program(){
     FixedLimitVector<ConsoleHandle> handles(consoles);
     for (size_t c = 0; c < consoles; c++){
         SwitchSystemSession& session = m_system[c];
-        AbstractController* controller = session.controller_session().controller();
+        AbstractController* controller = session.controller().controller();
         if (controller == nullptr){
             null_controller_placeholders.emplace_back(session.logger());
             controller = &null_controller_placeholders.back();

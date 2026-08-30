@@ -79,7 +79,7 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
 
     //  Startup Checks
     m_option.instance().start_program_controller_check(
-        m_system.controller_session()
+        m_system.controller()
     );
     m_option.instance().start_program_feedback_check(
         env.console,
@@ -165,7 +165,7 @@ void SingleSwitchProgramSession::internal_run_program(){
         timestamp()
     );
     NullController null_controller(m_system.logger());
-    AbstractController* controller = m_system.controller_session().controller();
+    AbstractController* controller = m_system.controller().controller();
     if (controller == nullptr){
         controller = &null_controller;
     }

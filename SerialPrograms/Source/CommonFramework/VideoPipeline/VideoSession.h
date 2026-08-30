@@ -70,7 +70,7 @@ public:
 
 
 public:
-    bool try_shutdown();
+    bool try_shutdown() noexcept;
     ~VideoSession();
     //  Built from a VideoSourceOption.
     //  VideoSourceOption manages the current VideoSourceDescriptor, which are the descriptors
@@ -138,7 +138,7 @@ public:
 
 public:
     //  Get current video source option
-    void get(VideoSourceOption& option);
+    void get(VideoSourceOption& option) const;
 
     //  Set a new video source. This will close the old video source.
     //  This equals to calling VideoSession::set_source(option.descriptor()).

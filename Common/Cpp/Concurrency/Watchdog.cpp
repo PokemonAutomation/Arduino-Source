@@ -71,7 +71,7 @@ void Watchdog::add(WatchdogCallback& callback, std::chrono::milliseconds period)
         m_cv.notify_all();
     }
 }
-void Watchdog::remove(WatchdogCallback& callback){
+void Watchdog::remove(WatchdogCallback& callback) noexcept{
     while (true){
         if (try_remove(callback)){
             return;
@@ -79,7 +79,7 @@ void Watchdog::remove(WatchdogCallback& callback){
         pause();
     }
 }
-bool Watchdog::try_remove(WatchdogCallback& callback){
+bool Watchdog::try_remove(WatchdogCallback& callback) noexcept{
     WriteSpinLock slg(m_state_lock);
     auto iter_c = m_callbacks.find(&callback);
     if (iter_c == m_callbacks.end()){

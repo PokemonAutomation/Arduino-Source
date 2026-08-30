@@ -21,7 +21,7 @@ namespace PokemonAutomation{
 
 
 
-class ControllerSession : private ControllerConnection::StatusListener{
+class ControllerSession final : private ControllerConnection::StatusListener{
 public:
     struct Listener{
         virtual void ready_changed(bool ready){}
@@ -52,7 +52,7 @@ public:
     }
     std::vector<ControllerType> available_controllers() const;
 
-    void get(ControllerOption& option);
+    void get(ControllerOption& option) const;
     void set(const ControllerOption& option);
 
     bool ready() const;

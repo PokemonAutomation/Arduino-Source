@@ -778,6 +778,8 @@ file(GLOB LIBRARY_SOURCES
     Source/ComputerPrograms/Framework/ComputerProgramWidget.h
     Source/ConsoleInfra/ConsoleSystemOption.cpp
     Source/ConsoleInfra/ConsoleSystemOption.h
+    Source/ConsoleInfra/ConsoleSystemSession.cpp
+    Source/ConsoleInfra/ConsoleSystemSession.h
     Source/ControllerInput/ControllerInput.cpp
     Source/ControllerInput/ControllerInput.h
     Source/ControllerInput/Keyboard/GlobalKeyboardHidTracker.cpp
