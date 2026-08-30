@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Qt/Options/BatchWidget.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "DiscordSettingsOption.h"
 

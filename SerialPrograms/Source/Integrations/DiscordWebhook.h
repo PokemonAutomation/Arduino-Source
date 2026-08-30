@@ -8,7 +8,9 @@
 #define PokemonAutomation_DiscordWebhook_H
 
 #include <deque>
+#ifdef QT_CORE_LIB
 #include <QNetworkReply>
+#endif
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
@@ -32,7 +34,7 @@ struct DiscordFileAttachment{
     std::string filepath;
 };
 
-
+#ifdef QT_CORE_LIB
 class DiscordWebhookSender : public QObject{
     Q_OBJECT
 
@@ -88,7 +90,7 @@ private:
     std::deque<WallClock> m_sent;
     ScheduledTaskRunner m_queue;
 };
-
+#endif
 
 
 

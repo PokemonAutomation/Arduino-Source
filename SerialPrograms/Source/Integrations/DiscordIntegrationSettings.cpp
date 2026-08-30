@@ -4,8 +4,11 @@
  *
  */
 
+#include <chrono>
 #include "Common/Cpp/Strings/Unicode.h"
+#ifdef QT_CORE_LIB
 #include "Common/Qt/StringToolsQt.h"
+#endif
 #include "Integrations/DppIntegration/DppClient.h"
 #include "DiscordIntegrationSettings.h"
 
@@ -167,17 +170,21 @@ std::string convert(const std::string& message){
 
 
 MessageBuilder::MessageBuilder(const std::vector<std::string>& message_tags){
+    #ifdef QT_CORE_LIB
     for (const std::string& tag : message_tags){
         m_message_tags.insert(to_lower(tag));
     }
+    #endif
 }
 bool MessageBuilder::should_send(const std::vector<std::string>& channel_tags) const{
+    #ifdef QT_CORE_LIB
     for (const std::string& tag : channel_tags){
         auto iter = m_message_tags.find(to_lower(tag));
         if (iter != m_message_tags.end()){
             return true;
         }
     }
+    #endif
     return false;
 }
 std::string MessageBuilder::build_message(

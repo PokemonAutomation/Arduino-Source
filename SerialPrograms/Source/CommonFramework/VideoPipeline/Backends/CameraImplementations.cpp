@@ -3,8 +3,9 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
-
+#ifdef QT_CORE_LIB
 #include <QtGlobal>
+#endif
 //#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Globals.h"
@@ -16,10 +17,11 @@
 //using std::cout;
 //using std::endl;
 
+#ifdef QT_CORE_LIB
 #include "CameraWidgetQt6.h"
 #include "CameraWidgetQt6.5.h"
 #include "CameraWidgetQt6_QQuickWidget.h"
-
+#endif
 
 namespace PokemonAutomation{
 
@@ -48,8 +50,9 @@ struct CameraBackends{
     }
 
     CameraBackends(){
+        #ifdef QT_CORE_LIB
         m_backends.emplace_back(
-            "qt6-QVideoSink", "Qt6: QVideoSink",
+            "qt6-QVideoSink", "Qt6: QVideoSink",            
             std::make_unique<CameraQt6QVideoSink::CameraBackend>()
         );
         m_backends.emplace_back(
@@ -62,6 +65,7 @@ struct CameraBackends{
                 std::make_unique<CameraQt6_QQuickWidget::CameraBackend>()
             );
         }
+        #endif
 
         size_t items = 0;
         for (const auto& item : m_backends){

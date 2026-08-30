@@ -194,7 +194,9 @@ private:
     //  This function is thread-safe as it has a lock to prevent concurrent fps calls.
     //  Note the lock does not protect the other frame listeners added by
     //  VideoSession::add_frame_listener().
+#ifdef QT_CORE_LIB
     virtual void on_frame(std::shared_ptr<const VideoFrame> frame) override;
+#endif
     //  Overwrites VideoSource::RenderedFrameListener::on_rendered_frame()
     //  This function is called when the video source finds a new rendered frame so
     //  VideoSession can update its internal fps record.

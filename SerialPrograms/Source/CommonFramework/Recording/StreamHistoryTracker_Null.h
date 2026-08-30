@@ -11,7 +11,9 @@
 
 #include "Common/Compiler.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
+#ifdef QT_CORE_LIB
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
+#endif
 
 namespace PokemonAutomation{
 
@@ -36,7 +38,9 @@ public:
 
 public:
     void on_samples(const float* data, size_t frames){}
+    #ifdef QT_CORE_LIB
     void on_frame(std::shared_ptr<const VideoFrame> frame){}
+    #endif
 
 private:
     Logger& m_logger;

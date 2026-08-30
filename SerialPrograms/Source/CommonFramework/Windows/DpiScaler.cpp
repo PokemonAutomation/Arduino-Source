@@ -4,8 +4,10 @@
  *
  */
 
+#ifdef QT_CORE_LIB
 #include <QApplication>
 #include <QScreen>
+#endif
 #include "DpiScaler.h"
 
 //#include <iostream>
@@ -16,23 +18,31 @@ namespace PokemonAutomation{
 
 
 int scale_dpi_width(int width){
+#ifdef QT_CORE_LIB
     int dpi = 96;
     QScreen* primaryScreen = QGuiApplication::primaryScreen();
     if (primaryScreen != nullptr){
         dpi = primaryScreen->logicalDotsPerInchX();
     }
     return width * dpi / 96;
+#else
+    return 0;
+#endif
 }
 int scale_dpi_height(int height){
+#ifdef QT_CORE_LIB
     int dpi = 96;
     QScreen* primaryScreen = QGuiApplication::primaryScreen();
     if (primaryScreen != nullptr){
         dpi = primaryScreen->logicalDotsPerInchY();
     }
     return height * dpi / 96;
+#else
+    return 0;
+#endif
 }
 
-
+#ifdef QT_CORE_LIB
 void scale_dpi_token(QString& str, int dpi){
     size_t length = str.length();
     if (length < 3){
@@ -56,7 +66,6 @@ void scale_dpi_token(QString& str, int dpi){
     value /= 96;
     str = QString::number(value) + "px";
 }
-
 
 QString scale_dpi_stylesheet(const QString& style_str){
     QScreen* primaryScreen = QGuiApplication::primaryScreen();
@@ -90,6 +99,7 @@ QString scale_dpi_stylesheet(const QString& style_str){
 //    cout << "out.length() = " << out.length() << endl;
     return out;
 }
+#endif
 
 
 }

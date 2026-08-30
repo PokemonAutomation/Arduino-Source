@@ -9,9 +9,10 @@
 
 #include <string>
 #include <vector>
-#include <QtConfig>
 #include "Common/Cpp/Containers/Pimpl.h"
 
+#ifdef QT_CORE_LIB
+#include <QtConfig>
 class QAudioFormat;
 
 #if QT_VERSION_MAJOR == 5
@@ -22,6 +23,7 @@ class QAudioDevice;
 using NativeAudioInfo = QAudioDevice;
 #else
 #error "Unknown Qt version."
+#endif
 #endif
 
 
@@ -51,11 +53,12 @@ enum class AudioChannelFormat{
 };
 extern const char* AUDIO_FORMAT_LABELS[];
 
+#ifdef QT_CORE_LIB
 //  Set the QAudioFormat to the our audio format enum.
 void set_format(QAudioFormat& native_format, AudioChannelFormat format);
 
-
 AudioSampleFormat get_sample_format(QAudioFormat& native_format);
+#endif
 
 
 
@@ -77,9 +80,12 @@ public:
 
     const std::vector<AudioChannelFormat>& supported_formats() const;
     int preferred_format_index() const;
+    #ifdef QT_CORE_LIB
     QAudioFormat preferred_format() const;
 
     const NativeAudioInfo& native_info() const;
+    #endif
+
 
     bool operator==(const AudioDeviceInfo& info) const;
 

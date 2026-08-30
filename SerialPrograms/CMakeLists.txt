@@ -262,10 +262,10 @@ apply_common_target_properties(SerialProgramsLib)
 apply_common_target_properties(SerialPrograms)
 
 if(MSVC)
-    set_source_files_properties("../3rdParty/miniz-3.1.1/miniz.c" PROPERTIES COMPILE_FLAGS "/W0")
+    set_source_files_properties("../3rdParty-Core/miniz-3.1.1/miniz.c" PROPERTIES COMPILE_FLAGS "/W0")
 else()
     # For GCC/Clang
-    set_source_files_properties("../3rdParty/miniz-3.1.1/miniz.c" PROPERTIES COMPILE_FLAGS "-w")
+    set_source_files_properties("../3rdParty-Core/miniz-3.1.1/miniz.c" PROPERTIES COMPILE_FLAGS "-w")
 endif()
 
 # REPO_ROOT_DIR: the root folder of the git repository, "Arduino-Source/"

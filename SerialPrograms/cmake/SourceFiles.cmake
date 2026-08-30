@@ -8,11 +8,13 @@ set(EXECUTABLE_SOURCES "Source/CommonFramework/Main.cpp" ${DARK_STYLE_RES})
 # Note: Command-line executable sources are defined in Source/CommandLine/CommandLineExecutable.cmake
 
 file(GLOB CORE_LIBRARY_SOURCES
-	../Common/ControllerStates/StandardHid_Keyboard_State.c
+    ../3rdParty-Core/miniz-3.1.1/miniz.c
+    ../3rdParty-Core/miniz-3.1.1/miniz.h
     ../Common/Compiler.h
     ../Common/ControllerStates/NintendoSwitch_OemController_State.cpp
     ../Common/ControllerStates/NintendoSwitch_OemController_State.h
     ../Common/ControllerStates/NintendoSwitch_WiredController_State.h
+    ../Common/ControllerStates/StandardHid_Keyboard_State.c
     ../Common/ControllerStates/StandardHid_Keyboard_State.h
     ../Common/Cpp/CancellableScope.cpp
     ../Common/Cpp/CancellableScope.h
@@ -27,16 +29,24 @@ file(GLOB CORE_LIBRARY_SOURCES
     ../Common/Cpp/Concurrency/Backends/ThreadPool_Default.h
     ../Common/Cpp/Concurrency/ConditionVariable.h
     ../Common/Cpp/Concurrency/Mutex.h
+    ../Common/Cpp/Concurrency/PeriodicRunner.cpp
+    ../Common/Cpp/Concurrency/PeriodicRunner.h
     ../Common/Cpp/Concurrency/Qt6.9ThreadBugWorkaround.h
     ../Common/Cpp/Concurrency/ReverseLockGuard.h
+    ../Common/Cpp/Concurrency/ScheduledTaskRunner.cpp
+    ../Common/Cpp/Concurrency/ScheduledTaskRunner.h
     ../Common/Cpp/Concurrency/SpinLock.cpp
     ../Common/Cpp/Concurrency/SpinLock.h
     ../Common/Cpp/Concurrency/SpinPause.h
     ../Common/Cpp/Concurrency/Thread.cpp
     ../Common/Cpp/Concurrency/Thread.h
     ../Common/Cpp/Concurrency/ThreadPool.h
+    ../Common/Cpp/Concurrency/Watchdog.cpp
+    ../Common/Cpp/Concurrency/Watchdog.h
     ../Common/Cpp/Containers/AlignedMalloc.cpp
     ../Common/Cpp/Containers/AlignedMalloc.h
+    ../Common/Cpp/Containers/AlignedVector.h
+    ../Common/Cpp/Containers/AlignedVector.tpp
     ../Common/Cpp/Containers/CircularBuffer.h
     ../Common/Cpp/Containers/FixedLimitVector.h
     ../Common/Cpp/Containers/FixedLimitVector.tpp
@@ -56,7 +66,9 @@ file(GLOB CORE_LIBRARY_SOURCES
     ../Common/Cpp/CpuUtilization/CpuUtilization_Windows.tpp
     ../Common/Cpp/Cryptography/SHA256.cpp
     ../Common/Cpp/Cryptography/SHA256.h
+    ../Common/Cpp/EarlyShutdown.h
     ../Common/Cpp/EnumStringMap.h
+    ../Common/Cpp/EventRateTracker.h
     ../Common/Cpp/Exceptions.cpp
     ../Common/Cpp/Exceptions.h
     ../Common/Cpp/ExpressionEvaluator.cpp
@@ -76,6 +88,8 @@ file(GLOB CORE_LIBRARY_SOURCES
     ../Common/Cpp/Hardware/Hardware_x86.tpp
     ../Common/Cpp/Hardware/Hardware_x86_Linux.tpp
     ../Common/Cpp/Hardware/Hardware_x86_Windows.tpp
+    ../Common/Cpp/ImageResolution.cpp
+    ../Common/Cpp/ImageResolution.h
     ../Common/Cpp/Json/JsonArray.cpp
     ../Common/Cpp/Json/JsonArray.h
     ../Common/Cpp/Json/JsonObject.cpp
@@ -113,13 +127,19 @@ file(GLOB CORE_LIBRARY_SOURCES
     ../Common/Cpp/Options/EnumDropdownDatabase.h
     ../Common/Cpp/Options/EnumDropdownOption.cpp
     ../Common/Cpp/Options/EnumDropdownOption.h
+    ../Common/Cpp/Options/FloatingPointOption.cpp
+    ../Common/Cpp/Options/FloatingPointOption.h
     ../Common/Cpp/Options/GroupOption.cpp
     ../Common/Cpp/Options/GroupOption.h
+    ../Common/Cpp/Options/KeyboardLayoutOption.cpp
+    ../Common/Cpp/Options/KeyboardLayoutOption.h
     ../Common/Cpp/Options/MacAddressOption.cpp
     ../Common/Cpp/Options/MacAddressOption.h
     ../Common/Cpp/Options/SimpleIntegerOption.cpp
     ../Common/Cpp/Options/SimpleIntegerOption.h
     ../Common/Cpp/Options/SimpleIntegerOptionBase.h
+    ../Common/Cpp/Options/StaticTableOption.cpp
+    ../Common/Cpp/Options/StaticTableOption.h
     ../Common/Cpp/Options/StaticTextOption.cpp
     ../Common/Cpp/Options/StaticTextOption.h
     ../Common/Cpp/Options/StringOption.cpp
@@ -131,6 +151,7 @@ file(GLOB CORE_LIBRARY_SOURCES
     ../Common/Cpp/PrettyPrint.cpp
     ../Common/Cpp/PrettyPrint.h
     ../Common/Cpp/RecursiveThrottler.h
+    ../Common/Cpp/ScopeExit.h
     ../Common/Cpp/SerialConnection/SerialConnection.cpp
     ../Common/Cpp/SerialConnection/SerialConnection.h
     ../Common/Cpp/SerialConnection/SerialConnectionPOSIX.h
@@ -141,6 +162,8 @@ file(GLOB CORE_LIBRARY_SOURCES
     ../Common/Cpp/StreamConnections/PollingStreamConnections.h
     ../Common/Cpp/StreamConnections/PushingStreamConnections.h
     ../Common/Cpp/StreamConnections/StreamInterface.h
+    ../Common/Cpp/StreamConverters.cpp
+    ../Common/Cpp/StreamConverters.h
     ../Common/Cpp/Strings/StringTools.cpp
     ../Common/Cpp/Strings/StringTools.h
     ../Common/Cpp/Strings/Unicode.cpp
@@ -156,6 +179,8 @@ file(GLOB CORE_LIBRARY_SOURCES
     ../Common/PABotBase2/PABotBase2_MessageProtocol.h
     ../Common/PABotBase2/PABotBase2CC_MessageDumper.cpp
     ../Common/PABotBase2/PABotBase2CC_MessageDumper.h
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_ConnectionDebug.cpp
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_ConnectionDebug.h
     ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_PacketParser.cpp
     ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_PacketParser.h
     ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_PacketProtocol.h
@@ -166,14 +191,68 @@ file(GLOB CORE_LIBRARY_SOURCES
     ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2CC_ReliableStreamConnection.cpp
     ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2CC_ReliableStreamConnection.h
     ../Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h
+    Source/CommonFramework/AudioPipeline/AudioConstants.h
+    Source/CommonFramework/AudioPipeline/AudioFeed.h
+    Source/CommonFramework/AudioPipeline/AudioInfo.cpp
+    Source/CommonFramework/AudioPipeline/AudioInfo.h
+    Source/CommonFramework/AudioPipeline/AudioOption.cpp
+    Source/CommonFramework/AudioPipeline/AudioOption.h
+    Source/CommonFramework/AudioPipeline/AudioPassthroughPair.h
+    Source/CommonFramework/AudioPipeline/AudioPipelineOptions.h
+    Source/CommonFramework/AudioPipeline/AudioSession.cpp
+    Source/CommonFramework/AudioPipeline/AudioSession.h
+    Source/CommonFramework/AudioPipeline/AudioStream.cpp
+    Source/CommonFramework/AudioPipeline/AudioStream.h
+    Source/CommonFramework/AudioPipeline/Spectrum/AudioSpectrumHolder.cpp
+    Source/CommonFramework/AudioPipeline/Spectrum/AudioSpectrumHolder.h
+    Source/CommonFramework/AudioPipeline/Spectrum/FFTStreamer.cpp
+    Source/CommonFramework/AudioPipeline/Spectrum/FFTStreamer.h
+    Source/CommonFramework/AudioPipeline/Spectrum/Spectrograph.cpp
+    Source/CommonFramework/AudioPipeline/Spectrum/Spectrograph.h
     Source/CommonFramework/Environment/Environment.cpp
     Source/CommonFramework/Environment/Environment.h
     Source/CommonFramework/Environment/Environment_Linux.h
     Source/CommonFramework/Environment/Environment_Linux.tpp
     Source/CommonFramework/Environment/Environment_Windows.h
     Source/CommonFramework/Environment/Environment_Windows.tpp
+    Source/CommonFramework/Environment/SystemSleep.cpp
+    Source/CommonFramework/Environment/SystemSleep.h
+    Source/CommonFramework/Environment/SystemSleep_Apple.tpp
+    Source/CommonFramework/Environment/SystemSleep_Linux.tpp
+    Source/CommonFramework/Environment/SystemSleep_Windows.tpp
+    Source/CommonFramework/ErrorReports/ErrorReports.cpp
+    Source/CommonFramework/ErrorReports/ErrorReports.h
+    Source/CommonFramework/ErrorReports/ProgramDumper.cpp
+    Source/CommonFramework/ErrorReports/ProgramDumper.h
+    Source/CommonFramework/ErrorReports/ProgramDumper_Windows.tpp
+    Source/CommonFramework/Exceptions/OperationFailedException.cpp
+    Source/CommonFramework/Exceptions/OperationFailedException.h
+    Source/CommonFramework/GlobalAutoPaths.cpp
+    Source/CommonFramework/GlobalAutoPaths.h
+    Source/CommonFramework/Globals.cpp
+    Source/CommonFramework/Globals.h
+    Source/CommonFramework/GlobalServices.cpp
+    Source/CommonFramework/GlobalServices.h
+    Source/CommonFramework/GlobalSettingsPanel.cpp
+    Source/CommonFramework/GlobalSettingsPanel.h
+    Source/CommonFramework/ImageTypes/ImageRGB32.cpp
+    Source/CommonFramework/ImageTypes/ImageRGB32.h
+    Source/CommonFramework/ImageTypes/ImageViewPlanar32.cpp
+    Source/CommonFramework/ImageTypes/ImageViewPlanar32.h
+    Source/CommonFramework/ImageTypes/ImageViewRGB32.cpp
+    Source/CommonFramework/ImageTypes/ImageViewRGB32.h
     Source/CommonFramework/Logging/Logger.cpp
     Source/CommonFramework/Logging/Logger.h
+    Source/CommonFramework/Notifications/EventNotificationOption.cpp
+    Source/CommonFramework/Notifications/EventNotificationOption.h
+    Source/CommonFramework/Notifications/EventNotificationsTable.cpp
+    Source/CommonFramework/Notifications/EventNotificationsTable.h
+    Source/CommonFramework/Notifications/MessageAttachment.cpp
+    Source/CommonFramework/Notifications/MessageAttachment.h
+    Source/CommonFramework/Notifications/ProgramInfo.h
+    Source/CommonFramework/Notifications/ProgramNotifications.cpp
+    Source/CommonFramework/Notifications/ProgramNotifications.h
+    Source/CommonFramework/Options/CheckForUpdatesOption.h
     Source/CommonFramework/Options/Environment/CoreAffinityOption.cpp
     Source/CommonFramework/Options/Environment/CoreAffinityOption.h
     Source/CommonFramework/Options/Environment/PerformanceOptions.cpp
@@ -181,18 +260,95 @@ file(GLOB CORE_LIBRARY_SOURCES
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.cpp
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.h
+    Source/CommonFramework/Options/Environment/SleepSuppressOption.cpp
+    Source/CommonFramework/Options/Environment/SleepSuppressOption.h
+    Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp
+    Source/CommonFramework/Options/Environment/ThemeSelectorOption.h
+    Source/CommonFramework/Options/LabelCellOption.cpp
+    Source/CommonFramework/Options/LabelCellOption.h
+    Source/CommonFramework/Options/ResolutionOption.cpp
+    Source/CommonFramework/Options/ResolutionOption.h
+    Source/CommonFramework/Options/ScreenshotFormatOption.h
     Source/CommonFramework/Options/ThreadPoolOption.cpp
     Source/CommonFramework/Options/ThreadPoolOption.h
+    Source/CommonFramework/Panels/PanelDescriptor.cpp
+    Source/CommonFramework/Panels/PanelDescriptor.h
+    Source/CommonFramework/Panels/PanelInstance.cpp
+    Source/CommonFramework/Panels/PanelInstance.h
+    Source/CommonFramework/Panels/PanelTools.h
+    Source/CommonFramework/Panels/ProgramDescriptor.cpp
+    Source/CommonFramework/Panels/ProgramDescriptor.h
+    Source/CommonFramework/Panels/SettingsPanel.cpp
+    Source/CommonFramework/Panels/SettingsPanel.h
+    Source/CommonFramework/PersistentSettings.cpp
+    Source/CommonFramework/PersistentSettings.h
+    Source/CommonFramework/ProgramSession.cpp
+    Source/CommonFramework/ProgramSession.h
+    Source/CommonFramework/ProgramStats/StatsDatabase.cpp
+    Source/CommonFramework/ProgramStats/StatsDatabase.h
+    Source/CommonFramework/ProgramStats/StatsTracking.cpp
+    Source/CommonFramework/ProgramStats/StatsTracking.h
+    Source/CommonFramework/Recording/StreamHistoryOption.cpp
+    Source/CommonFramework/Recording/StreamHistoryOption.h
+    Source/CommonFramework/Recording/StreamHistorySession.cpp
+    Source/CommonFramework/Recording/StreamHistorySession.h
+    Source/CommonFramework/Recording/StreamHistoryTracker_Null.h
+    Source/CommonFramework/ResourceDownload/DownloadThread.cpp
+    Source/CommonFramework/ResourceDownload/DownloadThread.h
+    Source/CommonFramework/ResourceDownload/GlobalResourceDownloadManager.cpp
+    Source/CommonFramework/ResourceDownload/GlobalResourceDownloadManager.h
+    Source/CommonFramework/ResourceDownload/ProgramMissingResourceTracker.cpp
+    Source/CommonFramework/ResourceDownload/ProgramMissingResourceTracker.h
+    Source/CommonFramework/ResourceDownload/ResourceDownload.cpp
+    Source/CommonFramework/ResourceDownload/ResourceDownload.h
+    Source/CommonFramework/ResourceDownload/ResourceDownloadHelpers.cpp
+    Source/CommonFramework/ResourceDownload/ResourceDownloadHelpers.h
+    Source/CommonFramework/ResourceDownload/SettingsResourceDownloadOptions.cpp
+    Source/CommonFramework/ResourceDownload/SettingsResourceDownloadOptions.h
+    Source/CommonFramework/ResourceDownload/SettingsResourceDownloadRow.cpp
+    Source/CommonFramework/ResourceDownload/SettingsResourceDownloadRow.h
+    Source/CommonFramework/ResourceDownload/SettingsResourceDownloadTable.cpp
+    Source/CommonFramework/ResourceDownload/SettingsResourceDownloadTable.h
     Source/CommonFramework/StaticGlobals.cpp
     Source/CommonFramework/StaticGlobals.h
+    Source/CommonFramework/Tools/FileHash.cpp
+    Source/CommonFramework/Tools/FileHash.h
+    Source/CommonFramework/Tools/FileUnzip.cpp
+    Source/CommonFramework/Tools/FileUnzip.h
     Source/CommonFramework/Tools/GlobalThreadPools.cpp
     Source/CommonFramework/Tools/GlobalThreadPools.h
+    Source/CommonFramework/Tools/ProgramEnvironment.cpp
+    Source/CommonFramework/Tools/ProgramEnvironment.h
+    Source/CommonFramework/Tools/StatAccumulator.cpp
+    Source/CommonFramework/Tools/StatAccumulator.h
+    Source/CommonFramework/VideoPipeline/Backends/CameraImplementations.cpp
+    Source/CommonFramework/VideoPipeline/Backends/CameraImplementations.h
+    Source/CommonFramework/VideoPipeline/CameraInfo.h
+    Source/CommonFramework/VideoPipeline/VideoFeed.h
+    Source/CommonFramework/VideoPipeline/VideoFormats.cpp
+    Source/CommonFramework/VideoPipeline/VideoFormats.h
+    Source/CommonFramework/VideoPipeline/VideoPipelineOptions.h
+    Source/CommonFramework/VideoPipeline/VideoSession.cpp
+    Source/CommonFramework/VideoPipeline/VideoSession.h
+    Source/CommonFramework/VideoPipeline/VideoSource.cpp
+    Source/CommonFramework/VideoPipeline/VideoSource.h
+    Source/CommonFramework/VideoPipeline/VideoSourceDescriptor.cpp
+    Source/CommonFramework/VideoPipeline/VideoSourceDescriptor.h
+    Source/CommonFramework/VideoPipeline/VideoSources/VideoSource_Camera.cpp
+    Source/CommonFramework/VideoPipeline/VideoSources/VideoSource_Camera.h
+    Source/CommonFramework/VideoPipeline/VideoSources/VideoSource_Null.cpp
+    Source/CommonFramework/VideoPipeline/VideoSources/VideoSource_Null.h
+    Source/CommonFramework/Windows/DpiScaler.cpp
+    Source/CommonFramework/Windows/DpiScaler.h
     Source/CommonTools/Async/InterruptableCommands.cpp
     Source/CommonTools/Async/InterruptableCommands.h
     Source/CommonTools/Async/InterruptableCommands.tpp
     Source/CommonTools/InferenceCallbacks/InferenceCallback.h
+    Source/CommonTools/Options/StringSelectOption.cpp
+    Source/CommonTools/Options/StringSelectOption.h
     Source/CommonTools/Random.cpp
     Source/CommonTools/Random.h
+    Source/CompileTimeBackends.h
     Source/ControllerInput/ControllerInput.cpp
     Source/ControllerInput/ControllerInput.h
     Source/ControllerInput/Keyboard/KeyBindingOption.cpp
@@ -208,7 +364,11 @@ file(GLOB CORE_LIBRARY_SOURCES
     Source/Controllers/ControllerDescriptor.h
     Source/Controllers/ControllerOption.cpp
     Source/Controllers/ControllerOption.h
+    Source/Controllers/ControllerSession.cpp
+    Source/Controllers/ControllerSession.h
     Source/Controllers/ControllerSettings.h
+    Source/Controllers/ControllerState.cpp
+    Source/Controllers/ControllerState.h
     Source/Controllers/ControllerStatusThread.h
     Source/Controllers/ControllerTypes.h
     Source/Controllers/ControllerTypeStrings.cpp
@@ -226,28 +386,56 @@ file(GLOB CORE_LIBRARY_SOURCES
     Source/Controllers/PABotBase2/PABotBase2_DeviceHandle.h
     Source/Controllers/PABotBase2/PABotBase2_MessageHandler.cpp
     Source/Controllers/PABotBase2/PABotBase2_MessageHandler.h
+    Source/Controllers/PABotBase2/SerialPABotBase2_Connection.cpp
+    Source/Controllers/PABotBase2/SerialPABotBase2_Connection.h
     Source/Controllers/PABotBase2/SerialPABotBase2_Descriptor.cpp
     Source/Controllers/PABotBase2/SerialPABotBase2_Descriptor.h
     Source/Controllers/RumbleListener.h
     Source/Controllers/Schedulers/ControllerWithScheduler.h
     Source/Controllers/Schedulers/SuperscalarScheduler.cpp
     Source/Controllers/Schedulers/SuperscalarScheduler.h
-    Source/Controllers/SerialPort/SerialPABotBase.cpp
-    Source/Controllers/SerialPort/SerialPABotBase.h
     Source/Controllers/SerialPort/SerialLogger.cpp
     Source/Controllers/SerialPort/SerialLogger.h
+    Source/Controllers/SerialPort/SerialPABotBase.cpp
+    Source/Controllers/SerialPort/SerialPABotBase.h
+    Source/Controllers/StandardHid/StandardHid_Keyboard.cpp
+    Source/Controllers/StandardHid/StandardHid_Keyboard.h
     Source/Controllers/StandardHid/StandardHid_Keyboard_PABotBase2.cpp
     Source/Controllers/StandardHid/StandardHid_Keyboard_PABotBase2.h
     Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.cpp
     Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.h
+    Source/Integrations/DiscordIntegrationSettings.cpp
+    Source/Integrations/DiscordIntegrationSettings.h
+    Source/Integrations/DiscordIntegrationTable.cpp
+    Source/Integrations/DiscordIntegrationTable.h
+    Source/Integrations/DiscordSettingsOption.cpp
+    Source/Integrations/DiscordSettingsOption.h
+    Source/Integrations/DiscordWebhook.cpp
+    Source/Integrations/DiscordWebhook.h
+    Source/Integrations/DiscordWebhookSettings.cpp
+    Source/Integrations/DiscordWebhookSettings.h
+    Source/Integrations/ProgramTracker.cpp
+    Source/Integrations/ProgramTracker.h
+    Source/Integrations/PybindSwitchController.cpp
+    Source/Integrations/PybindSwitchController.h
+    Source/Kernels/AbsFFT/Kernels_AbsFFT.cpp
+    Source/Kernels/AbsFFT/Kernels_AbsFFT.h
+    Source/Kernels/AudioStreamConversion/AudioStreamConversion.cpp
+    Source/Kernels/AudioStreamConversion/AudioStreamConversion.h
     Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon.cpp
     Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon.h
+    Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon_from_Keyboard.cpp
+    Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon_from_Keyboard.h
     Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_JoyconState.cpp
     Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_JoyconState.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerSettings.cpp
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerSettings.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.h
+    Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.cpp
+    Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h
     Source/NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_Controller.cpp
@@ -264,72 +452,17 @@ file(GLOB CORE_LIBRARY_SOURCES
     Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController_from_Keyboard.h
     Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProControllerState.cpp
     Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProControllerState.h
-
-
-    ../Common/Cpp/ImageResolution.cpp
-    ../Common/Cpp/ImageResolution.h
-
-    Source/NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_KeyboardEntryMappings.cpp
-    Source/NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_KeyboardEntryMappings.h
-
+    Source/NintendoSwitch/NintendoSwitch_Settings.cpp
+    Source/NintendoSwitch/NintendoSwitch_Settings.h
+    Source/NintendoSwitch/NintendoSwitch_SettingsPanel.cpp
+    Source/NintendoSwitch/NintendoSwitch_SettingsPanel.h
     Source/NintendoSwitch/Options/NintendoSwitch_CodeEntrySettingsOption.cpp
     Source/NintendoSwitch/Options/NintendoSwitch_CodeEntrySettingsOption.h
-
-    Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon_from_Keyboard.cpp
-    Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon_from_Keyboard.h
-
-    Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.cpp
-    Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.h
-
-    Source/CommonFramework/Globals.cpp
-    Source/CommonFramework/Globals.h
-
-    Source/CommonFramework/ImageTypes/ImageViewPlanar32.cpp
-    Source/CommonFramework/ImageTypes/ImageViewPlanar32.h
-    Source/CommonFramework/ImageTypes/ImageViewRGB32.cpp
-    Source/CommonFramework/ImageTypes/ImageViewRGB32.h
-
-    ../Common/Cpp/Containers/AlignedVector.h
-    ../Common/Cpp/Containers/AlignedVector.tpp
-
-    Source/CommonFramework/ImageTypes/ImageRGB32.cpp
-    Source/CommonFramework/ImageTypes/ImageRGB32.h
-
-    Source/CommonTools/Options/StringSelectOption.cpp
-    Source/CommonTools/Options/StringSelectOption.h
-
-    Source/Controllers/PABotBase2/SerialPABotBase2_Connection.cpp
-    Source/Controllers/PABotBase2/SerialPABotBase2_Connection.h
-
-    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_ConnectionDebug.cpp
-    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_ConnectionDebug.h
-
-    Source/Controllers/StandardHid/StandardHid_Keyboard.cpp
-    Source/Controllers/StandardHid/StandardHid_Keyboard.h
-    
-    Source/Controllers/ControllerState.cpp
-    Source/Controllers/ControllerState.h
-
-    Source/CompileTimeBackends.h
-
-    Source/CommonFramework/GlobalAutoPaths.cpp
-    Source/CommonFramework/GlobalAutoPaths.h
-
-    Source/CommonFramework/Notifications/ProgramInfo.h
-
-
-    Source/Integrations/PybindSwitchController.cpp
-    Source/Integrations/PybindSwitchController.h
+    Source/NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_KeyboardEntryMappings.cpp
+    Source/NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_KeyboardEntryMappings.h
 )
 
 file(GLOB LIBRARY_SOURCES
-
-
-
-
-
-    ../3rdParty/miniz-3.1.1/miniz.h
-    ../3rdParty/miniz-3.1.1/miniz.c
     ../3rdParty/ONNX/OnnxToolsPA.h
     ../3rdParty/QtWavFile/WavFile.cpp
     ../3rdParty/QtWavFile/WavFile.h
@@ -343,19 +476,11 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Concurrency/BusyPeriodicRunner.h
     ../Common/Cpp/Concurrency/FireForgetDispatcher.cpp
     ../Common/Cpp/Concurrency/FireForgetDispatcher.h
-    ../Common/Cpp/Concurrency/PeriodicRunner.cpp
-    ../Common/Cpp/Concurrency/PeriodicRunner.h
-    ../Common/Cpp/Concurrency/ScheduledTaskRunner.cpp
-    ../Common/Cpp/Concurrency/ScheduledTaskRunner.h
-    ../Common/Cpp/Concurrency/Watchdog.cpp
-    ../Common/Cpp/Concurrency/Watchdog.h
     ../Common/Cpp/Containers/BoxSet.h
     ../Common/Cpp/Containers/DllSafeString.h
     ../Common/Cpp/Containers/SparseArray.cpp
     ../Common/Cpp/Containers/SparseArray.h
     ../Common/Cpp/DateTime.h
-    ../Common/Cpp/EarlyShutdown.h
-    ../Common/Cpp/EventRateTracker.h
     ../Common/Cpp/Filesystem/Filesystem_Qt.h
     ../Common/Cpp/Logging/OutputRedirector.cpp
     ../Common/Cpp/Logging/OutputRedirector.h
@@ -374,18 +499,12 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Options/DateOption.h
     ../Common/Cpp/Options/FixedCodeOption.cpp
     ../Common/Cpp/Options/FixedCodeOption.h
-    ../Common/Cpp/Options/FloatingPointOption.cpp
-    ../Common/Cpp/Options/FloatingPointOption.h
     ../Common/Cpp/Options/IntegerRangeOption.cpp
     ../Common/Cpp/Options/IntegerRangeOption.h
-    ../Common/Cpp/Options/KeyboardLayoutOption.cpp
-    ../Common/Cpp/Options/KeyboardLayoutOption.h
     ../Common/Cpp/Options/PathOption.cpp
     ../Common/Cpp/Options/PathOption.h
     ../Common/Cpp/Options/RandomCodeOption.cpp
     ../Common/Cpp/Options/RandomCodeOption.h
-    ../Common/Cpp/Options/StaticTableOption.cpp
-    ../Common/Cpp/Options/StaticTableOption.h
     ../Common/Cpp/Options/TextEditOption.cpp
     ../Common/Cpp/Options/TextEditOption.h
     ../Common/Cpp/Options/TimeExpressionOption.cpp
@@ -394,7 +513,6 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/PrintDebuggers.h
     ../Common/Cpp/Rectangle.h
     ../Common/Cpp/Rectangle.tpp
-    ../Common/Cpp/ScopeExit.h
     ../Common/Cpp/SIMDDebuggers.h
     ../Common/Cpp/StreamConnections/MockDevice.cpp
     ../Common/Cpp/StreamConnections/MockDevice.h
@@ -404,8 +522,6 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Sockets/ClientSocket_POSIX.h
     ../Common/Cpp/Sockets/ClientSocket_Qt.h
     ../Common/Cpp/Sockets/ClientSocket_WinSocket.h
-    ../Common/Cpp/StreamConverters.cpp
-    ../Common/Cpp/StreamConverters.h
     ../Common/Cpp/TestRunners/UnitTest.h
     ../Common/Cpp/TestRunners/UnitTestDatabase.h
     ../Common/Cpp/TestRunners/ParallelUnitTestRunner.cpp
@@ -490,19 +606,7 @@ file(GLOB LIBRARY_SOURCES
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS1_OemControllers.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS_WiredController.h
     ../Common/SerialPABotBase/SerialPABotBase_Protocol.h
-    Source/CommonFramework/AudioPipeline/AudioConstants.h
-    Source/CommonFramework/AudioPipeline/AudioFeed.h
-    Source/CommonFramework/AudioPipeline/AudioInfo.cpp
-    Source/CommonFramework/AudioPipeline/AudioInfo.h
     Source/CommonFramework/AudioPipeline/AudioNormalization.h
-    Source/CommonFramework/AudioPipeline/AudioOption.cpp
-    Source/CommonFramework/AudioPipeline/AudioOption.h
-    Source/CommonFramework/AudioPipeline/AudioPassthroughPair.h
-    Source/CommonFramework/AudioPipeline/AudioPipelineOptions.h
-    Source/CommonFramework/AudioPipeline/AudioSession.cpp
-    Source/CommonFramework/AudioPipeline/AudioSession.h
-    Source/CommonFramework/AudioPipeline/AudioStream.cpp
-    Source/CommonFramework/AudioPipeline/AudioStream.h
     Source/CommonFramework/AudioPipeline/AudioTemplate.cpp
     Source/CommonFramework/AudioPipeline/AudioTemplate.h
     Source/CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQt.cpp
@@ -515,12 +619,6 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/AudioPipeline/IO/AudioSink.h
     Source/CommonFramework/AudioPipeline/IO/AudioSource.cpp
     Source/CommonFramework/AudioPipeline/IO/AudioSource.h
-    Source/CommonFramework/AudioPipeline/Spectrum/AudioSpectrumHolder.cpp
-    Source/CommonFramework/AudioPipeline/Spectrum/AudioSpectrumHolder.h
-    Source/CommonFramework/AudioPipeline/Spectrum/FFTStreamer.cpp
-    Source/CommonFramework/AudioPipeline/Spectrum/FFTStreamer.h
-    Source/CommonFramework/AudioPipeline/Spectrum/Spectrograph.cpp
-    Source/CommonFramework/AudioPipeline/Spectrum/Spectrograph.h
     Source/CommonFramework/AudioPipeline/Tools/AudioFormatUtils.cpp
     Source/CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h
     Source/CommonFramework/AudioPipeline/Tools/AudioNormalization.h
@@ -537,29 +635,13 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Environment/HardwareValidation.h
     Source/CommonFramework/Environment/HardwareValidation_arm64.tpp
     Source/CommonFramework/Environment/HardwareValidation_x86.tpp
-    Source/CommonFramework/Environment/SystemSleep.cpp
-    Source/CommonFramework/Environment/SystemSleep.h
-    Source/CommonFramework/Environment/SystemSleep_Apple.tpp
-    Source/CommonFramework/Environment/SystemSleep_Linux.tpp
-    Source/CommonFramework/Environment/SystemSleep_Windows.tpp
-    Source/CommonFramework/ErrorReports/ErrorReports.cpp
-    Source/CommonFramework/ErrorReports/ErrorReports.h
-    Source/CommonFramework/ErrorReports/ProgramDumper.cpp
-    Source/CommonFramework/ErrorReports/ProgramDumper.h
-    Source/CommonFramework/ErrorReports/ProgramDumper_Windows.tpp
     Source/CommonFramework/Exceptions/FatalProgramException.cpp
     Source/CommonFramework/Exceptions/FatalProgramException.h
-    Source/CommonFramework/Exceptions/OperationFailedException.cpp
-    Source/CommonFramework/Exceptions/OperationFailedException.h
     Source/CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.cpp
     Source/CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h
     Source/CommonFramework/Exceptions/ProgramFinishedException.cpp
     Source/CommonFramework/Exceptions/ProgramFinishedException.h
     Source/CommonFramework/Exceptions/UnexpectedBattleException.h
-    Source/CommonFramework/GlobalServices.cpp
-    Source/CommonFramework/GlobalServices.h
-    Source/CommonFramework/GlobalSettingsPanel.cpp
-    Source/CommonFramework/GlobalSettingsPanel.h
     Source/CommonFramework/ImageTools/FloatPixel.cpp
     Source/CommonFramework/ImageTools/FloatPixel.h
     Source/CommonFramework/ImageTools/ImageBoxes.cpp
@@ -585,47 +667,20 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Logging/OutputRedirector.h
     Source/CommonFramework/Logging/QueuedLogger.cpp
     Source/CommonFramework/Logging/QueuedLogger.h
-    Source/CommonFramework/Notifications/EventNotificationOption.cpp
-    Source/CommonFramework/Notifications/EventNotificationOption.h
-    Source/CommonFramework/Notifications/EventNotificationsTable.cpp
-    Source/CommonFramework/Notifications/EventNotificationsTable.h
     Source/CommonFramework/Notifications/EventNotificationWidget.cpp
     Source/CommonFramework/Notifications/EventNotificationWidget.h
-    Source/CommonFramework/Notifications/MessageAttachment.cpp
-    Source/CommonFramework/Notifications/MessageAttachment.h
-    Source/CommonFramework/Notifications/ProgramNotifications.cpp
-    Source/CommonFramework/Notifications/ProgramNotifications.h
     Source/CommonFramework/Notifications/SenderNotificationTable.cpp
     Source/CommonFramework/Notifications/SenderNotificationTable.h
     Source/CommonFramework/Options/BoxOption.cpp
     Source/CommonFramework/Options/BoxOption.h
-    Source/CommonFramework/Options/CheckForUpdatesOption.h
     Source/CommonFramework/Options/Environment/OnnxOptions.h
-    Source/CommonFramework/Options/Environment/SleepSuppressOption.cpp
-    Source/CommonFramework/Options/Environment/SleepSuppressOption.h
-    Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp
-    Source/CommonFramework/Options/Environment/ThemeSelectorOption.h
-    Source/CommonFramework/Options/LabelCellOption.cpp
-    Source/CommonFramework/Options/LabelCellOption.h
     Source/CommonFramework/Options/NestedBoxDrawOption.cpp
     Source/CommonFramework/Options/NestedBoxDrawOption.h
     Source/CommonFramework/Options/QtWidget/LabelCellWidget.cpp
     Source/CommonFramework/Options/QtWidget/LabelCellWidget.h
-    Source/CommonFramework/Options/ResolutionOption.cpp
-    Source/CommonFramework/Options/ResolutionOption.h
-    Source/CommonFramework/Options/ScreenshotFormatOption.h
     Source/CommonFramework/Panels/ConsoleSettingsStretch.h
-    Source/CommonFramework/Panels/PanelDescriptor.cpp
-    Source/CommonFramework/Panels/PanelDescriptor.h
-    Source/CommonFramework/Panels/PanelInstance.cpp
-    Source/CommonFramework/Panels/PanelInstance.h
     Source/CommonFramework/Panels/PanelList.cpp
     Source/CommonFramework/Panels/PanelList.h
-    Source/CommonFramework/Panels/PanelTools.h
-    Source/CommonFramework/Panels/ProgramDescriptor.cpp
-    Source/CommonFramework/Panels/ProgramDescriptor.h
-    Source/CommonFramework/Panels/SettingsPanel.cpp
-    Source/CommonFramework/Panels/SettingsPanel.h
     Source/CommonFramework/Panels/UI/PanelElements.cpp
     Source/CommonFramework/Panels/UI/PanelElements.h
     Source/CommonFramework/Panels/UI/PanelListWidget.cpp
@@ -634,45 +689,14 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Panels/UI/PanelWidget.h
     Source/CommonFramework/Panels/UI/SettingsPanelWidget.cpp
     Source/CommonFramework/Panels/UI/SettingsPanelWidget.h
-    Source/CommonFramework/PersistentSettings.cpp
-    Source/CommonFramework/PersistentSettings.h
-    Source/CommonFramework/ProgramSession.cpp
-    Source/CommonFramework/ProgramSession.h
-    Source/CommonFramework/ProgramStats/StatsDatabase.cpp
-    Source/CommonFramework/ProgramStats/StatsDatabase.h
-    Source/CommonFramework/ProgramStats/StatsTracking.cpp
-    Source/CommonFramework/ProgramStats/StatsTracking.h
-    Source/CommonFramework/Recording/StreamHistoryOption.cpp
-    Source/CommonFramework/Recording/StreamHistoryOption.h
-    Source/CommonFramework/Recording/StreamHistorySession.cpp
-    Source/CommonFramework/Recording/StreamHistorySession.h
-    Source/CommonFramework/Recording/StreamHistoryTracker_Null.h
     Source/CommonFramework/Recording/StreamHistoryTracker_ParallelStreams.h
     Source/CommonFramework/Recording/StreamHistoryTracker_RecordOnTheFly.h
     Source/CommonFramework/Recording/StreamHistoryTracker_SaveFrames.cpp
     Source/CommonFramework/Recording/StreamHistoryTracker_SaveFrames.h
     Source/CommonFramework/Recording/StreamRecorder.cpp
     Source/CommonFramework/Recording/StreamRecorder.h
-    Source/CommonFramework/ResourceDownload/DownloadThread.cpp
-    Source/CommonFramework/ResourceDownload/DownloadThread.h
-    Source/CommonFramework/ResourceDownload/GlobalResourceDownloadManager.cpp
-    Source/CommonFramework/ResourceDownload/GlobalResourceDownloadManager.h
-    Source/CommonFramework/ResourceDownload/ProgramMissingResourceTracker.cpp
-    Source/CommonFramework/ResourceDownload/ProgramMissingResourceTracker.h
     Source/CommonFramework/ResourceDownload/ProgramResourceDownloadWidget.cpp
     Source/CommonFramework/ResourceDownload/ProgramResourceDownloadWidget.h
-    Source/CommonFramework/ResourceDownload/ResourceDownload.cpp
-    Source/CommonFramework/ResourceDownload/ResourceDownload.h
-    Source/CommonFramework/ResourceDownload/ResourceDownloadHelpers.cpp
-    Source/CommonFramework/ResourceDownload/ResourceDownloadHelpers.h
-    Source/CommonFramework/ResourceDownload/ResourceDownloadHelpersQt.cpp
-    Source/CommonFramework/ResourceDownload/ResourceDownloadHelpersQt.h
-    Source/CommonFramework/ResourceDownload/SettingsResourceDownloadOptions.cpp
-    Source/CommonFramework/ResourceDownload/SettingsResourceDownloadOptions.h
-    Source/CommonFramework/ResourceDownload/SettingsResourceDownloadRow.cpp
-    Source/CommonFramework/ResourceDownload/SettingsResourceDownloadRow.h
-    Source/CommonFramework/ResourceDownload/SettingsResourceDownloadTable.cpp
-    Source/CommonFramework/ResourceDownload/SettingsResourceDownloadTable.h
     Source/CommonFramework/ResourceDownload/SettingsResourceDownloadWidget.cpp
     Source/CommonFramework/ResourceDownload/SettingsResourceDownloadWidget.h
     Source/CommonFramework/Startup/NewVersionCheck.cpp
@@ -685,18 +709,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Tools/ErrorDumper.h
     Source/CommonFramework/Tools/FileDownloader.cpp
     Source/CommonFramework/Tools/FileDownloader.h
-    Source/CommonFramework/Tools/FileHash.cpp
-    Source/CommonFramework/Tools/FileHash.h
-    Source/CommonFramework/Tools/FileUnzip.cpp
-    Source/CommonFramework/Tools/FileUnzip.h
-    Source/CommonFramework/Tools/ProgramEnvironment.cpp
-    Source/CommonFramework/Tools/ProgramEnvironment.h
-    Source/CommonFramework/Tools/StatAccumulator.cpp
-    Source/CommonFramework/Tools/StatAccumulator.h
     Source/CommonFramework/Tools/VideoStream.cpp
     Source/CommonFramework/Tools/VideoStream.h
-    Source/CommonFramework/VideoPipeline/Backends/CameraImplementations.cpp
-    Source/CommonFramework/VideoPipeline/Backends/CameraImplementations.h
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.5.cpp
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.5.h
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.cpp
@@ -715,7 +729,6 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/VideoPipeline/Backends/SnapshotManager.h
     Source/CommonFramework/VideoPipeline/Backends/VideoFrameQt.cpp
     Source/CommonFramework/VideoPipeline/Backends/VideoFrameQt.h
-    Source/CommonFramework/VideoPipeline/CameraInfo.h
     Source/CommonFramework/VideoPipeline/Stats/CpuUtilizationStats.cpp
     Source/CommonFramework/VideoPipeline/Stats/CpuUtilizationStats.h
     Source/CommonFramework/VideoPipeline/Stats/MemoryUtilizationStats.cpp
@@ -730,9 +743,6 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/VideoPipeline/UI/VideoOverlayWidget.h
     Source/CommonFramework/VideoPipeline/UI/VideoSourceSelectorWidget.cpp
     Source/CommonFramework/VideoPipeline/UI/VideoSourceSelectorWidget.h
-    Source/CommonFramework/VideoPipeline/VideoFeed.h
-    Source/CommonFramework/VideoPipeline/VideoFormats.cpp
-    Source/CommonFramework/VideoPipeline/VideoFormats.h
     Source/CommonFramework/VideoPipeline/VideoOverlay.cpp
     Source/CommonFramework/VideoPipeline/VideoOverlay.h
     Source/CommonFramework/VideoPipeline/VideoOverlayOption.cpp
@@ -742,23 +752,10 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/VideoPipeline/VideoOverlaySession.h
     Source/CommonFramework/VideoPipeline/VideoOverlayTypes.cpp
     Source/CommonFramework/VideoPipeline/VideoOverlayTypes.h
-    Source/CommonFramework/VideoPipeline/VideoPipelineOptions.h
-    Source/CommonFramework/VideoPipeline/VideoSession.cpp
-    Source/CommonFramework/VideoPipeline/VideoSession.h
-    Source/CommonFramework/VideoPipeline/VideoSource.cpp
-    Source/CommonFramework/VideoPipeline/VideoSource.h
-    Source/CommonFramework/VideoPipeline/VideoSourceDescriptor.cpp
-    Source/CommonFramework/VideoPipeline/VideoSourceDescriptor.h
-    Source/CommonFramework/VideoPipeline/VideoSources/VideoSource_Camera.cpp
-    Source/CommonFramework/VideoPipeline/VideoSources/VideoSource_Camera.h
-    Source/CommonFramework/VideoPipeline/VideoSources/VideoSource_Null.cpp
-    Source/CommonFramework/VideoPipeline/VideoSources/VideoSource_Null.h
     Source/CommonFramework/VideoPipeline/VideoSources/VideoSource_StillImage.cpp
     Source/CommonFramework/VideoPipeline/VideoSources/VideoSource_StillImage.h
     Source/CommonFramework/Windows/ButtonDiagram.cpp
     Source/CommonFramework/Windows/ButtonDiagram.h
-    Source/CommonFramework/Windows/DpiScaler.cpp
-    Source/CommonFramework/Windows/DpiScaler.h
     Source/CommonFramework/Windows/MainWindow.cpp
     Source/CommonFramework/Windows/MainWindow.h
     Source/CommonFramework/Windows/WindowTracker.cpp
@@ -913,8 +910,6 @@ file(GLOB LIBRARY_SOURCES
     Source/ControllerInput/Keyboard/KeyboardInput_StateTracker.h
     Source/Controllers/ControllerSelectorWidget.cpp
     Source/Controllers/ControllerSelectorWidget.h
-    Source/Controllers/ControllerSession.cpp
-    Source/Controllers/ControllerSession.h
     Source/Controllers/ControllerStateTable.cpp
     Source/Controllers/ControllerStateTable.h
     Source/Controllers/NullControllerWidget.cpp
@@ -924,20 +919,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/PABotBase2/SerialPABotBase_StatusThread.h
     Source/Controllers/SerialPort/SerialPortPollerQt.cpp
     Source/Controllers/SerialPort/SerialPortPollerQt.h
-    Source/Controllers/StandardHid/StandardHid_Keyboard.cpp
-    Source/Controllers/StandardHid/StandardHid_Keyboard.h
-    Source/Integrations/DiscordIntegrationSettings.cpp
-    Source/Integrations/DiscordIntegrationSettings.h
-    Source/Integrations/DiscordIntegrationTable.cpp
-    Source/Integrations/DiscordIntegrationTable.h
-    Source/Integrations/DiscordSettingsOption.cpp
-    Source/Integrations/DiscordSettingsOption.h
     Source/Integrations/DiscordSocial/DiscordSocial.cpp
     Source/Integrations/DiscordSocial/DiscordSocial.h
-    Source/Integrations/DiscordWebhook.cpp
-    Source/Integrations/DiscordWebhook.h
-    Source/Integrations/DiscordWebhookSettings.cpp
-    Source/Integrations/DiscordWebhookSettings.h
     Source/Integrations/DppIntegration/DppClient.cpp
     Source/Integrations/DppIntegration/DppClient.h
     Source/Integrations/DppIntegration/DppCommandHandler.cpp
@@ -946,12 +929,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Integrations/DppIntegration/DppUtility.h
     Source/Integrations/IntegrationsAPI.cpp
     Source/Integrations/IntegrationsAPI.h
-    Source/Integrations/ProgramTracker.cpp
-    Source/Integrations/ProgramTracker.h
-    Source/Integrations/PybindSwitchController.cpp
-    Source/Integrations/PybindSwitchController.h
-    Source/Kernels/AbsFFT/Kernels_AbsFFT.cpp
-    Source/Kernels/AbsFFT/Kernels_AbsFFT.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch_Default.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch_x86_AVX2.h
@@ -973,8 +950,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.tpp
     Source/Kernels/Algorithm/Kernels_Algorithm_DisjointSet.cpp
     Source/Kernels/Algorithm/Kernels_Algorithm_DisjointSet.h
-    Source/Kernels/AudioStreamConversion/AudioStreamConversion.cpp
-    Source/Kernels/AudioStreamConversion/AudioStreamConversion.h
     Source/Kernels/AudioStreamConversion/AudioStreamConversion_Core_Default.cpp
     Source/Kernels/AudioStreamConversion/AudioStreamConversion_Core_x86_SSE41.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.cpp
@@ -1179,8 +1154,6 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h
     Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_JoyconTable.cpp
     Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_JoyconTable.h
-    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerSettings.cpp
-    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerSettings.h
     Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProControllerTable.cpp
     Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProControllerTable.h
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase3_ControllerState.h
@@ -1258,10 +1231,6 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h
     Source/NintendoSwitch/NintendoSwitch_Panels.cpp
     Source/NintendoSwitch/NintendoSwitch_Panels.h
-    Source/NintendoSwitch/NintendoSwitch_Settings.cpp
-    Source/NintendoSwitch/NintendoSwitch_Settings.h
-    Source/NintendoSwitch/NintendoSwitch_SettingsPanel.cpp
-    Source/NintendoSwitch/NintendoSwitch_SettingsPanel.h
     Source/NintendoSwitch/NintendoSwitch_SingleSwitchProgram.cpp
     Source/NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h
     Source/NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.cpp

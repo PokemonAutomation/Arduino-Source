@@ -10,7 +10,9 @@
 #include "Common/Compiler.h"
 #include "PanelDescriptor.h"
 
+#ifdef QT_CORE_LIB
 class QWidget;
+#endif
 
 namespace PokemonAutomation{
 
@@ -32,10 +34,12 @@ public:
 
     void validate_resource_list();
 
+#ifdef QT_CORE_LIB
 public:
     // The implmentation is defined in "UI/PanelWidget.h" to avoid circular dependency
     // Returns a UI/PanelWidget.h:PanelWidget
     virtual QWidget* make_widget(QWidget& parent, PanelHolder& holder);
+#endif
 
 public:
     //  Serialization

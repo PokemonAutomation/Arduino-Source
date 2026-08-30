@@ -13,7 +13,6 @@
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/ButtonOption.h"
-#include "Common/Qt/Options/GroupWidget.h"
 #include "DiscordIntegrationTable.h"
 
 namespace PokemonAutomation{

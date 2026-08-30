@@ -4,9 +4,11 @@
  *
  */
 
+#ifdef QT_CORE_LIB
 #include <QFile>
 #include <QTextStream>
 #include <QApplication>
+#endif
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "ThemeSelectorOption.h"
@@ -16,6 +18,7 @@ namespace PokemonAutomation{
 
 
 void set_theme(UiThemeMode theme_mode){
+#ifdef QT_CORE_LIB
     if (theme_mode == CURRENT_THEME){
         return;
     }
@@ -41,6 +44,7 @@ void set_theme(UiThemeMode theme_mode){
     app->setStyleSheet(stylesheet);
 
     CURRENT_THEME = theme_mode;
+#endif
 }
 
 
