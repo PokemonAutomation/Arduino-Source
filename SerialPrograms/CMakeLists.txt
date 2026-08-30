@@ -376,6 +376,10 @@ if (WIN32)
     target_compile_options(SerialProgramsLib PRIVATE /wd5054)  # Deprecated enum arithemtic
     target_compile_options(SerialProgramsLib PRIVATE /wd4505)  # unreferenced local function has been removed
 
+    target_compile_options(CoreLib PRIVATE /FAs /FaAssembly/ /MP /W4 /WX /external:anglebrackets /external:W0 /utf-8)
+    target_compile_options(CoreLib PRIVATE /wd5054)  # Deprecated enum arithemtic
+    target_compile_options(CoreLib PRIVATE /wd4505)  # unreferenced local function has been removed
+
     set(ARCH_FLAGS_09_Nehalem       /W4)    # Dummy parameter
     set(ARCH_FLAGS_13_Haswell       /arch:AVX2)
     set(ARCH_FLAGS_17_Skylake       /arch:AVX512)
@@ -384,6 +388,8 @@ if (WIN32)
     if(CMAKE_GENERATOR_TOOLSET MATCHES "ClangCL")
         target_compile_options(SerialProgramsLib PRIVATE -Wno-unused-function)
         target_compile_options(SerialProgramsLib PRIVATE -march=nehalem)
+        target_compile_options(CoreLib PRIVATE -Wno-unused-function)
+        target_compile_options(CoreLib PRIVATE -march=nehalem)
         set(ARCH_FLAGS_09_Nehalem       -march=nehalem)
         set(ARCH_FLAGS_13_Haswell       -march=haswell)
         set(ARCH_FLAGS_17_Skylake       -march=skylake-avx512)
