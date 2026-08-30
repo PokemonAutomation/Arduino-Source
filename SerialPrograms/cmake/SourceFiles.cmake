@@ -378,9 +378,6 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Options/RandomCodeOption.cpp
     ../Common/Cpp/Options/RandomCodeOption.h
     ../Common/Cpp/Options/TextEditOption.cpp
-
-
-
     ../Common/Cpp/Options/TextEditOption.h
     ../Common/Cpp/Options/TimeExpressionOption.cpp
     ../Common/Cpp/Options/TimeExpressionOption.h
@@ -400,12 +397,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/TestRunners/ParallelUnitTestRunner.cpp
     ../Common/Cpp/TestRunners/ParallelUnitTestRunner.h
     ../Common/Cpp/TestRunners/UnitTest.h
-
-
     ../Common/Cpp/TestRunners/UnitTestDatabase.h
     ../Common/Cpp/ValueDebouncer.h
-
-
     ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2FW_ReliableStreamConnection.cpp
     ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2FW_ReliableStreamConnection.h
     ../Common/Qt/AutoHeightTable.cpp
@@ -415,8 +408,6 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/CheckboxDropdown.h
     ../Common/Qt/CodeValidator.cpp
     ../Common/Qt/CodeValidator.h
-
-
     ../Common/Qt/CollapsibleGroupBox.cpp
     ../Common/Qt/CollapsibleGroupBox.h
     ../Common/Qt/GlobalThreadPoolsQt.cpp
@@ -427,11 +418,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/Options/BooleanCheckBoxWidget.cpp
     ../Common/Qt/Options/BooleanCheckBoxWidget.h
     ../Common/Qt/Options/BoxFloatWidget.cpp
-
     ../Common/Qt/Options/BoxFloatWidget.h
     ../Common/Qt/Options/ButtonWidget.cpp
-
-
     ../Common/Qt/Options/ButtonWidget.h
     ../Common/Qt/Options/CheckboxDropdownWidget.cpp
     ../Common/Qt/Options/CheckboxDropdownWidget.h
@@ -450,10 +438,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/Options/FloatingPointWidget.cpp
     ../Common/Qt/Options/FloatingPointWidget.h
     ../Common/Qt/Options/GroupWidget.cpp
-
     ../Common/Qt/Options/GroupWidget.h
     ../Common/Qt/Options/IntegerRangeWidget.cpp
-
     ../Common/Qt/Options/IntegerRangeWidget.h
     ../Common/Qt/Options/MacAddressWidget.cpp
     ../Common/Qt/Options/MacAddressWidget.h
@@ -466,21 +452,17 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/Options/StaticTableWidget.cpp
     ../Common/Qt/Options/StaticTableWidget.h
     ../Common/Qt/Options/StaticTextWidget.cpp
-
     ../Common/Qt/Options/StaticTextWidget.h
     ../Common/Qt/Options/StringWidget.cpp
     ../Common/Qt/Options/StringWidget.h
     ../Common/Qt/Options/TextEditWidget.cpp
-
     ../Common/Qt/Options/TextEditWidget.h
     ../Common/Qt/Options/TimeDurationWidget.cpp
     ../Common/Qt/Options/TimeDurationWidget.h
-
     ../Common/Qt/Options/TimeExpressionWidget.cpp
     ../Common/Qt/Options/TimeExpressionWidget.h
     ../Common/Qt/QtThreadPool.cpp
     ../Common/Qt/QtThreadPool.h
-
     ../Common/Qt/Redispatch.cpp
     ../Common/Qt/Redispatch.h
     ../Common/Qt/ShutdownWithEvents.h
@@ -881,6 +863,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonTools/VisualDetectors/ImageMatchDetector.h
     Source/ComputerPrograms/ComputerProgram.cpp
     Source/ComputerPrograms/ComputerProgram.h
+    Source/ComputerPrograms/UnitTestRunner.cpp
+    Source/ComputerPrograms/UnitTestRunner.h
     Source/ComputerPrograms/Framework/ComputerProgramOption.cpp
     Source/ComputerPrograms/Framework/ComputerProgramOption.h
     Source/ComputerPrograms/Framework/ComputerProgramSession.cpp
