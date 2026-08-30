@@ -224,16 +224,6 @@ endif()
 # Function to apply common properties to both library and executable targets
 function(apply_common_target_properties target_name)
     set_target_properties(${target_name} PROPERTIES LINKER_LANGUAGE CXX)
-    target_link_libraries(${target_name} PRIVATE
-        Qt${QT_MAJOR}::Widgets
-        Qt${QT_MAJOR}::SerialPort
-        Qt${QT_MAJOR}::Multimedia
-        Qt${QT_MAJOR}::MultimediaWidgets
-        Qt${QT_MAJOR}::OpenGLWidgets
-        Qt${QT_MAJOR}::Qml
-        Qt${QT_MAJOR}::Quick
-        Qt${QT_MAJOR}::QuickWidgets
-    )
     target_link_libraries(${target_name} PRIVATE Threads::Threads)
 
     #add defines
@@ -247,6 +237,18 @@ function(apply_common_target_properties target_name)
         target_compile_definitions(${target_name} PRIVATE PA_IMAGE_BACKEND_None)
         return()
     endif()
+
+    # include Qt headers
+    target_link_libraries(${target_name} PRIVATE
+        Qt${QT_MAJOR}::Widgets
+        Qt${QT_MAJOR}::SerialPort
+        Qt${QT_MAJOR}::Multimedia
+        Qt${QT_MAJOR}::MultimediaWidgets
+        Qt${QT_MAJOR}::OpenGLWidgets
+        Qt${QT_MAJOR}::Qml
+        Qt${QT_MAJOR}::Quick
+        Qt${QT_MAJOR}::QuickWidgets
+    )    
 
     # more include directories
     target_include_directories(${target_name} SYSTEM PRIVATE ../3rdParty/)

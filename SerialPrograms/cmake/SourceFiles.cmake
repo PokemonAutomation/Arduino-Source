@@ -69,7 +69,6 @@ file(GLOB CORE_LIBRARY_SOURCES
     ../Common/Cpp/Filesystem/Filesystem.h
     ../Common/Cpp/Filesystem/Filesystem_Linux.h
     ../Common/Cpp/Filesystem/Filesystem_Mac.h
-    ../Common/Cpp/Filesystem/Filesystem_Qt.h
     ../Common/Cpp/Filesystem/Filesystem_Windows.h
     ../Common/Cpp/Hardware/Hardware.cpp
     ../Common/Cpp/Hardware/Hardware.h
@@ -233,10 +232,10 @@ file(GLOB CORE_LIBRARY_SOURCES
     Source/Controllers/Schedulers/ControllerWithScheduler.h
     Source/Controllers/Schedulers/SuperscalarScheduler.cpp
     Source/Controllers/Schedulers/SuperscalarScheduler.h
-    Source/Controllers/SerialPABotBase/Connection/MessageLogger.cpp
-    Source/Controllers/SerialPABotBase/Connection/MessageLogger.h
-    Source/Controllers/SerialPABotBase/SerialPABotBase.cpp
-    Source/Controllers/SerialPABotBase/SerialPABotBase.h
+    Source/Controllers/SerialPort/SerialPABotBase.cpp
+    Source/Controllers/SerialPort/SerialPABotBase.h
+    Source/Controllers/SerialPort/SerialLogger.cpp
+    Source/Controllers/SerialPort/SerialLogger.h
     Source/Controllers/StandardHid/StandardHid_Keyboard_PABotBase2.cpp
     Source/Controllers/StandardHid/StandardHid_Keyboard_PABotBase2.h
     Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.cpp
@@ -311,6 +310,13 @@ file(GLOB CORE_LIBRARY_SOURCES
     Source/Controllers/ControllerState.cpp
     Source/Controllers/ControllerState.h
 
+    Source/CompileTimeBackends.h
+
+    Source/CommonFramework/GlobalAutoPaths.cpp
+    Source/CommonFramework/GlobalAutoPaths.h
+
+    Source/CommonFramework/Notifications/ProgramInfo.h
+
 
     Source/Integrations/PybindSwitchController.cpp
     Source/Integrations/PybindSwitchController.h
@@ -350,6 +356,7 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/DateTime.h
     ../Common/Cpp/EarlyShutdown.h
     ../Common/Cpp/EventRateTracker.h
+    ../Common/Cpp/Filesystem/Filesystem_Qt.h
     ../Common/Cpp/Logging/OutputRedirector.cpp
     ../Common/Cpp/Logging/OutputRedirector.h
     ../Common/Cpp/MemoryUtilization/MemoryUtilization.cpp
@@ -549,8 +556,6 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Exceptions/ProgramFinishedException.cpp
     Source/CommonFramework/Exceptions/ProgramFinishedException.h
     Source/CommonFramework/Exceptions/UnexpectedBattleException.h
-    Source/CommonFramework/GlobalAutoPaths.cpp
-    Source/CommonFramework/GlobalAutoPaths.h
     Source/CommonFramework/GlobalServices.cpp
     Source/CommonFramework/GlobalServices.h
     Source/CommonFramework/GlobalSettingsPanel.cpp
@@ -588,7 +593,6 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Notifications/EventNotificationWidget.h
     Source/CommonFramework/Notifications/MessageAttachment.cpp
     Source/CommonFramework/Notifications/MessageAttachment.h
-    Source/CommonFramework/Notifications/ProgramInfo.h
     Source/CommonFramework/Notifications/ProgramNotifications.cpp
     Source/CommonFramework/Notifications/ProgramNotifications.h
     Source/CommonFramework/Notifications/SenderNotificationTable.cpp
@@ -918,10 +922,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/PABotBase2/SerialPABotBase2_SelectorWidget.cpp
     Source/Controllers/PABotBase2/SerialPABotBase2_SelectorWidget.h
     Source/Controllers/PABotBase2/SerialPABotBase_StatusThread.h
-    Source/Controllers/SerialPort/SerialLogger.cpp
-    Source/Controllers/SerialPort/SerialLogger.h
-    Source/Controllers/SerialPort/SerialPABotBase.cpp
-    Source/Controllers/SerialPort/SerialPABotBase.h
     Source/Controllers/SerialPort/SerialPortPollerQt.cpp
     Source/Controllers/SerialPort/SerialPortPollerQt.h
     Source/Controllers/StandardHid/StandardHid_Keyboard.cpp
@@ -1329,7 +1329,6 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboMacro.h
     Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.h
-    Source/CompileTimeBackends.h
     Source/PanelLists.cpp
     Source/PanelLists.h
     Source/Pokemon/Inference/Pokemon_BerryNameReader.cpp
