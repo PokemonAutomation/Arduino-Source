@@ -24,6 +24,10 @@
 #include "SnapshotManager.h"
 #include "CameraImplementations.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 class QCamera;
 class QVideoSink;
 
@@ -123,6 +127,14 @@ class CameraVideoDisplay : public QQuickWidget{
 public:
     virtual ~CameraVideoDisplay();
     CameraVideoDisplay(QWidget* parent);
+
+    //  QQuickWidget drops mouseReleaseEvent.
+    virtual void mousePressEvent(QMouseEvent* event) override{
+        QWidget::mousePressEvent(event);
+    }
+    virtual void mouseReleaseEvent(QMouseEvent* event) override{
+        QWidget::mouseReleaseEvent(event);
+    }
 
 private:
     LifetimeSanitizer m_sanitizer;

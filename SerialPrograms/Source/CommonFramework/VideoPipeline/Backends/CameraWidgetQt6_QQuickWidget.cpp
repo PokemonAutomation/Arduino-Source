@@ -255,7 +255,5 @@ CameraVideoDisplay::CameraVideoDisplay(QWidget* parent)
 
 
 
-
-
 }
 }
