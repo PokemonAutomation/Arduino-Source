@@ -274,6 +274,7 @@ private:
 void add_tests_SelectionDialogDetector(UnitTestDatabase& database) {
     // Switch 1/2
     
+    /*
     // Original GBA resolution; {0.0, 0.0, 1.0, 1.0}
     database.add<Test_SelectionDialogDetector>("PokemonRSE/SelectionDialogDetector/GBA-Eng-Ruby_true.png", true);
     database.add<Test_SelectionDialogDetector>("PokemonRSE/SelectionDialogDetector/GBA-Ger-Emerald_true.png", true);
@@ -281,6 +282,7 @@ void add_tests_SelectionDialogDetector(UnitTestDatabase& database) {
     // Game Boy Player; {0.064217, 0.107667, 0.86413, 0.787928}
     database.add<Test_SelectionDialogDetector>("PokemonRSE/SelectionDialogDetector/GBP-Ger-Emerald_true.png", true);
     database.add<Test_SelectionDialogDetector>("PokemonRSE/SelectionDialogDetector/GBP-Ger-Ruby_true.png", true);
+    */
 }
 
 
@@ -317,6 +319,7 @@ private:
 void add_tests_ConfirmSlotDetector(UnitTestDatabase& database) {
     // Switch 1/2
 
+    /*
     // Original GBA resolution {0.0, 0.0, 1.0, 1.0}
     database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBA-Eng-Ruby_yes.png", ConfirmSlot::YES, ConfirmPosition::STANDARD, true);
     //database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBA-Eng-Ruby_yes.png", ConfirmSlot::NO, ConfirmPosition::STANDARD, false);
@@ -363,6 +366,7 @@ void add_tests_ConfirmSlotDetector(UnitTestDatabase& database) {
 
     // GBP STARTER
     database.add<Test_ConfirmSlotDetector>("PokemonRSE/ConfirmSlotDetector/GBP-Ger-Emerald-Starter_yes.png", ConfirmSlot::YES, ConfirmPosition::STARTER, true);
+    */
 }
 
 

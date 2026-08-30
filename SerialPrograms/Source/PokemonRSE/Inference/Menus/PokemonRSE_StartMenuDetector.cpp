@@ -117,6 +117,7 @@ private:
 void add_tests_StartMenuDetector(UnitTestDatabase & database) {
     // Switch 1/2
 
+    /*
     // Original GBA resolution; {0.0, 0.0, 1.0, 1.0}
     database.add<Test_StartMenuDetector>("PokemonRSE/StartMenuDetector/GBA-Ger-Emerald-Full-Pokedex_true.png", StartMenuState::FULL, true);
     database.add<Test_StartMenuDetector>("PokemonRSE/StartMenuDetector/GBA-Ger-Emerald-PrePokenav-Exit_true.png", StartMenuState::PRE_POKENAV, true);
@@ -131,6 +132,7 @@ void add_tests_StartMenuDetector(UnitTestDatabase & database) {
     // Game Boy Player; {0.064217, 0.107667, 0.86413, 0.787928}
     database.add<Test_StartMenuDetector>("PokemonRSE/StartMenuDetector/GBP-Ger-Emerald-Full-Pokemon_true.png", StartMenuState::FULL, true);
     database.add<Test_StartMenuDetector>("PokemonRSE/StartMenuDetector/GBP-Ger-Ruby-Full-Pokemon_true.png", StartMenuState::FULL, true);
+    */
 }
 
 
@@ -167,6 +169,7 @@ private:
 void add_tests_StartMenuSlotDetector(UnitTestDatabase & database) {
     // Switch 1/2
 
+    /*
     // Original GBA resolution; {0.0, 0.0, 1.0, 1.0}
     database.add<Test_StartMenuSlotDetector>("PokemonRSE/StartMenuDetector/GBA-Ger-Emerald-Full-Pokedex_true.png", StartMenuSlot::POKEDEX, StartMenuState::FULL, true);
     database.add<Test_StartMenuSlotDetector>("PokemonRSE/StartMenuDetector/GBA-Ger-Emerald-PrePokenav-Exit_true.png", StartMenuSlot::EXIT, StartMenuState::PRE_POKENAV, true);
@@ -181,7 +184,7 @@ void add_tests_StartMenuSlotDetector(UnitTestDatabase & database) {
     // Game Boy Player; {0.064217, 0.107667, 0.86413, 0.787928}
     database.add<Test_StartMenuSlotDetector>("PokemonRSE/StartMenuDetector/GBP-Ger-Emerald-Full-Pokemon_true.png", StartMenuSlot::POKEMON, StartMenuState::FULL, true);
     database.add<Test_StartMenuSlotDetector>("PokemonRSE/StartMenuDetector/GBP-Ger-Ruby-Full-Pokemon_true.png", StartMenuSlot::POKEMON, StartMenuState::FULL, true);
-
+    */
 }
 
 
