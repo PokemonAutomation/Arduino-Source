@@ -101,7 +101,7 @@ public:
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         DummyVideoOverlay video_overlay;
         ImageRGB32 image(m_image);
-        GigantamaxDetector detector(COLOR_BLACK, &video_overlay, ImageFloatBox(0.463, 0.09, 0.04, 0.06));
+        GigantamaxDetector detector(COLOR_BLACK, &video_overlay);
         bool result = detector.detect(image);
 
         if (result == m_expected)
