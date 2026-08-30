@@ -46,6 +46,7 @@ protected:
 
 class GradientArrowWatcher : public DetectorToFinder<GradientArrowDetector>{
 public:
+    ~GradientArrowWatcher();
     GradientArrowWatcher(
         Color color,
         GradientArrowType type,

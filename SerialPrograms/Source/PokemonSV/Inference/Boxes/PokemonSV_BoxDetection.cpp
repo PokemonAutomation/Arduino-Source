@@ -358,6 +358,8 @@ bool BoxEmptySlotDetector::detect(const ImageViewRGB32& frame){
 }
 
 
+BoxEmptySlotWatcher::~BoxEmptySlotWatcher() = default;
+
 
 BoxEmptyPartyWatcher::BoxEmptyPartyWatcher(Color color) : VisualInferenceCallback("BoxEmptyPartyWatcher"), m_empty_watchers(5){
     for (uint8_t i = 0; i < 5; i++){
