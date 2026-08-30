@@ -229,27 +229,29 @@ void TestDatabaseGenerator::program(
 
             std::ostringstream output;
             output << std::boolalpha
-                   << database_path
-                   << " | dex=" << dex_number
-                   << ", form=" << (alpha ? "Alpha" : "Regular")
-                   << ", shiny=" << shiny
-                   << " | box-view=" << box_view
+                   << database_path;
+            if (!renamed_path.empty()){
+                output << " (renamed -> " << renamed_path << ")";
+            }
+            output << "\n"
+                   << "  UI State:       box-view=" << box_view
                    << ", summary=" << summary
-                   << ", gigantamax=" << gigantamax
                    << ", arrow=" << optional_arrow_name(arrow)
                    << ", B=" << button_b
-                   << ", plus=" << button_plus
-                   << ", ball=" << (ball.empty() ? "none" : ball)
+                   << ", plus=" << button_plus << "\n"
+                   << "  Box Indicators: form=" << (alpha ? "Alpha" : "Regular")
+                   << ", shiny=" << shiny
+                   << ", gigantamax=" << gigantamax
                    << ", gender=" << gender_to_string(gender)
+                   << ", ball=" << (ball.empty() ? "none" : ball)
                    << ", tera=" << POKEMON_TERA_TYPE_SLUGS().get_string(tera_type)
-                   << ", origin=" << ORIGIN_MARK_SLUGS().get_string(origin)
-                   << " | OT=" << quote_string(original_trainer_name)
-                   << ", OT-ID=" << original_trainer_id
+                   << ", origin=" << ORIGIN_MARK_SLUGS().get_string(origin) << "\n"
+                   << "  Summary Info:   dex=" << dex_number
+                   << ", level=" << level
                    << ", nature=" << quote_string(nature)
                    << ", ability=" << quote_string(ability)
-                   << ", level=" << level;
-            if (!renamed_path.empty())
-                output << " | renamed-to=" << renamed_path;
+                   << ", OT=" << quote_string(original_trainer_name)
+                   << ", OT-ID=" << original_trainer_id;
             env.log(output.str());
 
             TestEntry entry;
@@ -345,13 +347,6 @@ void TestDatabaseGenerator::program(
         {"SummaryReader_Text",      &TestEntry::summary_text},
         {"SummaryReader_OtName",    &TestEntry::summary_ot_name},
     };
-
-    for (const Section& section : SECTIONS){
-        env.log(std::string("\n") + section.name + ":");
-        for (const TestEntry& entry : entries){
-            env.log(entry.*section.member);
-        }
-    }
 
     const Filesystem::Path output_path = directory / "PokemonHome_TestDatabase.txt";
     std::ofstream output_file(output_path.string());
