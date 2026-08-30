@@ -37,7 +37,7 @@ const std::string SwitchSystemOption::JSON_CONSOLE_TYPE = "ConsoleType";
 SwitchSystemOption::SwitchSystemOption(
     bool allow_commands_while_running
 )
-    : ConsoleSystemOption(1, allow_commands_while_running)
+    : ConsoleSystemOption(1, allow_commands_while_running)  //  REMOVE
 {}
 SwitchSystemOption::SwitchSystemOption(
     bool allow_commands_while_running,

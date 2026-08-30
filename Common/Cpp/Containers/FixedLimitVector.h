@@ -27,10 +27,10 @@ template <typename Object>
 class FixedLimitVector{
 public:
     ~FixedLimitVector();
-    FixedLimitVector(const FixedLimitVector&) = delete;
-    void operator=(const FixedLimitVector&) = delete;
-    FixedLimitVector(FixedLimitVector&& x);
-    void operator=(FixedLimitVector&& x);
+    FixedLimitVector(const FixedLimitVector& x);
+    void operator=(const FixedLimitVector& x);
+    FixedLimitVector(FixedLimitVector&& x) noexcept;
+    void operator=(FixedLimitVector&& x) noexcept;
 
 public:
     FixedLimitVector();
@@ -73,7 +73,7 @@ private:
 //  Implementations
 
 template <typename Object>
-FixedLimitVector<Object>::FixedLimitVector(FixedLimitVector&& x)
+FixedLimitVector<Object>::FixedLimitVector(FixedLimitVector&& x) noexcept
     : m_data(x.m_data)
     , m_size(x.m_size)
     , m_capacity(x.m_capacity)
@@ -83,7 +83,7 @@ FixedLimitVector<Object>::FixedLimitVector(FixedLimitVector&& x)
     x.m_capacity = 0;
 }
 template <typename Object>
-void FixedLimitVector<Object>::operator=(FixedLimitVector&& x){
+void FixedLimitVector<Object>::operator=(FixedLimitVector&& x) noexcept{
     reset();
     m_data = x.m_data;
     m_size = x.m_size;

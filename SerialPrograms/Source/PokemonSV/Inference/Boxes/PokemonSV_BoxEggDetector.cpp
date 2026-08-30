@@ -17,9 +17,6 @@
 #include "PokemonSV_BoxEggDetector.h"
 
 namespace PokemonAutomation{
-
-template class FixedLimitVector<NintendoSwitch::PokemonSV::BoxEggWatcher>;
-
 namespace NintendoSwitch{
 namespace PokemonSV{
 
@@ -98,8 +95,8 @@ bool BoxEggDetector::detect(const ImageViewRGB32& frame){
 }
 
 BoxEggPartyColumnWatcher::BoxEggPartyColumnWatcher(Color color)
-    : VisualInferenceCallback("BoxEggPartyColumnWatcher"),
-    m_egg_watchers(5), m_empty_watchers(5)
+    : VisualInferenceCallback("BoxEggPartyColumnWatcher")
+    , m_egg_watchers(5), m_empty_watchers(5)
 {
     for (uint8_t i = 0; i < 5; i++){
         m_egg_watchers.emplace_back(

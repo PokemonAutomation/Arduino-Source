@@ -22,7 +22,11 @@ namespace PokemonAutomation{
 class ControllerSelectorWidget : public QWidget, private ControllerSession::Listener{
 public:
     ~ControllerSelectorWidget();
-    ControllerSelectorWidget(QWidget& parent, ControllerSession& session);
+    ControllerSelectorWidget(
+        QWidget& parent,
+        ControllerSession& session,
+        bool show_enable_box
+    );
 
     ControllerSession& session(){
         return m_session;
@@ -51,10 +55,10 @@ private:
     void update_buttons();
 
 #if 0
-    virtual void keyPressEvent(QKeyEvent* event) override;
-    virtual void keyReleaseEvent(QKeyEvent* event) override;
     virtual void focusInEvent(QFocusEvent* event) override;
     virtual void focusOutEvent(QFocusEvent* event) override;
+    virtual void keyPressEvent(QKeyEvent* event) override;
+    virtual void keyReleaseEvent(QKeyEvent* event) override;
 #endif
 
 private:

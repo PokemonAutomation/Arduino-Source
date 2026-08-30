@@ -27,6 +27,25 @@ FixedLimitVector<Object>::~FixedLimitVector(){
 
 
 
+template <typename Object>
+FixedLimitVector<Object>::FixedLimitVector(const FixedLimitVector& x)
+    : FixedLimitVector(x.capacity())
+{
+    for (const Object& obj : x){
+        emplace_back(obj);
+    }
+}
+template <typename Object>
+void FixedLimitVector<Object>::operator=(const FixedLimitVector& x){
+    if (this == &x){
+        return;
+    }
+    FixedLimitVector tmp(x);
+    operator=(std::move(tmp));
+}
+
+
+
 //  Constructors
 
 template <typename Object>

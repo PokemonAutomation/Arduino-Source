@@ -37,7 +37,11 @@ private:
 // Detect if a slot in the box system is an egg.
 class BoxEggDetector : public StaticScreenDetector{
 public:
-    BoxEggDetector(BoxCursorLocation side, uint8_t row, uint8_t col, Color color = COLOR_YELLOW);
+    BoxEggDetector(
+        BoxCursorLocation side,
+        uint8_t row, uint8_t col,
+        Color color = COLOR_YELLOW
+    );
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) override;
@@ -49,7 +53,12 @@ private:
 
 class BoxEggWatcher : public DetectorToFinder<BoxEggDetector>{
 public:
-    BoxEggWatcher(BoxCursorLocation side, uint8_t row, uint8_t col, FinderType finder_type = FinderType::PRESENT, Color color = COLOR_YELLOW)
+    BoxEggWatcher(
+        BoxCursorLocation side,
+        uint8_t row, uint8_t col,
+        FinderType finder_type = FinderType::PRESENT,
+        Color color = COLOR_YELLOW
+    )
          : DetectorToFinder("BoxEggWatcher", finder_type, std::chrono::milliseconds(100), side, row, col, color)
     {}
 };

@@ -6,9 +6,9 @@
 
 #include <QKeyEvent>
 #include <QHBoxLayout>
+#include <QCheckBox>
 #include <QMessageBox>
 #include "Common/Qt/NoWheelComboBox.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Panels/ConsoleSettingsStretch.h"
 #include "Controllers/ControllerTypeStrings.h"
 #include "ControllerSelectorWidget.h"
@@ -31,22 +31,48 @@ namespace PokemonAutomation{
 ControllerSelectorWidget::~ControllerSelectorWidget(){
     m_session.remove_listener(*this);
 }
-ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSession& session)
+ControllerSelectorWidget::ControllerSelectorWidget(
+    QWidget& parent,
+    ControllerSession& session,
+    bool show_enable_box
+)
     : QWidget(&parent)
     , m_session(session)
 {
-    QHBoxLayout* layout0 = new QHBoxLayout(this);
-    layout0->setContentsMargins(0, 0, 0, 0);
+    QHBoxLayout* layoutL = new QHBoxLayout(this);
+    layoutL->setContentsMargins(0, 0, 0, 0);
 
-    layout0->addWidget(new QLabel("<b>Controller:</b>", this), CONSOLE_SETTINGS_STRETCH_L0_LABEL);
+    if (!show_enable_box){
+        layoutL->addWidget(new QLabel("<b>Controller:</b>", this), CONSOLE_SETTINGS_STRETCH_L0_LABEL);
+    }else{
+        QHBoxLayout* layoutL0 = new QHBoxLayout();
+        layoutL->addLayout(layoutL0, CONSOLE_SETTINGS_STRETCH_L0_LABEL);
+        layoutL0->setContentsMargins(0, 0, 0, 0);
 
-    QHBoxLayout* layout1 = new QHBoxLayout();
-    layout0->addLayout(layout1, CONSOLE_SETTINGS_STRETCH_L0_RIGHT);
-    layout1->setContentsMargins(0, 0, 0, 0);
+        layoutL0->addWidget(new QLabel("<b>Controller:</b>", this));
+
+        QCheckBox* check_box = new QCheckBox(this);
+        layoutL0->addWidget(check_box, 1, Qt::AlignRight);
+        if (session.input_enabled()){
+            check_box->setCheckState(Qt::Checked);
+        }else{
+            check_box->setCheckState(Qt::Unchecked);
+        }
+        connect(
+            check_box, &QCheckBox::checkStateChanged,
+            this, [this, check_box](int){
+                m_session.set_input_enabled(check_box->isChecked());
+            }
+        );
+    }
+
+    QHBoxLayout* layoutR = new QHBoxLayout();
+    layoutL->addLayout(layoutR, CONSOLE_SETTINGS_STRETCH_L0_RIGHT);
+    layoutR->setContentsMargins(0, 0, 0, 0);
 
     m_dropdowns = new QHBoxLayout();
-    layout1->addLayout(m_dropdowns, CONSOLE_SETTINGS_STRETCH_L1_BODY);
-    layout1->addSpacing(5);
+    layoutR->addLayout(m_dropdowns, CONSOLE_SETTINGS_STRETCH_L1_BODY);
+    layoutR->addSpacing(5);
 
     m_interface_dropdown = new NoWheelCompactComboBox(this);
     m_dropdowns->addWidget(m_interface_dropdown);
@@ -83,8 +109,8 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
     refresh_controllers(session.controller_type(), session.available_controllers());
 
     m_status_text = new QLabel(this);
-    layout1->addWidget(m_status_text, CONSOLE_SETTINGS_STRETCH_L1_RIGHT);
-    layout1->addSpacing(5);
+    layoutR->addWidget(m_status_text, CONSOLE_SETTINGS_STRETCH_L1_RIGHT);
+    layoutR->addSpacing(5);
 
     m_status_text->setText(QString::fromStdString(session.status_text()));
     m_status_text->setTextFormat(Qt::RichText);
@@ -99,7 +125,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
         "If the controller supports pairing, this will unpair it and allow it to pair with a new host."
     );
 #endif
-    layout1->addWidget(m_reset_button, CONSOLE_SETTINGS_STRETCH_L1_BUTTON);
+    layoutR->addWidget(m_reset_button, CONSOLE_SETTINGS_STRETCH_L1_BUTTON);
 
     bool options_locked = session.options_locked();
     if (m_selector){
@@ -292,6 +318,16 @@ void ControllerSelectorWidget::update_buttons(){
 }
 
 
+void ControllerSelectorWidget::focusInEvent(QFocusEvent* event){
+//    cout << "ControllerSelectorWidget::focusInEvent()" << endl;
+    QWidget::focusInEvent(event);
+}
+void ControllerSelectorWidget::focusOutEvent(QFocusEvent* event){
+//    cout << "ControllerSelectorWidget::focusOutEvent()" << endl;
+    m_shift_held = false;
+    update_buttons();
+    QWidget::focusOutEvent(event);
+}
 void ControllerSelectorWidget::keyPressEvent(QKeyEvent* event){
 //    cout << "ControllerSelectorWidget::keyPressEvent()" << endl;
     if (event->key() == Qt::Key_Shift){
@@ -307,16 +343,6 @@ void ControllerSelectorWidget::keyReleaseEvent(QKeyEvent* event){
     }
     update_buttons();
 //    QWidget::keyReleaseEvent(event);
-}
-void ControllerSelectorWidget::focusInEvent(QFocusEvent* event){
-//    cout << "ControllerSelectorWidget::focusInEvent()" << endl;
-    QWidget::focusInEvent(event);
-}
-void ControllerSelectorWidget::focusOutEvent(QFocusEvent* event){
-//    cout << "ControllerSelectorWidget::focusOutEvent()" << endl;
-    m_shift_held = false;
-    update_buttons();
-    QWidget::focusOutEvent(event);
 }
 #endif
 

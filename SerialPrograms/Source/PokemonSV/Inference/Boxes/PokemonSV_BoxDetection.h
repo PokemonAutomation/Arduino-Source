@@ -135,7 +135,11 @@ public:
 // are fully loaded before calling this detector.
 class BoxEmptySlotDetector : public StaticScreenDetector{
 public:
-    BoxEmptySlotDetector(BoxCursorLocation side, uint8_t row, uint8_t col, Color color = COLOR_RED);
+    BoxEmptySlotDetector(
+        BoxCursorLocation side,
+        uint8_t row, uint8_t col,
+        Color color = COLOR_RED
+    );
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) override;
@@ -145,7 +149,12 @@ private:
 };
 class BoxEmptySlotWatcher : public DetectorToFinder<BoxEmptySlotDetector>{
 public:
-    BoxEmptySlotWatcher(BoxCursorLocation side, uint8_t row, uint8_t col, FinderType finder_type = FinderType::PRESENT, Color color = COLOR_RED)
+    BoxEmptySlotWatcher(
+        BoxCursorLocation side,
+        uint8_t row, uint8_t col,
+        FinderType finder_type = FinderType::PRESENT,
+        Color color = COLOR_RED
+    )
          : DetectorToFinder("BoxEmptySlotWatcher", finder_type, std::chrono::milliseconds(100), side, row, col, color)
     {}
 };

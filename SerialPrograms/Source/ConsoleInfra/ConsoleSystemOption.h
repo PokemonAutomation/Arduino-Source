@@ -10,7 +10,7 @@
 #ifndef PokemonAutomation_ConsoleInfra_ConsoleSystemOption_H
 #define PokemonAutomation_ConsoleInfra_ConsoleSystemOption_H
 
-#include <vector>
+#include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "CommonFramework/AudioPipeline/AudioOption.h"
 #include "CommonFramework/VideoPipeline/VideoSourceDescriptor.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayOption.h"
@@ -52,7 +52,7 @@ public:
     VideoSourceOption m_video;
     AudioOption m_audio;
     VideoOverlayOption m_overlay;
-    std::vector<ControllerOption> m_controllers;
+    FixedLimitVector<ControllerOption> m_controllers;
 };
 
 

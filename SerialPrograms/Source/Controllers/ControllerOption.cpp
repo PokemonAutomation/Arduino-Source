@@ -41,17 +41,24 @@ void InterfaceType::register_factory(
 
 
 
-ControllerOption::ControllerOption()
-    : m_descriptor(new NullControllerDescriptor())
+ControllerOption::ControllerOption(bool default_enable_mode)
+    : m_default_enable_mode(default_enable_mode)
+    , m_enable_input(default_enable_mode)
+    , m_descriptor(new NullControllerDescriptor())
+    , m_sanitizer("ControllerOption")
 {}
 
 
 void ControllerOption::set_descriptor(std::shared_ptr<ControllerDescriptor> descriptor){
+    m_sanitizer.check_scope();
+
     m_descriptor_cache[descriptor->interface_type] = descriptor;
     m_descriptor = std::move(descriptor);
 }
 
 std::shared_ptr<ControllerDescriptor> ControllerOption::get_descriptor_from_cache(ControllerInterface interface_type) const{
+    m_sanitizer.check_scope();
+
     auto iter = m_descriptor_cache.find(interface_type);
     if (iter == m_descriptor_cache.end()){
         return nullptr;
@@ -62,6 +69,8 @@ std::shared_ptr<ControllerDescriptor> ControllerOption::get_descriptor_from_cach
 
 
 void ControllerOption::load_json(const JsonValue& json){
+    m_sanitizer.check_scope();
+
     std::shared_ptr<ControllerDescriptor> descriptor;
     do{
         if (json.is_null()){
@@ -72,6 +81,9 @@ void ControllerOption::load_json(const JsonValue& json){
         if (obj == nullptr){
             break;
         }
+
+        obj->read_boolean(m_enable_input, "EnableInput");
+
         const std::string* type = obj->get_string("Interface");
         if (type == nullptr){
             break;
@@ -100,10 +112,13 @@ void ControllerOption::load_json(const JsonValue& json){
     m_descriptor = std::move(descriptor);
 }
 JsonValue ControllerOption::to_json() const{
+    m_sanitizer.check_scope();
+
     if (!m_descriptor){
         return JsonValue();
     }
     JsonObject obj;
+    obj["EnableInput"] = m_enable_input;
     obj["Interface"] = CONTROLLER_INTERFACE_STRINGS.get_string(m_descriptor->interface_type);
 
     for (const auto& item : m_descriptor_cache){

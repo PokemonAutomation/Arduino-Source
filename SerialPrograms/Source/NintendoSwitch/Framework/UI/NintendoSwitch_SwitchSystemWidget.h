@@ -21,6 +21,7 @@
 #include <QWidget>
 #include "CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h"
+#include "ConsoleInfra/ConsoleSystemWidget.h"
 
 namespace PokemonAutomation{
     class CollapsibleGroupBox;
@@ -46,9 +47,8 @@ class CommandRow;
 // - Video stream display
 // It also owns a SwitchSystemSession that manages the life time of the controller,
 // audio and video streams that will be exposed to automation programs.
-class SwitchSystemWidget final : public QWidget{
+class SwitchSystemWidget final : public ConsoleInfra::ConsoleSystemWidget{
 public:
-    virtual ~SwitchSystemWidget();
     SwitchSystemWidget(
         QWidget& parent,
         SwitchSystemSession& session,
@@ -59,25 +59,9 @@ public:
     void update_ui(ProgramState state);
 
 private:
-    virtual void focusInEvent(QFocusEvent* event) override;
-    virtual void focusOutEvent(QFocusEvent* event) override;
-    virtual void keyPressEvent(QKeyEvent* event) override;
-    virtual void keyReleaseEvent(QKeyEvent* event) override;
-
-private:
     SwitchSystemSession& m_session;
 
-    CollapsibleGroupBox* m_group_box;
-
-    ControllerSelectorWidget* m_controller;
-
-    VideoDisplayWidget* m_video_display;
-    AudioDisplayWidget* m_audio_display;
-
     CommandRow* m_command;
-
-    VideoSourceSelectorWidget* m_video_selector;
-    AudioSelectorWidget* m_audio_widget;
 };
 
 
