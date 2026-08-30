@@ -170,8 +170,8 @@ const std::unordered_set<std::string>& all_resource_names(){
 
 
 JsonValue fetch_resource_download_list_json_from_remote(){
-    Logger& logger = global_logger_tagged();
 #ifdef QT_CORE_LIB
+    Logger& logger = global_logger_tagged();
     JsonValue json = 
         FileDownloader::download_json_file(
             logger,
