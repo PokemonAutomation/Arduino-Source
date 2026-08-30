@@ -168,16 +168,12 @@ const std::unordered_set<std::string>& all_resource_names(){
 
 
 JsonValue fetch_resource_download_list_json_from_remote(){
-#ifdef QT_CORE_LIB
     Logger& logger = global_logger_tagged();
     JsonValue json = 
         FileDownloader::download_json_file(
             logger,
             "https://raw.githubusercontent.com/PokemonAutomation/Packages/refs/heads/master/Resources/ResourceDownloadList.json"
         );
-#else
-    JsonValue json; // placeholder when no Qt
-#endif
     
     return json;
 }

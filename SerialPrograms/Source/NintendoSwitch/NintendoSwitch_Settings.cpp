@@ -161,9 +161,7 @@ ConsoleSettings::ConsoleSettings()
     )
     , KEYBOARD_SECTION("<font size=4><b>Keyboard to Controller Mappings:</b></font>")
 {
-#ifdef QT_CORE_LIB
     PA_ADD_OPTION(CONTROLLER_SETTINGS);
-#endif
     PA_ADD_OPTION(TRUST_USER_CONSOLE_SELECTION);
     PA_ADD_OPTION(BLIND_START_GAME_MASH);
     PA_ADD_OPTION(CLOSE_GAME_DELAY);

@@ -9,8 +9,10 @@
 #include "Common/CRC32/pabb_CRC32.h"
 #include "CommonFramework/Logging/Logger.h"
 //#include "CommonFramework/PersistentSettings.h"
+#ifdef QT_CORE_LIB
 #include "CommonFramework/Panels/PanelTools.h"
 #include "NintendoSwitch/NintendoSwitch_SettingsPanel.h"
+#endif
 #include "NintendoSwitch_ControllerSettings.h"
 
 //#include <iostream>
@@ -579,10 +581,12 @@ ControllerProfile ControllerSettingsTable::get_or_make_profile(
     this->append_row(std::move(row));
 //    PERSISTENT_SETTINGS().write();
 
+#ifdef QT_CORE_LIB
     //  This is brutal (tech-debt). The only way to force the settings to save
     //  is to load the panel. TODO: Redesign panels to allow external editing.
     //  This is also coming in from a different thread (not the main Qt thread).
     PanelDescriptorWrapper<ConsoleSettings_Descriptor, ConsoleSettingsPanel>().make_panel()->save_settings();
+#endif
 
     return profile;
 }
