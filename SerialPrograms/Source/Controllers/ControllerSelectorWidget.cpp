@@ -105,7 +105,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(
     m_dropdowns->addSpacing(5);
     m_controllers_dropdown = new NoWheelCompactComboBox(this);
     m_controllers_dropdown->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-    m_dropdowns->addWidget(m_controllers_dropdown);
+    m_dropdowns->addWidget(m_controllers_dropdown, 5);
     refresh_controllers(session.controller_type(), session.available_controllers());
 
     m_status_text = new QLabel(this);
@@ -221,11 +221,12 @@ void ControllerSelectorWidget::update_interface_dropdown(ControllerInterface int
             return;
         }
     }
-    m_session.set_controller(ControllerType::None);
+//    m_session.set_controller(ControllerType::None);
     m_interface_dropdown->setCurrentIndex(-1);
 }
 void ControllerSelectorWidget::refresh_selection(ControllerInterface interface_type){
 //    cout << "refresh_selection(): "<< endl;
+
     update_interface_dropdown(interface_type);
 
     delete m_selector;
@@ -246,8 +247,6 @@ void ControllerSelectorWidget::refresh_selection(ControllerInterface interface_t
 
     default:;
     }
-
-
 }
 
 void ControllerSelectorWidget::refresh_controllers(

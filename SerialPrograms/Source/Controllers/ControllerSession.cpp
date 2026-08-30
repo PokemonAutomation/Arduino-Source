@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
+//#include "Common/Cpp/Exceptions.h"
 //#include "ControllerTypeStrings.h"
 #include "ControllerSession.h"
 
@@ -257,6 +257,7 @@ bool ControllerSession::set_controller(ControllerType controller_type){
                 return false;
             }
             if (m_connection){
+//                cout << (int)m_connection->current_controller() << endl;
                 if (m_connection->current_controller() == controller_type){
                     return true;
                 }
