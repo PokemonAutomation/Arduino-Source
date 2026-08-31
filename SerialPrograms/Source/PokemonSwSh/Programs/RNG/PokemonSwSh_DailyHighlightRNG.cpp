@@ -194,7 +194,7 @@ void DailyHighlightRNG::interact_with_trader(SingleSwitchProgramEnvironment& env
             DailyHighlightRNG_Descriptor::Stats& stats = env.current_stats<DailyHighlightRNG_Descriptor::Stats>();
             stats.errors++;
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to talk to the trader.",
                 env.console
             );
@@ -233,7 +233,7 @@ void DailyHighlightRNG::buy_highlight(SingleSwitchProgramEnvironment& env, ProCo
         DailyHighlightRNG_Descriptor::Stats& stats = env.current_stats<DailyHighlightRNG_Descriptor::Stats>();
         stats.errors++;
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Could not detect dialog.",
             env.console
         );
@@ -328,7 +328,7 @@ uint8_t DailyHighlightRNG::calibrate_num_npc_from_party(SingleSwitchProgramEnvir
     }
 
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "NPC is in the wrong state or an unexpected number of NPCs is in the area.",
         env.console
     );
@@ -401,7 +401,7 @@ void DailyHighlightRNG::return_to_overworld(SingleSwitchProgramEnvironment& env,
         DailyHighlightRNG_Descriptor::Stats& stats = env.current_stats<DailyHighlightRNG_Descriptor::Stats>();
         stats.errors++;
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Cannot detect the Y-Comm icon.",
             env.console
         );
@@ -519,7 +519,7 @@ void DailyHighlightRNG::program(SingleSwitchProgramEnvironment& env, ProControll
             state_errors++;
             if (state_errors >= 3){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Detected invalid RNG state three times in a row.",
                     env.console
                 );

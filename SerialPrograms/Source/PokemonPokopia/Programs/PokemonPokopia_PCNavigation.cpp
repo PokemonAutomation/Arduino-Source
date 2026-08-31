@@ -375,7 +375,7 @@ void wait_for_overworld(ConsoleHandle& console, ProControllerContext& context){
     if (ret != 0){
         console.log("Failed to detect overworld");
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "wait_for_overworld() failed to detect overworld",
             console
         );
@@ -397,7 +397,7 @@ void mash_until_overworld(ConsoleHandle& console, ProControllerContext& context)
     if (ret != 0){
         console.log("Failed to detect overworld");
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "mash_until_overworld() failed to detect overworld",
             console
         );
@@ -506,7 +506,7 @@ void access_pc_from_overworld(ConsoleHandle& console, ProControllerContext& cont
                             console.log("Successfully navigated up to main PC menu from stamp redeem prompt");
                             if (stop_on_stamp_card){
                                 OperationFailedExceptionWithScreenshot::fire(
-                                    ErrorReport::SEND_ERROR_REPORT,
+                                    ErrorReportMode::SEND_ERROR_REPORT,
                                     "access_pc_from_overworld() failed to find stamp card menu after redeeming stamps",
                                     console
                                 );
@@ -543,7 +543,7 @@ void access_pc_from_overworld(ConsoleHandle& console, ProControllerContext& cont
         }
     }
     throw OperationFailedExceptionWithScreenshot(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "access_pc_from_overworld() failed to open PC",
         console
     );
@@ -567,7 +567,7 @@ void exit_pc(ConsoleHandle& console, ProControllerContext& context){
     if (ret != 0){
         console.log("Failed to detect return to overworld");
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "exit_pc() failed to detect return to overworld",
             console
         );
@@ -584,7 +584,7 @@ void open_menu_option(ConsoleHandle& console, ProControllerContext& context, PCM
     if (!set_menu_option(console, context, option)){
         console.log("Failed to set menu option");
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "open_menu_option() failed to set menu option",
             console
         );
@@ -619,7 +619,7 @@ void open_menu_option(ConsoleHandle& console, ProControllerContext& context, PCM
     }
     console.log("Failed to open PC menu option");
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "open_menu_option() failed to open PC menu option",
         console
     );
@@ -642,7 +642,7 @@ void generic_select_and_open(
     if (!generic_navigate_to_target(console, context, option_boxes, target_index, arrow_type)){
         console.log("Failed to navigate and confirm the target");
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "generic_select_and_open() failed to navigate and confirm the target",
             console
         );
@@ -660,7 +660,7 @@ void generic_select_and_open(
     }
     console.log("Failed to open target option");
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "generic_select_and_open() failed to open target option",
         console
     );
@@ -696,7 +696,7 @@ void continue_until_prompt(
     if (ret != 0){
         console.log("Failed to detect prompt");
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "continue_until_prompt() failed to detect prompt",
             console
         );
@@ -758,7 +758,7 @@ void buy_item(ConsoleHandle& console, ProControllerContext& context, int item_in
     if (ret != 0){
         console.log("Failed to detect shop after purchase");
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "buy_item() failed to detect shop after purchase",
             console
         );
@@ -833,7 +833,7 @@ bool add_stamp(ConsoleHandle& console, ProControllerContext& context, SelectionA
         }
     }
     throw OperationFailedExceptionWithScreenshot(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "add_stamp() failed to add stamp",
         console
     );
@@ -860,7 +860,7 @@ void replace_stamp(
     }
     console.log("Failed to replace stamp");
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "replace_stamp() failed to replace stamp",
         console
     );
@@ -881,7 +881,7 @@ void move_to_next_stamp(ConsoleHandle& console, ProControllerContext& context, S
         if (ret != 0) {
             console.log("Failed to detect selector after moving to next stamp");
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "move_to_next_stamp() failed to detect selector after moving to next stamp",
                 console
             );
@@ -894,7 +894,7 @@ void move_to_next_stamp(ConsoleHandle& console, ProControllerContext& context, S
     }
     console.log("Failed to move selector to next stamp");
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "move_to_next_stamp() failed to move selector to next stamp",
         console
     );

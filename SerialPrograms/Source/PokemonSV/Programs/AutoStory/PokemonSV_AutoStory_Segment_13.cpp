@@ -266,7 +266,7 @@ void checkpoint_29(
         while (true){
             if (current_time() - start_to_cross_bridge > std::chrono::minutes(6)){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "checkpoint_26(): Failed to cross bridge after 6 minutes.",
                     env.console
                 );

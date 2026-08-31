@@ -589,7 +589,7 @@ void checkpoint_26(
         );
         if (ret < 0){
             throw_and_log<OliveActionFailedException>(
-                env.logger(), ErrorReport::SEND_ERROR_REPORT,
+                env.logger(), ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to finish Olive roll in the last stretch.",
                 env.console
             );

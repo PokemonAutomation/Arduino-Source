@@ -118,7 +118,7 @@ WildCatchOutcome catch_wild_for_seed_id(
     int ret = watch_for_shiny_encounter(env.console, context);
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "catch_wild_for_seed_id(): Failed to trigger battle",
             env.console
         );

@@ -101,7 +101,7 @@ void change_mount(VideoStream& stream, ProControllerContext& context, MountState
     }
 
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         std::string("Unable to find ") + MOUNT_STATE_STRINGS[(size_t)mount] + " after 10 attempts.",
         stream
     );
@@ -135,7 +135,7 @@ void dismount(VideoStream& stream, ProControllerContext& context){
     }
 
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "Unable to dismount after 10 attempts.",
         stream
     );

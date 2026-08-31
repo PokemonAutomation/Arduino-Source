@@ -140,7 +140,7 @@ bool IngoBattleGrinder::start_dialog(VideoStream& stream, ProControllerContext& 
             break;
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Unable to detect options after 10 A presses.",
                 stream
             );
@@ -171,7 +171,7 @@ bool IngoBattleGrinder::start_dialog(VideoStream& stream, ProControllerContext& 
         return false;
     default:
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Unable to find opponent list options after 5 A presses.",
             stream
         );
@@ -269,7 +269,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ProCo
         if (ret < 0){
             env.console.log("Error: Failed to find battle menu after 2 minutes.");
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to find battle menu after 2 minutes.",
                 env.console
             );
@@ -315,7 +315,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ProCo
                         // Struggle.
                         env.console.log("No PP on all moves. Abort program.", COLOR_RED);
                         OperationFailedExceptionWithScreenshot::fire(
-                            ErrorReport::SEND_ERROR_REPORT,
+                            ErrorReportMode::SEND_ERROR_REPORT,
                             "No PP on all moves.",
                             env.console
                         );

@@ -106,7 +106,7 @@ bool StandardEncounterHandler::handle_standard_encounter(const DoublesShinyDetec
         m_consecutive_failures++;
         if (m_consecutive_failures >= 3){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "3 consecutive failed encounter detections.",
                 m_stream
             );
@@ -169,7 +169,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         m_consecutive_failures++;
         if (m_consecutive_failures >= 3){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "3 consecutive failed encounter detections.",
                 m_stream
             );
@@ -284,7 +284,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
             break;
         default:
             throw_and_log<FatalProgramException>(
-                m_stream.logger(), ErrorReport::NO_ERROR_REPORT,
+                m_stream.logger(), ErrorReportMode::NO_ERROR_REPORT,
                 "Unable to recover from failed catch.",
                 m_stream
             );

@@ -186,7 +186,7 @@ void ShinyHunt_HyperspaceHunter::use_fly_spot_reset(
                     stats.errors++;
                     env.update_stats();
                     OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "use_fly_spot_reset(): Cannot fast travel after being chased by wild pokemon.",
                         env.console
                     );
@@ -199,7 +199,7 @@ void ShinyHunt_HyperspaceHunter::use_fly_spot_reset(
                     stats.errors++;
                     env.update_stats();
                     OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "use_fly_spot_reset(): Cannot fast travel after moving map cursor.",
                         env.console
                     );
@@ -213,7 +213,7 @@ void ShinyHunt_HyperspaceHunter::use_fly_spot_reset(
                     stats.errors++;
                     env.update_stats();
                     OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "use_fly_spot_reset(): Cannot read Calorie number on screen.",
                         env.console
                     );

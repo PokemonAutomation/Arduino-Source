@@ -135,7 +135,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to open bag after 10 attempts.",
                 env.console
             );
@@ -163,7 +163,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "AudioStarterReset: Invalid target.",
                 env.console
             );
@@ -189,7 +189,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to start battle after 10 attempts.",
                 env.console
             );
@@ -216,7 +216,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
                     stats.errors++;
                     env.update_stats();
                     OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Battle Advance arrow was not detected.",
                         env.console
                     );
@@ -269,7 +269,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
                     stats.errors++;
                     env.update_stats();
                     OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Battle menu was not detected.",
                         env.console
                     );

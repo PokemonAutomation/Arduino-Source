@@ -56,7 +56,7 @@ PageIngredients BerrySession::read_screen(std::shared_ptr<const ImageRGB32> scre
     //cout << "selected slot = " << (int)ret.selected << endl;
     if (ret.selected < 0 || ret.selected >= 8){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "BerrySession::read_current_page(): Invalid cursor slot.",
             m_stream,
             screen
@@ -113,7 +113,7 @@ PageIngredients BerrySession::read_screen(std::shared_ptr<const ImageRGB32> scre
                 sprite_result.insert(p.second);
             }
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "BerrySession::read_current_page(): Unable to read selected item. OCR and sprite do not agree on any match: ocr "
                 + set_to_str(ocr_result) + ", sprite " + set_to_str(sprite_result),
                 m_stream,
@@ -126,7 +126,7 @@ PageIngredients BerrySession::read_screen(std::shared_ptr<const ImageRGB32> scre
                 sprite_result.insert(p.second);
             }
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "BerrySession::read_current_page(): Unable to read selected item. Ambiguous result: "
                 + set_to_str(ocr_result) + ", " + set_to_str(sprite_result) + "\n" + language_warning(m_language),
                 m_stream,
@@ -309,7 +309,7 @@ void BerrySession::add_berries(
             const DonutBerries& name = get_berry_name(back.first);
             throw_and_log<BerryNotFoundException>(
                 stream.logger(),
-                ErrorReport::NO_ERROR_REPORT,
+                ErrorReportMode::NO_ERROR_REPORT,
                 "Unable to find Berry: \"" + name.display_name() + "\" - Did you run out?",
                 stream
             );
@@ -346,7 +346,7 @@ void BerrySession::add_berries(
 
             if (!ingredient_added){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::NO_ERROR_REPORT,
+                    ErrorReportMode::NO_ERROR_REPORT,
                     "Unable to add ingredient: \"" + name.display_name() + "\" - Did you run out?",
                     stream
                 );

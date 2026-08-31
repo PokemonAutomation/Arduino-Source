@@ -303,7 +303,7 @@ void RoamingLegendaryRng::program(SingleSwitchProgramEnvironment& env, ProContro
         if (failed_searches >= 5){
             env.log("Failed to find any matches 5 times in a row");
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::NO_ERROR_REPORT,
+                ErrorReportMode::NO_ERROR_REPORT,
                 "Failed to find any matches 5 times in a row. Check your seed and advances settings.",
                 env.console
             ); 
@@ -313,7 +313,7 @@ void RoamingLegendaryRng::program(SingleSwitchProgramEnvironment& env, ProContro
         if (failed_to_encounter >= 5){
             env.log("Failed to encounter the Roaming Legendary 5 times in a row");
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::NO_ERROR_REPORT,
+                ErrorReportMode::NO_ERROR_REPORT,
                 "Failed to encounter the Roaming Legendary 5 times in a row",
                 env.console
             ); 

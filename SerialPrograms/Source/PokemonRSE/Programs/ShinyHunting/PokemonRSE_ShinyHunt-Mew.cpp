@@ -132,7 +132,7 @@ void ShinyHuntMew::enter_mew(SingleSwitchProgramEnvironment& env, ProControllerC
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to enter area.",
             env.console
         );
@@ -185,7 +185,7 @@ void ShinyHuntMew::enter_mew(SingleSwitchProgramEnvironment& env, ProControllerC
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to start battle after 5 attempts.",
             env.console
         );
@@ -223,7 +223,7 @@ void ShinyHuntMew::exit_mew(SingleSwitchProgramEnvironment& env, ProControllerCo
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to exit area.",
             env.console
         );

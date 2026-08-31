@@ -135,7 +135,7 @@ bool IngoMoveGrinder::start_dialog(VideoStream& stream, ProControllerContext& co
             break;
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Unable to detect options after 10 A presses.",
                 stream
             );
@@ -166,7 +166,7 @@ bool IngoMoveGrinder::start_dialog(VideoStream& stream, ProControllerContext& co
         return false;
     default:
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Unable to find opponent list options after 5 A presses.",
             stream
         );
@@ -238,7 +238,7 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ProCont
 //            auto snapshot = env.console.video().snapshot();
 //            dump_image(env.logger(), env.program_info(), "BattleMenuNotFound", snapshot);
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to find battle menu after 2 minutes.",
                 env.console
             );
@@ -379,7 +379,7 @@ void IngoMoveGrinder::go_to_next_pokemon(SingleSwitchProgramEnvironment& env, Pr
 {
     if (cur_pokemon == 4){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Abort program. Your 4 first pokemons are done grinding moves, dead or without PP. "
             "Your fifth pokemon (Arceus) died so no other choice than stopping the program.",
             env.console

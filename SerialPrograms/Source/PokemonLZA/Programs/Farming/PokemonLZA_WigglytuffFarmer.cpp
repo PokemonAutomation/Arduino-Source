@@ -155,7 +155,7 @@ bool WigglytuffFarmer::run_lobby(SingleSwitchProgramEnvironment& env, ProControl
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "run_lobby(): No recognized state after 30 seconds.",
                 env.console
             );
@@ -206,7 +206,7 @@ void WigglytuffFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "run_round(): No state detected for 2 minutes.",
                 env.console
             );

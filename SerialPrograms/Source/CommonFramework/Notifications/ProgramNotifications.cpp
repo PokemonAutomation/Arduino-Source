@@ -376,14 +376,14 @@ void send_program_recoverable_error_notification_and_telemetry_report(
     Logger* logger,
     const ProgramInfo& info,
     EventNotificationOption& notif_settings,
-    ErrorReport error_report_mode,
+    ErrorReportMode error_report_mode,
     const std::string& message,
     std::string error_type,
     const ImageViewRGB32& image,
     const StreamHistorySession* stream_history
 ){
     send_program_recoverable_error_notification(env, notif_settings, message, image);
-    if (error_report_mode == ErrorReport::SEND_ERROR_REPORT){
+    if (error_report_mode == ErrorReportMode::SEND_ERROR_REPORT){
         report_error_to_telemetry(
             logger,
             info,
@@ -400,14 +400,14 @@ void send_program_fatal_error_notification_and_telemetry_report(
     Logger* logger,
     const ProgramInfo& info,
     EventNotificationOption& notif_settings,
-    ErrorReport error_report_mode,
+    ErrorReportMode error_report_mode,
     const std::string& message,
     std::string error_type,
     const ImageViewRGB32& image,
     const StreamHistorySession* stream_history
 ){
     send_program_fatal_error_notification(env, notif_settings, message, image);
-    if (error_report_mode == ErrorReport::SEND_ERROR_REPORT){
+    if (error_report_mode == ErrorReportMode::SEND_ERROR_REPORT){
         report_error_to_telemetry(
             logger,
             info,

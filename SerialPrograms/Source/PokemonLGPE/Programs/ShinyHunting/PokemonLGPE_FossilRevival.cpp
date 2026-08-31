@@ -129,7 +129,7 @@ void FossilRevival::run_revives(SingleSwitchProgramEnvironment& env, JoyconConte
         env.update_stats();
         env.log("Failed to revive fossil.", COLOR_RED);
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to revive fossil.",
             env.console
         );
@@ -152,7 +152,7 @@ void FossilRevival::run_revives(SingleSwitchProgramEnvironment& env, JoyconConte
         env.update_stats();
         env.log("Did not detect summary over.", COLOR_RED);
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Did not detect summary over.",
             env.console
         );

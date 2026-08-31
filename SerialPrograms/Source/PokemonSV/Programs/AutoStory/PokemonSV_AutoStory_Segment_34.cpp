@@ -142,7 +142,7 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         bool is_won = run_pokemon(env.console, context, move_table1, true, terastallized);
         if (!is_won){// throw exception if we lose
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to beat the Penny. Reset.",
                 env.console
             );

@@ -306,7 +306,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 stats.errors++;
                 env.update_stats();
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Failed to travel to Quasartico Inc.",
                     env.console
                 );
@@ -344,7 +344,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 stats.errors++;
                 env.update_stats();
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Failed to travel to Lysandre Café",
                     env.console
                 );
@@ -401,7 +401,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 stats.errors++;
                 env.update_stats();
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Failed to travel to Wild Zone 13",
                     env.console
                 );
@@ -441,7 +441,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 stats.errors++;
                 env.update_stats();
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Failed to travel to Research Lab",
                     env.console
                 );

@@ -113,7 +113,7 @@ void AutoItemPrinter::enter_printing_mode(SingleSwitchProgramEnvironment& env, P
             continue;
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "enter_printing_mode(): No recognized state after 120 seconds.",
                 env.console
             );

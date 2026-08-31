@@ -36,7 +36,7 @@ void navigate_to_menu_app(
     const int cur_app_index = menu_arrow.current_index();
     if (cur_app_index < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Cannot detect Rotom phone menu.",
             stream
         );
@@ -109,7 +109,7 @@ void menus_to_mainmenu(VideoStream& stream, ProControllerContext& context){
     }while (current_time() < deadline);
 
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "Unable to reach Main Menu after 2 minutes.",
         stream
     );
@@ -158,7 +158,7 @@ void menus_to_boxsystem(VideoStream& stream, ProControllerContext& context){
     }while (current_time() < deadline);
 
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "Unable to reach Box System after 2 minutes.",
         stream
     );
@@ -213,7 +213,7 @@ void save_game(VideoStream& stream, ProControllerContext& context){
     }while (current_time() < deadline);
 
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "Unable to save game after 2 minutes.",
         stream
     );
@@ -237,7 +237,7 @@ void mash_B_until_y_comm_icon(
     );
     if (ret != 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             error_msg + " No Y-Comm mark found.",
             stream
         );

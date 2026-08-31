@@ -108,7 +108,7 @@ void ItemDuplication::program(SingleSwitchProgramEnvironment& env, ProController
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "program(): Unable to detect selection arrow for Retro Mail. Please ensure Retro Mail is the top slot.",
                 env.console
             );
@@ -129,7 +129,7 @@ void ItemDuplication::program(SingleSwitchProgramEnvironment& env, ProController
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "program(): Unable to detect farfetchd held item. Please ensure farfetchd is holding an item to duplicate.",
                 env.console
             );
@@ -148,7 +148,7 @@ void ItemDuplication::program(SingleSwitchProgramEnvironment& env, ProController
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "program(): Unable to detect item description.",
                 env.console
             );
@@ -167,7 +167,7 @@ void ItemDuplication::program(SingleSwitchProgramEnvironment& env, ProController
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "program(): Unable to detect confirmation prompt.",
                 env.console
             );
@@ -191,7 +191,7 @@ void ItemDuplication::program(SingleSwitchProgramEnvironment& env, ProController
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "program(): Unable to detect confirmation prompt on mail screen.",
                 env.console
             );

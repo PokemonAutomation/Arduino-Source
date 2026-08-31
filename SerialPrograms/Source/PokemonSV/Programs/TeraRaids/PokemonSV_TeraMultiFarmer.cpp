@@ -360,7 +360,7 @@ bool TeraMultiFarmer::start_sequence_host(
         const char* error = normalize_code(lobby_code, code);
         if (error){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Unable to read raid code.",
                 console
             );

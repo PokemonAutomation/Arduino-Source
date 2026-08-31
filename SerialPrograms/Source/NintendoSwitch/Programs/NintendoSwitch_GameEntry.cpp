@@ -164,7 +164,7 @@ void ensure_at_home(ConsoleHandle& console, ControllerContext& context, size_t r
         pbf_press_button(context, BUTTON_HOME, 160ms, 160ms);
     }
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "Unable to find Switch Home",
         console
     );
@@ -534,7 +534,7 @@ void start_game_from_home_with_inference(
             console.log("Detected Home screen.");
         }else{
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "start_game_from_home_with_inference(): Failed to detect Home screen after 10 seconds.",
                 console
             );
@@ -629,7 +629,7 @@ void start_game_from_home_with_inference(
 
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "start_game_from_home_with_inference(): Failed to start game after multiple attempts.",
             console
         );

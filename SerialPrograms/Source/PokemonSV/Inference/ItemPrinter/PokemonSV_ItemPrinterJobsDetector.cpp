@@ -138,7 +138,7 @@ void ItemPrinterJobsDetector::set_print_jobs(
     }
 
     throw_and_log<OperationFailedExceptionWithScreenshot>(
-        stream.logger(), ErrorReport::SEND_ERROR_REPORT,
+        stream.logger(), ErrorReportMode::SEND_ERROR_REPORT,
         "Failed to set jobs after 10 tries.",
         &stream,
         std::move(snapshot.frame)

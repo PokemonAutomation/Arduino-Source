@@ -137,7 +137,7 @@ void EggAutonomousState::set(const EggAutonomousState& state){
 void EggAutonomousState::process_error(const std::string& name, const char* message){
     m_stats.m_errors++;
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         message,
         m_stream
     );

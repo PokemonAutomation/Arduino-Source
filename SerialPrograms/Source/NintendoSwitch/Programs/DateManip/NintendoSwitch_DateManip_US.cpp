@@ -166,7 +166,7 @@ void DateReader_US::set_date(
     }
 
     throw_and_log<OperationFailedExceptionWithScreenshot>(
-        stream.logger(), ErrorReport::SEND_ERROR_REPORT,
+        stream.logger(), ErrorReportMode::SEND_ERROR_REPORT,
         "Failed to set the hour after 10 attempts.",
         stream
     );

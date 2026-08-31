@@ -357,7 +357,7 @@ StateMachineAction throw_balls(
         pbf_mash_button(context, BUTTON_A, 1000ms);
     }else{
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::NO_ERROR_REPORT,
+            ErrorReportMode::NO_ERROR_REPORT,
             "Unable to find appropriate ball. Did you run out?",
             stream
         );

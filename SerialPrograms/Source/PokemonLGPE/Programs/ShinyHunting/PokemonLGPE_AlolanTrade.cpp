@@ -97,7 +97,7 @@ void AlolanTrade::run_trade(SingleSwitchProgramEnvironment& env, JoyconContext& 
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to start trade.",
             env.console
         );
@@ -118,7 +118,7 @@ void AlolanTrade::run_trade(SingleSwitchProgramEnvironment& env, JoyconContext& 
         env.update_stats();
         env.log("Did not detect end of trade.", COLOR_RED);
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Did not detect end of trade.",
             env.console
         );

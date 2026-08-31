@@ -41,7 +41,7 @@ void rng_reset_and_return_home(
     while (true){
         if (current_time() > deadline){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "rng_start_game_and_return_home(): Failed to start game and return to Home within 5 minutes.",
                 console
             );
@@ -206,7 +206,7 @@ void reset_and_perform_blind_sequence(
     while(true){
         if (attempts >= 5){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "RngHelper(): Failed to reset the game 5 times in a row.",
                 console
             );  
@@ -257,7 +257,7 @@ void reset_and_detect_copyright_text(ConsoleHandle& console, ProControllerContex
     while(true){
         if (attempts >= 5){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to resume the game 5 times in a row.",
                 console
             );  
@@ -300,7 +300,7 @@ void reset_and_detect_copyright_text(ConsoleHandle& console, ProControllerContex
             );
             if (ret2 < 0){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Black screen detected for more than 10 seconds after starting game.",
                     console
                 );

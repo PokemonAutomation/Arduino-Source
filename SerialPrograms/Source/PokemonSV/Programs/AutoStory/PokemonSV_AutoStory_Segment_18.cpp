@@ -201,7 +201,7 @@ void checkpoint_39(
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "checkpoint_39(): Failed to run into Great Tusk/Iron Treads.",
                 env.console
             );            

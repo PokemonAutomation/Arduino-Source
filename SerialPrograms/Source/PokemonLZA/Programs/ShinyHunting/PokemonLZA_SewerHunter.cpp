@@ -103,7 +103,7 @@ void fly_back_to_sewers_entrance(ConsoleHandle& console, ProControllerContext& c
         );
         if (ret != 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "fly_back_to_sewers_entrance(): cannot detect black screen after mashing A.",
                 console
             );
@@ -204,7 +204,7 @@ void ShinyHunt_SewerHunter::program(SingleSwitchProgramEnvironment& env, ProCont
         break;
     default:
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "route not implemented",
             env.console
         );

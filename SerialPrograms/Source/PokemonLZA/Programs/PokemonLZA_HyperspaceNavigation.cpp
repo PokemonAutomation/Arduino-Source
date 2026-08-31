@@ -34,7 +34,7 @@ bool check_calorie(
     );
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "check_calorie(): does not detect Calorie number after waiting for five seconds",
             console
         );
@@ -76,7 +76,7 @@ void detect_interactable(
     );
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "detect_interactable_pad(): Cannot detect interactable after 5 seconds",
             console
         );

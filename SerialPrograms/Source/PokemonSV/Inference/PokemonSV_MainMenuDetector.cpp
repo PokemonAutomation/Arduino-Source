@@ -132,7 +132,7 @@ bool MainMenuDetector::move_cursor(
             consecutive_detection_fails++;
             if (consecutive_detection_fails > 10){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "MainMenuDetector::move_cursor(): Unable to detect menu.",
                     stream,
                     screen

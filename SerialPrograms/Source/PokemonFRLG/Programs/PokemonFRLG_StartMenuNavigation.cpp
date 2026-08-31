@@ -24,7 +24,7 @@ void open_start_menu(ConsoleHandle& console, ProControllerContext& context){
     while(true){
         if (errors > 5){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to open Start menu 5 times in a row.",
                 console
             );
@@ -153,7 +153,7 @@ void save_game_to_overworld(ConsoleHandle& console, ProControllerContext& contex
 
         if (current_time() - start > std::chrono::seconds(120)){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "save_game_to_overworld(): Unable to save game after 2 minutes.",
                 console
             );

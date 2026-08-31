@@ -343,7 +343,7 @@ void OutbreakFinder::goto_region_and_return(
     if (is_wild_land(current_region) == false){
         dump_image(env.console.logger(), env.program_info(), "FindRegion", env.console.video().snapshot());
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Unable to find a wild land.",
             env.console
         );

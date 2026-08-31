@@ -160,7 +160,7 @@ void PrizeCornerReset::obtain_prize(SingleSwitchProgramEnvironment& env, ProCont
         env.update_stats();
         if (attempts >= 5){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "obtain_prize(): Unable to open prize menu after 5 attempts.",
                 env.console
             );

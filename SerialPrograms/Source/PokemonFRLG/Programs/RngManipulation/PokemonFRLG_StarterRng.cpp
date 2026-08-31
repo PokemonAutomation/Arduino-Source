@@ -635,7 +635,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         if (failed_searches >= 5){
             env.log("Failed to find any matches 5 times in a row");
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::NO_ERROR_REPORT,
+                ErrorReportMode::NO_ERROR_REPORT,
                 "Failed to find any matches 5 times in a row. Check your seed and advances settings.",
                 env.console
             ); 

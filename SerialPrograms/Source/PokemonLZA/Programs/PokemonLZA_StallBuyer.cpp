@@ -140,7 +140,7 @@ int detect_stall_amount_item(SingleSwitchProgramEnvironment& env, StallBuyer_Des
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "No recognized stall size.",
             env.console
         );
@@ -252,7 +252,7 @@ void StallBuyer::make_purchase(
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "No recognized state after 30 seconds.",
             env.console
         );

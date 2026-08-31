@@ -179,7 +179,7 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, ProControl
         if (!matcher.detect(env.console.video().snapshot())){
             stats.m_errors++;
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to return to starting position. Something is wrong.",
                 env.console
             );

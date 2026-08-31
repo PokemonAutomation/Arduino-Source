@@ -283,7 +283,7 @@ std::vector<BBQuests> process_quest_list(
                     //This case is handled in BBQSoloFarmer.
                     stream.log("OOEggs is Stop in process_quest_list().");
                     OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "OOEggs is Stop in process_quest_list().",
                         stream
                     );
@@ -393,7 +393,7 @@ std::vector<BBQuests> process_quest_list(
     /*
     if (!rerolled && quests_to_do.size() == 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "No possible quests! Check language selection.",
             stream
         );
@@ -504,7 +504,7 @@ bool process_and_do_quest(
             break;
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Unknown quest selection.",
                 console
             );
@@ -820,7 +820,7 @@ void quest_sneak_up(
                         default:
                             console.log("Invalid state quest_sneak_up(). Smoke Ball equipped?");
                             OperationFailedExceptionWithScreenshot::fire(
-                                ErrorReport::SEND_ERROR_REPORT,
+                                ErrorReportMode::SEND_ERROR_REPORT,
                                 "Invalid state quest_sneak_up(). Smoke Ball equipped?",
                                 console
                             );
@@ -837,7 +837,7 @@ void quest_sneak_up(
             default:
                 console.log("Invalid state in run_battle().");
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Invalid state in run_battle().",
                     console
                 );
@@ -1193,7 +1193,7 @@ void quest_sandwich(
         break;
     default:
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Invalid sandwich selection.",
             stream
         );
@@ -1268,7 +1268,7 @@ void quest_tera_raid(
                 }catch (...){
                     console.log("Unable to flee.");
                     OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Unable to flee!",
                         console
                     );

@@ -539,7 +539,7 @@ void hold_and_reanchor(
             consecutive_failures++;
             if (consecutive_failures >= config.max_reanchor_failures){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::NO_ERROR_REPORT,
+                    ErrorReportMode::NO_ERROR_REPORT,
                     std::to_string(consecutive_failures)
                     + " consecutive re-anchor failures: the blinks can no longer be read, "
                     "so the clock cannot be trusted to time the press.",

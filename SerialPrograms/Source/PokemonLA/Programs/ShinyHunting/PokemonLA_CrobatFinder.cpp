@@ -122,7 +122,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
     }
     if (error){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Unable to find Wyrdeer after 10 attempts.",
             env.console
         );

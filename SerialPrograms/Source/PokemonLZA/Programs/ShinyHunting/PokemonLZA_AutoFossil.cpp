@@ -258,7 +258,7 @@ void AutoFossil::revive_one_fossil(SingleSwitchProgramEnvironment& env, ProContr
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "revive_one_fossil(): No recognized state after 10 seconds.",
                 env.console
             );
@@ -286,7 +286,7 @@ bool AutoFossil::check_fossils_in_one_box(
         const int ret = wait_until(env.console, context, Seconds(5), {info_watcher});
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to detect box info at cell idx " + std::to_string(i) + " after 5 seconds",
                 env.console
             );

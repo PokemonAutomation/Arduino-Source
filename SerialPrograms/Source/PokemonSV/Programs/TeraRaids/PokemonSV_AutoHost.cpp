@@ -145,7 +145,7 @@ WallClock AutoHost::wait_for_lobby_open(
     );
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Unable to detect Tera lobby after 60 seconds.",
             env.console
         );
@@ -224,7 +224,7 @@ bool AutoHost::start_raid(
             return true;
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Stuck in lobby for 4 minutes.",
                 env.console
             );

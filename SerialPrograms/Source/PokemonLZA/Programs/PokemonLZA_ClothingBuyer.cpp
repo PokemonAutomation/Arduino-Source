@@ -117,7 +117,7 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             default:
                 env.log("Error looking for purchase prompt.");
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Error looking for purchase prompt.",
                     env.console
                 );

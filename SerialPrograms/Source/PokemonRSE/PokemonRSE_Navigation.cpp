@@ -153,7 +153,7 @@ uint64_t soft_reset(ConsoleHandle& console, ProControllerContext& context){
         }
     }
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "soft_reset(): Failed to reset after 5 attempts.",
         console
     );
@@ -178,7 +178,7 @@ void flee_battle(VideoStream& stream, ProControllerContext& context){
         stream.log("Running away...");
     }else{
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "handle_encounter(): Unable to navigate to flee button.",
             stream
         );
@@ -199,7 +199,7 @@ void flee_battle(VideoStream& stream, ProControllerContext& context){
         stream.log("Successfully ran from battle.");
     }else{
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "handle_encounter(): Unable to flee from battle.",
             stream
         );
@@ -226,7 +226,7 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
                 console.log("Advance arrow detected.");
             }else{
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "handle_encounter(): Did not detect battle start.",
                     console
                 );
@@ -258,7 +258,7 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
             console.log("Battle menu detecteed!");
         }else{
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "handle_encounter(): Did not detect battle menu.",
                 console
             );

@@ -174,7 +174,7 @@ std::set<std::string> read_singles_opponent(
     }
 
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "Unable to open status menu to read opponent name.",
         stream
     );

@@ -74,7 +74,7 @@ void TeraFailTracker::on_raid_start(){
     if (m_consecutive_failures > 0 && !m_completed_one){
         throw_and_log<FatalProgramException>(
             m_env.logger(),
-            ErrorReport::NO_ERROR_REPORT,
+            ErrorReportMode::NO_ERROR_REPORT,
             "Failed 1st raid attempt. Will not retry due to risk of ban."
         );
     }
@@ -86,7 +86,7 @@ void TeraFailTracker::on_raid_start(){
         if (minutes == 0){
             throw_and_log<FatalProgramException>(
                 m_env.logger(),
-                ErrorReport::NO_ERROR_REPORT,
+                ErrorReportMode::NO_ERROR_REPORT,
                 "Failed " + std::to_string(fail_threshold) +  " raid(s) in the row. "
                 "Stopping to prevent possible ban."
             );
@@ -179,13 +179,13 @@ void KillSwitchTracker::check_kill_switch(const std::string& kill_switch_url){
         if (m_killswitch_reason.empty()){
             throw_and_log<FatalProgramException>(
                 m_env.logger(),
-                ErrorReport::NO_ERROR_REPORT,
+                ErrorReportMode::NO_ERROR_REPORT,
                 "Stopped by remote kill switch. No reason specified."
             );
         }else{
             throw_and_log<FatalProgramException>(
                 m_env.logger(),
-                ErrorReport::NO_ERROR_REPORT,
+                ErrorReportMode::NO_ERROR_REPORT,
                 "Stopped by remote kill switch. Reason: " + m_killswitch_reason
             );
         }

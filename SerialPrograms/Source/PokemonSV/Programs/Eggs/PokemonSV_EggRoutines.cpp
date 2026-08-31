@@ -168,7 +168,7 @@ bool do_egg_cycle_motion(
             return true;
         }
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::NO_ERROR_REPORT,
+            ErrorReportMode::NO_ERROR_REPORT,
             "Detected battle menu. You got attacked!",
             stream
         );

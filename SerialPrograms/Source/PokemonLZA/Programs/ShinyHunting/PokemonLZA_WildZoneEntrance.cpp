@@ -190,7 +190,7 @@ void go_to_entrance(
         ret = run_towards_gate_with_A_button(env.console, context, joystick_x, +1, 10s);
         if (ret != 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "go_to_entrance(): Cannot reach gate from outside after day/night change.",
                 env.console
             );
@@ -198,7 +198,7 @@ void go_to_entrance(
         break;
     default:
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "go_to_entrance(): Cannot reach gate from outside.",
             env.console
         );
@@ -217,7 +217,7 @@ void fast_travel_outside_zone(
     if (!map_already_opened){
         if (!open_map(env.console, context, to_max_zoom_level_on_map, true)){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "fast_travel_outside_zone(): Fast travel disabled from supposedly outside the entrance." + extra_error_msg,
                 env.console
             );
@@ -229,7 +229,7 @@ void fast_travel_outside_zone(
     FastTravelState travel_status = fly_from_map(env.console, context);
     if (travel_status != FastTravelState::SUCCESS){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "fast_travel_outside_zone(): After moving map cursor, cannot fast travel to the zone." + extra_error_msg,
             env.console
         );
@@ -294,7 +294,7 @@ void leave_zone_and_reset_spawns(
             travel_status = fly_from_map(env.console, context);
             if (travel_status != FastTravelState::SUCCESS){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "leave_zone_and_reset_spawns(): Cannot fast travel to zone from outside the entrance.",
                     env.console
                 );
@@ -344,7 +344,7 @@ void leave_zone_and_reset_spawns(
                 joystick_y = -1;
             }else{
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "leave_zone_and_reset_spawns(): Facing direction after day/night change is wrong: " + tostr_fixed(direction_change, 0) + " deg",
                     env.console
                 );

@@ -148,7 +148,7 @@ void do_one_cafe_trip(
                 stats.errors++;
                 env.update_stats();
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "do_one_cafe_trip: Cannot fast travel after moving map cursor.",
                     env.console
                 );
@@ -208,7 +208,7 @@ void do_one_cafe_trip(
                 stats.errors++;
                 env.update_stats();
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "do_one_cafe_trip: Cannot reach wild zone gate after day/night change.",
                     env.console
                 );
@@ -219,7 +219,7 @@ void do_one_cafe_trip(
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "do_one_cafe_trip: Cannot reach wild zone gate after being chased by wild pokemon.",
             env.console
         );
@@ -242,7 +242,7 @@ void do_one_cafe_trip(
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "do_one_cafe_trip: Cannot fast travel outside gate.",
             env.console
         );
@@ -272,7 +272,7 @@ void do_one_cafe_trip(
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "do_one_cafe_trip: Cannot fast travel to cafe.",
             env.console
         );

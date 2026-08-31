@@ -132,7 +132,7 @@ void HyperspaceRewardReset::talk_to_trainer(SingleSwitchProgramEnvironment& env,
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "talk_to_trainer(): Failed to detect blue item received dialog.",
                 env.console
             );

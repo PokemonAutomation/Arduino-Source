@@ -135,7 +135,7 @@ DownloadedResourceMetadata get_resource_metadata_from_resource_type(const std::s
     }
 
     Logger& logger = global_logger_tagged();
-    throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
+    throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, 
         "get_resource_metadata_from_resource_type: Unable to find target_resource_slug within resource_list.");
 }
 
@@ -201,7 +201,7 @@ DownloadedResourceMetadata get_remote_resource_metadata_from_resource_slug(const
         remote_resources = remote_resource_download_list();
     }catch(OperationFailedException&){
         std::cerr << "get_remote_resource_metadata_from_resource_slug: Error" << endl;
-        throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
+        throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, 
             "Error: Download failed. Failed to fetch the list of available downloads. Check your internet connection.");
     }
 
@@ -210,7 +210,7 @@ DownloadedResourceMetadata get_remote_resource_metadata_from_resource_slug(const
         return get_resource_metadata_from_resource_type(target_resource_slug, remote_resources);
     }catch(OperationFailedException&){
         std::cerr << "get_remote_resource_metadata_from_resource_slug: Error" << endl;
-        throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
+        throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, 
             "get_remote_resource_metadata_from_resource_slug: Unable to find " + target_resource_slug + " within resource_list. "
             "Likely caused by resource being no longer available for download. We recommend updating the Computer Control program.");
     }

@@ -346,7 +346,7 @@ bool run_tera_battle(
             consecutive_timeouts++;
             if (consecutive_timeouts == 3){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "No state detected after 6 minutes.",
                     stream
                 );

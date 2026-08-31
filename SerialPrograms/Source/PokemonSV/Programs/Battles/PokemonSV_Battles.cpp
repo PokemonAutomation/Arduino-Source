@@ -40,7 +40,7 @@ void auto_heal_from_menu_or_overworld(
     while (true){
         if (current_time() - start > std::chrono::minutes(5)){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "auto_heal_from_menu(): Failed auto-heal after 5 minutes.",
                 stream
             );
@@ -82,7 +82,7 @@ void auto_heal_from_menu_or_overworld(
             continue;
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "auto_heal_from_menu(): No state detected after 60 seconds.",
                 stream
             );
@@ -128,13 +128,13 @@ int run_from_battle(
         case 2:
             stream.log("Detected own " + STRING_POKEMON + " fainted...");
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Your " + STRING_POKEMON + " fainted while attempting to run away.",
                 stream
             );
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "run_from_battle(): No state detected after 60 seconds.",
                 stream
             );
@@ -142,7 +142,7 @@ int run_from_battle(
     }
 
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "Failed to run away after 10 attempts.",
         stream
     );
@@ -194,13 +194,13 @@ int run_from_battle(
             stream.log("Detected own " + STRING_POKEMON + " fainted...");
             tracker.report_in_battle();
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Your " + STRING_POKEMON + " fainted while attempting to run away.",
                 stream
             );
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "run_from_battle(): No state detected after 60 seconds.",
                 stream
             );
@@ -208,7 +208,7 @@ int run_from_battle(
     }
 
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "Failed to run away after 10 attempts.",
         stream
     );
@@ -342,7 +342,7 @@ void process_battle(
             break;
         default:
             throw_and_log<FatalProgramException>(
-                stream.logger(), ErrorReport::NO_ERROR_REPORT,
+                stream.logger(), ErrorReportMode::NO_ERROR_REPORT,
                 "Unable to recover from failed catch.",
                 stream
             );

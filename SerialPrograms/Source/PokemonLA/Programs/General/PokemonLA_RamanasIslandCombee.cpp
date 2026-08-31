@@ -262,7 +262,7 @@ void RamanasCombeeFinder::run_iteration(
         }
         if (c >= 5){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to switch to Pokemon selection after 5 attempts.",
                 env.console
             );
@@ -315,7 +315,7 @@ void RamanasCombeeFinder::run_iteration(
             context.wait_for_all_requests();
         }
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Black out.",
             env.console
         );

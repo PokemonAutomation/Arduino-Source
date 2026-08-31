@@ -20,19 +20,19 @@ namespace PokemonAutomation{
 
 
 FatalProgramException::FatalProgramException(
-    ErrorReport error_report,
+    ErrorReportMode error_report_mode,
     std::string message
 )
-    : m_error_report_mode(error_report)
+    : m_error_report_mode(error_report_mode)
     , m_message(message)
 {}
 
 FatalProgramException::FatalProgramException(
-    ErrorReport error_report,
+    ErrorReportMode error_report_mode,
     std::string message,
     VideoStream& stream
 )
-    : m_error_report_mode(error_report)
+    : m_error_report_mode(error_report_mode)
     , m_message(message)
     , m_stream(&stream)
     , m_screenshot(stream.video().snapshot().frame)
@@ -42,24 +42,24 @@ FatalProgramException::FatalProgramException(
 //  Use the provided screenshot instead of taking one with the console.
 //  Store the console information (if provided) for stream history if requested later.
 FatalProgramException::FatalProgramException(
-    ErrorReport error_report,
+    ErrorReportMode error_report_mode,
     std::string message,
     VideoStream* stream,
     ImageRGB32 screenshot
 )
-    : m_error_report_mode(error_report)
+    : m_error_report_mode(error_report_mode)
     , m_message(message)
     , m_stream(stream)
     , m_screenshot(std::make_shared<ImageRGB32>(std::move(screenshot)))
 {}
 
 FatalProgramException::FatalProgramException(
-    ErrorReport error_report,
+    ErrorReportMode error_report_mode,
     std::string message,
     VideoStream* stream,
     std::shared_ptr<const ImageRGB32> screenshot
 )
-    : m_error_report_mode(error_report)
+    : m_error_report_mode(error_report_mode)
     , m_message(message)
     , m_stream(stream)
     , m_screenshot(std::move(screenshot))

@@ -122,7 +122,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
             break;
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "StarterReset: Invalid target.",
                 env.console
             );
@@ -164,7 +164,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         }else{
             env.log("Timed out waiting to enter party menu.", COLOR_RED);
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "StarterReset: Timed out waiting to enter party menu.",
                 env.console
             );

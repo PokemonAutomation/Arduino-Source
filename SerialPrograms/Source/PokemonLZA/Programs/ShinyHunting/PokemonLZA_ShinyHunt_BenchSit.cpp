@@ -178,7 +178,7 @@ void run_back_until_found_bench(
         break;
     default:
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "run_back_until_found_bench(): Unable to detect bench after multiple attempts.",
             env.console
         );

@@ -146,7 +146,7 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, ProControllerC
     }
 
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "No progress detected after 5 battle menus. Are you out of PP?",
         env.console
     );

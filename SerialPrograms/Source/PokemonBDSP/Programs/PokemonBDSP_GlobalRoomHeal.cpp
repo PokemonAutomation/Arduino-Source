@@ -39,7 +39,7 @@ bool heal_by_global_room(VideoStream& stream, ProControllerContext& context){
     );
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "No selection arrow detected when using Global Room.",
             stream
         );

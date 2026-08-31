@@ -190,7 +190,7 @@ bool StatsReset::enter_battle(SingleSwitchProgramEnvironment& env, ProController
         return false;
         /*
         OperationFailedExceptionWithScreenshot::fire(
-            env.console, ErrorReport::SEND_ERROR_REPORT,
+            env.console, ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to enter battle. Are you facing the Pokemon or in a menu?",
             true
         );
@@ -214,7 +214,7 @@ void StatsReset::open_ball_menu(SingleSwitchProgramEnvironment& env, ProControll
             env.update_stats();
             send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Timed out trying to read ball after 2 minutes.",
                 env.console
             );
@@ -266,7 +266,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerCo
                     stats.errors++;
                     env.update_stats();
                     OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Unable to find menu_before_throw.",
                         env.console
                     );
@@ -287,7 +287,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerCo
                         stats.errors++;
                         env.update_stats();
                         OperationFailedExceptionWithScreenshot::fire(
-                            ErrorReport::SEND_ERROR_REPORT,
+                            ErrorReportMode::SEND_ERROR_REPORT,
                             "Unable to find Quick Ball on turn 1.",
                             env.console
                         );
@@ -372,7 +372,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerCo
                         stats.errors++;
                         env.update_stats();
                         OperationFailedExceptionWithScreenshot::fire(
-                            ErrorReport::SEND_ERROR_REPORT,
+                            ErrorReportMode::SEND_ERROR_REPORT,
                             "Battle menu detected early. Out of PP, please check your setup.",
                             env.console
                         );
@@ -455,7 +455,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerCo
                     stats.errors++;
                     env.update_stats();
                     OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Invalid state ret2 run_battle.",
                         env.console
                     );
@@ -497,7 +497,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerCo
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Invalid state in run_battle().",
             env.console
         );
@@ -555,7 +555,7 @@ bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, ProControllerC
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Invalid state.",
                 env.console
             );
@@ -596,7 +596,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             //  Try to start battle 3 times.
             if (c > 2){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Failed to enter battle after 3 attempts.",
                     env.console
                 );

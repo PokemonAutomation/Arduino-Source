@@ -109,7 +109,7 @@ void GiftReset::obtain_pokemon(SingleSwitchProgramEnvironment& env, ProControlle
         env.update_stats();
         env.log("obtain_pokemon(): Unable to start starter dialog after 10 attempts.", COLOR_RED);
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "obtain_pokemon(): Unable to start starter dialog after 10 attempts.",
             env.console
         );
@@ -166,7 +166,7 @@ void GiftReset::obtain_pokemon(SingleSwitchProgramEnvironment& env, ProControlle
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "obtain_starter(): No recognized state after 10 seconds.",
                 env.console
             );
@@ -344,7 +344,7 @@ uint64_t GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControl
         }
     }
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "open_summary(): Failed to open party summary after 5 attempts.",
         env.console
     );
@@ -378,7 +378,7 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "GiftReset: Invalid target selection.",
             env.console
         );

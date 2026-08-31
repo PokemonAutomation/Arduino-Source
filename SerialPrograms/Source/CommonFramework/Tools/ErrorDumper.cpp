@@ -73,7 +73,7 @@ void dump_image_and_throw_recoverable_exception(
     const ImageViewRGB32& screenshot
 ){
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         error_message,
         stream
     );

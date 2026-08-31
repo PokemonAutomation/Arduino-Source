@@ -134,7 +134,7 @@ ImageFloatBox OliveDetector::get_olive_floatbox(VideoStream& stream, ProControll
 
     // dump_snapshot(stream);
     throw_and_log<OliveActionFailedException>(
-        stream.logger(), ErrorReport::SEND_ERROR_REPORT,
+        stream.logger(), ErrorReportMode::SEND_ERROR_REPORT,
         "get_olive_floatbox(): Olive not detected.",
         stream,
         OliveFail::NO_OLIVE_DETECTED
@@ -224,7 +224,7 @@ ImageFloatBox OliveDetector::align_to_olive(
         //     pbf_move_left_joystick(context, {0, -1}, 600ms, 800ms);  // walk backwards
         //     if (olive_unchanged_count == 2){
         //         throw OliveActionFailedException(
-        //             console, ErrorReport::SEND_ERROR_REPORT,
+        //             console, ErrorReportMode::SEND_ERROR_REPORT,
         //             "align_to_olive(): Failed to align to olive.",
         //             true,
         //             OliveFail::FAILED_ALIGN_TO_OLIVE
@@ -239,7 +239,7 @@ ImageFloatBox OliveDetector::align_to_olive(
     // don't throw an exception, since sometimes the program has trouble detecting the olive's exact location with the white logo on the olive.
     // so we rely on maxing out the attempts to move on.
     // throw OliveActionFailedException(
-    //     console, ErrorReport::SEND_ERROR_REPORT,
+    //     console, ErrorReportMode::SEND_ERROR_REPORT,
     //     "align_to_olive(): Failed to align to olive.",
     //     true,
     //     OliveFail::FAILED_ALIGN_TO_OLIVE
@@ -304,7 +304,7 @@ Milliseconds OliveDetector::push_olive_forward(
 
                 if (j == 2){
                     throw_and_log<OliveActionFailedException>(
-                        stream.logger(), ErrorReport::SEND_ERROR_REPORT,
+                        stream.logger(), ErrorReportMode::SEND_ERROR_REPORT,
                         "push_olive_forward(): Olive stuck.",
                         stream,
                         OliveFail::OLIVE_STUCK
@@ -331,7 +331,7 @@ Milliseconds OliveDetector::push_olive_forward(
     }
 
     throw_and_log<OliveActionFailedException>(
-        stream.logger(), ErrorReport::SEND_ERROR_REPORT,
+        stream.logger(), ErrorReportMode::SEND_ERROR_REPORT,
         "push_olive_forward(): Something went wrong. Failed to walk the Olive forward as expected.",
         stream,
         OliveFail::FAILED_PUSH_OLIVE_TOTAL_DISTANCE
@@ -387,7 +387,7 @@ Milliseconds OliveDetector::walk_up_to_olive(
     }    
 
     throw_and_log<OliveActionFailedException>(
-        stream.logger(), ErrorReport::SEND_ERROR_REPORT,
+        stream.logger(), ErrorReportMode::SEND_ERROR_REPORT,
         "walk_up_to_olive(): Something went wrong. Failed to walk up to the Olive",
         stream,
         OliveFail::FAILED_WALK_TO_OLIVE

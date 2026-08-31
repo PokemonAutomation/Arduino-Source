@@ -191,7 +191,7 @@ int8_t ItemPrinterMaterialDetector::find_happiny_dust_row_index(
     }
 
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "Failed to find Happiny dust after multiple attempts.",
         stream
     );
@@ -224,7 +224,7 @@ int16_t ItemPrinterMaterialDetector::find_highest_quantity_of_value_68(VideoStre
 
     if (!seen_material_value_68){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "find_highest_quantity_of_value_68: Failed to find any material with value of 68, after multiple attempts.",
             stream
         );
@@ -261,7 +261,7 @@ std::string ItemPrinterMaterialDetector::detect_material_name(
 
     if (results.size() > 1){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "ItemPrinterMaterialDetector::detect_material_name(): Unable to read selected item. Ambiguous or multiple results.\n" + language_warning(m_language),
             stream
         );

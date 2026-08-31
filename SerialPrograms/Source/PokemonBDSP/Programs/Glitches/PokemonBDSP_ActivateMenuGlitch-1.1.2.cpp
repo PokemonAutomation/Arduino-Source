@@ -69,7 +69,7 @@ void trigger_menu(VideoStream& stream, ProControllerContext& context){
     );
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Map not detected after 60 seconds.",
             stream
         );
@@ -104,7 +104,7 @@ void trigger_map_overlap(VideoStream& stream, ProControllerContext& context){
         pbf_press_button(context, BUTTON_R, 160ms, 1840ms);
     }
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "Failed to trigger map overlap after 10 attempts.",
         stream
     );
@@ -147,7 +147,7 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, ProCont
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Unable to leave " + STRING_POKEMON + " center.",
                 stream
             );

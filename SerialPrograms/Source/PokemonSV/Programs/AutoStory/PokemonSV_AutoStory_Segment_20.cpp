@@ -483,7 +483,7 @@ void checkpoint_44(
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to finish reach the Sunflora NPC.",
                 env.console
             );

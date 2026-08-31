@@ -36,7 +36,7 @@ bool save_game_to_menu(ConsoleHandle& console, ProControllerContext& context){
 
         if (current_time() - start > std::chrono::seconds(120)){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "save_game_to_menu(): Unable to save game after 2 minutes.",
                 console
             );
@@ -165,7 +165,7 @@ bool open_map(
 
     console.overlay().add_log("Failed to Open Map After 30 sec", COLOR_RED);
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "open_map(): Unable to find map after 30 seconds.",
         console
     );
@@ -206,7 +206,7 @@ FastTravelState fly_from_map(
             return FastTravelState::NOT_AT_FLY_SPOT;
 #if 0
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "fly_from_map(): Unable to fly.",
                 console
             );
@@ -236,7 +236,7 @@ FastTravelState fly_from_map(
         );
         if (ret != 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "fly_from_map(): Does not detect overworld after encountering blue dialog.",
                 console
             );
@@ -246,7 +246,7 @@ FastTravelState fly_from_map(
         break;
     default:
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "fly_from_map(): Does not detect overworld after fast travel.",
             console
         );
@@ -384,7 +384,7 @@ void sit_on_bench(ConsoleHandle& console, ProControllerContext& context){
             break;
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "sit_on_bench(): No day/night transition detected after mashing A.",
                 console
             );
@@ -400,7 +400,7 @@ void sit_on_bench(ConsoleHandle& console, ProControllerContext& context){
     );
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "sit_on_bench(): Unable to go back to overworld after day/night change on bench after 30 seconds.",
             console
         );
@@ -421,7 +421,7 @@ void wait_until_overworld(
     );
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "wait_until_overworld(): Unable to detect overworld after " + 
                 std::to_string(max_wait_time.count()) + " milliseconds.",
             console
@@ -446,7 +446,7 @@ double get_facing_direction(
         console.log("Direction arrow not detected within 1 second");
         console.overlay().add_log("No Minimap Arrow Found", COLOR_RED);
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "get_facing_direction(): Direction arrow on minimap not detected within 40 second",
             console
         );

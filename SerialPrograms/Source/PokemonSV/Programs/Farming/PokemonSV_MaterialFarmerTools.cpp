@@ -749,7 +749,7 @@ void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, VideoStream&
 
     if (!isFlySuccessful){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to fly to Blueberry academy, five times in a row.",
             stream
         );
@@ -818,7 +818,7 @@ void move_from_blueberry_entrance_to_league_club(const ProgramInfo& info, VideoS
 
     if (!isSuccessful){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to enter League club room, five times in a row.",
             stream
         );
@@ -868,7 +868,7 @@ void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, Video
     }else{
         stream.log("Failed to detect Blueberry navigation menu.");
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to find the exit from the League room.",
             stream
         );
@@ -884,7 +884,7 @@ void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, Video
         stream.log("Overworld detected");
     }else{
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to detect overworld.",
             stream
         );      
@@ -934,7 +934,7 @@ void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, VideoStream
     if (!isFlySuccessful){
 
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to fly to North province area 3, ten times in a row.",
             stream
         );

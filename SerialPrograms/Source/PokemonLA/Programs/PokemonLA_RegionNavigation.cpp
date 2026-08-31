@@ -118,7 +118,7 @@ void from_professor_return_to_jubilife(
             break;
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Did not detect option to return to Jubilife.",
                 stream
             );
@@ -140,7 +140,7 @@ void mash_A_to_enter_sub_area(
     );
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to load into sub area after 7 seconds.",
             stream
         );
@@ -168,7 +168,7 @@ void mash_A_to_change_region(
     );
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            stream, ErrorReport::SEND_ERROR_REPORT,
+            stream, ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to load into region after timeout."
         );
     }
@@ -191,7 +191,7 @@ void mash_A_to_change_region(
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to load into region after timeout.",
                 stream
             );
@@ -207,7 +207,7 @@ void mash_A_to_change_region(
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to load into region after timeout.",
                 stream
             );
@@ -243,7 +243,7 @@ void open_travel_map_from_jubilife(
             );
         }else{
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Map not detected after 10 x A presses.",
                 stream
             );
@@ -267,7 +267,7 @@ void goto_camp_from_jubilife(
     DpadPosition direction = location.region < MapRegion::HIGHLANDS ? DPAD_RIGHT : DPAD_LEFT;
     if (location.region == MapRegion::JUBILIFE){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             std::string("Should not choose Jubilife Village as destination when leaving camp"),
             stream
         );
@@ -285,7 +285,7 @@ void goto_camp_from_jubilife(
     }
     if (current_region != location.region){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             std::string("Unable to find: ") + location.display,
             stream
         );
@@ -321,7 +321,7 @@ void goto_camp_from_jubilife(
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Map not detected after 5 seconds.",
                 stream
             );
@@ -346,7 +346,7 @@ void goto_camp_from_jubilife(
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Unable to fly. Are you under attack?",
                 stream
             );
@@ -367,7 +367,7 @@ void goto_camp_from_jubilife(
     );
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to fly to camp after 20 seconds.",
             stream
         );
@@ -402,7 +402,7 @@ void goto_camp_from_overworld(
 
         if (current_time() - start > std::chrono::seconds(60)){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::NO_ERROR_REPORT,
+                ErrorReportMode::NO_ERROR_REPORT,
                 "Unable to escape from being attacked.",
                 stream
             );
@@ -463,7 +463,7 @@ void goto_camp_from_overworld(
     );
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to fly to camp after 20 seconds.",
             stream
         );
@@ -490,7 +490,7 @@ void fast_travel_from_overworld(
 
         if (current_time() - start > std::chrono::seconds(60)){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::NO_ERROR_REPORT,
+                ErrorReportMode::NO_ERROR_REPORT,
                 "Unable to escape from being attacked.",
                 stream
             );
@@ -507,7 +507,7 @@ void fast_travel_from_overworld(
             );
             if (ret < 0){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Map not detected after 5 seconds.",
                     stream
                 );
@@ -558,7 +558,7 @@ void fast_travel_from_overworld(
     );
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to fly to camp after 20 seconds.",
             stream
         );

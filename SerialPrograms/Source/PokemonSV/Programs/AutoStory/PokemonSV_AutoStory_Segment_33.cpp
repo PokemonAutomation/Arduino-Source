@@ -161,7 +161,7 @@ void checkpoint_86(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Never detected black screen. Failed to glide from the Academy to the route leading to the Pokemon League.",
                 env.console
             );
@@ -369,7 +369,7 @@ void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         bool is_won = run_pokemon(env.console, context, move_table1, true, terastallized);
         if (!is_won){// throw exception if we lose
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to beat the Ground trainer. Reset.",
                 env.console
             );
@@ -390,7 +390,7 @@ void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         is_won = run_pokemon(env.console, context, move_table2, true, terastallized);
         if (!is_won){// throw exception if we lose
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to beat the Steel trainer. Reset.",
                 env.console
             );
@@ -480,7 +480,7 @@ GameTitle get_game_title(SingleSwitchProgramEnvironment& env, ProControllerConte
 
     if (game_title == GameTitle::UNKNOWN){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "get_game_title(): Unable to determine what game we are playing. "
             "The color of the bottom bar in the Pokemon Summary page doesn't match any of the expected colors.",
             env.console
@@ -511,7 +511,7 @@ std::string get_ride_pokemon_name(SingleSwitchProgramEnvironment& env, ProContro
 
     if (results.empty()){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "AutoStory_Segment_34::checkpoint_86(): Unable to read selected item. No valid results.\n" + language_warning(language),
             env.console
         );
@@ -519,7 +519,7 @@ std::string get_ride_pokemon_name(SingleSwitchProgramEnvironment& env, ProContro
 
     if (results.size() > 1){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "AutoStory_Segment_34::checkpoint_86(): Unable to read selected item. Ambiguous or multiple results.\n" + language_warning(language),
             env.console
         );

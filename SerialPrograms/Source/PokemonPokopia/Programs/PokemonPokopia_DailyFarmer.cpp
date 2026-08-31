@@ -135,7 +135,7 @@ void DailyFarmer::go_to_date_menu(SingleSwitchProgramEnvironment& env, ProContro
         return;
     }
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "Failed to navigate to date change menu",
         env.console
     );

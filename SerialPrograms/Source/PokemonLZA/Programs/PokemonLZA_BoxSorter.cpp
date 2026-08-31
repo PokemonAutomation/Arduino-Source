@@ -303,7 +303,7 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                     bool dex_number_detected = dex_number_detector.detect(screen);
                     if (!dex_number_detected){
                         OperationFailedExceptionWithScreenshot::fire(
-                            ErrorReport::SEND_ERROR_REPORT,
+                            ErrorReportMode::SEND_ERROR_REPORT,
                             "BoxSorting Check Summary: Unable to read a correct dex number, found: " + std::to_string(dex_number_detector.dex_number_when_error()),
                             env.console
                         );

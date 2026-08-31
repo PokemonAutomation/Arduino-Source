@@ -123,7 +123,7 @@ bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, ProCont
         );
         if (ret != 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "End of trial not detected after 3 minutes.",
                 env.console
             );
@@ -161,7 +161,7 @@ bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, ProCont
             continue;
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "No recognized state after 80 seconds.",
                 env.console
             );

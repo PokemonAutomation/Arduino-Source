@@ -323,7 +323,7 @@ bool RideCloner101::run_post_win(
             int quantity = move_to_ball(reader, console, context, BALL_SELECT.slug());
             if (quantity == 0){
                 throw_and_log<FatalProgramException>(
-                    console.logger(), ErrorReport::NO_ERROR_REPORT,
+                    console.logger(), ErrorReportMode::NO_ERROR_REPORT,
                     "Unable to find appropriate ball. Did you run out?",
                     console
                 );

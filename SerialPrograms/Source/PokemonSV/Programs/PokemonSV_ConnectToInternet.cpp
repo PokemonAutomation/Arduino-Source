@@ -76,7 +76,7 @@ void connect_to_internet_from_menu(const ProgramInfo& info, VideoStream& stream,
     while (true){
         if (current_time() - start > std::chrono::minutes(5)){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "connect_to_internet_from_menu(): Failed to connect to internet after 5 minutes.",
                 stream
             );
@@ -126,13 +126,13 @@ void connect_to_internet_from_menu(const ProgramInfo& info, VideoStream& stream,
         case 5:
             stream.log("Detected battle menu...");
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::NO_ERROR_REPORT,
+                ErrorReportMode::NO_ERROR_REPORT,
                 "connect_to_internet_from_menu(): Looks like you got attacked.",
                 stream
             );
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "connect_to_internet_from_menu(): No recognized state after 60 seconds.",
                 stream
             );
@@ -145,7 +145,7 @@ void connect_to_internet_from_overworld(const ProgramInfo& info, VideoStream& st
     while (true){
         if (current_time() - start > std::chrono::minutes(5)){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "connect_to_internet_from_overworld(): Failed to connect to internet after 5 minutes.",
                 stream
             );
@@ -206,13 +206,13 @@ void connect_to_internet_from_overworld(const ProgramInfo& info, VideoStream& st
         case 5:
             stream.log("Detected battle menu...");
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::NO_ERROR_REPORT,
+                ErrorReportMode::NO_ERROR_REPORT,
                 "connect_to_internet_from_overworld(): Looks like you got attacked.",
                 stream
             );
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "connect_to_internet_from_overworld(): No recognized state after 60 seconds.",
                 stream
             );

@@ -1101,7 +1101,7 @@ void run_sandwich_maker(
                 }else{
                     stream.log("Read nothing on center plate label.");
                     OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "run_sandwich_maker: No ingredient found on center plate label.\n" + language_warning(language),
                         stream,
                         std::move(screen)
@@ -1151,7 +1151,7 @@ void run_sandwich_maker(
 
             if (left_filling.empty()){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "No ingredient label found on remaining plate " + std::to_string(i) + ".",
                     stream,
                     std::move(screen)
@@ -1173,7 +1173,7 @@ void run_sandwich_maker(
         if ((int)plate_order.size() != plates){
             env.log("Found # plate labels " + std::to_string(plate_order.size()) + ", not same as desired # plates " + std::to_string(plates));
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Number of plate labels did not match number of plates.",
                 stream,
                 std::move(screen)
@@ -1239,7 +1239,7 @@ void run_sandwich_maker(
                 plate_index.push_back(0);
             }else{
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "run_sandwich_maker(): Did not detect the expected ingredients on the plate(s).",
                     stream
                 );
@@ -1342,7 +1342,7 @@ void run_sandwich_maker(
     int ret = wait_until(stream, context, std::chrono::seconds(30), { grabbing_hand });
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "SandwichMaker: Cannot detect grabbing hand when waiting for upper bread.",
             stream,
             grabbing_hand.last_snapshot()

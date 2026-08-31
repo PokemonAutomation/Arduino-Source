@@ -170,7 +170,7 @@ void loop_adventures(
                     {{"Message:", "Failed to start adventure 10 times in the row."}}
                 );
                 throw_and_log<OperationFailedException>(
-                    env.logger(), ErrorReport::SEND_ERROR_REPORT,
+                    env.logger(), ErrorReportMode::SEND_ERROR_REPORT,
                     "Failed to start adventure 10 times in the row."
                 );
             }

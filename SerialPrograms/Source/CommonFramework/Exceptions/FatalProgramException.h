@@ -24,12 +24,12 @@ class FatalProgramException : public Exception{
 public:
 
     explicit FatalProgramException(
-        ErrorReport error_report,
+        ErrorReportMode error_report_mode,
         std::string message
     );
 
     explicit FatalProgramException(
-        ErrorReport error_report,
+        ErrorReportMode error_report_mode,
         std::string message,
         VideoStream& stream
     );
@@ -38,20 +38,20 @@ public:
     //  Use the provided screenshot instead of taking one with the console.
     //  Store the console information (if provided) for stream history if requested later.
     explicit FatalProgramException(
-        ErrorReport error_report,
+        ErrorReportMode error_report_mode,
         std::string message,
         VideoStream* stream,
         ImageRGB32 screenshot
     );
 
     explicit FatalProgramException(
-        ErrorReport error_report,
+        ErrorReportMode error_report_mode,
         std::string message,
         VideoStream* stream,
         std::shared_ptr<const ImageRGB32> screenshot
     );
 
-    ErrorReport error_report_mode() const { return m_error_report_mode; }
+    ErrorReportMode error_report_mode() const { return m_error_report_mode; }
     virtual const char* name() const override{ return "FatalProgramException"; }
     ImageViewRGB32 screenshot_view() const {
         if (m_screenshot){
@@ -69,7 +69,7 @@ public:
     );
 
 private:
-    ErrorReport m_error_report_mode;
+    ErrorReportMode m_error_report_mode;
     std::string m_message;
     VideoStream* m_stream = nullptr;
     std::shared_ptr<const ImageRGB32> m_screenshot;

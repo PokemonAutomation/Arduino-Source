@@ -118,7 +118,7 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, ProControlle
             const uint8_t expected_empty_slots_in_party = HAS_CLONE_RIDE_POKEMON ? 4 : 5;
             if (check_empty_slots_in_party(env.program_info(), env.console, context) != expected_empty_slots_in_party){
                 throw_and_log<FatalProgramException>(
-                    env.console, ErrorReport::SEND_ERROR_REPORT,
+                    env.console, ErrorReportMode::SEND_ERROR_REPORT,
                     "Your party should have " + std::to_string(6 - expected_empty_slots_in_party) + " " + STRING_POKEMON +
                     " and " + std::to_string(expected_empty_slots_in_party) + " empty slots.",
                     env.console
@@ -186,7 +186,7 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, ProControlle
         num_eggs = check_egg_party_column(env.program_info(), env.console, context).first;
         if (num_eggs > 0){
             throw_and_log<FatalProgramException>(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
+                env.console, ErrorReportMode::SEND_ERROR_REPORT,
                 "Detected egg in party after hatching.",
                 env.console
             );

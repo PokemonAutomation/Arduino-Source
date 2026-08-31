@@ -216,7 +216,7 @@ bool JacintheInfiniteFarmer::talk_to_jacinthe(SingleSwitchProgramEnvironment& en
                 stats.errors++;
                 env.update_stats();
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "talk_to_jacinthe(): Does not detect transparent battle dialog 20 sec after black screen.",
                     env.console
                 );
@@ -233,7 +233,7 @@ bool JacintheInfiniteFarmer::talk_to_jacinthe(SingleSwitchProgramEnvironment& en
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "talk_to_jacinthe(): No recognized state after 60 seconds.",
                 env.console
             );
@@ -276,7 +276,7 @@ void JacintheInfiniteFarmer::run_round(SingleSwitchProgramEnvironment& env, ProC
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "run_round(): no battle state or dialog window detected after 50 sec.",
                 env.console
             );

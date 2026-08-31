@@ -93,7 +93,7 @@ void SizeChecker::enter_check_mode(SingleSwitchProgramEnvironment& env, ProContr
     while (true){
         if (current_time() - start > std::chrono::minutes(2)){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "enter_check_mode(): Failed to enter box mode after 2 minutes.",
                 env.console
             );
@@ -125,7 +125,7 @@ void SizeChecker::enter_check_mode(SingleSwitchProgramEnvironment& env, ProContr
 
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "enter_check_mode(): No recognized state after 60 seconds.",
                 env.console
             );
@@ -144,7 +144,7 @@ void SizeChecker::exit_check_mode(SingleSwitchProgramEnvironment& env, ProContro
     while (true){
         if (current_time() - start > std::chrono::minutes(2)){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "exit_check_mode(): Failed to exit box mode after 2 minutes.",
                 env.console
             );
@@ -183,7 +183,7 @@ void SizeChecker::exit_check_mode(SingleSwitchProgramEnvironment& env, ProContro
 
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "exit_check_mode(): No recognized state after 60 seconds.",
                 env.console
             );
@@ -257,7 +257,7 @@ void SizeChecker::program(SingleSwitchProgramEnvironment& env, ProControllerCont
                 );
                 if (ret < 0){
                     OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Unable to initiate check after 10 A presses.",
                         env.console
                     );

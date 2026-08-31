@@ -75,7 +75,7 @@ void overworld_to_menu(VideoStream& stream, ProControllerContext& context){
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Menu not detected after 10 seconds.",
                 stream
             );
@@ -110,7 +110,7 @@ void overworld_to_box(VideoStream& stream, ProControllerContext& context){
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Box system not detected after 10 seconds.",
                 stream
             );
@@ -145,7 +145,7 @@ void box_to_overworld(VideoStream& stream, ProControllerContext& context){
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Menu not detected after 10 seconds.",
                 stream
             );

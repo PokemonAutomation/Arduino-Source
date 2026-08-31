@@ -130,7 +130,7 @@ void checkpoint_21(
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "checkpoint_21(): Failed to jump the East Mesagoza wall.",
                 env.console
             );
