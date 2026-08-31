@@ -87,10 +87,6 @@ bool FixedLimitVector<Object>::emplace_back(Args&&... args){
         return false;
     }
 }
-template <typename Object>
-void FixedLimitVector<Object>::pop_back(){
-    m_data[--m_size].~Object();
-}
 
 
 

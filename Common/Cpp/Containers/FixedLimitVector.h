@@ -109,6 +109,10 @@ FixedLimitVector<Object>::FixedLimitVector()
     , m_capacity(0)
 {}
 
+template <typename Object>
+void FixedLimitVector<Object>::pop_back(){
+    m_data[--m_size].~Object();
+}
 
 
 
