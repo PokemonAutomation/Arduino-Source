@@ -34,7 +34,7 @@ ControllerSelectorWidget::~ControllerSelectorWidget(){
 ControllerSelectorWidget::ControllerSelectorWidget(
     QWidget& parent,
     ControllerSession& session,
-    bool show_enable_box
+    std::optional<size_t> index
 )
     : QWidget(&parent)
     , m_session(session)
@@ -42,14 +42,19 @@ ControllerSelectorWidget::ControllerSelectorWidget(
     QHBoxLayout* layoutL = new QHBoxLayout(this);
     layoutL->setContentsMargins(0, 0, 0, 0);
 
-    if (!show_enable_box){
+    if (!index.has_value()){
         layoutL->addWidget(new QLabel("<b>Controller:</b>", this), CONSOLE_SETTINGS_STRETCH_L0_LABEL);
     }else{
         QHBoxLayout* layoutL0 = new QHBoxLayout();
         layoutL->addLayout(layoutL0, CONSOLE_SETTINGS_STRETCH_L0_LABEL);
         layoutL0->setContentsMargins(0, 0, 0, 0);
 
-        layoutL0->addWidget(new QLabel("<b>Controller:</b>", this));
+        layoutL0->addWidget(
+            new QLabel(
+                QString::fromStdString("<b>Controller " + std::to_string(index.value()) + ":</b>"),
+                this
+            )
+        );
 
         QCheckBox* check_box = new QCheckBox(this);
         layoutL0->addWidget(check_box, 1, Qt::AlignRight);

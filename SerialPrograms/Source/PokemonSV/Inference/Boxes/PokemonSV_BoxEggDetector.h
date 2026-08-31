@@ -53,7 +53,6 @@ private:
 
 class BoxEggWatcher : public DetectorToFinder<BoxEggDetector>{
 public:
-    ~BoxEggWatcher();
     BoxEggWatcher(
         BoxCursorLocation side,
         uint8_t row, uint8_t col,

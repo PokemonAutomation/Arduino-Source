@@ -55,13 +55,18 @@ ConsoleSystemSession::ConsoleSystemSession(
     , m_video(m_logger, option.m_video)
     , m_audio(m_logger, option.m_audio)
     , m_overlay(m_logger, option.m_overlay)
+    , m_controllers(option.m_controllers.size())
     , m_history(m_logger)
     , m_memory_usage(new MemoryUtilizationStats())
     , m_cpu_utilization(new CpuUtilizationStat())
     , m_main_thread_utilization(new ThreadUtilizationStat(current_thread_handle(), "Main Qt Thread:"))
 {
-    for (ControllerOption& controller : option.m_controllers){
-        m_controllers.emplace_back(std::make_unique<ControllerSession>(m_logger, controller));
+    if (option.m_controllers.size() == 1){
+        m_controllers.emplace_back(m_logger, option.m_controllers[0]);
+    }else{
+        for (ControllerOption& controller : option.m_controllers){
+            m_controllers.emplace_back(m_logger, m_controllers.size(), controller);
+        }
     }
 
     m_history.start(m_audio.input_format(), m_video.current_source() != nullptr);
@@ -106,13 +111,13 @@ void ConsoleSystemSession::load(const ConsoleSystemOption& option){
     size_t stop = std::min(m_option.m_controllers.size(), option.m_controllers.size());
     for (; c < stop; c++){
         m_option.m_controllers[c] = option.m_controllers[c];
-        m_controllers[c]->load(option.m_controllers[c]);
+        m_controllers[c].session.load(option.m_controllers[c]);
     }
 
     stop = m_option.m_controllers.size();
     for (; c < stop; c++){
         m_option.m_controllers[c].set_descriptor(std::make_shared<NullControllerDescriptor>());
-        m_controllers[c]->set_device(m_option.m_controllers[c].descriptor());
+        m_controllers[c].session.set_device(m_option.m_controllers[c].descriptor());
     }
 }
 
@@ -121,8 +126,8 @@ void ConsoleSystemSession::lock_controllers(std::string reason){
     {
         std::lock_guard<Mutex> lg(m_lock);
         m_lock_controllers_reason = std::move(reason);
-        for (std::unique_ptr<ControllerSession>& controller : m_controllers){
-            controller->set_options_locked(true);
+        for (ControllerEntry& controller : m_controllers){
+            controller.session.set_options_locked(true);
         }
     }
     m_listeners.run_method(&Listener::on_lock_controllers);
@@ -132,8 +137,8 @@ void ConsoleSystemSession::unlock_controllers(){
         std::lock_guard<Mutex> lg(m_lock);
         m_lock_controllers_reason.clear();
         global_input_clear_state();
-        for (std::unique_ptr<ControllerSession>& controller : m_controllers){
-            controller->set_options_locked(false);
+        for (ControllerEntry& controller : m_controllers){
+            controller.session.set_options_locked(false);
         }
     }
     m_listeners.run_method(&Listener::on_unlock_controllers);
@@ -167,8 +172,8 @@ void ConsoleSystemSession::on_focus_out(){
     global_input_clear_state();
     global_input_remove_listener(*this);
 
-    for (std::unique_ptr<ControllerSession>& controller : m_controllers){
-        std::string error = controller->try_run<AbstractController>([](AbstractController& controller){
+    for (ControllerEntry& controller : m_controllers){
+        std::string error = controller.session.try_run<AbstractController>([](AbstractController& controller){
             controller.cancel_all_commands();
         });
         if (!error.empty()){
@@ -188,8 +193,8 @@ void ConsoleSystemSession::run_controller_input(ControllerInputState& state){
     }
 
 //    cout << "ConsoleSystemSession::run_controller_input()" << endl;
-    for (std::unique_ptr<ControllerSession>& controller : m_controllers){
-        std::string error = controller->try_run<AbstractController>([&](AbstractController& controller){
+    for (ControllerEntry& controller : m_controllers){
+        std::string error = controller.session.try_run<AbstractController>([&](AbstractController& controller){
             controller.run_controller_input(state);
         });
         if (!error.empty()){

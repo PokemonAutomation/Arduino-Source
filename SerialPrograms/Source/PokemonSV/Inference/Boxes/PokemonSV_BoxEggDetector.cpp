@@ -94,7 +94,6 @@ bool BoxEggDetector::detect(const ImageViewRGB32& frame){
     );
 }
 
-BoxEggWatcher::~BoxEggWatcher() = default;
 
 BoxEggPartyColumnWatcher::BoxEggPartyColumnWatcher(Color color)
     : VisualInferenceCallback("BoxEggPartyColumnWatcher")

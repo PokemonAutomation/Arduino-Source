@@ -18,16 +18,6 @@ namespace PokemonAutomation{
 //  Rule of 5
 
 template <typename Object>
-FixedLimitVector<Object>::~FixedLimitVector(){
-    while (m_size > 0){
-        pop_back();
-    }
-    aligned_free(m_data);
-}
-
-
-
-template <typename Object>
 FixedLimitVector<Object>::FixedLimitVector(const FixedLimitVector& x)
     : FixedLimitVector(x.capacity())
 {

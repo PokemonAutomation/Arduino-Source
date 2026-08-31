@@ -19,6 +19,7 @@
 #define PokemonAutomation_FixedLimitVector_H
 
 #include <stddef.h>
+#include "AlignedMalloc.h"
 
 namespace PokemonAutomation{
 
@@ -71,6 +72,14 @@ private:
 
 
 //  Implementations
+
+template <typename Object>
+FixedLimitVector<Object>::~FixedLimitVector(){
+    while (m_size > 0){
+        pop_back();
+    }
+    aligned_free(m_data);
+}
 
 template <typename Object>
 FixedLimitVector<Object>::FixedLimitVector(FixedLimitVector&& x) noexcept

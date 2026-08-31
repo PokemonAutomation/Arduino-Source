@@ -247,8 +247,6 @@ bool GradientArrowDetector::detect(ImageFloatBox& box, const ImageViewRGB32& scr
 
 
 
-GradientArrowWatcher::~GradientArrowWatcher() = default;
-
 
 
 

@@ -25,7 +25,7 @@ public:
     ControllerSelectorWidget(
         QWidget& parent,
         ControllerSession& session,
-        bool show_enable_box
+        std::optional<size_t> index
     );
 
     ControllerSession& session(){

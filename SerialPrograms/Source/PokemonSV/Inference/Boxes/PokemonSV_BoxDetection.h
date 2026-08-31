@@ -149,7 +149,6 @@ private:
 };
 class BoxEmptySlotWatcher : public DetectorToFinder<BoxEmptySlotDetector>{
 public:
-    ~BoxEmptySlotWatcher();
     BoxEmptySlotWatcher(
         BoxCursorLocation side,
         uint8_t row, uint8_t col,
