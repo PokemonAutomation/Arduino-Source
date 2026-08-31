@@ -476,7 +476,7 @@ bool HeldItemFarmerSafariZone::run_safari_zone(SingleSwitchProgramEnvironment& e
         if (catch_result < 0){
             stats.errors++;
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "auto_catch_safari() encountered an error.",
                 env.console
             );

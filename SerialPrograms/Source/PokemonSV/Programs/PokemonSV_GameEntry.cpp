@@ -161,7 +161,7 @@ void reset_game(
         context.wait_for_all_requests();
         if (!reset_game_from_home(info, console, context, 5000ms)){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to start game.",
                 console
             );

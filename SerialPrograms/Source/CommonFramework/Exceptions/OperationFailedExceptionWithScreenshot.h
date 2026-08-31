@@ -25,7 +25,7 @@ class ProgramEnvironment;
 class OperationFailedExceptionWithScreenshot : public OperationFailedException{
 public:
     OperationFailedExceptionWithScreenshot(
-        ErrorReport error_report,
+        ErrorReportMode error_report_mode,
         std::string message,
         VideoStream& stream
     );
@@ -34,13 +34,13 @@ public:
     //  Use the provided screenshot instead of taking one with the console.
     //  Store the console information (if provided) for stream history if requested later.
     OperationFailedExceptionWithScreenshot(
-        ErrorReport error_report,
+        ErrorReportMode error_report_mode,
         std::string message,
         VideoStream* stream,
         ImageRGB32 screenshot
     );
     OperationFailedExceptionWithScreenshot(
-        ErrorReport error_report,
+        ErrorReportMode error_report_mode,
         std::string message,
         VideoStream* stream,
         std::shared_ptr<const ImageRGB32> screenshot
@@ -49,12 +49,12 @@ public:
     //  This is the most common use case. Throw and log exception.
     //  Include console information for screenshot and stream history.
     [[noreturn]] static void fire(
-        ErrorReport error_report,
+        ErrorReportMode error_report_mode,
         std::string message,
         VideoStream& stream
     );
     [[noreturn]] static void fire(
-        ErrorReport error_report,
+        ErrorReportMode error_report_mode,
         std::string message,
         VideoStream& stream,
         std::shared_ptr<const ImageRGB32> screenshot

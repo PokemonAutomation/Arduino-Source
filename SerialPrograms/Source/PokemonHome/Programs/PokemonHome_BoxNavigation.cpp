@@ -254,7 +254,7 @@ void read_summary_screen(
     const int dex_number = summary_reader.read_national_dex(env.console, screen);
     if (dex_number <= 0 || dex_number > static_cast<int>(NATIONAL_DEX_SLUGS().size())) {
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "BoxSorter Check Summary: Unable to read a correct dex number, found: " + std::to_string(dex_number),
             env.console
         );

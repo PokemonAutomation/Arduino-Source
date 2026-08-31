@@ -211,7 +211,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     size_t num_empty_slots_in_party = count_empty_slots_in_party(env.console, screen);
     if (num_eggs_in_column_0 + num_empty_slots_in_column_0 != 5){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Total number of eggs and empty slots in the first box column don't add up to 5. "
             "During setup, ensure there are no non-egg Pokemon in the first box column.",
             env.console
@@ -219,7 +219,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     }
     if (num_eggs_in_party + num_empty_slots_in_party != 5){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Total number of eggs and empty slots in the party don't add up to 5. "
             "During setup, ensure there is only one Pokemon in the lead slot, and no other Pokemon.",
             env.console
@@ -294,7 +294,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             consecutive_failures++;
             if (consecutive_failures >= 3){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Failed 3 batches in the row.",
                     env.console
                 );
@@ -502,7 +502,7 @@ bool EggAutonomous::run_bike_loop(
             return true;
         }else{
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "run_bike_loop: No recognized state after 10 seconds.",
                 env.console
             );
@@ -530,7 +530,7 @@ void EggAutonomous::exceed_bike_loop_limit(
     context.wait_for_all_requests();
 
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "Max number of loops reached. Not enough eggs in party?",
         env.console
     );
@@ -554,7 +554,7 @@ size_t EggAutonomous::hatch_routine(
     );
     if (ret0 < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "hatch_routine: We expected to see a hatching egg, but no hatching detected.",
             env.console
         );
@@ -640,7 +640,7 @@ void EggAutonomous::wait_for_egg_hatched(
     );
     if (ret > 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Cannot detect egg hatching ends.",
             env.console
         );
@@ -727,7 +727,7 @@ EggFetchResult EggAutonomous::talk_to_lady_to_fetch_egg(
             continue;     
         default:
            OperationFailedExceptionWithScreenshot::fire(
-               ErrorReport::SEND_ERROR_REPORT,
+               ErrorReportMode::SEND_ERROR_REPORT,
                "talk_to_lady_to_fetch_egg(): No recognized state after 30 seconds.",
                env.console
            );
@@ -736,7 +736,7 @@ EggFetchResult EggAutonomous::talk_to_lady_to_fetch_egg(
 
     if (!egg_status_known){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "talk_to_lady_to_fetch_egg(): Caught in loop. Unable to speak to lady after 2 minutes.",
             env.console
         );
@@ -753,7 +753,7 @@ EggFetchResult EggAutonomous::talk_to_lady_to_fetch_egg(
     );
     if (ret2 < 0){ // If dialog over is not detected:
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Cannot detect end of Nursery lady dialog. No Y-Comm mark found.",
             env.console
         );
@@ -795,14 +795,14 @@ bool EggAutonomous::process_hatched_pokemon(
     size_t num_empty_slots_in_party_before = count_empty_slots_in_party(env.console, screen0);
     if (num_eggs_in_column_0_before != 5 || num_empty_slots_in_column_0_before != 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "process_hatched_pokemon: Before processing, we expected 5 eggs in the first box column.",
             env.console
         );
     }
     if (num_eggs_in_party_before != 0 || num_empty_slots_in_party_before != 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "process_hatched_pokemon: Before processing, we expected a party without eggs (and no empty slots), since they should all be hatched.",
             env.console
         );        
@@ -944,7 +944,7 @@ bool EggAutonomous::process_hatched_pokemon(
                 );
                 if (ret != 0){
                     OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Cannot detect pokemon menu in storage box.",
                         env.console
                     );
@@ -973,7 +973,7 @@ bool EggAutonomous::process_hatched_pokemon(
                 );
                 if (ret != 0){
                     OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Miss second dialog when releasing pokemon.",
                         env.console
                     );
@@ -991,7 +991,7 @@ bool EggAutonomous::process_hatched_pokemon(
                 }
                 if (dialog_count == max_dialog_count){
                     OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Unexpected dialogs when releasing pokemon.",
                         env.console
                     );
@@ -1039,7 +1039,7 @@ bool EggAutonomous::process_hatched_pokemon(
     size_t num_empty_slots_in_party_after = count_empty_slots_in_party(env.console, screen);
     if (num_eggs_in_column_0_after != 0 || num_empty_slots_in_column_0_after != 5){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "process_hatched_pokemon: After processing, we expected an empty first box column.",
             env.console
         );
@@ -1047,7 +1047,7 @@ bool EggAutonomous::process_hatched_pokemon(
 
     if (num_eggs_in_party_after != 5 || num_empty_slots_in_party_after != 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "process_hatched_pokemon: After processing, we expected a party full of 5 eggs.",
             env.console
         );        
@@ -1072,7 +1072,7 @@ bool EggAutonomous::process_hatched_pokemon(
         );
         if (ret > 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Cannot detect Y-Comm after leaving menu.",
                 env.console
             );
@@ -1102,7 +1102,7 @@ void EggAutonomous::check_box_filled(VideoStream& stream, const ImageViewRGB32& 
             // stream.log("row " + std::to_string(row) + " col " + std::to_string(column) + (is_empty ? " is_empty" : " not empty"));
             if (is_empty){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "check_box_filled: Box is not filled.",
                     stream
                 );
@@ -1117,7 +1117,7 @@ void EggAutonomous::check_non_egg_lead(VideoStream& stream, const ImageViewRGB32
     bool is_empty = slot.detect(screen);
     if (is_empty){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "check_non_egg_lead: Detected an empty lead slot in party. This shouldn't be possible.",
             stream
         );
@@ -1127,7 +1127,7 @@ void EggAutonomous::check_non_egg_lead(VideoStream& stream, const ImageViewRGB32
     bool is_egg = egg.detect(screen);
     if (is_egg){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "check_non_egg_lead: Detected an egg in lead slot of party.",
             stream
         );

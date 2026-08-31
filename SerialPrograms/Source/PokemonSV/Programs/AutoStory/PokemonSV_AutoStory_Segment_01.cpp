@@ -255,7 +255,7 @@ void checkpoint_03(
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Stuck trying to clear auto heal tutorial.",
                 env.console
             );  

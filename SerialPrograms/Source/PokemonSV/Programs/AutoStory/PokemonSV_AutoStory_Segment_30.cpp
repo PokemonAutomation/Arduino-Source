@@ -222,7 +222,7 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "checkpoint_76(): Failed to Snow Slope Run.",
                 env.console
             );

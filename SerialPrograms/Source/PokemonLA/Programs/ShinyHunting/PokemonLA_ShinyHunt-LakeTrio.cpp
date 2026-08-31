@@ -173,7 +173,7 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, ProControll
                 consecutive_errors++;
                 if (consecutive_errors >= 3){
                     OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Failed to detect an encounter 3 times in the row.",
                         env.console
                     );

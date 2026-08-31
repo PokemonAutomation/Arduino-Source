@@ -84,7 +84,7 @@ void ThreeSegmentDudunsparceFinder::check_one_column(
     const uint8_t expected_empty_slots_in_party = HAS_CLONE_RIDE_POKEMON ? 4 : 5;
     if (check_empty_slots_in_party(env.program_info(), env.console, context) != expected_empty_slots_in_party){
         throw_and_log<FatalProgramException>(
-            env.console, ErrorReport::SEND_ERROR_REPORT,
+            env.console, ErrorReportMode::SEND_ERROR_REPORT,
             "Your party should have " + std::to_string(6 - expected_empty_slots_in_party) + " " + STRING_POKEMON +
             " and " + std::to_string(expected_empty_slots_in_party) + " empty slots.",
             env.console
@@ -161,7 +161,7 @@ void ThreeSegmentDudunsparceFinder::check_one_column(
     );
     if (ret < 0){
         throw_and_log<FatalProgramException>(
-            env.console, ErrorReport::NO_ERROR_REPORT,
+            env.console, ErrorReportMode::NO_ERROR_REPORT,
             "ThreeSegmentDudunsparceFinder::check_one_column(): No pokemon status summary screen found.",
             env.console
         );

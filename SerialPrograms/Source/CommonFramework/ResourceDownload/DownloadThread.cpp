@@ -56,7 +56,7 @@ void DownloadThread::start_download_thread(){
         try {
 
             // Logger& logger = global_logger_tagged();
-            // throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
+            // throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, 
             //         "Test");
             // throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Test."); 
 
@@ -128,7 +128,7 @@ void DownloadThread::run_download(DownloadedResourceMetadata resource_metadata){
         std::string expected_hash = resource_metadata.sha256;
         if (hash != expected_hash){
             std::cerr << "current hash: " << hash << endl;
-            throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
+            throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, 
                 "Downloaded file failed verification. SHA 256 hash did not match the expected value.");
         }
 

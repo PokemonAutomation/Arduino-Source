@@ -128,7 +128,7 @@ bool LegendaryReset::run_encounter(SingleSwitchProgramEnvironment& env, JoyconCo
                 stats.errors++;
                 env.update_stats();
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "run_battle(): Did not detect battle start.",
                     env.console
                 );
@@ -174,7 +174,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
 
         if (consecutive_failures >= 3){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed 3 times in the row.",
                 env.console
             );
@@ -216,7 +216,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
                     env.update_stats();
                     env.log("Timed out during battle after 5 minutes.", COLOR_RED);
                     OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Timed out during battle after 5 minutes.",
                         env.console
                     );
@@ -240,7 +240,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
                     env.update_stats();
                     env.log("Timed out during battle. Stuck, crashed, or took more than 30 seconds for a turn.", COLOR_RED);
                     OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Timed out during battle. Stuck, crashed, or took more than 30 seconds for a turn.",
                         env.console
                     );
@@ -261,7 +261,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to detect catching menu.",
             env.console
         );

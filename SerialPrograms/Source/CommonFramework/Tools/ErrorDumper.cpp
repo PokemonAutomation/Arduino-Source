@@ -45,7 +45,7 @@ void dump_image(
     const ImageViewRGB32& image,
     const StreamHistorySession* stream_history
 ){
-    report_error(
+    report_error_to_telemetry(
         &logger,
         program_info,
         label,
@@ -73,7 +73,7 @@ void dump_image_and_throw_recoverable_exception(
     const ImageViewRGB32& screenshot
 ){
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         error_message,
         stream
     );

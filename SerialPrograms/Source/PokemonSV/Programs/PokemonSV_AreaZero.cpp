@@ -39,7 +39,7 @@ void inside_zero_gate_to_station(
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Unable to find warp circle.",
                 stream
             );
@@ -52,7 +52,7 @@ void inside_zero_gate_to_station(
     while (true){
         if (current_time() - start > std::chrono::seconds(60)){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Unable to warp to station after 60 seconds.",
                 stream
             );
@@ -83,7 +83,7 @@ void inside_zero_gate_to_station(
             break;
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Unable to find warp to station 2.",
                 stream
             );
@@ -133,7 +133,7 @@ void inside_zero_gate_to_station(
                 }
             default:
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Heal at station: No state detected after 30 seconds.",
                     stream
                 );
@@ -158,7 +158,7 @@ void inside_zero_gate_to_station(
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Unable to exit station after 60 seconds.",
                 stream
             );
@@ -174,7 +174,7 @@ void inside_zero_gate_to_station(
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Unable to load overworld after exiting station for 30 seconds.",
                 stream
             );
@@ -208,7 +208,7 @@ void return_to_inside_zero_gate(
     );
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Unable to enter Zero Gate.",
             stream
         );
@@ -221,7 +221,7 @@ void return_to_inside_zero_gate(
     );
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Unable to detect overworld inside Zero Gate.",
             stream
         );
@@ -243,7 +243,7 @@ void return_to_inside_zero_gate_from_picnic(
     );
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Unable to enter Zero Gate.",
             stream
         );
@@ -256,7 +256,7 @@ void return_to_inside_zero_gate_from_picnic(
     );
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Unable to detect overworld inside Zero Gate.",
             stream
         );

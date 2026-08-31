@@ -56,7 +56,7 @@ void overworld_to_main_menu(ConsoleHandle& console, ProControllerContext& contex
             continue;
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "overworld_to_main_menu(): No state detected after 30 seconds.",
                 console
             );
@@ -64,7 +64,7 @@ void overworld_to_main_menu(ConsoleHandle& console, ProControllerContext& contex
     }
 
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "overworld_to_main_menu(): Failed to enter box system after 2 minutes.",
         console
     );
@@ -101,7 +101,7 @@ void overworld_to_box_system(ConsoleHandle& console, ProControllerContext& conte
             return;
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "overworld_to_box_system(): No state detected after 30 seconds.",
                 console
             );
@@ -109,7 +109,7 @@ void overworld_to_box_system(ConsoleHandle& console, ProControllerContext& conte
     }
 
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "overworld_to_box_system(): Failed to enter box system after 2 minutes.",
         console
     );
@@ -146,7 +146,7 @@ void box_system_to_overworld(ConsoleHandle& console, ProControllerContext& conte
             continue;
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "overworld_to_box_system(): No state detected after 30 seconds.",
                 console
             );
@@ -154,7 +154,7 @@ void box_system_to_overworld(ConsoleHandle& console, ProControllerContext& conte
     }
 
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "overworld_to_box_system(): Failed to exit box system after 2 minutes.",
         console
     );

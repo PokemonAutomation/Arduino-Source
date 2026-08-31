@@ -50,7 +50,7 @@ void save_game_from_menu_or_overworld(
     while (true){
         if (current_time() - start > std::chrono::minutes(5)){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "save_game_from_menu_or_overworld(): Failed to save game after 5 minutes.",
                 stream
             );
@@ -98,7 +98,7 @@ void save_game_from_menu_or_overworld(
             continue;
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "save_game_from_menu_or_overworld(): No recognized state after 60 seconds.",
                 stream
             );
@@ -134,7 +134,7 @@ void save_game_tutorial(
     );
     if (ret0 != 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to open menu!",
             stream
         );

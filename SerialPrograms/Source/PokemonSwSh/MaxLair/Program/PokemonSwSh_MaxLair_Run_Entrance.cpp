@@ -101,7 +101,7 @@ void run_entrance(
             // List of bosses is full, stop the program
             stream.log("Cannot save path – saved list is full. Stopping program.", COLOR_RED);
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::NO_ERROR_REPORT,
+                ErrorReportMode::NO_ERROR_REPORT,
                 "Paths list is full. Program stopped.",
                 stream
             );
@@ -111,7 +111,7 @@ void run_entrance(
             return;
         default:
             throw OperationFailedExceptionWithScreenshot(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "No recognized state after 10 seconds.",
                 stream
             );

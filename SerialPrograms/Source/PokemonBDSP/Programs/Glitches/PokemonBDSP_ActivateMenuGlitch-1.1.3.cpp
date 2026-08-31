@@ -73,7 +73,7 @@ void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, ProCont
     );
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Map not detected after 2 seconds.",
             stream
         );

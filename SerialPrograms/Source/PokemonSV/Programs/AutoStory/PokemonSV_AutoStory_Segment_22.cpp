@@ -252,7 +252,7 @@ void checkpoint_52(
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to detect white triangle in top right, which is an indicator of the Levincia Hide-and-Seek gym challenge.",
                 env.console
             );
@@ -275,7 +275,7 @@ void checkpoint_52(
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to detect white triangle in top right, which is an indicator of the Levincia Hide-and-Seek gym challenge.",
                 env.console
             );
@@ -293,7 +293,7 @@ void checkpoint_52(
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to detect white triangle in top right, which is an indicator of the Levincia Hide-and-Seek gym challenge.",
                 env.console
             );
@@ -318,7 +318,7 @@ void checkpoint_52(
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to detect white triangle in top right, which is an indicator of the Levincia Hide-and-Seek gym challenge.",
                 env.console
             );
@@ -336,7 +336,7 @@ void checkpoint_52(
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to detect white triangle in top right, which is an indicator of the Levincia Hide-and-Seek gym challenge.",
                 env.console
             );

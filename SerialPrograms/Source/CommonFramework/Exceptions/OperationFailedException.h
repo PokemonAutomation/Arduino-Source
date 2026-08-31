@@ -19,11 +19,11 @@ class EventNotificationOption;
 class OperationFailedException : public Exception{
 public:
     OperationFailedException(
-        ErrorReport error_report_mode,
+        ErrorReportMode error_report_mode,
         std::string message
     );
 
-    ErrorReport error_report_mode() const { return m_error_report_mode; };
+    ErrorReportMode error_report_mode() const { return m_error_report_mode; };
 
     virtual const char* name() const override{ return "OperationFailedException"; }
     virtual std::string message() const override{ return m_message; }
@@ -40,7 +40,7 @@ public:
 
 
 private:
-    ErrorReport m_error_report_mode;
+    ErrorReportMode m_error_report_mode;
     std::string m_message;
 };
 

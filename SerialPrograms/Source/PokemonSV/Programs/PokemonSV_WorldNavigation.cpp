@@ -50,7 +50,7 @@ bool fly_to_overworld_from_map(const ProgramInfo& info, VideoStream& stream, Pro
     while (true){
         if (current_time() - start > std::chrono::minutes(2)){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "fly_to_overworld_from_map(): Failed to fly from map after 2 minutes.",
                 stream
             );
@@ -96,7 +96,7 @@ bool fly_to_overworld_from_map(const ProgramInfo& info, VideoStream& stream, Pro
         case 4: //battle
             stream.log("Detected battle.");
             throw_and_log<UnexpectedBattleException>(
-                stream.logger(), ErrorReport::SEND_ERROR_REPORT,
+                stream.logger(), ErrorReportMode::SEND_ERROR_REPORT,
                 "fly_to_overworld_from_map(): Unexpectedly detected battle.",
                 stream
             ); 
@@ -106,7 +106,7 @@ bool fly_to_overworld_from_map(const ProgramInfo& info, VideoStream& stream, Pro
             return false;
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "fly_to_overworld_from_map(): No recognized state after 2 minutes.",
                 stream
             );
@@ -123,7 +123,7 @@ void picnic_from_overworld(const ProgramInfo& info, VideoStream& stream, ProCont
     while (true){
         if (current_time() - start > std::chrono::minutes(3)){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "picnic_from_overworld(): Failed to start picnic after 3 minutes.",
                 stream
             );
@@ -150,7 +150,7 @@ void picnic_from_overworld(const ProgramInfo& info, VideoStream& stream, ProCont
             success = main_menu.move_cursor(info, stream, context, MenuSide::RIGHT, 2, fast_mode);
             if (success == false){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "picnic_from_overworld(): Cannot move menu cursor to picnic.",
                     stream
                 );
@@ -167,7 +167,7 @@ void picnic_from_overworld(const ProgramInfo& info, VideoStream& stream, ProCont
             return;
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "picnic_from_overworld(): No recognized state after 30 seconds.",
                 stream
             );
@@ -197,7 +197,7 @@ void leave_picnic(const ProgramInfo& info, VideoStream& stream, ProControllerCon
 
         if (i == 4){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "leave_picnic(): Failed to leave picnic after 5 tries.",
                 stream
             );
@@ -221,7 +221,7 @@ void leave_picnic(const ProgramInfo& info, VideoStream& stream, ProControllerCon
     );
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "leave_picnic(): Failed to detect overworld after 20 seconds.",
             stream
         );
@@ -296,7 +296,7 @@ void place_marker_offset_from_flypoint(
     while (true){
         if (current_time() - start > std::chrono::minutes(2)){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "place_marker_offset_from_flypoint(): Failed to place down marker after 2 minutes.",
                 stream
             );
@@ -356,7 +356,7 @@ void move_cursor_to_position_offset_from_flypoint(const ProgramInfo& info, Video
         const std::vector<ImageFloatBox> found_locations = get_flypoint_locations(info, stream, context, fly_point);
         if (found_locations.empty()){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "move_cursor_to_position_offset_from_flypoint(): No visible " + fly_point_string + " found on map",
                 stream
             );
@@ -522,7 +522,7 @@ bool fly_to_visible_closest_flypoint_cur_zoom_level(
     }else{
         // detected pokecenter, but failed to fly there.
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "fly_to_visible_closest_flypoint_cur_zoom_level(): Detected pokecenter, but failed to fly there as no \"Fly\" menuitem.",
             stream
         );
@@ -558,7 +558,7 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, VideoStream& stre
             try_count++;
             if (try_count >= MAX_TRY_COUNT){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "fly_to_closest_pokecenter_on_map(): At min warpable map level, pokecenter was detected, but failed to fly there.",
                     stream
                 );                
@@ -601,7 +601,7 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, VideoStream& stre
                 // Does not detect any pokecenter on map
                 stream.overlay().add_log("Still no PokeCenter Found!", COLOR_RED);
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "fly_to_closest_pokecenter_on_map(): At max warpable map level, still cannot find PokeCenter icon.",
                     stream
                 );
@@ -639,7 +639,7 @@ void jump_off_wall_until_map_open(const ProgramInfo& info, VideoStream& stream, 
         if (i >= 3){
             stream.log("Could not escape wall.");
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "jump_off_wall_until_map_open(): Could not escape wall.",
                 stream
             );
@@ -698,7 +698,7 @@ void walk_forward_until_dialog(
         return;
     default:
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "walk_forward_until_dialog(): Timed out. Did not detect dialog.",
             stream
         );
@@ -763,7 +763,7 @@ bool attempt_fly_to_overlapping_flypoint(
 void fly_to_overlapping_flypoint(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     if (!attempt_fly_to_overlapping_flypoint(info, stream, context)){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to reset to overlapping Pokecenter.",
             stream
         );
@@ -773,7 +773,7 @@ void fly_to_overlapping_flypoint(const ProgramInfo& info, VideoStream& stream, P
 void confirm_no_overlapping_flypoint(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     if (attempt_fly_to_overlapping_flypoint(info, stream, context)){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Overlapping fly detected, when it wasn't expected.",
             stream
         );
@@ -790,7 +790,7 @@ void heal_at_pokecenter(
     
     // if (!attempt_fly_to_overlapping_flypoint(info, stream, context)){
     //     OperationFailedExceptionWithScreenshot::fire(
-    //         ErrorReport::SEND_ERROR_REPORT,
+    //         ErrorReportMode::SEND_ERROR_REPORT,
     //         "Failed to fly to pokecenter.",
     //         stream
     //     );  
@@ -847,7 +847,7 @@ void heal_at_pokecenter(
         default:
             stream.log("heal_at_pokecenter: Timed out.");
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to heal at pokecenter.",
                 stream
             );  
@@ -931,7 +931,7 @@ void run_battle_press_A(
         context.wait_for(std::chrono::milliseconds(100));
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "run_battle_press_A(): Timed out. Did not detect expected stop condition.",
                 stream
             );
@@ -957,7 +957,7 @@ void run_battle_press_A(
             }
             if(num_times_seen_overworld > 30){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "run_battle_press_A(): Stuck in overworld. Did not detect expected stop condition.",
                     stream
                 );  
@@ -973,7 +973,7 @@ void run_battle_press_A(
                 // dump_snapshot(console);
                 if (wipeout.detect(screen)){
                     OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "run_battle_press_A(): Detected wipeout. All pokemon fainted.",
                         stream
                     );                
@@ -995,7 +995,7 @@ void run_battle_press_A(
             break;
         case CallbackEnum::SWAP_MENU:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "run_battle_press_A(): Lead pokemon fainted.",
                 stream
             );    

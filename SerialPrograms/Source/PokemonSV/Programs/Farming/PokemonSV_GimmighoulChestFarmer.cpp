@@ -204,7 +204,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, ProCont
                     stats.errors++;
                     env.update_stats();
                     OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Failed to return to Overworld after two minutes. Did your attack miss or fail to defeat Gimmighoul in one hit?",
                         env.console
                     );
@@ -238,7 +238,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, ProCont
                         stats.errors++;
                         env.update_stats();
                         OperationFailedExceptionWithScreenshot::fire(
-                            ErrorReport::SEND_ERROR_REPORT,
+                            ErrorReportMode::SEND_ERROR_REPORT,
                             "Failed to return to Overworld after two minutes.",
                             env.console
                         );

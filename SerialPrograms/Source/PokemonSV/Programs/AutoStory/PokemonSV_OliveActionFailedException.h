@@ -29,12 +29,12 @@ enum class OliveFail{
 class OliveActionFailedException : public OperationFailedExceptionWithScreenshot{
 public:
     OliveActionFailedException(
-        ErrorReport error_report,
+        ErrorReportMode error_report_mode,
         std::string message,
         VideoStream& stream,
         OliveFail fail_reason = OliveFail::NONE
     )
-        : OperationFailedExceptionWithScreenshot(error_report, std::move(message), stream)
+        : OperationFailedExceptionWithScreenshot(error_report_mode, std::move(message), stream)
         , m_fail_reason(fail_reason)
     {}
     virtual const char* name() const override{ return "OliveActionFailedException"; }

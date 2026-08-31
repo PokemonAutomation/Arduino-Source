@@ -289,7 +289,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         context.wait_for(std::chrono::milliseconds(100));
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Team Star Fairy: Failed to kill 30 pokemon with Let's go.",
                 env.console
             );            

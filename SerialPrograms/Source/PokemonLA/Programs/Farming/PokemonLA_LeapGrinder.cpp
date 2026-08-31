@@ -165,7 +165,7 @@ bool LeapGrinder::run_iteration(
         }
         if (c >= 5){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to switch to Pokemon selection after 5 attempts.",
                 env.console
             );

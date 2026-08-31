@@ -64,7 +64,7 @@ void FriendSearchDisconnect::program(SingleSwitchProgramEnvironment& env, ProCon
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Home menu not detected after 5 seconds.",
                 env.console
             );

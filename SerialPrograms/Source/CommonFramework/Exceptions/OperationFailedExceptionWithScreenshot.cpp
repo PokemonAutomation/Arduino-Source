@@ -20,11 +20,11 @@ namespace PokemonAutomation{
 
 
 OperationFailedExceptionWithScreenshot::OperationFailedExceptionWithScreenshot(
-    ErrorReport error_report,
+    ErrorReportMode error_report_mode,
     std::string message,
     VideoStream& stream
 )
-    : OperationFailedException(error_report, std::move(message))
+    : OperationFailedException(error_report_mode, std::move(message))
     , m_stream(&stream)
     , m_screenshot(stream.video().snapshot().frame)
 {
@@ -33,48 +33,48 @@ OperationFailedExceptionWithScreenshot::OperationFailedExceptionWithScreenshot(
     }
 }
 OperationFailedExceptionWithScreenshot::OperationFailedExceptionWithScreenshot(
-    ErrorReport error_report,
+    ErrorReportMode error_report_mode,
     std::string message,
     VideoStream* stream,
     ImageRGB32 screenshot
 )
-    : OperationFailedException(error_report, std::move(message))
+    : OperationFailedException(error_report_mode, std::move(message))
     , m_stream(stream)
     , m_screenshot(std::make_shared<ImageRGB32>(std::move(screenshot)))
 {}
 OperationFailedExceptionWithScreenshot::OperationFailedExceptionWithScreenshot(
-    ErrorReport error_report,
+    ErrorReportMode error_report_mode,
     std::string message,
     VideoStream* stream,
     std::shared_ptr<const ImageRGB32> screenshot
 )
-    : OperationFailedException(error_report, std::move(message))
+    : OperationFailedException(error_report_mode, std::move(message))
     , m_stream(stream)
     , m_screenshot(std::move(screenshot))
 {}
 
 
 [[noreturn]] void OperationFailedExceptionWithScreenshot::fire(
-    ErrorReport error_report,
+    ErrorReportMode error_report_mode,
     std::string message,
     VideoStream& stream
 ){
     throw_and_log<OperationFailedExceptionWithScreenshot>(
         stream.logger(),
-        error_report,
+        error_report_mode,
         std::move(message),
         stream
     );
 }
 [[noreturn]] void OperationFailedExceptionWithScreenshot::fire(
-    ErrorReport error_report,
+    ErrorReportMode error_report_mode,
     std::string message,
     VideoStream& stream,
     std::shared_ptr<const ImageRGB32> screenshot
 ){
     throw_and_log<OperationFailedExceptionWithScreenshot>(
         stream.logger(),
-        error_report,
+        error_report_mode,
         std::move(message),
         &stream,
         std::move(screenshot)

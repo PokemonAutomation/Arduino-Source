@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 
 
 OperationFailedException::OperationFailedException(
-    ErrorReport error_report_mode,
+    ErrorReportMode error_report_mode,
     std::string message
 )
     : m_error_report_mode(error_report_mode)

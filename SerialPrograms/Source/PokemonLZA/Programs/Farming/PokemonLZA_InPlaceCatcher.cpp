@@ -136,7 +136,7 @@ void InPlaceCatcher::day_night_handler(SingleSwitchProgramEnvironment& env, ProC
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Unable to detect end of day/night change after 2 minutes.",
             env.console
         );

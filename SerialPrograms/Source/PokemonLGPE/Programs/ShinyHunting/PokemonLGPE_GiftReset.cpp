@@ -110,7 +110,7 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, CancellableScope& s
             env.update_stats();
             env.log("Failed to receive gift Pokemon.", COLOR_RED);
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to receive gift Pokemon.",
                 env.console
             );

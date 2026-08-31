@@ -151,7 +151,7 @@ void route_default(
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "route_default(): Cannot open map for fast travel.",
             env.console
         );
@@ -166,7 +166,7 @@ void route_default(
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "route_default(): Cannot fast travel after moving map cursor.",
             env.console
         );
@@ -261,7 +261,7 @@ bool route_hyperspace_wild_zone(
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "route_hyperspace_wild_zone(): Cannot read Calorie number on screen.",
             env.console
         );
@@ -332,7 +332,7 @@ void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProCon
         break;
     default:
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "route not implemented",
             env.console
         );

@@ -127,7 +127,7 @@ bool reset_game_from_home(
     if (dynamic_cast<RightJoycon*>(&context.controller()) == nullptr){
         console.log("Right Joycon required!", COLOR_RED);
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "reset_game_from_home(): Right Joycon required.",
             console
         );

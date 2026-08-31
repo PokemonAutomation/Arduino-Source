@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 
 
 
-enum class ErrorReport{
+enum class ErrorReportMode{
     NO_ERROR_REPORT,
     SEND_ERROR_REPORT,
 };

@@ -114,7 +114,7 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, ProControlle
         if (ret < 0){
             stats.errors++;
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "No distortion found after one hour.",
                 env.console
             );

@@ -113,7 +113,7 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         bool is_won = run_pokemon(env.console, context, move_table1, true, terastallized);
         if (!is_won){// throw exception if we lose
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to beat the AI Professor. Reset.",
                 env.console
             );
@@ -141,7 +141,7 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         is_won = run_pokemon(env.console, context, move_table2, true, terastallized);
         if (!is_won){// throw exception if we lose
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to beat the AI Professor, round 2. This shouldn't be possible. Reset.",
                 env.console
             );
@@ -163,7 +163,7 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Stuck trying to clear the Koraidon/Miraidon form change tutorial.",
                 env.console
             );  

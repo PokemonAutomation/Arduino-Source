@@ -136,7 +136,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, ProControll
         CatchResults result = basic_catcher(env.console, context, LANGUAGE, "master-ball", 999);
         if (result.result != CatchResult::POKEMON_CAUGHT){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Unable to catch Moltres.",
                 env.console
             );

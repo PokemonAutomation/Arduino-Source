@@ -277,7 +277,7 @@ void checkpoint_48(
         context.wait_for(std::chrono::milliseconds(100));
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "checkpoint_48(): Failed to kill 30 pokemon with Let's go.",
                 env.console
             );            

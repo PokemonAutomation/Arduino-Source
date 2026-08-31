@@ -17,11 +17,11 @@ namespace NintendoSwitch{
 class UnexpectedBattleException : public OperationFailedExceptionWithScreenshot{
 public:
     UnexpectedBattleException(
-        ErrorReport error_report,
+        ErrorReportMode error_report_mode,
         std::string message,
         VideoStream& stream
     )
-        : OperationFailedExceptionWithScreenshot(error_report, std::move(message), stream)
+        : OperationFailedExceptionWithScreenshot(error_report_mode, std::move(message), stream)
     {}
 
     virtual const char* name() const override{ return "UnexpectedBattleException"; }

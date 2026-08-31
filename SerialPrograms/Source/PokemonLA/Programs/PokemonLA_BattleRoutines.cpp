@@ -34,7 +34,7 @@ void mash_A_until_end_of_battle(VideoStream& stream, ProControllerContext& conte
     );
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to return to overworld after 3 minutes.",
             stream
         );
@@ -51,7 +51,7 @@ size_t switch_pokemon(
 ){
     if (pokemon_to_switch_to >= max_num_pokemon){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Cannot send any more Pokemon to battle, max: " + std::to_string(max_num_pokemon),
             stream
         );
@@ -81,7 +81,7 @@ size_t switch_pokemon(
         pokemon_to_switch_to++;
         if (pokemon_to_switch_to >= max_num_pokemon){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Cannot send any more Pokemon to battle, max: " + std::to_string(max_num_pokemon),
                 stream
             );
@@ -179,7 +179,7 @@ void use_next_move_with_pp(
             // Struggle.
             stream.log("No PP on all moves. Abort program.", COLOR_RED);
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "No PP on all moves.",
                 stream
             );

@@ -30,8 +30,8 @@ std::string dump_image_alone(
 );
 #endif
 
-// Call CommonFramework/ErrorReports/ErrorReports.h:report_error() to create an error
-// report with image. Check the comments of report_error() for more details.
+// Call CommonFramework/ErrorReports/ErrorReports.h:report_error_to_telemetry() to create an error
+// report with image. Check the comments of report_error_to_telemetry() for more details.
 void dump_image(
     Logger& logger,
     const ProgramInfo& program_info, const std::string& label,
@@ -40,8 +40,8 @@ void dump_image(
 );
 
 // Take a screenshot from the video stream and call
-// CommonFramework/ErrorReports/ErrorReports.h:report_error() to create an error
-// report with the screenshot. Check the comments of report_error() for more details.
+// CommonFramework/ErrorReports/ErrorReports.h:report_error_to_telemetry() to create an error
+// report with the screenshot. Check the comments of report_error_to_telemetry() for more details.
 void dump_image(
     Logger& logger,
     const ProgramInfo& program_info,

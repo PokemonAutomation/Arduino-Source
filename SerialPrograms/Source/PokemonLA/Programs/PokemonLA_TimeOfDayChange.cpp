@@ -88,7 +88,7 @@ void change_time_of_day_at_tent(
     );
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Did not interact with a tent.",
             stream
         );
@@ -121,7 +121,7 @@ void change_time_of_day_at_tent(
     );
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to stand up after resting in a tent.",
             stream
         );

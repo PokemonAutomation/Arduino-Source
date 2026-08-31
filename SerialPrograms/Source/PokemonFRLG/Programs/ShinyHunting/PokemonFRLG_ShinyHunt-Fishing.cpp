@@ -99,7 +99,7 @@ void ShinyHuntFishing::program(
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "program(): No fish hooked after 5 minutes. Please ensure you are facing water with a rod registered.",
                 env.console
             );

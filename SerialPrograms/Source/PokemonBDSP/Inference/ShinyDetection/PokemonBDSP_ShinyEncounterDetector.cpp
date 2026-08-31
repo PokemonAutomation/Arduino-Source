@@ -197,7 +197,7 @@ void determine_shiny_status(
         own_shiny_sound_detected |= own_shiny;
         if (!wild_shiny && !own_shiny){
             throw_and_log<OperationFailedException>(
-                env.logger(), ErrorReport::SEND_ERROR_REPORT,
+                env.logger(), ErrorReportMode::SEND_ERROR_REPORT,
                 "Wrong shiny sound timing found."
             );
         }

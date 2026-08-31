@@ -137,7 +137,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
             continue;
 #if 0
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to enter battle.",
                 env.console
             );

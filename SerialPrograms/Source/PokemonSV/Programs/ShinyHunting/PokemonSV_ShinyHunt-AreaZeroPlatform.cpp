@@ -467,7 +467,7 @@ void ShinyHuntAreaZeroPlatform::set_flags_and_run_state(
         if (m_consecutive_failures >= 3){
             throw_and_log<FatalProgramException>(
                 stream.logger(),
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed 3 times consecutively."
             );
         }

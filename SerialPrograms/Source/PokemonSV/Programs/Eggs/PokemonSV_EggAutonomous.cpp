@@ -835,7 +835,7 @@ bool EggAutonomous::handle_recoverable_error(
     consecutive_failures++;
     if (consecutive_failures >= 3){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed 3 times in the row.\n" + fail_message,
             env.console
         );
@@ -846,7 +846,7 @@ bool EggAutonomous::handle_recoverable_error(
     send_program_recoverable_error_notification_and_telemetry_report(
         env, &env.logger(), env.program_info(), 
         NOTIFICATION_ERROR_RECOVERABLE, 
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         message,
         "OperationFailedExceptionWithScreenshot",
         *snapshot,

@@ -119,7 +119,7 @@ void find_and_center_on_sky(
     while (true){
         if (current_time() - start > std::chrono::minutes(1)){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::NO_ERROR_REPORT,
+                ErrorReportMode::NO_ERROR_REPORT,
                 "Failed to find the sky after 1 minute. (state = " + std::to_string((int)state) + ")",
                 stream
             );

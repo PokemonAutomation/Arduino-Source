@@ -107,7 +107,7 @@ void route_alpha_pidgeot(SingleSwitchProgramEnvironment& env, ProControllerConte
         pbf_move_left_joystick(context, {+0.157, +0.156}, 100ms, 200ms);
         if (fly_from_map(env.console, context) == FastTravelState::NOT_AT_FLY_SPOT){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "fly_from_map(): Unable to fast travel",
                 env.console);
         }
@@ -152,7 +152,7 @@ void route_wild_zone_3_tower(SingleSwitchProgramEnvironment& env, ProControllerC
             pbf_move_left_joystick(context, {0, +1}, 500ms, 200ms);
         }else{
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "route_wild_zone_3_tower: unexpected facing direction: " + PokemonAutomation::tostr_fixed(direction, 0) + " deg",
                 env.console
             );
@@ -194,7 +194,7 @@ void ShinyHunt_ShuttleRun::program(SingleSwitchProgramEnvironment& env, ProContr
         break;
     default:
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "route not implemented",
             env.console
         );

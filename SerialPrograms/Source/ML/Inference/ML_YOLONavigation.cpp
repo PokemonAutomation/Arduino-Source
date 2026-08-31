@@ -187,7 +187,7 @@ void move_camera_yolo(
 
     if (!seen_object){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "move_camera_yolo(): Never detected the yolo object.",
             env.console
         );

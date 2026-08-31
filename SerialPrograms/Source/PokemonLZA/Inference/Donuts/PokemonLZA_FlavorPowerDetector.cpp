@@ -125,7 +125,7 @@ int FlavorPowerIconDetector::detect(const ImageViewRGB32& screen){
         );
         if (number < 1 || number > 3){
             throw_and_log<OperationFailedException>(
-                m_logger, ErrorReport::SEND_ERROR_REPORT,
+                m_logger, ErrorReportMode::SEND_ERROR_REPORT,
                 "DontPowerSpriteDetector::detect(): Unable to OCR power level. Got: " + std::to_string(number)
             );
         }
@@ -230,7 +230,7 @@ std::string FlavorPowerDetector::detect_power(const ImageViewRGB32& screen){
 
     if (!all_same_except_last){
         throw_and_log<OperationFailedException>(
-            m_logger, ErrorReport::SEND_ERROR_REPORT,
+            m_logger, ErrorReportMode::SEND_ERROR_REPORT,
             "FlavorPowerDetector::detect_power(): Unable to read selected item. "
             "Ambiguous or multiple results: " + get_all_results() + "\n" + 
             language_warning(m_language)
@@ -249,7 +249,7 @@ std::string FlavorPowerDetector::detect_power(const ImageViewRGB32& screen){
         }
     }
     throw_and_log<OperationFailedException>(
-        m_logger, ErrorReport::SEND_ERROR_REPORT,
+        m_logger, ErrorReportMode::SEND_ERROR_REPORT,
         "FlavorPowerDetector::detect_power(): Detected power level icon is "
         + std::to_string(detected_power_level)
         + " while getting mismatched power OCR: " + get_all_results() + 

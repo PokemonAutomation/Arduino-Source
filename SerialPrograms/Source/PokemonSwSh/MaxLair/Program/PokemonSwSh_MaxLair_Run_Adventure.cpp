@@ -163,14 +163,14 @@ void loop_adventures(
         case AdventureResult::START_ERROR:
             restart_count++;
             if (restart_count == 10){
-                report_error(
+                report_error_to_telemetry(
                     &env.logger(),
                     env.program_info(),
                     "Error",
                     {{"Message:", "Failed to start adventure 10 times in the row."}}
                 );
                 throw_and_log<OperationFailedException>(
-                    env.logger(), ErrorReport::SEND_ERROR_REPORT,
+                    env.logger(), ErrorReportMode::SEND_ERROR_REPORT,
                     "Failed to start adventure 10 times in the row."
                 );
             }

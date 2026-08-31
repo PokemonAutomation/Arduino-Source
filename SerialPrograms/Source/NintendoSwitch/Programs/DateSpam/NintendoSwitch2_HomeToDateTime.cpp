@@ -59,7 +59,7 @@ ConsoleType settings_detect_console_type(
         break;
     default:
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::NO_ERROR_REPORT,
+            ErrorReportMode::NO_ERROR_REPORT,
             "Unable to detect if this Switch 2 model is international or Japan-locked.",
             console, std::move(snapshot)
         );
@@ -251,7 +251,7 @@ void home_to_date_time_Switch2_procon_feedback(
         }
     }
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "Unable to navigate to date/time after 5 attempts.",
         console, console.video().snapshot_latest_blocking()
     );
@@ -277,7 +277,7 @@ void home_to_date_time_Switch2_joycon_feedback(
         }
     }
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "Unable to navigate to date/time after 5 attempts.",
         console, console.video().snapshot_latest_blocking()
     );

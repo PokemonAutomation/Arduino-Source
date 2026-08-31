@@ -94,7 +94,7 @@ bool save_game_from_overworld(
     }
     if (!found){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Unable to find save menu.",
             stream
         );
@@ -112,7 +112,7 @@ bool save_game_from_overworld(
     );
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Unable to return to overworld.",
             stream
         );

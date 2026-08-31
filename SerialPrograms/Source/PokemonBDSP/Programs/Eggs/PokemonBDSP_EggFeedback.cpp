@@ -48,13 +48,13 @@ void hatch_egg(VideoStream& stream, ProControllerContext& context){
             break;
         case 1:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Frozen screen detected!",
                 stream
             );
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "No hatch detected after 8 minutes of spinning.",
                 stream
             );
@@ -76,7 +76,7 @@ void hatch_egg(VideoStream& stream, ProControllerContext& context){
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "End of hatch not detected after 30 seconds.",
                 stream
             );
@@ -150,7 +150,7 @@ void release(VideoStream& stream, ProControllerContext& context){
         pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
     }
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "Unexpected dialogs when releasing.",
         stream
     );

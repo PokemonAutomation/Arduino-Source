@@ -326,7 +326,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
     while (true){
         if (failures >= 5){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Unable to print after 5 attempts.",
                 env.console
             );
@@ -457,7 +457,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
             env.console.log("No state detected after 2 minutes.", COLOR_RED);
 #if 0
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "No state detected after 2 minutes.",
                 env.console
             );
@@ -633,7 +633,7 @@ void ItemPrinterRNG::print_again(
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "No state detected after 2 minutes.",
                 env.console
             );
@@ -1021,7 +1021,7 @@ uint32_t ItemPrinterRNG::check_num_happiny_dust(
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "No state detected after 2 minutes.",
                 env.console
             );

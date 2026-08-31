@@ -209,7 +209,7 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, ProContro
             consecutive_failures++;
             if (consecutive_failures >= 3){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Failed 3 times in the row.",
                     env.console
                 );

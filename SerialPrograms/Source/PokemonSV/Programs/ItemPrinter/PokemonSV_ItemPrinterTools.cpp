@@ -66,7 +66,7 @@ void item_printer_start_print(
         }
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "start_print(): No recognized state after 120 seconds.",
                 stream
             );
@@ -127,7 +127,7 @@ ItemPrinterPrizeResult item_printer_finish_print(
         }
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "finish_print(): No recognized state after 120 seconds.",
                 stream
             );

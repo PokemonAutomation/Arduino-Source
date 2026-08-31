@@ -213,7 +213,7 @@ void checkpoint_62(
                 }
                 if (ret < 0){
                     OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Never detected black screen. Failed to enter Eatery.",
                         env.console
                     );

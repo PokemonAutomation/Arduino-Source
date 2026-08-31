@@ -178,7 +178,7 @@ void DirectionDetector::change_direction(
         if (current < 0){
             if (throw_if_fail){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "change_direction(): Unable to detect current direction.",
                     stream
                 );

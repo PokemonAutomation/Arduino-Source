@@ -59,7 +59,7 @@ void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, ProControllerC
 
         if (compatibility == ItemCompatibility::NONE){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Unable to detect item compatibility.",
                 env.console
             );

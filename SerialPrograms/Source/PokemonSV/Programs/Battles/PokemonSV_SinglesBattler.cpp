@@ -115,7 +115,7 @@ bool run_battle_menu(
         }
     }
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "Invalid SinglesMoveType: " + std::to_string((int)move.type),
         stream
     );
@@ -235,7 +235,7 @@ bool run_pokemon(
             consecutive_timeouts++;
             if (consecutive_timeouts == 3){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "No state detected after 6 minutes.",
                     stream
                 );
@@ -312,7 +312,7 @@ bool run_singles_battle(
                 continue;
             default:
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Unable to send in a " + STRING_POKEMON + ".",
                     stream
                 );

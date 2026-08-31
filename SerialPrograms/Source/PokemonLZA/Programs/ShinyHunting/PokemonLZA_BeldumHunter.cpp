@@ -111,7 +111,7 @@ bool BeldumHunter::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
         }else{
             env.log("Failed to enter the lab.");
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to warp.",
                 env.console
             );

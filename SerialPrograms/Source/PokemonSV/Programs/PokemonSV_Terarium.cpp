@@ -102,7 +102,7 @@ void return_to_plaza(const ProgramInfo& info, VideoStream& stream, ProController
                 }catch (...){
                     stream.log("Unable to flee.");
                     OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Unable to flee!",
                         stream
                     );
@@ -135,7 +135,7 @@ void map_move_cursor_fly(
             press_Bs_to_back_to_overworld(info, stream, context);
             if (i == 2){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Unable to fly to " + location + "!",
                     stream
                 );

@@ -344,7 +344,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
             break;
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "WildRng(): Unrecognized encounter type",
                 env.console
             ); 
@@ -410,7 +410,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         if (failed_searches >= 5){
             env.log("Failed to find any matches 5 times in a row");
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::NO_ERROR_REPORT,
+                ErrorReportMode::NO_ERROR_REPORT,
                 "Failed to find any matches 5 times in a row. Check your seed and advances settings.",
                 env.console
             ); 
@@ -480,7 +480,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
                 continue;
             }else{
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "WildRng(): Failed to trigger battle",
                     env.console
                 ); 

@@ -142,7 +142,7 @@ void CloudIslandReset::delete_cloud_island_save(SingleSwitchProgramEnvironment& 
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "delete_cloud_island_save() failed to detect settings menu loaded",
             env.console
         );
@@ -161,7 +161,7 @@ void CloudIslandReset::delete_cloud_island_save(SingleSwitchProgramEnvironment& 
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "delete_cloud_island_save() failed to navigate to delete save option",
             env.console
          );
@@ -226,7 +226,7 @@ void CloudIslandReset::create_cloud_island_after_delete(SingleSwitchProgramEnvir
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "create_cloud_island_after_delete() failed to navigate through create island menu",
             env.console
          );
@@ -250,7 +250,7 @@ void CloudIslandReset::create_cloud_island_after_delete(SingleSwitchProgramEnvir
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "create_cloud_island_after_delete() failed to detect travelling to new cloud island",
             env.console
         );
@@ -347,7 +347,7 @@ bool CloudIslandReset::buy_recipes(SingleSwitchProgramEnvironment& env, ProContr
             if (ret != 0){
                 env.console.log("Failed to read coin count in shop menu");
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "buy_recipes() failed to read coin count in shop menu",
                     env.console
                 );
@@ -402,7 +402,7 @@ void CloudIslandReset::leave_cloud_island(SingleSwitchProgramEnvironment& env, P
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "leave_cloud_island() failed to detect leaving cloud island",
             env.console
         );

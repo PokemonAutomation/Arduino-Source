@@ -360,7 +360,7 @@ void home_to_date_time_Switch1_wired_feedback(
     }
 
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "home_to_date_time(): Failed to reach Date and Time after several attempts.",
         stream
     );
@@ -492,7 +492,7 @@ void home_to_date_time_Switch1_wireless_feedback(
     }
 
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "home_to_date_time(): Failed to reach Date and Time after several attempts.",
         stream
     );    

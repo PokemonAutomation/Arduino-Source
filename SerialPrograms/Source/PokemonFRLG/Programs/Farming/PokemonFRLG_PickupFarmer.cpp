@@ -187,7 +187,7 @@ void take_pickup_items(SingleSwitchProgramEnvironment& env, ProControllerContext
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to detect selection menu.",
                 env.console
             );
@@ -238,7 +238,7 @@ void PickupFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCon
                     break;
                 default:
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Travel option not recognized. Please report this as a bug.",
                     env.console
                 );
@@ -256,7 +256,7 @@ void PickupFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCon
                     break;
                 default:
                     OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Game location not recognized. Please report this as a bug.",
                         env.console
                     );
@@ -276,7 +276,7 @@ void PickupFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCon
                 errors++;
                 if (errors >= 5){
                     OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Failed 5 times to trigger a wild encounter within 60 seconds",
                         env.console
                     );

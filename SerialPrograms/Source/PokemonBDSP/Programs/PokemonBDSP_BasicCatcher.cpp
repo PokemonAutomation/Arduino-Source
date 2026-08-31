@@ -245,7 +245,7 @@ CatchResults basic_catcher(
         case 1:
             if (results.result == CatchResult::POKEMON_CAUGHT){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "BasicCatcher: Found receive pokemon screen two times.",
                     stream
                 );
@@ -259,7 +259,7 @@ CatchResults basic_catcher(
             num_learned_moves++;
             if (num_learned_moves == 100){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "BasicCatcher: Learn new move attempts reach 100.",
                     stream
                 );

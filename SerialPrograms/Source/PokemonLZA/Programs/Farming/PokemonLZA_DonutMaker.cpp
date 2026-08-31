@@ -274,7 +274,7 @@ void DonutMaker::animation_to_donut(SingleSwitchProgramEnvironment& env, ProCont
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-           ErrorReport::SEND_ERROR_REPORT,
+           ErrorReportMode::SEND_ERROR_REPORT,
             "donut_maker(): Unable to skip donut making animation.",
             env.console
         );
@@ -306,7 +306,7 @@ void DonutMaker::animation_to_donut(SingleSwitchProgramEnvironment& env, ProCont
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "donut_maker(): Unable to find the donut flavor power screen.",
             env.console
         );
@@ -399,7 +399,7 @@ void DonutMaker::open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env,
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "donut_maker(): Unable to detect white dialog, selection arrow or berry menu after talking to Ansha.",
                 env.console
             );
@@ -410,7 +410,7 @@ void DonutMaker::open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env,
     stats.errors++;
     env.update_stats();
     OperationFailedExceptionWithScreenshot::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+        ErrorReportMode::SEND_ERROR_REPORT,
         "donut_maker(): 2 minutes passed yet unable to reach berry menu after taking to Ansha.",
         env.console
     );
@@ -460,7 +460,7 @@ void exit_menu_to_overworld(SingleSwitchProgramEnvironment& env, ProControllerCo
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-           ErrorReport::SEND_ERROR_REPORT,
+           ErrorReportMode::SEND_ERROR_REPORT,
             "donut_maker(): Unable to find overworld after exiting menu.",
             env.console
         );
@@ -491,7 +491,7 @@ void DonutMaker::move_to_ansha(SingleSwitchProgramEnvironment& env, ProControlle
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "donut_maker(): Cannot fast travel to Hotel Z.",
             env.console
         );
@@ -506,7 +506,7 @@ void DonutMaker::move_to_ansha(SingleSwitchProgramEnvironment& env, ProControlle
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "donut_maker(): Cannot reach Hotel Z gate after day/night change.",
                 env.console
             );
@@ -516,7 +516,7 @@ void DonutMaker::move_to_ansha(SingleSwitchProgramEnvironment& env, ProControlle
         stats.errors++;
         env.update_stats();
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "donut_maker(): Cannot reach Hotel Z gate after fast travel.",
             env.console
         );

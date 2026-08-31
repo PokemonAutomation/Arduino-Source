@@ -346,7 +346,7 @@ void hunt_latias_check(
     );
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "hunt_latias(): Cannot detect ladder after 5 seconds",
             env.console
         );
@@ -742,7 +742,7 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
                         hunt_cobalion(env, context, stats, MIN_CALORIE_TO_CATCH);
                     }else{
                         OperationFailedExceptionWithScreenshot::fire(
-                            ErrorReport::SEND_ERROR_REPORT,
+                            ErrorReportMode::SEND_ERROR_REPORT,
                             "legendary hunt not implemented",
                             env.console
                         );

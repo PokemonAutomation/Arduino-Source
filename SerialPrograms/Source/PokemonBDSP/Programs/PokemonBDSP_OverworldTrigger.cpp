@@ -167,7 +167,7 @@ bool OverworldTrigger::find_encounter(VideoStream& stream, ProControllerContext&
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Battle not detected after Sweet Scent for 30 seconds.",
                 stream
             );

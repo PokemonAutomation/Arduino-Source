@@ -278,7 +278,7 @@ bool BoxSorterLivingDex::is_viable_for_dex(
             int ret = wait_until(env.console, context, Seconds(5), { summary_screen_watcher });
             if (ret != 0){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT, "HomeBoxSorter(): does not find summary screen after 5 sec", env.console
+                    ErrorReportMode::SEND_ERROR_REPORT, "HomeBoxSorter(): does not find summary screen after 5 sec", env.console
                 );
             }
 
@@ -311,7 +311,7 @@ bool BoxSorterLivingDex::is_viable_for_dex(
             ret = wait_until(env.console, context, Seconds(5), { box_view_watcher });
             if (ret != 0){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT, "BoxSorterLivingDex(): does not find box view after 5 sec", env.console
+                    ErrorReportMode::SEND_ERROR_REPORT, "BoxSorterLivingDex(): does not find box view after 5 sec", env.console
                 );
             }
             video_overlay_set.clear();

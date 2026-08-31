@@ -34,7 +34,7 @@ Xoroshiro128PlusState find_rng_state(
         switch (detection){
         case OrbeetleAttackAnimationDetector::NO_DETECTION:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Attack animation could not be detected.",
                 stream
             );
@@ -107,7 +107,7 @@ std::pair<Xoroshiro128PlusState, uint64_t> refind_rng_state_and_animations(
         switch (detection){
         case OrbeetleAttackAnimationDetector::NO_DETECTION:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Attack animation could not be detected.",
                 stream
             );
@@ -136,7 +136,7 @@ std::pair<Xoroshiro128PlusState, uint64_t> refind_rng_state_and_animations(
     }
     if (possible_indices == 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Detected sequence of attack motions does not exist in expected range.",
             stream
         );

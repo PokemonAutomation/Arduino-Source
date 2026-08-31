@@ -182,7 +182,7 @@ bool RestaurantFarmer::run_lobby(SingleSwitchProgramEnvironment& env, ProControl
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "run_lobby(): No recognized state after 10 seconds.",
                 env.console
             );
@@ -277,7 +277,7 @@ void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "run_round(): No state detected for 2 minutes.",
                 env.console
             );

@@ -396,7 +396,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-//    OperationFailedExceptionWithScreenshot::fire(ErrorReport::SEND_ERROR_REPORT, "asdf", console);
+//    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "asdf", console);
 
 
 //    SinglesAIOption ai(false);
@@ -432,7 +432,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    context->issue_gyro_accel_x(&scope, 1000ms, 1000ms, 0ms, 123);
 
-//    OperationFailedExceptionWithScreenshot::fire(ErrorReport::SEND_ERROR_REPORT, "test", console);
+//    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "test", console);
 
 #if 0
     auto snapshot = feed.snapshot();

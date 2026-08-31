@@ -317,7 +317,7 @@ void CramomaticRNG::choose_apricorn(SingleSwitchProgramEnvironment& env, ProCont
     int ret = wait_until(env.console, context, Milliseconds(5000), { bag_arrow_detector });
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Could not detect bag.",
             env.console
         );
@@ -489,7 +489,7 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             state_errors++;
             if (state_errors >= 3){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Detected invalid RNG state three times in a row.",
                     env.console
                 );
@@ -525,7 +525,7 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             apricorn_selection_errors++;
             if (apricorn_selection_errors >= 3){
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Could not detect the bag three times on a row.",
                 env.console
                 );

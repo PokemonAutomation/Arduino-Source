@@ -185,7 +185,7 @@ void WildItemFarmer::refresh_pp(SingleSwitchProgramEnvironment& env, ProControll
 
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "No state detected while changing moves after 10 seconds.",
                 env.console
             );
@@ -219,7 +219,7 @@ bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, ProCo
 
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Unable to detect " + Pokemon::STRING_POKEMON + " select menu.",
                 env.console
             );
@@ -243,7 +243,7 @@ bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, ProCo
         );
         if (ret < 0){
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Unable to back out to battle menu.",
                 env.console
             );
@@ -321,7 +321,7 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, ProControl
                 stats.errors++;
                 env.update_stats();
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::NO_ERROR_REPORT,
+                    ErrorReportMode::NO_ERROR_REPORT,
                     "Failed to start battle after " + std::to_string(MANUVERS.size()) + " attempts.",
                     env.console
                 );
@@ -364,7 +364,7 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, ProControl
                     stats.failed++;
                     env.update_stats();
                     OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::NO_ERROR_REPORT,
+                        ErrorReportMode::NO_ERROR_REPORT,
                         "Failed to clone item. Possible incorrect encounter.",
                         env.console
                     );
@@ -453,7 +453,7 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, ProControl
 
         default:
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "No state detected after 120 seconds.",
                 env.console
             );

@@ -129,7 +129,7 @@ void GeneratePokemonImageTrainingData::program(SingleSwitchProgramEnvironment& e
     }catch (OperationFailedExceptionWithScreenshot& e){
         std::string fail_message = e.message();
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReportMode::SEND_ERROR_REPORT,
             fail_message,
             env.console
         );

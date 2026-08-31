@@ -239,7 +239,7 @@ void ShinyHuntDeoxys::program(SingleSwitchProgramEnvironment& env, ProController
                 stats.errors++;
                 env.update_stats();
                 OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Invalid starting position selected.",
                     env.console
                 );
@@ -267,7 +267,7 @@ void ShinyHuntDeoxys::program(SingleSwitchProgramEnvironment& env, ProController
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to start battle after 5 attempts.",
                 env.console
             );
