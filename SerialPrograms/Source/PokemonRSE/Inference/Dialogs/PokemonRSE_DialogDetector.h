@@ -9,12 +9,14 @@
 
 #include <chrono>
 #include <atomic>
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/VisualDetector.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
+#include "PokemonRSE/Inference/PokemonRSE_SelectionDetector.h"
 #include "PokemonRSE/PokemonRSE_Settings.h"
 
 namespace PokemonAutomation{
@@ -160,6 +162,35 @@ public:
     {}
 };
 
+
+enum class ConfirmSlot {
+    YES,
+    NO
+};
+
+enum class ConfirmPosition {
+    STANDARD, // e.g. save menu
+    SPECIAL, // e.g. clock in your room, replace move; not starter selection: ruby/sapphire is different
+    STARTER, // starter selection
+    MART, // confirm purchase
+    TOP_LEFT // e.g. player name
+};
+
+class ConfirmSlotDetector : public SelectionSlotDetector {
+public:
+    ConfirmSlotDetector(Color color, ConfirmSlot slot, ConfirmPosition position = ConfirmPosition::STANDARD);
+};
+class ConfirmSlotWatcher : public DetectorToFinder<ConfirmSlotDetector> {
+public:
+    ConfirmSlotWatcher(Color color, ConfirmSlot slot, ConfirmPosition position = ConfirmPosition::STANDARD, Milliseconds hold_duration = Milliseconds(250))
+        : DetectorToFinder("ConfirmSlotWatcher", hold_duration , color, slot, position)
+    {}
+};
+
+
+
+void add_tests_SelectionDialogDetector(UnitTestDatabase& database);
+void add_tests_ConfirmSlotDetector(UnitTestDatabase& database);
 
 }
 }

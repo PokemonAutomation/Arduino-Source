@@ -38,7 +38,8 @@ GameSettings::GameSettings()
             {Device::switch_1_2,            "switch_1_2",           "Nintendo Switch 1 and 2"},
             {Device::rg35xx,                "rg35xx",               "RG35XX"},
             {Device::tablet,                "tablet",               "tablet"},
-            //{Device::custom,                "custom",               "Custom"},
+            {Device::gameboyplayer,         "gameboyplayer",        "GameBoyPlayer"},
+            {Device::custom,                "custom",               "Custom"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         Device::switch_1_2
@@ -113,6 +114,13 @@ void GameSettings::on_config_value_changed(void* object){
         GAME_BOX.Y.set(0.003546);
         GAME_BOX.WIDTH.set(0.544186);
         GAME_BOX.HEIGHT.set(0.643026);
+        GAME_BOX.set_visibility(ConfigOptionState::DISABLED);
+        break;
+    case Device::gameboyplayer:
+        GAME_BOX.X.set(0.064217);
+        GAME_BOX.Y.set(0.107667);
+        GAME_BOX.WIDTH.set(0.86413);
+        GAME_BOX.HEIGHT.set(0.787928);
         GAME_BOX.set_visibility(ConfigOptionState::DISABLED);
         break;
     case Device::custom:
