@@ -13,9 +13,7 @@
 #include "Common/Cpp/Options/TimeDurationOption.h"
 // #include "CommonFramework/Panels/SettingsPanel.h"
 #include "Options/NintendoSwitch_CodeEntrySettingsOption.h"
-#ifdef QT_CORE_LIB
 #include "Controllers/NintendoSwitch_ControllerSettings.h"
-#endif
 #include "Controllers/NintendoSwitch_KeyboardMapping.h"
 
 namespace PokemonAutomation{
@@ -42,9 +40,7 @@ class ConsoleSettings : public BatchOption{
 public:
     static ConsoleSettings& instance();
 
-#ifdef QT_CORE_LIB
     ControllerSettingsTable CONTROLLER_SETTINGS;
-#endif
 
     BooleanCheckBoxOption TRUST_USER_CONSOLE_SELECTION;
     MillisecondsOption BLIND_START_GAME_MASH;

@@ -308,14 +308,12 @@ bool PABotBase2_OemController::run_preconnect_configure(
         }
     }
 
-#ifdef QT_CORE_LIB
     NintendoSwitch::ControllerProfile profile =
         PokemonAutomation::NintendoSwitch::ConsoleSettings::instance().CONTROLLER_SETTINGS.get_or_make_profile(
             controller_mac_address,
             "",
             controller_type
         );
-#endif
 
 #if _WIN32
 #pragma pack(push, 1)
@@ -334,7 +332,6 @@ bool PABotBase2_OemController::run_preconnect_configure(
 #endif
     Message message{};
 
-    #ifdef QT_CORE_LIB
     {
         Color color(profile.body_color);
         message.colors.body[0] = color.red();
@@ -359,7 +356,6 @@ bool PABotBase2_OemController::run_preconnect_configure(
         message.colors.right_grip[1] = color.green();
         message.colors.right_grip[2] = color.blue();
     }
-    #endif
 
 
     message.request.message_bytes = sizeof(message);
