@@ -401,7 +401,7 @@ AsyncTask send_all_unsent_reports(Logger& logger, bool allow_prompt){
 #endif
 }
 
-void report_error(
+void report_error_to_telemetry(
     Logger* logger,
     const ProgramInfo& info,
     std::string title,

@@ -45,7 +45,7 @@ void dump_image(
     const ImageViewRGB32& image,
     const StreamHistorySession* stream_history
 ){
-    report_error(
+    report_error_to_telemetry(
         &logger,
         program_info,
         label,

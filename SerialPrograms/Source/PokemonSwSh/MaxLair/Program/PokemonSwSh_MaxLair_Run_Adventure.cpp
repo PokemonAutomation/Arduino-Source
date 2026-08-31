@@ -163,7 +163,7 @@ void loop_adventures(
         case AdventureResult::START_ERROR:
             restart_count++;
             if (restart_count == 10){
-                report_error(
+                report_error_to_telemetry(
                     &env.logger(),
                     env.program_info(),
                     "Error",

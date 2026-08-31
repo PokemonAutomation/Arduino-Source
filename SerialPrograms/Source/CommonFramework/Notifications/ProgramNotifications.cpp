@@ -384,7 +384,7 @@ void send_program_recoverable_error_notification_and_telemetry_report(
 ){
     send_program_recoverable_error_notification(env, notif_settings, message, image);
     if (error_report_mode == ErrorReport::SEND_ERROR_REPORT){
-        report_error(
+        report_error_to_telemetry(
             logger,
             info,
             "Recoverable: " + error_type,
@@ -408,7 +408,7 @@ void send_program_fatal_error_notification_and_telemetry_report(
 ){
     send_program_fatal_error_notification(env, notif_settings, message, image);
     if (error_report_mode == ErrorReport::SEND_ERROR_REPORT){
-        report_error(
+        report_error_to_telemetry(
             logger,
             info,
             "Fatal: " + error_type,

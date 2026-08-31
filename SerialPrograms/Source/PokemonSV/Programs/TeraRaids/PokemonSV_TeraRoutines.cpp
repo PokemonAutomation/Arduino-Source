@@ -384,7 +384,7 @@ void join_raid(
 
         default:
             auto screen = console.video().snapshot();
-            report_error(
+            report_error_to_telemetry(
                 &console.logger(),
                 info,
                 "join_raid()",

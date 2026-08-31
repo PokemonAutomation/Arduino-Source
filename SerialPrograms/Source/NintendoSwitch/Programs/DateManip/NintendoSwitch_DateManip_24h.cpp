@@ -45,7 +45,7 @@ DateTime DateReader_24h::read_date(Logger& logger, std::shared_ptr<const ImageRG
         date.hour < 0 ||
         date.minute < 0
     ){
-        report_error(
+        report_error_to_telemetry(
             &logger, ProgramInfo(),
             "Failed to read date.",
             {},
