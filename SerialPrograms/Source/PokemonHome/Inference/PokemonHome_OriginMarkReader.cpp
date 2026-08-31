@@ -260,19 +260,27 @@ OriginMark origin_mark_from_slug(const std::string& slug){
     throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid origin mark slug: " + slug);
 }
 
-OriginMark OriginMarkReader::read_mark(
-    const ImageViewRGB32& original_screen,
-    const ImageFloatBox& box
-){
+OriginMarkReader::OriginMarkReader(Color color, VideoOverlay* overlay)
+    : m_color(color)
+    , m_overlay(overlay)
+    , m_box(0.617, 0.084, 0.044, 0.069)
+{}
+
+void OriginMarkReader::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_box);
+}
+
+OriginMark OriginMarkReader::read_mark(const ImageViewRGB32& original_screen){
     const double screen_rel_size = (original_screen.height() / 1080.0);
     const double screen_rel_size_2 = screen_rel_size * screen_rel_size;
 
     const double min_area_1080p = 400;
     const size_t min_area = size_t(screen_rel_size_2 * min_area_1080p);
 
-    ImageViewRGB32 image = extract_box_reference(original_screen, box);
+    ImageViewRGB32 image = extract_box_reference(original_screen, m_box);
 
     m_last_detected.clear();
+    m_last_detected_box.reset();
 
     std::multimap<double, std::pair<OriginMark, ImagePixelBox>> candidates;
 
@@ -289,7 +297,7 @@ OriginMark OriginMarkReader::read_mark(
                 m_last_detected.emplace_back(
                     DetectedBox{
                         matcher->name(),
-                        translate_to_parent(original_screen, box, object)
+                        translate_to_parent(original_screen, m_box, object)
                     }
                 );
                 return true;
@@ -297,6 +305,9 @@ OriginMark OriginMarkReader::read_mark(
         );
 
         if (!m_last_detected.empty()){
+            if (m_overlay){
+                m_last_detected_box.emplace(*m_overlay, m_box, COLOR_GREEN);
+            }
             return origin_mark_from_slug(m_last_detected[0].name);
         }
     }
@@ -318,7 +329,7 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         ImageRGB32 image(m_image);
-        OriginMark result = OriginMarkReader().read_mark(image, ImageFloatBox(0.617, 0.084, 0.044, 0.069));
+        OriginMark result = OriginMarkReader().read_mark(image);
 
         if (result == m_expected)
             return true;

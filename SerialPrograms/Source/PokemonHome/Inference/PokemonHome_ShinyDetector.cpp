@@ -57,6 +57,48 @@ private:
 };
 
 void add_tests_ShinyDetector(UnitTestDatabase& database){
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/annihilape_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/bidoof_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/bulbasaur_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Go.png", true);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Lza.png", true);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/capskid_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/castform_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/cyclizar_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/dudunsparce_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/dudunsparce_Regular_Sv.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/enamorus_Shiny.png", true);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/gimmighoul_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/glimmet_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/gogoat_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/greatTusk_Shiny.png", true);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/hatterne_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/houndstone_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/ironBunde_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/ironBundle_Regular_Sv.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/ironJugulis_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/ironThorns_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/kilowattrel_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/kingler_Shiny.png", true);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/komala_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/krabby_Shiny.png", true);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/machamp_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/pancham_Shiny.png", true);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/rapidash_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/rellor_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/riolu_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/rowlet_ShinyAlpha.png", true);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/scovillain_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/slitherWing_Shiny.png", true);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/squirtle_Shiny.png", true);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/tapuLele_Shiny.png", true);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/tatsugiri_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/teddiursa_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/terapagos_regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/vulpix_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/vulpix_Shiny.png", true);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/wartortle_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/wurmple_Regular.png", false);
 }
 
 

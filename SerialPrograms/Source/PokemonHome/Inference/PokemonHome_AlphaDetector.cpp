@@ -57,6 +57,48 @@ private:
 };
 
 void add_tests_AlphaDetector(UnitTestDatabase& database){
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/annihilape_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/bidoof_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/bulbasaur_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Go.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Lza.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/capskid_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/castform_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/cyclizar_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/dudunsparce_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/dudunsparce_Regular_Sv.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/enamorus_Shiny.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/gimmighoul_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/glimmet_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/gogoat_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/greatTusk_Shiny.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/hatterne_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/houndstone_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/ironBunde_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/ironBundle_Regular_Sv.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/ironJugulis_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/ironThorns_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/kilowattrel_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/kingler_Shiny.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/komala_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/krabby_Shiny.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/machamp_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/pancham_Shiny.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/rapidash_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/rellor_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/riolu_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/rowlet_ShinyAlpha.png", true);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/scovillain_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/slitherWing_Shiny.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/squirtle_Shiny.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/tapuLele_Shiny.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/tatsugiri_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/teddiursa_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/terapagos_regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/vulpix_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/vulpix_Shiny.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/wartortle_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/wurmple_Regular.png", false);
 }
 
 

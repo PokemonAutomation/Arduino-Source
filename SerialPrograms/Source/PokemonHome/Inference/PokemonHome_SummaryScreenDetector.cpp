@@ -54,9 +54,48 @@ private:
 
 void add_tests_SummaryScreenDetector(UnitTestDatabase& database){
     database.add<Test_SummaryScreenDetector>("PokemonHome/BoxView/BoxView-1.png", false);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/annihilape_Regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/bidoof_Regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/bulbasaur_Regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Go.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Lza.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/capskid_Regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/castform_Regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/cyclizar_Regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/dudunsparce_Regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/dudunsparce_Regular_Sv.png", true);
     database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/enamorus_Shiny.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/gimmighoul_Regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/glimmet_Regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/gogoat_Regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/greatTusk_Shiny.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/hatterne_Regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/houndstone_Regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/ironBunde_Regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/ironBundle_Regular_Sv.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/ironJugulis_Regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/ironThorns_Regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/kilowattrel_Regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/kingler_Shiny.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/komala_Regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/krabby_Shiny.png", true);
     database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/machamp_Regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/pancham_Shiny.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/rapidash_Regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/rellor_Regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/riolu_Regular.png", true);
     database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/rowlet_ShinyAlpha.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/scovillain_Regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/slitherWing_Shiny.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/squirtle_Shiny.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/tapuLele_Shiny.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/tatsugiri_Regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/teddiursa_Regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/terapagos_regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/vulpix_Regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/vulpix_Shiny.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/wartortle_Regular.png", true);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/wurmple_Regular.png", true);
 }
 
 }

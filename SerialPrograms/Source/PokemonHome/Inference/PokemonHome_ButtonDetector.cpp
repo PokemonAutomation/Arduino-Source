@@ -206,6 +206,47 @@ private:
 
 void add_tests_ButtonDetector(UnitTestDatabase& database){
     database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/annihilape_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/bidoof_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/bulbasaur_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Go.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Lza.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/capskid_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/castform_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/cyclizar_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/dudunsparce_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/dudunsparce_Regular_Sv.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/enamorus_Shiny.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/gimmighoul_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/glimmet_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/gogoat_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/greatTusk_Shiny.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/hatterne_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/houndstone_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/ironBunde_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/ironBundle_Regular_Sv.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/ironJugulis_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/ironThorns_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/kilowattrel_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/kingler_Shiny.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/komala_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/krabby_Shiny.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/machamp_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/pancham_Shiny.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/rapidash_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/rellor_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/riolu_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/rowlet_ShinyAlpha.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/scovillain_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/slitherWing_Shiny.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/squirtle_Shiny.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/tapuLele_Shiny.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/tatsugiri_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/teddiursa_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/terapagos_regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/vulpix_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/vulpix_Shiny.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/wartortle_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/wurmple_Regular.png", ButtonType::ButtonB);
 }
 
 }

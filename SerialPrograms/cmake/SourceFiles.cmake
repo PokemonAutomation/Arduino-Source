@@ -1741,6 +1741,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonHome/Programs/PokemonHome_PageSwap.h
     Source/PokemonHome/Programs/TestPrograms/PokemonHome_ReadSummaryScreen.cpp
     Source/PokemonHome/Programs/TestPrograms/PokemonHome_ReadSummaryScreen.h
+    Source/PokemonHome/Programs/TestPrograms/PokemonHome_TestDatabaseGenerator.cpp
+    Source/PokemonHome/Programs/TestPrograms/PokemonHome_TestDatabaseGenerator.h
     Source/PokemonHome/Resources/PokemonHome_PokeballSprites.cpp
     Source/PokemonHome/Resources/PokemonHome_PokeballSprites.h
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.cpp

@@ -97,6 +97,47 @@ private:
 
 void add_tests_BoxGenderDetector(UnitTestDatabase& database){
     database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/annihilape_Regular.png", Pokemon::StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/bidoof_Regular.png", Pokemon::StatsHuntGenderFilter::Female);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/bulbasaur_Regular.png", Pokemon::StatsHuntGenderFilter::Female);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Go.png", Pokemon::StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Lza.png", Pokemon::StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/capskid_Regular.png", Pokemon::StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/castform_Regular.png", Pokemon::StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/cyclizar_Regular.png", Pokemon::StatsHuntGenderFilter::Female);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/dudunsparce_Regular.png", Pokemon::StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/dudunsparce_Regular_Sv.png", Pokemon::StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/enamorus_Shiny.png", Pokemon::StatsHuntGenderFilter::Female);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/gimmighoul_Regular.png", Pokemon::StatsHuntGenderFilter::Genderless);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/glimmet_Regular.png", Pokemon::StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/gogoat_Regular.png", Pokemon::StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/greatTusk_Shiny.png", Pokemon::StatsHuntGenderFilter::Genderless);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/hatterne_Regular.png", Pokemon::StatsHuntGenderFilter::Female);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/houndstone_Regular.png", Pokemon::StatsHuntGenderFilter::Female);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/ironBunde_Regular.png", Pokemon::StatsHuntGenderFilter::Genderless);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/ironBundle_Regular_Sv.png", Pokemon::StatsHuntGenderFilter::Genderless);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/ironJugulis_Regular.png", Pokemon::StatsHuntGenderFilter::Genderless);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/ironThorns_Regular.png", Pokemon::StatsHuntGenderFilter::Genderless);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/kilowattrel_Regular.png", Pokemon::StatsHuntGenderFilter::Female);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/kingler_Shiny.png", Pokemon::StatsHuntGenderFilter::Female);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/komala_Regular.png", Pokemon::StatsHuntGenderFilter::Female);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/krabby_Shiny.png", Pokemon::StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/machamp_Regular.png", Pokemon::StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/pancham_Shiny.png", Pokemon::StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/rapidash_Regular.png", Pokemon::StatsHuntGenderFilter::Female);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/rellor_Regular.png", Pokemon::StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/riolu_Regular.png", Pokemon::StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/rowlet_ShinyAlpha.png", Pokemon::StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/scovillain_Regular.png", Pokemon::StatsHuntGenderFilter::Female);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/slitherWing_Shiny.png", Pokemon::StatsHuntGenderFilter::Genderless);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/squirtle_Shiny.png", Pokemon::StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/tapuLele_Shiny.png", Pokemon::StatsHuntGenderFilter::Genderless);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/tatsugiri_Regular.png", Pokemon::StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/teddiursa_Regular.png", Pokemon::StatsHuntGenderFilter::Female);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/terapagos_regular.png", Pokemon::StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/vulpix_Regular.png", Pokemon::StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/vulpix_Shiny.png", Pokemon::StatsHuntGenderFilter::Female);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/wartortle_Regular.png", Pokemon::StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/wurmple_Regular.png", Pokemon::StatsHuntGenderFilter::Female);
 }
 
 

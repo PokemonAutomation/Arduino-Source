@@ -27,7 +27,7 @@ std::multimap<double, std::pair<Pokemon::PokemonTeraType, ImagePixelBox>> find_t
 // Reads the tera type of a Pokemon.
 Pokemon::PokemonTeraType read_pokemon_tera_type(
     const ImageViewRGB32& original_screen,
-    const ImageFloatBox& box
+    const ImageFloatBox& box = ImageFloatBox(0.463, 0.09, 0.04, 0.06)
 );
 
 void add_tests_TeraTypeReader(UnitTestDatabase& database);

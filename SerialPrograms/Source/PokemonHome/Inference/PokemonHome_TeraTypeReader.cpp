@@ -310,7 +310,7 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         ImageRGB32 image(m_image);
-        PokemonTeraType result = read_pokemon_tera_type(image, ImageFloatBox(0.463, 0.09, 0.04, 0.06));
+        PokemonTeraType result = read_pokemon_tera_type(image);
         
         if (result == m_expected)
             return true;

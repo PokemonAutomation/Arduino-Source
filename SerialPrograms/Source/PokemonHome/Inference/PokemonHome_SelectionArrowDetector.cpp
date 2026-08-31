@@ -159,6 +159,47 @@ private:
 
 void add_tests_SelectionArrowDetector(UnitTestDatabase& database){
     database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/annihilape_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/bidoof_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/bulbasaur_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Go.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Lza.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/capskid_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/castform_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/cyclizar_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/dudunsparce_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/dudunsparce_Regular_Sv.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/enamorus_Shiny.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/gimmighoul_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/glimmet_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/gogoat_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/greatTusk_Shiny.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/hatterne_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/houndstone_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/ironBunde_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/ironBundle_Regular_Sv.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/ironJugulis_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/ironThorns_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/kilowattrel_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/kingler_Shiny.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/komala_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/krabby_Shiny.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/machamp_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/pancham_Shiny.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/rapidash_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/rellor_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/riolu_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/rowlet_ShinyAlpha.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/scovillain_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/slitherWing_Shiny.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/squirtle_Shiny.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/tapuLele_Shiny.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/tatsugiri_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/teddiursa_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/terapagos_regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/vulpix_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/vulpix_Shiny.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/wartortle_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/wurmple_Regular.png", std::nullopt);
 }
 
 }

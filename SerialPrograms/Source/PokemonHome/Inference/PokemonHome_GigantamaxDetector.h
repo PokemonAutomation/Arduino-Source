@@ -23,7 +23,7 @@ public:
     GigantamaxDetector(
         Color color,
         VideoOverlay* overlay,
-        const ImageFloatBox& box
+        const ImageFloatBox& box = ImageFloatBox(0.463, 0.09, 0.04, 0.06)
     );
 
     const ImageFloatBox& last_detected() const{ return m_last_detected; }
