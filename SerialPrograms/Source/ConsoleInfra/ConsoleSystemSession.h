@@ -21,7 +21,6 @@
 #define PokemonAutomation_ConsoleInfra_ConsoleSystemSession_H
 
 #include "Common/Cpp/Logging/TaggedLogger.h"
-#include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
 #include "CommonFramework/VideoPipeline/VideoSession.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
@@ -61,8 +60,7 @@ public:
     ConsoleSystemSession(
         Logger& logger,
         ConsoleSystemOption& option,
-        size_t console_number,
-        size_t num_controllers
+        size_t console_number
     );
 
 
@@ -78,7 +76,7 @@ public:
     const StreamHistorySession& stream_history() const{ return m_history; }
 
     size_t controllers() const{ return m_controllers.size(); }
-    ControllerSession& controller(size_t index){ return m_controllers[index]; }
+    ControllerSession& controller(size_t index){ return m_controllers[index].session; }
 
 
 public:
@@ -109,7 +107,21 @@ private:
     VideoSession m_video;
     AudioSession m_audio;
     VideoOverlaySession m_overlay;
-    FixedLimitVector<ControllerSession> m_controllers;
+
+    struct ControllerEntry{
+        TaggedLogger logger;
+        ControllerSession session;
+
+        ControllerEntry(TaggedLogger& p_logger, ControllerOption& option)
+            : logger(p_logger)
+            , session(logger, option)
+        {}
+        ControllerEntry(TaggedLogger& p_logger, size_t p_controller_index, ControllerOption& option)
+            : logger(p_logger, std::to_string(p_controller_index))
+            , session(logger, option)
+        {}
+    };
+    FixedLimitVector<ControllerEntry> m_controllers;
 
     StreamHistorySession m_history;
 

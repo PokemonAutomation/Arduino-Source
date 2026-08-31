@@ -877,6 +877,8 @@ file(GLOB LIBRARY_SOURCES
     Source/ConsoleInfra/ConsoleSystemOption.h
     Source/ConsoleInfra/ConsoleSystemSession.cpp
     Source/ConsoleInfra/ConsoleSystemSession.h
+    Source/ConsoleInfra/ConsoleSystemWidget.cpp
+    Source/ConsoleInfra/ConsoleSystemWidget.h
     Source/ControllerInput/Keyboard/GlobalKeyboardHidTracker.cpp
     Source/ControllerInput/Keyboard/GlobalKeyboardHidTracker.h
     Source/ControllerInput/Keyboard/GlobalQtKeyMap.cpp

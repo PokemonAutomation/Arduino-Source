@@ -4,9 +4,12 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
+#include "Common/Cpp/Containers/FixedLimitVector.tpp"
+#include "Controllers/NullController.h"
 #include "ConsoleInfra/ConsoleSystemOption.h"
 
 namespace PokemonAutomation{
@@ -27,7 +30,16 @@ ConsoleSystemOption::ConsoleSystemOption(
 )
     : m_allow_commands_while_running(allow_commands_while_running)
     , m_controllers(num_controllers)
-{}
+{
+    if (num_controllers == 0){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "num_controllers cannot be 0.");
+    }
+    bool enable_input = true;
+    for (size_t c = 0; c < num_controllers; c++){
+        m_controllers.emplace_back(enable_input);
+        enable_input = false;
+    }
+}
 ConsoleSystemOption::ConsoleSystemOption(
     size_t num_controllers,
     bool allow_commands_while_running,
@@ -35,7 +47,7 @@ ConsoleSystemOption::ConsoleSystemOption(
 )
     : ConsoleSystemOption(num_controllers, allow_commands_while_running)
 {
-    load_json(json);
+    ConsoleSystemOption::load_json(json);
 }
 void ConsoleSystemOption::load_json(const JsonValue& json){
     const JsonObject* obj = json.to_object();
@@ -57,21 +69,19 @@ void ConsoleSystemOption::load_json(const JsonValue& json){
     }
     value = obj->get_value(JSON_CONTROLLER);
     if (value){
-        std::vector<ControllerOption> controllers;
-        controllers.emplace_back().load_json(*value);
-        m_controllers = std::move(controllers);
+        m_controllers[0].load_json(*value);
     }
-    value = obj->get_value(JSON_CONTROLLERS);
-    if (value){
-        std::vector<ControllerOption> controllers;
-        if (value->is_array()){
-            for (const JsonValue& item : *value->to_array()){
-                controllers.emplace_back().load_json(item);
-            }
-        }else{
-            controllers.emplace_back().load_json(*value);
+    const JsonArray* array = obj->get_array(JSON_CONTROLLERS);
+    if (array){
+        size_t c = 0;
+        size_t stop = std::min(m_controllers.size(), array->size());
+        for (; c < stop; c++){
+            m_controllers[c].load_json((*array)[c]);
         }
-        m_controllers = std::move(controllers);
+        stop = m_controllers.size();
+        for (; c < stop; c++){
+            m_controllers[c].set_descriptor(std::make_shared<NullControllerDescriptor>());
+        }
     }
 }
 JsonValue ConsoleSystemOption::to_json() const{
