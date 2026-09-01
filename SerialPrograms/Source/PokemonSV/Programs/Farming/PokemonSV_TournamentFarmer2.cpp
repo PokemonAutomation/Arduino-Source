@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -196,8 +196,8 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, ProControll
             if (ret != 0){
                 stats.errors++;
                 env.update_stats();
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Failed to detect battle start!",
                     env.console
                 );
@@ -238,8 +238,8 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, ProControll
                 env.log("Failed to detect battle menu or dialog prompt!");
                 stats.errors++;
                 env.update_stats();
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Failed to detect battle menu or dialog prompt!",
                     env.console
                 );
@@ -265,8 +265,8 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, ProControll
                     {overworld} 
                 );
                 if (ret < 0){
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Failed to return to overworld after 2 minutes.",
                         env.console
                     );

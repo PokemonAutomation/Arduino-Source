@@ -61,7 +61,7 @@ EggHatcher::EggHatcher()
     , START_LOCATION(
         "<b>Start location:</b><br>Where to start the hatcher program.<br>"
         "Zero Gate Flying Spot: Stand at Zero Gate flying spot. The flying spot is already unlocked.<br>"
-        "Anywhere safe, on ride: You are in a safe location with no wild encounters or NPCs. You are on your ride lengendary.<br>"
+        "Anywhere safe, on ride: You are in a safe location with no wild encounters or NPCs. You are on your ride legendary.<br>"
         "Anywhere safe, on foot: You are in a safe location with no wild encounters or NPCs. You stand on foot.<br>",
         {
             {StartLocation::ZeroGateFlyingSpot, "zero-gate", "Zero Gate Flying Spot"},
@@ -79,7 +79,7 @@ EggHatcher::EggHatcher()
     , m_battle_ai_description(
         "<b>Battle AI if Attacked:</b><br>"
         "Occasionally (especially on the Switch 2), you will get attacked by wild " + STRING_POKEMON + ". "
-        "If the following section is enabled, it attempt to recover by killing the wild " + STRING_POKEMON + ". "
+        "If the following section is enabled, it attempts to recover by killing the wild " + STRING_POKEMON + ". "
         "If disabled, the program will instead reset the game. "
         "This table applies to the egg hatching " + STRING_POKEMON + " (the Flame Body one)."
     )
@@ -87,7 +87,7 @@ EggHatcher::EggHatcher()
     , HAS_CLONE_RIDE_POKEMON(
         "<b>Cloned Ride Legendary 2nd in Party:</b><br>"
         "Ride legendary cannot be cloned after patch 1.0.1. To preserve the existing clone while hatching eggs, "
-        "place it as second in party before starting the program.</b>"
+        "place it as second in party before starting the program. "
         "The program will skip the first row of eggs in the box as a result.",
         LockMode::LOCK_WHILE_RUNNING,
         false
@@ -118,8 +118,9 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, ProControlle
             const uint8_t expected_empty_slots_in_party = HAS_CLONE_RIDE_POKEMON ? 4 : 5;
             if (check_empty_slots_in_party(env.program_info(), env.console, context) != expected_empty_slots_in_party){
                 throw_and_log<FatalProgramException>(
-                    env.console, ErrorReport::SEND_ERROR_REPORT,
-                    "Your party should have " + std::to_string(expected_empty_slots_in_party) + " " + STRING_POKEMON + ".",
+                    env.console, ErrorReportMode::SEND_ERROR_REPORT,
+                    "Your party should have " + std::to_string(6 - expected_empty_slots_in_party) + " " + STRING_POKEMON +
+                    " and " + std::to_string(expected_empty_slots_in_party) + " empty slots.",
                     env.console
                 );
             }
@@ -185,7 +186,7 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, ProControlle
         num_eggs = check_egg_party_column(env.program_info(), env.console, context).first;
         if (num_eggs > 0){
             throw_and_log<FatalProgramException>(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
+                env.console, ErrorReportMode::SEND_ERROR_REPORT,
                 "Detected egg in party after hatching.",
                 env.console
             );

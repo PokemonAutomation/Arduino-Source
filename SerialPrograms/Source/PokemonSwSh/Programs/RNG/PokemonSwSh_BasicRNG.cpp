@@ -6,7 +6,7 @@
 
 #include <algorithm>
 #include "Common/Cpp/PrettyPrint.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh/Inference/RNG/PokemonSwSh_OrbeetleAttackAnimationDetector.h"
 #include "PokemonSwSh/Programs/RNG/PokemonSwSh_BasicRNG.h"
@@ -33,8 +33,8 @@ Xoroshiro128PlusState find_rng_state(
         uint64_t last_bit = 0;
         switch (detection){
         case OrbeetleAttackAnimationDetector::NO_DETECTION:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Attack animation could not be detected.",
                 stream
             );
@@ -106,8 +106,8 @@ std::pair<Xoroshiro128PlusState, uint64_t> refind_rng_state_and_animations(
         OrbeetleAttackAnimationDetector::Detection detection = detector.run(save_screenshots, log_image_values);
         switch (detection){
         case OrbeetleAttackAnimationDetector::NO_DETECTION:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Attack animation could not be detected.",
                 stream
             );
@@ -135,8 +135,8 @@ std::pair<Xoroshiro128PlusState, uint64_t> refind_rng_state_and_animations(
         }
     }
     if (possible_indices == 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Detected sequence of attack motions does not exist in expected range.",
             stream
         );

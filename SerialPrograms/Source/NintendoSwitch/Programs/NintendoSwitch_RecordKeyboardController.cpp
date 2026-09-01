@@ -99,7 +99,12 @@ void RecordKeyboardController::program(SingleSwitchProgramEnvironment& env, Canc
         std::string output_json_filename = std::string(FILE_NAME) + ".json";
         QFile file(QString::fromStdString(output_json_filename));
         if (file.open(QFile::ReadOnly)){
-            throw FileException(nullptr, PA_CURRENT_FUNCTION, "Given file name already exists. Choose a different file name.", output_json_filename);
+            throw FileException(
+                nullptr,
+                PA_CURRENT_FUNCTION,
+                "Given file name already exists. Choose a different file name.",
+                output_json_filename
+            );
         }
 
         context.controller().add_input_sniffer(*this);

@@ -52,15 +52,15 @@ public:
 
 // start: Beat Arven. At Los Platos Pokecenter.
 // end: Entered Area Zero Gate. Flew down to Area Zero from the platform.
-void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text);
 
 // start: Entered Area Zero Gate. Flew down to Area Zero from the platform.
 // end: Inside Area Zero Station 1. Deactivated the locks.
-void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text);
 
 // start: Inside Area Zero Station 1. Deactivated the locks.
 // end: Inside Area Zero Station 1. Deactivated the locks.
-void checkpoint_95(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+void checkpoint_95(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text);
 
 
 }

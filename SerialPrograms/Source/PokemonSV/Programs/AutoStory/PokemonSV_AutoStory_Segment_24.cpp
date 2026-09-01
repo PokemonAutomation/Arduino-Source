@@ -68,7 +68,7 @@ std::string AutoStory_Checkpoint_55::name() const{ return "055 - " + AutoStory_S
 std::string AutoStory_Checkpoint_55::start_text() const{ return "Defeated Levincia Gym (Electric). At Levincia (North) Pokecenter.";}
 std::string AutoStory_Checkpoint_55::end_text() const{ return "Beat Orthworm phase 1 and 2";}
 void AutoStory_Checkpoint_55::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_55(env, context, options.notif_status_update, stats);
+    checkpoint_55(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 
@@ -76,7 +76,7 @@ std::string AutoStory_Checkpoint_56::name() const{ return "056 - " + AutoStory_S
 std::string AutoStory_Checkpoint_56::start_text() const{ return AutoStory_Checkpoint_55().end_text();}
 std::string AutoStory_Checkpoint_56::end_text() const{ return "At East Province (Area Three) Pokecenter.";}
 void AutoStory_Checkpoint_56::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_56(env, context, options.notif_status_update, stats);
+    checkpoint_56(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 
@@ -84,18 +84,20 @@ std::string AutoStory_Checkpoint_57::name() const{ return "057 - " + AutoStory_S
 std::string AutoStory_Checkpoint_57::start_text() const{ return AutoStory_Checkpoint_56().end_text();}
 std::string AutoStory_Checkpoint_57::end_text() const{ return "At East Province (Area Three) Pokecenter.";}
 void AutoStory_Checkpoint_57::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_57(env, context, options.notif_status_update, stats);
+    checkpoint_57(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 
 
 void checkpoint_55(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 ){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
 
         DirectionDetector direction;
@@ -472,12 +474,14 @@ void checkpoint_55(
 }
 
 void checkpoint_56(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 ){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
         // fly back to East Province (Area Three) Watchtower. from Orthworm
         // this clears Pokemon in minimap
@@ -592,12 +596,14 @@ void checkpoint_56(
 }
 
 void checkpoint_57(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 ){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
         // empty checkpoint, to preserve ordering
     }, false);

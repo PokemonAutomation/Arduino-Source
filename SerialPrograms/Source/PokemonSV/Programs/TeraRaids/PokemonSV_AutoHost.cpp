@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -144,8 +144,8 @@ WallClock AutoHost::wait_for_lobby_open(
         {{lobby, std::chrono::milliseconds(500)}}
     );
     if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Unable to detect Tera lobby after 60 seconds.",
             env.console
         );
@@ -223,8 +223,8 @@ bool AutoHost::start_raid(
             update_stats_on_raid_start(env, player_count);
             return true;
         default:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Stuck in lobby for 4 minutes.",
                 env.console
             );
@@ -320,9 +320,9 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, ProControllerContext
             //  Connect to internet.
             try{
                 connect_to_internet_from_overworld(env.program_info(), env.console, context);
-            }catch (OperationFailedException& e){
+            }catch (OperationFailedExceptionWithScreenshot& e){
                 stats.m_errors++;
-                e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+                e.send_recoverable_error_notif_and_telemetry_report(env, NOTIFICATION_ERROR_RECOVERABLE);
                 fail_tracker.report_raid_error();
                 continue;
             }
@@ -341,9 +341,9 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, ProControllerContext
 
         try{
             open_hosting_lobby(env, env.console, context, mode);
-        }catch (OperationFailedException& e){
+        }catch (OperationFailedExceptionWithScreenshot& e){
             stats.m_errors++;
-            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+            e.send_recoverable_error_notif_and_telemetry_report(env, NOTIFICATION_ERROR_RECOVERABLE);
             fail_tracker.report_raid_error();
             continue;
         }
@@ -381,9 +381,9 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, ProControllerContext
                 exit_tera_win_without_catching(env.program_info(), env.console, context, 0);
             }
             fail_tracker.report_successful_raid();
-        }catch (OperationFailedException& e){
+        }catch (OperationFailedExceptionWithScreenshot& e){
             stats.m_errors++;
-            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+            e.send_recoverable_error_notif_and_telemetry_report(env, NOTIFICATION_ERROR_RECOVERABLE);
             fail_tracker.report_raid_error();
             continue;
         }

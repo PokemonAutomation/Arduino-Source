@@ -11,6 +11,8 @@
  */
 
 #ifndef PokemonAutomation_PokemonFRLG_DigitReader_H
+#define PokemonAutomation_PokemonFRLG_DigitReader_H
+
 #include <cstdint>
 #include <string>
 
@@ -25,22 +27,8 @@ namespace PokemonFRLG{
 enum class DigitTemplateType{
     StatBox,      // Yellow stat boxes (default): PokemonFRLG/Digits/
     LevelBox,     // Lilac level box: PokemonFRLG/LevelDigits/
+    DialogBox,    // White dialog box: PokemonFRLG/DialogDigits/
 };
-
-// Full OCR preprocessing pipeline for GBA pixel fonts.
-//
-// GBA fonts are seven-segment-like with 1-pixel gaps between segments.
-// Pipeline: blur at native -> smooth upscale -> BW -> smooth BW -> re-BW -> pad
-//
-// The native blur connects gaps. Post-BW padding provides margins.
-ImageRGB32 preprocess_for_ocr(
-    const ImageViewRGB32 &image,
-    const std::string &label,
-    int blur_kernel_size, int blur_passes,
-    bool in_range_black, uint32_t bw_min,
-    uint32_t bw_max,
-    bool save_debug_images = false
-);
 
 // Read a string of decimal digits from `stat_region`.
 //
@@ -51,8 +39,8 @@ ImageRGB32 preprocess_for_ocr(
 int read_digits_waterfill_template(
     Logger& logger,
     const ImageViewRGB32& stat_region,
-    double rmsd_threshold = 175.0,
     DigitTemplateType template_type = DigitTemplateType::StatBox,
+    double rmsd_threshold = 175.0,
     const std::string& dump_prefix = "digit",
     uint8_t binarize_high = 0xBE,  // 0xBE=190 for yellow stat boxes;
     bool save_debug_images = false

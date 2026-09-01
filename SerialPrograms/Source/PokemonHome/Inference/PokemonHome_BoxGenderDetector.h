@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonHome_BoxGenderDetector_H
 #define PokemonAutomation_PokemonHome_BoxGenderDetector_H
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
 
 namespace PokemonAutomation{
@@ -26,7 +27,7 @@ public:
     static Pokemon::StatsHuntGenderFilter detect(const ImageViewRGB32& screen);
 };
 
-
+void add_tests_BoxGenderDetector(UnitTestDatabase& database);
 
 }
 }

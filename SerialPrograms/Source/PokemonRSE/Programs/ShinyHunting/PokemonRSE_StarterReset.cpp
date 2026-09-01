@@ -4,16 +4,16 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "PokemonRSE/Inference/Dialogs/PokemonRSE_BattleDialogs.h"
 #include "PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h"
 #include "PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.h"
 #include "PokemonRSE/PokemonRSE_Navigation.h"
@@ -121,8 +121,8 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
             pbf_press_dpad(context, DPAD_RIGHT, 320ms, 800ms);
             break;
         default:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "StarterReset: Invalid target.",
                 env.console
             );
@@ -153,7 +153,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         pbf_press_dpad(context, DPAD_DOWN, 320ms, 640ms);
         pbf_press_button(context, BUTTON_A, 320ms, 640ms);
 
-        BlackScreenOverWatcher detector(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+        BlackScreenOverWatcher detector(COLOR_RED);
         int ret2 = wait_until(
             env.console, context,
             std::chrono::milliseconds(3000),
@@ -163,8 +163,8 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
             env.log("Entered party menu.");
         }else{
             env.log("Timed out waiting to enter party menu.", COLOR_RED);
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "StarterReset: Timed out waiting to enter party menu.",
                 env.console
             );

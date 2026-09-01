@@ -5,7 +5,7 @@
  */
 
 #include <cmath>
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -172,8 +172,8 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, ProControll
                 );
                 consecutive_errors++;
                 if (consecutive_errors >= 3){
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Failed to detect an encounter 3 times in the row.",
                         env.console
                     );

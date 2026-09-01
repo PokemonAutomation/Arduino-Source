@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -63,8 +63,8 @@ void run_away(
             context->logger().log("Unable to detect end of battle. Assume successful run away.", COLOR_ORANGE);
             return;
 #if 0
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT,
+            throw OperationFailedExceptionWithScreenshot(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Unable to run away. Are you stuck in the battle?",
                 stream
             );
@@ -133,8 +133,8 @@ bool StandardEncounterHandler::handle_standard_encounter(const ShinyDetectionRes
         m_session_stats.add_error();
         m_consecutive_failures++;
         if (m_consecutive_failures >= 3){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "3 consecutive failed encounter detections.",
                 m_stream
             );
@@ -189,8 +189,8 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         m_session_stats.add_error();
         m_consecutive_failures++;
         if (m_consecutive_failures >= 3){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "3 consecutive failed encounter detections.",
                 m_stream
             );
@@ -265,7 +265,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
             break;
         default:
             throw_and_log<FatalProgramException>(
-                m_stream.logger(), ErrorReport::NO_ERROR_REPORT,
+                m_stream.logger(), ErrorReportMode::NO_ERROR_REPORT,
                 "Unable to recover from failed catch.",
                 m_stream
             );
@@ -300,7 +300,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
             break;
         default:
             throw_and_log<FatalProgramException>(
-                m_stream.logger(), ErrorReport::NO_ERROR_REPORT,
+                m_stream.logger(), ErrorReportMode::NO_ERROR_REPORT,
                 "Unable to recover from failed catch.",
                 m_stream
             );

@@ -1,12 +1,15 @@
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+/*  Rng Navigation
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
-#include "PokemonFRLG/Inference/Sounds/PokemonFRLG_CatchFanfareDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_SelectionArrowDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
@@ -15,13 +18,10 @@
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_SummaryDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_PartyMenuDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_BagDetector.h"
-#include "PokemonFRLG/Inference/Menus/PokemonFRLG_DexRegistrationDetector.h"
-#include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_StatsReader.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_PokemonSpriteReader.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_PartyLevelUpReader.h"
-#include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_BlindNavigation.h"
 #include "PokemonFRLG_RngCalibration.h"
@@ -94,8 +94,8 @@ AdvObservedPokemon read_summary(
     );
 
     if (ret2 < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "read_summary(): Failed to detect second summary screen.",
             console
         ); 
@@ -152,135 +152,6 @@ AdvObservedPokemon read_summary(
     };
 
     return pokemon;
-}
-
-
-int auto_catch(
-    ConsoleHandle& console, 
-    ProControllerContext& context, 
-    const uint64_t& max_ball_throws,
-    bool safari_zone
-){
-    float catch_coefficient = 1.0;
-    bool catch_detected = false;
-
-    for (uint64_t i=0; i<=max_ball_throws; i++){
-        int count = 0;
-        while(true){
-            if (count >= 10){
-                console.log("auto_catch(): failed to detect battle menu");
-                return -1;
-            }
-            count++;
-
-            BattleMenuWatcher battle_menu(COLOR_RED);
-            PartyMenuWatcher party_menu(COLOR_RED);
-            DexRegistrationWatcher dex_registration(COLOR_RED);
-            BlackScreenWatcher black_screen(COLOR_RED);
-            CatchFanfareDetector catch_detector(console.logger(), [&](float error_coefficient) -> bool{
-                catch_coefficient = error_coefficient;
-                return true;
-            });
-            context.wait_for_all_requests();
-            int ret = run_until<ProControllerContext>(
-                console, context,
-                [](ProControllerContext& context) {
-                    for (int i=0; i<60; i++){
-                        pbf_press_button(context, BUTTON_B, 200ms, 300ms);
-                    }
-                },
-                { battle_menu, party_menu, dex_registration, black_screen, catch_detector},
-                10ms
-            );
-
-            int start_ret;
-            switch (ret){
-            case 0:
-                console.log("Battle menu detected");
-                break;
-            case 1:
-                console.log("Party menu detected. Attempting to send out next Pokemon");
-                pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
-                pbf_mash_button(context, BUTTON_A, 1000ms);
-                continue;
-            case 2:
-                console.log("Dex registration detected. Exiting battle...");
-                pbf_mash_button(context, BUTTON_B, 5000ms);
-                return catch_detected ? static_cast<int>(i) : 0;
-            case 3:
-                console.log("Black screen detected. Battle exited.");
-                pbf_mash_button(context, BUTTON_B, 2500ms);
-                return catch_detected ? static_cast<int>(i) : 0;
-            case 4: 
-                console.log("Catch detected!", COLOR_BLUE);
-                catch_detected = true;
-                pbf_wait(context, 2000ms);
-                continue;
-            default:
-                console.log("No recognized state. Try checking if in the overworld...");
-                StartMenuWatcher start_menu;
-                context.wait_for_all_requests();
-                start_ret = run_until<ProControllerContext>(
-                    console, context,
-                    [](ProControllerContext& context) {
-                        for (int i=0; i<3; i++){
-                            pbf_press_button(context, BUTTON_PLUS, 200ms, 2800ms);
-                            pbf_mash_button(context, BUTTON_B, 500ms);
-                        }
-                    },
-                    { start_menu }
-                );
-                if (start_ret < 0){
-                    console.log("auto_catch(): no recognized state after 30 seconds."); 
-                    return true;
-                }
-                console.log("Overworld detected.");
-                pbf_mash_button(context, BUTTON_B, 500ms);
-                context.wait_for_all_requests();
-                return catch_detected ? static_cast<int>(i) : 0;
-            }
-
-            break;
-        }
-
-        if (i == max_ball_throws) { break; }
-
-        if (!safari_zone){
-            // select BAG (selection arrow does not wrap around)
-            pbf_move_left_joystick(context, {+1, 0}, 100ms, 150ms);
-            pbf_move_left_joystick(context, {0, +1}, 100ms, 150ms);
-            pbf_move_left_joystick(context, {+1, 0}, 100ms, 150ms);
-            pbf_move_left_joystick(context, {0, +1}, 100ms, 150ms);
-
-            BagWatcher bag_open(COLOR_RED);
-            int ret2 = run_until<ProControllerContext>(
-                console, context,
-                [](ProControllerContext& context) {
-                    for (int i=0; i<5; i++){
-                        pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
-                    }
-                },
-                { bag_open }
-            );
-            if (ret2 < 0){
-                console.log("auto_catch(): failed to open bag."); 
-                return -1;
-            }
-
-            if (i == 0){
-                // go to balls pocket (pockets do not wrap around, topmost item will already be selected)
-                pbf_move_left_joystick(context, {+1, 0}, 200ms, 800ms);
-                pbf_move_left_joystick(context, {+1, 0}, 200ms, 800ms);
-                pbf_move_left_joystick(context, {+1, 0}, 200ms, 800ms);
-            }
-        }
-
-        // use ball
-        pbf_mash_button(context, BUTTON_A, 5s);
-    }
-
-    console.log("auto_catch(): ran out of balls.");
-    return 0;
 }
 
 bool use_rare_candy(
@@ -428,8 +299,8 @@ void hatch_togepi_egg(ConsoleHandle& console, ProControllerContext& context){
         { egg_dialog }
     );
     if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Togepi: failed to hatch egg within 10 minutes. Check your in-game setup.",
             console
         );
@@ -460,8 +331,8 @@ void hatch_daycare_egg(ConsoleHandle& console, ProControllerContext& context){
         { egg_dialog }
     );
     if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Daycare Egg: failed to hatch egg within 45 minutes. Check your in-game setup.",
             console
         );
@@ -489,8 +360,8 @@ void travel_from_celio_to_kanto(ConsoleHandle& console, ProControllerContext& co
         { dialog_detected }
     );
     if (ret < 0){        
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "travel_from_celio_to_route2(): Failed to detect One Island sign.",
             console
         ); 
@@ -511,8 +382,8 @@ void travel_from_celio_to_kanto(ConsoleHandle& console, ProControllerContext& co
         { dialog_detected }
     );
     if (ret2 < 0){        
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "travel_from_celio_to_route2(): Failed to initiate Seagallop ferry dialogue.",
             console
         ); 
@@ -529,8 +400,8 @@ void travel_from_celio_to_kanto(ConsoleHandle& console, ProControllerContext& co
         { black_screen }
     );
     if (ret3 < 0){        
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "travel_from_celio_to_kanto(): Failed to initiate Seagallop ferry travel.",
             console
         );
@@ -583,8 +454,8 @@ int watch_for_shiny_encounter(ConsoleHandle& console, ProControllerContext& cont
         {battle_entered}
     );
     if (ret < 0){
-        // OperationFailedException::fire(
-        //     ErrorReport::SEND_ERROR_REPORT,
+        // OperationFailedExceptionWithScreenshot::fire(
+        //     ErrorReportMode::SEND_ERROR_REPORT,
         //     "Failed to initiate encounter.",
         //     console
         // );
@@ -657,6 +528,7 @@ bool check_for_shiny(
     case PokemonFRLG_RngTarget::starters:
         return shiny_check_summary(console, context, -2, StartMenuContext::NO_DEX);
     case PokemonFRLG_RngTarget::togepi:
+    case PokemonFRLG_RngTarget::togepifast:
         hatch_togepi_egg(console, context);
     case PokemonFRLG_RngTarget::magikarp:
     case PokemonFRLG_RngTarget::hitmonlee:
@@ -704,8 +576,8 @@ bool check_for_shiny(
     case PokemonFRLG_RngTarget::roaming:
         return encounter_roamer(console, context, language, subset) == 1;
     default:
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "RNG target not recognized. Please report this as a bug.",
             console
         );
@@ -750,8 +622,8 @@ void daycare_steps(ConsoleHandle& console, ProControllerContext& context){
         { repel_over }
     );
     if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::NO_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::NO_ERROR_REPORT,
             "daycare_steps(): No Max Repel dialogue box detected.",
             console
         );
@@ -806,25 +678,69 @@ void walk_from_pond_to_daycare_man(ConsoleHandle& console, ProControllerContext&
 
 void egg_pickup(ConsoleHandle& console, ProControllerContext& context){
     console.log("Picking up egg...");
-    WhiteDialogWatcher dialogue(COLOR_RED);
+
+    // Clear the save dialogue, if it is open
+    WhiteDialogOverWatcher dialogue_cleared(COLOR_RED);
     context.wait_for_all_requests();
     int ret = run_until<ProControllerContext>(
         console, context,
         [](ProControllerContext& context) {
-            pbf_mash_button(context, BUTTON_A, 5000ms);
+            pbf_mash_button(context, BUTTON_B, 5000ms);
         },
-        { dialogue }
+        { dialogue_cleared }
     );
     if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "egg_pickup(): Failed to initiate dialogue.",
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
+            "egg_pickup(): Failed to clear dialogue before talking to the daycare man.",
             console
         );
     }
 
-    pbf_mash_button(context, BUTTON_A, 5000ms);
-    pbf_mash_button(context, BUTTON_B, 2500ms);
+    // Talk to the daycare man and wait for the egg prompt.
+    SelectionDialogWatcher egg_prompt(COLOR_RED);
+    context.wait_for_all_requests();
+    ret = run_until<ProControllerContext>(
+        console, context,
+        [](ProControllerContext& context) {
+            for (int i=0; i<12; i++){
+                pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+            }
+        },
+        { egg_prompt }
+    );
+    if (ret < 0){
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
+            "egg_pickup(): Failed to detect the egg selection dialogue.",
+            console
+        );
+    }
+    console.log("Egg selection dialogue detected. Taking the egg...");
+
+    // accept the egg
+    pbf_mash_button(context, BUTTON_A, 1000ms);
+
+    // clear the rest of the dialogue
+    WhiteDialogOverWatcher dialogue_over(COLOR_RED);
+    context.wait_for_all_requests();
+    ret = run_until<ProControllerContext>(
+        console, context,
+        [](ProControllerContext& context) {
+            pbf_mash_button(context, BUTTON_B, 10000ms);
+        },
+        { dialogue_over }
+    );
+    if (ret < 0){
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
+            "egg_pickup(): Failed to return to the overworld after taking the egg.",
+            console
+        );
+    }
+    context.wait_for_all_requests();
+
+    console.log("Egg picked up.");
 }
 
 bool walk_from_daycare_man_to_pond(ConsoleHandle& console, ProControllerContext& context){

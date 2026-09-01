@@ -5,9 +5,11 @@
  */
 
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "PokemonHome_GigantamaxDetector.h"
+#include "Tests/TestUtils.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -82,6 +84,80 @@ bool GigantamaxDetector::detect(const ImageViewRGB32& screen){
     }
 
     return found;
+}
+
+class Test_GigantamaxDetector : public UnitTest{
+public:
+
+    Test_GigantamaxDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonHome::GigantamaxDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyVideoOverlay video_overlay;
+        ImageRGB32 image(m_image);
+        GigantamaxDetector detector(COLOR_BLACK, &video_overlay);
+        bool result = detector.detect(image);
+
+        if (result == m_expected)
+            return true;
+
+        return "Expected: " + std::to_string(m_expected) + ", received: " + std::to_string(result);
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+void add_tests_GigantamaxDetector(UnitTestDatabase& database){
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/annihilape_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/bidoof_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/bulbasaur_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Go.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Lza.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/capskid_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/castform_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/cyclizar_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/dudunsparce_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/dudunsparce_Regular_Sv.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/enamorus_Shiny.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/gimmighoul_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/glimmet_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/gogoat_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/greatTusk_Shiny.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/hatterne_Regular.png", true);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/houndstone_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/ironBunde_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/ironBundle_Regular_Sv.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/ironJugulis_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/ironThorns_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/kilowattrel_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/kingler_Shiny.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/komala_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/krabby_Shiny.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/machamp_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/pancham_Shiny.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/rapidash_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/rellor_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/riolu_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/rowlet_ShinyAlpha.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/scovillain_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/slitherWing_Shiny.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/squirtle_Shiny.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/tapuLele_Shiny.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/tatsugiri_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/teddiursa_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/terapagos_regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/vulpix_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/vulpix_Shiny.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/wartortle_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/wurmple_Regular.png", false);
 }
 
 

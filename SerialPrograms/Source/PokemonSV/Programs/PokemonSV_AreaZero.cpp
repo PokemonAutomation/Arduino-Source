@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -38,8 +38,8 @@ void inside_zero_gate_to_station(
             {dialog}
         );
         if (ret < 0){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Unable to find warp circle.",
                 stream
             );
@@ -51,8 +51,8 @@ void inside_zero_gate_to_station(
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::seconds(60)){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Unable to warp to station after 60 seconds.",
                 stream
             );
@@ -82,8 +82,8 @@ void inside_zero_gate_to_station(
             stream.log("Black screen is over. Arrive at station.");
             break;
         default:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Unable to find warp to station 2.",
                 stream
             );
@@ -132,8 +132,8 @@ void inside_zero_gate_to_station(
                     continue;
                 }
             default:
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Heal at station: No state detected after 30 seconds.",
                     stream
                 );
@@ -157,8 +157,8 @@ void inside_zero_gate_to_station(
             {black_screen}
         );
         if (ret < 0){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Unable to exit station after 60 seconds.",
                 stream
             );
@@ -173,8 +173,8 @@ void inside_zero_gate_to_station(
             {overworld}
         );
         if (ret < 0){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Unable to load overworld after exiting station for 30 seconds.",
                 stream
             );
@@ -207,8 +207,8 @@ void return_to_inside_zero_gate(
         {black_screen}
     );
     if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Unable to enter Zero Gate.",
             stream
         );
@@ -220,8 +220,8 @@ void return_to_inside_zero_gate(
         {overworld}
     );
     if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Unable to detect overworld inside Zero Gate.",
             stream
         );
@@ -242,8 +242,8 @@ void return_to_inside_zero_gate_from_picnic(
         {black_screen}
     );
     if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Unable to enter Zero Gate.",
             stream
         );
@@ -255,8 +255,8 @@ void return_to_inside_zero_gate_from_picnic(
         {overworld}
     );
     if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Unable to detect overworld inside Zero Gate.",
             stream
         );

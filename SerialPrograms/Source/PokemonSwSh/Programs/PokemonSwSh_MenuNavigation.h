@@ -29,7 +29,7 @@ constexpr size_t TOWN_MAP_APP_INDEX = 5;
 // The target app index is from 0 to 9, in the order of top to bottom, left to right.
 // e.g. by default, Pokemon app is at index 1, while Town Map app is at index 5.
 // The function detects the current cursor location. So the function works on any initial cursor location.
-// Will OperationFailedException::fire when failed to detect menu
+// Will OperationFailedExceptionWithScreenshot::fire when failed to detect menu
 void navigate_to_menu_app(
     VideoStream& stream,
     ProControllerContext& context,

@@ -317,7 +317,6 @@ struct AudioDeviceInfo::Data{
 #elif QT_VERSION_MAJOR == 6
     QAudioDevice info;
 #endif
-
 };
 std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
     //  The device list that Qt provides above will include duplicates on Windows

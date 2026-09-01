@@ -7,6 +7,7 @@
 #include <map>
 #include <vector>
 #include "CommonTools/Images/WaterfillUtilities.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/DetectedBoxes.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
@@ -17,6 +18,8 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonHome{
+
+using Pokemon::ORIGIN_MARK_SLUGS;
 
 class MarkIconMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
@@ -136,7 +139,7 @@ const MarkIconMatcher& MarkIcon_Galar(){
         "galar",
         Color(0xff5e6453), Color(0xff757870),
         10,
-        45.0,
+        60.0,
         {
             {0xff5e6453, 0xff757870},
             {0xff47503d, 0xfffffff8}
@@ -257,19 +260,27 @@ OriginMark origin_mark_from_slug(const std::string& slug){
     throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid origin mark slug: " + slug);
 }
 
-OriginMark OriginMarkReader::read_mark(
-    const ImageViewRGB32& original_screen,
-    const ImageFloatBox& box
-){
+OriginMarkReader::OriginMarkReader(Color color, VideoOverlay* overlay)
+    : m_color(color)
+    , m_overlay(overlay)
+    , m_box(0.617, 0.084, 0.044, 0.069)
+{}
+
+void OriginMarkReader::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_box);
+}
+
+OriginMark OriginMarkReader::read_mark(const ImageViewRGB32& original_screen){
     const double screen_rel_size = (original_screen.height() / 1080.0);
     const double screen_rel_size_2 = screen_rel_size * screen_rel_size;
 
     const double min_area_1080p = 400;
     const size_t min_area = size_t(screen_rel_size_2 * min_area_1080p);
 
-    ImageViewRGB32 image = extract_box_reference(original_screen, box);
+    ImageViewRGB32 image = extract_box_reference(original_screen, m_box);
 
     m_last_detected.clear();
+    m_last_detected_box.reset();
 
     std::multimap<double, std::pair<OriginMark, ImagePixelBox>> candidates;
 
@@ -286,7 +297,7 @@ OriginMark OriginMarkReader::read_mark(
                 m_last_detected.emplace_back(
                     DetectedBox{
                         matcher->name(),
-                        translate_to_parent(original_screen, box, object)
+                        translate_to_parent(original_screen, m_box, object)
                     }
                 );
                 return true;
@@ -294,11 +305,88 @@ OriginMark OriginMarkReader::read_mark(
         );
 
         if (!m_last_detected.empty()){
+            if (m_overlay){
+                m_last_detected_box.emplace(*m_overlay, m_box, COLOR_GREEN);
+            }
             return origin_mark_from_slug(m_last_detected[0].name);
         }
     }
 
     return OriginMark::NONE;
+}
+
+class Test_OriginMarkReader : public UnitTest{
+public:
+
+    Test_OriginMarkReader(
+        const std::string& image,
+        OriginMark expected
+    )
+        : UnitTest("PokemonHome::OriginMarkReader - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        ImageRGB32 image(m_image);
+        OriginMark result = OriginMarkReader().read_mark(image);
+
+        if (result == m_expected)
+            return true;
+
+        return "Expected: " + ORIGIN_MARK_SLUGS().get_string(m_expected) + ", received: " + ORIGIN_MARK_SLUGS().get_string(result);
+    };
+
+private:
+    std::string m_image;
+    OriginMark m_expected;
+};
+
+//TODO: Missing multiple positive test cases for TeraTypeReader.
+void add_tests_OriginMarkReader(UnitTestDatabase& database){
+    database.add<Test_OriginMarkReader>("PokemonHome/BoxView/BoxView-1.png", OriginMark::NONE);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/annihilape_Regular.png", OriginMark::SV);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/bidoof_Regular.png", OriginMark::NONE);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/bulbasaur_Regular.png", OriginMark::LGPE);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Go.png", OriginMark::GO);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Lza.png", OriginMark::LZA);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/capskid_Regular.png", OriginMark::SV);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/castform_Regular.png", OriginMark::GO);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/cyclizar_Regular.png", OriginMark::SV);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/dudunsparce_Regular.png", OriginMark::SV);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/dudunsparce_Regular_Sv.png", OriginMark::SV);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/enamorus_Shiny.png", OriginMark::LA);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/gimmighoul_Regular.png", OriginMark::SV);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/glimmet_Regular.png", OriginMark::SV);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/gogoat_Regular.png", OriginMark::KALOS);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/greatTusk_Shiny.png", OriginMark::SV);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/hatterne_Regular.png", OriginMark::GALAR);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/houndstone_Regular.png", OriginMark::SV);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/ironBunde_Regular.png", OriginMark::SV);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/ironBundle_Regular_Sv.png", OriginMark::SV);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/ironJugulis_Regular.png", OriginMark::SV);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/ironThorns_Regular.png", OriginMark::SV);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/kilowattrel_Regular.png", OriginMark::SV);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/kingler_Shiny.png", OriginMark::GALAR);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/komala_Regular.png", OriginMark::SV);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/krabby_Shiny.png", OriginMark::GALAR);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/machamp_Regular.png", OriginMark::GALAR);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/pancham_Shiny.png", OriginMark::GALAR);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/rapidash_Regular.png", OriginMark::LGPE);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/rellor_Regular.png", OriginMark::SV);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/riolu_Regular.png", OriginMark::LZA);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/rowlet_ShinyAlpha.png", OriginMark::LA);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/scovillain_Regular.png", OriginMark::SV);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/slitherWing_Shiny.png", OriginMark::SV);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/squirtle_Shiny.png", OriginMark::GO);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/tapuLele_Shiny.png", OriginMark::ALOLA);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/tatsugiri_Regular.png", OriginMark::SV);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/teddiursa_Regular.png", OriginMark::LA);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/terapagos_regular.png", OriginMark::SV);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/vulpix_Regular.png", OriginMark::GALAR);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/vulpix_Shiny.png", OriginMark::GALAR);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/wartortle_Regular.png", OriginMark::GO);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/wurmple_Regular.png", OriginMark::BDSP);
 }
 
 

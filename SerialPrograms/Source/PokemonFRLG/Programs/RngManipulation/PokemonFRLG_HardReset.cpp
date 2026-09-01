@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -40,8 +40,8 @@ void rng_reset_and_return_home(
     WallClock deadline = current_time() + std::chrono::minutes(5);
     while (true){
         if (current_time() > deadline){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "rng_start_game_and_return_home(): Failed to start game and return to Home within 5 minutes.",
                 console
             );
@@ -189,6 +189,7 @@ void rng_reset_and_return_home(
 void reset_and_perform_blind_sequence(
     ConsoleHandle& console, 
     ProControllerContext& context, 
+    const Language& language,
     PokemonFRLG_RngTarget target,
     const SeedButton& seed_button,
     const BlackoutButton& extra_button,
@@ -205,8 +206,8 @@ void reset_and_perform_blind_sequence(
     uint8_t attempts = 0;
     while(true){
         if (attempts >= 5){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "RngHelper(): Failed to reset the game 5 times in a row.",
                 console
             );  
@@ -218,8 +219,8 @@ void reset_and_perform_blind_sequence(
         context.wait_for_all_requests();
         int ret = run_until<ProControllerContext>(
             console, context,
-            [target, seed_button, extra_button, timings, safari_zone, console_type](ProControllerContext& context) {
-                perform_blind_sequence(context, target, seed_button, extra_button, timings, safari_zone, console_type);
+            [language, target, seed_button, extra_button, timings, safari_zone, console_type](ProControllerContext& context) {
+                perform_blind_sequence(context, language, target, seed_button, extra_button, timings, safari_zone, console_type);
             },
             { update_detector, user_selection_detector },
             5000ms
@@ -256,8 +257,8 @@ void reset_and_detect_copyright_text(ConsoleHandle& console, ProControllerContex
     uint8_t attempts = 0;
     while(true){
         if (attempts >= 5){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to resume the game 5 times in a row.",
                 console
             );  
@@ -299,8 +300,8 @@ void reset_and_detect_copyright_text(ConsoleHandle& console, ProControllerContex
                 1ms // catch black screen as quickly as possible
             );
             if (ret2 < 0){
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Black screen detected for more than 10 seconds after starting game.",
                     console
                 );

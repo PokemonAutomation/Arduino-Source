@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -356,8 +356,8 @@ StateMachineAction throw_balls(
     if (balls != 0){
         pbf_mash_button(context, BUTTON_A, 1000ms);
     }else{
-        OperationFailedException::fire(
-            ErrorReport::NO_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::NO_ERROR_REPORT,
             "Unable to find appropriate ball. Did you run out?",
             stream
         );

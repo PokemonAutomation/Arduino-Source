@@ -7,7 +7,7 @@
 #ifdef QT_CORE_LIB
 #include <QSerialPortInfo>
 #include <QMessageBox>
-#include "Controllers/SerialPortPollerQt.h"
+#include "Controllers/SerialPort/SerialPortPollerQt.h"
 #endif
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/PrettyPrint.h"

@@ -61,30 +61,32 @@ std::string AutoStory_Checkpoint_05::name() const{ return "005 - " + AutoStory_S
 std::string AutoStory_Checkpoint_05::start_text() const{ return "Battled Nemona on the beach.";}
 std::string AutoStory_Checkpoint_05::end_text() const{ return "Met mom at gate. Received mom's sandwich.";}
 void AutoStory_Checkpoint_05::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_05(env, context, options.notif_status_update, stats);
+    checkpoint_05(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 std::string AutoStory_Checkpoint_06::name() const{ return "006 - " + AutoStory_Segment_03().name(); }
 std::string AutoStory_Checkpoint_06::start_text() const{ return AutoStory_Checkpoint_05().end_text();}
 std::string AutoStory_Checkpoint_06::end_text() const{ return "Cleared catch tutorial.";}
 void AutoStory_Checkpoint_06::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_06(env, context, options.notif_status_update, stats);
+    checkpoint_06(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 std::string AutoStory_Checkpoint_07::name() const{ return "007 - " + AutoStory_Segment_03().name(); }
 std::string AutoStory_Checkpoint_07::start_text() const{ return AutoStory_Checkpoint_06().end_text();}
 std::string AutoStory_Checkpoint_07::end_text() const{ return "Moved to cliff. Heard mystery cry. Standing in front of Nemona near the cliff.";}
 void AutoStory_Checkpoint_07::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_07(env, context, options.notif_status_update, stats);
+    checkpoint_07(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 void checkpoint_05(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 ){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
 
@@ -103,12 +105,14 @@ void checkpoint_05(
 }
 
 void checkpoint_06(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 ){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){        
 
         context.wait_for_all_requests();
@@ -141,12 +145,14 @@ void checkpoint_06(
 }
 
 void checkpoint_07(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 ){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){         
 
         context.wait_for_all_requests();

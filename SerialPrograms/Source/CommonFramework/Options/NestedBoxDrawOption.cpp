@@ -35,7 +35,10 @@ NestedBoxDrawOption::NestedBoxDrawOption(LockMode lock_while_program_is_running)
 }
 
 
-class NestedBoxDrawOption::DrawnBox final : public ConfigOption::Listener, public VideoOverlay::MouseListener{
+class NestedBoxDrawOption::DrawnBox final
+    : public ConfigOption::Listener
+    , public VideoDisplayHidListener
+{
 public:
     ~DrawnBox(){
         detach();
@@ -55,7 +58,7 @@ public:
         try{
             m_inference_box.add_listener(*this);
             m_content_box.add_listener(*this);
-            overlay.add_mouse_listener(*this);
+            overlay.add_hid_listener(*this);
             on_config_value_changed(nullptr);
         }catch (...){
             detach();
@@ -150,7 +153,7 @@ public:
 
 private:
     void detach(){
-        m_overlay.remove_mouse_listener(*this);
+        m_overlay.remove_hid_listener(*this);
         m_content_box.remove_listener(*this);
         m_inference_box.remove_listener(*this);
     }

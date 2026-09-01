@@ -5,13 +5,14 @@
  */
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h"
 #include "PokemonSV/Programs/Battles/PokemonSV_Battles.h"
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -75,7 +76,7 @@ std::string AutoStory_Checkpoint_85::name() const{ return "085 - " + AutoStory_S
 std::string AutoStory_Checkpoint_85::start_text() const{ return "Beat Alfornada gym challenge. Beat Alfornada gym. At Alfronada Pokecenter.";}
 std::string AutoStory_Checkpoint_85::end_text() const{ return "Beat Clavell. At Academy fly point.";}
 void AutoStory_Checkpoint_85::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_85(env, context, options.notif_status_update, stats);
+    checkpoint_85(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 
@@ -83,7 +84,7 @@ std::string AutoStory_Checkpoint_86::name() const{ return "086 - " + AutoStory_S
 std::string AutoStory_Checkpoint_86::start_text() const{ return AutoStory_Checkpoint_85().end_text();}
 std::string AutoStory_Checkpoint_86::end_text() const{ return "At Pokemon League entrance.";}
 void AutoStory_Checkpoint_86::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_86(env, context, options.notif_status_update, stats);
+    checkpoint_86(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 
@@ -91,15 +92,15 @@ std::string AutoStory_Checkpoint_87::name() const{ return "087 - " + AutoStory_S
 std::string AutoStory_Checkpoint_87::start_text() const{ return AutoStory_Checkpoint_86().end_text();}
 std::string AutoStory_Checkpoint_87::end_text() const{ return "Finished the Entrance quiz. Standing in front of Rika.";}
 void AutoStory_Checkpoint_87::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_87(env, context, options.notif_status_update, stats, options.language, options.starter_choice);
+    checkpoint_87(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text(), options.language, options.starter_choice);
 }
 
 
 std::string AutoStory_Checkpoint_88::name() const{ return "088 - " + AutoStory_Segment_33().name(); }
 std::string AutoStory_Checkpoint_88::start_text() const{ return AutoStory_Checkpoint_87().end_text();}
-std::string AutoStory_Checkpoint_88::end_text() const{ return "Beat Elite Four.";}
+std::string AutoStory_Checkpoint_88::end_text() const{ return "Beat the Elite Four. Door to Geeta up ahead.";}
 void AutoStory_Checkpoint_88::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_88(env, context, options.notif_status_update, stats);
+    checkpoint_88(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 
@@ -107,14 +108,14 @@ std::string AutoStory_Checkpoint_89::name() const{ return "089 - " + AutoStory_S
 std::string AutoStory_Checkpoint_89::start_text() const{ return AutoStory_Checkpoint_88().end_text();}
 std::string AutoStory_Checkpoint_89::end_text() const{ return "Beat Geeta. At Pokemon League Pokecenter.";}
 void AutoStory_Checkpoint_89::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_89(env, context, options.notif_status_update, stats);
+    checkpoint_89(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 
 
 
-void checkpoint_85(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+void checkpoint_85(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, +1, +0.609, 2560ms}, FlyPoint::FAST_TRAVEL);
 
@@ -132,8 +133,8 @@ void checkpoint_85(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 }
 
 
-void checkpoint_86(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+void checkpoint_86(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -1, 0, 400ms);
@@ -143,13 +144,30 @@ void checkpoint_86(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         pbf_move_left_joystick(context, {0, +1}, 8800ms, 400ms);
 
         get_on_ride(env.program_info(), env.console, context);
-        direction.change_direction(env.program_info(), env.console, context, 1.484555);
+        direction.change_direction(env.program_info(), env.console, context, 1.761373);
 
-        pbf_move_left_joystick(context, {0, +1}, 1506ms, 0ms);
+        pbf_move_left_joystick(context, {0, +1}, 1300ms, 0ms);
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 703ms);
         pbf_move_left_joystick(context, {0, +1}, 233ms, 0ms);
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 5098ms);
-        pbf_move_left_joystick(context, {0, +1}, 1000ms, 0ms);
+
+        BlackScreenWatcher black_screen(COLOR_RED);
+        int ret = run_until<ProControllerContext>(
+            env.console, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 0ms);
+            },
+            { black_screen }
+        );
+        if (ret < 0){
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
+                "Never detected black screen. Failed to glide from the Academy to the route leading to the Pokemon League.",
+                env.console
+            );
+        }
+
+        env.console.log("Detected black screen. Likely successful glide from the Academy to the route leading to the Pokemon League.");
 
         wait_for_overworld(env.program_info(), env.console, context);
 
@@ -215,9 +233,9 @@ void checkpoint_86(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     });   
 }
 
-void checkpoint_87(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, Language language, StarterChoice starter_choice){
+void checkpoint_87(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text, Language language, StarterChoice starter_choice){
     GameTitle game_title = GameTitle::UNKNOWN;
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
         if (game_title == GameTitle::UNKNOWN){
             game_title = get_game_title(env, context);
@@ -323,8 +341,8 @@ void checkpoint_87(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 }
 
 
-void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
         // standing in front of Rika
         // now done talking to Rika. walk around Rika's desk.
@@ -350,8 +368,8 @@ void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // We don't setup Misty Terrain on the Whiscash since Muddy Water can lower our accuracy.
         bool is_won = run_pokemon(env.console, context, move_table1, true, terastallized);
         if (!is_won){// throw exception if we lose
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to beat the Ground trainer. Reset.",
                 env.console
             );
@@ -371,8 +389,8 @@ void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         std::vector<SinglesMoveEntry> move_table2 = {move2};
         is_won = run_pokemon(env.console, context, move_table2, true, terastallized);
         if (!is_won){// throw exception if we lose
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to beat the Steel trainer. Reset.",
                 env.console
             );
@@ -407,8 +425,8 @@ void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     });     
 }
 
-void checkpoint_89(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+void checkpoint_89(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60000ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW, CallbackEnum::PROMPT_DIALOG});
@@ -461,8 +479,8 @@ GameTitle get_game_title(SingleSwitchProgramEnvironment& env, ProControllerConte
     }
 
     if (game_title == GameTitle::UNKNOWN){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "get_game_title(): Unable to determine what game we are playing. "
             "The color of the bottom bar in the Pokemon Summary page doesn't match any of the expected colors.",
             env.console
@@ -492,16 +510,16 @@ std::string get_ride_pokemon_name(SingleSwitchProgramEnvironment& env, ProContro
     }
 
     if (results.empty()){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "AutoStory_Segment_34::checkpoint_86(): Unable to read selected item. No valid results.\n" + language_warning(language),
             env.console
         );
     }
 
     if (results.size() > 1){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "AutoStory_Segment_34::checkpoint_86(): Unable to read selected item. Ambiguous or multiple results.\n" + language_warning(language),
             env.console
         );

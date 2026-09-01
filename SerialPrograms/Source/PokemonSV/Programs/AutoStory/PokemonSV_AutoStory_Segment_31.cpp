@@ -9,7 +9,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_NoMinimapDetector.h"
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -72,7 +72,7 @@ std::string AutoStory_Checkpoint_78::name() const{ return "078 - " + AutoStory_S
 std::string AutoStory_Checkpoint_78::start_text() const{ return "At North Province Area One Pokecenter";}
 std::string AutoStory_Checkpoint_78::end_text() const{ return "At North Province Area Two Pokecenter";}
 void AutoStory_Checkpoint_78::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_78(env, context, options.notif_status_update, stats);
+    checkpoint_78(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 
@@ -80,34 +80,34 @@ std::string AutoStory_Checkpoint_79::name() const{ return "079 - " + AutoStory_S
 std::string AutoStory_Checkpoint_79::start_text() const{ return AutoStory_Checkpoint_78().end_text();}
 std::string AutoStory_Checkpoint_79::end_text() const{ return "At North Province Area Two Pokecenter";}
 void AutoStory_Checkpoint_79::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_79(env, context, options.notif_status_update, stats);
+    checkpoint_79(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 std::string AutoStory_Checkpoint_80::name() const{ return "080 - " + AutoStory_Segment_31().name(); }
 std::string AutoStory_Checkpoint_80::start_text() const{ return AutoStory_Checkpoint_79().end_text();}
 std::string AutoStory_Checkpoint_80::end_text() const{ return "Beat Team Star (Fighting)";}
 void AutoStory_Checkpoint_80::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_80(env, context, options.notif_status_update, stats);
+    checkpoint_80(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 std::string AutoStory_Checkpoint_81::name() const{ return "081 - " + AutoStory_Segment_31().name(); }
 std::string AutoStory_Checkpoint_81::start_text() const{ return AutoStory_Checkpoint_80().end_text();}
 std::string AutoStory_Checkpoint_81::end_text() const{ return "At Alfornada Pokecenter.";}
 void AutoStory_Checkpoint_81::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_81(env, context, options.notif_status_update, stats);
+    checkpoint_81(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 std::string AutoStory_Checkpoint_82::name() const{ return "082 - " + AutoStory_Segment_31().name(); }
 std::string AutoStory_Checkpoint_82::start_text() const{ return AutoStory_Checkpoint_81().end_text();}
 std::string AutoStory_Checkpoint_82::end_text() const{ return "At Alfornada Pokecenter.";}
 void AutoStory_Checkpoint_82::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_82(env, context, options.notif_status_update, stats);
+    checkpoint_82(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 
 
-void checkpoint_78(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+void checkpoint_78(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
 
         heal_at_pokecenter(env.program_info(), env.console, context);
@@ -118,24 +118,24 @@ void checkpoint_78(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 }
 
 
-void checkpoint_79(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+void checkpoint_79(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
         // empty checkpoint
 
     }, false);
 }
 
-void checkpoint_80(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+void checkpoint_80(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
         beat_team_star_fighting1(env, context, attempt_number);
         beat_team_star_fighting2(env, context);
     });
 }
 
-void checkpoint_81(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+void checkpoint_81(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
         move_cursor_towards_flypoint_and_go_there(
             env.program_info(),
@@ -148,8 +148,8 @@ void checkpoint_81(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     });
 }
 
-void checkpoint_82(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+void checkpoint_82(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
         // empty checkpoint
 
@@ -572,8 +572,8 @@ void beat_team_star_fighting2(SingleSwitchProgramEnvironment& env, ProController
     );
     context.wait_for(std::chrono::milliseconds(100));
     if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "checkpoint_48(): Failed to kill 30 pokemon with Let's go.",
             env.console
         );            

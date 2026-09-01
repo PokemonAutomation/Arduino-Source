@@ -10,11 +10,20 @@
 #include "Common/Cpp/Cryptography/SHA256.h"
 #include "StaticGlobals.h"
 
+#ifdef PA_OFFICIAL
+#include "../../Internal/SerialPrograms/InternalDeveloper.h"
+#endif
+
 namespace PokemonAutomation{
 
 
 
 const std::set<std::string> TOKENS{
+    // new tokens - post regular/internal dev mode split
+    "4478663b6c92cb7eccd19131dce1c9a0f3fc113d9d21d87d602516c92756fc73",
+
+
+    // old tokens
 //    "f6538243092d8a3b9959bca988f054e1670f57c7246df2cbba25c4df3fe7a4e7",
     "2d04af67f6520e3550842d7eeb292868c6d0d4809b607f5a454712023d8815e1",
     "475d0a0a305a02cbf8b602bd47c3b275dccd5ac19fbe480729804a8e4e360b71",
@@ -22,14 +31,12 @@ const std::set<std::string> TOKENS{
     "8e48e38e49bffc8462ada9d2d9d850d5b3b5c9529d20978c09bc548bc9a614a4",
     "7694adee4419d62c6a923c4efc9e7b41def7b96bb84ea882701b0bf2e8c13bee",
     "e8d168bc482e96553ea9f9ecaea5a817474dbccc2a6a228a6bde67f2b2aa2889", //  James' token.
-};
-
-const std::set<std::string> INTERNAL_TOKENS{
-    "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", //  jw's token.
+    "c8ff3102de1a8b773121bcca242e2a252f09b126cca22eb2400d603c8b9a8957", //  jw's token.
     "7555b7c63481cad42306718c67e7f9def5bfd1da8f6cd299ccd3d7dc95f307ae", //  Kuro's token.
     "3d475b46d121fc24559d100de2426feaa53cd6578aac2817c4857a610ccde2dd", //  kichi's token.
     "9b41db8175b5f248a78e738c7bd63a36e33b57953cb4e80ccdd13c2a7e892eec", //  Dalton's token.
 };
+
 
 
 
@@ -51,10 +58,11 @@ void StaticGlobals::load_json(const JsonValue& json){
         hash.finish();
         hash.get_hash_hex();
 
-        bool internal_dev = INTERNAL_TOKENS.find(hash.get_hash_hex()) != INTERNAL_TOKENS.end();
-        bool regular_dev = TOKENS.find(hash.get_hash_hex()) != TOKENS.end();
-        DEVELOPER_MODE = regular_dev || internal_dev;
-        INTERNAL_DEVELOPER_MODE = internal_dev;
+        std::string str = hash.get_hash_hex();
+        DEVELOPER_MODE = TOKENS.find(str) != TOKENS.end();
+#ifdef PA_OFFICIAL
+        process_internal_dev(str);
+#endif
     }
 
     const JsonObject* debug_obj = obj->get_object("DEBUG");
@@ -65,6 +73,7 @@ void StaticGlobals::load_json(const JsonValue& json){
         debug_obj->read_integer(BOX_SYSTEM_CELL_ROW, "BOX_SYSTEM_CELL_ROW");
         debug_obj->read_integer(BOX_SYSTEM_CELL_COL, "BOX_SYSTEM_CELL_COL");
         debug_obj->read_boolean(GENERATE_TEST_GOLDEN_FILES, "GENERATE_TEST_GOLDEN_FILES");
+        debug_obj->read_boolean(PADDLE_OCR_DEBUG, "PADDLE_OCR_DEBUG");
     }
 }
 JsonValue StaticGlobals::to_json_debug() const{
@@ -75,6 +84,7 @@ JsonValue StaticGlobals::to_json_debug() const{
     debug_obj["BOX_SYSTEM_CELL_ROW"] = BOX_SYSTEM_CELL_ROW;
     debug_obj["BOX_SYSTEM_CELL_COL"] = BOX_SYSTEM_CELL_COL;
     debug_obj["GENERATE_TEST_GOLDEN_FILES"] = GENERATE_TEST_GOLDEN_FILES;
+    debug_obj["PADDLE_OCR_DEBUG"] = PADDLE_OCR_DEBUG;
     return debug_obj;
 }
 

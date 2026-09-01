@@ -22,7 +22,7 @@ class VideoSession
     : public VideoFeed  // interface class the automation programs have access to to query video snapshots
                         // and reset the video source
     , private VideoFrameListener  // listens to incoming frames from video source
-    , private VideoSource::RenderedFrameListener  // listens to newly rendered frame from video source
+    , private VideoSource::RenderedFrameListener  // listens to frames rendered to the screen.
     , private WatchdogCallback
 {
 public:
@@ -70,7 +70,7 @@ public:
 
 
 public:
-    bool try_shutdown();
+    bool try_shutdown() noexcept;
     ~VideoSession();
     //  Built from a VideoSourceOption.
     //  VideoSourceOption manages the current VideoSourceDescriptor, which are the descriptors
@@ -138,7 +138,7 @@ public:
 
 public:
     //  Get current video source option
-    void get(VideoSourceOption& option);
+    void save(VideoSourceOption& option) const;
 
     //  Set a new video source. This will close the old video source.
     //  This equals to calling VideoSession::set_source(option.descriptor()).
@@ -146,7 +146,7 @@ public:
     //  referenced video source option (aka the VideoSourceOption passed to the
     //  VideoSession constructor).
     //  The change is dispatched to the Qt main thread to execute.
-    void set(const VideoSourceOption& option);
+    void load(const VideoSourceOption& option);
 
     //  Implements VideoFeed::reset().
     //  Reset the current video source. This equals to close the old video source
@@ -186,6 +186,8 @@ public:
 
 
 private:
+    virtual void on_watchdog_timeout() override;
+
     //  Overwrites VideoFrameListener::on_frame()
     //  When this function is called, the VideoSession will update its internal fps record
     //  and call frame listeners added by VideoSession::add_frame_listener().
@@ -198,8 +200,6 @@ private:
     //  VideoSession can update its internal fps record.
     //  This function is thread-safe as it has a lock to prevent concurrent fps calls.
     virtual void on_rendered_frame(WallClock timestamp) override;
-
-    virtual void on_watchdog_timeout() override;
 
 
 private:

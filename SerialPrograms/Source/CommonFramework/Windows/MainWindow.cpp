@@ -14,9 +14,10 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include "Common/Cpp/ScopeExit.h"
-#include "Common/Cpp/Logging/MultiOutputLogger.h"
-#include "Common/Cpp/CpuId/CpuId.h"
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Logging/MultiOutputLogger.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
+#include "Common/Cpp/CpuId/CpuId.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -72,8 +73,8 @@ MainWindow::MainWindow(QWidget* parent)
 //    setStatusBar(statusbar);
     std::string title = PROGRAM_NAME + " Computer-Control Programs (" + PROGRAM_VERSION + ")";
 #if defined(__APPLE__)
-    if (!STARTUP_PROFILE().empty()){
-        setWindowTitle(QString::fromStdString(title + " [Profile: " + STARTUP_PROFILE() + "]"));
+    if (!Filesystem::STARTUP_PROFILE().empty()){
+        setWindowTitle(QString::fromStdString(title + " [Profile: " + Filesystem::STARTUP_PROFILE() + "]"));
     }else{
         setWindowTitle(QString::fromStdString(title));
     }

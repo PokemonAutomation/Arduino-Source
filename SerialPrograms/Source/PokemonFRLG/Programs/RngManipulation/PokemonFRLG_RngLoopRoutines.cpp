@@ -8,7 +8,7 @@
 #include <cmath>
 #include "Common/Cpp/Time.h"
 #include "CommonTools/Random.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
@@ -117,8 +117,8 @@ WildCatchOutcome catch_wild_for_seed_id(
 
     int ret = watch_for_shiny_encounter(env.console, context);
     if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "catch_wild_for_seed_id(): Failed to trigger battle",
             env.console
         );

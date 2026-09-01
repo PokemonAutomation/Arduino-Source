@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -342,8 +342,8 @@ bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, ProC
                     env.log("Timed out during battle after 5 minutes.", COLOR_RED);
                     stats.errors++;
                     env.update_stats();
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Timed out during battle after 5 minutes.",
                         env.console
                     );
@@ -376,8 +376,8 @@ bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, ProC
                     env.log("Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.", COLOR_RED);
                     stats.errors++;
                     env.update_stats();
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.",
                         env.console
                     );
@@ -395,8 +395,8 @@ bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, ProC
         BattleBallReader reader(env.console, LANGUAGE);
         int quantity = move_to_ball(reader, env.console, context, BALL_SELECT.slug());
         if (quantity == 0){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Unable to find appropriate ball. Did you run out?",
                 env.console
             );
@@ -518,8 +518,8 @@ bool StatsResetEventBattle::check_stats_after_win(SingleSwitchProgramEnvironment
             StatsResetEventBattle_Descriptor::Stats& stats = env.current_stats<StatsResetEventBattle_Descriptor::Stats>();
             stats.errors++;
             env.update_stats();
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "StatsResetEventBattle::check_stats_after_win(): No state detected after 1 minute.",
                 env.console
             );

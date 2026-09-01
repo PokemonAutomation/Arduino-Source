@@ -8,28 +8,26 @@
 #include <optional>
 #include <sstream>
 #include <vector>
-#include "Common/Cpp/Strings/Unicode.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
-#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/Images/ImageFilter.h"
-#include "CommonTools/OCR/OCR_Routines.h"
-#include "CommonTools/OCR/OCR_StringNormalization.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/OCR/OCR_NumberReader.h"
 #include "CommonTools/VisualDetectors/FrozenImageDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "Pokemon/Inference/Pokemon_TypeReader.h"
 #include "PokemonHome/Inference/PokemonHome_BallReader.h"
+#include "PokemonHome/Inference/PokemonHome_AlphaDetector.h"
 #include "PokemonHome/Inference/PokemonHome_BoxGenderDetector.h"
 #include "PokemonHome/Inference/PokemonHome_GigantamaxDetector.h"
 #include "PokemonHome/Inference/PokemonHome_OriginMarkReader.h"
+#include "PokemonHome/Inference/PokemonHome_ShinyDetector.h"
+#include "PokemonHome/Inference/PokemonHome_SummaryReader.h"
 #include "PokemonHome/Inference/PokemonHome_TeraTypeReader.h"
 #include "PokemonHome_BoxNavigation.h"
 
@@ -227,34 +225,23 @@ void read_summary_screen(
 ) {
     VideoOverlaySet video_overlay_set(env.console);
 
-    ImageFloatBox national_dex_number_box(0.448, 0.245, 0.049, 0.04); //pokemon national dex number pos
-    ImageFloatBox shiny_symbol_box(0.702, 0.09, 0.04, 0.06); // shiny symbol pos
-    ImageFloatBox gmax_tera_symbol_box(0.463, 0.09, 0.04, 0.06); // gmax OR tera symbol pos
-    ImageFloatBox origin_symbol_box(0.617, 0.084, 0.044, 0.069); // origin symbol pos
     ImageFloatBox pokemon_box(0.69, 0.18, 0.28, 0.46); // pokemon render pos
-    ImageFloatBox level_box(0.546, 0.099, 0.044, 0.041); // Level
-    ImageFloatBox ot_id_box(0.782, 0.719, 0.193, 0.046); // OT ID
-    ImageFloatBox ot_box(0.492, 0.719, 0.165, 0.049); // OT
-    ImageFloatBox nature_box(0.157, 0.783, 0.212, 0.042); // Nature
-    ImageFloatBox ability_box(0.158, 0.838, 0.213, 0.042); // Ability
-    ImageFloatBox alpha_box(0.787, 0.095, 0.024, 0.046); // Alpha symbol
     ImageFloatBox type_box(0.615, 0.240, 0.071, 0.057); // Type symbols
-
-
-    video_overlay_set.add(COLOR_WHITE, national_dex_number_box);
-    video_overlay_set.add(COLOR_BLUE, shiny_symbol_box);
-    video_overlay_set.add(COLOR_RED, gmax_tera_symbol_box);
-    video_overlay_set.add(COLOR_RED, alpha_box);
-    video_overlay_set.add(COLOR_DARKGREEN, origin_symbol_box);
     video_overlay_set.add(COLOR_DARK_BLUE, pokemon_box);
-    video_overlay_set.add(COLOR_RED, level_box);
-    video_overlay_set.add(COLOR_RED, ot_id_box);
-    video_overlay_set.add(COLOR_RED, ot_box);
-    video_overlay_set.add(COLOR_RED, nature_box);
-    video_overlay_set.add(COLOR_RED, ability_box);
     video_overlay_set.add(COLOR_RED, type_box);
-    BoxGenderDetector::make_overlays(video_overlay_set);
 
+    GigantamaxDetector gmax_detector(COLOR_RED, &env.console.overlay());
+    ShinyDetector shiny_detector(COLOR_RED, &env.console.overlay());
+    AlphaDetector alpha_detector(COLOR_RED, &env.console.overlay());
+    OriginMarkReader origin_mark_reader(COLOR_RED, &env.console.overlay());
+    SummaryReader summary_reader(COLOR_RED);
+
+    gmax_detector.make_overlays(video_overlay_set);
+    shiny_detector.make_overlays(video_overlay_set);
+    alpha_detector.make_overlays(video_overlay_set);
+    origin_mark_reader.make_overlays(video_overlay_set);
+    summary_reader.make_overlays(video_overlay_set);
+    BoxGenderDetector::make_overlays(video_overlay_set);
 
     // Wait for the summary screen transition to end
     FrozenImageDetector frozen_image_detector(COLOR_GREEN, { 0.388, 0.238, 0.109, 0.062 }, Milliseconds(80), 20);
@@ -263,44 +250,26 @@ void read_summary_screen(
 
     VideoSnapshot screen = env.console.video().snapshot();
 
-    const std::vector<std::pair<uint32_t, uint32_t>> white_number_filters = {
-        {0xff808080, 0xffffffff},
-        {0xff909090, 0xffffffff},
-    };
-
-    const int dex_number = OCR::read_number_waterfill_multifilter(
-        env.console, 
-        GlobalThreadPools::computation_normal(), 
-        extract_box_reference(screen, national_dex_number_box), 
-        white_number_filters,
-        true,
-        true,
-        20
-    );
+    const int dex_number = summary_reader.read_national_dex(env.console, screen);
     if (dex_number <= 0 || dex_number > static_cast<int>(NATIONAL_DEX_SLUGS().size())) {
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "BoxSorter Check Summary: Unable to read a correct dex number, found: " + std::to_string(dex_number),
             env.console
         );
     }
-    cur_pokemon_info.dex_number = (uint16_t)dex_number;
+    cur_pokemon_info.dex_number = static_cast<uint16_t>(dex_number);
     cur_pokemon_info.name_slug = NATIONAL_DEX_SLUGS()[dex_number - 1];
 
-    const int shiny_stddev_value = (int)image_stddev(extract_box_reference(screen, shiny_symbol_box)).sum();
-    const bool is_shiny = shiny_stddev_value > 30;
+    const bool is_shiny = shiny_detector.detect(screen);
     cur_pokemon_info.shiny = is_shiny;
-    env.console.log("Shiny detection stddev:" + std::to_string(shiny_stddev_value) + " is shiny:" + std::to_string(is_shiny));
 
-    GigantamaxDetector gmax_detector(COLOR_RED, &env.console.overlay(), gmax_tera_symbol_box);
     cur_pokemon_info.gmax = gmax_detector.detect(screen);
 
-    cur_pokemon_info.tera_type = read_pokemon_tera_type(screen, gmax_tera_symbol_box);
+    cur_pokemon_info.tera_type = read_pokemon_tera_type(screen);
 
-    const int alpha_stddev_value = (int)image_stddev(extract_box_reference(screen, alpha_box)).sum();
-    const bool is_alpha = alpha_stddev_value > 40;
+    const bool is_alpha = alpha_detector.detect(screen);
     cur_pokemon_info.alpha = is_alpha;
-    env.console.log("Alpha detection stddev:" + std::to_string(alpha_stddev_value) + " is alpha:" + std::to_string(is_alpha));
 
     BallReader ball_reader(env.console);
     cur_pokemon_info.ball_slug = ball_reader.read_ball(screen);
@@ -309,12 +278,7 @@ void read_summary_screen(
     env.console.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
     cur_pokemon_info.gender = gender;
 
-    const int ot_id = OCR::read_number_waterfill_multifilter(
-        env.console, 
-        GlobalThreadPools::computation_normal(),
-        extract_box_reference(screen, ot_id_box), 
-        white_number_filters
-    );
+    const int ot_id = summary_reader.read_original_trainer_id(env.console, screen);
     if (ot_id < 0 || ot_id > 999'999) {
         dump_image(env.console, ProgramInfo(), "ReadSummary_OT", screen);
     }
@@ -325,43 +289,16 @@ void read_summary_screen(
     cur_pokemon_info.primary_type = primary_type;
     cur_pokemon_info.secondary_type = secondary_type;
 
-    if (ot_name_language != Language::None){
-        const std::vector<OCR::TextColorRange>& text_filters = OCR::WHITE_TEXT_FILTERS();
-        std::vector<BlackWhiteRgb32Range> bw;
-        bw.reserve(text_filters.size());
-        for (const auto& f : text_filters){
-            bw.push_back({ true, f.mins, f.maxs });
-        }
+    cur_pokemon_info.ot_name = summary_reader.read_original_trainer_name(
+        ot_name_language, screen
+    );
 
-        auto filtered_images = to_blackwhite_rgb32_range(extract_box_reference(screen, ot_box), bw);
-
-        std::string best_raw;
-        for (auto& [img, px_count] : filtered_images){
-            if (px_count == 0){ 
-                continue; 
-            }
-            std::string candidate = OCR::ocr_read(ot_name_language, img, OCR::PageSegMode::SINGLE_LINE);
-            if (!candidate.empty() && best_raw.empty()){
-                best_raw = candidate;
-            }
-        }
-
-        env.log("Raw trainer name: " + best_raw);
-        std::string normalized = utf32_to_str(OCR::normalize_utf32(best_raw));
-        env.log("Normalized trainer name: " + normalized);
-        cur_pokemon_info.ot_name = normalized;
-    }
-
-    cur_pokemon_info.origin_mark = OriginMarkReader().read_mark(screen, origin_symbol_box);
+    cur_pokemon_info.origin_mark = origin_mark_reader.read_mark(screen);
 
     env.add_overlay_log(create_overlay_info(cur_pokemon_info));
     video_overlay_set.clear();
 
     // NOTE edit when adding new struct members (detections go here likely)
-
-    // level_box
-    // nature_box
-    // ability_box
 
     // Press button R to go to next summary screen
     pbf_press_button(context, BUTTON_R, 80ms, 300ms);

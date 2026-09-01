@@ -20,8 +20,7 @@ namespace PokemonAutomation{
 
 
 
-
-class ControllerSession : private ControllerConnection::StatusListener{
+class ControllerSession final : private ControllerConnection::StatusListener{
 public:
     struct Listener{
         virtual void ready_changed(bool ready){}
@@ -47,15 +46,22 @@ public:
         ControllerOption& option
     );
 
+
+public:
     Logger& logger(){
         return m_logger;
     }
     std::vector<ControllerType> available_controllers() const;
 
-    void get(ControllerOption& option);
-    void set(const ControllerOption& option);
+    void save(ControllerOption& option) const;
+    void load(const ControllerOption& option);
+
+    bool input_enabled() const;
+    void set_input_enabled(bool enabled);
 
     bool ready() const;
+    ControllerConnection::Status connection_status() const;
+
     std::shared_ptr<ControllerDescriptor> descriptor() const;
     ControllerType controller_type() const;
     std::string status_text() const;
@@ -63,7 +69,6 @@ public:
     const ControllerOption& option() const{
         return m_option;
     }
-    ControllerConnection& connection() const;
     AbstractController* controller() const;
 
 
@@ -93,6 +98,9 @@ public:
         ReadSpinLock lg(m_state_lock);
         if (!m_controller){
             return "Controller is null.";
+        }
+        if (!m_option.m_enable_input){
+            return "";
         }
         try{
             //  This will be a cross-cast in most cases.

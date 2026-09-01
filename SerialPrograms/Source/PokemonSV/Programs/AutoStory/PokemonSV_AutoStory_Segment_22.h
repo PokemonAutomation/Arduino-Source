@@ -67,36 +67,44 @@ void checkpoint_50(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 // start: At Levincia (South) Pokecenter.
-// end: At Levincia gym building. Talked to Hassel, met Rika.
+// end: Inside Levincia gym building. Talked to Hassel, met Rika.
 void checkpoint_51(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 
-// start: At Levincia gym building. Talked to Hassel, met Rika.
-// end: Finished Levincia gym challenge.
+// start: Inside Levincia gym building. Talked to Hassel, met Rika.
+// end: Finished Levincia gym challenge. Outside Levincia gym building.
 void checkpoint_52(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 
-// start: Finished Levincia gym challenge. Standing outside Levincia gym.
+// start: Finished Levincia gym challenge. Outside Levincia gym building.
 // end: Defeated Levincia Gym (Electric). At Levincia (North) Pokecenter.
 void checkpoint_53(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 

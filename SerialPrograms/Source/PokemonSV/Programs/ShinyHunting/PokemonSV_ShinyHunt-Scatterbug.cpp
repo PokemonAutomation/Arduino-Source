@@ -8,7 +8,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
@@ -187,10 +187,10 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, ProContro
         try{
             run_one_sandwich_iteration(env, context);
             consecutive_failures = 0;
-        }catch (OperationFailedException& e){
+        }catch (OperationFailedExceptionWithScreenshot& e){
             stats.m_errors++;
             env.update_stats();
-            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+            e.send_recoverable_error_notif_and_telemetry_report(env, NOTIFICATION_ERROR_RECOVERABLE);
 
             if (SAVE_DEBUG_VIDEO){
                 // Take a video to give more context for debugging
@@ -208,8 +208,8 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, ProContro
 
             consecutive_failures++;
             if (consecutive_failures >= 3){
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Failed 3 times in the row.",
                     env.console
                 );

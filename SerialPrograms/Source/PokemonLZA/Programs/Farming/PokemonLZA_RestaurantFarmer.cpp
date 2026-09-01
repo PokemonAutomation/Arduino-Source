@@ -5,7 +5,7 @@
  */
 
 //#include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 //#include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -181,8 +181,8 @@ bool RestaurantFarmer::run_lobby(SingleSwitchProgramEnvironment& env, ProControl
         default:
             stats.errors++;
             env.update_stats();
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "run_lobby(): No recognized state after 10 seconds.",
                 env.console
             );
@@ -276,8 +276,8 @@ void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
         default:
             stats.errors++;
             env.update_stats();
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "run_round(): No state detected for 2 minutes.",
                 env.console
             );

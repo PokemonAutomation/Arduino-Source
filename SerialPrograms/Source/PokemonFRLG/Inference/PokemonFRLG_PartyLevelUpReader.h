@@ -10,6 +10,7 @@
 #include <optional>
 #include <string>
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Language.h"
 #include "Pokemon/Pokemon_StatsCalculation.h"
@@ -45,6 +46,9 @@ private:
     ImageFloatBox m_box_speed;
 
 };
+
+
+void add_tests_PartyLevelUpReader(UnitTestDatabase& database);
 
 } // namespace PokemonFRLG
 } // namespace NintendoSwitch

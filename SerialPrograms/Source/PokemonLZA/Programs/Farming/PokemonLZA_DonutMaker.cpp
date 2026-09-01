@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -273,8 +273,8 @@ void DonutMaker::animation_to_donut(SingleSwitchProgramEnvironment& env, ProCont
     if (ret != 0){
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
-           ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+           ErrorReportMode::SEND_ERROR_REPORT,
             "donut_maker(): Unable to skip donut making animation.",
             env.console
         );
@@ -305,8 +305,8 @@ void DonutMaker::animation_to_donut(SingleSwitchProgramEnvironment& env, ProCont
     if (ret != 0){
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "donut_maker(): Unable to find the donut flavor power screen.",
             env.console
         );
@@ -398,8 +398,8 @@ void DonutMaker::open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env,
         default:
             stats.errors++;
             env.update_stats();
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "donut_maker(): Unable to detect white dialog, selection arrow or berry menu after talking to Ansha.",
                 env.console
             );
@@ -409,28 +409,35 @@ void DonutMaker::open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env,
 
     stats.errors++;
     env.update_stats();
-    OperationFailedException::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+    OperationFailedExceptionWithScreenshot::fire(
+        ErrorReportMode::SEND_ERROR_REPORT,
         "donut_maker(): 2 minutes passed yet unable to reach berry menu after taking to Ansha.",
         env.console
     );
 }
 
 // Exit the game and load the backup save
-void load_backup_save(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void load_backup_save(
+    SingleSwitchProgramEnvironment& env,
+    EventNotificationOption& recoverable_error,
+    ProControllerContext& context
+){
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
     env.log("Loading backup save.");
 
-    go_home(env.console, context);
-    const bool backup_save = true;
-    if (!reset_game_from_home(env, env.console, context, backup_save)){
+    while (true){
+        go_home(env.console, context);
+        if (reset_game_from_home(env, env.console, context, true)){
+            break;
+        }
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "donut_maker(): Cannot reset game from Switch Home screen.",
-            env.console
+        send_program_recoverable_error_notification(
+            env,
+            recoverable_error,
+            "Failed to reset game from home.",
+            env.console.video().snapshot_latest_blocking()
         );
     }
 }
@@ -452,8 +459,8 @@ void exit_menu_to_overworld(SingleSwitchProgramEnvironment& env, ProControllerCo
     if (ret != 0){
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
-           ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+           ErrorReportMode::SEND_ERROR_REPORT,
             "donut_maker(): Unable to find overworld after exiting menu.",
             env.console
         );
@@ -483,8 +490,8 @@ void DonutMaker::move_to_ansha(SingleSwitchProgramEnvironment& env, ProControlle
     if (travel_status != FastTravelState::SUCCESS){
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "donut_maker(): Cannot fast travel to Hotel Z.",
             env.console
         );
@@ -498,18 +505,18 @@ void DonutMaker::move_to_ansha(SingleSwitchProgramEnvironment& env, ProControlle
         if (run_towards_gate_with_A_button(env.console, context, 0, +1, Seconds(5)) != 0){
             stats.errors++;
             env.update_stats();
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "donut_maker(): Cannot reach Hotel Z gate after day/night change.",
                 env.console
             );
             // overworld.last_detected_frame()->save("debug_overworld_detection.png");
         }
-    } else if (ret != 0){
+    }else if (ret != 0){
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "donut_maker(): Cannot reach Hotel Z gate after fast travel.",
             env.console
         );
@@ -577,40 +584,57 @@ bool DonutMaker::should_stop(
 bool DonutMaker::donut_iteration(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    std::vector<uint16_t>& kept_counts
+    std::vector<uint16_t>& kept_counts,
+    size_t& consecutive_ingredient_fails
 ){
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
-    move_to_ansha(env, context);
-
-    const ImageFloatBox button_A_box{0.3, 0.2, 0.4, 0.7};
-    ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, button_A_box, &env.console.overlay());
-    int ret = wait_until(env.console, context, std::chrono::seconds(3), {buttonA});
-    if (ret != 0){
-        stats.errors++;
-        env.update_stats();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "donut_maker(): Unable to find button A facing Ansha.",
-            env.console
-        );
-    }
-
-    open_berry_menu_from_ansha(env, context);
-    // Add berries from menu and make a donut. Stop at flavor power screen.
-    add_berries_and_make_donut(env, context);
-
-    // Read flavor power and check if they match user requirement and should be kept:
     try{
+        move_to_ansha(env, context);
+
+        const ImageFloatBox button_A_box{0.3, 0.2, 0.4, 0.7};
+        ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, button_A_box, &env.console.overlay());
+        int ret = wait_until(env.console, context, std::chrono::seconds(3), {buttonA});
+        if (ret != 0){
+            env.log("donut_maker(): Unable to find button A facing Ansha.", COLOR_RED);
+        }
+
+        open_berry_menu_from_ansha(env, context);
+        // Add berries from menu and make a donut. Stop at flavor power screen.
+        add_berries_and_make_donut(env, context);
+        consecutive_ingredient_fails = 0;
+
+        // Read flavor power and check if they match user requirement and should be kept:
         if (match_powers(env, context, kept_counts)){
             return true;
         }
-    }catch (OperationFailedException&){
-        env.log("Encountered error... SR'ing...", COLOR_RED);
+    }catch (BerryNotFoundException& e){
+        stats.errors++;
+        env.update_stats();
+        consecutive_ingredient_fails++;
+        if (consecutive_ingredient_fails >= 3){
+            throw;
+        }
+        send_program_recoverable_error_notification(
+            env,
+            NOTIFICATION_ERROR_RECOVERABLE,
+            e.message(),
+            env.console.video().snapshot_latest_blocking()
+        );
+
+    }catch (OperationFailedException& e){
+        stats.errors++;
+        env.update_stats();
+        send_program_recoverable_error_notification(
+            env,
+            NOTIFICATION_ERROR_RECOVERABLE,
+            e.message(),
+            env.console.video().snapshot_latest_blocking()
+        );
     }
 
 
-    load_backup_save(env, context);
+    load_backup_save(env, NOTIFICATION_ERROR_RECOVERABLE, context);
     return false;
 }
 
@@ -638,9 +662,10 @@ void DonutMaker::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     reset_map_filter_state(env, context);
 
     std::vector<uint16_t> kept_counts(FLAVOR_POWERS.snapshot().size(), 0);
+    size_t consecutive_ingredient_fails = 0;
     uint16_t total_kept = 0;
-    while(true){
-        const bool should_keep = donut_iteration(env, context, kept_counts);
+    while (true){
+        const bool should_keep = donut_iteration(env, context, kept_counts, consecutive_ingredient_fails);
         stats.resets++;
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS);

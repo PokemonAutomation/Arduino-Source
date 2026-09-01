@@ -65,26 +65,28 @@ void AutoStory_Segment_16::run_segment(
 
 std::string AutoStory_Checkpoint_35::name() const{ return "035 - " + AutoStory_Segment_16().name(); }
 std::string AutoStory_Checkpoint_35::start_text() const{ return "At Cascarrafa (West) Pokecenter.";}
-std::string AutoStory_Checkpoint_35::end_text() const{ return "At Cascarrafa Gym. Received Kofu's wallet.";}
+std::string AutoStory_Checkpoint_35::end_text() const{ return "Outside Cascarrafa Gym. Received Kofu's wallet.";}
 void AutoStory_Checkpoint_35::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_35(env, context, options.notif_status_update, stats);
+    checkpoint_35(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 std::string AutoStory_Checkpoint_36::name() const{ return "036 - " + AutoStory_Segment_16().name(); }
 std::string AutoStory_Checkpoint_36::start_text() const{ return AutoStory_Checkpoint_35().end_text();}
 std::string AutoStory_Checkpoint_36::end_text() const{ return "At Porto Marinada Pokecenter.";}
 void AutoStory_Checkpoint_36::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_36(env, context, options.notif_status_update, stats);
+    checkpoint_36(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 void checkpoint_35(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 ){
     
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
         DirectionDetector direction;
@@ -123,13 +125,15 @@ void checkpoint_35(
 }
 
 void checkpoint_36(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 ){
     
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
 

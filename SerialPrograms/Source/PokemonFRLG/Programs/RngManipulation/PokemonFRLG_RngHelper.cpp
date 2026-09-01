@@ -87,6 +87,7 @@ RngHelper::RngHelper()
             {PokemonFRLG_RngTarget::gamecornerpinsir, "gamecornerpinsir", "Game Corner Pinsir"},
             {PokemonFRLG_RngTarget::gamecornerporygon, "gamecornerporygon", "Game Corner Porygon"},
             {PokemonFRLG_RngTarget::togepi, "togepi", "Togepi"},
+            {PokemonFRLG_RngTarget::togepifast, "togepifast", "Togepi (pre-approved)"},
             {PokemonFRLG_RngTarget::eggheld, "eggheld", "Daycare Egg Held Frame"},
             {PokemonFRLG_RngTarget::eggpickup, "eggpickup", "Daycare Egg Pickup"},
             {PokemonFRLG_RngTarget::staticencounter, "staticencounter", "Static Overworld Encounters"},
@@ -294,7 +295,8 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         
         // handle the blind part
         reset_and_perform_blind_sequence(
-            env.console, context, TARGET, 
+            env.console, context, 
+            LANGUAGE, TARGET, 
             SEED_BUTTON, EXTRA_BUTTON, 
             timings, launch_delay,
             SAFARI_ZONE, PROFILE

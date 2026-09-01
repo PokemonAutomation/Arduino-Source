@@ -42,8 +42,8 @@ public:
     //  If callback already exists, the period will be overwritten and the next
     //  call will be set to (now + period).
     void add(WatchdogCallback& callback, std::chrono::milliseconds period);
-    void remove(WatchdogCallback& callback);
-    bool try_remove(WatchdogCallback& callback);
+    void remove(WatchdogCallback& callback) noexcept;
+    bool try_remove(WatchdogCallback& callback) noexcept;
 
     //  Delay the specified callback. If the callback is current running, this
     //  function does nothing.

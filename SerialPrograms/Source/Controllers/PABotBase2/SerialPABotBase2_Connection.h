@@ -10,8 +10,8 @@
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/SerialConnection/SerialConnection.h"
 #include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2CC_ReliableStreamConnection.h"
+#include "Controllers/SerialPort/SerialLogger.h"
 #include "Controllers/PABotBase2/PABotBase2_Connection.h"
-#include "Controllers/SerialPABotBase/Connection/MessageLogger.h"
 
 namespace PokemonAutomation{
 namespace SerialPABotBase{

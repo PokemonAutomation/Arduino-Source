@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/StaticGlobals.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -122,8 +122,8 @@ bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, ProCont
             {dialog}
         );
         if (ret != 0){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "End of trial not detected after 3 minutes.",
                 env.console
             );
@@ -160,8 +160,8 @@ bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, ProCont
             trial_passed = true;
             continue;
         default:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "No recognized state after 80 seconds.",
                 env.console
             );

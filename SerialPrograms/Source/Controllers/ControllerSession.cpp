@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
+//#include "Common/Cpp/Exceptions.h"
 //#include "ControllerTypeStrings.h"
 #include "ControllerSession.h"
 
@@ -78,14 +78,23 @@ std::vector<ControllerType> ControllerSession::available_controllers() const{
     return m_connection->controller_list();
 }
 
-void ControllerSession::get(ControllerOption& option){
+void ControllerSession::save(ControllerOption& option) const{
     ReadSpinLock lg(m_state_lock);
     option = m_option;
 }
-void ControllerSession::set(const ControllerOption& option){
+void ControllerSession::load(const ControllerOption& option){
     set_device(option.descriptor());
 }
 
+
+bool ControllerSession::input_enabled() const{
+    ReadSpinLock lg(m_state_lock);
+    return m_option.m_enable_input;
+}
+void ControllerSession::set_input_enabled(bool enabled){
+    WriteSpinLock lg(m_state_lock);
+    m_option.m_enable_input = enabled;
+}
 
 
 bool ControllerSession::ready() const{
@@ -95,6 +104,14 @@ bool ControllerSession::ready() const{
     }
     return m_controller->is_ready();
 }
+ControllerConnection::Status ControllerSession::connection_status() const{
+    ReadSpinLock lg(m_state_lock);
+    if (!m_connection){
+        return ControllerConnection::Status::NOT_CONNECTED;
+    }
+    return m_connection->status();
+}
+
 std::shared_ptr<ControllerDescriptor> ControllerSession::descriptor() const{
     ReadSpinLock lg(m_state_lock);
     return m_descriptor;
@@ -112,12 +129,6 @@ std::string ControllerSession::status_text() const{
         return "<font color=\"red\">No controller selected.</font>";
     }
     return m_connection->status_text();
-}
-ControllerConnection& ControllerSession::connection() const{
-    if (m_connection){
-        return *m_connection;
-    }
-    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Connection is null.");
 }
 AbstractController* ControllerSession::controller() const{
     return m_controller.get();
@@ -140,7 +151,7 @@ std::string ControllerSession::user_input_blocked() const{
     return m_user_input_disallow_reason;
 }
 void ControllerSession::set_user_input_blocked(std::string disallow_reason){
-    ReadSpinLock lg(m_state_lock);
+    WriteSpinLock lg(m_state_lock);
 //    cout << "set_user_input_blocked() = " << disallow_reason << endl;
     m_user_input_disallow_reason = std::move(disallow_reason);
 }
@@ -246,6 +257,7 @@ bool ControllerSession::set_controller(ControllerType controller_type){
                 return false;
             }
             if (m_connection){
+//                cout << (int)m_connection->current_controller() << endl;
                 if (m_connection->current_controller() == controller_type){
                     return true;
                 }

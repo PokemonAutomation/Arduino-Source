@@ -9,7 +9,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Exceptions/UnexpectedBattleException.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -292,10 +292,10 @@ void run_material_farmer(
             
             context.wait_for_all_requests();
         }
-    }catch (OperationFailedException& e){
+    }catch (OperationFailedExceptionWithScreenshot& e){
         stats.m_errors++;
         env.update_stats();
-        e.send_notification(env, options.NOTIFICATION_ERROR_RECOVERABLE);
+        e.send_recoverable_error_notif_and_telemetry_report(env, options.NOTIFICATION_ERROR_RECOVERABLE);
 
         // save screenshot after operation failed, 
         // dump_snapshot(console);
@@ -308,7 +308,7 @@ void run_material_farmer(
 
         consecutive_failures++;
         if (consecutive_failures >= max_consecutive_failures){
-            throw e;
+            throw;
         }
 
         env.log("Reset game to handle recoverable error.");
@@ -689,8 +689,8 @@ void run_from_battles_and_back_to_pokecenter(
             stream.overlay().add_log("Detected battle. Now running away.");
             try{
                 run_from_battle(stream, context);
-            }catch (OperationFailedException& e){
-                throw FatalProgramException(std::move(e));
+            }catch (OperationFailedExceptionWithScreenshot& e){
+                throw FatalProgramException(e.error_report_mode(), e.message(), e.video_stream(), e.screenshot());
             }
         }
     } 
@@ -748,8 +748,8 @@ void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, VideoStream&
     }
 
     if (!isFlySuccessful){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to fly to Blueberry academy, five times in a row.",
             stream
         );
@@ -817,8 +817,8 @@ void move_from_blueberry_entrance_to_league_club(const ProgramInfo& info, VideoS
     }
 
     if (!isSuccessful){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to enter League club room, five times in a row.",
             stream
         );
@@ -867,8 +867,8 @@ void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, Video
         stream.log("Blueberry navigation menu detected.");
     }else{
         stream.log("Failed to detect Blueberry navigation menu.");
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to find the exit from the League room.",
             stream
         );
@@ -883,8 +883,8 @@ void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, Video
     if (ret == 0){
         stream.log("Overworld detected");
     }else{
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to detect overworld.",
             stream
         );      
@@ -933,8 +933,8 @@ void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, VideoStream
 
     if (!isFlySuccessful){
 
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to fly to North province area 3, ten times in a row.",
             stream
         );

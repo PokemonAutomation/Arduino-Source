@@ -76,7 +76,7 @@ std::string download_file(Logger& logger, const std::string& url){
     if (!reply){
         std::string str = "QNetworkReply is null.";
 //        logger.log(str, COLOR_RED);
-        throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, str);
+        throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, str);
     }else if (reply->error() == QNetworkReply::NoError){
 //        QString contents = QString::fromUtf8(reply->readAll());
 //        qDebug() << contents;
@@ -84,7 +84,7 @@ std::string download_file(Logger& logger, const std::string& url){
         QString error_string = reply->errorString();
         std::string str = "Network Error: " + error_string.toStdString();
 //        logger.log(str, COLOR_RED);
-        throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, str);
+        throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, str);
 //        QString err = reply->errorString();
 //        qDebug() << err;
     }
@@ -113,7 +113,7 @@ void download_file_to_disk(
     // 1. Initialize QSaveFile
     QSaveFile file(QString::fromStdString(file_path));
     if (!file.open(QIODevice::WriteOnly)) {
-        throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
+        throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, 
             "Could not open save file: " + file_path);
     }
 
@@ -161,7 +161,7 @@ void download_file_to_disk(
     if (reply->error() == QNetworkReply::NoError) {
         // This moves the temporary file to the final destination 'file_path'
         if (!file.commit()) {
-            throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
+            throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, 
                 "Failed to commit file to disk: " + file_path);
         }
     } else {
@@ -171,7 +171,7 @@ void download_file_to_disk(
         }else{
             QString error_string = reply->errorString();
             // QSaveFile automatically deletes the temp file if commit() isn't called
-            throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
+            throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, 
                 "Network Error: " + error_string.toStdString());
         }
     }

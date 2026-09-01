@@ -45,21 +45,25 @@ public:
 
 
 // start: At Cascarrafa (West) Pokecenter.
-// end: At Cascarrafa Gym. Received Kofu's wallet.
+// end: Outside Cascarrafa Gym. Received Kofu's wallet.
 void checkpoint_35(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
-// start: At Cascarrafa Gym. Received Kofu's wallet.
+// start: Outside Cascarrafa Gym. Received Kofu's wallet.
 // end: At Porto Marinada Pokecenter.
 void checkpoint_36(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 

@@ -24,17 +24,23 @@ public:
 class ReadStats : public SingleSwitchProgramInstance{
 public:
     ReadStats();
-    virtual void program(
-        SingleSwitchProgramEnvironment &env,
-        ProControllerContext &context
-    ) override;
 
+    virtual void start_program_controller_check(ControllerSession& session) override{}
     virtual void start_program_border_check(
         VideoStream &stream, FeedbackType feedback_type
     ) override{}
+    virtual void program(
+        SingleSwitchProgramEnvironment &env,
+        CancellableScope &scope
+    ) override;
 
 private:
+    enum class SummaryPage{
+        first,
+        second
+    };
     OCR::LanguageOCROption LANGUAGE;
+    EnumDropdownOption<SummaryPage> PAGE;
 };
 
 } // namespace PokemonFRLG

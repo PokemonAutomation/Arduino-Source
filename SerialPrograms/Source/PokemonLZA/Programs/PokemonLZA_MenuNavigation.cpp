@@ -5,7 +5,7 @@
  *  Functions to navigate main menu
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 // #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 // #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -55,16 +55,16 @@ void overworld_to_main_menu(ConsoleHandle& console, ProControllerContext& contex
             pbf_press_button(context, BUTTON_B, 160ms, 240ms);
             continue;
         default:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "overworld_to_main_menu(): No state detected after 30 seconds.",
                 console
             );
         }
     }
 
-    OperationFailedException::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+    OperationFailedExceptionWithScreenshot::fire(
+        ErrorReportMode::SEND_ERROR_REPORT,
         "overworld_to_main_menu(): Failed to enter box system after 2 minutes.",
         console
     );
@@ -100,16 +100,16 @@ void overworld_to_box_system(ConsoleHandle& console, ProControllerContext& conte
             console.log("Detected Box System...");
             return;
         default:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "overworld_to_box_system(): No state detected after 30 seconds.",
                 console
             );
         }
     }
 
-    OperationFailedException::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+    OperationFailedExceptionWithScreenshot::fire(
+        ErrorReportMode::SEND_ERROR_REPORT,
         "overworld_to_box_system(): Failed to enter box system after 2 minutes.",
         console
     );
@@ -145,16 +145,16 @@ void box_system_to_overworld(ConsoleHandle& console, ProControllerContext& conte
             pbf_press_button(context, BUTTON_B, 160ms, 240ms);
             continue;
         default:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "overworld_to_box_system(): No state detected after 30 seconds.",
                 console
             );
         }
     }
 
-    OperationFailedException::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+    OperationFailedExceptionWithScreenshot::fire(
+        ErrorReportMode::SEND_ERROR_REPORT,
         "overworld_to_box_system(): Failed to exit box system after 2 minutes.",
         console
     );

@@ -5,12 +5,17 @@
  */
 
 #include <cmath>
+#include <algorithm>
 #include <map>
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonTools/Images/DistanceToLine.h"
 #include "PokemonSwSh_SparkleDetectorSquare.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -313,7 +318,7 @@ double normalize_angle_0_360_new(double angle){
 
 
 //  Get all the pixels that border the background.
-std::multimap<double, std::pair<size_t, size_t>> get_edge_pixels(
+std::vector<std::pair<double, std::pair<size_t, size_t>>> get_edge_pixels(
     const PackedBinaryMatrix& object,
     const WaterfillObject& background,
     size_t center_x, size_t center_y,
@@ -322,7 +327,7 @@ std::multimap<double, std::pair<size_t, size_t>> get_edge_pixels(
     size_t width = object.width();
     size_t height = object.height();
 
-    std::multimap<double, std::pair<size_t, size_t>> edge_pixels;
+    std::vector<std::pair<double, std::pair<size_t, size_t>>> edge_pixels;
     if (background.area == 0){
         //  No background. Grab the entire edge.
         for (size_t r = 0; r < height; r++){
@@ -337,7 +342,7 @@ std::multimap<double, std::pair<size_t, size_t>> get_edge_pixels(
                         (ptrdiff_t)c - (ptrdiff_t)center_x
                     ) * 57.295779513082320877;
                     angle = normalize_angle_0_360_new(angle - base_angle);
-                    edge_pixels.emplace(
+                    edge_pixels.emplace_back(
                         angle,
                         std::pair<size_t, size_t>{c, r}
                     );
@@ -365,7 +370,7 @@ std::multimap<double, std::pair<size_t, size_t>> get_edge_pixels(
                     (ptrdiff_t)c - (ptrdiff_t)center_x
                 ) * 57.295779513082320877;
                 angle = normalize_angle_0_360_new(angle - base_angle);
-                edge_pixels.emplace(
+                edge_pixels.emplace_back(
                     angle,
                     std::pair<size_t, size_t>{c, r}
                 );
@@ -373,6 +378,32 @@ std::multimap<double, std::pair<size_t, size_t>> get_edge_pixels(
         }
     }
     return edge_pixels;
+}
+
+
+template <typename Key, typename Value>
+typename std::vector<std::pair<Key, Value>>::const_iterator lower_bound(
+    const std::vector<std::pair<Key, Value>>& sorted_vector,
+    const Key& target
+){
+    return std::lower_bound(
+        sorted_vector.begin(), sorted_vector.end(), target,
+        [](const std::pair<Key, Value>& element, const Key& key) {
+            return element.first < key;
+        }
+    );
+}
+template <typename Key, typename Value>
+typename std::vector<std::pair<Key, Value>>::const_iterator upper_bound(
+    const std::vector<std::pair<Key, Value>>& sorted_vector,
+    const Key& target
+){
+    return std::upper_bound(
+        sorted_vector.begin(), sorted_vector.end(), target,
+        [](const Key& key, const std::pair<Key, Value>& element) {
+            return key < element.first;
+        }
+    );
 }
 
 
@@ -393,7 +424,7 @@ double area_of_triangle(
 //      [point_hi_x, point_hi_y]
 //
 double sum_squares_from_line(
-    const std::multimap<double, std::pair<size_t, size_t>>& points_by_angle,
+    const std::vector<std::pair<double, std::pair<size_t, size_t>>>& points_by_angle,
     double point_lo_angle, size_t point_lo_x, size_t point_lo_y,
     double point_hi_angle, size_t point_hi_x, size_t point_hi_y
 ){
@@ -404,8 +435,8 @@ double sum_squares_from_line(
 //    double sum = 0;
     double sum_sqr = 0;
 
-    auto iter0 = points_by_angle.lower_bound(point_lo_angle);
-    auto iter1 = points_by_angle.lower_bound(point_hi_angle);
+    auto iter0 = lower_bound(points_by_angle, point_lo_angle);
+    auto iter1 = lower_bound(points_by_angle, point_hi_angle);
     DistanceToLine calc(
         point_lo_x, point_lo_y,
         point_hi_x, point_hi_y
@@ -522,7 +553,7 @@ bool is_square_sparkle(const Kernels::Waterfill::WaterfillObject& object, double
 
 
     //  Get all the edge pixels.
-    std::multimap<double, std::pair<size_t, size_t>> edge_pixels = get_edge_pixels(
+    std::vector<std::pair<double, std::pair<size_t, size_t>>> edge_pixels = get_edge_pixels(
         matrix, background,
         center_x, center_y, far_corner0.angle
     );
@@ -533,6 +564,13 @@ bool is_square_sparkle(const Kernels::Waterfill::WaterfillObject& object, double
 //    for (const auto& item : points_by_angle){
 //        cout << item.first << " : distance = " << item.second.distance << ", (" << item.second.x << "," << item.second.y << ")" << endl;
 //    }
+    std::sort(
+        edge_pixels.begin(),
+        edge_pixels.end(),
+        [](const auto& a, const auto& b) {
+            return a.first < b.first;
+        }
+    );
 
 
     PackedBinaryMatrix test(width, height);

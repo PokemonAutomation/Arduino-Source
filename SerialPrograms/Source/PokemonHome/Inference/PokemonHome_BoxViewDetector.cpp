@@ -57,9 +57,48 @@ private:
 
 void add_tests_BoxViewDetector(UnitTestDatabase& database){
     database.add<Test_BoxViewDetector>("PokemonHome/BoxView/BoxView-1.png", true);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/annihilape_Regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/bidoof_Regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/bulbasaur_Regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Go.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Lza.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/capskid_Regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/castform_Regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/cyclizar_Regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/dudunsparce_Regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/dudunsparce_Regular_Sv.png", false);
     database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/enamorus_Shiny.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/gimmighoul_Regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/glimmet_Regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/gogoat_Regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/greatTusk_Shiny.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/hatterne_Regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/houndstone_Regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/ironBunde_Regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/ironBundle_Regular_Sv.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/ironJugulis_Regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/ironThorns_Regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/kilowattrel_Regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/kingler_Shiny.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/komala_Regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/krabby_Shiny.png", false);
     database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/machamp_Regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/pancham_Shiny.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/rapidash_Regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/rellor_Regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/riolu_Regular.png", false);
     database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/rowlet_ShinyAlpha.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/scovillain_Regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/slitherWing_Shiny.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/squirtle_Shiny.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/tapuLele_Shiny.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/tatsugiri_Regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/teddiursa_Regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/terapagos_regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/vulpix_Regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/vulpix_Shiny.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/wartortle_Regular.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/wurmple_Regular.png", false);
 }
 
 }

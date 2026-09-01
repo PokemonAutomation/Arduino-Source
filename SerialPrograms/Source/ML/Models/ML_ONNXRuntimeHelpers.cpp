@@ -5,11 +5,6 @@
  *  Helper functions to work with ONNX Runtime library
  */
 
-#include <QString>
-#include <QFile>
-#include <QCryptographicHash>
-#include <QByteArray>
-
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -19,111 +14,99 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Tools/FileHash.h"
+#include "ML_OrtEnv.h"
 #include "ML_ONNXRuntimeHelpers.h"
 
 namespace PokemonAutomation{
 namespace ML{
 
 
-// Computes the cryptographic hash of a file.
-std::string create_file_hash(const std::string& filepath){
-    QFile file(QString::fromStdString(filepath));
-    if (!file.open(QIODevice::ReadOnly)){
-        return "";
-    }
-
-    QCryptographicHash hash(QCryptographicHash::Sha256);
-    if (hash.addData(&file)){
-        return hash.result().toHex(0).toStdString();
-    }else{
-        return "";
-    }
-}
 
 
 Ort::SessionOptions create_session_options(const std::string& model_cache_path, bool use_gpu){
     Ort::SessionOptions so;
     std::cout << "Set potential model cache path in session options: " << model_cache_path << std::endl;
 
-if (use_gpu){
+    if (use_gpu){
 #if __APPLE__
-    // create session using Apple ML acceleration library CoreML
-    std::unordered_map<std::string, std::string> provider_options;
-    // See for provider options: https://onnxruntime.ai/docs/execution-providers/CoreML-ExecutionProvider.html
-    // "NeuralNetwork" is a faster ModelFormat than "MLProgram".
-    provider_options["ModelFormat"] = std::string("NeuralNetwork");
-    provider_options["ModelCacheDirectory"] = model_cache_path;
+        // create session using Apple ML acceleration library CoreML
+        std::unordered_map<std::string, std::string> provider_options;
+        // See for provider options: https://onnxruntime.ai/docs/execution-providers/CoreML-ExecutionProvider.html
+        // "NeuralNetwork" is a faster ModelFormat than "MLProgram".
+        provider_options["ModelFormat"] = std::string("NeuralNetwork");
+        provider_options["ModelCacheDirectory"] = model_cache_path;
 
-    // provider_options["MLComputeUnits"] = "ALL";
-    // provider_options["RequireStaticInputShapes"] = "0";
-    // provider_options["EnableOnSubgraphs"] = "0";
-    so.AppendExecutionProvider("CoreML", provider_options);
-    std::cout << "Using CoreML execution provider for GPU acceleration" << std::endl;
+        // provider_options["MLComputeUnits"] = "ALL";
+        // provider_options["RequireStaticInputShapes"] = "0";
+        // provider_options["EnableOnSubgraphs"] = "0";
+        so.AppendExecutionProvider("CoreML", provider_options);
+        std::cout << "Using CoreML execution provider for GPU acceleration" << std::endl;
 #elif _WIN32
-    // Try CUDA first for NVIDIA GPUs (best performance)
-    // CUDA requires NVIDIA GPU and CUDA runtime installation
-    // See: https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html
-    bool cuda_available = false;
-    try{
-        OrtCUDAProviderOptions cuda_options{};
-        cuda_options.device_id = 0;
-        so.AppendExecutionProvider_CUDA(cuda_options);
-        std::cout << "Using CUDA execution provider for GPU acceleration" << std::endl;
-        cuda_available = true;
-    }catch (const Ort::Exception& e){
-        std::cout << "CUDA execution provider not available: " << e.what() << std::endl;
-    }
-
-    bool rocm_available = false;
-    if (!cuda_available){
-        // Try ROCm next for AMD GPUs
-        // See: https://onnxruntime.ai/docs/execution-providers/ROCm-ExecutionProvider.html
+        // Try CUDA first for NVIDIA GPUs (best performance)
+        // CUDA requires NVIDIA GPU and CUDA runtime installation
+        // See: https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html
+        bool cuda_available = false;
         try{
-            OrtROCMProviderOptions rocm_options{};
-            rocm_options.device_id = 0;
-            so.AppendExecutionProvider_ROCM(rocm_options);
-            std::cout << "Using ROCm execution provider for GPU acceleration" << std::endl;
-            rocm_available = true;
+            OrtCUDAProviderOptions cuda_options{};
+            cuda_options.device_id = 0;
+            so.AppendExecutionProvider_CUDA(cuda_options);
+            std::cout << "Using CUDA execution provider for GPU acceleration" << std::endl;
+            cuda_available = true;
         }catch (const Ort::Exception& e){
-            std::cout << "ROCm execution provider not available: " << e.what() << std::endl;
+            std::cout << "CUDA execution provider not available: " << e.what() << std::endl;
         }
-    }
 
-    // Fallback to DirectML for all GPU vendors (NVIDIA, AMD, Intel)
-    // DirectML is built into Windows 10 1903+ and requires no additional runtime installation
-    // See: https://onnxruntime.ai/docs/execution-providers/DirectML-ExecutionProvider.html
-    if (!cuda_available and !rocm_available){
-        try{
-            so.AppendExecutionProvider("DML");
-            std::cout << "Using DirectML execution provider for GPU acceleration" << std::endl;
-        }catch (const Ort::Exception& e){
-            std::cout << "DirectML execution provider not available, falling back to CPU: " << e.what() << std::endl;
+        bool rocm_available = false;
+        if (!cuda_available){
+            // Try ROCm next for AMD GPUs
+            // See: https://onnxruntime.ai/docs/execution-providers/ROCm-ExecutionProvider.html
+            try{
+                OrtROCMProviderOptions rocm_options{};
+                rocm_options.device_id = 0;
+                so.AppendExecutionProvider_ROCM(rocm_options);
+                std::cout << "Using ROCm execution provider for GPU acceleration" << std::endl;
+                rocm_available = true;
+            }catch (const Ort::Exception& e){
+                std::cout << "ROCm execution provider not available: " << e.what() << std::endl;
+            }
         }
-    }
+
+        // Fallback to DirectML for all GPU vendors (NVIDIA, AMD, Intel)
+        // DirectML is built into Windows 10 1903+ and requires no additional runtime installation
+        // See: https://onnxruntime.ai/docs/execution-providers/DirectML-ExecutionProvider.html
+        if (!cuda_available and !rocm_available){
+            try{
+                so.AppendExecutionProvider("DML");
+                std::cout << "Using DirectML execution provider for GPU acceleration" << std::endl;
+            }catch (const Ort::Exception& e){
+                std::cout << "DirectML execution provider not available, falling back to CPU: " << e.what() << std::endl;
+            }
+        }
 #elif defined(__linux__)
-    // Try CUDA first for NVIDIA GPUs (best performance)
-    // See: https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html
-    try{
-        OrtCUDAProviderOptions cuda_options{};
-        cuda_options.device_id = 0;
-        so.AppendExecutionProvider_CUDA(cuda_options);
-        std::cout << "Using CUDA execution provider for GPU acceleration" << std::endl;
-    }catch (const Ort::Exception& e){
-        std::cout << "CUDA execution provider not available, trying ROCm: " << e.what() << std::endl;
-
-        // Try ROCm next for AMD GPUs
-        // See: https://onnxruntime.ai/docs/execution-providers/ROCm-ExecutionProvider.html
+        // Try CUDA first for NVIDIA GPUs (best performance)
+        // See: https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html
         try{
-            OrtROCMProviderOptions rocm_options{};
-            rocm_options.device_id = 0;
-            so.AppendExecutionProvider_ROCM(rocm_options);
-            std::cout << "Using ROCm execution provider for GPU acceleration" << std::endl;
+            OrtCUDAProviderOptions cuda_options{};
+            cuda_options.device_id = 0;
+            so.AppendExecutionProvider_CUDA(cuda_options);
+            std::cout << "Using CUDA execution provider for GPU acceleration" << std::endl;
         }catch (const Ort::Exception& e){
-            std::cout << "ROCm execution provider not available, falling back to CPU: " << e.what() << std::endl;
+            std::cout << "CUDA execution provider not available, trying ROCm: " << e.what() << std::endl;
+
+            // Try ROCm next for AMD GPUs
+            // See: https://onnxruntime.ai/docs/execution-providers/ROCm-ExecutionProvider.html
+            try{
+                OrtROCMProviderOptions rocm_options{};
+                rocm_options.device_id = 0;
+                so.AppendExecutionProvider_ROCM(rocm_options);
+                std::cout << "Using ROCm execution provider for GPU acceleration" << std::endl;
+            }catch (const Ort::Exception& e){
+                std::cout << "ROCm execution provider not available, falling back to CPU: " << e.what() << std::endl;
+            }
         }
-    }
 #endif
-}
+    }
 
     // CPU fallback is always available
     return so;
@@ -142,7 +125,7 @@ if (use_gpu){
 // model_path: the model path to load the ML model. This is needed to ensure we delete the old model cache
 //   when a new model
 std::pair<bool, std::string> clean_up_old_model_cache(const std::string& model_cache_path, const std::string& model_path){
-    std::string file_hash = create_file_hash(model_path);
+    std::string file_hash = hash_file(model_path);
     if (file_hash.size() == 0){
         // the model file cannot be loaded
         return {true, ""};
@@ -181,7 +164,6 @@ void write_cache_flag_file(const std::string& model_cache_path, const std::strin
 
 
 Ort::Session create_session(
-    const Ort::Env& env, 
     const std::string& model_path, 
     const std::string& model_cache_path,
     bool try_gpu
@@ -200,7 +182,8 @@ Ort::Session create_session(
         try{
             logger.log("Attempting to create Ort::Session with GPU acceleration...");
             Ort::SessionOptions gpu_options = create_session_options(model_cache_path, true);
-            Ort::Session session{env, onnx_path.c_str(), gpu_options};
+            gpu_options.DisablePerSessionThreads();
+            Ort::Session session{global_ort_env(), onnx_path.c_str(), gpu_options};
             logger.log("Ort::Session created");
             // when Ort::Ssssion is created, if possible, it will create a model cache
             if (write_flag_file){
@@ -220,9 +203,10 @@ Ort::Session create_session(
     try {
         logger.log("Creating dedicated CPU-only session...");
         
-        Ort::SessionOptions cpu_options = create_session_options(model_cache_path, false);;
+        Ort::SessionOptions cpu_options = create_session_options(model_cache_path, false);
+        cpu_options.DisablePerSessionThreads();
         
-        Ort::Session session{env, onnx_path.c_str(), cpu_options};
+        Ort::Session session{global_ort_env(), onnx_path.c_str(), cpu_options};
         logger.log("Ort::Session created");
         return session;
     }
@@ -272,14 +256,8 @@ void print_model_input_output_info(const Ort::Session& session){
     }
 }
 
-Ort::Env create_ORT_env(){
-#if ORT_API_VERSION < 24 // Removed in ONNX Runtime 1.24.0
-    if (Ort::Global<void>::api_ == nullptr){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Onnx API returned a null pointer.");
-    }
-#endif
-    return Ort::Env();
-}
+
+
 
 }
 }

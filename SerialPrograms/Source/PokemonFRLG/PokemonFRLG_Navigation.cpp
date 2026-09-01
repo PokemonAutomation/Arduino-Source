@@ -7,7 +7,7 @@
  */
 
 #include <array>
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Random.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -18,12 +18,12 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
-#include "NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_PartyDialogs.h"
+#include "PokemonFRLG/Inference/Sounds/PokemonFRLG_CatchFanfareDetector.h"
 #include "PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_BagDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
@@ -33,6 +33,9 @@
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_PartyMenuDetector.h"
 #include "PokemonFRLG/Inference/Map/PokemonFRLG_MapDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_BattlePokemonDetector.h"
+#include "PokemonFRLG/Inference/PokemonFRLG_PokedexRegisteredDetector.h"
+#include "PokemonFRLG/Programs/PokemonFRLG_BattleMenuNavigation.h"
+#include "PokemonFRLG/Programs/PokemonFRLG_SafariOptimalAction.h"
 #include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
 #include "PokemonFRLG_Navigation.h"
 
@@ -172,8 +175,8 @@ uint64_t soft_reset(ConsoleHandle& console, ProControllerContext& context){
             return errors;
         }
     }
-    OperationFailedException::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+    OperationFailedExceptionWithScreenshot::fire(
+        ErrorReportMode::SEND_ERROR_REPORT,
         "soft_reset(): Failed to reset after 5 attempts.",
         console
     );
@@ -296,8 +299,8 @@ uint64_t open_slot_six(ConsoleHandle& console, ProControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 10000ms);
         }
     }
-    OperationFailedException::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+    OperationFailedExceptionWithScreenshot::fire(
+        ErrorReportMode::SEND_ERROR_REPORT,
         "open_slot_six(): Failed to open party summary after 5 attempts.",
         console
     );
@@ -322,8 +325,8 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
             if (ret == 0){
                 console.log("Battle Advance arrow detected.");
             }else{
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "handle_encounter(): Did not detect battle advance arrow.",
                     console
                 );
@@ -345,8 +348,8 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
             if (ret2 == 0){
                 console.log("Battle menu detecteed!");
             }else{
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "handle_encounter(): Did not detect battle menu.",
                     console
                 );
@@ -373,8 +376,8 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
         
         while (true){
             if (current_time() - start > 60s){
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "handle_encounter(): No battle menu detected after sixty seconds.",
                     console
                 );
@@ -415,14 +418,14 @@ BattleResult spam_first_move(ConsoleHandle& console, ProControllerContext& conte
     uint16_t times_moved = 0;
     while (true){
         if (errors > 5) {
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "spam_first_move(): Failed to use move 5 times.",
                 console
             );  
         } else if (times_moved > 50){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "spam_first_move(): More than 50 move uses detected.",
                 console
             );  
@@ -499,8 +502,8 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context){
     while (true)
     {
         if (errors > 5){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "flee_battle(): Failed to flee battle after 5 attempts.",
                 console
             );
@@ -581,8 +584,8 @@ bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, boo
     bool move_learned = false;
     while (true){
         if (errors > 5 || loops > 5){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "exit_wild_battle(): Failed to exit battle.",
                 console
             );
@@ -701,8 +704,8 @@ void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext
     bool start_menu_is_open = false;
     while (true){
         if (errors > 5){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "open_party_menu_from_overworld(): Failed to open party menu 5 times in a row.",
                 console
             );
@@ -782,8 +785,8 @@ void open_bag_from_overworld(ConsoleHandle& console, ProControllerContext& conte
     bool start_menu_is_open = false;
     while (true){
         if (errors > 5){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "open_party_menu_from_overworld(): Failed to open party menu 5 times in a row.",
                 console
             );
@@ -843,8 +846,8 @@ void use_sweet_scent_from_overworld(ConsoleHandle& console, ProControllerContext
     
     while (true){
         if (errors > 5){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "use_teleport_from_overworld(): Failed to use Teleport 5 times in a row.",
                 console
             );
@@ -890,8 +893,8 @@ void use_teleport_from_overworld(ConsoleHandle& console, ProControllerContext& c
     
     while (true){
         if (errors > 5){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "use_teleport_from_overworld(): Failed to use Teleport 5 times in a row.",
                 console
             );
@@ -951,8 +954,8 @@ void open_fly_map_from_overworld(ConsoleHandle& console, ProControllerContext& c
     uint16_t errors = 0;
     while (true){
         if (errors > 5){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "open_fly_map_from_overworld(): Failed to open Fly map 5 times in a row.",
                 console
             );
@@ -1010,8 +1013,8 @@ void fly_from_kanto_map(ConsoleHandle& console, ProControllerContext& context, K
     
     while (true){
         if (errors > 5){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "fly_from_kanto_map(): Failed to inititate Fly five times in a row.",
                 console
             ); 
@@ -1075,8 +1078,8 @@ void fly_from_kanto_map(ConsoleHandle& console, ProControllerContext& context, K
             pbf_move_left_joystick(context, {+1, 0}, 150ms, 100ms);
             break;
         default:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "fly_from_kanto_map(): Unimplemented Kanto fly target.",
                 console
             );
@@ -1114,8 +1117,8 @@ void enter_leave_pokecenter(ConsoleHandle& console, ProControllerContext& contex
 
     while (true){
         if (errors > 5){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 leave ? "leave_pokecenter(): Failed to exit PokeCenter." : "enter_pokecenter(): Failed to enter PokeCenter.",
                 console
             );
@@ -1158,8 +1161,8 @@ void heal_at_pokecenter(ConsoleHandle& console, ProControllerContext& context){
 
     while (true){
         if (errors > 5){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "heal_at_pokecenter(): Failed to initiate PokeCenter dialog.",
                 console
             );
@@ -1191,6 +1194,300 @@ void heal_at_pokecenter(ConsoleHandle& console, ProControllerContext& context){
         context.wait_for_all_requests();
         return;
     }
+}
+
+// tries to pull up the start menu to check if currently in the overworld
+bool in_overworld(
+    ConsoleHandle& console,
+    ProControllerContext& context
+){
+    StartMenuWatcher start_menu;
+    context.wait_for_all_requests();
+    int ret = run_until<ProControllerContext>(
+        console, context,
+        [](ProControllerContext& context) {
+            for (int i = 0; i < 3; i++){
+                pbf_press_button(context, BUTTON_PLUS, 200ms, 1800ms);
+                pbf_mash_button(context, BUTTON_B, 500ms);
+            }
+        },
+        { start_menu }
+    );
+    bool overworld = (ret == 0);
+    if (overworld){
+        pbf_mash_button(context, BUTTON_B, 500ms);
+    }
+    context.wait_for_all_requests();
+    return overworld;
+}
+
+
+void exit_battle_after_catch(
+    ConsoleHandle& console,
+    ProControllerContext& context
+){
+    AdvanceBattleDialogWatcher advance_battle_dialog(COLOR_RED);
+    WhiteDialogWatcher white_dialog(COLOR_RED);
+    PokedexRegisteredWatcher dex_registration(COLOR_RED, &console.overlay());
+    BattleSelectionArrowWatcher nickname_question_arrow(
+        COLOR_RED,
+        &console.overlay(),
+        BattleConfirmationOption::YES
+    );
+
+    bool exiting_menus = true;
+    int attempts = 0;
+    while (exiting_menus){
+        int ret = wait_until(
+            console, context,
+            std::chrono::milliseconds(5000),
+            { nickname_question_arrow, white_dialog, advance_battle_dialog, dex_registration }
+        );
+
+        switch (ret){
+        case 0:
+        case 1:
+            pbf_mash_button(context, BUTTON_B, 2000ms);
+            context.wait_for_all_requests();
+            exiting_menus = false;
+            break;
+        case 2:
+        case 3:
+            pbf_press_button(context, BUTTON_B, 200ms, 0ms);
+            context.wait_for_all_requests();
+            break;
+        default:
+            pbf_press_button(context, BUTTON_B, 200ms, 0ms);
+            context.wait_for_all_requests();
+            attempts++;
+            if (attempts > 3){
+                if (in_overworld(console, context)){
+                    return;
+                }
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
+                    "exit_battle_after_catch(): Failed to exit the battle.",
+                    console
+                );
+            }
+            break;
+        }
+    }
+    pbf_mash_button(context, BUTTON_B, 1500ms);
+    context.wait_for_all_requests();
+    return;
+}
+
+int auto_catch(
+    ConsoleHandle& console,
+    ProControllerContext& context,
+    const uint64_t& max_ball_throws
+){
+    float catch_coefficient = 1.0;
+
+    for (uint64_t i = 0; i <= max_ball_throws; i++){
+        WallClock last_detected_time = current_time();
+        while (true){
+            if (current_time() - last_detected_time > std::chrono::seconds(20)){
+                console.log("auto_catch(): no battle activity detected for 20 seconds");
+                return -1;
+            }
+
+            BattleMenuWatcher battle_menu(COLOR_RED);
+            PartyMenuWatcher party_menu(COLOR_RED);
+            PokedexRegisteredWatcher dex_registration(COLOR_RED, &console.overlay());
+            BlackScreenWatcher black_screen(COLOR_RED);
+            CatchFanfareDetector catch_detector(console.logger(), [&](float error_coefficient) -> bool{
+                catch_coefficient = error_coefficient;
+                return true;
+            });
+
+            context.wait_for_all_requests();
+            int ret = run_until<ProControllerContext>(
+                console, context,
+                [](ProControllerContext& context) {
+                    for (int i = 0; i < 60; i++){
+                        pbf_press_button(context, BUTTON_B, 200ms, 300ms);
+                    }
+                },
+                { battle_menu, party_menu, black_screen, dex_registration, catch_detector },
+                10ms
+            );
+
+            switch (ret){
+            case 0:
+                console.log("Battle menu detected");
+                break;
+            case 1:
+                console.log("Party menu detected. Attempting to send out next Pokemon");
+                pbf_mash_button(context, BUTTON_B, 1000ms);
+                pbf_move_left_joystick(context, { 0, -1 }, 200ms, 300ms);
+                pbf_mash_button(context, BUTTON_A, 1000ms);
+                context.wait_for_all_requests();
+                continue;
+            case 2: // either failed catch or fainting -> party menu
+                pbf_wait(context, 200ms);
+                continue;
+            case 3:
+            case 4:
+                console.log("Pokemon Caught!", COLOR_BLUE);
+                exit_battle_after_catch(console, context);
+                return static_cast<int>(i);
+            default:
+                console.log("No recognized state. Try checking if in the overworld...");
+                if (in_overworld(console, context)){
+                    console.log("Overworld detected.");
+                    return 0; // no catch detected
+                }
+            }
+            break;
+        }
+
+        if (i == max_ball_throws){ 
+            break; 
+        }
+
+        // select BAG (selection arrow does not wrap around)
+        pbf_move_left_joystick(context, { +1, 0 }, 100ms, 150ms);
+        pbf_move_left_joystick(context, { 0, +1 }, 100ms, 150ms);
+        pbf_move_left_joystick(context, { +1, 0 }, 100ms, 150ms);
+        pbf_move_left_joystick(context, { 0, +1 }, 100ms, 150ms);
+
+        BagWatcher bag_open(COLOR_RED);
+        int ret2 = run_until<ProControllerContext>(
+            console, context,
+            [](ProControllerContext& context) {
+                for (int i = 0; i < 5; i++){
+                    pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
+                }
+            },
+            { bag_open }
+        );
+        if (ret2 < 0){
+            console.log("auto_catch(): failed to open bag.");
+            return -1;
+        }
+
+        if (i == 0){
+            // go to balls pocket (pockets do not wrap around, topmost item will already be selected)
+            pbf_move_left_joystick(context, { +1, 0 }, 200ms, 800ms);
+            pbf_move_left_joystick(context, { +1, 0 }, 200ms, 800ms);
+            pbf_move_left_joystick(context, { +1, 0 }, 200ms, 800ms);
+        }
+
+        // use ball
+        pbf_mash_button(context, BUTTON_A, 5s);
+    }
+
+    console.log("auto_catch(): ran out of balls.");
+    return 0;
+}
+
+int auto_catch_safari(
+    ConsoleHandle& console,
+    ProControllerContext& context,
+    Language game_language,
+    int& safari_balls_remaining, 
+    std::string encounter_name
+){
+    float catch_coefficient = 1.0;
+    bool battle_detected = false;
+
+    SafariOptimalAction safari_optimal_action(game_language);
+    auto actions = safari_optimal_action.get_optimal_actions(
+        console,
+        encounter_name,
+        safari_balls_remaining
+    );
+    size_t action_count = 0;
+
+    std::vector<SafariBattleMenuOption> action_list;
+    if (actions.has_value())
+        action_list = actions->get();
+
+    AdvanceBattleDialogWatcher advance_battle_dialog(COLOR_RED);
+    WhiteDialogWatcher white_dialog(COLOR_RED);
+    BattleMenuWatcher battle_menu(COLOR_RED);
+    PokedexRegisteredWatcher dex_registration(COLOR_RED, &console.overlay());
+    BlackScreenWatcher battle_end(COLOR_RED);
+    CatchFanfareDetector catch_detector(console.logger(), [&](float error_coefficient) -> bool{
+        catch_coefficient = error_coefficient;
+        return true;
+    });
+    BattleSelectionArrowWatcher nickname_question_arrow(
+        COLOR_RED,
+        &console.overlay(),
+        BattleConfirmationOption::YES
+    );
+
+    WallClock last_detected_time = current_time();
+    while (true){
+        if (current_time() - last_detected_time > std::chrono::seconds(20)){
+            console.log("auto_catch_safari(): No battle activity detected for 20 seconds.");
+
+            if (!battle_detected){
+                console.log("Unable to detect battle activity.");
+                return -1;
+            }
+
+            if (!in_overworld(console, context)){
+                console.log("auto_catch_safari(): no recognized state after 30 seconds.");
+                return -1;
+            }
+            console.log("Overworld detected.");
+            pbf_mash_button(context, BUTTON_B, 500ms);
+            context.wait_for_all_requests();
+            return 0;
+        }
+
+        int ret = wait_until(
+            console, context,
+            std::chrono::milliseconds(2000),
+            {  battle_menu, battle_end, advance_battle_dialog, nickname_question_arrow, catch_detector }
+        );
+
+        switch (ret){
+        case 0: { // Battle Menu
+            battle_detected = true;
+            last_detected_time = current_time();
+            SafariBattleMenuOption action = SafariBattleMenuOption::BALL;
+
+            if (action_count < action_list.size()){
+                action = action_list[action_count];
+                action_count++;
+            }
+
+            if (!move_cursor_to_option(console, context, action)){
+                console.log("Failed to move cursor to option.", COLOR_RED);
+                if (action_count > 0){
+                    action_count--;
+                }
+                break;
+            }
+
+            pbf_press_button(context, BUTTON_A, 200ms, 200ms);
+            context.wait_for_all_requests();
+
+            if (action == SafariBattleMenuOption::BALL){
+                safari_balls_remaining--;
+            }
+
+            break;
+        }
+        case 1: { // Battle End
+            console.log("Failed to catch pokemon.");
+            return 0;
+        }
+        case 2: // Various catch indicators
+        case 3:
+        case 4: 
+            console.log("Pokemon Caught!");
+            exit_battle_after_catch(console, context);
+            return 1;
+        }
+    }
+
+    return 0;
 }
 
 int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftright, Seconds timeout){

@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -58,8 +58,8 @@ void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, ProControllerC
         const auto compatibility = detect_item_compatibility(env.console.video().snapshot());
 
         if (compatibility == ItemCompatibility::NONE){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Unable to detect item compatibility.",
                 env.console
             );

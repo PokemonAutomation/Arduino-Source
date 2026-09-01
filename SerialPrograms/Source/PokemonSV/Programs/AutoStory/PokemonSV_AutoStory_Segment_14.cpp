@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
@@ -65,24 +65,26 @@ std::string AutoStory_Checkpoint_30::name() const{ return "030 - " + AutoStory_S
 std::string AutoStory_Checkpoint_30::start_text() const{ return "At West Province Area One Central Pokecenter.";}
 std::string AutoStory_Checkpoint_30::end_text() const{ return "Defeated Bombirdier.";}
 void AutoStory_Checkpoint_30::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_30(env, context, options.notif_status_update, stats);
+    checkpoint_30(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 std::string AutoStory_Checkpoint_31::name() const{ return "031 - " + AutoStory_Segment_14().name(); }
 std::string AutoStory_Checkpoint_31::start_text() const{ return AutoStory_Checkpoint_30().end_text();}
 std::string AutoStory_Checkpoint_31::end_text() const{ return "At West Province Area One North Pokecenter.";}
 void AutoStory_Checkpoint_31::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_31(env, context, options.notif_status_update, stats);
+    checkpoint_31(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 void checkpoint_30(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 ){
     
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){         
         
         if (attempt_number > 0 || ENABLE_TEST){
@@ -229,8 +231,7 @@ void checkpoint_30(
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_BATTLE, NavigationMovementMode::DIRECTIONAL_ONLY, 
                 0, +1, 40, 5, false);   
-        }catch (OperationFailedException& e){ 
-            (void) e;
+        }catch (OperationFailedException&){ 
             // likely attempted to open/close phone to realign, but failed
             // likely already reached cutscene to battle Bombirdeier.
 
@@ -259,13 +260,15 @@ void checkpoint_30(
 
 
 void checkpoint_31(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 ){
     
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
         // section 1. fall down the mountain

@@ -5,9 +5,8 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
-#include "CommonFramework/Exceptions/ScreenshotException.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -127,10 +126,10 @@ void GeneratePokemonImageTrainingData::program(SingleSwitchProgramEnvironment& e
         // Program was stopped by user
         send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
         throw;
-    }catch (ScreenshotException& e){
+    }catch (OperationFailedExceptionWithScreenshot& e){
         std::string fail_message = e.message();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             fail_message,
             env.console
         );

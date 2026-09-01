@@ -62,7 +62,6 @@ ImageAnnotationDisplayWidget::ImageAnnotationDisplayWidget(
         m_video_display = new VideoDisplayWidget(
             *this, *video_holder,
             0,  // display source ID. We only display one image for annotation. So 0.
-            *this,
             m_session.video_session(),
             m_session.overlay_session()
         );

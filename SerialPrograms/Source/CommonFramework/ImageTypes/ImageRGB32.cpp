@@ -65,6 +65,9 @@ ImageRGB32::ImageRGB32(const std::string& filename){
     *this = OpenCV_load_image(filename);
 }
 #endif
+#ifdef PA_IMAGE_BACKEND_None
+ImageRGB32::ImageRGB32(const std::string& filename){}
+#endif
 
 ImageRGB32::ImageRGB32(std::unique_ptr<CustomImageRGB32Owner> image)
     : m_custom_owner(std::move(image))

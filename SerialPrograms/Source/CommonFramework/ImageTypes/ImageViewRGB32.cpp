@@ -60,16 +60,25 @@ bool ImageViewRGB32::save(const std::string& path) const{
 }
 
 
-#ifdef PA_IMAGE_BACKEND_Qt
 ImageRGB32 ImageViewRGB32::scale_to(size_t width, size_t height) const{
+    if (this->total_pixels() == 0){
+        ImageRGB32 ret(width, height);
+        ret.fill(0);
+        return ret;
+    }
+    if (width * height == 0){
+        return ImageRGB32();
+    }
+#ifdef PA_IMAGE_BACKEND_Qt
     return QImage_to_ImageRGB32(scaled_to_QImage(*this, width, height));
-}
 #endif
 #ifdef PA_IMAGE_BACKEND_OpenCV
-ImageRGB32 ImageViewRGB32::scale_to(size_t width, size_t height) const{
     return OpenCV_scale_image(*this, width, height);
-}
 #endif
+#ifdef PA_IMAGE_BACKEND_None
+    return ImageRGB32();
+#endif
+}
 
 
 

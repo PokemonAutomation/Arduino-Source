@@ -54,31 +54,37 @@ public:
 
 
 // start: At Medali Pokecenter.
-// end: At Medali Gym
+// end: Inside Medali Gym building
 void checkpoint_61(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
-// start: At Medali Gym
-// end: Beat Medali Gym
+// start: Inside Medali Gym building
+// end: Beat Medali Gym. Inside Medali Gym building.
 void checkpoint_62(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 
-// start: Beat Medali Gym
+// start: Beat Medali Gym. Inside Medali Gym building.
 // end: At Glaseado Mountain Pokecenter
 void checkpoint_63(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 // moves player from Medali East Pokecenter to Glaseado Mountain Pokecenter

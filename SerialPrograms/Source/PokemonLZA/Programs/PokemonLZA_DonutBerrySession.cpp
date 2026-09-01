@@ -6,14 +6,12 @@
 
 #include <algorithm>
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLZA/Resources/PokemonLZA_DonutBerries.h"
 #include "PokemonLZA_DonutBerrySession.h"
-#include "CommonTools/Async/InferenceRoutines.h"
-#include "Common/Cpp/PrettyPrint.h"
 
 //#include <iostream>
 //using std::cout;
@@ -57,8 +55,8 @@ PageIngredients BerrySession::read_screen(std::shared_ptr<const ImageRGB32> scre
     ret.selected = (int8_t)slot;
     //cout << "selected slot = " << (int)ret.selected << endl;
     if (ret.selected < 0 || ret.selected >= 8){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "BerrySession::read_current_page(): Invalid cursor slot.",
             m_stream,
             screen
@@ -114,8 +112,8 @@ PageIngredients BerrySession::read_screen(std::shared_ptr<const ImageRGB32> scre
             for (const auto& p : image_result.results){
                 sprite_result.insert(p.second);
             }
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "BerrySession::read_current_page(): Unable to read selected item. OCR and sprite do not agree on any match: ocr "
                 + set_to_str(ocr_result) + ", sprite " + set_to_str(sprite_result),
                 m_stream,
@@ -127,8 +125,8 @@ PageIngredients BerrySession::read_screen(std::shared_ptr<const ImageRGB32> scre
             for (const auto& p : image_result.results){
                 sprite_result.insert(p.second);
             }
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "BerrySession::read_current_page(): Unable to read selected item. Ambiguous result: "
                 + set_to_str(ocr_result) + ", " + set_to_str(sprite_result) + "\n" + language_warning(m_language),
                 m_stream,
@@ -308,9 +306,10 @@ void BerrySession::add_berries(
         const auto& back = ordered_berries.back();
         std::string found = this->move_to_ingredient(back.first, move_topdown);
         if (found.empty()){
-            const DonutBerries& name = get_berry_name(berries.begin()->first);
-            OperationFailedException::fire(
-                ErrorReport::NO_ERROR_REPORT,
+            const DonutBerries& name = get_berry_name(back.first);
+            throw_and_log<BerryNotFoundException>(
+                stream.logger(),
+                ErrorReportMode::NO_ERROR_REPORT,
                 "Unable to find Berry: \"" + name.display_name() + "\" - Did you run out?",
                 stream
             );
@@ -346,8 +345,8 @@ void BerrySession::add_berries(
             }
 
             if (!ingredient_added){
-                OperationFailedException::fire(
-                    ErrorReport::NO_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::NO_ERROR_REPORT,
                     "Unable to add ingredient: \"" + name.display_name() + "\" - Did you run out?",
                     stream
                 );

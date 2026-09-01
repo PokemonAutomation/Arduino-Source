@@ -105,7 +105,7 @@ bool MassPurchase::mass_purchase(ProgramEnvironment& env, VideoStream& stream, P
         env.log("Error - Stuck in Overworld");
         stats.errors++;
         throw_and_log<FatalProgramException>(
-            stream.logger(), ErrorReport::SEND_ERROR_REPORT,
+            stream.logger(), ErrorReportMode::SEND_ERROR_REPORT,
             "Stuck in Overworld.",
             stream
         );
@@ -142,7 +142,7 @@ bool MassPurchase::extra_items(ProgramEnvironment& env, VideoStream& stream, Pro
         env.log("Error - Stuck in Overworld");
         stats.errors++;
         throw_and_log<FatalProgramException>(
-            stream.logger(), ErrorReport::SEND_ERROR_REPORT,
+            stream.logger(), ErrorReportMode::SEND_ERROR_REPORT,
             "Stuck in Overworld.",
             stream
         );

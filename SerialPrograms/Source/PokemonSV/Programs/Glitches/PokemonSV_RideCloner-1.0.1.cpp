@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/Exceptions/FatalProgramException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -323,7 +323,7 @@ bool RideCloner101::run_post_win(
             int quantity = move_to_ball(reader, console, context, BALL_SELECT.slug());
             if (quantity == 0){
                 throw_and_log<FatalProgramException>(
-                    console.logger(), ErrorReport::NO_ERROR_REPORT,
+                    console.logger(), ErrorReportMode::NO_ERROR_REPORT,
                     "Unable to find appropriate ball. Did you run out?",
                     console
                 );
@@ -386,8 +386,8 @@ bool RideCloner101::run_post_win(
                     ssf_press_button(context, BUTTON_A, A_TO_B_DELAY0, 160ms);
                     pbf_press_button(context, BUTTON_B, 160ms, 1840ms);
                 }
-            }catch (OperationFailedException& e){
-                e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+            }catch (OperationFailedExceptionWithScreenshot& e){
+                e.send_recoverable_error_notif_and_telemetry_report(env, NOTIFICATION_ERROR_RECOVERABLE);
             }
             continue;
         case 7:

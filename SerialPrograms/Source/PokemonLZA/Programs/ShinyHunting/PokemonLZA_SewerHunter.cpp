@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -102,8 +102,8 @@ void fly_back_to_sewers_entrance(ConsoleHandle& console, ProControllerContext& c
             {black_screen}
         );
         if (ret != 0){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "fly_back_to_sewers_entrance(): cannot detect black screen after mashing A.",
                 console
             );
@@ -203,8 +203,8 @@ void ShinyHunt_SewerHunter::program(SingleSwitchProgramEnvironment& env, ProCont
         route = route_ariados;
         break;
     default:
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "route not implemented",
             env.console
         );

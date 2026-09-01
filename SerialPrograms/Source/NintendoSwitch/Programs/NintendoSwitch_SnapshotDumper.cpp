@@ -76,7 +76,7 @@ void SnapshotDumper::on_config_value_changed(void* object){
     PERIOD_MILLISECONDS.set_visibility(SNAPSHOT_MODE == SnapshotMode::PERIODIC ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
 }
 
-class SnapshotClickTrigger : public VideoOverlay::MouseListener{
+class SnapshotClickTrigger : public VideoDisplayHidListener{
 public:
     ~SnapshotClickTrigger(){
         detach();
@@ -87,7 +87,7 @@ public:
         , m_format(format)
     {
         try{
-            overlay.add_mouse_listener(*this);
+            overlay.add_hid_listener(*this);
         }catch (...){
             detach();
             throw;
@@ -101,7 +101,7 @@ public:
 
 private:
     void detach(){
-        m_overlay.remove_mouse_listener(*this);
+        m_overlay.remove_hid_listener(*this);
     }
 
 private:

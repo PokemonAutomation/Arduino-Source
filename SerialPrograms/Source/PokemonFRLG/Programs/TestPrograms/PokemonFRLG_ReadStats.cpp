@@ -41,13 +41,23 @@ ReadStats::ReadStats()
         Pokemon::PokemonNameReader::instance().languages(),
         LockMode::LOCK_WHILE_RUNNING, true
     )
+    , PAGE(
+        "<b>Summary Page:</b>",
+        {
+            { SummaryPage::first, "first", "first" },
+            { SummaryPage::second, "second", "second" }
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        SummaryPage::first
+    )
 {
     PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(PAGE);
 }
 
 void ReadStats::program(
     SingleSwitchProgramEnvironment &env,
-    ProControllerContext &context
+    CancellableScope &scope
 ){
     env.log(
         "Starting Read Stats program... Please ensure you are on Page 1 (POKEMON INFO)."
@@ -59,49 +69,46 @@ void ReadStats::program(
 
     PokemonFRLG_Stats stats;
 
-    env.log("Reading Page 1 (Name, Level, Nature)...");
-    VideoSnapshot screen1 = env.console.video().snapshot();
-    reader.read_page1(env.logger(), LANGUAGE, screen1, stats);
+    if (PAGE == SummaryPage::first){
+        env.log("Reading Page 1 (Name, Level, Nature)...");
+        VideoSnapshot screen1 = env.console.video().snapshot();
+        reader.read_page1(env.logger(), LANGUAGE, screen1, stats);
 
-    std::string gender_strings[] = {"Male", "Female", "Genderless"};
+        std::string gender_strings[] = {"Male", "Female", "Genderless"};
 
-    env.log("Name: " + stats.name);
-    env.log("Level: " +
-            (stats.level.has_value() ? std::to_string(*stats.level) : "???"));
-    env.log("Nature: " + stats.nature);
-    env.log("Gender: " + std::string(
-        stats.gender.has_value() ? (
-            (stats.gender == SummaryGender::Male) ? "Male" : (
-                (stats.gender == SummaryGender::Female) ? "Female" : "Genderless"
-            )
-        ) : "???"));
+        env.log("Name: " + stats.name);
+        env.log("Level: " +
+                (stats.level.has_value() ? std::to_string(*stats.level) : "???"));
+        env.log("Nature: " + stats.nature);
+        env.log("Gender: " + std::string(
+            stats.gender.has_value() ? (
+                (stats.gender == SummaryGender::Male) ? "Male" : (
+                    (stats.gender == SummaryGender::Female) ? "Female" : "Genderless"
+                )
+            ) : "???"));
+    }
 
-    env.log("Navigating to Page 2 (POKEMON SKILLS)...");
-    pbf_press_dpad(context, DPAD_RIGHT, 100ms, 100ms);
-    context.wait_for_all_requests();
-    pbf_wait(context, 500ms); // Wait for transition
-    context.wait_for_all_requests();
+    if (PAGE == SummaryPage::second){
+        env.log("Reading Page 2 (Stats)...");
+        VideoSnapshot screen2 = env.console.video().snapshot();
+        reader.read_page2(env.logger(), LANGUAGE, screen2, stats);
 
-    env.log("Reading Page 2 (Stats)...");
-    VideoSnapshot screen2 = env.console.video().snapshot();
-    reader.read_page2(env.logger(), LANGUAGE, screen2, stats);
-
-    env.log("HP (Total): " + (stats.hp.has_value() ? std::to_string(*stats.hp) : "???"));
-    env.log("Attack: " +
-            (stats.attack.has_value() ? std::to_string(*stats.attack) : "???"));
-    env.log("Defense: " +
-            (stats.defense.has_value() ? std::to_string(*stats.defense) : "???"));
-    env.log("Sp. Attack: " +
-            (stats.sp_attack.has_value() ? std::to_string(*stats.sp_attack) : "???"));
-    env.log("Sp. Defense: " +
-            (stats.sp_defense.has_value() ? std::to_string(*stats.sp_defense) : "???"));
-    env.log("Speed: " +
-            (stats.speed.has_value() ? std::to_string(*stats.speed) : "???"));
+        env.log("HP (Total): " + (stats.hp.has_value() ? std::to_string(*stats.hp) : "???"));
+        env.log("Attack: " +
+                (stats.attack.has_value() ? std::to_string(*stats.attack) : "???"));
+        env.log("Defense: " +
+                (stats.defense.has_value() ? std::to_string(*stats.defense) : "???"));
+        env.log("Sp. Attack: " +
+                (stats.sp_attack.has_value() ? std::to_string(*stats.sp_attack) : "???"));
+        env.log("Sp. Defense: " +
+                (stats.sp_defense.has_value() ? std::to_string(*stats.sp_defense) : "???"));
+        env.log("Speed: " +
+                (stats.speed.has_value() ? std::to_string(*stats.speed) : "???"));
+    }
 
     env.log("Finished Reading Stats. Verification boxes are on overlay.",
                     COLOR_BLUE);
-    pbf_wait(context, 10s);
-    context.wait_for_all_requests();
+    scope.wait_for(10s);
 }
 
 } // namespace PokemonFRLG

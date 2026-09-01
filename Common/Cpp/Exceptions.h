@@ -14,6 +14,13 @@
 namespace PokemonAutomation{
 
 
+
+enum class ErrorReportMode{
+    NO_ERROR_REPORT,
+    SEND_ERROR_REPORT,
+};
+
+
 template <typename ExceptionType, class... Args>
 [[noreturn]] void throw_and_log(Logger& logger, Args&&... args){
     ExceptionType exception(std::forward<Args>(args)...);

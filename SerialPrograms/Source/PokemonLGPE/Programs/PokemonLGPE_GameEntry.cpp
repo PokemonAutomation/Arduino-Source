@@ -7,7 +7,7 @@
 //#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 //#include "Controllers/ControllerTypes.h"
@@ -126,8 +126,8 @@ bool reset_game_from_home(
 ){
     if (dynamic_cast<RightJoycon*>(&context.controller()) == nullptr){
         console.log("Right Joycon required!", COLOR_RED);
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "reset_game_from_home(): Right Joycon required.",
             console
         );

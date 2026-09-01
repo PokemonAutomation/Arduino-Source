@@ -61,20 +61,20 @@ public:
 
 
 // start: At Montenevera Pokecenter
-// end: Spoke to Montenevera gym receptionist
-void checkpoint_71(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+// end: Spoke to Montenevera gym receptionist. Inside Montenevera gym building.
+void checkpoint_71(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text);
 
-// start: Spoke to Montenevera gym receptionist
-// end: Passed gym test with MC Sledge.
-void checkpoint_72(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+// start: Spoke to Montenevera gym receptionist. Inside Montenevera gym building.
+// end: Passed gym test with MC Sledge. Standing in front of MC Sledge, outside the Montenevera gym building.
+void checkpoint_72(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text);
 
-// start: Passed gym test with MC Sledge.
-// end: Beat Montenevera Gym. Inside gym building.
-void checkpoint_73(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+// start: Passed gym test with MC Sledge. Standing in front of MC Sledge, outside the Montenevera gym building.
+// end: Beat Montenevera Gym. Inside Montenevera gym building.
+void checkpoint_73(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text);
 
-// start: Beat Montenevera Gym. Inside gym building.
+// start: Beat Montenevera Gym. Inside Montenevera gym building.
 // end: At Glaseado gym Pokecenter.
-void checkpoint_74(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+void checkpoint_74(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text);
 
 // moves player from Montenevera Pokecenter to Glaseado Gym Pokecenter
 void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, ProControllerContext& context);

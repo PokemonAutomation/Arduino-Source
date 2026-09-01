@@ -5,7 +5,7 @@
  */
 #include "PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h"
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -66,27 +66,27 @@ std::string AutoStory_Checkpoint_90::name() const{ return "090 - " + AutoStory_S
 std::string AutoStory_Checkpoint_90::start_text() const{ return "Beat Geeta. At Pokemon League Pokecenter.";}
 std::string AutoStory_Checkpoint_90::end_text() const{ return "Beat Nemona. At dormitory room, next to bed.";}
 void AutoStory_Checkpoint_90::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_90(env, context, options.notif_status_update, stats);
+    checkpoint_90(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 std::string AutoStory_Checkpoint_91::name() const{ return "091 - " + AutoStory_Segment_34().name(); }
 std::string AutoStory_Checkpoint_91::start_text() const{ return AutoStory_Checkpoint_90().end_text();}
 std::string AutoStory_Checkpoint_91::end_text() const{ return "Beat Penny. At Academy fly point.";}
 void AutoStory_Checkpoint_91::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_91(env, context, options.notif_status_update, stats);
+    checkpoint_91(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 std::string AutoStory_Checkpoint_92::name() const{ return "092 - " + AutoStory_Segment_34().name(); }
 std::string AutoStory_Checkpoint_92::start_text() const{ return AutoStory_Checkpoint_91().end_text();}
 std::string AutoStory_Checkpoint_92::end_text() const{ return "Beat Arven. At Los Platos Pokecenter.";}
 void AutoStory_Checkpoint_92::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_92(env, context, options.notif_status_update, stats);
+    checkpoint_92(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 
 
-void checkpoint_90(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+void checkpoint_90(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
         // Fly to Academy
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, +1, -0.803, 640ms}, FlyPoint::FAST_TRAVEL);
@@ -114,8 +114,8 @@ void checkpoint_90(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     });   
 }
 
-void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
         
         // walk down
@@ -141,8 +141,8 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         bool terastallized = false;
         bool is_won = run_pokemon(env.console, context, move_table1, true, terastallized);
         if (!is_won){// throw exception if we lose
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to beat the Penny. Reset.",
                 env.console
             );
@@ -208,8 +208,8 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     });   
 }
 
-void checkpoint_92(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+void checkpoint_92(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, +0.134, -1, 2800ms}, FlyPoint::FAST_TRAVEL);
         handle_unexpected_battles(env.program_info(), env.console, context,

@@ -6,7 +6,7 @@
 
 #include <set>
 #include <map>
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -282,8 +282,8 @@ void travel_to_surf_spot(SingleSwitchProgramEnvironment& env, ProControllerConte
     int errors = 0;
     while (true){
         if (errors > 3){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to surf 3 times in a row.",
                 env.console
             );
@@ -338,8 +338,8 @@ void use_dig(SingleSwitchProgramEnvironment& env, ProControllerContext& context)
     uint16_t errors = 0;
     while (true){
         if (errors > 5){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to use Dig 5 times in a row.",
                 env.console
             );
@@ -480,8 +480,8 @@ EvTrainer::EvTrainingLocation EvTrainer::get_next_location(SingleSwitchProgramEn
     }else if (stats.spe_evs < SPEED_EVS){
         return EvTrainingLocation::route1;
     }else{
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "EvTrainer(): program failed to exit after earning all EVs",
             env.console
         );
@@ -509,8 +509,8 @@ bool EvTrainer::travel_to_location(SingleSwitchProgramEnvironment& env, ProContr
         travel_to_route1(env, context);
         return true;
     default:
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "EvTrainer: Invalid EV Training location.",
             env.console
         );
@@ -584,8 +584,8 @@ EvTrainer::EffortValues EvTrainer::get_ev_yield(SingleSwitchProgramEnvironment& 
         env.log("get_ev_yield(): failed to detect species");
         return {999, 999, 999, 999, 999, 999}; // this will always trigger running away
     }else if (ev_map.find(species) == ev_map.end()){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "get_ev_yield(): Missing EV yield for " + species,
             env.console
         );
@@ -720,8 +720,8 @@ void EvTrainer::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     while (!finished_all){
         try{
             if (failed_encounters >= 5){
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Failed to trigger a wild encounter within 60 seconds 5 times in a row",
                     env.console
                 );

@@ -19,7 +19,13 @@
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Pokemon/Inference/Pokemon_NatureReader.h"
 #include "PokemonFRLG/PokemonFRLG_Settings.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
+#include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "PokemonFRLG/PokemonFRLG_Tests.h"
+#include "Tests/TestUtils.h"
 #include "PokemonFRLG_DigitReader.h"
+#include "PokemonFRLG_OcrPreprocessing.h"
 #include <opencv2/imgproc.hpp>
 
 namespace PokemonAutomation {
@@ -29,7 +35,7 @@ namespace PokemonFRLG {
 StatsReader::StatsReader(Color color)
     : m_color(color), 
     m_box_nature(0.028976, 0.729610, 0.502487, 0.066639),
-    m_box_level(0.052000, 0.120140, 0.099000, 0.069416),
+    m_box_level(0.058333, 0.120140, 0.092308, 0.069416),
     m_box_name(0.163158, 0.122917, 0.262811, 0.066639),
     m_box_gender(0.430769, 0.114423, 0.034615, 0.081731),
     m_box_hp(0.805274, 0.131247, 0.183790, 0.066639),
@@ -47,7 +53,8 @@ StatsReader::StatsReader(Color color)
     m_box_defense_jpn(0.859615, 0.323792, 0.121795, 0.068269),
     m_box_sp_attack_jpn(0.859615, 0.404315, 0.121795, 0.068269),
     m_box_sp_defense_jpn(0.859615, 0.484838, 0.121795, 0.068269),
-    m_box_speed_jpn(0.859615, 0.565361, 0.121795, 0.068269)   
+    m_box_speed_jpn(0.859615, 0.565361, 0.121795, 0.068269),
+    m_box_level_spa(0.062179, 0.120140, 0.088462, 0.069416)
 {}
 
 void StatsReader::make_overlays(VideoOverlaySet &items) const {
@@ -72,6 +79,7 @@ void StatsReader::make_overlays(VideoOverlaySet &items) const {
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_sp_attack_jpn));
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_sp_defense_jpn));
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_speed_jpn));
+    items.add(m_color, GAME_BOX.inner_to_outer(m_box_level_spa));
 }
 
 bool StatsReader::read_name(
@@ -85,62 +93,24 @@ bool StatsReader::read_name(
 
     ImageViewRGB32 name_box = extract_box_reference(game_screen, jpn ? m_box_name_jpn : m_box_name);
 
-    static const std::vector<int> WHITE_THRESHOLDS = { 180, 200, 220, 230, 240 };
-    OCR::StringMatchResult best_result;
-    bool initialized = false;
-    for (int thresh : WHITE_THRESHOLDS){
-        ImageRGB32 name_filtered(name_box.width(), name_box.height());
-        for (size_t r = 0; r < name_box.height(); r++){
-            for (size_t c = 0; c < name_box.width(); c++){
-                Color pixel(name_box.pixel(c, r));
-                if (pixel.red() > thresh && pixel.green() > thresh && pixel.blue() > thresh){
-                    name_filtered.pixel(c, r) = (uint32_t)0xff000000; // Black
-                }else{
-                    name_filtered.pixel(c, r) = (uint32_t)0xffffffff; // White
-                }
-            }
-        }
-        ImageRGB32 name_ready = preprocess_for_ocr(
-            name_filtered, "name", 7, 2, true, 
-            combine_rgb(0, 0, 0), jpn ? combine_rgb(160, 160, 160) : combine_rgb(140, 140, 140)
+    ImageRGB32 name_ready = preprocess_for_ocr(name_box);
+
+    OCR::StringMatchResult result = subset.empty()
+        ? Pokemon::PokemonNameReader::instance().read_substring(
+            logger, language, name_ready, BRIGHT_TEXT_FILTERS()
+        )
+        : Pokemon::PokemonNameReader(subset).read_substring(
+            logger, language, name_ready, BRIGHT_TEXT_FILTERS()
         );
 
-        const std::vector<OCR::TextColorRange> name_text_color_ranges{
-            {combine_rgb(0, 0, 0), combine_rgb(120, 120, 120)}
-        };
-
-        OCR::StringMatchResult result;
-        if (subset.size() > 0){
-            auto name_result = Pokemon::PokemonNameReader(subset).read_substring(
-                    logger, language, name_ready, name_text_color_ranges
-            );
-            if (!name_result.results.empty()){
-                result = name_result;
-            }
-        }else{
-            auto name_result = Pokemon::PokemonNameReader::instance().read_substring(
-                    logger, language, name_ready, name_text_color_ranges
-            );
-            if (!name_result.results.empty()){
-                result = name_result;
-            }
-        }
-        if (!result.results.empty()){
-            if (!initialized){
-                best_result = result;
-                initialized = true;
-            }else if (result.results.begin()->first < best_result.results.begin()->first){
-                best_result = result;
-            }
-        }
-    }
-    if (initialized && !best_result.results.empty()){
-        stats.name = best_result.results.begin()->second.token;
+    if (!result.results.empty()){
+        stats.name = result.results.begin()->second.token;
         return true;
     }
     logger.log("Failed to read species name.", COLOR_RED);
     if (save_debug_images){
         name_box.save("DebugDumps/ocr_name_box.png");
+        name_ready.save("DebugDumps/ocr_name_ready.png");
     }
     return false;
 }
@@ -190,9 +160,11 @@ bool StatsReader::read_level(
     const std::set<std::string>& subset,
     bool save_debug_images
 ){
-    const bool jpn = language == Language::Japanese;
-
-    ImageViewRGB32 level_box = extract_box_reference(game_screen, jpn ? m_box_level_jpn : m_box_level);
+    ImageViewRGB32 level_box = extract_box_reference(game_screen, 
+        language == Language::Japanese ? m_box_level_jpn :
+        language == Language::Spanish  ? m_box_level_spa :
+                                         m_box_level
+    );
     
     // The level uses white text with dark shadow on a lilac background.
     // The digit reader's binarizer captures dark pixels (<=190 on all channels)
@@ -214,26 +186,16 @@ bool StatsReader::read_level(
             }
         }
     }
-    // Trim left 7% to exclude the "L" glyph blob (always at x~0).
-    // The actual level digits start at ~13%+ of the box width.
-    size_t lv_skip = preprocessed.width() * 7 / 100;
-    ImagePixelBox digits_bbox(
-        lv_skip, 0, preprocessed.width(),
-        preprocessed.height()
-    );
-    ImageViewRGB32 level_digit_view =
-            extract_box_reference(preprocessed, digits_bbox);
     // Use threshold 230 (not 175): lilac-background blob crops inherently
     // give higher RMSD than yellow stat-box crops due to background colour.
     stats.level = read_digits_waterfill_template(
-            logger, level_digit_view, 230.0, DigitTemplateType::LevelBox,
+            logger, preprocessed, DigitTemplateType::LevelBox, 230,
             "levelDigit", 0x7F);
     // log if it's an obviously bad read
     if (!stats.level.has_value() || stats.level.value_or(-1) < 2 || stats.level.value_or(-1) > 100){
         logger.log("Level OCR result out of range", COLOR_RED);
         if (save_debug_images){
             preprocessed.save("DebugDumps/ocr_level_preprocessed.png");
-            level_digit_view.save("DebugDumps/ocr_level_digits_trimmed.png");
         }
         return false;
     }
@@ -287,19 +249,13 @@ bool StatsReader::read_nature(
     const static Pokemon::NatureReader reader("PokemonFRLG/NatureCheckerOCR.json");
     ImageViewRGB32 nature_raw = extract_box_reference(game_screen, jpn ? m_box_nature_jpn : m_box_nature);
 
-    ImageRGB32 nature_ready = preprocess_for_ocr(
-        nature_raw, "nature", 7, 2, true,
-        combine_rgb(0, 0, 0), combine_rgb(190, 190, 190)
+    ImageRGB32 nature_ready = preprocess_for_ocr(nature_raw);
+
+    OCR::StringMatchResult nature_result = reader.read_substring(
+        logger, language, nature_ready, DARK_TEXT_FILTERS()
     );
 
-    OCR::StringMatchResult nature_result = reader.match_substring_from_image(
-        &logger, language, nature_ready,
-        Pokemon::NatureReader::MAX_LOG10P,
-        Pokemon::NatureReader::MAX_LOG10P_SPREAD,
-        OCR::PageSegMode::SINGLE_LINE);
-
     if (!nature_result.results.empty()){
-        nature_result.log(logger, Pokemon::NatureReader::MAX_LOG10P, "Nature Final");
         stats.nature = nature_result.results.begin()->second.token;
         return true;
     }
@@ -321,9 +277,9 @@ void StatsReader::read_page1(
     ImageViewRGB32 game_screen =
             extract_box_reference(frame, GameSettings::instance().GAME_BOX);
 
-    bool success = read_name(logger, language, game_screen, stats, subset, save_debug_images)
-                && read_level(logger, language, game_screen, stats, subset, save_debug_images)
-                && read_nature(logger, language, game_screen, stats, subset, save_debug_images);
+    bool success = read_name(logger, language, game_screen, stats, subset, save_debug_images);
+    success = read_level(logger, language, game_screen, stats, subset, save_debug_images) && success;
+    success = read_nature(logger, language, game_screen, stats, subset, save_debug_images) && success;
 
     read_gender(logger, language, game_screen, stats, subset);
 
@@ -345,7 +301,7 @@ void StatsReader::read_page2(
         ImageViewRGB32 stat_region = extract_box_reference(game_screen, box);
 
         // waterfill segmentation + template matching against the PokemonFRLG/Digits/0-9.png templates.
-        int stat = read_digits_waterfill_template(logger, stat_region);
+        int stat = read_digits_waterfill_template(logger, stat_region, DigitTemplateType::StatBox);
         // log impossible values or failed reads
         if (name != "hp" && (stat < 1 || stat > 614)){ // 614 comes from a max Def Shuckle
             logger.log("OCR result for " + name + " out of range: " + std::to_string(stat), COLOR_RED);
@@ -436,6 +392,145 @@ void StatsReader::read_page2(
         frame.save("DebugDumps/ocr_page2_failed_frame.png");
     }
 }
+
+
+namespace{
+
+std::string number_slug(const std::optional<unsigned>& value){
+    return value.has_value() ? std::to_string(*value) : "none";
+}
+std::string text_slug(const std::string& value){
+    return value.empty() ? "none" : value;
+}
+std::string gender_slug(const std::optional<SummaryGender>& gender){
+    if (!gender.has_value()){
+        return "none";
+    }
+    switch (*gender){
+    case SummaryGender::Male:
+        return "male";
+    case SummaryGender::Female:
+        return "female";
+    case SummaryGender::Genderless:
+        return "genderless";
+    }
+    return "none";
+}
+
+UnitTestResult language_from_filename(const std::string& image_path, Language& language){
+    const std::vector<std::string> words = parse_words(Filesystem::Path(image_path).stem().string());
+    if (words.empty()){
+        return "Error: filename must end with a language code.";
+    }
+    language = language_code_to_enum(words.back());
+    if (language == Language::None || language == Language::EndOfList){
+        return "Error: invalid language word in filename: " + words.back();
+    }
+    return true;
+}
+
+}
+
+
+class Test_StatsReaderPage1 : public UnitTest{
+public:
+    Test_StatsReaderPage1(const std::string& image)
+        : UnitTest("PokemonFRLG::StatsReader - page1 - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        Language language = Language::None;
+        UnitTestResult parsed = language_from_filename(m_image, language);
+        if (parsed.result != UnitTestResult::PASSED){
+            return parsed;
+        }
+
+        ImageRGB32 image(m_image);
+        StatsReader reader;
+        PokemonFRLG_Stats stats;
+        reader.read_page1(logger, language, image, stats);
+
+        return check_against_golden_file(
+            m_image,
+            {"name", "level", "gender", "nature"},
+            {
+                text_slug(stats.name),
+                number_slug(stats.level),
+                gender_slug(stats.gender),
+                text_slug(stats.nature),
+            }
+        );
+    };
+
+private:
+    std::string m_image;
+};
+
+
+class Test_StatsReaderPage2 : public UnitTest{
+public:
+    Test_StatsReaderPage2(const std::string& image)
+        : UnitTest("PokemonFRLG::StatsReader - page2 - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        Language language = Language::None;
+        UnitTestResult parsed = language_from_filename(m_image, language);
+        if (parsed.result != UnitTestResult::PASSED){
+            return parsed;
+        }
+
+        ImageRGB32 image(m_image);
+        StatsReader reader;
+        PokemonFRLG_Stats stats;
+        reader.read_page2(logger, language, image, stats);
+
+        return check_against_golden_file(
+            m_image,
+            {"hp", "attack", "defense", "spatk", "spdef", "speed"},
+            {
+                number_slug(stats.hp),
+                number_slug(stats.attack),
+                number_slug(stats.defense),
+                number_slug(stats.sp_attack),
+                number_slug(stats.sp_defense),
+                number_slug(stats.speed),
+            }
+        );
+    };
+
+private:
+    std::string m_image;
+};
+
+
+void add_tests_StatsReader(UnitTestDatabase& database){
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/bulbasaur_1_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/bulbasaur_2_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/bulbasaur_3_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/bulbasaur_4_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/bulbasaur_1_fra.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/bulbasaur_1_jpn.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/abra_1_deu.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/deoxys_1_jpn.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/horsea_1_deu.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/horsea_2_deu.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/horsea_3_deu.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/magikarp_1_spa.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/moltres_1_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/pidgey_1_ita.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/venonat_4k_eng.png");
+    database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/abra_1_deu.png");
+    database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/deoxys_1_jpn.png");
+    database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/mewtwo_1_spa.png");
+    database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/nidoranf_1_eng.jpg");
+    database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/raikou_1_eng.png");
+    database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/raikou_2_eng.png");
+    database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/venonat_1_eng.jpg");
+}
+
 
 } // namespace PokemonFRLG
 } // namespace NintendoSwitch

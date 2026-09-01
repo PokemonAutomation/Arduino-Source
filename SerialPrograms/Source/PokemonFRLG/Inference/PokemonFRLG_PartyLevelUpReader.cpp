@@ -18,7 +18,12 @@
 #include "Pokemon/Pokemon_StatsCalculation.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Pokemon/Inference/Pokemon_NatureReader.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
+#include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "PokemonFRLG/PokemonFRLG_Settings.h"
+#include "PokemonFRLG/PokemonFRLG_Tests.h"
+#include "Tests/TestUtils.h"
 #include "PokemonFRLG_DigitReader.h"
 #include "PokemonFRLG_PartyLevelUpReader.h"
 
@@ -54,27 +59,7 @@ StatReads PartyLevelUpReader::read_stats(Logger &logger, const ImageViewRGB32& f
     
     auto read_stat = [&](const ImageFloatBox &box, const std::string &name){
         ImageViewRGB32 stat_region = extract_box_reference(game_screen, box);
-
-        if (GlobalSettings::instance().OCR_LIBRARY != OcrLibrary::PADDLE_OCR){
-            // Tesseract-free path: waterfill segmentation + template matching
-            // against the PokemonFRLG/Digits/0-9.png templates.
-            return read_digits_waterfill_template(logger, stat_region);
-        }
-
-        // PaddleOCR path (original): preprocess then per-digit waterfill OCR.
-        // Dark text [0..190] -> black. Threshold at 190 captures the
-        // blurred gap pixels between segments, making bridges thicker.
-        // Not higher than 190 to avoid capturing yellow bg edge noise.
-        ImageRGB32 ocr_ready = preprocess_for_ocr(
-            stat_region, name, 7, 2, true,
-            combine_rgb(0, 0, 0), combine_rgb(190, 190, 190)
-        );
-
-        // Waterfill isolates each digit -> per-char SINGLE_CHAR OCR.
-        return OCR::read_number_waterfill(
-            logger, ocr_ready, 0xff000000,
-            0xff808080
-        );
+        return read_digits_waterfill_template(logger, stat_region, DigitTemplateType::DialogBox);
     };
 
     StatReads stats;
@@ -85,6 +70,55 @@ StatReads PartyLevelUpReader::read_stats(Logger &logger, const ImageViewRGB32& f
     stats.spdef = uint16_t(read_stat(m_box_sp_defense, "spdef"));
     stats.speed = uint16_t(read_stat(m_box_speed, "speed"));
     return stats;
+}
+
+
+class Test_PartyLevelUpReader : public UnitTest{
+public:
+    Test_PartyLevelUpReader(const std::string& image)
+        : UnitTest("PokemonFRLG::PartyLevelUpReader - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        ImageRGB32 image(m_image);
+        PartyLevelUpReader reader;
+        StatReads stats = reader.read_stats(logger, image);
+
+        return check_against_golden_file(
+            m_image,
+            {"hp", "attack", "defense", "spatk", "spdef", "speed"},
+            {
+                std::to_string(stats.hp),
+                std::to_string(stats.attack),
+                std::to_string(stats.defense),
+                std::to_string(stats.spatk),
+                std::to_string(stats.spdef),
+                std::to_string(stats.speed),
+            }
+        );
+    };
+
+private:
+    std::string m_image;
+};
+
+
+void add_tests_PartyLevelUpReader(UnitTestDatabase& database){
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/raikou_1.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/raikou_2.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/raikou_3.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/raikou_4.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/raikou_5.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/raikou_6.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/deoxys_1.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/deoxys_2.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/deoxys_3.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/dratini_1.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/dratini_2.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/dratini_3.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/dratini_4.png");
+        database.add<Test_PartyLevelUpReader>("PokemonFRLG/PartyLevelUpReader/dratini_5.png");
 }
 
 

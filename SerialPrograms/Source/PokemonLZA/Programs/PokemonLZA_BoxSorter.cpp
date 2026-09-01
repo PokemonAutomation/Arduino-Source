@@ -11,7 +11,7 @@
 #include <sstream>
 #include <algorithm>
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -302,8 +302,8 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
                     bool dex_number_detected = dex_number_detector.detect(screen);
                     if (!dex_number_detected){
-                        OperationFailedException::fire(
-                            ErrorReport::SEND_ERROR_REPORT,
+                        OperationFailedExceptionWithScreenshot::fire(
+                            ErrorReportMode::SEND_ERROR_REPORT,
                             "BoxSorting Check Summary: Unable to read a correct dex number, found: " + std::to_string(dex_number_detector.dex_number_when_error()),
                             env.console
                         );

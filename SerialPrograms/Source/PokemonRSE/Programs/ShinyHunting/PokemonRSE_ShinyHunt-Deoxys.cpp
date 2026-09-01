@@ -5,16 +5,16 @@
  */
 
 //#include "Common/Cpp/PrettyPrint.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "PokemonRSE/Inference/Dialogs/PokemonRSE_BattleDialogs.h"
 #include "PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h"
 #include "PokemonRSE/PokemonRSE_Navigation.h"
 #include "PokemonRSE_ShinyHunt-Deoxys.h"
@@ -238,8 +238,8 @@ void ShinyHuntDeoxys::program(SingleSwitchProgramEnvironment& env, ProController
             default:
                 stats.errors++;
                 env.update_stats();
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Invalid starting position selected.",
                     env.console
                 );
@@ -249,7 +249,7 @@ void ShinyHuntDeoxys::program(SingleSwitchProgramEnvironment& env, ProController
         }
 
         //Start battle
-        BlackScreenWatcher legendary_battle_start(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+        BlackScreenWatcher legendary_battle_start(COLOR_RED);
         int ret3 = run_until<ProControllerContext>(
             env.console, context,
             [&](ProControllerContext& context){
@@ -266,8 +266,8 @@ void ShinyHuntDeoxys::program(SingleSwitchProgramEnvironment& env, ProController
             env.log("Failed to start battle after 5 attempts.", COLOR_RED);
             stats.errors++;
             env.update_stats();
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to start battle after 5 attempts.",
                 env.console
             );

@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -185,8 +185,8 @@ void ShinyHunt_HyperspaceHunter::use_fly_spot_reset(
                 if (!open_map(env.console, context, zoom_to_max, require_icons)){
                     stats.errors++;
                     env.update_stats();
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "use_fly_spot_reset(): Cannot fast travel after being chased by wild pokemon.",
                         env.console
                     );
@@ -198,8 +198,8 @@ void ShinyHunt_HyperspaceHunter::use_fly_spot_reset(
                 if (travel_status != FastTravelState::SUCCESS){
                     stats.errors++;
                     env.update_stats();
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "use_fly_spot_reset(): Cannot fast travel after moving map cursor.",
                         env.console
                     );
@@ -212,8 +212,8 @@ void ShinyHunt_HyperspaceHunter::use_fly_spot_reset(
                 if (!hyperspace_calorie_detector.detect(*overworld_screen)){
                     stats.errors++;
                     env.update_stats();
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "use_fly_spot_reset(): Cannot read Calorie number on screen.",
                         env.console
                     );

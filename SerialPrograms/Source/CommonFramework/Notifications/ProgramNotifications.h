@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <string>
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "ProgramInfo.h"
 #include "EventNotificationOption.h"
@@ -18,6 +19,7 @@ namespace PokemonAutomation{
 class Logger;
 class StatsTracker;
 class ProgramEnvironment;
+class StreamHistorySession;
 
 
 
@@ -156,7 +158,29 @@ void send_program_fatal_error_notification(
 );
 
 
+void send_program_recoverable_error_notification_and_telemetry_report(
+    ProgramEnvironment& env, 
+    Logger* logger,
+    const ProgramInfo& info,
+    EventNotificationOption& notif_settings,
+    ErrorReportMode error_report_mode,
+    const std::string& message,
+    std::string error_type,
+    const ImageViewRGB32& image = ImageViewRGB32(),
+    const StreamHistorySession* stream_history = nullptr
+);
 
+void send_program_fatal_error_notification_and_telemetry_report(
+    ProgramEnvironment& env, 
+    Logger* logger,
+    const ProgramInfo& info,
+    EventNotificationOption& notif_settings,
+    ErrorReportMode error_report_mode,
+    const std::string& message,
+    std::string error_type,
+    const ImageViewRGB32& image = ImageViewRGB32(),
+    const StreamHistorySession* stream_history = nullptr
+);
 
 
 

@@ -4,6 +4,7 @@
  *
  */
 
+#include <algorithm>
 #include <array>
 #include <map>
 #include <memory>
@@ -14,15 +15,12 @@
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
 #include "CommonTools/ImageMatch/ExactImageMatcher.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
-#include "CommonTools/Images/ImageFilter.h"
-#include "CommonTools/Images/ImageManip.h"
 
 #include "PokemonFRLG_DigitReader.h"
 
@@ -34,114 +32,13 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
 
-// Debug counter for unique filenames
-static int debug_counter = 0;
-
-// Full OCR preprocessing pipeline for GBA pixel fonts.
-//
-// GBA fonts are seven-segment-like with 1-pixel gaps between segments.
-// Pipeline: blur at native -> smooth upscale -> BW -> smooth BW -> re-BW -> pad
-//
-// The native blur connects gaps. Post-BW padding provides margins.
-ImageRGB32 preprocess_for_ocr(
-    const ImageViewRGB32 &image,
-    const std::string &label,
-    int blur_kernel_size, int blur_passes,
-    bool in_range_black, uint32_t bw_min,
-    uint32_t bw_max,
-    bool save_debug_images
-){
-    int id = debug_counter++;
-    std::string prefix = "DebugDumps/ocr_" + label + "_" + std::to_string(id);
-
-    // Save raw input
-    if (save_debug_images){
-        image.save(prefix + "_0_raw.png");
-    }
-
-    cv::Mat src = to_OpenCV_ref(image);
-
-    // Step 1: Gaussian blur at NATIVE resolution with 5x5 kernel.
-    // The 5x5 kernel reaches 2 pixels away (vs 1px for 3x3), bridging
-    // wider gaps in the seven-segment font. Two passes for heavy smoothing.
-    cv::Mat blurred_native;
-    src.copyTo(blurred_native);
-    if (blur_kernel_size > 0 && blur_passes > 0){
-        for (int i = 0; i < blur_passes; i++){
-            cv::GaussianBlur(
-                blurred_native, blurred_native,
-                cv::Size(blur_kernel_size, blur_kernel_size), 1.5
-            );
-        }
-    }
-
-    // Save blurred at native res
-    ImageRGB32 blurred_native_img(blurred_native.cols, blurred_native.rows);
-    blurred_native.copyTo(to_OpenCV_ref(blurred_native_img));
-    if (save_debug_images){
-        blurred_native_img.save(prefix + "_1_blurred_native.png");
-    }
-
-    // Step 2: Smooth upscale 4x with bilinear interpolation.
-    int scale_factor = 4;
-    int new_w = static_cast<int>(image.width()) * scale_factor;
-    int new_h = static_cast<int>(image.height()) * scale_factor;
-    cv::Mat resized;
-    cv::resize(
-        blurred_native, resized, cv::Size(new_w, new_h), 0, 0,
-        cv::INTER_LINEAR
-    );
-
-    // Save upscaled
-    ImageRGB32 resized_img(resized.cols, resized.rows);
-    resized.copyTo(to_OpenCV_ref(resized_img));
-    if (save_debug_images){
-        resized_img.save(prefix + "_2_upscaled.png");
-    }
-
-    // Step 3: BW threshold on the smooth upscaled image.
-    ImageRGB32 bw =
-            to_blackwhite_rgb32_range(resized_img, in_range_black, bw_min, bw_max);
-    if (save_debug_images){
-        bw.save(prefix + "_3_bw.png");
-    }
-
-    // Step 4: Post-BW smoothing -> re-threshold.
-    // The BW image has angular seven-segment shapes. GaussianBlur on the
-    // binary image creates gray anti-aliased edges. Re-thresholding at 128
-    // rounds the corners into natural smooth digit shapes that Tesseract
-    // recognizes much better. This is equivalent to morphological closing.
-    cv::Mat bw_mat = to_OpenCV_ref(bw);
-    cv::Mat smoothed;
-    cv::GaussianBlur(bw_mat, smoothed, cv::Size(7, 7), 2.0);
-
-    // Re-threshold: convert smoothed back to ImageRGB32 and BW threshold.
-    // After blur on BW: text areas are dark gray (~0-64), bg areas are
-    // light gray (~192-255), edge zones are mid-gray (~64-192).
-    // Threshold at [0..128] captures text + expanded edges -> BLACK.
-    ImageRGB32 smoothed_img(smoothed.cols, smoothed.rows);
-    smoothed.copyTo(to_OpenCV_ref(smoothed_img));
-    ImageRGB32 smooth_bw = to_blackwhite_rgb32_range(
-            smoothed_img, true, combine_rgb(0, 0, 0), combine_rgb(128, 128, 128));
-    if (save_debug_images){
-        smooth_bw.save(prefix + "_4_smooth_bw.png");
-    }
-
-    // Step 5: Pad with white border (Tesseract needs margins).
-    ImageRGB32 padded = pad_image(smooth_bw, smooth_bw.height() / 2, 0xffffffff);
-    if (save_debug_images){
-        padded.save(prefix + "_5_padded.png");
-    }
-
-    return padded;
-}
-
 // ---------------------------------------------------------------------------
 // Template store: loads 10 digit matchers from a resource sub-directory.
 // Results are cached in a static map keyed by template type.
-// Supports both:
+// Supports:
 // - StatBox (yellow stat boxes): PokemonFRLG/Digits/
 // - LevelBox (lilac level box): PokemonFRLG/LevelDigits/
+// - DialogBox (white dialog box): PokemonFRLG/DialogDigits/
 // ---------------------------------------------------------------------------
 
 static std::string get_template_path(DigitTemplateType type){
@@ -150,6 +47,8 @@ static std::string get_template_path(DigitTemplateType type){
         return "PokemonFRLG/Digits/";
     case DigitTemplateType::LevelBox:
         return "PokemonFRLG/LevelDigits/";
+    case DigitTemplateType::DialogBox:
+        return "PokemonFRLG/DialogDigits/";
     default:
         return "PokemonFRLG/Digits/";
     }
@@ -194,14 +93,65 @@ struct DigitTemplates{
     }
 };
 
+// Shrink a digit's bounding box down to the glyph itself.
+static ImagePixelBox tighten_to_glyph(const ImageViewRGB32& region, const ImagePixelBox& box){
+    const size_t PADDING = 1;
+
+    auto brightness = [&](size_t x, size_t y) -> uint32_t{
+        uint32_t p = region.pixel(x, y);
+        return (p & 0xff) + ((p >> 8) & 0xff) + ((p >> 16) & 0xff);
+    };
+
+    uint32_t min_brightness = 0xffffffff;
+    uint32_t max_brightness = 0;
+    for (size_t y = box.min_y; y < box.max_y; ++y){
+        for (size_t x = box.min_x; x < box.max_x; ++x){
+            uint32_t b = brightness(x, y);
+            min_brightness = std::min(min_brightness, b);
+            max_brightness = std::max(max_brightness, b);
+        }
+    }
+    if (min_brightness > max_brightness){
+        return box;     //  Empty box.
+    }
+    uint32_t glyph_max = (min_brightness + max_brightness) / 2;
+
+    size_t glyph_min_x = box.max_x;
+    size_t glyph_min_y = box.max_y;
+    size_t glyph_max_x = box.min_x;
+    size_t glyph_max_y = box.min_y;
+    for (size_t y = box.min_y; y < box.max_y; ++y){
+        for (size_t x = box.min_x; x < box.max_x; ++x){
+            if (brightness(x, y) > glyph_max){
+                continue;
+            }
+            glyph_min_x = std::min(glyph_min_x, x);
+            glyph_min_y = std::min(glyph_min_y, y);
+            glyph_max_x = std::max(glyph_max_x, x);
+            glyph_max_y = std::max(glyph_max_y, y);
+        }
+    }
+    if (glyph_min_x > glyph_max_x || glyph_min_y > glyph_max_y){
+        return box;     //  Nothing dark enough to be a glyph.
+    }
+
+    //  max_x/max_y are exclusive, so the last glyph pixel needs a +1 of its own.
+    return ImagePixelBox(
+        glyph_min_x >= box.min_x + PADDING ? glyph_min_x - PADDING : box.min_x,
+        glyph_min_y >= box.min_y + PADDING ? glyph_min_y - PADDING : box.min_y,
+        std::min(glyph_max_x + 1 + PADDING, box.max_x),
+        std::min(glyph_max_y + 1 + PADDING, box.max_y)
+    );
+}
+
 // ---------------------------------------------------------------------------
 // Main function
 // ---------------------------------------------------------------------------
 int read_digits_waterfill_template(
     Logger& logger,
     const ImageViewRGB32& stat_region,
-    double rmsd_threshold,
     DigitTemplateType template_type,
+    double rmsd_threshold,
     const std::string& dump_prefix,
     uint8_t binarize_high,
     bool save_debug_images
@@ -302,8 +252,11 @@ int read_digits_waterfill_template(
             size_t min_x = obj.min_x + i * split_w;
             size_t max_x = (i == expected_digits - 1) ? obj.max_x : obj.min_x + (i + 1) * split_w;
 
-            // Crop original (unblurred) region to the split bounding box.
-            ImagePixelBox bbox(min_x, obj.min_y, max_x, obj.max_y);
+            // Crop the unblurred region to the split bounding box,
+            // shrink to the glyph so a captured drop shadow doesn't cause an offset
+            ImagePixelBox bbox = tighten_to_glyph(
+                stat_region, ImagePixelBox(min_x, obj.min_y, max_x, obj.max_y)
+            );
             ImageViewRGB32 crop = extract_box_reference(stat_region, bbox);
 
             if (save_debug_images && dump_prefix == "levelDigit"){

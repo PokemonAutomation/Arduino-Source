@@ -150,11 +150,10 @@ public:
             return "Error: invalid language word in filename.";
         }
 
-        auto& unit_logger = global_logger_command_line();
         FixedLimitVector<SandwichPlateDetector> detectors(3);
-        detectors.emplace_back(unit_logger, COLOR_RED, language, SandwichPlateDetector::Side::LEFT);
-        detectors.emplace_back(unit_logger, COLOR_RED, language, SandwichPlateDetector::Side::MIDDLE);
-        detectors.emplace_back(unit_logger, COLOR_RED, language, SandwichPlateDetector::Side::RIGHT);
+        detectors.emplace_back(logger, COLOR_RED, language, SandwichPlateDetector::Side::LEFT);
+        detectors.emplace_back(logger, COLOR_RED, language, SandwichPlateDetector::Side::MIDDLE);
+        detectors.emplace_back(logger, COLOR_RED, language, SandwichPlateDetector::Side::RIGHT);
 
         std::string sides[3] = {"left", "middle", "right"};
         ImageRGB32 image(m_image);

@@ -7,7 +7,7 @@
 #include <cmath>
 #include <algorithm>
 #include "CommonTools/Random.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -379,7 +379,7 @@ bool EggRng::reset_and_check_seed(
     // Step 1: reset and perform blind sequence
     env.log("Resetting Game...");
     reset_and_perform_blind_sequence(
-        env.console, context, target,
+        env.console, context, LANGUAGE, target,
         SEED_BUTTON, EXTRA_BUTTON,
         timings, launch_delay, false, PROFILE
     );
@@ -599,8 +599,9 @@ bool EggRng::held_frame_check(
     }
 
     if (locked_in && !(definitely_hit_held_frame || possibly_hit_held_frame)){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        STARTING_POINT.set(EggProgramState::held_prep);
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "EggRng(): Missed held frame after saving. Restart the program after repeating the manual in-game setup.",
             env.console
         ); 
@@ -711,8 +712,8 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     }catch (const InternalProgramError& err){
         env.log(err.message());
         env.log(EGG_SPECIES.slug());
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             err.message(),
             env.console
         ); 
@@ -739,8 +740,8 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     const uint16_t TARGET_HELD_SEED = parse_seed(env.console, HELD_SEED);
     const SeedMatch held_match = seeds_db.find_seed(TARGET_HELD_SEED, SOUND, SEED_RADIUS);
     if (!held_match.found){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "EggRng(): Held Seed was not found in the seed database for this game version, language, and sound setting.",
             env.console
         );
@@ -752,8 +753,8 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     const uint16_t TARGET_PICKUP_SEED = parse_seed(env.console, PICKUP_SEED);
     const SeedMatch pickup_match = seeds_db.find_seed(TARGET_PICKUP_SEED, SOUND, SEED_RADIUS);
     if (!pickup_match.found){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "EggRng(): Pickup Seed was not found in the seed database for this game version, language, and sound setting.",
             env.console
         );
@@ -834,7 +835,7 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 
         if (hist.pickup.results.size() > 0){
             env.log("Checking for nonshiny target hit...");
-            if (have_hit_target(TARGET_HELD_SEED, HELD_ADVANCES, hist.pickup.results.back())){
+            if (have_hit_target(TARGET_PICKUP_SEED, PICKUP_ADVANCES, hist.pickup.results.back())){
                 env.log("Target Hit!");
                 stats.nonshiny++;
                 break;
@@ -844,8 +845,8 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 
         if (failed_searches >= 5){
             env.log("Failed to find any matches 5 times in a row");
-            OperationFailedException::fire(
-                ErrorReport::NO_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::NO_ERROR_REPORT,
                 "Failed to find any matches 5 times in a row. Check your seed and advances settings.",
                 env.console
             ); 
@@ -958,14 +959,10 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 
         case EggProgramState::finished:
         default:
-            if (GO_HOME_WHEN_DONE){
-                pbf_press_button(context, BUTTON_HOME, 200ms, 1000ms);
-            }
-            send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+            break;
         }
     }
 
-    // just in case
     if (GO_HOME_WHEN_DONE){
         pbf_press_button(context, BUTTON_HOME, 200ms, 1000ms);
     }

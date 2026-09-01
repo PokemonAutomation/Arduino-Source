@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/StaticGlobals.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -177,8 +177,8 @@ void run_back_until_found_bench(
         env.console.log("Detected floating A button...");
         break;
     default:
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "run_back_until_found_bench(): Unable to detect bench after multiple attempts.",
             env.console
         );

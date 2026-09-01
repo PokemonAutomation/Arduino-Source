@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/EarlyShutdown.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
+#include "CommonFramework/Logging/Logger.h"
 #include "NintendoSwitch_MultiSwitchSystemSession.h"
 
 namespace PokemonAutomation{

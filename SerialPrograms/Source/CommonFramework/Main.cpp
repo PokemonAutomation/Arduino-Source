@@ -8,6 +8,7 @@
 #include "Common/Cpp/Logging/FileLogger.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
 #include "Common/Cpp/Logging/MultiOutputLogger.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Concurrency/Qt6.9ThreadBugWorkaround.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/FireForgetDispatcher.h"
@@ -41,7 +42,7 @@
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "ControllerInput/ControllerInput.h"
-#include "Controllers/SerialPortPollerQt.h"
+#include "Controllers/SerialPort/SerialPortPollerQt.h"
 #include "Integrations/DiscordWebhook.h"
 #include "Windows/MainWindow.h"
 
@@ -87,12 +88,20 @@ FileLogger& global_file_logger(){
 
 
 int run_program(int argc, char *argv[]){
+//    qputenv("QT_RHI_BACKEND", "opengl");
+
 #if defined(__APPLE__)
-    PokemonAutomation::set_startup_profile(argc, argv);
+    Filesystem::set_startup_profile(argc, argv);
     QApplication application(argc, argv);
 #else
     QApplication application(argc, argv);
 #endif
+
+    {
+        QString bin_dir = QCoreApplication::applicationDirPath();
+        QString qml_import_path = QDir(bin_dir).filePath("qml");
+        qputenv("QML_IMPORT_PATH", qml_import_path.toLocal8Bit());
+    }
 
     GlobalOutputRedirector redirect_stdout(std::cout, "stdout", Color());
     GlobalOutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);
@@ -107,8 +116,8 @@ int run_program(int argc, char *argv[]){
 
     logger.log("================================================================================");
     logger.log("Starting Program...");
-    logger.log("Current path: " + QDir::currentPath().toStdString());
-    logger.log("Executable path: " + qApp->applicationDirPath().toStdString());
+    logger.log("Current path: " + Filesystem::current_path().string_slash_normalized());
+    logger.log("Executable path: " + Filesystem::application_binary_directory().string_slash_normalized());
     logger.log("Program setting folder: " + SETTINGS_PATH());
     logger.log("Program resources folder: " + RESOURCE_PATH());
 
@@ -138,14 +147,6 @@ int run_program(int argc, char *argv[]){
         GlobalMediaServices::instance().stop();
     });
 
-    //  Preload a bunch of stuff now so they are ready later.
-    SerialPortPoller::instance().ports();
-    get_all_cameras();
-
-    //  Force all the Qt thread pools to be constructed now on the main thread.
-    GlobalThreadPools::qt_worker_threadpool();
-    GlobalThreadPools::qt_event_threadpool();
-
     //  Several novice developers struggled to build and run the program due to missing Resources folder.
     //  Add this check to pop a message box when Resources folder is missing.
     if (!check_resource_folder(logger)){
@@ -168,6 +169,14 @@ int run_program(int argc, char *argv[]){
     }catch (const ParseException& error){
         logger.log(error.message(), COLOR_RED);
     }
+
+    //  Preload a bunch of stuff now so they are ready later.
+    SerialPortPoller::instance().ports();
+    get_all_cameras();
+
+    //  Force all the Qt thread pools to be constructed now on the main thread.
+    GlobalThreadPools::qt_worker_threadpool();
+    GlobalThreadPools::qt_event_threadpool();
 
     for (size_t i = 0; i < argc; i++){
         constexpr const char* force_run_tests = "--command-line-test-mode";
@@ -239,8 +248,9 @@ int main(int argc, char *argv[]){
     // Qt multimedia, default to gstreamer to prevent flickering
     // Easier than the alternative which is compiling qt6multimedia with QT_DEFAULT_MEDIA_BACKEND
     // See: https://doc.qt.io/qt-6.5/qtmultimedia-index.html
-    if (qEnvironmentVariableIsEmpty("QT_MEDIA_BACKEND"))
+    if (qEnvironmentVariableIsEmpty("QT_MEDIA_BACKEND")){
         qputenv("QT_MEDIA_BACKEND", "gstreamer");
+    }
 #endif
 
     //  So far, this is only needed on Mac where static initialization is fucked up.

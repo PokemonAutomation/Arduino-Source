@@ -96,7 +96,7 @@ bool OverworldPartySelectionDetector::detect(const ImageViewRGB32& screen){
                 if (m_debug_mode && m_detected_up_idx != INVALID_PARTY_IDX){
                     cout << "Multiple dpad up buttons detected! First detection " << int(m_detected_up_idx)
                          << " second detection (" << int(i) << endl;
-                    throw FatalProgramException(ErrorReport::NO_ERROR_REPORT,
+                    throw FatalProgramException(ErrorReportMode::NO_ERROR_REPORT,
                         "Multiple dpad up buttons detected!", nullptr, screen.copy());
                 }
                 m_detected_up_idx = i;
@@ -110,7 +110,7 @@ bool OverworldPartySelectionDetector::detect(const ImageViewRGB32& screen){
                 if (m_debug_mode && m_detected_down_idx != INVALID_PARTY_IDX){
                     cout << "Multiple dpad down buttons detected! First detection " << int(m_detected_down_idx)
                          << " second detection (" << int(i) << endl;
-                    throw FatalProgramException(ErrorReport::NO_ERROR_REPORT,
+                    throw FatalProgramException(ErrorReportMode::NO_ERROR_REPORT,
                         "Multiple dpad down buttons detected!", nullptr, screen.copy());
                 }
                 m_detected_down_idx = i;

@@ -6,7 +6,7 @@
 
 #include <vector>
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -146,8 +146,8 @@ void finish_intro_animations(SingleSwitchProgramEnvironment& env, ProControllerC
     );
 
     if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT, "SidHelper(): black screen not detected within 10 seconds of setting SID", env.console
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT, "SidHelper(): black screen not detected within 10 seconds of setting SID", env.console
         );
     }
     
@@ -171,8 +171,8 @@ void navigate_to_trainer_card(SingleSwitchProgramEnvironment& env, ProController
     int errors = 0;
     while (true){
         if (errors >= 5){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT, "SidHelper(): failed 5 times to navigate to the Trainer Card", env.console
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT, "SidHelper(): failed 5 times to navigate to the Trainer Card", env.console
             ); 
         }
 
@@ -261,8 +261,8 @@ std::vector<std::pair<std::string, std::string>> get_sid_messages(
 
 void SidHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (TARGET_ADVANCES % 2 == 0){
-        OperationFailedException::fire(
-            ErrorReport::NO_ERROR_REPORT, "SidHelper(): the Target Advances setting needs to be odd", env.console
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::NO_ERROR_REPORT, "SidHelper(): the Target Advances setting needs to be odd", env.console
         ); 
     }
 
@@ -299,7 +299,9 @@ void SidHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     bool extra_press_at_end = (
         LANGUAGE == Language::German ||
-        LANGUAGE == Language::Japanese
+        LANGUAGE == Language::Japanese ||
+        LANGUAGE == Language::Spanish ||
+        LANGUAGE == Language::French
     );
 
     const uint64_t SID_DELAY = uint64_t((TARGET_ADVANCES - 2*FINAL_TEXT_FRAMES + FIXED_ADVANCES_OFFSET) * FRLG_FRAME_DURATION / 2); // advances pass 2 by 2

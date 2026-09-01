@@ -22,9 +22,6 @@ using std::cout;
 using std::endl;;
 
 namespace PokemonAutomation{
-
-template class FixedLimitVector<NintendoSwitch::PokemonSV::BoxEmptySlotWatcher>;
-
 namespace NintendoSwitch{
 namespace PokemonSV{
 

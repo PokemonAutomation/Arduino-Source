@@ -23,9 +23,6 @@ using std::endl;
 
 namespace PokemonAutomation{
 
-namespace fs = std::filesystem;
-
-
 
 
 DownloadThread::~DownloadThread(){
@@ -59,7 +56,7 @@ void DownloadThread::start_download_thread(){
         try {
 
             // Logger& logger = global_logger_tagged();
-            // throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
+            // throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, 
             //         "Test");
             // throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Test."); 
 
@@ -104,7 +101,7 @@ void DownloadThread::run_download(DownloadedResourceMetadata resource_metadata){
     try{
 
         // delete directory and the old resource
-        fs::remove_all(Filesystem::Path(resource_directory));
+        Filesystem::remove_all(resource_directory);
 
         // download
         std::string zip_path = resource_directory + "/temp.zip";
@@ -122,7 +119,7 @@ void DownloadThread::run_download(DownloadedResourceMetadata resource_metadata){
         // hash
         std::string hash = 
             hash_file(
-                *this,
+                this,
                 zip_path,
                 [this](uint64_t bytes_done, uint64_t total_bytes){
                     m_hooks.report_hash_progress(bytes_done, total_bytes);
@@ -131,7 +128,7 @@ void DownloadThread::run_download(DownloadedResourceMetadata resource_metadata){
         std::string expected_hash = resource_metadata.sha256;
         if (hash != expected_hash){
             std::cerr << "current hash: " << hash << endl;
-            throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
+            throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, 
                 "Downloaded file failed verification. SHA 256 hash did not match the expected value.");
         }
 
@@ -149,23 +146,23 @@ void DownloadThread::run_download(DownloadedResourceMetadata resource_metadata){
         );
 
         // delete old zip file
-        fs::remove(Filesystem::Path(zip_path));
+        Filesystem::remove(zip_path);
 
         throw_if_cancelled();
 
     }catch(OperationCancelledException&){
         // delete directory and the resource
-        fs::remove_all(Filesystem::Path(resource_directory));
+        Filesystem::remove_all(resource_directory);
 
         throw;
     }catch(OperationFailedException&){
         // delete directory and the resource
-        fs::remove_all(Filesystem::Path(resource_directory));
+        Filesystem::remove_all(resource_directory);
 
         throw;
     }catch(...){
         // delete directory and the resource
-        fs::remove_all(Filesystem::Path(resource_directory));
+        Filesystem::remove_all(resource_directory);
 
         throw;
     }

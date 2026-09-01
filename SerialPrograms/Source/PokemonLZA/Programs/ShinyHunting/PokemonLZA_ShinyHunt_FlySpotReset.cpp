@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -150,8 +150,8 @@ void route_default(
     if (!can_fast_travel){
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "route_default(): Cannot open map for fast travel.",
             env.console
         );
@@ -165,8 +165,8 @@ void route_default(
     if (travel_status != FastTravelState::SUCCESS){
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "route_default(): Cannot fast travel after moving map cursor.",
             env.console
         );
@@ -260,8 +260,8 @@ bool route_hyperspace_wild_zone(
     if (!hyperspace_calorie_detector.detect(*overworld_screen)){
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "route_hyperspace_wild_zone(): Cannot read Calorie number on screen.",
             env.console
         );
@@ -331,8 +331,8 @@ void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProCon
         route = route_alpha_pidgey;
         break;
     default:
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "route not implemented",
             env.console
         );

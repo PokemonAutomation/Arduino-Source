@@ -57,7 +57,9 @@ void checkpoint_01(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
     AutoStoryStats& stats,
+    const std::string& checkpoint_text,
     Language language
 );
 
@@ -67,7 +69,9 @@ void checkpoint_02(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 // start: standing in front of power of science NPC. Cleared map tutorial.
@@ -76,7 +80,9 @@ void checkpoint_03(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
     AutoStoryStats& stats,
+    const std::string& checkpoint_text,
     Language language,
     StarterChoice starter_choice
 );

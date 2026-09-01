@@ -8,7 +8,7 @@
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 //#include "CommonFramework/Exceptions/UnexpectedBattleException.h"
 #include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -151,7 +151,7 @@ EggAutonomous::EggAutonomous()
     , m_battle_ai_description(
         "<b>Battle AI if Attacked:</b><br>"
         "Occasionally (especially on the Switch 2), you will get attacked by wild " + STRING_POKEMON + ". "
-        "If the following section is enabled, it attempt to recover by killing the wild " + STRING_POKEMON + ". "
+        "If the following section is enabled, it attempts to recover by killing the wild " + STRING_POKEMON + ". "
         "If disabled, the program will instead reset the game. "
         "This table applies to the egg hatching " + STRING_POKEMON + " (the Flame Body one)."
     )
@@ -159,7 +159,7 @@ EggAutonomous::EggAutonomous()
     , HAS_CLONE_RIDE_POKEMON(
         "<b>Cloned Ride Legendary 2nd in Party:</b><br>"
         "Ride legendary cannot be cloned after patch 1.0.1. To preserve the existing clone while hatching eggs, "
-        "place it as second in party before starting the program.</b>"
+        "place it as second in party before starting the program. "
         "The program will skip the first row of the current box when storing and hatching eggs, so you will need "
         "to fill the first row with " + STRING_POKEMON + " before running this program.",
         LockMode::LOCK_WHILE_RUNNING,
@@ -263,7 +263,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             try{
                 num_party_eggs = fetch_eggs_full_routine(env, context);
                 break;
-            }catch (ScreenshotException& e){
+            }catch (OperationFailedException& e){
                 if (handle_recoverable_error(
                     env, context,
                     NOTIFICATION_ERROR_RECOVERABLE,
@@ -287,7 +287,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
                 GO_HOME_WHEN_DONE.run_end_of_program(context);
                 send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
                 return;
-            }catch (ScreenshotException& e){
+            }catch (OperationFailedException& e){
                 if (handle_recoverable_error(
                     env, context,
                     NOTIFICATION_ERROR_RECOVERABLE,
@@ -774,10 +774,10 @@ void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, ProController
         }else{
             save_game_from_menu(env.program_info(), env.console, context);
         }
-    }catch (OperationFailedException& e){
+    }catch (OperationFailedExceptionWithScreenshot& e){
         // To be safe: avoid interrupting or corrupting game saving,
         // make game saving non error recoverable
-        throw FatalProgramException(std::move(e));
+        throw FatalProgramException(e.error_report_mode(), e.message(), e.video_stream(), e.screenshot());
     }
 }
 
@@ -805,7 +805,7 @@ void change_settings_egg_program(SingleSwitchProgramEnvironment& env, ProControl
 bool EggAutonomous::handle_recoverable_error(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context,
     EventNotificationOption& notification,
-    const ScreenshotException& e,
+    const OperationFailedException& e,
     size_t& consecutive_failures
 ){
     auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
@@ -834,18 +834,29 @@ bool EggAutonomous::handle_recoverable_error(
     std::string fail_message = e.message();
     consecutive_failures++;
     if (consecutive_failures >= 3){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed 3 times in the row.\n" + fail_message,
             env.console
         );
     }
-    e.send_recoverable_notification(env);
+
+    auto snapshot = env.console.video().snapshot().frame;
+    std::string message = fail_message;
+    send_program_recoverable_error_notification_and_telemetry_report(
+        env, &env.logger(), env.program_info(), 
+        NOTIFICATION_ERROR_RECOVERABLE, 
+        ErrorReportMode::SEND_ERROR_REPORT,
+        message,
+        "OperationFailedExceptionWithScreenshot",
+        *snapshot,
+        &env.console.history()
+    );       
 
     env.log("Reset game to handle recoverable error");
     reset_game(env.program_info(), env.console, context);
 
-    if (e.message().find("collect_eggs_from_basket") != std::string::npos){
+    if (e.message().find("check_basket_to_collect_eggs") != std::string::npos){
         change_settings_egg_program(env, context, LANGUAGE);
     }
 

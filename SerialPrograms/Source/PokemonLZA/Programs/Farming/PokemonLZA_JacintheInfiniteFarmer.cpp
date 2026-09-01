@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonTools/Async/InterruptableCommands.h"
@@ -215,8 +215,8 @@ bool JacintheInfiniteFarmer::talk_to_jacinthe(SingleSwitchProgramEnvironment& en
             if (ret != 0){
                 stats.errors++;
                 env.update_stats();
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "talk_to_jacinthe(): Does not detect transparent battle dialog 20 sec after black screen.",
                     env.console
                 );
@@ -232,8 +232,8 @@ bool JacintheInfiniteFarmer::talk_to_jacinthe(SingleSwitchProgramEnvironment& en
         default:
             stats.errors++;
             env.update_stats();
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "talk_to_jacinthe(): No recognized state after 60 seconds.",
                 env.console
             );
@@ -275,8 +275,8 @@ void JacintheInfiniteFarmer::run_round(SingleSwitchProgramEnvironment& env, ProC
         default:
             stats.errors++;
             env.update_stats();
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "run_round(): no battle state or dialog window detected after 50 sec.",
                 env.console
             );

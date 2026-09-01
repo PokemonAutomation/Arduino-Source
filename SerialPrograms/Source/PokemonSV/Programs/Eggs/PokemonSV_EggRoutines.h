@@ -125,7 +125,7 @@ std::pair<uint8_t, uint8_t> check_egg_party_column(
 
 // In box view, check whether there is the right amount of non-egg pokemon in the five slots in the party column, after party lead.
 // return how many eggs in the five slots.
-// Throw OperationFailedException if found unxepcted non-egg pokemon count in the slots.
+// Throw OperationFailedException if found unexpected non-egg pokemon count in the slots.
 // Note: make sure the current cursor does not float above the five slots, otherwise it may affect detection.
 uint8_t check_non_eggs_count_in_party(
     const ProgramInfo& info,

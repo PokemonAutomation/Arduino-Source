@@ -369,7 +369,7 @@ bool BoxDetector::detect(const ImageViewRGB32& screen){
                 if (arrow_found && m_debug_mode){
                     cout << "Multiple box selection arrows detected! First detection (" << int(m_found_row) << ", " << int(m_found_col) << ")"
                         << " second detection (" << int(row) << ", " << int(col) << ")" << endl;
-                    throw FatalProgramException(ErrorReport::NO_ERROR_REPORT,
+                    throw FatalProgramException(ErrorReportMode::NO_ERROR_REPORT,
                         "Multiple box selection arrows detected!", nullptr, screen.copy());
                 }
                 arrow_found = true;
@@ -681,7 +681,7 @@ public:
 
         // Test BoxDexNumberDetector
         if (expect_dex_detection){
-            BoxDexNumberDetector dex_detector(global_logger_command_line());
+            BoxDexNumberDetector dex_detector(logger);
             bool detected_dex = dex_detector.detect(image);
 
             if (!detected_dex){

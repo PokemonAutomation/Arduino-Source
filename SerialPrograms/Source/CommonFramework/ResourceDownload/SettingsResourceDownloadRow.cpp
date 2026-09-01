@@ -17,7 +17,6 @@
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ResourceDownload/GlobalResourceDownloadManager.h"
 #include "ResourceDownloadHelpers.h"
-#include "ResourceDownloadHelpersQt.h"
 // #include "SettingsResourceDownloadTable.h"
 #include "SettingsResourceDownloadRow.h"
 
@@ -185,7 +184,7 @@ const DownloadedResourceMetadata& SettingsResourceDownloadRow::fetch_remote_meta
             "SettingsResourceDownloadRow::fetch_remote_metadata(): Error",
             COLOR_RED
         );
-        throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
+        throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, 
             "Error: Download failed. Failed to fetch the list of available downloads. Check your internet connection.");
     }
 
@@ -199,7 +198,7 @@ const DownloadedResourceMetadata& SettingsResourceDownloadRow::fetch_remote_meta
     }
 
     // if corresponding remote_metadata not found
-    throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
+    throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, 
             "fetch_remote_metadata: Resource no longer available for download. We recommend updating the Computer Control program.");
 
 }
@@ -233,7 +232,7 @@ void SettingsResourceDownloadRow::ensure_remote_metadata_loaded(){
             // cout << "Fetched remote metadata" << endl;
             // throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "testing");
             // Logger& logger = global_logger_tagged();
-            // throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, "test");
+            // throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, "test");
 
             report_metadata_fetch_finished(predownload_warning);
             success = true;
@@ -313,7 +312,7 @@ void SettingsResourceDownloadRow::start_delete(){
 
             // throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "test.");
             // Logger& logger = global_logger_tagged();
-            // throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, "test");
+            // throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, "test");
 
             if (!is_given_action_state(ActionState::PRE_DELETE)){
                 return;
@@ -537,7 +536,7 @@ void SettingsResourceDownloadRow::on_hash_progress(uint64_t bytes_done, uint64_t
 void SettingsResourceDownloadRow::on_download_finished(bool success, const std::string& resource_slug){
     // we can't run `download_ptr->remove_listener(*this)` in this function
     // since it results in deadlock, since this function is part of the listener loop
-    m_data->m_download_ptr.reset();
+//    m_data->m_download_ptr.reset();
 
     update_action_state(ActionState::READY);
     update_table_label(success);

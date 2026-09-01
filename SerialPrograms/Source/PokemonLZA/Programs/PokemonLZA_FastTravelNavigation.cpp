@@ -5,7 +5,7 @@
  */
 
 #include <cmath>
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -408,8 +408,8 @@ void set_fast_travel_menu_filter(
 
     bool filters_menu_opened = open_fast_travel_filters_menu(console, context);
     if (!filters_menu_opened){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "set_fast_travel_menu_filter(): Unable to open fast travel filter menu.",
             console
         );
@@ -447,8 +447,8 @@ void set_fast_travel_menu_filter(
             }
         }
     } while (current_time() < deadline);
-    OperationFailedException::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+    OperationFailedExceptionWithScreenshot::fire(
+        ErrorReportMode::SEND_ERROR_REPORT,
         "set_fast_travel_menu_filter(): Unable to set fast travel filter.",
         console
     );
@@ -473,8 +473,8 @@ void open_fast_travel_menu(
         console.log("Fast travel menu opened.");
         return;
     default:
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "open_fast_travel_menu(): Unable to open fast travel menu.",
             console
         );
@@ -541,8 +541,8 @@ FastTravelState open_map_and_fly_to(ConsoleHandle& console, ProControllerContext
         console.log("Pursued by wild pokemon while flying to " + target_slug);
         return FastTravelState::PURSUED;
     default:
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "open_map_and_fly_to(): Unable to fast travel to " + target_slug,
             console
         );
@@ -556,8 +556,8 @@ FastTravelState open_map_and_fly_to(ConsoleHandle& console, ProControllerContext
         console.log("Arrived at " + target_slug);
         return FastTravelState::SUCCESS;
     default:
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "open_map_and_fly_to(): Overworld not detected",
             console
         );

@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -302,8 +302,8 @@ void RoamingLegendaryRng::program(SingleSwitchProgramEnvironment& env, ProContro
 
         if (failed_searches >= 5){
             env.log("Failed to find any matches 5 times in a row");
-            OperationFailedException::fire(
-                ErrorReport::NO_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::NO_ERROR_REPORT,
                 "Failed to find any matches 5 times in a row. Check your seed and advances settings.",
                 env.console
             ); 
@@ -312,8 +312,8 @@ void RoamingLegendaryRng::program(SingleSwitchProgramEnvironment& env, ProContro
 
         if (failed_to_encounter >= 5){
             env.log("Failed to encounter the Roaming Legendary 5 times in a row");
-            OperationFailedException::fire(
-                ErrorReport::NO_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::NO_ERROR_REPORT,
                 "Failed to encounter the Roaming Legendary 5 times in a row",
                 env.console
             ); 
@@ -352,7 +352,7 @@ void RoamingLegendaryRng::program(SingleSwitchProgramEnvironment& env, ProContro
 
         env.log("Resetting Game...");
         reset_and_perform_blind_sequence(
-            env.console, context, TARGET, 
+            env.console, context, LANGUAGE, TARGET, 
             SEED_BUTTON, EXTRA_BUTTON, timings, 
             launch_delay, false, PROFILE
         );

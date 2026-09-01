@@ -133,12 +133,11 @@ std::tuple<int, int, double, double> resize_image_with_border(
 
 
 YOLOv5Session::YOLOv5Session(const std::string& model_path, bool use_gpu)
-: m_env{create_ORT_env()}
-, m_session{create_session(m_env, model_path, ML_MODEL_CACHE_PATH() + "YOLOv5", use_gpu)}
-, m_memory_info{Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU)}
-, m_input_names{m_session.GetInputNames()}
-, m_output_names{m_session.GetOutputNames()}
-, m_model_input(3*YOLO5_INPUT_IMAGE_SIZE*YOLO5_INPUT_IMAGE_SIZE)
+    : m_session{create_session(model_path, ML_MODEL_CACHE_PATH() + "YOLOv5", use_gpu)}
+    , m_memory_info{Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU)}
+    , m_input_names{m_session.GetInputNames()}
+    , m_output_names{m_session.GetOutputNames()}
+    , m_model_input(3*YOLO5_INPUT_IMAGE_SIZE*YOLO5_INPUT_IMAGE_SIZE)
 {
     // Extract YOLO labels from model metadata
     try{

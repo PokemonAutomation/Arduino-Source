@@ -6,7 +6,7 @@
 
 #include <algorithm>
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "PokemonSV_MenuOption.h"
@@ -64,8 +64,8 @@ void MenuOption::set_target_option(const std::vector<MenuOptionToggleEnum>& targ
         pbf_press_dpad(m_context, DPAD_RIGHT, 80ms, 400ms);
     }
 
-    OperationFailedException::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+    OperationFailedExceptionWithScreenshot::fire(
+        ErrorReportMode::SEND_ERROR_REPORT,
         "MenuOption::set_target_option(): Unable to set option to the correct toggle.",
         m_stream
     );
@@ -76,8 +76,8 @@ int8_t MenuOption::get_selected_index(const ImageViewRGB32& screen) const {
     m_context.wait_for_all_requests();
     ImageFloatBox box;
     if (!m_arrow.detect(box, screen)){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "MenuOption::get_selected_index(): Unable to find cursor.\n"
             "We expect to be in the Options screen. Ensure you selected the correct Autostory start segment.",
             m_stream
@@ -89,8 +89,8 @@ int8_t MenuOption::get_selected_index(const ImageViewRGB32& screen) const {
     int8_t selected_index = (int8_t)(slot + 0.5);
 
     if (selected_index < 0 || selected_index >= 10){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "MenuOption::get_selected_index(): Invalid cursor slot.",
             m_stream
         );
@@ -128,16 +128,16 @@ std::string MenuOption::read_option(const ImageViewRGB32& cropped) const{
                     return "fast";
             }
         }
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "MenuOption::read_option(): Unable to read item. No results returned.",
             m_stream
         );        
     }
 
     if (results.size() > 1){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "MenuOption::read_option(): Unable to read item. Ambiguous or multiple results.\n" + language_warning(m_language),
             m_stream
         );

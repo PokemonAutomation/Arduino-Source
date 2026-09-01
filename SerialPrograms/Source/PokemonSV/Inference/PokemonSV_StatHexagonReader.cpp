@@ -138,7 +138,7 @@ NatureAdjustments StatHexagonReader::read_nature(Logger& logger, const ImageView
     }
     if (non_neutral.size() != 2){
         throw_and_log<OperationFailedException>(
-            logger, ErrorReport::SEND_ERROR_REPORT,
+            logger, ErrorReportMode::SEND_ERROR_REPORT,
             "Unable to read nature."
         );
     }
@@ -165,7 +165,7 @@ NatureAdjustments StatHexagonReader::read_nature(Logger& logger, const ImageView
     }
 
     throw_and_log<OperationFailedException>(
-        logger, ErrorReport::SEND_ERROR_REPORT,
+        logger, ErrorReportMode::SEND_ERROR_REPORT,
         "Unable to read nature."
     );
 }

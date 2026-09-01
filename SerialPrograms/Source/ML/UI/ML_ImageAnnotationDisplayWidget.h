@@ -10,7 +10,6 @@
 #define POKEMON_AUTOMATION_ML_ImageAnnotationDisplayWidget_H
 
 #include <QWidget>
-#include "CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h"
 #include "CommonFramework/Globals.h"
 
 namespace PokemonAutomation{
@@ -23,6 +22,18 @@ namespace ML{
 class ImageAnnotationSourceSelectorWidget;
 class ImageAnnotationDisplaySession;
 class ImageAnnotationCommandRow;
+
+
+
+struct CommandReceiver{
+    virtual void key_press(QKeyEvent* event) = 0;
+    virtual void key_release(QKeyEvent* event) = 0;
+
+    virtual void focus_in(QFocusEvent* event) = 0;
+    virtual void focus_out(QFocusEvent* event) = 0;
+};
+
+
 
 // UI widget for loading and displaying an image for image annotation for training ML models
 // It includes:

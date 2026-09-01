@@ -43,7 +43,7 @@ std::u32string remove_non_alphanumeric(const std::u32string& text){
 
 
 std::map<char32_t, std::u32string> make_substitution_map32(){
-    std::string path = RESOURCE_PATH() + "Tesseract/CharacterReductions.json";
+    std::string path = RESOURCE_PATH() + "OCR/CharacterReductions.json";
     JsonValue json = load_json_file(path);
     JsonObject& obj = json.to_object_throw(path);
 
@@ -66,7 +66,7 @@ std::map<char32_t, std::u32string> make_substitution_map32(){
     return map;
 }
 
-// Load character substitution rules from RESOURCE_PATH()/Tesseract/CharacterReductions.json
+// Load character substitution rules from RESOURCE_PATH()/OCR/CharacterReductions.json
 // and build a lookup map. The JSON file maps target characters to source characters that
 // should be replaced, e.g. {"o": "0О"} means '0' and 'О' (Cyrillic O) should both map to 'o'.
 // This helps normalize OCR output where visually similar characters are often misrecognized.

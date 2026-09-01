@@ -28,6 +28,8 @@ public:
     enum class Device{
         switch_1_2,
         rg35xx,
+        tablet,
+        gameboyplayer,
         custom,
     };
 

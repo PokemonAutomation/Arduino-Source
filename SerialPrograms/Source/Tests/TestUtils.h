@@ -9,13 +9,9 @@
 #ifndef PokemonAutomation_Tests_TestUtils_H
 #define PokemonAutomation_Tests_TestUtils_H
 
-#include <iostream>
 #include <string>
 #include <vector>
 #include <map>
-#include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
-#include "Controllers/SerialPABotBase/Connection/BotBase.h"
-#include "Controllers/SerialPABotBase/Connection/BotBaseMessage.h"
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
 //#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -50,44 +46,6 @@ bool load_sprite_count(const std::string& filepath, std::map<std::string, int>& 
 // Each line is a slug.
 bool load_slug_list(const std::string& filepath, std::vector<std::string>& sprites);
 
-
-// Implement the dummy interface of BotBase so that we can run the test code
-// that relies on a BotBase.
-class DummyBotBase : public BotBaseController{
-public:
-    DummyBotBase(Logger& logger) : m_logger(logger) {}
-
-    virtual void stop(std::string error_message) noexcept override{}
-    
-    virtual Logger& logger() override { return m_logger; }
-
-    virtual State state() const override { return State::RUNNING; }
-    virtual size_t queue_limit() const override { return PABB_DEVICE_MINIMUM_QUEUE_SIZE; }
-
-    virtual void on_cancellable_cancel(
-        Cancellable& cancellable,
-        std::exception_ptr reason
-    ) override{}
-
-    virtual void wait_for_all_requests(Cancellable* cancelled = nullptr) override {}
-    virtual void stop_all_commands() override {}
-    virtual void next_command_interrupt() override {};
-
-    virtual bool try_issue_request(
-        const BotBaseRequest& request,
-        Cancellable* cancelled = nullptr
-    ) override { return true; }
-    virtual void issue_request(
-        const BotBaseRequest& request,
-        Cancellable* cancelled = nullptr
-    ) override {}
-    virtual BotBaseMessage issue_request_and_wait(
-        const BotBaseRequest& request,
-        Cancellable* cancelled = nullptr
-    ) override { return BotBaseMessage(0, ""); }
-
-    Logger& m_logger;
-};
 
 // Implement the dummy interface of VideoFeed so that we can test
 // the video inference code that relies on a VideoFeed.
@@ -128,6 +86,9 @@ public:
 
     virtual void add_stat(OverlayStat& stat) override{}
     virtual void remove_stat(OverlayStat& stat) override{}
+
+    virtual void add_hid_listener(VideoDisplayHidListener& listener) override{}
+    virtual void remove_hid_listener(VideoDisplayHidListener& listener) override{}
 };
 
 // Implement the dummy interface of AudioFeed so that we can test

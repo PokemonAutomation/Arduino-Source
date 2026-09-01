@@ -3,7 +3,7 @@
  */
 
 #include "Common/Cpp/RecursiveThrottler.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Exceptions/UnexpectedBattleException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -152,13 +152,13 @@ void press_Bs_to_back_to_overworld(const ProgramInfo& info, VideoStream& stream,
     );
     if (ret == 1){
         throw_and_log<UnexpectedBattleException>(
-            stream.logger(), ErrorReport::SEND_ERROR_REPORT,
+            stream.logger(), ErrorReportMode::SEND_ERROR_REPORT,
             "press_Bs_to_back_to_overworld(): Unexpectedly detected battle.",
             stream
         );         
     }else if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "press_Bs_to_back_to_overworld(): Unable to detect overworld after 10 button B presses.",
             stream
         );
@@ -187,13 +187,13 @@ void open_map_from_overworld(
             pbf_press_button(context, BUTTON_Y, 160ms, 840ms); // open map
         }else if (ret == 1){
             throw_and_log<UnexpectedBattleException>(
-                stream.logger(), ErrorReport::NO_ERROR_REPORT,
+                stream.logger(), ErrorReportMode::NO_ERROR_REPORT,
                 "open_map_from_overworld(): Unexpectedly detected battle.",
                 stream
             );              
         }else{
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "open_map_from_overworld(): No overworld state found after 10 seconds.",
                 stream
             );
@@ -203,8 +203,8 @@ void open_map_from_overworld(
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::minutes(2)){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "open_map_from_overworld(): Failed to open map after 2 minutes.",
                 stream
             );
@@ -254,13 +254,13 @@ void open_map_from_overworld(
         case 4:
             stream.log("Detected battle.");
             throw_and_log<UnexpectedBattleException>(
-                stream.logger(), ErrorReport::NO_ERROR_REPORT,
+                stream.logger(), ErrorReportMode::NO_ERROR_REPORT,
                 "open_map_from_overworld(): Unexpectedly detected battle.",
                 stream
             ); 
         default:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "open_map_from_overworld(): No recognized state after 30 seconds.",
                 stream
             );
@@ -279,8 +279,8 @@ void enter_box_system_from_overworld(
     bool success = false;
     while (true){
         if (current_time() - start > std::chrono::minutes(3)){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "enter_box_system_from_overworld(): Failed to enter box system after 3 minutes.",
                 stream
             );
@@ -307,8 +307,8 @@ void enter_box_system_from_overworld(
             stream.overlay().add_log("Enter box", COLOR_WHITE);
             success = main_menu.move_cursor(info, stream, context, MenuSide::RIGHT, 1, fast_mode);
             if (success == false){
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "enter_box_system_from_overworld(): Cannot move menu cursor to Boxes.",
                     stream
                 );
@@ -320,8 +320,8 @@ void enter_box_system_from_overworld(
             context.wait_for(std::chrono::milliseconds(200));
             return;
         default:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "enter_box_system_from_overworld(): No recognized state after 30 seconds.",
                 stream
             );
@@ -342,8 +342,8 @@ void open_pokedex_from_overworld(const ProgramInfo& info, VideoStream& stream, P
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::seconds(30)){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "open_pokedex_from_overworld(): Failed to open Pokédex after 30 seconds.",
                 stream
             );
@@ -368,8 +368,8 @@ void open_pokedex_from_overworld(const ProgramInfo& info, VideoStream& stream, P
             stream.log("Detected Pokédex.");
             return;
         default:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "open_pokedex_from_overworld(): No recognized state after 30 seconds.",
                 stream
             );
@@ -397,8 +397,8 @@ void open_recently_battled_from_pokedex(const ProgramInfo& info, VideoStream& st
         pbf_mash_button(context, BUTTON_A, 1200ms);
         pbf_wait(context, 1600ms);
     }else{
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "open_recently_battled_from_pokedex(): Unknown state after 10 dpad down presses.",
             stream
         );
@@ -427,7 +427,7 @@ void leave_phone_to_overworld(const ProgramInfo& info, VideoStream& stream, ProC
         return;
     case 1:
         throw_and_log<UnexpectedBattleException>(
-            stream.logger(), ErrorReport::SEND_ERROR_REPORT,
+            stream.logger(), ErrorReportMode::SEND_ERROR_REPORT,
             "leave_phone_to_overworld(): Unexpectedly detected battle.",
             stream
         );  
@@ -435,13 +435,13 @@ void leave_phone_to_overworld(const ProgramInfo& info, VideoStream& stream, ProC
         stream.log("Stuck in battle status screen.");
         pbf_mash_button(context, BUTTON_B, 1600ms);
         throw_and_log<UnexpectedBattleException>(
-            stream.logger(), ErrorReport::SEND_ERROR_REPORT,
+            stream.logger(), ErrorReportMode::SEND_ERROR_REPORT,
             "leave_phone_to_overworld(): Unexpectedly detected battle.",
             stream
         ); 
     default:
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "leave_phone_to_overworld(): Unknown state after 10 button Y presses.",
             stream
         );
@@ -467,8 +467,8 @@ void mash_button_till_overworld(
     );
 
     if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "mash_button_till_overworld(): Timed out, no recognized state found.",
             stream
         );
@@ -489,8 +489,8 @@ void enter_menu_from_overworld(const ProgramInfo& info, VideoStream& stream, Pro
 
     while (true){
         if (current_time() - start > std::chrono::minutes(1)){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "enter_menu_from_overworld(): Failed to enter specified menu after 1 minute.",
                 stream
             );
@@ -529,8 +529,8 @@ void enter_menu_from_overworld(const ProgramInfo& info, VideoStream& stream, Pro
             }
             success = main_menu.move_cursor(info, stream, context, side, menu_index, fast_mode);
             if (success == false){
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "enter_menu_from_overworld(): Cannot move menu cursor to specified menu.",
                     stream
                 );
@@ -539,13 +539,13 @@ void enter_menu_from_overworld(const ProgramInfo& info, VideoStream& stream, Pro
             return;
         case 2:
             throw_and_log<UnexpectedBattleException>(
-                stream.logger(), ErrorReport::SEND_ERROR_REPORT,
+                stream.logger(), ErrorReportMode::SEND_ERROR_REPORT,
                 "enter_menu_from_overworld(): Unexpectedly detected battle.",
                 stream
             );            
         default:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "enter_menu_from_overworld(): No recognized state after 30 seconds. Can't find overworld or main menu.",
                 stream
             );
@@ -562,8 +562,8 @@ void enter_menu_from_box_system(const ProgramInfo& info, VideoStream& stream, Pr
 
     while (true){
         if (current_time() - start > std::chrono::seconds(20)){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "enter_menu_from_box_system(): Failed to enter specified menu after 20 seconds.",
                 stream
             );
@@ -592,8 +592,8 @@ void enter_menu_from_box_system(const ProgramInfo& info, VideoStream& stream, Pr
             }
             success = main_menu.move_cursor(info, stream, context, side, menu_index, fast_mode);
             if (success == false){
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "enter_menu_from_box_system(): Cannot move menu cursor to specified menu.",
                     stream
                 );
@@ -601,8 +601,8 @@ void enter_menu_from_box_system(const ProgramInfo& info, VideoStream& stream, Pr
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             return;     
         default:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "enter_menu_from_box_system(): No recognized state after 30 seconds.",
                 stream
             );
@@ -620,8 +620,8 @@ void enter_menu_from_bag(const ProgramInfo& info, VideoStream& stream, ProContro
 
     while (true){
         if (current_time() - start > std::chrono::seconds(20)){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "enter_menu_from_bag(): Failed to enter specified menu after 20 seconds.",
                 stream
             );
@@ -651,8 +651,8 @@ void enter_menu_from_bag(const ProgramInfo& info, VideoStream& stream, ProContro
             }
             success = main_menu.move_cursor(info, stream, context, side, menu_index, fast_mode);
             if (success == false){
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "enter_menu_from_bag(): Cannot move menu cursor to specified menu.",
                     stream
                 );
@@ -664,8 +664,8 @@ void enter_menu_from_bag(const ProgramInfo& info, VideoStream& stream, ProContro
             pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
         default:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "enter_menu_from_bag(): No recognized state after 30 seconds.",
                 stream
             );
@@ -681,8 +681,8 @@ void enter_bag_from_menu(const ProgramInfo& info, VideoStream& stream, ProContro
 
     while (true){
         if (current_time() - start > std::chrono::seconds(20)){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "enter_bag_from_menu(): Failed to enter specified menu after 20 seconds.",
                 stream
             );
@@ -704,8 +704,8 @@ void enter_bag_from_menu(const ProgramInfo& info, VideoStream& stream, ProContro
             stream.log("Detected main menu.");
             success = main_menu.move_cursor(info, stream, context, MenuSide::RIGHT, 0, fast_mode);
             if (success == false){
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "enter_bag_from_menu(): Cannot move menu cursor to specified menu.",
                     stream
                 );
@@ -716,8 +716,8 @@ void enter_bag_from_menu(const ProgramInfo& info, VideoStream& stream, ProContro
             stream.overlay().add_log("Enter bag");
             return;
         default:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "enter_bag_from_menu(): No recognized state after 30 seconds.",
                 stream
             );
@@ -748,8 +748,8 @@ void press_button_until_gradient_arrow(
     if (ret == 0){
         stream.log("Gradient arrow detected.");
     }else{
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to detect gradient arrow.",
             stream
         );
@@ -769,8 +769,8 @@ void navigate_school_layout_menu(
 
     int ret = wait_until(stream, context, Milliseconds(5000), { arrow_start });
     if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "navigate_school_layout_menu: Failed to detect gradient arrow at expected start position.",
             stream
         );        
@@ -795,8 +795,8 @@ void navigate_school_layout_menu(
     if (ret == 0){
         stream.log("navigate_school_layout_menu: Desired item selected.");
     }else{
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "navigate_school_layout_menu: Failed to detect gradient arrow at expected end position.",
             stream
         );        

@@ -5,12 +5,15 @@
  *  
  */
 
-#include <iostream>
 #include <fstream>
 #include <limits>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
+#include "Common/Cpp/Logging/GlobalLogger.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
+#include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
 #include "ML/Models/ML_ONNXRuntimeHelpers.h"
 #include "ML_PaddleOCRPipeline.h"
@@ -56,20 +59,25 @@ PaddleOCRPipeline::PaddleOCRPipeline(Language language)
 {}
 
 PaddleOCRPipeline::PaddleOCRPipeline(Language language, std::string rec_path, std::string dict_path)
-    : m_env{create_ORT_env()}
     // , det_session(env, std::wstring(det_path.begin(), det_path.end()).c_str(), Ort::SessionOptions{})
-    , m_rec_session(create_session(m_env, rec_path, ML_MODEL_CACHE_PATH() + "PaddleOCRPipeline/", GlobalSettings::instance().USE_GPU_FOR_ML_INFERENCE0))
+    : m_rec_session(
+        create_session(
+            rec_path,
+            ML_MODEL_CACHE_PATH() + "PaddleOCRPipeline/",
+            PerformanceOptions::instance().ONNX_OPTIONS.USE_GPU
+        )
+    )
     // , memory_info(Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault)) 
     , m_language(language)
     , m_input_name(m_rec_session.GetInputNameAllocated(0, Ort::AllocatorWithDefaultOptions{}).get())
     , m_output_name(m_rec_session.GetOutputNameAllocated(0, Ort::AllocatorWithDefaultOptions{}).get())
+    , m_logger(global_logger_raw(), "OCR")
 {
-    load_dictionary(dict_path);
-    
+    load_dictionary(Filesystem::Path(dict_path));
 }
 
 void PaddleOCRPipeline::run(const std::string& img_path){
-    #if 0
+#if 0
     cv::Mat img = cv::imread(img_path);
     if (img.empty()) return;
 
@@ -82,25 +90,73 @@ void PaddleOCRPipeline::run(const std::string& img_path){
         std::string text = recognize(cropped);
         std::cout << "Detected Text: " << text << std::endl;
     }
-    #endif
+#endif
 }
 
 
 
-void PaddleOCRPipeline::load_dictionary(const std::string& path){
-    std::ifstream fs(path);
+void PaddleOCRPipeline::load_dictionary(const Filesystem::Path& path){
+
+    const bool debugging = STATIC_GLOBALS.PADDLE_OCR_DEBUG;
+
+    if (debugging){
+        m_logger.log("[OCR-INFO] Loading dictionary from: " + path.string());
+        m_logger.log("[OCR-INFO] Current working directory: " +
+                    Filesystem::current_path().string());
+
+        std::error_code ec;
+        const auto absolute_path = Filesystem::absolute(path);
+
+        if (!ec) {
+            m_logger.log("[OCR-INFO] Absolute dictionary path: " +
+                        absolute_path.string());
+
+            m_logger.log("[OCR-INFO] Dictionary exists: " +
+                        std::string(Filesystem::exists(absolute_path) ? "true" : "false"));
+
+            if (Filesystem::exists(absolute_path)) {
+                const auto file_size = Filesystem::file_size(absolute_path, ec);
+
+                if (!ec) {
+                    m_logger.log("[OCR-INFO] Dictionary file size: " +
+                                std::to_string(file_size) + " bytes");
+                }
+            }
+        }
+    }
+
+    std::ifstream fs_file(path.stdpath());
+
+    if (!fs_file.is_open()) {
+        m_logger.log("[OCR-ERROR] Failed to open dictionary: " + path.string());
+        throw FileException(nullptr, PA_CURRENT_FUNCTION, "PaddleOCRPipeline::load_dictionary(): Failed to open dictionary.", path.string());
+    }
+
     std::string line;
-    // m_dictionary.push_back("blank"); // CTC blank index
-    while (std::getline(fs, line)){
+    while (std::getline(fs_file, line)) {
         m_dictionary.push_back(line);
+    }
+
+    if (fs_file.bad()) {
+        m_logger.log("[OCR-ERROR] I/O error while reading dictionary: " + path.string());
+    }
+
+    if (debugging){
+        m_logger.log("[OCR-INFO] Loaded " +
+                    std::to_string(m_dictionary.size()) +
+                    " dictionary entries");
     }
 }
 
+
 std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
+
+    const bool debugging = STATIC_GLOBALS.PADDLE_OCR_DEBUG;
 
     // 1. Convert Image to OpenCV image (cv::mat)
     cv::Mat cv_image_rgb = imageviewrgb32_to_cv_mat_rgb(image);
     if (cv_image_rgb.empty()) {
+        m_logger.log("[OCR-DEBUG] Input was an empty image.");
         return "";
     }
 
@@ -108,6 +164,7 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     // 2. Crop tightly around the text, with small safety margin
     cv::Mat cropped_image = crop_to_text_region(cv_image_rgb);
     if (cropped_image.empty()){
+        m_logger.log("[OCR-DEBUG] Crop to text region returned empty image.");
         return "";
     }
 
@@ -124,6 +181,11 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
         1,
         (int)std::round(target_h * aspect_ratio)
     );
+
+    if (target_w <= 0 || target_w > 8192){
+        m_logger.log("[OCR-ERROR] Abnormally scaled target width calculated: " + std::to_string(target_w));
+        return "";
+    }
 
     cv::Mat resized;
     cv::resize(
@@ -144,17 +206,19 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     
     // 4b. Apply Mean/Std (Standard for PaddleOCR). except for Chinese
     // Mean: [0.485, 0.456, 0.406], Std: [0.229, 0.224, 0.225]
-    if (!(m_language == Language::ChineseSimplified || 
-        m_language == Language::ChineseTraditional ||
-        m_language == Language::Japanese ||
-        m_language == Language::Korean))
-    {
-        #if 0
+    switch (m_language){
+    case Language::ChineseSimplified:
+    case Language::ChineseTraditional:
+    case Language::Japanese:
+    case Language::Korean:
+        break;
+    default:;
+#if 0
         cv::Scalar mean(0.485, 0.456, 0.406);
         cv::Scalar std(0.229, 0.224, 0.225);
         cv::subtract(resized, mean, resized);
         cv::divide(resized, std, resized);
-        #endif
+#endif
     }
     
     
@@ -164,21 +228,63 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     // 6. Define Dynamic Shape
     std::vector<int64_t> input_shape = {1, 3, target_h, target_w};
 
+
+    size_t expected_elements = 1 * 3 * target_h * target_w;
+    if (debugging){
+        m_logger.log("[OCR-DEBUG] Cropped image constraints - Width: " + std::to_string(cropped_image.cols) 
+            + ", Height: " + std::to_string(cropped_image.rows) 
+            + ", Channels: " + std::to_string(cropped_image.channels()) 
+            + ", Total Pixels: " + std::to_string(cropped_image.total()));
+
+        size_t nan_count = 0;
+        size_t subnormal_count = 0;
+        for (float val : input_tensor_values) {
+            if (std::isnan(val)) {
+                nan_count++;
+            } else if (val != 0.0f && std::fpclassify(val) == FP_SUBNORMAL) {
+                subnormal_count++;
+            }
+        }
+        m_logger.log("[OCR-DEBUG] Tensor payload validation - Total Floats: " + std::to_string(input_tensor_values.size())
+                + ", NaNs detected: " + std::to_string(nan_count) 
+                + ", Subnormal (denormal) values: " + std::to_string(subnormal_count));
+    
+        // Validate expected payload sizing matches matrix dimensionality
+        m_logger.log("[OCR-DEBUG] Shape Definition - NCHW: [" + std::to_string(input_shape[0]) + "," + std::to_string(input_shape[1]) 
+                + "," + std::to_string(input_shape[2]) + "," + std::to_string(input_shape[3]) + "]. Expected Elements: " + std::to_string(expected_elements));
+
+    }
+
+    if (input_tensor_values.size() != static_cast<size_t>(expected_elements)) {
+        m_logger.log("[OCR-ERROR] Vector length vs input_shape calculation mismatch!");
+        m_logger.log("[OCR-ERROR] Fatal memory stride mismatch. Vector size (" + std::to_string(input_tensor_values.size())
+                    + ") does not match shape requirement (" + std::to_string(expected_elements));
+        return "";
+    }
+
     // 7. Create tensor with its own managed memory
     Ort::AllocatorWithDefaultOptions allocator;    
     auto input_tensor = Ort::Value::CreateTensor<float>(
-        allocator, input_shape.data(), input_shape.size()
+        allocator,
+        input_shape.data(),
+        input_shape.size()
     );
 
     // Copy your processed data into that memory
-    std::memcpy(input_tensor.GetTensorMutableData<float>(), 
-                input_tensor_values.data(), 
-                input_tensor_values.size() * sizeof(float));
+    std::memcpy(
+        input_tensor.GetTensorMutableData<float>(),
+        input_tensor_values.data(),
+        input_tensor_values.size() * sizeof(float)
+    );
 
     const char* input_names[] = {m_input_name.c_str()};
     const char* output_names[] = {m_output_name.c_str()};  
 
     try{
+        if (debugging) {
+            m_logger.log("[OCR-DEBUG] Calling m_rec_session.Run() now...");
+        }
+
         // 8. Run the recognition session
         auto outputs = m_rec_session.Run(
             Ort::RunOptions{nullptr}, 
@@ -188,9 +294,17 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
             output_names,  // char**
             1              // output_count
         );
-        return decode_CTC(outputs[0].GetTensorMutableData<float>(), outputs[0].GetTensorTypeAndShapeInfo().GetShape(), m_dictionary);
+        return decode_CTC(
+            outputs[0].GetTensorMutableData<float>(),
+            outputs[0].GetTensorTypeAndShapeInfo().GetShape(),
+            m_dictionary
+        );
     }catch (Ort::Exception& e){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "PaddleOCRPipeline::recognize(): Failed." + std::string(e.what()));
+        throw InternalProgramError(
+            nullptr,
+            PA_CURRENT_FUNCTION,
+            "PaddleOCRPipeline::recognize(): Failed." + std::string(e.what())
+        );
     }
     
 }
@@ -308,23 +422,58 @@ cv::Scalar estimate_background_color(const cv::Mat& image) {
 }
 
 
-
-
 std::vector<float> preprocess_NCHW(cv::Mat& img){
-    std::vector<float> dst(img.rows * img.cols * 3);
-    for (int c = 0; c < 3; ++c){
-        for (int i = 0; i < img.rows * img.cols; ++i){
-            dst[c * img.rows * img.cols + i] = ((float*)img.data)[i * 3 + c];
+    const int rows = img.rows;
+    const int cols = img.cols;
+    const int channels = 3;
+    
+    // Allocate a flat memory buffer big enough for all channels
+    std::vector<float> dst(rows * cols * channels);
+
+    // Define the size of one complete "color plane" (channel)
+    const int plane_size = rows * cols;
+
+    // Loop through the image row-by-row
+    for (int y = 0; y < rows; ++y) {
+        // Safely locate the exact memory address for the start of row 'y'
+        const float* row_ptr = img.ptr<float>(y);
+        
+        // Loop through every pixel column in the current row
+        for (int x = 0; x < cols; ++x) {
+            // Calculate the 1D coordinate of the pixel inside a flat 2D plane
+            int linear_idx = y * cols + x;
+            
+            // Extract the interleaved BGR channels explicitly
+            dst[0 * plane_size + linear_idx] = row_ptr[x * channels + 0]; // Channel 0
+            dst[1 * plane_size + linear_idx] = row_ptr[x * channels + 1]; // Channel 1
+            dst[2 * plane_size + linear_idx] = row_ptr[x * channels + 2]; // Channel 2
         }
     }
     return dst;
 }
 
-std::string decode_CTC(float* data, const std::vector<int64_t>& shape, const std::vector<std::string>& dict){
+
+
+std::string PaddleOCRPipeline::decode_CTC(float* data, const std::vector<int64_t>& shape, const std::vector<std::string>& dict){
+
+    const bool debugging = STATIC_GLOBALS.PADDLE_OCR_DEBUG;
+
     std::string text = "";
     size_t seq_len = static_cast<size_t>(shape[1]);
     int64_t num_cls = shape[2];
     size_t last_index = 0; 
+
+    // Initial boundary logging configuration
+    if (debugging){
+        m_logger.log("[OCR-CTC-DEBUG] Starting decode_CTC. Sequence Length: " + std::to_string(seq_len) + 
+                ", Total Classes: " + std::to_string(num_cls) + 
+                ", Dictionary Size: " + std::to_string(dict.size()));
+    }
+
+    if (dict.empty()) {
+        m_logger.log("[OCR-CTC-ERROR] FATAL: Dictionary payload array is empty! Parsing loops will fail to resolve text indicators.");
+    }
+
     for (size_t i = 0; i < seq_len; ++i){
         float* row = data + i * num_cls;
         // 1. Get the character index with highest probability (Argmax)
@@ -337,11 +486,27 @@ std::string decode_CTC(float* data, const std::vector<int64_t>& shape, const std
             // Index 1 from the model maps to the 1st line of your .txt file (Vector index 0)
             size_t dict_idx = argmax - 1; 
             if (dict_idx < dict.size()){
+                if (debugging) {
+                    m_logger.log("[OCR-CTC-DEBUG] Step " + std::to_string(i) + 
+                               ": Predicted Argmax = " + std::to_string(argmax) + 
+                               " -> Target Dict Index = " + std::to_string(dict_idx) +
+                               " (Character resolved: '" + dict[dict_idx] + "')");
+                }
                 text += dict[dict_idx];
+            }else {
+                m_logger.log("[OCR-CTC-ERROR] Step " + std::to_string(i) + 
+                            ": Predicted Argmax = " + std::to_string(argmax) + 
+                            " -> Target Dict Index = " + std::to_string(dict_idx) + 
+                            " (ERROR: Calculated index is out of bounds for the dictionary memory layout!)");
             }
         }
         last_index = argmax;
     }
+
+    if (debugging) {
+        m_logger.log("[OCR-CTC-DEBUG] Complete loop execution tracking finish. Resulting string extraction: '" + text + "'");
+    }
+
     return text;
 }
 
@@ -369,10 +534,12 @@ cv::Mat imageviewrgb32_to_cv_mat_rgb(const ImageViewRGB32& image){
 cv::Rect ImageFloatBox_to_cv_Rect(size_t width, size_t height, const ImageFloatBox& box){
     ImagePixelBox pixelbox = floatbox_to_pixelbox(width, height, box);
     
-    return cv::Rect(safe_convert<int>(pixelbox.min_x), 
-                    safe_convert<int>(pixelbox.min_y), 
-                    safe_convert<int>(pixelbox.width()), 
-                    safe_convert<int>(pixelbox.height()));
+    return cv::Rect(
+        safe_convert<int>(pixelbox.min_x),
+        safe_convert<int>(pixelbox.min_y),
+        safe_convert<int>(pixelbox.width()),
+        safe_convert<int>(pixelbox.height())
+    );
 }
 
 

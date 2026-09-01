@@ -22,23 +22,31 @@ namespace NintendoSwitch{
 namespace PokemonRSE{
 
 ShinyNumberDetector::ShinyNumberDetector(Color color)
-    : m_box_number(0.136, 0.156, 0.123, 0.072)
+    : m_box_number(0.025599, 0.103004, 0.125004, 0.093377)
 {}
 void ShinyNumberDetector::make_overlays(VideoOverlaySet& items) const{
-    items.add(COLOR_RED, m_box_number);
+    const BoxOption& GAME_BOX = GameSettings::instance().GAME_BOX;
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_box_number));
 }
 bool ShinyNumberDetector::read(Logger& logger, const ImageViewRGB32& frame){
+    ImageViewRGB32 game_screen = extract_box_reference(frame, GameSettings::instance().GAME_BOX);
+
     const bool replace_color_within_range = true;
 
-    //Filter out background
+    //Filter out background (R/S, purple)
     ImageRGB32 filtered_region = filter_rgb32_range(
-        extract_box_reference(frame, m_box_number),
-        combine_rgb(138, 97, 221), combine_rgb(200, 181, 239), Color(0), replace_color_within_range
+        extract_box_reference(game_screen, m_box_number),
+        combine_rgb(120, 100, 185), combine_rgb(254, 251, 255), Color(0), replace_color_within_range
     );
-    ImageStats stats = image_stats(filtered_region);
+    //Filter out background (E, green)
+    ImageRGB32 filtered_region2 = filter_rgb32_range(
+        filtered_region,
+        combine_rgb(86, 162, 99), combine_rgb(236, 255, 240), Color(0), replace_color_within_range
+    );
+    ImageStats stats = image_stats(filtered_region2);
 
     /*
-    filtered_region.save("./filtered_only.png");
+    filtered_region2.save("./filtered_only.png");
     cout << stats.average.r << endl;
     cout << stats.average.g << endl;
     cout << stats.average.b << endl;

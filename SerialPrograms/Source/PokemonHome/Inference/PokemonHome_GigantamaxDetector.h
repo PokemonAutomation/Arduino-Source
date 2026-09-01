@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonHome_GigantamaxDetector_H
 
 #include <optional>
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/VisualDetector.h"
@@ -22,7 +23,7 @@ public:
     GigantamaxDetector(
         Color color,
         VideoOverlay* overlay,
-        const ImageFloatBox& box
+        const ImageFloatBox& box = ImageFloatBox(0.463, 0.09, 0.04, 0.06)
     );
 
     const ImageFloatBox& last_detected() const{ return m_last_detected; }
@@ -50,6 +51,7 @@ public:
     {}
 };
 
+void add_tests_GigantamaxDetector(UnitTestDatabase& database);
 
 }
 }

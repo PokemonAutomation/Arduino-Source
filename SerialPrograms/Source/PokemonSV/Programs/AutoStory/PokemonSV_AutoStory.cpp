@@ -4,15 +4,22 @@
  *
  */
 
+
+
+#if 0
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "CommonFramework/Exceptions/UnexpectedBattleException.h"
+#endif
+
+
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-//#include "CommonFramework/Exceptions/UnexpectedBattleException.h"
-//#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
-//#include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "ML/Inference/ML_YOLOv5Detector.h"
@@ -374,9 +381,8 @@ AutoStory_Descriptor::AutoStory_Descriptor()
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         false,
-        { 
+        {
             "PokemonSV/AreaZero",
-            // "PaddleOCR" // not needed since an OCR library is bundled with this program
         }
     )
 {}
@@ -411,8 +417,8 @@ AutoStory::AutoStory()
     , STORY_SECTION(
         "<b>Story Section:",
         {
-            {StorySection::TUTORIAL,         "tutorial",           "Tutorial"},
-            {StorySection::MAIN_STORY,            "main-story",              "Main Story"},
+            {StorySection::TUTORIAL,    "tutorial",           "Tutorial"},
+            {StorySection::MAIN_STORY,  "main-story",              "Main Story"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         StorySection::TUTORIAL
@@ -690,7 +696,7 @@ AutoStory::AutoStory()
         false,
         "<b>YOLO Path:</b>", 
         LockMode::LOCK_WHILE_RUNNING, 
-        "PokemonSV/YOLO/A0-station-2.onnx",
+        "PokemonSV/AreaZero/A0-station-2.onnx",
         "<.onnx file>"
     )
     , TARGET_LABEL(
@@ -900,116 +906,123 @@ void AutoStory::test_checkpoints(
     int loop, int start_loop, int end_loop
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
-    EventNotificationOption& notif_status_update = NOTIFICATION_STATUS_UPDATE;
-    Language language = LANGUAGE;
-    StarterChoice starter_choice = STARTERCHOICE;
-    std::vector<std::function<void()>> checkpoint_list;
-    checkpoint_list.push_back([&](){checkpoint_00(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_01(env, context, notif_status_update, stats, language);});
-    checkpoint_list.push_back([&](){checkpoint_02(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_03(env, context, notif_status_update, stats, language, starter_choice);});
-    checkpoint_list.push_back([&](){checkpoint_04(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_05(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_06(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_07(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_08(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_09(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_10(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_11(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_12(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_13(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_14(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_15(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_16(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_17(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_18(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_19(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_20(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_21(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_22(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_23(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_24(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_25(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_26(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_27(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_28(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_29(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_30(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_31(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_32(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_33(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_34(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_35(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_36(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_37(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_38(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_39(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_40(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_41(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_42(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_43(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_44(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_45(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_46(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_47(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_48(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_49(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_50(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_51(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_52(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_53(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_54(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_55(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_56(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_57(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_58(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_59(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_60(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_61(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_62(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_63(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_64(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_65(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_66(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_67(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_68(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_69(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_70(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_71(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_72(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_73(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_74(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_75(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_76(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_77(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_78(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_79(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_80(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_81(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_82(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_83(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_84(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_85(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_86(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_87(env, context, notif_status_update, stats, language, starter_choice);});
-    checkpoint_list.push_back([&](){checkpoint_88(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_89(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_90(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_91(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_92(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_93(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_94(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_95(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_96(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_97(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_98(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_99(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_100(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_101(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_102(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_103(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_104(env, context, notif_status_update, stats);});
-    // checkpoint_list.push_back([&](){checkpoint_105(env, context, notif_status_update, stats);});
+    // EventNotificationOption& notif_status_update = NOTIFICATION_STATUS_UPDATE;
+    // Language language = LANGUAGE;
+    // StarterChoice starter_choice = STARTERCHOICE;
+    AutoStoryOptions options{
+        LANGUAGE,
+        STARTERCHOICE,
+        NOTIFICATION_STATUS_UPDATE,
+        NOTIFICATION_ERROR_RECOVERABLE
+    };
+
+    // std::vector<std::function<void()>> checkpoint_list;
+    // checkpoint_list.push_back([&](){checkpoint_00(env, context);});
+    // checkpoint_list.push_back([&](){checkpoint_01(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text, language);});
+    // checkpoint_list.push_back([&](){checkpoint_02(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_03(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text, language, starter_choice);});
+    // checkpoint_list.push_back([&](){checkpoint_04(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_05(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_06(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_07(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_08(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_09(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_10(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_11(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_12(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_13(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_14(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_15(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_16(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_17(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_18(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_19(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_20(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_21(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_22(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_23(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_24(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_25(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_26(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_27(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_28(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_29(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_30(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_31(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_32(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_33(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_34(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_35(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_36(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_37(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_38(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_39(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_40(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_41(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_42(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_43(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_44(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_45(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_46(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_47(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_48(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_49(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_50(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_51(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_52(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_53(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_54(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_55(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_56(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_57(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_58(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_59(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_60(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_61(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_62(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_63(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_64(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_65(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_66(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_67(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_68(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_69(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_70(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_71(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_72(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_73(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_74(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_75(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_76(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_77(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_78(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_79(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_80(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_81(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_82(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_83(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_84(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_85(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_86(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_87(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text, language, starter_choice);});
+    // checkpoint_list.push_back([&](){checkpoint_88(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_89(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_90(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_91(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_92(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_93(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_94(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_95(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_96(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_97(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_98(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_99(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_100(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_101(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_102(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_103(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_104(env, context, notif_status_update, notif_error_recoverable, stats);});
+    // // checkpoint_list.push_back([&](){checkpoint_105(env, context, notif_status_update, notif_error_recoverable, stats);});
     
     
     if (end == 0){
@@ -1019,7 +1032,8 @@ void AutoStory::test_checkpoints(
     for (int checkpoint = start; checkpoint <= end; checkpoint++){
         if (checkpoint == 0){
             stream.log("checkpoint_0");
-            checkpoint_list[checkpoint]();
+            ALL_AUTO_STORY_CHECKPOINT_LIST()[checkpoint]->run_checkpoint(env, context, options, stats);
+            // checkpoint_list[checkpoint]();
             continue;
         }
         bool has_minimap = true;
@@ -1052,11 +1066,13 @@ void AutoStory::test_checkpoints(
                     }
                 }
                 stream.log("checkpoint_" + number + ": loop " + std::to_string(i));
-                checkpoint_list[checkpoint]();
+                // checkpoint_list[checkpoint]();
+                ALL_AUTO_STORY_CHECKPOINT_LIST()[checkpoint]->run_checkpoint(env, context, options, stats);
             } 
         }else{
             stream.log("checkpoint_" + number + ".");
-            checkpoint_list[checkpoint]();            
+            ALL_AUTO_STORY_CHECKPOINT_LIST()[checkpoint]->run_checkpoint(env, context, options, stats);
+            // checkpoint_list[checkpoint]();            
         }
        
     }
@@ -1156,7 +1172,8 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, ProController
     AutoStoryOptions options{
         LANGUAGE,
         STARTERCHOICE,
-        NOTIFICATION_STATUS_UPDATE
+        NOTIFICATION_STATUS_UPDATE,
+        NOTIFICATION_ERROR_RECOVERABLE
     };    
 
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -1164,7 +1181,7 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, ProController
 
     if (ENABLE_ADVANCED_MODE){
         for (size_t checkpoint_index = get_start_checkpoint_index(); checkpoint_index <= get_end_checkpoint_index(); checkpoint_index++){
-            env.console.log("Start Checkpoint " + ALL_AUTO_STORY_CHECKPOINT_LIST()[checkpoint_index]->name(), COLOR_ORANGE);
+            // env.console.log("Start Checkpoint " + ALL_AUTO_STORY_CHECKPOINT_LIST()[checkpoint_index]->name(), COLOR_ORANGE);
             ALL_AUTO_STORY_CHECKPOINT_LIST()[checkpoint_index]->run_checkpoint(env, context, options, stats);
         }
 
@@ -1246,8 +1263,10 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
 
         DirectionDetector direction;
 
+        
 
-        // YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/A0-station-2.onnx");
+
+        // YOLOv5Detector yolo_detector(DOWNLOADED_RESOURCE_PATH() + "PokemonSV/AreaZero/A0-station-2.onnx");
         // move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "tree-tera", 0.294444);
         // move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "tree-tera", 0.604688);
         direction.change_direction(env.program_info(), env.console, context, 3.855289);
@@ -1325,8 +1344,27 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     }
 
     if (ENSURE_MINIMAP_UNLOCKED && STORY_SECTION == StorySection::MAIN_STORY){
-        env.console.log("Ensure the minimap is unlocked.");
-        confirm_minimap_unlocked(env, context);
+        env.console.log("Ensure the N symbol on minimap is visible.");
+        context.wait_for_all_requests();
+        
+        DirectionDetector direction;
+        double current = direction.get_current_direction(env.console, env.console.video().snapshot());
+        if (current < 0){
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
+                "change_direction(): Unable to detect current direction. Something (e.g. a marker) is covering the N symbol on the minimap. "
+                "Try moving the marker on the map.",
+                env.console
+            );
+        }
+
+        if (is_main_story_start_point_indoors()){
+            env.console.log("Can't confirm if minimap unlocked while indoors.");
+        }else{
+            env.console.log("Ensure the minimap is unlocked.");
+            confirm_minimap_unlocked(env, context);
+        }
+
     }
 
     run_autostory(env, context);
@@ -1335,7 +1373,36 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
+bool AutoStory::is_main_story_start_point_indoors(){
 
+    bool start_indoors = false;
+    if (ENABLE_ADVANCED_MODE){  // checkpoint mode
+        size_t checkpoint_index = get_start_checkpoint_index();
+
+        start_indoors = 
+            checkpoint_index == 44 ||
+            checkpoint_index == 46 ||
+            checkpoint_index == 52 ||
+            checkpoint_index == 62 ||
+            checkpoint_index == 63 ||
+            checkpoint_index == 72 ||
+            checkpoint_index == 74 ||
+            checkpoint_index == 76 ||
+            checkpoint_index == 77 ||
+            checkpoint_index == 88 ||
+            checkpoint_index == 89 ||
+            checkpoint_index == 91 ||
+            checkpoint_index >= 94;  // all of area zero is considered indoors
+    }else{  // segment mode
+        size_t segment_index = get_start_segment_index();
+
+        start_indoors = segment_index >= 35; // all of area zero is considered indoors
+        // all previous main story segments start outdoors
+    }
+
+    return start_indoors;
+
+}
 
 
 

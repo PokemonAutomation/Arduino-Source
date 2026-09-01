@@ -52,6 +52,7 @@ public:
         m_path.clear();
     }
 
+
 public:
     //  Implicit conversion to the C++ std::filesystem::path so it can be passed to other library functions.
     operator const std::filesystem::path&() const{
@@ -61,6 +62,7 @@ public:
     const std::filesystem::path& stdpath() const{
         return m_path;
     }
+
 
 public:
     bool empty() const{
@@ -109,11 +111,17 @@ public:
         return m_path.extension();
     }
 
+    Path lexically_normal() const{
+        return m_path.lexically_normal();
+    }
+
+
 public:
-    Path& replace_extension(const Path& replacement){
+    Path& replace_extension(const Path& replacement = Path()){
         m_path.replace_extension(replacement);
         return *this;
     }
+
 
 public:
     friend bool operator==(const Path& x, const Path& y){
@@ -129,6 +137,7 @@ public:
     friend Path operator/(const Path& x, const Path& y);
 
     friend std::ostream& operator<<(std::ostream& stream, const Path& x);
+
 
 private:
     std::filesystem::path m_path;

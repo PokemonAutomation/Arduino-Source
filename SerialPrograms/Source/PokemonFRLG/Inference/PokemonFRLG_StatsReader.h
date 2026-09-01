@@ -10,6 +10,7 @@
 #include <optional>
 #include <string>
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Language.h"
 
@@ -84,6 +85,10 @@ private:
     ImageFloatBox m_box_sp_attack_jpn;
     ImageFloatBox m_box_sp_defense_jpn;
     ImageFloatBox m_box_speed_jpn;
+    //  Spanish labels the level "Nv." where the other Latin-script languages
+    //  use "Lv". The trailing period pushes the digits ~6px right (at 1080p),
+    //  so Spanish needs its own left edge. Right edge matches m_box_level.
+    ImageFloatBox m_box_level_spa;
 
     // return false if the read failed
 
@@ -119,6 +124,9 @@ private:
     );
 
 };
+
+
+void add_tests_StatsReader(UnitTestDatabase& database);
 
 } // namespace PokemonFRLG
 } // namespace NintendoSwitch

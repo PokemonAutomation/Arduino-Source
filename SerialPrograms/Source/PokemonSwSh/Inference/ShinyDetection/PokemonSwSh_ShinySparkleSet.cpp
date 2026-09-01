@@ -4,8 +4,10 @@
  *
  */
 
+#include <deque>
 #include <sstream>
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
@@ -85,29 +87,52 @@ void ShinySparkleSetSwSh::update_alphas(){
 
 
 
+void find_sparkles(
+    size_t screen_area,
+    SpinLock& lock,
+    ShinySparkleSetSwSh& sparkles,
+    const WaterfillObject& object
+){
+    RadialSparkleDetector radial_sparkle(screen_area, object);
+    if (radial_sparkle.is_ball()){
+        WriteSpinLock lg(lock);
+        sparkles.balls.emplace_back(object.min_x, object.min_y, object.max_x, object.max_y);
+        return;
+    }
+    if (radial_sparkle.is_star()){
+        WriteSpinLock lg(lock);
+        sparkles.stars.emplace_back(object.min_x, object.min_y, object.max_x, object.max_y);
+        return;
+    }
+    if (is_line_sparkle(object)){
+        WriteSpinLock lg(lock);
+        sparkles.lines.emplace_back(object.min_x, object.min_y, object.max_x, object.max_y);
+        return;
+    }
+    if (is_square_sparkle(object)){
+        WriteSpinLock lg(lock);
+        sparkles.squares.emplace_back(object.min_x, object.min_y, object.max_x, object.max_y);
+        return;
+    }
+}
 
 ShinySparkleSetSwSh find_sparkles(size_t screen_area, WaterfillSession& session){
+    SpinLock lock;
     ShinySparkleSetSwSh sparkles;
     auto finder = session.make_iterator(20);
     WaterfillObject object;
+    std::deque<AsyncTask> tasks;
     while (finder->find_next(object, true)){
-        RadialSparkleDetector radial_sparkle(screen_area, object);
-        if (radial_sparkle.is_ball()){
-            sparkles.balls.emplace_back(object.min_x, object.min_y, object.max_x, object.max_y);
-            continue;
-        }
-        if (radial_sparkle.is_star()){
-            sparkles.stars.emplace_back(object.min_x, object.min_y, object.max_x, object.max_y);
-            continue;
-        }
-        if (is_line_sparkle(object)){
-            sparkles.lines.emplace_back(object.min_x, object.min_y, object.max_x, object.max_y);
-            continue;
-        }
-        if (is_square_sparkle(object)){
-            sparkles.squares.emplace_back(object.min_x, object.min_y, object.max_x, object.max_y);
-            continue;
-        }
+        tasks.emplace_back(GlobalThreadPools::computation_realtime().dispatch_now_blocking(
+            [&, screen_area, object = std::move(object)]{
+                find_sparkles(
+                    screen_area,
+                    lock,
+                    sparkles,
+                    object
+                );
+            }
+        ));
     }
     return sparkles;
 }

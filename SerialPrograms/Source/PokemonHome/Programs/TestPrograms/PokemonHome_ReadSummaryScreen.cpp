@@ -6,8 +6,10 @@
 
 #include <optional>
 #include <sstream>
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "Pokemon/Pokemon_CollectedPokemonInfo.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonHome/Inference/PokemonHome_SummaryReader.h"
 #include "PokemonHome/Programs/PokemonHome_BoxNavigation.h"
 #include "PokemonHome_ReadSummaryScreen.h"
 
@@ -28,14 +30,59 @@ ReadSummaryScreen_Descriptor::ReadSummaryScreen_Descriptor()
     )
 {}
 
-ReadSummaryScreen::ReadSummaryScreen(){}
+ReadSummaryScreen::ReadSummaryScreen()
+    : OT_NAME_LANGUAGE(
+        "<b>Original Trainer Name Language:</b>",
+        {
+            Language::English,
+            Language::Japanese,
+            Language::Spanish,
+            Language::French,
+            Language::German,
+            Language::Italian,
+            Language::Korean,
+            Language::ChineseSimplified,
+            Language::ChineseTraditional,
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        false
+    )
+    , HOME_LANGUAGE(
+        "<b>Home Language:</b>",
+        {
+            Language::English,
+            Language::Japanese,
+            Language::Spanish,
+            Language::French,
+            Language::German,
+            Language::Italian,
+            Language::Korean,
+            Language::ChineseSimplified,
+            Language::ChineseTraditional,
+        },
+        LockMode::LOCK_WHILE_RUNNING
+    )
+{
+    PA_ADD_OPTION(OT_NAME_LANGUAGE);
+    PA_ADD_OPTION(HOME_LANGUAGE);
+}
 
 void ReadSummaryScreen::program(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context
 ){
+    SummaryReader reader;
+    VideoOverlaySet overlays(env.console);
+    reader.make_overlays(overlays);
+
+    VideoSnapshot screen = env.console.video().snapshot();
+
+    env.log("Level: " + std::to_string(reader.read_level(env.console, screen)));
+    env.log("Ability: " + reader.read_ability(HOME_LANGUAGE, screen));
+    env.log("Nature: " + reader.read_nature(HOME_LANGUAGE, screen));
+
     CollectedPokemonInfo pokemon_info{};
-    read_summary_screen(env, context, pokemon_info);
+    read_summary_screen(env, context, pokemon_info, OT_NAME_LANGUAGE);
 
     std::optional<CollectedPokemonInfo> logged_info = pokemon_info;
     std::ostringstream ss;

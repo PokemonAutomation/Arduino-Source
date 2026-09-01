@@ -10,9 +10,9 @@
 #include "CommonFramework/GlobalServices.h"
 #include "VideoOverlayWidget.h"
 
-// #include <iostream>
-// using std::cout;
-// using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -23,7 +23,7 @@ namespace PokemonAutomation{
 
 
 void VideoOverlayWidget::detach(){
-    m_session.remove_listener(*this);
+    m_session.remove_content_listener(*this);
     global_watchdog().remove(*this);
 }
 VideoOverlayWidget::~VideoOverlayWidget(){
@@ -50,7 +50,7 @@ VideoOverlayWidget::VideoOverlayWidget(QWidget& parent, VideoOverlaySession& ses
 //    m_boxes.insert(&ENTIRE_VIDEO);
     try{
         global_watchdog().add(*this, std::chrono::milliseconds(50));
-        m_session.add_listener(*this);
+        m_session.add_content_listener(*this);
     }catch (...){
         detach();
         throw;
@@ -329,6 +329,29 @@ void VideoOverlayWidget::render_log(QPainter& painter){
 }
 
 
+
+
+#if 0
+void VideoOverlayWidget::mousePressEvent(QMouseEvent* event){
+    cout << "VideoOverlayWidget::mousePressEvent()" << endl;
+    QWidget::mousePressEvent(event);
+    double x = (double)event->pos().x() / this->width();
+    double y = (double)event->pos().y() / this->height();
+    m_session.on_mouse_press(x, y);
+}
+void VideoOverlayWidget::mouseReleaseEvent(QMouseEvent* event){
+    QWidget::mouseReleaseEvent(event);
+    double x = (double)event->pos().x() / this->width();
+    double y = (double)event->pos().y() / this->height();
+    m_session.on_mouse_release(x, y);
+}
+void VideoOverlayWidget::mouseMoveEvent(QMouseEvent* event){
+    QWidget::mouseMoveEvent(event);
+    double x = (double)event->pos().x() / this->width();
+    double y = (double)event->pos().y() / this->height();
+    m_session.on_mouse_move(x, y);
+}
+#endif
 
 
 

@@ -16,6 +16,7 @@
 
 #include "Programs/PokemonHome_GenerateNameOCR.h"
 #include "Programs/TestPrograms/PokemonHome_ReadSummaryScreen.h"
+#include "Programs/TestPrograms/PokemonHome_TestDatabaseGenerator.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -51,6 +52,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
         ret.emplace_back("---- Developer Tools ----");
         ret.emplace_back(make_single_switch_program<PokemonHome::GenerateNameOCRData_Descriptor, PokemonHome::GenerateNameOCRData>());
         ret.emplace_back(make_single_switch_program<PokemonHome::ReadSummaryScreen_Descriptor, PokemonHome::ReadSummaryScreen>());
+        ret.emplace_back(make_single_switch_program<PokemonHome::TestDatabaseGenerator_Descriptor, PokemonHome::TestDatabaseGenerator>());
     }
 
     return ret;

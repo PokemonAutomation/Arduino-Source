@@ -14,7 +14,7 @@
 #include "Common/Cpp/ColoredText.h"
 #include "Controllers/ControllerTypeStrings.h"
 #include "Controllers/ControllerSettings.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase.h"
+#include "Controllers/SerialPort/SerialPABotBase.h"
 #include "PABotBase2_DeviceHandle.h"
 
 //#include <iostream>
@@ -145,7 +145,7 @@ void DeviceHandle::query_protocol(){
     {
         m_device_id = query_u32(PABB2_MESSAGE_OPCODE_DEVICE_IDENTIFIER);
         m_logger.log("[MLC]: Device ID: 0x" + tostr_hex(m_device_id), COLOR_BLUE);
-        auto iter = PROGRAMS->find(m_device_id);
+        auto iter = PROGRAMS->find((uint8_t)m_device_id);
         if (iter == PROGRAMS->end()){
             m_logger.Logger::log(
                 "Unrecognized Program ID: (0x" + tostr_hex(m_device_id) + ") for this protocol version. "
@@ -207,7 +207,7 @@ void DeviceHandle::query_command_queue(){
 
     //  Don't let it get too large since we don't need it.
     command_queue_size = std::min<uint8_t>(
-        command_queue_size,
+        (uint8_t)command_queue_size,
         ControllerSettings::instance().COMMAND_QUEUE_LIMIT
     );
 

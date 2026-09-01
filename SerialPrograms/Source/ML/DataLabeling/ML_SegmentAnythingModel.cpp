@@ -27,8 +27,7 @@ namespace ML{
 
 
 SAMEmbedderSession::SAMEmbedderSession(const std::string& model_path, bool use_gpu)
-    : m_env{create_ORT_env()}
-    , session{create_session(m_env, model_path, ML_MODEL_CACHE_PATH() + "SAMEmbedder/", use_gpu)}
+    : session{create_session(model_path, ML_MODEL_CACHE_PATH() + "SAMEmbedder/", use_gpu)}
     , memory_info{Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU)}
     , input_names{session.GetInputNames()}
     , output_names{session.GetOutputNames()}
@@ -67,8 +66,7 @@ void SAMEmbedderSession::run(cv::Mat& input_image, std::vector<float>& model_out
 
 
 SAMSession::SAMSession(const std::string& model_path, bool use_gpu)
-    : m_env{create_ORT_env()}
-    , session{create_session(m_env, model_path, ML_MODEL_CACHE_PATH() + "SAM/", use_gpu)}
+    : session{create_session(model_path, ML_MODEL_CACHE_PATH() + "SAM/", use_gpu)}
     , memory_info{Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU)}
     , input_names{session.GetInputNames()}
     , output_names{session.GetOutputNames()}
@@ -177,7 +175,11 @@ void SAMSession::run(
 }
 
 
-void compute_embeddings_for_folder(const std::string& embedding_model_path, const std::string& image_folder_path, bool use_gpu_for_embedder_session){
+void compute_embeddings_for_folder(
+    const std::string& embedding_model_path,
+    const std::string& image_folder_path,
+    bool use_gpu_for_embedder_session
+){
     const bool recursive_search = true;
     std::vector<std::string> all_image_paths = find_images_in_folder(image_folder_path, recursive_search);
     if (all_image_paths.size() == 0){

@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -128,8 +128,8 @@ void FossilRevival::run_revives(SingleSwitchProgramEnvironment& env, JoyconConte
         stats.errors++;
         env.update_stats();
         env.log("Failed to revive fossil.", COLOR_RED);
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to revive fossil.",
             env.console
         );
@@ -151,8 +151,8 @@ void FossilRevival::run_revives(SingleSwitchProgramEnvironment& env, JoyconConte
         stats.errors++;
         env.update_stats();
         env.log("Did not detect summary over.", COLOR_RED);
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Did not detect summary over.",
             env.console
         );

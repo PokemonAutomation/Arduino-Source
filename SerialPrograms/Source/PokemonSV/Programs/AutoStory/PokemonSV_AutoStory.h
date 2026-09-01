@@ -58,6 +58,8 @@ public:
 
     void run_autostory(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
+    bool is_main_story_start_point_indoors();
+
 private:
     virtual void on_config_value_changed(void* object) override;
 

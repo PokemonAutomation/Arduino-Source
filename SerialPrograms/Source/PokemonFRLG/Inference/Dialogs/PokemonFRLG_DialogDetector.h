@@ -81,6 +81,13 @@ public:
     {}
 };
 
+class WhiteDialogOverWatcher : public DetectorToFinder<WhiteDialogDetector>{
+public:
+    WhiteDialogOverWatcher(Color color)
+        : DetectorToFinder("WhiteDialogOverWatcher", FinderType::GONE, std::chrono::milliseconds(250), color)
+    {}
+};
+
 // Same as WhiteDialogDetector, but filter for the red arrow
 // Detect the red advancement arrow by filtering for DARK red.
 // There is red/pink color text for female npcs in non-japan versions

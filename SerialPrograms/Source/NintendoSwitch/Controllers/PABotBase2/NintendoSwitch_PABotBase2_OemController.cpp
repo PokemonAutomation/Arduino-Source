@@ -6,7 +6,7 @@
 
 #include "Common/PABotBase2/Controllers/PABotBase2_Controller_NS1_OemController.h"
 #include "Common/Cpp/ColoredText.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase.h"
+#include "Controllers/SerialPort/SerialPABotBase.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_PABotBase2_OemController.h"
 
@@ -330,7 +330,7 @@ bool PABotBase2_OemController::run_preconnect_configure(
 #if _WIN32
 #pragma pack(pop)
 #endif
-    Message message;
+    Message message{};
 
     {
         Color color(profile.body_color);
@@ -472,7 +472,7 @@ void PABotBase2_OemController::issue_report(
 
     while (time_left > Milliseconds::zero()){
         Milliseconds current = std::min(time_left, 65535ms);
-        request.milliseconds = current.count();
+        request.milliseconds = (uint16_t)current.count();
         m_connection.device().command_queue().send_command(cancellable, request);
         time_left -= current;
     }
@@ -536,7 +536,7 @@ void PABotBase2_OemController::issue_report(
 
     while (time_left > Milliseconds::zero()){
         Milliseconds current = std::min(time_left, 65535ms);
-        request.milliseconds = current.count();
+        request.milliseconds = (uint16_t)current.count();
         m_connection.device().command_queue().send_command(cancellable, request);
         time_left -= current;
     }
@@ -743,7 +743,7 @@ PABotBase2_OemController::RumbleData PABotBase2_OemController::parse_rumble(cons
 
     return RumbleData{
         rumble_index_to_freq(lo_freq_i),
-        rumble_index_to_amp(lo_amp_i),
+        rumble_index_to_amp((uint8_t)lo_amp_i),
         rumble_index_to_freq(hi_freq_i * 0.25 + 32),
         rumble_index_to_amp(hi_amp_i)
     };

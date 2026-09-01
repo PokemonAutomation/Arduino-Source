@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -272,8 +272,8 @@ CameraAngle quest_photo_navi(
 
             break;
         default:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Invalid photo quest.",
                 console
             );
@@ -367,8 +367,8 @@ void quest_photo(
                     return_to_plaza(info, console, context);
                 }catch (...){
                     console.log("Unable to flee.");
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Unable to flee!",
                         console
                     );
@@ -639,8 +639,8 @@ void quest_catch_navi(
 
             break;
         default:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Invalid catch quest.",
                 console
             );
@@ -671,8 +671,8 @@ void quest_catch_throw_ball(
     while (ball_reader == ""){
         if (current_time() - start > std::chrono::minutes(2)){
             console.log("Timed out trying to read ball after 2 minutes.", COLOR_RED);
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Timed out trying to read ball after 2 minutes.",
                 console
             );
@@ -694,8 +694,8 @@ void quest_catch_throw_ball(
     int quantity = move_to_ball(reader, console, context, selected_ball);
     if (quantity == 0){
         console.log("Unable to find ball.");
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Unable to find ball.",
             console
         );
@@ -742,8 +742,8 @@ void quest_catch_handle_battle(
                 );
                 if (bMenu < 0){
                     console.log("Unable to find menu_before_throw.");
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Unable to find menu_before_throw.",
                         console
                     );
@@ -825,8 +825,8 @@ void quest_catch_handle_battle(
                         );
                         if (ret3 == 0){
                             console.log("Battle menu detected early. Out of PP/No move in slot, please check your setup.");
-                            OperationFailedException::fire(
-                                ErrorReport::SEND_ERROR_REPORT,
+                            OperationFailedExceptionWithScreenshot::fire(
+                                ErrorReportMode::SEND_ERROR_REPORT,
                                 "Battle menu detected early. Out of PP, please check your setup.",
                                 console
                             );
@@ -863,8 +863,8 @@ void quest_catch_handle_battle(
                     break;
                 default:
                     console.log("Invalid state ret2_run. Out of moves?");
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Invalid state ret2_run. Out of moves?",
                         console
                     );
@@ -889,8 +889,8 @@ void quest_catch_handle_battle(
         break;
     default:
         console.log("Invalid state in run_battle().");
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Invalid state in run_battle().",
             console
         );
@@ -992,8 +992,8 @@ void wild_battle_tera(
             while(true){
                 if (current_time() - start > std::chrono::minutes(5)){
                     console.log("Timed out during battle after 5 minutes.", COLOR_RED);
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Timed out during battle after 5 minutes.",
                         console
                     );
@@ -1041,8 +1041,8 @@ void wild_battle_tera(
                     }
                     break;
                 default:
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.",
                         console
                     );

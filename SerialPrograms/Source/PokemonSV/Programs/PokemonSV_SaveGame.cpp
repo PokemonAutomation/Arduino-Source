@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -49,8 +49,8 @@ void save_game_from_menu_or_overworld(
     bool saved = false;
     while (true){
         if (current_time() - start > std::chrono::minutes(5)){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "save_game_from_menu_or_overworld(): Failed to save game after 5 minutes.",
                 stream
             );
@@ -97,8 +97,8 @@ void save_game_from_menu_or_overworld(
             saved = true;
             continue;
         default:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "save_game_from_menu_or_overworld(): No recognized state after 60 seconds.",
                 stream
             );
@@ -133,8 +133,8 @@ void save_game_tutorial(
         {menu}
     );
     if (ret0 != 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to open menu!",
             stream
         );

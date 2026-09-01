@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/ProgramStats/StatsTracking.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -257,8 +257,8 @@ void AutoFossil::revive_one_fossil(SingleSwitchProgramEnvironment& env, ProContr
         default:
             stats.errors++;
             env.update_stats();
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "revive_one_fossil(): No recognized state after 10 seconds.",
                 env.console
             );
@@ -285,8 +285,8 @@ bool AutoFossil::check_fossils_in_one_box(
         info_watcher.reset_state();
         const int ret = wait_until(env.console, context, Seconds(5), {info_watcher});
         if (ret < 0){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to detect box info at cell idx " + std::to_string(i) + " after 5 seconds",
                 env.console
             );

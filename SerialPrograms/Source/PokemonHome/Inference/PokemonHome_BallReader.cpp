@@ -5,15 +5,16 @@
  */
 
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
+#include "CommonFramework/Recording/StreamHistorySession.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
 #include "PokemonHome/Resources/PokemonHome_PokeballSprites.h"
-//#include "PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h"
-//#include "PokemonBDSP/Inference/PokemonBDSP_PokeballSpriteMatcher.h"
 #include "PokemonHome_BallReader.h"
+#include "Tests/TestUtils.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -120,6 +121,84 @@ std::string BallReader::read_ball(const ImageViewRGB32& screen) const{
     }
 
     return sprite_result.results.begin()->second;
+}
+
+class Test_BallReader : public UnitTest{
+public:
+
+    Test_BallReader(
+        const std::string& image,
+        const std::string& expected
+    )
+        : UnitTest("PokemonHome::BallReader - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyAudioFeed audio_feed;
+        DummyVideoFeed video_feed;
+        StreamHistorySession history(logger);
+        DummyVideoOverlay video_overlay;
+        VideoStream stream(logger, audio_feed, video_feed, history, video_overlay);
+        ImageRGB32 image(m_image);
+        BallReader reader(stream);
+        std::string result = reader.read_ball(image);
+
+        if (result == m_expected)
+            return true;
+
+        return "Expected: " + m_expected + ", received: " + result;
+    };
+
+private:
+    std::string m_image;
+    std::string m_expected;
+};
+
+void add_tests_BallReader(UnitTestDatabase& database){
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/annihilape_Regular.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/bidoof_Regular.png", "ultra-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/bulbasaur_Regular.png", "ultra-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Go.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Lza.png", "repeat-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/capskid_Regular.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/castform_Regular.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/cyclizar_Regular.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/dudunsparce_Regular.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/dudunsparce_Regular_Sv.png", "quick-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/enamorus_Shiny.png", "cherish-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/gimmighoul_Regular.png", "ultra-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/glimmet_Regular.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/gogoat_Regular.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/greatTusk_Shiny.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/hatterne_Regular.png", "ultra-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/houndstone_Regular.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/ironBunde_Regular.png", "dive-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/ironBundle_Regular_Sv.png", "quick-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/ironJugulis_Regular.png", "quick-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/ironThorns_Regular.png", "ultra-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/kilowattrel_Regular.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/kingler_Shiny.png", "net-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/komala_Regular.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/krabby_Shiny.png", "ultra-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/machamp_Regular.png", "repeat-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/pancham_Shiny.png", "luxury-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/rapidash_Regular.png", "ultra-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/rellor_Regular.png", "great-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/riolu_Regular.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/rowlet_ShinyAlpha.png", "jet-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/scovillain_Regular.png", "great-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/slitherWing_Shiny.png", "beast-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/squirtle_Shiny.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/tapuLele_Shiny.png", "cherish-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/tatsugiri_Regular.png", "quick-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/teddiursa_Regular.png", "wing-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/terapagos_regular.png", "luxury-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/vulpix_Regular.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/vulpix_Shiny.png", "luxury-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/wartortle_Regular.png", "ultra-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/wurmple_Regular.png", "premier-ball");
 }
 
 

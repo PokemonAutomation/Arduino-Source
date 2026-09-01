@@ -65,18 +65,23 @@ void ReadTrainerId::program(
     TrainerCardDetector detector(COLOR_RED);
     TrainerIdReader reader;
     VideoOverlaySet overlays(env.console.overlay());
+    detector.make_overlays(overlays);
     reader.make_overlays(overlays);
 
     VideoSnapshot screen = env.console.video().snapshot();
     bool trainercard = detector.detect(screen);
     if (trainercard){
-        env.log("Trainer Card detected.");
-        env.log("Reading TID...");
-        uint16_t tid = reader.read_tid(env.logger(), LANGUAGE, screen);
-        env.log("TID: " + std::to_string(tid));
+        env.log("Trainer Card detected.", COLOR_BLUE);
     }else{
-        env.log("Trainer Card not detected!");
+        env.log("Trainer Card not detected!", COLOR_RED);
     }
+    env.log("Reading TID...");
+    uint16_t tid = reader.read_tid(env.logger(), LANGUAGE, screen);
+    env.log("TID: " + std::to_string(tid));
+
+    env.log("Finished Reading TID. Verification boxes are on overlay.",
+                    COLOR_BLUE);
+    scope.wait_for(10s);
 }
 
 } // namespace PokemonFRLG

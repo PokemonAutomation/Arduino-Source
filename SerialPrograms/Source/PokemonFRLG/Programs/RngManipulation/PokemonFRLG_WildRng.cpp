@@ -4,16 +4,20 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonFramework/Language.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.h"
+#include "PokemonFRLG/Programs/PokemonFRLG_SafariOptimalAction.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_RngNavigation.h"
 #include "PokemonFRLG_HardReset.h"
@@ -339,8 +343,8 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
             TARGET = safari_zone ? PokemonFRLG_RngTarget::safarizonefish : PokemonFRLG_RngTarget::fishing;
             break;
         default:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "WildRng(): Unrecognized encounter type",
                 env.console
             ); 
@@ -405,8 +409,8 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
         if (failed_searches >= 5){
             env.log("Failed to find any matches 5 times in a row");
-            OperationFailedException::fire(
-                ErrorReport::NO_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::NO_ERROR_REPORT,
                 "Failed to find any matches 5 times in a row. Check your seed and advances settings.",
                 env.console
             ); 
@@ -456,7 +460,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
         env.log("Resetting Game...");
         reset_and_perform_blind_sequence(
-            env.console, context, TARGET, 
+            env.console, context, LANGUAGE, TARGET, 
             SEED_BUTTON, EXTRA_BUTTON, timings, 
             launch_delay, safari_zone, PROFILE
         );
@@ -475,8 +479,8 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
                 env.log("No battle triggered. Resetting...");
                 continue;
             }else{
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "WildRng(): Failed to trigger battle",
                     env.console
                 ); 
@@ -503,15 +507,32 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
             break;
         }
 
-        int balls_thrown = auto_catch(env.console, context, MAX_BALL_THROWS, safari_zone);
-        if (balls_thrown < 0){
+        int catch_result = 0;
+        if (safari_zone){
+            int safari_balls_remaining = 30;
+
+            pbf_press_button(context, BUTTON_B, 100ms, 500ms);
+            context.wait_for_all_requests();
+
+            WildEncounterReader reader(COLOR_RED);
+            VideoOverlaySet overlays(env.console.overlay());
+            reader.make_overlays(overlays);
+            VideoSnapshot screen = env.console.video().snapshot();
+            PokemonFRLG_WildEncounter encounter = reader.read_encounter(env.logger(), LANGUAGE, screen, SAFARI_ZONE_POKEMON_SUBSET);
+
+            catch_result = auto_catch_safari(env.console, context, LANGUAGE, safari_balls_remaining, encounter.name);
+        } else{
+            catch_result = auto_catch(env.console, context, MAX_BALL_THROWS);
+        }
+
+        if (catch_result < 0){
             stats.errors++;
             send_program_recoverable_error_notification(
                 env, NOTIFICATION_ERROR_RECOVERABLE,
-                "auto_catch() encountered an error."
-            ); 
+                safari_zone ? "auto_catch_safari() encountered an error." : "auto_catch() encountered an error."
+            );
             continue;
-        }else if(balls_thrown == 0){
+        } else if (catch_result == 0){
             env.log("Failed catch.");
             continue;
         }

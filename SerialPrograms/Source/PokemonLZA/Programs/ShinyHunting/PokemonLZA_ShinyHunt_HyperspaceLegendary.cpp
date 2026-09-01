@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageHSV32.h"
@@ -345,8 +345,8 @@ void hunt_latias_check(
         {{ButtonA}}
     );
     if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "hunt_latias(): Cannot detect ladder after 5 seconds",
             env.console
         );
@@ -741,8 +741,8 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
                     }else if (LEGENDARY == Legendary::COBALION){
                         hunt_cobalion(env, context, stats, MIN_CALORIE_TO_CATCH);
                     }else{
-                        OperationFailedException::fire(
-                            ErrorReport::SEND_ERROR_REPORT,
+                        OperationFailedExceptionWithScreenshot::fire(
+                            ErrorReportMode::SEND_ERROR_REPORT,
                             "legendary hunt not implemented",
                             env.console
                         );

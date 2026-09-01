@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -121,6 +121,7 @@ GiftRng::GiftRng()
             {PokemonFRLG_RngTarget::gamecornerpinsir, "gamecornerpinsir", "Game Corner Pinsir"},
             {PokemonFRLG_RngTarget::gamecornerporygon, "gamecornerporygon", "Game Corner Porygon"},
             {PokemonFRLG_RngTarget::togepi, "togepi", "Togepi"},
+            {PokemonFRLG_RngTarget::togepifast, "togepifast", "Togepi (pre-approved)"}
         },
         LockMode::LOCK_WHILE_RUNNING,
         PokemonFRLG_RngTarget::magikarp
@@ -313,6 +314,7 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         GENDER_THRESHOLD = -1;
         break;
     case PokemonFRLG_RngTarget::togepi:
+    case PokemonFRLG_RngTarget::togepifast:
         BASE_STATS = { 35, 20, 65, 40, 65, 20 };
         GENDER_THRESHOLD = 30;
         LEVEL = 5;
@@ -373,8 +375,8 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
         if (failed_searches >= 5){
             env.log("Failed to find any matches 5 times in a row");
-            OperationFailedException::fire(
-                ErrorReport::NO_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::NO_ERROR_REPORT,
                 "Failed to find any matches 5 times in a row. Check your seed and advances settings.",
                 env.console
             ); 
@@ -413,7 +415,7 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
         env.log("Resetting Game...");
         reset_and_perform_blind_sequence(
-            env.console, context, TARGET, 
+            env.console, context, LANGUAGE, TARGET, 
             SEED_BUTTON, EXTRA_BUTTON, timings, 
             launch_delay, false, PROFILE
         );

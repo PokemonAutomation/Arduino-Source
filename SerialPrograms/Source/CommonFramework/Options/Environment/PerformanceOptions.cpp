@@ -83,6 +83,8 @@ PerformanceOptions::PerformanceOptions()
 
     //  Used only by sys-botbase 2 which has been removed.
 //    PA_ADD_OPTION(PRECISE_WAKE_MARGIN);
+
+    PA_ADD_OPTION(ONNX_OPTIONS);
 }
 
 

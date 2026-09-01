@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/ImageMatchDetector.h"
@@ -33,8 +33,8 @@ void mash_A_until_end_of_battle(VideoStream& stream, ProControllerContext& conte
         {{detector}}
     );
     if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to return to overworld after 3 minutes.",
             stream
         );
@@ -50,8 +50,8 @@ size_t switch_pokemon(
     size_t max_num_pokemon
 ){
     if (pokemon_to_switch_to >= max_num_pokemon){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Cannot send any more Pokemon to battle, max: " + std::to_string(max_num_pokemon),
             stream
         );
@@ -80,8 +80,8 @@ size_t switch_pokemon(
         // and therefore cannot be used. Try the next pokemon:
         pokemon_to_switch_to++;
         if (pokemon_to_switch_to >= max_num_pokemon){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Cannot send any more Pokemon to battle, max: " + std::to_string(max_num_pokemon),
                 stream
             );
@@ -178,8 +178,8 @@ void use_next_move_with_pp(
             // Pokemon has zero PP on all moves. This should not happen as it will just use
             // Struggle.
             stream.log("No PP on all moves. Abort program.", COLOR_RED);
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "No PP on all moves.",
                 stream
             );

@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -135,8 +135,8 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, ProControll
         context.wait_for_all_requests();
         CatchResults result = basic_catcher(env.console, context, LANGUAGE, "master-ball", 999);
         if (result.result != CatchResult::POKEMON_CAUGHT){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Unable to catch Moltres.",
                 env.console
             );

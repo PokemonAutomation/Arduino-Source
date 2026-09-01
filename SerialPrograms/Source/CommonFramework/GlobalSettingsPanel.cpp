@@ -6,13 +6,14 @@
 
 #include <iostream>
 #include <set>
-#include <QStandardPaths>
-#include <QCryptographicHash>
+#ifdef QT_CORE_LIB
 #include <QDesktopServices>
 #include <QUrl>
+#endif
 #include "Common/Cpp/ColoredText.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/LifetimeSanitizer.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
@@ -64,8 +65,8 @@ GlobalSettings::GlobalSettings()
         "<b>Stats File:</b><br>Use the stats file here. Multiple instances of the program can use the same file.",
         LockMode::LOCK_WHILE_RUNNING,
 #if defined(__APPLE__)
-        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/UserSettings/PA-Stats.txt",
-        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/UserSettings/PA-Stats.txt"
+        Filesystem::application_scratch_path().string() + "/UserSettings/PA-Stats.txt",
+        Filesystem::application_scratch_path().string() + "/UserSettings/PA-Stats.txt"
 #else
         "UserSettings/PA-Stats.txt",
         "UserSettings/PA-Stats.txt"
@@ -76,8 +77,8 @@ GlobalSettings::GlobalSettings()
         "<b>Temp Folder:</b><br>Place temporary files in this directory.",
         LockMode::LOCK_WHILE_RUNNING,
 #if defined(__APPLE__)
-        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/TempFiles/",
-        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/TempFiles/"
+        Filesystem::application_scratch_path().string() + "/TempFiles/",
+        Filesystem::application_scratch_path().string() + "/TempFiles/"
 #else
         "TempFiles/",
         "TempFiles/"
@@ -96,15 +97,6 @@ GlobalSettings::GlobalSettings()
     , OCR_WARNING(
         "WARNING: If you change the OCR library away from the default (PaddleOCR), you must ensure that you have the necessary resource downloaded. "
         "Otherwise, the programs that use OCR will throw an error."
-    )
-    , USE_GPU_FOR_ML_INFERENCE0(
-        "<b>Use GPU for Machine learning inference:</b><br>"
-        "Use the GPU by default for machine learning. Will fall-back to CPU if using the GPU fails.<br>"
-        "<font color=\"red\">WARNING: DirectML ONNX on Windows is not threadsafe. Using multithreaded PaddleOCR with DirectML will cause a crash with our current infra. "
-        "Furthermore, with PaddleOCR, DirectML is slower than using the CPU. With other models, such as SAM, DirectML seems to be ~10% "
-        "faster than the CPU. Cuda has not been tested.</font>",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false
     )
     , WINDOW_SIZE(
         CONSTRUCT_TOKEN,
@@ -161,13 +153,6 @@ GlobalSettings::GlobalSettings()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , ENABLE_PABOTBASE1(
-        "<b>Enable PABotBase1:</b><br>Enable support for the legacy PABotBase 1 protocol.<br>"
-        "Turn this on if you are still using Arduino Uno R3, Arduino Leonardo, Teensy, or Pro Micro. "
-        "Note that this feature is slated to be removed in September 2026.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false
-    )
     , DUMP_VIDEO_FORMATS(
         "<b>Dump Video Formats:</b><br>Log all video formats supported by your capture card.",
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -212,7 +197,6 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(OCR_LIBRARY);
 
     // gated behind Dev mode. see GlobalSettings::load_json
-    PA_ADD_OPTION(USE_GPU_FOR_ML_INFERENCE0);
     // PA_ADD_OPTION(OCR_WARNING); // TODO: enable this when Tesseract is no longer a default resource.
     PA_ADD_OPTION(RESOURCE_DOWNLOAD_TABLE);
     PA_ADD_OPTION(DOWNLOAD_ERROR);
@@ -237,7 +221,6 @@ GlobalSettings::GlobalSettings()
 
     PA_ADD_STATIC(m_advanced_options);
     add_option(PokemonAutomation::LOG_EVERYTHING(), "LOG_EVERYTHING");
-    PA_ADD_OPTION(ENABLE_PABOTBASE1);
     PA_ADD_OPTION(DUMP_VIDEO_FORMATS);
     PA_ADD_OPTION(SAVE_DEBUG_IMAGES);
 
@@ -263,8 +246,6 @@ GlobalSettings::GlobalSettings()
 
     PA_ADD_OPTION(DEVELOPER_TOKEN);
 
-    USE_GPU_FOR_ML_INFERENCE0.set_visibility(ConfigOptionState::HIDDEN);
-    RESOURCE_DOWNLOAD_TABLE.set_visibility(ConfigOptionState::HIDDEN);
     DOWNLOAD_ERROR.set_visibility(ConfigOptionState::HIDDEN);
     SAVE_DEBUG_VIDEOS_ON_SWITCH.set_visibility(ConfigOptionState::HIDDEN);
     ControllerSettings::instance().DEVICE_LOGGING_FLAG.set_visibility(ConfigOptionState::HIDDEN);
@@ -290,10 +271,9 @@ void GlobalSettings::load_json(const JsonValue& json){
     ConfigOptionState devmode_visibility = developer_mode
         ? ConfigOptionState::ENABLED
         : ConfigOptionState::HIDDEN;
-    USE_GPU_FOR_ML_INFERENCE0.set_visibility(devmode_visibility);
-    RESOURCE_DOWNLOAD_TABLE.set_visibility(devmode_visibility);
     DOWNLOAD_ERROR.set_visibility(devmode_visibility);
     SAVE_DEBUG_VIDEOS_ON_SWITCH.set_visibility(devmode_visibility);
+    PerformanceOptions::instance().ONNX_OPTIONS.USE_GPU.set_visibility(devmode_visibility);
     ControllerSettings::instance().DEVICE_LOGGING_FLAG.set_visibility(devmode_visibility);
 
     //  Remake this to update the color.
@@ -404,8 +384,10 @@ void GlobalSettings::on_config_value_changed(void* object){
 }
 
 void GlobalSettings::on_press(ButtonCell& button){
+#ifdef QT_CORE_LIB
     // Open the runtime base folder in the system file manager
     QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdString(RUNTIME_BASE_PATH())));
+#endif
 }
 
 void GlobalSettings::connect_row_with_download(const std::string& resource_slug, std::shared_ptr<ResourceDownload>& download_ptr){

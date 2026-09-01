@@ -7,7 +7,7 @@
 #include "PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h"
 #include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -66,18 +66,18 @@ std::string AutoStory_Checkpoint_104::name() const{ return "104 - " + AutoStory_
 std::string AutoStory_Checkpoint_104::start_text() const{ return "Entered Zero Lab. Spoke to AI Professor.";}
 std::string AutoStory_Checkpoint_104::end_text() const{ return "Battled the AI Professor. Completed the game.";}
 void AutoStory_Checkpoint_104::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_104(env, context, options.notif_status_update, stats);
+    checkpoint_104(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 // std::string AutoStory_Checkpoint_105::name() const{ return "105 - " + AutoStory_Segment_40().name(); }
 // std::string AutoStory_Checkpoint_105::start_text() const{ return "";}
 // std::string AutoStory_Checkpoint_105::end_text() const{ return "";}
 // void AutoStory_Checkpoint_105::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-//     checkpoint_105(env, context, options.notif_status_update, stats);
+//     checkpoint_105(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 // }
 
-void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text){
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
 
         pbf_press_button(context, BUTTON_L, 240ms, 80ms);
@@ -112,8 +112,8 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         // start with Psychic to defeat Iron Moth for Violet, which quad resists Moonblast.
         bool is_won = run_pokemon(env.console, context, move_table1, true, terastallized);
         if (!is_won){// throw exception if we lose
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to beat the AI Professor. Reset.",
                 env.console
             );
@@ -140,8 +140,8 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         std::vector<SinglesMoveEntry> move_table2 = {move4, move4, move4, move4, move4, move4_tera};
         is_won = run_pokemon(env.console, context, move_table2, true, terastallized);
         if (!is_won){// throw exception if we lose
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to beat the AI Professor, round 2. This shouldn't be possible. Reset.",
                 env.console
             );
@@ -162,8 +162,8 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
             {tutorial}
         );
         if (ret < 0){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Stuck trying to clear the Koraidon/Miraidon form change tutorial.",
                 env.console
             );  
@@ -174,7 +174,7 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     }, false);
 }
 
-// void checkpoint_105(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+// void checkpoint_105(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, EventNotificationOption& notif_error_recoverable, AutoStoryStats& stats, const std::string& checkpoint_text){
 // }
 
 

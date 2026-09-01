@@ -7,7 +7,7 @@
 #include <cmath>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -165,8 +165,8 @@ void open_hosting_lobby(
             stream.log("Detected overworld.");
             recovery_mode = false;
             if (!open_raid(stream, context)){
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "No Tera raid found.",
                     stream
                 );
@@ -384,7 +384,7 @@ void join_raid(
 
         default:
             auto screen = console.video().snapshot();
-            report_error(
+            report_error_to_telemetry(
                 &console.logger(),
                 info,
                 "join_raid()",
@@ -394,8 +394,8 @@ void join_raid(
             );
 
             pbf_press_button(context, BUTTON_B, 160ms, 840ms);
-//            OperationFailedException::fire(
-//                ErrorReport::SEND_ERROR_REPORT,
+//            OperationFailedExceptionWithScreenshot::fire(
+//                ErrorReportMode::SEND_ERROR_REPORT,
 //                "join_raid(): No recognized state after 30 seconds.",
 //                console,
 //                std::move(screen)
@@ -552,7 +552,7 @@ void exit_tera_win_by_catching(
             int quantity = move_to_ball(reader, stream, context, ball_slug);
             if (quantity == 0){
                 throw_and_log<FatalProgramException>(
-                    stream.logger(), ErrorReport::NO_ERROR_REPORT,
+                    stream.logger(), ErrorReportMode::NO_ERROR_REPORT,
                     "Unable to find appropriate ball. Did you run out?",
                     stream
                 );
@@ -668,7 +668,7 @@ TeraResult exit_tera_win_by_catching(
             int quantity = move_to_ball(reader, stream, context, ball_slug);
             if (quantity == 0){
                 throw_and_log<FatalProgramException>(
-                    stream.logger(), ErrorReport::NO_ERROR_REPORT,
+                    stream.logger(), ErrorReportMode::NO_ERROR_REPORT,
                     "Unable to find appropriate ball. Did you run out?",
                     stream
                 );
@@ -808,8 +808,8 @@ void run_from_tera_battle(
     while (true){
         // Having a lot of Abilities activating can take a while, setting 3 minutes to be safe
         if (current_time() - start > std::chrono::minutes(3)){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "run_from_tera_battle(): Failed to run away from tera raid battle after 3 minutes.",
                 stream
             );
@@ -864,8 +864,8 @@ void run_from_tera_battle(
                 (*stat_errors)++;
                 env.update_stats();
             }
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "run_from_tera_battle(): No recognized state after 1 minutes.",
                 stream
             );

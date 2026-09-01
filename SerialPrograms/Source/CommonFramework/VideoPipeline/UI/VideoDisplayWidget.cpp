@@ -25,14 +25,12 @@ namespace PokemonAutomation{
 VideoDisplayWidget::VideoDisplayWidget(
     QWidget& parent, QLayout& holder,
     size_t id,
-    CommandReceiver& command_receiver,
     VideoSession& video_session,
     VideoOverlaySession& overlay
 )
     : WidgetStackFixedAspectRatio(parent, WidgetStackFixedAspectRatio::ADJUST_HEIGHT_TO_WIDTH)
     , m_holder(holder)
     , m_id(id)
-    , m_command_receiver(command_receiver)
     , m_video_session(video_session)
     , m_overlay_session(overlay)
     , m_overlay(new VideoOverlayWidget(*this, overlay))
@@ -234,22 +232,24 @@ void VideoDisplayWidget::resizeEvent(QResizeEvent* event){
 }
 
 void VideoDisplayWidget::mousePressEvent(QMouseEvent* event){
+//    cout << "VideoDisplayWidget::mousePressEvent()" << endl;
     WidgetStackFixedAspectRatio::mousePressEvent(event);
     double x = (double)event->pos().x() / this->width();
     double y = (double)event->pos().y() / this->height();
-    m_overlay_session.issue_mouse_press(x, y);
+    m_overlay_session.report_mouse_press(x, y);
 }
 void VideoDisplayWidget::mouseReleaseEvent(QMouseEvent* event){
+//    cout << "VideoDisplayWidget::mouseReleaseEvent()" << endl;
     WidgetStackFixedAspectRatio::mouseReleaseEvent(event);
     double x = (double)event->pos().x() / this->width();
     double y = (double)event->pos().y() / this->height();
-    m_overlay_session.issue_mouse_release(x, y);
+    m_overlay_session.report_mouse_release(x, y);
 }
 void VideoDisplayWidget::mouseMoveEvent(QMouseEvent* event){
     WidgetStackFixedAspectRatio::mouseMoveEvent(event);
     double x = (double)event->pos().x() / this->width();
     double y = (double)event->pos().y() / this->height();
-    m_overlay_session.issue_mouse_move(x, y);
+    m_overlay_session.report_mouse_move(x, y);
 }
 
 

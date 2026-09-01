@@ -64,22 +64,24 @@ std::string AutoStory_Checkpoint_12::name() const{ return "012 - " + AutoStory_S
 std::string AutoStory_Checkpoint_12::start_text() const{ return "Arrived at Los Platos pokecenter. Cleared Let's go tutorial.";}
 std::string AutoStory_Checkpoint_12::end_text() const{ return "Arrived at Mesagoza (South) Pokecenter.";}
 void AutoStory_Checkpoint_12::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_12(env, context, options.notif_status_update, stats);
+    checkpoint_12(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
 }
 
 
 
 void checkpoint_12(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 ){
     // reset rate: ~25%. 12 resets out of 52. 
     // resets due to: getting attacked by wild pokemon, either from behind, 
     // or when lead pokemon not strong enough to clear them with Let's go
     
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
     [&](size_t attempt_number){
 
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);

@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h" 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Exceptions/UnexpectedBattleException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -66,8 +66,8 @@ void clear_tutorial(VideoStream& stream, ProControllerContext& context, uint16_t
         default:
             stream.log("clear_tutorial: Timed out.");
             if(!seen_tutorial){
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "clear_tutorial(): Tutorial screen never detected.",
                     stream
                 );                
@@ -86,8 +86,8 @@ void clear_dialog(VideoStream& stream, ProControllerContext& context,
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::minutes(5)){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "clear_dialog(): Failed to clear dialog after 5 minutes.",
                 stream
             );
@@ -170,8 +170,8 @@ void clear_dialog(VideoStream& stream, ProControllerContext& context,
             if (seen_dialog && mode == ClearDialogMode::STOP_TIMEOUT){
                 return;
             }
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "clear_dialog(): Timed out. Did not detect dialog or did not detect the expected stop condition.",
                 stream
             );
@@ -260,7 +260,7 @@ bool confirm_marker_present(
             return true;
         case 1: // battle
             throw_and_log<UnexpectedBattleException>(
-                stream.logger(), ErrorReport::SEND_ERROR_REPORT,
+                stream.logger(), ErrorReportMode::SEND_ERROR_REPORT,
                 "confirm_marker_present(): Unexpectedly detected battle.",
                 stream
             );
@@ -428,8 +428,8 @@ void overworld_navigation(
                 return;
             }
             if (stop_condition == NavigationStopCondition::STOP_MARKER){
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "overworld_navigation(): Unexpectedly detected dialog.",
                     stream
                 );
@@ -447,8 +447,8 @@ void overworld_navigation(
             if (stop_condition == NavigationStopCondition::STOP_TIME){
                 return;
             }
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "overworld_navigation(): Timed out. Did not detect expected stop condition.",
                 stream
             );
@@ -463,7 +463,12 @@ void config_option(ProControllerContext& context, int change_option_value){
     pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
 }
 
-void swap_starter_moves(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Language language){
+void swap_starter_moves(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    Language language, 
+    EventNotificationOption& notif_error_recoverable)
+{
     const ProgramInfo& info = env.program_info();
     VideoStream& stream = env.console;
 
@@ -497,12 +502,18 @@ void swap_starter_moves(SingleSwitchProgramEnvironment& env, ProControllerContex
     stream.log("Current top move: " + top_move);
     if (top_move != "ember" && top_move != "leafage" && top_move != "water-gun"){
         stream.log("Unable to confirm that the moves actually swapped.");
-        OperationFailedException exception(
-            ErrorReport::SEND_ERROR_REPORT,
-            "swap_starter_moves: Unable to confirm that the moves actually swapped.\n" + language_warning(language),
-            stream
+
+        auto snapshot = stream.video().snapshot().frame;
+        std::string message = "swap_starter_moves: Unable to confirm that the moves actually swapped.\n" + language_warning(language);
+        send_program_recoverable_error_notification_and_telemetry_report(
+            env, &env.logger(), env.program_info(), 
+            notif_error_recoverable, 
+            ErrorReportMode::SEND_ERROR_REPORT,
+            message,
+            "OperationFailedExceptionWithScreenshot",
+            *snapshot,
+            &stream.history()
         );
-        exception.send_recoverable_notification(env);
     }   
 
 }
@@ -538,8 +549,8 @@ void confirm_lead_pokemon_moves(SingleSwitchProgramEnvironment& env, ProControll
 
     if (move_0 != "moonblast" || move_1 != "mystical-fire" || move_2 != "psychic" || move_3 != "misty-terrain"){
         stream.log("Lead Pokemon's moves are wrong. They are supposed to be: Moonblast, Mystical Fire, Psychic, Misty Terrain.");
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "We expect your lead Pokemon to be a Gardevoir with moves in this order: Moonblast, Mystical Fire, Psychic, Misty Terrain. "
             "But we see something else instead. If you confirm that your lead Gardevoir does indeed have these moves in this order, "
             "and are still getting this error, you can uncheck 'Pre-check: Ensure correct moves', under Advanced mode.\n" + language_warning(language),
@@ -557,8 +568,8 @@ void confirm_minimap_unlocked(SingleSwitchProgramEnvironment& env, ProController
         direction.change_direction(env.program_info(), env.console, context, 3.02);
         pbf_press_button(context, BUTTON_L, 200ms, 200ms);
     }catch (OperationFailedException&){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "confirm_minimap_unlocked(): Unable to confirm that the minimap is unlocked. Likely because the direction cannot be detected. "
             "If you manually confirm that the minimap is unlocked, you can disable this precheck in the program setting \"Pre-check: Ensure the minimap is unlocked\".",
             env.console
@@ -802,7 +813,7 @@ void do_action_and_monitor_for_battles(
     );
     if (ret == 0){ // battle detected
         throw_and_log<UnexpectedBattleException>(
-            stream.logger(), ErrorReport::SEND_ERROR_REPORT,
+            stream.logger(), ErrorReportMode::SEND_ERROR_REPORT,
             "do_action_and_monitor_for_battles(): Detected battle. Failed to complete action.",
             stream
         );
@@ -838,8 +849,8 @@ void do_action_and_monitor_for_battles_early(
         });
 
         // if no battle seen, then throw Exception.
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "do_action_and_monitor_for_battles_early(): Expected to see a battle, but didn't. Possible false positive on NoMinimapWatcher.",
             stream
         ); 
@@ -874,8 +885,8 @@ void do_action_until_dialog(
         stream.log("do_action_until_dialog(): Detected dialog.");
         return;
     default:
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "do_action_until_dialog(): Finished action. Did not detect dialog.",
             stream
         );
@@ -932,8 +943,8 @@ void do_action_and_monitor_for_overworld(
         // successfully completed action detecting the overworld
         return;
     }else if (ret == 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "do_action_and_monitor_for_overworld(): Failed to complete action. Detected overworld.",
             stream
         );                
@@ -964,8 +975,8 @@ void handle_when_stationary_in_overworld(
     size_t num_failures = 0;
     while (true){
         if (current_time() - start > std::chrono::minutes(minutes_timeout)){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "handle_when_stationary_in_overworld(): Failed to complete action after " + std::to_string(minutes_timeout) + " minutes.",
                 stream
             );
@@ -988,8 +999,8 @@ void handle_when_stationary_in_overworld(
             stream.log("Detected stationary overworld.");
             num_failures++;
             if (num_failures > max_failures){
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "handle_when_stationary_in_overworld(): Failed to complete action within " + std::to_string(max_failures) + " attempts.",
                     stream
                 );                
@@ -1023,10 +1034,10 @@ void handle_failed_action(
             context.wait_for_all_requests();
             action(info, stream, context);
             return;
-        }catch (OperationFailedException& e){
+        }catch (OperationFailedException&){
             num_failures++;
             if (num_failures > max_failures){
-                throw e;
+                throw;
             }
             recovery_action(info, stream, context);
         }
@@ -1051,8 +1062,8 @@ void wait_for_gradient_arrow(
     if (ret == 0){
         stream.log("Gradient arrow detected.");
     }else{
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to detect gradient arrow.",
             stream
         );
@@ -1075,8 +1086,8 @@ void wait_for_overworld(
     if (ret == 0){
         stream.log("Overworld detected.");
     }else{
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to detect overworld.",
             stream
         );
@@ -1104,8 +1115,8 @@ void press_A_until_dialog(
     if (ret == 0){
         stream.log("press_A_until_dialog: Detected dialog.");
     }else{
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "press_A_until_dialog(): Unable to detect dialog after 10 button presses.",
             stream
         );
@@ -1156,8 +1167,8 @@ void get_on_or_off_ride(const ProgramInfo& info, VideoStream& stream, ProControl
     WallClock start = current_time();
     while (get_on != is_ride_active(info, stream, context)){
         if (current_time() - start > std::chrono::minutes(3)){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "get_on_or_off_ride(): Failed to get on/off ride after 3 minutes.",
                 stream
             );
@@ -1193,8 +1204,8 @@ void realign_player_from_landmark(
 
     while (true){
         if (current_time() - start > std::chrono::minutes(5)){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "realign_player_from_landmark(): Failed to realign player after 5 minutes.",
                 stream
             );
@@ -1230,8 +1241,8 @@ void realign_player_from_landmark(
             // move cursor to pokecenter
             double push_scale = 0.29 * adjustment_table[try_count];
             if (!detect_closest_flypoint_and_move_map_cursor_there(info, stream, context, FlyPoint::POKECENTER, push_scale)){
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "realign_player_from_landmark(): No visible pokecenter found on map.",
                     stream
                 );         
@@ -1275,8 +1286,8 @@ void realign_player_from_landmark(
         }catch (OperationFailedException&){
             try_count++;
             if (try_count >= MAX_TRY_COUNT){
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "fly_to_closest_pokecenter_on_map(): At min warpable map level, pokecenter was detected, but failed to fly there.",
                     stream
                 );                
@@ -1296,8 +1307,8 @@ void confirm_cursor_centered_on_pokecenter(const ProgramInfo& info, VideoStream&
     ImageFloatBox center_cursor{0.484, 0.472, 0.030, 0.053};
     MapPokeCenterIconDetector pokecenter(COLOR_RED, center_cursor);
     if (!pokecenter.detect(stream.video().snapshot())){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "confirm_cursor_centered_on_pokecenter(): Cursor is not centered on a pokecenter.",
             stream
         );            
@@ -1323,8 +1334,8 @@ void move_cursor_towards_flypoint_and_go_there(
 
     while (true){
         if (current_time() - start > std::chrono::minutes(5)){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "move_cursor_towards_flypoint_and_go_there(): Failed to fly after 5 minutes.",
                 stream
             );
@@ -1359,8 +1370,8 @@ void move_cursor_towards_flypoint_and_go_there(
 
             double push_scale = 0.29 * adjustment_table[try_count];
             if (!fly_to_visible_closest_flypoint_cur_zoom_level(info, stream, context, fly_point, push_scale)){
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "move_cursor_towards_flypoint_and_go_there(): No visible pokecenter found on map.",
                     stream
                 );                  
@@ -1373,8 +1384,8 @@ void move_cursor_towards_flypoint_and_go_there(
         }catch (OperationFailedException&){
             try_count++;
             if (try_count >= MAX_TRY_COUNT){
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "move_cursor_towards_flypoint_and_go_there(): At given zoom level, pokecenter was detected, but failed to fly there.",
                     stream
                 );                
@@ -1402,8 +1413,8 @@ void check_num_sunflora_found(SingleSwitchProgramEnvironment& env, ProController
     if (number_string.compare(0, expected_number_string.size(), expected_number_string) == 0){
         env.console.log("Number of sunflora found: " + expected_number_string);
     }else{
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "The number of sunflora found is different than expected.",
             env.console
         );
@@ -1413,10 +1424,12 @@ void check_num_sunflora_found(SingleSwitchProgramEnvironment& env, ProController
 }
 
 void checkpoint_reattempt_loop(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
     AutoStoryStats& stats,
+    const std::string& checkpoint_text,
     std::function<void(size_t attempt_number)>&& action,
     bool day_skip
 ){
@@ -1432,6 +1445,8 @@ void checkpoint_reattempt_loop(
             save_game_from_overworld(env.program_info(), env.console, context);
         }
 
+        env.console.log(checkpoint_text + " Num attempts: " + std::to_string(i));
+
         context.wait_for_all_requests();
         action(i);
 
@@ -1439,10 +1454,25 @@ void checkpoint_reattempt_loop(
        
         break;
     }catch (OperationFailedException& e){
+        if (i == 10){  // send an error report for debugging if 10 failed attempts for a given checkpoint.
+            auto snapshot = env.console.video().snapshot().frame;
+            std::string message = "10 failed attempts. " + checkpoint_text;
+            send_program_recoverable_error_notification_and_telemetry_report(
+                env, &env.logger(), env.program_info(), 
+                notif_error_recoverable, 
+                ErrorReportMode::SEND_ERROR_REPORT,
+                message,
+                "OperationFailedExceptionWithScreenshot",
+                *snapshot,
+                &env.console.history()
+            );
+        }
+
         if (i > max_attempts){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Autostory checkpoint failed " + std::to_string(max_attempts) + " times.\n"
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
+                "Autostory checkpoint failed " + std::to_string(max_attempts) + " times.\n" +
+                checkpoint_text + "\n"
                 "Make sure you selected the correct Start Point, and your character is in the exactly correct starting position."
                 "Also, make sure you have set the correct Language.\n" + e.message(),
                 env.console
@@ -1459,10 +1489,12 @@ void checkpoint_reattempt_loop(
 }
 
 void checkpoint_reattempt_loop_tutorial(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
     AutoStoryStats& stats,
+    const std::string& checkpoint_text,
     std::function<void(size_t attempt_number)>&& action
 ){
     size_t max_attempts = 100;
@@ -1475,14 +1507,30 @@ void checkpoint_reattempt_loop_tutorial(
             send_program_status_notification(env, notif_status_update, "Saved at checkpoint.");     
         }
         
+        env.console.log(checkpoint_text + " Num attempts: " + std::to_string(i));
+
         context.wait_for_all_requests();
         action(i);
 
         break;  
     }catch (OperationFailedException& e){
+        if (i == 10){  // send an error report for debugging if 10 failed attempts for a given checkpoint.
+            auto snapshot = env.console.video().snapshot().frame;
+            std::string message = "10 failed attempts. " + checkpoint_text;
+            send_program_recoverable_error_notification_and_telemetry_report(
+                env, &env.logger(), env.program_info(), 
+                notif_error_recoverable, 
+                ErrorReportMode::SEND_ERROR_REPORT,
+                message,
+                "OperationFailedExceptionWithScreenshot",
+                *snapshot,
+                &env.console.history()
+            );
+        }
+
         if (i > max_attempts){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Autostory checkpoint failed " + std::to_string(max_attempts) + " times.\n"
                 "Make sure you selected the correct Start Point, and your character is in the exactly correct starting position."
                 "Also, make sure you have set the correct Language.\n" + e.message(),
@@ -1597,8 +1645,8 @@ void move_forward_until_yolo_object_above_min_size(
         }
 
         if (forward_move_count > 50){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "move_forward_until_yolo_object_above_min_size(): Unable to reach target object after many attempts.",
                 env.console
             );
@@ -1606,8 +1654,8 @@ void move_forward_until_yolo_object_above_min_size(
     }
 
     if (!seen_object){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "move_forward_until_yolo_object_above_min_size(): Never detected the yolo object.",
             env.console
         );
@@ -1663,8 +1711,8 @@ void move_player_until_yolo_object_detected(
 
         round_num++;
         if (round_num > max_rounds){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "move_player_until_yolo_object_detected(): Unable to detect target object.",
                 env.console
             );  
@@ -1717,8 +1765,8 @@ void move_forward_until_yolo_object_not_detected(
     round_num++;
 
     if (round_num > max_rounds){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "move_forward_until_yolo_object_not_detected(): Unable to walk away from target object.",
             env.console
         );  
@@ -1812,8 +1860,8 @@ bool move_player_to_realign_via_yolo(
     }
 
     if (!seen_object){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "move_player_to_realign_via_yolo(): Never detected the yolo object.",
             env.console
         );
@@ -1878,8 +1926,8 @@ void move_camera_until_yolo_object_detected(
         }
         round_num++;
         if (round_num > max_rounds){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "move_camera_until_yolo_object_detected(): Unable to detect target object.",
                 env.console
             );  
@@ -1916,8 +1964,8 @@ void confirm_titan_battle(SingleSwitchProgramEnvironment& env, ProControllerCont
         env.console.log("Confirmed Titan battle.");
         
     }else{
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "confirm_titan_battle(): Unable to confirm Titan battle.",
             env.console
         );

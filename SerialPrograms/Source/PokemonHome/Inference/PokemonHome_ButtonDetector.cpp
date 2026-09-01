@@ -5,10 +5,12 @@
  */
 
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "PokemonHome_ButtonDetector.h"
+#include "Tests/TestUtils.h"
 
 //#include <iostream>
 //using std::cout;
@@ -155,6 +157,97 @@ bool ButtonDetector::detect(const ImageViewRGB32& screen){
     return found;
 }
 
+class Test_ButtonDetector : public UnitTest{
+public:
+
+    Test_ButtonDetector(
+        const std::string& image,
+        std::optional<ButtonType> expected
+    )
+        : UnitTest("PokemonHome::ButtonDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyVideoOverlay video_overlay;
+        ImageRGB32 image(m_image);
+        ImageFloatBox box(0.100, 0.956, 0.107, 0.041);
+        ButtonDetector b_detector(COLOR_RED, ButtonType::ButtonB, box, &video_overlay);
+        ButtonDetector plus_detector(COLOR_RED, ButtonType::ButtonPlus, box, &video_overlay);
+
+        const bool b_detected = b_detector.detect(image);
+        const bool plus_detected = plus_detector.detect(image);
+        const bool expected_b = m_expected && *m_expected == ButtonType::ButtonB;
+        const bool expected_plus = m_expected && *m_expected == ButtonType::ButtonPlus;
+
+        if (b_detected == expected_b && plus_detected == expected_plus)
+            return true;
+
+        std::string received;
+        if (b_detected && plus_detected){
+            received = "ButtonB and ButtonPlus";
+        }else if (b_detected){
+            received = button_name(ButtonType::ButtonB);
+        }else if (plus_detected){
+            received = button_name(ButtonType::ButtonPlus);
+        }else{
+            received = "none";
+        }
+
+        return std::string("Expected: ") + (m_expected ? button_name(*m_expected) : "none")
+            + ", received: " + received;
+    };
+
+private:
+    std::string m_image;
+    std::optional<ButtonType> m_expected;
+};
+
+void add_tests_ButtonDetector(UnitTestDatabase& database){
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/annihilape_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/bidoof_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/bulbasaur_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Go.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Lza.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/capskid_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/castform_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/cyclizar_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/dudunsparce_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/dudunsparce_Regular_Sv.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/enamorus_Shiny.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/gimmighoul_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/glimmet_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/gogoat_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/greatTusk_Shiny.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/hatterne_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/houndstone_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/ironBunde_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/ironBundle_Regular_Sv.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/ironJugulis_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/ironThorns_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/kilowattrel_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/kingler_Shiny.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/komala_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/krabby_Shiny.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/machamp_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/pancham_Shiny.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/rapidash_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/rellor_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/riolu_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/rowlet_ShinyAlpha.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/scovillain_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/slitherWing_Shiny.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/squirtle_Shiny.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/tapuLele_Shiny.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/tatsugiri_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/teddiursa_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/terapagos_regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/vulpix_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/vulpix_Shiny.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/wartortle_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/wurmple_Regular.png", ButtonType::ButtonB);
+}
 
 }
 }

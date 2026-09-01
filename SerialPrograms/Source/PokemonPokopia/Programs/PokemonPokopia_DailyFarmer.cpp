@@ -6,7 +6,7 @@
 
 //#include "CommonFramework/Logging/Logger.h"
 #include <chrono>
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
@@ -134,8 +134,8 @@ void DailyFarmer::go_to_date_menu(SingleSwitchProgramEnvironment& env, ProContro
         env.console.log("Successfully navigated to date change menu");
         return;
     }
-    OperationFailedException::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+    OperationFailedExceptionWithScreenshot::fire(
+        ErrorReportMode::SEND_ERROR_REPORT,
         "Failed to navigate to date change menu",
         env.console
     );

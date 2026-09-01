@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Concurrency/ReverseLockGuard.h"
+//#include "Common/Cpp/Concurrency/ReverseLockGuard.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "CommonFramework/ImageTypes/ImageRGB32_Qt.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
@@ -116,6 +116,7 @@ bool SnapshotManager::try_dispatch_conversion(uint64_t seqnum, QVideoFrame frame
     }catch (...){}
 
     m_pending_conversions.erase(seqnum);
+    m_cv.notify_all();
 
     return false;
 }
@@ -148,6 +149,7 @@ SnapshotManager::ObjectsToGC SnapshotManager::cleanup(){
         if (iter->second.is_finished()){
             ret.tasks_to_free.emplace_back(std::move(iter->second));
             m_pending_conversions.erase(iter);
+            m_cv.notify_all();
         }else{
             break;
         }

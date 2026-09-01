@@ -60,21 +60,25 @@ public:
 
 
 // start: Defeated Klawf. At Artazon (West) Pokecenter.
-// end: At Artazon Gym building. Battled Nemona. Received Sunflora gym challenge.
+// end: Battled Nemona. Inside Artazon Gym building.
 void checkpoint_43(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
-// start: At Artazon Gym building. Battled Nemona. Received Sunflora gym challenge.
+// start: Battled Nemona. Inside Artazon Gym building.
 // end: Finished Sunflora gym challenge.
 void checkpoint_44(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 // start: Finished Sunflora gym challenge.
@@ -83,7 +87,9 @@ void checkpoint_45(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 // start: Defeated Artazon Gym (Grass). Inside gym building.
@@ -92,7 +98,9 @@ void checkpoint_46(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
 );
 
 
