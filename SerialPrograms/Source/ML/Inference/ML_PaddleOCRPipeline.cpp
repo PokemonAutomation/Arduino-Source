@@ -162,7 +162,7 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
 
     
     // 2. Crop tightly around the text, with small safety margin
-    cv::Mat cropped_image = crop_to_text_region(cv_image_rgb);
+    cv::Mat cropped_image = crop_to_text_region_with_padding(cv_image_rgb);
     if (cropped_image.empty()){
         m_logger.log("[OCR-DEBUG] Crop to text region returned empty image.");
         return "";
@@ -309,7 +309,7 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     
 }
 
-cv::Mat crop_to_text_region(const cv::Mat& image) {
+cv::Mat crop_to_text_region_with_padding(const cv::Mat& image) {
     // first convert to grayscale
     cv::Mat gray;
     cv::cvtColor(image, gray, cv::COLOR_RGB2GRAY);
@@ -339,32 +339,67 @@ cv::Mat crop_to_text_region(const cv::Mat& image) {
     // create bounding box for crop
     cv::Rect bbox = cv::boundingRect(nonZeroCoords);
 
-    // increase bounding box slightly to add small safety margin
-    int pad_x = std::max(4, bbox.width / 20);  // ~5%
-    int pad_y = std::max(2, bbox.height / 20);  // ~5%
+    // get the current gap between the text and the edge
+    int top_gap = bbox.y;
+    int bottom_gap = image.rows - (bbox.y + bbox.height);
+    int left_gap = bbox.x;
+    int right_gap = image.cols - (bbox.x + bbox.width);
 
-    bbox.x = std::max(0, bbox.x - pad_x);
-    bbox.y = std::max(0, bbox.y - pad_y);
+    // calculate the desired padding
+    int pad_x = std::max(4, bbox.width / 10);  // ~10%
+    int pad_y = std::max(2, bbox.height / 10);  // ~10%
 
-    bbox.width = std::min(
-        image.cols - bbox.x,
-        bbox.width + 2 * pad_x
-    );
-
-    bbox.height = std::min(
-        image.rows - bbox.y,
-        bbox.height + 2 * pad_y
-    );
-
-    // crop the original image based on the bounding box
-    // the crop should be within bounds.
-    cv::Mat cropped_image;
-    cropped_image = image(bbox).clone();
 
     // static int i = 0;
     // i++;
-    // cv::imwrite("aabinary" + std::to_string(i) + ".png", binary);
-    // cv::imwrite("aacropped_image" + std::to_string(i) + ".png", cropped_image);
+    cv::Mat cropped_image;
+    if (top_gap >= pad_y && bottom_gap >= pad_y && left_gap >= pad_x && right_gap >= pad_x){
+        // Original image has plenty of padding.
+        // We just expand the bounding box out by pad_x, pad_y and crop directly.
+
+        // we guarantee that bbox.x - pad_x >= 0
+        // and image.cols >= bbox.width + (pad_x * 2)
+        cv::Rect optimal_crop(
+            bbox.x - pad_x,
+            bbox.y - pad_y,
+            bbox.width + (pad_x * 2),
+            bbox.height + (pad_y * 2)
+        );
+        // crop the original image
+        // the crop should be within bounds.
+        cropped_image = image(optimal_crop).clone();
+    }else{
+
+        // add more padding to original image
+        cv::Scalar bg = estimate_background_color(image);
+        cv::Mat padded_image;
+        cv::copyMakeBorder(
+            image,
+            padded_image,
+            pad_y, pad_y,
+            pad_x, pad_x,
+            cv::BORDER_CONSTANT,
+            bg
+        );
+
+        // cv::imwrite(std::to_string(i) + "-padded" + ".png", padded_image);
+
+        cv::Rect final_crop(
+            bbox.x, // (bbox.x + pad_x) - pad_x cancels out perfectly to just bbox.x
+            bbox.y, // (bbox.y + pad_y) - pad_y cancels out perfectly to just bbox.y
+            bbox.width + (pad_x * 2),
+            bbox.height + (pad_y * 2)
+        );
+
+        // crop the padded image
+        // the crop should be within bounds.
+        
+        cropped_image = padded_image(final_crop).clone();
+    }
+
+
+    // cv::imwrite(std::to_string(i) + "-binary" + ".png", binary);
+    // cv::imwrite(std::to_string(i) + "-cropped_image" +".png", cropped_image);
 
     return cropped_image;
 }
@@ -400,7 +435,7 @@ void add_horizontal_padding(cv::Mat& image){
 
     // static int i = 0;
     // i++;
-    // cv::imwrite("aapadded" + std::to_string(i) + ".png", image);
+    // cv::imwrite(std::to_string(i) + "-horiz-padded" + ".png", image);
 
 }
 
