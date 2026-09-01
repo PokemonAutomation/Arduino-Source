@@ -295,7 +295,8 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         
         // handle the blind part
         reset_and_perform_blind_sequence(
-            env.console, context, TARGET, 
+            env.console, context, 
+            LANGUAGE, TARGET, 
             SEED_BUTTON, EXTRA_BUTTON, 
             timings, launch_delay,
             SAFARI_ZONE, PROFILE

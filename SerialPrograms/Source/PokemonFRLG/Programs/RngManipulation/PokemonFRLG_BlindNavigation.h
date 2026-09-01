@@ -100,7 +100,8 @@ namespace PokemonFRLG{
 
     // performs the blind sequence between launching the game and arriving at the RNG manipulation target
     void perform_blind_sequence(
-        ProControllerContext& context, 
+        ProControllerContext& context,
+        const Language& language,
         PokemonFRLG_RngTarget target,
         const SeedButton& seed_button,
         const BlackoutButton& extra_button,

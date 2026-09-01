@@ -415,7 +415,7 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
         env.log("Resetting Game...");
         reset_and_perform_blind_sequence(
-            env.console, context, TARGET, 
+            env.console, context, LANGUAGE, TARGET, 
             SEED_BUTTON, EXTRA_BUTTON, timings, 
             launch_delay, false, PROFILE
         );

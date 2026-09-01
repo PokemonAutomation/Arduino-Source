@@ -189,6 +189,7 @@ void rng_reset_and_return_home(
 void reset_and_perform_blind_sequence(
     ConsoleHandle& console, 
     ProControllerContext& context, 
+    const Language& language,
     PokemonFRLG_RngTarget target,
     const SeedButton& seed_button,
     const BlackoutButton& extra_button,
@@ -218,8 +219,8 @@ void reset_and_perform_blind_sequence(
         context.wait_for_all_requests();
         int ret = run_until<ProControllerContext>(
             console, context,
-            [target, seed_button, extra_button, timings, safari_zone, console_type](ProControllerContext& context) {
-                perform_blind_sequence(context, target, seed_button, extra_button, timings, safari_zone, console_type);
+            [language, target, seed_button, extra_button, timings, safari_zone, console_type](ProControllerContext& context) {
+                perform_blind_sequence(context, language, target, seed_button, extra_button, timings, safari_zone, console_type);
             },
             { update_detector, user_selection_detector },
             5000ms

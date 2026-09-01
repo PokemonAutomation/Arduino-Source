@@ -678,7 +678,8 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
         env.log("Resetting Game...");
         reset_and_perform_blind_sequence(
-            env.console, context, PokemonFRLG_RngTarget::starters, 
+            env.console, context, 
+            LANGUAGE, PokemonFRLG_RngTarget::starters, 
             SEED_BUTTON, EXTRA_BUTTON, timings,
             launch_delay, false, PROFILE
         );
