@@ -408,7 +408,7 @@ void walk_to_safarizonewest(ProControllerContext& context){
     // total duration: 52930ms
 }
 
-void activate_roamer(ProControllerContext& context, const uint64_t& ingame_delay){
+void activate_roamer(ProControllerContext& context, const Language& language, const uint64_t& ingame_delay){
     // a lot of dialogue while Celio inserts the Sapphire
     pbf_press_button(context, BUTTON_A, 200ms, 5300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
@@ -419,6 +419,9 @@ void activate_roamer(ProControllerContext& context, const uint64_t& ingame_delay
     pbf_press_button(context, BUTTON_A, 200ms, 5300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    if (language == Language::Spanish){ // "de HOENN!" gets pushed to a new line
+        pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    }
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - 26700)); //5500ms + 4*1500ms + 3500ms + 5500ms + 4*1500ms + 200
@@ -721,6 +724,7 @@ void check_timings(
 
 void perform_blind_sequence(
     ProControllerContext& context, 
+    const Language& language,
     PokemonFRLG_RngTarget target,
     const SeedButton& seed_button,
     const BlackoutButton& extra_button,
@@ -854,7 +858,7 @@ void perform_blind_sequence(
     case PokemonFRLG_RngTarget::entei:
     case PokemonFRLG_RngTarget::suicune:
     case PokemonFRLG_RngTarget::roaming:
-        activate_roamer(context, timings.ingame_delay);
+        activate_roamer(context, language, timings.ingame_delay);
     }
 }
 

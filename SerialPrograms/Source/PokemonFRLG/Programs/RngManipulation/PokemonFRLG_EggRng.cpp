@@ -379,7 +379,7 @@ bool EggRng::reset_and_check_seed(
     // Step 1: reset and perform blind sequence
     env.log("Resetting Game...");
     reset_and_perform_blind_sequence(
-        env.console, context, target,
+        env.console, context, LANGUAGE, target,
         SEED_BUTTON, EXTRA_BUTTON,
         timings, launch_delay, false, PROFILE
     );

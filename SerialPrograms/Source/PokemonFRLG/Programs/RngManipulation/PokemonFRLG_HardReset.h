@@ -20,6 +20,7 @@ static const Milliseconds INITIAL_LAUNCH_DELAY = 950ms;
 void reset_and_perform_blind_sequence(
     ConsoleHandle& console, 
     ProControllerContext& context, 
+    const Language& language,
     PokemonFRLG_RngTarget target,
     const SeedButton& seed_button,
     const BlackoutButton& extra_button,
