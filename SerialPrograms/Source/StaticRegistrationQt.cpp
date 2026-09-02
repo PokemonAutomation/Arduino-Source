@@ -46,11 +46,16 @@
 
 //  Controllers
 #include "Controllers/NullControllerWidget.h"
+#include "Controllers/ControllerSelectorWidget.h"
 #include "Controllers/PABotBase2/SerialPABotBase2_SelectorWidget.h"
 #include "ControllerInput/Keyboard/KeyBindingWidget.h"
 
+//  Consoles
+#include "ConsoleInfra/ConsoleSystemWidget.h"
+
 //  Nintendo Switch
 #include "NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h"
+#include "NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h"
 #include "NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.h"
 
 //  Pokemon LA
@@ -119,11 +124,16 @@ void register_all_statics(){
 
     //  Controllers
     RegisterUiStateQtWidget<NullControllerWidget>();
+    RegisterUiStateQtWidget<ControllerSelectorWidget>();
     RegisterUiStateQtWidget<SerialPABotBase::SerialPABotBase2_SelectorWidget>();
     RegisterUiStateQtWidget<KeyboardHidBindingCellWidget>();
 
+    //  Consoles
+    RegisterUiStateQtWidget<ConsoleInfra::ConsoleSystemWidget>();
+
     //  Nintendo Switch
     RegisterUiStateQtWidget<SysbotBase::TcpSysbotBase_SelectorWidget>();
+    RegisterUiStateQtWidget<NintendoSwitch::SwitchSystemWidget>();
     RegisterUiStateQtWidget<NintendoSwitch::FriendCodeListWidget>();
 
     //  Pokemon LA

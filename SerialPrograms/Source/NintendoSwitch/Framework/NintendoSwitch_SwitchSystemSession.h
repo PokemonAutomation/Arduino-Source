@@ -32,7 +32,10 @@ class SwitchSystemOption;
 
 
 
-class SwitchSystemSession final : public TrackableConsole, public ConsoleInfra::ConsoleSystemSession{
+class SwitchSystemSession final
+    : public UiState<SwitchSystemSession, ConsoleInfra::ConsoleSystemSession>
+    , public TrackableConsole
+{
 public:
     virtual bool try_shutdown() noexcept override;
     ~SwitchSystemSession();

@@ -25,6 +25,9 @@
 
 namespace PokemonAutomation{
 
+template class RegisterUiStateQtWidget<ControllerSelectorWidget>;
+
+
 
 
 
@@ -33,8 +36,7 @@ ControllerSelectorWidget::~ControllerSelectorWidget(){
 }
 ControllerSelectorWidget::ControllerSelectorWidget(
     QWidget& parent,
-    ControllerSession& session,
-    std::optional<size_t> index
+    ControllerSession& session
 )
     : QWidget(&parent)
     , m_session(session)
@@ -42,7 +44,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(
     QHBoxLayout* layoutL = new QHBoxLayout(this);
     layoutL->setContentsMargins(0, 0, 0, 0);
 
-    if (!index.has_value()){
+    if (!session.index().has_value()){
         layoutL->addWidget(new QLabel("<b>Controller:</b>", this), CONSOLE_SETTINGS_STRETCH_L0_LABEL);
     }else{
         QHBoxLayout* layoutL0 = new QHBoxLayout();
@@ -51,7 +53,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(
 
         layoutL0->addWidget(
             new QLabel(
-                QString::fromStdString("<b>Controller " + std::to_string(index.value()) + ":</b>"),
+                QString::fromStdString("<b>Controller " + std::to_string(session.index().value()) + ":</b>"),
                 this
             )
         );

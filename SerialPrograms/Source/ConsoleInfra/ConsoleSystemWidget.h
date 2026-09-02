@@ -9,6 +9,7 @@
 
 #include <QVBoxLayout>
 #include <QWidget>
+#include "Common/Qt/UiStateQtWidget.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/AudioPipeline/UI/AudioSelectorWidget.h"
 #include "CommonFramework/AudioPipeline/UI/AudioDisplayWidget.h"
@@ -20,7 +21,10 @@ namespace PokemonAutomation{
 namespace ConsoleInfra{
 
 
-class ConsoleSystemWidget : public QWidget{
+class ConsoleSystemWidget : public QWidget, public UiComponentQtWidget{
+public:
+    using ParentState = ConsoleSystemSession;
+
 public:
     virtual ~ConsoleSystemWidget();
 
@@ -41,6 +45,7 @@ protected:
 
 
 private:
+    virtual QWidget& widget() override{ return *this; }
     virtual void focusInEvent(QFocusEvent* event) override;
     virtual void focusOutEvent(QFocusEvent* event) override;
     virtual void keyPressEvent(QKeyEvent* event) override;

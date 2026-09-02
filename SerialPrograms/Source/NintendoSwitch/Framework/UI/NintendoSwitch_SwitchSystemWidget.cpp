@@ -14,6 +14,9 @@
 //using std::endl;
 
 namespace PokemonAutomation{
+
+template class RegisterUiStateQtWidget<NintendoSwitch::SwitchSystemWidget>;
+
 namespace NintendoSwitch{
 
 

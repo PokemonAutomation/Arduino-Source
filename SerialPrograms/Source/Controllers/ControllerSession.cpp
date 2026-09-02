@@ -42,10 +42,12 @@ ControllerSession::~ControllerSession(){
 }
 ControllerSession::ControllerSession(
     Logger& logger,
-    ControllerOption& option
+    ControllerOption& option,
+    std::optional<size_t> index
 )
     : m_logger(logger)
     , m_option(option)
+    , m_index(index)
     , m_options_locked(false)
     , m_descriptor(option.descriptor())
     , m_connection(m_descriptor->open_connection(logger))

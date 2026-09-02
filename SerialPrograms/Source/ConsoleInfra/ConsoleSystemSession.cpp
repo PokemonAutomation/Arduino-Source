@@ -177,7 +177,7 @@ void ConsoleSystemSession::on_focus_out(){
             controller.cancel_all_commands();
         });
         if (!error.empty()){
-            m_logger.log(error, COLOR_RED);
+            controller.session.logger().log(error, COLOR_RED);
         }
     }
 }
@@ -198,7 +198,7 @@ void ConsoleSystemSession::run_controller_input(ControllerInputState& state){
             controller.run_controller_input(state);
         });
         if (!error.empty()){
-            m_logger.log("Keyboard Command Failed: " + error, COLOR_RED);
+            controller.session.logger().log("Keyboard Command Failed: " + error, COLOR_RED);
         }
     }
 }

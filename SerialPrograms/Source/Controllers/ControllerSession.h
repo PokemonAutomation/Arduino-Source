@@ -10,7 +10,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/ListenerSet.h"
-//#include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/UiWrapper.h"
 #include "Controller.h"
 #include "ControllerDescriptor.h"
 #include "ControllerOption.h"
@@ -20,7 +20,10 @@ namespace PokemonAutomation{
 
 
 
-class ControllerSession final : private ControllerConnection::StatusListener{
+class ControllerSession final
+    : public UiState<ControllerSession>
+    , private ControllerConnection::StatusListener
+{
 public:
     struct Listener{
         virtual void ready_changed(bool ready){}
@@ -43,7 +46,8 @@ public:
     ~ControllerSession();
     ControllerSession(
         Logger& logger,
-        ControllerOption& option
+        ControllerOption& option,
+        std::optional<size_t> index
     );
 
 
@@ -66,6 +70,9 @@ public:
     ControllerType controller_type() const;
     std::string status_text() const;
 
+    std::optional<size_t> index() const{
+        return m_index;
+    }
     const ControllerOption& option() const{
         return m_option;
     }
@@ -154,6 +161,7 @@ private:
 private:
     Logger& m_logger;
     ControllerOption& m_option;
+    std::optional<size_t> m_index;
 
     Mutex m_reset_lock;
     mutable SpinLock m_state_lock;

@@ -21,6 +21,7 @@
 #define PokemonAutomation_ConsoleInfra_ConsoleSystemSession_H
 
 #include "Common/Cpp/Logging/TaggedLogger.h"
+#include "Common/Cpp/UiWrapper.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
 #include "CommonFramework/VideoPipeline/VideoSession.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
@@ -37,7 +38,8 @@ namespace ConsoleInfra{
 
 
 class ConsoleSystemSession
-    : private VideoDisplayHidListener
+    : public UiState<ConsoleSystemSession>
+    , private VideoDisplayHidListener
     , private ControllerInputListener
 {
 public:
@@ -114,11 +116,11 @@ private:
 
         ControllerEntry(TaggedLogger& p_logger, ControllerOption& option)
             : logger(p_logger)
-            , session(logger, option)
+            , session(logger, option, std::nullopt)
         {}
         ControllerEntry(TaggedLogger& p_logger, size_t p_controller_index, ControllerOption& option)
             : logger(p_logger, std::to_string(p_controller_index))
-            , session(logger, option)
+            , session(logger, option, p_controller_index)
         {}
     };
     FixedLimitVector<ControllerEntry> m_controllers;

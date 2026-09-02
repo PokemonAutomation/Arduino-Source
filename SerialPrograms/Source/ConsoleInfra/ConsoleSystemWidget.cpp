@@ -12,6 +12,9 @@
 #include "ConsoleSystemWidget.h"
 
 namespace PokemonAutomation{
+
+template class RegisterUiStateQtWidget<ConsoleInfra::ConsoleSystemWidget>;
+
 namespace ConsoleInfra{
 
 
@@ -65,7 +68,8 @@ ConsoleSystemWidget::ConsoleSystemWidget(
     m_group_layout->setContentsMargins(0, 0, 0, 0);
 
     if (session.controllers() == 1){
-        m_group_layout->addWidget(new ControllerSelectorWidget(*this, m_session.controller(0), std::nullopt));
+        UiWrapper wrapper = m_session.controller(0).make_ui_component(this);
+        m_group_layout->addWidget(&wrapper.cast<UiComponentQtWidget>().widget());
     }
 
     m_video_selector = new VideoSourceSelectorWidget(m_session.logger(), m_session.video());
@@ -76,7 +80,8 @@ ConsoleSystemWidget::ConsoleSystemWidget(
 
     if (session.controllers() != 1){
         for (size_t c = 0; c < m_session.controllers(); c++){
-            m_group_layout->addWidget(new ControllerSelectorWidget(*this, m_session.controller(c), c));
+            UiWrapper wrapper = m_session.controller(c).make_ui_component(this);
+            m_group_layout->addWidget(&wrapper.cast<UiComponentQtWidget>().widget());
         }
     }
 

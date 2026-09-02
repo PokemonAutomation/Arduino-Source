@@ -12,6 +12,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QComboBox>
+#include "Common/Qt/UiStateQtWidget.h"
 #include "ControllerSession.h"
 
 namespace PokemonAutomation{
@@ -19,13 +20,19 @@ namespace PokemonAutomation{
 
 
 
-class ControllerSelectorWidget : public QWidget, private ControllerSession::Listener{
+class ControllerSelectorWidget
+    : public QWidget
+    , public UiComponentQtWidget
+    , private ControllerSession::Listener
+{
+public:
+    using ParentState = ControllerSession;
+
 public:
     ~ControllerSelectorWidget();
     ControllerSelectorWidget(
         QWidget& parent,
-        ControllerSession& session,
-        std::optional<size_t> index
+        ControllerSession& session
     );
 
     ControllerSession& session(){
@@ -33,6 +40,7 @@ public:
     }
 
 public:
+    virtual QWidget& widget() override{ return *this; }
     virtual void descriptor_changed(
         const std::shared_ptr<const ControllerDescriptor>& descriptor
     ) override;

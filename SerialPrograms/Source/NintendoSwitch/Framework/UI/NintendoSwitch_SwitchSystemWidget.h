@@ -48,6 +48,9 @@ class CommandRow;
 // audio and video streams that will be exposed to automation programs.
 class SwitchSystemWidget final : public ConsoleInfra::ConsoleSystemWidget{
 public:
+    using ParentState = SwitchSystemSession;
+
+public:
     SwitchSystemWidget(
         QWidget& parent,
         SwitchSystemSession& session

@@ -87,10 +87,15 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
         QVBoxLayout* scroll_layout = new QVBoxLayout(scroll_inner);
         scroll_layout->setAlignment(Qt::AlignTop);
 
+#if 1
+        UiWrapper wrapper = m_session.system().make_ui_component(this);
+        m_system = dynamic_cast<SwitchSystemWidget*>(wrapper.release());
+#else
         m_system = new SwitchSystemWidget(
             *this,
             m_session.system()
         );
+#endif
         scroll_layout->addWidget(m_system);
 
         m_options = ConfigWidget::make_from_option(option.options(), this);

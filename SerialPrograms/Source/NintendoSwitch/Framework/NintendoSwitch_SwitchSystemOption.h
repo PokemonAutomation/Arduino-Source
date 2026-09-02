@@ -26,9 +26,9 @@ namespace NintendoSwitch{
 Color pick_color(ProgramControllerClass color_class);
 
 
-// options to control and monitor a Switch. It inlcudes
-// what micro-controller and what video source to use and
-// what video overlay display option to set.
+//  Options to control and monitor a Switch. It includes
+//  what micro-controller and what video source to use and
+//  what video overlay display option to set.
 class SwitchSystemOption : public ConsoleInfra::ConsoleSystemOption{
     static const std::string JSON_CONSOLE_TYPE;
 
