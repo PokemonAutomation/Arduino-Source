@@ -36,7 +36,8 @@ StatsReader::StatsReader(Color color)
     : m_color(color), 
     m_box_nature(0.028976, 0.729610, 0.502487, 0.066639),
     m_box_level(0.058333, 0.120140, 0.092308, 0.069416),
-    m_box_name(0.163158, 0.122917, 0.262811, 0.066639),
+    // m_box_name(0.163158, 0.122917, 0.262811, 0.066639),  // white text, top left
+    m_box_name(0.688942, 0.223798, 0.292308, 0.075721),     // black text, right side 
     m_box_gender(0.430769, 0.114423, 0.034615, 0.081731),
     m_box_hp(0.805274, 0.131247, 0.183790, 0.066639),
     m_box_attack(0.891000, 0.245089, 0.097607, 0.066639),
@@ -46,7 +47,8 @@ StatsReader::StatsReader(Color color)
     m_box_speed(0.891000, 0.567180, 0.097607, 0.066639),
     m_box_nature_jpn(0.048718, 0.752884, 0.458205, 0.064423),
     m_box_level_jpn(0.060256, 0.116346, 0.124359, 0.075962),
-    m_box_name_jpn(0.176282, 0.114423, 0.257051, 0.077885),
+    // m_box_name_jpn(0.176282, 0.114423, 0.257051, 0.077885),
+    m_box_name_jpn(0.688942, 0.210577, 0.261538, 0.069231),
     m_box_gender_jpn(0.435256, 0.115384, 0.035256, 0.076923),
     m_box_hp_jpn(0.717165, 0.131662, 0.269632, 0.066876),
     m_box_attack_jpn(0.859615, 0.243269, 0.121795, 0.068269),
@@ -97,10 +99,10 @@ bool StatsReader::read_name(
 
     OCR::StringMatchResult result = subset.empty()
         ? Pokemon::PokemonNameReader::instance().read_substring(
-            logger, language, name_ready, BRIGHT_TEXT_FILTERS()
+            logger, language, name_ready, DARK_TEXT_FILTERS()
         )
         : Pokemon::PokemonNameReader(subset).read_substring(
-            logger, language, name_ready, BRIGHT_TEXT_FILTERS()
+            logger, language, name_ready, DARK_TEXT_FILTERS()
         );
 
     if (!result.results.empty()){

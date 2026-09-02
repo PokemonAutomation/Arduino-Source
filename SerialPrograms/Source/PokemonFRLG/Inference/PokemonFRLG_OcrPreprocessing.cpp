@@ -63,7 +63,8 @@ const std::vector<OCR::TextColorRange>& DARK_TEXT_FILTERS(){
         {combine_rgb(0, 0, 0), combine_rgb(96, 96, 96)},
         {combine_rgb(0, 0, 0), combine_rgb(128, 128, 128)},
         {combine_rgb(0, 0, 0), combine_rgb(160, 160, 160)},
-        {combine_rgb(0, 0, 0), combine_rgb(190, 190, 190)},
+        {combine_rgb(0, 0, 0), combine_rgb(184, 184, 184)},
+        {combine_rgb(0, 0, 0), combine_rgb(208, 208, 208)},
     };
     return filters;
 }
@@ -71,7 +72,9 @@ const std::vector<OCR::TextColorRange>& DARK_TEXT_FILTERS(){
 const std::vector<OCR::TextColorRange>& BRIGHT_TEXT_FILTERS(){
     static std::vector<OCR::TextColorRange> filters{
         {combine_rgb(180, 180, 180), combine_rgb(255, 255, 255)},
+        {combine_rgb(190, 190, 190), combine_rgb(255, 255, 255)},
         {combine_rgb(200, 200, 200), combine_rgb(255, 255, 255)},
+        {combine_rgb(210, 210, 210), combine_rgb(255, 255, 255)},
         {combine_rgb(220, 220, 220), combine_rgb(255, 255, 255)},
         {combine_rgb(230, 230, 230), combine_rgb(255, 255, 255)},
         {combine_rgb(240, 240, 240), combine_rgb(255, 255, 255)},
