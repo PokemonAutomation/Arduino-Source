@@ -879,6 +879,8 @@ file(GLOB LIBRARY_SOURCES
     Source/ConsoleInfra/ConsoleSystemSession.h
     Source/ConsoleInfra/ConsoleSystemWidget.cpp
     Source/ConsoleInfra/ConsoleSystemWidget.h
+    Source/ConsoleInfra/VirtualConsole.cpp
+    Source/ConsoleInfra/VirtualConsole.h
     Source/ControllerInput/Keyboard/GlobalKeyboardHidTracker.cpp
     Source/ControllerInput/Keyboard/GlobalKeyboardHidTracker.h
     Source/ControllerInput/Keyboard/GlobalQtKeyMap.cpp
@@ -1298,8 +1300,6 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboButton.h
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboMacro.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboMacro.h
-    Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.cpp
-    Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.h
     Source/PanelLists.cpp
     Source/PanelLists.h
     Source/Pokemon/Inference/Pokemon_BerryNameReader.cpp
