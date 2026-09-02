@@ -211,6 +211,12 @@ EggRng::EggRng()
         LockMode::LOCK_WHILE_RUNNING,
         EggProgramState::held_prep
         )
+    , ROCK_SMASH(
+        "<b>Use Rock Smash:</b><br>"
+        "When checked, the boulder on the beach will be smashed to prevent RNG noise.",
+        LockMode::LOCK_WHILE_RUNNING,
+        true // default
+        )
     , MAX_RESETS(
         "<b>Max Resets:</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -277,6 +283,7 @@ EggRng::EggRng()
     PA_ADD_OPTION(m_program_settings);
     PA_ADD_OPTION(SEED_RADIUS);
     PA_ADD_OPTION(STARTING_POINT);
+    PA_ADD_OPTION(ROCK_SMASH);
     PA_ADD_OPTION(MAX_RESETS);
     PA_ADD_OPTION(MAX_BALL_THROWS);
     PA_ADD_OPTION(MAX_RARE_CANDIES);
@@ -517,8 +524,10 @@ bool EggRng::held_frame_check(
     // decide if it's a good idea to save and commit to this held frame
     bool locked_in = false;
     if (previously_hit_held_frame && (current_seed == TARGET_HELD_SEED)){
-        env.log("Smashing rock on the beach...");
-        smash_daycare_rock(env.console, context);
+        if (ROCK_SMASH){
+            env.log("Smashing rock on the beach...");
+            smash_daycare_rock(env.console, context);
+        }
         env.log("Committing to this Held Frame and saving the game...");
         save_game_to_overworld(env.console, context);
         locked_in = true;

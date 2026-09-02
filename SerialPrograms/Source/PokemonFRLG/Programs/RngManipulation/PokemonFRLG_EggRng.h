@@ -165,6 +165,7 @@ private:
     SectionDividerOption m_program_settings;
     SimpleIntegerOption<uint16_t> SEED_RADIUS;
     EnumDropdownOption<EggProgramState> STARTING_POINT;
+    BooleanCheckBoxOption ROCK_SMASH;
     SimpleIntegerOption<uint64_t> MAX_RESETS;
     SimpleIntegerOption<uint64_t> MAX_RARE_CANDIES;
     SimpleIntegerOption<uint64_t> MAX_BALL_THROWS;
