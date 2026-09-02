@@ -89,8 +89,7 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
 
         m_system = new SwitchSystemWidget(
             *this,
-            m_session.system(),
-            m_session.instance_id()
+            m_session.system()
         );
         scroll_layout->addWidget(m_system);
 

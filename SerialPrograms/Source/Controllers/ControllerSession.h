@@ -96,11 +96,11 @@ public:
     template <typename ControllerType, typename Lambda>
     std::string try_run(Lambda&& function) noexcept{
         ReadSpinLock lg(m_state_lock);
-        if (!m_controller){
-            return "Controller is null.";
-        }
         if (!m_option.m_enable_input){
             return "";
+        }
+        if (!m_controller){
+            return "Controller is null.";
         }
         try{
             //  This will be a cross-cast in most cases.

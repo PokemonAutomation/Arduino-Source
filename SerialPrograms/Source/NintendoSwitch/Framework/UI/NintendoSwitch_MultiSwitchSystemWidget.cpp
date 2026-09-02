@@ -134,8 +134,7 @@ void MultiSwitchSystemWidget::redraw_videos(size_t count){
         m_switches.emplace_back(
             new SwitchSystemWidget(
                 *m_videos,
-                m_session[c],
-                m_program_id
+                m_session[c]
             )
         );
     }

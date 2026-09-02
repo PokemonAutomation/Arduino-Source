@@ -4,18 +4,17 @@
  *
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_VirtualConsole_H
-#define PokemonAutomation_NintendoSwitch_VirtualConsole_H
+#ifndef PokemonAutomation_ConsoleInfra_VirtualConsole_H
+#define PokemonAutomation_ConsoleInfra_VirtualConsole_H
 
 #include "CommonFramework/Panels/PanelInstance.h"
 #include "CommonFramework/Panels/UI/PanelWidget.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h"
+#include "ConsoleInfra/ConsoleSystemOption.h"
+#include "ConsoleInfra/ConsoleSystemSession.h"
+#include "ConsoleInfra/ConsoleSystemWidget.h"
 
 namespace PokemonAutomation{
-namespace NintendoSwitch{
-
-class SwitchSystemWidget;
+namespace ConsoleInfra{
 
 
 // Descriptor for the program "Virtual Console".
@@ -27,7 +26,15 @@ class SwitchSystemWidget;
 // to create a wrapper class that implements `make_panel()` to instantiate the descriptor.
 class VirtualConsole_Descriptor : public PanelDescriptor{
 public:
-    VirtualConsole_Descriptor();
+    VirtualConsole_Descriptor(size_t controllers = 1);
+
+    const size_t m_controllers;
+};
+class MultiControllerTester_Descriptor : public VirtualConsole_Descriptor{
+public:
+    MultiControllerTester_Descriptor()
+        : VirtualConsole_Descriptor(8)
+    {}
 };
 
 
@@ -47,7 +54,7 @@ private:
     friend class VirtualConsole_Widget;
     // switch control options like what micro-controller 
     // and what video source to use
-    SwitchSystemOption m_switch_control_option;
+    ConsoleSystemOption m_console_options;
 };
 
 
@@ -70,8 +77,8 @@ private:
     void construct();
 
 private:
-    SwitchSystemSession m_session;
-    SwitchSystemWidget* m_switch_widget;
+    ConsoleSystemSession m_session;
+    ConsoleSystemWidget* m_console_widget;
 };
 
 

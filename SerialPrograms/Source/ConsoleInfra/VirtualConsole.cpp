@@ -7,34 +7,41 @@
 #include <QVBoxLayout>
 #include <QScrollArea>
 #include "Common/Cpp/Json/JsonValue.h"
-#include "Common/Qt/CollapsibleGroupBox.h"
-#include "NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h"
-#include "NintendoSwitch_VirtualConsole.h"
+#include "Common/Cpp/Logging/GlobalLogger.h"
+#include "VirtualConsole.h"
 
 namespace PokemonAutomation{
-namespace NintendoSwitch{
+namespace ConsoleInfra{
 
-VirtualConsole_Descriptor::VirtualConsole_Descriptor()
+VirtualConsole_Descriptor::VirtualConsole_Descriptor(size_t controllers)
     : PanelDescriptor(
         Color(),
-        "NintendoSwitch:VirtualConsole",
-        "Nintendo Switch", "Virtual Console",
+        controllers == 1
+            ? "CC:VirtualConsole"
+            : "CC:MultiControllerTester",
+        "CC",
+        controllers == 1
+            ? "Virtual Console"
+            : "Multi-Controller Tester",
         "Programs/NintendoSwitch/VirtualConsole.html",
-        "Play your Switch from your computer. Device logging is logged to the output window."
+        controllers == 1
+            ? "Play your console from your computer."
+            : "Test multiple controllers at once."
     )
+    , m_controllers(controllers)
 {}
 
 
 
 VirtualConsole::VirtualConsole(const VirtualConsole_Descriptor& descriptor)
     : PanelInstance(descriptor)
-    , m_switch_control_option({}, false)
+    , m_console_options(descriptor.m_controllers, true)
 {}
 void VirtualConsole::from_json(const JsonValue& json){
-    m_switch_control_option.load_json(json);
+    m_console_options.load_json(json);
 }
 JsonValue VirtualConsole::to_json() const{
-    return m_switch_control_option.to_json();
+    return m_console_options.to_json();
 }
 QWidget* VirtualConsole::make_widget(QWidget& parent, PanelHolder& holder){
     return VirtualConsole_Widget::make(parent, *this, holder);
@@ -52,7 +59,7 @@ VirtualConsole_Widget* VirtualConsole_Widget::make(
     return widget;
 }
 VirtualConsole_Widget::~VirtualConsole_Widget(){
-    delete m_switch_widget;
+    delete m_console_widget;
 }
 VirtualConsole_Widget::VirtualConsole_Widget(
     QWidget& parent,
@@ -60,7 +67,7 @@ VirtualConsole_Widget::VirtualConsole_Widget(
     PanelHolder& holder
 )
     : PanelWidget(parent, instance, holder)
-    , m_session(instance.m_switch_control_option, 0, 0)
+    , m_session(global_logger_raw(), instance.m_console_options, 0)
 {}
 void VirtualConsole_Widget::construct(){
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -76,8 +83,8 @@ void VirtualConsole_Widget::construct(){
     QVBoxLayout* scroll_layout = new QVBoxLayout(scroll_inner);
     scroll_layout->setAlignment(Qt::AlignTop);
 
-    m_switch_widget = new SwitchSystemWidget(*this, m_session, 0);
-    scroll_layout->addWidget(m_switch_widget);
+    m_console_widget = new ConsoleSystemWidget(*this, m_session);
+    scroll_layout->addWidget(m_console_widget);
 }
 
 

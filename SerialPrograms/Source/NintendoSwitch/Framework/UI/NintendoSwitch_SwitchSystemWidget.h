@@ -19,7 +19,6 @@
 #define PokemonAutomation_NintendoSwitch_SwitchSystemWidget_H
 
 #include <QWidget>
-#include "CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h"
 #include "ConsoleInfra/ConsoleSystemWidget.h"
 
@@ -51,16 +50,13 @@ class SwitchSystemWidget final : public ConsoleInfra::ConsoleSystemWidget{
 public:
     SwitchSystemWidget(
         QWidget& parent,
-        SwitchSystemSession& session,
-        uint64_t program_id
+        SwitchSystemSession& session
     );
 
-public:
     void update_ui(ProgramState state);
 
 private:
     SwitchSystemSession& m_session;
-
     CommandRow* m_command;
 };
 

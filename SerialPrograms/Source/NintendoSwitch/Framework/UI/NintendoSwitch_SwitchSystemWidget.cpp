@@ -21,21 +21,18 @@ namespace NintendoSwitch{
 
 SwitchSystemWidget::SwitchSystemWidget(
     QWidget& parent,
-    SwitchSystemSession& session,
-    uint64_t program_id
+    SwitchSystemSession& session
 )
-    : ConsoleSystemWidget(parent, session)
+    : ConsoleSystemWidget(parent, session, false)
     , m_session(session)
 {
-    {
-        m_command = new CommandRow(
-            *m_group_box->widget(),
-            m_session,
-            m_session.console_type(),
-            m_session.allow_commands_while_running()
-        );
-        m_group_layout->addWidget(m_command);
-    }
+    m_command = new CommandRow(
+        *m_group_box->widget(),
+        m_session,
+        m_session.console_type(),
+        m_session.allow_commands_while_running()
+    );
+    m_group_layout->addWidget(m_command);
 }
 
 

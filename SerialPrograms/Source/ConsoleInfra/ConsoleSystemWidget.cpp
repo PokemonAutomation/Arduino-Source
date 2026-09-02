@@ -8,6 +8,7 @@
 #include <QVBoxLayout>
 #include <QGroupBox>
 #include "Controllers/ControllerSelectorWidget.h"
+#include "CommandRowWidget.h"
 #include "ConsoleSystemWidget.h"
 
 namespace PokemonAutomation{
@@ -25,7 +26,8 @@ ConsoleSystemWidget::~ConsoleSystemWidget(){
 
 ConsoleSystemWidget::ConsoleSystemWidget(
     QWidget& parent,
-    ConsoleSystemSession& session
+    ConsoleSystemSession& session,
+    bool include_command_row
 )
     : QWidget(&parent)
     , m_session(session)
@@ -76,6 +78,10 @@ ConsoleSystemWidget::ConsoleSystemWidget(
         for (size_t c = 0; c < m_session.controllers(); c++){
             m_group_layout->addWidget(new ControllerSelectorWidget(*this, m_session.controller(c), c));
         }
+    }
+
+    if (include_command_row){
+        m_group_layout->addWidget(new CommandRowWidget(*this, m_session));
     }
 }
 

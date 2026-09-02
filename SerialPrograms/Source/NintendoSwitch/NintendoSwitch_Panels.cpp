@@ -10,7 +10,7 @@
 
 #include "NintendoSwitch_SettingsPanel.h"
 
-#include "Programs/NintendoSwitch_VirtualConsole.h"
+#include "ConsoleInfra/VirtualConsole.h"
 #include "Programs/NintendoSwitch_SwitchViewer.h"
 
 #include "Programs/NintendoSwitch_TurboA.h"
@@ -59,7 +59,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_settings<ConsoleSettings_Descriptor, ConsoleSettingsPanel>());
 
     ret.emplace_back("---- Virtual Consoles ----");
-    ret.emplace_back(make_panel<VirtualConsole_Descriptor, VirtualConsole>());
+    ret.emplace_back(make_panel<ConsoleInfra::VirtualConsole_Descriptor, ConsoleInfra::VirtualConsole>());
+    ret.emplace_back(make_panel<ConsoleInfra::MultiControllerTester_Descriptor, ConsoleInfra::VirtualConsole>());
     ret.emplace_back(make_panel<SwitchViewer_Descriptor, SwitchViewer>());
 
     ret.emplace_back("---- Programs ----");

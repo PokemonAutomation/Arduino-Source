@@ -23,9 +23,20 @@ namespace ConsoleInfra{
 class ConsoleSystemWidget : public QWidget{
 public:
     virtual ~ConsoleSystemWidget();
+
     ConsoleSystemWidget(
         QWidget& parent,
         ConsoleSystemSession& session
+    )
+        : ConsoleSystemWidget(parent, session, true)
+    {}
+
+
+protected:
+    ConsoleSystemWidget(
+        QWidget& parent,
+        ConsoleSystemSession& session,
+        bool include_command_row
     );
 
 
