@@ -32,13 +32,14 @@ SwitchSystemSession::~SwitchSystemSession(){
 }
 SwitchSystemSession::SwitchSystemSession(
     SwitchSystemOption& option,
-    uint64_t program_id,
-    size_t console_number
+    size_t console_number,
+    std::optional<uint64_t> program_id
 )
     : UiState<SwitchSystemSession, ConsoleInfra::ConsoleSystemSession>(
         global_logger_raw(),
         option,
-        console_number
+        console_number,
+        std::nullopt
     )
     , m_option(option)
 {

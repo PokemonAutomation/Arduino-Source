@@ -295,6 +295,17 @@ void ProgramTracker::remove_console(uint64_t console_id){
         }
     }
 }
+std::optional<uint64_t> ProgramTracker::add_console(std::optional<uint64_t> program_id, TrackableConsole& console){
+    if (!program_id.has_value()){
+        return std::nullopt;
+    }
+    return add_console(program_id.value(), console);
+}
+void ProgramTracker::remove_console(std::optional<uint64_t> console_id){
+    if (console_id.has_value()){
+        remove_console(console_id.value());
+    }
+}
 
 
 

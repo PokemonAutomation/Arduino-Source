@@ -20,7 +20,6 @@
 #ifndef PokemonAutomation_NintendoSwitch_SwitchSystemSession_H
 #define PokemonAutomation_NintendoSwitch_SwitchSystemSession_H
 
-#include "Integrations/ProgramTrackerInterfaces.h"
 #include "ConsoleInfra/ConsoleSystemSession.h"
 #include "NintendoSwitch_SwitchSystemOption.h"
 
@@ -32,31 +31,25 @@ class SwitchSystemOption;
 
 
 
-class SwitchSystemSession final
-    : public UiState<SwitchSystemSession, ConsoleInfra::ConsoleSystemSession>
-    , public TrackableConsole
+class SwitchSystemSession final : public UiState<SwitchSystemSession, ConsoleInfra::ConsoleSystemSession>
 {
 public:
     virtual bool try_shutdown() noexcept override;
     ~SwitchSystemSession();
     SwitchSystemSession(
         SwitchSystemOption& option,
-        uint64_t program_id,
-        size_t console_number
+        size_t console_number,
+        std::optional<uint64_t> program_id
     );
 
 
 public:
-    virtual VideoFeed& video_feed() override{ return video(); }
-    virtual AudioFeed& audio_feed() override{ return audio(); }
-    virtual ControllerSession& controller() override{ return ConsoleSystemSession::controller(0); };
     ConsoleModelCell& console_type(){ return m_option.m_console_type; }
 
 
 private:
-    //  Globally unique ID.
-    uint64_t m_console_id = 0;
     SwitchSystemOption& m_option;
+    std::optional<uint64_t> m_console_id;
 };
 
 

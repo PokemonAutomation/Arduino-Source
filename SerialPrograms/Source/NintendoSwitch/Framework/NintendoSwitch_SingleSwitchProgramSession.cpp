@@ -34,7 +34,7 @@ namespace NintendoSwitch{
 SingleSwitchProgramSession::SingleSwitchProgramSession(SingleSwitchProgramOption& option, size_t console_number)
     : ProgramSession(option.descriptor())
     , m_option(option)
-    , m_system(option.system(), instance_id(), console_number)
+    , m_system(option.system(), console_number, instance_id())
     , m_scope(nullptr)
 {}
 

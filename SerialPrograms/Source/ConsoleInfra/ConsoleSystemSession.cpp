@@ -9,6 +9,7 @@
 #include "CommonFramework/VideoPipeline/Stats/MemoryUtilizationStats.h"
 #include "CommonFramework/VideoPipeline/Stats/CpuUtilizationStats.h"
 #include "CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.h"
+#include "Integrations/ProgramTracker.h"
 #include "Controllers/NullController.h"
 #include "ConsoleSystemSession.h"
 
@@ -38,6 +39,7 @@ bool ConsoleSystemSession::try_shutdown() noexcept{
     return success;
 }
 ConsoleSystemSession::~ConsoleSystemSession(){
+    ProgramTracker::instance().remove_console(m_console_tracking_id);
     blocking_shutdown(
         m_logger,
         "ConsoleSystemSession",
@@ -47,7 +49,8 @@ ConsoleSystemSession::~ConsoleSystemSession(){
 ConsoleSystemSession::ConsoleSystemSession(
     Logger& logger,
     ConsoleSystemOption& option,
-    size_t console_number
+    size_t console_number,
+    std::optional<uint64_t> program_tracking_id
 )
     : m_console_number(console_number)
     , m_logger(logger, "Console " + std::to_string(console_number))
@@ -87,6 +90,8 @@ ConsoleSystemSession::ConsoleSystemSession(
         ConsoleSystemSession::try_shutdown();
         throw;
     }
+
+    m_console_tracking_id = ProgramTracker::instance().add_console(program_tracking_id, *this);
 }
 
 
