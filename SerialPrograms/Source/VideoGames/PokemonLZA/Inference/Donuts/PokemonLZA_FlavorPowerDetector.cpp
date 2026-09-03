@@ -148,7 +148,7 @@ int FlavorPowerIconDetector::detect(const ImageViewRGB32& screen){
 
 FlavorPowerDetector::FlavorPowerDetector(Logger& logger, Color color, Language language, int position)
     : m_logger(logger), m_color(color), m_language(language)
-    , m_position(position), m_ocr_box(0.131, 0.759 + 0.045*position, 0.260, 0.043)
+    , m_position(position), m_ocr_box(0.131, 0.761 + 0.045*position, 0.260, 0.041)
     , m_icon_detector(logger, position)
 {}
 
