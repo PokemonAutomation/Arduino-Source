@@ -266,7 +266,7 @@ void ReliableStreamConnection::send_ack(uint8_t seqnum, uint8_t opcode){
     packet.header.seqnum = seqnum;
     packet.header.packet_bytes = sizeof(packet);
     packet.header.opcode = opcode;
-    pabb_crc32_write_to_message(m_reliable_sender.session_id(), &packet, sizeof(packet));
+    pabb_crc32c_write_to_message(m_reliable_sender.session_id(), &packet, sizeof(packet));
     unreliable_send(&packet, sizeof(packet));
 }
 void ReliableStreamConnection::send_ack_u32(uint8_t seqnum, uint8_t opcode, uint32_t data){
@@ -280,7 +280,7 @@ void ReliableStreamConnection::send_ack_u32(uint8_t seqnum, uint8_t opcode, uint
     packet.header.packet_bytes = sizeof(packet);
     packet.header.opcode = opcode;
     packet.header.data = data;
-    pabb_crc32_write_to_message(m_reliable_sender.session_id(), &packet, sizeof(packet));
+    pabb_crc32c_write_to_message(m_reliable_sender.session_id(), &packet, sizeof(packet));
     unreliable_send(&packet, sizeof(packet));
 }
 
@@ -524,7 +524,7 @@ void ReliableStreamConnection::process_RET_BUFFER_SLOTS(const PacketHeader* pack
     {
         std::lock_guard<Mutex> lg(m_lock);
         m_reliable_sender.remove(packet->seqnum);
-        m_max_unacked_packets = std::min<uint8_t>((uint8_t)message->data, PABB2_PacketSender_REORDER_WINDOW);
+        m_max_unacked_packets = (uint8_t)std::min<uint32_t>(message->data, PABB2_PacketSender_REORDER_WINDOW);
     }
     m_logger.log(
         "[RSC]: Setting Reorder Window: " + std::to_string(m_max_unacked_packets) + " slots",
@@ -544,7 +544,7 @@ void ReliableStreamConnection::process_RET_BUFFER_BYTES(const PacketHeader* pack
     {
         std::lock_guard<Mutex> lg(m_lock);
         m_reliable_sender.remove(packet->seqnum);
-        m_max_unacked_bytes = std::min<uint16_t>((uint16_t)message->data, PABB2_PacketSender_BUFFER_SIZE);
+        m_max_unacked_bytes = (uint8_t)std::min<uint32_t>(message->data, PABB2_PacketSender_BUFFER_SIZE);
     }
     m_logger.log(
         "[RSC]: Setting Reorder Window: " + std::to_string(m_max_unacked_bytes) + " bytes",

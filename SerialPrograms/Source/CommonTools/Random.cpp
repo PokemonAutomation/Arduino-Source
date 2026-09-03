@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 uint32_t random_u32(){
     uint64_t seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
     uint32_t crc = 0;
-    pabb_crc32_buffer(&crc, &seed, sizeof(seed));
+    pabb_crc32c_buffer(&crc, &seed, sizeof(seed));
     return crc;
 }
 uint32_t random_u32(uint32_t min, uint32_t max){

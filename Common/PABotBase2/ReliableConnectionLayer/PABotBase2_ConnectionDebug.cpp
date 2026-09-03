@@ -55,8 +55,8 @@ void PacketHeader_print(const PacketHeader* packet, bool ascii){
     );
     uint32_t actual_crc32 = 0xffffffff;
     uint8_t magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
-    pabb_crc32_buffer(&actual_crc32, &magic_number, 1);
-    pabb_crc32_buffer(&actual_crc32, (const uint8_t*)packet + 1, packet_bytes - sizeof(uint32_t) - 1);
+    pabb_crc32c_buffer(&actual_crc32, &magic_number, 1);
+    pabb_crc32c_buffer(&actual_crc32, (const uint8_t*)packet + 1, packet_bytes - sizeof(uint32_t) - 1);
     std::cout << "    CRC32:  0x" << std::hex << actual_crc32 << " / 0x" << expected_crc32 << std::dec;
     if (actual_crc32 != expected_crc32){
         std::cout << "    (** mismatch **)";
@@ -93,8 +93,8 @@ bool PacketHeader_check(const PacketHeader* packet, bool ascii){
     );
     uint32_t actual_crc32 = 0xffffffff;
     uint8_t magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
-    pabb_crc32_buffer(&actual_crc32, &magic_number, 1);
-    pabb_crc32_buffer(&actual_crc32, (const uint8_t*)packet + 1, packet_bytes - sizeof(uint32_t) - 1);
+    pabb_crc32c_buffer(&actual_crc32, &magic_number, 1);
+    pabb_crc32c_buffer(&actual_crc32, (const uint8_t*)packet + 1, packet_bytes - sizeof(uint32_t) - 1);
     if (actual_crc32 == expected_crc32){
         return true;
     }

@@ -65,7 +65,7 @@ PA_NO_INLINE void PacketSender::send_oob_packet_empty(uint8_t seqnum, uint8_t op
     packet.header.seqnum = seqnum;
     packet.header.packet_bytes = sizeof(packet);
     packet.header.opcode = opcode;
-    pabb_crc32_write_to_message(m_session_id, &packet, sizeof(packet));
+    pabb_crc32c_write_to_message(m_session_id, &packet, sizeof(packet));
     m_connection.unreliable_send(&packet, sizeof(packet));
 }
 PA_NO_INLINE void PacketSender::send_oob_packet_u32(uint8_t seqnum, uint8_t opcode, const uint32_t& data) noexcept{
@@ -78,7 +78,7 @@ PA_NO_INLINE void PacketSender::send_oob_packet_u32(uint8_t seqnum, uint8_t opco
     packet.header.packet_bytes = sizeof(packet);
     packet.header.opcode = opcode;
     memcpy(&packet.header.data, &data, sizeof(uint32_t));
-    pabb_crc32_write_to_message(m_session_id, &packet, sizeof(packet));
+    pabb_crc32c_write_to_message(m_session_id, &packet, sizeof(packet));
     m_connection.unreliable_send(&packet, sizeof(packet));
 }
 PA_NO_INLINE void PacketSender::send_oob_packet_data(
@@ -91,8 +91,8 @@ PA_NO_INLINE void PacketSender::send_oob_packet_data(
     header.packet_bytes = sizeof(PacketHeader) + sizeof(uint32_t) + bytes;
     header.opcode = opcode;
     uint32_t crc = m_session_id;
-    pabb_crc32_buffer(&crc, &header, sizeof(PacketHeader));
-    pabb_crc32_buffer(&crc, data, bytes);
+    pabb_crc32c_buffer(&crc, &header, sizeof(PacketHeader));
+    pabb_crc32c_buffer(&crc, data, bytes);
     m_connection.unreliable_send(&header, sizeof(header));
     m_connection.unreliable_send(data, bytes);
     m_connection.unreliable_send(&crc, sizeof(uint32_t));
@@ -109,8 +109,8 @@ PA_NO_INLINE void PacketSender::send_oob_packet_u32_data(
     header.opcode = opcode;
     memcpy(&header.data, &u32, sizeof(uint32_t));
     uint32_t crc = m_session_id;
-    pabb_crc32_buffer(&crc, &header, sizeof(PacketHeader_u32));
-    pabb_crc32_buffer(&crc, data, bytes);
+    pabb_crc32c_buffer(&crc, &header, sizeof(PacketHeader_u32));
+    pabb_crc32c_buffer(&crc, data, bytes);
     m_connection.unreliable_send(&header, sizeof(header));
     m_connection.unreliable_send(data, bytes);
     m_connection.unreliable_send(&crc, sizeof(uint32_t));
@@ -269,7 +269,7 @@ PacketHeader* PacketSender::reserve_packet(
     return ret;
 }
 void PacketSender::commit_packet(PacketHeader* packet) noexcept{
-    pabb_crc32_write_to_message(m_session_id, packet, packet->packet_bytes);
+    pabb_crc32c_write_to_message(m_session_id, packet, packet->packet_bytes);
 
     m_connection.unreliable_send(packet, packet->packet_bytes);
 
@@ -319,7 +319,7 @@ bool PacketSender::iterate_retransmits() noexcept{
         packet->opcode |= PABB2_CONNECTION_RETRANSMIT_FLAG;
         packet->magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
         uint8_t packet_bytes = packet->packet_bytes;
-        pabb_crc32_write_to_message(m_session_id, packet, packet_bytes);
+        pabb_crc32c_write_to_message(m_session_id, packet, packet_bytes);
 
 #if 0
         printf("Retransmitting: %u\n", packet->seqnum);
@@ -426,7 +426,7 @@ bool PacketSender::enqueue_uncommitted_send_stream(const void* data, size_t byte
         m_stream_offset_uncommitted += (uint16_t)current;
 
         //  Build CRC
-        pabb_crc32_write_to_message(m_session_id, packet, packet_bytes);
+        pabb_crc32c_write_to_message(m_session_id, packet, packet_bytes);
 
         data = (const char*)data + current;
         bytes -= current;

@@ -107,7 +107,14 @@ void StreamCoalescer::advance_slot_head(){
 
 
 uint16_t StreamCoalescer::free_bytes() const{
-    if (m_slot_head == m_slot_tail){
+    if (m_stream_tail == m_stream_free){
+        //  Empty buffer. The stream pointers are monotonic 16-bit offsets
+        //  and the in-buffer extent is bounded to BUFFER_SIZE (< 2^16), so
+        //  the tail can only coincide with the free pointer when no data is
+        //  in the buffer. (A full buffer keeps the tail one BUFFER_SIZE
+        //  ahead, and the formula below correctly reports 0 there.)
+        //  Slots are popped as soon as their data is in the buffer, so the
+        //  absence of pending slots does NOT mean the buffer is empty.
         return BUFFER_SIZE;
     }
     return (m_stream_free - m_stream_tail) & BUFFER_MASK;

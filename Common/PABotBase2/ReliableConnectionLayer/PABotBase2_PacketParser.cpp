@@ -118,7 +118,7 @@ const PacketHeader* PacketParser::pull_bytes(
     uint32_t actual_crc = header->opcode == PABB2_CONNECTION_OPCODE_ASK_RESET
         ? 0xffffffff
         : session_id;
-    pabb_crc32_buffer(&actual_crc, m_buffer, packet_bytes - sizeof(uint32_t));
+    pabb_crc32c_buffer(&actual_crc, m_buffer, packet_bytes - sizeof(uint32_t));
 
     uint32_t expected_crc;
     memcpy(
@@ -182,7 +182,10 @@ void PacketParser::push_bytes(
 
         PacketHeader* header = (PacketHeader*)m_buffer;
 
-        uint8_t packet_bytes = header->packet_bytes;
+        size_t packet_bytes = header->packet_bytes;
+        if (packet_bytes == 0){
+            packet_bytes = 256;
+        }
         if (packet_bytes < MIN_PACKET_SIZE || packet_bytes > PABB2_MAX_INCOMING_PACKET_SIZE){
 //            cout << "Invalid length: " << (int)packet_bytes << endl;
 
@@ -194,7 +197,7 @@ void PacketParser::push_bytes(
 
             //  Valid length.
 
-            uint8_t bytes_needed_to_finish_packet = packet_bytes - index;
+            uint8_t bytes_needed_to_finish_packet = (uint8_t)(packet_bytes - index);
 
 //            cout << "bytes = " << (int)bytes << ", bytes_needed_to_finish_packet = " << (int)bytes_needed_to_finish_packet << endl;
 
@@ -213,7 +216,7 @@ void PacketParser::push_bytes(
             uint32_t actual_crc = header->opcode == PABB2_CONNECTION_OPCODE_ASK_RESET
                 ? 0xffffffff
                 : session_id;
-            pabb_crc32_buffer(&actual_crc, m_buffer, packet_bytes - sizeof(uint32_t));
+            pabb_crc32c_buffer(&actual_crc, m_buffer, packet_bytes - sizeof(uint32_t));
 
             uint32_t expected_crc;
             memcpy(&expected_crc, m_buffer + packet_bytes - sizeof(uint32_t), sizeof(uint32_t));
