@@ -350,8 +350,8 @@ cv::Mat crop_to_text_region_with_padding(const cv::Mat& image) {
     int pad_y = std::max(2, bbox.height / 10);  // ~10%
 
 
-    // static int i = 0;
-    // i++;
+    static int i = 0;
+    i++;
     cv::Mat cropped_image;
     if (top_gap >= pad_y && bottom_gap >= pad_y && left_gap >= pad_x && right_gap >= pad_x){
         // Original image has plenty of padding.
@@ -382,7 +382,9 @@ cv::Mat crop_to_text_region_with_padding(const cv::Mat& image) {
             bg
         );
 
-        // cv::imwrite(std::to_string(i) + "-padded" + ".png", padded_image);
+        if (STATIC_GLOBALS.PADDLE_OCR_DEBUG_IMAGE){
+            cv::imwrite(std::to_string(i) + "-padded" + ".png", padded_image);
+        }
 
         cv::Rect final_crop(
             bbox.x, // (bbox.x + pad_x) - pad_x cancels out perfectly to just bbox.x
@@ -397,9 +399,10 @@ cv::Mat crop_to_text_region_with_padding(const cv::Mat& image) {
         cropped_image = padded_image(final_crop).clone();
     }
 
-
-    // cv::imwrite(std::to_string(i) + "-binary" + ".png", binary);
-    // cv::imwrite(std::to_string(i) + "-cropped_image" +".png", cropped_image);
+    if (STATIC_GLOBALS.PADDLE_OCR_DEBUG_IMAGE){
+        cv::imwrite(std::to_string(i) + "-binary" + ".png", binary);
+        cv::imwrite(std::to_string(i) + "-cropped_image" +".png", cropped_image);
+    }
 
     return cropped_image;
 }
@@ -433,9 +436,11 @@ void add_horizontal_padding(cv::Mat& image){
         image = padded_image;
     }
 
-    // static int i = 0;
-    // i++;
-    // cv::imwrite(std::to_string(i) + "-horiz-padded" + ".png", image);
+    if (STATIC_GLOBALS.PADDLE_OCR_DEBUG_IMAGE){
+        static int i = 0;
+        i++;
+        cv::imwrite(std::to_string(i) + "-horiz-padded" + ".png", image);
+    }
 
 }
 
