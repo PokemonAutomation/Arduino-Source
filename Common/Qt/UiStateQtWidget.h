@@ -28,7 +28,10 @@ public:
     RegisterUiStateQtWidget(){
         UiStateType::m_ui_factory = [](UiStateType& state, void* params){
             QWidget* parent = (QWidget*)params;
-            return UiWrapper(parent == nullptr, new UiWidgetType(*parent, state));
+            return UiWrapper(
+                parent == nullptr,  //  Do not take ownership if it has a parent.
+                new UiWidgetType(*parent, state)
+            );
         };
     }
 
