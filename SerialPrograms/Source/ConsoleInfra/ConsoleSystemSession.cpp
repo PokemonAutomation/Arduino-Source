@@ -25,6 +25,8 @@ namespace ConsoleInfra{
 bool ConsoleSystemSession::try_shutdown() noexcept{
     bool success = true;
 
+    global_input_remove_listener(*this);
+
     m_video.remove_state_listener(m_history);
     m_video.remove_state_listener(m_history);
     m_audio.remove_stream_listener(m_history);

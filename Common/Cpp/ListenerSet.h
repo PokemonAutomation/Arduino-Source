@@ -55,6 +55,15 @@ public:
 
     //  Remove a listener (non-blocking). This will return false if it needs to
     //  wait. This function is always safe and will never deadlock.
+    //
+    //  This is intended as a safety outlet for possible self-removal. If the
+    //  removal fails because it is a self-removal, it returns false so you can
+    //  handle it higher up the stack.
+    //
+    //  Given that listeners typically remove themselves in their destructor,
+    //  self-removals where a callback tries to remove itself are never safe
+    //  since the class will be destructed while still deep in the call stack
+    //  of its own method.
     bool try_remove(ListenerType& listener) noexcept;
 
 
@@ -88,12 +97,12 @@ private:
     //  "m_lock" protects the structure of container. You cannot change the
     //  map or the linked list without holding this lock. When iterating the
     //  nodes to fire callbacks, you must hold this lock when moving from one
-    //  node to the next to prevent the points from changing from under you.
+    //  node to the next to prevent the pointer from changing under you.
     //
     //  To prevent a listener from being removed while its callback is running,
     //  there is a lock on each node. The contract for removing is a listener is
     //  that when "remove_listener()" returns, this class holds no more
-    //  references to it and thus is the listener is safe to destroy.
+    //  references to it and thus the listener is safe to destroy.
     //
     struct Node{
         SpinLock lock;
@@ -219,6 +228,7 @@ bool ListenerSet<ListenerType>::try_remove(ListenerType& listener) noexcept{
         try{
             std::cout << "ListenerSet::try_remove(): Fail inner." << std::endl;
         }catch (...){}
+        m_lock.unlock_write();
         return false;
     }
 
