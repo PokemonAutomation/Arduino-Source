@@ -69,6 +69,8 @@ public:
 
     uint64_t add_console(uint64_t program_id, TrackableConsole& console);
     void remove_console(uint64_t console_id);
+    std::optional<uint64_t> add_console(std::optional<uint64_t> program_id, TrackableConsole& console);
+    void remove_console(std::optional<uint64_t> console_id);
 
 
 private:

@@ -26,6 +26,7 @@
 #include "CommonFramework/VideoPipeline/VideoSession.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
 #include "CommonFramework/Recording/StreamHistorySession.h"
+#include "Integrations/ProgramTrackerInterfaces.h"
 #include "ControllerInput/ControllerInput.h"
 #include "Controllers/ControllerSession.h"
 #include "ConsoleSystemOption.h"
@@ -39,6 +40,7 @@ namespace ConsoleInfra{
 
 class ConsoleSystemSession
     : public UiState<ConsoleSystemSession>
+    , public TrackableConsole
     , private VideoDisplayHidListener
     , private ControllerInputListener
 {
@@ -62,7 +64,8 @@ public:
     ConsoleSystemSession(
         Logger& logger,
         ConsoleSystemOption& option,
-        size_t console_number
+        size_t console_number,
+        std::optional<uint64_t> program_tracking_id = {}
     );
 
 
@@ -82,6 +85,10 @@ public:
 
 
 public:
+    virtual VideoFeed& video_feed() override{ return video(); }
+    virtual AudioFeed& audio_feed() override{ return audio(); }
+    virtual ControllerSession& controller() override{ return ConsoleSystemSession::controller(0); };
+
     virtual void save(ConsoleSystemOption& option) const;
     virtual void load(const ConsoleSystemOption& option);
 
@@ -102,6 +109,7 @@ private:
 private:
     //  The console # within a program.
     const size_t m_console_number;
+    std::optional<uint64_t> m_console_tracking_id;
 
     TaggedLogger m_logger;
     ConsoleSystemOption& m_option;
