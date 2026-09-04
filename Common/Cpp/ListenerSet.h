@@ -49,6 +49,7 @@ public:
 
     //  Remove a listener. This will block if the listener being removed is
     //  running a callback from this class.
+    //
     //  Therefore, this will deadlock if a listener tries to remove itself from
     //  inside its own callback.
     void remove(ListenerType& listener) noexcept;
@@ -86,9 +87,9 @@ private:
     const bool m_suppress_lock_prints;
     mutable SpinLock m_lock;
 
-    //  The data structure here is an intrusive map where the nodes form a
-    //  linked-list. The map provides a fast way to add/remove listeners while
-    //  the linked-list is the main method of iterating the listeners.
+    //  The data structure here is (formetly) an intrusive map where the nodes
+    //  form a linked-list. The map provides a fast way to add/remove listeners
+    //  while the linked-list is the main method of iterating the listeners.
     //
     //  Iterating listeners to fire callbacks is completely thread-safe as they
     //  do not modify the structure of the container. OTOH, adding/removing does
