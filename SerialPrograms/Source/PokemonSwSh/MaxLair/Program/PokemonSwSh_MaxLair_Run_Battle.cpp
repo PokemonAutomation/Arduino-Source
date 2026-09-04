@@ -24,6 +24,38 @@ namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
+
+bool process_header_read(
+    Logger& logger,
+    GlobalState& state,
+    std::set<std::string> mon
+){
+    if (mon.size() == 1){
+        state.opponent = std::move(mon);
+        return true;
+    }
+    if (mon.size() > 1){
+        logger.log("Ambiguous Read Result: " + set_to_str(mon), COLOR_PURPLE);
+        if (state.opponent.size() == 1 && mon.find(*state.opponent.begin()) != mon.end()){
+            logger.log(
+                "Using previous known value to disambiguate: " + set_to_str(mon),
+                COLOR_PURPLE
+            );
+            return true;
+        }
+    }
+    if (state.opponent.size() == 1){
+        logger.log(
+            "Failed to read opponent from battle. Using previously known value: " + set_to_str(state.opponent),
+            COLOR_ORANGE
+        );
+        return true;
+    }
+
+    return false;
+}
+
+
 bool read_battle_menu(
     ProgramEnvironment& env,
     VideoStream& stream, ProControllerContext& context, size_t player_index,
@@ -39,58 +71,52 @@ bool read_battle_menu(
     BattleMoveArrowFinder arrow_finder(stream.overlay());
     arrow_finder.make_overlays(boxes);
 
-
     //  Read raid mon.
-    do{
-        std::set<std::string> mon = reader.read_opponent(stream.logger(), context, stream.video());
-        if (mon.size() == 1){
-            state.opponent = std::move(mon);
-            break;
-        }
-        if (mon.size() > 1){
-            stream.log("Ambiguous Read Result: " + set_to_str(mon), COLOR_PURPLE);
-            if (state.opponent.size() == 1 && mon.find(*state.opponent.begin()) != mon.end()){
-                stream.log("Using previous known value to disambiguate: " + set_to_str(mon), COLOR_PURPLE);
-                break;
-            }
-        }
-        if (state.opponent.size() == 1){
-            stream.log("Failed to read opponent from battle. Using previously known value: " + set_to_str(state.opponent), COLOR_ORANGE);
-            break;
-        }
+    std::set<std::string> mon = reader.read_opponent(stream.logger(), context, stream.video());
 
+    bool retry = !process_header_read(stream.logger(), state, std::move(mon));
+    std::string opponent = state.opponent.empty()
+        ? ""
+        : *state.opponent.begin();
+
+    //  If we see a boss before the end. Something is wrong. Retry.
+    if (state.wins != 3 && is_boss(opponent)){
+        retry = true;
+    }
+
+    VideoSnapshot snapshot;
+    if (retry){
         stream.log("Unable to read opponent from battle. Attempting to read from summary.", COLOR_ORANGE);
         pbf_press_button(context, BUTTON_Y, 80ms, 1000ms);
         pbf_press_dpad(context, DPAD_UP, 80ms, 400ms);
         pbf_press_button(context, BUTTON_A, 80ms, 2000ms);
         context.wait_for_all_requests();
-        mon = reader.read_opponent_in_summary(stream.logger(), stream.video().snapshot());
+
+        snapshot = stream.video().snapshot();
+        mon = reader.read_opponent_in_summary(stream.logger(), snapshot);
         pbf_mash_button(context, BUTTON_B, 3000ms);
         state.opponent = std::move(mon);
 
         if (state.wins == 3 && !state.boss.empty()){
             if (!state.opponent.empty() && *state.opponent.begin() != state.boss){
-                stream.log("Inconsistent Boss: Expected " + state.boss + ", Read: " + *state.opponent.begin(), COLOR_RED);
+                stream.log(
+                    "Inconsistent Boss: Expected " + state.boss + ", Read: " + *state.opponent.begin(),
+                    COLOR_RED
+                );
             }
             state.opponent = {state.boss};
-            break;
         }
-    }while (false);
+
+        opponent = state.opponent.empty()
+            ? ""
+            : *state.opponent.begin();
+    }
     context.wait_for_all_requests();
 
-    const std::string& opponent = state.opponent.empty()
-        ? ""
-        : *state.opponent.begin();
 
     if (state.wins != 3 && is_boss(opponent)){
         stream.log("Boss found before 3 wins. Something is seriously out-of-sync.", COLOR_RED);
-        dump_image(stream.logger(), MODULE_NAME, stream.video(), "BossBeforeEnd");
-//        send_program_telemetry(
-//            env.logger(), true, COLOR_RED, MODULE_NAME,
-//            "Error",
-//            {{"Message:", "Boss found before 3 wins."}},
-//            ""
-//        );
+        dump_image(stream.logger(), MODULE_NAME, "BossBeforeEnd", snapshot);
         return false;
     }
 
