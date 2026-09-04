@@ -99,15 +99,6 @@ public:
         return m_component;
     }
 
-    template <typename Type>
-    const Type& cast() const{
-        return *static_cast<const Type*>(m_component);
-    }
-    template <typename Type>
-    Type& cast(){
-        return *static_cast<Type*>(m_component);
-    }
-
 
 private:
     bool m_owns;

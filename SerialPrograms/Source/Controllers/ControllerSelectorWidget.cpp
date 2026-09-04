@@ -220,7 +220,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(
 
 void ControllerSelectorWidget::update_interface_dropdown(ControllerInterface interface_type){
     if (interface_type == ControllerInterface::None){
-        interface_type = ControllerInterface::SerialPABotBase;
+        interface_type = ControllerInterface::SerialPABotBase2;
     }
     for (size_t index = 0; index < m_interface_list.size(); index++){
         if (interface_type == m_interface_list[index]){

@@ -4,8 +4,6 @@
  *
  */
 
-#include "Common/Qt/CollapsibleGroupBox.h"
-#include "CommonFramework/Globals.h"
 #include "NintendoSwitch_CommandRow.h"
 #include "NintendoSwitch_SwitchSystemWidget.h"
 
@@ -27,20 +25,13 @@ SwitchSystemWidget::SwitchSystemWidget(
     SwitchSystemSession& session
 )
     : ConsoleSystemWidget(parent, session, false)
-    , m_session(session)
 {
-    m_command = new CommandRow(*m_group_box->widget(), m_session);
-    m_group_layout->addWidget(m_command);
+    m_group_layout->addWidget(
+        new CommandRow(*m_group_box->widget(), session)
+    );
 }
 
 
-void SwitchSystemWidget::update_ui(ProgramState state){
-    if (state != ProgramState::STOPPED){
-        m_session.lock_controllers("Program is Running");
-    }else{
-        m_session.unlock_controllers();
-    }
-}
 
 
 

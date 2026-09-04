@@ -163,8 +163,12 @@ void MultiSwitchSystemWidget::redraw_videos(size_t count){
 
 void MultiSwitchSystemWidget::update_ui(ProgramState state){
     m_console_count_box->setEnabled(state == ProgramState::STOPPED);
-    for (const auto& item : m_switches){
-        item->update_ui(state);
+    for (SwitchSystemWidget* item : m_switches){
+        if (state != ProgramState::STOPPED){
+            item->session().lock_controllers("Program is Running");
+        }else{
+            item->session().unlock_controllers();
+        }
     }
 }
 

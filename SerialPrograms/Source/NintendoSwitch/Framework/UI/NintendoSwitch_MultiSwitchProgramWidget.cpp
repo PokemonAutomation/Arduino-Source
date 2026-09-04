@@ -34,6 +34,10 @@ MultiSwitchProgramWidget2::~MultiSwitchProgramWidget2(){
     auto ScopeCheck = m_sanitizer.check_scope();
     m_session.ProgramSession::remove_listener(*this);
     m_session.remove_listener(*this);
+
+    //  This is necessary here because the widget here owns the session.
+    //  Sessions are supposed to outlive their widgets. But this was written
+    //  long before we converged on the session/widget split design.
     delete m_actions_bar;
     delete m_stats_bar;
     delete m_options;
