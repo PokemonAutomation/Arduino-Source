@@ -46,6 +46,7 @@ class ConsoleSystemSession
 {
 public:
     struct Listener{
+        virtual void on_input_status_change(const std::string& status){}
         virtual void on_lock_controllers(){}
         virtual void on_unlock_controllers(){}
     };
@@ -71,7 +72,8 @@ public:
 
 public:
     size_t console_number() const{ return m_console_number; }
-    bool allow_commands_while_running() const{ return m_option.m_allow_commands_while_running; }
+    bool allow_commands_while_locked() const{ return m_option.m_allow_commands_while_locked; }
+    std::string status() const;
 
     Logger& logger(){ return m_logger; }
 
@@ -100,6 +102,8 @@ public:
 
 
 private:
+    std::string update_status();
+
     virtual void on_focus_in() override;
     virtual void on_focus_out() override;
 
@@ -138,6 +142,7 @@ private:
     mutable Mutex m_lock;
     std::string m_lock_controllers_reason;
     bool m_focused = false;
+    std::string m_status_text;
 
     std::unique_ptr<MemoryUtilizationStats> m_memory_usage;
     std::unique_ptr<CpuUtilizationStat> m_cpu_utilization;

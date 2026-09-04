@@ -26,9 +26,9 @@ const std::string ConsoleSystemOption::JSON_CONTROLLERS = "Controllers";
 
 ConsoleSystemOption::ConsoleSystemOption(
     size_t num_controllers,
-    bool allow_commands_while_running
+    bool allow_commands_while_locked
 )
-    : m_allow_commands_while_running(allow_commands_while_running)
+    : m_allow_commands_while_locked(allow_commands_while_locked)
     , m_controllers(num_controllers)
 {
     if (num_controllers == 0){
@@ -42,10 +42,10 @@ ConsoleSystemOption::ConsoleSystemOption(
 }
 ConsoleSystemOption::ConsoleSystemOption(
     size_t num_controllers,
-    bool allow_commands_while_running,
+    bool allow_commands_while_locked,
     const JsonValue& json
 )
-    : ConsoleSystemOption(num_controllers, allow_commands_while_running)
+    : ConsoleSystemOption(num_controllers, allow_commands_while_locked)
 {
     ConsoleSystemOption::load_json(json);
 }

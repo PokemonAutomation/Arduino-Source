@@ -33,6 +33,7 @@ public:
 
 
 private:
+    virtual void on_input_status_change(const std::string& status) override;
     virtual void on_lock_controllers() override;
     virtual void on_unlock_controllers() override;
 
@@ -48,6 +49,8 @@ protected:
 
     QLabel* m_label = nullptr;
     QHBoxLayout* m_layout = nullptr;
+
+    QLabel* m_status = nullptr;
 
     CheckboxDropdownItem* m_overlay_stats = nullptr;
     CheckboxDropdownItem* m_overlay_boxes = nullptr;

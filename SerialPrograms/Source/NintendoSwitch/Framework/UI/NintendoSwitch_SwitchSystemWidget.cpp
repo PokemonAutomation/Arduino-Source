@@ -29,12 +29,7 @@ SwitchSystemWidget::SwitchSystemWidget(
     : ConsoleSystemWidget(parent, session, false)
     , m_session(session)
 {
-    m_command = new CommandRow(
-        *m_group_box->widget(),
-        m_session,
-        m_session.console_type(),
-        m_session.allow_commands_while_running()
-    );
+    m_command = new CommandRow(*m_group_box->widget(), m_session);
     m_group_layout->addWidget(m_command);
 }
 
@@ -45,7 +40,6 @@ void SwitchSystemWidget::update_ui(ProgramState state){
     }else{
         m_session.unlock_controllers();
     }
-    m_command->on_state_changed(state);
 }
 
 
