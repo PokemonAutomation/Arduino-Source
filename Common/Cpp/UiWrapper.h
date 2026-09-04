@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_UiWrapper_H
 #define PokemonAutomation_UiWrapper_H
 
+#include <typeinfo>
 #include "Common/Cpp/Exceptions.h"
 
 namespace PokemonAutomation{
