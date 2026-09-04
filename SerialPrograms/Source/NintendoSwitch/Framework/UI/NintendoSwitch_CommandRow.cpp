@@ -17,19 +17,12 @@ namespace NintendoSwitch{
 
 
 
-CommandRow::~CommandRow(){}
-CommandRow::CommandRow(
-    QWidget& parent,
-    SwitchSystemSession& session,
-    ConsoleModelCell& console_type,
-    bool allow_commands_while_running
-)
+CommandRow::CommandRow(QWidget& parent, SwitchSystemSession& session)
     : CommandRowWidget(parent, session)
-    , m_session(session)
 {
     m_label->setText("<b>Console Type:</b>");
 
-    ConfigWidget* console_type_box = ConfigWidget::make_from_option(console_type, this);
+    ConfigWidget* console_type_box = ConfigWidget::make_from_option(session.console_type(), this);
     m_layout->insertWidget(0, &console_type_box->widget());
 }
 
