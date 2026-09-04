@@ -8,6 +8,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QScrollArea>
+#include "Common/Qt/UiStateQtWidget.h"
 #include "Common/Qt/ShutdownWithEvents.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "Common/Qt/Options/ConfigWidget.h"
@@ -30,6 +31,10 @@ namespace NintendoSwitch{
 
 SingleSwitchProgramWidget2::~SingleSwitchProgramWidget2(){
     m_session.remove_listener(*this);
+
+    //  This is necessary here because the widget here owns the session.
+    //  Sessions are supposed to outlive their widgets. But this was written
+    //  long before we converged on the session/widget split design.
     delete m_actions_bar;
     delete m_stats_bar;
     delete m_options;
@@ -87,15 +92,8 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
         QVBoxLayout* scroll_layout = new QVBoxLayout(scroll_inner);
         scroll_layout->setAlignment(Qt::AlignTop);
 
-#if 1
         UiWrapper wrapper = m_session.system().make_ui_component(this);
-        m_system = dynamic_cast<SwitchSystemWidget*>(wrapper.release());
-#else
-        m_system = new SwitchSystemWidget(
-            *this,
-            m_session.system()
-        );
-#endif
+        m_system = dynamic_cast<QWidget*>(wrapper.release());
         scroll_layout->addWidget(m_system);
 
         m_options = ConfigWidget::make_from_option(option.options(), this);
@@ -144,7 +142,11 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
 
 void SingleSwitchProgramWidget2::state_change(ProgramState state){
     QMetaObject::invokeMethod(this, [this, state]{
-        m_system->update_ui(state);
+        if (state != ProgramState::STOPPED){
+            m_session.system().lock_controllers("Program is Running");
+        }else{
+            m_session.system().unlock_controllers();
+        }
         m_options->option().report_program_state(state != ProgramState::STOPPED);
 //        cout << "state = " << (state != ProgramState::STOPPED) << endl;
 //        if (m_option.descriptor().lock_options_while_running()){

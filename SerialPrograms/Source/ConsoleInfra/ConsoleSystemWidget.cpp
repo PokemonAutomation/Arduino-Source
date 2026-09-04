@@ -6,8 +6,6 @@
 
 #include <QKeyEvent>
 #include <QVBoxLayout>
-#include <QGroupBox>
-#include "Controllers/ControllerSelectorWidget.h"
 #include "CommandRowWidget.h"
 #include "ConsoleSystemWidget.h"
 
@@ -69,7 +67,7 @@ ConsoleSystemWidget::ConsoleSystemWidget(
 
     if (session.controllers() == 1){
         UiWrapper wrapper = m_session.controller(0).make_ui_component(this);
-        m_group_layout->addWidget(&wrapper.cast<UiComponentQtWidget>().widget());
+        m_group_layout->addWidget(dynamic_cast<QWidget*>(wrapper.release()));
     }
 
     m_video_selector = new VideoSourceSelectorWidget(m_session.logger(), m_session.video());
@@ -81,7 +79,7 @@ ConsoleSystemWidget::ConsoleSystemWidget(
     if (session.controllers() != 1){
         for (size_t c = 0; c < m_session.controllers(); c++){
             UiWrapper wrapper = m_session.controller(c).make_ui_component(this);
-            m_group_layout->addWidget(&wrapper.cast<UiComponentQtWidget>().widget());
+            m_group_layout->addWidget(dynamic_cast<QWidget*>(wrapper.release()));
         }
     }
 

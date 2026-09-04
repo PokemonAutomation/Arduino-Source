@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_UiWrapper_H
 #define PokemonAutomation_UiWrapper_H
 
-#include <typeinfo>
 #include "Common/Cpp/Exceptions.h"
 
 namespace PokemonAutomation{
@@ -97,15 +96,6 @@ public:
     }
     UiComponent* get(){
         return m_component;
-    }
-
-    template <typename Type>
-    const Type& cast() const{
-        return *static_cast<const Type*>(m_component);
-    }
-    template <typename Type>
-    Type& cast(){
-        return *static_cast<Type*>(m_component);
     }
 
 

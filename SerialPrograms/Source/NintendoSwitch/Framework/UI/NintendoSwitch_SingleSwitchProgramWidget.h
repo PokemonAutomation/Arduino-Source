@@ -21,7 +21,6 @@
 #include "CommonFramework/Panels/UI/PanelElements.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.h"
-#include "NintendoSwitch_SwitchSystemWidget.h"
 
 QT_FORWARD_DECLARE_CLASS(QVBoxLayout)
 namespace PokemonAutomation{
@@ -54,7 +53,7 @@ private:
     PanelHolder& m_holder;
     SingleSwitchProgramSession m_session;
     QVBoxLayout* m_layout;
-    SwitchSystemWidget* m_system;
+    QWidget* m_system;
     ConfigWidget* m_options;
     StatsBar* m_stats_bar;
     RunnablePanelActionBar* m_actions_bar;

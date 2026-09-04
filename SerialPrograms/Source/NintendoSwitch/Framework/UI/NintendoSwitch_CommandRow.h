@@ -7,14 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_CommandRow_H
 #define PokemonAutomation_NintendoSwitch_CommandRow_H
 
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QComboBox>
-#include <QPushButton>
-#include <QCheckBox>
-#include "CommonFramework/Globals.h"
 #include "ConsoleInfra/CommandRowWidget.h"
-#include "NintendoSwitch/Options/NintendoSwitch_ModelType.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h"
 
 namespace PokemonAutomation{

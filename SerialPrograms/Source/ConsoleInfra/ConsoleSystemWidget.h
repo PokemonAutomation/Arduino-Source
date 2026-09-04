@@ -35,6 +35,10 @@ public:
         : ConsoleSystemWidget(parent, session, true)
     {}
 
+    ConsoleSystemSession& session(){
+        return m_session;
+    }
+
 
 protected:
     ConsoleSystemWidget(
