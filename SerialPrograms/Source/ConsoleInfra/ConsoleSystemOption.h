@@ -34,11 +34,11 @@ public:
     virtual ~ConsoleSystemOption() = default;
     ConsoleSystemOption(
         size_t num_controllers,
-        bool allow_commands_while_running
+        bool allow_commands_while_locked
     );
     ConsoleSystemOption(
         size_t num_controllers,
-        bool allow_commands_while_running,
+        bool allow_commands_while_locked,
         const JsonValue& json
     );
 
@@ -47,7 +47,7 @@ public:
 
 
 public:
-    const bool m_allow_commands_while_running;
+    const bool m_allow_commands_while_locked;
 
     VideoSourceOption m_video;
     AudioOption m_audio;

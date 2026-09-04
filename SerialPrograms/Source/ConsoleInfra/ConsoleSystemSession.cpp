@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/ColoredText.h"
 #include "Common/Cpp/EarlyShutdown.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "CommonFramework/VideoPipeline/Stats/MemoryUtilizationStats.h"
@@ -72,6 +73,7 @@ ConsoleSystemSession::ConsoleSystemSession(
         }
     }
 
+    update_status();
     m_history.start(m_audio.input_format(), m_video.current_source() != nullptr);
 
     try{
@@ -94,6 +96,11 @@ ConsoleSystemSession::ConsoleSystemSession(
     m_console_tracking_id = ProgramTracker::instance().add_console(program_tracking_id, *this);
 }
 
+
+std::string ConsoleSystemSession::status() const{
+    std::lock_guard<Mutex> lg(m_lock);
+    return m_status_text;
+}
 
 void ConsoleSystemSession::save(ConsoleSystemOption& option) const{
     std::lock_guard<Mutex> lg(m_lock);
@@ -128,16 +135,20 @@ void ConsoleSystemSession::load(const ConsoleSystemOption& option){
 
 
 void ConsoleSystemSession::lock_controllers(std::string reason){
+    std::string status;
     {
         std::lock_guard<Mutex> lg(m_lock);
         m_lock_controllers_reason = std::move(reason);
         for (ControllerEntry& controller : m_controllers){
             controller.session.set_options_locked(true);
         }
+        status = update_status();
     }
     m_listeners.run_method(&Listener::on_lock_controllers);
+    m_listeners.run_method(&Listener::on_input_status_change, status);
 }
 void ConsoleSystemSession::unlock_controllers(){
+    std::string status;
     {
         std::lock_guard<Mutex> lg(m_lock);
         m_lock_controllers_reason.clear();
@@ -145,46 +156,91 @@ void ConsoleSystemSession::unlock_controllers(){
         for (ControllerEntry& controller : m_controllers){
             controller.session.set_options_locked(false);
         }
+        status = update_status();
     }
     m_listeners.run_method(&Listener::on_unlock_controllers);
+    m_listeners.run_method(&Listener::on_input_status_change, status);
 }
 void ConsoleSystemSession::save_history(const std::string& filename){
     m_history.save(filename);
 }
 
 
+std::string ConsoleSystemSession::update_status(){
+    //  Must call under the lock.
+
+    //  No controllers are ready.
+    bool ok = false;
+    for (ControllerEntry& controller : m_controllers){
+        if (controller.session.ready()){
+            ok = true;
+            break;
+        }
+    }
+    if (!ok){
+        m_status_text = "Keyboard: " + html_color_text("&#x2b24;", COLOR_RED);
+        return m_status_text;
+    }
+
+    //  Controllers are locked. (program is probably running)
+    if (!m_lock_controllers_reason.empty() && !allow_commands_while_locked()){
+        m_status_text = "Keyboard: " + html_color_text("&#x2b24;", COLOR_PURPLE);
+        return m_status_text;
+    }
+
+    //  Not focused.
+    if (!m_focused){
+        m_status_text = "Keyboard: " + html_color_text("&#x2b24;", COLOR_ORANGE);
+        return m_status_text;
+    }
+
+    //  Ready.
+    m_status_text = "Keyboard: " + html_color_text("&#x2b24;", COLOR_DARKGREEN);
+    return m_status_text;
+}
 void ConsoleSystemSession::on_focus_in(){
 //    cout << "ConsoleSystemSession::on_focus_in()" << endl;
-    std::lock_guard<Mutex> lg(m_lock);
-    if (m_focused){
-        return;
-    }
-    m_focused = true;
+    std::string status;
+    {
+        std::lock_guard<Mutex> lg(m_lock);
+        if (m_focused){
+            return;
+        }
+        m_focused = true;
 
-    global_input_add_listener(*this);
+        global_input_add_listener(*this);
+        status = update_status();
+    }
+    m_listeners.run_method(&Listener::on_input_status_change, status);
 }
 void ConsoleSystemSession::on_focus_out(){
 //    cout << "ConsoleSystemSession::on_focus_out()" << endl;
-    std::lock_guard<Mutex> lg(m_lock);
-    if (!m_focused){
-        return;
-    }
-    m_focused = false;
-    if (!m_lock_controllers_reason.empty() && !allow_commands_while_running()){
-        return;
-    }
-
-    global_input_clear_state();
-    global_input_remove_listener(*this);
-
-    for (ControllerEntry& controller : m_controllers){
-        std::string error = controller.session.try_run<AbstractController>([](AbstractController& controller){
-            controller.cancel_all_commands();
-        });
-        if (!error.empty()){
-            controller.session.logger().log(error, COLOR_RED);
+    std::string status;
+    {
+        std::lock_guard<Mutex> lg(m_lock);
+        if (!m_focused){
+            return;
         }
+        m_focused = false;
+        if (!m_lock_controllers_reason.empty() && !allow_commands_while_locked()){
+            return;
+        }
+
+        global_input_clear_state();
+        global_input_remove_listener(*this);
+
+        for (ControllerEntry& controller : m_controllers){
+            std::string error = controller.session.try_run<AbstractController>([](AbstractController& controller){
+                controller.cancel_all_commands();
+            });
+            if (!error.empty()){
+                controller.session.logger().log(error, COLOR_RED);
+            }
+        }
+
+        status = update_status();
     }
+    m_listeners.run_method(&Listener::on_input_status_change, status);
 }
 void ConsoleSystemSession::run_controller_input(ControllerInputState& state){
     std::lock_guard<Mutex> lg(m_lock);
@@ -192,7 +248,7 @@ void ConsoleSystemSession::run_controller_input(ControllerInputState& state){
         m_logger.log("Keyboard Command Suppressed: Not in focus.", COLOR_RED);
         return;
     }
-    if (!m_lock_controllers_reason.empty() && !allow_commands_while_running()){
+    if (!m_lock_controllers_reason.empty() && !allow_commands_while_locked()){
         m_logger.log("Keyboard Command Suppressed: " + m_lock_controllers_reason, COLOR_RED);
         return;
     }

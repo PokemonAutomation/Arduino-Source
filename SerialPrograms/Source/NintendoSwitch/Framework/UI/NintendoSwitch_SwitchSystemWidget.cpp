@@ -33,7 +33,7 @@ SwitchSystemWidget::SwitchSystemWidget(
         *m_group_box->widget(),
         m_session,
         m_session.console_type(),
-        m_session.allow_commands_while_running()
+        m_session.allow_commands_while_locked()
     );
     m_group_layout->addWidget(m_command);
 }
@@ -45,7 +45,6 @@ void SwitchSystemWidget::update_ui(ProgramState state){
     }else{
         m_session.unlock_controllers();
     }
-    m_command->on_state_changed(state);
 }
 
 

@@ -44,6 +44,12 @@ CommandRowWidget::CommandRowWidget(
     m_layout->addStretch(100);
 
 
+    m_status = new QLabel(QString::fromStdString(session.status()), this);
+//    m_status->setVisible(false);
+    m_layout->addWidget(m_status);
+    m_layout->addSpacing(5);
+
+
     CheckboxDropdown* overlays = new CheckboxDropdown(this, "Overlays");
     overlays->setMinimumWidth(80);
     {
@@ -139,7 +145,7 @@ CommandRowWidget::CommandRowWidget(
 
             ConsoleSystemOption option(
                 m_session.controllers(),
-                m_session.allow_commands_while_running()
+                m_session.allow_commands_while_locked()
             );
 
             //  Deserialize into this local option instance.
@@ -164,7 +170,7 @@ CommandRowWidget::CommandRowWidget(
             //  Create a copy of option, to be able to serialize it later on
             ConsoleSystemOption option(
                 m_session.controllers(),
-                m_session.allow_commands_while_running()
+                m_session.allow_commands_while_locked()
             );
 
             m_session.save(option);
@@ -208,7 +214,11 @@ CommandRowWidget::CommandRowWidget(
 
 
 
-
+void CommandRowWidget::on_input_status_change(const std::string& status){
+    QMetaObject::invokeMethod(this, [this, status]{
+        m_status->setText(QString::fromStdString(status));
+    }, Qt::QueuedConnection);
+}
 void CommandRowWidget::on_lock_controllers(){
     QMetaObject::invokeMethod(this, [this]{
         m_load_profile_button->setEnabled(false);
