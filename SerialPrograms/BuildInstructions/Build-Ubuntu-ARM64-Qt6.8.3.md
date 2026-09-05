@@ -22,8 +22,8 @@ sudo apt install build-essential cmake ninja-build git pkg-config
 
 # Libraries this project links against directly
 sudo apt install libopencv-dev libtesseract-dev libleptonica-dev \
-    libdbus-1-dev libsdbus-c++-dev libopenexr-dev \
-    libgl1-mesa-dev libglx-dev libglu1-mesa-dev
+    libsystemd-dev libopenexr-dev libgl1-mesa-dev libglx-dev \
+    libglu1-mesa-dev
 
 # Dependencies needed to build Qt itself (xcb platform plugin, fonts, etc.)
 sudo apt install libxkbcommon-dev libxkbcommon-x11-dev libxcb-cursor-dev \
