@@ -524,7 +524,7 @@ else() # macOS and Linux
         endif () # end searching or downloading onnx runtime
 
         # Systemd DBus Library
-	# Used for different programs on the same coomputer to communicate with each other.
+	# Used for different programs on the same computer to communicate with each other.
         # The bundled archive is prebuilt native object code, so it must be picked per-arch
         # (a single .a cannot serve both x86_64 and aarch64 Linux).
         if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^(arm|arm64|aarch64)")
@@ -585,7 +585,7 @@ else() # macOS and Linux
     endif()
 
     # Discord's Social SDK does not offer a Linux ARM64 build as of 2026 Sep 5, so we set
-    # CMake option PA_SOCIAL_SDK_DEFAULT to off on ARM64 Linux and on on all other platforms.
+    # CMake option PA_SOCIAL_SDK_DEFAULT to off on ARM64 Linux and on for all other platforms.
     # For future development, you can still force on/off explicitly on any platform via
     # -DPA_SOCIAL_SDK=ON/OFF.
     if (NOT APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm|arm64|aarch64)")
