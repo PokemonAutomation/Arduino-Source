@@ -11,7 +11,7 @@ namespace PokemonAutomation{
 
 
 
-template class RegisterUiStateQtWidget<NullControllerWidget>;
+//template class RegisterUiStateQtWidget<NullControllerWidget>;
 
 
 

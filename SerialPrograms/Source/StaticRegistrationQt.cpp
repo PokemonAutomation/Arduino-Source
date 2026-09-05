@@ -45,7 +45,7 @@
 #include "CommonTools/Options/QtWidgets/LanguageOCRWidget.h"
 
 //  Controllers
-#include "Controllers/NullControllerWidget.h"
+//#include "Controllers/NullControllerWidget.h"
 #include "Controllers/ControllerSelectorWidget.h"
 #include "Controllers/PABotBase2/SerialPABotBase2_SelectorWidget.h"
 #include "ControllerInput/Keyboard/KeyBindingWidget.h"
@@ -123,7 +123,7 @@ void register_all_statics(){
     RegisterUiStateQtWidget<OCR::LanguageOCROptionWidget>();
 
     //  Controllers
-    RegisterUiStateQtWidget<NullControllerWidget>();
+//    RegisterUiStateQtWidget<NullControllerWidget>();
     RegisterUiStateQtWidget<ControllerSelectorWidget>();
     RegisterUiStateQtWidget<SerialPABotBase::SerialPABotBase2_SelectorWidget>();
     RegisterUiStateQtWidget<KeyboardHidBindingCellWidget>();

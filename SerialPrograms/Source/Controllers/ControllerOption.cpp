@@ -44,7 +44,7 @@ void InterfaceType::register_factory(
 ControllerOption::ControllerOption(bool default_enable_mode)
     : m_default_enable_mode(default_enable_mode)
     , m_enable_input(default_enable_mode)
-    , m_descriptor(new NullControllerDescriptor())
+    , m_descriptor(null_controller_descriptor())
     , m_sanitizer("ControllerOption")
 {}
 
@@ -97,16 +97,20 @@ void ControllerOption::load_json(const JsonValue& json){
             m_descriptor_cache[item.first] = item.second->make(*params);
         }
 
-        auto iter = m_descriptor_cache.find(CONTROLLER_INTERFACE_STRINGS.get_enum(*type, ControllerInterface::None));
-        if (iter == m_descriptor_cache.end()){
+        try{
+            auto iter = m_descriptor_cache.find(CONTROLLER_INTERFACE_STRINGS.get_enum(*type));
+            if (iter == m_descriptor_cache.end()){
+                break;
+            }
+            descriptor = iter->second;
+        }catch (ParseException&){
             break;
         }
 
-        descriptor = iter->second;
     }while (false);
 
     if (descriptor == nullptr){
-        descriptor.reset(new NullControllerDescriptor());
+        descriptor = null_controller_descriptor();
     }
 
     m_descriptor = std::move(descriptor);

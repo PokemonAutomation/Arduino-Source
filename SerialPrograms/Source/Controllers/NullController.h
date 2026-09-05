@@ -8,12 +8,17 @@
 #define PokemonAutomation_Controllers_NullController_H
 
 #include "ControllerDescriptor.h"
-#include "ControllerConnection.h"
+//#include "ControllerConnection.h"
 
 namespace PokemonAutomation{
 
 
 
+std::unique_ptr<ControllerDescriptor> null_controller_descriptor();
+
+
+
+#if 0
 class NullControllerDescriptor : public UiState<const NullControllerDescriptor&, ControllerDescriptor>{
 public:
     static constexpr ControllerInterface INTERFACE_NAME = ControllerInterface::None;
@@ -34,7 +39,7 @@ public:
         ControllerType controller_type
     ) const override;
 };
-
+#endif
 
 
 
