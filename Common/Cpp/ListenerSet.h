@@ -87,7 +87,7 @@ private:
     const bool m_suppress_lock_prints;
     mutable SpinLock m_lock;
 
-    //  The data structure here is (formetly) an intrusive map where the nodes
+    //  The data structure here is (formerly) an intrusive map where the nodes
     //  form a linked-list. The map provides a fast way to add/remove listeners
     //  while the linked-list is the main method of iterating the listeners.
     //
