@@ -50,7 +50,7 @@ private:
 };
 
 // assumes the input image is RGB
-cv::Mat crop_to_text_region(const cv::Mat& image);
+cv::Mat crop_to_text_region_with_padding(const cv::Mat& image);
 
 // if the image is narrow/tall, add horizontal padding
 // modifies the input image
