@@ -71,11 +71,7 @@ SerialPABotBase2_SelectorWidget::SerialPABotBase2_SelectorWidget(
     this->setMaxVisibleItems(32);
     this->setPlaceholderText("(invalid or still loading...)");
 
-    if (current == nullptr || (
-            current->interface_type != ControllerInterface::None &&
-            current->interface_type != ControllerInterface::SerialPABotBase2
-        )
-    ){
+    if (current == nullptr || current->interface_type != ControllerInterface::SerialPABotBase2){
         std::shared_ptr<ControllerDescriptor> descriptor =
             parent.session().option().get_descriptor_from_cache(ControllerInterface::SerialPABotBase2);
         if (!descriptor){
@@ -109,6 +105,7 @@ SerialPABotBase2_SelectorWidget::SerialPABotBase2_SelectorWidget(
 }
 
 void SerialPABotBase2_SelectorWidget::refresh_devices(const QList<QSerialPortInfo>& ports){
+//    cout << "SerialPABotBase2_SelectorWidget::refresh_devices()" << endl;
 //    SerialPortPoller::instance().begin_refresh_now();
 //    cout << "Current = " << width() << " x " << height() << endl;
 //    cout << "sizeHint = " << sizeHint().width() << " x " << sizeHint().height() << endl;

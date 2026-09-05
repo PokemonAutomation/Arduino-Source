@@ -4,9 +4,10 @@
  *
  */
 
-#include "Common/Cpp/Json/JsonValue.h"
-#include "ControllerConnection.h"
+//#include "Common/Cpp/Json/JsonValue.h"
 #include "NullController.h"
+
+#include "Controllers/PABotBase2/SerialPABotBase2_Descriptor.h"
 
 //#include <iostream>
 //using std::cout;
@@ -15,11 +16,16 @@
 namespace PokemonAutomation{
 
 
+
+std::unique_ptr<ControllerDescriptor> null_controller_descriptor(){
+    return std::make_unique<SerialPABotBase::SerialPABotBase2_Descriptor>();
+}
+
+
+
+
+#if 0
 template class InterfaceType_t<NullControllerDescriptor>;
-
-
-const char NullController::NAME[] = "(none)";
-
 
 
 bool NullControllerDescriptor::operator==(const ControllerDescriptor& x) const{
@@ -44,9 +50,11 @@ std::unique_ptr<AbstractController> NullControllerDescriptor::make_controller(
 ) const{
     return nullptr;
 }
+#endif
 
 
 
+const char NullController::NAME[] = "(none)";
 
 
 

@@ -130,7 +130,7 @@ void ConsoleSystemSession::load(const ConsoleSystemOption& option){
 
     stop = m_option.m_controllers.size();
     for (; c < stop; c++){
-        m_option.m_controllers[c].set_descriptor(std::make_shared<NullControllerDescriptor>());
+        m_option.m_controllers[c].set_descriptor(null_controller_descriptor());
         m_controllers[c].session.set_device(m_option.m_controllers[c].descriptor());
     }
 }

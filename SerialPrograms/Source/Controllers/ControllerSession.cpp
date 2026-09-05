@@ -240,6 +240,7 @@ bool ControllerSession::set_device(const std::shared_ptr<ControllerDescriptor>& 
 
         make_controller({}, false);
     }
+//    cout << "ControllerSession::set_device() - signal"<< endl;
     signal_descriptor_changed(device);
     signal_status_text_changed(status_text());
     return true;

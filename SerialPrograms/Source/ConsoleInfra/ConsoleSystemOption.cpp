@@ -80,7 +80,7 @@ void ConsoleSystemOption::load_json(const JsonValue& json){
         }
         stop = m_controllers.size();
         for (; c < stop; c++){
-            m_controllers[c].set_descriptor(std::make_shared<NullControllerDescriptor>());
+            m_controllers[c].set_descriptor(null_controller_descriptor());
         }
     }
 }

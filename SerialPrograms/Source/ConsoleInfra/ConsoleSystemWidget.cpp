@@ -18,11 +18,6 @@ namespace ConsoleInfra{
 
 
 ConsoleSystemWidget::~ConsoleSystemWidget(){
-    //  Delete all the UI elements first since they reference the states.
-    delete m_audio_display;
-    delete m_audio_widget;
-    delete m_video_display;
-    delete m_video_selector;
 }
 
 ConsoleSystemWidget::ConsoleSystemWidget(
