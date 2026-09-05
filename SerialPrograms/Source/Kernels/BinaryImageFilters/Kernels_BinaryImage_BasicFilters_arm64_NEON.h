@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_Kernels_BinaryImage_BasicFilters_arm64_NEON_H
 #define PokemonAutomation_Kernels_BinaryImage_BasicFilters_arm64_NEON_H
 
+#include <cstring>
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_arm64_NEON.h"
 
 // #include <iostream>
@@ -286,6 +287,9 @@ private:
     PA_FORCE_INLINE uint64_t convert4(const uint32_t* pixel) const{
         uint32x4_t in_u32 = vld1q_u32(pixel);
         return convert4(vreinterpretq_u8_u32(in_u32));
+    }
+    PA_FORCE_INLINE uint64_t convert4(const uint8x16_t& in_u8) const{
+        return convert4(vreinterpretq_u32_u8(in_u8));
     }
     PA_FORCE_INLINE uint64_t convert4(const uint32x4_t& in_u32) const{
         // subtract the expected values

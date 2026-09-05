@@ -448,9 +448,13 @@ else() # macOS and Linux
             target_include_directories(SerialProgramsLib PUBLIC ${ONNXRUNTIME_INCLUDE_DIRS})
             target_link_libraries(SerialProgramsLib PUBLIC ${ONNXRUNTIME_LIBRARIES})
 
-        else()
+        else() # linux, download onnxruntime
             set(ONNXRUNTIME_VERSION "1.23.0")
-            set(ONNXRUNTIME_ARCH "x64")
+            if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^(arm|arm64|aarch64)")
+                set(ONNXRUNTIME_ARCH "aarch64")
+            else()
+                set(ONNXRUNTIME_ARCH "x64")
+            endif()
             set(ONNXRUNTIME_DIR_NAME "onnxruntime-linux-${ONNXRUNTIME_ARCH}-${ONNXRUNTIME_VERSION}")
             set(ONNXRUNTIME_TGZ_NAME "${ONNXRUNTIME_DIR_NAME}.tgz")
             # build up the URL based on the version and name
@@ -517,15 +521,24 @@ else() # macOS and Linux
             else()
                 message(FATAL_ERROR "Could not find ONNX Runtime headers or library.")
             endif()
-        endif ()
+        endif () # end searching or downloading onnx runtime
 
         # Systemd DBus Library
-        message(STATUS "Using bundled sdbus-c++ library.")
+	# Used for different programs on the same coomputer to communicate with each other.
+        # The bundled archive is prebuilt native object code, so it must be picked per-arch
+        # (a single .a cannot serve both x86_64 and aarch64 Linux).
+        if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^(arm|arm64|aarch64)")
+            set(SDBUS_CPP_LIB "${REPO_ROOT_DIR}/3rdParty/sdbus-cpp/lib/libsdbus-c++-aarch64.a")
+        else()
+            set(SDBUS_CPP_LIB "${REPO_ROOT_DIR}/3rdParty/sdbus-cpp/lib/libsdbus-c++-x86_64.a")
+        endif()
+        message(STATUS "Using bundled sdbus-c++ library: ${SDBUS_CPP_LIB}")
+
         target_include_directories(SerialProgramsLib PRIVATE
             ${REPO_ROOT_DIR}/3rdParty/sdbus-cpp/include
         )
         target_link_libraries(SerialProgramsLib PRIVATE
-            ${REPO_ROOT_DIR}/3rdParty/sdbus-cpp/lib/libsdbus-c++.a
+            ${SDBUS_CPP_LIB}
             systemd #sdbus-c++ relies on libsystemd, almost all distros should have this
         )
 
@@ -533,7 +546,7 @@ else() # macOS and Linux
             ${REPO_ROOT_DIR}/3rdParty/sdbus-cpp/include
         )
         target_link_libraries(CoreLib PRIVATE
-            ${REPO_ROOT_DIR}/3rdParty/sdbus-cpp/lib/libsdbus-c++.a
+            ${SDBUS_CPP_LIB}
             systemd #sdbus-c++ relies on libsystemd, almost all distros should have this
         )
     endif() # end Linux
@@ -571,27 +584,41 @@ else() # macOS and Linux
         message(NOTICE "Compiling with DPP integration disabled")
     endif()
 
-    if (APPLE)
-        set(DISCORD_ZIP "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_mac.zip")
-        set(DISCORD_DIR "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_mac")
-        set(DISCORD_LIB_RELEASE "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_mac/lib/release/libdiscord_partner_sdk.dylib")
+    # Discord's Social SDK does not offer a Linux ARM64 build as of 2026 Sep 5, so we set
+    # CMake option PA_SOCIAL_SDK_DEFAULT to off on ARM64 Linux and on on all other platforms.
+    # For future development, you can still force on/off explicitly on any platform via
+    # -DPA_SOCIAL_SDK=ON/OFF.
+    if (NOT APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm|arm64|aarch64)")
+        set(PA_SOCIAL_SDK_DEFAULT OFF)
     else()
-        set(DISCORD_ZIP "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_linux.zip")
-        set(DISCORD_DIR "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_linux")
-        set(DISCORD_LIB_RELEASE "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_linux/lib/release/libdiscord_partner_sdk.so")
+        set(PA_SOCIAL_SDK_DEFAULT ON)
     endif()
+    option(PA_SOCIAL_SDK "Enable Discord social SDK integration" ${PA_SOCIAL_SDK_DEFAULT})
+    if (PA_SOCIAL_SDK)
+        if (APPLE)
+            set(DISCORD_ZIP "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_mac.zip")
+            set(DISCORD_DIR "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_mac")
+            set(DISCORD_LIB_RELEASE "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_mac/lib/release/libdiscord_partner_sdk.dylib")
+        else()
+            set(DISCORD_ZIP "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_linux.zip")
+            set(DISCORD_DIR "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_linux")
+            set(DISCORD_LIB_RELEASE "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_linux/lib/release/libdiscord_partner_sdk.so")
+        endif()
 
-    if (NOT EXISTS "${DISCORD_DIR}")
-        message(STATUS "Discord SDK not found, extracting from zip...")
-        execute_process(
-            COMMAND ${CMAKE_COMMAND} -E tar xf "${DISCORD_ZIP}"
-            WORKING_DIRECTORY "${REPO_ROOT_DIR}/3rdPartyBinaries"
-        )
+        if (NOT EXISTS "${DISCORD_DIR}")
+            message(STATUS "Discord SDK not found, extracting from zip...")
+            execute_process(
+                COMMAND ${CMAKE_COMMAND} -E tar xf "${DISCORD_ZIP}"
+                WORKING_DIRECTORY "${REPO_ROOT_DIR}/3rdPartyBinaries"
+            )
+        endif()
+
+        target_compile_definitions(SerialProgramsLib PUBLIC PA_SOCIAL_SDK)
+        target_include_directories(SerialProgramsLib SYSTEM PRIVATE ../3rdParty/discord_social_sdk/)
+        target_link_libraries(SerialProgramsLib PRIVATE ${DISCORD_LIB_RELEASE})
+    else()
+        message(NOTICE "Compiling with Discord social SDK integration disabled")
     endif()
-
-    target_compile_definitions(SerialProgramsLib PUBLIC PA_SOCIAL_SDK)
-    target_include_directories(SerialProgramsLib SYSTEM PRIVATE ../3rdParty/discord_social_sdk/)
-    target_link_libraries(SerialProgramsLib PRIVATE ${DISCORD_LIB_RELEASE})
 
     if(APPLE)
         target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -Wshorten-64-to-32)
@@ -606,8 +633,8 @@ else() # macOS and Linux
         target_compile_options(CoreLib PRIVATE -Wall -Wextra -Wpedantic -Werror -fno-strict-aliasing)
     endif()
 
-    if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
-        # Arm CPU
+    if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^(arm|arm64|aarch64)")
+        # Arm CPU (arm64 on macOS, aarch64 on Linux)
         #   Run-time ISA dispatching
         target_compile_definitions(SerialProgramsLib PRIVATE PA_AutoDispatch_arm64_20_M1)
     else()

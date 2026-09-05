@@ -50,7 +50,7 @@ PA_FORCE_INLINE uint64x2_t bit_reverse(uint64x2_t x){
     r1 = vandq_u8(r1, vdupq_n_u8(0xaa));
     r1 = vorrq_u8(r0, r1); // a, b, c, d, e, f, g, h
 
-    return r1;
+    return vreinterpretq_u64_u8(r1);
 }
 
 
