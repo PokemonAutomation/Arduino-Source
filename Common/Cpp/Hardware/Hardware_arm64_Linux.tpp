@@ -1,8 +1,8 @@
-/*  Hardware (arm64)
+/*  Hardware (arm64 Linux)
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *  Used for Apple M-series (macOS) and Linux aarch64 environments.
+ *  Used for Linux aarch64 environment.
  */
 
 
@@ -12,39 +12,11 @@
 #include <string>
 #include <fstream>
 #include <thread>
-#ifdef __APPLE__
-#include <sys/sysctl.h>
-#endif
 #include "Hardware.h"
 
 namespace PokemonAutomation{
 
 
-#ifdef __APPLE__
-
-uint64_t get_cpu_freq()
-{
-    uint64_t freq = 0;
-    size_t size = sizeof(freq);
-
-    if (sysctlbyname("hw.cpufrequency", &freq, &size, NULL, 0) < 0)
-    {
-        perror("sysctl");
-    }
-    return freq;
-}
-
-std::string get_processor_name(){
-    char name_buffer[100] = "";
-    size_t size = 100;
-    if (sysctlbyname("machdep.cpu.brand_string", name_buffer, &size, NULL, 0) < 0)
-    {
-        perror("sysctl");
-    }
-    return name_buffer;
-}
-
-#else
 // Linux: /proc/cpuinfo does not have a "Model name" line on ARM kernels,
 // so fall back to the SoC "Hardware" line, and finally the kernel name.
 
@@ -89,7 +61,6 @@ std::string get_processor_name(){
     }
     return name;
 }
-#endif
 
 
 ProcessorSpecs get_processor_specs(){
@@ -100,7 +71,6 @@ ProcessorSpecs get_processor_specs(){
 
     return specs;
 }
-
 
 
 }
