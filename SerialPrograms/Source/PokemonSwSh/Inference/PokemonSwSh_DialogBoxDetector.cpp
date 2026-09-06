@@ -65,7 +65,7 @@ bool BlackDialogBoxDetector::process_frame(const ImageViewRGB32& frame, WallCloc
 
 BlackDialogBoxDetector2::BlackDialogBoxDetector2(Color color)
     : m_color(color)
-    , m_bottom(0.184009, 0.945419, 0.554217, 0.021442)
+    , m_bottom(0.184009, 0.955, 0.552, 0.013)
     , m_left(0.175246, 0.807018, 0.019715, 0.064327)
     , m_right(0.808324, 0.810916, 0.014239, 0.146199)
 {}
@@ -135,8 +135,31 @@ private:
     bool m_expected;
 };
 
+class Test_BlackDialogBoxDetector2 : public UnitTest{
+public:
+    Test_BlackDialogBoxDetector2(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonSwSh::BlackDialogBoxDetector2 - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        BlackDialogBoxDetector2 detector;
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
 
 void add_tests_DialogBoxDetector(UnitTestDatabase& database){
+    database.add<Test_BlackDialogBoxDetector2>("PokemonSwSh/BlackDialogBoxDetector2/black-dialog-1.png", true);
 
 }
 
