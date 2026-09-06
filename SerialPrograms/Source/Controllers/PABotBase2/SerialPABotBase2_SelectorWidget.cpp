@@ -67,9 +67,10 @@ SerialPABotBase2_SelectorWidget::SerialPABotBase2_SelectorWidget(
 {
     SerialPortPoller::instance().begin_refresh_now();
 
-//        cout << "SerialPABotBase(): " << current << endl;
+//    cout << "SerialPABotBase(): " << current << endl;
     this->setMaxVisibleItems(32);
-    this->setPlaceholderText("(invalid or still loading...)");
+//    this->setPlaceholderText("invalid/loading...");
+//    this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
     if (current == nullptr || current->interface_type != ControllerInterface::SerialPABotBase2){
         std::shared_ptr<ControllerDescriptor> descriptor =

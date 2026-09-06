@@ -15,7 +15,7 @@ const EnumStringMap<ControllerInterface> CONTROLLER_INTERFACE_STRINGS{
 //    {ControllerInterface::SerialPABotBase,      "Serial: PABotBase"},
     {ControllerInterface::SerialPABotBase2,     "Serial: PABotBase2"},
     {ControllerInterface::TcpSysbotBase,        "TCP: sys-botbase"},
-    {ControllerInterface::UsbSysbotBase,        "USB: sys-botbase"},
+//    {ControllerInterface::UsbSysbotBase,        "USB: sys-botbase"},
 };
 
 const EnumStringMap<ControllerType> CONTROLLER_TYPE_STRINGS{

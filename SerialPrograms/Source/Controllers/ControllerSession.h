@@ -90,6 +90,7 @@ public:
 
 
 public:
+    bool set_interface(ControllerInterface controller_interface);
     bool set_device(const std::shared_ptr<ControllerDescriptor>& device);
     bool set_controller(ControllerType controller_type);
 

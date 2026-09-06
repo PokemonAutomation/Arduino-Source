@@ -49,6 +49,17 @@ ControllerOption::ControllerOption(bool default_enable_mode)
 {}
 
 
+void ControllerOption::set_interface(ControllerInterface interface_type){
+    m_sanitizer.check_scope();
+
+    m_descriptor_cache[m_descriptor->interface_type] = m_descriptor;
+    auto iter = m_descriptor_cache.find(interface_type);
+    if (iter != m_descriptor_cache.end()){
+        m_descriptor = iter->second;
+    }else{
+        m_descriptor = ALL_CONTROLLER_INTERFACES().find(interface_type)->second->make();
+    }
+}
 void ControllerOption::set_descriptor(std::shared_ptr<ControllerDescriptor> descriptor){
     m_sanitizer.check_scope();
 

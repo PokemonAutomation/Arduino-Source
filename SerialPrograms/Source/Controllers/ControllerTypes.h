@@ -16,7 +16,7 @@ enum class ControllerInterface{
 //    SerialPABotBase,
     SerialPABotBase2,
     TcpSysbotBase,
-    UsbSysbotBase,
+//    UsbSysbotBase,
 };
 
 enum class ControllerPerformanceClass{

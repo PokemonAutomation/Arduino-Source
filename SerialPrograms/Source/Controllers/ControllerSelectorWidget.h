@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 
 
 
-class ControllerSelectorWidget
+class ControllerSelectorWidget final
     : public QWidget
     , public UiComponentQtWidget
     , private ControllerSession::Listener
@@ -53,7 +53,7 @@ public:
 
 private:
     void update_interface_dropdown(ControllerInterface interface_type);
-    void refresh_selection(ControllerInterface interface_type);
+    void refresh_selection();
     void refresh_controllers(
         ControllerType controller_type,
         const std::vector<ControllerType>& available_controllers

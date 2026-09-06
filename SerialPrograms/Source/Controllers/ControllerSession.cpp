@@ -206,6 +206,45 @@ void ControllerSession::make_controller(
 
 
 
+
+bool ControllerSession::set_interface(ControllerInterface controller_interface){
+    std::shared_ptr<const ControllerDescriptor> device;
+    {
+        std::lock_guard<Mutex> lg0(m_reset_lock);
+
+        //  Destroy the current connection+controller.
+        std::unique_ptr<AbstractController> controller;
+        std::unique_ptr<ControllerConnection> connection;
+        {
+            WriteSpinLock lg1(m_state_lock);
+            if (m_options_locked){
+                return false;
+            }
+            if (controller_interface == m_descriptor->interface_type){
+                return true;
+            }
+
+            //  Move these out to indicate that we should no longer access them.
+            controller = std::move(m_controller);
+            connection = std::move(m_connection);
+
+            m_option.set_interface(controller_interface);
+            m_descriptor = m_option.descriptor();
+        }
+
+        //  With the lock released, it is now safe to destroy them.
+        //  We cannot destroy these under (m_state_lock) due to their asynchronous
+        //  callbacks into this class which will also acquire the same lock.
+        controller.reset();
+        connection.reset();
+
+        make_controller({}, false);
+    }
+//    cout << "ControllerSession::set_interface() - signal"<< endl;
+    signal_descriptor_changed(device);
+    signal_status_text_changed(status_text());
+    return true;
+}
 bool ControllerSession::set_device(const std::shared_ptr<ControllerDescriptor>& device){
 //    cout << "ControllerSession::set_device() = " << device->display_name() << endl;
     {
