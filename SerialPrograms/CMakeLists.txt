@@ -148,6 +148,9 @@ link_directories(${CMAKE_CURRENT_LIST_DIR})
 # add the list of all code file paths as ${CORE_LIBRARY_SOURCES}, ${LIBRARY_SOURCES} and ${EXECUTABLE_SOURCES}
 include(cmake/SourceFiles.cmake)
 
+# add extract_discord_sdk(), which unpacks the per-platform Discord Social SDK zips
+include(cmake/ExtractDiscordSDK.cmake)
+
 # Organize source files in IDE project view
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../../ FILES ${CORE_LIBRARY_SOURCES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../../ FILES ${LIBRARY_SOURCES})
@@ -605,13 +608,7 @@ else() # macOS and Linux
             set(DISCORD_LIB_RELEASE "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_linux/lib/release/libdiscord_partner_sdk.so")
         endif()
 
-        if (NOT EXISTS "${DISCORD_DIR}")
-            message(STATUS "Discord SDK not found, extracting from zip...")
-            execute_process(
-                COMMAND ${CMAKE_COMMAND} -E tar xf "${DISCORD_ZIP}"
-                WORKING_DIRECTORY "${REPO_ROOT_DIR}/3rdPartyBinaries"
-            )
-        endif()
+        extract_discord_sdk("${DISCORD_ZIP}" "${DISCORD_DIR}")
 
         target_compile_definitions(SerialProgramsLib PUBLIC PA_SOCIAL_SDK)
         target_include_directories(SerialProgramsLib SYSTEM PRIVATE ../3rdParty/discord_social_sdk/)
@@ -788,14 +785,7 @@ if (WIN32)
         COMMAND cmd /c "if exist \"$<TARGET_PDB_FILE:SerialPrograms>\" ( \"${CMAKE_COMMAND}\" -E rename \"$<TARGET_PDB_FILE:SerialPrograms>\" \"${WIN_DEPLOY_DIR}/$<TARGET_PDB_FILE_NAME:SerialPrograms>\" ) else ( echo [Deploy] PDB file missing: $<TARGET_PDB_FILE:SerialPrograms> )"
     )
 
-    # Extract Discord SDK if missing
-    if (NOT EXISTS "${DISCORD_DIR}")
-        message(STATUS "Discord SDK not found, extracting from zip...")
-        execute_process(
-            COMMAND ${CMAKE_COMMAND} -E tar xf "${DISCORD_ZIP}"
-            WORKING_DIRECTORY "${REPO_ROOT_DIR}/3rdPartyBinaries"
-        )
-    endif()
+    extract_discord_sdk("${DISCORD_ZIP}" "${DISCORD_DIR}")
 
     # Copy dpp dll
     add_custom_command(
