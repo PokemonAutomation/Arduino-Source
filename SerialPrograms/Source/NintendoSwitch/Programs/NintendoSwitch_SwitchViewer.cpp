@@ -41,18 +41,17 @@ void SwitchViewer::from_json(const JsonValue& json){
 JsonValue SwitchViewer::to_json() const{
     return m_switches.to_json();
 }
-QWidget* SwitchViewer::make_widget(QWidget& parent, PanelHolder& holder){
-    return SwitchViewer_Widget::make(parent, *this, holder);
+QWidget* SwitchViewer::make_widget(QWidget& parent){
+    return SwitchViewer_Widget::make(parent, *this);
 }
 
 
 
 SwitchViewer_Widget* SwitchViewer_Widget::make(
     QWidget& parent,
-    SwitchViewer& instance,
-    PanelHolder& holder
+    SwitchViewer& instance
 ){
-    SwitchViewer_Widget* widget = new SwitchViewer_Widget(parent, instance, holder);
+    SwitchViewer_Widget* widget = new SwitchViewer_Widget(parent, instance);
     widget->construct();
     return widget;
 }
@@ -61,16 +60,15 @@ SwitchViewer_Widget::~SwitchViewer_Widget(){
 }
 SwitchViewer_Widget::SwitchViewer_Widget(
     QWidget& parent,
-    SwitchViewer& instance,
-    PanelHolder& holder
+    SwitchViewer& instance
 )
-    : PanelWidget(parent, instance, holder)
+    : PanelWidget(parent, instance)
     , m_session(instance.m_switches, 0)
 {}
 void SwitchViewer_Widget::construct(){
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(make_header(*this));
+    layout->addWidget(make_header());
 
     QScrollArea* scroll_outer = new QScrollArea(this);
     layout->addWidget(scroll_outer);

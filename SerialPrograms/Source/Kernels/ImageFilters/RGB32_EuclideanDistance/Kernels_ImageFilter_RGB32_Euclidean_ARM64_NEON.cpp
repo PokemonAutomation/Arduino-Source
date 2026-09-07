@@ -6,6 +6,7 @@
 
 #ifdef PA_AutoDispatch_arm64_20_M1
 
+#include <cstring>
 #include "Kernels/Kernels_arm64_NEON.h"
 #include "Kernels_ImageFilter_RGB32_Euclidean.h"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h"

@@ -35,8 +35,8 @@ namespace PokemonAutomation{
 namespace ML{
 
 
-QWidget* LabelImages::make_widget(QWidget& parent, PanelHolder& holder){
-    return new LabelImages_Widget(parent, *this, holder);
+QWidget* LabelImages::make_widget(QWidget& parent){
+    return new LabelImages_Widget(parent, *this);
 }
 
 
@@ -48,10 +48,9 @@ LabelImages_Widget::~LabelImages_Widget(){
 }
 LabelImages_Widget::LabelImages_Widget(
     QWidget& parent,
-    LabelImages& program,
-    PanelHolder& holder
+    LabelImages& program
 )
-    : PanelWidget(parent, program, holder)
+    : PanelWidget(parent, program)
     , m_program(program)
     , m_display_session(m_program.m_display_session)
 {
@@ -63,7 +62,7 @@ LabelImages_Widget::LabelImages_Widget(
     // Main layout
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(make_header(*this));
+    layout->addWidget(make_header());
 
     QScrollArea* scroll_outer = new QScrollArea(this);
     layout->addWidget(scroll_outer);

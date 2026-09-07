@@ -48,11 +48,9 @@ SingleSwitchProgramWidget2::~SingleSwitchProgramWidget2(){
 }
 SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
     QWidget& parent,
-    SingleSwitchProgramOption& option,
-    PanelHolder& holder
+    SingleSwitchProgramOption& option
 )
     : QWidget(&parent)
-    , m_holder(holder)
     , m_session(option, 0)
 {
     m_layout = new QVBoxLayout(this);
@@ -154,10 +152,10 @@ void SingleSwitchProgramWidget2::state_change(ProgramState state){
 //        }
         m_actions_bar->set_state(state);
         if (state == ProgramState::STOPPED){
-            m_holder.on_idle();
+            global_panel_holder()->on_idle();
             check_new_version();
         }else{
-            m_holder.on_busy();
+            global_panel_holder()->on_busy();
         }
 
         if(state == ProgramState::STOPPING){

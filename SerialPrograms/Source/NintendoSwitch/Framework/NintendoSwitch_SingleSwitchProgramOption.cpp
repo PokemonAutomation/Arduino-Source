@@ -50,8 +50,8 @@ void SingleSwitchProgramOption::restore_defaults(){
 }
 
 
-QWidget* SingleSwitchProgramOption::make_widget(QWidget& parent, PanelHolder& holder){
-    return new SingleSwitchProgramWidget2(parent, *this, holder);
+QWidget* SingleSwitchProgramOption::make_widget(QWidget& parent){
+    return new SingleSwitchProgramWidget2(parent, *this);
 }
 
 

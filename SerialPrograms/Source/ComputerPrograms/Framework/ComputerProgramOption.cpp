@@ -39,8 +39,8 @@ void ComputerProgramOption::restore_defaults(){
 }
 
 
-QWidget* ComputerProgramOption::make_widget(QWidget& parent, PanelHolder& holder){
-    return new ComputerProgramWidget(parent, *this, holder);
+QWidget* ComputerProgramOption::make_widget(QWidget& parent){
+    return new ComputerProgramWidget(parent, *this);
 }
 
 

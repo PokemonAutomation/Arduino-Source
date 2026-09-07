@@ -6,7 +6,9 @@
 
 
 #include <stdint.h>
+#ifdef __APPLE__
 #include <sys/sysctl.h>
+#endif
 #include <iostream>
 
 #include "CpuId.h"
@@ -18,9 +20,10 @@ const char* PA_ARCH_STRING = "arm64";
 
 uint64_t detect_NEON()
 {
+#ifdef __APPLE__
     // https://developer.apple.com/documentation/kernel/1387446-sysctlbyname/determining_instruction_set_characteristics
     // But this developer webpage may be out of date.
-    
+
     uint64_t available = 0;
     size_t size = sizeof(available);
 
@@ -35,6 +38,11 @@ uint64_t detect_NEON()
         }
     }
     return available;
+#else
+    // On Linux aarch64, AdvSIMD (NEON) is part of the mandatory ARMv8-A baseline,
+    // so it is always available.
+    return 1;
+#endif
 }
 
 CPU_Features& CPU_Features::set_to_current(){

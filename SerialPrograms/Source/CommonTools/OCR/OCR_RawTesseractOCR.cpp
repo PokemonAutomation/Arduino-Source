@@ -96,7 +96,7 @@ public:
     void add_instance(){
         //  Check for non-ascii characters in path.
         for (char ch : m_training_data_path){
-            if (ch < 0){
+            if ((unsigned char)ch > 127){
                 throw InternalSystemError(
                     nullptr, PA_CURRENT_FUNCTION,
                     "Detected non-ASCII character in Tesseract path. Please move the program to a path with only ASCII characters."

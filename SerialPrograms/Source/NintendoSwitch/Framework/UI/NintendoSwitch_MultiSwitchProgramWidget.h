@@ -36,8 +36,7 @@ public:
     ~MultiSwitchProgramWidget2();
     MultiSwitchProgramWidget2(
         QWidget& parent,
-        MultiSwitchProgramOption& option,
-        PanelHolder& holder
+        MultiSwitchProgramOption& option
     );
 
 private:
@@ -53,7 +52,6 @@ private:
     ProgramResourceDownloadTableWidget* ensure_downloads_table();
 
 private:
-    PanelHolder& m_holder;
     MultiSwitchProgramSession m_session;
     QVBoxLayout* m_layout;
     MultiSwitchSystemWidget* m_system;

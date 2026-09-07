@@ -16,31 +16,29 @@
 namespace PokemonAutomation{
 
 
-QWidget* SettingsPanelInstance::make_widget(QWidget& parent, PanelHolder& holder){
-    return SettingsPanelWidget::make(parent, *this, holder);
+QWidget* SettingsPanelInstance::make_widget(QWidget& parent){
+    return SettingsPanelWidget::make(parent, *this);
 }
 
 
 SettingsPanelWidget* SettingsPanelWidget::make(
     QWidget& parent,
-    SettingsPanelInstance& instance,
-    PanelHolder& holder
+    SettingsPanelInstance& instance
 ){
-    SettingsPanelWidget* widget = new SettingsPanelWidget(parent, instance, holder);
+    SettingsPanelWidget* widget = new SettingsPanelWidget(parent, instance);
     widget->construct();
     return widget;
 }
 SettingsPanelWidget::SettingsPanelWidget(
     QWidget& parent,
-    SettingsPanelInstance& instance,
-    PanelHolder& holder
+    SettingsPanelInstance& instance
 )
-    : PanelWidget(parent, instance, holder)
+    : PanelWidget(parent, instance)
 {}
 void SettingsPanelWidget::construct(){
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(make_header(*this));
+    layout->addWidget(make_header());
 
     QScrollArea* scroll = new QScrollArea(this);
     layout->addWidget(scroll);

@@ -17,22 +17,20 @@ namespace PokemonAutomation{
 
 
 
-QWidget* PanelInstance::make_widget(QWidget& parent, PanelHolder& holder){
-    return new PanelWidget(parent, *this, holder);
+QWidget* PanelInstance::make_widget(QWidget& parent){
+    return new PanelWidget(parent, *this);
 }
 
 
 PanelWidget::PanelWidget(
     QWidget& parent,
-    PanelInstance& instance,
-    PanelHolder& holder
+    PanelInstance& instance
 )
     : QWidget(&parent)
     , m_instance(instance)
-    , m_holder(holder)
 {}
 
-CollapsibleGroupBox* PanelWidget::make_header(QWidget& parent){
+CollapsibleGroupBox* PanelWidget::make_header(){
     return make_panel_header(
         *this,
         m_instance.descriptor().display_name(),
