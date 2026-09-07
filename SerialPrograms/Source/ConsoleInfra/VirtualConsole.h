@@ -43,7 +43,7 @@ public:
 class VirtualConsole : public PanelInstance{
 public:
     VirtualConsole(const VirtualConsole_Descriptor& descriptor);
-    virtual QWidget* make_widget(QWidget& parent, PanelHolder& holder) override;
+    virtual QWidget* make_widget(QWidget& parent) override;
 
 public:
     //  Serialization
@@ -63,16 +63,14 @@ class VirtualConsole_Widget : public PanelWidget{
 public:
     static VirtualConsole_Widget* make(
         QWidget& parent,
-        VirtualConsole& instance,
-        PanelHolder& holder
+        VirtualConsole& instance
     );
 
 private:
     ~VirtualConsole_Widget();
     VirtualConsole_Widget(
         QWidget& parent,
-        VirtualConsole& instance,
-        PanelHolder& holder
+        VirtualConsole& instance
     );
     void construct();
 

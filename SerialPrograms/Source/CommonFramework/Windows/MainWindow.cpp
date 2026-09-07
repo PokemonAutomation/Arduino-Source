@@ -43,6 +43,8 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , m_current_panel_widget(nullptr)
 {
+    global_panel_holder() = this;
+
     if (objectName().isEmpty()){
         setObjectName(QString::fromUtf8("MainWindow"));
     }
@@ -393,7 +395,7 @@ void MainWindow::load_panel(
     //  Make new widget.
     try{
         check_new_version();
-        m_current_panel_widget = panel->make_widget(*this, *this);
+        m_current_panel_widget = panel->make_widget(*this);
 //        cout << "load_panel() = " << m_current_panel_widget << endl;
         m_current_panel_descriptor = std::move(descriptor);
         m_current_panel = std::move(panel);

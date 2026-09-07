@@ -65,7 +65,7 @@ public:
 class LabelImages : public PanelInstance, public ConfigOption::Listener {
 public:
     LabelImages(const LabelImages_Descriptor& descriptor);
-    virtual QWidget* make_widget(QWidget& parent, PanelHolder& holder) override;
+    virtual QWidget* make_widget(QWidget& parent) override;
     ~LabelImages();
 
 public:

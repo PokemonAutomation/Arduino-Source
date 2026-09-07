@@ -47,11 +47,9 @@ MultiSwitchProgramWidget2::~MultiSwitchProgramWidget2(){
 
 MultiSwitchProgramWidget2::MultiSwitchProgramWidget2(
     QWidget& parent,
-    MultiSwitchProgramOption& option,
-    PanelHolder& holder
+    MultiSwitchProgramOption& option
 )
     : QWidget(&parent)
-    , m_holder(holder)
     , m_session(option)
     , m_sanitizer("MultiSwitchProgramWidget2")
 {
@@ -155,10 +153,10 @@ void MultiSwitchProgramWidget2::state_change(ProgramState state){
 //        }
         m_actions_bar->set_state(state);
         if (state == ProgramState::STOPPED){
-            m_holder.on_idle();
+            global_panel_holder()->on_idle();
             check_new_version();
         }else{
-            m_holder.on_busy();
+            global_panel_holder()->on_busy();
         }
 
         if(state == ProgramState::STOPPING){

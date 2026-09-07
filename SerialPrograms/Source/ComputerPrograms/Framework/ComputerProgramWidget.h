@@ -35,8 +35,7 @@ public:
     ~ComputerProgramWidget();
     ComputerProgramWidget(
         QWidget& parent,
-        ComputerProgramOption& option,
-        PanelHolder& holder
+        ComputerProgramOption& option
     );
 
 private:
@@ -50,7 +49,6 @@ private:
     ProgramResourceDownloadTableWidget* ensure_downloads_table();
 
 private:
-    PanelHolder& m_holder;
     ComputerProgramSession m_session;
     QVBoxLayout* m_layout;
     ConfigWidget* m_options;

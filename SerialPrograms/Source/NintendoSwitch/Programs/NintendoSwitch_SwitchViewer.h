@@ -26,7 +26,7 @@ public:
 class SwitchViewer : public PanelInstance{
 public:
     SwitchViewer(const SwitchViewer_Descriptor& descriptor);
-    virtual QWidget* make_widget(QWidget& parent, PanelHolder& holder) override;
+    virtual QWidget* make_widget(QWidget& parent) override;
 
 public:
     //  Serialization
@@ -45,16 +45,14 @@ class SwitchViewer_Widget : public PanelWidget{
 public:
     static SwitchViewer_Widget* make(
         QWidget& parent,
-        SwitchViewer& instance,
-        PanelHolder& holder
+        SwitchViewer& instance
     );
 
 private:
     ~SwitchViewer_Widget();
     SwitchViewer_Widget(
         QWidget& parent,
-        SwitchViewer& instance,
-        PanelHolder& holder
+        SwitchViewer& instance
     );
     void construct();
 

@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PanelInstance_H
 #define PokemonAutomation_PanelInstance_H
 
-#include "Common/Compiler.h"
 #include "PanelDescriptor.h"
 
 class QWidget;
@@ -29,19 +28,21 @@ public:
     const PanelDescriptor& descriptor() const{ return m_descriptor; }
 
     void save_settings() const;
-
     void validate_resource_list();
+
 
 public:
     // The implmentation is defined in "UI/PanelWidget.h" to avoid circular dependency
     // Returns a UI/PanelWidget.h:PanelWidget
-    virtual QWidget* make_widget(QWidget& parent, PanelHolder& holder);
+    virtual QWidget* make_widget(QWidget& parent);
+
 
 public:
     //  Serialization
     void from_json();
-    virtual void from_json([[maybe_unused]] const JsonValue& json){}
+    virtual void from_json(const JsonValue& json);
     virtual JsonValue to_json() const;
+
 
 protected:
     const PanelDescriptor& m_descriptor;

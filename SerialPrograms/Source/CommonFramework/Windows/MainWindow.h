@@ -12,6 +12,7 @@
 #include "Common/Cpp/Options/ConfigOption.h"
 #include "CommonFramework/Environment/SystemSleep.h"
 #include "CommonFramework/Panels/PanelTools.h"
+#include "CommonFramework/Panels/PanelInstance.h"
 #include "PanelLists.h"
 
 class QVBoxLayout;
@@ -24,11 +25,11 @@ class ButtonDiagram;
 class LoggerWindow;
 
 
-class MainWindow :
-    public QMainWindow,
-    public PanelHolder,
-    public ConfigOption::Listener,
-    public SystemSleepController::Listener
+class MainWindow
+    : public QMainWindow
+    , public PanelHolder
+    , public ConfigOption::Listener
+    , public SystemSleepController::Listener
 {
 public:
     MainWindow(QWidget* parent = nullptr);
@@ -49,8 +50,6 @@ private:
         std::shared_ptr<const PanelDescriptor> descriptor,
         std::unique_ptr<PanelInstance> panel
     ) override;
-    // implements PanelHolder::raw_logger()
-    virtual Logger& raw_logger() override{ return global_logger_raw(); }
 
 private:
     // implements PanelHolder::on_busy()

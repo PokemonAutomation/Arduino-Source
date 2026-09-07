@@ -22,8 +22,7 @@ class PanelWidget : public QWidget{
 public:
     PanelWidget(
         QWidget& parent,
-        PanelInstance& instance,
-        PanelHolder& holder
+        PanelInstance& instance
     );
     virtual ~PanelWidget() = default;
 
@@ -33,11 +32,10 @@ public:
 protected:
     //  Generate a collapsible UI element that shows the program panel header.
     //  It contains the name of the program and its description.
-    virtual CollapsibleGroupBox* make_header(QWidget& parent);
+    virtual CollapsibleGroupBox* make_header();
 
 protected:
     PanelInstance& m_instance;
-    PanelHolder& m_holder;
 };
 
 

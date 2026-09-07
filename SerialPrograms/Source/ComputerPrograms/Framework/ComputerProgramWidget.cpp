@@ -33,11 +33,9 @@ ComputerProgramWidget::~ComputerProgramWidget(){
 }
 ComputerProgramWidget::ComputerProgramWidget(
     QWidget& parent,
-    ComputerProgramOption& option,
-    PanelHolder& holder
+    ComputerProgramOption& option
 )
     : QWidget(&parent)
-    , m_holder(holder)
     , m_session(option)
 {
     m_layout = new QVBoxLayout(this);
@@ -113,9 +111,9 @@ void ComputerProgramWidget::state_change(ProgramState state){
         m_options->widget().setEnabled(state == ProgramState::STOPPED);
         m_actions_bar->set_state(state);
         if (state == ProgramState::STOPPED){
-            m_holder.on_idle();
+            global_panel_holder()->on_idle();
         }else{
-            m_holder.on_busy();
+            global_panel_holder()->on_busy();
         }
 
         if(state == ProgramState::STOPPING){

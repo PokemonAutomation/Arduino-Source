@@ -59,8 +59,8 @@ void MultiSwitchProgramOption::restore_defaults(){
 }
 
 
-QWidget* MultiSwitchProgramOption::make_widget(QWidget& parent, PanelHolder& holder){
-    return new MultiSwitchProgramWidget2(parent, *this, holder);
+QWidget* MultiSwitchProgramOption::make_widget(QWidget& parent){
+    return new MultiSwitchProgramWidget2(parent, *this);
 }
 
 
