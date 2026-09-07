@@ -36,12 +36,21 @@ struct PanelHolder{
         std::shared_ptr<const PanelDescriptor> descriptor,
         std::unique_ptr<PanelInstance> panel
     ) = 0;
-    virtual Logger& raw_logger() = 0;
+
     // called when an automation program is running
     virtual void on_busy() = 0;
     // called when no automation program is not running
     virtual void on_idle() = 0;
 };
+
+
+
+//  TODO: REMOVE: Temporary for refactor.
+inline PanelHolder*& global_panel_holder(){
+    static PanelHolder* holder;
+    return holder;
+}
+
 
 
 

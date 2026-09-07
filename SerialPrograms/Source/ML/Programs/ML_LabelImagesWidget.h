@@ -45,8 +45,7 @@ public:
     ~LabelImages_Widget();
     LabelImages_Widget(
         QWidget& parent,
-        LabelImages& instance,
-        PanelHolder& holder
+        LabelImages& instance
     );
 
     //  Overwrites ConfigOption::Listener::on_config_value_changed().

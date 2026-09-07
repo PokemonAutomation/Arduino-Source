@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "CommonFramework/ResourceDownload/ResourceDownloadHelpers.h"
@@ -35,6 +36,10 @@ void PanelInstance::from_json(){
     }
     from_json(*node);
 }
+
+void PanelInstance::from_json(const JsonValue& json){
+
+}
 JsonValue PanelInstance::to_json() const{
     return JsonValue();
 }
@@ -61,6 +66,10 @@ void PanelInstance::validate_resource_list(){
         }
     }
 }
+
+
+
+
 
 
 }

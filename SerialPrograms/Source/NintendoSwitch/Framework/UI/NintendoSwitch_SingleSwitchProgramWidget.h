@@ -35,8 +35,7 @@ public:
     ~SingleSwitchProgramWidget2();
     SingleSwitchProgramWidget2(
         QWidget& parent,
-        SingleSwitchProgramOption& option,
-        PanelHolder& holder
+        SingleSwitchProgramOption& option
     );
 
 private:
@@ -50,7 +49,6 @@ private:
     ProgramResourceDownloadTableWidget* ensure_downloads_table();
 
 private:
-    PanelHolder& m_holder;
     SingleSwitchProgramSession m_session;
     QVBoxLayout* m_layout;
     QWidget* m_system;

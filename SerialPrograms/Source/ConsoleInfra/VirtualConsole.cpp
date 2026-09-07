@@ -43,18 +43,17 @@ void VirtualConsole::from_json(const JsonValue& json){
 JsonValue VirtualConsole::to_json() const{
     return m_console_options.to_json();
 }
-QWidget* VirtualConsole::make_widget(QWidget& parent, PanelHolder& holder){
-    return VirtualConsole_Widget::make(parent, *this, holder);
+QWidget* VirtualConsole::make_widget(QWidget& parent){
+    return VirtualConsole_Widget::make(parent, *this);
 }
 
 
 
 VirtualConsole_Widget* VirtualConsole_Widget::make(
     QWidget& parent,
-    VirtualConsole& instance,
-    PanelHolder& holder
+    VirtualConsole& instance
 ){
-    VirtualConsole_Widget* widget = new VirtualConsole_Widget(parent, instance, holder);
+    VirtualConsole_Widget* widget = new VirtualConsole_Widget(parent, instance);
     widget->construct();
     return widget;
 }
@@ -63,16 +62,15 @@ VirtualConsole_Widget::~VirtualConsole_Widget(){
 }
 VirtualConsole_Widget::VirtualConsole_Widget(
     QWidget& parent,
-    VirtualConsole& instance,
-    PanelHolder& holder
+    VirtualConsole& instance
 )
-    : PanelWidget(parent, instance, holder)
+    : PanelWidget(parent, instance)
     , m_session(global_logger_raw(), instance.m_console_options, 0)
 {}
 void VirtualConsole_Widget::construct(){
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(make_header(*this));
+    layout->addWidget(make_header());
 
     QScrollArea* scroll_outer = new QScrollArea(this);
     layout->addWidget(scroll_outer);

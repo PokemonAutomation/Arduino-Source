@@ -43,7 +43,7 @@ public:
     void restore_defaults();
 
 private:
-    virtual QWidget* make_widget(QWidget& parent, PanelHolder& holder) override;
+    virtual QWidget* make_widget(QWidget& parent) override;
 
 private:
     const SingleSwitchProgramDescriptor& m_descriptor;
