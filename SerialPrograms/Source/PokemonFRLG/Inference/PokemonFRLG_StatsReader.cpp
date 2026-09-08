@@ -531,6 +531,7 @@ void add_tests_StatsReader(UnitTestDatabase& database){
     database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/raikou_1_eng.png");
     database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/raikou_2_eng.png");
     database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/venonat_1_eng.jpg");
+    database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/scyther_1_eng.png");
 }
 
 
