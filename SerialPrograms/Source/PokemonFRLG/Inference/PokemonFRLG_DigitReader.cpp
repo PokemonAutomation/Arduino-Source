@@ -236,14 +236,12 @@ int read_digits_waterfill_template(
         size_t width = obj.max_x - obj.min_x;
         size_t height = obj.max_y - obj.min_y;
 
-        int expected_digits = 1;
         // GBA font digits are typically narrower than they are tall (aspect ~0.6).
         // If the blob's width is wider than expected for a single digit, it's a
         // merged blob.
-        if (width > height * 1.5){
-            expected_digits = 3; // e.g. "100"
-        }else if (width > height * 0.8){
-            expected_digits = 2; // e.g. "23"
+        int expected_digits = int(std::ceil((double)width / height / 0.6 - 0.5));
+        if (expected_digits < 1){
+            expected_digits = 1;
         }
 
         size_t split_w = width / expected_digits;
