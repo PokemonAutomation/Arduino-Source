@@ -410,23 +410,30 @@ void walk_to_safarizonewest(ProControllerContext& context){
 
 void activate_roamer(ProControllerContext& context, const Language& language, const uint64_t& ingame_delay){
     // a lot of dialogue while Celio inserts the Sapphire
-    pbf_press_button(context, BUTTON_A, 200ms, 5300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 3300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 5300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    if (language == Language::Spanish){ // "de HOENN!" gets pushed to a new line
+    pbf_press_button(context, BUTTON_A, 200ms, 5300ms); // handed the sapphire to Celio
+                                                        // "So this is the gem..."
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms); // "<Player>, you've gone through a lot..."
+    if (language == Language::Japanese){                // extra dialog box for the above message
         pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     }
-    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - 26700)); //5500ms + 4*1500ms + 3500ms + 5500ms + 4*1500ms + 200
-    // finalize roamer
-    pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms); // "You don't have to tell  me..."
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms); // "Thank you so much!"
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms); // "Now it's my turn..."
+    pbf_press_button(context, BUTTON_A, 200ms, 3300ms); // "Okay, this is good..."
+    pbf_press_button(context, BUTTON_A, 200ms, 5300ms); // "I did it! I linked up with LANETTE!"
+    if (language == Language::Spanish){                 // "con AREDIA!" is pushed to a new line
+        pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    }
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms); // "<Player!>! <Player>, I did it!"
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms); // "I've managed to link up with TRAINERS in the HOENN region!"
+    if (language == Language::Spanish){                 // "de HOENN!" gets pushed to a new line
+        pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    }
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms); // "Finally, the Network Machine..."
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms); // "<Player>, I owe it all to you!"
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - 26700)); // 5500ms + 4*1500ms + 3500ms + 5500ms + 4*1500ms + 200
+                                                        // "Thanks to you, my dream came true..."
+    pbf_press_button(context, BUTTON_A, 200ms, 800ms);  // finalize roamer and exit dialogue
     context.wait_for_all_requests();
 }
 
