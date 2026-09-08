@@ -93,18 +93,19 @@ namespace PokemonFRLG{
     // and fires an error if any of the timings are too short.
     void check_timings(
         ConsoleHandle& console, 
-        const PokemonFRLG_RngTarget& TARGET,
+        PokemonFRLG_RngTarget TARGET,
         const RngTimings& timings,
+        Language language,
         bool safari_zone
     );
 
     // performs the blind sequence between launching the game and arriving at the RNG manipulation target
     void perform_blind_sequence(
         ProControllerContext& context,
-        const Language& language,
+        Language language,
         PokemonFRLG_RngTarget target,
-        const SeedButton& seed_button,
-        const BlackoutButton& extra_button,
+        SeedButton seed_button,
+        BlackoutButton extra_button,
         const RngTimings& timings,
         bool safari_zone,
         ConsoleType console_type
