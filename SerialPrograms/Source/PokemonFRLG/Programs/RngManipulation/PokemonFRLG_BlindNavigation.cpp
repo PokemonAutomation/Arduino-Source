@@ -17,7 +17,7 @@ namespace NintendoSwitch{
 namespace PokemonFRLG{
 
 
-void set_seed_after_delay(ProControllerContext& context, const SeedButton& seed_button, const BlackoutButton& extra_button, int64_t seed_delay, ConsoleType console_type){
+void set_seed_after_delay(ProControllerContext& context, SeedButton seed_button, BlackoutButton extra_button, int64_t seed_delay, ConsoleType console_type){
     // be warned: not tested with all console types
     switch (console_type){
     case ConsoleType::Switch1:
@@ -70,7 +70,7 @@ void set_seed_after_delay(ProControllerContext& context, const SeedButton& seed_
     pbf_press_button(context, s_button, 3000ms, 0ms);
 }
 
-void load_game_after_delay(ProControllerContext& context, const uint64_t& csf_delay){
+void load_game_after_delay(ProControllerContext& context, uint64_t csf_delay){
     pbf_wait(context, std::chrono::milliseconds(csf_delay - 3000));
     pbf_press_button(context, BUTTON_A, 50ms, 1450ms);
     // skip recap
@@ -78,7 +78,7 @@ void load_game_after_delay(ProControllerContext& context, const uint64_t& csf_de
     // need to later subtract 4000ms from delay to hit desired number of advances
 }
 
-void wait_with_teachy_tv(ProControllerContext& context, const uint64_t& teachy_delay){
+void wait_with_teachy_tv(ProControllerContext& context, uint64_t teachy_delay){
     // open start menu -> bag -> key items -> Teachy TV -> use
     pbf_press_button(context, BUTTON_PLUS, 200ms, 300ms);
     pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
@@ -98,7 +98,7 @@ void wait_with_teachy_tv(ProControllerContext& context, const uint64_t& teachy_d
 }
 
 
-void collect_starter_after_delay(ProControllerContext& context, const uint64_t& ingame_delay){
+void collect_starter_after_delay(ProControllerContext& context, uint64_t ingame_delay){
     // Advance through starter dialogue and wait on "really quite energetic!"
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
@@ -112,7 +112,7 @@ void collect_starter_after_delay(ProControllerContext& context, const uint64_t& 
     context.wait_for_all_requests();
 }
 
-void collect_magikarp_after_delay(ProControllerContext& context, const uint64_t& ingame_delay){
+void collect_magikarp_after_delay(ProControllerContext& context, uint64_t ingame_delay){
     // Advance through starter dialogue and wait on YES/NO
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
@@ -124,7 +124,7 @@ void collect_magikarp_after_delay(ProControllerContext& context, const uint64_t&
     context.wait_for_all_requests();
 }
 
-void collect_hitmon_after_delay(ProControllerContext& context, const uint64_t& ingame_delay){
+void collect_hitmon_after_delay(ProControllerContext& context, uint64_t ingame_delay){
     // One dialog before accepting
     pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - 4200)); // 4000ms + 200ms
     // Confirm selection
@@ -134,7 +134,7 @@ void collect_hitmon_after_delay(ProControllerContext& context, const uint64_t& i
     context.wait_for_all_requests();
 }
 
-void collect_eevee_after_delay(ProControllerContext& context, const uint64_t& ingame_delay){
+void collect_eevee_after_delay(ProControllerContext& context, uint64_t ingame_delay){
     // No dialogue to advance through -- just wait
     pbf_wait(context, std::chrono::milliseconds(ingame_delay - 4000));
     // Interact with the pokeball
@@ -144,7 +144,7 @@ void collect_eevee_after_delay(ProControllerContext& context, const uint64_t& in
     context.wait_for_all_requests();
 }
 
-void collect_lapras_after_delay(ProControllerContext& context, const uint64_t& ingame_delay){
+void collect_lapras_after_delay(ProControllerContext& context, uint64_t ingame_delay){
     // 3 dialog presses
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
@@ -156,7 +156,7 @@ void collect_lapras_after_delay(ProControllerContext& context, const uint64_t& i
     context.wait_for_all_requests();
 }
 
-void collect_fossil_after_delay(ProControllerContext& context, const uint64_t& ingame_delay){
+void collect_fossil_after_delay(ProControllerContext& context, uint64_t ingame_delay){
     // 2 dialog presses
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - 5700)); // 4000ms + 1500ms + 200ms
@@ -167,7 +167,7 @@ void collect_fossil_after_delay(ProControllerContext& context, const uint64_t& i
     context.wait_for_all_requests();
 }
 
-void collect_gamecorner_after_delay(ProControllerContext& context, const uint64_t& ingame_delay, int SLOT){
+void collect_gamecorner_after_delay(ProControllerContext& context, uint64_t ingame_delay, int SLOT){
     // 2 dialog presses
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
@@ -187,7 +187,7 @@ void collect_gamecorner_after_delay(ProControllerContext& context, const uint64_
     context.wait_for_all_requests();
 }
 
-void collect_togepi_egg_after_delay(ProControllerContext& context, const uint64_t& ingame_delay){
+void collect_togepi_egg_after_delay(ProControllerContext& context, uint64_t ingame_delay){
     // 6 dialog presses
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
@@ -202,7 +202,7 @@ void collect_togepi_egg_after_delay(ProControllerContext& context, const uint64_
     context.wait_for_all_requests();    
 }
 
-void collect_preapproved_togepi_egg_after_delay(ProControllerContext& context, const uint64_t& ingame_delay){
+void collect_preapproved_togepi_egg_after_delay(ProControllerContext& context, uint64_t ingame_delay){
     // wait with the start menu open to avoid overworld stuff causing extra advances
     pbf_press_button(context, BUTTON_PLUS, 200ms, 300ms);
     pbf_wait(context, std::chrono::milliseconds(ingame_delay - 5200)); // 4000ms + 500ms + 500ms + 200ms
@@ -213,7 +213,7 @@ void collect_preapproved_togepi_egg_after_delay(ProControllerContext& context, c
     pbf_mash_button(context, BUTTON_B, 2500ms);
 }
 
-void trigger_held_daycare_egg_after_delay(ProControllerContext& context, const uint64_t& ingame_delay){
+void trigger_held_daycare_egg_after_delay(ProControllerContext& context, uint64_t ingame_delay){
     // No dialogue to advance through -- just wait
     pbf_wait(context, std::chrono::milliseconds(ingame_delay - 4000));
     // Trigger the encounter (WALK LEFT)
@@ -221,7 +221,7 @@ void trigger_held_daycare_egg_after_delay(ProControllerContext& context, const u
     context.wait_for_all_requests();
 }
 
-void collect_daycare_egg_after_delay(ProControllerContext& context, const uint64_t& ingame_delay){
+void collect_daycare_egg_after_delay(ProControllerContext& context, uint64_t ingame_delay){
     // wait with the start menu open to avoid overworld stuff causing extra advances
     pbf_press_button(context, BUTTON_PLUS, 200ms, 300ms);
     pbf_wait(context, std::chrono::milliseconds(ingame_delay - 12000)); // 4000ms + 500ms + 500ms + 6000ms + 1000ms
@@ -239,7 +239,7 @@ void collect_daycare_egg_after_delay(ProControllerContext& context, const uint64
     context.wait_for_all_requests();    
 }
 
-void encounter_static_after_delay(ProControllerContext& context, const uint64_t& ingame_delay){
+void encounter_static_after_delay(ProControllerContext& context, uint64_t ingame_delay){
     // No dialogue to advance through -- just wait in the start menu (avoids extra RNG advances by boulders Mt Ember and Seafoam Islands)
     pbf_press_button(context, BUTTON_PLUS, 200ms, 300ms);
     pbf_wait(context, std::chrono::milliseconds(ingame_delay - 5000)); // 4000ms + 1000ms
@@ -250,7 +250,7 @@ void encounter_static_after_delay(ProControllerContext& context, const uint64_t&
     context.wait_for_all_requests();
 }
 
-void encounter_snorlax_after_delay(ProControllerContext& context, const uint64_t& ingame_delay){
+void encounter_snorlax_after_delay(ProControllerContext& context, uint64_t ingame_delay){
     // Interact with Snorlax, YES to PokeFlute, wait on "woke up!"
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 9800ms); // PokeFlute tune
@@ -259,7 +259,7 @@ void encounter_snorlax_after_delay(ProControllerContext& context, const uint64_t
     context.wait_for_all_requests();
 }
 
-void encounter_mewtwo_after_delay(ProControllerContext& context, const uint64_t& ingame_delay){
+void encounter_mewtwo_after_delay(ProControllerContext& context, uint64_t ingame_delay){
     // one dialogue before the encounter happens
     pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - 4200)); // 4000ms + 200ms
     // Initiate encounter
@@ -267,7 +267,7 @@ void encounter_mewtwo_after_delay(ProControllerContext& context, const uint64_t&
     context.wait_for_all_requests();
 }
 
-void encounter_hooh_after_delay(ProControllerContext& context, const uint64_t& ingame_delay){
+void encounter_hooh_after_delay(ProControllerContext& context, uint64_t ingame_delay){
     // No dialogue to advance through -- just wait
     pbf_wait(context, std::chrono::milliseconds(ingame_delay - 4000));
     // Trigger the encounter (WALK UP)
@@ -275,7 +275,7 @@ void encounter_hooh_after_delay(ProControllerContext& context, const uint64_t& i
     context.wait_for_all_requests();
 }
 
-void encounter_hypno_after_delay(ProControllerContext& context, const uint64_t& ingame_delay){
+void encounter_hypno_after_delay(ProControllerContext& context, uint64_t ingame_delay){
     // 5 dialog advances, with the 5th needing some extra time
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
@@ -289,7 +289,7 @@ void encounter_hypno_after_delay(ProControllerContext& context, const uint64_t& 
     context.wait_for_all_requests();
 }
 
-void use_sweet_scent(ProControllerContext& context, const uint64_t& ingame_delay, bool safari_zone = false){
+void use_sweet_scent(ProControllerContext& context, uint64_t ingame_delay, bool safari_zone = false){
     // navigate to last party slot
     pbf_press_button(context, BUTTON_PLUS, 200ms, 300ms);
     pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
@@ -306,7 +306,7 @@ void use_sweet_scent(ProControllerContext& context, const uint64_t& ingame_delay
     context.wait_for_all_requests();
 }
 
-void use_rock_smash(ProControllerContext& context, const uint64_t& ingame_delay){
+void use_rock_smash(ProControllerContext& context, uint64_t ingame_delay){
     // three button presses
     pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
     pbf_press_button(context, BUTTON_A, 200ms, 300ms);
@@ -315,7 +315,7 @@ void use_rock_smash(ProControllerContext& context, const uint64_t& ingame_delay)
     context.wait_for_all_requests();
 }
 
-void use_registered_fishing_rod(ProControllerContext& context, const uint64_t& ingame_delay){
+void use_registered_fishing_rod(ProControllerContext& context, uint64_t ingame_delay){
     uint32_t rng_wait = 50 * random_u32(0, 20); // helps avoid always hitting "Not even a nibble" (?)
     pbf_wait(context, std::chrono::milliseconds(rng_wait));
     pbf_press_button(context, BUTTON_MINUS, 200ms, std::chrono::milliseconds(ingame_delay - rng_wait - 4200));
@@ -408,33 +408,48 @@ void walk_to_safarizonewest(ProControllerContext& context){
     // total duration: 52930ms
 }
 
-void activate_roamer(ProControllerContext& context, const Language& language, const uint64_t& ingame_delay){
+void activate_roamer(ProControllerContext& context, Language language, uint64_t ingame_delay){
+    int offset = 26700; // 5500ms + 4*1500ms + 3500ms + 5500ms + 4*1500ms + 200
+    if (language == Language::Japanese){
+        offset += 1500; // extra dialog box for the "you've gone through a lot..." message
+    }else if (language == Language::Spanish){
+        offset += 3000;
+    }
+    
     // a lot of dialogue while Celio inserts the Sapphire
-    pbf_press_button(context, BUTTON_A, 200ms, 5300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 3300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 5300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    if (language == Language::Spanish){ // "de HOENN!" gets pushed to a new line
+    pbf_press_button(context, BUTTON_A, 200ms, 5300ms); // handed the sapphire to Celio
+                                                        // "So this is the gem..."
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms); // "<Player>, you've gone through a lot..."
+    if (language == Language::Japanese){                // extra dialog box for the above message
         pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     }
-    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - 26700)); //5500ms + 4*1500ms + 3500ms + 5500ms + 4*1500ms + 200
-    // finalize roamer
-    pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms); // "You don't have to tell  me..."
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms); // "Thank you so much!"
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms); // "Now it's my turn..."
+    pbf_press_button(context, BUTTON_A, 200ms, 3300ms); // "Okay, this is good..."
+    pbf_press_button(context, BUTTON_A, 200ms, 5300ms); // "I did it! I linked up with LANETTE!"
+    if (language == Language::Spanish){                 // "con AREDIA!" is pushed to a new line
+        pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    }
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms); // "<Player!>! <Player>, I did it!"
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms); // "I've managed to link up with TRAINERS in the HOENN region!"
+    if (language == Language::Spanish){                 // "de HOENN!" gets pushed to a new line
+        pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    }
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms); // "Finally, the Network Machine..."
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms); // "<Player>, I owe it all to you!"
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - offset)); 
+                                                        // "Thanks to you, my dream came true..."
+    pbf_press_button(context, BUTTON_A, 200ms, 800ms);  // finalize roamer and exit dialogue
     context.wait_for_all_requests();
 }
 
 
 void check_timings(
     ConsoleHandle& console, 
-    const PokemonFRLG_RngTarget& TARGET,
+    PokemonFRLG_RngTarget TARGET,
     const RngTimings& timings,
+    Language language,
     bool safari_zone
 ){
     if (timings.csf_delay < 3200){
@@ -705,10 +720,26 @@ void check_timings(
     case PokemonFRLG_RngTarget::entei:
     case PokemonFRLG_RngTarget::suicune:
     case PokemonFRLG_RngTarget::roaming:
-        if (timings.ingame_delay < 27000){
+        uint64_t offset;
+        uint64_t frames;
+        switch (language){
+        case Language::Japanese:
+            offset = 28500;
+            frames = 3490;
+            break;
+        case Language::Spanish:
+            offset = 30000;
+            frames = 3580;
+            break;
+        default:
+            offset = 27000; 
+            frames = 3400;
+            break;
+        }
+        if (timings.ingame_delay < offset){
             OperationFailedExceptionWithScreenshot::fire(
                 ErrorReportMode::SEND_ERROR_REPORT,
-                "Roaming: the in-game delay cannot be less than 27000ms (3400 frames). Check your in-game advances and calibration.",
+                "Roaming: the in-game delay cannot be less than " + std::to_string(offset) + "ms (" + std::to_string(frames) + " frames). Check your in-game advances and calibration.",
                 console
             );
         }
@@ -724,10 +755,10 @@ void check_timings(
 
 void perform_blind_sequence(
     ProControllerContext& context, 
-    const Language& language,
+    Language language,
     PokemonFRLG_RngTarget target,
-    const SeedButton& seed_button,
-    const BlackoutButton& extra_button,
+    SeedButton seed_button,
+    BlackoutButton extra_button,
     const RngTimings& timings,
     bool safari_zone,
     ConsoleType console_type
