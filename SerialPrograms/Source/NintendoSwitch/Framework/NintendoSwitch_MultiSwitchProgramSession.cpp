@@ -94,19 +94,25 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
     }
 
     //  Startup Checks
+    std::deque<ControllerContext<AbstractController>> contexts;
     size_t consoles = m_system.count();
-    for (size_t c = 0; c < consoles; c++){
+    for (size_t console = 0; console < consoles; console++){
         m_option.instance().start_program_controller_check(
-            m_system[c].controller(), c
+            m_system[console].controller(), console
         );
         m_option.instance().start_program_feedback_check(
-            env.consoles[c], c,
+            env.consoles[console], console,
             m_option.descriptor().feedback()
         );
         m_option.instance().start_program_border_check(
-            env.consoles[c], c,
+            env.consoles[console], console,
             m_option.descriptor().feedback()
         );
+
+        size_t controllers = env.consoles[console].controllers();
+        for (size_t controller = 0; controller < controllers; controller++){
+            contexts.emplace_back(scope, env.consoles[console].controller(controller));
+        }
     }
 
     {
@@ -146,22 +152,24 @@ void MultiSwitchProgramSession::internal_stop_program(){
     }
 }
 void MultiSwitchProgramSession::internal_run_program(){
-    CancellableHolder<CancellableScope> download_scope;
     {
-        std::lock_guard<Mutex> lg(program_lock());
-        if (current_state() != ProgramState::RUNNING){
+        CancellableHolder<CancellableScope> download_scope;
+        {
+            std::lock_guard<Mutex> lg(program_lock());
+            if (current_state() != ProgramState::RUNNING){
+                return;
+            }
+            m_scope.store(&download_scope, std::memory_order_release);
+        }
+
+        bool success = download_prereqs(download_scope);
+        {
+            std::lock_guard<Mutex> lg(program_lock());
+            m_scope.store(nullptr, std::memory_order_release);
+        }
+        if (!success){
             return;
         }
-        m_scope.store(&download_scope, std::memory_order_release);
-    }
-
-    bool success = download_prereqs(download_scope);
-    {
-        std::lock_guard<Mutex> lg(program_lock());
-        m_scope.store(nullptr, std::memory_order_release);
-    }    
-    if (!success){
-        return;
     }
         
     auto ScopeCheck = m_sanitizer.check_scope();
@@ -180,7 +188,6 @@ void MultiSwitchProgramSession::internal_run_program(){
     );
 
     size_t consoles = m_system.count();
-    FixedLimitVector<NullController> null_controller_placeholders(consoles);
     FixedLimitVector<ConsoleHandle> handles(consoles);
     for (size_t c = 0; c < consoles; c++){
         SwitchSystemSession& session = m_system[c];
