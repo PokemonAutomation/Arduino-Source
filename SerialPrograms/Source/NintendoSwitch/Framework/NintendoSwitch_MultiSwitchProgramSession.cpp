@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/EarlyShutdown.h"
 #include "Common/Cpp/Concurrency/SpinPause.h"
@@ -116,25 +117,18 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
         m_scope.store(&scope, std::memory_order_release);
     }
 
-    try{
-        m_option.instance().program(env, scope);
+    ScopeExit on_exit([&, this]{
         for (size_t c = 0; c < consoles; c++){
-            ControllerContext<AbstractController> context(scope, env.consoles[c].controller());
-            context.wait_for_all_requests();
-        }
-    }catch (...){
-        for (size_t c = 0; c < consoles; c++){
-            try{
-                env.consoles[c].controller().cancel_all_commands();
-            }catch (...){}
+            env.consoles[c].cancel_all_controllers();
         }
         std::lock_guard<Mutex> lg(program_lock());
         m_scope.store(nullptr, std::memory_order_release);
-        throw;
-    }
+    });
 
-    std::lock_guard<Mutex> lg(program_lock());
-    m_scope.store(nullptr, std::memory_order_release);
+    m_option.instance().program(env, scope);
+    for (size_t c = 0; c < consoles; c++){
+        env.consoles[c].wait_for_all_controllers();
+    }
 }
 void MultiSwitchProgramSession::internal_stop_program(){
     auto ScopeCheck = m_sanitizer.check_scope();
@@ -190,20 +184,7 @@ void MultiSwitchProgramSession::internal_run_program(){
     FixedLimitVector<ConsoleHandle> handles(consoles);
     for (size_t c = 0; c < consoles; c++){
         SwitchSystemSession& session = m_system[c];
-        AbstractController* controller = session.controller().controller();
-        if (controller == nullptr){
-            null_controller_placeholders.emplace_back(session.logger());
-            controller = &null_controller_placeholders.back();
-        }
-        handles.emplace_back(
-            c,
-            session.logger(),
-            *controller,
-            session.video(),
-            session.overlay(),
-            session.audio(),
-            session.stream_history()
-        );
+        handles.emplace_back(session);
 
         ConsoleState& state = handles.back().state();
         if (ConsoleSettings::instance().TRUST_USER_CONSOLE_SELECTION){

@@ -4,11 +4,10 @@
  *
  */
 
-#include "CommonFramework/Recording/StreamHistorySession.h"
 #include "CommonTools/Audio/SpectrogramMatcher.h"
 #include "CommonTools/Audio/AudioTemplateCache.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h"
 #include "Tests/TestUtils.h"
-#include "Controllers/NullController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA_ShinySoundDetector.h"
@@ -55,18 +54,14 @@ public:
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        NullController controller(logger);
-        DummyVideoFeed video_feed;
-        DummyVideoOverlay video_overlay;
-        DummyAudioFeed audio_feed;
-        StreamHistorySession history(logger);
-
-        ConsoleHandle console(0, logger, controller, video_feed, video_overlay, audio_feed, history);
+        SwitchSystemOption option(false);
+        SwitchSystemSession session(option, 0, {});
+        ConsoleHandle console(session);
         ShinySoundDetector detector(console, [&](float error_coefficient) -> bool{
             return true;
         });
 
-        bool result = detector.process_spectrums(m_spectrums, audio_feed);
+        bool result = detector.process_spectrums(m_spectrums, console.audio());
         TEST_RESULT_EQUAL_STR(result, m_expected);
         return true;
     };
