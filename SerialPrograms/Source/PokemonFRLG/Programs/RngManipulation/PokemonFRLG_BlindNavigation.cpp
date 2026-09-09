@@ -720,8 +720,8 @@ void check_timings(
     case PokemonFRLG_RngTarget::entei:
     case PokemonFRLG_RngTarget::suicune:
     case PokemonFRLG_RngTarget::roaming:
-        int offset;
-        int frames;
+        uint64_t offset;
+        uint64_t frames;
         switch (language){
         case Language::Japanese:
             offset = 28500;
