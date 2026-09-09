@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/EarlyShutdown.h"
 #include "Common/Cpp/Concurrency/SpinPause.h"
@@ -18,8 +19,6 @@
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_SingleSwitchProgramOption.h"
 #include "NintendoSwitch_SingleSwitchProgramSession.h"
-
-#define PA_CATCH_PROGRAM_SYSTEM_EXCEPTIONS
 
 //#include <iostream>
 //using std::cout;
@@ -99,27 +98,14 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
         m_scope.store(&context, std::memory_order_release);
     }
 
-#ifdef PA_CATCH_PROGRAM_SYSTEM_EXCEPTIONS
-    try{
-        m_option.instance().program(env, context);
-        context.wait_for_all_requests();
-    }catch (...){
-        try{
-            env.console.controller().cancel_all_commands();
-        }catch (...){}
+    ScopeExit on_exit([&, this]{
+        env.console.cancel_all_controllers();
         std::lock_guard<Mutex> lg(program_lock());
         m_scope.store(nullptr, std::memory_order_release);
-        throw;
-    }
-#else
-    {
-        m_option.instance().program(env, context);
-        context.wait_for_all_requests();
-    }
-#endif
+    });
 
-    std::lock_guard<Mutex> lg(program_lock());
-    m_scope.store(nullptr, std::memory_order_release);
+    m_option.instance().program(env, context);
+    context.wait_for_all_requests();
 }
 void SingleSwitchProgramSession::internal_stop_program(){
     {
@@ -175,12 +161,7 @@ void SingleSwitchProgramSession::internal_run_program(){
         context,
         *this,
         current_stats_tracker(), historical_stats_tracker(),
-        m_system.logger(),
-        *controller,
-        m_system.video(),
-        m_system.overlay(),
-        m_system.audio(),
-        m_system.stream_history()
+        m_system
     );
 
     if (ConsoleSettings::instance().TRUST_USER_CONSOLE_SELECTION){
@@ -256,7 +237,6 @@ void SingleSwitchProgramSession::internal_run_program(){
             message
         );
     }
-#ifdef PA_CATCH_PROGRAM_SYSTEM_EXCEPTIONS
     catch (std::exception& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
         env.console.overlay().add_log("- Program Error -", COLOR_RED);
@@ -278,7 +258,6 @@ void SingleSwitchProgramSession::internal_run_program(){
             "Unknown error."
         );
     }
-#endif
 }
 
 

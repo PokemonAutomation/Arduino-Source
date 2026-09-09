@@ -32,7 +32,6 @@ void PABotBase2_Controller::cancel_all_commands(){
     if (!is_ready()){
         throw InvalidConnectionStateException(error_string());
     }
-    m_logger.log("cancel_all_commands()", COLOR_DARKGREEN);
     m_connection.device().command_queue().send_cancel();
     m_scheduler.clear_on_next();
 }
@@ -41,7 +40,6 @@ void PABotBase2_Controller::replace_on_next_command(){
     if (!is_ready()){
         throw InvalidConnectionStateException(error_string());
     }
-    m_logger.log("replace_on_next_command()", COLOR_DARKGREEN);
     m_connection.device().command_queue().send_replace_on_next();
     m_scheduler.clear_on_next();
 }
