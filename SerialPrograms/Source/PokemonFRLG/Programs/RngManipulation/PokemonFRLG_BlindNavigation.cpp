@@ -720,8 +720,8 @@ void check_timings(
     case PokemonFRLG_RngTarget::entei:
     case PokemonFRLG_RngTarget::suicune:
     case PokemonFRLG_RngTarget::roaming:
-        int offset = 27000; // English
-        int frames = 3400;
+        int offset;
+        int frames;
         switch (language){
         case Language::Japanese:
             offset = 28500;
@@ -730,6 +730,10 @@ void check_timings(
         case Language::Spanish:
             offset = 30000;
             frames = 3580;
+            break;
+        default:
+            offset = 27000; 
+            frames = 3400;
             break;
         }
         if (timings.ingame_delay < offset){

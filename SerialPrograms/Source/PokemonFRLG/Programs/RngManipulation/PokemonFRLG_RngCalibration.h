@@ -83,13 +83,14 @@ void log_calibrations(ConsoleHandle& console, const RngCalibrations& calibration
 RngTimings prepare_timings(
     ConsoleHandle& console,
     PokemonFRLG_RngTarget target,
-    const uint64_t& SEED_DELAY,
-    const uint64_t& CONTINUE_SCREEN_FRAMES,
-    const uint64_t& INGAME_ADVANCES,
-    const bool& USE_TEACHY_TV,
+    uint64_t SEED_DELAY,
+    uint64_t CONTINUE_SCREEN_FRAMES,
+    uint64_t INGAME_ADVANCES,
+    bool USE_TEACHY_TV,
     const RngCalibrations& calibrations,
-    const int64_t& FIXED_SEED_OFFSET, 
-    const int64_t& FIXED_ADVANCES_OFFSET
+    int64_t FIXED_SEED_OFFSET, 
+    int64_t FIXED_ADVANCES_OFFSET,
+    Language LANGUAGE = Language::None
 );
 
 // get search hits for any of the provided seed values and advances range
@@ -98,8 +99,8 @@ std::vector<AdvRngState> get_search_results(
     AdvRngSearcher& searcher, 
     AdvRngFilters& filters,
     const std::vector<uint16_t>& SEED_VALUES,
-    const uint64_t& ADVANCES, 
-    const uint64_t& advances_radius,
+    uint64_t ADVANCES, 
+    uint64_t advances_radius,
     int16_t gender_threshold = 126,
     uint16_t tid_xor_sid = 0
 );
@@ -109,8 +110,8 @@ std::vector<AdvRngState> get_wild_search_results(
     AdvRngWildSearcher& searcher, 
     AdvRngFilters& filters,
     const std::vector<uint16_t>& SEED_VALUES,
-    const uint64_t& ADVANCES, 
-    const uint64_t& advances_radius,
+    uint64_t ADVANCES, 
+    uint64_t advances_radius,
     int16_t gender_threshold = 126,
     bool super_rod = false,
     uint16_t tid_xor_sid = 0
@@ -122,10 +123,10 @@ std::vector<std::pair<AdvRngState,AdvRngState>> get_egg_search_results(
     AdvRngFilters& filters,
     const std::vector<uint16_t>& HELD_SEED_VALUES,
     const std::vector<uint16_t>& PICKUP_SEED_VALUES,
-    const uint64_t& HELD_ADVANCES, 
-    const uint64_t& held_advances_radius,
-    const uint64_t& PICKUP_ADVANCES, 
-    const uint64_t& pickup_advances_radius,
+    uint64_t HELD_ADVANCES, 
+    uint64_t held_advances_radius,
+    uint64_t PICKUP_ADVANCES, 
+    uint64_t pickup_advances_radius,
     AdvIVs& parentA,
     AdvIVs& parentB,
     AdvEggCompatibility compatibility,
@@ -157,26 +158,26 @@ void update_filters(
 uint64_t get_advances_radius(
     ConsoleHandle& console, 
     const RngCalibrationHistory& calibration_history,
-    const uint64_t& initial_radius
+    uint64_t initial_radius
 );
 
 // get seed calibration based on average offset in the RNG calibration history
 double get_seed_calibration_frames(
     const RngCalibrationHistory& history, 
     const std::vector<uint16_t>& seed_values, 
-    const int16_t& seed_position
+    int16_t seed_position
 );
 
 // get advances calibration based on average offset in the RNG calibration history
-double get_advances_calibration(const RngCalibrationHistory& calibration_history, const uint64_t& advances);
+double get_advances_calibration(const RngCalibrationHistory& calibration_history, uint64_t advances);
 
 // get RngCalibrations from the RNG calibration history
 RngCalibrations get_calibrations(
     ConsoleHandle& console,
     const RngCalibrationHistory& history,
     const std::vector<uint16_t>& seed_values,
-    const int16_t& seed_position,
-    const uint64_t& advances,
+    int16_t seed_position,
+    uint64_t advances,
     bool csf_first = false
 );
 
@@ -185,7 +186,7 @@ bool update_history(
     ConsoleHandle& console,
     RngUncertainHistory& advance_history,
     RngCalibrationHistory& calibration_history, 
-    const uint16_t& max_history_length,
+    uint16_t max_history_length,
     const RngCalibrations calibrations,
     const std::vector<AdvRngState>& search_hits,
     uint32_t max_advance_possibilities = 1,
@@ -195,12 +196,12 @@ bool update_history(
 
 bool all_equal(const std::vector<AdvRngState>& search_hits);
 
-bool all_indistinguishable(const std::vector<AdvRngState>& hits, AdvRngSearcher& searcher, const int16_t& gender_threshold);
-bool all_indistinguishable(const std::vector<AdvRngState>& hits, AdvRngWildSearcher& searcher, const int16_t& gender_threshold, bool super_rod);
+bool all_indistinguishable(const std::vector<AdvRngState>& hits, AdvRngSearcher& searcher, int16_t gender_threshold);
+bool all_indistinguishable(const std::vector<AdvRngState>& hits, AdvRngWildSearcher& searcher, int16_t gender_threshold, bool super_rod);
 bool all_indistinguishable(
     const std::vector<std::pair<AdvRngState, AdvRngState>>& hits, 
     AdvRngEggSearcher& searcher,
-    const int16_t& gender_threshold,
+    int16_t gender_threshold,
     AdvIVs& parentA_ivs, AdvIVs& parentB_ivs
 );
 

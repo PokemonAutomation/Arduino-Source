@@ -347,7 +347,7 @@ void RoamingLegendaryRng::program(SingleSwitchProgramEnvironment& env, ProContro
             env.console, TARGET,
             SEED_DELAY, CONTINUE_SCREEN_FRAMES, ingame_advances,
             USE_TEACHY_TV, calibrations,
-            FIXED_SEED_OFFSET, FIXED_ADVANCES_OFFSET
+            FIXED_SEED_OFFSET, FIXED_ADVANCES_OFFSET, LANGUAGE
         );
 
         env.log("Resetting Game...");
