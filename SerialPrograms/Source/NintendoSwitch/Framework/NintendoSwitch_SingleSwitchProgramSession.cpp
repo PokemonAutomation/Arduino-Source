@@ -8,6 +8,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/EarlyShutdown.h"
 #include "Common/Cpp/Concurrency/SpinPause.h"
+#include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
@@ -15,7 +16,6 @@
 #include "CommonFramework/Options/Environment/SleepSuppressOption.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "Controllers/NullController.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_SingleSwitchProgramOption.h"
 #include "NintendoSwitch_SingleSwitchProgramSession.h"
@@ -89,13 +89,17 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
         m_option.descriptor().feedback()
     );
 
-    ControllerContext<AbstractController> context(scope, env.console.controller());
+    size_t controllers = env.console.controllers();
+    FixedLimitVector<ControllerContext<AbstractController>> contexts(controllers);
+    for (size_t c = 0; c < controllers; c++){
+        contexts.emplace_back(scope, env.console.controller(c));
+    }
     {
         std::lock_guard<Mutex> lg(program_lock());
         if (current_state() != ProgramState::RUNNING){
             return;
         }
-        m_scope.store(&context, std::memory_order_release);
+        m_scope.store(&scope, std::memory_order_release);
     }
 
     ScopeExit on_exit([&, this]{
@@ -104,8 +108,8 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
         m_scope.store(nullptr, std::memory_order_release);
     });
 
-    m_option.instance().program(env, context);
-    context.wait_for_all_requests();
+    m_option.instance().program(env, scope);
+    env.console.wait_for_all_controllers();
 }
 void SingleSwitchProgramSession::internal_stop_program(){
     {
@@ -122,22 +126,24 @@ void SingleSwitchProgramSession::internal_stop_program(){
     }
 }
 void SingleSwitchProgramSession::internal_run_program(){
-    CancellableHolder<CancellableScope> scope;
     {
-        std::lock_guard<Mutex> lg(program_lock());
-        if (current_state() != ProgramState::RUNNING){
+        CancellableHolder<CancellableScope> scope;
+        {
+            std::lock_guard<Mutex> lg(program_lock());
+            if (current_state() != ProgramState::RUNNING){
+                return;
+            }
+            m_scope.store(&scope, std::memory_order_release);
+        }
+        bool success = download_prereqs(scope);
+        {
+            std::lock_guard<Mutex> lg(program_lock());
+            m_scope.store(nullptr, std::memory_order_release);
+        }
+
+        if (!success){
             return;
         }
-        m_scope.store(&scope, std::memory_order_release);
-    }
-    bool success = download_prereqs(scope);
-    {
-        std::lock_guard<Mutex> lg(program_lock());
-        m_scope.store(nullptr, std::memory_order_release);
-    }
-
-    if (!success){
-        return;
     }
 
     m_option.options().reset_state();
@@ -150,15 +156,10 @@ void SingleSwitchProgramSession::internal_run_program(){
         m_option.descriptor().display_name(),
         timestamp()
     );
-    NullController null_controller(m_system.logger());
-    AbstractController* controller = m_system.controller().controller();
-    if (controller == nullptr){
-        controller = &null_controller;
-    }
-    ControllerContext<AbstractController> context(*controller);
+    CancellableHolder<CancellableScope> scope;
     SingleSwitchProgramEnvironment env(
         program_info,
-        context,
+        scope,
         *this,
         current_stats_tracker(), historical_stats_tracker(),
         m_system
@@ -175,7 +176,7 @@ void SingleSwitchProgramSession::internal_run_program(){
         logger().log("<b>Starting Program: " + identifier() + "</b>");
         env.console.overlay().clear_log();
         env.console.overlay().add_log("- Starting Program -");
-        run_program_instance(env, context);
+        run_program_instance(env, scope);
         env.console.overlay().add_log("- Program Finished -");
         logger().log("Program finished normally!", COLOR_BLUE);
     }catch (OperationCancelledException&){
