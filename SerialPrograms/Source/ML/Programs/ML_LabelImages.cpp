@@ -150,7 +150,16 @@ LabelImages::~LabelImages(){
     FORM_LABEL.remove_listener(*this);
 }
 
-void LabelImages::from_json(const JsonValue& json){
+JsonValue LabelImages::to_json() const{
+    JsonObject obj = std::move(*m_options.to_json().to_object());
+    obj["ImageSetup"] = m_display_option.to_json();
+    obj["CUSTOM_LABEL_SET_FILE_PATH"] = m_custom_label_set_file_path;
+    obj["YOLO_CONFIG_FILE_PATH"] = m_yolo_config_file_path;
+
+    save_annotation_to_file();
+    return obj;
+}
+void LabelImages::load_json(const JsonValue& json){
     const JsonObject* obj = json.to_object();
     if (obj == nullptr){
         return;
@@ -169,15 +178,6 @@ void LabelImages::from_json(const JsonValue& json){
     if (file_path){
         m_yolo_config_file_path = *file_path;
     }
-}
-JsonValue LabelImages::to_json() const{
-    JsonObject obj = std::move(*m_options.to_json().to_object());
-    obj["ImageSetup"] = m_display_option.to_json();
-    obj["CUSTOM_LABEL_SET_FILE_PATH"] = m_custom_label_set_file_path;
-    obj["YOLO_CONFIG_FILE_PATH"] = m_yolo_config_file_path;
-
-    save_annotation_to_file();
-    return obj;
 }
 
 void LabelImages::init_sam_session(bool use_gpu){
@@ -278,7 +278,7 @@ void LabelImages::load_image_related_data(const std::string& image_path, size_t 
 
     for (size_t i = 0; i < json_array->size(); i++){
         try{
-            ObjectAnnotation anno_obj = ObjectAnnotation::from_json((*json_array)[i]);
+            ObjectAnnotation anno_obj = ObjectAnnotation::load_json((*json_array)[i]);
             m_annotations.emplace_back(std::move(anno_obj));
         }catch (JsonParseException&){
             m_fail_to_load_annotation_file = true;

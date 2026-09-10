@@ -255,6 +255,35 @@ GlobalSettings::GlobalSettings()
     OPEN_BASE_FOLDER_BUTTON.add_listener(static_cast<ButtonListener&>(*this));
 }
 
+JsonValue GlobalSettings::to_json() const{
+    JsonObject obj = std::move(*BatchOption::to_json().to_object());
+    obj["NAUGHTY_MODE"] = STATIC_GLOBALS.NAUGHTY_MODE;
+
+    JsonObject command_line_test_obj;
+    command_line_test_obj["RUN"] = COMMAND_LINE_TEST_MODE;
+    command_line_test_obj["FOLDER"] = COMMAND_LINE_TEST_FOLDER;
+
+    {
+        JsonArray test_list;
+        for (const auto& name : COMMAND_LINE_TEST_LIST){
+            test_list.push_back(name);
+        }
+        command_line_test_obj["TEST_LIST"] = std::move(test_list);
+    }
+
+    {
+        JsonArray ignore_list;
+        for (const auto& name : COMMAND_LINE_IGNORE_LIST){
+            ignore_list.push_back(name);
+        }
+        command_line_test_obj["IGNORE_LIST"] = std::move(ignore_list);
+    }
+
+    obj["COMMAND_LINE_TESTS"] = std::move(command_line_test_obj);
+    obj["DEBUG"] = STATIC_GLOBALS.to_json_debug();
+
+    return obj;
+}
 void GlobalSettings::load_json(const JsonValue& json){
     const JsonObject* obj = json.to_object();
     if (obj == nullptr){
@@ -343,35 +372,6 @@ void GlobalSettings::load_json(const JsonValue& json){
 }
 
 
-JsonValue GlobalSettings::to_json() const{
-    JsonObject obj = std::move(*BatchOption::to_json().to_object());
-    obj["NAUGHTY_MODE"] = STATIC_GLOBALS.NAUGHTY_MODE;
-
-    JsonObject command_line_test_obj;
-    command_line_test_obj["RUN"] = COMMAND_LINE_TEST_MODE;
-    command_line_test_obj["FOLDER"] = COMMAND_LINE_TEST_FOLDER;
-
-    {
-        JsonArray test_list;
-        for (const auto& name : COMMAND_LINE_TEST_LIST){
-            test_list.push_back(name);
-        }
-        command_line_test_obj["TEST_LIST"] = std::move(test_list);
-    }
-
-    {
-        JsonArray ignore_list;
-        for (const auto& name : COMMAND_LINE_IGNORE_LIST){
-            ignore_list.push_back(name);
-        }
-        command_line_test_obj["IGNORE_LIST"] = std::move(ignore_list);
-    }
-
-    obj["COMMAND_LINE_TESTS"] = std::move(command_line_test_obj);
-    obj["DEBUG"] = STATIC_GLOBALS.to_json_debug();
-
-    return obj;
-}
 
 void GlobalSettings::on_config_value_changed(void* object){
     bool enabled = ENABLE_LIFETIME_SANITIZER0;

@@ -56,8 +56,8 @@ public:
     //  do some optional additional stuff, e.g. open a file selection dialog
     //  box to continue user interaction.
     virtual void run_post_select(){};
-    virtual void load_json(const JsonValue& json) = 0;
     virtual JsonValue to_json() const = 0;
+    virtual void load_json(const JsonValue& json) = 0;
 
 public:
     virtual std::unique_ptr<VideoSource> make_VideoSource(

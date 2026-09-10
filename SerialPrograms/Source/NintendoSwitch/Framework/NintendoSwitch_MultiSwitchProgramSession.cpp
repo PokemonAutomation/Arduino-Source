@@ -100,7 +100,12 @@ ConfigOption& MultiSwitchProgramSession::options(){
 }
 
 
-void MultiSwitchProgramSession::from_json(const JsonValue& json){
+JsonValue MultiSwitchProgramSession::to_json() const{
+    JsonObject obj = std::move(*m_instance->to_json().to_object());
+    obj["SwitchSetup"] = m_system_option.to_json();
+    return obj;
+}
+void MultiSwitchProgramSession::load_json(const JsonValue& json){
     const JsonObject* obj = json.to_object();
     if (obj == nullptr){
         return;
@@ -109,12 +114,7 @@ void MultiSwitchProgramSession::from_json(const JsonValue& json){
     if (value){
         m_system.load_json(*value);
     }
-    m_instance->from_json(json);
-}
-JsonValue MultiSwitchProgramSession::to_json() const{
-    JsonObject obj = std::move(*m_instance->to_json().to_object());
-    obj["SwitchSetup"] = m_system_option.to_json();
-    return obj;
+    m_instance->load_json(json);
 }
 QWidget* MultiSwitchProgramSession::make_widget(QWidget& parent){
     return new MultiSwitchProgramWidget2(parent, *this);

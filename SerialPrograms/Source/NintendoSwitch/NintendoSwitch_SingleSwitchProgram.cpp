@@ -141,11 +141,11 @@ void SingleSwitchProgramInstance::start_program_border_check(
 void SingleSwitchProgramInstance::add_option(ConfigOption& option, std::string serialization_string){
     m_options.add_option(option, std::move(serialization_string));
 }
-void SingleSwitchProgramInstance::from_json(const JsonValue& json){
-    m_options.load_json(json);
-}
 JsonValue SingleSwitchProgramInstance::to_json() const{
     return m_options.to_json();
+}
+void SingleSwitchProgramInstance::load_json(const JsonValue& json){
+    m_options.load_json(json);
 }
 std::string SingleSwitchProgramInstance::check_validity() const{
     return m_options.check_validity();

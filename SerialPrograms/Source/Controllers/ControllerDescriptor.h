@@ -102,8 +102,8 @@ public:
     virtual std::string display_name() const = 0;
 
 public:
-    virtual void load_json(const JsonValue& json) = 0;
     virtual JsonValue to_json() const = 0;
+    virtual void load_json(const JsonValue& json) = 0;
 
 public:
     virtual std::unique_ptr<ControllerConnection> open_connection(Logger& logger) const = 0;

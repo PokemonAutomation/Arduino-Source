@@ -47,9 +47,17 @@ SwitchSystemOption::SwitchSystemOption(
 {
     load_json(json);
 }
+JsonValue SwitchSystemOption::to_json() const{
+    JsonValue ret = ConsoleSystemOption::to_json();
+    JsonObject& root = ret.to_object_throw();
+    root[JSON_CONSOLE_TYPE] = m_console_type.to_json();
+    return ret;
+}
 void SwitchSystemOption::load_json(const JsonValue& json){
     ConsoleSystemOption::load_json(json);
-
+    load_json_self(json);
+}
+void SwitchSystemOption::load_json_self(const JsonValue& json){
     const JsonObject* obj = json.to_object();
     if (obj == nullptr){
         return;
@@ -60,12 +68,6 @@ void SwitchSystemOption::load_json(const JsonValue& json){
     if (value){
         m_console_type.load_json(*value);
     }
-}
-JsonValue SwitchSystemOption::to_json() const{
-    JsonValue ret = ConsoleSystemOption::to_json();
-    JsonObject& root = ret.to_object_throw();
-    root[JSON_CONSOLE_TYPE] = m_console_type.to_json();
-    return ret;
 }
 
 

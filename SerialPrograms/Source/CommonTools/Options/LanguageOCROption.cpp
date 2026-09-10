@@ -67,6 +67,9 @@ void LanguageOCRCell::set(Language language){
 }
 
 
+JsonValue LanguageOCRCell::to_json() const{
+    return language_data((Language)*this).code;
+}
 void LanguageOCRCell::load_json(const JsonValue& json){
     const std::string* str = json.to_string();
     if (str == nullptr){
@@ -91,9 +94,6 @@ void LanguageOCRCell::load_json(const JsonValue& json){
     }
     m_current.store(iter->second, std::memory_order_relaxed);
     report_value_changed(this);
-}
-JsonValue LanguageOCRCell::to_json() const{
-    return language_data((Language)*this).code;
 }
 
 std::string LanguageOCRCell::check_validity() const{

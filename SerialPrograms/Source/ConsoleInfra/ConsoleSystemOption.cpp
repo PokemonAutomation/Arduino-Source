@@ -49,6 +49,23 @@ ConsoleSystemOption::ConsoleSystemOption(
 {
     ConsoleSystemOption::load_json(json);
 }
+JsonValue ConsoleSystemOption::to_json() const{
+    JsonObject root;
+    root[JSON_VIDEO] = m_video.to_json();
+    root[JSON_AUDIO] = m_audio.to_json();
+    root[JSON_OVERLAY] = m_overlay.to_json();
+    if (m_controllers.size() == 1){
+        root[JSON_CONTROLLER] = m_controllers[0].to_json();
+    }else{
+        JsonArray list;
+        for (const ControllerOption& controller : m_controllers){
+            list.push_back(controller.to_json());
+        }
+        root[JSON_CONTROLLERS] = std::move(list);
+    }
+
+    return root;
+}
 void ConsoleSystemOption::load_json(const JsonValue& json){
     const JsonObject* obj = json.to_object();
     if (obj == nullptr){
@@ -78,28 +95,11 @@ void ConsoleSystemOption::load_json(const JsonValue& json){
         for (; c < stop; c++){
             m_controllers[c].load_json((*array)[c]);
         }
-        stop = m_controllers.size();
-        for (; c < stop; c++){
-            m_controllers[c].set_descriptor(null_controller_descriptor());
-        }
+//        stop = m_controllers.size();
+//        for (; c < stop; c++){
+//            m_controllers[c].set_descriptor(null_controller_descriptor());
+//        }
     }
-}
-JsonValue ConsoleSystemOption::to_json() const{
-    JsonObject root;
-    root[JSON_VIDEO] = m_video.to_json();
-    root[JSON_AUDIO] = m_audio.to_json();
-    root[JSON_OVERLAY] = m_overlay.to_json();
-    if (m_controllers.size() == 1){
-        root[JSON_CONTROLLER] = m_controllers[0].to_json();
-    }else{
-        JsonArray list;
-        for (const ControllerOption& controller : m_controllers){
-            list.push_back(controller.to_json());
-        }
-        root[JSON_CONTROLLERS] = std::move(list);
-    }
-
-    return root;
 }
 
 

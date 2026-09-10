@@ -272,22 +272,21 @@ void SingleSwitchProgramSession::internal_run_program(){
 }
 
 
-void SingleSwitchProgramSession::from_json(const JsonValue& json){
+JsonValue SingleSwitchProgramSession::to_json() const{
+    JsonObject obj = std::move(*m_instance->to_json().to_object());
+    obj["SwitchSetup"] = m_system_option.to_json();
+    return obj;
+}
+void SingleSwitchProgramSession::load_json(const JsonValue& json){
     const JsonObject* obj = json.to_object();
     if (obj == nullptr){
         return;
     }
     const JsonValue* value = obj->get_value("SwitchSetup");
     if (value){
-        SwitchSystemOption option(m_system_option.m_allow_commands_while_locked, *value);
-        m_system.load(option);
+        m_system.load_json(*value);
     }
-    m_instance->from_json(json);
-}
-JsonValue SingleSwitchProgramSession::to_json() const{
-    JsonObject obj = std::move(*m_instance->to_json().to_object());
-    obj["SwitchSetup"] = m_system_option.to_json();
-    return obj;
+    m_instance->load_json(json);
 }
 QWidget* SingleSwitchProgramSession::make_widget(QWidget& parent){
     return new SingleSwitchProgramWidget2(parent, *this);

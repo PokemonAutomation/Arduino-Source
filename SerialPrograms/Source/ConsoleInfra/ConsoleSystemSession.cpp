@@ -104,34 +104,23 @@ std::string ConsoleSystemSession::status() const{
     return m_status_text;
 }
 
-void ConsoleSystemSession::save(ConsoleSystemOption& option) const{
+JsonValue ConsoleSystemSession::to_json() const{
     std::lock_guard<Mutex> lg(m_lock);
-
-    m_video.save(option.m_video);
-    m_audio.save(option.m_audio);
-    m_overlay.save(option.m_overlay);
-
-    option.m_controllers = m_option.m_controllers;
+    return m_option.to_json();
 }
-void ConsoleSystemSession::load(const ConsoleSystemOption& option){
+void ConsoleSystemSession::load_json(const JsonValue& json){
     std::lock_guard<Mutex> lg(m_lock);
 
-    m_video.load(option.m_video);
-    m_audio.load(option.m_audio);
-    m_overlay.load(option.m_overlay);
+    m_option.load_json(json);
+    m_video.load(m_option.m_video);
+    m_audio.load(m_option.m_audio);
+    m_overlay.load(m_option.m_overlay);
 
     size_t c = 0;
 
-    size_t stop = std::min(m_option.m_controllers.size(), option.m_controllers.size());
+    size_t stop = m_option.m_controllers.size();
     for (; c < stop; c++){
-        m_option.m_controllers[c] = option.m_controllers[c];
-        m_controllers[c].session.load(option.m_controllers[c]);
-    }
-
-    stop = m_option.m_controllers.size();
-    for (; c < stop; c++){
-        m_option.m_controllers[c].set_descriptor(null_controller_descriptor());
-        m_controllers[c].session.set_device(m_option.m_controllers[c].descriptor());
+        m_controllers[c].session.load(m_option.m_controllers[c]);
     }
 }
 

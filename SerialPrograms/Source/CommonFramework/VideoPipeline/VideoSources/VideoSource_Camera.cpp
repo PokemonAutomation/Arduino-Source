@@ -26,14 +26,14 @@ std::string VideoSourceDescriptor_Camera::display_name() const{
     return get_camera_name(m_info);
 }
 
+JsonValue VideoSourceDescriptor_Camera::to_json() const{
+    return m_info.device_name();
+}
 void VideoSourceDescriptor_Camera::load_json(const JsonValue& json){
     const std::string* name = json.to_string();
     if (name != nullptr){
         m_info = CameraInfo(*name);
     }
-}
-JsonValue VideoSourceDescriptor_Camera::to_json() const{
-    return m_info.device_name();
 }
 
 std::unique_ptr<VideoSource> VideoSourceDescriptor_Camera::make_VideoSource(

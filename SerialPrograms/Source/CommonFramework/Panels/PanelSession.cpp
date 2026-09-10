@@ -29,19 +29,19 @@ PanelSession::PanelSession(const PanelDescriptor& descriptor)
     }
 }
 
-void PanelSession::from_json(){
+void PanelSession::load_json(){
     JsonValue* node = PERSISTENT_SETTINGS().panels.get_value(m_descriptor.identifier());
     if (node == nullptr){
         return;
     }
-    from_json(*node);
+    load_json(*node);
 }
 
-void PanelSession::from_json(const JsonValue& json){
-
-}
 JsonValue PanelSession::to_json() const{
     return JsonValue();
+}
+void PanelSession::load_json(const JsonValue& json){
+
 }
 void PanelSession::save_settings() const{
     const std::string& identifier = m_descriptor.identifier();

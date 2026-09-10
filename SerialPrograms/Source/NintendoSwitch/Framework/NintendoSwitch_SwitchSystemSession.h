@@ -46,6 +46,11 @@ public:
     ConsoleModelCell& console_type(){ return m_option.m_console_type; }
 
 
+public:
+    virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
+
+
 private:
     SwitchSystemOption& m_option;
     std::optional<uint64_t> m_console_id;

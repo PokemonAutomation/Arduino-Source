@@ -91,8 +91,8 @@ public:
     virtual AudioFeed& audio_feed() override{ return audio(); }
     virtual ControllerSession& controller() override{ return ConsoleSystemSession::controller(0); };
 
-    virtual void save(ConsoleSystemOption& option) const;
-    virtual void load(const ConsoleSystemOption& option);
+    virtual JsonValue to_json() const;
+    virtual void load_json(const JsonValue& json);
 
 
 public:

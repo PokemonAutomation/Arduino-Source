@@ -34,11 +34,11 @@ SwitchViewer::SwitchViewer(const SwitchViewer_Descriptor& descriptor)
         1, 4, 1
     )
 {}
-void SwitchViewer::from_json(const JsonValue& json){
-    m_switches.load_json(json);
-}
 JsonValue SwitchViewer::to_json() const{
     return m_switches.to_json();
+}
+void SwitchViewer::load_json(const JsonValue& json){
+    m_switches.load_json(json);
 }
 QWidget* SwitchViewer::make_widget(QWidget& parent){
     return SwitchViewer_Widget::make(parent, *this);

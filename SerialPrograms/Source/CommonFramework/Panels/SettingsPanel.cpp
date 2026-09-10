@@ -16,11 +16,11 @@ SettingsPanelInstance::SettingsPanelInstance(const PanelDescriptor& descriptor)
     , m_options(LockMode::LOCK_WHILE_RUNNING)
 {}
 
-void SettingsPanelInstance::from_json(const JsonValue& json){
-    m_options.load_json(json);
-}
 JsonValue SettingsPanelInstance::to_json() const{
     return m_options.to_json();
+}
+void SettingsPanelInstance::load_json(const JsonValue& json){
+    m_options.load_json(json);
 }
 
 

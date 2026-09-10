@@ -34,11 +34,11 @@ bool NullControllerDescriptor::operator==(const ControllerDescriptor& x) const{
 std::string NullControllerDescriptor::display_name() const{
     return "(none)";
 }
-void NullControllerDescriptor::load_json(const JsonValue& json){
-
-}
 JsonValue NullControllerDescriptor::to_json() const{
     return JsonValue();
+}
+void NullControllerDescriptor::load_json(const JsonValue& json){
+
 }
 std::unique_ptr<ControllerConnection> NullControllerDescriptor::open_connection(Logger& logger) const{
     return nullptr;

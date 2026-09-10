@@ -27,6 +27,14 @@ EncounterFilterOption::EncounterFilterOption(bool rare_stars, bool enable_overri
     , m_shiny_filter_current(m_shiny_filter_default)
     , m_table(rare_stars)
 {}
+JsonValue EncounterFilterOption::to_json() const{
+    JsonObject obj;
+    obj["ShinyFilter"] = ShinyFilter_NAMES[(size_t)m_shiny_filter_current.load(std::memory_order_relaxed)];
+    if (m_enable_overrides){
+        obj["Overrides"] = m_table.to_json();
+    }
+    return obj;
+}
 void EncounterFilterOption::load_json(const JsonValue& json){
     using namespace Pokemon;
 
@@ -46,14 +54,6 @@ void EncounterFilterOption::load_json(const JsonValue& json){
             m_table.load_json(*value);
         }
     }
-}
-JsonValue EncounterFilterOption::to_json() const{
-    JsonObject obj;
-    obj["ShinyFilter"] = ShinyFilter_NAMES[(size_t)m_shiny_filter_current.load(std::memory_order_relaxed)];
-    if (m_enable_overrides){
-        obj["Overrides"] = m_table.to_json();
-    }
-    return obj;
 }
 void EncounterFilterOption::restore_defaults(){
     m_shiny_filter_current = m_shiny_filter_default;

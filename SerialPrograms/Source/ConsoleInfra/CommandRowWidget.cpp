@@ -148,10 +148,7 @@ CommandRowWidget::CommandRowWidget(
                 m_session.allow_commands_while_locked()
             );
 
-            //  Deserialize into this local option instance.
-            option.load_json(load_json_file(path));
-
-            m_session.load(option);
+            m_session.load_json(load_json_file(path));
         }
     );
     connect(
@@ -173,9 +170,7 @@ CommandRowWidget::CommandRowWidget(
                 m_session.allow_commands_while_locked()
             );
 
-            m_session.save(option);
-
-            option.to_json().dump(path);
+            m_session.to_json().dump(path);
         }
     );
     connect(

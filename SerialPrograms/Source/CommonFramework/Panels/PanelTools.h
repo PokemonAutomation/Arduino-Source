@@ -98,7 +98,7 @@ std::unique_ptr<PanelDescriptor> make_panel(){
 template <typename Descriptor, typename Instance>
 std::unique_ptr<PanelDescriptor> make_settings(){
     auto ret = std::make_unique<PanelDescriptorWrapper<Descriptor, Instance>>();
-    ret->make_panel()->from_json();
+    ret->make_panel()->load_json();
     return ret;
 }
 
