@@ -175,7 +175,6 @@ public:
 
 
 protected:
-    friend class MultiSwitchProgramOption;
     friend class MultiSwitchProgramSession;
 
     BatchOption m_options;

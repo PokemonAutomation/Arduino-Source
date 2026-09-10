@@ -5,15 +5,15 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Options/Environment/PerformanceOptions.h"
-#include "ComputerProgramOption.h"
 #include "ComputerProgramSession.h"
+#include "ComputerProgramWidget.h"
 
 //#include <iostream>
 //using std::cout;
@@ -22,9 +22,11 @@
 namespace PokemonAutomation{
 
 
-ComputerProgramSession::ComputerProgramSession(ComputerProgramOption& option)
-    : ProgramSession(option.descriptor())
-    , m_option(option)
+ComputerProgramSession::ComputerProgramSession(const ComputerProgramDescriptor& descriptor)
+    : PanelSession(descriptor)
+    , ProgramSession(descriptor)
+    , m_descriptor(descriptor)
+    , m_instance(descriptor.make_instance())
 {}
 
 ComputerProgramSession::~ComputerProgramSession(){
@@ -40,14 +42,27 @@ void ComputerProgramSession::restore_defaults(){
         return;
     }
     logger().log("Restoring settings to defaults...");
-    m_option.restore_defaults();
+    m_instance->restore_defaults();
+}
+ConfigOption& ComputerProgramSession::options(){
+    return m_instance->m_options;
 }
 std::string ComputerProgramSession::check_validity() const{
-    return m_option.check_validity();
+    return m_instance->check_validity();
 }
 
 
 
+
+JsonValue ComputerProgramSession::to_json() const{
+    return m_instance->to_json();
+}
+void ComputerProgramSession::load_json(const JsonValue& json){
+    m_instance->load_json(json);
+}
+QWidget* ComputerProgramSession::make_widget(QWidget& parent){
+    return new ComputerProgramWidget(parent, *this);
+}
 
 
 void ComputerProgramSession::run_program_instance(ProgramEnvironment& env, CancellableScope& scope){
@@ -65,7 +80,7 @@ void ComputerProgramSession::run_program_instance(ProgramEnvironment& env, Cance
     }
 
     try{
-        m_option.instance().program(env, scope);
+        m_instance->program(env, scope);
     }catch (...){
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_scope = nullptr;
@@ -95,12 +110,12 @@ void ComputerProgramSession::internal_run_program(){
         return;
     }
 
-    m_option.options().reset_state();
+    options().reset_state();
 
     ProgramInfo program_info(
         identifier(),
-        m_option.descriptor().category(),
-        m_option.descriptor().display_name(),
+        m_descriptor.category(),
+        m_descriptor.display_name(),
         timestamp()
     );
     CancellableHolder<CancellableScope> scope;
@@ -119,7 +134,7 @@ void ComputerProgramSession::internal_run_program(){
     }catch (ProgramCancelledException&){
     }catch (ProgramFinishedException& e){
         logger().log("Program finished early!", COLOR_BLUE);
-        send_program_finished_notification(env, m_option.instance().NOTIFICATION_PROGRAM_FINISH, e.message(), *e.screenshot());
+        send_program_finished_notification(env, m_instance->NOTIFICATION_PROGRAM_FINISH, e.message(), *e.screenshot());
     }catch (InvalidConnectionStateException&){
     }catch (OperationFailedExceptionWithScreenshot& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
@@ -128,7 +143,7 @@ void ComputerProgramSession::internal_run_program(){
             message = e.name();
         }
         report_error(message);
-        e.send_fatal_error_notif_and_telemetry_report(env, m_option.instance().NOTIFICATION_ERROR_FATAL);
+        e.send_fatal_error_notif_and_telemetry_report(env, m_instance->NOTIFICATION_ERROR_FATAL);
     }catch (OperationFailedException& e){ // no screenshot
         logger().log("Program stopped with an exception!", COLOR_RED);
         std::string message = e.message();
@@ -136,7 +151,7 @@ void ComputerProgramSession::internal_run_program(){
             message = e.name();
         }
         report_error(message);
-        e.send_fatal_error_notif_and_telemetry_report(env, m_option.instance().NOTIFICATION_ERROR_FATAL);
+        e.send_fatal_error_notif_and_telemetry_report(env, m_instance->NOTIFICATION_ERROR_FATAL);
     }catch (FatalProgramException& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
         std::string message = e.message();
@@ -144,7 +159,7 @@ void ComputerProgramSession::internal_run_program(){
             message = e.name();
         }
         report_error(message);
-        e.send_fatal_error_notif_and_telemetry_report(env, m_option.instance().NOTIFICATION_ERROR_FATAL);
+        e.send_fatal_error_notif_and_telemetry_report(env, m_instance->NOTIFICATION_ERROR_FATAL);
     }catch (Exception& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
         std::string message = e.message();
@@ -153,7 +168,7 @@ void ComputerProgramSession::internal_run_program(){
         }
         report_error(message);
         send_program_fatal_error_notification(
-            env, m_option.instance().NOTIFICATION_ERROR_FATAL,
+            env, m_instance->NOTIFICATION_ERROR_FATAL,
             message
         );
     }catch (std::exception& e){
@@ -164,14 +179,14 @@ void ComputerProgramSession::internal_run_program(){
         }
         report_error(message);
         send_program_fatal_error_notification(
-            env, m_option.instance().NOTIFICATION_ERROR_FATAL,
+            env, m_instance->NOTIFICATION_ERROR_FATAL,
             message
         );
     }catch (...){
         logger().log("Program stopped with an exception!", COLOR_RED);
         report_error("Unknown error.");
         send_program_fatal_error_notification(
-            env, m_option.instance().NOTIFICATION_ERROR_FATAL,
+            env, m_instance->NOTIFICATION_ERROR_FATAL,
             "Unknown error."
         );
     }

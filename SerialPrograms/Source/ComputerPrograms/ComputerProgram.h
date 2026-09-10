@@ -76,7 +76,7 @@ public:
 
 
 protected:
-    friend class ComputerProgramOption;
+    friend class ComputerProgramSession;
 
     BatchOption m_options;
     void add_option(ConfigOption& option, std::string serialization_string);
