@@ -63,8 +63,8 @@ private:
     virtual void shutdown() override;
     virtual void startup(size_t switch_count) override;
 
-    virtual void from_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
     virtual QWidget* make_widget(QWidget& parent) override;
 
 

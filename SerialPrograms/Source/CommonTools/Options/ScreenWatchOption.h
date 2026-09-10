@@ -50,8 +50,8 @@ public:
         double default_width = 1, double default_height = 1
     );
 
-//    virtual void load_json(const JsonValue& json) override;
 //    virtual JsonValue to_json() const override;
+//    virtual void load_json(const JsonValue& json) override;
 
 //    virtual void restore_defaults() override;
 

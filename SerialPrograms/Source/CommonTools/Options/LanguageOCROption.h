@@ -31,8 +31,8 @@ public:
     operator Language() const{ return m_case_list[m_current.load(std::memory_order_relaxed)].first; }
     void set(Language language);
 
-    virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
 
     virtual std::string check_validity() const override;
     virtual void restore_defaults() override;

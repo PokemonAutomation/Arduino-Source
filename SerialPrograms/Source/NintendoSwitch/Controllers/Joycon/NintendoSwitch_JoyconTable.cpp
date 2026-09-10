@@ -119,6 +119,14 @@ std::unique_ptr<EditableTableRow> JoyconStateRow::clone() const{
     return ret;
 }
 
+JsonValue JoyconStateRow::to_json() const{
+    JoyconState state;
+    get_state(state);
+
+    JsonObject json = state.to_json();
+    json["ms"] = DURATION.to_json();
+    return json;
+}
 void JoyconStateRow::load_json(const JsonValue& json){
     const JsonObject& obj = json.to_object_throw();
 
@@ -137,14 +145,6 @@ void JoyconStateRow::load_json(const JsonValue& json){
     BUTTONS.replace_all(state.buttons);
     JOYSTICK_X.set(state.joystick.x);
     JOYSTICK_Y.set(state.joystick.y);
-}
-JsonValue JoyconStateRow::to_json() const{
-    JoyconState state;
-    get_state(state);
-
-    JsonObject json = state.to_json();
-    json["ms"] = DURATION.to_json();
-    return json;
 }
 
 void JoyconStateRow::get_state(JoyconState& state) const{

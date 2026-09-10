@@ -37,11 +37,11 @@ VirtualConsole::VirtualConsole(const VirtualConsole_Descriptor& descriptor)
     : PanelSession(descriptor)
     , m_console_options(descriptor.m_controllers, true)
 {}
-void VirtualConsole::from_json(const JsonValue& json){
-    m_console_options.load_json(json);
-}
 JsonValue VirtualConsole::to_json() const{
     return m_console_options.to_json();
+}
+void VirtualConsole::load_json(const JsonValue& json){
+    m_console_options.load_json(json);
 }
 QWidget* VirtualConsole::make_widget(QWidget& parent){
     return VirtualConsole_Widget::make(parent, *this);

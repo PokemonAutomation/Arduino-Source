@@ -39,9 +39,9 @@ public:
 
 public:
     //  Serialization
-    void from_json();
-    virtual void from_json(const JsonValue& json);
+    void load_json();
     virtual JsonValue to_json() const;
+    virtual void load_json(const JsonValue& json);
 
 
 protected:

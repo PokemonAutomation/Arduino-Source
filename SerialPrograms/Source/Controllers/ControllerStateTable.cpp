@@ -232,6 +232,17 @@ void ControllerCommandTable::load_json_NS_TurboMacro(const JsonValue& json){
     load_json(value);
 }
 
+JsonValue ControllerCommandTable::to_json() const{
+    JsonObject obj;
+    obj["ControllerClass"] = CONTROLLER_CLASS_STRINGS().get_string(m_type);
+    JsonArray history;
+    run_on_all_rows<ControllerStateRow>([&](const ControllerStateRow& row){
+        history.push_back(row.to_json());
+        return false;
+    });
+    obj["Schedule"] = std::move(history);
+    return obj;
+}
 void ControllerCommandTable::load_json(const JsonValue& json){
     clear();
 
@@ -261,17 +272,6 @@ void ControllerCommandTable::load_json(const JsonValue& json){
     }
 
     EditableTableOption::load_json(*value);
-}
-JsonValue ControllerCommandTable::to_json() const{
-    JsonObject obj;
-    obj["ControllerClass"] = CONTROLLER_CLASS_STRINGS().get_string(m_type);
-    JsonArray history;
-    run_on_all_rows<ControllerStateRow>([&](const ControllerStateRow& row){
-        history.push_back(row.to_json());
-        return false;
-    });
-    obj["Schedule"] = std::move(history);
-    return obj;
 }
 
 std::vector<std::string> ControllerCommandTable::make_header() const{

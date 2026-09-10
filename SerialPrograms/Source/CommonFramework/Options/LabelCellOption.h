@@ -47,8 +47,8 @@ public:
 
     void set_text(std::string x);
 
-    virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
 
     virtual void restore_defaults() override{}
 

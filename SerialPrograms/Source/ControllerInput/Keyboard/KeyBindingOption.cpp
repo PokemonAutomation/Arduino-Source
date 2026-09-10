@@ -59,12 +59,12 @@ void KeyboardHidBindingCell::set(std::string text){
 
 
 
-void KeyboardHidBindingCell::load_json(const JsonValue& json){
-    set((KeyboardKey)json.to_integer_default(0));
-}
 JsonValue KeyboardHidBindingCell::to_json() const{
     ReadSpinLock lg(m_data->m_lock);
     return (uint64_t)m_data->m_current;
+}
+void KeyboardHidBindingCell::load_json(const JsonValue& json){
+    set((KeyboardKey)json.to_integer_default(0));
 }
 
 void KeyboardHidBindingCell::restore_defaults(){

@@ -67,8 +67,8 @@ class GlobalSettings : public BatchOption, private ConfigOption::Listener, priva
 public:
     static GlobalSettings& instance();
 
-    virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
 
     void connect_row_with_download(const std::string& resource_slug, std::shared_ptr<ResourceDownload>& download_ptr);
 

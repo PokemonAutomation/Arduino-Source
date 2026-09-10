@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/Json/JsonValue.h"
-#include "Common/Cpp/Json/JsonObject.h"
 #include "ComputerProgramOption.h"
 #include "ComputerProgramWidget.h"
 
@@ -20,11 +19,11 @@ ComputerProgramOption::ComputerProgramOption(const ComputerProgramDescriptor& de
     , m_instance(descriptor.make_instance())
 {}
 
-void ComputerProgramOption::from_json(const JsonValue& json){
-    m_instance->from_json(json);
-}
 JsonValue ComputerProgramOption::to_json() const{
     return m_instance->to_json();
+}
+void ComputerProgramOption::load_json(const JsonValue& json){
+    m_instance->load_json(json);
 }
 
 ConfigOption& ComputerProgramOption::options(){

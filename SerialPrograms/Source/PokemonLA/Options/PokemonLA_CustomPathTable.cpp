@@ -190,6 +190,34 @@ std::unique_ptr<EditableTableRow> CustomPathTableRow::clone() const{
     ret->parameters = parameters;
     return ret;
 }
+JsonValue CustomPathTableRow::to_json() const{
+    JsonObject obj;
+    obj["Action"] = action.to_json();
+    switch (action){
+    case PathAction::CHANGE_MOUNT:
+        obj["Mount"] = parameters.mount.to_json();
+        break;
+    case PathAction::MOVE_FORWARD:
+        obj["MoveForwardMs"] = parameters.move_forward.to_json();
+        obj["Speed"] = parameters.move_speed.to_json();
+        break;
+    case PathAction::MOVE_IN_DIRECTION:
+        obj["MoveForwardMs"] = parameters.move_forward.to_json();
+//        obj["Speed"] = parameters.move_speed.to_json();
+        obj["MoveDirectionX"] = parameters.left_x.to_json();
+        obj["MoveDirectionY"] = parameters.left_y.to_json();
+        break;
+    case PathAction::JUMP:
+        obj["JumpWaitMs"] = parameters.jump_wait.to_json();
+        break;
+    case PathAction::WAIT:
+        obj["WaitMs"] = parameters.wait.to_json();
+        break;
+    default:
+        break;
+    }
+    return obj;
+}
 void CustomPathTableRow::load_json(const JsonValue& json){
     const JsonObject* obj = json.to_object();
     if (obj == nullptr){
@@ -268,34 +296,6 @@ void CustomPathTableRow::load_json(const JsonValue& json){
     default:
         break;
     }
-}
-JsonValue CustomPathTableRow::to_json() const{
-    JsonObject obj;
-    obj["Action"] = action.to_json();
-    switch (action){
-    case PathAction::CHANGE_MOUNT:
-        obj["Mount"] = parameters.mount.to_json();
-        break;
-    case PathAction::MOVE_FORWARD:
-        obj["MoveForwardMs"] = parameters.move_forward.to_json();
-        obj["Speed"] = parameters.move_speed.to_json();
-        break;
-    case PathAction::MOVE_IN_DIRECTION:
-        obj["MoveForwardMs"] = parameters.move_forward.to_json();
-//        obj["Speed"] = parameters.move_speed.to_json();
-        obj["MoveDirectionX"] = parameters.left_x.to_json();
-        obj["MoveDirectionY"] = parameters.left_y.to_json();
-        break;
-    case PathAction::JUMP:
-        obj["JumpWaitMs"] = parameters.jump_wait.to_json();
-        break;
-    case PathAction::WAIT:
-        obj["WaitMs"] = parameters.wait.to_json();
-        break;
-    default:
-        break;
-    }
-    return obj;
 }
 
 CustomPathTable::CustomPathTable()

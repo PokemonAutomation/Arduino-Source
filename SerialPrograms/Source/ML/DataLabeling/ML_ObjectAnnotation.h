@@ -41,7 +41,7 @@ struct ObjectAnnotation{
     ObjectAnnotation();
 
     // if failed to pass, will throw JsonParseException
-    static ObjectAnnotation from_json(const JsonValue& json);
+    static ObjectAnnotation load_json(const JsonValue& json);
     JsonValue to_json() const;
 };
 

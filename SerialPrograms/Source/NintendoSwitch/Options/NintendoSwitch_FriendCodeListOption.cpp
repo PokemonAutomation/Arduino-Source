@@ -19,6 +19,14 @@ FriendCodeListOption::FriendCodeListOption(std::string label, std::vector<std::s
     , m_lines(m_default)
 {}
 
+JsonValue FriendCodeListOption::to_json() const{
+    JsonArray list;
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
+    for (const std::string& line : m_lines){
+        list.push_back(line);
+    }
+    return list;
+}
 void FriendCodeListOption::load_json(const JsonValue& json){
     const JsonArray* list = json.to_array();
     if (list == nullptr){
@@ -37,14 +45,6 @@ void FriendCodeListOption::load_json(const JsonValue& json){
         m_lines = std::move(lines);
     }
     report_value_changed(this);
-}
-JsonValue FriendCodeListOption::to_json() const{
-    JsonArray list;
-    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-    for (const std::string& line : m_lines){
-        list.push_back(line);
-    }
-    return list;
 }
 void FriendCodeListOption::restore_defaults(){
     {

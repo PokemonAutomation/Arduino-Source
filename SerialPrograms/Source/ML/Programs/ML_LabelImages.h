@@ -70,8 +70,8 @@ public:
 
 public:
     // Serialization
-    virtual void from_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
 
     void init_sam_session(bool use_gpu);
 

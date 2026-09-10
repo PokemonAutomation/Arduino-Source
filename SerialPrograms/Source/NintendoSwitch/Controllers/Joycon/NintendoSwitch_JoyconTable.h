@@ -27,8 +27,8 @@ public:
 
     virtual std::unique_ptr<EditableTableRow> clone() const override;
 
-    virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
 
     void get_state(JoyconState& state) const;
     virtual std::unique_ptr<ControllerState> get_state(Milliseconds& duration) const override;

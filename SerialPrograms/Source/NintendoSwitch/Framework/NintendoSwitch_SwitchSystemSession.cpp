@@ -48,6 +48,15 @@ SwitchSystemSession::SwitchSystemSession(
 
 
 
+JsonValue SwitchSystemSession::to_json() const{
+    return m_option.to_json();
+}
+void SwitchSystemSession::load_json(const JsonValue& json){
+    ConsoleSystemSession::load_json(json);
+    m_option.load_json_self(json);
+}
+
+
 
 
 }

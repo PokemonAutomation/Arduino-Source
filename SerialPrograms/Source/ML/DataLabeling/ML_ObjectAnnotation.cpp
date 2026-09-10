@@ -22,7 +22,7 @@ ObjectAnnotation::ObjectAnnotation()
 {}
 
 // if failed to pass, will throw JsonParseException
-ObjectAnnotation ObjectAnnotation::from_json(const JsonValue& json){
+ObjectAnnotation ObjectAnnotation::load_json(const JsonValue& json){
     ObjectAnnotation anno_obj;
 
     const JsonObject& json_obj = json.to_object_throw();

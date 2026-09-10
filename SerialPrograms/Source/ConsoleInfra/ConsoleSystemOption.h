@@ -42,8 +42,8 @@ public:
         const JsonValue& json
     );
 
-    virtual void load_json(const JsonValue& json);
     virtual JsonValue to_json() const;
+    virtual void load_json(const JsonValue& json);
 
 
 public:
