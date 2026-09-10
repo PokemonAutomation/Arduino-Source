@@ -13,7 +13,7 @@
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Controllers/ControllerSession.h"
 #include "Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "Framework/NintendoSwitch_SingleSwitchProgramOption.h"
+#include "Framework/NintendoSwitch_SingleSwitchProgramSession.h"
 #include "NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -50,7 +50,7 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     , m_deprecated(deprecated)
 {}
 std::unique_ptr<PanelSession> SingleSwitchProgramDescriptor::make_panel() const{
-    return std::make_unique<SingleSwitchProgramOption>(*this);
+    return std::make_unique<SingleSwitchProgramSession>(*this);
 }
 
 

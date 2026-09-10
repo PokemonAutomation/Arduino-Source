@@ -35,7 +35,7 @@ public:
     ~SingleSwitchProgramWidget2();
     SingleSwitchProgramWidget2(
         QWidget& parent,
-        SingleSwitchProgramOption& option
+        SingleSwitchProgramSession& session
     );
 
 private:
@@ -49,7 +49,8 @@ private:
     ProgramResourceDownloadTableWidget* ensure_downloads_table();
 
 private:
-    SingleSwitchProgramSession m_session;
+    std::optional<SingleSwitchProgramSession> m_owner;
+    SingleSwitchProgramSession& m_session;
     QVBoxLayout* m_layout;
     QWidget* m_system;
     ConfigWidget* m_options;

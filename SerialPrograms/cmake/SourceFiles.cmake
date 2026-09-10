@@ -1187,8 +1187,6 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.h
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemSession.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemSession.h
-    Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramOption.cpp
-    Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramOption.h
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.h
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.cpp
