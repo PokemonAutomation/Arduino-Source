@@ -35,14 +35,6 @@ namespace NintendoSwitch{
 SingleSwitchProgramWidget2::~SingleSwitchProgramWidget2(){
     m_session.remove_listener(*this);
 
-    //  This is necessary here because the widget here owns the session.
-    //  Sessions are supposed to outlive their widgets. But this was written
-    //  long before we converged on the session/widget split design.
-    delete m_actions_bar;
-    delete m_stats_bar;
-    delete m_options;
-    delete m_system;
-
     shutdown_with_events(
         m_session.logger(),
         "SingleSwitchProgramWidget2",
