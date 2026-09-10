@@ -6,6 +6,8 @@
 
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/EarlyShutdown.h"
 #include "Common/Cpp/Concurrency/SpinPause.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
@@ -17,12 +19,13 @@
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch_SingleSwitchProgramOption.h"
 #include "NintendoSwitch_SingleSwitchProgramSession.h"
+#include "UI/NintendoSwitch_SingleSwitchProgramWidget.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+//  REMOVE
+#include <iostream>
+using std::cout;
+using std::endl;
 
 
 namespace PokemonAutomation{
@@ -30,10 +33,13 @@ namespace NintendoSwitch{
 
 
 
-SingleSwitchProgramSession::SingleSwitchProgramSession(SingleSwitchProgramOption& option, size_t console_number)
-    : ProgramSession(option.descriptor())
-    , m_option(option)
-    , m_system(option.system(), console_number, instance_id())
+SingleSwitchProgramSession::SingleSwitchProgramSession(const SingleSwitchProgramDescriptor& descriptor)
+    : PanelSession(descriptor)
+    , ProgramSession(descriptor)
+    , m_descriptor(descriptor)
+    , m_system_option(descriptor.allow_commands_while_running())
+    , m_system(m_system_option, 0, instance_id())
+    , m_instance(descriptor.make_instance())
     , m_scope(nullptr)
 {}
 
@@ -59,10 +65,13 @@ void SingleSwitchProgramSession::restore_defaults(){
         return;
     }
     logger().log("Restoring settings to defaults...");
-    m_option.restore_defaults();
+    m_instance->restore_defaults();
+}
+ConfigOption& SingleSwitchProgramSession::options(){
+    return m_instance->m_options;
 }
 std::string SingleSwitchProgramSession::check_validity() const{
-    return m_option.check_validity();
+    return m_instance->check_validity();
 }
 
 
@@ -77,16 +86,16 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
     }
 
     //  Startup Checks
-    m_option.instance().start_program_controller_check(
+    m_instance->start_program_controller_check(
         m_system.controller()
     );
-    m_option.instance().start_program_feedback_check(
+    m_instance->start_program_feedback_check(
         env.console,
-        m_option.descriptor().feedback()
+        m_descriptor.feedback()
     );
-    m_option.instance().start_program_border_check(
+    m_instance->start_program_border_check(
         env.console,
-        m_option.descriptor().feedback()
+        m_descriptor.feedback()
     );
 
     //  Attach all the controllers to the scope so they can be cancelled from the top.
@@ -110,7 +119,7 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
         m_scope.store(nullptr, std::memory_order_release);
     });
 
-    m_option.instance().program(env, scope);
+    m_instance->program(env, scope);
     env.console.wait_for_all_controllers();
 }
 void SingleSwitchProgramSession::internal_stop_program(){
@@ -148,14 +157,14 @@ void SingleSwitchProgramSession::internal_run_program(){
         }
     }
 
-    m_option.options().reset_state();
+    m_instance->m_options.reset_state();
 
     SleepSuppressScope sleep_scope(GlobalSettings::instance().SLEEP_SUPPRESS->PROGRAM_RUNNING);
 
     ProgramInfo program_info(
         identifier(),
-        m_option.descriptor().category(),
-        m_option.descriptor().display_name(),
+        m_descriptor.category(),
+        m_descriptor.display_name(),
         timestamp()
     );
     CancellableHolder<CancellableScope> scope;
@@ -188,7 +197,7 @@ void SingleSwitchProgramSession::internal_run_program(){
     }catch (ProgramFinishedException& e){
         logger().log("Program finished early!", COLOR_BLUE);
         env.console.overlay().add_log("- Program Finished -");
-        send_program_finished_notification(env, m_option.instance().NOTIFICATION_PROGRAM_FINISH, e.message(), *e.screenshot());
+        send_program_finished_notification(env, m_instance->NOTIFICATION_PROGRAM_FINISH, e.message(), *e.screenshot());
     }catch (InvalidConnectionStateException& e){
         logger().log("Program stopped due to connection issue.", COLOR_RED);
         env.console.overlay().add_log("- Invalid Connection -", COLOR_RED);
@@ -206,7 +215,7 @@ void SingleSwitchProgramSession::internal_run_program(){
             message = e.name();
         }
         report_error(message);
-        e.send_fatal_error_notif_and_telemetry_report(env, m_option.instance().NOTIFICATION_ERROR_FATAL);
+        e.send_fatal_error_notif_and_telemetry_report(env, m_instance->NOTIFICATION_ERROR_FATAL);
     }catch (OperationFailedException& e){ // no screenshot
         logger().log("Program stopped with an exception!", COLOR_RED);
         env.console.overlay().add_log("- Program Error -", COLOR_RED);
@@ -216,7 +225,7 @@ void SingleSwitchProgramSession::internal_run_program(){
             message = e.name();
         }
         report_error(message);
-        e.send_fatal_error_notif_and_telemetry_report(env, m_option.instance().NOTIFICATION_ERROR_FATAL);
+        e.send_fatal_error_notif_and_telemetry_report(env, m_instance->NOTIFICATION_ERROR_FATAL);
     }catch (FatalProgramException& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
         env.console.overlay().add_log("- Program Error -", COLOR_RED);
@@ -226,7 +235,7 @@ void SingleSwitchProgramSession::internal_run_program(){
             message = e.name();
         }
         report_error(message);
-        e.send_fatal_error_notif_and_telemetry_report(env, m_option.instance().NOTIFICATION_ERROR_FATAL);
+        e.send_fatal_error_notif_and_telemetry_report(env, m_instance->NOTIFICATION_ERROR_FATAL);
     }catch (Exception& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
         env.console.overlay().add_log("- Program Error -", COLOR_RED);
@@ -236,7 +245,7 @@ void SingleSwitchProgramSession::internal_run_program(){
         }
         report_error(message);
         send_program_fatal_error_notification(
-            env, m_option.instance().NOTIFICATION_ERROR_FATAL,
+            env, m_instance->NOTIFICATION_ERROR_FATAL,
             message
         );
     }
@@ -249,7 +258,7 @@ void SingleSwitchProgramSession::internal_run_program(){
         }
         report_error(message);
         send_program_fatal_error_notification(
-            env, m_option.instance().NOTIFICATION_ERROR_FATAL,
+            env, m_instance->NOTIFICATION_ERROR_FATAL,
             message
         );
     }catch (...){
@@ -257,11 +266,42 @@ void SingleSwitchProgramSession::internal_run_program(){
         env.console.overlay().add_log("- Unknown Error -", COLOR_RED);
         report_error("Unknown error.");
         send_program_fatal_error_notification(
-            env, m_option.instance().NOTIFICATION_ERROR_FATAL,
+            env, m_instance->NOTIFICATION_ERROR_FATAL,
             "Unknown error."
         );
     }
 }
+
+
+void SingleSwitchProgramSession::from_json(const JsonValue& json){
+    cout << "SingleSwitchProgramSession::from_json()" << endl;
+    const JsonObject* obj = json.to_object();
+    if (obj == nullptr){
+        return;
+    }
+    const JsonValue* value = obj->get_value("SwitchSetup");
+    if (value){
+        SwitchSystemOption option(m_system_option.m_allow_commands_while_locked, *value);
+        m_system.load(option);
+    }
+    m_instance->from_json(json);
+}
+JsonValue SingleSwitchProgramSession::to_json() const{
+    cout << "SingleSwitchProgramSession::to_json()" << endl;
+    JsonObject obj = std::move(*m_instance->to_json().to_object());
+    obj["SwitchSetup"] = m_system_option.to_json();
+    return obj;
+}
+QWidget* SingleSwitchProgramSession::make_widget(QWidget& parent){
+    return new SingleSwitchProgramWidget2(parent, *this);
+}
+
+
+
+
+
+
+
 
 
 

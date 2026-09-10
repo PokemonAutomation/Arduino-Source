@@ -59,7 +59,7 @@ bool MultiSwitchProgramSession::try_shutdown(){
 MultiSwitchProgramSession::~MultiSwitchProgramSession(){
     blocking_shutdown(
         logger(),
-        "SingleSwitchProgramSession",
+        "MultiSwitchProgramSession",
         [this]{ return try_shutdown(); }
     );
 }

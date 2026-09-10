@@ -152,6 +152,7 @@ public:
 
 protected:
     friend class SingleSwitchProgramOption;
+    friend class SingleSwitchProgramSession;
 
     BatchOption m_options;
     void add_option(ConfigOption& option, std::string serialization_string);

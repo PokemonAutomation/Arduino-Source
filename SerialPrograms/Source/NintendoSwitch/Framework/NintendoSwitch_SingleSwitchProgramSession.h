@@ -15,6 +15,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_SingleSwitchProgramSession_H
 #define PokemonAutomation_NintendoSwitch_SingleSwitchProgramSession_H
 
+#include "CommonFramework/Panels/PanelSession.h"
 #include "CommonFramework/ProgramSession.h"
 #include "NintendoSwitch_SwitchSystemSession.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -25,16 +26,20 @@ namespace NintendoSwitch{
 class SingleSwitchProgramOption;
 
 
-class SingleSwitchProgramSession final : public ProgramSession{
+class SingleSwitchProgramSession final : public PanelSession, public ProgramSession{
 public:
     bool try_shutdown();
     ~SingleSwitchProgramSession();
-    SingleSwitchProgramSession(SingleSwitchProgramOption& option, size_t console_number);
+    SingleSwitchProgramSession(const SingleSwitchProgramDescriptor& descriptor);
 
     void restore_defaults();
 
+
 public:
+    const SingleSwitchProgramDescriptor& descriptor() const{ return m_descriptor; }
     SwitchSystemSession& system(){ return m_system; }
+    ConfigOption& options();
+
 
 private:
     virtual std::string check_validity() const override;
@@ -44,11 +49,22 @@ private:
 
 
 private:
-    void run_program_instance(SingleSwitchProgramEnvironment& env, CancellableScope& scope);
+    virtual void from_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
+    virtual QWidget* make_widget(QWidget& parent) override;
+
 
 private:
-    SingleSwitchProgramOption& m_option;
+    void run_program_instance(SingleSwitchProgramEnvironment& env, CancellableScope& scope);
+
+
+private:
+    const SingleSwitchProgramDescriptor& m_descriptor;
+
+    SwitchSystemOption m_system_option;
     SwitchSystemSession m_system;
+
+    std::unique_ptr<SingleSwitchProgramInstance> m_instance;
 
     std::atomic<CancellableScope*> m_scope;
 };
