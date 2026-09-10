@@ -26,7 +26,10 @@ namespace NintendoSwitch{
 class SingleSwitchProgramOption;
 
 
-class SingleSwitchProgramSession final : public PanelSession, public ProgramSession{
+class SingleSwitchProgramSession final
+    : public UiState<SingleSwitchProgramSession, PanelSession>
+    , public ProgramSession
+{
 public:
     bool try_shutdown();
     ~SingleSwitchProgramSession();
@@ -51,7 +54,6 @@ private:
 private:
     virtual JsonValue to_json() const override;
     virtual void load_json(const JsonValue& json) override;
-    virtual QWidget* make_widget(QWidget& parent) override;
 
 
 private:

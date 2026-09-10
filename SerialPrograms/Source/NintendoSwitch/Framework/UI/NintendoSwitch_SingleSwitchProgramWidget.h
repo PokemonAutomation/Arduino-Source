@@ -18,6 +18,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_SingleSwitchProgramWidget_H
 #define PokemonAutomation_NintendoSwitch_SingleSwitchProgramWidget_H
 
+#include "Common/Qt/UiStateQtWidget.h"
 #include "CommonFramework/Panels/UI/PanelElements.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.h"
@@ -30,13 +31,21 @@ namespace NintendoSwitch{
 
 
 
-class SingleSwitchProgramWidget2 : public QWidget, private ProgramSession::Listener{
+class SingleSwitchProgramWidget2
+    : public QWidget
+    , public UiComponentQtWidget
+    , private ProgramSession::Listener
+{
+public:
+    using ParentState = SingleSwitchProgramSession;
+
 public:
     ~SingleSwitchProgramWidget2();
-    SingleSwitchProgramWidget2(
-        QWidget& parent,
-        SingleSwitchProgramSession& session
-    );
+    SingleSwitchProgramWidget2(QWidget& parent, SingleSwitchProgramSession& session);
+
+    virtual QWidget& widget() override{
+        return *this;
+    }
 
 private:
     virtual void state_change(ProgramState state) override;

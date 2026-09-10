@@ -12,6 +12,9 @@
 #include "NintendoSwitch_SwitchViewer.h"
 
 namespace PokemonAutomation{
+
+template class RegisterUiStateQtWidget<NintendoSwitch::SwitchViewer_Widget>;
+
 namespace NintendoSwitch{
 
 
@@ -28,7 +31,7 @@ SwitchViewer_Descriptor::SwitchViewer_Descriptor()
 
 
 SwitchViewer::SwitchViewer(const SwitchViewer_Descriptor& descriptor)
-    : PanelSession(descriptor)
+    : UiState<SwitchViewer, PanelSession>(descriptor)
     , m_switches(
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         1, 4, 1
@@ -40,31 +43,19 @@ JsonValue SwitchViewer::to_json() const{
 void SwitchViewer::load_json(const JsonValue& json){
     m_switches.load_json(json);
 }
-QWidget* SwitchViewer::make_widget(QWidget& parent){
-    return SwitchViewer_Widget::make(parent, *this);
-}
 
 
 
-SwitchViewer_Widget* SwitchViewer_Widget::make(
-    QWidget& parent,
-    SwitchViewer& instance
-){
-    SwitchViewer_Widget* widget = new SwitchViewer_Widget(parent, instance);
-    widget->construct();
-    return widget;
-}
 SwitchViewer_Widget::~SwitchViewer_Widget(){
     delete m_switches;
 }
 SwitchViewer_Widget::SwitchViewer_Widget(
     QWidget& parent,
-    SwitchViewer& instance
+    SwitchViewer& session
 )
-    : PanelWidget(parent, instance)
-    , m_session(instance.m_switches, 0)
-{}
-void SwitchViewer_Widget::construct(){
+    : PanelWidget(parent, session)
+    , m_session(session.m_switches, 0)
+{
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(make_header());

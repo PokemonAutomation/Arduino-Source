@@ -40,10 +40,9 @@ public:
 
 // The program panel of Virtual Console.
 // It calls make_widget() to create a VirtualConsole_Widget that holds the UI wideget.
-class VirtualConsole : public PanelSession{
+class VirtualConsole : public UiState<VirtualConsole, PanelSession>{
 public:
     VirtualConsole(const VirtualConsole_Descriptor& descriptor);
-    virtual QWidget* make_widget(QWidget& parent) override;
 
 public:
     //  Serialization
@@ -59,20 +58,13 @@ private:
 
 
 // The UI of the prgoram Virtual Console
-class VirtualConsole_Widget : public PanelWidget{
+class VirtualConsole_Widget final : public PanelWidget{
 public:
-    static VirtualConsole_Widget* make(
-        QWidget& parent,
-        VirtualConsole& instance
-    );
+    using ParentState = VirtualConsole;
 
-private:
+public:
     ~VirtualConsole_Widget();
-    VirtualConsole_Widget(
-        QWidget& parent,
-        VirtualConsole& instance
-    );
-    void construct();
+    VirtualConsole_Widget(QWidget& parent, VirtualConsole& session);
 
 private:
     ConsoleSystemSession m_session;

@@ -32,12 +32,12 @@ using std::endl;
 
 
 namespace PokemonAutomation{
+
+template class RegisterUiStateQtWidget<ML::LabelImages_Widget>;
+
 namespace ML{
 
 
-QWidget* LabelImages::make_widget(QWidget& parent){
-    return new LabelImages_Widget(parent, *this);
-}
 
 
 LabelImages_Widget::~LabelImages_Widget(){
@@ -48,10 +48,10 @@ LabelImages_Widget::~LabelImages_Widget(){
 }
 LabelImages_Widget::LabelImages_Widget(
     QWidget& parent,
-    LabelImages& program
+    LabelImages& session
 )
-    : PanelWidget(parent, program)
-    , m_program(program)
+    : PanelWidget(parent, session)
+    , m_program(session)
     , m_display_session(m_program.m_display_session)
 {
     m_display_session.overlay().add_hid_listener(*this);
@@ -115,14 +115,14 @@ LabelImages_Widget::LabelImages_Widget(
     scroll_layout->addLayout(annotation_row);
 
     // add a dropdown menu for user to pick whether to choose from pokemon form label or custom label
-    ConfigWidget* label_type_widget = ConfigWidget::make_from_option(program.LABEL_TYPE, scroll_inner);
+    ConfigWidget* label_type_widget = ConfigWidget::make_from_option(session.LABEL_TYPE, scroll_inner);
     annotation_row->addWidget(&label_type_widget->widget(), 0);
 
-    ConfigWidget* pokemon_label_widget = ConfigWidget::make_from_option(program.FORM_LABEL, scroll_inner);
+    ConfigWidget* pokemon_label_widget = ConfigWidget::make_from_option(session.FORM_LABEL, scroll_inner);
     annotation_row->addWidget(&pokemon_label_widget->widget(), 2);
-    ConfigWidget* custom_label_widget = ConfigWidget::make_from_option(program.CUSTOM_SET_LABEL, scroll_inner);
+    ConfigWidget* custom_label_widget = ConfigWidget::make_from_option(session.CUSTOM_SET_LABEL, scroll_inner);
     annotation_row->addWidget(&custom_label_widget->widget(), 2);
-    ConfigWidget* manual_input_label_widget = ConfigWidget::make_from_option(program.MANUAL_LABEL, scroll_inner);
+    ConfigWidget* manual_input_label_widget = ConfigWidget::make_from_option(session.MANUAL_LABEL, scroll_inner);
     annotation_row->addWidget(&manual_input_label_widget->widget(), 2);
     QPushButton* load_custom_set_button = new QPushButton("Load Custom Set", scroll_inner);
     annotation_row->addWidget(load_custom_set_button, 2);
@@ -132,23 +132,23 @@ LabelImages_Widget::LabelImages_Widget(
     // QHBoxLayout* use_gpu_row = new QHBoxLayout();
     // scroll_layout->addLayout(use_gpu_row);
 
-    // ConfigWidget* gpu_checkbox_widget = ConfigWidget::make_from_option(program.USE_GPU_FOR_EMBEDDER_SESSION, scroll_inner);
+    // ConfigWidget* gpu_checkbox_widget = ConfigWidget::make_from_option(session.USE_GPU_FOR_EMBEDDER_SESSION, scroll_inner);
     // use_gpu_row->addWidget(&gpu_checkbox_widget->widget(), 2);    
 
     // add Color selection dropdown
     QHBoxLayout* selected_color_choice_row = new QHBoxLayout();
     scroll_layout->addLayout(selected_color_choice_row);
-    ConfigWidget* selected_color_choice_widget = ConfigWidget::make_from_option(program.SELECTED_ANNO_COLOR, scroll_inner);
+    ConfigWidget* selected_color_choice_widget = ConfigWidget::make_from_option(session.SELECTED_ANNO_COLOR, scroll_inner);
     selected_color_choice_row->addWidget(&selected_color_choice_widget->widget(), 2); 
 
     QHBoxLayout* unselected_color_choice_row = new QHBoxLayout();
     scroll_layout->addLayout(unselected_color_choice_row);
-    ConfigWidget* unselected_color_choice_widget = ConfigWidget::make_from_option(program.UNSELECTED_ANNO_COLOR, scroll_inner);
+    ConfigWidget* unselected_color_choice_widget = ConfigWidget::make_from_option(session.UNSELECTED_ANNO_COLOR, scroll_inner);
     unselected_color_choice_row->addWidget(&unselected_color_choice_widget->widget(), 2); 
 
     QHBoxLayout* current_drawn_box_row = new QHBoxLayout();
     scroll_layout->addLayout(current_drawn_box_row);
-    ConfigWidget* current_drawn_box_widget = ConfigWidget::make_from_option(program.CURRENT_DRAWN_BOX, scroll_inner);
+    ConfigWidget* current_drawn_box_widget = ConfigWidget::make_from_option(session.CURRENT_DRAWN_BOX, scroll_inner);
     current_drawn_box_row->addWidget(&current_drawn_box_widget->widget(), 2); 
 
     // add compute embedding button

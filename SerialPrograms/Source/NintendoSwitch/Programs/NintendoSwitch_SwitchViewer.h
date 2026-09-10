@@ -23,10 +23,9 @@ public:
 
 
 
-class SwitchViewer : public PanelSession{
+class SwitchViewer : public UiState<SwitchViewer, PanelSession>{
 public:
     SwitchViewer(const SwitchViewer_Descriptor& descriptor);
-    virtual QWidget* make_widget(QWidget& parent) override;
 
 public:
     //  Serialization
@@ -41,20 +40,17 @@ private:
 
 
 
-class SwitchViewer_Widget : public PanelWidget{
+class SwitchViewer_Widget final : public PanelWidget{
 public:
-    static SwitchViewer_Widget* make(
-        QWidget& parent,
-        SwitchViewer& instance
-    );
+    using ParentState = SwitchViewer;
 
-private:
+public:
     ~SwitchViewer_Widget();
-    SwitchViewer_Widget(
-        QWidget& parent,
-        SwitchViewer& instance
-    );
-    void construct();
+    SwitchViewer_Widget(QWidget& parent, SwitchViewer& session);
+
+    virtual QWidget& widget() override{
+        return *this;
+    }
 
 private:
     MultiSwitchSystemSession m_session;

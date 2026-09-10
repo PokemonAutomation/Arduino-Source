@@ -11,6 +11,10 @@
 #include "VirtualConsole.h"
 
 namespace PokemonAutomation{
+
+template class RegisterUiStateQtWidget<ConsoleInfra::VirtualConsole_Widget>;
+
+
 namespace ConsoleInfra{
 
 VirtualConsole_Descriptor::VirtualConsole_Descriptor(size_t controllers)
@@ -34,7 +38,7 @@ VirtualConsole_Descriptor::VirtualConsole_Descriptor(size_t controllers)
 
 
 VirtualConsole::VirtualConsole(const VirtualConsole_Descriptor& descriptor)
-    : PanelSession(descriptor)
+    : UiState<VirtualConsole, PanelSession>(descriptor)
     , m_console_options(descriptor.m_controllers, true)
 {}
 JsonValue VirtualConsole::to_json() const{
@@ -43,31 +47,19 @@ JsonValue VirtualConsole::to_json() const{
 void VirtualConsole::load_json(const JsonValue& json){
     m_console_options.load_json(json);
 }
-QWidget* VirtualConsole::make_widget(QWidget& parent){
-    return VirtualConsole_Widget::make(parent, *this);
-}
 
 
 
-VirtualConsole_Widget* VirtualConsole_Widget::make(
-    QWidget& parent,
-    VirtualConsole& instance
-){
-    VirtualConsole_Widget* widget = new VirtualConsole_Widget(parent, instance);
-    widget->construct();
-    return widget;
-}
 VirtualConsole_Widget::~VirtualConsole_Widget(){
     delete m_console_widget;
 }
 VirtualConsole_Widget::VirtualConsole_Widget(
     QWidget& parent,
-    VirtualConsole& instance
+    VirtualConsole& session
 )
-    : PanelWidget(parent, instance)
-    , m_session(global_logger_raw(), instance.m_console_options, 0)
-{}
-void VirtualConsole_Widget::construct(){
+    : PanelWidget(parent, session)
+    , m_session(global_logger_raw(), session.m_console_options, 0)
+{
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(make_header());

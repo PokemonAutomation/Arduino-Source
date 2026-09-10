@@ -20,7 +20,6 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_SingleSwitchProgramSession.h"
-#include "UI/NintendoSwitch_SingleSwitchProgramWidget.h"
 
 //#include <iostream>
 //using std::cout;
@@ -33,7 +32,7 @@ namespace NintendoSwitch{
 
 
 SingleSwitchProgramSession::SingleSwitchProgramSession(const SingleSwitchProgramDescriptor& descriptor)
-    : PanelSession(descriptor)
+    : UiState<SingleSwitchProgramSession, PanelSession>(descriptor)
     , ProgramSession(descriptor)
     , m_descriptor(descriptor)
     , m_system_option(descriptor.allow_commands_while_running())
@@ -287,9 +286,6 @@ void SingleSwitchProgramSession::load_json(const JsonValue& json){
         m_system.load_json(*value);
     }
     m_instance->load_json(json);
-}
-QWidget* SingleSwitchProgramSession::make_widget(QWidget& parent){
-    return new SingleSwitchProgramWidget2(parent, *this);
 }
 
 

@@ -15,27 +15,25 @@
 
 namespace PokemonAutomation{
 
+template class RegisterUiStateQtWidget<PanelWidget>;
 
 
-QWidget* PanelSession::make_widget(QWidget& parent){
-    return new PanelWidget(parent, *this);
-}
 
 
 PanelWidget::PanelWidget(
     QWidget& parent,
-    PanelSession& instance
+    PanelSession& session
 )
     : QWidget(&parent)
-    , m_instance(instance)
+    , m_session(session)
 {}
 
 CollapsibleGroupBox* PanelWidget::make_header(){
     return make_panel_header(
         *this,
-        m_instance.descriptor().display_name(),
-        m_instance.descriptor().doc_link(),
-        m_instance.descriptor().description()
+        m_session.descriptor().display_name(),
+        m_session.descriptor().doc_link(),
+        m_session.descriptor().description()
     );
 }
 

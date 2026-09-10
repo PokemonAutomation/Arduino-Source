@@ -18,6 +18,7 @@
 #ifndef PokemonAutomation_ComputerPrograms_ComputerProgramWidget_H
 #define PokemonAutomation_ComputerPrograms_ComputerProgramWidget_H
 
+#include "Common/Qt/UiStateQtWidget.h"
 #include "CommonFramework/Panels/UI/PanelElements.h"
 #include "ComputerPrograms/ComputerProgram.h"
 #include "ComputerPrograms/Framework/ComputerProgramSession.h"
@@ -30,13 +31,21 @@ namespace PokemonAutomation{
 
 
 
-class ComputerProgramWidget : public QWidget, private ProgramSession::Listener{
+class ComputerProgramWidget
+    : public QWidget
+    , public UiComponentQtWidget
+    , private ProgramSession::Listener
+{
+public:
+    using ParentState = ComputerProgramSession;
+
 public:
     ~ComputerProgramWidget();
-    ComputerProgramWidget(
-        QWidget& parent,
-        ComputerProgramSession& session
-    );
+    ComputerProgramWidget(QWidget& parent, ComputerProgramSession& session);
+
+    virtual QWidget& widget() override{
+        return *this;
+    }
 
 private:
     virtual void state_change(ProgramState state) override;

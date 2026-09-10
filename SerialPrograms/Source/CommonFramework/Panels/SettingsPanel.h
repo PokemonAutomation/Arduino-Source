@@ -15,15 +15,13 @@ namespace PokemonAutomation{
 
 
 
-class SettingsPanelInstance : public PanelSession{
+class SettingsPanelInstance : public UiState<SettingsPanelInstance, PanelSession>{
 public:
     SettingsPanelInstance(const PanelDescriptor& descriptor);
 
     void add_option(ConfigOption& option, std::string serialization_string){
         m_options.add_option(option, std::move(serialization_string));
     }
-
-    virtual QWidget* make_widget(QWidget& parent) override;
 
 public:
     //  Serialization

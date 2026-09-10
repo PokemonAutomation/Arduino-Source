@@ -18,6 +18,7 @@
 #include "Common/Cpp/Logging/MultiOutputLogger.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/CpuId/CpuId.h"
+#include "Common/Qt/UiStateQtWidget.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -395,7 +396,9 @@ void MainWindow::load_panel(
     //  Make new widget.
     try{
         check_new_version();
-        m_current_panel_widget = panel->make_widget(*this);
+        m_current_panel_widget = &dynamic_cast<UiComponentQtWidget*>(
+            panel->make_ui_component(this).release()
+        )->widget();
 //        cout << "load_panel() = " << m_current_panel_widget << endl;
         m_current_panel_descriptor = std::move(descriptor);
         m_current_panel = std::move(panel);

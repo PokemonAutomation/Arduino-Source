@@ -35,6 +35,8 @@
 //  Common Framework
 #include "CommonFramework/Options/QtWidget/LabelCellWidget.h"
 #include "CommonFramework/Notifications/EventNotificationWidget.h"
+#include "CommonFramework/Panels/UI/PanelWidget.h"
+#include "CommonFramework/Panels/UI/SettingsPanelWidget.h"
 
 // Resource Download
 #include "CommonFramework/ResourceDownload/SettingsResourceDownloadWidget.h"
@@ -44,6 +46,12 @@
 #include "CommonTools/Options/QtWidgets/ScreenWatchWidget.h"
 #include "CommonTools/Options/QtWidgets/LanguageOCRWidget.h"
 
+//  ML
+#include "ML/Programs/ML_LabelImagesWidget.h"
+
+//  Computer Programs
+#include "ComputerPrograms/Framework/ComputerProgramWidget.h"
+
 //  Controllers
 //#include "Controllers/NullControllerWidget.h"
 #include "Controllers/ControllerSelectorWidget.h"
@@ -52,10 +60,14 @@
 
 //  Consoles
 #include "ConsoleInfra/ConsoleSystemWidget.h"
+#include "ConsoleInfra/VirtualConsole.h"
 
 //  Nintendo Switch
 #include "NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h"
 #include "NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_SwitchViewer.h"
+#include "NintendoSwitch/Framework/UI/NintendoSwitch_SingleSwitchProgramWidget.h"
+#include "NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchProgramWidget.h"
 #include "NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.h"
 
 //  Pokemon LA
@@ -107,6 +119,8 @@ void register_all_statics(){
     //  Common Framework
     RegisterUiStateQtWidget<LabelCellWidget>();
     RegisterUiStateQtWidget<TestButtonWidget>();
+    RegisterUiStateQtWidget<PanelWidget>();
+    RegisterUiStateQtWidget<SettingsPanelWidget>();
 
     // Resource Download
     RegisterUiStateQtWidget<SettingsDownloadButtonWidget>();
@@ -122,6 +136,12 @@ void register_all_statics(){
     RegisterUiStateQtWidget<OCR::LanguageOCRCellWidget>();
     RegisterUiStateQtWidget<OCR::LanguageOCROptionWidget>();
 
+    //  ML
+    RegisterUiStateQtWidget<ML::LabelImages_Widget>();
+
+    //  Computer Programs
+    RegisterUiStateQtWidget<ComputerProgramWidget>();
+
     //  Controllers
 //    RegisterUiStateQtWidget<NullControllerWidget>();
     RegisterUiStateQtWidget<ControllerSelectorWidget>();
@@ -130,10 +150,14 @@ void register_all_statics(){
 
     //  Consoles
     RegisterUiStateQtWidget<ConsoleInfra::ConsoleSystemWidget>();
+    RegisterUiStateQtWidget<ConsoleInfra::VirtualConsole_Widget>();
 
     //  Nintendo Switch
     RegisterUiStateQtWidget<SysbotBase::TcpSysbotBase_SelectorWidget>();
     RegisterUiStateQtWidget<NintendoSwitch::SwitchSystemWidget>();
+    RegisterUiStateQtWidget<NintendoSwitch::SwitchViewer_Widget>();
+    RegisterUiStateQtWidget<NintendoSwitch::SingleSwitchProgramWidget2>();
+    RegisterUiStateQtWidget<NintendoSwitch::MultiSwitchProgramWidget2>();
     RegisterUiStateQtWidget<NintendoSwitch::FriendCodeListWidget>();
 
     //  Pokemon LA

@@ -8,7 +8,9 @@
 #define PokemonAutomation_PanelWidget_H
 
 #include <QWidget>
+#include "Common/Qt/UiStateQtWidget.h"
 #include "CommonFramework/Panels/PanelTools.h"
+#include "CommonFramework/Panels/PanelSession.h"
 
 namespace PokemonAutomation{
 
@@ -18,16 +20,19 @@ class CollapsibleGroupBox;
 // A PanelSession can call make_widget() to create it.
 // Its derived classes can call make_header() to create a collabspile program header
 // that shows program title, link to online documentation and others.
-class PanelWidget : public QWidget{
+class PanelWidget : public QWidget, public UiComponentQtWidget{
 public:
-    PanelWidget(
-        QWidget& parent,
-        PanelSession& instance
-    );
+    using ParentState = PanelSession;
+
+public:
+    PanelWidget(QWidget& parent, PanelSession& session);
     virtual ~PanelWidget() = default;
 
-    // return the panel instance
-    PanelSession& instance(){ return m_instance; }
+//    PanelSession& session(){ return m_session; }
+
+    virtual QWidget& widget() override{
+        return *this;
+    }
 
 protected:
     //  Generate a collapsible UI element that shows the program panel header.
@@ -35,7 +40,7 @@ protected:
     virtual CollapsibleGroupBox* make_header();
 
 protected:
-    PanelSession& m_instance;
+    PanelSession& m_session;
 };
 
 

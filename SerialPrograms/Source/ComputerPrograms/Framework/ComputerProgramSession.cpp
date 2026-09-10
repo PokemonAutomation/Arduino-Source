@@ -13,7 +13,6 @@
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "ComputerProgramSession.h"
-#include "ComputerProgramWidget.h"
 
 //#include <iostream>
 //using std::cout;
@@ -23,7 +22,7 @@ namespace PokemonAutomation{
 
 
 ComputerProgramSession::ComputerProgramSession(const ComputerProgramDescriptor& descriptor)
-    : PanelSession(descriptor)
+    : UiState<ComputerProgramSession, PanelSession>(descriptor)
     , ProgramSession(descriptor)
     , m_descriptor(descriptor)
     , m_instance(descriptor.make_instance())
@@ -59,9 +58,6 @@ JsonValue ComputerProgramSession::to_json() const{
 }
 void ComputerProgramSession::load_json(const JsonValue& json){
     m_instance->load_json(json);
-}
-QWidget* ComputerProgramSession::make_widget(QWidget& parent){
-    return new ComputerProgramWidget(parent, *this);
 }
 
 
