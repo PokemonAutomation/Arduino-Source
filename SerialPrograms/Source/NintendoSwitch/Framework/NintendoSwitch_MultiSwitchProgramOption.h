@@ -14,7 +14,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_MultiSwitchProgramOption_H
 #define PokemonAutomation_NintendoSwitch_MultiSwitchProgramOption_H
 
-#include "CommonFramework/Panels/PanelInstance.h"
+#include "CommonFramework/Panels/PanelSession.h"
 #include "NintendoSwitch_MultiSwitchSystemOption.h"
 
 namespace PokemonAutomation{
@@ -25,7 +25,7 @@ class MultiSwitchProgramDescriptor;
 class MultiSwitchProgramInstance;
 
 
-class MultiSwitchProgramOption final : public PanelInstance{
+class MultiSwitchProgramOption final : public PanelSession{
 public:
     ~MultiSwitchProgramOption();
     MultiSwitchProgramOption(const MultiSwitchProgramDescriptor& descriptor);

@@ -16,7 +16,7 @@ namespace NintendoSwitch{
 
 MultiSwitchProgramOption::~MultiSwitchProgramOption() = default;
 MultiSwitchProgramOption::MultiSwitchProgramOption(const MultiSwitchProgramDescriptor& descriptor)
-    : PanelInstance(descriptor)
+    : PanelSession(descriptor)
     , m_descriptor(descriptor)
     , m_system(
         descriptor.feedback(),

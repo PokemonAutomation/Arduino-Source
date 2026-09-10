@@ -376,7 +376,7 @@ bool MainWindow::report_new_panel_intent(const PanelDescriptor& descriptor){
 }
 void MainWindow::load_panel(
     std::shared_ptr<const PanelDescriptor> descriptor,
-    std::unique_ptr<PanelInstance> panel
+    std::unique_ptr<PanelSession> panel
 ){
     if (m_panel_transition){
         global_logger_tagged().log(

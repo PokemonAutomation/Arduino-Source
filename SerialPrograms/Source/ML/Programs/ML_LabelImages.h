@@ -15,7 +15,7 @@
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Color.h"
-#include "CommonFramework/Panels/PanelInstance.h"
+#include "CommonFramework/Panels/PanelSession.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Pokemon/Options/Pokemon_HomeSpriteSelectOption.h"
 #include "ML/DataLabeling/ML_ObjectAnnotation.h"
@@ -62,7 +62,7 @@ public:
 
 
 // Program to annoatation images for training ML models
-class LabelImages : public PanelInstance, public ConfigOption::Listener {
+class LabelImages : public PanelSession, public ConfigOption::Listener {
 public:
     LabelImages(const LabelImages_Descriptor& descriptor);
     virtual QWidget* make_widget(QWidget& parent) override;

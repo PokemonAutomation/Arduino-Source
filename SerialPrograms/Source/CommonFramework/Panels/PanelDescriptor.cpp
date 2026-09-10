@@ -5,7 +5,7 @@
  */
 
 #include "PanelDescriptor.h"
-#include "PanelInstance.h"
+#include "PanelSession.h"
 
 namespace PokemonAutomation{
 
@@ -26,8 +26,8 @@ PanelDescriptor::PanelDescriptor(
     , m_description(std::move(description))
     , m_required_resources(std::move(required_resources))
 {}
-std::unique_ptr<PanelInstance> PanelDescriptor::make_panel() const{
-    return std::unique_ptr<PanelInstance>(new PanelInstance(*this));
+std::unique_ptr<PanelSession> PanelDescriptor::make_panel() const{
+    return std::unique_ptr<PanelSession>(new PanelSession(*this));
 }
 
 

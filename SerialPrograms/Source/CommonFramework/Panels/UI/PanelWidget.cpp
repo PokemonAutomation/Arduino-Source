@@ -9,7 +9,7 @@
 #include <QLabel>
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/Panels/PanelDescriptor.h"
-#include "CommonFramework/Panels/PanelInstance.h"
+#include "CommonFramework/Panels/PanelSession.h"
 #include "PanelElements.h"
 #include "PanelWidget.h"
 
@@ -17,14 +17,14 @@ namespace PokemonAutomation{
 
 
 
-QWidget* PanelInstance::make_widget(QWidget& parent){
+QWidget* PanelSession::make_widget(QWidget& parent){
     return new PanelWidget(parent, *this);
 }
 
 
 PanelWidget::PanelWidget(
     QWidget& parent,
-    PanelInstance& instance
+    PanelSession& instance
 )
     : QWidget(&parent)
     , m_instance(instance)

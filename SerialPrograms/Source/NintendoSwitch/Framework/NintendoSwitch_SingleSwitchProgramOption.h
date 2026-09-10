@@ -14,7 +14,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_SingleSwitchProgramOption_H
 #define PokemonAutomation_NintendoSwitch_SingleSwitchProgramOption_H
 
-#include "CommonFramework/Panels/PanelInstance.h"
+#include "CommonFramework/Panels/PanelSession.h"
 #include "NintendoSwitch_SwitchSystemOption.h"
 
 namespace PokemonAutomation{
@@ -25,7 +25,7 @@ class SingleSwitchProgramDescriptor;
 class SingleSwitchProgramInstance;
 
 
-class SingleSwitchProgramOption final : public PanelInstance{
+class SingleSwitchProgramOption final : public PanelSession{
 public:
     ~SingleSwitchProgramOption();
     SingleSwitchProgramOption(const SingleSwitchProgramDescriptor& descriptor);

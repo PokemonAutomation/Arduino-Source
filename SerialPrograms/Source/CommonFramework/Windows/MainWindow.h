@@ -12,7 +12,7 @@
 #include "Common/Cpp/Options/ConfigOption.h"
 #include "CommonFramework/Environment/SystemSleep.h"
 #include "CommonFramework/Panels/PanelTools.h"
-#include "CommonFramework/Panels/PanelInstance.h"
+#include "CommonFramework/Panels/PanelSession.h"
 #include "PanelLists.h"
 
 class QVBoxLayout;
@@ -48,7 +48,7 @@ private:
     // implements PanelHolder::load_panel()
     virtual void load_panel(
         std::shared_ptr<const PanelDescriptor> descriptor,
-        std::unique_ptr<PanelInstance> panel
+        std::unique_ptr<PanelSession> panel
     ) override;
 
 private:
@@ -75,7 +75,7 @@ private:
     //  Keep a reference to the panel descriptor since it is referenced by the
     //  panel instance and the original descriptor may destroyed at any time.
     std::shared_ptr<const PanelDescriptor> m_current_panel_descriptor;
-    std::unique_ptr<PanelInstance> m_current_panel;
+    std::unique_ptr<PanelSession> m_current_panel;
     QWidget* m_current_panel_widget;
 
     std::unique_ptr<ButtonDiagram> m_button_diagram;

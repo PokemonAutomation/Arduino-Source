@@ -93,10 +93,10 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
         }
     }
 
-    //  Startup Checks
     std::deque<ControllerContext<AbstractController>> contexts;
     size_t consoles = m_system.count();
     for (size_t console = 0; console < consoles; console++){
+        //  Startup Checks
         m_option.instance().start_program_controller_check(
             m_system[console].controller(), console
         );
@@ -109,6 +109,7 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
             m_option.descriptor().feedback()
         );
 
+        //  Attach all the controllers to the scope so they can be cancelled from the top.
         size_t controllers = env.consoles[console].controllers();
         for (size_t controller = 0; controller < controllers; controller++){
             contexts.emplace_back(scope, env.consoles[console].controller(controller));

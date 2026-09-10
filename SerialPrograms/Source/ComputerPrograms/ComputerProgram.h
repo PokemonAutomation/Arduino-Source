@@ -27,7 +27,7 @@ public:
         std::string description
     );
 
-    virtual std::unique_ptr<PanelInstance> make_panel() const override;
+    virtual std::unique_ptr<PanelSession> make_panel() const override;
     virtual std::unique_ptr<ComputerProgramInstance> make_instance() const = 0;
 };
 

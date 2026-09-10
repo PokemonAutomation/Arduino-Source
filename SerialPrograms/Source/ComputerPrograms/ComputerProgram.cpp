@@ -25,8 +25,8 @@ ComputerProgramDescriptor::ComputerProgramDescriptor(
         std::move(description)
     )
 {}
-std::unique_ptr<PanelInstance> ComputerProgramDescriptor::make_panel() const{
-    return std::unique_ptr<PanelInstance>(new ComputerProgramOption(*this));
+std::unique_ptr<PanelSession> ComputerProgramDescriptor::make_panel() const{
+    return std::unique_ptr<PanelSession>(new ComputerProgramOption(*this));
 }
 
 

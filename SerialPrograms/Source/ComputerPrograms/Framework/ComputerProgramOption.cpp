@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 
 
 ComputerProgramOption::ComputerProgramOption(const ComputerProgramDescriptor& descriptor)
-    : PanelInstance(descriptor)
+    : PanelSession(descriptor)
     , m_descriptor(descriptor)
     , m_instance(descriptor.make_instance())
 {}

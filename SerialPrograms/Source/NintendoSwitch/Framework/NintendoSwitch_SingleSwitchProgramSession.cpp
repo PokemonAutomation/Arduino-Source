@@ -89,11 +89,13 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
         m_option.descriptor().feedback()
     );
 
+    //  Attach all the controllers to the scope so they can be cancelled from the top.
     size_t controllers = env.console.controllers();
     FixedLimitVector<ControllerContext<AbstractController>> contexts(controllers);
     for (size_t c = 0; c < controllers; c++){
         contexts.emplace_back(scope, env.console.controller(c));
     }
+
     {
         std::lock_guard<Mutex> lg(program_lock());
         if (current_state() != ProgramState::RUNNING){

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_ConsoleInfra_VirtualConsole_H
 #define PokemonAutomation_ConsoleInfra_VirtualConsole_H
 
-#include "CommonFramework/Panels/PanelInstance.h"
+#include "CommonFramework/Panels/PanelSession.h"
 #include "CommonFramework/Panels/UI/PanelWidget.h"
 #include "ConsoleInfra/ConsoleSystemOption.h"
 #include "ConsoleInfra/ConsoleSystemSession.h"
@@ -20,7 +20,7 @@ namespace ConsoleInfra{
 // Descriptor for the program "Virtual Console".
 // It defines basic info such as title name and color of the program on the program list panel.
 // It inherits abstract base class PanelDescriptor but is still an abstract class as it does
-// not define `make_panel()`, which functionality is simply to instantiate the PanelInstance, the
+// not define `make_panel()`, which functionality is simply to instantiate the PanelSession, the
 // program panel.
 // Call CommonFramework/Panels/PanelTools.h:make_panel<VirtualConsole_Descriptor, VirtualConsole>()
 // to create a wrapper class that implements `make_panel()` to instantiate the descriptor.
@@ -40,7 +40,7 @@ public:
 
 // The program panel of Virtual Console.
 // It calls make_widget() to create a VirtualConsole_Widget that holds the UI wideget.
-class VirtualConsole : public PanelInstance{
+class VirtualConsole : public PanelSession{
 public:
     VirtualConsole(const VirtualConsole_Descriptor& descriptor);
     virtual QWidget* make_widget(QWidget& parent) override;

@@ -9,13 +9,13 @@
 
 #include "Common/Cpp/Options/ConfigOption.h"
 #include "Common/Cpp/Options/BatchOption.h"
-#include "CommonFramework/Panels/PanelInstance.h"
+#include "CommonFramework/Panels/PanelSession.h"
 
 namespace PokemonAutomation{
 
 
 
-class SettingsPanelInstance : public PanelInstance{
+class SettingsPanelInstance : public PanelSession{
 public:
     SettingsPanelInstance(const PanelDescriptor& descriptor);
 

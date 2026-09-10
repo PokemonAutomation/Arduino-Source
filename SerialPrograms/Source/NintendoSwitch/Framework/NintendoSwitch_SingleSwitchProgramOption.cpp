@@ -15,7 +15,7 @@ namespace NintendoSwitch{
 
 SingleSwitchProgramOption::~SingleSwitchProgramOption() = default;
 SingleSwitchProgramOption::SingleSwitchProgramOption(const SingleSwitchProgramDescriptor& descriptor)
-    : PanelInstance(descriptor)
+    : PanelSession(descriptor)
     , m_descriptor(descriptor)
     , m_system(descriptor.allow_commands_while_running())
     , m_instance(descriptor.make_instance())

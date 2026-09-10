@@ -69,7 +69,7 @@ public:
     bool allow_commands_while_running() const{ return m_allow_commands_while_running; }
     bool deprecated() const{ return m_deprecated; }
 
-    virtual std::unique_ptr<PanelInstance> make_panel() const override;
+    virtual std::unique_ptr<PanelSession> make_panel() const override;
     virtual std::unique_ptr<SingleSwitchProgramInstance> make_instance() const = 0;
 
 private:

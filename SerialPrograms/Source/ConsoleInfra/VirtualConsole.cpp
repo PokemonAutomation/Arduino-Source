@@ -34,7 +34,7 @@ VirtualConsole_Descriptor::VirtualConsole_Descriptor(size_t controllers)
 
 
 VirtualConsole::VirtualConsole(const VirtualConsole_Descriptor& descriptor)
-    : PanelInstance(descriptor)
+    : PanelSession(descriptor)
     , m_console_options(descriptor.m_controllers, true)
 {}
 void VirtualConsole::from_json(const JsonValue& json){

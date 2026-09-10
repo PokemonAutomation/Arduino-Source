@@ -94,7 +94,7 @@ public:
     size_t max_switches() const{ return m_max_switches; }
     size_t default_switches() const{ return m_default_switches; }
 
-    virtual std::unique_ptr<PanelInstance> make_panel() const override;
+    virtual std::unique_ptr<PanelSession> make_panel() const override;
     virtual std::unique_ptr<MultiSwitchProgramInstance> make_instance() const{ return nullptr; }
 
 private:

@@ -66,7 +66,7 @@ DownloadedResourceMetadata get_resource_metadata_from_resource_type(const std::s
 
 
 // ASSUMES: given target_resource_slug is listed within expected_resource_download_list().
-// PanelInstance::validate_resource_list() should ensure that target_resource_slug is valid.
+// PanelSession::validate_resource_list() should ensure that target_resource_slug is valid.
 DownloadedResourceMetadata get_expected_resource_metadata_from_resource_slug(const std::string& target_resource_slug);
 
 

@@ -14,12 +14,12 @@ namespace PokemonAutomation{
 
 class Logger;
 class JsonValue;
-class PanelInstance;
+class PanelSession;
 class PanelDescriptor;
 
 // Abstract base class of a panel holder.
 // It is named as the owner of all the panel instances.
-// A panel instance, CommonFramework/Panels/PanelInstance.h:PanelInstance holds
+// A panel instance, CommonFramework/Panels/PanelSession.h:PanelSession holds
 // both the program panel UI and the implementation of the actual program logic.
 //
 // Currently the main window is the only class that implements PanelHolder.
@@ -34,7 +34,7 @@ struct PanelHolder{
 
     virtual void load_panel(
         std::shared_ptr<const PanelDescriptor> descriptor,
-        std::unique_ptr<PanelInstance> panel
+        std::unique_ptr<PanelSession> panel
     ) = 0;
 
     // called when an automation program is running
@@ -73,9 +73,9 @@ struct PanelEntry{
 template <typename Descriptor, typename Instance>
 class PanelDescriptorWrapper : public Descriptor{
 public:
-    // Instance must be an inherited class of PanelInstance and its constructor must be
+    // Instance must be an inherited class of PanelSession and its constructor must be
     // Instance(const Descriptor&)
-    virtual std::unique_ptr<PanelInstance> make_panel() const override{
+    virtual std::unique_ptr<PanelSession> make_panel() const override{
         return std::make_unique<Instance>(*this);
     }
 };
@@ -86,7 +86,7 @@ public:
 //
 // template type `Descriptor` is a derived class of CommonFramework/Panels/PanelDescriptor.h:PanelDescriptor
 // and `Instance` is the program panel UI instance, derived class of 
-// CommonFramework/Panels/PanelInstance.h:Panelnstance.
+// CommonFramework/Panels/PanelSession.h:Panelnstance.
 //
 // Each panel descriptor instance should have implemented `make_panel()` to create the panel instance.
 // But writing this creation for each unique program implementation is repetitive. In stead, this function

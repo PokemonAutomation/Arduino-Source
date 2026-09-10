@@ -1,11 +1,11 @@
-/*  Panel Instance
+/*  Panel Session
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_PanelInstance_H
-#define PokemonAutomation_PanelInstance_H
+#ifndef PokemonAutomation_PanelSession_H
+#define PokemonAutomation_PanelSession_H
 
 #include "PanelDescriptor.h"
 
@@ -17,13 +17,13 @@ class JsonValue;
 struct PanelHolder;
 
 // Class to represent one instance of a pokemon automation program.
-// Since programs are listed in the program panels, so this class is called PanelInstance.
+// Since programs are listed in the program panels, so this class is called PanelSession.
 // Its derived classes hold all the program data and program logic. It also calls
 // `make_widget()` to generate the UI for the program.
-class PanelInstance{
+class PanelSession{
 public:
-    explicit PanelInstance(const PanelDescriptor& descriptor);
-    virtual ~PanelInstance() = default;
+    explicit PanelSession(const PanelDescriptor& descriptor);
+    virtual ~PanelSession() = default;
 
     const PanelDescriptor& descriptor() const{ return m_descriptor; }
 

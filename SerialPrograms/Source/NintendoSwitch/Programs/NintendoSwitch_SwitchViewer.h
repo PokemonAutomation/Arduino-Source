@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_SwitchViewer_H
 #define PokemonAutomation_NintendoSwitch_SwitchViewer_H
 
-#include "CommonFramework/Panels/PanelInstance.h"
+#include "CommonFramework/Panels/PanelSession.h"
 #include "CommonFramework/Panels/UI/PanelWidget.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemSession.h"
@@ -23,7 +23,7 @@ public:
 
 
 
-class SwitchViewer : public PanelInstance{
+class SwitchViewer : public PanelSession{
 public:
     SwitchViewer(const SwitchViewer_Descriptor& descriptor);
     virtual QWidget* make_widget(QWidget& parent) override;

@@ -134,8 +134,8 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
     , m_max_switches(max_switches)
     , m_default_switches(default_switches)
 {}
-std::unique_ptr<PanelInstance> MultiSwitchProgramDescriptor::make_panel() const{
-    return std::unique_ptr<PanelInstance>(new MultiSwitchProgramOption(*this));
+std::unique_ptr<PanelSession> MultiSwitchProgramDescriptor::make_panel() const{
+    return std::unique_ptr<PanelSession>(new MultiSwitchProgramOption(*this));
 }
 
 

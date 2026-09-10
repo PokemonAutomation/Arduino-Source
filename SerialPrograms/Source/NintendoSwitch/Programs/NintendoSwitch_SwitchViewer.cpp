@@ -28,7 +28,7 @@ SwitchViewer_Descriptor::SwitchViewer_Descriptor()
 
 
 SwitchViewer::SwitchViewer(const SwitchViewer_Descriptor& descriptor)
-    : PanelInstance(descriptor)
+    : PanelSession(descriptor)
     , m_switches(
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,

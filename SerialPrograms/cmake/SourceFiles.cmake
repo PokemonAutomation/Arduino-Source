@@ -603,8 +603,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Panels/ConsoleSettingsStretch.h
     Source/CommonFramework/Panels/PanelDescriptor.cpp
     Source/CommonFramework/Panels/PanelDescriptor.h
-    Source/CommonFramework/Panels/PanelInstance.cpp
-    Source/CommonFramework/Panels/PanelInstance.h
+    Source/CommonFramework/Panels/PanelSession.cpp
+    Source/CommonFramework/Panels/PanelSession.h
     Source/CommonFramework/Panels/PanelList.cpp
     Source/CommonFramework/Panels/PanelList.h
     Source/CommonFramework/Panels/PanelTools.h

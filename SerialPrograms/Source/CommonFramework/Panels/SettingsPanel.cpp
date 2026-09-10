@@ -12,7 +12,7 @@ namespace PokemonAutomation{
 
 
 SettingsPanelInstance::SettingsPanelInstance(const PanelDescriptor& descriptor)
-    : PanelInstance(descriptor)
+    : PanelSession(descriptor)
     , m_options(LockMode::LOCK_WHILE_RUNNING)
 {}
 

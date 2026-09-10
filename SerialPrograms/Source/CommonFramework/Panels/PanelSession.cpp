@@ -10,7 +10,7 @@
 #include "CommonFramework/ResourceDownload/ResourceDownloadHelpers.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "PanelInstance.h"
+#include "PanelSession.h"
 
 //#include <iostream>
 //using std::cout;
@@ -19,7 +19,7 @@
 namespace PokemonAutomation{
 
 
-PanelInstance::PanelInstance(const PanelDescriptor& descriptor)
+PanelSession::PanelSession(const PanelDescriptor& descriptor)
     : m_descriptor(descriptor)
 {
     try{
@@ -29,7 +29,7 @@ PanelInstance::PanelInstance(const PanelDescriptor& descriptor)
     }
 }
 
-void PanelInstance::from_json(){
+void PanelSession::from_json(){
     JsonValue* node = PERSISTENT_SETTINGS().panels.get_value(m_descriptor.identifier());
     if (node == nullptr){
         return;
@@ -37,13 +37,13 @@ void PanelInstance::from_json(){
     from_json(*node);
 }
 
-void PanelInstance::from_json(const JsonValue& json){
+void PanelSession::from_json(const JsonValue& json){
 
 }
-JsonValue PanelInstance::to_json() const{
+JsonValue PanelSession::to_json() const{
     return JsonValue();
 }
-void PanelInstance::save_settings() const{
+void PanelSession::save_settings() const{
     const std::string& identifier = m_descriptor.identifier();
     if (!identifier.empty()){
         PERSISTENT_SETTINGS().panels[identifier] = to_json();
@@ -53,7 +53,7 @@ void PanelInstance::save_settings() const{
 }
 
 
-void PanelInstance::validate_resource_list(){
+void PanelSession::validate_resource_list(){
     const std::unordered_set<std::string>& master_list = all_resource_names();
 
     for (const std::string& resource_string : m_descriptor.required_resources()){

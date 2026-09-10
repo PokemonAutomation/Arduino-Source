@@ -14,7 +14,7 @@
 #ifndef PokemonAutomation_ComputerPrograms_ComputerProgramOption_H
 #define PokemonAutomation_ComputerPrograms_ComputerProgramOption_H
 
-#include "CommonFramework/Panels/PanelInstance.h"
+#include "CommonFramework/Panels/PanelSession.h"
 #include "ComputerPrograms/ComputerProgram.h"
 
 namespace PokemonAutomation{
@@ -25,7 +25,7 @@ class ComputerProgramInstance;
 
 
 
-class ComputerProgramOption final : public PanelInstance{
+class ComputerProgramOption final : public PanelSession{
 public:
     ComputerProgramOption(const ComputerProgramDescriptor& descriptor);
 

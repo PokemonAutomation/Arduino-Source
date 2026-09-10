@@ -14,7 +14,7 @@
 
 namespace PokemonAutomation{
 
-class PanelInstance;
+class PanelSession;
 
 // Abstract base class that sets the interface for program descriptors.
 // A program descriptor contains various information (descriptions) of a program panel UI.
@@ -39,7 +39,7 @@ public:
     const std::string& description() const{ return m_description; }
     const std::vector<std::string>& required_resources() const{ return m_required_resources; }
 
-    virtual std::unique_ptr<PanelInstance> make_panel() const = 0;
+    virtual std::unique_ptr<PanelSession> make_panel() const = 0;
 
 private:
     const Color m_color;
