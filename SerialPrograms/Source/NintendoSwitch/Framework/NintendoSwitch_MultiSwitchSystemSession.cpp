@@ -86,6 +86,16 @@ bool MultiSwitchSystemSession::set_switch_count(size_t count){
 
 
 
+void MultiSwitchSystemSession::load_json(const JsonValue& json){
+    m_option.load_json(json);
+    set_switch_count(m_option.count());
+}
+JsonValue MultiSwitchSystemSession::to_json() const{
+    return m_option.to_json();
+}
+
+
+
 
 
 }

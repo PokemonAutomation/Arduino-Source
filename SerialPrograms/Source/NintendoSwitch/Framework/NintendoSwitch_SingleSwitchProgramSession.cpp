@@ -22,10 +22,9 @@
 #include "NintendoSwitch_SingleSwitchProgramSession.h"
 #include "UI/NintendoSwitch_SingleSwitchProgramWidget.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 
 namespace PokemonAutomation{
@@ -274,7 +273,6 @@ void SingleSwitchProgramSession::internal_run_program(){
 
 
 void SingleSwitchProgramSession::from_json(const JsonValue& json){
-    cout << "SingleSwitchProgramSession::from_json()" << endl;
     const JsonObject* obj = json.to_object();
     if (obj == nullptr){
         return;
@@ -287,7 +285,6 @@ void SingleSwitchProgramSession::from_json(const JsonValue& json){
     m_instance->from_json(json);
 }
 JsonValue SingleSwitchProgramSession::to_json() const{
-    cout << "SingleSwitchProgramSession::to_json()" << endl;
     JsonObject obj = std::move(*m_instance->to_json().to_object());
     obj["SwitchSetup"] = m_system_option.to_json();
     return obj;

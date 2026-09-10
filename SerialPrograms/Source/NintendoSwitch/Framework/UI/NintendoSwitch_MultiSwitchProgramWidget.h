@@ -36,7 +36,7 @@ public:
     ~MultiSwitchProgramWidget2();
     MultiSwitchProgramWidget2(
         QWidget& parent,
-        MultiSwitchProgramOption& option
+        MultiSwitchProgramSession& session
     );
 
 private:
@@ -52,7 +52,7 @@ private:
     ProgramResourceDownloadTableWidget* ensure_downloads_table();
 
 private:
-    MultiSwitchProgramSession m_session;
+    MultiSwitchProgramSession& m_session;
     QVBoxLayout* m_layout;
     MultiSwitchSystemWidget* m_system;
     ConfigWidget* m_options;

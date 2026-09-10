@@ -151,7 +151,6 @@ public:
 
 
 protected:
-    friend class SingleSwitchProgramOption;
     friend class SingleSwitchProgramSession;
 
     BatchOption m_options;
