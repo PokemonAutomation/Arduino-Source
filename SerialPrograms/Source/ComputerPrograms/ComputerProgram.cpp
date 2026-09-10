@@ -4,9 +4,9 @@
  *
  */
 
-#include "Common/Cpp/Json/JsonObject.h"
+#include "Common/Cpp/Json/JsonValue.h"
 #include "ComputerProgram.h"
-#include "ComputerPrograms/Framework/ComputerProgramOption.h"
+#include "ComputerPrograms/Framework/ComputerProgramSession.h"
 
 namespace PokemonAutomation{
 
@@ -26,7 +26,7 @@ ComputerProgramDescriptor::ComputerProgramDescriptor(
     )
 {}
 std::unique_ptr<PanelSession> ComputerProgramDescriptor::make_panel() const{
-    return std::unique_ptr<PanelSession>(new ComputerProgramOption(*this));
+    return std::unique_ptr<PanelSession>(new ComputerProgramSession(*this));
 }
 
 

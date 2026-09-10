@@ -15,7 +15,6 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/ResourceDownload/ProgramResourceDownloadWidget.h"
 #include "ComputerPrograms/ComputerProgram.h"
-#include "ComputerPrograms/Framework/ComputerProgramOption.h"
 #include "ComputerProgramWidget.h"
 
 // #include <iostream>
@@ -33,15 +32,15 @@ ComputerProgramWidget::~ComputerProgramWidget(){
 }
 ComputerProgramWidget::ComputerProgramWidget(
     QWidget& parent,
-    ComputerProgramOption& option
+    ComputerProgramSession& session
 )
     : QWidget(&parent)
-    , m_session(option)
+    , m_session(session)
 {
     m_layout = new QVBoxLayout(this);
     m_layout->setContentsMargins(0, 0, 0, 0);
 
-    const ComputerProgramDescriptor& descriptor = option.descriptor();
+    const ComputerProgramDescriptor& descriptor = m_session.descriptor();
 
     CollapsibleGroupBox* header = make_panel_header(
         *this,
@@ -62,7 +61,7 @@ ComputerProgramWidget::ComputerProgramWidget(
         QVBoxLayout* scroll_layout = new QVBoxLayout(scroll_inner);
         scroll_layout->setAlignment(Qt::AlignTop);
 
-        m_options = ConfigWidget::make_from_option(option.options(), this);
+        m_options = ConfigWidget::make_from_option(m_session.options(), this);
         scroll_layout->addWidget(&m_options->widget());
 
         scroll_layout->addStretch(1);
@@ -98,7 +97,7 @@ ComputerProgramWidget::ComputerProgramWidget(
         m_actions_bar, &RunnablePanelActionBar::defaults_clicked,
         this, [&]{
             std::lock_guard<Mutex> lg(m_session.program_lock());
-            option.restore_defaults();
+            m_session.restore_defaults();
             m_options->update_all(false);
         }
     );

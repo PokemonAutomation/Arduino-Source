@@ -865,8 +865,6 @@ file(GLOB LIBRARY_SOURCES
     Source/ComputerPrograms/ComputerProgram.h
     Source/ComputerPrograms/UnitTestRunner.cpp
     Source/ComputerPrograms/UnitTestRunner.h
-    Source/ComputerPrograms/Framework/ComputerProgramOption.cpp
-    Source/ComputerPrograms/Framework/ComputerProgramOption.h
     Source/ComputerPrograms/Framework/ComputerProgramSession.cpp
     Source/ComputerPrograms/Framework/ComputerProgramSession.h
     Source/ComputerPrograms/Framework/ComputerProgramWidget.cpp
