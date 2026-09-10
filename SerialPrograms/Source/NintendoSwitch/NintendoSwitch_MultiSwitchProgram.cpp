@@ -12,7 +12,7 @@
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Controllers/ControllerSession.h"
 #include "NintendoSwitch_MultiSwitchProgram.h"
-#include "Framework/NintendoSwitch_MultiSwitchProgramOption.h"
+#include "Framework/NintendoSwitch_MultiSwitchProgramSession.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -135,7 +135,7 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
     , m_default_switches(default_switches)
 {}
 std::unique_ptr<PanelSession> MultiSwitchProgramDescriptor::make_panel() const{
-    return std::unique_ptr<PanelSession>(new MultiSwitchProgramOption(*this));
+    return std::unique_ptr<PanelSession>(new MultiSwitchProgramSession(*this));
 }
 
 

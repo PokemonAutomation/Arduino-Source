@@ -1179,8 +1179,6 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.h
     Source/NintendoSwitch/DevPrograms/WaterfillTemplateMaker.cpp
     Source/NintendoSwitch/DevPrograms/WaterfillTemplateMaker.h
-    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.cpp
-    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.h
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.cpp

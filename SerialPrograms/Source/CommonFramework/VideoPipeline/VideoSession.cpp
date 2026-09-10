@@ -71,6 +71,7 @@ VideoSession::VideoSession(Logger& logger, VideoSourceOption& option)
 
 
 std::shared_ptr<const VideoSourceDescriptor> VideoSession::descriptor() const{
+    auto scope = m_sanitizer.check_scope();
     ReadSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
     return m_descriptor;
 }
@@ -79,6 +80,7 @@ void VideoSession::current_stream_format(
     VideoFormat& format,
     FramesPerSecond& fps
 ){
+    auto scope = m_sanitizer.check_scope();
     ReadSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
     if (m_video_source){
         resolution = m_video_source->current_resolution();
@@ -91,6 +93,7 @@ void VideoSession::current_stream_format(
     }
 }
 Resolution VideoSession::current_resolution(){
+    auto scope = m_sanitizer.check_scope();
     ReadSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
     if (m_video_source){
         return m_video_source->current_resolution();
@@ -117,6 +120,7 @@ FramesPerSecond VideoSession::current_fps(){
 }
 #endif
 VideoFormatSet VideoSession::supported_formats() const{
+    auto scope = m_sanitizer.check_scope();
     ReadSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
     if (m_video_source){
         return m_video_source->supported_formats();
@@ -128,10 +132,12 @@ VideoFormatSet VideoSession::supported_formats() const{
 
 
 void VideoSession::save(VideoSourceOption& option) const{
+    auto scope = m_sanitizer.check_scope();
     ReadSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
     option = m_option;
 }
 void VideoSession::load(const VideoSourceOption& option){
+    auto scope = m_sanitizer.check_scope();
     set_source(
         option.descriptor(),
         option.m_resolution,
@@ -141,6 +147,7 @@ void VideoSession::load(const VideoSourceOption& option){
 }
 
 void VideoSession::reset(){
+    auto scope = m_sanitizer.check_scope();
     {
         WriteSpinLock lg(m_queue_lock, PA_CURRENT_FUNCTION);
 //        cout << "VideoSession::reset(): " << m_queued_commands.size() << endl;
@@ -162,6 +169,7 @@ void VideoSession::set_source(
     VideoFormat format,
     size_t fps
 ){
+    auto scope = m_sanitizer.check_scope();
     {
         WriteSpinLock lg(m_queue_lock, PA_CURRENT_FUNCTION);
 //        cout << "VideoSession::set_source(): " << resolution.to_string() << endl;
@@ -178,6 +186,7 @@ void VideoSession::set_source(
     run_commands();
 }
 void VideoSession::set_resolution(Resolution resolution){
+    auto scope = m_sanitizer.check_scope();
     {
         WriteSpinLock lg(m_queue_lock, PA_CURRENT_FUNCTION);
 //        cout << "VideoSession::set_resolution(): " << m_queued_commands.size() << endl;
@@ -194,6 +203,7 @@ void VideoSession::set_resolution(Resolution resolution){
     run_commands();
 }
 void VideoSession::set_format(VideoFormat format, size_t fps){
+    auto scope = m_sanitizer.check_scope();
     {
         WriteSpinLock lg(m_queue_lock, PA_CURRENT_FUNCTION);
 //        cout << "VideoSession::set_resolution(): " << m_queued_commands.size() << endl;
@@ -211,6 +221,7 @@ void VideoSession::set_format(VideoFormat format, size_t fps){
 }
 
 void VideoSession::internal_reset(){
+    auto scope = m_sanitizer.check_scope();
     m_logger.log("Resetting the video...", COLOR_GREEN);
     m_state_listeners.run_method(&StateListener::pre_shutdown);
 
@@ -256,6 +267,7 @@ void VideoSession::internal_set_source(
     VideoFormat format,
     FramesPerSecond fps
 ){
+    auto scope = m_sanitizer.check_scope();
     m_logger.log("Changing video...", COLOR_GREEN);
     if (*m_descriptor == *device && !m_descriptor->should_reload() &&
         m_option.m_resolution == resolution &&
@@ -308,6 +320,7 @@ void VideoSession::internal_set_source(
     );
 }
 void VideoSession::internal_set_resolution(Resolution resolution){
+    auto scope = m_sanitizer.check_scope();
     m_logger.log("Changing resolution...", COLOR_GREEN);
     if (m_option.m_resolution == resolution){
         return;
@@ -356,6 +369,7 @@ void VideoSession::internal_set_resolution(Resolution resolution){
     );
 }
 void VideoSession::internal_set_format(VideoFormat format, FramesPerSecond fps){
+    auto scope = m_sanitizer.check_scope();
     m_logger.log("Changing format...", COLOR_GREEN);
     if (m_option.m_format == format && m_option.m_fps == fps){
         return;
@@ -396,6 +410,7 @@ void VideoSession::internal_set_format(VideoFormat format, FramesPerSecond fps){
 }
 
 void VideoSession::run_commands(){
+    auto scope = m_sanitizer.check_scope();
     if (!m_reset_lock.try_acquire_write()){
         m_logger.log("Suppressing re-entrant command...", COLOR_RED);
         return;
@@ -468,6 +483,7 @@ double VideoSession::fps_display() const{
 
 
 void VideoSession::on_watchdog_timeout(){
+    auto scope = m_sanitizer.check_scope();
     {
         ReadSpinLock lg(m_state_lock, PA_CURRENT_FUNCTION);
         if (!m_video_source || !m_video_source->allow_watchdog_reset()){

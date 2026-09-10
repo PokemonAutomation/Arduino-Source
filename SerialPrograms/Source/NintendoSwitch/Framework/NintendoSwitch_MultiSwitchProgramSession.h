@@ -15,6 +15,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_MultiSwitchProgramSession_H
 #define PokemonAutomation_NintendoSwitch_MultiSwitchProgramSession_H
 
+#include "CommonFramework/Panels/PanelSession.h"
 #include "CommonFramework/ProgramSession.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 #include "NintendoSwitch_MultiSwitchSystemSession.h"
@@ -25,7 +26,11 @@ namespace NintendoSwitch{
 class MultiSwitchProgramOption;
 
 
-class MultiSwitchProgramSession final : public ProgramSession, private MultiSwitchSystemSession::Listener{
+class MultiSwitchProgramSession final
+    : public PanelSession
+    , public ProgramSession
+    , private MultiSwitchSystemSession::Listener
+{
 public:
     //  This is temporary. Remove once configs have push notifications.
     struct Listener{
@@ -34,15 +39,20 @@ public:
     void add_listener(Listener& listener);
     void remove_listener(Listener& listener);
 
+
 public:
     bool try_shutdown();
     ~MultiSwitchProgramSession();
-    MultiSwitchProgramSession(MultiSwitchProgramOption& option);
+    MultiSwitchProgramSession(const MultiSwitchProgramDescriptor& descriptor);
 
     void restore_defaults();
 
+
 public:
+    const MultiSwitchProgramDescriptor& descriptor() const{ return m_descriptor; }
     MultiSwitchSystemSession& system(){ return m_system; }
+    ConfigOption& options();
+
 
 private:
     virtual std::string check_validity() const override;
@@ -53,12 +63,23 @@ private:
     virtual void shutdown() override;
     virtual void startup(size_t switch_count) override;
 
+    virtual void from_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
+    virtual QWidget* make_widget(QWidget& parent) override;
+
+
 private:
     void run_program_instance(MultiSwitchProgramEnvironment& env, CancellableScope& scope);
 
+
 private:
-    MultiSwitchProgramOption& m_option;
+
+    const MultiSwitchProgramDescriptor& m_descriptor;
+
+    MultiSwitchSystemOption m_system_option;
     MultiSwitchSystemSession m_system;
+
+    std::unique_ptr<MultiSwitchProgramInstance> m_instance;
 
     std::atomic<CancellableScope*> m_scope;
 

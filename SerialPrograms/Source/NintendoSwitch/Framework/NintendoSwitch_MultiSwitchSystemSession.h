@@ -63,6 +63,9 @@ public:
     size_t count() const{ return m_consoles.size(); }
     SwitchSystemSession& operator[](size_t index){ return m_consoles[index]; }
 
+    void load_json(const JsonValue& json);
+    JsonValue to_json() const;
+
 
 private:
     MultiSwitchSystemOption& m_option;

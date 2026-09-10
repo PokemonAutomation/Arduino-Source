@@ -13,9 +13,7 @@
 #ifndef PokemonAutomationn_NintendoSwitch_MultiSwitchSystemOption_H
 #define PokemonAutomationn_NintendoSwitch_MultiSwitchSystemOption_H
 
-#include <memory>
-#include <vector>
-#include "CommonFramework/Globals.h"
+#include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
 #include "NintendoSwitch_SwitchSystemOption.h"
 
@@ -31,14 +29,12 @@ public:
 
 public:
     MultiSwitchSystemOption(
-        FeedbackType feedback,
         AllowCommandsWhenRunning allow_commands_while_running,
         size_t min_switches,
         size_t max_switches,
         size_t switches
     );
     MultiSwitchSystemOption(
-        FeedbackType feedback,
         AllowCommandsWhenRunning allow_commands_while_running,
         size_t min_switches,
         size_t max_switches,
@@ -54,10 +50,11 @@ public:
     size_t max_switches() const{ return m_max_switches; }
 
     size_t count() const{ return m_active_switches; }
-    SwitchSystemOption& operator[](size_t index){ return *m_switches[index]; }
+    SwitchSystemOption& operator[](size_t index){ return m_switches[index]; }
 
 
 private:
+    friend class MultiSwitchProgramSession;
     friend class MultiSwitchSystemWidget;
 
     const bool m_allow_commands_while_running;
@@ -65,7 +62,7 @@ private:
     const size_t m_min_switches;
     const size_t m_max_switches;
     size_t m_active_switches;
-    std::vector<std::unique_ptr<SwitchSystemOption>> m_switches;
+    FixedLimitVector<SwitchSystemOption> m_switches;
 };
 
 

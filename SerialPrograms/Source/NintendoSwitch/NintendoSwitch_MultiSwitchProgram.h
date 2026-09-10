@@ -176,6 +176,7 @@ public:
 
 protected:
     friend class MultiSwitchProgramOption;
+    friend class MultiSwitchProgramSession;
 
     BatchOption m_options;
     void add_option(ConfigOption& option, std::string serialization_string);

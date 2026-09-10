@@ -17,7 +17,6 @@
 #include "CommonFramework/Panels/UI/PanelElements.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/ResourceDownload/ProgramResourceDownloadWidget.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h"
 #include "NintendoSwitch_MultiSwitchProgramWidget.h"
 
@@ -47,16 +46,16 @@ MultiSwitchProgramWidget2::~MultiSwitchProgramWidget2(){
 
 MultiSwitchProgramWidget2::MultiSwitchProgramWidget2(
     QWidget& parent,
-    MultiSwitchProgramOption& option
+    MultiSwitchProgramSession& session
 )
     : QWidget(&parent)
-    , m_session(option)
+    , m_session(session)
     , m_sanitizer("MultiSwitchProgramWidget2")
 {
     m_layout = new QVBoxLayout(this);
     m_layout->setContentsMargins(0, 0, 0, 0);
 
-    const MultiSwitchProgramDescriptor& descriptor = option.descriptor();
+    const MultiSwitchProgramDescriptor& descriptor = session.descriptor();
 
     CollapsibleGroupBox* header = make_panel_header(
         *this,
@@ -93,7 +92,7 @@ MultiSwitchProgramWidget2::MultiSwitchProgramWidget2(
         m_system = new MultiSwitchSystemWidget(*this, m_session.system(), m_session.instance_id());
         scroll_layout->addWidget(m_system);
 
-        m_options = ConfigWidget::make_from_option(option.options(), this);
+        m_options = ConfigWidget::make_from_option(m_session.options(), this);
         scroll_layout->addWidget(&m_options->widget());
 
         scroll_layout->addStretch(1);
@@ -130,7 +129,7 @@ MultiSwitchProgramWidget2::MultiSwitchProgramWidget2(
         m_actions_bar, &RunnablePanelActionBar::defaults_clicked,
         this, [&]{
             std::lock_guard<Mutex> lg(m_session.program_lock());
-            option.restore_defaults();
+            m_session.restore_defaults();
             m_options->update_all(false);
         }
     );
