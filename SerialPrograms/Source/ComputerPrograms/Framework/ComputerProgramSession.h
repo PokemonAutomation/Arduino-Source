@@ -27,7 +27,7 @@ class ComputerProgramOption;
 class ProgramEnvironment;
 
 
-class ComputerProgramSession final : public PanelSession, public ProgramSession{
+class ComputerProgramSession final : public UiState<ComputerProgramSession, PanelSession>, public ProgramSession{
 public:
     virtual ~ComputerProgramSession();
     ComputerProgramSession(const ComputerProgramDescriptor& descriptor);
@@ -50,7 +50,6 @@ private:
 private:
     virtual JsonValue to_json() const override;
     virtual void load_json(const JsonValue& json) override;
-    virtual QWidget* make_widget(QWidget& parent) override;
 
 
 private:

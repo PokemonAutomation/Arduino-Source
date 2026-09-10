@@ -56,7 +56,7 @@ IntegerEnumDropdownDatabase create_label_type_database(){
 }
 
 LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
-    : PanelSession(descriptor)
+    : UiState<LabelImages, PanelSession>(descriptor)
     , m_display_session(m_display_option)
     , m_options(LockMode::UNLOCK_WHILE_RUNNING)
     , m_use_gpu_for_sam_anno(PerformanceOptions::instance().ONNX_OPTIONS.USE_GPU)

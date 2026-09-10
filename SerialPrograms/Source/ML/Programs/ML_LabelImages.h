@@ -62,10 +62,9 @@ public:
 
 
 // Program to annoatation images for training ML models
-class LabelImages : public PanelSession, public ConfigOption::Listener {
+class LabelImages : public UiState<LabelImages, PanelSession>, public ConfigOption::Listener{
 public:
     LabelImages(const LabelImages_Descriptor& descriptor);
-    virtual QWidget* make_widget(QWidget& parent) override;
     ~LabelImages();
 
 public:

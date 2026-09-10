@@ -25,6 +25,9 @@
 //using std::endl;
 
 namespace PokemonAutomation{
+
+template class RegisterUiStateQtWidget<NintendoSwitch::SingleSwitchProgramWidget2>;
+
 namespace NintendoSwitch{
 
 

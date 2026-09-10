@@ -20,7 +20,6 @@
 #include "CommonFramework/Options/Environment/SleepSuppressOption.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_MultiSwitchProgramSession.h"
-#include "UI/NintendoSwitch_MultiSwitchProgramWidget.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -40,7 +39,7 @@ void MultiSwitchProgramSession::remove_listener(Listener& listener){
 
 
 MultiSwitchProgramSession::MultiSwitchProgramSession(const MultiSwitchProgramDescriptor& descriptor)
-    : PanelSession(descriptor)
+    : UiState<MultiSwitchProgramSession, PanelSession>(descriptor)
     , ProgramSession(descriptor)
     , m_descriptor(descriptor)
     , m_system_option(
@@ -115,9 +114,6 @@ void MultiSwitchProgramSession::load_json(const JsonValue& json){
         m_system.load_json(*value);
     }
     m_instance->load_json(json);
-}
-QWidget* MultiSwitchProgramSession::make_widget(QWidget& parent){
-    return new MultiSwitchProgramWidget2(parent, *this);
 }
 
 

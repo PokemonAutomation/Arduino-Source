@@ -16,26 +16,17 @@
 namespace PokemonAutomation{
 
 
-QWidget* SettingsPanelInstance::make_widget(QWidget& parent){
-    return SettingsPanelWidget::make(parent, *this);
-}
+template class RegisterUiStateQtWidget<SettingsPanelWidget>;
 
 
-SettingsPanelWidget* SettingsPanelWidget::make(
-    QWidget& parent,
-    SettingsPanelInstance& instance
-){
-    SettingsPanelWidget* widget = new SettingsPanelWidget(parent, instance);
-    widget->construct();
-    return widget;
-}
+
+
 SettingsPanelWidget::SettingsPanelWidget(
     QWidget& parent,
-    SettingsPanelInstance& instance
+    SettingsPanelInstance& session
 )
-    : PanelWidget(parent, instance)
-{}
-void SettingsPanelWidget::construct(){
+    : PanelWidget(parent, session)
+{
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(make_header());
@@ -54,7 +45,7 @@ QWidget* SettingsPanelWidget::make_options(QWidget& parent){
     QVBoxLayout* options_layout = new QVBoxLayout(options_widget);
     options_layout->setAlignment(Qt::AlignTop);
 
-    SettingsPanelInstance& instance = static_cast<SettingsPanelInstance&>(m_instance);
+    SettingsPanelInstance& instance = static_cast<SettingsPanelInstance&>(m_session);
     m_options = static_cast<BatchWidget*>(ConfigWidget::make_from_option(instance.m_options, &parent));
     options_layout->addWidget(m_options);
     options_layout->addStretch();

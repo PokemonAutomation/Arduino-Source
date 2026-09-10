@@ -20,6 +20,7 @@
 #include "CommonFramework/VideoPipeline/VideoSession.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "ML/UI/ML_ImageAnnotationDisplayWidget.h"
+#include "ML_LabelImages.h"
 
 class QLabel;
 class QPushButton;
@@ -42,11 +43,15 @@ class LabelImages_Widget
     , public VideoDisplayHidListener
 {
 public:
+    using ParentState = LabelImages;
+
+public:
     ~LabelImages_Widget();
-    LabelImages_Widget(
-        QWidget& parent,
-        LabelImages& instance
-    );
+    LabelImages_Widget(QWidget& parent, LabelImages& session);
+
+    virtual QWidget& widget() override{
+        return *this;
+    }
 
     //  Overwrites ConfigOption::Listener::on_config_value_changed().
     virtual void on_config_value_changed(void* object) override;

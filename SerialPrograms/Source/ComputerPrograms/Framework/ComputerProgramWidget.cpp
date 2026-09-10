@@ -23,6 +23,8 @@
 
 namespace PokemonAutomation{
 
+template class RegisterUiStateQtWidget<ComputerProgramWidget>;
+
 
 ComputerProgramWidget::~ComputerProgramWidget(){
     m_session.remove_listener(*this);

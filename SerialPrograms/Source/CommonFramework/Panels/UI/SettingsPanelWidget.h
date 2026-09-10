@@ -17,21 +17,16 @@ namespace PokemonAutomation{
 class BatchWidget;
 
 
-class SettingsPanelWidget : public PanelWidget{
+class SettingsPanelWidget final : public PanelWidget{
 public:
-    static SettingsPanelWidget* make(
-        QWidget& parent,
-        SettingsPanelInstance& instance
-    );
+    using ParentState = SettingsPanelInstance;
+
+public:
+    SettingsPanelWidget(QWidget& parent, SettingsPanelInstance& session);
 
     void restore_defaults();
 
 private:
-    SettingsPanelWidget(
-        QWidget& parent,
-        SettingsPanelInstance& instance
-    );
-    void construct();
     QWidget* make_options(QWidget& parent);
     QWidget* make_actions(QWidget& parent);
 

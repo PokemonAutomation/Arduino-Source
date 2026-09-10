@@ -27,7 +27,7 @@ class MultiSwitchProgramOption;
 
 
 class MultiSwitchProgramSession final
-    : public PanelSession
+    : public UiState<MultiSwitchProgramSession, PanelSession>
     , public ProgramSession
     , private MultiSwitchSystemSession::Listener
 {
@@ -65,7 +65,6 @@ private:
 
     virtual JsonValue to_json() const override;
     virtual void load_json(const JsonValue& json) override;
-    virtual QWidget* make_widget(QWidget& parent) override;
 
 
 private:
