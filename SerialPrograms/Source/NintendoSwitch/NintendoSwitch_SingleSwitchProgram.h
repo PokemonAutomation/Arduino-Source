@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_SingleSwitchProgram_H
 #define PokemonAutomation_NintendoSwitch_SingleSwitchProgram_H
 
+#include <type_traits>
 #include "Common/Cpp/Options/BatchOption.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
@@ -20,6 +21,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+class SwitchSystemSession;
 class SingleSwitchProgramInstance;
 
 
@@ -70,7 +72,9 @@ public:
     bool deprecated() const{ return m_deprecated; }
 
     virtual std::unique_ptr<PanelSession> make_panel() const override;
-    virtual std::unique_ptr<SingleSwitchProgramInstance> make_instance() const = 0;
+    virtual std::unique_ptr<SingleSwitchProgramInstance> make_instance(
+        SwitchSystemSession& system
+    ) const = 0;
 
 private:
     const ProgramControllerClass m_color_class;
@@ -169,8 +173,14 @@ public:
 template <typename Descriptor, typename Instance>
 class SingleSwitchProgramWrapper : public Descriptor{
 public:
-    virtual std::unique_ptr<SingleSwitchProgramInstance> make_instance() const override{
-        return std::make_unique<Instance>();
+    virtual std::unique_ptr<SingleSwitchProgramInstance> make_instance(
+        SwitchSystemSession& system
+    ) const override{
+        if constexpr (std::is_constructible_v<SwitchSystemSession&>){
+            return std::make_unique<Instance>(system);
+        }else{
+            return std::make_unique<Instance>();
+        }
     }
 };
 
