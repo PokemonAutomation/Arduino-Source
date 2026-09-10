@@ -120,6 +120,7 @@ struct TestEntry{
     std::string summary_numbers;
     std::string summary_text;
     std::string summary_ot_name;
+    std::string language_of_origin;
 };
 
 
@@ -190,6 +191,7 @@ void TestDatabaseGenerator::program(
             const bool button_b = b_detector.detect(image);
             const bool button_plus = plus_detector.detect(image);
             const std::string ball = ball_reader.read_ball(image);
+            const std::string language_of_origin = summary_reader.read_language_of_origin(image);
             const Pokemon::StatsHuntGenderFilter gender = BoxGenderDetector::detect(image);
             const Pokemon::PokemonTeraType tera_type = read_pokemon_tera_type(image, { 0.463, 0.09, 0.04, 0.06 });
             const Pokemon::OriginMark origin = origin_reader.read_mark(image);
@@ -235,11 +237,13 @@ void TestDatabaseGenerator::program(
                 output << " (renamed -> " << renamed_path << ")";
             }
             output << "\n"
+
                    << "  UI State:       box-view=" << box_view
                    << ", summary=" << summary
                    << ", arrow=" << optional_arrow_name(arrow)
                    << ", B=" << button_b
                    << ", plus=" << button_plus << "\n"
+
                    << "  Box Indicators: form=" << (alpha ? "Alpha" : "Regular")
                    << ", shiny=" << shiny
                    << ", gigantamax=" << gigantamax
@@ -247,8 +251,10 @@ void TestDatabaseGenerator::program(
                    << ", ball=" << (ball.empty() ? "none" : ball)
                    << ", tera=" << POKEMON_TERA_TYPE_SLUGS().get_string(tera_type)
                    << ", origin=" << ORIGIN_MARK_SLUGS().get_string(origin) << "\n"
+
                    << "  Summary Info:   dex=" << dex_number
                    << ", level=" << level
+                   << ", language-of-origin=" << (language_of_origin.empty() ? "none" : language_of_origin)
                    << ", nature=" << quote_string(nature)
                    << ", ability=" << quote_string(ability)
                    << ", OT=" << quote_string(original_trainer_name)
@@ -269,6 +275,11 @@ void TestDatabaseGenerator::program(
             entry.summary_ot_name = std::format(
                 "database.add<Test_SummaryReader_OtName>({}, {}, Language::English);",
                 quote_string(database_path), quote_string(original_trainer_name)
+            );
+
+            entry.language_of_origin = std::format(
+                "database.add<Test_SummaryReader_LanguageOfOrigin>({}, {});",
+                quote_string(database_path), quote_string(language_of_origin)
             );
 
             entry.box_view = std::format(
@@ -347,6 +358,7 @@ void TestDatabaseGenerator::program(
         {"SummaryReader_Numbers",   &TestEntry::summary_numbers},
         {"SummaryReader_Text",      &TestEntry::summary_text},
         {"SummaryReader_OtName",    &TestEntry::summary_ot_name},
+        {"SummaryReader_LanguageOfOrigin",& TestEntry::language_of_origin}
     };
 
     const Filesystem::Path output_path = directory / "PokemonHome_TestDatabase.txt";

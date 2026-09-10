@@ -29,6 +29,7 @@ public:
     std::string read_original_trainer_name(Language language, const ImageViewRGB32& screen) const;
     std::string read_nature(Language language, const ImageViewRGB32& screen) const;
     std::string read_ability(Language language, const ImageViewRGB32& screen) const;
+    std::string read_language_of_origin(const ImageViewRGB32& screen) const;
     int read_level(Logger& logger, const ImageViewRGB32& screen) const;
 
 private:
@@ -39,6 +40,7 @@ private:
     ImageFloatBox m_original_trainer_name_box;
     ImageFloatBox m_nature_box;
     ImageFloatBox m_ability_box;
+    ImageFloatBox m_language_of_origin_box;
 };
 
 void add_tests_SummaryReader(UnitTestDatabase& database);

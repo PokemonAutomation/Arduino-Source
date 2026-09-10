@@ -5,14 +5,19 @@
  */
 
 #include <string>
+#include <tuple>
+#include <utility>
 #include <vector>
 #include "Common/Cpp/CancellableScope.h"
+#include "Common/Cpp/Json/JsonObject.h"
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Strings/Unicode.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
+#include "CommonTools/OCR/OCR_DictionaryMatcher.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "CommonTools/OCR/OCR_StringNormalization.h"
 #include "PokemonHome_SummaryReader.h"
@@ -22,6 +27,25 @@ namespace NintendoSwitch{
 namespace PokemonHome{
 
 namespace{
+
+class LanguageOfOriginMatcher : public OCR::DictionaryMatcher{
+public:
+    LanguageOfOriginMatcher(){
+        const std::string path = RESOURCE_PATH() + "Pokemon/LanguageOfOrigin.json";
+        JsonValue json = load_json_file(path);
+        const JsonObject& dictionary = json.to_object_throw(path);
+        m_database.emplace(
+            std::piecewise_construct,
+            std::forward_as_tuple(Language::English),
+            std::forward_as_tuple(
+                dictionary, nullptr,
+                language_data(Language::English).random_match_chance,
+                false
+            )
+        );
+        m_languages += Language::English;
+    }
+};
 
 const std::vector<std::pair<uint32_t, uint32_t>>& white_number_filters(){
     static const std::vector<std::pair<uint32_t, uint32_t>> filters = {
@@ -100,6 +124,7 @@ SummaryReader::SummaryReader(Color color)
     , m_original_trainer_name_box(0.492, 0.719, 0.165, 0.049)
     , m_nature_box(0.157, 0.783, 0.212, 0.042)
     , m_ability_box(0.158, 0.838, 0.213, 0.042)
+    , m_language_of_origin_box(0.0265, 0.176, 0.056, 0.035)
 {}
 
 void SummaryReader::make_overlays(VideoOverlaySet& items) const{
@@ -109,6 +134,7 @@ void SummaryReader::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_original_trainer_name_box);
     items.add(m_color, m_nature_box);
     items.add(m_color, m_ability_box);
+    items.add(m_color, m_language_of_origin_box);
 }
 
 int SummaryReader::read_national_dex(Logger& logger, const ImageViewRGB32& screen) const{
@@ -129,6 +155,26 @@ std::string SummaryReader::read_nature(Language language, const ImageViewRGB32& 
 
 std::string SummaryReader::read_ability(Language language, const ImageViewRGB32& screen) const{
     return read_text(language, screen, m_ability_box, gray_text_filters());
+}
+
+std::string SummaryReader::read_language_of_origin(const ImageViewRGB32& screen) const{
+    static const LanguageOfOriginMatcher dictionary;
+    OCR::StringMatchResult result = dictionary.match_substring_from_image_multifiltered(
+        nullptr,
+        Language::English,
+        extract_box_reference(screen, m_language_of_origin_box),
+        OCR::BLACK_TEXT_FILTERS(),
+        -1.30,
+        0.50,
+        0.01,
+        0.50,
+        OCR::PageSegMode::SINGLE_LINE
+    );
+
+    if (result.results.empty()){
+        return "";
+    }
+    return result.results.begin()->second.token;
 }
 
 // Due to the position of the level changing slightly depending on digits and language. The box contains the "Lv" text and the level number.
@@ -219,6 +265,29 @@ private:
     std::string m_image;
     std::string m_expected_ot_name;
     Language m_language;
+};
+
+class Test_SummaryReader_LanguageOfOrigin : public UnitTest{
+public:
+    Test_SummaryReader_LanguageOfOrigin(const std::string& image, std::string expected)
+        : UnitTest("PokemonHome::SummaryReader_LanguageOfOrigin - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        ImageRGB32 image(m_image);
+        std::string language = SummaryReader().read_language_of_origin(image);
+        if (language == m_expected){
+            return true;
+        }
+
+        return "Expected: " + m_expected + ", received: " + language;
+    }
+
+private:
+    std::string m_image;
+    std::string m_expected;
 };
 
 void add_tests_SummaryReader(UnitTestDatabase& database){
@@ -351,6 +420,49 @@ void add_tests_SummaryReader(UnitTestDatabase& database){
     database.add<Test_SummaryReader_OtName>("PokemonHome/SummaryScreen/vulpix_Shiny.png", "m00n", Language::English);
     database.add<Test_SummaryReader_OtName>("PokemonHome/SummaryScreen/wartortle_Regular.png", "ru", Language::German);
     database.add<Test_SummaryReader_OtName>("PokemonHome/SummaryScreen/wurmple_Regular.png", "r0n", Language::English);
+    // Language of Origin
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/annihilape_Regular.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/bidoof_Regular.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/bulbasaur_Regular.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Go.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Lza.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/capskid_Regular.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/castform_Regular.png", "ITA");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/cyclizar_Regular.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/dudunsparce_Regular.png", "DEU");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/dudunsparce_Regular_Sv.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/enamorus_Shiny.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/gimmighoul_Regular.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/glimmet_Regular.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/gogoat_Regular.png", "JPN");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/greatTusk_Shiny.png", "CHS");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/hatterne_Regular.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/houndstone_Regular.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/ironBunde_Regular.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/ironBundle_Regular_Sv.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/ironJugulis_Regular.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/ironThorns_Regular.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/kilowattrel_Regular.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/kingler_Shiny.png", "ITA");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/komala_Regular.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/krabby_Shiny.png", "ITA");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/machamp_Regular.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/pancham_Shiny.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/rapidash_Regular.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/rellor_Regular.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/riolu_Regular.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/rowlet_ShinyAlpha.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/scovillain_Regular.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/slitherWing_Shiny.png", "CHS");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/squirtle_Shiny.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/tapuLele_Shiny.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/tatsugiri_Regular.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/teddiursa_Regular.png", "JPN");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/terapagos_regular.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/vulpix_Regular.png", "DEU");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/vulpix_Shiny.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/wartortle_Regular.png", "DEU");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/wurmple_Regular.png", "FRA");
 }
     
 

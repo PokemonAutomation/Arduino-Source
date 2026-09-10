@@ -77,9 +77,11 @@ void ReadSummaryScreen::program(
 
     VideoSnapshot screen = env.console.video().snapshot();
 
-    env.log("Level: " + std::to_string(reader.read_level(env.console, screen)));
-    env.log("Ability: " + reader.read_ability(HOME_LANGUAGE, screen));
-    env.log("Nature: " + reader.read_nature(HOME_LANGUAGE, screen));
+
+    std::string language_of_origin = reader.read_language_of_origin(screen);
+    std::string level_text = std::to_string(reader.read_level(env.console, screen));
+    std::string ability = reader.read_ability(HOME_LANGUAGE, screen);
+    std::string nature = reader.read_nature(HOME_LANGUAGE, screen);
 
     CollectedPokemonInfo pokemon_info{};
     read_summary_screen(env, context, pokemon_info, OT_NAME_LANGUAGE);
@@ -88,6 +90,10 @@ void ReadSummaryScreen::program(
     std::ostringstream ss;
     ss << logged_info;
     env.log("Summary screen result: " + ss.str());
+    env.log("Language of origin: " + language_of_origin);
+    env.log("Level: " + level_text);
+    env.log("Ability: " + ability);
+    env.log("Nature: " + nature);
 }
 
 }
