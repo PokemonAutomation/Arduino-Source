@@ -18,6 +18,10 @@ namespace ConsoleInfra{
 
 
 ConsoleSystemWidget::~ConsoleSystemWidget(){
+    //  We must delete the video early because it holds a reference to the
+    //  layout that it resides in. If the layout is destructed first, the
+    //  video's destructor will crash.
+    delete m_video_display;
 }
 
 ConsoleSystemWidget::ConsoleSystemWidget(
