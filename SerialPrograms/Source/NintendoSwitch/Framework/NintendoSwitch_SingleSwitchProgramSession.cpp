@@ -38,7 +38,7 @@ SingleSwitchProgramSession::SingleSwitchProgramSession(const SingleSwitchProgram
     , m_descriptor(descriptor)
     , m_system_option(descriptor.allow_commands_while_running())
     , m_system(m_system_option, 0, instance_id())
-    , m_instance(descriptor.make_instance())
+    , m_instance(descriptor.make_instance(m_system))
     , m_scope(nullptr)
 {}
 
