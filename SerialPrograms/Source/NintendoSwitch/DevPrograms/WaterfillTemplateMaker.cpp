@@ -9,6 +9,7 @@
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
+#include "ConsoleInfra/ConsoleSystemSession.h"
 #include "WaterfillTemplateMaker.h"
 
 //#include <iostream>
@@ -35,51 +36,26 @@ WaterfillTemplateMaker_Descriptor::WaterfillTemplateMaker_Descriptor()
 
 
 
-WaterfillTemplateMaker::~WaterfillTemplateMaker(){
-    BUTTON.remove_listener(*this);
-}
-WaterfillTemplateMaker::WaterfillTemplateMaker()
-    : BUTTON("<b>Make Template:</b>", "Make Template")
-    , MIN_AREA("<b>Min Area (in pixels):</b>", LockMode::UNLOCK_WHILE_RUNNING, 100)
+WaterfillTemplateMaker::WaterfillTemplateMaker(ConsoleInfra::ConsoleSystemSession& system)
+    : MIN_AREA("<b>Min Area (in pixels):</b>", LockMode::UNLOCK_WHILE_RUNNING, 100)
     , FILTER_LOWER("<b>Filter (lower):</b>", LockMode::UNLOCK_WHILE_RUNNING, false, 0xff000000, 0xff000000)
     , FILTER_UPPER("<b>Filter (upper):</b>", LockMode::UNLOCK_WHILE_RUNNING, false, 0xffffffff, 0xffffffff)
-    , BOX_DRAW(LockMode::UNLOCK_WHILE_RUNNING)
+    , BOX_DRAW(LockMode::UNLOCK_WHILE_RUNNING, system.overlay())
 {
-    PA_ADD_OPTION(BUTTON);
     PA_ADD_OPTION(MIN_AREA);
     PA_ADD_OPTION(FILTER_LOWER);
     PA_ADD_OPTION(FILTER_UPPER);
     PA_ADD_OPTION(BOX_DRAW);
-    BUTTON.add_listener(*this);
 }
 
 
 void WaterfillTemplateMaker::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
-    {
-        std::lock_guard<Mutex> lg(m_lock);
-        m_stream = &env.console;
-    }
-    ScopeExit on_exit([this]{
-        std::lock_guard<Mutex> lg(m_lock);
-        m_stream = nullptr;
-    });
-    auto drawn_box = BOX_DRAW.make_session(env.console.overlay());
-    scope.wait_until_cancel();
-}
-
-
-void WaterfillTemplateMaker::on_press(ButtonCell& button){
-
     using namespace Kernels;
     using namespace Kernels::Waterfill;
 
-    global_logger_tagged().log("Button pressed. Attempting to make template.");
-    std::lock_guard<Mutex> lg(m_lock);
-    if (m_stream == nullptr){
-        global_logger_tagged().log("Program isn't running.", COLOR_RED);
-    }
+    global_logger_tagged().log("Attempting to make template.");
 
-    VideoSnapshot screenshot = m_stream->video().snapshot_latest_blocking();
+    VideoSnapshot screenshot = env.console.video().snapshot_latest_blocking();
     ImageViewRGB32 image;
     if (BOX_DRAW.CONTENT_BOX.enabled()){
         image = extract_box_reference(*screenshot.frame, BOX_DRAW.CONTENT_BOX);
@@ -171,7 +147,6 @@ void WaterfillTemplateMaker::on_press(ButtonCell& button){
 
 //    filter_by_mask(*largest_object->object., filtered, Color(0), true);
 #endif
-
 }
 
 

@@ -877,8 +877,9 @@ file(GLOB LIBRARY_SOURCES
     Source/ConsoleInfra/ConsoleSystemOption.h
     Source/ConsoleInfra/ConsoleSystemSession.cpp
     Source/ConsoleInfra/ConsoleSystemSession.h
-    Source/ConsoleInfra/VirtualConsole.cpp
-    Source/ConsoleInfra/VirtualConsole.h
+    Source/ConsoleInfra/Panels/BoxDraw.cpp
+    Source/ConsoleInfra/Panels/BoxDraw.h
+    Source/ConsoleInfra/Panels/VirtualConsole.h
     Source/ConsoleInfra/UI/CommandRowWidget.cpp
     Source/ConsoleInfra/UI/CommandRowWidget.h
     Source/ConsoleInfra/UI/ConsolePanelWidget.cpp
@@ -1171,8 +1172,6 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Descriptor.h
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.cpp
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h
-    Source/NintendoSwitch/DevPrograms/BoxDraw.cpp
-    Source/NintendoSwitch/DevPrograms/BoxDraw.h
     Source/NintendoSwitch/DevPrograms/JoyconProgram.cpp
     Source/NintendoSwitch/DevPrograms/JoyconProgram.h
     Source/NintendoSwitch/DevPrograms/TestDudunsparceFormDetector.cpp

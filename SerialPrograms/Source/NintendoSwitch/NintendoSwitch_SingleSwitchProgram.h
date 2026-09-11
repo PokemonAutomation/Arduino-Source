@@ -176,7 +176,7 @@ public:
     virtual std::unique_ptr<SingleSwitchProgramInstance> make_instance(
         SwitchSystemSession& system
     ) const override{
-        if constexpr (std::is_constructible_v<SwitchSystemSession&>){
+        if constexpr (std::is_constructible_v<Instance, SwitchSystemSession&>){
             return std::make_unique<Instance>(system);
         }else{
             return std::make_unique<Instance>();

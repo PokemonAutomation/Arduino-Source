@@ -10,7 +10,8 @@
 
 #include "NintendoSwitch_SettingsPanel.h"
 
-#include "ConsoleInfra/VirtualConsole.h"
+#include "ConsoleInfra/Panels/VirtualConsole.h"
+#include "ConsoleInfra/Panels/BoxDraw.h"
 #include "Programs/NintendoSwitch_SwitchViewer.h"
 
 #include "Programs/NintendoSwitch_TurboA.h"
@@ -22,7 +23,6 @@
 #include "Programs/NintendoSwitch_FriendDelete.h"
 #include "Programs/NintendoSwitch_RecordKeyboardController.h"
 
-#include "DevPrograms/BoxDraw.h"
 #include "Programs/NintendoSwitch_SnapshotDumper.h"
 
 #include "Programs/NintendoSwitch_MenuStabilityTester.h"
@@ -74,7 +74,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<RecordKeyboardController_Descriptor, RecordKeyboardController>());
 
     ret.emplace_back("---- Testing ----");
-    ret.emplace_back(make_single_switch_program<BoxDraw_Descriptor, BoxDraw>());
+    ret.emplace_back(ConsoleInfra::make_ConsolePanel<ConsoleInfra::BoxDraw_Descriptor, ConsoleInfra::BoxDraw>());
     ret.emplace_back(make_single_switch_program<SnapshotDumper_Descriptor, SnapshotDumper>());
 
     if (STATIC_GLOBALS.DEVELOPER_MODE){

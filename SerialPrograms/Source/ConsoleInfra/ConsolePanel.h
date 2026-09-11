@@ -2,6 +2,8 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
+ *  ConsolePanel is a panel with a console and options. It cannot be run.
+ *
  */
 
 #ifndef PokemonAutomation_ConsoleInfra_ConsolePanel_H
@@ -27,7 +29,7 @@ public:
         std::string category, std::string display_name,
         std::string doc_link,
         std::string description,
-        size_t num_controllers,
+        size_t num_controllers = 1,
         bool deprecated = false,
         std::vector<std::string> required_resources = {}
     );
@@ -86,7 +88,7 @@ public:
     virtual std::unique_ptr<ConsolePanelInstance> make_instance(
         ConsoleSystemSession& system
     ) const override{
-        if constexpr (std::is_constructible_v<ConsoleSystemSession&>){
+        if constexpr (std::is_constructible_v<Instance, ConsoleSystemSession&>){
             return std::make_unique<Instance>(system);
         }else{
             return std::make_unique<Instance>();
