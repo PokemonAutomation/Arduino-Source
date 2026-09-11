@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_CommandRow_H
 #define PokemonAutomation_NintendoSwitch_CommandRow_H
 
-#include "ConsoleInfra/CommandRowWidget.h"
+#include "ConsoleInfra/UI/CommandRowWidget.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h"
 
 namespace PokemonAutomation{

@@ -23,7 +23,6 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
-class SingleSwitchProgramOption;
 
 
 class SingleSwitchProgramSession final

@@ -25,7 +25,6 @@
 
 QT_FORWARD_DECLARE_CLASS(QVBoxLayout)
 namespace PokemonAutomation{
-    struct PanelHolder;
     class ProgramResourceDownloadTableWidget;
 namespace NintendoSwitch{
 
@@ -58,7 +57,6 @@ private:
     ProgramResourceDownloadTableWidget* ensure_downloads_table();
 
 private:
-    std::optional<SingleSwitchProgramSession> m_owner;
     SingleSwitchProgramSession& m_session;
     QVBoxLayout* m_layout;
     QWidget* m_system;

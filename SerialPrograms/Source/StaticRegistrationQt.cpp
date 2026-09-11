@@ -59,8 +59,8 @@
 #include "ControllerInput/Keyboard/KeyBindingWidget.h"
 
 //  Consoles
-#include "ConsoleInfra/ConsoleSystemWidget.h"
-#include "ConsoleInfra/VirtualConsole.h"
+#include "ConsoleInfra/UI/ConsoleSystemWidget.h"
+#include "ConsoleInfra/UI/ConsolePanelWidget.h"
 
 //  Nintendo Switch
 #include "NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h"
@@ -150,7 +150,7 @@ void register_all_statics(){
 
     //  Consoles
     RegisterUiStateQtWidget<ConsoleInfra::ConsoleSystemWidget>();
-    RegisterUiStateQtWidget<ConsoleInfra::VirtualConsole_Widget>();
+    RegisterUiStateQtWidget<ConsoleInfra::ConsolePanelWidget>();
 
     //  Nintendo Switch
     RegisterUiStateQtWidget<SysbotBase::TcpSysbotBase_SelectorWidget>();
