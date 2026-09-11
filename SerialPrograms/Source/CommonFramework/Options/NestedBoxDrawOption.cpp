@@ -7,6 +7,10 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "NestedBoxDrawOption.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -92,6 +96,13 @@ void NestedBoxDrawOption::on_mouse_move(double x, double y){
     if (!m_mouse_start){
         return;
     }
+
+    x = std::max<double>(x, 0);
+    y = std::max<double>(y, 0);
+    x = std::min<double>(x, 1);
+    y = std::min<double>(y, 1);
+
+//    cout << "x = " << x << ", y = " << y << endl;
 
     double xl = m_mouse_start->first;
     double xh = x;
