@@ -19,7 +19,6 @@ moves
 stats
 level
 surname
-language
 "stamps"
 */
 
