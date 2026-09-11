@@ -49,16 +49,16 @@ jobs:
       - name: Checkout Arduino-Source
         uses: actions/checkout@v7
         with:
-          path: 'Arduino-Source'
-          submodules: 'recursive'
+          path: "Arduino-Source"
+          submodules: "recursive"
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
           # Delete aqtsource once https://github.com/miurahr/aqtinstall/issues/1007 is fixed and released
-          aqtsource: 'git+https://github.com/miurahr/aqtinstall'
-          version: '6.10.2'
-          modules: 'qtmultimedia qtserialport'
+          aqtsource: "git+https://github.com/miurahr/aqtinstall"
+          version: "6.10.2"
+          modules: "qtmultimedia qtserialport"
 
       - name: Install dependencies (Ubuntu)
         if: startsWith(inputs.os, 'ubuntu')
@@ -118,8 +118,8 @@ jobs:
         uses: actions/checkout@v7
         if: inputs.run-tests
         with:
-          repository: 'PokemonAutomation/CommandLineTests'
-          path: 'CommandLineTests'
+          repository: "PokemonAutomation/CommandLineTests"
+          path: "CommandLineTests"
 
       - name: Run tests (Windows)
         if: startsWith(inputs.os, 'windows') && inputs.run-tests
@@ -150,7 +150,7 @@ jobs:
 
       - name: Run clang query
         if: inputs.run-clang-query
-        run : |
+        run: |
           cd Arduino-Source
 
           cat << 'EOF' > query.txt
