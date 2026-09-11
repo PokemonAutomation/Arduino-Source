@@ -33,13 +33,8 @@ class SwitchSystemOption : public GameConsole::ConsoleSystemOption{
     static const std::string JSON_CONSOLE_TYPE;
 
 public:
-    SwitchSystemOption(
-        bool allow_commands_while_running
-    );
-    SwitchSystemOption(
-        bool allow_commands_while_running,
-        const JsonValue& json
-    );
+    SwitchSystemOption();
+    SwitchSystemOption(const JsonValue& json);
 
     virtual JsonValue to_json() const override;
     virtual void load_json(const JsonValue& json) override;

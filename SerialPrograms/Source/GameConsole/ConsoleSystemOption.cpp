@@ -23,12 +23,8 @@ const std::string ConsoleSystemOption::JSON_CONTROLLERS = "Controllers";
 
 
 
-ConsoleSystemOption::ConsoleSystemOption(
-    size_t num_controllers,
-    bool allow_commands_while_locked
-)
-    : m_allow_commands_while_locked(allow_commands_while_locked)
-    , m_controllers(num_controllers)
+ConsoleSystemOption::ConsoleSystemOption(size_t num_controllers)
+    : m_controllers(num_controllers)
 {
     if (num_controllers == 0){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "num_controllers cannot be 0.");
@@ -39,12 +35,8 @@ ConsoleSystemOption::ConsoleSystemOption(
         enable_input = false;
     }
 }
-ConsoleSystemOption::ConsoleSystemOption(
-    size_t num_controllers,
-    bool allow_commands_while_locked,
-    const JsonValue& json
-)
-    : ConsoleSystemOption(num_controllers, allow_commands_while_locked)
+ConsoleSystemOption::ConsoleSystemOption(size_t num_controllers, const JsonValue& json)
+    : ConsoleSystemOption(num_controllers)
 {
     ConsoleSystemOption::load_json(json);
 }

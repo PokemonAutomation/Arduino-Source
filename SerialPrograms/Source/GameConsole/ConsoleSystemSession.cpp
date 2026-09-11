@@ -51,10 +51,12 @@ ConsoleSystemSession::~ConsoleSystemSession(){
 ConsoleSystemSession::ConsoleSystemSession(
     Logger& logger,
     ConsoleSystemOption& option,
+    bool allow_commands_while_locked,
     size_t console_number,
     std::optional<uint64_t> program_tracking_id
 )
-    : m_console_number(console_number)
+    : m_allow_commands_while_locked(allow_commands_while_locked)
+    , m_console_number(console_number)
     , m_logger(logger, "Console " + std::to_string(console_number))
     , m_option(option)
     , m_video(m_logger, option.m_video)

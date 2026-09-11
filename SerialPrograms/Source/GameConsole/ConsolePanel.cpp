@@ -20,16 +20,14 @@ ConsolePanelDescriptor::ConsolePanelDescriptor(
     std::string doc_link,
     std::string description,
     size_t num_controllers,
-    bool deprecated,
-    std::vector<std::string> required_resources
+    bool deprecated
 )
     : PanelDescriptor(
         color,
         std::move(identifier),
         std::move(category), std::move(display_name),
         std::move(doc_link),
-        std::move(description),
-        std::move(required_resources)
+        std::move(description)
     )
     , m_deprecated(deprecated)
     , m_num_controllers(num_controllers)

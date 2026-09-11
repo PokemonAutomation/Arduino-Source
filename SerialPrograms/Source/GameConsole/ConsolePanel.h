@@ -30,8 +30,7 @@ public:
         std::string doc_link,
         std::string description,
         size_t num_controllers = 1,
-        bool deprecated = false,
-        std::vector<std::string> required_resources = {}
+        bool deprecated = false
     );
 
     bool deprecated() const{ return m_deprecated; }
@@ -43,7 +42,6 @@ public:
 
 private:
     const bool m_deprecated;
-    const std::vector<std::string> m_required_resources;
     const size_t m_num_controllers;
 };
 

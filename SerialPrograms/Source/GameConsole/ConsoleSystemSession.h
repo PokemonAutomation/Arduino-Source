@@ -65,6 +65,7 @@ public:
     ConsoleSystemSession(
         Logger& logger,
         ConsoleSystemOption& option,
+        bool allow_commands_while_locked,
         size_t console_number,
         std::optional<uint64_t> program_tracking_id = {}
     );
@@ -72,7 +73,7 @@ public:
 
 public:
     size_t console_number() const{ return m_console_number; }
-    bool allow_commands_while_locked() const{ return m_option.m_allow_commands_while_locked; }
+    bool allow_commands_while_locked() const{ return m_allow_commands_while_locked; }
     std::string status() const;
 
     Logger& logger(){ return m_logger; }
@@ -111,6 +112,8 @@ private:
 
 
 private:
+    const bool m_allow_commands_while_locked;
+
     //  The console # within a program.
     const size_t m_console_number;
     std::optional<uint64_t> m_console_tracking_id;

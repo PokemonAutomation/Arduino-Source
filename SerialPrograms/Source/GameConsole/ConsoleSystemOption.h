@@ -32,23 +32,14 @@ class ConsoleSystemOption{
 
 public:
     virtual ~ConsoleSystemOption() = default;
-    ConsoleSystemOption(
-        size_t num_controllers,
-        bool allow_commands_while_locked
-    );
-    ConsoleSystemOption(
-        size_t num_controllers,
-        bool allow_commands_while_locked,
-        const JsonValue& json
-    );
+    ConsoleSystemOption(size_t num_controllers);
+    ConsoleSystemOption(size_t num_controllers, const JsonValue& json);
 
     virtual JsonValue to_json() const;
     virtual void load_json(const JsonValue& json);
 
 
 public:
-    const bool m_allow_commands_while_locked;
-
     VideoSourceOption m_video;
     AudioOption m_audio;
     VideoOverlayOption m_overlay;

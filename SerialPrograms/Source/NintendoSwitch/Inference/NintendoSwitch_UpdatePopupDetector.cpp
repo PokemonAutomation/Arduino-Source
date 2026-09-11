@@ -275,7 +275,7 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         SwitchSystemOption option(false);
-        SwitchSystemSession session(option, 0, {});
+        SwitchSystemSession session(option, false, 0, {});
         ConsoleHandle console(session);
 
         UpdatePopupDetector detector(console);

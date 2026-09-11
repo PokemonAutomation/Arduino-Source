@@ -37,6 +37,7 @@ public:
     ~SwitchSystemSession();
     SwitchSystemSession(
         SwitchSystemOption& option,
+        bool allow_commands_while_locked,
         size_t console_number,
         std::optional<uint64_t> program_id
     );

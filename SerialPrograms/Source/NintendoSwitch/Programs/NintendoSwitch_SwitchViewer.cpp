@@ -32,10 +32,7 @@ SwitchViewer_Descriptor::SwitchViewer_Descriptor()
 
 SwitchViewer::SwitchViewer(const SwitchViewer_Descriptor& descriptor)
     : UiState<SwitchViewer, PanelSession>(descriptor)
-    , m_switches(
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        1, 4, 1
-    )
+    , m_switches(1, 4, 1)
 {}
 JsonValue SwitchViewer::to_json() const{
     return m_switches.to_json();
@@ -54,7 +51,7 @@ SwitchViewer_Widget::SwitchViewer_Widget(
     SwitchViewer& session
 )
     : PanelWidget(parent, session)
-    , m_session(session.m_switches, 0)
+    , m_session(session.m_switches, true, 0)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);

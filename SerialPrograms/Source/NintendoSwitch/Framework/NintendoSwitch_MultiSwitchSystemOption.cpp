@@ -15,37 +15,33 @@ namespace NintendoSwitch{
 
 
 MultiSwitchSystemOption::MultiSwitchSystemOption(
-    AllowCommandsWhenRunning allow_commands_while_running,
     size_t min_switches,
     size_t max_switches,
     size_t switches
 )
-    : m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
-    , m_min_switches(std::max(min_switches, (size_t)1))
+    : m_min_switches(std::max(min_switches, (size_t)1))
     , m_max_switches(std::min(max_switches, (size_t)MAX_SWITCHES))
     , m_active_switches(0)
     , m_switches(m_max_switches)
 {
     for (size_t c = 0; c < m_max_switches; c++){
-        m_switches.emplace_back(m_allow_commands_while_running);
+        m_switches.emplace_back();
     }
     switches = std::max(switches, m_min_switches);
     switches = std::min(switches, m_max_switches);
     m_active_switches = switches;
 }
 MultiSwitchSystemOption::MultiSwitchSystemOption(
-    AllowCommandsWhenRunning allow_commands_while_running,
     size_t min_switches,
     size_t max_switches,
     const JsonValue& json
 )
-    : m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
-    , m_min_switches(std::max(min_switches, (size_t)1))
+    : m_min_switches(std::max(min_switches, (size_t)1))
     , m_max_switches(std::min(max_switches, (size_t)MAX_SWITCHES))
     , m_active_switches(0)
 {
     for (size_t c = 0; c < m_max_switches; c++){
-        m_switches.emplace_back(m_allow_commands_while_running);
+        m_switches.emplace_back();
     }
     MultiSwitchSystemOption::load_json(json);
 }

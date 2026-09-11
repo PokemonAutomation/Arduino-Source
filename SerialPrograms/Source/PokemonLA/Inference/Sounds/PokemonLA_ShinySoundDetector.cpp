@@ -55,7 +55,7 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         SwitchSystemOption option(false);
-        SwitchSystemSession session(option, 0, {});
+        SwitchSystemSession session(option, false, 0, {});
         ConsoleHandle console(session);
         ShinySoundDetector detector(console, [&](float error_coefficient) -> bool{
             return true;

@@ -43,14 +43,11 @@ MultiSwitchProgramSession::MultiSwitchProgramSession(const MultiSwitchProgramDes
     , ProgramSession(descriptor)
     , m_descriptor(descriptor)
     , m_system_option(
-        descriptor.allow_commands_while_running()
-            ? AllowCommandsWhenRunning::ENABLE_COMMANDS
-            : AllowCommandsWhenRunning::DISABLE_COMMANDS,
         descriptor.min_switches(),
         descriptor.max_switches(),
         descriptor.default_switches()
     )
-    , m_system(m_system_option, instance_id())
+    , m_system(m_system_option, descriptor.allow_commands_while_running(), instance_id())
     , m_instance(descriptor.make_instance())
     , m_scope(nullptr)
     , m_sanitizer("MultiSwitchProgramSession")

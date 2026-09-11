@@ -14,7 +14,6 @@
 #define PokemonAutomationn_NintendoSwitch_MultiSwitchSystemOption_H
 
 #include "Common/Cpp/Containers/FixedLimitVector.h"
-#include "CommonFramework/Panels/ProgramDescriptor.h"
 #include "NintendoSwitch_SwitchSystemOption.h"
 
 namespace PokemonAutomation{
@@ -29,13 +28,11 @@ public:
 
 public:
     MultiSwitchSystemOption(
-        AllowCommandsWhenRunning allow_commands_while_running,
         size_t min_switches,
         size_t max_switches,
         size_t switches
     );
     MultiSwitchSystemOption(
-        AllowCommandsWhenRunning allow_commands_while_running,
         size_t min_switches,
         size_t max_switches,
         const JsonValue& json
@@ -56,8 +53,6 @@ public:
 private:
     friend class MultiSwitchProgramSession;
     friend class MultiSwitchSystemWidget;
-
-    const bool m_allow_commands_while_running;
 
     const size_t m_min_switches;
     const size_t m_max_switches;

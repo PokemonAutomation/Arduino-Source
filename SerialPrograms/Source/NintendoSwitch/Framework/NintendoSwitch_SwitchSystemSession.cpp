@@ -32,12 +32,14 @@ SwitchSystemSession::~SwitchSystemSession(){
 }
 SwitchSystemSession::SwitchSystemSession(
     SwitchSystemOption& option,
+    bool allow_commands_while_locked,
     size_t console_number,
     std::optional<uint64_t> program_id
 )
     : UiState<SwitchSystemSession, GameConsole::ConsoleSystemSession>(
         global_logger_raw(),
         option,
+        allow_commands_while_locked,
         console_number,
         std::nullopt
     )

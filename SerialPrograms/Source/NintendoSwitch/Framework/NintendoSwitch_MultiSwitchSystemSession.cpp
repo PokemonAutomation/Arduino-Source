@@ -42,16 +42,18 @@ MultiSwitchSystemSession::~MultiSwitchSystemSession(){
 
 MultiSwitchSystemSession::MultiSwitchSystemSession(
     MultiSwitchSystemOption& option,
+    bool allow_commands_while_locked,
     uint64_t program_id
 )
     : m_option(option)
+    , m_allow_commands_while_locked(allow_commands_while_locked)
     , m_program_id(program_id)
     , m_switch_count_locked(false)
     , m_consoles(option.count())
 {
     size_t count = option.count();
     for (size_t c = 0; c < count; c++){
-        m_consoles.emplace_back(option[c], c, program_id);
+        m_consoles.emplace_back(option[c], allow_commands_while_locked, c, program_id);
     }
 }
 
@@ -75,7 +77,7 @@ bool MultiSwitchSystemSession::set_switch_count(size_t count){
     m_consoles.reset(count);
     m_option.resize(count);
     for (size_t c = 0; c < count; c++){
-        m_consoles.emplace_back(m_option[c], c, m_program_id);
+        m_consoles.emplace_back(m_option[c], m_allow_commands_while_locked, c, m_program_id);
     }
     for (Listener* listener : m_listeners){
         listener->startup(count);

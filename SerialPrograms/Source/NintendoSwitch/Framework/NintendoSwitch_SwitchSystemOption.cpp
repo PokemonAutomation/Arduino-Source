@@ -34,18 +34,13 @@ Color pick_color(ProgramControllerClass color_class){
 const std::string SwitchSystemOption::JSON_CONSOLE_TYPE = "ConsoleType";
 
 
-SwitchSystemOption::SwitchSystemOption(
-    bool allow_commands_while_running
-)
-    : ConsoleSystemOption(1, allow_commands_while_running)
+SwitchSystemOption::SwitchSystemOption()
+    : ConsoleSystemOption(1)
 {}
-SwitchSystemOption::SwitchSystemOption(
-    bool allow_commands_while_running,
-    const JsonValue& json
-)
-    : SwitchSystemOption(allow_commands_while_running)
+SwitchSystemOption::SwitchSystemOption(const JsonValue& json)
+    : ConsoleSystemOption(1)
 {
-    load_json(json);
+    SwitchSystemOption::load_json(json);
 }
 JsonValue SwitchSystemOption::to_json() const{
     JsonValue ret = ConsoleSystemOption::to_json();

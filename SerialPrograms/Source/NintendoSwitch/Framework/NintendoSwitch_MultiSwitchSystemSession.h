@@ -45,6 +45,7 @@ public:
     ~MultiSwitchSystemSession();
     MultiSwitchSystemSession(
         MultiSwitchSystemOption& option,
+        bool allow_commands_while_locked,
         uint64_t program_id
     );
 
@@ -69,6 +70,7 @@ public:
 
 private:
     MultiSwitchSystemOption& m_option;
+    const bool m_allow_commands_while_locked;
     const uint64_t m_program_id;
 
     Mutex m_lock;
