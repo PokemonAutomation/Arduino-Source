@@ -27,7 +27,10 @@ class ComputerProgramOption;
 class ProgramEnvironment;
 
 
-class ComputerProgramSession final : public UiState<ComputerProgramSession, PanelSession>, public ProgramSession{
+class ComputerProgramSession final
+    : public UiState<ComputerProgramSession, PanelSession>
+    , public ProgramSession
+{
 public:
     virtual ~ComputerProgramSession();
     ComputerProgramSession(const ComputerProgramDescriptor& descriptor);

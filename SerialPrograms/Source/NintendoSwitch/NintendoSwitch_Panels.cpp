@@ -59,8 +59,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_settings<ConsoleSettings_Descriptor, ConsoleSettingsPanel>());
 
     ret.emplace_back("---- Virtual Consoles ----");
-    ret.emplace_back(make_panel<ConsoleInfra::VirtualConsole_Descriptor, ConsoleInfra::VirtualConsole>());
-    ret.emplace_back(make_panel<ConsoleInfra::MultiControllerTester_Descriptor, ConsoleInfra::VirtualConsole>());
+    ret.emplace_back(ConsoleInfra::make_ConsolePanel<ConsoleInfra::VirtualConsole_Descriptor, ConsoleInfra::ConsolePanelInstance>());
+    ret.emplace_back(ConsoleInfra::make_ConsolePanel<ConsoleInfra::MultiControllerTester_Descriptor, ConsoleInfra::ConsolePanelInstance>());
     ret.emplace_back(make_panel<SwitchViewer_Descriptor, SwitchViewer>());
 
     ret.emplace_back("---- Programs ----");

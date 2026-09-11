@@ -19,7 +19,7 @@
 #define PokemonAutomation_NintendoSwitch_SwitchSystemWidget_H
 
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h"
-#include "ConsoleInfra/ConsoleSystemWidget.h"
+#include "ConsoleInfra/UI/ConsoleSystemWidget.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

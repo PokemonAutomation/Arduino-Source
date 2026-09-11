@@ -28,9 +28,6 @@ template class RegisterUiStateQtWidget<ComputerProgramWidget>;
 
 ComputerProgramWidget::~ComputerProgramWidget(){
     m_session.remove_listener(*this);
-    delete m_actions_bar;
-    delete m_stats_bar;
-    delete m_options;
 }
 ComputerProgramWidget::ComputerProgramWidget(
     QWidget& parent,

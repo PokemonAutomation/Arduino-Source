@@ -869,16 +869,22 @@ file(GLOB LIBRARY_SOURCES
     Source/ComputerPrograms/Framework/ComputerProgramSession.h
     Source/ComputerPrograms/Framework/ComputerProgramWidget.cpp
     Source/ComputerPrograms/Framework/ComputerProgramWidget.h
-    Source/ConsoleInfra/CommandRowWidget.cpp
-    Source/ConsoleInfra/CommandRowWidget.h
+    Source/ConsoleInfra/ConsolePanel.cpp
+    Source/ConsoleInfra/ConsolePanel.h
+    Source/ConsoleInfra/ConsolePanelSession.cpp
+    Source/ConsoleInfra/ConsolePanelSession.h
     Source/ConsoleInfra/ConsoleSystemOption.cpp
     Source/ConsoleInfra/ConsoleSystemOption.h
     Source/ConsoleInfra/ConsoleSystemSession.cpp
     Source/ConsoleInfra/ConsoleSystemSession.h
-    Source/ConsoleInfra/ConsoleSystemWidget.cpp
-    Source/ConsoleInfra/ConsoleSystemWidget.h
     Source/ConsoleInfra/VirtualConsole.cpp
     Source/ConsoleInfra/VirtualConsole.h
+    Source/ConsoleInfra/UI/CommandRowWidget.cpp
+    Source/ConsoleInfra/UI/CommandRowWidget.h
+    Source/ConsoleInfra/UI/ConsolePanelWidget.cpp
+    Source/ConsoleInfra/UI/ConsolePanelWidget.h
+    Source/ConsoleInfra/UI/ConsoleSystemWidget.cpp
+    Source/ConsoleInfra/UI/ConsoleSystemWidget.h
     Source/ControllerInput/Keyboard/GlobalKeyboardHidTracker.cpp
     Source/ControllerInput/Keyboard/GlobalKeyboardHidTracker.h
     Source/ControllerInput/Keyboard/GlobalQtKeyMap.cpp
