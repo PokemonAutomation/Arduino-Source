@@ -35,7 +35,7 @@ SwitchSystemSession::SwitchSystemSession(
     size_t console_number,
     std::optional<uint64_t> program_id
 )
-    : UiState<SwitchSystemSession, ConsoleInfra::ConsoleSystemSession>(
+    : UiState<SwitchSystemSession, GameConsole::ConsoleSystemSession>(
         global_logger_raw(),
         option,
         console_number,

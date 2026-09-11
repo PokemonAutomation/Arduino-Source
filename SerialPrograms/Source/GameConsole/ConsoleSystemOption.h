@@ -17,7 +17,7 @@
 #include "Controllers/ControllerOption.h"
 
 namespace PokemonAutomation{
-namespace ConsoleInfra{
+namespace GameConsole{
 
 
 

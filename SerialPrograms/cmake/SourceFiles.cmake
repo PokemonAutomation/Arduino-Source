@@ -869,23 +869,6 @@ file(GLOB LIBRARY_SOURCES
     Source/ComputerPrograms/Framework/ComputerProgramSession.h
     Source/ComputerPrograms/Framework/ComputerProgramWidget.cpp
     Source/ComputerPrograms/Framework/ComputerProgramWidget.h
-    Source/ConsoleInfra/ConsolePanel.cpp
-    Source/ConsoleInfra/ConsolePanel.h
-    Source/ConsoleInfra/ConsolePanelSession.cpp
-    Source/ConsoleInfra/ConsolePanelSession.h
-    Source/ConsoleInfra/ConsoleSystemOption.cpp
-    Source/ConsoleInfra/ConsoleSystemOption.h
-    Source/ConsoleInfra/ConsoleSystemSession.cpp
-    Source/ConsoleInfra/ConsoleSystemSession.h
-    Source/ConsoleInfra/Panels/BoxDraw.cpp
-    Source/ConsoleInfra/Panels/BoxDraw.h
-    Source/ConsoleInfra/Panels/VirtualConsole.h
-    Source/ConsoleInfra/UI/CommandRowWidget.cpp
-    Source/ConsoleInfra/UI/CommandRowWidget.h
-    Source/ConsoleInfra/UI/ConsolePanelWidget.cpp
-    Source/ConsoleInfra/UI/ConsolePanelWidget.h
-    Source/ConsoleInfra/UI/ConsoleSystemWidget.cpp
-    Source/ConsoleInfra/UI/ConsoleSystemWidget.h
     Source/ControllerInput/Keyboard/GlobalKeyboardHidTracker.cpp
     Source/ControllerInput/Keyboard/GlobalKeyboardHidTracker.h
     Source/ControllerInput/Keyboard/GlobalQtKeyMap.cpp
@@ -932,6 +915,23 @@ file(GLOB LIBRARY_SOURCES
     Source/Integrations/IntegrationsAPI.h
     Source/Integrations/ProgramTracker.cpp
     Source/Integrations/ProgramTracker.h
+    Source/GameConsole/ConsolePanel.cpp
+    Source/GameConsole/ConsolePanel.h
+    Source/GameConsole/ConsolePanelSession.cpp
+    Source/GameConsole/ConsolePanelSession.h
+    Source/GameConsole/ConsoleSystemOption.cpp
+    Source/GameConsole/ConsoleSystemOption.h
+    Source/GameConsole/ConsoleSystemSession.cpp
+    Source/GameConsole/ConsoleSystemSession.h
+    Source/GameConsole/Panels/BoxDraw.cpp
+    Source/GameConsole/Panels/BoxDraw.h
+    Source/GameConsole/Panels/VirtualConsole.h
+    Source/GameConsole/UI/CommandRowWidget.cpp
+    Source/GameConsole/UI/CommandRowWidget.h
+    Source/GameConsole/UI/ConsolePanelWidget.cpp
+    Source/GameConsole/UI/ConsolePanelWidget.h
+    Source/GameConsole/UI/ConsoleSystemWidget.cpp
+    Source/GameConsole/UI/ConsoleSystemWidget.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch.h

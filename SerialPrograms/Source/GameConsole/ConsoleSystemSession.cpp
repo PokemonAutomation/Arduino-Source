@@ -18,7 +18,7 @@
 //using std::endl;
 
 namespace PokemonAutomation{
-namespace ConsoleInfra{
+namespace GameConsole{
 
 
 bool ConsoleSystemSession::try_shutdown() noexcept{

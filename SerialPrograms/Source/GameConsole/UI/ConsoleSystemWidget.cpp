@@ -11,9 +11,9 @@
 
 namespace PokemonAutomation{
 
-template class RegisterUiStateQtWidget<ConsoleInfra::ConsoleSystemWidget>;
+template class RegisterUiStateQtWidget<GameConsole::ConsoleSystemWidget>;
 
-namespace ConsoleInfra{
+namespace GameConsole{
 
 
 

@@ -19,13 +19,13 @@
 #define PokemonAutomation_NintendoSwitch_SwitchSystemWidget_H
 
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h"
-#include "ConsoleInfra/UI/ConsoleSystemWidget.h"
+#include "GameConsole/UI/ConsoleSystemWidget.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class SwitchSystemWidget final : public ConsoleInfra::ConsoleSystemWidget{
+class SwitchSystemWidget final : public GameConsole::ConsoleSystemWidget{
 public:
     using ParentState = SwitchSystemSession;
 

@@ -11,11 +11,11 @@
 #include <QVBoxLayout>
 #include "Common/Qt/UiStateQtWidget.h"
 //#include "CommonFramework/Panels/UI/PanelElements.h"
-#include "ConsoleInfra/ConsolePanel.h"
-#include "ConsoleInfra/ConsolePanelSession.h"
+#include "GameConsole/ConsolePanel.h"
+#include "GameConsole/ConsolePanelSession.h"
 
 namespace PokemonAutomation{
-namespace ConsoleInfra{
+namespace GameConsole{
 
 
 class ConsolePanelWidget : public QWidget, public UiComponentQtWidget{

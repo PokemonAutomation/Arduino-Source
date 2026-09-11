@@ -20,7 +20,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_SwitchSystemSession_H
 #define PokemonAutomation_NintendoSwitch_SwitchSystemSession_H
 
-#include "ConsoleInfra/ConsoleSystemSession.h"
+#include "GameConsole/ConsoleSystemSession.h"
 #include "NintendoSwitch_SwitchSystemOption.h"
 
 namespace PokemonAutomation{
@@ -31,7 +31,7 @@ class SwitchSystemOption;
 
 
 
-class SwitchSystemSession final : public UiState<SwitchSystemSession, ConsoleInfra::ConsoleSystemSession>{
+class SwitchSystemSession final : public UiState<SwitchSystemSession, GameConsole::ConsoleSystemSession>{
 public:
     virtual bool try_shutdown() noexcept override;
     ~SwitchSystemSession();

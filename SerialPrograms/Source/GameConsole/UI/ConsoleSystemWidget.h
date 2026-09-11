@@ -15,10 +15,10 @@
 #include "CommonFramework/AudioPipeline/UI/AudioDisplayWidget.h"
 #include "CommonFramework/VideoPipeline/UI/VideoSourceSelectorWidget.h"
 #include "CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h"
-#include "ConsoleInfra/ConsoleSystemSession.h"
+#include "GameConsole/ConsoleSystemSession.h"
 
 namespace PokemonAutomation{
-namespace ConsoleInfra{
+namespace GameConsole{
 
 
 class ConsoleSystemWidget : public QWidget, public UiComponentQtWidget{

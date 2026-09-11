@@ -35,7 +35,7 @@ namespace PokemonAutomation{
     class MemoryUtilizationStats;
     class CpuUtilizationStat;
     class ThreadUtilizationStat;
-namespace ConsoleInfra{
+namespace GameConsole{
 
 
 class ConsoleSystemSession

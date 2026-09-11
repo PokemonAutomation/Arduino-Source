@@ -8,10 +8,10 @@
 #define PokemonAutomation_ConsoleInfra_BoxDraw_H
 
 #include "CommonFramework/Options/NestedBoxDrawOption.h"
-#include "ConsoleInfra/ConsolePanel.h"
+#include "GameConsole/ConsolePanel.h"
 
 namespace PokemonAutomation{
-namespace ConsoleInfra{
+namespace GameConsole{
 
 
 class BoxDraw_Descriptor : public ConsolePanelDescriptor{

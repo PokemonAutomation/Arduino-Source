@@ -15,7 +15,7 @@
 #include "CommandRowWidget.h"
 
 namespace PokemonAutomation{
-namespace ConsoleInfra{
+namespace GameConsole{
 
 
 

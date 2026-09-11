@@ -12,7 +12,7 @@
 #include "ConsolePanel.h"
 
 namespace PokemonAutomation{
-namespace ConsoleInfra{
+namespace GameConsole{
 
 
 

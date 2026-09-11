@@ -13,10 +13,10 @@
 #include <QPushButton>
 #include "Common/Qt/CheckboxDropdown.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
-#include "ConsoleInfra/ConsoleSystemSession.h"
+#include "GameConsole/ConsoleSystemSession.h"
 
 namespace PokemonAutomation{
-namespace ConsoleInfra{
+namespace GameConsole{
 
 
 class CommandRowWidget

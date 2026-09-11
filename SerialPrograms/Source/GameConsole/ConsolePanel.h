@@ -13,7 +13,7 @@
 #include "CommonFramework/Panels/PanelDescriptor.h"
 
 namespace PokemonAutomation{
-namespace ConsoleInfra{
+namespace GameConsole{
 
 
 class ConsoleSystemSession;

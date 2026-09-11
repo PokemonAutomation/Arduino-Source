@@ -4,7 +4,7 @@
  *
  */
 
-#include "ConsoleInfra/ConsoleSystemSession.h"
+#include "GameConsole/ConsoleSystemSession.h"
 #include "BoxDraw.h"
 
 //#include <iostream>
@@ -12,15 +12,15 @@
 //using std::endl;
 
 namespace PokemonAutomation{
-namespace ConsoleInfra{
+namespace GameConsole{
 
 
 
 BoxDraw_Descriptor::BoxDraw_Descriptor()
     : ConsolePanelDescriptor(
         Color(),
-        "NintendoSwitch:BoxDraw",
-        "Nintendo Switch", "Box Draw",
+        "GameConsole:BoxDraw",
+        "Game Console", "Box Draw",
         "",
         "Test box coordinates for development."
     )

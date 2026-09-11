@@ -9,11 +9,10 @@
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
-#include "Controllers/NullController.h"
-#include "ConsoleInfra/ConsoleSystemOption.h"
+#include "GameConsole/ConsoleSystemOption.h"
 
 namespace PokemonAutomation{
-namespace ConsoleInfra{
+namespace GameConsole{
 
 const std::string ConsoleSystemOption::JSON_CAMERA      = "Camera";
 const std::string ConsoleSystemOption::JSON_VIDEO       = "Video";

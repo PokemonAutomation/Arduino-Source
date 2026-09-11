@@ -7,7 +7,7 @@
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.h"
-#include "ConsoleInfra/ConsoleSystemSession.h"
+#include "GameConsole/ConsoleSystemSession.h"
 #include "NintendoSwitch_ConsoleHandle.h"
 
 //#include <iostream>
@@ -26,7 +26,7 @@ ConsoleHandle::~ConsoleHandle(){
 }
 
 
-ConsoleHandle::ConsoleHandle(ConsoleInfra::ConsoleSystemSession& session)
+ConsoleHandle::ConsoleHandle(GameConsole::ConsoleSystemSession& session)
     : VideoStream(
         session.logger(),
         session.audio(),

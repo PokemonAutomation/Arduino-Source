@@ -9,7 +9,7 @@
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
-#include "ConsoleInfra/ConsoleSystemSession.h"
+#include "GameConsole/ConsoleSystemSession.h"
 #include "WaterfillTemplateMaker.h"
 
 //#include <iostream>
@@ -36,7 +36,7 @@ WaterfillTemplateMaker_Descriptor::WaterfillTemplateMaker_Descriptor()
 
 
 
-WaterfillTemplateMaker::WaterfillTemplateMaker(ConsoleInfra::ConsoleSystemSession& system)
+WaterfillTemplateMaker::WaterfillTemplateMaker(GameConsole::ConsoleSystemSession& system)
     : MIN_AREA("<b>Min Area (in pixels):</b>", LockMode::UNLOCK_WHILE_RUNNING, 100)
     , FILTER_LOWER("<b>Filter (lower):</b>", LockMode::UNLOCK_WHILE_RUNNING, false, 0xff000000, 0xff000000)
     , FILTER_UPPER("<b>Filter (upper):</b>", LockMode::UNLOCK_WHILE_RUNNING, false, 0xffffffff, 0xffffffff)

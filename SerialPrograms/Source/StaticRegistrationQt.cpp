@@ -59,8 +59,8 @@
 #include "ControllerInput/Keyboard/KeyBindingWidget.h"
 
 //  Consoles
-#include "ConsoleInfra/UI/ConsoleSystemWidget.h"
-#include "ConsoleInfra/UI/ConsolePanelWidget.h"
+#include "GameConsole/UI/ConsoleSystemWidget.h"
+#include "GameConsole/UI/ConsolePanelWidget.h"
 
 //  Nintendo Switch
 #include "NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h"
@@ -149,8 +149,8 @@ void register_all_statics(){
     RegisterUiStateQtWidget<KeyboardHidBindingCellWidget>();
 
     //  Consoles
-    RegisterUiStateQtWidget<ConsoleInfra::ConsoleSystemWidget>();
-    RegisterUiStateQtWidget<ConsoleInfra::ConsolePanelWidget>();
+    RegisterUiStateQtWidget<GameConsole::ConsoleSystemWidget>();
+    RegisterUiStateQtWidget<GameConsole::ConsolePanelWidget>();
 
     //  Nintendo Switch
     RegisterUiStateQtWidget<SysbotBase::TcpSysbotBase_SelectorWidget>();

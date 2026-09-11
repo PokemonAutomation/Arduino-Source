@@ -7,10 +7,10 @@
 #ifndef PokemonAutomation_ConsoleInfra_VirtualConsole_H
 #define PokemonAutomation_ConsoleInfra_VirtualConsole_H
 
-#include "ConsoleInfra/ConsolePanel.h"
+#include "GameConsole/ConsolePanel.h"
 
 namespace PokemonAutomation{
-namespace ConsoleInfra{
+namespace GameConsole{
 
 
 
@@ -19,8 +19,8 @@ public:
     VirtualConsole_Descriptor()
         : ConsolePanelDescriptor(
             Color(),
-            "CC:VirtualConsole",
-            "CC",
+            "GameConsole:VirtualConsole",
+            "Game Console",
             "Virtual Console",
             "Programs/NintendoSwitch/VirtualConsole.html",
             "Play your console from your computer.",
@@ -35,8 +35,8 @@ public:
     MultiControllerTester_Descriptor()
         : ConsolePanelDescriptor(
             Color(),
-            "CC:MultiControllerTester",
-            "CC",
+            "GameConsole:MultiControllerTester",
+            "Game Console",
             "Multi-Controller Tester",
             "Programs/NintendoSwitch/VirtualConsole.html",
             "Test multiple controllers at once.",

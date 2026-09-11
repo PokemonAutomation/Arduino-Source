@@ -17,7 +17,7 @@ namespace PokemonAutomation{
     class ThreadHandle;
     class ThreadUtilizationStat;
     class ThreadPoolUtilizationStat;
-namespace ConsoleInfra{
+namespace GameConsole{
     class ConsoleSystemSession;
 }
 namespace NintendoSwitch{
@@ -32,7 +32,7 @@ public:
 
 
 public:
-    ConsoleHandle(ConsoleInfra::ConsoleSystemSession& session);
+    ConsoleHandle(GameConsole::ConsoleSystemSession& session);
 
     size_t index() const{ return m_index; }
 
@@ -69,7 +69,7 @@ public:
 
 
 private:
-    ConsoleInfra::ConsoleSystemSession& m_session;
+    GameConsole::ConsoleSystemSession& m_session;
     size_t m_index;
     NullController m_null_controller;
 

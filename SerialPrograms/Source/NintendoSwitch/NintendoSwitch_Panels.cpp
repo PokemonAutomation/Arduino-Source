@@ -10,8 +10,8 @@
 
 #include "NintendoSwitch_SettingsPanel.h"
 
-#include "ConsoleInfra/Panels/VirtualConsole.h"
-#include "ConsoleInfra/Panels/BoxDraw.h"
+#include "GameConsole/Panels/VirtualConsole.h"
+#include "GameConsole/Panels/BoxDraw.h"
 #include "Programs/NintendoSwitch_SwitchViewer.h"
 
 #include "Programs/NintendoSwitch_TurboA.h"
@@ -59,8 +59,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_settings<ConsoleSettings_Descriptor, ConsoleSettingsPanel>());
 
     ret.emplace_back("---- Virtual Consoles ----");
-    ret.emplace_back(ConsoleInfra::make_ConsolePanel<ConsoleInfra::VirtualConsole_Descriptor, ConsoleInfra::ConsolePanelInstance>());
-    ret.emplace_back(ConsoleInfra::make_ConsolePanel<ConsoleInfra::MultiControllerTester_Descriptor, ConsoleInfra::ConsolePanelInstance>());
+    ret.emplace_back(GameConsole::make_ConsolePanel<GameConsole::VirtualConsole_Descriptor, GameConsole::ConsolePanelInstance>());
+    ret.emplace_back(GameConsole::make_ConsolePanel<GameConsole::MultiControllerTester_Descriptor, GameConsole::ConsolePanelInstance>());
     ret.emplace_back(make_panel<SwitchViewer_Descriptor, SwitchViewer>());
 
     ret.emplace_back("---- Programs ----");
@@ -74,7 +74,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<RecordKeyboardController_Descriptor, RecordKeyboardController>());
 
     ret.emplace_back("---- Testing ----");
-    ret.emplace_back(ConsoleInfra::make_ConsolePanel<ConsoleInfra::BoxDraw_Descriptor, ConsoleInfra::BoxDraw>());
+    ret.emplace_back(GameConsole::make_ConsolePanel<GameConsole::BoxDraw_Descriptor, GameConsole::BoxDraw>());
     ret.emplace_back(make_single_switch_program<SnapshotDumper_Descriptor, SnapshotDumper>());
 
     if (STATIC_GLOBALS.DEVELOPER_MODE){

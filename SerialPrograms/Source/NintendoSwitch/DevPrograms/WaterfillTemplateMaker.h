@@ -26,7 +26,7 @@ public:
 
 class WaterfillTemplateMaker : public SingleSwitchProgramInstance{
 public:
-    WaterfillTemplateMaker(ConsoleInfra::ConsoleSystemSession& system);
+    WaterfillTemplateMaker(GameConsole::ConsoleSystemSession& system);
 
     virtual void start_program_controller_check(ControllerSession& session) override{}
     virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;

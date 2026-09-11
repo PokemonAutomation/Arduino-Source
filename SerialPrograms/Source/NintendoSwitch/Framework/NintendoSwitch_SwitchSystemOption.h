@@ -16,7 +16,7 @@
 #define PokemonAutomation_NintendoSwitch_SwitchSystemOption_H
 
 #include "CommonFramework/Panels/ProgramDescriptor.h"
-#include "ConsoleInfra/ConsoleSystemOption.h"
+#include "GameConsole/ConsoleSystemOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_ModelType.h"
 
 namespace PokemonAutomation{
@@ -29,7 +29,7 @@ Color pick_color(ProgramControllerClass color_class);
 //  Options to control and monitor a Switch. It includes
 //  what micro-controller and what video source to use and
 //  what video overlay display option to set.
-class SwitchSystemOption : public ConsoleInfra::ConsoleSystemOption{
+class SwitchSystemOption : public GameConsole::ConsoleSystemOption{
     static const std::string JSON_CONSOLE_TYPE;
 
 public:
