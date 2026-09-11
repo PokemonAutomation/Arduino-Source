@@ -86,7 +86,7 @@ public:
     virtual std::unique_ptr<ConsolePanelInstance> make_instance(
         ConsoleSystemSession& system
     ) const override{
-        if constexpr (std::is_constructible_v<ConsolePanelSession&>){
+        if constexpr (std::is_constructible_v<ConsoleSystemSession&>){
             return std::make_unique<Instance>(system);
         }else{
             return std::make_unique<Instance>();
