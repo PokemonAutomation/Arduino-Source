@@ -118,22 +118,22 @@ DailyFarmer::DailyFarmer()
 void DailyFarmer::go_to_date_menu(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     DateChangeWatcher date_change_watcher(env.console);
 
+    go_home(env.console, context);
+    home_to_date_time(env.console, context, true);
+
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [&](ProControllerContext& context){
-            for (int i = 0; i < 3; i++){
-                go_home(env.console, context);
-                home_to_date_time(env.console, context, true);
-                pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
-                context.wait_for_all_requests();
-            }
+            pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
         },
         { date_change_watcher }
     );
     if (ret == 0){
         env.console.log("Successfully navigated to date change menu");
+        context.wait_for(250ms);    //  Wait for it to finish loading.
         return;
     }
+
     OperationFailedExceptionWithScreenshot::fire(
         ErrorReportMode::SEND_ERROR_REPORT,
         "Failed to navigate to date change menu",
