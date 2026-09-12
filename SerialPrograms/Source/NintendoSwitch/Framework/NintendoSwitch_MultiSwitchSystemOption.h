@@ -13,51 +13,43 @@
 #ifndef PokemonAutomationn_NintendoSwitch_MultiSwitchSystemOption_H
 #define PokemonAutomationn_NintendoSwitch_MultiSwitchSystemOption_H
 
-#include "Common/Cpp/Containers/FixedLimitVector.h"
+#include "GameConsole/MultiConsoleSystemOption.h"
 #include "NintendoSwitch_SwitchSystemOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class MultiSwitchSystemWidget;
-
-class MultiSwitchSystemOption{
-public:
-    static const size_t MAX_SWITCHES = 4;
-
+class MultiSwitchSystemOption final : public GameConsole::MultiConsoleSystemOption{
 public:
     MultiSwitchSystemOption(
-        size_t min_switches,
-        size_t max_switches,
-        size_t switches
-    );
+        size_t min_consoles,
+        size_t max_consoles,
+        size_t consoles
+    )
+        : MultiConsoleSystemOption(
+            min_consoles,
+            max_consoles,
+            consoles,
+            []{ return std::make_unique<SwitchSystemOption>(); }
+        )
+    {}
     MultiSwitchSystemOption(
-        size_t min_switches,
-        size_t max_switches,
+        size_t min_consoles,
+        size_t max_consoles,
         const JsonValue& json
-    );
-    void load_json(const JsonValue& json);
-    JsonValue to_json() const;
+    )
+        : MultiConsoleSystemOption(
+            min_consoles,
+            max_consoles,
+            json,
+            []{ return std::make_unique<SwitchSystemOption>(); }
+        )
+    {}
 
-    void resize(size_t count);
-
-public:
-    size_t min_switches() const{ return m_min_switches; }
-    size_t max_switches() const{ return m_max_switches; }
-
-    size_t count() const{ return m_active_switches; }
-    SwitchSystemOption& operator[](size_t index){ return m_switches[index]; }
-
-
-private:
-    friend class MultiSwitchProgramSession;
-    friend class MultiSwitchSystemWidget;
-
-    const size_t m_min_switches;
-    const size_t m_max_switches;
-    size_t m_active_switches;
-    FixedLimitVector<SwitchSystemOption> m_switches;
+    SwitchSystemOption& operator[](size_t index){
+        return static_cast<SwitchSystemOption&>(MultiConsoleSystemOption::operator[](index));
+    }
 };
 
 

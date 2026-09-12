@@ -17,8 +17,8 @@
  *
  */
 
-#ifndef PokemonAutomation_ConsoleInfra_ConsoleSystemSession_H
-#define PokemonAutomation_ConsoleInfra_ConsoleSystemSession_H
+#ifndef PokemonAutomation_GameConsole_ConsoleSystemSession_H
+#define PokemonAutomation_GameConsole_ConsoleSystemSession_H
 
 #include "Common/Cpp/Logging/TaggedLogger.h"
 #include "Common/Cpp/UiWrapper.h"

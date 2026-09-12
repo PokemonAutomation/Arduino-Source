@@ -15,6 +15,8 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
+class MultiSwitchSystemWidget;
+
 
 class SwitchViewer_Descriptor : public PanelDescriptor{
 public:

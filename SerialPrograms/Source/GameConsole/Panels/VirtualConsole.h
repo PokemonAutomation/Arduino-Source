@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_ConsoleInfra_VirtualConsole_H
-#define PokemonAutomation_ConsoleInfra_VirtualConsole_H
+#ifndef PokemonAutomation_GameConsole_VirtualConsole_H
+#define PokemonAutomation_GameConsole_VirtualConsole_H
 
 #include "GameConsole/ConsolePanel.h"
 

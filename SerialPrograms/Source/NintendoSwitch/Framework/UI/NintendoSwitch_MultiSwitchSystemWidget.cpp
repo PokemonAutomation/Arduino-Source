@@ -152,13 +152,13 @@ void MultiSwitchSystemWidget::redraw_videos(size_t count){
         vbox->addLayout(vrow1, 1);
         vrow1->setContentsMargins(0, 0, 0, 0);
         vrow1->addWidget(m_switches[2], 1);
-        if (m_switches.size() >= MultiSwitchSystemOption::MAX_SWITCHES){
+        if (m_switches.size() >= MultiSwitchSystemOption::MAX_CONSOLES){
             vrow1->addWidget(m_switches[3], 1);
         }else{
             vrow1->addWidget(new QWidget(), 1);
         }
     }
-    static_assert(MultiSwitchSystemOption::MAX_SWITCHES <= 4, "Can't display more than 4 Switches.");
+    static_assert(MultiSwitchSystemOption::MAX_CONSOLES <= 4, "Can't display more than 4 Switches.");
 }
 
 void MultiSwitchSystemWidget::update_ui(ProgramState state){

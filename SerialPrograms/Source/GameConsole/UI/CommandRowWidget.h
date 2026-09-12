@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_ConsoleInfra_CommandRowWidget_H
-#define PokemonAutomation_ConsoleInfra_CommandRowWidget_H
+#ifndef PokemonAutomation_GameConsole_CommandRowWidget_H
+#define PokemonAutomation_GameConsole_CommandRowWidget_H
 
 #include <QHBoxLayout>
 #include <QLabel>
