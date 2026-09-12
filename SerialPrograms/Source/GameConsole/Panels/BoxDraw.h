@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_ConsoleInfra_BoxDraw_H
-#define PokemonAutomation_ConsoleInfra_BoxDraw_H
+#ifndef PokemonAutomation_GameConsole_BoxDraw_H
+#define PokemonAutomation_GameConsole_BoxDraw_H
 
 #include "CommonFramework/Options/NestedBoxDrawOption.h"
 #include "GameConsole/ConsolePanel.h"

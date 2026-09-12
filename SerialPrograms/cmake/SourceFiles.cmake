@@ -925,6 +925,8 @@ file(GLOB LIBRARY_SOURCES
     Source/GameConsole/ConsoleSystemOption.h
     Source/GameConsole/ConsoleSystemSession.cpp
     Source/GameConsole/ConsoleSystemSession.h
+    Source/GameConsole/MultiConsoleSystemOption.cpp
+    Source/GameConsole/MultiConsoleSystemOption.h
     Source/GameConsole/Panels/BoxDraw.cpp
     Source/GameConsole/Panels/BoxDraw.h
     Source/GameConsole/Panels/VirtualConsole.h
@@ -1186,7 +1188,6 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/DevPrograms/WaterfillTemplateMaker.h
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h
-    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.h
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemSession.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemSession.h

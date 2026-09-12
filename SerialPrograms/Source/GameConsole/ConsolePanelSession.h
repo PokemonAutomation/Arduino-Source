@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_ConsoleInfra_ConsolePanelSession_H
-#define PokemonAutomation_ConsoleInfra_ConsolePanelSession_H
+#ifndef PokemonAutomation_GameConsole_ConsolePanelSession_H
+#define PokemonAutomation_GameConsole_ConsolePanelSession_H
 
 #include "CommonFramework/Panels/PanelSession.h"
 #include "ConsoleSystemSession.h"

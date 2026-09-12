@@ -56,16 +56,17 @@ public:
     //  Returns true only on success.
     bool set_switch_count(size_t count);
 
-    size_t min_switches() const{ return m_option.min_switches(); }
-    size_t max_switches() const{ return m_option.max_switches(); }
+    size_t min_switches() const{ return m_option.min_consoles(); }
+    size_t max_switches() const{ return m_option.max_consoles(); }
+
 
 public:
     //  Note that these are not thread-safe with changing the # of switches.
     size_t count() const{ return m_consoles.size(); }
     SwitchSystemSession& operator[](size_t index){ return m_consoles[index]; }
 
-    void load_json(const JsonValue& json);
     JsonValue to_json() const;
+    void load_json(const JsonValue& json);
 
 
 private:

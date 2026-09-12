@@ -6,8 +6,8 @@
  *
  */
 
-#ifndef PokemonAutomation_ConsoleInfra_ConsolePanel_H
-#define PokemonAutomation_ConsoleInfra_ConsolePanel_H
+#ifndef PokemonAutomation_GameConsole_ConsolePanel_H
+#define PokemonAutomation_GameConsole_ConsolePanel_H
 
 #include "Common/Cpp/Options/BatchOption.h"
 #include "CommonFramework/Panels/PanelDescriptor.h"

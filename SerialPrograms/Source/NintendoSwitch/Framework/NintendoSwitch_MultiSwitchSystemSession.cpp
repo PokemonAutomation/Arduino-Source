@@ -49,9 +49,9 @@ MultiSwitchSystemSession::MultiSwitchSystemSession(
     , m_allow_commands_while_locked(allow_commands_while_locked)
     , m_program_id(program_id)
     , m_switch_count_locked(false)
-    , m_consoles(option.count())
+    , m_consoles(option.active_consoles())
 {
-    size_t count = option.count();
+    size_t count = option.active_consoles();
     for (size_t c = 0; c < count; c++){
         m_consoles.emplace_back(option[c], allow_commands_while_locked, c, program_id);
     }
@@ -88,12 +88,12 @@ bool MultiSwitchSystemSession::set_switch_count(size_t count){
 
 
 
-void MultiSwitchSystemSession::load_json(const JsonValue& json){
-    m_option.load_json(json);
-    set_switch_count(m_option.count());
-}
 JsonValue MultiSwitchSystemSession::to_json() const{
     return m_option.to_json();
+}
+void MultiSwitchSystemSession::load_json(const JsonValue& json){
+    m_option.load_json(json);
+    set_switch_count(m_option.active_consoles());
 }
 
 

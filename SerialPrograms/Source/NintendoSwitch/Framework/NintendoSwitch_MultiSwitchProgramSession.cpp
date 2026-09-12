@@ -53,7 +53,7 @@ MultiSwitchProgramSession::MultiSwitchProgramSession(const MultiSwitchProgramDes
     , m_sanitizer("MultiSwitchProgramSession")
 {
 //    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-    m_instance->update_active_consoles(m_system_option.count());
+    m_instance->update_active_consoles(m_system_option.active_consoles());
     m_system.add_listener(*this);
 }
 
