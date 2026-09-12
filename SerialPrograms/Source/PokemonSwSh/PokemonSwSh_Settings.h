@@ -11,7 +11,7 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
-#include "CommonFramework/Panels/SettingsPanel.h"
+#include "CommonFramework/Panels/OptionsPanel.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -84,15 +84,15 @@ public:
 
 
 
-class GameSettings_Descriptor : public PanelDescriptor{
+class GameSettings_Descriptor : public OptionsPanelDescriptor{
 public:
     GameSettings_Descriptor();
 };
 
 
-class GameSettingsPanel : public SettingsPanelInstance{
+class GameSettingsPanel : public OptionsPanelInstance{
 public:
-    GameSettingsPanel(const GameSettings_Descriptor& descriptor);
+    GameSettingsPanel();
 private:
     GameSettings& settings;
 };

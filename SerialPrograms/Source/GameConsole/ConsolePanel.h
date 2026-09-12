@@ -29,11 +29,12 @@ public:
         std::string category, std::string display_name,
         std::string doc_link,
         std::string description,
-        size_t num_controllers = 1,
-        bool deprecated = false
+        PanelDeprecation deprecation = PanelDeprecation::NOT_DEPRECATED,
+        bool restore_defaults_button = true,
+        size_t num_controllers = 1
     );
 
-    bool deprecated() const{ return m_deprecated; }
+    bool restore_defaults_button() const{ return m_restore_defaults_button; }
     size_t num_controllers() const{ return m_num_controllers; }
 
     virtual std::unique_ptr<PanelSession> make_panel() const override;
@@ -41,7 +42,7 @@ public:
 
 
 private:
-    const bool m_deprecated;
+    const bool m_restore_defaults_button;
     const size_t m_num_controllers;
 };
 
@@ -94,7 +95,6 @@ public:
     }
 };
 
-// Create a program PanelDescriptor
 template <typename Descriptor, typename Instance>
 std::unique_ptr<PanelDescriptor> make_ConsolePanel(){
     return std::make_unique<ConsolePanelWrapper<Descriptor, Instance>>();

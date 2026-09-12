@@ -29,7 +29,7 @@ GameSettings::GameSettings()
 
 
 GameSettings_Descriptor::GameSettings_Descriptor()
-    : PanelDescriptor(
+    : OptionsPanelDescriptor(
         Color(),
         "PokemonHome:GlobalSettings",
         STRING_POKEMON + " Home", STRING_POKEMON + " Settings",
@@ -40,9 +40,8 @@ GameSettings_Descriptor::GameSettings_Descriptor()
 
 
 
-GameSettingsPanel::GameSettingsPanel(const GameSettings_Descriptor& descriptor)
-    : SettingsPanelInstance(descriptor)
-    , settings(GameSettings::instance())
+GameSettingsPanel::GameSettingsPanel()
+    : settings(GameSettings::instance())
 {
     PA_ADD_OPTION(settings);
 }

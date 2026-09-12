@@ -16,7 +16,7 @@
 //#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/ButtonOption.h"
-#include "CommonFramework/Panels/SettingsPanel.h"
+#include "CommonFramework/Panels/OptionsPanel.h"
 #include "CommonFramework/Panels/PanelTools.h"
 #include "CommonFramework/ResourceDownload/SettingsResourceDownloadOptions.h"
 #include "CommonFramework/ResourceDownload/SettingsResourceDownloadTable.h"
@@ -136,11 +136,11 @@ public:
 
 class GlobalSettingsPanel;
 
-class GlobalSettings_Descriptor : public PanelDescriptor{
+class GlobalSettings_Descriptor : public OptionsPanelDescriptor{
 public:
     GlobalSettings_Descriptor();
 public:
-    using Wrapper = PanelDescriptorWrapper<GlobalSettings_Descriptor, GlobalSettingsPanel>;
+    using Wrapper = OptionsPanelWrapper<GlobalSettings_Descriptor, GlobalSettingsPanel>;
     static Wrapper& instance(){
         static Wrapper wrapper;
         return wrapper;
@@ -148,9 +148,9 @@ public:
 };
 
 
-class GlobalSettingsPanel : public SettingsPanelInstance{
+class GlobalSettingsPanel : public OptionsPanelInstance{
 public:
-    GlobalSettingsPanel(const GlobalSettings_Descriptor& descriptor);
+    GlobalSettingsPanel();
 private:
     GlobalSettings& settings;
 };

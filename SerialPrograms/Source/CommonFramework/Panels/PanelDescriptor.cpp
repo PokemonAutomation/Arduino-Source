@@ -16,6 +16,7 @@ PanelDescriptor::PanelDescriptor(
     std::string category, std::string display_name,
     std::string doc_link,
     std::string description,
+    PanelDeprecation deprecation,
     std::vector<std::string> required_resources
 )
     : m_color(color)
@@ -24,6 +25,7 @@ PanelDescriptor::PanelDescriptor(
     , m_display_name(std::move(display_name))
     , m_doc_link(std::move(doc_link))
     , m_description(std::move(description))
+    , m_deprecation(deprecation)
     , m_required_resources(std::move(required_resources))
 {}
 std::unique_ptr<PanelSession> PanelDescriptor::make_panel() const{

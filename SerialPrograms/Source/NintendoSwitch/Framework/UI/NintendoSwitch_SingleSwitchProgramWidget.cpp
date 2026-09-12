@@ -62,7 +62,7 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
     );
     m_layout->addWidget(header);
 
-    if (descriptor.deprecated()){
+    if (descriptor.deprecation() == PanelDeprecation::DEPRECATED){
         QMessageBox box;
         box.warning(
             nullptr,

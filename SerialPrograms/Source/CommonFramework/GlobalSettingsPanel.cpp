@@ -396,7 +396,7 @@ void GlobalSettings::connect_row_with_download(const std::string& resource_slug,
 
 
 GlobalSettings_Descriptor::GlobalSettings_Descriptor()
-    : PanelDescriptor(
+    : OptionsPanelDescriptor(
         Color(),
         "",
         "Global Settings", "Global Settings",
@@ -406,9 +406,8 @@ GlobalSettings_Descriptor::GlobalSettings_Descriptor()
 {}
 
 
-GlobalSettingsPanel::GlobalSettingsPanel(const GlobalSettings_Descriptor& descriptor)
-    : SettingsPanelInstance(descriptor)
-    , settings(GlobalSettings::instance())
+GlobalSettingsPanel::GlobalSettingsPanel()
+    : settings(GlobalSettings::instance())
 {
     PA_ADD_OPTION(settings);
 }

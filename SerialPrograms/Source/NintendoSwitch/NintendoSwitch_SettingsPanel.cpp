@@ -15,7 +15,7 @@ namespace NintendoSwitch{
 
 
 ConsoleSettings_Descriptor::ConsoleSettings_Descriptor()
-    : PanelDescriptor(
+    : OptionsPanelDescriptor(
         Color(),
         "NintendoSwitch:GlobalSettings",
         "Nintendo Switch", "Framework Settings",
@@ -24,9 +24,8 @@ ConsoleSettings_Descriptor::ConsoleSettings_Descriptor()
     )
 {}
 
-ConsoleSettingsPanel::ConsoleSettingsPanel(const ConsoleSettings_Descriptor& descriptor)
-    : SettingsPanelInstance(descriptor)
-    , settings(ConsoleSettings::instance())
+ConsoleSettingsPanel::ConsoleSettingsPanel()
+    : settings(ConsoleSettings::instance())
 {
     PA_ADD_OPTION(settings);
 }

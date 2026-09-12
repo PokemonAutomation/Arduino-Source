@@ -380,7 +380,7 @@ AutoStory_Descriptor::AutoStory_Descriptor()
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        false,
+        PanelDeprecation::NOT_DEPRECATED,
         {
             "PokemonSV/AreaZero",
         }

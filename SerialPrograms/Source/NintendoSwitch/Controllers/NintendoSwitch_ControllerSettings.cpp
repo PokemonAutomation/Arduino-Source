@@ -585,7 +585,7 @@ ControllerProfile ControllerSettingsTable::get_or_make_profile(
     //  This is brutal (tech-debt). The only way to force the settings to save
     //  is to load the panel. TODO: Redesign panels to allow external editing.
     //  This is also coming in from a different thread (not the main Qt thread).
-    PanelDescriptorWrapper<ConsoleSettings_Descriptor, ConsoleSettingsPanel>().make_panel()->save_settings();
+    OptionsPanelWrapper<ConsoleSettings_Descriptor, ConsoleSettingsPanel>().make_panel()->save_settings();
 #endif
 
     return profile;

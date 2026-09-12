@@ -11,7 +11,6 @@
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
-// #include "CommonFramework/Panels/SettingsPanel.h"
 #include "Options/NintendoSwitch_CodeEntrySettingsOption.h"
 #include "Controllers/NintendoSwitch_ControllerSettings.h"
 #include "Controllers/NintendoSwitch_KeyboardMapping.h"

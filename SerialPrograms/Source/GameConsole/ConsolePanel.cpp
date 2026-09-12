@@ -19,17 +19,19 @@ ConsolePanelDescriptor::ConsolePanelDescriptor(
     std::string category, std::string display_name,
     std::string doc_link,
     std::string description,
-    size_t num_controllers,
-    bool deprecated
+    PanelDeprecation deprecation,
+    bool restore_defaults_button,
+    size_t num_controllers
 )
     : PanelDescriptor(
         color,
         std::move(identifier),
         std::move(category), std::move(display_name),
         std::move(doc_link),
-        std::move(description)
+        std::move(description),
+        deprecation
     )
-    , m_deprecated(deprecated)
+    , m_restore_defaults_button(restore_defaults_button)
     , m_num_controllers(num_controllers)
 {}
 std::unique_ptr<PanelSession> ConsolePanelDescriptor::make_panel() const{

@@ -37,7 +37,7 @@ BBQSoloFarmer_Descriptor::BBQSoloFarmer_Descriptor()
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        false,
+        PanelDeprecation::NOT_DEPRECATED,
         {
             "Tesseract",
         }
