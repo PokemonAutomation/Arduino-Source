@@ -137,7 +137,7 @@ void GameSettings::on_config_value_changed(void* object){
 
 
 GameSettings_Descriptor::GameSettings_Descriptor()
-    : PanelDescriptor(
+    : OptionsPanelDescriptor(
         Color(),
         "PokemonFRLG:GlobalSettings",
         STRING_POKEMON + " FRLG", "Game Settings",
@@ -148,9 +148,8 @@ GameSettings_Descriptor::GameSettings_Descriptor()
 
 
 
-GameSettingsPanel::GameSettingsPanel(const GameSettings_Descriptor& descriptor)
-    : SettingsPanelInstance(descriptor)
-    , settings(GameSettings::instance())
+GameSettingsPanel::GameSettingsPanel()
+    : settings(GameSettings::instance())
 {
     PA_ADD_OPTION(settings);
 }

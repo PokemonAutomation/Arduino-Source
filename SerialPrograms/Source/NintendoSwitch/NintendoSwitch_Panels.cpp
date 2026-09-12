@@ -56,7 +56,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     std::vector<PanelEntry> ret;
 
     ret.emplace_back("---- Settings ----");
-    ret.emplace_back(make_settings<ConsoleSettings_Descriptor, ConsoleSettingsPanel>());
+    ret.emplace_back(make_OptionsPanel<ConsoleSettings_Descriptor, ConsoleSettingsPanel>());
 
     ret.emplace_back("---- Virtual Consoles ----");
     ret.emplace_back(GameConsole::make_ConsolePanel<GameConsole::VirtualConsole_Descriptor, GameConsole::ConsolePanelInstance>());

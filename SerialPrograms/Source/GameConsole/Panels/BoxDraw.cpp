@@ -22,7 +22,9 @@ BoxDraw_Descriptor::BoxDraw_Descriptor()
         "GameConsole:BoxDraw",
         "Game Console", "Box Draw",
         "",
-        "Test box coordinates for development."
+        "Test box coordinates for development.",
+        PanelDeprecation::NOT_DEPRECATED,
+        false
     )
 {}
 

@@ -33,7 +33,7 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     ProgramControllerClass color_class,
     FeedbackType feedback,
     AllowCommandsWhenRunning allow_commands_while_running,
-    bool deprecated,
+    PanelDeprecation deprecation,
     std::vector<std::string> required_resources
 )
     : ProgramDescriptor(
@@ -42,12 +42,12 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description),
+        deprecation,
         std::move(required_resources)
     )
     , m_color_class(color_class)
     , m_feedback(feedback)
     , m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
-    , m_deprecated(deprecated)
 {}
 std::unique_ptr<PanelSession> SingleSwitchProgramDescriptor::make_panel() const{
     return std::make_unique<SingleSwitchProgramSession>(*this);

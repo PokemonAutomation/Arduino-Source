@@ -9,7 +9,7 @@
 
 
 #include "NintendoSwitch_Settings.h"
-#include "CommonFramework/Panels/SettingsPanel.h"
+#include "CommonFramework/Panels/OptionsPanel.h"
 
 
 namespace PokemonAutomation{
@@ -18,15 +18,15 @@ namespace NintendoSwitch{
 
 
 
-class ConsoleSettings_Descriptor : public PanelDescriptor{
+class ConsoleSettings_Descriptor : public OptionsPanelDescriptor{
 public:
     ConsoleSettings_Descriptor();
 };
 
 
-class ConsoleSettingsPanel : public SettingsPanelInstance{
+class ConsoleSettingsPanel : public OptionsPanelInstance{
 public:
-    ConsoleSettingsPanel(const ConsoleSettings_Descriptor& descriptor);
+    ConsoleSettingsPanel();
 private:
     ConsoleSettings& settings;
 };

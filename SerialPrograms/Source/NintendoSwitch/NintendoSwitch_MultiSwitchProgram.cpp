@@ -115,7 +115,7 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
     size_t min_switches,
     size_t max_switches,
     size_t default_switches,
-    bool deprecated,
+    PanelDeprecation deprecation,
     std::vector<std::string> required_resources
 )
     : ProgramDescriptor(
@@ -124,12 +124,12 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description),
+        deprecation,
         std::move(required_resources)
     )
     , m_color_class(color_class)
     , m_feedback(feedback)
     , m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
-    , m_deprecated(deprecated)
     , m_min_switches(min_switches)
     , m_max_switches(max_switches)
     , m_default_switches(default_switches)

@@ -53,7 +53,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     std::vector<PanelEntry> ret;
     
     ret.emplace_back("---- Settings ----");
-    ret.emplace_back(make_settings<GameSettings_Descriptor, GameSettingsPanel>());
+    ret.emplace_back(make_OptionsPanel<GameSettings_Descriptor, GameSettingsPanel>());
 
     ret.emplace_back("---- Farming ----");
     ret.emplace_back(make_single_switch_program<NuggetBridgeFarmer_Descriptor, NuggetBridgeFarmer>());

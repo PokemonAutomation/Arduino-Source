@@ -81,14 +81,13 @@ public:
         size_t min_switches,
         size_t max_switches,
         size_t default_switches,
-        bool deprecated = false,
+        PanelDeprecation deprecation = PanelDeprecation::NOT_DEPRECATED,
         std::vector<std::string> required_resources = {}
     );
 
     ProgramControllerClass color_class() const{ return m_color_class; }
     FeedbackType feedback() const{ return m_feedback; }
     bool allow_commands_while_running() const{ return m_allow_commands_while_running; }
-    bool deprecated() const{ return m_deprecated; }
 
     size_t min_switches() const{ return m_min_switches; }
     size_t max_switches() const{ return m_max_switches; }
@@ -101,7 +100,6 @@ private:
     const ProgramControllerClass m_color_class;
     const FeedbackType m_feedback;
     const bool m_allow_commands_while_running;
-    const bool m_deprecated;
 
     const size_t m_min_switches;
     const size_t m_max_switches;

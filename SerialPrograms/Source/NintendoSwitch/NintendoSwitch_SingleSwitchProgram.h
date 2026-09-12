@@ -62,14 +62,13 @@ public:
         ProgramControllerClass color_class,
         FeedbackType feedback,
         AllowCommandsWhenRunning allow_commands_while_running,
-        bool deprecated = false,
+        PanelDeprecation deprecation = PanelDeprecation::NOT_DEPRECATED,
         std::vector<std::string> required_resources = {}
     );
 
     ProgramControllerClass color_class() const{ return m_color_class; }
     FeedbackType feedback() const{ return m_feedback; }
     bool allow_commands_while_running() const{ return m_allow_commands_while_running; }
-    bool deprecated() const{ return m_deprecated; }
 
     virtual std::unique_ptr<PanelSession> make_panel() const override;
     virtual std::unique_ptr<SingleSwitchProgramInstance> make_instance(
@@ -80,7 +79,6 @@ private:
     const ProgramControllerClass m_color_class;
     const FeedbackType m_feedback;
     const bool m_allow_commands_while_running;
-    const bool m_deprecated;
     const std::vector<std::string> m_required_resources;
 };
 

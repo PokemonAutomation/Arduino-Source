@@ -1,35 +1,27 @@
-/*  Console Panel Widget
+/*  Options Panel Widget
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#include <QMessageBox>
 #include <QPushButton>
 #include <QScrollArea>
-#include "Common/Qt/ShutdownWithEvents.h"
+#include <QMessageBox>
+#include "Common/Qt/CollapsibleGroupBox.h"
 #include "Common/Qt/Options/ConfigWidget.h"
 #include "CommonFramework/Panels/UI/PanelElements.h"
-#include "ConsolePanelWidget.h"
+#include "OptionsPanelWidget.h"
 
 namespace PokemonAutomation{
 
-template class RegisterUiStateQtWidget<GameConsole::ConsolePanelWidget>;
-
-namespace GameConsole{
+template class RegisterUiStateQtWidget<OptionsPanelWidget>;
 
 
 
-ConsolePanelWidget::~ConsolePanelWidget(){
-    shutdown_with_events(
-        m_session.logger(),
-        "ConsolePanelWidget",
-        [this]{ return m_session.try_shutdown(); }
-    );
-}
-ConsolePanelWidget::ConsolePanelWidget(
+
+OptionsPanelWidget::OptionsPanelWidget(
     QWidget& parent,
-    ConsolePanelSession& session
+    OptionsPanelSession& session
 )
     : QWidget(&parent)
     , m_session(session)
@@ -37,7 +29,7 @@ ConsolePanelWidget::ConsolePanelWidget(
     m_layout = new QVBoxLayout(this);
     m_layout->setContentsMargins(0, 0, 0, 0);
 
-    const ConsolePanelDescriptor& descriptor = session.descriptor();
+    const OptionsPanelDescriptor& descriptor = session.descriptor();
 
     CollapsibleGroupBox* header = make_panel_header(
         *this,
@@ -46,7 +38,6 @@ ConsolePanelWidget::ConsolePanelWidget(
         descriptor.description()
     );
     m_layout->addWidget(header);
-
 
     {
         QScrollArea* scroll_outer = new QScrollArea(this);
@@ -57,10 +48,6 @@ ConsolePanelWidget::ConsolePanelWidget(
         scroll_outer->setWidget(scroll_inner);
         QVBoxLayout* scroll_layout = new QVBoxLayout(scroll_inner);
         scroll_layout->setAlignment(Qt::AlignTop);
-
-        UiWrapper wrapper = m_session.system().make_ui_component(this);
-        m_system = dynamic_cast<QWidget*>(wrapper.release());
-        scroll_layout->addWidget(m_system);
 
         m_options = ConfigWidget::make_from_option(session.options(), this);
         scroll_layout->addWidget(&m_options->widget());
@@ -102,5 +89,4 @@ ConsolePanelWidget::ConsolePanelWidget(
 
 
 
-}
 }

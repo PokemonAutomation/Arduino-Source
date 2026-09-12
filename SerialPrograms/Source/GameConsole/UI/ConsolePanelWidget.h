@@ -10,7 +10,6 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include "Common/Qt/UiStateQtWidget.h"
-//#include "CommonFramework/Panels/UI/PanelElements.h"
 #include "GameConsole/ConsolePanel.h"
 #include "GameConsole/ConsolePanelSession.h"
 

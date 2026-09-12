@@ -36,7 +36,7 @@
 #include "CommonFramework/Options/QtWidget/LabelCellWidget.h"
 #include "CommonFramework/Notifications/EventNotificationWidget.h"
 #include "CommonFramework/Panels/UI/PanelWidget.h"
-#include "CommonFramework/Panels/UI/SettingsPanelWidget.h"
+#include "CommonFramework/Panels/UI/OptionsPanelWidget.h"
 
 // Resource Download
 #include "CommonFramework/ResourceDownload/SettingsResourceDownloadWidget.h"
@@ -120,7 +120,7 @@ void register_all_statics(){
     RegisterUiStateQtWidget<LabelCellWidget>();
     RegisterUiStateQtWidget<TestButtonWidget>();
     RegisterUiStateQtWidget<PanelWidget>();
-    RegisterUiStateQtWidget<SettingsPanelWidget>();
+    RegisterUiStateQtWidget<OptionsPanelWidget>();
 
     // Resource Download
     RegisterUiStateQtWidget<SettingsDownloadButtonWidget>();

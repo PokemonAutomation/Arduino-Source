@@ -24,6 +24,8 @@ public:
             "Virtual Console",
             "Programs/NintendoSwitch/VirtualConsole.html",
             "Play your console from your computer.",
+            PanelDeprecation::NOT_DEPRECATED,
+            false,
             1
         )
     {}
@@ -40,6 +42,8 @@ public:
             "Multi-Controller Tester",
             "Programs/NintendoSwitch/VirtualConsole.html",
             "Test multiple controllers at once.",
+            PanelDeprecation::NOT_DEPRECATED,
+            false,
             8
         )
     {}

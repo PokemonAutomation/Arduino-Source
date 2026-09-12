@@ -16,6 +16,13 @@ namespace PokemonAutomation{
 
 class PanelSession;
 
+
+enum class PanelDeprecation{
+    NOT_DEPRECATED,
+    DEPRECATED,
+};
+
+
 // Abstract base class that sets the interface for program descriptors.
 // A program descriptor contains various information (descriptions) of a program panel UI.
 // It can also use function `make_panel()` to create the corresponding panel.
@@ -27,6 +34,7 @@ public:
         std::string category, std::string display_name,
         std::string doc_link,
         std::string description,
+        PanelDeprecation deprecation = PanelDeprecation::NOT_DEPRECATED,
         std::vector<std::string> required_resources = {}
     );
     virtual ~PanelDescriptor() = default;
@@ -37,6 +45,7 @@ public:
     const std::string& display_name() const{ return m_display_name; }
     const std::string& doc_link() const{ return m_doc_link; }
     const std::string& description() const{ return m_description; }
+    PanelDeprecation deprecation() const{ return m_deprecation; }
     const std::vector<std::string>& required_resources() const{ return m_required_resources; }
 
     virtual std::unique_ptr<PanelSession> make_panel() const = 0;
@@ -48,6 +57,7 @@ private:
     const std::string m_display_name;
     const std::string m_doc_link;
     const std::string m_description;
+    const PanelDeprecation m_deprecation;
     const std::vector<std::string> m_required_resources;
 };
 

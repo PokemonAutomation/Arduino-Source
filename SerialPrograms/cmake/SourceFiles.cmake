@@ -610,16 +610,18 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Panels/PanelTools.h
     Source/CommonFramework/Panels/ProgramDescriptor.cpp
     Source/CommonFramework/Panels/ProgramDescriptor.h
-    Source/CommonFramework/Panels/SettingsPanel.cpp
-    Source/CommonFramework/Panels/SettingsPanel.h
+    Source/CommonFramework/Panels/OptionsPanel.cpp
+    Source/CommonFramework/Panels/OptionsPanel.h
+    Source/CommonFramework/Panels/OptionsPanelSession.cpp
+    Source/CommonFramework/Panels/OptionsPanelSession.h
+    Source/CommonFramework/Panels/UI/OptionsPanelWidget.cpp
+    Source/CommonFramework/Panels/UI/OptionsPanelWidget.h
     Source/CommonFramework/Panels/UI/PanelElements.cpp
     Source/CommonFramework/Panels/UI/PanelElements.h
     Source/CommonFramework/Panels/UI/PanelListWidget.cpp
     Source/CommonFramework/Panels/UI/PanelListWidget.h
     Source/CommonFramework/Panels/UI/PanelWidget.cpp
     Source/CommonFramework/Panels/UI/PanelWidget.h
-    Source/CommonFramework/Panels/UI/SettingsPanelWidget.cpp
-    Source/CommonFramework/Panels/UI/SettingsPanelWidget.h
     Source/CommonFramework/PersistentSettings.cpp
     Source/CommonFramework/PersistentSettings.h
     Source/CommonFramework/ProgramSession.cpp
