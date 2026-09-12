@@ -19,6 +19,13 @@ FriendCodeListOption::FriendCodeListOption(std::string label, std::vector<std::s
     , m_lines(m_default)
 {}
 
+void FriendCodeListOption::restore_defaults(){
+    {
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
+        m_lines = m_default;
+    }
+    report_value_changed(this);
+}
 JsonValue FriendCodeListOption::to_json() const{
     JsonArray list;
     ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
@@ -43,13 +50,6 @@ void FriendCodeListOption::load_json(const JsonValue& json){
     {
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_lines = std::move(lines);
-    }
-    report_value_changed(this);
-}
-void FriendCodeListOption::restore_defaults(){
-    {
-        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-        m_lines = m_default;
     }
     report_value_changed(this);
 }

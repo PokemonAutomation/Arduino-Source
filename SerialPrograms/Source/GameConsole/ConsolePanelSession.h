@@ -22,8 +22,6 @@ public:
     ~ConsolePanelSession();
     ConsolePanelSession(const ConsolePanelDescriptor& descriptor);
 
-    void restore_defaults();
-
 
 public:
     const ConsolePanelDescriptor& descriptor() const{ return m_descriptor; }
@@ -33,7 +31,10 @@ public:
     ConfigOption& options();
 
 
-private:
+public:
+    //  Serialization
+
+    void restore_defaults();
     virtual JsonValue to_json() const override;
     virtual void load_json(const JsonValue& json) override;
 

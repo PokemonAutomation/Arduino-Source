@@ -27,7 +27,7 @@ class MultiSwitchSystemSession{
 public:
     struct Listener{
         //  Sent before the Switch sessions are destroyed. Listeners should
-        //  their references to them before returning.
+        //  drop their references to them before returning.
         virtual void shutdown() = 0;
 
         //  Sent after new Switches are started up.

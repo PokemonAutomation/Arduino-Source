@@ -198,17 +198,18 @@ void MultiSwitchProgramInstance::start_program_border_check(
 void MultiSwitchProgramInstance::add_option(ConfigOption& option, std::string serialization_string){
     m_options.add_option(option, std::move(serialization_string));
 }
-JsonValue MultiSwitchProgramInstance::to_json() const{
-    return m_options.to_json();
-}
-void MultiSwitchProgramInstance::load_json(const JsonValue& json){
-    m_options.load_json(json);
-}
+
 std::string MultiSwitchProgramInstance::check_validity() const{
     return m_options.check_validity();
 }
 void MultiSwitchProgramInstance::restore_defaults(){
     return m_options.restore_defaults();
+}
+JsonValue MultiSwitchProgramInstance::to_json() const{
+    return m_options.to_json();
+}
+void MultiSwitchProgramInstance::load_json(const JsonValue& json){
+    m_options.load_json(json);
 }
 
 

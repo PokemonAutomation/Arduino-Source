@@ -45,8 +45,6 @@ public:
     ~MultiSwitchProgramSession();
     MultiSwitchProgramSession(const MultiSwitchProgramDescriptor& descriptor);
 
-    void restore_defaults();
-
 
 public:
     const MultiSwitchProgramDescriptor& descriptor() const{ return m_descriptor; }
@@ -55,14 +53,16 @@ public:
 
 
 private:
-    virtual std::string check_validity() const override;
-
     virtual void internal_run_program() override;
     virtual void internal_stop_program() override;
 
     virtual void shutdown() override;
     virtual void startup(size_t switch_count) override;
 
+
+public:
+    void restore_defaults();
+    virtual std::string check_validity() const override;
     virtual JsonValue to_json() const override;
     virtual void load_json(const JsonValue& json) override;
 

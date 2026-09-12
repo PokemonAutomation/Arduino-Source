@@ -34,15 +34,6 @@ ComputerProgramSession::~ComputerProgramSession(){
 }
 
 
-void ComputerProgramSession::restore_defaults(){
-    std::lock_guard<Mutex> lg(program_lock());
-    if (current_state() != ProgramState::STOPPED){
-        logger().log("Cannot change settings while program is running.", COLOR_RED);
-        return;
-    }
-    logger().log("Restoring settings to defaults...");
-    m_instance->restore_defaults();
-}
 ConfigOption& ComputerProgramSession::options(){
     return m_instance->m_options;
 }
@@ -53,6 +44,15 @@ std::string ComputerProgramSession::check_validity() const{
 
 
 
+void ComputerProgramSession::restore_defaults(){
+    std::lock_guard<Mutex> lg(program_lock());
+    if (current_state() != ProgramState::STOPPED){
+        logger().log("Cannot change settings while program is running.", COLOR_RED);
+        return;
+    }
+    logger().log("Restoring settings to defaults...");
+    m_instance->restore_defaults();
+}
 JsonValue ComputerProgramSession::to_json() const{
     return m_instance->to_json();
 }

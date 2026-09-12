@@ -34,8 +34,6 @@ public:
     ~SingleSwitchProgramSession();
     SingleSwitchProgramSession(const SingleSwitchProgramDescriptor& descriptor);
 
-    void restore_defaults();
-
 
 public:
     const SingleSwitchProgramDescriptor& descriptor() const{ return m_descriptor; }
@@ -43,16 +41,16 @@ public:
     ConfigOption& options();
 
 
-private:
+public:
     virtual std::string check_validity() const override;
-
-    virtual void internal_run_program() override;
-    virtual void internal_stop_program() override;
-
-
-private:
+    void restore_defaults();
     virtual JsonValue to_json() const override;
     virtual void load_json(const JsonValue& json) override;
+
+
+private:
+    virtual void internal_run_program() override;
+    virtual void internal_stop_program() override;
 
 
 private:

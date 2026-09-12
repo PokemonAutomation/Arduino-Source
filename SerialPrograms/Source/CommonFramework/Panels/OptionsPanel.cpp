@@ -45,14 +45,14 @@ OptionsPanelInstance::OptionsPanelInstance()
 void OptionsPanelInstance::add_option(ConfigOption& option, std::string serialization_string){
     m_options.add_option(option, std::move(serialization_string));
 }
+void OptionsPanelInstance::restore_defaults(){
+    m_options.restore_defaults();
+}
 JsonValue OptionsPanelInstance::to_json() const{
     return m_options.to_json();
 }
 void OptionsPanelInstance::load_json(const JsonValue& json){
     m_options.load_json(json);
-}
-void OptionsPanelInstance::restore_defaults(){
-    m_options.restore_defaults();
 }
 
 

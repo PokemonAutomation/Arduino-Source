@@ -25,10 +25,11 @@ public:
     operator std::string() const;
     void set(KeyboardKey key);
 
+
+public:
+    virtual void restore_defaults() override;
     virtual JsonValue to_json() const override;
     virtual void load_json(const JsonValue& json) override;
-
-    virtual void restore_defaults() override;
 
 
 public:

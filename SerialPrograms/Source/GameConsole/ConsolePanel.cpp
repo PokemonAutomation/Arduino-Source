@@ -47,17 +47,18 @@ ConsolePanelInstance::ConsolePanelInstance()
 void ConsolePanelInstance::add_option(ConfigOption& option, std::string serialization_string){
     m_options.add_option(option, std::move(serialization_string));
 }
-JsonValue ConsolePanelInstance::to_json() const{
-    return m_options.to_json();
-}
-void ConsolePanelInstance::load_json(const JsonValue& json){
-    m_options.load_json(json);
-}
+
 std::string ConsolePanelInstance::check_validity() const{
     return m_options.check_validity();
 }
 void ConsolePanelInstance::restore_defaults(){
     return m_options.restore_defaults();
+}
+JsonValue ConsolePanelInstance::to_json() const{
+    return m_options.to_json();
+}
+void ConsolePanelInstance::load_json(const JsonValue& json){
+    m_options.load_json(json);
 }
 
 

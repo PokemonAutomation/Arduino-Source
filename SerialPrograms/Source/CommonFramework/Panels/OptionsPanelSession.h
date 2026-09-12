@@ -18,8 +18,6 @@ class OptionsPanelSession final : public UiState<OptionsPanelSession, PanelSessi
 public:
     OptionsPanelSession(const OptionsPanelDescriptor& descriptor);
 
-    void restore_defaults();
-
 
 public:
     const OptionsPanelDescriptor& descriptor() const{ return m_descriptor; }
@@ -27,7 +25,8 @@ public:
     ConfigOption& options();
 
 
-private:
+public:
+    void restore_defaults();
     virtual JsonValue to_json() const override;
     virtual void load_json(const JsonValue& json) override;
 

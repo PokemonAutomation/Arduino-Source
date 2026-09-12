@@ -162,11 +162,11 @@ public:
 public:
     //  Settings
 
+    virtual std::string check_validity() const;
+    virtual void restore_defaults();
     virtual JsonValue to_json() const;
     virtual void load_json(const JsonValue& json);
 
-    virtual std::string check_validity() const;
-    virtual void restore_defaults();
 
     //  Called when the # of Switches changes.
     virtual void update_active_consoles(size_t switch_count){}

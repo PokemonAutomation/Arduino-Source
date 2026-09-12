@@ -145,11 +145,11 @@ public:
 public:
     //  Settings
 
+    virtual std::string check_validity() const;
+    virtual void restore_defaults();
     virtual JsonValue to_json() const;
     virtual void load_json(const JsonValue& json);
 
-    virtual std::string check_validity() const;
-    virtual void restore_defaults();
 
 
 protected:

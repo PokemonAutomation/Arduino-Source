@@ -56,6 +56,14 @@ SingleSwitchProgramSession::~SingleSwitchProgramSession(){
 }
 
 
+ConfigOption& SingleSwitchProgramSession::options(){
+    return m_instance->m_options;
+}
+
+
+std::string SingleSwitchProgramSession::check_validity() const{
+    return m_instance->check_validity();
+}
 void SingleSwitchProgramSession::restore_defaults(){
     std::lock_guard<Mutex> lg(program_lock());
     if (current_state() != ProgramState::STOPPED){
@@ -65,11 +73,21 @@ void SingleSwitchProgramSession::restore_defaults(){
     logger().log("Restoring settings to defaults...");
     m_instance->restore_defaults();
 }
-ConfigOption& SingleSwitchProgramSession::options(){
-    return m_instance->m_options;
+JsonValue SingleSwitchProgramSession::to_json() const{
+    JsonObject obj = std::move(*m_instance->to_json().to_object());
+    obj["SwitchSetup"] = m_system_option.to_json();
+    return obj;
 }
-std::string SingleSwitchProgramSession::check_validity() const{
-    return m_instance->check_validity();
+void SingleSwitchProgramSession::load_json(const JsonValue& json){
+    const JsonObject* obj = json.to_object();
+    if (obj == nullptr){
+        return;
+    }
+    const JsonValue* value = obj->get_value("SwitchSetup");
+    if (value){
+        m_system.load_json(*value);
+    }
+    m_instance->load_json(json);
 }
 
 
@@ -268,24 +286,6 @@ void SingleSwitchProgramSession::internal_run_program(){
             "Unknown error."
         );
     }
-}
-
-
-JsonValue SingleSwitchProgramSession::to_json() const{
-    JsonObject obj = std::move(*m_instance->to_json().to_object());
-    obj["SwitchSetup"] = m_system_option.to_json();
-    return obj;
-}
-void SingleSwitchProgramSession::load_json(const JsonValue& json){
-    const JsonObject* obj = json.to_object();
-    if (obj == nullptr){
-        return;
-    }
-    const JsonValue* value = obj->get_value("SwitchSetup");
-    if (value){
-        m_system.load_json(*value);
-    }
-    m_instance->load_json(json);
 }
 
 

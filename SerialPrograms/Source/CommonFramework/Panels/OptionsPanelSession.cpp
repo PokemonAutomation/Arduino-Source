@@ -23,11 +23,11 @@ OptionsPanelSession::OptionsPanelSession(const OptionsPanelDescriptor& descripto
 ConfigOption& OptionsPanelSession::options(){
     return m_instance->m_options;
 }
+
+
 void OptionsPanelSession::restore_defaults(){
     m_instance->restore_defaults();
 }
-
-
 JsonValue OptionsPanelSession::to_json() const{
     return m_instance->to_json();
 }

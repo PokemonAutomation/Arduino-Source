@@ -118,10 +118,12 @@ public:
 
     const StringSelectDatabase& database() const;
 
+
+public:
+    virtual void restore_defaults() override;
     virtual JsonValue to_json() const override;
     virtual void load_json(const JsonValue& json) override;
 
-    virtual void restore_defaults() override;
 
 private:
     struct Data;

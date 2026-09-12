@@ -71,6 +71,10 @@ MultiSwitchProgramSession::~MultiSwitchProgramSession(){
     );
 }
 
+ConfigOption& MultiSwitchProgramSession::options(){
+    return m_instance->m_options;
+}
+
 
 
 void MultiSwitchProgramSession::restore_defaults(){
@@ -87,15 +91,6 @@ std::string MultiSwitchProgramSession::check_validity() const{
     auto ScopeCheck = m_sanitizer.check_scope();
     return m_instance->check_validity();
 }
-
-
-
-
-ConfigOption& MultiSwitchProgramSession::options(){
-    return m_instance->m_options;
-}
-
-
 JsonValue MultiSwitchProgramSession::to_json() const{
     JsonObject obj = std::move(*m_instance->to_json().to_object());
     obj["SwitchSetup"] = m_system_option.to_json();

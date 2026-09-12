@@ -55,10 +55,9 @@ public:
 
 public:
     //  Serialization
+    virtual void restore_defaults();
     virtual JsonValue to_json() const;
     virtual void load_json(const JsonValue& json);
-
-    virtual void restore_defaults();
 
 
 protected:

@@ -35,12 +35,16 @@ public:
     virtual ~ComputerProgramSession();
     ComputerProgramSession(const ComputerProgramDescriptor& descriptor);
 
-    void restore_defaults();
-
 
 public:
     const ComputerProgramDescriptor& descriptor() const{ return m_descriptor; }
     ConfigOption& options();
+
+
+public:
+    void restore_defaults();
+    virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
 
 
 private:
@@ -48,11 +52,6 @@ private:
 
     virtual void internal_run_program() override;
     virtual void internal_stop_program() override;
-
-
-private:
-    virtual JsonValue to_json() const override;
-    virtual void load_json(const JsonValue& json) override;
 
 
 private:

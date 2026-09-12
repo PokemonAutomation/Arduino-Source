@@ -36,11 +36,11 @@ ConsolePanelSession::ConsolePanelSession(const ConsolePanelDescriptor& descripto
 ConfigOption& ConsolePanelSession::options(){
     return m_instance->m_options;
 }
+
+
 void ConsolePanelSession::restore_defaults(){
     m_instance->restore_defaults();
 }
-
-
 JsonValue ConsolePanelSession::to_json() const{
     JsonObject obj = std::move(*m_instance->to_json().to_object());
     obj["ConsoleSetup"] = m_system_option.to_json();
