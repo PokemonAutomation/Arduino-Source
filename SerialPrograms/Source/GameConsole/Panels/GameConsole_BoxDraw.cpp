@@ -4,8 +4,8 @@
  *
  */
 
-#include "GameConsole/ConsoleSystemSession.h"
-#include "BoxDraw.h"
+#include "GameConsole/Framework/ConsoleSystemSession.h"
+#include "GameConsole_BoxDraw.h"
 
 //#include <iostream>
 //using std::cout;

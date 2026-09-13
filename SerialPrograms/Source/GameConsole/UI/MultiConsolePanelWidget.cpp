@@ -1,4 +1,4 @@
-/*  Console Panel Widget
+/*  Multi-Console Panel Widget
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -11,26 +11,26 @@
 #include "Common/Qt/ShutdownWithEvents.h"
 #include "Common/Qt/Options/ConfigWidget.h"
 #include "CommonFramework/Panels/UI/PanelElements.h"
-#include "ConsolePanelWidget.h"
+#include "MultiConsolePanelWidget.h"
 
 namespace PokemonAutomation{
 
-template class RegisterUiStateQtWidget<GameConsole::ConsolePanelWidget>;
+template class RegisterUiStateQtWidget<GameConsole::MultiConsolePanelWidget>;
 
 namespace GameConsole{
 
 
 
-ConsolePanelWidget::~ConsolePanelWidget(){
+MultiConsolePanelWidget::~MultiConsolePanelWidget(){
     shutdown_with_events(
         m_session.logger(),
-        "ConsolePanelWidget",
+        "MultiConsolePanelWidget",
         [this]{ return m_session.try_shutdown(); }
     );
 }
-ConsolePanelWidget::ConsolePanelWidget(
+MultiConsolePanelWidget::MultiConsolePanelWidget(
     QWidget& parent,
-    ConsolePanelSession& session
+    MultiConsolePanelSession& session
 )
     : QWidget(&parent)
     , m_session(session)
@@ -38,7 +38,7 @@ ConsolePanelWidget::ConsolePanelWidget(
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    const ConsolePanelDescriptor& descriptor = session.descriptor();
+    const MultiConsolePanelDescriptor& descriptor = session.descriptor();
 
     CollapsibleGroupBox* header = make_panel_header(
         *this,

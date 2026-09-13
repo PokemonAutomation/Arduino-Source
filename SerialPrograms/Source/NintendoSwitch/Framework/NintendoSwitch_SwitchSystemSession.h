@@ -20,7 +20,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_SwitchSystemSession_H
 #define PokemonAutomation_NintendoSwitch_SwitchSystemSession_H
 
-#include "GameConsole/ConsoleSystemSession.h"
+#include "GameConsole/Framework/ConsoleSystemSession.h"
 #include "NintendoSwitch_SwitchSystemOption.h"
 
 namespace PokemonAutomation{
@@ -39,7 +39,7 @@ public:
         SwitchSystemOption& option,
         bool allow_commands_while_locked,
         size_t console_number,
-        std::optional<uint64_t> program_id
+        std::optional<uint64_t> program_tracking_id
     );
 
 

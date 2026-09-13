@@ -8,10 +8,9 @@
 #define PokemonAutomation_GameConsole_ConsolePanelWidget_H
 
 #include <QWidget>
-#include <QVBoxLayout>
 #include "Common/Qt/UiStateQtWidget.h"
+#include "GameConsole/Framework/ConsolePanelSession.h"
 #include "GameConsole/ConsolePanel.h"
-#include "GameConsole/ConsolePanelSession.h"
 
 namespace PokemonAutomation{
 namespace GameConsole{
@@ -31,10 +30,6 @@ public:
 
 private:
     ConsolePanelSession& m_session;
-    QVBoxLayout* m_layout;
-    QWidget* m_system;
-    ConfigWidget* m_options;
-//    RunnablePanelActionBar* m_actions_bar;
 };
 
 

@@ -13,7 +13,7 @@
 #include <QPushButton>
 #include "Common/Qt/CheckboxDropdown.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
-#include "GameConsole/ConsoleSystemSession.h"
+#include "GameConsole/Framework/ConsoleSystemSession.h"
 
 namespace PokemonAutomation{
 namespace GameConsole{

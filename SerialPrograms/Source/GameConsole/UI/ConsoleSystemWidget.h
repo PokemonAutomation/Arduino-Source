@@ -15,7 +15,7 @@
 #include "CommonFramework/AudioPipeline/UI/AudioDisplayWidget.h"
 #include "CommonFramework/VideoPipeline/UI/VideoSourceSelectorWidget.h"
 #include "CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h"
-#include "GameConsole/ConsoleSystemSession.h"
+#include "GameConsole/Framework/ConsoleSystemSession.h"
 
 namespace PokemonAutomation{
 namespace GameConsole{

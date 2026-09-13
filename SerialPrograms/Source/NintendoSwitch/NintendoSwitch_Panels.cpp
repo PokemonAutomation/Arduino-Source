@@ -11,9 +11,9 @@
 
 #include "NintendoSwitch_SettingsPanel.h"
 
-#include "GameConsole/Panels/VirtualConsole.h"
-#include "GameConsole/Panels/BoxDraw.h"
-#include "Programs/NintendoSwitch_SwitchViewer.h"
+#include "GameConsole/Panels/GameConsole_VirtualConsole.h"
+#include "GameConsole/Panels/GameConsole_BoxDraw.h"
+#include "GameConsole/Panels/GameConsole_SwitchViewer.h"
 
 #include "Programs/NintendoSwitch_TurboA.h"
 #include "Programs/NintendoSwitch_TurboButton.h"
@@ -62,7 +62,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- Virtual Consoles ----");
     ret.emplace_back(GameConsole::make_ConsolePanel<GameConsole::VirtualConsole_Descriptor, GameConsole::ConsolePanelInstance>());
     ret.emplace_back(GameConsole::make_ConsolePanel<GameConsole::MultiControllerTester_Descriptor, GameConsole::ConsolePanelInstance>());
-    ret.emplace_back(make_panel<SwitchViewer_Descriptor, SwitchViewer>());
+    ret.emplace_back(GameConsole::make_MultiConsolePanel<GameConsole::MultiConsoleViewer_Descriptor, GameConsole::MultiConsolePanelInstance>());
+//    ret.emplace_back(make_panel<SwitchViewer_Descriptor, SwitchViewer>());
 
     ret.emplace_back("---- Programs ----");
     ret.emplace_back(make_single_switch_program<TurboA_Descriptor, TurboA>());

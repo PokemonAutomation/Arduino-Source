@@ -15,7 +15,7 @@
 #ifndef PokemonAutomationn_NintendoSwitch_MultiSwitchSystemSession_H
 #define PokemonAutomationn_NintendoSwitch_MultiSwitchSystemSession_H
 
-#include "GameConsole/MultiConsoleSystemSession.h"
+#include "GameConsole/Framework/MultiConsoleSystemSession.h"
 #include "NintendoSwitch_SwitchSystemSession.h"
 #include "NintendoSwitch_MultiSwitchSystemOption.h"
 

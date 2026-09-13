@@ -13,7 +13,7 @@
 #ifndef PokemonAutomationn_NintendoSwitch_MultiSwitchSystemOption_H
 #define PokemonAutomationn_NintendoSwitch_MultiSwitchSystemOption_H
 
-#include "GameConsole/MultiConsoleSystemOption.h"
+#include "GameConsole/Framework/MultiConsoleSystemOption.h"
 #include "NintendoSwitch_SwitchSystemOption.h"
 
 namespace PokemonAutomation{
@@ -31,7 +31,9 @@ public:
             min_consoles,
             max_consoles,
             consoles,
-            []{ return std::make_unique<SwitchSystemOption>(); }
+            [](size_t console_index){
+                return std::make_unique<SwitchSystemOption>();
+            }
         )
     {}
     MultiSwitchSystemOption(
@@ -43,7 +45,9 @@ public:
             min_consoles,
             max_consoles,
             json,
-            []{ return std::make_unique<SwitchSystemOption>(); }
+            [](size_t console_index){
+                return std::make_unique<SwitchSystemOption>();
+            }
         )
     {}
 
