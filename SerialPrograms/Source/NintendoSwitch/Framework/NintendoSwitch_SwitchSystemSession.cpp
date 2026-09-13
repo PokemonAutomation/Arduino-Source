@@ -34,19 +34,17 @@ SwitchSystemSession::SwitchSystemSession(
     SwitchSystemOption& option,
     bool allow_commands_while_locked,
     size_t console_number,
-    std::optional<uint64_t> program_id
+    std::optional<uint64_t> program_tracking_id
 )
     : UiState<SwitchSystemSession, GameConsole::ConsoleSystemSession>(
         global_logger_raw(),
         option,
         allow_commands_while_locked,
         console_number,
-        std::nullopt
+        program_tracking_id
     )
     , m_option(option)
-{
-    m_console_id = ProgramTracker::instance().add_console(program_id, *this);
-}
+{}
 
 
 
