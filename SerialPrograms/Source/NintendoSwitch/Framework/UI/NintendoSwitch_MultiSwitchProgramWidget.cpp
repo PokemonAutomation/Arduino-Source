@@ -34,6 +34,7 @@ namespace NintendoSwitch{
 
 MultiSwitchProgramWidget2::~MultiSwitchProgramWidget2(){
     auto ScopeCheck = m_sanitizer.check_scope();
+    m_session.system().remove_console_count_lock(*this);
     m_session.ProgramSession::remove_listener(*this);
     m_session.remove_listener(*this);
 }
@@ -84,8 +85,8 @@ MultiSwitchProgramWidget2::MultiSwitchProgramWidget2(
         QVBoxLayout* scroll_layout = new QVBoxLayout(scroll_inner);
         scroll_layout->setAlignment(Qt::AlignTop);
 
-        m_system = new MultiSwitchSystemWidget(*this, m_session.system(), m_session.instance_id());
-        scroll_layout->addWidget(m_system);
+        UiWrapper wrapper = m_session.system().make_ui_component(this);
+        scroll_layout->addWidget(dynamic_cast<QWidget*>(wrapper.release()));
 
         m_options = ConfigWidget::make_from_option(m_session.options(), this);
         scroll_layout->addWidget(&m_options->widget());
@@ -139,8 +140,16 @@ MultiSwitchProgramWidget2::MultiSwitchProgramWidget2(
 void MultiSwitchProgramWidget2::state_change(ProgramState state){
     auto ScopeCheck = m_sanitizer.check_scope();
     QMetaObject::invokeMethod(this, [this, state]{
-        m_system->update_ui(state);
+
+        if (state != ProgramState::STOPPED){
+            m_session.system().add_console_count_lock(*this);
+            m_session.system().lock_controllers("Program is Running");
+        }else{
+            m_session.system().unlock_controllers();
+            m_session.system().remove_console_count_lock(*this);
+        }
         m_options->option().report_program_state(state != ProgramState::STOPPED);
+
 //        cout << "state = " << (state != ProgramState::STOPPED) << endl;
 //        if (m_option.descriptor().lock_options_while_running()){
 //            m_options->widget().setEnabled(state == ProgramState::STOPPED);

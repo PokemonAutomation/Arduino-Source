@@ -15,7 +15,7 @@
 #ifndef PokemonAutomationn_NintendoSwitch_MultiSwitchSystemSession_H
 #define PokemonAutomationn_NintendoSwitch_MultiSwitchSystemSession_H
 
-#include "Common/Cpp/Containers/FixedLimitVector.h"
+#include "GameConsole/MultiConsoleSystemSession.h"
 #include "NintendoSwitch_SwitchSystemSession.h"
 #include "NintendoSwitch_MultiSwitchSystemOption.h"
 
@@ -23,61 +23,29 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class MultiSwitchSystemSession{
+class MultiSwitchSystemSession : public GameConsole::MultiConsoleSystemSession{
 public:
-    struct Listener{
-        //  Sent before the Switch sessions are destroyed. Listeners should
-        //  drop their references to them before returning.
-        virtual void shutdown() = 0;
-
-        //  Sent after new Switches are started up.
-        //  This is called immediately when attaching a listener to give the
-        //  current switch count. The listener must drop all references to the
-        //  switch sessions before detaching.
-        virtual void startup(size_t switch_count) = 0;
-    };
-    void add_listener(Listener& listener);
-    void remove_listener(Listener& listener);
-
-
-public:
-    bool try_shutdown();
-    ~MultiSwitchSystemSession();
     MultiSwitchSystemSession(
         MultiSwitchSystemOption& option,
         bool allow_commands_while_locked,
         uint64_t program_id
-    );
+    )
+        : GameConsole::MultiConsoleSystemSession(
+            option,
+            [=](GameConsole::ConsoleSystemOption& option, size_t console_index){
+                return std::make_unique<SwitchSystemSession>(
+                    static_cast<SwitchSystemOption&>(option),
+                    allow_commands_while_locked,
+                    console_index,
+                    program_id
+                );
+            }
+        )
+    {}
 
-    //  Lock/unlock the Switch count.
-    void lock();
-    void unlock();
-
-    //  Returns true only on success.
-    bool set_switch_count(size_t count);
-
-    size_t min_switches() const{ return m_option.min_consoles(); }
-    size_t max_switches() const{ return m_option.max_consoles(); }
-
-
-public:
-    //  Note that these are not thread-safe with changing the # of switches.
-    size_t count() const{ return m_consoles.size(); }
-    SwitchSystemSession& operator[](size_t index){ return m_consoles[index]; }
-
-    JsonValue to_json() const;
-    void load_json(const JsonValue& json);
-
-
-private:
-    MultiSwitchSystemOption& m_option;
-    const bool m_allow_commands_while_locked;
-    const uint64_t m_program_id;
-
-    Mutex m_lock;
-    bool m_switch_count_locked;
-    FixedLimitVector<SwitchSystemSession> m_consoles;
-    std::set<Listener*> m_listeners;
+    SwitchSystemSession& operator[](size_t index){
+        return static_cast<SwitchSystemSession&>(MultiConsoleSystemSession::operator[](index));
+    }
 };
 
 

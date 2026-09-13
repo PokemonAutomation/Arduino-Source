@@ -22,7 +22,6 @@
 #include "CommonFramework/Panels/UI/PanelElements.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h"
-#include "NintendoSwitch_MultiSwitchSystemWidget.h"
 
 QT_FORWARD_DECLARE_CLASS(QVBoxLayout)
 namespace PokemonAutomation{
@@ -36,6 +35,7 @@ class MultiSwitchProgramWidget2
     : public QWidget
     , public UiComponentQtWidget
     , private ProgramSession::Listener
+    , private GameConsole::MultiConsoleSystemSession::Listener
     , private MultiSwitchProgramSession::Listener
 {
 public:
@@ -50,6 +50,10 @@ public:
     }
 
 private:
+    virtual void on_console_count_lock(bool locked) override{}
+    virtual void shutdown() override{}
+    virtual void startup(size_t console_count) override{}
+
     virtual void state_change(ProgramState state) override;
     virtual void stats_update(const StatsTracker* current_stats, const StatsTracker* historical_stats) override;
     virtual void error(const std::string& message) override;
@@ -64,7 +68,6 @@ private:
 private:
     MultiSwitchProgramSession& m_session;
     QVBoxLayout* m_layout;
-    MultiSwitchSystemWidget* m_system;
     ConfigWidget* m_options;
     StatsBar* m_stats_bar;
     RunnablePanelActionBar* m_actions_bar;

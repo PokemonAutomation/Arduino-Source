@@ -86,8 +86,7 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
         scroll_layout->setAlignment(Qt::AlignTop);
 
         UiWrapper wrapper = m_session.system().make_ui_component(this);
-        m_system = dynamic_cast<QWidget*>(wrapper.release());
-        scroll_layout->addWidget(m_system);
+        scroll_layout->addWidget(dynamic_cast<QWidget*>(wrapper.release()));
 
         m_options = ConfigWidget::make_from_option(session.options(), this);
         scroll_layout->addWidget(&m_options->widget());

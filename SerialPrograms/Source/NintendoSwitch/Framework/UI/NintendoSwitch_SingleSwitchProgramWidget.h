@@ -59,7 +59,6 @@ private:
 private:
     SingleSwitchProgramSession& m_session;
     QVBoxLayout* m_layout;
-    QWidget* m_system;
     ConfigWidget* m_options;
     StatsBar* m_stats_bar;
     RunnablePanelActionBar* m_actions_bar;
