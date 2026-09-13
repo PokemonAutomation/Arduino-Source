@@ -65,14 +65,17 @@ public:
 
     Test_ShinySymbolDetector(
         const std::string& image,
-        bool expected
+        bool expected,
+        GameSettings::Device device = GameSettings::Device::switch_1_2
     )
-        : UnitTest("PokemonHome::ShinySymbolDetector - " + image)
+        : UnitTest("PokemonFRLG::ShinySymbolDetector - " + image)
         , m_image(UNIT_TEST_RESOURCE_PATH() + image)
         , m_expected(expected)
+        , m_device(device)
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        GameSettings::instance().DEVICE.set(m_device);
         ShinySymbolDetector detector(COLOR_RED);
         ImageRGB32 image(m_image);
         return detector.read(logger, image) == m_expected;
@@ -81,12 +84,14 @@ public:
 private:
     std::string m_image;
     bool m_expected;
+    GameSettings::Device m_device;
 };
 
 void add_tests_ShinySymbolDetector(UnitTestDatabase& database){
     database.add<Test_ShinySymbolDetector>("PokemonFRLG/ShinySymbolDetector/Char_False.png", false);
     database.add<Test_ShinySymbolDetector>("PokemonFRLG/ShinySymbolDetector/Karp-coloredited_True.png", true);
     database.add<Test_ShinySymbolDetector>("PokemonFRLG/ShinySymbolDetector/Karp-snotyak_True.png", true);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/ShinySymbolDetector/Carerpie-Emulator-True.png", true, GameSettings::Device::dev_test);
 }
 
 }

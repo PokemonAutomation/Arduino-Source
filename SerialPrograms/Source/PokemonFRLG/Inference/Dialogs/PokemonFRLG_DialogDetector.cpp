@@ -132,14 +132,17 @@ public:
 
     Test_AdvanceWhiteDialogDetector(
         const std::string& image,
-        bool expected
+        bool expected,
+        GameSettings::Device device = GameSettings::Device::switch_1_2
     )
         : UnitTest("PokemonFRLG::AdvanceWhiteDialogDetector - " + image)
         , m_image(UNIT_TEST_RESOURCE_PATH() + image)
         , m_expected(expected)
+        , m_device(device)
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        GameSettings::instance().DEVICE.set(m_device);
         AdvanceWhiteDialogDetector detector(COLOR_RED);
         ImageRGB32 image(m_image);
         return detector.detect(image) == m_expected;
@@ -148,6 +151,7 @@ public:
 private:
     std::string m_image;
     bool m_expected;
+    GameSettings::Device m_device;
 };
 
 void add_tests_AdvanceWhiteDialogDetector(UnitTestDatabase& database){
@@ -168,14 +172,17 @@ public:
 
     Test_SelectionDialogDetector(
         const std::string& image,
-        bool expected
+        bool expected,
+        GameSettings::Device device = GameSettings::Device::switch_1_2
     )
         : UnitTest("PokemonFRLG::SelectionDialogDetector - " + image)
         , m_image(UNIT_TEST_RESOURCE_PATH() + image)
         , m_expected(expected)
+        , m_device(device)
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        GameSettings::instance().DEVICE.set(m_device);
         SelectionDialogDetector detector(COLOR_RED);
         ImageRGB32 image(m_image);
         return detector.detect(image) == m_expected;
@@ -184,6 +191,7 @@ public:
 private:
     std::string m_image;
     bool m_expected;
+    GameSettings::Device m_device;
 };
 
 void add_tests_SelectionDialogDetector(UnitTestDatabase& database){
