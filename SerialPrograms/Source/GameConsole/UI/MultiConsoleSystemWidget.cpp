@@ -11,10 +11,9 @@
 #include "Common/Qt/NoWheelComboBox.h"
 #include "MultiConsoleSystemWidget.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -69,7 +68,7 @@ MultiConsoleSystemWidget::MultiConsoleSystemWidget(
 
 
 void MultiConsoleSystemWidget::on_console_count_lock(bool locked){
-    cout << "MultiConsoleSystemWidget::on_console_count_lock(): " << locked << endl;
+//    cout << "MultiConsoleSystemWidget::on_console_count_lock(): " << locked << endl;
     QMetaObject::invokeMethod(this, [=, this]{
         m_console_count_box->setEnabled(!locked);
     }, Qt::QueuedConnection);

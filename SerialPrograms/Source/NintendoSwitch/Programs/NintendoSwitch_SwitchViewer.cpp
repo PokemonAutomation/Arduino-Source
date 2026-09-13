@@ -51,7 +51,6 @@ SwitchViewer_Widget::SwitchViewer_Widget(
     SwitchViewer& session
 )
     : PanelWidget(parent, session)
-    , m_session(session.m_session)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);

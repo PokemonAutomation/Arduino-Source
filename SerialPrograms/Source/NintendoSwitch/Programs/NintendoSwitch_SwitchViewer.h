@@ -51,9 +51,6 @@ public:
     virtual QWidget& widget() override{
         return *this;
     }
-
-private:
-    GameConsole::MultiConsoleSystemSession& m_session;
 };
 
 
