@@ -9,8 +9,8 @@
 
 #include <QWidget>
 #include "Common/Qt/UiStateQtWidget.h"
+#include "GameConsole/Framework/ConsolePanelSession.h"
 #include "GameConsole/ConsolePanel.h"
-#include "GameConsole/ConsolePanelSession.h"
 
 namespace PokemonAutomation{
 namespace GameConsole{

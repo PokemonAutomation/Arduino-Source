@@ -10,7 +10,7 @@
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/UiWrapper.h"
 #include "Common/Cpp/Containers/FixedLimitVector.h"
-#include "GameConsole/ConsoleSystemSession.h"
+#include "ConsoleSystemSession.h"
 #include "MultiConsoleSystemOption.h"
 
 namespace PokemonAutomation{

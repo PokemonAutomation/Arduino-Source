@@ -919,20 +919,20 @@ file(GLOB LIBRARY_SOURCES
     Source/Integrations/ProgramTracker.h
     Source/GameConsole/ConsolePanel.cpp
     Source/GameConsole/ConsolePanel.h
-    Source/GameConsole/ConsolePanelSession.cpp
-    Source/GameConsole/ConsolePanelSession.h
-    Source/GameConsole/ConsoleSystemOption.cpp
-    Source/GameConsole/ConsoleSystemOption.h
-    Source/GameConsole/ConsoleSystemSession.cpp
-    Source/GameConsole/ConsoleSystemSession.h
+    Source/GameConsole/Framework/ConsolePanelSession.cpp
+    Source/GameConsole/Framework/ConsolePanelSession.h
+    Source/GameConsole/Framework/ConsoleSystemOption.cpp
+    Source/GameConsole/Framework/ConsoleSystemOption.h
+    Source/GameConsole/Framework/ConsoleSystemSession.cpp
+    Source/GameConsole/Framework/ConsoleSystemSession.h
+    Source/GameConsole/Framework/MultiConsolePanelSession.cpp
+    Source/GameConsole/Framework/MultiConsolePanelSession.h
+    Source/GameConsole/Framework/MultiConsoleSystemOption.cpp
+    Source/GameConsole/Framework/MultiConsoleSystemOption.h
+    Source/GameConsole/Framework/MultiConsoleSystemSession.cpp
+    Source/GameConsole/Framework/MultiConsoleSystemSession.h
     Source/GameConsole/MultiConsolePanel.cpp
     Source/GameConsole/MultiConsolePanel.h
-    Source/GameConsole/MultiConsolePanelSession.cpp
-    Source/GameConsole/MultiConsolePanelSession.h
-    Source/GameConsole/MultiConsoleSystemOption.cpp
-    Source/GameConsole/MultiConsoleSystemOption.h
-    Source/GameConsole/MultiConsoleSystemSession.cpp
-    Source/GameConsole/MultiConsoleSystemSession.h
     Source/GameConsole/Panels/GameConsole_BoxDraw.cpp
     Source/GameConsole/Panels/GameConsole_BoxDraw.h
     Source/GameConsole/Panels/GameConsole_SwitchViewer.h

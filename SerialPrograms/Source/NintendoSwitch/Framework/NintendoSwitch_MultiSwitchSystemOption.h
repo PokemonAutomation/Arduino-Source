@@ -13,7 +13,7 @@
 #ifndef PokemonAutomationn_NintendoSwitch_MultiSwitchSystemOption_H
 #define PokemonAutomationn_NintendoSwitch_MultiSwitchSystemOption_H
 
-#include "GameConsole/MultiConsoleSystemOption.h"
+#include "GameConsole/Framework/MultiConsoleSystemOption.h"
 #include "NintendoSwitch_SwitchSystemOption.h"
 
 namespace PokemonAutomation{

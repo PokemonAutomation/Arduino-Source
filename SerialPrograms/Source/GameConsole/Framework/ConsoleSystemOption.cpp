@@ -9,7 +9,7 @@
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
-#include "GameConsole/ConsoleSystemOption.h"
+#include "GameConsole/Framework/ConsoleSystemOption.h"
 
 namespace PokemonAutomation{
 namespace GameConsole{

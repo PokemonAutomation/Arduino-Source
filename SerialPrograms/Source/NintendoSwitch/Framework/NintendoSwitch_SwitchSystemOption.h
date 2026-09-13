@@ -16,7 +16,7 @@
 #define PokemonAutomation_NintendoSwitch_SwitchSystemOption_H
 
 #include "CommonFramework/Panels/ProgramDescriptor.h"
-#include "GameConsole/ConsoleSystemOption.h"
+#include "GameConsole/Framework/ConsoleSystemOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_ModelType.h"
 
 namespace PokemonAutomation{

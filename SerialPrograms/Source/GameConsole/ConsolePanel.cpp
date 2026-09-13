@@ -5,8 +5,8 @@
  */
 
 #include "Common/Cpp/Json/JsonValue.h"
+#include "Framework/ConsolePanelSession.h"
 #include "ConsolePanel.h"
-#include "ConsolePanelSession.h"
 
 namespace PokemonAutomation{
 namespace GameConsole{

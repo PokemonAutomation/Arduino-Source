@@ -20,7 +20,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_SwitchSystemSession_H
 #define PokemonAutomation_NintendoSwitch_SwitchSystemSession_H
 
-#include "GameConsole/ConsoleSystemSession.h"
+#include "GameConsole/Framework/ConsoleSystemSession.h"
 #include "NintendoSwitch_SwitchSystemOption.h"
 
 namespace PokemonAutomation{

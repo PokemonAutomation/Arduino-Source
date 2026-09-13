@@ -5,8 +5,8 @@
  */
 
 #include "Common/Cpp/Logging/GlobalLogger.h"
-#include "ConsoleSystemSession.h"
-#include "MultiConsolePanelSession.h"
+#include "Framework/ConsoleSystemSession.h"
+#include "Framework/MultiConsolePanelSession.h"
 #include "MultiConsolePanel.h"
 
 namespace PokemonAutomation{

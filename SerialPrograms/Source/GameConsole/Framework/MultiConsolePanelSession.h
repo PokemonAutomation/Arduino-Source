@@ -9,7 +9,7 @@
 
 #include "CommonFramework/Panels/PanelSession.h"
 #include "MultiConsoleSystemSession.h"
-#include "MultiConsolePanel.h"
+#include "GameConsole/MultiConsolePanel.h"
 
 namespace PokemonAutomation{
 namespace GameConsole{
