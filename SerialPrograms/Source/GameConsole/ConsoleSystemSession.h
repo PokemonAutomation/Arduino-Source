@@ -20,8 +20,9 @@
 #ifndef PokemonAutomation_GameConsole_ConsoleSystemSession_H
 #define PokemonAutomation_GameConsole_ConsoleSystemSession_H
 
-#include "Common/Cpp/Logging/TaggedLogger.h"
 #include "Common/Cpp/UiWrapper.h"
+#include "Common/Cpp/EarlyShutdown.h"
+#include "Common/Cpp/Logging/TaggedLogger.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
 #include "CommonFramework/VideoPipeline/VideoSession.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
@@ -40,6 +41,7 @@ namespace GameConsole{
 
 class ConsoleSystemSession
     : public UiState<ConsoleSystemSession>
+    , public TryShutdownable
     , public TrackableConsole
     , private VideoDisplayHidListener
     , private ControllerInputListener
@@ -60,8 +62,9 @@ public:
 
 
 public:
-    virtual bool try_shutdown() noexcept;
+    virtual bool try_shutdown() noexcept override;
     virtual ~ConsoleSystemSession();
+
     ConsoleSystemSession(
         Logger& logger,
         ConsoleSystemOption& option,

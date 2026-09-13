@@ -25,7 +25,7 @@ void MultiConsoleSystemSession::remove_listener(Listener& listener){
     m_listeners.remove(listener);
 }
 
-bool MultiConsoleSystemSession::try_shutdown(){
+bool MultiConsoleSystemSession::try_shutdown() noexcept{
     bool success = true;
     for (std::unique_ptr<ConsoleSystemSession>& console : m_consoles){
         success &= console->try_shutdown();
@@ -34,9 +34,9 @@ bool MultiConsoleSystemSession::try_shutdown(){
 }
 MultiConsoleSystemSession::~MultiConsoleSystemSession(){
     blocking_shutdown(
-        global_logger_tagged(),
+        m_logger,
         "MultiConsoleSystemSession",
-        [this]{ return try_shutdown(); }
+        [this]{ return MultiConsoleSystemSession::try_shutdown(); }
     );
 }
 
@@ -60,21 +60,18 @@ MultiConsoleSystemSession::MultiConsoleSystemSession(
 {}
 MultiConsoleSystemSession::MultiConsoleSystemSession(
     MultiConsoleSystemOption& option,
-    std::function<
-        std::unique_ptr<ConsoleSystemSession>(
-            ConsoleSystemOption& option,
-            size_t console_index
-        )
-    > factory
+    SessionFactory session_factory
 )
-    : m_option(option)
+    : m_logger(global_logger_tagged())
+    , m_option(option)
     , m_consoles(option.active_consoles())
-    , m_factory(std::move(factory))
+    , m_session_factory(std::move(session_factory))
 {
     size_t count = option.active_consoles();
     for (size_t c = 0; c < count; c++){
-        m_consoles.emplace_back(m_factory(option[c], c));
+        m_consoles.emplace_back(m_session_factory(option[c], c));
     }
+//    cout << "MultiConsoleSystemSession(): count = " << count << endl;
 }
 
 void MultiConsoleSystemSession::lock_controllers(const std::string& reason){
@@ -130,7 +127,7 @@ void MultiConsoleSystemSession::set_active_consoles(size_t count){
         m_consoles.reset(count);
         m_option.resize(count);
         for (size_t c = 0; c < count; c++){
-            m_consoles.emplace_back(m_factory(m_option[c], c));
+            m_consoles.emplace_back(m_session_factory(m_option[c], c));
         }
     }
 
@@ -144,11 +141,11 @@ JsonValue MultiConsoleSystemSession::to_json() const{
     return m_option.to_json();
 }
 void MultiConsoleSystemSession::load_json(const JsonValue& json){
-//    cout << "MultiConsoleSystemSession::load_json()" << endl;
     {
         std::lock_guard<Mutex> lg(m_state_lock);
         m_option.load_json(json);
     }
+//    cout << "MultiConsoleSystemSession::load_json(): " << m_option.active_consoles() << endl;
     set_active_consoles(m_option.active_consoles());
 }
 

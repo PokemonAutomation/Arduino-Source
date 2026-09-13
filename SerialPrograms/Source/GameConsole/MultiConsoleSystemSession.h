@@ -17,7 +17,10 @@ namespace PokemonAutomation{
 namespace GameConsole{
 
 
-class MultiConsoleSystemSession : public UiState<MultiConsoleSystemSession>{
+class MultiConsoleSystemSession
+    : public UiState<MultiConsoleSystemSession>
+    , public TryShutdownable
+{
 public:
     struct Listener{
         //  Called when the console count is locked or unlocked.
@@ -38,9 +41,19 @@ public:
 
 
 public:
-    bool try_shutdown();
+    virtual bool try_shutdown() noexcept override;
     virtual ~MultiConsoleSystemSession();
 
+    using SessionFactory = std::function<
+        std::unique_ptr<ConsoleSystemSession>(
+            ConsoleSystemOption& option,
+            size_t console_index
+        )
+    >;
+
+    //  Construct the multi-console session.
+    //  By default it constructs the generic console. But you can inject your
+    //  own factory for your own custom subclass.
     MultiConsoleSystemSession(
         MultiConsoleSystemOption& option,
         bool allow_commands_while_locked,
@@ -48,16 +61,13 @@ public:
     );
     MultiConsoleSystemSession(
         MultiConsoleSystemOption& option,
-        std::function<
-            std::unique_ptr<ConsoleSystemSession>(
-                ConsoleSystemOption& option,
-                size_t console_index
-            )
-        > factory
+        SessionFactory session_factory
     );
 
 
 public:
+    Logger& logger(){ return m_logger; }
+
     //  These are not thread-safe with "resize()".
     size_t min_consoles() const{ return m_option.min_consoles(); }
     size_t max_consoles() const{ return m_option.max_consoles(); }
@@ -85,17 +95,13 @@ public:
 
 
 private:
+    Logger& m_logger;
     MultiConsoleSystemOption& m_option;
 
     Mutex m_resize_lock;
     FixedLimitVector<std::unique_ptr<ConsoleSystemSession>> m_consoles;
 
-    std::function<
-        std::unique_ptr<ConsoleSystemSession>(
-            ConsoleSystemOption& option,
-            size_t console_index
-        )
-    > m_factory;
+    SessionFactory m_session_factory;
 
     //  Listeners who are currently locking the console count.
     //  It is not safe to change the console count if this is not zero.

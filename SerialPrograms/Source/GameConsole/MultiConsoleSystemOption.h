@@ -21,11 +21,21 @@ public:
 
 public:
     virtual ~MultiConsoleSystemOption();
+
+    using OptionFactory = std::function<
+        std::unique_ptr<ConsoleSystemOption>(
+            size_t console_index
+        )
+    >;
+
+    //  Construct the multi-console option.
+    //  By default it constructs the generic console. But you can inject your
+    //  own factory for your own custom subclass.
     MultiConsoleSystemOption(
         size_t min_consoles,
         size_t max_consoles,
         size_t consoles,
-        std::function<std::unique_ptr<ConsoleSystemOption>()> factory = []{
+        const OptionFactory& option_factory = [](size_t console_index){
             return std::make_unique<ConsoleSystemOption>(1);
         }
     );
@@ -33,7 +43,7 @@ public:
         size_t min_consoles,
         size_t max_consoles,
         const JsonValue& json,
-        std::function<std::unique_ptr<ConsoleSystemOption>()> factory = []{
+        const OptionFactory& option_factory = [](size_t console_index){
             return std::make_unique<ConsoleSystemOption>(1);
         }
     );

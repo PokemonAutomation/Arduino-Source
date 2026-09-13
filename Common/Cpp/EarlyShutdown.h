@@ -35,6 +35,9 @@ void blocking_shutdown(
 }
 
 
+struct TryShutdownable{
+    virtual bool try_shutdown() noexcept = 0;
+};
 
 
 }

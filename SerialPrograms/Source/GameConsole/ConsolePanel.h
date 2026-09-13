@@ -2,7 +2,10 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  ConsolePanel is a panel with a console and options. It cannot be run.
+ *  ConsolePanel is a panel with:
+ *    - Has options.
+ *    - Has a console.
+ *    - Cannot be run.
  *
  */
 

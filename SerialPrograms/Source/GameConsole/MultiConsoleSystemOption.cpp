@@ -22,7 +22,7 @@ MultiConsoleSystemOption::MultiConsoleSystemOption(
     size_t min_consoles,
     size_t max_consoles,
     size_t consoles,
-    std::function<std::unique_ptr<ConsoleSystemOption>()> factory
+    const OptionFactory& option_factory
 )
     : m_min_consoles(std::max(min_consoles, (size_t)1))
     , m_max_consoles(std::min(max_consoles, (size_t)MAX_CONSOLES))
@@ -30,7 +30,7 @@ MultiConsoleSystemOption::MultiConsoleSystemOption(
     , m_consoles(m_max_consoles)
 {
     for (size_t c = 0; c < m_max_consoles; c++){
-        m_consoles.emplace_back(factory());
+        m_consoles.emplace_back(option_factory(c));
     }
     consoles = std::max(consoles, m_min_consoles);
     consoles = std::min(consoles, m_max_consoles);
@@ -40,9 +40,9 @@ MultiConsoleSystemOption::MultiConsoleSystemOption(
     size_t min_consoles,
     size_t max_consoles,
     const JsonValue& json,
-    std::function<std::unique_ptr<ConsoleSystemOption>()> factory
+    const OptionFactory& option_factory
 )
-    : MultiConsoleSystemOption(min_consoles, max_consoles, 0, std::move(factory))
+    : MultiConsoleSystemOption(min_consoles, max_consoles, 0, option_factory)
 {
     MultiConsoleSystemOption::load_json(json);
 }
@@ -78,7 +78,6 @@ void MultiConsoleSystemOption::load_json(const JsonValue& json){
             for (; c < stop; c++){
                 m_consoles[c]->load_json((*array)[c]);
             }
-            m_active_consoles = c;
         }
     }
 }

@@ -925,19 +925,26 @@ file(GLOB LIBRARY_SOURCES
     Source/GameConsole/ConsoleSystemOption.h
     Source/GameConsole/ConsoleSystemSession.cpp
     Source/GameConsole/ConsoleSystemSession.h
+    Source/GameConsole/MultiConsolePanel.cpp
+    Source/GameConsole/MultiConsolePanel.h
+    Source/GameConsole/MultiConsolePanelSession.cpp
+    Source/GameConsole/MultiConsolePanelSession.h
     Source/GameConsole/MultiConsoleSystemOption.cpp
     Source/GameConsole/MultiConsoleSystemOption.h
     Source/GameConsole/MultiConsoleSystemSession.cpp
     Source/GameConsole/MultiConsoleSystemSession.h
-    Source/GameConsole/Panels/BoxDraw.cpp
-    Source/GameConsole/Panels/BoxDraw.h
-    Source/GameConsole/Panels/VirtualConsole.h
+    Source/GameConsole/Panels/GameConsole_BoxDraw.cpp
+    Source/GameConsole/Panels/GameConsole_BoxDraw.h
+    Source/GameConsole/Panels/GameConsole_SwitchViewer.h
+    Source/GameConsole/Panels/GameConsole_VirtualConsole.h
     Source/GameConsole/UI/CommandRowWidget.cpp
     Source/GameConsole/UI/CommandRowWidget.h
     Source/GameConsole/UI/ConsolePanelWidget.cpp
     Source/GameConsole/UI/ConsolePanelWidget.h
     Source/GameConsole/UI/ConsoleSystemWidget.cpp
     Source/GameConsole/UI/ConsoleSystemWidget.h
+    Source/GameConsole/UI/MultiConsolePanelWidget.cpp
+    Source/GameConsole/UI/MultiConsolePanelWidget.h
     Source/GameConsole/UI/MultiConsoleSystemWidget.cpp
     Source/GameConsole/UI/MultiConsoleSystemWidget.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT.cpp
@@ -1294,8 +1301,6 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Programs/NintendoSwitch_RecordKeyboardController.h
     Source/NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.h
-    Source/NintendoSwitch/Programs/NintendoSwitch_SwitchViewer.cpp
-    Source/NintendoSwitch/Programs/NintendoSwitch_SwitchViewer.h
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboA.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboA.h
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboButton.cpp
