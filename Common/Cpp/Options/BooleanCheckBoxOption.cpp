@@ -62,17 +62,18 @@ void BooleanCheckBoxCell::operator=(bool x){
         report_value_changed(this);
     }
 }
+
+void BooleanCheckBoxCell::restore_defaults(){
+    *this = m_data->m_default;
+}
+JsonValue BooleanCheckBoxCell::to_json() const{
+    return (bool)*this;
+}
 void BooleanCheckBoxCell::load_json(const JsonValue& json){
     bool value;
     if (json.read_boolean(value)){
         *this = value;
     }
-}
-JsonValue BooleanCheckBoxCell::to_json() const{
-    return (bool)*this;
-}
-void BooleanCheckBoxCell::restore_defaults(){
-    *this = m_data->m_default;
 }
 
 

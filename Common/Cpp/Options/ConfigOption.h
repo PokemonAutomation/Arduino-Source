@@ -64,6 +64,7 @@ public:
     void remove_listener(Listener& listener);
     size_t total_listeners() const;
 
+
 public:
     virtual ~ConfigOption();
     ConfigOption(ConfigOption&&) = delete;
@@ -71,14 +72,22 @@ public:
 protected:
     ConfigOption(const ConfigOption& x);
 
+
 public:
     ConfigOption();
     ConfigOption(LockMode lock_mode);
     ConfigOption(ConfigOptionState visibility);
 
-    virtual void load_json(const JsonValue& json);
-    virtual JsonValue to_json() const;
 
+public:
+    //  Returns error message if invalid. Otherwise returns empty string.
+    virtual std::string check_validity() const;
+    virtual void restore_defaults();
+    virtual JsonValue to_json() const;
+    virtual void load_json(const JsonValue& json);
+
+
+public:
     //  Lifetime sanitizer
     void check_usage() const{
         m_lifetime_sanitizer.check_usage();
@@ -86,6 +95,7 @@ public:
     LifetimeSanitizer::CheckScope check_scope() const{
         return m_lifetime_sanitizer.check_scope();
     }
+
 
 public:
     //  Return the lock mode: how locking works on this option. It can be:
@@ -96,10 +106,6 @@ public:
     //  when constructing the ConfigOption.
     LockMode lock_mode() const;
 
-    //  Returns error message if invalid. Otherwise returns empty string.
-    virtual std::string check_validity() const;
-
-    virtual void restore_defaults();
 
     //  This is called by the framework at the start of a program to reset any
     //  transient state that the option object may have.

@@ -155,34 +155,6 @@ void BoxFloatOption::set_all(double x, double y, double width, double height){
 }
 
 
-void BoxFloatOption::load_json(const JsonValue& json){
-    const JsonObject* obj = json.to_object();
-    if (obj == nullptr){
-        return;
-    }
-
-    double x, y, width, height;
-    get_all(x, y, width, height);
-
-    obj->read_float(x, "x");
-    obj->read_float(y, "y");
-    obj->read_float(width, "width");
-    obj->read_float(height, "height");
-
-    set_all(x, y, width, height);
-}
-JsonValue BoxFloatOption::to_json() const{
-    double x, y, width, height;
-    get_all(x, y, width, height);
-
-    JsonObject ret;
-    ret["x"] = std::to_string(x);
-    ret["y"] = std::to_string(y);
-    ret["width"] = std::to_string(width);
-    ret["height"] = std::to_string(height);
-    return ret;
-}
-
 std::string BoxFloatOption::check_validity() const{
     double x, y, width, height;
     get_all(x, y, width, height);
@@ -217,6 +189,34 @@ void BoxFloatOption::restore_defaults(){
         self.m_default_height
     );
 }
+JsonValue BoxFloatOption::to_json() const{
+    double x, y, width, height;
+    get_all(x, y, width, height);
+
+    JsonObject ret;
+    ret["x"] = std::to_string(x);
+    ret["y"] = std::to_string(y);
+    ret["width"] = std::to_string(width);
+    ret["height"] = std::to_string(height);
+    return ret;
+}
+void BoxFloatOption::load_json(const JsonValue& json){
+    const JsonObject* obj = json.to_object();
+    if (obj == nullptr){
+        return;
+    }
+
+    double x, y, width, height;
+    get_all(x, y, width, height);
+
+    obj->read_float(x, "x");
+    obj->read_float(y, "y");
+    obj->read_float(width, "width");
+    obj->read_float(height, "height");
+
+    set_all(x, y, width, height);
+}
+
 
 
 

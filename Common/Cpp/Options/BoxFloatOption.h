@@ -37,11 +37,12 @@ public:
     void get_all(double& x, double& y, double& width, double& height) const;
     void set_all(double x, double y, double width, double height);
 
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
 
+public:
     virtual std::string check_validity() const override;
     virtual void restore_defaults() override;
+    virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
 
 
 private:

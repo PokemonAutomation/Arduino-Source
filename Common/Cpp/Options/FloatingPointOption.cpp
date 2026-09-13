@@ -103,22 +103,7 @@ void FloatingPointCell::set_and_sanitize(double x){
     }
 }
 
-void FloatingPointCell::load_json(const JsonValue& json){
-    double value;
-    if (!json.read_float(value)){
-        return;
-    }
-    Data& data = *m_data;
-    value = std::max(value, data.m_min_value);
-    value = std::min(value, data.m_max_value);
-    if (std::isnan(value)){
-        value = data.m_default;
-    }
-    set(value);
-}
-JsonValue FloatingPointCell::to_json() const{
-    return (double)*this;
-}
+
 
 std::string FloatingPointCell::check_validity(double x) const{
     const Data& data = *m_data;
@@ -141,6 +126,23 @@ std::string FloatingPointCell::check_validity() const{
 void FloatingPointCell::restore_defaults(){
     set(m_data->m_default);
 }
+JsonValue FloatingPointCell::to_json() const{
+    return (double)*this;
+}
+void FloatingPointCell::load_json(const JsonValue& json){
+    double value;
+    if (!json.read_float(value)){
+        return;
+    }
+    Data& data = *m_data;
+    value = std::max(value, data.m_min_value);
+    value = std::min(value, data.m_max_value);
+    if (std::isnan(value)){
+        value = data.m_default;
+    }
+    set(value);
+}
+
 
 
 

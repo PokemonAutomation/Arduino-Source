@@ -263,26 +263,6 @@ std::string TimeDurationCell<Type>::time_string(const std::string& text) const{
     }
 }
 
-template <typename Type>
-void TimeDurationCell<Type>::load_json(const JsonValue& json){
-    Data& data = *m_data;
-    const std::string* str = json.to_string();
-    if (str == nullptr){
-        return;
-    }
-    {
-        WriteSpinLock lg(data.m_lock);
-        data.m_current = *str;
-        data.m_error = data.process(data.m_current, data.m_value);
-    }
-    this->report_value_changed(this);
-}
-template <typename Type>
-JsonValue TimeDurationCell<Type>::to_json() const{
-    const Data& data = *m_data;
-    ReadSpinLock lg(data.m_lock);
-    return data.m_current;
-}
 
 template <typename Type>
 std::string TimeDurationCell<Type>::check_validity() const{
@@ -300,6 +280,27 @@ void TimeDurationCell<Type>::restore_defaults(){
     }
     this->report_value_changed(this);
 }
+template <typename Type>
+JsonValue TimeDurationCell<Type>::to_json() const{
+    const Data& data = *m_data;
+    ReadSpinLock lg(data.m_lock);
+    return data.m_current;
+}
+template <typename Type>
+void TimeDurationCell<Type>::load_json(const JsonValue& json){
+    Data& data = *m_data;
+    const std::string* str = json.to_string();
+    if (str == nullptr){
+        return;
+    }
+    {
+        WriteSpinLock lg(data.m_lock);
+        data.m_current = *str;
+        data.m_error = data.process(data.m_current, data.m_value);
+    }
+    this->report_value_changed(this);
+}
+
 
 
 

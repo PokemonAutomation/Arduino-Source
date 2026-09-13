@@ -122,34 +122,6 @@ const std::string& RandomCodeOption::label() const{
     return m_data->m_label;
 }
 
-void RandomCodeOption::load_json(const JsonValue& json){
-    const JsonObject* obj = json.to_object();
-    if (obj == nullptr){
-        return;
-    }
-
-    RaidCodeOption code(m_data->m_default.total_digits());
-
-    obj->read_integer(code.m_random_digits, "RandomDigits");
-
-    std::string str;
-    if (obj->read_string(str, "RaidCode")){
-        code.m_code = str;
-    }
-
-    {
-        WriteSpinLock lg(m_data->m_lock);
-        m_data->m_current = code;
-    }
-    report_value_changed(this);
-}
-JsonValue RandomCodeOption::to_json() const{
-    ReadSpinLock lg(m_data->m_lock);
-    JsonObject obj;
-    obj["RandomDigits"] = m_data->m_current.m_random_digits;
-    obj["RaidCode"] = m_data->m_current.m_code;
-    return obj;
-}
 
 
 
@@ -181,6 +153,35 @@ std::string RandomCodeOption::get_code() const{
     return m_data->m_current.get_code();
 }
 
+
+JsonValue RandomCodeOption::to_json() const{
+    ReadSpinLock lg(m_data->m_lock);
+    JsonObject obj;
+    obj["RandomDigits"] = m_data->m_current.m_random_digits;
+    obj["RaidCode"] = m_data->m_current.m_code;
+    return obj;
+}
+void RandomCodeOption::load_json(const JsonValue& json){
+    const JsonObject* obj = json.to_object();
+    if (obj == nullptr){
+        return;
+    }
+
+    RaidCodeOption code(m_data->m_default.total_digits());
+
+    obj->read_integer(code.m_random_digits, "RandomDigits");
+
+    std::string str;
+    if (obj->read_string(str, "RaidCode")){
+        code.m_code = str;
+    }
+
+    {
+        WriteSpinLock lg(m_data->m_lock);
+        m_data->m_current = code;
+    }
+    report_value_changed(this);
+}
 std::string RandomCodeOption::check_validity() const{
     return m_data->m_current.check_validity();
 }

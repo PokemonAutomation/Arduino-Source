@@ -60,12 +60,6 @@ public:
 
     virtual void press_button();
 
-//    virtual void load_json(const JsonValue& json) override;
-//    virtual JsonValue to_json() const override;
-
-//    virtual void restore_defaults() override;
-
-
 
 protected:
     struct Data;

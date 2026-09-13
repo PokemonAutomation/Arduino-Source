@@ -88,13 +88,13 @@ public:
         return SimpleIntegerCellBase::set(x);
     }
 
-    using SimpleIntegerCellBase::load_json;
+    using SimpleIntegerCellBase::check_validity;
+    using SimpleIntegerCellBase::restore_defaults;
     using SimpleIntegerCellBase::to_json;
+    using SimpleIntegerCellBase::load_json;
     std::string check_validity(Type x) const{
         return SimpleIntegerCellBase::check_validity(x);
     }
-    using SimpleIntegerCellBase::check_validity;
-    using SimpleIntegerCellBase::restore_defaults;
 };
 
 

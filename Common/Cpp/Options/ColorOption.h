@@ -31,9 +31,11 @@ public:
     void set(uint32_t x);
     void set(const std::string& str);
 
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
+
+public:
     virtual void restore_defaults() override;
+    virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
 
 
 private:

@@ -26,29 +26,8 @@ StaticTableRow::StaticTableRow(std::string slug)
 void StaticTableRow::add_option(ConfigOption& option, std::string serialization_string){
     m_options.emplace_back(std::move(serialization_string), &option);
 }
-void StaticTableRow::load_json(const JsonValue& json){
-    const JsonObject* obj = json.to_object();
-    if (obj == nullptr){
-        return;
-    }
-    for (auto& item : m_options){
-        if (!item.first.empty()){
-            const JsonValue* value = obj->get_value(item.first);
-            if (value){
-                item.second->load_json(*value);
-            }
-        }
-    }
-}
-JsonValue StaticTableRow::to_json() const{
-    JsonObject obj;
-    for (auto& item : m_options){
-        if (!item.first.empty()){
-            obj[item.first] = item.second->to_json();
-        }
-    }
-    return obj;
-}
+
+
 std::string StaticTableRow::check_validity() const{
     for (const auto& item : m_options){
         std::string error = item.second->check_validity();
@@ -61,6 +40,29 @@ std::string StaticTableRow::check_validity() const{
 void StaticTableRow::restore_defaults(){
     for (const auto& item : m_options){
         item.second->restore_defaults();
+    }
+}
+JsonValue StaticTableRow::to_json() const{
+    JsonObject obj;
+    for (auto& item : m_options){
+        if (!item.first.empty()){
+            obj[item.first] = item.second->to_json();
+        }
+    }
+    return obj;
+}
+void StaticTableRow::load_json(const JsonValue& json){
+    const JsonObject* obj = json.to_object();
+    if (obj == nullptr){
+        return;
+    }
+    for (auto& item : m_options){
+        if (!item.first.empty()){
+            const JsonValue* value = obj->get_value(item.first);
+            if (value){
+                item.second->load_json(*value);
+            }
+        }
     }
 }
 void StaticTableRow::report_program_state(bool program_is_running){

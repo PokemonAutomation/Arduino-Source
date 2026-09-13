@@ -23,10 +23,11 @@ public:
     std::string text() const;
     void set_text(std::string label);
 
+
+public:
+    virtual void restore_defaults() override{}
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
-
-    virtual void restore_defaults() override{}
 
 
 private:

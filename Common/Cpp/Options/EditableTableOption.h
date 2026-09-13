@@ -154,11 +154,12 @@ public:
 
     void clear();
 
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
 
+public:
     virtual std::string check_validity() const override;
     virtual void restore_defaults() override final;
+    virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
 
 
 public:

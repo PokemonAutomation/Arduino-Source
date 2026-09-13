@@ -158,16 +158,9 @@ void CheckboxDropdownCell<FlagEnum>::toggle_index(size_t index){
 
 
 template <typename FlagEnum>
-void CheckboxDropdownCell<FlagEnum>::load_json(const JsonValue& json){
-    m_current = empty_value((FlagEnum*)nullptr);
-    const JsonArray& array = json.to_array_throw();
-    for (const JsonValue& item : array){
-        const std::string slug = item.to_string_throw();
-        const FlagEnum* flag = m_database.find_slug(slug);
-        if (flag){
-            m_current |= *flag;
-        }
-    }
+void CheckboxDropdownCell<FlagEnum>::restore_defaults(){
+    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
+    m_current = m_default;
 }
 template <typename FlagEnum>
 JsonValue CheckboxDropdownCell<FlagEnum>::to_json() const{
@@ -179,12 +172,19 @@ JsonValue CheckboxDropdownCell<FlagEnum>::to_json() const{
     }
     return ret;
 }
-
 template <typename FlagEnum>
-void CheckboxDropdownCell<FlagEnum>::restore_defaults(){
-    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-    m_current = m_default;
+void CheckboxDropdownCell<FlagEnum>::load_json(const JsonValue& json){
+    m_current = empty_value((FlagEnum*)nullptr);
+    const JsonArray& array = json.to_array_throw();
+    for (const JsonValue& item : array){
+        const std::string slug = item.to_string_throw();
+        const FlagEnum* flag = m_database.find_slug(slug);
+        if (flag){
+            m_current |= *flag;
+        }
+    }
 }
+
 
 
 

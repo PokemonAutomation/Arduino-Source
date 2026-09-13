@@ -29,13 +29,14 @@ public:
 
 
 public:
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
-
-    std::string check_validity() const override;
+    virtual std::string check_validity() const override;
     virtual void restore_defaults() override;
-    virtual void reset_state() override;
+    virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
 
+
+public:
+    virtual void reset_state() override;
     virtual void report_program_state(bool program_is_running) override;
 
     bool horizontal() const;

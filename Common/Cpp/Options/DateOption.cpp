@@ -109,7 +109,16 @@ std::string DateTimeCell::check_validity() const{
 void DateTimeCell::restore_defaults(){
     set(m_default);
 }
-
+JsonValue DateTimeCell::to_json(const DateTime& date){
+    JsonObject ret;
+    if (date.year   >= 0) ret["Year"  ] = date.year;
+    if (date.month  >= 0) ret["Month" ] = date.month;
+    if (date.day    >= 0) ret["Day"   ] = date.day;
+    if (date.hour   >= 0) ret["Hour"  ] = date.hour;
+    if (date.minute >= 0) ret["Minute"] = date.minute;
+    if (date.second >= 0) ret["Second"] = date.second;
+    return ret;
+}
 DateTime DateTimeCell::from_json(const JsonValue& json){
     DateTime ret;
 
@@ -127,15 +136,13 @@ DateTime DateTimeCell::from_json(const JsonValue& json){
 
     return ret;
 }
-JsonValue DateTimeCell::to_json(const DateTime& date){
-    JsonObject ret;
-    if (date.year   >= 0) ret["Year"  ] = date.year;
-    if (date.month  >= 0) ret["Month" ] = date.month;
-    if (date.day    >= 0) ret["Day"   ] = date.day;
-    if (date.hour   >= 0) ret["Hour"  ] = date.hour;
-    if (date.minute >= 0) ret["Minute"] = date.minute;
-    if (date.second >= 0) ret["Second"] = date.second;
-    return ret;
+JsonValue DateTimeCell::to_json() const{
+    DateTime current;
+    {
+        ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
+        current = m_current;
+    }
+    return to_json(current);
 }
 void DateTimeCell::load_json(const JsonValue& json){
     DateTime date = from_json(json);
@@ -147,14 +154,6 @@ void DateTimeCell::load_json(const JsonValue& json){
         m_current = date;
     }
     report_value_changed(this);
-}
-JsonValue DateTimeCell::to_json() const{
-    DateTime current;
-    {
-        ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-        current = m_current;
-    }
-    return to_json(current);
 }
 
 

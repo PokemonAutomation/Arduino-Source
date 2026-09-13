@@ -36,30 +36,6 @@ void BatchOption::add_option(ConfigOption& option, std::string serialization_str
     m_data->m_options.emplace_back(&option, std::move(serialization_string));
 }
 
-void BatchOption::load_json(const JsonValue& json){
-    const JsonObject* obj = json.to_object();
-    if (obj == nullptr){
-        return;
-    }
-    for (auto& item : m_data->m_options){
-        if (!item.second.empty()){
-            const JsonValue* value = obj->get_value(item.second);
-            if (value){
-                item.first->load_json(*value);
-            }
-        }
-    }
-}
-JsonValue BatchOption::to_json() const{
-    JsonObject obj;
-    for (auto& item : m_data->m_options){
-        if (!item.second.empty()){
-            obj[item.second] = item.first->to_json();
-        }
-    }
-    return obj;
-}
-
 std::string BatchOption::check_validity() const{
     for (const auto& item : m_data->m_options){
         std::string error = item.first->check_validity();
@@ -74,6 +50,30 @@ void BatchOption::restore_defaults(){
         item.first->restore_defaults();
     }
 }
+JsonValue BatchOption::to_json() const{
+    JsonObject obj;
+    for (auto& item : m_data->m_options){
+        if (!item.second.empty()){
+            obj[item.second] = item.first->to_json();
+        }
+    }
+    return obj;
+}
+void BatchOption::load_json(const JsonValue& json){
+    const JsonObject* obj = json.to_object();
+    if (obj == nullptr){
+        return;
+    }
+    for (auto& item : m_data->m_options){
+        if (!item.second.empty()){
+            const JsonValue* value = obj->get_value(item.second);
+            if (value){
+                item.first->load_json(*value);
+            }
+        }
+    }
+}
+
 void BatchOption::reset_state(){
     for (const auto& item : m_data->m_options){
         item.first->reset_state();

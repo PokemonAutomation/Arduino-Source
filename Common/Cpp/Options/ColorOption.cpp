@@ -107,18 +107,18 @@ void ColorCell::set(const std::string& str){
     set(x);
 }
 
+void ColorCell::restore_defaults(){
+    set(m_default_value);
+}
+JsonValue ColorCell::to_json() const{
+    return (uint32_t)*this;
+}
 void ColorCell::load_json(const JsonValue& json){
     uint32_t value;
     if (!json.read_integer(value)){
         return;
     }
     set(value);
-}
-JsonValue ColorCell::to_json() const{
-    return (uint32_t)*this;
-}
-void ColorCell::restore_defaults(){
-    set(m_default_value);
 }
 
 

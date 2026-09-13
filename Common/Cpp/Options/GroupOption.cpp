@@ -81,6 +81,23 @@ bool GroupOption::restore_defaults_button_enabled() const{
     return m_data->m_show_restore_defaults_button;
 }
 
+void GroupOption::restore_defaults(){
+    BatchOption::restore_defaults();
+    if (toggleable()){
+        bool default_value = m_data->m_enable_mode == EnableMode::DEFAULT_ENABLED;
+        if (default_value != m_data->m_enabled.exchange(default_value, std::memory_order_relaxed)){
+            report_value_changed(this);
+            on_set_enabled(default_value);
+        }
+    }
+}
+JsonValue GroupOption::to_json() const{
+    JsonObject obj = std::move(*BatchOption::to_json().to_object());
+    if (toggleable()){
+        obj["Enabled"] = m_data->m_enabled.load(std::memory_order_relaxed);
+    }
+    return obj;
+}
 void GroupOption::load_json(const JsonValue& json){
     BatchOption::load_json(json);
     const JsonObject* obj = json.to_object();
@@ -97,23 +114,7 @@ void GroupOption::load_json(const JsonValue& json){
         }
     }
 }
-JsonValue GroupOption::to_json() const{
-    JsonObject obj = std::move(*BatchOption::to_json().to_object());
-    if (toggleable()){
-        obj["Enabled"] = m_data->m_enabled.load(std::memory_order_relaxed);
-    }
-    return obj;
-}
-void GroupOption::restore_defaults(){
-    BatchOption::restore_defaults();
-    if (toggleable()){
-        bool default_value = m_data->m_enable_mode == EnableMode::DEFAULT_ENABLED;
-        if (default_value != m_data->m_enabled.exchange(default_value, std::memory_order_relaxed)){
-            report_value_changed(this);
-            on_set_enabled(default_value);
-        }
-    }
-}
+
 void GroupOption::on_set_enabled(bool enabled){}
 
 

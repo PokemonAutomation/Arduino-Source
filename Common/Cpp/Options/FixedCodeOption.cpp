@@ -87,28 +87,6 @@ std::string FixedCodeOption::set(std::string x){
     return std::string();
 }
 
-void FixedCodeOption::load_json(const JsonValue& json){
-    const std::string* str = json.to_string();
-    if (str == nullptr){
-        return;
-    }
-    {
-        WriteSpinLock lg(m_data->m_lock);
-        m_data->m_current = *str;
-    }
-    report_value_changed(this);
-}
-JsonValue FixedCodeOption::to_json() const{
-    ReadSpinLock lg(m_data->m_lock);
-    return m_data->m_current;
-}
-
-std::string FixedCodeOption::to_str() const{
-    {
-        ReadSpinLock lg(m_data->m_lock);
-        return sanitize_code(8, m_data->m_current);
-    }
-}
 
 std::string FixedCodeOption::check_validity() const{
     ReadSpinLock lg(m_data->m_lock);
@@ -127,6 +105,29 @@ void FixedCodeOption::restore_defaults(){
     }
     report_value_changed(this);
 }
+JsonValue FixedCodeOption::to_json() const{
+    ReadSpinLock lg(m_data->m_lock);
+    return m_data->m_current;
+}
+void FixedCodeOption::load_json(const JsonValue& json){
+    const std::string* str = json.to_string();
+    if (str == nullptr){
+        return;
+    }
+    {
+        WriteSpinLock lg(m_data->m_lock);
+        m_data->m_current = *str;
+    }
+    report_value_changed(this);
+}
+
+std::string FixedCodeOption::to_str() const{
+    {
+        ReadSpinLock lg(m_data->m_lock);
+        return sanitize_code(8, m_data->m_current);
+    }
+}
+
 
 
 

@@ -86,6 +86,14 @@ void PathCell::set(std::string x){
     report_value_changed(this);
 }
 
+
+void PathCell::restore_defaults(){
+    set(m_data->m_default);
+}
+JsonValue PathCell::to_json() const{
+    ReadSpinLock lg(m_data->m_lock);
+    return m_data->m_current;
+}
 void PathCell::load_json(const JsonValue& json){
     const std::string* str = json.to_string();
     if (str == nullptr){
@@ -93,14 +101,7 @@ void PathCell::load_json(const JsonValue& json){
     }
     set(*str);
 }
-JsonValue PathCell::to_json() const{
-    ReadSpinLock lg(m_data->m_lock);
-    return m_data->m_current;
-}
 
-void PathCell::restore_defaults(){
-    set(m_data->m_default);
-}
 
 
 
