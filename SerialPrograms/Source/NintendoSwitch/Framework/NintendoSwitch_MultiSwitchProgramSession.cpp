@@ -122,7 +122,7 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
     }
 
     std::deque<ControllerContext<AbstractController>> contexts;
-    size_t consoles = m_system.count();
+    size_t consoles = m_system.active_consoles();
     for (size_t console = 0; console < consoles; console++){
         //  Startup Checks
         m_instance->start_program_controller_check(
@@ -206,8 +206,8 @@ void MultiSwitchProgramSession::internal_run_program(){
 
     SleepSuppressScope sleep_scope(GlobalSettings::instance().SLEEP_SUPPRESS->PROGRAM_RUNNING);
 
-    //  Lock the system to prevent the # of Switches from changing.
-    std::lock_guard<MultiSwitchSystemSession> lg(m_system);
+//    //  Lock the system to prevent the # of Switches from changing.
+//    std::lock_guard<MultiSwitchSystemSession> lg(m_system);
 
     ProgramInfo program_info(
         identifier(),
@@ -216,7 +216,7 @@ void MultiSwitchProgramSession::internal_run_program(){
         timestamp()
     );
 
-    size_t consoles = m_system.count();
+    size_t consoles = m_system.active_consoles();
     FixedLimitVector<ConsoleHandle> handles(consoles);
     for (size_t c = 0; c < consoles; c++){
         SwitchSystemSession& session = m_system[c];

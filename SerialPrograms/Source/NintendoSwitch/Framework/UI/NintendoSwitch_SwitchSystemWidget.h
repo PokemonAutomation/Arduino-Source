@@ -18,8 +18,9 @@
 #ifndef PokemonAutomation_NintendoSwitch_SwitchSystemWidget_H
 #define PokemonAutomation_NintendoSwitch_SwitchSystemWidget_H
 
-#include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h"
 #include "GameConsole/UI/ConsoleSystemWidget.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h"
+#include "NintendoSwitch_CommandRow.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -33,7 +34,13 @@ public:
     SwitchSystemWidget(
         QWidget& parent,
         SwitchSystemSession& session
-    );
+    )
+        : ConsoleSystemWidget(parent, session, false)
+    {
+        m_group_layout->addWidget(
+            new CommandRow(*m_group_box->widget(), session)
+        );
+    }
 };
 
 

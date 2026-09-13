@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_ConsoleInfra_MultiConsoleSystemOption_H
-#define PokemonAutomation_ConsoleInfra_MultiConsoleSystemOption_H
+#ifndef PokemonAutomation_GameConsole_MultiConsoleSystemOption_H
+#define PokemonAutomation_GameConsole_MultiConsoleSystemOption_H
 
 #include <functional>
 #include "Common/Cpp/Containers/FixedLimitVector.h"
@@ -25,13 +25,17 @@ public:
         size_t min_consoles,
         size_t max_consoles,
         size_t consoles,
-        std::function<std::unique_ptr<ConsoleSystemOption>()> console_factory
+        std::function<std::unique_ptr<ConsoleSystemOption>()> factory = []{
+            return std::make_unique<ConsoleSystemOption>(1);
+        }
     );
     MultiConsoleSystemOption(
         size_t min_consoles,
         size_t max_consoles,
         const JsonValue& json,
-        std::function<std::unique_ptr<ConsoleSystemOption>()> console_factory
+        std::function<std::unique_ptr<ConsoleSystemOption>()> factory = []{
+            return std::make_unique<ConsoleSystemOption>(1);
+        }
     );
 
     void resize(size_t count){

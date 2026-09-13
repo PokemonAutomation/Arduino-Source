@@ -927,6 +927,8 @@ file(GLOB LIBRARY_SOURCES
     Source/GameConsole/ConsoleSystemSession.h
     Source/GameConsole/MultiConsoleSystemOption.cpp
     Source/GameConsole/MultiConsoleSystemOption.h
+    Source/GameConsole/MultiConsoleSystemSession.cpp
+    Source/GameConsole/MultiConsoleSystemSession.h
     Source/GameConsole/Panels/BoxDraw.cpp
     Source/GameConsole/Panels/BoxDraw.h
     Source/GameConsole/Panels/VirtualConsole.h
@@ -936,6 +938,8 @@ file(GLOB LIBRARY_SOURCES
     Source/GameConsole/UI/ConsolePanelWidget.h
     Source/GameConsole/UI/ConsoleSystemWidget.cpp
     Source/GameConsole/UI/ConsoleSystemWidget.h
+    Source/GameConsole/UI/MultiConsoleSystemWidget.cpp
+    Source/GameConsole/UI/MultiConsoleSystemWidget.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch.h
@@ -1189,7 +1193,6 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.h
-    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemSession.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemSession.h
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.h
@@ -1201,11 +1204,8 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_CommandRow.h
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchProgramWidget.cpp
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchProgramWidget.h
-    Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchSystemWidget.cpp
-    Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchSystemWidget.h
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SingleSwitchProgramWidget.cpp
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SingleSwitchProgramWidget.h
-    Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.cpp
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h
     Source/NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.h

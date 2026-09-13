@@ -7,8 +7,8 @@
 #include <QVBoxLayout>
 #include <QScrollArea>
 #include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Qt/UiStateQtWidget.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
-#include "NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchSystemWidget.h"
 #include "NintendoSwitch_SwitchViewer.h"
 
 namespace PokemonAutomation{
@@ -32,26 +32,25 @@ SwitchViewer_Descriptor::SwitchViewer_Descriptor()
 
 SwitchViewer::SwitchViewer(const SwitchViewer_Descriptor& descriptor)
     : UiState<SwitchViewer, PanelSession>(descriptor)
-    , m_switches(1, 4, 1)
+    , m_option(1, 4, 1)
+    , m_session(m_option, true)
 {}
 JsonValue SwitchViewer::to_json() const{
-    return m_switches.to_json();
+    return m_session.to_json();
 }
 void SwitchViewer::load_json(const JsonValue& json){
-    m_switches.load_json(json);
+    m_session.load_json(json);
 }
 
 
 
 SwitchViewer_Widget::~SwitchViewer_Widget(){
-    delete m_switches;
 }
 SwitchViewer_Widget::SwitchViewer_Widget(
     QWidget& parent,
     SwitchViewer& session
 )
     : PanelWidget(parent, session)
-    , m_session(session.m_switches, true, 0)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -66,8 +65,8 @@ SwitchViewer_Widget::SwitchViewer_Widget(
     QVBoxLayout* scroll_layout = new QVBoxLayout(scroll_inner);
     scroll_layout->setAlignment(Qt::AlignTop);
 
-    m_switches = new MultiSwitchSystemWidget(*this, m_session, 0);
-    scroll_layout->addWidget(m_switches);
+    UiWrapper wrapper = session.m_session.make_ui_component(this);
+    scroll_layout->addWidget(dynamic_cast<QWidget*>(wrapper.release()));
     scroll_layout->addStretch(1);
 }
 

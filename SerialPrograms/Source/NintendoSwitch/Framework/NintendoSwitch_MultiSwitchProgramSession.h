@@ -56,6 +56,7 @@ private:
     virtual void internal_run_program() override;
     virtual void internal_stop_program() override;
 
+    virtual void on_console_count_lock(bool locked) override{}
     virtual void shutdown() override;
     virtual void startup(size_t switch_count) override;
 

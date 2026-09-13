@@ -9,13 +9,10 @@
 
 #include "CommonFramework/Panels/PanelSession.h"
 #include "CommonFramework/Panels/UI/PanelWidget.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemSession.h"
+#include "GameConsole/MultiConsoleSystemSession.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-
-class MultiSwitchSystemWidget;
 
 
 class SwitchViewer_Descriptor : public PanelDescriptor{
@@ -37,7 +34,8 @@ public:
 private:
     friend class SwitchViewer_Widget;
 
-    MultiSwitchSystemOption m_switches;
+    GameConsole::MultiConsoleSystemOption m_option;
+    GameConsole::MultiConsoleSystemSession m_session;
 };
 
 
@@ -53,10 +51,6 @@ public:
     virtual QWidget& widget() override{
         return *this;
     }
-
-private:
-    MultiSwitchSystemSession m_session;
-    MultiSwitchSystemWidget* m_switches;
 };
 
 
