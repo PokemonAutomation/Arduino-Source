@@ -19,6 +19,7 @@ class QPushButton;
 namespace PokemonAutomation{
 
 
+class ConfigOption;
 
 
 CollapsibleGroupBox* make_panel_header(
@@ -68,6 +69,19 @@ private:
 
 
 
+
+QWidget* make_actions_bar(
+    QWidget& panel,
+    PanelSession& session
+);
+
+void populate_panel_widget(
+    QWidget& panel,
+    const PanelDescriptor& descriptor,
+    QWidget* console_system,
+    ConfigOption& options,
+    QWidget* footer
+);
 
 
 

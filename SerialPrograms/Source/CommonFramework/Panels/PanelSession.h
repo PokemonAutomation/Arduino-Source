@@ -32,7 +32,8 @@ public:
 
 
 public:
-    //  Serialization
+    virtual void restore_defaults(){}
+
     void load_json();
     virtual JsonValue to_json() const;
     virtual void load_json(const JsonValue& json);

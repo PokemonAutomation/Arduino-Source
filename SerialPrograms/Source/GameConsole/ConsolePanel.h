@@ -37,7 +37,6 @@ public:
         size_t num_controllers = 1
     );
 
-    bool restore_defaults_button() const{ return m_restore_defaults_button; }
     size_t num_controllers() const{ return m_num_controllers; }
 
     virtual std::unique_ptr<PanelSession> make_panel() const override;
@@ -45,7 +44,6 @@ public:
 
 
 private:
-    const bool m_restore_defaults_button;
     const size_t m_num_controllers;
 };
 

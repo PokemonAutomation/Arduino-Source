@@ -6,10 +6,13 @@
 
 #include <QMessageBox>
 #include <QVBoxLayout>
+#include <QScrollArea>
 #include <QLabel>
 #include <QPushButton>
-#include "CommonFramework/Globals.h"
 #include "Common/Cpp/ColoredText.h"
+#include "Common/Qt/Options/ConfigWidget.h"
+#include "CommonFramework/Globals.h"
+#include "CommonFramework/Panels/PanelSession.h"
 #include "PanelElements.h"
 
 namespace PokemonAutomation{
@@ -208,6 +211,89 @@ void RunnablePanelActionBar::set_state(ProgramState state){
         m_start_button->setEnabled(false);
         m_default_button->setEnabled(false);
         break;
+    }
+}
+
+
+
+QWidget* make_actions_bar(
+    QWidget& panel,
+    PanelSession& session
+){
+    if (!session.descriptor().restore_defaults_button()){
+        return nullptr;
+    }
+
+    QWidget* actions_widget = new QGroupBox("Actions", &panel);
+
+    QHBoxLayout* action_layout = new QHBoxLayout(actions_widget);
+//    action_layout->setContentsMargins(0, 0, 0, 0);
+    QPushButton* default_button = new QPushButton("Restore Defaults", actions_widget);
+    {
+        action_layout->addWidget(default_button, 1);
+        QFont font = default_button->font();
+        font.setPointSize(16);
+        default_button->setFont(font);
+    }
+
+    panel.connect(
+        default_button, &QPushButton::clicked,
+        &panel, [&session](bool){
+            QMessageBox::StandardButton button = QMessageBox::question(
+                nullptr,
+                "Restore Defaults",
+                "Are you sure you wish to restore settings back to defaults? This will wipe the current settings.",
+                QMessageBox::Ok | QMessageBox::Cancel
+            );
+            if (button == QMessageBox::Ok){
+                session.restore_defaults();
+            }
+        }
+    );
+
+    return actions_widget;
+}
+
+
+
+void populate_panel_widget(
+    QWidget& panel,
+    const PanelDescriptor& descriptor,
+    QWidget* console_system,
+    ConfigOption& options,
+    QWidget* footer
+){
+    QVBoxLayout* layout = new QVBoxLayout(&panel);
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    CollapsibleGroupBox* header = make_panel_header(
+        panel,
+        descriptor.display_name(),
+        descriptor.doc_link(),
+        descriptor.description()
+    );
+    layout->addWidget(header);
+
+    QScrollArea* scroll_outer = new QScrollArea(&panel);
+    layout->addWidget(scroll_outer);
+    scroll_outer->setWidgetResizable(true);
+
+    QWidget* scroll_inner = new QWidget(scroll_outer);
+    scroll_outer->setWidget(scroll_inner);
+    QVBoxLayout* scroll_layout = new QVBoxLayout(scroll_inner);
+    scroll_layout->setAlignment(Qt::AlignTop);
+
+    if (console_system){
+        scroll_layout->addWidget(console_system);
+    }
+
+    ConfigWidget* options_widget = ConfigWidget::make_from_option(options, &panel);
+    scroll_layout->addWidget(&options_widget->widget());
+
+    scroll_layout->addStretch(1);
+
+    if (footer){
+        layout->addWidget(footer);
     }
 }
 

@@ -62,9 +62,9 @@ void BlackOutDetector::make_overlays(VideoOverlaySet& items) const{
 bool BlackOutDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
 
     auto save_image = [&](){
-        static int count = 0;
-        frame.save("BlackOut-" + std::to_string(count) + ".png");
-        count++;
+//        static int count = 0;
+//        frame.save("BlackOut-" + std::to_string(count) + ".png");
+//        count++;
     };
 
     // check whether it is the black out screen

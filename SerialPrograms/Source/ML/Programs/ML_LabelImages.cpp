@@ -16,7 +16,6 @@
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "ML/DataLabeling/ML_SegmentAnythingModel.h"
@@ -39,7 +38,10 @@ LabelImages_Descriptor::LabelImages_Descriptor()
         "ML:LabelImages",
         "ML", "Label Images",
         "Programs/ML/LabelImages.html",
-        "Label " + Pokemon::STRING_POKEMON + " on images" 
+        "Label " + Pokemon::STRING_POKEMON + " on images",
+        PanelDeprecation::NOT_DEPRECATED,
+        true,
+        {}
     )
 {}
 

@@ -27,9 +27,10 @@ OptionsPanelDescriptor::OptionsPanelDescriptor(
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description),
-        deprecation
+        deprecation,
+        restore_defaults_button,
+        {}
     )
-    , m_restore_defaults_button(restore_defaults_button)
 {}
 std::unique_ptr<PanelSession> OptionsPanelDescriptor::make_panel() const{
     return std::make_unique<OptionsPanelSession>(*this);

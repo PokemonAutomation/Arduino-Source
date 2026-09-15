@@ -34,8 +34,9 @@ public:
         std::string category, std::string display_name,
         std::string doc_link,
         std::string description,
-        PanelDeprecation deprecation = PanelDeprecation::NOT_DEPRECATED,
-        std::vector<std::string> required_resources = {}
+        PanelDeprecation deprecation,
+        bool restore_defaults_button,
+        std::vector<std::string> required_resources
     );
     virtual ~PanelDescriptor() = default;
 
@@ -46,6 +47,7 @@ public:
     const std::string& doc_link() const{ return m_doc_link; }
     const std::string& description() const{ return m_description; }
     PanelDeprecation deprecation() const{ return m_deprecation; }
+    bool restore_defaults_button() const{ return m_restore_defaults_button; }
     const std::vector<std::string>& required_resources() const{ return m_required_resources; }
 
     virtual std::unique_ptr<PanelSession> make_panel() const = 0;
@@ -58,6 +60,7 @@ private:
     const std::string m_doc_link;
     const std::string m_description;
     const PanelDeprecation m_deprecation;
+    const bool m_restore_defaults_button;
     const std::vector<std::string> m_required_resources;
 };
 

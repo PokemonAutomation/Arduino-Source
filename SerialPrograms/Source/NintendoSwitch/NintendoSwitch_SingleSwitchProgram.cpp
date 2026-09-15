@@ -43,6 +43,7 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
         std::move(doc_link),
         std::move(description),
         deprecation,
+        true,
         std::move(required_resources)
     )
     , m_color_class(color_class)

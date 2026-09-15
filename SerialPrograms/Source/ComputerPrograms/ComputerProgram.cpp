@@ -24,7 +24,9 @@ ComputerProgramDescriptor::ComputerProgramDescriptor(
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description),
-        deprecation
+        deprecation,
+        true,
+        {}
     )
 {}
 std::unique_ptr<PanelSession> ComputerProgramDescriptor::make_panel() const{

@@ -67,7 +67,6 @@ public:
         SessionFactory session_factory
     );
 
-    bool restore_defaults_button() const{ return m_restore_defaults_button; }
     size_t min_consoles() const{ return m_min_consoles; }
     size_t max_consoles() const{ return m_max_consoles; }
     size_t default_consoles() const{ return m_default_consoles; }
@@ -82,7 +81,6 @@ public:
 
 
 private:
-    const bool m_restore_defaults_button;
     size_t m_min_consoles;
     size_t m_max_consoles;
     size_t m_default_consoles;
