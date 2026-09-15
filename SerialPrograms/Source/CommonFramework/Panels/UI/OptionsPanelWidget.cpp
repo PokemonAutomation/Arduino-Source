@@ -19,7 +19,6 @@ OptionsPanelWidget::OptionsPanelWidget(
     OptionsPanelSession& session
 )
     : QWidget(&parent)
-    , m_session(session)
 {
     populate_panel_widget(
         *this,

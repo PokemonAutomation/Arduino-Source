@@ -30,11 +30,6 @@ public:
     virtual QWidget& widget() override{
         return *this;
     }
-
-private:
-    OptionsPanelSession& m_session;
-    QVBoxLayout* m_layout;
-    ConfigWidget* m_options;
 };
 
 
