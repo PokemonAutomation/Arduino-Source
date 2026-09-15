@@ -62,7 +62,7 @@ private:
 
 
 public:
-    void restore_defaults();
+    virtual void restore_defaults() override;
     virtual std::string check_validity() const override;
     virtual JsonValue to_json() const override;
     virtual void load_json(const JsonValue& json) override;

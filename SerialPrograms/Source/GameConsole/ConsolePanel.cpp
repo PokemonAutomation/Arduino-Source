@@ -29,9 +29,10 @@ ConsolePanelDescriptor::ConsolePanelDescriptor(
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description),
-        deprecation
+        deprecation,
+        restore_defaults_button,
+        {}
     )
-    , m_restore_defaults_button(restore_defaults_button)
     , m_num_controllers(num_controllers)
 {}
 std::unique_ptr<PanelSession> ConsolePanelDescriptor::make_panel() const{

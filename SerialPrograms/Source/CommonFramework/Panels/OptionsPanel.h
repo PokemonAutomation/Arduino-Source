@@ -35,14 +35,8 @@ public:
         bool restore_defaults_button = true
     );
 
-    bool restore_defaults_button() const{ return m_restore_defaults_button; }
-
     virtual std::unique_ptr<PanelSession> make_panel() const override;
     virtual std::unique_ptr<OptionsPanelInstance> make_instance() const = 0;
-
-
-private:
-    const bool m_restore_defaults_button;
 };
 
 

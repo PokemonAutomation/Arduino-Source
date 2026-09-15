@@ -17,6 +17,7 @@ PanelDescriptor::PanelDescriptor(
     std::string doc_link,
     std::string description,
     PanelDeprecation deprecation,
+    bool restore_defaults_button,
     std::vector<std::string> required_resources
 )
     : m_color(color)
@@ -26,6 +27,7 @@ PanelDescriptor::PanelDescriptor(
     , m_doc_link(std::move(doc_link))
     , m_description(std::move(description))
     , m_deprecation(deprecation)
+    , m_restore_defaults_button(restore_defaults_button)
     , m_required_resources(std::move(required_resources))
 {}
 std::unique_ptr<PanelSession> PanelDescriptor::make_panel() const{

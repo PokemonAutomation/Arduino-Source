@@ -70,9 +70,10 @@ MultiConsolePanelDescriptor::MultiConsolePanelDescriptor(
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description),
-        deprecation
+        deprecation,
+        restore_defaults_button,
+        {}
     )
-    , m_restore_defaults_button(restore_defaults_button)
     , m_min_consoles(min_consoles)
     , m_max_consoles(max_consoles)
     , m_default_consoles(default_consoles)
