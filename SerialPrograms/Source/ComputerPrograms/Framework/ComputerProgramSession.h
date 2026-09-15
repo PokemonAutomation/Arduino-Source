@@ -42,14 +42,13 @@ public:
 
 
 public:
+    virtual std::string check_validity() const override;
     virtual void restore_defaults() override;
     virtual JsonValue to_json() const override;
     virtual void load_json(const JsonValue& json) override;
 
 
 private:
-    virtual std::string check_validity() const override;
-
     virtual void internal_run_program() override;
     virtual void internal_stop_program() override;
 

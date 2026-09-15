@@ -77,6 +77,10 @@ ConfigOption& MultiSwitchProgramSession::options(){
 
 
 
+std::string MultiSwitchProgramSession::check_validity() const{
+    auto ScopeCheck = m_sanitizer.check_scope();
+    return m_instance->check_validity();
+}
 void MultiSwitchProgramSession::restore_defaults(){
     auto ScopeCheck = m_sanitizer.check_scope();
     std::lock_guard<Mutex> lg(program_lock());
@@ -86,10 +90,6 @@ void MultiSwitchProgramSession::restore_defaults(){
     }
     logger().log("Restoring settings to defaults...");
     m_instance->restore_defaults();
-}
-std::string MultiSwitchProgramSession::check_validity() const{
-    auto ScopeCheck = m_sanitizer.check_scope();
-    return m_instance->check_validity();
 }
 JsonValue MultiSwitchProgramSession::to_json() const{
     JsonObject obj = std::move(*m_instance->to_json().to_object());
@@ -124,10 +124,14 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
     std::deque<ControllerContext<AbstractController>> contexts;
     size_t consoles = m_system.active_consoles();
     for (size_t console = 0; console < consoles; console++){
+        size_t controllers = env.consoles[console].controllers();
+
         //  Startup Checks
-        m_instance->start_program_controller_check(
-            m_system[console].controller(), console
-        );
+        if (controllers > 0){
+            m_instance->start_program_controller_check(
+                m_system[console].controller(0), console
+            );
+        }
         m_instance->start_program_feedback_check(
             env.consoles[console], console,
            m_descriptor.feedback()
@@ -138,7 +142,6 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
         );
 
         //  Attach all the controllers to the scope so they can be cancelled from the top.
-        size_t controllers = env.consoles[console].controllers();
         for (size_t controller = 0; controller < controllers; controller++){
             contexts.emplace_back(scope, env.consoles[console].controller(controller));
         }
@@ -213,7 +216,7 @@ void MultiSwitchProgramSession::internal_run_program(){
         identifier(),
         m_descriptor.category(),
         m_descriptor.display_name(),
-        timestamp()
+        last_state_change()
     );
 
     size_t consoles = m_system.active_consoles();

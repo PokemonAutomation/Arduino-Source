@@ -31,7 +31,10 @@ class SwitchSystemOption;
 
 
 
-class SwitchSystemSession final : public UiState<SwitchSystemSession, GameConsole::ConsoleSystemSession>{
+class SwitchSystemSession final
+    : public UiState<SwitchSystemSession
+    , GameConsole::ConsoleSystemSession>
+{
 public:
     virtual bool try_shutdown() noexcept override;
     ~SwitchSystemSession();

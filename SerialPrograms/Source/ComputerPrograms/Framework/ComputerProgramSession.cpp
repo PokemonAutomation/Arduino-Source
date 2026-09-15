@@ -112,7 +112,7 @@ void ComputerProgramSession::internal_run_program(){
         identifier(),
         m_descriptor.category(),
         m_descriptor.display_name(),
-        timestamp()
+        last_state_change()
     );
     CancellableHolder<CancellableScope> scope;
     ProgramEnvironment env(

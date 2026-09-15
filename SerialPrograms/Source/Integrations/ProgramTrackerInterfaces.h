@@ -25,13 +25,14 @@ class TrackableConsole{
 public:
     virtual VideoFeed& video_feed() = 0;
     virtual AudioFeed& audio_feed() = 0;
-    virtual ControllerSession& controller() = 0;
+    virtual size_t controllers() const = 0;
+    virtual ControllerSession& controller(size_t index) = 0;
 };
 
 class TrackableProgram{
 public:
     virtual const std::string& identifier() const = 0;
-    virtual WallClock timestamp() const = 0;
+    virtual WallClock last_state_change() const = 0;
     virtual ProgramState current_state() const = 0;
     virtual std::string current_stats() const = 0;
 

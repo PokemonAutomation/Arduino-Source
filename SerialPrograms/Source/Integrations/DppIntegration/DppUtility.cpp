@@ -113,6 +113,22 @@ int64_t Utility::sanitize_integer_input(const parameter_list_t& params, const ui
     return val;
 }
 
+std::optional<int64_t> Utility::sanitize_optional_integer_input(const dpp::parameter_list_t& params, const uint8_t& index){
+    const auto& value_variant = params[index].second;
+
+    // 1. Check if the parameter was omitted
+    if (std::holds_alternative<std::monostate>(value_variant)) {
+        return std::nullopt;
+    }
+
+    // 2. Extract and sanitize the integer
+    int64_t val = std::get<int64_t>(value_variant);
+    if (val < 0){
+        return 0;
+    }
+    return val;
+}
+
 
 
 }

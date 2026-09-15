@@ -23,15 +23,35 @@ void pai_status                     (DllSafeString& description);
 void pai_screenshot                 (DllSafeString& error, uint64_t console_id, const char* path);
 
 void pai_reset_camera               (DllSafeString& error, uint64_t console_id);
-void pai_reset_serial               (DllSafeString& error, uint64_t console_id);
+void pai_reset_controller           (DllSafeString& error, uint64_t console_id, uint64_t controller_index);
 
 void pai_start_program              (DllSafeString& error, uint64_t program_id);
 void pai_stop_program               (DllSafeString& error, uint64_t program_id);
 
-void pai_nsw_press_button           (DllSafeString& error, uint64_t console_id, uint16_t button, uint16_t ticks);
-void pai_nsw_press_dpad             (DllSafeString& error, uint64_t console_id, uint8_t position, uint16_t ticks);
-void pai_nsw_press_left_joystick    (DllSafeString& error, uint64_t console_id, uint8_t x, uint8_t y, uint16_t ticks);
-void pai_nsw_press_right_joystick   (DllSafeString& error, uint64_t console_id, uint8_t x, uint8_t y, uint16_t ticks);
+void pai_nsw_press_button(
+    DllSafeString& error,
+    uint64_t console_id, uint64_t controller_index,
+    uint32_t milliseconds,
+    uint32_t button
+);
+void pai_nsw_press_dpad(
+    DllSafeString& error,
+    uint64_t console_id, uint64_t controller_index,
+    uint32_t milliseconds,
+    uint8_t position
+);
+void pai_nsw_press_left_joystick(
+    DllSafeString& error,
+    uint64_t console_id, uint64_t controller_index,
+    uint32_t milliseconds,
+    uint8_t x, uint8_t y
+);
+void pai_nsw_press_right_joystick(
+    DllSafeString& error,
+    uint64_t console_id, uint64_t controller_index,
+    uint32_t milliseconds,
+    uint8_t x, uint8_t y
+);
 
 
 }
@@ -53,9 +73,9 @@ inline std::string reset_camera(uint64_t console_id){
     pai_reset_camera(error, console_id);
     return error;
 }
-inline std::string reset_serial(uint64_t console_id){
+inline std::string reset_controller(uint64_t console_id, uint64_t controller_index){
     DllSafeString error;
-    pai_reset_serial(error, console_id);
+    pai_reset_controller(error, console_id, controller_index);
     return error;
 }
 inline std::string start_program(uint64_t program_id){
@@ -68,24 +88,40 @@ inline std::string stop_program(uint64_t program_id){
     pai_stop_program(error, program_id);
     return error;
 }
-inline std::string press_button(uint64_t console_id, uint16_t button, uint16_t ticks){
+inline std::string press_button2(
+    uint64_t console_id, uint64_t controller_index,
+    uint32_t milliseconds,
+    uint16_t button
+){
     DllSafeString error;
-    pai_nsw_press_button(error, console_id, button, ticks);
+    pai_nsw_press_button(error, console_id, controller_index, milliseconds, button);
     return error;
 }
-inline std::string press_dpad(uint64_t console_id, uint8_t position, uint16_t ticks){
+inline std::string press_dpad2(
+    uint64_t console_id, uint64_t controller_index,
+    uint32_t milliseconds,
+    uint8_t position
+){
     DllSafeString error;
-    pai_nsw_press_dpad(error, console_id, position, ticks);
+    pai_nsw_press_dpad(error, console_id, controller_index, milliseconds, position);
     return error;
 }
-inline std::string press_left_joystick(uint64_t console_id, uint8_t x, uint8_t y, uint16_t ticks){
+inline std::string press_left_joystick2(
+    uint64_t console_id, uint64_t controller_index,
+    uint32_t milliseconds,
+    uint8_t x, uint8_t y
+){
     DllSafeString error;
-    pai_nsw_press_left_joystick(error, console_id, x, y, ticks);
+    pai_nsw_press_left_joystick(error, console_id, controller_index, milliseconds, x, y);
     return error;
 }
-inline std::string press_right_joystick(uint64_t console_id, uint8_t x, uint8_t y, uint16_t ticks){
+inline std::string press_right_joystick2(
+    uint64_t console_id, uint64_t controller_index,
+    uint32_t milliseconds,
+    uint8_t x, uint8_t y
+){
     DllSafeString error;
-    pai_nsw_press_right_joystick(error, console_id, x, y, ticks);
+    pai_nsw_press_right_joystick(error, console_id, controller_index, milliseconds, x, y);
     return error;
 }
 

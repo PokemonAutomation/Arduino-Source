@@ -37,7 +37,7 @@ ProgramSession::ProgramSession(const ProgramDescriptor& descriptor)
     , m_instance_id(ProgramTracker::instance().add_program(*this))
 //    , m_logger(global_logger_raw(), "Program:" + std::to_string(m_instance_id))
     , m_logger(global_logger_raw(), "Program")
-    , m_timestamp(current_time())
+    , m_last_state_change(current_time())
     , m_state(ProgramState::STOPPED)
 {
     load_historical_stats();
@@ -71,8 +71,8 @@ std::string ProgramSession::historical_stats() const{
     }
     return "";
 }
-WallClock ProgramSession::timestamp() const{
-    return m_timestamp.load(std::memory_order_relaxed);
+WallClock ProgramSession::last_state_change() const{
+    return m_last_state_change.load(std::memory_order_relaxed);
 }
 
 
@@ -190,7 +190,7 @@ std::string ProgramSession::start_program(){
 
         //  Now start the program.
         m_logger.log("Starting program...");
-        m_timestamp.store(current_time(), std::memory_order_relaxed);
+        m_last_state_change.store(current_time(), std::memory_order_relaxed);
         set_state(ProgramState::RUNNING);
         m_program_thread = GlobalThreadPools::unlimited_realtime().dispatch_now_blocking(
             [this]{
@@ -254,6 +254,7 @@ std::string ProgramSession::stop_program(){
         }
     }
     internal_stop_program();
+    m_last_state_change.store(current_time(), std::memory_order_relaxed);
     return "";
 }
 
