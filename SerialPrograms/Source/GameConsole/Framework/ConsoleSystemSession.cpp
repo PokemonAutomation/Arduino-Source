@@ -105,6 +105,7 @@ std::string ConsoleSystemSession::status() const{
     return m_status_text;
 }
 
+
 JsonValue ConsoleSystemSession::to_json() const{
     std::lock_guard<Mutex> lg(m_lock);
     return m_option.to_json();

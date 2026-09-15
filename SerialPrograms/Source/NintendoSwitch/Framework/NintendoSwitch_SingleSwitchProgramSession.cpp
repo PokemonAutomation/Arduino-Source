@@ -101,10 +101,14 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
         }
     }
 
+    size_t controllers = env.console.controllers();
+
     //  Startup Checks
-    m_instance->start_program_controller_check(
-        m_system.controller()
-    );
+    if (controllers > 0){
+        m_instance->start_program_controller_check(
+            m_system.controller(0)
+        );
+    }
     m_instance->start_program_feedback_check(
         env.console,
         m_descriptor.feedback()
@@ -115,7 +119,6 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
     );
 
     //  Attach all the controllers to the scope so they can be cancelled from the top.
-    size_t controllers = env.console.controllers();
     FixedLimitVector<ControllerContext<AbstractController>> contexts(controllers);
     for (size_t c = 0; c < controllers; c++){
         contexts.emplace_back(scope, env.console.controller(c));
@@ -181,7 +184,7 @@ void SingleSwitchProgramSession::internal_run_program(){
         identifier(),
         m_descriptor.category(),
         m_descriptor.display_name(),
-        timestamp()
+        last_state_change()
     );
     CancellableHolder<CancellableScope> scope;
     SingleSwitchProgramEnvironment env(

@@ -29,7 +29,7 @@ class AudioFeed;
 struct ProgramTrackingState{
     std::string program_name;
     std::vector<uint64_t> console_ids;
-    WallClock start_time;
+    WallClock last_state_change;
     ProgramState state;
     std::string stats;
 };
@@ -44,7 +44,7 @@ public:
 
     std::string grab_screenshot     (uint64_t console_id, std::shared_ptr<const ImageRGB32>& image);
     std::string reset_camera        (uint64_t console_id);
-    std::string reset_serial        (uint64_t console_id);
+    std::string reset_controller    (uint64_t console_id, uint64_t controller_index);
 //    void change_program (uint64_t program_id, std::string program_identifier);
     std::string start_program       (uint64_t program_id);
     std::string stop_program        (uint64_t program_id);
@@ -52,10 +52,26 @@ public:
 
 public:
     //  Nintendo Switch
-    std::string nsw_press_button        (uint64_t console_id, NintendoSwitch::Button button, uint16_t ticks);
-    std::string nsw_press_dpad          (uint64_t console_id, NintendoSwitch::DpadPosition position, uint16_t ticks);
-    std::string nsw_press_left_joystick (uint64_t console_id, uint8_t x, uint8_t y, uint16_t ticks);
-    std::string nsw_press_right_joystick(uint64_t console_id, uint8_t x, uint8_t y, uint16_t ticks);
+    std::string nsw_press_button(
+        uint64_t console_id, uint64_t controller_index,
+        Milliseconds duration,
+        NintendoSwitch::Button button
+    );
+    std::string nsw_press_dpad(
+        uint64_t console_id, uint64_t controller_index,
+        Milliseconds duration,
+        NintendoSwitch::DpadPosition position
+    );
+    std::string nsw_press_left_joystick(
+        uint64_t console_id, uint64_t controller_index,
+        Milliseconds duration,
+        uint8_t x, uint8_t y
+    );
+    std::string nsw_press_right_joystick(
+        uint64_t console_id, uint64_t controller_index,
+        Milliseconds duration,
+        uint8_t x, uint8_t y
+    );
 
 
 private:

@@ -251,7 +251,8 @@ void Handler::create_unified_commands(commandhandler& handler){
     .add_command(
         "resetserial",
         {
-            {"id", param_info(pt_integer, false, "Console ID. Find yours by using the \"status\" command.")}
+            {"id", param_info(pt_integer, false, "Console ID. Find yours by using the \"status\" command.")},
+            {"index", param_info(pt_integer, true, "Controller index.")},
         },
         [&handler, this](const std::string& command, const parameter_list_t& params, command_source src){
             log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
@@ -265,7 +266,8 @@ void Handler::create_unified_commands(commandhandler& handler){
             embed.set_color((uint32_t)color).set_title("Command Response");
 
             int64_t id = Utility::sanitize_integer_input(params, 0);
-            std::string response = Integration::reset_serial(id);
+            int64_t index = Utility::sanitize_optional_integer_input(params, 1).value_or(0);
+            std::string response = Integration::reset_controller(id, index);
             if (!response.empty()){
                 embed.set_description(response);
                 message.add_embed(embed);
@@ -389,6 +391,7 @@ void Handler::create_unified_commands(commandhandler& handler){
         "click",
         {
             {"id", param_info(pt_integer, false, "Console ID. Find yours by using the \"status\" command.")},
+            {"index", param_info(pt_integer, false, "Controller index.")},
             {"button", param_info(pt_string, false, "Switch console button.",
                 {{"0", "Y"},
                 {"1", "B"},
@@ -409,7 +412,7 @@ void Handler::create_unified_commands(commandhandler& handler){
                 {"16", "DLEFT"},
                 {"17", "DRIGHT"},}
             )},
-            {"ticks", param_info(pt_integer, false, "How long to hold the button for, in ticks.")},
+            {"milliseconds", param_info(pt_integer, true, "How long to hold the button for, in milliseconds. (defaults to 100ms)")},
         },
         [&handler, this](const std::string& command, const parameter_list_t& params, command_source src){
             log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
@@ -430,11 +433,12 @@ void Handler::create_unified_commands(commandhandler& handler){
             }
 
             int64_t id = Utility::sanitize_integer_input(params, 0);
-            std::string button_input = std::get<std::string>(params[1].second);
+            int64_t index = Utility::sanitize_optional_integer_input(params, 1).value_or(0);
+            std::string button_input = std::get<std::string>(params[2].second);
 
             std::string name = "None";
             int64_t button = Utility::get_value_from_input(handler, command, button_input, name);
-            int64_t ticks = Utility::sanitize_integer_input(params, 2);
+            int64_t milliseconds = Utility::sanitize_optional_integer_input(params, 3).value_or(100);
 
             if (button < 0){
                 embed.set_description("No such button found: " + button_input);
@@ -445,9 +449,9 @@ void Handler::create_unified_commands(commandhandler& handler){
 
             std::string response;
             if (button > 13){
-                response = Integration::press_dpad(id, Utility::get_button(button), ticks);
+                response = Integration::press_dpad2(id, index, milliseconds, Utility::get_button(button));
             }else{
-                response = Integration::press_button(id, Utility::get_button(button), ticks);
+                response = Integration::press_button2(id, index, milliseconds, Utility::get_button(button));
             }
 
             if (!response.empty()){
@@ -462,18 +466,19 @@ void Handler::create_unified_commands(commandhandler& handler){
             handler.reply(message, src);
         },
         "Click a button for the specified console.")
-                
+
     .add_command(
         "joystick",
         {
             {"id", param_info(pt_integer, false, "Console ID. Find yours by using the \"status\" command.")},
+            {"index", param_info(pt_integer, false, "Controller index.")},
             {"stick", param_info(pt_string, false, "Switch console joystick.",
                 {{"0", "LStick"},
                 {"1", "RStick"},}
             )},
             {"magnitude_x", param_info(pt_integer, false, "Movement amount in the horizontal direction. \"Left\" is 0, \"right\" is 255, \"neutral\" is 127.")},
             {"magnitude_y", param_info(pt_integer, false, "Movement amount in the vertical direction. \"Down\" is 0, \"up\" is 255, \"neutral\" is 127.")},
-            {"ticks", param_info(pt_integer, false, "How long to hold the stick for, in ticks.")},
+            {"milliseconds", param_info(pt_integer, true, "How long to hold the stick for, in milliseconds. (defaults to 100ms)")},
         },
         [&handler, this](const std::string& command, const parameter_list_t& params, command_source src){
             log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
@@ -495,7 +500,8 @@ void Handler::create_unified_commands(commandhandler& handler){
 
             std::string name = "None";
             int64_t id = Utility::sanitize_integer_input(params, 0);
-            std::string stick_input = std::get<std::string>(params[1].second);
+            int64_t index = Utility::sanitize_optional_integer_input(params, 1).value_or(0);
+            std::string stick_input = std::get<std::string>(params[2].second);
             int64_t stick = Utility::get_value_from_input(handler, command, stick_input, name);
 
             if (stick < 0){
@@ -505,15 +511,15 @@ void Handler::create_unified_commands(commandhandler& handler){
                 return;
             }
 
-            int64_t x = Utility::sanitize_integer_input(params, 2);
-            int64_t y = Utility::sanitize_integer_input(params, 3);
-            int64_t ticks = Utility::sanitize_integer_input(params, 4);
+            int64_t x = Utility::sanitize_integer_input(params, 3);
+            int64_t y = Utility::sanitize_integer_input(params, 4);
+            int64_t milliseconds = Utility::sanitize_optional_integer_input(params, 5).value_or(100);
 
             std::string response;
             if (stick == 0){
-                response = Integration::press_left_joystick(id, x, y, ticks);
+                response = Integration::press_left_joystick2(id, index, milliseconds, x, y);
             }else{
-                response = Integration::press_right_joystick(id, x, y, ticks);
+                response = Integration::press_right_joystick2(id, index, milliseconds, x, y);
             }
 
             if (!response.empty()){
@@ -523,7 +529,10 @@ void Handler::create_unified_commands(commandhandler& handler){
                 return;
             }
 
-            embed.set_description("Console ID " + std::to_string(id) + " moved " + name + " (X: " + std::to_string(x) + ", Y: " + std::to_string(y) + ") for " + std::to_string(ticks) + " ticks.");
+            embed.set_description(
+                "Console ID " + std::to_string(id) + " moved " + name + " (X: " + std::to_string(x) +
+                ", Y: " + std::to_string(y) + ") for " + std::to_string(milliseconds) + "ms."
+            );
             message.add_embed(embed);
             handler.reply(message, src);
         },
@@ -534,8 +543,10 @@ void Handler::create_unified_commands(commandhandler& handler){
         {
             {"id", param_info(pt_integer, false, "Console ID. Find yours by using the \"status\" command.")},
             {"format", param_info(pt_string, false, "Image format.",
-                {{"0", "png"},
-                {"1", "jpg"},}
+                {
+                    {"0", "png"},
+                    {"1", "jpg"},
+                }
             )},
         },
         [&handler, this](const std::string& command, const parameter_list_t& params, command_source src){

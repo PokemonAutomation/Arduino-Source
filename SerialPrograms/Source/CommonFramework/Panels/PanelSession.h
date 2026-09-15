@@ -33,10 +33,9 @@ public:
 
 public:
     virtual void restore_defaults(){}
-
-    void load_json();
     virtual JsonValue to_json() const;
     virtual void load_json(const JsonValue& json);
+    void load_json_from_global();
 
 
 protected:

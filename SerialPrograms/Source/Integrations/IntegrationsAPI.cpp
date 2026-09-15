@@ -48,7 +48,9 @@ void pai_status(DllSafeString& description){
         case ProgramState::RUNNING:
             str += "Running";
             str += " (";
-            str += duration_to_string(std::chrono::duration_cast<std::chrono::milliseconds>(now - item.second.start_time));
+            str += duration_to_string(
+                std::chrono::duration_cast<std::chrono::milliseconds>(now - item.second.last_state_change)
+            );
             str += ")";
             break;
         case ProgramState::STOPPING:
@@ -95,8 +97,8 @@ void pai_screenshot(DllSafeString& error, uint64_t console_id, const char* path)
 void pai_reset_camera(DllSafeString& error, uint64_t console_id){
     error = ProgramTracker::instance().reset_camera(console_id);
 }
-void pai_reset_serial(DllSafeString& error, uint64_t console_id){
-    error = ProgramTracker::instance().reset_serial(console_id);
+void pai_reset_controller(DllSafeString& error, uint64_t console_id, uint64_t controller_index){
+    error = ProgramTracker::instance().reset_controller(console_id, controller_index);
 }
 
 void pai_start_program(DllSafeString& error, uint64_t program_id){
@@ -106,17 +108,53 @@ void pai_stop_program(DllSafeString& error, uint64_t program_id){
     error = ProgramTracker::instance().stop_program(program_id);
 }
 
-void pai_nsw_press_button(DllSafeString& error, uint64_t console_id, uint16_t button, uint16_t ticks){
-    error = ProgramTracker::instance().nsw_press_button(console_id, (NintendoSwitch::Button)button, ticks);
+void pai_nsw_press_button(
+    DllSafeString& error,
+    uint64_t console_id, uint64_t controller_index,
+    uint32_t milliseconds,
+    uint32_t button
+){
+    error = ProgramTracker::instance().nsw_press_button(
+        console_id, controller_index,
+        Milliseconds(milliseconds),
+        (NintendoSwitch::Button)button
+    );
 }
-void pai_nsw_press_dpad(DllSafeString& error, uint64_t console_id, uint8_t position, uint16_t ticks){
-    error = ProgramTracker::instance().nsw_press_dpad(console_id, (NintendoSwitch::DpadPosition)position, ticks);
+void pai_nsw_press_dpad(
+    DllSafeString& error,
+    uint64_t console_id, uint64_t controller_index,
+    uint32_t milliseconds,
+    uint8_t position
+){
+    error = ProgramTracker::instance().nsw_press_dpad(
+        console_id, controller_index,
+        Milliseconds(milliseconds),
+        (NintendoSwitch::DpadPosition)position
+    );
 }
-void pai_nsw_press_left_joystick(DllSafeString& error, uint64_t console_id, uint8_t x, uint8_t y, uint16_t ticks){
-    error = ProgramTracker::instance().nsw_press_left_joystick(console_id, x, y, ticks);
+void pai_nsw_press_left_joystick(
+    DllSafeString& error,
+    uint64_t console_id, uint64_t controller_index,
+    uint32_t milliseconds,
+    uint8_t x, uint8_t y
+){
+    error = ProgramTracker::instance().nsw_press_left_joystick(
+        console_id, controller_index,
+        Milliseconds(milliseconds),
+        x, y
+    );
 }
-void pai_nsw_press_right_joystick(DllSafeString& error, uint64_t console_id, uint8_t x, uint8_t y, uint16_t ticks){
-    error = ProgramTracker::instance().nsw_press_right_joystick(console_id, x, y, ticks);
+void pai_nsw_press_right_joystick(
+    DllSafeString& error,
+    uint64_t console_id, uint64_t controller_index,
+    uint32_t milliseconds,
+    uint8_t x, uint8_t y
+){
+    error = ProgramTracker::instance().nsw_press_right_joystick(
+        console_id, controller_index,
+        Milliseconds(milliseconds),
+        x, y
+    );
 }
 
 

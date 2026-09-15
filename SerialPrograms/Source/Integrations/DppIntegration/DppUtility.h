@@ -41,6 +41,7 @@ protected:
         std::string& out
     );
     int64_t sanitize_integer_input(const dpp::parameter_list_t& params, const uint8_t& index);
+    std::optional<int64_t> sanitize_optional_integer_input(const dpp::parameter_list_t& params, const uint8_t& index);
     uint16_t get_button(const uint16_t& bt);
 
 private:

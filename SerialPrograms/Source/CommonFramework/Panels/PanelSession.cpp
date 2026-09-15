@@ -29,7 +29,7 @@ PanelSession::PanelSession(const PanelDescriptor& descriptor)
     }
 }
 
-void PanelSession::load_json(){
+void PanelSession::load_json_from_global(){
     JsonValue* node = PERSISTENT_SETTINGS().panels.get_value(m_descriptor.identifier());
     if (node == nullptr){
         return;

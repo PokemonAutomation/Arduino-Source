@@ -89,7 +89,7 @@ public:
     virtual ProgramState current_state() const override final{ return m_state.load(std::memory_order_relaxed); }
     virtual std::string current_stats() const override final;
     std::string historical_stats() const;
-    virtual WallClock timestamp() const final;
+    virtual WallClock last_state_change() const final;
 
     //  Temporary for migration.
     StatsTracker* current_stats_tracker(){ return m_current_stats.get(); }
@@ -155,7 +155,7 @@ private:
 
     mutable Mutex m_lock;
 
-    std::atomic<WallClock> m_timestamp;
+    std::atomic<WallClock> m_last_state_change;
     std::atomic<ProgramState> m_state;
 
     // ProgramMissingResourceTracker m_missing_resource_tracker;
