@@ -629,13 +629,6 @@ void Handler::add_command_click(dpp::commandhandler& handler, bool full_version)
             uint32_t button = (uint32_t)Utility::get_value_from_input(handler, command, full_version ? 2 : 0, button_input, name);
             uint32_t milliseconds = (uint32_t)Utility::sanitize_optional_integer_input(params, c++).value_or(100);
 
-            if (button < 0){
-                embed.set_description("No such button found: " + button_input);
-                message.add_embed(embed);
-                handler.reply(message, src);
-                return;
-            }
-
             std::string response;
             if (button >= 25){
                 response = Integration::press_dpad(id, index, milliseconds, Utility::get_button(button));
