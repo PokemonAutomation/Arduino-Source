@@ -37,11 +37,13 @@ protected:
     int64_t get_value_from_input(
         const dpp::commandhandler& handler,
         const std::string& cmd,
+        uint8_t param_index,
         const std::string& input,
         std::string& out
     );
     int64_t sanitize_integer_input(const dpp::parameter_list_t& params, const uint8_t& index);
-    uint16_t get_button(const uint16_t& bt);
+    std::optional<int64_t> sanitize_optional_integer_input(const dpp::parameter_list_t& params, const uint8_t& index);
+    uint32_t get_button(uint32_t bt);
 
 private:
     Logger& dpp_logger();

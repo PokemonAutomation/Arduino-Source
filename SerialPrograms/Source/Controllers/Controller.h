@@ -58,7 +58,7 @@ public:
     //  Static Information
 
     virtual const char* name() = 0;
-    virtual ControllerClass controller_class() const = 0;
+    virtual ControllerClass controller_class() const noexcept = 0;
 
     //  Performance Metrics
     virtual ControllerPerformanceClass performance_class() const = 0;

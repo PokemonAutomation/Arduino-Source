@@ -55,15 +55,15 @@ public:
 
 
 public:
-    ControllerType current_controller() const{
+    ControllerType current_controller() const noexcept{
         return m_current_controller.load(std::memory_order_acquire);
     }
-    bool is_ready() const{ return status() == Status::READY; }
-    Status status() const{ return m_status.load(std::memory_order_acquire); }
+    bool is_ready() const noexcept{ return status() == Status::READY; }
+    Status status() const noexcept{ return m_status.load(std::memory_order_acquire); }
     std::string status_text() const;
 
     //  It it not safe to call this until "is_ready()" is true.
-    const std::vector<ControllerType>& controller_list(){
+    const std::vector<ControllerType>& controller_list() noexcept{
         return m_controller_list;
     }
 

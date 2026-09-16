@@ -207,7 +207,7 @@ public:
     virtual const char* name() override{
         return NAME;
     };
-    virtual ControllerClass controller_class() const override;
+    virtual ControllerClass controller_class() const noexcept override;
 };
 class RightJoycon : public JoyconController{
 public:
@@ -217,7 +217,7 @@ public:
     virtual const char* name() override{
         return NAME;
     };
-    virtual ControllerClass controller_class() const override;
+    virtual ControllerClass controller_class() const noexcept override;
 };
 
 

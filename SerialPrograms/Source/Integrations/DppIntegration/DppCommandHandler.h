@@ -12,6 +12,7 @@
 #include "CommonFramework/Notifications/MessageAttachment.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "Integrations/IntegrationsAPI.h"
 #include "Integrations/DiscordSettingsOption.h"
 
 namespace PokemonAutomation{
@@ -58,6 +59,22 @@ protected:
     );
 
 private:
+    static uint8_t get_min_parameters(const dpp::parameter_registration_t& params);
+
+    void add_command_hi(dpp::commandhandler& handler);
+    void add_command_ping(dpp::commandhandler& handler);
+    void add_command_about(dpp::commandhandler& handler);
+    void add_command_help(dpp::commandhandler& handler);
+    void add_command_status(dpp::commandhandler& handler);
+    void add_command_screenshot(dpp::commandhandler& handler, bool full_version);
+    void add_command_start(dpp::commandhandler& handler);
+    void add_command_stop(dpp::commandhandler& handler);
+    void add_command_resetcamera(dpp::commandhandler& handler);
+    void add_command_resetcontroller(dpp::commandhandler& handler);
+    void add_command_click(dpp::commandhandler& handler, bool full_version);
+    void add_command_joystick(dpp::commandhandler& handler, bool full_version, JoystickSide side);
+
+
     void create_unified_commands(dpp::commandhandler& handler);
     void update_response(
         const dpp::command_source& src,

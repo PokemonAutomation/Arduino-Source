@@ -118,7 +118,14 @@ std::shared_ptr<ControllerDescriptor> ControllerSession::descriptor() const{
     ReadSpinLock lg(m_state_lock);
     return m_descriptor;
 }
-ControllerType ControllerSession::controller_type() const{
+ControllerClass ControllerSession::controller_class() const noexcept{
+    ReadSpinLock lg(m_state_lock);
+    if (!m_controller){
+        return ControllerClass::None;
+    }
+    return m_controller->controller_class();
+}
+ControllerType ControllerSession::controller_type() const noexcept{
     ReadSpinLock lg(m_state_lock);
     if (!m_connection){
         return ControllerType::None;

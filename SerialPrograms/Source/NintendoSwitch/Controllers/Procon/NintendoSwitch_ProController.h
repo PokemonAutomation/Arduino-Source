@@ -78,7 +78,7 @@ public:
     virtual const char* name() override{
         return NAME;
     };
-    virtual ControllerClass controller_class() const override;
+    virtual ControllerClass controller_class() const noexcept override;
 
     virtual ControllerPlayerNumber get_player_number(Cancellable& cancellable){
         return ControllerPlayerNumber::UNKNOWN;
