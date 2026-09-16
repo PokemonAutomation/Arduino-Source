@@ -91,7 +91,7 @@ inline std::string stop_program(uint64_t program_id){
 inline std::string press_button(
     uint64_t console_id, uint64_t controller_index,
     uint32_t milliseconds,
-    uint16_t button
+    uint32_t button
 ){
     DllSafeString error;
     pai_nsw_press_button(error, console_id, controller_index, milliseconds, button);

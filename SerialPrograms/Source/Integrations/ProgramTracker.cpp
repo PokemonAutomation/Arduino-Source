@@ -7,16 +7,14 @@
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "Controllers/JoystickTools.h"
 #include "Controllers/ControllerSession.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon.h"
 #include "ProgramTracker.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -206,6 +204,8 @@ std::string ProgramTracker::nsw_press_button(
     if (controller == nullptr){
         return error;
     }
+
+//    cout << "button = " << button << endl;
 
     try{
         switch (controller->controller_class()){
