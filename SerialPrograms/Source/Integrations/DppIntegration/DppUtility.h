@@ -37,6 +37,7 @@ protected:
     int64_t get_value_from_input(
         const dpp::commandhandler& handler,
         const std::string& cmd,
+        uint8_t param_index,
         const std::string& input,
         std::string& out
     );

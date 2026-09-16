@@ -90,11 +90,12 @@ uint16_t Utility::get_button(const uint16_t& bt){
 int64_t Utility::get_value_from_input(
     const commandhandler& handler,
     const std::string& command_name,
+    uint8_t param_index,
     const std::string& input,
     std::string& out
 ){
     auto cmd = handler.commands.find(command_name);
-    auto& choices = cmd->second.parameters[1].second.choices;
+    auto& choices = cmd->second.parameters[param_index].second.choices;
     for (auto& choice : choices){
         std::string val = std::get<std::string>(choice.first);
         if (val == input || choice.second == input){
@@ -114,14 +115,18 @@ int64_t Utility::sanitize_integer_input(const parameter_list_t& params, const ui
 }
 
 std::optional<int64_t> Utility::sanitize_optional_integer_input(const dpp::parameter_list_t& params, const uint8_t& index){
+    if (index >= params.size()){
+        return std::nullopt;
+    }
+
     const auto& value_variant = params[index].second;
 
-    // 1. Check if the parameter was omitted
+    // Check if the parameter was omitted
     if (std::holds_alternative<std::monostate>(value_variant)) {
         return std::nullopt;
     }
 
-    // 2. Extract and sanitize the integer
+    // Extract and sanitize the integer
     int64_t val = std::get<int64_t>(value_variant);
     if (val < 0){
         return 0;

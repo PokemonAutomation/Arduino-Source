@@ -23,10 +23,10 @@ class BotBaseHandle;
 
 class TrackableConsole{
 public:
-    virtual VideoFeed& video_feed() = 0;
-    virtual AudioFeed& audio_feed() = 0;
-    virtual size_t controllers() const = 0;
-    virtual ControllerSession& controller(size_t index) = 0;
+    virtual VideoFeed& video_feed() noexcept = 0;
+    virtual AudioFeed& audio_feed() noexcept = 0;
+    virtual size_t controllers() const noexcept = 0;
+    virtual ControllerSession& controller(size_t index) noexcept = 0;
 };
 
 class TrackableProgram{

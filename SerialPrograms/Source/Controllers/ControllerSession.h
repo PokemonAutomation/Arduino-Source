@@ -67,7 +67,8 @@ public:
     ControllerConnection::Status connection_status() const;
 
     std::shared_ptr<ControllerDescriptor> descriptor() const;
-    ControllerType controller_type() const;
+    ControllerClass controller_class() const noexcept;
+    ControllerType controller_type() const noexcept;
     std::string status_text() const;
 
     std::optional<size_t> index() const{

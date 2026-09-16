@@ -16,6 +16,7 @@
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "CommonFramework/Globals.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
+#include "IntegrationsAPI.h"
 #include "ProgramTrackerInterfaces.h"
 
 namespace PokemonAutomation{
@@ -62,15 +63,10 @@ public:
         Milliseconds duration,
         NintendoSwitch::DpadPosition position
     );
-    std::string nsw_press_left_joystick(
+    std::string nsw_press_joystick(
         uint64_t console_id, uint64_t controller_index,
         Milliseconds duration,
-        uint8_t x, uint8_t y
-    );
-    std::string nsw_press_right_joystick(
-        uint64_t console_id, uint64_t controller_index,
-        Milliseconds duration,
-        uint8_t x, uint8_t y
+        Integration::JoystickSide side, uint8_t x, uint8_t y
     );
 
 
@@ -78,6 +74,7 @@ private:
     ProgramTracker() = default;
     ProgramTracker(const ProgramTracker&) = delete;
     void operator=(const ProgramTracker&) = delete;
+
 
 public:
     uint64_t add_program(TrackableProgram& program);
@@ -87,6 +84,26 @@ public:
     void remove_console(uint64_t console_id);
     std::optional<uint64_t> add_console(std::optional<uint64_t> program_id, TrackableConsole& console);
     void remove_console(std::optional<uint64_t> console_id);
+
+
+private:
+    static std::string make_header(const std::string& function_name, uint64_t id);
+    TrackableProgram* get_program(
+        std::string& error,
+        const std::string& header,
+        uint64_t program_id
+    );
+    TrackableConsole* get_console(
+        std::string& error,
+        const std::string& header,
+        uint64_t console_id
+    );
+    ControllerSession* get_controller(
+        std::string& error,
+        const std::string& header,
+        uint64_t console_id,
+        uint64_t controller_index
+    );
 
 
 private:

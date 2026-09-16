@@ -14,6 +14,11 @@ namespace PokemonAutomation{
 namespace Integration{
 extern "C" {
 
+enum JoystickSide{
+    NEITHER,
+    LEFT,
+    RIGHT,
+};
 
 //  Empty error means no error.
 
@@ -40,17 +45,11 @@ void pai_nsw_press_dpad(
     uint32_t milliseconds,
     uint8_t position
 );
-void pai_nsw_press_left_joystick(
+void pai_nsw_press_joystick(
     DllSafeString& error,
     uint64_t console_id, uint64_t controller_index,
     uint32_t milliseconds,
-    uint8_t x, uint8_t y
-);
-void pai_nsw_press_right_joystick(
-    DllSafeString& error,
-    uint64_t console_id, uint64_t controller_index,
-    uint32_t milliseconds,
-    uint8_t x, uint8_t y
+    JoystickSide side, uint8_t x, uint8_t y
 );
 
 
@@ -106,22 +105,13 @@ inline std::string press_dpad2(
     pai_nsw_press_dpad(error, console_id, controller_index, milliseconds, position);
     return error;
 }
-inline std::string press_left_joystick2(
+inline std::string press_joystick(
     uint64_t console_id, uint64_t controller_index,
     uint32_t milliseconds,
-    uint8_t x, uint8_t y
+    JoystickSide side, uint8_t x, uint8_t y
 ){
     DllSafeString error;
-    pai_nsw_press_left_joystick(error, console_id, controller_index, milliseconds, x, y);
-    return error;
-}
-inline std::string press_right_joystick2(
-    uint64_t console_id, uint64_t controller_index,
-    uint32_t milliseconds,
-    uint8_t x, uint8_t y
-){
-    DllSafeString error;
-    pai_nsw_press_right_joystick(error, console_id, controller_index, milliseconds, x, y);
+    pai_nsw_press_joystick(error, console_id, controller_index, milliseconds, side, x, y);
     return error;
 }
 

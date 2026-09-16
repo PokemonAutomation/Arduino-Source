@@ -113,10 +113,10 @@ void JoyconController::on_rumble(double magnitude){
 
 
 
-ControllerClass LeftJoycon::controller_class() const{
+ControllerClass LeftJoycon::controller_class() const noexcept{
     return ControllerClass::NintendoSwitch_LeftJoycon;
 }
-ControllerClass RightJoycon::controller_class() const{
+ControllerClass RightJoycon::controller_class() const noexcept{
     return ControllerClass::NintendoSwitch_RightJoycon;
 }
 

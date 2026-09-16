@@ -132,28 +132,16 @@ void pai_nsw_press_dpad(
         (NintendoSwitch::DpadPosition)position
     );
 }
-void pai_nsw_press_left_joystick(
+void pai_nsw_press_joystick(
     DllSafeString& error,
     uint64_t console_id, uint64_t controller_index,
     uint32_t milliseconds,
-    uint8_t x, uint8_t y
+    JoystickSide side, uint8_t x, uint8_t y
 ){
-    error = ProgramTracker::instance().nsw_press_left_joystick(
+    error = ProgramTracker::instance().nsw_press_joystick(
         console_id, controller_index,
         Milliseconds(milliseconds),
-        x, y
-    );
-}
-void pai_nsw_press_right_joystick(
-    DllSafeString& error,
-    uint64_t console_id, uint64_t controller_index,
-    uint32_t milliseconds,
-    uint8_t x, uint8_t y
-){
-    error = ProgramTracker::instance().nsw_press_right_joystick(
-        console_id, controller_index,
-        Milliseconds(milliseconds),
-        x, y
+        side, x, y
     );
 }
 

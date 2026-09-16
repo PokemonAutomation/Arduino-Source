@@ -87,12 +87,11 @@ public:
     const StreamHistorySession& stream_history() const{ return m_history; }
 
 
-
 public:
-    virtual VideoFeed& video_feed() override{ return video(); }
-    virtual AudioFeed& audio_feed() override{ return audio(); }
-    virtual size_t controllers() const override{ return m_controllers.size(); }
-    virtual ControllerSession& controller(size_t index) override{ return m_controllers[index].session; }
+    virtual VideoFeed& video_feed() noexcept override{ return video(); }
+    virtual AudioFeed& audio_feed() noexcept override{ return audio(); }
+    virtual size_t controllers() const noexcept override{ return m_controllers.size(); }
+    virtual ControllerSession& controller(size_t index) noexcept override{ return m_controllers[index].session; }
 
     virtual JsonValue to_json() const;
     virtual void load_json(const JsonValue& json);

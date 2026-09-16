@@ -60,7 +60,7 @@ ProController::ProController(Logger& logger)
 ProController::~ProController(){
 }
 
-ControllerClass ProController::controller_class() const{
+ControllerClass ProController::controller_class() const noexcept{
     return ControllerClass::NintendoSwitch_ProController;
 }
 
