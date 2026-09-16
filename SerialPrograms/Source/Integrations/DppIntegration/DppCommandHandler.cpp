@@ -559,8 +559,8 @@ void Handler::add_command_click(dpp::commandhandler& handler, bool full_version)
         parameters.insert(parameters.end(), {"index", param_info(pt_integer, false, "Controller index.")});
     }
     parameters.insert(parameters.end(), {
-        {"button", param_info(pt_string, false, "Switch console button.",
-            {{"0", "Y"},
+        {"button", param_info(pt_string, false, "Switch console button.",{
+            {"0", "Y"},
             {"1", "B"},
             {"2", "A"},
             {"3", "X"},
@@ -574,11 +574,23 @@ void Handler::add_command_click(dpp::commandhandler& handler, bool full_version)
             {"11", "RStick"},
             {"12", "Home"},
             {"13", "Capture"},
-            {"14", "DUP"},
-            {"15", "DDOWN"},
-            {"16", "DLEFT"},
-            {"17", "DRIGHT"},}
-        )},
+            {"14", "GR"},
+            {"15", "GL"},
+            {"16", "UP"},
+            {"17", "RIGHT"},
+            {"18", "DOWN"},
+            {"19", "LEFT"},
+            {"20", "LEFT_SL"},
+            {"21", "LEFT_SR"},
+            {"22", "RIGHT_SL"},
+            {"23", "RIGHT_SR"},
+            {"24", "C"},
+
+//            {"25", "DUP"},
+//            {"26", "DDOWN"},
+//            {"27", "DLEFT"},
+//            {"28", "DRIGHT"},
+        })},
         {"milliseconds", param_info(pt_integer, true, "How long to hold the button for, in milliseconds. (defaults to 100ms)")}
     });
     uint8_t min_parameters = get_min_parameters(parameters);
@@ -615,7 +627,7 @@ void Handler::add_command_click(dpp::commandhandler& handler, bool full_version)
 
             std::string name = "None";
             int64_t button = Utility::get_value_from_input(handler, command, full_version ? 2 : 0, button_input, name);
-            int64_t milliseconds = Utility::sanitize_optional_integer_input(params, c++).value_or(100);
+            uint32_t milliseconds = (uint32_t)Utility::sanitize_optional_integer_input(params, c++).value_or(100);
 
             if (button < 0){
                 embed.set_description("No such button found: " + button_input);
@@ -625,10 +637,10 @@ void Handler::add_command_click(dpp::commandhandler& handler, bool full_version)
             }
 
             std::string response;
-            if (button > 13){
-                response = Integration::press_dpad2(id, index, milliseconds, Utility::get_button(button));
+            if (button >= 25){
+                response = Integration::press_dpad(id, index, milliseconds, Utility::get_button(button));
             }else{
-                response = Integration::press_button2(id, index, milliseconds, Utility::get_button(button));
+                response = Integration::press_button(id, index, milliseconds, Utility::get_button(button));
             }
 
             if (!response.empty()){
@@ -668,8 +680,8 @@ void Handler::add_command_joystick(dpp::commandhandler& handler, bool full_versi
         parameters.insert(parameters.end(), {"index", param_info(pt_integer, false, "Controller index.")});
     }
     parameters.insert(parameters.end(), {
-        {"magnitude_x", param_info(pt_integer, false, "Movement amount in the horizontal direction. \"Left\" is 0, \"right\" is 255, \"neutral\" is 127.")},
-        {"magnitude_y", param_info(pt_integer, false, "Movement amount in the vertical direction. \"Down\" is 0, \"up\" is 255, \"neutral\" is 127.")},
+        {"magnitude_x", param_info(pt_double, false, "Movement amount in the horizontal direction. \"Left\" is -1.0, \"right\" is +1.0, \"neutral\" is 0.0.")},
+        {"magnitude_y", param_info(pt_double, false, "Movement amount in the vertical direction. \"Down\" is -1.0, \"up\" is +1.0, \"neutral\" is 0.0.")},
         {"milliseconds", param_info(pt_integer, true, "How long to hold the stick for, in milliseconds. (defaults to 100ms)")},
     });
     uint8_t min_parameters = get_min_parameters(parameters);
@@ -703,9 +715,9 @@ void Handler::add_command_joystick(dpp::commandhandler& handler, bool full_versi
                 index = Utility::sanitize_optional_integer_input(params, c++).value_or(0);
             }
 
-            int64_t x = Utility::sanitize_integer_input(params, c++);
-            int64_t y = Utility::sanitize_integer_input(params, c++);
-            int64_t milliseconds = Utility::sanitize_optional_integer_input(params, c++).value_or(100);
+            double x = std::get<double>(params[c++].second);
+            double y = std::get<double>(params[c++].second);
+            uint32_t milliseconds = (uint32_t)Utility::sanitize_optional_integer_input(params, c++).value_or(100);
 
             std::string response = Integration::press_joystick(id, index, milliseconds, side, x, y);
             if (!response.empty()){

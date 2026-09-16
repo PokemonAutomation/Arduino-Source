@@ -15,6 +15,7 @@
 #include <memory>
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "CommonFramework/Globals.h"
+#include "Controllers/Joystick.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 #include "IntegrationsAPI.h"
 #include "ProgramTrackerInterfaces.h"
@@ -66,7 +67,8 @@ public:
     std::string nsw_press_joystick(
         uint64_t console_id, uint64_t controller_index,
         Milliseconds duration,
-        Integration::JoystickSide side, uint8_t x, uint8_t y
+        Integration::JoystickSide side,
+        JoystickPosition position
     );
 
 

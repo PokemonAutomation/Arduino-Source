@@ -136,12 +136,13 @@ void pai_nsw_press_joystick(
     DllSafeString& error,
     uint64_t console_id, uint64_t controller_index,
     uint32_t milliseconds,
-    JoystickSide side, uint8_t x, uint8_t y
+    JoystickSide side,
+    double x, double y
 ){
     error = ProgramTracker::instance().nsw_press_joystick(
         console_id, controller_index,
         Milliseconds(milliseconds),
-        side, x, y
+        side, JoystickPosition{x, y}
     );
 }
 

@@ -73,13 +73,13 @@ void Utility::get_user_counts(cluster& bot, const guild_create_t& event){
 }
 
 uint16_t Utility::get_button(const uint16_t& bt){
-    if (bt > 13){
+    if (bt >= 25){
         uint8_t dpad = 0;
         switch (bt){
-            case 14: dpad = 0; break; // DUP
-            case 15: dpad = 4; break; // DDown
-            case 16: dpad = 6; break; // DLeft
-            case 17: dpad = 2; break; // DRight
+            case 25: dpad = 0; break; // DUP
+            case 26: dpad = 4; break; // DDown
+            case 27: dpad = 6; break; // DLeft
+            case 28: dpad = 2; break; // DRight
             default: dpad = 0; break;
         };
         return dpad;

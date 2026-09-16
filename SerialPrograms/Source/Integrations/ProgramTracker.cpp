@@ -282,7 +282,8 @@ std::string ProgramTracker::nsw_press_dpad(
 std::string ProgramTracker::nsw_press_joystick(
     uint64_t console_id, uint64_t controller_index,
     Milliseconds duration,
-    Integration::JoystickSide side, uint8_t x, uint8_t y
+    Integration::JoystickSide side,
+    JoystickPosition position
 ){
     using namespace NintendoSwitch;
     std::string header = make_header("press_left_joystick", console_id);
@@ -298,31 +299,13 @@ std::string ProgramTracker::nsw_press_joystick(
     ControllerClass type = controller->controller_class();
     try{
         auto procon_left = [=](ProController& controller){
-            controller.issue_left_joystick(
-                nullptr, duration, duration, 0ms,
-                {
-                    JoystickTools::linear_u8_to_float(x),
-                    -JoystickTools::linear_u8_to_float(y)
-                }
-            );
+            controller.issue_left_joystick(nullptr, duration, duration, 0ms, position);
         };
         auto procon_right = [=](ProController& controller){
-            controller.issue_right_joystick(
-                nullptr, duration, duration, 0ms,
-                {
-                    JoystickTools::linear_u8_to_float(x),
-                    -JoystickTools::linear_u8_to_float(y)
-                }
-            );
+            controller.issue_right_joystick(nullptr, duration, duration, 0ms, position);
         };
         auto joycon = [=](JoyconController& controller){
-            controller.issue_joystick(
-                nullptr, duration, duration, 0ms,
-                {
-                    JoystickTools::linear_u8_to_float(x),
-                    -JoystickTools::linear_u8_to_float(y)
-                }
-            );
+            controller.issue_joystick(nullptr, duration, duration, 0ms, position);
         };
 
         switch (type){
