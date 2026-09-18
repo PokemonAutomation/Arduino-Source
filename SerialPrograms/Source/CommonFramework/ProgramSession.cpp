@@ -9,11 +9,16 @@
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Exceptions/FatalProgramException.h"
+#include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
+#include "CommonFramework/Options/Environment/SleepSuppressOption.h"
 #include "CommonFramework/ProgramSession.h"
 #include "CommonFramework/ProgramStats/StatsDatabase.h"
-#include "CommonFramework/Panels/ProgramDescriptor.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Panels/ProgramDescriptor.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/ResourceDownload/ProgramMissingResourceTracker.h"
 #include "CommonFramework/ResourceDownload/GlobalResourceDownloadManager.h"
@@ -298,28 +303,130 @@ std::string ProgramSession::stop_program(){
 
 
 void ProgramSession::run_program(){
+    SleepSuppressScope sleep_scope(GlobalSettings::instance().SLEEP_SUPPRESS->PROGRAM_RUNNING);
+
     {
         std::lock_guard<Mutex> lg(m_lock);
         if (current_state() != ProgramState::RUNNING){
             return;
         }
+
+        std::string error = check_validity();
+        if (!error.empty()){
+            throw UserSetupError(logger(), std::move(error));
+        }
+
         m_current_stats = m_descriptor.make_stats();
         load_historical_stats();
         push_stats();
     }
+
+    m_instance->options().reset_state();
+
     ProgramInfo program_info(
         identifier(),
         m_descriptor.category(),
         m_descriptor.display_name(),
         last_state_change()
     );
+
     {
         RunningProgramScope running_scope(*this);
         if (!download_prereqs(*m_scope)){
             return;
         }
-        internal_run_program(program_info);
+        std::unique_ptr<ProgramEnvironment> env = make_env(program_info);
+        try{
+            logger().log("<b>Starting Program: " + identifier() + "</b>");
+            env->log_to_ui("- Starting Program -");
+            internal_run_program(*env);
+            env->log_to_ui("- Program Finished -");
+            logger().log("Program finished normally!", COLOR_BLUE);
+        }catch (OperationCancelledException&){
+            env->log_to_ui("- Program Stopped -");
+        }catch (ProgramCancelledException&){
+            env->log_to_ui("- Program Stopped -");
+        }catch (ProgramFinishedException& e){
+            logger().log("Program finished early!", COLOR_BLUE);
+            env->log_to_ui("- Program Finished -");
+            send_program_finished_notification(
+                *env, m_instance->NOTIFICATION_PROGRAM_FINISH,
+                e.message(),
+                *e.screenshot()
+            );
+        }catch (InvalidConnectionStateException& e){
+            logger().log("Program stopped due to connection issue.", COLOR_RED);
+            env->log_to_ui("- Invalid Connection -", COLOR_RED);
+            std::string message = e.message();
+            if (message.empty()){
+                message = e.name();
+            }
+            report_error(message);
+        }catch (FatalProgramException& e){
+            logger().log("Program stopped with an exception!", COLOR_RED);
+            env->log_to_ui("- Program Error -", COLOR_RED);
+
+            std::string message = e.message();
+            if (message.empty()){
+                message = e.name();
+            }
+            report_error(message);
+            e.send_fatal_error_notif_and_telemetry_report(*env, m_instance->NOTIFICATION_ERROR_FATAL);
+        }catch (OperationFailedExceptionWithScreenshot& e){
+            logger().log("Program stopped with an exception!", COLOR_RED);
+            env->log_to_ui("- Program Error -", COLOR_RED);
+
+            std::string message = e.message();
+            if (message.empty()){
+                message = e.name();
+            }
+            report_error(message);
+            e.send_fatal_error_notif_and_telemetry_report(*env, m_instance->NOTIFICATION_ERROR_FATAL);
+        }catch (OperationFailedException& e){ // no screenshot
+            logger().log("Program stopped with an exception!", COLOR_RED);
+            env->log_to_ui("- Program Error -", COLOR_RED);
+
+            std::string message = e.message();
+            if (message.empty()){
+                message = e.name();
+            }
+            report_error(message);
+            e.send_fatal_error_notif_and_telemetry_report(*env, m_instance->NOTIFICATION_ERROR_FATAL);
+        }catch (Exception& e){
+            logger().log("Program stopped with an exception!", COLOR_RED);
+            env->log_to_ui("- Program Error -", COLOR_RED);
+            std::string message = e.message();
+            if (message.empty()){
+                message = e.name();
+            }
+            report_error(message);
+            send_program_fatal_error_notification(
+                *env, m_instance->NOTIFICATION_ERROR_FATAL,
+                message
+            );
+        }catch (std::exception& e){
+            logger().log("Program stopped with an exception!", COLOR_RED);
+            env->log_to_ui("- Program Error -", COLOR_RED);
+            std::string message = e.what();
+            if (message.empty()){
+                message = "Unknown std::exception.";
+            }
+            report_error(message);
+            send_program_fatal_error_notification(
+                *env, m_instance->NOTIFICATION_ERROR_FATAL,
+                message
+            );
+        }catch (...){
+            logger().log("Program stopped with an exception!", COLOR_RED);
+            env->log_to_ui("- Unknown Error -", COLOR_RED);
+            report_error("Unknown error.");
+            send_program_fatal_error_notification(
+                *env, m_instance->NOTIFICATION_ERROR_FATAL,
+                "Unknown error."
+            );
+        }
     }
+
     {
         std::lock_guard<Mutex> lg(m_lock);
         push_stats();

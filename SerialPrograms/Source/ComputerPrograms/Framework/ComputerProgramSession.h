@@ -48,16 +48,12 @@ public:
 
 
 private:
-    virtual void internal_run_program(const ProgramInfo& program_info) override;
-
-
-private:
-    void run_program_instance(ProgramEnvironment& env);
+    virtual std::unique_ptr<ProgramEnvironment> make_env(const ProgramInfo& program_info) override;
+    virtual void internal_run_program(ProgramEnvironment& env) override;
 
 
 private:
     const ComputerProgramDescriptor& m_descriptor;
-    std::unique_ptr<ComputerProgramInstance> m_instance;
 };
 
 

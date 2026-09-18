@@ -28,6 +28,7 @@
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "CommonFramework/Globals.h"
 //#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Panels/ProgramDescriptor.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 // #include "CommonFramework/ResourceDownload/ProgramMissingResourceTracker.h"
 #include "Integrations/ProgramTrackerInterfaces.h"
@@ -118,7 +119,8 @@ public:
 
 
 protected:
-    virtual void internal_run_program(const ProgramInfo& program_info) = 0;
+    virtual std::unique_ptr<ProgramEnvironment> make_env(const ProgramInfo& program_info) = 0;
+    virtual void internal_run_program(ProgramEnvironment& env) = 0;
     virtual void internal_stop_program();
 
 //    virtual void restore_defaults(){ return; }
@@ -158,6 +160,7 @@ private:
     uint64_t m_instance_id = 0;
     TaggedLogger m_logger;
 
+
     mutable Mutex m_lock;
     ConditionVariable m_cv;
 
@@ -176,6 +179,8 @@ private:
 
 
 protected:
+    std::unique_ptr<ProgramInstance> m_instance;
+
     class RunningProgramScope{
     public:
         RunningProgramScope(ProgramSession& session);

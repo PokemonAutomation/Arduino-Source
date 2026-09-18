@@ -49,11 +49,8 @@ public:
 
 
 private:
-    virtual void internal_run_program(const ProgramInfo& program_info) override;
-
-
-private:
-    void run_program_instance(SingleSwitchProgramEnvironment& env);
+    virtual std::unique_ptr<ProgramEnvironment> make_env(const ProgramInfo& program_info) override;
+    virtual void internal_run_program(ProgramEnvironment& env) override;
 
 
 private:
@@ -61,8 +58,6 @@ private:
 
     SwitchSystemOption m_system_option;
     SwitchSystemSession m_system;
-
-    std::unique_ptr<SingleSwitchProgramInstance> m_instance;
 };
 
 

@@ -5,18 +5,15 @@
  */
 
 #include "Common/Cpp/ScopeExit.h"
-#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/EarlyShutdown.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Options/Environment/SleepSuppressOption.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_MultiSwitchProgramSession.h"
 
@@ -47,11 +44,11 @@ MultiSwitchProgramSession::MultiSwitchProgramSession(const MultiSwitchProgramDes
         descriptor.default_switches()
     )
     , m_system(m_system_option, descriptor.allow_commands_while_running(), instance_id())
-    , m_instance(descriptor.make_instance())
     , m_sanitizer("MultiSwitchProgramSession")
 {
-//    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-    m_instance->update_active_consoles(m_system_option.active_consoles());
+    auto instance = descriptor.make_instance();
+    instance->update_active_consoles(m_system_option.active_consoles());
+    m_instance = std::move(instance);
     m_system.add_listener(*this);
 }
 
@@ -109,66 +106,7 @@ void MultiSwitchProgramSession::load_json(const JsonValue& json){
 
 
 
-void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironment& env){
-    auto ScopeCheck = m_sanitizer.check_scope();
-    {
-        std::lock_guard<Mutex> lg(program_lock());
-        std::string error = check_validity();
-        if (!error.empty()){
-            throw UserSetupError(logger(), std::move(error));
-        }
-    }
-
-    std::deque<ControllerContext<AbstractController>> contexts;
-    size_t consoles = m_system.active_consoles();
-    for (size_t console = 0; console < consoles; console++){
-        size_t controllers = env.consoles[console].controllers();
-
-        //  Startup Checks
-        if (controllers > 0){
-            m_instance->start_program_controller_check(
-                m_system[console].controller(0), console
-            );
-        }
-        m_instance->start_program_feedback_check(
-            env.consoles[console], console,
-           m_descriptor.feedback()
-        );
-        m_instance->start_program_border_check(
-            env.consoles[console], console,
-            m_descriptor.feedback()
-        );
-
-        //  Attach all the controllers to the scope so they can be cancelled from the top.
-        for (size_t controller = 0; controller < controllers; controller++){
-            contexts.emplace_back(*m_scope, env.consoles[console].controller(controller));
-        }
-    }
-
-    {
-        std::lock_guard<Mutex> lg(program_lock());
-        if (current_state() != ProgramState::RUNNING){
-            return;
-        }
-    }
-
-    ScopeExit on_exit([&]{
-        for (size_t c = 0; c < consoles; c++){
-            env.consoles[c].cancel_all_controllers();
-        }
-    });
-
-    m_instance->program(env, *m_scope);
-    for (size_t c = 0; c < consoles; c++){
-        env.consoles[c].wait_for_all_controllers();
-    }
-}
-void MultiSwitchProgramSession::internal_run_program(const ProgramInfo& program_info){
-    auto ScopeCheck = m_sanitizer.check_scope();
-    options().reset_state();
-
-    SleepSuppressScope sleep_scope(GlobalSettings::instance().SLEEP_SUPPRESS->PROGRAM_RUNNING);
-
+std::unique_ptr<ProgramEnvironment> MultiSwitchProgramSession::make_env(const ProgramInfo& program_info){
     size_t consoles = m_system.active_consoles();
     FixedLimitVector<ConsoleHandle> handles(consoles);
     for (size_t c = 0; c < consoles; c++){
@@ -182,101 +120,62 @@ void MultiSwitchProgramSession::internal_run_program(const ProgramInfo& program_
             state.set_console_type_user(session.console_type());
         }
     }
-    MultiSwitchProgramEnvironment env(
+    return std::make_unique<MultiSwitchProgramEnvironment>(
         program_info,
         *m_scope,
         *this,
         current_stats_tracker(), historical_stats_tracker(),
         std::move(handles)
     );
+}
+void MultiSwitchProgramSession::internal_run_program(ProgramEnvironment& env){
+    auto ScopeCheck = m_sanitizer.check_scope();
 
-    try{
-        logger().log("<b>Starting Program: " + identifier() + "</b>");
-        env.log_to_ui("- Starting Program -");
-        run_program_instance(static_cast<MultiSwitchProgramEnvironment&>(env));
-//        m_setup->wait_for_all_requests();
-        env.log_to_ui("- Program Finished -");
-        logger().log("Program finished normally!", COLOR_BLUE);
-    }catch (OperationCancelledException& e){
-        logger().log("Program Stopped (OperationCancelledException): " + e.message(), COLOR_RED);
-        env.log_to_ui("- Program Stopped -");
-    }catch (ProgramCancelledException& e){
-        logger().log("Program Stopped (ProgramCancelledException): " + e.message(), COLOR_BLUE);
-        env.log_to_ui("- Program Stopped -");
-    }catch (ProgramFinishedException& e){
-        logger().log("Program finished early!", COLOR_BLUE);
-        env.log_to_ui("- Program Finished -");
-        send_program_finished_notification(env, m_instance->NOTIFICATION_PROGRAM_FINISH, e.message(), *e.screenshot());
-    }catch (InvalidConnectionStateException& e){
-        logger().log("Program stopped due to connection issue.", COLOR_RED);
-        env.log_to_ui("- Invalid Connection -", COLOR_RED);
-        std::string message = e.message();
-        if (message.empty()){
-            message = e.name();
-        }
-        report_error(message);
-    }catch (OperationFailedExceptionWithScreenshot& e){
-        logger().log("Program stopped with an exception!", COLOR_RED);
-        env.log_to_ui("- Program Error -", COLOR_RED);
+    MultiSwitchProgramInstance& instance = static_cast<MultiSwitchProgramInstance&>(*m_instance);
+    MultiSwitchProgramEnvironment& lenv = static_cast<MultiSwitchProgramEnvironment&>(env);
 
-        std::string message = e.message();
-        if (message.empty()){
-            message = e.name();
-        }
-        report_error(message);
-        e.send_fatal_error_notif_and_telemetry_report(env, m_instance->NOTIFICATION_ERROR_FATAL);
-    }catch (OperationFailedException& e){ // no screenshot
-        logger().log("Program stopped with an exception!", COLOR_RED);
-        env.log_to_ui("- Program Error -", COLOR_RED);
+    std::deque<ControllerContext<AbstractController>> contexts;
+    size_t consoles = m_system.active_consoles();
+    for (size_t console = 0; console < consoles; console++){
+        size_t controllers = lenv.consoles[console].controllers();
 
-        std::string message = e.message();
-        if (message.empty()){
-            message = e.name();
+        //  Startup Checks
+        if (controllers > 0){
+            instance.start_program_controller_check(
+                m_system[console].controller(0), console
+            );
         }
-        report_error(message);
-        e.send_fatal_error_notif_and_telemetry_report(env, m_instance->NOTIFICATION_ERROR_FATAL);
-    }catch (FatalProgramException& e){
-        logger().log("Program stopped with an exception!", COLOR_RED);
-        env.log_to_ui("- Program Error -", COLOR_RED);
-
-        std::string message = e.message();
-        if (message.empty()){
-            message = e.name();
-        }
-        report_error(message);
-        e.send_fatal_error_notif_and_telemetry_report(env, m_instance->NOTIFICATION_ERROR_FATAL);
-    }catch (Exception& e){
-        logger().log("Program stopped with an exception!", COLOR_RED);
-        env.log_to_ui("- Program Error -", COLOR_RED);
-        std::string message = e.message();
-        if (message.empty()){
-            message = e.name();
-        }
-        report_error(message);
-        send_program_fatal_error_notification(
-            env, m_instance->NOTIFICATION_ERROR_FATAL,
-            message
+        instance.start_program_feedback_check(
+            lenv.consoles[console], console,
+           m_descriptor.feedback()
         );
-    }catch (std::exception& e){
-        logger().log("Program stopped with an exception!", COLOR_RED);
-        env.log_to_ui("- Program Error -", COLOR_RED);
-        std::string message = e.what();
-        if (message.empty()){
-            message = "Unknown std::exception.";
+        instance.start_program_border_check(
+            lenv.consoles[console], console,
+            m_descriptor.feedback()
+        );
+
+        //  Attach all the controllers to the scope so they can be cancelled from the top.
+        for (size_t controller = 0; controller < controllers; controller++){
+            contexts.emplace_back(*m_scope, lenv.consoles[console].controller(controller));
         }
-        report_error(message);
-        send_program_fatal_error_notification(
-            env, m_instance->NOTIFICATION_ERROR_FATAL,
-            message
-        );
-    }catch (...){
-        logger().log("Program stopped with an exception!", COLOR_RED);
-        env.log_to_ui("- Unknown Error -", COLOR_RED);
-        report_error("Unknown error.");
-        send_program_fatal_error_notification(
-            env, m_instance->NOTIFICATION_ERROR_FATAL,
-            "Unknown error."
-        );
+    }
+
+    {
+        std::lock_guard<Mutex> lg(program_lock());
+        if (current_state() != ProgramState::RUNNING){
+            return;
+        }
+    }
+
+    ScopeExit on_exit([&]{
+        for (size_t c = 0; c < consoles; c++){
+            lenv.consoles[c].cancel_all_controllers();
+        }
+    });
+
+    instance.program(lenv, *m_scope);
+    for (size_t c = 0; c < consoles; c++){
+        lenv.consoles[c].wait_for_all_controllers();
     }
 }
 
@@ -287,7 +186,8 @@ void MultiSwitchProgramSession::shutdown(){
 }
 void MultiSwitchProgramSession::startup(size_t switch_count){
     auto ScopeCheck = m_sanitizer.check_scope();
-    m_instance->update_active_consoles(switch_count);
+    MultiSwitchProgramInstance& instance = static_cast<MultiSwitchProgramInstance&>(*m_instance);
+    instance.update_active_consoles(switch_count);
     m_listeners.run_method(&Listener::redraw_options);
 }
 
