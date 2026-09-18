@@ -10,9 +10,7 @@
 #include <functional>
 //#include "Common/Compiler.h"
 #include "Common/Cpp/Containers/FixedLimitVector.h"
-#include "Common/Cpp/Options/BatchOption.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
@@ -23,6 +21,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+class SwitchSystemSession;
 class MultiSwitchProgramInstance;
 
 
@@ -120,7 +119,7 @@ public:
     //  Startup Checks: Feel free to override to change behavior.
 
     virtual void start_program_controller_check(
-        ControllerSession& session, size_t console_index
+        SwitchSystemSession& session, size_t console_index
     );
     virtual void start_program_feedback_check(
         VideoStream& stream, size_t console_index,

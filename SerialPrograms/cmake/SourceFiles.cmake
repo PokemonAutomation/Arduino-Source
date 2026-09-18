@@ -917,6 +917,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Integrations/IntegrationsAPI.h
     Source/Integrations/ProgramTracker.cpp
     Source/Integrations/ProgramTracker.h
+    Source/GameConsole/ConsoleHandle.cpp
+    Source/GameConsole/ConsoleHandle.h
     Source/GameConsole/ConsolePanel.cpp
     Source/GameConsole/ConsolePanel.h
     Source/GameConsole/Framework/ConsolePanelSession.cpp

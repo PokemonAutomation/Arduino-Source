@@ -111,9 +111,7 @@ void SingleSwitchProgramSession::internal_run_program(ProgramEnvironment& env){
 
     //  Startup Checks
     if (controllers > 0){
-        instance.start_program_controller_check(
-            m_system.controller(0)
-        );
+        instance.start_program_controller_check(m_system);
     }
     instance.start_program_feedback_check(
         lenv.console,

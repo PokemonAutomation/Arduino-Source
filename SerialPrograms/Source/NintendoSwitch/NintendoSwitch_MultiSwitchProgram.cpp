@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.h"
@@ -138,9 +137,12 @@ std::unique_ptr<PanelSession> MultiSwitchProgramDescriptor::make_panel() const{
 
 
 void MultiSwitchProgramInstance::start_program_controller_check(
-    ControllerSession& session, size_t console_index
+    SwitchSystemSession& session, size_t console_index
 ){
-    if (!session.ready()){
+    if (session.controllers() == 0){
+        return;
+    }
+    if (!session.controller(0).ready()){
         throw UserSetupError(session.logger(), "Cannot Start: Controller is not ready.");
     }
 }

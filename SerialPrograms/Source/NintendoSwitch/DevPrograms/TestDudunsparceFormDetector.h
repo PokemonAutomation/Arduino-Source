@@ -23,7 +23,7 @@ class TestDudunsparceFormDetector : public SingleSwitchProgramInstance{
 public:
     TestDudunsparceFormDetector();
 
-    virtual void start_program_controller_check(ControllerSession& session) override{}
+    virtual void start_program_controller_check(SwitchSystemSession& session) override{}
     virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:

@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Cpp/Json/JsonValue.h"
 //#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
@@ -86,9 +85,12 @@ void SingleSwitchProgramInstance::program(SingleSwitchProgramEnvironment& env, P
 
 
 void SingleSwitchProgramInstance::start_program_controller_check(
-    ControllerSession& session
+    SwitchSystemSession& session
 ){
-    if (!session.ready()){
+    if (session.controllers() == 0){
+        return;
+    }
+    if (!session.controller(0).ready()){
         throw UserSetupError(session.logger(), "Cannot Start: Controller is not ready.");
     }
 }
