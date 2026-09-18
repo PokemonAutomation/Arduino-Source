@@ -1,0 +1,80 @@
+/*  Console Handle
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#ifndef PokemonAutomation_GameConsole_ConsoleHandle_H
+#define PokemonAutomation_GameConsole_ConsoleHandle_H
+
+#include <memory>
+#include "CommonFramework/Tools/VideoStream.h"
+#include "Controllers/Controller.h"
+#include "Controllers/NullController.h"
+
+namespace PokemonAutomation{
+
+class ThreadHandle;
+class ThreadUtilizationStat;
+class ThreadPoolUtilizationStat;
+
+namespace GameConsole{
+
+class ConsoleSystemSession;
+
+
+
+class ConsoleHandle : public VideoStream{
+public:
+    virtual ~ConsoleHandle();
+    ConsoleHandle(ConsoleHandle&& x) = delete;
+    void operator=(ConsoleHandle&& x) = delete;
+    ConsoleHandle(const ConsoleHandle& x) = delete;
+    void operator=(const ConsoleHandle& x) = delete;
+
+
+public:
+    ConsoleHandle(GameConsole::ConsoleSystemSession& session);
+
+    size_t index() const{ return m_index; }
+
+    operator Logger&(){ return logger(); }
+    operator VideoFeed&(){ return video(); }
+    operator VideoOverlay&(){ return overlay(); }
+    operator AudioFeed&(){ return audio(); }
+    operator const StreamHistorySession&() const{ return history(); }
+
+
+public:
+    size_t controllers() const;
+    AbstractController& controller(size_t index);
+
+    template <typename ControllerType = AbstractController>
+    ControllerType& controller(size_t index = 0){
+        return controller(index).cast_with_exception<ControllerType>();
+    }
+
+
+public:
+    void wait_for_all_controllers() noexcept;
+    void cancel_all_controllers() noexcept;
+
+
+private:
+    GameConsole::ConsoleSystemSession& m_session;
+    size_t m_index;
+    NullController m_null_controller;
+
+    std::unique_ptr<ThreadPoolUtilizationStat> m_realtime_inference_utilization;
+    std::unique_ptr<ThreadPoolUtilizationStat> m_normal_inference_utilization;
+    std::unique_ptr<ThreadUtilizationStat> m_thread_utilization;
+};
+
+
+
+
+}
+}
+#endif
+
+

@@ -77,7 +77,7 @@ public:
         return true;
     }
     virtual bool is_ready() const override{
-        return true;
+        return false;
     }
 
     virtual void cancel_all_commands() override{}

@@ -142,7 +142,7 @@ void MultiSwitchProgramSession::internal_run_program(ProgramEnvironment& env){
         //  Startup Checks
         if (controllers > 0){
             instance.start_program_controller_check(
-                m_system[console].controller(0), console
+                m_system[console], console
             );
         }
         instance.start_program_feedback_check(

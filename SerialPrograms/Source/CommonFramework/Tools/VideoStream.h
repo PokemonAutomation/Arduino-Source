@@ -39,7 +39,7 @@ public:
     void operator=(VideoStream&& x) = delete;
     VideoStream(const VideoStream& x) = delete;
     void operator=(const VideoStream& x) = delete;
-    ~VideoStream();
+    virtual ~VideoStream();
 
 public:
     VideoStream(

@@ -8,9 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_SingleSwitchProgram_H
 
 #include <type_traits>
-#include "Common/Cpp/Options/BatchOption.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
@@ -35,17 +33,17 @@ public:
 public:
     friend class SingleSwitchProgramSession;
     friend class SingleSwitchProgramWidget;
-    template <class... Args>
+
     SingleSwitchProgramEnvironment(
         const ProgramInfo& program_info,
         CancellableScope& scope,
         ProgramSession& session,
         StatsTracker* current_stats,
         const StatsTracker* historical_stats,
-        Args&&... args
+        GameConsole::ConsoleSystemSession& system
     )
         : ProgramEnvironment(program_info, session, current_stats, historical_stats)
-        , console(std::forward<Args>(args)...)
+        , console(system)
     {
         console.initialize_inference_threads(scope);
     }
@@ -80,7 +78,6 @@ private:
     const ProgramControllerClass m_color_class;
     const FeedbackType m_feedback;
     const bool m_allow_commands_while_running;
-    const std::vector<std::string> m_required_resources;
 };
 
 
@@ -101,7 +98,7 @@ public:
     //  Startup Checks: Feel free to override to change behavior.
 
     virtual void start_program_controller_check(
-        ControllerSession& session
+        SwitchSystemSession& session
     );
     virtual void start_program_feedback_check(
         VideoStream& stream,
