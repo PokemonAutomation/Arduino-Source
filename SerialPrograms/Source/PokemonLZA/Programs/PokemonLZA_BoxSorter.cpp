@@ -177,7 +177,7 @@ void sort(
     BoxCursor& cur_cursor
 ){
     env.log("Start sorting...");
-    env.add_overlay_log("Start Sorting...");
+    env.log_to_ui("Start Sorting...");
 
     std::ostringstream ss;
     // this need to be separated into functions when I will redo the whole thing but I just wanted it to work
@@ -312,7 +312,7 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                     // XXX TODO: change code to use regional dex, both Lumiose and Hyperspace
                     uint16_t dex_number = dex_number_detector.dex_number();
                     std::string name_slug;
-                    // env.add_overlay_log(std::to_string(dex_number_detector.dex_type_color_ratio()));
+                    // env.log_to_ui(std::to_string(dex_number_detector.dex_type_color_ratio()));
                     if (dex_number_detector.dex_type() == DexType::HYPERSPACE){
                         name_slug = HYPERSPACE_DEX_SLUGS()[dex_number-1];
                         dex_number += (uint16_t)LUMIOSE_DEX_SLUGS().size();
@@ -333,11 +333,11 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                         }
                         );
                     ss << "\u2705 " ;    //  checkbox
-                    env.add_overlay_log(create_overlay_info(*boxes_data.back(), dex_number_detector));
+                    env.log_to_ui(create_overlay_info(*boxes_data.back(), dex_number_detector));
                 }else{
                     stats.empty++;
                     num_empty_slots++;
-                    env.add_overlay_log("Empty Slot");
+                    env.log_to_ui("Empty Slot");
                     env.update_stats();
                     boxes_data.push_back(std::nullopt); //empty optional to make sorting easier later
                     ss << "\u274c " ;    //  "X"
@@ -346,7 +346,7 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
             ss << "\n";
         }
         env.console.log(ss.str());
-        env.add_overlay_log("Empty: " + std::to_string(num_empty_slots) + "/30");
+        env.log_to_ui("Empty: " + std::to_string(num_empty_slots) + "/30");
         ss.str("");
     } // end box_idx
         

@@ -30,9 +30,9 @@ public:
     ConsoleHandle console;
 
     // Call console.overlay().add_log(msg, color) to add a log message to overlay display
-    void add_overlay_log(std::string msg, Color color = COLOR_WHITE);
+    virtual void log_to_ui(const std::string& msg, Color color = Color()) override;
 
-private:
+public:
     friend class SingleSwitchProgramSession;
     friend class SingleSwitchProgramWidget;
     template <class... Args>
@@ -50,6 +50,7 @@ private:
         console.initialize_inference_threads(scope);
     }
 };
+
 
 
 class SingleSwitchProgramDescriptor : public ProgramDescriptor{
@@ -84,39 +85,9 @@ private:
 
 
 
-
-
-
-//
-//  As of this writing, this class will never be called in a manner where
-//  thread-safety is of concern with one exception: config options
-//
-//  Here is the curent status:
-//
-//  Called from UI thread:
-//    - Construction/destruction
-//    - from/to_json()
-//    - restore_defaults()
-//
-//  Called from program thread:
-//    - program()
-//
-//  Called from both UI and program threads:
-//    - check_validity()
-//    - All config options.
-//
-//  With the exception of the configs, nothing will be called concurrently from
-//  different threads.
-//
-class SingleSwitchProgramInstance{
+class SingleSwitchProgramInstance : public ProgramInstance{
 public:
-    virtual ~SingleSwitchProgramInstance();
-    SingleSwitchProgramInstance(const SingleSwitchProgramInstance&) = delete;
-    void operator=(const SingleSwitchProgramInstance&) = delete;
-
-    SingleSwitchProgramInstance(
-        const std::vector<std::string>& error_notification_tags = {"Notifs"}
-    );
+    using ProgramInstance::ProgramInstance;
 
     //  Called by SingleSwitchProgramSession::run_program_instance() to start an automation program.
     //  Child classes should override one of the overloaded functions.
@@ -140,29 +111,6 @@ public:
         VideoStream& stream,
         FeedbackType feedback_type
     );
-
-
-public:
-    //  Settings
-
-    virtual std::string check_validity() const;
-    virtual void restore_defaults();
-    virtual JsonValue to_json() const;
-    virtual void load_json(const JsonValue& json);
-
-
-
-protected:
-    friend class SingleSwitchProgramSession;
-
-    BatchOption m_options;
-    void add_option(ConfigOption& option, std::string serialization_string);
-
-
-public:
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
-    EventNotificationOption NOTIFICATION_ERROR_RECOVERABLE;
-    EventNotificationOption NOTIFICATION_ERROR_FATAL;
 };
 
 

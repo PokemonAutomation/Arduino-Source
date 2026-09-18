@@ -15,7 +15,6 @@
 #ifndef PokemonAutomation_ComputerPrograms_ComputerProgramSession_H
 #define PokemonAutomation_ComputerPrograms_ComputerProgramSession_H
 
-#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/Panels/PanelSession.h"
 #include "CommonFramework/ProgramSession.h"
 #include "ComputerPrograms/ComputerProgram.h"
@@ -49,20 +48,12 @@ public:
 
 
 private:
-    virtual void internal_run_program() override;
-    virtual void internal_stop_program() override;
-
-
-private:
-    void run_program_instance(ProgramEnvironment& env, CancellableScope& scope);
+    virtual std::unique_ptr<ProgramEnvironment> make_env(const ProgramInfo& program_info) override;
+    virtual void internal_run_program(ProgramEnvironment& env) override;
 
 
 private:
     const ComputerProgramDescriptor& m_descriptor;
-    std::unique_ptr<ComputerProgramInstance> m_instance;
-
-    SpinLock m_lock;
-    CancellableScope* m_scope = nullptr;
 };
 
 

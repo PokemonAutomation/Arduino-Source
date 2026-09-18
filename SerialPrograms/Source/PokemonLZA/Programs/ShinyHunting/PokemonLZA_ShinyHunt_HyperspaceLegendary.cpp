@@ -356,7 +356,7 @@ void hunt_latias_check(
 
     // Run to Latias to trigger a potential shiny sound
     env.log("Move to check Latias.");
-    env.add_overlay_log("To Check Latias");
+    env.log_to_ui("To Check Latias");
     pbf_press_button(context, BUTTON_A, 160ms, 80ms);
     ssf_press_left_joystick(context, {0, +1}, 0ms, 4000ms, 0ms);
     pbf_mash_button(context, BUTTON_Y, 4000ms);
@@ -423,7 +423,7 @@ void hunt_cobalion(
 
     // Run to Cobalion to trigger potential shiny sound
     env.log("Move to check Cobalion.");
-    env.add_overlay_log("To Check Cobalion");
+    env.log_to_ui("To Check Cobalion");
 
     // run right to line up with Cobalion
     ssf_press_button(context, BUTTON_B, 0ms, 6000ms, 0ms);
@@ -492,7 +492,7 @@ void hunt_terrakion(
 
     // Roll to Terrakion to trigger potential shiny sound
     env.log("Move to check Terrakion.");
-    env.add_overlay_log("To Check Terrakion");
+    env.log_to_ui("To Check Terrakion");
 
     ssf_press_left_joystick(context, {-0.15, +0.5}, 0ms, 500ms, 0ms);
     pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
@@ -551,7 +551,7 @@ void hunt_virizion_balcony(
     }
 
     env.log("Move to check Virizion");
-    env.add_overlay_log("To Check Virision");
+    env.log_to_ui("To Check Virision");
     // We have done enough shuttle runs to refresh Virizion spawns.
     // Now run towards it to check shiny!
 
@@ -582,10 +582,10 @@ void hunt_virizion_balcony(
                 double center_x = detection->box.x + detection->box.width/2;
 
                 env.log("Found trash bin");
-                env.add_overlay_log(std::format("Found Trash Bin at {:.2f}", center_x));
+                env.log_to_ui(std::format("Found Trash Bin at {:.2f}", center_x));
                 if (0.45 <= center_x && center_x <= 0.55){
                     // We are facing the trash bin, stop
-                    env.add_overlay_log("Facing Trash Bin");
+                    env.log_to_ui("Facing Trash Bin");
                     break;
                 }
                 double dir_x = (center_x < 0.5 ? -0.5 : 0.5);
@@ -664,7 +664,7 @@ void hunt_virizion_rooftop(
 
     context.wait_for_all_requests();
     env.log("Move to check Virizion");
-    env.add_overlay_log("To Check Virizion");
+    env.log_to_ui("To Check Virizion");
 
     run_forward(use_switch1_only_timings ? 2700ms : 2600ms);
     pbf_wait(context, use_switch1_only_timings ? 1100ms : 1s); // wait for drop to lower level
@@ -706,7 +706,7 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
         // check whether this is Switch 1 or 2.
         ConsoleType console_type = env.console.state().console_type();
         if (console_type == ConsoleType::Unknown){
-            env.add_overlay_log("Detecting Console Type");
+            env.log_to_ui("Detecting Console Type");
             env.console.log("Unknown Switch type. Try to detect.");
             console_type = detect_console_type_from_in_game(env.console, context);
         }

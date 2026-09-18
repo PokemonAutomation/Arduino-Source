@@ -213,7 +213,7 @@ std::array<size_t, 2> find_occupied_slots_in_box(
 
     //env.update_stats();
     env.log(ss.str());
-    env.add_overlay_log("Empty: " + std::to_string(num_empty_slots) + "/30");
+    env.log_to_ui("Empty: " + std::to_string(num_empty_slots) + "/30");
 
     return first_pokemon_slot;
 }
@@ -295,7 +295,7 @@ void read_summary_screen(
 
     cur_pokemon_info.origin_mark = origin_mark_reader.read_mark(screen);
 
-    env.add_overlay_log(create_overlay_info(cur_pokemon_info));
+    env.log_to_ui(create_overlay_info(cur_pokemon_info));
     video_overlay_set.clear();
 
     // NOTE edit when adding new struct members (detections go here likely)

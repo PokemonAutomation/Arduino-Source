@@ -49,12 +49,8 @@ public:
 
 
 private:
-    virtual void internal_run_program() override;
-    virtual void internal_stop_program() override;
-
-
-private:
-    void run_program_instance(SingleSwitchProgramEnvironment& env, CancellableScope& scope);
+    virtual std::unique_ptr<ProgramEnvironment> make_env(const ProgramInfo& program_info) override;
+    virtual void internal_run_program(ProgramEnvironment& env) override;
 
 
 private:
@@ -62,10 +58,6 @@ private:
 
     SwitchSystemOption m_system_option;
     SwitchSystemSession m_system;
-
-    std::unique_ptr<SingleSwitchProgramInstance> m_instance;
-
-    std::atomic<CancellableScope*> m_scope;
 };
 
 

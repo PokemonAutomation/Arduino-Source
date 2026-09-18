@@ -270,7 +270,7 @@ bool route_hyperspace_wild_zone(
     const uint16_t calorie_number = hyperspace_calorie_detector.calorie_number();
     const uint16_t min_calorie = MIN_CALORIE_REMAINING;
     const std::string log_msg = std::format("Calorie: {}/{}", calorie_number, min_calorie);
-    env.add_overlay_log(log_msg);
+    env.log_to_ui(log_msg);
     env.log(log_msg);
     // `ready_to_stop_counter` serves as a "buffer zone" to ensure one wrong calorie detection won't stop
     // the program early.

@@ -53,8 +53,8 @@ public:
 
 
 private:
-    virtual void internal_run_program() override;
-    virtual void internal_stop_program() override;
+    virtual std::unique_ptr<ProgramEnvironment> make_env(const ProgramInfo& program_info) override;
+    virtual void internal_run_program(ProgramEnvironment& env) override;
 
     virtual void on_console_count_lock(bool locked) override{}
     virtual void shutdown() override;
@@ -69,19 +69,11 @@ public:
 
 
 private:
-    void run_program_instance(MultiSwitchProgramEnvironment& env, CancellableScope& scope);
-
-
-private:
 
     const MultiSwitchProgramDescriptor& m_descriptor;
 
     MultiSwitchSystemOption m_system_option;
     MultiSwitchSystemSession m_system;
-
-    std::unique_ptr<MultiSwitchProgramInstance> m_instance;
-
-    std::atomic<CancellableScope*> m_scope;
 
     ListenerSet<Listener> m_listeners;
 
