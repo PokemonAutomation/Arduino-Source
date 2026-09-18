@@ -15,7 +15,6 @@
 #ifndef PokemonAutomation_ComputerPrograms_ComputerProgramSession_H
 #define PokemonAutomation_ComputerPrograms_ComputerProgramSession_H
 
-#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/Panels/PanelSession.h"
 #include "CommonFramework/ProgramSession.h"
 #include "ComputerPrograms/ComputerProgram.h"
@@ -60,9 +59,6 @@ private:
 private:
     const ComputerProgramDescriptor& m_descriptor;
     std::unique_ptr<ComputerProgramInstance> m_instance;
-
-    SpinLock m_lock;
-    CancellableScope* m_scope = nullptr;
 };
 
 

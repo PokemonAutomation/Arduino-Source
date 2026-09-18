@@ -22,7 +22,9 @@
 #include "Common/Cpp/Logging/TaggedLogger.h"
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/ListenerSet.h"
+#include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "CommonFramework/Globals.h"
 //#include "CommonFramework/Logging/Logger.h"
@@ -36,10 +38,12 @@ class CancellableScope;
 class ProgramDescriptor;
 class ResourceDownload;
 
-struct RequiredResourceResult {
+struct RequiredResourceResult{
     std::vector<std::string> missing_resources;
     bool requires_upgrade = false;
 };
+
+
 
 
 class ProgramSession : public TrackableProgram{
@@ -154,6 +158,7 @@ private:
     TaggedLogger m_logger;
 
     mutable Mutex m_lock;
+    ConditionVariable m_cv;
 
     std::atomic<WallClock> m_last_state_change;
     std::atomic<ProgramState> m_state;
@@ -165,9 +170,28 @@ private:
 //    Mutex m_stats_lock;
     std::unique_ptr<StatsTracker> m_historical_stats;
     std::unique_ptr<StatsTracker> m_current_stats;
-//    CancellableScope* m_scope = nullptr;
 
     ListenerSet<Listener> m_listeners;
+
+
+protected:
+
+    class RunningProgramScope{
+    public:
+        RunningProgramScope(ProgramSession& session);
+        ~RunningProgramScope();
+
+    private:
+        ProgramSession& m_session;
+        CancellableHolder<CancellableScope> m_scope;
+    };
+
+    void wait_for_finish(){
+        std::unique_lock<Mutex> lg(m_lock);
+        m_cv.wait(lg, [this]{ return m_scope == nullptr; });
+    }
+
+    CancellableScope* m_scope;
 };
 
 

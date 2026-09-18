@@ -38,7 +38,6 @@ SingleSwitchProgramSession::SingleSwitchProgramSession(const SingleSwitchProgram
     , m_system_option(descriptor.allow_commands_while_running())
     , m_system(m_system_option, descriptor.allow_commands_while_running(), 0, instance_id())
     , m_instance(descriptor.make_instance(m_system))
-    , m_scope(nullptr)
 {}
 
 
@@ -129,13 +128,10 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
         if (current_state() != ProgramState::RUNNING){
             return;
         }
-        m_scope.store(&scope, std::memory_order_release);
     }
 
-    ScopeExit on_exit([&, this]{
+    ScopeExit on_exit([&]{
         env.console.cancel_all_controllers();
-        std::lock_guard<Mutex> lg(program_lock());
-        m_scope.store(nullptr, std::memory_order_release);
     });
 
     m_instance->program(env, scope);
@@ -144,36 +140,24 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
 void SingleSwitchProgramSession::internal_stop_program(){
     {
         std::lock_guard<Mutex> lg(program_lock());
-        CancellableScope* scope = m_scope.load(std::memory_order_acquire);
-        if (scope != nullptr){
-            scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
+        if (m_scope != nullptr){
+            m_scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
         }
     }
 
-    //  Wait for program thread to finish.
-    while (m_scope.load(std::memory_order_acquire) != nullptr){
-        pause();
-    }
+    wait_for_finish();
 }
 void SingleSwitchProgramSession::internal_run_program(){
-    {
-        CancellableHolder<CancellableScope> scope;
-        {
-            std::lock_guard<Mutex> lg(program_lock());
-            if (current_state() != ProgramState::RUNNING){
-                return;
-            }
-            m_scope.store(&scope, std::memory_order_release);
-        }
-        bool success = download_prereqs(scope);
-        {
-            std::lock_guard<Mutex> lg(program_lock());
-            m_scope.store(nullptr, std::memory_order_release);
-        }
+    RunningProgramScope running_scope(*this);
 
-        if (!success){
+    {
+        std::lock_guard<Mutex> lg(program_lock());
+        if (current_state() != ProgramState::RUNNING){
             return;
         }
+    }
+    if (!download_prereqs(*m_scope)){
+        return;
     }
 
     m_instance->m_options.reset_state();
@@ -186,10 +170,9 @@ void SingleSwitchProgramSession::internal_run_program(){
         m_descriptor.display_name(),
         last_state_change()
     );
-    CancellableHolder<CancellableScope> scope;
     SingleSwitchProgramEnvironment env(
         program_info,
-        scope,
+        *m_scope,
         *this,
         current_stats_tracker(), historical_stats_tracker(),
         m_system
@@ -206,7 +189,7 @@ void SingleSwitchProgramSession::internal_run_program(){
         logger().log("<b>Starting Program: " + identifier() + "</b>");
         env.console.overlay().clear_log();
         env.console.overlay().add_log("- Starting Program -");
-        run_program_instance(env, scope);
+        run_program_instance(env, *m_scope);
         env.console.overlay().add_log("- Program Finished -");
         logger().log("Program finished normally!", COLOR_BLUE);
     }catch (OperationCancelledException&){

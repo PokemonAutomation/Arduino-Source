@@ -81,8 +81,6 @@ private:
 
     std::unique_ptr<MultiSwitchProgramInstance> m_instance;
 
-    std::atomic<CancellableScope*> m_scope;
-
     ListenerSet<Listener> m_listeners;
 
     LifetimeSanitizer m_sanitizer;

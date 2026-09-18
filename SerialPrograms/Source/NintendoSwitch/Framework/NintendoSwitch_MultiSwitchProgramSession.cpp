@@ -49,7 +49,6 @@ MultiSwitchProgramSession::MultiSwitchProgramSession(const MultiSwitchProgramDes
     )
     , m_system(m_system_option, descriptor.allow_commands_while_running(), instance_id())
     , m_instance(descriptor.make_instance())
-    , m_scope(nullptr)
     , m_sanitizer("MultiSwitchProgramSession")
 {
 //    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
@@ -152,15 +151,12 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
         if (current_state() != ProgramState::RUNNING){
             return;
         }
-        m_scope.store(&scope, std::memory_order_release);
     }
 
-    ScopeExit on_exit([&, this]{
+    ScopeExit on_exit([&]{
         for (size_t c = 0; c < consoles; c++){
             env.consoles[c].cancel_all_controllers();
         }
-        std::lock_guard<Mutex> lg(program_lock());
-        m_scope.store(nullptr, std::memory_order_release);
     });
 
     m_instance->program(env, scope);
@@ -172,36 +168,23 @@ void MultiSwitchProgramSession::internal_stop_program(){
     auto ScopeCheck = m_sanitizer.check_scope();
     {
         std::lock_guard<Mutex> lg(program_lock());
-        CancellableScope* scope = m_scope.load(std::memory_order_acquire);
-        if (scope != nullptr){
-            scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
+        if (m_scope != nullptr){
+            m_scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
         }
     }
-
-    //  Wait for program thread to finish.
-    while (m_scope.load(std::memory_order_acquire) != nullptr){
-        pause();
-    }
+    wait_for_finish();
 }
 void MultiSwitchProgramSession::internal_run_program(){
-    {
-        CancellableHolder<CancellableScope> download_scope;
-        {
-            std::lock_guard<Mutex> lg(program_lock());
-            if (current_state() != ProgramState::RUNNING){
-                return;
-            }
-            m_scope.store(&download_scope, std::memory_order_release);
-        }
+    RunningProgramScope running_scope(*this);
 
-        bool success = download_prereqs(download_scope);
-        {
-            std::lock_guard<Mutex> lg(program_lock());
-            m_scope.store(nullptr, std::memory_order_release);
-        }
-        if (!success){
+    {
+        std::lock_guard<Mutex> lg(program_lock());
+        if (current_state() != ProgramState::RUNNING){
             return;
         }
+    }
+    if (!download_prereqs(*m_scope)){
+        return;
     }
         
     auto ScopeCheck = m_sanitizer.check_scope();
@@ -235,10 +218,9 @@ void MultiSwitchProgramSession::internal_run_program(){
 
 
 
-    CancellableHolder<CancellableScope> scope;
     MultiSwitchProgramEnvironment env(
         program_info,
-        scope,
+        *m_scope,
         *this,
         current_stats_tracker(), historical_stats_tracker(),
         std::move(handles)
@@ -247,7 +229,7 @@ void MultiSwitchProgramSession::internal_run_program(){
     try{
         logger().log("<b>Starting Program: " + identifier() + "</b>");
         env.add_overlay_log_to_all_consoles("- Starting Program -");
-        run_program_instance(env, scope);
+        run_program_instance(env, *m_scope);
 //        m_setup->wait_for_all_requests();
         env.add_overlay_log_to_all_consoles("- Program Finished -");
         logger().log("Program finished normally!", COLOR_BLUE);

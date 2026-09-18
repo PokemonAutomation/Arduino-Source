@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/CancellableScope.h"
@@ -68,41 +69,32 @@ void ComputerProgramSession::run_program_instance(ProgramEnvironment& env, Cance
         if (!error.empty()){
             throw UserSetupError(logger(), std::move(error));
         }
+        if (current_state() != ProgramState::RUNNING){
+            return;
+        }
     }
 
-    {
-        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-        m_scope = &scope;
-    }
-
-    try{
-        m_instance->program(env, scope);
-    }catch (...){
-        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-        m_scope = nullptr;
-        throw;
-    }
-    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-    m_scope = nullptr;
+    m_instance->program(env, scope);
 }
 void ComputerProgramSession::internal_stop_program(){
-    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-    if (m_scope != nullptr){
-        m_scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
-    }
-}
-void ComputerProgramSession::internal_run_program(){
-    CancellableHolder<CancellableScope> download_scope;
-    {
-        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-        m_scope = &download_scope;
-    }
-    bool success = download_prereqs(download_scope);
     {
         std::lock_guard<Mutex> lg(program_lock());
-        m_scope = nullptr;
-    }    
-    if (!success){
+        if (m_scope != nullptr){
+            m_scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
+        }
+    }
+    wait_for_finish();
+}
+void ComputerProgramSession::internal_run_program(){
+    RunningProgramScope running_scope(*this);
+
+    {
+        std::lock_guard<Mutex> lg(program_lock());
+        if (current_state() != ProgramState::RUNNING){
+            return;
+        }
+    }
+    if (!download_prereqs(*m_scope)){
         return;
     }
 
@@ -114,7 +106,6 @@ void ComputerProgramSession::internal_run_program(){
         m_descriptor.display_name(),
         last_state_change()
     );
-    CancellableHolder<CancellableScope> scope;
     ProgramEnvironment env(
         program_info,
         *this,
@@ -123,7 +114,7 @@ void ComputerProgramSession::internal_run_program(){
 
     try{
         logger().log("<b>Starting Program: " + identifier() + "</b>");
-        run_program_instance(env, scope);
+        run_program_instance(env, *m_scope);
 //        m_setup->wait_for_all_requests();
         logger().log("Program finished normally!", COLOR_BLUE);
     }catch (OperationCancelledException&){

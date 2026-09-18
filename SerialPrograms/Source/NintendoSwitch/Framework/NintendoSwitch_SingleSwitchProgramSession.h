@@ -64,8 +64,6 @@ private:
     SwitchSystemSession m_system;
 
     std::unique_ptr<SingleSwitchProgramInstance> m_instance;
-
-    std::atomic<CancellableScope*> m_scope;
 };
 
 

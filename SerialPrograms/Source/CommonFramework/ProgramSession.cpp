@@ -23,6 +23,31 @@ namespace PokemonAutomation{
 
 
 
+ProgramSession::RunningProgramScope::RunningProgramScope(ProgramSession& session)
+    : m_session(session)
+{
+    std::lock_guard<Mutex> lg(session.m_lock);
+    if (session.m_scope != nullptr){
+        throw InternalProgramError(
+            &session.m_logger,
+            PA_CURRENT_FUNCTION,
+            "Program is already running."
+        );
+    }
+    session.m_scope = &m_scope;
+}
+ProgramSession::RunningProgramScope::~RunningProgramScope(){
+    {
+        std::lock_guard<Mutex> lg(m_session.m_lock);
+        m_session.m_scope = nullptr;
+    }
+    m_session.m_cv.notify_all();
+}
+
+
+
+
+
 void ProgramSession::add_listener(Listener& listener){
     m_listeners.add(listener);
 }
@@ -39,6 +64,7 @@ ProgramSession::ProgramSession(const ProgramDescriptor& descriptor)
     , m_logger(global_logger_raw(), "Program")
     , m_last_state_change(current_time())
     , m_state(ProgramState::STOPPED)
+    , m_scope(nullptr)
 {
     load_historical_stats();
 }
