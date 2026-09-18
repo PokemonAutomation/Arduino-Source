@@ -48,12 +48,11 @@ public:
 
 
 private:
-    virtual void internal_run_program() override;
-    virtual void internal_stop_program() override;
+    virtual void internal_run_program(const ProgramInfo& program_info) override;
 
 
 private:
-    void run_program_instance(ProgramEnvironment& env, CancellableScope& scope);
+    void run_program_instance(ProgramEnvironment& env);
 
 
 private:

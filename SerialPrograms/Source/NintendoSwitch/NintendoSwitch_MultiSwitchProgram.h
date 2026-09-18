@@ -61,9 +61,7 @@ public:
     );
 
     // add video overlay log on all console video streams
-    void add_overlay_log_to_all_consoles(const std::string& message, Color color = COLOR_WHITE);
-    // clear video overlay log on all console video streams
-    void clear_all_overlay_logs();
+    virtual void log_to_ui(const std::string& msg, Color color = Color()) override;
 };
 
 
@@ -108,37 +106,12 @@ private:
 
 
 
-
-//
-//  As of this writing, this class will never be called in a manner where
-//  thread-safety is of concern with one exception: config options
-//
-//  Here is the curent status:
-//
-//  Called from UI thread:
-//    - Construction/destruction
-//    - from/to_json()
-//    - restore_defaults()
-//
-//  Called from program thread:
-//    - program()
-//
-//  Called from both UI and program threads:
-//    - check_validity()
-//    - All config options.
-//
-//  With the exception of the configs, nothing will be called concurrently from
-//  different threads.
-//
-class MultiSwitchProgramInstance{
+class MultiSwitchProgramInstance : public ProgramInstance{
 public:
-    virtual ~MultiSwitchProgramInstance();
-    MultiSwitchProgramInstance(const MultiSwitchProgramInstance&) = delete;
-    void operator=(const MultiSwitchProgramInstance&) = delete;
+    using ProgramInstance::ProgramInstance;
 
-    MultiSwitchProgramInstance(
-        const std::vector<std::string>& error_notification_tags = {"Notifs"}
-    );
+    //  Called when the # of Switches changes.
+    virtual void update_active_consoles(size_t switch_count){}
 
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) = 0;
 
@@ -157,32 +130,6 @@ public:
         VideoStream& stream, size_t console_index,
         FeedbackType feedback_type
     );
-
-
-public:
-    //  Settings
-
-    virtual std::string check_validity() const;
-    virtual void restore_defaults();
-    virtual JsonValue to_json() const;
-    virtual void load_json(const JsonValue& json);
-
-
-    //  Called when the # of Switches changes.
-    virtual void update_active_consoles(size_t switch_count){}
-
-
-protected:
-    friend class MultiSwitchProgramSession;
-
-    BatchOption m_options;
-    void add_option(ConfigOption& option, std::string serialization_string);
-
-
-public:
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
-    EventNotificationOption NOTIFICATION_ERROR_RECOVERABLE;
-    EventNotificationOption NOTIFICATION_ERROR_FATAL;
 };
 
 

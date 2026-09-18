@@ -222,7 +222,7 @@ void ShinyHunt_HyperspaceHunter::use_fly_spot_reset(
                 const uint16_t calorie_number = hyperspace_calorie_detector.calorie_number();
                 const uint16_t min_calorie = MIN_CALORIE_REMAINING;
                 const std::string log_msg = std::format("Calorie: {}/{}", calorie_number, min_calorie);
-                env.add_overlay_log(log_msg);
+                env.log_to_ui(log_msg);
                 env.log(log_msg);
 
                 stats.resets++;
@@ -235,7 +235,7 @@ void ShinyHunt_HyperspaceHunter::use_fly_spot_reset(
 
                 if (calorie_number <= min_calorie){
                     env.log("min calorie reached");
-                    env.add_overlay_log("Min Calorie Reached");
+                    env.log_to_ui("Min Calorie Reached");
                     break;
                 }
                 if (NUM_RESETS > 0 && stats.resets >= NUM_RESETS){

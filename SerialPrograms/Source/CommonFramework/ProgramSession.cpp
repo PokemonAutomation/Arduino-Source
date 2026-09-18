@@ -9,11 +9,12 @@
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Tools/GlobalThreadPools.h"
-#include "CommonFramework/Panels/ProgramDescriptor.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ProgramSession.h"
 #include "CommonFramework/ProgramStats/StatsDatabase.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Panels/ProgramDescriptor.h"
+#include "CommonFramework/Notifications/ProgramInfo.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/ResourceDownload/ProgramMissingResourceTracker.h"
 #include "CommonFramework/ResourceDownload/GlobalResourceDownloadManager.h"
 #include "CommonFramework/ResourceDownload/ResourceDownloadHelpers.h"
@@ -99,6 +100,16 @@ std::string ProgramSession::historical_stats() const{
 }
 WallClock ProgramSession::last_state_change() const{
     return m_last_state_change.load(std::memory_order_relaxed);
+}
+
+void ProgramSession::internal_stop_program(){
+    {
+        std::lock_guard<Mutex> lg(program_lock());
+        if (m_scope != nullptr){
+            m_scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
+        }
+    }
+    wait_for_finish();
 }
 
 
@@ -289,11 +300,26 @@ std::string ProgramSession::stop_program(){
 void ProgramSession::run_program(){
     {
         std::lock_guard<Mutex> lg(m_lock);
+        if (current_state() != ProgramState::RUNNING){
+            return;
+        }
         m_current_stats = m_descriptor.make_stats();
         load_historical_stats();
         push_stats();
     }
-    internal_run_program();
+    ProgramInfo program_info(
+        identifier(),
+        m_descriptor.category(),
+        m_descriptor.display_name(),
+        last_state_change()
+    );
+    {
+        RunningProgramScope running_scope(*this);
+        if (!download_prereqs(*m_scope)){
+            return;
+        }
+        internal_run_program(program_info);
+    }
     {
         std::lock_guard<Mutex> lg(m_lock);
         push_stats();

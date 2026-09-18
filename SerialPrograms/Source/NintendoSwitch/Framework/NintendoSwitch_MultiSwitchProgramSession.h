@@ -53,8 +53,7 @@ public:
 
 
 private:
-    virtual void internal_run_program() override;
-    virtual void internal_stop_program() override;
+    virtual void internal_run_program(const ProgramInfo& program_info) override;
 
     virtual void on_console_count_lock(bool locked) override{}
     virtual void shutdown() override;
@@ -69,7 +68,7 @@ public:
 
 
 private:
-    void run_program_instance(MultiSwitchProgramEnvironment& env, CancellableScope& scope);
+    void run_program_instance(MultiSwitchProgramEnvironment& env);
 
 
 private:

@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Json/JsonValue.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "ProgramDescriptor.h"
 
@@ -17,6 +18,45 @@ std::unique_ptr<StatsTracker> ProgramDescriptor::make_stats() const{
 
 
 
+ProgramInstance::ProgramInstance(
+    const std::vector<std::string>& error_notification_tags
+)
+    : m_options(LockMode::LOCK_WHILE_RUNNING)
+    , NOTIFICATION_PROGRAM_FINISH(
+        "Program Finished",
+        true, true,
+        ImageAttachmentMode::JPG,
+        {"Notifs"}
+    )
+    , NOTIFICATION_ERROR_RECOVERABLE(
+        "Program Error (Recoverable)",
+        true, false,
+        ImageAttachmentMode::PNG,
+        error_notification_tags
+    )
+    , NOTIFICATION_ERROR_FATAL(
+        "Program Error (Fatal)",
+        true, true,
+        ImageAttachmentMode::PNG,
+        error_notification_tags
+    )
+{}
+void ProgramInstance::add_option(ConfigOption& option, std::string serialization_string){
+    m_options.add_option(option, std::move(serialization_string));
+}
+
+std::string ProgramInstance::check_validity() const{
+    return m_options.check_validity();
+}
+void ProgramInstance::restore_defaults(){
+    return m_options.restore_defaults();
+}
+JsonValue ProgramInstance::to_json() const{
+    return m_options.to_json();
+}
+void ProgramInstance::load_json(const JsonValue& json){
+    m_options.load_json(json);
+}
 
 
 

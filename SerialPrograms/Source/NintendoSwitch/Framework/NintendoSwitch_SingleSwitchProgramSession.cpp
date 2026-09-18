@@ -9,7 +9,6 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/EarlyShutdown.h"
-#include "Common/Cpp/Concurrency/SpinPause.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
@@ -56,7 +55,7 @@ SingleSwitchProgramSession::~SingleSwitchProgramSession(){
 
 
 ConfigOption& SingleSwitchProgramSession::options(){
-    return m_instance->m_options;
+    return m_instance->options();
 }
 
 
@@ -91,7 +90,7 @@ void SingleSwitchProgramSession::load_json(const JsonValue& json){
 
 
 
-void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnvironment& env){
     {
         std::lock_guard<Mutex> lg(program_lock());
         std::string error = check_validity();
@@ -120,7 +119,7 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
     //  Attach all the controllers to the scope so they can be cancelled from the top.
     FixedLimitVector<ControllerContext<AbstractController>> contexts(controllers);
     for (size_t c = 0; c < controllers; c++){
-        contexts.emplace_back(scope, env.console.controller(c));
+        contexts.emplace_back(*m_scope, env.console.controller(c));
     }
 
     {
@@ -134,42 +133,14 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
         env.console.cancel_all_controllers();
     });
 
-    m_instance->program(env, scope);
+    m_instance->program(env, *m_scope);
     env.console.wait_for_all_controllers();
 }
-void SingleSwitchProgramSession::internal_stop_program(){
-    {
-        std::lock_guard<Mutex> lg(program_lock());
-        if (m_scope != nullptr){
-            m_scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
-        }
-    }
-
-    wait_for_finish();
-}
-void SingleSwitchProgramSession::internal_run_program(){
-    RunningProgramScope running_scope(*this);
-
-    {
-        std::lock_guard<Mutex> lg(program_lock());
-        if (current_state() != ProgramState::RUNNING){
-            return;
-        }
-    }
-    if (!download_prereqs(*m_scope)){
-        return;
-    }
-
-    m_instance->m_options.reset_state();
+void SingleSwitchProgramSession::internal_run_program(const ProgramInfo& program_info){
+    options().reset_state();
 
     SleepSuppressScope sleep_scope(GlobalSettings::instance().SLEEP_SUPPRESS->PROGRAM_RUNNING);
 
-    ProgramInfo program_info(
-        identifier(),
-        m_descriptor.category(),
-        m_descriptor.display_name(),
-        last_state_change()
-    );
     SingleSwitchProgramEnvironment env(
         program_info,
         *m_scope,
@@ -177,32 +148,29 @@ void SingleSwitchProgramSession::internal_run_program(){
         current_stats_tracker(), historical_stats_tracker(),
         m_system
     );
-
     if (ConsoleSettings::instance().TRUST_USER_CONSOLE_SELECTION){
         env.console.state().set_console_type(m_system.logger(), m_system.console_type());
     }else{
         env.console.state().set_console_type_user(m_system.console_type());
     }
 
-
     try{
         logger().log("<b>Starting Program: " + identifier() + "</b>");
-        env.console.overlay().clear_log();
-        env.console.overlay().add_log("- Starting Program -");
-        run_program_instance(env, *m_scope);
-        env.console.overlay().add_log("- Program Finished -");
+        env.log_to_ui("- Starting Program -");
+        run_program_instance(static_cast<SingleSwitchProgramEnvironment&>(env));
+        env.log_to_ui("- Program Finished -");
         logger().log("Program finished normally!", COLOR_BLUE);
     }catch (OperationCancelledException&){
-        env.console.overlay().add_log("- Program Stopped -");
+        env.log_to_ui("- Program Stopped -");
     }catch (ProgramCancelledException&){
-        env.console.overlay().add_log("- Program Stopped -");
+        env.log_to_ui("- Program Stopped -");
     }catch (ProgramFinishedException& e){
         logger().log("Program finished early!", COLOR_BLUE);
-        env.console.overlay().add_log("- Program Finished -");
+        env.log_to_ui("- Program Finished -");
         send_program_finished_notification(env, m_instance->NOTIFICATION_PROGRAM_FINISH, e.message(), *e.screenshot());
     }catch (InvalidConnectionStateException& e){
         logger().log("Program stopped due to connection issue.", COLOR_RED);
-        env.console.overlay().add_log("- Invalid Connection -", COLOR_RED);
+        env.log_to_ui("- Invalid Connection -", COLOR_RED);
         std::string message = e.message();
         if (message.empty()){
             message = e.name();
@@ -210,7 +178,7 @@ void SingleSwitchProgramSession::internal_run_program(){
         report_error(message);
     }catch (OperationFailedExceptionWithScreenshot& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
-        env.console.overlay().add_log("- Program Error -", COLOR_RED);
+        env.log_to_ui("- Program Error -", COLOR_RED);
 
         std::string message = e.message();
         if (message.empty()){
@@ -220,7 +188,7 @@ void SingleSwitchProgramSession::internal_run_program(){
         e.send_fatal_error_notif_and_telemetry_report(env, m_instance->NOTIFICATION_ERROR_FATAL);
     }catch (OperationFailedException& e){ // no screenshot
         logger().log("Program stopped with an exception!", COLOR_RED);
-        env.console.overlay().add_log("- Program Error -", COLOR_RED);
+        env.log_to_ui("- Program Error -", COLOR_RED);
 
         std::string message = e.message();
         if (message.empty()){
@@ -230,7 +198,7 @@ void SingleSwitchProgramSession::internal_run_program(){
         e.send_fatal_error_notif_and_telemetry_report(env, m_instance->NOTIFICATION_ERROR_FATAL);
     }catch (FatalProgramException& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
-        env.console.overlay().add_log("- Program Error -", COLOR_RED);
+        env.log_to_ui("- Program Error -", COLOR_RED);
 
         std::string message = e.message();
         if (message.empty()){
@@ -240,7 +208,7 @@ void SingleSwitchProgramSession::internal_run_program(){
         e.send_fatal_error_notif_and_telemetry_report(env, m_instance->NOTIFICATION_ERROR_FATAL);
     }catch (Exception& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
-        env.console.overlay().add_log("- Program Error -", COLOR_RED);
+        env.log_to_ui("- Program Error -", COLOR_RED);
         std::string message = e.message();
         if (message.empty()){
             message = e.name();
@@ -253,7 +221,7 @@ void SingleSwitchProgramSession::internal_run_program(){
     }
     catch (std::exception& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
-        env.console.overlay().add_log("- Program Error -", COLOR_RED);
+        env.log_to_ui("- Program Error -", COLOR_RED);
         std::string message = e.what();
         if (message.empty()){
             message = "Unknown std::exception.";
@@ -265,7 +233,7 @@ void SingleSwitchProgramSession::internal_run_program(){
         );
     }catch (...){
         logger().log("Program stopped with an exception!", COLOR_RED);
-        env.console.overlay().add_log("- Unknown Error -", COLOR_RED);
+        env.log_to_ui("- Unknown Error -", COLOR_RED);
         report_error("Unknown error.");
         send_program_fatal_error_notification(
             env, m_instance->NOTIFICATION_ERROR_FATAL,

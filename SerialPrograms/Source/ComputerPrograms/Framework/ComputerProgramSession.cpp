@@ -36,7 +36,7 @@ ComputerProgramSession::~ComputerProgramSession(){
 
 
 ConfigOption& ComputerProgramSession::options(){
-    return m_instance->m_options;
+    return m_instance->options();
 }
 std::string ComputerProgramSession::check_validity() const{
     return m_instance->check_validity();
@@ -62,50 +62,19 @@ void ComputerProgramSession::load_json(const JsonValue& json){
 }
 
 
-void ComputerProgramSession::run_program_instance(ProgramEnvironment& env, CancellableScope& scope){
+void ComputerProgramSession::run_program_instance(ProgramEnvironment& env){
     {
         std::lock_guard<Mutex> lg(program_lock());
         std::string error = check_validity();
         if (!error.empty()){
             throw UserSetupError(logger(), std::move(error));
         }
-        if (current_state() != ProgramState::RUNNING){
-            return;
-        }
     }
-
-    m_instance->program(env, scope);
+    m_instance->program(env, *m_scope);
 }
-void ComputerProgramSession::internal_stop_program(){
-    {
-        std::lock_guard<Mutex> lg(program_lock());
-        if (m_scope != nullptr){
-            m_scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
-        }
-    }
-    wait_for_finish();
-}
-void ComputerProgramSession::internal_run_program(){
-    RunningProgramScope running_scope(*this);
-
-    {
-        std::lock_guard<Mutex> lg(program_lock());
-        if (current_state() != ProgramState::RUNNING){
-            return;
-        }
-    }
-    if (!download_prereqs(*m_scope)){
-        return;
-    }
-
+void ComputerProgramSession::internal_run_program(const ProgramInfo& program_info){
     options().reset_state();
 
-    ProgramInfo program_info(
-        identifier(),
-        m_descriptor.category(),
-        m_descriptor.display_name(),
-        last_state_change()
-    );
     ProgramEnvironment env(
         program_info,
         *this,
@@ -114,7 +83,7 @@ void ComputerProgramSession::internal_run_program(){
 
     try{
         logger().log("<b>Starting Program: " + identifier() + "</b>");
-        run_program_instance(env, *m_scope);
+        run_program_instance(env);
 //        m_setup->wait_for_all_requests();
         logger().log("Program finished normally!", COLOR_BLUE);
     }catch (OperationCancelledException&){

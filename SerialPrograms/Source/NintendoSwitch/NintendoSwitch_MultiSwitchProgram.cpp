@@ -91,15 +91,9 @@ void MultiSwitchProgramEnvironment::run_in_parallel(
     );
 }
 
-void MultiSwitchProgramEnvironment::add_overlay_log_to_all_consoles(const std::string& message, Color color){
+void MultiSwitchProgramEnvironment::log_to_ui(const std::string& message, Color color){
     for (auto&console: consoles){
         console.overlay().add_log(message, color);
-    }
-}
-
-void MultiSwitchProgramEnvironment::clear_all_overlay_logs(){
-    for (auto&console: consoles){
-        console.overlay().clear_log();
     }
 }
 
@@ -142,31 +136,6 @@ std::unique_ptr<PanelSession> MultiSwitchProgramDescriptor::make_panel() const{
 
 
 
-MultiSwitchProgramInstance::~MultiSwitchProgramInstance() = default;
-MultiSwitchProgramInstance::MultiSwitchProgramInstance(
-    const std::vector<std::string>& error_notification_tags
-)
-    : m_options(LockMode::UNLOCK_WHILE_RUNNING)
-    , NOTIFICATION_PROGRAM_FINISH(
-        "Program Finished",
-        true, true,
-        ImageAttachmentMode::JPG,
-        {"Notifs"}
-    )
-    , NOTIFICATION_ERROR_RECOVERABLE(
-        "Program Error (Recoverable)",
-        true, false,
-        ImageAttachmentMode::PNG,
-        error_notification_tags
-    )
-    , NOTIFICATION_ERROR_FATAL(
-        "Program Error (Fatal)",
-        true, true,
-        ImageAttachmentMode::PNG,
-        error_notification_tags
-    )
-{}
-
 
 void MultiSwitchProgramInstance::start_program_controller_check(
     ControllerSession& session, size_t console_index
@@ -194,26 +163,6 @@ void MultiSwitchProgramInstance::start_program_border_check(
         StartProgramChecks::check_border(stream);
     }
 }
-
-
-void MultiSwitchProgramInstance::add_option(ConfigOption& option, std::string serialization_string){
-    m_options.add_option(option, std::move(serialization_string));
-}
-
-std::string MultiSwitchProgramInstance::check_validity() const{
-    return m_options.check_validity();
-}
-void MultiSwitchProgramInstance::restore_defaults(){
-    return m_options.restore_defaults();
-}
-JsonValue MultiSwitchProgramInstance::to_json() const{
-    return m_options.to_json();
-}
-void MultiSwitchProgramInstance::load_json(const JsonValue& json){
-    m_options.load_json(json);
-}
-
-
 
 
 

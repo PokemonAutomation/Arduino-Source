@@ -141,7 +141,7 @@ void sort(
     Milliseconds GAME_DELAY
 ){
     env.log("Start sorting...");
-    env.add_overlay_log("Start Sorting...");
+    env.log_to_ui("Start Sorting...");
 
     std::ostringstream ss;
     // this need to be separated into functions when I will redo the whole thing but I just wanted it to work
@@ -245,7 +245,7 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
             dest_cursor = {0, first_pokemon_slot[0], first_pokemon_slot[1]};
             nav_cursor = move_cursor_to(env, context, nav_cursor, dest_cursor, GAME_DELAY);
 
-            env.add_overlay_log("Checking Summary...");
+            env.log_to_ui("Checking Summary...");
 
             pbf_press_button(context, BUTTON_A, 80ms, GAME_DELAY);
             context.wait_for_all_requests();

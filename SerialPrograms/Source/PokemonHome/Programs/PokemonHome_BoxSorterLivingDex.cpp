@@ -267,7 +267,7 @@ bool BoxSorterLivingDex::is_viable_for_dex(
             dest_cursor = { starting_box + box_idx, first_pokemon_slot[0], first_pokemon_slot[1] };
             nav_cursor = move_cursor_to(env, context, nav_cursor, dest_cursor, GAME_DELAY);
 
-            env.add_overlay_log("Checking Summary...");
+            env.log_to_ui("Checking Summary...");
 
             pbf_press_button(context, BUTTON_A, 80ms, GAME_DELAY);
             context.wait_for_all_requests();

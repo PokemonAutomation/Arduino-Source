@@ -28,6 +28,7 @@
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "CommonFramework/Globals.h"
 //#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 // #include "CommonFramework/ResourceDownload/ProgramMissingResourceTracker.h"
 #include "Integrations/ProgramTrackerInterfaces.h"
 
@@ -117,8 +118,8 @@ public:
 
 
 protected:
-    virtual void internal_run_program() = 0;
-    virtual void internal_stop_program() = 0;
+    virtual void internal_run_program(const ProgramInfo& program_info) = 0;
+    virtual void internal_stop_program();
 
 //    virtual void restore_defaults(){ return; }
 
@@ -175,7 +176,6 @@ private:
 
 
 protected:
-
     class RunningProgramScope{
     public:
         RunningProgramScope(ProgramSession& session);

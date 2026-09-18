@@ -215,10 +215,10 @@ bool DonutMaker::match_powers(
         FlavorPowerDetector read_power(env.logger(), COLOR_GREEN, LANGUAGE, i);
         const std::string power = read_power.detect_power(screen);
         if (power.empty()){
-            env.add_overlay_log(std::format("{}: Empty", i+1));
+            env.log_to_ui(std::format("{}: Empty", i+1));
             continue;
         }
-        env.add_overlay_log(std::format("{}: {}", i+1, power));
+        env.log_to_ui(std::format("{}: {}", i+1, power));
         donut_results.push_back(power);
     }
 
@@ -290,7 +290,7 @@ void DonutMaker::animation_to_donut(SingleSwitchProgramEnvironment& env, ProCont
     pbf_mash_button(context, BUTTON_A, Seconds(3));
     context.wait_for_all_requests();
 
-    env.add_overlay_log("Waiting for Flavor Power Screen...");
+    env.log_to_ui("Waiting for Flavor Power Screen...");
 
     FlavorPowerScreenWatcher flavor_power_screen_watcher;
     int ret = run_until<ProControllerContext>(
@@ -312,12 +312,12 @@ void DonutMaker::animation_to_donut(SingleSwitchProgramEnvironment& env, ProCont
         );
     }
     env.log("Found donut flavor power screen");
-    env.add_overlay_log("Detected Flavor Power Screen");
+    env.log_to_ui("Detected Flavor Power Screen");
 
     // Wait for the UI animation for revealing flavor powers to play out
     pbf_wait(context, Seconds(3));
     context.wait_for_all_requests();
-    env.add_overlay_log("Read Flavor Powers");
+    env.log_to_ui("Read Flavor Powers");
 #endif
 }
 
@@ -389,7 +389,7 @@ void DonutMaker::open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env,
             break;
         case 2:
             env.log("Berry selection menu shown.");
-            env.add_overlay_log("Found Berry Selection Menu");
+            env.log_to_ui("Found Berry Selection Menu");
             return;
         case 3: case 4:
             env.log("Detected selection arrow for Bad Dreams/Alpha/Omega/Delta recipe.");
