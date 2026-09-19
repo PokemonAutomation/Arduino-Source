@@ -10,6 +10,7 @@
 #include "Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
 #include "Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "Inference/Dialogs/PokemonFRLG_PrizeSelectDetector.h"
+#include "Inference/Menus/PokemonFRLG_PartyMenuDetector.h"
 #include "Inference/PokemonFRLG_BattleLevelUpReader.h"
 #include "Inference/PokemonFRLG_PartyLevelUpReader.h"
 #include "Inference/PokemonFRLG_ShinySymbolDetector.h"
@@ -39,6 +40,7 @@ void add_tests(UnitTestDatabase& database){
     add_tests_TrainerIdReader(database);
     add_tests_PartyLevelUpReader(database);
     add_tests_BattleLevelUpReader(database);
+    add_tests_PartySlotDetector(database);
 }
 
 
