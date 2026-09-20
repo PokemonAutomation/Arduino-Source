@@ -28,6 +28,7 @@ public:
 
 class LZA_TurboMacro : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = LZA_TurboMacro_Descriptor;
     LZA_TurboMacro();
 
     virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
@@ -54,4 +55,4 @@ private:
 }
 }
 }
-#endif // PokemonAutomation_PokemonLZA_TurboMacro_H
+#endif

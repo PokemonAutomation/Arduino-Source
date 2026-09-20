@@ -16,14 +16,7 @@
 #include "PokemonLZA/Options/PokemonLZA_BattleAIOption.h"
 
 namespace PokemonAutomation{
-
-template <typename Type> class ControllerContext;
-
 namespace NintendoSwitch{
-
-class ProController;
-using ProControllerContext = ControllerContext<ProController>;
-
 namespace PokemonLZA{
 
 
@@ -38,6 +31,7 @@ public:
 
 class JacintheInfiniteFarmer : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = JacintheInfiniteFarmer_Descriptor;
     JacintheInfiniteFarmer();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

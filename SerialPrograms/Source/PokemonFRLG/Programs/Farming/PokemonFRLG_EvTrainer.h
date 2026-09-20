@@ -29,6 +29,7 @@ public:
 
 class EvTrainer : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = EvTrainer_Descriptor;
     EvTrainer();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
     virtual void start_program_border_check(

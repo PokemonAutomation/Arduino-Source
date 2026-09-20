@@ -7,9 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousRegigigas2_H
 #define PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousRegigigas2_H
 
-#include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
@@ -34,6 +32,7 @@ public:
 
 class ShinyHuntAutonomousRegigigas2 : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ShinyHuntAutonomousRegigigas2_Descriptor;
     ShinyHuntAutonomousRegigigas2();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

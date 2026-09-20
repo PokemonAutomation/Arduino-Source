@@ -27,6 +27,7 @@ public:
 
 class DistortionWaiter : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = DistortionWaiter_Descriptor;
     DistortionWaiter();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

@@ -51,6 +51,7 @@ public:
 
 class StatsResetEventBattle : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = StatsResetEventBattle_Descriptor;
     StatsResetEventBattle();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

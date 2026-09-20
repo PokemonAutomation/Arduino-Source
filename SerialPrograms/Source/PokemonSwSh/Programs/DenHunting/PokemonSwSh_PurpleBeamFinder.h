@@ -32,6 +32,7 @@ public:
 
 class PurpleBeamFinder : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = PurpleBeamFinder_Descriptor;
     PurpleBeamFinder();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

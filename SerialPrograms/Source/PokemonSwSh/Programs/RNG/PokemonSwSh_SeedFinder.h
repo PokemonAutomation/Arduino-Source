@@ -26,6 +26,7 @@ public:
 
 class SeedFinder : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = SeedFinder_Descriptor;
     SeedFinder();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

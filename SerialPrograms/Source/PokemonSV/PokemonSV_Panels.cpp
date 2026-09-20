@@ -90,43 +90,43 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_OptionsPanel<GameSettingsPanel>());
 
     ret.emplace_back("---- General ----");
-    ret.emplace_back(make_single_switch_program<MassPurchase_Descriptor, MassPurchase>());
-    ret.emplace_back(make_single_switch_program<ClothingBuyer_Descriptor, ClothingBuyer>());
-    ret.emplace_back(make_single_switch_program<AutonomousBallThrower_Descriptor, AutonomousBallThrower>());
-    ret.emplace_back(make_single_switch_program<SizeChecker_Descriptor, SizeChecker>());
+    ret.emplace_back(make_SingleSwitchProgram<MassPurchase>());
+    ret.emplace_back(make_SingleSwitchProgram<ClothingBuyer>());
+    ret.emplace_back(make_SingleSwitchProgram<AutonomousBallThrower>());
+    ret.emplace_back(make_SingleSwitchProgram<SizeChecker>());
 
 //    ret.emplace_back("---- Trading ----");
     ret.emplace_back(make_MultiSwitchProgram<SelfBoxTrade>());
 
 //    ret.emplace_back("---- Sandwiches ----");
-    ret.emplace_back(make_single_switch_program<SandwichMaker_Descriptor, SandwichMaker>());
+    ret.emplace_back(make_SingleSwitchProgram<SandwichMaker>());
 
     ret.emplace_back("---- Boxes ----");
-    ret.emplace_back(make_single_switch_program<MassRelease_Descriptor, MassRelease>());
-    ret.emplace_back(make_single_switch_program<MassAttachItems_Descriptor, MassAttachItems>());
+    ret.emplace_back(make_SingleSwitchProgram<MassRelease>());
+    ret.emplace_back(make_SingleSwitchProgram<MassAttachItems>());
 
     ret.emplace_back("---- Farming ----");
-    ret.emplace_back(make_single_switch_program<LPFarmer_Descriptor, LPFarmer>());
-    ret.emplace_back(make_single_switch_program<GimmighoulRoamingFarmer_Descriptor, GimmighoulRoamingFarmer>());
-    ret.emplace_back(make_single_switch_program<GimmighoulChestFarmer_Descriptor, GimmighoulChestFarmer>());
-    ret.emplace_back(make_single_switch_program<AuctionFarmer_Descriptor, AuctionFarmer>());
-    ret.emplace_back(make_single_switch_program<ESPTraining_Descriptor, ESPTraining>());
-    ret.emplace_back(make_single_switch_program<TournamentFarmer_Descriptor, TournamentFarmer>());
-    ret.emplace_back(make_single_switch_program<TournamentFarmer2_Descriptor, TournamentFarmer2>());
-    ret.emplace_back(make_single_switch_program<FlyingTrialFarmer_Descriptor, FlyingTrialFarmer>());
-    ret.emplace_back(make_single_switch_program<BBQSoloFarmer_Descriptor, BBQSoloFarmer>());
-    ret.emplace_back(make_single_switch_program<MaterialFarmer_Descriptor, MaterialFarmer>());
-    ret.emplace_back(make_single_switch_program<ItemPrinterRNG_Descriptor, ItemPrinterRNG>());
+    ret.emplace_back(make_SingleSwitchProgram<LPFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<GimmighoulRoamingFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<GimmighoulChestFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<AuctionFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<ESPTraining>());
+    ret.emplace_back(make_SingleSwitchProgram<TournamentFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<TournamentFarmer2>());
+    ret.emplace_back(make_SingleSwitchProgram<FlyingTrialFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<BBQSoloFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<MaterialFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<ItemPrinterRNG>());
 
     ret.emplace_back("---- Eggs ----");
-    ret.emplace_back(make_single_switch_program<EggFetcher_Descriptor, EggFetcher>());
-    ret.emplace_back(make_single_switch_program<EggHatcher_Descriptor, EggHatcher>());
-    ret.emplace_back(make_single_switch_program<EggAutonomous_Descriptor, EggAutonomous>());
+    ret.emplace_back(make_SingleSwitchProgram<EggFetcher>());
+    ret.emplace_back(make_SingleSwitchProgram<EggHatcher>());
+    ret.emplace_back(make_SingleSwitchProgram<EggAutonomous>());
 
     ret.emplace_back("---- Tera Raids ----");
-    ret.emplace_back(make_single_switch_program<AutoHost_Descriptor, AutoHost>());
-    ret.emplace_back(make_single_switch_program<TeraRoller_Descriptor, TeraRoller>());
-    ret.emplace_back(make_single_switch_program<TeraSelfFarmer_Descriptor, TeraSelfFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<AutoHost>());
+    ret.emplace_back(make_SingleSwitchProgram<TeraRoller>());
+    ret.emplace_back(make_SingleSwitchProgram<TeraSelfFarmer>());
     ret.emplace_back(make_MultiSwitchProgram<TeraMultiFarmer>());
 
     ret.emplace_back("---- Fast Code Entry ----");
@@ -135,28 +135,28 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_MultiSwitchProgram<VideoFastCodeEntry>());
 
     ret.emplace_back("---- Stats Hunting ----");
-    ret.emplace_back(make_single_switch_program<StatsReset_Descriptor, StatsReset>());
-    ret.emplace_back(make_single_switch_program<StatsResetEventBattle_Descriptor, StatsResetEventBattle>());
+    ret.emplace_back(make_SingleSwitchProgram<StatsReset>());
+    ret.emplace_back(make_SingleSwitchProgram<StatsResetEventBattle>());
 
     ret.emplace_back("---- Shiny Hunting ----");
-    ret.emplace_back(make_single_switch_program<ShinyHuntAreaZeroPlatform_Descriptor, ShinyHuntAreaZeroPlatform>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntScatterbug_Descriptor, ShinyHuntScatterbug>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHuntAreaZeroPlatform>());
+    ret.emplace_back(make_SingleSwitchProgram< ShinyHuntScatterbug>());
 
     ret.emplace_back("---- Story Automation ----");
-    ret.emplace_back(make_single_switch_program<AutoStory_Descriptor, AutoStory>());
-    ret.emplace_back(make_single_switch_program<ClaimMysteryGift_Descriptor, ClaimMysteryGift>());
+    ret.emplace_back(make_SingleSwitchProgram<AutoStory>());
+    ret.emplace_back(make_SingleSwitchProgram<ClaimMysteryGift>());
 
     ret.emplace_back("---- Glitches (v3.0.0) ----");
-    ret.emplace_back(make_single_switch_program<WildItemFarmer_Descriptor, WildItemFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<WildItemFarmer>());
 
     ret.emplace_back("---- Glitches (v1.0.1) ----");
-    ret.emplace_back(make_single_switch_program<RideCloner101_Descriptor, RideCloner101>());
-    ret.emplace_back(make_single_switch_program<CloneItems101_Descriptor, CloneItems101>());
+    ret.emplace_back(make_SingleSwitchProgram<RideCloner101>());
+    ret.emplace_back(make_SingleSwitchProgram< CloneItems101>());
 
 //    ret.emplace_back("---- Public Betas ----");
 
     ret.emplace_back("---- Deprecated Programs ----");
-    ret.emplace_back(make_single_switch_program<AutoItemPrinter_Descriptor, AutoItemPrinter>());
+    ret.emplace_back(make_SingleSwitchProgram<AutoItemPrinter>());
 
 //    if (STATIC_GLOBALS.DEVELOPER_MODE || IS_BETA_VERSION){
 //        ret.emplace_back("---- Untested/Beta/WIP ----");
@@ -166,8 +166,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 //    }
     if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
-        ret.emplace_back(make_single_switch_program<SoundListener_Descriptor, SoundListener>());
-        ret.emplace_back(make_single_switch_program<ThreeSegmentDudunsparceFinder_Descriptor, ThreeSegmentDudunsparceFinder>());
+        ret.emplace_back(make_SingleSwitchProgram<SoundListener>());
+        ret.emplace_back(make_SingleSwitchProgram<ThreeSegmentDudunsparceFinder>());
     }
 
 #ifdef PA_OFFICIAL

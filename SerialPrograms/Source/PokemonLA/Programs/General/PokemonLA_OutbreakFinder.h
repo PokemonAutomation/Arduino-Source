@@ -29,6 +29,7 @@ public:
 
 class OutbreakFinder : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = OutbreakFinder_Descriptor;
     OutbreakFinder();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

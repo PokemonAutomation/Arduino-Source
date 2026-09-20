@@ -26,6 +26,7 @@ public:
 
 class BerryFarmer : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = BerryFarmer_Descriptor;
     BerryFarmer();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

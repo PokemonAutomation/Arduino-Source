@@ -25,6 +25,7 @@ public:
 
 class MultiGameFossil : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = MultiGameFossil_Descriptor;
     MultiGameFossil();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

@@ -11,8 +11,6 @@
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "PokemonLA/PokemonLA_Locations.h"
-#include "PokemonLA/PokemonLA_TravelLocations.h"
 #include "PokemonLA/Options/PokemonLA_MiscOptions.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 #include "PokemonLA/Options/PokemonLA_TravelLocation.h"
@@ -33,6 +31,7 @@ public:
 
 class ShinyHuntFlagPin : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ShinyHuntFlagPin_Descriptor;
     ShinyHuntFlagPin();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

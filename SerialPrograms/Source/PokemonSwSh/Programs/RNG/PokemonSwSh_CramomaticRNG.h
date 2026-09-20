@@ -40,6 +40,7 @@ struct CramomaticTarget{
 
 class CramomaticRNG : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = CramomaticRNG_Descriptor;
     CramomaticRNG();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

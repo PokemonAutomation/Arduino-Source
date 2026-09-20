@@ -27,6 +27,7 @@ public:
 
 class ShinyHuntMew : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ShinyHuntMew_Descriptor;
     ShinyHuntMew();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

@@ -34,6 +34,7 @@ public:
 
 class ShinyHuntAutonomousBerryTree : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ShinyHuntAutonomousBerryTree_Descriptor;
     ShinyHuntAutonomousBerryTree();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

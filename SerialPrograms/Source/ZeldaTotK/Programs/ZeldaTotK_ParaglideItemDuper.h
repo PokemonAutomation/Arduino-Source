@@ -26,6 +26,7 @@ public:
 
 class ParaglideItemDuper : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ParaglideItemDuper_Descriptor;
     ParaglideItemDuper();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

@@ -12,7 +12,6 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "PokemonSwSh_EggHelpers.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -28,6 +27,7 @@ public:
 
 class GodEggItemDupe : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = GodEggItemDupe_Descriptor;
     GodEggItemDupe();
 
     void collect_godegg(ProControllerContext& context, uint8_t party_slot, bool map_to_pokemon, bool pokemon_to_map) const;

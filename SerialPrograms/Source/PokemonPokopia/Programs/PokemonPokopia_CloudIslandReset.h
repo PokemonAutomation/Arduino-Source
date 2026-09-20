@@ -36,6 +36,7 @@ public:
 
 class CloudIslandReset : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = CloudIslandReset_Descriptor;
     CloudIslandReset();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

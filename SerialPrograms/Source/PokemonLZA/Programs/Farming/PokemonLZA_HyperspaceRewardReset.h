@@ -10,7 +10,6 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "PokemonLZA/Options/PokemonLZA_HyperspaceRewardTable.h"
 
 namespace PokemonAutomation{
@@ -26,6 +25,7 @@ public:
 
 class HyperspaceRewardReset : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = HyperspaceRewardReset_Descriptor;
     HyperspaceRewardReset();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

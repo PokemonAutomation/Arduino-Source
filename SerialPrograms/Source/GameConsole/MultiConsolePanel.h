@@ -124,8 +124,8 @@ protected:
 
 
 
-template <typename Descriptor, typename Instance>
-class MultiConsolePanelWrapper : public Descriptor{
+template <typename Instance>
+class MultiConsolePanelWrapper : public Instance::Descriptor{
 public:
     virtual std::unique_ptr<MultiConsolePanelInstance> make_instance(
         MultiConsoleSystemSession& system
@@ -138,9 +138,9 @@ public:
     }
 };
 
-template <typename Descriptor, typename Instance>
+template <typename Instance>
 std::unique_ptr<PanelDescriptor> make_MultiConsolePanel(){
-    return std::make_unique<MultiConsolePanelWrapper<Descriptor, Instance>>();
+    return std::make_unique<MultiConsolePanelWrapper<Instance>>();
 }
 
 

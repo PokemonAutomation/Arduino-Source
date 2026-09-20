@@ -113,8 +113,8 @@ public:
 
 
 
-template <typename Descriptor, typename Instance>
-class SingleSwitchProgramWrapper : public Descriptor{
+template <typename Instance>
+class SingleSwitchProgramWrapper : public Instance::Descriptor{
 public:
     virtual std::unique_ptr<SingleSwitchProgramInstance> make_instance(
         SwitchSystemSession& system
@@ -128,9 +128,9 @@ public:
 };
 
 // Create a program PanelDescriptor
-template <typename Descriptor, typename Instance>
-std::unique_ptr<PanelDescriptor> make_single_switch_program(){
-    return std::make_unique<SingleSwitchProgramWrapper<Descriptor, Instance>>();
+template <typename Instance>
+std::unique_ptr<PanelDescriptor> make_SingleSwitchProgram(){
+    return std::make_unique<SingleSwitchProgramWrapper<Instance>>();
 }
 
 

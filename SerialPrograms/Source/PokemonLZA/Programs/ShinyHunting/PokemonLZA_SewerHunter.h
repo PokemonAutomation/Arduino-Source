@@ -30,6 +30,7 @@ public:
 
 class ShinyHunt_SewerHunter : public SingleSwitchProgramInstance {
 public:
+    using Descriptor = ShinyHunt_SewerHunter_Descriptor;
     ShinyHunt_SewerHunter();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

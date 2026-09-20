@@ -14,14 +14,11 @@
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonTools/Options/LanguageOCROption.h"
 #include "CommonTools/Options/StringSelectTableOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Pokemon_Xoroshiro128Plus.h"
-#include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
-#include "PokemonSwSh/Resources/PokemonSwSh_DailyHighlightDatabase.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -38,6 +35,7 @@ public:
 
 class DailyHighlightRNG : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = DailyHighlightRNG_Descriptor;
     DailyHighlightRNG();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

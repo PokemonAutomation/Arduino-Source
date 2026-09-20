@@ -29,6 +29,7 @@ public:
 
 class TradeBot : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = TradeBot_Descriptor;
     TradeBot();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

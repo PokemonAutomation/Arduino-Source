@@ -9,8 +9,6 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
-#include "PokemonLA/Inference/PokemonLA_MountDetector.h"
-#include "PokemonLA/Inference/PokemonLA_UnderAttackDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -26,6 +24,7 @@ public:
 
 class UnownFinder : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = UnownFinder_Descriptor;
     UnownFinder();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

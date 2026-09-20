@@ -22,6 +22,7 @@ public:
 
 class PokedexTasksReader : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = PokedexTasksReader_Descriptor;
     PokedexTasksReader();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

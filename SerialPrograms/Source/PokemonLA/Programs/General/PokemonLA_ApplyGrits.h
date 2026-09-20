@@ -24,6 +24,7 @@ public:
 
 class ApplyGrits : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ApplyGrits_Descriptor;
     ApplyGrits();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

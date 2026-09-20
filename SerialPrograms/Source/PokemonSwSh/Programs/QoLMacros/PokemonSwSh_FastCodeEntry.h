@@ -25,6 +25,7 @@ public:
 
 class FastCodeEntry : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = FastCodeEntry_Descriptor;
     FastCodeEntry();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

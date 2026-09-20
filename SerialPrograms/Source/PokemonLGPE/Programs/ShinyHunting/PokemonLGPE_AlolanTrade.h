@@ -26,6 +26,7 @@ public:
 
 class AlolanTrade : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = AlolanTrade_Descriptor;
     AlolanTrade();
     virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 

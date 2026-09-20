@@ -37,6 +37,7 @@ public:
 
 class RideCloner101 : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = RideCloner101_Descriptor;
     RideCloner101();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

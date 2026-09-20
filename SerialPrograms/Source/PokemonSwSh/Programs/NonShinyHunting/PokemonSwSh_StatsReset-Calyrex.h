@@ -35,6 +35,7 @@ public:
 
 class StatsResetCalyrex : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = StatsResetCalyrex_Descriptor;
     StatsResetCalyrex();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

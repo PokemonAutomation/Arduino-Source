@@ -34,6 +34,7 @@ enum class MultiSpawn{
 
 class AutoMultiSpawn : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = AutoMultiSpawn_Descriptor;
     AutoMultiSpawn();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

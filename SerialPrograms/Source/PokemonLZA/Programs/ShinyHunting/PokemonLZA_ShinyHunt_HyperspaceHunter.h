@@ -14,7 +14,6 @@
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "Controllers/ControllerStateTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 #include "PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.h"
@@ -35,6 +34,7 @@ public:
 
 class ShinyHunt_HyperspaceHunter : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ShinyHunt_HyperspaceHunter_Descriptor;
     ShinyHunt_HyperspaceHunter();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

@@ -49,6 +49,7 @@ public:
 
 class TeraSelfFarmer : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
+    using Descriptor = TeraSelfFarmer_Descriptor;
     ~TeraSelfFarmer();
     TeraSelfFarmer();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

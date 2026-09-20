@@ -28,6 +28,7 @@ public:
 
 class PostMMOSpawnReset : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = PostMMOSpawnReset_Descriptor;
     PostMMOSpawnReset();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

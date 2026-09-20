@@ -36,6 +36,7 @@ public:
 
 class AutoHost : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = AutoHost_Descriptor;
     AutoHost();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

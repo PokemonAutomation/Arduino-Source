@@ -26,6 +26,7 @@ public:
 
 class FlagNavigationTest : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = FlagNavigationTest_Descriptor;
     FlagNavigationTest();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

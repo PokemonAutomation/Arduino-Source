@@ -43,22 +43,22 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     //ret.emplace_back("---- General ----");
 
     ret.emplace_back("---- Shiny Hunting (Ruby/Sapphire) ----"); //Remove RS only if E is fixed
-    ret.emplace_back(make_single_switch_program<AudioStarterReset_Descriptor, AudioStarterReset>());
-    ret.emplace_back(make_single_switch_program<LegendaryReset_Descriptor, LegendaryReset>());
-    ret.emplace_back(make_single_switch_program<GiftReset_Descriptor, GiftReset>());
+    ret.emplace_back(make_SingleSwitchProgram<AudioStarterReset>());
+    ret.emplace_back(make_SingleSwitchProgram<LegendaryReset>());
+    ret.emplace_back(make_SingleSwitchProgram<GiftReset>());
 
     ret.emplace_back("---- Shiny Hunting (Emerald only) ----");
-    ret.emplace_back(make_single_switch_program<LegendaryRunAwayEmerald_Descriptor, LegendaryRunAwayEmerald>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntDeoxys_Descriptor, ShinyHuntDeoxys>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntMew_Descriptor, ShinyHuntMew>());
+    ret.emplace_back(make_SingleSwitchProgram<LegendaryRunAwayEmerald>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHuntDeoxys>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHuntMew>());
     
 
     if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Test ----");
-        ret.emplace_back(make_single_switch_program<StarterReset_Descriptor, StarterReset>()); //outdated early test program
+        ret.emplace_back(make_SingleSwitchProgram<StarterReset>()); //outdated early test program
 
         ret.emplace_back("---- Developer Tools ----");
-        ret.emplace_back(make_single_switch_program<SoundListener_Descriptor, SoundListener>());
+        ret.emplace_back(make_SingleSwitchProgram<SoundListener>());
     }
 
     return ret;

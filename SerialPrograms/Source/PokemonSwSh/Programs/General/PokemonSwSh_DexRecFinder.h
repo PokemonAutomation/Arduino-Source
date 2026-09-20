@@ -45,6 +45,7 @@ public:
 
 class DexRecFinder : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = DexRecFinder_Descriptor;
     DexRecFinder();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

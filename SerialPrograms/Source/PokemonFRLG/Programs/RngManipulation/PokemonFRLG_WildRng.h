@@ -8,19 +8,15 @@
 #define PokemonAutomation_PokemonFRLG_WildRng_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
-#include "Common/Cpp/Options/TextEditOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "CommonTools/Options/StringSelectOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
-#include "Pokemon/Pokemon_StatsCalculation.h"
 #include "Pokemon/Pokemon_AdvRng.h"
 #include "PokemonFRLG_BlindNavigation.h"
-#include "PokemonFRLG_RngCalibration.h"
 #include "PokemonFRLG_RngDisplays.h"
 #include "PokemonFRLG_SeedsDatabase.h"
 
@@ -37,6 +33,7 @@ public:
 
 class WildRng : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = WildRng_Descriptor;
     WildRng();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
     virtual void start_program_border_check(

@@ -32,6 +32,7 @@ public:
 
 class AutoItemPrinter : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = AutoItemPrinter_Descriptor;
     AutoItemPrinter();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

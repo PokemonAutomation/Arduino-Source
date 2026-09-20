@@ -31,6 +31,7 @@ public:
 
 class ShinyHunt_FlySpotReset : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
+    using Descriptor = ShinyHunt_FlySpotReset_Descriptor;
     ShinyHunt_FlySpotReset();
 
     virtual ~ShinyHunt_FlySpotReset();

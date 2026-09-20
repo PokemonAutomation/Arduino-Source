@@ -28,6 +28,7 @@ public:
 
 class GenerateLocationNameOCR : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = GenerateLocationNameOCR_Descriptor;
     GenerateLocationNameOCR();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

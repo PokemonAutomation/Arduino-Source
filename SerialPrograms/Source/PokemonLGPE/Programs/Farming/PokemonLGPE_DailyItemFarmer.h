@@ -26,6 +26,7 @@ public:
 
 class DailyItemFarmer : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = DailyItemFarmer_Descriptor;
     DailyItemFarmer();
     virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 

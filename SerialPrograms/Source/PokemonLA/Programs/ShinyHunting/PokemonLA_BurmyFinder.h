@@ -29,6 +29,7 @@ public:
 
 class BurmyFinder : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = BurmyFinder_Descriptor;
     BurmyFinder();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

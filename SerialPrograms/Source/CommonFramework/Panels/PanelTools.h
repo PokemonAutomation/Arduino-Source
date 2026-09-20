@@ -70,8 +70,8 @@ struct PanelEntry{
 
 // Used by `make_panel()` to link the panel instance to the panel descriptor.
 // For more details, see `make_panel()` defined below.
-template <typename Descriptor, typename Instance>
-class PanelDescriptorWrapper : public Descriptor{
+template <typename Instance>
+class PanelDescriptorWrapper : public Instance::Descriptor{
 public:
     // Instance must be an inherited class of PanelSession and its constructor must be
     // Instance(const Descriptor&)
@@ -91,9 +91,9 @@ public:
 // Each panel descriptor instance should have implemented `make_panel()` to create the panel instance.
 // But writing this creation for each unique program implementation is repetitive. In stead, this function
 // uses `PanelDescriptorWrapper` to implement `make_panel()`.
-template <typename Descriptor, typename Instance>
+template <typename Instance>
 std::unique_ptr<PanelDescriptor> make_panel(){
-    return std::make_unique<PanelDescriptorWrapper<Descriptor, Instance>>();
+    return std::make_unique<PanelDescriptorWrapper<Instance>>();
 }
 
 

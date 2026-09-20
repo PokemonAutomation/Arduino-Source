@@ -27,6 +27,7 @@ public:
 
 class NuggetBridgeFarmer : public SingleSwitchProgramInstance {
 public:
+    using Descriptor = NuggetBridgeFarmer_Descriptor;
     NuggetBridgeFarmer();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
     virtual void start_program_border_check(

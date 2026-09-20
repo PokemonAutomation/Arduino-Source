@@ -29,6 +29,7 @@ public:
 
 class IngoMoveGrinder : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = IngoMoveGrinder_Descriptor;
     IngoMoveGrinder();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

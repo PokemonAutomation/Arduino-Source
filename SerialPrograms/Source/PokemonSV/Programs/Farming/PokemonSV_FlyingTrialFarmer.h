@@ -30,6 +30,7 @@ public:
 
 class FlyingTrialFarmer : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = FlyingTrialFarmer_Descriptor;
     FlyingTrialFarmer();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

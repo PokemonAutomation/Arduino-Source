@@ -22,6 +22,7 @@ public:
 
 class OverworldWatcher : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = OverworldWatcher_Descriptor;
     OverworldWatcher();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

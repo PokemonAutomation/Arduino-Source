@@ -26,6 +26,7 @@ public:
 
 class MineruItemDuper : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = MineruItemDuper_Descriptor;
     MineruItemDuper();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

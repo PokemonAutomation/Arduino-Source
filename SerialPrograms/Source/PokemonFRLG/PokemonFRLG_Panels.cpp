@@ -56,44 +56,44 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_OptionsPanel<GameSettingsPanel>());
 
     ret.emplace_back("---- Farming ----");
-    ret.emplace_back(make_single_switch_program<NuggetBridgeFarmer_Descriptor, NuggetBridgeFarmer>());
-    ret.emplace_back(make_single_switch_program<PickupFarmer_Descriptor, PickupFarmer>());
-    ret.emplace_back(make_single_switch_program<EvTrainer_Descriptor, EvTrainer>());
-    ret.emplace_back(make_single_switch_program<HeldItemFarmerSafariZone_Descriptor, HeldItemFarmerSafariZone>());
-    ret.emplace_back(make_single_switch_program<ItemDuplication_Descriptor, ItemDuplication>());
+    ret.emplace_back(make_SingleSwitchProgram<NuggetBridgeFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<PickupFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<EvTrainer>());
+    ret.emplace_back(make_SingleSwitchProgram<HeldItemFarmerSafariZone>());
+    ret.emplace_back(make_SingleSwitchProgram<ItemDuplication>());
 
     //ret.emplace_back("---- General ----");
 
     ret.emplace_back("---- Shiny Hunting  ----");
-    ret.emplace_back(make_single_switch_program<GiftReset_Descriptor, GiftReset>());
-    ret.emplace_back(make_single_switch_program<LegendaryReset_Descriptor, LegendaryReset>());
-    ret.emplace_back(make_single_switch_program<LegendaryRunAway_Descriptor, LegendaryRunAway>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntFishing_Descriptor, ShinyHuntFishing>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntOverworld_Descriptor, ShinyHuntOverworld>());
-    ret.emplace_back(make_single_switch_program<PrizeCornerReset_Descriptor, PrizeCornerReset>());
+    ret.emplace_back(make_SingleSwitchProgram<GiftReset>());
+    ret.emplace_back(make_SingleSwitchProgram<LegendaryReset>());
+    ret.emplace_back(make_SingleSwitchProgram<LegendaryRunAway>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHuntFishing>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHuntOverworld>());
+    ret.emplace_back(make_SingleSwitchProgram<PrizeCornerReset>());
 
     ret.emplace_back("---- RNG Manipulation  ----");
-    ret.emplace_back(make_single_switch_program<RngHelper_Descriptor, RngHelper>());
-    ret.emplace_back(make_single_switch_program<SidHelper_Descriptor, SidHelper>());
-    ret.emplace_back(make_single_switch_program<StarterRng_Descriptor, StarterRng>());
-    ret.emplace_back(make_single_switch_program<GiftRng_Descriptor, GiftRng>());
-    ret.emplace_back(make_single_switch_program<StaticRng_Descriptor, StaticRng>());
-    ret.emplace_back(make_single_switch_program<WildRng_Descriptor, WildRng>());
-    ret.emplace_back(make_single_switch_program<RoamingLegendaryRng_Descriptor, RoamingLegendaryRng>());
+    ret.emplace_back(make_SingleSwitchProgram<RngHelper>());
+    ret.emplace_back(make_SingleSwitchProgram<SidHelper>());
+    ret.emplace_back(make_SingleSwitchProgram<StarterRng>());
+    ret.emplace_back(make_SingleSwitchProgram<GiftRng>());
+    ret.emplace_back(make_SingleSwitchProgram<StaticRng>());
+    ret.emplace_back(make_SingleSwitchProgram<WildRng>());
+    ret.emplace_back(make_SingleSwitchProgram<RoamingLegendaryRng>());
 
     if (IS_BETA_VERSION || STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Untested/Beta/WIP ----");
-        ret.emplace_back(make_single_switch_program<EggRng_Descriptor, EggRng>());
+        ret.emplace_back(make_SingleSwitchProgram<EggRng>());
     }
 
     if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
-        ret.emplace_back(make_single_switch_program<SoundListener_Descriptor, SoundListener>());
-        ret.emplace_back(make_single_switch_program<ReadStats_Descriptor, ReadStats>());
-        ret.emplace_back(make_single_switch_program<ReadBattleLevelUp_Descriptor, ReadBattleLevelUp>());
-        ret.emplace_back(make_single_switch_program<ReadTrainerId_Descriptor, ReadTrainerId>());
-        ret.emplace_back(make_single_switch_program<ReadEncounter_Descriptor, ReadEncounter>());
-        ret.emplace_back(make_single_switch_program<SafariOptimalActionTest_Descriptor, SafariOptimalActionTest>());
+        ret.emplace_back(make_SingleSwitchProgram<SoundListener>());
+        ret.emplace_back(make_SingleSwitchProgram<ReadStats>());
+        ret.emplace_back(make_SingleSwitchProgram<ReadBattleLevelUp>());
+        ret.emplace_back(make_SingleSwitchProgram<ReadTrainerId>());
+        ret.emplace_back(make_SingleSwitchProgram<ReadEncounter>());
+        ret.emplace_back(make_SingleSwitchProgram<SafariOptimalActionTest>());
     }
 
     return ret;

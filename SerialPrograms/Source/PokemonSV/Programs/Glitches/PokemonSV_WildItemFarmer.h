@@ -28,6 +28,7 @@ public:
 
 class WildItemFarmer : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = WildItemFarmer_Descriptor;
     WildItemFarmer();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

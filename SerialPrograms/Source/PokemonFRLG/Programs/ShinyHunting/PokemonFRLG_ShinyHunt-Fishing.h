@@ -25,6 +25,7 @@ public:
 
 class ShinyHuntFishing : public SingleSwitchProgramInstance {
 public:
+    using Descriptor = ShinyHuntFishing_Descriptor;
     ShinyHuntFishing();
 
     void program(

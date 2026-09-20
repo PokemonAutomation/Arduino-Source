@@ -26,6 +26,7 @@ public:
 
 class LegendaryRunAwayEmerald : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = LegendaryRunAwayEmerald_Descriptor;
     LegendaryRunAwayEmerald();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

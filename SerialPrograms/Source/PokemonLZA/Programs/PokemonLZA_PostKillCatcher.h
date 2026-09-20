@@ -24,6 +24,7 @@ public:
 
 class PostKillCatcher : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = PostKillCatcher_Descriptor;
     PostKillCatcher();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

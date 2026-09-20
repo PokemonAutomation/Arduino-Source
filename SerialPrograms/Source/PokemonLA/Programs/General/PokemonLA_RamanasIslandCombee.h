@@ -29,6 +29,7 @@ public:
 
 class RamanasCombeeFinder: public SingleSwitchProgramInstance{
 public:
+    using Descriptor = RamanasCombeeFinder_Descriptor;
     RamanasCombeeFinder();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

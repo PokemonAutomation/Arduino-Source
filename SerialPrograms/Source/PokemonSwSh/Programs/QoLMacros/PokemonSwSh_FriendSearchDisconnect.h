@@ -24,6 +24,7 @@ public:
 
 class FriendSearchDisconnect : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = FriendSearchDisconnect_Descriptor;
     FriendSearchDisconnect();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

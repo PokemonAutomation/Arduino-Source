@@ -47,6 +47,7 @@ public:
 
 class GeneratePokemonImageTrainingData : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = GeneratePokemonImageTrainingData_Descriptor;
     GeneratePokemonImageTrainingData();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

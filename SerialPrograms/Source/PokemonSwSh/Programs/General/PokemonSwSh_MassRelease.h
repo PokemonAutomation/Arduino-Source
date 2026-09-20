@@ -26,6 +26,7 @@ public:
 
 class MassRelease : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = MassRelease_Descriptor;
     MassRelease();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

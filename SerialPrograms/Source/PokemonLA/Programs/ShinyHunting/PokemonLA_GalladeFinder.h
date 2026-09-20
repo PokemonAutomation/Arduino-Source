@@ -27,6 +27,7 @@ public:
 
 class GalladeFinder : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = GalladeFinder_Descriptor;
     GalladeFinder();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

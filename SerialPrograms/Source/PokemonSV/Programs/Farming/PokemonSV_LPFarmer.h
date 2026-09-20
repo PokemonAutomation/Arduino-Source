@@ -27,6 +27,7 @@ public:
 
 class LPFarmer : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = LPFarmer_Descriptor;
     LPFarmer();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

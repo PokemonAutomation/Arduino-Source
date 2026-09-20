@@ -25,6 +25,7 @@ public:
 
 class GeneratePokedexSprites : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = GeneratePokedexSprites_Descriptor;
     GeneratePokedexSprites();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

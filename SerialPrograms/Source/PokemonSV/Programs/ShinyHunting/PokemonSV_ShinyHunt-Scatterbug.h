@@ -36,6 +36,7 @@ public:
 
 class ShinyHuntScatterbug : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ShinyHuntScatterbug_Descriptor;
     ShinyHuntScatterbug();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

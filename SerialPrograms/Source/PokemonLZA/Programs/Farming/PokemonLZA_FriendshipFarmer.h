@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonLZA_FriendshipFarmer_H
 #define PokemonAutomation_PokemonLZA_FriendshipFarmer_H
 
-
 #include <memory>
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
@@ -28,6 +27,7 @@ public:
 
 class FriendshipFarmer : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
+    using Descriptor = FriendshipFarmer_Descriptor;
     ~FriendshipFarmer();
     FriendshipFarmer();
 

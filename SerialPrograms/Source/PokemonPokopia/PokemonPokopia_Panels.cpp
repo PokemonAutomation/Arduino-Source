@@ -42,8 +42,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     }
 
     ret.emplace_back("---- Untested/Beta/WIP ----");
-    ret.emplace_back(make_single_switch_program<CloudIslandReset_Descriptor, CloudIslandReset>());
-    ret.emplace_back(make_single_switch_program<DailyFarmer_Descriptor, DailyFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<CloudIslandReset>());
+    ret.emplace_back(make_SingleSwitchProgram<DailyFarmer>());
 
     // if (STATIC_GLOBALS.DEVELOPER_MODE){
     //     ret.emplace_back("---- Developer Tools ----");

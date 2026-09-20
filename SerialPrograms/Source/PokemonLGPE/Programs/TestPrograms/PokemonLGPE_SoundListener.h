@@ -26,6 +26,7 @@ public:
 
 class SoundListener : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = SoundListener_Descriptor;
     SoundListener();
     virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 

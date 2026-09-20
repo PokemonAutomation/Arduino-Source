@@ -22,6 +22,7 @@ public:
 
 class TestBoxCellInfo : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = TestBoxCellInfo_Descriptor;
     TestBoxCellInfo();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

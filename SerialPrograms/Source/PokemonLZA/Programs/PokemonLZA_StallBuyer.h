@@ -49,6 +49,7 @@ public:
 
 class StallBuyer : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = StallBuyer_Descriptor;
     StallBuyer();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

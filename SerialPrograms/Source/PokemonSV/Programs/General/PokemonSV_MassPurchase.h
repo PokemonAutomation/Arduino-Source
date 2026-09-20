@@ -28,6 +28,7 @@ public:
 
 class MassPurchase : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = MassPurchase_Descriptor;
     MassPurchase();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

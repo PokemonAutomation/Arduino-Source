@@ -27,6 +27,7 @@ public:
 
 class SandwichMaker : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = SandwichMaker_Descriptor;
     SandwichMaker();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

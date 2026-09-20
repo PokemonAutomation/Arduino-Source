@@ -13,7 +13,6 @@
 #include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "Pokemon/Options/Pokemon_BoxSortingTable.h"
 
 
@@ -31,6 +30,7 @@ public:
 
 class BoxSorter : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = BoxSorter_Descriptor;
     BoxSorter();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

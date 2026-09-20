@@ -30,6 +30,7 @@ public:
 
 class WeatherFinder : public SingleSwitchProgramInstance {
 public:
+    using Descriptor = WeatherFinder_Descriptor;
     WeatherFinder();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

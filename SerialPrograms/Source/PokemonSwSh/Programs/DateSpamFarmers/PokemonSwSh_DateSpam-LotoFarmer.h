@@ -27,6 +27,7 @@ public:
 
 class LotoFarmer : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = LotoFarmer_Descriptor;
     LotoFarmer();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

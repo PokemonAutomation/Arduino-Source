@@ -30,6 +30,7 @@ public:
 
 class WigglytuffFarmer : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = WigglytuffFarmer_Descriptor;
     WigglytuffFarmer();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

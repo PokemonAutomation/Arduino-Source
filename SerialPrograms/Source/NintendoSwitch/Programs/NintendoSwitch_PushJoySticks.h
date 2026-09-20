@@ -24,6 +24,7 @@ public:
 
 class PushJoySticks : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = PushJoySticks_Descriptor;
     PushJoySticks();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_WattFarmer_H
 #define PokemonAutomation_PokemonSwSh_WattFarmer_H
 
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
@@ -28,6 +28,7 @@ public:
 
 class WattFarmer : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = WattFarmer_Descriptor;
     WattFarmer();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

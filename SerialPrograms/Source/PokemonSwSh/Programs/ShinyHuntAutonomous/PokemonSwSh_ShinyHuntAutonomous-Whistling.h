@@ -37,6 +37,7 @@ public:
 
 class ShinyHuntAutonomousWhistling : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ShinyHuntAutonomousWhistling_Descriptor;
     ShinyHuntAutonomousWhistling();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

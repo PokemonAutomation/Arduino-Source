@@ -23,6 +23,7 @@ public:
 
 class PageSwap : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = PageSwap_Descriptor;
     PageSwap();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

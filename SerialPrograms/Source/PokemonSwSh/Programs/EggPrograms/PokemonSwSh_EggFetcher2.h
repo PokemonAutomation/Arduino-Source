@@ -27,6 +27,7 @@ public:
 
 class EggFetcher2 : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = EggFetcher2_Descriptor;
     EggFetcher2();
 
     void run_eggfetcher(Logger& logger, ProControllerContext& context, bool deposit_automatically, uint16_t attempts) const;

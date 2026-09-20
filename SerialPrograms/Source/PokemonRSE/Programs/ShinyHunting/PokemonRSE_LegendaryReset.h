@@ -11,7 +11,6 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 
@@ -28,6 +27,7 @@ public:
 
 class LegendaryReset : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = LegendaryReset_Descriptor;
     LegendaryReset();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
 

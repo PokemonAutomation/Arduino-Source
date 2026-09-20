@@ -25,6 +25,7 @@ public:
 
 class BedroomSeedFinder : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = BedroomSeedFinder_Descriptor;
     BedroomSeedFinder();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

@@ -36,6 +36,7 @@ public:
 
 class ShinyHuntAutonomousFishing : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ShinyHuntAutonomousFishing_Descriptor;
     ShinyHuntAutonomousFishing();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

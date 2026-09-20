@@ -30,6 +30,7 @@ public:
 
 class MoneyFarmerRoute212 : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = MoneyFarmerRoute212_Descriptor;
     MoneyFarmerRoute212();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

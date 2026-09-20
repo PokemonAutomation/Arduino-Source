@@ -26,6 +26,7 @@ public:
 
 class BowItemDuper : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = BowItemDuper_Descriptor;
     BowItemDuper();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

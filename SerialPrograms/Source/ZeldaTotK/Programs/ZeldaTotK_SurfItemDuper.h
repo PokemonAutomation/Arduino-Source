@@ -25,6 +25,7 @@ public:
 
 class SurfItemDuper : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = SurfItemDuper_Descriptor;
     SurfItemDuper();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

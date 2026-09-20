@@ -27,6 +27,7 @@ public:
 
 class SurpriseTrade : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = SurpriseTrade_Descriptor;
     SurpriseTrade();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

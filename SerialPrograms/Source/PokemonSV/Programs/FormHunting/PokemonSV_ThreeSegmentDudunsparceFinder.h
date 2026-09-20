@@ -30,6 +30,7 @@ public:
 
 class ThreeSegmentDudunsparceFinder : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ThreeSegmentDudunsparceFinder_Descriptor;
     ThreeSegmentDudunsparceFinder();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

@@ -26,6 +26,7 @@ public:
 
 class PokeJobsFarmer : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = PokeJobsFarmer_Descriptor;
     PokeJobsFarmer();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

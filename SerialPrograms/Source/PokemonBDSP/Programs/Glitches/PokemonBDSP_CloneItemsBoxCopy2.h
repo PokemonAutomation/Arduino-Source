@@ -28,6 +28,7 @@ public:
 
 class CloneItemsBoxCopy2 : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = CloneItemsBoxCopy2_Descriptor;
     CloneItemsBoxCopy2();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

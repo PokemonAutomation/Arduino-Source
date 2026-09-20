@@ -28,6 +28,7 @@ public:
 
 class LegendaryReset : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = LegendaryReset_Descriptor;
     LegendaryReset();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
 

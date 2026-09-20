@@ -23,6 +23,7 @@ public:
 
 class ClothingBuyer : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ClothingBuyer_Descriptor;
     ClothingBuyer();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

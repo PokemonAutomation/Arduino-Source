@@ -30,6 +30,7 @@ public:
 
 class IngoBattleGrinder : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = IngoBattleGrinder_Descriptor;
     IngoBattleGrinder();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

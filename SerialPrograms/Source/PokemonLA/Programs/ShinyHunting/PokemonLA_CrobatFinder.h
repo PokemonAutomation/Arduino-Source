@@ -27,6 +27,7 @@ public:
 
 class CrobatFinder : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = CrobatFinder_Descriptor;
     CrobatFinder();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

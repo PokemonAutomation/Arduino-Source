@@ -22,6 +22,7 @@ public:
 
 class ReadEncounter : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ReadEncounter_Descriptor;
     ReadEncounter();
 
     virtual void start_program_controller_check(SwitchSystemSession& session) override{}

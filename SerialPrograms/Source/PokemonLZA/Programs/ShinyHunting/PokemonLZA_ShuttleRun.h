@@ -30,6 +30,7 @@ public:
 
 class ShinyHunt_ShuttleRun : public SingleSwitchProgramInstance {
 public:
+    using Descriptor = ShinyHunt_ShuttleRun_Descriptor;
     ShinyHunt_ShuttleRun();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

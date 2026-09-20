@@ -30,6 +30,10 @@ public:
         )
     {}
 };
+class MultiConsoleViewer : public MultiConsolePanelInstance{
+public:
+    using Descriptor = MultiConsoleViewer_Descriptor;
+};
 
 
 

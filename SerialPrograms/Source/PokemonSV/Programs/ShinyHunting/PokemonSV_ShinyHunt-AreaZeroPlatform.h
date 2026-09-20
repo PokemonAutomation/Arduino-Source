@@ -44,6 +44,7 @@ public:
 
 class ShinyHuntAreaZeroPlatform : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
+    using Descriptor = ShinyHuntAreaZeroPlatform_Descriptor;
     ~ShinyHuntAreaZeroPlatform();
     ShinyHuntAreaZeroPlatform();
 
