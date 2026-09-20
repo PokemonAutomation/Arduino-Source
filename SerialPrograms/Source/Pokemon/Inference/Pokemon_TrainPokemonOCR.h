@@ -25,6 +25,7 @@ public:
 
 class TrainPokemonOCR : public ComputerProgramInstance{
 public:
+    using Descriptor = TrainPokemonOCR_Descriptor;
     TrainPokemonOCR();
 
     virtual void program(ProgramEnvironment& env, CancellableScope& scope) override;

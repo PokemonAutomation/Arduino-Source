@@ -54,6 +54,7 @@ public:
 
 class GameSettingsPanel : public OptionsPanelInstance{
 public:
+    using Descriptor = GameSettings_Descriptor;
     GameSettingsPanel();
 private:
     GameSettings& settings;

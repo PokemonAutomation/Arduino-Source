@@ -134,17 +134,17 @@ public:
 
 
 
-template <typename Descriptor, typename Instance>
-class MultiSwitchProgramWrapper : public Descriptor{
+template <typename Instance>
+class MultiSwitchProgramWrapper : public Instance::Descriptor{
 public:
     virtual std::unique_ptr<MultiSwitchProgramInstance> make_instance() const override{
         return std::unique_ptr<MultiSwitchProgramInstance>(new Instance());
     }
 };
 
-template <typename Descriptor, typename Instance>
-std::unique_ptr<PanelDescriptor> make_multi_switch_program(){
-    return std::make_unique<MultiSwitchProgramWrapper<Descriptor, Instance>>();
+template <typename Instance>
+std::unique_ptr<PanelDescriptor> make_MultiSwitchProgram(){
+    return std::make_unique<MultiSwitchProgramWrapper<Instance>>();
 }
 
 

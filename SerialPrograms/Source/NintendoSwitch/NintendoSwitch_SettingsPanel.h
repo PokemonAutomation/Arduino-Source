@@ -26,6 +26,7 @@ public:
 
 class ConsoleSettingsPanel : public OptionsPanelInstance{
 public:
+    using Descriptor = ConsoleSettings_Descriptor;
     ConsoleSettingsPanel();
 private:
     ConsoleSettings& settings;

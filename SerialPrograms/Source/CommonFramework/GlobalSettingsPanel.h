@@ -140,16 +140,14 @@ class GlobalSettings_Descriptor : public OptionsPanelDescriptor{
 public:
     GlobalSettings_Descriptor();
 public:
-    using Wrapper = OptionsPanelWrapper<GlobalSettings_Descriptor, GlobalSettingsPanel>;
-    static Wrapper& instance(){
-        static Wrapper wrapper;
-        return wrapper;
-    }
+    using Wrapper = OptionsPanelWrapper<GlobalSettingsPanel>;
+    static Wrapper& instance();
 };
 
 
 class GlobalSettingsPanel : public OptionsPanelInstance{
 public:
+    using Descriptor = GlobalSettings_Descriptor;
     GlobalSettingsPanel();
 private:
     GlobalSettings& settings;

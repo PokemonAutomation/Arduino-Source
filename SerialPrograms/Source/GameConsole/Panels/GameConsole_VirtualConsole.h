@@ -30,6 +30,11 @@ public:
         )
     {}
 };
+class VirtualConsole : public ConsolePanelInstance{
+public:
+    using Descriptor = VirtualConsole_Descriptor;
+};
+
 
 
 class MultiControllerTester_Descriptor : public ConsolePanelDescriptor{
@@ -47,6 +52,10 @@ public:
             8
         )
     {}
+};
+class MultiControllerTester : public ConsolePanelInstance{
+public:
+    using Descriptor = MultiControllerTester_Descriptor;
 };
 
 

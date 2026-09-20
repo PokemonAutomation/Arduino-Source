@@ -65,7 +65,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     std::vector<PanelEntry> ret;
 
     ret.emplace_back("---- Settings ----");
-    ret.emplace_back(make_OptionsPanel<GameSettings_Descriptor, GameSettingsPanel>());
+    ret.emplace_back(make_OptionsPanel<GameSettingsPanel>());
 
     ret.emplace_back("---- General ----");
     ret.emplace_back(make_single_switch_program<BraviaryHeightGlitch_Descriptor, BraviaryHeightGlitch>());
@@ -78,8 +78,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<RamanasCombeeFinder_Descriptor, RamanasCombeeFinder>());
 
     ret.emplace_back("---- Trading ----");
-    ret.emplace_back(make_multi_switch_program<SelfBoxTrade_Descriptor, SelfBoxTrade>());
-    ret.emplace_back(make_multi_switch_program<SelfTouchTrade_Descriptor, SelfTouchTrade>());
+    ret.emplace_back(make_MultiSwitchProgram<SelfBoxTrade>());
+    ret.emplace_back(make_MultiSwitchProgram<SelfTouchTrade>());
 
     ret.emplace_back("---- Farming ----");
     ret.emplace_back(make_single_switch_program<NuggetFarmerHighlands_Descriptor, NuggetFarmerHighlands>());

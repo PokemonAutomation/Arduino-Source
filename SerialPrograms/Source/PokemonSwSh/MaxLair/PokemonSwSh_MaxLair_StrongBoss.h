@@ -38,6 +38,7 @@ public:
     };
 
 public:
+    using Descriptor = MaxLairStrongBoss_Descriptor;
     MaxLairStrongBoss();
 
     virtual std::string check_validity() const override;

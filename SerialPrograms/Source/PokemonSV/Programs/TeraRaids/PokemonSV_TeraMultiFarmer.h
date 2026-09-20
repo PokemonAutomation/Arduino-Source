@@ -79,6 +79,7 @@ public:
 
 class TeraMultiFarmer : public MultiSwitchProgramInstance, private ConfigOption::Listener{
 public:
+    using Descriptor = TeraMultiFarmer_Descriptor;
     ~TeraMultiFarmer();
     TeraMultiFarmer();
     virtual void update_active_consoles(size_t switch_count) override;

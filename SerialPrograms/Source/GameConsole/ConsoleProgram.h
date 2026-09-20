@@ -58,9 +58,6 @@ private:
 
 class ConsoleProgramDescriptor : public ProgramDescriptor{
 public:
-    using SystemSession = ConsoleSystemSession;
-
-public:
     ConsoleProgramDescriptor(
         std::string identifier,
         std::string category, std::string display_name,
@@ -111,15 +108,13 @@ public:
 
 
 
-template <typename Descriptor, typename Instance>
-class ConsoleProgramWrapper : public Descriptor{
+template <typename Instance>
+class ConsoleProgramWrapper : public Instance::Descriptor{
 public:
-    using SystemSession = typename Descriptor::SystemSession;
-
     virtual std::unique_ptr<ConsoleProgramInstance> make_instance(
-        SystemSession& system
+        ConsoleSystemSession& system
     ) const override{
-        if constexpr (std::is_constructible_v<Instance, SystemSession&>){
+        if constexpr (std::is_constructible_v<Instance, ConsoleSystemSession&>){
             return std::make_unique<Instance>(system);
         }else{
             return std::make_unique<Instance>();
@@ -127,9 +122,9 @@ public:
     }
 };
 
-template <typename Descriptor, typename Instance>
+template <typename Instance>
 std::unique_ptr<PanelDescriptor> make_ConsoleProgram(){
-    return std::make_unique<ConsoleProgramWrapper<Descriptor, Instance>>();
+    return std::make_unique<ConsoleProgramWrapper<Instance>>();
 }
 
 

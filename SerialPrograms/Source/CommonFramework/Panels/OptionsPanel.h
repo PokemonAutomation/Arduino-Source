@@ -69,18 +69,18 @@ protected:
 
 
 
-template <typename Descriptor, typename Instance>
-class OptionsPanelWrapper : public Descriptor{
+template <typename PanelInstance>
+class OptionsPanelWrapper : public PanelInstance::Descriptor{
 public:
     virtual std::unique_ptr<OptionsPanelInstance> make_instance() const override{
-        return std::make_unique<Instance>();
+        return std::make_unique<PanelInstance>();
     }
 };
 
 
-template <typename Descriptor, typename Instance>
+template <typename PanelInstance>
 std::unique_ptr<PanelDescriptor> make_OptionsPanel(){
-    return std::make_unique<OptionsPanelWrapper<Descriptor, Instance>>();
+    return std::make_unique<OptionsPanelWrapper<PanelInstance>>();
 }
 
 

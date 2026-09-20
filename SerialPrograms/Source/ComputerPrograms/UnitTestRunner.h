@@ -35,6 +35,8 @@ class UnitTestRunner
     , public ConfigOption::Listener
 {
 public:
+    using Descriptor = UnitTestRunner_Descriptor;
+
     ~UnitTestRunner();
     UnitTestRunner();
 

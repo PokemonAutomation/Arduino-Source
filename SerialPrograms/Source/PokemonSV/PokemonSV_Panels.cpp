@@ -87,7 +87,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     std::vector<PanelEntry> ret;
 
     ret.emplace_back("---- Settings ----");
-    ret.emplace_back(make_OptionsPanel<GameSettings_Descriptor, GameSettingsPanel>());
+    ret.emplace_back(make_OptionsPanel<GameSettingsPanel>());
 
     ret.emplace_back("---- General ----");
     ret.emplace_back(make_single_switch_program<MassPurchase_Descriptor, MassPurchase>());
@@ -96,7 +96,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<SizeChecker_Descriptor, SizeChecker>());
 
 //    ret.emplace_back("---- Trading ----");
-    ret.emplace_back(make_multi_switch_program<SelfBoxTrade_Descriptor, SelfBoxTrade>());
+    ret.emplace_back(make_MultiSwitchProgram<SelfBoxTrade>());
 
 //    ret.emplace_back("---- Sandwiches ----");
     ret.emplace_back(make_single_switch_program<SandwichMaker_Descriptor, SandwichMaker>());
@@ -127,12 +127,12 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<AutoHost_Descriptor, AutoHost>());
     ret.emplace_back(make_single_switch_program<TeraRoller_Descriptor, TeraRoller>());
     ret.emplace_back(make_single_switch_program<TeraSelfFarmer_Descriptor, TeraSelfFarmer>());
-    ret.emplace_back(make_multi_switch_program<TeraMultiFarmer_Descriptor, TeraMultiFarmer>());
+    ret.emplace_back(make_MultiSwitchProgram<TeraMultiFarmer>());
 
     ret.emplace_back("---- Fast Code Entry ----");
-    ret.emplace_back(make_multi_switch_program<FastCodeEntry_Descriptor, FastCodeEntry>());
-    ret.emplace_back(make_multi_switch_program<ClipboardFastCodeEntry_Descriptor, ClipboardFastCodeEntry>());
-    ret.emplace_back(make_multi_switch_program<VideoFastCodeEntry_Descriptor, VideoFastCodeEntry>());
+    ret.emplace_back(make_MultiSwitchProgram<FastCodeEntry>());
+    ret.emplace_back(make_MultiSwitchProgram<ClipboardFastCodeEntry>());
+    ret.emplace_back(make_MultiSwitchProgram<VideoFastCodeEntry>());
 
     ret.emplace_back("---- Stats Hunting ----");
     ret.emplace_back(make_single_switch_program<StatsReset_Descriptor, StatsReset>());

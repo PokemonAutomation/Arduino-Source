@@ -21,6 +21,7 @@ public:
 
 class BoxDraw : public ConsolePanelInstance{
 public:
+    using Descriptor = BoxDraw_Descriptor;
     BoxDraw(ConsoleSystemSession& system);
 
 private:

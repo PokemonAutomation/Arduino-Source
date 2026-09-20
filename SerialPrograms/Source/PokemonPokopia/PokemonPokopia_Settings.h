@@ -8,8 +8,6 @@
 #define PokemonAutomation_PokemonPokopia_Settings_H
 
 #include "Common/Cpp/Options/StaticTextOption.h"
-#include "Common/Cpp/Options/FloatingPointOption.h"
-#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Panels/OptionsPanel.h"
 
 namespace PokemonAutomation{
@@ -23,7 +21,6 @@ public:
     static GameSettings& instance();
 
     SectionDividerOption m_general;
-
     SectionDividerOption m_advanced_options;
 
 
@@ -40,6 +37,7 @@ public:
 
 class GameSettingsPanel : public OptionsPanelInstance{
 public:
+    using Descriptor = GameSettings_Descriptor;
     GameSettingsPanel();
 private:
     GameSettings& settings;

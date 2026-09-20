@@ -47,6 +47,7 @@ public:
 
 class TestProgram : public MultiSwitchProgramInstance, public ButtonListener{
 public:
+    using Descriptor = TestProgram_Descriptor;
     ~TestProgram();
     TestProgram();
 
