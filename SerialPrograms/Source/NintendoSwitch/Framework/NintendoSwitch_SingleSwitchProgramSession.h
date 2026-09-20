@@ -15,9 +15,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_SingleSwitchProgramSession_H
 #define PokemonAutomation_NintendoSwitch_SingleSwitchProgramSession_H
 
-#include "CommonFramework/Panels/PanelSession.h"
-#include "CommonFramework/ProgramSession.h"
-#include "GameConsole/Framework/ConsoleSystemSession.h"
+#include "GameConsole/Framework/ConsoleProgramSession.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -26,38 +24,19 @@ namespace NintendoSwitch{
 
 
 class SingleSwitchProgramSession final
-    : public UiState<SingleSwitchProgramSession, PanelSession>
-    , public ProgramSession
+    : public UiState<SingleSwitchProgramSession, GameConsole::ConsoleProgramSession>
 {
 public:
-    bool try_shutdown();
     ~SingleSwitchProgramSession();
     SingleSwitchProgramSession(const SingleSwitchProgramDescriptor& descriptor);
 
-
-public:
     const SingleSwitchProgramDescriptor& descriptor() const{ return m_descriptor; }
-    GameConsole::ConsoleSystemSession& system(){ return m_system; }
-    ConfigOption& options();
-
-
-public:
-    virtual std::string check_validity() const override;
-    virtual void restore_defaults() override;
-    virtual JsonValue to_json() const override;
-    virtual void load_json(const JsonValue& json) override;
-
 
 private:
     virtual std::unique_ptr<ProgramEnvironment> make_env(const ProgramInfo& program_info) override;
-    virtual void internal_run_program(ProgramEnvironment& env) override;
-
 
 private:
     const SingleSwitchProgramDescriptor& m_descriptor;
-
-    GameConsole::ConsoleSystemOption m_system_option;
-    GameConsole::ConsoleSystemSession m_system;
 };
 
 

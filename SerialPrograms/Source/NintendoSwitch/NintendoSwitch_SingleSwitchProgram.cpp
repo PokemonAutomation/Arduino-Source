@@ -10,7 +10,6 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
-#include "Controllers/ControllerSession.h"
 #include "Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Framework/NintendoSwitch_SingleSwitchProgramSession.h"
 #include "NintendoSwitch_SingleSwitchProgram.h"
@@ -19,10 +18,25 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void SingleSwitchProgramEnvironment::log_to_ui(const std::string& msg, Color color){
-    console.overlay().add_log(msg, color);
-}
 
+SingleSwitchProgramEnvironment::SingleSwitchProgramEnvironment(
+    const ProgramInfo& program_info,
+    CancellableScope& scope,
+    ProgramSession& session,
+    StatsTracker* current_stats,
+    const StatsTracker* historical_stats,
+    GameConsole::ConsoleSystemSession& system
+)
+    : GameConsole::ConsoleProgramEnvironment(
+        program_info,
+        scope,
+        session,
+        current_stats,
+        historical_stats,
+        std::make_unique<ConsoleHandle>(system)
+    )
+    , console(static_cast<ConsoleHandle&>(ConsoleProgramEnvironment::console()))
+{}
 
 SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     std::string identifier,
@@ -35,19 +49,18 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     PanelDeprecation deprecation,
     std::vector<std::string> required_resources
 )
-    : ProgramDescriptor(
+    : GameConsole::ConsoleProgramDescriptor(
         std::move(identifier),
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description),
         GameConsole::pick_color(controller_class),
+        feedback,
+        allow_commands_while_running,
         deprecation,
-        true,
         std::move(required_resources)
     )
     , m_controller_class(controller_class)
-    , m_feedback(feedback)
-    , m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
 {}
 std::unique_ptr<PanelSession> SingleSwitchProgramDescriptor::make_panel() const{
     return std::make_unique<SingleSwitchProgramSession>(*this);
@@ -55,7 +68,9 @@ std::unique_ptr<PanelSession> SingleSwitchProgramDescriptor::make_panel() const{
 
 
 
-
+void SingleSwitchProgramInstance::program(GameConsole::ConsoleProgramEnvironment& env, CancellableScope& scope){
+    program(static_cast<SingleSwitchProgramEnvironment&>(env), scope);
+}
 void SingleSwitchProgramInstance::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     ProControllerContext context(scope, env.console.controller<ProController>());
     if (!context->is_ready()){
@@ -87,11 +102,14 @@ void SingleSwitchProgramInstance::program(SingleSwitchProgramEnvironment& env, P
 }
 
 
-void SingleSwitchProgramInstance::start_program_feedback_check(
-    VideoStream& stream,
-    FeedbackType feedback_type
+void SingleSwitchProgramInstance::run_start_program_checks(
+    const ProgramDescriptor& descriptor,
+    ProgramEnvironment& env
 ){
-    StartProgramChecks::check_feedback(stream, feedback_type);
+    const GameConsole::ConsoleProgramDescriptor& ldescriptor = dynamic_cast<const GameConsole::ConsoleProgramDescriptor&>(descriptor);
+    GameConsole::ConsoleProgramEnvironment& lenv = dynamic_cast<GameConsole::ConsoleProgramEnvironment&>(env);
+    start_program_feedback_check(lenv.console(), ldescriptor.feedback());
+    start_program_border_check(lenv.console(), ldescriptor.feedback());
 }
 void SingleSwitchProgramInstance::start_program_border_check(
     VideoStream& stream,

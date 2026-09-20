@@ -40,7 +40,7 @@ namespace PokemonAutomation{
 namespace GameConsole{
 
 
-class ConsoleSystemSession
+class ConsoleSystemSession final
     : public UiState<ConsoleSystemSession>
     , public TryShutdownable
     , public TrackableConsole

@@ -11,6 +11,7 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "GameConsole/ConsoleProgram.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
@@ -23,12 +24,9 @@ class SwitchSystemSession;
 class SingleSwitchProgramInstance;
 
 
-class SingleSwitchProgramEnvironment : public ProgramEnvironment{
+class SingleSwitchProgramEnvironment : public GameConsole::ConsoleProgramEnvironment{
 public:
-    ConsoleHandle console;
-
-    // Call console.overlay().add_log(msg, color) to add a log message to overlay display
-    virtual void log_to_ui(const std::string& msg, Color color = Color()) override;
+    ConsoleHandle& console;
 
 public:
     friend class SingleSwitchProgramSession;
@@ -41,17 +39,12 @@ public:
         StatsTracker* current_stats,
         const StatsTracker* historical_stats,
         GameConsole::ConsoleSystemSession& system
-    )
-        : ProgramEnvironment(program_info, session, current_stats, historical_stats)
-        , console(system)
-    {
-        console.initialize_inference_threads(scope);
-    }
+    );
 };
 
 
 
-class SingleSwitchProgramDescriptor : public ProgramDescriptor{
+class SingleSwitchProgramDescriptor : public GameConsole::ConsoleProgramDescriptor{
 public:
     SingleSwitchProgramDescriptor(
         std::string identifier,
@@ -66,25 +59,18 @@ public:
     );
 
     ProgramControllerClass controller_class() const{ return m_controller_class; }
-    FeedbackType feedback() const{ return m_feedback; }
-    bool allow_commands_while_running() const{ return m_allow_commands_while_running; }
 
     virtual std::unique_ptr<PanelSession> make_panel() const override;
-    virtual std::unique_ptr<SingleSwitchProgramInstance> make_instance(
-        GameConsole::ConsoleSystemSession& system
-    ) const = 0;
 
 private:
     const ProgramControllerClass m_controller_class;
-    const FeedbackType m_feedback;
-    const bool m_allow_commands_while_running;
 };
 
 
 
-class SingleSwitchProgramInstance : public ProgramInstance{
+class SingleSwitchProgramInstance : public GameConsole::ConsoleProgramInstance{
 public:
-    using ProgramInstance::ProgramInstance;
+    using GameConsole::ConsoleProgramInstance::ConsoleProgramInstance;
 
     //  Called by SingleSwitchProgramSession::run_program_instance() to start an automation program.
     //  Child classes should override one of the overloaded functions.
@@ -97,19 +83,23 @@ public:
 public:
     //  Startup Checks: Feel free to override to change behavior.
 
-    virtual void start_program_feedback_check(
-        VideoStream& stream,
-        FeedbackType feedback_type
-    );
+    virtual void run_start_program_checks(
+        const ProgramDescriptor& descriptor,
+        ProgramEnvironment& env
+    ) override;
     virtual void start_program_border_check(
         VideoStream& stream,
         FeedbackType feedback_type
     );
+
+private:
+    virtual void program(GameConsole::ConsoleProgramEnvironment& env, CancellableScope& scope) override;
 };
 
 
 
 
+#if 0
 template <typename Instance>
 class SingleSwitchProgramWrapper : public Instance::Descriptor{
 public:
@@ -123,6 +113,11 @@ public:
         }
     }
 };
+#endif
+
+template <typename Instance>
+using SingleSwitchProgramWrapper = GameConsole::ConsoleProgramWrapper<Instance>;
+
 
 // Create a program PanelDescriptor
 template <typename Instance>

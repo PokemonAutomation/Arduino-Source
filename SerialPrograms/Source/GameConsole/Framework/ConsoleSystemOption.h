@@ -27,7 +27,7 @@ Color pick_color(ProgramControllerClass color_class);
 
 
 
-class ConsoleSystemOption{
+class ConsoleSystemOption final{
     static const std::string JSON_CAMERA;
     static const std::string JSON_VIDEO;
     static const std::string JSON_AUDIO;
@@ -37,14 +37,13 @@ class ConsoleSystemOption{
     static const std::string JSON_OPTIONS;
 
 public:
-    virtual ~ConsoleSystemOption() = default;
     ConsoleSystemOption(
         size_t num_controllers,
         std::unique_ptr<ConfigOption> extra_option = nullptr
     );
 
-    virtual JsonValue to_json() const;
-    virtual void load_json(const JsonValue& json);
+    JsonValue to_json() const;
+    void load_json(const JsonValue& json);
 
 
 public:
