@@ -13,6 +13,8 @@
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
+#include "PokemonFRLG/PokemonFRLG_Settings.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "PokemonFRLG_PartyMenuDetector.h"
 
 
@@ -91,7 +93,7 @@ bool PartySlotDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 target_box_party = extract_box_reference(game_screen, m_party_box);
 
     //orange FF701C border. light/dark blues in the selected box are close to each other.
-    if (is_solid(target_box_party, { 0.6455696, 0.2835, 0.070886 }, 0.25, 20)
+    if (is_solid(target_box_party, { 0.6455696, 0.2835, 0.070886 }, 0.25, 30)
     ){
         return true;
     }
@@ -99,6 +101,34 @@ bool PartySlotDetector::detect(const ImageViewRGB32& screen){
 }
 
 
+class Test_PartySlotDetector : public UnitTest{
+public:
+    Test_PartySlotDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonFRLG::PartySlotDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        PartySlotWatcher detector(COLOR_RED, PartySlot::SIX);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+void add_tests_PartySlotDetector(UnitTestDatabase& database){
+    database.add<Test_PartySlotDetector>("PokemonFRLG/PartySlotDetector/elgato-PartySlotDetector_True.png", true);
+    database.add<Test_PartySlotDetector>("PokemonFRLG/PartySlotDetector/SirGArilla-PartySlotDetector_True.png", true);
+    database.add<Test_PartySlotDetector>("PokemonFRLG/PartySlotDetector/elgato-EmptySlot_False.png", false);
+    database.add<Test_PartySlotDetector>("PokemonFRLG/PartySlotDetector/elgato-PartySlotDetector_False.png", false);
+}
 
 }
 }
