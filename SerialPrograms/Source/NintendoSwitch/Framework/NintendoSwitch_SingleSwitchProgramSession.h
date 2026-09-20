@@ -19,7 +19,6 @@
 #include "CommonFramework/ProgramSession.h"
 #include "GameConsole/Framework/ConsoleSystemSession.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "NintendoSwitch_SwitchSystemOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -57,7 +56,7 @@ private:
 private:
     const SingleSwitchProgramDescriptor& m_descriptor;
 
-    SwitchSystemOption m_system_option;
+    GameConsole::ConsoleSystemOption m_system_option;
     GameConsole::ConsoleSystemSession m_system;
 };
 

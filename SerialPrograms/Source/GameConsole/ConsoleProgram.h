@@ -2,6 +2,11 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
+ *  ConsolePanel is a panel with:
+ *    - Has options.
+ *    - Has a console.
+ *    - Can be run.
+ *
  *  This is the main header for game console programs.
  *  This file is intentionally thin and has only the bare minimum dependencies
  *  for programs.
@@ -90,15 +95,16 @@ class ConsoleProgramInstance : public ProgramInstance{
 public:
     using ProgramInstance::ProgramInstance;
 
-    virtual void program(ConsoleProgramEnvironment& env, CancellableScope& scope);
+    virtual void program(ConsoleProgramEnvironment& env, CancellableScope& scope) = 0;
 
 
 public:
     //  Startup Checks: Feel free to override to change behavior.
 
-    virtual void start_program_controller_check(
-        ConsoleSystemSession& session
-    );
+    virtual void run_start_program_checks(
+        const ProgramDescriptor& descriptor,
+        ProgramEnvironment& env
+    ) override;
     virtual void start_program_feedback_check(
         VideoStream& stream,
         FeedbackType feedback_type

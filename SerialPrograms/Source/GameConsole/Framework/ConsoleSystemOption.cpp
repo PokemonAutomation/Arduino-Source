@@ -14,6 +14,25 @@
 namespace PokemonAutomation{
 namespace GameConsole{
 
+
+Color pick_color(ProgramControllerClass color_class){
+    switch (color_class){
+    case ProgramControllerClass::StandardController_NoRestrictions:
+        return COLOR_BLUE;
+    case ProgramControllerClass::StandardController_PerformanceClassSensitive:
+        return COLOR_DARKGREEN;
+    case ProgramControllerClass::StandardController_RequiresPrecision:
+        return COLOR_PURPLE;
+    case ProgramControllerClass::StandardController_WithRestrictions:
+        return COLOR_RED;
+    case ProgramControllerClass::SpecializedController:
+        return COLOR_MAGENTA;
+    default:
+        return Color();
+    }
+}
+
+
 const std::string ConsoleSystemOption::JSON_CAMERA      = "Camera";
 const std::string ConsoleSystemOption::JSON_VIDEO       = "Video";
 const std::string ConsoleSystemOption::JSON_AUDIO       = "Audio";
@@ -39,15 +58,6 @@ ConsoleSystemOption::ConsoleSystemOption(
         m_controllers.emplace_back(enable_input);
         enable_input = false;
     }
-}
-ConsoleSystemOption::ConsoleSystemOption(
-    size_t num_controllers,
-    std::unique_ptr<ConfigOption> extra_option,
-    const JsonValue& json
-)
-    : ConsoleSystemOption(num_controllers, std::move(extra_option))
-{
-    ConsoleSystemOption::load_json(json);
 }
 JsonValue ConsoleSystemOption::to_json() const{
     JsonObject root;

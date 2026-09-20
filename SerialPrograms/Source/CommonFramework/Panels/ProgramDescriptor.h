@@ -15,6 +15,7 @@ namespace PokemonAutomation{
 
 class JsonValue;
 class StatsTracker;
+class ProgramEnvironment;
 
 
 enum class ProgramControllerClass{
@@ -58,6 +59,12 @@ public:
     virtual void restore_defaults();
     virtual JsonValue to_json() const;
     virtual void load_json(const JsonValue& json);
+
+public:
+    virtual void run_start_program_checks(
+        const ProgramDescriptor& descriptor,
+        ProgramEnvironment& env
+    ){}
 
 protected:
     BatchOption m_options;

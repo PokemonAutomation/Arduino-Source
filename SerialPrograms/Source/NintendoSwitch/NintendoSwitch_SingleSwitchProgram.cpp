@@ -40,7 +40,7 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description),
-        pick_color(controller_class),
+        GameConsole::pick_color(controller_class),
         deprecation,
         true,
         std::move(required_resources)
