@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Cpp/Logging/GlobalLogger.h"
 #include "Framework/ConsoleSystemSession.h"
 #include "Framework/MultiConsolePanelSession.h"
 #include "MultiConsolePanel.h"
@@ -38,15 +37,6 @@ MultiConsolePanelDescriptor::MultiConsolePanelDescriptor(
         restore_defaults_button,
         [](size_t console_index){
             return std::make_unique<ConsoleSystemOption>(1);
-        },
-        [](ConsoleSystemOption& option, size_t console_index){
-            return std::make_unique<ConsoleSystemSession>(
-                global_logger_raw(),
-                option,
-                true,
-                console_index,
-                std::nullopt
-            );
         }
     )
 {}
@@ -61,8 +51,7 @@ MultiConsolePanelDescriptor::MultiConsolePanelDescriptor(
     size_t max_consoles,
     size_t default_consoles,
     bool restore_defaults_button,
-    OptionFactory option_factory,
-    SessionFactory session_factory
+    OptionFactory option_factory
 )
     : PanelDescriptor(
         std::move(identifier),
@@ -78,7 +67,6 @@ MultiConsolePanelDescriptor::MultiConsolePanelDescriptor(
     , m_max_consoles(max_consoles)
     , m_default_consoles(default_consoles)
     , m_option_factory(std::move(option_factory))
-    , m_session_factory(std::move(session_factory))
 {}
 std::unique_ptr<PanelSession> MultiConsolePanelDescriptor::make_panel() const{
     return std::make_unique<MultiConsolePanelSession>(*this);

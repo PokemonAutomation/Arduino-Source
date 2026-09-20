@@ -35,7 +35,7 @@ MultiConsolePanelSession::MultiConsolePanelSession(const MultiConsolePanelDescri
         descriptor.default_consoles(),
         descriptor.option_factory()
     )
-    , m_system(m_system_option, descriptor.session_factory())
+    , m_system(m_system_option, true)
     , m_instance(descriptor.make_instance(m_system))
 {}
 

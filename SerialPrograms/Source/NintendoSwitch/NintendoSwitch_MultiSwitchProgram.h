@@ -119,7 +119,7 @@ public:
     //  Startup Checks: Feel free to override to change behavior.
 
     virtual void start_program_controller_check(
-        SwitchSystemSession& session, size_t console_index
+        GameConsole::ConsoleSystemSession& session, size_t console_index
     );
     virtual void start_program_feedback_check(
         VideoStream& stream, size_t console_index,

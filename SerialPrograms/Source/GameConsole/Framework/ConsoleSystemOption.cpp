@@ -20,11 +20,16 @@ const std::string ConsoleSystemOption::JSON_AUDIO       = "Audio";
 const std::string ConsoleSystemOption::JSON_OVERLAY     = "Overlay";
 const std::string ConsoleSystemOption::JSON_CONTROLLER  = "Controller";
 const std::string ConsoleSystemOption::JSON_CONTROLLERS = "Controllers";
+const std::string ConsoleSystemOption::JSON_OPTIONS     = "Options";
 
 
 
-ConsoleSystemOption::ConsoleSystemOption(size_t num_controllers)
+ConsoleSystemOption::ConsoleSystemOption(
+    size_t num_controllers,
+    std::unique_ptr<ConfigOption> extra_option
+)
     : m_controllers(num_controllers)
+    , m_extra_option(std::move(extra_option))
 {
     if (num_controllers == 0){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "num_controllers cannot be 0.");
@@ -35,8 +40,12 @@ ConsoleSystemOption::ConsoleSystemOption(size_t num_controllers)
         enable_input = false;
     }
 }
-ConsoleSystemOption::ConsoleSystemOption(size_t num_controllers, const JsonValue& json)
-    : ConsoleSystemOption(num_controllers)
+ConsoleSystemOption::ConsoleSystemOption(
+    size_t num_controllers,
+    std::unique_ptr<ConfigOption> extra_option,
+    const JsonValue& json
+)
+    : ConsoleSystemOption(num_controllers, std::move(extra_option))
 {
     ConsoleSystemOption::load_json(json);
 }
@@ -54,7 +63,9 @@ JsonValue ConsoleSystemOption::to_json() const{
         }
         root[JSON_CONTROLLERS] = std::move(list);
     }
-
+    if (m_extra_option){
+        root[JSON_OPTIONS] = m_extra_option->to_json();
+    }
     return root;
 }
 void ConsoleSystemOption::load_json(const JsonValue& json){
@@ -90,6 +101,12 @@ void ConsoleSystemOption::load_json(const JsonValue& json){
 //        for (; c < stop; c++){
 //            m_controllers[c].set_descriptor(null_controller_descriptor());
 //        }
+    }
+    if (m_extra_option){
+        value = obj->get_value(JSON_OPTIONS);
+        if (value){
+            m_extra_option->load_json(*value);
+        }
     }
 }
 

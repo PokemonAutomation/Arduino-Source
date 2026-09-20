@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Cpp/Logging/GlobalLogger.h"
 #include "Common/Cpp/EarlyShutdown.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "CommonFramework/Logging/Logger.h"
@@ -45,33 +44,23 @@ MultiConsoleSystemSession::MultiConsoleSystemSession(
     bool allow_commands_while_locked,
     std::optional<uint64_t> program_tracking_id
 )
-    : MultiConsoleSystemSession(
-        option,
-        [allow_commands_while_locked, program_tracking_id](ConsoleSystemOption& option, size_t console_index){
-            return std::make_unique<ConsoleSystemSession>(
-                global_logger_raw(),
-                option,
-                allow_commands_while_locked,
-                console_index,
-                program_tracking_id
-            );
-        }
-    )
-{}
-MultiConsoleSystemSession::MultiConsoleSystemSession(
-    MultiConsoleSystemOption& option,
-    SessionFactory session_factory
-)
     : m_logger(global_logger_tagged())
     , m_option(option)
+    , m_allow_commands_while_locked(allow_commands_while_locked)
+    , m_program_tracking_id(program_tracking_id)
     , m_consoles(option.active_consoles())
-    , m_session_factory(std::move(session_factory))
 {
     size_t count = option.active_consoles();
     for (size_t c = 0; c < count; c++){
-        m_consoles.emplace_back(m_session_factory(option[c], c));
+        m_consoles.emplace_back(
+            std::make_unique<ConsoleSystemSession>(
+                option[c],
+                allow_commands_while_locked,
+                c,
+                program_tracking_id
+            )
+        );
     }
-//    cout << "MultiConsoleSystemSession(): count = " << count << endl;
 }
 
 void MultiConsoleSystemSession::lock_controllers(const std::string& reason){
@@ -127,7 +116,14 @@ void MultiConsoleSystemSession::set_active_consoles(size_t count){
         m_consoles.reset(count);
         m_option.resize(count);
         for (size_t c = 0; c < count; c++){
-            m_consoles.emplace_back(m_session_factory(m_option[c], c));
+            m_consoles.emplace_back(
+                std::make_unique<ConsoleSystemSession>(
+                    m_option[c],
+                    m_allow_commands_while_locked,
+                    c,
+                    m_program_tracking_id
+                )
+            );
         }
     }
 

@@ -44,13 +44,6 @@ public:
     virtual bool try_shutdown() noexcept override;
     virtual ~MultiConsoleSystemSession();
 
-    using SessionFactory = std::function<
-        std::unique_ptr<ConsoleSystemSession>(
-            ConsoleSystemOption& option,
-            size_t console_index
-        )
-    >;
-
     //  Construct the multi-console session.
     //  By default it constructs the generic console. But you can inject your
     //  own factory for your own custom subclass.
@@ -58,10 +51,6 @@ public:
         MultiConsoleSystemOption& option,
         bool allow_commands_while_locked,
         std::optional<uint64_t> program_tracking_id = {}
-    );
-    MultiConsoleSystemSession(
-        MultiConsoleSystemOption& option,
-        SessionFactory session_factory
     );
 
 
@@ -98,10 +87,11 @@ private:
     Logger& m_logger;
     MultiConsoleSystemOption& m_option;
 
+    bool m_allow_commands_while_locked;
+    std::optional<uint64_t> m_program_tracking_id;
+
     Mutex m_resize_lock;
     FixedLimitVector<std::unique_ptr<ConsoleSystemSession>> m_consoles;
-
-    SessionFactory m_session_factory;
 
     //  Listeners who are currently locking the console count.
     //  It is not safe to change the console count if this is not zero.

@@ -71,7 +71,7 @@ public:
 
     virtual std::unique_ptr<PanelSession> make_panel() const override;
     virtual std::unique_ptr<SingleSwitchProgramInstance> make_instance(
-        SwitchSystemSession& system
+        GameConsole::ConsoleSystemSession& system
     ) const = 0;
 
 private:
@@ -114,9 +114,9 @@ template <typename Instance>
 class SingleSwitchProgramWrapper : public Instance::Descriptor{
 public:
     virtual std::unique_ptr<SingleSwitchProgramInstance> make_instance(
-        SwitchSystemSession& system
+        GameConsole::ConsoleSystemSession& system
     ) const override{
-        if constexpr (std::is_constructible_v<Instance, SwitchSystemSession&>){
+        if constexpr (std::is_constructible_v<Instance, GameConsole::ConsoleSystemSession&>){
             return std::make_unique<Instance>(system);
         }else{
             return std::make_unique<Instance>();

@@ -1204,20 +1204,14 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.h
-    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemSession.h
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.h
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h
-    Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.cpp
-    Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h
-    Source/NintendoSwitch/Framework/UI/NintendoSwitch_CommandRow.cpp
-    Source/NintendoSwitch/Framework/UI/NintendoSwitch_CommandRow.h
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchProgramWidget.cpp
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchProgramWidget.h
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SingleSwitchProgramWidget.cpp
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SingleSwitchProgramWidget.h
-    Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h
     Source/NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.h
     Source/NintendoSwitch/Inference/NintendoSwitch_CheckOnlineDetector.cpp

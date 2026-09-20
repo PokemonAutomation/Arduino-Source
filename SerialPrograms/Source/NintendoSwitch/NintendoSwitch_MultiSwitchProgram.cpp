@@ -137,7 +137,7 @@ std::unique_ptr<PanelSession> MultiSwitchProgramDescriptor::make_panel() const{
 
 
 void MultiSwitchProgramInstance::start_program_controller_check(
-    SwitchSystemSession& session, size_t console_index
+    GameConsole::ConsoleSystemSession& session, size_t console_index
 ){
     if (session.controllers() == 0){
         return;

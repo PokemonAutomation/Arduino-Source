@@ -23,6 +23,7 @@
 #include "Common/Cpp/UiWrapper.h"
 #include "Common/Cpp/EarlyShutdown.h"
 #include "Common/Cpp/Logging/TaggedLogger.h"
+#include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
 #include "CommonFramework/VideoPipeline/VideoSession.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
@@ -66,7 +67,6 @@ public:
     virtual ~ConsoleSystemSession();
 
     ConsoleSystemSession(
-        Logger& logger,
         ConsoleSystemOption& option,
         bool allow_commands_while_locked,
         size_t console_number,
@@ -85,6 +85,7 @@ public:
     AudioSession& audio(){ return m_audio; }
     VideoOverlaySession& overlay(){ return m_overlay; }
     const StreamHistorySession& stream_history() const{ return m_history; }
+    ConfigOption* extra_option(){ return m_option.m_extra_option.get(); }
 
 
 public:

@@ -96,10 +96,13 @@ std::unique_ptr<ProgramEnvironment> SingleSwitchProgramSession::make_env(const P
         current_stats_tracker(), historical_stats_tracker(),
         m_system
     );
+
+    ConsoleModelCell& console_type = static_cast<ConsoleModelCell&>(*m_system.extra_option());
+
     if (ConsoleSettings::instance().TRUST_USER_CONSOLE_SELECTION){
-        env->console.state().set_console_type(m_system.logger(), m_system.console_type());
+        env->console.state().set_console_type(m_system.logger(), console_type);
     }else{
-        env->console.state().set_console_type_user(m_system.console_type());
+        env->console.state().set_console_type_user(console_type);
     }
     return env;
 }
