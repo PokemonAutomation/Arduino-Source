@@ -15,7 +15,7 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
+#include "VideoGames/PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

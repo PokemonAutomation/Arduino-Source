@@ -11,7 +11,7 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
-#include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
+#include "VideoGames/PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

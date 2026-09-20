@@ -72,7 +72,7 @@
 #include "NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.h"
 
 //  Pokemon LA
-#include "PokemonLA/Options/QtWidgets/PokemonLA_CustomPathTableWidget.h"
+#include "VideoGames/PokemonLA/Options/QtWidgets/PokemonLA_CustomPathTableWidget.h"
 
 namespace PokemonAutomation{
 
