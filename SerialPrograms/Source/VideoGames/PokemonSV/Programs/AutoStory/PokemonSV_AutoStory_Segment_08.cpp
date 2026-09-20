@@ -1,0 +1,217 @@
+/*  AutoStory
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "VideoGames/PokemonSV/Inference/PokemonSV_TutorialDetector.h"
+#include "VideoGames/PokemonSV/Programs/PokemonSV_GameEntry.h"
+#include "VideoGames/PokemonSV/Programs/PokemonSV_SaveGame.h"
+#include "VideoGames/PokemonSV/Programs/PokemonSV_WorldNavigation.h"
+#include "PokemonSV_AutoStoryTools.h"
+#include "PokemonSV_AutoStory_Segment_08.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+//#include <unordered_map>
+//#include <algorithm>
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSV{
+
+
+
+
+std::string AutoStory_Segment_08::name() const{
+    return "08: Beat Team Star and arrive at School";
+}
+
+std::string AutoStory_Segment_08::start_text() const{
+    return "Start: At Mesagoza South Pokecenter.";
+}
+
+std::string AutoStory_Segment_08::end_text() const{
+    return "End: Battled Team Star. Talked to Jacq, introduced self to class, standing in middle of classroom.";
+}
+
+void AutoStory_Segment_08::run_segment(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+) const{
+    
+
+    stats.m_segment++;
+    env.update_stats();
+    context.wait_for_all_requests();
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
+
+    AutoStory_Checkpoint_13().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_14().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_15().run_checkpoint(env, context, options, stats);
+
+    context.wait_for_all_requests();
+    env.console.log("End Segment " + name(), COLOR_GREEN);
+
+}
+
+std::string AutoStory_Checkpoint_13::name() const{ return "013 - " + AutoStory_Segment_08().name(); }
+std::string AutoStory_Checkpoint_13::start_text() const{ return "Arrived at Mesagoza (South) Pokecenter.";}
+std::string AutoStory_Checkpoint_13::end_text() const{ return "Battled Nemona at Mesagoza gate. Entered Mesagoza.";}
+void AutoStory_Checkpoint_13::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_13(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
+}
+
+
+
+std::string AutoStory_Checkpoint_14::name() const{ return "014 - " + AutoStory_Segment_08().name(); }
+std::string AutoStory_Checkpoint_14::start_text() const{ return AutoStory_Checkpoint_13().end_text();}
+std::string AutoStory_Checkpoint_14::end_text() const{ return "Battled Team Star at school entrance.";}
+void AutoStory_Checkpoint_14::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_14(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
+}
+
+
+
+std::string AutoStory_Checkpoint_15::name() const{ return "015 - " + AutoStory_Segment_08().name(); }
+std::string AutoStory_Checkpoint_15::start_text() const{ return AutoStory_Checkpoint_14().end_text();}
+std::string AutoStory_Checkpoint_15::end_text() const{ return "Talked to Jacq in classroom. Standing in classroom.";}
+void AutoStory_Checkpoint_15::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_15(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
+}
+
+
+
+void checkpoint_13(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
+){
+    // reset rate: 0%. 0 resets out of 70.
+    
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
+    [&](size_t attempt_number){
+        do_action_and_monitor_for_battles(env.program_info(), env.console, context,
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){                  
+
+            fly_to_overlapping_flypoint(info, env.console, context);
+
+            context.wait_for_all_requests();
+            realign_player(info, env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -1, +0.375, 400ms);
+            walk_forward_while_clear_front_path(info, env.console, context, 4000ms);
+            walk_forward_until_dialog(info, env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30000ms);
+        });
+
+        env.console.log("clear_dialog: Talk with Nemona at Mesagoza gate. Stop when detect battle.");
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60,
+            {CallbackEnum::PROMPT_DIALOG, CallbackEnum::DIALOG_ARROW, CallbackEnum::BATTLE});
+        
+        env.console.log("Battle with Nemona at Mesagoza gate. Stop when detect dialog.");
+        // story continues even if you lose, no need to detect wipeout
+        run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        
+        env.console.log("clear_dialog: Talk with Nemona within Mesagoza. Stop when detect overworld.");
+        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, 
+            {CallbackEnum::OVERWORLD, CallbackEnum::PROMPT_DIALOG, CallbackEnum::WHITE_A_BUTTON});
+        
+       
+    }, false);
+
+}
+
+void checkpoint_14(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
+){
+    
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
+    [&](size_t attempt_number){
+
+        context.wait_for_all_requests();
+        // realign diagonally to the left
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -0.375, +1, 800ms);
+        // walk forward so you're off center
+        pbf_move_left_joystick(context, {0, +1}, 800ms, 800ms);
+        // realign going straight
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, +1, 800ms);
+        // walk forward, while still off center
+        pbf_move_left_joystick(context, {0, +1}, 16000ms, 800ms);
+        // realign diagonally to the right
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +0.394, +1, 800ms);
+        // walk forward so you're closer to the center
+        pbf_move_left_joystick(context, {0, +1}, 1200ms, 800ms);
+        // realign going straight
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, +1, 800ms);
+        // walk forward until hit dialog at top of stairs
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60000ms);
+        // clear dialog until battle. with prompt, battle
+        env.console.log("clear_dialog: Talk with Team Star at the top of the stairs. Stop when detect battle.");
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::PROMPT_DIALOG, CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});
+        // run battle until dialog
+        env.console.log("Battle with Team Star grunt 1. Stop when detect dialog.");
+        run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG, {}, true);  // need to detect wipeouts, since you need to win, and you likely only have 1 pokemon
+        // clear dialog until battle, with prompt, white button, tutorial, battle
+        env.console.log("clear_dialog: Talk with Team Star and Nemona. Receive Tera orb. Stop when detect battle.");
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, 
+            {CallbackEnum::PROMPT_DIALOG, CallbackEnum::WHITE_A_BUTTON, CallbackEnum::TUTORIAL, CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});
+        // run battle until dialog
+        env.console.log("Battle with Team Star grunt 2. Stop when detect dialog.");
+        run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG, {}, true); // need to detect wipeouts, since you need to win, and you likely only have 1 pokemon
+        // clear dialog until overworld
+        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
+       
+    }, false);
+
+}
+
+void checkpoint_15(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
+){
+    
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
+    [&](size_t attempt_number){
+
+        context.wait_for_all_requests();
+        // realign diagonally to the right
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +0.394, +1, 800ms);
+        // walk forward so you're closer to the center
+        pbf_move_left_joystick(context, {0, +1}, 800ms, 800ms);
+        // realign going straight
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, +1, 800ms);
+        // walk forward up stairs
+        pbf_move_left_joystick(context, {0, +1}, 8000ms, 800ms);
+        // realign going straight
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        // walk forward until hit dialog inside the school
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60000ms);
+
+        env.console.log("clear_dialog: Talk with Nemona, Clavell, and Jacq inside the school. Stop when detect overworld.");
+        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, 
+            {CallbackEnum::PROMPT_DIALOG, CallbackEnum::OVERWORLD});
+       
+    }, false);
+
+}
+
+
+
+}
+}
+}

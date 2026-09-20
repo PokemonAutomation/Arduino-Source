@@ -1,0 +1,161 @@
+/*  AutoStory
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "VideoGames/PokemonSV/Inference/PokemonSV_TutorialDetector.h"
+#include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
+#include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_NoMinimapDetector.h"
+#include "VideoGames/PokemonSV/Programs/PokemonSV_GameEntry.h"
+#include "VideoGames/PokemonSV/Programs/PokemonSV_SaveGame.h"
+#include "VideoGames/PokemonSV/Programs/PokemonSV_MenuNavigation.h"
+#include "VideoGames/PokemonSV/Programs/PokemonSV_WorldNavigation.h"
+#include "PokemonSV_AutoStoryTools.h"
+#include "PokemonSV_AutoStory_Segment_12.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+//#include <unordered_map>
+//#include <algorithm>
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSV{
+
+
+
+
+std::string AutoStory_Segment_12::name() const{
+    return "12: Cortondo Gym (Bug): Gym battle";
+}
+
+std::string AutoStory_Segment_12::start_text() const{
+    return "Start: Beat Cortondo Gym challenge. At Cortondo East Pokecenter.";
+}
+
+std::string AutoStory_Segment_12::end_text() const{
+    return "End: Beat Cortondo Gym battle. At Cortondo West Pokecenter.";
+}
+
+
+void AutoStory_Segment_12::run_segment(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+) const{
+    
+
+    stats.m_segment++;
+    env.update_stats();
+    context.wait_for_all_requests();
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
+
+    AutoStory_Checkpoint_28().run_checkpoint(env, context, options, stats);
+
+    context.wait_for_all_requests();
+    env.console.log("End Segment " + name(), COLOR_GREEN);
+
+}
+
+std::string AutoStory_Checkpoint_28::name() const{ return "028 - " + AutoStory_Segment_12().name(); }
+std::string AutoStory_Checkpoint_28::start_text() const{ return "At Cortondo East Pokecenter.";}
+std::string AutoStory_Checkpoint_28::end_text() const{ return "Beat Cortondo Gym. At Cortondo West Pokecenter.";}
+void AutoStory_Checkpoint_28::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_28(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
+}
+
+
+void checkpoint_28(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
+){
+    
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
+    [&](size_t attempt_number){         
+        context.wait_for_all_requests();
+        DirectionDetector direction;
+        if (attempt_number > 0 || ENABLE_TEST){
+            env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, -1, +1, 0ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, -1, +1, 0ms});
+        }
+
+        do_action_and_monitor_for_battles(env.program_info(), env.console, context,
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                direction.change_direction(env.program_info(), env.console, context, 2.71);
+                pbf_move_left_joystick(context, {0, +1}, 3000ms, 800ms);
+                direction.change_direction(env.program_info(), env.console, context, 1.26);
+                pbf_move_left_joystick(context, {0, +1}, 14000ms, 800ms);
+        });        
+       
+        direction.change_direction(env.program_info(), env.console, context, 2.73);
+
+        NoMinimapWatcher no_minimap(env.console, COLOR_RED, Milliseconds(2000));
+        int ret = run_until<ProControllerContext>(
+            env.console, context,
+            [&](ProControllerContext& context){
+                handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+                    [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                        pbf_move_left_joystick(context, {0, +1}, 10000ms, 800ms);
+                    }, 
+                    [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                        pbf_move_left_joystick(context, {-1, +1}, 800ms, 160ms);
+                    },
+                    5, 3
+                );     
+            },
+            {no_minimap}
+        );
+        if (ret < 0){
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
+                "Failed to enter Cortondo Gym.",
+                env.console
+            );
+        }
+
+        wait_for_overworld(env.program_info(), env.console, context);
+
+        // talk to receptionist
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10000ms);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::PROMPT_DIALOG, CallbackEnum::DIALOG_ARROW});
+
+        // battle Katy
+        env.console.log("Battle Grass Gym.");
+        run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        mash_button_till_overworld(env.console, context, BUTTON_A, 360);
+
+        // leave gym building
+        pbf_move_left_joystick(context, {0, -1}, 2400ms, 800ms);
+        pbf_wait(context, 3000ms);
+        // wait for overworld after leaving gym
+        wait_for_overworld(env.program_info(), env.console, context, 30);
+
+        pbf_move_left_joystick(context, {0, +1}, 3600ms, 800ms);
+        direction.change_direction(env.program_info(), env.console, context, 1.26);
+        pbf_move_left_joystick(context, {0, +1}, 12800ms, 800ms);
+        fly_to_overlapping_flypoint(env.program_info(), env.console, context);
+       
+    });
+
+}
+
+
+
+
+}
+}
+}

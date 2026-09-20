@@ -1,0 +1,194 @@
+/*  Tera Silhouette Reader
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#include <opencv2/imgproc.hpp>
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
+#include "CommonTools/Images/ImageFilter.h"
+#include "CommonTools/ImageMatch/ImageCropper.h"
+#include "Tests/TestUtils.h"
+#include "VideoGames/PokemonSV/Resources/PokemonSV_PokemonSprites.h"
+#include "PokemonSV_TeraSilhouetteReader.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSV{
+
+
+ImageMatch::SilhouetteDictionaryMatcher make_TERA_RAID_SILHOUETTE_MATCHER(){
+    ImageMatch::SilhouetteDictionaryMatcher matcher;
+    for (const auto& item : ALL_POKEMON_SILHOUETTES()){
+        if (item.first == "pm1084_00_00_00_big" ||
+            item.first == "pm1091_00_00_00_big" ||
+            item.first == "error"){
+            continue;
+        }
+        ImageRGB32 filtered_image = to_blackwhite_rgb32_range(
+            item.second.icon,
+            true,
+            0xff000000, 0xff5f5f5f
+        );
+        matcher.add(item.first, filtered_image);
+    }
+    return matcher;
+}
+const ImageMatch::SilhouetteDictionaryMatcher& TERA_RAID_SILHOUETTE_MATCHER(){
+    static ImageMatch::SilhouetteDictionaryMatcher matcher = make_TERA_RAID_SILHOUETTE_MATCHER();
+    return matcher;
+}
+
+TeraSilhouetteReader::TeraSilhouetteReader(Color color)
+    : m_color(color)
+    , m_box(0.536, 0.122, 0.252, 0.430)
+{}
+
+void TeraSilhouetteReader::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_box);
+}
+
+ImageMatch::ImageMatchResult TeraSilhouetteReader::read(const ImageViewRGB32& screen) const{
+    static constexpr double MAX_ALPHA = 120;
+    static constexpr double ALPHA_SPREAD = 20;
+
+    const std::vector<uint32_t> BRIGHTNESS_THRESHOLDS{
+        200,
+        150,
+        100,
+        125,
+        175,
+        225,
+    };
+
+//    static int c = 0;
+
+    ImageMatch::ImageMatchResult slugs;
+    for (uint32_t threshold : BRIGHTNESS_THRESHOLDS){
+//        cout << "check0" << endl;
+        //  Get a loose crop of the silhouette icon
+        ImageViewRGB32 cropped_image = extract_box_reference(screen, m_box);
+//        cropped_image.save("tera_cropped_image-" + std::to_string(c++) + ".png");
+
+//        cout << "check1" << endl;
+        ImageRGB32 preprocessed_image(cropped_image.width(), cropped_image.height());
+        cv::medianBlur(to_OpenCV_ref(cropped_image), to_OpenCV_ref(preprocessed_image), 5);
+//        preprocessed_image.save("tera_blurred_image.png");
+
+        //  Get a tight crop
+//        cout << "check2" << endl;
+        const ImagePixelBox tight_box = ImageMatch::enclosing_rectangle_with_pixel_filter(
+            preprocessed_image,
+            // The filter is a lambda function that returns true on black silhouette pixels.
+            [=](Color pixel){
+                return (uint32_t)pixel.red() + pixel.green() + pixel.blue() <= threshold;
+            }
+        );
+
+        if (tight_box.area() == 0){
+//            global_logger_tagged().log("TeraSilhouetteReader::read(): Cropped image is empty.", COLOR_RED);
+            continue;
+        }
+
+//        cout << "check3" << endl;
+        ImageRGB32 processed_image = extract_box_reference(preprocessed_image, tight_box).copy();
+//        processed_image.save("tera_processed_image-" + std::to_string(c++) + ".png");
+
+//        cout << "check4" << endl;
+//        ImageRGB32 filtered_image = to_blackwhite_rgb32_range(processed_image, true, 0xff000000, 0xff5f5f5f);
+        ImageRGB32 filtered_image = to_blackwhite_rgb32_brightness(
+            processed_image, true,
+            0x00010101, 0, threshold
+        );
+//        filtered_image.save("tera_filtered_image-" + std::to_string(c++) + ".png");
+
+//        cout << "check5" << endl;
+        slugs = TERA_RAID_SILHOUETTE_MATCHER().match(filtered_image, ALPHA_SPREAD);
+
+        slugs.clear_beyond_alpha(MAX_ALPHA);
+
+//        slugs.log(global_logger_tagged(), MAX_ALPHA);
+
+        if (slugs.results.size() == 1){
+            return slugs;
+        }
+    }
+
+    return slugs;
+}
+
+
+
+
+
+
+
+
+
+class Test_TeraSilhouetteReader : public UnitTest{
+public:
+    Test_TeraSilhouetteReader(
+        const std::string& image,
+        std::string expected
+    )
+        : UnitTest("PokemonSV::TeraSilhouetteReader - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(std::move(expected))
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        TeraSilhouetteReader reader(COLOR_RED);
+
+        ImageRGB32 image(m_image);
+        ImageMatch::ImageMatchResult slugs = reader.read(image);
+        if (slugs.results.empty()){
+            std::stringstream ss;
+            ss << "No silhouette detected" << std::endl;
+            return ss.str();
+        }
+        std::string best_match = slugs.results.begin()->second;
+
+        TEST_RESULT_EQUAL_STR(best_match, m_expected);
+
+        return true;
+    };
+
+private:
+    std::string m_image;
+    std::string m_expected;
+};
+
+
+
+
+void add_tests_TeraSilhouetteReader(UnitTestDatabase& database){
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/applin.png", "applin");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/arboliva.png", "arboliva");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/axew.jpg", "axew");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/clodsire.jpg", "clodsire");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/donphan.jpg", "donphan");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/girafarig.jpg", "girafarig");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/lurantis.jpg", "lurantis");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/mimikyu-disguised.jpg", "mimikyu-disguised");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/noivern.jpg", "noivern");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/pineco.png", "pineco");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/raichu.jpg", "raichu");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/Scarlet_1star_applin.png", "applin");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/seviper.jpg", "seviper");
+    database.add<Test_TeraSilhouetteReader>("PokemonSV/TeraSilhouetteReader/staraptor.jpg", "staraptor");
+}
+
+
+
+
+
+
+}
+}
+}
