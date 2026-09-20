@@ -25,6 +25,7 @@ public:
 
 class ClipboardFastCodeEntry : public MultiSwitchProgramInstance{
 public:
+    using Descriptor = ClipboardFastCodeEntry_Descriptor;
     ClipboardFastCodeEntry();
     virtual void update_active_consoles(size_t switch_count) override;
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;

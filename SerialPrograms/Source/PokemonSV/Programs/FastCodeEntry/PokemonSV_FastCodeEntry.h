@@ -27,6 +27,7 @@ public:
 
 class FastCodeEntry : public MultiSwitchProgramInstance{
 public:
+    using Descriptor = FastCodeEntry_Descriptor;
     FastCodeEntry();
     virtual void update_active_consoles(size_t switch_count) override;
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;

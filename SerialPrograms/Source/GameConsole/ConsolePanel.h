@@ -49,7 +49,6 @@ private:
 
 
 
-
 class ConsolePanelInstance{
 public:
     virtual ~ConsolePanelInstance() = default;
@@ -80,9 +79,8 @@ protected:
 
 
 
-
-template <typename Descriptor, typename Instance>
-class ConsolePanelWrapper : public Descriptor{
+template <typename Instance>
+class ConsolePanelWrapper : public Instance::Descriptor{
 public:
     virtual std::unique_ptr<ConsolePanelInstance> make_instance(
         ConsoleSystemSession& system
@@ -95,9 +93,9 @@ public:
     }
 };
 
-template <typename Descriptor, typename Instance>
+template <typename Instance>
 std::unique_ptr<PanelDescriptor> make_ConsolePanel(){
-    return std::make_unique<ConsolePanelWrapper<Descriptor, Instance>>();
+    return std::make_unique<ConsolePanelWrapper<Instance>>();
 }
 
 

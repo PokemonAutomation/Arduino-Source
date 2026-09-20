@@ -28,6 +28,8 @@ public:
 
 class SelfBoxTrade : public MultiSwitchProgramInstance{
 public:
+    using Descriptor = SelfBoxTrade_Descriptor;
+
     SelfBoxTrade();
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 

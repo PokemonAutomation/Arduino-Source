@@ -33,6 +33,7 @@ public:
 
 class MaxLairBossFinder : public MultiSwitchProgramInstance{
 public:
+    using Descriptor = MaxLairBossFinder_Descriptor;
     MaxLairBossFinder();
 
     virtual std::string check_validity() const override;

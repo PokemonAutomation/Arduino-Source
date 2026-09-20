@@ -23,6 +23,7 @@ public:
 
 class SynchronizedSpinning : public MultiSwitchProgramInstance{
 public:
+    using Descriptor = SynchronizedSpinning_Descriptor;
     SynchronizedSpinning();
 
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;

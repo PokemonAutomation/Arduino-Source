@@ -37,6 +37,7 @@ public:
     };
 
 public:
+    using Descriptor = MaxLairStandard_Descriptor;
     MaxLairStandard();
 
     virtual std::string check_validity() const override;

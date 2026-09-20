@@ -53,6 +53,7 @@ public:
 
 class VideoFastCodeEntry : public MultiSwitchProgramInstance{
 public:
+    using Descriptor = VideoFastCodeEntry_Descriptor;
     VideoFastCodeEntry();
     virtual void update_active_consoles(size_t switch_count) override;
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;

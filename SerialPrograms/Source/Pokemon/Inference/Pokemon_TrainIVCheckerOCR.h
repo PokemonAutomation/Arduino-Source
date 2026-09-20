@@ -25,6 +25,7 @@ public:
 
 class TrainIVCheckerOCR : public ComputerProgramInstance{
 public:
+    using Descriptor = TrainIVCheckerOCR_Descriptor;
     TrainIVCheckerOCR();
 
     virtual void program(ProgramEnvironment& env, CancellableScope& scope) override;

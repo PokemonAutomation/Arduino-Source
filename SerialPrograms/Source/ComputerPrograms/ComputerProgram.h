@@ -40,17 +40,17 @@ public:
 
 
 
-template <typename Descriptor, typename Instance>
-class ComputerProgramWrapper : public Descriptor{
+template <typename Instance>
+class ComputerProgramWrapper : public Instance::Descriptor{
 public:
     virtual std::unique_ptr<ComputerProgramInstance> make_instance() const override{
         return std::unique_ptr<ComputerProgramInstance>(new Instance());
     }
 };
 
-template <typename Descriptor, typename Instance>
-std::unique_ptr<PanelDescriptor> make_computer_program(){
-    return std::make_unique<ComputerProgramWrapper<Descriptor, Instance>>();
+template <typename Instance>
+std::unique_ptr<PanelDescriptor> make_ComputerProgram(){
+    return std::make_unique<ComputerProgramWrapper<Instance>>();
 }
 
 

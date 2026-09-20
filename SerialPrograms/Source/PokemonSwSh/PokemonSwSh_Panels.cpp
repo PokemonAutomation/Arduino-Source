@@ -100,7 +100,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     std::vector<PanelEntry> ret;
 
     ret.emplace_back("---- Settings ----");
-    ret.emplace_back(make_OptionsPanel<GameSettings_Descriptor, GameSettingsPanel>());
+    ret.emplace_back(make_OptionsPanel<GameSettingsPanel>());
 
     ret.emplace_back("---- QoL Macros ----");
     ret.emplace_back(make_single_switch_program<FastCodeEntry_Descriptor, FastCodeEntry>());
@@ -174,13 +174,13 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<CramomaticRNG_Descriptor, CramomaticRNG>());
 
     ret.emplace_back("---- Multi-Switch Programs ----");
-    ret.emplace_back(make_multi_switch_program<SynchronizedSpinning_Descriptor, SynchronizedSpinning>());
-    ret.emplace_back(make_multi_switch_program<RaidItemFarmerOHKO_Descriptor, RaidItemFarmerOHKO>());
+    ret.emplace_back(make_MultiSwitchProgram<SynchronizedSpinning>());
+    ret.emplace_back(make_MultiSwitchProgram<RaidItemFarmerOHKO>());
 
     ret.emplace_back("---- Auto Max Lair 2.0 ----");
-    ret.emplace_back(make_multi_switch_program<MaxLairStandard_Descriptor, MaxLairStandard>());
-    ret.emplace_back(make_multi_switch_program<MaxLairStrongBoss_Descriptor, MaxLairStrongBoss>());
-    ret.emplace_back(make_multi_switch_program<MaxLairBossFinder_Descriptor, MaxLairBossFinder>());
+    ret.emplace_back(make_MultiSwitchProgram<MaxLairStandard>());
+    ret.emplace_back(make_MultiSwitchProgram<MaxLairStrongBoss>());
+    ret.emplace_back(make_MultiSwitchProgram<MaxLairBossFinder>());
 
     ret.emplace_back("---- Public Betas ----");
     ret.emplace_back(make_single_switch_program<DailyHighlightRNG_Descriptor, DailyHighlightRNG>());

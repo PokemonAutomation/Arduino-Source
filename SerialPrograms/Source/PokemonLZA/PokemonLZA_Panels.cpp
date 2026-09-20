@@ -72,12 +72,12 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     std::vector<PanelEntry> ret;
 
     ret.emplace_back("---- Settings ----");
-    ret.emplace_back(make_OptionsPanel<GameSettings_Descriptor, GameSettingsPanel>());
+    ret.emplace_back(make_OptionsPanel<GameSettingsPanel>());
 
     ret.emplace_back("---- General ----");
     ret.emplace_back(make_single_switch_program<ClothingBuyer_Descriptor, ClothingBuyer>());
     ret.emplace_back(make_single_switch_program<StallBuyer_Descriptor, StallBuyer>());
-    ret.emplace_back(make_multi_switch_program<SelfBoxTrade_Descriptor, SelfBoxTrade>());
+    ret.emplace_back(make_MultiSwitchProgram<SelfBoxTrade>());
     ret.emplace_back(make_single_switch_program<PostKillCatcher_Descriptor, PostKillCatcher>());
     ret.emplace_back(make_single_switch_program<BoxSorter_Descriptor, BoxSorter>());
     ret.emplace_back(make_single_switch_program<WeatherFinder_Descriptor, WeatherFinder>());

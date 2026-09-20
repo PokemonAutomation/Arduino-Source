@@ -403,6 +403,10 @@ GlobalSettings_Descriptor::GlobalSettings_Descriptor()
         "Global Settings"
     )
 {}
+GlobalSettings_Descriptor::Wrapper& GlobalSettings_Descriptor::instance(){
+    static Wrapper wrapper;
+    return wrapper;
+}
 
 
 GlobalSettingsPanel::GlobalSettingsPanel()
