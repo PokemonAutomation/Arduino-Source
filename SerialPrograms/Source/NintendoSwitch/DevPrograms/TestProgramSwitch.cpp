@@ -142,7 +142,7 @@
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Async/InterruptableCommands.h"
-#include "PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.h"
+#include "VideoGames/PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.h"
 #include "VideoGames/PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "VideoGames/PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "VideoGames/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
@@ -175,7 +175,7 @@
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_MainMenuDetector.h"
 #include "VideoGames/PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.h"
-#include "PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.h"
+#include "VideoGames/PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_ExperienceGainDetector.h"
 
 

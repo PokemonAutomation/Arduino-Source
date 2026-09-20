@@ -1956,32 +1956,32 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonLA/Resources/PokemonLA_PokemonSprites.h
     Source/VideoGames/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.cpp
     Source/VideoGames/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h
-    Source/PokemonLGPE/Commands/PokemonLGPE_DateSpam.cpp
-    Source/PokemonLGPE/Commands/PokemonLGPE_DateSpam.h
-    Source/PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.cpp
-    Source/PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.h
-    Source/PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.cpp
-    Source/PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.h
-    Source/PokemonLGPE/Inference/Sounds/PokemonLGPE_ShinySoundDetector.cpp
-    Source/PokemonLGPE/Inference/Sounds/PokemonLGPE_ShinySoundDetector.h
-    Source/PokemonLGPE/PokemonLGPE_Panels.cpp
-    Source/PokemonLGPE/PokemonLGPE_Panels.h
-    Source/PokemonLGPE/PokemonLGPE_Settings.cpp
-    Source/PokemonLGPE/PokemonLGPE_Settings.h
-    Source/PokemonLGPE/Programs/Farming/PokemonLGPE_DailyItemFarmer.cpp
-    Source/PokemonLGPE/Programs/Farming/PokemonLGPE_DailyItemFarmer.h
-    Source/PokemonLGPE/Programs/PokemonLGPE_GameEntry.cpp
-    Source/PokemonLGPE/Programs/PokemonLGPE_GameEntry.h
-    Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_AlolanTrade.cpp
-    Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_AlolanTrade.h
-    Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_FossilRevival.cpp
-    Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_FossilRevival.h
-    Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_GiftReset.cpp
-    Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_GiftReset.h
-    Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_LegendaryReset.cpp
-    Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_LegendaryReset.h
-    Source/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.cpp
-    Source/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.h
+    Source/VideoGames/PokemonLGPE/Commands/PokemonLGPE_DateSpam.cpp
+    Source/VideoGames/PokemonLGPE/Commands/PokemonLGPE_DateSpam.h
+    Source/VideoGames/PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.cpp
+    Source/VideoGames/PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.h
+    Source/VideoGames/PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.cpp
+    Source/VideoGames/PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.h
+    Source/VideoGames/PokemonLGPE/Inference/Sounds/PokemonLGPE_ShinySoundDetector.cpp
+    Source/VideoGames/PokemonLGPE/Inference/Sounds/PokemonLGPE_ShinySoundDetector.h
+    Source/VideoGames/PokemonLGPE/PokemonLGPE_Panels.cpp
+    Source/VideoGames/PokemonLGPE/PokemonLGPE_Panels.h
+    Source/VideoGames/PokemonLGPE/PokemonLGPE_Settings.cpp
+    Source/VideoGames/PokemonLGPE/PokemonLGPE_Settings.h
+    Source/VideoGames/PokemonLGPE/Programs/Farming/PokemonLGPE_DailyItemFarmer.cpp
+    Source/VideoGames/PokemonLGPE/Programs/Farming/PokemonLGPE_DailyItemFarmer.h
+    Source/VideoGames/PokemonLGPE/Programs/PokemonLGPE_GameEntry.cpp
+    Source/VideoGames/PokemonLGPE/Programs/PokemonLGPE_GameEntry.h
+    Source/VideoGames/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_AlolanTrade.cpp
+    Source/VideoGames/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_AlolanTrade.h
+    Source/VideoGames/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_FossilRevival.cpp
+    Source/VideoGames/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_FossilRevival.h
+    Source/VideoGames/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_GiftReset.cpp
+    Source/VideoGames/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_GiftReset.h
+    Source/VideoGames/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_LegendaryReset.cpp
+    Source/VideoGames/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_LegendaryReset.h
+    Source/VideoGames/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.cpp
+    Source/VideoGames/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.h
     Source/VideoGames/PokemonLZA/Inference/Battles/PokemonLZA_MoveEffectivenessSymbol.cpp
     Source/VideoGames/PokemonLZA/Inference/Battles/PokemonLZA_MoveEffectivenessSymbol.h
     Source/VideoGames/PokemonLZA/Inference/Battles/PokemonLZA_RunFromBattleDetector.cpp

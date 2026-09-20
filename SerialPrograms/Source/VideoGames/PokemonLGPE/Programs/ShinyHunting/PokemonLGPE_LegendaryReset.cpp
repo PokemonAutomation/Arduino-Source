@@ -15,9 +15,9 @@
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
-#include "PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.h"
-#include "PokemonLGPE/Inference/Sounds/PokemonLGPE_ShinySoundDetector.h"
-#include "PokemonLGPE/Programs/PokemonLGPE_GameEntry.h"
+#include "VideoGames/PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.h"
+#include "VideoGames/PokemonLGPE/Inference/Sounds/PokemonLGPE_ShinySoundDetector.h"
+#include "VideoGames/PokemonLGPE/Programs/PokemonLGPE_GameEntry.h"
 #include "PokemonLGPE_LegendaryReset.h"
 
 namespace PokemonAutomation{
