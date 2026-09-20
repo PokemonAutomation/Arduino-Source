@@ -1,0 +1,39 @@
+/*  Shiny Number Detector
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#ifndef PokemonAutomation_PokemonRSE_ShinyNumberDetector_H
+#define PokemonAutomation_PokemonRSE_ShinyNumberDetector_H
+
+#include "Common/Cpp/Logging/AbstractLogger.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "VideoGames/PokemonRSE/PokemonRSE_Settings.h"
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonRSE{
+
+// In the summary screen, the dex number will be yellow if a shiny, white if not.
+// Additionally, the background behind the sprite will be white if shiny, grey if not.
+// Number is easier to check as the background is scan lines.
+// Number might be cut off a bit for japan, but as long as most of it is in its fine
+// Warning: In Emerald, the moving sprite may cover the number!
+class ShinyNumberDetector{
+public:
+    ShinyNumberDetector(Color color);
+
+    virtual void make_overlays(VideoOverlaySet& items) const;
+    bool read(Logger& logger, const ImageViewRGB32& frame);
+
+private:
+    ImageFloatBox m_box_number;
+};
+
+
+
+}
+}
+}
+#endif
