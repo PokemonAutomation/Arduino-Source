@@ -13,7 +13,7 @@
 //#include "Controllers/ControllerTypes.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
-#include "PokemonLGPE/PokemonLGPE_Settings.h"
+#include "VideoGames/PokemonLGPE/PokemonLGPE_Settings.h"
 #include "PokemonLGPE_GameEntry.h"
 
 //#include <iostream>

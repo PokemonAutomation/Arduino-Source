@@ -15,8 +15,8 @@
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
-#include "PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.h"
-#include "PokemonLGPE/Programs/PokemonLGPE_GameEntry.h"
+#include "VideoGames/PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.h"
+#include "VideoGames/PokemonLGPE/Programs/PokemonLGPE_GameEntry.h"
 #include "PokemonLGPE_AlolanTrade.h"
 
 namespace PokemonAutomation{

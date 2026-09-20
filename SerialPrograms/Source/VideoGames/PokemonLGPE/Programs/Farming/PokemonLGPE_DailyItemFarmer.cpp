@@ -17,9 +17,9 @@
 #include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.h"
 #include "Pokemon/Pokemon_Strings.h"
 //#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
-#include "PokemonLGPE/Commands/PokemonLGPE_DateSpam.h"
-//#include "PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.h"
-//#include "PokemonLGPE/Programs/PokemonLGPE_GameEntry.h"
+#include "VideoGames/PokemonLGPE/Commands/PokemonLGPE_DateSpam.h"
+//#include "VideoGames/PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.h"
+//#include "VideoGames/PokemonLGPE/Programs/PokemonLGPE_GameEntry.h"
 #include "VideoGames/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonLGPE_DailyItemFarmer.h"
 
