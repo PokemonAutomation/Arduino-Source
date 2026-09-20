@@ -22,7 +22,7 @@
 #include "VideoGames/PokemonLA/PokemonLA_Panels.h"
 #include "PokemonLGPE/PokemonLGPE_Panels.h"
 #include "VideoGames/PokemonRSE/PokemonRSE_Panels.h"
-#include "PokemonSV/PokemonSV_Panels.h"
+#include "VideoGames/PokemonSV/PokemonSV_Panels.h"
 #include "VideoGames/PokemonLZA/PokemonLZA_Panels.h"
 #include "VideoGames/PokemonPokopia/PokemonPokopia_Panels.h"
 #include "VideoGames/ZeldaTotK/ZeldaTotK_Panels.h"

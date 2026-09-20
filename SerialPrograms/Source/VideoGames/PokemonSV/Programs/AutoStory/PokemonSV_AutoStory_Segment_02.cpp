@@ -1,0 +1,109 @@
+/*  AutoStory
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "VideoGames/PokemonSV/Programs/PokemonSV_GameEntry.h"
+#include "VideoGames/PokemonSV/Programs/PokemonSV_SaveGame.h"
+#include "VideoGames/PokemonSV/Programs/PokemonSV_MenuNavigation.h"
+#include "VideoGames/PokemonSV/Programs/PokemonSV_WorldNavigation.h"
+#include "VideoGames/PokemonSV/Inference/PokemonSV_TutorialDetector.h"
+#include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
+#include "PokemonSV_AutoStoryTools.h"
+#include "PokemonSV_AutoStory_Segment_02.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+//#include <unordered_map>
+//#include <algorithm>
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSV{
+
+
+
+
+
+std::string AutoStory_Segment_02::name() const{
+    return "02: First Nemona Battle";
+}
+
+std::string AutoStory_Segment_02::start_text() const{
+    return "Start: Picked the starter. Changed move order.";
+}
+
+std::string AutoStory_Segment_02::end_text() const{
+    return "End: Battled Nemona on the beach.";
+}
+
+void AutoStory_Segment_02::run_segment(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+) const{
+    stats.m_segment++;
+    env.update_stats();
+    context.wait_for_all_requests();
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
+
+    AutoStory_Checkpoint_04().run_checkpoint(env, context, options, stats);
+
+    context.wait_for_all_requests();
+    env.console.log("End Segment " + name(), COLOR_GREEN);         
+
+}
+
+
+std::string AutoStory_Checkpoint_04::name() const{ return "004 - " + AutoStory_Segment_02().name(); }
+std::string AutoStory_Checkpoint_04::start_text() const{ return "Received starter Pokemon. Changed move order. Cleared autoheal tutorial.";}
+std::string AutoStory_Checkpoint_04::end_text() const{ return "Battled Nemona on the beach.";}
+void AutoStory_Checkpoint_04::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_04(env, context, options.notif_status_update, options.notif_error_recoverable, stats, checkpoint_text());
+}
+
+
+void checkpoint_04(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
+){
+    checkpoint_reattempt_loop(env, context, notif_status_update, notif_error_recoverable, stats, checkpoint_text,
+    [&](size_t attempt_number){        
+        context.wait_for_all_requests();
+
+        DirectionDetector direction;
+        direction.change_direction(env.program_info(), env.console, context, 3.72);
+        pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
+        direction.change_direction(env.program_info(), env.console, context, 4.55);
+        pbf_move_left_joystick(context, {0, +1}, 4800ms, 400ms);
+        direction.change_direction(env.program_info(), env.console, context, 5.27);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20000ms);
+
+        context.wait_for_all_requests();
+        env.console.log("Starting battle...");
+        // TODO: Battle start prompt detection
+        // can lose this battle, and story will continue
+        mash_button_till_overworld(env.console, context);
+        context.wait_for_all_requests();
+        env.console.log("Finished battle.");
+
+    }, false);
+
+}
+
+
+
+
+}
+}
+}

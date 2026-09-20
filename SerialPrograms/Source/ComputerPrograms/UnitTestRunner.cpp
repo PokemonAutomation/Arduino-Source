@@ -23,7 +23,7 @@
 #include "VideoGames/PokemonHome/PokemonHome_Tests.h"
 #include "VideoGames/PokemonSwSh/PokemonSwSh_Tests.h"
 #include "VideoGames/PokemonLA/PokemonLA_Tests.h"
-#include "PokemonSV/PokemonSV_Tests.h"
+#include "VideoGames/PokemonSV/PokemonSV_Tests.h"
 #include "VideoGames/PokemonLZA/PokemonLZA_Tests.h"
 
 namespace PokemonAutomation{
