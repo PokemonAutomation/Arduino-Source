@@ -29,7 +29,6 @@ public:
     using Descriptor = WaterfillTemplateMaker_Descriptor;
     WaterfillTemplateMaker(GameConsole::ConsoleSystemSession& system);
 
-    virtual void start_program_controller_check(SwitchSystemSession& session) override{}
     virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:

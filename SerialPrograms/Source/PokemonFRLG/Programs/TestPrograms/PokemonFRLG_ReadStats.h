@@ -25,7 +25,6 @@ public:
     using Descriptor = ReadStats_Descriptor;
     ReadStats();
 
-    virtual void start_program_controller_check(SwitchSystemSession& session) override{}
     virtual void start_program_border_check(
         VideoStream &stream, FeedbackType feedback_type
     ) override{}

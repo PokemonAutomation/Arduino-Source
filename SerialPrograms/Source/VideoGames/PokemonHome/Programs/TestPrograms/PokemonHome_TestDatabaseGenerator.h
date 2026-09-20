@@ -25,7 +25,6 @@ class TestDatabaseGenerator : public SingleSwitchProgramInstance{
 public:
     using Descriptor = TestDatabaseGenerator_Descriptor;
     TestDatabaseGenerator();
-    virtual void start_program_controller_check(SwitchSystemSession& session) override{}
     virtual void program(
         SingleSwitchProgramEnvironment& env,
         CancellableScope& scope
