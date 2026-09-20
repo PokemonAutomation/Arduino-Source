@@ -35,7 +35,6 @@ GameSettings::GameSettings()
 
 GameSettings_Descriptor::GameSettings_Descriptor()
     : OptionsPanelDescriptor(
-        Color(),
         "PokemonPokopia:GlobalSettings",
         STRING_POKEMON + " Pokopia", "Game Settings",
         "Programs/PokemonPokopia/PokemonSettings.html",

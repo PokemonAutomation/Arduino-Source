@@ -58,7 +58,7 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
         descriptor.display_name(),
         descriptor.doc_link(),
         descriptor.description(),
-        descriptor.color_class()
+        descriptor.controller_class()
     );
     m_layout->addWidget(header);
 

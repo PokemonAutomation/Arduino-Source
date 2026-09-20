@@ -61,7 +61,6 @@ GameSettings::GameSettings()
 
 GameSettings_Descriptor::GameSettings_Descriptor()
     : OptionsPanelDescriptor(
-        Color(),
         "ZeldaTotK:GlobalSettings",
         "Zelda: TotK", "Tears of the Kingdom Settings",
         "Programs/ZeldaTotK/TotKSettings.html",

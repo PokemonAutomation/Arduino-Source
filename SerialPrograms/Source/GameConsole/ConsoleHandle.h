@@ -7,17 +7,11 @@
 #ifndef PokemonAutomation_GameConsole_ConsoleHandle_H
 #define PokemonAutomation_GameConsole_ConsoleHandle_H
 
-#include <memory>
+#include "Common/Cpp/Containers/Pimpl.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "Controllers/Controller.h"
-#include "Controllers/NullController.h"
 
 namespace PokemonAutomation{
-
-class ThreadHandle;
-class ThreadUtilizationStat;
-class ThreadPoolUtilizationStat;
-
 namespace GameConsole{
 
 class ConsoleSystemSession;
@@ -34,9 +28,9 @@ public:
 
 
 public:
-    ConsoleHandle(GameConsole::ConsoleSystemSession& session);
+    ConsoleHandle(ConsoleSystemSession& session);
 
-    size_t index() const{ return m_index; }
+    size_t index() const;
 
     operator Logger&(){ return logger(); }
     operator VideoFeed&(){ return video(); }
@@ -61,13 +55,8 @@ public:
 
 
 private:
-    GameConsole::ConsoleSystemSession& m_session;
-    size_t m_index;
-    NullController m_null_controller;
-
-    std::unique_ptr<ThreadPoolUtilizationStat> m_realtime_inference_utilization;
-    std::unique_ptr<ThreadPoolUtilizationStat> m_normal_inference_utilization;
-    std::unique_ptr<ThreadUtilizationStat> m_thread_utilization;
+    struct Data;
+    Pimpl<Data> m_data;
 };
 
 

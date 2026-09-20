@@ -72,7 +72,7 @@ public:
         std::string category, std::string display_name,
         std::string doc_link,
         std::string description,
-        ProgramControllerClass color_class,
+        ProgramControllerClass controller_class,
         FeedbackType feedback,
         AllowCommandsWhenRunning allow_commands_while_running,
         size_t min_switches,
@@ -82,7 +82,7 @@ public:
         std::vector<std::string> required_resources = {}
     );
 
-    ProgramControllerClass color_class() const{ return m_color_class; }
+    ProgramControllerClass controller_class() const{ return m_controller_class; }
     FeedbackType feedback() const{ return m_feedback; }
     bool allow_commands_while_running() const{ return m_allow_commands_while_running; }
 
@@ -94,7 +94,7 @@ public:
     virtual std::unique_ptr<MultiSwitchProgramInstance> make_instance() const{ return nullptr; }
 
 private:
-    const ProgramControllerClass m_color_class;
+    const ProgramControllerClass m_controller_class;
     const FeedbackType m_feedback;
     const bool m_allow_commands_while_running;
 

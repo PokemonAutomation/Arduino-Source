@@ -115,7 +115,6 @@ GameSettings::GameSettings()
 
 GameSettings_Descriptor::GameSettings_Descriptor()
     : OptionsPanelDescriptor(
-        Color(),
         "PokemonLA:GlobalSettings",
         STRING_POKEMON + " LA", "Game Settings",
         "Programs/PokemonLA/PokemonSettings.html",

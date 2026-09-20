@@ -172,7 +172,6 @@ GameSettings::GameSettings()
 
 GameSettings_Descriptor::GameSettings_Descriptor()
     : OptionsPanelDescriptor(
-        Color(),
         "PokemonBDSP:GlobalSettings",
         STRING_POKEMON + " BDSP", "Game Settings",
         "Programs/PokemonBDSP/PokemonSettings.html",
