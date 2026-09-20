@@ -30,7 +30,7 @@
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Resources/PokemonSV_AuctionItemNames.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+#include "VideoGames/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV_AuctionFarmer.h"
 
 

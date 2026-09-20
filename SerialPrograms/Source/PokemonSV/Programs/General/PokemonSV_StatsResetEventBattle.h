@@ -13,7 +13,7 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
-#include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
+#include "VideoGames/PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

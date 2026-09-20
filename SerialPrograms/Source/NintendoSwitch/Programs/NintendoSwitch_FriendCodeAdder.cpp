@@ -11,7 +11,7 @@
 #include "NintendoSwitch_FriendCodeAdder.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_NumberCodeEntry.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h"
+#include "VideoGames/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

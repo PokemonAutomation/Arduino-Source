@@ -11,7 +11,7 @@
 #include "CommonFramework/Tools/VideoStream.h"
 #include "Pokemon/Pokemon_DataTypes.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
-#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogTracker.h"
+#include "VideoGames/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogTracker.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "PokemonBDSP_ShinySparkleSet.h"
 

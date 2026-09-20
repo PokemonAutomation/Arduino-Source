@@ -12,8 +12,8 @@
 #include "NintendoSwitch_SettingsPanel.h"
 
 #include "GameConsole/Panels/GameConsole_VirtualConsole.h"
+#include "GameConsole/Panels/GameConsole_MultiConsoleViewer.h"
 #include "GameConsole/Panels/GameConsole_BoxDraw.h"
-#include "GameConsole/Panels/GameConsole_SwitchViewer.h"
 
 #include "Programs/NintendoSwitch_TurboA.h"
 #include "Programs/NintendoSwitch_TurboButton.h"

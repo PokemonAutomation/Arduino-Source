@@ -21,7 +21,7 @@
 #include "PokemonFRLG/PokemonFRLG_Tests.h"
 #include "PokemonRSE/PokemonRSE_Tests.h"
 #include "PokemonHome/PokemonHome_Tests.h"
-#include "PokemonSwSh/PokemonSwSh_Tests.h"
+#include "VideoGames/PokemonSwSh/PokemonSwSh_Tests.h"
 #include "PokemonLA/PokemonLA_Tests.h"
 #include "PokemonSV/PokemonSV_Tests.h"
 #include "PokemonLZA/PokemonLZA_Tests.h"
