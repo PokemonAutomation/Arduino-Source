@@ -20,7 +20,7 @@
 #include "PokemonLGPE/Commands/PokemonLGPE_DateSpam.h"
 //#include "PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.h"
 //#include "PokemonLGPE/Programs/PokemonLGPE_GameEntry.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+#include "VideoGames/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonLGPE_DailyItemFarmer.h"
 
 namespace PokemonAutomation{

@@ -15,7 +15,7 @@
 #include "CommonFramework/Panels/UI/PanelListWidget.h"
 #include "ML/ML_Panels.h"
 #include "NintendoSwitch/NintendoSwitch_Panels.h"
-#include "PokemonSwSh/PokemonSwSh_Panels.h"
+#include "VideoGames/PokemonSwSh/PokemonSwSh_Panels.h"
 #include "PokemonHome/PokemonHome_Panels.h"
 #include "PokemonBDSP/PokemonBDSP_Panels.h"
 #include "PokemonFRLG/PokemonFRLG_Panels.h"
@@ -25,7 +25,7 @@
 #include "PokemonSV/PokemonSV_Panels.h"
 #include "PokemonLZA/PokemonLZA_Panels.h"
 #include "PokemonPokopia/PokemonPokopia_Panels.h"
-#include "ZeldaTotK/ZeldaTotK_Panels.h"
+#include "VideoGames/ZeldaTotK/ZeldaTotK_Panels.h"
 #include "PanelLists.h"
 
 //#include <iostream>

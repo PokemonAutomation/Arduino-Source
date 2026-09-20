@@ -11,7 +11,7 @@
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
 #include "CommonTools/Options/StringSelectOption.h"
-#include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
+#include "VideoGames/PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

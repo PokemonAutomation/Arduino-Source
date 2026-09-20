@@ -13,7 +13,7 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "CommonTools/Options/LanguageOCROption.h"
-#include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
+#include "VideoGames/PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 #include "PokemonSV/Options/PokemonSV_TeraAIOption.h"
 #include "PokemonSV/Options/PokemonSV_TeraCatchOnWinOption.h"
 
