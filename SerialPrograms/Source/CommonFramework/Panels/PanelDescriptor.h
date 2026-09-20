@@ -54,12 +54,12 @@ public:
     virtual std::unique_ptr<PanelSession> make_panel() const = 0;
 
 private:
-    const Color m_color;
     const std::string m_identifier;
     const std::string m_category;
     const std::string m_display_name;
     const std::string m_doc_link;
     const std::string m_description;
+    const Color m_color;
     const PanelDeprecation m_deprecation;
     const bool m_restore_defaults_button;
     const std::vector<std::string> m_required_resources;
