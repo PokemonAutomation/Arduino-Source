@@ -925,6 +925,8 @@ file(GLOB LIBRARY_SOURCES
     Source/GameConsole/ConsoleProgram.h
     Source/GameConsole/Framework/ConsolePanelSession.cpp
     Source/GameConsole/Framework/ConsolePanelSession.h
+    Source/GameConsole/Framework/ConsoleProgramSession.cpp
+    Source/GameConsole/Framework/ConsoleProgramSession.h
     Source/GameConsole/Framework/ConsoleSystemOption.cpp
     Source/GameConsole/Framework/ConsoleSystemOption.h
     Source/GameConsole/Framework/ConsoleSystemSession.cpp

@@ -40,7 +40,7 @@ namespace PokemonAutomation{
 namespace GameConsole{
 
 
-class ConsoleSystemSession
+class ConsoleSystemSession final
     : public UiState<ConsoleSystemSession>
     , public TryShutdownable
     , public TrackableConsole
@@ -64,7 +64,7 @@ public:
 
 public:
     virtual bool try_shutdown() noexcept override;
-    virtual ~ConsoleSystemSession();
+    ~ConsoleSystemSession();
 
     ConsoleSystemSession(
         ConsoleSystemOption& option,
@@ -94,8 +94,8 @@ public:
     virtual size_t controllers() const noexcept override{ return m_controllers.size(); }
     virtual ControllerSession& controller(size_t index) noexcept override{ return m_controllers[index].session; }
 
-    virtual JsonValue to_json() const;
-    virtual void load_json(const JsonValue& json);
+    JsonValue to_json() const;
+    void load_json(const JsonValue& json);
 
 
 public:
