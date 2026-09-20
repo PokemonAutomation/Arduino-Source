@@ -39,14 +39,6 @@ public:
             return std::make_unique<ConsoleSystemOption>(1);
         }
     );
-    MultiConsoleSystemOption(
-        size_t min_consoles,
-        size_t max_consoles,
-        const JsonValue& json,
-        const OptionFactory& option_factory = [](size_t console_index){
-            return std::make_unique<ConsoleSystemOption>(1);
-        }
-    );
 
     void resize(size_t count){
         m_active_consoles = count;

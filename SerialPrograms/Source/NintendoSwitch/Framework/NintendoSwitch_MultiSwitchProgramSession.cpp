@@ -15,6 +15,7 @@
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/Options/NintendoSwitch_ModelType.h"
 #include "NintendoSwitch_MultiSwitchProgramSession.h"
 
 namespace PokemonAutomation{
@@ -41,7 +42,12 @@ MultiSwitchProgramSession::MultiSwitchProgramSession(const MultiSwitchProgramDes
     , m_system_option(
         descriptor.min_switches(),
         descriptor.max_switches(),
-        descriptor.default_switches()
+        descriptor.default_switches(),
+            [](size_t console_index){
+                return std::make_unique<GameConsole::ConsoleSystemOption>(
+                    1, std::make_unique<ConsoleModelCell>()
+                );
+            }
     )
     , m_system(m_system_option, descriptor.allow_commands_while_running(), instance_id())
     , m_sanitizer("MultiSwitchProgramSession")

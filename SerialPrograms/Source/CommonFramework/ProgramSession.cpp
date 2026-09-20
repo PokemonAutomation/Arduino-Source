@@ -339,6 +339,7 @@ void ProgramSession::run_program(){
         try{
             logger().log("<b>Starting Program: " + identifier() + "</b>");
             env->log_to_ui("- Starting Program -");
+            m_instance->run_start_program_checks(m_descriptor, *env);
             internal_run_program(*env);
             env->log_to_ui("- Program Finished -");
             logger().log("Program finished normally!", COLOR_BLUE);

@@ -15,10 +15,14 @@
 #include "CommonFramework/AudioPipeline/AudioOption.h"
 #include "CommonFramework/VideoPipeline/VideoSourceDescriptor.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayOption.h"
+#include "CommonFramework/Panels/ProgramDescriptor.h"
 #include "Controllers/ControllerOption.h"
 
 namespace PokemonAutomation{
 namespace GameConsole{
+
+
+Color pick_color(ProgramControllerClass color_class);
 
 
 
@@ -37,11 +41,6 @@ public:
     ConsoleSystemOption(
         size_t num_controllers,
         std::unique_ptr<ConfigOption> extra_option = nullptr
-    );
-    ConsoleSystemOption(
-        size_t num_controllers,
-        std::unique_ptr<ConfigOption> extra_option,
-        const JsonValue& json
     );
 
     virtual JsonValue to_json() const;

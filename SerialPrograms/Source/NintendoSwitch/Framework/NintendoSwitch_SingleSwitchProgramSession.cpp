@@ -15,6 +15,7 @@
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/Options/NintendoSwitch_ModelType.h"
 #include "NintendoSwitch_SingleSwitchProgramSession.h"
 
 //#include <iostream>
@@ -31,7 +32,7 @@ SingleSwitchProgramSession::SingleSwitchProgramSession(const SingleSwitchProgram
     : UiState<SingleSwitchProgramSession, PanelSession>(descriptor)
     , ProgramSession(descriptor)
     , m_descriptor(descriptor)
-    , m_system_option(descriptor.allow_commands_while_running())
+    , m_system_option(1, std::make_unique<ConsoleModelCell>())
     , m_system(m_system_option, descriptor.allow_commands_while_running(), 0, instance_id())
 {
     m_instance = descriptor.make_instance(m_system);

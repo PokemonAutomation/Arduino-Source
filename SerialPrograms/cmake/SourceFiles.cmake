@@ -1203,11 +1203,8 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/DevPrograms/WaterfillTemplateMaker.h
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h
-    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.h
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.h
-    Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.cpp
-    Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchProgramWidget.cpp
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchProgramWidget.h
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SingleSwitchProgramWidget.cpp

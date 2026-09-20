@@ -8,7 +8,6 @@
 #include "CommonTools/Audio/AudioTemplateCache.h"
 #include "GameConsole/Framework/ConsoleSystemSession.h"
 #include "Tests/TestUtils.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "VideoGames/PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA_ShinySoundDetector.h"
@@ -55,7 +54,7 @@ public:
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        SwitchSystemOption option(false);
+        GameConsole::ConsoleSystemOption option(1);
         GameConsole::ConsoleSystemSession session(option, false, 0, {});
         ConsoleHandle console(session);
         ShinySoundDetector detector(console, [&](float error_coefficient) -> bool{

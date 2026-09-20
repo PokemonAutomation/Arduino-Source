@@ -18,7 +18,6 @@
 #include "CommonFramework/Panels/PanelSession.h"
 #include "CommonFramework/ProgramSession.h"
 #include "GameConsole/Framework/MultiConsoleSystemSession.h"
-#include "NintendoSwitch_MultiSwitchSystemOption.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -73,7 +72,7 @@ private:
 
     const MultiSwitchProgramDescriptor& m_descriptor;
 
-    MultiSwitchSystemOption m_system_option;
+    GameConsole::MultiConsoleSystemOption m_system_option;
     GameConsole::MultiConsoleSystemSession m_system;
 
     ListenerSet<Listener> m_listeners;

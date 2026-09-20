@@ -12,7 +12,6 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "GameConsole/Framework/ConsoleSystemSession.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h"
 #include "NintendoSwitch_UpdatePopupDetector.h"
 //#include <iostream>
 //using std::cout;
@@ -272,7 +271,7 @@ public:
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        SwitchSystemOption option(false);
+        GameConsole::ConsoleSystemOption option(1);
         GameConsole::ConsoleSystemSession session(option, false, 0, {});
         ConsoleHandle console(session);
 

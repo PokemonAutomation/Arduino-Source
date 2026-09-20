@@ -43,6 +43,34 @@ ConsoleProgramEnvironment::ConsoleProgramEnvironment(
 void ConsoleProgramEnvironment::log_to_ui(const std::string& msg, Color color){
     m_console->overlay().add_log(msg, color);
 }
+
+
+ConsoleProgramDescriptor::ConsoleProgramDescriptor(
+    std::string identifier,
+    std::string category, std::string display_name,
+    std::string doc_link,
+    std::string description,
+    Color color,
+    FeedbackType feedback,
+    AllowCommandsWhenRunning allow_commands_while_running,
+    PanelDeprecation deprecation,
+    std::vector<std::string> required_resources
+)
+    : ProgramDescriptor(
+        std::move(identifier),
+        std::move(category), std::move(display_name),
+        std::move(doc_link),
+        std::move(description),
+        color,
+        deprecation,
+        true,
+        std::move(required_resources)
+    )
+    , m_feedback(feedback)
+    , m_allow_commands_while_running(
+        allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS
+    )
+{}
 std::unique_ptr<PanelSession> ConsoleProgramDescriptor::make_panel() const{
     //  TODO
     return nullptr;
@@ -50,15 +78,13 @@ std::unique_ptr<PanelSession> ConsoleProgramDescriptor::make_panel() const{
 
 
 
-void ConsoleProgramInstance::start_program_controller_check(
-    ConsoleSystemSession& session
+void ConsoleProgramInstance::run_start_program_checks(
+    const ProgramDescriptor& descriptor,
+    ProgramEnvironment& env
 ){
-    if (session.controllers() == 0){
-        return;
-    }
-    if (!session.controller(0).ready()){
-        throw UserSetupError(session.logger(), "Cannot Start: Controller is not ready.");
-    }
+    const ConsoleProgramDescriptor& ldescriptor = dynamic_cast<const ConsoleProgramDescriptor&>(descriptor);
+    ConsoleProgramEnvironment& lenv = dynamic_cast<ConsoleProgramEnvironment&>(env);
+    start_program_feedback_check(lenv.console(), ldescriptor.feedback());
 }
 void ConsoleProgramInstance::start_program_feedback_check(
     VideoStream& stream,

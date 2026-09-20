@@ -36,16 +36,6 @@ MultiConsoleSystemOption::MultiConsoleSystemOption(
     consoles = std::min(consoles, m_max_consoles);
     m_active_consoles = consoles;
 }
-MultiConsoleSystemOption::MultiConsoleSystemOption(
-    size_t min_consoles,
-    size_t max_consoles,
-    const JsonValue& json,
-    const OptionFactory& option_factory
-)
-    : MultiConsoleSystemOption(min_consoles, max_consoles, 0, option_factory)
-{
-    MultiConsoleSystemOption::load_json(json);
-}
 
 JsonValue MultiConsoleSystemOption::to_json() const{
     JsonObject obj;
