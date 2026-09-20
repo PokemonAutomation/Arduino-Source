@@ -97,9 +97,6 @@ public:
 public:
     //  Startup Checks: Feel free to override to change behavior.
 
-    virtual void start_program_controller_check(
-        SwitchSystemSession& session
-    );
     virtual void start_program_feedback_check(
         VideoStream& stream,
         FeedbackType feedback_type

@@ -24,7 +24,6 @@ public:
     using Descriptor = TestDudunsparceFormDetector_Descriptor;
     TestDudunsparceFormDetector();
 
-    virtual void start_program_controller_check(SwitchSystemSession& session) override{}
     virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:

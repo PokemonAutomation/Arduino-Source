@@ -25,7 +25,6 @@ public:
     using Descriptor = OverworldWatcher_Descriptor;
     OverworldWatcher();
 
-    virtual void start_program_controller_check(SwitchSystemSession& session) override{}
     virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 };
 

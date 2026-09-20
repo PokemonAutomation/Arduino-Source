@@ -58,6 +58,9 @@ std::unique_ptr<PanelSession> SingleSwitchProgramDescriptor::make_panel() const{
 
 void SingleSwitchProgramInstance::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     ProControllerContext context(scope, env.console.controller<ProController>());
+    if (!context->is_ready()){
+        throw UserSetupError(context->logger(), "Controller is not ready.");
+    }
 
     auto record_debug_video = [&](){
         if (GlobalSettings::instance().SAVE_DEBUG_VIDEOS_ON_SWITCH){
@@ -84,16 +87,6 @@ void SingleSwitchProgramInstance::program(SingleSwitchProgramEnvironment& env, P
 }
 
 
-void SingleSwitchProgramInstance::start_program_controller_check(
-    SwitchSystemSession& session
-){
-    if (session.controllers() == 0){
-        return;
-    }
-    if (!session.controller(0).ready()){
-        throw UserSetupError(session.logger(), "Cannot Start: Controller is not ready.");
-    }
-}
 void SingleSwitchProgramInstance::start_program_feedback_check(
     VideoStream& stream,
     FeedbackType feedback_type
