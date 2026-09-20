@@ -54,7 +54,7 @@ public:
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        GameConsole::ConsoleSystemOption option(false);
+        GameConsole::ConsoleSystemOption option(1);
         GameConsole::ConsoleSystemSession session(option, false, 0, {});
         ConsoleHandle console(session);
         ShinySoundDetector detector(console, [&](float error_coefficient) -> bool{
