@@ -3,8 +3,8 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
-
 #include "Common/Cpp/Options/ConfigOption.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -16,9 +16,11 @@
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_DayNightStateDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_WeatherDetector.h"
-#include "PokemonLZA_ShinyHunt_HelioptileHunter.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
+#include "PokemonLZA/Programs/PokemonLZA_FastTravelNavigation.h"
+#include "PokemonLZA_ShinyHunt_HelioptileHunter.h"
 #include <cstddef>
 #include <string>
 
@@ -66,7 +68,11 @@ std::unique_ptr<StatsTracker> ShinyHunt_HelioptileHunter_Descriptor::make_stats(
 }
 
 ShinyHunt_HelioptileHunter::ShinyHunt_HelioptileHunter()
-    : END_AFTER_CYCLE("<b>How Many cycles before stopping. 0 for never stop.</b>",
+    : END_AFTER_CYCLE("<b>How many cycles before stopping. 0 for never stop.</b><br>"
+        "<br>"
+        "<b>Cycle Definition:</b><br>"
+        "A cycle consists of entering Wild Zone 14 a total of at most 65 times. "
+        "After 65 entry loops, the program resets the day before continuing.",
         LockMode::LOCK_WHILE_RUNNING,
         0, 0, 32*30
     )
@@ -82,24 +88,6 @@ ShinyHunt_HelioptileHunter::ShinyHunt_HelioptileHunter()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-bool proper_weather(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    
-    open_map(env.console, context, true, true);
-
-    WeatherIconDetector sunnyDetector(
-        WeatherIconType::Sunny,
-        &env.console.overlay()
-    );
-
-    WeatherIconDetector clearDetector(
-        WeatherIconType::Clear,
-        &env.console.overlay()
-    );
-    VideoSnapshot screen = env.console.video().snapshot();
-    
-    return (sunnyDetector.detect(screen) || clearDetector.detect(screen));
-}
-
 void bench_loop(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t quantity){
     for (size_t i = 0; i < quantity; i++){
         sit_on_bench(env.console, context);
@@ -107,14 +95,61 @@ void bench_loop(SingleSwitchProgramEnvironment& env, ProControllerContext& conte
     }
 }
 
-void find_weather(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool is_night_time){
+struct WeatherTimeState{
+    bool correct_weather;
+    bool daytime;
+};
+
+WeatherTimeState get_weather_time_state(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool close_map){
+    open_map(env.console, context, false, true);
+    context.wait_for_all_requests();
+
+    // zoom fully in
+    pbf_move_right_joystick(context, {0, 1}, 900ms, 120ms);
+    context.wait_for_all_requests();
+    // hide icons
+    pbf_press_button(context, BUTTON_MINUS, 80ms, 120ms);
+    context.wait_for_all_requests();
+
+    VideoSnapshot screen = env.console.video().snapshot();
+    WeatherIconDetector sunnyDetector(WeatherIconType::Sunny, &env.console.overlay());
+    WeatherIconDetector clearDetector(WeatherIconType::Clear, &env.console.overlay());
+    DayNightStateDetector dayNightDetector(&env.console.overlay());
+    dayNightDetector.detect(screen);
+    bool night_time = dayNightDetector.state() == DayNightState::NIGHT;
+    bool daytime = !night_time;
+
+    bool correct_weather =
+        sunnyDetector.detect(screen) ||
+        clearDetector.detect(screen);
+
+    env.log(std::string("Weather=")
+        + (correct_weather ? "Good" : "Bad")
+        + " Time="
+        + (daytime ? "Day" : "Night")
+    );
+
+    if (close_map){
+        context.wait_for_all_requests();
+        pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms);
+        context.wait_for_all_requests();
+    }
+
+    return {correct_weather, daytime};
+}
+
+void find_weather(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    WeatherTimeState state = get_weather_time_state(env, context, true);
     context.wait_for_all_requests();
     env.log("Starting weather loop");
-    bench_loop(env, context, (is_night_time) ? 1 : 2);
+    bench_loop(env, context, (state.daytime) ? 2 : 1);
 
-    while (!proper_weather(env, context)){
-        env.log("Weather not found"); 
-        pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms);
+    while (true){
+        state = get_weather_time_state(env, context, true);
+        if (state.correct_weather && state.daytime){
+            break;
+        }
+        env.log("Incorrect weather or nighttime"); 
         bench_loop(env, context, 2);
     }
     env.log("Weather found");
@@ -123,10 +158,24 @@ void find_weather(SingleSwitchProgramEnvironment& env, ProControllerContext& con
 
 void reach_bench(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     //Go to poke center
-    pbf_move_left_joystick(context, {-0.141, +1}, 100ms, 200ms);
-    pbf_press_button(context, BUTTON_A, 500ms, 500ms);
-    pbf_press_button(context, BUTTON_A, 500ms, 500ms);
-    pbf_wait(context, 3000ms);
+    FastTravelState result = open_map_and_fly_to(
+        env.console, context, Language::English,
+        Location::MAGENTA_POKEMON_CENTER, false, true
+    );
+
+    if (result != FastTravelState::SUCCESS) {
+        env.log(
+            "Fast travel to Magenta failed. State = "
+            + std::to_string((int)result)
+        );
+
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to fast travel to Magenta Pokemon Center.",
+            env.console
+        );
+    }
+    context.wait_for_all_requests();
     //Go to bench
     pbf_move_left_joystick(context, {-1, 0},  700ms, 200ms);
     pbf_move_left_joystick(context, {0, +1}, 500ms, 200ms);
@@ -151,11 +200,20 @@ void reach_gate(
     env.console.overlay().add_log("Detect Entrance");
 }
 
-void reach_wild_zone(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    pbf_move_left_joystick(context, {+0.094, -1}, 200ms, 200ms);
-    pbf_press_button(context, BUTTON_A, 500ms, 500ms);
-    pbf_press_button(context, BUTTON_A, 500ms, 500ms);
-    pbf_wait(context, 2000ms);
+void warp_wild_zone_14(SingleSwitchProgramEnvironment& env, ProControllerContext& context
+) {
+    FastTravelState result = open_map_and_fly_to(
+        env.console, context, Language::English,
+        Location::WILD_ZONE_14, false, true
+    );
+
+    if (result != FastTravelState::SUCCESS) {
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to fast travel to Wild Zone 14.",
+            env.console
+        );
+    }
 }
 
 void execute_fixed_routine(SingleSwitchProgramEnvironment& env, ConsoleHandle& console, ProControllerContext& context, EventNotificationOption& settings){
@@ -191,7 +249,6 @@ void ShinyHunt_HelioptileHunter::program(SingleSwitchProgramEnvironment& env, Pr
 
     ShinyHunt_HelioptileHunter_Descriptor::Stats& stats = env.current_stats<ShinyHunt_HelioptileHunter_Descriptor::Stats>();
     
-    // This routine do not care for day/night change as is supposed to stop before time change.
     while(true){
         
         if (END_AFTER_CYCLE.current_value() > 0 && END_AFTER_CYCLE.current_value() == stats.cycles.load()){
@@ -202,17 +259,52 @@ void ShinyHunt_HelioptileHunter::program(SingleSwitchProgramEnvironment& env, Pr
 
         int hunt_loops = 0;
         while (hunt_loops < 65){
-            if (!proper_weather(env,context) || (hunt_loops == 0)){
+            // On startup and every 65 hunt loops, force a return to the bench
+            // and re-roll/check weather conditions. This ensures the hunt does
+            // not continue indefinitely after the desired daytime sunny/clear
+            // weather has changed.
+            if (hunt_loops == 0){
                 env.log("Not correct weather");
                 reach_bench(env, context);
-                find_weather(env, context, false);
-                reach_wild_zone(env, context);
+                find_weather(env, context);
+                warp_wild_zone_14(env, context);
                 hunt_loops = 0;
             }else{
-                env.log("Correct weather. Continuing");
-                move_map_cursor_from_entrance_to_zone(env.console, context, Location::WILD_ZONE_14);
-                fly_from_map(env.console, context);
-            }   
+                WeatherTimeState state = get_weather_time_state(env, context, false);
+                if (state.correct_weather && state.daytime){
+                    env.log("Correct weather. Continuing");
+                    // Zoom fully out before moving map cursor for fast travel.
+                    pbf_move_right_joystick(context, {0, -1}, 900ms, 120ms);
+                    // Re-show icons before moving the map cursor to the destination.
+                    pbf_press_button(context, BUTTON_MINUS, 80ms, 120ms);
+                    //these extra waits help prevent early execution of the map move which sometimes fired early during testing
+                    context.wait_for_all_requests(); 
+                    pbf_wait(context, 100ms);
+                    move_map_cursor_from_entrance_to_zone(env.console, context, Location::WILD_ZONE_14);
+                    FastTravelState result = fly_from_map(env.console, context);
+
+                    switch (result) {
+                    case FastTravelState::SUCCESS:
+                        wait_until_overworld(env.console, context);
+                        break;
+
+                    default:
+                        OperationFailedException::fire(
+                            ErrorReport::SEND_ERROR_REPORT,
+                            "Failed to fast travel back to Wild Zone 14 after weather check.",
+                            env.console
+                        );
+                    }
+                }else{
+                    env.log("Not correct weather");
+                    pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms);
+                    context.wait_for_all_requests();
+                    reach_bench(env, context);
+                    find_weather(env, context);
+                    warp_wild_zone_14(env, context);
+                    hunt_loops = 0;
+                }
+            }  
 
             execute_fixed_routine(env,env.console, context, NOTIFICATION_STATUS);
 
