@@ -134,7 +134,7 @@
 #include "VideoGames/PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_StartBattleYellowBar.h"
 #include "VideoGames/PokemonLA/Inference/Map/PokemonLA_SelectedRegionDetector.h"
-#include "PokemonHome/Inference/PokemonHome_BallReader.h"
+#include "VideoGames/PokemonHome/Inference/PokemonHome_BallReader.h"
 #include "VideoGames/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSide.h"
 #include "VideoGames/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathMap.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_SelectedSettingDetector.h"
