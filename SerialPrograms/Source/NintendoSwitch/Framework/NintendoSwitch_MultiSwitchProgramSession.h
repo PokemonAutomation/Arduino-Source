@@ -17,8 +17,9 @@
 
 #include "CommonFramework/Panels/PanelSession.h"
 #include "CommonFramework/ProgramSession.h"
+#include "GameConsole/Framework/MultiConsoleSystemSession.h"
+#include "NintendoSwitch_MultiSwitchSystemOption.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
-#include "NintendoSwitch_MultiSwitchSystemSession.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -29,7 +30,7 @@ class MultiSwitchProgramOption;
 class MultiSwitchProgramSession final
     : public UiState<MultiSwitchProgramSession, PanelSession>
     , public ProgramSession
-    , private MultiSwitchSystemSession::Listener
+    , private GameConsole::MultiConsoleSystemSession::Listener
 {
 public:
     //  This is temporary. Remove once configs have push notifications.
@@ -48,7 +49,7 @@ public:
 
 public:
     const MultiSwitchProgramDescriptor& descriptor() const{ return m_descriptor; }
-    MultiSwitchSystemSession& system(){ return m_system; }
+    GameConsole::MultiConsoleSystemSession& system(){ return m_system; }
     ConfigOption& options();
 
 
@@ -73,7 +74,7 @@ private:
     const MultiSwitchProgramDescriptor& m_descriptor;
 
     MultiSwitchSystemOption m_system_option;
-    MultiSwitchSystemSession m_system;
+    GameConsole::MultiConsoleSystemSession m_system;
 
     ListenerSet<Listener> m_listeners;
 

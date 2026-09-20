@@ -110,14 +110,16 @@ std::unique_ptr<ProgramEnvironment> MultiSwitchProgramSession::make_env(const Pr
     size_t consoles = m_system.active_consoles();
     FixedLimitVector<ConsoleHandle> handles(consoles);
     for (size_t c = 0; c < consoles; c++){
-        SwitchSystemSession& session = m_system[c];
+        GameConsole::ConsoleSystemSession& session = m_system[c];
         handles.emplace_back(session);
+
+        ConsoleModelCell& console_type = static_cast<ConsoleModelCell&>(*session.extra_option());
 
         ConsoleState& state = handles.back().state();
         if (ConsoleSettings::instance().TRUST_USER_CONSOLE_SELECTION){
-            state.set_console_type(handles.back().logger(), session.console_type());
+            state.set_console_type(handles.back().logger(), console_type);
         }else{
-            state.set_console_type_user(session.console_type());
+            state.set_console_type_user(console_type);
         }
     }
     return std::make_unique<MultiSwitchProgramEnvironment>(

@@ -30,20 +30,15 @@ Color pick_color(ProgramControllerClass color_class);
 //  what micro-controller and what video source to use and
 //  what video overlay display option to set.
 class SwitchSystemOption : public GameConsole::ConsoleSystemOption{
-    static const std::string JSON_CONSOLE_TYPE;
-
 public:
-    SwitchSystemOption();
-    SwitchSystemOption(const JsonValue& json);
-
-    virtual JsonValue to_json() const override;
-    virtual void load_json(const JsonValue& json) override;
-
-    void load_json_self(const JsonValue& json);
-
-
-public:
-    ConsoleModelCell m_console_type;
+    SwitchSystemOption()
+        : ConsoleSystemOption(1, std::make_unique<ConsoleModelCell>())
+    {}
+    SwitchSystemOption(const JsonValue& json)
+        : ConsoleSystemOption(1, std::make_unique<ConsoleModelCell>(), json)
+    {
+        SwitchSystemOption::load_json(json);
+    }
 };
 
 

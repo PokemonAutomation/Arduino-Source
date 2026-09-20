@@ -29,7 +29,7 @@ ConsolePanelSession::ConsolePanelSession(const ConsolePanelDescriptor& descripto
     : UiState<ConsolePanelSession, PanelSession>(descriptor)
     , m_descriptor(descriptor)
     , m_system_option(descriptor.num_controllers())
-    , m_system(global_logger_raw(), m_system_option, true, 0)
+    , m_system(m_system_option, true, 0)
     , m_instance(descriptor.make_instance(m_system))
 {}
 

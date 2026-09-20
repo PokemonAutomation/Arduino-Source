@@ -26,8 +26,7 @@ ConsoleSystemWidget::~ConsoleSystemWidget(){
 
 ConsoleSystemWidget::ConsoleSystemWidget(
     QWidget& parent,
-    ConsoleSystemSession& session,
-    bool include_command_row
+    ConsoleSystemSession& session
 )
     : QWidget(&parent)
     , m_session(session)
@@ -82,9 +81,7 @@ ConsoleSystemWidget::ConsoleSystemWidget(
         }
     }
 
-    if (include_command_row){
-        m_group_layout->addWidget(new CommandRowWidget(*this, m_session));
-    }
+    m_group_layout->addWidget(new CommandRowWidget(*this, m_session));
 }
 
 
@@ -99,12 +96,12 @@ void ConsoleSystemWidget::focusOutEvent(QFocusEvent* event){
     m_session.overlay().report_focus_out();
 }
 void ConsoleSystemWidget::keyPressEvent(QKeyEvent* event){
-//    cout << "SwitchSystemWidget::keyPressEvent()" << endl;
+//    cout << "ConsoleSystemWidget::keyPressEvent()" << endl;
     m_session.overlay().report_key_press(event);
 //    QWidget::keyPressEvent(event);
 }
 void ConsoleSystemWidget::keyReleaseEvent(QKeyEvent* event){
-//    cout << "SwitchSystemWidget::keyReleaseEvent()" << endl;
+//    cout << "ConsoleSystemWidget::keyReleaseEvent()" << endl;
     m_session.overlay().report_key_release(event);
 //    QWidget::keyReleaseEvent(event);
 }

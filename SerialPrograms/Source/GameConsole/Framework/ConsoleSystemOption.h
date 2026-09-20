@@ -11,6 +11,7 @@
 #define PokemonAutomation_GameConsole_ConsoleSystemOption_H
 
 #include "Common/Cpp/Containers/FixedLimitVector.h"
+#include "Common/Cpp/Options/ConfigOption.h"
 #include "CommonFramework/AudioPipeline/AudioOption.h"
 #include "CommonFramework/VideoPipeline/VideoSourceDescriptor.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayOption.h"
@@ -29,11 +30,19 @@ class ConsoleSystemOption{
     static const std::string JSON_OVERLAY;
     static const std::string JSON_CONTROLLER;
     static const std::string JSON_CONTROLLERS;
+    static const std::string JSON_OPTIONS;
 
 public:
     virtual ~ConsoleSystemOption() = default;
-    ConsoleSystemOption(size_t num_controllers);
-    ConsoleSystemOption(size_t num_controllers, const JsonValue& json);
+    ConsoleSystemOption(
+        size_t num_controllers,
+        std::unique_ptr<ConfigOption> extra_option = nullptr
+    );
+    ConsoleSystemOption(
+        size_t num_controllers,
+        std::unique_ptr<ConfigOption> extra_option,
+        const JsonValue& json
+    );
 
     virtual JsonValue to_json() const;
     virtual void load_json(const JsonValue& json);
@@ -44,6 +53,7 @@ public:
     AudioOption m_audio;
     VideoOverlayOption m_overlay;
     FixedLimitVector<ControllerOption> m_controllers;
+    std::unique_ptr<ConfigOption> m_extra_option;
 };
 
 

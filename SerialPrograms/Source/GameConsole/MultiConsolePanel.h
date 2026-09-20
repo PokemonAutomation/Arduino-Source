@@ -33,12 +33,6 @@ public:
             size_t console_index
         )
     >;
-    using SessionFactory = std::function<
-        std::unique_ptr<ConsoleSystemSession>(
-            ConsoleSystemOption& option,
-            size_t console_index
-        )
-    >;
 
     MultiConsolePanelDescriptor(
         std::string identifier,
@@ -63,8 +57,7 @@ public:
         size_t max_consoles,
         size_t default_consoles,
         bool restore_defaults_button,
-        OptionFactory option_factory,
-        SessionFactory session_factory
+        OptionFactory option_factory
     );
 
     size_t min_consoles() const{ return m_min_consoles; }
@@ -72,7 +65,6 @@ public:
     size_t default_consoles() const{ return m_default_consoles; }
 
     const OptionFactory& option_factory() const{ return m_option_factory; }
-    const SessionFactory& session_factory() const{ return m_session_factory; }
 
     size_t num_controllers(size_t index) const{ return m_num_controllers[index]; }
 
@@ -87,7 +79,6 @@ private:
     std::vector<size_t> m_num_controllers;
 
     OptionFactory m_option_factory;
-    SessionFactory m_session_factory;
 };
 
 

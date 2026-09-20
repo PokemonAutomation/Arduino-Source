@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/ColoredText.h"
 #include "Common/Cpp/EarlyShutdown.h"
+#include "Common/Cpp/Logging/GlobalLogger.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "CommonFramework/VideoPipeline/Stats/MemoryUtilizationStats.h"
 #include "CommonFramework/VideoPipeline/Stats/CpuUtilizationStats.h"
@@ -49,7 +50,6 @@ ConsoleSystemSession::~ConsoleSystemSession(){
     );
 }
 ConsoleSystemSession::ConsoleSystemSession(
-    Logger& logger,
     ConsoleSystemOption& option,
     bool allow_commands_while_locked,
     size_t console_number,
@@ -57,7 +57,7 @@ ConsoleSystemSession::ConsoleSystemSession(
 )
     : m_allow_commands_while_locked(allow_commands_while_locked)
     , m_console_number(console_number)
-    , m_logger(logger, "Console " + std::to_string(console_number))
+    , m_logger(global_logger_raw(), "Console " + std::to_string(console_number))
     , m_option(option)
     , m_video(m_logger, option.m_video)
     , m_audio(m_logger, option.m_audio)

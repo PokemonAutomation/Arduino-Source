@@ -12,10 +12,6 @@
 
 namespace PokemonAutomation{
 
-namespace NintendoSwitch{
-    class SwitchSystemWidget;
-}
-
 
 //  A separate window to render video display.
 //  This is used when the user wants to pop out the video display widget to a separate window.

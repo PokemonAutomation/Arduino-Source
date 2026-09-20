@@ -40,7 +40,11 @@ CommandRowWidget::CommandRowWidget(
     layout0->addLayout(m_layout, CONSOLE_SETTINGS_STRETCH_L0_RIGHT);
     m_layout->setContentsMargins(0, 0, 0, 0);
 
-
+    ConfigOption* extra_option = session.extra_option();
+    if (extra_option){
+        UiWrapper wrapper = extra_option->make_ui_component(this);
+        m_layout->addWidget(dynamic_cast<QWidget*>(wrapper.release()));
+    }
     m_layout->addStretch(100);
 
 
@@ -143,11 +147,6 @@ CommandRowWidget::CommandRowWidget(
                 return;
             }
 
-            ConsoleSystemOption option(
-                m_session.controllers(),
-                m_session.allow_commands_while_locked()
-            );
-
             m_session.load_json(load_json_file(path));
         }
     );
@@ -163,12 +162,6 @@ CommandRowWidget::CommandRowWidget(
             if (path.empty()){
                 return;
             }
-
-            //  Create a copy of option, to be able to serialize it later on
-            ConsoleSystemOption option(
-                m_session.controllers(),
-                m_session.allow_commands_while_locked()
-            );
 
             m_session.to_json().dump(path);
         }

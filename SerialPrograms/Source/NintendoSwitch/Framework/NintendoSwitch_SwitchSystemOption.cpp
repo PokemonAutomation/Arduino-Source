@@ -4,8 +4,8 @@
  *
  */
 
-#include "Common/Cpp/Json/JsonValue.h"
-#include "Common/Cpp/Json/JsonObject.h"
+//#include "Common/Cpp/Json/JsonValue.h"
+//#include "Common/Cpp/Json/JsonObject.h"
 #include "NintendoSwitch_SwitchSystemOption.h"
 
 namespace PokemonAutomation{
@@ -31,14 +31,15 @@ Color pick_color(ProgramControllerClass color_class){
 }
 
 
+#if 0
 const std::string SwitchSystemOption::JSON_CONSOLE_TYPE = "ConsoleType";
 
 
 SwitchSystemOption::SwitchSystemOption()
-    : ConsoleSystemOption(1)
+    : ConsoleSystemOption(1, std::make_unique<ConsoleModelCell>())
 {}
 SwitchSystemOption::SwitchSystemOption(const JsonValue& json)
-    : ConsoleSystemOption(1)
+    : ConsoleSystemOption(1, std::make_unique<ConsoleModelCell>())
 {
     SwitchSystemOption::load_json(json);
 }
@@ -64,7 +65,7 @@ void SwitchSystemOption::load_json_self(const JsonValue& json){
         m_console_type.load_json(*value);
     }
 }
-
+#endif
 
 
 

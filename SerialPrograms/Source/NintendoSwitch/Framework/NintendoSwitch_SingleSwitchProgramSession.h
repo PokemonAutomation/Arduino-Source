@@ -17,8 +17,9 @@
 
 #include "CommonFramework/Panels/PanelSession.h"
 #include "CommonFramework/ProgramSession.h"
-#include "NintendoSwitch_SwitchSystemSession.h"
+#include "GameConsole/Framework/ConsoleSystemSession.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch_SwitchSystemOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -37,7 +38,7 @@ public:
 
 public:
     const SingleSwitchProgramDescriptor& descriptor() const{ return m_descriptor; }
-    SwitchSystemSession& system(){ return m_system; }
+    GameConsole::ConsoleSystemSession& system(){ return m_system; }
     ConfigOption& options();
 
 
@@ -57,7 +58,7 @@ private:
     const SingleSwitchProgramDescriptor& m_descriptor;
 
     SwitchSystemOption m_system_option;
-    SwitchSystemSession m_system;
+    GameConsole::ConsoleSystemSession m_system;
 };
 
 
