@@ -51,7 +51,6 @@ GameSettings::GameSettings()
 
 GameSettings_Descriptor::GameSettings_Descriptor()
     : OptionsPanelDescriptor(
-        Color(),
         "PokemonLZA:GlobalSettings",
         STRING_POKEMON + " LZA", "Game Settings",
         "Programs/PokemonLZA/PokemonSettings.html",

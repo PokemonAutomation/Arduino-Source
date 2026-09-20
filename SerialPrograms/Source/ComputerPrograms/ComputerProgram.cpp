@@ -18,11 +18,11 @@ ComputerProgramDescriptor::ComputerProgramDescriptor(
     PanelDeprecation deprecation
 )
     : ProgramDescriptor(
-        COLOR_DARKCYAN,
         std::move(identifier),
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description),
+        COLOR_DARKCYAN,
         deprecation,
         true,
         {}

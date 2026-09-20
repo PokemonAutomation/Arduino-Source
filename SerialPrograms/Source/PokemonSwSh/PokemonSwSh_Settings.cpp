@@ -283,7 +283,6 @@ GameSettings::GameSettings()
 
 GameSettings_Descriptor::GameSettings_Descriptor()
     : OptionsPanelDescriptor(
-        Color(),
         "PokemonSwSh:GlobalSettings",
         STRING_POKEMON + " SwSh", "Game Settings",
         "Programs/PokemonSwSh/PokemonSettings.html",

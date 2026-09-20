@@ -138,7 +138,6 @@ void GameSettings::on_config_value_changed(void* object){
 
 GameSettings_Descriptor::GameSettings_Descriptor()
     : OptionsPanelDescriptor(
-        Color(),
         "PokemonFRLG:GlobalSettings",
         STRING_POKEMON + " FRLG", "Game Settings",
         "Programs/PokemonFRLG/FRLGSettings.html",

@@ -26,11 +26,11 @@ class OptionsPanelInstance;
 class OptionsPanelDescriptor : public PanelDescriptor{
 public:
     OptionsPanelDescriptor(
-        Color color,
         std::string identifier,
         std::string category, std::string display_name,
         std::string doc_link,
         std::string description,
+        Color color = Color(),
         PanelDeprecation deprecation = PanelDeprecation::NOT_DEPRECATED,
         bool restore_defaults_button = true
     );

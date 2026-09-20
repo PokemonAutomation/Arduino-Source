@@ -13,20 +13,20 @@ namespace PokemonAutomation{
 
 
 OptionsPanelDescriptor::OptionsPanelDescriptor(
-    Color color,
     std::string identifier,
     std::string category, std::string display_name,
     std::string doc_link,
     std::string description,
+    Color color,
     PanelDeprecation deprecation,
     bool restore_defaults_button
 )
     : PanelDescriptor(
-        color,
         std::move(identifier),
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description),
+        color,
         deprecation,
         restore_defaults_button,
         {}

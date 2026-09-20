@@ -140,7 +140,6 @@ void GameSettings::on_config_value_changed(void* object){
 
 GameSettings_Descriptor::GameSettings_Descriptor()
     : OptionsPanelDescriptor(
-        Color(),
         "PokemonRSE:GlobalSettings",
         STRING_POKEMON + " RSE", "Game Settings",
         "Programs/PokemonRSE/RSESettings.html",

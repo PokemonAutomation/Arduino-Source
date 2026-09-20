@@ -92,7 +92,6 @@ GameSettings::GameSettings()
 
 GameSettings_Descriptor::GameSettings_Descriptor()
     : OptionsPanelDescriptor(
-        Color(),
         "PokemonSV:GlobalSettings",
         STRING_POKEMON + " SV", "Game Settings",
         "Programs/PokemonSV/PokemonSettings.html",

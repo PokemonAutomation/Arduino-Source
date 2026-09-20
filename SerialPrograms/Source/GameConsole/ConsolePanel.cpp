@@ -24,11 +24,11 @@ ConsolePanelDescriptor::ConsolePanelDescriptor(
     size_t num_controllers
 )
     : PanelDescriptor(
-        color,
         std::move(identifier),
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description),
+        color,
         deprecation,
         restore_defaults_button,
         {}

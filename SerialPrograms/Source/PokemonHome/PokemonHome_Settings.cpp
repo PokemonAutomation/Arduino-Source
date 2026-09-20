@@ -30,7 +30,6 @@ GameSettings::GameSettings()
 
 GameSettings_Descriptor::GameSettings_Descriptor()
     : OptionsPanelDescriptor(
-        Color(),
         "PokemonHome:GlobalSettings",
         STRING_POKEMON + " Home", STRING_POKEMON + " Settings",
         "Programs/PokemonHome/PokemonSettings.html",

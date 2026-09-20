@@ -16,7 +16,6 @@ namespace NintendoSwitch{
 
 ConsoleSettings_Descriptor::ConsoleSettings_Descriptor()
     : OptionsPanelDescriptor(
-        Color(),
         "NintendoSwitch:GlobalSettings",
         "Nintendo Switch", "Framework Settings",
         "Programs/NintendoSwitch/FrameworkSettings.html",

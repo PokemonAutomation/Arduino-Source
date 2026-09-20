@@ -77,7 +77,6 @@ GameSettings::GameSettings()
 
 GameSettings_Descriptor::GameSettings_Descriptor()
     : OptionsPanelDescriptor(
-        Color(),
         "PokemonLGPE:GlobalSettings",
         STRING_POKEMON + " LGPE", "Game Settings",
         "Programs/PokemonLGPE/PokemonSettings.html",

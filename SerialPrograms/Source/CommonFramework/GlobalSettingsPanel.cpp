@@ -397,7 +397,6 @@ void GlobalSettings::connect_row_with_download(const std::string& resource_slug,
 
 GlobalSettings_Descriptor::GlobalSettings_Descriptor()
     : OptionsPanelDescriptor(
-        Color(),
         "",
         "Global Settings", "Global Settings",
         "",

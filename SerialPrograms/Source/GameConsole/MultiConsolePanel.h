@@ -41,11 +41,11 @@ public:
     >;
 
     MultiConsolePanelDescriptor(
-        Color color,
         std::string identifier,
         std::string category, std::string display_name,
         std::string doc_link,
         std::string description,
+        Color color,
         PanelDeprecation deprecation,
         size_t min_consoles,
         size_t max_consoles,
@@ -53,11 +53,11 @@ public:
         bool restore_defaults_button = true
     );
     MultiConsolePanelDescriptor(
-        Color color,
         std::string identifier,
         std::string category, std::string display_name,
         std::string doc_link,
         std::string description,
+        Color color,
         PanelDeprecation deprecation,
         size_t min_consoles,
         size_t max_consoles,

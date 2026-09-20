@@ -14,11 +14,11 @@ namespace GameConsole{
 
 
 MultiConsolePanelDescriptor::MultiConsolePanelDescriptor(
-    Color color,
     std::string identifier,
     std::string category, std::string display_name,
     std::string doc_link,
     std::string description,
+    Color color,
     PanelDeprecation deprecation,
     size_t min_consoles,
     size_t max_consoles,
@@ -26,11 +26,11 @@ MultiConsolePanelDescriptor::MultiConsolePanelDescriptor(
     bool restore_defaults_button
 )
     : MultiConsolePanelDescriptor(
-        color,
         std::move(identifier),
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description),
+        color,
         deprecation,
         min_consoles,
         max_consoles,
@@ -51,11 +51,11 @@ MultiConsolePanelDescriptor::MultiConsolePanelDescriptor(
     )
 {}
 MultiConsolePanelDescriptor::MultiConsolePanelDescriptor(
-    Color color,
     std::string identifier,
     std::string category, std::string display_name,
     std::string doc_link,
     std::string description,
+    Color color,
     PanelDeprecation deprecation,
     size_t min_consoles,
     size_t max_consoles,
@@ -65,11 +65,11 @@ MultiConsolePanelDescriptor::MultiConsolePanelDescriptor(
     SessionFactory session_factory
 )
     : PanelDescriptor(
-        color,
         std::move(identifier),
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description),
+        color,
         deprecation,
         restore_defaults_button,
         {}

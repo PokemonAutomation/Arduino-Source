@@ -18,12 +18,12 @@ class MultiConsoleViewer_Descriptor : public MultiConsolePanelDescriptor{
 public:
     MultiConsoleViewer_Descriptor()
         : MultiConsolePanelDescriptor(
-            Color(),
             "GameConsole:MultiConsoleViewer",
             "Game Console",
             "Multi-Console Viewer",
             "Programs/NintendoSwitch/SwitchViewer.html",
             "View multiple consoles simultaneously. Use this to figure out your camera/audio/controller mappings.",
+            Color(),
             PanelDeprecation::NOT_DEPRECATED,
             1, 4, 2,
             false
