@@ -30,6 +30,7 @@ public:
 
 class LegendaryRunAway : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = LegendaryRunAway_Descriptor;
     LegendaryRunAway();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
 

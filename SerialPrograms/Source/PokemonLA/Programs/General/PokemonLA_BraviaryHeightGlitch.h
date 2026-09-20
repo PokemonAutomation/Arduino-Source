@@ -22,6 +22,7 @@ public:
 
 class BraviaryHeightGlitch : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = BraviaryHeightGlitch_Descriptor;
     BraviaryHeightGlitch();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

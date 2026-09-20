@@ -51,6 +51,7 @@ public:
     };
 
 public:
+    using Descriptor = GenerateIVCheckerOCR_Descriptor;
     GenerateIVCheckerOCR();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

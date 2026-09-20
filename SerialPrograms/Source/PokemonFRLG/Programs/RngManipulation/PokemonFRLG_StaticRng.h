@@ -36,6 +36,7 @@ public:
 
 class StaticRng : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = StaticRng_Descriptor;
     StaticRng();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
     virtual void start_program_border_check(

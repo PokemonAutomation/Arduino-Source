@@ -25,6 +25,7 @@ public:
 
 class WeaponDuper : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = WeaponDuper_Descriptor;
     WeaponDuper();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

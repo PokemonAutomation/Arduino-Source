@@ -34,6 +34,7 @@ public:
 
 class AutoStory : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
+    using Descriptor = AutoStory_Descriptor;
     ~AutoStory();
     AutoStory();
 

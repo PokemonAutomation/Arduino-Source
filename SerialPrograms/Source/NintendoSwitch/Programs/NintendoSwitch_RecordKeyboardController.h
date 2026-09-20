@@ -48,6 +48,7 @@ class RecordKeyboardController
     , public AbstractController::InputSniffer
 {
 public:
+    using Descriptor = RecordKeyboardController_Descriptor;
     ~RecordKeyboardController();
     RecordKeyboardController();
     

@@ -25,6 +25,7 @@ public:
 
 class ShinyEncounterTester : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ShinyEncounterTester_Descriptor;
     ShinyEncounterTester();
 
     virtual void start_program_controller_check(SwitchSystemSession& session) override{}

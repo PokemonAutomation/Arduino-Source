@@ -64,6 +64,7 @@ public:
 // Program to annoatation images for training ML models
 class LabelImages : public UiState<LabelImages, PanelSession>, public ConfigOption::Listener{
 public:
+    using Descriptor = LabelImages_Descriptor;
     LabelImages(const LabelImages_Descriptor& descriptor);
     ~LabelImages();
 

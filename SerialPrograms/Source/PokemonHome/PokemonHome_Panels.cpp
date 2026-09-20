@@ -37,9 +37,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 //    ret.emplace_back("---- Settings ----");
 //    ret.emplace_back(make_settings<GameSettings_Descriptor, GameSettingsPanel>());
     ret.emplace_back("---- General ----");
-    ret.emplace_back(make_single_switch_program<PokemonHome::PageSwap_Descriptor, PokemonHome::PageSwap>());
-    ret.emplace_back(make_single_switch_program<PokemonHome::BoxSorter_Descriptor, PokemonHome::BoxSorter>());
-    ret.emplace_back(make_single_switch_program<PokemonHome::BoxSorterLivingDex_Descriptor, PokemonHome::BoxSorterLivingDex>());
+    ret.emplace_back(make_SingleSwitchProgram<PokemonHome::PageSwap>());
+    ret.emplace_back(make_SingleSwitchProgram<PokemonHome::BoxSorter>());
+    ret.emplace_back(make_SingleSwitchProgram<PokemonHome::BoxSorterLivingDex>());
     if (IS_BETA_VERSION || STATIC_GLOBALS.DEVELOPER_MODE){
     }
 //    ret.emplace_back("---- Trading ----");
@@ -50,9 +50,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
-        ret.emplace_back(make_single_switch_program<PokemonHome::GenerateNameOCRData_Descriptor, PokemonHome::GenerateNameOCRData>());
-        ret.emplace_back(make_single_switch_program<PokemonHome::ReadSummaryScreen_Descriptor, PokemonHome::ReadSummaryScreen>());
-        ret.emplace_back(make_single_switch_program<PokemonHome::TestDatabaseGenerator_Descriptor, PokemonHome::TestDatabaseGenerator>());
+        ret.emplace_back(make_SingleSwitchProgram<PokemonHome::GenerateNameOCRData>());
+        ret.emplace_back(make_SingleSwitchProgram<PokemonHome::ReadSummaryScreen>());
+        ret.emplace_back(make_SingleSwitchProgram<PokemonHome::TestDatabaseGenerator>());
     }
 
     return ret;

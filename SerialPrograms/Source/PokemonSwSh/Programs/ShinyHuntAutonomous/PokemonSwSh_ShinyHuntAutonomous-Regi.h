@@ -36,6 +36,7 @@ public:
 
 class ShinyHuntAutonomousRegi : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ShinyHuntAutonomousRegi_Descriptor;
     ShinyHuntAutonomousRegi();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

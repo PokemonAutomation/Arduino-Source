@@ -26,6 +26,7 @@ public:
 
 class WattTraderFarmer : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = WattTraderFarmer_Descriptor;
     WattTraderFarmer();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

@@ -27,6 +27,7 @@ public:
 
 class BoxReorderNationalDex : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = BoxReorderNationalDex_Descriptor;
     BoxReorderNationalDex();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

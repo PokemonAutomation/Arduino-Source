@@ -7,13 +7,10 @@
 #ifndef PokemonAutomation_PokemonLZA_ShinyHunt_HelioptileHunter_H
 #define PokemonAutomation_PokemonLZA_ShinyHunt_HelioptileHunter_H
 
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
-#include "PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -33,6 +30,7 @@ public:
 
 class ShinyHunt_HelioptileHunter : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ShinyHunt_HelioptileHunter_Descriptor;
     ShinyHunt_HelioptileHunter();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

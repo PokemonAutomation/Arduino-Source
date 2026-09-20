@@ -23,6 +23,7 @@ public:
 
 class SkipToFullMoon : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = SkipToFullMoon_Descriptor;
     SkipToFullMoon();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

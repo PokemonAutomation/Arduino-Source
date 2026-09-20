@@ -26,6 +26,7 @@ public:
 
 class ShinyHuntDeoxys : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ShinyHuntDeoxys_Descriptor;
     ShinyHuntDeoxys();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

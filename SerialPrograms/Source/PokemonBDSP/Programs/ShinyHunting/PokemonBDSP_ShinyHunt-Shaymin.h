@@ -12,7 +12,6 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h"
 #include "PokemonBDSP/Options/PokemonBDSP_EncounterBotCommon.h"
 
@@ -31,6 +30,7 @@ public:
 
 class ShinyHuntShaymin : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ShinyHuntShaymin_Descriptor;
     ShinyHuntShaymin();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

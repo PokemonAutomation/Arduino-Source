@@ -33,6 +33,7 @@ public:
 
 class TeraRoller : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = TeraRoller_Descriptor;
     TeraRoller();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

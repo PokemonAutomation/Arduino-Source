@@ -24,6 +24,7 @@ public:
 
 class SafariOptimalActionTest : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = SafariOptimalActionTest_Descriptor;
     SafariOptimalActionTest();
 
     virtual void start_program_border_check(VideoStream& stream, FeedbackType feedback_type) override{}

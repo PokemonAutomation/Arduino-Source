@@ -41,6 +41,7 @@ enum class DateSkipMode{
 
 class DailyFarmer : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = DailyFarmer_Descriptor;
     DailyFarmer();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

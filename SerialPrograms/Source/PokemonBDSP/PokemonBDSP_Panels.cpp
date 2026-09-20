@@ -66,50 +66,50 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_OptionsPanel<GameSettingsPanel>());
 
     ret.emplace_back("---- General ----");
-    ret.emplace_back(make_single_switch_program<MassRelease_Descriptor, MassRelease>());
-    ret.emplace_back(make_single_switch_program<AutonomousBallThrower_Descriptor, AutonomousBallThrower>());
+    ret.emplace_back(make_SingleSwitchProgram<MassRelease>());
+    ret.emplace_back(make_SingleSwitchProgram<AutonomousBallThrower>());
 
     ret.emplace_back("---- Trading ----");
     ret.emplace_back(make_MultiSwitchProgram<SelfBoxTrade>());
     ret.emplace_back(make_MultiSwitchProgram<SelfTouchTrade>());
 
     ret.emplace_back("---- Farming ----");
-    ret.emplace_back(make_single_switch_program<MoneyFarmerRoute212_Descriptor, MoneyFarmerRoute212>());
-    ret.emplace_back(make_single_switch_program<MoneyFarmerRoute210_Descriptor, MoneyFarmerRoute210>());
-    ret.emplace_back(make_single_switch_program<DoublesLeveling_Descriptor, DoublesLeveling>());
-    ret.emplace_back(make_single_switch_program<AmitySquarePickUpFarmer_Descriptor, AmitySquarePickUpFarmer>());
-    ret.emplace_back(make_single_switch_program<GiftBerryReset_Descriptor, GiftBerryReset>());
-    ret.emplace_back(make_single_switch_program<PoffinCooker_Descriptor, PoffinCooker>());
+    ret.emplace_back(make_SingleSwitchProgram<MoneyFarmerRoute212>());
+    ret.emplace_back(make_SingleSwitchProgram<MoneyFarmerRoute210>());
+    ret.emplace_back(make_SingleSwitchProgram<DoublesLeveling>());
+    ret.emplace_back(make_SingleSwitchProgram<AmitySquarePickUpFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<GiftBerryReset>());
+    ret.emplace_back(make_SingleSwitchProgram<PoffinCooker>());
 
     ret.emplace_back("---- Shiny Hunting ----");
-    ret.emplace_back(make_single_switch_program<StarterReset_Descriptor, StarterReset>());
-    ret.emplace_back(make_single_switch_program<LegendaryReset_Descriptor, LegendaryReset>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntOverworld_Descriptor, ShinyHuntOverworld>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntFishing_Descriptor, ShinyHuntFishing>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntShaymin_Descriptor, ShinyHuntShaymin>());
+    ret.emplace_back(make_SingleSwitchProgram<StarterReset>());
+    ret.emplace_back(make_SingleSwitchProgram<LegendaryReset>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHuntOverworld>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHuntFishing>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHuntShaymin>());
 
     ret.emplace_back("---- Eggs ----");
-    ret.emplace_back(make_single_switch_program<EggFetcher_Descriptor, EggFetcher>());
-    ret.emplace_back(make_single_switch_program<EggHatcher_Descriptor, EggHatcher>());
-    ret.emplace_back(make_single_switch_program<EggAutonomous_Descriptor, EggAutonomous>());
+    ret.emplace_back(make_SingleSwitchProgram<EggFetcher>());
+    ret.emplace_back(make_SingleSwitchProgram<EggHatcher>());
+    ret.emplace_back(make_SingleSwitchProgram<EggAutonomous>());
 
     ret.emplace_back("---- Glitches (v1.1.3) ----");
-    ret.emplace_back(make_single_switch_program<ActivateMenuGlitch113_Descriptor, ActivateMenuGlitch113>());
-    ret.emplace_back(make_single_switch_program<CloneItemsBoxCopy2_Descriptor, CloneItemsBoxCopy2>());
+    ret.emplace_back(make_SingleSwitchProgram<ActivateMenuGlitch113>());
+    ret.emplace_back(make_SingleSwitchProgram<CloneItemsBoxCopy2>());
 
     ret.emplace_back("---- Glitches (v1.1.2) ----");
-    ret.emplace_back(make_single_switch_program<ActivateMenuGlitch112_Descriptor, ActivateMenuGlitch112>());
+    ret.emplace_back(make_SingleSwitchProgram<ActivateMenuGlitch112>());
 
     if (IS_BETA_VERSION || STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Untested/Beta/WIP ----");
-        ret.emplace_back(make_single_switch_program<IntroSeedFinder_Descriptor, IntroSeedFinder>());
-        ret.emplace_back(make_single_switch_program<BedroomSeedFinder_Descriptor, BedroomSeedFinder>());
+        ret.emplace_back(make_SingleSwitchProgram<IntroSeedFinder>());
+        ret.emplace_back(make_SingleSwitchProgram<BedroomSeedFinder>());
     }
     if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
-        ret.emplace_back(make_single_switch_program<ShinyEncounterTester_Descriptor, ShinyEncounterTester>());
-        ret.emplace_back(make_single_switch_program<SoundListener_Descriptor, SoundListener>());
-        ret.emplace_back(make_single_switch_program<SummaryReaderTester_Descriptor, SummaryReaderTester>());
+        ret.emplace_back(make_SingleSwitchProgram<ShinyEncounterTester>());
+        ret.emplace_back(make_SingleSwitchProgram<SoundListener>());
+        ret.emplace_back(make_SingleSwitchProgram<SummaryReaderTester>());
     }
 
     return ret;

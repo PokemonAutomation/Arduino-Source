@@ -21,6 +21,7 @@ public:
 
 class PreventSleep : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = PreventSleep_Descriptor;
     PreventSleep();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

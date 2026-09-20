@@ -33,6 +33,7 @@ public:
 
 class InPlaceCatcher : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
+    using Descriptor = InPlaceCatcher_Descriptor;
     InPlaceCatcher();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

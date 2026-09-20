@@ -75,44 +75,44 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_OptionsPanel<GameSettingsPanel>());
 
     ret.emplace_back("---- General ----");
-    ret.emplace_back(make_single_switch_program<ClothingBuyer_Descriptor, ClothingBuyer>());
-    ret.emplace_back(make_single_switch_program<StallBuyer_Descriptor, StallBuyer>());
+    ret.emplace_back(make_SingleSwitchProgram<ClothingBuyer>());
+    ret.emplace_back(make_SingleSwitchProgram<StallBuyer>());
     ret.emplace_back(make_MultiSwitchProgram<SelfBoxTrade>());
-    ret.emplace_back(make_single_switch_program<PostKillCatcher_Descriptor, PostKillCatcher>());
-    ret.emplace_back(make_single_switch_program<BoxSorter_Descriptor, BoxSorter>());
-    ret.emplace_back(make_single_switch_program<WeatherFinder_Descriptor, WeatherFinder>());
-    ret.emplace_back(make_single_switch_program<HyperspaceRewardReset_Descriptor, HyperspaceRewardReset>());
-    ret.emplace_back(make_single_switch_program<DonutMaker_Descriptor, DonutMaker>());
+    ret.emplace_back(make_SingleSwitchProgram<PostKillCatcher>());
+    ret.emplace_back(make_SingleSwitchProgram<BoxSorter>());
+    ret.emplace_back(make_SingleSwitchProgram<WeatherFinder>());
+    ret.emplace_back(make_SingleSwitchProgram<HyperspaceRewardReset>());
+    ret.emplace_back(make_SingleSwitchProgram<DonutMaker>());
     if (IS_BETA_VERSION){
-        ret.emplace_back(make_single_switch_program<LZA_TurboMacro_Descriptor, LZA_TurboMacro>());
+        ret.emplace_back(make_SingleSwitchProgram<LZA_TurboMacro>());
     }
 
     ret.emplace_back("---- Farming ----");
-    ret.emplace_back(make_single_switch_program<RestaurantFarmer_Descriptor, RestaurantFarmer>());
-    ret.emplace_back(make_single_switch_program<MegaShardFarmer_Descriptor, MegaShardFarmer>());
-    ret.emplace_back(make_single_switch_program<JacintheInfiniteFarmer_Descriptor, JacintheInfiniteFarmer>());
-    ret.emplace_back(make_single_switch_program<FriendshipFarmer_Descriptor, FriendshipFarmer>());
-    ret.emplace_back(make_single_switch_program<InPlaceCatcher_Descriptor, InPlaceCatcher>());
-    ret.emplace_back(make_single_switch_program<WigglytuffFarmer_Descriptor, WigglytuffFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<RestaurantFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<MegaShardFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<JacintheInfiniteFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<FriendshipFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<InPlaceCatcher>());
+    ret.emplace_back(make_SingleSwitchProgram<WigglytuffFarmer>());
     if (IS_BETA_VERSION){
     }
 
     ret.emplace_back("---- Shiny Hunting ----");
-    ret.emplace_back(make_single_switch_program<AutoFossil_Descriptor, AutoFossil>());
-    ret.emplace_back(make_single_switch_program<ShinyHunt_BenchSit_Descriptor, ShinyHunt_BenchSit>());
-    ret.emplace_back(make_single_switch_program<ShinyHunt_OverworldReset_Descriptor, ShinyHunt_OverworldReset>());
-    ret.emplace_back(make_single_switch_program<ShinyHunt_WildZoneEntrance_Descriptor, ShinyHunt_WildZoneEntrance>());
-    ret.emplace_back(make_single_switch_program<ShinyHunt_WildZoneCafe_Descriptor, ShinyHunt_WildZoneCafe>());
-    ret.emplace_back(make_single_switch_program<ShinyHunt_FlySpotReset_Descriptor, ShinyHunt_FlySpotReset>());
-    ret.emplace_back(make_single_switch_program<ShinyHunt_SewerHunter_Descriptor, ShinyHunt_SewerHunter>());
-    ret.emplace_back(make_single_switch_program<ShinyHunt_HelioptileHunter_Descriptor, ShinyHunt_HelioptileHunter>());
-    ret.emplace_back(make_single_switch_program<ShinyHunt_HyperspaceLegendary_Descriptor, ShinyHunt_HyperspaceLegendary>());
+    ret.emplace_back(make_SingleSwitchProgram<AutoFossil>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHunt_BenchSit>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHunt_OverworldReset>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHunt_WildZoneEntrance>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHunt_WildZoneCafe>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHunt_FlySpotReset>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHunt_SewerHunter>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHunt_HelioptileHunter>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHunt_HyperspaceLegendary>());
     if (IS_BETA_VERSION){
-        ret.emplace_back(make_single_switch_program<ShinyHunt_ShuttleRun_Descriptor, ShinyHunt_ShuttleRun>());
+        ret.emplace_back(make_SingleSwitchProgram<ShinyHunt_ShuttleRun>());
     }
     if (STATIC_GLOBALS.DEVELOPER_MODE){
-        ret.emplace_back(make_single_switch_program<ShinyHunt_HyperspaceHunter_Descriptor, ShinyHunt_HyperspaceHunter>());
-        ret.emplace_back(make_single_switch_program<BeldumHunter_Descriptor, BeldumHunter>());
+        ret.emplace_back(make_SingleSwitchProgram<ShinyHunt_HyperspaceHunter>());
+        ret.emplace_back(make_SingleSwitchProgram<BeldumHunter>());
     }
 
 //    ret.emplace_back("---- Non-Shiny Hunting ----");
@@ -120,14 +120,14 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     }
 
     ret.emplace_back("---- Public Betas ----");
-    ret.emplace_back(make_single_switch_program<StatsReset_Descriptor, StatsReset>());
+    ret.emplace_back(make_SingleSwitchProgram<StatsReset>());
 
     if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
-        ret.emplace_back(make_single_switch_program<OverworldWatcher_Descriptor, OverworldWatcher>());
-        ret.emplace_back(make_single_switch_program<MoveBoxArrow_Descriptor, MoveBoxArrow>());
-        ret.emplace_back(make_single_switch_program<TestBoxCellInfo_Descriptor, TestBoxCellInfo>());
-        ret.emplace_back(make_single_switch_program<GenerateLocationNameOCR_Descriptor, GenerateLocationNameOCR>());
+        ret.emplace_back(make_SingleSwitchProgram<OverworldWatcher>());
+        ret.emplace_back(make_SingleSwitchProgram<MoveBoxArrow>());
+        ret.emplace_back(make_SingleSwitchProgram<TestBoxCellInfo>());
+        ret.emplace_back(make_SingleSwitchProgram<GenerateLocationNameOCR>());
     }
     return ret;
 }

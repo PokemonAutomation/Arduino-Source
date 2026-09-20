@@ -28,6 +28,7 @@ public:
 
 class GenerateNameOCRDataPokedex : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = GenerateNameOCRDataPokedex_Descriptor;
     GenerateNameOCRDataPokedex();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

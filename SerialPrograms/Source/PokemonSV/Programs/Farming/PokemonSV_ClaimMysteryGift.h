@@ -8,14 +8,12 @@
 #define PokemonAutomation_PokemonSV_ClaimMysteryGift_H
 
 #include "Common/Cpp/Options/StaticTextOption.h"
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/FloatingPointOption.h"
+#include "Common/Cpp/Options/TextEditOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonTools/Options/StringSelectOption.h"
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
-#include "Common/Cpp/Options/TextEditOption.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.h"
 
 namespace PokemonAutomation{
@@ -34,6 +32,7 @@ public:
 
 class ClaimMysteryGift : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
+    using Descriptor = ClaimMysteryGift_Descriptor;
     ~ClaimMysteryGift();
     ClaimMysteryGift();
 

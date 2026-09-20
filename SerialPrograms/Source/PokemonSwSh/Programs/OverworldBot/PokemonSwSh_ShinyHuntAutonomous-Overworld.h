@@ -40,6 +40,7 @@ public:
 
 class ShinyHuntAutonomousOverworld : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ShinyHuntAutonomousOverworld_Descriptor;
     ShinyHuntAutonomousOverworld();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

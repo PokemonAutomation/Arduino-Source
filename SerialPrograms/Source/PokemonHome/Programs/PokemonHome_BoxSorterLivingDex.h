@@ -33,6 +33,7 @@ public:
 
 class BoxSorterLivingDex : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
+    using Descriptor = BoxSorterLivingDex_Descriptor;
     ~BoxSorterLivingDex();
     BoxSorterLivingDex();
 

@@ -9,7 +9,6 @@
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "PokemonSV/Options/PokemonSV_BBQOption.h"
 
@@ -27,6 +26,7 @@ public:
 
 class BBQSoloFarmer : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = BBQSoloFarmer_Descriptor;
     BBQSoloFarmer();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

@@ -36,17 +36,17 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_OptionsPanel<GameSettingsPanel>());
 
     ret.emplace_back("---- General ----");
-    ret.emplace_back(make_single_switch_program<DailyItemFarmer_Descriptor, DailyItemFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<DailyItemFarmer>());
 
     ret.emplace_back("---- Shiny Hunting ----");
-    ret.emplace_back(make_single_switch_program<AlolanTrade_Descriptor, AlolanTrade>());
-    ret.emplace_back(make_single_switch_program<FossilRevival_Descriptor, FossilRevival>());
-    ret.emplace_back(make_single_switch_program<GiftReset_Descriptor, GiftReset>());
-    ret.emplace_back(make_single_switch_program<LegendaryReset_Descriptor, LegendaryReset>());
+    ret.emplace_back(make_SingleSwitchProgram<AlolanTrade>());
+    ret.emplace_back(make_SingleSwitchProgram<FossilRevival>());
+    ret.emplace_back(make_SingleSwitchProgram<GiftReset>());
+    ret.emplace_back(make_SingleSwitchProgram<LegendaryReset>());
 
     if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
-        ret.emplace_back(make_single_switch_program<SoundListener_Descriptor, SoundListener>());
+        ret.emplace_back(make_SingleSwitchProgram<SoundListener>());
     }
 
     return ret;

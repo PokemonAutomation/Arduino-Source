@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonLZA_WildZoneCafe_H
 #define PokemonAutomation_PokemonLZA_WildZoneCafe_H
 
-#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -28,6 +27,7 @@ public:
 
 class ShinyHunt_WildZoneCafe : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ShinyHunt_WildZoneCafe_Descriptor;
     ShinyHunt_WildZoneCafe();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

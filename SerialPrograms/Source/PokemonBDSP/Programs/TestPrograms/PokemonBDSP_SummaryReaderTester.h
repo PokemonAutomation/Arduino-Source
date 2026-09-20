@@ -23,6 +23,7 @@ public:
 
 class SummaryReaderTester : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = SummaryReaderTester_Descriptor;
     SummaryReaderTester();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

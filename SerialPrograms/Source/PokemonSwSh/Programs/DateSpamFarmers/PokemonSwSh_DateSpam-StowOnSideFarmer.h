@@ -26,6 +26,7 @@ public:
 
 class StowOnSideFarmer : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = StowOnSideFarmer_Descriptor;
     StowOnSideFarmer();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

@@ -25,6 +25,7 @@ public:
 
 class GimmighoulRoamingFarmer : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = GimmighoulRoamingFarmer_Descriptor;
     GimmighoulRoamingFarmer();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

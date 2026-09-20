@@ -34,6 +34,7 @@ public:
 
 class AutoFossil : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = AutoFossil_Descriptor;
     AutoFossil();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

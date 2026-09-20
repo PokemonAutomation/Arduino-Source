@@ -20,13 +20,13 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+#include "PokemonSwSh/Resources/PokemonSwSh_DailyHighlightDatabase.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.h"
 #include "PokemonSwSh/Programs/RNG/PokemonSwSh_BasicRNG.h"
 #include "PokemonSwSh/Programs/RNG/PokemonSwSh_DailyHighlightRNG.h"
-
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

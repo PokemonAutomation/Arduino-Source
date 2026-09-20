@@ -12,12 +12,11 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "CommonTools/Options/LanguageOCROption.h"
-#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "PokemonLZA/Options/PokemonLZA_DonutBerriesOption.h"
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonLZA {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonLZA{
 
 
 class DonutMaker_Descriptor : public SingleSwitchProgramDescriptor {
@@ -31,6 +30,7 @@ public:
 
 class DonutMaker : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = DonutMaker_Descriptor;
     DonutMaker();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
@@ -73,7 +73,7 @@ private:
 };
 
 
-}  // namespace PokemonLZA
-}  // namespace NintendoSwitch
-}  // namespace PokemonAutomation
+}
+}
+}
 #endif

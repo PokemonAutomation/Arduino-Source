@@ -43,6 +43,7 @@ public:
 
 class TournamentFarmer : public SingleSwitchProgramInstance, public ButtonListener{
 public:
+    using Descriptor = TournamentFarmer_Descriptor;
     ~TournamentFarmer();
     TournamentFarmer();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

@@ -7,12 +7,10 @@
 #ifndef PokemonAutomation_PokemonSwSh_GodEggDuplication_H
 #define PokemonAutomation_PokemonSwSh_GodEggDuplication_H
 
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "PokemonSwSh_EggHelpers.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -28,6 +26,7 @@ public:
 
 class GodEggDuplication : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = GodEggDuplication_Descriptor;
     GodEggDuplication();
 
     void collect_godegg(ProControllerContext& context, uint8_t party_slot) const;

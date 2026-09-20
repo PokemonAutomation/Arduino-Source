@@ -21,6 +21,7 @@ public:
 
 class ReadSummaryScreen : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ReadSummaryScreen_Descriptor;
     ReadSummaryScreen();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

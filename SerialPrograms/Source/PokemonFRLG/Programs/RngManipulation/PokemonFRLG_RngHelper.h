@@ -30,6 +30,7 @@ public:
 
 class RngHelper : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = RngHelper_Descriptor;
     RngHelper();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
     virtual void start_program_border_check(

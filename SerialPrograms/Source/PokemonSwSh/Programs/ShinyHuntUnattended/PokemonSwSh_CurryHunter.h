@@ -30,6 +30,7 @@ public:
 
 class CurryHunter : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = CurryHunter_Descriptor;
     CurryHunter();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

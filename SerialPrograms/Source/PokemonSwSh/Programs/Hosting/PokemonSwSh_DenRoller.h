@@ -33,6 +33,7 @@ public:
 
 class DenRoller : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = DenRoller_Descriptor;
     DenRoller();
 
     void ring_bell(ProControllerContext& context, int count) const;

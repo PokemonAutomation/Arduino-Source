@@ -28,8 +28,10 @@ public:
 
 class TournamentFarmer2 : public SingleSwitchProgramInstance, public ButtonListener{
 public:
+    using Descriptor = TournamentFarmer2_Descriptor;
     ~TournamentFarmer2();
     TournamentFarmer2();
+
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
     virtual void on_press(ButtonCell& button) override;
 

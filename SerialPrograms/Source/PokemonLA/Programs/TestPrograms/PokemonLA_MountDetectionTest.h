@@ -24,6 +24,7 @@ public:
 
 class MountDetectionTest : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = MountDetectionTest_Descriptor;
     MountDetectionTest();
 
     virtual void start_program_controller_check(SwitchSystemSession& session) override{}

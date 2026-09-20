@@ -26,6 +26,7 @@ public:
 
 class MegaShardFarmer : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = MegaShardFarmer_Descriptor;
     MegaShardFarmer();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

@@ -25,8 +25,8 @@ public:
 
 class EventBeamFinder : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = EventBeamFinder_Descriptor;
     EventBeamFinder();
-
 
     void goto_near_den(ProControllerContext& context) const;
     void goto_far_den(ProControllerContext& context) const;

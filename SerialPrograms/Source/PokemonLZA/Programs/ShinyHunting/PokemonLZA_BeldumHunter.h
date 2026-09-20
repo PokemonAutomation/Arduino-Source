@@ -28,6 +28,7 @@ public:
 
 class BeldumHunter : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = BeldumHunter_Descriptor;
     BeldumHunter();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

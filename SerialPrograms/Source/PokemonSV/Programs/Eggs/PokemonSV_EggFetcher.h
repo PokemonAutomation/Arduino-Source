@@ -34,6 +34,7 @@ public:
 
 class EggFetcher : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = EggFetcher_Descriptor;
     EggFetcher();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

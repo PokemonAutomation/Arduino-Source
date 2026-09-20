@@ -8,7 +8,6 @@
 #define PokemonAutomation_PokemonBDSP_StarterReset_H
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_NameSelectOption.h"
@@ -29,6 +28,7 @@ public:
 
 class StarterReset : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = StarterReset_Descriptor;
     StarterReset();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

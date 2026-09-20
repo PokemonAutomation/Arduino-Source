@@ -37,6 +37,7 @@ public:
 
 class ShinyHuntAutonomousSwordsOfJustice : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ShinyHuntAutonomousSwordsOfJustice_Descriptor;
     ShinyHuntAutonomousSwordsOfJustice();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

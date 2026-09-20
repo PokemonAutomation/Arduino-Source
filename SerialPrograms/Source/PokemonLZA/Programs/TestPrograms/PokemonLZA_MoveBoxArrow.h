@@ -23,6 +23,7 @@ public:
 
 class MoveBoxArrow : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = MoveBoxArrow_Descriptor;
     MoveBoxArrow();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

@@ -27,6 +27,7 @@ public:
 
 class FossilRevival : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = FossilRevival_Descriptor;
     FossilRevival();
     virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 

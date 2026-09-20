@@ -9,7 +9,6 @@
 
 #include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/Options/LanguageOCROption.h"
-#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -23,6 +22,7 @@ public:
 
 class ReadStats : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ReadStats_Descriptor;
     ReadStats();
 
     virtual void start_program_controller_check(SwitchSystemSession& session) override{}

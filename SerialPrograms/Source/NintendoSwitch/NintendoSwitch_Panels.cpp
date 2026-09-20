@@ -62,33 +62,33 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- Virtual Consoles ----");
     ret.emplace_back(GameConsole::make_ConsolePanel<GameConsole::VirtualConsole>());
     ret.emplace_back(GameConsole::make_ConsolePanel<GameConsole::MultiControllerTester>());
-    ret.emplace_back(GameConsole::make_MultiConsolePanel<GameConsole::MultiConsoleViewer_Descriptor, GameConsole::MultiConsolePanelInstance>());
+    ret.emplace_back(GameConsole::make_MultiConsolePanel<GameConsole::MultiConsoleViewer>());
 //    ret.emplace_back(make_panel<SwitchViewer_Descriptor, SwitchViewer>());
 
     ret.emplace_back("---- Programs ----");
-    ret.emplace_back(make_single_switch_program<TurboA_Descriptor, TurboA>());
-    ret.emplace_back(make_single_switch_program<TurboButton_Descriptor, TurboButton>());
-    ret.emplace_back(make_single_switch_program<TurboMacro_Descriptor, TurboMacro>());
-    ret.emplace_back(make_single_switch_program<PushJoySticks_Descriptor, PushJoySticks>());
-    ret.emplace_back(make_single_switch_program<PreventSleep_Descriptor, PreventSleep>());
-    ret.emplace_back(make_single_switch_program<FriendCodeAdder_Descriptor, FriendCodeAdder>());
-    ret.emplace_back(make_single_switch_program<FriendDelete_Descriptor, FriendDelete>());
-    ret.emplace_back(make_single_switch_program<RecordKeyboardController_Descriptor, RecordKeyboardController>());
+    ret.emplace_back(make_SingleSwitchProgram<TurboA>());
+    ret.emplace_back(make_SingleSwitchProgram<TurboButton>());
+    ret.emplace_back(make_SingleSwitchProgram<TurboMacro>());
+    ret.emplace_back(make_SingleSwitchProgram<PushJoySticks>());
+    ret.emplace_back(make_SingleSwitchProgram<PreventSleep>());
+    ret.emplace_back(make_SingleSwitchProgram<FriendCodeAdder>());
+    ret.emplace_back(make_SingleSwitchProgram<FriendDelete>());
+    ret.emplace_back(make_SingleSwitchProgram<RecordKeyboardController>());
 
     ret.emplace_back("---- Testing ----");
     ret.emplace_back(GameConsole::make_ConsolePanel<GameConsole::BoxDraw>());
-    ret.emplace_back(make_single_switch_program<SnapshotDumper_Descriptor, SnapshotDumper>());
+    ret.emplace_back(make_SingleSwitchProgram<SnapshotDumper>());
 
     if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
-        ret.emplace_back(make_single_switch_program<MenuStabilityTester_Descriptor, MenuStabilityTester>());
+        ret.emplace_back(make_SingleSwitchProgram<MenuStabilityTester>());
         ret.emplace_back(make_ComputerProgram<TestProgramComputer>());
         ret.emplace_back(make_MultiSwitchProgram<TestProgram>());
-        ret.emplace_back(make_single_switch_program<JoyconProgram_Descriptor, JoyconProgram>());
-        ret.emplace_back(make_single_switch_program<WaterfillTemplateMaker_Descriptor, WaterfillTemplateMaker>());
+        ret.emplace_back(make_SingleSwitchProgram<JoyconProgram>());
+        ret.emplace_back(make_SingleSwitchProgram<WaterfillTemplateMaker>());
         ret.emplace_back(make_ComputerProgram<Pokemon::TrainIVCheckerOCR>());
         ret.emplace_back(make_ComputerProgram<Pokemon::TrainPokemonOCR>());
-        ret.emplace_back(make_single_switch_program<TestDudunsparceFormDetector_Descriptor, TestDudunsparceFormDetector>());
+        ret.emplace_back(make_SingleSwitchProgram<TestDudunsparceFormDetector>());
         ret.emplace_back(make_ComputerProgram<ComputerPrograms::UnitTestRunner>());
 #ifdef PA_OFFICIAL
         if (STATIC_GLOBALS.INTERNAL_DEVELOPER_MODE){

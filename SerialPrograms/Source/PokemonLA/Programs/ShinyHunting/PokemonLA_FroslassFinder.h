@@ -26,6 +26,7 @@ public:
 
 class FroslassFinder : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = FroslassFinder_Descriptor;
     FroslassFinder();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

@@ -7,12 +7,13 @@
 #ifndef PokemonAutomation_PokemonFRLG_PrizeCornerReset_H
 #define PokemonAutomation_PokemonFRLG_PrizeCornerReset_H
 
+#include "Common/Cpp/Options/StaticTextOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
-#include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -27,6 +28,7 @@ public:
 
 class PrizeCornerReset : public SingleSwitchProgramInstance, private ConfigOption::Listener{
 public:
+    using Descriptor = PrizeCornerReset_Descriptor;
     ~PrizeCornerReset();
     PrizeCornerReset();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;

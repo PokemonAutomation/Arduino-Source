@@ -36,6 +36,7 @@ public:
 
 class ShinyHunt_BenchSit : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ShinyHunt_BenchSit_Descriptor;
     ShinyHunt_BenchSit();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

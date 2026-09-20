@@ -24,8 +24,8 @@ public:
 
 
 class GenerateNameOCRData : public SingleSwitchProgramInstance{
-
 public:
+    using Descriptor = GenerateNameOCRData_Descriptor;
     GenerateNameOCRData();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

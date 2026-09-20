@@ -25,6 +25,7 @@ public:
 
 class FriendDelete : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = FriendDelete_Descriptor;
     FriendDelete();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

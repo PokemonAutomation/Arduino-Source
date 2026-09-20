@@ -8,7 +8,6 @@
 #ifndef PokemonAutomation_PokemonLA_TenacityCandyFarmer_H
 #define PokemonAutomation_PokemonLA_TenacityCandyFarmer_H
 
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
@@ -29,6 +28,7 @@ public:
 
 class TenacityCandyFarmer : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = TenacityCandyFarmer_Descriptor;
     TenacityCandyFarmer();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

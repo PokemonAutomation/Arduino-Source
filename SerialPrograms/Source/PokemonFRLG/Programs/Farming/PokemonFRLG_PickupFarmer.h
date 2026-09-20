@@ -26,6 +26,7 @@ public:
 
 class PickupFarmer : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = PickupFarmer_Descriptor;
     PickupFarmer();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
     virtual void start_program_border_check(

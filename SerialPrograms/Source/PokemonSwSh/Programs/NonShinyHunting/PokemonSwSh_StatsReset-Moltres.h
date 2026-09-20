@@ -33,6 +33,7 @@ public:
 
 class StatsResetMoltres : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = StatsResetMoltres_Descriptor;
     StatsResetMoltres();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

@@ -34,6 +34,7 @@ public:
 
 class StatsResetRegi : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = StatsResetRegi_Descriptor;
     StatsResetRegi();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

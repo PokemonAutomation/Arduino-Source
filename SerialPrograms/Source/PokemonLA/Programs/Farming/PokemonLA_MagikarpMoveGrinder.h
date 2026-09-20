@@ -28,6 +28,7 @@ public:
 
 class MagikarpMoveGrinder : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = MagikarpMoveGrinder_Descriptor;
     MagikarpMoveGrinder();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

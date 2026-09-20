@@ -7,11 +7,9 @@
 #ifndef PokemonAutomation_PokemonSV_MaterialFarmer_H
 #define PokemonAutomation_PokemonSV_MaterialFarmer_H
 
-#include <functional>
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
-#include "PokemonSV/Options/PokemonSV_SandwichMakerOption.h"
 #include "PokemonSV_MaterialFarmerTools.h"
 
 namespace PokemonAutomation{
@@ -28,6 +26,7 @@ public:
 
 class MaterialFarmer : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = MaterialFarmer_Descriptor;
     MaterialFarmer();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

@@ -30,6 +30,7 @@ public:
 
 class MassAttachItems : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = MassAttachItems_Descriptor;
     MassAttachItems();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

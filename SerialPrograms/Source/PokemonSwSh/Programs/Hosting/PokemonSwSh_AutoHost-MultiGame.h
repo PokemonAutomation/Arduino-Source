@@ -35,6 +35,7 @@ public:
 
 class AutoHostMultiGame : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = AutoHostMultiGame_Descriptor;
     AutoHostMultiGame();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

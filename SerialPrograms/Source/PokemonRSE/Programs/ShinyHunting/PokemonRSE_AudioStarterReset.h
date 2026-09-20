@@ -26,6 +26,7 @@ public:
 
 class AudioStarterReset : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = AudioStarterReset_Descriptor;
     AudioStarterReset();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

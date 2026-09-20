@@ -28,6 +28,7 @@ enum class Format{
 
 class SnapshotDumper : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
+    using Descriptor = SnapshotDumper_Descriptor;
     ~SnapshotDumper();
     SnapshotDumper();
 

@@ -26,6 +26,7 @@ public:
 
 class DailyHighlightFarmer : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = DailyHighlightFarmer_Descriptor;
     DailyHighlightFarmer();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

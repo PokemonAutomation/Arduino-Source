@@ -37,6 +37,7 @@ public:
 
 class AuctionFarmer : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = AuctionFarmer_Descriptor;
     AuctionFarmer();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

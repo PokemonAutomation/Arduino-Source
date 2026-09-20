@@ -103,75 +103,75 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_OptionsPanel<GameSettingsPanel>());
 
     ret.emplace_back("---- QoL Macros ----");
-    ret.emplace_back(make_single_switch_program<FastCodeEntry_Descriptor, FastCodeEntry>());
-    ret.emplace_back(make_single_switch_program<FriendSearchDisconnect_Descriptor, FriendSearchDisconnect>());
+    ret.emplace_back(make_SingleSwitchProgram<FastCodeEntry>());
+    ret.emplace_back(make_SingleSwitchProgram<FriendSearchDisconnect>());
 
     ret.emplace_back("---- General ----");
-    ret.emplace_back(make_single_switch_program<MassRelease_Descriptor, MassRelease>());
-    ret.emplace_back(make_single_switch_program<SurpriseTrade_Descriptor, SurpriseTrade>());
-    ret.emplace_back(make_single_switch_program<TradeBot_Descriptor, TradeBot>());
-    ret.emplace_back(make_single_switch_program<ClothingBuyer_Descriptor, ClothingBuyer>());
-    ret.emplace_back(make_single_switch_program<AutonomousBallThrower_Descriptor, AutonomousBallThrower>());
-    ret.emplace_back(make_single_switch_program<DexRecFinder_Descriptor, DexRecFinder>());
-    ret.emplace_back(make_single_switch_program<BoxReorderNationalDex_Descriptor, BoxReorderNationalDex>());
+    ret.emplace_back(make_SingleSwitchProgram<MassRelease>());
+    ret.emplace_back(make_SingleSwitchProgram<SurpriseTrade>());
+    ret.emplace_back(make_SingleSwitchProgram<TradeBot>());
+    ret.emplace_back(make_SingleSwitchProgram<ClothingBuyer>());
+    ret.emplace_back(make_SingleSwitchProgram<AutonomousBallThrower>());
+    ret.emplace_back(make_SingleSwitchProgram<DexRecFinder>());
+    ret.emplace_back(make_SingleSwitchProgram<BoxReorderNationalDex>());
 
     ret.emplace_back("---- Date-Spam Farmers ----");
-    ret.emplace_back(make_single_switch_program<WattFarmer_Descriptor, WattFarmer>());
-    ret.emplace_back(make_single_switch_program<BerryFarmer_Descriptor, BerryFarmer>());
-    ret.emplace_back(make_single_switch_program<BerryFarmer2_Descriptor, BerryFarmer2>());
-    ret.emplace_back(make_single_switch_program<LotoFarmer_Descriptor, LotoFarmer>());
-    ret.emplace_back(make_single_switch_program<StowOnSideFarmer_Descriptor, StowOnSideFarmer>());
-    ret.emplace_back(make_single_switch_program<DailyHighlightFarmer_Descriptor, DailyHighlightFarmer>());
-    ret.emplace_back(make_single_switch_program<PokeJobsFarmer_Descriptor, PokeJobsFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<WattFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<BerryFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<BerryFarmer2>());
+    ret.emplace_back(make_SingleSwitchProgram<LotoFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<StowOnSideFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<DailyHighlightFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<PokeJobsFarmer>());
     if (STATIC_GLOBALS.DEVELOPER_MODE){
-        ret.emplace_back(make_single_switch_program<WattTraderFarmer_Descriptor, WattTraderFarmer>());
+        ret.emplace_back(make_SingleSwitchProgram<WattTraderFarmer>());
     }
 
     ret.emplace_back("---- Den Hunting ----");
-    ret.emplace_back(make_single_switch_program<PurpleBeamFinder_Descriptor, PurpleBeamFinder>());
-    ret.emplace_back(make_single_switch_program<EventBeamFinder_Descriptor, EventBeamFinder>());
-    ret.emplace_back(make_single_switch_program<DaySkipperJPN_Descriptor, DaySkipperJPN>());
-    ret.emplace_back(make_single_switch_program<DaySkipperEU_Descriptor, DaySkipperEU>());
-    ret.emplace_back(make_single_switch_program<DaySkipperUS_Descriptor, DaySkipperUS>());
-    ret.emplace_back(make_single_switch_program<DaySkipperJPN7p8k_Descriptor, DaySkipperJPN7p8k>());
+    ret.emplace_back(make_SingleSwitchProgram<PurpleBeamFinder>());
+    ret.emplace_back(make_SingleSwitchProgram<EventBeamFinder>());
+    ret.emplace_back(make_SingleSwitchProgram<DaySkipperJPN>());
+    ret.emplace_back(make_SingleSwitchProgram<DaySkipperEU>());
+    ret.emplace_back(make_SingleSwitchProgram<DaySkipperUS>());
+    ret.emplace_back(make_SingleSwitchProgram<DaySkipperJPN7p8k>());
 
     ret.emplace_back("---- Hosting ----");
-    ret.emplace_back(make_single_switch_program<DenRoller_Descriptor, DenRoller>());
-    ret.emplace_back(make_single_switch_program<AutoHostRolling_Descriptor, AutoHostRolling>());
-    ret.emplace_back(make_single_switch_program<AutoHostMultiGame_Descriptor, AutoHostMultiGame>());
+    ret.emplace_back(make_SingleSwitchProgram<DenRoller>());
+    ret.emplace_back(make_SingleSwitchProgram<AutoHostRolling>());
+    ret.emplace_back(make_SingleSwitchProgram<AutoHostMultiGame>());
 
     ret.emplace_back("---- Eggs ----");
-    ret.emplace_back(make_single_switch_program<EggFetcher2_Descriptor, EggFetcher2>());
-    ret.emplace_back(make_single_switch_program<EggFetcherMultiple_Descriptor, EggFetcherMultiple>());
-    ret.emplace_back(make_single_switch_program<EggHatcher_Descriptor, EggHatcher>());
-    ret.emplace_back(make_single_switch_program<EggAutonomous_Descriptor, EggAutonomous>());
-    ret.emplace_back(make_single_switch_program<GodEggItemDupe_Descriptor, GodEggItemDupe>());
+    ret.emplace_back(make_SingleSwitchProgram<EggFetcher2>());
+    ret.emplace_back(make_SingleSwitchProgram<EggFetcherMultiple>());
+    ret.emplace_back(make_SingleSwitchProgram<EggHatcher>());
+    ret.emplace_back(make_SingleSwitchProgram<EggAutonomous>());
+    ret.emplace_back(make_SingleSwitchProgram<GodEggItemDupe>());
     if (STATIC_GLOBALS.NAUGHTY_MODE || STATIC_GLOBALS.DEVELOPER_MODE){
-        ret.emplace_back(make_single_switch_program<GodEggDuplication_Descriptor, GodEggDuplication>());
+        ret.emplace_back(make_SingleSwitchProgram<GodEggDuplication>());
     }
 
     ret.emplace_back("---- Non-Shiny Hunting ----");
-    ret.emplace_back(make_single_switch_program<StatsReset_Descriptor, StatsReset>());
-    ret.emplace_back(make_single_switch_program<StatsResetCalyrex_Descriptor, StatsResetCalyrex>());
-    ret.emplace_back(make_single_switch_program<StatsResetMoltres_Descriptor, StatsResetMoltres>());
-    ret.emplace_back(make_single_switch_program<StatsResetRegi_Descriptor, StatsResetRegi>());
+    ret.emplace_back(make_SingleSwitchProgram<StatsReset>());
+    ret.emplace_back(make_SingleSwitchProgram<StatsResetCalyrex>());
+    ret.emplace_back(make_SingleSwitchProgram<StatsResetMoltres>());
+    ret.emplace_back(make_SingleSwitchProgram<StatsResetRegi>());
 
     ret.emplace_back("---- Shiny Hunting ----");
-    ret.emplace_back(make_single_switch_program<MultiGameFossil_Descriptor, MultiGameFossil>());
-    ret.emplace_back(make_single_switch_program<CurryHunter_Descriptor, CurryHunter>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntAutonomousRegi_Descriptor, ShinyHuntAutonomousRegi>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntAutonomousSwordsOfJustice_Descriptor, ShinyHuntAutonomousSwordsOfJustice>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntAutonomousStrongSpawn_Descriptor, ShinyHuntAutonomousStrongSpawn>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntAutonomousRegigigas2_Descriptor, ShinyHuntAutonomousRegigigas2>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntAutonomousIoATrade_Descriptor, ShinyHuntAutonomousIoATrade>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntAutonomousBerryTree_Descriptor, ShinyHuntAutonomousBerryTree>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntAutonomousWhistling_Descriptor, ShinyHuntAutonomousWhistling>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntAutonomousFishing_Descriptor, ShinyHuntAutonomousFishing>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntAutonomousOverworld_Descriptor, ShinyHuntAutonomousOverworld>());
+    ret.emplace_back(make_SingleSwitchProgram<MultiGameFossil>());
+    ret.emplace_back(make_SingleSwitchProgram<CurryHunter>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHuntAutonomousRegi>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHuntAutonomousSwordsOfJustice>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHuntAutonomousStrongSpawn>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHuntAutonomousRegigigas2>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHuntAutonomousIoATrade>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHuntAutonomousBerryTree>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHuntAutonomousWhistling>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHuntAutonomousFishing>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHuntAutonomousOverworld>());
 
     ret.emplace_back("---- RNG ----");
-    ret.emplace_back(make_single_switch_program<SeedFinder_Descriptor, SeedFinder>());
-    ret.emplace_back(make_single_switch_program<CramomaticRNG_Descriptor, CramomaticRNG>());
+    ret.emplace_back(make_SingleSwitchProgram<SeedFinder>());
+    ret.emplace_back(make_SingleSwitchProgram<CramomaticRNG>());
 
     ret.emplace_back("---- Multi-Switch Programs ----");
     ret.emplace_back(make_MultiSwitchProgram<SynchronizedSpinning>());
@@ -183,7 +183,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_MultiSwitchProgram<MaxLairBossFinder>());
 
     ret.emplace_back("---- Public Betas ----");
-    ret.emplace_back(make_single_switch_program<DailyHighlightRNG_Descriptor, DailyHighlightRNG>());
+    ret.emplace_back(make_SingleSwitchProgram<DailyHighlightRNG>());
 
 #if 0
     ret.emplace_back("---- Deprecated Programs ----");
@@ -194,10 +194,10 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     }
     if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
-        ret.emplace_back(make_single_switch_program<ShinyEncounterTester_Descriptor, ShinyEncounterTester>());
-        ret.emplace_back(make_single_switch_program<GenerateIVCheckerOCR_Descriptor, GenerateIVCheckerOCR>());
-        ret.emplace_back(make_single_switch_program<GenerateNameOCRDataPokedex_Descriptor, GenerateNameOCRDataPokedex>());
-        ret.emplace_back(make_single_switch_program<GeneratePokedexSprites_Descriptor, GeneratePokedexSprites>());
+        ret.emplace_back(make_SingleSwitchProgram<ShinyEncounterTester>());
+        ret.emplace_back(make_SingleSwitchProgram<GenerateIVCheckerOCR>());
+        ret.emplace_back(make_SingleSwitchProgram<GenerateNameOCRDataPokedex>());
+        ret.emplace_back(make_SingleSwitchProgram<GeneratePokedexSprites>());
     }
 
     return ret;

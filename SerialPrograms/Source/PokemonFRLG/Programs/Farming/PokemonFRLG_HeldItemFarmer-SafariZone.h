@@ -28,6 +28,7 @@ public:
 
 class HeldItemFarmerSafariZone : public SingleSwitchProgramInstance {
 public:
+    using Descriptor = HeldItemFarmerSafariZone_Descriptor;
     HeldItemFarmerSafariZone();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
     virtual void start_program_border_check(

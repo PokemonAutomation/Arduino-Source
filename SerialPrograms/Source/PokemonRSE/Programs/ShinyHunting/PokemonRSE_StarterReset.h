@@ -24,6 +24,7 @@ public:
 
 class StarterReset : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = StarterReset_Descriptor;
     StarterReset();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
 

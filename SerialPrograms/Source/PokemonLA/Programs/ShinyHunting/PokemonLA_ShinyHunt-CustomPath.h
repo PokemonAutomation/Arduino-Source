@@ -32,6 +32,7 @@ public:
 
 class ShinyHuntCustomPath : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ShinyHuntCustomPath_Descriptor;
     ShinyHuntCustomPath();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

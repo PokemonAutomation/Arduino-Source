@@ -29,6 +29,7 @@ public:
 
 class LeapGrinder : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = LeapGrinder_Descriptor;
     LeapGrinder();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

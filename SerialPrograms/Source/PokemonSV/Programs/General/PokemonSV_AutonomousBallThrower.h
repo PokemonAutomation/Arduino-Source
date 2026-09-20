@@ -32,6 +32,7 @@ public:
 
 class AutonomousBallThrower : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = AutonomousBallThrower_Descriptor;
     AutonomousBallThrower();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

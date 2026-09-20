@@ -54,6 +54,7 @@ struct ESPTrainingStats : public StatsTracker{
 
 class ESPTraining : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ESPTraining_Descriptor;
     ESPTraining();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

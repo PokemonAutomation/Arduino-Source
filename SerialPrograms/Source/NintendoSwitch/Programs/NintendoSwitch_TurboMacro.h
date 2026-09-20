@@ -23,6 +23,7 @@ public:
 
 class TurboMacro : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = TurboMacro_Descriptor;
     TurboMacro();
 
     virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;

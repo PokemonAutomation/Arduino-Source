@@ -30,7 +30,6 @@
 #include "Programs/Farming/PokemonLA_TenacityCandyFarmer.h"
 #include "Programs/Farming/PokemonLA_LeapGrinder.h"
 
-//#include "Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.h"
 #include "Programs/ShinyHunting/PokemonLA_AutoMultiSpawn.h"
 #include "Programs/ShinyHunting/PokemonLA_GalladeFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_CrobatFinder.h"
@@ -68,51 +67,50 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_OptionsPanel<GameSettingsPanel>());
 
     ret.emplace_back("---- General ----");
-    ret.emplace_back(make_single_switch_program<BraviaryHeightGlitch_Descriptor, BraviaryHeightGlitch>());
-    ret.emplace_back(make_single_switch_program<DistortionWaiter_Descriptor, DistortionWaiter>());
-    ret.emplace_back(make_single_switch_program<OutbreakFinder_Descriptor, OutbreakFinder>());
-    ret.emplace_back(make_single_switch_program<ClothingBuyer_Descriptor, ClothingBuyer>());
-    ret.emplace_back(make_single_switch_program<SkipToFullMoon_Descriptor, SkipToFullMoon>());
-    ret.emplace_back(make_single_switch_program<ApplyGrits_Descriptor, ApplyGrits>());
-    ret.emplace_back(make_single_switch_program<PokedexTasksReader_Descriptor, PokedexTasksReader>());
-    ret.emplace_back(make_single_switch_program<RamanasCombeeFinder_Descriptor, RamanasCombeeFinder>());
+    ret.emplace_back(make_SingleSwitchProgram<BraviaryHeightGlitch>());
+    ret.emplace_back(make_SingleSwitchProgram<DistortionWaiter>());
+    ret.emplace_back(make_SingleSwitchProgram<OutbreakFinder>());
+    ret.emplace_back(make_SingleSwitchProgram<ClothingBuyer>());
+    ret.emplace_back(make_SingleSwitchProgram<SkipToFullMoon>());
+    ret.emplace_back(make_SingleSwitchProgram<ApplyGrits>());
+    ret.emplace_back(make_SingleSwitchProgram<PokedexTasksReader>());
+    ret.emplace_back(make_SingleSwitchProgram<RamanasCombeeFinder>());
 
     ret.emplace_back("---- Trading ----");
     ret.emplace_back(make_MultiSwitchProgram<SelfBoxTrade>());
     ret.emplace_back(make_MultiSwitchProgram<SelfTouchTrade>());
 
     ret.emplace_back("---- Farming ----");
-    ret.emplace_back(make_single_switch_program<NuggetFarmerHighlands_Descriptor, NuggetFarmerHighlands>());
-    ret.emplace_back(make_single_switch_program<IngoBattleGrinder_Descriptor, IngoBattleGrinder>());
-    ret.emplace_back(make_single_switch_program<IngoMoveGrinder_Descriptor, IngoMoveGrinder>());
-    ret.emplace_back(make_single_switch_program<MagikarpMoveGrinder_Descriptor, MagikarpMoveGrinder>());
-    ret.emplace_back(make_single_switch_program<TenacityCandyFarmer_Descriptor, TenacityCandyFarmer>());
-    ret.emplace_back(make_single_switch_program<LeapGrinder_Descriptor, LeapGrinder>());
+    ret.emplace_back(make_SingleSwitchProgram<NuggetFarmerHighlands>());
+    ret.emplace_back(make_SingleSwitchProgram<IngoBattleGrinder>());
+    ret.emplace_back(make_SingleSwitchProgram<IngoMoveGrinder>());
+    ret.emplace_back(make_SingleSwitchProgram<MagikarpMoveGrinder>());
+    ret.emplace_back(make_SingleSwitchProgram<TenacityCandyFarmer>());
+    ret.emplace_back(make_SingleSwitchProgram<LeapGrinder>());
 
     ret.emplace_back("---- Shiny Hunting ----");
-//    ret.emplace_back(make_single_switch_program<ShinyHuntLakeTrio_Descriptor, ShinyHuntLakeTrio>());
-    ret.emplace_back(make_single_switch_program<CrobatFinder_Descriptor, CrobatFinder>());
-    ret.emplace_back(make_single_switch_program<GalladeFinder_Descriptor, GalladeFinder>());
-    ret.emplace_back(make_single_switch_program<FroslassFinder_Descriptor, FroslassFinder>());
-    ret.emplace_back(make_single_switch_program<BurmyFinder_Descriptor, BurmyFinder>());
-    ret.emplace_back(make_single_switch_program<UnownFinder_Descriptor, UnownFinder>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntFlagPin_Descriptor, ShinyHuntFlagPin>());
-    ret.emplace_back(make_single_switch_program<PostMMOSpawnReset_Descriptor, PostMMOSpawnReset>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntCustomPath_Descriptor, ShinyHuntCustomPath>());
+    ret.emplace_back(make_SingleSwitchProgram<CrobatFinder>());
+    ret.emplace_back(make_SingleSwitchProgram<GalladeFinder>());
+    ret.emplace_back(make_SingleSwitchProgram<FroslassFinder>());
+    ret.emplace_back(make_SingleSwitchProgram<BurmyFinder>());
+    ret.emplace_back(make_SingleSwitchProgram<UnownFinder>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHuntFlagPin>());
+    ret.emplace_back(make_SingleSwitchProgram<PostMMOSpawnReset>());
+    ret.emplace_back(make_SingleSwitchProgram<ShinyHuntCustomPath>());
 
     if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Untested/Beta/WIP ----");
-        ret.emplace_back(make_single_switch_program<AutoMultiSpawn_Descriptor, AutoMultiSpawn>());
+        ret.emplace_back(make_SingleSwitchProgram<AutoMultiSpawn>());
     }
     if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Machine Learning ----");
-        ret.emplace_back(make_single_switch_program<GeneratePokemonImageTrainingData_Descriptor, GeneratePokemonImageTrainingData>());
+        ret.emplace_back(make_SingleSwitchProgram<GeneratePokemonImageTrainingData>());
 
         ret.emplace_back("---- Developer Tools ----");
-        ret.emplace_back(make_single_switch_program<MountDetectionTest_Descriptor, MountDetectionTest>());
-        ret.emplace_back(make_single_switch_program<OverworldWatcher_Descriptor, OverworldWatcher>());
-        ret.emplace_back(make_single_switch_program<SoundListener_Descriptor, SoundListener>());
-        ret.emplace_back(make_single_switch_program<FlagNavigationTest_Descriptor, FlagNavigationTest>());
+        ret.emplace_back(make_SingleSwitchProgram<MountDetectionTest>());
+        ret.emplace_back(make_SingleSwitchProgram<OverworldWatcher>());
+        ret.emplace_back(make_SingleSwitchProgram<SoundListener>());
+        ret.emplace_back(make_SingleSwitchProgram<FlagNavigationTest>());
     }
 
     return ret;

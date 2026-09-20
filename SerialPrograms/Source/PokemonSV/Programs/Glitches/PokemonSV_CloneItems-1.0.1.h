@@ -32,6 +32,7 @@ public:
 
 class CloneItems101 : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = CloneItems101_Descriptor;
     CloneItems101();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

@@ -32,6 +32,7 @@ public:
 
 class ShinyHunt_OverworldReset : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ShinyHunt_OverworldReset_Descriptor;
     ShinyHunt_OverworldReset();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

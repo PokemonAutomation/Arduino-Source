@@ -9,7 +9,6 @@
 
 #include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/Options/LanguageOCROption.h"
-#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
 
@@ -24,6 +23,7 @@ public:
 
 class ReadBattleLevelUp : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ReadBattleLevelUp_Descriptor;
     ReadBattleLevelUp();
 
     virtual void start_program_controller_check(SwitchSystemSession& session) override{}

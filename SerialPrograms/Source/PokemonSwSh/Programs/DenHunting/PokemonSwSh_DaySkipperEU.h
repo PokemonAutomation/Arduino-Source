@@ -28,6 +28,7 @@ public:
 
 class DaySkipperEU : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = DaySkipperEU_Descriptor;
     DaySkipperEU();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

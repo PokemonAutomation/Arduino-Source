@@ -21,6 +21,7 @@ public:
 
 class TestDudunsparceFormDetector : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = TestDudunsparceFormDetector_Descriptor;
     TestDudunsparceFormDetector();
 
     virtual void start_program_controller_check(SwitchSystemSession& session) override{}

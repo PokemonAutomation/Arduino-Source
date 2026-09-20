@@ -27,6 +27,7 @@ public:
 
 class ItemDuplication : public SingleSwitchProgramInstance {
 public:
+    using Descriptor = ItemDuplication_Descriptor;
     ItemDuplication();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
     virtual void start_program_border_check(

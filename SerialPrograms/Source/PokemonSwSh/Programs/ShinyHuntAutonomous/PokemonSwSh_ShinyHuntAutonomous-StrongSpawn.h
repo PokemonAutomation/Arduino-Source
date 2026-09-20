@@ -34,6 +34,7 @@ public:
 
 class ShinyHuntAutonomousStrongSpawn : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ShinyHuntAutonomousStrongSpawn_Descriptor;
     ShinyHuntAutonomousStrongSpawn();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

@@ -32,6 +32,7 @@ public:
 
 class ShinyHuntAutonomousIoATrade : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ShinyHuntAutonomousIoATrade_Descriptor;
     ShinyHuntAutonomousIoATrade();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

@@ -8,17 +8,14 @@
 #define PokemonAutomation_PokemonFRLG_StarterRng_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
-#include "Common/Cpp/Options/TextEditOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "Pokemon/Pokemon_StatsCalculation.h"
 #include "Pokemon/Pokemon_AdvRng.h"
-#include "PokemonFRLG_RngCalibration.h"
 #include "PokemonFRLG_RngDisplays.h"
 #include "PokemonFRLG_SeedsDatabase.h"
 
@@ -35,6 +32,7 @@ public:
 
 class StarterRng : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = StarterRng_Descriptor;
     StarterRng();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
     virtual void start_program_border_check(

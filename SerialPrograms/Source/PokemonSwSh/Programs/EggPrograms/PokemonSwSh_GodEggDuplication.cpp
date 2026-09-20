@@ -11,12 +11,14 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
+#include "PokemonSwSh_EggHelpers.h"
 #include "PokemonSwSh_GodEggDuplication.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
-    using namespace Pokemon;
+
+using namespace Pokemon;
 
 
 GodEggDuplication_Descriptor::GodEggDuplication_Descriptor()

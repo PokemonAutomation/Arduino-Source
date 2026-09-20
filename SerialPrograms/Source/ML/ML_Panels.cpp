@@ -25,10 +25,10 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     std::vector<PanelEntry> ret;
     if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
-        ret.emplace_back(make_panel<LabelImages_Descriptor, LabelImages>());
+        ret.emplace_back(make_panel<LabelImages>());
         // ret.emplace_back(make_panel<RunYOLO_Descriptor, RunYOLO>());
-        ret.emplace_back(NintendoSwitch::make_single_switch_program<RunYOLO_Descriptor, RunYOLO>());
-        // ret.emplace_back(make_single_switch_program<ThreeSegmentDudunsparceFinder_Descriptor, ThreeSegmentDudunsparceFinder>());
+        ret.emplace_back(NintendoSwitch::make_SingleSwitchProgram<RunYOLO>());
+        // ret.emplace_back(make_SingleSwitchProgram<ThreeSegmentDudunsparceFinder_Descriptor, ThreeSegmentDudunsparceFinder>());
     }
 
     return ret;

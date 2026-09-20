@@ -35,6 +35,7 @@ public:
 
 class ShinyHunt_WildZoneEntrance : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
+    using Descriptor = ShinyHunt_WildZoneEntrance_Descriptor;
     ShinyHunt_WildZoneEntrance();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

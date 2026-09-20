@@ -31,6 +31,7 @@ public:
 
 class ItemPrinterRNG : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
+    using Descriptor = ItemPrinterRNG_Descriptor;
     ~ItemPrinterRNG();
     ItemPrinterRNG();
 

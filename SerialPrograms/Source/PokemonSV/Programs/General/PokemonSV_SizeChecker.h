@@ -34,6 +34,7 @@ public:
 
 class SizeChecker : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = SizeChecker_Descriptor;
     SizeChecker();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

@@ -27,6 +27,7 @@ public:
 
 class NuggetFarmerHighlands : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = NuggetFarmerHighlands_Descriptor;
     NuggetFarmerHighlands();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

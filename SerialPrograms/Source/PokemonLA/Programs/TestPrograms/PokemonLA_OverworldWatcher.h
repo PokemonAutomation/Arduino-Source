@@ -22,6 +22,7 @@ public:
 
 class OverworldWatcher : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = OverworldWatcher_Descriptor;
     OverworldWatcher();
 
     virtual void start_program_controller_check(SwitchSystemSession& session) override{}

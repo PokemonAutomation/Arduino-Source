@@ -30,6 +30,7 @@ public:
 
 class ShinyHunt_HyperspaceLegendary : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ShinyHunt_HyperspaceLegendary_Descriptor;
     ShinyHunt_HyperspaceLegendary();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
