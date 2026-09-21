@@ -24,6 +24,10 @@ ConsoleProgramSession::~ConsoleProgramSession(){
         "ConsoleProgramSession",
         [this]{ return try_shutdown(); }
     );
+
+    //  The instance may hold references to m_system.
+    //  So it must be destroyed first.
+    m_instance.reset();
 }
 
 ConsoleProgramSession::ConsoleProgramSession(

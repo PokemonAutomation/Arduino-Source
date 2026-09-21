@@ -945,6 +945,8 @@ file(GLOB LIBRARY_SOURCES
     Source/GameConsole/Panels/GameConsole_SnapshotDumper.cpp
     Source/GameConsole/Panels/GameConsole_SnapshotDumper.h
     Source/GameConsole/Panels/GameConsole_VirtualConsole.h
+    Source/GameConsole/Panels/GameConsole_WaterfillTemplateMaker.cpp
+    Source/GameConsole/Panels/GameConsole_WaterfillTemplateMaker.h
     Source/GameConsole/UI/CommandRowWidget.cpp
     Source/GameConsole/UI/CommandRowWidget.h
     Source/GameConsole/UI/ConsolePanelWidget.cpp
@@ -1205,8 +1207,6 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.h
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.cpp
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.h
-    Source/NintendoSwitch/DevPrograms/WaterfillTemplateMaker.cpp
-    Source/NintendoSwitch/DevPrograms/WaterfillTemplateMaker.h
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.cpp

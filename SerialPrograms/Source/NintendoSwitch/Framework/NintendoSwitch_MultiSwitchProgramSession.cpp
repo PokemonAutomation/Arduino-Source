@@ -70,6 +70,10 @@ MultiSwitchProgramSession::~MultiSwitchProgramSession(){
         "MultiSwitchProgramSession",
         [this]{ return try_shutdown(); }
     );
+
+    //  The instance may hold references to m_system.
+    //  So it must be destroyed first.
+    m_instance.reset();
 }
 
 ConfigOption& MultiSwitchProgramSession::options(){

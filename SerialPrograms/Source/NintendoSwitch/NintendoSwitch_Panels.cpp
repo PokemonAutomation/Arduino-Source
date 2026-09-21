@@ -12,8 +12,9 @@
 
 #include "GameConsole/Panels/GameConsole_VirtualConsole.h"
 #include "GameConsole/Panels/GameConsole_MultiConsoleViewer.h"
-#include "GameConsole/Panels/GameConsole_BoxDraw.h"
 #include "GameConsole/Panels/GameConsole_SnapshotDumper.h"
+#include "GameConsole/Panels/GameConsole_BoxDraw.h"
+#include "GameConsole/Panels/GameConsole_WaterfillTemplateMaker.h"
 
 #include "Programs/NintendoSwitch_TurboA.h"
 #include "Programs/NintendoSwitch_TurboButton.h"
@@ -28,7 +29,6 @@
 #include "DevPrograms/TestProgramComputer.h"
 #include "DevPrograms/TestProgramSwitch.h"
 #include "DevPrograms/JoyconProgram.h"
-#include "DevPrograms/WaterfillTemplateMaker.h"
 #include "DevPrograms/TestDudunsparceFormDetector.h"
 #include "Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h"
 #include "Pokemon/Inference/Pokemon_TrainPokemonOCR.h"
@@ -83,7 +83,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
         ret.emplace_back(make_ComputerProgram<TestProgramComputer>());
         ret.emplace_back(make_MultiSwitchProgram<TestProgram>());
         ret.emplace_back(make_SingleSwitchProgram<JoyconProgram>());
-        ret.emplace_back(make_SingleSwitchProgram<WaterfillTemplateMaker>());
+        ret.emplace_back(GameConsole::make_ConsoleProgram<GameConsole::WaterfillTemplateMaker>());
         ret.emplace_back(make_ComputerProgram<Pokemon::TrainIVCheckerOCR>());
         ret.emplace_back(make_ComputerProgram<Pokemon::TrainPokemonOCR>());
         ret.emplace_back(make_SingleSwitchProgram<TestDudunsparceFormDetector>());

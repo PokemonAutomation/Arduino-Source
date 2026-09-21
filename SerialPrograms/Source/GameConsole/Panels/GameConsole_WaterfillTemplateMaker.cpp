@@ -9,25 +9,26 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "GameConsole/Framework/ConsoleSystemSession.h"
-#include "WaterfillTemplateMaker.h"
+#include "GameConsole_WaterfillTemplateMaker.h"
 
 //#include <iostream>
 //using std::cout;
 //using std::endl;
 
 namespace PokemonAutomation{
-namespace NintendoSwitch{
+namespace GameConsole{
 
 
 
 
 WaterfillTemplateMaker_Descriptor::WaterfillTemplateMaker_Descriptor()
-    : SingleSwitchProgramDescriptor(
+    : ConsoleProgramDescriptor(
         "NintendoSwitch:WaterfillTemplateMaker",
         "Nintendo Switch", "Waterfill Template Maker",
         "",
         "Helper to make waterfill templates.",
         ProgramControllerClass::StandardController_NoRestrictions,
+        Color(),
         FeedbackType::NONE,
         AllowCommandsWhenRunning::ENABLE_COMMANDS
     )
@@ -35,7 +36,7 @@ WaterfillTemplateMaker_Descriptor::WaterfillTemplateMaker_Descriptor()
 
 
 
-WaterfillTemplateMaker::WaterfillTemplateMaker(GameConsole::ConsoleSystemSession& system)
+WaterfillTemplateMaker::WaterfillTemplateMaker(ConsoleSystemSession& system)
     : MIN_AREA("<b>Min Area (in pixels):</b>", LockMode::UNLOCK_WHILE_RUNNING, 100)
     , FILTER_LOWER("<b>Filter (lower):</b>", LockMode::UNLOCK_WHILE_RUNNING, false, 0xff000000, 0xff000000)
     , FILTER_UPPER("<b>Filter (upper):</b>", LockMode::UNLOCK_WHILE_RUNNING, false, 0xffffffff, 0xffffffff)
@@ -48,13 +49,13 @@ WaterfillTemplateMaker::WaterfillTemplateMaker(GameConsole::ConsoleSystemSession
 }
 
 
-void WaterfillTemplateMaker::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void WaterfillTemplateMaker::program(ConsoleProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
 
     global_logger_tagged().log("Attempting to make template.");
 
-    VideoSnapshot screenshot = env.console.video().snapshot_latest_blocking();
+    VideoSnapshot screenshot = env.console().video().snapshot_latest_blocking();
     ImageViewRGB32 image;
     if (BOX_DRAW.CONTENT_BOX.enabled()){
         image = extract_box_reference(*screenshot.frame, BOX_DRAW.CONTENT_BOX);
