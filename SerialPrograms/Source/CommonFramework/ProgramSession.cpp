@@ -507,9 +507,7 @@ RequiredResourceResult ProgramSession::find_missing_resources(){
 
 
 bool ProgramSession::download_prereqs(CancellableScope& scope){
-
     try{
-
         auto [missing_resources, requires_upgrade] = find_missing_resources();
 
         if (requires_upgrade){ 
@@ -555,8 +553,6 @@ bool ProgramSession::download_prereqs(CancellableScope& scope){
         report_all_downloads_done();
 
         return success;
-   
-            
     }catch(OperationFailedException& e){
         report_error(e.message());
     }catch(InternalProgramError& e){

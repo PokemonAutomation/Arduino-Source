@@ -132,7 +132,7 @@ std::string UserSetupError::message() const{
 
 
 MLModelSessionCreationError::MLModelSessionCreationError(Logger* logger, std::string model_path)
-: m_model_path(model_path)
+    : m_model_path(model_path)
 {
     if (logger){
         logger->log(message());

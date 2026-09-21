@@ -91,6 +91,8 @@ void MultiConsoleSystemSession::remove_console_count_lock(Listener& listener){
 }
 
 void MultiConsoleSystemSession::set_active_consoles(size_t count){
+#if 0
+    //  Can't skip this or first time JSON loading fails.
     {
         std::lock_guard<Mutex> lg(m_state_lock);
         if (count == m_option.active_consoles() &&
@@ -99,6 +101,7 @@ void MultiConsoleSystemSession::set_active_consoles(size_t count){
             return;
         }
     }
+#endif
 
     std::lock_guard<Mutex> lg0(m_resize_lock);
 

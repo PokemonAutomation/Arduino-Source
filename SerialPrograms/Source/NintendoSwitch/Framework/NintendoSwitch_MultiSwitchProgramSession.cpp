@@ -18,6 +18,10 @@
 #include "NintendoSwitch/Options/NintendoSwitch_ModelType.h"
 #include "NintendoSwitch_MultiSwitchProgramSession.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
@@ -102,6 +106,7 @@ JsonValue MultiSwitchProgramSession::to_json() const{
     return obj;
 }
 void MultiSwitchProgramSession::load_json(const JsonValue& json){
+//    cout << "MultiSwitchProgramSession::load_json()" << endl;
     const JsonObject* obj = json.to_object();
     if (obj == nullptr){
         return;
