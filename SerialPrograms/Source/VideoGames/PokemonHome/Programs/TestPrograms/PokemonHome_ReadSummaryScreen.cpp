@@ -81,7 +81,7 @@ void ReadSummaryScreen::program(
     std::string language_of_origin = reader.read_language_of_origin(screen);
     std::string level_text = std::to_string(reader.read_level(env.console, screen));
     std::string ability = reader.read_ability(HOME_LANGUAGE, screen);
-    std::string nature = reader.read_nature(HOME_LANGUAGE, screen);
+    std::string nature = reader.read_nature(env.console, HOME_LANGUAGE, screen);
 
     CollectedPokemonInfo pokemon_info{};
     read_summary_screen(env, context, pokemon_info, OT_NAME_LANGUAGE);
