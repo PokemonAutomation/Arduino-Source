@@ -30,8 +30,7 @@ ConsolePanelDescriptor::ConsolePanelDescriptor(
         std::move(description),
         color,
         deprecation,
-        restore_defaults_button,
-        {}
+        restore_defaults_button
     )
     , m_num_controllers(num_controllers)
 {}

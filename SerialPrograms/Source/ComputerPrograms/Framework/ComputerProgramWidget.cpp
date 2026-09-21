@@ -5,16 +5,11 @@
  */
 
 #include <QVBoxLayout>
-#include <QLabel>
 #include <QMessageBox>
-#include <QScrollArea>
-#include "Common/Qt/CollapsibleGroupBox.h"
-#include "Common/Qt/Options/ConfigWidget.h"
 #include "CommonFramework/Panels/PanelTools.h"
 #include "CommonFramework/Panels/UI/PanelElements.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/ResourceDownload/ProgramResourceDownloadWidget.h"
-#include "ComputerPrograms/ComputerProgram.h"
 #include "ComputerProgramWidget.h"
 
 // #include <iostream>
@@ -36,77 +31,30 @@ ComputerProgramWidget::ComputerProgramWidget(
     : QWidget(&parent)
     , m_session(session)
 {
-    m_layout = new QVBoxLayout(this);
-    m_layout->setContentsMargins(0, 0, 0, 0);
-
-    const ComputerProgramDescriptor& descriptor = m_session.descriptor();
-
-    CollapsibleGroupBox* header = make_panel_header(
+    m_stats_bar = new StatsBar(*this, m_session);
+    m_actions_bar = new RunnablePanelActionBar(
         *this,
-        descriptor.display_name(),
-        descriptor.doc_link(),
-        descriptor.description()
+        session,
+        session,
+        m_session.current_state()
     );
-    m_layout->addWidget(header);
 
-
-    {
-        QScrollArea* scroll_outer = new QScrollArea(this);
-        m_layout->addWidget(scroll_outer);
-        scroll_outer->setWidgetResizable(true);
-
-        QWidget* scroll_inner = new QWidget(scroll_outer);
-        scroll_outer->setWidget(scroll_inner);
-        QVBoxLayout* scroll_layout = new QVBoxLayout(scroll_inner);
-        scroll_layout->setAlignment(Qt::AlignTop);
-
-        m_options = ConfigWidget::make_from_option(m_session.options(), this);
-        scroll_layout->addWidget(&m_options->widget());
-
-        scroll_layout->addStretch(1);
-    }
-
-    m_stats_bar = new StatsBar(*this);
-    m_stats_bar->set_stats("", m_session.historical_stats());
-    m_layout->addWidget(m_stats_bar);
-
-    m_actions_bar = new RunnablePanelActionBar(*this, m_session.current_state());
-    m_layout->addWidget(m_actions_bar);
-
-
-    connect(
-        m_actions_bar, &RunnablePanelActionBar::start_clicked,
-        this, [&](ProgramState state){
-            std::string error;
-            switch (state){
-            case ProgramState::STOPPED:
-                error = m_session.start_program();
-                break;
-            case ProgramState::RUNNING:
-                error = m_session.stop_program();
-                break;
-            default:;
-            }
-            if (!error.empty()){
-                this->error(error);
-            }
-        }
+    populate_panel_widget(
+        *this,
+        session.descriptor(),
+        nullptr,
+        session.options(),
+        {m_stats_bar, m_actions_bar}
     );
-    connect(
-        m_actions_bar, &RunnablePanelActionBar::defaults_clicked,
-        this, [&]{
-            std::lock_guard<Mutex> lg(m_session.program_lock());
-            m_session.restore_defaults();
-            m_options->update_all(false);
-        }
-    );
+
+    m_layout = static_cast<QVBoxLayout*>(this->layout());
 
     m_session.add_listener(*this);
 }
 
 void ComputerProgramWidget::state_change(ProgramState state){
     QMetaObject::invokeMethod(this, [this, state]{
-        m_options->widget().setEnabled(state == ProgramState::STOPPED);
+        m_session.options().report_program_state(state != ProgramState::STOPPED);
         m_actions_bar->set_state(state);
         if (state == ProgramState::STOPPED){
             global_panel_holder()->on_idle();

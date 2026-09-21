@@ -4,10 +4,7 @@
  *
  */
 
-#include "Common/Compiler.h"
-#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
-#include "CommonFramework/ResourceDownload/ResourceDownloadHelpers.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "PanelSession.h"
@@ -21,13 +18,7 @@ namespace PokemonAutomation{
 
 PanelSession::PanelSession(const PanelDescriptor& descriptor)
     : m_descriptor(descriptor)
-{
-    try{
-        validate_resource_list();
-    }catch (FileException& e){
-        e.log(global_logger_tagged());
-    }
-}
+{}
 
 void PanelSession::load_json_from_global(){
     JsonValue* node = PERSISTENT_SETTINGS().panels.get_value(m_descriptor.identifier());
@@ -53,19 +44,6 @@ void PanelSession::save_settings() const{
 }
 
 
-void PanelSession::validate_resource_list(){
-    const std::unordered_set<std::string>& master_list = all_resource_names();
-
-    for (const std::string& resource_string : m_descriptor.required_resources()){
-        if (!master_list.contains(resource_string)){
-            throw InternalProgramError(
-                nullptr,
-                PA_CURRENT_FUNCTION,
-                "validate_resource_list: Invalid resource in descriptor."
-            );
-        }
-    }
-}
 
 
 

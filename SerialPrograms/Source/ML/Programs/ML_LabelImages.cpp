@@ -40,8 +40,7 @@ LabelImages_Descriptor::LabelImages_Descriptor()
         "Label " + Pokemon::STRING_POKEMON + " on images",
         Color(),
         PanelDeprecation::NOT_DEPRECATED,
-        true,
-        {}
+        true
     )
 {}
 

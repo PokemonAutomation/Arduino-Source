@@ -28,7 +28,6 @@ public:
     const PanelDescriptor& descriptor() const{ return m_descriptor; }
 
     void save_settings() const;
-    void validate_resource_list();
 
 
 public:

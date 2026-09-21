@@ -134,7 +134,7 @@ public:
 
 
 template <typename Type>
-class UiState<Type>{
+class UiState<Type> : public UiState<>{
 public:
     virtual UiWrapper make_ui_component(void* params){
         if (m_ui_factory){

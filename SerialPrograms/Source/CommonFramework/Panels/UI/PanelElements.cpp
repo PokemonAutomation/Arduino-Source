@@ -13,7 +13,13 @@
 #include "Common/Qt/Options/ConfigWidget.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Panels/PanelSession.h"
+#include "CommonFramework/ProgramSession.h"
+#include "GameConsole/ConsoleProgram.h"
 #include "PanelElements.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -111,6 +117,11 @@ StatsBar::StatsBar(QWidget& parent)
     font.setPointSize(10);
     this->setFont(font);
 }
+StatsBar::StatsBar(QWidget& parent, ProgramSession& session)
+    : StatsBar(parent)
+{
+    set_stats("", session.historical_stats());
+}
 void StatsBar::set_stats(std::string current_stats, std::string historical_stats){
     if (current_stats.empty() && historical_stats.empty()){
         this->setText("");
@@ -141,7 +152,12 @@ void StatsBar::set_stats(std::string current_stats, std::string historical_stats
 
 
 
-RunnablePanelActionBar::RunnablePanelActionBar(QWidget& parent, ProgramState initial_state)
+RunnablePanelActionBar::RunnablePanelActionBar(
+    QWidget& parent,
+    PanelSession& panel_session,
+    ProgramSession& program_session,
+    ProgramState initial_state
+)
     : QGroupBox("Actions", &parent)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -171,11 +187,25 @@ RunnablePanelActionBar::RunnablePanelActionBar(QWidget& parent, ProgramState ini
 
     connect(
         m_start_button, &QPushButton::clicked,
-        this, [this](bool){ emit start_clicked(m_last_known_state); }
+        this, [&](bool){
+            std::string error;
+            switch (program_session.current_state()){
+            case ProgramState::STOPPED:
+                error = program_session.start_program();
+                break;
+            case ProgramState::RUNNING:
+                error = program_session.stop_program();
+                break;
+            default:;
+            }
+            if (!error.empty()){
+                program_session.report_error(error);
+            }
+        }
     );
     connect(
         m_default_button, &QPushButton::clicked,
-        this, [this](bool){
+        this, [&](bool){
             QMessageBox::StandardButton button = QMessageBox::question(
                 nullptr,
                 "Restore Defaults",
@@ -183,7 +213,7 @@ RunnablePanelActionBar::RunnablePanelActionBar(QWidget& parent, ProgramState ini
                 QMessageBox::Ok | QMessageBox::Cancel
             );
             if (button == QMessageBox::Ok){
-                emit defaults_clicked();
+                panel_session.restore_defaults();
             }
         }
     );
@@ -256,22 +286,48 @@ QWidget* make_actions_bar(
 
 
 
+
 void populate_panel_widget(
     QWidget& panel,
     const PanelDescriptor& descriptor,
-    QWidget* console_system,
+    UiState<>* console_system,
     ConfigOption& options,
-    QWidget* footer
+    std::vector<QWidget*> footers
 ){
+    if (descriptor.deprecation() == PanelDeprecation::DEPRECATED){
+        QMessageBox box;
+        box.warning(
+            nullptr,
+            "Deprecation Notice",
+            QString::fromStdString(
+                "The program \"" + descriptor.display_name() + "\" is deprecated "
+                "and no longer maintained. Please consider using a newer alternative."
+            )
+        );
+    }
+
     QVBoxLayout* layout = new QVBoxLayout(&panel);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    CollapsibleGroupBox* header = make_panel_header(
-        panel,
-        descriptor.display_name(),
-        descriptor.doc_link(),
-        descriptor.description()
-    );
+    CollapsibleGroupBox* header;
+    const GameConsole::ConsoleProgramDescriptor* console_descriptor =
+        dynamic_cast<const GameConsole::ConsoleProgramDescriptor*>(&descriptor);
+    if (console_descriptor != nullptr){
+        header = make_panel_header(
+            panel,
+            descriptor.display_name(),
+            descriptor.doc_link(),
+            descriptor.description(),
+            console_descriptor->controller_class()
+        );
+    }else{
+        header = make_panel_header(
+            panel,
+            descriptor.display_name(),
+            descriptor.doc_link(),
+            descriptor.description()
+        );
+    }
     layout->addWidget(header);
 
     QScrollArea* scroll_outer = new QScrollArea(&panel);
@@ -284,7 +340,9 @@ void populate_panel_widget(
     scroll_layout->setAlignment(Qt::AlignTop);
 
     if (console_system){
-        scroll_layout->addWidget(console_system);
+        scroll_layout->addWidget(
+            dynamic_cast<QWidget*>(console_system->make_ui_component(&panel).release())
+        );
     }
 
     ConfigWidget* options_widget = ConfigWidget::make_from_option(options, &panel);
@@ -292,10 +350,14 @@ void populate_panel_widget(
 
     scroll_layout->addStretch(1);
 
-    if (footer){
-        layout->addWidget(footer);
+    for (QWidget* footer : footers){
+        if (footer){
+            layout->addWidget(footer);
+        }
     }
 }
+
+
 
 
 

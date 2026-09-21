@@ -12,6 +12,27 @@ namespace PokemonAutomation{
 
 
 
+ProgramDescriptor::ProgramDescriptor(
+    std::string identifier,
+    std::string category, std::string display_name,
+    std::string doc_link,
+    std::string description,
+    Color color,
+    PanelDeprecation deprecation,
+    bool restore_defaults_button,
+    std::vector<std::string> required_resources
+)
+    : PanelDescriptor(
+        std::move(identifier),
+        std::move(category), std::move(display_name),
+        std::move(doc_link),
+        std::move(description),
+        color,
+        deprecation,
+        restore_defaults_button
+    )
+    , m_required_resources(std::move(required_resources))
+{}
 std::unique_ptr<StatsTracker> ProgramDescriptor::make_stats() const{
     return nullptr;
 }
