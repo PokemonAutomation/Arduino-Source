@@ -13,6 +13,7 @@
 #include "GameConsole/Panels/GameConsole_VirtualConsole.h"
 #include "GameConsole/Panels/GameConsole_MultiConsoleViewer.h"
 #include "GameConsole/Panels/GameConsole_BoxDraw.h"
+#include "GameConsole/Panels/GameConsole_SnapshotDumper.h"
 
 #include "Programs/NintendoSwitch_TurboA.h"
 #include "Programs/NintendoSwitch_TurboButton.h"
@@ -22,8 +23,6 @@
 #include "Programs/NintendoSwitch_FriendCodeAdder.h"
 #include "Programs/NintendoSwitch_FriendDelete.h"
 #include "Programs/NintendoSwitch_RecordKeyboardController.h"
-
-#include "Programs/NintendoSwitch_SnapshotDumper.h"
 
 #include "Programs/NintendoSwitch_MenuStabilityTester.h"
 #include "DevPrograms/TestProgramComputer.h"
@@ -76,7 +75,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- Testing ----");
     ret.emplace_back(GameConsole::make_ConsolePanel<GameConsole::BoxDraw>());
-    ret.emplace_back(make_SingleSwitchProgram<SnapshotDumper>());
+    ret.emplace_back(GameConsole::make_ConsoleProgram<GameConsole::SnapshotDumper>());
 
     if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");

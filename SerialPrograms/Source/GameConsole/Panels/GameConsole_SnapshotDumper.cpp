@@ -13,26 +13,26 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "ControllerInput/Keyboard/GlobalKeyboardHidTracker.h"
-#include "NintendoSwitch_SnapshotDumper.h"
+#include "GameConsole_SnapshotDumper.h"
 
 //#include <iostream>
 //using std::cout;
 //using std::endl;
 
 namespace PokemonAutomation{
-namespace NintendoSwitch{
+namespace GameConsole{
 
 
 SnapshotDumper_Descriptor::SnapshotDumper_Descriptor()
-    : SingleSwitchProgramDescriptor(
-        "NintendoSwitch:SnapshotDumper",
-        "Nintendo Switch", "Snapshot Dumper",
+    : ConsoleProgramDescriptor(
+        "GameConsole:SnapshotDumper",
+        "Game Console", "Snapshot Dumper",
         "Programs/NintendoSwitch/SnapshotDumper.html",
         "Periodically take screenshots.",
         ProgramControllerClass::StandardController_NoRestrictions,
+        Color(),
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::ENABLE_COMMANDS
     )
 {}
 
@@ -137,19 +137,19 @@ void SnapshotKeyTrigger::run_controller_input(ControllerInputState& state){
 }
 
 
-void SnapshotDumper::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void SnapshotDumper::program(ConsoleProgramEnvironment& env, CancellableScope& scope){
     std::string folder_path = USER_FILE_PATH() + "ScreenshotDumper/";
     QDir().mkpath(folder_path.c_str());
 
     if (SNAPSHOT_MODE == SnapshotMode::KEYPRESS){
-        SnapshotKeyTrigger key_trigger(env.console, FORMAT);
+        SnapshotKeyTrigger key_trigger(env.console(), FORMAT);
         scope.wait_until_cancel();
     }else if (SNAPSHOT_MODE == SnapshotMode::MOUSE_CLICK){
-        SnapshotClickTrigger click_trigger(env.console, env.console.overlay(), FORMAT);
+        SnapshotClickTrigger click_trigger(env.console(), env.console().overlay(), FORMAT);
         scope.wait_until_cancel();
     }else if (SNAPSHOT_MODE == SnapshotMode::PERIODIC){
         while (true){
-            VideoSnapshot last = env.console.video().snapshot();
+            VideoSnapshot last = env.console().video().snapshot();
             std::string filename = folder_path + now_to_filestring();
             last->save(filename + to_format_string(FORMAT));
             scope.wait_until(last.timestamp + std::chrono::milliseconds(PERIOD_MILLISECONDS));

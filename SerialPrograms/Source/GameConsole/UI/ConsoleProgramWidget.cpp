@@ -1,57 +1,36 @@
-/*  Single Switch Program Widget
+/*  Console Program Widget
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#include <QVBoxLayout>
-#include <QLabel>
 #include <QMessageBox>
 #include <QScrollArea>
-#include "Common/Qt/UiStateQtWidget.h"
-#include "Common/Qt/ShutdownWithEvents.h"
-#include "Common/Qt/CollapsibleGroupBox.h"
+#include "Common/Cpp/ScopeExit.h"
 #include "Common/Qt/Options/ConfigWidget.h"
-#include "CommonFramework/Startup/NewVersionCheck.h"
-#include "CommonFramework/Panels/PanelTools.h"
-#include "CommonFramework/Panels/UI/PanelElements.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/ResourceDownload/ProgramResourceDownloadWidget.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.h"
-#include "NintendoSwitch_SingleSwitchProgramWidget.h"
-
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+#include "CommonFramework/Panels/PanelTools.h"
+#include "ConsoleProgramWidget.h"
 
 namespace PokemonAutomation{
 
-template class RegisterUiStateQtWidget<NintendoSwitch::SingleSwitchProgramWidget2>;
+template class RegisterUiStateQtWidget<GameConsole::ConsoleProgramWidget>;
 
-namespace NintendoSwitch{
+namespace GameConsole{
 
 
-
-SingleSwitchProgramWidget2::~SingleSwitchProgramWidget2(){
+ConsoleProgramWidget::~ConsoleProgramWidget(){
     m_session.remove_listener(*this);
-
-    shutdown_with_events(
-        m_session.logger(),
-        "SingleSwitchProgramWidget2",
-        [this]{ return m_session.try_shutdown(); }
-    );
 }
-SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
-    QWidget& parent,
-    SingleSwitchProgramSession& session
-)
+ConsoleProgramWidget::ConsoleProgramWidget(QWidget& parent, ConsoleProgramSession& session)
     : QWidget(&parent)
     , m_session(session)
 {
     m_layout = new QVBoxLayout(this);
     m_layout->setContentsMargins(0, 0, 0, 0);
 
-    const SingleSwitchProgramDescriptor& descriptor = session.descriptor();
+    const ConsoleProgramDescriptor& descriptor = session.descriptor();
 
     CollapsibleGroupBox* header = make_panel_header(
         *this,
@@ -132,7 +111,7 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
     m_session.add_listener(*this);
 }
 
-void SingleSwitchProgramWidget2::state_change(ProgramState state){
+void ConsoleProgramWidget::state_change(ProgramState state){
     QMetaObject::invokeMethod(this, [this, state]{
         if (state != ProgramState::STOPPED){
             m_session.system().lock_controllers("Program is Running");
@@ -147,17 +126,16 @@ void SingleSwitchProgramWidget2::state_change(ProgramState state){
         m_actions_bar->set_state(state);
         if (state == ProgramState::STOPPED){
             global_panel_holder()->on_idle();
-            check_new_version();
         }else{
             global_panel_holder()->on_busy();
         }
 
         if(state == ProgramState::STOPPING){
             ensure_downloads_table()->remove_all_downloads();
-        }        
+        }
     }, Qt::QueuedConnection);
 }
-void SingleSwitchProgramWidget2::stats_update(const StatsTracker* current_stats, const StatsTracker* historical_stats){
+void ConsoleProgramWidget::stats_update(const StatsTracker* current_stats, const StatsTracker* historical_stats){
     QMetaObject::invokeMethod(this, [this, current_stats, historical_stats]{
         m_stats_bar->set_stats(
             current_stats == nullptr ? "" : current_stats->to_str(StatsTracker::DISPLAY_ON_SCREEN),
@@ -165,39 +143,40 @@ void SingleSwitchProgramWidget2::stats_update(const StatsTracker* current_stats,
         );
     }, Qt::QueuedConnection);
 }
-void SingleSwitchProgramWidget2::error(const std::string& message){
+void ConsoleProgramWidget::error(const std::string& message){
     QMetaObject::invokeMethod(this, [message]{
         QMessageBox box;
         box.critical(nullptr, "Error", QString::fromStdString(message));
     }, Qt::QueuedConnection);
 }
-void SingleSwitchProgramWidget2::download_error(const std::string& message){
+
+
+void ConsoleProgramWidget::download_error(const std::string& message){
     if (m_popup_is_open.exchange(true)){ // only show popups if one isn't already open
         return;
     }
 
+    ScopeExit scope([&]{
+        m_popup_is_open.store(false, std::memory_order_release);
+    });
+
     QMetaObject::invokeMethod(this, [message]{
         QMessageBox box;
         box.critical(nullptr, "Error", QString::fromStdString(message));
     }, Qt::QueuedConnection);
-    m_popup_is_open.store(false);
 }
-
-void SingleSwitchProgramWidget2::download_added(std::shared_ptr<ResourceDownload> download_ptr){
+void ConsoleProgramWidget::download_added(std::shared_ptr<ResourceDownload> download_ptr){
     QMetaObject::invokeMethod(this, [this, download_ptr = std::move(download_ptr)]() mutable{
         this->ensure_downloads_table()->add_download(std::move(download_ptr));
     }, Qt::QueuedConnection);
 }
-
-void SingleSwitchProgramWidget2::all_downloads_done(){
+void ConsoleProgramWidget::all_downloads_done(){
     QMetaObject::invokeMethod(this, [this]{
         this->ensure_downloads_table()->remove_all_downloads();
     }, Qt::QueuedConnection);
 }
-
-
-ProgramResourceDownloadTableWidget* SingleSwitchProgramWidget2::ensure_downloads_table() {
-    if (!m_internal_lazy_downloads_table) {
+ProgramResourceDownloadTableWidget* ConsoleProgramWidget::ensure_downloads_table(){
+    if (!m_internal_lazy_downloads_table){
         m_internal_lazy_downloads_table = new ProgramResourceDownloadTableWidget(*this);
         m_internal_lazy_downloads_table->setVisible(false);
         m_layout->addWidget(m_internal_lazy_downloads_table);

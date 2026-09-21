@@ -58,12 +58,7 @@ public:
         std::vector<std::string> required_resources = {}
     );
 
-    ProgramControllerClass controller_class() const{ return m_controller_class; }
-
     virtual std::unique_ptr<PanelSession> make_panel() const override;
-
-private:
-    const ProgramControllerClass m_controller_class;
 };
 
 

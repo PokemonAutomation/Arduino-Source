@@ -23,9 +23,7 @@ namespace NintendoSwitch{
 
 
 
-class SingleSwitchProgramSession final
-    : public UiState<SingleSwitchProgramSession, GameConsole::ConsoleProgramSession>
-{
+class SingleSwitchProgramSession final : public GameConsole::ConsoleProgramSession{
 public:
     ~SingleSwitchProgramSession();
     SingleSwitchProgramSession(const SingleSwitchProgramDescriptor& descriptor);

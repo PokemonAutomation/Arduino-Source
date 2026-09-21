@@ -426,6 +426,7 @@ void MainWindow::on_idle(){
         m_program_list->unlock();
         m_settings->setEnabled(true);
     }
+    check_new_version();
 }
 
 

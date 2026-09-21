@@ -54,13 +54,13 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description),
+        controller_class,
         GameConsole::pick_color(controller_class),
         feedback,
         allow_commands_while_running,
         deprecation,
         std::move(required_resources)
     )
-    , m_controller_class(controller_class)
 {}
 std::unique_ptr<PanelSession> SingleSwitchProgramDescriptor::make_panel() const{
     return std::make_unique<SingleSwitchProgramSession>(*this);
