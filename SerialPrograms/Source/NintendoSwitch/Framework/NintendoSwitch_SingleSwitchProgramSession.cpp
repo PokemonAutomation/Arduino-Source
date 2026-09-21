@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/EarlyShutdown.h"
-#include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Options/NintendoSwitch_ModelType.h"
 #include "NintendoSwitch_SingleSwitchProgramSession.h"
@@ -20,7 +19,7 @@ namespace NintendoSwitch{
 
 
 SingleSwitchProgramSession::SingleSwitchProgramSession(const SingleSwitchProgramDescriptor& descriptor)
-    : UiState<SingleSwitchProgramSession, GameConsole::ConsoleProgramSession>(
+    : GameConsole::ConsoleProgramSession(
         descriptor,
         std::make_unique<ConsoleModelCell>()
     )

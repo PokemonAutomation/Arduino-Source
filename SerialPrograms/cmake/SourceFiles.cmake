@@ -942,11 +942,15 @@ file(GLOB LIBRARY_SOURCES
     Source/GameConsole/Panels/GameConsole_BoxDraw.cpp
     Source/GameConsole/Panels/GameConsole_BoxDraw.h
     Source/GameConsole/Panels/GameConsole_MultiConsoleViewer.h
+    Source/GameConsole/Panels/GameConsole_SnapshotDumper.cpp
+    Source/GameConsole/Panels/GameConsole_SnapshotDumper.h
     Source/GameConsole/Panels/GameConsole_VirtualConsole.h
     Source/GameConsole/UI/CommandRowWidget.cpp
     Source/GameConsole/UI/CommandRowWidget.h
     Source/GameConsole/UI/ConsolePanelWidget.cpp
     Source/GameConsole/UI/ConsolePanelWidget.h
+    Source/GameConsole/UI/ConsoleProgramWidget.cpp
+    Source/GameConsole/UI/ConsoleProgramWidget.h
     Source/GameConsole/UI/ConsoleSystemWidget.cpp
     Source/GameConsole/UI/ConsoleSystemWidget.h
     Source/GameConsole/UI/MultiConsolePanelWidget.cpp
@@ -1209,8 +1213,6 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.h
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchProgramWidget.cpp
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchProgramWidget.h
-    Source/NintendoSwitch/Framework/UI/NintendoSwitch_SingleSwitchProgramWidget.cpp
-    Source/NintendoSwitch/Framework/UI/NintendoSwitch_SingleSwitchProgramWidget.h
     Source/NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.h
     Source/NintendoSwitch/Inference/NintendoSwitch_CheckOnlineDetector.cpp
@@ -1296,8 +1298,6 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.h
     Source/NintendoSwitch/Programs/NintendoSwitch_RecordKeyboardController.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_RecordKeyboardController.h
-    Source/NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.cpp
-    Source/NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.h
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboA.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboA.h
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboButton.cpp

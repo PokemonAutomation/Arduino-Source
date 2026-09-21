@@ -68,6 +68,7 @@ public:
         std::string category, std::string display_name,
         std::string doc_link,
         std::string description,
+        ProgramControllerClass controller_class,
         Color color,
         FeedbackType feedback,
         AllowCommandsWhenRunning allow_commands_while_running,
@@ -75,6 +76,7 @@ public:
         std::vector<std::string> required_resources = {}
     );
 
+    ProgramControllerClass controller_class() const{ return m_controller_class; }
     FeedbackType feedback() const{ return m_feedback; }
     bool allow_commands_while_running() const{ return m_allow_commands_while_running; }
 
@@ -85,6 +87,7 @@ public:
 
 
 private:
+    const ProgramControllerClass m_controller_class;
     const FeedbackType m_feedback;
     const bool m_allow_commands_while_running;
 };

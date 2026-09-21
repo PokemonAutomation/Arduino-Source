@@ -7,6 +7,7 @@
 #include "CommonFramework/Panels/PanelSession.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Framework/ConsoleSystemSession.h"
+#include "Framework/ConsoleProgramSession.h"
 #include "ConsoleProgram.h"
 
 namespace PokemonAutomation{
@@ -50,6 +51,7 @@ ConsoleProgramDescriptor::ConsoleProgramDescriptor(
     std::string category, std::string display_name,
     std::string doc_link,
     std::string description,
+    ProgramControllerClass controller_class,
     Color color,
     FeedbackType feedback,
     AllowCommandsWhenRunning allow_commands_while_running,
@@ -66,14 +68,14 @@ ConsoleProgramDescriptor::ConsoleProgramDescriptor(
         true,
         std::move(required_resources)
     )
+    , m_controller_class(controller_class)
     , m_feedback(feedback)
     , m_allow_commands_while_running(
         allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS
     )
 {}
 std::unique_ptr<PanelSession> ConsoleProgramDescriptor::make_panel() const{
-    //  TODO
-    return nullptr;
+    return std::make_unique<ConsoleProgramSession>(*this);
 }
 
 

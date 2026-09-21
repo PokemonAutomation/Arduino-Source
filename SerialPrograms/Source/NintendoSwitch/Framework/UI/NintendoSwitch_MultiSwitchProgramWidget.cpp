@@ -157,7 +157,6 @@ void MultiSwitchProgramWidget2::state_change(ProgramState state){
         m_actions_bar->set_state(state);
         if (state == ProgramState::STOPPED){
             global_panel_holder()->on_idle();
-            check_new_version();
         }else{
             global_panel_holder()->on_busy();
         }

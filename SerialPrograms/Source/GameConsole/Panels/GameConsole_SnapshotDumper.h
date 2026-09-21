@@ -4,19 +4,19 @@
  *
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_SnapshotDumper_H
-#define PokemonAutomation_NintendoSwitch_SnapshotDumper_H
+#ifndef PokemonAutomation_GameConsole_SnapshotDumper_H
+#define PokemonAutomation_GameConsole_SnapshotDumper_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "ControllerInput/ControllerInput.h"
-#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "GameConsole/ConsoleProgram.h"
 
 namespace PokemonAutomation{
-namespace NintendoSwitch{
+namespace GameConsole{
 
 
-class SnapshotDumper_Descriptor : public SingleSwitchProgramDescriptor{
+class SnapshotDumper_Descriptor : public ConsoleProgramDescriptor{
 public:
     SnapshotDumper_Descriptor();
 };
@@ -26,13 +26,13 @@ enum class Format{
     JPG,
 };
 
-class SnapshotDumper : public SingleSwitchProgramInstance, public ConfigOption::Listener{
+class SnapshotDumper : public ConsoleProgramInstance, public ConfigOption::Listener{
 public:
     using Descriptor = SnapshotDumper_Descriptor;
     ~SnapshotDumper();
     SnapshotDumper();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
+    virtual void program(ConsoleProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     virtual void on_config_value_changed(void* object) override;
