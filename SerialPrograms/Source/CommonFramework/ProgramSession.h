@@ -128,6 +128,8 @@ protected:
 public:
     void report_stats_changed();
     void report_error(const std::string& message);
+
+    void validate_resource_list();
     void report_download_error(const std::string& message);
     void report_download_added(std::shared_ptr<ResourceDownload> download_ptr);
     void report_all_downloads_done();

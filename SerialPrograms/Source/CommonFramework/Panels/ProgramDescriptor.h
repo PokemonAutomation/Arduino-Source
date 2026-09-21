@@ -34,9 +34,24 @@ enum class AllowCommandsWhenRunning{
 
 class ProgramDescriptor : public PanelDescriptor{
 public:
-    using PanelDescriptor::PanelDescriptor;
+    ProgramDescriptor(
+        std::string identifier,
+        std::string category, std::string display_name,
+        std::string doc_link,
+        std::string description,
+        Color color,
+        PanelDeprecation deprecation,
+        bool restore_defaults_button,
+        std::vector<std::string> required_resources
+    );
+
+public:
+    const std::vector<std::string>& required_resources() const{ return m_required_resources; }
 
     virtual std::unique_ptr<StatsTracker> make_stats() const;
+
+private:
+    const std::vector<std::string> m_required_resources;
 };
 
 

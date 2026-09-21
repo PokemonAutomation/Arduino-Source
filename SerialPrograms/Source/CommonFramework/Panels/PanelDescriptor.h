@@ -9,7 +9,6 @@
 
 #include <memory>
 #include <string>
-#include <vector>
 #include "Common/Cpp/Color.h"
 
 namespace PokemonAutomation{
@@ -35,8 +34,7 @@ public:
         std::string description,
         Color color,
         PanelDeprecation deprecation,
-        bool restore_defaults_button,
-        std::vector<std::string> required_resources
+        bool restore_defaults_button
     );
     virtual ~PanelDescriptor() = default;
 
@@ -49,7 +47,6 @@ public:
     Color color() const{ return m_color; }
     PanelDeprecation deprecation() const{ return m_deprecation; }
     bool restore_defaults_button() const{ return m_restore_defaults_button; }
-    const std::vector<std::string>& required_resources() const{ return m_required_resources; }
 
     virtual std::unique_ptr<PanelSession> make_panel() const = 0;
 
@@ -62,7 +59,6 @@ private:
     const Color m_color;
     const PanelDeprecation m_deprecation;
     const bool m_restore_defaults_button;
-    const std::vector<std::string> m_required_resources;
 };
 
 

@@ -30,15 +30,12 @@ ConsolePanelWidget::ConsolePanelWidget(
     : QWidget(&parent)
     , m_session(session)
 {
-    UiWrapper wrapper = m_session.system().make_ui_component(this);
-    QWidget* system = dynamic_cast<QWidget*>(wrapper.release());
-
     populate_panel_widget(
         *this,
         session.descriptor(),
-        system,
+        &m_session.system(),
         session.options(),
-        make_actions_bar(*this, session)
+        {make_actions_bar(*this, session)}
     );
 }
 

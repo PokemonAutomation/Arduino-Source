@@ -9,6 +9,7 @@
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
@@ -73,6 +74,11 @@ ProgramSession::ProgramSession(const ProgramDescriptor& descriptor)
     , m_scope(nullptr)
 {
     load_historical_stats();
+    try{
+        validate_resource_list();
+    }catch (FileException& e){
+        e.log(global_logger_tagged());
+    }
 }
 ProgramSession::~ProgramSession(){
     ProgramTracker::instance().remove_program(m_instance_id);
@@ -127,16 +133,27 @@ void ProgramSession::report_error(const std::string& message){
     push_error(message);
 }
 
+
+void ProgramSession::validate_resource_list(){
+    const std::unordered_set<std::string>& master_list = all_resource_names();
+    for (const std::string& resource_string : m_descriptor.required_resources()){
+        if (!master_list.contains(resource_string)){
+            throw InternalProgramError(
+                nullptr,
+                PA_CURRENT_FUNCTION,
+                "validate_resource_list(): Invalid resource in descriptor."
+            );
+        }
+    }
+}
 void ProgramSession::report_download_error(const std::string& message){
     std::lock_guard<Mutex> lg(m_lock);
     push_download_error(message);
 }
-
 void ProgramSession::report_download_added(std::shared_ptr<ResourceDownload> download_ptr){
     // std::lock_guard<Mutex> lg(m_lock);
     m_listeners.run_method(&Listener::download_added, std::move(download_ptr));
 }
-
 void ProgramSession::report_all_downloads_done(){
     m_listeners.run_method(&Listener::all_downloads_done);
 }

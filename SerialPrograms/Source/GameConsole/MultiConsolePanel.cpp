@@ -4,7 +4,6 @@
  *
  */
 
-#include "Framework/ConsoleSystemSession.h"
 #include "Framework/MultiConsolePanelSession.h"
 #include "MultiConsolePanel.h"
 
@@ -60,8 +59,7 @@ MultiConsolePanelDescriptor::MultiConsolePanelDescriptor(
         std::move(description),
         color,
         deprecation,
-        restore_defaults_button,
-        {}
+        restore_defaults_button
     )
     , m_min_consoles(min_consoles)
     , m_max_consoles(max_consoles)

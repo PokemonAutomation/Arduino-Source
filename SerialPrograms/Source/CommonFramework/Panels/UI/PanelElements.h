@@ -20,6 +20,7 @@ namespace PokemonAutomation{
 
 
 class ConfigOption;
+class ProgramSession;
 
 
 CollapsibleGroupBox* make_panel_header(
@@ -39,27 +40,25 @@ CollapsibleGroupBox* make_panel_header(
 
 
 class StatsBar : public QLabel{
-    Q_OBJECT
 public:
     StatsBar(QWidget& parent);
+    StatsBar(QWidget& parent, ProgramSession& session);
 
-public slots:
     void set_stats(std::string current_stats, std::string historical_stats);
 };
 
 
 
 class RunnablePanelActionBar : public QGroupBox{
-    Q_OBJECT
 public:
-    RunnablePanelActionBar(QWidget& parent, ProgramState initial_state);
+    RunnablePanelActionBar(
+        QWidget& parent,
+        PanelSession& panel_session,
+        ProgramSession& program_session,
+        ProgramState initial_state
+    );
 
-public slots:
     void set_state(PokemonAutomation::ProgramState state);
-
-signals:
-    void start_clicked(ProgramState state);
-    void defaults_clicked();
 
 private:
     PokemonAutomation::ProgramState m_last_known_state;
@@ -78,9 +77,9 @@ QWidget* make_actions_bar(
 void populate_panel_widget(
     QWidget& panel,
     const PanelDescriptor& descriptor,
-    QWidget* console_system,
+    UiState<>* console_system,
     ConfigOption& options,
-    QWidget* footer
+    std::vector<QWidget*> footers
 );
 
 

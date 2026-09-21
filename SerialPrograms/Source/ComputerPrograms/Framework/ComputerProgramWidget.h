@@ -20,7 +20,6 @@
 
 #include "Common/Qt/UiStateQtWidget.h"
 #include "CommonFramework/Panels/UI/PanelElements.h"
-#include "ComputerPrograms/ComputerProgram.h"
 #include "ComputerPrograms/Framework/ComputerProgramSession.h"
 #include "ComputerProgramSession.h"
 
@@ -60,7 +59,6 @@ private:
 private:
     ComputerProgramSession& m_session;
     QVBoxLayout* m_layout;
-    ConfigWidget* m_options;
     StatsBar* m_stats_bar;
     RunnablePanelActionBar* m_actions_bar;
 

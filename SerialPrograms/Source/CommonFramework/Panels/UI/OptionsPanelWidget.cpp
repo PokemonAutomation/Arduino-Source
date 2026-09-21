@@ -25,7 +25,7 @@ OptionsPanelWidget::OptionsPanelWidget(
         session.descriptor(),
         nullptr,
         session.options(),
-        make_actions_bar(*this, session)
+        {make_actions_bar(*this, session)}
     );
 }
 

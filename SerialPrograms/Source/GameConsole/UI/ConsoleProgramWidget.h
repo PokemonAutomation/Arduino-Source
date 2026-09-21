@@ -53,7 +53,6 @@ private:
 private:
     ConsoleProgramSession& m_session;
     QVBoxLayout* m_layout;
-    ConfigWidget* m_options;
     StatsBar* m_stats_bar;
     RunnablePanelActionBar* m_actions_bar;
 

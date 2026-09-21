@@ -28,8 +28,7 @@ OptionsPanelDescriptor::OptionsPanelDescriptor(
         std::move(description),
         color,
         deprecation,
-        restore_defaults_button,
-        {}
+        restore_defaults_button
     )
 {}
 std::unique_ptr<PanelSession> OptionsPanelDescriptor::make_panel() const{
