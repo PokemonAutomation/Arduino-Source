@@ -628,6 +628,9 @@ else() # macOS and Linux
         # Assume GCC
         target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -fno-strict-aliasing)
         target_compile_options(CoreLib PRIVATE -Wall -Wextra -Wpedantic -Werror -fno-strict-aliasing)
+
+        target_link_libraries(SerialProgramsLib PRIVATE stdc++exp)
+        target_link_libraries(CoreLib PRIVATE stdc++exp)
     endif()
 
     if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^(arm|arm64|aarch64)")
