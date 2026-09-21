@@ -39,9 +39,6 @@ namespace PokemonHome{
 using namespace Pokemon;
 
 
-const size_t MAX_HOME_BOXES = 200;
-
-
 BoxSorterLivingDex_Descriptor::BoxSorterLivingDex_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonHome:BoxSorterLivingDex",

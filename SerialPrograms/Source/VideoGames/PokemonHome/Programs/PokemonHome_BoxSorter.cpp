@@ -52,9 +52,6 @@ namespace PokemonHome{
 using namespace Pokemon;
 
 
-const size_t MAX_BOXES = 200;
-
-
 BoxSorter_Descriptor::BoxSorter_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonHome:BoxSorter",
@@ -91,7 +88,7 @@ BoxSorter::BoxSorter()
     : BOX_NUMBER(
         "<b>Number of Boxes to Sort:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        1, 1, MAX_BOXES
+        1, 1, MAX_HOME_BOXES
     )
     , VIDEO_DELAY(
           "<b>Capture Card Delay:</b>",

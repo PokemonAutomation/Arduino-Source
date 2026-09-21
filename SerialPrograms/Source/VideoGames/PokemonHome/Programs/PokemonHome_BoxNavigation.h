@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonHome_BoxNavigation_H
 
 #include <array>
+#include <cstddef>
 #include <optional>
 #include <vector>
 #include "Common/Cpp/Time.h"
@@ -19,6 +20,8 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonHome{
+
+inline constexpr size_t MAX_HOME_BOXES = 300;
 
 // Move the red cursor to the first slot of the box
 bool go_to_first_slot(
