@@ -247,8 +247,10 @@ void VideoSourceSelectorWidget::update_resolution_list(){
 
 
 void VideoSourceSelectorWidget::post_startup(VideoSource* source){
-    update_source_list();
-    update_resolution_list();
+    QMetaObject::invokeMethod(this, [this]{
+        update_source_list();
+        update_resolution_list();
+    }, Qt::QueuedConnection);
 }
 
 
