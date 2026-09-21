@@ -10,26 +10,26 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/ColorOption.h"
 #include "CommonFramework/Options/NestedBoxDrawOption.h"
-#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "GameConsole/ConsoleProgram.h"
 
 namespace PokemonAutomation{
-namespace NintendoSwitch{
+namespace GameConsole{
 
 
 
 
-class WaterfillTemplateMaker_Descriptor : public SingleSwitchProgramDescriptor{
+class WaterfillTemplateMaker_Descriptor : public ConsoleProgramDescriptor{
 public:
     WaterfillTemplateMaker_Descriptor();
 };
 
 
-class WaterfillTemplateMaker : public SingleSwitchProgramInstance{
+class WaterfillTemplateMaker : public ConsoleProgramInstance{
 public:
     using Descriptor = WaterfillTemplateMaker_Descriptor;
     WaterfillTemplateMaker(GameConsole::ConsoleSystemSession& system);
 
-    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
+    virtual void program(ConsoleProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     SimpleIntegerOption<size_t> MIN_AREA;

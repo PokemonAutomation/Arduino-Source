@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_NintendoSwitch_SingleSwitchProgram_H
 #define PokemonAutomation_NintendoSwitch_SingleSwitchProgram_H
 
-#include <type_traits>
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
