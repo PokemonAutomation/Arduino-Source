@@ -63,9 +63,10 @@ WattFarmer::WattFarmer()
         LockMode::LOCK_WHILE_RUNNING,
         100
     )
-    , HAVE_NSO(
-        "<b>I have Nintendo Switch Online</b><br>"
-        "If you don't have NSO, the program won't use the Y-Comm glitch",
+    , YCOMM_GLITCH_ENABLED(
+        "<b>Y-COMM Glitch is Enabled:</b><br>"
+        "Uncheck this box to allow this program to function without enabling the Y-COMM glitch. "
+        "However, this will drastically slow down the program.",
         LockMode::LOCK_WHILE_RUNNING,
         true
     )
@@ -78,7 +79,7 @@ WattFarmer::WattFarmer()
     PA_ADD_OPTION(EXIT_DEN_WAIT);
     PA_ADD_OPTION(SKIPS);
     PA_ADD_OPTION(SAVE_ITERATIONS0);
-    PA_ADD_OPTION(HAVE_NSO);
+    PA_ADD_OPTION(YCOMM_GLITCH_ENABLED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -96,25 +97,26 @@ void WattFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     uint8_t year = MAX_YEAR;
     uint16_t save_count = 0;
 
-    if (!HAVE_NSO){
-        // First subdivide the number of skips into batches of 60 because the roll_den function only goes up to 60
+    if (!YCOMM_GLITCH_ENABLED){
+        bool has_watts = false;
 
+        //  First subdivide the number of skips into batches of 60 because the roll_den function only goes up to 60.
         for (uint32_t c = 0; c < SKIPS; c++){
-            enter_den(context, 0ms, true, false);
-            enter_lobby(context, 0ms, false, Catchability::ALWAYS_CATCHABLE);
-
             //  Skip forward.
-            ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0, 80ms);
-            home_to_date_time(env.console, context, true);
-            roll_date_forward_1(env.console, context, false);
-
-            //  Enter game
-            pbf_press_button(context, BUTTON_HOME, 80ms, 720ms);
-            PokemonAutomation::NintendoSwitch::resume_game_from_home(env.console, context);
+            home_roll_date_enter_game_autorollback(env.console, context, year);
 
             //  Exit Raid
             ssf_press_button(context, BUTTON_B, 960ms, 400ms);
             ssf_press_button(context, BUTTON_A, GameSettings::instance().REENTER_DEN_DELAY0, 400ms);
+            has_watts = true;
+
+            //  1st iteration is unclear if there are watts.
+            if (c < 1){
+                pbf_mash_button(context, BUTTON_B, EXIT_DEN_WAIT);
+                ssf_press_button_ptv(context, BUTTON_A, 40ms);
+                pbf_mash_button(context, BUTTON_B, EXIT_DEN_WAIT);
+                has_watts = false;
+            }
 
             // Save after X skips
             if (SAVE_ITERATIONS0 != 0){
@@ -127,21 +129,19 @@ void WattFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     pbf_press_button(context, BUTTON_ZL, 160ms, 3000ms);
                 }
             }
-        }
-        // Take the last Watts from the Den
-        ssf_mash_AZs(context, GameSettings::instance().COLLECT_WATTS_OFFLINE_DELAY0);
-        ssf_mash1_button(context, BUTTON_B, 960ms);
 
+            enter_den(context, 0ms, has_watts, false);
+            enter_lobby(context, 0ms, false, Catchability::ALWAYS_CATCHABLE);
+
+            ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0, 80ms);
+        }
     }else{
+        //  First subdivide the number of skips into batches of 60 because the roll_den function only goes up to 60.
         for (uint32_t c = 0; c < SKIPS; c++){
             env.log("Fetch Attempts: " + tostr_u_commas(c));
 
             home_roll_date_enter_game_autorollback(env.console, context, year);
-            if (context->performance_class() == ControllerPerformanceClass::SysbotBase){
-                pbf_wait(context, 720ms);
-            }else{
-                pbf_mash_button(context, BUTTON_B, 720ms);
-            }
+            pbf_mash_button(context, BUTTON_B, 720ms);
 
             ssf_press_button_ptv(context, BUTTON_A, 40ms);
             pbf_mash_button(context, BUTTON_B, EXIT_DEN_WAIT);

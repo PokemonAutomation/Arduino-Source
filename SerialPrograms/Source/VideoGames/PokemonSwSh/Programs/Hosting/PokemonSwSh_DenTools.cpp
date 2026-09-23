@@ -13,7 +13,7 @@
 #include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateForward1.h"
 #include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateBackwardN.h"
 #include "VideoGames/PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
-#include "VideoGames/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+//#include "VideoGames/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh_DenTools.h"
 
 namespace PokemonAutomation{
