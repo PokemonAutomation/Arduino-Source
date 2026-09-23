@@ -64,6 +64,7 @@
 #include "GameConsole/UI/ConsoleProgramWidget.h"
 #include "GameConsole/UI/MultiConsoleSystemWidget.h"
 #include "GameConsole/UI/MultiConsolePanelWidget.h"
+#include "GameConsole/UI/MultiConsoleProgramWidget.h"
 
 //  Nintendo Switch
 #include "NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h"
@@ -155,6 +156,7 @@ void register_all_statics(){
     RegisterUiStateQtWidget<GameConsole::ConsoleProgramWidget>();
     RegisterUiStateQtWidget<GameConsole::MultiConsoleSystemWidget>();
     RegisterUiStateQtWidget<GameConsole::MultiConsolePanelWidget>();
+    RegisterUiStateQtWidget<GameConsole::MultiConsoleProgramWidget>();
 
     //  Nintendo Switch
     RegisterUiStateQtWidget<SysbotBase::TcpSysbotBase_SelectorWidget>();

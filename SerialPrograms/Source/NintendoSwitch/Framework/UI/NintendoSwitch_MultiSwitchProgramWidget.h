@@ -20,7 +20,7 @@
 
 #include "Common/Qt/UiStateQtWidget.h"
 #include "CommonFramework/Panels/UI/PanelElements.h"
-#include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
+#include "GameConsole/Framework/MultiConsoleSystemSession.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h"
 
 QT_FORWARD_DECLARE_CLASS(QVBoxLayout)
@@ -36,7 +36,6 @@ class MultiSwitchProgramWidget2
     , public UiComponentQtWidget
     , private ProgramSession::Listener
     , private GameConsole::MultiConsoleSystemSession::Listener
-    , private MultiSwitchProgramSession::Listener
 {
 public:
     using ParentState = MultiSwitchProgramSession;
@@ -60,8 +59,6 @@ private:
     virtual void download_error(const std::string& message) override;
     virtual void download_added(std::shared_ptr<ResourceDownload> download_ptr) override;
     virtual void all_downloads_done() override;
-
-    virtual void redraw_options() override;
 
     ProgramResourceDownloadTableWidget* ensure_downloads_table();
 

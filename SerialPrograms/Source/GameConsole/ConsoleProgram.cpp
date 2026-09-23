@@ -86,13 +86,13 @@ void ConsoleProgramInstance::run_start_program_checks(
 ){
     const ConsoleProgramDescriptor& ldescriptor = dynamic_cast<const ConsoleProgramDescriptor&>(descriptor);
     ConsoleProgramEnvironment& lenv = dynamic_cast<ConsoleProgramEnvironment&>(env);
-    start_program_feedback_check(lenv.console(), ldescriptor.feedback());
+    start_program_feedback_check(ldescriptor, lenv.console());
 }
 void ConsoleProgramInstance::start_program_feedback_check(
-    VideoStream& stream,
-    FeedbackType feedback_type
+    const ConsoleProgramDescriptor& descriptor,
+    VideoStream& stream
 ){
-    StartProgramChecks::check_feedback(stream, feedback_type);
+    StartProgramChecks::check_feedback(stream, descriptor.feedback());
 }
 
 

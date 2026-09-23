@@ -121,7 +121,11 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
         true,
         std::move(required_resources)
     )
-    , m_controller_class(controller_class)
+    , m_controller_class(controller_class)/*  Multi-Console Program
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
     , m_feedback(feedback)
     , m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
     , m_min_switches(min_switches)

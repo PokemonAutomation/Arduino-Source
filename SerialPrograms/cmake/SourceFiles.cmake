@@ -933,12 +933,16 @@ file(GLOB LIBRARY_SOURCES
     Source/GameConsole/Framework/ConsoleSystemSession.h
     Source/GameConsole/Framework/MultiConsolePanelSession.cpp
     Source/GameConsole/Framework/MultiConsolePanelSession.h
+    Source/GameConsole/Framework/MultiConsoleProgramSession.cpp
+    Source/GameConsole/Framework/MultiConsoleProgramSession.h
     Source/GameConsole/Framework/MultiConsoleSystemOption.cpp
     Source/GameConsole/Framework/MultiConsoleSystemOption.h
     Source/GameConsole/Framework/MultiConsoleSystemSession.cpp
     Source/GameConsole/Framework/MultiConsoleSystemSession.h
     Source/GameConsole/MultiConsolePanel.cpp
     Source/GameConsole/MultiConsolePanel.h
+    Source/GameConsole/MultiConsoleProgram.cpp
+    Source/GameConsole/MultiConsoleProgram.h
     Source/GameConsole/Panels/GameConsole_BoxDraw.cpp
     Source/GameConsole/Panels/GameConsole_BoxDraw.h
     Source/GameConsole/Panels/GameConsole_MultiConsoleViewer.h
@@ -957,6 +961,8 @@ file(GLOB LIBRARY_SOURCES
     Source/GameConsole/UI/ConsoleSystemWidget.h
     Source/GameConsole/UI/MultiConsolePanelWidget.cpp
     Source/GameConsole/UI/MultiConsolePanelWidget.h
+    Source/GameConsole/UI/MultiConsoleProgramWidget.cpp
+    Source/GameConsole/UI/MultiConsoleProgramWidget.h
     Source/GameConsole/UI/MultiConsoleSystemWidget.cpp
     Source/GameConsole/UI/MultiConsoleSystemWidget.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT.cpp
