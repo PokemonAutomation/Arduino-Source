@@ -288,7 +288,7 @@ bool BoxSorterLivingDex::is_viable_for_dex(
                     }
 
                     // Read the summary screen and assign data to boxes_data[global_idx]
-                    read_summary_screen(env, context, boxes_data[global_idx].value(), ot_name_language);
+                    read_summary_screen(env, context, boxes_data[global_idx].value(), ot_name_language, Language::None);
                 }
             }
 

@@ -12,6 +12,7 @@
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_BoxSortingTable.h"
 
@@ -37,6 +38,7 @@ public:
 
 private:
     SimpleIntegerOption<uint16_t> BOX_NUMBER;
+    OCR::LanguageOCROption HOME_LANGUAGE;
     MillisecondsOption VIDEO_DELAY;
     MillisecondsOption GAME_DELAY;
     Pokemon::BoxSortingTable SORT_TABLE;

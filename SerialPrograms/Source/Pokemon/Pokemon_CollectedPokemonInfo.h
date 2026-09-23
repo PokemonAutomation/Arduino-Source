@@ -27,6 +27,7 @@ struct CollectedPokemonInfo{
     // When adding any new member here, do not forget to modify the functions below (ctrl-f "new struct members")
     uint16_t dex_number = 0;
     std::string name_slug = "";
+    std::string nature = "";
     bool shiny = false;
     bool gmax = false;
     bool alpha = false;

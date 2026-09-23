@@ -26,6 +26,7 @@ enum class SortingRuleType
     Type,
     Tera_Type,
     Origin_Mark,
+    Nature,
 };
 
 struct SortingRule

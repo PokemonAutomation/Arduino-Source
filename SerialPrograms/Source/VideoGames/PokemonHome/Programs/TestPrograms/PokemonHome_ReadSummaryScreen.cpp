@@ -84,7 +84,7 @@ void ReadSummaryScreen::program(
     std::string nature = reader.read_nature(env.console, HOME_LANGUAGE, screen);
 
     CollectedPokemonInfo pokemon_info{};
-    read_summary_screen(env, context, pokemon_info, OT_NAME_LANGUAGE);
+    read_summary_screen(env, context, pokemon_info, OT_NAME_LANGUAGE, HOME_LANGUAGE);
 
     std::optional<CollectedPokemonInfo> logged_info = pokemon_info;
     std::ostringstream ss;
