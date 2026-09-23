@@ -108,7 +108,7 @@ void SingleSwitchProgramInstance::run_start_program_checks(
 ){
     const GameConsole::ConsoleProgramDescriptor& ldescriptor = dynamic_cast<const GameConsole::ConsoleProgramDescriptor&>(descriptor);
     GameConsole::ConsoleProgramEnvironment& lenv = dynamic_cast<GameConsole::ConsoleProgramEnvironment&>(env);
-    start_program_feedback_check(lenv.console(), ldescriptor.feedback());
+    start_program_feedback_check(ldescriptor, lenv.console());
     start_program_border_check(lenv.console(), ldescriptor.feedback());
 }
 void SingleSwitchProgramInstance::start_program_border_check(

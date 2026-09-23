@@ -109,10 +109,11 @@ public:
         ProgramEnvironment& env
     ) override;
     virtual void start_program_feedback_check(
-        VideoStream& stream,
-        FeedbackType feedback_type
+        const ConsoleProgramDescriptor& descriptor,
+        VideoStream& stream
     );
 };
+
 
 
 

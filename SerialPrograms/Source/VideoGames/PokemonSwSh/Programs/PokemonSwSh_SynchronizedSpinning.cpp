@@ -31,7 +31,13 @@ SynchronizedSpinning_Descriptor::SynchronizedSpinning_Descriptor()
 SynchronizedSpinning::SynchronizedSpinning(){}
 
 void SynchronizedSpinning::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
-    env.run_in_parallel(
+    //  Ensure all controllers are ready. This will automatically throw if they aren't.
+    env.run_in_parallel<ProController>(
+        scope,
+        [&](ConsoleHandle& console, ProControllerContext& context){}
+    );
+
+    env.run_in_parallel<ProController>(
         scope,
         [&](ConsoleHandle& console, ProControllerContext& context){
             pbf_move_left_joystick(context, {0, -1}, 40ms, 160ms);

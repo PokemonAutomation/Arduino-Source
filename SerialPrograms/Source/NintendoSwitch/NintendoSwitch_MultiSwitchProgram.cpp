@@ -4,19 +4,13 @@
  *
  */
 
-#include "Common/Cpp/Containers/FixedLimitVector.tpp"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
-#include "CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.h"
-#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
-#include "Controllers/ControllerSession.h"
 #include "NintendoSwitch_MultiSwitchProgram.h"
 #include "Framework/NintendoSwitch_MultiSwitchProgramSession.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
-MultiSwitchProgramEnvironment::~MultiSwitchProgramEnvironment(){}
 
 MultiSwitchProgramEnvironment::MultiSwitchProgramEnvironment(
     const ProgramInfo& program_info,
@@ -24,77 +18,18 @@ MultiSwitchProgramEnvironment::MultiSwitchProgramEnvironment(
     ProgramSession& session,
     StatsTracker* current_stats,
     const StatsTracker* historical_stats,
-    FixedLimitVector<ConsoleHandle> p_switches
+    std::vector<std::unique_ptr<GameConsole::ConsoleHandle>> consoles
 )
-    : ProgramEnvironment(program_info, session, current_stats, historical_stats)
-    , consoles(std::move(p_switches))
-{
-    for (ConsoleHandle& console : consoles){
-        console.initialize_inference_threads(scope);
-    }
-}
+    : GameConsole::MultiConsoleProgramEnvironment(
+        program_info,
+        scope,
+        session,
+        current_stats,
+        historical_stats,
+        std::move(consoles)
+    )
+{}
 
-void MultiSwitchProgramEnvironment::run_in_parallel(
-    CancellableScope& scope,
-    const std::function<void(CancellableScope& scope, ConsoleHandle& console)>& func
-){
-    run_in_parallel(scope, 0, consoles.size(), func);
-}
-void MultiSwitchProgramEnvironment::run_in_parallel(
-    CancellableScope& scope,
-    const std::function<void(ConsoleHandle& console, ProControllerContext& context)>& func
-){
-    run_in_parallel(scope, 0, consoles.size(), func);
-}
-void MultiSwitchProgramEnvironment::run_in_parallel(
-    CancellableScope& scope, size_t s, size_t e,
-    const std::function<void(CancellableScope& scope, ConsoleHandle& console)>& func
-){
-    GlobalThreadPools::unlimited_realtime().run_in_parallel(
-        [&](size_t index){
-            ConsoleHandle& console = consoles[index];
-            ThreadUtilizationStat stat(current_thread_handle(), "Program Thread " + std::to_string(index) + ":");
-            console.overlay().add_stat(stat);
-            try{
-                func(scope, console);
-                console.controller().wait_for_all(&scope);
-                console.overlay().remove_stat(stat);
-            }catch (...){
-                console.overlay().remove_stat(stat);
-                throw;
-            }
-        },
-        s, e
-    );
-}
-void MultiSwitchProgramEnvironment::run_in_parallel(
-    CancellableScope& scope, size_t s, size_t e,
-    const std::function<void(ConsoleHandle& console, ProControllerContext& context)>& func
-){
-    GlobalThreadPools::unlimited_realtime().run_in_parallel(
-        [&](size_t index){
-            ConsoleHandle& console = consoles[index];
-            ThreadUtilizationStat stat(current_thread_handle(), "Program Thread " + std::to_string(index) + ":");
-            console.overlay().add_stat(stat);
-            try{
-                ProControllerContext context(scope, consoles[index].controller<ProController>());   //  REMOVE: don't use pro_controller()
-                func(console, context);
-                context.wait_for_all_requests();
-                console.overlay().remove_stat(stat);
-            }catch (...){
-                console.overlay().remove_stat(stat);
-                throw;
-            }
-        },
-        s, e
-    );
-}
-
-void MultiSwitchProgramEnvironment::log_to_ui(const std::string& message, Color color){
-    for (auto&console: consoles){
-        console.overlay().add_log(message, color);
-    }
-}
 
 
 MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
@@ -111,22 +46,21 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
     PanelDeprecation deprecation,
     std::vector<std::string> required_resources
 )
-    : ProgramDescriptor(
+    : GameConsole::MultiConsoleProgramDescriptor(
         std::move(identifier),
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description),
+        controller_class,
         GameConsole::pick_color(controller_class),
+        feedback,
+        allow_commands_while_running,
+        min_switches,
+        max_switches,
+        default_switches,
         deprecation,
-        true,
         std::move(required_resources)
     )
-    , m_controller_class(controller_class)
-    , m_feedback(feedback)
-    , m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
-    , m_min_switches(min_switches)
-    , m_max_switches(max_switches)
-    , m_default_switches(default_switches)
 {}
 std::unique_ptr<PanelSession> MultiSwitchProgramDescriptor::make_panel() const{
     return std::unique_ptr<PanelSession>(new MultiSwitchProgramSession(*this));
@@ -136,21 +70,21 @@ std::unique_ptr<PanelSession> MultiSwitchProgramDescriptor::make_panel() const{
 
 
 
-void MultiSwitchProgramInstance::start_program_controller_check(
-    GameConsole::ConsoleSystemSession& session, size_t console_index
-){
-    if (session.controllers() == 0){
-        return;
-    }
-    if (!session.controller(0).ready()){
-        throw UserSetupError(session.logger(), "Cannot Start: Controller is not ready.");
-    }
+
+void MultiSwitchProgramInstance::program(GameConsole::MultiConsoleProgramEnvironment& env, CancellableScope& scope){
+    program(static_cast<MultiSwitchProgramEnvironment&>(env), scope);
 }
-void MultiSwitchProgramInstance::start_program_feedback_check(
-    VideoStream& stream, size_t console_index,
-    FeedbackType feedback_type
+void MultiSwitchProgramInstance::run_start_program_checks(
+    const ProgramDescriptor& descriptor,
+    ProgramEnvironment& env
 ){
-    StartProgramChecks::check_feedback(stream, feedback_type);
+    const GameConsole::MultiConsoleProgramDescriptor& ldescriptor = dynamic_cast<const GameConsole::MultiConsoleProgramDescriptor&>(descriptor);
+    GameConsole::MultiConsoleProgramEnvironment& lenv = dynamic_cast<GameConsole::MultiConsoleProgramEnvironment&>(env);
+    size_t consoles = lenv.consoles();
+    for (size_t c = 0; c < consoles; c++){
+        start_program_feedback_check(ldescriptor, c, lenv.console(c));
+        start_program_border_check(lenv.console(c), c, ldescriptor.feedback());
+    }
 }
 void MultiSwitchProgramInstance::start_program_border_check(
     VideoStream& stream, size_t console_index,

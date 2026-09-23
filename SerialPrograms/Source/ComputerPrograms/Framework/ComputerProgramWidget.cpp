@@ -4,8 +4,8 @@
  *
  */
 
-#include <QVBoxLayout>
 #include <QMessageBox>
+#include "Common/Cpp/ScopeExit.h"
 #include "CommonFramework/Panels/PanelTools.h"
 #include "CommonFramework/Panels/UI/PanelElements.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -86,11 +86,15 @@ void ComputerProgramWidget::download_error(const std::string& message){
     if (m_popup_is_open.exchange(true)){ // only show popups if one isn't already open
         return;
     }
+
+    ScopeExit scope([&]{
+        m_popup_is_open.store(false, std::memory_order_release);
+    });
+
     QMetaObject::invokeMethod(this, [message]{
         QMessageBox box;
         box.critical(nullptr, "Error", QString::fromStdString(message));
     }, Qt::QueuedConnection);
-    m_popup_is_open.store(false);
 }
 
 void ComputerProgramWidget::download_added(std::shared_ptr<ResourceDownload> download_ptr){

@@ -1,46 +1,29 @@
-/*  Multi-Switch Program Widget
+/*  Multi-Console Program Widget
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#include <QVBoxLayout>
 #include <QMessageBox>
-#include "Common/Cpp/Containers/FixedLimitVector.tpp"
-#include "CommonFramework/Panels/PanelTools.h"
-#include "CommonFramework/Panels/UI/PanelElements.h"
+#include "Common/Cpp/ScopeExit.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/ResourceDownload/ProgramResourceDownloadWidget.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h"
-#include "NintendoSwitch_MultiSwitchProgramWidget.h"
-
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+#include "CommonFramework/Panels/PanelTools.h"
+#include "MultiConsoleProgramWidget.h"
 
 namespace PokemonAutomation{
 
-template class RegisterUiStateQtWidget<NintendoSwitch::MultiSwitchProgramWidget2>;
+template class RegisterUiStateQtWidget<GameConsole::MultiConsoleProgramWidget>;
 
-namespace NintendoSwitch{
+namespace GameConsole{
 
 
-
-MultiSwitchProgramWidget2::~MultiSwitchProgramWidget2(){
-    auto ScopeCheck = m_sanitizer.check_scope();
-    m_session.system().remove_console_count_lock(*this);
-    m_session.ProgramSession::remove_listener(*this);
+MultiConsoleProgramWidget::~MultiConsoleProgramWidget(){
     m_session.remove_listener(*this);
 }
-
-
-MultiSwitchProgramWidget2::MultiSwitchProgramWidget2(
-    QWidget& parent,
-    MultiSwitchProgramSession& session
-)
+MultiConsoleProgramWidget::MultiConsoleProgramWidget(QWidget& parent, MultiConsoleProgramSession& session)
     : QWidget(&parent)
     , m_session(session)
-    , m_sanitizer("MultiSwitchProgramWidget2")
 {
     m_stats_bar = new StatsBar(*this, m_session);
     m_actions_bar = new RunnablePanelActionBar(
@@ -61,29 +44,16 @@ MultiSwitchProgramWidget2::MultiSwitchProgramWidget2(
     m_layout = static_cast<QVBoxLayout*>(this->layout());
 
     m_session.add_listener(*this);
-    m_session.ProgramSession::add_listener(*this);
 }
 
-
-
-
-void MultiSwitchProgramWidget2::state_change(ProgramState state){
-    auto ScopeCheck = m_sanitizer.check_scope();
+void MultiConsoleProgramWidget::state_change(ProgramState state){
     QMetaObject::invokeMethod(this, [this, state]{
-
         if (state != ProgramState::STOPPED){
-            m_session.system().add_console_count_lock(*this);
             m_session.system().lock_controllers("Program is Running");
         }else{
             m_session.system().unlock_controllers();
-            m_session.system().remove_console_count_lock(*this);
         }
         m_session.options().report_program_state(state != ProgramState::STOPPED);
-
-//        cout << "state = " << (state != ProgramState::STOPPED) << endl;
-//        if (m_option.descriptor().lock_options_while_running()){
-//            m_options->widget().setEnabled(state == ProgramState::STOPPED);
-//        }
         m_actions_bar->set_state(state);
         if (state == ProgramState::STOPPED){
             global_panel_holder()->on_idle();
@@ -96,8 +66,7 @@ void MultiSwitchProgramWidget2::state_change(ProgramState state){
         }
     }, Qt::QueuedConnection);
 }
-void MultiSwitchProgramWidget2::stats_update(const StatsTracker* current_stats, const StatsTracker* historical_stats){
-    auto ScopeCheck = m_sanitizer.check_scope();
+void MultiConsoleProgramWidget::stats_update(const StatsTracker* current_stats, const StatsTracker* historical_stats){
     QMetaObject::invokeMethod(this, [this, current_stats, historical_stats]{
         m_stats_bar->set_stats(
             current_stats == nullptr ? "" : current_stats->to_str(StatsTracker::DISPLAY_ON_SCREEN),
@@ -105,55 +74,47 @@ void MultiSwitchProgramWidget2::stats_update(const StatsTracker* current_stats, 
         );
     }, Qt::QueuedConnection);
 }
-void MultiSwitchProgramWidget2::error(const std::string& message){
-    auto ScopeCheck = m_sanitizer.check_scope();
+void MultiConsoleProgramWidget::error(const std::string& message){
     QMetaObject::invokeMethod(this, [message]{
         QMessageBox box;
         box.critical(nullptr, "Error", QString::fromStdString(message));
     }, Qt::QueuedConnection);
 }
 
-void MultiSwitchProgramWidget2::download_error(const std::string& message){
+
+void MultiConsoleProgramWidget::download_error(const std::string& message){
     if (m_popup_is_open.exchange(true)){ // only show popups if one isn't already open
         return;
     }
-    auto ScopeCheck = m_sanitizer.check_scope();
+
+    ScopeExit scope([&]{
+        m_popup_is_open.store(false, std::memory_order_release);
+    });
+
     QMetaObject::invokeMethod(this, [message]{
         QMessageBox box;
         box.critical(nullptr, "Error", QString::fromStdString(message));
     }, Qt::QueuedConnection);
-    m_popup_is_open.store(false);
 }
-
-void MultiSwitchProgramWidget2::download_added(std::shared_ptr<ResourceDownload> download_ptr){
+void MultiConsoleProgramWidget::download_added(std::shared_ptr<ResourceDownload> download_ptr){
     QMetaObject::invokeMethod(this, [this, download_ptr = std::move(download_ptr)]() mutable{
         this->ensure_downloads_table()->add_download(std::move(download_ptr));
     }, Qt::QueuedConnection);
 }
-
-void MultiSwitchProgramWidget2::all_downloads_done(){
+void MultiConsoleProgramWidget::all_downloads_done(){
     QMetaObject::invokeMethod(this, [this]{
         this->ensure_downloads_table()->remove_all_downloads();
     }, Qt::QueuedConnection);
 }
-
-
-void MultiSwitchProgramWidget2::redraw_options(){
-    auto ScopeCheck = m_sanitizer.check_scope();
-    QMetaObject::invokeMethod(this, [this]{
-        m_session.options().report_program_state(false);
-    }, Qt::QueuedConnection);
-}
-
-
-ProgramResourceDownloadTableWidget* MultiSwitchProgramWidget2::ensure_downloads_table() {
-    if (!m_internal_lazy_downloads_table) {
+ProgramResourceDownloadTableWidget* MultiConsoleProgramWidget::ensure_downloads_table(){
+    if (!m_internal_lazy_downloads_table){
         m_internal_lazy_downloads_table = new ProgramResourceDownloadTableWidget(*this);
         m_internal_lazy_downloads_table->setVisible(false);
         m_layout->addWidget(m_internal_lazy_downloads_table);
     }
     return m_internal_lazy_downloads_table;
 }
+
 
 
 

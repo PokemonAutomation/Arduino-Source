@@ -93,7 +93,7 @@ SelfBoxTrade::SelfBoxTrade()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
-    env.run_in_parallel(
+    env.run_in_parallel<ProController>(
         scope,
         [](ConsoleHandle& console, ProControllerContext& context){
             assert_16_9_720p_min(console, console);
@@ -111,7 +111,7 @@ void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope&
 
     for (uint8_t box = 0; box < BOXES_TO_TRADE; box++){
         if (box != 0){
-            env.run_in_parallel(scope, [](ConsoleHandle& console, ProControllerContext& context){
+            env.run_in_parallel<ProController>(scope, [](ConsoleHandle& console, ProControllerContext& context){
                 pbf_press_button(context, BUTTON_R, 480ms, 800ms);
             });
         }

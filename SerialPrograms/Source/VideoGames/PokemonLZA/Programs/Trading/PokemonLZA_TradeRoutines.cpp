@@ -155,7 +155,7 @@ void trade_current_box(
             bool ok[2] = {false, false};
 
             MultiConsoleErrorState error_state;
-            env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+            env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
                 VideoOverlaySet overlays(console.overlay());
 
                 BoxDetector detector(COLOR_RED, &console.overlay());

@@ -86,7 +86,7 @@ bool SelfTouchTrade::trade_one(
 ){
     TradeStats& stats = env.current_stats<TradeStats>();
 
-    ConsoleHandle& host = HOSTING_SWITCH == HostingSwitch::Switch0 ? env.consoles[0] : env.consoles[1];
+    ConsoleHandle& host = HOSTING_SWITCH == HostingSwitch::Switch0 ? env.console(0) : env.console(1);
 
     //  Read the name and see if the receiver still needs it.
     TradeNameReader name_reader(host, host, LANGUAGE);
@@ -113,7 +113,7 @@ bool SelfTouchTrade::trade_one(
     host.log("\"" + slug + "\" - Trades Remaining: " + std::to_string(current_trades_left));
 #if 1
     MultiConsoleErrorState error_state;
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         trade_current_pokemon(console, context, error_state, stats);
     });
     stats.m_trades++;
@@ -161,7 +161,7 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
     }
 
     //  Connect both controllers.
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         //  Connect the controller.
         require_player(console, context, BUTTON_LCLICK);
     });
@@ -170,9 +170,9 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
     uint8_t col = 0;
 
     bool host0 = HOSTING_SWITCH == HostingSwitch::Switch0;
-    ProControllerContext host_context(scope, (host0 ? env.consoles[0] : env.consoles[1]).controller<ProController>());
-    ConsoleHandle& host = host0 ? env.consoles[0] : env.consoles[1];
-    ConsoleHandle& recv = host0 ? env.consoles[1] : env.consoles[0];
+    ProControllerContext host_context(scope, (host0 ? env.console(0) : env.console(1)).controller<ProController>());
+    ConsoleHandle& host = host0 ? env.console(0) : env.console(1);
+    ConsoleHandle& recv = host0 ? env.console(1) : env.console(0);
 
     for (uint8_t boxes = 0; boxes < BOXES_TO_TRADE;){
         env.update_stats();
@@ -182,7 +182,7 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
         bool host_ok, recv_ok;
         OverlayBoxScope box0(host, {0.925, 0.100, 0.014, 0.030});
         OverlayBoxScope box1(recv, {0.925, 0.100, 0.014, 0.030});
-        env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+        env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
             ImageStats stats = image_stats(extract_box_reference(console.video().snapshot(), box0));
             bool ok = is_white(stats);
             if (host.index() == console.index()){

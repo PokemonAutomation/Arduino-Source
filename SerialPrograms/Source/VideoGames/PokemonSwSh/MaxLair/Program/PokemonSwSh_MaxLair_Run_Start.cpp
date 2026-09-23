@@ -24,7 +24,7 @@ namespace MaxLairInternal{
 
 bool abort_if_error(MultiSwitchProgramEnvironment& env, CancellableScope& scope, const std::atomic<size_t>& errors){
     if (errors.load(std::memory_order_acquire)){
-        env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+        env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
             pbf_press_button(context, BUTTON_B, 80ms, 1000ms);
             pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
             pbf_mash_button(context, BUTTON_B, 8000ms);
@@ -129,7 +129,7 @@ bool start_raid_local(
     const HostingSettings& settings,
     ConsoleRuntime console_stats[4]
 ){
-    if (env.consoles.size() == 1){
+    if (env.consoles() == 1){
         ProControllerContext context(scope, host.controller<ProController>());
         return start_raid_self_solo(
             env.program_info(), host, context,
@@ -142,7 +142,7 @@ bool start_raid_local(
     std::string code = settings.RAID_CODE.get_code();
 
     std::atomic<size_t> errors(0);
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         size_t index = console.index();
         bool is_host = index == host.index();
 
@@ -158,13 +158,13 @@ bool start_raid_local(
         }
     });
     if (errors.load(std::memory_order_acquire) != 0){
-        env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+        env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 8000ms);
         });
         return false;
     }
 
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         size_t index = console.index();
         GlobalState& state = state_tracker[index];
         bool is_host = index == host.index();
@@ -175,7 +175,7 @@ bool start_raid_local(
         }
 
         //  Enter code.
-        if (!code.empty() && env.consoles.size() > 1){
+        if (!code.empty() && env.consoles() > 1){
             pbf_press_button(context, BUTTON_PLUS, 80ms, 1000ms);
             FastCodeEntry::numberpad_enter_code(console, context, false, code, true);
             pbf_wait(context, 2000ms);
@@ -184,9 +184,9 @@ bool start_raid_local(
     });
 
     //  Open lobby.
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         //  Delay to prevent the Switches from forming separate lobbies.
-        if (env.consoles.size() > 1 && console.index() != host.index()){
+        if (env.consoles() > 1 && console.index() != host.index()){
             pbf_wait(context, 5000ms);
         }
         pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
@@ -194,10 +194,10 @@ bool start_raid_local(
 
     auto time_limit = current_time() + settings.LOBBY_WAIT_DELAY0.get();
 
-    AllJoinedTracker joined_tracker(scope, env.consoles.size(), time_limit);
+    AllJoinedTracker joined_tracker(scope, env.consoles(), time_limit);
 
     //  Wait for all Switches to join.
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         size_t index = console.index();
 
         //  Wait for a player to show up. This lets you ready up.
@@ -210,7 +210,7 @@ bool start_raid_local(
         return false;
     }
 
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         //  Wait for all consoles to join.
         if (!joined_tracker.report_joined()){
             console.log("Not everyone was able to join.", COLOR_RED);
@@ -222,9 +222,9 @@ bool start_raid_local(
         return false;
     }
 
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         size_t index = console.index();
-        if (!wait_for_all_join(console, context, *entrance[index], env.consoles.size())){
+        if (!wait_for_all_join(console, context, *entrance[index], env.consoles())){
             console.log("Switches joined into different raids.", COLOR_RED);
             errors.fetch_add(1);
             return;
@@ -235,7 +235,7 @@ bool start_raid_local(
     }
 
     //  Ready up and wait for lobby to be ready.
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         //  Ready up.
         context.wait_for(std::chrono::seconds(1));
         pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
@@ -243,7 +243,7 @@ bool start_raid_local(
 
         //  Wait
         size_t index = console.index();
-        if (!wait_for_lobby_ready(console, context, *entrance[index], env.consoles.size(), env.consoles.size(), time_limit)){
+        if (!wait_for_lobby_ready(console, context, *entrance[index], env.consoles(), env.consoles(), time_limit)){
             errors.fetch_add(1);
             pbf_mash_button(context, BUTTON_B, 10000ms);
             return;
@@ -253,9 +253,9 @@ bool start_raid_local(
         return false;
     }
 
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         //  Start
-        if (!start_adventure(console, context, env.consoles.size())){
+        if (!start_adventure(console, context, env.consoles())){
             errors.fetch_add(1);
             pbf_mash_button(context, BUTTON_B, 10000ms);
             return;
@@ -278,7 +278,7 @@ bool start_raid_host(
     const StatsTracker& session_stats,
     ConsoleRuntime console_stats[4]
 ){
-    if (env.consoles.size() == 1){
+    if (env.consoles() == 1){
         ProControllerContext context(scope, host.controller<ProController>());
         return start_raid_host_solo(
             env, host, context,
@@ -296,7 +296,7 @@ bool start_raid_host(
     std::string boss;
 
     std::atomic<size_t> errors(0);
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         size_t index = console.index();
         bool is_host = index == host.index();
 
@@ -312,13 +312,13 @@ bool start_raid_host(
         }
     });
     if (errors.load(std::memory_order_acquire) != 0){
-        env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+        env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 8000ms);
         });
         return false;
     }
 
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         size_t index = console.index();
         GlobalState& state = state_tracker[index];
         bool is_host = index == host.index();
@@ -342,7 +342,7 @@ bool start_raid_host(
     scope.wait_for(settings.START_DELAY0);
 
     //  Open lobby.
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         //  If you start the raids at the same time, they won't find each other.
         if (console.index() != host.index()){
             pbf_wait(context, 3000ms);
@@ -352,10 +352,10 @@ bool start_raid_host(
 
     auto time_limit = current_time() + settings.LOBBY_WAIT_DELAY0.get();
 
-    AllJoinedTracker joined_tracker(scope, env.consoles.size(), time_limit);
+    AllJoinedTracker joined_tracker(scope, env.consoles(), time_limit);
 
     //  Wait for all Switches to join.
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         //  Wait for a player to show up. This lets you ready up.
         size_t index = console.index();
         if (!wait_for_a_player(console, context, *entrance[index], time_limit)){
@@ -367,7 +367,7 @@ bool start_raid_host(
         return false;
     }
 
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         //  Wait for all consoles to join.
         if (!joined_tracker.report_joined()){
             console.log("Not everyone was able to join.", COLOR_RED);
@@ -379,9 +379,9 @@ bool start_raid_host(
         return false;
     }
 
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         size_t index = console.index();
-        if (!wait_for_all_join(console, context, *entrance[index], env.consoles.size())){
+        if (!wait_for_all_join(console, context, *entrance[index], env.consoles())){
             console.log("Switches joined into different raids.", COLOR_RED);
             errors.fetch_add(1);
             return;
@@ -401,7 +401,7 @@ bool start_raid_host(
     );
 
     //  Ready up and wait for lobby to be ready.
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         //  Ready up.
         context.wait_for(std::chrono::seconds(1));
         pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
@@ -409,7 +409,7 @@ bool start_raid_host(
 
         //  Wait
         size_t index = console.index();
-        if (!wait_for_lobby_ready(console, context, *entrance[index], env.consoles.size(), 4, time_limit)){
+        if (!wait_for_lobby_ready(console, context, *entrance[index], env.consoles(), 4, time_limit)){
             errors.fetch_add(1);
             pbf_mash_button(context, BUTTON_B, 10000ms);
             return;
@@ -419,9 +419,9 @@ bool start_raid_host(
         return false;
     }
 
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         //  Start
-        if (!start_adventure(console, context, env.consoles.size())){
+        if (!start_adventure(console, context, env.consoles())){
             errors.fetch_add(1);
             pbf_mash_button(context, BUTTON_B, 10000ms);
             return;
