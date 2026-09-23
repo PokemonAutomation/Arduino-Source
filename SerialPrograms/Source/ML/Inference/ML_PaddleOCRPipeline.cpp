@@ -414,7 +414,7 @@ void add_horizontal_padding(cv::Mat& image){
 
     int h = image.rows;
     int w = image.cols;
-    constexpr float min_ratio = 0.5f;
+    constexpr float min_ratio = 0.8f;
 
     // add horizontal padding to tall/narrow characters
     if (h > 0 && (float)w / h < min_ratio) {
