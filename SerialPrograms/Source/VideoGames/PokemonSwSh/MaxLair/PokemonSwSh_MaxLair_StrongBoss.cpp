@@ -232,11 +232,11 @@ private:
 
 void MaxLairStrongBoss::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     size_t host_index = CONSOLES.HOST.current_value();
-    if (host_index >= env.consoles.size()){
+    if (host_index >= env.consoles()){
         throw UserSetupError(env.logger(), "Invalid Host Switch");
     }
 
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         assert_16_9_720p_min(console, console);
         if (START_LOCATION.start_in_grip_menu()){
             grip_menu_connect_go_home(context);

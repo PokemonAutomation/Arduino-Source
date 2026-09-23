@@ -7,13 +7,11 @@
 #ifndef PokemonAutomation_NintendoSwitch_MultiSwitchProgram_H
 #define PokemonAutomation_NintendoSwitch_MultiSwitchProgram_H
 
-#include <functional>
 //#include "Common/Compiler.h"
-#include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
-#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
+#include "GameConsole/MultiConsoleProgram.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
@@ -25,47 +23,63 @@ class SwitchSystemSession;
 class MultiSwitchProgramInstance;
 
 
-class MultiSwitchProgramEnvironment : public ProgramEnvironment{
+class MultiSwitchProgramEnvironment : public GameConsole::MultiConsoleProgramEnvironment{
 public:
-    ~MultiSwitchProgramEnvironment();
     MultiSwitchProgramEnvironment(
         const ProgramInfo& program_info,
         CancellableScope& scope,
         ProgramSession& session,
         StatsTracker* current_stats,
         const StatsTracker* historical_stats,
-        FixedLimitVector<ConsoleHandle> p_switches
+        std::vector<std::unique_ptr<GameConsole::ConsoleHandle>> consoles
     );
 
-    FixedLimitVector<ConsoleHandle> consoles;
+    ConsoleHandle& console(size_t index){
+        return static_cast<ConsoleHandle&>(GameConsole::MultiConsoleProgramEnvironment::console(index));
+    }
 
-    //  Run the specified lambda for all switches in parallel.
+
+public:
     void run_in_parallel(
         CancellableScope& scope,
         const std::function<void(CancellableScope& scope, ConsoleHandle& console)>& func
-    );
-    void run_in_parallel(   //  REMOVE: Temporary for refactor.
-        CancellableScope& scope,
-        const std::function<void(ConsoleHandle& console, ProControllerContext& context)>& func
-    );
-
-    //  Run the specified lambda for switch indices [s, e) in parallel.
+    ){
+        GameConsole::MultiConsoleProgramEnvironment::run_in_parallel<ConsoleHandle>(
+            scope, func
+        );
+    }
     void run_in_parallel(
         CancellableScope& scope, size_t s, size_t e,
         const std::function<void(CancellableScope& scope, ConsoleHandle& console)>& func
-    );
-    void run_in_parallel(   //  REMOVE: Temporary for refactor.
-        CancellableScope& scope, size_t s, size_t e,
-        const std::function<void(ConsoleHandle& console, ProControllerContext& context)>& func
-    );
+    ){
+        GameConsole::MultiConsoleProgramEnvironment::run_in_parallel<ConsoleHandle>(
+            scope, s, e, func
+        );
+    }
 
-    // add video overlay log on all console video streams
-    virtual void log_to_ui(const std::string& msg, Color color = Color()) override;
+    template <typename ControllerType>
+    void run_in_parallel(
+        CancellableScope& scope,
+        const std::function<void(ConsoleHandle& console, ControllerContext<ControllerType>& context)>& func
+    ){
+        GameConsole::MultiConsoleProgramEnvironment::run_in_parallel<ConsoleHandle, ControllerType>(
+            scope, func
+        );
+    }
+    template <typename ControllerType>
+    void run_in_parallel(
+        CancellableScope& scope, size_t s, size_t e,
+        const std::function<void(ConsoleHandle& console, ControllerContext<ControllerType>& context)>& func
+    ){
+        GameConsole::MultiConsoleProgramEnvironment::run_in_parallel<ConsoleHandle, ControllerType>(
+            scope, s, e, func
+        );
+    }
 };
 
 
 
-class MultiSwitchProgramDescriptor : public ProgramDescriptor{
+class MultiSwitchProgramDescriptor : public GameConsole::MultiConsoleProgramDescriptor{
 public:
     MultiSwitchProgramDescriptor(
         std::string identifier,
@@ -82,35 +96,14 @@ public:
         std::vector<std::string> required_resources = {}
     );
 
-    ProgramControllerClass controller_class() const{ return m_controller_class; }
-    FeedbackType feedback() const{ return m_feedback; }
-    bool allow_commands_while_running() const{ return m_allow_commands_while_running; }
-
-    size_t min_switches() const{ return m_min_switches; }
-    size_t max_switches() const{ return m_max_switches; }
-    size_t default_switches() const{ return m_default_switches; }
-
     virtual std::unique_ptr<PanelSession> make_panel() const override;
-    virtual std::unique_ptr<MultiSwitchProgramInstance> make_instance() const{ return nullptr; }
-
-private:
-    const ProgramControllerClass m_controller_class;
-    const FeedbackType m_feedback;
-    const bool m_allow_commands_while_running;
-
-    const size_t m_min_switches;
-    const size_t m_max_switches;
-    const size_t m_default_switches;
 };
 
 
 
-class MultiSwitchProgramInstance : public ProgramInstance{
+class MultiSwitchProgramInstance : public GameConsole::MultiConsoleProgramInstance{
 public:
-    using ProgramInstance::ProgramInstance;
-
-    //  Called when the # of Switches changes.
-    virtual void update_active_consoles(size_t switch_count){}
+    using GameConsole::MultiConsoleProgramInstance::MultiConsoleProgramInstance;
 
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) = 0;
 
@@ -118,22 +111,22 @@ public:
 public:
     //  Startup Checks: Feel free to override to change behavior.
 
-    virtual void start_program_controller_check(
-        GameConsole::ConsoleSystemSession& session, size_t console_index
-    );
-    virtual void start_program_feedback_check(
-        VideoStream& stream, size_t console_index,
-        FeedbackType feedback_type
-    );
+    virtual void run_start_program_checks(
+        const ProgramDescriptor& descriptor,
+        ProgramEnvironment& env
+    ) override;
     virtual void start_program_border_check(
         VideoStream& stream, size_t console_index,
         FeedbackType feedback_type
     );
+
+private:
+    virtual void program(GameConsole::MultiConsoleProgramEnvironment& env, CancellableScope& scope) override;
 };
 
 
 
-
+#if 0
 template <typename Instance>
 class MultiSwitchProgramWrapper : public Instance::Descriptor{
 public:
@@ -141,6 +134,11 @@ public:
         return std::unique_ptr<MultiSwitchProgramInstance>(new Instance());
     }
 };
+#endif
+
+
+template <typename Instance>
+using MultiSwitchProgramWrapper = GameConsole::MultiConsoleProgramWrapper<Instance>;
 
 template <typename Instance>
 std::unique_ptr<PanelDescriptor> make_MultiSwitchProgram(){

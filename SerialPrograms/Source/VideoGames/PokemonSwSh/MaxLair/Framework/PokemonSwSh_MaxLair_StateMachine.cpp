@@ -40,7 +40,7 @@ namespace MaxLairInternal{
 
 AdventureRuntime::~AdventureRuntime() = default;
 AdventureRuntime::AdventureRuntime(
-    FixedLimitVector<ConsoleHandle>& consoles,
+    MultiSwitchProgramEnvironment& env,
     const size_t p_host_index,
     const Consoles& p_console_settings,
     const EndBattleDecider& p_actions,
@@ -61,7 +61,7 @@ AdventureRuntime::AdventureRuntime(
     , session_stats(p_session_stats)
 {
     for (size_t c = 0; c < p_console_settings.active_consoles(); c++){
-        ocr_watchdog.emplace_back(consoles[c].logger(), console_settings.PLAYERS[c]->language);
+        ocr_watchdog.emplace_back(env.console(c).logger(), console_settings.PLAYERS[c]->language);
     }
 }
 

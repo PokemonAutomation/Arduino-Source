@@ -1217,8 +1217,6 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.h
-    Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchProgramWidget.cpp
-    Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchProgramWidget.h
     Source/NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.h
     Source/NintendoSwitch/Inference/NintendoSwitch_CheckOnlineDetector.cpp

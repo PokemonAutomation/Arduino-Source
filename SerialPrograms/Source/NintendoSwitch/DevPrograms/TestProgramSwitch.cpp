@@ -334,10 +334,10 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    using namespace PokemonFRLG;
 
     [[maybe_unused]] Logger& logger = env.logger();
-    [[maybe_unused]] ConsoleHandle& console = env.consoles[0];
-//    [[maybe_unused]] BotBase& botbase = env.consoles[0];
-    [[maybe_unused]] VideoFeed& feed = env.consoles[0];
-    [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
+    [[maybe_unused]] ConsoleHandle& console = env.console(0);
+//    [[maybe_unused]] BotBase& botbase = env.console(0);
+    [[maybe_unused]] VideoFeed& feed = env.console(0);
+    [[maybe_unused]] VideoOverlay& overlay = env.console(0);
 //    ProControllerContext context(scope, console.controller<ProController>());
     // JoyconContext context(scope, console.controller<JoyconController>());
     VideoOverlaySet overlays(overlay);

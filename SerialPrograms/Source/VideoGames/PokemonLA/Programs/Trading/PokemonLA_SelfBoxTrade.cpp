@@ -84,14 +84,14 @@ bool SelfBoxTrade::move_to_next(
 
     env.log("Moving to next slot.");
     if (col < 5){
-        env.run_in_parallel(scope, [](ConsoleHandle& console, ProControllerContext& context){
+        env.run_in_parallel<ProController>(scope, [](ConsoleHandle& console, ProControllerContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 160ms, 1120ms);
         });
         col++;
         return false;
     }
     if (row < 4){
-        env.run_in_parallel(scope, [](ConsoleHandle& console, ProControllerContext& context){
+        env.run_in_parallel<ProController>(scope, [](ConsoleHandle& console, ProControllerContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 160ms, 840ms);
             pbf_press_dpad(context, DPAD_RIGHT, 160ms, 840ms);
             pbf_press_dpad(context, DPAD_DOWN, 160ms, 1120ms);
@@ -100,7 +100,7 @@ bool SelfBoxTrade::move_to_next(
         row++;
         return false;
     }
-    env.run_in_parallel(scope, [](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [](ConsoleHandle& console, ProControllerContext& context){
         pbf_press_button(context, BUTTON_R, 160ms, 1840ms);
         pbf_press_dpad(context, DPAD_RIGHT, 160ms, 840ms);
         pbf_press_dpad(context, DPAD_RIGHT, 160ms, 840ms);
@@ -116,7 +116,7 @@ void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope&
     TradeStats& stats = env.current_stats<TradeStats>();
 
     //  Connect both controllers.
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         //  Connect the controller.
         require_player(console, context, BUTTON_LCLICK);
     });
@@ -129,11 +129,11 @@ void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope&
 
         //  Make sure both consoles have selected something.
         std::atomic<bool> ok(true);
-        OverlayBoxScope box0(env.consoles[0], {0.925, 0.100, 0.014, 0.030});
-        OverlayBoxScope box1(env.consoles[1], {0.925, 0.100, 0.014, 0.030});
-        TradeNameReader name_reader0(env.consoles[0], env.consoles[0], LANGUAGE_LEFT);
-        TradeNameReader name_reader1(env.consoles[1], env.consoles[1], LANGUAGE_RIGHT);
-        env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+        OverlayBoxScope box0(env.console(0), {0.925, 0.100, 0.014, 0.030});
+        OverlayBoxScope box1(env.console(1), {0.925, 0.100, 0.014, 0.030});
+        TradeNameReader name_reader0(env.console(0), env.console(0), LANGUAGE_LEFT);
+        TradeNameReader name_reader1(env.console(1), env.console(1), LANGUAGE_RIGHT);
+        env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
             auto snapshot = console.video().snapshot();
             ImageStats stats = image_stats(extract_box_reference(snapshot, box0));
             bool is_ok = is_white(stats);
@@ -154,7 +154,7 @@ void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope&
         if (ok.load(std::memory_order_acquire)){
             //  Perform trade.
             MultiConsoleErrorState error_state;
-            env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+            env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
                 trade_current_pokemon(console, context, error_state, stats);
             });
             stats.m_trades++;

@@ -372,7 +372,7 @@ bool TeraMultiFarmer::start_sequence_host(
     }
 
     raid_waiter.signal_raid_code_is_ready(lobby_code);
-    raid_waiter.wait_for_joiners(env.consoles.size() - 1);
+    raid_waiter.wait_for_joiners(env.consoles() - 1);
 
 #if 1
     //  Put it up on auto-host.
@@ -387,7 +387,7 @@ bool TeraMultiFarmer::start_sequence_host(
 
         TeraLobbyWaiter waiter(
             env, console, context,
-            (uint8_t)env.consoles.size(),
+            (uint8_t)env.consoles(),
             lobby_code, lobby_start_time,
             HOSTING_OPTIONS.LOBBY_WAIT_DELAY,
             HOSTING_OPTIONS.START_RAID_PLAYERS,
@@ -410,7 +410,7 @@ bool TeraMultiFarmer::start_sequence_host(
             return false;
         }
 
-        uint8_t hosts = (uint8_t)env.consoles.size();
+        uint8_t hosts = (uint8_t)env.consoles();
         uint8_t players = waiter.last_known_players();
         if (players > hosts){
             stats.m_joiners += players - hosts;
@@ -459,7 +459,7 @@ bool TeraMultiFarmer::run_raid(
     CancellableHolder<RaidWaiter> raid_waiter(scope);
     CancellableHolder<CancellableScope> joiner_scope((CancellableScope&)raid_waiter);
 
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         try{
             if (console.index() == host_index){
                 start_sequence_host(
@@ -506,7 +506,7 @@ bool TeraMultiFarmer::run_raid(
     bool win = false;
 
     //  Run the raid.
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         try{
             if (console.index() == host_index){
                 win = run_raid_host(env, console, context);
@@ -526,10 +526,10 @@ bool TeraMultiFarmer::run_raid(
 }
 void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     size_t host_index = HOSTING_SWITCH.current_value();
-    if (host_index >= env.consoles.size()){
+    if (host_index >= env.consoles()){
         throw UserSetupError(env.logger(), "The host Switch doesn't exist.");
     }
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         assert_16_9_720p_min(console.logger(), console);
         //  Connect the controller.
         require_player(console, context, BUTTON_LCLICK);
@@ -540,7 +540,7 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
 //    BotBaseContext host_context(scope, host_console.botbase());
 
     std::string report_name = "PokemonSV-AutoHost-JoinReport-" + now_to_filestring() + ".txt";
-    MultiLanguageJoinTracker join_tracker((uint8_t)env.consoles.size());
+    MultiLanguageJoinTracker join_tracker((uint8_t)env.consoles());
 
     m_reset_required[0].store(false, std::memory_order_relaxed);
     m_reset_required[1].store(false, std::memory_order_relaxed);
@@ -548,7 +548,7 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
     m_reset_required[3].store(false, std::memory_order_relaxed);
 
     if (RECOVERY_MODE == RecoveryMode::SAVE_AND_RESET){
-        env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+        env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
             if (console.index() != host_index){
                 //  Do 2 presses in quick succession in case one drops or is
                 //  needed to connect the controller.
@@ -579,7 +579,7 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
         }
 
         //  Reset all errored Switches.
-        env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+        env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
             size_t index = console.index();
             if (!m_reset_required[index].load(std::memory_order_relaxed)){
                 return;

@@ -46,13 +46,58 @@ public:
     void run_in_parallel(
         CancellableScope& scope,
         const std::function<void(CancellableScope& scope, ConsoleHandle& console)>& func
-    );
+    ){
+        run_in_parallel(scope, 0, m_consoles.size(), func);
+    }
 
     //  Run the specified lambda for switch indices [s, e) in parallel.
     void run_in_parallel(
         CancellableScope& scope, size_t s, size_t e,
         const std::function<void(CancellableScope& scope, ConsoleHandle& console)>& func
     );
+
+
+protected:
+    template <typename ConsoleHandleType>
+    void run_in_parallel(
+        CancellableScope& scope,
+        const std::function<void(CancellableScope& scope, ConsoleHandleType& console)>& func
+    ){
+        run_in_parallel<ConsoleHandleType>(scope, 0, m_consoles.size(), func);
+    }
+    template <typename ConsoleHandleType>
+    void run_in_parallel(
+        CancellableScope& scope, size_t s, size_t e,
+        const std::function<void(CancellableScope& scope, ConsoleHandleType& console)>& func
+    ){
+        GameConsole::MultiConsoleProgramEnvironment::run_in_parallel(
+            scope, s, e,
+            [&](CancellableScope& scope, ConsoleHandle& console){
+                func(scope, dynamic_cast<ConsoleHandleType&>(console));
+            }
+        );
+    }
+
+    template <typename ConsoleHandleType, typename ControllerType>
+    void run_in_parallel(
+        CancellableScope& scope,
+        const std::function<void(ConsoleHandleType& console, ControllerContext<ControllerType>& context)>& func
+    ){
+        run_in_parallel<ConsoleHandleType, ControllerType>(scope, 0, m_consoles.size(), func);
+    }
+    template <typename ConsoleHandleType, typename ControllerType>
+    void run_in_parallel(
+        CancellableScope& scope, size_t s, size_t e,
+        const std::function<void(ConsoleHandleType& console, ControllerContext<ControllerType>& context)>& func
+    ){
+        GameConsole::MultiConsoleProgramEnvironment::run_in_parallel(
+            scope, s, e,
+            [&](CancellableScope& scope, ConsoleHandle& console){
+                ControllerContext<ControllerType> context(scope, console.controller<ControllerType>());
+                func(dynamic_cast<ConsoleHandleType&>(console), context);
+            }
+        );
+    }
 
 
 private:

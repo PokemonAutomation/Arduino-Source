@@ -32,13 +32,13 @@ AdventureResult run_adventure(
     send_status_notification(env, runtime);
 
     std::shared_ptr<const ImageRGB32> entrance[4];
-    GlobalStateTracker state_tracker(scope, env.consoles.size());
+    GlobalStateTracker state_tracker(scope, env.consoles());
 
     if (!start_adventure(
         env, scope,
         state_tracker,
         entrance,
-        env.consoles[runtime.host_index], boss_slot,
+        env.console(runtime.host_index), boss_slot,
         runtime.hosting_settings,
         runtime.path_stats,
         runtime.session_stats,
@@ -54,7 +54,7 @@ AdventureResult run_adventure(
     std::atomic<bool> stop(false);
     std::atomic<bool> error(false);
 
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         StateMachineAction action;
         while (true){
             //  Dump current state, but don't spam if nothing has changed.
@@ -130,7 +130,7 @@ void loop_adventures(
     Stats& stats = env.current_stats<Stats>();
 
     AdventureRuntime runtime(
-        env.consoles,
+        env,
         host_index,
         consoles,
         decider,
@@ -145,7 +145,7 @@ void loop_adventures(
     while (true){
         //  Touch the date.
         if (TOUCH_DATE_INTERVAL.ok_to_touch_now()){
-            env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+            env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
                 env.log("Touching date to prevent rollover.");
                 pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
                 touch_date_from_home(console, context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
@@ -175,7 +175,7 @@ void loop_adventures(
                 );
             }
             env.log("Failed to start adventure. Resetting all Switches...", COLOR_RED);
-            env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+            env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
                 pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
                 reset_game_from_home_with_inference(console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             });

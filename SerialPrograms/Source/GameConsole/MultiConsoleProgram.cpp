@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/ScopeExit.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.h"
 #include "CommonFramework/Panels/PanelSession.h"
@@ -39,12 +40,6 @@ void MultiConsoleProgramEnvironment::log_to_ui(const std::string& msg, Color col
 }
 
 void MultiConsoleProgramEnvironment::run_in_parallel(
-    CancellableScope& scope,
-    const std::function<void(CancellableScope& scope, ConsoleHandle& console)>& func
-){
-    run_in_parallel(scope, 0, m_consoles.size(), func);
-}
-void MultiConsoleProgramEnvironment::run_in_parallel(
     CancellableScope& scope, size_t s, size_t e,
     const std::function<void(CancellableScope& scope, ConsoleHandle& console)>& func
 ){
@@ -53,14 +48,11 @@ void MultiConsoleProgramEnvironment::run_in_parallel(
             ConsoleHandle& console = *m_consoles[index];
             ThreadUtilizationStat stat(current_thread_handle(), "Program Thread " + std::to_string(index) + ":");
             console.overlay().add_stat(stat);
-            try{
-                func(scope, console);
-                console.controller().wait_for_all(&scope);
+            ScopeExit on_exit([&]{
                 console.overlay().remove_stat(stat);
-            }catch (...){
-                console.overlay().remove_stat(stat);
-                throw;
-            }
+            });
+            func(scope, console);
+            console.controller().wait_for_all(&scope);
         },
         s, e
     );

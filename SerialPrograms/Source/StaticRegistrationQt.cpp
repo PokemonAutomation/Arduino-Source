@@ -69,7 +69,6 @@
 //  Nintendo Switch
 #include "NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h"
 //#include "NintendoSwitch/Framework/UI/NintendoSwitch_SingleSwitchProgramWidget.h"
-#include "NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchProgramWidget.h"
 #include "NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.h"
 
 //  Pokemon LA
@@ -160,8 +159,6 @@ void register_all_statics(){
 
     //  Nintendo Switch
     RegisterUiStateQtWidget<SysbotBase::TcpSysbotBase_SelectorWidget>();
-//    RegisterUiStateQtWidget<NintendoSwitch::SingleSwitchProgramWidget2>();
-    RegisterUiStateQtWidget<NintendoSwitch::MultiSwitchProgramWidget2>();
     RegisterUiStateQtWidget<NintendoSwitch::FriendCodeListWidget>();
 
     //  Pokemon LA

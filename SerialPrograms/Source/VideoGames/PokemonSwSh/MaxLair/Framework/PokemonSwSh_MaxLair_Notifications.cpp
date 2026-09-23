@@ -45,7 +45,7 @@ void send_status_notification(
         status_str += "Current Path: " + str + "\n";
         embeds.emplace_back("Current Path:", std::move(str));
     }
-    for (size_t c = 0; c < env.consoles.size(); c++){
+    for (size_t c = 0; c < env.consoles(); c++){
         const ConsoleRuntime& stats = runtime.consoles[c];
         std::string label = "Console " + std::to_string(c) + ":";
         std::string str;

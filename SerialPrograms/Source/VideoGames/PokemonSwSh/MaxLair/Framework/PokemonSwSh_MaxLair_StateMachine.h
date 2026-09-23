@@ -14,6 +14,7 @@
 #include "CommonTools/FailureWatchdog.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_QuantityReader.h"
 #include "VideoGames/PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
 #include "VideoGames/PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Consoles.h"
@@ -57,7 +58,7 @@ struct ConsoleRuntime{
 struct AdventureRuntime{
     ~AdventureRuntime();
     AdventureRuntime(
-        FixedLimitVector<ConsoleHandle>& consoles,
+        MultiSwitchProgramEnvironment& env,
         const size_t p_host_index,
         const Consoles& p_console_settings,
         const EndBattleDecider& p_actions,

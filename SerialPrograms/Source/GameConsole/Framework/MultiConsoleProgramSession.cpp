@@ -92,7 +92,7 @@ void MultiConsoleProgramSession::load_json(const JsonValue& json){
 
 std::unique_ptr<ProgramEnvironment> MultiConsoleProgramSession::make_env(const ProgramInfo& program_info){
     size_t consoles = m_system.active_consoles();
-    std::vector<std::unique_ptr<ConsoleHandle>> handles(consoles);
+    std::vector<std::unique_ptr<ConsoleHandle>> handles;
     for (size_t c = 0; c < consoles; c++){
         ConsoleSystemSession& session = m_system[c];
         handles.emplace_back(std::make_unique<ConsoleHandle>(session));

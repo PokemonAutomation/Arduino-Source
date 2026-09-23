@@ -15,9 +15,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_MultiSwitchProgramSession_H
 #define PokemonAutomation_NintendoSwitch_MultiSwitchProgramSession_H
 
-#include "CommonFramework/Panels/PanelSession.h"
-#include "CommonFramework/ProgramSession.h"
-#include "GameConsole/Framework/MultiConsoleSystemSession.h"
+#include "GameConsole/Framework/MultiConsoleProgramSession.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -26,58 +24,16 @@ namespace NintendoSwitch{
 class MultiSwitchProgramOption;
 
 
-class MultiSwitchProgramSession final
-    : public UiState<MultiSwitchProgramSession, PanelSession>
-    , public ProgramSession
-    , private GameConsole::MultiConsoleSystemSession::Listener
-{
+class MultiSwitchProgramSession final : public GameConsole::MultiConsoleProgramSession{
 public:
-    //  This is temporary. Remove once configs have push notifications.
-    struct Listener{
-        virtual void redraw_options() = 0;
-    };
-    void add_listener(Listener& listener);
-    void remove_listener(Listener& listener);
-
-
-public:
-    bool try_shutdown();
     ~MultiSwitchProgramSession();
     MultiSwitchProgramSession(const MultiSwitchProgramDescriptor& descriptor);
 
-
-public:
-    const MultiSwitchProgramDescriptor& descriptor() const{ return m_descriptor; }
-    GameConsole::MultiConsoleSystemSession& system(){ return m_system; }
-    ConfigOption& options();
-
-
 private:
     virtual std::unique_ptr<ProgramEnvironment> make_env(const ProgramInfo& program_info) override;
-    virtual void internal_run_program(ProgramEnvironment& env) override;
-
-    virtual void on_console_count_lock(bool locked) override{}
-    virtual void shutdown() override;
-    virtual void startup(size_t switch_count) override;
-
-
-public:
-    virtual std::string check_validity() const override;
-    virtual void restore_defaults() override;
-    virtual JsonValue to_json() const override;
-    virtual void load_json(const JsonValue& json) override;
-
 
 private:
-
     const MultiSwitchProgramDescriptor& m_descriptor;
-
-    GameConsole::MultiConsoleSystemOption m_system_option;
-    GameConsole::MultiConsoleSystemSession m_system;
-
-    ListenerSet<Listener> m_listeners;
-
-    LifetimeSanitizer m_sanitizer;
 };
 
 
