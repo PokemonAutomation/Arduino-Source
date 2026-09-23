@@ -32,7 +32,6 @@ MultiSwitchProgramSession::MultiSwitchProgramSession(const MultiSwitchProgramDes
             }
         )
     )
-    , m_descriptor(descriptor)
 {}
 MultiSwitchProgramSession::~MultiSwitchProgramSession(){
     blocking_shutdown(

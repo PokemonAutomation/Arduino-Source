@@ -31,9 +31,6 @@ public:
 
 private:
     virtual std::unique_ptr<ProgramEnvironment> make_env(const ProgramInfo& program_info) override;
-
-private:
-    const MultiSwitchProgramDescriptor& m_descriptor;
 };
 
 
