@@ -18,6 +18,8 @@ void add_tests(UnitTestDatabase& database);
 
 void add_tests_raw_OCR(UnitTestDatabase& database);
 
+void add_tests_number_waterfill_OCR(UnitTestDatabase& database);
+
 
 
 }

@@ -6,8 +6,10 @@
 
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 // #include "Common/Cpp/Strings/Unicode.h"
+#include "CommonTools/OCR/OCR_NumberReader.h"
 #include "OCR_Routines.h"
 #include "OCR_StringNormalization.h"
 #include "OCR_Tests.h"
@@ -23,6 +25,7 @@ namespace OCR{
 
 void add_tests(UnitTestDatabase& database){
     add_tests_raw_OCR(database);
+    add_tests_number_waterfill_OCR(database);
 }
 
 class Test_RawOCR : public UnitTest{
@@ -53,6 +56,42 @@ private:
     std::string m_expected;
 };
 
+class Test_NumberWaterfillOCR : public UnitTest{
+public:
+    Test_NumberWaterfillOCR(
+        const std::string& image_path,
+        int expected,
+        uint32_t rgb32_min, uint32_t rgb32_max,
+        bool text_inside_range
+    )
+        : UnitTest("OCR::NumberWaterfillOCR - " + image_path)
+        , m_image_path(UNIT_TEST_RESOURCE_PATH() + image_path)
+        , m_expected(expected)
+        , m_rgb32_min(rgb32_min)
+        , m_rgb32_max(rgb32_max)
+        , m_text_inside_range(text_inside_range)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        ImageRGB32 image(m_image_path);
+
+        int result = OCR::read_number_waterfill(
+            logger, image,
+            0xff000000, 0xffff7fff, true
+        );
+        // logger.log("Raw OCR read: " + std::to_string(result));
+
+        return result == m_expected;
+    };
+
+private:
+    std::string m_image_path;
+    int m_expected;
+    uint32_t m_rgb32_min;
+    uint32_t m_rgb32_max;
+    bool m_text_inside_range;
+};
+
 void add_tests_raw_OCR(UnitTestDatabase& database){
     database.add<Test_RawOCR>("OCR/letter-i-tall-1.jpg", Language::English, "I");
     database.add<Test_RawOCR>("OCR/letter-i-tall-2.jpg", Language::English, "I");
@@ -75,6 +114,11 @@ void add_tests_raw_OCR(UnitTestDatabase& database){
     database.add<Test_RawOCR>("OCR/Lv.1-4.png", Language::English, "Lv. 1");
     database.add<Test_RawOCR>("OCR/Lv.1-5.png", Language::English, "Lv. 1");
     database.add<Test_RawOCR>("OCR/dash.png", Language::English, "---");
+}
+
+
+void add_tests_number_waterfill_OCR(UnitTestDatabase& database){
+    database.add<Test_NumberWaterfillOCR>("OCR/date-1.png", 11, 0xff000000, 0xffff7fff, true);
 }
 
 
