@@ -39,6 +39,7 @@ struct CollectedPokemonInfo{
     PokemonType secondary_type = PokemonType::NONE;
     PokemonTeraType tera_type = PokemonTeraType::NONE;
     OriginMark origin_mark = OriginMark::NONE;
+    std::string language_of_origin = "";
 };
 
 bool operator==(const CollectedPokemonInfo& lhs, const CollectedPokemonInfo& rhs);

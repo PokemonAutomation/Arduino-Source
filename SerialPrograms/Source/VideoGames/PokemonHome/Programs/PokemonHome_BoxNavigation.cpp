@@ -301,6 +301,8 @@ void read_summary_screen(
 
     cur_pokemon_info.origin_mark = origin_mark_reader.read_mark(screen);
 
+    cur_pokemon_info.language_of_origin = summary_reader.read_language_of_origin(screen);
+
     env.log_to_ui(create_overlay_info(cur_pokemon_info));
     video_overlay_set.clear();
 
