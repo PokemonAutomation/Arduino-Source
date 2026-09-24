@@ -18,7 +18,7 @@
 #include "VideoGames/PokemonSwSh/PokemonSwSh_Panels.h"
 #include "VideoGames/PokemonHome/PokemonHome_Panels.h"
 #include "PokemonBDSP/PokemonBDSP_Panels.h"
-#include "PokemonFRLG/PokemonFRLG_Panels.h"
+#include "VideoGames/PokemonFRLG/PokemonFRLG_Panels.h"
 #include "VideoGames/PokemonLA/PokemonLA_Panels.h"
 #include "VideoGames/PokemonLGPE/PokemonLGPE_Panels.h"
 #include "VideoGames/PokemonRSE/PokemonRSE_Panels.h"

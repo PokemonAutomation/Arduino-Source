@@ -18,7 +18,7 @@
 
 #include "CommonTools/OCR/OCR_Tests.h"
 #include "Kernels/Kernels_Tests.h"
-#include "PokemonFRLG/PokemonFRLG_Tests.h"
+#include "VideoGames/PokemonFRLG/PokemonFRLG_Tests.h"
 #include "VideoGames/PokemonRSE/PokemonRSE_Tests.h"
 #include "VideoGames/PokemonHome/PokemonHome_Tests.h"
 #include "VideoGames/PokemonSwSh/PokemonSwSh_Tests.h"

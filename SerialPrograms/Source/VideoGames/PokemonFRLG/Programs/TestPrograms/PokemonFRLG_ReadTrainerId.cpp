@@ -1,0 +1,90 @@
+/*  Read Trainer ID
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#include <chrono>
+#include <string>
+#include <optional>
+#include "Common/Cpp/Color.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Pokemon_Strings.h"
+#include "Pokemon/Inference/Pokemon_NameReader.h"
+#include "VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_TrainerCardDetector.h"
+#include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_TrainerIdReader.h"
+#include "PokemonFRLG_ReadTrainerId.h"
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonFRLG{
+
+using namespace std::chrono_literals;
+
+
+ReadTrainerId_Descriptor::ReadTrainerId_Descriptor()
+    : SingleSwitchProgramDescriptor(
+        "PokemonFRLG:ReadTrainerId",
+        Pokemon::STRING_POKEMON + " FRLG",
+        "Read TID", "",
+        "Read TID from the trainer card.",
+        ProgramControllerClass::StandardController_NoRestrictions,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
+){}
+
+ReadTrainerId::ReadTrainerId()
+    : LANGUAGE(
+        "<b>Game Language:</b><br>"
+        "Language affects the number of advances (based on the number of text characters) that pass after the last button press.",
+        {
+            Language::English,
+            Language::Japanese,
+            Language::Spanish,
+            Language::French,
+            Language::German,
+            Language::Italian,
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        true
+    )
+{
+    PA_ADD_OPTION(LANGUAGE);
+}
+
+void ReadTrainerId::program(
+    SingleSwitchProgramEnvironment &env,
+    CancellableScope& scope
+){
+    env.log(
+        "Starting Read Trainer ID program... Please ensure you are on the Trainer Card."
+    );
+
+    TrainerCardDetector detector(COLOR_RED);
+    TrainerIdReader reader;
+    VideoOverlaySet overlays(env.console.overlay());
+    detector.make_overlays(overlays);
+    reader.make_overlays(overlays);
+
+    VideoSnapshot screen = env.console.video().snapshot();
+    bool trainercard = detector.detect(screen);
+    if (trainercard){
+        env.log("Trainer Card detected.", COLOR_BLUE);
+    }else{
+        env.log("Trainer Card not detected!", COLOR_RED);
+    }
+    env.log("Reading TID...");
+    uint16_t tid = reader.read_tid(env.logger(), LANGUAGE, screen);
+    env.log("TID: " + std::to_string(tid));
+
+    env.log("Finished Reading TID. Verification boxes are on overlay.",
+                    COLOR_BLUE);
+    scope.wait_for(10s);
+}
+
+} // namespace PokemonFRLG
+} // namespace NintendoSwitch
+} // namespace PokemonAutomation
+
