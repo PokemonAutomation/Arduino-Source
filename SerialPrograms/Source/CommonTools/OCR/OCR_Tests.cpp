@@ -77,7 +77,7 @@ public:
 
         int result = OCR::read_number_waterfill(
             logger, image,
-            0xff000000, 0xffff7fff, true
+            m_rgb32_min, m_rgb32_max, m_text_inside_range
         );
         // logger.log("Raw OCR read: " + std::to_string(result));
 
