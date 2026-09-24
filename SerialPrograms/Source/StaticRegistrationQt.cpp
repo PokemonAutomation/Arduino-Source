@@ -46,9 +46,6 @@
 #include "CommonTools/Options/QtWidgets/ScreenWatchWidget.h"
 #include "CommonTools/Options/QtWidgets/LanguageOCRWidget.h"
 
-//  ML
-#include "ML/Programs/ML_LabelImagesWidget.h"
-
 //  Computer Programs
 #include "ComputerPrograms/Framework/ComputerProgramWidget.h"
 
@@ -136,9 +133,6 @@ void register_all_statics(){
     RegisterUiStateQtWidget<ScreenWatchWidget>();
     RegisterUiStateQtWidget<OCR::LanguageOCRCellWidget>();
     RegisterUiStateQtWidget<OCR::LanguageOCROptionWidget>();
-
-    //  ML
-    RegisterUiStateQtWidget<ML::LabelImages_Widget>();
 
     //  Computer Programs
     RegisterUiStateQtWidget<ComputerProgramWidget>();

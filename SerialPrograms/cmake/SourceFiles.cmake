@@ -1175,20 +1175,8 @@ file(GLOB LIBRARY_SOURCES
     Source/ML/Programs/ML_LabelImages.h
     Source/ML/Programs/ML_LabelImagesOverlayManager.cpp
     Source/ML/Programs/ML_LabelImagesOverlayManager.h
-    Source/ML/Programs/ML_LabelImagesWidget.cpp
-    Source/ML/Programs/ML_LabelImagesWidget.h
     Source/ML/Programs/ML_RunYOLO.cpp
     Source/ML/Programs/ML_RunYOLO.h
-    Source/ML/UI/ML_ImageAnnotationCommandRow.cpp
-    Source/ML/UI/ML_ImageAnnotationCommandRow.h
-    Source/ML/UI/ML_ImageAnnotationDisplayOption.cpp
-    Source/ML/UI/ML_ImageAnnotationDisplayOption.h
-    Source/ML/UI/ML_ImageAnnotationDisplaySession.cpp
-    Source/ML/UI/ML_ImageAnnotationDisplaySession.h
-    Source/ML/UI/ML_ImageAnnotationDisplayWidget.cpp
-    Source/ML/UI/ML_ImageAnnotationDisplayWidget.h
-    Source/ML/UI/ML_ImageAnnotationSourceSelectorWidget.cpp
-    Source/ML/UI/ML_ImageAnnotationSourceSelectorWidget.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.cpp

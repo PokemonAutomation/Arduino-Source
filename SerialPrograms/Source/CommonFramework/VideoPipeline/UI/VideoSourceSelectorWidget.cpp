@@ -125,6 +125,10 @@ VideoSourceSelectorWidget::VideoSourceSelectorWidget(Logger& logger, VideoSessio
 
 
 
+void VideoSourceSelectorWidget::set_reset_button_text(const std::string& text){
+    m_reset_button->setText(QString::fromStdString(text));
+}
+
 void VideoSourceSelectorWidget::update_source_list(){
     m_sources_box->clear();
     m_sources.clear();

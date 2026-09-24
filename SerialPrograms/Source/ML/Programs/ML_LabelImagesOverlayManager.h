@@ -16,6 +16,7 @@
 
 
 namespace PokemonAutomation{
+    class VideoOverlay;
 namespace ML{
 
 class LabelImages;
@@ -23,7 +24,10 @@ class LabelImages;
 
 class LabelImages_OverlayManager{
 public:
-    LabelImages_OverlayManager(LabelImages& proram);
+    //  `overlay` is the video overlay the annotations are drawn on. For this
+    //  program that is the overlay of the console whose video display is showing
+    //  the image being labeled.
+    LabelImages_OverlayManager(LabelImages& program, VideoOverlay& overlay);
 
     // clear all data to prepare for a new image to label
     void clear();
