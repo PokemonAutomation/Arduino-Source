@@ -27,7 +27,7 @@ public:
     int read_national_dex(Logger& logger, const ImageViewRGB32& screen) const;
     int read_original_trainer_id(Logger& logger, const ImageViewRGB32& screen) const;
     std::string read_original_trainer_name(Language language, const ImageViewRGB32& screen) const;
-    std::string read_nature(Language language, const ImageViewRGB32& screen) const;
+    std::string read_nature(Logger& logger, Language language, const ImageViewRGB32& screen) const;
     std::string read_ability(Language language, const ImageViewRGB32& screen) const;
     std::string read_language_of_origin(const ImageViewRGB32& screen) const;
     int read_level(Logger& logger, const ImageViewRGB32& screen) const;

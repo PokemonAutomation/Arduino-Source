@@ -90,6 +90,21 @@ BoxSorter::BoxSorter()
         LockMode::LOCK_WHILE_RUNNING,
         1, 1, MAX_HOME_BOXES
     )
+    , HOME_LANGUAGE(
+        "<b>Home Language:</b>",
+        {
+            Language::English,
+            Language::Japanese,
+            Language::Spanish,
+            Language::French,
+            Language::German,
+            Language::Italian,
+            Language::Korean,
+            Language::ChineseSimplified,
+            Language::ChineseTraditional,
+        },
+        LockMode::LOCK_WHILE_RUNNING
+    )
     , VIDEO_DELAY(
           "<b>Capture Card Delay:</b>",
           LockMode::LOCK_WHILE_RUNNING,
@@ -120,6 +135,7 @@ BoxSorter::BoxSorter()
     })
 {
     PA_ADD_OPTION(BOX_NUMBER); //number of box to check and sort
+    PA_ADD_OPTION(HOME_LANGUAGE);
     PA_ADD_OPTION(VIDEO_DELAY); //delay for every input that need video feedback, user will be able to modify this to enhance capture card delay compatibility
     PA_ADD_OPTION(GAME_DELAY);  //delay for non video feedback, this way I can go as fast as pokemon home can handle movement when needed
     PA_ADD_OPTION(SORT_TABLE);
@@ -266,7 +282,7 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                     }
 
                     // Read the summary screen and assign data to boxes_data[global_idx]
-                    read_summary_screen(env, context, boxes_data[global_idx].value());
+                    read_summary_screen(env, context, boxes_data[global_idx].value(), Language::None, HOME_LANGUAGE);
                 }
             }
 

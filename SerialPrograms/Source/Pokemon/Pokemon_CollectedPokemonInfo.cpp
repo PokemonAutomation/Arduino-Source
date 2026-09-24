@@ -21,6 +21,7 @@ bool operator==(const CollectedPokemonInfo& lhs, const CollectedPokemonInfo& rhs
     // NOTE edit when adding new struct members
     return lhs.dex_number == rhs.dex_number &&
            lhs.name_slug == rhs.name_slug &&
+           lhs.nature == rhs.nature &&
            lhs.shiny == rhs.shiny &&
            lhs.gmax == rhs.gmax &&
            lhs.alpha == rhs.alpha &&
@@ -31,7 +32,8 @@ bool operator==(const CollectedPokemonInfo& lhs, const CollectedPokemonInfo& rhs
            lhs.primary_type == rhs.primary_type &&
            lhs.secondary_type == rhs.secondary_type &&
            lhs.tera_type == rhs.tera_type &&
-           lhs.origin_mark == rhs.origin_mark;
+           lhs.origin_mark == rhs.origin_mark &&
+           lhs.language_of_origin == rhs.language_of_origin;
 }
 
 
@@ -95,6 +97,16 @@ bool operator<(const std::optional<CollectedPokemonInfo>& lhs, const std::option
                 return (lhs->origin_mark < rhs->origin_mark) != preference.reverse;
             }
             break;
+        case SortingRuleType::Nature:
+            if (lhs->nature != rhs->nature){
+                return (lhs->nature < rhs->nature) != preference.reverse;
+            }
+            break;
+        case SortingRuleType::Language_of_Origin:
+            if (lhs->language_of_origin != rhs->language_of_origin){
+                return (lhs->language_of_origin < rhs->language_of_origin) != preference.reverse;
+            }
+            break;
         default:
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "unknown SortingRuleType");
         } // end switch
@@ -117,10 +129,12 @@ std::ostream& operator<<(std::ostream& os, const std::optional<CollectedPokemonI
         os << "gender:" << gender_to_string(pokemon->gender) << " ";
         os << "ot_id:" << pokemon->ot_id << " ";
         os << "ot_name:" << pokemon->ot_name << " ";
+        os << "nature:" << pokemon->nature << " ";
         os << "primaryType:" << POKEMON_TYPE_SLUGS().get_string(pokemon->primary_type) << " ";
         os << "secondaryType:" << POKEMON_TYPE_SLUGS().get_string(pokemon->secondary_type) << " ";
         os << "teraType:" << POKEMON_TERA_TYPE_SLUGS().get_string(pokemon->tera_type) << " ";
         os << "originMark:" << ORIGIN_MARK_SLUGS().get_string(pokemon->origin_mark) << " ";
+        os << "languageOfOrigin:" << pokemon->language_of_origin << " ";
         os << ")";
     }else{
         os << "(empty)";
@@ -172,10 +186,12 @@ void save_boxes_data_to_json(const std::vector<std::optional<CollectedPokemonInf
             pokemon["gender"] = gender_to_string(current_pokemon->gender);
             pokemon["ot_id"] = current_pokemon->ot_id;
             pokemon["ot_name"] = current_pokemon->ot_name;
+            pokemon["nature"] = current_pokemon->nature;
             pokemon["primary_type"] = POKEMON_TYPE_SLUGS().get_string(current_pokemon->primary_type);
             pokemon["secondary_type"] = POKEMON_TYPE_SLUGS().get_string(current_pokemon->secondary_type);
             pokemon["tera_type"] = POKEMON_TERA_TYPE_SLUGS().get_string(current_pokemon->tera_type);
             pokemon["origin_mark"] = ORIGIN_MARK_SLUGS().get_string(current_pokemon->origin_mark);
+            pokemon["language_of_origin"] = current_pokemon->language_of_origin;
         }
         pokemon_data.push_back(std::move(pokemon));
     }

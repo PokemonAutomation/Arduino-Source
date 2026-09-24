@@ -221,7 +221,7 @@ std::array<size_t, 2> find_occupied_slots_in_box(
 // Read the current summary screen and assign various pokemon info into `cur_pokemon_info`
 void read_summary_screen(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-    CollectedPokemonInfo& cur_pokemon_info, Language ot_name_language
+    CollectedPokemonInfo& cur_pokemon_info, Language ot_name_language, Language home_language
 ) {
     VideoOverlaySet video_overlay_set(env.console);
 
@@ -293,7 +293,15 @@ void read_summary_screen(
         ot_name_language, screen
     );
 
+    if (home_language != Language::None){
+        cur_pokemon_info.nature = summary_reader.read_nature(
+            env.console, home_language, screen
+        );
+    }
+
     cur_pokemon_info.origin_mark = origin_mark_reader.read_mark(screen);
+
+    cur_pokemon_info.language_of_origin = summary_reader.read_language_of_origin(screen);
 
     env.log_to_ui(create_overlay_info(cur_pokemon_info));
     video_overlay_set.clear();
