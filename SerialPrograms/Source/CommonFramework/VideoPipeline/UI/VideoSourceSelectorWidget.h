@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_VideoPipeline_VideoSourceSelectorWidget_H
 #define PokemonAutomation_VideoPipeline_VideoSourceSelectorWidget_H
 
+#include <string>
 #include <vector>
 #include <QWidget>
 #include "CommonFramework/VideoPipeline/VideoSession.h"
@@ -24,6 +25,12 @@ class VideoSourceSelectorWidget : public QWidget, public VideoSession::StateList
 public:
     ~VideoSourceSelectorWidget();
     VideoSourceSelectorWidget(Logger& logger, VideoSession& session);
+
+    //  Change the label on the button that resets the video source. It says
+    //  "Reset Video" unless someone calls this. A panel that shows something
+    //  other than a live console can use this to name the button after what it
+    //  is actually showing, e.g. "Reset Image" for image labeling.
+    void set_reset_button_text(const std::string& text);
 
 
 private:

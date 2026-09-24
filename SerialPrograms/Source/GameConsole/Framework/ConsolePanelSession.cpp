@@ -30,7 +30,9 @@ ConsolePanelSession::ConsolePanelSession(const ConsolePanelDescriptor& descripto
     , m_system_option(descriptor.num_controllers())
     , m_system(m_system_option, true, 0)
     , m_instance(descriptor.make_instance(m_system))
-{}
+{
+    m_system.set_video_reset_button_text(descriptor.video_reset_button_text());
+}
 
 ConfigOption& ConsolePanelSession::options(){
     return m_instance->m_options;
