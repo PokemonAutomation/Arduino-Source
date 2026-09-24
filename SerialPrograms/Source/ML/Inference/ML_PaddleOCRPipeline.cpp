@@ -152,6 +152,7 @@ void PaddleOCRPipeline::load_dictionary(const Filesystem::Path& path){
 std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
 
     const bool debugging = STATIC_GLOBALS.PADDLE_OCR_DEBUG;
+    m_index++;
 
     // 1. Convert Image to OpenCV image (cv::mat)
     cv::Mat cv_image_rgb = imageviewrgb32_to_cv_mat_rgb(image);
@@ -162,14 +163,12 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
 
     
     // 2. Crop tightly around the text, with small safety margin
-    cv::Mat cropped_image = crop_to_text_region_with_padding(cv_image_rgb);
+    cv::Mat cropped_image = crop_to_text_region_with_padding(cv_image_rgb, m_index);
     if (cropped_image.empty()){
         m_logger.log("[OCR-DEBUG] Crop to text region returned empty image.");
         return "";
     }
 
-    // add horizontal padding to tall/narrow characters
-    add_horizontal_padding(cropped_image);
 
     // 3. Calculate dynamic width (maintain aspect ratio)
     // the model shape is {1, 3, 48, dynamic_width}. Note that the height is fixed at 48 pixels
@@ -309,25 +308,10 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     
 }
 
-cv::Mat crop_to_text_region_with_padding(const cv::Mat& image) {
-    // first convert to grayscale
-    cv::Mat gray;
-    cv::cvtColor(image, gray, cv::COLOR_RGB2GRAY);
 
+cv::Mat crop_to_text_region_with_padding(const cv::Mat& image, int image_index) {
     // get a binary image, for cropping purposes
-    cv::Mat binary;
-    cv::threshold(gray, binary, 0, 255,
-                cv::THRESH_BINARY_INV | cv::THRESH_OTSU);
-
-    double ratio = cv::countNonZero(binary) /
-                static_cast<double>(binary.total());
-
-    // we want text pixels to be white for the next step
-    // If most pixels are white, Otsu likely classified the background as foreground.
-    // Flip it so text becomes white again.
-    if (ratio > 0.5){
-        cv::bitwise_not(binary, binary);
-    }                
+    cv::Mat binary = get_binary_image(image);
 
     // Find coordinates of all non-zero pixels (the text)
     std::vector<cv::Point> nonZeroCoords;
@@ -350,8 +334,6 @@ cv::Mat crop_to_text_region_with_padding(const cv::Mat& image) {
     int pad_y = std::max(2, bbox.height / 10);  // ~10%
 
 
-    static int i = 0;
-    i++;
     cv::Mat cropped_image;
     if (top_gap >= pad_y && bottom_gap >= pad_y && left_gap >= pad_x && right_gap >= pad_x){
         // Original image has plenty of padding.
@@ -383,7 +365,7 @@ cv::Mat crop_to_text_region_with_padding(const cv::Mat& image) {
         );
 
         if (STATIC_GLOBALS.PADDLE_OCR_DEBUG_IMAGE){
-            cv::imwrite(std::to_string(i) + "-padded" + ".png", padded_image);
+            cv::imwrite(std::to_string(image_index) + "-padded" + ".png", padded_image);
         }
 
         cv::Rect final_crop(
@@ -400,14 +382,142 @@ cv::Mat crop_to_text_region_with_padding(const cv::Mat& image) {
     }
 
     if (STATIC_GLOBALS.PADDLE_OCR_DEBUG_IMAGE){
-        cv::imwrite(std::to_string(i) + "-binary" + ".png", binary);
-        cv::imwrite(std::to_string(i) + "-cropped_image" +".png", cropped_image);
+        cv::imwrite(std::to_string(image_index) + "-binary" + ".png", binary);
+        cv::imwrite(std::to_string(image_index) + "-cropped_image" +".png", cropped_image);
     }
+
+    // add horizontal padding to tall/narrow characters
+    add_horizontal_padding(cropped_image, image_index);
+
+    add_vertical_padding(cropped_image, binary, bbox, image_index);
+
 
     return cropped_image;
 }
 
-void add_horizontal_padding(cv::Mat& image){
+cv::Mat get_binary_image(const cv::Mat& image){
+    // first convert to grayscale
+    cv::Mat gray;
+    cv::cvtColor(image, gray, cv::COLOR_RGB2GRAY);
+    cv::Mat binary;
+    cv::threshold(gray, binary, 0, 255,
+                cv::THRESH_BINARY_INV | cv::THRESH_OTSU);
+
+    double ratio = cv::countNonZero(binary) /
+                static_cast<double>(binary.total());
+
+    // we want text pixels to be white for the next step
+    // If most pixels are white, Otsu likely classified the background as foreground.
+    // Flip it so text becomes white again.
+    if (ratio > 0.5){
+        cv::bitwise_not(binary, binary);
+    }
+
+    return binary;
+}
+
+
+void add_vertical_padding(cv::Mat& image, const cv::Mat& binary, cv::Rect tight_box, int image_index){
+    if (image.empty()) {
+        return;
+    }
+
+    int h = tight_box.height;
+    int w = tight_box.width;
+
+    if (is_horizontal_line(binary, tight_box, image_index)){
+        cout << "Input image is likely just a horizontal line." << endl;
+        cv::Scalar bg = estimate_background_color(image);
+
+        int target_h = static_cast<int>(std::ceil(w / 2));
+        int top = (target_h - h) / 2;
+        int bottom = target_h - h - top;
+        cv::Mat padded_image;
+        cv::copyMakeBorder(
+            image,
+            padded_image,
+            top, bottom,              // no vertical padding
+            0, 0,              // no horizontal padding
+            cv::BORDER_CONSTANT,
+            bg
+        );
+        image = padded_image;
+
+        if (STATIC_GLOBALS.PADDLE_OCR_DEBUG_IMAGE){
+            cv::imwrite(std::to_string(image_index) + "-vertic-padded" + ".png", image);
+        }
+    }
+
+}
+
+bool is_horizontal_line(const cv::Mat& binary, cv::Rect tight_box, int image_index){
+
+    int h = tight_box.height;
+    int w = tight_box.width;
+    constexpr float min_ratio = 4.0f;
+    if (h <= 0 || (float)w / h < min_ratio) {
+        return false;
+    }
+
+    // Find all contours
+    std::vector<std::vector<cv::Point>> contours;
+    std::vector<cv::Vec4i> hierarchy;
+    cv::findContours(binary, contours, hierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+
+    for (size_t i = 0; i < contours.size(); ++i) {
+        if (STATIC_GLOBALS.PADDLE_OCR_DEBUG_IMAGE){
+            cv::Mat contour_image = binary(cv::boundingRect(contours[i])).clone();
+            cv::imwrite(std::to_string(image_index) + "-contour_image-" + std::to_string(i) + ".png", contour_image);
+        }
+
+        if (!is_line_shape(binary, contours[i])) {
+            cout << "Input image is likely NOT a horizontal line." << endl;
+
+            return false;
+            // std::cout << "Contour #" << i << " matches the criteria!" << std::endl;
+        }
+    }
+
+
+    return true;
+}
+
+bool is_line_shape(const cv::Mat& binary, const std::vector<cv::Point>& contour){
+    
+    cv::Mat cropped_binary = binary(cv::boundingRect(contour)).clone();
+    double area = cv::countNonZero(cropped_binary);
+    
+    // Safety check to avoid division by zero on tiny noise artifacts
+    if (area <= 0) {
+        return false;
+    }
+
+    // 2. Get the straight bounding box
+    cv::Rect rect = cv::boundingRect(contour);
+    double width = static_cast<double>(rect.width);
+    double height = static_cast<double>(rect.height);
+
+    // 3. Calculate Aspect Ratio (Width / Height)
+    double aspectRatio = width / height;
+
+    // 4. Calculate Bounding Box Density (Area / Bounding Box Area)
+    double bboxArea = width * height;
+    double density = area / bboxArea;
+
+    cout << "area: " << std::to_string(area) << endl;
+    cout << "bboxArea: " << std::to_string(bboxArea) << endl;
+    cout << "Density: " << std::to_string(density) << endl;
+    cout << "aspectRatio: " << std::to_string(aspectRatio) << endl;
+    
+
+
+    // 5. Evaluate both conditions
+    // - Density must be greater than 75%
+    // - Aspect ratio must be greater than 2 (at least twice as wide as it is tall)
+    return (density > 0.75) && (aspectRatio > 2.0);
+}
+
+void add_horizontal_padding(cv::Mat& image, int image_index){
     if (image.empty()) {
         return;
     }
@@ -437,12 +547,12 @@ void add_horizontal_padding(cv::Mat& image){
     }
 
     if (STATIC_GLOBALS.PADDLE_OCR_DEBUG_IMAGE){
-        static int i = 0;
-        i++;
-        cv::imwrite(std::to_string(i) + "-horiz-padded" + ".png", image);
+        cv::imwrite(std::to_string(image_index) + "-horiz-padded" + ".png", image);
     }
 
 }
+
+
 
 cv::Scalar estimate_background_color(const cv::Mat& image) {
     if (image.empty() || image.type() != CV_8UC3) {
