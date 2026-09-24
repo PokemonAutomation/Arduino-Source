@@ -67,11 +67,14 @@ void add_horizontal_padding(cv::Mat& image, int image_index);
 // if the image is just a line, add vertical padding
 // modifies the input image
 // to avoid PaddleOCR hallucinating text
-void add_vertical_padding(cv::Mat& image, const cv::Mat& binary, cv::Rect tight_box, int image_index);
+void add_vertical_padding(cv::Mat& image, const cv::Mat& binary_tight_crop, int image_index);
 
 // from given binary image, returns true if it's a horizontal line
-bool is_horizontal_line(const cv::Mat& binary, cv::Rect tight_box, int image_index);
+bool is_horizontal_line(const cv::Mat& binary, int image_index);
 
+// from given binary image, and single contour within the binary image,
+// return true if the given contour is line shaped. 
+// density of the contour must be >75%. and at least twice as wide as it is tall
 bool is_line_shape(const cv::Mat& binary, const std::vector<cv::Point>& contour);
 
 // assumes input image is RGB

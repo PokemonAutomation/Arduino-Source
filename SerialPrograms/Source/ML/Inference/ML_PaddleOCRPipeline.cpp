@@ -389,7 +389,8 @@ cv::Mat crop_to_text_region_with_padding(const cv::Mat& image, int image_index) 
     // add horizontal padding to tall/narrow characters
     add_horizontal_padding(cropped_image, image_index);
 
-    add_vertical_padding(cropped_image, binary, bbox, image_index);
+    cv::Mat binary_tight_crop = binary(bbox).clone();
+    add_vertical_padding(cropped_image, binary_tight_crop, image_index);
 
 
     return cropped_image;
@@ -417,15 +418,15 @@ cv::Mat get_binary_image(const cv::Mat& image){
 }
 
 
-void add_vertical_padding(cv::Mat& image, const cv::Mat& binary, cv::Rect tight_box, int image_index){
+void add_vertical_padding(cv::Mat& image, const cv::Mat& binary_tight_crop, int image_index){
     if (image.empty()) {
         return;
     }
 
-    int h = tight_box.height;
-    int w = tight_box.width;
+    int h = binary_tight_crop.rows;
+    int w = binary_tight_crop.cols;
 
-    if (is_horizontal_line(binary, tight_box, image_index)){
+    if (is_horizontal_line(binary_tight_crop, image_index)){
         cout << "Input image is likely just a horizontal line." << endl;
         cv::Scalar bg = estimate_background_color(image);
 
@@ -450,10 +451,10 @@ void add_vertical_padding(cv::Mat& image, const cv::Mat& binary, cv::Rect tight_
 
 }
 
-bool is_horizontal_line(const cv::Mat& binary, cv::Rect tight_box, int image_index){
+bool is_horizontal_line(const cv::Mat& binary, int image_index){
 
-    int h = tight_box.height;
-    int w = tight_box.width;
+    int h = binary.rows;
+    int w = binary.cols;
     constexpr float min_ratio = 4.0f;
     if (h <= 0 || (float)w / h < min_ratio) {
         return false;
@@ -504,17 +505,18 @@ bool is_line_shape(const cv::Mat& binary, const std::vector<cv::Point>& contour)
     double bboxArea = width * height;
     double density = area / bboxArea;
 
-    cout << "area: " << std::to_string(area) << endl;
-    cout << "bboxArea: " << std::to_string(bboxArea) << endl;
-    cout << "Density: " << std::to_string(density) << endl;
-    cout << "aspectRatio: " << std::to_string(aspectRatio) << endl;
-    
+    if (STATIC_GLOBALS.PADDLE_OCR_DEBUG_IMAGE){
+        cout << "area: " << std::to_string(area) << endl;
+        cout << "bboxArea: " << std::to_string(bboxArea) << endl;
+        cout << "Density: " << std::to_string(density) << endl;
+        cout << "aspectRatio: " << std::to_string(aspectRatio) << endl;
+    }
 
 
     // 5. Evaluate both conditions
     // - Density must be greater than 75%
     // - Aspect ratio must be greater than 2 (at least twice as wide as it is tall)
-    return (density > 0.75) && (aspectRatio > 2.0);
+    return (density >= 0.75) && (aspectRatio > 2.0);
 }
 
 void add_horizontal_padding(cv::Mat& image, int image_index){
@@ -544,10 +546,10 @@ void add_horizontal_padding(cv::Mat& image, int image_index){
             bg
         );
         image = padded_image;
-    }
 
-    if (STATIC_GLOBALS.PADDLE_OCR_DEBUG_IMAGE){
-        cv::imwrite(std::to_string(image_index) + "-horiz-padded" + ".png", image);
+        if (STATIC_GLOBALS.PADDLE_OCR_DEBUG_IMAGE){
+            cv::imwrite(std::to_string(image_index) + "-horiz-padded" + ".png", image);
+        }
     }
 
 }

@@ -113,7 +113,9 @@ void add_tests_raw_OCR(UnitTestDatabase& database){
     database.add<Test_RawOCR>("OCR/Lv.1-3.png", Language::English, "Lv. 1");
     database.add<Test_RawOCR>("OCR/Lv.1-4.png", Language::English, "Lv. 1");
     database.add<Test_RawOCR>("OCR/Lv.1-5.png", Language::English, "Lv. 1");
-    database.add<Test_RawOCR>("OCR/dash.png", Language::English, "---");
+    database.add<Test_RawOCR>("OCR/dash-1.png", Language::English, "---");
+    database.add<Test_RawOCR>("OCR/dash-2.png", Language::English, "---");
+    database.add<Test_RawOCR>("OCR/dash-3.png", Language::English, "---");
     database.add<Test_RawOCR>("OCR/num-1.png", Language::English, "1");
 }
 
