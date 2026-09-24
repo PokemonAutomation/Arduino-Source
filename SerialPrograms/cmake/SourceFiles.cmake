@@ -1085,6 +1085,7 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_SSE41.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr.h
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_arm64_NEON.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_Default.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX2.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX512.cpp
