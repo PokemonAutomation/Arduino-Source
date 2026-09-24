@@ -330,8 +330,8 @@ cv::Mat crop_to_text_region_with_padding(const cv::Mat& image, int image_index) 
     int right_gap = image.cols - (bbox.x + bbox.width);
 
     // calculate the desired padding
-    int pad_x = std::max(4, bbox.width / 10);  // ~10%
-    int pad_y = std::max(2, bbox.height / 10);  // ~10%
+    int pad_x = std::max(4, bbox.width / 15);  // ~5-10%
+    int pad_y = std::max(2, bbox.height / 15);  // ~5-10%
 
 
     cv::Mat cropped_image;
