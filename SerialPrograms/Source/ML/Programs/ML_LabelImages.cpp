@@ -612,6 +612,7 @@ void LabelImages::compute_embeddings_for_folder(const std::string& image_folder_
     std::string embedding_model_path = RESOURCE_PATH() + "ML/sam_embedder_cpu.onnx";
     m_system.logger().log("Use SAM Embedding model " + embedding_model_path);
     ML::compute_embeddings_for_folder(
+        m_system.logger(),
         embedding_model_path,
         image_folder_path,
         PerformanceOptions::instance().ONNX_OPTIONS.USE_GPU

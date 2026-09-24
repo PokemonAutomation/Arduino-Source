@@ -7,7 +7,10 @@
 
 #include <QDir>
 #include <QDirIterator>
+#include <atomic>
+#include <format>
 #include <fstream>
+#include <mutex>
 #include <iostream>
 #include <QMessageBox>
 #include <onnxruntime_cxx_api.h>
@@ -16,7 +19,9 @@
 #include "3rdParty/ONNX/OnnxToolsPA.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "ML/Models/ML_ONNXRuntimeHelpers.h"
 #include "ML_SegmentAnythingModelConstants.h"
 #include "ML_SegmentAnythingModel.h"
@@ -33,15 +38,17 @@ SAMEmbedderSession::SAMEmbedderSession(const std::string& model_path, bool use_g
     , output_names{session.GetOutputNames()}
     , input_shape{1, SAM_EMBEDDER_INPUT_IMAGE_HEIGHT, SAM_EMBEDDER_INPUT_IMAGE_WIDTH, 3}
     , output_shape{1, SAM_EMBEDDER_OUTPUT_N_CHANNELS, SAM_EMBEDDER_OUTPUT_IMAGE_SIZE, SAM_EMBEDDER_OUTPUT_IMAGE_SIZE}
-    , model_input(SAM_EMBEDDER_INPUT_SIZE)
 {
     std::cout << "Built SAM embedder session" << std::endl;
 }
 
-void SAMEmbedderSession::run(cv::Mat& input_image, std::vector<float>& model_output){
+void SAMEmbedderSession::run(const cv::Mat& input_image, std::vector<float>& model_output){
     assert(input_image.rows == SAM_EMBEDDER_INPUT_IMAGE_HEIGHT);
     assert(input_image.cols == SAM_EMBEDDER_INPUT_IMAGE_WIDTH);
 
+    // The input buffer is local (not a member) so that multiple threads can call `run()` on the same
+    // session concurrently. `Ort::Session::Run()` itself is thread-safe.
+    std::vector<uint8_t> model_input(SAM_EMBEDDER_INPUT_SIZE);
     model_output.resize(SAM_EMBEDDER_OUTPUT_SIZE);
     auto input_tensor = create_tensor<uint8_t>(memory_info, model_input, input_shape);
     auto output_tensor = create_tensor<float>(memory_info, model_output, output_shape);
@@ -175,28 +182,98 @@ void SAMSession::run(
 }
 
 
+namespace{
+
+// Result of trying to compute the embedding of one image in `embed_one_image()`.
+enum class EmbedImageResult{
+    SUCCESS,
+    FAILED_TO_LOAD,         // `cv::imread()` returned an empty image, e.g. the file is not an actual image.
+    UNSUPPORTED_CHANNELS,   // image is not 3-channel (BGR) or 4-channel (BGRA).
+};
+
+// Load the image at `image_path`, convert it to the RGB, SAM_EMBEDDER_INPUT_IMAGE_WIDTH x
+// SAM_EMBEDDER_INPUT_IMAGE_HEIGHT format that `SAMEmbedderSession::run()` expects, run the embedder
+// and save the result to "<image_path>.embedding" via `save_image_embedding_to_disk()`.
+// This is the per-image work item of `compute_embeddings_for_folder()` and runs on worker threads
+// of `GlobalThreadPools::computation_normal()`, so it must not touch any Qt UI (e.g. QMessageBox).
+// Image problems are reported through the return value. Inference failures propagate as exceptions
+// (usually `Ort::Exception`) so the caller can decide whether to fall back from GPU to CPU.
+EmbedImageResult embed_one_image(SAMEmbedderSession& embedding_session, const std::string& image_path){
+    cv::Mat image_bgr = cv::imread(image_path);
+    if (image_bgr.empty()){
+        return EmbedImageResult::FAILED_TO_LOAD;
+    }
+    cv::Mat image;
+    if (image_bgr.channels() == 4){
+        cv::cvtColor(image_bgr, image, cv::COLOR_BGRA2RGB);
+    }else if (image_bgr.channels() == 3){
+        cv::cvtColor(image_bgr, image, cv::COLOR_BGR2RGB);
+    }else{
+        return EmbedImageResult::UNSUPPORTED_CHANNELS;
+    }
+
+    cv::Mat resized_mat;  // resize to the shape for the ML model input
+    cv::resize(image, resized_mat, cv::Size(SAM_EMBEDDER_INPUT_IMAGE_WIDTH, SAM_EMBEDDER_INPUT_IMAGE_HEIGHT));
+
+    std::vector<float> output_image_embedding;
+    embedding_session.run(resized_mat, output_image_embedding);
+    save_image_embedding_to_disk(image_path, output_image_embedding);
+    return EmbedImageResult::SUCCESS;
+}
+
+void log_image_list(Logger& logger, const std::string& header, const std::vector<std::string>& image_paths){
+    if (image_paths.empty()){
+        return;
+    }
+    logger.log(header, COLOR_RED);
+    for (const std::string& image_path : image_paths){
+        logger.log("- " + image_path, COLOR_RED);
+    }
+}
+
+}
+
+
 void compute_embeddings_for_folder(
+    Logger& logger,
     const std::string& embedding_model_path,
     const std::string& image_folder_path,
     bool use_gpu_for_embedder_session
 ){
     const bool recursive_search = true;
-    std::vector<std::string> all_image_paths = find_images_in_folder(image_folder_path, recursive_search);
+    const std::vector<std::string> all_image_paths = find_images_in_folder(image_folder_path, recursive_search);
     if (all_image_paths.size() == 0){
+        logger.log("No images found in " + image_folder_path + ".");
         return;
     }
-    
+
+    // Only compute embeddings that do not exist on disk yet.
+    std::vector<std::string> image_paths;
+    for (const std::string& image_path : all_image_paths){
+        if (!Filesystem::exists(image_path + ".embedding")){
+            image_paths.emplace_back(image_path);
+        }
+    }
+    logger.log(std::format(
+        "Found {} images in {}. {} already have embeddings. Computing {} embeddings...",
+        all_image_paths.size(), image_folder_path,
+        all_image_paths.size() - image_paths.size(), image_paths.size()
+    ));
+    if (image_paths.empty()){
+        return;
+    }
+
     if (!Filesystem::exists(embedding_model_path)){
-        std::cerr << "Error: no such embedding model path " << embedding_model_path << "." << std::endl;
+        logger.log("Error: no such embedding model path " + embedding_model_path + ".", COLOR_RED);
         QMessageBox box;
         box.critical(nullptr, "Embedding Model Does Not Exist",
             QString::fromStdString("Embedding model path" + embedding_model_path + " does not exist."));
         return;
     }
     // since the embedding model has too many weights, onnx created a .data file to contain weights.
-    auto embedding_model_data_path = embedding_model_path + ".data";
+    const std::string embedding_model_data_path = embedding_model_path + ".data";
     if (!Filesystem::exists(embedding_model_data_path)){
-        std::cerr << "Error: no such embedding model data path " << embedding_model_data_path << "." << std::endl;
+        logger.log("Error: no such embedding model data path " + embedding_model_data_path + ".", COLOR_RED);
         QMessageBox box;
         box.critical(nullptr, "Embedding Model Data File Does Not Exist",
             QString::fromStdString("Embedding model data file path" + embedding_model_data_path + " does not exist."));
@@ -213,82 +290,97 @@ void compute_embeddings_for_folder(
             QString::fromStdString(e.message() + ". Try using CPU?"));
         return;
     }
-    std::vector<float> output_image_embedding;
-    for (size_t i = 0; i < all_image_paths.size(); i++){
-        const auto& image_path = all_image_paths[i];
-        std::cout << (i+1) << "/" << all_image_paths.size() << ": ";
-        const std::string embedding_path = image_path + ".embedding";
-        if (Filesystem::exists(embedding_path)){
-            std::cout << "skip already computed embedding " << embedding_path << "." << std::endl;
-            continue;
-        }
-        std::cout << "computing embedding for " << image_path << "..." << std::endl;
-        cv::Mat image_bgr = cv::imread(image_path);
-        if (image_bgr.empty()){
-            std::cerr << "Error: image empty. Probably the file is not an image?" << std::endl;
-            QMessageBox box;
-            box.warning(nullptr, "Unable To Open Image",
-                QString::fromStdString("Cannot open image file " + image_path + ". Probably not an actual image?"));
+
+    // Per-image errors are collected here and reported after all images are processed, instead of
+    // popping up a QMessageBox per image (which is not allowed from worker threads and would stall
+    // the whole batch on one bad file).
+    std::mutex error_lock;
+    std::vector<std::string> images_failed_to_load;
+    std::vector<std::string> images_with_unsupported_channels;
+    std::vector<std::string> images_failed_inference;
+    std::atomic<size_t> num_computed{0};
+
+    auto record_result = [&](const std::string& image_path, EmbedImageResult result){
+        switch (result){
+        case EmbedImageResult::SUCCESS:{
+            const size_t count = ++num_computed;
+            logger.log(std::format("{}/{}: computed embedding for {}", count, image_paths.size(), image_path));
             return;
         }
-        cv::Mat image;
-        if (image_bgr.channels() == 4){
-            cv::cvtColor(image_bgr, image, cv::COLOR_BGRA2RGB);
-        } else if (image_bgr.channels() == 3){
-            cv::cvtColor(image_bgr, image, cv::COLOR_BGR2RGB);
-        }else{
-            std::cerr << "Error: wrong image channels. Only work with RGB or RGBA images." << std::endl;
-            QMessageBox box;
-            box.warning(nullptr, "Wrong Image Channels",
-                QString::fromStdString("Image has " + std::to_string(image_bgr.channels()) + " channels. Only support 3 or 4 channels."));
+        case EmbedImageResult::FAILED_TO_LOAD:{
+            std::lock_guard<std::mutex> lg(error_lock);
+            images_failed_to_load.emplace_back(image_path);
             return;
         }
+        case EmbedImageResult::UNSUPPORTED_CHANNELS:{
+            std::lock_guard<std::mutex> lg(error_lock);
+            images_with_unsupported_channels.emplace_back(image_path);
+            return;
+        }
+        }
+    };
 
-        cv::Mat resized_mat;  // resize to the shape for the ML model input
-        cv::resize(image, resized_mat, cv::Size(SAM_EMBEDDER_INPUT_IMAGE_WIDTH, SAM_EMBEDDER_INPUT_IMAGE_HEIGHT));
-
-        output_image_embedding.clear();
-
-        // fall back to CPU if fails with GPU.
-        for (size_t j = 0; j < 2; j++){
+    // Phase 1: run serially until the first successful inference.
+    // This verifies the session actually works on this machine before fanning out. If inference
+    // fails on the GPU, we rebuild the session on the CPU here and retry the same image, so that
+    // all the parallel workers in phase 2 share one known-good session.
+    size_t next_idx = 0;
+    bool session_verified = false;
+    while (next_idx < image_paths.size() && !session_verified){
+        const std::string& image_path = image_paths[next_idx];
+        EmbedImageResult result;
+        try{
+            // throw Ort::Exception("Testing.", ORT_FAIL);  // to simulate GPU/CPU failure
+            result = embed_one_image(*embedding_session, image_path);
+        }catch (const std::exception& e){
+            if (!use_gpu){
+                logger.log(std::string("Error: Embedding session failed even when using the CPU.\n") + e.what(), COLOR_RED);
+                QMessageBox box;
+                box.warning(nullptr, "Error:",
+                    QString::fromStdString("Error: Embedding session failed."));
+                return;
+            }
+            logger.log(std::string("Warning: Embedding session failed using the GPU. Will reattempt with the CPU.\n") + e.what(), COLOR_RED);
+            use_gpu = false;
             try{
-                // If fails with GPU, fall back to CPU.
-                // throw Ort::Exception("Testing.", ORT_FAIL);  // to simulate GPU/CPU failure
-                embedding_session->run(resized_mat, output_image_embedding);
-                break;
-            }catch (Ort::Exception& e){
-                if (use_gpu){
-                    std::cerr << "Warning: Embedding session failed using the GPU. Will reattempt with the CPU.\n" << e.what() << std::endl;
-                    use_gpu = false;
-                    embedding_session = make_unique<SAMEmbedderSession>(embedding_model_path, use_gpu);
-                }else{
-                    std::cerr << "Error: Embedding session failed even when using the CPU.\n" << e.what() << std::endl;
-                    QMessageBox box;
-                    box.warning(nullptr, "Error:",
-                        QString::fromStdString("Error: Embedding session failed."));
-                    return;
-                }
-            }catch (...){
-                std::cerr << "Error: Unknown error. Embedding session failed." << std::endl;
+                embedding_session = make_unique<SAMEmbedderSession>(embedding_model_path, use_gpu);
+            }catch (MLModelSessionCreationError& e){
                 QMessageBox box;
-                box.warning(nullptr, "Error:",
-                    QString::fromStdString("Error: Unknown error. Embedding session failed."));
-                return;
-
-            }
-
-            if (j > 0){
-                std::cerr << "Internal Program Error: This section of code shouldn't be reachable." << std::endl;
-                QMessageBox box;
-                box.warning(nullptr, "Error:",
-                    QString::fromStdString("Internal Program Error: This section of code shouldn't be reachable."));
+                box.warning(nullptr, "Unable To Create Model Session",
+                    QString::fromStdString(e.message()));
                 return;
             }
+            continue;  // retry the same image with the CPU session
         }
-        save_image_embedding_to_disk(image_path, output_image_embedding);
+        record_result(image_path, result);
+        session_verified = result == EmbedImageResult::SUCCESS;
+        next_idx++;
     }
-    std::cout << "Done computing embeddings for images in folder " << image_folder_path << "." << std::endl;
 
+    // Phase 2: compute the remaining embeddings in parallel.
+    // `SAMEmbedderSession::run()` is thread-safe, so all workers share the same session.
+    // An inference failure here only skips that image; it is reported at the end.
+    GlobalThreadPools::computation_normal().run_in_parallel(
+        [&](size_t image_idx){
+            const std::string& image_path = image_paths[image_idx];
+            try{
+                record_result(image_path, embed_one_image(*embedding_session, image_path));
+            }catch (const std::exception& e){
+                logger.log("Error: failed to compute embedding for " + image_path + ": " + e.what(), COLOR_RED);
+                std::lock_guard<std::mutex> lg(error_lock);
+                images_failed_inference.emplace_back(image_path);
+            }
+        },
+        next_idx, image_paths.size(), 1
+    );
+
+    logger.log(std::format(
+        "Done computing embeddings for images in folder {}. Computed {}/{}.",
+        image_folder_path, num_computed.load(), image_paths.size()
+    ));
+    log_image_list(logger, "Following images failed to load. Probably not actual images?", images_failed_to_load);
+    log_image_list(logger, "Following images have unsupported color channels. Only work with RGB or RGBA images:", images_with_unsupported_channels);
+    log_image_list(logger, "Following images failed during embedding inference:", images_failed_inference);
 }
 
 }
