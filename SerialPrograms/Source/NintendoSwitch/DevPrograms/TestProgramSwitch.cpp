@@ -170,7 +170,7 @@
 #include "Common/Cpp/StreamConnections/MockDevice.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "CommonTools/Images/ImageTools.h"
-#include "PokemonFRLG/Inference/PokemonFRLG_BattleSelectionArrowDetector.h"
+#include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattleSelectionArrowDetector.h"
 #include "Controllers/RumbleListener.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_MainMenuDetector.h"
