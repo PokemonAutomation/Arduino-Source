@@ -87,13 +87,6 @@ public:
     const StreamHistorySession& stream_history() const{ return m_history; }
     ConfigOption* extra_option(){ return m_option.m_extra_option.get(); }
 
-    //  What this console calls the video source's reset button. Empty means
-    //  keep the default ("Reset Video"). Panels that show something other than
-    //  a live console set this to name the button after what they are showing.
-    //  Must be set before the console's UI is built.
-    const std::string& video_reset_button_text() const{ return m_video_reset_button_text; }
-    void set_video_reset_button_text(std::string text){ m_video_reset_button_text = std::move(text); }
-
 
 public:
     virtual VideoFeed& video_feed() noexcept override{ return video(); }
@@ -129,7 +122,6 @@ private:
 
     TaggedLogger m_logger;
     ConsoleSystemOption& m_option;
-    std::string m_video_reset_button_text;
 
     VideoSession m_video;
     AudioSession m_audio;

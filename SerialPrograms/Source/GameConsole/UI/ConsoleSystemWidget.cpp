@@ -69,9 +69,6 @@ ConsoleSystemWidget::ConsoleSystemWidget(
     }
 
     m_video_selector = new VideoSourceSelectorWidget(m_session.logger(), m_session.video());
-    if (!m_session.video_reset_button_text().empty()){
-        m_video_selector->set_reset_button_text(m_session.video_reset_button_text());
-    }
     m_group_layout->addWidget(m_video_selector);
 
     m_audio_widget = new AudioSelectorWidget(*m_group_box->widget(), m_session.audio());

@@ -46,9 +46,7 @@ LabelImages_Descriptor::LabelImages_Descriptor()
         "Programs/ML/LabelImages.html",
         "Label " + Pokemon::STRING_POKEMON + " on images",
         PanelDeprecation::NOT_DEPRECATED,
-        false,
-        1,              //  Consoles.
-        "Reset Image"   //  The video source here is the image being labeled.
+        false
     )
 {}
 

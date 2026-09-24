@@ -21,8 +21,7 @@ ConsolePanelDescriptor::ConsolePanelDescriptor(
     std::string description,
     PanelDeprecation deprecation,
     bool restore_defaults_button,
-    size_t num_controllers,
-    std::string video_reset_button_text
+    size_t num_controllers
 )
     : PanelDescriptor(
         std::move(identifier),
@@ -34,7 +33,6 @@ ConsolePanelDescriptor::ConsolePanelDescriptor(
         restore_defaults_button
     )
     , m_num_controllers(num_controllers)
-    , m_video_reset_button_text(std::move(video_reset_button_text))
 {}
 std::unique_ptr<PanelSession> ConsolePanelDescriptor::make_panel() const{
     return std::make_unique<ConsolePanelSession>(*this);

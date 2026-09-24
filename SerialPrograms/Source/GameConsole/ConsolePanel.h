@@ -34,15 +34,10 @@ public:
         std::string description,
         PanelDeprecation deprecation = PanelDeprecation::NOT_DEPRECATED,
         bool restore_defaults_button = true,
-        size_t num_controllers = 1,
-        std::string video_reset_button_text = ""
+        size_t num_controllers = 1
     );
 
     size_t num_controllers() const{ return m_num_controllers; }
-
-    //  What this panel calls the video source's reset button. Empty means keep
-    //  the default ("Reset Video").
-    const std::string& video_reset_button_text() const{ return m_video_reset_button_text; }
 
     virtual std::unique_ptr<PanelSession> make_panel() const override;
     virtual std::unique_ptr<ConsolePanelInstance> make_instance(ConsoleSystemSession& system) const = 0;
@@ -50,7 +45,6 @@ public:
 
 private:
     const size_t m_num_controllers;
-    const std::string m_video_reset_button_text;
 };
 
 
