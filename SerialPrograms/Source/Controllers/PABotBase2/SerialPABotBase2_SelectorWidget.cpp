@@ -35,13 +35,6 @@ bool filter_serial_port(const QSerialPortInfo& port){
         return false;
     }
 
-#ifdef _WIN32
-    //  COM1 is never the correct port on Windows.
-    if (port.portName() == "COM1"){
-        return false;
-    }
-#endif
-
 #if defined(__APPLE__)
     // exlude tty
     if (port.portName().startsWith("tty.")){
