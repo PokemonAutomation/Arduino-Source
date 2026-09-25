@@ -2,8 +2,11 @@
 # For the main CMake file, see CMakeLists.txt
 
 # the GUI executable needs the dark style format file
-qt_add_resources(DARK_STYLE_RES "../3rdParty/qdarkstyle/dark/darkstyle.qrc")
-set(EXECUTABLE_SOURCES "Source/CommonFramework/Main.cpp" ${DARK_STYLE_RES})
+# PA_CORE_ONLY: cmake option to only build the GUI-free core lib
+if(NOT PA_CORE_ONLY)
+    qt_add_resources(DARK_STYLE_RES "../3rdParty/qdarkstyle/dark/darkstyle.qrc")
+    set(EXECUTABLE_SOURCES "Source/CommonFramework/Main.cpp" ${DARK_STYLE_RES})
+endif()
 
 # Note: Command-line executable sources are defined in Source/CommandLine/CommandLineExecutable.cmake
 
