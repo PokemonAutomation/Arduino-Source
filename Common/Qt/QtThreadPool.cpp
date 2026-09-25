@@ -223,11 +223,17 @@ QObject* QtEventThreadPool::add_object(std::function<std::unique_ptr<QObject>()>
     //  back to `m_available_threads` once `remove_object()` has destroyed our object.
     QtEventThread& thread = get_thread();
     QObject* ret = thread.add_object(std::move(factory));
-
-    //  `m_objects` is shared with every other add/remove call, so it must only be
-    //  touched under `m_lock`.
-    std::lock_guard<Mutex> lg(m_lock);
-    m_objects[ret] = &thread;
+    try{
+        //  `m_objects` is shared with every other add/remove call, so it must only be
+        //  touched under `m_lock`.
+        std::lock_guard<Mutex> lg(m_lock);
+        m_objects[ret] = &thread;
+    }catch (...){
+        thread.remove_object();
+        std::lock_guard<Mutex> lg(m_lock);
+        m_available_threads.emplace_back(&thread);
+        throw;
+    }
     return ret;
 }
 void QtEventThreadPool::remove_object(QObject* object) noexcept{
