@@ -7,6 +7,7 @@
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "Common/Qt/QtThreadPool_Tests.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
@@ -37,6 +38,7 @@ namespace ComputerPrograms{
 UnitTestDatabase make_UNIT_TESTS_ALL(){
     UnitTestDatabase ret;
 
+    add_tests_QtEventThreadPool(ret);
     add_tests_BlackBorderDetector(ret);
     OCR::add_tests(ret);
     Kernels::add_tests(ret);
