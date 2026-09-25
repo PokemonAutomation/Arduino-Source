@@ -52,6 +52,18 @@ jobs:
           path: 'Arduino-Source'
           submodules: 'recursive'
 
+      # Check out the Packages repo (resources, firmware, scripts) before CMake configures.
+      # Otherwise CMake does a full `git clone` of it (see SerialPrograms/CMakeLists.txt), which
+      # downloads the entire history: every old version of every model and zip ever committed,
+      # which only grows. actions/checkout fetches only the latest commit (fetch-depth: 1), and
+      # CMake skips its own clone when Arduino-Source/Packages already exists.
+      - name: Checkout Packages
+        uses: actions/checkout@v7
+        with:
+          repository: 'PokemonAutomation/Packages'
+          ref: 'master'
+          path: 'Arduino-Source/Packages'
+
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
