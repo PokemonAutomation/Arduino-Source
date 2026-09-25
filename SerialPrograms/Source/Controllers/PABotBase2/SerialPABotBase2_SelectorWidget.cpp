@@ -21,6 +21,20 @@ namespace SerialPABotBase{
 
 
 bool filter_serial_port(const QSerialPortInfo& port){
+    //  Exclude ports that are not backed by a USB device. All supported
+    //  controllers (Arduino, ESP32, Pico, USB-UART adapters) enumerate over
+    //  USB, so Qt can read a USB vendor ID for them from the OS device tree.
+    //  Non-USB ports have no vendor ID, e.g.:
+    //    - macOS: "cu.debug-console" (built-in SoC UART),
+    //      "cu.Bluetooth-Incoming-Port", and "cu.<DeviceName>" Bluetooth
+    //      serial ports created for paired devices like headphones.
+    //    - Windows: legacy motherboard ports like COM1 and
+    //      "Standard Serial over Bluetooth link" ports.
+    //    - Linux: onboard UARTs like /dev/ttyS* and Bluetooth /dev/rfcomm*.
+    if (!port.hasVendorIdentifier()){
+        return false;
+    }
+
 #ifdef _WIN32
     //  COM1 is never the correct port on Windows.
     if (port.portName() == "COM1"){
@@ -31,12 +45,6 @@ bool filter_serial_port(const QSerialPortInfo& port){
 #if defined(__APPLE__)
     // exlude tty
     if (port.portName().startsWith("tty.")){
-        return false;
-    }
-    // exclude system builtin serial ports
-    if (port.portName() == "cu.debug-console" ||
-        port.portName() == "cu.Bluetooth-Incoming-Port"
-    ){
         return false;
     }
 #endif
