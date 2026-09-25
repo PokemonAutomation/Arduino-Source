@@ -38,7 +38,7 @@ namespace ComputerPrograms{
 UnitTestDatabase make_UNIT_TESTS_ALL(){
     UnitTestDatabase ret;
 
-    add_tests_QtEventThreadPool(ret);
+    add_tests_QtEventThreadPool(ret, GlobalThreadPools::computation_normal());
     add_tests_BlackBorderDetector(ret);
     OCR::add_tests(ret);
     Kernels::add_tests(ret);
