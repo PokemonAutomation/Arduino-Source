@@ -58,6 +58,8 @@ public:
 
     bool PADDLE_OCR_DEBUG = false;
 
+    bool PADDLE_OCR_DEBUG_IMAGE = false;
+
 
 };
 
