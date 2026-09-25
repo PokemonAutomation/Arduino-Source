@@ -466,6 +466,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/Options/TimeExpressionWidget.h
     ../Common/Qt/QtThreadPool.cpp
     ../Common/Qt/QtThreadPool.h
+    ../Common/Qt/QtThreadPool_Tests.cpp
+    ../Common/Qt/QtThreadPool_Tests.h
     ../Common/Qt/Redispatch.cpp
     ../Common/Qt/Redispatch.h
     ../Common/Qt/ShutdownWithEvents.h
