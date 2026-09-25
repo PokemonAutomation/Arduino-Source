@@ -71,6 +71,7 @@ __pycache__
 vcpkg/
 
 CLAUDE.md
+.claude/
 
 build_*/
 .cache/*

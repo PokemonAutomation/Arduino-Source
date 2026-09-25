@@ -63,9 +63,13 @@ find_package(Threads REQUIRED)
 # Define a toggle option (ON by default)
 option(COMMAND_LINE_EXE "Build the optional executable" ON)
 
-# Build only the GUI-free core: CoreLib and SerialProgramsCommandLine. This needs
-# no Qt, OpenCV, ONNX Runtime, Tesseract, DPP or Discord SDK, so none of them are
-# searched for.
+# Python bindings and the MCP server for AI agents (see Source/PythonBindings/README.md).
+# OFF by default because it needs a Python interpreter with development headers.
+option(PA_PYTHON_BINDINGS "Build the _pa_core Python module (acts as a Switch controller)" OFF)
+
+# Build only the GUI-free core: CoreLib, SerialProgramsCommandLine and (with
+# PA_PYTHON_BINDINGS) the Python module. This needs no Qt, OpenCV, ONNX Runtime,
+# Tesseract, DPP or Discord SDK, so none of them are searched for.
 option(PA_CORE_ONLY "Build only the GUI-free core (basic microcontroller functions, no Qt, OpenCV, etc.)" OFF)
 
 if(PA_CORE_ONLY)
@@ -77,6 +81,9 @@ if(PA_CORE_ONLY)
     include(cmake/CoreLib.cmake)
     if(COMMAND_LINE_EXE)
         include(Source/CommandLine/CommandLineExecutable.cmake)
+    endif()
+    if(PA_PYTHON_BINDINGS)
+        include(Source/PythonBindings/PythonBindings.cmake)
     endif()
     return()
 endif()
@@ -844,4 +851,8 @@ endif()
 if(COMMAND_LINE_EXE)
     # Add command-line executable (GUI-free) from subdirectory
     include(Source/CommandLine/CommandLineExecutable.cmake)
+endif()
+
+if(PA_PYTHON_BINDINGS)
+    include(Source/PythonBindings/PythonBindings.cmake)
 endif()
