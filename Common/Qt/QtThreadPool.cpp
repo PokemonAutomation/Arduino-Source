@@ -219,33 +219,42 @@ void QtEventThreadPool::stop(){
 
 
 QObject* QtEventThreadPool::add_object(std::function<std::unique_ptr<QObject>()> factory){
+    //  `get_thread()` hands out an idle thread exclusively to this call. It only goes
+    //  back to `m_available_threads` once `remove_object()` has destroyed our object.
     QtEventThread& thread = get_thread();
     QObject* ret = thread.add_object(std::move(factory));
-    try{
-        m_objects[ret] = &thread;
-    }catch (...){
-        thread.remove_object();
-        std::lock_guard<Mutex> lg(m_lock);
-        m_available_threads.emplace_back(&thread);
-        throw;
-    }
+
+    //  `m_objects` is shared with every other add/remove call, so it must only be
+    //  touched under `m_lock`.
+    std::lock_guard<Mutex> lg(m_lock);
+    m_objects[ret] = &thread;
     return ret;
 }
 void QtEventThreadPool::remove_object(QObject* object) noexcept{
-    std::map<QObject*, QtEventThread*>::iterator iter;
+    //  Take the object out of `m_objects` *before* destroying it. Once it's destroyed,
+    //  its address may be reused right away by a new object created on another thread
+    //  by a concurrent `add_object()`. If the stale entry were still in the map, that
+    //  `add_object()` would overwrite it with its own thread, and we would then hand
+    //  that busy thread back to `m_available_threads`, where the next `add_object()`
+    //  would replace (destroy) the new object while it is still in use.
+    QtEventThread* thread;
     {
         std::lock_guard<Mutex> lg(m_lock);
-        iter = m_objects.find(object);
+        auto iter = m_objects.find(object);
         if (iter == m_objects.end()){
             return;
         }
-    }
-    iter->second->remove_object();
-    {
-        std::lock_guard<Mutex> lg(m_lock);
-        m_available_threads.emplace_back(iter->second);
+        thread = iter->second;
         m_objects.erase(iter);
     }
+
+    //  Destroy the object on its own thread. The thread is still exclusively ours, so
+    //  nobody else can be using it.
+    thread->remove_object();
+
+    //  Only now is the thread idle and safe to hand out again.
+    std::lock_guard<Mutex> lg(m_lock);
+    m_available_threads.emplace_back(thread);
 }
 
 QtEventThread& QtEventThreadPool::get_thread(){
