@@ -177,7 +177,7 @@
 #include "VideoGames/PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.h"
 #include "VideoGames/PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_ExperienceGainDetector.h"
-
+#include <stacktrace>
 
 
 #include <QPixmap>
@@ -344,13 +344,21 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
+    auto stacktrace = std::stacktrace::current();
+    std::stringstream ss;
+    ss << stacktrace << endl;
+    std::cerr << ss.str() << std::endl;
+
+
+
+#if 0
     PokemonBDSP::ExperienceGainDetector detector;
     detector.make_overlays(overlays);
 
 
     auto snapshot = feed.snapshot();
     cout << detector.detect(snapshot) << endl;
-
+#endif
 
 
 #if 0

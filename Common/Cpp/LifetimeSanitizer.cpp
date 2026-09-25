@@ -8,6 +8,7 @@
 //#include <exception>
 #include <atomic>
 #include <iostream>
+#include <stacktrace>
 #include "Concurrency/SpinLock.h"
 #include "LifetimeSanitizer.h"
 
@@ -60,6 +61,9 @@ void LifetimeSanitizer::disable(){
 }
 
 PA_NO_INLINE void LifetimeSanitizer::terminate_with_dump(){
+    auto stacktrace = std::stacktrace::current();
+    std::cerr << stacktrace << std::endl;
+
     //  Intentionally crash the program here and let the crash dump deal with
     //  the error reporting.
 
