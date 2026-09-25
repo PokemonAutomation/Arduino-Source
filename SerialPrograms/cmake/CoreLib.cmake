@@ -9,6 +9,7 @@
 #
 # Users of CoreLib:
 #   - SerialProgramsCommandLine (Source/CommandLine/)
+#   - the `_pa_core` Python module (Source/PythonBindings/)
 # The GUI program does not link CoreLib; SerialProgramsLib compiles the same
 # sources itself with Qt enabled.
 #
