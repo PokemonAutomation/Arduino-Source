@@ -815,8 +815,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonTools/OCR/OCR_LargeDictionaryMatcher.h
     Source/CommonTools/OCR/OCR_NumberReader.cpp
     Source/CommonTools/OCR/OCR_NumberReader.h
-    Source/CommonTools/OCR/OCR_RawPaddleOCR.cpp
-    Source/CommonTools/OCR/OCR_RawPaddleOCR.h
+    Source/CommonTools/OCR/OCR_PaddleOCR.cpp
+    Source/CommonTools/OCR/OCR_PaddleOCR.h
     Source/CommonTools/OCR/OCR_RawTesseractOCR.cpp
     Source/CommonTools/OCR/OCR_RawTesseractOCR.h
     Source/CommonTools/OCR/OCR_Routines.cpp
@@ -1157,6 +1157,8 @@ file(GLOB LIBRARY_SOURCES
     Source/ML/DataLabeling/ML_SegmentAnythingModel.cpp
     Source/ML/DataLabeling/ML_SegmentAnythingModel.h
     Source/ML/DataLabeling/ML_SegmentAnythingModelConstants.h
+    Source/ML/Inference/ML_PaddleOCRDetector.cpp
+    Source/ML/Inference/ML_PaddleOCRDetector.h
     Source/ML/Inference/ML_PaddleOCRPipeline.cpp
     Source/ML/Inference/ML_PaddleOCRPipeline.h
     Source/ML/Inference/ML_YOLONavigation.cpp

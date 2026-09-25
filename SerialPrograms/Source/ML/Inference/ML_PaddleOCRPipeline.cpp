@@ -55,11 +55,22 @@ std::pair<std::string, std::string> PaddleOCRPipeline::get_paths(Language langua
 }
 
 PaddleOCRPipeline::PaddleOCRPipeline(Language language)
-    : PaddleOCRPipeline(language, get_paths(language).first, get_paths(language).second)
+    : PaddleOCRPipeline(
+        language,
+        // Shared by all languages. This is the downloadable resource "PaddleOCRDetection",
+        // see Packages/Resources/ResourceDownloadList.json.
+        DOWNLOADED_RESOURCE_PATH() + "PaddleOCRDetection/det.onnx",
+        get_paths(language).first,
+        get_paths(language).second
+    )
 {}
 
-PaddleOCRPipeline::PaddleOCRPipeline(Language language, std::string rec_path, std::string dict_path)
-    // , det_session(env, std::wstring(det_path.begin(), det_path.end()).c_str(), Ort::SessionOptions{})
+PaddleOCRPipeline::PaddleOCRPipeline(
+    Language language,
+    std::string det_path,
+    std::string rec_path,
+    std::string dict_path
+)
     : m_rec_session(
         create_session(
             rec_path,
@@ -67,30 +78,33 @@ PaddleOCRPipeline::PaddleOCRPipeline(Language language, std::string rec_path, st
             PerformanceOptions::instance().ONNX_OPTIONS.USE_GPU
         )
     )
-    // , memory_info(Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault)) 
     , m_language(language)
     , m_input_name(m_rec_session.GetInputNameAllocated(0, Ort::AllocatorWithDefaultOptions{}).get())
     , m_output_name(m_rec_session.GetOutputNameAllocated(0, Ort::AllocatorWithDefaultOptions{}).get())
     , m_logger(global_logger_raw(), "OCR")
+    , m_det_path(std::move(det_path))
 {
     load_dictionary(Filesystem::Path(dict_path));
 }
 
-void PaddleOCRPipeline::run(const std::string& img_path){
-#if 0
-    cv::Mat img = cv::imread(img_path);
-    if (img.empty()) return;
-
-    // 1. Text Detection (simplified for brevity)
-    // In practice, use DBPostProcess to get boxes from detection output
-    std::vector<cv::Rect> boxes = {{10, 10, 100, 30}}; // Mock detected box
-
-    for (auto& box : boxes){
-        cv::Mat cropped = img(box);
-        std::string text = recognize(cropped);
-        std::cout << "Detected Text: " << text << std::endl;
+PaddleOCRDetector& PaddleOCRPipeline::detector(){
+    std::lock_guard<Mutex> lg(m_detector_lock);
+    if (!m_detector){
+        // The detection model is a downloadable resource, so it may be missing.
+        // Programs that use multi-line OCR should list "PaddleOCRDetection" in their
+        // descriptor's required resources so it's downloaded before they start.
+        if (!Filesystem::exists(Filesystem::Path(m_det_path))){
+            throw FileException(
+                &m_logger, PA_CURRENT_FUNCTION,
+                "PaddleOCR text detection model not found. "
+                "Please download the \"PaddleOCRDetection\" resource from the Settings panel.",
+                m_det_path
+            );
+        }
+        m_logger.log("Loading PaddleOCR text detection model: " + m_det_path);
+        m_detector = std::make_unique<PaddleOCRDetector>(m_det_path);
     }
-#endif
+    return *m_detector;
 }
 
 
@@ -150,8 +164,6 @@ void PaddleOCRPipeline::load_dictionary(const Filesystem::Path& path){
 
 
 std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
-
-    const bool debugging = STATIC_GLOBALS.PADDLE_OCR_DEBUG;
     m_index++;
 
     // 1. Convert Image to OpenCV image (cv::mat)
@@ -169,6 +181,99 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
         return "";
     }
 
+
+    return recognize_line(cropped_image);
+}
+
+
+std::vector<PaddleOCRTextResult> PaddleOCRPipeline::detect_and_recognize(const ImageViewRGB32& image){
+    cv::Mat cv_image_rgb = imageviewrgb32_to_cv_mat_rgb(image);
+    if (cv_image_rgb.empty()){
+        return {};
+    }
+
+    // 1. Find all text regions.
+    std::vector<PaddleOCRTextBox> boxes = detector().detect(cv_image_rgb);
+
+    // 2. Put them in reading order.
+    std::vector<std::vector<size_t>> lines = group_text_boxes_into_lines(boxes);
+
+    // 3. Recognize each region. Words of the same line that are close together are
+    //    merged and recognized as one piece. See `merge_text_boxes_in_line()`.
+    std::vector<PaddleOCRTextResult> results;
+    for (size_t line_index = 0; line_index < lines.size(); line_index++){
+        std::vector<PaddleOCRTextBox> line_boxes;
+        for (size_t box_index : lines[line_index]){
+            line_boxes.emplace_back(boxes[box_index]);
+        }
+        for (const PaddleOCRTextBox& box : merge_text_boxes_in_line(line_boxes)){
+            cv::Mat crop = crop_text_box(cv_image_rgb, box);
+            if (crop.empty()){
+                continue;
+            }
+            // Same as `recognize()`: pad narrow crops (e.g. a lone "1") so the
+            // recognition model does not stretch them.
+            add_horizontal_padding(crop, m_index);
+
+            PaddleOCRTextResult result;
+            result.text = recognize_line(crop);
+            result.box = box;
+            result.line_index = line_index;
+            if (STATIC_GLOBALS.PADDLE_OCR_DEBUG){
+                ImagePixelBox r = box.pixel_box(cv_image_rgb.cols, cv_image_rgb.rows);
+                m_logger.log(
+                    "[OCR-DET-DEBUG] Line " + std::to_string(line_index) +
+                    ", box (" + std::to_string(r.min_x) + ", " + std::to_string(r.min_y) + ", " +
+                    std::to_string(r.width()) + ", " + std::to_string(r.height()) +
+                    "), score " + std::to_string(box.score) + ": '" + result.text + "'"
+                );
+            }
+            results.emplace_back(std::move(result));
+        }
+    }
+    return results;
+}
+
+
+std::string PaddleOCRPipeline::recognize_multiline(const ImageViewRGB32& image){
+    // Chinese and Japanese don't put spaces between words.
+    const char* word_separator = " ";
+    switch (m_language){
+    case Language::ChineseSimplified:
+    case Language::ChineseTraditional:
+    case Language::Japanese:
+        word_separator = "";
+        break;
+    default:;
+    }
+
+    std::string text;
+    size_t current_line = 0;
+    bool line_empty = true;
+    for (const PaddleOCRTextResult& result : detect_and_recognize(image)){
+        if (result.text.empty()){
+            continue;
+        }
+        if (!text.empty()){
+            if (result.line_index != current_line){
+                text += "\n";
+                line_empty = true;
+            }
+            if (!line_empty){
+                text += word_separator;
+            }
+        }
+        text += result.text;
+        current_line = result.line_index;
+        line_empty = false;
+    }
+    return text;
+}
+
+
+std::string PaddleOCRPipeline::recognize_line(const cv::Mat& cropped_image){
+
+    const bool debugging = STATIC_GLOBALS.PADDLE_OCR_DEBUG;
 
     // 3. Calculate dynamic width (maintain aspect ratio)
     // the model shape is {1, 3, 48, dynamic_width}. Note that the height is fixed at 48 pixels
