@@ -60,6 +60,27 @@ endif()
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
+# Define a toggle option (ON by default)
+option(COMMAND_LINE_EXE "Build the optional executable" ON)
+
+# Build only the GUI-free core: CoreLib and SerialProgramsCommandLine. This needs
+# no Qt, OpenCV, ONNX Runtime, Tesseract, DPP or Discord SDK, so none of them are
+# searched for.
+option(PA_CORE_ONLY "Build only the GUI-free core (basic microcontroller functions, no Qt, OpenCV, etc.)" OFF)
+
+if(PA_CORE_ONLY)
+    message(STATUS "PA_CORE_ONLY: building only the GUI-free core")
+    set(CMAKE_AUTOMOC OFF)
+    set(CMAKE_AUTORCC OFF)
+    set(CMAKE_AUTOUIC OFF)
+    include(cmake/SourceFiles.cmake)
+    include(cmake/CoreLib.cmake)
+    if(COMMAND_LINE_EXE)
+        include(Source/CommandLine/CommandLineExecutable.cmake)
+    endif()
+    return()
+endif()
+
 # Define the major version of Qt to search for
 if(NOT QT_MAJOR)
     set(QT_MAJOR 6)
@@ -156,8 +177,8 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../../ FILES ${CORE_LIBRARY_SOURCE
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../../ FILES ${LIBRARY_SOURCES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../../ FILES ${EXECUTABLE_SOURCES})
 
-# Create GUI-free Controller library
-add_library(CoreLib STATIC ${CORE_LIBRARY_SOURCES})
+# Create GUI-free Controller library, CoreLib
+include(cmake/CoreLib.cmake)
 
 # see apply_common_target_properties() for target_include_directories, set_target_properties, target_compile_definitions
 
@@ -225,21 +246,14 @@ if (IS_AZURE_BUILD)
 endif()
 
 # Function to apply common properties to both library and executable targets
+#   (pa_apply_*_target_properties() are defined in cmake/CoreLib.cmake.)
 function(apply_common_target_properties target_name)
-    set_target_properties(${target_name} PROPERTIES LINKER_LANGUAGE CXX)
-    target_link_libraries(${target_name} PRIVATE Threads::Threads)
-
-    #add defines
-    target_compile_definitions(${target_name} PRIVATE NOMINMAX DPP_NO_DEPRECATED)
-
-    #add include directory
-    target_include_directories(${target_name} SYSTEM PRIVATE ../3rdParty-Core)
-    target_include_directories(${target_name} PRIVATE ../ ../../Internal/ Source/)
-
     if("NO_GUI" IN_LIST ARGN)
-        target_compile_definitions(${target_name} PRIVATE PA_IMAGE_BACKEND_None)
+        pa_apply_gui_free_target_properties(${target_name})
         return()
     endif()
+
+    pa_apply_base_target_properties(${target_name})
 
     # include Qt headers
     target_link_libraries(${target_name} PRIVATE
@@ -260,7 +274,6 @@ function(apply_common_target_properties target_name)
 endfunction()
 
 # Apply common properties to both targets
-apply_common_target_properties(CoreLib NO_GUI)
 apply_common_target_properties(SerialProgramsLib)
 apply_common_target_properties(SerialPrograms)
 
@@ -379,18 +392,12 @@ if (WIN32)
     target_compile_options(SerialProgramsLib PRIVATE /wd5054)  # Deprecated enum arithemtic
     target_compile_options(SerialProgramsLib PRIVATE /wd4505)  # unreferenced local function has been removed
 
-    target_compile_options(CoreLib PRIVATE /FAs /FaAssembly/ /MP /W4 /WX /external:anglebrackets /external:W0 /utf-8)
-    target_compile_options(CoreLib PRIVATE /wd5054)  # Deprecated enum arithemtic
-    target_compile_options(CoreLib PRIVATE /wd4505)  # unreferenced local function has been removed
-
     set(ARCH_FLAGS_09_Nehalem       /W4)    # Dummy parameter
     set(ARCH_FLAGS_13_Haswell       /arch:AVX2)
     set(ARCH_FLAGS_17_Skylake       /arch:AVX512)
     set(ARCH_FLAGS_19_IceLake       /arch:AVX512)
 
     if(CMAKE_GENERATOR_TOOLSET MATCHES "ClangCL")
-        target_compile_options(CoreLib PRIVATE -Wno-unused-function)
-        target_compile_options(CoreLib PRIVATE -march=nehalem)
         target_compile_options(SerialProgramsLib PRIVATE -Wno-unused-function)
         target_compile_options(SerialProgramsLib PRIVATE -march=nehalem)
         set(ARCH_FLAGS_09_Nehalem       -march=nehalem)
@@ -621,13 +628,9 @@ else() # macOS and Linux
         target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -Wshorten-64-to-32)
         # on macOS, need this framework to query OS API to control display sleep and system sleep behavior
         target_link_libraries(SerialProgramsLib PRIVATE "-framework IOKit -framework CoreFoundation")
-
-        target_compile_options(CoreLib PRIVATE -Wall -Wextra -Wpedantic -Werror -Wshorten-64-to-32)
-        target_link_libraries(CoreLib PRIVATE "-framework IOKit -framework CoreFoundation")
     else() # Linux
         # Assume GCC
         target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -fno-strict-aliasing)
-        target_compile_options(CoreLib PRIVATE -Wall -Wextra -Wpedantic -Werror -fno-strict-aliasing)
     endif()
 
     if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^(arm|arm64|aarch64)")
@@ -636,7 +639,6 @@ else() # macOS and Linux
         target_compile_definitions(SerialProgramsLib PRIVATE PA_AutoDispatch_arm64_20_M1)
     else()
         # Intel CPU
-        target_compile_options(CoreLib PRIVATE -march=nehalem)
         target_compile_options(SerialProgramsLib PRIVATE -march=nehalem)
         set(ARCH_FLAGS_09_Nehalem       -march=nehalem)
         set(ARCH_FLAGS_13_Haswell       -march=haswell)
@@ -838,9 +840,6 @@ if (QT_MAJOR GREATER_EQUAL 6)
     qt_finalize_target(SerialPrograms)
 endif()
 
-
-# Define a toggle option (ON by default)
-option(COMMAND_LINE_EXE "Build the optional executable" ON)
 
 if(COMMAND_LINE_EXE)
     # Add command-line executable (GUI-free) from subdirectory
