@@ -32,9 +32,15 @@ struct TextColorRange{
 
 bool ocr_language_available(Language language);
 
-// will use the OCR library as per the dropdown in GlobalSettings
-// if the preferred library's resource is missing (i.e. it has not been downloaded),
+// Main OCR function for Pokemon automation.
+// It uses the OCR library as per the dropdown in GlobalSettings
+// If the preferred library's resource is missing (i.e. it has not been downloaded),
 // an error will be thrown within OCR initialization infra.
+// psm: text layout mode to help improve OCR model accuracy.
+//   with PaddleOCR, SINGLE_LINE (and other single-line modes) assume the image is
+//   already cropped to one line of text. AUTO, SINGLE_BLOCK and SINGLE_COLUMN run the
+//   PaddleOCR text detection model to find each line first, and return the lines
+//   separated by '\n'.
 std::string ocr_read(Language language, const ImageViewRGB32& image, PageSegMode psm = PageSegMode::SINGLE_LINE);
 
 //
