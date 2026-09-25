@@ -437,7 +437,7 @@ void add_vertical_padding(cv::Mat& image, const cv::Mat& binary_tight_crop, int 
         cv::copyMakeBorder(
             image,
             padded_image,
-            top, bottom,              // no vertical padding
+            top, bottom,
             0, 0,              // no horizontal padding
             cv::BORDER_CONSTANT,
             bg
