@@ -121,6 +121,26 @@ jobs:
           repository: 'PokemonAutomation/CommandLineTests'
           path: 'CommandLineTests'
 
+      # The unit tests assume the downloadable resources they need are already downloaded
+      # (see Packages/Resources/ResourceDownloadList.json). Unzip them from the Packages
+      # checkout into where the program looks for them, DOWNLOADED_RESOURCE_PATH():
+      # the working directory on Windows/Linux, and ~/Library/Application Support/SerialPrograms
+      # on macOS.
+      - name: Install downloadable resources for tests
+        if: inputs.run-tests
+        shell: bash
+        run: |
+          if [[ "${{inputs.os}}" == mac* ]]; then
+            DOWNLOADED_RESOURCES="$HOME/Library/Application Support/SerialPrograms/DownloadedResources"
+          else
+            DOWNLOADED_RESOURCES="Arduino-Source/SerialPrograms/bin/DownloadedResources"
+          fi
+          for RESOURCE in PaddleOCRDetection; do
+            mkdir -p "$DOWNLOADED_RESOURCES/$RESOURCE"
+            (cd "$DOWNLOADED_RESOURCES/$RESOURCE" && cmake -E tar xf "${{github.workspace}}/Arduino-Source/Packages/DownloadedResources/$RESOURCE.zip")
+            ls -la "$DOWNLOADED_RESOURCES/$RESOURCE"
+          done
+
       - name: Run tests (Windows)
         if: startsWith(inputs.os, 'windows') && inputs.run-tests
         run: |
