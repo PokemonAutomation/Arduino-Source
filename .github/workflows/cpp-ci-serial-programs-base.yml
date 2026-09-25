@@ -126,7 +126,7 @@ jobs:
         run: |
           cd Arduino-Source/SerialPrograms/bin
           $process = Start-Process -FilePath "./RelWithDebInfo/SerialPrograms.exe" `
-                                   -ArgumentList "--command-line-test-mode --command-line-test-folder ../../../CommandLineTests" `
+                                   -ArgumentList "--command-line-test-mode" `
                                    -NoNewWindow -Wait -PassThru
           if ($process.ExitCode -ne 0) {
               Write-Error "Tests failed with exit code $($process.ExitCode)"
@@ -140,13 +140,13 @@ jobs:
           TESSDATA_PREFIX: ${{ github.workspace }}/Arduino-Source/SerialPrograms/bin/Resources/Tesseract
         run: |
           cd Arduino-Source/SerialPrograms/bin
-          ./SerialPrograms --command-line-test-mode --command-line-test-folder ../../../CommandLineTests
+          ./SerialPrograms --command-line-test-mode
 
       - name: Run tests (Mac)
         if: startsWith(inputs.os, 'mac') && inputs.run-tests
         run: |
           cd Arduino-Source/SerialPrograms/bin
-          ./SerialPrograms.app/Contents/MacOS/SerialPrograms --command-line-test-mode --command-line-test-folder ../../../CommandLineTests
+          ./SerialPrograms.app/Contents/MacOS/SerialPrograms --command-line-test-mode
 
       - name: Run clang query
         if: inputs.run-clang-query
