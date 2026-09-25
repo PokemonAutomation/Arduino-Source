@@ -9,7 +9,7 @@
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "ML/Inference/ML_PaddleOCRPipeline.h"
-#include "OCR_RawPaddleOCR.h"
+#include "OCR_PaddleOCR.h"
 
 namespace PokemonAutomation{
 namespace OCR{
@@ -97,7 +97,7 @@ ML::PaddleOCRPipeline& ensure_paddle_ocr_instance(Language language){
 }
 
 
-std::string paddle_ocr_read(Language language, const ImageViewRGB32& image){
+std::string paddle_ocr_read(Language language, const ImageViewRGB32& image, PageSegMode psm){
 //    static size_t c = 0;
 //    image.save("ocr-" + std::to_string(c++) + ".png");
 
@@ -105,7 +105,18 @@ std::string paddle_ocr_read(Language language, const ImageViewRGB32& image){
     
     // Run inference with the paddle model. 
     // PaddleOCR with Onnx is threadsafe, so a single instance can be called by multiple threads.
-    std::string ret = paddle_instance.recognize(image);
+    std::string ret;
+    switch (psm){
+    case PageSegMode::AUTO:
+    case PageSegMode::SINGLE_BLOCK:
+    case PageSegMode::SINGLE_COLUMN:
+        // Multi-line: run text detection first, then recognize each line.
+        ret = paddle_instance.recognize_multiline(image);
+        break;
+    default:
+        // Single line: the image is already cropped to the text, skip detection.
+        ret = paddle_instance.recognize(image);
+    }
 
 //    global_logger_tagged().log(ret);
 
