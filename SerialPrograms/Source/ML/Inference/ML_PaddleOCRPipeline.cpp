@@ -435,7 +435,10 @@ cv::Mat crop_to_text_region_with_padding(const cv::Mat& image, int image_index) 
     int right_gap = image.cols - (bbox.x + bbox.width);
 
     // calculate the desired padding
-    int pad_x = std::max(4, bbox.width / 15);  // ~5-10%
+    // Horizontal padding is also at least half the text height. With a too-tight crop, the
+    // recognition model tends to drop a thin character at the edge, e.g. "Lv. 1" read
+    // as "Lv." (PokemonHome/SummaryScreen/squirtle_Shiny.png).
+    int pad_x = std::max({4, bbox.width / 15, bbox.height / 2});  // ~5-10%
     int pad_y = std::max(2, bbox.height / 15);  // ~5-10%
 
 
