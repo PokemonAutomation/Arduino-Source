@@ -118,16 +118,9 @@ public:
 
     StringOption DEVELOPER_TOKEN;
 
-    // The mode that does not run Qt GUI, but instead runs some tests for
-    // debugging, unit testing and developing purposes.
+    // The mode that does not run Qt GUI, but instead runs all the unit tests.
+    // See Tests/CommandLineTests.h.
     bool COMMAND_LINE_TEST_MODE = false;
-    // The path to the command line test folder.
-    std::string COMMAND_LINE_TEST_FOLDER;
-    // Which tests to run if in the command line test mode.
-    std::vector<std::string> COMMAND_LINE_TEST_LIST;
-    // Which tests to ignore running under the command line test mode.
-    // If a test path appears in both COMMAND_LINE_TEST_LIST and COMMAND_LINE_IGNORE_LIST, it's still ignored.
-    std::vector<std::string> COMMAND_LINE_IGNORE_LIST;
 };
 
 

@@ -261,24 +261,6 @@ JsonValue GlobalSettings::to_json() const{
 
     JsonObject command_line_test_obj;
     command_line_test_obj["RUN"] = COMMAND_LINE_TEST_MODE;
-    command_line_test_obj["FOLDER"] = COMMAND_LINE_TEST_FOLDER;
-
-    {
-        JsonArray test_list;
-        for (const auto& name : COMMAND_LINE_TEST_LIST){
-            test_list.push_back(name);
-        }
-        command_line_test_obj["TEST_LIST"] = std::move(test_list);
-    }
-
-    {
-        JsonArray ignore_list;
-        for (const auto& name : COMMAND_LINE_IGNORE_LIST){
-            ignore_list.push_back(name);
-        }
-        command_line_test_obj["IGNORE_LIST"] = std::move(ignore_list);
-    }
-
     obj["COMMAND_LINE_TESTS"] = std::move(command_line_test_obj);
     obj["DEBUG"] = STATIC_GLOBALS.to_json_debug();
 
@@ -314,59 +296,11 @@ void GlobalSettings::load_json(const JsonValue& json){
         ) + ")</font>"
     );
 
-    COMMAND_LINE_TEST_LIST.clear();
-    COMMAND_LINE_IGNORE_LIST.clear();
     const JsonObject* command_line_tests_setting = obj->get_object("COMMAND_LINE_TESTS");
     if (command_line_tests_setting){
         command_line_tests_setting->read_boolean(COMMAND_LINE_TEST_MODE, "RUN");
-
-        if (!command_line_tests_setting->read_string(COMMAND_LINE_TEST_FOLDER, "FOLDER")){
-            COMMAND_LINE_TEST_FOLDER = "CommandLineTests";
-        }
-
-        const JsonArray* test_list = command_line_tests_setting->get_array("TEST_LIST");
-        if (test_list){
-            for (const auto& value: *test_list){
-                if (!value.is_string()){
-                    continue;
-                }
-                const std::string* test_name = value.to_string();
-                if (test_name != nullptr && !test_name->empty()){
-                    COMMAND_LINE_TEST_LIST.emplace_back(*test_name);
-                }
-            }
-        }
-        const JsonArray* ignore_list = command_line_tests_setting->get_array("IGNORE_LIST");
-        if (ignore_list){
-            for (const auto& value: *ignore_list){
-                if (!value.is_string()){
-                    continue;
-                }
-                const std::string* test_name = value.to_string();
-                if (test_name != nullptr && !test_name->empty()){
-                    COMMAND_LINE_IGNORE_LIST.emplace_back(*test_name);
-                }
-            }
-        }
-
         if (COMMAND_LINE_TEST_MODE){
-            std::cout << "Enter command line test mode:" << std::endl;
-            if (COMMAND_LINE_TEST_LIST.size() > 0){
-                std::cout << "Run following tests: " << std::endl;
-                for (const auto& name : COMMAND_LINE_TEST_LIST){
-                    std::cout << "- " << name << std::endl;
-                }
-            }
-            if (COMMAND_LINE_IGNORE_LIST.size() > 0){
-                std::cout << "Ignore following " << COMMAND_LINE_IGNORE_LIST.size() << " paths: " << std::endl;
-                const size_t MAX_LINES = 5;
-                for (size_t i = 0; i < COMMAND_LINE_IGNORE_LIST.size() && i < MAX_LINES; i++){
-                    std::cout << "- " << COMMAND_LINE_IGNORE_LIST[i] << std::endl;
-                }
-                if (COMMAND_LINE_IGNORE_LIST.size() > MAX_LINES){
-                    std::cout << "..." << std::endl;
-                }
-            }
+            std::cout << "Enter command line test mode." << std::endl;
         }
     }
 }
