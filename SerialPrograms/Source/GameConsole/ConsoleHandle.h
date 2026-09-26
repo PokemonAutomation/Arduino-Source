@@ -32,6 +32,10 @@ public:
 
     size_t index() const;
 
+    //  The console session this handle belongs to. Programs use it to listen for
+    //  session events, e.g. the user's keyboard input (see ConsoleSystemSession::Listener).
+    ConsoleSystemSession& system_session();
+
     operator Logger&(){ return logger(); }
     operator VideoFeed&(){ return video(); }
     operator VideoOverlay&(){ return overlay(); }

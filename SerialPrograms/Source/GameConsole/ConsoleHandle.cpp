@@ -83,6 +83,9 @@ ConsoleHandle::ConsoleHandle(ConsoleSystemSession& session)
 size_t ConsoleHandle::index() const{
     return m_data->m_index;
 }
+ConsoleSystemSession& ConsoleHandle::system_session(){
+    return m_data->m_session;
+}
 size_t ConsoleHandle::controllers() const{
     return m_data->m_session.controllers();
 }

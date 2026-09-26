@@ -258,6 +258,8 @@ file(GLOB CORE_LIBRARY_SOURCES
     Source/Controllers/ControllerDescriptor.h
     Source/Controllers/ControllerOption.cpp
     Source/Controllers/ControllerOption.h
+    Source/Controllers/ControllerRelease.cpp
+    Source/Controllers/ControllerRelease.h
     Source/Controllers/ControllerSession.cpp
     Source/Controllers/ControllerSession.h
     Source/Controllers/ControllerState.cpp
@@ -900,6 +902,14 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/PABotBase2/SerialPABotBase_StatusThread.h
     Source/Controllers/SerialPort/SerialPortPollerQt.cpp
     Source/Controllers/SerialPort/SerialPortPollerQt.h
+    Source/Integrations/AgentServer/AgentServer_HttpServer.cpp
+    Source/Integrations/AgentServer/AgentServer_HttpServer.h
+    Source/Integrations/AgentServer/AgentServer_InputSteps.cpp
+    Source/Integrations/AgentServer/AgentServer_InputSteps.h
+    Source/Integrations/AgentServer/AgentServer_McpServer.cpp
+    Source/Integrations/AgentServer/AgentServer_McpServer.h
+    Source/Integrations/AgentServer/AgentServer_ToolDefinitions.cpp
+    Source/Integrations/AgentServer/AgentServer_ToolDefinitions.h
     Source/Integrations/DiscordIntegrationSettings.cpp
     Source/Integrations/DiscordIntegrationSettings.h
     Source/Integrations/DiscordIntegrationTable.cpp
@@ -1176,6 +1186,8 @@ file(GLOB LIBRARY_SOURCES
     Source/ML/Models/ML_OrtEnv.h
     Source/ML/Models/ML_YOLOv5Model.cpp
     Source/ML/Models/ML_YOLOv5Model.h
+    Source/ML/Programs/ML_AgentServer.cpp
+    Source/ML/Programs/ML_AgentServer.h
     Source/ML/Programs/ML_LabelImages.cpp
     Source/ML/Programs/ML_LabelImages.h
     Source/ML/Programs/ML_LabelImagesOverlayManager.cpp

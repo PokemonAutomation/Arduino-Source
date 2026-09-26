@@ -52,6 +52,12 @@ public:
         virtual void on_input_status_change(const std::string& status){}
         virtual void on_lock_controllers(){}
         virtual void on_unlock_controllers(){}
+
+        //  Called after the user's keyboard (or other controller input) was sent to
+        //  this console's controllers, e.g. so a program can notice that the user is
+        //  steering by hand. Not called for input that was suppressed (console not in
+        //  focus, or controllers locked). Runs on the UI thread; keep it quick.
+        virtual void on_controller_input(const ControllerInputState& state){}
     };
 
     void add_listener(Listener& listener){

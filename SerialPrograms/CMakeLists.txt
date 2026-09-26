@@ -63,9 +63,13 @@ find_package(Threads REQUIRED)
 # Define a toggle option (ON by default)
 option(COMMAND_LINE_EXE "Build the optional executable" ON)
 
-# Build only the GUI-free core: CoreLib and SerialProgramsCommandLine. This needs
-# no Qt, OpenCV, ONNX Runtime, Tesseract, DPP or Discord SDK, so none of them are
-# searched for.
+# Python bindings and the MCP server for AI agents (see Source/PythonBindings/README.md).
+# OFF by default because it needs a Python interpreter with development headers.
+option(PA_PYTHON_BINDINGS "Build the _pa_core Python module (acts as a Switch controller)" OFF)
+
+# Build only the GUI-free core: CoreLib, SerialProgramsCommandLine and (with
+# PA_PYTHON_BINDINGS) the Python module. This needs no Qt, OpenCV, ONNX Runtime,
+# Tesseract, DPP or Discord SDK, so none of them are searched for.
 option(PA_CORE_ONLY "Build only the GUI-free core (basic microcontroller functions, no Qt, OpenCV, etc.)" OFF)
 
 if(PA_CORE_ONLY)
@@ -77,6 +81,9 @@ if(PA_CORE_ONLY)
     include(cmake/CoreLib.cmake)
     if(COMMAND_LINE_EXE)
         include(Source/CommandLine/CommandLineExecutable.cmake)
+    endif()
+    if(PA_PYTHON_BINDINGS)
+        include(Source/PythonBindings/PythonBindings.cmake)
     endif()
     return()
 endif()
@@ -108,6 +115,7 @@ if(WIN32 AND QT_DEPLOY_FILES)
             Qml
             Quick
             QuickWidgets
+            Network
         )
     else()
         # Find all subdirectories in the Qt base directory
@@ -120,6 +128,7 @@ if(WIN32 AND QT_DEPLOY_FILES)
             Qml
             Quick
             QuickWidgets
+            Network
         )
         file(GLOB QT_SUBDIRS LIST_DIRECTORIES true "${QT_BASE_DIR}/${QT_MAJOR}*")
 
@@ -157,6 +166,7 @@ else()
         Qml
         Quick
         QuickWidgets
+        Network
     )
 endif()
 
@@ -265,6 +275,7 @@ function(apply_common_target_properties target_name)
         Qt${QT_MAJOR}::Qml
         Qt${QT_MAJOR}::Quick
         Qt${QT_MAJOR}::QuickWidgets
+        Qt${QT_MAJOR}::Network
     )    
 
     # more include directories
@@ -272,6 +283,16 @@ function(apply_common_target_properties target_name)
     target_link_directories(${target_name} PRIVATE ../3rdPartyBinaries/)
 
 endfunction()
+
+# Compile the shared AI agent tool definitions into the app (see
+# Source/Integrations/AgentServer/AgentTools.json).
+include(cmake/EmbedTextFile.cmake)
+pa_embed_text_file(
+    SerialProgramsLib
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/Integrations/AgentServer/AgentTools.json
+    ${CMAKE_CURRENT_BINARY_DIR}/Generated/AgentServer_AgentToolsJson.cpp
+    "PokemonAutomation::AgentServer::agent_tools_json_text"
+)
 
 # Apply common properties to both targets
 apply_common_target_properties(SerialProgramsLib)
@@ -844,4 +865,8 @@ endif()
 if(COMMAND_LINE_EXE)
     # Add command-line executable (GUI-free) from subdirectory
     include(Source/CommandLine/CommandLineExecutable.cmake)
+endif()
+
+if(PA_PYTHON_BINDINGS)
+    include(Source/PythonBindings/PythonBindings.cmake)
 endif()
