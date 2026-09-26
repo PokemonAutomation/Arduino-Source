@@ -900,6 +900,14 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/PABotBase2/SerialPABotBase_StatusThread.h
     Source/Controllers/SerialPort/SerialPortPollerQt.cpp
     Source/Controllers/SerialPort/SerialPortPollerQt.h
+    Source/Integrations/AgentServer/AgentServer_HttpServer.cpp
+    Source/Integrations/AgentServer/AgentServer_HttpServer.h
+    Source/Integrations/AgentServer/AgentServer_InputSteps.cpp
+    Source/Integrations/AgentServer/AgentServer_InputSteps.h
+    Source/Integrations/AgentServer/AgentServer_McpServer.cpp
+    Source/Integrations/AgentServer/AgentServer_McpServer.h
+    Source/Integrations/AgentServer/AgentServer_ToolDefinitions.cpp
+    Source/Integrations/AgentServer/AgentServer_ToolDefinitions.h
     Source/Integrations/DiscordIntegrationSettings.cpp
     Source/Integrations/DiscordIntegrationSettings.h
     Source/Integrations/DiscordIntegrationTable.cpp

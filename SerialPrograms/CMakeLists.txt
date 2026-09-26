@@ -115,6 +115,7 @@ if(WIN32 AND QT_DEPLOY_FILES)
             Qml
             Quick
             QuickWidgets
+            Network
         )
     else()
         # Find all subdirectories in the Qt base directory
@@ -127,6 +128,7 @@ if(WIN32 AND QT_DEPLOY_FILES)
             Qml
             Quick
             QuickWidgets
+            Network
         )
         file(GLOB QT_SUBDIRS LIST_DIRECTORIES true "${QT_BASE_DIR}/${QT_MAJOR}*")
 
@@ -164,6 +166,7 @@ else()
         Qml
         Quick
         QuickWidgets
+        Network
     )
 endif()
 
@@ -272,6 +275,7 @@ function(apply_common_target_properties target_name)
         Qt${QT_MAJOR}::Qml
         Qt${QT_MAJOR}::Quick
         Qt${QT_MAJOR}::QuickWidgets
+        Qt${QT_MAJOR}::Network
     )    
 
     # more include directories
@@ -279,6 +283,16 @@ function(apply_common_target_properties target_name)
     target_link_directories(${target_name} PRIVATE ../3rdPartyBinaries/)
 
 endfunction()
+
+# Compile the shared AI agent tool definitions into the app (see
+# Source/Integrations/AgentServer/AgentTools.json).
+include(cmake/EmbedTextFile.cmake)
+pa_embed_text_file(
+    SerialProgramsLib
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/Integrations/AgentServer/AgentTools.json
+    ${CMAKE_CURRENT_BINARY_DIR}/Generated/AgentServer_AgentToolsJson.cpp
+    "PokemonAutomation::AgentServer::agent_tools_json_text"
+)
 
 # Apply common properties to both targets
 apply_common_target_properties(SerialProgramsLib)
