@@ -297,6 +297,9 @@ void read_summary_screen(
         cur_pokemon_info.nature = summary_reader.read_nature(
             env.console, home_language, screen
         );
+        cur_pokemon_info.ability = summary_reader.read_ability(
+            env.console, home_language, screen
+        );
     }
 
     cur_pokemon_info.origin_mark = origin_mark_reader.read_mark(screen);
