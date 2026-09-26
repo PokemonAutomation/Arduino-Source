@@ -1304,6 +1304,8 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboMacro.h
     Source/PanelLists.cpp
     Source/PanelLists.h
+    Source/Pokemon/Inference/Pokemon_AbilityReader.cpp
+    Source/Pokemon/Inference/Pokemon_AbilityReader.h
     Source/Pokemon/Inference/Pokemon_BerryNameReader.cpp
     Source/Pokemon/Inference/Pokemon_BerryNameReader.h
     Source/Pokemon/Inference/Pokemon_BoxGenderDetector.cpp
