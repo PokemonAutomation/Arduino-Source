@@ -1184,6 +1184,8 @@ file(GLOB LIBRARY_SOURCES
     Source/ML/Models/ML_OrtEnv.h
     Source/ML/Models/ML_YOLOv5Model.cpp
     Source/ML/Models/ML_YOLOv5Model.h
+    Source/ML/Programs/ML_AgentServer.cpp
+    Source/ML/Programs/ML_AgentServer.h
     Source/ML/Programs/ML_LabelImages.cpp
     Source/ML/Programs/ML_LabelImages.h
     Source/ML/Programs/ML_LabelImagesOverlayManager.cpp
