@@ -28,6 +28,7 @@ enum class SortingRuleType
     Origin_Mark,
     Nature,
     Language_of_Origin,
+    Ability,
 };
 
 struct SortingRule
