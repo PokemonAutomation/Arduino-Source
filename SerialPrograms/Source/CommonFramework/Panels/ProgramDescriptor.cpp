@@ -40,9 +40,10 @@ std::unique_ptr<StatsTracker> ProgramDescriptor::make_stats() const{
 
 
 ProgramInstance::ProgramInstance(
-    const std::vector<std::string>& error_notification_tags
+    const std::vector<std::string>& error_notification_tags,
+    LockMode options_lock_mode
 )
-    : m_options(LockMode::LOCK_WHILE_RUNNING)
+    : m_options(options_lock_mode)
     , NOTIFICATION_PROGRAM_FINISH(
         "Program Finished",
         true, true,
