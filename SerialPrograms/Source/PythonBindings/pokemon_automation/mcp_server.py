@@ -45,6 +45,7 @@ except ImportError:  # mcp 1.x
     from mcp.server.fastmcp import FastMCP as _Server, Image  # type: ignore[no-redef]
     from mcp.server.fastmcp.exceptions import ToolError  # type: ignore[no-redef]
 
+from . import agent_tools
 from . import buttons as btn
 from ._core import core, core_available
 from .console import Console
@@ -55,49 +56,26 @@ from .video import VideoSource, find_video_device, ocr_available
 
 log = logging.getLogger("pokemon_automation.mcp")
 
-INSTRUCTIONS = """\
-You control a real Nintendo Switch through a USB device that acts as a controller, and see its screen
-through a capture card.
+# Tool names, descriptions, input schemas and agent instructions come from the
+# shared AgentTools.json (see agent_tools.py), which the SerialPrograms app serves
+# too. The functions below implement the tools; their signatures do the argument
+# validation and must stay in line with the shared schemas (tests check this).
 
-Workflow:
-- Call `screenshot` first to see where you are.
-- Input tools (`press_buttons`, `move_stick`, `run_inputs`) return a screenshot taken
-  `settle_ms` after the inputs finished, unless observe=false. Prefer `run_inputs` to send
-  several steps in one call when you are confident about them (e.g. navigating a known menu).
-- Use `read_text` to read on-screen text reliably instead of reading it off a screenshot.
-- If something goes wrong, call `release_all`.
-
-Conventions:
-- Buttons: A B X Y L R ZL ZR PLUS MINUS HOME CAPTURE LCLICK RCLICK. D-pad: UP DOWN LEFT
-  RIGHT (and UP_RIGHT etc.). Combine with "+", e.g. "L+R" or "ZL+A".
-- Sticks: direction names (up, down_left, ...) or [x, y] in [-1, 1], +y = up.
-- Boxes: [x, y, width, height] as fractions of the screen, (0, 0) = top-left.
-- Menus usually need a short press (hold 80 ms) and ~300-800 ms to animate. Walking is
-  done by holding a stick for a duration.
-- Switch UI: A = confirm, B = back, HOME = Home menu, X on Home menu = close game.
-- A black screen may mean the Switch is asleep; ask the user to wake it.
-"""
-
-BoxArg = Annotated[
-    list[float] | None,
-    Field(description="Crop box [x, y, width, height] as fractions of the screen; omit for the full screen."),
-]
+BoxArg = list[float] | None
 
 
 class Step(BaseModel):
-    """One input step. Set `buttons` and/or sticks to press something, or only
-    `wait_ms` to pause."""
+    """One `run_inputs` step (schema and descriptions: AgentTools.json)."""
 
-    buttons: str | None = Field(
-        None, description='Buttons and/or d-pad to hold together, e.g. "A", "L+R", "ZL+UP".')
-    left_stick: str | list[float] | None = Field(
-        None, description='Left stick: direction name ("up", "down_left") or [x, y] in [-1, 1].')
-    right_stick: str | list[float] | None = Field(
-        None, description="Right stick (camera in most games), same format as left_stick.")
-    hold_ms: int = Field(80, ge=1, description="How long to hold the inputs.")
-    release_ms: int = Field(80, ge=0, description="Neutral time after releasing, before the next step.")
-    repeat: int = Field(1, ge=1, le=100, description="Repeat this press/release cycle this many times.")
-    wait_ms: int = Field(0, ge=0, description="Extra pause after the step (or the whole step if nothing is pressed).")
+    model_config = {"extra": "forbid"}
+
+    buttons: str | None = None
+    left_stick: str | list[float] | None = None
+    right_stick: str | list[float] | None = None
+    hold_ms: int = Field(80, ge=1)
+    release_ms: int = Field(80, ge=0)
+    repeat: int = Field(1, ge=1, le=100)
+    wait_ms: int = Field(0, ge=0)
 
     def to_input_step(self) -> InputStep:
         return InputStep(
@@ -216,7 +194,21 @@ def agent_errors(fn):
 def create_server(config: ServerConfig) -> tuple[Any, ConsoleManager]:
     """Build the MCP server and its console manager. Separate from `main()` for tests."""
     manager = ConsoleManager(config)
-    server = _Server("pokemon-automation-switch", instructions=INSTRUCTIONS)
+    server = _Server(agent_tools.server_name(), instructions=agent_tools.instructions())
+    shared_tools = agent_tools.tools_for("python")
+
+    def tool(structured_output: bool | None = None):
+        """Register a tool under its function name, with the description and input
+        schema from AgentTools.json. Raises KeyError for a tool not in the file."""
+        def decorator(fn):
+            definition = shared_tools[fn.__name__]
+            server.tool(description=definition["description"],
+                        structured_output=structured_output)(fn)
+            # Advertise the shared schema (the SDK would otherwise derive one from
+            # the signature, which validates the same arguments but reads differently).
+            server._tool_manager.get_tool(fn.__name__).parameters = definition["inputSchema"]
+            return fn
+        return decorator
     # Serializes input tools so two calls can't interleave their button presses.
     input_lock = anyio.Lock()
 
@@ -266,13 +258,13 @@ def create_server(config: ServerConfig) -> tuple[Any, ConsoleManager]:
 
     # ---- status & setup ------------------------------------------------------
 
-    @server.tool()
+    @tool()
     @agent_errors
     async def switch_status() -> dict[str, Any]:
-        """Report controller and video connection status, resolution and limits."""
         def work() -> dict[str, Any]:
             console = manager.console()
-            status: dict[str, Any] = {"read_only": config.read_only, "fake": config.fake}
+            status: dict[str, Any] = {"control": "agent", "read_only": config.read_only,
+                                      "fake": config.fake}
             if console.controller is not None:
                 status["controller"] = {
                     "ready": console.controller.is_ready(),
@@ -300,20 +292,17 @@ def create_server(config: ServerConfig) -> tuple[Any, ConsoleManager]:
             return status
         return await anyio.to_thread.run_sync(work)
 
-    @server.tool()
+    @tool()
     @agent_errors
     async def list_devices() -> dict[str, Any]:
-        """List serial ports (controller devices) and video capture devices."""
         return {"serial_ports": list_serial_ports(), "video_devices": list_video_devices()}
 
-    @server.tool()
+    @tool()
     @agent_errors
     async def connect(
-        serial_port: Annotated[str | None, Field(description="Serial port of the controller device.")] = None,
-        video_device: Annotated[str | None, Field(description="Video device index or name substring.")] = None,
+        serial_port: str | None = None,
+        video_device: str | None = None,
     ) -> dict[str, Any]:
-        """(Re)connect to the controller and/or video device. Omitted arguments keep
-        the current setting. Use after unplugging a device or to switch devices."""
         def work() -> dict[str, Any]:
             if video_device is not None and not config.fake:
                 find_video_device(video_device)  # fail fast on a bad name
@@ -324,75 +313,64 @@ def create_server(config: ServerConfig) -> tuple[Any, ConsoleManager]:
 
     # ---- observation ------------------------------------------------------------
 
-    @server.tool(structured_output=False)
+    @tool(structured_output=False)
     @agent_errors
     async def screenshot(
         box: BoxArg = None,
-        max_width: Annotated[int | None, Field(ge=64, le=3840, description="Downscale to this width.")] = None,
+        max_width: Annotated[int | None, Field(ge=64, le=3840)] = None,
     ) -> list[Any]:
-        """Capture the current screen as a JPEG. Crop with `box` to zoom into details."""
         def work() -> list[Any]:
             return screenshot_content(manager.console(), box, max_width, 0)
         return await anyio.to_thread.run_sync(work)
 
-    @server.tool(structured_output=False)
+    @tool(structured_output=False)
     @agent_errors
     async def wait_and_observe(
-        duration_ms: Annotated[int, Field(ge=0, le=60_000, description="How long to wait.")],
+        duration_ms: Annotated[int, Field(ge=0, le=60_000)],
         box: BoxArg = None,
     ) -> list[Any]:
-        """Wait without pressing anything (e.g. for a loading screen), then screenshot."""
         def work() -> list[Any]:
             return screenshot_content(manager.console(), box, None, duration_ms)
         return await anyio.to_thread.run_sync(work)
 
-    @server.tool()
+    @tool()
     @agent_errors
     async def read_text(
         box: BoxArg = None,
-        mode: Annotated[Literal["block", "line", "word", "sparse"], Field(
-            description='"line" for one line, "block" for a paragraph, "sparse" for scattered text.')] = "block",
-        language: Annotated[str, Field(description='Tesseract language code, e.g. "eng", "jpn".')] = "eng",
-        whitelist: Annotated[str, Field(description='Only allow these characters, e.g. "0123456789".')] = "",
+        mode: Literal["block", "line", "word", "sparse"] = "block",
+        language: str = "eng",
     ) -> str:
-        """Read on-screen text with OCR. Crop tightly around the text with `box` for
-        best results."""
         def work() -> str:
             return manager.console().read_text(
-                tuple(box) if box else None, language=language, mode=mode, whitelist=whitelist)
+                tuple(box) if box else None, language=language, mode=mode)
         return await anyio.to_thread.run_sync(work)
 
     # ---- input --------------------------------------------------------------------
 
-    @server.tool(structured_output=False)
+    @tool(structured_output=False)
     @agent_errors
     async def press_buttons(
-        buttons: Annotated[str, Field(description='Buttons/d-pad to press together, e.g. "A", "L+R", "DOWN".')],
+        buttons: str,
         hold_ms: Annotated[int, Field(ge=1)] = 80,
         release_ms: Annotated[int, Field(ge=0)] = 120,
-        repeat: Annotated[int, Field(ge=1, le=100, description="Press this many times.")] = 1,
-        observe: Annotated[bool, Field(description="Return a screenshot afterwards.")] = True,
-        settle_ms: Annotated[int | None, Field(ge=0, le=10_000, description=(
-            "Wait this long after the inputs before the screenshot (default from server config)."))] = None,
+        repeat: Annotated[int, Field(ge=1, le=100)] = 1,
+        observe: bool = True,
+        settle_ms: Annotated[int | None, Field(ge=0, le=10_000)] = None,
     ) -> list[Any]:
-        """Press a button combination, optionally several times."""
         step = InputStep(buttons=buttons, hold_ms=hold_ms, release_ms=release_ms, repeat=repeat)
         return await send_and_observe([step], observe, settle_ms,
                                       f"press {buttons}" + (f" x{repeat}" if repeat > 1 else ""))
 
-    @server.tool(structured_output=False)
+    @tool(structured_output=False)
     @agent_errors
     async def move_stick(
-        direction: Annotated[str | list[float], Field(
-            description='Direction name ("up", "down_left", ...) or [x, y] in [-1, 1], +y = up.')],
-        duration_ms: Annotated[int, Field(ge=1, description="How long to hold the stick.")] = 500,
+        direction: str | list[float],
+        duration_ms: Annotated[int, Field(ge=1)] = 500,
         stick: Literal["left", "right"] = "left",
-        buttons: Annotated[str | None, Field(description='Buttons to hold at the same time, e.g. "B" to run.')] = None,
+        buttons: str | None = None,
         observe: bool = True,
         settle_ms: Annotated[int | None, Field(ge=0, le=10_000)] = None,
     ) -> list[Any]:
-        """Tilt a stick for a duration (walk, move a cursor, turn the camera),
-        optionally while holding buttons."""
         btn.parse_stick(direction)  # validate early for a clear error
         step = InputStep(buttons=buttons, hold_ms=duration_ms, release_ms=0)
         setattr(step, stick + "_stick", direction)
@@ -400,24 +378,19 @@ def create_server(config: ServerConfig) -> tuple[Any, ConsoleManager]:
                                       f"{stick} stick {direction} for {duration_ms} ms"
                                       + (f" holding {buttons}" if buttons else ""))
 
-    @server.tool(structured_output=False)
+    @tool(structured_output=False)
     @agent_errors
     async def run_inputs(
         steps: Annotated[list[Step], Field(min_length=1, max_length=200)],
         observe: bool = True,
         settle_ms: Annotated[int | None, Field(ge=0, le=10_000)] = None,
     ) -> list[Any]:
-        """Run a sequence of input steps back to back, then optionally screenshot.
-        Example: [{"buttons": "DOWN", "repeat": 3}, {"buttons": "A"}, {"wait_ms": 1000},
-        {"left_stick": "up", "hold_ms": 2000, "release_ms": 0}]"""
         input_steps = [s.to_input_step() for s in steps]
         return await send_and_observe(input_steps, observe, settle_ms, f"{len(steps)} steps")
 
-    @server.tool()
+    @tool()
     @agent_errors
     async def release_all() -> str:
-        """Emergency stop: cancel queued inputs and release every button and stick,
-        then wait briefly for the device to confirm."""
         console = manager.current()
         if console is None or console.controller is None:
             return "No controller connected."
@@ -429,14 +402,18 @@ def create_server(config: ServerConfig) -> tuple[Any, ConsoleManager]:
         return (f"Release requested, but the device did not confirm within {timeout_ms} ms. "
                 "Check switch_status; the controller may be disconnected.")
 
-    @server.tool()
+    @tool()
     @agent_errors
     async def get_logs(count: Annotated[int, Field(ge=1, le=500)] = 30) -> list[str]:
-        """Recent internal log lines (connection status, inputs, errors)."""
         if not core_available():
             return []
         return list(core().recent_logs(count))
 
+    registered = {t.name for t in server._tool_manager.list_tools()}
+    if registered != set(shared_tools):
+        raise RuntimeError(
+            f"Tools out of sync with AgentTools.json: missing {sorted(set(shared_tools) - registered)}, "
+            f"extra {sorted(registered - set(shared_tools))}")
     return server, manager
 
 

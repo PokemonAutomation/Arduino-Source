@@ -1,6 +1,9 @@
 # Built by CMake and copied here after each build.
 pokemon_automation/_pa_core*.so
 pokemon_automation/_pa_core*.pyd
+# Copied from Source/Integrations/AgentServer/ by the build (see agent_tools.py).
+pokemon_automation/AgentTools.json
+pokemon_automation/AgentInputTestCases.json
 __pycache__/
 *.egg-info/
 .pytest_cache/

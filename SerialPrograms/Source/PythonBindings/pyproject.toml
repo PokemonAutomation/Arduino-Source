@@ -32,7 +32,7 @@ pa-switch-mcp = "pokemon_automation.mcp_server:main"
 packages = ["pokemon_automation"]
 
 [tool.setuptools.package-data]
-pokemon_automation = ["_pa_core*.so", "_pa_core*.pyd"]
+pokemon_automation = ["_pa_core*.so", "_pa_core*.pyd", "AgentTools.json", "AgentInputTestCases.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
