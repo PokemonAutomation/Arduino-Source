@@ -28,6 +28,7 @@ struct CollectedPokemonInfo{
     uint16_t dex_number = 0;
     std::string name_slug = "";
     std::string nature = "";
+    std::string ability = "";
     bool shiny = false;
     bool gmax = false;
     bool alpha = false;

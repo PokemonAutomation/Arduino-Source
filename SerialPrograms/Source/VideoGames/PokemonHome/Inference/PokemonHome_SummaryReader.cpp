@@ -20,6 +20,7 @@
 #include "CommonTools/OCR/OCR_DictionaryMatcher.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "CommonTools/OCR/OCR_StringNormalization.h"
+#include "Pokemon/Inference/Pokemon_AbilityReader.h"
 #include "Pokemon/Inference/Pokemon_NatureReader.h"
 #include "PokemonHome_SummaryReader.h"
 
@@ -168,8 +169,15 @@ std::string SummaryReader::read_nature(Logger& logger, Language language, const 
     return result.results.size() == 1 ? result.results.begin()->second.token : "";
 }
 
-std::string SummaryReader::read_ability(Language language, const ImageViewRGB32& screen) const{
-    return read_text(language, screen, m_ability_box, gray_text_filters());
+std::string SummaryReader::read_ability(Logger& logger, Language language, const ImageViewRGB32& screen) const{
+    static const Pokemon::AbilityReader reader;
+    OCR::StringMatchResult result = reader.read_substring(
+        logger,
+        language,
+        extract_box_reference(screen, m_ability_box),
+        gray_nature_text_filters()
+    );
+    return result.results.size() == 1 ? result.results.begin()->second.token : "";
 }
 
 std::string SummaryReader::read_language_of_origin(const ImageViewRGB32& screen) const{
@@ -264,7 +272,7 @@ public:
         SummaryReader reader;
 
         std::string nature = reader.read_nature(logger, m_language, image);
-        std::string ability = reader.read_ability(m_language, image);
+        std::string ability = reader.read_ability(logger, m_language, image);
         std::string errors;
         if (nature != m_expected_nature){
             errors += "Nature: Expected: " + m_expected_nature + ", received: " + nature + "\n";
@@ -377,48 +385,48 @@ void add_tests_SummaryReader(UnitTestDatabase& database){
     database.add<Test_SummaryReader_Numbers>("PokemonHome/SummaryScreen/wartortle_Regular.png", 8, 379916, 15);
     database.add<Test_SummaryReader_Numbers>("PokemonHome/SummaryScreen/wurmple_Regular.png", 265, 843926, 1);
     //Text
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/annihilape_Regular.png", "Hardy", "1nnerf0cus", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/bidoof_Regular.png", "Lonely", "s1mp1e", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/annihilape_Regular.png", "Hardy", "Inner Focus", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/bidoof_Regular.png", "Lonely", "Simple", Language::English);
     database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/bulbasaur_Regular.png", "Relaxed", "", Language::English);
     database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Go.png", "Lonely", "", Language::English);
     database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Lza.png", "Sassy", "", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/capskid_Regular.png", "Sassy", "1ns0mn1a", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/castform_Regular.png", "Modest", "f0recast", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/cyclizar_Regular.png", "Impish", "shedsk1n", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/dudunsparce_Regular.png", "Calm", "hasenfub", Language::German);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/dudunsparce_Regular_Sv.png", "Relaxed", "serenegrace", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/capskid_Regular.png", "Sassy", "Insomnia", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/castform_Regular.png", "Modest", "Forecast", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/cyclizar_Regular.png", "Impish", "Shed Skin", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/dudunsparce_Regular.png", "Calm", "Rattled", Language::German);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/dudunsparce_Regular_Sv.png", "Relaxed", "Serene Grace", Language::English);
     database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/enamorus_Shiny.png", "Naive", "", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/gimmighoul_Regular.png", "Quiet", "ratt1ed", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/glimmet_Regular.png", "Naive", "t0x1cdebr1s", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/gogoat_Regular.png", "Quirky", "saps1pper", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/greatTusk_Shiny.png", "Adamant", "古代活性", Language::ChineseSimplified);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/hatterne_Regular.png", "Quiet", "hea1er", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/houndstone_Regular.png", "Bold", "sandrush", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/ironBunde_Regular.png", "Careful", "quarkdr1ve", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/ironBundle_Regular_Sv.png", "Calm", "quarkdr1ve", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/ironJugulis_Regular.png", "Docile", "quarkdr1ve", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/ironThorns_Regular.png", "Careful", "quarkdr1ve", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/kilowattrel_Regular.png", "Impish", "v01tabs0rb", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/kingler_Shiny.png", "Lonely", "sheerf0rce", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/komala_Regular.png", "Gentle", "c0mat0se", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/krabby_Shiny.png", "Hasty", "hypercutter", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/machamp_Regular.png", "Bold", "guts", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/pancham_Shiny.png", "Naive", "1r0nf1st", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/gimmighoul_Regular.png", "Quiet", "Rattled", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/glimmet_Regular.png", "Naive", "Toxic Debris", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/gogoat_Regular.png", "Quirky", "Sap Sipper", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/greatTusk_Shiny.png", "Adamant", "Protosynthesis", Language::ChineseSimplified);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/hatterne_Regular.png", "Quiet", "Healer", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/houndstone_Regular.png", "Bold", "Sand Rush", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/ironBunde_Regular.png", "Careful", "Quark Drive", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/ironBundle_Regular_Sv.png", "Calm", "Quark Drive", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/ironJugulis_Regular.png", "Docile", "Quark Drive", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/ironThorns_Regular.png", "Careful", "Quark Drive", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/kilowattrel_Regular.png", "Impish", "Volt Absorb", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/kingler_Shiny.png", "Lonely", "Sheer Force", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/komala_Regular.png", "Gentle", "Comatose", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/krabby_Shiny.png", "Hasty", "Hyper Cutter", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/machamp_Regular.png", "Bold", "Guts", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/pancham_Shiny.png", "Naive", "Iron Fist", Language::English);
     database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/rapidash_Regular.png", "Calm", "", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/rellor_Regular.png", "Hasty", "c0mp0undeyes", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/rellor_Regular.png", "Hasty", "Compound Eyes", Language::English);
     database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/riolu_Regular.png", "Rash", "", Language::English);
     database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/rowlet_ShinyAlpha.png", "Rash", "", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/scovillain_Regular.png", "Timid", "1ns0mn1a", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/slitherWing_Shiny.png", "Adamant", "古代活性", Language::ChineseSimplified);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/squirtle_Shiny.png", "Quiet", "sturzbach", Language::German);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/tapuLele_Shiny.png", "Sassy", "psych1csurge", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/tatsugiri_Regular.png", "Rash", "c0mmander", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/scovillain_Regular.png", "Timid", "Insomnia", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/slitherWing_Shiny.png", "Adamant", "Protosynthesis", Language::ChineseSimplified);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/squirtle_Shiny.png", "Quiet", "Torrent", Language::German);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/tapuLele_Shiny.png", "Sassy", "Psychic Surge", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/tatsugiri_Regular.png", "Rash", "Commander", Language::English);
     database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/teddiursa_Regular.png", "Mild", "", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/terapagos_regular.png", "Hardy", "terash1ft", Language::English);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/vulpix_Regular.png", "Naughty", "feuerfanger", Language::German);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/vulpix_Shiny.png", "Jolly", "feuerfanger", Language::German);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/wartortle_Regular.png", "Brave", "sturzbach", Language::German);
-    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/wurmple_Regular.png", "Sassy", "sh1e1ddust", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/terapagos_regular.png", "Hardy", "Tera Shift", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/vulpix_Regular.png", "Naughty", "Flash Fire", Language::German);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/vulpix_Shiny.png", "Jolly", "Flash Fire", Language::German);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/wartortle_Regular.png", "Brave", "Torrent", Language::German);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/wurmple_Regular.png", "Sassy", "Shield Dust", Language::English);
     //OT Name
     database.add<Test_SummaryReader_OtName>("PokemonHome/SummaryScreen/annihilape_Regular.png", "da1t0n", Language::English);
     database.add<Test_SummaryReader_OtName>("PokemonHome/SummaryScreen/bidoof_Regular.png", "h1karu", Language::English);

@@ -22,6 +22,7 @@ bool operator==(const CollectedPokemonInfo& lhs, const CollectedPokemonInfo& rhs
     return lhs.dex_number == rhs.dex_number &&
            lhs.name_slug == rhs.name_slug &&
            lhs.nature == rhs.nature &&
+           lhs.ability == rhs.ability &&
            lhs.shiny == rhs.shiny &&
            lhs.gmax == rhs.gmax &&
            lhs.alpha == rhs.alpha &&
@@ -102,6 +103,11 @@ bool operator<(const std::optional<CollectedPokemonInfo>& lhs, const std::option
                 return (lhs->nature < rhs->nature) != preference.reverse;
             }
             break;
+        case SortingRuleType::Ability:
+            if (lhs->ability != rhs->ability){
+                return (lhs->ability < rhs->ability) != preference.reverse;
+            }
+            break;
         case SortingRuleType::Language_of_Origin:
             if (lhs->language_of_origin != rhs->language_of_origin){
                 return (lhs->language_of_origin < rhs->language_of_origin) != preference.reverse;
@@ -130,6 +136,7 @@ std::ostream& operator<<(std::ostream& os, const std::optional<CollectedPokemonI
         os << "ot_id:" << pokemon->ot_id << " ";
         os << "ot_name:" << pokemon->ot_name << " ";
         os << "nature:" << pokemon->nature << " ";
+        os << "ability:" << pokemon->ability << " ";
         os << "primaryType:" << POKEMON_TYPE_SLUGS().get_string(pokemon->primary_type) << " ";
         os << "secondaryType:" << POKEMON_TYPE_SLUGS().get_string(pokemon->secondary_type) << " ";
         os << "teraType:" << POKEMON_TERA_TYPE_SLUGS().get_string(pokemon->tera_type) << " ";
@@ -187,6 +194,7 @@ void save_boxes_data_to_json(const std::vector<std::optional<CollectedPokemonInf
             pokemon["ot_id"] = current_pokemon->ot_id;
             pokemon["ot_name"] = current_pokemon->ot_name;
             pokemon["nature"] = current_pokemon->nature;
+            pokemon["ability"] = current_pokemon->ability;
             pokemon["primary_type"] = POKEMON_TYPE_SLUGS().get_string(current_pokemon->primary_type);
             pokemon["secondary_type"] = POKEMON_TYPE_SLUGS().get_string(current_pokemon->secondary_type);
             pokemon["tera_type"] = POKEMON_TERA_TYPE_SLUGS().get_string(current_pokemon->tera_type);

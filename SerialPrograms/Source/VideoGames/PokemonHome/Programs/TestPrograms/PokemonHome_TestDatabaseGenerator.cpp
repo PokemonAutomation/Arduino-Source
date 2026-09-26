@@ -167,7 +167,7 @@ void TestDatabaseGenerator::program(
             const int original_trainer_id = summary_reader.read_original_trainer_id(env.console, image);
             const std::string original_trainer_name = summary_reader.read_original_trainer_name(Language::English, image);
             const std::string nature = summary_reader.read_nature(env.console, Language::English, image);
-            const std::string ability = summary_reader.read_ability(Language::English, image);
+            const std::string ability = summary_reader.read_ability(env.console, Language::English, image);
             const int level = summary_reader.read_level(env.console, image);
             BoxViewDetector box_view_detector(&env.console.overlay());
             SummaryScreenDetector summary_detector(&env.console.overlay());
