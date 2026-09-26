@@ -5,13 +5,12 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/CancellableScope.h"
-#include "Common/Cpp/Concurrency/Thread.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
 #include "Common/Cpp/Logging/TaggedLogger.h"
 #include "Controllers/ControllerConnection.h"
+#include "Controllers/ControllerRelease.h"
 #include "Controllers/PABotBase2/SerialPABotBase2_Descriptor.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "PybindSwitchController.h"
@@ -197,38 +196,7 @@ bool PybindSwitchProController::release_all(uint64_t timeout_millis){
     if (controller == nullptr){
         return false;
     }
-    controller->cancel_all_commands();
-
-    //  Bound the confirmation: this timer cancels `scope` when the timeout passes,
-    //  which makes `issue_nop()` / `wait_for_all()` below throw
-    //  OperationCancelledException.
-    CancellableHolder<CancellableScope> scope;
-    Mutex lock;
-    ConditionVariable cv;
-    bool done = false;
-    Thread timer([&]{
-        std::unique_lock<Mutex> lg(lock);
-        if (!cv.wait_for(lg, Milliseconds(timeout_millis), [&]{ return done; })){
-            scope.cancel(nullptr);
-        }
-    });
-
-    bool confirmed = false;
-    try{
-        //  Queued after the cancel, so the device reports this no-op finished only
-        //  after it has dropped everything before it and held neutral for 10 ms.
-        controller->issue_nop(&scope, Milliseconds(10));
-        controller->wait_for_all(&scope);
-        confirmed = true;
-    }catch (OperationCancelledException&){}
-
-    {
-        std::lock_guard<Mutex> lg(lock);
-        done = true;
-    }
-    cv.notify_all();
-    timer.join();
-
+    bool confirmed = release_all_and_confirm(*controller, Milliseconds(timeout_millis));
     if (!confirmed){
         internal->m_logger.log(
             "release_all(): device did not confirm the neutral state within " +

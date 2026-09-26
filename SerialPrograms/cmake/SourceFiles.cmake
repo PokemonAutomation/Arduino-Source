@@ -258,6 +258,8 @@ file(GLOB CORE_LIBRARY_SOURCES
     Source/Controllers/ControllerDescriptor.h
     Source/Controllers/ControllerOption.cpp
     Source/Controllers/ControllerOption.h
+    Source/Controllers/ControllerRelease.cpp
+    Source/Controllers/ControllerRelease.h
     Source/Controllers/ControllerSession.cpp
     Source/Controllers/ControllerSession.h
     Source/Controllers/ControllerState.cpp

@@ -91,7 +91,8 @@ public:
     // Same as `cancel_all()`, then wait for the device to confirm that it is in the
     // neutral state, for at most `timeout_millis`.
     //
-    // Confirmation works by queueing a short neutral no-op after the cancel and
+    // Confirmation (see `release_all_and_confirm()` in Controllers/ControllerRelease.h)
+    // works by queueing a short neutral no-op after the cancel and
     // waiting for the device to report that the no-op finished. The serial protocol
     // delivers messages in order, so that report means the device has processed the
     // cancel and is holding the neutral state.
