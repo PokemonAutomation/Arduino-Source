@@ -96,13 +96,7 @@ private:
 
 class ConsoleProgramInstance : public ProgramInstance{
 public:
-    //  Options are locked individually while the program runs, so options
-    //  constructed with UNLOCK_WHILE_RUNNING (and buttons) stay usable.
-    ConsoleProgramInstance(
-        const std::vector<std::string>& error_notification_tags = {"Notifs"}
-    )
-        : ProgramInstance(error_notification_tags, LockMode::UNLOCK_WHILE_RUNNING)
-    {}
+    using ProgramInstance::ProgramInstance;
 
     virtual void program(ConsoleProgramEnvironment& env, CancellableScope& scope) = 0;
 

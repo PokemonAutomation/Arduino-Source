@@ -151,13 +151,7 @@ private:
 
 class MultiConsoleProgramInstance : public ProgramInstance{
 public:
-    //  Options are locked individually while the program runs, so options
-    //  constructed with UNLOCK_WHILE_RUNNING (and buttons) stay usable.
-    MultiConsoleProgramInstance(
-        const std::vector<std::string>& error_notification_tags = {"Notifs"}
-    )
-        : ProgramInstance(error_notification_tags, LockMode::UNLOCK_WHILE_RUNNING)
-    {}
+    using ProgramInstance::ProgramInstance;
 
     //  Called when the # of consoles changes.
     virtual void update_active_consoles(size_t console_count){}

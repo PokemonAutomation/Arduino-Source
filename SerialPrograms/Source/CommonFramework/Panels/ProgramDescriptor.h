@@ -69,10 +69,10 @@ public:
     //  - LOCK_WHILE_RUNNING: the whole options panel is disabled while running.
     //  - UNLOCK_WHILE_RUNNING: each option follows its own lock mode, so options
     //    constructed with UNLOCK_WHILE_RUNNING (and buttons) stay usable while the
-    //    program runs. Console programs use this; see ConsoleProgramInstance.
+    //    program runs. This is the default for all program instances.
     ProgramInstance(
         const std::vector<std::string>& error_notification_tags = {"Notifs"},
-        LockMode options_lock_mode = LockMode::LOCK_WHILE_RUNNING
+        LockMode options_lock_mode = LockMode::UNLOCK_WHILE_RUNNING
     );
     ConfigOption& options(){ return m_options; }
 
