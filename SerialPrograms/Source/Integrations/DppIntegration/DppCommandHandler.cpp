@@ -746,7 +746,7 @@ void Handler::add_command_string(dpp::commandhandler& handler, bool full_version
     }
     parameters.insert(parameters.end(), {
         {"command", param_info(pt_string, false, "String command.")},
-        {"milliseconds", param_info(pt_integer, true, "How long to hold the stick for, in milliseconds. (defaults to 100ms)")},
+        {"milliseconds", param_info(pt_integer, true, "How long to hold the command for. (defaults to 24ms)")},
     });
     uint8_t min_parameters = get_min_parameters(parameters);
 
@@ -798,7 +798,7 @@ void Handler::add_command_string(dpp::commandhandler& handler, bool full_version
             message.add_embed(embed);
             handler.reply(message, src);
         },
-        "Click a button for the specified console."
+        "Run a custom string command. (controller specific)"
     );
 }
 
@@ -821,6 +821,8 @@ void Handler::create_unified_commands(commandhandler& handler){
     add_command_joystick(handler, true, JoystickSide::NEITHER);
     add_command_joystick(handler, true, JoystickSide::LEFT);
     add_command_joystick(handler, true, JoystickSide::RIGHT);
+    add_command_string(handler, false);
+    add_command_string(handler, true);
 }
 
 }
