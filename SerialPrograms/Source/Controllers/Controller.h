@@ -195,9 +195,14 @@ public:
 
 
 public:
-    //  Controller Input
+    //  External Inputs
 
+    virtual bool run_string_command(Milliseconds duration, const std::string& command){ return false; };
     virtual void run_controller_input(const ControllerInputState& state){}
+
+
+public:
+    //  Input Sniffing
 
     struct InputSniffer{
         virtual void on_command_input(WallClock timestamp, const ControllerState& state) = 0;

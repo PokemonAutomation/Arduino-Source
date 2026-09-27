@@ -342,15 +342,20 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     // JoyconContext context(scope, console.controller<JoyconController>());
     VideoOverlaySet overlays(overlay);
 
+//    context->run_string_command("100|A");
+//    context->run_string_command("100|LJ:+1:0");
+
+    console.controller().run_string_command(16ms, "asdf");
 
 
+#if 0
     PokemonBDSP::ExperienceGainDetector detector;
     detector.make_overlays(overlays);
 
 
     auto snapshot = feed.snapshot();
     cout << detector.detect(snapshot) << endl;
-
+#endif
 
 
 #if 0

@@ -181,7 +181,15 @@ public:
 
 
 public:
-    //  Controller Input
+    //  External Inputs
+
+    //  stop
+    //  replace
+    //  wait
+    //  A,B
+    //  JS:+0.5:-0.5
+    //  A,B|JL:+0.5:-0.5
+    virtual bool run_string_command(Milliseconds duration, const std::string& command) override;
 
     virtual void run_controller_input(const ControllerInputState& state) override;
 
