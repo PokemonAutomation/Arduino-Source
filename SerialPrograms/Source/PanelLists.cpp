@@ -37,10 +37,11 @@ namespace PokemonAutomation{
 
 
 ProgramSelect::ProgramSelect(QWidget& parent, PanelHolder& holder)
-    : QGroupBox("Program Select", &parent)
+    : QWidget(&parent)
     , m_holder(holder)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->setAlignment(Qt::AlignTop);
     m_dropdown = new NoWheelCompactComboBox(this);
     m_dropdown->setMaxVisibleItems(20);
@@ -165,7 +166,7 @@ void ProgramSelect::change_list(int index){
 }
 
 QSize ProgramSelect::sizeHint() const{
-    QSize size = QGroupBox::sizeHint();
+    QSize size = QWidget::sizeHint();
 //    cout << size.width() << " x " << size.height() << endl;
 //    cout << this->size().width() << " x " << this->size().height() << endl;
     size.setWidth(scale_dpi_width(size.width() + 10));
