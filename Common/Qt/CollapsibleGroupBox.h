@@ -8,13 +8,13 @@
 #define PokemonAutomation_CollapsibleGroupBox_H
 
 #include <QWidget>
-#include <QGroupBox>
 
-class QToolButton;
+class QString;
+class QAbstractButton;
 
 namespace PokemonAutomation{
 
-class CollapsibleGroupBox : public QGroupBox{
+class CollapsibleGroupBox : public QWidget{
 public:
     CollapsibleGroupBox(QWidget& parent, const QString& title, bool expanded = true);
 
@@ -24,26 +24,10 @@ public:
 private:
     void set_expanded(bool expanded);
 
+    QAbstractButton* m_header;
+    QWidget* m_content;
     QWidget* m_widget;
 };
-
-
-
-
-#if 0
-class CollapsibleGroupBox : public QWidget{
-public:
-    explicit CollapsibleGroupBox(QWidget& parent, const QString& title);
-    QWidget* box();
-
-private:
-    QToolButton* m_arrow;
-    QGroupBox* m_box;
-
-};
-#endif
-
-
 
 }
 #endif

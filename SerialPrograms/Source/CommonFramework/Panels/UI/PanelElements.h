@@ -8,6 +8,7 @@
 #define PokemonAutomation_PanelElements_H
 
 #include <string>
+#include <QGroupBox>
 #include <QLabel>
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/Globals.h"
