@@ -7,6 +7,9 @@
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "ControllerInput/ControllerInput.h"
 #include "ControllerInput/Keyboard/KeyboardInput_State.h"
+#ifdef QT_CORE_LIB
+#include "ControllerInput/Keyboard/KeyboardInput_KeyMappings.h"
+#endif
 #include "Controllers/ControllerState.h"
 #include "StandardHid_Keyboard.h"
 
@@ -103,6 +106,21 @@ Keyboard::~Keyboard(){
 }
 
 
+bool Keyboard::run_string_command(Milliseconds duration, const std::string& command){
+#ifdef QT_CORE_LIB
+    const KeyboardInputMappings& map = get_keyid_to_hid_map();
+
+    for (char ch : command){
+        char upper = std::toupper(static_cast<unsigned char>(ch));
+        issue_key(
+            nullptr,
+            2*duration, duration, duration,
+            map.get(static_cast<Qt::Key>(upper))
+        );
+    }
+#endif
+    return true;
+}
 void Keyboard::run_controller_input(const ControllerInputState& state){
     if (state.type() != ControllerInputType::HID_Keyboard){
         return;

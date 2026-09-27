@@ -4,9 +4,9 @@
  *
  */
 
-#include "NintendoSwitch_ControllerButtons.h"
 #include "Common/Cpp/EnumStringMap.h"
 #include "Common/Cpp/Strings/StringTools.h"
+#include "NintendoSwitch_ControllerButtons.h"
 
 //#include <iostream>
 //using std::cout;
@@ -30,7 +30,9 @@ const EnumStringMap<Button> BUTTON_STRINGS{
     {Button::BUTTON_LCLICK,            "LJ"},
     {Button::BUTTON_RCLICK,            "RJ"},
     {Button::BUTTON_HOME,              "HOME"},
+    {Button::BUTTON_HOME,              "Home"},
     {Button::BUTTON_CAPTURE,           "CAPTURE"},
+    {Button::BUTTON_CAPTURE,           "Capture"},
     {Button::BUTTON_GR,                "GR"},
     {Button::BUTTON_GL,                "GL"},
     {Button::BUTTON_UP,                "Up"},
@@ -91,8 +93,8 @@ std::string button_to_string(Button button){
     return str;
 }
 
-Button string_to_button(std::string multi_button_string){
-    std::vector<std::string> string_vector = StringTools::split(multi_button_string, " ");
+Button string_to_button(std::string multi_button_string, const std::string& delim){
+    std::vector<std::string> string_vector = StringTools::split(multi_button_string, delim);
     Button button_result = BUTTON_NONE;
     for (const std::string& button_string : string_vector){
         if (button_string.empty()){

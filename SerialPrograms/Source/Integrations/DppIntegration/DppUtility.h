@@ -43,7 +43,6 @@ protected:
     );
     int64_t sanitize_integer_input(const dpp::parameter_list_t& params, const uint8_t& index);
     std::optional<int64_t> sanitize_optional_integer_input(const dpp::parameter_list_t& params, const uint8_t& index);
-    uint32_t get_button(uint32_t bt);
 
 private:
     Logger& dpp_logger();

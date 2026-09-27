@@ -16,6 +16,10 @@
 #include "DppUtility.h"
 #include "DppCommandHandler.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 using namespace dpp;
 namespace PokemonAutomation{
 namespace Integration{
@@ -558,39 +562,36 @@ void Handler::add_command_click(dpp::commandhandler& handler, bool full_version)
         parameters.insert(parameters.end(), {"id", param_info(pt_integer, false, "Console ID. Find yours by using the \"status\" command.")});
         parameters.insert(parameters.end(), {"index", param_info(pt_integer, false, "Controller index.")});
     }
-    parameters.insert(parameters.end(), {
-        {"button", param_info(pt_string, false, "Switch console button.",{
-            {"0", "Y"},
-            {"1", "B"},
-            {"2", "A"},
-            {"3", "X"},
-            {"4", "L"},
-            {"5", "R"},
-            {"6", "ZL"},
-            {"7", "ZR"},
-            {"8", "Minus"},
-            {"9", "Plus"},
-            {"10", "LStick"},
-            {"11", "RStick"},
-            {"12", "Home"},
-            {"13", "Capture"},
-            {"14", "GR"},
-            {"15", "GL"},
-            {"16", "UP"},
-            {"17", "RIGHT"},
-            {"18", "DOWN"},
-            {"19", "LEFT"},
-            {"20", "LEFT_SL"},
-            {"21", "LEFT_SR"},
-            {"22", "RIGHT_SL"},
-            {"23", "RIGHT_SR"},
-            {"24", "C"},
 
-//            {"25", "DUP"},
-//            {"26", "DDOWN"},
-//            {"27", "DLEFT"},
-//            {"28", "DRIGHT"},
-        })},
+    const param_info BUTTON_MAP(pt_string, false, "Console button.", {
+        {"0", "Y"},
+        {"1", "B"},
+        {"2", "A"},
+        {"3", "X"},
+        {"4", "L"},
+        {"5", "R"},
+        {"6", "ZL"},
+        {"7", "ZR"},
+        {"8", "-"},
+        {"9", "+"},
+        {"10", "LJ"},
+        {"11", "RJ"},
+        {"12", "Home"},
+        {"13", "Capture"},
+        {"14", "GR"},
+        {"15", "GL"},
+        {"16", "Up"},
+        {"17", "Right"},
+        {"18", "Down"},
+        {"19", "Left"},
+        {"20", "Left-SL"},
+        {"21", "Left-SR"},
+        {"22", "Right-SL"},
+        {"23", "Right-SR"},
+        {"24", "C"},
+    });
+    parameters.insert(parameters.end(), {
+        {"button", BUTTON_MAP},
         {"milliseconds", param_info(pt_integer, true, "How long to hold the button for, in milliseconds. (defaults to 100ms)")}
     });
     uint8_t min_parameters = get_min_parameters(parameters);
@@ -626,15 +627,14 @@ void Handler::add_command_click(dpp::commandhandler& handler, bool full_version)
             std::string button_input = std::get<std::string>(params[c++].second);
 
             std::string name = "None";
-            uint32_t button = (uint32_t)Utility::get_value_from_input(handler, command, full_version ? 2 : 0, button_input, name);
+            Utility::get_value_from_input(handler, command, full_version ? 2 : 0, button_input, name);
             uint32_t milliseconds = (uint32_t)Utility::sanitize_optional_integer_input(params, c++).value_or(100);
 
-            std::string response;
-            if (button >= 25){
-                response = Integration::press_dpad(id, index, milliseconds, Utility::get_button(button));
-            }else{
-                response = Integration::press_button(id, index, milliseconds, Utility::get_button(button));
-            }
+            std::string response = Integration::run_controller_command(
+                id, index,
+                milliseconds,
+                name.c_str()
+            );
 
             if (!response.empty()){
                 embed.set_description(response);
@@ -652,15 +652,19 @@ void Handler::add_command_click(dpp::commandhandler& handler, bool full_version)
 }
 void Handler::add_command_joystick(dpp::commandhandler& handler, bool full_version, JoystickSide side){
     std::string side_str = "";
+    std::string command_name = "";
     switch (side){
     case JoystickSide::NEITHER:
         side_str = "joystick";
+        command_name = "JS";
         break;
     case JoystickSide::LEFT:
         side_str = "Lstick";
+        command_name = "JSL";
         break;
     case JoystickSide::RIGHT:
         side_str = "Rstick";
+        command_name = "JSR";
         break;
     }
     if (full_version){
@@ -712,7 +716,11 @@ void Handler::add_command_joystick(dpp::commandhandler& handler, bool full_versi
             double y = std::get<double>(params[c++].second);
             uint32_t milliseconds = (uint32_t)Utility::sanitize_optional_integer_input(params, c++).value_or(100);
 
-            std::string response = Integration::press_joystick(id, index, milliseconds, side, x, y);
+            std::string response = Integration::run_controller_command(
+                id, index,
+                milliseconds,
+                (command_name + ":" + std::to_string(x) + ":" + std::to_string(y)).c_str()
+            );
             if (!response.empty()){
                 embed.set_description(response);
                 message.add_embed(embed);
@@ -728,6 +736,69 @@ void Handler::add_command_joystick(dpp::commandhandler& handler, bool full_versi
             handler.reply(message, src);
         },
         "Click a button for the specified console."
+    );
+}
+void Handler::add_command_string(dpp::commandhandler& handler, bool full_version){
+    parameter_registration_t parameters;
+    if (full_version){
+        parameters.insert(parameters.end(), {"id", param_info(pt_integer, false, "Console ID. Find yours by using the \"status\" command.")});
+        parameters.insert(parameters.end(), {"index", param_info(pt_integer, false, "Controller index.")});
+    }
+    parameters.insert(parameters.end(), {
+        {"command", param_info(pt_string, false, "String command.")},
+        {"milliseconds", param_info(pt_integer, true, "How long to hold the command for. (defaults to 24ms)")},
+    });
+    uint8_t min_parameters = get_min_parameters(parameters);
+
+    handler.add_command(
+        full_version ? "stringX" : "string",
+        parameters,
+        [=, &handler, this](const std::string& command, const parameter_list_t& params, command_source src){
+            log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
+            if (!GlobalSettings::instance().DISCORD->integration.allow_buttons_from_users && src.issuer.id != owner.id){
+                handler.reply(message("You do not have permission to use this command."), src);
+                return;
+            }
+
+            message message;
+            embed embed;
+            embed.set_color((uint32_t)color).set_title("Command Response");
+
+            if (params.size() < min_parameters){
+                embed.set_description("Missing command arguments.");
+                message.add_embed(embed);
+                handler.reply(message, src);
+                return;
+            }
+
+            uint8_t c = 0;
+            int64_t id = -1;
+            int64_t index = 0;
+            if (full_version){
+                id = Utility::sanitize_integer_input(params, c++);
+                index = Utility::sanitize_optional_integer_input(params, c++).value_or(0);
+            }
+
+            std::string str = std::get<std::string>(params[c++].second);
+            uint32_t milliseconds = (uint32_t)Utility::sanitize_optional_integer_input(params, c++).value_or(24);
+
+            std::string response = Integration::run_controller_command(
+                id, index,
+                milliseconds,
+                str.c_str()
+            );
+            if (!response.empty()){
+                embed.set_description(response);
+                message.add_embed(embed);
+                handler.reply(message, src);
+                return;
+            }
+
+            embed.set_description("Console ID " + std::to_string(id) + " sent:" + str);
+            message.add_embed(embed);
+            handler.reply(message, src);
+        },
+        "Run a custom string command. (controller specific)"
     );
 }
 
@@ -750,6 +821,8 @@ void Handler::create_unified_commands(commandhandler& handler){
     add_command_joystick(handler, true, JoystickSide::NEITHER);
     add_command_joystick(handler, true, JoystickSide::LEFT);
     add_command_joystick(handler, true, JoystickSide::RIGHT);
+    add_command_string(handler, false);
+    add_command_string(handler, true);
 }
 
 }

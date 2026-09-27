@@ -53,7 +53,11 @@ public:
 
 
 public:
-    //  Nintendo Switch
+    std::string run_controller_command(
+        uint64_t console_id, uint64_t controller_index,
+        Milliseconds duration,
+        const char* command
+    );
     std::string nsw_press_button(
         uint64_t console_id, uint64_t controller_index,
         Milliseconds duration,

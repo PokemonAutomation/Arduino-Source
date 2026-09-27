@@ -9,9 +9,9 @@
 
 #include <string>
 #include "Controllers/StandardHid/StandardHid_Keyboard.h"
-#include "NintendoSwitch/Options/NintendoSwitch_CodeEntrySettingsOption.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_KeyboardEntryMappings.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
