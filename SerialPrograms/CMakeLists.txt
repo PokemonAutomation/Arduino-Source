@@ -660,6 +660,7 @@ endif()
 
 if (ARCH_FLAGS_09_Nehalem)
 SET_SOURCE_FILES_PROPERTIES(
+    Source/Kernels/AudioResampling/Kernels_AudioResampling_Core_x86_SSE41.cpp
     Source/Kernels/AudioStreamConversion/AudioStreamConversion_Core_x86_SSE41.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_SSE41.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.cpp
@@ -680,6 +681,7 @@ endif()
 if (ARCH_FLAGS_13_Haswell)
 SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_AVX2.cpp
+    Source/Kernels/AudioResampling/Kernels_AudioResampling_Core_x86_AVX2.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX2.cpp
     Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness_x64_AVX2.cpp
     Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range_x64_AVX2.cpp

@@ -4,7 +4,6 @@
  *
  */
 
-#include <vector>
 #include <QtGlobal>
 #include <QAudioSink>
 using NativeAudioSink = QAudioSink;
@@ -12,6 +11,7 @@ using NativeAudioSink = QAudioSink;
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/LifetimeSanitizer.h"
+#include "Kernels/AudioResampling/Kernels_AudioResampling.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "AudioSink.h"
 
@@ -57,94 +57,9 @@ const char* audio_error_to_str(QAudio::Error error){
 
 
 
-// Convert a stream of interleaved float frames from one channel count and sample rate
-// to another. This is used by `AudioOutputDevice` when the output device (e.g. headphones)
-// cannot play the capture card's format directly. For example, capture cards typically
-// give 48000Hz stereo, while Bluetooth headphones may only accept 44100Hz stereo (A2DP
-// profile) or 16000Hz mono (hands-free profile), and many USB headsets only support one
-// fixed sample rate.
-//
-// 1. Channel mapping is done first, per frame:
-//    - Mono output: average all input channels.
-//    - Mono input: copy it into the first two output channels (left and right).
-//    - Otherwise: copy each input channel to the same output channel.
-//    Any remaining output channels (e.g. surround channels) are filled with silence.
-// 2. Sample rate conversion uses streaming linear interpolation between consecutive
-//    frames. The fractional read position and the previous frame are kept across calls
-//    so there are no clicks at buffer boundaries. There is no anti-aliasing filter, so
-//    large downsampling ratios lose some quality, but this is only for listening to the
-//    game, not for audio inference (which uses the unconverted input stream).
-class AudioFrameConverter{
-public:
-    AudioFrameConverter(
-        size_t input_channels, size_t input_rate,
-        size_t output_channels, size_t output_rate
-    )
-        : m_input_channels(input_channels)
-        , m_output_channels(output_channels)
-        , m_step((double)input_rate / (double)output_rate)
-        , m_position(0)
-        , m_mapped(output_channels)
-        , m_previous(output_channels, 0.0f)
-    {}
-
-    // Convert `frames` input frames in `data` and return a pointer to the output
-    // frames. The number of output frames is written to `output_frames`. The returned
-    // buffer is owned by this class and is valid until the next call.
-    const float* convert(const float* data, size_t frames, size_t& output_frames){
-        m_output.clear();
-        for (size_t f = 0; f < frames; f++){
-            map_channels(data + f * m_input_channels);
-
-            //  Emit all output frames that fall between the previous input frame and
-            //  this one. `m_position` is the read position relative to the previous frame.
-            while (m_position < 1.0){
-                float t = (float)m_position;
-                for (size_t c = 0; c < m_output_channels; c++){
-                    m_output.push_back(m_previous[c] + (m_mapped[c] - m_previous[c]) * t);
-                }
-                m_position += m_step;
-            }
-            m_position -= 1.0;
-            m_previous.swap(m_mapped);
-        }
-        output_frames = m_output.size() / m_output_channels;
-        return m_output.data();
-    }
-
-private:
-    void map_channels(const float* in){
-        if (m_output_channels == 1){
-            float sum = 0;
-            for (size_t c = 0; c < m_input_channels; c++){
-                sum += in[c];
-            }
-            m_mapped[0] = sum / (float)m_input_channels;
-            return;
-        }
-        for (size_t c = 0; c < m_output_channels; c++){
-            if (m_input_channels == 1){
-                m_mapped[c] = c < 2 ? in[0] : 0.0f;
-            }else{
-                m_mapped[c] = c < m_input_channels ? in[c] : 0.0f;
-            }
-        }
-    }
-
-private:
-    size_t m_input_channels;
-    size_t m_output_channels;
-    double m_step;
-    double m_position;
-    std::vector<float> m_mapped;
-    std::vector<float> m_previous;
-    std::vector<float> m_output;
-};
-
-
-
 // Receive float frames in the input (capture card) layout, convert them to the output
-// device's channel count and sample rate if needed, convert to the device's sample
+// device's channel count and sample rate if needed (using
+// `Kernels::AudioResampling::AudioFormatConverter`), convert to the device's sample
 // format and write them to the Qt audio sink.
 class AudioOutputDevice : public AudioFloatStreamListener, private ObjectStreamListener{
 public:
@@ -153,7 +68,7 @@ public:
         const NativeAudioInfo& device, const QAudioFormat& format,
         AudioSampleFormat sample_format,
         size_t input_channels, size_t input_steps_per_frame,
-        std::unique_ptr<AudioFrameConverter> converter,
+        std::unique_ptr<Kernels::AudioResampling::AudioFormatConverter> converter,
         double volume
     )
         : AudioFloatStreamListener(input_channels * input_steps_per_frame)
@@ -235,7 +150,7 @@ private:
     size_t m_input_steps_per_frame;
 
     //  Null if the device plays the input format directly.
-    std::unique_ptr<AudioFrameConverter> m_converter;
+    std::unique_ptr<Kernels::AudioResampling::AudioFormatConverter> m_converter;
 
     AudioFloatToStream m_to_stream;
     NativeAudioSink m_sink;
@@ -304,7 +219,7 @@ AudioSink::AudioSink(
     }
     logger.log("AudioOutputDevice(): Target: " + dump_audio_format(target_format));
 
-    std::unique_ptr<AudioFrameConverter> converter;
+    std::unique_ptr<Kernels::AudioResampling::AudioFormatConverter> converter;
     if (!native_info.isFormatSupported(target_format)){
         //  The device cannot play the input format. This is common with headphones,
         //  e.g. Bluetooth headphones that only accept 44100Hz, or 16000Hz mono when in
@@ -326,6 +241,14 @@ AudioSink::AudioSink(
             );
             return;
         }
+        if (!Kernels::AudioResampling::AudioFormatConverter::is_supported(m_sample_rate, target_format.sampleRate())){
+            logger.log(
+                "Unable to convert audio from " + std::to_string(m_sample_rate) + "Hz to " +
+                std::to_string(target_format.sampleRate()) + "Hz. Audio output is disabled.",
+                COLOR_RED
+            );
+            return;
+        }
         logger.log(
             "AudioOutputDevice(): Device does not support the input format. Converting from " +
             std::to_string(m_channels) + " channel(s) at " + std::to_string(m_sample_rate) + "Hz to " +
@@ -333,7 +256,7 @@ AudioSink::AudioSink(
             std::to_string(target_format.sampleRate()) + "Hz.",
             COLOR_ORANGE
         );
-        converter = std::make_unique<AudioFrameConverter>(
+        converter = std::make_unique<Kernels::AudioResampling::AudioFormatConverter>(
             m_channels, m_sample_rate,
             target_format.channelCount(), target_format.sampleRate()
         );
