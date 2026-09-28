@@ -669,6 +669,7 @@ SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness_x64_SSE42.cpp
     Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range_x64_SSE42.cpp
     Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean_x64_SSE42.cpp
+    Source/Kernels/YUVConversion/Kernels_YUVConversion_x64_SSE41.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_SSE41.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_SSE41.cpp
@@ -690,6 +691,7 @@ SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness_x64_AVX2.cpp
     Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range_x64_AVX2.cpp
     Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean_x64_AVX2.cpp
+    Source/Kernels/YUVConversion/Kernels_YUVConversion_x64_AVX2.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX2.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX2.cpp
