@@ -165,7 +165,9 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     // 2. Crop tightly around the text, with small safety margin
     cv::Mat cropped_image = crop_to_text_region_with_padding(cv_image_rgb, m_index);
     if (cropped_image.empty()){
-        m_logger.log("[OCR-DEBUG] Crop to text region returned empty image.");
+        if(STATIC_GLOBALS.PADDLE_OCR_DEBUG){
+            m_logger.log("[OCR-DEBUG] Crop to text region returned empty image.");
+        }
         return "";
     }
 
@@ -472,7 +474,7 @@ bool is_horizontal_line(const cv::Mat& binary, int image_index){
         }
 
         if (!is_line_shape(binary, contours[i])) {
-            cout << "Input image is likely NOT a horizontal line." << endl;
+            // cout << "Input image is likely NOT a horizontal line." << endl;
 
             return false;
             // std::cout << "Contour #" << i << " matches the criteria!" << std::endl;
