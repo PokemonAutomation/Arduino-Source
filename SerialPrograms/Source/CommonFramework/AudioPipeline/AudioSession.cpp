@@ -47,6 +47,7 @@ AudioSession::AudioSession(Logger& logger, AudioOption& option)
      : m_logger(logger)
      , m_option(option)
      , m_devices(new AudioPassthroughPairQtThread(logger))
+     , m_consecutive_timeouts(0)
 {
     AudioSession::reset();
     m_devices->add_listener(*this);
@@ -74,6 +75,7 @@ void AudioSession::save(AudioOption& option) const{
 void AudioSession::load(const AudioOption& option){
     {
         std::lock_guard<Mutex> lg(m_lock);
+        m_consecutive_timeouts.store(0, std::memory_order_relaxed);
         signal_pre_input_change();
 
         m_option.m_input_file       = option.m_input_file;
@@ -124,6 +126,7 @@ AudioOption::AudioDisplayType AudioSession::display_type() const{
 
 void AudioSession::clear_audio_input(){
     std::lock_guard<Mutex> lg(m_lock);
+    m_consecutive_timeouts.store(0, std::memory_order_relaxed);
     m_logger.log("Clearing audio input...");
     signal_pre_input_change();
     m_devices->clear_audio_source();
@@ -141,6 +144,7 @@ void AudioSession::clear_audio_input(){
 }
 void AudioSession::set_audio_input(std::string file){
     std::lock_guard<Mutex> lg(m_lock);
+    m_consecutive_timeouts.store(0, std::memory_order_relaxed);
     signal_pre_input_change();
     m_option.m_input_file = std::move(file);
     sanitize_format();
@@ -149,6 +153,7 @@ void AudioSession::set_audio_input(std::string file){
 }
 void AudioSession::set_audio_input(AudioDeviceInfo info){
     std::lock_guard<Mutex> lg(m_lock);
+    m_consecutive_timeouts.store(0, std::memory_order_relaxed);
     m_logger.log("Setting audio input to: " + info.display_name());
     signal_pre_input_change();
     m_option.m_input_file.clear();
@@ -163,6 +168,7 @@ void AudioSession::set_audio_input(AudioDeviceInfo info){
 }
 void AudioSession::set_format(AudioChannelFormat format){
     std::lock_guard<Mutex> lg(m_lock);
+    m_consecutive_timeouts.store(0, std::memory_order_relaxed);
     signal_pre_input_change();
     m_option.m_input_format = format;
     if (sanitize_format()){
@@ -289,8 +295,15 @@ void AudioSession::add_overlay(uint64_t starting_seqnum, size_t end_seqnum, Colo
 
 void AudioSession::on_fft(size_t sample_rate, std::shared_ptr<const AlignedVector<float>> fft_output){
     m_spectrum_holder.push_spectrum(sample_rate, std::move(fft_output));
+    m_consecutive_timeouts.store(0, std::memory_order_relaxed);
     global_watchdog().delay(*this);
 }
+
+
+const size_t AUDIO_RESET_FAST_ATTEMPTS = 3;
+const size_t AUDIO_RESET_SLOW_STRIDE = 12;
+
+
 void AudioSession::on_watchdog_timeout(){
 //    m_logger.log("AudioSession::on_watchdog_timeout()", COLOR_RED);
     if (m_option.m_input_file.empty() && !m_option.m_input_device){
@@ -298,11 +311,38 @@ void AudioSession::on_watchdog_timeout(){
     }
 
     uint8_t watchdog_timeout = GlobalSettings::instance().AUDIO_PIPELINE->AUTO_RESET_SECONDS;
-    m_logger.log("No audio detected for " + std::to_string(watchdog_timeout) + " seconds...", COLOR_RED);
+    size_t failures = m_consecutive_timeouts.fetch_add(1, std::memory_order_relaxed) + 1;
 
     if (watchdog_timeout == 0){
+        //  Log once so that a deliberately silent setup doesn't fill the log.
+        if (failures == 1){
+            m_logger.log("No audio detected for " + std::to_string(watchdog_timeout) + " seconds...", COLOR_RED);
+        }
         return;
     }
+
+    if (failures > AUDIO_RESET_FAST_ATTEMPTS){
+        if (failures == AUDIO_RESET_FAST_ATTEMPTS + 1){
+            m_logger.log(
+                "Audio has not recovered after " + std::to_string(AUDIO_RESET_FAST_ATTEMPTS) +
+                " resets. Backing off to one attempt per " +
+                std::to_string(watchdog_timeout * AUDIO_RESET_SLOW_STRIDE) + " seconds.",
+                COLOR_RED
+            );
+            m_logger.log(
+                "If the audio and the video come from the same capture card, some cards "
+                "cannot start their audio stream while their video stream is already "
+                "running. Select the audio input device before starting the video, or "
+                "unplug and replug the card.",
+                COLOR_RED
+            );
+        }
+        if ((failures - AUDIO_RESET_FAST_ATTEMPTS) % AUDIO_RESET_SLOW_STRIDE != 0){
+            return;
+        }
+    }
+
+    m_logger.log("No audio detected for " + std::to_string(watchdog_timeout) + " seconds...", COLOR_RED);
     m_logger.log("Resetting the audio...", COLOR_GREEN);
     reset();
 }

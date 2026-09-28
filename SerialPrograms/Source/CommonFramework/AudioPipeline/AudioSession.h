@@ -16,6 +16,7 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioSession_H
 #define PokemonAutomation_AudioPipeline_AudioSession_H
 
+#include <atomic>
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Concurrency/Watchdog.h"
 #include "AudioFeed.h"
@@ -100,6 +101,8 @@ private:
     std::unique_ptr<AudioPassthroughPair> m_devices;
 
     mutable Mutex m_lock;
+
+    std::atomic<size_t> m_consecutive_timeouts;
 
     ListenerSet<StateListener> m_listeners;
 
