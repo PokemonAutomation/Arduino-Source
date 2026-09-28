@@ -73,6 +73,7 @@ private:
     void add_command_resetcontroller(dpp::commandhandler& handler);
     void add_command_click(dpp::commandhandler& handler, bool full_version);
     void add_command_joystick(dpp::commandhandler& handler, bool full_version, JoystickSide side);
+    void add_command_string(dpp::commandhandler& handler, bool full_version);
 
 
     void create_unified_commands(dpp::commandhandler& handler);

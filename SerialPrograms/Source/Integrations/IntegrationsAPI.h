@@ -33,24 +33,11 @@ void pai_reset_controller           (DllSafeString& error, uint64_t console_id, 
 void pai_start_program              (DllSafeString& error, uint64_t program_id);
 void pai_stop_program               (DllSafeString& error, uint64_t program_id);
 
-void pai_nsw_press_button(
+void pai_run_controller_command(
     DllSafeString& error,
     uint64_t console_id, uint64_t controller_index,
     uint32_t milliseconds,
-    uint32_t button
-);
-void pai_nsw_press_dpad(
-    DllSafeString& error,
-    uint64_t console_id, uint64_t controller_index,
-    uint32_t milliseconds,
-    uint8_t position
-);
-void pai_nsw_press_joystick(
-    DllSafeString& error,
-    uint64_t console_id, uint64_t controller_index,
-    uint32_t milliseconds,
-    JoystickSide side,
-    double x, double y
+    const char* command
 );
 
 
@@ -88,32 +75,13 @@ inline std::string stop_program(uint64_t program_id){
     pai_stop_program(error, program_id);
     return error;
 }
-inline std::string press_button(
+inline std::string run_controller_command(
     uint64_t console_id, uint64_t controller_index,
     uint32_t milliseconds,
-    uint32_t button
+    const char* command
 ){
     DllSafeString error;
-    pai_nsw_press_button(error, console_id, controller_index, milliseconds, button);
-    return error;
-}
-inline std::string press_dpad(
-    uint64_t console_id, uint64_t controller_index,
-    uint32_t milliseconds,
-    uint8_t position
-){
-    DllSafeString error;
-    pai_nsw_press_dpad(error, console_id, controller_index, milliseconds, position);
-    return error;
-}
-inline std::string press_joystick(
-    uint64_t console_id, uint64_t controller_index,
-    uint32_t milliseconds,
-    JoystickSide side,
-    double x, double y
-){
-    DllSafeString error;
-    pai_nsw_press_joystick(error, console_id, controller_index, milliseconds, side, x, y);
+    pai_run_controller_command(error, console_id, controller_index, milliseconds, command);
     return error;
 }
 

@@ -108,41 +108,15 @@ void pai_stop_program(DllSafeString& error, uint64_t program_id){
     error = ProgramTracker::instance().stop_program(program_id);
 }
 
-void pai_nsw_press_button(
+void pai_run_controller_command(
     DllSafeString& error,
     uint64_t console_id, uint64_t controller_index,
     uint32_t milliseconds,
-    uint32_t button
+    const char* command
 ){
-    error = ProgramTracker::instance().nsw_press_button(
+    error = ProgramTracker::instance().run_controller_command(
         console_id, controller_index,
-        Milliseconds(milliseconds),
-        (NintendoSwitch::Button)button
-    );
-}
-void pai_nsw_press_dpad(
-    DllSafeString& error,
-    uint64_t console_id, uint64_t controller_index,
-    uint32_t milliseconds,
-    uint8_t position
-){
-    error = ProgramTracker::instance().nsw_press_dpad(
-        console_id, controller_index,
-        Milliseconds(milliseconds),
-        (NintendoSwitch::DpadPosition)position
-    );
-}
-void pai_nsw_press_joystick(
-    DllSafeString& error,
-    uint64_t console_id, uint64_t controller_index,
-    uint32_t milliseconds,
-    JoystickSide side,
-    double x, double y
-){
-    error = ProgramTracker::instance().nsw_press_joystick(
-        console_id, controller_index,
-        Milliseconds(milliseconds),
-        side, JoystickPosition{x, y}
+        Milliseconds(milliseconds), command
     );
 }
 

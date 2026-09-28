@@ -189,69 +189,12 @@ std::string ProgramTracker::stop_program(uint64_t program_id){
     program->async_stop();
     return "";
 }
-std::string ProgramTracker::nsw_press_button(
+std::string ProgramTracker::run_controller_command(
     uint64_t console_id, uint64_t controller_index,
     Milliseconds duration,
-    NintendoSwitch::Button button
+    const char* command
 ){
-    using namespace NintendoSwitch;
-    std::string header = make_header("press_button", console_id);
-
-    std::lock_guard<Mutex> lg(m_lock);
-
-    std::string error;
-    ControllerSession* controller = get_controller(error, header, console_id, controller_index);
-    if (controller == nullptr){
-        return error;
-    }
-
-//    cout << "button = " << button << endl;
-
-    try{
-        switch (controller->controller_class()){
-        case ControllerClass::NintendoSwitch_ProController:
-            error = controller->try_run<ProController>(
-                [=](ProController& controller){
-                    controller.issue_buttons(nullptr, duration, duration, 0ms, button);
-                }
-            );
-            break;
-        case ControllerClass::NintendoSwitch_LeftJoycon:
-            error = controller->try_run<LeftJoycon>(
-                [=](LeftJoycon& controller){
-                    controller.issue_buttons(nullptr, duration, duration, 0ms, button);
-                }
-            );
-            break;
-        case ControllerClass::NintendoSwitch_RightJoycon:
-            error = controller->try_run<RightJoycon>(
-                [=](RightJoycon& controller){
-                    controller.issue_buttons(nullptr, duration, duration, 0ms, button);
-                }
-            );
-            break;
-        default:
-            error = "Incompatible controller class.";
-        }
-    }catch (Exception& e){
-        e.log(global_logger_tagged());
-        error = e.to_str();
-    }
-    if (error.empty()){
-        global_logger_tagged().log("ProgramTracker::" + header, COLOR_BLUE);
-        return "";
-    }else{
-        global_logger_tagged().log("ProgramTracker::" + header + ": " + error, COLOR_RED);
-        return error;
-    }
-}
-std::string ProgramTracker::nsw_press_dpad(
-    uint64_t console_id, uint64_t controller_index,
-    Milliseconds duration,
-    NintendoSwitch::DpadPosition position
-){
-    using namespace NintendoSwitch;
-    std::string header = make_header("press_dpad", console_id);
+    std::string header = make_header("controller_command", console_id);
 
     std::lock_guard<Mutex> lg(m_lock);
 
@@ -262,89 +205,11 @@ std::string ProgramTracker::nsw_press_dpad(
     }
 
     try{
-        error = controller->try_run<ProController>(
-            [=](ProController& controller){
-                controller.issue_dpad(nullptr, duration, duration, 0ms, position);
+        error = controller->try_run<AbstractController>(
+            [=](AbstractController& controller){
+                controller.run_string_command(duration, command);
             }
         );
-    }catch (Exception& e){
-        e.log(global_logger_tagged());
-        error = e.to_str();
-    }
-    if (error.empty()){
-        global_logger_tagged().log("ProgramTracker::" + header, COLOR_BLUE);
-        return "";
-    }else{
-        global_logger_tagged().log("ProgramTracker::" + header + ": " + error, COLOR_RED);
-        return error;
-    }
-}
-std::string ProgramTracker::nsw_press_joystick(
-    uint64_t console_id, uint64_t controller_index,
-    Milliseconds duration,
-    Integration::JoystickSide side,
-    JoystickPosition position
-){
-    using namespace NintendoSwitch;
-    std::string header = make_header("press_left_joystick", console_id);
-
-    std::lock_guard<Mutex> lg(m_lock);
-
-    std::string error;
-    ControllerSession* controller = get_controller(error, header, console_id, controller_index);
-    if (controller == nullptr){
-        return error;
-    }
-
-    ControllerClass type = controller->controller_class();
-    try{
-        auto procon_left = [=](ProController& controller){
-            controller.issue_left_joystick(nullptr, duration, duration, 0ms, position);
-        };
-        auto procon_right = [=](ProController& controller){
-            controller.issue_right_joystick(nullptr, duration, duration, 0ms, position);
-        };
-        auto joycon = [=](JoyconController& controller){
-            controller.issue_joystick(nullptr, duration, duration, 0ms, position);
-        };
-
-        switch (type){
-        case ControllerClass::NintendoSwitch_ProController:
-            switch (side){
-            case PokemonAutomation::Integration::JoystickSide::LEFT:
-                error = controller->try_run<ProController>(procon_left);
-                break;
-            case PokemonAutomation::Integration::JoystickSide::RIGHT:
-                error = controller->try_run<ProController>(procon_right);
-                break;
-            default:
-                error = "Incompatible controller class.";
-            }
-            break;
-        case ControllerClass::NintendoSwitch_LeftJoycon:
-            switch (side){
-            case PokemonAutomation::Integration::JoystickSide::NEITHER:
-            case PokemonAutomation::Integration::JoystickSide::LEFT:
-                error = controller->try_run<LeftJoycon>(joycon);
-                break;
-            default:
-                error = "Incompatible controller class.";
-            }
-            break;
-        case ControllerClass::NintendoSwitch_RightJoycon:
-            switch (side){
-            case PokemonAutomation::Integration::JoystickSide::NEITHER:
-            case PokemonAutomation::Integration::JoystickSide::RIGHT:
-                error = controller->try_run<RightJoycon>(joycon);
-                break;
-            default:
-                error = "Incompatible controller class.";
-            }
-            break;
-        default:
-            error = "Incompatible controller class.";
-        }
-
     }catch (Exception& e){
         e.log(global_logger_tagged());
         error = e.to_str();

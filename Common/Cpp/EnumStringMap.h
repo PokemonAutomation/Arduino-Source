@@ -19,10 +19,9 @@ namespace PokemonAutomation{
 template <typename EnumType>
 class EnumStringMap{
 public:
-    EnumStringMap(std::initializer_list<std::pair<const EnumType, std::string>> x)
-        : m_enum_to_string(std::move(x))
-    {
-        for (const auto& item : m_enum_to_string){
+    EnumStringMap(std::initializer_list<std::pair<const EnumType, std::string>> x){
+        for (const std::pair<const EnumType, std::string>& item : x){
+            m_enum_to_string.emplace(item);
             auto ret =  m_string_to_enum.emplace(item.second, item.first);
             if (!ret.second){
                 throw InternalProgramError(
