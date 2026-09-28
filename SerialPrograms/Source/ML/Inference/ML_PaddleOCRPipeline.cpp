@@ -8,6 +8,11 @@
 #include <array>
 #include <fstream>
 #include <limits>
+#include <opencv2/opencv.hpp>
+#if CV_VERSION_MAJOR >= 5
+//  OpenCV 5 moved minAreaRect()/boxPoints() out of imgproc into their own header.
+#include <opencv2/geometry.hpp>
+#endif
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"

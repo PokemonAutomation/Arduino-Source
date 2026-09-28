@@ -144,8 +144,7 @@ static ReidentifyResult reidentify_by_types(
     for (uint64_t phase = 0; phase < stride; phase++){
         std::vector<uint64_t> positions;
         std::vector<BlinkType> observed_types;
-        uint64_t scanned = 0;
-        for (uint64_t index = phase; index < nibbles.size(); index += stride, scanned++){
+        for (uint64_t index = phase; index < nibbles.size(); index += stride){
             if (nibble_blinked(nibbles[(size_t)index])){
                 positions.emplace_back(index);
                 observed_types.emplace_back(nibble_type(nibbles[(size_t)index]));

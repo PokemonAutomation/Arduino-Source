@@ -10,6 +10,7 @@
 
 #include <functional>
 #include <utility>
+#include <cstdint>
 #include "Common/Cpp/ImageResolution.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 

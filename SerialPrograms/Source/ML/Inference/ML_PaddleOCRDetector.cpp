@@ -10,6 +10,10 @@
 #include <optional>
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
+#if CV_VERSION_MAJOR >= 5
+//  OpenCV 5 moved minAreaRect()/getPerspectiveTransform() out of imgproc into their own header.
+#include <opencv2/geometry.hpp>
+#endif
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Rectangle.tpp"
 #include "CommonFramework/Logging/Logger.h"
