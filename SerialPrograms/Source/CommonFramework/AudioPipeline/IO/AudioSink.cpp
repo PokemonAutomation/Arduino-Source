@@ -45,8 +45,11 @@ const char* audio_error_to_str(QAudio::Error error){
         return "OpenError (device cannot be opened with the requested format)";
     case QAudio::IOError:
         return "IOError";
+#if QT_VERSION < QT_VERSION_CHECK(6, 11, 0)
+    //  Deprecated in Qt 6.11, which no longer emits it.
     case QAudio::UnderrunError:
         return "UnderrunError";
+#endif
     case QAudio::FatalError:
         return "FatalError";
     default:
