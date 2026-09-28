@@ -15,7 +15,9 @@
 #include <QCameraDevice>
 #include <QMediaCaptureSession>
 #include <QVideoFrame>
+#include "VideoFrameQt.h"
 #include <QQuickWidget>
+#include <QQuickItem>
 #include "CommonFramework/Tools/StatAccumulator.h"
 #include "CommonFramework/VideoPipeline/VideoSource.h"
 #include "CommonFramework/VideoPipeline/CameraInfo.h"
@@ -112,6 +114,10 @@ private:
     std::unique_ptr<QCameraThread> m_camera;
     std::unique_ptr<QVideoSink> m_video_sink;
     std::unique_ptr<QMediaCaptureSession> m_capture;
+
+    //  Torn down by handle: m_metaobject is neither sender nor receiver, so
+    //  m_metaobject->disconnect() would be a no-op.
+    QMetaObject::Connection m_display_connection;
 
     VideoFormatSet m_formats;
 

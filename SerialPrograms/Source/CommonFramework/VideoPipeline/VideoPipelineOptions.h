@@ -42,11 +42,20 @@ public:
             5
 #endif
         )
+        , LOG_VIDEO_PATH_STATS(
+            "<b>Log Video Path Diagnostics:</b><br>"
+            "Once a second, log what the capture backend is actually delivering: pixel format, "
+            "resolution, whether frames arrive on the CPU or as a GPU texture, and what it costs "
+            "to copy one. Useful when diagnosing a capture card that renders wrong or burns CPU.",
+            LockMode::UNLOCK_WHILE_RUNNING,
+            false
+        )
     {
         PA_ADD_OPTION(SHOW_ALL_FPS);
         PA_ADD_OPTION(VIDEO_BACKEND0);
 
         PA_ADD_OPTION(AUTO_RESET_SECONDS);
+        PA_ADD_OPTION(LOG_VIDEO_PATH_STATS);
     }
 
 public:
@@ -54,6 +63,7 @@ public:
     VideoBackendOption VIDEO_BACKEND0;
 
     SimpleIntegerOption<uint8_t> AUTO_RESET_SECONDS;
+    BooleanCheckBoxOption LOG_VIDEO_PATH_STATS;
 };
 
 

@@ -1,9 +1,11 @@
 
 #include <QDir>
 #include <QApplication>
+#include <QSurfaceFormat>
 #include <QFileInfo>
 //#include <QTextStream>
 #include <QMessageBox>
+#include <fstream>
 #include "Common/Cpp/Logging/LastLogTracker.h"
 #include "Common/Cpp/Logging/FileLogger.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
@@ -87,6 +89,35 @@ FileLogger& global_file_logger(){
 
 
 
+#if defined(__linux__)
+//  With nodrop=1 (the kernel default), uvcvideo delivers frames that lost USB
+//  packets instead of dropping them. The missing rows are stale, which shows up
+//  as a horizontal tear that detection reads as a normal frame.
+void warn_if_uvcvideo_delivers_torn_frames(Logger& logger){
+    std::ifstream file("/sys/module/uvcvideo/parameters/nodrop");
+    if (!file){
+        return;
+    }
+    std::string value;
+    std::getline(file, value);
+    while (!value.empty() && (value.back() == '\r' || value.back() == ' ')){
+        value.pop_back();
+    }
+    if (value != "1"){
+        return;
+    }
+    logger.log(
+        "uvcvideo is set to nodrop=1. Frames that lose USB packets will be delivered "
+        "partially written instead of dropped: part of the image will be stale. This "
+        "is visible as a horizontal tear and is read as-is by detection. To fix it:  "
+        "echo 0 | sudo tee /sys/module/uvcvideo/parameters/nodrop  (to persist:  "
+        "echo \"options uvcvideo nodrop=0\" | sudo tee /etc/modprobe.d/uvcvideo.conf)",
+        COLOR_RED
+    );
+}
+#endif
+
+
 int run_program(int argc, char *argv[]){
 //    qputenv("QT_RHI_BACKEND", "opengl");
 
@@ -120,6 +151,10 @@ int run_program(int argc, char *argv[]){
     logger.log("Executable path: " + Filesystem::application_binary_directory().string_slash_normalized());
     logger.log("Program setting folder: " + SETTINGS_PATH());
     logger.log("Program resources folder: " + RESOURCE_PATH());
+
+#if defined(__linux__)
+    warn_if_uvcvideo_delivers_torn_frames(logger);
+#endif
 
     qRegisterMetaType<size_t>("size_t");
     qRegisterMetaType<uint8_t>("uint8_t");
@@ -246,6 +281,23 @@ int main(int argc, char *argv[]){
     // See: https://doc.qt.io/qt-6.5/qtmultimedia-index.html
     if (qEnvironmentVariableIsEmpty("QT_MEDIA_BACKEND")){
         qputenv("QT_MEDIA_BACKEND", "gstreamer");
+    }
+
+    //  Use mmap instead of dmabuf. With dmabuf, Qt imports capture buffers as
+    //  EGLImages, and drivers that reject the fourcc (NVIDIA with YUYV) render
+    //  a flat color without reporting an error.
+    if (qEnvironmentVariableIsEmpty("QT_GSTREAMER_V4L2SRC_IOMODE")){
+        qputenv("QT_GSTREAMER_V4L2SRC_IOMODE", "2");
+    }
+#endif
+
+#if defined(__linux__)
+    //  Force vsync, or video tears under Wayland. Must be set before the
+    //  QApplication is constructed.
+    {
+        QSurfaceFormat format = QSurfaceFormat::defaultFormat();
+        format.setSwapInterval(1);
+        QSurfaceFormat::setDefaultFormat(format);
     }
 #endif
 

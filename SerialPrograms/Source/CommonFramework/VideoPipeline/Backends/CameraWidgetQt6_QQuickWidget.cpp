@@ -8,6 +8,7 @@
 #include <QCamera>
 #include <QPainter>
 #include <QVideoSink>
+#include <QVideoFrameFormat>
 #include <QQuickItem>
 #include "Common/Qt/Redispatch.h"
 #include "VideoFrameQt.h"
@@ -91,9 +92,10 @@ CameraVideoSource::CameraVideoSource(
     , m_snapshot_manager(logger, m_last_frame)
 {
     if (!info){
+        m_logger.log("Camera has no device info. Not starting.", COLOR_RED);
         return;
     }
-    m_logger.log("Starting Camera: Backend = CameraQt6QVideoSink");
+    m_logger.log("Starting Camera: Backend = CameraQt6_QQuickWidget, device = \"" + info.device_name() + "\"");
 
     run_on_main_thread_and_wait([&]{
         init(info, desired_resolution, desired_format, desired_fps);
@@ -152,16 +154,27 @@ void CameraVideoSource::init(
         }
     });
 #endif
+    //  Context is the QCamera: runs on the camera thread and outlives every display.
     m_metaobject->connect(
         m_video_sink.get(), &QVideoSink::videoFrameChanged,
-        &m_camera->camera(), [&](const QVideoFrame& frame){
+        &m_camera->camera(), [this](const QVideoFrame& frame){
             //  This runs on the QCamera's thread. So it is off the critical path.
 
-            WallClock now = current_time();
-            if (!m_last_frame.push_frame(frame, now)){
+            WallClock copy_start = current_time();
+            QVideoFrame owned = deep_copy_frame(frame);
+            WallClock copy_end = current_time();
+            report_video_path_stats(
+                m_logger, "QQuickWidget", frame, owned.isValid(), copy_start, copy_end
+            );
+            if (!owned.isValid()){
                 return;
             }
-            report_source_frame(std::make_shared<VideoFrame>(now, frame));
+
+            WallClock now = current_time();
+            if (!m_last_frame.push_frame(owned, now)){
+                return;
+            }
+            report_source_frame(std::make_shared<VideoFrame>(now, owned));
         }
     );
 }
@@ -169,6 +182,12 @@ void CameraVideoSource::init(
 
 QWidget* CameraVideoSource::make_display_QtWidget(QWidget* parent){
     CameraVideoDisplay* display = new CameraVideoDisplay(parent);
+
+    //  Null if init() found no camera or usable format.
+    if (m_camera == nullptr || m_video_sink == nullptr){
+        m_logger.log("make_display_QtWidget(): camera was not initialized", COLOR_RED);
+        return display;
+    }
 
     QObject* root = display->rootObject();
     if (root == nullptr){
@@ -188,17 +207,16 @@ QWidget* CameraVideoSource::make_display_QtWidget(QWidget* parent){
         return display;
     }
 
-    m_metaobject->disconnect();
-    m_metaobject->connect(
+    QObject::disconnect(m_display_connection);
+
+    //  qml_sink must be the context: it is destroyed whenever the display is
+    //  rebuilt, which drops this connection, and it queues the call onto the
+    //  GUI thread.
+    m_display_connection = QObject::connect(
         m_video_sink.get(), &QVideoSink::videoFrameChanged,
         qml_sink, [this, qml_sink](const QVideoFrame& frame){
-            WallClock now = current_time();
-
-            QMetaObject::invokeMethod(qml_sink, [qml_sink, frame](){
-                qml_sink->setVideoFrame(frame);
-            }, Qt::QueuedConnection);
-
-            report_rendered_frame(now);
+            qml_sink->setVideoFrame(frame);
+            report_rendered_frame(current_time());
         }
     );
 
@@ -211,6 +229,7 @@ QWidget* CameraVideoSource::make_display_QtWidget(QWidget* parent){
 
 CameraVideoDisplay::~CameraVideoDisplay(){
 }
+
 CameraVideoDisplay::CameraVideoDisplay(QWidget* parent)
     : QQuickWidget(parent)
     , m_sanitizer("CameraVideoDisplay")
@@ -239,7 +258,6 @@ CameraVideoDisplay::CameraVideoDisplay(QWidget* parent)
         file.close();
         this->setSource(QUrl::fromLocalFile(file.fileName()));
     }
-
 }
 
 

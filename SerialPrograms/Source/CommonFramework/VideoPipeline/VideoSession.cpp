@@ -297,7 +297,11 @@ void VideoSession::internal_set_source(
 
     Resolution desired_resolution = resolution ? resolution : m_option.m_resolution;
 //    cout << "desired_resolution = " << desired_resolution.to_string() << endl;
+    m_logger.log("Changing video to: " + device->display_name());
     source = device->make_VideoSource(m_logger, desired_resolution, format, fps);
+    if (!source){
+        m_logger.log("No video source was created.", COLOR_RED);
+    }
     if (source){
         resolution = source->current_resolution();
         format = source->current_format();

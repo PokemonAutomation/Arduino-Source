@@ -174,11 +174,21 @@ void CameraVideoSource::set_video_output(QGraphicsVideoItem& item){
         &m_camera->camera(), [&](const QVideoFrame& frame){
             //  This runs on the QCamera's thread. So it is off the critical path.
 
-            WallClock now = current_time();
-            if (!m_last_frame.push_frame(frame, now)){
+            WallClock copy_start = current_time();
+            QVideoFrame owned = deep_copy_frame(frame);
+            WallClock copy_end = current_time();
+            report_video_path_stats(
+                m_logger, "Qt6.5-QGraphicsScene", frame, owned.isValid(), copy_start, copy_end
+            );
+            if (!owned.isValid()){
                 return;
             }
-            report_source_frame(std::make_shared<VideoFrame>(now, frame));
+
+            WallClock now = current_time();
+            if (!m_last_frame.push_frame(owned, now)){
+                return;
+            }
+            report_source_frame(std::make_shared<VideoFrame>(now, owned));
         }
     );
 }

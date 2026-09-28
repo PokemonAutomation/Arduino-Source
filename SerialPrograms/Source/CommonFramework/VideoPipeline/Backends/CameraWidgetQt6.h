@@ -14,6 +14,7 @@
 #include <QCameraDevice>
 #include <QMediaCaptureSession>
 #include <QVideoFrame>
+#include "VideoFrameQt.h"
 #include "CommonFramework/Tools/StatAccumulator.h"
 #include "CommonFramework/VideoPipeline/VideoSource.h"
 #include "CommonFramework/VideoPipeline/CameraInfo.h"
