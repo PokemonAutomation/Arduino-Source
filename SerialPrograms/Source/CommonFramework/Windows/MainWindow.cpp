@@ -18,6 +18,7 @@
 #include "Common/Cpp/Logging/MultiOutputLogger.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/CpuId/CpuId.h"
+#include "Common/Qt/CollapsibleGroupBox.h"
 #include "Common/Qt/UiStateQtWidget.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
@@ -86,25 +87,18 @@ MainWindow::MainWindow(QWidget* parent)
 #endif
 
     QHBoxLayout* hbox = new QHBoxLayout(centralwidget);
-    QVBoxLayout* left_layout = new QVBoxLayout();
-    hbox->addLayout(left_layout, 0);
+    CollapsibleGroupBox* sidebar = new CollapsibleGroupBox(
+        *centralwidget, "Program Select", true, Qt::Horizontal
+    );
+    hbox->addWidget(sidebar, 0);
+    QWidget* sidebar_body = new QWidget(sidebar);
+    sidebar->set_widget(sidebar_body);
+    QVBoxLayout* left_layout = new QVBoxLayout(sidebar_body);
+    left_layout->setContentsMargins(0, 0, 0, 0);
 
-#if 0
-    QGroupBox* program_box = new QGroupBox("Program Select", centralwidget);
-    left_layout->addWidget(program_box, 1);
-    QVBoxLayout* program_layout = new QVBoxLayout(program_box);
-    program_layout->setAlignment(Qt::AlignTop);
-
-//    NoWheelCompactComboBox* program_dropdown = new NoWheelCompactComboBox(this);
-//    program_layout->addWidget(program_dropdown);
-
-    m_program_list = new ProgramTabs(*this, *this);
-    program_layout->addWidget(m_program_list);
-#else
-    m_program_list = new ProgramSelect(*this, *this);
+    m_program_list = new ProgramSelect(*sidebar_body, *this);
     m_program_list->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
     left_layout->addWidget(m_program_list, 1);
-#endif
 
 
     QGroupBox* support_box = new QGroupBox(

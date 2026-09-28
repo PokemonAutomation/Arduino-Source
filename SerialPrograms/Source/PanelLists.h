@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_ProgramTabs_H
 #define PokemonAutomation_ProgramTabs_H
 
-#include <QGroupBox>
+#include <QWidget>
 #include "CommonFramework/Panels/PanelList.h"
 
 class QComboBox;
@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 // a display list window to show the current active game's program list.
 // This class owns the a vector of PanelListDescriptor. A PanelListDescriptor is
 // like a generator for the programs and their UIs for a game.
-class ProgramSelect : public QGroupBox{
+class ProgramSelect : public QWidget{
 public:
     ProgramSelect(QWidget& parent, PanelHolder& holder);
 

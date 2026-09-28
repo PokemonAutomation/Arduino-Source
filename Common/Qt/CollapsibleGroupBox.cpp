@@ -23,8 +23,9 @@ constexpr int CONTENT_INDENT = HEADER_PADDING + ARROW_SIZE + ARROW_SPACING;
 
 class SectionHeader : public QAbstractButton{
 public:
-    SectionHeader(QWidget* parent, const QString& title)
+    SectionHeader(QWidget* parent, const QString& title, Qt::Orientation orientation)
         : QAbstractButton(parent)
+        , m_orientation(orientation)
     {
         setText(title);
         setCheckable(true);
@@ -37,14 +38,28 @@ public:
     }
 
     QSize sizeHint() const override{
-        return QSize(
+        QSize size(
             CONTENT_INDENT + fontMetrics().horizontalAdvance(text()) + HEADER_PADDING,
             qMax(ARROW_SIZE, fontMetrics().height()) + 2 * HEADER_PADDING
         );
+        if (compact()){
+            size.transpose();
+        }
+        return size;
     }
     QSize minimumSizeHint() const override{
+        if (compact()){
+            return sizeHint();
+        }
         return QSize(CONTENT_INDENT + HEADER_PADDING, sizeHint().height());
     }
+
+private:
+    bool compact() const{
+        return m_orientation == Qt::Horizontal && !isChecked();
+    }
+
+    const Qt::Orientation m_orientation;
 
 protected:
     bool event(QEvent* event) override{
@@ -78,16 +93,28 @@ protected:
         }
 
         option.rect = QStyle::visualRect(layoutDirection(), rect(), QRect(
-            HEADER_PADDING, (height() - ARROW_SIZE) / 2, ARROW_SIZE, ARROW_SIZE
+            compact() ? (width() - ARROW_SIZE) / 2 : HEADER_PADDING,
+            compact() ? HEADER_PADDING : (height() - ARROW_SIZE) / 2,
+            ARROW_SIZE, ARROW_SIZE
         ));
+        QStyle::PrimitiveElement arrow = QStyle::PE_IndicatorArrowRight;
+        if (isChecked()){
+            arrow = m_orientation == Qt::Horizontal
+                ? QStyle::PE_IndicatorArrowLeft : QStyle::PE_IndicatorArrowDown;
+        }
         style()->drawPrimitive(
-            isChecked() ? QStyle::PE_IndicatorArrowDown : QStyle::PE_IndicatorArrowRight,
-            &option, &painter, this
+            arrow, &option, &painter, this
         );
 
         QRect text_rect = QStyle::visualRect(layoutDirection(), rect(), rect().adjusted(
             CONTENT_INDENT, 0, -HEADER_PADDING, 0
         ));
+        if (compact()){
+            //  Read the collapsed title from top to bottom beneath the arrow.
+            painter.translate(width(), CONTENT_INDENT);
+            painter.rotate(90);
+            text_rect = QRect(0, 0, height() - CONTENT_INDENT - HEADER_PADDING, width());
+        }
         style()->drawItemText(
             &painter, text_rect, Qt::AlignVCenter | Qt::AlignLeading | Qt::TextShowMnemonic,
             option.palette, isEnabled(),
@@ -100,11 +127,14 @@ protected:
 }
 
 
-CollapsibleGroupBox::CollapsibleGroupBox(QWidget& parent, const QString& title, bool expanded)
+CollapsibleGroupBox::CollapsibleGroupBox(
+    QWidget& parent, const QString& title, bool expanded, Qt::Orientation orientation
+)
     : QWidget(&parent)
-    , m_header(new SectionHeader(this, title))
+    , m_header(new SectionHeader(this, title, orientation))
     , m_content(new QWidget(this))
     , m_widget(nullptr)
+    , m_orientation(orientation)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -112,10 +142,18 @@ CollapsibleGroupBox::CollapsibleGroupBox(QWidget& parent, const QString& title, 
 
     m_header->setChecked(expanded);
     layout->addWidget(m_header);
-    layout->addWidget(m_content);
+    layout->addWidget(m_content, orientation == Qt::Horizontal ? 1 : 0);
+    if (orientation == Qt::Horizontal){
+        //  Keep the reopen button at the top of the collapsed sidebar.
+        layout->addStretch(0);
+    }
 
     QVBoxLayout* content_layout = new QVBoxLayout(m_content);
-    content_layout->setContentsMargins(CONTENT_INDENT, HEADER_PADDING, HEADER_PADDING, HEADER_PADDING);
+    if (orientation == Qt::Horizontal){
+        content_layout->setContentsMargins(0, HEADER_PADDING, 0, 0);
+    }else{
+        content_layout->setContentsMargins(CONTENT_INDENT, HEADER_PADDING, HEADER_PADDING, HEADER_PADDING);
+    }
     content_layout->setSpacing(0);
 
     set_expanded(expanded);
@@ -129,6 +167,18 @@ CollapsibleGroupBox::CollapsibleGroupBox(QWidget& parent, const QString& title, 
 }
 void CollapsibleGroupBox::set_expanded(bool expanded){
     m_content->setVisible(expanded && m_widget != nullptr);
+    if (m_orientation == Qt::Horizontal){
+        static_cast<QVBoxLayout*>(layout())->setStretch(2, expanded ? 0 : 1);
+        m_header->setToolTip((expanded ? tr("Collapse %1") : tr("Expand %1")).arg(m_header->text()));
+        m_header->updateGeometry();
+        if (expanded){
+            setMinimumWidth(0);
+            setMaximumWidth(QWIDGETSIZE_MAX);
+        }else{
+            setFixedWidth(m_header->sizeHint().width());
+        }
+        updateGeometry();
+    }
 }
 
 QWidget* CollapsibleGroupBox::widget(){

@@ -16,7 +16,11 @@ namespace PokemonAutomation{
 
 class CollapsibleGroupBox : public QWidget{
 public:
-    CollapsibleGroupBox(QWidget& parent, const QString& title, bool expanded = true);
+    //  Horizontal sections collapse to a narrow header with a vertical title.
+    CollapsibleGroupBox(
+        QWidget& parent, const QString& title, bool expanded = true,
+        Qt::Orientation orientation = Qt::Vertical
+    );
 
     QWidget* widget();
     void set_widget(QWidget* widget);
@@ -27,6 +31,7 @@ private:
     QAbstractButton* m_header;
     QWidget* m_content;
     QWidget* m_widget;
+    const Qt::Orientation m_orientation;
 };
 
 }
