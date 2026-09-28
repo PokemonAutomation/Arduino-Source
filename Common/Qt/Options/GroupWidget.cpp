@@ -91,6 +91,7 @@ void GroupWidget::make_options(){
     QVBoxLayout* options_layout = new QVBoxLayout(m_options_holder);
     options_layout->setContentsMargins(0, 0, 0, 0);
 
+    m_options.clear();
     for (auto& item : m_value.options()){
         m_options.emplace_back(ConfigWidget::make_from_option(*item, this));
         m_options.back()->widget().setContentsMargins(5, 5, 5, 5);
@@ -148,6 +149,7 @@ void GroupWidget::on_config_value_changed(void* object){
 void GroupWidget::mouseDoubleClickEvent(QMouseEvent*){
     if (m_options_holder){
         m_expand_text->setVisible(true);
+        m_options.clear();
         delete m_options_holder;
         m_options_holder = nullptr;
         return;
