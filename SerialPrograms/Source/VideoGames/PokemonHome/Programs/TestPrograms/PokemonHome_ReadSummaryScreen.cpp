@@ -6,6 +6,7 @@
 
 #include <optional>
 #include <sstream>
+#include "Common/Cpp/CancellableScope.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "Pokemon/Pokemon_CollectedPokemonInfo.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -69,7 +70,7 @@ ReadSummaryScreen::ReadSummaryScreen()
 
 void ReadSummaryScreen::program(
     SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context
+    CancellableScope& scope
 ){
     SummaryReader reader;
     VideoOverlaySet overlays(env.console);
@@ -84,7 +85,7 @@ void ReadSummaryScreen::program(
     std::string nature = reader.read_nature(env.console, HOME_LANGUAGE, screen);
 
     CollectedPokemonInfo pokemon_info{};
-    read_summary_screen(env, context, pokemon_info, OT_NAME_LANGUAGE, HOME_LANGUAGE);
+    read_summary_screen(env, pokemon_info, OT_NAME_LANGUAGE, HOME_LANGUAGE);
 
     std::optional<CollectedPokemonInfo> logged_info = pokemon_info;
     std::ostringstream ss;

@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonHome_ReadSummaryScreen_H
 #define PokemonAutomation_PokemonHome_ReadSummaryScreen_H
 
+#include "Common/Cpp/CancellableScope.h"
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -24,7 +25,7 @@ public:
     using Descriptor = ReadSummaryScreen_Descriptor;
     ReadSummaryScreen();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     OCR::LanguageOCROption OT_NAME_LANGUAGE;

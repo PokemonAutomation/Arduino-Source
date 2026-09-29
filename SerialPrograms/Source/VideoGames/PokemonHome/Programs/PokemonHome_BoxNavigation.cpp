@@ -12,12 +12,10 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
-#include "CommonTools/Images/ImageFilter.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/VisualDetectors/FrozenImageDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "Pokemon/Inference/Pokemon_TypeReader.h"
@@ -220,8 +218,10 @@ std::array<size_t, 2> find_occupied_slots_in_box(
 
 // Read the current summary screen and assign various pokemon info into `cur_pokemon_info`
 void read_summary_screen(
-    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-    CollectedPokemonInfo& cur_pokemon_info, Language ot_name_language, Language home_language
+    SingleSwitchProgramEnvironment& env, 
+    CollectedPokemonInfo& cur_pokemon_info, 
+    Language ot_name_language, 
+    Language home_language
 ) {
     VideoOverlaySet video_overlay_set(env.console);
 
@@ -242,11 +242,6 @@ void read_summary_screen(
     origin_mark_reader.make_overlays(video_overlay_set);
     summary_reader.make_overlays(video_overlay_set);
     BoxGenderDetector::make_overlays(video_overlay_set);
-
-    // Wait for the summary screen transition to end
-    FrozenImageDetector frozen_image_detector(COLOR_GREEN, { 0.388, 0.238, 0.109, 0.062 }, Milliseconds(80), 20);
-    frozen_image_detector.make_overlays(video_overlay_set);
-    wait_until(env.console, context, 5s, { frozen_image_detector });
 
     VideoSnapshot screen = env.console.video().snapshot();
 
@@ -310,10 +305,6 @@ void read_summary_screen(
     video_overlay_set.clear();
 
     // NOTE edit when adding new struct members (detections go here likely)
-
-    // Press button R to go to next summary screen
-    pbf_press_button(context, BUTTON_R, 80ms, 300ms);
-    context.wait_for_all_requests();
 }
 
 void print_boxes_data(const std::vector<std::optional<CollectedPokemonInfo>>& boxes_data, SingleSwitchProgramEnvironment& env) {

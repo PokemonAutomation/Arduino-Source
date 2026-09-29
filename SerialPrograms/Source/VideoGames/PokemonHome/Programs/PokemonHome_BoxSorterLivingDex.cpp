@@ -24,6 +24,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "CommonTools/OCR/OCR_StringNormalization.h"
+#include "CommonTools/VisualDetectors/FrozenImageDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_BoxCursor.h"
@@ -288,7 +289,16 @@ bool BoxSorterLivingDex::is_viable_for_dex(
                     }
 
                     // Read the summary screen and assign data to boxes_data[global_idx]
-                    read_summary_screen(env, context, boxes_data[global_idx].value(), ot_name_language, Language::None);
+                    read_summary_screen(env, boxes_data[global_idx].value(), ot_name_language, Language::None);
+
+                    // Press button R to go to next summary screen
+                    pbf_press_button(context, BUTTON_R, 80ms, 300ms);
+                    context.wait_for_all_requests();
+
+                    // Wait for the summary screen transition to end
+                    FrozenImageDetector frozen_image_detector(COLOR_GREEN, { 0.388, 0.238, 0.109, 0.062 }, Milliseconds(80), 20);
+                    frozen_image_detector.make_overlays(video_overlay_set);
+                    wait_until(env.console, context, 5s, { frozen_image_detector });
                 }
             }
 
