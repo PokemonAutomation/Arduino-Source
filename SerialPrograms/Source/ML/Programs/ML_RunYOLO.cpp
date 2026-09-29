@@ -5,16 +5,17 @@
  *  Test YOLO detection model on Switch streams.
  */
 
-#include <iostream>
-#include <filesystem>
+//#include <iostream>
+//#include <filesystem>
 #include <QMessageBox>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
-#include "Common/Cpp/PrettyPrint.h"
+//#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
+//#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+//#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "ML/Inference/ML_YOLOv5Detector.h"
 #include "ML_RunYOLO.h"
 
@@ -49,11 +50,11 @@ RunYOLO::RunYOLO()
     PA_ADD_OPTION(MODEL_PATH);
 }
 
-void RunYOLO::program(NintendoSwitch::SingleSwitchProgramEnvironment& env, NintendoSwitch::ProControllerContext& context){
+void RunYOLO::program(NintendoSwitch::SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     std::string model_path = MODEL_PATH;
     YOLOv5Watcher watcher(env.console.overlay(), model_path);
 
-    wait_until(env.console, context, WallClock::max(), {watcher});
+    wait_until(env.console, scope, WallClock::max(), {watcher});
 }
 
 

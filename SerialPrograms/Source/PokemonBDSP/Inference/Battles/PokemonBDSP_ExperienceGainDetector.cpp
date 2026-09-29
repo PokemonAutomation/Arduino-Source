@@ -10,9 +10,9 @@
 #include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonBDSP_ExperienceGainDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -47,7 +47,7 @@ bool ExperienceGainDetector::detect(const ImageViewRGB32& screen){
     }
     const ImageStats stats1 = image_stats(extract_box_reference(screen, m_left_column));
 //    cout << "ExperienceGainDetector: No m_left_column detected, " << stats1.average.to_string() << ", " << stats1.stddev.to_string() << endl;
-    if (!is_solid(stats1, {0.3, 0.35, 0.35}, 0.1, 40)){
+    if (!is_solid(stats1, {0.3, 0.35, 0.35}, 0.1, 50)){
         return false;
     }
     const ImageStats stats2 = image_stats(extract_box_reference(screen, m_lower_left_region));

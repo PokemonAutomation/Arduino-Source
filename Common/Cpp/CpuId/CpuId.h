@@ -13,7 +13,7 @@
 #elif _M_IX86 || _M_X64 || __i386__ || __x86_64__
 #define PA_ARCH_x86 1
 #include "CpuId_x86.h"
-#elif __arm64__
+#elif __arm64__ || __aarch64__
 #define PA_ARCH_arm64 1
 #include "CpuId_arm64.h"
 #else

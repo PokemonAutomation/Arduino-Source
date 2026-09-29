@@ -27,6 +27,8 @@ struct CollectedPokemonInfo{
     // When adding any new member here, do not forget to modify the functions below (ctrl-f "new struct members")
     uint16_t dex_number = 0;
     std::string name_slug = "";
+    std::string nature = "";
+    std::string ability = "";
     bool shiny = false;
     bool gmax = false;
     bool alpha = false;
@@ -38,6 +40,7 @@ struct CollectedPokemonInfo{
     PokemonType secondary_type = PokemonType::NONE;
     PokemonTeraType tera_type = PokemonTeraType::NONE;
     OriginMark origin_mark = OriginMark::NONE;
+    std::string language_of_origin = "";
 };
 
 bool operator==(const CollectedPokemonInfo& lhs, const CollectedPokemonInfo& rhs);

@@ -1,0 +1,207 @@
+/*  Selection Arrow Detector
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "CommonTools/Images/WaterfillUtilities.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "Tests/TestUtils.h"
+#include "PokemonHome_SelectionArrowDetector.h"
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonHome{
+
+
+class SelectionArrowMatcher : public ImageMatch::WaterfillTemplateMatcher{
+public:
+    // The Pokemon Home arrows are red on a light background.
+    SelectionArrowMatcher(const char* path)
+        : WaterfillTemplateMatcher(
+            path,
+            Color(0xffa00000), Color(0xffffc0c0), 100
+        )
+    {
+        m_aspect_ratio_lower = 0.9;
+        m_aspect_ratio_upper = 1.1;
+        m_area_ratio_lower = 0.85;
+        m_area_ratio_upper = 1.1;
+    }
+
+    static const SelectionArrowMatcher& matcher(SelectionArrowType type){
+        switch (type){
+        case SelectionArrowType::RIGHT:
+            return RIGHT_ARROW();
+        case SelectionArrowType::DOWN:
+            return DOWN_ARROW();
+        default:
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid enum.");
+        }
+    }
+    static const SelectionArrowMatcher& RIGHT_ARROW(){
+        static SelectionArrowMatcher matcher("PokemonHome/SelectionArrows/SelectionArrowRight.png");
+        return matcher;
+    }
+    static const SelectionArrowMatcher& DOWN_ARROW(){
+        static SelectionArrowMatcher matcher("PokemonHome/SelectionArrows/SelectionArrowDown.png");
+        return matcher;
+    }
+};
+
+SelectionArrowDetector::SelectionArrowDetector(
+    Color color,
+    VideoOverlay* overlay,
+    SelectionArrowType type,
+    const ImageFloatBox& box
+)
+    : m_color(color)
+    , m_overlay(overlay)
+    , m_type(type)
+    , m_arrow_box(box)
+{}
+void SelectionArrowDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_arrow_box);
+}
+bool SelectionArrowDetector::detect(const ImageViewRGB32& screen){
+    double screen_rel_size = (screen.height() / 1080.0);
+    double screen_rel_size_2 = screen_rel_size * screen_rel_size;
+
+    double min_area_1080p = 700;
+    double rmsd_threshold = 80;
+    size_t min_area = size_t(screen_rel_size_2 * min_area_1080p);
+
+    const std::vector<std::pair<uint32_t, uint32_t>> FILTERS = {
+        {0xff800000, 0xffff9090},
+        {0xffa00000, 0xffffa0a0},
+        {0xffc00000, 0xffffc0c0},
+        {0xffd00000, 0xffffd0d0},
+    };
+
+    bool found = match_template_by_waterfill(
+        screen.size(),
+        extract_box_reference(screen, m_arrow_box),
+        SelectionArrowMatcher::matcher(m_type),
+        FILTERS,
+        {min_area, SIZE_MAX},
+        rmsd_threshold,
+        [&](Kernels::Waterfill::WaterfillObject& object) -> bool {
+            m_last_detected = translate_to_parent(screen, m_arrow_box, object);
+            return true;
+        }
+    );
+
+    if (m_overlay){
+        if (found){
+            m_last_detected_box.emplace(*m_overlay, m_last_detected, COLOR_GREEN);
+        }else{
+            m_last_detected_box.reset();
+        }
+    }
+
+    return found;
+}
+
+class Test_SelectionArrowDetector : public UnitTest{
+public:
+
+    Test_SelectionArrowDetector(
+        const std::string& image,
+        std::optional<SelectionArrowType> expected
+    )
+        : UnitTest("PokemonHome::SelectionArrowDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        DummyVideoOverlay video_overlay;
+        ImageRGB32 image(m_image);
+        SelectionArrowDetector right_detector(COLOR_BLACK, &video_overlay, SelectionArrowType::RIGHT, ImageFloatBox(0.463, 0.09, 0.04, 0.06));
+        SelectionArrowDetector down_detector(COLOR_BLACK, &video_overlay, SelectionArrowType::DOWN, ImageFloatBox(0.463, 0.09, 0.04, 0.06));
+
+        const bool right_detected = right_detector.detect(image);
+        const bool down_detected = down_detector.detect(image);
+
+        const bool expected_right = m_expected && *m_expected == SelectionArrowType::RIGHT;
+        const bool expected_down = m_expected && *m_expected == SelectionArrowType::DOWN;
+
+        if (right_detected == expected_right && down_detected == expected_down)
+            return true;
+
+        auto arrow_name = [](std::optional<SelectionArrowType> arrow){
+            if (!arrow)
+                return std::string("none");
+            return *arrow == SelectionArrowType::RIGHT
+                ? std::string("RIGHT")
+                : std::string("DOWN");
+        };
+
+        std::optional<SelectionArrowType> result;
+        if (right_detected && down_detected){
+            return "Expected: " + arrow_name(m_expected) + ", received: RIGHT and DOWN";
+        }else if (right_detected){
+            result = SelectionArrowType::RIGHT;
+        }else if (down_detected){
+            result = SelectionArrowType::DOWN;
+        }
+
+        return "Expected: " + arrow_name(m_expected) + ", received: " + arrow_name(result);
+    };
+
+private:
+    std::string m_image;
+    std::optional<SelectionArrowType> m_expected;
+};
+
+void add_tests_SelectionArrowDetector(UnitTestDatabase& database){
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/annihilape_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/bidoof_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/bulbasaur_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Go.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/bulbasuar_Shiny_Lza.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/capskid_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/castform_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/cyclizar_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/dudunsparce_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/dudunsparce_Regular_Sv.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/enamorus_Shiny.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/gimmighoul_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/glimmet_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/gogoat_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/greatTusk_Shiny.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/hatterne_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/houndstone_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/ironBunde_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/ironBundle_Regular_Sv.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/ironJugulis_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/ironThorns_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/kilowattrel_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/kingler_Shiny.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/komala_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/krabby_Shiny.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/machamp_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/pancham_Shiny.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/rapidash_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/rellor_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/riolu_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/rowlet_ShinyAlpha.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/scovillain_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/slitherWing_Shiny.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/squirtle_Shiny.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/tapuLele_Shiny.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/tatsugiri_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/teddiursa_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/terapagos_regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/vulpix_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/vulpix_Shiny.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/wartortle_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/wurmple_Regular.png", std::nullopt);
+}
+
+}
+}
+}

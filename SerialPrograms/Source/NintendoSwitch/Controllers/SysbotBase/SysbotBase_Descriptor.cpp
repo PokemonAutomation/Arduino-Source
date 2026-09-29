@@ -32,15 +32,15 @@ std::string TcpSysbotBase_Descriptor::display_name() const{
     return m_url;
 }
 
+JsonValue TcpSysbotBase_Descriptor::to_json() const{
+    return m_url;
+}
 void TcpSysbotBase_Descriptor::load_json(const JsonValue& json){
     const std::string* url = json.to_string();
     if (url == nullptr || url->empty()){
         return;
     }
     m_url = *url;
-}
-JsonValue TcpSysbotBase_Descriptor::to_json() const{
-    return m_url;
 }
 
 

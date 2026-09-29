@@ -1,0 +1,40 @@
+/*  Console Panel Widget
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#ifndef PokemonAutomation_GameConsole_ConsolePanelWidget_H
+#define PokemonAutomation_GameConsole_ConsolePanelWidget_H
+
+#include <QWidget>
+#include "Common/Qt/UiStateQtWidget.h"
+#include "GameConsole/Framework/ConsolePanelSession.h"
+#include "GameConsole/ConsolePanel.h"
+
+namespace PokemonAutomation{
+namespace GameConsole{
+
+
+class ConsolePanelWidget : public QWidget, public UiComponentQtWidget{
+public:
+    using ParentState = ConsolePanelSession;
+
+public:
+    ~ConsolePanelWidget();
+    ConsolePanelWidget(QWidget& parent, ConsolePanelSession& session);
+
+    virtual QWidget& widget() override{
+        return *this;
+    }
+
+private:
+    ConsolePanelSession& m_session;
+};
+
+
+
+
+}
+}
+#endif

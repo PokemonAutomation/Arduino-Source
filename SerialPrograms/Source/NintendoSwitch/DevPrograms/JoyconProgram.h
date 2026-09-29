@@ -22,6 +22,7 @@ public:
 
 class JoyconProgram : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = JoyconProgram_Descriptor;
     JoyconProgram();
     virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 

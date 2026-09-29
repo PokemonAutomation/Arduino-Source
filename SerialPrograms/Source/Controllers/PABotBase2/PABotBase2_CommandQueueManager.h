@@ -46,11 +46,17 @@ public:
 
 
 public:
+    enum CancelResult{
+        SUCCESS,
+        BUFFER_FULL,
+        SUPPRESSED_DUPLICATE,
+    };
+
     void wait_for_all(Cancellable* cancellable);
     void wait_for_command_finish(Cancellable* cancellable, uint8_t id);
 
-    void send_cancel() noexcept;
-    void send_replace_on_next() noexcept;
+    CancelResult send_cancel() noexcept;
+    CancelResult send_replace_on_next() noexcept;
 
     uint8_t send_command(Cancellable* cancellable, MessageHeader& command);
     void report_command_finished(const MessageHeader& finished_message);

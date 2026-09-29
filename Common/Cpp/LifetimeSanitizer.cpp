@@ -39,6 +39,7 @@ struct LifetimeSanitizerFields{
 //            "MultiSwitchProgramWidget2",
 //            "VideoSource",
 //            "AsyncTask",
+//            "ControllerOption",
         })
     {}
 };

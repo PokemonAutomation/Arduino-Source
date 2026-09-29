@@ -9,35 +9,31 @@
 #include <QLabel>
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/Panels/PanelDescriptor.h"
-#include "CommonFramework/Panels/PanelInstance.h"
+#include "CommonFramework/Panels/PanelSession.h"
 #include "PanelElements.h"
 #include "PanelWidget.h"
 
 namespace PokemonAutomation{
 
+template class RegisterUiStateQtWidget<PanelWidget>;
 
 
-QWidget* PanelInstance::make_widget(QWidget& parent, PanelHolder& holder){
-    return new PanelWidget(parent, *this, holder);
-}
 
 
 PanelWidget::PanelWidget(
     QWidget& parent,
-    PanelInstance& instance,
-    PanelHolder& holder
+    PanelSession& session
 )
     : QWidget(&parent)
-    , m_instance(instance)
-    , m_holder(holder)
+    , m_session(session)
 {}
 
-CollapsibleGroupBox* PanelWidget::make_header(QWidget& parent){
+CollapsibleGroupBox* PanelWidget::make_header(){
     return make_panel_header(
         *this,
-        m_instance.descriptor().display_name(),
-        m_instance.descriptor().doc_link(),
-        m_instance.descriptor().description()
+        m_session.descriptor().display_name(),
+        m_session.descriptor().doc_link(),
+        m_session.descriptor().description()
     );
 }
 

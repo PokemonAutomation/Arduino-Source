@@ -1,0 +1,93 @@
+/*  Autostory
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#ifndef PokemonAutomation_PokemonSV_AutoStory_Segment_10_H
+#define PokemonAutomation_PokemonSV_AutoStory_Segment_10_H
+
+#include "PokemonSV_AutoStoryTools.h"
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSV{
+
+class AutoStory_Segment_10 : public AutoStory_Segment{
+public:
+    virtual std::string name() const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text() const override;
+    virtual void run_segment(
+        SingleSwitchProgramEnvironment& env, 
+        ProControllerContext& context,
+        AutoStoryOptions options,
+        AutoStoryStats& stats
+    ) const override;
+};
+
+class AutoStory_Checkpoint_21 : public AutoStory_Checkpoint{
+public:
+    virtual std::string name() const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text() const override;
+    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const override;
+};
+
+class AutoStory_Checkpoint_22 : public AutoStory_Checkpoint{
+public:
+    virtual std::string name() const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text() const override;
+    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const override;
+};
+
+class AutoStory_Checkpoint_23 : public AutoStory_Checkpoint{
+public:
+    virtual std::string name() const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text() const override;
+    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const override;
+};
+
+
+
+
+// start: After the break, with level 100 Gardevoir. At Mesagoza West pokecenter.
+// end: At Mesagoza West gate flypoint
+void checkpoint_21(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
+);
+
+// start: At Mesagoza West gate flypoint
+// end: At South Province Area Two Pokecenter.
+void checkpoint_22(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
+);
+
+// start: At South Province Area Two Pokecenter.
+// end: At Cortondo East Pokecenter
+void checkpoint_23(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
+);
+
+
+}
+}
+}
+#endif

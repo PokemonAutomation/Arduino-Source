@@ -4,18 +4,20 @@
  *
  */
 
+#ifdef QT_CORE_LIB
 #include <QSerialPortInfo>
 #include <QMessageBox>
+#include "Controllers/SerialPort/SerialPortPollerQt.h"
+#endif
+#include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/PanicDump.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2_PacketProtocol.h"
-#include "Common/PABotBase2/PABotBase2_MessageProtocol.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "CommonFramework/Logging/Logger.h"
+#include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
-#include "Controllers/SerialPortPollerQt.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "SerialPABotBase2_Connection.h"
 
 //#include <iostream>
@@ -35,7 +37,7 @@ SerialPABotBase2_Connection::SerialPABotBase2_Connection(
     Logger& logger,
     std::string name
 )
-    : m_logger(logger, GlobalSettings::instance().LOG_EVERYTHING)
+    : m_logger(logger, LOG_EVERYTHING())
     , m_device_name(std::move(name))
 {
     set_status_line0("Not Connected", COLOR_RED);
@@ -55,7 +57,7 @@ bool SerialPABotBase2_Connection::cancel(std::exception_ptr exception) noexcept{
     if (Connection::cancel(std::move(exception))){
         return true;
     }
-    m_ready.store(false, std::memory_order_release);
+    m_status.store(Status::NOT_CONNECTED, std::memory_order_release);
     m_connect_thread.wait_and_ignore_exceptions();
 
     if (m_unreliable_connection == nullptr){
@@ -118,6 +120,9 @@ bool SerialPABotBase2_Connection::open_serial_port(){
         return false;
     }
 
+
+    //  Validate the serial port.
+#ifdef QT_CORE_LIB
     QSerialPortInfo info;
     if(USE_QT_UI){
         info = SerialPortPoller::instance().get_port(m_device_name);
@@ -129,7 +134,7 @@ bool SerialPABotBase2_Connection::open_serial_port(){
     if(USE_QT_UI){
         //  Port is invalid.
         if (info.isNull()){
-            std::string text = "Serial port " + m_device_name + " is invalid.";
+            std::string text = "Serial port " + m_device_name + " is invalid or not loaded.";
             m_logger.log(text, COLOR_RED);
             set_status_line0(text, COLOR_RED);
             return false;
@@ -151,6 +156,7 @@ bool SerialPABotBase2_Connection::open_serial_port(){
             return false;
         }
     }
+#endif
 
     if (cancelled()){
         return false;
@@ -158,7 +164,7 @@ bool SerialPABotBase2_Connection::open_serial_port(){
 
     m_unreliable_connection = std::make_unique<SerialConnection>(
         GlobalThreadPools::unlimited_realtime(),
-        info.systemLocation().toStdString(),
+        m_device_name,
         115200
     );
 
@@ -248,7 +254,7 @@ bool SerialPABotBase2_Connection::open_serial_connection(){
     }
     m_stream_connection = std::make_unique<PABotBase2::ReliableStreamConnection>(
         static_cast<CancellableScope*>(this),
-        m_logger, GlobalSettings::instance().LOG_EVERYTHING,
+        m_logger, LOG_EVERYTHING(),
         GlobalThreadPools::unlimited_realtime(),
         *m_unreliable_connection,
         std::chrono::milliseconds(80),
@@ -317,6 +323,14 @@ bool SerialPABotBase2_Connection::open_device_connection(){
     return true;
 }
 void SerialPABotBase2_Connection::connect_thread_body(){
+    bool ok = false;
+    ScopeExit scope([&]{
+        if (ok){
+            declare_ready();
+        }else{
+            declare_failed();
+        }
+    });
     try{
         if (!open_serial_port()){
             return;
@@ -327,7 +341,7 @@ void SerialPABotBase2_Connection::connect_thread_body(){
         if (!open_device_connection()){
             return;
         }
-        declare_ready();
+        ok = true;
     }catch (Exception& e){
         set_status_line0(e.message(), COLOR_RED);
     }

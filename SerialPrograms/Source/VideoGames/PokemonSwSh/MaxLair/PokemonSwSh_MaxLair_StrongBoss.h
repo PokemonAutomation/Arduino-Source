@@ -1,0 +1,73 @@
+/*  Max Lair (Strong-Boss Mode)
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#ifndef PokemonAutomation_PokemonSwSh_MaxLair_StrongBoss_H
+#define PokemonAutomation_PokemonSwSh_MaxLair_StrongBoss_H
+
+#include "Common/Cpp/Options/FloatingPointOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
+#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
+#include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
+#include "VideoGames/PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
+#include "Options/PokemonSwSh_MaxLair_Options.h"
+#include "Options/PokemonSwSh_MaxLair_Options_Consoles.h"
+#include "Options/PokemonSwSh_MaxLair_Options_Hosting.h"
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSwSh{
+
+
+class MaxLairStrongBoss_Descriptor : public MultiSwitchProgramDescriptor{
+public:
+    MaxLairStrongBoss_Descriptor();
+
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
+};
+
+
+class MaxLairStrongBoss : public MultiSwitchProgramInstance{
+public:
+    enum class StopCondition{
+        STOP_ON_SHINY_LEGENDARY,
+        STOP_ON_NOTHING,
+    };
+
+public:
+    using Descriptor = MaxLairStrongBoss_Descriptor;
+    MaxLairStrongBoss();
+
+    virtual std::string check_validity() const override;
+    virtual void update_active_consoles(size_t switch_count) override;
+    virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
+
+
+private:
+    StartInGripOrGameOption START_LOCATION;
+    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
+
+    FloatingPointOption MIN_WIN_RATE;
+    MaxLairInternal::BossSlotOption BOSS_SLOT;
+
+    MaxLairInternal::Consoles CONSOLES;
+    MaxLairInternal::HostingSettings HOSTING;
+
+    TouchDateIntervalOption TOUCH_DATE_INTERVAL;
+
+    EventNotificationOption NOTIFICATION_STATUS;
+    EventNotificationOption NOTIFICATION_SHINY;
+    EventNotificationsOption NOTIFICATIONS;
+};
+
+
+
+
+
+}
+}
+}
+#endif

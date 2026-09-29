@@ -8,12 +8,17 @@
 #define PokemonAutomation_Controllers_NullController_H
 
 #include "ControllerDescriptor.h"
-#include "ControllerConnection.h"
+//#include "ControllerConnection.h"
 
 namespace PokemonAutomation{
 
 
 
+std::unique_ptr<ControllerDescriptor> null_controller_descriptor();
+
+
+
+#if 0
 class NullControllerDescriptor : public UiState<const NullControllerDescriptor&, ControllerDescriptor>{
 public:
     static constexpr ControllerInterface INTERFACE_NAME = ControllerInterface::None;
@@ -24,8 +29,8 @@ public:
     {}
     virtual bool operator==(const ControllerDescriptor& x) const override;
     virtual std::string display_name() const override;
-    virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
 
     virtual std::unique_ptr<ControllerConnection> open_connection(Logger& logger) const override;
     virtual std::unique_ptr<AbstractController> make_controller(
@@ -34,7 +39,7 @@ public:
         ControllerType controller_type
     ) const override;
 };
-
+#endif
 
 
 
@@ -53,7 +58,7 @@ public:
     virtual const char* name() override{
         return NAME;
     }
-    virtual ControllerClass controller_class() const override{
+    virtual ControllerClass controller_class() const noexcept override{
         return ControllerClass::None;
     }
     virtual ControllerPerformanceClass performance_class() const override{
@@ -72,7 +77,7 @@ public:
         return true;
     }
     virtual bool is_ready() const override{
-        return true;
+        return false;
     }
 
     virtual void cancel_all_commands() override{}

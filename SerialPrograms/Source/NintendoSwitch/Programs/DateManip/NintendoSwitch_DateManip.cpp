@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
@@ -75,8 +75,8 @@ bool DateReader::detect(const ImageViewRGB32& screen){
 
 std::pair<DateFormat, DateTime> DateReader::read_date(Logger& logger, std::shared_ptr<const ImageRGB32> screen){
     if (!detect(*screen)){
-        throw_and_log<OperationFailedException>(
-            logger, ErrorReport::SEND_ERROR_REPORT,
+        throw_and_log<OperationFailedExceptionWithScreenshot>(
+            logger, ErrorReportMode::SEND_ERROR_REPORT,
             "Not on date change screen.",
             nullptr,
             std::move(screen)
@@ -125,8 +125,8 @@ void DateReader::set_date(
     {
         auto snapshot = console.video().snapshot();
         if (!detect(snapshot)){
-            throw_and_log<OperationFailedException>(
-                console.logger(), ErrorReport::SEND_ERROR_REPORT,
+            throw_and_log<OperationFailedExceptionWithScreenshot>(
+                console.logger(), ErrorReportMode::SEND_ERROR_REPORT,
                 "Expected date change menu.",
                 &console,
                 snapshot
@@ -138,8 +138,8 @@ void DateReader::set_date(
     auto snapshot = console.video().snapshot();
 
     if (!detect(snapshot)){
-        throw_and_log<OperationFailedException>(
-            console, ErrorReport::SEND_ERROR_REPORT,
+        throw_and_log<OperationFailedExceptionWithScreenshot>(
+            console, ErrorReportMode::SEND_ERROR_REPORT,
             "Not on date change screen.",
             nullptr,
             snapshot
@@ -225,8 +225,8 @@ void change_date(
             return;
         }
         default:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed to set date",
                 env.console
             );
@@ -251,8 +251,8 @@ void ensure_time_unsynced(SingleSwitchProgramEnvironment& env, ProControllerCont
     );
 
     if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to enter Date Change window. Ensure that System Time is not synced to the internet.",
             env.console
         );

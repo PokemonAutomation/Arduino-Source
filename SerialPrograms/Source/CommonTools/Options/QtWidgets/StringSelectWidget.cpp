@@ -11,6 +11,7 @@
 #include <QLineEdit>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/ImageTypes/ImageRGB32_Qt.h"
 #include "StringSelectWidget.h"
 
 //#include <iostream>
@@ -42,7 +43,7 @@ StringSelectCellWidget::StringSelectCellWidget(QWidget& parent, StringSelectCell
 //    this->setFrame(false);
 
     const StringSelectEntry& entry = value.entry();
-    QPixmap pixmap = QPixmap::fromImage(entry.icon.to_QImage_ref());
+    QPixmap pixmap = QPixmap::fromImage(to_QImage_ref(entry.icon));
     this->addItem(pixmap, QString::fromStdString(entry.display_name));
     this->setCurrentIndex(0);
 //    this->setMinimumContentsLength((int)value.database().longest_text_length());
@@ -75,7 +76,7 @@ void StringSelectCellWidget::load_options(){
         global_logger_tagged().log("Loading dropdown with " + tostr_u_commas(cases.size()) + " elements.");
         this->clear();
         for (const StringSelectEntry& item : cases){
-            QPixmap pixmap = QPixmap::fromImage(item.icon.to_QImage_ref());
+            QPixmap pixmap = QPixmap::fromImage(to_QImage_ref(item.icon));
             this->addItem(pixmap, QString::fromStdString(item.display_name));
             if (item.text_color){
                 this->setItemData(this->count() - 1, QBrush(QColor((uint32_t)item.text_color)), Qt::ForegroundRole);
@@ -118,7 +119,7 @@ void StringSelectCellWidget::hide_options(){
     //  Remove all elements and add the one that is selected.
     this->clear();
     const StringSelectEntry& entry = m_value.entry();
-    QPixmap pixmap = QPixmap::fromImage(entry.icon.to_QImage_ref());
+    QPixmap pixmap = QPixmap::fromImage(to_QImage_ref(entry.icon));
     this->addItem(pixmap, QString::fromStdString(entry.display_name));
     this->setCurrentIndex(0);
 

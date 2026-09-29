@@ -4,13 +4,13 @@
  *
  */
 
+#include "Common/Cpp/Strings/StringTools.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
-#include "CommonTools/Async/InterruptableCommands.tpp"
-#include "CommonTools/Async/SuperControlSession.tpp"
 #include "ControllerInput/ControllerInput.h"
 #include "ControllerInput/Keyboard/KeyboardInput_State.h"
 #include "Controllers/RumbleListener.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h"
 #include "NintendoSwitch_ProControllerState.h"
 #include "NintendoSwitch_ProController.h"
@@ -20,11 +20,6 @@
 //using std::endl;
 
 namespace PokemonAutomation{
-
-//  Instantiate some template helper classes.
-template class AsyncCommandSession<NintendoSwitch::ProController>;
-template class SuperControlSession<NintendoSwitch::ProController>;
-
 namespace NintendoSwitch{
 
 using namespace std::chrono_literals;
@@ -67,10 +62,67 @@ ProController::ProController(Logger& logger)
 ProController::~ProController(){
 }
 
-ControllerClass ProController::controller_class() const{
+ControllerClass ProController::controller_class() const noexcept{
     return ControllerClass::NintendoSwitch_ProController;
 }
 
+
+
+
+
+bool ProController::run_string_command(Milliseconds duration, const std::string& command){
+    //  stop
+    //  replace
+    //  wait
+    //  A,B
+    //  A,B|JSL:+0.5:-0.5
+
+    std::vector<std::string> tokens = StringTools::split(command, "|");
+    if (tokens.empty()){
+        return false;
+    }
+
+    if (tokens[0] == "stop"){
+        cancel_all_commands();
+        return true;
+    }
+    if (tokens[0] == "replace"){
+        replace_on_next_command();
+        return true;
+    }
+    if (tokens[0] == "wait"){
+        issue_nop(nullptr, duration);
+        return true;
+    }
+
+    ProControllerState state;
+
+    for (const std::string& token : tokens){
+        if (token.starts_with("JSL")){
+            std::vector<std::string> args = StringTools::split(token, ":");
+            if (args.size() != 3){
+                return false;
+            }
+            state.left_joystick.x = std::atof(args[1].data());
+            state.left_joystick.y = std::atof(args[2].data());
+            continue;
+        }
+        if (token.starts_with("JSR")){
+            std::vector<std::string> args = StringTools::split(token, ":");
+            if (args.size() != 3){
+                return false;
+            }
+            state.right_joystick.x = std::atof(args[1].data());
+            state.right_joystick.y = std::atof(args[2].data());
+            continue;
+        }
+        state.buttons |= string_to_button(token, ",");
+    }
+
+    state.execute(nullptr, true, *this, duration);
+
+    return true;
+}
 
 
 

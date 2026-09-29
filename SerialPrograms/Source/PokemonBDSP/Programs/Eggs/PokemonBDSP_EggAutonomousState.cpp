@@ -5,7 +5,7 @@
  */
 
 #include <cmath>
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
@@ -136,8 +136,8 @@ void EggAutonomousState::set(const EggAutonomousState& state){
 
 void EggAutonomousState::process_error(const std::string& name, const char* message){
     m_stats.m_errors++;
-    OperationFailedException::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+    OperationFailedExceptionWithScreenshot::fire(
+        ErrorReportMode::SEND_ERROR_REPORT,
         message,
         m_stream
     );
@@ -404,7 +404,7 @@ void EggAutonomousState::hatch_egg(){
         );
         if (ret < 0){
             process_error("NoHatchEnd", "End of hatch not detected after 30 seconds.");
-//            OperationFailedException::fire(m_console, "End of hatch not detected after 30 seconds.");
+//            OperationFailedExceptionWithScreenshot::fire(m_console, "End of hatch not detected after 30 seconds.");
         }
         m_stream.log("Egg finished hatching.");
         m_stats.m_hatched++;

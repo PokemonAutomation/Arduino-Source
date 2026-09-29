@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "NintendoSwitch_Settings.h"
 
 //#include <iostream>
@@ -175,7 +175,7 @@ ConsoleSettings::ConsoleSettings()
     PA_ADD_OPTION(TIMING_OPTIONS);
     PA_ADD_OPTION(DATE_MENU_OPEN_SWITCH2_0);
     PA_ADD_OPTION(DATE_MENU_CLOSE_SWITCH2_0);
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         PA_ADD_OPTION(CODEBOARD_ENTRY_SWITCH1_WIRED);
         PA_ADD_OPTION(CODEBOARD_ENTRY_SWITCH1_WIRELESS);
         PA_ADD_OPTION(CODEBOARD_ENTRY_SWITCH2_WIRED);
@@ -194,22 +194,6 @@ void ConsoleSettings::load_json(const JsonValue& json){
 }
 
 
-ConsoleSettings_Descriptor::ConsoleSettings_Descriptor()
-    : PanelDescriptor(
-        Color(),
-        "NintendoSwitch:GlobalSettings",
-        "Nintendo Switch", "Framework Settings",
-        "Programs/NintendoSwitch/FrameworkSettings.html",
-        "Switch Framework Settings"
-    )
-{}
-
-ConsoleSettingsPanel::ConsoleSettingsPanel(const ConsoleSettings_Descriptor& descriptor)
-    : SettingsPanelInstance(descriptor)
-    , settings(ConsoleSettings::instance())
-{
-    PA_ADD_OPTION(settings);
-}
 
 
 

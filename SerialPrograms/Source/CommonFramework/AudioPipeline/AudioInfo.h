@@ -51,7 +51,7 @@ enum class AudioChannelFormat{
 };
 extern const char* AUDIO_FORMAT_LABELS[];
 
-//  Set the QAudioFormat to the our audio format enum.
+//  Convert our audio format enum to QAudioFormat.
 void set_format(QAudioFormat& native_format, AudioChannelFormat format);
 
 

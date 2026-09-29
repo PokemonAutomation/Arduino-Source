@@ -11,7 +11,7 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
+//#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 
 namespace PokemonAutomation{ 
 namespace NintendoSwitch{
@@ -26,9 +26,9 @@ public:
 
 class SoundListener : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = SoundListener_Descriptor;
     SoundListener();
 
-    virtual void start_program_controller_check(ControllerSession& session) override{}
     virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:

@@ -1,0 +1,36 @@
+/*  Box Gender Detector
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#ifndef PokemonAutomation_PokemonHome_BoxGenderDetector_H
+#define PokemonAutomation_PokemonHome_BoxGenderDetector_H
+
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
+
+namespace PokemonAutomation{
+
+class ImageViewRGB32;
+class VideoOverlaySet;
+
+namespace NintendoSwitch{
+namespace PokemonHome{
+
+// Detect gender symbol inside the pokemon storage box
+class BoxGenderDetector{
+public:
+    static void make_overlays(VideoOverlaySet& items);
+    
+    // Return StatsHuntGenderFilter::Male, Female or Genderless
+    static Pokemon::StatsHuntGenderFilter detect(const ImageViewRGB32& screen);
+};
+
+void add_tests_BoxGenderDetector(UnitTestDatabase& database);
+
+}
+}
+}
+
+#endif

@@ -7,6 +7,7 @@
 #include <QWidget>
 #include <QPainter>
 #include <QFileDialog>
+#include "CommonFramework/ImageTypes/ImageRGB32_Qt.h"
 #include "VideoSource_StillImage.h"
 
 //#include <iostream>
@@ -46,6 +47,10 @@ void VideoSourceDescriptor_StillImage::run_post_select(){
     ).toStdString();
     set_path(std::move(path));
 }
+JsonValue VideoSourceDescriptor_StillImage::to_json() const{
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
+    return m_path;
+}
 void VideoSourceDescriptor_StillImage::load_json(const JsonValue& json){
 //    cout << "load_json: " << m_path << endl;
     const std::string* name = json.to_string();
@@ -53,10 +58,6 @@ void VideoSourceDescriptor_StillImage::load_json(const JsonValue& json){
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_path = *name;
     }
-}
-JsonValue VideoSourceDescriptor_StillImage::to_json() const{
-    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-    return m_path;
 }
 
 std::unique_ptr<VideoSource> VideoSourceDescriptor_StillImage::make_VideoSource(
@@ -85,12 +86,17 @@ VideoSource_StillImage::VideoSource_StillImage(
 {
     if (resolution){
         m_snapshot = VideoSnapshot(
-            ImageRGB32(m_original_image).scale_to(resolution.width, resolution.height),
+            QImage_to_ImageRGB32(
+                m_original_image.scaled(
+                    (int)resolution.width,
+                    (int)resolution.height
+                )
+            ),
             current_time()
         );
     }else{
         m_snapshot = VideoSnapshot(
-            m_original_image,
+            QImage_to_ImageRGB32(m_original_image),
             current_time()
         );
     }

@@ -37,6 +37,24 @@ float convertAudioVolumeFromSlider(double volume){
 }
 
 
+const char* audio_error_to_str(QAudio::Error error){
+    switch (error){
+    case QAudio::NoError:
+        return "NoError";
+    case QAudio::OpenError:
+        return "OpenError (device cannot be opened with the requested format)";
+    case QAudio::IOError:
+        return "IOError";
+    case QAudio::UnderrunError:
+        return "UnderrunError";
+    case QAudio::FatalError:
+        return "FatalError";
+    default:
+        return "UnknownError";
+    }
+}
+
+
 
 
 class AudioOutputDevice : public AudioFloatToStream, private ObjectStreamListener{
@@ -51,18 +69,34 @@ public:
         , ObjectStreamListener(samples_per_frame * sample_size(sample_format))
         , m_logger(logger)
         , m_sink(device, format)
+        , m_io_device(nullptr)
     {
         m_sink.connect(
             &m_sink, &NativeAudioSink::stateChanged,
             &m_sink, [this](QAudio::State state){
                 if (state == QAudio::State::StoppedState){
                     m_io_device = nullptr;
-                    m_logger.log("AudioOutputDevice has stopped.", COLOR_ORANGE);
+                    QAudio::Error error = m_sink.error();
+                    if (error == QAudio::NoError){
+                        m_logger.log("AudioOutputDevice has stopped.", COLOR_ORANGE);
+                    }else{
+                        m_logger.log(
+                            std::string("AudioOutputDevice has stopped with error: ") + audio_error_to_str(error),
+                            COLOR_RED
+                        );
+                    }
                 }
             }
         );
 
         m_io_device = m_sink.start();
+        QAudio::Error error = m_sink.error();
+        if (m_io_device == nullptr || error != QAudio::NoError){
+            m_logger.log(
+                std::string("Unable to start audio output device: ") + audio_error_to_str(error),
+                COLOR_RED
+            );
+        }
         m_sink.setVolume(convertAudioVolumeFromSlider(volume));
         add_listener(*this);
     }
@@ -114,10 +148,13 @@ AudioSink::AudioSink(
 
     logger.log("AudioOutputDevice(): Target: " + dump_audio_format(target_format));
     logger.log("AudioOutputDevice(): Native: " + dump_audio_format(native_format));
-    if (!native_info.isFormatSupported(native_format) &&
-        native_format != target_format
-    ){
-        logger.log("Audio output device does not support the requested audio format.", COLOR_RED);
+    if (!native_info.isFormatSupported(target_format)){
+        logger.log(
+            "Audio output device does not support the requested audio format. Audio output is disabled. "
+            "Try setting the output device to the same sample rate and channel count as the input device "
+            "in your OS sound settings.",
+            COLOR_RED
+        );
         return;
     }
 

@@ -9,13 +9,9 @@
 #ifndef PokemonAutomation_Tests_TestUtils_H
 #define PokemonAutomation_Tests_TestUtils_H
 
-#include <iostream>
 #include <string>
 #include <vector>
 #include <map>
-#include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
-#include "Controllers/SerialPABotBase/Connection/BotBase.h"
-#include "Controllers/SerialPABotBase/Connection/BotBaseMessage.h"
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
 //#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -50,44 +46,6 @@ bool load_sprite_count(const std::string& filepath, std::map<std::string, int>& 
 // Each line is a slug.
 bool load_slug_list(const std::string& filepath, std::vector<std::string>& sprites);
 
-
-// Implement the dummy interface of BotBase so that we can run the test code
-// that relies on a BotBase.
-class DummyBotBase : public BotBaseController{
-public:
-    DummyBotBase(Logger& logger) : m_logger(logger) {}
-
-    virtual void stop(std::string error_message) noexcept override{}
-    
-    virtual Logger& logger() override { return m_logger; }
-
-    virtual State state() const override { return State::RUNNING; }
-    virtual size_t queue_limit() const override { return PABB_DEVICE_MINIMUM_QUEUE_SIZE; }
-
-    virtual void on_cancellable_cancel(
-        Cancellable& cancellable,
-        std::exception_ptr reason
-    ) override{}
-
-    virtual void wait_for_all_requests(Cancellable* cancelled = nullptr) override {}
-    virtual void stop_all_commands() override {}
-    virtual void next_command_interrupt() override {};
-
-    virtual bool try_issue_request(
-        const BotBaseRequest& request,
-        Cancellable* cancelled = nullptr
-    ) override { return true; }
-    virtual void issue_request(
-        const BotBaseRequest& request,
-        Cancellable* cancelled = nullptr
-    ) override {}
-    virtual BotBaseMessage issue_request_and_wait(
-        const BotBaseRequest& request,
-        Cancellable* cancelled = nullptr
-    ) override { return BotBaseMessage(0, ""); }
-
-    Logger& m_logger;
-};
 
 // Implement the dummy interface of VideoFeed so that we can test
 // the video inference code that relies on a VideoFeed.
@@ -128,6 +86,9 @@ public:
 
     virtual void add_stat(OverlayStat& stat) override{}
     virtual void remove_stat(OverlayStat& stat) override{}
+
+    virtual void add_hid_listener(VideoDisplayHidListener& listener) override{}
+    virtual void remove_hid_listener(VideoDisplayHidListener& listener) override{}
 };
 
 // Implement the dummy interface of AudioFeed so that we can test
@@ -147,90 +108,53 @@ public:
 
 
 
-#define TEST_RESULT_EQUAL(result, target) \
-    do { \
-        if ((result) != (target)){\
-            std::cerr << "Error: " << __func__ << ":" << __LINE__ << " result is " << (result) << " but should be " << (target) << "." << std::endl; \
-            return 1; \
-        } \
-    } while (0)
-
-
-#define TEST_RESULT_COMPONENT_EQUAL(result, target, component_name) \
-    do { \
-        if ((result) != (target)){\
-            std::cerr << "Error: " << __func__ << ":" << __LINE__ << " " << component_name << " result is " << (result) << " but should be " << \
-                (target) << "." << std::endl; \
-            return 1; \
-        } \
-    } while (0)
-
-#define TEST_RESULT_COMPONENT_EQUAL_WITH_PRINT_FUNC(result, target, component_name, print_func) \
-    do { \
-        if ((result) != (target)){\
-            std::cerr << "Error: " << __func__ << ":" << __LINE__ << " " << component_name << " result is " << print_func(result) << " but should be " << \
-                print_func(target) << "." << std::endl; \
-            return 1; \
-        } \
-    } while (0)
-
-#define TEST_RESULT_APPROXIMATE(result, target, threshold) \
-    do { \
-        if (std::fabs((result) - (target)) > (threshold)){\
-            std::cerr << "Error: " << __func__ << ":" << __LINE__ << " result is " << (result) << " but should be close to " << (target) << \
-                " with threshold: " << (threshold) << "." << std::endl; \
-            return 1; \
-        } \
-    } while (0)
-
-
 
 #define TEST_RESULT_EQUAL_STR(result, target) \
     do { \
         if ((result) != (target)){\
-            std::stringstream ss;   \
-            ss << "Error: " << __func__ << ":" << __LINE__ << " result is " << (result) << " but should be " << (target) << "." << std::endl; \
-            return ss.str(); \
+            std::stringstream _ss;   \
+            _ss << "Error: " << __func__ << ":" << __LINE__ << " result is " << (result) << " but should be " << (target) << "." << std::endl; \
+            return _ss.str(); \
         } \
     } while (0)
 
 #define TEST_RESULT_COMPONENT_EQUAL_STR(result, target, component_name) \
     do { \
         if ((result) != (target)){\
-            std::stringstream ss;   \
-            ss << "Error: " << __func__ << ":" << __LINE__ << " " << component_name << " result is " << (result) << " but should be " << \
+            std::stringstream _ss;   \
+            _ss << "Error: " << __func__ << ":" << __LINE__ << " " << component_name << " result is " << (result) << " but should be " << \
                 (target) << "." << std::endl; \
-            return ss.str(); \
+            return _ss.str(); \
         } \
     } while (0)
 
 #define TEST_RESULT_COMPONENT_EQUAL_WITH_PRINT_FUNC_STR(result, target, component_name, print_func) \
     do { \
         if ((result) != (target)){\
-            std::stringstream ss;   \
-            ss << "Error: " << __func__ << ":" << __LINE__ << " " << component_name << " result is " << print_func(result) << " but should be " << \
+            std::stringstream _ss;   \
+            _ss << "Error: " << __func__ << ":" << __LINE__ << " " << component_name << " result is " << print_func(result) << " but should be " << \
                 print_func(target) << "." << std::endl; \
-            return ss.str(); \
+            return _ss.str(); \
         } \
     } while (0)
 
 #define TEST_RESULT_APPROXIMATE_STR(result, target, threshold) \
     do { \
         if (std::fabs((result) - (target)) > (threshold)){\
-            std::stringstream ss;   \
-            ss << "Error: " << __func__ << ":" << __LINE__ << " result is " << (result) << " but should be close to " << (target) << \
+            std::stringstream _ss;   \
+            _ss << "Error: " << __func__ << ":" << __LINE__ << " result is " << (result) << " but should be close to " << (target) << \
                 " with threshold: " << (threshold) << "." << std::endl; \
-            return ss.str(); \
+            return _ss.str(); \
         } \
     } while (0)
 
 #define TEST_RESULT_APPROXIMATE_STR(result, target, threshold) \
     do { \
         if (std::fabs((result) - (target)) > (threshold)){\
-            std::stringstream ss;   \
-            ss << "Error: " << __func__ << ":" << __LINE__ << " result is " << (result) << " but should be close to " << (target) << \
+            std::stringstream _ss;   \
+            _ss << "Error: " << __func__ << ":" << __LINE__ << " result is " << (result) << " but should be close to " << (target) << \
                 " with threshold: " << (threshold) << "." << std::endl; \
-            return ss.str(); \
+            return _ss.str(); \
         } \
     } while (0)
 

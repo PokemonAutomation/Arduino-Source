@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/RecursiveThrottler.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 //#include "CommonFramework/VideoPipeline/VideoFeed.h"
 //#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -359,8 +359,8 @@ void home_to_date_time_Switch1_wired_feedback(
         return;
     }
 
-    OperationFailedException::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+    OperationFailedExceptionWithScreenshot::fire(
+        ErrorReportMode::SEND_ERROR_REPORT,
         "home_to_date_time(): Failed to reach Date and Time after several attempts.",
         stream
     );
@@ -491,8 +491,8 @@ void home_to_date_time_Switch1_wireless_feedback(
         return;
     }
 
-    OperationFailedException::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+    OperationFailedExceptionWithScreenshot::fire(
+        ErrorReportMode::SEND_ERROR_REPORT,
         "home_to_date_time(): Failed to reach Date and Time after several attempts.",
         stream
     );    

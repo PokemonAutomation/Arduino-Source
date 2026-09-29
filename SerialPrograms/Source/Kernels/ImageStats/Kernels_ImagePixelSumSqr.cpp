@@ -35,6 +35,12 @@ void pixel_sum_sqr_x64_AVX512(
     const uint32_t* image, size_t image_bytes_per_row,
     const uint32_t* alpha, size_t alpha_bytes_per_row
 );
+void pixel_sum_sqr_arm64_NEON(
+    PixelSums& sums,
+    size_t width, size_t height,
+    const uint32_t* image, size_t image_bytes_per_row,
+    const uint32_t* alpha, size_t alpha_bytes_per_row
+);
 
 
 
@@ -69,6 +75,17 @@ void pixel_sum_sqr(
 #ifdef PA_AutoDispatch_x64_08_Nehalem
     if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
         pixel_sum_sqr_x64_SSE41(
+            sums,
+            width, height,
+            image, image_bytes_per_row,
+            alpha, alpha_bytes_per_row
+        );
+        return;
+    }
+#endif
+#ifdef PA_AutoDispatch_arm64_20_M1
+    if (CPU_CAPABILITY_CURRENT.OK_M1){
+        pixel_sum_sqr_arm64_NEON(
             sums,
             width, height,
             image, image_bytes_per_row,

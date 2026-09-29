@@ -7,12 +7,14 @@
 #include <string.h>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/PABotBase2/PABotBase2CC_MessageDumper.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Logging/Logger.h"
+#include "Common/Cpp/ColoredText.h"
 #include "Controllers/ControllerTypeStrings.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase.h"
+#include "Controllers/ControllerSettings.h"
+#include "Controllers/SerialPort/SerialPABotBase.h"
 #include "PABotBase2_DeviceHandle.h"
 
 //#include <iostream>
@@ -143,7 +145,7 @@ void DeviceHandle::query_protocol(){
     {
         m_device_id = query_u32(PABB2_MESSAGE_OPCODE_DEVICE_IDENTIFIER);
         m_logger.log("[MLC]: Device ID: 0x" + tostr_hex(m_device_id), COLOR_BLUE);
-        auto iter = PROGRAMS->find(m_device_id);
+        auto iter = PROGRAMS->find((uint8_t)m_device_id);
         if (iter == PROGRAMS->end()){
             m_logger.Logger::log(
                 "Unrecognized Program ID: (0x" + tostr_hex(m_device_id) + ") for this protocol version. "
@@ -205,8 +207,8 @@ void DeviceHandle::query_command_queue(){
 
     //  Don't let it get too large since we don't need it.
     command_queue_size = std::min<uint8_t>(
-        command_queue_size,
-        GlobalSettings::instance().COMMAND_QUEUE_LIMIT
+        (uint8_t)command_queue_size,
+        ControllerSettings::instance().COMMAND_QUEUE_LIMIT
     );
 
     m_logger.Logger::log("Setting queue size to: " + std::to_string(command_queue_size));
@@ -228,6 +230,7 @@ void DeviceHandle::connect(){
     m_device_name = query_data(PABB2_MESSAGE_OPCODE_DEVICE_NAME);
     m_logger.log("[MLC]: Device Name: " + m_device_name, COLOR_BLUE);
 
+    set_logging_flag(ControllerSettings::instance().DEVICE_LOGGING_FLAG);
     query_controller_list();
     query_command_queue();
 }
@@ -268,7 +271,7 @@ ControllerType DeviceHandle::refresh_controller_type(){
 void DeviceHandle::send_request_with_no_response(MessageHeader& request){
     request.id = 0;
     std::unique_lock<Mutex> lg(m_lock);
-    m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &request);
+    m_message_loggers.log_send(m_logger, LOG_EVERYTHING(), &request);
     m_connection.reliable_send_all_or_nothing(
         nullptr,
         &request,
@@ -281,7 +284,7 @@ bool DeviceHandle::try_send_request_with_no_response(
 ) noexcept{
     request.id = 0;
     std::unique_lock<Mutex> lg(m_lock);
-    m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &request);
+    m_message_loggers.log_send(m_logger, LOG_EVERYTHING(), &request);
     return m_connection.reliable_send_all_or_nothing(
         nullptr,
         &request,
@@ -308,7 +311,7 @@ uint8_t DeviceHandle::send_request_with_response(MessageHeader& request){
         break;
     }
 
-    m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &request);
+    m_message_loggers.log_send(m_logger, LOG_EVERYTHING(), &request);
 
     try{
         m_connection.reliable_send_all_or_nothing(
@@ -349,7 +352,7 @@ std::optional<uint8_t> DeviceHandle::try_send_request_with_response(
         break;
     }
 
-    m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &request);
+    m_message_loggers.log_send(m_logger, LOG_EVERYTHING(), &request);
 
     try{
         if (m_connection.reliable_send_all_or_nothing(
@@ -491,7 +494,7 @@ void DeviceHandle::on_recv(const void* data, size_t bytes){
 
         const MessageHeader* header = (const MessageHeader*)message.c_str();
 
-        m_message_loggers.log_recv(m_logger, GlobalSettings::instance().LOG_EVERYTHING, header);
+        m_message_loggers.log_recv(m_logger, LOG_EVERYTHING(), header);
 
         //  Now we can process the message.
         switch (header->opcode){

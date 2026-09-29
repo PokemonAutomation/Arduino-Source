@@ -7,9 +7,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "KeyboardInput_State.h"
 #include "KeyboardInput_KeyMappings.h"
@@ -72,21 +70,23 @@ void KeyboardHidTracker::clear_state(){
     m_cv.notify_all();
 }
 
-void KeyboardHidTracker::on_key_press(const QKeyEvent& key){
-    QtKeyMap::instance().record(key);
+void KeyboardHidTracker::on_key_press(const void* key){
+    const QKeyEvent& qkey = *(const QKeyEvent*)key;
+    QtKeyMap::instance().record(qkey);
     {
         WriteSpinLock lg(m_state_lock);
-        m_state_tracker.press(key.nativeVirtualKey());
+        m_state_tracker.press(qkey.nativeVirtualKey());
     }
 
     std::lock_guard<Mutex> lg(m_sleep_lock);
     m_cv.notify_all();
 }
-void KeyboardHidTracker::on_key_release(const QKeyEvent& key){
-    QtKeyMap::instance().record(key);
+void KeyboardHidTracker::on_key_release(const void* key){
+    const QKeyEvent& qkey = *(const QKeyEvent*)key;
+    QtKeyMap::instance().record(qkey);
     {
         WriteSpinLock lg(m_state_lock);
-        m_state_tracker.release(key.nativeVirtualKey());
+        m_state_tracker.release(qkey.nativeVirtualKey());
     }
 
     std::lock_guard<Mutex> lg(m_sleep_lock);
@@ -116,8 +116,6 @@ KeyboardInputState KeyboardHidTracker::keys_to_state(const std::set<uint32_t>& p
 
 
 void KeyboardHidTracker::thread_loop(){
-    GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread(m_logger);
-
     KeyboardInputState last;
     KeyboardInputState current;
 

@@ -7,9 +7,7 @@
 #include <QtGlobal>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "CommonFramework/Globals.h"
-#include "OCR_StringNormalization.h"
-#include "OCR_TextMatcher.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "OCR_SmallDictionaryMatcher.h"
 
 namespace PokemonAutomation{

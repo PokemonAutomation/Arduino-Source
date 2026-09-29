@@ -8,13 +8,18 @@
 #define PokemonAutomation_StringTools_H
 
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace PokemonAutomation{
 namespace StringTools{
 
 
-std::string replace(const std::string& str, const std::string& desired, const std::string& replace_with);
+std::string replace(
+    const std::string& str,
+    const std::string& desired,
+    const std::string& replace_with
+);
 
 // Trim leading and trailing white spaces
 std::string strip(const std::string& str);
@@ -27,6 +32,7 @@ size_t to_size_t(const std::string& str);
 // Note, if the string ends with a delimiter, the last element in the returned vector is an empty sub-string.
 // e.g. split("a; b; ", "; ") -> ["a", "b", ""]
 std::vector<std::string> split(const std::string& str, const std::string& delimiter);
+std::vector<std::string_view> split(const std::string_view& str, const std::string& delimiter);
 
 // Capitalize each word in str. Words are separated by space characters.
 std::string capitalize(const std::string& str);

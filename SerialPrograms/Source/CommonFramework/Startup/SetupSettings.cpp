@@ -14,7 +14,7 @@
 #endif
 #endif
 #include "Common/Cpp/Logging/AbstractLogger.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "SetupSettings.h"
 

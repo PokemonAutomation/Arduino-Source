@@ -6,7 +6,7 @@
 
 #include <set>
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -132,8 +132,8 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
         // dialog_detector.make_overlays(set);
         VideoSnapshot screen = env.console.video().snapshot();
         if (!dialog_detector.detect(screen)){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "No npc dialog box found when reading berry name",
                 env.console
             );
@@ -146,8 +146,8 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
             OCR::BLACK_TEXT_FILTERS()
         );
         if (result.results.empty()){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "No berry name found in dialog box",
                 env.console
             );
@@ -173,8 +173,8 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
         // Reset game:
         pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
         if (!reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Error resetting game",
                 env.console
             );

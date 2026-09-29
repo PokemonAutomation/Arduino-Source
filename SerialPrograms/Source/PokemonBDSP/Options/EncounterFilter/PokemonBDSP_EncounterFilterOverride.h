@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
-#include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
+#include "VideoGames/PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 #include "PokemonBDSP_EncounterFilterEnums.h"
 
 namespace PokemonAutomation{

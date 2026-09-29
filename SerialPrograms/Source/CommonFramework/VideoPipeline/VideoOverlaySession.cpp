@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "ControllerInput/Keyboard/GlobalKeyboardHidTracker.h"
 #include "VideoOverlaySession.h"
 
 //#include <iostream>
@@ -15,11 +16,11 @@ namespace PokemonAutomation{
 
 
 
-void VideoOverlaySession::add_listener(ContentListener& listener){
-    m_listeners.add(listener);
+void VideoOverlaySession::add_content_listener(ContentListener& listener){
+    m_content_listeners.add(listener);
 }
-void VideoOverlaySession::remove_listener(ContentListener& listener){
-    m_listeners.remove(listener);
+void VideoOverlaySession::remove_content_listener(ContentListener& listener){
+    m_content_listeners.remove(listener);
 }
 
 
@@ -40,7 +41,7 @@ VideoOverlaySession::VideoOverlaySession(Logger& logger, VideoOverlayOption& opt
 {}
 
 
-void VideoOverlaySession::get(VideoOverlayOption& option){
+void VideoOverlaySession::save(VideoOverlayOption& option) const{
     bool stats = m_option.stats.load(std::memory_order_relaxed);
     bool boxes = m_option.boxes.load(std::memory_order_relaxed);
     bool text = m_option.text.load(std::memory_order_relaxed);
@@ -52,7 +53,7 @@ void VideoOverlaySession::get(VideoOverlayOption& option){
     option.log.store(log, std::memory_order_relaxed);
     option.stats.store(stats, std::memory_order_relaxed);
 }
-void VideoOverlaySession::set(const VideoOverlayOption& option){
+void VideoOverlaySession::load(const VideoOverlayOption& option){
     bool stats = option.stats.load(std::memory_order_relaxed);
     bool boxes = option.boxes.load(std::memory_order_relaxed);
     bool text = option.text.load(std::memory_order_relaxed);
@@ -63,26 +64,27 @@ void VideoOverlaySession::set(const VideoOverlayOption& option){
     m_option.text.store(text, std::memory_order_relaxed);
     m_option.images.store(images, std::memory_order_relaxed);
     m_option.log.store(log, std::memory_order_relaxed);
-    m_listeners.run_method(&ContentListener::on_overlay_enabled_stats, stats);
-    m_listeners.run_method(&ContentListener::on_overlay_enabled_boxes, boxes);
-    m_listeners.run_method(&ContentListener::on_overlay_enabled_text, text);
-    m_listeners.run_method(&ContentListener::on_overlay_enabled_images, images);
-    m_listeners.run_method(&ContentListener::on_overlay_enabled_log, log);
+    m_content_listeners.run_method(&ContentListener::on_overlay_enabled_stats, stats);
+    m_content_listeners.run_method(&ContentListener::on_overlay_enabled_boxes, boxes);
+    m_content_listeners.run_method(&ContentListener::on_overlay_enabled_text, text);
+    m_content_listeners.run_method(&ContentListener::on_overlay_enabled_images, images);
+    m_content_listeners.run_method(&ContentListener::on_overlay_enabled_log, log);
 }
 
 
 void VideoOverlaySession::stats_thread(){
     std::unique_lock<Mutex> lg(m_stats_lock);
     while (!m_stopping){
-        {
-            std::vector<OverlayStatSnapshot> lines;
-            WriteSpinLock lg0(m_lock);
-            for (const auto& stat : m_stats_order){
-                OverlayStatSnapshot snapshot = stat->get_current();
-                if (!snapshot.text.empty()){
-                    lines.emplace_back(std::move(snapshot));
-                }
+        std::vector<OverlayStatSnapshot> lines;
+        m_stats.run_on_all([&](OverlayStat& stat){
+            OverlayStatSnapshot snapshot = stat.get_current();
+            if (!snapshot.text.empty()){
+                lines.emplace_back(std::move(snapshot));
             }
+            return false;
+        });
+        {
+            WriteSpinLock lg0(m_lock, PA_CURRENT_FUNCTION);
             m_stat_lines = std::move(lines);
         }
         m_stats_cv.wait_for(lg, std::chrono::milliseconds(100));
@@ -92,23 +94,23 @@ void VideoOverlaySession::stats_thread(){
 
 void VideoOverlaySession::set_enabled_stats(bool enabled){
     m_option.stats.store(enabled, std::memory_order_relaxed);
-    m_listeners.run_method(&ContentListener::on_overlay_enabled_stats, enabled);
+    m_content_listeners.run_method(&ContentListener::on_overlay_enabled_stats, enabled);
 }
 void VideoOverlaySession::set_enabled_boxes(bool enabled){
     m_option.boxes.store(enabled, std::memory_order_relaxed);
-    m_listeners.run_method(&ContentListener::on_overlay_enabled_boxes, enabled);
+    m_content_listeners.run_method(&ContentListener::on_overlay_enabled_boxes, enabled);
 }
 void VideoOverlaySession::set_enabled_text(bool enabled){
     m_option.text.store(enabled, std::memory_order_relaxed);
-    m_listeners.run_method(&ContentListener::on_overlay_enabled_text, enabled);
+    m_content_listeners.run_method(&ContentListener::on_overlay_enabled_text, enabled);
 }
 void VideoOverlaySession::set_enabled_images(bool enabled){
     m_option.images.store(enabled, std::memory_order_relaxed);
-    m_listeners.run_method(&ContentListener::on_overlay_enabled_images, enabled);
+    m_content_listeners.run_method(&ContentListener::on_overlay_enabled_images, enabled);
 }
 void VideoOverlaySession::set_enabled_log(bool enabled){
     m_option.log.store(enabled, std::memory_order_relaxed);
-    m_listeners.run_method(&ContentListener::on_overlay_enabled_log, enabled);
+    m_content_listeners.run_method(&ContentListener::on_overlay_enabled_log, enabled);
 }
 
 
@@ -117,31 +119,10 @@ void VideoOverlaySession::set_enabled_log(bool enabled){
 //
 
 void VideoOverlaySession::add_stat(OverlayStat& stat){
-    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-    auto map_iter = m_stats.find(&stat);
-    if (map_iter != m_stats.end()){
-        return;
-    }
-
-    m_stats_order.emplace_back(&stat);
-    auto list_iter = m_stats_order.end();
-    --list_iter;
-    try{
-        m_stats.emplace(&stat, list_iter);
-    }catch (...){
-        m_stats_order.pop_back();
-        throw;
-    }
+    m_stats.add(stat);
 }
 void VideoOverlaySession::remove_stat(OverlayStat& stat){
-    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-    auto iter = m_stats.find(&stat);
-    if (iter == m_stats.end()){
-        return;
-    }
-
-    m_stats_order.erase(iter->second);
-    m_stats.erase(iter);
+    m_stats.remove(stat);
 }
 
 std::vector<OverlayStatSnapshot> VideoOverlaySession::stats() const{
@@ -157,7 +138,7 @@ std::vector<OverlayStatSnapshot> VideoOverlaySession::stats() const{
 void VideoOverlaySession::add_box(const OverlayBox& box){
     std::shared_ptr<std::vector<OverlayBox>> ptr = std::make_shared<std::vector<OverlayBox>>();
     {
-        WriteSpinLock lg(m_lock, "VideoOverlaySession::add_box()");
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_boxes.insert(&box);
 
         //  We create a newly allocated Box vector to avoid listener accessing
@@ -166,12 +147,12 @@ void VideoOverlaySession::add_box(const OverlayBox& box){
             ptr->emplace_back(*item);
         }
     }
-    m_listeners.run_method(&ContentListener::on_overlay_update_boxes, ptr);
+    m_content_listeners.run_method(&ContentListener::on_overlay_update_boxes, ptr);
 }
 void VideoOverlaySession::remove_box(const OverlayBox& box){
     std::shared_ptr<std::vector<OverlayBox>> ptr = std::make_shared<std::vector<OverlayBox>>();
     {
-        WriteSpinLock lg(m_lock, "VideoOverlaySession::remove_box()");
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_boxes.erase(&box);
 
         //  We create a newly allocated Box vector to avoid listener accessing
@@ -180,7 +161,7 @@ void VideoOverlaySession::remove_box(const OverlayBox& box){
             ptr->emplace_back(*item);
         }
     }
-    m_listeners.run_method(&ContentListener::on_overlay_update_boxes, ptr);
+    m_content_listeners.run_method(&ContentListener::on_overlay_update_boxes, ptr);
 }
 std::vector<OverlayBox> VideoOverlaySession::boxes() const{
     ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
@@ -199,7 +180,7 @@ std::vector<OverlayBox> VideoOverlaySession::boxes() const{
 void VideoOverlaySession::add_text(const OverlayText& text){
     std::shared_ptr<std::vector<OverlayText>> ptr = std::make_shared<std::vector<OverlayText>>();
     {
-        WriteSpinLock lg(m_lock, "VideoOverlaySession::add_text()");
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_texts.insert(&text);
 
         //  We create a newly allocated Box vector to avoid listener accessing
@@ -208,12 +189,12 @@ void VideoOverlaySession::add_text(const OverlayText& text){
             ptr->emplace_back(*item);
         }
     }
-    m_listeners.run_method(&ContentListener::on_overlay_update_text, ptr);
+    m_content_listeners.run_method(&ContentListener::on_overlay_update_text, ptr);
 }
 void VideoOverlaySession::remove_text(const OverlayText& text){
     std::shared_ptr<std::vector<OverlayText>> ptr = std::make_shared<std::vector<OverlayText>>();
     {
-        WriteSpinLock lg(m_lock, "VideoOverlaySession::remove_text()");
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_texts.erase(&text);
 
         //  We create a newly allocated Box vector to avoid listener accessing
@@ -222,7 +203,7 @@ void VideoOverlaySession::remove_text(const OverlayText& text){
             ptr->emplace_back(*item);
         }
     }
-    m_listeners.run_method(&ContentListener::on_overlay_update_text, ptr);
+    m_content_listeners.run_method(&ContentListener::on_overlay_update_text, ptr);
 }
 std::vector<OverlayText> VideoOverlaySession::texts() const{
     ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
@@ -241,7 +222,7 @@ std::vector<OverlayText> VideoOverlaySession::texts() const{
 void VideoOverlaySession::add_image(const OverlayImage& image){
     std::shared_ptr<std::vector<OverlayImage>> ptr = std::make_shared<std::vector<OverlayImage>>();
     {
-        WriteSpinLock lg(m_lock, "VideoOverlaySession::add_image()");
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_images.insert(&image);
 
         //  We create a newly allocated Box vector to avoid listener accessing
@@ -250,12 +231,12 @@ void VideoOverlaySession::add_image(const OverlayImage& image){
             ptr->emplace_back(*item);
         }
     }
-    m_listeners.run_method(&ContentListener::on_overlay_update_images, ptr);
+    m_content_listeners.run_method(&ContentListener::on_overlay_update_images, ptr);
 }
 void VideoOverlaySession::remove_image(const OverlayImage& image){
     std::shared_ptr<std::vector<OverlayImage>> ptr = std::make_shared<std::vector<OverlayImage>>();
     {
-        WriteSpinLock lg(m_lock, "VideoOverlaySession::remove_image()");
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_images.erase(&image);
 
         //  We create a newly allocated Box vector to avoid listener accessing
@@ -264,7 +245,7 @@ void VideoOverlaySession::remove_image(const OverlayImage& image){
             ptr->emplace_back(*item);
         }
     }
-    m_listeners.run_method(&ContentListener::on_overlay_update_images, ptr);
+    m_content_listeners.run_method(&ContentListener::on_overlay_update_images, ptr);
 }
 std::vector<OverlayImage> VideoOverlaySession::images() const{
     ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
@@ -283,7 +264,7 @@ std::vector<OverlayImage> VideoOverlaySession::images() const{
 void VideoOverlaySession::add_log(std::string message, Color color){
     std::shared_ptr<std::vector<OverlayLogLine>> ptr = std::make_shared<std::vector<OverlayLogLine>>();
     {
-        WriteSpinLock lg(m_lock, "VideoOverlaySession::add_log_text()");
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_log_texts.emplace_front(color, std::move(message));
 
         if (m_log_texts.size() > LOG_MAX_LINES){
@@ -296,12 +277,12 @@ void VideoOverlaySession::add_log(std::string message, Color color){
             ptr->emplace_back(item);
         }
     }
-    m_listeners.run_method(&ContentListener::on_overlay_update_log, ptr);
+    m_content_listeners.run_method(&ContentListener::on_overlay_update_log, ptr);
 }
 void VideoOverlaySession::clear_log(){
     std::shared_ptr<std::vector<OverlayLogLine>> ptr = std::make_shared<std::vector<OverlayLogLine>>();
     {
-        WriteSpinLock lg(m_lock, "VideoOverlaySession::clear_log_texts()");
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_log_texts.clear();
 
         //  We create a newly allocated log text vector to avoid listener accessing
@@ -310,7 +291,7 @@ void VideoOverlaySession::clear_log(){
             ptr->emplace_back(item);
         }
     }
-    m_listeners.run_method(&ContentListener::on_overlay_update_log, ptr);
+    m_content_listeners.run_method(&ContentListener::on_overlay_update_log, ptr);
 }
 std::vector<OverlayLogLine> VideoOverlaySession::log_texts() const{
     ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
@@ -322,6 +303,45 @@ std::vector<OverlayLogLine> VideoOverlaySession::log_texts() const{
 }
 
 
+
+
+void VideoOverlaySession::report_key_press(const void* key){
+    global_keyboard_tracker().on_key_press(key);
+    m_hid_listeners.run_method(&VideoDisplayHidListener::on_key_press, key);
+}
+void VideoOverlaySession::report_key_release(const void* key){
+    global_keyboard_tracker().on_key_release(key);
+    m_hid_listeners.run_method(&VideoDisplayHidListener::on_key_release, key);
+}
+
+
+void VideoOverlaySession::add_hid_listener(VideoDisplayHidListener& listener){
+    m_hid_listeners.add(listener);
+}
+void VideoOverlaySession::remove_hid_listener(VideoDisplayHidListener& listener){
+    m_hid_listeners.remove(listener);
+}
+void VideoOverlaySession::on_focus_in(){
+    m_hid_listeners.run_method(&VideoDisplayHidListener::on_focus_in);
+}
+void VideoOverlaySession::on_focus_out(){
+    m_hid_listeners.run_method(&VideoDisplayHidListener::on_focus_out);
+}
+void VideoOverlaySession::on_mouse_press(double x, double y){
+    m_hid_listeners.run_method(&VideoDisplayHidListener::on_mouse_press, x, y);
+}
+void VideoOverlaySession::on_mouse_release(double x, double y){
+    m_hid_listeners.run_method(&VideoDisplayHidListener::on_mouse_release, x, y);
+}
+void VideoOverlaySession::on_mouse_move(double x, double y){
+    m_hid_listeners.run_method(&VideoDisplayHidListener::on_mouse_move, x, y);
+}
+void VideoOverlaySession::on_key_press(const void* key){
+    m_hid_listeners.run_method(&VideoDisplayHidListener::on_key_press, key);
+}
+void VideoOverlaySession::on_key_release(const void* key){
+    m_hid_listeners.run_method(&VideoDisplayHidListener::on_key_release, key);
+}
 
 
 

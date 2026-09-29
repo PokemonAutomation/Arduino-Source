@@ -5,7 +5,7 @@
  */
 
 #include "Pokemon/Resources/Pokemon_EggSteps.h"
-#include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
+#include "VideoGames/PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
 #include "PokemonBDSP_EggStepOption.h"
 
 namespace PokemonAutomation{

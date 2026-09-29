@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -69,6 +70,31 @@ bool BlackBorderDetector::detect(const ImageViewRGB32& screen){
 //    }
 
     return true;
+}
+
+
+class Test_BlackBorderDetector : public UnitTest{
+public:
+    Test_BlackBorderDetector(const std::string& image, bool expected)
+        : UnitTest("CommonFramework::BlackBorderDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        BlackBorderDetector detector;
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    }
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+
+void add_tests_BlackBorderDetector(UnitTestDatabase& database){
+    database.add<Test_BlackBorderDetector>("CommonFramework/BlackBorderDetector/Dark_SV_Crystal_False.png", false);
 }
 
 

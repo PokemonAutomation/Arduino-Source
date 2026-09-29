@@ -5,9 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Globals.h"
-#include "OCR_StringNormalization.h"
-#include "OCR_TextMatcher.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "OCR_LargeDictionaryMatcher.h"
 
 namespace PokemonAutomation{

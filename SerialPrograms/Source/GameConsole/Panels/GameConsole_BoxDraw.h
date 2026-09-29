@@ -1,0 +1,37 @@
+/*  Box Draw
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#ifndef PokemonAutomation_GameConsole_BoxDraw_H
+#define PokemonAutomation_GameConsole_BoxDraw_H
+
+#include "CommonFramework/Options/NestedBoxDrawOption.h"
+#include "GameConsole/ConsolePanel.h"
+
+namespace PokemonAutomation{
+namespace GameConsole{
+
+
+class BoxDraw_Descriptor : public ConsolePanelDescriptor{
+public:
+    BoxDraw_Descriptor();
+};
+
+class BoxDraw : public ConsolePanelInstance{
+public:
+    using Descriptor = BoxDraw_Descriptor;
+    BoxDraw(ConsoleSystemSession& system);
+
+private:
+    NestedBoxDrawOption BOX_DRAW;
+};
+
+
+
+
+
+}
+}
+#endif

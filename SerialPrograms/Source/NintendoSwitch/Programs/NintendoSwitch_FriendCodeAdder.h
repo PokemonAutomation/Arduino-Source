@@ -25,6 +25,7 @@ public:
 
 class FriendCodeAdder : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = FriendCodeAdder_Descriptor;
     FriendCodeAdder();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

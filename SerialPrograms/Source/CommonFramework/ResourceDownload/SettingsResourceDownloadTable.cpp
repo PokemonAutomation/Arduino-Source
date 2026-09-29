@@ -4,9 +4,7 @@
  *
  */
 
-#include "CommonFramework/Globals.h"
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Filesystem.h"
 #include "ResourceDownload.h"
 #include "SettingsResourceDownloadRow.h"
 #include "SettingsResourceDownloadTable.h"

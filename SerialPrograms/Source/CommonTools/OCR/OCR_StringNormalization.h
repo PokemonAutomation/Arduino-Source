@@ -18,7 +18,7 @@ namespace OCR{
 // against a dictionary.
 std::u32string remove_non_alphanumeric(const std::u32string& text);
 
-// Apply character substitution rules loaded from RESOURCE_PATH()/Tesseract/CharacterReductions.json
+// Apply character substitution rules loaded from RESOURCE_PATH()/OCR/CharacterReductions.json
 // to merge similar-looking characters. This is called by `normalize_utf32()` as a fix for OCR
 // failure on those similar-looking characters.
 std::u32string run_character_reductions(const std::u32string& text);

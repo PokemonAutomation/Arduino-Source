@@ -29,6 +29,7 @@ public:
 
 class AmitySquarePickUpFarmer : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = AmitySquarePickUpFarmer_Descriptor;
     AmitySquarePickUpFarmer();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

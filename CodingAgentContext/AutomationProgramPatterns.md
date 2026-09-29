@@ -118,7 +118,7 @@ while(true){
         env.update_stats();
         send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
         throw;
-    }catch(ScreenshotException& e){ // an exception indicating an error somewhere in the loop
+    }catch(OperationFailedException& e){ // an exception indicating an error somewhere in the loop
         if(...){ // if we can recover from it
             // execute recover logic (usually is restarting the game)
             continue;

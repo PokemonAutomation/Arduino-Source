@@ -8,22 +8,21 @@
 #ifndef PokemonAutomation_ML_PaddleOCRPipeline_H
 #define PokemonAutomation_ML_PaddleOCRPipeline_H
 
-
 #include <string>
 #include <vector>
 #include <onnxruntime_cxx_api.h>
 #include <opencv2/opencv.hpp>
+#include "Common/Cpp/Logging/TaggedLogger.h"
+#include "Common/Cpp/Filesystem/FilePath.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-
-
 
 namespace PokemonAutomation{
 namespace ML{
 
 
-class PaddleOCRPipeline {
+class PaddleOCRPipeline{
 public:
     PaddleOCRPipeline(Language language);
     PaddleOCRPipeline(Language language, std::string rec_path, std::string dict_path);
@@ -34,35 +33,58 @@ public:
 
     static std::pair<std::string, std::string> get_paths(Language language);
 
-private:
-    void load_dictionary(const std::string& path);
+    std::string decode_CTC(float* data, const std::vector<int64_t>& shape, const std::vector<std::string>& dict);
 
-    Ort::Env m_env;
+private:
+    void load_dictionary(const Filesystem::Path& path);
+
     // Ort::Session det_session;
     Ort::Session m_rec_session;
     // Ort::MemoryInfo memory_info;
     Language m_language;
     std::string m_input_name;
     std::string m_output_name;
-    std::vector<std::string> m_dictionary;    
+    std::vector<std::string> m_dictionary;
+    TaggedLogger m_logger;
+
+    int m_index = 0;
 
 };
 
 // assumes the input image is RGB
-cv::Mat crop_to_text_region(const cv::Mat& image);
+cv::Mat crop_to_text_region_with_padding(const cv::Mat& image, int image_index);
+
+// returns binary image of given image
+// text pixels are white.
+// uses Otsu thresholding
+cv::Mat get_binary_image(const cv::Mat& image);
 
 // if the image is narrow/tall, add horizontal padding
 // modifies the input image
 // assumes input image is RGB
-void add_horizontal_padding(cv::Mat& image);
+void add_horizontal_padding(cv::Mat& image, int image_index);
+
+// if the image is just a line, add vertical padding
+// modifies the input image
+// to avoid PaddleOCR hallucinating text
+void add_vertical_padding(cv::Mat& image, const cv::Mat& binary_tight_crop, int image_index);
+
+// from given binary image, returns true if it's a horizontal line
+bool is_horizontal_line(const cv::Mat& binary, int image_index);
+
+// from given binary image, and single contour within the binary image,
+// return true if the given contour is line shaped. 
+// density of the contour must be >75%. and at least twice as wide as it is tall
+bool is_line_shape(const cv::Mat& binary, const std::vector<cv::Point>& contour);
 
 // assumes input image is RGB
 cv::Scalar estimate_background_color(const cv::Mat& image);
 
-// convert HCW (height, width, channels) to NCHW (batch N, channels C, height H, width W)
+// convert HWC (height, width, channels) to NCHW (batch N, channels C, height H, width W)
+// HWC: pixels are interleaved. [B,G,R] [B,G,R] [B,G,R] ...
+// NCHW: [All Blue Pixels...] [All Green Pixels...] [All Red Pixels...]
 std::vector<float> preprocess_NCHW(cv::Mat& img);
 
-std::string decode_CTC(float* data, const std::vector<int64_t>& shape, const std::vector<std::string>& dict);
 
 cv::Mat imageviewrgb32_to_cv_mat_rgb(const ImageViewRGB32& image);
 

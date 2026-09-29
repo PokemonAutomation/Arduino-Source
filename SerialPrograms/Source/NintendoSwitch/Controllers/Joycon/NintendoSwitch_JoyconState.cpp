@@ -51,7 +51,7 @@ void JoyconState::load_json(const JsonObject& json){
     {
         std::string buttons_string;
         json.read_string(buttons_string, "buttons");
-        buttons = string_to_button(buttons_string);
+        buttons = string_to_button(buttons_string, " ");
     }
 
 

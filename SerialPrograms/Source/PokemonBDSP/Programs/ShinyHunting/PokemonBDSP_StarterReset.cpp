@@ -4,7 +4,8 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -14,7 +15,7 @@
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
-#include "PokemonSwSh/ShinyHuntTracker.h"
+#include "VideoGames/PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonBDSP/Resources/PokemonBDSP_NameDatabase.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameEntry.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
@@ -117,8 +118,8 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         env.update_stats();
 
         if (consecutive_failures >= 3){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Failed 3 times in the row.",
                 env.console
             );

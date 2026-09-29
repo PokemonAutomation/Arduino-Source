@@ -58,7 +58,7 @@ public:
     //  Static Information
 
     virtual const char* name() = 0;
-    virtual ControllerClass controller_class() const = 0;
+    virtual ControllerClass controller_class() const noexcept = 0;
 
     //  Performance Metrics
     virtual ControllerPerformanceClass performance_class() const = 0;
@@ -195,9 +195,14 @@ public:
 
 
 public:
-    //  Controller Input
+    //  External Inputs
 
+    virtual bool run_string_command(Milliseconds duration, const std::string& command){ return false; };
     virtual void run_controller_input(const ControllerInputState& state){}
+
+
+public:
+    //  Input Sniffing
 
     struct InputSniffer{
         virtual void on_command_input(WallClock timestamp, const ControllerState& state) = 0;

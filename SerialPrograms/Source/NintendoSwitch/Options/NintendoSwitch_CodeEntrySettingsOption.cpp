@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "NintendoSwitch_CodeEntrySettingsOption.h"
 
 namespace PokemonAutomation{
@@ -68,7 +68,7 @@ CodeboardTimingsOption::CodeboardTimingsOption(
     , HOLD(
         "<b>Hold:</b><br>Duration to hold each button press down.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        PreloadSettings::instance().DEVELOPER_MODE && performance_class == ControllerPerformanceClass::SerialPABotBase_Wired
+        STATIC_GLOBALS.DEVELOPER_MODE && performance_class == ControllerPerformanceClass::SerialPABotBase_Wired
             ? "40 ms"
             : std::to_string(unit.count() * 2) + " ms"
     )
@@ -116,9 +116,9 @@ CodeboardTimingsOption::CodeboardTimingsOption(
 Milliseconds CodeboardTimingsOption::get_unit_timing(ControllerPerformanceClass performance_class){
     switch (performance_class){
     case ControllerPerformanceClass::SerialPABotBase_Wired:
-        return PreloadSettings::instance().DEVELOPER_MODE ? 24ms : 40ms;
+        return STATIC_GLOBALS.DEVELOPER_MODE ? 24ms : 40ms;
     case ControllerPerformanceClass::SerialPABotBase_Wireless:
-        return PreloadSettings::instance().DEVELOPER_MODE ? 34ms : 40ms;
+        return STATIC_GLOBALS.DEVELOPER_MODE ? 34ms : 40ms;
     case ControllerPerformanceClass::SysbotBase:
         return 100ms;
     default:
@@ -142,12 +142,12 @@ KeyboardControllerTimingsOption::KeyboardControllerTimingsOption()
     , PARLLELIZE(
         "<b>Parallel Entry:</b><br>Allow characters to be entered in parallel if possible.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        PreloadSettings::instance().DEVELOPER_MODE
+        STATIC_GLOBALS.DEVELOPER_MODE
     )
     , TIME_UNIT(
         "<b>Time Unit:</b><br>Timesteps should increment in multiples of this unit.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        PreloadSettings::instance().DEVELOPER_MODE ? "24 ms" : "40 ms"
+        STATIC_GLOBALS.DEVELOPER_MODE ? "24 ms" : "40 ms"
     )
     , HOLD(
         "<b>Hold:</b><br>Duration to hold each key press down.",

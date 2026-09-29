@@ -1,12 +1,18 @@
-#pragma once
-#ifndef DPP_HANDLER_H
-#define DPP_HANDLER_H
+/*  DPP Command Handler
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#ifndef PokemonAutomation_Integrations_DppCommandHandler_H
+#define PokemonAutomation_Integrations_DppCommandHandler_H
 
 #include <Integrations/DppIntegration/DppUtility.h>
 #include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
 #include "CommonFramework/Notifications/MessageAttachment.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "Integrations/IntegrationsAPI.h"
 #include "Integrations/DiscordSettingsOption.h"
 
 namespace PokemonAutomation{
@@ -53,6 +59,23 @@ protected:
     );
 
 private:
+    static uint8_t get_min_parameters(const dpp::parameter_registration_t& params);
+
+    void add_command_hi(dpp::commandhandler& handler);
+    void add_command_ping(dpp::commandhandler& handler);
+    void add_command_about(dpp::commandhandler& handler);
+    void add_command_help(dpp::commandhandler& handler);
+    void add_command_status(dpp::commandhandler& handler);
+    void add_command_screenshot(dpp::commandhandler& handler, bool full_version);
+    void add_command_start(dpp::commandhandler& handler);
+    void add_command_stop(dpp::commandhandler& handler);
+    void add_command_resetcamera(dpp::commandhandler& handler);
+    void add_command_resetcontroller(dpp::commandhandler& handler);
+    void add_command_click(dpp::commandhandler& handler, bool full_version);
+    void add_command_joystick(dpp::commandhandler& handler, bool full_version, JoystickSide side);
+    void add_command_string(dpp::commandhandler& handler, bool full_version);
+
+
     void create_unified_commands(dpp::commandhandler& handler);
     void update_response(
         const dpp::command_source& src,

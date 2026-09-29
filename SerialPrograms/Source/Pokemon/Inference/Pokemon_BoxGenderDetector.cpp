@@ -7,7 +7,7 @@
  */
 
 #include "Common/Cpp/Color.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
@@ -53,7 +53,7 @@ StatsHuntGenderFilter BoxGenderDetector::detect(const ImageViewRGB32& screen) co
 
     const double threshold = region.width() * region.height() * m_area_ratio_threshold;
 
-    if (PreloadSettings::debug().COLOR_CHECK){
+    if (STATIC_GLOBALS.COLOR_CHECK){
         cout << "num_red_pixels: " << num_red_pixels << ", num_blue_pixels: " << num_blue_pixels
              << ", region " << region.width() << " x " << region.height() << " threshold " << threshold << endl;
 

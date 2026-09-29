@@ -116,7 +116,7 @@ void UnitTestRunner::run(){
         {
             const std::string& name = m_test_by_total_memory.rbegin()->second;
             PendingEntry& entry = m_test_by_name.find(name)->second;
-            if (m_current_memory + entry.test->memory() <= m_max_memory ||
+            if (m_current_memory + entry.test->memory() <= m_max_memory &&
                 m_current_threads + entry.test->threads() <= m_max_threads
             ){
                 dispatch_test(name);
@@ -128,7 +128,7 @@ void UnitTestRunner::run(){
         {
             const std::string& name = m_test_by_per_thread_memory.begin()->second;
             PendingEntry& entry = m_test_by_name.find(name)->second;
-            if (m_current_memory + entry.test->memory() <= m_max_memory ||
+            if (m_current_memory + entry.test->memory() <= m_max_memory &&
                 m_current_threads + entry.test->threads() <= m_max_threads
             ){
                 dispatch_test(name);

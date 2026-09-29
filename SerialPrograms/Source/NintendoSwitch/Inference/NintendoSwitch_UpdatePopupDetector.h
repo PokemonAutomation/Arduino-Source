@@ -8,6 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_UpdatePopupDetector_H
 
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/VisualDetector.h"
@@ -80,6 +81,7 @@ public:
 };
 
 
+void add_tests_UpdatePopupDetector(UnitTestDatabase& database);
 
 
 

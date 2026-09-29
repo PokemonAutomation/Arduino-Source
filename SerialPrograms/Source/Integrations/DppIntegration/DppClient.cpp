@@ -1,3 +1,9 @@
+/*  DPP Client
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
 #ifdef PA_DPP
 
 #include <set>

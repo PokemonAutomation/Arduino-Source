@@ -1,0 +1,118 @@
+/*  Autostory
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#ifndef PokemonAutomation_PokemonSV_AutoStory_Segment_22_H
+#define PokemonAutomation_PokemonSV_AutoStory_Segment_22_H
+
+#include "PokemonSV_AutoStoryTools.h"
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSV{
+
+class AutoStory_Segment_22 : public AutoStory_Segment{
+public:
+    virtual std::string name() const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text() const override;
+    virtual void run_segment(
+        SingleSwitchProgramEnvironment& env, 
+        ProControllerContext& context,
+        AutoStoryOptions options,
+        AutoStoryStats& stats
+    ) const override;
+};
+
+class AutoStory_Checkpoint_50 : public AutoStory_Checkpoint{
+public:
+    virtual std::string name() const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text() const override;
+    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const override;
+};
+
+class AutoStory_Checkpoint_51 : public AutoStory_Checkpoint{
+public:
+    virtual std::string name() const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text() const override;
+    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const override;
+};
+
+class AutoStory_Checkpoint_52 : public AutoStory_Checkpoint{
+public:
+    virtual std::string name() const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text() const override;
+    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const override;
+};
+
+class AutoStory_Checkpoint_53 : public AutoStory_Checkpoint{
+public:
+    virtual std::string name() const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text() const override;
+    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const override;
+};
+
+
+
+
+// start: Defeated Team Star (Fire). At East Province (Area Two) Pokecenter.
+// end: At Levincia (South) Pokecenter.
+void checkpoint_50(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
+);
+
+// start: At Levincia (South) Pokecenter.
+// end: Inside Levincia gym building. Talked to Hassel, met Rika.
+void checkpoint_51(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
+);
+
+
+// start: Inside Levincia gym building. Talked to Hassel, met Rika.
+// end: Finished Levincia gym challenge. Outside Levincia gym building.
+void checkpoint_52(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
+);
+
+
+// start: Finished Levincia gym challenge. Outside Levincia gym building.
+// end: Defeated Levincia Gym (Electric). At Levincia (North) Pokecenter.
+void checkpoint_53(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    EventNotificationOption& notif_error_recoverable,
+    AutoStoryStats& stats,
+    const std::string& checkpoint_text
+);
+
+
+
+
+
+
+}
+}
+}
+#endif

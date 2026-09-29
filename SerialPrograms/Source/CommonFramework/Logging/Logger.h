@@ -25,5 +25,9 @@ Logger& global_logger_tagged();
 Logger& global_logger_command_line();
 
 
+class BooleanCheckBoxOption;
+BooleanCheckBoxOption& LOG_EVERYTHING();
+
+
 }
 #endif

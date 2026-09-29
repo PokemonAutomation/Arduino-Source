@@ -92,8 +92,7 @@ public:
 public:
     EnumDropdownDatabase() : IntegerEnumDropdownDatabase() {}
     EnumDropdownDatabase(std::initializer_list<Entry> list){
-        size_t index = 0;
-        for (auto iter = list.begin(); iter != list.end(); ++iter, index++){
+        for (auto iter = list.begin(); iter != list.end(); ++iter){
             add(
                 iter->value,
                 std::move(iter->slug),

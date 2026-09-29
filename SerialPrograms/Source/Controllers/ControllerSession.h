@@ -10,7 +10,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/ListenerSet.h"
-//#include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/UiWrapper.h"
 #include "Controller.h"
 #include "ControllerDescriptor.h"
 #include "ControllerOption.h"
@@ -20,8 +20,10 @@ namespace PokemonAutomation{
 
 
 
-
-class ControllerSession : private ControllerConnection::StatusListener{
+class ControllerSession final
+    : public UiState<ControllerSession>
+    , private ControllerConnection::StatusListener
+{
 public:
     struct Listener{
         virtual void ready_changed(bool ready){}
@@ -44,26 +46,37 @@ public:
     ~ControllerSession();
     ControllerSession(
         Logger& logger,
-        ControllerOption& option
+        ControllerOption& option,
+        std::optional<size_t> index
     );
 
+
+public:
     Logger& logger(){
         return m_logger;
     }
     std::vector<ControllerType> available_controllers() const;
 
-    void get(ControllerOption& option);
-    void set(const ControllerOption& option);
+    void save(ControllerOption& option) const;
+    void load(const ControllerOption& option);
+
+    bool input_enabled() const;
+    void set_input_enabled(bool enabled);
 
     bool ready() const;
+    ControllerConnection::Status connection_status() const;
+
     std::shared_ptr<ControllerDescriptor> descriptor() const;
-    ControllerType controller_type() const;
+    ControllerClass controller_class() const noexcept;
+    ControllerType controller_type() const noexcept;
     std::string status_text() const;
 
+    std::optional<size_t> index() const{
+        return m_index;
+    }
     const ControllerOption& option() const{
         return m_option;
     }
-    ControllerConnection& connection() const;
     AbstractController* controller() const;
 
 
@@ -78,6 +91,7 @@ public:
 
 
 public:
+    bool set_interface(ControllerInterface controller_interface);
     bool set_device(const std::shared_ptr<ControllerDescriptor>& device);
     bool set_controller(ControllerType controller_type);
 
@@ -91,6 +105,9 @@ public:
     template <typename ControllerType, typename Lambda>
     std::string try_run(Lambda&& function) noexcept{
         ReadSpinLock lg(m_state_lock);
+        if (!m_option.m_enable_input){
+            return "";
+        }
         if (!m_controller){
             return "Controller is null.";
         }
@@ -146,6 +163,7 @@ private:
 private:
     Logger& m_logger;
     ControllerOption& m_option;
+    std::optional<size_t> m_index;
 
     Mutex m_reset_lock;
     mutable SpinLock m_state_lock;
@@ -157,8 +175,7 @@ private:
     std::string m_controller_error;
 
     //  Next Reset
-    ControllerType m_desired_controller;
-    ControllerResetMode m_next_reset_mode;
+    std::optional<ControllerType> m_change_controller_on_ready;
 
     std::shared_ptr<ControllerDescriptor> m_descriptor;
     std::unique_ptr<ControllerConnection> m_connection;

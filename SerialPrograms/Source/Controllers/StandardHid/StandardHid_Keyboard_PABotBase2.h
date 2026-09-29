@@ -48,7 +48,7 @@ public:
 //    virtual ControllerType controller_type() const override{
 //        return ControllerType::HID_Keyboard;
 //    }
-    virtual ControllerClass controller_class() const override{
+    virtual ControllerClass controller_class() const noexcept override{
         return ControllerClass::HID_Keyboard;
     }
 

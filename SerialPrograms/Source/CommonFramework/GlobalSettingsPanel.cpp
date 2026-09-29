@@ -6,17 +6,21 @@
 
 #include <iostream>
 #include <set>
-#include <QStandardPaths>
-#include <QCryptographicHash>
+#ifdef QT_CORE_LIB
 #include <QDesktopServices>
 #include <QUrl>
+#endif
+#include "Common/Cpp/ColoredText.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/LifetimeSanitizer.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Options/KeyboardLayoutOption.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/StaticGlobals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Options/CheckForUpdatesOption.h"
 #include "CommonFramework/Options/ResolutionOption.h"
@@ -29,6 +33,7 @@
 #include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "Integrations/DiscordSettingsOption.h"
 //#include "CommonFramework/Environment/Environment.h"
+#include "Controllers/ControllerSettings.h"
 #include "GlobalSettingsPanel.h"
 
 // #include <iostream>
@@ -36,67 +41,6 @@
 // using std::endl;
 
 namespace PokemonAutomation{
-
-
-const std::set<std::string> TOKENS{
-//    "f6538243092d8a3b9959bca988f054e1670f57c7246df2cbba25c4df3fe7a4e7",
-    "2d04af67f6520e3550842d7eeb292868c6d0d4809b607f5a454712023d8815e1",
-    "475d0a0a305a02cbf8b602bd47c3b275dccd5ac19fbe480729804a8e4e360b71",
-    "6643d9fe87b3e54dc75dfac8ac22f0cc8bd17f6a8a786debf5fc4c517ee65469",
-    "8e48e38e49bffc8462ada9d2d9d850d5b3b5c9529d20978c09bc548bc9a614a4",
-    "7694adee4419d62c6a923c4efc9e7b41def7b96bb84ea882701b0bf2e8c13bee",
-    "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", //  jw's token.
-    "e8d168bc482e96553ea9f9ecaea5a817474dbccc2a6a228a6bde67f2b2aa2889", //  James' token.
-    "7555b7c63481cad42306718c67e7f9def5bfd1da8f6cd299ccd3d7dc95f307ae", //  Kuro's token.
-    "3d475b46d121fc24559d100de2426feaa53cd6578aac2817c4857a610ccde2dd", //  kichi's token.
-    "9b41db8175b5f248a78e738c7bd63a36e33b57953cb4e80ccdd13c2a7e892eec", //  Dalton's token.
-};
-
-
-
-
-
-PreloadSettings::PreloadSettings(){}
-PreloadSettings& PreloadSettings::instance(){
-    static PreloadSettings settings;
-    return settings;
-}
-DebugSettings& PreloadSettings::debug(){
-    return PreloadSettings::instance().DEBUG;
-}
-
-void PreloadSettings::load(const JsonValue& json){
-    const JsonObject* obj = json.to_object();
-    if (obj == nullptr){
-        return;
-    }
-
-    //  Naughty mode.
-    obj->read_boolean(NAUGHTY_MODE, "NAUGHTY_MODE");
-
-    //  Developer mode stuff.
-    const std::string* dev_token = obj->get_string("DEVELOPER_TOKEN");
-    if (dev_token){
-        QCryptographicHash hash(QCryptographicHash::Algorithm::Sha256);
-#if QT_VERSION < 0x060700
-        hash.addData(dev_token->c_str(), (int)dev_token->size());
-#else
-        QByteArrayView dataView(dev_token->data(), dev_token->size());
-        hash.addData(dataView);
-#endif
-        DEVELOPER_MODE = TOKENS.find(hash.result().toHex().toStdString()) != TOKENS.end();
-    }
-
-    const JsonObject* debug_obj = obj->get_object("DEBUG");
-    if (debug_obj){
-        debug_obj->read_boolean(DEBUG.COLOR_CHECK, "COLOR_CHECK");
-        debug_obj->read_boolean(DEBUG.IMAGE_TEMPLATE_MATCHING, "IMAGE_TEMPLATE_MATCHING");
-        debug_obj->read_boolean(DEBUG.IMAGE_DICTIONARY_MATCHING, "IMAGE_DICTIONARY_MATCHING");
-        debug_obj->read_integer(DEBUG.BOX_SYSTEM_CELL_ROW, "BOX_SYSTEM_CELL_ROW");
-        debug_obj->read_integer(DEBUG.BOX_SYSTEM_CELL_COL, "BOX_SYSTEM_CELL_COL");
-        debug_obj->read_boolean(DEBUG.GENERATE_TEST_GOLDEN_FILES, "GENERATE_TEST_GOLDEN_FILES");
-    }
-}
 
 
 
@@ -121,8 +65,8 @@ GlobalSettings::GlobalSettings()
         "<b>Stats File:</b><br>Use the stats file here. Multiple instances of the program can use the same file.",
         LockMode::LOCK_WHILE_RUNNING,
 #if defined(__APPLE__)
-        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/UserSettings/PA-Stats.txt",
-        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/UserSettings/PA-Stats.txt"
+        Filesystem::application_scratch_path().string() + "/UserSettings/PA-Stats.txt",
+        Filesystem::application_scratch_path().string() + "/UserSettings/PA-Stats.txt"
 #else
         "UserSettings/PA-Stats.txt",
         "UserSettings/PA-Stats.txt"
@@ -133,8 +77,8 @@ GlobalSettings::GlobalSettings()
         "<b>Temp Folder:</b><br>Place temporary files in this directory.",
         LockMode::LOCK_WHILE_RUNNING,
 #if defined(__APPLE__)
-        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/TempFiles/",
-        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/TempFiles/"
+        Filesystem::application_scratch_path().string() + "/TempFiles/",
+        Filesystem::application_scratch_path().string() + "/TempFiles/"
 #else
         "TempFiles/",
         "TempFiles/"
@@ -153,15 +97,6 @@ GlobalSettings::GlobalSettings()
     , OCR_WARNING(
         "WARNING: If you change the OCR library away from the default (PaddleOCR), you must ensure that you have the necessary resource downloaded. "
         "Otherwise, the programs that use OCR will throw an error."
-    )
-    , USE_GPU_FOR_ML_INFERENCE0(
-        "<b>Use GPU for Machine learning inference:</b><br>"
-        "Use the GPU by default for machine learning. Will fall-back to CPU if using the GPU fails.<br>"
-        "<font color=\"red\">WARNING: DirectML ONNX on Windows is not threadsafe. Using multithreaded PaddleOCR with DirectML will cause a crash with our current infra. "
-        "Furthermore, with PaddleOCR, DirectML is slower than using the CPU. With other models, such as SAM, DirectML seems to be ~10% "
-        "faster than the CPU. Cuda has not been tested.</font>",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false
     )
     , WINDOW_SIZE(
         CONSTRUCT_TOKEN,
@@ -218,18 +153,6 @@ GlobalSettings::GlobalSettings()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , LOG_EVERYTHING(
-        "<b>Log Everything:</b><br>Log everything to the output window and output log. Will be very spammy.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false
-    )
-    , ENABLE_PABOTBASE1(
-        "<b>Enable PABotBase1:</b><br>Enable support for the legacy PABotBase 1 protocol.<br>"
-        "Turn this on if you are still using Arduino Uno R3, Arduino Leonardo, Teensy, or Pro Micro. "
-        "Note that this feature is slated to be removed in September 2026.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false
-    )
     , DUMP_VIDEO_FORMATS(
         "<b>Dump Video Formats:</b><br>Log all video formats supported by your capture card.",
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -248,21 +171,8 @@ GlobalSettings::GlobalSettings()
         false
     )
 //    , NAUGHTY_MODE_OPTION("<b>Naughty Mode:</b>", false)
-    , PERFORMANCE(CONSTRUCT_TOKEN)
     , AUDIO_PIPELINE(CONSTRUCT_TOKEN)
     , VIDEO_PIPELINE(CONSTRUCT_TOKEN)
-    , COMMAND_QUEUE_LIMIT(
-        "<b>Maximum Command Queue Size:</b><br>"
-        "Do not queue more than this many commands to the controller at once. "
-        "Larger values will tolerate longer connection interrupts, but may increase cancellation latency after a burst of commands.",
-        LockMode::LOCK_WHILE_RUNNING,
-        64, 4, 255
-    )
-    , DEVICE_LOGGING_FLAG(
-        "<b>Configure Device-Specific Debug Logging:</b>",
-        LockMode::LOCK_WHILE_RUNNING,
-        0
-    )
     , ENABLE_LIFETIME_SANITIZER0(
         "<b>Enable Lifetime Sanitizer: (for debugging)</b><br>"
         "Check for C++ object lifetime violations. Terminate program with stack dump if violations are found. "
@@ -287,7 +197,6 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(OCR_LIBRARY);
 
     // gated behind Dev mode. see GlobalSettings::load_json
-    PA_ADD_OPTION(USE_GPU_FOR_ML_INFERENCE0);
     // PA_ADD_OPTION(OCR_WARNING); // TODO: enable this when Tesseract is no longer a default resource.
     PA_ADD_OPTION(RESOURCE_DOWNLOAD_TABLE);
     PA_ADD_OPTION(DOWNLOAD_ERROR);
@@ -311,8 +220,7 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(DISCORD);
 
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(LOG_EVERYTHING);
-    PA_ADD_OPTION(ENABLE_PABOTBASE1);
+    add_option(PokemonAutomation::LOG_EVERYTHING(), "LOG_EVERYTHING");
     PA_ADD_OPTION(DUMP_VIDEO_FORMATS);
     PA_ADD_OPTION(SAVE_DEBUG_IMAGES);
 
@@ -320,14 +228,15 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(SAVE_DEBUG_VIDEOS_ON_SWITCH);
 //    PA_ADD_OPTION(NAUGHTY_MODE);
 
-    PA_ADD_OPTION(PERFORMANCE);
+    add_option(PerformanceOptions::instance(), "PERFORMANCE");
 
     PA_ADD_OPTION(AUDIO_PIPELINE);
     PA_ADD_OPTION(VIDEO_PIPELINE);
-    PA_ADD_OPTION(COMMAND_QUEUE_LIMIT);
 
+    add_option(ControllerSettings::instance().COMMAND_QUEUE_LIMIT, "COMMAND_QUEUE_LIMIT");
     // gated behind Dev mode. see GlobalSettings::load_json
-    PA_ADD_OPTION(DEVICE_LOGGING_FLAG);
+    add_option(ControllerSettings::instance().DEVICE_LOGGING_FLAG, "DEVICE_LOGGING_FLAG");
+
 
     PA_ADD_OPTION(ENABLE_LIFETIME_SANITIZER0);
 
@@ -337,35 +246,46 @@ GlobalSettings::GlobalSettings()
 
     PA_ADD_OPTION(DEVELOPER_TOKEN);
 
-    USE_GPU_FOR_ML_INFERENCE0.set_visibility(ConfigOptionState::HIDDEN);
-    RESOURCE_DOWNLOAD_TABLE.set_visibility(ConfigOptionState::HIDDEN);
     DOWNLOAD_ERROR.set_visibility(ConfigOptionState::HIDDEN);
     SAVE_DEBUG_VIDEOS_ON_SWITCH.set_visibility(ConfigOptionState::HIDDEN);
-    DEVICE_LOGGING_FLAG.set_visibility(ConfigOptionState::HIDDEN);
+    ControllerSettings::instance().DEVICE_LOGGING_FLAG.set_visibility(ConfigOptionState::HIDDEN);
 
     GlobalSettings::on_config_value_changed(this);
     ENABLE_LIFETIME_SANITIZER0.add_listener(*this);
     OPEN_BASE_FOLDER_BUTTON.add_listener(static_cast<ButtonListener&>(*this));
 }
 
+JsonValue GlobalSettings::to_json() const{
+    JsonObject obj = std::move(*BatchOption::to_json().to_object());
+    obj["NAUGHTY_MODE"] = STATIC_GLOBALS.NAUGHTY_MODE;
+
+    JsonObject command_line_test_obj;
+    command_line_test_obj["RUN"] = COMMAND_LINE_TEST_MODE;
+    obj["COMMAND_LINE_TESTS"] = std::move(command_line_test_obj);
+    obj["DEBUG"] = STATIC_GLOBALS.to_json_debug();
+
+    return obj;
+}
 void GlobalSettings::load_json(const JsonValue& json){
     const JsonObject* obj = json.to_object();
     if (obj == nullptr){
         return;
     }
 
-    PreloadSettings::instance().load(json);
-    const bool developer_mode = PreloadSettings::instance().DEVELOPER_MODE;
+    STATIC_GLOBALS.load_json(json);
     BatchOption::load_json(json);
+
+    // cout << "DEVELOPER_MODE: " << STATIC_GLOBALS.DEVELOPER_MODE << endl;
+    // cout << "INTERNAL_DEVELOPER_MODE: " << STATIC_GLOBALS.INTERNAL_DEVELOPER_MODE << endl;
+    const bool developer_mode = STATIC_GLOBALS.DEVELOPER_MODE;
 
     ConfigOptionState devmode_visibility = developer_mode
         ? ConfigOptionState::ENABLED
         : ConfigOptionState::HIDDEN;
-    USE_GPU_FOR_ML_INFERENCE0.set_visibility(devmode_visibility);
-    RESOURCE_DOWNLOAD_TABLE.set_visibility(devmode_visibility);
     DOWNLOAD_ERROR.set_visibility(devmode_visibility);
     SAVE_DEBUG_VIDEOS_ON_SWITCH.set_visibility(devmode_visibility);
-    DEVICE_LOGGING_FLAG.set_visibility(devmode_visibility);
+    PerformanceOptions::instance().ONNX_OPTIONS.USE_GPU.set_visibility(devmode_visibility);
+    ControllerSettings::instance().DEVICE_LOGGING_FLAG.set_visibility(devmode_visibility);
 
     //  Remake this to update the color.
     m_discord_settings.set_text(
@@ -376,102 +296,16 @@ void GlobalSettings::load_json(const JsonValue& json){
         ) + ")</font>"
     );
 
-    COMMAND_LINE_TEST_LIST.clear();
-    COMMAND_LINE_IGNORE_LIST.clear();
     const JsonObject* command_line_tests_setting = obj->get_object("COMMAND_LINE_TESTS");
     if (command_line_tests_setting){
         command_line_tests_setting->read_boolean(COMMAND_LINE_TEST_MODE, "RUN");
-
-        if (!command_line_tests_setting->read_string(COMMAND_LINE_TEST_FOLDER, "FOLDER")){
-            COMMAND_LINE_TEST_FOLDER = "CommandLineTests";
-        }
-
-        const JsonArray* test_list = command_line_tests_setting->get_array("TEST_LIST");
-        if (test_list){
-            for (const auto& value: *test_list){
-                if (!value.is_string()){
-                    continue;
-                }
-                const std::string* test_name = value.to_string();
-                if (test_name != nullptr && !test_name->empty()){
-                    COMMAND_LINE_TEST_LIST.emplace_back(*test_name);
-                }
-            }
-        }
-        const JsonArray* ignore_list = command_line_tests_setting->get_array("IGNORE_LIST");
-        if (ignore_list){
-            for (const auto& value: *ignore_list){
-                if (!value.is_string()){
-                    continue;
-                }
-                const std::string* test_name = value.to_string();
-                if (test_name != nullptr && !test_name->empty()){
-                    COMMAND_LINE_IGNORE_LIST.emplace_back(*test_name);
-                }
-            }
-        }
-
         if (COMMAND_LINE_TEST_MODE){
-            std::cout << "Enter command line test mode:" << std::endl;
-            if (COMMAND_LINE_TEST_LIST.size() > 0){
-                std::cout << "Run following tests: " << std::endl;
-                for (const auto& name : COMMAND_LINE_TEST_LIST){
-                    std::cout << "- " << name << std::endl;
-                }
-            }
-            if (COMMAND_LINE_IGNORE_LIST.size() > 0){
-                std::cout << "Ignore following " << COMMAND_LINE_IGNORE_LIST.size() << " paths: " << std::endl;
-                const size_t MAX_LINES = 5;
-                for (size_t i = 0; i < COMMAND_LINE_IGNORE_LIST.size() && i < MAX_LINES; i++){
-                    std::cout << "- " << COMMAND_LINE_IGNORE_LIST[i] << std::endl;
-                }
-                if (COMMAND_LINE_IGNORE_LIST.size() > MAX_LINES){
-                    std::cout << "..." << std::endl;
-                }
-            }
+            std::cout << "Enter command line test mode." << std::endl;
         }
     }
 }
 
 
-JsonValue GlobalSettings::to_json() const{
-    JsonObject obj = std::move(*BatchOption::to_json().to_object());
-    obj["NAUGHTY_MODE"] = PreloadSettings::instance().NAUGHTY_MODE;
-
-    JsonObject command_line_test_obj;
-    command_line_test_obj["RUN"] = COMMAND_LINE_TEST_MODE;
-    command_line_test_obj["FOLDER"] = COMMAND_LINE_TEST_FOLDER;
-
-    {
-        JsonArray test_list;
-        for (const auto& name : COMMAND_LINE_TEST_LIST){
-            test_list.push_back(name);
-        }
-        command_line_test_obj["TEST_LIST"] = std::move(test_list);
-    }
-
-    {
-        JsonArray ignore_list;
-        for (const auto& name : COMMAND_LINE_IGNORE_LIST){
-            ignore_list.push_back(name);
-        }
-        command_line_test_obj["IGNORE_LIST"] = std::move(ignore_list);
-    }
-
-    obj["COMMAND_LINE_TESTS"] = std::move(command_line_test_obj);
-
-    JsonObject debug_obj;
-    const auto& debug_settings = PreloadSettings::instance().DEBUG;
-    debug_obj["COLOR_CHECK"] = debug_settings.COLOR_CHECK;
-    debug_obj["IMAGE_TEMPLATE_MATCHING"] = debug_settings.IMAGE_TEMPLATE_MATCHING;
-    debug_obj["IMAGE_DICTIONARY_MATCHING"] = debug_settings.IMAGE_DICTIONARY_MATCHING;
-    debug_obj["BOX_SYSTEM_CELL_ROW"] = debug_settings.BOX_SYSTEM_CELL_ROW;
-    debug_obj["BOX_SYSTEM_CELL_COL"] = debug_settings.BOX_SYSTEM_CELL_COL;
-    debug_obj["GENERATE_TEST_GOLDEN_FILES"] = debug_settings.GENERATE_TEST_GOLDEN_FILES;
-    obj["DEBUG"] = std::move(debug_obj);
-
-    return obj;
-}
 
 void GlobalSettings::on_config_value_changed(void* object){
     bool enabled = ENABLE_LIFETIME_SANITIZER0;
@@ -484,8 +318,10 @@ void GlobalSettings::on_config_value_changed(void* object){
 }
 
 void GlobalSettings::on_press(ButtonCell& button){
+#ifdef QT_CORE_LIB
     // Open the runtime base folder in the system file manager
     QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdString(RUNTIME_BASE_PATH())));
+#endif
 }
 
 void GlobalSettings::connect_row_with_download(const std::string& resource_slug, std::shared_ptr<ResourceDownload>& download_ptr){
@@ -494,19 +330,21 @@ void GlobalSettings::connect_row_with_download(const std::string& resource_slug,
 
 
 GlobalSettings_Descriptor::GlobalSettings_Descriptor()
-    : PanelDescriptor(
-        Color(),
+    : OptionsPanelDescriptor(
         "",
         "Global Settings", "Global Settings",
         "",
         "Global Settings"
     )
 {}
+GlobalSettings_Descriptor::Wrapper& GlobalSettings_Descriptor::instance(){
+    static Wrapper wrapper;
+    return wrapper;
+}
 
 
-GlobalSettingsPanel::GlobalSettingsPanel(const GlobalSettings_Descriptor& descriptor)
-    : SettingsPanelInstance(descriptor)
-    , settings(GlobalSettings::instance())
+GlobalSettingsPanel::GlobalSettingsPanel()
+    : settings(GlobalSettings::instance())
 {
     PA_ADD_OPTION(settings);
 }

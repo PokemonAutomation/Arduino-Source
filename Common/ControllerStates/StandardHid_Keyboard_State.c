@@ -8,7 +8,7 @@
 #include "StandardHid_Keyboard_State.h"
 
 
-const pabb_HID_Keyboard_State pabb_HID_Keyboard_State_NEUTRAL_STATE = {};
+const pabb_HID_Keyboard_State pabb_HID_Keyboard_State_NEUTRAL_STATE = {0};
 
 bool pabb_HID_Keyboard_State_equals(
     const pabb_HID_Keyboard_State* state0,

@@ -25,6 +25,7 @@ public:
 
 class TestProgramComputer : public ComputerProgramInstance{
 public:
+    using Descriptor = TestProgramComputer_Descriptor;
     TestProgramComputer();
 
     virtual void program(ProgramEnvironment& env, CancellableScope& scope) override;

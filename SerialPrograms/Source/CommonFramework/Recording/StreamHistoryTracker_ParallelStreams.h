@@ -15,14 +15,13 @@
 #include <map>
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "Common/Qt/Redispatch.h"
+//#include "Common/Qt/Redispatch.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 #include "StreamRecorder.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 

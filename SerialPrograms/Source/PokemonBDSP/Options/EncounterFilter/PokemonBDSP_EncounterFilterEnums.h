@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterEnums.h"
+#include "VideoGames/PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterEnums.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

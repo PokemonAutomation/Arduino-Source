@@ -1,0 +1,72 @@
+/*  Multi-Console System Option
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#ifndef PokemonAutomation_GameConsole_MultiConsoleSystemOption_H
+#define PokemonAutomation_GameConsole_MultiConsoleSystemOption_H
+
+#include <functional>
+#include "Common/Cpp/Containers/FixedLimitVector.h"
+#include "ConsoleSystemOption.h"
+
+namespace PokemonAutomation{
+namespace GameConsole{
+
+
+class MultiConsoleSystemOption{
+public:
+    static const size_t MAX_CONSOLES = 4;
+
+public:
+    virtual ~MultiConsoleSystemOption();
+
+    using OptionFactory = std::function<
+        std::unique_ptr<ConsoleSystemOption>(
+            size_t console_index
+        )
+    >;
+
+    //  Construct the multi-console option.
+    //  By default it constructs the generic console. But you can inject your
+    //  own factory for your own custom subclass.
+    MultiConsoleSystemOption(
+        size_t min_consoles,
+        size_t max_consoles,
+        size_t consoles,
+        const OptionFactory& option_factory = [](size_t console_index){
+            return std::make_unique<ConsoleSystemOption>(1);
+        }
+    );
+
+    void resize(size_t count){
+        m_active_consoles = count;
+    }
+
+public:
+    size_t min_consoles() const{ return m_min_consoles; }
+    size_t max_consoles() const{ return m_max_consoles; }
+
+    size_t active_consoles() const{ return m_active_consoles; }
+    ConsoleSystemOption& operator[](size_t index){ return *m_consoles[index]; }
+
+
+public:
+    virtual JsonValue to_json() const;
+    virtual void load_json(const JsonValue& json);
+
+
+private:
+    const size_t m_min_consoles;
+    const size_t m_max_consoles;
+    size_t m_active_consoles;
+    FixedLimitVector<std::unique_ptr<ConsoleSystemOption>> m_consoles;
+};
+
+
+
+
+}
+}
+#endif

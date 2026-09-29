@@ -19,7 +19,9 @@ namespace PokemonAutomation{
 //
 class ControllerOption{
 public:
-    ControllerOption();
+    ControllerOption(bool default_enable_mode);
+
+    void set_interface(ControllerInterface interface_type);
 
     std::shared_ptr<ControllerDescriptor> descriptor() const{
         return m_descriptor;
@@ -37,9 +39,15 @@ public:
     JsonValue to_json() const;
 
 
+public:
+    bool m_default_enable_mode;
+    bool m_enable_input = true;
+
 private:
     std::shared_ptr<ControllerDescriptor> m_descriptor;
     std::map<ControllerInterface, std::shared_ptr<ControllerDescriptor>> m_descriptor_cache;
+
+    LifetimeSanitizer m_sanitizer;
 };
 
 

@@ -15,10 +15,12 @@
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Hardware/Hardware.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/StaticGlobals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/Recording/StreamHistorySession.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "ProgramDumper.h"
@@ -94,7 +96,7 @@ ErrorReportOption::ErrorReportOption()
     PA_ADD_OPTION(VIDEO);
     PA_ADD_OPTION(LOGS);
     PA_ADD_OPTION(DUMPS);
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         PA_ADD_OPTION(FILES);
     }
 }
@@ -104,7 +106,7 @@ SendableErrorReport::SendableErrorReport()
     : m_timestamp(now_to_filestring())
     , m_directory(RUNTIME_BASE_PATH() + ERROR_PATH_UNSENT + "/" + m_timestamp + "/")
     , m_processor(get_processor_name())
-    , m_program(PreloadSettings::instance().DEVELOPER_MODE
+    , m_program(STATIC_GLOBALS.DEVELOPER_MODE
         ? PROGRAM_NAME + " (" + PROGRAM_VERSION + "-dev)"
         : PROGRAM_NAME + " (" + PROGRAM_VERSION + ")"
     )
@@ -399,7 +401,7 @@ AsyncTask send_all_unsent_reports(Logger& logger, bool allow_prompt){
 #endif
 }
 
-void report_error(
+void report_error_to_telemetry(
     Logger* logger,
     const ProgramInfo& info,
     std::string title,

@@ -158,6 +158,44 @@ std::unique_ptr<EditableTableRow> TurboMacroRow::clone() const{
     return ret;
 }
 
+JsonValue TurboMacroRow::to_json() const{
+    JsonObject obj;
+    obj["Action"] = action.to_json();
+    switch (action){
+    case TurboMacroAction::LEFT_JOY_CLICK:
+    case TurboMacroAction::RIGHT_JOY_CLICK:
+    case TurboMacroAction::B:
+    case TurboMacroAction::A:
+    case TurboMacroAction::Y:
+    case TurboMacroAction::X:
+    case TurboMacroAction::R:
+    case TurboMacroAction::L:
+    case TurboMacroAction::ZR:
+    case TurboMacroAction::ZL:
+    case TurboMacroAction::PLUS:
+    case TurboMacroAction::MINUS:
+    case TurboMacroAction::DPADLEFT:
+    case TurboMacroAction::DPADRIGHT:
+    case TurboMacroAction::DPADUP:
+    case TurboMacroAction::DPADDOWN:
+        obj["HoldMs"] = parameters.button_hold.to_json();
+        obj["ReleaseMs"] = parameters.button_release.to_json();
+        break;
+    case TurboMacroAction::LEFT_JOYSTICK:
+    case TurboMacroAction::RIGHT_JOYSTICK:
+        obj["MoveDirectionX"] = parameters.x_axis.to_json();
+        obj["MoveDirectionY"] = parameters.y_axis.to_json();
+        obj["HoldMs"] = parameters.button_hold.to_json();
+        obj["ReleaseMs"] = parameters.button_release.to_json();
+        break;
+    case TurboMacroAction::WAIT:
+        obj["WaitMs"] = parameters.wait.to_json();
+        break;
+    default:
+        break;
+    }
+    return obj;
+}
 void TurboMacroRow::load_json(const JsonValue& json){
     const JsonObject* obj = json.to_object();
     if (obj == nullptr){
@@ -244,44 +282,6 @@ void TurboMacroRow::load_json(const JsonValue& json){
     default:
         break;
     }
-}
-JsonValue TurboMacroRow::to_json() const{
-    JsonObject obj;
-    obj["Action"] = action.to_json();
-    switch (action){
-    case TurboMacroAction::LEFT_JOY_CLICK:
-    case TurboMacroAction::RIGHT_JOY_CLICK:
-    case TurboMacroAction::B:
-    case TurboMacroAction::A:
-    case TurboMacroAction::Y:
-    case TurboMacroAction::X:
-    case TurboMacroAction::R:
-    case TurboMacroAction::L:
-    case TurboMacroAction::ZR:
-    case TurboMacroAction::ZL:
-    case TurboMacroAction::PLUS:
-    case TurboMacroAction::MINUS:
-    case TurboMacroAction::DPADLEFT:
-    case TurboMacroAction::DPADRIGHT:
-    case TurboMacroAction::DPADUP:
-    case TurboMacroAction::DPADDOWN:
-        obj["HoldMs"] = parameters.button_hold.to_json();
-        obj["ReleaseMs"] = parameters.button_release.to_json();
-        break;
-    case TurboMacroAction::LEFT_JOYSTICK:
-    case TurboMacroAction::RIGHT_JOYSTICK:
-        obj["MoveDirectionX"] = parameters.x_axis.to_json();
-        obj["MoveDirectionY"] = parameters.y_axis.to_json();
-        obj["HoldMs"] = parameters.button_hold.to_json();
-        obj["ReleaseMs"] = parameters.button_release.to_json();
-        break;
-    case TurboMacroAction::WAIT:
-        obj["WaitMs"] = parameters.wait.to_json();
-        break;
-    default:
-        break;
-    }
-    return obj;
 }
 
 

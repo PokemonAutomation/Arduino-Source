@@ -28,8 +28,8 @@ public:
     virtual bool operator==(const VideoSourceDescriptor& x) const override;
     virtual std::string display_name() const override;
 
-    virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
 
     virtual std::unique_ptr<VideoSource> make_VideoSource(
         Logger& logger,

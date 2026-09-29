@@ -29,19 +29,6 @@ namespace PokemonAutomation{
 class VideoDisplayWindow;
 
 
-//  Interface for forwarding keyboard and focus events from the VideoDisplayWidget to
-//  whatever thing inheriting CommandReceiver.
-struct CommandReceiver{
-    virtual void key_press(QKeyEvent* event) = 0;
-    virtual void key_release(QKeyEvent* event) = 0;
-
-    virtual void focus_in(QFocusEvent* event) = 0;
-    virtual void focus_out(QFocusEvent* event) = 0;
-};
-
-
-
-
 
 class VideoDisplayWidget;
 
@@ -85,7 +72,6 @@ public:
     VideoDisplayWidget(
         QWidget& parent, QLayout& holder,
         size_t id,
-        CommandReceiver& command_receiver,
         VideoSession& video_session,
         VideoOverlaySession& overlay
     );
@@ -95,18 +81,12 @@ public:
     size_t id() const{ return m_id; }
 
     VideoOverlayWidget& overlay(){ return *m_overlay; }
-    CommandReceiver& command_receiver(){ return m_command_receiver; }
 
     // Move the video display widget to a new Qt window, so that we can make it full screen.
     // We need to go to a new window to do fullscreen because Qt cannot fullscreen a widget unless
     // it's a window.
     void move_to_new_window();
     void move_back_from_window();
-
-    // likely triggered by SwitchSystemWidget::key_press().
-    // this forwards the QKeyEvent to VideoOverlaySession::issue_key_press().
-    void on_key_press(QKeyEvent* event);
-    void on_key_release(QKeyEvent* event);
 
 protected:
     virtual void post_startup(VideoSource* source) override;
@@ -132,7 +112,6 @@ private:
 
     QLayout& m_holder;
     const size_t m_id;
-    CommandReceiver& m_command_receiver;
     VideoSession& m_video_session;
     VideoOverlaySession& m_overlay_session;
 

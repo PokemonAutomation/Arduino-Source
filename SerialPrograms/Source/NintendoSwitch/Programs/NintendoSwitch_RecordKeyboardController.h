@@ -8,6 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_RecordKeyboardController_H
 
 //#include <functional>
+#include "Common/Cpp/Json/JsonValue.h"
 //#include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
@@ -48,6 +49,7 @@ class RecordKeyboardController
     , public AbstractController::InputSniffer
 {
 public:
+    using Descriptor = RecordKeyboardController_Descriptor;
     ~RecordKeyboardController();
     RecordKeyboardController();
     

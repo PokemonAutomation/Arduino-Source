@@ -6,8 +6,8 @@
  */
 
 
-#include "Common/Cpp/Filesystem.h"
-#include "Common/Cpp/Json/JsonTools.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
+#include "Common/Cpp/Filesystem/FileIO.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonValue.h"
@@ -248,7 +248,7 @@ void export_image_annotations_to_yolo_dataset(
             const int64_t image_height = json_obj->get_integer_throw("IMAGE_HEIGHT");
             const JsonArray& json_array = json_obj->get_array_throw("ANNOTATION");
             for (size_t j = 0; j < json_array.size(); j++){
-                const ObjectAnnotation anno_obj = ObjectAnnotation::from_json((json_array)[j]);
+                const ObjectAnnotation anno_obj = ObjectAnnotation::load_json((json_array)[j]);
                 const std::string& label = anno_obj.label;
 
                 auto it = label_indices.find(label);

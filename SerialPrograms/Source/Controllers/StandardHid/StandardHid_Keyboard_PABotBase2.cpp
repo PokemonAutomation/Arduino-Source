@@ -6,7 +6,7 @@
 
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
 #include "Common/PABotBase2/Controllers/PABotBase2_Controller_HID_Keyboard.h"
-#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "Common/Cpp/ColoredText.h"
 #include "StandardHid_Keyboard_PABotBase2.h"
 
 namespace PokemonAutomation{
@@ -117,7 +117,6 @@ void PABotBase2_Keyboard::cancel_all_commands(){
     if (!is_ready()){
         throw InvalidConnectionStateException(error_string());
     }
-    m_logger.log("cancel_all_commands()", COLOR_DARKGREEN);
     m_connection.device().command_queue().send_cancel();
     m_scheduler.clear_on_next();
 }
@@ -126,7 +125,6 @@ void PABotBase2_Keyboard::replace_on_next_command(){
     if (!is_ready()){
         throw InvalidConnectionStateException(error_string());
     }
-    m_logger.log("replace_on_next_command()", COLOR_DARKGREEN);
     m_connection.device().command_queue().send_replace_on_next();
     m_scheduler.clear_on_next();
 }
@@ -251,7 +249,7 @@ void PABotBase2_Keyboard::execute_state(
 
     while (time_left > Milliseconds::zero()){
         Milliseconds current = std::min(time_left, 65535ms);
-        request.milliseconds = current.count();
+        request.milliseconds = (uint16_t)current.count();
         m_connection.device().command_queue().send_command(cancellable, request);
         time_left -= current;
     }

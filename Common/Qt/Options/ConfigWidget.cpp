@@ -5,7 +5,6 @@
  */
 
 #include <QWidget>
-#include "Common/Cpp/Exceptions.h"
 #include "ConfigWidget.h"
 
 //#include <iostream>
@@ -18,13 +17,6 @@ namespace PokemonAutomation{
 
 ConfigWidget* ConfigWidget::make_from_option(ConfigOption& option, QWidget* parent){
     UiWrapper wrapper = option.make_ui_component(parent);
-    if (!wrapper){
-        throw InternalProgramError(
-            nullptr,
-            PA_CURRENT_FUNCTION,
-            std::string("UI component not registered for type: ") + typeid(option).name()
-        );
-    }
     return dynamic_cast<ConfigWidget*>(wrapper.release());
 }
 

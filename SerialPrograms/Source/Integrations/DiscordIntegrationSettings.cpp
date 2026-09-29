@@ -122,6 +122,7 @@ void DiscordIntegrationSettingsOption::on_config_value_changed([[maybe_unused]] 
 }
 
 void DiscordIntegrationSettingsOption::on_press(ButtonCell& button){
+#ifdef PA_DPP
     if (&button == &m_start_button){
         DppClient::Client::instance().connect();
         on_config_value_changed(this);
@@ -132,6 +133,9 @@ void DiscordIntegrationSettingsOption::on_press(ButtonCell& button){
         on_config_value_changed(this);
         return;
     }
+#else
+    (void)button;
+#endif
 }
 
 

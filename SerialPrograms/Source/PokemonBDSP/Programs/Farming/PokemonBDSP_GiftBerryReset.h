@@ -29,6 +29,7 @@ public:
 
 class GiftBerryReset : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = GiftBerryReset_Descriptor;
     GiftBerryReset();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

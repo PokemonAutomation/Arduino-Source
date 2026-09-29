@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
+//#include "Common/Cpp/Exceptions.h"
 //#include "ControllerTypeStrings.h"
 #include "ControllerSession.h"
 
@@ -42,13 +42,13 @@ ControllerSession::~ControllerSession(){
 }
 ControllerSession::ControllerSession(
     Logger& logger,
-    ControllerOption& option
+    ControllerOption& option,
+    std::optional<size_t> index
 )
     : m_logger(logger)
     , m_option(option)
+    , m_index(index)
     , m_options_locked(false)
-    , m_desired_controller(ControllerType::None)
-    , m_next_reset_mode(ControllerResetMode::DO_NOT_RESET)
     , m_descriptor(option.descriptor())
     , m_connection(m_descriptor->open_connection(logger))
 {
@@ -62,7 +62,7 @@ ControllerSession::ControllerSession(
         //  If we already missed it, run it ourselves.
         if (m_connection->is_ready()){
 //            cout << "ControllerSession::ControllerSession() - early ready" << endl;
-            m_desired_controller = m_connection->current_controller();
+            m_change_controller_on_ready = m_connection->current_controller();
             ControllerSession::post_connection_ready(*m_connection);
         }
     }catch (...){
@@ -80,14 +80,23 @@ std::vector<ControllerType> ControllerSession::available_controllers() const{
     return m_connection->controller_list();
 }
 
-void ControllerSession::get(ControllerOption& option){
+void ControllerSession::save(ControllerOption& option) const{
     ReadSpinLock lg(m_state_lock);
     option = m_option;
 }
-void ControllerSession::set(const ControllerOption& option){
+void ControllerSession::load(const ControllerOption& option){
     set_device(option.descriptor());
 }
 
+
+bool ControllerSession::input_enabled() const{
+    ReadSpinLock lg(m_state_lock);
+    return m_option.m_enable_input;
+}
+void ControllerSession::set_input_enabled(bool enabled){
+    WriteSpinLock lg(m_state_lock);
+    m_option.m_enable_input = enabled;
+}
 
 
 bool ControllerSession::ready() const{
@@ -97,11 +106,26 @@ bool ControllerSession::ready() const{
     }
     return m_controller->is_ready();
 }
+ControllerConnection::Status ControllerSession::connection_status() const{
+    ReadSpinLock lg(m_state_lock);
+    if (!m_connection){
+        return ControllerConnection::Status::NOT_CONNECTED;
+    }
+    return m_connection->status();
+}
+
 std::shared_ptr<ControllerDescriptor> ControllerSession::descriptor() const{
     ReadSpinLock lg(m_state_lock);
     return m_descriptor;
 }
-ControllerType ControllerSession::controller_type() const{
+ControllerClass ControllerSession::controller_class() const noexcept{
+    ReadSpinLock lg(m_state_lock);
+    if (!m_controller){
+        return ControllerClass::None;
+    }
+    return m_controller->controller_class();
+}
+ControllerType ControllerSession::controller_type() const noexcept{
     ReadSpinLock lg(m_state_lock);
     if (!m_connection){
         return ControllerType::None;
@@ -114,12 +138,6 @@ std::string ControllerSession::status_text() const{
         return "<font color=\"red\">No controller selected.</font>";
     }
     return m_connection->status_text();
-}
-ControllerConnection& ControllerSession::connection() const{
-    if (m_connection){
-        return *m_connection;
-    }
-    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Connection is null.");
 }
 AbstractController* ControllerSession::controller() const{
     return m_controller.get();
@@ -142,7 +160,7 @@ std::string ControllerSession::user_input_blocked() const{
     return m_user_input_disallow_reason;
 }
 void ControllerSession::set_user_input_blocked(std::string disallow_reason){
-    ReadSpinLock lg(m_state_lock);
+    WriteSpinLock lg(m_state_lock);
 //    cout << "set_user_input_blocked() = " << disallow_reason << endl;
     m_user_input_disallow_reason = std::move(disallow_reason);
 }
@@ -183,15 +201,7 @@ void ControllerSession::make_controller(
         }
     }
 
-//    m_desired_controller = m_connection->current_controller();
-    m_next_reset_mode = ControllerResetMode::DO_NOT_RESET;
-    if (change_controller.has_value()){
-        m_desired_controller = change_controller.value();
-        m_next_reset_mode = ControllerResetMode::SIMPLE_RESET;
-    }
-    if (clear_settings){
-        m_next_reset_mode = ControllerResetMode::RESET_AND_CLEAR_STATE;
-    }
+    m_change_controller_on_ready = change_controller;
 
     //  If we already missed it, run it ourselves.
     if (ready){
@@ -203,6 +213,45 @@ void ControllerSession::make_controller(
 
 
 
+
+bool ControllerSession::set_interface(ControllerInterface controller_interface){
+    std::shared_ptr<const ControllerDescriptor> device;
+    {
+        std::lock_guard<Mutex> lg0(m_reset_lock);
+
+        //  Destroy the current connection+controller.
+        std::unique_ptr<AbstractController> controller;
+        std::unique_ptr<ControllerConnection> connection;
+        {
+            WriteSpinLock lg1(m_state_lock);
+            if (m_options_locked){
+                return false;
+            }
+            if (controller_interface == m_descriptor->interface_type){
+                return true;
+            }
+
+            //  Move these out to indicate that we should no longer access them.
+            controller = std::move(m_controller);
+            connection = std::move(m_connection);
+
+            m_option.set_interface(controller_interface);
+            m_descriptor = m_option.descriptor();
+        }
+
+        //  With the lock released, it is now safe to destroy them.
+        //  We cannot destroy these under (m_state_lock) due to their asynchronous
+        //  callbacks into this class which will also acquire the same lock.
+        controller.reset();
+        connection.reset();
+
+        make_controller({}, false);
+    }
+//    cout << "ControllerSession::set_interface() - signal"<< endl;
+    signal_descriptor_changed(device);
+    signal_status_text_changed(status_text());
+    return true;
+}
 bool ControllerSession::set_device(const std::shared_ptr<ControllerDescriptor>& device){
 //    cout << "ControllerSession::set_device() = " << device->display_name() << endl;
     {
@@ -237,6 +286,7 @@ bool ControllerSession::set_device(const std::shared_ptr<ControllerDescriptor>& 
 
         make_controller({}, false);
     }
+//    cout << "ControllerSession::set_device() - signal"<< endl;
     signal_descriptor_changed(device);
     signal_status_text_changed(status_text());
     return true;
@@ -256,6 +306,7 @@ bool ControllerSession::set_controller(ControllerType controller_type){
                 return false;
             }
             if (m_connection){
+//                cout << (int)m_connection->current_controller() << endl;
                 if (m_connection->current_controller() == controller_type){
                     return true;
                 }
@@ -306,9 +357,7 @@ std::string ControllerSession::reset(bool clear_settings){
 
 //            cout << "Checking readiness... " << (int)m_desired_controller << endl;
             if (m_connection && m_connection->is_ready()){
-                m_desired_controller = m_connection->current_controller();
-//                cout << "Ready! - " << (int)m_desired_controller << endl;
-                m_connection->try_set_controller_type(m_desired_controller, clear_settings);
+                m_connection->try_set_controller_type(m_connection->current_controller(), clear_settings);
             }
 
             //  Move these out to indicate that we should no longer access them.
@@ -322,7 +371,7 @@ std::string ControllerSession::reset(bool clear_settings){
         controller.reset();
         connection.reset();
 
-        make_controller(m_desired_controller, clear_settings);
+        make_controller({}, clear_settings);
     }
     signal_status_text_changed(status_text());
     return "";
@@ -343,7 +392,7 @@ void ControllerSession::post_connection_ready(ControllerConnection& connection){
     std::vector<ControllerType> supported_controllers;
     ControllerType current_controller = ControllerType::None;
 
-    ControllerType desired_controller;
+    ControllerType controller_type;
 
     std::unique_ptr<AbstractController> controller;
 
@@ -361,9 +410,10 @@ void ControllerSession::post_connection_ready(ControllerConnection& connection){
             return;
         }
 
-        desired_controller = m_desired_controller;
-        if (m_next_reset_mode == ControllerResetMode::DO_NOT_RESET){
-            desired_controller = m_connection->current_controller();
+        if (m_change_controller_on_ready.has_value()){
+            controller_type = m_change_controller_on_ready.value();
+        }else{
+            controller_type = m_connection->current_controller();
         }
 
         supported_controllers = m_connection->controller_list();
@@ -372,11 +422,11 @@ void ControllerSession::post_connection_ready(ControllerConnection& connection){
     signal_controller_changed(current_controller, supported_controllers);
 
     //  Construct the controller.
-    if (desired_controller != ControllerType::None){
+    if (controller_type != ControllerType::None){
         controller = m_descriptor->make_controller(
             m_logger,
             connection,
-            desired_controller
+            controller_type
         );
     }
 
@@ -389,8 +439,7 @@ void ControllerSession::post_connection_ready(ControllerConnection& connection){
         }
 
         m_controller = std::move(controller);
-        m_desired_controller = desired_controller;
-        m_next_reset_mode = ControllerResetMode::DO_NOT_RESET;
+        m_change_controller_on_ready.reset();
 
         supported_controllers = m_connection->controller_list();
         current_controller = m_connection->current_controller();

@@ -15,7 +15,7 @@
 #ifndef PokemonAutomation_ComputerPrograms_ComputerProgramSession_H
 #define PokemonAutomation_ComputerPrograms_ComputerProgramSession_H
 
-#include "Common/Cpp/Concurrency/SpinLock.h"
+#include "CommonFramework/Panels/PanelSession.h"
 #include "CommonFramework/ProgramSession.h"
 #include "ComputerPrograms/ComputerProgram.h"
 
@@ -26,28 +26,34 @@ class ComputerProgramOption;
 class ProgramEnvironment;
 
 
-class ComputerProgramSession final : public ProgramSession{
+class ComputerProgramSession final
+    : public UiState<ComputerProgramSession, PanelSession>
+    , public ProgramSession
+{
 public:
     virtual ~ComputerProgramSession();
-    ComputerProgramSession(ComputerProgramOption& option);
+    ComputerProgramSession(const ComputerProgramDescriptor& descriptor);
 
-    void restore_defaults();
 
-private:
+public:
+    const ComputerProgramDescriptor& descriptor() const{ return m_descriptor; }
+    ConfigOption& options();
+
+
+public:
     virtual std::string check_validity() const override;
+    virtual void restore_defaults() override;
+    virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
 
-    virtual void internal_run_program() override;
-    virtual void internal_stop_program() override;
+
+private:
+    virtual std::unique_ptr<ProgramEnvironment> make_env(const ProgramInfo& program_info) override;
+    virtual void internal_run_program(ProgramEnvironment& env) override;
 
 
 private:
-    void run_program_instance(ProgramEnvironment& env, CancellableScope& scope);
-
-private:
-    ComputerProgramOption& m_option;
-
-    SpinLock m_lock;
-    CancellableScope* m_scope = nullptr;
+    const ComputerProgramDescriptor& m_descriptor;
 };
 
 

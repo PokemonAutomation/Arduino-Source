@@ -17,10 +17,13 @@ namespace PokemonAutomation{
 
 // uses SHA 256
 std::string hash_file(
-    CancellableScope& scope,
+    CancellableScope* scope,
     const std::string& file_path,
-    std::function<void(uint64_t bytes_done, uint64_t total_bytes)> hash_progress
+    std::function<void(uint64_t bytes_done, uint64_t total_bytes)> hash_progress = nullptr
 );
+inline std::string hash_file(const std::string& file_path){
+    return hash_file(nullptr, file_path, nullptr);
+}
 
 
 }

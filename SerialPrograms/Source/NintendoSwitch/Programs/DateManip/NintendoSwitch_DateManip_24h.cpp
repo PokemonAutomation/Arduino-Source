@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -45,7 +45,7 @@ DateTime DateReader_24h::read_date(Logger& logger, std::shared_ptr<const ImageRG
         date.hour < 0 ||
         date.minute < 0
     ){
-        report_error(
+        report_error_to_telemetry(
             &logger, ProgramInfo(),
             "Failed to read date.",
             {},
@@ -123,8 +123,8 @@ void DateReader_EU::set_date(
         move_horizontal(context, cursor_position, 5);
     }
 
-    throw_and_log<OperationFailedException>(
-        stream.logger(), ErrorReport::SEND_ERROR_REPORT,
+    throw_and_log<OperationFailedExceptionWithScreenshot>(
+        stream.logger(), ErrorReportMode::SEND_ERROR_REPORT,
         "Failed to set the hour after 10 attempts.",
         stream
     );
@@ -197,8 +197,8 @@ void DateReader_JP::set_date(
         move_horizontal(context, cursor_position, 5);
     }
 
-    throw_and_log<OperationFailedException>(
-        stream.logger(), ErrorReport::SEND_ERROR_REPORT,
+    throw_and_log<OperationFailedExceptionWithScreenshot>(
+        stream.logger(), ErrorReportMode::SEND_ERROR_REPORT,
         "Failed to set the hour after 10 attempts.",
         stream
     );

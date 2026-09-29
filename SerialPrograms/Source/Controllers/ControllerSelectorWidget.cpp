@@ -6,19 +6,12 @@
 
 #include <QKeyEvent>
 #include <QHBoxLayout>
+#include <QCheckBox>
 #include <QMessageBox>
 #include "Common/Qt/NoWheelComboBox.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Panels/ConsoleSettingsStretch.h"
 #include "Controllers/ControllerTypeStrings.h"
 #include "ControllerSelectorWidget.h"
-//#include "NintendoSwitch/NintendoSwitch_Settings.h"
-
-#include "PABotBase2/SerialPABotBase2_Descriptor.h"
-
-#include "SerialPABotBase/SerialPABotBase_SelectorWidget.h"
-#include "PABotBase2/SerialPABotBase2_SelectorWidget.h"
-#include "NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h"
 
 //#include <iostream>
 //using std::cout;
@@ -26,28 +19,63 @@
 
 namespace PokemonAutomation{
 
+template class RegisterUiStateQtWidget<ControllerSelectorWidget>;
+
+
 
 
 
 ControllerSelectorWidget::~ControllerSelectorWidget(){
     m_session.remove_listener(*this);
 }
-ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSession& session)
+ControllerSelectorWidget::ControllerSelectorWidget(
+    QWidget& parent,
+    ControllerSession& session
+)
     : QWidget(&parent)
     , m_session(session)
 {
-    QHBoxLayout* layout0 = new QHBoxLayout(this);
-    layout0->setContentsMargins(0, 0, 0, 0);
+//    cout << "ControllerSelectorWidget()" << endl;
 
-    layout0->addWidget(new QLabel("<b>Controller:</b>", this), CONSOLE_SETTINGS_STRETCH_L0_LABEL);
+    QHBoxLayout* layoutL = new QHBoxLayout(this);
+    layoutL->setContentsMargins(0, 0, 0, 0);
 
-    QHBoxLayout* layout1 = new QHBoxLayout();
-    layout0->addLayout(layout1, CONSOLE_SETTINGS_STRETCH_L0_RIGHT);
-    layout1->setContentsMargins(0, 0, 0, 0);
+    if (!session.index().has_value()){
+        layoutL->addWidget(new QLabel("<b>Controller:</b>", this), CONSOLE_SETTINGS_STRETCH_L0_LABEL);
+    }else{
+        QHBoxLayout* layoutL0 = new QHBoxLayout();
+        layoutL->addLayout(layoutL0, CONSOLE_SETTINGS_STRETCH_L0_LABEL);
+        layoutL0->setContentsMargins(0, 0, 0, 0);
+
+        layoutL0->addWidget(
+            new QLabel(
+                QString::fromStdString("<b>Controller " + std::to_string(session.index().value()) + ":</b>"),
+                this
+            )
+        );
+
+        QCheckBox* check_box = new QCheckBox(this);
+        layoutL0->addWidget(check_box, 1, Qt::AlignRight);
+        if (session.input_enabled()){
+            check_box->setCheckState(Qt::Checked);
+        }else{
+            check_box->setCheckState(Qt::Unchecked);
+        }
+        connect(
+            check_box, &QCheckBox::checkStateChanged,
+            this, [this, check_box](int){
+                m_session.set_input_enabled(check_box->isChecked());
+            }
+        );
+    }
+
+    QHBoxLayout* layoutR = new QHBoxLayout();
+    layoutL->addLayout(layoutR, CONSOLE_SETTINGS_STRETCH_L0_RIGHT);
+    layoutR->setContentsMargins(0, 0, 0, 0);
 
     m_dropdowns = new QHBoxLayout();
-    layout1->addLayout(m_dropdowns, CONSOLE_SETTINGS_STRETCH_L1_BODY);
-    layout1->addSpacing(5);
+    layoutR->addLayout(m_dropdowns, CONSOLE_SETTINGS_STRETCH_L1_BODY);
+    layoutR->addSpacing(5);
 
     m_interface_dropdown = new NoWheelCompactComboBox(this);
     m_dropdowns->addWidget(m_interface_dropdown);
@@ -55,9 +83,6 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
 
     //  Add all the supported interfaces.
     {
-        if (GlobalSettings::instance().ENABLE_PABOTBASE1){
-            m_interface_list.emplace_back(ControllerInterface::SerialPABotBase);
-        }
         m_interface_list.emplace_back(ControllerInterface::SerialPABotBase2);
         m_interface_list.emplace_back(ControllerInterface::TcpSysbotBase);
 //        m_interface_list.emplace_back(ControllerInterface::UsbSysbotBase);
@@ -70,25 +95,18 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
 
 //    m_interface_dropdown->setHidden(true);
 
-    auto current = session.descriptor();
-    if (current == nullptr || current->interface_type == ControllerInterface::None){
-        current.reset(new SerialPABotBase::SerialPABotBase2_Descriptor());
-        session.set_device(std::move(current));
-    }
-    update_interface_dropdown(current->interface_type);
-    m_selector = &static_cast<UiComponentQtWidget&>(*current->make_ui_component(this)).widget();
-    m_dropdowns->addWidget(m_selector, 1);
+    refresh_selection();
 
 
-    m_dropdowns->addSpacing(5);
+//    m_dropdowns->addSpacing(5);
     m_controllers_dropdown = new NoWheelCompactComboBox(this);
-    m_controllers_dropdown->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-    m_dropdowns->addWidget(m_controllers_dropdown);
+//    m_controllers_dropdown->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    m_dropdowns->addWidget(m_controllers_dropdown, 3);
     refresh_controllers(session.controller_type(), session.available_controllers());
 
     m_status_text = new QLabel(this);
-    layout1->addWidget(m_status_text, CONSOLE_SETTINGS_STRETCH_L1_RIGHT);
-    layout1->addSpacing(5);
+    layoutR->addWidget(m_status_text, CONSOLE_SETTINGS_STRETCH_L1_RIGHT);
+    layoutR->addSpacing(5);
 
     m_status_text->setText(QString::fromStdString(session.status_text()));
     m_status_text->setTextFormat(Qt::RichText);
@@ -103,7 +121,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
         "If the controller supports pairing, this will unpair it and allow it to pair with a new host."
     );
 #endif
-    layout1->addWidget(m_reset_button, CONSOLE_SETTINGS_STRETCH_L1_BUTTON);
+    layoutR->addWidget(m_reset_button, CONSOLE_SETTINGS_STRETCH_L1_BUTTON);
 
     bool options_locked = session.options_locked();
     if (m_selector){
@@ -127,7 +145,9 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
                 return;
             }
 
-            refresh_selection(incoming);
+            m_session.set_interface(incoming);
+
+            refresh_selection();
         }
     );
     connect(
@@ -190,46 +210,30 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
 
 
 void ControllerSelectorWidget::update_interface_dropdown(ControllerInterface interface_type){
-    if (interface_type == ControllerInterface::None){
-        interface_type = ControllerInterface::SerialPABotBase;
-    }
     for (size_t index = 0; index < m_interface_list.size(); index++){
         if (interface_type == m_interface_list[index]){
             m_interface_dropdown->setCurrentIndex((int)index);
-            break;
+            return;
         }
     }
 
+//    m_session.set_controller(ControllerType::None);
+    m_interface_dropdown->setCurrentIndex(-1);
 }
-void ControllerSelectorWidget::refresh_selection(ControllerInterface interface_type){
-//    cout << "refresh_selection(): "<< endl;
-    update_interface_dropdown(interface_type);
+void ControllerSelectorWidget::refresh_selection(){
+//    cout << "refresh_selection()" << endl;
 
     delete m_selector;
     m_selector = nullptr;
 
-//    m_status_text->setText(QString::fromStdString(html_color_text("Not Connected", COLOR_RED)));
-
-    switch (interface_type){
-    case ControllerInterface::SerialPABotBase:
-        m_selector = new SerialPABotBase::SerialPABotBase_SelectorWidget(*this, m_session.descriptor().get());
+    auto current = m_session.descriptor();
+    if (current == nullptr){
+        m_selector = new QWidget(this);
+    }else{
+        update_interface_dropdown(current->interface_type);
+        m_selector = &static_cast<UiComponentQtWidget&>(*current->make_ui_component(this)).widget();
         m_dropdowns->insertWidget(1, m_selector, 1);
-        break;
-
-    case ControllerInterface::SerialPABotBase2:
-        m_selector = new SerialPABotBase::SerialPABotBase2_SelectorWidget(*this, m_session.descriptor().get());
-        m_dropdowns->insertWidget(1, m_selector, 1);
-        break;
-
-    case ControllerInterface::TcpSysbotBase:
-        m_selector = new SysbotBase::TcpSysbotBase_SelectorWidget(*this, m_session.descriptor().get());
-        m_dropdowns->insertWidget(1, m_selector, 1);
-        break;
-
-    default:;
     }
-
-
 }
 
 void ControllerSelectorWidget::refresh_controllers(
@@ -261,7 +265,7 @@ void ControllerSelectorWidget::descriptor_changed(
 ){
 //    cout << "descriptor_changed()" << endl;
     QMetaObject::invokeMethod(this, [=, this]{
-        refresh_selection(descriptor->interface_type);
+        refresh_selection();
         refresh_controllers(ControllerType::None, {});
     }, Qt::QueuedConnection);
 }
@@ -282,7 +286,9 @@ void ControllerSelectorWidget::post_status_text_changed(const std::string& text)
 }
 void ControllerSelectorWidget::options_locked(bool locked){
     QMetaObject::invokeMethod(this, [this, locked]{
-        m_selector->setEnabled(!locked);
+        if (m_selector){
+            m_selector->setEnabled(!locked);
+        }
         m_interface_dropdown->setEnabled(!locked);
         m_controllers_dropdown->setEnabled(!locked);
         m_reset_button->setEnabled(!locked);
@@ -300,6 +306,16 @@ void ControllerSelectorWidget::update_buttons(){
 }
 
 
+void ControllerSelectorWidget::focusInEvent(QFocusEvent* event){
+//    cout << "ControllerSelectorWidget::focusInEvent()" << endl;
+    QWidget::focusInEvent(event);
+}
+void ControllerSelectorWidget::focusOutEvent(QFocusEvent* event){
+//    cout << "ControllerSelectorWidget::focusOutEvent()" << endl;
+    m_shift_held = false;
+    update_buttons();
+    QWidget::focusOutEvent(event);
+}
 void ControllerSelectorWidget::keyPressEvent(QKeyEvent* event){
 //    cout << "ControllerSelectorWidget::keyPressEvent()" << endl;
     if (event->key() == Qt::Key_Shift){
@@ -315,16 +331,6 @@ void ControllerSelectorWidget::keyReleaseEvent(QKeyEvent* event){
     }
     update_buttons();
 //    QWidget::keyReleaseEvent(event);
-}
-void ControllerSelectorWidget::focusInEvent(QFocusEvent* event){
-//    cout << "ControllerSelectorWidget::focusInEvent()" << endl;
-    QWidget::focusInEvent(event);
-}
-void ControllerSelectorWidget::focusOutEvent(QFocusEvent* event){
-//    cout << "ControllerSelectorWidget::focusOutEvent()" << endl;
-    m_shift_held = false;
-    update_buttons();
-    QWidget::focusOutEvent(event);
 }
 #endif
 

@@ -4,24 +4,14 @@
  *
  */
 
-#include <QtGlobal>
-#if QT_VERSION_MAJOR == 6 && QT_VERSION_MINOR >= 5
-
-//#include <chrono>
 #include <QCamera>
-#include <QPainter>
-#include <QMediaDevices>
-#include <QVBoxLayout>
 #include <QVideoSink>
 #include <QImageCapture>
-//#include "Common/Cpp/Exceptions.h"
-//#include "Common/Cpp/Time.h"
-//#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Qt/Redispatch.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "VideoFrameQt.h"
+#include "QFormatAggregator.h"
 #include "MediaServicesQt6.h"
-#include "CameraWidgetQt6.h"
 #include "CameraWidgetQt6.5.h"
 
 //#include <iostream>
@@ -37,11 +27,7 @@ namespace CameraQt65QMediaCaptureSession{
 
 
 std::vector<CameraInfo> CameraBackend::get_all_cameras() const{
-#if 1
     const auto cameras = GlobalMediaServices::instance().get_all_cameras();
-#else
-    const auto cameras = QMediaDevices::videoInputs();
-#endif
     std::vector<CameraInfo> ret;
     for (const auto& info : cameras){
         ret.emplace_back(info.id().toStdString());
@@ -49,11 +35,7 @@ std::vector<CameraInfo> CameraBackend::get_all_cameras() const{
     return ret;
 }
 std::string CameraBackend::get_camera_name(const CameraInfo& info) const{
-#if 1
     const auto cameras = GlobalMediaServices::instance().get_all_cameras();
-#else
-    const auto cameras = QMediaDevices::videoInputs();
-#endif
     for (const auto& camera : cameras){
         if (camera.id().toStdString() == info.device_name()){
             return camera.description().toStdString();
@@ -141,7 +123,7 @@ void CameraVideoSource::init(
     }
     m_logger.log("Camera: " + device->description().toStdString());
 
-    QCameraFormat format = CameraQt6QVideoSink::build_format_set(
+    QCameraFormat format = build_format_set(
         m_logger,
         m_formats,
         *device,
@@ -153,7 +135,7 @@ void CameraVideoSource::init(
         return;
     }
 
-    CameraQt6QVideoSink::get_format(format, m_resolution, m_format, m_fps);
+    get_format(format, m_resolution, m_format, m_fps);
     m_logger.log(
         "Resolution: " + m_resolution.to_string() +
         ", Format: " + VideoFormat_database().find(m_format)->display +
@@ -262,4 +244,3 @@ void CameraVideoDisplay::resizeEvent(QResizeEvent* event){
 
 }
 }
-#endif

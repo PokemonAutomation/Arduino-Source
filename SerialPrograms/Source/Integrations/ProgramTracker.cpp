@@ -7,9 +7,9 @@
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "Controllers/JoystickTools.h"
 #include "Controllers/ControllerSession.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon.h"
 #include "ProgramTracker.h"
 
 //#include <iostream>
@@ -47,7 +47,7 @@ std::map<uint64_t, ProgramTrackingState> ProgramTracker::all_programs(){
         info[item.first] = ProgramTrackingState{
             item.second->program.identifier(),
             item.second->console_ids,
-            item.second->program.timestamp(),
+            item.second->program.last_state_change(),
             item.second->program.current_state(),
             item.second->program.current_stats()
         };
@@ -55,192 +55,171 @@ std::map<uint64_t, ProgramTrackingState> ProgramTracker::all_programs(){
     return info;
 }
 
-std::string ProgramTracker::grab_screenshot(uint64_t console_id, std::shared_ptr<const ImageRGB32>& image){
-    std::lock_guard<Mutex> lg(m_lock);
-    auto iter = m_consoles.find(console_id);
+std::string ProgramTracker::make_header(const std::string& function_name, uint64_t id){
+    if (id == (uint64_t)-1){
+        return function_name + "()";
+    }
+    return function_name + "(ID = " + std::to_string(id) + ")";
+}
+TrackableProgram* ProgramTracker::get_program(
+    std::string& error,
+    const std::string& header,
+    uint64_t program_id
+){
+    auto iter = m_programs.end();
+    if (m_programs.empty()){
+        error = header + ": No programs found.";
+        global_logger_tagged().log("ProgramTracker::" + error, COLOR_RED);
+        return nullptr;
+    }else if (program_id != (uint64_t)-1){
+        iter = m_programs.find(program_id);
+    }else if (m_programs.size() == 1){
+        iter = m_programs.begin();
+    }else{
+        error = header + ": Multiple programs found. Please specify an ID.";
+        global_logger_tagged().log("ProgramTracker::" + error, COLOR_RED);
+        return nullptr;
+    }
+    if (iter == m_programs.end()){
+        error = header + ": ID not found.";
+        global_logger_tagged().log("ProgramTracker::" + error, COLOR_RED);
+        return nullptr;
+    }
+
+    return &iter->second->program;
+}
+TrackableConsole* ProgramTracker::get_console(
+    std::string& error,
+    const std::string& header,
+    uint64_t console_id
+){
+    auto iter = m_consoles.end();
+    if (m_consoles.empty()){
+        error = header + ": No consoles found.";
+        global_logger_tagged().log("ProgramTracker::" + error, COLOR_RED);
+        return nullptr;
+    }else if (console_id != (uint64_t)-1){
+        iter = m_consoles.find(console_id);
+    }else if (m_consoles.size() == 1){
+        iter = m_consoles.begin();
+    }else{
+        error = header + ": Multiple consoles found. Please specify an ID.";
+        global_logger_tagged().log("ProgramTracker::" + error, COLOR_RED);
+        return nullptr;
+    }
     if (iter == m_consoles.end()){
-        std::string error = "grab_screenshot(" + std::to_string(console_id) + ") - ID not found.";
-        global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
+        error = header + ": ID not found.";
+        global_logger_tagged().log("ProgramTracker::" + error, COLOR_RED);
+        return nullptr;
+    }
+
+    return iter->second.first;
+}
+ControllerSession* ProgramTracker::get_controller(
+    std::string& error,
+    const std::string& header,
+    uint64_t console_id,
+    uint64_t controller_index
+){
+    TrackableConsole* console = get_console(error, header, console_id);
+    if (console == nullptr){
+        return nullptr;
+    }
+    if (controller_index >= console->controllers()){
+        error = "reset_serial(" + std::to_string(console_id) + ") - Index out of bounds.";
+        global_logger_tagged().log("ProgramTracker::" + error, COLOR_RED);
+        return nullptr;
+    }
+    return &console->controller(controller_index);
+}
+
+std::string ProgramTracker::grab_screenshot(uint64_t console_id, std::shared_ptr<const ImageRGB32>& image){
+    std::string header = make_header("grab_screenshot", console_id);
+    std::lock_guard<Mutex> lg(m_lock);
+    std::string error;
+    TrackableConsole* console = get_console(error, header, console_id);
+    if (console == nullptr){
         return error;
     }
-    VideoSnapshot snapshot = iter->second.first->video().snapshot();
+    VideoSnapshot snapshot = console->video_feed().snapshot();
     image = std::move(snapshot.frame);
     return "";
 }
 std::string ProgramTracker::reset_camera(uint64_t console_id){
+    std::string header = make_header("reset_camera", console_id);
     std::lock_guard<Mutex> lg(m_lock);
-    auto iter = m_consoles.find(console_id);
-    if (iter == m_consoles.end()){
-        std::string error = "reset_camera(" + std::to_string(console_id) + ") - ID not found.";
-        global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
+    std::string error;
+    TrackableConsole* console = get_console(error, header, console_id);
+    if (console == nullptr){
         return error;
     }
-    iter->second.first->video().reset();
+    console->video_feed().reset();
     return "";
 }
-std::string ProgramTracker::reset_serial(uint64_t console_id){
+std::string ProgramTracker::reset_controller(uint64_t console_id, uint64_t controller_index){
+    std::string header = make_header("reset_controller", console_id);
     std::lock_guard<Mutex> lg(m_lock);
-    auto iter = m_consoles.find(console_id);
-    if (iter == m_consoles.end()){
-        std::string error = "reset_serial(" + std::to_string(console_id) + ") - ID not found.";
-        global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
+    std::string error;
+    ControllerSession* controller = get_controller(error, header, console_id, controller_index);
+    if (controller == nullptr){
         return error;
     }
-    std::string error = iter->second.first->controller().reset(false);
+    error = controller->reset(false);
     return error.empty() ? "Controller was reset." : error;
 }
 std::string ProgramTracker::start_program(uint64_t program_id){
+    std::string header = make_header("start_program", program_id);
     std::lock_guard<Mutex> lg(m_lock);
-    auto iter = m_programs.find(program_id);
-    if (iter == m_programs.end()){
-        std::string error = "start_program(ID = " + std::to_string(program_id) + ") - ID not found.";
-        global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
+    std::string error;
+    TrackableProgram* program = get_program(error, header, program_id);
+    if (program == nullptr){
         return error;
     }
-    iter->second->program.async_start();
+    program->async_start();
     return "";
 }
 std::string ProgramTracker::stop_program(uint64_t program_id){
+    std::string header = make_header("stop_program", program_id);
     std::lock_guard<Mutex> lg(m_lock);
-    auto iter = m_programs.find(program_id);
-    if (iter == m_programs.end()){
-        std::string error = "stop_program(ID = " + std::to_string(program_id) + ") - ID not found.";
-        global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
+    std::string error;
+    TrackableProgram* program = get_program(error, header, program_id);
+    if (program == nullptr){
         return error;
     }
-    iter->second->program.async_stop();
+    program->async_stop();
     return "";
 }
-std::string ProgramTracker::nsw_press_button(uint64_t console_id, NintendoSwitch::Button button, uint16_t ticks){
-    using namespace NintendoSwitch;
-    std::string header = "press_button(ID = " + std::to_string(console_id) + ")";
+std::string ProgramTracker::run_controller_command(
+    uint64_t console_id, uint64_t controller_index,
+    Milliseconds duration,
+    const char* command
+){
+    std::string header = make_header("controller_command", console_id);
+
     std::lock_guard<Mutex> lg(m_lock);
-    auto iter = m_consoles.find(console_id);
-    if (iter == m_consoles.end()){
-        std::string error = header + ": ID not found.";
-        global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
+
+    std::string error;
+    ControllerSession* controller = get_controller(error, header, console_id, controller_index);
+    if (controller == nullptr){
         return error;
     }
-    Milliseconds duration = ticks * 8ms;
-    std::string err;
+
     try{
-        err = iter->second.first->controller().try_run<ProController>(
-            [=](ProController& controller){
-                controller.issue_buttons(nullptr, duration, duration, 0ms, button);
+        error = controller->try_run<AbstractController>(
+            [=](AbstractController& controller){
+                controller.run_string_command(duration, command);
             }
         );
     }catch (Exception& e){
         e.log(global_logger_tagged());
-        err = e.to_str();
+        error = e.to_str();
     }
-    if (err.empty()){
-        global_logger_tagged().log("SwitchProgramTracker::" + header, COLOR_BLUE);
+    if (error.empty()){
+        global_logger_tagged().log("ProgramTracker::" + header, COLOR_BLUE);
         return "";
     }else{
-        global_logger_tagged().log("SwitchProgramTracker::" + header + ": " + err, COLOR_RED);
-        return err;
-    }
-}
-std::string ProgramTracker::nsw_press_dpad(uint64_t console_id, NintendoSwitch::DpadPosition position, uint16_t ticks){
-    using namespace NintendoSwitch;
-    std::string header = "press_dpad(ID = " + std::to_string(console_id) + ")";
-    std::lock_guard<Mutex> lg(m_lock);
-    auto iter = m_consoles.find(console_id);
-    if (iter == m_consoles.end()){
-        std::string error = header + ": ID not found.";
-        global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
+        global_logger_tagged().log("ProgramTracker::" + header + ": " + error, COLOR_RED);
         return error;
-    }
-    Milliseconds duration = ticks * 8ms;
-    std::string err;
-    try{
-        err = iter->second.first->controller().try_run<ProController>(
-            [=](ProController& controller){
-                controller.issue_dpad(nullptr, duration, duration, 0ms, position);
-            }
-        );
-    }catch (Exception& e){
-        e.log(global_logger_tagged());
-        err = e.to_str();
-    }
-    if (err.empty()){
-        global_logger_tagged().log("SwitchProgramTracker::" + header, COLOR_BLUE);
-        return "";
-    }else{
-        global_logger_tagged().log("SwitchProgramTracker::" + header + ": " + err, COLOR_RED);
-        return err;
-    }
-}
-std::string ProgramTracker::nsw_press_left_joystick(uint64_t console_id, uint8_t x, uint8_t y, uint16_t ticks){
-    using namespace NintendoSwitch;
-    std::string header = "press_left_joystick(ID = " + std::to_string(console_id) + ")";
-    std::lock_guard<Mutex> lg(m_lock);
-    auto iter = m_consoles.find(console_id);
-    if (iter == m_consoles.end()){
-        std::string error = header + ": ID not found.";
-        global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
-        return error;
-    }
-    Milliseconds duration = ticks * 8ms;
-    std::string err;
-    try{
-        err = iter->second.first->controller().try_run<ProController>(
-            [=](ProController& controller){
-                controller.issue_left_joystick(
-                    nullptr, duration, duration, 0ms,
-                    {
-                        JoystickTools::linear_u8_to_float(x),
-                        -JoystickTools::linear_u8_to_float(y)
-                    }
-                );
-            }
-        );
-    }catch (Exception& e){
-        e.log(global_logger_tagged());
-        err = e.to_str();
-    }
-    if (err.empty()){
-        global_logger_tagged().log("SwitchProgramTracker::" + header, COLOR_BLUE);
-        return "";
-    }else{
-        global_logger_tagged().log("SwitchProgramTracker::" + header + ": " + err, COLOR_RED);
-        return err;
-    }
-}
-std::string ProgramTracker::nsw_press_right_joystick(uint64_t console_id, uint8_t x, uint8_t y, uint16_t ticks){
-    using namespace NintendoSwitch;
-    std::string header = "press_right_joystick(ID = " + std::to_string(console_id) + ")";
-    std::lock_guard<Mutex> lg(m_lock);
-    auto iter = m_consoles.find(console_id);
-    if (iter == m_consoles.end()){
-        std::string error = header + ": ID not found.";
-        global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
-        return error;
-    }
-    Milliseconds duration = ticks * 8ms;
-    std::string err;
-    try{
-        err = iter->second.first->controller().try_run<ProController>(
-            [=](ProController& controller){
-                controller.issue_right_joystick(
-                    nullptr, duration, duration, 0ms,
-                    {
-                        JoystickTools::linear_u8_to_float(x),
-                        -JoystickTools::linear_u8_to_float(y)
-                    }
-                );
-            }
-        );
-    }catch (Exception& e){
-        e.log(global_logger_tagged());
-        err = e.to_str();
-    }
-    if (err.empty()){
-        global_logger_tagged().log("SwitchProgramTracker::" + header, COLOR_BLUE);
-        return "";
-    }else{
-        global_logger_tagged().log("SwitchProgramTracker::" + header + ": " + err, COLOR_RED);
-        return err;
     }
 }
 
@@ -293,6 +272,17 @@ void ProgramTracker::remove_console(uint64_t console_id){
             consoles.erase(iter);
             break;
         }
+    }
+}
+std::optional<uint64_t> ProgramTracker::add_console(std::optional<uint64_t> program_id, TrackableConsole& console){
+    if (!program_id.has_value()){
+        return std::nullopt;
+    }
+    return add_console(program_id.value(), console);
+}
+void ProgramTracker::remove_console(std::optional<uint64_t> console_id){
+    if (console_id.has_value()){
+        remove_console(console_id.value());
     }
 }
 

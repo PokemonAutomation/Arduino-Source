@@ -4,9 +4,8 @@
  *
  */
 
+#include "Common/Cpp/Strings/StringTools.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
-#include "CommonTools/Async/InterruptableCommands.tpp"
-#include "CommonTools/Async/SuperControlSession.tpp"
 #include "ControllerInput/ControllerInput.h"
 #include "ControllerInput/Keyboard/KeyboardInput_State.h"
 #include "Controllers/ControllerTypes.h"
@@ -21,11 +20,6 @@
 //using std::endl;
 
 namespace PokemonAutomation{
-
-//  Instantiate some template helper classes.
-template class AsyncCommandSession<NintendoSwitch::JoyconController>;
-template class SuperControlSession<NintendoSwitch::JoyconController>;
-
 namespace NintendoSwitch{
 
 using namespace std::chrono_literals;
@@ -71,6 +65,53 @@ JoyconController::~JoyconController(){
 }
 
 
+
+
+
+bool JoyconController::run_string_command(Milliseconds duration, const std::string& command){
+    //  stop
+    //  replace
+    //  wait
+    //  A,B
+    //  A,B|JS:+0.5:-0.5
+
+    std::vector<std::string> tokens = StringTools::split(command, "|");
+    if (tokens.empty()){
+        return false;
+    }
+
+    if (tokens[0] == "stop"){
+        cancel_all_commands();
+        return true;
+    }
+    if (tokens[0] == "replace"){
+        replace_on_next_command();
+        return true;
+    }
+    if (tokens[0] == "wait"){
+        issue_nop(nullptr, duration);
+        return true;
+    }
+
+    JoyconState state;
+
+    for (const std::string& token : tokens){
+        if (token.starts_with("JS")){
+            std::vector<std::string> args = StringTools::split(token, ":");
+            if (args.size() != 3){
+                return false;
+            }
+            state.joystick.x = std::atof(args[1].data());
+            state.joystick.y = std::atof(args[2].data());
+            continue;
+        }
+        state.buttons |= string_to_button(token, ",");
+    }
+
+    state.execute(nullptr, true, *this, duration);
+
+    return true;
+}
 
 
 void JoyconController::run_controller_input(const ControllerInputState& state){
@@ -120,10 +161,10 @@ void JoyconController::on_rumble(double magnitude){
 
 
 
-ControllerClass LeftJoycon::controller_class() const{
+ControllerClass LeftJoycon::controller_class() const noexcept{
     return ControllerClass::NintendoSwitch_LeftJoycon;
 }
-ControllerClass RightJoycon::controller_class() const{
+ControllerClass RightJoycon::controller_class() const noexcept{
     return ControllerClass::NintendoSwitch_RightJoycon;
 }
 

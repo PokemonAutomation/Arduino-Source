@@ -7,7 +7,7 @@
 #include <QCoreApplication>
 #include <QMessageBox>
 #include <QMenuBar>
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "WindowTracker.h"
 #include "ButtonDiagram.h"
 

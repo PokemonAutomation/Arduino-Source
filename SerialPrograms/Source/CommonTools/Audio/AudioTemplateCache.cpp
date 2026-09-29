@@ -8,7 +8,7 @@
 #include <QString>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
 #include "AudioTemplateCache.h"
 

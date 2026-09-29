@@ -18,26 +18,33 @@
 #ifndef PokemonAutomation_ComputerPrograms_ComputerProgramWidget_H
 #define PokemonAutomation_ComputerPrograms_ComputerProgramWidget_H
 
+#include <QVBoxLayout>
+#include "Common/Qt/UiStateQtWidget.h"
 #include "CommonFramework/Panels/UI/PanelElements.h"
-#include "ComputerPrograms/ComputerProgram.h"
 #include "ComputerPrograms/Framework/ComputerProgramSession.h"
 #include "ComputerProgramSession.h"
 
-QT_FORWARD_DECLARE_CLASS(QVBoxLayout)
 namespace PokemonAutomation{
 
     class ProgramResourceDownloadTableWidget;
 
 
 
-class ComputerProgramWidget : public QWidget, private ProgramSession::Listener{
+class ComputerProgramWidget
+    : public QWidget
+    , public UiComponentQtWidget
+    , private ProgramSession::Listener
+{
+public:
+    using ParentState = ComputerProgramSession;
+
 public:
     ~ComputerProgramWidget();
-    ComputerProgramWidget(
-        QWidget& parent,
-        ComputerProgramOption& option,
-        PanelHolder& holder
-    );
+    ComputerProgramWidget(QWidget& parent, ComputerProgramSession& session);
+
+    virtual QWidget& widget() override{
+        return *this;
+    }
 
 private:
     virtual void state_change(ProgramState state) override;
@@ -50,10 +57,8 @@ private:
     ProgramResourceDownloadTableWidget* ensure_downloads_table();
 
 private:
-    PanelHolder& m_holder;
-    ComputerProgramSession m_session;
+    ComputerProgramSession& m_session;
     QVBoxLayout* m_layout;
-    ConfigWidget* m_options;
     StatsBar* m_stats_bar;
     RunnablePanelActionBar* m_actions_bar;
 

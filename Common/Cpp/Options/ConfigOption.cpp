@@ -82,23 +82,26 @@ size_t ConfigOption::total_listeners() const{
 
 
 
-void ConfigOption::load_json(const JsonValue& json){
-    m_lifetime_sanitizer.check_usage();
-}
-JsonValue ConfigOption::to_json() const{
-    m_lifetime_sanitizer.check_usage();
-    return JsonValue();
-}
-LockMode ConfigOption::lock_mode() const{
-    m_lifetime_sanitizer.check_usage();
-    return m_data->lock_mode;
-}
 std::string ConfigOption::check_validity() const{
     m_lifetime_sanitizer.check_usage();
     return std::string();
 }
 void ConfigOption::restore_defaults(){
     m_lifetime_sanitizer.check_usage();
+}
+JsonValue ConfigOption::to_json() const{
+    m_lifetime_sanitizer.check_usage();
+    return JsonValue();
+}
+void ConfigOption::load_json(const JsonValue& json){
+    m_lifetime_sanitizer.check_usage();
+}
+
+
+
+LockMode ConfigOption::lock_mode() const{
+    m_lifetime_sanitizer.check_usage();
+    return m_data->lock_mode;
 }
 ConfigOptionState ConfigOption::visibility() const{
     m_lifetime_sanitizer.check_usage();

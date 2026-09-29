@@ -19,8 +19,9 @@ enum class ThreadPriority{
     Low,
 };
 
-constexpr ThreadPriority DEFAULT_PRIORITY_REALTIME              = ThreadPriority::High;
-constexpr ThreadPriority DEFAULT_PRIORITY_REALTIME_INFERENCE    = ThreadPriority::AboveNormal;
+constexpr ThreadPriority DEFAULT_PRIORITY_UI                    = ThreadPriority::High;
+constexpr ThreadPriority DEFAULT_PRIORITY_REALTIME              = ThreadPriority::AboveNormal;
+constexpr ThreadPriority DEFAULT_PRIORITY_REALTIME_INFERENCE    = ThreadPriority::Normal;
 constexpr ThreadPriority DEFAULT_PRIORITY_NORMAL_INFERENCE      = ThreadPriority::BelowNormal;
 constexpr ThreadPriority DEFAULT_PRIORITY_COMPUTE               = ThreadPriority::Low;
 

@@ -90,10 +90,10 @@ PA_FORCE_INLINE uint64_t reduce32_arm64_NEON(uint32x4_t x){
 // and one new uint64x2_t vector from the upper half of them.
 // Assign r0 to the former, r1 to the letter.
 PA_FORCE_INLINE void transpose_u64_2x2_NEON(uint64x2_t& r0, uint64x2_t& r1){
-    int64x1_t r0_l = vget_low_u64(r0);
-    int64x1_t r1_l = vget_low_u64(r1);
-    int64x1_t r0_h = vget_high_u64(r0);
-    int64x1_t r1_h = vget_high_u64(r1);
+    uint64x1_t r0_l = vget_low_u64(r0);
+    uint64x1_t r1_l = vget_low_u64(r1);
+    uint64x1_t r0_h = vget_high_u64(r0);
+    uint64x1_t r1_h = vget_high_u64(r1);
 
     r0 = vcombine_u64(r0_l, r1_l);
     r1 = vcombine_u64(r0_h, r1_h);

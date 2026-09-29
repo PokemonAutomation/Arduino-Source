@@ -31,12 +31,13 @@ public:
     std::string set(std::string x);
     std::string to_str() const;
 
-    virtual std::string check_validity() const override;
-    std::string check_validity(const std::string& x) const;
-    virtual void restore_defaults() override;
 
-    virtual void load_json(const JsonValue& json) override;
+public:
+    std::string check_validity(const std::string& x) const;
+    virtual std::string check_validity() const override;
+    virtual void restore_defaults() override;
     virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
 
 
 private:

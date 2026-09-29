@@ -29,17 +29,29 @@ public:
 
         auto ret = m_map.emplace(enum_value, std::move(entry));
         if (!ret.second){
-            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate Enum: " + std::to_string(enum_value));
+            throw InternalProgramError(
+                nullptr,
+                PA_CURRENT_FUNCTION,
+                "Duplicate Enum: " + std::to_string(enum_value)
+            );
         }
 
         auto ret1 = m_slug_to_enum.emplace(ret.first->second.slug, &ret.first->second);
         if (!ret1.second){
-            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate Enum Slug: " + ret.first->second.slug);
+            throw InternalProgramError(
+                nullptr,
+                PA_CURRENT_FUNCTION,
+                "Duplicate Enum Slug: " + ret.first->second.slug
+            );
         }
 
         auto ret2 = m_display_to_enum.emplace(ret.first->second.display, &ret.first->second);
         if (!ret2.second){
-            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate Enum Display: " + ret.first->second.display);
+            throw InternalProgramError(
+                nullptr,
+                PA_CURRENT_FUNCTION,
+                "Duplicate Enum Display: " + ret.first->second.display
+            );
         }
     }
 
@@ -101,7 +113,12 @@ IntegerEnumDropdownDatabase::IntegerEnumDropdownDatabase(std::initializer_list<E
     : m_core(CONSTRUCT_TOKEN)
 {
     for (auto iter = list.begin(); iter != list.end(); ++iter){
-        add(iter->enum_value, std::move(iter->slug), std::move(iter->display), iter->enabled);
+        add(
+            iter->enum_value,
+            std::move(iter->slug),
+            std::move(iter->display),
+            iter->enabled
+        );
     }
 }
 void IntegerEnumDropdownDatabase::add(EnumEntry entry){

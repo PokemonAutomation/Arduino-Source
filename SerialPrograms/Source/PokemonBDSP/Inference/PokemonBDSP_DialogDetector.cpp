@@ -34,10 +34,12 @@ void ShortDialogDetector::make_overlays(VideoOverlaySet& items) const{
 }
 bool ShortDialogDetector::detect(const ImageViewRGB32& screen){
     ImageStats left_white = image_stats(extract_box_reference(screen, m_left_white));
+//    cout << left_white.average << left_white.stddev << endl;
     if (!is_white(left_white)){
         return false;
     }
     ImageStats right_white = image_stats(extract_box_reference(screen, m_right_white));
+//    cout << right_white.average << right_white.stddev << endl;
     if (!is_white(right_white)){
         return false;
     }

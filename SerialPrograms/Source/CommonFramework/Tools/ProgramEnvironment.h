@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_ProgramEnvironment_H
 #define PokemonAutomation_ProgramEnvironment_H
 
+#include "Common/Compiler.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 
 namespace PokemonAutomation{
@@ -21,6 +22,7 @@ struct ProgramEnvironmentData;
 
 class ProgramEnvironment{
 public:
+    virtual ~ProgramEnvironment() = default;
     ProgramEnvironment(
         const ProgramInfo& program_info,
         ProgramSession& session,
@@ -30,11 +32,15 @@ public:
 
     const ProgramInfo& program_info() const;
 
+
 public:
     //  Logging
     Logger& logger(){ return m_logger; }
     void log(const char* msg, Color color = Color()){ m_logger.log(msg, color); }
     void log(const std::string& msg, Color color = Color()){ m_logger.log(msg, color); }
+
+    virtual void log_to_ui(const std::string& msg, Color color = Color()){}
+
 
 public:
     //  Stats Management

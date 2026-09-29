@@ -218,15 +218,8 @@ void IntegerRangeCell<Type>::set(const IntegerRangeCell& option){
 }
 
 template <typename Type>
-void IntegerRangeCell<Type>::load_json(const JsonValue& json){
-    const JsonArray* array = json.to_array();
-    if (array == nullptr || array->size() != 2){
-        return;
-    }
-    set(
-        (Type)(*array)[0].to_integer_default(m_data->m_lo_default),
-        (Type)(*array)[1].to_integer_default(m_data->m_hi_default)
-    );
+void IntegerRangeCell<Type>::restore_defaults(){
+    set(m_data->m_lo_default, m_data->m_hi_default);
 }
 template <typename Type>
 JsonValue IntegerRangeCell<Type>::to_json() const{
@@ -238,8 +231,15 @@ JsonValue IntegerRangeCell<Type>::to_json() const{
     return array;
 }
 template <typename Type>
-void IntegerRangeCell<Type>::restore_defaults(){
-    set(m_data->m_lo_default, m_data->m_hi_default);
+void IntegerRangeCell<Type>::load_json(const JsonValue& json){
+    const JsonArray* array = json.to_array();
+    if (array == nullptr || array->size() != 2){
+        return;
+    }
+    set(
+        (Type)(*array)[0].to_integer_default(m_data->m_lo_default),
+        (Type)(*array)[1].to_integer_default(m_data->m_hi_default)
+    );
 }
 
 

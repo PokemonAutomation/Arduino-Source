@@ -8,7 +8,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Exceptions/UnexpectedBattleException.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -17,7 +17,7 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "ML/Inference/ML_YOLOv5Detector.h"
 #include "ML/Models/ML_YOLOv5Model.h"
-#include "PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.h"
+#include "VideoGames/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.h"
 #include "ML_YOLONavigation.h"
 
 using namespace std::chrono_literals;
@@ -186,8 +186,8 @@ void move_camera_yolo(
     }
 
     if (!seen_object){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "move_camera_yolo(): Never detected the yolo object.",
             env.console
         );

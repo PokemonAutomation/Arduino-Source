@@ -1,6 +1,13 @@
+/*  Discord Social
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
 #ifdef PA_SOCIAL_SDK
 #define DISCORDPP_IMPLEMENTATION
 
+#include <thread>
 #include "Common/Cpp/Logging/TaggedLogger.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
 #include "CommonFramework/Globals.h"
@@ -8,6 +15,10 @@
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "Integrations/ProgramTracker.h"
 #include "DiscordSocial.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 using namespace discordpp;
 namespace PokemonAutomation{
@@ -79,6 +90,7 @@ void DiscordSocial::thread_loop(){
 }
 
 void DiscordSocial::update_rich_presence(){
+//    cout << "DiscordSocial::update_rich_presence()" << endl;
     try{
         std::string details = m_activity.Details().value();
         std::string state = m_activity.State().value();
@@ -113,7 +125,11 @@ void DiscordSocial::update_rich_presence(){
                 details = item.second.program_name;
             }
 
-            m_timestamps.SetStart(std::chrono::duration_cast<std::chrono::seconds>(item.second.start_time.time_since_epoch()).count());
+            m_timestamps.SetStart(
+                std::chrono::duration_cast<std::chrono::seconds>(
+                    item.second.last_state_change.time_since_epoch()
+                ).count()
+            );
         }
 
         m_activity.SetTimestamps(m_timestamps);

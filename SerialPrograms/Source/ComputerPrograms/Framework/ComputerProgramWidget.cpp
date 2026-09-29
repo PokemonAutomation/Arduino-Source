@@ -4,18 +4,12 @@
  *
  */
 
-#include <QVBoxLayout>
-#include <QLabel>
 #include <QMessageBox>
-#include <QScrollArea>
-#include "Common/Qt/CollapsibleGroupBox.h"
-#include "Common/Qt/Options/ConfigWidget.h"
+#include "Common/Cpp/ScopeExit.h"
 #include "CommonFramework/Panels/PanelTools.h"
 #include "CommonFramework/Panels/UI/PanelElements.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/ResourceDownload/ProgramResourceDownloadWidget.h"
-#include "ComputerPrograms/ComputerProgram.h"
-#include "ComputerPrograms/Framework/ComputerProgramOption.h"
 #include "ComputerProgramWidget.h"
 
 // #include <iostream>
@@ -24,98 +18,48 @@
 
 namespace PokemonAutomation{
 
+template class RegisterUiStateQtWidget<ComputerProgramWidget>;
+
 
 ComputerProgramWidget::~ComputerProgramWidget(){
     m_session.remove_listener(*this);
-    delete m_actions_bar;
-    delete m_stats_bar;
-    delete m_options;
 }
 ComputerProgramWidget::ComputerProgramWidget(
     QWidget& parent,
-    ComputerProgramOption& option,
-    PanelHolder& holder
+    ComputerProgramSession& session
 )
     : QWidget(&parent)
-    , m_holder(holder)
-    , m_session(option)
+    , m_session(session)
 {
-    m_layout = new QVBoxLayout(this);
-    m_layout->setContentsMargins(0, 0, 0, 0);
-
-    const ComputerProgramDescriptor& descriptor = option.descriptor();
-
-    CollapsibleGroupBox* header = make_panel_header(
+    m_stats_bar = new StatsBar(*this, m_session);
+    m_actions_bar = new RunnablePanelActionBar(
         *this,
-        descriptor.display_name(),
-        descriptor.doc_link(),
-        descriptor.description()
+        session,
+        session,
+        m_session.current_state()
     );
-    m_layout->addWidget(header);
 
-
-    {
-        QScrollArea* scroll_outer = new QScrollArea(this);
-        m_layout->addWidget(scroll_outer);
-        scroll_outer->setWidgetResizable(true);
-
-        QWidget* scroll_inner = new QWidget(scroll_outer);
-        scroll_outer->setWidget(scroll_inner);
-        QVBoxLayout* scroll_layout = new QVBoxLayout(scroll_inner);
-        scroll_layout->setAlignment(Qt::AlignTop);
-
-        m_options = ConfigWidget::make_from_option(option.options(), this);
-        scroll_layout->addWidget(&m_options->widget());
-
-        scroll_layout->addStretch(1);
-    }
-
-    m_stats_bar = new StatsBar(*this);
-    m_stats_bar->set_stats("", m_session.historical_stats());
-    m_layout->addWidget(m_stats_bar);
-
-    m_actions_bar = new RunnablePanelActionBar(*this, m_session.current_state());
-    m_layout->addWidget(m_actions_bar);
-
-
-    connect(
-        m_actions_bar, &RunnablePanelActionBar::start_clicked,
-        this, [&](ProgramState state){
-            std::string error;
-            switch (state){
-            case ProgramState::STOPPED:
-                error = m_session.start_program();
-                break;
-            case ProgramState::RUNNING:
-                error = m_session.stop_program();
-                break;
-            default:;
-            }
-            if (!error.empty()){
-                this->error(error);
-            }
-        }
+    populate_panel_widget(
+        *this,
+        session.descriptor(),
+        nullptr,
+        session.options(),
+        {m_stats_bar, m_actions_bar}
     );
-    connect(
-        m_actions_bar, &RunnablePanelActionBar::defaults_clicked,
-        this, [&]{
-            std::lock_guard<Mutex> lg(m_session.program_lock());
-            option.restore_defaults();
-            m_options->update_all(false);
-        }
-    );
+
+    m_layout = static_cast<QVBoxLayout*>(this->layout());
 
     m_session.add_listener(*this);
 }
 
 void ComputerProgramWidget::state_change(ProgramState state){
     QMetaObject::invokeMethod(this, [this, state]{
-        m_options->widget().setEnabled(state == ProgramState::STOPPED);
+        m_session.options().report_program_state(state != ProgramState::STOPPED);
         m_actions_bar->set_state(state);
         if (state == ProgramState::STOPPED){
-            m_holder.on_idle();
+            global_panel_holder()->on_idle();
         }else{
-            m_holder.on_busy();
+            global_panel_holder()->on_busy();
         }
 
         if(state == ProgramState::STOPPING){
@@ -142,11 +86,15 @@ void ComputerProgramWidget::download_error(const std::string& message){
     if (m_popup_is_open.exchange(true)){ // only show popups if one isn't already open
         return;
     }
+
+    ScopeExit scope([&]{
+        m_popup_is_open.store(false, std::memory_order_release);
+    });
+
     QMetaObject::invokeMethod(this, [message]{
         QMessageBox box;
         box.critical(nullptr, "Error", QString::fromStdString(message));
     }, Qt::QueuedConnection);
-    m_popup_is_open.store(false);
 }
 
 void ComputerProgramWidget::download_added(std::shared_ptr<ResourceDownload> download_ptr){

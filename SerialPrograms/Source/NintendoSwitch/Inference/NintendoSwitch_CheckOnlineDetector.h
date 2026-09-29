@@ -8,6 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_CheckOnlineDetector_H
 
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/VisualDetector.h"
 
@@ -42,6 +43,7 @@ public:
 };
 
 
+void add_tests_CheckOnlineDetector(UnitTestDatabase& database);
 
 }
 }

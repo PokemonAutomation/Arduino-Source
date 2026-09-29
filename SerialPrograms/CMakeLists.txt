@@ -38,7 +38,7 @@ add_custom_target(build-time-make-directory ALL
 set(REPO_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../")
 
 # Determine environment
-if(DEFINED ENV{GITHUB_ACTIONS} OR DEFINED IS_AZURE_BUILD)
+if(DEFINED ENV{GITHUB_ACTIONS})
     message(STATUS "Detected CI environment, skipping qt deployment")
     set(QT_DEPLOY_FILES FALSE)
 else()
@@ -60,6 +60,27 @@ endif()
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
+# Define a toggle option (ON by default)
+option(COMMAND_LINE_EXE "Build the optional executable" ON)
+
+# Build only the GUI-free core: CoreLib and SerialProgramsCommandLine. This needs
+# no Qt, OpenCV, ONNX Runtime, Tesseract, DPP or Discord SDK, so none of them are
+# searched for.
+option(PA_CORE_ONLY "Build only the GUI-free core (basic microcontroller functions, no Qt, OpenCV, etc.)" OFF)
+
+if(PA_CORE_ONLY)
+    message(STATUS "PA_CORE_ONLY: building only the GUI-free core")
+    set(CMAKE_AUTOMOC OFF)
+    set(CMAKE_AUTORCC OFF)
+    set(CMAKE_AUTOUIC OFF)
+    include(cmake/SourceFiles.cmake)
+    include(cmake/CoreLib.cmake)
+    if(COMMAND_LINE_EXE)
+        include(Source/CommandLine/CommandLineExecutable.cmake)
+    endif()
+    return()
+endif()
+
 # Define the major version of Qt to search for
 if(NOT QT_MAJOR)
     set(QT_MAJOR 6)
@@ -78,10 +99,28 @@ if(WIN32 AND QT_DEPLOY_FILES)
     if(QT_CANDIDATE_DIR AND EXISTS "${QT_CANDIDATE_DIR}")
         message(STATUS "Using preferred Qt directory for Qt${QT_MAJOR} ${PREFERRED_QT_VER}: ${QT_CANDIDATE_DIR}")
         list(APPEND CMAKE_PREFIX_PATH "${QT_CANDIDATE_DIR}")
-        find_package(Qt${QT_MAJOR} ${PREFERRED_QT_VER} COMPONENTS Widgets SerialPort Multimedia MultimediaWidgets REQUIRED)
+        find_package(Qt${QT_MAJOR} ${PREFERRED_QT_VER} REQUIRED COMPONENTS
+            Widgets
+            SerialPort
+            Multimedia
+            MultimediaWidgets
+            OpenGLWidgets
+            Qml
+            Quick
+            QuickWidgets
+        )
     else()
         # Find all subdirectories in the Qt base directory
-        find_package(Qt${QT_MAJOR} COMPONENTS Widgets SerialPort Multimedia MultimediaWidgets REQUIRED)
+        find_package(Qt${QT_MAJOR} REQUIRED COMPONENTS
+            Widgets
+            SerialPort
+            Multimedia
+            MultimediaWidgets
+            OpenGLWidgets
+            Qml
+            Quick
+            QuickWidgets
+        )
         file(GLOB QT_SUBDIRS LIST_DIRECTORIES true "${QT_BASE_DIR}/${QT_MAJOR}*")
 
         # Filter and sort the directories to find the latest version
@@ -109,7 +148,16 @@ if(WIN32 AND QT_DEPLOY_FILES)
         REQUIRED
     )
 else()
-    find_package(Qt${QT_MAJOR} COMPONENTS Widgets SerialPort Multimedia MultimediaWidgets REQUIRED)
+    find_package(Qt${QT_MAJOR} REQUIRED COMPONENTS
+        Widgets
+        SerialPort
+        Multimedia
+        MultimediaWidgets
+        OpenGLWidgets
+        Qml
+        Quick
+        QuickWidgets
+    )
 endif()
 
 # disable deprecated Qt APIs
@@ -118,15 +166,27 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
 # add current directory to find tesseractPA.lib
 link_directories(${CMAKE_CURRENT_LIST_DIR})
 
-# add the list of all code file paths as ${LIBRARY_SOURCES} and ${EXECUTABLE_SOURCES}
+# add the list of all code file paths as ${CORE_LIBRARY_SOURCES}, ${LIBRARY_SOURCES} and ${EXECUTABLE_SOURCES}
 include(cmake/SourceFiles.cmake)
 
+# add extract_discord_sdk(), which unpacks the per-platform Discord Social SDK zips
+include(cmake/ExtractDiscordSDK.cmake)
+
 # Organize source files in IDE project view
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../../ FILES ${CORE_LIBRARY_SOURCES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../../ FILES ${LIBRARY_SOURCES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../../ FILES ${EXECUTABLE_SOURCES})
 
-# Create library target first
-add_library(SerialProgramsLib STATIC ${LIBRARY_SOURCES})
+# Create GUI-free Controller library, CoreLib
+include(cmake/CoreLib.cmake)
+
+# see apply_common_target_properties() for target_include_directories, set_target_properties, target_compile_definitions
+
+
+
+# Create the GUI library
+add_library(SerialProgramsLib STATIC ${CORE_LIBRARY_SOURCES} ${LIBRARY_SOURCES})
+
 
 # Create binary target
 if (APPLE)
@@ -186,18 +246,31 @@ if (IS_AZURE_BUILD)
 endif()
 
 # Function to apply common properties to both library and executable targets
+#   (pa_apply_*_target_properties() are defined in cmake/CoreLib.cmake.)
 function(apply_common_target_properties target_name)
-    set_target_properties(${target_name} PROPERTIES LINKER_LANGUAGE CXX)
-    target_link_libraries(${target_name} PRIVATE Qt${QT_MAJOR}::Widgets Qt${QT_MAJOR}::SerialPort Qt${QT_MAJOR}::Multimedia Qt${QT_MAJOR}::MultimediaWidgets)
-    target_link_libraries(${target_name} PRIVATE Threads::Threads)
+    if("NO_GUI" IN_LIST ARGN)
+        pa_apply_gui_free_target_properties(${target_name})
+        return()
+    endif()
 
-    #add defines
-    target_compile_definitions(${target_name} PRIVATE NOMINMAX DPP_NO_DEPRECATED)
+    pa_apply_base_target_properties(${target_name})
 
-    #add include directory
+    # include Qt headers
+    target_link_libraries(${target_name} PRIVATE
+        Qt${QT_MAJOR}::Widgets
+        Qt${QT_MAJOR}::SerialPort
+        Qt${QT_MAJOR}::Multimedia
+        Qt${QT_MAJOR}::MultimediaWidgets
+        Qt${QT_MAJOR}::OpenGLWidgets
+        Qt${QT_MAJOR}::Qml
+        Qt${QT_MAJOR}::Quick
+        Qt${QT_MAJOR}::QuickWidgets
+    )    
+
+    # more include directories
     target_include_directories(${target_name} SYSTEM PRIVATE ../3rdParty/)
-    target_include_directories(${target_name} PRIVATE ../ ../../Internal/ Source/)
     target_link_directories(${target_name} PRIVATE ../3rdPartyBinaries/)
+
 endfunction()
 
 # Apply common properties to both targets
@@ -205,13 +278,10 @@ apply_common_target_properties(SerialProgramsLib)
 apply_common_target_properties(SerialPrograms)
 
 if(MSVC)
-    if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        add_compile_options(/lowpriority)
-    endif()
-    set_source_files_properties("../3rdParty/miniz-3.1.1/miniz.c" PROPERTIES COMPILE_FLAGS "/W0")
+    set_source_files_properties("../3rdParty-Core/miniz-3.1.1/miniz.c" PROPERTIES COMPILE_FLAGS "/W0")
 else()
     # For GCC/Clang
-    set_source_files_properties("../3rdParty/miniz-3.1.1/miniz.c" PROPERTIES COMPILE_FLAGS "-w")
+    set_source_files_properties("../3rdParty-Core/miniz-3.1.1/miniz.c" PROPERTIES COMPILE_FLAGS "-w")
 endif()
 
 # REPO_ROOT_DIR: the root folder of the git repository, "Arduino-Source/"
@@ -388,9 +458,13 @@ else() # macOS and Linux
             target_include_directories(SerialProgramsLib PUBLIC ${ONNXRUNTIME_INCLUDE_DIRS})
             target_link_libraries(SerialProgramsLib PUBLIC ${ONNXRUNTIME_LIBRARIES})
 
-        else()
+        else() # linux, download onnxruntime
             set(ONNXRUNTIME_VERSION "1.23.0")
-            set(ONNXRUNTIME_ARCH "x64")
+            if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^(arm|arm64|aarch64)")
+                set(ONNXRUNTIME_ARCH "aarch64")
+            else()
+                set(ONNXRUNTIME_ARCH "x64")
+            endif()
             set(ONNXRUNTIME_DIR_NAME "onnxruntime-linux-${ONNXRUNTIME_ARCH}-${ONNXRUNTIME_VERSION}")
             set(ONNXRUNTIME_TGZ_NAME "${ONNXRUNTIME_DIR_NAME}.tgz")
             # build up the URL based on the version and name
@@ -457,15 +531,32 @@ else() # macOS and Linux
             else()
                 message(FATAL_ERROR "Could not find ONNX Runtime headers or library.")
             endif()
-        endif ()
+        endif () # end searching or downloading onnx runtime
 
         # Systemd DBus Library
-        message(STATUS "Using bundled sdbus-c++ library.")
+	# Used for different programs on the same computer to communicate with each other.
+        # The bundled archive is prebuilt native object code, so it must be picked per-arch
+        # (a single .a cannot serve both x86_64 and aarch64 Linux).
+        if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^(arm|arm64|aarch64)")
+            set(SDBUS_CPP_LIB "${REPO_ROOT_DIR}/3rdParty/sdbus-cpp/lib/libsdbus-c++-aarch64.a")
+        else()
+            set(SDBUS_CPP_LIB "${REPO_ROOT_DIR}/3rdParty/sdbus-cpp/lib/libsdbus-c++-x86_64.a")
+        endif()
+        message(STATUS "Using bundled sdbus-c++ library: ${SDBUS_CPP_LIB}")
+
         target_include_directories(SerialProgramsLib PRIVATE
             ${REPO_ROOT_DIR}/3rdParty/sdbus-cpp/include
         )
         target_link_libraries(SerialProgramsLib PRIVATE
-            ${REPO_ROOT_DIR}/3rdParty/sdbus-cpp/lib/libsdbus-c++.a
+            ${SDBUS_CPP_LIB}
+            systemd #sdbus-c++ relies on libsystemd, almost all distros should have this
+        )
+
+        target_include_directories(CoreLib PRIVATE
+            ${REPO_ROOT_DIR}/3rdParty/sdbus-cpp/include
+        )
+        target_link_libraries(CoreLib PRIVATE
+            ${SDBUS_CPP_LIB}
             systemd #sdbus-c++ relies on libsystemd, almost all distros should have this
         )
     endif() # end Linux
@@ -503,27 +594,35 @@ else() # macOS and Linux
         message(NOTICE "Compiling with DPP integration disabled")
     endif()
 
-    if (APPLE)
-        set(DISCORD_ZIP "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_mac.zip")
-        set(DISCORD_DIR "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_mac")
-        set(DISCORD_LIB_RELEASE "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_mac/lib/release/libdiscord_partner_sdk.dylib")
+    # Discord's Social SDK does not offer a Linux ARM64 build as of 2026 Sep 5, so we set
+    # CMake option PA_SOCIAL_SDK_DEFAULT to off on ARM64 Linux and on for all other platforms.
+    # For future development, you can still force on/off explicitly on any platform via
+    # -DPA_SOCIAL_SDK=ON/OFF.
+    if (NOT APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm|arm64|aarch64)")
+        set(PA_SOCIAL_SDK_DEFAULT OFF)
     else()
-        set(DISCORD_ZIP "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_linux.zip")
-        set(DISCORD_DIR "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_linux")
-        set(DISCORD_LIB_RELEASE "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_linux/lib/release/libdiscord_partner_sdk.so")
+        set(PA_SOCIAL_SDK_DEFAULT ON)
     endif()
+    option(PA_SOCIAL_SDK "Enable Discord social SDK integration" ${PA_SOCIAL_SDK_DEFAULT})
+    if (PA_SOCIAL_SDK)
+        if (APPLE)
+            set(DISCORD_ZIP "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_mac.zip")
+            set(DISCORD_DIR "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_mac")
+            set(DISCORD_LIB_RELEASE "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_mac/lib/release/libdiscord_partner_sdk.dylib")
+        else()
+            set(DISCORD_ZIP "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_linux.zip")
+            set(DISCORD_DIR "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_linux")
+            set(DISCORD_LIB_RELEASE "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_linux/lib/release/libdiscord_partner_sdk.so")
+        endif()
 
-    if (NOT EXISTS "${DISCORD_DIR}")
-        message(STATUS "Discord SDK not found, extracting from zip...")
-        execute_process(
-            COMMAND ${CMAKE_COMMAND} -E tar xf "${DISCORD_ZIP}"
-            WORKING_DIRECTORY "${REPO_ROOT_DIR}/3rdPartyBinaries"
-        )
+        extract_discord_sdk("${DISCORD_ZIP}" "${DISCORD_DIR}")
+
+        target_compile_definitions(SerialProgramsLib PUBLIC PA_SOCIAL_SDK)
+        target_include_directories(SerialProgramsLib SYSTEM PRIVATE ../3rdParty/discord_social_sdk/)
+        target_link_libraries(SerialProgramsLib PRIVATE ${DISCORD_LIB_RELEASE})
+    else()
+        message(NOTICE "Compiling with Discord social SDK integration disabled")
     endif()
-
-    target_compile_definitions(SerialProgramsLib PUBLIC PA_SOCIAL_SDK)
-    target_include_directories(SerialProgramsLib SYSTEM PRIVATE ../3rdParty/discord_social_sdk/)
-    target_link_libraries(SerialProgramsLib PRIVATE ${DISCORD_LIB_RELEASE})
 
     if(APPLE)
         target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -Wshorten-64-to-32)
@@ -534,8 +633,8 @@ else() # macOS and Linux
         target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -fno-strict-aliasing)
     endif()
 
-    if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
-        # Arm CPU
+    if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^(arm|arm64|aarch64)")
+        # Arm CPU (arm64 on macOS, aarch64 on Linux)
         #   Run-time ISA dispatching
         target_compile_definitions(SerialProgramsLib PRIVATE PA_AutoDispatch_arm64_20_M1)
     else()
@@ -638,6 +737,19 @@ if (WIN32)
     set(DPP_DEBUG_DLL "${REPO_ROOT_DIR}/3rdPartyBinaries/dpp_debug/dpp.dll")
     set(DPP_RELEASE_DLL "${REPO_ROOT_DIR}/3rdPartyBinaries/dpp_release/dpp.dll")
 
+    # Copy QML library dependencies.
+    get_target_property(_qt_widgets_location Qt6::Widgets LOCATION)
+    get_filename_component(_qt_bin_dir "${_qt_widgets_location}" DIRECTORY)
+    set(_qt_qml_source_dir "${_qt_bin_dir}/../qml/QtMultimedia")
+    set(_local_qml_dest_dir "${WIN_DEPLOY_DIR}/qml/QtMultimedia")
+    add_custom_command(
+        TARGET SerialPrograms POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "[Deploy-Local] Auto-copying QML Multimedia modules from ${_qt_qml_source_dir}"
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${_local_qml_dest_dir}"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${_qt_qml_source_dir}" "${_local_qml_dest_dir}"
+        COMMENT "Syncing local dev environment QML bindings..."
+    )
+
     if(QT_DEPLOY_FILES)
         # Run windeployqt if Qt DLLs are missing
         if(WINDEPLOYQT_EXECUTABLE AND NOT EXISTS "${WIN_DEPLOY_DIR}/Qt6Core.dll")
@@ -649,12 +761,13 @@ if (WIN32)
                     $<IF:$<CONFIG:Debug>,--debug,--release>
                     $<TARGET_FILE:SerialPrograms>
             )
-            add_custom_target(run_windeployqt DEPENDS $<TARGET_FILE:SerialPrograms>)
+            add_custom_target(run_windeployqt DEPENDS $<TARGET_FILE:SerialPrograms> COMMENT "Running windeployqt")
         else()
             add_custom_target(run_windeployqt COMMENT "Skipping windeployqt (not found)")
         endif()
     else()
         add_custom_target(run_windeployqt COMMENT "Skipping windeployqt (CI environment)")
+
     endif()
 
     # Copy Discord SDK DLL
@@ -674,14 +787,7 @@ if (WIN32)
         COMMAND cmd /c "if exist \"$<TARGET_PDB_FILE:SerialPrograms>\" ( \"${CMAKE_COMMAND}\" -E rename \"$<TARGET_PDB_FILE:SerialPrograms>\" \"${WIN_DEPLOY_DIR}/$<TARGET_PDB_FILE_NAME:SerialPrograms>\" ) else ( echo [Deploy] PDB file missing: $<TARGET_PDB_FILE:SerialPrograms> )"
     )
 
-    # Extract Discord SDK if missing
-    if (NOT EXISTS "${DISCORD_DIR}")
-        message(STATUS "Discord SDK not found, extracting from zip...")
-        execute_process(
-            COMMAND ${CMAKE_COMMAND} -E tar xf "${DISCORD_ZIP}"
-            WORKING_DIRECTORY "${REPO_ROOT_DIR}/3rdPartyBinaries"
-        )
-    endif()
+    extract_discord_sdk("${DISCORD_ZIP}" "${DISCORD_DIR}")
 
     # Copy dpp dll
     add_custom_command(
@@ -728,9 +834,14 @@ if (WIN32)
     )
 endif() # end WIN32
 
+set_target_properties(SerialPrograms PROPERTIES QT_QML_IMPORT_DEPENDENCIES "QtMultimedia")
+
 if (QT_MAJOR GREATER_EQUAL 6)
     qt_finalize_target(SerialPrograms)
 endif()
 
-# Add command-line executable (GUI-free) from subdirectory
-include(Source/CommandLine/CommandLineExecutable.cmake)
+
+if(COMMAND_LINE_EXE)
+    # Add command-line executable (GUI-free) from subdirectory
+    include(Source/CommandLine/CommandLineExecutable.cmake)
+endif()

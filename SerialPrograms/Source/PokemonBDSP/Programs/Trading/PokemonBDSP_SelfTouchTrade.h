@@ -27,6 +27,7 @@ public:
 
 class SelfTouchTrade : public MultiSwitchProgramInstance{
 public:
+    using Descriptor = SelfTouchTrade_Descriptor;
     SelfTouchTrade();
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 

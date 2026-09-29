@@ -177,7 +177,7 @@ AsyncTask send_all_unsent_reports(Logger& logger, bool allow_prompt);
 //   image: Screenshot to include in the report
 //   stream_history: Video recording session to save (captures video leading up to error)
 //   files: Additional file paths to include in the report
-void report_error(
+void report_error_to_telemetry(
     Logger* logger = nullptr,
     const ProgramInfo& info = ProgramInfo(),
     std::string title = "",

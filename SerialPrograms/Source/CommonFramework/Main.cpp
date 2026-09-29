@@ -8,6 +8,7 @@
 #include "Common/Cpp/Logging/FileLogger.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
 #include "Common/Cpp/Logging/MultiOutputLogger.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Concurrency/Qt6.9ThreadBugWorkaround.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/FireForgetDispatcher.h"
@@ -18,6 +19,7 @@
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Qt/GlobalThreadPoolsQt.h"
 #include "StaticRegistration.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "VideoPipeline/Backends/MediaServicesQt6.h"
 #include "Globals.h"
@@ -40,7 +42,7 @@
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "ControllerInput/ControllerInput.h"
-#include "Controllers/SerialPortPollerQt.h"
+#include "Controllers/SerialPort/SerialPortPollerQt.h"
 #include "Integrations/DiscordWebhook.h"
 #include "Windows/MainWindow.h"
 
@@ -86,12 +88,20 @@ FileLogger& global_file_logger(){
 
 
 int run_program(int argc, char *argv[]){
+//    qputenv("QT_RHI_BACKEND", "opengl");
+
 #if defined(__APPLE__)
-    PokemonAutomation::set_startup_profile(argc, argv);
+    Filesystem::set_startup_profile(argc, argv);
     QApplication application(argc, argv);
 #else
     QApplication application(argc, argv);
 #endif
+
+    {
+        QString bin_dir = QCoreApplication::applicationDirPath();
+        QString qml_import_path = QDir(bin_dir).filePath("qml");
+        qputenv("QML_IMPORT_PATH", qml_import_path.toLocal8Bit());
+    }
 
     GlobalOutputRedirector redirect_stdout(std::cout, "stdout", Color());
     GlobalOutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);
@@ -106,8 +116,8 @@ int run_program(int argc, char *argv[]){
 
     logger.log("================================================================================");
     logger.log("Starting Program...");
-    logger.log("Current path: " + QDir::currentPath().toStdString());
-    logger.log("Executable path: " + qApp->applicationDirPath().toStdString());
+    logger.log("Current path: " + Filesystem::current_path().string_slash_normalized());
+    logger.log("Executable path: " + Filesystem::application_binary_directory().string_slash_normalized());
     logger.log("Program setting folder: " + SETTINGS_PATH());
     logger.log("Program resources folder: " + RESOURCE_PATH());
 
@@ -137,14 +147,6 @@ int run_program(int argc, char *argv[]){
         GlobalMediaServices::instance().stop();
     });
 
-    //  Preload a bunch of stuff now so they are ready later.
-    SerialPortPoller::instance().ports();
-    get_all_cameras();
-
-    //  Force all the Qt thread pools to be constructed now on the main thread.
-    GlobalThreadPools::qt_worker_threadpool();
-    GlobalThreadPools::qt_event_threadpool();
-
     //  Several novice developers struggled to build and run the program due to missing Resources folder.
     //  Add this check to pop a message box when Resources folder is missing.
     if (!check_resource_folder(logger)){
@@ -168,15 +170,19 @@ int run_program(int argc, char *argv[]){
         logger.log(error.message(), COLOR_RED);
     }
 
+    //  Preload a bunch of stuff now so they are ready later.
+    SerialPortPoller::instance().ports();
+    get_all_cameras();
+
+    //  Force all the Qt thread pools to be constructed now on the main thread.
+    GlobalThreadPools::qt_worker_threadpool();
+    GlobalThreadPools::qt_event_threadpool();
+
     for (size_t i = 0; i < argc; i++){
         constexpr const char* force_run_tests = "--command-line-test-mode";
-        constexpr const char* command_line_test_folder = "--command-line-test-folder";
 
         if (strcmp(argv[i], force_run_tests) == 0){
             GlobalSettings::instance().COMMAND_LINE_TEST_MODE = true;
-        }
-        if (strcmp(argv[i], command_line_test_folder) == 0 && (i + 1 < argc)){
-            GlobalSettings::instance().COMMAND_LINE_TEST_FOLDER = argv[i + 1];
         }
     }
 
@@ -218,7 +224,13 @@ int run_program(int argc, char *argv[]){
     w.raise(); // bring the window to front on macOS
     set_permissions(w);
 
-    return application.exec();
+    int ret = application.exec();
+
+    //  Write program settings back to the json file.
+    std::cout << "Saving Settings..." << std::endl;
+    PERSISTENT_SETTINGS().write();
+
+    return ret;
 }
 
 
@@ -232,8 +244,9 @@ int main(int argc, char *argv[]){
     // Qt multimedia, default to gstreamer to prevent flickering
     // Easier than the alternative which is compiling qt6multimedia with QT_DEFAULT_MEDIA_BACKEND
     // See: https://doc.qt.io/qt-6.5/qtmultimedia-index.html
-    if (qEnvironmentVariableIsEmpty("QT_MEDIA_BACKEND"))
+    if (qEnvironmentVariableIsEmpty("QT_MEDIA_BACKEND")){
         qputenv("QT_MEDIA_BACKEND", "gstreamer");
+    }
 #endif
 
     //  So far, this is only needed on Mac where static initialization is fucked up.
@@ -242,10 +255,6 @@ int main(int argc, char *argv[]){
     setup_crash_handler();
 
     int ret = run_program(argc, argv);
-
-
-    //  Write program settings back to the json file.
-    PERSISTENT_SETTINGS().write();
 
 
 #ifdef PA_SOCIAL_SDK

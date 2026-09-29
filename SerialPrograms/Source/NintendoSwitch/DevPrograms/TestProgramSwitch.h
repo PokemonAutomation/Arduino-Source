@@ -20,10 +20,10 @@
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
-#include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
-#include "PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterOption.h"
-#include "PokemonSV/Options/PokemonSV_PlayerList.h"
-#include "PokemonSV/Options/PokemonSV_SinglesAIOption.h"
+#include "VideoGames/PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
+#include "VideoGames/PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterOption.h"
+#include "VideoGames/PokemonSV/Options/PokemonSV_PlayerList.h"
+#include "VideoGames/PokemonSV/Options/PokemonSV_SinglesAIOption.h"
 #include "Common/Cpp/Options/ColorOption.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerSettings.h"
 #include "NintendoSwitch/Options/NintendoSwitch_ModelType.h"
@@ -47,15 +47,13 @@ public:
 
 class TestProgram : public MultiSwitchProgramInstance, public ButtonListener{
 public:
+    using Descriptor = TestProgram_Descriptor;
     ~TestProgram();
     TestProgram();
 
 //    std::unique_ptr<StatsTracker> make_stats() const override{
 //        return std::unique_ptr<StatsTracker>(new StatsTracker());
 //    }
-    virtual void start_program_controller_check(
-        ControllerSession& session, size_t console_index
-    ) override{}
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
     virtual void on_press(ButtonCell& button) override;

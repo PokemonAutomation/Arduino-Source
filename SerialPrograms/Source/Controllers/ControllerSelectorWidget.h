@@ -12,6 +12,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QComboBox>
+#include "Common/Qt/UiStateQtWidget.h"
 #include "ControllerSession.h"
 
 namespace PokemonAutomation{
@@ -19,16 +20,27 @@ namespace PokemonAutomation{
 
 
 
-class ControllerSelectorWidget : public QWidget, private ControllerSession::Listener{
+class ControllerSelectorWidget final
+    : public QWidget
+    , public UiComponentQtWidget
+    , private ControllerSession::Listener
+{
+public:
+    using ParentState = ControllerSession;
+
 public:
     ~ControllerSelectorWidget();
-    ControllerSelectorWidget(QWidget& parent, ControllerSession& session);
+    ControllerSelectorWidget(
+        QWidget& parent,
+        ControllerSession& session
+    );
 
     ControllerSession& session(){
         return m_session;
     }
 
 public:
+    virtual QWidget& widget() override{ return *this; }
     virtual void descriptor_changed(
         const std::shared_ptr<const ControllerDescriptor>& descriptor
     ) override;
@@ -41,7 +53,7 @@ public:
 
 private:
     void update_interface_dropdown(ControllerInterface interface_type);
-    void refresh_selection(ControllerInterface interface_type);
+    void refresh_selection();
     void refresh_controllers(
         ControllerType controller_type,
         const std::vector<ControllerType>& available_controllers
@@ -51,10 +63,10 @@ private:
     void update_buttons();
 
 #if 0
-    virtual void keyPressEvent(QKeyEvent* event) override;
-    virtual void keyReleaseEvent(QKeyEvent* event) override;
     virtual void focusInEvent(QFocusEvent* event) override;
     virtual void focusOutEvent(QFocusEvent* event) override;
+    virtual void keyPressEvent(QKeyEvent* event) override;
+    virtual void keyReleaseEvent(QKeyEvent* event) override;
 #endif
 
 private:

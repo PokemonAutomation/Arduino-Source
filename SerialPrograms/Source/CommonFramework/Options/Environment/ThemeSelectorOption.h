@@ -7,13 +7,13 @@
 #ifndef PokemonAutomation_ThemeSelectorOption_H
 #define PokemonAutomation_ThemeSelectorOption_H
 
-#include "Common/Cpp/Color.h"
+#include "Common/Cpp/ColoredText.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 
 namespace PokemonAutomation{
 
 
-class ThemeSelectorOption : public IntegerEnumDropdownOption{
+class ThemeSelectorOption : public EnumDropdownOption<UiThemeMode>{
 public:
     ThemeSelectorOption();
 
@@ -22,9 +22,6 @@ public:
 };
 
 
-Color theme_friendly_darkblue();
-std::string html_color_text(const std::string& text, Color color);
-std::string make_text_url(const std::string& url, const std::string& text);
 
 
 

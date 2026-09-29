@@ -9,7 +9,7 @@
 #include <QMenuBar>
 #include <QDir>
 #include "Common/Cpp/Logging/LastLogTracker.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "CommonFramework/Windows/WindowTracker.h"

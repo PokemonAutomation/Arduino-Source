@@ -10,7 +10,7 @@
 #include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Options/CheckForUpdatesOption.h"
-#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/Tools/FileDownloader.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"

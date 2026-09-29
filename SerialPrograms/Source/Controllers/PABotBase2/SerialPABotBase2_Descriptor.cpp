@@ -7,7 +7,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Controllers/ControllerTypeStrings.h"
 #ifdef QT_CORE_LIB
-#include "Controllers/SerialPortPollerQt.h"
+#include "Controllers/SerialPort/SerialPortPollerQt.h"
 #endif
 #include "SerialPABotBase2_Connection.h"
 #include "SerialPABotBase2_Descriptor.h"
@@ -44,15 +44,15 @@ std::string SerialPABotBase2_Descriptor::display_name() const{
     }
     return m_name;
 }
+JsonValue SerialPABotBase2_Descriptor::to_json() const{
+    return m_name;
+}
 void SerialPABotBase2_Descriptor::load_json(const JsonValue& json){
     const std::string* name = json.to_string();
     if (name == nullptr || name->empty()){
         return;
     }
     m_name = *name;
-}
-JsonValue SerialPABotBase2_Descriptor::to_json() const{
-    return m_name;
 }
 
 std::unique_ptr<ControllerConnection> SerialPABotBase2_Descriptor::open_connection(Logger& logger) const{

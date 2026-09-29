@@ -9,7 +9,9 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
+#include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -38,7 +40,7 @@ void append_body_fields(JsonArray& fields, const std::vector<std::pair<std::stri
 JsonObject make_credits_field(const ProgramInfo& info){
     JsonObject field;
     field["name"] = "Powered By:";
-    std::string text = PreloadSettings::instance().DEVELOPER_MODE
+    std::string text = STATIC_GLOBALS.DEVELOPER_MODE
         ? PROGRAM_NAME + " CC " + PROGRAM_VERSION + "-dev"
         : PROGRAM_NAME + " CC " + PROGRAM_VERSION + "";
     text += " ([GitHub](" + GITHUB_LINK_URL + ")/[Discord](" + DISCORD_LINK_URL_EMBED + "))";
@@ -369,7 +371,53 @@ void send_program_fatal_error_notification(
     );
 }
 
+void send_program_recoverable_error_notification_and_telemetry_report(
+    ProgramEnvironment& env, 
+    Logger* logger,
+    const ProgramInfo& info,
+    EventNotificationOption& notif_settings,
+    ErrorReportMode error_report_mode,
+    const std::string& message,
+    std::string error_type,
+    const ImageViewRGB32& image,
+    const StreamHistorySession* stream_history
+){
+    send_program_recoverable_error_notification(env, notif_settings, message, image);
+    if (error_report_mode == ErrorReportMode::SEND_ERROR_REPORT){
+        report_error_to_telemetry(
+            logger,
+            info,
+            "Recoverable: " + error_type,
+            {{"Message:", message}},
+            image,
+            stream_history
+        );
+    }
+}
 
+void send_program_fatal_error_notification_and_telemetry_report(
+    ProgramEnvironment& env, 
+    Logger* logger,
+    const ProgramInfo& info,
+    EventNotificationOption& notif_settings,
+    ErrorReportMode error_report_mode,
+    const std::string& message,
+    std::string error_type,
+    const ImageViewRGB32& image,
+    const StreamHistorySession* stream_history
+){
+    send_program_fatal_error_notification(env, notif_settings, message, image);
+    if (error_report_mode == ErrorReportMode::SEND_ERROR_REPORT){
+        report_error_to_telemetry(
+            logger,
+            info,
+            "Fatal: " + error_type,
+            {{"Message:", message}},
+            image,
+            stream_history
+        );
+    }
+}
 
 
 

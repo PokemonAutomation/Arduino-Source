@@ -1,8 +1,12 @@
-#pragma once
-#ifndef DISCORD_SOCIAL_H
-#define DISCORD_SOCIAL_H
+/*  Discord Social
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
 
-#include <thread>
+#ifndef PokemonAutomation_Integrations_DiscordSocial_H
+#define PokemonAutomation_Integrations_DiscordSocial_H
+
 #include <atomic>
 #include <discord_social_sdk/discordpp.h>
 #include "Common/Cpp/Logging/AbstractLogger.h"

@@ -24,6 +24,7 @@ public:
 
 class ActivateMenuGlitch113 : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = ActivateMenuGlitch113_Descriptor;
     ActivateMenuGlitch113();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

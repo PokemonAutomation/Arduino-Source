@@ -7,17 +7,25 @@
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/Globals.h"
+#include "Common/Qt/QtThreadPool_Tests.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "CommonTools/VisualDetectors/BlackBorderDetector.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_CheckOnlineDetector.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_FailedToConnectDetector.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h"
 #include "UnitTestRunner.h"
 
 #include "CommonTools/OCR/OCR_Tests.h"
-#include "PokemonHome/PokemonHome_Tests.h"
-#include "PokemonSwSh/PokemonSwSh_Tests.h"
-#include "PokemonLA/PokemonLA_Tests.h"
-#include "PokemonSV/PokemonSV_Tests.h"
-#include "PokemonLZA/PokemonLZA_Tests.h"
+#include "Kernels/Kernels_Tests.h"
+#include "VideoGames/PokemonFRLG/PokemonFRLG_Tests.h"
+#include "VideoGames/PokemonRSE/PokemonRSE_Tests.h"
+#include "VideoGames/PokemonHome/PokemonHome_Tests.h"
+#include "VideoGames/PokemonSwSh/PokemonSwSh_Tests.h"
+#include "VideoGames/PokemonLA/PokemonLA_Tests.h"
+#include "VideoGames/PokemonSV/PokemonSV_Tests.h"
+#include "VideoGames/PokemonLZA/PokemonLZA_Tests.h"
 
 namespace PokemonAutomation{
 namespace ComputerPrograms{
@@ -30,7 +38,15 @@ namespace ComputerPrograms{
 UnitTestDatabase make_UNIT_TESTS_ALL(){
     UnitTestDatabase ret;
 
+    add_tests_QtEventThreadPool(ret, GlobalThreadPools::computation_normal());
+    add_tests_BlackBorderDetector(ret);
     OCR::add_tests(ret);
+    Kernels::add_tests(ret);
+    NintendoSwitch::add_tests_CheckOnlineDetector(ret);
+    NintendoSwitch::add_tests_FailedToConnectDetector(ret);
+    NintendoSwitch::add_tests_UpdatePopupDetector(ret);
+    NintendoSwitch::PokemonFRLG::add_tests(ret);
+    NintendoSwitch::PokemonRSE::add_tests(ret);
     NintendoSwitch::PokemonHome::add_tests(ret);
     NintendoSwitch::PokemonSwSh::add_tests(ret);
     NintendoSwitch::PokemonLA::add_tests(ret);

@@ -4,8 +4,9 @@
  *
  */
 
-#include "Common/Cpp/Concurrency/ReverseLockGuard.h"
+//#include "Common/Cpp/Concurrency/ReverseLockGuard.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "CommonFramework/ImageTypes/ImageRGB32_Qt.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "SnapshotManager.h"
 
@@ -45,7 +46,9 @@ VideoSnapshot SnapshotManager::convert(QVideoFrame frame, WallClock timestamp) n
     snapshot.timestamp = timestamp;
     try{
         WallClock time0 = current_time();
-        snapshot.frame = std::make_shared<const ImageRGB32>(frame_to_image(frame));
+        snapshot.frame = std::make_shared<const ImageRGB32>(
+            QImage_to_ImageRGB32(frame_to_image(frame))
+        );
         WallClock time1 = current_time();
         WriteSpinLock lg(m_stats_lock);
         m_stats_conversion.report_data(
@@ -113,6 +116,7 @@ bool SnapshotManager::try_dispatch_conversion(uint64_t seqnum, QVideoFrame frame
     }catch (...){}
 
     m_pending_conversions.erase(seqnum);
+    m_cv.notify_all();
 
     return false;
 }
@@ -145,6 +149,7 @@ SnapshotManager::ObjectsToGC SnapshotManager::cleanup(){
         if (iter->second.is_finished()){
             ret.tasks_to_free.emplace_back(std::move(iter->second));
             m_pending_conversions.erase(iter);
+            m_cv.notify_all();
         }else{
             break;
         }

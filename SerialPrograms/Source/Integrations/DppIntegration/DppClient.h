@@ -1,6 +1,11 @@
-#pragma once
-#ifndef DPP_CLIENT_H
-#define DPP_CLIENT_H
+/*  DPP Client
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#ifndef PokemonAutomation_Integrations_DppClient_H
+#define PokemonAutomation_Integrations_DppClient_H
 
 #ifdef PA_DPP
 #include <atomic>

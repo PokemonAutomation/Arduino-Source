@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "SolidColorTest.h"
 
@@ -33,7 +33,7 @@ bool is_black(
 ){
     double average = stats.average.sum();
     double stddev = stats.stddev.sum();
-    if (PreloadSettings::debug().COLOR_CHECK){
+    if (STATIC_GLOBALS.COLOR_CHECK){
         cout << "is_black(): stats.average " << stats.average.to_string() << "(sum " << average << ") stats.stddev " << stats.stddev.to_string()
              << "(sum " << stddev << ") max_rgb_sum " << max_rgb_sum << " max_stddev_sum " << max_stddev_sum << endl;
     }
@@ -72,7 +72,7 @@ bool is_solid(
     double max_stddev_sum
 ){
     const double stddev = stats.stddev.sum();
-    if (PreloadSettings::debug().COLOR_CHECK){
+    if (STATIC_GLOBALS.COLOR_CHECK){
         cout << "is_solid(): stddev sum " << stddev << " vs max " << max_stddev_sum << endl;
     }
     if (stddev > max_stddev_sum){
@@ -83,7 +83,7 @@ bool is_solid(
     const double average = stats.average.sum();
     const FloatPixel actual = stats.average / average;
     const double distance = euclidean_distance(actual, expected_color_ratio);
-    if (PreloadSettings::debug().COLOR_CHECK){
+    if (STATIC_GLOBALS.COLOR_CHECK){
         cout << "is_solid(): average: " << actual.to_string() << " vs "
              << expected_color_ratio.to_string() << ", distance " << distance
              << " vs max " << max_euclidean_distance << endl;

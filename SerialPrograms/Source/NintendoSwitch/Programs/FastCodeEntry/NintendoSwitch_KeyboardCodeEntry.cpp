@@ -82,7 +82,7 @@ void keyboard_enter_code(
         auto iter = MAP.find(ch);
         if (iter == MAP.end()){
             throw_and_log<OperationFailedException>(
-                console, ErrorReport::NO_ERROR_REPORT,
+                console, ErrorReportMode::NO_ERROR_REPORT,
                 "Invalid code character."
             );
         }
@@ -270,7 +270,7 @@ void keyboard_enter_code(
         auto iter = POSITION_MAP.find(ch);
         if (iter == POSITION_MAP.end()){
             throw_and_log<OperationFailedException>(
-                console, ErrorReport::NO_ERROR_REPORT,
+                console, ErrorReportMode::NO_ERROR_REPORT,
                 "Invalid code character."
             );
         }

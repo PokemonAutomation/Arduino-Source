@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -163,8 +163,8 @@ void ensure_at_home(ConsoleHandle& console, ControllerContext& context, size_t r
         console.log("Unable to detect Home. Pressing Home button...", COLOR_RED);
         pbf_press_button(context, BUTTON_HOME, 160ms, 160ms);
     }
-    OperationFailedException::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+    OperationFailedExceptionWithScreenshot::fire(
+        ErrorReportMode::SEND_ERROR_REPORT,
         "Unable to find Switch Home",
         console
     );
@@ -533,8 +533,8 @@ void start_game_from_home_with_inference(
         if (ret == 0){
             console.log("Detected Home screen.");
         }else{
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "start_game_from_home_with_inference(): Failed to detect Home screen after 10 seconds.",
                 console
             );
@@ -557,8 +557,15 @@ void start_game_from_home_with_inference(
         [&](ControllerContext& context){
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
 
-            WallClock deadline = current_time() + std::chrono::minutes(60 * 5);
-            while (current_time() < deadline){
+            WallClock last_online_check = current_time();
+            WallClock master_deadline = current_time() + std::chrono::minutes(60 * 5);
+            while (true){
+                WallClock online_check_deadline = last_online_check + std::chrono::minutes(2);
+                WallClock deadline = std::min(master_deadline, online_check_deadline);
+                if (current_time() > deadline){
+                    break;
+                }
+
                 HomeMenuWatcher home(console, false, COLOR_RED, std::chrono::milliseconds(2000));
                 StartGameUserSelectWatcher user_select(console, COLOR_GREEN);
                 UpdateMenuWatcher update_menu(console, COLOR_PURPLE);
@@ -599,6 +606,7 @@ void start_game_from_home_with_inference(
                 case 3:
                     console.log("Detected check online.", COLOR_BLUE);
                     context.wait_for(std::chrono::seconds(1));
+                    last_online_check = current_time();
                     break;
                 case 4:
                     console.log("Detected failed to connect.", COLOR_BLUE);
@@ -620,9 +628,9 @@ void start_game_from_home_with_inference(
     }
 
     if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "start_game_from_home_with_inference(): Failed to start game after 5 hours.",
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
+            "start_game_from_home_with_inference(): Failed to start game after multiple attempts.",
             console
         );
     }

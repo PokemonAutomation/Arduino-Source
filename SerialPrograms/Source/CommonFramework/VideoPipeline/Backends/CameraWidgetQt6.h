@@ -2,19 +2,18 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
+ *  Intercept video frames and directly paint them to the screen.
+ *  There is no hardware acceleration.
+ *
  */
 
 #ifndef PokemonAutomation_VideoPipeline_Qt6VideoWidget_H
 #define PokemonAutomation_VideoPipeline_Qt6VideoWidget_H
 
-#include <QtGlobal>
-#if QT_VERSION_MAJOR == 6
-
 #include <QWidget>
 #include <QCameraDevice>
 #include <QMediaCaptureSession>
 #include <QVideoFrame>
-#include "Common/Cpp/Concurrency/Mutex.h"
 #include "CommonFramework/Tools/StatAccumulator.h"
 #include "CommonFramework/VideoPipeline/VideoSource.h"
 #include "CommonFramework/VideoPipeline/CameraInfo.h"
@@ -28,25 +27,6 @@ class QVideoSink;
 
 namespace PokemonAutomation{
 namespace CameraQt6QVideoSink{
-
-
-void get_format(
-    const QCameraFormat& qformat,
-    Resolution& resolution,
-    VideoFormat& format,
-    FramesPerSecond& fps
-);
-
-QCameraFormat build_format_set(
-    Logger& logger,
-    VideoFormatSet& format_set,
-    const QCameraDevice& device,
-    Resolution desired_resolution,
-    VideoFormat desired_format,
-    FramesPerSecond desired_fps
-);
-
-
 
 
 class CameraBackend : public PokemonAutomation::CameraBackend{
@@ -67,11 +47,6 @@ public:
         FramesPerSecond fps
     ) const override;
 };
-
-
-
-
-
 
 
 
@@ -128,8 +103,6 @@ private:
     VideoFormat m_format;
     FramesPerSecond m_fps;
 
-    Mutex m_snapshot_lock;
-
     std::unique_ptr<QCameraThread> m_camera;
     std::unique_ptr<QVideoSink> m_video_sink;
     std::unique_ptr<QMediaCaptureSession> m_capture;
@@ -176,5 +149,4 @@ private:
 
 }
 }
-#endif
 #endif

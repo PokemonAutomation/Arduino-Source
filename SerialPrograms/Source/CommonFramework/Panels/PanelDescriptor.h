@@ -9,12 +9,18 @@
 
 #include <memory>
 #include <string>
-#include <vector>
 #include "Common/Cpp/Color.h"
 
 namespace PokemonAutomation{
 
-class PanelInstance;
+class PanelSession;
+
+
+enum class PanelDeprecation{
+    NOT_DEPRECATED,
+    DEPRECATED,
+};
+
 
 // Abstract base class that sets the interface for program descriptors.
 // A program descriptor contains various information (descriptions) of a program panel UI.
@@ -22,33 +28,37 @@ class PanelInstance;
 class PanelDescriptor{
 public:
     PanelDescriptor(
-        Color color,
         std::string identifier,
         std::string category, std::string display_name,
         std::string doc_link,
         std::string description,
-        std::vector<std::string> required_resources = {}
+        Color color,
+        PanelDeprecation deprecation,
+        bool restore_defaults_button
     );
     virtual ~PanelDescriptor() = default;
 
-    Color color() const{ return m_color; }
     const std::string& identifier() const{ return m_identifier; }
     const std::string& category() const{ return m_category; }
     const std::string& display_name() const{ return m_display_name; }
     const std::string& doc_link() const{ return m_doc_link; }
     const std::string& description() const{ return m_description; }
-    const std::vector<std::string>& required_resources() const{ return m_required_resources; }
 
-    virtual std::unique_ptr<PanelInstance> make_panel() const = 0;
+    Color color() const{ return m_color; }
+    PanelDeprecation deprecation() const{ return m_deprecation; }
+    bool restore_defaults_button() const{ return m_restore_defaults_button; }
+
+    virtual std::unique_ptr<PanelSession> make_panel() const = 0;
 
 private:
-    const Color m_color;
     const std::string m_identifier;
     const std::string m_category;
     const std::string m_display_name;
     const std::string m_doc_link;
     const std::string m_description;
-    const std::vector<std::string> m_required_resources;
+    const Color m_color;
+    const PanelDeprecation m_deprecation;
+    const bool m_restore_defaults_button;
 };
 
 

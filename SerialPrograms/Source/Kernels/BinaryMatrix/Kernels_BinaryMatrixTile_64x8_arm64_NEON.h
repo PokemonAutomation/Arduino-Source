@@ -222,13 +222,13 @@ public:
     // The shifted values are first performend a logical OR with the values in `tile` before assigned to `tile`.
     // In this way it the operation does not damage other un-assigned regions on `tile`.
     void copy_to_shift_np(BinaryTile_64x8_arm64_NEON& tile, size_t shift_x, size_t shift_y) const{
-        uint64x2_t shift_x_u64x2 = vdupq_n_u64(shift_x);
+        int64x2_t shift_x_s64x2 = vreinterpretq_s64_u64(vdupq_n_u64(shift_x));
         const uint64_t* src = (const uint64_t*)&vec;
         uint64_t* dest = (uint64_t*)&tile.vec;
         while (shift_y < 7){
             uint64x2_t row_64x2 = vld1q_u64(src + shift_y);
             // left shift
-            row_64x2 = vshlq_u64(row_64x2, shift_x_u64x2);
+            row_64x2 = vshlq_u64(row_64x2, shift_x_s64x2);
             row_64x2 = vorrq_u64(row_64x2, vld1q_u64(dest));
             vst1q_u64(dest, row_64x2);
             dest += 2;
@@ -275,7 +275,7 @@ public:
     // The shifted values are first performend a logical OR with the values in `tile` before assigned to `tile`.
     // In this way it the operation does not damage other un-assigned regions on `tile`.
     void copy_to_shift_nn(BinaryTile_64x8_arm64_NEON& tile, size_t shift_x, size_t shift_y) const{
-        uint64x2_t shift_x_u64x2 = vdupq_n_u64(shift_x);
+        int64x2_t shift_x_s64x2 = vreinterpretq_s64_u64(vdupq_n_u64(shift_x));
         const uint64_t* src = (const uint64_t*)&vec;
         uint64_t* dest = (uint64_t*)&tile.vec;
         if (shift_y & 1){
@@ -286,7 +286,7 @@ public:
         while (shift_y < 8){
             uint64x2_t row_64x2 = vld1q_u64(src);
             // left shift
-            row_64x2 = vshlq_u64(row_64x2, shift_x_u64x2);
+            row_64x2 = vshlq_u64(row_64x2, shift_x_s64x2);
             row_64x2 = vorrq_u64(row_64x2, vld1q_u64(dest + shift_y));
             vst1q_u64((dest + shift_y), row_64x2);
             src += 2;

@@ -4,11 +4,15 @@
  *
  */
 
+#include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "GameConsole/Framework/ConsoleSystemSession.h"
 #include "NintendoSwitch_UpdatePopupDetector.h"
-
 //#include <iostream>
 //using std::cout;
 //using std::endl;
@@ -255,6 +259,41 @@ bool UpdatePopupDetector_Switch2::detect(const ImageViewRGB32& screen){
     }
 
     return true;
+}
+
+
+class Test_UpdatePopupDetector : public UnitTest{
+public:
+    Test_UpdatePopupDetector(const std::string& image, bool expected)
+        : UnitTest("NintendoSwitch::UpdatePopupDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        GameConsole::ConsoleSystemOption option(1);
+        GameConsole::ConsoleSystemSession session(option, false, 0, {});
+        ConsoleHandle console(session);
+
+        UpdatePopupDetector detector(console);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    }
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+
+void add_tests_UpdatePopupDetector(UnitTestDatabase& database){
+    database.add<Test_UpdatePopupDetector>("NintendoSwitch/UpdateMenuDetector/English_1_True.png", true);
+    database.add<Test_UpdatePopupDetector>("NintendoSwitch/UpdateMenuDetector/English_2_True.png", true);
+    database.add<Test_UpdatePopupDetector>("NintendoSwitch/UpdateMenuDetector/English_White_1_True.png", true);
+    database.add<Test_UpdatePopupDetector>("NintendoSwitch/UpdateMenuDetector/English_White_2_True.png", true);
+    database.add<Test_UpdatePopupDetector>("NintendoSwitch/UpdateMenuDetector/German_1_True.jpg", true);
+    database.add<Test_UpdatePopupDetector>("NintendoSwitch/UpdateMenuDetector/German_2_True.png", true);
+    database.add<Test_UpdatePopupDetector>("NintendoSwitch/UpdateMenuDetector/Home_False.png", false);
 }
 
 

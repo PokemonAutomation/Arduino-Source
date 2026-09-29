@@ -9,6 +9,7 @@
 #define PokemonAutomation_ML_YOLOv5Model_H
 
 
+#include <opencv2/core/mat.hpp>
 #include <onnxruntime_cxx_api.h>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 
@@ -43,7 +44,6 @@ private:
 
     std::vector<std::string> m_label_names;
 
-    Ort::Env m_env;
     Ort::Session m_session;
     Ort::MemoryInfo m_memory_info;
     Ort::RunOptions m_run_options;

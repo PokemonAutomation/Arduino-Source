@@ -75,7 +75,7 @@ PA_FORCE_INLINE void scale_brightness_arm64_NEON_four_pixels_per_channel_scale(
         uint32x4_t gb_u32x4 = vsliq_n_u32(b_u32x4, g_u32x4, 8);
         // shift r channels left by 16, then combine with gb channels
         uint32x4_t rgb_u32x4 = vsliq_n_u32(gb_u32x4, r_u32x4, 16);
-        vec_u32x4 = vorrq_s32(a_u32x4, rgb_u32x4);
+        vec_u32x4 = vorrq_u32(a_u32x4, rgb_u32x4);
         vst1q_u32(&image[c], vec_u32x4);
     }
 

@@ -14,14 +14,22 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
+const double STRIPE_TOP = 0.110;
+const double STRIPE_TOP_BELOW_BANNER = 0.170;
+const double STRIPE_BOTTOM = 0.598;
 
-MenuDetector::MenuDetector(Color color)
+static ImageFloatBox menu_stripe(size_t index, bool skip_new_banner){
+    double top = skip_new_banner ? STRIPE_TOP_BELOW_BANNER : STRIPE_TOP;
+    return ImageFloatBox(0.160 + 0.166 * (double)index, top, 0.015, STRIPE_BOTTOM - top);
+}
+
+MenuDetector::MenuDetector(Color color, bool skip_new_banner)
     : m_color(color)
-    , m_line0(0.160 + 0.166 * 0, 0.110, 0.015, 0.488)
-    , m_line1(0.160 + 0.166 * 1, 0.110, 0.015, 0.488)
-    , m_line2(0.160 + 0.166 * 2, 0.110, 0.015, 0.488)
-    , m_line3(0.160 + 0.166 * 3, 0.110, 0.015, 0.488)
-    , m_line4(0.160 + 0.166 * 4, 0.110, 0.015, 0.488)
+    , m_line0(menu_stripe(0, skip_new_banner))
+    , m_line1(menu_stripe(1, skip_new_banner))
+    , m_line2(menu_stripe(2, skip_new_banner))
+    , m_line3(menu_stripe(3, skip_new_banner))
+    , m_line4(menu_stripe(4, skip_new_banner))
     , m_cross(0.20, 0.15, 0.60, 0.37)
 {}
 
@@ -63,8 +71,8 @@ bool MenuDetector::detect(const ImageViewRGB32& screen){
 }
 
 
-MenuWatcher::MenuWatcher(Color color)
-    : MenuDetector(color)
+MenuWatcher::MenuWatcher(Color color, bool skip_new_banner)
+    : MenuDetector(color, skip_new_banner)
     , VisualInferenceCallback("MenuWatcher")
 {}
 void MenuWatcher::make_overlays(VideoOverlaySet& items) const{

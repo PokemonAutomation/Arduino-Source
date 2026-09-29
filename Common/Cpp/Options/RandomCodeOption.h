@@ -44,9 +44,6 @@ public:
     RandomCodeOption(std::string label, size_t total_digits, size_t random_digits, std::string code_string);
 //    virtual std::unique_ptr<ConfigOption> clone() const override;
 
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
-
     const std::string& label() const;
 
     operator RaidCodeOption() const;
@@ -55,8 +52,12 @@ public:
     bool code_enabled() const;
     std::string get_code() const;
 
+
+public:
     virtual std::string check_validity() const override;
     virtual void restore_defaults() override;
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
 
 
 private:

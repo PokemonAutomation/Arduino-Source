@@ -62,7 +62,7 @@ void ProControllerState::load_json(const JsonObject& json){
     {
         std::string buttons_string;
         if (json.read_string(buttons_string, "buttons")){
-            buttons = string_to_button(buttons_string);
+            buttons = string_to_button(buttons_string, " ");
         }
     }
     {

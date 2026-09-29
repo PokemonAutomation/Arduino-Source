@@ -71,12 +71,12 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
     env.update_stats();
 
     //  Connect the controller.
-    env.run_in_parallel(scope, [](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [](ConsoleHandle& console, ProControllerContext& context){
         require_player(console, context, BUTTON_LCLICK);
     });
 
     size_t host_index = HOSTING_SWITCH == HostingSwitch::Switch0 ? 0 : 1;
-    ProControllerContext host(scope, env.consoles[host_index].controller<ProController>());
+    ProControllerContext host(scope, env.console(host_index).controller<ProController>());
 
     //  Swap trade all the boxes.
     for (uint8_t box = 0; box < BOXES_TO_TRADE; box++){

@@ -4,11 +4,10 @@
  *
  */
 
-#include <map>
 #include "Common/Cpp/Color.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
@@ -20,7 +19,6 @@
 #include <iostream>
 using std::cout;
 using std::endl;
-
 
 namespace PokemonAutomation{
 
@@ -39,25 +37,28 @@ std::pair<PackedBinaryMatrix, size_t> remove_center_pixels(
     //  Sort all pixels by distance from center.
     size_t center_x = (size_t)(object.center_of_gravity_x() - object.min_x);
     size_t center_y = (size_t)(object.center_of_gravity_y() - object.min_y);
-    std::map<uint64_t, size_t> distances;
+    std::vector<uint64_t> distances;
+    distances.reserve(object.area);
     for (size_t r = 0; r < height; r++){
         for (size_t c = 0; c < width; c++){
             if (matrix.get(c, r)){
                 size_t dist_x = c - center_x;
                 size_t dist_y = r - center_y;
                 uint64_t distance_sqr = (uint64_t)dist_x*dist_x + (uint64_t)dist_y*dist_y;
-                distances[distance_sqr]++;
+                distances.emplace_back(distance_sqr);
             }
         }
     }
 
+//    cout << "total = " << total << endl;
+
     //  Filter out pixels close to center
     size_t count = 0;
     uint64_t distance_sqr_th = 0;
-    for (auto& item : distances){
-        count += item.second;
+    for (uint64_t item : distances){
+        count++;
         if (count >= num_pixels_to_remove){
-            distance_sqr_th = item.first;
+            distance_sqr_th = item;
             break;
         }
     }
@@ -128,7 +129,7 @@ bool match_template_by_waterfill(
     double rmsd_threshold,
     std::function<bool(WaterfillObject& object)> check_matched_object)
 {
-    const bool debug_mode = PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING;
+    const bool debug_mode = STATIC_GLOBALS.IMAGE_TEMPLATE_MATCHING;
     if (debug_mode){
         cout << "============ match_template_by_waterfill ============" << endl;
         dump_inputs(image, filters, area_thresholds, rmsd_threshold);

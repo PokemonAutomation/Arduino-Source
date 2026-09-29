@@ -123,15 +123,6 @@ std::string SimpleIntegerCellBase::set(NativeType x){
     }
     return std::string();
 }
-void SimpleIntegerCellBase::load_json(const JsonValue& json){
-    NativeType value;
-    if (json.read_integer(value, m_data->m_min_value, m_data->m_max_value)){
-        set(value);
-    }
-}
-JsonValue SimpleIntegerCellBase::to_json() const{
-    return current_value();
-}
 
 std::string SimpleIntegerCellBase::check_validity(NativeType x) const{
     if (x < m_data->m_min_value){
@@ -147,6 +138,15 @@ std::string SimpleIntegerCellBase::check_validity() const{
 }
 void SimpleIntegerCellBase::restore_defaults(){
     set(m_data->m_default);
+}
+void SimpleIntegerCellBase::load_json(const JsonValue& json){
+    NativeType value;
+    if (json.read_integer(value, m_data->m_min_value, m_data->m_max_value)){
+        set(value);
+    }
+}
+JsonValue SimpleIntegerCellBase::to_json() const{
+    return current_value();
 }
 
 

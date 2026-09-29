@@ -18,11 +18,20 @@ namespace PokemonAutomation{
 //  Rule of 5
 
 template <typename Object>
-FixedLimitVector<Object>::~FixedLimitVector(){
-    while (m_size > 0){
-        pop_back();
+FixedLimitVector<Object>::FixedLimitVector(const FixedLimitVector& x)
+    : FixedLimitVector(x.capacity())
+{
+    for (const Object& obj : x){
+        emplace_back(obj);
     }
-    aligned_free(m_data);
+}
+template <typename Object>
+void FixedLimitVector<Object>::operator=(const FixedLimitVector& x){
+    if (this == &x){
+        return;
+    }
+    FixedLimitVector tmp(x);
+    operator=(std::move(tmp));
 }
 
 
@@ -77,10 +86,6 @@ bool FixedLimitVector<Object>::emplace_back(Args&&... args){
     }else{
         return false;
     }
-}
-template <typename Object>
-void FixedLimitVector<Object>::pop_back(){
-    m_data[--m_size].~Object();
 }
 
 

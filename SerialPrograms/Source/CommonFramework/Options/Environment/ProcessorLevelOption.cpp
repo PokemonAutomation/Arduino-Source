@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
+#include "Common/Cpp/CpuId/CpuId.h"
 #include "Common/Cpp/Hardware/Hardware.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "ProcessorLevelOption.h"
@@ -45,6 +46,12 @@ bool ProcessorLevelOption::set_value(size_t value){
     set_global(value);
     return true;
 }
+JsonValue ProcessorLevelOption::to_json() const{
+    JsonObject obj;
+    obj["Level"] = IntegerEnumDropdownOption::to_json();
+    obj["ProcessorString"] = get_processor_name();
+    return obj;
+}
 void ProcessorLevelOption::load_json(const JsonValue& json){
     const JsonObject* obj = json.to_object();
     if (obj == nullptr){
@@ -69,12 +76,6 @@ void ProcessorLevelOption::load_json(const JsonValue& json){
     }else{
         global_logger_tagged().log("Mismatched processor string. Will not load saved processor level.", COLOR_RED);
     }
-}
-JsonValue ProcessorLevelOption::to_json() const{
-    JsonObject obj;
-    obj["Level"] = IntegerEnumDropdownOption::to_json();
-    obj["ProcessorString"] = get_processor_name();
-    return obj;
 }
 void ProcessorLevelOption::set_global(){
     set_global(current_value());

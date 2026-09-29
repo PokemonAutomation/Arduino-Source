@@ -8,24 +8,24 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include "Common/Qt/NoWheelComboBox.h"
-#include "CommonFramework/Globals.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/PersistentSettings.h"
+#include "CommonFramework/ImageTypes/ImageRGB32_Qt.h"
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "CommonFramework/Panels/UI/PanelListWidget.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "ML/ML_Panels.h"
 #include "NintendoSwitch/NintendoSwitch_Panels.h"
-#include "PokemonSwSh/PokemonSwSh_Panels.h"
-#include "PokemonHome/PokemonHome_Panels.h"
+#include "VideoGames/PokemonSwSh/PokemonSwSh_Panels.h"
+#include "VideoGames/PokemonHome/PokemonHome_Panels.h"
 #include "PokemonBDSP/PokemonBDSP_Panels.h"
-#include "PokemonFRLG/PokemonFRLG_Panels.h"
-#include "PokemonLA/PokemonLA_Panels.h"
-#include "PokemonLGPE/PokemonLGPE_Panels.h"
-#include "PokemonRSE/PokemonRSE_Panels.h"
-#include "PokemonSV/PokemonSV_Panels.h"
-#include "PokemonLZA/PokemonLZA_Panels.h"
-#include "PokemonPokopia/PokemonPokopia_Panels.h"
-#include "ZeldaTotK/ZeldaTotK_Panels.h"
+#include "VideoGames/PokemonFRLG/PokemonFRLG_Panels.h"
+#include "VideoGames/PokemonLA/PokemonLA_Panels.h"
+#include "VideoGames/PokemonLGPE/PokemonLGPE_Panels.h"
+#include "VideoGames/PokemonRSE/PokemonRSE_Panels.h"
+#include "VideoGames/PokemonSV/PokemonSV_Panels.h"
+#include "VideoGames/PokemonLZA/PokemonLZA_Panels.h"
+#include "VideoGames/PokemonPokopia/PokemonPokopia_Panels.h"
+#include "VideoGames/ZeldaTotK/ZeldaTotK_Panels.h"
 #include "PanelLists.h"
 
 //#include <iostream>
@@ -37,10 +37,11 @@ namespace PokemonAutomation{
 
 
 ProgramSelect::ProgramSelect(QWidget& parent, PanelHolder& holder)
-    : QGroupBox("Program Select", &parent)
+    : QWidget(&parent)
     , m_holder(holder)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->setAlignment(Qt::AlignTop);
     m_dropdown = new NoWheelCompactComboBox(this);
     m_dropdown->setMaxVisibleItems(20);
@@ -66,17 +67,16 @@ ProgramSelect::ProgramSelect(QWidget& parent, PanelHolder& holder)
     add(std::make_unique<NintendoSwitch::PokemonBDSP::PanelListFactory>());
     add(std::make_unique<NintendoSwitch::PokemonLA::PanelListFactory>());
     add(std::make_unique<NintendoSwitch::PokemonSV::PanelListFactory>());
-
     add(std::make_unique<NintendoSwitch::PokemonLZA::PanelListFactory>());
     add(std::make_unique<NintendoSwitch::PokemonFRLG::PanelListFactory>());
     add(std::make_unique<NintendoSwitch::PokemonPokopia::PanelListFactory>());
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         add(std::make_unique<NintendoSwitch::PokemonRSE::PanelListFactory>());
     }
 
     add(std::make_unique<NintendoSwitch::ZeldaTotK::PanelListFactory>());
 
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
         add(std::make_unique<ML::PanelListFactory>());
     }
 
@@ -109,7 +109,7 @@ void ProgramSelect::add(std::unique_ptr<PanelListDescriptor> list){
     const ImageViewRGB32& icon = list->icon();
     if (icon){
         m_dropdown->addItem(
-            QIcon(QPixmap::fromImage(icon.to_QImage_ref())),
+            QIcon(QPixmap::fromImage(to_QImage_ref(icon))),
             QString::fromStdString(list->name())
         );
     }else{
@@ -166,7 +166,7 @@ void ProgramSelect::change_list(int index){
 }
 
 QSize ProgramSelect::sizeHint() const{
-    QSize size = QGroupBox::sizeHint();
+    QSize size = QWidget::sizeHint();
 //    cout << size.width() << " x " << size.height() << endl;
 //    cout << this->size().width() << " x " << this->size().height() << endl;
     size.setWidth(scale_dpi_width(size.width() + 10));

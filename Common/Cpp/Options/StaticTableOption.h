@@ -26,13 +26,14 @@ public:
 
     const std::string& slug() const{ return m_slug; }
 
-    virtual void load_json(const JsonValue& json);
-    virtual JsonValue to_json() const;
+    void report_program_state(bool program_is_running);
 
+
+public:
     virtual std::string check_validity() const;
     virtual void restore_defaults();
-
-    void report_program_state(bool program_is_running);
+    virtual JsonValue to_json() const;
+    virtual void load_json(const JsonValue& json);
 
 
 protected:

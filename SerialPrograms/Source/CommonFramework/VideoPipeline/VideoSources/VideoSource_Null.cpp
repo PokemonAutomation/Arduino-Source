@@ -17,11 +17,11 @@ std::string VideoSourceDescriptor_Null::display_name() const{
     return "(none)";
 }
 
-void VideoSourceDescriptor_Null::load_json(const JsonValue& json){
-
-}
 JsonValue VideoSourceDescriptor_Null::to_json() const{
     return JsonValue();
+}
+void VideoSourceDescriptor_Null::load_json(const JsonValue& json){
+
 }
 
 std::unique_ptr<VideoSource> VideoSourceDescriptor_Null::make_VideoSource(
