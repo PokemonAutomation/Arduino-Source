@@ -5,7 +5,9 @@
  */
 
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "PokemonSwSh_MainMenuDetector.h"
 
 //#include <iostream>
@@ -79,13 +81,13 @@ bool PartyMenuDetector::detect(const ImageViewRGB32& screen){
 
     ImageStats top_dark_red = image_stats(extract_box_reference(screen, m_top_dark_red));
 //    cout << top_dark_red.average << top_dark_red.stddev << endl;
-    if (!is_solid(top_dark_red, {0.681818, 0.136364, 0.181818}, 0.20)){
+    if (!is_solid(top_dark_red, {0.681818, 0.136364, 0.181818}, 0.25)){
         return false;
     }
 
     ImageStats bottom_dark_red = image_stats(extract_box_reference(screen, m_bottom_dark_red));
 //    cout << bottom_dark_red.average << bottom_dark_red.stddev << endl;
-    if (!is_solid(bottom_dark_red, {0.681818, 0.136364, 0.181818}, 0.20)){
+    if (!is_solid(bottom_dark_red, {0.681818, 0.136364, 0.181818}, 0.25)){
         return false;
     }
 
@@ -101,6 +103,34 @@ bool PartyMenuDetector::detect(const ImageViewRGB32& screen){
 
     return true;
 }
+
+class Test_PartyMenuDetector : public UnitTest{
+public:
+    Test_PartyMenuDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonSwSh::PartyMenuDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        ImageRGB32 image(m_image);
+        PartyMenuDetector detector;
+
+        return m_expected == detector.detect(image);
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+void add_tests_PartyMenuDetector(UnitTestDatabase& database){
+    database.add<Test_PartyMenuDetector>("PokemonSwSh/PartyMenuDetector/party-menu-1.png", true);
+}
+
 
 
 BoxMenuDetector::BoxMenuDetector(Color color)

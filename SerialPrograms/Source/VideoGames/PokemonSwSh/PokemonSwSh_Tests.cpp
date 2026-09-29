@@ -9,6 +9,7 @@
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.h"
+#include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_MainMenuDetector.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "VideoGames/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
@@ -25,6 +26,7 @@ void add_tests(UnitTestDatabase& database){
     NintendoSwitch::PokemonSwSh::add_tests_DialogTriangleDetector(database);
     NintendoSwitch::PokemonSwSh::add_tests_BoxGenderDetector(database);
     NintendoSwitch::PokemonSwSh::add_tests_BoxShinySymbolDetector(database);
+    NintendoSwitch::PokemonSwSh::add_tests_PartyMenuDetector(database);
     NintendoSwitch::PokemonSwSh::add_tests_YCommDetector(database);
     NintendoSwitch::PokemonSwSh::add_tests_SelectionArrowFinder(database);
     NintendoSwitch::PokemonSwSh::MaxLairInternal::add_tests_MaxLairBattleMenuDetector(database);

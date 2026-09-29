@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_MainMenuDetector_H
 
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/VisualDetector.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
@@ -84,7 +85,7 @@ public:
 };
 
 
-
+void add_tests_PartyMenuDetector(UnitTestDatabase& database);
 
 
 
