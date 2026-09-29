@@ -28,6 +28,7 @@ public:
 
 class MenuStabilityTester : public SingleSwitchProgramInstance, private ConfigOption::Listener{
 public:
+    using Descriptor = MenuStabilityTester_Descriptor;
     ~MenuStabilityTester();
     MenuStabilityTester();
 

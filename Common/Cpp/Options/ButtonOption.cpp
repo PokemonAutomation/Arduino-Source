@@ -119,10 +119,6 @@ void ButtonCell::press_button(){
     }
 }
 
-//void ButtonCell::restore_defaults(){
-//    *this = m_data->m_default;
-//}
-
 
 
 

@@ -144,8 +144,7 @@ public:
 
     PA_FORCE_INLINE WriteSpinLock(
         SpinLockMRSW& lock,
-        const char* label = "(unnamed lock)",
-        bool try_acquire = false
+        const char* label = "(unnamed lock)"
     )
         : m_lock(lock)
     {

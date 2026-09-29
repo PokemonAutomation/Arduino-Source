@@ -18,13 +18,30 @@ namespace cv{
 }
 
 namespace PokemonAutomation{
+
+class Logger;
+
 namespace ML{
 
 
 // Compute embeddings for all images in a folder. Only support .png, .jpg and .jpeg filename extensions so far.
-// This can be very slow!
-// It skips existing embedding files.
-void compute_embeddings_for_folder(const std::string& embedding_model_path, const std::string& image_folder_path, bool use_gpu_for_embedder_session);
+// This can be very slow! It skips existing embedding files ("<image_path>.embedding").
+// Called by the Label Images program when the user presses the "Compute Embeddings" button.
+// How it works:
+// 1. Run the embedder serially until the first image succeeds. If inference fails on the GPU,
+//    rebuild the session on the CPU and retry. This makes sure the shared session works.
+// 2. Compute the rest of the images in parallel on `GlobalThreadPools::computation_normal()`,
+//    all sharing that one session.
+// Model-level errors (missing model files, session creation failure) are shown in a QMessageBox,
+// so this must be called from the UI thread. Per-image errors (not an image, unsupported color
+// channels, inference failure) are collected and logged to `logger` at the end.
+// This function blocks until all embeddings are computed.
+void compute_embeddings_for_folder(
+    Logger& logger,
+    const std::string& embedding_model_path,
+    const std::string& image_folder_path,
+    bool use_gpu_for_embedder_session
+);
 
 
 class SAMEmbedderSession{
@@ -35,7 +52,9 @@ public:
     // Given an image of shape SAM_EMBEDDER_INPUT_IMAGE_WIDTH x SAM_EMBEDDER_INPUT_IMAGE_HEIGHT, RGB channel order,
     // compute its image embedding as a vector<float> of size [SAM_EMBEDDER_OUTPUT_SIZE]
     // it has shape [1, SAM_EMBEDDER_OUTPUT_N_CHANNELS, SAM_EMBEDDER_OUTPUT_IMAGE_SIZE, SAM_EMBEDDER_OUTPUT_IMAGE_SIZE]
-    void run(cv::Mat& input_image, std::vector<float>& output_image_embedding);
+    // Thread-safe: multiple threads can call `run()` on the same session concurrently.
+    // Throws `Ort::Exception` if inference fails.
+    void run(const cv::Mat& input_image, std::vector<float>& output_image_embedding);
     
 private:
     Ort::Session session;
@@ -45,8 +64,6 @@ private:
 
     const std::array<int64_t, 4> input_shape;
     const std::array<int64_t, 4> output_shape;
-
-    std::vector<uint8_t> model_input;
 };
 
 // Run Segment Anything Model in an ONNX session.

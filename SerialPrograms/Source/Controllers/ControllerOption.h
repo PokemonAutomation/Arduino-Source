@@ -21,6 +21,8 @@ class ControllerOption{
 public:
     ControllerOption(bool default_enable_mode);
 
+    void set_interface(ControllerInterface interface_type);
+
     std::shared_ptr<ControllerDescriptor> descriptor() const{
         return m_descriptor;
     }

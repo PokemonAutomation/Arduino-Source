@@ -15,42 +15,26 @@
 #ifndef PokemonAutomation_NintendoSwitch_SingleSwitchProgramSession_H
 #define PokemonAutomation_NintendoSwitch_SingleSwitchProgramSession_H
 
-#include "CommonFramework/ProgramSession.h"
-#include "NintendoSwitch_SwitchSystemSession.h"
+#include "GameConsole/Framework/ConsoleProgramSession.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
-class SingleSwitchProgramOption;
 
 
-class SingleSwitchProgramSession final : public ProgramSession{
+class SingleSwitchProgramSession final : public GameConsole::ConsoleProgramSession{
 public:
-    bool try_shutdown();
     ~SingleSwitchProgramSession();
-    SingleSwitchProgramSession(SingleSwitchProgramOption& option, size_t console_number);
+    SingleSwitchProgramSession(const SingleSwitchProgramDescriptor& descriptor);
 
-    void restore_defaults();
-
-public:
-    SwitchSystemSession& system(){ return m_system; }
+    const SingleSwitchProgramDescriptor& descriptor() const{ return m_descriptor; }
 
 private:
-    virtual std::string check_validity() const override;
-
-    virtual void internal_run_program() override;
-    virtual void internal_stop_program() override;
-
+    virtual std::unique_ptr<ProgramEnvironment> make_env(const ProgramInfo& program_info) override;
 
 private:
-    void run_program_instance(SingleSwitchProgramEnvironment& env, CancellableScope& scope);
-
-private:
-    SingleSwitchProgramOption& m_option;
-    SwitchSystemSession m_system;
-
-    std::atomic<CancellableScope*> m_scope;
+    const SingleSwitchProgramDescriptor& m_descriptor;
 };
 
 

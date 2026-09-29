@@ -9,11 +9,9 @@
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/Recording/StreamHistorySession.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
-#include "Tests/TestUtils.h"
-#include "Controllers/NullController.h"
+#include "GameConsole/Framework/ConsoleSystemSession.h"
 #include "NintendoSwitch_UpdatePopupDetector.h"
 //#include <iostream>
 //using std::cout;
@@ -273,12 +271,9 @@ public:
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        NullController controller(logger);
-        DummyVideoFeed video_feed;
-        DummyVideoOverlay video_overlay;
-        DummyAudioFeed audio_feed;
-        StreamHistorySession history(logger);
-        ConsoleHandle console(0, logger, controller, video_feed, video_overlay, audio_feed, history);
+        GameConsole::ConsoleSystemOption option(1);
+        GameConsole::ConsoleSystemSession session(option, false, 0, {});
+        ConsoleHandle console(session);
 
         UpdatePopupDetector detector(console);
         ImageRGB32 image(m_image);

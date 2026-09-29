@@ -15,6 +15,6 @@ target_link_libraries(SerialProgramsCommandLine PRIVATE CoreLib)
 # Ensure SerialProgramsCommandLine rebuilds when SerialProgramsLib is updated
 add_dependencies(SerialProgramsCommandLine CoreLib)
 
-# Apply common target properties (includes, compile flags, etc.)
-# This function is defined in the parent CMakeLists.txt
-apply_common_target_properties(SerialProgramsCommandLine NO_GUI)
+# Apply common GUI-free target properties (includes, compile flags, etc.)
+# This function is defined in cmake/CoreLib.cmake
+pa_apply_gui_free_target_properties(SerialProgramsCommandLine)

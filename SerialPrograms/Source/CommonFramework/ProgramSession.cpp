@@ -9,17 +9,49 @@
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Tools/GlobalThreadPools.h"
-#include "CommonFramework/Panels/ProgramDescriptor.h"
+#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Exceptions/FatalProgramException.h"
+#include "CommonFramework/Exceptions/ProgramFinishedException.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
+#include "CommonFramework/Options/Environment/SleepSuppressOption.h"
 #include "CommonFramework/ProgramSession.h"
 #include "CommonFramework/ProgramStats/StatsDatabase.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Notifications/ProgramInfo.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Panels/ProgramDescriptor.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/ResourceDownload/ProgramMissingResourceTracker.h"
 #include "CommonFramework/ResourceDownload/GlobalResourceDownloadManager.h"
 #include "CommonFramework/ResourceDownload/ResourceDownloadHelpers.h"
 #include "Integrations/ProgramTracker.h"
 
 namespace PokemonAutomation{
+
+
+
+ProgramSession::RunningProgramScope::RunningProgramScope(ProgramSession& session)
+    : m_session(session)
+{
+    std::lock_guard<Mutex> lg(session.m_lock);
+    if (session.m_scope != nullptr){
+        throw InternalProgramError(
+            &session.m_logger,
+            PA_CURRENT_FUNCTION,
+            "Program is already running."
+        );
+    }
+    session.m_scope = &m_scope;
+}
+ProgramSession::RunningProgramScope::~RunningProgramScope(){
+    {
+        std::lock_guard<Mutex> lg(m_session.m_lock);
+        m_session.m_scope = nullptr;
+    }
+    m_session.m_cv.notify_all();
+}
+
+
 
 
 
@@ -37,10 +69,16 @@ ProgramSession::ProgramSession(const ProgramDescriptor& descriptor)
     , m_instance_id(ProgramTracker::instance().add_program(*this))
 //    , m_logger(global_logger_raw(), "Program:" + std::to_string(m_instance_id))
     , m_logger(global_logger_raw(), "Program")
-    , m_timestamp(current_time())
+    , m_last_state_change(current_time())
     , m_state(ProgramState::STOPPED)
+    , m_scope(nullptr)
 {
     load_historical_stats();
+    try{
+        validate_resource_list();
+    }catch (FileException& e){
+        e.log(global_logger_tagged());
+    }
 }
 ProgramSession::~ProgramSession(){
     ProgramTracker::instance().remove_program(m_instance_id);
@@ -71,8 +109,18 @@ std::string ProgramSession::historical_stats() const{
     }
     return "";
 }
-WallClock ProgramSession::timestamp() const{
-    return m_timestamp.load(std::memory_order_relaxed);
+WallClock ProgramSession::last_state_change() const{
+    return m_last_state_change.load(std::memory_order_relaxed);
+}
+
+void ProgramSession::internal_stop_program(){
+    {
+        std::lock_guard<Mutex> lg(program_lock());
+        if (m_scope != nullptr){
+            m_scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
+        }
+    }
+    wait_for_finish();
 }
 
 
@@ -85,16 +133,27 @@ void ProgramSession::report_error(const std::string& message){
     push_error(message);
 }
 
+
+void ProgramSession::validate_resource_list(){
+    const std::unordered_set<std::string>& master_list = all_resource_names();
+    for (const std::string& resource_string : m_descriptor.required_resources()){
+        if (!master_list.contains(resource_string)){
+            throw InternalProgramError(
+                nullptr,
+                PA_CURRENT_FUNCTION,
+                "validate_resource_list(): Invalid resource in descriptor."
+            );
+        }
+    }
+}
 void ProgramSession::report_download_error(const std::string& message){
     std::lock_guard<Mutex> lg(m_lock);
     push_download_error(message);
 }
-
 void ProgramSession::report_download_added(std::shared_ptr<ResourceDownload> download_ptr){
     // std::lock_guard<Mutex> lg(m_lock);
     m_listeners.run_method(&Listener::download_added, std::move(download_ptr));
 }
-
 void ProgramSession::report_all_downloads_done(){
     m_listeners.run_method(&Listener::all_downloads_done);
 }
@@ -190,7 +249,7 @@ std::string ProgramSession::start_program(){
 
         //  Now start the program.
         m_logger.log("Starting program...");
-        m_timestamp.store(current_time(), std::memory_order_relaxed);
+        m_last_state_change.store(current_time(), std::memory_order_relaxed);
         set_state(ProgramState::RUNNING);
         m_program_thread = GlobalThreadPools::unlimited_realtime().dispatch_now_blocking(
             [this]{
@@ -254,19 +313,138 @@ std::string ProgramSession::stop_program(){
         }
     }
     internal_stop_program();
+    m_last_state_change.store(current_time(), std::memory_order_relaxed);
     return "";
 }
 
 
 
 void ProgramSession::run_program(){
+    SleepSuppressScope sleep_scope(GlobalSettings::instance().SLEEP_SUPPRESS->PROGRAM_RUNNING);
+
     {
         std::lock_guard<Mutex> lg(m_lock);
+        if (current_state() != ProgramState::RUNNING){
+            return;
+        }
+
+        std::string error = check_validity();
+        if (!error.empty()){
+            throw UserSetupError(logger(), std::move(error));
+        }
+
         m_current_stats = m_descriptor.make_stats();
         load_historical_stats();
         push_stats();
     }
-    internal_run_program();
+
+    m_instance->options().reset_state();
+
+    ProgramInfo program_info(
+        identifier(),
+        m_descriptor.category(),
+        m_descriptor.display_name(),
+        last_state_change()
+    );
+
+    {
+        RunningProgramScope running_scope(*this);
+        if (!download_prereqs(*m_scope)){
+            return;
+        }
+        std::unique_ptr<ProgramEnvironment> env = make_env(program_info);
+        try{
+            logger().log("<b>Starting Program: " + identifier() + "</b>");
+            env->log_to_ui("- Starting Program -");
+            m_instance->run_start_program_checks(m_descriptor, *env);
+            internal_run_program(*env);
+            env->log_to_ui("- Program Finished -");
+            logger().log("Program finished normally!", COLOR_BLUE);
+        }catch (OperationCancelledException&){
+            env->log_to_ui("- Program Stopped -");
+        }catch (ProgramCancelledException&){
+            env->log_to_ui("- Program Stopped -");
+        }catch (ProgramFinishedException& e){
+            logger().log("Program finished early!", COLOR_BLUE);
+            env->log_to_ui("- Program Finished -");
+            send_program_finished_notification(
+                *env, m_instance->NOTIFICATION_PROGRAM_FINISH,
+                e.message(),
+                *e.screenshot()
+            );
+        }catch (InvalidConnectionStateException& e){
+            logger().log("Program stopped due to connection issue.", COLOR_RED);
+            env->log_to_ui("- Invalid Connection -", COLOR_RED);
+            std::string message = e.message();
+            if (message.empty()){
+                message = e.name();
+            }
+            report_error(message);
+        }catch (FatalProgramException& e){
+            logger().log("Program stopped with an exception!", COLOR_RED);
+            env->log_to_ui("- Program Error -", COLOR_RED);
+
+            std::string message = e.message();
+            if (message.empty()){
+                message = e.name();
+            }
+            report_error(message);
+            e.send_fatal_error_notif_and_telemetry_report(*env, m_instance->NOTIFICATION_ERROR_FATAL);
+        }catch (OperationFailedExceptionWithScreenshot& e){
+            logger().log("Program stopped with an exception!", COLOR_RED);
+            env->log_to_ui("- Program Error -", COLOR_RED);
+
+            std::string message = e.message();
+            if (message.empty()){
+                message = e.name();
+            }
+            report_error(message);
+            e.send_fatal_error_notif_and_telemetry_report(*env, m_instance->NOTIFICATION_ERROR_FATAL);
+        }catch (OperationFailedException& e){ // no screenshot
+            logger().log("Program stopped with an exception!", COLOR_RED);
+            env->log_to_ui("- Program Error -", COLOR_RED);
+
+            std::string message = e.message();
+            if (message.empty()){
+                message = e.name();
+            }
+            report_error(message);
+            e.send_fatal_error_notif_and_telemetry_report(*env, m_instance->NOTIFICATION_ERROR_FATAL);
+        }catch (Exception& e){
+            logger().log("Program stopped with an exception!", COLOR_RED);
+            env->log_to_ui("- Program Error -", COLOR_RED);
+            std::string message = e.message();
+            if (message.empty()){
+                message = e.name();
+            }
+            report_error(message);
+            send_program_fatal_error_notification(
+                *env, m_instance->NOTIFICATION_ERROR_FATAL,
+                message
+            );
+        }catch (std::exception& e){
+            logger().log("Program stopped with an exception!", COLOR_RED);
+            env->log_to_ui("- Program Error -", COLOR_RED);
+            std::string message = e.what();
+            if (message.empty()){
+                message = "Unknown std::exception.";
+            }
+            report_error(message);
+            send_program_fatal_error_notification(
+                *env, m_instance->NOTIFICATION_ERROR_FATAL,
+                message
+            );
+        }catch (...){
+            logger().log("Program stopped with an exception!", COLOR_RED);
+            env->log_to_ui("- Unknown Error -", COLOR_RED);
+            report_error("Unknown error.");
+            send_program_fatal_error_notification(
+                *env, m_instance->NOTIFICATION_ERROR_FATAL,
+                "Unknown error."
+            );
+        }
+    }
+
     {
         std::lock_guard<Mutex> lg(m_lock);
         push_stats();
@@ -329,9 +507,7 @@ RequiredResourceResult ProgramSession::find_missing_resources(){
 
 
 bool ProgramSession::download_prereqs(CancellableScope& scope){
-
     try{
-
         auto [missing_resources, requires_upgrade] = find_missing_resources();
 
         if (requires_upgrade){ 
@@ -377,8 +553,6 @@ bool ProgramSession::download_prereqs(CancellableScope& scope){
         report_all_downloads_done();
 
         return success;
-   
-            
     }catch(OperationFailedException& e){
         report_error(e.message());
     }catch(InternalProgramError& e){

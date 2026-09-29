@@ -72,12 +72,12 @@ bool is_safe(const std::string& target_dir, const std::string& entry_name){
     try {
         // 1. Get absolute, normalized paths
         // handles symlinks. and resolves .. and . components. throws error if path doesn't exist
-        Filesystem::Path base = fs::canonical(Filesystem::Path(target_dir));
+        Filesystem::Path base = fs::absolute(Filesystem::Path(target_dir)).lexically_normal();
         // confirms that base is a directory, and not a file
         if (!fs::is_directory(base)) return false;
         
         // resolves .. and . components and returns an absolute path without requiring the final path to exist.
-        fs::path target = fs::weakly_canonical(Filesystem::Path(base / Filesystem::Path(entry_name)));
+        fs::path target = fs::absolute(Filesystem::Path(base / Filesystem::Path(entry_name))).lexically_normal();
 
         // cout << base << endl;
         // cout << target << endl;

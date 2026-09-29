@@ -1,0 +1,116 @@
+/*  Console System (Qt Widget)
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#include <QKeyEvent>
+#include <QVBoxLayout>
+#include "CommandRowWidget.h"
+#include "ConsoleSystemWidget.h"
+
+namespace PokemonAutomation{
+
+template class RegisterUiStateQtWidget<GameConsole::ConsoleSystemWidget>;
+
+namespace GameConsole{
+
+
+
+ConsoleSystemWidget::~ConsoleSystemWidget(){
+    //  We must delete the video early because it holds a reference to the
+    //  layout that it resides in. If the layout is destructed first, the
+    //  video's destructor will crash.
+    delete m_video_display;
+}
+
+ConsoleSystemWidget::ConsoleSystemWidget(
+    QWidget& parent,
+    ConsoleSystemSession& session
+)
+    : QWidget(&parent)
+    , m_session(session)
+{
+    setFocusPolicy(Qt::StrongFocus);
+
+    QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setAlignment(Qt::AlignTop);
+
+    m_group_box = new CollapsibleGroupBox(*this, "Console " + QString::number(m_session.console_number()) + " Settings");
+    layout->addWidget(m_group_box);
+
+    {
+        m_audio_display = new AudioDisplayWidget(*this, m_session.logger(), m_session.audio());
+        layout->addWidget(m_audio_display);
+
+        QVBoxLayout* video_holder = new QVBoxLayout();
+        layout->addLayout(video_holder);
+        video_holder->setContentsMargins(0, 0, 0, 0);
+
+        m_video_display = new VideoDisplayWidget(
+            *this, *video_holder,
+            m_session.console_number(),
+            m_session.video(),
+            m_session.overlay()
+        );
+        video_holder->addWidget(m_video_display);
+    }
+
+    QWidget* widget = new QWidget(m_group_box);
+    m_group_box->set_widget(widget);
+    m_group_layout = new QVBoxLayout(widget);
+    m_group_layout->setAlignment(Qt::AlignTop);
+    m_group_layout->setContentsMargins(0, 0, 0, 0);
+
+    if (session.controllers() == 1){
+        UiWrapper wrapper = m_session.controller(0).make_ui_component(this);
+        m_group_layout->addWidget(dynamic_cast<QWidget*>(wrapper.release()));
+    }
+
+    m_video_selector = new VideoSourceSelectorWidget(m_session.logger(), m_session.video());
+    m_group_layout->addWidget(m_video_selector);
+
+    m_audio_widget = new AudioSelectorWidget(*m_group_box->widget(), m_session.audio());
+    m_group_layout->addWidget(m_audio_widget);
+
+    if (session.controllers() != 1){
+        for (size_t c = 0; c < m_session.controllers(); c++){
+            UiWrapper wrapper = m_session.controller(c).make_ui_component(this);
+            m_group_layout->addWidget(dynamic_cast<QWidget*>(wrapper.release()));
+        }
+    }
+
+    m_group_layout->addWidget(new CommandRowWidget(*this, m_session));
+}
+
+
+void ConsoleSystemWidget::focusInEvent(QFocusEvent* event){
+//    cout << "focusInEvent" << endl;
+    QWidget::focusInEvent(event);
+    m_session.overlay().report_focus_in();
+}
+void ConsoleSystemWidget::focusOutEvent(QFocusEvent* event){
+//    cout << "focusOutEvent" << endl;
+    QWidget::focusOutEvent(event);
+    m_session.overlay().report_focus_out();
+}
+void ConsoleSystemWidget::keyPressEvent(QKeyEvent* event){
+//    cout << "ConsoleSystemWidget::keyPressEvent()" << endl;
+    m_session.overlay().report_key_press(event);
+//    QWidget::keyPressEvent(event);
+}
+void ConsoleSystemWidget::keyReleaseEvent(QKeyEvent* event){
+//    cout << "ConsoleSystemWidget::keyReleaseEvent()" << endl;
+    m_session.overlay().report_key_release(event);
+//    QWidget::keyReleaseEvent(event);
+}
+
+
+
+
+
+
+
+}
+}

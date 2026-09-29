@@ -125,19 +125,19 @@ void TextEditOption::append(const std::string& x){
 }
 
 
+void TextEditOption::restore_defaults(){
+    set(m_data->m_default);
+}
+JsonValue TextEditOption::to_json() const{
+    ReadSpinLock lg(m_data->m_lock);
+    return m_data->m_current;
+}
 void TextEditOption::load_json(const JsonValue& json){
     const std::string* str = json.to_string();
     if (str == nullptr){
         return;
     }
     set(*str);
-}
-JsonValue TextEditOption::to_json() const{
-    ReadSpinLock lg(m_data->m_lock);
-    return m_data->m_current;
-}
-void TextEditOption::restore_defaults(){
-    set(m_data->m_default);
 }
 
 

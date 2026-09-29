@@ -32,14 +32,14 @@ public:
     )
         : m_mins_u8(vreinterpretq_u8_u32(vdupq_n_u32(mins)))
         , m_maxs_u8(vreinterpretq_u8_u32(vdupq_n_u32(maxs)))
-        , m_zeros_u8(vreinterpretq_u32_u8(vdupq_n_u8(0)))
+        , m_zeros_u8(vdupq_n_u8(0))
     {}
     PA_FORCE_INLINE PixelTest_Rgb32Range_ARM64_NEON(
         const ToBlackWhiteRgb32RangeFilter& filter
     )
         : m_mins_u8(vreinterpretq_u8_u32(vdupq_n_u32(filter.mins)))
         , m_maxs_u8(vreinterpretq_u8_u32(vdupq_n_u32(filter.maxs)))
-        , m_zeros_u8(vreinterpretq_u32_u8(vdupq_n_u8(0)))
+        , m_zeros_u8(vdupq_n_u8(0))
     {}
 
     //  Return a mask indicating which lanes are in range.

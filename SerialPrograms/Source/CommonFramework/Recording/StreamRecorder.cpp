@@ -33,7 +33,6 @@
 //#define PA_STREAM_HISTORY_LOCAL_BUFFER
 
 
-//  REMOVE
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -511,7 +510,7 @@ StreamRecording2::~StreamRecording2(){
 #endif
 
 #ifndef PA_STREAM_HISTORY_LOCAL_BUFFER
-    cout << QDir().remove(QString::fromStdString(m_filename)) << endl;  //  REMOVE
+    cout << QDir().remove(QString::fromStdString(m_filename)) << endl;
 #endif
 }
 
@@ -549,7 +548,7 @@ void StreamRecording2::stop(){
     m_recorder->stop();
 
     while (m_recorder->recorderState() != QMediaRecorder::StoppedState){
-        cout << "Spin waiting..." << endl;  //  REMOVE
+        cout << "Spin waiting..." << endl;
         pause();
     }
 }
@@ -740,7 +739,7 @@ void StreamRecording2::process(){
         {
             std::unique_lock<Mutex> lg(m_lock);
             if (m_stopping){
-                cout << "exit" << endl; //  REMOVE
+                cout << "exit" << endl;
                 break;
             }
 

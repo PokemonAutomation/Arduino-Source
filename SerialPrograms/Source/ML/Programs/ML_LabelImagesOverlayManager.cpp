@@ -24,9 +24,9 @@ inline size_t size_t_subtract_clamp(size_t x, size_t y){
     return x >= y ? x - y : 0;
 }
 
-LabelImages_OverlayManager::LabelImages_OverlayManager(LabelImages& program)
+LabelImages_OverlayManager::LabelImages_OverlayManager(LabelImages& program, VideoOverlay& overlay)
     : m_program(program)
-    , m_overlay_set(program.m_display_session.overlay())
+    , m_overlay_set(overlay)
 {
     m_inclusion_point_icon_template = ImageRGB32(21, 21);
     m_inclusion_point_icon_template.fill(0);

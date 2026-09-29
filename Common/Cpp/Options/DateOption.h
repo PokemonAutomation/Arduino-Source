@@ -40,17 +40,19 @@ public:
     DateTime get() const;
     std::string set(const DateTime& x);
 
+
+public:
+    virtual void restore_defaults() override;
     std::string check_validity(const DateTime& x) const;
     virtual std::string check_validity() const override;
-    virtual void restore_defaults() override;
 
 
 public:
-    static DateTime from_json(const JsonValue& json);
     static JsonValue to_json(const DateTime& date);
+    static DateTime from_json(const JsonValue& json);
 
-    virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
 
 
 private:

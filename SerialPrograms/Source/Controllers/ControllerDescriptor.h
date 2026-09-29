@@ -39,6 +39,8 @@ class InterfaceType{
 public:
     virtual ~InterfaceType() = default;
 
+    virtual std::unique_ptr<ControllerDescriptor> make() const = 0;
+
     //  Construct a descriptor from a JSON config. (reloading saved controller settings)
     virtual std::unique_ptr<ControllerDescriptor> make(const JsonValue& json) const = 0;
 
@@ -56,6 +58,9 @@ protected:
 template <typename DescriptorType>
 class InterfaceType_t : public InterfaceType{
 public:
+    virtual std::unique_ptr<ControllerDescriptor> make() const override{
+        return std::make_unique<DescriptorType>();
+    }
     virtual std::unique_ptr<ControllerDescriptor> make(const JsonValue& json) const override{
         std::unique_ptr<DescriptorType> ptr(new DescriptorType());
         ptr->load_json(json);
@@ -97,8 +102,8 @@ public:
     virtual std::string display_name() const = 0;
 
 public:
-    virtual void load_json(const JsonValue& json) = 0;
     virtual JsonValue to_json() const = 0;
+    virtual void load_json(const JsonValue& json) = 0;
 
 public:
     virtual std::unique_ptr<ControllerConnection> open_connection(Logger& logger) const = 0;

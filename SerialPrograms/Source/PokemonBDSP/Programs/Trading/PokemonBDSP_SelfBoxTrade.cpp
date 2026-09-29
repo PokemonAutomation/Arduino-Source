@@ -61,13 +61,13 @@ void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope&
     env.update_stats();
 
     //  Connect the controller.
-    env.run_in_parallel(scope, [](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel<ProController>(scope, [](ConsoleHandle& console, ProControllerContext& context){
         require_player(console, context, BUTTON_LCLICK);
     });
 
     for (uint8_t box = 0; box < BOXES_TO_TRADE; box++){
         if (box != 0){
-            env.run_in_parallel(scope, [](ConsoleHandle& console, ProControllerContext& context){
+            env.run_in_parallel<ProController>(scope, [](ConsoleHandle& console, ProControllerContext& context){
                 pbf_press_button(context, BUTTON_R, 160ms, GameSettings::instance().BOX_CHANGE_DELAY0);
             });
         }

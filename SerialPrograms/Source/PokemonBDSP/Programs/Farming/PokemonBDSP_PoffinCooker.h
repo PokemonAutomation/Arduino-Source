@@ -27,6 +27,7 @@ public:
 
 class PoffinCooker : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = PoffinCooker_Descriptor;
     PoffinCooker();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

@@ -67,6 +67,17 @@ void LanguageOCRCell::set(Language language){
 }
 
 
+
+std::string LanguageOCRCell::check_validity() const{
+    return m_case_list[m_current.load(std::memory_order_relaxed)].second ? std::string() : "Language data is not available.";
+}
+void LanguageOCRCell::restore_defaults(){
+    m_current.store(m_default, std::memory_order_relaxed);
+    report_value_changed(this);
+}
+JsonValue LanguageOCRCell::to_json() const{
+    return language_data((Language)*this).code;
+}
 void LanguageOCRCell::load_json(const JsonValue& json){
     const std::string* str = json.to_string();
     if (str == nullptr){
@@ -92,17 +103,7 @@ void LanguageOCRCell::load_json(const JsonValue& json){
     m_current.store(iter->second, std::memory_order_relaxed);
     report_value_changed(this);
 }
-JsonValue LanguageOCRCell::to_json() const{
-    return language_data((Language)*this).code;
-}
 
-std::string LanguageOCRCell::check_validity() const{
-    return m_case_list[m_current.load(std::memory_order_relaxed)].second ? std::string() : "Language data is not available.";
-}
-void LanguageOCRCell::restore_defaults(){
-    m_current.store(m_default, std::memory_order_relaxed);
-    report_value_changed(this);
-}
 
 
 

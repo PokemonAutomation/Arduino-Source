@@ -50,11 +50,11 @@ RunYOLO::RunYOLO()
     PA_ADD_OPTION(MODEL_PATH);
 }
 
-void RunYOLO::program(NintendoSwitch::SingleSwitchProgramEnvironment& env, NintendoSwitch::ProControllerContext& context){
+void RunYOLO::program(NintendoSwitch::SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     std::string model_path = MODEL_PATH;
     YOLOv5Watcher watcher(env.console.overlay(), model_path);
 
-    wait_until(env.console, context, WallClock::max(), {watcher});
+    wait_until(env.console, scope, WallClock::max(), {watcher});
 }
 
 

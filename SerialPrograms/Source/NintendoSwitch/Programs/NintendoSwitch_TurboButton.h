@@ -24,6 +24,7 @@ public:
 
 class TurboButton : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = TurboButton_Descriptor;
     TurboButton();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

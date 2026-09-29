@@ -8,7 +8,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/PersistentSettings.h"
 //#include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Panels/PanelInstance.h"
+#include "CommonFramework/Panels/PanelSession.h"
 #include "PanelListWidget.h"
 
 namespace PokemonAutomation{
@@ -97,9 +97,9 @@ void PanelListWidget::handle_panel_clicked(const std::string& text){
         return;
     }
     try{
-        std::unique_ptr<PanelInstance> panel = descriptor->make_panel();
+        std::unique_ptr<PanelSession> panel = descriptor->make_panel();
 //        try{
-            panel->from_json(PERSISTENT_SETTINGS().panels[descriptor->identifier()]);
+            panel->load_json(PERSISTENT_SETTINGS().panels[descriptor->identifier()]);
 //        }catch (ParseException&){}
         m_panel_holder.load_panel(descriptor, std::move(panel));
 

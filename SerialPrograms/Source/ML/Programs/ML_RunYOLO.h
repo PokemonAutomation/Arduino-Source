@@ -23,9 +23,10 @@ public:
 
 class RunYOLO : public NintendoSwitch::SingleSwitchProgramInstance{
 public:
+    using Descriptor = RunYOLO_Descriptor;
     RunYOLO();
 
-    virtual void program(NintendoSwitch::SingleSwitchProgramEnvironment& env, NintendoSwitch::ProControllerContext& context) override;
+    virtual void program(NintendoSwitch::SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     PathOption MODEL_PATH;

@@ -76,8 +76,8 @@ public:
         }
     }
 
-    virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
 
     virtual std::vector<std::string> make_header() const override;
     virtual std::unique_ptr<EditableTableRow> make_row() override;

@@ -328,7 +328,7 @@ int test_binary_matrix_tile(){
         for (size_t i = 0; i < num_bytes; ++i){
             if (x[i] != buffer[i + 16]){
                 cout << "Error: PartialWordAccess_arm64_NEON(" << num_bytes << ")::store_int_no_past_end(), i = " << i << " is " << int(buffer[i + 16])
-                    << ", but should be " << int(x[i + 16]) << endl;
+                    << ", but should be " << int(x[i]) << endl;
                 return 1;
             }
         }

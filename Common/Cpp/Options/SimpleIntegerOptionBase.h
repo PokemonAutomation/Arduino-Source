@@ -51,12 +51,13 @@ public:
 //    operator NativeType() const;
     std::string set(NativeType x);
 
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
 
+public:
     std::string check_validity(NativeType x) const;
     virtual std::string check_validity() const override;
     virtual void restore_defaults() override;
+    virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
 
 
 protected:

@@ -50,13 +50,6 @@ public:
         double default_width = 1, double default_height = 1
     );
 
-//    virtual void load_json(const JsonValue& json) override;
-//    virtual JsonValue to_json() const override;
-
-//    virtual void restore_defaults() override;
-
-//    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
-
     double aspect_ratio();
     VideoSnapshot screenshot();
 

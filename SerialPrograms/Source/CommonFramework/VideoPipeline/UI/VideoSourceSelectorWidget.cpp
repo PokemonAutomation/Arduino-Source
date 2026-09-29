@@ -157,6 +157,14 @@ void VideoSourceSelectorWidget::update_source_list(){
     }else{
         m_logger.log("Unable to find entry for this source.", COLOR_RED);
     }
+
+    //  Name the reset button after whatever the selected source actually is.
+    //  A still image is not video, so calling it "Reset Video" there is wrong.
+    m_reset_button->setText(
+        current_descriptor && current_descriptor->type == VideoSourceType::StillImage
+            ? "Reset Image"
+            : "Reset Video"
+    );
 }
 void VideoSourceSelectorWidget::update_resolution_list(){
     m_resolution_box->clear();
@@ -247,8 +255,10 @@ void VideoSourceSelectorWidget::update_resolution_list(){
 
 
 void VideoSourceSelectorWidget::post_startup(VideoSource* source){
-    update_source_list();
-    update_resolution_list();
+    QMetaObject::invokeMethod(this, [this]{
+        update_source_list();
+        update_resolution_list();
+    }, Qt::QueuedConnection);
 }
 
 

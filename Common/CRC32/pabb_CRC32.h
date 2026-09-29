@@ -9,7 +9,7 @@
 
 
 #if 0
-#elif _M_IX86 || _M_X64
+#elif _M_IX86 || _M_X64 || __i386__ || __x86_64__
 #include "pabb_CRC32_x86_SSE4.1.h"
 #elif __AVR__
 #include "pabb_CRC32_AVR8.h"

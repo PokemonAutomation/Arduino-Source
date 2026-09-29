@@ -47,6 +47,10 @@ void VideoSourceDescriptor_StillImage::run_post_select(){
     ).toStdString();
     set_path(std::move(path));
 }
+JsonValue VideoSourceDescriptor_StillImage::to_json() const{
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
+    return m_path;
+}
 void VideoSourceDescriptor_StillImage::load_json(const JsonValue& json){
 //    cout << "load_json: " << m_path << endl;
     const std::string* name = json.to_string();
@@ -54,10 +58,6 @@ void VideoSourceDescriptor_StillImage::load_json(const JsonValue& json){
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_path = *name;
     }
-}
-JsonValue VideoSourceDescriptor_StillImage::to_json() const{
-    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-    return m_path;
 }
 
 std::unique_ptr<VideoSource> VideoSourceDescriptor_StillImage::make_VideoSource(

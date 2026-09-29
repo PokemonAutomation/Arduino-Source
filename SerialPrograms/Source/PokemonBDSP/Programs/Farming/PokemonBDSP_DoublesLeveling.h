@@ -34,6 +34,7 @@ public:
 
 class DoublesLeveling : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = DoublesLeveling_Descriptor;
     DoublesLeveling();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

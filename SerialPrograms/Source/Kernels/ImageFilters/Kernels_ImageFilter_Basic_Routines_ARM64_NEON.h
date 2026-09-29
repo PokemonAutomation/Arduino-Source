@@ -5,6 +5,7 @@
  */
 
 #include <stdint.h>
+#include <cstring>
 #include "Common/Compiler.h"
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_arm64_NEON.h"
 #include "Kernels/Kernels_arm64_NEON.h"

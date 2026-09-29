@@ -32,6 +32,7 @@ public:
 
 class EggAutonomous : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = EggAutonomous_Descriptor;
     EggAutonomous();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

@@ -1,0 +1,82 @@
+/*  Prize Select Detector
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Images/SolidColorTest.h"
+#include "CommonTools/Images/ImageFilter.h"
+#include "CommonTools/Images/WaterfillUtilities.h"
+#include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
+#include "PokemonFRLG_PrizeSelectDetector.h"
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonFRLG{
+
+PrizeSelectDetector::PrizeSelectDetector(Color color)
+    : m_right_box(0.923385, 0.748077, 0.00615385, 0.204577)
+    , m_top_box(0.0704615, 0.75, 0.859077, 0.00623077)
+    , m_bottom_box(0.0716923, 0.943308, 0.851692, 0.00934615)
+    , m_selection_box(0.705538, 0.528962, 0.212923, 0.0602308)
+{}
+void PrizeSelectDetector::make_overlays(VideoOverlaySet& items) const{
+    const BoxOption& GAME_BOX = GameSettings::instance().GAME_BOX;
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_right_box));
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_top_box));
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_bottom_box));
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_selection_box));
+}
+bool PrizeSelectDetector::detect(const ImageViewRGB32& screen){
+    ImageViewRGB32 game_screen = extract_box_reference(screen, GameSettings::instance().GAME_BOX);
+
+    ImageViewRGB32 right_image = extract_box_reference(game_screen, m_right_box);
+    ImageViewRGB32 top_image = extract_box_reference(game_screen, m_top_box);
+    ImageViewRGB32 bottom_image = extract_box_reference(game_screen, m_bottom_box);
+    ImageViewRGB32 selection_image = extract_box_reference(game_screen, m_selection_box);
+    if (is_white(right_image)
+        && is_white(top_image)
+        && is_white(bottom_image)
+        && is_white(selection_image)
+    ){
+        return true;
+    }
+    return false;
+}
+
+class Test_PrizeSelectDetector : public UnitTest{
+public:
+
+    Test_PrizeSelectDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonFRLG::PrizeSelectDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        PrizeSelectDetector detector(COLOR_RED);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+void add_tests_PrizeSelectDetector(UnitTestDatabase& database){
+    //todo: gather test images for this detector
+}
+
+
+}
+}
+}

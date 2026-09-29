@@ -128,6 +128,51 @@ void EditableTableOption::clear(){
     }
     report_value_changed(this);
 }
+
+
+std::string EditableTableOption::check_validity() const{
+    ReadSpinLock lg(m_current_lock);
+    for (const std::shared_ptr<EditableTableRow>& item : m_current){
+        std::string error = item->check_validity();
+        if (!error.empty()){
+            return error;
+        }
+    }
+    return std::string();
+}
+void EditableTableOption::restore_defaults(){
+    {
+        std::vector<std::shared_ptr<EditableTableRow>> tmp;
+        {
+            ReadSpinLock lg(m_default_lock);
+
+            //  Pre-allocate seqnums.
+            uint64_t seqnum = m_seqnum.fetch_add(m_default.size());
+
+            //  Build table outside of lock first.
+            //  If the table is built inside of the lock, you can get issues with deadlock.
+            //  (see load_json() for more details)
+            for (const std::unique_ptr<EditableTableRow>& item : m_default){
+                tmp.emplace_back(item->clone());
+                tmp.back()->m_seqnum = seqnum++;
+                tmp.back()->m_index = tmp.size() - 1;
+            }
+        }
+
+        //  Now commit the table inside the lock.
+        WriteSpinLock lg(m_current_lock);
+        m_current = std::move(tmp);
+    }
+    report_value_changed(this);
+}
+JsonValue EditableTableOption::to_json() const{
+    ReadSpinLock lg(m_current_lock);
+    JsonArray array;
+    for (const std::shared_ptr<EditableTableRow>& row : m_current){
+        array.push_back(row->to_json());
+    }
+    return array;
+}
 void EditableTableOption::load_json(const JsonValue& json){
 //    cout << "EditableTableOption::load_json(): " << this << endl;
 
@@ -165,50 +210,7 @@ void EditableTableOption::load_json(const JsonValue& json){
     }
     report_value_changed(this);
 }
-JsonValue EditableTableOption::to_json() const{
-    ReadSpinLock lg(m_current_lock);
-    JsonArray array;
-    for (const std::shared_ptr<EditableTableRow>& row : m_current){
-        array.push_back(row->to_json());
-    }
-    return array;
-}
 
-std::string EditableTableOption::check_validity() const{
-    ReadSpinLock lg(m_current_lock);
-    for (const std::shared_ptr<EditableTableRow>& item : m_current){
-        std::string error = item->check_validity();
-        if (!error.empty()){
-            return error;
-        }
-    }
-    return std::string();
-}
-void EditableTableOption::restore_defaults(){
-    {
-        std::vector<std::shared_ptr<EditableTableRow>> tmp;
-        {
-            ReadSpinLock lg(m_default_lock);
-
-            //  Pre-allocate seqnums.
-            uint64_t seqnum = m_seqnum.fetch_add(m_default.size());
-
-            //  Build table outside of lock first.
-            //  If the table is built inside of the lock, you can get issues with deadlock.  
-            //  (see load_json() for more details)           
-            for (const std::unique_ptr<EditableTableRow>& item : m_default){
-                tmp.emplace_back(item->clone());
-                tmp.back()->m_seqnum = seqnum++;
-                tmp.back()->m_index = tmp.size() - 1;
-            }
-        }
-
-        //  Now commit the table inside the lock.
-        WriteSpinLock lg(m_current_lock);
-        m_current = std::move(tmp);
-    }
-    report_value_changed(this);
-}
 
 
 

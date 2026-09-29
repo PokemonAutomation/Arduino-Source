@@ -35,6 +35,8 @@
 //  Common Framework
 #include "CommonFramework/Options/QtWidget/LabelCellWidget.h"
 #include "CommonFramework/Notifications/EventNotificationWidget.h"
+#include "CommonFramework/Panels/UI/PanelWidget.h"
+#include "CommonFramework/Panels/UI/OptionsPanelWidget.h"
 
 // Resource Download
 #include "CommonFramework/ResourceDownload/SettingsResourceDownloadWidget.h"
@@ -44,17 +46,30 @@
 #include "CommonTools/Options/QtWidgets/ScreenWatchWidget.h"
 #include "CommonTools/Options/QtWidgets/LanguageOCRWidget.h"
 
+//  Computer Programs
+#include "ComputerPrograms/Framework/ComputerProgramWidget.h"
+
 //  Controllers
-#include "Controllers/NullControllerWidget.h"
+//#include "Controllers/NullControllerWidget.h"
+#include "Controllers/ControllerSelectorWidget.h"
 #include "Controllers/PABotBase2/SerialPABotBase2_SelectorWidget.h"
 #include "ControllerInput/Keyboard/KeyBindingWidget.h"
 
+//  Consoles
+#include "GameConsole/UI/ConsoleSystemWidget.h"
+#include "GameConsole/UI/ConsolePanelWidget.h"
+#include "GameConsole/UI/ConsoleProgramWidget.h"
+#include "GameConsole/UI/MultiConsoleSystemWidget.h"
+#include "GameConsole/UI/MultiConsolePanelWidget.h"
+#include "GameConsole/UI/MultiConsoleProgramWidget.h"
+
 //  Nintendo Switch
 #include "NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h"
+//#include "NintendoSwitch/Framework/UI/NintendoSwitch_SingleSwitchProgramWidget.h"
 #include "NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.h"
 
 //  Pokemon LA
-#include "PokemonLA/Options/QtWidgets/PokemonLA_CustomPathTableWidget.h"
+#include "VideoGames/PokemonLA/Options/QtWidgets/PokemonLA_CustomPathTableWidget.h"
 
 namespace PokemonAutomation{
 
@@ -102,6 +117,8 @@ void register_all_statics(){
     //  Common Framework
     RegisterUiStateQtWidget<LabelCellWidget>();
     RegisterUiStateQtWidget<TestButtonWidget>();
+    RegisterUiStateQtWidget<PanelWidget>();
+    RegisterUiStateQtWidget<OptionsPanelWidget>();
 
     // Resource Download
     RegisterUiStateQtWidget<SettingsDownloadButtonWidget>();
@@ -117,10 +134,22 @@ void register_all_statics(){
     RegisterUiStateQtWidget<OCR::LanguageOCRCellWidget>();
     RegisterUiStateQtWidget<OCR::LanguageOCROptionWidget>();
 
+    //  Computer Programs
+    RegisterUiStateQtWidget<ComputerProgramWidget>();
+
     //  Controllers
-    RegisterUiStateQtWidget<NullControllerWidget>();
+//    RegisterUiStateQtWidget<NullControllerWidget>();
+    RegisterUiStateQtWidget<ControllerSelectorWidget>();
     RegisterUiStateQtWidget<SerialPABotBase::SerialPABotBase2_SelectorWidget>();
     RegisterUiStateQtWidget<KeyboardHidBindingCellWidget>();
+
+    //  Consoles
+    RegisterUiStateQtWidget<GameConsole::ConsoleSystemWidget>();
+    RegisterUiStateQtWidget<GameConsole::ConsolePanelWidget>();
+    RegisterUiStateQtWidget<GameConsole::ConsoleProgramWidget>();
+    RegisterUiStateQtWidget<GameConsole::MultiConsoleSystemWidget>();
+    RegisterUiStateQtWidget<GameConsole::MultiConsolePanelWidget>();
+    RegisterUiStateQtWidget<GameConsole::MultiConsoleProgramWidget>();
 
     //  Nintendo Switch
     RegisterUiStateQtWidget<SysbotBase::TcpSysbotBase_SelectorWidget>();

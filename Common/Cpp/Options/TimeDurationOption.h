@@ -72,11 +72,10 @@ public:
 
 
 public:
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
-
     virtual std::string check_validity() const override;
     virtual void restore_defaults() override;
+    virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
 
 
 protected:

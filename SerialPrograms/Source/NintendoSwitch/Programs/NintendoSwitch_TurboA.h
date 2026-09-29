@@ -25,6 +25,7 @@ public:
 
 class TurboA : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = TurboA_Descriptor;
     TurboA();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

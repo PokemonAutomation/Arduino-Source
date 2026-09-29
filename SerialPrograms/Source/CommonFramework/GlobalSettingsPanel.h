@@ -16,7 +16,7 @@
 //#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/ButtonOption.h"
-#include "CommonFramework/Panels/SettingsPanel.h"
+#include "CommonFramework/Panels/OptionsPanel.h"
 #include "CommonFramework/Panels/PanelTools.h"
 #include "CommonFramework/ResourceDownload/SettingsResourceDownloadOptions.h"
 #include "CommonFramework/ResourceDownload/SettingsResourceDownloadTable.h"
@@ -67,8 +67,8 @@ class GlobalSettings : public BatchOption, private ConfigOption::Listener, priva
 public:
     static GlobalSettings& instance();
 
-    virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
 
     void connect_row_with_download(const std::string& resource_slug, std::shared_ptr<ResourceDownload>& download_ptr);
 
@@ -118,16 +118,9 @@ public:
 
     StringOption DEVELOPER_TOKEN;
 
-    // The mode that does not run Qt GUI, but instead runs some tests for
-    // debugging, unit testing and developing purposes.
+    // The mode that does not run Qt GUI, but instead runs all the unit tests.
+    // See Tests/CommandLineTests.h.
     bool COMMAND_LINE_TEST_MODE = false;
-    // The path to the command line test folder.
-    std::string COMMAND_LINE_TEST_FOLDER;
-    // Which tests to run if in the command line test mode.
-    std::vector<std::string> COMMAND_LINE_TEST_LIST;
-    // Which tests to ignore running under the command line test mode.
-    // If a test path appears in both COMMAND_LINE_TEST_LIST and COMMAND_LINE_IGNORE_LIST, it's still ignored.
-    std::vector<std::string> COMMAND_LINE_IGNORE_LIST;
 };
 
 
@@ -136,21 +129,19 @@ public:
 
 class GlobalSettingsPanel;
 
-class GlobalSettings_Descriptor : public PanelDescriptor{
+class GlobalSettings_Descriptor : public OptionsPanelDescriptor{
 public:
     GlobalSettings_Descriptor();
 public:
-    using Wrapper = PanelDescriptorWrapper<GlobalSettings_Descriptor, GlobalSettingsPanel>;
-    static Wrapper& instance(){
-        static Wrapper wrapper;
-        return wrapper;
-    }
+    using Wrapper = OptionsPanelWrapper<GlobalSettingsPanel>;
+    static Wrapper& instance();
 };
 
 
-class GlobalSettingsPanel : public SettingsPanelInstance{
+class GlobalSettingsPanel : public OptionsPanelInstance{
 public:
-    GlobalSettingsPanel(const GlobalSettings_Descriptor& descriptor);
+    using Descriptor = GlobalSettings_Descriptor;
+    GlobalSettingsPanel();
 private:
     GlobalSettings& settings;
 };

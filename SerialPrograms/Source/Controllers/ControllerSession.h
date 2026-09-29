@@ -10,7 +10,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/ListenerSet.h"
-//#include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/UiWrapper.h"
 #include "Controller.h"
 #include "ControllerDescriptor.h"
 #include "ControllerOption.h"
@@ -20,7 +20,10 @@ namespace PokemonAutomation{
 
 
 
-class ControllerSession final : private ControllerConnection::StatusListener{
+class ControllerSession final
+    : public UiState<ControllerSession>
+    , private ControllerConnection::StatusListener
+{
 public:
     struct Listener{
         virtual void ready_changed(bool ready){}
@@ -43,7 +46,8 @@ public:
     ~ControllerSession();
     ControllerSession(
         Logger& logger,
-        ControllerOption& option
+        ControllerOption& option,
+        std::optional<size_t> index
     );
 
 
@@ -63,9 +67,13 @@ public:
     ControllerConnection::Status connection_status() const;
 
     std::shared_ptr<ControllerDescriptor> descriptor() const;
-    ControllerType controller_type() const;
+    ControllerClass controller_class() const noexcept;
+    ControllerType controller_type() const noexcept;
     std::string status_text() const;
 
+    std::optional<size_t> index() const{
+        return m_index;
+    }
     const ControllerOption& option() const{
         return m_option;
     }
@@ -83,6 +91,7 @@ public:
 
 
 public:
+    bool set_interface(ControllerInterface controller_interface);
     bool set_device(const std::shared_ptr<ControllerDescriptor>& device);
     bool set_controller(ControllerType controller_type);
 
@@ -96,11 +105,11 @@ public:
     template <typename ControllerType, typename Lambda>
     std::string try_run(Lambda&& function) noexcept{
         ReadSpinLock lg(m_state_lock);
-        if (!m_controller){
-            return "Controller is null.";
-        }
         if (!m_option.m_enable_input){
             return "";
+        }
+        if (!m_controller){
+            return "Controller is null.";
         }
         try{
             //  This will be a cross-cast in most cases.
@@ -154,6 +163,7 @@ private:
 private:
     Logger& m_logger;
     ControllerOption& m_option;
+    std::optional<size_t> m_index;
 
     Mutex m_reset_lock;
     mutable SpinLock m_state_lock;

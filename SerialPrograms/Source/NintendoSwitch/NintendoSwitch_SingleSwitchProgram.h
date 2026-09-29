@@ -7,11 +7,10 @@
 #ifndef PokemonAutomation_NintendoSwitch_SingleSwitchProgram_H
 #define PokemonAutomation_NintendoSwitch_SingleSwitchProgram_H
 
-#include "Common/Cpp/Options/BatchOption.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Notifications/EventNotificationOption.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "GameConsole/ConsoleProgram.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
@@ -20,101 +19,52 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+class SwitchSystemSession;
 class SingleSwitchProgramInstance;
 
 
-class SingleSwitchProgramEnvironment : public ProgramEnvironment{
+class SingleSwitchProgramEnvironment : public GameConsole::ConsoleProgramEnvironment{
 public:
-    ConsoleHandle console;
+    ConsoleHandle& console;
 
-    // Call console.overlay().add_log(msg, color) to add a log message to overlay display
-    void add_overlay_log(std::string msg, Color color = COLOR_WHITE);
-
-private:
+public:
     friend class SingleSwitchProgramSession;
     friend class SingleSwitchProgramWidget;
-    template <class... Args>
+
     SingleSwitchProgramEnvironment(
         const ProgramInfo& program_info,
         CancellableScope& scope,
         ProgramSession& session,
         StatsTracker* current_stats,
         const StatsTracker* historical_stats,
-        Args&&... args
-    )
-        : ProgramEnvironment(program_info, session, current_stats, historical_stats)
-        , console(0, std::forward<Args>(args)...)
-    {
-        console.initialize_inference_threads(scope);
-    }
+        GameConsole::ConsoleSystemSession& system
+    );
 };
 
 
-class SingleSwitchProgramDescriptor : public ProgramDescriptor{
+
+class SingleSwitchProgramDescriptor : public GameConsole::ConsoleProgramDescriptor{
 public:
     SingleSwitchProgramDescriptor(
         std::string identifier,
         std::string category, std::string display_name,
         std::string doc_link,
         std::string description,
-        ProgramControllerClass color_class,
+        ProgramControllerClass controller_class,
         FeedbackType feedback,
         AllowCommandsWhenRunning allow_commands_while_running,
-        bool deprecated = false,
+        PanelDeprecation deprecation = PanelDeprecation::NOT_DEPRECATED,
         std::vector<std::string> required_resources = {}
     );
 
-    ProgramControllerClass color_class() const{ return m_color_class; }
-    FeedbackType feedback() const{ return m_feedback; }
-    bool allow_commands_while_running() const{ return m_allow_commands_while_running; }
-    bool deprecated() const{ return m_deprecated; }
-
-    virtual std::unique_ptr<PanelInstance> make_panel() const override;
-    virtual std::unique_ptr<SingleSwitchProgramInstance> make_instance() const = 0;
-
-private:
-    const ProgramControllerClass m_color_class;
-    const FeedbackType m_feedback;
-    const bool m_allow_commands_while_running;
-    const bool m_deprecated;
-    const std::vector<std::string> m_required_resources;
+    virtual std::unique_ptr<PanelSession> make_panel() const override;
 };
 
 
 
-
-
-
-//
-//  As of this writing, this class will never be called in a manner where
-//  thread-safety is of concern with one exception: config options
-//
-//  Here is the curent status:
-//
-//  Called from UI thread:
-//    - Construction/destruction
-//    - from/to_json()
-//    - restore_defaults()
-//
-//  Called from program thread:
-//    - program()
-//
-//  Called from both UI and program threads:
-//    - check_validity()
-//    - All config options.
-//
-//  With the exception of the configs, nothing will be called concurrently from
-//  different threads.
-//
-class SingleSwitchProgramInstance{
+class SingleSwitchProgramInstance : public GameConsole::ConsoleProgramInstance{
 public:
-    virtual ~SingleSwitchProgramInstance();
-    SingleSwitchProgramInstance(const SingleSwitchProgramInstance&) = delete;
-    void operator=(const SingleSwitchProgramInstance&) = delete;
-
-    SingleSwitchProgramInstance(
-        const std::vector<std::string>& error_notification_tags = {"Notifs"}
-    );
+    using GameConsole::ConsoleProgramInstance::ConsoleProgramInstance;
 
     //  Called by SingleSwitchProgramSession::run_program_instance() to start an automation program.
     //  Child classes should override one of the overloaded functions.
@@ -127,57 +77,46 @@ public:
 public:
     //  Startup Checks: Feel free to override to change behavior.
 
-    virtual void start_program_controller_check(
-        ControllerSession& session
-    );
-    virtual void start_program_feedback_check(
-        VideoStream& stream,
-        FeedbackType feedback_type
-    );
+    virtual void run_start_program_checks(
+        const ProgramDescriptor& descriptor,
+        ProgramEnvironment& env
+    ) override;
     virtual void start_program_border_check(
         VideoStream& stream,
         FeedbackType feedback_type
     );
 
-
-public:
-    //  Settings
-
-    virtual void from_json(const JsonValue& json);
-    virtual JsonValue to_json() const;
-
-    virtual std::string check_validity() const;
-    virtual void restore_defaults();
-
-
-protected:
-    friend class SingleSwitchProgramOption;
-
-    BatchOption m_options;
-    void add_option(ConfigOption& option, std::string serialization_string);
-
-
-public:
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
-    EventNotificationOption NOTIFICATION_ERROR_RECOVERABLE;
-    EventNotificationOption NOTIFICATION_ERROR_FATAL;
+private:
+    virtual void program(GameConsole::ConsoleProgramEnvironment& env, CancellableScope& scope) override;
 };
 
 
 
 
-template <typename Descriptor, typename Instance>
-class SingleSwitchProgramWrapper : public Descriptor{
+#if 0
+template <typename Instance>
+class SingleSwitchProgramWrapper : public Instance::Descriptor{
 public:
-    virtual std::unique_ptr<SingleSwitchProgramInstance> make_instance() const override{
-        return std::make_unique<Instance>();
+    virtual std::unique_ptr<SingleSwitchProgramInstance> make_instance(
+        GameConsole::ConsoleSystemSession& system
+    ) const override{
+        if constexpr (std::is_constructible_v<Instance, GameConsole::ConsoleSystemSession&>){
+            return std::make_unique<Instance>(system);
+        }else{
+            return std::make_unique<Instance>();
+        }
     }
 };
+#endif
+
+template <typename Instance>
+using SingleSwitchProgramWrapper = GameConsole::ConsoleProgramWrapper<Instance>;
+
 
 // Create a program PanelDescriptor
-template <typename Descriptor, typename Instance>
-std::unique_ptr<PanelDescriptor> make_single_switch_program(){
-    return std::make_unique<SingleSwitchProgramWrapper<Descriptor, Instance>>();
+template <typename Instance>
+std::unique_ptr<PanelDescriptor> make_SingleSwitchProgram(){
+    return std::make_unique<SingleSwitchProgramWrapper<Instance>>();
 }
 
 

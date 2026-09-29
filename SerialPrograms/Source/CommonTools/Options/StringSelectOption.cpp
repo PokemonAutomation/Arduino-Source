@@ -250,17 +250,17 @@ const StringSelectDatabase& StringSelectCell::database() const{
     return m_data->m_database;
 }
 
-void StringSelectCell::load_json(const JsonValue& json){
-    if (m_data->load_json(json)){
-        report_value_changed(this);
-    }
+void StringSelectCell::restore_defaults(){
+    m_data->restore_defaults();
+    report_value_changed(this);
 }
 JsonValue StringSelectCell::to_json() const{
     return m_data->to_json();
 }
-void StringSelectCell::restore_defaults(){
-    m_data->restore_defaults();
-    report_value_changed(this);
+void StringSelectCell::load_json(const JsonValue& json){
+    if (m_data->load_json(json)){
+        report_value_changed(this);
+    }
 }
 
 

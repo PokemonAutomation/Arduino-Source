@@ -7,7 +7,7 @@
 #include "pabb_CRC32_Basic.h"
 
 //  8-bit table
-const uint32_t PABB_CRC32_TABLE8[] = {
+const uint32_t PABB_CRC32C_TABLE8[] = {
     0x00000000, 0xf26b8303, 0xe13b70f7, 0x1350f3f4, 0xc79a971f, 0x35f1141c, 0x26a1e7e8, 0xd4ca64eb,
     0x8ad958cf, 0x78b2dbcc, 0x6be22838, 0x9989ab3b, 0x4d43cfd0, 0xbf284cd3, 0xac78bf27, 0x5e133c24,
     0x105ec76f, 0xe235446c, 0xf165b798, 0x030e349b, 0xd7c45070, 0x25afd373, 0x36ff2087, 0xc494a384,
@@ -43,14 +43,14 @@ const uint32_t PABB_CRC32_TABLE8[] = {
 };
 
 
-void pabb_crc32_byte(uint32_t* crc, uint8_t data){
-    *crc = PABB_CRC32_TABLE8[(uint8_t)*crc ^ data] ^ (*crc >> 8);
+void pabb_crc32c_byte(uint32_t* crc, uint8_t data){
+    *crc = PABB_CRC32C_TABLE8[(uint8_t)*crc ^ data] ^ (*crc >> 8);
 }
-void pabb_crc32_buffer(uint32_t* crc, const void* data, uint8_t length){
+void pabb_crc32c_buffer(uint32_t* crc, const void* data, size_t length){
     const uint8_t* ptr = (const uint8_t*)data;
     uint32_t tmp = *crc;
     while (length--){
-        tmp = PABB_CRC32_TABLE8[(uint8_t)tmp ^ (uint8_t)*ptr] ^ (tmp >> 8);
+        tmp = PABB_CRC32C_TABLE8[(uint8_t)tmp ^ (uint8_t)*ptr] ^ (tmp >> 8);
         ptr++;
     }
     *crc = tmp;

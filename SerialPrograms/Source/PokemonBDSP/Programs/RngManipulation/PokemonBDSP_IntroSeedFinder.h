@@ -24,6 +24,7 @@ public:
 
 class IntroSeedFinder : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = IntroSeedFinder_Descriptor;
     IntroSeedFinder();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;

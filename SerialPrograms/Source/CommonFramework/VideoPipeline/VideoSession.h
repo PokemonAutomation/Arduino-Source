@@ -251,6 +251,8 @@ private:
 
     ListenerSet<StateListener> m_state_listeners;
     ListenerSet<VideoFrameListener> m_frame_listeners;
+
+    LifetimeSanitizer m_sanitizer;
 };
 
 

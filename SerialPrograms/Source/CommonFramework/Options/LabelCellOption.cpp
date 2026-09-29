@@ -90,10 +90,10 @@ const ImageViewRGB32& LabelCellOption::icon() const{
 Resolution LabelCellOption::resolution() const{
     return m_data->m_resolution;
 }
-void LabelCellOption::load_json(const JsonValue&){
-}
 JsonValue LabelCellOption::to_json() const{
     return JsonValue();
+}
+void LabelCellOption::load_json(const JsonValue&){
 }
 
 void LabelCellOption::set_text(std::string x){

@@ -143,7 +143,7 @@ void trade_current_box(
             send_program_status_notification(env, notifications);
 
             MultiConsoleErrorState error_state;
-            env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+            env.run_in_parallel<ProController>(scope, [&](ConsoleHandle& console, ProControllerContext& context){
                 Milliseconds box_scroll_delay = GameSettings::instance().BOX_SCROLL_DELAY0;
                 for (size_t r = 0; r < row; r++){
                     pbf_move_right_joystick(context, {0, -1}, 160ms, box_scroll_delay);

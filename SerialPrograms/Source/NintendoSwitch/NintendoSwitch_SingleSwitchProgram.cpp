@@ -4,86 +4,78 @@
  *
  */
 
-#include "Common/Cpp/Json/JsonValue.h"
 //#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
-#include "Controllers/ControllerSession.h"
 #include "Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "Framework/NintendoSwitch_SingleSwitchProgramOption.h"
+#include "Framework/NintendoSwitch_SingleSwitchProgramSession.h"
 #include "NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void SingleSwitchProgramEnvironment::add_overlay_log(std::string msg, Color color){
-    console.overlay().add_log(std::move(msg), color);
-}
 
+SingleSwitchProgramEnvironment::SingleSwitchProgramEnvironment(
+    const ProgramInfo& program_info,
+    CancellableScope& scope,
+    ProgramSession& session,
+    StatsTracker* current_stats,
+    const StatsTracker* historical_stats,
+    GameConsole::ConsoleSystemSession& system
+)
+    : GameConsole::ConsoleProgramEnvironment(
+        program_info,
+        scope,
+        session,
+        current_stats,
+        historical_stats,
+        std::make_unique<ConsoleHandle>(system)
+    )
+    , console(static_cast<ConsoleHandle&>(ConsoleProgramEnvironment::console()))
+{}
 
 SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     std::string identifier,
     std::string category, std::string display_name,
     std::string doc_link,
     std::string description,
-    ProgramControllerClass color_class,
+    ProgramControllerClass controller_class,
     FeedbackType feedback,
     AllowCommandsWhenRunning allow_commands_while_running,
-    bool deprecated,
+    PanelDeprecation deprecation,
     std::vector<std::string> required_resources
 )
-    : ProgramDescriptor(
-        pick_color(color_class),
+    : GameConsole::ConsoleProgramDescriptor(
         std::move(identifier),
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description),
+        controller_class,
+        GameConsole::pick_color(controller_class),
+        feedback,
+        allow_commands_while_running,
+        deprecation,
         std::move(required_resources)
     )
-    , m_color_class(color_class)
-    , m_feedback(feedback)
-    , m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
-    , m_deprecated(deprecated)
 {}
-std::unique_ptr<PanelInstance> SingleSwitchProgramDescriptor::make_panel() const{
-    return std::make_unique<SingleSwitchProgramOption>(*this);
+std::unique_ptr<PanelSession> SingleSwitchProgramDescriptor::make_panel() const{
+    return std::make_unique<SingleSwitchProgramSession>(*this);
 }
 
 
 
-SingleSwitchProgramInstance::~SingleSwitchProgramInstance() = default;
-SingleSwitchProgramInstance::SingleSwitchProgramInstance(
-    const std::vector<std::string>& error_notification_tags
-)
-    : m_options(LockMode::UNLOCK_WHILE_RUNNING)
-    , NOTIFICATION_PROGRAM_FINISH(
-        "Program Finished",
-        true, true,
-        ImageAttachmentMode::JPG,
-        {"Notifs"}
-    )
-    , NOTIFICATION_ERROR_RECOVERABLE(
-        "Program Error (Recoverable)",
-        true, false,
-        ImageAttachmentMode::JPG,
-        error_notification_tags
-
-    )
-    , NOTIFICATION_ERROR_FATAL(
-        "Program Error (Fatal)",
-        true, true,
-        ImageAttachmentMode::JPG,
-        error_notification_tags
-    )
-{}
-
-
+void SingleSwitchProgramInstance::program(GameConsole::ConsoleProgramEnvironment& env, CancellableScope& scope){
+    program(static_cast<SingleSwitchProgramEnvironment&>(env), scope);
+}
 void SingleSwitchProgramInstance::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     ProControllerContext context(scope, env.console.controller<ProController>());
+    if (!context->is_ready()){
+        throw UserSetupError(context->logger(), "Controller is not ready.");
+    }
 
     auto record_debug_video = [&](){
         if (GlobalSettings::instance().SAVE_DEBUG_VIDEOS_ON_SWITCH){
@@ -110,18 +102,14 @@ void SingleSwitchProgramInstance::program(SingleSwitchProgramEnvironment& env, P
 }
 
 
-void SingleSwitchProgramInstance::start_program_controller_check(
-    ControllerSession& session
+void SingleSwitchProgramInstance::run_start_program_checks(
+    const ProgramDescriptor& descriptor,
+    ProgramEnvironment& env
 ){
-    if (!session.ready()){
-        throw UserSetupError(session.logger(), "Cannot Start: Controller is not ready.");
-    }
-}
-void SingleSwitchProgramInstance::start_program_feedback_check(
-    VideoStream& stream,
-    FeedbackType feedback_type
-){
-    StartProgramChecks::check_feedback(stream, feedback_type);
+    const GameConsole::ConsoleProgramDescriptor& ldescriptor = dynamic_cast<const GameConsole::ConsoleProgramDescriptor&>(descriptor);
+    GameConsole::ConsoleProgramEnvironment& lenv = dynamic_cast<GameConsole::ConsoleProgramEnvironment&>(env);
+    start_program_feedback_check(ldescriptor, lenv.console());
+    start_program_border_check(lenv.console(), ldescriptor.feedback());
 }
 void SingleSwitchProgramInstance::start_program_border_check(
     VideoStream& stream,
@@ -137,22 +125,6 @@ void SingleSwitchProgramInstance::start_program_border_check(
     }
 }
 
-
-void SingleSwitchProgramInstance::add_option(ConfigOption& option, std::string serialization_string){
-    m_options.add_option(option, std::move(serialization_string));
-}
-void SingleSwitchProgramInstance::from_json(const JsonValue& json){
-    m_options.load_json(json);
-}
-JsonValue SingleSwitchProgramInstance::to_json() const{
-    return m_options.to_json();
-}
-std::string SingleSwitchProgramInstance::check_validity() const{
-    return m_options.check_validity();
-}
-void SingleSwitchProgramInstance::restore_defaults(){
-    return m_options.restore_defaults();
-}
 
 
 

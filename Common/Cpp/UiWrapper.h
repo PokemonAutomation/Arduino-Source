@@ -7,6 +7,9 @@
 #ifndef PokemonAutomation_UiWrapper_H
 #define PokemonAutomation_UiWrapper_H
 
+#include <typeinfo>
+#include "Common/Cpp/Exceptions.h"
+
 namespace PokemonAutomation{
 
 
@@ -131,13 +134,17 @@ public:
 
 
 template <typename Type>
-class UiState<Type>{
+class UiState<Type> : public UiState<>{
 public:
     virtual UiWrapper make_ui_component(void* params){
         if (m_ui_factory){
             return m_ui_factory(static_cast<Type&>(*this), params);
         }
-        return UiWrapper();
+        throw InternalProgramError(
+            nullptr,
+            PA_CURRENT_FUNCTION,
+            std::string("UI component not registered for type: ") + typeid(Type).name()
+        );
     }
 
     static UiFactory<Type> m_ui_factory;

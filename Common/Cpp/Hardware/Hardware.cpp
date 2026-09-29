@@ -22,7 +22,11 @@
 #ifdef PA_ARCH_x86
 #include "Hardware_x86_Linux.tpp"
 #elif PA_ARCH_arm64
+#ifdef __APPLE__
+#include "Hardware_arm64_Mac.tpp"
+#else
 #include "Hardware_arm64_Linux.tpp"
+#endif
 #endif
 #endif
 

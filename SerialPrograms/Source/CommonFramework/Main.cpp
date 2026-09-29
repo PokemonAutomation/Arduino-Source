@@ -180,13 +180,9 @@ int run_program(int argc, char *argv[]){
 
     for (size_t i = 0; i < argc; i++){
         constexpr const char* force_run_tests = "--command-line-test-mode";
-        constexpr const char* command_line_test_folder = "--command-line-test-folder";
 
         if (strcmp(argv[i], force_run_tests) == 0){
             GlobalSettings::instance().COMMAND_LINE_TEST_MODE = true;
-        }
-        if (strcmp(argv[i], command_line_test_folder) == 0 && (i + 1 < argc)){
-            GlobalSettings::instance().COMMAND_LINE_TEST_FOLDER = argv[i + 1];
         }
     }
 

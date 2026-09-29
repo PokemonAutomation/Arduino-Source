@@ -190,7 +190,7 @@ CatchResults basic_catcher(
         stream.log("BasicCatcher: Ball limit reached.", COLOR_RED);
         return results;
     case CatchResult::OWN_FAINTED:
-        stream.log("BasicCatcher: Wwn " + Pokemon::STRING_POKEMON + " fainted after throwing " + pokeball_str, COLOR_RED);
+        stream.log("BasicCatcher: Own " + Pokemon::STRING_POKEMON + " fainted after throwing " + pokeball_str, COLOR_RED);
         return results;
     case CatchResult::TIMED_OUT:
         stream.log("BasicCatcher: Timed out.", COLOR_RED);
@@ -225,9 +225,9 @@ CatchResults basic_catcher(
                 pbf_mash_button(context, BUTTON_B, 120000ms);
             },
             {
-                {end_battle},
-                {caught_detector},
-                {learn_move},
+                end_battle,
+                caught_detector,
+                learn_move,
             }
         );
         switch (ret){

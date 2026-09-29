@@ -15,9 +15,8 @@
 #ifndef PokemonAutomation_NintendoSwitch_MultiSwitchProgramSession_H
 #define PokemonAutomation_NintendoSwitch_MultiSwitchProgramSession_H
 
-#include "CommonFramework/ProgramSession.h"
+#include "GameConsole/Framework/MultiConsoleProgramSession.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
-#include "NintendoSwitch_MultiSwitchSystemSession.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -25,46 +24,13 @@ namespace NintendoSwitch{
 class MultiSwitchProgramOption;
 
 
-class MultiSwitchProgramSession final : public ProgramSession, private MultiSwitchSystemSession::Listener{
+class MultiSwitchProgramSession final : public GameConsole::MultiConsoleProgramSession{
 public:
-    //  This is temporary. Remove once configs have push notifications.
-    struct Listener{
-        virtual void redraw_options() = 0;
-    };
-    void add_listener(Listener& listener);
-    void remove_listener(Listener& listener);
-
-public:
-    bool try_shutdown();
     ~MultiSwitchProgramSession();
-    MultiSwitchProgramSession(MultiSwitchProgramOption& option);
-
-    void restore_defaults();
-
-public:
-    MultiSwitchSystemSession& system(){ return m_system; }
+    MultiSwitchProgramSession(const MultiSwitchProgramDescriptor& descriptor);
 
 private:
-    virtual std::string check_validity() const override;
-
-    virtual void internal_run_program() override;
-    virtual void internal_stop_program() override;
-
-    virtual void shutdown() override;
-    virtual void startup(size_t switch_count) override;
-
-private:
-    void run_program_instance(MultiSwitchProgramEnvironment& env, CancellableScope& scope);
-
-private:
-    MultiSwitchProgramOption& m_option;
-    MultiSwitchSystemSession m_system;
-
-    std::atomic<CancellableScope*> m_scope;
-
-    ListenerSet<Listener> m_listeners;
-
-    LifetimeSanitizer m_sanitizer;
+    virtual std::unique_ptr<ProgramEnvironment> make_env(const ProgramInfo& program_info) override;
 };
 
 

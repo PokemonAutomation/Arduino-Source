@@ -36,10 +36,11 @@ public:
     operator bool() const;
     void operator=(bool x);
 
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
 
+public:
     virtual void restore_defaults() override;
+    virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
 
 
 protected:

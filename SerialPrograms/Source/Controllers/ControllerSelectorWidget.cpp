@@ -12,18 +12,15 @@
 #include "CommonFramework/Panels/ConsoleSettingsStretch.h"
 #include "Controllers/ControllerTypeStrings.h"
 #include "ControllerSelectorWidget.h"
-//#include "NintendoSwitch/NintendoSwitch_Settings.h"
-
-#include "PABotBase2/SerialPABotBase2_Descriptor.h"
-
-#include "PABotBase2/SerialPABotBase2_SelectorWidget.h"
-#include "NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h"
 
 //#include <iostream>
 //using std::cout;
 //using std::endl;
 
 namespace PokemonAutomation{
+
+template class RegisterUiStateQtWidget<ControllerSelectorWidget>;
+
 
 
 
@@ -33,16 +30,17 @@ ControllerSelectorWidget::~ControllerSelectorWidget(){
 }
 ControllerSelectorWidget::ControllerSelectorWidget(
     QWidget& parent,
-    ControllerSession& session,
-    std::optional<size_t> index
+    ControllerSession& session
 )
     : QWidget(&parent)
     , m_session(session)
 {
+//    cout << "ControllerSelectorWidget()" << endl;
+
     QHBoxLayout* layoutL = new QHBoxLayout(this);
     layoutL->setContentsMargins(0, 0, 0, 0);
 
-    if (!index.has_value()){
+    if (!session.index().has_value()){
         layoutL->addWidget(new QLabel("<b>Controller:</b>", this), CONSOLE_SETTINGS_STRETCH_L0_LABEL);
     }else{
         QHBoxLayout* layoutL0 = new QHBoxLayout();
@@ -51,7 +49,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(
 
         layoutL0->addWidget(
             new QLabel(
-                QString::fromStdString("<b>Controller " + std::to_string(index.value()) + ":</b>"),
+                QString::fromStdString("<b>Controller " + std::to_string(session.index().value()) + ":</b>"),
                 this
             )
         );
@@ -97,20 +95,13 @@ ControllerSelectorWidget::ControllerSelectorWidget(
 
 //    m_interface_dropdown->setHidden(true);
 
-    auto current = session.descriptor();
-    if (current == nullptr || current->interface_type == ControllerInterface::None){
-        current.reset(new SerialPABotBase::SerialPABotBase2_Descriptor());
-        session.set_device(std::move(current));
-    }
-    update_interface_dropdown(current->interface_type);
-    m_selector = &static_cast<UiComponentQtWidget&>(*current->make_ui_component(this)).widget();
-    m_dropdowns->addWidget(m_selector, 1);
+    refresh_selection();
 
 
-    m_dropdowns->addSpacing(5);
+//    m_dropdowns->addSpacing(5);
     m_controllers_dropdown = new NoWheelCompactComboBox(this);
-    m_controllers_dropdown->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-    m_dropdowns->addWidget(m_controllers_dropdown, 5);
+//    m_controllers_dropdown->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    m_dropdowns->addWidget(m_controllers_dropdown, 3);
     refresh_controllers(session.controller_type(), session.available_controllers());
 
     m_status_text = new QLabel(this);
@@ -154,7 +145,9 @@ ControllerSelectorWidget::ControllerSelectorWidget(
                 return;
             }
 
-            refresh_selection(incoming);
+            m_session.set_interface(incoming);
+
+            refresh_selection();
         }
     );
     connect(
@@ -217,40 +210,29 @@ ControllerSelectorWidget::ControllerSelectorWidget(
 
 
 void ControllerSelectorWidget::update_interface_dropdown(ControllerInterface interface_type){
-    if (interface_type == ControllerInterface::None){
-        interface_type = ControllerInterface::SerialPABotBase;
-    }
     for (size_t index = 0; index < m_interface_list.size(); index++){
         if (interface_type == m_interface_list[index]){
             m_interface_dropdown->setCurrentIndex((int)index);
             return;
         }
     }
+
 //    m_session.set_controller(ControllerType::None);
     m_interface_dropdown->setCurrentIndex(-1);
 }
-void ControllerSelectorWidget::refresh_selection(ControllerInterface interface_type){
-//    cout << "refresh_selection(): "<< endl;
-
-    update_interface_dropdown(interface_type);
+void ControllerSelectorWidget::refresh_selection(){
+//    cout << "refresh_selection()" << endl;
 
     delete m_selector;
     m_selector = nullptr;
 
-//    m_status_text->setText(QString::fromStdString(html_color_text("Not Connected", COLOR_RED)));
-
-    switch (interface_type){
-    case ControllerInterface::SerialPABotBase2:
-        m_selector = new SerialPABotBase::SerialPABotBase2_SelectorWidget(*this, m_session.descriptor().get());
+    auto current = m_session.descriptor();
+    if (current == nullptr){
+        m_selector = new QWidget(this);
+    }else{
+        update_interface_dropdown(current->interface_type);
+        m_selector = &static_cast<UiComponentQtWidget&>(*current->make_ui_component(this)).widget();
         m_dropdowns->insertWidget(1, m_selector, 1);
-        break;
-
-    case ControllerInterface::TcpSysbotBase:
-        m_selector = new SysbotBase::TcpSysbotBase_SelectorWidget(*this, m_session.descriptor().get());
-        m_dropdowns->insertWidget(1, m_selector, 1);
-        break;
-
-    default:;
     }
 }
 
@@ -283,7 +265,7 @@ void ControllerSelectorWidget::descriptor_changed(
 ){
 //    cout << "descriptor_changed()" << endl;
     QMetaObject::invokeMethod(this, [=, this]{
-        refresh_selection(descriptor->interface_type);
+        refresh_selection();
         refresh_controllers(ControllerType::None, {});
     }, Qt::QueuedConnection);
 }
@@ -304,7 +286,9 @@ void ControllerSelectorWidget::post_status_text_changed(const std::string& text)
 }
 void ControllerSelectorWidget::options_locked(bool locked){
     QMetaObject::invokeMethod(this, [this, locked]{
-        m_selector->setEnabled(!locked);
+        if (m_selector){
+            m_selector->setEnabled(!locked);
+        }
         m_interface_dropdown->setEnabled(!locked);
         m_controllers_dropdown->setEnabled(!locked);
         m_reset_button->setEnabled(!locked);

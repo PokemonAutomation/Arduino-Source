@@ -42,9 +42,9 @@ public:
 
 
 private:
-    size_t m_sample_rate;
-    size_t m_channels;
-    size_t m_multiplier;
+    size_t m_sample_rate = 0;
+    size_t m_channels = 0;
+    size_t m_multiplier = 1;
 
     std::unique_ptr<AudioOutputDevice> m_writer;
 
