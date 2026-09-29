@@ -152,7 +152,7 @@ CollapsibleGroupBox::CollapsibleGroupBox(
     if (orientation == Qt::Horizontal){
         content_layout->setContentsMargins(0, HEADER_PADDING, 0, 0);
     }else{
-        content_layout->setContentsMargins(CONTENT_INDENT, HEADER_PADDING, HEADER_PADDING, HEADER_PADDING);
+        content_layout->setContentsMargins(HEADER_PADDING, HEADER_PADDING, HEADER_PADDING, HEADER_PADDING);
     }
     content_layout->setSpacing(0);
 
