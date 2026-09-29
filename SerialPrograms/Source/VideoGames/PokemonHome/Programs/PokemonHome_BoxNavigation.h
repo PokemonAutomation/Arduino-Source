@@ -51,7 +51,6 @@ std::array<size_t, 2> find_occupied_slots_in_box(
 // Read the current summary screen and assign various pokemon info into cur_pokemon_info
 void read_summary_screen(
     SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
     Pokemon::CollectedPokemonInfo& cur_pokemon_info,
     Language ot_name_language = Language::None,
     Language home_language = Language::None
