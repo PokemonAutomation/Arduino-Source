@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_GlobalSettingsPanel_H
 #define PokemonAutomation_GlobalSettingsPanel_H
 
-#include <vector>
+//#include <vector>
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/ConfigOption.h"
@@ -17,6 +17,7 @@
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/PathOption.h"
 #include "Common/Cpp/Options/ButtonOption.h"
+#include "CommonFramework/Options/WallpaperOption.h"
 #include "CommonFramework/Panels/OptionsPanel.h"
 #include "CommonFramework/Panels/PanelTools.h"
 #include "CommonFramework/ResourceDownload/SettingsResourceDownloadOptions.h"
@@ -48,12 +49,6 @@ enum class OcrLibrary{
     TESSERACT,
 };
 
-enum class BackgroundImageFitMode{
-    FILL,
-    FIT,
-    STRETCH,
-    TILE,
-};
 
 class FolderInputOption : public StringOption{
 public:
@@ -92,11 +87,7 @@ public:
     FolderInputOption TEMP_FOLDER;
 
     Pimpl<ThemeSelectorOption> THEME;
-    BooleanCheckBoxOption BACKGROUND_IMAGE_ENABLED;
-    PathOption BACKGROUND_IMAGE;
-    EnumDropdownOption<BackgroundImageFitMode> BACKGROUND_IMAGE_FIT;
-    SimpleIntegerOption<uint8_t> BACKGROUND_IMAGE_OVERLAY;
-    ButtonOption BACKGROUND_IMAGE_CLEAR;
+    WallpaperOption WALLPAPER;
     EnumDropdownOption<OcrLibrary> OCR_LIBRARY;
     StaticTextOption OCR_WARNING;
     SettingsResourceDownloadTable RESOURCE_DOWNLOAD_TABLE;

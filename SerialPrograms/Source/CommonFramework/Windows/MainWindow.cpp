@@ -511,10 +511,7 @@ MainWindow::MainWindow(QWidget* parent)
     GlobalSettings::instance().WINDOW_SIZE->X_POS.add_listener(*this);
     GlobalSettings::instance().WINDOW_SIZE->Y_POS.add_listener(*this);    
     GlobalSettings::instance().THEME->add_listener(*this);
-    GlobalSettings::instance().BACKGROUND_IMAGE_ENABLED.add_listener(*this);
-    GlobalSettings::instance().BACKGROUND_IMAGE.add_listener(*this);
-    GlobalSettings::instance().BACKGROUND_IMAGE_FIT.add_listener(*this);
-    GlobalSettings::instance().BACKGROUND_IMAGE_OVERLAY.add_listener(*this);
+    GlobalSettings::instance().WALLPAPER.add_listener(*this);
     SystemSleepController::instance().add_listener(*this);
     update_background();
 //    cout << "Done constructing" << endl;
@@ -527,10 +524,7 @@ MainWindow::~MainWindow(){
     GlobalSettings::instance().WINDOW_SIZE->X_POS.remove_listener(*this);
     GlobalSettings::instance().WINDOW_SIZE->Y_POS.remove_listener(*this);
     GlobalSettings::instance().THEME->remove_listener(*this);
-    GlobalSettings::instance().BACKGROUND_IMAGE_ENABLED.remove_listener(*this);
-    GlobalSettings::instance().BACKGROUND_IMAGE.remove_listener(*this);
-    GlobalSettings::instance().BACKGROUND_IMAGE_FIT.remove_listener(*this);
-    GlobalSettings::instance().BACKGROUND_IMAGE_OVERLAY.remove_listener(*this);
+    GlobalSettings::instance().WALLPAPER.remove_listener(*this);
     if (m_output_window){
         global_multi_logger().remove_listener(*m_output_window);
     }
@@ -690,10 +684,7 @@ void MainWindow::on_config_value_changed(void* object){
         });        
     }else if (
         object == &*GlobalSettings::instance().THEME ||
-        object == &GlobalSettings::instance().BACKGROUND_IMAGE_ENABLED ||
-        object == &GlobalSettings::instance().BACKGROUND_IMAGE ||
-        object == &GlobalSettings::instance().BACKGROUND_IMAGE_FIT ||
-        object == &GlobalSettings::instance().BACKGROUND_IMAGE_OVERLAY
+        object == &GlobalSettings::instance().WALLPAPER
     ){
         queue_background_update();
     }
@@ -727,13 +718,13 @@ void MainWindow::update_background(){
     GlobalSettings& settings = GlobalSettings::instance();
     const QColor surface_color = palette().color(QPalette::Active, QPalette::Window);
     centralwidget->set_appearance(
-        settings.BACKGROUND_IMAGE_FIT,
-        settings.BACKGROUND_IMAGE_OVERLAY,
+        settings.WALLPAPER.IMAGE_FIT,
+        settings.WALLPAPER.IMAGE_OVERLAY,
         surface_color
     );
     centralwidget->set_image(
-        settings.BACKGROUND_IMAGE_ENABLED,
-        QString::fromStdString(static_cast<std::string>(settings.BACKGROUND_IMAGE))
+        settings.WALLPAPER.enabled(),
+        QString::fromStdString(static_cast<std::string>(settings.WALLPAPER.IMAGE_PATH))
     );
     const QString error = centralwidget->take_error();
 
