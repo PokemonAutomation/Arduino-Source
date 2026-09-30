@@ -224,6 +224,8 @@ file(GLOB CORE_LIBRARY_SOURCES
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.h
     Source/CommonFramework/Options/ThreadPoolOption.cpp
     Source/CommonFramework/Options/ThreadPoolOption.h
+    Source/CommonFramework/Options/WallpaperOption.cpp
+    Source/CommonFramework/Options/WallpaperOption.h
     Source/CommonFramework/StaticGlobals.cpp
     Source/CommonFramework/StaticGlobals.h
     Source/CommonFramework/Tools/FileHash.cpp
