@@ -783,12 +783,9 @@ namespace PokemonAutomation {
                     case StarterChoice::CHIMCHAR: select_chimchar(env.console, context); break;
                     case StarterChoice::PIPLUP:   select_piplup(env.console, context);   break;
                     }
-                    //Fight Starly
                     fight_starly(env.console, context);
+                    post_starly_clenaup(env.console, context);
                 },
-                true
-					post_starly_clenaup(env.console, context);
-                }
                 true
             );
         }
