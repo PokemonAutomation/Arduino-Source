@@ -15,6 +15,8 @@ namespace AbsFFT{
 
 
 const float TW8_1 = 0.70710678118654752440f;
+const float TW16_1 = 0.92387953251128675613f;
+const float TW16_3 = 0.38268343236508977173f;
 
 #if 0
 PA_FORCE_INLINE void cmul_pp(

@@ -50,6 +50,7 @@ TwiddleTable<Context>::TwiddleTable(int initial_size)
     expand(initial_size);
 }
 
+#if 0
 template <typename Context>
 const PerSizeTables<Context>& TwiddleTable<Context>::operator[](int k) const{
     int size_k = m_size_k.load(std::memory_order_acquire);
@@ -58,6 +59,7 @@ const PerSizeTables<Context>& TwiddleTable<Context>::operator[](int k) const{
     }
     return m_tables[k];
 }
+#endif
 
 template <typename Context>
 void TwiddleTable<Context>::ensure(int k){

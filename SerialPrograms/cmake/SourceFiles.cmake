@@ -975,8 +975,10 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch_Default.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch_x86_AVX2.h
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch_x86_AVX512.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch_x86_SSE41.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_BaseTransform_x86_AVX2.h
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_BaseTransform_x86_AVX512.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_BaseTransform_x86_SSE41.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_BitReverse.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Butterflies.h
@@ -985,6 +987,7 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/AbsFFT/Kernels_AbsFFT_ComplexVector.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_Default.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_AVX2.cpp
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_AVX512.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_SSE41.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT_FullTransform.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_FullTransform.tpp

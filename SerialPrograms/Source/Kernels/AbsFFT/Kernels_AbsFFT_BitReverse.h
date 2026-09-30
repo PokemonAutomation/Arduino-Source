@@ -153,7 +153,7 @@ static void bitreverse_u64_np(int len_k, uint64_t* out, uint64_t* in){
         out[0] = r0;
         out[1] = r2;
         out[2] = r1;
-        out[0] = r3;
+        out[3] = r3;
         return;
     }
     if (len_k == 3){
