@@ -17,6 +17,7 @@ namespace AbsFFT{
 void fft_abs_Default(int k, float* abs, float* real);
 void fft_abs_x86_SSE41(int k, float* abs, float* real);
 void fft_abs_x86_AVX2(int k, float* abs, float* real);
+void fft_abs_x86_AVX512(int k, float* abs, float* real);
 
 
 void fft_abs(int k, float* abs, float* real){
@@ -30,6 +31,12 @@ void fft_abs(int k, float* abs, float* real){
         throw "real must be aligned to 64 bytes.";
     }
 
+#ifdef PA_AutoDispatch_x64_17_Skylake
+    if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
+        fft_abs_x86_AVX512(k, abs, real);
+        return;
+    }
+#endif
 #ifdef PA_AutoDispatch_x64_13_Haswell
     if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
         fft_abs_x86_AVX2(k, abs, real);

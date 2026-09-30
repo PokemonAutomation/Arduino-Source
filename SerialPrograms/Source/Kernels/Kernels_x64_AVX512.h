@@ -56,6 +56,17 @@ inline void print_u64(const __m512i& x){
     }
     std::cout << std::endl;
 }
+inline void print(const __m512& x){
+    union{
+        __m512 v;
+        float s[16];
+    };
+    v = x;
+    for (int i = 0; i < 16; i++){
+        std::cout << s[i] << " ";
+    }
+    std::cout << std::endl;
+}
 
 
 
