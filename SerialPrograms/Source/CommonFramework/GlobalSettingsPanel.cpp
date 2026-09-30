@@ -51,7 +51,9 @@ GlobalSettings& GlobalSettings::instance(){
 }
 GlobalSettings::~GlobalSettings(){
     ENABLE_LIFETIME_SANITIZER0.remove_listener(*this);
+    BACKGROUND_IMAGE_ENABLED.remove_listener(*this);
     OPEN_BASE_FOLDER_BUTTON.remove_listener(static_cast<ButtonListener&>(*this));
+    BACKGROUND_IMAGE_CLEAR.remove_listener(static_cast<ButtonListener&>(*this));
 }
 GlobalSettings::GlobalSettings()
     : BatchOption(LockMode::LOCK_WHILE_RUNNING)
@@ -85,6 +87,38 @@ GlobalSettings::GlobalSettings()
 #endif
     )
     , THEME(CONSTRUCT_TOKEN)
+    , BACKGROUND_IMAGE_ENABLED(
+        "<b>Use Background Image:</b><br>Display a custom image behind the main program interface.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    )
+    , BACKGROUND_IMAGE(
+        "<b>Background Image:</b>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        "",
+        "Images (*.png *.jpg *.jpeg *.bmp *.webp);;All Files (*)",
+        "Select a PNG, JPEG, BMP, or WebP image"
+    )
+    , BACKGROUND_IMAGE_FIT(
+        "<b>Background Image Fit:</b>",
+        {
+            {BackgroundImageFitMode::FILL, "fill", "Fill (crop to window)"},
+            {BackgroundImageFitMode::FIT, "fit", "Fit (show entire image)"},
+            {BackgroundImageFitMode::STRETCH, "stretch", "Stretch"},
+            {BackgroundImageFitMode::TILE, "tile", "Tile"},
+        },
+        LockMode::UNLOCK_WHILE_RUNNING,
+        BackgroundImageFitMode::FILL
+    )
+    , BACKGROUND_IMAGE_OVERLAY(
+        "<b>Background Overlay (%):</b><br>Increase this to improve text readability over the image.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        35, 0, 100
+    )
+    , BACKGROUND_IMAGE_CLEAR(
+        "<b>Clear Background Image:</b>",
+        "Clear"
+    )
     , OCR_LIBRARY(
         "<b>OCR library:",
         {
@@ -194,6 +228,11 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(STATS_FILE);
     PA_ADD_OPTION(TEMP_FOLDER);
     PA_ADD_OPTION(THEME);
+    PA_ADD_OPTION(BACKGROUND_IMAGE_ENABLED);
+    PA_ADD_OPTION(BACKGROUND_IMAGE);
+    PA_ADD_OPTION(BACKGROUND_IMAGE_FIT);
+    PA_ADD_OPTION(BACKGROUND_IMAGE_OVERLAY);
+    PA_ADD_OPTION(BACKGROUND_IMAGE_CLEAR);
     PA_ADD_OPTION(OCR_LIBRARY);
 
     // gated behind Dev mode. see GlobalSettings::load_json
@@ -252,7 +291,9 @@ GlobalSettings::GlobalSettings()
 
     GlobalSettings::on_config_value_changed(this);
     ENABLE_LIFETIME_SANITIZER0.add_listener(*this);
+    BACKGROUND_IMAGE_ENABLED.add_listener(*this);
     OPEN_BASE_FOLDER_BUTTON.add_listener(static_cast<ButtonListener&>(*this));
+    BACKGROUND_IMAGE_CLEAR.add_listener(static_cast<ButtonListener&>(*this));
 }
 
 JsonValue GlobalSettings::to_json() const{
@@ -308,20 +349,39 @@ void GlobalSettings::load_json(const JsonValue& json){
 
 
 void GlobalSettings::on_config_value_changed(void* object){
-    bool enabled = ENABLE_LIFETIME_SANITIZER0;
-    if (enabled){
-        global_logger_tagged().log("LifeTime Sanitizer: Enabled", COLOR_BLUE);
-    }else{
-        global_logger_tagged().log("LifeTime Sanitizer: Disabled", COLOR_BLUE);
-        LifetimeSanitizer::disable();
+    if (object == this || object == &BACKGROUND_IMAGE_ENABLED){
+        ConfigOptionState state = BACKGROUND_IMAGE_ENABLED
+            ? ConfigOptionState::ENABLED
+            : ConfigOptionState::DISABLED;
+        BACKGROUND_IMAGE.set_visibility(state);
+        BACKGROUND_IMAGE_FIT.set_visibility(state);
+        BACKGROUND_IMAGE_OVERLAY.set_visibility(state);
+        BACKGROUND_IMAGE_CLEAR.set_visibility(state);
+    }
+
+    if (object == this || object == &ENABLE_LIFETIME_SANITIZER0){
+        bool enabled = ENABLE_LIFETIME_SANITIZER0;
+        if (enabled){
+            global_logger_tagged().log("LifeTime Sanitizer: Enabled", COLOR_BLUE);
+        }else{
+            global_logger_tagged().log("LifeTime Sanitizer: Disabled", COLOR_BLUE);
+            LifetimeSanitizer::disable();
+        }
     }
 }
 
 void GlobalSettings::on_press(ButtonCell& button){
 #ifdef QT_CORE_LIB
-    // Open the runtime base folder in the system file manager
-    QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdString(RUNTIME_BASE_PATH())));
+    if (&button == &OPEN_BASE_FOLDER_BUTTON){
+        // Open the runtime base folder in the system file manager
+        QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdString(RUNTIME_BASE_PATH())));
+        return;
+    }
 #endif
+    if (&button == &BACKGROUND_IMAGE_CLEAR){
+        BACKGROUND_IMAGE.set("");
+        BACKGROUND_IMAGE_ENABLED = false;
+    }
 }
 
 void GlobalSettings::connect_row_with_download(const std::string& resource_slug, std::shared_ptr<ResourceDownload>& download_ptr){

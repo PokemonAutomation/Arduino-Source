@@ -13,8 +13,9 @@
 #include "Common/Cpp/Options/ConfigOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-//#include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StringOption.h"
+#include "Common/Cpp/Options/PathOption.h"
 #include "Common/Cpp/Options/ButtonOption.h"
 #include "CommonFramework/Panels/OptionsPanel.h"
 #include "CommonFramework/Panels/PanelTools.h"
@@ -45,6 +46,13 @@ class ResourceDownload;
 enum class OcrLibrary{
     PADDLE_OCR,
     TESSERACT,
+};
+
+enum class BackgroundImageFitMode{
+    FILL,
+    FIT,
+    STRETCH,
+    TILE,
 };
 
 class FolderInputOption : public StringOption{
@@ -84,6 +92,11 @@ public:
     FolderInputOption TEMP_FOLDER;
 
     Pimpl<ThemeSelectorOption> THEME;
+    BooleanCheckBoxOption BACKGROUND_IMAGE_ENABLED;
+    PathOption BACKGROUND_IMAGE;
+    EnumDropdownOption<BackgroundImageFitMode> BACKGROUND_IMAGE_FIT;
+    SimpleIntegerOption<uint8_t> BACKGROUND_IMAGE_OVERLAY;
+    ButtonOption BACKGROUND_IMAGE_CLEAR;
     EnumDropdownOption<OcrLibrary> OCR_LIBRARY;
     StaticTextOption OCR_WARNING;
     SettingsResourceDownloadTable RESOURCE_DOWNLOAD_TABLE;

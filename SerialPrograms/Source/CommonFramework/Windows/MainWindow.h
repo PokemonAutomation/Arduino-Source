@@ -23,6 +23,7 @@ namespace PokemonAutomation{
 
 class ButtonDiagram;
 class LoggerWindow;
+class BackgroundWidget;
 
 
 class MainWindow
@@ -37,6 +38,7 @@ public:
 
 
 private:
+    virtual void changeEvent(QEvent* event) override;
     virtual void closeEvent(QCloseEvent* event) override;
     virtual void resizeEvent(QResizeEvent* event) override;
     virtual void moveEvent(QMoveEvent* event) override;
@@ -61,8 +63,12 @@ private:
     virtual void on_config_value_changed(void* object) override;
     virtual void sleep_suppress_state_changed(SleepSuppress new_state) override;
 
+    void update_background();
+    void queue_background_update();
+
 private:
-    QWidget* centralwidget;
+    BackgroundWidget* centralwidget = nullptr;
+    bool m_background_update_pending = false;
     QMenuBar* menubar;
 //    QStatusBar* statusbar;
 

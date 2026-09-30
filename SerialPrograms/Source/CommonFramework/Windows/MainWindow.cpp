@@ -4,6 +4,14 @@
  *
  */
 
+#include <algorithm>
+#include <cmath>
+#include <exception>
+#include <functional>
+#include <memory>
+#include <utility>
+#include <QFutureWatcher>
+#include <QScreen>
 #include <QMenuBar>
 //#include <QStatusBar>
 #include <QHBoxLayout>
@@ -13,6 +21,10 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QMessageBox>
+#include <QPainter>
+#include <QImageReader>
+#include <QPaintEvent>
+#include <QStyleOption>
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Logging/MultiOutputLogger.h"
@@ -26,6 +38,7 @@
 #include "CommonFramework/Logging/LoggerWindow.h"
 #include "CommonFramework/Startup/NewVersionCheck.h"
 #include "CommonFramework/Options/ResolutionOption.h"
+#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "PanelLists.h"
@@ -39,6 +52,225 @@ using std::cout;
 using std::endl;
 
 namespace PokemonAutomation{
+
+
+namespace{
+
+struct BackgroundImageResult{
+    QImage image;
+    QString error;
+};
+
+BackgroundImageResult load_background_image(const QString& path, QSize target_size, bool tile){
+    QImageReader reader(path);
+    reader.setAutoTransform(true);
+    // Sprite loaders disable QImageReader's application-wide allocation limit.
+    // Might want to reject overly large images.
+    constexpr qint64 MAX_DISPLAY_PIXELS = 8 * 1024 * 1024; // 4k image size.
+    const QSize dimensions = reader.size();
+    if (!dimensions.isValid() || dimensions.isEmpty()){
+        return {{}, "Unable to determine the image dimensions safely."};
+    }
+    const qint64 pixels = static_cast<qint64>(dimensions.width()) * dimensions.height();
+    if (!tile){
+        const qreal scale = std::min({
+            qreal(1),
+            std::max(qreal(target_size.width()) / dimensions.width(),
+                     qreal(target_size.height()) / dimensions.height()),
+            std::sqrt(qreal(MAX_DISPLAY_PIXELS) / pixels)
+        });
+        const QSize scaled_size(
+            std::max(1, static_cast<int>(dimensions.width() * scale)),
+            std::max(1, static_cast<int>(dimensions.height() * scale))
+        );
+        if (scaled_size != dimensions){
+            reader.setScaledSize(scaled_size);
+        }
+    }
+    QImage image = reader.read();
+    if (image.isNull()){
+        return {{}, reader.errorString()};
+    }
+    return {std::move(image), {}};
+}
+
+QThreadPool& background_image_pool(){
+    // Serialize decoding so rapid path changes cannot multiply peak memory.
+    static const auto pool = []{
+        auto result = std::make_unique<QThreadPool>();
+        result->setMaxThreadCount(1);
+        return result;
+    }();
+    return *pool;
+}
+
+}
+
+class BackgroundWidget : public QWidget{
+public:
+    BackgroundWidget(QWidget* parent, std::function<void()> on_loaded)
+        : QWidget(parent)
+        , m_on_loaded(std::move(on_loaded))
+    {}
+
+    ~BackgroundWidget(){
+        if (m_loading){
+            m_loading->cancel();
+        }
+    }
+
+    void set_appearance(
+        BackgroundImageFitMode fit_mode,
+        uint8_t overlay,
+        const QColor& surface_color
+    ){
+        m_fit_mode = fit_mode;
+        m_overlay = overlay;
+        m_surface_color = surface_color;
+        update();
+    }
+
+    void set_image(bool enabled, const QString& path){
+        const QString requested_path = enabled ? path : QString();
+        const bool tile = m_fit_mode == BackgroundImageFitMode::TILE;
+        if (requested_path == m_path && (requested_path.isEmpty() || m_failed || tile == m_tile)){
+            return;
+        }
+        ++m_generation;
+        if (m_loading){
+            m_loading->cancel();
+            m_loading = nullptr;
+        }
+        m_path = requested_path;
+        m_tile = tile;
+        m_failed = false;
+        m_error.clear();
+        // Release the previous image before decoding its replacement.
+        m_pixmap = QPixmap();
+        update();
+        if (m_path.isEmpty()){
+            return;
+        }
+
+        const QSize target_size = screen()
+            ? screen()->size() * screen()->devicePixelRatio()
+            : size();
+        auto promise = std::make_shared<QPromise<BackgroundImageResult>>();
+        promise->start();
+        auto* watcher = new QFutureWatcher<BackgroundImageResult>(this);
+        m_loading = watcher;
+        const uint64_t generation = m_generation;
+        connect(watcher, &QFutureWatcher<BackgroundImageResult>::finished,
+            this, [this, watcher, generation]{
+                watcher->deleteLater();
+                if (generation != m_generation || watcher->isCanceled()){
+                    return;
+                }
+                m_loading = nullptr;
+                BackgroundImageResult result;
+                try{
+                    result = watcher->result();
+                }catch (...){
+                    result.error = QStringLiteral("Unable to decode the background image.");
+                }
+                m_error = std::move(result.error);
+                if (!result.image.isNull()){
+                    m_pixmap = QPixmap::fromImage(std::move(result.image));
+                    if (m_pixmap.isNull()){
+                        m_error = "Unable to create the background pixmap.";
+                    }
+                }
+                m_failed = m_pixmap.isNull();
+                update();
+                m_on_loaded();
+            }
+        );
+        watcher->setFuture(promise->future());
+        background_image_pool().start([promise, requested_path, target_size, tile]{
+            try{
+                if (!promise->isCanceled()){
+                    auto result = load_background_image(requested_path, target_size, tile);
+                    if (!promise->isCanceled()){
+                        promise->addResult(std::move(result));
+                    }
+                }
+            }catch (...){
+                promise->setException(std::current_exception());
+            }
+            promise->finish();
+        });
+    }
+
+    bool active() const{
+        return !m_pixmap.isNull();
+    }
+
+    QString take_error(){
+        return std::exchange(m_error, QString());
+    }
+
+protected:
+    virtual void paintEvent(QPaintEvent*) override{
+        QStyleOption option;
+        option.initFrom(this);
+        QPainter painter(this);
+        style()->drawPrimitive(QStyle::PE_Widget, &option, &painter, this);
+
+        if (m_pixmap.isNull()){
+            return;
+        }
+
+        painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+
+        switch (m_fit_mode){
+        case BackgroundImageFitMode::FILL:
+        case BackgroundImageFitMode::FIT:{
+            QSizeF image_size = m_pixmap.deviceIndependentSize();
+            QSizeF window_size = size();
+            const qreal scale_x = window_size.width() / image_size.width();
+            const qreal scale_y = window_size.height() / image_size.height();
+            const qreal scale = m_fit_mode == BackgroundImageFitMode::FILL
+                ? std::max(scale_x, scale_y)
+                : std::min(scale_x, scale_y);
+            QSizeF scaled_size = image_size * scale;
+            QRectF destination(
+                (window_size.width() - scaled_size.width()) / 2,
+                (window_size.height() - scaled_size.height()) / 2,
+                scaled_size.width(),
+                scaled_size.height()
+            );
+            painter.drawPixmap(destination, m_pixmap, QRectF(m_pixmap.rect()));
+            break;
+        }
+        case BackgroundImageFitMode::STRETCH:
+            painter.drawPixmap(QRectF(rect()), m_pixmap, QRectF(m_pixmap.rect()));
+            break;
+        case BackgroundImageFitMode::TILE:
+            painter.drawTiledPixmap(rect(), m_pixmap);
+            break;
+        }
+
+        if (m_overlay > 0){
+            int alpha = static_cast<int>(m_overlay) * 255 / 100;
+            QColor overlay = m_surface_color;
+            overlay.setAlpha(alpha);
+            painter.fillRect(rect(), overlay);
+        }
+    }
+
+private:
+    std::function<void()> m_on_loaded;
+    QFutureWatcher<BackgroundImageResult>* m_loading = nullptr;
+    uint64_t m_generation = 0;
+    bool m_tile = false;
+    bool m_failed = false;
+    QString m_error;
+    QString m_path;
+    QPixmap m_pixmap;
+    BackgroundImageFitMode m_fit_mode = BackgroundImageFitMode::FILL;
+    uint8_t m_overlay = 35;
+    QColor m_surface_color;
+};
 
 
 MainWindow::MainWindow(QWidget* parent)
@@ -66,7 +298,7 @@ MainWindow::MainWindow(QWidget* parent)
     int32_t move_y_main = move_y_within_screen_bounds(y_pos_main);
     move(move_x_main, move_y_main);
 
-    centralwidget = new QWidget(this);
+    centralwidget = new BackgroundWidget(this, [this]{ queue_background_update(); });
     centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
     setCentralWidget(centralwidget);
     menubar = new QMenuBar(this);
@@ -92,6 +324,7 @@ MainWindow::MainWindow(QWidget* parent)
     );
     hbox->addWidget(sidebar, 0);
     QWidget* sidebar_body = new QWidget(sidebar);
+    sidebar_body->setObjectName(QString::fromUtf8("backgroundSidebarBody"));
     sidebar->set_widget(sidebar_body);
     QVBoxLayout* left_layout = new QVBoxLayout(sidebar_body);
     left_layout->setContentsMargins(0, 0, 0, 0);
@@ -105,6 +338,7 @@ MainWindow::MainWindow(QWidget* parent)
         QString::fromStdString(PROGRAM_NAME + " " + PROGRAM_VERSION + " (" + PA_ARCH_STRING + ")"),
         centralwidget
     );
+    support_box->setObjectName(QString::fromUtf8("backgroundSupportBox"));
 
 
     left_layout->addWidget(support_box);
@@ -276,7 +510,13 @@ MainWindow::MainWindow(QWidget* parent)
     GlobalSettings::instance().WINDOW_SIZE->HEIGHT.add_listener(*this);
     GlobalSettings::instance().WINDOW_SIZE->X_POS.add_listener(*this);
     GlobalSettings::instance().WINDOW_SIZE->Y_POS.add_listener(*this);    
+    GlobalSettings::instance().THEME->add_listener(*this);
+    GlobalSettings::instance().BACKGROUND_IMAGE_ENABLED.add_listener(*this);
+    GlobalSettings::instance().BACKGROUND_IMAGE.add_listener(*this);
+    GlobalSettings::instance().BACKGROUND_IMAGE_FIT.add_listener(*this);
+    GlobalSettings::instance().BACKGROUND_IMAGE_OVERLAY.add_listener(*this);
     SystemSleepController::instance().add_listener(*this);
+    update_background();
 //    cout << "Done constructing" << endl;
 }
 MainWindow::~MainWindow(){
@@ -286,6 +526,11 @@ MainWindow::~MainWindow(){
     GlobalSettings::instance().WINDOW_SIZE->HEIGHT.remove_listener(*this);
     GlobalSettings::instance().WINDOW_SIZE->X_POS.remove_listener(*this);
     GlobalSettings::instance().WINDOW_SIZE->Y_POS.remove_listener(*this);
+    GlobalSettings::instance().THEME->remove_listener(*this);
+    GlobalSettings::instance().BACKGROUND_IMAGE_ENABLED.remove_listener(*this);
+    GlobalSettings::instance().BACKGROUND_IMAGE.remove_listener(*this);
+    GlobalSettings::instance().BACKGROUND_IMAGE_FIT.remove_listener(*this);
+    GlobalSettings::instance().BACKGROUND_IMAGE_OVERLAY.remove_listener(*this);
     if (m_output_window){
         global_multi_logger().remove_listener(*m_output_window);
     }
@@ -443,8 +688,87 @@ void MainWindow::on_config_value_changed(void* object){
                 );
             }
         });        
+    }else if (
+        object == &*GlobalSettings::instance().THEME ||
+        object == &GlobalSettings::instance().BACKGROUND_IMAGE_ENABLED ||
+        object == &GlobalSettings::instance().BACKGROUND_IMAGE ||
+        object == &GlobalSettings::instance().BACKGROUND_IMAGE_FIT ||
+        object == &GlobalSettings::instance().BACKGROUND_IMAGE_OVERLAY
+    ){
+        queue_background_update();
     }
 }
+
+void MainWindow::changeEvent(QEvent* event){
+    QMainWindow::changeEvent(event);
+    if (event->type() == QEvent::PaletteChange || event->type() == QEvent::StyleChange){
+        queue_background_update();
+    }
+}
+
+void MainWindow::queue_background_update(){
+    if (QThread::currentThread() != thread()){
+        QMetaObject::invokeMethod(this, [this]{ queue_background_update(); }, Qt::QueuedConnection);
+        return;
+    }
+    if (m_background_update_pending){
+        return;
+    }
+    m_background_update_pending = true;
+    QMetaObject::invokeMethod(this, [this]{
+        m_background_update_pending = false;
+        if (centralwidget){
+            update_background();
+        }
+    }, Qt::QueuedConnection);
+}
+
+void MainWindow::update_background(){
+    GlobalSettings& settings = GlobalSettings::instance();
+    const QColor surface_color = palette().color(QPalette::Active, QPalette::Window);
+    centralwidget->set_appearance(
+        settings.BACKGROUND_IMAGE_FIT,
+        settings.BACKGROUND_IMAGE_OVERLAY,
+        surface_color
+    );
+    centralwidget->set_image(
+        settings.BACKGROUND_IMAGE_ENABLED,
+        QString::fromStdString(static_cast<std::string>(settings.BACKGROUND_IMAGE))
+    );
+    const QString error = centralwidget->take_error();
+
+    if (!error.isEmpty()){
+        global_logger_tagged().log(
+            "Unable to load background image: " + error.toStdString(),
+            COLOR_RED
+        );
+    }
+
+    if (!centralwidget->active()){
+        if (!centralwidget->styleSheet().isEmpty()){
+            centralwidget->setStyleSheet(QString());
+        }
+        return;
+    }
+
+    const QString surface = QStringLiteral("rgba(%1, %2, %3, 215)")
+        .arg(surface_color.red()).arg(surface_color.green()).arg(surface_color.blue());
+    const QString stylesheet = QString::fromLatin1(
+        "QWidget[backgroundContainer=\"true\"] { background-color: transparent; }"
+        "QWidget#backgroundSidebarBody { background-color: transparent; }"
+        "QGroupBox#backgroundSupportBox { background-color: %1; }"
+        "QWidget#backgroundPanelRoot { background-color: transparent; }"
+        "QWidget#backgroundProgramHeader { background-color: %1; }"
+        "QWidget#backgroundProgramHeader QLabel { background-color: transparent; }"
+        "QScrollArea#backgroundScrollArea { background-color: transparent; border: none; }"
+        "QWidget#backgroundScrollViewport { background-color: transparent; }"
+        "QWidget#backgroundScrollContents { background-color: %1; }"
+    ).arg(surface);
+    if (centralwidget->styleSheet() != stylesheet){
+        centralwidget->setStyleSheet(stylesheet);
+    }
+}
+
 void MainWindow::sleep_suppress_state_changed(SleepSuppress new_state){
     QMetaObject::invokeMethod(this, [=, this]{
         switch (new_state){
