@@ -4,7 +4,7 @@
  *
  */
 #include "Common/Cpp/Options/ConfigOption.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -169,8 +169,8 @@ void reach_bench(SingleSwitchProgramEnvironment& env, ProControllerContext& cont
             + std::to_string((int)result)
         );
 
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to fast travel to Magenta Pokemon Center.",
             env.console
         );
@@ -208,8 +208,8 @@ void warp_wild_zone_14(SingleSwitchProgramEnvironment& env, ProControllerContext
     );
 
     if (result != FastTravelState::SUCCESS) {
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to fast travel to Wild Zone 14.",
             env.console
         );
@@ -289,8 +289,8 @@ void ShinyHunt_HelioptileHunter::program(SingleSwitchProgramEnvironment& env, Pr
                         break;
 
                     default:
-                        OperationFailedException::fire(
-                            ErrorReport::SEND_ERROR_REPORT,
+                        OperationFailedExceptionWithScreenshot::fire(
+                            ErrorReportMode::SEND_ERROR_REPORT,
                             "Failed to fast travel back to Wild Zone 14 after weather check.",
                             env.console
                         );
