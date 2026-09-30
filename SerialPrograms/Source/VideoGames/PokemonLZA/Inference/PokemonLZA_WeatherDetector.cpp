@@ -50,12 +50,24 @@ const std::vector<SupplementalTemplateCheck>& supplemental_template_checks(Weath
         {"PokemonLZA/Weather/rainbow_cloud.png", ImageFloatBox(0.8840, 0.0465, 0.0140, 0.0165), COLOR_GREEN, 90.0},
         {"PokemonLZA/Weather/rainbow_arch.png",  ImageFloatBox(0.8930, 0.0420, 0.0120, 0.0100), COLOR_BLUE,  90.0},
     };
+    static const std::vector<SupplementalTemplateCheck> CLEAR = {
+        {"PokemonLZA/Weather/clear_full.png", ImageFloatBox(0.880000, 0.010000, 0.035800, 0.068000), COLOR_GREEN, 115.0},
+        {"PokemonLZA/Weather/clear_core.png", ImageFloatBox(0.89115, 0.03611, 0.01094, 0.02130), COLOR_BLUE, 90.0},
+    };
+    static const std::vector<SupplementalTemplateCheck> SUNNY = {
+        {"PokemonLZA/Weather/sunny_full.png", ImageFloatBox(0.880000, 0.010000, 0.035800, 0.068000), COLOR_GREEN, 120.0},
+        {"PokemonLZA/Weather/sunny_core.png", ImageFloatBox(0.89115, 0.03611, 0.01094, 0.02130), COLOR_BLUE, 90.0},
+    };
     static const std::vector<SupplementalTemplateCheck> FOGGY = {
         {"PokemonLZA/Weather/foggy_tray_1.png", ImageFloatBox(0.8893, 0.0487, 0.0218, 0.0080), COLOR_GREEN, 90.0},
         {"PokemonLZA/Weather/foggy_tray_2.png", ImageFloatBox(0.8880, 0.0555, 0.0225, 0.0080), COLOR_BLUE,  90.0},
     };
 
     switch (type){
+    case WeatherIconType::Clear:
+        return CLEAR;
+    case WeatherIconType::Sunny:
+        return SUNNY;
     case WeatherIconType::Rain:
         return RAIN;
     case WeatherIconType::Cloudy:
@@ -195,8 +207,8 @@ std::string weather_list_string(const std::vector<WeatherIconType>& weathers){
 
 class WeatherFullMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
-    WeatherFullMatcher(const char* path, double max_rmsd)
-        : WaterfillTemplateMatcher(path, Color(0xff707070), Color(0xffffffff), 50)
+    WeatherFullMatcher(const char* path, double max_rmsd, bool use_blue_filter = false)
+        : WaterfillTemplateMatcher(path, use_blue_filter ? Color(0xff143769) : Color(0xff707070), use_blue_filter ? Color(0xff6991be) : Color(0xffffffff), 50)
         , m_max_rmsd(max_rmsd)
     {
         m_aspect_ratio_lower = 0.60;
@@ -206,11 +218,11 @@ public:
     }
 
     static const WeatherFullMatcher& clear(){
-        static const WeatherFullMatcher matcher("PokemonLZA/Weather/clear_full.png", 115.0);
+        static const WeatherFullMatcher matcher("PokemonLZA/Weather/clear_full.png", 115.0, true);
         return matcher;
     }
     static const WeatherFullMatcher& sunny(){
-        static const WeatherFullMatcher matcher("PokemonLZA/Weather/sunny_full.png", 120.0);
+        static const WeatherFullMatcher matcher("PokemonLZA/Weather/sunny_full.png", 120.0, true);
         return matcher;
     }
     static const WeatherFullMatcher& rain(){
@@ -277,16 +289,22 @@ bool WeatherIconDetector::detect(const ImageViewRGB32& screen){
     const double scale = screen.height() / 1080.0;
     const size_t min_area = (size_t)(scale * scale * 120.0);
 
-    static const std::vector<std::pair<uint32_t, uint32_t>> FILTERS = {
+    static const std::vector<std::pair<uint32_t, uint32_t>> LIGHT_FILTERS = {
         {0xff707070, 0xffffffff},
     };
+    static const std::vector<std::pair<uint32_t, uint32_t>> BLUE_FILTERS = {
+        {0xff143769, 0xff6991be},
+    };
+    const auto& filters =
+        m_type == WeatherIconType::Clear || m_type == WeatherIconType::Sunny
+        ? BLUE_FILTERS : LIGHT_FILTERS;
 
     ImageViewRGB32 cropped = extract_box_reference(screen, m_box);
     const bool full_match = match_template_by_waterfill(
         screen.size(),
         cropped,
         matcher,
-        FILTERS,
+        filters,
         {min_area, SIZE_MAX},
         matcher.m_max_rmsd,
         [](Kernels::Waterfill::WaterfillObject& object) -> bool {
@@ -297,32 +315,6 @@ bool WeatherIconDetector::detect(const ImageViewRGB32& screen){
 
     if (!full_match){
         return false;
-    }
-
-    if (m_type == WeatherIconType::Clear || m_type == WeatherIconType::Sunny || m_type == WeatherIconType::Cloudy){
-        const double clear_rmsd = full_template_rmsd(cropped, WeatherIconType::Clear);
-        const double sunny_rmsd = full_template_rmsd(cropped, WeatherIconType::Sunny);
-        const double cloudy_rmsd = full_template_rmsd(cropped, WeatherIconType::Cloudy);
-
-        switch (m_type){
-        case WeatherIconType::Clear:
-            if (clear_rmsd + 4.0 >= sunny_rmsd || clear_rmsd > cloudy_rmsd + 5.0){
-                return false;
-            }
-            break;
-        case WeatherIconType::Sunny:
-            if (sunny_rmsd > clear_rmsd + 12.0 || sunny_rmsd > cloudy_rmsd + 6.0){
-                return false;
-            }
-            break;
-        case WeatherIconType::Cloudy:
-            if (cloudy_rmsd > sunny_rmsd || cloudy_rmsd > clear_rmsd + 5.0){
-                return false;
-            }
-            break;
-        default:
-            break;
-        }
     }
 
     for (const auto& check : supplemental_template_checks(m_type)){
@@ -339,9 +331,10 @@ bool WeatherIconDetector::detect(const ImageViewRGB32& screen){
         };
 
         double rmsd = compute_rmsd(candidate);
-
-        if (screen.height() < 1080){
-            const int search_radius = std::min(candidate.width(), candidate.height()) <= 12 ? 2 : 1;
+        if (screen.height() < 1080 || m_type == WeatherIconType::Rain) {
+            const int search_radius = m_type == WeatherIconType::Rain
+                ? 2
+                : (std::min(candidate.width(), candidate.height()) <= 12 ? 2 : 1);
             for (int dy = -search_radius; dy <= search_radius; dy++){
                 for (int dx = -search_radius; dx <= search_radius; dx++){
                     if (dx == 0 && dy == 0){
@@ -355,7 +348,6 @@ bool WeatherIconDetector::detect(const ImageViewRGB32& screen){
                 }
             }
         }
-
         if (rmsd >= check.rmsd_threshold){
             return false;
         }
