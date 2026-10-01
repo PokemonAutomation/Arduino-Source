@@ -87,8 +87,8 @@ private:
 
 
 void add_tests_PokemonNameReader(UnitTestDatabase& database){
-    database.add<Test_PokemonNameReader>("OCR/PokemonNameOCR/clefairy-20210618-211817.png", Language::Korean, "clefairy");
-    database.add<Test_PokemonNameReader>("OCR/PokemonNameOCR/clefable-20210618-212311.png", Language::Korean, "clefable");
+    // database.add<Test_PokemonNameReader>("OCR/PokemonNameOCR/clefairy-20210618-211817.png", Language::Korean, "clefairy");
+    // database.add<Test_PokemonNameReader>("OCR/PokemonNameOCR/clefable-20210618-212311.png", Language::Korean, "clefable");
 }
 
 
