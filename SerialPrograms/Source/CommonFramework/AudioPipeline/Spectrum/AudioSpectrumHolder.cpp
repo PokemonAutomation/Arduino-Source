@@ -22,7 +22,7 @@ namespace PokemonAutomation{
 
 
 AudioSpectrumHolder::AudioSpectrumHolder()
-    : m_num_freqs(NUM_FFT_SAMPLES/2)
+    : m_num_freqs(NUM_FFT_SAMPLES / 4)
     , m_num_freq_windows(1000)
 //    , m_num_freq_visualization_blocks(384)
 //    , m_freq_visualization_block_boundaries(m_num_freq_visualization_blocks + 1)
@@ -180,7 +180,7 @@ void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<cons
         //  Scale the by the square root of the transform length.
         //  For random noise input, the frequency domain will have an average
         //  magnitude of sqrt(transform length).
-        float scale = std::sqrt(0.25f / (float)output.size());
+        float scale = std::sqrt(0.5f / (float)output.size());
 
 //        //  Divide by output size. Since samples can never be larger than 1.0, the
 //        //  frequency domain can never be larger than the FFT length. So we scale by
@@ -210,7 +210,7 @@ void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<cons
                 mag *= scale;
 
                 if (log_scale){
-                    mag = std::log1pf(mag) * 2.0;
+                    mag = std::log1pf(mag * 2);
                 }else{
                     mag = std::sqrt(mag);
                 }
