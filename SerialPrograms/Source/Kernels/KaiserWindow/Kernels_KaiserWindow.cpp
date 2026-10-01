@@ -78,7 +78,7 @@ const float* get_kaiser_window_k(int window_k){
     slot = AlignedVector<float>(window);
     make_kaiser_window(slot.data(), window);
 
-    kaiser_window_cache_ptr[window_k].store(slot.data(), std::memory_order_acquire);
+    kaiser_window_cache_ptr[window_k].store(slot.data(), std::memory_order_release);
     return slot.data();
 }
 
