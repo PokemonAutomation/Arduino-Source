@@ -1,0 +1,61 @@
+{
+    "_comment": [
+        "Test cases for the input vocabulary of AgentTools.json, shared by the C++",
+        "(AgentServer_InputSteps.cpp) and Python (pokemon_automation/buttons.py)",
+        "implementations so both parse inputs identically.",
+        "Button bits are NintendoSwitch::Button values; d-pad positions are",
+        "NintendoSwitch::DpadPosition values (0 = up, clockwise, 8 = none).",
+        "Stick values are [x, y] with +y = up; diagonals are normalized to length 1."
+    ],
+    "buttons": [
+        {"input": "A",              "bitfield": 4,    "dpad": 8},
+        {"input": "a",              "bitfield": 4,    "dpad": 8},
+        {"input": "L+R",            "bitfield": 48,   "dpad": 8},
+        {"input": ["ZL", "a"],      "bitfield": 68,   "dpad": 8},
+        {"input": "+",              "bitfield": 512,  "dpad": 8},
+        {"input": "-",              "bitfield": 256,  "dpad": 8},
+        {"input": "start",          "bitfield": 512,  "dpad": 8},
+        {"input": "select",         "bitfield": 256,  "dpad": 8},
+        {"input": "L3",             "bitfield": 1024, "dpad": 8},
+        {"input": "rs",             "bitfield": 2048, "dpad": 8},
+        {"input": "HOME",           "bitfield": 4096, "dpad": 8},
+        {"input": "capture",        "bitfield": 8192, "dpad": 8},
+        {"input": ["A", "+"],       "bitfield": 516,  "dpad": 8},
+        {"input": "up",             "bitfield": 0,    "dpad": 0},
+        {"input": "up+right",       "bitfield": 0,    "dpad": 1},
+        {"input": "UP_RIGHT",       "bitfield": 0,    "dpad": 1},
+        {"input": "down-left",      "bitfield": 0,    "dpad": 5},
+        {"input": "UPLEFT",         "bitfield": 0,    "dpad": 7},
+        {"input": "dpad_left",      "bitfield": 0,    "dpad": 6},
+        {"input": "ZL+DOWN",        "bitfield": 64,   "dpad": 4},
+        {"input": " b , x ",        "bitfield": 10,   "dpad": 8},
+        {"input": "",               "bitfield": 0,    "dpad": 8},
+        {"input": "Q",              "error": "Unknown button"},
+        {"input": "up+down",        "error": "Contradictory"},
+        {"input": "left+right",     "error": "Contradictory"}
+    ],
+    "sticks": [
+        {"input": "up",             "x": 0.0,  "y": 1.0},
+        {"input": "DOWN",           "x": 0.0,  "y": -1.0},
+        {"input": "left",           "x": -1.0, "y": 0.0},
+        {"input": "neutral",        "x": 0.0,  "y": 0.0},
+        {"input": "center",         "x": 0.0,  "y": 0.0},
+        {"input": "down_right",     "x": 0.7071067811865475, "y": -0.7071067811865475},
+        {"input": "up-left",        "x": -0.7071067811865475, "y": 0.7071067811865475},
+        {"input": [0.5, -0.25],     "x": 0.5,  "y": -0.25},
+        {"input": [2, 0],           "error": "within [-1, 1]"},
+        {"input": [0.5],            "error": "two numbers"},
+        {"input": "sideways",       "error": "Unknown stick direction"}
+    ],
+    "steps": [
+        {"input": {"buttons": "A"},                                   "duration_ms": 160},
+        {"input": {"buttons": "A", "hold_ms": 100, "release_ms": 50, "repeat": 3}, "duration_ms": 450},
+        {"input": {"wait_ms": 1000},                                  "duration_ms": 1000},
+        {"input": {"left_stick": "up", "hold_ms": 500, "release_ms": 0}, "duration_ms": 500},
+        {"input": {"buttons": "B", "left_stick": [0.5, 1.0], "hold_ms": 1500, "wait_ms": 100}, "duration_ms": 1680},
+        {"input": {"button": "A"},                                    "error": "Unknown input step field"},
+        {"input": {"buttons": "A", "hold_ms": 0},                     "error": "hold_ms"},
+        {"input": {"buttons": "A", "repeat": 0},                      "error": "repeat"},
+        {"input": {"buttons": "A", "release_ms": -1},                 "error": "negative"}
+    ]
+}

@@ -1,0 +1,220 @@
+{
+    "_comment": [
+        "The MCP interface for AI agents that control a Nintendo Switch.",
+        "Shared by both MCP servers so they expose exactly the same tools:",
+        "  - the SerialPrograms app ('AI Agent Server' program in the ML tab): host 'app'",
+        "  - the Python package (pokemon_automation.mcp_server): host 'python'",
+        "Each tool lists the hosts that implement it. 'inputSchema' is the JSON Schema",
+        "sent to agents in tools/list; both servers validate arguments against it.",
+        "Input steps (buttons, sticks, durations) follow the vocabulary in",
+        "AgentInputTestCases.json, which both implementations are tested against."
+    ],
+    "server_name": "pokemon-automation-switch",
+    "instructions": [
+        "You control a real Nintendo Switch through a USB device that acts as a controller, and see its screen through a capture card.",
+        "",
+        "Workflow:",
+        "- Call `screenshot` first to see where you are.",
+        "- Input tools (`press_buttons`, `move_stick`, `run_inputs`) return a screenshot taken `settle_ms` after the inputs finished, unless observe=false. Prefer `run_inputs` to send several steps in one call when you are confident about them (e.g. navigating a known menu).",
+        "- Use `read_text` to read on-screen text reliably instead of reading it off a screenshot.",
+        "- If something goes wrong, call `release_all`.",
+        "- If a tool says the user has taken control, stop sending inputs. The user is steering the console by hand; check `switch_status` later to see when control is returned.",
+        "",
+        "Conventions:",
+        "- Buttons: A B X Y L R ZL ZR PLUS MINUS HOME CAPTURE LCLICK RCLICK. D-pad: UP DOWN LEFT RIGHT (and UP_RIGHT etc.). Combine with \"+\", e.g. \"L+R\" or \"ZL+A\".",
+        "- Sticks: direction names (up, down_left, ...) or [x, y] in [-1, 1], +y = up.",
+        "- Boxes: [x, y, width, height] as fractions of the screen, (0, 0) = top-left.",
+        "- Menus usually need a short press (hold 80 ms) and ~300-800 ms to animate. Walking is done by holding a stick for a duration.",
+        "- Switch UI: A = confirm, B = back, HOME = Home menu, X on Home menu = close game.",
+        "- A black screen may mean the Switch is asleep; ask the user to wake it."
+    ],
+    "definitions": {
+        "box": {
+            "type": "array",
+            "items": {"type": "number", "minimum": 0, "maximum": 1},
+            "minItems": 4,
+            "maxItems": 4,
+            "description": "Crop box [x, y, width, height] as fractions of the screen; omit for the full screen."
+        },
+        "stick": {
+            "anyOf": [
+                {"type": "string"},
+                {"type": "array", "items": {"type": "number", "minimum": -1, "maximum": 1}, "minItems": 2, "maxItems": 2}
+            ]
+        },
+        "settle_ms": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000,
+            "description": "Wait this long after the inputs before the screenshot (default from server config)."
+        },
+        "observe": {
+            "type": "boolean",
+            "default": true,
+            "description": "Return a screenshot afterwards."
+        }
+    },
+    "tools": [
+        {
+            "name": "switch_status",
+            "hosts": ["app", "python"],
+            "description": "Report controller and video connection status, resolution, who is in control, and limits.",
+            "inputSchema": {"type": "object", "properties": {}, "additionalProperties": false}
+        },
+        {
+            "name": "list_devices",
+            "hosts": ["python"],
+            "description": "List serial ports (controller devices) and video capture devices.",
+            "inputSchema": {"type": "object", "properties": {}, "additionalProperties": false}
+        },
+        {
+            "name": "connect",
+            "hosts": ["python"],
+            "description": "(Re)connect to the controller and/or video device. Omitted arguments keep the current setting. Use after unplugging a device or to switch devices.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "serial_port": {"type": "string", "description": "Serial port of the controller device."},
+                    "video_device": {"type": "string", "description": "Video device index or name substring."}
+                },
+                "additionalProperties": false
+            }
+        },
+        {
+            "name": "screenshot",
+            "hosts": ["app", "python"],
+            "description": "Capture the current screen as a JPEG. Crop with `box` to zoom into details.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "box": {"$ref": "#/definitions/box"},
+                    "max_width": {"type": "integer", "minimum": 64, "maximum": 3840, "description": "Downscale to this width."}
+                },
+                "additionalProperties": false
+            }
+        },
+        {
+            "name": "wait_and_observe",
+            "hosts": ["app", "python"],
+            "description": "Wait without pressing anything (e.g. for a loading screen), then screenshot.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "duration_ms": {"type": "integer", "minimum": 0, "maximum": 60000, "description": "How long to wait."},
+                    "box": {"$ref": "#/definitions/box"}
+                },
+                "required": ["duration_ms"],
+                "additionalProperties": false
+            }
+        },
+        {
+            "name": "read_text",
+            "hosts": ["app", "python"],
+            "description": "Read on-screen text with OCR. Crop tightly around the text with `box` for best results.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "box": {"$ref": "#/definitions/box"},
+                    "mode": {
+                        "type": "string",
+                        "enum": ["block", "line", "word", "sparse"],
+                        "default": "block",
+                        "description": "\"line\" for one line, \"block\" for a paragraph, \"sparse\" for scattered text."
+                    },
+                    "language": {"type": "string", "default": "eng", "description": "Tesseract language code, e.g. \"eng\", \"jpn\"."}
+                },
+                "additionalProperties": false
+            }
+        },
+        {
+            "name": "press_buttons",
+            "hosts": ["app", "python"],
+            "description": "Press a button combination, optionally several times.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "buttons": {"type": "string", "description": "Buttons/d-pad to press together, e.g. \"A\", \"L+R\", \"DOWN\"."},
+                    "hold_ms": {"type": "integer", "minimum": 1, "default": 80},
+                    "release_ms": {"type": "integer", "minimum": 0, "default": 120},
+                    "repeat": {"type": "integer", "minimum": 1, "maximum": 100, "default": 1, "description": "Press this many times."},
+                    "observe": {"$ref": "#/definitions/observe"},
+                    "settle_ms": {"$ref": "#/definitions/settle_ms"}
+                },
+                "required": ["buttons"],
+                "additionalProperties": false
+            }
+        },
+        {
+            "name": "move_stick",
+            "hosts": ["app", "python"],
+            "description": "Tilt a stick for a duration (walk, move a cursor, turn the camera), optionally while holding buttons.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "direction": {
+                        "$ref": "#/definitions/stick",
+                        "description": "Direction name (\"up\", \"down_left\", ...) or [x, y] in [-1, 1], +y = up."
+                    },
+                    "duration_ms": {"type": "integer", "minimum": 1, "default": 500, "description": "How long to hold the stick."},
+                    "stick": {"type": "string", "enum": ["left", "right"], "default": "left"},
+                    "buttons": {"type": "string", "description": "Buttons to hold at the same time, e.g. \"B\" to run."},
+                    "observe": {"$ref": "#/definitions/observe"},
+                    "settle_ms": {"$ref": "#/definitions/settle_ms"}
+                },
+                "required": ["direction"],
+                "additionalProperties": false
+            }
+        },
+        {
+            "name": "run_inputs",
+            "hosts": ["app", "python"],
+            "description": "Run a sequence of input steps back to back, then optionally screenshot. Example: [{\"buttons\": \"DOWN\", \"repeat\": 3}, {\"buttons\": \"A\"}, {\"wait_ms\": 1000}, {\"left_stick\": \"up\", \"hold_ms\": 2000, \"release_ms\": 0}]",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "steps": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 200,
+                        "items": {
+                            "type": "object",
+                            "description": "One input step. Set `buttons` and/or sticks to press something, or only `wait_ms` to pause.",
+                            "properties": {
+                                "buttons": {"type": "string", "description": "Buttons and/or d-pad to hold together, e.g. \"A\", \"L+R\", \"ZL+UP\"."},
+                                "left_stick": {"$ref": "#/definitions/stick", "description": "Left stick: direction name (\"up\", \"down_left\") or [x, y] in [-1, 1]."},
+                                "right_stick": {"$ref": "#/definitions/stick", "description": "Right stick (camera in most games), same format as left_stick."},
+                                "hold_ms": {"type": "integer", "minimum": 1, "default": 80, "description": "How long to hold the inputs."},
+                                "release_ms": {"type": "integer", "minimum": 0, "default": 80, "description": "Neutral time after releasing, before the next step."},
+                                "repeat": {"type": "integer", "minimum": 1, "maximum": 100, "default": 1, "description": "Repeat this press/release cycle this many times."},
+                                "wait_ms": {"type": "integer", "minimum": 0, "default": 0, "description": "Extra pause after the step (or the whole step if nothing is pressed)."}
+                            },
+                            "additionalProperties": false
+                        }
+                    },
+                    "observe": {"$ref": "#/definitions/observe"},
+                    "settle_ms": {"$ref": "#/definitions/settle_ms"}
+                },
+                "required": ["steps"],
+                "additionalProperties": false
+            }
+        },
+        {
+            "name": "release_all",
+            "hosts": ["app", "python"],
+            "description": "Emergency stop: cancel queued inputs and release every button and stick, then wait briefly for the device to confirm.",
+            "inputSchema": {"type": "object", "properties": {}, "additionalProperties": false}
+        },
+        {
+            "name": "get_logs",
+            "hosts": ["app", "python"],
+            "description": "Recent log lines (connection status, inputs, errors).",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "count": {"type": "integer", "minimum": 1, "maximum": 500, "default": 30}
+                },
+                "additionalProperties": false
+            }
+        }
+    ]
+}

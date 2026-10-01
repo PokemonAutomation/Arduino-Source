@@ -236,25 +236,28 @@ void ConsoleSystemSession::on_focus_out(){
     m_listeners.run_method(&Listener::on_input_status_change, status);
 }
 void ConsoleSystemSession::run_controller_input(ControllerInputState& state){
-    std::lock_guard<Mutex> lg(m_lock);
-    if (!m_focused){
-        m_logger.log("Keyboard Command Suppressed: Not in focus.", COLOR_RED);
-        return;
-    }
-    if (!m_lock_controllers_reason.empty() && !allow_commands_while_locked()){
-        m_logger.log("Keyboard Command Suppressed: " + m_lock_controllers_reason, COLOR_RED);
-        return;
-    }
+    {
+        std::lock_guard<Mutex> lg(m_lock);
+        if (!m_focused){
+            m_logger.log("Keyboard Command Suppressed: Not in focus.", COLOR_RED);
+            return;
+        }
+        if (!m_lock_controllers_reason.empty() && !allow_commands_while_locked()){
+            m_logger.log("Keyboard Command Suppressed: " + m_lock_controllers_reason, COLOR_RED);
+            return;
+        }
 
-//    cout << "ConsoleSystemSession::run_controller_input()" << endl;
-    for (ControllerEntry& controller : m_controllers){
-        std::string error = controller.session.try_run<AbstractController>([&](AbstractController& controller){
-            controller.run_controller_input(state);
-        });
-        if (!error.empty()){
-            controller.session.logger().log("Keyboard Command Failed: " + error, COLOR_RED);
+//        cout << "ConsoleSystemSession::run_controller_input()" << endl;
+        for (ControllerEntry& controller : m_controllers){
+            std::string error = controller.session.try_run<AbstractController>([&](AbstractController& controller){
+                controller.run_controller_input(state);
+            });
+            if (!error.empty()){
+                controller.session.logger().log("Keyboard Command Failed: " + error, COLOR_RED);
+            }
         }
     }
+    m_listeners.run_method(&Listener::on_controller_input, state);
 }
 
 
