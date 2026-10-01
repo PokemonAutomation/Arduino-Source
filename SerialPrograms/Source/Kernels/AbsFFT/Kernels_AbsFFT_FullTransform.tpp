@@ -124,7 +124,7 @@ void fft_abs(
     size_t block = (size_t)1 << (k - 2);
 
     //  Initial split-radix reduction.
-    Reductions<Context>::fft_real_split_reduce<use_weights>(
+    Reductions<Context>::template fft_real_split_reduce<use_weights>(
         table, k,
         (vtype*)real,
         (vtype*)abs,
