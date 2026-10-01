@@ -7,8 +7,11 @@
 #include <sstream>
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Common/Qt/GlobalThreadPoolsQt.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 #include "Kernels/Kernels_Alignment.h"
+#include "Kernels/KaiserWindow/Kernels_KaiserWindow.h"
 #include "Kernels/AbsFFT/Kernels_AbsFFT.h"
 #include "AudioConstants.h"
 #include "AudioTemplate.h"
@@ -65,6 +68,10 @@ AudioTemplate loadAudioTemplate(const std::string& filename, size_t sample_rate)
 
         size_t numWindows = 0;
 
+        const float* kaiser_weights = GlobalSettings::instance().AUDIO_PIPELINE->USE_KAISER_WINDOW
+            ? Kernels::KaiserWindow::get_kaiser_window_k(FFT_LENGTH_POWER_OF_TWO)
+            : nullptr;
+
         // If sample count < FFT input requirement, we pad zeros in the end to do one FFT.
         // Otherwise, we don't pad zeros and compute FFT as much as possible using fixed
         // window step.
@@ -74,7 +81,12 @@ AudioTemplate loadAudioTemplate(const std::string& filename, size_t sample_rate)
 
             memset(input_buffer.data(), 0, sizeof(float) * NUM_FFT_SAMPLES);
             memcpy(input_buffer.data(), data, sizeof(float) * numSamples);
-            Kernels::AbsFFT::fft_abs(FFT_LENGTH_POWER_OF_TWO, output_buffer.data(), input_buffer.data());
+            Kernels::AbsFFT::fft_abs(
+                FFT_LENGTH_POWER_OF_TWO,
+                output_buffer.data(),
+                input_buffer.data(),
+                kaiser_weights
+            );
             memcpy(audio_template.getWindow(0), output_buffer.data(), sizeof(float) * numFrequencies);
         }else{
             numWindows = (numSamples - NUM_FFT_SAMPLES) / FFT_SLIDING_WINDOW_STEP + 1;
@@ -83,7 +95,12 @@ AudioTemplate loadAudioTemplate(const std::string& filename, size_t sample_rate)
             for (size_t i = 0, start = 0; start+NUM_FFT_SAMPLES <= numSamples; i++, start += FFT_SLIDING_WINDOW_STEP){
                 assert(i < numWindows);
                 memcpy(input_buffer.data(), data + start, sizeof(float) * NUM_FFT_SAMPLES);
-                Kernels::AbsFFT::fft_abs(FFT_LENGTH_POWER_OF_TWO, output_buffer.data(), input_buffer.data());
+                Kernels::AbsFFT::fft_abs(
+                    FFT_LENGTH_POWER_OF_TWO,
+                    output_buffer.data(),
+                    input_buffer.data(),
+                    kaiser_weights
+                );
                 memcpy(audio_template.getWindow(i), output_buffer.data(), sizeof(float) * numFrequencies);
             }
         }
