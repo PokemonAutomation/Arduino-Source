@@ -7,7 +7,7 @@
 #include <atomic>
 #include <cmath>
 #include "Common/Cpp/Concurrency/Mutex.h"
-#include "Common/Cpp/Containers/AlignedVector.h"
+#include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Kernels_KaiserWindow.h"
 
 namespace PokemonAutomation{
