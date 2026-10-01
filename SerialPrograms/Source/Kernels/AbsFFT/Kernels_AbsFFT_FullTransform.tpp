@@ -12,9 +12,9 @@
 #include "Kernels_AbsFFT_ComplexVector.h"
 #include "Kernels_AbsFFT_FullTransform.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -62,7 +62,11 @@ void fft_abs_k3(const TwiddleTable<Context>& table, float abs[4], float real[8])
 }
 
 template <typename Context>
-void fft_abs_scalar(const TwiddleTable<Context>& table, int k, float* abs, float* real){
+void fft_abs_scalar(
+    const TwiddleTable<Context>& table, int k,
+    float* abs,
+    float* real
+){
     if (k == 1){
         fft_abs_k1(abs, real);
         return;
@@ -97,11 +101,22 @@ void fft_abs_scalar(const TwiddleTable<Context>& table, int k, float* abs, float
 }
 
 
-template <typename Context>
-void fft_abs(const TwiddleTable<Context>& table, int k, float* abs, float* real){
+template <typename Context, bool use_weights>
+void fft_abs(
+    const TwiddleTable<Context>& table, int k,
+    float* abs,
+    float* real,
+    const float* weights
+){
     using vtype = typename Context::vtype;
 
     if (k - 2 < Context::BASE_COMPLEX_TRANSFORM_K){
+        if constexpr (use_weights){
+            size_t length = (size_t)1 << k;
+            for (size_t c = 0; c < length; c++){
+                real[c] *= weights[c];
+            }
+        }
         fft_abs_scalar<Context>(table, k, abs, real);
         return;
     }
@@ -109,7 +124,12 @@ void fft_abs(const TwiddleTable<Context>& table, int k, float* abs, float* real)
     size_t block = (size_t)1 << (k - 2);
 
     //  Initial split-radix reduction.
-    Reductions<Context>::fft_real_split_reduce(table, k, (vtype*)real, (vtype*)abs);
+    Reductions<Context>::template fft_real_split_reduce<use_weights>(
+        table, k,
+        (vtype*)real,
+        (vtype*)abs,
+        (const vtype*)weights
+    );
 
     //  Transform complex upper-half.
     fft_complex_tk(table, k - 2, (vtype*)abs);
@@ -122,7 +142,12 @@ void fft_abs(const TwiddleTable<Context>& table, int k, float* abs, float* real)
     );
 
     //  Recurse into lower-half.
-    fft_abs(table, k - 1, real + 2*block, real);
+    fft_abs<Context, false>(
+        table, k - 1,
+        real + 2*block,
+        real,
+        nullptr
+    );
 
     //  Fix ordering.
     real += 2*block;

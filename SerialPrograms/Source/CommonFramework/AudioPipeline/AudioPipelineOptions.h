@@ -45,6 +45,12 @@ public:
             LockMode::UNLOCK_WHILE_RUNNING,
             false
         )
+        , USE_KAISER_WINDOW(
+            "<b>Use Kaiser Window:</b><br>"
+            "Use Kaiser Window for FFTs.",
+            LockMode::UNLOCK_WHILE_RUNNING,
+            true
+        )
         , SHOW_RECORD_FREQUENCIES(
             "<b>Show Record Frequencies:</b><br>"
             "Show option to record audio frequencies.",
@@ -61,6 +67,7 @@ public:
         PA_ADD_OPTION(FILE_VOLUME_SCALE);
         PA_ADD_OPTION(DEVICE_VOLUME_SCALE);
         PA_ADD_OPTION(SHOW_ALL_DEVICES);
+        PA_ADD_OPTION(USE_KAISER_WINDOW);
         if (STATIC_GLOBALS.DEVELOPER_MODE){
             PA_ADD_OPTION(SHOW_RECORD_FREQUENCIES);
         }
@@ -71,6 +78,7 @@ public:
     FloatingPointOption FILE_VOLUME_SCALE;
     FloatingPointOption DEVICE_VOLUME_SCALE;
     BooleanCheckBoxOption SHOW_ALL_DEVICES;
+    BooleanCheckBoxOption USE_KAISER_WINDOW;
     BooleanCheckBoxOption SHOW_RECORD_FREQUENCIES;
     SimpleIntegerOption<uint8_t> AUTO_RESET_SECONDS;
 };

@@ -6,7 +6,10 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
+#include "Kernels/KaiserWindow/Kernels_KaiserWindow.h"
 #include "Kernels/AbsFFT/Kernels_AbsFFT.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 #include "CommonFramework/AudioPipeline/AudioConstants.h"
 #include "FFTStreamer.h"
 
@@ -114,7 +117,14 @@ void AudioFloatToFFT::run_fft(){
         }
     }
     std::shared_ptr<AlignedVector<float>> out = std::make_unique<AlignedVector<float>>(NUM_FFT_SAMPLES / 2);
-    Kernels::AbsFFT::fft_abs(FFT_LENGTH_POWER_OF_TWO, out->data(), m_fft_input.data());
+    Kernels::AbsFFT::fft_abs(
+        FFT_LENGTH_POWER_OF_TWO,
+        out->data(),
+        m_fft_input.data(),
+        GlobalSettings::instance().AUDIO_PIPELINE->USE_KAISER_WINDOW
+            ? Kernels::KaiserWindow::get_kaiser_window_k(FFT_LENGTH_POWER_OF_TWO)
+            : nullptr
+    );
     m_listeners.run_method(
         &FFTListener::on_fft,
         m_sample_rate, out

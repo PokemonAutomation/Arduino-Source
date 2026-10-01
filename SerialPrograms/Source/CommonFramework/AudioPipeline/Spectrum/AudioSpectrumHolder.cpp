@@ -8,7 +8,9 @@
 #include <cmath>
 #include <cassert>
 #include <algorithm>
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/AudioPipeline/AudioConstants.h"
+#include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 #include "AudioSpectrumHolder.h"
 
 #include <iostream>
@@ -188,6 +190,8 @@ void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<cons
 //        float skew_factor = 999.;
 //        float skew_scale = 1.f / (float)std::log1pf(skew_factor);
 
+        bool log_scale = GlobalSettings::instance().AUDIO_PIPELINE->USE_KAISER_WINDOW;
+
         // For one window, use how many blocks to show all frequencies:
         float previous = 0;
         m_last_spectrum.timestamp = timestamp;
@@ -205,7 +209,11 @@ void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<cons
                 mag /= width;
                 mag *= scale;
 
-                mag = std::sqrt(mag);
+                if (log_scale){
+                    mag = std::log1pf(mag) * 2.0;
+                }else{
+                    mag = std::sqrt(mag);
+                }
 //                mag = std::log1pf(mag * skew_factor) * skew_scale;
 //                mag = std::log1pf(std::sqrtf(mag)) * std::log1pf(1);
 //                mag = std::sqrt(2*mag - mag*mag);
