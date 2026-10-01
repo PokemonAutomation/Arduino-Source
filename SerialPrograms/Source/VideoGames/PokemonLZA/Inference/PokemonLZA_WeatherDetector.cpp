@@ -4,14 +4,6 @@
  *
  */
 
-#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/ImageTools/ImageDiff.h"
-#include "CommonTools/Images/WaterfillUtilities.h"
-#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
-#include "Tests/TestUtils.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
-#include "PokemonLZA_WeatherDetector.h"
 #include <array>
 #include <algorithm>
 #include <cctype>
@@ -21,6 +13,14 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/ImageTools/ImageDiff.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonTools/Images/WaterfillUtilities.h"
+#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "Tests/TestUtils.h"
+#include "PokemonLZA_WeatherDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -263,9 +263,8 @@ const WeatherFullMatcher& weather_full_matcher(WeatherIconType type){
         throw std::runtime_error("No weather full matcher for requested WeatherIconType");
     }
 }
-//-----------------------------------------------------
-//  Detector
-//-----------------------------------------------------
+
+
 
 WeatherIconDetector::WeatherIconDetector(WeatherIconType type, VideoOverlay* overlay)
     : m_box(0.880000, 0.010000, 0.035800, 0.068000)

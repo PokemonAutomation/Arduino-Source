@@ -27,9 +27,8 @@ enum class WeatherIconType{
     Unknown,
 };
 
-//-----------------------------------------------------
-//  Detector
-//-----------------------------------------------------
+
+
 class WeatherIconDetector : public StaticScreenDetector{
 public:
     WeatherIconDetector(WeatherIconType type, VideoOverlay* overlay = nullptr);
