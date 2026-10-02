@@ -208,7 +208,7 @@ void AudioSpectrumHolder::push_spectrum(
                 mag *= scale;
 
                 if (log_scale){
-                    mag = std::log1pf(mag * 2);
+                    mag = std::log1pf(mag * 32) * 0.25;
                 }else{
                     mag = std::sqrt(mag);
                 }
