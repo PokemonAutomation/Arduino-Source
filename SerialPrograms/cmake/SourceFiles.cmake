@@ -410,6 +410,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/AutoHeightTable.h
     ../Common/Qt/AutoWidthLineEdit.cpp
     ../Common/Qt/AutoWidthLineEdit.h
+    ../Common/Qt/BackgroundWidget.cpp
+    ../Common/Qt/BackgroundWidget.h
     ../Common/Qt/CheckboxDropdown.h
     ../Common/Qt/CodeValidator.cpp
     ../Common/Qt/CodeValidator.h
