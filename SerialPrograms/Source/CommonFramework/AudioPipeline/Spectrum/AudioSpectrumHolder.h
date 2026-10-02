@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioSpectrumHolder_H
 #define PokemonAutomation_AudioPipeline_AudioSpectrumHolder_H
 
-#include <list>
+#include <deque>
 #include <fstream>
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/ListenerSet.h"
@@ -37,8 +37,15 @@ public:
 
 
 public:
-    void push_spectrum(size_t sample_rate, std::shared_ptr<const AlignedVector<float>> fft_output);
-    void add_overlay(uint64_t starting_stamp, uint64_t end_stamp, Color color);
+    void push_spectrum(
+        size_t sample_rate,
+        std::shared_ptr<const AlignedVector<float>> fft_output
+    );
+    void add_overlay(
+        uint64_t starting_stamp,
+        uint64_t end_stamp,
+        Color color
+    );
 
 
 public:
@@ -68,6 +75,10 @@ public:
 
 
 private:
+
+
+
+private:
     // Num frequencies to store for the output of one fft computation.
     const size_t m_num_freqs;
     // Num sliding fft windows to visualize.
@@ -92,7 +103,7 @@ private:
     // of audio inference for automation programs.
     // The head of the list is the most recent FFT window, while the tail
     // is the oldest in history.
-    std::list<AudioSpectrum> m_spectrums;
+    std::deque<AudioSpectrum> m_spectrums;
     size_t m_spectrum_history_length = 40;
     // The initial timestamp for the incoming spectrums.
     size_t m_spectrum_stamp_start = 0;
