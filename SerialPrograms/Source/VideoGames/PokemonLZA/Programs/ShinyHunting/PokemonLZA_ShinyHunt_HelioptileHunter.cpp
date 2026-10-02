@@ -8,6 +8,7 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -21,6 +22,7 @@
 #include "VideoGames/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "VideoGames/PokemonLZA/Programs/PokemonLZA_FastTravelNavigation.h"
 #include "PokemonLZA_ShinyHunt_HelioptileHunter.h"
+#include <array>
 #include <cstddef>
 #include <string>
 
@@ -72,7 +74,8 @@ ShinyHunt_HelioptileHunter::ShinyHunt_HelioptileHunter()
         "<br>"
         "<b>Cycle Definition:</b><br>"
         "A cycle consists of entering Wild Zone 14 a total of at most 65 times. "
-        "After 65 entry loops, the program resets the day before continuing.",
+        "A cycle ends after 65 entry loops or when unsuitable weather or nighttime is detected. "
+        "The next cycle resets the day before continuing.",
         LockMode::LOCK_WHILE_RUNNING,
         0, 0, 32*30
     )
@@ -112,21 +115,63 @@ WeatherTimeState get_weather_time_state(SingleSwitchProgramEnvironment& env, Pro
     context.wait_for_all_requests();
 
     VideoSnapshot screen = env.console.video().snapshot();
-    WeatherIconDetector sunnyDetector(WeatherIconType::Sunny, &env.console.overlay());
-    WeatherIconDetector clearDetector(WeatherIconType::Clear, &env.console.overlay());
+    // Log every weather type so uploaded user logs distinguish unsuitable
+    // weather from missed or ambiguous detections. These small-region checks
+    // run between controller sequences; retain them for support troubleshooting.
+    // Keep the Sunny-or-Clear acceptance rule, including multiple matches.
+    const std::array<WeatherIconType, 6> types = {
+        WeatherIconType::Sunny, WeatherIconType::Clear, WeatherIconType::Rain,
+        WeatherIconType::Cloudy, WeatherIconType::Foggy, WeatherIconType::Rainbow,
+    };
+    const std::array<const char*, 6> names = {
+        "Sunny", "Clear", "Rain", "Cloudy", "Foggy", "Rainbow",
+    };
+    std::array<bool, 6> matches{};
+    std::string detected;
+    std::string detection_map;
+    size_t match_count = 0;
+    for (size_t i = 0; i < types.size(); i++){
+        WeatherIconDetector detector(types[i], &env.console.overlay());
+        matches[i] = detector.detect(screen);
+        if (i > 0){
+            detection_map += ",";
+        }
+        detection_map += std::string(names[i]) + "=" + (matches[i] ? "1" : "0");
+        if (matches[i]){
+            if (match_count++ > 0){
+                detected += ",";
+            }
+            detected += names[i];
+        }
+    }
+    if (match_count == 0){
+        detected = "Unknown";
+    }
+
     DayNightStateDetector dayNightDetector(&env.console.overlay());
     dayNightDetector.detect(screen);
-    bool night_time = dayNightDetector.state() == DayNightState::NIGHT;
-    bool daytime = !night_time;
+    bool daytime = dayNightDetector.state() != DayNightState::NIGHT;
+    bool correct_weather = matches[0] || matches[1];
 
-    bool correct_weather =
-        sunnyDetector.detect(screen) ||
-        clearDetector.detect(screen);
-
-    env.log(std::string("Weather=")
-        + (correct_weather ? "Good" : "Bad")
-        + " Time="
-        + (daytime ? "Day" : "Night")
+    // Mirror the detector's terrain sample so the day/night threshold can be
+    // checked against capture brightness without changing the detector itself.
+    const ImageStats terrain = image_stats(
+        extract_box_reference(screen, ImageFloatBox(0.30, 0.55, 0.15, 0.18))
+    );
+    const double blue_ratio = terrain.average.b /
+        (terrain.average.r + terrain.average.g + terrain.average.b);
+    auto& stats = env.current_stats<ShinyHunt_HelioptileHunter_Descriptor::Stats>();
+    env.log("[Helioptile][Weather] cycle=" + std::to_string(stats.cycles.load() + 1)
+        + " completed_loops=" + std::to_string(stats.loops.load())
+        + " phase=" + (close_map ? "bench" : "hunt")
+        + " detected=" + detected
+        + " ambiguous=" + (match_count > 1 ? "1" : "0")
+        + " matches={" + detection_map + "}"
+        + " time=" + (daytime ? "Day" : "Night")
+        + " blue_ratio=" + std::to_string(blue_ratio)
+        + " night_threshold=0.36"
+        + " eligible=" + (correct_weather && daytime ? "1" : "0")
+        + " frame=" + std::to_string(screen->width()) + "x" + std::to_string(screen->height())
     );
 
     if (close_map){
@@ -141,18 +186,22 @@ WeatherTimeState get_weather_time_state(SingleSwitchProgramEnvironment& env, Pro
 void find_weather(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     WeatherTimeState state = get_weather_time_state(env, context, true);
     context.wait_for_all_requests();
-    env.log("Starting weather loop");
+    env.log("[Helioptile][Decision] action=initial_bench_reroll sits="
+        + std::to_string(state.daytime ? 2 : 1));
     bench_loop(env, context, (state.daytime) ? 2 : 1);
 
+    size_t weather_attempt = 0;
     while (true){
+        env.log("[Helioptile][Bench] attempt=" + std::to_string(++weather_attempt));
         state = get_weather_time_state(env, context, true);
         if (state.correct_weather && state.daytime){
             break;
         }
-        env.log("Incorrect weather or nighttime"); 
+        env.log("[Helioptile][Decision] action=bench_reroll sits=2 reason="
+            + std::string(!state.correct_weather ? "weather" : "night"));
         bench_loop(env, context, 2);
     }
-    env.log("Weather found");
+    env.log("[Helioptile][Decision] action=weather_found destination=WildZone14");
     context.wait_for_all_requests();
 }
 
@@ -258,13 +307,12 @@ void ShinyHunt_HelioptileHunter::program(SingleSwitchProgramEnvironment& env, Pr
         }
 
         int hunt_loops = 0;
+        std::string cycle_end_reason = "loop_limit";
         while (hunt_loops < 65){
-            // On startup and every 65 hunt loops, force a return to the bench
-            // and re-roll/check weather conditions. This ensures the hunt does
-            // not continue indefinitely after the desired daytime sunny/clear
-            // weather has changed.
+            // Begin each cycle by re-rolling weather at the bench. A cycle ends
+            // after 65 completed hunt loops or when the weather/time check fails.
             if (hunt_loops == 0){
-                env.log("Not correct weather");
+                env.log("[Helioptile][Decision] action=reach_bench reason=cycle_start");
                 reach_bench(env, context);
                 find_weather(env, context);
                 warp_wild_zone_14(env, context);
@@ -272,7 +320,7 @@ void ShinyHunt_HelioptileHunter::program(SingleSwitchProgramEnvironment& env, Pr
             }else{
                 WeatherTimeState state = get_weather_time_state(env, context, false);
                 if (state.correct_weather && state.daytime){
-                    env.log("Correct weather. Continuing");
+                    env.log("[Helioptile][Decision] action=continue_hunt");
                     // Zoom fully out before moving map cursor for fast travel.
                     pbf_move_right_joystick(context, {0, -1}, 900ms, 120ms);
                     // Re-show icons before moving the map cursor to the destination.
@@ -296,22 +344,27 @@ void ShinyHunt_HelioptileHunter::program(SingleSwitchProgramEnvironment& env, Pr
                         );
                     }
                 }else{
-                    env.log("Not correct weather");
+                    cycle_end_reason = !state.correct_weather ? "weather" : "night";
+                    env.log("[Helioptile][Decision] action=end_cycle reason=" + cycle_end_reason);
                     pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms);
                     context.wait_for_all_requests();
-                    reach_bench(env, context);
-                    find_weather(env, context);
-                    warp_wild_zone_14(env, context);
-                    hunt_loops = 0;
+                    break;
                 }
             }  
 
+            env.log("[Helioptile][Loop] cycle=" + std::to_string(stats.cycles.load() + 1)
+                + " cycle_loop=" + std::to_string(hunt_loops + 1)
+                + " total_loop=" + std::to_string(stats.loops.load() + 1));
             execute_fixed_routine(env,env.console, context, NOTIFICATION_STATUS);
 
             stats.loops++;
             hunt_loops++;
             env.update_stats();
         }
+        env.log("[Helioptile][Decision] action=cycle_complete cycle="
+            + std::to_string(stats.cycles.load() + 1)
+            + " completed_loops=" + std::to_string(hunt_loops)
+            + " reason=" + cycle_end_reason);
         stats.cycles++;
         env.update_stats();
     }
