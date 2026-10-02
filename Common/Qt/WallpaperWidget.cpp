@@ -7,8 +7,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <exception>
-#include <memory>
 #include <utility>
 #include <QImageReader>
 #include <QPaintEvent>
@@ -53,28 +51,12 @@ WallpaperImageResult load_background_image(const QString& path, QSize target_siz
     return {std::move(image), {}};
 }
 
-QThreadPool& background_image_pool(){
-    // Serialize decoding so rapid path changes cannot multiply peak memory.
-    static const auto pool = []{
-        auto result = std::make_unique<QThreadPool>();
-        result->setMaxThreadCount(1);
-        return result;
-    }();
-    return *pool;
 }
 
-}
-
-WallpaperWidget::WallpaperWidget(QWidget* parent, std::function<void()> on_loaded)
+WallpaperWidget::WallpaperWidget(QWidget* parent)
     : QWidget(parent)
-    , m_on_loaded(std::move(on_loaded))
 {}
 
-WallpaperWidget::~WallpaperWidget(){
-    if (m_loading){
-        m_loading->cancel();
-    }
-}
 
 void WallpaperWidget::set_appearance(
     WallpaperImageFitMode fit_mode,
@@ -93,11 +75,7 @@ void WallpaperWidget::set_image(bool enabled, const QString& path){
     if (requested_path == m_path && (requested_path.isEmpty() || m_failed || tile == m_tile)){
         return;
     }
-    ++m_generation;
-    if (m_loading){
-        m_loading->cancel();
-        m_loading = nullptr;
-    }
+
     m_path = requested_path;
     m_tile = tile;
     m_failed = false;
@@ -112,50 +90,23 @@ void WallpaperWidget::set_image(bool enabled, const QString& path){
     const QSize target_size = screen()
         ? screen()->size() * screen()->devicePixelRatio()
         : size();
-    auto promise = std::make_shared<QPromise<WallpaperImageResult>>();
-    promise->start();
-    auto* watcher = new QFutureWatcher<WallpaperImageResult>(this);
-    m_loading = watcher;
-    const uint64_t generation = m_generation;
-    connect(watcher, &QFutureWatcher<WallpaperImageResult>::finished,
-        this, [this, watcher, generation]{
-            watcher->deleteLater();
-            if (generation != m_generation || watcher->isCanceled()){
-                return;
-            }
-            m_loading = nullptr;
-            WallpaperImageResult result;
-            try{
-                result = watcher->result();
-            }catch (...){
-                result.error = QStringLiteral("Unable to decode the background image.");
-            }
-            m_error = std::move(result.error);
-            if (!result.image.isNull()){
-                m_pixmap = QPixmap::fromImage(std::move(result.image));
-                if (m_pixmap.isNull()){
-                    m_error = "Unable to create the background pixmap.";
-                }
-            }
-            m_failed = m_pixmap.isNull();
-            update();
-            m_on_loaded();
+
+    WallpaperImageResult result;
+    try{
+        result = load_background_image(requested_path, target_size, tile);
+    }
+    catch (...){
+        m_error = "Unable to decode the background image.";
+    }
+
+    if (!result.image.isNull()){
+        m_pixmap = QPixmap::fromImage(std::move(result.image));
+        if (m_pixmap.isNull()){
+            m_error = "Unable to create the background pixmap.";
         }
-    );
-    watcher->setFuture(promise->future());
-    background_image_pool().start([promise, requested_path, target_size, tile]{
-        try{
-            if (!promise->isCanceled()){
-                auto result = load_background_image(requested_path, target_size, tile);
-                if (!promise->isCanceled()){
-                    promise->addResult(std::move(result));
-                }
-            }
-        }catch (...){
-            promise->setException(std::current_exception());
-        }
-        promise->finish();
-    });
+    }
+
+    update();
 }
 
 bool WallpaperWidget::active() const{

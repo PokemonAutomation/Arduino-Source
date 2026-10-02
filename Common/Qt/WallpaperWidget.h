@@ -8,13 +8,6 @@
 #define PokemonAutomation_WallpaperWidget_H
 
 #include <cstdint>
-#include <functional>
-#include <QColor>
-#include <QFutureWatcher>
-#include <QImage>
-#include <QPixmap>
-#include <QString>
-#include <QWidget>
 #include "CommonFramework/Options/WallpaperOption.h"
 
 class QPaintEvent;
@@ -28,8 +21,7 @@ struct WallpaperImageResult{
 
 class WallpaperWidget : public QWidget{
 public:
-    WallpaperWidget(QWidget* parent, std::function<void()> on_loaded);
-    ~WallpaperWidget();
+    WallpaperWidget(QWidget* parent);
 
     void set_appearance(
         WallpaperImageFitMode fit_mode,
@@ -44,9 +36,6 @@ protected:
     virtual void paintEvent(QPaintEvent*) override;
 
 private:
-    std::function<void()> m_on_loaded;
-    QFutureWatcher<WallpaperImageResult>* m_loading = nullptr;
-    uint64_t m_generation = 0;
     bool m_tile = false;
     bool m_failed = false;
     QString m_error;

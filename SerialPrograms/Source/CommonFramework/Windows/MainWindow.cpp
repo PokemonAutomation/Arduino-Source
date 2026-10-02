@@ -70,7 +70,7 @@ MainWindow::MainWindow(QWidget* parent)
     int32_t move_y_main = move_y_within_screen_bounds(y_pos_main);
     move(move_x_main, move_y_main);
 
-    centralwidget = new WallpaperWidget(this, [this]{ queue_background_update(); });
+    centralwidget = new WallpaperWidget(this);
     centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
     setCentralWidget(centralwidget);
     menubar = new QMenuBar(this);
@@ -285,7 +285,7 @@ MainWindow::MainWindow(QWidget* parent)
     GlobalSettings::instance().THEME->add_listener(*this);
     GlobalSettings::instance().WALLPAPER.add_listener(*this);
     SystemSleepController::instance().add_listener(*this);
-    update_background();
+    update_wallpaper();
 //    cout << "Done constructing" << endl;
 }
 MainWindow::~MainWindow(){
@@ -458,35 +458,18 @@ void MainWindow::on_config_value_changed(void* object){
         object == &*GlobalSettings::instance().THEME ||
         object == &GlobalSettings::instance().WALLPAPER
     ){
-        queue_background_update();
+        update_wallpaper();
     }
 }
 
 void MainWindow::changeEvent(QEvent* event){
     QMainWindow::changeEvent(event);
     if (event->type() == QEvent::PaletteChange || event->type() == QEvent::StyleChange){
-        queue_background_update();
+        update_wallpaper();
     }
 }
 
-void MainWindow::queue_background_update(){
-    if (QThread::currentThread() != thread()){
-        QMetaObject::invokeMethod(this, [this]{ queue_background_update(); }, Qt::QueuedConnection);
-        return;
-    }
-    if (m_background_update_pending){
-        return;
-    }
-    m_background_update_pending = true;
-    QMetaObject::invokeMethod(this, [this]{
-        m_background_update_pending = false;
-        if (centralwidget){
-            update_background();
-        }
-    }, Qt::QueuedConnection);
-}
-
-void MainWindow::update_background(){
+void MainWindow::update_wallpaper(){
     GlobalSettings& settings = GlobalSettings::instance();
     const QColor surface_color = palette().color(QPalette::Active, QPalette::Window);
     centralwidget->set_appearance(

@@ -63,8 +63,7 @@ private:
     virtual void on_config_value_changed(void* object) override;
     virtual void sleep_suppress_state_changed(SleepSuppress new_state) override;
 
-    void update_background();
-    void queue_background_update();
+    void update_wallpaper();
 
 private:
     WallpaperWidget* centralwidget = nullptr;
