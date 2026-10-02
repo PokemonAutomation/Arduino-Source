@@ -7,19 +7,15 @@
 #ifndef PokemonAutomation_GlobalSettingsPanel_H
 #define PokemonAutomation_GlobalSettingsPanel_H
 
-//#include <vector>
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/ConfigOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StringOption.h"
-#include "Common/Cpp/Options/PathOption.h"
 #include "Common/Cpp/Options/ButtonOption.h"
 #include "CommonFramework/Options/WallpaperOption.h"
 #include "CommonFramework/Panels/OptionsPanel.h"
-#include "CommonFramework/Panels/PanelTools.h"
 #include "CommonFramework/ResourceDownload/SettingsResourceDownloadOptions.h"
 #include "CommonFramework/ResourceDownload/SettingsResourceDownloadTable.h"
 

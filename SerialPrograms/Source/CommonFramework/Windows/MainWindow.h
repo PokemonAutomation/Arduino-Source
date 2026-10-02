@@ -67,7 +67,6 @@ private:
 
 private:
     WallpaperWidget* centralwidget = nullptr;
-    bool m_background_update_pending = false;
     QMenuBar* menubar;
 //    QStatusBar* statusbar;
 
