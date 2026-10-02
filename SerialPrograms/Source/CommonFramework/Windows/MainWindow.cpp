@@ -4,6 +4,8 @@
  *
  */
 
+#include <algorithm>
+#include <utility>
 #include <QMenuBar>
 //#include <QStatusBar>
 #include <QHBoxLayout>
@@ -20,12 +22,14 @@
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "Common/Qt/UiStateQtWidget.h"
+#include "Common/Qt/WallpaperWidget.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/LoggerWindow.h"
 #include "CommonFramework/Startup/NewVersionCheck.h"
 #include "CommonFramework/Options/ResolutionOption.h"
+#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "PanelLists.h"
@@ -66,7 +70,7 @@ MainWindow::MainWindow(QWidget* parent)
     int32_t move_y_main = move_y_within_screen_bounds(y_pos_main);
     move(move_x_main, move_y_main);
 
-    centralwidget = new QWidget(this);
+    centralwidget = new WallpaperWidget(this);
     centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
     setCentralWidget(centralwidget);
     menubar = new QMenuBar(this);
@@ -92,6 +96,7 @@ MainWindow::MainWindow(QWidget* parent)
     );
     hbox->addWidget(sidebar, 0);
     QWidget* sidebar_body = new QWidget(sidebar);
+    sidebar_body->setObjectName(QString::fromUtf8("backgroundSidebarBody"));
     sidebar->set_widget(sidebar_body);
     QVBoxLayout* left_layout = new QVBoxLayout(sidebar_body);
     left_layout->setContentsMargins(0, 0, 0, 0);
@@ -105,6 +110,7 @@ MainWindow::MainWindow(QWidget* parent)
         QString::fromStdString(PROGRAM_NAME + " " + PROGRAM_VERSION + " (" + PA_ARCH_STRING + ")"),
         centralwidget
     );
+    support_box->setObjectName(QString::fromUtf8("backgroundSupportBox"));
 
 
     left_layout->addWidget(support_box);
@@ -276,7 +282,10 @@ MainWindow::MainWindow(QWidget* parent)
     GlobalSettings::instance().WINDOW_SIZE->HEIGHT.add_listener(*this);
     GlobalSettings::instance().WINDOW_SIZE->X_POS.add_listener(*this);
     GlobalSettings::instance().WINDOW_SIZE->Y_POS.add_listener(*this);    
+    GlobalSettings::instance().THEME->add_listener(*this);
+    GlobalSettings::instance().WALLPAPER.add_listener(*this);
     SystemSleepController::instance().add_listener(*this);
+    update_wallpaper();
 //    cout << "Done constructing" << endl;
 }
 MainWindow::~MainWindow(){
@@ -286,6 +295,8 @@ MainWindow::~MainWindow(){
     GlobalSettings::instance().WINDOW_SIZE->HEIGHT.remove_listener(*this);
     GlobalSettings::instance().WINDOW_SIZE->X_POS.remove_listener(*this);
     GlobalSettings::instance().WINDOW_SIZE->Y_POS.remove_listener(*this);
+    GlobalSettings::instance().THEME->remove_listener(*this);
+    GlobalSettings::instance().WALLPAPER.remove_listener(*this);
     if (m_output_window){
         global_multi_logger().remove_listener(*m_output_window);
     }
@@ -443,8 +454,67 @@ void MainWindow::on_config_value_changed(void* object){
                 );
             }
         });        
+    }else if (
+        object == &*GlobalSettings::instance().THEME ||
+        object == &GlobalSettings::instance().WALLPAPER
+    ){
+        update_wallpaper();
     }
 }
+
+void MainWindow::changeEvent(QEvent* event){
+    QMainWindow::changeEvent(event);
+    if (event->type() == QEvent::PaletteChange || event->type() == QEvent::StyleChange){
+        update_wallpaper();
+    }
+}
+
+void MainWindow::update_wallpaper(){
+    GlobalSettings& settings = GlobalSettings::instance();
+    const QColor surface_color = palette().color(QPalette::Active, QPalette::Window);
+    centralwidget->set_appearance(
+        settings.WALLPAPER.IMAGE_FIT,
+        settings.WALLPAPER.IMAGE_OVERLAY,
+        surface_color
+    );
+    centralwidget->set_image(
+        settings.WALLPAPER.enabled(),
+        QString::fromStdString(static_cast<std::string>(settings.WALLPAPER.IMAGE_PATH))
+    );
+    const QString error = centralwidget->take_error();
+
+    if (!error.isEmpty()){
+        global_logger_tagged().log(
+            "Unable to load background image: " + error.toStdString(),
+            COLOR_RED
+        );
+    }
+
+    if (!centralwidget->active()){
+        if (!centralwidget->styleSheet().isEmpty()){
+            centralwidget->setStyleSheet(QString());
+        }
+        return;
+    }
+
+    const QString surface = QStringLiteral("rgba(%1, %2, %3, 215)")
+        .arg(surface_color.red()).arg(surface_color.green()).arg(surface_color.blue());
+    const QString stylesheet = QString::fromLatin1(
+        "QWidget[backgroundContainer=\"true\"] { background-color: transparent; }"
+        "QWidget#backgroundSidebarBody { background-color: transparent; }"
+        "QGroupBox#backgroundSupportBox { background-color: %1; }"
+        "QWidget#backgroundPanelRoot { background-color: transparent; }"
+        "QWidget#backgroundProgramHeader { background-color: %1; }"
+        "QWidget#backgroundProgramHeader QLabel { background-color: transparent; }"
+        "QScrollArea#backgroundScrollArea { background-color: transparent; border: none; }"
+        "QWidget#backgroundScrollViewport { background-color: transparent; }"
+        "QWidget#backgroundScrollContents { background-color: %1; }"
+    ).arg(surface);
+    if (centralwidget->styleSheet() != stylesheet){
+        centralwidget->setStyleSheet(stylesheet);
+    }
+}
+
 void MainWindow::sleep_suppress_state_changed(SleepSuppress new_state){
     QMetaObject::invokeMethod(this, [=, this]{
         switch (new_state){
