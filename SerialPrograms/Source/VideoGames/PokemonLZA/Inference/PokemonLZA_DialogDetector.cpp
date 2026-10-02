@@ -220,6 +220,7 @@ bool FlatWhiteDialogDetector::detect(const ImageViewRGB32& screen){
 
     const std::vector<std::pair<uint32_t, uint32_t>> FILTERS = {
         {combine_rgb(0,0,0), combine_rgb(100, 100, 100)},
+        {combine_rgb(0,0,0), combine_rgb(130, 130, 130)},
     };
 
     bool found = match_template_by_waterfill(
@@ -549,6 +550,7 @@ void add_tests_DialogDetector(UnitTestDatabase& database){
     database.add<Test_BlueDialogDetector>("PokemonLZA/BlueDialogDetector/mac_canFastTravel_False.png", false);
     database.add<Test_BlueDialogDetector>("PokemonLZA/BlueDialogDetector/mac_cannotFastTravel_True.png", true);
     database.add<Test_BlueDialogDetector>("PokemonLZA/BlueDialogDetector/mac_receive_tyrunt_True.png", true);
+    database.add<Test_FlatWhiteDialogDetector>("PokemonLZA/FlatWhiteDialogDetector/ansha_donuts_welcome_True.png", true);
     database.add<Test_FlatWhiteDialogDetector>("PokemonLZA/FlatWhiteDialogDetector/chao_fossil_True.png", true);
     database.add<Test_FlatWhiteDialogDetector>("PokemonLZA/FlatWhiteDialogDetector/french_fossil_1_True.png", true);
     database.add<Test_FlatWhiteDialogDetector>("PokemonLZA/FlatWhiteDialogDetector/french_fossil_2_True.png", true);
