@@ -10,6 +10,7 @@
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 // #include "Common/Cpp/Strings/Unicode.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
+#include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "OCR_Routines.h"
 #include "OCR_StringNormalization.h"
 #include "OCR_Tests.h"
@@ -26,6 +27,7 @@ namespace OCR{
 void add_tests(UnitTestDatabase& database){
     add_tests_raw_OCR(database);
     add_tests_number_waterfill_OCR(database);
+    Pokemon::add_tests_PokemonNameReader(database);
 }
 
 class Test_RawOCR : public UnitTest{

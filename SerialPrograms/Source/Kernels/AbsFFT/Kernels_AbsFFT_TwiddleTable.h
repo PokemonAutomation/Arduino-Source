@@ -35,7 +35,9 @@ public:
     ~TwiddleTable();
     TwiddleTable(int initial_size = 14);
 
-    const PerSizeTables<Context>& operator[](int k) const;
+    PA_FORCE_INLINE const PerSizeTables<Context>& operator[](int k) const{
+        return m_tables[k];
+    }
     void ensure(int k);
 
 private:

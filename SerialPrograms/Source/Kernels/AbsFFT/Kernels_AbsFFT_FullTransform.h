@@ -15,10 +15,19 @@ namespace AbsFFT{
 
 
 template <typename Context>
-void fft_abs_scalar(const TwiddleTable<Context>& table, int k, float* abs, float* real);
+void fft_abs_scalar(
+    const TwiddleTable<Context>& table, int k,
+    float* abs,
+    float* real
+);
 
-template <typename Context>
-void fft_abs(const TwiddleTable<Context>& table, int k, float* abs, float* real);
+template <typename Context, bool use_weights>
+void fft_abs(
+    const TwiddleTable<Context>& table, int k,
+    float* abs,
+    float* real,
+    const float* weights
+);
 
 
 

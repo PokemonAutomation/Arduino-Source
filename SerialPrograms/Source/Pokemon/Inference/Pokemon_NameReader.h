@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_Pokemon_PokemonNameReader_H
 #define PokemonAutomation_Pokemon_PokemonNameReader_H
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonTools/OCR/OCR_LargeDictionaryMatcher.h"
 
 namespace PokemonAutomation{
@@ -36,6 +37,8 @@ public:
     ) const;
 
 };
+
+void add_tests_PokemonNameReader(UnitTestDatabase& database);
 
 
 }

@@ -117,14 +117,18 @@ PathOptionWidget::PathOptionWidget(QWidget& parent, PathOption& value)
     text->setWordWrap(true);
     layout->addWidget(text, 1);
 
+    QHBoxLayout* controls = new QHBoxLayout();
+    controls->setContentsMargins(0, 0, 0, 0);
+    layout->addLayout(controls, 1);
+
     m_line_edit = new QLineEdit(QString::fromStdString(m_value), this);
     m_line_edit->setPlaceholderText(QString::fromStdString(value.placeholder_text()));
     m_line_edit->setReadOnly(value.lock_mode() == LockMode::READ_ONLY);
-    layout->addWidget(m_line_edit, 1);
+    controls->addWidget(m_line_edit, 1);
 
     m_browse_button = new QPushButton("Browse...", this);
     m_browse_button->setEnabled(value.lock_mode() != LockMode::READ_ONLY);
-    layout->addWidget(m_browse_button);
+    controls->addWidget(m_browse_button, 0);
 
     connect(
         m_line_edit, &QLineEdit::editingFinished,

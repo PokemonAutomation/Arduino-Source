@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_Kernels_AbsFFT_BaseTransform_x86_AVX2_H
 #define PokemonAutomation_Kernels_AbsFFT_BaseTransform_x86_AVX2_H
 
-#include "Kernels/Kernels_x64_AVX2.h"
+//#include "Kernels/Kernels_x64_AVX2.h"
 #include "Kernels_AbsFFT_Arch_x86_AVX2.h"
 #include "Kernels_AbsFFT_Butterflies.h"
 #include "Kernels_AbsFFT_ComplexVector.h"
@@ -15,6 +15,7 @@
 namespace PokemonAutomation{
 namespace Kernels{
 namespace AbsFFT{
+
 
 PA_FORCE_INLINE void vtranspose(
     __m256& r0, __m256& r1, __m256& r2, __m256& r3,

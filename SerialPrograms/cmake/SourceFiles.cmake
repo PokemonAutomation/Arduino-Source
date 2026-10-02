@@ -224,6 +224,8 @@ file(GLOB CORE_LIBRARY_SOURCES
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.h
     Source/CommonFramework/Options/ThreadPoolOption.cpp
     Source/CommonFramework/Options/ThreadPoolOption.h
+    Source/CommonFramework/Options/WallpaperOption.cpp
+    Source/CommonFramework/Options/WallpaperOption.h
     Source/CommonFramework/StaticGlobals.cpp
     Source/CommonFramework/StaticGlobals.h
     Source/CommonFramework/Tools/FileHash.cpp
@@ -975,8 +977,10 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch_Default.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch_x86_AVX2.h
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch_x86_AVX512.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch_x86_SSE41.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_BaseTransform_x86_AVX2.h
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_BaseTransform_x86_AVX512.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_BaseTransform_x86_SSE41.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_BitReverse.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Butterflies.h
@@ -985,6 +989,7 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/AbsFFT/Kernels_AbsFFT_ComplexVector.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_Default.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_AVX2.cpp
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_AVX512.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_SSE41.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT_FullTransform.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_FullTransform.tpp
@@ -1101,6 +1106,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX2.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX512.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_SSE41.cpp
+    Source/Kernels/KaiserWindow/Kernels_KaiserWindow.cpp
+    Source/Kernels/KaiserWindow/Kernels_KaiserWindow.h
     Source/Kernels/Kernels_Alignment.h
     Source/Kernels/Kernels_arm64_NEON.h
     Source/Kernels/Kernels_BitScan.h

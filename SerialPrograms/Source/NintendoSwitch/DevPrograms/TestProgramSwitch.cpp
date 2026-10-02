@@ -13,6 +13,8 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Cpp/Concurrency/BusyPeriodicRunner.h"
+#include "CommonFramework/StaticGlobals.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "VideoGames/PokemonLA/Inference/PokemonLA_MountDetector.h"
@@ -173,11 +175,14 @@
 #include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattleSelectionArrowDetector.h"
 #include "Controllers/RumbleListener.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
+#include "VideoGames/PokemonLZA/Inference/PokemonLZA_WeatherDetector.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_MainMenuDetector.h"
 #include "VideoGames/PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.h"
 #include "VideoGames/PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_ExperienceGainDetector.h"
 
+//#include "Kernels/Kernels_x64_AVX512.h"
+//#include "Kernels/AbsFFT/Kernels_AbsFFT_BaseTransform_x86_AVX512.h"
 
 
 #include <QPixmap>
@@ -320,6 +325,7 @@ public:
 
 
 
+
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -342,10 +348,65 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     // JoyconContext context(scope, console.controller<JoyconController>());
     VideoOverlaySet overlays(overlay);
 
+
+#if 0
+    alignas(64) float r[256] = {
+        3, 6, 4, 7, 8, 6, 1, 3, 8, 0, 6, 1, 1, 3, 5, 3, 3, 7, 9, 4, 1, 5, 5, \
+7, 8, 6, 6, 6, 2, 1, 9, 5, 5, 3, 0, 5, 1, 8, 4, 5, 1, 8, 7, 8, 5, 7, \
+7, 5, 4, 9, 3, 3, 8, 7, 7, 9, 3, 1, 7, 9, 7, 3, 9, 8, 8, 7, 2, 3, 7, \
+6, 6, 2, 4, 5, 0, 0, 7, 8, 6, 2, 0, 9, 9, 8, 2, 9, 7, 0, 3, 7, 0, 2, \
+3, 5, 6, 0, 3, 3, 6, 6, 0, 5, 9, 3, 3, 2, 3, 8, 5, 1, 7, 2, 4, 6, 7, \
+1, 8, 1, 2, 4, 4, 9, 4, 5, 2, 0, 4, 7, 1, 7, 6, 4, 9, 3, 4, 9, 9, 2, \
+3, 2, 9, 2, 5, 6, 9, 4, 3, 8, 7, 5, 5, 1, 9, 1, 6, 9, 2, 4, 6, 7, 3, \
+0, 1, 4, 2, 5, 6, 0, 3, 4, 7, 8, 2, 7, 8, 2, 3, 0, 9, 5, 8, 4, 7, 7, \
+3, 2, 9, 7, 3, 5, 5, 8, 8, 3, 1, 1, 1, 1, 4, 8, 2, 2, 2, 4, 7, 3, 9, \
+1, 9, 5, 9, 0, 0, 4, 3, 6, 2, 7, 3, 8, 2, 9, 8, 6, 7, 3, 2, 0, 1, 9, \
+6, 3, 9, 3, 7, 9, 5, 5, 2, 4, 9, 5, 5, 6, 2, 7, 0, 0, 1, 4, 6, 3, 5, \
+0, 4, 6
+    };
+    alignas(64) float i[256] = {
+        1, 1, 3, 2, 4, 1, 6, 1, 4, 3, 0, 9, 6, 4, 8, 8, 8, 9, 9, 2, 8, 1, 2, \
+0, 7, 2, 4, 0, 6, 3, 4, 9, 5, 5, 0, 0, 7, 7, 3, 6, 0, 6, 2, 0, 8, 9, \
+1, 9, 7, 7, 5, 0, 5, 7, 5, 7, 8, 2, 1, 1, 0, 2, 9, 2, 7, 9, 3, 4, 9, \
+6, 6, 7, 1, 8, 4, 9, 9, 1, 6, 3, 7, 8, 6, 0, 5, 3, 0, 7, 1, 6, 7, 5, \
+0, 9, 0, 2, 0, 8, 4, 5, 5, 6, 8, 0, 5, 9, 6, 9, 1, 3, 5, 3, 4, 2, 1, \
+3, 2, 9, 2, 9, 3, 0, 5, 7, 5, 1, 0, 1, 0, 0, 7, 2, 2, 8, 6, 4, 4, 3, \
+2, 1, 7, 4, 0, 1, 9, 8, 6, 9, 5, 5, 7, 4, 2, 7, 0, 6, 5, 3, 0, 9, 5, \
+4, 7, 5, 9, 1, 5, 6, 8, 8, 7, 1, 0, 3, 5, 7, 1, 8, 9, 3, 3, 3, 3, 9, \
+6, 0, 5, 0, 9, 5, 2, 2, 4, 1, 6, 2, 3, 4, 5, 9, 2, 3, 5, 1, 2, 5, 2, \
+7, 4, 1, 0, 2, 5, 9, 9, 1, 3, 2, 5, 4, 1, 4, 6, 4, 4, 7, 7, 1, 1, 6, \
+5, 2, 3, 0, 2, 3, 6, 4, 9, 3, 9, 2, 6, 2, 5, 9, 5, 3, 5, 3, 1, 8, 9, \
+4, 0, 3
+    };
+
+    __m512 T[32];
+    for (size_t c = 0; c < 16; c++){
+        T[2*c + 0] = _mm512_load_ps(r + 16*c);
+        T[2*c + 1] = _mm512_load_ps(i + 16*c);
+    }
+
+
+    using namespace Kernels::AbsFFT;
+
+    TwiddleTable<Context_x86_AVX512> table(14);
+    base_transform<>(table, T);
+
+    for (size_t c = 0; c < 16; c++){
+        _mm512_store_ps(r + 16*c, T[2*c + 0]);
+        _mm512_store_ps(i + 16*c, T[2*c + 1]);
+    }
+
+    for (size_t c = 0; c < 256; c++){
+        cout << r[c] << " + " << i[c] << ", ";
+    }
+    cout << endl;
+#endif
+
+
 //    context->run_string_command("100|A");
 //    context->run_string_command("100|LJ:+1:0");
 
-    console.controller().run_string_command(16ms, "asdf");
+//    console.controller().run_string_command(16ms, "asdf");
 
 
 #if 0
@@ -357,6 +418,69 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     cout << detector.detect(snapshot) << endl;
 #endif
 
+
+#if 0
+    YCommIconDetector detector(COLOR_RED, true);
+    detector.make_overlays(overlays);
+
+    auto snapshot = feed.snapshot();
+    cout << detector.detect(snapshot) << endl;
+#endif
+    auto snapshot = feed.snapshot();
+#if 1
+
+    using namespace PokemonLZA;
+
+    const bool old_image_template_matching = STATIC_GLOBALS.IMAGE_TEMPLATE_MATCHING;
+    STATIC_GLOBALS.IMAGE_TEMPLATE_MATCHING = true;
+    cout << "Weather detector waterfill debug enabled (dump + stats)." << endl;
+
+    const struct {
+        WeatherIconType type;
+        const char* name;
+    } weather[] = {
+        {WeatherIconType::Clear,   "Clear"},
+        {WeatherIconType::Sunny,   "Sunny"},
+        {WeatherIconType::Rain,    "Rain"},
+        {WeatherIconType::Cloudy,  "Cloudy"},
+        {WeatherIconType::Foggy,   "Foggy"},
+        {WeatherIconType::Rainbow, "Rainbow"},
+    };
+    bool weather_detected[sizeof(weather)/sizeof(weather[0])] = {};
+
+    for (size_t i = 0; i < sizeof(weather)/sizeof(weather[0]); i++) {
+        const auto& entry = weather[i];
+        WeatherIconDetector detector(entry.type, &overlay);
+
+        detector.make_overlays(overlays);
+
+        bool detected = detector.detect(snapshot);
+        weather_detected[i] = detected;
+
+        cout << entry.name
+            << ": "
+            << (detected ? "MATCH" : "NO MATCH")
+            << endl;
+    }
+
+    STATIC_GLOBALS.IMAGE_TEMPLATE_MATCHING = old_image_template_matching;
+    cout << "Weather detector waterfill debug restored." << endl;
+
+    cout << endl;
+    cout << "Weather Summary:" << endl;
+    for (size_t i = 0; i < sizeof(weather)/sizeof(weather[0]); i++) {
+        cout << weather[i].name
+            << ": "
+            << (weather_detected[i] ? "MATCH" : "NO MATCH")
+            << endl;
+    }
+
+    scope.wait_for(std::chrono::seconds(30));
+#endif
+
+
+
+//    context->issue_gyro_accel_x(&scope, 1000ms, 1000ms, 0ms, 123);
 
 #if 0
     size_t min_area = 100;

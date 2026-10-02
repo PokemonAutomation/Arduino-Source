@@ -15,6 +15,7 @@ namespace PokemonAutomation{
 namespace Kernels{
 namespace AbsFFT{
 
+
 PA_FORCE_INLINE void vtranspose(__m128& r0, __m128& r1, __m128& r2, __m128& r3){
     __m128 a0, a1, a2, a3;
     a0 = _mm_unpacklo_ps(r0, r1);

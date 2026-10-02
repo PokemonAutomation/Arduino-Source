@@ -142,7 +142,7 @@ void ensure_at_home(ConsoleHandle& console, ControllerContext& context, size_t r
     }
 
     for (size_t attempts = 0; attempts < retries; attempts++){
-        HomeMenuWatcher home_menu(console, false, COLOR_RED, 100ms);
+        HomeMenuWatcher home_menu(console, false, COLOR_RED);
         context.wait_for_all_requests();
         int ret = wait_until(
             console, context, 5000ms,

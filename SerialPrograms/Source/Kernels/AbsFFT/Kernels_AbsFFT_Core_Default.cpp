@@ -25,10 +25,14 @@ TwiddleTable<Context_Default>& global_table_Default(){
     static TwiddleTable<Context_Default> table(14);
     return table;
 }
-void fft_abs_Default(int k, float* abs, float* real){
+void fft_abs_Default(int k, float* abs, float* real, const float* weights){
     TwiddleTable<Context_Default>& table = global_table_Default();
     table.ensure(k);
-    fft_abs(table, k, abs, real);
+    if (weights == nullptr){
+        fft_abs<Context_Default, false>(table, k, abs, real, nullptr);
+    }else{
+        fft_abs<Context_Default, true>(table, k, abs, real, weights);
+    }
 }
 
 

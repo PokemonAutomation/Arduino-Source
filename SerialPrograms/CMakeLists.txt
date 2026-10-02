@@ -697,6 +697,7 @@ SET_SOURCE_FILES_PROPERTIES(
 endif()
 if (ARCH_FLAGS_17_Skylake)
 SET_SOURCE_FILES_PROPERTIES(
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_AVX512.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.cpp
     Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range_x64_AVX512.cpp
     Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean_x64_AVX512.cpp
