@@ -23,7 +23,7 @@ namespace PokemonAutomation{
 
 class ButtonDiagram;
 class LoggerWindow;
-class BackgroundWidget;
+class WallpaperWidget;
 
 
 class MainWindow
@@ -67,7 +67,7 @@ private:
     void queue_background_update();
 
 private:
-    BackgroundWidget* centralwidget = nullptr;
+    WallpaperWidget* centralwidget = nullptr;
     bool m_background_update_pending = false;
     QMenuBar* menubar;
 //    QStatusBar* statusbar;

@@ -31,13 +31,13 @@ WallpaperOption::WallpaperOption()
     , IMAGE_FIT(
         "<b>Wallpaper Image Fit:</b>",
         {
-            {BackgroundImageFitMode::FILL, "fill", "Fill (crop to window)"},
-            {BackgroundImageFitMode::FIT, "fit", "Fit (show entire image)"},
-            {BackgroundImageFitMode::STRETCH, "stretch", "Stretch"},
-            {BackgroundImageFitMode::TILE, "tile", "Tile"},
+            {WallpaperImageFitMode::FILL, "fill", "Fill (crop to window)"},
+            {WallpaperImageFitMode::FIT, "fit", "Fit (show entire image)"},
+            {WallpaperImageFitMode::STRETCH, "stretch", "Stretch"},
+            {WallpaperImageFitMode::TILE, "tile", "Tile"},
         },
         LockMode::UNLOCK_WHILE_RUNNING,
-        BackgroundImageFitMode::FILL
+        WallpaperImageFitMode::FILL
     )
     , IMAGE_OVERLAY(
         "<b>Background Overlay (%):</b><br>Increase this to improve text readability over the image.",

@@ -1,11 +1,11 @@
-/*  Background Widget
+/*  Wallpaper Widget
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_BackgroundWidget_H
-#define PokemonAutomation_BackgroundWidget_H
+#ifndef PokemonAutomation_WallpaperWidget_H
+#define PokemonAutomation_WallpaperWidget_H
 
 #include <cstdint>
 #include <functional>
@@ -21,18 +21,18 @@ class QPaintEvent;
 
 namespace PokemonAutomation{
 
-struct BackgroundImageResult{
+struct WallpaperImageResult{
     QImage image;
     QString error;
 };
 
-class BackgroundWidget : public QWidget{
+class WallpaperWidget : public QWidget{
 public:
-    BackgroundWidget(QWidget* parent, std::function<void()> on_loaded);
-    ~BackgroundWidget();
+    WallpaperWidget(QWidget* parent, std::function<void()> on_loaded);
+    ~WallpaperWidget();
 
     void set_appearance(
-        BackgroundImageFitMode fit_mode,
+        WallpaperImageFitMode fit_mode,
         uint8_t overlay,
         const QColor& surface_color
     );
@@ -45,14 +45,14 @@ protected:
 
 private:
     std::function<void()> m_on_loaded;
-    QFutureWatcher<BackgroundImageResult>* m_loading = nullptr;
+    QFutureWatcher<WallpaperImageResult>* m_loading = nullptr;
     uint64_t m_generation = 0;
     bool m_tile = false;
     bool m_failed = false;
     QString m_error;
     QString m_path;
     QPixmap m_pixmap;
-    BackgroundImageFitMode m_fit_mode = BackgroundImageFitMode::FILL;
+    WallpaperImageFitMode m_fit_mode = WallpaperImageFitMode::FILL;
     uint8_t m_overlay = 35;
     QColor m_surface_color;
 };

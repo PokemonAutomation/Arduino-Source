@@ -1,30 +1,26 @@
-/*  Background Widget
+/*  Wallpaper Widget
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#include "BackgroundWidget.h"
 
 #include <algorithm>
 #include <cmath>
 #include <exception>
 #include <memory>
 #include <utility>
-#include <QFutureWatcher>
 #include <QImageReader>
 #include <QPaintEvent>
 #include <QPainter>
-#include <QPromise>
-#include <QScreen>
 #include <QStyleOption>
-#include <QThreadPool>
+#include "WallpaperWidget.h"
 
 namespace PokemonAutomation{
 
 namespace{
 
-BackgroundImageResult load_background_image(const QString& path, QSize target_size, bool tile){
+WallpaperImageResult load_background_image(const QString& path, QSize target_size, bool tile){
     QImageReader reader(path);
     reader.setAutoTransform(true);
     // Sprite loaders disable QImageReader's application-wide allocation limit.
@@ -69,19 +65,19 @@ QThreadPool& background_image_pool(){
 
 }
 
-BackgroundWidget::BackgroundWidget(QWidget* parent, std::function<void()> on_loaded)
+WallpaperWidget::WallpaperWidget(QWidget* parent, std::function<void()> on_loaded)
     : QWidget(parent)
     , m_on_loaded(std::move(on_loaded))
 {}
 
-BackgroundWidget::~BackgroundWidget(){
+WallpaperWidget::~WallpaperWidget(){
     if (m_loading){
         m_loading->cancel();
     }
 }
 
-void BackgroundWidget::set_appearance(
-    BackgroundImageFitMode fit_mode,
+void WallpaperWidget::set_appearance(
+    WallpaperImageFitMode fit_mode,
     uint8_t overlay,
     const QColor& surface_color
 ){
@@ -91,9 +87,9 @@ void BackgroundWidget::set_appearance(
     update();
 }
 
-void BackgroundWidget::set_image(bool enabled, const QString& path){
+void WallpaperWidget::set_image(bool enabled, const QString& path){
     const QString requested_path = enabled ? path : QString();
-    const bool tile = m_fit_mode == BackgroundImageFitMode::TILE;
+    const bool tile = m_fit_mode == WallpaperImageFitMode::TILE;
     if (requested_path == m_path && (requested_path.isEmpty() || m_failed || tile == m_tile)){
         return;
     }
@@ -116,19 +112,19 @@ void BackgroundWidget::set_image(bool enabled, const QString& path){
     const QSize target_size = screen()
         ? screen()->size() * screen()->devicePixelRatio()
         : size();
-    auto promise = std::make_shared<QPromise<BackgroundImageResult>>();
+    auto promise = std::make_shared<QPromise<WallpaperImageResult>>();
     promise->start();
-    auto* watcher = new QFutureWatcher<BackgroundImageResult>(this);
+    auto* watcher = new QFutureWatcher<WallpaperImageResult>(this);
     m_loading = watcher;
     const uint64_t generation = m_generation;
-    connect(watcher, &QFutureWatcher<BackgroundImageResult>::finished,
+    connect(watcher, &QFutureWatcher<WallpaperImageResult>::finished,
         this, [this, watcher, generation]{
             watcher->deleteLater();
             if (generation != m_generation || watcher->isCanceled()){
                 return;
             }
             m_loading = nullptr;
-            BackgroundImageResult result;
+            WallpaperImageResult result;
             try{
                 result = watcher->result();
             }catch (...){
@@ -162,15 +158,15 @@ void BackgroundWidget::set_image(bool enabled, const QString& path){
     });
 }
 
-bool BackgroundWidget::active() const{
+bool WallpaperWidget::active() const{
     return !m_pixmap.isNull();
 }
 
-QString BackgroundWidget::take_error(){
+QString WallpaperWidget::take_error(){
     return std::exchange(m_error, QString());
 }
 
-void BackgroundWidget::paintEvent(QPaintEvent*){
+void WallpaperWidget::paintEvent(QPaintEvent*){
     QStyleOption option;
     option.initFrom(this);
     QPainter painter(this);
@@ -183,13 +179,13 @@ void BackgroundWidget::paintEvent(QPaintEvent*){
     painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
     switch (m_fit_mode){
-    case BackgroundImageFitMode::FILL:
-    case BackgroundImageFitMode::FIT:{
+    case WallpaperImageFitMode::FILL:
+    case WallpaperImageFitMode::FIT:{
         QSizeF image_size = m_pixmap.deviceIndependentSize();
         QSizeF window_size = size();
         const qreal scale_x = window_size.width() / image_size.width();
         const qreal scale_y = window_size.height() / image_size.height();
-        const qreal scale = m_fit_mode == BackgroundImageFitMode::FILL
+        const qreal scale = m_fit_mode == WallpaperImageFitMode::FILL
             ? std::max(scale_x, scale_y)
             : std::min(scale_x, scale_y);
         QSizeF scaled_size = image_size * scale;
@@ -202,10 +198,10 @@ void BackgroundWidget::paintEvent(QPaintEvent*){
         painter.drawPixmap(destination, m_pixmap, QRectF(m_pixmap.rect()));
         break;
     }
-    case BackgroundImageFitMode::STRETCH:
+    case WallpaperImageFitMode::STRETCH:
         painter.drawPixmap(QRectF(rect()), m_pixmap, QRectF(m_pixmap.rect()));
         break;
-    case BackgroundImageFitMode::TILE:
+    case WallpaperImageFitMode::TILE:
         painter.drawTiledPixmap(rect(), m_pixmap);
         break;
     }

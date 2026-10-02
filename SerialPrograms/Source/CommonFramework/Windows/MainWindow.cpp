@@ -20,9 +20,9 @@
 #include "Common/Cpp/Logging/MultiOutputLogger.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/CpuId/CpuId.h"
-#include "Common/Qt/BackgroundWidget.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "Common/Qt/UiStateQtWidget.h"
+#include "Common/Qt/WallpaperWidget.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -70,7 +70,7 @@ MainWindow::MainWindow(QWidget* parent)
     int32_t move_y_main = move_y_within_screen_bounds(y_pos_main);
     move(move_x_main, move_y_main);
 
-    centralwidget = new BackgroundWidget(this, [this]{ queue_background_update(); });
+    centralwidget = new WallpaperWidget(this, [this]{ queue_background_update(); });
     centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
     setCentralWidget(centralwidget);
     menubar = new QMenuBar(this);

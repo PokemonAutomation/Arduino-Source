@@ -410,8 +410,6 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/AutoHeightTable.h
     ../Common/Qt/AutoWidthLineEdit.cpp
     ../Common/Qt/AutoWidthLineEdit.h
-    ../Common/Qt/BackgroundWidget.cpp
-    ../Common/Qt/BackgroundWidget.h
     ../Common/Qt/CheckboxDropdown.h
     ../Common/Qt/CodeValidator.cpp
     ../Common/Qt/CodeValidator.h
@@ -420,6 +418,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/GlobalThreadPoolsQt.cpp
     ../Common/Qt/GlobalThreadPoolsQt.h
     ../Common/Qt/NoWheelComboBox.h
+    ../Common/Qt/WallpaperWidget.cpp
+    ../Common/Qt/WallpaperWidget.h
     ../Common/Qt/Options/BatchWidget.cpp
     ../Common/Qt/Options/BatchWidget.h
     ../Common/Qt/Options/BooleanCheckBoxWidget.cpp

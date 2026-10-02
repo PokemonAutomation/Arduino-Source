@@ -7,16 +7,16 @@
 #ifndef PokemonAutomation_WallpaperOption_H
 #define PokemonAutomation_WallpaperOption_H
 
-#include "Common/Cpp/Options/GroupOption.h"
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/PathOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 
 namespace PokemonAutomation{
 
 
 
-enum class BackgroundImageFitMode{
+enum class WallpaperImageFitMode{
     FILL,
     FIT,
     STRETCH,
@@ -35,7 +35,7 @@ protected:
 
 public:
     PathOption IMAGE_PATH;
-    EnumDropdownOption<BackgroundImageFitMode> IMAGE_FIT;
+    EnumDropdownOption<WallpaperImageFitMode> IMAGE_FIT;
     SimpleIntegerOption<uint8_t> IMAGE_OVERLAY;
 };
 
