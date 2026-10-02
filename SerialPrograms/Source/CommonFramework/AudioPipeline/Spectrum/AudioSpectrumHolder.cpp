@@ -22,7 +22,7 @@ namespace PokemonAutomation{
 
 
 AudioSpectrumHolder::AudioSpectrumHolder()
-    : m_num_freqs(NUM_FFT_SAMPLES/2)
+    : m_num_freqs(NUM_FFT_SAMPLES / 4)
     , m_num_freq_windows(1000)
 //    , m_num_freq_visualization_blocks(384)
 //    , m_freq_visualization_block_boundaries(m_num_freq_visualization_blocks + 1)
@@ -158,7 +158,10 @@ PA_FORCE_INLINE uint32_t jetColorMap(float v){
     }
 }
 
-void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<const AlignedVector<float>> fft_output){
+void AudioSpectrumHolder::push_spectrum(
+    size_t sample_rate,
+    std::shared_ptr<const AlignedVector<float>> fft_output
+){
     WallClock timestamp = current_time();
 
     {
@@ -167,7 +170,9 @@ void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<cons
         const AlignedVector<float>& output = *fft_output;
 
         {
-            const size_t stamp = (m_spectrums.size() > 0) ? m_spectrums.front().stamp + 1 : m_spectrum_stamp_start;
+            const size_t stamp = m_spectrums.size() > 0
+                ? m_spectrums.front().stamp + 1
+                : m_spectrum_stamp_start;
             m_spectrums.emplace_front(stamp, sample_rate, fft_output);
             if (m_spectrums.size() > m_spectrum_history_length){
                 m_spectrums.pop_back();
@@ -180,50 +185,41 @@ void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<cons
         //  Scale the by the square root of the transform length.
         //  For random noise input, the frequency domain will have an average
         //  magnitude of sqrt(transform length).
-        float scale = std::sqrt(0.25f / (float)output.size());
-
-//        //  Divide by output size. Since samples can never be larger than 1.0, the
-//        //  frequency domain can never be larger than the FFT length. So we scale by
-//        //  the FFT length to guarantee that it also stays less than 1.0.
-//        float scale = 0.5f / (float)output.size();
-
-//        float skew_factor = 999.;
-//        float skew_scale = 1.f / (float)std::log1pf(skew_factor);
+        float scale = std::sqrt(0.5f / (float)output.size());
 
         bool log_scale = GlobalSettings::instance().AUDIO_PIPELINE->USE_KAISER_WINDOW;
 
-        // For one window, use how many blocks to show all frequencies:
+        //  For one window, use how many blocks to show all frequencies:
         float previous = 0;
         m_last_spectrum.timestamp = timestamp;
         for (size_t i = 0; i < m_freq_visualization_block_boundaries.size() - 1; i++){
-            float mag = 0.0f;
-            for (size_t j = m_freq_visualization_block_boundaries[i]; j < m_freq_visualization_block_boundaries[i+1]; j++){
-                mag += output[j];
-            }
+            size_t block_start = m_freq_visualization_block_boundaries[i];
+            size_t block_end = m_freq_visualization_block_boundaries[i + 1];
 
-            size_t width = m_freq_visualization_block_boundaries[i+1] - m_freq_visualization_block_boundaries[i];
+            float mag = previous;
 
-            if (width == 0){
-                mag = previous;
-            }else{
+            size_t width = block_end - block_start;
+            if (width != 0){
+                for (size_t j = block_start; j < block_end; j++){
+                    mag += output[j];
+                }
+
                 mag /= width;
                 mag *= scale;
 
                 if (log_scale){
-                    mag = std::log1pf(mag) * 2.0;
+                    mag = std::log1pf(mag * 32) * 0.25;
                 }else{
                     mag = std::sqrt(mag);
                 }
-//                mag = std::log1pf(mag * skew_factor) * skew_scale;
-//                mag = std::log1pf(std::sqrtf(mag)) * std::log1pf(1);
-//                mag = std::sqrt(2*mag - mag*mag);
-//                float m1 = 1 - mag;
-//                mag = std::sqrtf(1 - m1*m1);
 
                 // Clamp to [0.0, 1.0]
                 mag = std::min(mag, 1.0f);
                 mag = std::max(mag, 0.0f);
             }
+
+            //  Exponential decay to reduce jitter.
+            mag = mag * VISUAL_JITTER_DECAY + (1 - VISUAL_JITTER_DECAY) * m_last_spectrum.values[i];
 
             m_last_spectrum.values[i] = mag;
             m_last_spectrum.colors[i] = jetColorMap(mag);
@@ -243,7 +239,11 @@ void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<cons
     }
     m_listeners.run_method(&Listener::state_changed);
 }
-void AudioSpectrumHolder::add_overlay(uint64_t starting_stamp, uint64_t end_stamp, Color color){
+void AudioSpectrumHolder::add_overlay(
+    uint64_t starting_stamp,
+    uint64_t end_stamp,
+    Color color
+){
     {
         std::lock_guard<Mutex> lg(m_state_lock);
 
