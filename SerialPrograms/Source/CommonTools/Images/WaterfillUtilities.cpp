@@ -139,6 +139,7 @@ bool match_template_by_waterfill(
 
     bool detected = false;
     bool stop_match = false;
+    size_t num_waterfill_objects_found = 0;
     for (size_t i_matrix = 0; i_matrix < matrices.size(); i_matrix++){
         PackedBinaryMatrix& matrix = matrices[i_matrix];
         if (debug_mode){
@@ -157,6 +158,7 @@ bool match_template_by_waterfill(
         auto finder = session->make_iterator(min_area);
         const bool keep_object_matrix = debug_mode;
         while (finder->find_next(object, keep_object_matrix)){
+            num_waterfill_objects_found++;
             if (debug_mode){
                 cout << "------------ Matching One WaterfillObject ------------" << endl;
                 dump_object(object, image, area_thresholds);
@@ -186,6 +188,10 @@ bool match_template_by_waterfill(
         }
     }
     if (debug_mode){
+        if (num_waterfill_objects_found == 0){
+            cout << "None of the filters produced any waterfill objects. "
+            << "Either the color filters are too restrictive, or the min_area threshold is too high." << endl;
+        }
         cout << "============ End of match_template_by_waterfill ============" << endl;
     }
     return detected;
