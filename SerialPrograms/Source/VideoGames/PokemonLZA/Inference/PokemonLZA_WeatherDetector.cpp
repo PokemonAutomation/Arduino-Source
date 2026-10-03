@@ -328,23 +328,25 @@ bool WeatherIconDetector::detect(const ImageViewRGB32& screen){
                 ? ImageMatch::pixel_RMSD(image, templ)
                 : ImageMatch::pixel_RMSD(image, templ.scale_to(image.width(), image.height()));
         };
-
         double rmsd = compute_rmsd(candidate);
-        if (screen.height() < 1080 || m_type == WeatherIconType::Rain) {
-            const int search_radius = m_type == WeatherIconType::Rain
-                ? 2
-                : (std::min(candidate.width(), candidate.height()) <= 12 ? 2 : 1);
-            for (int dy = -search_radius; dy <= search_radius; dy++){
-                for (int dx = -search_radius; dx <= search_radius; dx++){
-                    if (dx == 0 && dy == 0){
-                        continue;
-                    }
-                    ImageViewRGB32 shifted = extract_box_reference(screen, check.box, dx, dy);
-                    if (shifted.width() != candidate.width() || shifted.height() != candidate.height()){
-                        continue;
-                    }
-                    rmsd = std::min(rmsd, compute_rmsd(shifted));
+        const int search_radius =
+            m_type == WeatherIconType::Rain ||
+            std::min(candidate.width(), candidate.height()) <= 12
+            ? 2 : 1;
+
+        for (int dy = -search_radius; dy <= search_radius; dy++) {
+            for (int dx = -search_radius; dx <= search_radius; dx++) {
+                if (dx == 0 && dy == 0) {
+                    continue;
                 }
+
+                ImageViewRGB32 shifted = extract_box_reference(screen, check.box, dx, dy);
+                if (shifted.width() != candidate.width() ||
+                    shifted.height() != candidate.height()) {
+                    continue;
+                }
+
+                rmsd = std::min(rmsd, compute_rmsd(shifted));
             }
         }
         if (rmsd >= check.rmsd_threshold){
