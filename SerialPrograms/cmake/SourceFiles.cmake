@@ -998,6 +998,14 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.tpp
     Source/Kernels/Algorithm/Kernels_Algorithm_DisjointSet.cpp
     Source/Kernels/Algorithm/Kernels_Algorithm_DisjointSet.h
+    Source/Kernels/AudioResampling/Kernels_AudioResampling.cpp
+    Source/Kernels/AudioResampling/Kernels_AudioResampling.h
+    Source/Kernels/AudioResampling/Kernels_AudioResampling_Core_Default.cpp
+    Source/Kernels/AudioResampling/Kernels_AudioResampling_Core_arm64_NEON.cpp
+    Source/Kernels/AudioResampling/Kernels_AudioResampling_Core_x86_AVX2.cpp
+    Source/Kernels/AudioResampling/Kernels_AudioResampling_Core_x86_SSE41.cpp
+    Source/Kernels/AudioResampling/Kernels_AudioResampling_Tests.cpp
+    Source/Kernels/AudioResampling/Kernels_AudioResampling_Tests.h
     Source/Kernels/AudioStreamConversion/AudioStreamConversion.cpp
     Source/Kernels/AudioStreamConversion/AudioStreamConversion.h
     Source/Kernels/AudioStreamConversion/AudioStreamConversion_Core_Default.cpp
