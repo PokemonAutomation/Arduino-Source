@@ -41,17 +41,16 @@ private:
     // Ort::Session det_session;
     Ort::Session m_rec_session;
     // Ort::MemoryInfo memory_info;
-    Language m_language;
     std::string m_input_name;
     std::string m_output_name;
     std::vector<std::string> m_dictionary;
     TaggedLogger m_logger;
 
-    int m_index = 0;
+    int m_debug_image_index = 0;
 
 };
 
-// assumes the input image is RGB
+// assumes the input image is BGR
 cv::Mat crop_to_text_region_with_padding(const cv::Mat& image, int image_index);
 
 // returns binary image of given image
@@ -61,7 +60,7 @@ cv::Mat get_binary_image(const cv::Mat& image);
 
 // if the image is narrow/tall, add horizontal padding
 // modifies the input image
-// assumes input image is RGB
+// assumes input image is BGR
 void add_horizontal_padding(cv::Mat& image, int image_index);
 
 // if the image is just a line, add vertical padding
@@ -77,16 +76,15 @@ bool is_horizontal_line(const cv::Mat& binary, int image_index);
 // density of the contour must be >75%. and at least twice as wide as it is tall
 bool is_line_shape(const cv::Mat& binary, const std::vector<cv::Point>& contour);
 
-// assumes input image is RGB
+// assumes input image is BGR
 cv::Scalar estimate_background_color(const cv::Mat& image);
 
-// convert HWC (height, width, channels) to NCHW (batch N, channels C, height H, width W)
-// HWC: pixels are interleaved. [B,G,R] [B,G,R] [B,G,R] ...
-// NCHW: [All Blue Pixels...] [All Green Pixels...] [All Red Pixels...]
-std::vector<float> preprocess_NCHW(cv::Mat& img);
-
-
-cv::Mat imageviewrgb32_to_cv_mat_rgb(const ImageViewRGB32& image);
+// Recognition model input: 8-bit BGR image (CV_8UC3) -> B, G, R planes (NCHW) scaled
+// to [-1, 1], written into `dst` (3 * rows * dst_width floats, dst_width >= cols).
+// Columns past `cols` are left as they are, so a zero-filled `dst` gives the zero right
+// padding the model was trained with.
+// Throws InternalProgramError if OpenCV did not write into `dst` (should not happen).
+void write_recognition_input_NCHW(const cv::Mat& image_bgr, float* dst, int dst_width);
 
 cv::Rect ImageFloatBox_to_cv_Rect(size_t width, size_t height, const ImageFloatBox& box);
 

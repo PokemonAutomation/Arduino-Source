@@ -5,6 +5,7 @@
  *  
  */
 
+#include <array>
 #include <fstream>
 #include <limits>
 #include "Common/Cpp/Exceptions.h"
@@ -68,7 +69,6 @@ PaddleOCRPipeline::PaddleOCRPipeline(Language language, std::string rec_path, st
         )
     )
     // , memory_info(Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault)) 
-    , m_language(language)
     , m_input_name(m_rec_session.GetInputNameAllocated(0, Ort::AllocatorWithDefaultOptions{}).get())
     , m_output_name(m_rec_session.GetOutputNameAllocated(0, Ort::AllocatorWithDefaultOptions{}).get())
     , m_logger(global_logger_raw(), "OCR")
@@ -152,18 +152,17 @@ void PaddleOCRPipeline::load_dictionary(const Filesystem::Path& path){
 std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
 
     const bool debugging = STATIC_GLOBALS.PADDLE_OCR_DEBUG;
-    m_index++;
+    m_debug_image_index++;
 
-    // 1. Convert Image to OpenCV image (cv::mat)
-    cv::Mat cv_image_rgb = imageviewrgb32_to_cv_mat_rgb(image);
-    if (cv_image_rgb.empty()) {
+    if (image.width() == 0 || image.height() == 0) {
         m_logger.log("[OCR-DEBUG] Input was an empty image.");
         return "";
     }
+    cv::Mat image_bgr;
+    cv::cvtColor(to_OpenCV_ref(image), image_bgr, cv::COLOR_BGRA2BGR);
 
-    
-    // 2. Crop tightly around the text, with small safety margin
-    cv::Mat cropped_image = crop_to_text_region_with_padding(cv_image_rgb, m_index);
+    // 1. Crop tightly around the text, with small safety margin
+    cv::Mat cropped_image = crop_to_text_region_with_padding(image_bgr, m_debug_image_index);
     if (cropped_image.empty()){
         if(STATIC_GLOBALS.PADDLE_OCR_DEBUG){
             m_logger.log("[OCR-DEBUG] Crop to text region returned empty image.");
@@ -172,7 +171,7 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     }
 
 
-    // 3. Calculate dynamic width (maintain aspect ratio)
+    // 2. Calculate dynamic width (maintain aspect ratio)
     // the model shape is {1, 3, 48, dynamic_width}. Note that the height is fixed at 48 pixels
     // the input image must be scaled to match the height of 48, for the neural network
     int target_h = 48;
@@ -188,10 +187,10 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
         return "";
     }
 
-    cv::Mat resized;
+    cv::Mat resized_image;
     cv::resize(
         cropped_image,
-        resized,
+        resized_image,
         cv::Size(target_w, target_h),
         0,
         0,
@@ -199,38 +198,44 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     );
 
 
-    // 4. Normalize
-    // convert UC3 8-bit [0,255] to 32FC3 float [0,1], then use ImageNet Normalization
-    // output = (Input * Scale) = (old_pixel * 1/255). This transforms [0,255] to range [0, 1]
-    // TODO: determine if normalizing to [-1,1] is preferred or to perform ImageNet normalization (mean = [0.485, 0.456, 0.406] and std = [0.229, 0.224, 0.225])
-    resized.convertTo(resized, CV_32FC3, 1.0 / 255.0);
-    
-    // 4b. Apply Mean/Std (Standard for PaddleOCR). except for Chinese
-    // Mean: [0.485, 0.456, 0.406], Std: [0.229, 0.224, 0.225]
-    switch (m_language){
-    case Language::ChineseSimplified:
-    case Language::ChineseTraditional:
-    case Language::Japanese:
-    case Language::Korean:
-        break;
-    default:;
-#if 0
-        cv::Scalar mean(0.485, 0.456, 0.406);
-        cv::Scalar std(0.229, 0.224, 0.225);
-        cv::subtract(resized, mean, resized);
-        cv::divide(resized, std, resized);
-#endif
-    }
-    
-    
-    // 5. Convert HWC to NCHW
-    std::vector<float> input_tensor_values = preprocess_NCHW(resized);
+    // 3. Prepare the input exactly the way PaddleOCR prepared images when it trained the
+    //    PP-OCRv5 recognition models (all four we ship: en/latin/korean mobile and the
+    //    server model used for Chinese/Japanese):
+    //    a. BGR channel order. PaddleOCR decodes images with OpenCV and never converts
+    //       them to RGB. Our BGR image is already in this order.
+    //    b. Scale [0, 255] to [-1, 1]: pixel / 255, then - 0.5, then / 0.5.
+    //       (No ImageNet mean/std here, unlike the detection model.)
+    //    c. Pad on the right to a width of at least 320 with zeros, i.e. mid-gray in the
+    //       [-1, 1] range. Training pads every line to a fixed-width canvas
+    //       (`image_shape: [3, 48, 320]`), and inference pads to at least 320 wide.
+    //
+    //    Matching this preprocessing improves model confidence.
+    //
+    //    Sources (links pinned to the versions that were checked):
+    //    - Training and eval config (`DecodeImage: img_mode: BGR`, `RecResizeImg` with
+    //      `image_shape: [3, 48, 320]`). The latin, korean and server configs match:
+    //      https://github.com/PaddlePaddle/PaddleOCR/blob/dab3fe35379033fdcb2d0e9572fac0b36c9a9ebf/configs/rec/PP-OCRv5/multi_language/en_PP-OCRv5_mobile_rec.yaml#L86-L129
+    //    - Training resize and normalization (`MultiScaleDataSet.resize_norm_img()`):
+    //      https://github.com/PaddlePaddle/PaddleOCR/blob/dab3fe35379033fdcb2d0e9572fac0b36c9a9ebf/ppocr/data/simple_dataset.py#L467-L495
+    //    - Eval resize and normalization (`resize_norm_img()`):
+    //      https://github.com/PaddlePaddle/PaddleOCR/blob/dab3fe35379033fdcb2d0e9572fac0b36c9a9ebf/ppocr/data/imaug/rec_img_aug.py#L631-L656
+    //    - PaddleOCR inference (`TextRecognizer.resize_norm_img()`, default shape 3,48,320):
+    //      https://github.com/PaddlePaddle/PaddleOCR/blob/dab3fe35379033fdcb2d0e9572fac0b36c9a9ebf/tools/infer/predict_rec.py#L208-L261
+    //    - Inference configs shipped with the official models:
+    //      https://huggingface.co/PaddlePaddle/en_PP-OCRv5_mobile_rec/blob/267c36e24c331595590fe7bd72bde2436fd286f2/inference.yml
+    //      https://huggingface.co/PaddlePaddle/PP-OCRv5_server_rec/blob/b26c3587fda8da3c8ec0ce357214b4d661ff1558/inference.yml
+    //    - PaddleX, the runtime PaddleOCR 3.x uses: reads BGR per the inference.yml, then
+    //      `OCRReisizeNormImg` does the same resize, normalization and padding:
+    //      https://github.com/PaddlePaddle/PaddleX/blob/c50f5da858020db473a2285f089bb8c7bbd6afdc/paddlex/inference/models/text_recognition/predictor.py#L142-L209
+    //      https://github.com/PaddlePaddle/PaddleX/blob/c50f5da858020db473a2285f089bb8c7bbd6afdc/paddlex/inference/models/text_recognition/processors.py#L47-L98
+    constexpr int MIN_TARGET_W = 320;
+    const int tensor_w = std::max(target_w, MIN_TARGET_W);
+    const std::array<int64_t, 4> input_shape = {1, 3, target_h, tensor_w};
 
-    // 6. Define Dynamic Shape
-    std::vector<int64_t> input_shape = {1, 3, target_h, target_w};
+    // Zero-filled, and zero is the padding value.
+    std::vector<float> input_buffer(3 * (size_t)target_h * tensor_w, 0.0f);
+    write_recognition_input_NCHW(resized_image, input_buffer.data(), tensor_w);
 
-
-    size_t expected_elements = 1 * 3 * target_h * target_w;
     if (debugging){
         m_logger.log("[OCR-DEBUG] Cropped image constraints - Width: " + std::to_string(cropped_image.cols) 
             + ", Height: " + std::to_string(cropped_image.rows) 
@@ -239,43 +244,27 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
 
         size_t nan_count = 0;
         size_t subnormal_count = 0;
-        for (float val : input_tensor_values) {
+        for (float val : input_buffer) {
             if (std::isnan(val)) {
                 nan_count++;
             } else if (val != 0.0f && std::fpclassify(val) == FP_SUBNORMAL) {
                 subnormal_count++;
             }
         }
-        m_logger.log("[OCR-DEBUG] Tensor payload validation - Total Floats: " + std::to_string(input_tensor_values.size())
+        m_logger.log("[OCR-DEBUG] Tensor payload validation - Total Floats: " + std::to_string(input_buffer.size())
                 + ", NaNs detected: " + std::to_string(nan_count) 
                 + ", Subnormal (denormal) values: " + std::to_string(subnormal_count));
-    
-        // Validate expected payload sizing matches matrix dimensionality
         m_logger.log("[OCR-DEBUG] Shape Definition - NCHW: [" + std::to_string(input_shape[0]) + "," + std::to_string(input_shape[1]) 
-                + "," + std::to_string(input_shape[2]) + "," + std::to_string(input_shape[3]) + "]. Expected Elements: " + std::to_string(expected_elements));
-
+                + "," + std::to_string(input_shape[2]) + "," + std::to_string(input_shape[3]) + "]");
     }
 
-    if (input_tensor_values.size() != static_cast<size_t>(expected_elements)) {
-        m_logger.log("[OCR-ERROR] Vector length vs input_shape calculation mismatch!");
-        m_logger.log("[OCR-ERROR] Fatal memory stride mismatch. Vector size (" + std::to_string(input_tensor_values.size())
-                    + ") does not match shape requirement (" + std::to_string(expected_elements));
-        return "";
-    }
-
-    // 7. Create tensor with its own managed memory
-    Ort::AllocatorWithDefaultOptions allocator;    
-    auto input_tensor = Ort::Value::CreateTensor<float>(
-        allocator,
-        input_shape.data(),
-        input_shape.size()
-    );
-
-    // Copy your processed data into that memory
-    std::memcpy(
-        input_tensor.GetTensorMutableData<float>(),
-        input_tensor_values.data(),
-        input_tensor_values.size() * sizeof(float)
+    // 4. Wrap the buffer as the input tensor, without copying. `input_buffer` stays alive
+    //    and unchanged until `Run()` returns.
+    static const Ort::MemoryInfo memory_info = Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault);
+    Ort::Value input_tensor = Ort::Value::CreateTensor<float>(
+        memory_info,
+        input_buffer.data(), input_buffer.size(),
+        input_shape.data(), input_shape.size()
     );
 
     const char* input_names[] = {m_input_name.c_str()};
@@ -286,7 +275,7 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
             m_logger.log("[OCR-DEBUG] Calling m_rec_session.Run() now...");
         }
 
-        // 8. Run the recognition session
+        // 5. Run the recognition session
         auto outputs = m_rec_session.Run(
             Ort::RunOptions{nullptr}, 
             input_names,   // char** 
@@ -307,11 +296,10 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
             "PaddleOCRPipeline::recognize(): Failed." + std::string(e.what())
         );
     }
-    
 }
 
 
-cv::Mat crop_to_text_region_with_padding(const cv::Mat& image, int image_index) {
+cv::Mat crop_to_text_region_with_padding(const cv::Mat& image, int debug_image_index) {
     // get a binary image, for cropping purposes
     cv::Mat binary = get_binary_image(image);
 
@@ -367,7 +355,7 @@ cv::Mat crop_to_text_region_with_padding(const cv::Mat& image, int image_index) 
         );
 
         if (STATIC_GLOBALS.PADDLE_OCR_DEBUG_IMAGE){
-            cv::imwrite(std::to_string(image_index) + "-padded" + ".png", padded_image);
+            cv::imwrite(std::to_string(debug_image_index) + "-padded" + ".png", padded_image);
         }
 
         cv::Rect final_crop(
@@ -384,15 +372,15 @@ cv::Mat crop_to_text_region_with_padding(const cv::Mat& image, int image_index) 
     }
 
     if (STATIC_GLOBALS.PADDLE_OCR_DEBUG_IMAGE){
-        cv::imwrite(std::to_string(image_index) + "-binary" + ".png", binary);
-        cv::imwrite(std::to_string(image_index) + "-cropped_image" +".png", cropped_image);
+        cv::imwrite(std::to_string(debug_image_index) + "-binary" + ".png", binary);
+        cv::imwrite(std::to_string(debug_image_index) + "-cropped_image" +".png", cropped_image);
     }
 
     // add horizontal padding to tall/narrow characters
-    add_horizontal_padding(cropped_image, image_index);
+    add_horizontal_padding(cropped_image, debug_image_index);
 
     cv::Mat binary_tight_crop = binary(bbox).clone();
-    add_vertical_padding(cropped_image, binary_tight_crop, image_index);
+    add_vertical_padding(cropped_image, binary_tight_crop, debug_image_index);
 
 
     return cropped_image;
@@ -401,7 +389,7 @@ cv::Mat crop_to_text_region_with_padding(const cv::Mat& image, int image_index) 
 cv::Mat get_binary_image(const cv::Mat& image){
     // first convert to grayscale
     cv::Mat gray;
-    cv::cvtColor(image, gray, cv::COLOR_RGB2GRAY);
+    cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
     cv::Mat binary;
     cv::threshold(gray, binary, 0, 255,
                 cv::THRESH_BINARY_INV | cv::THRESH_OTSU);
@@ -420,7 +408,7 @@ cv::Mat get_binary_image(const cv::Mat& image){
 }
 
 
-void add_vertical_padding(cv::Mat& image, const cv::Mat& binary_tight_crop, int image_index){
+void add_vertical_padding(cv::Mat& image, const cv::Mat& binary_tight_crop, int debug_image_index){
     if (image.empty()) {
         return;
     }
@@ -428,7 +416,7 @@ void add_vertical_padding(cv::Mat& image, const cv::Mat& binary_tight_crop, int 
     int h = binary_tight_crop.rows;
     int w = binary_tight_crop.cols;
 
-    if (is_horizontal_line(binary_tight_crop, image_index)){
+    if (is_horizontal_line(binary_tight_crop, debug_image_index)){
         cout << "Input image is likely just a horizontal line." << endl;
         cv::Scalar bg = estimate_background_color(image);
 
@@ -447,13 +435,13 @@ void add_vertical_padding(cv::Mat& image, const cv::Mat& binary_tight_crop, int 
         image = padded_image;
 
         if (STATIC_GLOBALS.PADDLE_OCR_DEBUG_IMAGE){
-            cv::imwrite(std::to_string(image_index) + "-vertic-padded" + ".png", image);
+            cv::imwrite(std::to_string(debug_image_index) + "-vertic-padded" + ".png", image);
         }
     }
 
 }
 
-bool is_horizontal_line(const cv::Mat& binary, int image_index){
+bool is_horizontal_line(const cv::Mat& binary, int debug_image_index){
 
     int h = binary.rows;
     int w = binary.cols;
@@ -470,7 +458,7 @@ bool is_horizontal_line(const cv::Mat& binary, int image_index){
     for (size_t i = 0; i < contours.size(); ++i) {
         if (STATIC_GLOBALS.PADDLE_OCR_DEBUG_IMAGE){
             cv::Mat contour_image = binary(cv::boundingRect(contours[i])).clone();
-            cv::imwrite(std::to_string(image_index) + "-contour_image-" + std::to_string(i) + ".png", contour_image);
+            cv::imwrite(std::to_string(debug_image_index) + "-contour_image-" + std::to_string(i) + ".png", contour_image);
         }
 
         if (!is_line_shape(binary, contours[i])) {
@@ -521,7 +509,7 @@ bool is_line_shape(const cv::Mat& binary, const std::vector<cv::Point>& contour)
     return (density >= 0.75) && (aspectRatio > 2.0);
 }
 
-void add_horizontal_padding(cv::Mat& image, int image_index){
+void add_horizontal_padding(cv::Mat& image, int debug_image_index){
     if (image.empty()) {
         return;
     }
@@ -550,7 +538,7 @@ void add_horizontal_padding(cv::Mat& image, int image_index){
         image = padded_image;
 
         if (STATIC_GLOBALS.PADDLE_OCR_DEBUG_IMAGE){
-            cv::imwrite(std::to_string(image_index) + "-horiz-padded" + ".png", image);
+            cv::imwrite(std::to_string(debug_image_index) + "-horiz-padded" + ".png", image);
         }
     }
 
@@ -576,36 +564,24 @@ cv::Scalar estimate_background_color(const cv::Mat& image) {
 }
 
 
-std::vector<float> preprocess_NCHW(cv::Mat& img){
-    const int rows = img.rows;
-    const int cols = img.cols;
-    const int channels = 3;
-    
-    // Allocate a flat memory buffer big enough for all channels
-    std::vector<float> dst(rows * cols * channels);
+void write_recognition_input_NCHW(const cv::Mat& image_bgr, float* dst, int dst_width){
+    const int rows = image_bgr.rows;
+    const int cols = image_bgr.cols;
+    const size_t plane_size = (size_t)rows * dst_width;
 
-    // Define the size of one complete "color plane" (channel)
-    const int plane_size = rows * cols;
+    // Split the interleaved B, G, R into separate 2D planes.
+    cv::Mat channels[3];
+    cv::split(image_bgr, channels);
 
-    // Loop through the image row-by-row
-    for (int y = 0; y < rows; ++y) {
-        // Safely locate the exact memory address for the start of row 'y'
-        const float* row_ptr = img.ptr<float>(y);
-        
-        // Loop through every pixel column in the current row
-        for (int x = 0; x < cols; ++x) {
-            // Calculate the 1D coordinate of the pixel inside a flat 2D plane
-            int linear_idx = y * cols + x;
-            
-            // Extract the interleaved BGR channels explicitly
-            dst[0 * plane_size + linear_idx] = row_ptr[x * channels + 0]; // Channel 0
-            dst[1 * plane_size + linear_idx] = row_ptr[x * channels + 1]; // Channel 1
-            dst[2 * plane_size + linear_idx] = row_ptr[x * channels + 2]; // Channel 2
-        }
+    // Scale each color channel from [0, 255] to [-1, 1] and write it into `dst`
+    for (int c = 0; c < 3; c++){
+        float* plane_data = dst + c * plane_size;
+        // Create a view of `dst` with row step == `dst_width * sizeof(float)`.
+        // This is to accommodate the right padded columns.
+        cv::Mat plane(rows, cols, CV_32FC1, plane_data, dst_width * sizeof(float));
+        channels[c].convertTo(plane, CV_32F, 2.0 / 255.0, -1.0);
     }
-    return dst;
 }
-
 
 
 std::string PaddleOCRPipeline::decode_CTC(float* data, const std::vector<int64_t>& shape, const std::vector<std::string>& dict){
@@ -671,18 +647,6 @@ _Tp safe_convert(size_t value){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "safe_convert: Value too large for template type _Tp.");
     }
     return static_cast<_Tp>(value);
-}
-
-// Convert ImageViewRGB32 (ARGB) to CV Mat (RGB). Create a new copy of the image.
-cv::Mat imageviewrgb32_to_cv_mat_rgb(const ImageViewRGB32& image){
-    // 1. Wrap the existing 4-channel data without copying memory
-    cv::Mat bgra_wrap = to_OpenCV_ref(image);
-
-    // 2. Convert and copy to a new 3-channel RGB Mat
-    cv::Mat rgb;
-    cv::cvtColor(bgra_wrap, rgb, cv::COLOR_BGRA2RGB);
-
-    return rgb;
 }
 
 cv::Rect ImageFloatBox_to_cv_Rect(size_t width, size_t height, const ImageFloatBox& box){
