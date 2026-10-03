@@ -23,7 +23,7 @@ namespace PokemonAutomation{
 
 AudioSpectrumHolder::AudioSpectrumHolder()
     : m_num_freqs(NUM_FFT_SAMPLES / 4)
-    , m_num_freq_windows(1000)
+    , m_num_freq_windows(48000 / FFT_SLIDING_WINDOW_STEP * 20)  //  20 seconds
 //    , m_num_freq_visualization_blocks(384)
 //    , m_freq_visualization_block_boundaries(m_num_freq_visualization_blocks + 1)
 //    , m_spectrograph(m_num_freq_visualization_blocks, m_num_freq_windows)
