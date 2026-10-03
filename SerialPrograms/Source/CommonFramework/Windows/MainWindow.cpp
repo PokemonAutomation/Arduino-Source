@@ -500,6 +500,7 @@ void MainWindow::update_wallpaper(){
     const QString surface = QStringLiteral("rgba(%1, %2, %3, 215)")
         .arg(surface_color.red()).arg(surface_color.green()).arg(surface_color.blue());
     const QString stylesheet = QString::fromLatin1(
+        "QLabel, QLabel:disabled { background-color: transparent; }"
         "QWidget[backgroundContainer=\"true\"] { background-color: transparent; }"
         "QWidget#backgroundSidebarBody { background-color: transparent; }"
         "QGroupBox#backgroundSupportBox { background-color: %1; }"
