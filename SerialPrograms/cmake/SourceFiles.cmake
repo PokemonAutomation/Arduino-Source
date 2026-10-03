@@ -1575,6 +1575,8 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_PrizeSelectDetector.h
     Source/VideoGames/PokemonFRLG/Inference/Map/PokemonFRLG_MapDetector.cpp
     Source/VideoGames/PokemonFRLG/Inference/Map/PokemonFRLG_MapDetector.h
+    Source/VideoGames/PokemonFRLG/Inference/Map/PokemonFRLG_PokemonLeagueDetectors.cpp
+    Source/VideoGames/PokemonFRLG/Inference/Map/PokemonFRLG_PokemonLeagueDetectors.h
     Source/VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_BagDetector.cpp
     Source/VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_BagDetector.h
     Source/VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_LoadMenuDetector.cpp
@@ -1632,6 +1634,8 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonFRLG/PokemonFRLG_Settings.h
     Source/VideoGames/PokemonFRLG/PokemonFRLG_Tests.cpp
     Source/VideoGames/PokemonFRLG/PokemonFRLG_Tests.h
+    Source/VideoGames/PokemonFRLG/Programs/Farming/PokemonFRLG_EliteFourFarmer.cpp
+    Source/VideoGames/PokemonFRLG/Programs/Farming/PokemonFRLG_EliteFourFarmer.h
     Source/VideoGames/PokemonFRLG/Programs/Farming/PokemonFRLG_EvTrainer.cpp
     Source/VideoGames/PokemonFRLG/Programs/Farming/PokemonFRLG_EvTrainer.h
     Source/VideoGames/PokemonFRLG/Programs/Farming/PokemonFRLG_HeldItemFarmer-SafariZone.cpp

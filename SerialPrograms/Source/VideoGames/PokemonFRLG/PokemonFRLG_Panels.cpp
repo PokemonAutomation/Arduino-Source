@@ -10,6 +10,7 @@
 #include "PokemonFRLG_Panels.h"
 
 #include "PokemonFRLG_Settings.h"
+#include "Programs/Farming/PokemonFRLG_EliteFourFarmer.h"
 #include "Programs/Farming/PokemonFRLG_HeldItemFarmer-SafariZone.h"
 #include "Programs/Farming/PokemonFRLG_ItemDuplication.h"
 #include "Programs/Farming/PokemonFRLG_NuggetBridgeFarmer.h"
@@ -61,6 +62,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_SingleSwitchProgram<EvTrainer>());
     ret.emplace_back(make_SingleSwitchProgram<HeldItemFarmerSafariZone>());
     ret.emplace_back(make_SingleSwitchProgram<ItemDuplication>());
+    ret.emplace_back(make_SingleSwitchProgram<EliteFourFarmer>());
 
     //ret.emplace_back("---- General ----");
 
