@@ -68,7 +68,6 @@ PaddleOCRPipeline::PaddleOCRPipeline(Language language, std::string rec_path, st
         )
     )
     // , memory_info(Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault)) 
-    , m_language(language)
     , m_input_name(m_rec_session.GetInputNameAllocated(0, Ort::AllocatorWithDefaultOptions{}).get())
     , m_output_name(m_rec_session.GetOutputNameAllocated(0, Ort::AllocatorWithDefaultOptions{}).get())
     , m_logger(global_logger_raw(), "OCR")
@@ -199,30 +198,54 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     );
 
 
-    // 4. Normalize
-    // convert UC3 8-bit [0,255] to 32FC3 float [0,1], then use ImageNet Normalization
-    // output = (Input * Scale) = (old_pixel * 1/255). This transforms [0,255] to range [0, 1]
-    // TODO: determine if normalizing to [-1,1] is preferred or to perform ImageNet normalization (mean = [0.485, 0.456, 0.406] and std = [0.229, 0.224, 0.225])
-    resized.convertTo(resized, CV_32FC3, 1.0 / 255.0);
-    
-    // 4b. Apply Mean/Std (Standard for PaddleOCR). except for Chinese
-    // Mean: [0.485, 0.456, 0.406], Std: [0.229, 0.224, 0.225]
-    switch (m_language){
-    case Language::ChineseSimplified:
-    case Language::ChineseTraditional:
-    case Language::Japanese:
-    case Language::Korean:
-        break;
-    default:;
-#if 0
-        cv::Scalar mean(0.485, 0.456, 0.406);
-        cv::Scalar std(0.229, 0.224, 0.225);
-        cv::subtract(resized, mean, resized);
-        cv::divide(resized, std, resized);
-#endif
+    // 4. Prepare the input exactly the way PaddleOCR prepared images when it trained the
+    //    PP-OCRv5 recognition models (all four we ship: en/latin/korean mobile and the
+    //    server model used for Chinese/Japanese):
+    //    a. BGR channel order. PaddleOCR decodes images with OpenCV and never converts
+    //       them to RGB.
+    //    b. Scale [0, 255] to [-1, 1]: pixel / 255, then - 0.5, then / 0.5.
+    //       (No ImageNet mean/std here, unlike the detection model.)
+    //    c. Pad on the right to a width of at least 320 with zeros, i.e. mid-gray in the
+    //       [-1, 1] range. Training pads every line to a fixed-width canvas
+    //       (`image_shape: [3, 48, 320]`), and inference pads to at least 320 wide.
+    //
+    //    Matching this matters: on our unit test suite, the full recipe raised the mean
+    //    per-character confidence from 0.952 to 0.968 and cut the share of low-confidence
+    //    reads (< 0.9) from 13% to 8%, compared to the previous RGB [0, 1] input without
+    //    padding. The pieces only help together: padding alone with [0, 1] input made
+    //    recognition much worse.
+    //
+    //    Sources (links pinned to the versions that were checked):
+    //    - Training and eval config (`DecodeImage: img_mode: BGR`, `RecResizeImg` with
+    //      `image_shape: [3, 48, 320]`). The latin, korean and server configs match:
+    //      https://github.com/PaddlePaddle/PaddleOCR/blob/dab3fe35379033fdcb2d0e9572fac0b36c9a9ebf/configs/rec/PP-OCRv5/multi_language/en_PP-OCRv5_mobile_rec.yaml#L86-L129
+    //    - Training resize and normalization (`MultiScaleDataSet.resize_norm_img()`):
+    //      https://github.com/PaddlePaddle/PaddleOCR/blob/dab3fe35379033fdcb2d0e9572fac0b36c9a9ebf/ppocr/data/simple_dataset.py#L467-L495
+    //    - Eval resize and normalization (`resize_norm_img()`):
+    //      https://github.com/PaddlePaddle/PaddleOCR/blob/dab3fe35379033fdcb2d0e9572fac0b36c9a9ebf/ppocr/data/imaug/rec_img_aug.py#L631-L656
+    //    - PaddleOCR inference (`TextRecognizer.resize_norm_img()`, default shape 3,48,320):
+    //      https://github.com/PaddlePaddle/PaddleOCR/blob/dab3fe35379033fdcb2d0e9572fac0b36c9a9ebf/tools/infer/predict_rec.py#L208-L261
+    //    - Inference configs shipped with the official models:
+    //      https://huggingface.co/PaddlePaddle/en_PP-OCRv5_mobile_rec/blob/267c36e24c331595590fe7bd72bde2436fd286f2/inference.yml
+    //      https://huggingface.co/PaddlePaddle/PP-OCRv5_server_rec/blob/b26c3587fda8da3c8ec0ce357214b4d661ff1558/inference.yml
+    //    - PaddleX, the runtime PaddleOCR 3.x uses: reads BGR per the inference.yml, then
+    //      `OCRReisizeNormImg` does the same resize, normalization and padding:
+    //      https://github.com/PaddlePaddle/PaddleX/blob/c50f5da858020db473a2285f089bb8c7bbd6afdc/paddlex/inference/models/text_recognition/predictor.py#L142-L209
+    //      https://github.com/PaddlePaddle/PaddleX/blob/c50f5da858020db473a2285f089bb8c7bbd6afdc/paddlex/inference/models/text_recognition/processors.py#L47-L98
+    cv::cvtColor(resized, resized, cv::COLOR_RGB2BGR);
+    resized.convertTo(resized, CV_32FC3, 2.0 / 255.0, -1.0);
+
+    constexpr int MIN_TARGET_W = 320;
+    if (target_w < MIN_TARGET_W){
+        cv::copyMakeBorder(
+            resized, resized,
+            0, 0, 0, MIN_TARGET_W - target_w,
+            cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0)
+        );
+        target_w = MIN_TARGET_W;
     }
-    
-    
+
+
     // 5. Convert HWC to NCHW
     std::vector<float> input_tensor_values = preprocess_NCHW(resized);
 

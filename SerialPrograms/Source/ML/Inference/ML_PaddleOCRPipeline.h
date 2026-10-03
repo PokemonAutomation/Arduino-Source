@@ -41,7 +41,6 @@ private:
     // Ort::Session det_session;
     Ort::Session m_rec_session;
     // Ort::MemoryInfo memory_info;
-    Language m_language;
     std::string m_input_name;
     std::string m_output_name;
     std::vector<std::string> m_dictionary;
