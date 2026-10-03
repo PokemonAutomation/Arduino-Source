@@ -207,8 +207,43 @@ std::vector<PaddleOCRTextBox> PaddleOCRDetector::detect(const cv::Mat& image_bgr
     cv::Mat resized;
     cv::resize(padded, resized, cv::Size(input_w, input_h), 0, 0, cv::INTER_LINEAR);
 
-    // 3. Normalize. PaddleOCR reads images as BGR with cv2 and applies ImageNet
-    //    mean/std in that channel order. Our input is already BGR, so it matches.
+    // 3. Normalize exactly the way PaddleOCR prepared images when it trained this model:
+    //    BGR channel order, scaled to [0, 1], then the ImageNet mean/std per channel.
+    //
+    //    NOTE: The channel order mismatch below is INTENTIONAL. The mean/std are the
+    //    standard ImageNet values, which are defined in RGB order (R: 0.485/0.229,
+    //    G: 0.456/0.224, B: 0.406/0.225). But PaddleOCR decodes images with OpenCV,
+    //    which gives BGR, never converts them to RGB, and then applies these values to
+    //    the channels in the order listed. So during training the blue channel was
+    //    normalized with the red mean/std and vice versa. The model's weights were
+    //    learned from inputs prepared that way, so we must do the same: our input image
+    //    is already BGR, and we keep the mean/std in the listed order. "Fixing" it to
+    //    proper RGB normalization would feed the model inputs it never saw during training.
+    //    (The effect is small because the three means/stds are close to each other.)
+    //
+    //    Evidence (links pinned to the versions that were checked):
+    //    - PP-OCRv5 det training and eval config: `DecodeImage` with `img_mode: BGR`,
+    //      then `NormalizeImage` with mean [0.485, 0.456, 0.406], std
+    //      [0.229, 0.224, 0.225] and `order: hwc`:
+    //      https://github.com/PaddlePaddle/PaddleOCR/blob/dab3fe35379033fdcb2d0e9572fac0b36c9a9ebf/configs/det/PP-OCRv5/PP-OCRv5_server_det.yml#L78-L123
+    //    - `DecodeImage` decodes with `cv2.imdecode()` (BGR) and only reverses the
+    //      channels when `img_mode` is RGB. `NormalizeImage` computes
+    //      `(img * scale - mean) / std` with the mean/std laid out per channel (HWC):
+    //      https://github.com/PaddlePaddle/PaddleOCR/blob/dab3fe35379033fdcb2d0e9572fac0b36c9a9ebf/ppocr/data/imaug/operators.py#L31-L94
+    //    - The inference config shipped with the official model has the same
+    //      `img_mode: BGR` and mean/std:
+    //      https://huggingface.co/PaddlePaddle/PP-OCRv5_server_det/blob/ca867c897ecbca8873081573a802ad70d499cb94/inference.yml
+    //    - PaddleX, the runtime PaddleOCR 3.x uses, replaces its default RGB reader with
+    //      `ReadImage(format="BGR")` from that inference.yml, then normalizes channel c
+    //      with mean[c] and std[c]:
+    //      https://github.com/PaddlePaddle/PaddleX/blob/c50f5da858020db473a2285f089bb8c7bbd6afdc/paddlex/inference/models/text_detection/predictor.py#L107-L164
+    //      https://github.com/PaddlePaddle/PaddleX/blob/c50f5da858020db473a2285f089bb8c7bbd6afdc/paddlex/inference/models/text_detection/processors.py#L236-L274
+    //
+    //    The config.json next to the ONNX model we use (monkt/paddleocr-onnx) describes
+    //    the preprocessing as "RGB image, normalized to [0, 1]". That's inaccurate: the
+    //    ONNX conversion doesn't change what input the model expects, so PaddleOCR's own
+    //    configs above are the authority.
+    //
     //    Normalization and the HWC -> NCHW conversion are done together, straight into
     //    the input buffer: split the image into its B, G, R planes, then `convertTo()`
     //    each plane into its slice of `input_values` as ((pixel / 255) - mean) / std.
