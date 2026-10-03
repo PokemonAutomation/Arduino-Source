@@ -59,9 +59,9 @@ add_library(CoreLib STATIC ${CORE_LIBRARY_SOURCES})
 pa_apply_gui_free_target_properties(CoreLib)
 
 if (WIN32)
-    #  /FaAssembly/ writes assembly listings to Assembly/ in the build folder.
-    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Assembly)
-    target_compile_options(CoreLib PRIVATE /FAs /FaAssembly/ /MP /W4 /WX /external:anglebrackets /external:W0 /utf-8)
+    #  /FaAssembly/CoreLib/ writes assembly listings to Assembly/CoreLib/ in the build folder.
+    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Assembly/CoreLib)
+    target_compile_options(CoreLib PRIVATE /FAs /FaAssembly/CoreLib/ /MP /W4 /WX /external:anglebrackets /external:W0 /utf-8)
     target_compile_options(CoreLib PRIVATE /wd5054)  # Deprecated enum arithemtic
     target_compile_options(CoreLib PRIVATE /wd4505)  # unreferenced local function has been removed
 
