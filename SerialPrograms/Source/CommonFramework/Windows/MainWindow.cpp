@@ -102,6 +102,8 @@ MainWindow::MainWindow(QWidget* parent)
     left_layout->setContentsMargins(0, 0, 0, 0);
 
     m_program_list = new ProgramSelect(*sidebar_body, *this);
+    m_program_list->setObjectName(QStringLiteral("backgroundProgramSelect"));
+    m_program_list->setAttribute(Qt::WA_StyledBackground, true);
     m_program_list->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
     left_layout->addWidget(m_program_list, 1);
 
@@ -503,10 +505,12 @@ void MainWindow::update_wallpaper(){
         "QLabel, QLabel:disabled { background-color: transparent; }"
         "QWidget[backgroundContainer=\"true\"] { background-color: transparent; }"
         "QWidget#backgroundSidebarBody { background-color: transparent; }"
+        "QWidget#backgroundProgramSelect { background-color: %1; }"
+        "QListWidget#backgroundProgramList { background-color: transparent; }"
+        "QWidget#backgroundProgramListViewport { background-color: transparent; }"
         "QGroupBox#backgroundSupportBox { background-color: %1; }"
         "QWidget#backgroundPanelRoot { background-color: transparent; }"
         "QWidget#backgroundProgramHeader { background-color: %1; }"
-        "QWidget#backgroundProgramHeader QLabel { background-color: transparent; }"
         "QScrollArea#backgroundScrollArea { background-color: transparent; border: none; }"
         "QWidget#backgroundScrollViewport { background-color: transparent; }"
         "QWidget#backgroundScrollContents { background-color: %1; }"

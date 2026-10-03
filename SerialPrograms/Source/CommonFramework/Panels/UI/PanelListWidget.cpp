@@ -34,6 +34,8 @@ PanelListWidget::PanelListWidget(
     : QListWidget(&parent)
     , m_panel_holder(holder)
 {
+    setObjectName(QStringLiteral("backgroundProgramList"));
+    viewport()->setObjectName(QStringLiteral("backgroundProgramListViewport"));
 //    QFontMetrics fm(this->font());
     // this->setStyleSheet(
     //     "QListWidget::item {"
