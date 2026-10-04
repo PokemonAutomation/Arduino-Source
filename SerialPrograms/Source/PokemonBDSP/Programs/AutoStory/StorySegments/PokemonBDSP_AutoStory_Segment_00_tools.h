@@ -114,6 +114,23 @@ namespace PokemonAutomation {
                 const std::string& direction_name,
                 BattleType battle_type = BattleType::STANDARD
             );
+
+            bool detect_black_screen_after_movement(
+                VideoStream& stream,
+                ProControllerContext& context,
+                Milliseconds timeout
+            );
+
+            bool try_right_down_exit_search(
+                VideoStream& stream,
+                ProControllerContext& context,
+                size_t iterations
+            );
+
+            void leave_pokemon_center_before_barry_1(
+                VideoStream& stream,
+                ProControllerContext& context
+            );
 			// ---------------------------------------------------------------------------
 			// Helper function to navigate the poketech challenge clown dialogue.
             // Example usage
