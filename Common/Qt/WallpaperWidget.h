@@ -36,11 +36,12 @@ protected:
     virtual void paintEvent(QPaintEvent*) override;
 
 private:
-    bool m_tile = false;
-    bool m_failed = false;
     QString m_error;
     QString m_path;
     QPixmap m_pixmap;
+    QPixmap m_scaled_pixmap;
+    QSize m_cached_size;
+    qreal m_cached_pixel_ratio = 0;
     WallpaperImageFitMode m_fit_mode = WallpaperImageFitMode::FILL;
     uint8_t m_overlay = 35;
     QColor m_surface_color;
