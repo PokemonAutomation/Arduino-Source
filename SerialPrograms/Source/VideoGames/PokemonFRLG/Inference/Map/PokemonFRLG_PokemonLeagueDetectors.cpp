@@ -8,6 +8,8 @@
 #include <cstdio>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
@@ -189,6 +191,157 @@ bool HallOfFameSavingDetector::detect(const ImageViewRGB32& screen){
     return is_solid(background, {0.2872, 0.3144, 0.3984}, 0.20, 40)
         && is_solid(top_band, {0.2825, 0.3150, 0.4025}, 0.20, 30)
         && top_band.average.sum() < background.average.sum() * 0.7;
+}
+
+
+
+class Test_EliteFourRoomDetector : public UnitTest{
+public:
+    Test_EliteFourRoomDetector(
+        const std::string& image,
+        EliteFourRoom room,
+        bool expected
+    )
+        : UnitTest(
+            std::string("PokemonFRLG::EliteFourRoomDetector(") + elite_four_room_name(room) + ") - " + image
+        )
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_room(room)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        EliteFourRoomDetector detector(COLOR_RED, m_room);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    EliteFourRoom m_room;
+    bool m_expected;
+};
+
+void add_tests_EliteFourRoomDetector(UnitTestDatabase& database){
+    //  Captures from Kuroneko: 4K60, Shadowcast and MYPIN (a low-end benchmark
+    //  card) capture cards, each in NV12 and YUYV formats.
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Lorelei-4k60-NV12.png", EliteFourRoom::LORELEI, true);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Lorelei-4k60-YUYV.png", EliteFourRoom::LORELEI, true);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Lorelei-Shadowcast-NV12.png", EliteFourRoom::LORELEI, true);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Lorelei-Shadowcast-YUYV.png", EliteFourRoom::LORELEI, true);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Lorelei-MYPIN-NV12.png", EliteFourRoom::LORELEI, true);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Lorelei-MYPIN-YUYV.png", EliteFourRoom::LORELEI, true);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-4k60-NV12.png", EliteFourRoom::BRUNO, true);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-4k60-YUYV.png", EliteFourRoom::BRUNO, true);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-Shadowcast-NV12.png", EliteFourRoom::BRUNO, true);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-Shadowcast-YUYV.png", EliteFourRoom::BRUNO, true);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-MYPIN-NV12.png", EliteFourRoom::BRUNO, true);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-MYPIN-YUYV.png", EliteFourRoom::BRUNO, true);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Agatha-4k60-NV12.png", EliteFourRoom::AGATHA, true);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Agatha-4k60-YUYV.png", EliteFourRoom::AGATHA, true);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Agatha-Shadowcast-NV12.png", EliteFourRoom::AGATHA, true);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Agatha-Shadowcast-YUYV.png", EliteFourRoom::AGATHA, true);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Agatha-MYPIN-NV12.png", EliteFourRoom::AGATHA, true);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Agatha-MYPIN-YUYV.png", EliteFourRoom::AGATHA, true);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Lance-4k60-NV12.png", EliteFourRoom::LANCE, true);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Lance-4k60-YUYV.png", EliteFourRoom::LANCE, true);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Lance-Shadowcast-NV12.png", EliteFourRoom::LANCE, true);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Lance-Shadowcast-YUYV.png", EliteFourRoom::LANCE, true);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Lance-MYPIN-NV12.png", EliteFourRoom::LANCE, true);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Lance-MYPIN-YUYV.png", EliteFourRoom::LANCE, true);
+
+    //  Bruno's yellow floor must not pass as any of the bluish rooms, and
+    //  the bluish rooms must not pass as Bruno's. (The three bluish rooms
+    //  overlap at this tolerance, so they are not tested against each other.)
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Lorelei-4k60-NV12.png", EliteFourRoom::BRUNO, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Lorelei-4k60-YUYV.png", EliteFourRoom::BRUNO, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Lorelei-Shadowcast-NV12.png", EliteFourRoom::BRUNO, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Lorelei-Shadowcast-YUYV.png", EliteFourRoom::BRUNO, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Lorelei-MYPIN-NV12.png", EliteFourRoom::BRUNO, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Lorelei-MYPIN-YUYV.png", EliteFourRoom::BRUNO, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-4k60-NV12.png", EliteFourRoom::LORELEI, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-4k60-NV12.png", EliteFourRoom::AGATHA, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-4k60-NV12.png", EliteFourRoom::LANCE, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-4k60-YUYV.png", EliteFourRoom::LORELEI, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-4k60-YUYV.png", EliteFourRoom::AGATHA, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-4k60-YUYV.png", EliteFourRoom::LANCE, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-Shadowcast-NV12.png", EliteFourRoom::LORELEI, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-Shadowcast-NV12.png", EliteFourRoom::AGATHA, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-Shadowcast-NV12.png", EliteFourRoom::LANCE, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-Shadowcast-YUYV.png", EliteFourRoom::LORELEI, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-Shadowcast-YUYV.png", EliteFourRoom::AGATHA, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-Shadowcast-YUYV.png", EliteFourRoom::LANCE, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-MYPIN-NV12.png", EliteFourRoom::LORELEI, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-MYPIN-NV12.png", EliteFourRoom::AGATHA, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-MYPIN-NV12.png", EliteFourRoom::LANCE, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-MYPIN-YUYV.png", EliteFourRoom::LORELEI, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-MYPIN-YUYV.png", EliteFourRoom::AGATHA, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-MYPIN-YUYV.png", EliteFourRoom::LANCE, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Agatha-4k60-NV12.png", EliteFourRoom::BRUNO, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Agatha-4k60-YUYV.png", EliteFourRoom::BRUNO, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Agatha-Shadowcast-NV12.png", EliteFourRoom::BRUNO, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Agatha-Shadowcast-YUYV.png", EliteFourRoom::BRUNO, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Agatha-MYPIN-NV12.png", EliteFourRoom::BRUNO, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Agatha-MYPIN-YUYV.png", EliteFourRoom::BRUNO, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Lance-4k60-NV12.png", EliteFourRoom::BRUNO, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Lance-4k60-YUYV.png", EliteFourRoom::BRUNO, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Lance-Shadowcast-NV12.png", EliteFourRoom::BRUNO, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Lance-Shadowcast-YUYV.png", EliteFourRoom::BRUNO, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Lance-MYPIN-NV12.png", EliteFourRoom::BRUNO, false);
+    database.add<Test_EliteFourRoomDetector>("PokemonFRLG/EliteFourRoomDetector/Lance-MYPIN-YUYV.png", EliteFourRoom::BRUNO, false);
+}
+
+
+class Test_HallOfFameSavingDetector : public UnitTest{
+public:
+    Test_HallOfFameSavingDetector(
+        const std::string& image,
+        bool expected
+    )
+        : UnitTest("PokemonFRLG::HallOfFameSavingDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        HallOfFameSavingDetector detector(COLOR_RED);
+        ImageRGB32 image(m_image);
+        return detector.detect(image) == m_expected;
+    };
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+void add_tests_HallOfFameSavingDetector(UnitTestDatabase& database){
+    database.add<Test_HallOfFameSavingDetector>("PokemonFRLG/HallOfFameSavingDetector/Switch-Saving_True.jpg", true);
+
+    //  Elite Four rooms must not pass as the save message.
+    database.add<Test_HallOfFameSavingDetector>("PokemonFRLG/EliteFourRoomDetector/Lorelei-4k60-NV12.png", false);
+    database.add<Test_HallOfFameSavingDetector>("PokemonFRLG/EliteFourRoomDetector/Lorelei-4k60-YUYV.png", false);
+    database.add<Test_HallOfFameSavingDetector>("PokemonFRLG/EliteFourRoomDetector/Lorelei-Shadowcast-NV12.png", false);
+    database.add<Test_HallOfFameSavingDetector>("PokemonFRLG/EliteFourRoomDetector/Lorelei-Shadowcast-YUYV.png", false);
+    database.add<Test_HallOfFameSavingDetector>("PokemonFRLG/EliteFourRoomDetector/Lorelei-MYPIN-NV12.png", false);
+    database.add<Test_HallOfFameSavingDetector>("PokemonFRLG/EliteFourRoomDetector/Lorelei-MYPIN-YUYV.png", false);
+    database.add<Test_HallOfFameSavingDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-4k60-NV12.png", false);
+    database.add<Test_HallOfFameSavingDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-4k60-YUYV.png", false);
+    database.add<Test_HallOfFameSavingDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-Shadowcast-NV12.png", false);
+    database.add<Test_HallOfFameSavingDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-Shadowcast-YUYV.png", false);
+    database.add<Test_HallOfFameSavingDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-MYPIN-NV12.png", false);
+    database.add<Test_HallOfFameSavingDetector>("PokemonFRLG/EliteFourRoomDetector/Bruno-MYPIN-YUYV.png", false);
+    database.add<Test_HallOfFameSavingDetector>("PokemonFRLG/EliteFourRoomDetector/Agatha-4k60-NV12.png", false);
+    database.add<Test_HallOfFameSavingDetector>("PokemonFRLG/EliteFourRoomDetector/Agatha-4k60-YUYV.png", false);
+    database.add<Test_HallOfFameSavingDetector>("PokemonFRLG/EliteFourRoomDetector/Agatha-Shadowcast-NV12.png", false);
+    database.add<Test_HallOfFameSavingDetector>("PokemonFRLG/EliteFourRoomDetector/Agatha-Shadowcast-YUYV.png", false);
+    database.add<Test_HallOfFameSavingDetector>("PokemonFRLG/EliteFourRoomDetector/Agatha-MYPIN-NV12.png", false);
+    database.add<Test_HallOfFameSavingDetector>("PokemonFRLG/EliteFourRoomDetector/Agatha-MYPIN-YUYV.png", false);
+    database.add<Test_HallOfFameSavingDetector>("PokemonFRLG/EliteFourRoomDetector/Lance-4k60-NV12.png", false);
+    database.add<Test_HallOfFameSavingDetector>("PokemonFRLG/EliteFourRoomDetector/Lance-4k60-YUYV.png", false);
+    database.add<Test_HallOfFameSavingDetector>("PokemonFRLG/EliteFourRoomDetector/Lance-Shadowcast-NV12.png", false);
+    database.add<Test_HallOfFameSavingDetector>("PokemonFRLG/EliteFourRoomDetector/Lance-Shadowcast-YUYV.png", false);
+    database.add<Test_HallOfFameSavingDetector>("PokemonFRLG/EliteFourRoomDetector/Lance-MYPIN-NV12.png", false);
+    database.add<Test_HallOfFameSavingDetector>("PokemonFRLG/EliteFourRoomDetector/Lance-MYPIN-YUYV.png", false);
 }
 
 

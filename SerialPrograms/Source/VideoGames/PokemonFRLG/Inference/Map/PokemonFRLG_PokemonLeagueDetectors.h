@@ -14,6 +14,7 @@
 #include <chrono>
 #include <string>
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/VisualDetector.h"
@@ -99,6 +100,10 @@ public:
         : DetectorToFinder("HallOfFameSavingOverWatcher", FinderType::GONE, std::chrono::milliseconds(100), color)
     {}
 };
+
+
+void add_tests_EliteFourRoomDetector(UnitTestDatabase& database);
+void add_tests_HallOfFameSavingDetector(UnitTestDatabase& database);
 
 
 }
