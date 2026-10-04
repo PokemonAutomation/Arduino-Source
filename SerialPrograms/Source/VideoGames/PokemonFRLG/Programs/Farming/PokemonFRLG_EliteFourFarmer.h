@@ -43,16 +43,16 @@ public:
     // The Pokemon doing all the battling. Each needs a specific moveset;
     // see the move tables in the .cpp.
     enum class Attacker{
-        starmie,
-        mewtwo,
-        lapras,
+        STARMIE,
+        MEWTWO,
+        LAPRAS,
     };
 
     // The starter the PLAYER chose. This decides the rival's team.
     enum class Starter{
-        bulbasaur,
-        charmander,
-        squirtle,
+        BULBASAUR,
+        CHARMANDER,
+        SQUIRTLE,
     };
 
 private:

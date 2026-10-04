@@ -86,23 +86,23 @@ EliteFourFarmer::EliteFourFarmer()
         "The Pokemon in slot 1 that battles. It must be level 100 with 252 EVs in Sp. Atk and Speed, "
         "a +Sp. Atk nature, and exactly these moves in this order in the battle menu (top-left, top-right, bottom-left, bottom-right).",
         {
-            {Attacker::starmie, "starmie", "Starmie: Surf / Psychic / Ice Beam / Thunderbolt (Sp. Atk 302+)"},
-            {Attacker::mewtwo,  "mewtwo",  "Mewtwo: Psychic / Ice Beam / Thunderbolt / Water Pulse (Sp. Atk 445+, or 405+ holding Mystic Water)"},
-            {Attacker::lapras,  "lapras",  "Lapras: Surf / Ice Beam / Psychic / Thunderbolt, holding NeverMeltIce (Sp. Atk 277+)"},
+            {Attacker::STARMIE, "starmie", "Starmie: Surf / Psychic / Ice Beam / Thunderbolt (Sp. Atk 302+)"},
+            {Attacker::MEWTWO,  "mewtwo",  "Mewtwo: Psychic / Ice Beam / Thunderbolt / Water Pulse (Sp. Atk 445+, or 405+ holding Mystic Water)"},
+            {Attacker::LAPRAS,  "lapras",  "Lapras: Surf / Ice Beam / Psychic / Thunderbolt, holding NeverMeltIce (Sp. Atk 277+)"},
         },
         LockMode::LOCK_WHILE_RUNNING,
-        Attacker::starmie
+        Attacker::STARMIE
     )
     , STARTER(
         "<b>Your Starter:</b><br>"
         "The starter you chose at the start of the game. This decides your rival's team.",
         {
-            {Starter::bulbasaur,  "bulbasaur",  "Bulbasaur"},
-            {Starter::charmander, "charmander", "Charmander"},
-            {Starter::squirtle,   "squirtle",   "Squirtle"},
+            {Starter::BULBASAUR,  "bulbasaur",  "Bulbasaur"},
+            {Starter::CHARMANDER, "charmander", "Charmander"},
+            {Starter::SQUIRTLE,   "squirtle",   "Squirtle"},
         },
         LockMode::LOCK_WHILE_RUNNING,
-        Starter::charmander
+        Starter::CHARMANDER
     )
     , NUM_WINS(
         "<b>Number of Wins:</b><br>"
@@ -132,39 +132,39 @@ namespace{
 
 
 enum class Move{
-    surf,
-    psychic,
-    ice_beam,
-    thunderbolt,
-    water_pulse,
+    SURF,
+    PSYCHIC,
+    ICE_BEAM,
+    THUNDERBOLT,
+    WATER_PULSE,
 };
 
 const char* move_name(Move move){
     switch (move){
-    case Move::surf:        return "Surf";
-    case Move::psychic:     return "Psychic";
-    case Move::ice_beam:    return "Ice Beam";
-    case Move::thunderbolt: return "Thunderbolt";
-    case Move::water_pulse: return "Water Pulse";
+    case Move::SURF:        return "Surf";
+    case Move::PSYCHIC:     return "Psychic";
+    case Move::ICE_BEAM:    return "Ice Beam";
+    case Move::THUNDERBOLT: return "Thunderbolt";
+    case Move::WATER_PULSE: return "Water Pulse";
     }
     return "?";
 }
 
 enum class Trainer{
-    lorelei,
-    bruno,
-    agatha,
-    lance,
-    champion,
+    LORELEI,
+    BRUNO,
+    AGATHA,
+    LANCE,
+    CHAMPION,
 };
 
 const char* trainer_name(Trainer trainer){
     switch (trainer){
-    case Trainer::lorelei:  return "Lorelei";
-    case Trainer::bruno:    return "Bruno";
-    case Trainer::agatha:   return "Agatha";
-    case Trainer::lance:    return "Lance";
-    case Trainer::champion: return "Champion";
+    case Trainer::LORELEI:  return "Lorelei";
+    case Trainer::BRUNO:    return "Bruno";
+    case Trainer::AGATHA:   return "Agatha";
+    case Trainer::LANCE:    return "Lance";
+    case Trainer::CHAMPION: return "Champion";
     }
     return "?";
 }
@@ -191,33 +191,33 @@ struct AttackerPlan{
 
 const AttackerPlan& STARMIE_PLAN(){
     static const AttackerPlan plan{
-        {Move::surf, Move::psychic, Move::ice_beam, Move::thunderbolt},
+        {Move::SURF, Move::PSYCHIC, Move::ICE_BEAM, Move::THUNDERBOLT},
         {
-            {"dewgong",    Move::thunderbolt},
-            {"cloyster",   Move::thunderbolt},
-            {"piloswine",  Move::surf},
-            {"jynx",       Move::surf},
-            {"lapras",     Move::thunderbolt},
-            {"steelix",    Move::surf},
-            {"hitmonchan", Move::psychic},
-            {"hitmonlee",  Move::psychic},
-            {"machamp",    Move::psychic},
-            {"gengar",     Move::psychic},
-            {"crobat",     Move::thunderbolt},  //  Psychic also works; Thunderbolt saves Psychic PP.
-            {"misdreavus", Move::surf},
-            {"arbok",      Move::psychic},
-            {"gyarados",   Move::thunderbolt},
-            {"dragonite",  Move::ice_beam},
-            {"kingdra",    Move::psychic},      //  Sets Starmie's 302 Sp. Atk requirement.
-            {"aerodactyl", Move::surf},
-            {"heracross",  Move::psychic},
-            {"alakazam",   Move::surf},
-            {"tyranitar",  Move::surf},
-            {"arcanine",   Move::surf},
-            {"exeggutor",  Move::ice_beam},
-            {"blastoise",  Move::thunderbolt},
-            {"venusaur",   Move::psychic},
-            {"charizard",  Move::thunderbolt},
+            {"dewgong",    Move::THUNDERBOLT},
+            {"cloyster",   Move::THUNDERBOLT},
+            {"piloswine",  Move::SURF},
+            {"jynx",       Move::SURF},
+            {"lapras",     Move::THUNDERBOLT},
+            {"steelix",    Move::SURF},
+            {"hitmonchan", Move::PSYCHIC},
+            {"hitmonlee",  Move::PSYCHIC},
+            {"machamp",    Move::PSYCHIC},
+            {"gengar",     Move::PSYCHIC},
+            {"crobat",     Move::THUNDERBOLT},  //  Psychic also works; Thunderbolt saves Psychic PP.
+            {"misdreavus", Move::SURF},
+            {"arbok",      Move::PSYCHIC},
+            {"gyarados",   Move::THUNDERBOLT},
+            {"dragonite",  Move::ICE_BEAM},
+            {"kingdra",    Move::PSYCHIC},      //  Sets Starmie's 302 Sp. Atk requirement.
+            {"aerodactyl", Move::SURF},
+            {"heracross",  Move::PSYCHIC},
+            {"alakazam",   Move::SURF},
+            {"tyranitar",  Move::SURF},
+            {"arcanine",   Move::SURF},
+            {"exeggutor",  Move::ICE_BEAM},
+            {"blastoise",  Move::THUNDERBOLT},
+            {"venusaur",   Move::PSYCHIC},
+            {"charizard",  Move::THUNDERBOLT},
         },
         {{
             {"dewgong", "cloyster", "lapras", "piloswine", "jynx"},
@@ -236,33 +236,33 @@ const AttackerPlan& STARMIE_PLAN(){
 
 const AttackerPlan& MEWTWO_PLAN(){
     static const AttackerPlan plan{
-        {Move::psychic, Move::ice_beam, Move::thunderbolt, Move::water_pulse},
+        {Move::PSYCHIC, Move::ICE_BEAM, Move::THUNDERBOLT, Move::WATER_PULSE},
         {
-            {"dewgong",    Move::thunderbolt},
-            {"cloyster",   Move::thunderbolt},
-            {"piloswine",  Move::water_pulse},  //  Psychic also works; Water Pulse saves Psychic PP.
-            {"jynx",       Move::thunderbolt},
-            {"lapras",     Move::thunderbolt},
-            {"steelix",    Move::water_pulse},
-            {"hitmonchan", Move::psychic},
-            {"hitmonlee",  Move::psychic},
-            {"machamp",    Move::psychic},
-            {"gengar",     Move::thunderbolt},  //  Psychic also works; Thunderbolt saves Psychic PP.
-            {"crobat",     Move::thunderbolt},  //  Same as above.
-            {"misdreavus", Move::psychic},
-            {"arbok",      Move::psychic},
-            {"gyarados",   Move::thunderbolt},
-            {"dragonite",  Move::ice_beam},
-            {"kingdra",    Move::psychic},
-            {"aerodactyl", Move::ice_beam},
-            {"heracross",  Move::psychic},
-            {"alakazam",   Move::ice_beam},
-            {"tyranitar",  Move::water_pulse},  //  Sets Mewtwo's 445 (405 with Mystic Water) requirement.
-            {"arcanine",   Move::water_pulse},  //  Psychic also works; Water Pulse saves Psychic PP.
-            {"exeggutor",  Move::ice_beam},
-            {"blastoise",  Move::thunderbolt},
-            {"venusaur",   Move::psychic},
-            {"charizard",  Move::thunderbolt},
+            {"dewgong",    Move::THUNDERBOLT},
+            {"cloyster",   Move::THUNDERBOLT},
+            {"piloswine",  Move::WATER_PULSE},  //  Psychic also works; Water Pulse saves Psychic PP.
+            {"jynx",       Move::THUNDERBOLT},
+            {"lapras",     Move::THUNDERBOLT},
+            {"steelix",    Move::WATER_PULSE},
+            {"hitmonchan", Move::PSYCHIC},
+            {"hitmonlee",  Move::PSYCHIC},
+            {"machamp",    Move::PSYCHIC},
+            {"gengar",     Move::THUNDERBOLT},  //  Psychic also works; Thunderbolt saves Psychic PP.
+            {"crobat",     Move::THUNDERBOLT},  //  Same as above.
+            {"misdreavus", Move::PSYCHIC},
+            {"arbok",      Move::PSYCHIC},
+            {"gyarados",   Move::THUNDERBOLT},
+            {"dragonite",  Move::ICE_BEAM},
+            {"kingdra",    Move::PSYCHIC},
+            {"aerodactyl", Move::ICE_BEAM},
+            {"heracross",  Move::PSYCHIC},
+            {"alakazam",   Move::ICE_BEAM},
+            {"tyranitar",  Move::WATER_PULSE},  //  Sets Mewtwo's 445 (405 with Mystic Water) requirement.
+            {"arcanine",   Move::WATER_PULSE},  //  Psychic also works; Water Pulse saves Psychic PP.
+            {"exeggutor",  Move::ICE_BEAM},
+            {"blastoise",  Move::THUNDERBOLT},
+            {"venusaur",   Move::PSYCHIC},
+            {"charizard",  Move::THUNDERBOLT},
         },
         {{
             {"dewgong", "cloyster", "piloswine", "jynx", "lapras"},
@@ -281,33 +281,33 @@ const AttackerPlan& MEWTWO_PLAN(){
 
 const AttackerPlan& LAPRAS_PLAN(){
     static const AttackerPlan plan{
-        {Move::surf, Move::ice_beam, Move::psychic, Move::thunderbolt},
+        {Move::SURF, Move::ICE_BEAM, Move::PSYCHIC, Move::THUNDERBOLT},
         {
-            {"dewgong",    Move::thunderbolt},
-            {"cloyster",   Move::thunderbolt},
-            {"piloswine",  Move::surf},
-            {"jynx",       Move::surf},
-            {"lapras",     Move::thunderbolt},  //  Water Absorb: never Surf.
-            {"steelix",    Move::surf},
-            {"hitmonchan", Move::psychic},
-            {"hitmonlee",  Move::psychic},
-            {"machamp",    Move::psychic},
-            {"gengar",     Move::psychic},
-            {"crobat",     Move::thunderbolt},
-            {"misdreavus", Move::surf},
-            {"arbok",      Move::psychic},
-            {"gyarados",   Move::thunderbolt},
-            {"dragonite",  Move::ice_beam},
-            {"kingdra",    Move::ice_beam},
-            {"aerodactyl", Move::thunderbolt},
-            {"heracross",  Move::psychic},
-            {"alakazam",   Move::ice_beam},
-            {"tyranitar",  Move::surf},
-            {"arcanine",   Move::surf},
-            {"exeggutor",  Move::ice_beam},
-            {"blastoise",  Move::thunderbolt},  //  Sets Lapras's 277 Sp. Atk requirement.
-            {"venusaur",   Move::ice_beam},
-            {"charizard",  Move::thunderbolt},
+            {"dewgong",    Move::THUNDERBOLT},
+            {"cloyster",   Move::THUNDERBOLT},
+            {"piloswine",  Move::SURF},
+            {"jynx",       Move::SURF},
+            {"lapras",     Move::THUNDERBOLT},  //  Water Absorb: never Surf.
+            {"steelix",    Move::SURF},
+            {"hitmonchan", Move::PSYCHIC},
+            {"hitmonlee",  Move::PSYCHIC},
+            {"machamp",    Move::PSYCHIC},
+            {"gengar",     Move::PSYCHIC},
+            {"crobat",     Move::THUNDERBOLT},
+            {"misdreavus", Move::SURF},
+            {"arbok",      Move::PSYCHIC},
+            {"gyarados",   Move::THUNDERBOLT},
+            {"dragonite",  Move::ICE_BEAM},
+            {"kingdra",    Move::ICE_BEAM},
+            {"aerodactyl", Move::THUNDERBOLT},
+            {"heracross",  Move::PSYCHIC},
+            {"alakazam",   Move::ICE_BEAM},
+            {"tyranitar",  Move::SURF},
+            {"arcanine",   Move::SURF},
+            {"exeggutor",  Move::ICE_BEAM},
+            {"blastoise",  Move::THUNDERBOLT},  //  Sets Lapras's 277 Sp. Atk requirement.
+            {"venusaur",   Move::ICE_BEAM},
+            {"charizard",  Move::THUNDERBOLT},
         },
         {{
             {"dewgong", "piloswine", "lapras", "cloyster", "jynx"},
@@ -326,18 +326,18 @@ const AttackerPlan& LAPRAS_PLAN(){
 
 const AttackerPlan& get_plan(EliteFourFarmer::Attacker attacker){
     switch (attacker){
-    case EliteFourFarmer::Attacker::starmie: return STARMIE_PLAN();
-    case EliteFourFarmer::Attacker::mewtwo:  return MEWTWO_PLAN();
-    case EliteFourFarmer::Attacker::lapras:  return LAPRAS_PLAN();
+    case EliteFourFarmer::Attacker::STARMIE: return STARMIE_PLAN();
+    case EliteFourFarmer::Attacker::MEWTWO:  return MEWTWO_PLAN();
+    case EliteFourFarmer::Attacker::LAPRAS:  return LAPRAS_PLAN();
     }
     return STARMIE_PLAN();
 }
 
 size_t starter_index(EliteFourFarmer::Starter starter){
     switch (starter){
-    case EliteFourFarmer::Starter::bulbasaur:  return 0;
-    case EliteFourFarmer::Starter::charmander: return 1;
-    case EliteFourFarmer::Starter::squirtle:   return 2;
+    case EliteFourFarmer::Starter::BULBASAUR:  return 0;
+    case EliteFourFarmer::Starter::CHARMANDER: return 1;
+    case EliteFourFarmer::Starter::SQUIRTLE:   return 2;
     }
     return 1;
 }
@@ -346,11 +346,11 @@ const std::vector<std::string>& expected_order(
     const AttackerPlan& plan, EliteFourFarmer::Starter starter, Trainer trainer
 ){
     switch (trainer){
-    case Trainer::lorelei:  return plan.elite_four[0];
-    case Trainer::bruno:    return plan.elite_four[1];
-    case Trainer::agatha:   return plan.elite_four[2];
-    case Trainer::lance:    return plan.elite_four[3];
-    case Trainer::champion: return plan.champion[starter_index(starter)];
+    case Trainer::LORELEI:  return plan.elite_four[0];
+    case Trainer::BRUNO:    return plan.elite_four[1];
+    case Trainer::AGATHA:   return plan.elite_four[2];
+    case Trainer::LANCE:    return plan.elite_four[3];
+    case Trainer::CHAMPION: return plan.champion[starter_index(starter)];
     }
     return plan.elite_four[0];
 }
@@ -450,13 +450,13 @@ void walk_through_door(
 
 EliteFourRoom room_of(Trainer trainer){
     switch (trainer){
-    case Trainer::lorelei:  return EliteFourRoom::lorelei;
-    case Trainer::bruno:    return EliteFourRoom::bruno;
-    case Trainer::agatha:   return EliteFourRoom::agatha;
-    case Trainer::lance:    return EliteFourRoom::lance;
-    case Trainer::champion: return EliteFourRoom::none;
+    case Trainer::LORELEI:  return EliteFourRoom::LORELEI;
+    case Trainer::BRUNO:    return EliteFourRoom::BRUNO;
+    case Trainer::AGATHA:   return EliteFourRoom::AGATHA;
+    case Trainer::LANCE:    return EliteFourRoom::LANCE;
+    case Trainer::CHAMPION: return EliteFourRoom::NONE;
     }
-    return EliteFourRoom::none;
+    return EliteFourRoom::NONE;
 }
 
 //  Confirm the player walked into the expected Elite Four room.
@@ -478,7 +478,7 @@ void check_room(ConsoleHandle& console, ProControllerContext& context, Trainer t
 
     VideoSnapshot screen = console.video().snapshot();
     const EliteFourRoom seen = read_elite_four_room(screen);
-    if (seen == EliteFourRoom::none){
+    if (seen == EliteFourRoom::NONE || seen == expected){
         console.log(
             std::string("Could not confirm ") + elite_four_room_name(expected) +
             " from the floor color. Continuing anyway. Measured " + describe_elite_four_floor(screen),
@@ -607,13 +607,13 @@ void walk_to_next_room(ConsoleHandle& console, ProControllerContext& context, Tr
     walk_through_door(
         console, context, DPAD_UP,
         {{DPAD_RIGHT, 1}, {DPAD_UP, 2}, {DPAD_LEFT, 1}, {DPAD_UP, 2}},
-        next == Trainer::champion ? std::string("the Champion's room") : std::string(elite_four_room_name(room_of(next)))
+        next == Trainer::CHAMPION ? std::string("the Champion's room") : std::string(elite_four_room_name(room_of(next)))
     );
 }
 
 //  Enter a trainer's room and get to the battle menu.
 void start_battle(ConsoleHandle& console, ProControllerContext& context, Trainer trainer){
-    if (trainer == Trainer::champion){
+    if (trainer == Trainer::CHAMPION){
         //  The game walks the player up to the rival and the battle starts
         //  on its own.
         console.log("Entered the Champion's room.");
@@ -737,7 +737,18 @@ void run_battle(
         //  faint watcher only feeds the log: if it never fires, either the
         //  detector missed it or the opponent really survived.
         bool faint_seen = false;
-        while (true){
+        auto report_missed_faint = [&]{
+            if (!faint_seen){
+                console.log(
+                    "Did not see the opponent faint. If the battle runs long, the opponent "
+                    "survived: check the attacker's Sp. Atk, nature and moves.",
+                    COLOR_RED
+                );
+            }
+        };
+
+        bool waiting = true;
+        while (waiting){
             BattleMenuWatcher battle_menu(COLOR_RED);
             BlackScreenWatcher battle_ended(COLOR_RED);
             BattleOpponentFaintWatcher opponent_fainted(COLOR_RED);
@@ -755,31 +766,15 @@ void run_battle(
                 callbacks
             );
 
-            if (ret < 0){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT,
-                    "run_battle(): Nothing detected for 60 seconds after attacking.",
-                    console
-                );
-            }
-            if (ret == 2){          //  opponent fainted; keep waiting for the menu or the end
-                console.log("Opponent fainted.");
-                faint_seen = true;
-                continue;
-            }
-            if (!faint_seen){
-                console.log(
-                    "Did not see the opponent faint. If the battle runs long, the opponent "
-                    "survived: check the attacker's Sp. Atk, nature and moves.",
-                    COLOR_RED
-                );
-            }
-            opponent++;
-
-            if (ret == 0){          //  battle menu: next opponent
+            switch (ret){
+            case 0:     //  Battle menu: the next opponent is out.
+                report_missed_faint();
+                opponent++;
+                waiting = false;
                 break;
-            }
-            if (ret == 1){          //  battle over
+            case 1:     //  Battle over.
+                report_missed_faint();
+                opponent++;
                 if (opponent != order.size()){
                     console.log(
                         "Battle ended after " + std::to_string(opponent) + " attacks (expected " +
@@ -789,6 +784,16 @@ void run_battle(
                 }
                 console.log(std::string("Defeated ") + trainer_name(trainer) + ".");
                 return;
+            case 2:     //  Opponent fainted. Keep waiting for the menu or the end.
+                console.log("Opponent fainted.");
+                faint_seen = true;
+                break;
+            default:
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
+                    "run_battle(): Nothing detected for 60 seconds after attacking.",
+                    console
+                );
             }
         }
     }
@@ -807,7 +812,7 @@ void EliteFourFarmer::program(SingleSwitchProgramEnvironment& env, ProController
     const Starter starter = STARTER;
 
     const std::array<Trainer, 5> TRAINERS{
-        Trainer::lorelei, Trainer::bruno, Trainer::agatha, Trainer::lance, Trainer::champion
+        Trainer::LORELEI, Trainer::BRUNO, Trainer::AGATHA, Trainer::LANCE, Trainer::CHAMPION
     };
 
     uint32_t consecutive_errors = 0;
@@ -830,7 +835,7 @@ void EliteFourFarmer::program(SingleSwitchProgramEnvironment& env, ProController
                 stats.battles++;
                 env.update_stats();
 
-                if (trainer != Trainer::champion){
+                if (trainer != Trainer::CHAMPION){
                     clear_post_battle_dialog(env.console, context, trainer);
                 }
             }

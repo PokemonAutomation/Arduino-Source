@@ -25,19 +25,23 @@ namespace PokemonFRLG{
 
 
 enum class EliteFourRoom{
-    none,
-    lorelei,
-    bruno,
-    agatha,
-    lance,
+    NONE,
+    LORELEI,
+    BRUNO,
+    AGATHA,
+    LANCE,
 };
 const char* elite_four_room_name(EliteFourRoom room);
 
 
-//  Reads which Elite Four room is on screen from the floor color on both
-//  sides of the battle area. Only valid once the player has walked into the
-//  room (the camera then shows the floor in the sample boxes). Returns
-//  EliteFourRoom::none for anything else, including fades and the lobby.
+//  Whether the floor color on both sides of the battle area matches the
+//  given room. Only valid once the player has walked into the room (the
+//  camera then shows the floor in the sample boxes).
+bool is_in_elite_four_room(const ImageViewRGB32& screen, EliteFourRoom room);
+
+//  The room whose floor color is closest to what's on screen, for error
+//  messages. Returns EliteFourRoom::NONE when no room is close, including
+//  fades and the lobby.
 EliteFourRoom read_elite_four_room(const ImageViewRGB32& screen);
 
 //  The measured floor colors, for the log when a room isn't recognized.
@@ -81,6 +85,7 @@ private:
     ImageFloatBox m_dialog_top_box;
     ImageFloatBox m_dialog_bottom_box;
     ImageFloatBox m_background_box;
+    ImageFloatBox m_top_band_box;
 };
 class HallOfFameSavingWatcher : public DetectorToFinder<HallOfFameSavingDetector>{
 public:
