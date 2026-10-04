@@ -136,6 +136,8 @@ CollapsibleGroupBox::CollapsibleGroupBox(
     , m_widget(nullptr)
     , m_orientation(orientation)
 {
+    setProperty("backgroundContainer", true);
+    m_content->setProperty("backgroundContainer", true);
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);

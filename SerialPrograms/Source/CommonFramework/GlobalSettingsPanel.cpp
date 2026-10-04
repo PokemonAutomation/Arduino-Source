@@ -194,6 +194,9 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(STATS_FILE);
     PA_ADD_OPTION(TEMP_FOLDER);
     PA_ADD_OPTION(THEME);
+    if (STATIC_GLOBALS.DEVELOPER_MODE){
+        PA_ADD_OPTION(WALLPAPER);
+    }
     PA_ADD_OPTION(OCR_LIBRARY);
 
     // gated behind Dev mode. see GlobalSettings::load_json
@@ -319,8 +322,11 @@ void GlobalSettings::on_config_value_changed(void* object){
 
 void GlobalSettings::on_press(ButtonCell& button){
 #ifdef QT_CORE_LIB
-    // Open the runtime base folder in the system file manager
-    QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdString(RUNTIME_BASE_PATH())));
+    if (&button == &OPEN_BASE_FOLDER_BUTTON){
+        // Open the runtime base folder in the system file manager
+        QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdString(RUNTIME_BASE_PATH())));
+        return;
+    }
 #endif
 }
 

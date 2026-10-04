@@ -32,8 +32,10 @@ CollapsibleGroupBox* make_panel_header(
     const std::string& description
 ){
     CollapsibleGroupBox* header = new CollapsibleGroupBox(parent, "Current Program");
+    header->setObjectName(QStringLiteral("backgroundProgramHeader"));
 
     QWidget* body = new QWidget(header);
+    body->setProperty("backgroundContainer", true);
     QVBoxLayout* vbox = new QVBoxLayout(body);
     vbox->setContentsMargins(0, 0, 0, 0);
 
@@ -294,6 +296,8 @@ void populate_panel_widget(
     ConfigOption& options,
     std::vector<QWidget*> footers
 ){
+    panel.setObjectName(QString::fromUtf8("backgroundPanelRoot"));
+
     if (descriptor.deprecation() == PanelDeprecation::DEPRECATED){
         QMessageBox box;
         box.warning(
@@ -331,10 +335,13 @@ void populate_panel_widget(
     layout->addWidget(header);
 
     QScrollArea* scroll_outer = new QScrollArea(&panel);
+    scroll_outer->setObjectName(QString::fromUtf8("backgroundScrollArea"));
+    scroll_outer->viewport()->setObjectName(QString::fromUtf8("backgroundScrollViewport"));
     layout->addWidget(scroll_outer);
     scroll_outer->setWidgetResizable(true);
 
     QWidget* scroll_inner = new QWidget(scroll_outer);
+    scroll_inner->setObjectName(QString::fromUtf8("backgroundScrollContents"));
     scroll_outer->setWidget(scroll_inner);
     QVBoxLayout* scroll_layout = new QVBoxLayout(scroll_inner);
     scroll_layout->setAlignment(Qt::AlignTop);

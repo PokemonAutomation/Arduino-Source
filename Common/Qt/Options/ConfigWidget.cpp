@@ -36,6 +36,11 @@ ConfigWidget::ConfigWidget(ConfigOption& m_value, QWidget& widget)
     , m_widget(&widget)
 {
 //    cout << "ConfigWidget::ConfigWidget(): " << (int)m_value.visibility() << endl;
+    // Plain QWidget option wrappers are layout containers. Keep native input
+    // controls (QLineEdit, QCheckBox, etc.) on their normal theme surfaces.
+    if (widget.metaObject() == &QWidget::staticMetaObject){
+        widget.setProperty("backgroundContainer", true);
+    }
     m_program_is_running = false;
     ConfigWidget::update_visibility();
     m_value.add_listener(*this);
