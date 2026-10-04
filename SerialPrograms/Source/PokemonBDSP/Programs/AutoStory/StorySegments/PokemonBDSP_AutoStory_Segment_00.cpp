@@ -6,7 +6,7 @@
  */
 
 #include "PokemonBDSP_AutoStory_Segment_00.h"
-#include "PokemonBDSP_AutoStory_Segment_00_tools.h"
+#include "../Utils/PokemonBDSP_AutoStory_Segment_00_tools.h"
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
-#include "PokemonBDSP_AutoStory_Segment_00.h"
+#include "../StorySegments/PokemonBDSP_AutoStory_Segment_00.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 
 #include "NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.h"

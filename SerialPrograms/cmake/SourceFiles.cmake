@@ -1487,6 +1487,12 @@ file(GLOB LIBRARY_SOURCES
     Source/Pokemon/Resources/Pokemon_PokemonNames.h
     Source/Pokemon/Resources/Pokemon_PokemonSlugs.cpp
     Source/Pokemon/Resources/Pokemon_PokemonSlugs.h
+    Source/PokemonBDSP/PokemonBDSP_Tests.cpp
+    Source/PokemonBDSP/PokemonBDSP_Tests.h
+    Source/PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Segment_00_tools.cpp
+    Source/PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Segment_00_tools.h
+    Source/PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_Autostory_Segment_01_tools.cpp
+    Source/PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_Autostory_Segment_01_tools.h
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.cpp
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.h
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.cpp
@@ -1579,8 +1585,6 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonBDSP/Programs/AutoStory/Data/PokemonBDSP_AutoStory_BDSPData.h
     Source/PokemonBDSP/Programs/AutoStory/StorySegments/PokemonBDSP_AutoStory_Segment_00.cpp
     Source/PokemonBDSP/Programs/AutoStory/StorySegments/PokemonBDSP_AutoStory_Segment_00.h
-    Source/PokemonBDSP/Programs/AutoStory/StorySegments/PokemonBDSP_AutoStory_Segment_00_tools.cpp
-    Source/PokemonBDSP/Programs/AutoStory/StorySegments/PokemonBDSP_AutoStory_Segment_00_tools.h
     Source/PokemonBDSP/Programs/AutoStory/StorySegments/PokemonBDSP_AutoStory_Segment_01.cpp
     Source/PokemonBDSP/Programs/AutoStory/StorySegments/PokemonBDSP_AutoStory_Segment_01.h
     Source/PokemonBDSP/Programs/AutoStory/StorySegments/PokemonBDSP_AutoStory_Segment_02.cpp

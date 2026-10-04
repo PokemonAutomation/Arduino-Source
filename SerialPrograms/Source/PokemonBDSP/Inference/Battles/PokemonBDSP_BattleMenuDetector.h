@@ -25,12 +25,26 @@ enum class BattleType{
 };
 
 
+// Vertical command order in the BDSP battle menu.
+enum class BattleMenuOption{
+    UNKNOWN = -1,
+    BATTLE = 0,
+    POKEMON = 1,
+    BAG = 2,
+    RUN = 3,
+};
+
 class BattleMenuDetector : public StaticScreenDetector{
 public:
     BattleMenuDetector(BattleType battle_type, Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) override;
+
+    // Requires the battle menu and white selection brackets at all four corners.
+    // Missing or ambiguous brackets return UNKNOWN; never infer the cursor.
+    BattleMenuOption selected_option(const ImageViewRGB32& screen);
+
 
 private:
     bool is_battle_button(const ImageViewRGB32& screen) const;
