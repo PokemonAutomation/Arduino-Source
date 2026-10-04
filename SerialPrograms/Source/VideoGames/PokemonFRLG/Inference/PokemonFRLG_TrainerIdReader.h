@@ -40,6 +40,7 @@ private:
     ImageFloatBox m_box_tid;
     ImageFloatBox m_box_tid_spa;
     ImageFloatBox m_box_tid_jpn;
+    ImageFloatBox m_box_tid_fra;
 };
 
 
