@@ -913,6 +913,65 @@ namespace PokemonAutomation {
             // Movement Helpers
             // ---------------------------------------------------------------------------
 
+            bool detect_black_screen_after_movement(
+                VideoStream& stream,
+                ProControllerContext& context,
+                Milliseconds timeout
+            ) {
+                BlackScreenWatcher black_screen;
+                return wait_until(stream, context, timeout, {{black_screen}}) == 0;
+            }
+
+            bool try_right_down_exit_search(
+                VideoStream& stream,
+                ProControllerContext& context,
+                size_t iterations
+            ) {
+                for (size_t i = 0; i < iterations; i++) {
+                    pbf_move_left_joystick(context, { 1.0, 0.0 }, 80ms, 0ms);
+                    pbf_move_left_joystick(context, { 0.0, -1.0 }, 220ms, 0ms);
+
+                    if (detect_black_screen_after_movement(stream, context, 1000ms)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            void leave_pokemon_center_before_barry_1(
+                VideoStream& stream,
+                ProControllerContext& context
+            ) {
+                // Original down movement to leave Pokemon Center.
+                pbf_move_left_joystick(context, { 0.0, -1.0 }, 814ms, 0ms);
+
+                if (detect_black_screen_after_movement(stream, context, 1200ms)) {
+                    pbf_wait(context, 2340ms);
+                    return;
+                }
+
+                stream.log("[AutoStory] Pokemon Center exit black screen not detected. Searching with right/down movement.", COLOR_ORANGE);
+
+                if (try_right_down_exit_search(stream, context, 20)) {
+                    pbf_wait(context, 2340ms);
+                    return;
+                }
+
+                stream.log("[AutoStory] First exit search failed. Repositioning left and retrying.", COLOR_ORANGE);
+                pbf_move_left_joystick(context, { -1.0, 0.0 }, 5000ms, 0ms);
+
+                if (try_right_down_exit_search(stream, context, 30)) {
+                    pbf_wait(context, 2340ms);
+                    return;
+                }
+
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Failed to find Pokemon Center exit black screen before Barry 1. Triggering checkpoint retry.",
+                    stream
+                );
+            }
+
             // ---------------------------------------------------------------------------
 			// Generic Movement Helper - Walk through grass in specified direction for 
             // specified steps, attempting to run from any battles that are encountered.
@@ -927,6 +986,7 @@ namespace PokemonAutomation {
                 BattleType battle_type
             ) {
                 BlackScreenWatcher battle_start;
+                WhiteScreenOverWatcher white_screen(COLOR_YELLOW, {0.1, 0.1, 0.8, 0.8});
                 BattleMenuWatcher battle_menu(battle_type, COLOR_YELLOW);
                 BattleDialogWatcher battle_dialog(COLOR_YELLOW);
 
@@ -950,8 +1010,8 @@ namespace PokemonAutomation {
                         context,
                         2500ms,
                         {
+                            {white_screen},
                             {battle_start},
-                            {battle_menu},
                             {battle_dialog},
                         }
                     );
@@ -963,9 +1023,9 @@ namespace PokemonAutomation {
                             COLOR_ORANGE
                         );
 
-                        // If battle_ret == 0 (black screen transition), wait for the
+                        // If battle_ret == 0/1 (black/white transition), wait for the
                         // battle menu to fully appear before attempting to navigate.
-                        if (battle_ret == 0) {
+                        if (battle_ret == 0 || battle_ret == 1) {
                             BattleMenuWatcher wait_for_menu(battle_type, COLOR_YELLOW);
                             wait_until(stream, context, 10s, {{wait_for_menu}});
                             context.wait_for_all_requests();

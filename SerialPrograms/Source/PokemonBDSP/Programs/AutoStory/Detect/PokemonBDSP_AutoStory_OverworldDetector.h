@@ -21,6 +21,8 @@
 #include "Common/Cpp/Color.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/VisualDetector.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_MenuDetector.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
@@ -57,6 +59,33 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 };
+
+
+//  Detects the big red button on the right edge of the Poketch overlay.
+//  Present only while the Poketch is shown at its normal size.
+class PoketchButtonDetector : public StaticScreenDetector{
+public:
+    PoketchButtonDetector(Color color = COLOR_RED);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+private:
+    Color m_color;
+    ImageFloatBox m_button;
+};
+
+class PoketchButtonWatcher : public PoketchButtonDetector, public VisualInferenceCallback{
+public:
+    PoketchButtonWatcher(Color color = COLOR_RED);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+};
+
+//  Tries up to 3 times to get the Poketch button on screen using R presses.
+//  Returns true if the button was seen.
+bool ensure_poketch_visible(VideoStream& stream, ProControllerContext& context);
 
 
 }
