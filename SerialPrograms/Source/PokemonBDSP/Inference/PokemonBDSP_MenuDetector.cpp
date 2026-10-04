@@ -4,6 +4,12 @@
  *
  */
 
+#include <algorithm>
+#include <exception>
+#include <QCoreApplication>
+#include <QDir>
+#include "CommonFramework/Globals.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include <array>
 #include <format>
 #include <string_view>
@@ -151,6 +157,82 @@ private:
 
 } // namespace
 
+std::string menu_detector_test_folder(){
+    QDir directory(QCoreApplication::applicationDirPath());
+    for (size_t level = 0; level < 6; level++){
+        const QString folder = directory.filePath("Packages/Resources/PokemonBDSP/menu_detector");
+        if (QDir(folder).exists()){
+            return QDir(folder).absolutePath().toStdString();
+        }
+        if (!directory.cdUp()) break;
+    }
+    return RESOURCE_PATH() + "PokemonBDSP/menu_detector";
+}
+
+bool run_menu_detector_tests(Logger& logger, const std::string& folder){
+    const QDir directory(QString::fromStdString(folder));
+    const auto files = directory.entryList({"*.png"}, QDir::Files, QDir::Name);
+    if (files.isEmpty()){
+        logger.log("[Menu tests] No PNG screenshots in " + folder, COLOR_RED);
+        return false;
+    }
+    size_t passed = 0;
+    size_t failed = 0;
+    auto check = [&](bool actual, bool expected, const std::string& label){
+        const bool success = actual == expected;
+        (success ? passed : failed)++;
+        logger.log(std::string(success ? "[PASS] " : "[FAIL] ") + label +
+            ": detected=" + (actual ? "true" : "false") +
+            ", expected=" + (expected ? "true" : "false"), success ? COLOR_GREEN : COLOR_RED);
+    };
+    for (const QString& filename : files){
+        const bool expected = !filename.startsWith("non_menu_");
+        try{
+            const ImageRGB32 image(directory.filePath(filename).toStdString());
+            for (size_t width : {size_t(1920), size_t(1280), size_t(960)}){
+                const ImageRGB32 scaled = image.scale_to(width, width * 9 / 16);
+                MenuDetector detector;
+                check(detector.detect(scaled), expected,
+                    filename.toStdString() + " at " + std::to_string(width) + "px");
+            }
+        }catch (const std::exception& error){
+            failed++;
+            logger.log("[FAIL] " + filename.toStdString() + ": " + error.what(), COLOR_RED);
+        }
+    }
+    // Uniform bright/dark frames must not count as an open menu.
+    for (uint32_t color : {uint32_t(0xff000000), uint32_t(0xffffffff)}){
+        ImageRGB32 blank(1280, 720);
+        for (size_t y = 0; y < blank.height(); y++){
+            for (size_t x = 0; x < blank.width(); x++) blank.pixel(x, y) = color;
+        }
+        MenuDetector detector;
+        check(detector.detect(blank), false, color == 0xff000000 ? "Black frame" : "White frame");
+    }
+    logger.log("[Menu tests] " + std::to_string(passed) + " passed, " +
+        std::to_string(failed) + " failed.", failed == 0 ? COLOR_GREEN : COLOR_RED);
+    return failed == 0;
+}
+
+// Adapter for the existing filename-based command-line test map.
+int test_MenuDetector(const ImageViewRGB32& image, bool expected){
+    for (size_t width : {size_t(1920), size_t(1280), size_t(960)}){
+        const ImageRGB32 scaled = image.scale_to(width, width * 9 / 16);
+        MenuDetector detector;
+        if (detector.detect(scaled) != expected) return 1;
+    }
+    return 0;
+}
+
+class Test_MenuDetector_Legacy : public UnitTest{
+public:
+    Test_MenuDetector_Legacy() : UnitTest("PokemonBDSP::MenuDetector screenshot tests"){}
+    UnitTestResult run(Logger& logger, CancellableScope&) const override{
+        return run_menu_detector_tests(logger, menu_detector_test_folder());
+    }
+};
+
+
 void add_tests_MenuDetector(UnitTestDatabase& database){
     static constexpr std::array<MenuCase, 20> CASES{{
         {.input = {.image = "PokemonBDSP/MenuDetector/NewGameBagOptions_True.png", .columns = Columns::FromTop},
@@ -197,6 +279,7 @@ void add_tests_MenuDetector(UnitTestDatabase& database){
     for (const MenuCase& test : CASES){
         database.add<Test_MenuDetector>(test);
     }
+    database.add<Test_MenuDetector_Legacy>();
 }
 
 } // namespace PokemonBDSP
