@@ -1,9 +1,11 @@
+#include <filesystem>
 /*  BDSP AutoStory Tools
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 #include <cmath>
+#include "CommonFramework/ImageTools/ImageDiff.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_MenuDetector.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Globals.h"
@@ -361,7 +363,7 @@ static const char* shop_item_slug(ShopItem item){
     }
 }
 
-// {MaxRepel, 2, 4}, {FullRestore, 0, 3} → "4 Max repel, 3 Full restore"
+// {MaxRepel, 2, 4}, {FullRestore, 0, 3} â†’ "4 Max repel, 3 Full restore"
 static std::string make_buy_label(const std::vector<ItemToBuy>& items){
     std::string label;
     for (size_t i = 0; i < items.size(); i++){
@@ -394,7 +396,7 @@ bool buy_items(
     context.wait_for_all_requests();
 
 
-    // ── Coordinate constants ─────────────────────────────────────────────────
+    // â”€â”€ Coordinate constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     // Area where the selection arrow appears at the vendor greeting menu (Buy/Sell/Leave).
     static const ImageFloatBox VENDOR_ARROW_BOX{0.630000, 0.550000, 0.070000, 0.120000};
@@ -409,13 +411,13 @@ bool buy_items(
     static constexpr size_t MAX_OUTER       = 50;
     static constexpr size_t MAX_ITEM_SEARCH = 50;  // max iterations per item before giving up
 
-    // ── Outer state machine ──────────────────────────────────────────────────
+    // â”€â”€ Outer state machine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     for (size_t outer = 0; outer < MAX_OUTER; outer++){
         SelectionArrowFinder  arrow_vendor(stream.overlay(), VENDOR_ARROW_BOX, COLOR_GREEN);
         ShopBuyingWindowWatcher buying_window;
         ShortDialogWatcher    dialog(COLOR_RED);
 
-        // case 0: no detectors fired — press A in a for-loop (5 presses) while watching.
+        // case 0: no detectors fired â€” press A in a for-loop (5 presses) while watching.
         stream.log("Starting to loop over items");
         int state = run_until<ProControllerContext>(
             stream, context,
@@ -432,12 +434,12 @@ bool buy_items(
 
         switch (state){
 
-        case 0:  // case 1: SelectionArrow at vendor menu → press A to choose "Buy"
+        case 0:  // case 1: SelectionArrow at vendor menu â†’ press A to choose "Buy"
             stream.log("Found the selection arrow, pressing A to enter the buying window...", COLOR_GREEN);
             pbf_press_button(context, BUTTON_A, 80ms, 500ms);
             break;
 
-        case 1:  // case 2: buying window open → buy each requested item
+        case 1:  // case 2: buying window open â†’ buy each requested item
         stream.log("Found the buying window, searching for the right item...", COLOR_GREEN);
         {
             bool buying_failed = false;
@@ -472,7 +474,7 @@ bool buy_items(
 
                     switch (sub){
 
-                    case 0:  // YES/NO confirmation arrow → confirm purchase
+                    case 0:  // YES/NO confirmation arrow â†’ confirm purchase
                         stream.log("Found the confirmation to buy arrow, pressing A to buy", COLOR_GREEN);
                     {
                         context.wait_for_all_requests();
@@ -492,7 +494,7 @@ bool buy_items(
 
                     case 1:  // quantity window
                         if (!hover_confirmed){
-                            // Quantity window appeared before we confirmed the right item —
+                            // Quantity window appeared before we confirmed the right item â€”
                             // an earlier A press accidentally opened the wrong item's selector.
                             // Press B to go back to the list and continue searching.
                             stream.log("Unexpected quantity window (wrong item), pressing B...", COLOR_YELLOW);
@@ -513,14 +515,14 @@ bool buy_items(
                         pbf_wait(context, 1000ms);
                         break;
 
-                    case 2:  // correct item highlighted → press A to open quantity selector
+                    case 2:  // correct item highlighted â†’ press A to open quantity selector
                         stream.log("Found the right item, pressing A to buy a certain quantity...", COLOR_GREEN);
                         hover_confirmed = true;
                         pbf_press_button(context, BUTTON_A, 80ms, 300ms);
                         pbf_wait(context, 1000ms);
                         break;
 
-                    default:  // outline not found or wrong item → advance to next row
+                    default:  // outline not found or wrong item â†’ advance to next row
                         stream.log("Not on the right item, moving...", COLOR_GREEN);
                         pbf_press_dpad(context, DPAD_DOWN, 80ms, 300ms);
                         pbf_wait(context, 300ms);
@@ -543,7 +545,7 @@ bool buy_items(
             break;
         }
 
-        case 2:  // case 3: unexpected ShortDialog → press B until back in buying window
+        case 2:  // case 3: unexpected ShortDialog â†’ press B until back in buying window
         {
             ShopBuyingWindowWatcher back_in_shop;
             run_until<ProControllerContext>(
@@ -556,7 +558,7 @@ bool buy_items(
             break;
         }
 
-        default:  // outer default: unrecognised state → press B to recover
+        default:  // outer default: unrecognised state â†’ press B to recover
             pbf_press_button(context, BUTTON_B, 80ms, 3000ms);
             break;
         }
@@ -1029,9 +1031,11 @@ void open_menu(
 ){
     using namespace std::chrono_literals;
 
-    context.wait_for_all_requests();
-    overworld_to_menu(stream, context);
-    pbf_wait(context, 1000ms);
+    // Previous single opening attempt:
+    // context.wait_for_all_requests();
+    // overworld_to_menu(stream, context);
+    // pbf_wait(context, 1000ms);
+    // context.wait_for_all_requests();
     context.wait_for_all_requests();
 
     MenuCursorDetector detector;
@@ -1040,9 +1044,17 @@ void open_menu(
             "POKEDEX", "POKEMON", "BAG", "CARD",
             "OPTIONS", "MAP", "CAPSULES", "MYSTERYGIFT",
         };
-        std::string ref_dir = RESOURCE_PATH() + "PokemonBDSP/AutoStory";
+        // Previous optional template directory: PokemonBDSP/AutoStory.
+        std::string ref_dir = RESOURCE_PATH() + "PokemonBDSP/Autostory";
         for (int i = 0; i < MENU_CURSOR_NUM_ICONS; i++){
             std::string path = ref_dir + "/" + ICON_NAMES[i] + ".png";
+            // These templates are optional. The dark-pixel cursor detector
+            // remains available when a template is not packaged.
+            std::error_code file_error;
+            if (!std::filesystem::is_regular_file(path, file_error)){
+                continue;
+            }
+            // Previously constructed the image before checking its availability.
             ImageRGB32 img(path);
             if (img){
                 detector.set_icon_reference(
@@ -1052,16 +1064,54 @@ void open_menu(
             }
         }
     }
+    // Previous single detection attempt retained for comparison.
+    // MenuCursorPosition cur = MenuCursorPosition::UNKNOWN;
+    // for (int i = 0; i < 10 && cur == MenuCursorPosition::UNKNOWN; i++){
+    //     context.wait_for(50ms);
+    //     VideoSnapshot snap = stream.video().snapshot();
+    //     if (snap) cur = detector.detect(snap);
+    // }
+    // if (cur == MenuCursorPosition::UNKNOWN){
+    //     OperationFailedException::fire(
+    //         ErrorReport::SEND_ERROR_REPORT,
+    //         "Menu cursor not detected after opening menu.",
+    //         stream
+    //     );
+    // }
+
     MenuCursorPosition cur = MenuCursorPosition::UNKNOWN;
-    for (int i = 0; i < 10 && cur == MenuCursorPosition::UNKNOWN; i++){
-        context.wait_for(50ms);
-        VideoSnapshot snap = stream.video().snapshot();
-        if (snap) cur = detector.detect(snap);
+    for (size_t attempt = 1; attempt <= 3; attempt++){
+        stream.log("[Open menu] Open and detect attempt " + std::to_string(attempt) + "/3.");
+        try {
+            // A late-opening menu may already be visible after a timeout.
+            // Check before pressing X again, since X would close that menu.
+            MenuWatcher already_open;
+            if (wait_until(stream, context, 100ms, {{already_open}}) < 0){
+                overworld_to_menu(stream, context);
+            }
+            pbf_wait(context, 1000ms);
+            context.wait_for_all_requests();
+            for (int frame = 0; frame < 10 && cur == MenuCursorPosition::UNKNOWN; frame++){
+                context.wait_for(50ms);
+                const VideoSnapshot snapshot = stream.video().snapshot();
+                if (snapshot){
+                    cur = detector.detect(snapshot);
+                }
+            }
+            if (cur != MenuCursorPosition::UNKNOWN){
+                stream.log("[Open menu] Menu and cursor detected on attempt " + std::to_string(attempt) + ".", COLOR_GREEN);
+                break;
+            }
+            stream.log("[Open menu] Menu cursor not detected on attempt " + std::to_string(attempt) + ".", COLOR_ORANGE);
+        }
+        catch (OperationFailedException& error){
+            stream.log("[Open menu] Attempt " + std::to_string(attempt) + " failed: " + error.message(), COLOR_ORANGE);
+        }
     }
     if (cur == MenuCursorPosition::UNKNOWN){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Menu cursor not detected after opening menu.",
+            "Menu or cursor detection failed after 3 opening attempts.",
             stream
         );
     }
@@ -1092,6 +1142,643 @@ void open_menu(
     }
 
     pbf_press_button(context, BUTTON_A, 80ms, 200ms);
+}
+
+
+// Search the selected item's fixed description header rather than guessing
+// which list row is selected. This remains in place while the list scrolls.
+// A cursor parked at row 2 or 6 does not indicate a list end: only repeated
+// unchanged item headers after movement are used to detect an end.
+// Previous selected-item-only search, retained for reference.
+// bool find_bag_item(
+//     VideoStream& stream,
+//     ProControllerContext& context,
+//     const BagItemTemplate& item,
+//     int num_icons,
+//     size_t max_scrolls_per_pocket,
+//     std::chrono::milliseconds search_timeout
+// ){
+//     auto reference = std::make_shared<const ImageRGB32>(
+//         RESOURCE_PATH() + item.reference_path
+//     );
+//     ImageMatchDetector icon(reference, item.icon_box, item.max_icon_rmsd, true);
+//     ImageMatchDetector name(reference, item.name_box, item.max_name_rmsd, true);
+//     ImageMatchDetector bag(reference, ImageFloatBox(0.055, 0.012, 0.044, 0.045), 35.0, true);
+//     const ImageFloatBox selected_header(0.428, 0.754, 0.382, 0.046);
+//     const auto deadline = std::chrono::steady_clock::now() + search_timeout;
+// 
+//     stream.log("[Bag search] Looking for " + item.label + ".");
+//     open_menu(stream, context, MenuCursorPosition::BAG, num_icons);
+//     pbf_wait(context, 1000ms);
+//     context.wait_for_all_requests();
+// 
+//     for (size_t pocket = 0; pocket < 8; pocket++){
+//         ImageRGB32 initial_header;
+//         ImageRGB32 previous_header;
+//         size_t unchanged = 0;
+//         size_t matching_frames = 0;
+//         size_t scrolls = 0;
+//         bool scanning_up = false;
+// 
+//         while (std::chrono::steady_clock::now() < deadline){
+//             context.wait_for_all_requests();
+//             const VideoSnapshot frame = stream.video().snapshot();
+//             if (!frame || !bag.detect(frame)){
+//                 stream.log("[Bag search] Bag screen not detected.", COLOR_ORANGE);
+//                 return false;
+//             }
+//             const double icon_score = icon.rmsd(frame);
+//             const double name_score = item.check_name ? name.rmsd(frame) : 0.0;
+//             stream.log(
+//                 "[Bag search] Pocket " + std::to_string(pocket + 1) +
+//                 ", scroll " + std::to_string(scrolls) +
+//                 ": icon=" + std::to_string(icon_score) +
+//                 ", name=" + std::to_string(name_score)
+//             );
+//             if (icon_score <= item.max_icon_rmsd &&
+//                 name_score <= item.max_name_rmsd){
+//                 if (++matching_frames >= 3){
+//                     stream.log("[Bag search] " + item.label + " confirmed.", COLOR_GREEN);
+//                     return true;
+//                 }
+//                 pbf_wait(context, 150ms);
+//                 continue;
+//             }
+//             matching_frames = 0;
+// 
+//             const ImageRGB32 header = extract_box_reference(frame, selected_header).scale_to(382, 46);
+//             if (!initial_header){
+//                 initial_header = header.copy();
+//             }
+//             else if (scrolls > 0){
+//                 const bool same_as_previous =
+//                     ImageMatch::pixel_RMSD(previous_header, header) <= 3.0;
+//                 const bool returned_to_start =
+//                     ImageMatch::pixel_RMSD(initial_header, header) <= 3.0;
+//                 if (returned_to_start && !same_as_previous){
+//                     break;
+//                 }
+//                 // Repeated unchanged rows mean an empty pocket or list end.
+//                 // Returning to the initial row means the list wrapped.
+//                 unchanged = same_as_previous || returned_to_start ? unchanged + 1 : 0;
+//                 if (unchanged >= 3){
+//                     if (scanning_up){
+//                         break;
+//                     }
+//                     // A non-wrapping list may have opened in the middle.
+//                     // Search upward as well before moving to another pocket.
+//                     scanning_up = true;
+//                     unchanged = 0;
+//                     initial_header = header.copy();
+//                 }
+//             }
+//             previous_header = header.copy();
+//             if (scrolls >= max_scrolls_per_pocket){
+//                 stream.log("[Bag search] Scroll limit reached; search incomplete.", COLOR_ORANGE);
+//                 return false;
+//             }
+//             scrolls++;
+//             pbf_press_dpad(context, scanning_up ? DPAD_UP : DPAD_DOWN, 80ms, 350ms);
+//         }
+//         if (std::chrono::steady_clock::now() >= deadline){
+//             stream.log("[Bag search] Search timed out; search incomplete.", COLOR_ORANGE);
+//             return false;
+//         }
+//         if (pocket < 7){
+//             pbf_press_dpad(context, DPAD_RIGHT, 80ms, 500ms);
+//             context.wait_for_all_requests();
+//         }
+//     }
+//     stream.log("[Bag search] Item not found in any pocket.", COLOR_ORANGE);
+//     return false;
+// }
+// 
+
+// One narrow strip on the left side of the red selection border. Divide its
+// height into the seven row bands; the item's art and NEW badge are outside it.
+int bag_cursor_position(const ImageViewRGB32& frame){
+    if (!frame){
+        return 0;
+    }
+    const ImageViewRGB32 strip = extract_box_reference(
+        frame, ImageFloatBox(0.431, 0.229, 0.005, 0.470)
+    );
+    double best = 0.0;
+    double second = 0.0;
+    int position = 0;
+    for (int row = 0; row < 7; row++){
+        const size_t top = static_cast<size_t>(strip.height() * (row * 0.075 / 0.470));
+        const size_t bottom = static_cast<size_t>(strip.height() * ((row * 0.075 + 0.020) / 0.470));
+        size_t red = 0;
+        size_t total = 0;
+        for (size_t y = top; y < bottom && y < strip.height(); y++){
+            for (size_t x = 0; x < strip.width(); x++){
+                const uint32_t pixel = strip.pixel(x, y);
+                const unsigned r = (pixel >> 16) & 255;
+                const unsigned g = (pixel >> 8) & 255;
+                const unsigned b = pixel & 255;
+                red += r > 180 && g < 120 && b < 120;
+                total++;
+            }
+        }
+        const double score = total == 0 ? 0.0 : static_cast<double>(red) / total;
+        if (score > best){
+            second = best;
+            best = score;
+            position = row + 1;
+        }else if (score > second){
+            second = score;
+        }
+    }
+    return best >= 0.15 && best - second >= 0.10 ? position : 0;
+}
+
+static ImageFloatBox bag_list_icon_box(size_t row){
+    return ImageFloatBox(0.449, 0.212 + (row - 1) * 0.075, 0.033, 0.050);
+}
+
+static ImageFloatBox bag_list_name_box(size_t row){
+    // Previous height included the faint lower selection border in rows 2/6.
+    // return ImageFloatBox(0.492, 0.213 + (row - 1) * 0.075, 0.335, 0.052);
+    return ImageFloatBox(0.492, 0.213 + (row - 1) * 0.075, 0.335, 0.050);
+}
+
+static double bag_row_patch_score(
+    const ImageRGB32& reference,
+    const ImageViewRGB32& frame,
+    const ImageFloatBox& box
+){
+    const ImageRGB32 live = extract_box_reference(frame, box).scale_to(
+        reference.width(), reference.height()
+    );
+    return ImageMatch::pixel_RMSD(reference, live);
+}
+
+// Previous name-area empty-list check retained for reference.
+// static bool bag_list_is_empty(const ImageViewRGB32& frame){
+//     const ImageViewRGB32 names = extract_box_reference(
+//         frame, ImageFloatBox(0.492, 0.213, 0.335, 0.500)
+//     );
+//     size_t dark = 0;
+//     for (size_t y = 0; y < names.height(); y++){
+//         for (size_t x = 0; x < names.width(); x++){
+//             const uint32_t pixel = names.pixel(x, y);
+//             dark += ((pixel >> 16) & 255) < 100 &&
+//                 ((pixel >> 8) & 255) < 100 && (pixel & 255) < 100;
+//         }
+//     }
+//     return dark < names.width() * names.height() * 0.001;
+// }
+
+int bag_pocket_position(const ImageViewRGB32& frame){
+    if (!frame) return 0;
+    int selected = 0;
+    for (int pocket = 1; pocket <= 8; pocket++){
+        // The lower left edge of each tab is below the red NEW badge.
+        // This strip includes both the normal outline and enlarged selection.
+        const auto edge = extract_box_reference(frame,
+            ImageFloatBox(0.570 + (pocket - 1) * 0.0421, 0.098, 0.0045, 0.021));
+        size_t colored = 0;
+        for (size_t y = 0; y < edge.height(); y++){
+            for (size_t x = 0; x < edge.width(); x++){
+                const uint32_t pixel = edge.pixel(x, y);
+                const int r = (pixel >> 16) & 255;
+                const int g = (pixel >> 8) & 255;
+                const int b = pixel & 255;
+                // Red when focused, blue when the item list has focus.
+                colored += (r > 160 && r > g + 60 && r > b + 60) ||
+                    (b > 160 && b > r + 40 && b > g + 20);
+            }
+        }
+        const double pixels = (double)edge.width() * edge.height();
+        if (pixels > 0 && colored / pixels >= 0.18){
+            if (selected != 0) return 0;
+            selected = pocket;
+        }
+    }
+    return selected;
+}
+
+bool bag_list_is_empty(const ImageViewRGB32& frame){
+    if (!frame || bag_pocket_position(frame) == 0 || bag_cursor_position(frame) != 0) return false;
+    // Empty pockets have no item icons. The central Empty label is outside
+    // this column; counting dark pixels in the name area included that label.
+    const auto icons = extract_box_reference(frame, ImageFloatBox(0.449, 0.213, 0.032, 0.500));
+    const auto stats = image_stats(icons);
+    return stats.average.r > 220 && stats.average.g > 220 && stats.average.b > 220 &&
+        stats.stddev.sum() < 20;
+}
+
+
+std::array<BagItemRowMatch, 7> match_bag_item_rows(
+    const ImageViewRGB32& frame,
+    const ImageViewRGB32& reference,
+    const BagItemTemplate& item
+){
+    std::array<BagItemRowMatch, 7> result;
+    if (!frame || !reference || item.reference_row < 1 || item.reference_row > 7){
+        return result;
+    }
+    const ImageRGB32 icon = extract_box_reference(reference, bag_list_icon_box(item.reference_row)).copy();
+    const ImageRGB32 name = extract_box_reference(reference, bag_list_name_box(item.reference_row)).copy();
+    for (size_t row = 1; row <= 7; row++){
+        auto& match = result[row - 1];
+        match.icon_rmsd = bag_row_patch_score(icon, frame, bag_list_icon_box(row));
+        match.name_rmsd = item.check_name
+            ? bag_row_patch_score(name, frame, bag_list_name_box(row)) : 0.0;
+        match.matched = match.icon_rmsd <= item.max_icon_rmsd && match.name_rmsd <= item.max_name_rmsd;
+    }
+    return result;
+}
+
+BagMovePlan plan_bag_item_move(int cursor_row, int item_row){
+    if (cursor_row < 1 || cursor_row > 7 || item_row < 0 || item_row > 7){
+        return {};
+    }
+    if (item_row != 0){
+        if (item_row == cursor_row){
+            return {BagMoveAction::CONFIRM, 0};
+        }
+        return {
+            item_row > cursor_row ? BagMoveAction::DOWN : BagMoveAction::UP,
+            static_cast<size_t>(std::abs(item_row - cursor_row))
+        };
+    }
+    if (cursor_row == 7){
+        return {BagMoveAction::REWIND, 1};
+    }
+    return {BagMoveAction::PAGE_DOWN, cursor_row == 1 ? 13 : static_cast<size_t>(13 - cursor_row)};
+}
+
+
+static int bag_confirm_pocket(VideoStream& stream, ProControllerContext& context){
+    int previous = 0;
+    size_t matches = 0;
+    for (size_t check = 0; check < 10; check++){
+        context.wait_for_all_requests();
+        const auto frame = stream.video().snapshot();
+        const int pocket = frame ? bag_pocket_position(frame) : 0;
+        matches = pocket != 0 && pocket == previous ? matches + 1 : pocket != 0 ? 1 : 0;
+        previous = pocket;
+        if (matches >= 3) return pocket;
+        pbf_wait(context, 100ms);
+    }
+    return 0;
+}
+
+// static bool bag_advance_pocket(VideoStream& stream, ProControllerContext& context, int current){
+//     const int expected = current % 8 + 1;
+//     for (size_t attempt = 0; attempt < 3; attempt++){
+//         // Recheck before retrying: a delayed change must not cause a second step.
+//         const int observed = bag_confirm_pocket(stream, context);
+//         if (observed == expected) return true;
+//         if (observed != current){
+//             stream.log("[Bag search] Pocket selection uncertain; stopping.", COLOR_ORANGE);
+//             return false;
+//         }
+//         pbf_press_dpad(context, DPAD_RIGHT, 80ms, 500ms);
+//         const int result = bag_confirm_pocket(stream, context);
+//         stream.log("[Bag search] Pocket change: " + std::to_string(current) + " -> " +
+//             std::to_string(result) + ", expected " + std::to_string(expected) + ".");
+//         if (result == expected) return true;
+//     }
+//     stream.log("[Bag search] Could not confirm pocket change after 3 attempts.", COLOR_ORANGE);
+//     return false;
+// }
+
+BagPocketMovePlan plan_bag_pocket_move(int current, int target){
+    if (current < 1 || current > 8 || target < 1 || target > 8) return {};
+    const int right = (target - current + 8) % 8;
+    const int left = (current - target + 8) % 8;
+    if (right == 0) return {BagPocketAction::CONFIRM, 0};
+    return right <= left ? BagPocketMovePlan{BagPocketAction::RIGHT, static_cast<size_t>(right)}
+        : BagPocketMovePlan{BagPocketAction::LEFT, static_cast<size_t>(left)};
+}
+
+static bool bag_navigate_to_pocket(VideoStream& stream, ProControllerContext& context, int target){
+    int current = bag_confirm_pocket(stream, context);
+    for (size_t attempt = 0; attempt < 3; attempt++){
+        const auto plan = plan_bag_pocket_move(current, target);
+        if (plan.action == BagPocketAction::CONFIRM) return true;
+        if (plan.action == BagPocketAction::UNKNOWN){
+            stream.log("[Bag search] Selected pocket not detected.", COLOR_ORANGE);
+            return false;
+        }
+        stream.log("[Bag search] Pocket " + std::to_string(current) + " to " +
+            std::to_string(target) + ": " +
+            (plan.action == BagPocketAction::RIGHT ? "right " : "left ") +
+            std::to_string(plan.presses) + " presses, attempt " + std::to_string(attempt + 1) + "/3.");
+        for (size_t press = 0; press < plan.presses; press++){
+            pbf_press_dpad(context, plan.action == BagPocketAction::RIGHT ? DPAD_RIGHT : DPAD_LEFT,
+                80ms, 150ms);
+        }
+        pbf_wait(context, 350ms);
+        current = bag_confirm_pocket(stream, context);
+        stream.log("[Bag search] Final pocket=" + std::to_string(current) +
+            ", expected=" + std::to_string(target) + ".");
+        if (current == target) return true;
+    }
+    stream.log("[Bag search] Target pocket not reached after 3 movement batches.", COLOR_ORANGE);
+    return false;
+}
+
+
+bool find_bag_item(
+    VideoStream& stream,
+    ProControllerContext& context,
+    const BagItemTemplate& item,
+    int target_pocket,
+    int num_icons,
+    size_t max_scrolls_per_pocket,
+    std::chrono::milliseconds search_timeout
+){
+    if (target_pocket < 1 || target_pocket > 8 || item.reference_row < 1 || item.reference_row > 7){
+        stream.log("[Bag search] Invalid template reference row.", COLOR_ORANGE);
+        return false;
+    }
+    auto reference = std::make_shared<const ImageRGB32>(RESOURCE_PATH() + item.reference_path);
+//     const ImageRGB32 reference_icon = extract_box_reference(
+//         *reference, bag_list_icon_box(item.reference_row)
+//     ).copy();
+//     const ImageRGB32 reference_name = extract_box_reference(
+//         *reference, bag_list_name_box(item.reference_row)
+//     ).copy();
+    ImageMatchDetector bag(reference, ImageFloatBox(0.055, 0.012, 0.044, 0.045), 35.0, true);
+    ImageMatchDetector selected_icon(reference, item.icon_box, item.max_icon_rmsd, true);
+    ImageMatchDetector selected_name(reference, item.name_box, item.max_name_rmsd, true);
+    const auto deadline = std::chrono::steady_clock::now() + search_timeout;
+
+    open_menu(stream, context, MenuCursorPosition::BAG, num_icons);
+    pbf_wait(context, 1000ms);
+    context.wait_for_all_requests();
+
+    if (!bag_navigate_to_pocket(stream, context, target_pocket)) return false;
+    // Previously searched all eight pockets. Only inspect the requested pocket now.
+    // for (size_t pocket = 0; pocket < 8; pocket++){
+    {
+        const int selected_pocket = bag_confirm_pocket(stream, context);
+        if (selected_pocket == 0){
+            stream.log("[Bag search] Selected pocket not detected.", COLOR_ORANGE);
+            return false;
+        }
+        size_t commands = 0;
+        bool empty = false;
+        auto move = [&](DpadPosition direction, size_t count, bool check_rows = false){
+            for (size_t press = 0; press < count; press++){
+                if (commands >= max_scrolls_per_pocket ||
+                    std::chrono::steady_clock::now() >= deadline){
+                    stream.log("[Bag search] Limit reached; search incomplete.", COLOR_ORANGE);
+                    return false;
+                }
+                commands++;
+                pbf_press_dpad(context, direction, 80ms, 150ms);
+                if (check_rows){
+                    context.wait_for_all_requests();
+                    const VideoSnapshot page_frame = stream.video().snapshot();
+                    if (!page_frame || !bag.detect(page_frame)){
+                        return false;
+                    }
+                    const auto matches = match_bag_item_rows(page_frame, *reference, item);
+                    for (const auto& match : matches){
+                        if (match.matched){
+                            // Stop paging; the main loop verifies and selects the row.
+                            return true;
+                        }
+                    }
+                }
+            }
+            pbf_wait(context, 250ms);
+            context.wait_for_all_requests();
+            return true;
+        };
+        for (size_t pass = 0; pass < 3 && !empty; pass++){
+            size_t matching_frames = 0;
+            size_t missing_cursor = 0;
+            size_t failed_confirmation = 0;
+            size_t unchanged_pages = 0;
+            ImageRGB32 previous_page;
+            stream.log(
+                "[Bag search] Looking for " + item.label + ": pocket " +
+                std::to_string(selected_pocket) + ", pass " + std::to_string(pass + 1) + "/3."
+            );
+            while (std::chrono::steady_clock::now() < deadline){
+                const VideoSnapshot frame = stream.video().snapshot();
+                if (!frame || !bag.detect(frame)){
+                    stream.log("[Bag search] Bag screen not detected.", COLOR_ORANGE);
+                    return false;
+                }
+                const int cursor = bag_cursor_position(frame);
+                int target = 0;
+                double best = 1000.0;
+                bool ambiguous = false;
+                // The seven list ROIs move neither with the cursor nor with
+                // scrolling. Each contains an icon patch and a name patch.
+                // Previous per-row loop retained for reference.
+                // for (size_t row = 1; row <= 7; row++){
+                // const double icon = bag_row_patch_score(reference_icon, frame, bag_list_icon_box(row));
+                // const double name = item.check_name
+                // ? bag_row_patch_score(reference_name, frame, bag_list_name_box(row)) : 0.0;
+                // if (icon <= item.max_icon_rmsd && name <= item.max_name_rmsd){
+                // if (target != 0){
+                // ambiguous = true;
+                // }
+                // if (icon + name < best){
+                // target = static_cast<int>(row);
+                // best = icon + name;
+                // }
+                // }
+                // }
+                const auto matches = match_bag_item_rows(frame, *reference, item);
+                for (size_t row = 1; row <= 7; row++){
+                    const auto& match = matches[row - 1];
+                    if (match.matched){
+                        if (target != 0){
+                            ambiguous = true;
+                        }
+                        if (match.icon_rmsd + match.name_rmsd < best){
+                            target = static_cast<int>(row);
+                            best = match.icon_rmsd + match.name_rmsd;
+                        }
+                    }
+                }
+                stream.log(
+                    "[Bag search] " + item.label + (target == 0 ? " is not detected" : " is detected") +
+                    " on screen; item row=" + std::to_string(target) +
+                    ", cursor row=" + std::to_string(cursor) + "."
+                );
+                if (ambiguous){
+                    stream.log("[Bag search] Multiple rows match; selection is uncertain.", COLOR_ORANGE);
+                    return false;
+                }
+                if (cursor == 0){
+                    if (bag_list_is_empty(frame)){
+                        empty = true;
+                        break;
+                    }
+                    if (++missing_cursor >= 3){
+                        stream.log("[Bag search] Cursor location uncertain.", COLOR_ORANGE);
+                        return false;
+                    }
+                    pbf_wait(context, 200ms);
+                    context.wait_for_all_requests();
+                    continue;
+                }
+                missing_cursor = 0;
+                if (target != 0){
+                    previous_page = ImageRGB32();
+                    unchanged_pages = 0;
+                    if (target == cursor && selected_icon.detect(frame) &&
+                        (!item.check_name || selected_name.detect(frame))){
+                        if (++matching_frames >= 3){
+                            stream.log("[Bag search] Item and cursor confirmed in row " +
+                                std::to_string(cursor) + ".", COLOR_GREEN);
+                            return true;
+                        }
+                        pbf_wait(context, 150ms);
+                        context.wait_for_all_requests();
+                        continue;
+                    }
+                    matching_frames = 0;
+                    if (target == cursor){
+                        if (++failed_confirmation < 3){
+                            pbf_wait(context, 150ms);
+                            context.wait_for_all_requests();
+                            continue;
+                        }
+                        stream.log("[Bag search] Selected-item confirmation failed.", COLOR_ORANGE);
+                        return false;
+                    }
+                    failed_confirmation = 0;
+                    const size_t count = plan_bag_item_move(cursor, target).presses;
+                    stream.log("[Bag search] Moving " + std::string(target > cursor ? "down " : "up ") +
+                        std::to_string(count) + " time(s), then checking again.");
+                    if (!move(target > cursor ? DPAD_DOWN : DPAD_UP, count)){
+                        return false;
+                    }
+                    continue;
+                }
+                matching_frames = 0;
+                const ImageRGB32 page = extract_box_reference(
+                    frame, ImageFloatBox(0.449, 0.212, 0.378, 0.500)
+                ).scale_to(378, 500);
+                if (previous_page && ImageMatch::pixel_RMSD(previous_page, page) <= 3.0){
+                    unchanged_pages++;
+                }else{
+                    unchanged_pages = 0;
+                }
+                previous_page = page.copy();
+                // Row 7 signals the bottom of a long list. Repeated pages
+                // also cover shorter lists whose final row is less than 7.
+                if (cursor == 7 || unchanged_pages >= 2){
+                    stream.log("[Bag search] List end; returning to row 1.");
+                    while (true){
+                        const VideoSnapshot rewind_frame = stream.video().snapshot();
+                        if (!rewind_frame || !bag.detect(rewind_frame)){
+                            return false;
+                        }
+                        const int rewind_cursor = bag_cursor_position(rewind_frame);
+                        if (rewind_cursor == 1){
+                            break;
+                        }
+                        if (rewind_cursor == 0 || !move(DPAD_UP, 1)){
+                            return false;
+                        }
+                    }
+                    break;
+                }
+                const size_t count = plan_bag_item_move(cursor, 0).presses;
+                stream.log("[Bag search] Advancing " + std::to_string(count) + " presses to another page.");
+                if (!move(DPAD_DOWN, count, true)){
+                    return false;
+                }
+            }
+            if (std::chrono::steady_clock::now() >= deadline){
+                stream.log("[Bag search] Timeout; search incomplete.", COLOR_ORANGE);
+                return false;
+            }
+        }
+//         if (pocket < 7){
+//             // pbf_press_dpad(context, DPAD_RIGHT, 80ms, 500ms);
+//             // context.wait_for_all_requests();
+//             if (!bag_advance_pocket(stream, context, selected_pocket)) return false;
+//         }
+
+    }
+    stream.log("[Bag search] Item not found after three passes per nonempty pocket.", COLOR_ORANGE);
+    return false;
+}
+
+bool use_escape_rope(
+    VideoStream& stream,
+    ProControllerContext& context,
+    int num_icons
+){
+    const BagItemTemplate rope{
+        // "PokemonBDSP/AutoStory/Bag_EscapeRope.png", "escape-rope"
+        "PokemonBDSP/Autostory/Bag_EscapeRope.png", "escape-rope"
+    };
+    if (!find_bag_item(stream, context, rope, 5, num_icons)){
+        return false;
+    }
+
+    pbf_press_button(context, BUTTON_A, 80ms, 350ms);
+    context.wait_for_all_requests();
+    SelectionArrowFinder use_menu(
+        stream.overlay(), ImageFloatBox(0.660, 0.100, 0.310, 0.430), COLOR_GREEN
+    );
+    if (wait_until(stream, context, 3s, {{use_menu}}) != 0){
+        stream.log("[Escape Rope] Item action menu not detected.", COLOR_ORANGE);
+        return false;
+    }
+
+    // Watch while selecting Use so the transition cannot happen before
+    // the watcher starts. Extra A presses handle a confirmation prompt.
+    BlackScreenWatcher transition;
+    // Escape Rope fades white in the supplied clips; support black transitions too.
+    WhiteScreenWatcher white_transition;
+    const int result = run_until<ProControllerContext>(
+        stream, context,
+        [](ProControllerContext& ctx){
+            for (size_t press = 0; press < 10; press++){
+                pbf_press_button(ctx, BUTTON_A, 80ms, 500ms);
+            }
+            ctx.wait_for_all_requests();
+            pbf_wait(ctx, 10s);
+            ctx.wait_for_all_requests();
+        },
+        {transition, white_transition}
+    );
+    if (result < 0){
+        stream.log("[Escape Rope] No exit transition detected.", COLOR_ORANGE);
+        return false;
+    }
+    BlackScreenWatcher finished(
+        COLOR_RED, {0.1, 0.1, 0.8, 0.8}, 100, 10,
+        BlackScreenWatcher::FinderType::GONE, 500ms
+    );
+    WhiteScreenWatcher white_finished(
+        COLOR_RED, {0.1, 0.1, 0.8, 0.8}, 500, 10,
+        WhiteScreenWatcher::FinderType::GONE, 500ms
+    );
+    stream.log(std::string("[Escape Rope] ") +
+        (result == 1 ? "White" : "Black") + " exit transition detected.");
+    // if (wait_until(stream, context, 15s, {{finished}}) != 0){ return false; }
+    const int finish_result = result == 1
+        ? wait_until(stream, context, 15s, {{white_finished}})
+        : wait_until(stream, context, 15s, {{finished}});
+    if (finish_result != 0){
+        stream.log("[Escape Rope] Exit transition did not finish.", COLOR_ORANGE);
+        return false;
+    }
+    OverworldWatcher overworld;
+    if (wait_until(stream, context, 10s, {{overworld}}) != 0){
+        stream.log("[Escape Rope] Overworld not detected after transition.", COLOR_ORANGE);
+        return false;
+    }
+    pbf_wait(context, 1000ms);
+    context.wait_for_all_requests();
+    stream.log("[Escape Rope] Exit transition and overworld confirmed.", COLOR_GREEN);
+    return true;
 }
 
 
