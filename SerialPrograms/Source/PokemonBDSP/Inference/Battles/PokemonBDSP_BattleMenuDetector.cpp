@@ -4,6 +4,7 @@
  *
  */
 
+#include <algorithm>
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonBDSP_BattleMenuDetector.h"
@@ -145,6 +146,64 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen){
 
 
 
+
+BattleMenuOption BattleMenuDetector::selected_option(const ImageViewRGB32& screen){
+    if (!screen || !detect(screen)){
+        return BattleMenuOption::UNKNOWN;
+    }
+    int selected = -1;
+    for (int row = 0; row < 4; row++){
+        const double offset = row * 0.1075;
+        bool brackets = false;
+        // The corner brackets wiggle; all four must agree on one small offset.
+        const double offsets[] = {0.0, -0.003, 0.003, -0.006, 0.006};
+        for (double dy : offsets){
+            for (double dx : offsets){
+                const ImageFloatBox corners[] = {
+                    {0.793 + dx, 0.562 + offset + dy, 0.018, 0.023},
+                    {0.976 + dx, 0.562 + offset + dy, 0.018, 0.023},
+                    {0.793 + dx, 0.652 + offset + dy, 0.018, 0.023},
+                    {0.976 + dx, 0.652 + offset + dy, 0.018, 0.023},
+                };
+                bool candidate = true;
+                for (const ImageFloatBox& box : corners){
+                    const ImageViewRGB32 patch = extract_box_reference(screen, box);
+                    size_t white = 0;
+                    const size_t total = patch.width() * patch.height();
+                    for (size_t y = 0; y < patch.height(); y++){
+                        for (size_t x = 0; x < patch.width(); x++){
+                            const uint32_t pixel = patch.pixel(x, y);
+                            const unsigned r = (pixel >> 16) & 255;
+                            const unsigned g = (pixel >> 8) & 255;
+                            const unsigned b = pixel & 255;
+                            const unsigned low = std::min(r, std::min(g, b));
+                            const unsigned high = std::max(r, std::max(g, b));
+                            white += low > 210 && high - low < 35;
+                        }
+                    }
+                    if (total == 0 || static_cast<double>(white) / total < 0.15){
+                        candidate = false;
+                        break;
+                    }
+                }
+                if (candidate){
+                    brackets = true;
+                    break;
+                }
+            }
+            if (brackets){
+                break;
+            }
+        }
+        if (brackets){
+            if (selected >= 0){
+                return BattleMenuOption::UNKNOWN;
+            }
+            selected = row;
+        }
+    }
+    return static_cast<BattleMenuOption>(selected);
+}
 
 BattleMenuWatcher::BattleMenuWatcher(BattleType battle_type, Color color)
     : BattleMenuDetector(battle_type, color)

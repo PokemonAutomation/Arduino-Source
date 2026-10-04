@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_AutoStoryTools_H
 #define PokemonAutomation_PokemonBDSP_AutoStoryTools_H
 
+#include <array>
 #include <functional>
 #include <string>
 #include <chrono>
@@ -229,6 +230,81 @@ void mash_until_dialogue_ends(
     ProControllerContext& context,
     Button button = BUTTON_B,
     Milliseconds timeout = std::chrono::seconds(60)
+);
+
+// A full Bag screenshot with the desired item highlighted. Paths are relative
+// to RESOURCE_PATH(); quantities and selection borders are excluded.
+struct BagItemTemplate {
+    std::string reference_path;
+    std::string label;
+    ImageFloatBox icon_box{0.428, 0.754, 0.029, 0.044};
+    ImageFloatBox name_box{0.460, 0.755, 0.350, 0.045};
+    double max_icon_rmsd = 25.0;
+    double max_name_rmsd = 20.0;
+    bool check_name = true;
+    // Selected item row in the reference screenshot (1-7).
+    size_t reference_row = 1;
+};
+
+// Screenshot-only helpers shared by live search and developer tests.
+// Cursor 0 means unknown. Array index 0 corresponds to visible row 1.
+struct BagItemRowMatch {
+    double icon_rmsd = 1000.0;
+    double name_rmsd = 1000.0;
+    bool matched = false;
+};
+
+// Pocket positions 1-8: Medicine, Balls, Battle Items, Berries, Other Items,
+// TMs, Treasures, Key Items. Zero means the selected tab is uncertain.
+int bag_pocket_position(const ImageViewRGB32& frame);
+bool bag_list_is_empty(const ImageViewRGB32& frame);
+int bag_cursor_position(const ImageViewRGB32& frame);
+std::array<BagItemRowMatch, 7> match_bag_item_rows(
+    const ImageViewRGB32& frame,
+    const ImageViewRGB32& reference,
+    const BagItemTemplate& item
+);
+
+enum class BagMoveAction { UNKNOWN, CONFIRM, UP, DOWN, PAGE_DOWN, REWIND };
+struct BagMovePlan {
+    BagMoveAction action = BagMoveAction::UNKNOWN;
+    size_t presses = 0;
+};
+
+// Describes the next input without sending it. REWIND means repeat Up and
+// recheck until row 1; a screenshot cannot tell the total distance to the top.
+BagMovePlan plan_bag_item_move(int cursor_row, int item_row);
+
+enum class BagPocketAction { UNKNOWN, CONFIRM, LEFT, RIGHT };
+struct BagPocketMovePlan {
+    BagPocketAction action = BagPocketAction::UNKNOWN;
+    size_t presses = 0;
+};
+// Circular eight-pocket route; ties prefer Right. Invalid positions send no input.
+BagPocketMovePlan plan_bag_pocket_move(int current, int target);
+
+
+// Starts in the overworld, opens the Bag, and leaves the requested item
+// highlighted. Navigates to the requested pocket, then searches its item rows.
+// Checks all seven visible rows and the cursor, then confirms the selected
+// item in the green header. Makes up to three passes per pocket.
+// Limits report an incomplete search, not absence.
+// Returns false on missing frames, timeout, or no match; does not use an item.
+bool find_bag_item(
+    VideoStream& stream,
+    ProControllerContext& context,
+    const BagItemTemplate& item,
+    int target_pocket,
+    int num_icons = 8,
+    size_t max_scrolls_per_pocket = 512,
+    std::chrono::milliseconds search_timeout = std::chrono::minutes(10)
+);
+
+// Find Escape Rope, choose Use, and verify a transition back to the overworld.
+bool use_escape_rope(
+    VideoStream& stream,
+    ProControllerContext& context,
+    int num_icons = 8
 );
 
 //  Open the bag, navigate to the repel compartment tab, and use a repel.
