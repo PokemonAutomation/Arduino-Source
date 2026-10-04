@@ -21,6 +21,9 @@ struct WallpaperImageResult{
 
 class WallpaperWidget : public QWidget{
 public:
+    static const QString DEFAULT_WALLPAPER_LIGHT_PATH;
+    static const QString DEFAULT_WALLPAPER_DARK_PATH;
+
     WallpaperWidget(QWidget* parent);
 
     void set_appearance(

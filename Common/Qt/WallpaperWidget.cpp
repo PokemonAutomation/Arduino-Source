@@ -6,10 +6,14 @@
 
 
 #include <utility>
+#include <QApplication>
 #include <QImageReader>
 #include <QPaintEvent>
 #include <QPainter>
 #include <QStyleOption>
+#include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "WallpaperWidget.h"
 
 namespace PokemonAutomation{
@@ -26,7 +30,23 @@ WallpaperImageResult load_background_image(const QString& path){
     return {std::move(image), {}};
 }
 
+QString get_theme_default_path(){
+    if (QApplication::palette().color(QPalette::Active, QPalette::Window).lightness() < 128 
+        || GlobalSettings::instance().THEME->get() == UiThemeMode::DARK_MODE){
+        return WallpaperWidget::DEFAULT_WALLPAPER_DARK_PATH;
+    }else{
+        return WallpaperWidget::DEFAULT_WALLPAPER_LIGHT_PATH;
+    }   
 }
+
+bool is_default_path(const QString& path){
+    return path == WallpaperWidget::DEFAULT_WALLPAPER_LIGHT_PATH || path == WallpaperWidget::DEFAULT_WALLPAPER_DARK_PATH;
+}
+
+}
+
+const QString WallpaperWidget::DEFAULT_WALLPAPER_LIGHT_PATH = QString::fromStdString(RESOURCE_PATH() + "Wallpapers/light-alpha.png");
+const QString WallpaperWidget::DEFAULT_WALLPAPER_DARK_PATH = QString::fromStdString(RESOURCE_PATH() + "Wallpapers/dark-alpha.png");
 
 WallpaperWidget::WallpaperWidget(QWidget* parent)
     : QWidget(parent)
@@ -48,8 +68,18 @@ void WallpaperWidget::set_appearance(
 }
 
 void WallpaperWidget::set_image(bool enabled, const QString& path){
-    const QString requested_path = enabled ? path : QString();
-    if (requested_path == m_path){
+    if (!enabled){
+        m_pixmap = QPixmap();
+        m_scaled_pixmap = QPixmap();
+        return;
+    }
+
+    QString requested_path = path;
+    if (requested_path.isEmpty() || is_default_path(requested_path)){
+        requested_path = get_theme_default_path();
+    }
+
+    if (requested_path == m_path && !m_pixmap.isNull()){
         return;
     }
 
