@@ -5,6 +5,11 @@
  *
  */
 
+#include <cmath>
+#include <opencv2/imgproc.hpp>
+#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
@@ -16,7 +21,90 @@ using namespace std::chrono_literals;
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
+    // Match only the mart emblem, avoiding moving NPCs and changing ground shadows.
+    static cv::Mat mart_grayscale(const ImageRGB32& image) {
+        cv::Mat pixels((int)image.height(), (int)image.width(), CV_8UC4,
+            const_cast<uint32_t*>(image.data()), image.bytes_per_row());
+        cv::Mat gray;
+        cv::cvtColor(pixels, gray, cv::COLOR_BGRA2GRAY);
+        return gray;
+    }
+
+    static void align_to_oreburgh_mart(VideoStream& stream, ProControllerContext& context) {
+        const ImageRGB32 reference(RESOURCE_PATH() +
+            "PokemonBDSP/Autostory/OreburghMart/MartEmblem.png");
+        const ImageRGB32 small_reference = reference.scale_to(54, 43);
+        const cv::Mat emblem = mart_grayscale(small_reference);
+        context.wait_for_all_requests();
+        pbf_wait(context, 700ms);
+        context.wait_for_all_requests();
+        size_t confirmations = 0;
+        for (size_t attempt = 0; attempt < 40; attempt++) {
+            const VideoSnapshot frame = stream.video().snapshot();
+            if (!frame) {
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                    "Mart alignment: No video frame.", stream);
+            }
+            const ImageRGB32 small_frame = frame->scale_to(960, 540);
+            const cv::Mat gray = mart_grayscale(small_frame);
+            cv::Mat scores;
+            cv::matchTemplate(gray(cv::Rect(0, 0, 960, 360)), emblem, scores, cv::TM_CCOEFF_NORMED);
+            double score;
+            cv::Point location;
+            cv::minMaxLoc(scores, nullptr, &score, nullptr, &location);
+            // Reject an ambiguous landmark rather than steering toward another building.
+            cv::Mat competitors = scores.clone();
+            const cv::Rect exclusion = cv::Rect(location.x - 15, location.y - 15, 31, 31)
+                & cv::Rect(0, 0, scores.cols, scores.rows);
+            competitors(exclusion).setTo(-1);
+            double runner_up;
+            cv::minMaxLoc(competitors, nullptr, &runner_up);
+            if (score < 0.93 || score - runner_up < 0.10) {
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                    "Mart alignment: Emblem match missing or ambiguous.", stream);
+            }
+            // Reference emblem top-left at half resolution. The reference player
+            // stands directly outside the door, 64 full-resolution pixels left
+            // of the emblem center; do not steer to the emblem center itself.
+            const int dx = location.x - 482;
+            const int dy = location.y - 127;
+            stream.log("[Mart alignment] score=" + std::to_string(score) +
+                ", offset=(" + std::to_string(dx * 2) + "," + std::to_string(dy * 2) + ")");
+            if (std::abs(dx) <= 3 && std::abs(dy) <= 3) {
+                if (++confirmations >= 3) {
+                    stream.log("[Mart alignment] Door position confirmed.");
+                    return;
+                }
+                pbf_wait(context, 250ms);
+            } else {
+                confirmations = 0;
+                const bool horizontal = std::abs(dx) >= std::abs(dy);
+                const int error = horizontal ? dx : dy;
+                const auto duration = std::abs(error) > 15 ? 80ms : 40ms;
+                pbf_move_left_joystick(context,
+                    {horizontal ? (dx > 0 ? 1.0 : -1.0) : 0.0,
+                     horizontal ? 0.0 : (dy < 0 ? 1.0 : -1.0)}, duration, 0ms);
+                pbf_wait(context, 350ms);
+            }
+            context.wait_for_all_requests();
+        }
+        OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+            "Mart alignment: Could not reach the doorway reference position.", stream);
+    }
+
     void roark_to_mars(VideoStream& stream, ProControllerContext& context) {
+        pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 3995ms, 0ms);
+        pbf_wait(context, 672ms);
+        pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 681ms, 0ms);
+        pbf_wait(context, 468ms);
+        pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 1081ms, 0ms);
+        pbf_wait(context, 420ms);
+        pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 2445ms, 0ms);
+        pbf_wait(context, 1056ms);
+        pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 95ms, 0ms);
+        align_to_oreburgh_mart(stream, context);
+        pbf_wait(context, 4787ms);
+        pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 1309ms, 0ms);
 
     }
     void mars_to_eterna_forest(VideoStream& stream, ProControllerContext& context) {

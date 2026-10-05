@@ -68,46 +68,6 @@ namespace PokemonAutomation {
 
             //  Runs from a wild battle that is already in progress (menu visible or about to be).
             //  Throws OperationFailedException if it cannot escape within `timeout`.
-            // Previous escape completion check retained for comparison.
-            // static void escape_wild_battle(
-            //     VideoStream& stream,
-            //     ProControllerContext& context,
-            //     BattleType battle_type = BattleType::STANDARD,
-            //     std::chrono::seconds timeout = 30s
-            // ) {
-            //     bool escaped = false;
-            //     auto deadline = std::chrono::steady_clock::now() + timeout;
-            //     while (std::chrono::steady_clock::now() < deadline) {
-            //         pbf_press_button(context, BUTTON_B, 40ms, 200ms);
-            //         context.wait_for_all_requests();
-            //
-            //         BattleMenuWatcher menu_ready(battle_type, COLOR_YELLOW);
-            //         if (wait_until(stream, context, 3s, {{menu_ready}}) != 0) {
-            //             continue;
-            //         }
-            //
-            //         pbf_move_left_joystick(context, {0, -1}, 80ms, 80ms);
-            //         pbf_press_button(context, BUTTON_A, 60ms, 0ms);
-            //         context.wait_for_all_requests();
-            //
-            //         EndBattleWatcher battle_end;
-            //         BattleMenuWatcher back_to_menu(battle_type, COLOR_YELLOW);
-            //         if (wait_until(stream, context, 4s, {{battle_end}, {back_to_menu}}) == 0) {
-            //             escaped = true;
-            //             break;
-            //         }
-            //     }
-            //     if (!escaped) {
-            //         OperationFailedException::fire(
-            //             ErrorReport::SEND_ERROR_REPORT,
-            //             "escape_wild_battle: Failed to run from battle.",
-            //             stream
-            //         );
-            //     }
-            //     OverworldWatcher overworld;
-            //     wait_until(stream, context, 5s, {{overworld}});
-            // }
-            //
 
             // The main game menu is independent evidence that battle has ended.
             static bool mine_confirm_escape_via_menu(
@@ -120,7 +80,6 @@ namespace PokemonAutomation {
                 BattleMenuWatcher battle_menu(battle_type, COLOR_YELLOW);
                 for (size_t attempt = 1; attempt <= 3; attempt++) {
                     // Do not accept the absence-based overworld detector before menu proof.
-                    // Previous order: {game_menu}, {overworld}, {battle_menu}.
                     const int state = wait_until(stream, context, 300ms, {{game_menu}, {battle_menu}});
                     if (state == 1) {
                         stream.log("[Mine escape] Battle menu still present; retrying Run.");
@@ -172,74 +131,6 @@ namespace PokemonAutomation {
                 return false;
             }
 
-            // Previous early overworld completion check retained for comparison.
-            // static void escape_wild_battle(
-            //     VideoStream& stream,
-            //     ProControllerContext& context,
-            //     BattleType battle_type = BattleType::STANDARD,
-            //     std::chrono::seconds timeout = 30s
-            // ) {
-            //     // Keep transition history across retries and observe the Run input.
-            //     EndBattleWatcher battle_end;
-            //     OverworldWatcher overworld;
-            //     bool escaped = false;
-            //     const auto deadline = std::chrono::steady_clock::now() + timeout;
-            //     while (std::chrono::steady_clock::now() < deadline) {
-            //         // Accept a completed escape even if its black transition was missed.
-            //         if (wait_until(stream, context, 200ms, {{overworld}}) == 0) {
-            //             escaped = true;
-            //             break;
-            //         }
-            //         pbf_press_button(context, BUTTON_B, 40ms, 200ms);
-            //         context.wait_for_all_requests();
-            //         BattleMenuWatcher menu_ready(battle_type, COLOR_YELLOW);
-            //         const int ready = wait_until(stream, context, 3s, {{overworld}, {menu_ready}});
-            //         if (ready == 0) {
-            //             escaped = true;
-            //             break;
-            //         }
-            //         if (ready != 1) {
-            //             // No battle menu and no observed exit: ask the main menu.
-            //             if (mine_confirm_escape_via_menu(stream, context, battle_type)) {
-            //                 return;
-            //             }
-            //             continue;
-            //         }
-            //         pbf_move_left_joystick(context, {0, -1}, 80ms, 80ms);
-            //         context.wait_for_all_requests();
-            //         stream.log("[Mine escape] Selecting Run; watching transition and overworld.");
-            //         const int result = run_until<ProControllerContext>(
-            //             stream, context,
-            //             [](ProControllerContext& controller) {
-            //                 pbf_press_button(controller, BUTTON_A, 60ms, 0ms);
-            //                 pbf_wait(controller, 4s);
-            //                 controller.wait_for_all_requests();
-            //             },
-            //             {battle_end, overworld}
-            //         );
-            //         if (result >= 0) {
-            //             escaped = true;
-            //             break;
-            //         }
-            //     }
-            //     // An exit animation can finish just after the retry deadline.
-            //     // Confirm the overworld before reporting failure or resuming movement.
-            //     if (wait_until(stream, context, 10s, {{overworld}}) == 0) {
-            //         stream.log("[Mine escape] Overworld confirmed. Escape succeeded.", COLOR_GREEN);
-            //         return;
-            //     }
-            //     if (mine_confirm_escape_via_menu(stream, context, battle_type)) {
-            //         return;
-            //     }
-            //     OperationFailedException::fire(
-            //         ErrorReport::SEND_ERROR_REPORT,
-            //         escaped
-            //             ? "escape_wild_battle: Exit detected, but overworld did not return."
-            //             : "escape_wild_battle: Exit, overworld, and main-menu fallback could not confirm escape.",
-            //         stream
-            //     );
-            // }
-            //
 
             static bool mine_select_run(
                 VideoStream& stream,
@@ -271,8 +162,6 @@ namespace PokemonAutomation {
                             pbf_wait(context, 150ms);
                         }
                         else {
-                            // Previous navigation always moved Down.
-                            // Battle wraps upward directly to Run.
                             const DpadPosition direction = selected == BattleMenuOption::BATTLE
                                 ? DPAD_UP : DPAD_DOWN;
                             pbf_press_dpad(context, direction, 80ms, 250ms);
@@ -304,9 +193,6 @@ namespace PokemonAutomation {
                     if (ready != 1) {
                         continue;
                     }
-                    // Previous blind selection:
-                    // pbf_move_left_joystick(context, {0, -1}, 80ms, 80ms);
-                    // context.wait_for_all_requests();
                     if (!mine_select_run(stream, context, battle_type)) {
                         continue;
                     }
@@ -788,7 +674,6 @@ namespace PokemonAutomation {
                 ProControllerContext& context
             ) {
                 const ImageRGB32 reference(
-                    // Previous resource reference: RESOURCE_PATH() + "PokemonBDSP/Autostory/Oreburg_mine_nav/mine_start_center.png"
                     mine_navigation_resource_path() + "mine_start_center.png"
                 );
 
@@ -928,18 +813,6 @@ namespace PokemonAutomation {
                     return false;
                 }
 
-                // Previous duplicate overworld-only check. Escape helper now
-                // confirms either the overworld or opening and closing the main menu.
-                // OverworldWatcher overworld;
-                //
-                // if (wait_until(stream, context, 5s, { {overworld} }) != 0) {
-                //     stream.log(
-                //         "[Mine encounter] Overworld not detected. Stopping.",
-                //         COLOR_ORANGE
-                //     );
-                //     return false;
-                // }
-                //
 
                 pbf_wait(context, 800ms);
                 context.wait_for_all_requests();
@@ -1123,7 +996,6 @@ namespace PokemonAutomation {
                 double max_patch = 30.0
             ) {
                 const ImageRGB32 reference(
-                    // Previous resource reference: RESOURCE_PATH() + "PokemonBDSP/Autostory/Oreburg_mine_nav/"
                     mine_navigation_resource_path() + filename
                 );
                 const ImageRGB32 reference_scaled = reference.scale_to(960, 540);
@@ -1206,7 +1078,6 @@ namespace PokemonAutomation {
                 std::array<std::unique_ptr<ImageRGB32>, Endpoints> references;
                 for (size_t index = 0; index < Endpoints; index++) {
                     const ImageRGB32 image(
-                        // Previous resource reference: RESOURCE_PATH() + "PokemonBDSP/Autostory/Oreburg_mine_nav/"
                         mine_navigation_resource_path() + files[index]
                     );
                     references[index] = std::make_unique<ImageRGB32>(image.scale_to(960, 540));
@@ -1829,7 +1700,6 @@ namespace PokemonAutomation {
                 ProControllerContext& context
             ) {
                 const ImageRGB32 reference(
-                    // Previous resource reference: RESOURCE_PATH() + "PokemonBDSP/Autostory/Oreburg_mine_nav/Mine_path_18.png"
                     mine_navigation_resource_path() + "Mine_path_18.png"
                 );
                 const ImageRGB32 reference_scaled = reference.scale_to(960, 540);
@@ -2078,64 +1948,6 @@ namespace PokemonAutomation {
 
             // Start Roark's conversation once, then advance it with B.
             // Require dialogue to be seen before accepting its disappearance.
-            // Previous polling conversation retained for comparison.
-            // static bool mine_talk_to_roark(
-            //     VideoStream& stream,
-            //     ProControllerContext& context
-            // ) {
-            //     ShortDialogDetector dialogue(COLOR_YELLOW);
-            //     const auto start = std::chrono::steady_clock::now();
-            //     const auto deadline = start + 60s;
-            //     bool saw_dialogue = false;
-            //     bool timing_absence = false;
-            //     auto absent_since = start;
-            //
-            //     stream.log("[Mine Roark] Pressing A to start conversation.");
-            //     pbf_press_button(context, BUTTON_A, 80ms, 100ms);
-            //     context.wait_for_all_requests();
-            //
-            //     while (std::chrono::steady_clock::now() < deadline) {
-            //         const VideoSnapshot frame = stream.video().snapshot();
-            //         if (!frame) {
-            //             stream.log("[Mine Roark] No video frame.", COLOR_ORANGE);
-            //             return false;
-            //         }
-            //         const auto now = std::chrono::steady_clock::now();
-            //         if (dialogue.detect(frame)) {
-            //             saw_dialogue = true;
-            //             timing_absence = false;
-            //         }
-            //         else if (saw_dialogue) {
-            //             if (!timing_absence) {
-            //                 timing_absence = true;
-            //                 absent_since = now;
-            //             }
-            //             if (now - absent_since >= 1500ms) {
-            //                 stream.log(
-            //                     "[Mine Roark] Dialogue absent for 1.5 seconds. Finished.",
-            //                     COLOR_GREEN
-            //                 );
-            //                 return true;
-            //             }
-            //         }
-            //         else if (now - start >= 10s) {
-            //             stream.log("[Mine Roark] No dialogue appeared.", COLOR_ORANGE);
-            //             return false;
-            //         }
-            //
-            //         // Wait for the first box before mashing, so it isn't skipped
-            //         // before the detector has observed the conversation.
-            //         if (saw_dialogue) {
-            //             pbf_mash_button(context, BUTTON_B, 100ms);
-            //         }
-            //         else {
-            //             pbf_wait(context, 100ms);
-            //         }
-            //         context.wait_for_all_requests();
-            //     }
-            //     stream.log("[Mine Roark] Conversation timed out.", COLOR_ORANGE);
-            //     return false;
-            // }
 
             static bool mine_talk_to_roark(
                 VideoStream& stream,
@@ -2168,7 +1980,6 @@ namespace PokemonAutomation {
                             timing_absence = true;
                             absent_since = now;
                         }
-                        // Previous quiet period: 1500ms.
                         if (now - absent_since >= 4s) {
                             stream.log(
                                 "[Mine Roark] Dialogue absent for 4 seconds. Finished.",
@@ -2240,63 +2051,13 @@ namespace PokemonAutomation {
                 MineRouteTestOptions route;
                 route.reset_on_failure = true;
 
-                // if (!oreburgh_mine_first_leg_test(stream, context, route)) { return; }
                 if (!oreburgh_mine_route(stream, context, route)) {
                     OperationFailedException::fire(
                         ErrorReport::SEND_ERROR_REPORT, "Mine route did not complete.", stream
                     );
                 }
 
-                // Previous conversation sequence retained for comparison.
-                // // Position 19 already faces north toward Roark.
-                // pbf_press_button(context, BUTTON_A, 200ms, 800ms);
-                // pbf_mash_button(context, BUTTON_B, 12000ms);
-                // context.wait_for_all_requests();
-                //
-                // if (!mine_finish_item_dialogue(stream, context)) {
-                // OperationFailedException::fire(
-                // ErrorReport::SEND_ERROR_REPORT,
-                // "Mine route: Roark dialogue did not finish.",
-                // stream
-                // );
-                // }
 
-                // Previous inline conversation and exit retained for comparison.
-                // // Position 19 already faces north toward Roark.
-                // if (!mine_talk_to_roark(stream, context)) {
-                //     OperationFailedException::fire(
-                //         ErrorReport::SEND_ERROR_REPORT,
-                //         "Mine route: Roark dialogue did not finish.",
-                //         stream
-                //     );
-                // }
-                //
-                // // Previous Escape Rope button sequence retained for comparison.
-                // // pbf_press_button(context, BUTTON_X, 142ms, 0ms);
-                // // pbf_wait(context, 1707ms);
-                // // pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 162ms, 0ms);
-                // // pbf_wait(context, 457ms);
-                // // pbf_press_button(context, BUTTON_A, 144ms, 0ms);
-                // // pbf_wait(context, 1704ms);
-                // // pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 159ms, 0ms);
-                // // pbf_wait(context, 640ms);
-                // // pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 160ms, 0ms);
-                // // pbf_wait(context, 555ms);
-                // // pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 180ms, 0ms);
-                // // pbf_wait(context, 494ms);
-                // // pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 171ms, 0ms);
-                // // pbf_wait(context, 826ms);
-                // // pbf_press_button(context, BUTTON_A, 92ms, 0ms);
-                // // pbf_wait(context, 823ms);
-                // // pbf_press_button(context, BUTTON_A, 110ms, 0ms);
-                //
-                // if (!use_escape_rope(stream, context, 8)) {
-                //     OperationFailedException::fire(
-                //         ErrorReport::SEND_ERROR_REPORT,
-                //         "Mine route: failed to find or use Escape Rope.",
-                //         stream
-                //     );
-                // }
                 if (!mine_talk_and_escape(stream, context)) {
                     OperationFailedException::fire(
                         ErrorReport::SEND_ERROR_REPORT,
@@ -2309,47 +2070,59 @@ namespace PokemonAutomation {
             // ---------------------------------------------------------------------------
             //  Segment 1 Part 3: Oreburgh Mine to Gym
             //  Assumes that escape rope was picked up and used to exit the mine.
-            //  Navigates to the gym.
+            //  Follows the validated blind route into the gym.
             //  ----------------------------------------------------------------------------
             void oreburgh_mine_to_gym(SingleSwitchProgramEnvironment& env,
                 VideoStream& stream, ProControllerContext& context) {
+
                 stream.log("[Mine to gym] Following recorded route from the mine exit.");
-                pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 2382ms, 0ms);
-                pbf_wait(context, 10234ms);
-                pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 2034ms, 0ms);
-                pbf_wait(context, 3635ms);
-                pbf_move_left_joystick(context, { 0.000000, -1.000000 }, 861ms, 0ms);
-                pbf_wait(context, 939ms);
-                pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 83ms, 0ms);
-                pbf_wait(context, 521ms);
-                pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 111ms, 0ms);
-                pbf_wait(context, 5495ms);
-                pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 640ms, 0ms);
-                pbf_wait(context, 3795ms);
-                pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 1065ms, 0ms);
-                pbf_wait(context, 602ms);
-                pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 912ms, 0ms);
-                pbf_wait(context, 4134ms);
-                pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 2364ms, 0ms);
-                pbf_wait(context, 5069ms);
-                pbf_move_left_joystick(context, { 0.000000, -1.000000 }, 1079ms, 0ms);
-                pbf_wait(context, 605ms);
-                pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 728ms, 0ms);
-                pbf_wait(context, 1081ms);
-                pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 155ms, 0ms);
-                pbf_wait(context, 2642ms);
-                pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 64ms, 0ms);
-                pbf_wait(context, 5340ms);
-                pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 541ms, 0ms);
-                pbf_wait(context, 140ms);
-                pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 47ms, 0ms);
+                pbf_wait(context, 700ms);
                 context.wait_for_all_requests();
-                stream.log("[Mine to gym] Entering the gym and checking the doorway transition.");
-                walk_until_doorway(stream, context, MoveDirection::UP, 5s);
+                pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 3995ms, 0ms);
+                pbf_wait(context, 672ms);
+                pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 681ms, 0ms);
+                pbf_wait(context, 468ms);
+                pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 1081ms, 0ms);
+                pbf_wait(context, 420ms);
+                pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 2445ms, 0ms);
+                pbf_wait(context, 1056ms);
+                pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 95ms, 0ms);
+                pbf_wait(context, 4787ms);
+                pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 1309ms, 0ms);
+
+                //pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 4450ms, 0ms);
+                //pbf_wait(context, 3635ms);
+                //pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 640ms, 0ms);
+                //pbf_wait(context, 3795ms);
                 context.wait_for_all_requests();
-                pbf_wait(context, 1500ms);
-                context.wait_for_all_requests();
-                stream.log("[Mine to gym] Gym doorway transition confirmed.", COLOR_GREEN);
+
+                //stream.log("[Mine to gym] Staying west of the hiker; moving north along the left fence.");
+                //pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 2000ms, 0ms);
+                //pbf_wait(context, 602ms);
+                //pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 2364ms, 0ms);
+                //pbf_wait(context, 5069ms);
+                //pbf_move_left_joystick(context, { 0.000000, -1.000000 }, 1079ms, 0ms);
+                //pbf_wait(context, 605ms);
+                //pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 728ms, 0ms);
+                //pbf_wait(context, 1081ms);
+                //pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 155ms, 0ms);
+                //pbf_wait(context, 2642ms);
+                //pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 64ms, 0ms);
+                //pbf_wait(context, 5340ms);
+                //context.wait_for_all_requests();
+
+                //pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 541ms, 0ms);
+                //pbf_wait(context, 140ms);
+                //pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 47ms, 0ms);
+                //context.wait_for_all_requests();
+                //stream.log("[Mine to gym] Recorded movement finished; waiting for gym entry to settle.");
+                // walk_until_doorway(stream, context, MoveDirection::UP, 5s);
+                // Finish entering the doorway with a bounded blind input.
+                //pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 1000ms, 0ms);
+                //context.wait_for_all_requests();
+                //pbf_wait(context, 1500ms);
+                //context.wait_for_all_requests();
+                stream.log("[Mine to gym] Blind mine-to-gym sequence completed.", COLOR_GREEN);
             }
 
             // ---------------------------------------------------------------------------
@@ -2361,6 +2134,12 @@ namespace PokemonAutomation {
                 VideoStream& stream, ProControllerContext& context) {
 
                 //Upon entering the Gym.
+                // The entry camera sequence lasts about 7.5 seconds in the reference
+                // video. Allow another 500ms before sending puzzle movement inputs.
+                context.wait_for_all_requests();
+                env.log("[Gym puzzle] Waiting for the entry cutscene to finish.");
+                pbf_wait(context, 8000ms);
+                context.wait_for_all_requests();
 
                 struct Move {
                     DpadPosition dir;
@@ -2389,17 +2168,45 @@ namespace PokemonAutomation {
                 //Barry 1 battle logic can be used here since the moves don't matter this early.
                 Barry_1_fight(env, stream, context);
 
-                //Button presses after battle with small cutscene of badge being put in case between dialogue boxes.
-
-				wait_for_dialogue(stream, context, "Phase 4 (Roark post battle dialog)");
-                pbf_mash_button(context, BUTTON_B, 5000ms);
                 context.wait_for_all_requests();
+                wait_for_dialogue(stream, context, "Phase 4 (Roark post battle dialog)");
+                ShortDialogDetector post_battle_dialogue(COLOR_YELLOW);
+                const auto dialogue_deadline = std::chrono::steady_clock::now() + 180s;
+                auto dialogue_absent_since = std::chrono::steady_clock::now();
+                bool dialogue_finished = false;
+                stream.log("[Gym post battle] Clearing dialogue until absent for 4 seconds.");
+                while (std::chrono::steady_clock::now() < dialogue_deadline) {
+                    const VideoSnapshot frame = stream.video().snapshot();
+                    if (!frame) {
+                        OperationFailedException::fire(
+                            ErrorReport::SEND_ERROR_REPORT,
+                            "Gym post battle: No video frame while clearing dialogue.", stream
+                        );
+                    }
+                    const auto now = std::chrono::steady_clock::now();
+                    if (post_battle_dialogue.detect(frame)) {
+                        dialogue_absent_since = now;
+                    }
+                    else if (now - dialogue_absent_since >= 4s) {
+                        dialogue_finished = true;
+                        break;
+                    }
+                    pbf_mash_button(context, BUTTON_B, 100ms);
+                    context.wait_for_all_requests();
+                }
+                if (!dialogue_finished) {
+                    OperationFailedException::fire(
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Gym post battle: Dialogue did not finish within 180 seconds.", stream
+                    );
+                }
+                stream.log("[Gym post battle] Dialogue absent for 4 seconds. Walking down.");
 
                 for (int i = 0; i < 21; i++) {
                     pbf_press_dpad(context, DPAD_DOWN, 80ms, 300ms);
                 }
 
-                //Exits Buiilding
+                // Exit the building.
                 pbf_wait(context, 1000ms);
             }
 
