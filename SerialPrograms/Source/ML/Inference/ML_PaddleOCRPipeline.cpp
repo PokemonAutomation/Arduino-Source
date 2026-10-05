@@ -152,7 +152,7 @@ void PaddleOCRPipeline::load_dictionary(const Filesystem::Path& path){
 std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
 
     const bool debugging = STATIC_GLOBALS.PADDLE_OCR_DEBUG;
-    m_debug_image_index++;
+    const int debug_image_index = m_debug_image_index.fetch_add(1, std::memory_order_relaxed) + 1;
 
     if (image.width() == 0 || image.height() == 0) {
         m_logger.log("[OCR-DEBUG] Input was an empty image.");
@@ -162,7 +162,7 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     cv::cvtColor(to_OpenCV_ref(image), image_bgr, cv::COLOR_BGRA2BGR);
 
     // 1. Crop tightly around the text, with small safety margin
-    cv::Mat cropped_image = crop_to_text_region_with_padding(image_bgr, m_debug_image_index);
+    cv::Mat cropped_image = crop_to_text_region_with_padding(image_bgr, debug_image_index);
     if (cropped_image.empty()){
         if(STATIC_GLOBALS.PADDLE_OCR_DEBUG){
             m_logger.log("[OCR-DEBUG] Crop to text region returned empty image.");

@@ -8,6 +8,7 @@
 #ifndef PokemonAutomation_ML_PaddleOCRPipeline_H
 #define PokemonAutomation_ML_PaddleOCRPipeline_H
 
+#include <atomic>
 #include <string>
 #include <vector>
 #include <onnxruntime_cxx_api.h>
@@ -46,7 +47,9 @@ private:
     std::vector<std::string> m_dictionary;
     TaggedLogger m_logger;
 
-    int m_debug_image_index = 0;
+    // Counts `recognize()` calls, to give each call's debug images unique filenames
+    // (see PADDLE_OCR_DEBUG_IMAGE). Atomic because `recognize()` runs on many threads.
+    std::atomic<int> m_debug_image_index{0};
 
 };
 
