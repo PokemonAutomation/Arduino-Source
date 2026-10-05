@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Globals.h"
 #include "WallpaperOption.h"
 
 namespace PokemonAutomation{
@@ -19,7 +20,9 @@ WallpaperOption::WallpaperOption()
     : GroupOption(
         "Wallpaper",
         LockMode::UNLOCK_WHILE_RUNNING,
-        EnableMode::DEFAULT_ENABLED
+        IS_BETA_VERSION
+            ? EnableMode::DEFAULT_ENABLED
+            : EnableMode::DEFAULT_DISABLED
     )
     , IMAGE_PATH(
         "<b>Wallpaper Path:</b>",
