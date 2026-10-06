@@ -284,6 +284,16 @@ function(apply_common_target_properties target_name)
 
 endfunction()
 
+# Compile the shared AI agent tool definitions into the app (see
+# Source/Integrations/AgentServer/AgentTools.json).
+include(cmake/EmbedTextFile.cmake)
+pa_embed_text_file(
+    SerialProgramsLib
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/Integrations/AgentServer/AgentTools.json
+    ${CMAKE_CURRENT_BINARY_DIR}/Generated/AgentServer_AgentToolsJson.cpp
+    "PokemonAutomation::AgentServer::agent_tools_json_text"
+)
+
 # Apply common properties to both targets
 apply_common_target_properties(SerialProgramsLib)
 apply_common_target_properties(SerialPrograms)

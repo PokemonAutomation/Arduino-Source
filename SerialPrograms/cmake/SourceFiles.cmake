@@ -906,6 +906,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/SerialPort/SerialPortPollerQt.h
     Source/Integrations/AgentServer/AgentServer_HttpServer.cpp
     Source/Integrations/AgentServer/AgentServer_HttpServer.h
+    Source/Integrations/AgentServer/AgentServer_ToolDefinitions.cpp
+    Source/Integrations/AgentServer/AgentServer_ToolDefinitions.h
     Source/Integrations/DiscordIntegrationSettings.cpp
     Source/Integrations/DiscordIntegrationSettings.h
     Source/Integrations/DiscordIntegrationTable.cpp
