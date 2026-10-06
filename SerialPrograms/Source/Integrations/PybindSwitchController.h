@@ -2,6 +2,12 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
+ *  A GUI-free Nintendo Switch controller that talks to a PABotBase2 microcontroller
+ *  over a serial port. It is part of CoreLib and uses only plain types in its
+ *  interface, so it can be bound to other languages: the `_pa_core` Python module
+ *  (Source/PythonBindings/) wraps it, and the Python package and MCP server are built
+ *  on top of that. SerialProgramsCommandLine also uses it directly to test its
+ *  functionality.
  */
 
 #ifndef PokemonAutomation_Integrations_PybindSwitchController_H
@@ -35,7 +41,7 @@ namespace NintendoSwitch{
 //
 // Thread safety: all methods can be called from any thread. In particular
 // `cancel_all_commands_blocking()` may be called while another thread is blocked in
-// `wait_for_all_requests()`, e.g. to stop everything in an emergency.
+// `wait_for_all_requests()`, which is how the Python layer implements an emergency stop.
 class PybindSwitchProController{
     PybindSwitchProController(const PybindSwitchProController&) = delete;
     void operator=(const PybindSwitchProController&) = delete;
