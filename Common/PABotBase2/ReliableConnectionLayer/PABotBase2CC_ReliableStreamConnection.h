@@ -59,7 +59,7 @@ public:
     }
 
     size_t pending() const;
-    bool wait_for_pending(WallDuration timeout = WallDuration::max());
+    virtual bool wait_for_pending(WallDuration timeout = WallDuration::max()) override;
 
 
 public:

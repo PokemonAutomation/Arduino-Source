@@ -145,6 +145,15 @@ void PybindSwitchProController::wait_for_all_requests(){
     }
     controller->wait_for_all(nullptr);
 }
+bool PybindSwitchProController::cancel_all_and_wait(uint64_t timeout_millis){
+    PybindSwitchProControllerInternal* internal = (PybindSwitchProControllerInternal*)m_internals;
+    ProController* controller = internal->controller_if_ready();
+    if (controller == nullptr){
+        internal->m_logger.log("Controller is not ready.", COLOR_RED);
+        return false;
+    }
+    return controller->cancel_all_and_wait(Milliseconds(timeout_millis));
+}
 void PybindSwitchProController::wait(uint64_t duration){
     PybindSwitchProControllerInternal* internal = (PybindSwitchProControllerInternal*)m_internals;
     internal->controller().issue_nop(nullptr, Milliseconds(duration));

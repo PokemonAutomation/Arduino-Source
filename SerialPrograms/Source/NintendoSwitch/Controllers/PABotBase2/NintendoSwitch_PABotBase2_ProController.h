@@ -76,6 +76,9 @@ public:
     virtual void replace_on_next_command() override{
         PABotBase2_Controller::replace_on_next_command();
     }
+    virtual bool cancel_all_and_wait(Milliseconds timeout) override{
+        return PABotBase2_Controller::cancel_all_and_wait(timeout);
+    }
 
     virtual void wait_for_all(Cancellable* cancellable) override{
         PABotBase2_Controller::wait_for_all(cancellable);

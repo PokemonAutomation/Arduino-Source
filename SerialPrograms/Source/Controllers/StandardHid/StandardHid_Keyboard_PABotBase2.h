@@ -107,6 +107,7 @@ public:
 public:
     virtual void cancel_all_commands() override;
     virtual void replace_on_next_command() override;
+    virtual bool cancel_all_and_wait(Milliseconds timeout) override;
 
     virtual void wait_for_all(Cancellable* cancellable) override;
 
