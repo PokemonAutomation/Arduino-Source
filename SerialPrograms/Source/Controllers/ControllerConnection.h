@@ -60,7 +60,13 @@ public:
     }
     bool is_ready() const noexcept{ return status() == Status::READY; }
     Status status() const noexcept{ return m_status.load(std::memory_order_acquire); }
+    //  The status shown in the GUI's controller panel, formatted as HTML: each line is
+    //  colored with <font> tags and the two lines are joined with <br>.
     std::string status_text() const;
+    //  The same status as plain text, for non-GUI callers (e.g. the Python bindings):
+    //  the text of each line as it was set, without colors, joined with a newline.
+    //  e.g. "PABotBase2-Pico1W (UART) (2026062701)"
+    std::string raw_status_text() const;
 
     //  It it not safe to call this until "is_ready()" is true.
     const std::vector<ControllerType>& controller_list() noexcept{
@@ -95,8 +101,10 @@ protected:
 
 private:
     mutable SpinLock m_status_text_lock;
-    std::string m_status_line0;
+    std::string m_status_line0;     //  HTML, for status_text()
     std::string m_status_line1;
+    std::string m_raw_status_line0; //  plain text, for raw_status_text()
+    std::string m_raw_status_line1;
     ListenerSet<StatusListener> m_status_listeners;
 };
 

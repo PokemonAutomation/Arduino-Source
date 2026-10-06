@@ -54,8 +54,8 @@ public:
 
     bool is_ready() const;
 
-    // The connection status text shown in the GUI (formatted as HTML), e.g.
-    // device name and firmware version, or the error message if the connection failed.
+    // The connection status text: device name and firmware version,
+    // or the error message if the connection failed.
     std::string current_status() const;
 
     // Block until every command queued so far has been executed by the device.
