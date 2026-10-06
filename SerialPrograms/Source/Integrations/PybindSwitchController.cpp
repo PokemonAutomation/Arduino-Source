@@ -145,6 +145,22 @@ void PybindSwitchProController::wait_for_all_requests(){
     }
     controller->wait_for_all(nullptr);
 }
+bool PybindSwitchProController::wait_for_all_commands_cancelled(uint64_t timeout_millis){
+    PybindSwitchProControllerInternal* internal = (PybindSwitchProControllerInternal*)m_internals;
+    ProController* controller = internal->controller_if_ready();
+    if (controller == nullptr){
+        return false;
+    }
+    bool confirmed = controller->wait_for_all_commands_cancelled(Milliseconds(timeout_millis));
+    if (!confirmed){
+        internal->m_logger.log(
+            "wait_for_all_commands_cancelled(): device did not confirm the neutral state within " +
+            std::to_string(timeout_millis) + " ms.",
+            COLOR_RED
+        );
+    }
+    return confirmed;
+}
 void PybindSwitchProController::wait(uint64_t duration){
     PybindSwitchProControllerInternal* internal = (PybindSwitchProControllerInternal*)m_internals;
     internal->controller().issue_nop(nullptr, Milliseconds(duration));
