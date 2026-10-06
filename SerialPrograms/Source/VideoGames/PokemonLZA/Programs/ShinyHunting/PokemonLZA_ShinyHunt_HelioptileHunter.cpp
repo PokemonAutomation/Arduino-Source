@@ -3,6 +3,10 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
+
+#include <array>
+#include <cstddef>
+#include <string>
 #include "Common/Cpp/Options/ConfigOption.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -22,9 +26,6 @@
 #include "VideoGames/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "VideoGames/PokemonLZA/Programs/PokemonLZA_FastTravelNavigation.h"
 #include "PokemonLZA_ShinyHunt_HelioptileHunter.h"
-#include <array>
-#include <cstddef>
-#include <string>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -70,16 +71,14 @@ std::unique_ptr<StatsTracker> ShinyHunt_HelioptileHunter_Descriptor::make_stats(
 }
 
 ShinyHunt_HelioptileHunter::ShinyHunt_HelioptileHunter()
-    : END_AFTER_CYCLE("<b>How many cycles before stopping. 0 for never stop.</b><br>"
+    : END_AFTER_CYCLE(
+        "<b>How many day/night cycles before stopping. 0 for never stop.</b><br>"
         "<br>"
-        "<b>Cycle Definition:</b><br>"
-        "A cycle consists of entering Wild Zone 14 a total of at most 65 times. "
-        "A cycle ends after 65 entry loops or when unsuitable weather or nighttime is detected. "
-        "The next cycle resets the day before continuing.",
+        "Each day/night cycle is roughly 65 tries.",
         LockMode::LOCK_WHILE_RUNNING,
-        0, 0, 32*30
+        0, 0
     )
-    , NOTIFICATION_STATUS("Status Update", true, false,   ImageAttachmentMode::JPG, {"Notifs"}, std::chrono::seconds(3600))
+    , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
         &NOTIFICATION_PROGRAM_FINISH,
@@ -103,7 +102,11 @@ struct WeatherTimeState{
     bool daytime;
 };
 
-WeatherTimeState get_weather_time_state(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool close_map){
+WeatherTimeState get_weather_time_state(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    bool close_map
+){
     open_map(env.console, context, false, true);
     context.wait_for_all_requests();
 
@@ -297,10 +300,12 @@ void ShinyHunt_HelioptileHunter::program(SingleSwitchProgramEnvironment& env, Pr
     require_player(env.console, context, BUTTON_L);
 
     ShinyHunt_HelioptileHunter_Descriptor::Stats& stats = env.current_stats<ShinyHunt_HelioptileHunter_Descriptor::Stats>();
-    
+
     while(true){
-        
-        if (END_AFTER_CYCLE.current_value() > 0 && END_AFTER_CYCLE.current_value() == stats.cycles.load()){
+
+        if (END_AFTER_CYCLE.current_value() > 0 &&
+            END_AFTER_CYCLE.current_value() == stats.cycles.load(std::memory_order_relaxed)
+        ){
             go_home(env.console, context);
             send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
             break;
@@ -326,7 +331,7 @@ void ShinyHunt_HelioptileHunter::program(SingleSwitchProgramEnvironment& env, Pr
                     // Re-show icons before moving the map cursor to the destination.
                     pbf_press_button(context, BUTTON_MINUS, 80ms, 120ms);
                     //these extra waits help prevent early execution of the map move which sometimes fired early during testing
-                    context.wait_for_all_requests(); 
+                    context.wait_for_all_requests();
                     pbf_wait(context, 100ms);
                     move_map_cursor_from_entrance_to_zone(env.console, context, Location::WILD_ZONE_14);
                     FastTravelState result = fly_from_map(env.console, context);
@@ -350,21 +355,25 @@ void ShinyHunt_HelioptileHunter::program(SingleSwitchProgramEnvironment& env, Pr
                     context.wait_for_all_requests();
                     break;
                 }
-            }  
+            }
 
-            env.log("[Helioptile][Loop] cycle=" + std::to_string(stats.cycles.load() + 1)
+            env.log(
+                "[Helioptile][Loop] cycle=" + std::to_string(stats.cycles.load(std::memory_order_relaxed) + 1)
                 + " cycle_loop=" + std::to_string(hunt_loops + 1)
-                + " total_loop=" + std::to_string(stats.loops.load() + 1));
+                + " total_loop=" + std::to_string(stats.loops.load() + 1)
+            );
             execute_fixed_routine(env,env.console, context, NOTIFICATION_STATUS);
 
             stats.loops++;
             hunt_loops++;
             env.update_stats();
         }
-        env.log("[Helioptile][Decision] action=cycle_complete cycle="
-            + std::to_string(stats.cycles.load() + 1)
+        env.log(
+            "[Helioptile][Decision] action=cycle_complete cycle="
+            + std::to_string(stats.cycles.load(std::memory_order_relaxed) + 1)
             + " completed_loops=" + std::to_string(hunt_loops)
-            + " reason=" + cycle_end_reason);
+            + " reason=" + cycle_end_reason
+        );
         stats.cycles++;
         env.update_stats();
     }
