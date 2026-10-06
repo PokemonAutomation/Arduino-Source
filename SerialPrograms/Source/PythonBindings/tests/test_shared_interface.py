@@ -1,9 +1,10 @@
-"""AgentTools.json must be usable as-is, and the Python input vocabulary must pass
-the shared AgentInputTestCases.json (also used by C++)."""
+"""The Python server must match the shared interface in AgentTools.json, and the
+input vocabulary must pass the shared AgentInputTestCases.json (also used by C++)."""
 
 import json
 import math
 
+import anyio
 import pytest
 
 from pokemon_automation import agent_tools
@@ -19,6 +20,40 @@ def test_schemas_are_self_contained():
 def test_every_tool_names_known_hosts():
     for tool in agent_tools.load()["tools"]:
         assert tool["hosts"] and set(tool["hosts"]) <= {"app", "python"}, tool["name"]
+
+
+def test_python_server_serves_the_shared_definitions():
+    pytest.importorskip("mcp")
+    from mcp import Client
+    from pokemon_automation.mcp_server import ServerConfig, create_server
+
+    server, _ = create_server(ServerConfig(fake=True))
+
+    async def go():
+        async with Client(server) as client:
+            return (await client.list_tools()).tools, client.instructions
+
+    tools, instructions = anyio.run(go)
+    shared = agent_tools.tools_for("python")
+    assert {t.name for t in tools} == set(shared)
+    for t in tools:
+        assert t.description == shared[t.name]["description"]
+        assert t.input_schema == shared[t.name]["inputSchema"]
+    assert instructions == agent_tools.instructions()
+
+
+def test_python_signatures_accept_the_shared_arguments():
+    """Each tool function takes exactly the shared schema's properties, with the same
+    required ones. (The function signature is what validates arguments in Python.)"""
+    pytest.importorskip("mcp")
+    from pokemon_automation.mcp_server import ServerConfig, create_server
+
+    server, _ = create_server(ServerConfig(fake=True))
+    for name, definition in agent_tools.tools_for("python").items():
+        derived = server._tool_manager.get_tool(name).fn_metadata.arg_model.model_json_schema()
+        schema = definition["inputSchema"]
+        assert set(derived.get("properties", {})) == set(schema.get("properties", {})), name
+        assert set(derived.get("required", [])) == set(schema.get("required", [])), name
 
 
 CASES = agent_tools.load_test_cases()

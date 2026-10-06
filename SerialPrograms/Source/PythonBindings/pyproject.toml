@@ -19,9 +19,13 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+mcp = ["mcp>=1.2"]
 ocr = ["pytesseract>=0.3.10"]  # also needs the tesseract program installed
 serial = ["pyserial>=3.5"]
-test = ["pytest>=7", "pytesseract>=0.3.10", "pillow"]
+test = ["pytest>=7", "mcp>=1.2", "pytesseract>=0.3.10", "pillow"]
+
+[project.scripts]
+pa-switch-mcp = "pokemon_automation.mcp_server:main"
 
 [tool.setuptools]
 packages = ["pokemon_automation"]

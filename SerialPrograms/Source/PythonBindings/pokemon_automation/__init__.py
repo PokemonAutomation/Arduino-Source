@@ -8,6 +8,8 @@ Layers (each built on the one below):
 - Video and OCR are pure Python: opencv-python for capture, pytesseract (optional)
   for OCR.
 - `SwitchController`, `VideoSource`, `Console`: the Python API.
+- `pokemon_automation.mcp_server`: an MCP server exposing a `Console` to AI agents.
+  Run it with `python -m pokemon_automation.mcp_server --help`.
 
 Quick start:
     from pokemon_automation import Console, list_serial_ports, list_video_devices
