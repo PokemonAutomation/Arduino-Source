@@ -1,8 +1,8 @@
 import pytest
 
-from pokemon_automation import InputStep, SwitchController
+from pokemon_automation import Console, InputStep, SwitchController, VideoSource
 from pokemon_automation import buttons as btn
-from pokemon_automation.fake import FakeController
+from pokemon_automation.fake import FakeController, FakeVideoCapture
 
 
 @pytest.fixture
@@ -52,6 +52,19 @@ def test_sequence_duration(fake):
         InputStep(left_stick="up", hold_ms=500, release_ms=0),
     ])
     assert total == 3 * 150 + 1000 + 500
+
+
+def test_console_act_returns_new_frame(fake):
+    console = Console(controller=SwitchController(backend=fake),
+                      video_source=VideoSource(backend=FakeVideoCapture(fake)))
+    before = console.observe()
+    after = console.act([{"buttons": "A"}], settle_ms=0)
+    assert after.sequence > before.sequence
+    assert after.image.shape == (180, 320, 3)
+    # The fake video changes color with every command, so the input "did something".
+    assert (after.image != before.image).any()
+    console.close()
+    assert console.controller is None and console.video is None
 
 
 def test_closed_controller_raises(fake):
