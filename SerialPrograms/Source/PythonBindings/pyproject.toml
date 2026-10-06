@@ -27,7 +27,7 @@ test = ["pytest>=7", "pytesseract>=0.3.10", "pillow"]
 packages = ["pokemon_automation"]
 
 [tool.setuptools.package-data]
-pokemon_automation = ["_pa_core*.so", "_pa_core*.pyd"]
+pokemon_automation = ["_pa_core*.so", "_pa_core*.pyd", "AgentTools.json", "AgentInputTestCases.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

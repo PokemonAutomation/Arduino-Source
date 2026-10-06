@@ -53,8 +53,15 @@ pa_apply_gui_free_target_properties(_pa_core)
 target_link_libraries(_pa_core PRIVATE CoreLib)
 
 set(PA_PYTHON_PACKAGE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Source/PythonBindings/pokemon_automation)
+# Also copy the shared MCP interface (AgentTools.json, also compiled into the app)
+# and its test cases, so an installed package doesn't need the source tree.
+set(PA_AGENT_SERVER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Source/Integrations/AgentServer)
 add_custom_command(
     TARGET _pa_core POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:_pa_core> ${PA_PYTHON_PACKAGE_DIR}/
-    COMMENT "Copying _pa_core into the pokemon_automation Python package"
+    COMMAND ${CMAKE_COMMAND} -E copy
+        ${PA_AGENT_SERVER_DIR}/AgentTools.json
+        ${PA_AGENT_SERVER_DIR}/AgentInputTestCases.json
+        ${PA_PYTHON_PACKAGE_DIR}/
+    COMMENT "Copying _pa_core and the shared agent tool definitions into the pokemon_automation Python package"
 )
