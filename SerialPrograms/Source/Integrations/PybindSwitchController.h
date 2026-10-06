@@ -42,8 +42,8 @@ public:
     // "cu.usbserial-0001" or "COM3".
     // The connection is established asynchronously; After the constructor, call
     // `wait_for_ready()` next to wait until it is ready.
-    // Log lines go to the command-line logger with tag "Pybind", which also prints
-    // them to stdout.
+    // Log lines go to the global logger (`global_logger_raw()`) with tag "Pybind",
+    // never to stdout.
     PybindSwitchProController(const std::string& port_name);
     ~PybindSwitchProController();
 
