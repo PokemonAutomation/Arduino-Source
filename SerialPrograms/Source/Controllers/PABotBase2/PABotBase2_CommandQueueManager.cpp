@@ -25,6 +25,8 @@ void CommandQueueManager::set_command_queue_size(uint8_t command_queue_size){
     }
     m_cv.notify_all();
 }
+
+
 bool CommandQueueManager::cancel(std::exception_ptr exception) noexcept{
     bool ret = Cancellable::cancel(std::move(exception));
     {
@@ -39,6 +41,7 @@ bool CommandQueueManager::cancel(std::exception_ptr exception) noexcept{
     return ret;
 }
 
+
 void CommandQueueManager::wait_for_all(Cancellable* cancellable){
     std::unique_lock<Mutex> lg(m_lock);
     while (!m_pending_commands.empty()){
@@ -46,6 +49,8 @@ void CommandQueueManager::wait_for_all(Cancellable* cancellable){
         cv_wait(cancellable, lg);
     }
 }
+
+
 void CommandQueueManager::wait_for_command_finish(Cancellable* cancellable, uint8_t id){
     std::unique_lock<Mutex> lg(m_lock);
     while (true){
@@ -81,6 +86,41 @@ CommandQueueManager::CancelResult CommandQueueManager::send_cancel() noexcept{
     m_logger.log("cancel_all_commands() - Buffer Full", COLOR_RED);
     return CancelResult::BUFFER_FULL;
 }
+
+
+bool CommandQueueManager::wait_for_cancel(WallDuration timeout){
+    WallClock deadline = current_time() + timeout;
+    {
+        std::unique_lock<Mutex> lg(m_lock);
+
+        //  If "send_cancel()" hit a full buffer, the cancel hasn't been sent
+        //  yet. Keep retrying as the device acks what's in flight.
+        while (m_pending_special == PABB2_MESSAGE_OPCODE_CQ_CANCEL &&
+            !try_push_pending_specials()
+        ){
+            WallClock now = current_time();
+            if (now >= deadline){
+                m_logger.log("wait_for_cancel(): Timed out sending the cancel.", COLOR_RED);
+                return false;
+            }
+            lg.unlock();
+            m_connection.wait_for_pending(deadline - now);
+            lg.lock();
+        }
+    }
+    m_cv.notify_all();
+
+    //  The device acks a packet once it lands in its receive buffer. Commands
+    //  are processed in order, so anything sent after this is behind the cancel.
+    WallClock now = current_time();
+    if (m_connection.wait_for_pending(now < deadline ? deadline - now : WallDuration::zero())){
+        return true;
+    }
+    m_logger.log("wait_for_cancel(): Timed out waiting for the device to ack the cancel.", COLOR_RED);
+    return false;
+}
+
+
 CommandQueueManager::CancelResult CommandQueueManager::send_replace_on_next() noexcept{
     bool success;
     {
@@ -157,6 +197,8 @@ uint8_t CommandQueueManager::send_command(Cancellable* cancellable, MessageHeade
     m_cv.notify_all();
     return command.id;
 }
+
+
 void CommandQueueManager::report_command_finished(const MessageHeader& finished_message){
     {
         std::lock_guard<Mutex> lg(m_lock);
@@ -224,6 +266,8 @@ void CommandQueueManager::on_cancellable_cancel(
     }
     m_cv.notify_all();
 }
+
+
 void CommandQueueManager::cv_wait(Cancellable* cancellable, std::unique_lock<Mutex>& lg){
     if (cancellable == nullptr){
         m_cv.wait(lg);
@@ -239,6 +283,8 @@ void CommandQueueManager::cv_wait(Cancellable* cancellable, std::unique_lock<Mut
     cancellable->remove_cancel_listener(*this);
     lg.lock();
 }
+
+
 void CommandQueueManager::throw_if_cancelled(Cancellable* cancellable){
     Cancellable::throw_if_cancelled();
     if (cancellable){

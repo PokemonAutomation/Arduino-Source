@@ -43,6 +43,12 @@ void PABotBase2_Controller::replace_on_next_command(){
     m_connection.device().command_queue().send_replace_on_next();
     m_scheduler.clear_on_next();
 }
+bool PABotBase2_Controller::cancel_all_and_wait(Milliseconds timeout){
+    cancel_all_commands();
+
+    //  Wait outside "m_state_lock" since this can take a while.
+    return m_connection.device().command_queue().wait_for_cancel(timeout);
+}
 
 
 void PABotBase2_Controller::wait_for_all(Cancellable* cancellable){

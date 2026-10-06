@@ -33,7 +33,9 @@ namespace NintendoSwitch{
 // `NintendoSwitch::DpadPosition` values (0 = up, clockwise to 7 = up-left, 8 = none).
 // Joystick coordinates are in [-1.0, 1.0] with +x = right and +y = up.
 //
-// Thread safety: all methods can be called from any thread.
+// Thread safety: all methods can be called from any thread. In particular
+// `cancel_all_and_wait()` may be called while another thread is blocked in
+// `wait_for_all_requests()`, e.g. to stop everything in an emergency.
 class PybindSwitchProController{
     PybindSwitchProController(const PybindSwitchProController&) = delete;
     void operator=(const PybindSwitchProController&) = delete;
@@ -67,6 +69,15 @@ public:
     // Block until every command queued so far has been executed by the device.
     // Returns immediately if the controller is not ready.
     void wait_for_all_requests();
+
+    // Drop every queued command that has not executed yet, return to the neutral
+    // state (no buttons pressed, sticks centered), and wait at most `timeout_millis`
+    // for the device to acknowledge that it received the cancel.
+    //
+    // Returns true if acknowledged, false on timeout or if the controller is not ready.
+    // Commands pushed from other threads while this is running may land after the
+    // cancel and are not cancelled.
+    bool cancel_all_and_wait(uint64_t timeout_millis);
 
 public:
     //  Commands. These throw InvalidConnectionStateException if the controller is not

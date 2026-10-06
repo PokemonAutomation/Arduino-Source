@@ -58,6 +58,11 @@ public:
     CancelResult send_cancel() noexcept;
     CancelResult send_replace_on_next() noexcept;
 
+    //  Call after "send_cancel()". Blocks until the device has acked the
+    //  cancel (and everything sent before it) or until the timeout.
+    //  Returns true if acked. Throws if the connection is dead.
+    bool wait_for_cancel(WallDuration timeout);
+
     uint8_t send_command(Cancellable* cancellable, MessageHeader& command);
     void report_command_finished(const MessageHeader& finished_message);
 

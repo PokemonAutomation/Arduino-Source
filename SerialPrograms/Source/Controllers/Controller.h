@@ -112,6 +112,18 @@ public:
     //  ever releasing it during the transition.
     virtual void replace_on_next_command() = 0;
 
+    //  Same as "cancel_all_commands()", but unlike the two functions above,
+    //  this one blocks until the device acks the cancel or until "timeout".
+    //
+    //  Returns true if the device has received the cancel. Commands issued
+    //  after this returns are queued behind the cancel, so the controller is
+    //  immediately usable.
+    //  Returns false on timeout or if the controller cannot confirm cancels.
+    //
+    //  Commands issued from other threads while this is running may land
+    //  after the cancel and are not cancelled.
+    virtual bool cancel_all_and_wait(Milliseconds timeout) = 0;
+
 
 public:
     //

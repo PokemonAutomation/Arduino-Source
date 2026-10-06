@@ -57,6 +57,11 @@ public:
         WallClock deadline
     ) = 0;
 
+    //  Wait until the remote has acked everything sent so far.
+    //  Returns false if this doesn't happen within the timeout.
+    //  Throws exception if connection is dead.
+    virtual bool wait_for_pending(WallDuration timeout) = 0;
+
 protected:
     void on_reliable_recv(const void* data, size_t bytes){
         m_listeners.run_method(&StreamListener::on_recv, data, bytes);
