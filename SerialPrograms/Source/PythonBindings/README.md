@@ -111,7 +111,11 @@ Conventions:
 
 ## MCP server
 
-The tools are defined in the shared `Source/Integrations/AgentServer/AgentTools.json`.
+The same MCP interface is also served by the SerialPrograms app itself (**ML → AI
+Agent Server**, see `Source/Integrations/AgentServer/README.md`), so an agent can
+drive the Switch through the app while you watch and take over with the keyboard.
+Both servers load their tools from the shared
+`Source/Integrations/AgentServer/AgentTools.json`.
 
 ```bash
 python -m pokemon_automation.mcp_server --serial /dev/cu.usbserial-0001 --video MiraBox
