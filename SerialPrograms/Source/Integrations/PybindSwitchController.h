@@ -32,6 +32,8 @@ namespace NintendoSwitch{
 // Button bitfields use `NintendoSwitch::Button` values, and d-pad positions use
 // `NintendoSwitch::DpadPosition` values (0 = up, clockwise to 7 = up-left, 8 = none).
 // Joystick coordinates are in [-1.0, 1.0] with +x = right and +y = up.
+//
+// Thread safety: all methods can be called from any thread.
 class PybindSwitchProController{
     PybindSwitchProController(const PybindSwitchProController&) = delete;
     void operator=(const PybindSwitchProController&) = delete;
@@ -57,6 +59,10 @@ public:
     // The connection status text: device name and firmware version,
     // or the error message if the connection failed.
     std::string current_status() const;
+
+    // Name of the active controller implementation, e.g. "Nintendo Switch: Pro Controller".
+    // Empty if not ready.
+    std::string controller_name() const;
 
     // Block until every command queued so far has been executed by the device.
     // Returns immediately if the controller is not ready.
