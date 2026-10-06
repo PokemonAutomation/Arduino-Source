@@ -129,6 +129,11 @@ std::string PybindSwitchProController::current_status() const{
     PybindSwitchProControllerInternal* internal = (PybindSwitchProControllerInternal*)m_internals;
     return internal->m_connection->raw_status_text();
 }
+std::string PybindSwitchProController::controller_name() const{
+    PybindSwitchProControllerInternal* internal = (PybindSwitchProControllerInternal*)m_internals;
+    ProController* controller = internal->controller_if_ready();
+    return controller == nullptr ? "" : controller->name();
+}
 
 
 void PybindSwitchProController::wait_for_all_requests(){
