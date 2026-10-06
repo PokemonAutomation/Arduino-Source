@@ -6,8 +6,8 @@
 
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
+#include "Common/Cpp/Logging/GlobalLogger.h"
 #include "Common/Cpp/Logging/TaggedLogger.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "Controllers/ControllerConnection.h"
 #include "Controllers/PABotBase2/SerialPABotBase2_Descriptor.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
@@ -25,7 +25,7 @@ namespace NintendoSwitch{
 class PybindSwitchProControllerInternal final : public ControllerConnection::StatusListener{
 public:
     PybindSwitchProControllerInternal(const std::string& name)
-        : m_logger(global_logger_command_line(), "Pybind")
+        : m_logger(global_logger_raw(), "Pybind")
         , m_descriptor(name)
         , m_connection(m_descriptor.open_connection(m_logger))
     {
