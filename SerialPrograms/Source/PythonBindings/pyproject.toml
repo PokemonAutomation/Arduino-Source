@@ -10,6 +10,7 @@ build-backend = "setuptools.build_meta"
 name = "pokemon-automation"
 version = "0.1.0"
 description = "Control a Nintendo Switch from Python with Pokemon Automation hardware."
+readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "numpy>=1.24",
