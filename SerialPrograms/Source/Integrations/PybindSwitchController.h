@@ -63,8 +63,8 @@ public:
     void wait_for_all_requests();
 
 public:
-    //  Commands. If the controller is not ready, these log an error and do nothing.
-    //  They block only if the device's command queue is full.
+    //  Commands. These throw InvalidConnectionStateException if the controller is not
+    //  ready, and block only if the device's command queue is full.
     //
     //  `delay` is how long to wait before the next command may start, `hold` how long
     //  the input is held, and `release` how long it must stay released before the same
@@ -74,7 +74,7 @@ public:
 
     // Send a wait command to the controller. Nothing is pressed during the wait time.
     // duration: wait duration, milliseconds.
-    // If the controller is not ready, these log an error and do nothing.
+    // If the controller is not ready, it throws InvalidConnectionStateException.
     // The function will block only if the device's command queue is full.
     void wait(uint64_t duration);
 
@@ -89,7 +89,7 @@ public:
     //
     // `delay = hold + release` runs commands back to back like `pbf_press_button()`;
     // `delay < hold` overlaps commands, e.g. to hold a button while moving a stick.
-    // If the controller is not ready, these log an error and do nothing.
+    // If the controller is not ready, it throws InvalidConnectionStateException.
     // The function will block only if the device's command queue is full.
     void push_button(uint64_t delay, uint64_t hold, uint64_t release, uint32_t bitfield);
     // Send a D-pad press command to the controller. It will press one or two D-pad buttons to
@@ -102,7 +102,7 @@ public:
     //
     // `delay = hold + release` runs commands back to back like `pbf_press_button()`;
     // `delay < hold` overlaps commands, e.g. to hold a button while moving a stick.
-    // If the controller is not ready, these log an error and do nothing.
+    // If the controller is not ready, it throws InvalidConnectionStateException.
     // The function will block only if the device's command queue is full.
     void push_dpad(uint64_t delay, uint64_t hold, uint64_t release, uint8_t position);
     // Send a left joystick push command to the controller.
@@ -114,7 +114,7 @@ public:
     //
     // `delay = hold + release` runs commands back to back like `pbf_press_button()`;
     // `delay < hold` overlaps commands, e.g. to hold a button while moving a stick.
-    // If the controller is not ready, these log an error and do nothing.
+    // If the controller is not ready, it throws InvalidConnectionStateException.
     // The function will block only if the device's command queue is full.
     void push_left_joystick(uint64_t delay, uint64_t hold, uint64_t release, double x, double y);
     // Send a right joystick push command to the controller.
@@ -126,7 +126,7 @@ public:
     //
     // `delay = hold + release` runs commands back to back like `pbf_press_button()`;
     // `delay < hold` overlaps commands, e.g. to hold a button while moving a stick.
-    // If the controller is not ready, these log an error and do nothing.
+    // If the controller is not ready, it throws InvalidConnectionStateException.
     // The function will block only if the device's command queue is full.
     void push_right_joystick(uint64_t delay, uint64_t hold, uint64_t release, double x, double y);
 
