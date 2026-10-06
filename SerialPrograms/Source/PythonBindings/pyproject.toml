@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+# The compiled `_pa_core` module (acts as a Switch controller) is built by CMake (see
+# README.md) and copied into pokemon_automation/. This file packages the Python side
+# for `pip install -e .`.
+
+[project]
+name = "pokemon-automation"
+version = "0.1.0"
+description = "Control a Nintendo Switch from Python with Pokemon Automation hardware."
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+serial = ["pyserial>=3.5"]
+test = ["pytest>=7"]
+
+[tool.setuptools]
+packages = ["pokemon_automation"]
+
+[tool.setuptools.package-data]
+pokemon_automation = ["_pa_core*.so", "_pa_core*.pyd"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
