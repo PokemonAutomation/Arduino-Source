@@ -4,18 +4,24 @@ build-backend = "setuptools.build_meta"
 
 # The compiled `_pa_core` module (acts as a Switch controller) is built by CMake (see
 # README.md) and copied into pokemon_automation/. This file packages the Python side
-# for `pip install -e .`.
+# for `pip install -e .`. Video and OCR use the third-party packages below.
 
 [project]
 name = "pokemon-automation"
 version = "0.1.0"
 description = "Control a Nintendo Switch from Python with Pokemon Automation hardware."
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "numpy>=1.24",
+    "opencv-python>=4.8",
+    # Video device names on macOS, in OpenCV's index order.
+    "pyobjc-framework-AVFoundation>=10; sys_platform == 'darwin'",
+]
 
 [project.optional-dependencies]
+ocr = ["pytesseract>=0.3.10"]  # also needs the tesseract program installed
 serial = ["pyserial>=3.5"]
-test = ["pytest>=7"]
+test = ["pytest>=7", "pytesseract>=0.3.10", "pillow"]
 
 [tool.setuptools]
 packages = ["pokemon_automation"]
