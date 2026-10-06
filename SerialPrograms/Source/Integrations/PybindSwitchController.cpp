@@ -127,7 +127,7 @@ bool PybindSwitchProController::is_ready() const{
 }
 std::string PybindSwitchProController::current_status() const{
     PybindSwitchProControllerInternal* internal = (PybindSwitchProControllerInternal*)m_internals;
-    return internal->m_connection->status_text();
+    return internal->m_connection->raw_status_text();
 }
 
 

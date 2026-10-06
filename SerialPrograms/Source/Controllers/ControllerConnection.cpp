@@ -34,12 +34,22 @@ std::string ControllerConnection::status_text() const{
     }
     return str;
 }
+std::string ControllerConnection::raw_status_text() const{
+    ReadSpinLock lg(m_status_text_lock);
+    std::string str = m_raw_status_line0;
+    if (!str.empty() && !m_raw_status_line1.empty()){
+        str += "\n";
+        str += m_raw_status_line1;
+    }
+    return str;
+}
 
 
 void ControllerConnection::set_status_line0(const std::string& text, Color color){
     {
         WriteSpinLock lg(m_status_text_lock);
         m_status_line0 = html_color_text(text, color);
+        m_raw_status_line0 = text;
     }
     signal_status_text_changed(status_text());
 }
@@ -47,6 +57,7 @@ void ControllerConnection::set_status_line1(const std::string& text, Color color
     {
         WriteSpinLock lg(m_status_text_lock);
         m_status_line1 = html_color_text(text, color);
+        m_raw_status_line1 = text;
     }
     signal_status_text_changed(status_text());
 }
