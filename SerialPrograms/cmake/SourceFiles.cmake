@@ -1702,6 +1702,8 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Fishing.h
     Source/VideoGames/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Overworld.cpp
     Source/VideoGames/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Overworld.h
+    Source/VideoGames/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_WildPokemonFinder.cpp
+    Source/VideoGames/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_WildPokemonFinder.h
     Source/VideoGames/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_ReadBattleLevelUp.cpp
     Source/VideoGames/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_ReadBattleLevelUp.h
     Source/VideoGames/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_ReadEncounter.cpp

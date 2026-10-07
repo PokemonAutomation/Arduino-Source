@@ -22,6 +22,7 @@
 #include "Programs/ShinyHunting/PokemonFRLG_PrizeCornerReset.h"
 #include "Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Fishing.h"
 #include "Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Overworld.h"
+#include "Programs/ShinyHunting/PokemonFRLG_WildPokemonFinder.h"
 #include "Programs/RngManipulation/PokemonFRLG_RngHelper.h"
 #include "Programs/RngManipulation/PokemonFRLG_SidHelper.h"
 #include "Programs/RngManipulation/PokemonFRLG_StarterRng.h"
@@ -71,6 +72,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_SingleSwitchProgram<LegendaryRunAway>());
     ret.emplace_back(make_SingleSwitchProgram<ShinyHuntFishing>());
     ret.emplace_back(make_SingleSwitchProgram<ShinyHuntOverworld>());
+    ret.emplace_back(make_SingleSwitchProgram<WildPokemonFinder>());
     ret.emplace_back(make_SingleSwitchProgram<PrizeCornerReset>());
 
     ret.emplace_back("---- RNG Manipulation  ----");
