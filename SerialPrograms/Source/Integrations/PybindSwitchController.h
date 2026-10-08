@@ -2,6 +2,12 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
+ *  A GUI-free Nintendo Switch controller that talks to a PABotBase2 microcontroller
+ *  over a serial port. It is part of CoreLib and uses only plain types in its
+ *  interface, so it can be bound to other languages: the `_pa_core` Python module
+ *  (Source/PythonBindings/) wraps it, and the Python package and MCP server are built
+ *  on top of that. SerialProgramsCommandLine also uses it directly to test its
+ *  functionality.
  */
 
 #ifndef PokemonAutomation_Integrations_PybindSwitchController_H
@@ -32,6 +38,10 @@ namespace NintendoSwitch{
 // Button bitfields use `NintendoSwitch::Button` values, and d-pad positions use
 // `NintendoSwitch::DpadPosition` values (0 = up, clockwise to 7 = up-left, 8 = none).
 // Joystick coordinates are in [-1.0, 1.0] with +x = right and +y = up.
+//
+// Thread safety: all methods can be called from any thread. In particular
+// `cancel_all_commands_blocking()` may be called while another thread is blocked in
+// `wait_for_all_requests()`, which is how the Python layer implements an emergency stop.
 class PybindSwitchProController{
     PybindSwitchProController(const PybindSwitchProController&) = delete;
     void operator=(const PybindSwitchProController&) = delete;
@@ -58,9 +68,28 @@ public:
     // or the error message if the connection failed.
     std::string current_status() const;
 
+    // Name of the active controller implementation, e.g. "Nintendo Switch: Pro Controller".
+    // Empty if not ready.
+    std::string controller_name() const;
+
     // Block until every command queued so far has been executed by the device.
     // Returns immediately if the controller is not ready.
     void wait_for_all_requests();
+
+    // Drop every queued command that has not executed yet, return to the neutral
+    // state (no buttons pressed, sticks centered), and wait for the device to confirm
+    // it, for at most `timeout_millis`. The controller stays usable afterwards.
+    //
+    // Confirmation (see `AbstractController::cancel_all_commands_blocking()`) works by
+    // queueing a short neutral no-op after the cancel and waiting for the device to
+    // report that the no-op finished. The serial protocol delivers messages in order,
+    // so that report means the device has processed the cancel and is holding the
+    // neutral state.
+    //
+    // Returns true if confirmed, false on timeout or if the controller is not ready.
+    // The timeout covers waiting for the device; if another thread is in the middle
+    // of issuing a command on this controller, that call is allowed to finish first.
+    bool cancel_all_commands_blocking(uint64_t timeout_millis);
 
 public:
     //  Commands. These throw InvalidConnectionStateException if the controller is not

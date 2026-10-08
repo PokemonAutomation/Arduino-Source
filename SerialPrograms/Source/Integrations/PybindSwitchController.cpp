@@ -129,6 +129,11 @@ std::string PybindSwitchProController::current_status() const{
     PybindSwitchProControllerInternal* internal = (PybindSwitchProControllerInternal*)m_internals;
     return internal->m_connection->raw_status_text();
 }
+std::string PybindSwitchProController::controller_name() const{
+    PybindSwitchProControllerInternal* internal = (PybindSwitchProControllerInternal*)m_internals;
+    ProController* controller = internal->controller_if_ready();
+    return controller == nullptr ? "" : controller->name();
+}
 
 
 void PybindSwitchProController::wait_for_all_requests(){
@@ -139,6 +144,22 @@ void PybindSwitchProController::wait_for_all_requests(){
         return;
     }
     controller->wait_for_all(nullptr);
+}
+bool PybindSwitchProController::cancel_all_commands_blocking(uint64_t timeout_millis){
+    PybindSwitchProControllerInternal* internal = (PybindSwitchProControllerInternal*)m_internals;
+    ProController* controller = internal->controller_if_ready();
+    if (controller == nullptr){
+        return false;
+    }
+    bool confirmed = controller->cancel_all_commands_blocking(Milliseconds(timeout_millis));
+    if (!confirmed){
+        internal->m_logger.log(
+            "cancel_all_commands_blocking(): device did not confirm the neutral state within " +
+            std::to_string(timeout_millis) + " ms.",
+            COLOR_RED
+        );
+    }
+    return confirmed;
 }
 void PybindSwitchProController::wait(uint64_t duration){
     PybindSwitchProControllerInternal* internal = (PybindSwitchProControllerInternal*)m_internals;
