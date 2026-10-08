@@ -5,6 +5,7 @@
  */
 
 #include "Kernels_Tests.h"
+#include "AudioResampling/Kernels_AudioResampling_Tests.h"
 #include "BinaryMatrix/Kernels_BinaryMatrix_Tests.h"
 #include "ImageFilters/Kernels_ImageFilter_Tests.h"
 #include "ImageScaleBrightness/Kernels_ImageScaleBrightness_Tests.h"
@@ -16,6 +17,7 @@ namespace Kernels{
 
 
 void add_tests(UnitTestDatabase& database){
+    add_tests_AudioResampling(database);
     add_tests_BinaryMatrix(database);
     add_tests_ImageFilters(database);
     add_tests_ImageScaleBrightness(database);

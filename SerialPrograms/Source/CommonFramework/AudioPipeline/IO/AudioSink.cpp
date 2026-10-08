@@ -11,6 +11,7 @@ using NativeAudioSink = QAudioSink;
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/LifetimeSanitizer.h"
+#include "Kernels/AudioResampling/Kernels_AudioResampling.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "AudioSink.h"
 
@@ -56,18 +57,26 @@ const char* audio_error_to_str(QAudio::Error error){
 
 
 
-
-class AudioOutputDevice : public AudioFloatToStream, private ObjectStreamListener{
+// Receive float frames in the input (capture card) layout, convert them to the output
+// device's channel count and sample rate if needed (using
+// `Kernels::AudioResampling::AudioFormatConverter`), convert to the device's sample
+// format and write them to the Qt audio sink.
+class AudioOutputDevice : public AudioFloatStreamListener, private ObjectStreamListener{
 public:
     AudioOutputDevice(
         Logger& logger,
         const NativeAudioInfo& device, const QAudioFormat& format,
-        AudioSampleFormat sample_format, size_t samples_per_frame,
+        AudioSampleFormat sample_format,
+        size_t input_channels, size_t input_steps_per_frame,
+        std::unique_ptr<Kernels::AudioResampling::AudioFormatConverter> converter,
         double volume
     )
-        : AudioFloatToStream(sample_format, samples_per_frame)
-        , ObjectStreamListener(samples_per_frame * sample_size(sample_format))
+        : AudioFloatStreamListener(input_channels * input_steps_per_frame)
+        , ObjectStreamListener((size_t)format.channelCount() * sample_size(sample_format))
         , m_logger(logger)
+        , m_input_steps_per_frame(input_steps_per_frame)
+        , m_converter(std::move(converter))
+        , m_to_stream(sample_format, (size_t)format.channelCount())
         , m_sink(device, format)
         , m_io_device(nullptr)
     {
@@ -98,10 +107,10 @@ public:
             );
         }
         m_sink.setVolume(convertAudioVolumeFromSlider(volume));
-        add_listener(*this);
+        m_to_stream.add_listener(*this);
     }
     ~AudioOutputDevice(){
-        remove_listener(*this);
+        m_to_stream.remove_listener(*this);
     }
 
     void set_volume(double volume){
@@ -111,6 +120,21 @@ public:
         m_sink.setVolume(absolute);
     }
 
+    virtual void on_samples(const float* data, size_t frames) override{
+        auto scope_check = m_sanitizer.check_scope();
+        //  The input frames are contiguous, so a frame that groups several time steps
+        //  (MONO_96000) can be treated as that many single-step frames.
+        size_t steps = frames * m_input_steps_per_frame;
+        if (!m_converter){
+            m_to_stream.on_samples(data, steps);
+            return;
+        }
+        size_t output_frames;
+        const float* output = m_converter->convert(data, steps, output_frames);
+        m_to_stream.on_samples(output, output_frames);
+    }
+
+private:
     virtual void on_objects(const void* data, size_t objects) override{
         auto scope_check = m_sanitizer.check_scope();
         if (m_io_device != nullptr){
@@ -120,6 +144,15 @@ public:
 
 private:
     Logger& m_logger;
+
+    //  Number of time steps in each input frame. e.g. MONO_96000 groups
+    //  2 mono samples into each frame.
+    size_t m_input_steps_per_frame;
+
+    //  Null if the device plays the input format directly.
+    std::unique_ptr<Kernels::AudioResampling::AudioFormatConverter> m_converter;
+
+    AudioFloatToStream m_to_stream;
     NativeAudioSink m_sink;
     QIODevice* m_io_device;
     LifetimeSanitizer m_sanitizer;
@@ -134,30 +167,6 @@ AudioSink::AudioSink(
     AudioChannelFormat format,
     double volume
 ){
-    NativeAudioInfo native_info = device.native_info();
-    QAudioFormat native_format = native_info.preferredFormat();
-    QAudioFormat target_format = native_format;
-
-    set_format(target_format, format);
-
-    AudioSampleFormat sample_format = get_sample_format(target_format);
-    if (sample_format == AudioSampleFormat::INVALID){
-        sample_format = AudioSampleFormat::FLOAT32;
-        set_sample_format_to_float(target_format);
-    }
-
-    logger.log("AudioOutputDevice(): Target: " + dump_audio_format(target_format));
-    logger.log("AudioOutputDevice(): Native: " + dump_audio_format(native_format));
-    if (!native_info.isFormatSupported(target_format)){
-        logger.log(
-            "Audio output device does not support the requested audio format. Audio output is disabled. "
-            "Try setting the output device to the same sample rate and channel count as the input device "
-            "in your OS sound settings.",
-            COLOR_RED
-        );
-        return;
-    }
-
     switch (format){
     case AudioChannelFormat::MONO_48000:
         m_sample_rate = 48000;
@@ -195,10 +204,70 @@ AudioSink::AudioSink(
         );
     }
 
+    NativeAudioInfo native_info = device.native_info();
+    QAudioFormat native_format = native_info.preferredFormat();
+    logger.log("AudioOutputDevice(): Native: " + dump_audio_format(native_format));
+
+    //  First try to play the input format as-is: the device's preferred sample format
+    //  with the input's channel count and sample rate.
+    QAudioFormat target_format = native_format;
+    set_format(target_format, format);
+    AudioSampleFormat sample_format = get_sample_format(target_format);
+    if (sample_format == AudioSampleFormat::INVALID){
+        sample_format = AudioSampleFormat::FLOAT32;
+        set_sample_format_to_float(target_format);
+    }
+    logger.log("AudioOutputDevice(): Target: " + dump_audio_format(target_format));
+
+    std::unique_ptr<Kernels::AudioResampling::AudioFormatConverter> converter;
+    if (!native_info.isFormatSupported(target_format)){
+        //  The device cannot play the input format. This is common with headphones,
+        //  e.g. Bluetooth headphones that only accept 44100Hz, or 16000Hz mono when in
+        //  hands-free mode. Fall back to the device's preferred format and convert the
+        //  channel count and sample rate ourselves.
+        target_format = native_format;
+        sample_format = get_sample_format(target_format);
+        if (sample_format == AudioSampleFormat::INVALID){
+            sample_format = AudioSampleFormat::FLOAT32;
+            set_sample_format_to_float(target_format);
+        }
+        if (target_format.channelCount() <= 0 || target_format.sampleRate() <= 0 ||
+            !native_info.isFormatSupported(target_format)
+        ){
+            logger.log(
+                "Audio output device does not support the requested audio format or its own preferred format. "
+                "Audio output is disabled. Target: " + dump_audio_format(target_format),
+                COLOR_RED
+            );
+            return;
+        }
+        if (!Kernels::AudioResampling::AudioFormatConverter::is_supported(m_sample_rate, target_format.sampleRate())){
+            logger.log(
+                "Unable to convert audio from " + std::to_string(m_sample_rate) + "Hz to " +
+                std::to_string(target_format.sampleRate()) + "Hz. Audio output is disabled.",
+                COLOR_RED
+            );
+            return;
+        }
+        logger.log(
+            "AudioOutputDevice(): Device does not support the input format. Converting from " +
+            std::to_string(m_channels) + " channel(s) at " + std::to_string(m_sample_rate) + "Hz to " +
+            std::to_string(target_format.channelCount()) + " channel(s) at " +
+            std::to_string(target_format.sampleRate()) + "Hz.",
+            COLOR_ORANGE
+        );
+        converter = std::make_unique<Kernels::AudioResampling::AudioFormatConverter>(
+            m_channels, m_sample_rate,
+            target_format.channelCount(), target_format.sampleRate()
+        );
+    }
+
     m_writer = std::make_unique<AudioOutputDevice>(
         logger,
         native_info, target_format,
-        sample_format, m_channels * m_multiplier,
+        sample_format,
+        m_channels, m_multiplier,
+        std::move(converter),
         volume
     );
 }
