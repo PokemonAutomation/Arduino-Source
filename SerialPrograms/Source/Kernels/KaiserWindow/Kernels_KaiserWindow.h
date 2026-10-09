@@ -7,12 +7,14 @@
 #ifndef PokemonAutomation_Kernels_KaiserWindow_H
 #define PokemonAutomation_Kernels_KaiserWindow_H
 
+#include "Common/Cpp/Containers/AlignedVector.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
 namespace KaiserWindow{
 
 
+double bessel_i0(double x);
 void make_kaiser_window(float* weights, size_t window, double beta = 9.0);
 
 
