@@ -138,6 +138,8 @@ void add_tests_BoxGenderDetector(UnitTestDatabase& database){
     database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/vulpix_Shiny.png", Pokemon::StatsHuntGenderFilter::Female);
     database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/wartortle_Regular.png", Pokemon::StatsHuntGenderFilter::Male);
     database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/wurmple_Regular.png", Pokemon::StatsHuntGenderFilter::Female);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", Pokemon::StatsHuntGenderFilter::Female);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", Pokemon::StatsHuntGenderFilter::Female);
 }
 
 

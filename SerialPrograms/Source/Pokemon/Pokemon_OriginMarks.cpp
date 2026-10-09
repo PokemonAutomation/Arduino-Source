@@ -21,7 +21,8 @@ const EnumStringMap<OriginMark>& ORIGIN_MARK_SLUGS(){
         {OriginMark::LA, "la"},
         {OriginMark::SV, "sv"},
         {OriginMark::LZA, "lza"},
-        {OriginMark::NONE, "none"}
+        {OriginMark::NONE, "none"},
+        {OriginMark::GAMEBOYADVANCE, "gameboyadvance"},
     };
     return database;
 }

@@ -199,6 +199,8 @@ void add_tests_BallReader(UnitTestDatabase& database){
     database.add<Test_BallReader>("PokemonHome/SummaryScreen/vulpix_Shiny.png", "luxury-ball");
     database.add<Test_BallReader>("PokemonHome/SummaryScreen/wartortle_Regular.png", "ultra-ball");
     database.add<Test_BallReader>("PokemonHome/SummaryScreen/wurmple_Regular.png", "premier-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", "poke-ball");
 }
 
 

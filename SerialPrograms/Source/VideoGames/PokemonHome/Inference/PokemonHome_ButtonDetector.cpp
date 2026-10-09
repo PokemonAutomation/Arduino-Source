@@ -247,6 +247,8 @@ void add_tests_ButtonDetector(UnitTestDatabase& database){
     database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/vulpix_Shiny.png", ButtonType::ButtonB);
     database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/wartortle_Regular.png", ButtonType::ButtonB);
     database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/wurmple_Regular.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", ButtonType::ButtonB);
 }
 
 }

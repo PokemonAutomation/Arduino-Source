@@ -99,6 +99,8 @@ void add_tests_AlphaDetector(UnitTestDatabase& database){
     database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/vulpix_Shiny.png", false);
     database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/wartortle_Regular.png", false);
     database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/wurmple_Regular.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", false);
 }
 
 

@@ -99,6 +99,8 @@ void add_tests_ShinyDetector(UnitTestDatabase& database){
     database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/vulpix_Shiny.png", true);
     database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/wartortle_Regular.png", false);
     database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/wurmple_Regular.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", false);
 }
 
 
