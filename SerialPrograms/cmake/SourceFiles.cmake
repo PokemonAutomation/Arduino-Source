@@ -1001,6 +1001,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/Algorithm/Kernels_Algorithm_DisjointSet.cpp
     Source/Kernels/Algorithm/Kernels_Algorithm_DisjointSet.h
     Source/Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_Default.h
+    Source/Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_SSE2.h
+    Source/Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_FMA3.h
     Source/Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_AVX512.h
     Source/Kernels/AudioResampler/Kernels_AudioResampler_WeightTable.cpp
     Source/Kernels/AudioResampler/Kernels_AudioResampler_WeightTable.h

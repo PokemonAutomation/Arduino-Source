@@ -27,7 +27,8 @@ WeightTable::WeightTable(
     size_t out_sample_rate,
     uint32_t taps,
     double beta,
-    size_t min_samples
+    size_t min_samples,
+    size_t min_taps
 )
     : m_taps(taps)
 {
@@ -69,15 +70,16 @@ WeightTable::WeightTable(
     m_tap_stride = Kernels::align_int_up<CACHE_WAY>(m_tap_stride);
 
     //  Extra padding to break superalignment.
-    m_tap_stride += 4096 / taps;
+    size_t taps_in_table = std::max<size_t>(taps, min_taps);
+    m_tap_stride += 4096 / taps_in_table;
 
     //  Round up to min alignment.
     m_tap_stride = Kernels::align_int_up<PA_ALIGNMENT>(m_tap_stride);
     m_tap_stride /= sizeof(float);
 
 
-    m_data = AlignedVector<float>(taps * m_tap_stride);
-    memset(m_data.data(), 0, taps * m_tap_stride * sizeof(float));
+    m_data = AlignedVector<float>(taps_in_table * m_tap_stride);
+    memset(m_data.data(), 0, taps_in_table * m_tap_stride * sizeof(float));
 //    cout << "items = " << taps * m_tap_stride << endl;
 
     for (uint32_t tap_index = 0; tap_index < taps; tap_index++){

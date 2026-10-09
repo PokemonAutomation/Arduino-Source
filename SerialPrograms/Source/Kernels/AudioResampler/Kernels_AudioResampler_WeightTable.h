@@ -22,7 +22,12 @@ public:
         size_t out_sample_rate,
         uint32_t taps,
         double beta,
-        size_t min_samples
+        //  Extend the table to at least this many samples even if it goes
+        //  beyond the period. Block kernels may overshoot the period.
+        size_t min_samples,
+        //  Extend the tap count to this many taps with zero padding.
+        //  Block kernels may overshoot the tap count.
+        size_t min_taps
     );
 
     size_t taps() const{
@@ -36,6 +41,9 @@ public:
     }
     const float* tap_start(size_t tap_index) const{
         return m_data.data() + tap_index * m_tap_stride;
+    }
+    size_t tap_stride() const{
+        return m_tap_stride;
     }
 
 
