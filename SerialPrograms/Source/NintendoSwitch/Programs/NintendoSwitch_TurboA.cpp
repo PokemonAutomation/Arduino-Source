@@ -30,7 +30,20 @@ TurboA_Descriptor::TurboA_Descriptor()
 
 
 TurboA::TurboA()
-    : TIME_LIMIT(
+    : MASH_SPEED(
+        "<b>Mash Speed:</b><br>"
+        "Each A press is a separate command sent to the microcontroller over the serial port. "
+        "If your controller connection drops during long runs (e.g. the serial adapter shares "
+        "a USB hub with your capture card), a slower speed sends less serial traffic.",
+        {
+            {MashSpeed::Fast,       "fast",     "Fast (~16 presses/s)"},
+            {MashSpeed::Reduced,    "reduced",  "Reduced (5 presses/s)"},
+            {MashSpeed::Minimal,    "minimal",  "Minimal (2 presses/s)"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        MashSpeed::Fast
+    )
+    , TIME_LIMIT(
         "<b>Time Limit:</b><br>Stop mashing A after this amount of time. Set to 0 for no time limit.",
         LockMode::LOCK_WHILE_RUNNING,
         "0 s"
@@ -38,9 +51,26 @@ TurboA::TurboA()
     , GO_HOME_WHEN_DONE(false)
 {
     PA_ADD_OPTION(START_LOCATION);
+    PA_ADD_OPTION(MASH_SPEED);
     PA_ADD_OPTION(TIME_LIMIT);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
 }
+
+void TurboA::mash_A(ProControllerContext& context, Milliseconds duration) const{
+    switch (MASH_SPEED){
+    case MashSpeed::Fast:
+        ssf_mash1_button(context, BUTTON_A, duration); // 40ms hold + 24ms release
+        return;
+    case MashSpeed::Reduced:
+        //  Arguments after BUTTON_A: delay until next press, hold, release.
+        context->issue_mash_button(&context, duration, BUTTON_A, 200ms, 80ms, 120ms);
+        return;
+    case MashSpeed::Minimal:
+        context->issue_mash_button(&context, duration, BUTTON_A, 500ms, 100ms, 400ms);
+        return;
+    }
+}
+
 void TurboA::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
@@ -56,7 +86,7 @@ void TurboA::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     const uint64_t total_ms = time_limit.count();
     if (total_ms == 0){
         while (true){
-            ssf_mash1_button(context, BUTTON_A, 10000ms);
+            mash_A(context, 10000ms);
         }
         // will never return
     }
@@ -65,10 +95,10 @@ void TurboA::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     const uint64_t num_iters = total_ms / 1000;
     const uint64_t remaining_ms = total_ms % 1000;
     for (uint64_t i = 0; i < num_iters; i++){
-        ssf_mash1_button(context, BUTTON_A, 1000ms);
+        mash_A(context, 1000ms);
     }
     if (remaining_ms > 0){
-        ssf_mash1_button(context, BUTTON_A, Milliseconds(remaining_ms));
+        mash_A(context, Milliseconds(remaining_ms));
     }
     context.wait_for_all_requests();
     GO_HOME_WHEN_DONE.run_end_of_program(context);
