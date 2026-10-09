@@ -158,6 +158,8 @@ void add_tests_GigantamaxDetector(UnitTestDatabase& database){
     database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/vulpix_Shiny.png", false);
     database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/wartortle_Regular.png", false);
     database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/wurmple_Regular.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", false);
 }
 
 

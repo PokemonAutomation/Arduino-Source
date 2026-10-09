@@ -375,7 +375,7 @@ void add_tests_SummaryReader(UnitTestDatabase& database){
     database.add<Test_SummaryReader_Numbers>("PokemonHome/SummaryScreen/rowlet_ShinyAlpha.png", 722, 764041, 31);
     database.add<Test_SummaryReader_Numbers>("PokemonHome/SummaryScreen/scovillain_Regular.png", 952, 493124, 41);
     database.add<Test_SummaryReader_Numbers>("PokemonHome/SummaryScreen/slitherWing_Shiny.png", 988, 402737, 100);
-    //database.add<Test_SummaryReader_Numbers>("PokemonHome/SummaryScreen/squirtle_Shiny.png", 7, 700052, 1);
+    database.add<Test_SummaryReader_Numbers>("PokemonHome/SummaryScreen/squirtle_Shiny.png", 7, 700052, 1);
     database.add<Test_SummaryReader_Numbers>("PokemonHome/SummaryScreen/tapuLele_Shiny.png", 786, 181130, 62);
     database.add<Test_SummaryReader_Numbers>("PokemonHome/SummaryScreen/tatsugiri_Regular.png", 978, 493124, 52);
     database.add<Test_SummaryReader_Numbers>("PokemonHome/SummaryScreen/teddiursa_Regular.png", 216, 333685, 29);
@@ -384,6 +384,8 @@ void add_tests_SummaryReader(UnitTestDatabase& database){
     database.add<Test_SummaryReader_Numbers>("PokemonHome/SummaryScreen/vulpix_Shiny.png", 37, 225962, 14);
     database.add<Test_SummaryReader_Numbers>("PokemonHome/SummaryScreen/wartortle_Regular.png", 8, 379916, 15);
     database.add<Test_SummaryReader_Numbers>("PokemonHome/SummaryScreen/wurmple_Regular.png", 265, 843926, 1);
+    database.add<Test_SummaryReader_Numbers>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", 14, 40419, 8);
+    database.add<Test_SummaryReader_Numbers>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", 14, 40419, 8);
     //Text
     database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/annihilape_Regular.png", "Hardy", "Inner Focus", Language::English);
     database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/bidoof_Regular.png", "Lonely", "Simple", Language::English);
@@ -427,6 +429,8 @@ void add_tests_SummaryReader(UnitTestDatabase& database){
     database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/vulpix_Shiny.png", "Jolly", "Flash Fire", Language::German);
     database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/wartortle_Regular.png", "Brave", "Torrent", Language::German);
     database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/wurmple_Regular.png", "Sassy", "Shield Dust", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", "Gentle", "Shed Skin", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", "Gentle", "Shed Skin", Language::English);
     //OT Name
     database.add<Test_SummaryReader_OtName>("PokemonHome/SummaryScreen/annihilape_Regular.png", "da1t0n", Language::English);
     database.add<Test_SummaryReader_OtName>("PokemonHome/SummaryScreen/bidoof_Regular.png", "h1karu", Language::English);
@@ -470,6 +474,8 @@ void add_tests_SummaryReader(UnitTestDatabase& database){
     database.add<Test_SummaryReader_OtName>("PokemonHome/SummaryScreen/vulpix_Shiny.png", "m00n", Language::English);
     database.add<Test_SummaryReader_OtName>("PokemonHome/SummaryScreen/wartortle_Regular.png", "ru", Language::German);
     database.add<Test_SummaryReader_OtName>("PokemonHome/SummaryScreen/wurmple_Regular.png", "r0n", Language::English);
+    database.add<Test_SummaryReader_OtName>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", "da1t0n", Language::English);
+    database.add<Test_SummaryReader_OtName>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", "da1t0n", Language::English);
     // Language of Origin
     database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/annihilape_Regular.png", "ENG");
     database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/bidoof_Regular.png", "ENG");
@@ -513,6 +519,8 @@ void add_tests_SummaryReader(UnitTestDatabase& database){
     database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/vulpix_Shiny.png", "ENG");
     database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/wartortle_Regular.png", "DEU");
     database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/wurmple_Regular.png", "FRA");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", "ENG");
 }
     
 

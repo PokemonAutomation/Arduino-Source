@@ -368,6 +368,8 @@ void add_tests_TeraTypeReader(UnitTestDatabase& database){
     database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/vulpix_Shiny.png", PokemonTeraType::NONE);
     database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/wartortle_Regular.png", PokemonTeraType::NONE);
     database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/wurmple_Regular.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", PokemonTeraType::NONE);
 }
 
 }

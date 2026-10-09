@@ -200,6 +200,8 @@ void add_tests_SelectionArrowDetector(UnitTestDatabase& database){
     database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/vulpix_Shiny.png", std::nullopt);
     database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/wartortle_Regular.png", std::nullopt);
     database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/wurmple_Regular.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", std::nullopt);
 }
 
 }
