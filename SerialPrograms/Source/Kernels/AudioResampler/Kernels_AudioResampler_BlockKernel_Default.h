@@ -15,7 +15,7 @@ namespace AudioResampler{
 
 
 
-inline void run_bidirectional_block8_Default(
+inline void run_block8_Default(
     const WeightTable& table,
     size_t in_index, const float* in_samples,
     size_t out_index, float* out_samples

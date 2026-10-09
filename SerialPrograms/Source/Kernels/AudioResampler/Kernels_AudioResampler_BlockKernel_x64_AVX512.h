@@ -16,7 +16,8 @@ namespace AudioResampler{
 
 
 
-inline void run_upsample_block128_x64_AVX512(
+template <int input_loads>
+inline void run_block128_x64_AVX512(
     const WeightTable& table,
     size_t in_index, const float* in_samples,
     size_t out_index, float* out_samples
@@ -74,14 +75,29 @@ inline void run_upsample_block128_x64_AVX512(
     do{
         const float* tap_weights = table.tap_start(tap) + out_index;
 
-        __m512 i0 = _mm512_permutexvar_ps(shuffle0, _mm512_loadu_ps(in0 + tap));
-        __m512 i1 = _mm512_permutexvar_ps(shuffle1, _mm512_loadu_ps(in1 + tap));
-        __m512 i2 = _mm512_permutexvar_ps(shuffle2, _mm512_loadu_ps(in2 + tap));
-        __m512 i3 = _mm512_permutexvar_ps(shuffle3, _mm512_loadu_ps(in3 + tap));
-        __m512 i4 = _mm512_permutexvar_ps(shuffle4, _mm512_loadu_ps(in4 + tap));
-        __m512 i5 = _mm512_permutexvar_ps(shuffle5, _mm512_loadu_ps(in5 + tap));
-        __m512 i6 = _mm512_permutexvar_ps(shuffle6, _mm512_loadu_ps(in6 + tap));
-        __m512 i7 = _mm512_permutexvar_ps(shuffle7, _mm512_loadu_ps(in7 + tap));
+        __m512 i0, i1, i2, i3, i4, i5, i6, i7;
+
+        if constexpr (input_loads == 1){
+            i0 = _mm512_permutexvar_ps(shuffle0, _mm512_loadu_ps(in0 + tap));
+            i1 = _mm512_permutexvar_ps(shuffle1, _mm512_loadu_ps(in1 + tap));
+            i2 = _mm512_permutexvar_ps(shuffle2, _mm512_loadu_ps(in2 + tap));
+            i3 = _mm512_permutexvar_ps(shuffle3, _mm512_loadu_ps(in3 + tap));
+            i4 = _mm512_permutexvar_ps(shuffle4, _mm512_loadu_ps(in4 + tap));
+            i5 = _mm512_permutexvar_ps(shuffle5, _mm512_loadu_ps(in5 + tap));
+            i6 = _mm512_permutexvar_ps(shuffle6, _mm512_loadu_ps(in6 + tap));
+            i7 = _mm512_permutexvar_ps(shuffle7, _mm512_loadu_ps(in7 + tap));
+        }else if constexpr (input_loads == 2){
+            i0 = _mm512_permutex2var_ps(_mm512_loadu_ps(in0 + tap + 0), shuffle0, _mm512_loadu_ps(in0 + tap + 16));
+            i1 = _mm512_permutex2var_ps(_mm512_loadu_ps(in1 + tap + 0), shuffle1, _mm512_loadu_ps(in1 + tap + 16));
+            i2 = _mm512_permutex2var_ps(_mm512_loadu_ps(in2 + tap + 0), shuffle2, _mm512_loadu_ps(in2 + tap + 16));
+            i3 = _mm512_permutex2var_ps(_mm512_loadu_ps(in3 + tap + 0), shuffle3, _mm512_loadu_ps(in3 + tap + 16));
+            i4 = _mm512_permutex2var_ps(_mm512_loadu_ps(in4 + tap + 0), shuffle4, _mm512_loadu_ps(in4 + tap + 16));
+            i5 = _mm512_permutex2var_ps(_mm512_loadu_ps(in5 + tap + 0), shuffle5, _mm512_loadu_ps(in5 + tap + 16));
+            i6 = _mm512_permutex2var_ps(_mm512_loadu_ps(in6 + tap + 0), shuffle6, _mm512_loadu_ps(in6 + tap + 16));
+            i7 = _mm512_permutex2var_ps(_mm512_loadu_ps(in7 + tap + 0), shuffle7, _mm512_loadu_ps(in7 + tap + 16));
+        }else{
+            static_assert(false);
+        }
 
         r0 = _mm512_fmadd_ps(i0, _mm512_loadu_ps(tap_weights + 16*0), r0);
         r1 = _mm512_fmadd_ps(i1, _mm512_loadu_ps(tap_weights + 16*1), r1);
