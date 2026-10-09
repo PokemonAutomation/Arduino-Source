@@ -25,6 +25,7 @@ enum class OriginMark{
     SV,
     LZA,
     NONE,
+    GAMEBOYADVANCE,
 };
 const EnumStringMap<OriginMark>& ORIGIN_MARK_SLUGS();
 

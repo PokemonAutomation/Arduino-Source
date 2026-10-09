@@ -208,6 +208,21 @@ const MarkIconMatcher& MarkIcon_Lza(){
     return ret;
 }
 
+const MarkIconMatcher& MarkIcon_GameBoyAdvance(){
+    static MarkIconMatcher ret(
+        "PokemonHome/OriginMarks/gba.png",
+        "gameboyadvance",
+        Color(0xff61645b), Color(0xff646664),
+        10,
+        60.0,
+        {
+            {0xff61645b, 0xff646664},
+            {0xff424c3c, 0xffb7c6a9}
+        }
+    );
+    return ret;
+}
+
 const std::vector<const MarkIconMatcher*>& ALL_ORIGIN_MARK_MATCHERS(){
     static const std::vector<const MarkIconMatcher*> matchers = {
         &MarkIcon_Kalos(),
@@ -220,6 +235,7 @@ const std::vector<const MarkIconMatcher*>& ALL_ORIGIN_MARK_MATCHERS(){
         &MarkIcon_La(),
         &MarkIcon_Sv(),
         &MarkIcon_Lza(),
+        &MarkIcon_GameBoyAdvance(),
     };
     return matchers;
 }
@@ -246,6 +262,8 @@ const MarkIconMatcher& get_mark_icon_matcher(OriginMark mark){
         return MarkIcon_Sv();
     case OriginMark::LZA:
         return MarkIcon_Lza();
+    case OriginMark::GAMEBOYADVANCE:
+        return MarkIcon_GameBoyAdvance();
     default:
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid origin mark: " + std::to_string((int)mark));
     }
@@ -342,7 +360,6 @@ private:
     OriginMark m_expected;
 };
 
-//TODO: Missing multiple positive test cases for TeraTypeReader.
 void add_tests_OriginMarkReader(UnitTestDatabase& database){
     database.add<Test_OriginMarkReader>("PokemonHome/BoxView/BoxView-1.png", OriginMark::NONE);
     database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/annihilape_Regular.png", OriginMark::SV);
@@ -387,6 +404,8 @@ void add_tests_OriginMarkReader(UnitTestDatabase& database){
     database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/vulpix_Shiny.png", OriginMark::GALAR);
     database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/wartortle_Regular.png", OriginMark::GO);
     database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/wurmple_Regular.png", OriginMark::BDSP);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", OriginMark::GAMEBOYADVANCE);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", OriginMark::GAMEBOYADVANCE);
 }
 
 
