@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonFRLG_BattleSelectionArrowDetector_H
 #define PokemonAutomation_PokemonFRLG_BattleSelectionArrowDetector_H
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/VisualDetector.h"
 
@@ -32,12 +33,22 @@ enum class SafariBattleMenuOption{
     RUN,
 };
 
+// The four moves in the FIGHT move list, in the same row-major order.
+const int BATTLE_MOVE_OPTION_COUNT = 4;
+enum class BattleMoveOption{
+    MOVE_1,     //  top left
+    MOVE_2,     //  top right
+    MOVE_3,     //  bottom left
+    MOVE_4,     //  bottom right
+};
+
 enum class BattleConfirmationOption{
     YES,
     NO,
 };
 
 const ImageFloatBox BATTLE_MENU_ARROW_BOX(0.525, 0.741, 0.273, 0.212);
+const ImageFloatBox BATTLE_MOVE_ARROW_BOX(0.025, 0.741, 0.373, 0.212);
 
 class BattleSelectionArrowDetector : public StaticScreenDetector{
 public:
@@ -58,6 +69,11 @@ public:
     );
     BattleSelectionArrowDetector(
         Color color,
+        VideoOverlay* overlay,
+        BattleMoveOption option
+    );
+    BattleSelectionArrowDetector(
+        Color color,
         VideoOverlay* overlay
     );
     BattleSelectionArrowDetector(
@@ -68,6 +84,7 @@ public:
 
     static ImageFloatBox box_for_option(BattleMenuOption option);
     static ImageFloatBox box_for_option(SafariBattleMenuOption option);
+    static ImageFloatBox box_for_option(BattleMoveOption option);
     static ImageFloatBox box_for_option(BattleConfirmationOption option);
 
     const ImageFloatBox& last_detected() const { return m_last_detected; }
@@ -116,6 +133,14 @@ public:
     BattleSelectionArrowWatcher(
         Color color,
         VideoOverlay* overlay,
+        BattleMoveOption option,
+        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
+    )
+        : DetectorToFinder("BattleSelectionArrowWatcher", hold_duration, color, overlay, box_for_option(option))
+    {}
+    BattleSelectionArrowWatcher(
+        Color color,
+        VideoOverlay* overlay,
         BattleConfirmationOption option,
         std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
     )
@@ -129,6 +154,9 @@ public:
         : DetectorToFinder("BattleSelectionArrowWatcher", hold_duration, color, overlay, BATTLE_MENU_ARROW_BOX)
     {}
 };
+
+
+void add_tests_BattleMoveSelectionArrow(UnitTestDatabase& database);
 
 
 }

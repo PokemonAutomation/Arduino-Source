@@ -12,8 +12,10 @@
  *       in Pallet Town, ready for the next loop.
  *
  *  Battles: every opponent is one-hit KO'd by a fixed move (see the move
- *  tables below). The opponents' AI sends out their Pokemon in a fixed
- *  order for a given attacker, so the move is picked from that order.
+ *  tables below). Each turn the opponent's species is read from the screen
+ *  and the move for it is used, so an opponent that survives a low damage
+ *  roll is simply attacked again. If the name can't be read, the move is
+ *  picked from the opponents' known send-out order instead.
  *
  */
 
@@ -21,19 +23,24 @@
 #include <array>
 #include <cmath>
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
 #include "VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "VideoGames/PokemonFRLG/Inference/Map/PokemonFRLG_PokemonLeagueDetectors.h"
+#include "VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_PartyMenuDetector.h"
 #include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattlePokemonDetector.h"
+#include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.h"
 #include "VideoGames/PokemonFRLG/Programs/PokemonFRLG_BattleMenuNavigation.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_EliteFourFarmer.h"
@@ -59,17 +66,20 @@ struct EliteFourFarmer_Descriptor::Stats : public StatsTracker{
     Stats()
         : wins(m_stats["Wins"])
         , battles(m_stats["Battles Won"])
+        , losses(m_stats["Losses"])
         , resets(m_stats["Resets"])
         , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Wins");
         m_display_order.emplace_back("Battles Won");
+        m_display_order.emplace_back("Losses", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Resets", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
 
     std::atomic<uint64_t>& wins;
     std::atomic<uint64_t>& battles;
+    std::atomic<uint64_t>& losses;
     std::atomic<uint64_t>& resets;
     std::atomic<uint64_t>& errors;
 };
@@ -81,6 +91,20 @@ std::unique_ptr<StatsTracker> EliteFourFarmer_Descriptor::make_stats() const{
 
 EliteFourFarmer::EliteFourFarmer()
     : STOP_AFTER_CURRENT("Win")
+    , LANGUAGE(
+        "<b>Game Language:</b><br>"
+        "Used to read the opposing Pokemon's name.",
+        {
+            Language::English,
+            Language::Japanese,
+            Language::Spanish,
+            Language::French,
+            Language::German,
+            Language::Italian,
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        true
+    )
     , ATTACKER(
         "<b>Attacker:</b><br>"
         "The Pokemon in slot 1 that battles. It must be level 100 with 252 EVs in Sp. Atk and Speed, "
@@ -119,6 +143,7 @@ EliteFourFarmer::EliteFourFarmer()
     })
 {
     PA_ADD_OPTION(STOP_AFTER_CURRENT);
+    PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(ATTACKER);
     PA_ADD_OPTION(STARTER);
     PA_ADD_OPTION(NUM_WINS);
@@ -660,23 +685,29 @@ void wait_for_hall_of_fame_save(ConsoleHandle& console, ProControllerContext& co
 }
 
 //  From the battle menu, choose FIGHT and then the move in the given slot.
-//  Pressing left and up first always puts the move cursor on the top-left
-//  slot, whatever slot was used last turn, so no cursor tracking is needed.
+//  The arrow is read from the screen, so only the presses needed to reach
+//  the move are made (none if the arrow is already on it).
 void use_move_in_slot(ConsoleHandle& console, ProControllerContext& context, int slot){
     if (!move_cursor_to_option(console, context, BattleMenuOption::FIGHT)){
         console.log("Could not confirm the cursor is on FIGHT. Pressing A anyway.", COLOR_RED);
     }
-    pbf_press_button(context, BUTTON_A, 200ms, 600ms);       //  open the move list
-
-    pbf_press_dpad(context, DPAD_LEFT, 160ms, 240ms);
-    pbf_press_dpad(context, DPAD_UP, 160ms, 240ms);
-    if (slot & 1){
-        pbf_press_dpad(context, DPAD_RIGHT, 160ms, 240ms);
-    }
-    if (slot & 2){
-        pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
-    }
+    pbf_press_button(context, BUTTON_A, 200ms, 300ms);       //  open the move list
     context.wait_for_all_requests();
+
+    if (!move_cursor_to_option(console, context, static_cast<BattleMoveOption>(slot))){
+        //  Could not see the arrow. Fall back to pressing left and up, which
+        //  always lands on the top-left move, then moving to the slot.
+        console.log("Could not find the move cursor. Moving to the move without it.", COLOR_RED);
+        pbf_press_dpad(context, DPAD_LEFT, 160ms, 240ms);
+        pbf_press_dpad(context, DPAD_UP, 160ms, 240ms);
+        if (slot & 1){
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 240ms);
+        }
+        if (slot & 2){
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
+        }
+        context.wait_for_all_requests();
+    }
 
     //  The PP text turns red when the highlighted move is out of PP.
     BattleOutOfPpWatcher out_of_pp(COLOR_RED);
@@ -693,13 +724,42 @@ void use_move_in_slot(ConsoleHandle& console, ProControllerContext& context, int
     context.wait_for_all_requests();
 }
 
+enum class TrainerBattleResult{
+    WON,
+    ATTACKER_FAINTED,
+};
+
+//  Read the opposing Pokemon's species from its name. It is matched against
+//  every species in the attacker's move table, not just this trainer's, so an
+//  unexpected opponent is reported by name instead of being misread.
+//  Returns an empty string if it can't be read.
+std::string read_opponent(
+    ConsoleHandle& console, Language language,
+    const std::set<std::string>& candidates
+){
+    WildEncounterReader reader(COLOR_RED);
+    VideoOverlaySet overlays(console.overlay());
+    reader.make_overlays(overlays);
+    VideoSnapshot screen = console.video().snapshot();
+    return reader.read_encounter(console.logger(), language, screen, candidates).name;
+}
+
 //  Fight one trainer from the battle menu until the battle ends.
-void run_battle(
-    ConsoleHandle& console, ProControllerContext& context,
+TrainerBattleResult run_battle(
+    ConsoleHandle& console, ProControllerContext& context, Language language,
     const AttackerPlan& plan, const std::vector<std::string>& order, Trainer trainer
 ){
-    size_t opponent = 0;    //  index into the send-out order
+    //  Times the opponent's Pokemon left the field. This counts switch-outs
+    //  as well as faints, since both look the same on screen.
+    size_t left_field = 0;
     size_t turns = 0;
+    std::string last_species;       //  the opponent we attacked last turn
+    bool same_opponent = false;     //  true if it did not leave the field
+
+    std::set<std::string> candidates;
+    for (const auto& item : plan.move_for){
+        candidates.insert(item.first);
+    }
 
     while (true){
         if (turns > 3 * order.size()){
@@ -710,8 +770,20 @@ void run_battle(
             );
         }
 
-        //  We are at the battle menu.
-        const std::string& species = order[std::min(opponent, order.size() - 1)];
+        //  We are at the battle menu. Read who we are facing. If that fails,
+        //  assume the last opponent if it never left the field, otherwise
+        //  fall back to the expected send-out order.
+        std::string species = read_opponent(console, language, candidates);
+        if (species.empty()){
+            if (same_opponent){
+                species = last_species;
+                console.log("Could not read the opponent's name. Assuming " + species + " is still out.", COLOR_RED);
+            }else{
+                species = order[std::min(left_field, order.size() - 1)];
+                console.log("Could not read the opponent's name. Assuming " + species + " from the send-out order.", COLOR_RED);
+            }
+        }
+        last_species = species;
         auto iter = plan.move_for.find(species);
         if (iter == plan.move_for.end()){
             OperationFailedExceptionWithScreenshot::fire(
@@ -723,25 +795,22 @@ void run_battle(
         Move move = iter->second;
         int slot = slot_of(plan, move);
         console.log(
-            std::string(trainer_name(trainer)) + " #" + std::to_string(opponent + 1) +
+            std::string(trainer_name(trainer)) + ", turn " + std::to_string(turns + 1) +
             " (" + species + "): using " + move_name(move) + " (slot " + std::to_string(slot + 1) + ")"
         );
         use_move_in_slot(console, context, slot);
         turns++;
 
         //  Mash B through the battle text until the battle menu comes back
-        //  (next opponent) or the battle ends (fade to black).
-        //
-        //  Every move is a guaranteed OHKO at the required stats, so each
-        //  return to the battle menu means the next opponent is out. The
-        //  faint watcher only feeds the log: if it never fires, either the
-        //  detector missed it or the opponent really survived.
+        //  (next opponent, or the same one if it survived) or the battle ends
+        //  (fade to black). The next turn reads the name again, so a survivor
+        //  is attacked again.
         bool faint_seen = false;
         auto report_missed_faint = [&]{
             if (!faint_seen){
                 console.log(
-                    "Did not see the opponent faint. If the battle runs long, the opponent "
-                    "survived: check the attacker's Sp. Atk, nature and moves.",
+                    "Did not see the opponent faint. It may have survived: "
+                    "check the attacker's Sp. Atk, nature and moves.",
                     COLOR_RED
                 );
             }
@@ -751,9 +820,10 @@ void run_battle(
         while (waiting){
             BattleMenuWatcher battle_menu(COLOR_RED);
             BlackScreenWatcher battle_ended(COLOR_RED);
+            BattleFaintWatcher attacker_fainted(COLOR_RED);
             BattleOpponentFaintWatcher opponent_fainted(COLOR_RED);
 
-            std::vector<PeriodicInferenceCallback> callbacks{battle_menu, battle_ended};
+            std::vector<PeriodicInferenceCallback> callbacks{battle_menu, battle_ended, attacker_fainted};
             if (!faint_seen){
                 callbacks.emplace_back(opponent_fainted);
             }
@@ -767,26 +837,49 @@ void run_battle(
             );
 
             switch (ret){
-            case 0:     //  Battle menu: the next opponent is out.
+            case 0:     //  Battle menu: our next turn.
                 report_missed_faint();
-                opponent++;
+                same_opponent = !faint_seen;
                 waiting = false;
                 break;
-            case 1:     //  Battle over.
-                report_missed_faint();
-                opponent++;
-                if (opponent != order.size()){
+            case 1:{    //  Fade to black.
+                //  A won battle ends with the last opponent fainting, then a
+                //  fade to the overworld. If no faint was seen this turn, the
+                //  fade may instead be the game opening the party screen
+                //  because our attacker fainted (this can happen before the
+                //  attacker faint watcher triggers).
+                if (!faint_seen){
+                    PartyMenuWatcher party_menu(COLOR_RED);
+                    if (wait_until(console, context, 5000ms, { party_menu }) == 0){
+                        console.log(
+                            std::string("The attacker fainted against ") + trainer_name(trainer) +
+                            " (the party screen opened). Check its Sp. Atk, Speed, nature and moves against the requirements.",
+                            COLOR_RED
+                        );
+                        return TrainerBattleResult::ATTACKER_FAINTED;
+                    }
+                }
+                if (turns != order.size()){
                     console.log(
-                        "Battle ended after " + std::to_string(opponent) + " attacks (expected " +
-                        std::to_string(order.size()) + ").",
+                        "Battle took " + std::to_string(turns) + " attacks (" +
+                        std::to_string(order.size()) + " if every attack is a one-hit KO).",
                         COLOR_RED
                     );
                 }
                 console.log(std::string("Defeated ") + trainer_name(trainer) + ".");
-                return;
-            case 2:     //  Opponent fainted. Keep waiting for the menu or the end.
-                console.log("Opponent fainted.");
+                return TrainerBattleResult::WON;
+            }
+            case 2:     //  Our attacker fainted. The run is lost; no need to wait it out.
+                console.log(
+                    std::string("The attacker fainted against ") + trainer_name(trainer) +
+                    ". Check its Sp. Atk, nature and moves against the requirements.",
+                    COLOR_RED
+                );
+                return TrainerBattleResult::ATTACKER_FAINTED;
+            case 3:     //  Opponent fainted (or switched out). Keep waiting for the menu or the end.
+                console.log("Opponent left the field (fainted or switched out).");
                 faint_seen = true;
+                left_field++;
                 break;
             default:
                 OperationFailedExceptionWithScreenshot::fire(
@@ -816,6 +909,7 @@ void EliteFourFarmer::program(SingleSwitchProgramEnvironment& env, ProController
     };
 
     uint32_t consecutive_errors = 0;
+    uint32_t consecutive_losses = 0;
     while (true){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
         if (NUM_WINS != 0 && stats.wins >= NUM_WINS){
@@ -825,19 +919,46 @@ void EliteFourFarmer::program(SingleSwitchProgramEnvironment& env, ProController
         try{
             travel_to_lorelei(env.console, context);
 
+            bool lost = false;
             for (size_t i = 0; i < TRAINERS.size(); i++){
                 Trainer trainer = TRAINERS[i];
                 if (i > 0){
                     walk_to_next_room(env.console, context, trainer);
                 }
                 start_battle(env.console, context, trainer);
-                run_battle(env.console, context, plan, expected_order(plan, starter, trainer), trainer);
+                TrainerBattleResult result = run_battle(env.console, context, LANGUAGE, plan, expected_order(plan, starter, trainer), trainer);
+                if (result == TrainerBattleResult::ATTACKER_FAINTED){
+                    lost = true;
+                    break;
+                }
                 stats.battles++;
                 env.update_stats();
 
                 if (trainer != Trainer::CHAMPION){
                     clear_post_battle_dialog(env.console, context, trainer);
                 }
+            }
+
+            if (lost){
+                //  A lost run is not an error: reset right away and try again.
+                stats.losses++;
+                env.update_stats();
+                consecutive_losses++;
+                if (consecutive_losses >= 5){
+                    throw UserSetupError(
+                        env.console,
+                        "The attacker lost 5 runs in a row. Check its moves and move order, "
+                        "its Sp. Atk, Speed and nature, and the Attacker and Your Starter options."
+                    );
+                }
+                env.log("Run lost. Soft resetting and trying again.", COLOR_RED);
+                soft_reset(env.console, context);
+                stats.resets++;
+                env.update_stats();
+                if (STOP_AFTER_CURRENT.should_stop()){
+                    break;
+                }
+                continue;
             }
 
             //  The game is saved once the Hall of Fame save message is gone,
@@ -847,6 +968,7 @@ void EliteFourFarmer::program(SingleSwitchProgramEnvironment& env, ProController
             stats.wins++;
             env.update_stats();
             consecutive_errors = 0;
+            consecutive_losses = 0;
 
             env.log("Soft resetting to Pallet Town...");
             soft_reset(env.console, context);

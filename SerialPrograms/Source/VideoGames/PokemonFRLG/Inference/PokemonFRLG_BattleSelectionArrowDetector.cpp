@@ -5,6 +5,8 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
@@ -65,6 +67,21 @@ ImageFloatBox BattleSelectionArrowDetector::box_for_option(SafariBattleMenuOptio
     }
     throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid FRLG Safari Battle Menu Option");
 }
+ImageFloatBox BattleSelectionArrowDetector::box_for_option(BattleMoveOption option){
+    switch (option){
+    case BattleMoveOption::MOVE_1:
+        return ImageFloatBox(0.028, 0.765, 0.040, 0.080);
+    case BattleMoveOption::MOVE_2:
+        return ImageFloatBox(0.328, 0.765, 0.040, 0.080);
+    case BattleMoveOption::MOVE_3:
+        return ImageFloatBox(0.028, 0.865, 0.040, 0.080);
+    case BattleMoveOption::MOVE_4:
+        return ImageFloatBox(0.328, 0.865, 0.040, 0.080);
+    default:
+        break;
+    }
+    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid FRLG Battle Move Option");
+}
 ImageFloatBox BattleSelectionArrowDetector::box_for_option(BattleConfirmationOption option){
     switch (option){
     case BattleConfirmationOption::YES:
@@ -99,6 +116,15 @@ BattleSelectionArrowDetector::BattleSelectionArrowDetector(
     Color color,
     VideoOverlay* overlay,
     SafariBattleMenuOption option
+)
+    : m_color(color)
+    , m_overlay(overlay)
+    , m_arrow_box(box_for_option(option))
+{}
+BattleSelectionArrowDetector::BattleSelectionArrowDetector(
+    Color color,
+    VideoOverlay* overlay,
+    BattleMoveOption option
 )
     : m_color(color)
     , m_overlay(overlay)
@@ -163,6 +189,57 @@ bool BattleSelectionArrowDetector::detect(const ImageViewRGB32& screen){
     }
 
     return found;
+}
+
+
+
+//  Each image shows the FIGHT move list with the arrow on one move. The arrow
+//  must be found in that move's box and in none of the other three. Searching
+//  the whole move list (as the cursor navigation does) must also find it in
+//  the right place, not on the move names.
+class Test_BattleMoveSelectionArrow : public UnitTest{
+public:
+    Test_BattleMoveSelectionArrow(
+        const std::string& image,
+        BattleMoveOption expected
+    )
+        : UnitTest("PokemonFRLG::BattleMoveSelectionArrow - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        ImageRGB32 image(m_image);
+        for (int i = 0; i < BATTLE_MOVE_OPTION_COUNT; i++){
+            BattleMoveOption option = static_cast<BattleMoveOption>(i);
+            BattleSelectionArrowDetector detector(COLOR_RED, nullptr, option);
+            if (detector.detect(image) != (option == m_expected)){
+                return false;
+            }
+        }
+
+        BattleSelectionArrowDetector whole_list(COLOR_RED, nullptr, BATTLE_MOVE_ARROW_BOX);
+        if (!whole_list.detect(image)){
+            return false;
+        }
+        const ImageFloatBox& found = whole_list.last_detected();
+        const ImageFloatBox expected = BattleSelectionArrowDetector::box_for_option(m_expected);
+        double cx = found.x + found.width / 2;
+        double cy = found.y + found.height / 2;
+        return expected.x <= cx && cx <= expected.x + expected.width
+            && expected.y <= cy && cy <= expected.y + expected.height;
+    };
+
+private:
+    std::string m_image;
+    BattleMoveOption m_expected;
+};
+
+void add_tests_BattleMoveSelectionArrow(UnitTestDatabase& database){
+    database.add<Test_BattleMoveSelectionArrow>("PokemonFRLG/BattleMoveSelectionArrow/MoveArrow-TopLeft.png", BattleMoveOption::MOVE_1);
+    database.add<Test_BattleMoveSelectionArrow>("PokemonFRLG/BattleMoveSelectionArrow/MoveArrow-TopRight.png", BattleMoveOption::MOVE_2);
+    database.add<Test_BattleMoveSelectionArrow>("PokemonFRLG/BattleMoveSelectionArrow/MoveArrow-BottomLeft.png", BattleMoveOption::MOVE_3);
+    database.add<Test_BattleMoveSelectionArrow>("PokemonFRLG/BattleMoveSelectionArrow/MoveArrow-BottomRight.png", BattleMoveOption::MOVE_4);
 }
 
 

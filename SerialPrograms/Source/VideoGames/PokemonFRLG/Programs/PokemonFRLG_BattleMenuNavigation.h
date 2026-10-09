@@ -29,6 +29,13 @@ bool move_cursor_to_option(
     BattleMenuOption destination
 );
 
+// Starting from the FIGHT move list, move the selection arrow to the specified move.
+// Returns true if successful, false otherwise (e.g. if selection arrow is not detected).
+bool move_cursor_to_option(
+    ConsoleHandle& console, ProControllerContext& context,
+    BattleMoveOption destination
+);
+
 // Starting from the Safari Zone battle command menu, move the selection arrow to the specified option.
 // Returns true if successful, false otherwise (e.g. if selection arrow is not detected).
 bool move_cursor_to_option(

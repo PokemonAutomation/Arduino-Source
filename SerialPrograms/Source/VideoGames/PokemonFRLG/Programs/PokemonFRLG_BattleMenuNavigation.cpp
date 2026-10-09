@@ -96,6 +96,17 @@ bool move_cursor_to_option(ConsoleHandle& console, ProControllerContext& context
     );
 }
 
+bool move_cursor_to_option(ConsoleHandle& console, ProControllerContext& context, BattleMoveOption destination){
+    return move_cursor_2d_impl(
+        console, context,
+        BATTLE_MOVE_ARROW_BOX,
+        BATTLE_MOVE_OPTION_COUNT,
+        BATTLE_MENU_COLS,
+        [](int i){ return BattleSelectionArrowDetector::box_for_option(static_cast<BattleMoveOption>(i)); },
+        static_cast<int>(destination)
+    );
+}
+
 bool move_cursor_to_option(ConsoleHandle& console, ProControllerContext& context, SafariBattleMenuOption destination){
     return move_cursor_2d_impl(
         console, context,
