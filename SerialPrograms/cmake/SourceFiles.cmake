@@ -1010,6 +1010,13 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/AudioStreamConversion/AudioStreamConversion.h
     Source/Kernels/AudioStreamConversion/AudioStreamConversion_Core_Default.cpp
     Source/Kernels/AudioStreamConversion/AudioStreamConversion_Core_x86_SSE41.cpp
+    Source/Kernels/AudioStreamConverter/Kernels_AudioStreamConverter_Kernels_Default.cpp
+    Source/Kernels/AudioStreamConverter/Kernels_AudioStreamConverter_Kernels_Default.h
+    Source/Kernels/AudioStreamConverter/Kernels_AudioStreamConverter_Kernels_x64_AVX2.cpp
+    Source/Kernels/AudioStreamConverter/Kernels_AudioStreamConverter_Kernels_x64_AVX2.h
+    Source/Kernels/AudioStreamConverter/Kernels_AudioStreamConverter_Kernels_x64_AVX512.cpp
+    Source/Kernels/AudioStreamConverter/Kernels_AudioStreamConverter_Kernels_x64_AVX512.h
+    Source/Kernels/AudioStreamConverter/Kernels_AudioStreamConverter_TestInfra.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_arm64_NEON.h
