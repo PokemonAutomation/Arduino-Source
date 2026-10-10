@@ -159,7 +159,9 @@ private:
 
 
 void add_tests_DialogBoxDetector(UnitTestDatabase& database){
-    database.add<Test_BlackDialogBoxDetector2>("PokemonSwSh/BlackDialogBoxDetector2/black-dialog-1.png", true);
+    database.add<Test_BlackDialogBoxDetector2>("PokemonSwSh/BlackDialogBoxDetector2/black-dialog-2-1.png", true);
+    database.add<Test_BlackDialogBoxDetector2>("PokemonSwSh/BlackDialogBoxDetector2/black-dialog-2-2.jpg", true);
+    database.add<Test_BlackDialogBoxDetector2>("PokemonSwSh/BlackDialogBoxDetector2/black-dialog-2-3.jpg", true);
 
 }
 
