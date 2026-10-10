@@ -21,18 +21,10 @@ namespace AudioStreamConverter{
 
 
 
-template <typename Type>
-using ConvertFrom = void (*)(
-    size_t channels, size_t samples,
-    size_t stride, float* strided_stream,
-    const Type* interleaved_stream
-);
-template <typename Type>
-using ConvertTo = void (*)(
-    size_t channels, size_t samples,
-    size_t stride, const float* strided_stream,
-    Type* interleaved_stream
-);
+template <typename ExternalType>
+using ConvertFrom = void (*)(r_ptr<float> native, c_ptr<ExternalType> ext, size_t samples);
+template <typename ExternalType>
+using ConvertTo = void (*)(c_ptr<float> native, r_ptr<ExternalType> ext, size_t samples, float multiplier);
 
 
 
@@ -40,69 +32,60 @@ using ConvertTo = void (*)(
 
 
 template <typename Type>
-class Test_Kernel : public UnitTest{
+class Test : public UnitTest{
 public:
-    Test_Kernel(
+    Test(
         const std::string& arch_str,
-        size_t channels, size_t samples,
+        size_t samples,
         ConvertFrom<Type> convert_from,
         ConvertTo<Type> convert_to
     )
         : UnitTest(
-            "Kernels::AudioStreamConverter - convert_to/from_" + typestr() + "_" + arch_str +
-            "(ch = " + std::to_string(channels) + ", samples=" + std::to_string(samples) + ")"
+            "Kernels::AudioStreamConverter - " + typestr() + "_" + arch_str +
+            "(" + std::to_string(samples) + ")"
         )
-        , m_channels(channels)
         , m_samples(samples)
         , m_convert_from(convert_from)
         , m_convert_to(convert_to)
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        size_t total = m_channels * m_samples;
-        if (total < 2){
+        if (m_samples < 2){
             throw InternalProgramError(&logger, PA_CURRENT_FUNCTION, "Test size is too small.");
         }
 
-        AlignedVector<Type> interleaved0(total);
-        AlignedVector<Type> interleaved1(total);
-        AlignedVector<float> strided(total);
+        AlignedVector<Type> ext0(m_samples);
+        AlignedVector<Type> ext1(m_samples);
+        AlignedVector<float> native(m_samples);
 
         std::mt19937 generator(42);
 
-        if constexpr (std::is_floating_point_v<Type>){
-            std::uniform_real_distribution<Type> distribution(-1.0, +1.0);
-            for (size_t c = 0; c < total; c++){
-                interleaved0[c] = distribution(generator);
-            }
-        }else{
-            std::uniform_int_distribution<long long> distribution(
-                std::numeric_limits<Type>::min(),
-                std::numeric_limits<Type>::max()
-            );
-            interleaved0[0] = std::numeric_limits<Type>::min();
-            interleaved0[1] = std::numeric_limits<Type>::max();
+        std::uniform_int_distribution<long long> distribution(
+            std::numeric_limits<Type>::min(),
+            std::numeric_limits<Type>::max()
+        );
+        ext0[0] = std::numeric_limits<Type>::min();
+        ext0[1] = std::numeric_limits<Type>::max();
+        if constexpr (std::is_same_v<Type, int32_t>){
+            ext0[0] &= 0xfffff000;
+            ext0[1] &= 0xfffff000;
+        }
+        for (size_t c = 2; c < m_samples; c++){
+            ext0[c] = (Type)distribution(generator);
+            //  Truncate some precision so the round-trip is lossless.
             if constexpr (std::is_same_v<Type, int32_t>){
-                interleaved0[0] &= 0xfffff000;
-                interleaved0[1] &= 0xfffff000;
-            }
-            for (size_t c = 2; c < total; c++){
-                interleaved0[c] = (Type)distribution(generator);
-                //  Truncate some precision so the round-trip is lossless.
-                if constexpr (std::is_same_v<Type, int32_t>){
-                    interleaved0[c] &= 0xfffff000;
-                }
+                ext0[c] &= 0xfffff000;
             }
         }
 
-        m_convert_from(m_channels, m_samples, m_samples, strided.data(), interleaved0.data());
-        m_convert_to(m_channels, m_samples, m_samples, strided.data(), interleaved1.data());
+        m_convert_from(native.data(), ext0.data(), m_samples);
+        m_convert_to(native.data(), ext1.data(), m_samples, 1.0f);
 
         //  Check for errors.
-        for (size_t c = 0; c < total; c++){
-            if (interleaved0[c] != interleaved1[c]){
+        for (size_t c = 0; c < m_samples; c++){
+            if (ext0[c] != ext1[c]){
                 return "Mismatch at " + std::to_string(c) + ": " +
-                    std::to_string(interleaved0[c]) + " != " + std::to_string(interleaved1[c]);
+                    std::to_string(ext0[c]) + " != " + std::to_string(ext1[c]);
             }
         }
 
@@ -116,15 +99,12 @@ public:
             return "s16";
         }else if constexpr (std::is_same_v<Type, int32_t>){
             return "s32";
-        }else if constexpr (std::is_same_v<Type, float>){
-            return "f32";
         }else{
             static_assert(false);
         }
     }
 
 private:
-    size_t m_channels;
     size_t m_samples;
     ConvertFrom<Type> m_convert_from;
     ConvertTo<Type> m_convert_to;

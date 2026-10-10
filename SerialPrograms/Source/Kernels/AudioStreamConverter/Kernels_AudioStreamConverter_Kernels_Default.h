@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_Kernels_AudioStreamConverter_Kernels_Default_H
 #define PokemonAutomation_Kernels_AudioStreamConverter_Kernels_Default_H
 
+#include <stddef.h>
 #include "Common/Compiler.h"
 
 //#include <iostream>
@@ -21,35 +22,11 @@ namespace Kernels{
 namespace AudioStreamConverter{
 
 
-template <typename Type, size_t channels>
-void convert_from_Default(
-    size_t samples,
-    size_t stride, float* strided_stream,
-    const Type* interleaved_stream
-);
-template <typename Type, size_t channels>
-void convert_to_Default(
-    size_t samples,
-    size_t stride, const float* strided_stream,
-    Type* interleaved_stream
-);
 
-
-
-template <typename Type>
-void convert_from_Default(
-    size_t channels, size_t samples,
-    size_t stride, float* strided_stream,
-    const Type* interleaved_stream
-);
-template <typename Type>
-void convert_to_Default(
-    size_t channels, size_t samples,
-    size_t stride, const float* strided_stream,
-    Type* interleaved_stream
-);
-
-
+template <typename ExternalType>
+void convert_from_Default(r_ptr<float> native, c_ptr<ExternalType> ext, size_t samples);
+template <typename ExternalType>
+void convert_to_Default(c_ptr<float> native, r_ptr<ExternalType> ext, size_t samples, float multiplier);
 
 
 
