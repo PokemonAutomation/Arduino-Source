@@ -181,8 +181,8 @@ public:
         : Test<Type>(
             "from_x64_SSE41",
             samples,
-            static_cast<ConvertFrom<Type>>(convert_from_x64_SSE41<Type>),
-            static_cast<ConvertTo<Type>>(convert_to_Default<Type>)
+            static_cast<ConvertFrom<Type>>(&convert_from_x64_SSE41<Type>),
+            static_cast<ConvertTo<Type>>(&convert_to_Default<Type>)
         )
     {}
 };
@@ -193,8 +193,8 @@ public:
         : Test<Type>(
             "to_x64_SSE41",
             samples,
-            static_cast<ConvertFrom<Type>>(convert_from_Default<Type>),
-            static_cast<ConvertTo<Type>>(convert_to_x64_SSE41<Type>)
+            static_cast<ConvertFrom<Type>>(&convert_from_Default<Type>),
+            static_cast<ConvertTo<Type>>(&convert_to_x64_SSE41<Type>)
         )
     {}
 };

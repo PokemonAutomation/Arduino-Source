@@ -86,8 +86,8 @@ public:
         : Test<Type>(
             "Default",
             samples,
-            static_cast<ConvertFrom<Type>>(convert_from_Default<Type>),
-            static_cast<ConvertTo<Type>>(convert_to_Default<Type>)
+            (ConvertFrom<Type>)convert_from_Default<Type>,
+            (ConvertTo<Type>)convert_to_Default<Type>
         )
     {}
 };
