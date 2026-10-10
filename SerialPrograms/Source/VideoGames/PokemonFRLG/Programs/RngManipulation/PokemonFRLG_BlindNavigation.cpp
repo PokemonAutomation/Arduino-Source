@@ -4,6 +4,8 @@
  *
  */
 
+#include <cmath>
+#include <string>
 #include "CommonTools/Random.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -11,10 +13,60 @@
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonFRLG_BlindNavigation.h"
+#include "PokemonFRLG_RngCalibration.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
+
+// The fixed parts (ms) of the button press sequences for each target,
+// including the 4000ms spent loading the save and skipping the recap in load_game_after_delay().
+static const uint64_t STARTER_FIXED_DURATION        = 7200;     // 4000ms + 3000ms + 200ms
+static const uint64_t MAGIKARP_FIXED_DURATION       = 7200;     // 4000ms + 3000ms + 200ms
+static const uint64_t HITMON_FIXED_DURATION         = 4200;     // 4000ms + 200ms
+static const uint64_t EEVEE_FIXED_DURATION          = 4000;
+static const uint64_t LAPRAS_FIXED_DURATION         = 7200;     // 4000ms + 3000ms + 200ms
+static const uint64_t FOSSIL_FIXED_DURATION         = 5700;     // 4000ms + 1500ms + 200ms
+static const uint64_t GAMECORNER_FIXED_DURATION     = 8200;     // 4000ms + 3000ms + (400ms * 5) + 200ms
+static const uint64_t TOGEPI_FIXED_DURATION         = 11700;    // 4000ms + 7500ms + 200ms
+static const uint64_t TOGEPI_FAST_FIXED_DURATION    = 5200;     // 4000ms + 500ms + 500ms + 200ms
+static const uint64_t EGG_HELD_FIXED_DURATION       = 4000;
+static const uint64_t EGG_PICKUP_FIXED_DURATION     = 12000;    // 4000ms + 500ms + 500ms + 6000ms + 1000ms
+static const uint64_t STATIC_FIXED_DURATION         = 5000;     // 4000ms + 1000ms
+static const uint64_t SNORLAX_FIXED_DURATION        = 15700;    // 4000ms + 1500ms + 10000ms + 200ms
+static const uint64_t MEWTWO_FIXED_DURATION         = 4200;     // 4000ms + 200ms
+static const uint64_t HOOH_FIXED_DURATION           = 4000;
+static const uint64_t HYPNO_FIXED_DURATION          = 12700;    // 4000ms + 8500ms + 200ms
+static const uint64_t SWEET_SCENT_FIXED_DURATION    = 7400;
+static const uint64_t SAFARI_SWEET_SCENT_FIXED_DURATION = 7900; // there is an extra menu option at the top of the start menu
+static const uint64_t ROCK_SMASH_FIXED_DURATION     = 6500;     // 4000ms + 2000ms + 500ms
+static const uint64_t FISHING_FIXED_DURATION        = 4200;     // 4000ms + 200ms
+static const uint64_t FISHING_MAX_RNG_WAIT          = 1000;     // 50ms * 20. The random wait before casting comes out of the variable wait
+
+// The part of the in-game delay (ms) that is spent walking to each Safari Zone target.
+static const uint64_t SAFARI_CENTER_WALK_DURATION   = 22170;
+static const uint64_t SAFARI_EAST_WALK_DURATION     = 37660;
+static const uint64_t SAFARI_NORTH_WALK_DURATION    = 38910;
+static const uint64_t SAFARI_WEST_WALK_DURATION     = 52930;
+static const uint64_t SAFARI_SURF_WALK_DURATION     = 31800;
+static const uint64_t SAFARI_FISH_WALK_DURATION     = 25300;
+
+// The minimum delay (ms) before the final button press to avoid button press drops
+static const uint64_t MIN_PRESS_GAP = 300;
+
+// frames, approximate
+static const int64_t DEFAULT_ADVANCES_OFFSET = 160;
+static const int64_t SWEET_SCENT_ADVANCES_OFFSET = -352;
+
+static uint64_t roamer_fixed_duration(Language language){
+    uint64_t duration = 26700; // 5500ms + 4*1500ms + 3500ms + 5500ms + 4*1500 + 200
+    if (language == Language::Japanese){
+        duration += 1500; 
+    }else if (language == Language::Spanish){
+        duration += 3000;
+    }
+    return duration;
+}
 
 
 void set_seed_after_delay(ProControllerContext& context, SeedButton seed_button, BlackoutButton extra_button, int64_t seed_delay, ConsoleType console_type){
@@ -102,7 +154,7 @@ void collect_starter_after_delay(ProControllerContext& context, uint64_t ingame_
     // Advance through starter dialogue and wait on "really quite energetic!"
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - 7200)); // 4000ms + 3000ms + 200ms
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - STARTER_FIXED_DURATION));
     // Finish dialogue (hits the target advance)
     pbf_press_button(context, BUTTON_A, 200ms, 5800ms);
     // Decline nickname
@@ -116,7 +168,7 @@ void collect_magikarp_after_delay(ProControllerContext& context, uint64_t ingame
     // Advance through starter dialogue and wait on YES/NO
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - 7200)); // 4000ms + 3000ms + 200ms
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - MAGIKARP_FIXED_DURATION));
     // Finish dialogue (hits the target advance)
     pbf_press_button(context, BUTTON_A, 200ms, 3800ms);
     // Decline nickname
@@ -126,7 +178,7 @@ void collect_magikarp_after_delay(ProControllerContext& context, uint64_t ingame
 
 void collect_hitmon_after_delay(ProControllerContext& context, uint64_t ingame_delay){
     // One dialog before accepting
-    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - 4200)); // 4000ms + 200ms
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - HITMON_FIXED_DURATION));
     // Confirm selection
     pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
     // Decline nickname
@@ -136,7 +188,7 @@ void collect_hitmon_after_delay(ProControllerContext& context, uint64_t ingame_d
 
 void collect_eevee_after_delay(ProControllerContext& context, uint64_t ingame_delay){
     // No dialogue to advance through -- just wait
-    pbf_wait(context, std::chrono::milliseconds(ingame_delay - 4000));
+    pbf_wait(context, std::chrono::milliseconds(ingame_delay - EEVEE_FIXED_DURATION));
     // Interact with the pokeball
     pbf_press_button(context, BUTTON_A, 200ms, 3800ms);
     // Decline nickname
@@ -148,7 +200,7 @@ void collect_lapras_after_delay(ProControllerContext& context, uint64_t ingame_d
     // 3 dialog presses
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - 7200)); // 4000ms + 3000ms + 200ms
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - LAPRAS_FIXED_DURATION));
     // Accept Lapras on target frame
     pbf_press_button(context, BUTTON_A, 200ms, 3800ms);
     // Decline nickname and exit dialog
@@ -159,7 +211,7 @@ void collect_lapras_after_delay(ProControllerContext& context, uint64_t ingame_d
 void collect_fossil_after_delay(ProControllerContext& context, uint64_t ingame_delay){
     // 2 dialog presses
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - 5700)); // 4000ms + 1500ms + 200ms
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - FOSSIL_FIXED_DURATION));
     // Advance dialog on target frame
     pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
     // Decline nickname
@@ -179,7 +231,7 @@ void collect_gamecorner_after_delay(ProControllerContext& context, uint64_t inga
         pbf_wait(context, 400ms);
     }
     // select option and wait on confirmation
-    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - 8200)); // 4000ms + 3000ms + (400ms * 5) + 200ms
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - GAMECORNER_FIXED_DURATION));
     // confirm prize
     pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
     // decline nickname
@@ -194,7 +246,7 @@ void collect_togepi_egg_after_delay(ProControllerContext& context, uint64_t inga
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - 11700)); // 4000ms + 7500ms + 200ms
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - TOGEPI_FIXED_DURATION));
     // accept egg
     pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
     // exit dialogue
@@ -205,7 +257,7 @@ void collect_togepi_egg_after_delay(ProControllerContext& context, uint64_t inga
 void collect_preapproved_togepi_egg_after_delay(ProControllerContext& context, uint64_t ingame_delay){
     // wait with the start menu open to avoid overworld stuff causing extra advances
     pbf_press_button(context, BUTTON_PLUS, 200ms, 300ms);
-    pbf_wait(context, std::chrono::milliseconds(ingame_delay - 5200)); // 4000ms + 500ms + 500ms + 200ms
+    pbf_wait(context, std::chrono::milliseconds(ingame_delay - TOGEPI_FAST_FIXED_DURATION));
     pbf_press_button(context, BUTTON_B, 200ms, 300ms);
     // accept egg
     pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
@@ -215,7 +267,7 @@ void collect_preapproved_togepi_egg_after_delay(ProControllerContext& context, u
 
 void trigger_held_daycare_egg_after_delay(ProControllerContext& context, uint64_t ingame_delay){
     // No dialogue to advance through -- just wait
-    pbf_wait(context, std::chrono::milliseconds(ingame_delay - 4000));
+    pbf_wait(context, std::chrono::milliseconds(ingame_delay - EGG_HELD_FIXED_DURATION));
     // Trigger the encounter (WALK LEFT)
     pbf_move_left_joystick(context, {-1, 0}, 200ms, 800ms);
     context.wait_for_all_requests();
@@ -224,7 +276,7 @@ void trigger_held_daycare_egg_after_delay(ProControllerContext& context, uint64_
 void collect_daycare_egg_after_delay(ProControllerContext& context, uint64_t ingame_delay){
     // wait with the start menu open to avoid overworld stuff causing extra advances
     pbf_press_button(context, BUTTON_PLUS, 200ms, 300ms);
-    pbf_wait(context, std::chrono::milliseconds(ingame_delay - 12000)); // 4000ms + 500ms + 500ms + 6000ms + 1000ms
+    pbf_wait(context, std::chrono::milliseconds(ingame_delay - EGG_PICKUP_FIXED_DURATION));
     pbf_press_button(context, BUTTON_B, 200ms, 300ms);
     // 5 dialog presses
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
@@ -242,7 +294,7 @@ void collect_daycare_egg_after_delay(ProControllerContext& context, uint64_t ing
 void encounter_static_after_delay(ProControllerContext& context, uint64_t ingame_delay){
     // No dialogue to advance through -- just wait in the start menu (avoids extra RNG advances by boulders Mt Ember and Seafoam Islands)
     pbf_press_button(context, BUTTON_PLUS, 200ms, 300ms);
-    pbf_wait(context, std::chrono::milliseconds(ingame_delay - 5000)); // 4000ms + 1000ms
+    pbf_wait(context, std::chrono::milliseconds(ingame_delay - STATIC_FIXED_DURATION));
     pbf_press_button(context, BUTTON_B, 200ms, 300ms);
     // Interact with the static encounter
     pbf_press_button(context, BUTTON_A, 200ms, 800ms);
@@ -254,14 +306,14 @@ void encounter_snorlax_after_delay(ProControllerContext& context, uint64_t ingam
     // Interact with Snorlax, YES to PokeFlute, wait on "woke up!"
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 9800ms); // PokeFlute tune
-    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - 15700)); // 4000ms + 1500ms + 10000ms + 200ms
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - SNORLAX_FIXED_DURATION));
     pbf_press_button(context, BUTTON_A, 200ms, 200ms); 
     context.wait_for_all_requests();
 }
 
 void encounter_mewtwo_after_delay(ProControllerContext& context, uint64_t ingame_delay){
     // one dialogue before the encounter happens
-    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - 4200)); // 4000ms + 200ms
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - MEWTWO_FIXED_DURATION));
     // Initiate encounter
     pbf_press_button(context, BUTTON_A, 200ms, 200ms); 
     context.wait_for_all_requests();
@@ -269,7 +321,7 @@ void encounter_mewtwo_after_delay(ProControllerContext& context, uint64_t ingame
 
 void encounter_hooh_after_delay(ProControllerContext& context, uint64_t ingame_delay){
     // No dialogue to advance through -- just wait
-    pbf_wait(context, std::chrono::milliseconds(ingame_delay - 4000));
+    pbf_wait(context, std::chrono::milliseconds(ingame_delay - HOOH_FIXED_DURATION));
     // Trigger the encounter (WALK UP)
     pbf_move_left_joystick(context, {0, +1}, 800ms, 700ms);
     context.wait_for_all_requests();
@@ -283,7 +335,7 @@ void encounter_hypno_after_delay(ProControllerContext& context, uint64_t ingame_
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 2300ms);
     // Wait after the 6th
-    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - 12700)); // 4000ms + 8500ms + 200ms
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - HYPNO_FIXED_DURATION));
     // Initiate encounter
     pbf_press_button(context, BUTTON_A, 200ms, 200ms); 
     context.wait_for_all_requests();
@@ -301,7 +353,7 @@ void use_sweet_scent(ProControllerContext& context, uint64_t ingame_delay, bool 
     pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 300ms);
     // hover over Sweet Scent (2nd option, but maybe HMs could change this)
-    pbf_move_left_joystick(context, {0, -1}, 200ms, std::chrono::milliseconds(ingame_delay - (safari_zone ? 7900 : 7400)));
+    pbf_move_left_joystick(context, {0, -1}, 200ms, std::chrono::milliseconds(ingame_delay - (safari_zone ? SAFARI_SWEET_SCENT_FIXED_DURATION : SWEET_SCENT_FIXED_DURATION)));
     pbf_press_button(context, BUTTON_A, 200ms, 800ms);
     context.wait_for_all_requests();
 }
@@ -310,7 +362,7 @@ void use_rock_smash(ProControllerContext& context, uint64_t ingame_delay){
     // three button presses
     pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
     pbf_press_button(context, BUTTON_A, 200ms, 300ms);
-    pbf_wait(context, std::chrono::milliseconds(ingame_delay - 6500)); // 4000ms + 2000ms + 500ms
+    pbf_wait(context, std::chrono::milliseconds(ingame_delay - ROCK_SMASH_FIXED_DURATION));
     pbf_press_button(context, BUTTON_A, 200ms, 800ms);
     context.wait_for_all_requests();
 }
@@ -318,7 +370,7 @@ void use_rock_smash(ProControllerContext& context, uint64_t ingame_delay){
 void use_registered_fishing_rod(ProControllerContext& context, uint64_t ingame_delay){
     uint32_t rng_wait = 50 * random_u32(0, 20); // helps avoid always hitting "Not even a nibble" (?)
     pbf_wait(context, std::chrono::milliseconds(rng_wait));
-    pbf_press_button(context, BUTTON_MINUS, 200ms, std::chrono::milliseconds(ingame_delay - rng_wait - 4200));
+    pbf_press_button(context, BUTTON_MINUS, 200ms, std::chrono::milliseconds(ingame_delay - rng_wait - FISHING_FIXED_DURATION));
     pbf_press_button(context, BUTTON_A, 200ms, 800ms);
     context.wait_for_all_requests();
 }
@@ -351,7 +403,7 @@ void walk_to_safarizonefish(ProControllerContext& context){
 }
 
 void walk_to_safarizonesurf(ProControllerContext& context){
-    walk_to_safarizonefish(context); // 23800ms
+    walk_to_safarizonefish(context); // 25300ms
     // start surfing
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
@@ -381,7 +433,7 @@ void walk_to_safarizoneeast(ProControllerContext& context){
 }
 
 void walk_to_safarizonenorth(ProControllerContext& context){
-    walk_to_safarizonesurf(context); // 30300ms
+    walk_to_safarizonesurf(context); // 31800ms
     // from the pond to the grass in the north area
     pbf_move_left_joystick(context, {0, +1}, 2810ms, 300ms);
     pbf_move_left_joystick(context, {-1, 0}, 1530ms, 300ms);
@@ -390,7 +442,7 @@ void walk_to_safarizonenorth(ProControllerContext& context){
 }
 
 void walk_to_safarizonewest(ProControllerContext& context){
-    walk_to_safarizonesurf(context); // 30300ms
+    walk_to_safarizonesurf(context); // 31800ms
     // surf past the hedge and exit the pond
     pbf_move_left_joystick(context, {-1, 0}, 500ms, 300ms);
     pbf_move_left_joystick(context, {0, -1}, 260ms, 500ms);
@@ -409,12 +461,7 @@ void walk_to_safarizonewest(ProControllerContext& context){
 }
 
 void activate_roamer(ProControllerContext& context, Language language, uint64_t ingame_delay){
-    int offset = 26700; // 5500ms + 4*1500ms + 3500ms + 5500ms + 4*1500ms + 200
-    if (language == Language::Japanese){
-        offset += 1500; // extra dialog box for the "you've gone through a lot..." message
-    }else if (language == Language::Spanish){
-        offset += 3000;
-    }
+    uint64_t offset = roamer_fixed_duration(language);
     
     // a lot of dialogue while Celio inserts the Sapphire
     pbf_press_button(context, BUTTON_A, 200ms, 5300ms); // handed the sapphire to Celio
@@ -445,12 +492,103 @@ void activate_roamer(ProControllerContext& context, Language language, uint64_t 
 }
 
 
+struct IngameSequence{
+    const char* name;
+    uint64_t fixed_duration;   
+    uint64_t min_wait;
+    int64_t advances_offset;   
+};
+
+IngameSequence get_ingame_sequence(PokemonFRLG_RngTarget target, Language language){
+    switch (target){
+    case PokemonFRLG_RngTarget::starters:
+        return {"Starters", STARTER_FIXED_DURATION, MIN_PRESS_GAP, DEFAULT_ADVANCES_OFFSET};
+    case PokemonFRLG_RngTarget::magikarp:
+        return {"Magikarp", MAGIKARP_FIXED_DURATION, MIN_PRESS_GAP, DEFAULT_ADVANCES_OFFSET};
+    case PokemonFRLG_RngTarget::hitmonchan:
+    case PokemonFRLG_RngTarget::hitmonlee:
+    case PokemonFRLG_RngTarget::hitmon:
+        return {"Hitmonchan/Hitmonlee", HITMON_FIXED_DURATION, MIN_PRESS_GAP, DEFAULT_ADVANCES_OFFSET};
+    case PokemonFRLG_RngTarget::eevee:
+        return {"Eevee", EEVEE_FIXED_DURATION, 0, DEFAULT_ADVANCES_OFFSET};
+    case PokemonFRLG_RngTarget::lapras:
+        return {"Lapras", LAPRAS_FIXED_DURATION, MIN_PRESS_GAP, DEFAULT_ADVANCES_OFFSET};
+    case PokemonFRLG_RngTarget::omanyte:
+    case PokemonFRLG_RngTarget::kabuto:
+    case PokemonFRLG_RngTarget::aerodactyl:
+    case PokemonFRLG_RngTarget::fossils:
+        return {"Fossils", FOSSIL_FIXED_DURATION, MIN_PRESS_GAP, DEFAULT_ADVANCES_OFFSET};
+    case PokemonFRLG_RngTarget::gamecornerabra:
+    case PokemonFRLG_RngTarget::gamecornerclefairy:
+    case PokemonFRLG_RngTarget::gamecornerdratinifr:
+    case PokemonFRLG_RngTarget::gamecornerdratinilg:
+    case PokemonFRLG_RngTarget::gamecornerscyther:
+    case PokemonFRLG_RngTarget::gamecornerpinsir:
+    case PokemonFRLG_RngTarget::gamecornerporygon:
+        return {"Game Corner", GAMECORNER_FIXED_DURATION, MIN_PRESS_GAP, DEFAULT_ADVANCES_OFFSET};
+    case PokemonFRLG_RngTarget::togepi:
+        return {"Togepi", TOGEPI_FIXED_DURATION, MIN_PRESS_GAP, DEFAULT_ADVANCES_OFFSET};
+    case PokemonFRLG_RngTarget::togepifast:
+        return {"Togepi (pre-approved)", TOGEPI_FAST_FIXED_DURATION, 0, DEFAULT_ADVANCES_OFFSET};
+    case PokemonFRLG_RngTarget::eggheld:
+        return {"Held Frame", EGG_HELD_FIXED_DURATION, 0, 135};
+    case PokemonFRLG_RngTarget::eggpickup:
+        return {"Pickup Frame", EGG_PICKUP_FIXED_DURATION, 0, -246};
+    case PokemonFRLG_RngTarget::electrode:
+    case PokemonFRLG_RngTarget::articuno:
+    case PokemonFRLG_RngTarget::zapdos:
+    case PokemonFRLG_RngTarget::moltres:
+    case PokemonFRLG_RngTarget::lugia:
+    case PokemonFRLG_RngTarget::deoxys_attack:
+    case PokemonFRLG_RngTarget::deoxys_defense:
+    case PokemonFRLG_RngTarget::staticencounter:
+        return {"Static Encounter", STATIC_FIXED_DURATION, 0, DEFAULT_ADVANCES_OFFSET};
+    case PokemonFRLG_RngTarget::snorlax:
+        return {"Snorlax", SNORLAX_FIXED_DURATION, MIN_PRESS_GAP, DEFAULT_ADVANCES_OFFSET};
+    case PokemonFRLG_RngTarget::mewtwo:
+        return {"Mewtwo", MEWTWO_FIXED_DURATION, MIN_PRESS_GAP, DEFAULT_ADVANCES_OFFSET};
+    case PokemonFRLG_RngTarget::hooh:
+        return {"Ho-oh", HOOH_FIXED_DURATION, 0, DEFAULT_ADVANCES_OFFSET};
+    case PokemonFRLG_RngTarget::hypno:
+        return {"Hypno", HYPNO_FIXED_DURATION, MIN_PRESS_GAP, DEFAULT_ADVANCES_OFFSET};
+    case PokemonFRLG_RngTarget::sweetscent:
+        return {"Sweet Scent", SWEET_SCENT_FIXED_DURATION, MIN_PRESS_GAP, SWEET_SCENT_ADVANCES_OFFSET};
+    case PokemonFRLG_RngTarget::rocksmash:
+        return {"Rock Smash", ROCK_SMASH_FIXED_DURATION, 0, SWEET_SCENT_ADVANCES_OFFSET};
+    case PokemonFRLG_RngTarget::fishing:
+        return {"Fishing", FISHING_FIXED_DURATION + FISHING_MAX_RNG_WAIT, MIN_PRESS_GAP, DEFAULT_ADVANCES_OFFSET};
+    case PokemonFRLG_RngTarget::safarizonecenter:
+        return {"Safari Zone Center", SAFARI_CENTER_WALK_DURATION + SAFARI_SWEET_SCENT_FIXED_DURATION, MIN_PRESS_GAP, SWEET_SCENT_ADVANCES_OFFSET};
+    case PokemonFRLG_RngTarget::safarizoneeast:
+        return {"Safari Zone East", SAFARI_EAST_WALK_DURATION + SAFARI_SWEET_SCENT_FIXED_DURATION, MIN_PRESS_GAP, SWEET_SCENT_ADVANCES_OFFSET};
+    case PokemonFRLG_RngTarget::safarizonenorth:
+        return {"Safari Zone North", SAFARI_NORTH_WALK_DURATION + SAFARI_SWEET_SCENT_FIXED_DURATION, MIN_PRESS_GAP, SWEET_SCENT_ADVANCES_OFFSET};
+    case PokemonFRLG_RngTarget::safarizonewest:
+        return {"Safari Zone West", SAFARI_WEST_WALK_DURATION + SAFARI_SWEET_SCENT_FIXED_DURATION, MIN_PRESS_GAP, SWEET_SCENT_ADVANCES_OFFSET};
+    case PokemonFRLG_RngTarget::safarizonesurf:
+        return {"Safari Zone Surfing", SAFARI_SURF_WALK_DURATION + SAFARI_SWEET_SCENT_FIXED_DURATION, MIN_PRESS_GAP, SWEET_SCENT_ADVANCES_OFFSET};
+    case PokemonFRLG_RngTarget::safarizonefish:
+        return {"Safari Zone Fishing", SAFARI_FISH_WALK_DURATION + FISHING_FIXED_DURATION + FISHING_MAX_RNG_WAIT, MIN_PRESS_GAP, DEFAULT_ADVANCES_OFFSET};
+    case PokemonFRLG_RngTarget::raikou:
+    case PokemonFRLG_RngTarget::entei:
+    case PokemonFRLG_RngTarget::suicune:
+    case PokemonFRLG_RngTarget::roaming:
+        return {"Roaming", roamer_fixed_duration(language), MIN_PRESS_GAP, DEFAULT_ADVANCES_OFFSET};
+    }
+    return {nullptr, 0, 0, 0};
+}
+
+int64_t fixed_advances_offset(PokemonFRLG_RngTarget target){
+    return get_ingame_sequence(target, Language::None).advances_offset;
+}
+
 void check_timings(
-    ConsoleHandle& console, 
+    ConsoleHandle& console,
     PokemonFRLG_RngTarget TARGET,
     const RngTimings& timings,
     Language language,
-    bool safari_zone
+    uint64_t ingame_advances,
+    uint64_t continue_screen_frames
 ){
     if (timings.csf_delay < 3200){
         OperationFailedExceptionWithScreenshot::fire(
@@ -466,291 +604,39 @@ void check_timings(
             console
         );
     }
-    
-    switch (TARGET){
-    case PokemonFRLG_RngTarget::starters:
-        if (timings.ingame_delay < 7500){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Starters: the in-game delay cannot be less than 7500ms (740 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }
-        return;
-    case PokemonFRLG_RngTarget::magikarp:
-        if (timings.ingame_delay < 7500){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Magikarp: the in-game delay cannot be less than 7500ms (740 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }
-        return;
-    case PokemonFRLG_RngTarget::hitmonchan:
-    case PokemonFRLG_RngTarget::hitmonlee:
-    case PokemonFRLG_RngTarget::hitmon:
-        if (timings.ingame_delay < 4500){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Hitmonchan/Hitmonlee: the in-game delay cannot be less than 4500ms (380 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }
-        return;
-    case PokemonFRLG_RngTarget::eevee:
-        if (timings.ingame_delay < 4000){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Eevee: the in-game delay cannot be less than 4000ms (320 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }
-        return;
-    case PokemonFRLG_RngTarget::lapras:
-        if (timings.ingame_delay < 7500){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Lapras: the in-game delay cannot be less than 7500ms (740 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }
-        return;
-    case PokemonFRLG_RngTarget::omanyte:
-    case PokemonFRLG_RngTarget::kabuto:
-    case PokemonFRLG_RngTarget::aerodactyl:
-    case PokemonFRLG_RngTarget::fossils:
-        if (timings.ingame_delay < 6000){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Fossils: the in-game delay cannot be less than 6000ms (560 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }
-        return;
-    case PokemonFRLG_RngTarget::gamecornerabra:
-    case PokemonFRLG_RngTarget::gamecornerclefairy:
-    case PokemonFRLG_RngTarget::gamecornerdratinifr:
-    case PokemonFRLG_RngTarget::gamecornerdratinilg:
-    case PokemonFRLG_RngTarget::gamecornerscyther:
-    case PokemonFRLG_RngTarget::gamecornerpinsir:
-    case PokemonFRLG_RngTarget::gamecornerporygon:
-        if (timings.ingame_delay < 8500){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Game Corner: the in-game delay cannot be less than 8500ms (860 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }
-        return;
-    case PokemonFRLG_RngTarget::togepi:
-        if (timings.ingame_delay < 12000) {
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Togepi: the in-game delay cannot be less than 12000ms (1280 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }
-        return;
-    case PokemonFRLG_RngTarget::togepifast:
-        if (timings.ingame_delay < 5500){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Togepi (pre-approved): the in-game delay cannot be less than 5500ms (500 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }
-        return;
-    case PokemonFRLG_RngTarget::eggheld:
-        if (timings.ingame_delay < 4000) {
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Held Frame: the in-game delay cannot be less than 4000ms (350 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }
-        return;
-    case PokemonFRLG_RngTarget::eggpickup:
-        if (timings.ingame_delay < 12000) {
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Pickup Frame: the in-game delay cannot be less than 12000ms (1440 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }
-        return;
-    case PokemonFRLG_RngTarget::electrode:
-    case PokemonFRLG_RngTarget::articuno:
-    case PokemonFRLG_RngTarget::zapdos:
-    case PokemonFRLG_RngTarget::moltres:
-    case PokemonFRLG_RngTarget::lugia:
-    case PokemonFRLG_RngTarget::deoxys_attack:
-    case PokemonFRLG_RngTarget::deoxys_defense:
-    case PokemonFRLG_RngTarget::staticencounter:
-        if (timings.ingame_delay < 5000){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Static Encounter: the in-game delay cannot be less than 5000ms (440 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }
-        return;
-    case PokemonFRLG_RngTarget::snorlax:
-        if (timings.ingame_delay < 16000){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Snorlax: the in-game delay cannot be less than 16000ms (1760 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }
-        return;
-    case PokemonFRLG_RngTarget::mewtwo:
-        if (timings.ingame_delay < 4500){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Mewtwo: the in-game delay cannot be less than 4500ms (380 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }
-        return;
-    case PokemonFRLG_RngTarget::hooh:
-        if (timings.ingame_delay < 4000){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Ho-oh: the in-game delay cannot be less than 4000ms (320 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }
-        return;
-    case PokemonFRLG_RngTarget::hypno:
-        if (timings.ingame_delay < 13000){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Hypno: the in-game delay cannot be less than 13000ms (1400 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }
-        return;
-    case PokemonFRLG_RngTarget::sweetscent:
-        if (!safari_zone && timings.ingame_delay < 8500){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Sweet Scent: the in-game delay cannot be less than 8500ms (1372 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }else if (safari_zone && timings.ingame_delay < 9500){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Sweet Scent: the in-game delay cannot be less than 9500ms (1492 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }
-        return;
-    case PokemonFRLG_RngTarget::rocksmash:
-        if (timings.ingame_delay < 6500){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Rock Smash: the in-game delay cannot be less than 7000ms (1192 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }
-    case PokemonFRLG_RngTarget::fishing:
-        if (timings.ingame_delay < 5500){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Fishing: the in-game delay cannot be less than 5500ms (500 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }
-        return;
-    case PokemonFRLG_RngTarget::safarizonecenter:
-        if (timings.ingame_delay < 40500){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Safari Zone Center: in-game delay cannot be less than 40500ms (5212 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }
-        return;
-    case PokemonFRLG_RngTarget::safarizoneeast:
-        if (timings.ingame_delay < 46500){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Safari Zone East: in-game delay cannot be less than 46500ms (5932 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }
-        return;
-    case PokemonFRLG_RngTarget::safarizonenorth:
-        if (timings.ingame_delay < 47500){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Safari Zone North: in-game delay cannot be less than 47500ms (6052 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }
-        return;
-    case PokemonFRLG_RngTarget::safarizonewest:
-        if (timings.ingame_delay < 61500){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Safari Zone West: in-game delay cannot be less than 61500ms (7732 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }
-        return;
-    case PokemonFRLG_RngTarget::safarizonesurf:
-        if (timings.ingame_delay < 47500){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Safari Zone Surfing: in-game delay cannot be less than 47500ms (6052 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }
-        return;
-    case PokemonFRLG_RngTarget::safarizonefish:
-        if (timings.ingame_delay < 36500){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::NO_ERROR_REPORT,
-                "Safari Zone Fishing: in-game delay cannot be less than 36500ms (4220 advances). Check your in-game advances and calibration or pick a new target.",
-                console
-            );
-        }
-        return;
-    case PokemonFRLG_RngTarget::raikou:
-    case PokemonFRLG_RngTarget::entei:
-    case PokemonFRLG_RngTarget::suicune:
-    case PokemonFRLG_RngTarget::roaming:
-        uint64_t offset;
-        uint64_t frames;
-        switch (language){
-        case Language::Japanese:
-            offset = 28500;
-            frames = 3490;
-            break;
-        case Language::Spanish:
-            offset = 30000;
-            frames = 3580;
-            break;
-        default:
-            offset = 27000; 
-            frames = 3400;
-            break;
-        }
-        if (timings.ingame_delay < offset){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::SEND_ERROR_REPORT,
-                "Roaming: the in-game delay cannot be less than " + std::to_string(offset) + "ms (" + std::to_string(frames) + " frames). Check your in-game advances and calibration.",
-                console
-            );
-        }
-        return;
-    default:
+
+    IngameSequence sequence = get_ingame_sequence(TARGET, language);
+    if (sequence.name == nullptr){
         OperationFailedExceptionWithScreenshot::fire(
             ErrorReportMode::NO_ERROR_REPORT,
             "RNG target not recognized. Please report this as a bug.",
             console
         );
     }
+
+    uint64_t min_delay = sequence.fixed_duration + sequence.min_wait;
+    if (timings.ingame_delay >= min_delay){
+        return;
+    }
+
+    std::string message = std::string(sequence.name) + ": the in-game delay (" + std::to_string(timings.ingame_delay)
+        + "ms) cannot be less than " + std::to_string(min_delay) + "ms. ";
+    if (timings.teachy_delay > 0){
+        // extra advances would be spent in the Teachy TV rather than added to the in-game delay
+        message += "The Teachy TV doesn't leave enough time for this target. Disable the Teachy TV or pick a new target.";
+    }else{
+        // each frame of in-game delay is worth 2 advances. Round up to the nearest 10 advances.
+        uint64_t missing_advances = uint64_t(std::ceil((min_delay - timings.ingame_delay) * 2 / FRLG_FRAME_DURATION));
+        uint64_t min_ingame_advances = (ingame_advances + missing_advances + 9) / 10 * 10;
+        message += "With your current calibration, this target needs at least " + std::to_string(min_ingame_advances)
+            + " in-game advances (" + std::to_string(min_ingame_advances + continue_screen_frames)
+            + " total). Check your advances and calibration or pick a new target.";
+    }
+    OperationFailedExceptionWithScreenshot::fire(
+        ErrorReportMode::NO_ERROR_REPORT,
+        message,
+        console
+    );
 }
 
 void perform_blind_sequence(
@@ -856,32 +742,32 @@ void perform_blind_sequence(
         use_registered_fishing_rod(context, timings.ingame_delay);
         return;
     case PokemonFRLG_RngTarget::safarizonecenter:
-        modified_ingame_delay = timings.ingame_delay - 20670;
+        modified_ingame_delay = timings.ingame_delay - SAFARI_CENTER_WALK_DURATION;
         walk_to_safarizonecenter(context);
         use_sweet_scent(context, modified_ingame_delay, true);
         return;
     case PokemonFRLG_RngTarget::safarizoneeast:
-        modified_ingame_delay = timings.ingame_delay - 36160;
+        modified_ingame_delay = timings.ingame_delay - SAFARI_EAST_WALK_DURATION;
         walk_to_safarizoneeast(context);
         use_sweet_scent(context, modified_ingame_delay, true);
         return;
     case PokemonFRLG_RngTarget::safarizonenorth:
-        modified_ingame_delay = timings.ingame_delay - 37410;
+        modified_ingame_delay = timings.ingame_delay - SAFARI_NORTH_WALK_DURATION;
         walk_to_safarizonenorth(context);
         use_sweet_scent(context, modified_ingame_delay, true);
         return;
     case PokemonFRLG_RngTarget::safarizonewest:
-        modified_ingame_delay = timings.ingame_delay - 51430;
+        modified_ingame_delay = timings.ingame_delay - SAFARI_WEST_WALK_DURATION;
         walk_to_safarizonewest(context);
         use_sweet_scent(context, modified_ingame_delay, true);
         return;
     case PokemonFRLG_RngTarget::safarizonesurf:
-        modified_ingame_delay = timings.ingame_delay - 30300;
+        modified_ingame_delay = timings.ingame_delay - SAFARI_SURF_WALK_DURATION;
         walk_to_safarizonesurf(context);
         use_sweet_scent(context, modified_ingame_delay, true);
         return;
     case PokemonFRLG_RngTarget::safarizonefish:
-        modified_ingame_delay = timings.ingame_delay - 30300;
+        modified_ingame_delay = timings.ingame_delay - SAFARI_FISH_WALK_DURATION;
         walk_to_safarizonefish(context);
         use_registered_fishing_rod(context, modified_ingame_delay);
         return;

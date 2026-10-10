@@ -248,18 +248,7 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     bool shiny_found = false;
 
-    bool sweet_scent = (
-        TARGET == PokemonFRLG_RngTarget::sweetscent ||
-        TARGET == PokemonFRLG_RngTarget::rocksmash ||
-        TARGET == PokemonFRLG_RngTarget::safarizonecenter ||
-        TARGET == PokemonFRLG_RngTarget::safarizoneeast ||
-        TARGET == PokemonFRLG_RngTarget::safarizonenorth ||
-        TARGET == PokemonFRLG_RngTarget::safarizonewest ||
-        TARGET == PokemonFRLG_RngTarget::safarizonesurf
-    );
-
     static const int64_t FIXED_SEED_OFFSET = -845; // milliseconds, approximate
-    const int64_t FIXED_ADVANCES_OFFSET = sweet_scent ? -352 : 160; // frames, approximate
 
     const bool SAFARI_ZONE = (TARGET == PokemonFRLG_RngTarget::safarizonecenter
         || TARGET == PokemonFRLG_RngTarget::safarizoneeast
@@ -290,7 +279,7 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
             env.console, TARGET,
             SEED_DELAY, CONTINUE_SCREEN_FRAMES, INGAME_ADVANCES,
             USE_TEACHY_TV, CALIBRATIONS,
-            FIXED_SEED_OFFSET, FIXED_ADVANCES_OFFSET
+            FIXED_SEED_OFFSET
         );
         
         // handle the blind part

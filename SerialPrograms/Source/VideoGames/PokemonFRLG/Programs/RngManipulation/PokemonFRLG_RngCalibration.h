@@ -88,8 +88,7 @@ RngTimings prepare_timings(
     uint64_t INGAME_ADVANCES,
     bool USE_TEACHY_TV,
     const RngCalibrations& calibrations,
-    int64_t FIXED_SEED_OFFSET, 
-    int64_t FIXED_ADVANCES_OFFSET,
+    int64_t FIXED_SEED_OFFSET,
     Language LANGUAGE = Language::None
 );
 

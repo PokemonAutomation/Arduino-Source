@@ -30,6 +30,9 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
 
+static const int64_t FIXED_SEED_OFFSET = -845;              // ms, approximate
+static const uint64_t CONTINUE_SCREEN_FRAMES = 200;
+
 ParentIVsRow::ParentIVsRow(int index, std::string&& label)
     : StaticTableRow(label)
     , parent(LockMode::LOCK_WHILE_RUNNING, label)
@@ -352,11 +355,6 @@ bool EggRng::reset_and_check_seed(
     const SeedButton& SEED_BUTTON = frame_target.seed_button;
     const BlackoutButton& EXTRA_BUTTON = frame_target.extra_button;
 
-    static const int64_t FIXED_SEED_OFFSET = -845; // ms, approximate
-    const int64_t FIXED_ADVANCES_OFFSET = pickup_frame ? -246 : 135;    // frames, approximate
-
-    static const uint64_t CONTINUE_SCREEN_FRAMES = 200;
-
     static const uint64_t WILD_ADVANCES_RADIUS = 4096;
     
     static const uint16_t MAX_HISTORY_LENGTH = 2;
@@ -380,7 +378,7 @@ bool EggRng::reset_and_check_seed(
         env.console, target,
         SEED_DELAY, CONTINUE_SCREEN_FRAMES, ingame_advances,
         false, calibrations,
-        FIXED_SEED_OFFSET, FIXED_ADVANCES_OFFSET
+        FIXED_SEED_OFFSET
     );
 
     // Step 1: reset and perform blind sequence
@@ -811,6 +809,29 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     }
 
     log_calibrations(env.console, hist.calibrations, true);
+
+    // check timings for the pickup phase before starting
+    if (STARTING_POINT != EggProgramState::pickup_calibration){
+        env.log("Checking held frame timings...");
+        prepare_timings(
+            env.console, PokemonFRLG_RngTarget::eggheld,
+            frame_targets.held.seed_delay, CONTINUE_SCREEN_FRAMES, HELD_ADVANCES - CONTINUE_SCREEN_FRAMES,
+            false, initial_held_calibrations,
+            FIXED_SEED_OFFSET
+        );
+    }
+    env.log("Checking pickup frame timings...");
+    prepare_timings(
+        env.console, PokemonFRLG_RngTarget::eggpickup,
+        frame_targets.pickup.seed_delay, CONTINUE_SCREEN_FRAMES, PICKUP_ADVANCES - CONTINUE_SCREEN_FRAMES,
+        false,
+        {
+            PICKUP_CALIBRATION.seed_calibration / FRLG_FRAME_DURATION,
+            PICKUP_CALIBRATION.csf_calibration,
+            PICKUP_CALIBRATION.advances_calibration
+        },
+        FIXED_SEED_OFFSET
+    );
 
     bool shiny_found = false;
 
