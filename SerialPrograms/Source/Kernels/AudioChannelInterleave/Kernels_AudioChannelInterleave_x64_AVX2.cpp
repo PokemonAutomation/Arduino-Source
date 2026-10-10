@@ -44,7 +44,6 @@ void channel_deinterleave_x64_AVX2<2>(
     size_t stride, r_ptr<float> strided_stream,
     c_ptr<float> interleaved_stream
 ){
-    cout << "asdf" << endl;
     while (samples >= 8){
         __m256 r0, r1;
         __m256 s0, s1;
@@ -71,7 +70,6 @@ void channel_interleave_x64_AVX2<2>(
     size_t stride, c_ptr<float> strided_stream,
     r_ptr<float> interleaved_stream
 ){
-    cout << "qwer" << endl;
     while (samples >= 8){
         __m256 r0, r1;
         __m256 s0, s1;
