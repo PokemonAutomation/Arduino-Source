@@ -9,7 +9,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Images/ImageFilter.h"
-#include "OCR_RawPaddleOCR.h"
+#include "OCR_PaddleOCR.h"
 #include "OCR_RawTesseractOCR.h"
 #include "OCR_DictionaryMatcher.h"
 #include "OCR_Routines.h"
@@ -34,31 +34,15 @@ bool ocr_language_available(Language language){
 
 
 std::string ocr_read(Language language, const ImageViewRGB32& image, PageSegMode psm){
-    std::string ocr_text = "";
-    if (psm == PageSegMode::AUTO || psm == PageSegMode::SINGLE_BLOCK || psm == PageSegMode::SINGLE_COLUMN){
-        // if using multiline detection, force Tesseract
-        ocr_text = OCR::tesseract_ocr_read(language, image, psm);
+    if (GlobalSettings::instance().OCR_LIBRARY == OcrLibrary::PADDLE_OCR){
+        return OCR::paddle_ocr_read(language, image, psm);
     }else{
-        if (GlobalSettings::instance().OCR_LIBRARY == OcrLibrary::PADDLE_OCR){
-            ocr_text = OCR::paddle_ocr_read(language, image);
-        }else{
-            ocr_text = OCR::tesseract_ocr_read(language, image, psm);
-        }
+        return OCR::tesseract_ocr_read(language, image, psm);
     }
-    return ocr_text;
 }
 
 bool allow_parallel_ocr(PageSegMode psm){
-    if (psm == PageSegMode::AUTO || psm == PageSegMode::SINGLE_BLOCK || psm == PageSegMode::SINGLE_COLUMN){
-        // if using multiline detection, force Tesseract
-        return true;
-    }else{
-        if (GlobalSettings::instance().OCR_LIBRARY == OcrLibrary::PADDLE_OCR){
-            return false;
-        }else{
-            return true;
-        }
-    }
+    return GlobalSettings::instance().OCR_LIBRARY != OcrLibrary::PADDLE_OCR;
 }
 
 void ensure_ocr_instances(Language language, size_t instances){
