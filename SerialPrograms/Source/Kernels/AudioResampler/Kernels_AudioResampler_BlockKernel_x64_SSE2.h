@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_Kernels_BlockKernel_x64_SSE4_H
-#define PokemonAutomation_Kernels_BlockKernel_x64_SSE4_H
+#ifndef PokemonAutomation_Kernels_AudioResampler_BlockKernel_x64_SSE4_H
+#define PokemonAutomation_Kernels_AudioResampler_BlockKernel_x64_SSE4_H
 
 #include <immintrin.h>
 #include "Common/Compiler.h"
