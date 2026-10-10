@@ -345,7 +345,7 @@ void convert_to_x64_AVX2<int32_t, 2>(
         r1 = _mm256_permutevar8x32_epi32(r1, _mm256_setr_epi32(7, 0, 4, 1, 5, 2, 6, 3));
         s0 = _mm256_blend_epi32(r0, r1, 0xaa);
         s1 = _mm256_blend_epi32(r0, r1, 0x55);
-        s1 = _mm256_alignr_epi32(s1, s1, 1);
+        s1 = _mm256_permutevar8x32_epi32(s1, _mm256_setr_epi32(1, 2, 3, 4, 5, 6, 7, 0));
         _mm256_storeu_si256((__m256i*)interleaved_stream + 0, s0);
         _mm256_storeu_si256((__m256i*)interleaved_stream + 1, s1);
 
