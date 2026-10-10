@@ -5,17 +5,22 @@
  */
 
 #include <atomic>
+//#include <numeric>
 #include <cmath>
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Kernels_KaiserWindow.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace Kernels{
 namespace KaiserWindow{
 
 
-double bessel_i0(double x) {
+double bessel_i0(double x){
     double sum = 1.0;
     double term = 1.0;
     double x_half = x / 2.0;
@@ -41,6 +46,7 @@ void make_kaiser_window(float* weights, size_t window, double beta){
         weights[c] = (float)t;
     }
 }
+
 
 
 constexpr int MAX_WINDOW_K = 30;
