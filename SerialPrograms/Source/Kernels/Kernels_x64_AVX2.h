@@ -68,6 +68,17 @@ inline static void print_u32(const __m256i& x){
     }
     std::cout << std::endl;
 }
+inline static void print_s32(const __m256i& x){
+    union{
+        __m256i v;
+        int32_t s[8];
+    };
+    v = x;
+    for (int i = 0; i < 8; i++){
+        std::cout << s[i] << " ";
+    }
+    std::cout << std::endl;
+}
 inline static void print_u64(const __m256i& x){
     union{
         __m256i v;

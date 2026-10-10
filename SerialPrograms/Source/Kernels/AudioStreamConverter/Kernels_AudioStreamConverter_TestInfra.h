@@ -1,4 +1,4 @@
-/*  Audio Stream Conversion Test Infra
+/*  Audio Stream Converter Test Infra
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -10,12 +10,12 @@
 #include "Common/Cpp/TestRunners/UnitTest.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 
-#ifndef PokemonAutomation_Kernels_AudioStreamConversion_TestInfra_H
-#define PokemonAutomation_Kernels_AudioStreamConversion_TestInfra_H
+#ifndef PokemonAutomation_Kernels_AudioStreamConverter_TestInfra_H
+#define PokemonAutomation_Kernels_AudioStreamConverter_TestInfra_H
 
 namespace PokemonAutomation{
 namespace Kernels{
-namespace AudioStreamConversion{
+namespace AudioStreamConverter{
 
 
 
@@ -49,7 +49,7 @@ public:
         ConvertTo<Type> convert_to
     )
         : UnitTest(
-            "Kernels::AudioStreamConversion - convert_to/from_" + typestr() + "_" + arch_str +
+            "Kernels::AudioStreamConverter - convert_to/from_" + typestr() + "_" + arch_str +
             "(ch = " + std::to_string(channels) + ", samples=" + std::to_string(samples) + ")"
         )
         , m_channels(channels)

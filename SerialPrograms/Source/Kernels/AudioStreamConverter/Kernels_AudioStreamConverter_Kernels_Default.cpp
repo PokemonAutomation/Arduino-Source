@@ -1,16 +1,16 @@
-/*  Audio Stream Conversion Kernels (Default)
+/*  Audio Stream Converter Kernels (Default)
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
 #include <algorithm>
-#include "Kernels_AudioStreamConversion_TestInfra.h"
-#include "Kernels_AudioStreamConversion_Kernels_Default.h"
+#include "Kernels_AudioStreamConverter_TestInfra.h"
+#include "Kernels_AudioStreamConverter_Kernels_Default.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
-namespace AudioStreamConversion{
+namespace AudioStreamConverter{
 
 
 

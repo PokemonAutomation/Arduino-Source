@@ -1,11 +1,11 @@
-/*  Audio Stream Conversion Kernels (Default)
+/*  Audio Stream Converter Kernels (Default)
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_Kernels_AudioStreamConversion_Kernels_Default_H
-#define PokemonAutomation_Kernels_AudioStreamConversion_Kernels_Default_H
+#ifndef PokemonAutomation_Kernels_AudioStreamConverter_Kernels_Default_H
+#define PokemonAutomation_Kernels_AudioStreamConverter_Kernels_Default_H
 
 #include "Common/Compiler.h"
 
@@ -18,7 +18,7 @@ namespace PokemonAutomation{
 class UnitTestDatabase;
 
 namespace Kernels{
-namespace AudioStreamConversion{
+namespace AudioStreamConverter{
 
 
 template <typename Type, size_t channels>

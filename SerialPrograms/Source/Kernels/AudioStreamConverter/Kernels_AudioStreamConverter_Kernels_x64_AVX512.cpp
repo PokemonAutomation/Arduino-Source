@@ -1,4 +1,4 @@
-/*  Audio Stream Conversion Kernels (Generic Defaults)
+/*  Audio Stream Converter Kernels (x64 AVX512)
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -10,9 +10,9 @@
 #include "Common/Cpp/TestRunners/UnitTest.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/Kernels_x64_AVX512.h"
-#include "Kernels_AudioStreamConversion_TestInfra.h"
-#include "Kernels_AudioStreamConversion_Kernels_Default.h"
-#include "Kernels_AudioStreamConversion_Kernels_x64_AVX512.h"
+#include "Kernels_AudioStreamConverter_TestInfra.h"
+#include "Kernels_AudioStreamConverter_Kernels_Default.h"
+#include "Kernels_AudioStreamConverter_Kernels_x64_AVX512.h"
 
 //#include <iostream>
 //using std::cout;
@@ -20,7 +20,7 @@
 
 namespace PokemonAutomation{
 namespace Kernels{
-namespace AudioStreamConversion{
+namespace AudioStreamConverter{
 
 
 
@@ -276,7 +276,7 @@ void convert_to_x64_AVX512<uint8_t, 2>(
             r1
         );
         s0 = _mm512_cvtepi16_epi8(r0);
-        _mm256_storeu_epi32(interleaved_stream, s0);
+        _mm256_storeu_si256((__m256i*)interleaved_stream, s0);
 
         strided_stream += 16;
         interleaved_stream += 32;
