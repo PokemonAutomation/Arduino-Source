@@ -8,7 +8,6 @@
 #include <random>
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Common/Cpp/TestRunners/UnitTest.h"
-#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 
 #ifndef PokemonAutomation_Kernels_AudioStreamConverter_TestInfra_H
 #define PokemonAutomation_Kernels_AudioStreamConverter_TestInfra_H

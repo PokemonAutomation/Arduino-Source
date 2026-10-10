@@ -8,7 +8,6 @@
 
 #include <immintrin.h>
 #include <smmintrin.h>
-#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 //#include "Kernels/Kernels_x64_SSE41.h"
 #include "Kernels_AudioStreamConverter_TestInfra.h"
@@ -182,8 +181,8 @@ public:
         : Test<Type>(
             "from_x64_SSE41",
             samples,
-            convert_from_x64_SSE41<Type>,
-            convert_to_Default<Type>
+            static_cast<ConvertFrom<Type>>(convert_from_x64_SSE41<Type>),
+            static_cast<ConvertTo<Type>>(convert_to_Default<Type>)
         )
     {}
 };
@@ -194,8 +193,8 @@ public:
         : Test<Type>(
             "to_x64_SSE41",
             samples,
-            convert_from_Default<Type>,
-            convert_to_x64_SSE41<Type>
+            static_cast<ConvertFrom<Type>>(convert_from_Default<Type>),
+            static_cast<ConvertTo<Type>>(convert_to_x64_SSE41<Type>)
         )
     {}
 };

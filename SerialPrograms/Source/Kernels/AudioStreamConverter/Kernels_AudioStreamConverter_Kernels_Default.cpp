@@ -5,6 +5,7 @@
  */
 
 #include <algorithm>
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels_AudioStreamConverter_TestInfra.h"
 
 namespace PokemonAutomation{
@@ -85,8 +86,8 @@ public:
         : Test<Type>(
             "Default",
             samples,
-            convert_from_Default<Type>,
-            convert_to_Default<Type>
+            static_cast<ConvertFrom<Type>>(convert_from_Default<Type>),
+            static_cast<ConvertTo<Type>>(convert_to_Default<Type>)
         )
     {}
 };
