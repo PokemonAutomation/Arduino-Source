@@ -367,6 +367,36 @@ bool JsonValue::read_string(std::string& value) const{
 
 
 
+//  Equality.
+
+bool operator==(const JsonValue& x, const JsonValue& y){
+    if (x.m_type != y.m_type){
+        return false;
+    }
+    switch (x.m_type){
+    case JsonType::EMPTY:
+        return true;
+    case JsonType::BOOLEAN:
+        return x.u.m_bool == y.u.m_bool;
+    case JsonType::INTEGER:
+        return x.u.m_integer == y.u.m_integer;
+    case JsonType::FLOAT:
+        return x.u.m_float == y.u.m_float;
+    case JsonType::STRING:
+        return *x.u.m_string == *y.u.m_string;
+    case JsonType::ARRAY:
+        return *x.u.m_array == *y.u.m_array;
+    case JsonType::OBJECT:
+        return *x.u.m_object == *y.u.m_object;
+    }
+    return false;
+}
+bool operator!=(const JsonValue& x, const JsonValue& y){
+    return !(x == y);
+}
+
+
+
 JsonValue parse_json(const std::string& str){
     return from_nlohmann(nlohmann::json::parse(str, nullptr, false));
 }

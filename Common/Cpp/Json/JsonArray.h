@@ -26,6 +26,24 @@ private:
 public:
     JsonArray clone() const;
 
+    //  Structurally compare two arrays.
+    friend bool operator==(const JsonArray& x, const JsonArray& y){
+        if (x.m_data.size() != y.m_data.size()){
+            return false;
+        }
+        auto itx = x.m_data.cbegin();
+        auto ity = y.m_data.cbegin();
+        for (; itx != x.m_data.cend(); ++itx, ++ity){
+            if (!(*itx == *ity)){
+                return false;
+            }
+        }
+        return true;
+    }
+    friend bool operator!=(const JsonArray& x, const JsonArray& y){
+        return !(x == y);
+    }
+
 public:
     std::string dump(int indent = 4) const;
     void dump(const std::string& filename, int indent = 4) const;
