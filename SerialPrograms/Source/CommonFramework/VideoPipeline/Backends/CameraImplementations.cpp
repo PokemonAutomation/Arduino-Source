@@ -101,7 +101,7 @@ VideoBackendOption::VideoBackendOption()
 
 
 const CameraBackend& get_camera_backend(){
-    size_t index = GlobalSettings::instance().VIDEO_PIPELINE->VIDEO_BACKEND.current_value();
+    size_t index = GlobalSettings::instance().VIDEO_PIPELINE->VIDEO_BACKEND0.current_value();
     const CameraBackends& backends = CameraBackends::instance();
     if (index >= backends.m_backends.size()){
         index = 1;

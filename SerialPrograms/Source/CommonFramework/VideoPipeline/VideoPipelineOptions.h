@@ -25,12 +25,12 @@ public:
             true,
             false
         )
-    , SHOW_ALL_FPS(
-        "<b>Show all FPS Options:</b><br>"
-        "Show all video format/FPS combinations. This is hidden by default since Qt usually ignores the FPS.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false
-    )
+        , SHOW_ALL_FPS(
+            "<b>Show all FPS Options:</b><br>"
+            "Show all video format/FPS combinations. This is hidden by default since Qt usually ignores the FPS.",
+            LockMode::UNLOCK_WHILE_RUNNING,
+            false
+        )
         , AUTO_RESET_SECONDS(
             "<b>Video Auto-Reset:</b><br>"
             "Attempt to reset the video if this many seconds has elapsed since the last video frame (in order to fix issues with RDP disconnection, etc).<br>"
@@ -44,14 +44,14 @@ public:
         )
     {
         PA_ADD_OPTION(SHOW_ALL_FPS);
-        PA_ADD_OPTION(VIDEO_BACKEND);
+        PA_ADD_OPTION(VIDEO_BACKEND0);
 
         PA_ADD_OPTION(AUTO_RESET_SECONDS);
     }
 
 public:
     BooleanCheckBoxOption SHOW_ALL_FPS;
-    VideoBackendOption VIDEO_BACKEND;
+    VideoBackendOption VIDEO_BACKEND0;
 
     SimpleIntegerOption<uint8_t> AUTO_RESET_SECONDS;
 };
