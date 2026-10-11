@@ -194,8 +194,8 @@ public:
         : Test<Type>(
             "from_x64_AVX2",
             samples,
-            static_cast<ConvertFrom<Type>>(convert_from_x64_AVX2<Type>),
-            static_cast<ConvertTo<Type>>(convert_to_Default<Type>)
+            (ConvertFrom<Type>)convert_from_x64_AVX2<Type>,
+            (ConvertTo<Type>)convert_to_Default<Type>
         )
     {}
 };
@@ -206,8 +206,8 @@ public:
         : Test<Type>(
             "to_x64_AVX2",
             samples,
-            static_cast<ConvertFrom<Type>>(&convert_from_Default<Type>),
-            static_cast<ConvertTo<Type>>(&convert_to_x64_AVX2<Type>)
+            (ConvertFrom<Type>)convert_from_Default<Type>,
+            (ConvertTo<Type>)convert_to_x64_AVX2<Type>
         )
     {}
 };
