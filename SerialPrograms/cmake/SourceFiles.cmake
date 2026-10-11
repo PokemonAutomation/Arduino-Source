@@ -1002,6 +1002,7 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/Algorithm/Kernels_Algorithm_DisjointSet.h
     Source/Kernels/AudioChannelInterleave/Kernels_AudioChannelInterleave.cpp
     Source/Kernels/AudioChannelInterleave/Kernels_AudioChannelInterleave.h
+    Source/Kernels/AudioChannelInterleave/Kernels_AudioChannelInterleave_TestInfra.cpp
     Source/Kernels/AudioChannelInterleave/Kernels_AudioChannelInterleave_TestInfra.h
     Source/Kernels/AudioChannelInterleave/Kernels_AudioChannelInterleave_Default.cpp
     Source/Kernels/AudioChannelInterleave/Kernels_AudioChannelInterleave_Default.h
@@ -1011,6 +1012,7 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer.h
     Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer_Default.cpp
     Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer_Default.h
+    Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer_TestInfra.cpp
     Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer_TestInfra.h
     Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer_x64_AVX512.cpp
     Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer_x64_FMA3.cpp
@@ -1031,6 +1033,7 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/AudioStreamConverter/Kernels_AudioStreamConverter_Kernels_x64_SSE41.cpp
     Source/Kernels/AudioStreamConverter/Kernels_AudioStreamConverter_Kernels_x64_AVX2.cpp
     Source/Kernels/AudioStreamConverter/Kernels_AudioStreamConverter_Kernels_x64_AVX512.cpp
+    Source/Kernels/AudioStreamConverter/Kernels_AudioStreamConverter_TestInfra.cpp
     Source/Kernels/AudioStreamConverter/Kernels_AudioStreamConverter_TestInfra.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h
