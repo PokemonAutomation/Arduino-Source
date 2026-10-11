@@ -6,6 +6,7 @@
 
 #include <numeric>
 #include <cmath>
+#include <numbers>
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Kernels/Kernels_Alignment.h"
 #include "Kernels/KaiserWindow/Kernels_KaiserWindow.h"
@@ -102,7 +103,7 @@ WeightTable::WeightTable(
 
             x *= downsample_scale;
 
-            double arg = 3.1415926535897932385 * x;
+            double arg = std::numbers::pi * x;
             double sinc = std::sin(arg) / arg;
 //            cout << "sinc = " << sinc << endl;
 
