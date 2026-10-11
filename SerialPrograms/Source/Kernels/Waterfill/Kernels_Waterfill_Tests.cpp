@@ -25,6 +25,7 @@
 #include "Kernels/Waterfill/Kernels_Waterfill_Routines.h"
 #include "Kernels_Waterfill_Tests.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 
 #include <iostream>
 using std::cout;
@@ -40,11 +41,16 @@ public:
         const std::string& image
     )
         : UnitTest("Kernels::Waterfill - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
 
         const size_t width = image.width();
         const size_t height = image.height();

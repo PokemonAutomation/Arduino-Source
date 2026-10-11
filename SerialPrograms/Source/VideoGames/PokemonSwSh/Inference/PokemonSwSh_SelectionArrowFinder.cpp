@@ -19,6 +19,7 @@
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/ImageMatch/ExactImageMatcher.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 #include "PokemonSwSh_SelectionArrowFinder.h"
 
 //#include <iostream>
@@ -242,12 +243,17 @@ public:
         size_t expected
     )
         : UnitTest("PokemonSwSh::SelectionArrowFinder - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected(expected)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         std::vector<ImagePixelBox> boxes = find_selection_arrows(image, 10);
         for (const auto& box : boxes){
             std::cout << "Found box: " << box.min_x << " " << box.max_x << " " << box.min_y << " " << box.max_y << std::endl;
@@ -266,14 +272,19 @@ public:
         bool expected
     )
         : UnitTest("PokemonSwSh::RetrieveEggArrowFinder - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected(expected)
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         DummyVideoOverlay overlay;
         RetrieveEggArrowFinder detector(overlay);
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         return detector.detect(image) == m_expected;
     };
 
@@ -288,14 +299,19 @@ public:
         bool expected
     )
         : UnitTest("PokemonSwSh::CheckNurseryArrowFinder - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected(expected)
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         DummyVideoOverlay overlay;
         CheckNurseryArrowFinder detector(overlay);
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         return detector.detect(image) == m_expected;
     };
 
@@ -310,14 +326,19 @@ public:
         bool expected
     )
         : UnitTest("PokemonSwSh::StoragePokemonMenuArrowFinder - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected(expected)
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         DummyVideoOverlay overlay;
         StoragePokemonMenuArrowFinder detector(overlay);
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         return detector.detect(image) == m_expected;
     };
 
@@ -332,14 +353,19 @@ public:
         int index
     )
         : UnitTest("PokemonSwSh::RotomPhoneMenuArrowFinder - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_index(index)
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         DummyVideoOverlay overlay;
         RotomPhoneMenuArrowFinder detector(overlay);
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         return detector.detect_index(image) == m_index;
     };
 

@@ -8,6 +8,7 @@
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "Tests/TestImageDistortion.h"
 #include "BlackBorderDetector.h"
 
 #include <iostream>
@@ -77,13 +78,18 @@ class Test_BlackBorderDetector : public UnitTest{
 public:
     Test_BlackBorderDetector(const std::string& image, bool expected)
         : UnitTest("CommonFramework::BlackBorderDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected(expected)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         BlackBorderDetector detector;
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         return detector.detect(image) == m_expected;
     }
 

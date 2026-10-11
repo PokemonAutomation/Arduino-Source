@@ -11,6 +11,7 @@
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 #include "PokemonSV_MapDetector.h"
 
 //#include <iostream>
@@ -166,9 +167,13 @@ public:
         std::vector<std::string> words
     )
         : UnitTest("PokemonSV::MapDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_words(std::move(words))
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         // two words: <Map ready to exit> <In fixed view (instead of the rotated view)>
@@ -193,7 +198,8 @@ public:
         }
 
         WhiteButtonDetector map_exit_detector(COLOR_RED, WhiteButton::ButtonY, {0.800, 0.118, 0.030, 0.060});
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         bool result_map = map_exit_detector.detect(image);
 
         TEST_RESULT_EQUAL_STR(result_map, target_map_existence);

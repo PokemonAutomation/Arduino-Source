@@ -9,6 +9,7 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "Tests/TestImageDistortion.h"
 //#include "Tests/TestUtils.h"
 #include <opencv2/opencv.hpp>
 #include <cmath>
@@ -343,9 +344,13 @@ class Test_DirectionArrowDetector : public UnitTest{
 public:
     Test_DirectionArrowDetector(const std::string& image, int target_angle)
         : UnitTest("PokemonPLZA::DirectionArrowDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_target_angle(target_angle)
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         if (m_target_angle < 0 || m_target_angle >= 360){
@@ -353,7 +358,8 @@ public:
         }
 
         DirectionArrowDetector detector(COLOR_RED);
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         if (!detector.detect(image)){
             return "Error: detector failed to detect arrow in image.";
         }

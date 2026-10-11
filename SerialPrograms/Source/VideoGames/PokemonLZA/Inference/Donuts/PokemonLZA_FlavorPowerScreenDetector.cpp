@@ -15,6 +15,7 @@
 #include "PokemonLZA_FlavorPowerDetector.h"
 #include "PokemonLZA_FlavorPowerScreenDetector.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 
 #include <fstream>
 #include <sstream>
@@ -59,11 +60,15 @@ class Test_FlavorPowerScreenDetector : public UnitTest{
 public:
     Test_FlavorPowerScreenDetector(const std::string& image)
         : UnitTest("PokemonPLZA::FlavorPowerScreenDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        Filesystem::Path file_path(m_image);
+        Filesystem::Path file_path(UNIT_TEST_RESOURCE_PATH() + m_image);
         Filesystem::Path parent_dir = file_path.parent_path();
         std::string base_name = file_path.stem().string();
 
@@ -83,7 +88,8 @@ public:
             return "Error: invalid language word in filename.";
         }
 
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         FlavorPowerScreenDetector screen_detector;
         if (!screen_detector.detect(image)){
             return "Error: FlavorPowerScreenDetector did not detect flavor power screen.";

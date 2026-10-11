@@ -13,6 +13,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonLZA_OverworldPartySelectionDetector.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 
 #include <iostream>
 using std::cout;
@@ -146,10 +147,14 @@ public:
         int expected_down_idx
     )
         : UnitTest("PokemonPLZA::OverworldPartySelectionDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected_up_idx(expected_up_idx)
         , m_expected_down_idx(expected_down_idx)
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         if (m_expected_up_idx < 0 || m_expected_up_idx > 6){
@@ -162,7 +167,8 @@ public:
         DummyVideoOverlay overlay;
         OverworldPartySelectionDetector detector(COLOR_RED, &overlay);
         detector.set_debug_mode(true);
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         bool detected = detector.detect(image);
 
         if (m_expected_up_idx == 6 && m_expected_down_idx == 6){

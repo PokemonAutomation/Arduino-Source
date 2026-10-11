@@ -11,6 +11,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonLA_CommonColorCheck.h"
 #include "PokemonLA_StatusInfoScreenDetector.h"
@@ -191,9 +192,13 @@ public:
         std::vector<std::string> keywords
     )
         : UnitTest("PokemonLA::StatusInfoScreenDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_keywords(std::move(keywords))
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         // the last five keywords should be: <language> <pokemon name slug> <Shiny/NotShiny> <Alpha/NotAlpha> <Male/Female/Genderless>
@@ -206,7 +211,8 @@ public:
         }
 
         DummyVideoOverlay overlay;
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         const PokemonDetails details = read_status_info(logger, overlay, image, language);
 
         ret = test_pokemon_details(details, target);

@@ -10,6 +10,7 @@
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 #include "PokemonHome_SelectionArrowDetector.h"
 
 namespace PokemonAutomation{
@@ -113,13 +114,18 @@ public:
         std::optional<SelectionArrowType> expected
     )
         : UnitTest("PokemonHome::SelectionArrowDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected(expected)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         DummyVideoOverlay video_overlay;
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         SelectionArrowDetector right_detector(COLOR_BLACK, &video_overlay, SelectionArrowType::RIGHT, ImageFloatBox(0.463, 0.09, 0.04, 0.06));
         SelectionArrowDetector down_detector(COLOR_BLACK, &video_overlay, SelectionArrowType::DOWN, ImageFloatBox(0.463, 0.09, 0.04, 0.06));
 

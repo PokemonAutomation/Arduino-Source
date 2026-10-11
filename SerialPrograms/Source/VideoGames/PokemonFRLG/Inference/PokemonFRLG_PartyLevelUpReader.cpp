@@ -24,6 +24,7 @@
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Tests.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 #include "PokemonFRLG_DigitReader.h"
 #include "PokemonFRLG_PartyLevelUpReader.h"
 
@@ -77,16 +78,21 @@ class Test_PartyLevelUpReader : public UnitTest{
 public:
     Test_PartyLevelUpReader(const std::string& image)
         : UnitTest("PokemonFRLG::PartyLevelUpReader - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         PartyLevelUpReader reader;
         StatReads stats = reader.read_stats(logger, image);
 
         return check_against_golden_file(
-            m_image,
+            UNIT_TEST_RESOURCE_PATH() + m_image,
             {"hp", "attack", "defense", "spatk", "spdef", "speed"},
             {
                 std::to_string(stats.hp),

@@ -15,6 +15,7 @@
 #include "PokemonSV_SandwichPlateDetector.h"
 #include "VideoGames/PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 // #include "CommonFramework/Tools/DebugDumper.h"
 
 //#include <iostream>
@@ -136,9 +137,13 @@ class Test_SandwichPlateDetector : public UnitTest{
 public:
     Test_SandwichPlateDetector(const std::string& image, std::vector<std::string> words)
         : UnitTest("PokemonSV::SandwichPlateDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_words(std::move(words))
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         if (m_words.size() < 4){
@@ -156,7 +161,8 @@ public:
         detectors.emplace_back(logger, COLOR_RED, language, SandwichPlateDetector::Side::RIGHT);
 
         std::string sides[3] = {"left", "middle", "right"};
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         for (int i = 0; i < 3; i++){
             bool is_yellow = detectors[i].is_label_yellow(image);
             std::string target = m_words[m_words.size() - 3 + i];

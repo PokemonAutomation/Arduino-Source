@@ -8,6 +8,7 @@
 #include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonSV_DialogArrowDetector.h"
 #include "PokemonSV_GradientArrowDetector.h"
+#include "Tests/TestImageDistortion.h"
 #include "PokemonSV_DialogDetector.h"
 
 //#include <iostream>
@@ -129,13 +130,18 @@ class Test_AdvanceDialogDetector : public UnitTest{
 public:
     Test_AdvanceDialogDetector(const std::string& image, bool expected)
         : UnitTest("PokemonSV::AdvanceDialogDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected(expected)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         AdvanceDialogDetector detector(COLOR_RED);
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         return detector.detect(image) == m_expected;
     }
 
@@ -148,13 +154,18 @@ class Test_DialogBoxDetector : public UnitTest{
 public:
     Test_DialogBoxDetector(const std::string& image, bool expected)
         : UnitTest("PokemonSV::DialogBoxDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected(expected)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         DialogBoxDetector detector(COLOR_RED);
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         return detector.detect(image) == m_expected;
     }
 

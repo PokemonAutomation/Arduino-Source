@@ -13,6 +13,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
+#include "Tests/TestImageDistortion.h"
 #include "PokemonSV_NormalBattleMenus.h"
 
 
@@ -384,13 +385,18 @@ public:
         bool expected
     )
         : UnitTest("PokemonSV::SwapMenuDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected(expected)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         SwapMenuDetector detector(COLOR_RED);
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         return detector.detect(image) == m_expected;
     };
 
@@ -406,13 +412,18 @@ public:
         bool expected
     )
         : UnitTest("PokemonSV::TerastallizingDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected(expected)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         TerastallizingDetector detector(COLOR_RED);
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         return detector.detect(image) == m_expected;
     };
 

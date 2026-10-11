@@ -34,6 +34,7 @@
 #include "CommonTools/Resources/SpriteDatabase.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 #include "VideoGames/PokemonLA/Resources/PokemonLA_AvailablePokemon.h"
 #include "VideoGames/PokemonLA/Inference/Objects/PokemonLA_MMOQuestionMarkDetector.h"
 #include "PokemonLA_PokemonMapSpriteReader.h"
@@ -1016,11 +1017,23 @@ public:
         const std::string& image
     )
         : UnitTest("PokemonLA::MMOSpriteMatcher - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
     {}
 
+    //  The test image with the MMO sprites revealed, which `run()` loads as well: the same file
+    //  name with a leading "_", e.g. "_MMO_Region_Fieldlands_01.png" next to "MMO_Region_Fieldlands_01.png".
+    //  Like `m_image`, it is relative to `UNIT_TEST_RESOURCE_PATH()`.
+    std::string revealed_image_path() const{
+        const QFileInfo fileinfo(QString::fromStdString(m_image));
+        return fileinfo.dir().filePath("_" + fileinfo.fileName()).toStdString();
+    }
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image, revealed_image_path()};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        const QString full_path(QString::fromStdString(m_image));
+        const QString full_path(QString::fromStdString(UNIT_TEST_RESOURCE_PATH() + m_image));
         const QFileInfo fileinfo(full_path);
         const QString filename = fileinfo.fileName();
         const QDir parent_dir = fileinfo.dir();
@@ -1055,12 +1068,14 @@ public:
         const QString mmo_revealed_image_path = parent_dir.filePath("_" + filename);
         const QString mmo_revealed_txt_path = parent_dir.filePath("_" + fileinfo.baseName() + ".txt");
 
-        ImageRGB32 question_mark_image(m_image);
+        ImageRGB32 question_mark_image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(question_mark_image, m_image, distortion_label());
         ImageRGB32 sprite_image(mmo_revealed_image_path.toStdString());
+        apply_test_image_distortion(sprite_image, revealed_image_path(), distortion_label());
 
         if (!question_mark_image){
-            cerr << "Error: cannot load MMO question mark image file " << m_image << endl;
-            return "Error: cannot load MMO question mark image file " + m_image;
+            cerr << "Error: cannot load MMO question mark image file " << UNIT_TEST_RESOURCE_PATH() + m_image << endl;
+            return "Error: cannot load MMO question mark image file " + UNIT_TEST_RESOURCE_PATH() + m_image;
         }
         if (!sprite_image){
             cerr << "Error: cannot load MMO revealed sprites image file " << mmo_revealed_image_path.toStdString() << endl;

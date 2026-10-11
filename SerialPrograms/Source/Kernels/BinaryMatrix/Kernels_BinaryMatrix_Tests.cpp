@@ -17,6 +17,7 @@
 #endif
 //#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64xH_Default.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
+#include "Tests/TestImageDistortion.h"
 #include "Kernels_BinaryMatrix_Tests.h"
 
 #include <functional>
@@ -344,11 +345,16 @@ public:
         const std::string& image
     )
         : UnitTest("Kernels::BinaryMatrix - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
 
         if (test_binary_matrix_tile() != 0){
             return false;

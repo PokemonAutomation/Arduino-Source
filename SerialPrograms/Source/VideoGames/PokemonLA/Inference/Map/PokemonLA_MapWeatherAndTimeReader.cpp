@@ -15,6 +15,7 @@
 #include "CommonTools/ImageMatch/ImageCropper.h"
 #include "CommonTools/ImageMatch/SilhouetteDictionaryMatcher.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 #include "VideoGames/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h"
 #include "PokemonLA_MapWeatherAndTimeReader.h"
 
@@ -140,9 +141,13 @@ public:
         std::vector<std::string> keywords
     )
         : UnitTest("PokemonLA::MapWeatherAndTimeReader - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_keywords(std::move(keywords))
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         // two keywords: <Weather name> <Time of day name>
@@ -155,7 +160,8 @@ public:
         const auto& target_weather = m_keywords[m_keywords.size()-2];
         const auto& target_time = m_keywords[m_keywords.size()-1];
 
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         const std::string weather_result = WEATHER_NAMES[(int)detect_weather_on_map(logger, image)];
         const std::string time_result = TIME_OF_DAY_NAMES[(int)detect_time_of_day_on_map(logger, image)];
 

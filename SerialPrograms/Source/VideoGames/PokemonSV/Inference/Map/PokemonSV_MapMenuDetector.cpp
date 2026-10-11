@@ -11,6 +11,7 @@
 #include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonSV_MapMenuDetector.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 
 //#include <iostream>
 //using std::cout;
@@ -106,14 +107,19 @@ class Test_MapFlyMenuDetector : public UnitTest{
 public:
     Test_MapFlyMenuDetector(const std::string& image, bool expected)
         : UnitTest("PokemonSV::MapFlyMenuDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected(expected)
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         MapFlyMenuDetector fly_menu(COLOR_RED);
         MapDestinationMenuDetector dest_menu(COLOR_RED);
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         TEST_RESULT_EQUAL_STR(fly_menu.detect(image), m_expected);
         TEST_RESULT_EQUAL_STR(dest_menu.detect(image), !m_expected);
         return true;

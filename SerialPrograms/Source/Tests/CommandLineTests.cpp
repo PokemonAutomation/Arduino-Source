@@ -17,10 +17,10 @@ namespace PokemonAutomation{
 
 
 
-int run_command_line_tests(){
+int run_command_line_tests(bool augment_color_distortions){
     cout << "Running parallel unit tests..." << endl;
     ComputerPrograms::CommandLineUnitTestRunner runner(global_logger_command_line());
-    if (runner.run()){
+    if (runner.run(augment_color_distortions)){
         return 1;
     }
     cout << "Running parallel unit tests... Done!" << endl;

@@ -19,6 +19,7 @@
 #include "VideoGames/PokemonLZA/Resources/PokemonLZA_DonutBerries.h"
 #include "PokemonLZA_DonutBerriesDetector.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 
 #include <fstream>
 //#include <iostream>
@@ -181,11 +182,15 @@ class Test_DonutBerriesReader : public UnitTest{
 public:
     Test_DonutBerriesReader(const std::string& image)
         : UnitTest("PokemonPLZA::DonutBerriesReader - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        Filesystem::Path file_path(m_image);
+        Filesystem::Path file_path(UNIT_TEST_RESOURCE_PATH() + m_image);
         Filesystem::Path parent_dir = file_path.parent_path();
         std::string base_name = file_path.stem().string();
 
@@ -213,7 +218,8 @@ public:
             return "Error: selected_berry must be in range [0, 7].";
         }
 
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         Filesystem::Path target_berries_path = parent_dir / ("_" + base_name + ".txt");
 
         if (STATIC_GLOBALS.GENERATE_TEST_GOLDEN_FILES){

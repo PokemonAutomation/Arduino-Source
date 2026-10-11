@@ -16,6 +16,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA_MapIconDetector.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -409,11 +410,15 @@ class Test_MapIconDetector : public UnitTest{
 public:
     Test_MapIconDetector(const std::string& image)
         : UnitTest("PokemonPLZA::MapIconDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        Filesystem::Path file_path(m_image);
+        Filesystem::Path file_path(UNIT_TEST_RESOURCE_PATH() + m_image);
         Filesystem::Path parent_dir = file_path.parent_path();
         std::string base_name = file_path.stem().string();
         Filesystem::Path target_detections_path = parent_dir / ("_" + base_name + ".txt");
@@ -450,7 +455,8 @@ public:
             }
         }
 
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         std::map<MapIconType, std::vector<DetectedBox>> detected_boxes;
         for (const auto& pair : expected_counts){
             MapIconDetector detector(COLOR_RED, pair.first, ImageFloatBox(0.0, 0.0, 1.0, 1.0));

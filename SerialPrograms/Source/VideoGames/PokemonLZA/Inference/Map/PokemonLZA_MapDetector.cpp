@@ -11,6 +11,7 @@
 #include "PokemonLZA_MapDetector.h"
 #include "PokemonLZA_MapIconDetector.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 
 //#include <iostream>
 //using std::cout;
@@ -138,14 +139,19 @@ class Test_MapDetector : public UnitTest{
 public:
     Test_MapDetector(const std::string& image, bool expected)
         : UnitTest("PokemonPLZA::MapDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected(expected)
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         DummyVideoOverlay overlay;
         MapDetector detector(COLOR_RED, &overlay);
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         return detector.detect(image) == m_expected;
     }
 

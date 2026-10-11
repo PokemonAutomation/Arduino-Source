@@ -10,6 +10,7 @@
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "PokemonHome_GigantamaxDetector.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -94,13 +95,18 @@ public:
         bool expected
     )
         : UnitTest("PokemonHome::GigantamaxDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected(expected)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         DummyVideoOverlay video_overlay;
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         GigantamaxDetector detector(COLOR_BLACK, &video_overlay);
         bool result = detector.detect(image);
 
