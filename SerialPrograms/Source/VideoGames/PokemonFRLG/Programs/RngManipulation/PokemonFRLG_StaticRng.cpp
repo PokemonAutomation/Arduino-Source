@@ -305,7 +305,6 @@ void StaticRng::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     }
 
     static const int64_t FIXED_SEED_OFFSET = -845; // milliseconds, approximate
-    static const int64_t FIXED_ADVANCES_OFFSET = 160; // frames, approximate
     
     static const uint64_t CONTINUE_SCREEN_FRAMES = 200;
 
@@ -383,7 +382,7 @@ void StaticRng::program(SingleSwitchProgramEnvironment& env, ProControllerContex
             env.console, TARGET,
             SEED_DELAY, CONTINUE_SCREEN_FRAMES, ingame_advances,
             USE_TEACHY_TV, calibrations,
-            FIXED_SEED_OFFSET, FIXED_ADVANCES_OFFSET
+            FIXED_SEED_OFFSET
         );
 
         env.log("Resetting Game...");

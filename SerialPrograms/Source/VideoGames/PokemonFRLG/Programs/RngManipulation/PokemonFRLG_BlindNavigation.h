@@ -89,14 +89,20 @@ namespace PokemonFRLG{
     };
 
 
+    // the approximate fixed difference (in frames) between the in-game delay and the advances hit for each target
+    int64_t fixed_advances_offset(PokemonFRLG_RngTarget target);
+
     // checks seed, continue screen, and in-game timings for the specificed RNG manipulation target
     // and fires an error if any of the timings are too short.
+    // ingame_advances and continue_screen_frames are the uncalibrated values the timings were prepared from.
+    // They're used to report the minimum advances the target needs.
     void check_timings(
-        ConsoleHandle& console, 
+        ConsoleHandle& console,
         PokemonFRLG_RngTarget TARGET,
         const RngTimings& timings,
         Language language,
-        bool safari_zone
+        uint64_t ingame_advances,
+        uint64_t continue_screen_frames
     );
 
     // performs the blind sequence between launching the game and arriving at the RNG manipulation target

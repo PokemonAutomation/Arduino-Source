@@ -123,11 +123,10 @@ RngTimings prepare_timings(
     uint64_t INGAME_ADVANCES,
     bool USE_TEACHY_TV,
     const RngCalibrations& calibrations,
-    int64_t FIXED_SEED_OFFSET, 
-    int64_t FIXED_ADVANCES_OFFSET,
+    int64_t FIXED_SEED_OFFSET,
     Language LANGUAGE
 ){
-    double modified_ingame_advances = INGAME_ADVANCES + calibrations.ingame_offset + FIXED_ADVANCES_OFFSET;
+    double modified_ingame_advances = INGAME_ADVANCES + calibrations.ingame_offset + fixed_advances_offset(target);
     if (modified_ingame_advances < 0) {
         throw UserSetupError(console, "In-game advances cannot be negative. Check your in-game advances and calibration.");
     }
@@ -184,7 +183,7 @@ RngTimings prepare_timings(
     console.log("In-game delay: " + std::to_string(timings.ingame_delay) + "ms");
     console.log("Total time: " + std::to_string(timings.seed_delay + timings.csf_delay + timings.teachy_delay + timings.ingame_delay) + "ms");
 
-    check_timings(console, target, timings, LANGUAGE, safari_zone);
+    check_timings(console, target, timings, LANGUAGE, INGAME_ADVANCES, CONTINUE_SCREEN_FRAMES);
 
     return timings;
 }
