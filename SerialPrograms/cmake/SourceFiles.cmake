@@ -1017,6 +1017,13 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer_x64_AVX512.cpp
     Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer_x64_FMA3.cpp
     Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer_x64_SSE.cpp
+    Source/Kernels/AudioPipeline/Kernels_AudioPipeline.h
+    Source/Kernels/AudioPipeline/Kernels_ChannelMixer.cpp
+    Source/Kernels/AudioPipeline/Kernels_ChannelMixer.h
+    Source/Kernels/AudioPipeline/Kernels_RawAudio2WorkingAudio.cpp
+    Source/Kernels/AudioPipeline/Kernels_RawAudio2WorkingAudio.h
+    Source/Kernels/AudioPipeline/Kernels_WorkingAudio2RawAudio.cpp
+    Source/Kernels/AudioPipeline/Kernels_WorkingAudio2RawAudio.h
     Source/Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_Default.h
     Source/Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_SSE2.h
     Source/Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_FMA3.h
