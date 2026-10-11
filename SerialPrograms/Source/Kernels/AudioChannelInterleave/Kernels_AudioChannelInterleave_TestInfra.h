@@ -12,7 +12,6 @@
 #include "Common/Compiler.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Common/Cpp/TestRunners/UnitTest.h"
-#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -58,9 +57,6 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         size_t total = m_channels * m_samples;
-        if (total < 2){
-            throw InternalProgramError(&logger, PA_CURRENT_FUNCTION, "Test size is too small.");
-        }
 
         AlignedVector<float> interleaved0(total);
         AlignedVector<float> interleaved1(total);

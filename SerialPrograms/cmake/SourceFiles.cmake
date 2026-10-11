@@ -1007,6 +1007,14 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/AudioChannelInterleave/Kernels_AudioChannelInterleave_Default.h
     Source/Kernels/AudioChannelInterleave/Kernels_AudioChannelInterleave_x64_AVX2.cpp
     Source/Kernels/AudioChannelInterleave/Kernels_AudioChannelInterleave_x64_AVX512.cpp
+    Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer.cpp
+    Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer.h
+    Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer_Default.cpp
+    Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer_Default.h
+    Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer_TestInfra.h
+    Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer_x64_AVX512.cpp
+    Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer_x64_FMA3.cpp
+    Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer_x64_SSE.cpp
     Source/Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_Default.h
     Source/Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_SSE2.h
     Source/Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_FMA3.h

@@ -1,4 +1,4 @@
-/*  Audio Stream Converter Kernels (x64 AVX512)
+/*  Audio Stream Converter (x64 AVX512)
  *
  *  From: https://github.com/PokemonAutomation/
  *

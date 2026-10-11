@@ -1,4 +1,4 @@
-/*  Audio Stream Converter Kernels (Default)
+/*  Audio Stream Converter (Default)
  *
  *  From: https://github.com/PokemonAutomation/
  *

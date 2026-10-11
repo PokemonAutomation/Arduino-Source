@@ -91,10 +91,14 @@ void channel_interleave(
 void add_tests(UnitTestDatabase& database){
     add_tests_Default(database);
 #ifdef PA_AutoDispatch_x64_13_Haswell
-    add_tests_x64_AVX2(database);
+    if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
+        add_tests_x64_AVX2(database);
+    }
 #endif
 #ifdef PA_AutoDispatch_x64_17_Skylake
-    add_tests_x64_AVX512(database);
+    if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
+        add_tests_x64_AVX512(database);
+    }
 #endif
 }
 

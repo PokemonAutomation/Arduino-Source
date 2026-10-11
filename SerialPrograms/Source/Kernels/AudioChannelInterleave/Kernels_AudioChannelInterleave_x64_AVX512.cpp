@@ -10,6 +10,7 @@
 #include <string.h>
 #include <immintrin.h>
 #include "Common/Compiler.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels_AudioChannelInterleave_TestInfra.h"
 #include "Kernels_AudioChannelInterleave_Default.h"
 

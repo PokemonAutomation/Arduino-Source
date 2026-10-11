@@ -100,13 +100,19 @@ void convert_to(c_ptr<float> native, r_ptr<ExternalType> ext, size_t samples, fl
 void add_tests(UnitTestDatabase& database){
     add_tests_Default(database);
 #ifdef PA_AutoDispatch_x64_08_Nehalem
-    add_tests_x64_SSE41(database);
+    if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
+        add_tests_x64_SSE41(database);
+    }
 #endif
 #ifdef PA_AutoDispatch_x64_13_Haswell
-    add_tests_x64_AVX2(database);
+    if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
+        add_tests_x64_AVX2(database);
+    }
 #endif
 #ifdef PA_AutoDispatch_x64_17_Skylake
-    add_tests_x64_AVX512(database);
+    if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
+        add_tests_x64_AVX512(database);
+    }
 #endif
 }
 
