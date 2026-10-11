@@ -11,10 +11,9 @@
 #include "Kernels/KaiserWindow/Kernels_KaiserWindow.h"
 #include "Kernels_AudioResampler_WeightTable.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace Kernels{

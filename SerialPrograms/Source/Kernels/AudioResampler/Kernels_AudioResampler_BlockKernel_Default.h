@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_Kernels_BlockKernel_Default_H
-#define PokemonAutomation_Kernels_BlockKernel_Default_H
+#ifndef PokemonAutomation_Kernels_AudioResampler_BlockKernel_Default_H
+#define PokemonAutomation_Kernels_AudioResampler_BlockKernel_Default_H
 
 #include "Kernels_AudioResampler_WeightTable.h"
 
