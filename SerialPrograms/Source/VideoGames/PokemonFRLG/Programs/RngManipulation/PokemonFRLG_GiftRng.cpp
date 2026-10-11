@@ -409,7 +409,7 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
             env.console, TARGET,
             SEED_DELAY, CONTINUE_SCREEN_FRAMES, ingame_advances,
             USE_TEACHY_TV, calibrations,
-            FIXED_SEED_OFFSET
+            FIXED_SEED_OFFSET, LANGUAGE
         );
 
         env.log("Resetting Game...");

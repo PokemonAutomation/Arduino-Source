@@ -279,7 +279,7 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
             env.console, TARGET,
             SEED_DELAY, CONTINUE_SCREEN_FRAMES, INGAME_ADVANCES,
             USE_TEACHY_TV, CALIBRATIONS,
-            FIXED_SEED_OFFSET
+            FIXED_SEED_OFFSET, LANGUAGE
         );
         
         // handle the blind part

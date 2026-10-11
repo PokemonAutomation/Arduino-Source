@@ -22,10 +22,8 @@ namespace PokemonFRLG{
 // The fixed parts (ms) of the button press sequences for each target,
 // including the 4000ms spent loading the save and skipping the recap in load_game_after_delay().
 static const uint64_t STARTER_FIXED_DURATION        = 7200;     // 4000ms + 3000ms + 200ms
-static const uint64_t MAGIKARP_FIXED_DURATION       = 7200;     // 4000ms + 3000ms + 200ms
 static const uint64_t HITMON_FIXED_DURATION         = 4200;     // 4000ms + 200ms
 static const uint64_t EEVEE_FIXED_DURATION          = 4000;
-static const uint64_t LAPRAS_FIXED_DURATION         = 7200;     // 4000ms + 3000ms + 200ms
 static const uint64_t FOSSIL_FIXED_DURATION         = 5700;     // 4000ms + 1500ms + 200ms
 static const uint64_t GAMECORNER_FIXED_DURATION     = 8200;     // 4000ms + 3000ms + (400ms * 5) + 200ms
 static const uint64_t TOGEPI_FIXED_DURATION         = 11700;    // 4000ms + 7500ms + 200ms
@@ -57,6 +55,22 @@ static const uint64_t MIN_PRESS_GAP = 300;
 // frames, approximate
 static const int64_t DEFAULT_ADVANCES_OFFSET = 160;
 static const int64_t SWEET_SCENT_ADVANCES_OFFSET = -352;
+
+static uint64_t magikarp_fixed_duration(Language language){
+    uint64_t duration = 7200; // 4000ms + 3000ms + 200ms
+    if (language == Language::French){
+        duration -= 1500;
+    }
+    return duration;
+}
+
+static uint64_t lapras_fixed_duration(Language language){
+    uint64_t duration = 7200; // 4000ms + 3000ms + 200ms
+    if (language == Language::French){
+        duration -= 1500;
+    }
+    return duration;
+}
 
 static uint64_t roamer_fixed_duration(Language language){
     uint64_t duration = 26700; // 5500ms + 4*1500ms + 3500ms + 5500ms + 4*1500 + 200
@@ -164,11 +178,13 @@ void collect_starter_after_delay(ProControllerContext& context, uint64_t ingame_
     context.wait_for_all_requests();
 }
 
-void collect_magikarp_after_delay(ProControllerContext& context, uint64_t ingame_delay){
+void collect_magikarp_after_delay(ProControllerContext& context, uint64_t ingame_delay, Language language){
     // Advance through starter dialogue and wait on YES/NO
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - MAGIKARP_FIXED_DURATION));
+    if (language != Language::French){
+        pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    }
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - magikarp_fixed_duration(language)));
     // Finish dialogue (hits the target advance)
     pbf_press_button(context, BUTTON_A, 200ms, 3800ms);
     // Decline nickname
@@ -196,11 +212,13 @@ void collect_eevee_after_delay(ProControllerContext& context, uint64_t ingame_de
     context.wait_for_all_requests();
 }
 
-void collect_lapras_after_delay(ProControllerContext& context, uint64_t ingame_delay){
+void collect_lapras_after_delay(ProControllerContext& context, uint64_t ingame_delay, Language language){
     // 3 dialog presses
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - LAPRAS_FIXED_DURATION));
+    if (language != Language::French){
+        pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    }
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - lapras_fixed_duration(language)));
     // Accept Lapras on target frame
     pbf_press_button(context, BUTTON_A, 200ms, 3800ms);
     // Decline nickname and exit dialog
@@ -504,7 +522,7 @@ IngameSequence get_ingame_sequence(PokemonFRLG_RngTarget target, Language langua
     case PokemonFRLG_RngTarget::starters:
         return {"Starters", STARTER_FIXED_DURATION, MIN_PRESS_GAP, DEFAULT_ADVANCES_OFFSET};
     case PokemonFRLG_RngTarget::magikarp:
-        return {"Magikarp", MAGIKARP_FIXED_DURATION, MIN_PRESS_GAP, DEFAULT_ADVANCES_OFFSET};
+        return {"Magikarp", magikarp_fixed_duration(language), MIN_PRESS_GAP, DEFAULT_ADVANCES_OFFSET};
     case PokemonFRLG_RngTarget::hitmonchan:
     case PokemonFRLG_RngTarget::hitmonlee:
     case PokemonFRLG_RngTarget::hitmon:
@@ -512,7 +530,7 @@ IngameSequence get_ingame_sequence(PokemonFRLG_RngTarget target, Language langua
     case PokemonFRLG_RngTarget::eevee:
         return {"Eevee", EEVEE_FIXED_DURATION, 0, DEFAULT_ADVANCES_OFFSET};
     case PokemonFRLG_RngTarget::lapras:
-        return {"Lapras", LAPRAS_FIXED_DURATION, MIN_PRESS_GAP, DEFAULT_ADVANCES_OFFSET};
+        return {"Lapras", lapras_fixed_duration(language), MIN_PRESS_GAP, DEFAULT_ADVANCES_OFFSET};
     case PokemonFRLG_RngTarget::omanyte:
     case PokemonFRLG_RngTarget::kabuto:
     case PokemonFRLG_RngTarget::aerodactyl:
@@ -662,7 +680,7 @@ void perform_blind_sequence(
         collect_starter_after_delay(context, timings.ingame_delay);
         return;
     case PokemonFRLG_RngTarget::magikarp:
-        collect_magikarp_after_delay(context, timings.ingame_delay);
+        collect_magikarp_after_delay(context, timings.ingame_delay, language);
         return;
     case PokemonFRLG_RngTarget::hitmonchan:
     case PokemonFRLG_RngTarget::hitmonlee:
@@ -673,7 +691,7 @@ void perform_blind_sequence(
         collect_eevee_after_delay(context, timings.ingame_delay);
         return;
     case PokemonFRLG_RngTarget::lapras:
-        collect_lapras_after_delay(context, timings.ingame_delay);
+        collect_lapras_after_delay(context, timings.ingame_delay, language);
         return;
     case PokemonFRLG_RngTarget::omanyte:
     case PokemonFRLG_RngTarget::kabuto:
