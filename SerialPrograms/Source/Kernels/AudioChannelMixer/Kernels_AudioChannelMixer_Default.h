@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_Kernels_AudioChannelMixer_Default_H
 #define PokemonAutomation_Kernels_AudioChannelMixer_Default_H
 
+#include <stddef.h>
 #include "Common/Compiler.h"
 
 namespace PokemonAutomation{
