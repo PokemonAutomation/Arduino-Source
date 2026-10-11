@@ -13,6 +13,7 @@
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "OCR_Routines.h"
 #include "OCR_StringNormalization.h"
+#include "Tests/TestImageDistortion.h"
 #include "OCR_Tests.h"
 
 #include <iostream>
@@ -38,13 +39,18 @@ public:
         const std::string& expected
     )
         : UnitTest("OCR::RawOCR - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_language(language)
         , m_expected(expected)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
 
         std::string result = ocr_read(m_language, image);
         logger.log("Raw OCR read: " + result);
@@ -67,15 +73,20 @@ public:
         bool text_inside_range
     )
         : UnitTest("OCR::NumberWaterfillOCR - " + image_path)
-        , m_image_path(UNIT_TEST_RESOURCE_PATH() + image_path)
+        , m_image_path(image_path)
         , m_expected(expected)
         , m_rgb32_min(rgb32_min)
         , m_rgb32_max(rgb32_max)
         , m_text_inside_range(text_inside_range)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image_path};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image_path);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image_path);
+        apply_test_image_distortion(image, m_image_path, distortion_label());
 
         int result = OCR::read_number_waterfill(
             logger, image,

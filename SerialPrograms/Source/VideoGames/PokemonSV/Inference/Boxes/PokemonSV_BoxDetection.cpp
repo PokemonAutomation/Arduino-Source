@@ -12,6 +12,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV_BoxGenderDetector.h"
 #include "PokemonSV_BoxShinyDetector.h"
@@ -442,9 +443,13 @@ public:
         std::vector<std::string> words
     )
         : UnitTest("PokemonSV::BoxInfoDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_words(std::move(words))
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         // two words: <shiny or not> <gender (1: male, 2: female, 3: genderless)
@@ -468,7 +473,8 @@ public:
         }
 
         SomethingInBoxSlotDetector sth_detector(COLOR_RED);
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         bool sth = sth_detector.detect(image);
         TEST_RESULT_EQUAL_STR(sth, true);
 
@@ -493,13 +499,18 @@ class Test_SomethingInBoxSlotDetector : public UnitTest{
 public:
     Test_SomethingInBoxSlotDetector(const std::string& image, bool expected)
         : UnitTest("PokemonSV::SomethingInBoxSlotDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected(expected)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         SomethingInBoxSlotDetector detector(COLOR_RED);
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         return detector.detect(image) == m_expected;
     }
 
@@ -512,13 +523,18 @@ class Test_BoxBottomButtonDetector : public UnitTest{
 public:
     Test_BoxBottomButtonDetector(const std::string& image, bool target_y, bool target_b)
         : UnitTest("PokemonSV::BoxBottomButtonDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_target_y(target_y)
         , m_target_b(target_b)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         BoxBottomButtonYDetector y_detector;
         TEST_RESULT_COMPONENT_EQUAL_STR(y_detector.detect(image), m_target_y, "button Y");
 

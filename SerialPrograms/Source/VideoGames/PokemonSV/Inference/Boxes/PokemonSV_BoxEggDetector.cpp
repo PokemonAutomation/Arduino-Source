@@ -14,6 +14,7 @@
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
+#include "Tests/TestImageDistortion.h"
 #include "PokemonSV_BoxEggDetector.h"
 
 namespace PokemonAutomation{
@@ -162,13 +163,18 @@ class Test_BoxCurrentEggDetector : public UnitTest{
 public:
     Test_BoxCurrentEggDetector(const std::string& image, bool expected)
         : UnitTest("PokemonSV::BoxCurrentEggDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected(expected)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         BoxCurrentEggDetector detector(COLOR_RED);
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         return detector.detect(image) == m_expected;
     }
 
@@ -181,13 +187,18 @@ class Test_BoxPartyEggDetector : public UnitTest{
 public:
     Test_BoxPartyEggDetector(const std::string& image, int target)
         : UnitTest("PokemonSV::BoxPartyEggDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_target(target)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         uint8_t num_eggs = 0;
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         for (uint8_t i = 0; i < 5; i++){
             BoxEggDetector detector(BoxCursorLocation::PARTY, i + 1, 0);
             if (detector.detect(image)){

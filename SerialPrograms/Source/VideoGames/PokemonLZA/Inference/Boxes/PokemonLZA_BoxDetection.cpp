@@ -27,6 +27,7 @@
 #include "VideoGames/PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.h"
 #include "PokemonLZA_BoxDetection.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 
 #include <iostream>
  //#include <sstream>
@@ -506,9 +507,13 @@ public:
         std::vector<std::string> words
     )
         : UnitTest("PokemonPLZA::BoxCellInfoDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_words(std::move(words))
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         // Expected filename format: <...>_<row>_<col>_<status>_<dex_info>.png
@@ -618,7 +623,8 @@ public:
 
         // Run detectors
         auto overlay = DummyVideoOverlay();
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
 
         // Test BoxDetector for row and col
         BoxDetector box_detector(COLOR_RED, &overlay);

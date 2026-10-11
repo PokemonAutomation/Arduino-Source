@@ -18,6 +18,7 @@
 #include "PokemonSV_SandwichIngredientDetector.h"
 
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 
 //#include <iostream>
 //using std::cout;
@@ -419,9 +420,13 @@ class Test_SandwichIngredientsDetector : public UnitTest{
 public:
     Test_SandwichIngredientsDetector(const std::string& image, std::vector<std::string> words)
         : UnitTest("PokemonSV::SandwichIngredientsDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_words(std::move(words))
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         if (m_words.size() < 3){
@@ -444,7 +449,8 @@ public:
             return "Error: invalid condiments count.";
         }
 
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         SandwichCondimentsPageDetector condiments_detector;
         SandwichPicksPageDetector picks_detector;
 
@@ -470,11 +476,15 @@ class Test_SandwichIngredientReader : public UnitTest{
 public:
     Test_SandwichIngredientReader(const std::string& image)
         : UnitTest("PokemonSV::SandwichIngredientReader - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        Filesystem::Path file_path(m_image);
+        Filesystem::Path file_path(UNIT_TEST_RESOURCE_PATH() + m_image);
         Filesystem::Path parent_dir = file_path.parent_path();
         std::string base_name = file_path.stem().string();
         const std::vector<std::string> words = parse_words(base_name);
@@ -511,7 +521,8 @@ public:
             return "Error: need exactly 10 ingredients in golden file.";
         }
 
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         SandwichIngredientReader reader(sandwich_type);
         for (size_t i = 0; i < 10; ++i){
             if (selected_ingredient == i){

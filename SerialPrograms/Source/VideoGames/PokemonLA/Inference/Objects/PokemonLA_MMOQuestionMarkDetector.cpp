@@ -13,6 +13,7 @@
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 #include "PokemonLA_MMOQuestionMarkDetector.h"
 #include "VideoGames/PokemonLA/PokemonLA_Locations.h"
 
@@ -227,9 +228,13 @@ public:
         std::vector<std::string> keywords
     )
         : UnitTest("PokemonLA::MMOQuestionMarkDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_keywords(std::move(keywords))
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         bool hisui_kw_found = false;
@@ -296,7 +301,8 @@ public:
         }
 
         MMOQuestionMarkDetector detector(logger);
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
 
         if (hisui_kw_found){
             const auto region_has_MMO = detector.detect_MMO_on_hisui_map(image);

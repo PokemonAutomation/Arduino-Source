@@ -15,6 +15,7 @@
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 #include "PokemonSV_SandwichRecipeDetector.h"
 
 //#include <iostream>
@@ -167,9 +168,13 @@ public:
         std::vector<std::string> words
     )
         : UnitTest("PokemonSV::Test_SandwichRecipeDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_words(std::move(words))
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         // seven words: the sandwich recipe IDs on the screen. Order:
@@ -198,7 +203,8 @@ public:
         SandwichRecipeNumberDetector detector(logger);
 
         size_t detected_IDs[6] = {0, 0, 0, 0, 0, 0};
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         detector.detect_recipes(image, detected_IDs);
 
         for (int i = 0; i < 6; i++){

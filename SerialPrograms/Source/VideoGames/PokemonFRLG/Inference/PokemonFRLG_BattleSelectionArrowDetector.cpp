@@ -10,6 +10,7 @@
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
+#include "Tests/TestImageDistortion.h"
 #include "PokemonFRLG_BattleSelectionArrowDetector.h"
 
 namespace PokemonAutomation{
@@ -204,12 +205,17 @@ public:
         BattleMoveOption expected
     )
         : UnitTest("PokemonFRLG::BattleMoveSelectionArrow - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected(expected)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         for (int i = 0; i < BATTLE_MOVE_OPTION_COUNT; i++){
             BattleMoveOption option = static_cast<BattleMoveOption>(i);
             BattleSelectionArrowDetector detector(COLOR_RED, nullptr, option);

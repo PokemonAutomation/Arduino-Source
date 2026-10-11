@@ -22,6 +22,7 @@
 #include "Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean.h"
 #include "Kernels_ImageFilter_Tests.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 
 #include <iostream>
 using std::cout;
@@ -37,11 +38,16 @@ public:
         const std::string& image
     )
         : UnitTest("Kernels::ImageFilterRGB32Range - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
 
         const size_t width = image.width(), height = image.height();
         cout << "Testing filter_rgb32_range(), image size " << width << " x " << height << endl;
@@ -155,11 +161,16 @@ public:
         const std::string& image
     )
         : UnitTest("Kernels::ImageFilterRGB32Euclidean - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
 
         const size_t width = image.width();
         const size_t height = image.height();
@@ -282,11 +293,16 @@ public:
         const std::string& image
     )
         : UnitTest("Kernels::ImageToBlackWhiteRGB32Range - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
 
         const size_t width = image.width();
         const size_t height = image.height();
@@ -407,11 +423,16 @@ public:
         const std::string& image
     )
         : UnitTest("Kernels::ImageFilterByMask - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
 
         const size_t width = image.width(), height = image.height();
         cout << "Image width " << width << " height " << height << endl;
@@ -503,11 +524,16 @@ public:
         const std::string& image
     )
         : UnitTest("Kernels::CompressRGB32ToBinaryEuclidean - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
 
         const size_t width = image.width();
         const size_t height = image.height();

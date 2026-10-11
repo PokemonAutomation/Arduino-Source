@@ -24,6 +24,7 @@
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Tests.h"
 #include "VideoGames/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_EncountersDatabase.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 #include "PokemonFRLG_DigitReader.h"
 #include <opencv2/imgproc.hpp>
 #include <sstream>
@@ -95,12 +96,16 @@ class Test_WildEncounterReader : public UnitTest{
 public:
     Test_WildEncounterReader(const std::string& image)
         : UnitTest("PokemonFRLG::WildEncounterReader - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         const std::vector<std::string> words =
-                parse_words(Filesystem::Path(m_image).stem().string());
+                parse_words(Filesystem::Path(UNIT_TEST_RESOURCE_PATH() + m_image).stem().string());
         if (words.size() < 2){
             return "Error: filename must be <anything>_<language>_<species>.";
         }
@@ -113,7 +118,8 @@ public:
             return "Error: invalid language word in filename: " + language_word;
         }
 
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         WildEncounterReader reader;
         PokemonFRLG_WildEncounter encounter =
                 reader.read_encounter(logger, language, image, {});

@@ -9,6 +9,7 @@
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/DetectedBoxes.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 #include "VideoGames/PokemonLA/Inference/Battles/PokemonLA_BattleSpriteWatcher.h"
 #include "PokemonLA_BattleSpriteArrowDetector.h"
 
@@ -116,13 +117,18 @@ public:
         int target
     )
         : UnitTest("PokemonLA::BattleSpriteArrowDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_target(target)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         DummyVideoOverlay overlay;
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
 
         const size_t target_index = m_target;
         for (size_t sprite_index = 0; sprite_index < MAX_WILD_POKEMON_IN_MULTI_BATTLE; sprite_index++){

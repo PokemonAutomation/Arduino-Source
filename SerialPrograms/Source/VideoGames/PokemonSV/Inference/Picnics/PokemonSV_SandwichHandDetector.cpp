@@ -12,6 +12,7 @@
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 #include "PokemonSV_SandwichHandDetector.h"
 
 //#include <iostream>
@@ -167,9 +168,13 @@ public:
         std::vector<std::string> words
     )
         : UnitTest("PokemonSV::SandwichHandWatcher - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_words(std::move(words))
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         // five words: hand_type("Free"/"Grabbing"), <image float box (four words total)>
@@ -212,7 +217,8 @@ public:
             }
         }
 
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         auto result = detector.detect(image);
         bool has_hand = result.first >= 0.0;
 

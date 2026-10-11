@@ -20,6 +20,7 @@
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "PokemonLA_BerryTreeDetector.h"
 #include "VideoGames/PokemonLA/PokemonLA_Locations.h"
+#include "Tests/TestImageDistortion.h"
 
 #include <iostream>
 using std::cout;
@@ -401,13 +402,18 @@ public:
         bool expected
     )
         : UnitTest("PokemonLA::BerryTreeDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected(expected)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         BerryTreeDetector detector;
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         return detector.process_frame(image, current_time()) == m_expected;
     };
 

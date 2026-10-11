@@ -6,6 +6,7 @@
 
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "Tests/TestImageDistortion.h"
 #include "Pokemon_NameReader.h"
 
 namespace PokemonAutomation{
@@ -47,13 +48,18 @@ public:
         const std::string& expected
     )
         : UnitTest("OCR::RawOCR - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_language(language)
         , m_expected(expected)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
 
         OCR::StringMatchResult ocr_result = Pokemon::PokemonNameReader::instance().read_substring(
             logger, m_language, image, OCR::BLACK_OR_WHITE_TEXT_FILTERS()

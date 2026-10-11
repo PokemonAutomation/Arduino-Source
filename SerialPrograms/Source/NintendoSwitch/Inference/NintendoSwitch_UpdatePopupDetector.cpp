@@ -12,6 +12,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "GameConsole/Framework/ConsoleSystemSession.h"
+#include "Tests/TestImageDistortion.h"
 #include "NintendoSwitch_UpdatePopupDetector.h"
 //#include <iostream>
 //using std::cout;
@@ -266,9 +267,13 @@ class Test_UpdatePopupDetector : public UnitTest{
 public:
     Test_UpdatePopupDetector(const std::string& image, bool expected)
         : UnitTest("NintendoSwitch::UpdatePopupDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected(expected)
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         GameConsole::ConsoleSystemOption option(1);
@@ -276,7 +281,8 @@ public:
         ConsoleHandle console(session);
 
         UpdatePopupDetector detector(console);
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         return detector.detect(image) == m_expected;
     }
 

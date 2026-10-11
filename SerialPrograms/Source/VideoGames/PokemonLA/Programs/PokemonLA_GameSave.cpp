@@ -16,6 +16,7 @@
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "VideoGames/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 #include "PokemonLA_GameSave.h"
@@ -133,9 +134,13 @@ public:
         std::vector<std::string> keywords
     )
         : UnitTest("PokemonLA::GameSave - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_keywords(std::move(keywords))
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
 
@@ -159,7 +164,8 @@ public:
             return ss.str();
         }
 
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         bool save_tab = save_tab_selected(image);
         bool save_disabled = save_tab_disabled(image);
 

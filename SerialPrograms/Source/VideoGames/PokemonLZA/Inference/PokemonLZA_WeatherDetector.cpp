@@ -20,6 +20,7 @@
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 #include "PokemonLZA_WeatherDetector.h"
 
 namespace PokemonAutomation{
@@ -367,18 +368,23 @@ public:
         bool expected_result
     )
         : UnitTest("PokemonPLZA::WeatherIconDetector - " + image + " [" + weather_name(expected_weather) + "]")
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected_weather(expected_weather)
         , m_expected_result(expected_result)
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         (void)scope;
 
         DummyVideoOverlay overlay;
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         if (image.width() == 0 || image.height() == 0){
-            return "Failed to load test image: " + m_image;
+            return "Failed to load test image: " + UNIT_TEST_RESOURCE_PATH() + m_image;
         }
 
         std::vector<WeatherIconType> detected_weathers;

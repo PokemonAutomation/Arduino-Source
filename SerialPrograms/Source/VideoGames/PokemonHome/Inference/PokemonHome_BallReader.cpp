@@ -15,6 +15,7 @@
 #include "VideoGames/PokemonHome/Resources/PokemonHome_PokeballSprites.h"
 #include "PokemonHome_BallReader.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -131,9 +132,13 @@ public:
         const std::string& expected
     )
         : UnitTest("PokemonHome::BallReader - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected(expected)
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         DummyAudioFeed audio_feed;
@@ -141,7 +146,8 @@ public:
         StreamHistorySession history(logger);
         DummyVideoOverlay video_overlay;
         VideoStream stream(logger, audio_feed, video_feed, history, video_overlay);
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         BallReader reader(stream);
         std::string result = reader.read_ball(image);
 

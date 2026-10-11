@@ -12,6 +12,7 @@
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "PokemonSV_MapDetector.h"
+#include "Tests/TestImageDistortion.h"
 #include "PokemonSV_MapPokeCenterIconDetector.h"
 
 //#include <iostream>
@@ -119,13 +120,18 @@ class Test_MapPokeCenterIconDetector : public UnitTest{
 public:
     Test_MapPokeCenterIconDetector(const std::string& image, int target)
         : UnitTest("PokemonSV::MapPokeCenterIconDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_target(target)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         MapPokeCenterIconDetector detector(COLOR_RED, MAP_READABLE_AREA);
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         const auto result = detector.detect_all(image);
         return (int)result.size() == m_target;
     }

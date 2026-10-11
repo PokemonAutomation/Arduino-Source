@@ -22,6 +22,7 @@
 #include "CommonTools/OCR/OCR_StringNormalization.h"
 #include "Pokemon/Inference/Pokemon_AbilityReader.h"
 #include "Pokemon/Inference/Pokemon_NatureReader.h"
+#include "Tests/TestImageDistortion.h"
 #include "PokemonHome_SummaryReader.h"
 
 namespace PokemonAutomation{
@@ -224,14 +225,19 @@ class Test_SummaryReader_Numbers : public UnitTest{
 public:
     Test_SummaryReader_Numbers(const std::string& image, int expected_dex, int expected_ot_id, int expected_level)
         : UnitTest("PokemonHome::SummaryReader_Numbers - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected_dex(expected_dex)
         , m_expected_ot_id(expected_ot_id)
         , m_expected_level(expected_level)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         SummaryReader reader;
         int dex = reader.read_national_dex(logger, image);
         int ot_id = reader.read_original_trainer_id(logger, image);
@@ -261,14 +267,19 @@ class Test_SummaryReader_Text : public UnitTest{
 public:
     Test_SummaryReader_Text(const std::string& image, std::string expected_nature, std::string expected_ability, Language language)
         : UnitTest("PokemonHome::SummaryReader_Text - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected_nature(expected_nature)
         , m_expected_ability(expected_ability)
         , m_language(language)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         SummaryReader reader;
 
         std::string nature = reader.read_nature(logger, m_language, image);
@@ -295,13 +306,18 @@ class Test_SummaryReader_OtName : public UnitTest{
 public:
     Test_SummaryReader_OtName(const std::string& image, std::string expected_ot_name, Language language)
         : UnitTest("PokemonHome::SummaryReader_OtName - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected_ot_name(expected_ot_name)
         , m_language(language)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         SummaryReader reader;
         std::string ot_name = reader.read_original_trainer_name(m_language, image);
         if (ot_name == m_expected_ot_name){
@@ -321,12 +337,17 @@ class Test_SummaryReader_LanguageOfOrigin : public UnitTest{
 public:
     Test_SummaryReader_LanguageOfOrigin(const std::string& image, std::string expected)
         : UnitTest("PokemonHome::SummaryReader_LanguageOfOrigin - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected(expected)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         std::string language = SummaryReader().read_language_of_origin(image);
         if (language == m_expected){
             return true;

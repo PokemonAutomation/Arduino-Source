@@ -9,6 +9,7 @@
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 #include "VideoGames/PokemonSV/Resources/PokemonSV_PokemonSprites.h"
 #include "PokemonSV_TeraTypeReader.h"
 
@@ -111,14 +112,19 @@ public:
         std::string expected
     )
         : UnitTest("PokemonSV::TeraTypeReader - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected(std::move(expected))
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         TeraTypeReader reader(COLOR_RED);
 
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         ImageMatch::ImageMatchResult types = reader.read(image);
         if (types.results.empty()){
             return false;

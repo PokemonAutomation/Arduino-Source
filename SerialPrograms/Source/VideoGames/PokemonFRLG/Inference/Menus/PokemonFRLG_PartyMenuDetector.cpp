@@ -15,6 +15,7 @@
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
 #include "CommonFramework/GlobalAutoPaths.h"
+#include "Tests/TestImageDistortion.h"
 #include "PokemonFRLG_PartyMenuDetector.h"
 
 
@@ -108,13 +109,18 @@ public:
         bool expected
     )
         : UnitTest("PokemonFRLG::PartySlotDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected(expected)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         PartySlotWatcher detector(COLOR_RED, PartySlot::SIX);
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         return detector.detect(image) == m_expected;
     };
 

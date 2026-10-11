@@ -11,6 +11,7 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 //#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64xH_Default.h"
 #include "Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h"
+#include "Tests/TestImageDistortion.h"
 #include "Kernels_ImageScaleBrightness_Tests.h"
 
 #include <iostream>
@@ -26,11 +27,16 @@ public:
         const std::string& image
     )
         : UnitTest("Kernels::ImageScaleBrightness - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 new_image(m_image);
+        ImageRGB32 new_image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(new_image, m_image, distortion_label());
 
         int num_iterations = 500;
         auto time_start = current_time();

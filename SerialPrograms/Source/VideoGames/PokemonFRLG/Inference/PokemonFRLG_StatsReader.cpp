@@ -24,6 +24,7 @@
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Tests.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 #include "PokemonFRLG_DigitReader.h"
 #include "PokemonFRLG_OcrPreprocessing.h"
 #include <opencv2/imgproc.hpp>
@@ -438,23 +439,28 @@ class Test_StatsReaderPage1 : public UnitTest{
 public:
     Test_StatsReaderPage1(const std::string& image)
         : UnitTest("PokemonFRLG::StatsReader - page1 - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         Language language = Language::None;
-        UnitTestResult parsed = language_from_filename(m_image, language);
+        UnitTestResult parsed = language_from_filename(UNIT_TEST_RESOURCE_PATH() + m_image, language);
         if (parsed.result != UnitTestResult::PASSED){
             return parsed;
         }
 
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         StatsReader reader;
         PokemonFRLG_Stats stats;
         reader.read_page1(logger, language, image, stats);
 
         return check_against_golden_file(
-            m_image,
+            UNIT_TEST_RESOURCE_PATH() + m_image,
             {"name", "level", "gender", "nature"},
             {
                 text_slug(stats.name),
@@ -474,23 +480,28 @@ class Test_StatsReaderPage2 : public UnitTest{
 public:
     Test_StatsReaderPage2(const std::string& image)
         : UnitTest("PokemonFRLG::StatsReader - page2 - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         Language language = Language::None;
-        UnitTestResult parsed = language_from_filename(m_image, language);
+        UnitTestResult parsed = language_from_filename(UNIT_TEST_RESOURCE_PATH() + m_image, language);
         if (parsed.result != UnitTestResult::PASSED){
             return parsed;
         }
 
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         StatsReader reader;
         PokemonFRLG_Stats stats;
         reader.read_page2(logger, language, image, stats);
 
         return check_against_golden_file(
-            m_image,
+            UNIT_TEST_RESOURCE_PATH() + m_image,
             {"hp", "attack", "defense", "spatk", "spdef", "speed"},
             {
                 number_slug(stats.hp),

@@ -13,6 +13,7 @@
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "PokemonLZA_HyperspaceCalorieDetector.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -133,9 +134,13 @@ class Test_HyperspaceCalorieDetector : public UnitTest{
 public:
     Test_HyperspaceCalorieDetector(const std::string& image, int expected_calorie)
         : UnitTest("PokemonPLZA::HyperspaceCalorieDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected_calorie(expected_calorie)
     {}
+
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         if (m_expected_calorie <= 0 || m_expected_calorie > 9999){
@@ -143,7 +148,8 @@ public:
         }
 
         HyperspaceCalorieDetector detector(logger);
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         if (!detector.detect(image)){
             return "Error: detector failed to detect calorie number in image.";
         }

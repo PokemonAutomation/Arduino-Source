@@ -13,6 +13,7 @@
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/ImageMatch/ExactImageMatcher.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "Tests/TestImageDistortion.h"
 #include "PokemonHome_OriginMarkReader.h"
 
 namespace PokemonAutomation{
@@ -341,12 +342,17 @@ public:
         OriginMark expected
     )
         : UnitTest("PokemonHome::OriginMarkReader - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected(expected)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         OriginMark result = OriginMarkReader().read_mark(image);
 
         if (result == m_expected)

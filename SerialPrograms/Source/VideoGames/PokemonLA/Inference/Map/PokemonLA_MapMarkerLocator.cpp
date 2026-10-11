@@ -15,6 +15,7 @@
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "Tests/TestUtils.h"
+#include "Tests/TestImageDistortion.h"
 #include "PokemonLA_MapMarkerLocator.h"
 
 #include <iostream>
@@ -150,13 +151,18 @@ public:
         float target_angle, float threshold
     )
         : UnitTest("PokemonLA::MapMarkerLocator - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_target_angle(target_angle)
         , m_threshold(threshold)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         double angle = get_orientation_on_map(image);
         TEST_RESULT_APPROXIMATE_STR(angle, m_target_angle, m_threshold);
         return true;

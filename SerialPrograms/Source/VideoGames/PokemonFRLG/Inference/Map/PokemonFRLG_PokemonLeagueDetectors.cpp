@@ -14,6 +14,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
+#include "Tests/TestImageDistortion.h"
 #include "PokemonFRLG_PokemonLeagueDetectors.h"
 
 namespace PokemonAutomation{
@@ -205,14 +206,19 @@ public:
         : UnitTest(
             std::string("PokemonFRLG::EliteFourRoomDetector(") + elite_four_room_name(room) + ") - " + image
         )
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_room(room)
         , m_expected(expected)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         EliteFourRoomDetector detector(COLOR_RED, m_room);
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         return detector.detect(image) == m_expected;
     };
 
@@ -299,13 +305,18 @@ public:
         bool expected
     )
         : UnitTest("PokemonFRLG::HallOfFameSavingDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_image(image)
         , m_expected(expected)
     {}
 
+    virtual std::vector<std::string> image_paths() const override{
+        return {m_image};
+    }
+
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         HallOfFameSavingDetector detector(COLOR_RED);
-        ImageRGB32 image(m_image);
+        ImageRGB32 image(UNIT_TEST_RESOURCE_PATH() + m_image);
+        apply_test_image_distortion(image, m_image, distortion_label());
         return detector.detect(image) == m_expected;
     };
 
