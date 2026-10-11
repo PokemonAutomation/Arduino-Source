@@ -286,18 +286,18 @@ void UnitTestRunner::on_test_finished(
         break;
     case UnitTestResult::PASSED:
         stats.passed++;
-        PASSED_TESTS.append(test->name() + "\n");
+        PASSED_TESTS.append(test->name_with_distortion() + "\n");
         break;
     case UnitTestResult::FAILED:
         stats.failed++;
-        FAILED_TESTS.append("FAILED: " + test->name() + "\n");
+        FAILED_TESTS.append("FAILED: " + test->name_with_distortion() + "\n");
         break;
     case UnitTestResult::SKIPPED:
         stats.skipped++;
         break;
     case UnitTestResult::OOM:
         stats.oom++;
-        FAILED_TESTS.append("OOM: " + test->name() + "\n");
+        FAILED_TESTS.append("OOM: " + test->name_with_distortion() + "\n");
         break;
     }
     m_env->update_stats();
@@ -308,11 +308,19 @@ void UnitTestRunner::on_test_finished(
 
 
 
-bool CommandLineUnitTestRunner::run(){
+bool CommandLineUnitTestRunner::run(bool augment_color_distortions){
     PokemonAutomation::UnitTestRunner runner(
         m_logger,
         GlobalThreadPools::computation_normal()
     );
+    if (augment_color_distortions){
+        try{
+            runner.enable_test_image_distortions(UNIT_TEST_RESOURCE_PATH());
+        }catch (Exception& e){
+            m_logger.log("Unable to load the test image distortions: " + e.to_str(), COLOR_RED);
+            return true;
+        }
+    }
     runner.add_listener(*this);
     for (const auto& test : UNIT_TESTS_ALL()){
         runner.add_test(test.second);
@@ -333,23 +341,23 @@ void CommandLineUnitTestRunner::on_test_finished(
 ){
     switch (result.result){
     case UnitTestResult::NOT_RUN:
-        m_logger.log("NOT RUN: " + test->name(), COLOR_ORANGE);
+        m_logger.log("NOT RUN: " + test->name_with_distortion(), COLOR_ORANGE);
         m_skipped_tests++;
         break;
     case UnitTestResult::PASSED:
-        m_logger.log("PASSED: " + test->name(), COLOR_BLUE);
+        m_logger.log("PASSED: " + test->name_with_distortion(), COLOR_BLUE);
         m_passed_tests++;
         break;
     case UnitTestResult::FAILED:
-        m_logger.log("FAILED: " + test->name(), COLOR_RED);
+        m_logger.log("FAILED: " + test->name_with_distortion(), COLOR_RED);
         m_failed_tests++;
         break;
     case UnitTestResult::SKIPPED:
-        m_logger.log("SKIPPED: " + test->name(), COLOR_ORANGE);
+        m_logger.log("SKIPPED: " + test->name_with_distortion(), COLOR_ORANGE);
         m_skipped_tests++;
         break;
     case UnitTestResult::OOM:
-        m_logger.log("OOM: " + test->name(), COLOR_RED);
+        m_logger.log("OOM: " + test->name_with_distortion(), COLOR_RED);
         m_failed_tests++;
         break;
     }

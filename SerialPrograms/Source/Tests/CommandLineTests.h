@@ -22,6 +22,14 @@
  *    ComputerPrograms/UnitTestRunner.cpp collects all of them.
  *  - The tests are run in parallel by `ParallelUnitTestRunner`, within memory and thread limits.
  *
+ *  Capture card distortions:
+ *  Also pass "--augment-color-distortions" to run image tests with color distortion augmentation if
+ *  the distortion data is available from the test repo.
+ *  Each such test run will be reported with a color disortion setting name after test name, e.g.
+ *      FAILED: NintendoSwitch::UpdatePopupDetector - NintendoSwitch/UpdateMenuDetector/English_1_True.png [Win-MYPIN]
+ *  This needs the CaptureCardCalibration/ folder of the CommandLineTests repo. See
+ *  Common/Cpp/TestRunners/TestImageDistortionManager.h.
+ *
  *  The same tests can also be run from the GUI with the "Unit Test Runner" program, which can
  *  run a single test, the tests matching a substring, or all tests.
  */
@@ -36,8 +44,10 @@ namespace PokemonAutomation{
 
 // Called by main() to run all the unit tests on command line, without launching any GUI.
 // This function is only called when GlobalSettings::COMMAND_LINE_TEST_MODE is true.
+// `augment_color_distortions` is set by the "--augment-color-distortions" argument: also run image tests
+// with color distortion augmentation if the distortion data is available from the test repo.
 // Return 0 if all tests are passed.
-int run_command_line_tests();
+int run_command_line_tests(bool augment_color_distortions);
 
 
 
