@@ -3021,6 +3021,8 @@ file(GLOB LIBRARY_SOURCES
     Source/StaticRegistrationQt.cpp
     Source/Tests/CommandLineTests.cpp
     Source/Tests/CommandLineTests.h
+    Source/Tests/TestImageDistortion.cpp
+    Source/Tests/TestImageDistortion.h
     Source/Tests/TestUtils.cpp
     Source/Tests/TestUtils.h
     Source/VideoGames/ZeldaTotK/Programs/ZeldaTotK_BowItemDuper.cpp
