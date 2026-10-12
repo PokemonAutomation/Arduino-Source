@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/GlobalAutoPaths.h"
 #include <algorithm>
 #include <exception>
 #include <QCoreApplication>

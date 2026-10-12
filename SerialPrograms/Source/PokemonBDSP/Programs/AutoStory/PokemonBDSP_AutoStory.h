@@ -20,13 +20,13 @@ class BDSPAutoStory_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     BDSPAutoStory_Descriptor();
 
-    virtual std::unique_ptr<SingleSwitchProgramInstance> make_instance() const override;
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
 class BDSPAutoStory : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
+    using Descriptor = BDSPAutoStory_Descriptor;
     ~BDSPAutoStory();
     BDSPAutoStory();
 

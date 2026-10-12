@@ -1,3 +1,4 @@
+#include "CommonFramework/GlobalAutoPaths.h"
 #include <filesystem>
 /*  BDSP AutoStory Tools
  *
@@ -8,6 +9,7 @@
 #include "CommonFramework/ImageTools/ImageDiff.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_MenuDetector.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -120,8 +122,8 @@ bool save_game(
                 { overworld }
             );
             if (ret < 0) {
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT,
+                throw OperationFailedExceptionWithScreenshot(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Failed to detect overworld after save.",
                     env.console
                 );
@@ -228,8 +230,8 @@ void checkpoint_reattempt_loop(
                 env.console.log("Resetting game from HOME before retry...", COLOR_ORANGE);
                 bool ok = reset_game_from_home(env, env.console, context, true, 1000ms);
                 if (!ok){
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT,
+                    throw OperationFailedExceptionWithScreenshot(
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Failed to reset game from HOME during checkpoint retry.",
                         env.console
                     );
@@ -285,8 +287,8 @@ void wait_for_dialogue(
     );
     if (ret == 0){ log_detected(); return; }
 
-    OperationFailedException::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+    OperationFailedExceptionWithScreenshot::fire(
+        ErrorReportMode::SEND_ERROR_REPORT,
         (label.empty() ? "wait_for_dialogue" : label) + ": dialogue not detected within timeout.",
         stream
     );
@@ -308,8 +310,8 @@ void mash_until_dialogue_ends(
         {{overworld}}
     );
     if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "mash_until_dialogue_ends: overworld not reached within timeout.",
             stream
         );
@@ -890,7 +892,7 @@ static double confirmed_potion_hp(VideoStream& stream, ProControllerContext& con
         previous = hp;
         pbf_wait(context, 150ms);
     }
-    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
         "Potion: Slot 1 HP bar could not be confirmed.", stream);
 }
 
@@ -904,14 +906,14 @@ void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context
     for (size_t dose = 0; dose < 3; dose++) {
         stream.log("[Potion] Finding Bag/Medicine/Potion; dose " + std::to_string(dose + 1) + "/3.");
         if (!find_bag_item(stream, context, potion, 1, 5, 64, std::chrono::seconds(45))) {
-            OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                 "Potion: Could not verify Potion in the Medicine pocket.", stream);
         }
         const double before = confirmed_potion_hp(stream, context);
         stream.log("[Potion] Slot 1 HP bar before use=" + std::to_string(before * 100) + "%.");
         if (before >= 0.98) { healed = true; break; }
         if (before <= 0.005) {
-            OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                 "Potion: Slot 1 appears fainted; a Potion cannot revive it.", stream);
         }
         pbf_press_button(context, BUTTON_A, 80ms, 500ms);
@@ -921,7 +923,7 @@ void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context
         context.wait_for_all_requests();
         OverworldWatcher overworld;
         if (wait_until(stream, context, std::chrono::seconds(10), {{overworld}}) != 0) {
-            OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                 "Potion: Did not return to the overworld after use.", stream);
         }
         // Reopen Bag to verify the result, including when the last Potion was used.
@@ -931,20 +933,20 @@ void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context
         const double after = confirmed_potion_hp(stream, context);
         stream.log("[Potion] Slot 1 HP bar after use=" + std::to_string(after * 100) + "%.");
         if (after <= before + 0.005) {
-            OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                 "Potion: Slot 1 HP did not increase; refusing to continue movement.", stream);
         }
         if (after >= 0.98) { healed = true; break; }
         pbf_mash_button(context, BUTTON_B, 2000ms);
         context.wait_for_all_requests();
     }
-    if (!healed) OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+    if (!healed) OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
         "Potion: Full HP not confirmed after three uses.", stream);
     pbf_mash_button(context, BUTTON_B, 2000ms);
     context.wait_for_all_requests();
     OverworldWatcher overworld;
     if (wait_until(stream, context, std::chrono::seconds(10), {{overworld}}) != 0)
-        OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Potion: Final overworld return not confirmed.", stream);
     stream.log("[Potion] Slot 1 HP bar full and overworld confirmed.");
 }
@@ -1020,8 +1022,8 @@ void open_menu(
     //     if (snap) cur = detector.detect(snap);
     // }
     // if (cur == MenuCursorPosition::UNKNOWN){
-    //     OperationFailedException::fire(
-    //         ErrorReport::SEND_ERROR_REPORT,
+    //     OperationFailedExceptionWithScreenshot::fire(
+    //         ErrorReportMode::SEND_ERROR_REPORT,
     //         "Menu cursor not detected after opening menu.",
     //         stream
     //     );
@@ -1057,8 +1059,8 @@ void open_menu(
         }
     }
     if (cur == MenuCursorPosition::UNKNOWN){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Menu or cursor detection failed after 3 opening attempts.",
             stream
         );
@@ -1067,8 +1069,8 @@ void open_menu(
     IconGrid cur_g = icon_to_grid(cur,    num_icons);
     IconGrid tgt_g = icon_to_grid(target, num_icons);
     if (tgt_g.row == -1){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
             "Unknown target menu icon.",
             stream
         );
