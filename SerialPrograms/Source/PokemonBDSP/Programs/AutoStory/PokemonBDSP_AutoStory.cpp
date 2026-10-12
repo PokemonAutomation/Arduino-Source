@@ -56,6 +56,7 @@ static std::vector<std::unique_ptr<AutoStory_Checkpoint>> make_checkpoint_list()
     std::vector<std::unique_ptr<AutoStory_Checkpoint>> checkpoint_list;
 
     //Segment 00
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0000>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0001>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0002>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0003>());
@@ -249,35 +250,35 @@ static const std::vector<std::unique_ptr<AutoStory_Checkpoint>>& ALL_CHECKPOINTS
 //  Segment database
 // ---------------------------------------------------------------------------
 
-StringSelectDatabase make_segment_database(){
-    StringSelectDatabase db;
-    int index = 0;
-    for (const auto& segment : ALL_SEGMENTS()){
-        db.add_entry(StringSelectEntry(std::to_string(index), segment->name()));
-        index++;
-    }
-    return db;
-}
-// ---------------------------------------------------------------------------
-//  Checkpoint database (SV-style)
-// ---------------------------------------------------------------------------
-const StringSelectDatabase& SEGMENT_DATABASE(){
-    static StringSelectDatabase db = make_segment_database();
-    return db;
-}
-StringSelectDatabase make_checkpoint_database(){
-    StringSelectDatabase db;
-    int index = 0;
-    for (const auto& checkpoint : ALL_CHECKPOINTS()){
-        db.add_entry(StringSelectEntry(std::to_string(index), checkpoint->name()));
-        index++;
-    }
-    return db;
-}
-
-const StringSelectDatabase& CHECKPOINT_DATABASE(){
-    static StringSelectDatabase db = make_checkpoint_database();
-    return db;
+// Section databases retain global index slugs. Never execute across the
+// tutorial/main-story boundary: the starter must be returned from HOME first.
+static constexpr size_t TUTORIAL_CHECKPOINT_COUNT = 6;
+static const StringSelectDatabase& section_database(bool checkpoints, bool tutorial){
+    static const StringSelectDatabase tutorial_segments = []{
+        StringSelectDatabase db;
+        db.add_entry(StringSelectEntry("0", ALL_SEGMENTS()[0]->name()));
+        return db;
+    }();
+    static const StringSelectDatabase main_segments = []{
+        StringSelectDatabase db;
+        for (size_t i = 1; i < ALL_SEGMENTS().size(); i++)
+            db.add_entry(StringSelectEntry(std::to_string(i), ALL_SEGMENTS()[i]->name()));
+        return db;
+    }();
+    static const StringSelectDatabase tutorial_checkpoints = []{
+        StringSelectDatabase db;
+        for (size_t i = 0; i < TUTORIAL_CHECKPOINT_COUNT; i++)
+            db.add_entry(StringSelectEntry(std::to_string(i), ALL_CHECKPOINTS()[i]->name()));
+        return db;
+    }();
+    static const StringSelectDatabase main_checkpoints = []{
+        StringSelectDatabase db;
+        for (size_t i = TUTORIAL_CHECKPOINT_COUNT; i < ALL_CHECKPOINTS().size(); i++)
+            db.add_entry(StringSelectEntry(std::to_string(i), ALL_CHECKPOINTS()[i]->name()));
+        return db;
+    }();
+    return checkpoints ? (tutorial ? tutorial_checkpoints : main_checkpoints)
+        : (tutorial ? tutorial_segments : main_segments);
 }
 
 // ---------------------------------------------------------------------------
@@ -293,7 +294,9 @@ BDSPAutoStory_Descriptor::BDSPAutoStory_Descriptor()
           "Automatically completes BDSP story segments.",
           ProgramControllerClass::StandardController_NoRestrictions,
           FeedbackType::REQUIRED,
-          AllowCommandsWhenRunning::DISABLE_COMMANDS
+          AllowCommandsWhenRunning::DISABLE_COMMANDS,
+          false,
+          {"Tesseract"}
           )
 {}
 
@@ -316,6 +319,17 @@ BDSPAutoStory_Descriptor::make_stats() const{
 BDSPAutoStory::~BDSPAutoStory(){
     OUTSIDE_HELP_POKEMON.remove_listener(*this);
     HELP_MODE.remove_listener(*this);
+    STORY_SECTION.remove_listener(*this);
+    START_SEGMENT_MAINSTORY.remove_listener(*this);
+    END_SEGMENT_MAINSTORY.remove_listener(*this);
+    START_CHECKPOINT_MAINSTORY.remove_listener(*this);
+    END_CHECKPOINT_MAINSTORY.remove_listener(*this);
+    START_CHECKPOINT_TUTORIAL.remove_listener(*this);
+    END_CHECKPOINT_TUTORIAL.remove_listener(*this);
+    START_SEGMENT.remove_listener(*this);
+    END_SEGMENT.remove_listener(*this);
+    ENABLE_ADVANCED_MODE.remove_listener(*this);
+
 
 }
 
@@ -326,6 +340,29 @@ BDSPAutoStory::~BDSPAutoStory(){
 
 BDSPAutoStory::BDSPAutoStory()
     : SingleSwitchProgramInstance()
+    // DIAGNOSTIC ONLY: Remove before pushing to production.
+    , DIAGNOSTIC_POST_CATCH_ONLY(
+          "<b>Diagnostic only: Run 00.04 after catch through 00.05</b><br>"
+          "Start at the saved position immediately after catching the second Pokemon. "
+          "Applies only in advanced Tutorial mode when Start Checkpoint is 00.04. Runs its post-catch part, then 00.05. Other starting checkpoints run normally. "
+          "Remove before pushing to production.",
+          LockMode::LOCK_WHILE_RUNNING,
+          false
+          )
+    // DIAGNOSTIC ONLY: Remove before pushing to production.
+    , DIAGNOSTIC_FAKE_CHECKPOINT_SAVE(
+          "<b>Diagnostic only: Fake checkpoint saves</b><br>"
+          "Use the fake save helper instead of normal checkpoint saving. "
+          "Checkpoint saves are not verified in this mode. Remove before pushing to production.",
+          LockMode::LOCK_WHILE_RUNNING, false)
+    , STORY_SECTION(
+          "<b>Story Section:</b>",
+          {{StorySection::TUTORIAL, "tutorial", "Tutorial"},
+           {StorySection::MAIN_STORY, "main-story", "Main Story"}},
+          LockMode::LOCK_WHILE_RUNNING, StorySection::TUTORIAL
+          )
+    , MAINSTORY_NOTE("", "Return your maxed starter from Pokemon HOME before starting Main Story. "
+          "Use the required moveset and the starting position shown below.")
     , ENABLE_ADVANCED_MODE(
           "<b>Advanced mode:</b><br>"
           "Use checkpoints instead of segments.",
@@ -334,15 +371,15 @@ BDSPAutoStory::BDSPAutoStory()
           )
     , START_CHECKPOINT_TUTORIAL(
           "<b>Start Checkpoint:</b>",
-          CHECKPOINT_DATABASE(),
+          section_database(true, true),
           LockMode::LOCK_WHILE_RUNNING,
           "0"
           )
     , END_CHECKPOINT_TUTORIAL(
           "<b>End Checkpoint:</b>",
-          CHECKPOINT_DATABASE(),
+          section_database(true, true),
           LockMode::UNLOCK_WHILE_RUNNING,
-          "2"
+          "5"
           )
 
     , START_DESCRIPTION_SEGMENT("<b>Start:</b><br>", "")
@@ -353,32 +390,38 @@ BDSPAutoStory::BDSPAutoStory()
 
     , START_CHECKPOINT_MAINSTORY(
           "<b>Start Checkpoint (Main):</b>",
-          CHECKPOINT_DATABASE(),
+          section_database(true, false),
           LockMode::LOCK_WHILE_RUNNING,
-          "0"
+          "6"
           )
 
     , END_CHECKPOINT_MAINSTORY(
           "<b>End Checkpoint (Main):</b>",
-          CHECKPOINT_DATABASE(),
+          section_database(true, false),
           LockMode::UNLOCK_WHILE_RUNNING,
-          "2"
+          std::to_string(ALL_CHECKPOINTS().size() - 1)
           )
 
     , START_SEGMENT(
         "<b>Start Segment:</b>",
-        SEGMENT_DATABASE(),
+        section_database(false, true),
         LockMode::LOCK_WHILE_RUNNING,
         "0"
     )
 
     , END_SEGMENT(
         "<b>End Segment:</b>",
-        SEGMENT_DATABASE(),
+        section_database(false, true),
         LockMode::UNLOCK_WHILE_RUNNING,
-        std::to_string(ALL_SEGMENTS().size() - 1)
+        "0"
     )
 
+    , START_SEGMENT_MAINSTORY(
+          "<b>Start Segment:</b>", section_database(false, false),
+          LockMode::LOCK_WHILE_RUNNING, "1")
+    , END_SEGMENT_MAINSTORY(
+          "<b>End Segment:</b>", section_database(false, false),
+          LockMode::LOCK_WHILE_RUNNING, std::to_string(ALL_SEGMENTS().size() - 1))
     , STARTERCHOICE(
           "<b>Starter Pokemon:</b>",
           {
@@ -522,20 +565,28 @@ BDSPAutoStory::BDSPAutoStory()
     //  Options
     // -----------------------------------------------------------------------
 
+    PA_ADD_OPTION(DIAGNOSTIC_POST_CATCH_ONLY);
+    PA_ADD_OPTION(DIAGNOSTIC_FAKE_CHECKPOINT_SAVE);
+    PA_ADD_OPTION(STORY_SECTION);
+    PA_ADD_OPTION(MAINSTORY_NOTE);
     PA_ADD_OPTION(ENABLE_ADVANCED_MODE);
 
     // Segment UI
     PA_ADD_OPTION(START_SEGMENT);
+    PA_ADD_OPTION(START_SEGMENT_MAINSTORY);
     PA_ADD_OPTION(START_DESCRIPTION_SEGMENT);
 
     PA_ADD_OPTION(END_SEGMENT);
+    PA_ADD_OPTION(END_SEGMENT_MAINSTORY);
     PA_ADD_OPTION(END_DESCRIPTION_SEGMENT);
 
     // Checkpoint UI
     PA_ADD_OPTION(START_CHECKPOINT_TUTORIAL);
+    PA_ADD_OPTION(START_CHECKPOINT_MAINSTORY);
     PA_ADD_OPTION(START_DESCRIPTION_CHECKPOINT);
 
     PA_ADD_OPTION(END_CHECKPOINT_TUTORIAL);
+    PA_ADD_OPTION(END_CHECKPOINT_MAINSTORY);
     PA_ADD_OPTION(END_DESCRIPTION_CHECKPOINT);
 
 
@@ -560,36 +611,32 @@ BDSPAutoStory::BDSPAutoStory()
     ENABLE_ADVANCED_MODE.add_listener(*this);
     START_SEGMENT.add_listener(*this);
     END_SEGMENT.add_listener(*this);
-    update_ui_state();
+    STORY_SECTION.add_listener(*this);
+    START_SEGMENT_MAINSTORY.add_listener(*this);
+    END_SEGMENT_MAINSTORY.add_listener(*this);
+    START_CHECKPOINT_MAINSTORY.add_listener(*this);
+    END_CHECKPOINT_MAINSTORY.add_listener(*this);
+    on_config_value_changed(nullptr);
 }
 void BDSPAutoStory::update_ui_state(){
-    bool advanced = ENABLE_ADVANCED_MODE;
-    START_DESCRIPTION_SEGMENT.set_visibility(
-        advanced ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED
-    );
-    END_DESCRIPTION_SEGMENT.set_visibility(
-        advanced ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED
-    );
-
-    START_DESCRIPTION_CHECKPOINT.set_visibility(
-        advanced ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
-    );
-    END_DESCRIPTION_CHECKPOINT.set_visibility(
-        advanced ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
-    );
-    START_DESCRIPTION_SEGMENT.set_visibility(
-        advanced ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED
-    );
-    END_DESCRIPTION_SEGMENT.set_visibility(
-        advanced ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED
-    );
-
-    START_DESCRIPTION_CHECKPOINT.set_visibility(
-        advanced ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
-    );
-    END_DESCRIPTION_CHECKPOINT.set_visibility(
-        advanced ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
-    );
+    const bool advanced = ENABLE_ADVANCED_MODE;
+    const bool tutorial = STORY_SECTION == StorySection::TUTORIAL;
+    auto visible = [](ConfigOption& option, bool show){
+        option.set_visibility(show ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    };
+    visible(START_SEGMENT, !advanced && tutorial);
+    visible(END_SEGMENT, !advanced && tutorial);
+    visible(START_SEGMENT_MAINSTORY, !advanced && !tutorial);
+    visible(END_SEGMENT_MAINSTORY, !advanced && !tutorial);
+    visible(START_CHECKPOINT_TUTORIAL, advanced && tutorial);
+    visible(END_CHECKPOINT_TUTORIAL, advanced && tutorial);
+    visible(START_CHECKPOINT_MAINSTORY, advanced && !tutorial);
+    visible(END_CHECKPOINT_MAINSTORY, advanced && !tutorial);
+    visible(START_DESCRIPTION_SEGMENT, !advanced);
+    visible(END_DESCRIPTION_SEGMENT, !advanced);
+    visible(START_DESCRIPTION_CHECKPOINT, advanced);
+    visible(END_DESCRIPTION_CHECKPOINT, advanced);
+    visible(MAINSTORY_NOTE, !tutorial);
 
     bool show_help = ((HelpMode)HELP_MODE == HelpMode::OUTSIDE_HELP);
 
@@ -603,28 +650,12 @@ void BDSPAutoStory::update_ui_state(){
     OUTSIDE_HELP_ATTACK_4.set_visibility(show_help ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
 }
 void BDSPAutoStory::on_config_value_changed(void*){
-    bool advanced = ENABLE_ADVANCED_MODE;
-
-    // Segments
-    START_SEGMENT.set_visibility(
-        advanced ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED
-    );
-    END_SEGMENT.set_visibility(
-        advanced ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED
-    );
-
-    // Checkpoints (tutorial for now)
-    START_CHECKPOINT_TUTORIAL.set_visibility(
-        advanced ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
-    );
-    END_CHECKPOINT_TUTORIAL.set_visibility(
-        advanced ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
-    );
+    const bool tutorial = STORY_SECTION == StorySection::TUTORIAL;
     if (ENABLE_ADVANCED_MODE){
         const auto& checkpoints = ALL_CHECKPOINTS();
 
-        size_t start = START_CHECKPOINT_TUTORIAL.index();
-        size_t end   = END_CHECKPOINT_TUTORIAL.index();
+        size_t start = std::stoul((tutorial ? START_CHECKPOINT_TUTORIAL : START_CHECKPOINT_MAINSTORY).slug());
+        size_t end   = std::stoul((tutorial ? END_CHECKPOINT_TUTORIAL : END_CHECKPOINT_MAINSTORY).slug());
 
         if (start < checkpoints.size()){
             START_DESCRIPTION_CHECKPOINT.set_text(
@@ -640,8 +671,8 @@ void BDSPAutoStory::on_config_value_changed(void*){
     }else{
         const auto& segments = ALL_SEGMENTS();
 
-        size_t start = START_SEGMENT.index();
-        size_t end   = END_SEGMENT.index();
+        size_t start = std::stoul((tutorial ? START_SEGMENT : START_SEGMENT_MAINSTORY).slug());
+        size_t end   = std::stoul((tutorial ? END_SEGMENT : END_SEGMENT_MAINSTORY).slug());
 
         if (start < segments.size()){
             START_DESCRIPTION_SEGMENT.set_text(
@@ -680,16 +711,27 @@ void BDSPAutoStory::program(
                 (TorterraMove)OUTSIDE_HELP_ATTACK_3,
                 (TorterraMove)OUTSIDE_HELP_ATTACK_4,
             }
-        }
+        },
+        DIAGNOSTIC_FAKE_CHECKPOINT_SAVE ? CheckpointSaveMode::FAKE : CheckpointSaveMode::REAL
     };
 
+    // DIAGNOSTIC ONLY: Remove this branch before pushing to production.
+    if (DIAGNOSTIC_POST_CATCH_ONLY && ENABLE_ADVANCED_MODE &&
+        STORY_SECTION == StorySection::TUTORIAL && START_CHECKPOINT_TUTORIAL.slug() == "4"){
+        env.log("Diagnostic only: Running checkpoint 00.04 after catch.");
+        diagnostic_checkpoint_0004_after_catch(env, context, options, stats);
+        env.log("Diagnostic continuation: Running checkpoint 00.05.");
+        AutoStory_Checkpoint_0005().run_checkpoint(env, context, options, stats);
+        send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+        return;
+    }
+
+    const bool tutorial = STORY_SECTION == StorySection::TUTORIAL;
     const auto& segments = ALL_SEGMENTS();
 
-
-
     if (ENABLE_ADVANCED_MODE){
-        size_t start = START_CHECKPOINT_TUTORIAL.index();
-        size_t end   = END_CHECKPOINT_TUTORIAL.index();
+        size_t start = std::stoul((tutorial ? START_CHECKPOINT_TUTORIAL : START_CHECKPOINT_MAINSTORY).slug());
+        size_t end   = std::stoul((tutorial ? END_CHECKPOINT_TUTORIAL : END_CHECKPOINT_MAINSTORY).slug());
 
         env.log("Starting AutoStory from checkpoint " + std::to_string(start) +
                 " to " + std::to_string(end));
@@ -702,8 +744,8 @@ void BDSPAutoStory::program(
         }
 
     }else{
-        size_t start = START_SEGMENT.index();
-        size_t end   = END_SEGMENT.index();
+        size_t start = std::stoul((tutorial ? START_SEGMENT : START_SEGMENT_MAINSTORY).slug());
+        size_t end   = std::stoul((tutorial ? END_SEGMENT : END_SEGMENT_MAINSTORY).slug());
 
         for (size_t i = start; i <= end && i < segments.size(); i++){
             env.log("Running Segment: " + std::to_string(i));

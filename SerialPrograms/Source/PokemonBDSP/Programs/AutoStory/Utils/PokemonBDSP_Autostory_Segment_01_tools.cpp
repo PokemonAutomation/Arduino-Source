@@ -172,11 +172,11 @@ namespace PokemonAutomation {
                 return false;
             }
 
-            static void escape_wild_battle(
+            void escape_wild_battle(
                 VideoStream& stream,
                 ProControllerContext& context,
-                BattleType battle_type = BattleType::STANDARD,
-                std::chrono::seconds timeout = 30s
+                BattleType battle_type,
+                std::chrono::seconds timeout
             ) {
                 EndBattleWatcher battle_end;
                 bool exit_transition = false;
@@ -359,7 +359,7 @@ namespace PokemonAutomation {
                 return walked;
             }
 
-            static void Barry_1_fight(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context) {
+            void Barry_1_fight(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context) {
                 stream.log("Starting Barry 1 battle...");
 
                 // State machine: loop until EndBattleWatcher fires
@@ -600,14 +600,15 @@ namespace PokemonAutomation {
                     ImageFloatBox(0.615, 0.37, 0.035, 0.23)
                 };
 
-                std::array<double, 193> scores = {};
-                std::array<double, 193> worst_regions = {};
+                const int search_radius = (int)std::lround(0.10*live_scaled.width());
+                std::vector<double> scores(2*search_radius+1);
+                std::vector<double> worst_regions(2*search_radius+1);
 
                 int best_shift = 0;
                 double best_score = 1000.0;
 
                 // Search up to 10% of the screen width in either direction.
-                for (int shift = -96; shift <= 96; shift++) {
+                for (int shift = -search_radius; shift <= search_radius; shift++) {
                     double total = 0.0;
                     double worst = 0.0;
 
@@ -629,7 +630,7 @@ namespace PokemonAutomation {
                     }
 
                     const double average = total / boxes.size();
-                    const size_t index = static_cast<size_t>(shift + 96);
+                    const size_t index = static_cast<size_t>(shift + search_radius);
 
                     scores[index] = average;
                     worst_regions[index] = worst;
@@ -643,28 +644,28 @@ namespace PokemonAutomation {
                 // Reject another similarly good match well away from the chosen position.
                 double alternative_score = 1000.0;
 
-                for (int shift = -96; shift <= 96; shift++) {
-                    if (std::abs(shift - best_shift) <= 12) {
+                for (int shift = -search_radius; shift <= search_radius; shift++) {
+                    if (std::abs(shift - best_shift) <= std::lround(0.0125*live_scaled.width())) {
                         continue;
                     }
 
-                    const double score = scores[static_cast<size_t>(shift + 96)];
+                    const double score = scores[static_cast<size_t>(shift + search_radius)];
                     if (score < alternative_score) {
                         alternative_score = score;
                     }
                 }
 
-                const size_t best_index = static_cast<size_t>(best_shift + 96);
+                const size_t best_index = static_cast<size_t>(best_shift + search_radius);
 
                 const bool valid =
                     best_score <= 20.0 &&
                     worst_regions[best_index] <= 30.0 &&
                     alternative_score - best_score >= 3.0 &&
-                    std::abs(best_shift) < 96;
+                    std::abs(best_shift) < search_radius;
 
                 return {
                     valid,
-                    static_cast<double>(best_shift) / 960.0,
+                    static_cast<double>(best_shift) / live_scaled.width(),
                     best_score
                 };
             }
@@ -946,8 +947,8 @@ namespace PokemonAutomation {
             struct MinePictureScore {
                 double average = 1000.0;
                 double worst = 1000.0;
-                int horizontal = 0;
-                int vertical = 0;
+                double horizontal = 0;
+                double vertical = 0;
             };
 
             // Supports four, five, or six regions. Existing four-region callers keep
@@ -957,12 +958,14 @@ namespace PokemonAutomation {
                 const ImageRGB32& reference,
                 const ImageRGB32& live,
                 const std::array<ImageFloatBox, Regions>& boxes,
-                int horizontal_range = 16,
-                int vertical_range = 8
+                double horizontal_range = 1.0/60,
+                double vertical_range = 2.0/135
             ) {
                 MinePictureScore best;
-                for (int y = -vertical_range; y <= vertical_range; y++) {
-                    for (int x = -horizontal_range; x <= horizontal_range; x++) {
+                const int radius_x = (int)std::lround(horizontal_range*live.width());
+                const int radius_y = (int)std::lround(vertical_range*live.height());
+                for (int y = -radius_y; y <= radius_y; y++) {
+                    for (int x = -radius_x; x <= radius_x; x++) {
                         double total = 0.0;
                         double worst = 0.0;
                         for (const ImageFloatBox& box : boxes) {
@@ -976,8 +979,8 @@ namespace PokemonAutomation {
                         if (average < best.average) {
                             best.average = average;
                             best.worst = worst;
-                            best.horizontal = x;
-                            best.vertical = y;
+                            best.horizontal = (double)x/live.width();
+                            best.vertical = (double)y/live.height();
                         }
                     }
                 }
@@ -1059,8 +1062,8 @@ namespace PokemonAutomation {
                 std::chrono::milliseconds settle = 500ms;
                 std::chrono::milliseconds initial_settle = 0ms;
                 size_t max_movements = 30;
-                int horizontal_range = 12;
-                int vertical_range = 6;
+                double horizontal_range = 0.0125;
+                double vertical_range = 1.0/90;
                 double max_average = 20.0;
                 double max_patch = 30.0;
             };
@@ -1120,7 +1123,7 @@ namespace PokemonAutomation {
                                         label + " Endpoint " + std::to_string(endpoint + 1) +
                                         ": average=" + std::to_string(score.average) +
                                         ", worst patch=" + std::to_string(score.worst) +
-                                        ", offset=(" + std::to_string(score.horizontal) +
+                                        ", screen-relative offset=(" + std::to_string(score.horizontal) +
                                         "," + std::to_string(score.vertical) + ")"
                                     );
 
@@ -1204,7 +1207,7 @@ namespace PokemonAutomation {
                 options.y = -1.0;
                 options.pulse = 80ms;
                 options.max_movements = 40;
-                options.horizontal_range = 24;
+                options.horizontal_range = 0.025;
                 return mine_walk_to_endpoints(
                     stream, context, files, boxes, options, "[Mine path 01]", force_encounter
                 );
@@ -1239,7 +1242,7 @@ namespace PokemonAutomation {
                 options.y = 0.0;
                 options.pulse = 40ms;
                 options.max_movements = 20;
-                options.horizontal_range = 12;
+                options.horizontal_range = 0.0125;
                 return mine_walk_to_endpoints(
                     stream, context, files, boxes, options, "[Mine right]"
                 );
@@ -1274,10 +1277,10 @@ namespace PokemonAutomation {
                 options.y = -1.0;
                 options.pulse = 40ms;
                 options.max_movements = 30;
-                // options.horizontal_range = 12;
+                // options.horizontal_range = 0.0125;
                 // Path 02 can be shifted horizontally after the first right endpoint.
-                // The screenshot regression matches at -20 pixels on the 960px image.
-                options.horizontal_range = 24;
+                // The screenshot regression matches at about -2.08% of screen width.
+                options.horizontal_range = 0.025;
                 return mine_walk_to_endpoints(
                     stream, context, files, boxes, options, "[Mine down 02]"
                 );
@@ -1303,7 +1306,7 @@ namespace PokemonAutomation {
                 options.y = 0.0;
                 options.pulse = 40ms;
                 options.max_movements = 30;
-                options.horizontal_range = 12;
+                options.horizontal_range = 0.0125;
                 return mine_walk_to_endpoints(
                     stream, context, files, boxes, options, "[Mine left 03]"
                 );
@@ -1338,8 +1341,8 @@ namespace PokemonAutomation {
                 options.max_movements = step.max_movements;
                 options.max_average = step.max_average;
                 options.max_patch = step.max_patch;
-                options.horizontal_range = 16;
-                options.vertical_range = 8;
+                options.horizontal_range = 1.0/60;
+                options.vertical_range = 2.0/135;
                 options.initial_settle = 700ms;
                 options.settle = 700ms;
                 const std::array<const char*, 1> files = {step.file};
@@ -1609,12 +1612,14 @@ namespace PokemonAutomation {
                 const ImageRGB32& reference,
                 const ImageRGB32& live,
                 const ImageFloatBox& box,
-                int horizontal,
-                int vertical
+                double horizontal,
+                double vertical
             ) {
                 const ImageViewRGB32 reference_crop = extract_box_reference(reference, box);
-                const ImageViewRGB32 live_crop =
-                    extract_box_reference(live, box, horizontal, vertical);
+                ImageFloatBox shifted = box;
+                shifted.x += horizontal;
+                shifted.y += vertical;
+                const ImageViewRGB32 live_crop = extract_box_reference(live, shifted);
                 ImageRGB32 adjusted = live_crop.scale_to(
                     reference_crop.width(), reference_crop.height()
                 );
@@ -1636,10 +1641,10 @@ namespace PokemonAutomation {
                 double left = 1000.0;
                 double right = 1000.0;
                 double helmet = 1000.0;
-                int horizontal = 0;
-                int vertical = 0;
-                int helmet_horizontal = 0;
-                int helmet_vertical = 0;
+                double horizontal = 0;
+                double vertical = 0;
+                double helmet_horizontal = 0;
+                double helmet_vertical = 0;
             };
 
             static MineRoarkOffsetScore mine_score_roark_offsets(
@@ -1655,11 +1660,14 @@ namespace PokemonAutomation {
                 double best_total = 2000.0;
 
                 // Both rocks must use the SAME offset. They cannot match independently.
-                // Offsets are pixels on the 960 x 540 comparison image.
-                for (int y = -8; y <= 8; y++) {
-                    for (int x = -16; x <= 16; x++) {
-                        const double left = mine_offset_patch_score(reference, live, left_box, x, y);
-                        const double right = mine_offset_patch_score(reference, live, right_box, x, y);
+                // Search ranges are screen fractions; enumerate pixels only for scoring.
+                const int radius_x = (int)std::lround(live.width()/60.0);
+                const int radius_y = (int)std::lround(live.height()*2.0/135);
+                for (int y = -radius_y; y <= radius_y; y++) {
+                    for (int x = -radius_x; x <= radius_x; x++) {
+                        const double dx = (double)x/live.width(), dy = (double)y/live.height();
+                        const double left = mine_offset_patch_score(reference, live, left_box, dx, dy);
+                        const double right = mine_offset_patch_score(reference, live, right_box, dx, dy);
                         const double worst = left > right ? left : right;
                         const double total = left + right;
 
@@ -1669,25 +1677,27 @@ namespace PokemonAutomation {
                             best_total = total;
                             best.left = left;
                             best.right = right;
-                            best.horizontal = x;
-                            best.vertical = y;
+                            best.horizontal = (double)x/live.width();
+                            best.vertical = (double)y/live.height();
                         }
                     }
                 }
 
                 // Roark's helmet may move slightly relative to the stationary rocks.
                 // Keep this extra search small so another red object cannot match far away.
-                for (int extra_y = -6; extra_y <= 6; extra_y++) {
-                    for (int extra_x = -6; extra_x <= 6; extra_x++) {
+                const int helmet_radius_x = (int)std::lround(live.width()*0.00625);
+                const int helmet_radius_y = (int)std::lround(live.height()/90.0);
+                for (int extra_y = -helmet_radius_y; extra_y <= helmet_radius_y; extra_y++) {
+                    for (int extra_x = -helmet_radius_x; extra_x <= helmet_radius_x; extra_x++) {
                         const double score = mine_offset_patch_score(
                             reference, live, helmet_box,
-                            best.horizontal + extra_x,
-                            best.vertical + extra_y
+                            best.horizontal + (double)extra_x/live.width(),
+                            best.vertical + (double)extra_y/live.height()
                         );
                         if (score < best.helmet) {
                             best.helmet = score;
-                            best.helmet_horizontal = extra_x;
-                            best.helmet_vertical = extra_y;
+                            best.helmet_horizontal = (double)extra_x/live.width();
+                            best.helmet_vertical = (double)extra_y/live.height();
                         }
                     }
                 }
@@ -1729,9 +1739,9 @@ namespace PokemonAutomation {
                                 "[Mine endpoint 18] Left rock=" + std::to_string(score.left) +
                                 ", Right rock=" + std::to_string(score.right) +
                                 ", Helmet=" + std::to_string(score.helmet) +
-                                ", shared offset=(" + std::to_string(score.horizontal) +
+                                ", shared screen-relative offset=(" + std::to_string(score.horizontal) +
                                 "," + std::to_string(score.vertical) +
-                                "), helmet extra=(" + std::to_string(score.helmet_horizontal) +
+                                "), helmet screen-relative extra=(" + std::to_string(score.helmet_horizontal) +
                                 "," + std::to_string(score.helmet_vertical) + ")"
                             );
 

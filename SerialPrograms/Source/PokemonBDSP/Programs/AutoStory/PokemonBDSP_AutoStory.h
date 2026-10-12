@@ -14,6 +14,8 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
+enum class StorySection { TUTORIAL, MAIN_STORY };
+
 class BDSPAutoStory_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     BDSPAutoStory_Descriptor();
@@ -38,6 +40,12 @@ private:
     virtual void on_config_value_changed(void* object) override;
     void update_ui_state();
 private:
+    // DIAGNOSTIC ONLY: Remove before pushing to production.
+    BooleanCheckBoxOption DIAGNOSTIC_POST_CATCH_ONLY;
+    // DIAGNOSTIC ONLY: Remove before pushing to production.
+    BooleanCheckBoxOption DIAGNOSTIC_FAKE_CHECKPOINT_SAVE;
+    EnumDropdownOption<StorySection> STORY_SECTION;
+    StaticTextOption MAINSTORY_NOTE;
     BooleanCheckBoxOption ENABLE_ADVANCED_MODE;
 
     StringSelectOption START_CHECKPOINT_TUTORIAL;
@@ -52,6 +60,8 @@ private:
     StringSelectOption END_CHECKPOINT_MAINSTORY;
     StringSelectOption START_SEGMENT;
     StringSelectOption END_SEGMENT;
+    StringSelectOption START_SEGMENT_MAINSTORY;
+    StringSelectOption END_SEGMENT_MAINSTORY;
 
     EnumDropdownOption<StarterChoice>      STARTERCHOICE;
     BooleanCheckBoxOption                  STARTER_SHINY;
