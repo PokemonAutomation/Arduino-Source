@@ -144,7 +144,7 @@ std::string tostr(const MessageHeader* header){
         return str;
     case PABB2_MESSAGE_OPCODE_LOG_LABEL_H32:{
         const Message_u32* message = (const Message_u32*)header;
-        str += "PABB2_MESSAGE_OPCODE_LOG_LABEL_U32: id = ";
+        str += "PABB2_MESSAGE_OPCODE_LOG_LABEL_H32: id = ";
         str += std::to_string(message->id);
         str += ": " + std::string(
             (const char*)(message + 1),
@@ -168,7 +168,7 @@ std::string tostr(const MessageHeader* header){
     }
     case PABB2_MESSAGE_OPCODE_LOG_LABEL_I32:{
         const Message_u32* message = (const Message_u32*)header;
-        str += "PABB2_MESSAGE_OPCODE_LOG_LABEL_U32: id = ";
+        str += "PABB2_MESSAGE_OPCODE_LOG_LABEL_I32: id = ";
         str += std::to_string(message->id);
         str += ": " + std::string(
             (const char*)(message + 1),
