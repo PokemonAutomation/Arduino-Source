@@ -10,6 +10,7 @@
 #include <QDir>
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include <array>
 #include <format>
 #include <string_view>

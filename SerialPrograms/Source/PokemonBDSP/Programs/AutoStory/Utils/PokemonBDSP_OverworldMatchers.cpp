@@ -1,3 +1,4 @@
+#include "CommonFramework/GlobalAutoPaths.h"
 #include <algorithm>
 #include <cmath>
 #include <opencv2/imgproc.hpp>

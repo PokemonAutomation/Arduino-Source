@@ -295,16 +295,12 @@ BDSPAutoStory_Descriptor::BDSPAutoStory_Descriptor()
           ProgramControllerClass::StandardController_NoRestrictions,
           FeedbackType::REQUIRED,
           AllowCommandsWhenRunning::DISABLE_COMMANDS,
-          false,
+          PanelDeprecation::NOT_DEPRECATED,
           {"Tesseract"}
           )
 {}
 
 
-std::unique_ptr<SingleSwitchProgramInstance>
-BDSPAutoStory_Descriptor::make_instance() const{
-    return std::make_unique<BDSPAutoStory>();
-}
 
 std::unique_ptr<StatsTracker>
 BDSPAutoStory_Descriptor::make_stats() const{

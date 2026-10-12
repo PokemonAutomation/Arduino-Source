@@ -5,6 +5,7 @@
  *
  */
 
+#include "CommonFramework/GlobalAutoPaths.h"
 #include <array>
 #include <cmath>
 #include <memory>
@@ -12,6 +13,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTools/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -227,8 +229,8 @@ namespace PokemonAutomation {
                 if (mine_confirm_escape_via_menu(stream, context, battle_type)) {
                     return;
                 }
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "escape_wild_battle: Exit transition and late main-menu fallback could not confirm escape.",
                     stream
                 );
@@ -302,8 +304,8 @@ namespace PokemonAutomation {
                     switch (state) {
                     case NavState::WALKING: {
                         if (walked >= max_travel) {
-                            OperationFailedException::fire(
-                                ErrorReport::SEND_ERROR_REPORT,
+                            OperationFailedExceptionWithScreenshot::fire(
+                                ErrorReportMode::SEND_ERROR_REPORT,
                                 "walk_until_doorway: Doorway not found within time budget.",
                                 stream
                             );
@@ -340,8 +342,8 @@ namespace PokemonAutomation {
                     }
                     case NavState::IN_BATTLE: {
                         if (++battles > options.max_battles) {
-                            OperationFailedException::fire(
-                                ErrorReport::SEND_ERROR_REPORT,
+                            OperationFailedExceptionWithScreenshot::fire(
+                                ErrorReportMode::SEND_ERROR_REPORT,
                                 "walk_until_doorway: Too many battles while walking.",
                                 stream
                             );
@@ -389,16 +391,16 @@ namespace PokemonAutomation {
                         context.wait_for_all_requests();
                         return;
                     default:
-                        OperationFailedException::fire(
-                            ErrorReport::SEND_ERROR_REPORT,
+                        OperationFailedExceptionWithScreenshot::fire(
+                            ErrorReportMode::SEND_ERROR_REPORT,
                             "Barry_1_fight: Timed out waiting for battle menu or end.",
                             stream
                         );
                     }
                 }
 
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Barry_1_fight: Battle did not end after 20 turns.",
                     stream
                 );
@@ -482,8 +484,8 @@ namespace PokemonAutomation {
                 context.wait_for_all_requests();
 
                 if (!black_screen_found) {
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "jubilife_to_oreburgh_gate: No black screen after 3 attempts.",
                         stream
                     );
@@ -553,8 +555,8 @@ namespace PokemonAutomation {
                 context.wait_for_all_requests();
 
                 if (!black_screen_found) {
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "oreburgh_gate_to_mine: No black screen after 3 attempts.",
                         stream
                     );
@@ -1936,8 +1938,8 @@ namespace PokemonAutomation {
                         );
 
                         if (options.reset_on_failure) {
-                            OperationFailedException::fire(
-                                ErrorReport::SEND_ERROR_REPORT,
+                            OperationFailedExceptionWithScreenshot::fire(
+                                ErrorReportMode::SEND_ERROR_REPORT,
                                 std::string("Mine route failed during: ") + step.name,
                                 stream
                             );
@@ -2062,15 +2064,15 @@ namespace PokemonAutomation {
                 route.reset_on_failure = true;
 
                 if (!oreburgh_mine_route(stream, context, route)) {
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT, "Mine route did not complete.", stream
+                    OperationFailedExceptionWithScreenshot::fire(
+                        ErrorReportMode::SEND_ERROR_REPORT, "Mine route did not complete.", stream
                     );
                 }
 
 
                 if (!mine_talk_and_escape(stream, context)) {
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Mine route: Roark conversation or Escape Rope exit failed.",
                         stream
                     );
@@ -2188,8 +2190,8 @@ namespace PokemonAutomation {
                 while (std::chrono::steady_clock::now() < dialogue_deadline) {
                     const VideoSnapshot frame = stream.video().snapshot();
                     if (!frame) {
-                        OperationFailedException::fire(
-                            ErrorReport::SEND_ERROR_REPORT,
+                        OperationFailedExceptionWithScreenshot::fire(
+                            ErrorReportMode::SEND_ERROR_REPORT,
                             "Gym post battle: No video frame while clearing dialogue.", stream
                         );
                     }
@@ -2205,8 +2207,8 @@ namespace PokemonAutomation {
                     context.wait_for_all_requests();
                 }
                 if (!dialogue_finished) {
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Gym post battle: Dialogue did not finish within 180 seconds.", stream
                     );
                 }
