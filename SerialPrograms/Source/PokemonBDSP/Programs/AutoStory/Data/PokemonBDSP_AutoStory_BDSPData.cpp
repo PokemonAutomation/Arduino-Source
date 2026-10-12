@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/GlobalAutoPaths.h"
 #include <map>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"

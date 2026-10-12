@@ -5,6 +5,7 @@
  *
  */
 
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "PokemonBDSP_AutoStory_Segment_00.h"
 #include "../Utils/PokemonBDSP_AutoStory_Segment_00_tools.h"
 #include "../Utils/PokemonBDSP_OverworldMatchers.h"
@@ -16,6 +17,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 
@@ -57,13 +59,13 @@ namespace PokemonAutomation {
                         pbf_wait(ctx, 5000ms);
                     }, {{black}});
                 if (ret != 0) {
-                    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                         label + ": Black transition not detected.", stream);
                 }
                 BlackScreenWatcher visible(COLOR_RED, {0.1, 0.1, 0.8, 0.8},
                     100, 10, BlackScreenWatcher::FinderType::GONE, 500ms);
                 if (wait_until(stream, context, 15s, {{visible}}) != 0) {
-                    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                         label + ": Transition did not finish.", stream);
                 }
                 stream.log("[Tutorial transition] " + label + ": destination visible.");
@@ -228,7 +230,7 @@ namespace PokemonAutomation {
                     pbf_move_left_joystick(ctx, {0, 1}, 5000ms, 0ms);
                 }, {{entry_black}});
             if (entry_ret != 0) {
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     "Barry house: Entry fade not detected.", stream);
             }
             // Release the joystick during loading; resume indoor movement only
@@ -236,7 +238,7 @@ namespace PokemonAutomation {
             BlackScreenWatcher entry_visible(COLOR_RED, {0.1, 0.1, 0.8, 0.8},
                 100, 10, BlackScreenWatcher::FinderType::GONE, 500ms);
             if (wait_until(stream, context, 15s, {{entry_visible}}) != 0) {
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     "Barry house: Entry fade did not finish.", stream);
             }
             pbf_wait(context, 500ms);
@@ -343,8 +345,8 @@ namespace PokemonAutomation {
             }
             else {
                 stream.log("Timed out waiting for briefcase.");
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT,
+                throw OperationFailedExceptionWithScreenshot(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Failed to detect briefcase in Segment 00.",
                     stream
                 );
@@ -531,7 +533,7 @@ namespace PokemonAutomation {
             double previous_dx = 0, previous_dy = 0;
             for (size_t attempt = 0; attempt < 60; attempt++) {
                 const auto frame = stream.video().snapshot();
-                if (!frame) OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                if (!frame) OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     label + ": No video frame.", stream);
                 const auto result = matcher(*frame.frame);
                 VideoOverlaySet overlays(stream.overlay());
@@ -588,7 +590,7 @@ namespace PokemonAutomation {
                 }
                 context.wait_for_all_requests();
             }
-            OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                 label + ": Reference position not confirmed; route movement stopped.", stream);
         }
 
@@ -731,7 +733,7 @@ namespace PokemonAutomation {
                 Milliseconds walked = 0ms;
                 while (walked < 1900ms) {
                     auto frame = stream.video().snapshot();
-                    if (!frame) OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                    if (!frame) OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                         "Poketch approach: No video frame.", stream);
                     const auto result = match_poketch_landmarks(*frame.frame);
                     VideoOverlaySet overlays(stream.overlay());
@@ -766,7 +768,7 @@ namespace PokemonAutomation {
                 const int vertical_probes[] = {-80, 160, -240, 320, -160, -120, 240, -360, 480, -240};
                 for (size_t attempt = 0; attempt < 80; attempt++) {
                     auto frame = stream.video().snapshot();
-                    if (!frame) OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                    if (!frame) OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                         "Poketch interaction: No video frame.", stream);
                     const OverworldMatchResult result = match_poketch_landmarks(*frame.frame);
                     stream.log(result.coarse ? "[Poketch landmarks] Coarse acquisition." : "[Poketch landmarks] Fine alignment.");
@@ -836,7 +838,7 @@ namespace PokemonAutomation {
                     }
                     context.wait_for_all_requests();
                 }
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     "Poketch interaction: Building landmarks did not confirm the reference position; A not pressed.", stream);
             }
 
@@ -847,7 +849,7 @@ namespace PokemonAutomation {
                 size_t confirmed = 0;
                 for (size_t attempt = 0; attempt < 60; attempt++) {
                     const auto frame = stream.video().snapshot();
-                    if (!frame) OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                    if (!frame) OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                         "Jubilife Center alignment: No video frame.", stream);
                     const auto result = match_jubilife_center_entrance(*frame.frame);
                     VideoOverlaySet overlays(stream.overlay());
@@ -882,7 +884,7 @@ namespace PokemonAutomation {
                     }
                     context.wait_for_all_requests();
                 }
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     "Jubilife Center alignment: Door reference not confirmed; entry not attempted.", stream);
             }
 

@@ -11,6 +11,7 @@
 #include <string>
 #include <algorithm>
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -20,7 +21,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_StatsCalculation.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
-#include "PokemonSwSh/Resources/PokemonSwSh_TypeMatchup.h"
+#include "VideoGames/PokemonSwSh/Resources/PokemonSwSh_TypeMatchup.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_EndBattleDetector.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h"
@@ -90,8 +91,8 @@ void handle_unexpected_battle(
         run_battle_press_A(info, stream, context);
         recovery_action(info, stream, context);
     }
-    OperationFailedException::fire(
-        ErrorReport::SEND_ERROR_REPORT,
+    OperationFailedExceptionWithScreenshot::fire(
+        ErrorReportMode::SEND_ERROR_REPORT,
         "handle_unexpected_battle: exceeded max attempts",
         stream
     );
