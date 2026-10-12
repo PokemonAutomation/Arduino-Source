@@ -616,7 +616,7 @@ else() # macOS and Linux
             message(FATAL_ERROR "PA_STREAM_HISTORY_FFMPEG=ON requires ffmpeg >= 5.1 (libavcodec 59+).")
         endif()
         target_include_directories(SerialProgramsLib SYSTEM PRIVATE ${FFMPEG_INCLUDE_DIRS})
-        target_link_libraries(SerialProgramsLib PUBLIC ${FFMPEG_LINK_LIBRARIES})
+        target_link_libraries(SerialProgramsLib PRIVATE ${FFMPEG_LINK_LIBRARIES})
     endif()
 
     #we hope to use our own Tesseract build in future so we can rid that dependency
