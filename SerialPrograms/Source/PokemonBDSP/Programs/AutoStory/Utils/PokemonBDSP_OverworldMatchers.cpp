@@ -247,8 +247,28 @@ OverworldMatchResult match_route202_grass_exit(const ImageRGB32& frame){
     }
     return best;
 }
+OverworldMatchResult match_jubilife_street_approach(const ImageRGB32& frame){
+    // Static building/fence geometry excludes people and localized signs.
+    return match_landmarks(frame,{
+        {"Door","PokemonBDSP/Autostory/JubilifeStreet/Door.png",
+            {0.677083333333,0.439814814815,0.213541666667,0.162037037037},{0,0,1,1},.90,.04},
+        {"Facade","PokemonBDSP/Autostory/JubilifeStreet/Facade.png",
+            {0.583333333333,0.138888888889,0.322916666667,0.250000000000},{0,0,1,1},.90,.04}
+    },2,1.0/128,1.0/72,true);
+}
+OverworldMatchResult match_jubilife_plaza_approach(const ImageRGB32& frame){
+    // Static building/fence geometry excludes people and localized signs.
+    return match_landmarks(frame,{
+        {"Roof","PokemonBDSP/Autostory/JubilifePlaza/Roof.png",
+            {0.640625000000,0.069444444444,0.260416666667,0.189814814815},{0,0,1,1},.90,.04},
+        {"Fence","PokemonBDSP/Autostory/JubilifePlaza/Fence.png",
+            {0.041666666667,0.319444444444,0.169270833333,0.120370370370},{0,0,1,1},.90,.04}
+    },2,1.0/128,1.0/72,true);
+}
 const std::vector<OverworldMatcher>& overworld_matchers(){
     static const std::vector<OverworldMatcher> matchers={
+        {"jubilife-street-approach","Jubilife street before Galactic plaza",match_jubilife_street_approach},
+        {"jubilife-plaza-approach","Jubilife Galactic plaza approach",match_jubilife_plaza_approach},
         {"poketch-landmarks","Jubilife Poketch landmarks",match_poketch_landmarks},
         {"oreburgh-mart","Oreburgh Mart emblem",match_oreburgh_mart},
         {"jubilife-center","Jubilife Pokemon Center entrance",match_jubilife_center_entrance},
