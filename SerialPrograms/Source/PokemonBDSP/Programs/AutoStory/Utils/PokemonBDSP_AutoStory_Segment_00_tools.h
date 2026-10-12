@@ -1,5 +1,7 @@
 #pragma once
 
+#include "PokemonBDSP_OverworldMatchers.h"
+
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "../StorySegments/PokemonBDSP_AutoStory_Segment_00.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -24,6 +26,8 @@ namespace PokemonAutomation {
             // ---------------------------------------------------------------------------
             // Time / setup helpers
             // ---------------------------------------------------------------------------
+
+            void verify_tutorial_settings(VideoStream& stream, ProControllerContext& context);
 
             void set_time_fast(
                 SingleSwitchProgramEnvironment& env,
@@ -59,6 +63,9 @@ namespace PokemonAutomation {
                 ProControllerContext& context
             );
 
+            // One wild encounter using Scratch, followed by verified Potion healing.
+            void battle_1_pokemon(VideoStream& stream, ProControllerContext& context);
+
             // Burst wiggle variant of catch_1_pokemon for testing.
             // Commented out in the .cpp - uncomment both to enable.
             // void catch_1_pokemon_v2(
@@ -76,35 +83,6 @@ namespace PokemonAutomation {
             // Grass movement helpers
             // ---------------------------------------------------------------------------
 
-            void walk_right_until_on_path(
-                VideoStream& stream,
-                ProControllerContext& context,
-                BattleType battle_type = BattleType::STANDARD
-            );
-
-            void walk_up_through_grass_2(
-                VideoStream& stream,
-                ProControllerContext& context,
-                BattleType battle_type = BattleType::STANDARD
-            );
-
-            void walk_right_through_grass_2(
-                VideoStream& stream,
-                ProControllerContext& context,
-                BattleType battle_type = BattleType::STANDARD
-            );
-
-            void walk_left_through_grass_3(
-                VideoStream& stream,
-                ProControllerContext& context,
-                BattleType battle_type = BattleType::STANDARD
-            );
-
-            void walk_up_through_grass_3(
-                VideoStream& stream,
-                ProControllerContext& context,
-                BattleType battle_type = BattleType::STANDARD
-            );
             void walk_through_grass(
                 VideoStream& stream,
                 ProControllerContext& context,
@@ -112,7 +90,9 @@ namespace PokemonAutomation {
                 int8_t y,
                 size_t steps,
                 const std::string& direction_name,
-                BattleType battle_type = BattleType::STANDARD
+                BattleType battle_type = BattleType::STANDARD,
+                Milliseconds movement_duration = Milliseconds(200),
+                OverworldMatchResult (*destination)(const ImageRGB32&) = nullptr
             );
 
             bool detect_black_screen_after_movement(

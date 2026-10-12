@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_BattleMenuDetector_H
 #define PokemonAutomation_PokemonBDSP_BattleMenuDetector_H
 
+#include <array>
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
@@ -33,6 +34,15 @@ enum class BattleMenuOption{
     BAG = 2,
     RUN = 3,
 };
+
+// Logical move slots are ordered top-to-bottom among populated move buttons.
+// selected_slot is 1-4, or 0 when missing/ambiguous. Never guess on uncertainty.
+struct BattleMoveMenuState {
+    size_t move_count = 0;
+    size_t selected_slot = 0;
+    std::array<ImageFloatBox, 4> buttons;
+};
+BattleMoveMenuState detect_battle_move_menu(const ImageViewRGB32& screen);
 
 class BattleMenuDetector : public StaticScreenDetector{
 public:

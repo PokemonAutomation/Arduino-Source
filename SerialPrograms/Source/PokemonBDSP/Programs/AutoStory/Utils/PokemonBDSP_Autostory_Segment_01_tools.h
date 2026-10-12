@@ -2,10 +2,18 @@
 #pragma once
 
 #include "../PokemonBDSP_AutoStoryTools.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 
 namespace PokemonAutomation {
     namespace NintendoSwitch {
         namespace PokemonBDSP {
+            // Shared confirmed-Run escape: verifies exit transition or main menu.
+            void escape_wild_battle(
+                VideoStream& stream, ProControllerContext& context,
+                BattleType battle_type = BattleType::STANDARD,
+                std::chrono::seconds timeout = std::chrono::seconds(30)
+            );
+
             enum class MineRouteStage {
                 ALIGN_ENTRANCE,
                 FIRST_ROCK,
@@ -27,6 +35,10 @@ namespace PokemonAutomation {
                 // True: let the checkpoint retry handler reset the game.
                 bool reset_on_failure = false;
             };
+
+            // Shared battle routine: use the first move until the battle ends.
+            void Barry_1_fight(SingleSwitchProgramEnvironment& env,
+                VideoStream& stream, ProControllerContext& context);
 
             void jubilife_to_oreburgh_gate(SingleSwitchProgramEnvironment& env,
                 VideoStream& stream, ProControllerContext& context);

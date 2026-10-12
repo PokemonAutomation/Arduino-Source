@@ -7,7 +7,14 @@
 
 #include "PokemonBDSP_AutoStory_Segment_00.h"
 #include "../Utils/PokemonBDSP_AutoStory_Segment_00_tools.h"
+#include "../Utils/PokemonBDSP_OverworldMatchers.h"
 
+#include <algorithm>
+#include <cmath>
+#include <opencv2/imgproc.hpp>
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -18,6 +25,7 @@
 #include "PokemonBDSP/Programs/AutoStory/PokemonBDSP_AutoStoryTools.h"
 #include "PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_StarterReset.h"
 #include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/VisualDetectors/ImageMatchDetector.h"
 
 #include "NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.h"
@@ -32,6 +40,34 @@ namespace PokemonAutomation {
             // ---------------------------------------------------------------------------
             // Starter selection
             // ---------------------------------------------------------------------------
+
+            // Watch before movement starts, release on the fade, and hold the
+            // following recorded wait until the destination is visible again.
+            static void recorded_move_until_transition(
+                VideoStream& stream, ProControllerContext& context,
+                double x, double y, Milliseconds duration, const std::string& label
+            ) {
+                context.wait_for_all_requests();
+                stream.log("[Tutorial transition] " + label + ": approaching fade.");
+                BlackScreenWatcher black;
+                int ret = run_until<ProControllerContext>(stream, context,
+                    [x, y, duration](ProControllerContext& ctx) {
+                        pbf_move_left_joystick(ctx, {x, y}, duration, 0ms);
+                        // Keep observing a delayed fade after the recorded hold.
+                        pbf_wait(ctx, 5000ms);
+                    }, {{black}});
+                if (ret != 0) {
+                    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                        label + ": Black transition not detected.", stream);
+                }
+                BlackScreenWatcher visible(COLOR_RED, {0.1, 0.1, 0.8, 0.8},
+                    100, 10, BlackScreenWatcher::FinderType::GONE, 500ms);
+                if (wait_until(stream, context, 15s, {{visible}}) != 0) {
+                    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                        label + ": Transition did not finish.", stream);
+                }
+                stream.log("[Tutorial transition] " + label + ": destination visible.");
+            }
 
             static void select_turtwig(VideoStream& stream, ProControllerContext& context) {
                 stream.log("[DEBUG] Turtwig Selection: Starting starter selection");
@@ -131,7 +167,7 @@ namespace PokemonAutomation {
         // They may also be modified or removed without warning.
 
         // ---------------------------------------------------------------------------
-        // Segment 00-000 begins
+        // Segment 00-01 begins
         // Navigates from player's room to Route 201 through Mom/Barry dialogues.
         // ---------------------------------------------------------------------------
 
@@ -184,8 +220,31 @@ namespace PokemonAutomation {
             pbf_wait(context, 800ms);
 
             pbf_wait(context, 1306ms);
-            pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 1000ms, 0ms);
-			pbf_wait(context, 1422ms);
+            context.wait_for_all_requests();
+            stream.log("[Barry house] Entering; waiting for entry fade.");
+            BlackScreenWatcher entry_black;
+            int entry_ret = run_until<ProControllerContext>(stream, context,
+                [](ProControllerContext& ctx) {
+                    pbf_move_left_joystick(ctx, {0, 1}, 5000ms, 0ms);
+                }, {{entry_black}});
+            if (entry_ret != 0) {
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                    "Barry house: Entry fade not detected.", stream);
+            }
+            // Release the joystick during loading; resume indoor movement only
+            // after the screen has stayed non-black for half a second.
+            BlackScreenWatcher entry_visible(COLOR_RED, {0.1, 0.1, 0.8, 0.8},
+                100, 10, BlackScreenWatcher::FinderType::GONE, 500ms);
+            if (wait_until(stream, context, 15s, {{entry_visible}}) != 0) {
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                    "Barry house: Entry fade did not finish.", stream);
+            }
+            pbf_wait(context, 500ms);
+            context.wait_for_all_requests();
+            stream.log("[Barry house] Entry settled; starting stair approach.");
+            // Align left after entry before the next upward stair approach.
+            pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 400ms, 0ms);
+            pbf_move_left_joystick(context, { -1.000000, 0.000000 }, 1600ms, 0ms);
             pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 2722ms, 0ms);
             pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 1600ms, 0ms);
             pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 501ms, 0ms);
@@ -198,13 +257,25 @@ namespace PokemonAutomation {
             pbf_mash_button(context, BUTTON_A, 10000ms);
 
             pbf_wait(context, 856ms);
-            pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 920ms, 0ms);
-            pbf_wait(context, 631ms);
-            pbf_move_left_joystick(context, { 0.000000, -1.000000 }, 2183ms, 0ms);
-            pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 1076ms, 0ms);
-            pbf_move_left_joystick(context, { 0.000000, -1.000000 }, 781ms, 0ms);
-            pbf_wait(context, 1500ms);
-            pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 2713ms, 0ms);
+
+
+            // Recorded route from the top of Barry's stairs. Moves rounded to
+            // 100ms, waits to 50ms; transition waits gate both floor changes.
+            recorded_move_until_transition(stream, context, -1.0, 0.0, 900ms,
+                "Barry house downstairs");
+            pbf_wait(context, 750ms);
+            pbf_move_left_joystick(context, {-1.0, 0.0}, 2000ms, 0ms);
+            pbf_wait(context, 250ms);
+            pbf_move_left_joystick(context, {0.0, -1.0}, 2000ms, 0ms);
+            pbf_wait(context, 150ms);
+            pbf_move_left_joystick(context, {1.0, 0.0}, 1400ms, 0ms);
+            pbf_wait(context, 500ms);
+            recorded_move_until_transition(stream, context, 0.0, -1.0, 1200ms,
+                "Barry house exit");
+            // First-run video placed the player east of the northbound path.
+            // Shorten the rightward approach; tune further from the next recording.
+            stream.log("[Route 201] Aligning east for 2300ms before northbound approach.");
+            pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 2300ms, 0ms);
             pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 5861ms, 0ms);
             pbf_wait(context, 134ms);
 
@@ -225,11 +296,15 @@ namespace PokemonAutomation {
 
             pbf_wait(context, 1000ms);
 
-            save_game(stream, context);
+            // save_game(stream, context);  // Disabled: checkpoint save mode controls saving.
             context.wait_for_all_requests();
         }
         // ---------------------------------------------------------------------------
-        //  Segment 00-001 begins
+        // End of Segment 00 - 01
+		// Standing in front lake varity ready to enter lake Verity for starter selection.
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        //  Segment 00-02 begins
         //  Navigates into lake Verity to recieve starter
         // ---------------------------------------------------------------------------
         static void starter_nav(VideoStream& stream, ProControllerContext& context) {
@@ -283,7 +358,11 @@ namespace PokemonAutomation {
             pbf_mash_button(context, BUTTON_B, 60000ms);
         }
         // ---------------------------------------------------------------------------
-        //  Segment 00-002 begins
+        // End of Segment 00 - 02
+        // Standing in front lake varity after starter selection.
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        //  Segment 00-03 begins
         //  Navigates from Exit of lake Verity to receipt of the Pokedex
         // ---------------------------------------------------------------------------
 
@@ -314,9 +393,9 @@ namespace PokemonAutomation {
             pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 745ms, 0ms);
             DateTime t{ 2026, 1, 1, 0, 0, 50 };
             set_time_fast(env, context, t);
-            walk_right_until_on_path(stream, context, BattleType::STARTER);
-            walk_up_through_grass_2(stream, context, BattleType::STARTER);
-            walk_right_through_grass_2(stream, context, BattleType::STARTER);
+            walk_through_grass(stream, context, 1, 0, 20, "right through grass to path", BattleType::STARTER);
+            walk_through_grass(stream, context, 0, 1, 18, "up through grass 2", BattleType::STARTER);
+            walk_through_grass(stream, context, 1, 0, 10, "right through grass 2", BattleType::STARTER);
             pbf_move_left_joystick(context, { 0.000000, -1.000000 }, 730ms, 0ms);
             pbf_wait(context, 941ms);
             pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 1950ms, 0ms);
@@ -333,12 +412,12 @@ namespace PokemonAutomation {
 
 
         // ---------------------------------------------------------------------------
-        // End of Segment 00 - 002
+        // End of Segment 00 - 03
         // Standing in front of the professor after receiving the pokedex.
         // ---------------------------------------------------------------------------
 
         // ---------------------------------------------------------------------------
-        // Begin Segment 00 - 003
+        // Begin Segment 00 - 04
         // Will heal at Sandgem pokeCenter to reliably catch a second pokemon for Home
         // transfer.
         // Collects poketech and stands in front of the PC to end the tutorial section
@@ -346,7 +425,11 @@ namespace PokemonAutomation {
         // ---------------------------------------------------------------------------
 
         static void tutorial_part_3_navigation(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context) {
-            /*pbf_move_left_joystick(context, {0.000000, -1.000000}, 2010ms, 0ms);
+            // Arm exit detection before movement and finish the fade before
+            // starting the dialogue watcher, which cancels queued commands.
+            recorded_move_until_transition(stream, context, 0.0, -1.0, 2010ms,
+                "Rowan lab exit");
+            context.wait_for_all_requests();
 
             wait_for_dialogue(stream, context, "Phase 14 (dawn tour)");
 
@@ -405,9 +488,9 @@ namespace PokemonAutomation {
 
             DateTime t{ 2026, 1, 1, 0, 0, 50 };
             set_time_fast(env, context, t);
-            walk_right_until_on_path(stream, context, BattleType::STARTER);
-            walk_up_through_grass_2(stream, context, BattleType::STARTER);
-            walk_right_through_grass_2(stream, context, BattleType::STARTER);
+            walk_through_grass(stream, context, 1, 0, 20, "right through grass to path", BattleType::STARTER);
+            walk_through_grass(stream, context, 0, 1, 18, "up through grass 2", BattleType::STARTER);
+            walk_through_grass(stream, context, 1, 0, 10, "right through grass 2", BattleType::STARTER);
             context.wait_for_all_requests();
             pbf_wait(context, 1500ms);
 
@@ -429,17 +512,105 @@ namespace PokemonAutomation {
 
             pbf_mash_button(context, BUTTON_B, 70000ms);
             context.wait_for_all_requests();
-            pbf_wait(context, 2000ms);*/
+            pbf_wait(context, 2000ms);
             catch_1_pokemon(stream, context);
             pbf_wait(context, 1500ms);
             context.wait_for_all_requests();
-            save_game(stream, context);
+        }
+
+        // Align to a route reference before continuing recorded navigation.
+        // Matcher offsets and thresholds are fractions of screen width/height.
+        static void align_to_tutorial_landmarks(
+            VideoStream& stream, ProControllerContext& context,
+            OverworldMatchResult (*matcher)(const ImageRGB32&), const std::string& label
+        ) {
             context.wait_for_all_requests();
+            pbf_wait(context, 700ms);
+            context.wait_for_all_requests();
+            size_t confirmations = 0, coarse_confirmations = 0;
+            double previous_dx = 0, previous_dy = 0;
+            for (size_t attempt = 0; attempt < 60; attempt++) {
+                const auto frame = stream.video().snapshot();
+                if (!frame) OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                    label + ": No video frame.", stream);
+                const auto result = matcher(*frame.frame);
+                VideoOverlaySet overlays(stream.overlay());
+                for (const auto& landmark : result.landmarks) {
+                    overlays.add(COLOR_CYAN, landmark.search);
+                    if (landmark.accepted) overlays.add(COLOR_GREEN, landmark.found);
+                    stream.log("[" + label + "] " + landmark.name +
+                        " score=" + std::to_string(landmark.score) +
+                        " margin=" + std::to_string(landmark.margin) +
+                        " accepted=" + std::to_string(landmark.accepted) +
+                        " screen-relative offset=(" + std::to_string(landmark.dx) +
+                        "," + std::to_string(landmark.dy) + ")");
+                }
+                stream.log("[" + label + "] located=" + std::to_string(result.located) +
+                    " mode=" + (result.coarse ? "vertical acquisition" : "fine alignment") +
+                    " reference screen-relative offset=(" + std::to_string(result.dx) +
+                    "," + std::to_string(result.dy) + ")");
+                if (result.coarse && result.located) {
+                    if (coarse_confirmations && std::abs(result.dx-previous_dx)<=0.00625 &&
+                        std::abs(result.dy-previous_dy)<=1.0/90) coarse_confirmations++;
+                    else coarse_confirmations=1;
+                    previous_dx=result.dx;
+                    previous_dy=result.dy;
+                } else coarse_confirmations=0;
+                if (!result.located) {
+                    confirmations = 0;
+                    pbf_wait(context, 250ms);
+                } else if (result.coarse && coarse_confirmations<3) {
+                    confirmations = 0;
+                    stream.log("[" + label + "] Waiting for consistent vertical acquisition.");
+                    pbf_wait(context, 250ms);
+                } else if (result.at_target) {
+                    if (++confirmations >= 3) {
+                        stream.log("[" + label + "] Reference position confirmed.");
+                        return;
+                    }
+                    pbf_wait(context, 300ms);
+                } else {
+                    confirmations = 0;
+                    const bool horizontal = !result.coarse &&
+                        std::abs(result.dx) >= std::abs(result.dy)*9.0/16;
+                    const double error = horizontal ? result.dx : result.dy*9.0/16;
+                    const auto duration = std::abs(error) > 1.0/24 ? 80ms :
+                        std::abs(error) > 0.015625 ? 40ms : 16ms;
+                    stream.log("[" + label + "] Correcting " +
+                        std::string(horizontal ? "horizontal" : "vertical") + " axis " +
+                        (horizontal ? (result.dx>0 ? "right" : "left") : (result.dy<0 ? "up" : "down")) +
+                        " for " + std::to_string(duration.count()) + "ms.");
+                    // Reuse confirmed-Run encounter handling if correction enters grass.
+                    walk_through_grass(stream, context,
+                        horizontal ? (result.dx > 0 ? 1 : -1) : 0,
+                        horizontal ? 0 : (result.dy < 0 ? 1 : -1),
+                        1, label, BattleType::STANDARD, duration);
+                }
+                context.wait_for_all_requests();
+            }
+            OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                label + ": Reference position not confirmed; route movement stopped.", stream);
+        }
+
+        static void align_to_sandgem_junction(VideoStream& stream, ProControllerContext& context) {
+            align_to_tutorial_landmarks(stream, context, match_sandgem_junction, "Sandgem junction");
+        }
+
+        // Resumes from the save made after catching the second Pokemon.
+        static void tutorial_part_3_after_catch_navigation(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context) {
             pbf_wait(context, 1500ms);
             //--------------------------------------------------------
             // To get potions
             // -------------------------------------------------------
-            walk_right_through_grass_2(stream, context);
+            walk_through_grass(stream, context, 1, 0, 10, "Route 202 grass exit",
+                BattleType::STANDARD, 200ms, match_route202_grass_exit);
+            // Recording: the exit reference was reached after two 200ms steps.
+            // Eight further steps (1600ms) reached the eastern tree boundary.
+            // Continue outside grass to preserve the next down movement's start.
+            stream.log("[Tutorial] Route 202 grass exit confirmed; continuing right to the tree boundary.");
+            pbf_move_left_joystick(context, {1.0, 0.0}, 1600ms, 0ms);
+            pbf_wait(context, 700ms);
+            context.wait_for_all_requests();
             pbf_move_left_joystick(context, { 0.000000, -1.000000 }, 1421ms, 0ms);
             pbf_wait(context, 52ms);
             pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 1013ms, 0ms);
@@ -451,14 +622,26 @@ namespace PokemonAutomation {
             pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 856ms, 0ms);
             context.wait_for_all_requests();
             pbf_wait(context, 1500ms);
-            walk_left_through_grass_3(stream, context);
+            walk_through_grass(stream, context, -1, 0, 18, "left through grass 3");
             pbf_press_button(context, BUTTON_A, 180ms, 0ms);
 
             wait_for_dialogue(stream, context, "Phase 17 (accept potions)");
 
             pbf_mash_button(context, BUTTON_B, 10000ms);
+            context.wait_for_all_requests();
+            // Catching the second Pokemon can damage the starter. Verify healing
+            // once Potions are available, before continuing toward Tristan.
+            stream.log("[Tutorial] Checking starter HP after the first Potion pickup.");
+            use_potion_first_pokemon(stream, context);
+            context.wait_for_all_requests();
+            // Start with one training encounter toward level 6 / Ember. The helper
+            // waits through XP/automatic move learning and heals after the fight.
+            battle_1_pokemon(stream, context);
 
-            walk_right_through_grass_2(stream, context);
+            // Stop on the verified Route 201 reference instead of overshooting
+            // with ten fixed steps. The limit also allows small final corrections.
+            walk_through_grass(stream, context, 1, 0, 20, "Route 201 Potion exit",
+                BattleType::STANDARD, 200ms, match_route201_potion_exit);
             context.wait_for_all_requests();
             pbf_wait(context, 1500ms);
 
@@ -471,6 +654,7 @@ namespace PokemonAutomation {
             pbf_wait(context, 1500ms);
             pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 1000ms, 0ms);
             pbf_wait(context, 1500ms);
+            align_to_sandgem_junction(stream, context);
             pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 1855ms, 0ms);
             pbf_wait(context, 1500ms);
             pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 430ms, 0ms);
@@ -480,8 +664,8 @@ namespace PokemonAutomation {
             pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 1120ms, 0ms);
 
             // Continue on to jubilife
-            walk_left_through_grass_3(stream, context);
-            walk_up_through_grass_3(stream, context);
+            walk_through_grass(stream, context, -1, 0, 18, "left through grass 3");
+            walk_through_grass(stream, context, 0, 1, 18, "up through grass 3");
             pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 1000ms, 0ms);
             wait_for_dialogue(stream, context, "Phase 18 (tristan encounter dialog)");
 
@@ -530,15 +714,177 @@ namespace PokemonAutomation {
             pbf_mash_button(context, BUTTON_B, 5000ms);
         }
         // ---------------------------------------------------------------------------
-        // End of Segment 00 - 003
+        // End of Segment 00 - 04
         // Standing in Jubilife after speaking to dawn.
         // ---------------------------------------------------------------------------
         // ---------------------------------------------------------------------------
-        // Begin Segment 00 - 004
+        // Begin Segment 00 - 05
         // Standing at the entrance to jubilife after speaking to dawn, will navigate to the poketech challenge.
         // Collects poketech and stands in front of the PC to end the tutorial section
         // and send the starter to pokemon HOME.
         // ---------------------------------------------------------------------------
+
+            // Stop the approach as soon as buildings can guide it, instead of
+            // overshooting south and then blindly walking back north.
+            static void approach_poketch_landmarks(VideoStream& stream, ProControllerContext& context) {
+                context.wait_for_all_requests();
+                Milliseconds walked = 0ms;
+                while (walked < 1900ms) {
+                    auto frame = stream.video().snapshot();
+                    if (!frame) OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                        "Poketch approach: No video frame.", stream);
+                    const auto result = match_poketch_landmarks(*frame.frame);
+                    VideoOverlaySet overlays(stream.overlay());
+                    for (const auto& landmark : result.landmarks) {
+                        overlays.add(COLOR_CYAN, landmark.search);
+                        if (landmark.accepted) overlays.add(COLOR_GREEN, landmark.found);
+                        stream.log("[Poketch approach] " + landmark.name + " score=" + std::to_string(landmark.score) +
+                            " margin=" + std::to_string(landmark.margin));
+                    }
+                    if (result.located) {
+                        stream.log("[Poketch approach] Landmarks acquired after " + std::to_string(walked.count()) + "ms; ending downward approach.");
+                        return;
+                    }
+                    const Milliseconds step = std::min(200ms, 1900ms - walked);
+                    pbf_move_left_joystick(context, {0, -1}, step, 0ms);
+                    walked += step;
+                    pbf_wait(context, 700ms);
+                    context.wait_for_all_requests();
+                }
+                stream.log("[Poketch approach] Reached 1900ms downward limit; handing off to locator.");
+            }
+
+            static void align_and_talk_to_poketch_man(VideoStream& stream, ProControllerContext& context) {
+                context.wait_for_all_requests();
+                pbf_wait(context, 700ms);
+                context.wait_for_all_requests();
+                size_t confirmed = 0, coarse_confirmed = 0;
+                double previous_dx = 0, previous_dy = 0;
+                size_t acquisition_misses = 0, vertical_probe = 0;
+                // Two small excursions around the approach position. This is
+                // visibility recovery, not permission to interact without a match.
+                const int vertical_probes[] = {-80, 160, -240, 320, -160, -120, 240, -360, 480, -240};
+                for (size_t attempt = 0; attempt < 80; attempt++) {
+                    auto frame = stream.video().snapshot();
+                    if (!frame) OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                        "Poketch interaction: No video frame.", stream);
+                    const OverworldMatchResult result = match_poketch_landmarks(*frame.frame);
+                    stream.log(result.coarse ? "[Poketch landmarks] Coarse acquisition." : "[Poketch landmarks] Fine alignment.");
+                    VideoOverlaySet overlays(stream.overlay());
+                    for (const auto& landmark : result.landmarks) {
+                        overlays.add(COLOR_CYAN, landmark.search);
+                        if (landmark.accepted) overlays.add(COLOR_GREEN, landmark.found);
+                        stream.log("[Poketch landmarks] " + landmark.name + " score=" + std::to_string(landmark.score) +
+                            " margin=" + std::to_string(landmark.margin) + " accepted=" + std::to_string(landmark.accepted) +
+                            " screen-relative offset=(" + std::to_string(landmark.dx) + "," + std::to_string(landmark.dy) + ")");
+                    }
+                    if (result.located) acquisition_misses = 0;
+                    if (result.coarse && result.located) {
+                        if (coarse_confirmed && std::abs(result.dx - previous_dx) <= 0.00625 && std::abs(result.dy - previous_dy) <= 1.0/90)
+                            coarse_confirmed++;
+                        else coarse_confirmed = 1;
+                        previous_dx = result.dx; previous_dy = result.dy;
+                    } else coarse_confirmed = 0;
+                    if (!result.located) {
+                        confirmed = 0;
+                        if (++acquisition_misses >= 4 && vertical_probe < sizeof(vertical_probes) / sizeof(vertical_probes[0])) {
+                            int probe = vertical_probes[vertical_probe++];
+                            acquisition_misses = 0;
+                            stream.log("[Poketch landmarks] Bounded vertical visibility probe " + std::to_string(vertical_probe) +
+                                "/10: " + (probe < 0 ? "down " : "up ") + std::to_string(std::abs(probe)) + "ms.");
+                            pbf_move_left_joystick(context, {0, probe < 0 ? -1.0 : 1.0}, Milliseconds(std::abs(probe)), 0ms);
+                            pbf_wait(context, 700ms);
+                        } else {
+                            stream.log("[Poketch landmarks] No trustworthy acquisition; waiting for another frame.");
+                            pbf_wait(context, 250ms);
+                        }
+                    } else if (result.coarse && coarse_confirmed < 3) {
+                        confirmed = 0;
+                        stream.log("[Poketch landmarks] Waiting for consistent coarse offset before movement.");
+                        pbf_wait(context, 250ms);
+                    } else if (result.at_target) {
+                        if (++confirmed >= 3) {
+                            stream.log("[Poketch landmarks] Above-NPC reference confirmed; turning down.");
+                            pbf_press_dpad(context, DPAD_DOWN, 40ms, 400ms);
+                            context.wait_for_all_requests();
+                            pbf_press_button(context, BUTTON_A, 80ms, 500ms);
+                            context.wait_for_all_requests();
+                            wait_for_dialogue(stream, context, "Phase 27 (poketech challenge completed dialog)", 10s);
+                            return;
+                        }
+                        pbf_wait(context, 300ms);
+                    } else {
+                        confirmed = 0;
+                        const double dx = result.dx, dy = result.dy;
+                        stream.log("[Poketch landmarks] Reference screen-relative offset=(" + std::to_string(result.dx) + "," + std::to_string(result.dy) + ").");
+                        const bool horizontal = std::abs(dx) > 7.0/960 &&
+                            (std::abs(dy) <= 7.0/540 || std::abs(dx) >= std::abs(dy)*9.0/16);
+                        double error = horizontal ? dx : dy*9.0/16;
+                        auto duration = std::abs(error) > 0.03125 ? 80ms : std::abs(error) > 0.015625 ? 40ms : 16ms;
+                        if (std::abs(dx) <= 7.0/960 && std::abs(dy) <= 7.0/540) {
+                            stream.log("[Poketch landmarks] Coarse position near target; waiting for fine confirmation.");
+                            pbf_wait(context, 300ms);
+                            context.wait_for_all_requests();
+                            continue;
+                        }
+                        stream.log("[Poketch landmarks] Correcting " + std::string(horizontal ? "horizontal" : "vertical") +
+                            " axis for " + std::to_string(duration.count()) + "ms.");
+                        pbf_move_left_joystick(context,
+                            {horizontal ? (dx > 0 ? 1.0 : -1.0) : 0.0,
+                             horizontal ? 0.0 : (dy < 0 ? 1.0 : -1.0)}, duration, 0ms);
+                        pbf_wait(context, 700ms);
+                    }
+                    context.wait_for_all_requests();
+                }
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                    "Poketch interaction: Building landmarks did not confirm the reference position; A not pressed.", stream);
+            }
+
+            void align_and_enter_jubilife_center(VideoStream& stream, ProControllerContext& context) {
+                context.wait_for_all_requests();
+                pbf_wait(context, 700ms);
+                context.wait_for_all_requests();
+                size_t confirmed = 0;
+                for (size_t attempt = 0; attempt < 60; attempt++) {
+                    const auto frame = stream.video().snapshot();
+                    if (!frame) OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                        "Jubilife Center alignment: No video frame.", stream);
+                    const auto result = match_jubilife_center_entrance(*frame.frame);
+                    VideoOverlaySet overlays(stream.overlay());
+                    for (const auto& landmark : result.landmarks) {
+                        overlays.add(COLOR_CYAN, landmark.search);
+                        if (landmark.accepted) overlays.add(COLOR_GREEN, landmark.found);
+                        stream.log("[Jubilife Center alignment] score=" + std::to_string(landmark.score) +
+                            " margin=" + std::to_string(landmark.margin) + " screen-relative offset=(" +
+                            std::to_string(landmark.dx) + "," + std::to_string(landmark.dy) + ")");
+                    }
+                    if (!result.located) {
+                        confirmed = 0;
+                        pbf_wait(context, 250ms);
+                    } else if (result.at_target) {
+                        if (++confirmed >= 3) {
+                            stream.log("[Jubilife Center alignment] Door position confirmed; entering.");
+                            recorded_move_until_transition(stream, context, 0, 1, 2000ms, "Jubilife Pokemon Center entry");
+                            pbf_wait(context, 700ms);
+                            context.wait_for_all_requests();
+                            return;
+                        }
+                        pbf_wait(context, 300ms);
+                    } else {
+                        confirmed = 0;
+                        bool horizontal = std::abs(result.dx) >= std::abs(result.dy)*9.0/16;
+                        double error = horizontal ? result.dx : result.dy*9.0/16;
+                        const auto duration = std::abs(error) > 1.0/24 ? 80ms : std::abs(error) > 0.015625 ? 40ms : 16ms;
+                        pbf_move_left_joystick(context,
+                            {horizontal ? (result.dx > 0 ? 1.0 : -1.0) : 0.0,
+                             horizontal ? 0.0 : (result.dy < 0 ? 1.0 : -1.0)}, duration, 0ms);
+                        pbf_wait(context, 700ms);
+                    }
+                    context.wait_for_all_requests();
+                }
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                    "Jubilife Center alignment: Door reference not confirmed; entry not attempted.", stream);
+            }
 
         static void tutorial_part_4_navigation(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context) {
             pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 2580ms, 0ms);
@@ -665,33 +1011,10 @@ namespace PokemonAutomation {
             pbf_wait(context, 2521ms);
             pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 3600ms, 0ms);
             pbf_wait(context, 610ms);
-            pbf_move_left_joystick(context, { 0.000000, -1.000000 }, 1907ms, 0ms);
-            pbf_wait(context, 529ms);
-            pbf_move_left_joystick(context, { 0.000000, -1.000000 }, 275ms, 0ms);
-            pbf_wait(context, 3600ms);
-            pbf_move_left_joystick(context, { 0.000000, -1.000000 }, 899ms, 0ms);
-            pbf_wait(context, 1308ms);
+            approach_poketch_landmarks(stream, context);
             pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 192ms, 0ms);
             pbf_wait(context, 3238ms);
-            pbf_press_dpad(context, DPAD_UP, 108ms, 0ms);
-            pbf_wait(context, 433ms);
-            pbf_press_dpad(context, DPAD_UP, 260ms, 0ms);
-            pbf_wait(context, 365ms);
-            pbf_press_dpad(context, DPAD_UP, 187ms, 0ms);
-            pbf_wait(context, 542ms);
-            pbf_press_dpad(context, DPAD_UP, 243ms, 0ms);
-            pbf_wait(context, 370ms);
-            pbf_press_dpad(context, DPAD_UP, 217ms, 0ms);
-            pbf_wait(context, 495ms);
-            pbf_press_dpad(context, DPAD_UP, 219ms, 0ms);
-            pbf_wait(context, 572ms);
-            pbf_press_dpad(context, DPAD_UP, 231ms, 0ms);
-            pbf_wait(context, 1757ms);
-            pbf_press_dpad(context, DPAD_RIGHT, 115ms, 0ms);
-            pbf_press_button(context, BUTTON_A, 150ms, 0ms);
-            pbf_wait(context, 795ms);
-            context.wait_for_all_requests();
-            wait_for_dialogue(stream, context, "Phase 27 (poketech challenge completed dialog)");
+            align_and_talk_to_poketch_man(stream, context);
 
             pbf_mash_button(context, BUTTON_B, 15000ms);
             context.wait_for_all_requests();
@@ -703,8 +1026,7 @@ namespace PokemonAutomation {
             pbf_wait(context, 1522ms);
             pbf_press_dpad(context, DPAD_RIGHT, 144ms, 0ms);
             pbf_wait(context, 1767ms);
-            pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 1344ms, 0ms);
-            pbf_wait(context, 3428ms);
+            align_and_enter_jubilife_center(stream, context);
             pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 1099ms, 0ms);
             pbf_wait(context, 1222ms);
             pbf_press_dpad(context, DPAD_RIGHT, 228ms, 0ms);
@@ -718,7 +1040,7 @@ namespace PokemonAutomation {
             pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 642ms, 0ms);
         }
         // ---------------------------------------------------------------------------
-        // Segment 00-04 ends
+        // Segment 00-05 ends
         // Standing in front of the Jubilife City Pokemon Center PC.
         // Player will need to deposit pokemon in the pc and transfer to Pokemon Home
         // and level to 100 before starting the next segment.
@@ -743,6 +1065,7 @@ namespace PokemonAutomation {
             context.wait_for_all_requests();
             env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
+            AutoStory_Checkpoint_0000().run_checkpoint(env, context, options, stats);
             AutoStory_Checkpoint_0001().run_checkpoint(env, context, options, stats);
             AutoStory_Checkpoint_0002().run_checkpoint(env, context, options, stats);
             AutoStory_Checkpoint_0003().run_checkpoint(env, context, options, stats);
@@ -753,13 +1076,26 @@ namespace PokemonAutomation {
             env.console.log("End Segment " + name(), COLOR_GREEN);
         }
 
+        std::string AutoStory_Checkpoint_0000::name() const { return "00.00 - Verify Settings"; }
+        std::string AutoStory_Checkpoint_0000::start_text() const { return "Standing in the initial bedroom before beginning the tutorial."; }
+        std::string AutoStory_Checkpoint_0000::end_text() const { return "Required game settings verified and saved; ready for 00.01."; }
+        void AutoStory_Checkpoint_0000::run_checkpoint(
+            SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+            AutoStoryOptions options, AutoStoryStats& stats
+        ) const {
+            // Before any route movement or checkpoint save: fail visibly if
+            // options cannot be read, rather than navigate with unknown settings.
+            verify_tutorial_settings(env.console, context);
+            context.wait_for_all_requests();
+        }
+
         static void checkpoint_0001(
             SingleSwitchProgramEnvironment& env,
             ProControllerContext& context,
             AutoStoryOptions options,
             AutoStoryStats& stats
         ) {
-            checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+            checkpoint_reattempt_loop(env, context, options, stats,
                 [&](size_t /*attempt*/) {
                     // Segment 00-00: Intro and starter selection
                     tutorial_part_1_navigation(env, env.console, context);
@@ -773,7 +1109,7 @@ namespace PokemonAutomation {
             AutoStoryOptions options,
             AutoStoryStats& stats
         ) {
-            checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+            checkpoint_reattempt_loop(env, context, options, stats,
                 [&](size_t /*attempt*/) {
                     // Segment 00-01: Starter acquisition
                     starter_nav(env.console, context);
@@ -795,7 +1131,7 @@ namespace PokemonAutomation {
             AutoStoryOptions options,
             AutoStoryStats& stats
         ) {
-            checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+            checkpoint_reattempt_loop(env, context, options, stats,
                 [&](size_t /*attempt*/) {
                     // Segment 00-002: Pokedex acquisition
                     tutorial_part_2_navigation(env, env.console, context);
@@ -809,21 +1145,43 @@ namespace PokemonAutomation {
             AutoStoryOptions options,
             AutoStoryStats& stats
         ) {
-            checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+            checkpoint_reattempt_loop(env, context, options, stats,
                 [&](size_t /*attempt*/) {
                     // Segment 00-003: Poketech acquisition
                     tutorial_part_3_navigation(env, env.console, context);
                 },
                 true
             );
+
+            // Save and advance progress at the catch boundary. Retries of this
+            // section must start from the caught-Pokemon save, not the old route.
+            checkpoint_reattempt_loop(env, context, options, stats,
+                [&](size_t /*attempt*/) {
+                    tutorial_part_3_after_catch_navigation(env, env.console, context);
+                },
+                true
+            );
         }
+        // DIAGNOSTIC ONLY: Remove before pushing to production.
+        void diagnostic_checkpoint_0004_after_catch(
+            SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+            AutoStoryOptions options, AutoStoryStats& stats
+        ) {
+            checkpoint_reattempt_loop(env, context, options, stats,
+                [&](size_t /*attempt*/) {
+                    tutorial_part_3_after_catch_navigation(env, env.console, context);
+                },
+                true
+            );
+        }
+
         static void checkpoint_0005(
             SingleSwitchProgramEnvironment& env,
             ProControllerContext& context,
             AutoStoryOptions options,
             AutoStoryStats& stats
         ) {
-            checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+            checkpoint_reattempt_loop(env, context, options, stats,
                 [&](size_t /*attempt*/) {
                     // Segment 00-004: Poketech acquisition
                     tutorial_part_4_navigation(env, env.console, context);

@@ -1,4 +1,4 @@
-﻿/*  BDSP AutoStory - Segment 00 Tools
+/*  BDSP AutoStory - Segment 00 Tools
  *
  *  Helper implementations for Segment 00.
  * 
@@ -7,13 +7,19 @@
  */
 
 
+#include <algorithm>
+#include <cmath>
 #include <chrono>
+#include <cctype>
+
 #include "PokemonBDSP_AutoStory_Segment_00_tools.h"
+#include "PokemonBDSP_Autostory_Segment_01_tools.h"
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
@@ -117,7 +123,8 @@ namespace PokemonAutomation {
                             "[AutoStory] Clown helper timed out finding dialog.",
                             COLOR_RED
                         );
-                        return;
+                        OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                            "[AutoStory] Clown helper timed out finding dialog.", stream);
                     }
 
                     context.wait_for_all_requests();
@@ -152,6 +159,403 @@ namespace PokemonAutomation {
             // ---------------------------------------------------------------------------
             // Time helper
             // ---------------------------------------------------------------------------
+
+            // Options chrome and position detectors are independent of setting values.
+            class TutorialOptionsDetector {
+            public:
+                bool detect(const ImageViewRGB32& screen) const {
+                    ImageViewRGB32 panel = extract_box_reference(screen, ImageFloatBox{0.04, 0.065, 0.93, 0.70});
+                    size_t white = 0;
+                    for (size_t y = 0; y < panel.height(); y += 4)
+                        for (size_t x = 0; x < panel.width(); x += 4) {
+                            uint32_t p = panel.pixel(x, y);
+                            if (((p >> 16) & 255) > 225 && ((p >> 8) & 255) > 225 && (p & 255) > 225) white++;
+                        }
+                    double samples = (double)(((panel.width() + 3) / 4) * ((panel.height() + 3) / 4));
+                    // Distinguish Options from the icon menu and bag using its
+                    // blue heading and full-width white settings panel.
+                    ImageViewRGB32 heading = extract_box_reference(screen, ImageFloatBox{0.01, 0.005, 0.20, 0.025});
+                    size_t blue = 0, total = 0;
+                    for (size_t y = 0; y < heading.height(); y++)
+                        for (size_t x = 0; x < heading.width(); x++) {
+                            uint32_t p = heading.pixel(x, y);
+                            int r = (p >> 16) & 255, g = (p >> 8) & 255, b = p & 255;
+                            blue += b > r + 20 && g > r + 10;
+                            total++;
+                        }
+                    return samples > 0 && white / samples > 0.70 && total > 0 && blue > total / 4;
+                }
+            };
+
+            class TutorialOptionPositionDetector {
+            public:
+                // Locate the two long red horizontal lines surrounding the
+                // selected row. Scrolling changes their position automatically.
+                double selected_row(const ImageViewRGB32& screen) const {
+                    int first = -1, last = -1;
+                    for (size_t y = (size_t)(screen.height() * 0.08); y < screen.height() * 0.75; y++) {
+                        size_t red = 0, total = 0;
+                        for (size_t x = (size_t)(screen.width() * 0.08); x < screen.width() * 0.90; x += 2) {
+                            uint32_t p = screen.pixel(x, y);
+                            int r = (p >> 16) & 255, g = (p >> 8) & 255, b = p & 255;
+                            red += r > 150 && r > g + 40 && r > b + 40;
+                            total++;
+                        }
+                        if (total && red > total * 0.70) {
+                            if (first < 0) first = (int)y;
+                            last = (int)y;
+                        }
+                    }
+                    if (first < 0 || last - first < screen.height() * 0.04 || last - first > screen.height() * 0.12) return -1;
+                    return (first + last) / (2.0 * screen.height());
+                }
+                // Locate selected red value text separately from the row border.
+                bool selected_value(const ImageViewRGB32& screen, double y) const {
+                    ImageViewRGB32 value = extract_box_reference(screen, ImageFloatBox{0.33, y - 0.025, 0.54, 0.05});
+                    size_t red = 0;
+                    for (size_t py = 0; py < value.height(); py++)
+                        for (size_t px = 0; px < value.width(); px++) {
+                            uint32_t p = value.pixel(px, py);
+                            int r = (p >> 16) & 255, g = (p >> 8) & 255, b = p & 255;
+                            red += r > g + 20 && r > b + 20;
+                        }
+                    return red > value.width() * value.height() * 0.0005;
+                }
+            };
+
+
+            // Compare binary visual shapes with small alignment tolerance.
+            // No text recognition is needed for fixed English option labels.
+            static double option_image_score(const ImageViewRGB32& screen,
+                const ImageFloatBox& box, const ImageRGB32& reference, bool red_only) {
+                ImageRGB32 actual = extract_box_reference(screen, box).scale_to(384, 32);
+                ImageRGB32 expected = reference.scale_to(384, 32);
+                auto ink = [red_only](uint32_t p){
+                    int r = (p >> 16) & 255, g = (p >> 8) & 255, b = p & 255;
+                    return red_only ? r > g + 20 && r > b + 20 : r + g + b < 500;
+                };
+                double best = 0;
+                for (int dy = -2; dy <= 2; dy++) for (int dx = -2; dx <= 2; dx++) {
+                    size_t overlap = 0, count = 0;
+                    for (int y = 2; y < 30; y++) for (int x = 2; x < 382; x++) {
+                        bool a = ink(actual.pixel(x + dx, y + dy));
+                        bool b = ink(expected.pixel(x, y));
+                        overlap += a && b;
+                        count += a + b;
+                    }
+                    if (count) best = std::max(best, 2.0 * overlap / count);
+                }
+                return best;
+            }
+
+            static bool autosave_off_highlight(const ImageViewRGB32& screen, double y) {
+                auto red_count = [&](const ImageFloatBox& box){
+                    ImageViewRGB32 image = extract_box_reference(screen, box);
+                    size_t red = 0;
+                    for (size_t py = 0; py < image.height(); py++)
+                        for (size_t px = 0; px < image.width(); px++) {
+                            uint32_t p = image.pixel(px, py);
+                            int r = (p >> 16) & 255, g = (p >> 8) & 255, b = p & 255;
+                            red += r > g + 30 && r > b + 30;
+                        }
+                    return red;
+                };
+                size_t off = red_count({0.63, y - 0.022, 0.055, 0.044});
+                size_t on = red_count({0.34, y - 0.022, 0.055, 0.044});
+                // Require a clear Off highlight and reject any competing On highlight.
+                return off >= 10 && on * 10 < off;
+            }
+
+            static void verify_tutorial_settings_once(VideoStream& stream, ProControllerContext& context) {
+                context.wait_for_all_requests();
+                MenuDetector menu;
+                VideoOverlaySet detector_overlays(stream.overlay());
+                menu.make_overlays(detector_overlays);
+                detector_overlays.add(COLOR_CYAN, {0.04, 0.065, 0.93, 0.70}, "");
+                detector_overlays.add(COLOR_BLUE, {0.01, 0.005, 0.20, 0.025}, "");
+                detector_overlays.add(COLOR_RED, {0.08, 0.08, 0.82, 0.67}, "");
+                auto initial = stream.video().snapshot();
+                if (!initial || !menu.detect(initial)) {
+                    pbf_press_button(context, BUTTON_X, 80ms, 1000ms);
+                    context.wait_for_all_requests();
+                }
+                MenuWatcher menu_open;
+                if (wait_until(stream, context, 5s, {{menu_open}}) != 0) {
+                    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                        "Settings checkpoint: Main menu not detected.", stream);
+                }
+                stream.log("[Tutorial settings] Main menu detected; settling for 500ms before Options navigation.");
+                pbf_wait(context, 500ms);
+                context.wait_for_all_requests();
+                TutorialOptionsDetector options_screen;
+                TutorialOptionPositionDetector position;
+                // Only two icons are available at this initial checkpoint.
+                // Verify the main menu before navigating to the neighboring icon.
+                bool options_open = false;
+                for (size_t attempt = 0; attempt < 2; attempt++) {
+                    pbf_press_dpad(context, attempt == 0 ? DPAD_RIGHT : DPAD_LEFT, 80ms, 350ms);
+                    pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
+                    context.wait_for_all_requests();
+                    auto frame = stream.video().snapshot();
+                    if (frame && options_screen.detect(frame)) {
+                        options_open = true;
+                        break;
+                    }
+                    pbf_press_button(context, BUTTON_B, 80ms, 1000ms);
+                    context.wait_for_all_requests();
+                    MenuWatcher back_to_menu;
+                    if (wait_until(stream, context, 5s, {{back_to_menu}}) != 0) break;
+                }
+                if (!options_open) {
+                    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                        "Settings checkpoint: Options screen not detected.", stream);
+                }
+                stream.log("[Tutorial settings] Options screen detected.");
+                pbf_wait(context, 500ms);
+                context.wait_for_all_requests();
+                struct Setting { const char* label; const char* value; };
+                const Setting settings[] = {
+                    {"textspeed", "fast"}, {"changewindow", "type1"},
+                    {"battleeffects", "off"}, {"battlestyle", "set"},
+                    {"sendtoboxes", "automatic"}, {"givenicknames", "dontgive"},
+                    {"gyroscope", "use"}, {"autosave", "off"},
+                    {"shownicknames", "show"}, {"backgroundmusic", "8"},
+                    {"soundeffects", "8"},
+                };
+                for (size_t row = 0; row < sizeof(settings) / sizeof(settings[0]); row++) {
+                    // Detect the selected row afresh after every navigation/correction.
+                    double y = -1;
+                    const std::string base = RESOURCE_PATH() + "PokemonBDSP/Autostory/Options/" + settings[row].label;
+                    const ImageRGB32 label_reference(base + "_label.png");
+                    const ImageRGB32 value_reference(base + "_value.png");
+                    bool slider_reset = false;
+                    bool correct = false;
+                    for (size_t attempt = 0; attempt < 30; attempt++) {
+                        context.wait_for_all_requests();
+                        auto frame = stream.video().snapshot();
+                        if (frame && options_screen.detect(frame)) y = position.selected_row(frame);
+                        else y = -1;
+                        const bool value_visible = y >= 0 && position.selected_value(frame, y);
+                        const double label_score = y >= 0 ? option_image_score(frame,
+                            {0.08, y - 0.025, 0.24, 0.05}, label_reference, false) : 0;
+                        stream.log("[Tutorial settings] Expected row=" + std::string(settings[row].label) +
+                            " row_y=" + std::to_string(y) + " highlighted_value=" + std::to_string(value_visible) +
+                            " label_match=" + std::to_string(label_score));
+                        if (y < 0 || !value_visible || label_score < 0.80) {
+                            // A menu can be detected while its row/text is still
+                            // fading in. Re-read without directional inputs first.
+                            if (attempt < 4) {
+                                pbf_wait(context, 200ms);
+                                context.wait_for_all_requests();
+                                continue;
+                            }
+                            OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                                "Settings checkpoint: Unable to confirm expected row " + std::string(settings[row].label), stream);
+                        }
+                        // These are regular video-overlay boxes, so the existing
+                        // overlay display control can show/hide every active ROI.
+                        OverlayBoxScope row_overlay(stream.overlay(), COLOR_RED,
+                            {0.07, y - 0.04, 0.84, 0.08}, "");
+                        OverlayBoxScope label_overlay(stream.overlay(), COLOR_YELLOW,
+                            {0.08, y - 0.025, 0.24, 0.05}, "");
+                        OverlayBoxScope value_overlay(stream.overlay(), COLOR_GREEN,
+                            {0.33, y - 0.025, 0.54, 0.05}, "");
+                        VideoOverlaySet autosave_rois(stream.overlay());
+                        if (row == 7) {
+                            autosave_rois.add(COLOR_GREEN, {0.63, y - 0.022, 0.055, 0.044});
+                            autosave_rois.add(COLOR_RED, {0.34, y - 0.022, 0.055, 0.044});
+                        }
+                        double score;
+                        if (row >= 9) {
+                            // Compare the numeric value rather than the long slider:
+                            // neighboring slider levels otherwise look too similar.
+                            ImageViewRGB32 number = value_reference.sub_image(
+                                value_reference.width() * 82 / 100, 0,
+                                value_reference.width() - value_reference.width() * 82 / 100,
+                                value_reference.height());
+                            ImageRGB32 number_reference = number.scale_to(96, 32);
+                            score = option_image_score(frame,
+                                {0.7728, y - 0.025, 0.0972, 0.05}, number_reference, true);
+                        } else {
+                            score = option_image_score(frame,
+                                {0.33, y - 0.025, 0.54, 0.05}, value_reference, true);
+                        }
+                        stream.log("[Tutorial settings] " + std::string(settings[row].label) +
+                            " target match=" + std::to_string(score));
+                        // The reference recording uses inactive pale-red text;
+                        // the focused live row has a thicker dark-red glyph mask.
+                        // Verified Fast scores 0.734 while Slow/Normal score 0.
+                        if (score >= 0.65 && (row != 7 || autosave_off_highlight(frame, y))) {
+                            if (row == 7) {
+                                for (size_t confirmation = 0; confirmation < 3; confirmation++) {
+                                    pbf_wait(context, 200ms);
+                                    context.wait_for_all_requests();
+                                    auto check = stream.video().snapshot();
+                                    double check_y = check ? position.selected_row(check) : -1;
+                                    if (!check || !options_screen.detect(check) || check_y < 0 ||
+                                        option_image_score(check, {0.08, check_y - 0.025, 0.24, 0.05}, label_reference, false) < 0.80 ||
+                                        !autosave_off_highlight(check, check_y)) {
+                                        OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                                            "Autosave Off could not be confirmed. Stopping before movement.", stream);
+                                    }
+                                }
+                            }
+                            stream.log("[Tutorial settings] Verified " + std::string(settings[row].label) + "=" + settings[row].value);
+                            correct = true;
+                            break;
+                        }
+                        stream.log("[Tutorial settings] Correcting " + std::string(settings[row].label));
+                        if (row >= 9 && !slider_reset) {
+                            // Sliders clamp at zero. Establish a known endpoint,
+                            // then increment; verify the target image afterward.
+                            for (size_t step = 0; step < 12; step++)
+                                pbf_press_dpad(context, DPAD_LEFT, 80ms, 100ms);
+                            slider_reset = true;
+                        } else {
+                            pbf_press_dpad(context, DPAD_RIGHT, 80ms, 350ms);
+                        }
+                        context.wait_for_all_requests();
+                    }
+                    if (!correct) {
+                        OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                            "Settings checkpoint: Could not apply " + std::string(settings[row].label), stream);
+                    }
+                    if (row + 1 < sizeof(settings) / sizeof(settings[0]))
+                        pbf_press_dpad(context, DPAD_DOWN, 80ms, 350ms);
+                }
+                // Confirm settings before exiting: A A A A B B.
+                pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
+                pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
+                pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
+                pbf_press_button(context, BUTTON_A, 80ms, 1200ms);
+                pbf_press_button(context, BUTTON_B, 80ms, 1000ms);
+                pbf_press_button(context, BUTTON_B, 80ms, 1000ms);
+                context.wait_for_all_requests();
+                OverworldWatcher overworld;
+                if (wait_until(stream, context, 10s, {{overworld}}) != 0) {
+                    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                        "Settings checkpoint: Did not return to the overworld after saving options.", stream);
+                }
+                // Reopen the saved Options screen and independently verify Autosave.
+                // No route movement is permitted until this persisted-value check passes.
+                pbf_press_button(context, BUTTON_X, 80ms, 1000ms);
+                context.wait_for_all_requests();
+                MenuWatcher verify_menu;
+                if (wait_until(stream, context, 5s, {{verify_menu}}) != 0) {
+                    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                        "Autosave verification: Main menu not detected.", stream);
+                }
+                bool reopened = false;
+                for (size_t attempt = 0; attempt < 2; attempt++) {
+                    pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
+                    context.wait_for_all_requests();
+                    auto check = stream.video().snapshot();
+                    if (check && options_screen.detect(check)) { reopened = true; break; }
+                    pbf_press_button(context, BUTTON_B, 80ms, 1000ms);
+                    context.wait_for_all_requests();
+                    MenuWatcher return_menu;
+                    if (wait_until(stream, context, 5s, {{return_menu}}) != 0) break;
+                    pbf_press_dpad(context, DPAD_RIGHT, 80ms, 350ms);
+                }
+                if (!reopened) {
+                    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                        "Autosave verification: Could not reopen saved Options.", stream);
+                }
+                // Options starts on Text Speed; Autosave is seven rows below it.
+                for (size_t step = 0; step < 7; step++)
+                    pbf_press_dpad(context, DPAD_DOWN, 80ms, 350ms);
+                context.wait_for_all_requests();
+                const ImageRGB32 autosave_label(RESOURCE_PATH() + "PokemonBDSP/Autostory/Options/autosave_label.png");
+                for (size_t confirmation = 0; confirmation < 3; confirmation++) {
+                    auto check = stream.video().snapshot();
+                    double check_y = check ? position.selected_row(check) : -1;
+                    if (!check || !options_screen.detect(check) || check_y < 0 ||
+                        option_image_score(check, {0.08, check_y - 0.025, 0.24, 0.05}, autosave_label, false) < 0.80 ||
+                        !autosave_off_highlight(check, check_y)) {
+                        OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                            "Saved Autosave setting is not verified Off. Stopping before movement.", stream);
+                    }
+                    pbf_wait(context, 200ms);
+                    context.wait_for_all_requests();
+                }
+                stream.log("[Tutorial settings] Autosave = Off: confirmed after reopening saved Options (3 frames).");
+                // Confirm settings before exiting: A A A A B B.
+                pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
+                pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
+                pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
+                pbf_press_button(context, BUTTON_A, 80ms, 1200ms);
+                pbf_press_button(context, BUTTON_B, 80ms, 1000ms);
+                pbf_press_button(context, BUTTON_B, 80ms, 1000ms);
+                context.wait_for_all_requests();
+                OverworldWatcher verified_exit;
+                if (wait_until(stream, context, 10s, {{verified_exit}}) != 0) {
+                    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                        "Autosave verification: Could not return to the overworld.", stream);
+                }
+                // Report inferred values explicitly: these are visual matches,
+                // allowing the user to compare our conclusions with the screen.
+                stream.log("[Tutorial settings] Completed. Values believed applied (visual matches before saving):");
+                stream.log("[Tutorial settings] Text Speed = Fast; Change Window = Type 1; Battle Effects = Off; Battle Style = Set.");
+                stream.log("[Tutorial settings] Send to Boxes = Automatic; Give Nicknames = Don't give; Gyroscope = Use.");
+                stream.log("[Tutorial settings] Autosave = Off; Show Nicknames = Show; Background Music = 8; Sound Effects = 8.");
+            }
+
+
+            void verify_tutorial_settings(VideoStream& stream, ProControllerContext& context) {
+                // Settings-only recovery: initial attempt plus three retries.
+                // Never permit route movement unless the complete check succeeds.
+                constexpr size_t MAX_RETRIES = 3;
+                for (size_t attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+                    stream.log("[Tutorial settings] Attempt " + std::to_string(attempt + 1) + "/4.");
+                    try {
+                        verify_tutorial_settings_once(stream, context);
+                        return;
+                    } catch (OperationFailedException& error) {
+                        stream.log("[Tutorial settings] Attempt failed: " + error.message(), COLOR_ORANGE);
+                        if (attempt == MAX_RETRIES) {
+                            stream.log("[Tutorial settings] All three retries exhausted; stopping before movement.", COLOR_RED);
+                            throw;
+                        }
+                        // Back out of Options, save prompts, bag, or menu without
+                        // moving the player or resetting/loading the game.
+                        stream.log("[Tutorial settings] Returning to overworld before retry.");
+                        context.wait_for_all_requests();
+                        TutorialOptionsDetector options_screen;
+                        const auto failed_frame = stream.video().snapshot();
+                        if (failed_frame && options_screen.detect(failed_frame)) {
+                            // Finish the known Options save/exit sequence before
+                            // observing state; never cancel it on an Options frame
+                            // misclassified as overworld by the generic detector.
+                            for (size_t press = 0; press < 4; press++)
+                                pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
+                        }
+                        pbf_mash_button(context, BUTTON_B, 3000ms);
+                        context.wait_for_all_requests();
+                        OverworldDetector overworld;
+                        MenuDetector menu;
+                        BlackScreenDetector black;
+                        bool recovered = false;
+                        size_t confirmations = 0;
+                        for (size_t check = 0; check < 15; check++) {
+                            const auto frame = stream.video().snapshot();
+                            const bool clear = frame && !options_screen.detect(frame) &&
+                                !menu.detect(frame) && !black.detect(frame) && bag_pocket_position(frame) == 0 && overworld.detect(frame);
+                            if (clear) {
+                                if (++confirmations >= 3) { recovered = true; break; }
+                                pbf_wait(context, 200ms);
+                            } else {
+                                confirmations = 0;
+                                pbf_mash_button(context, BUTTON_B, 500ms);
+                            }
+                            context.wait_for_all_requests();
+                        }
+                        stream.log(recovered ? "[Tutorial settings] Recovery confirmed outside Options/menu; retrying."
+                            : "[Tutorial settings] Recovery not confirmed; next attempt will recheck the screen.");
+                        pbf_wait(context, 500ms);
+                        context.wait_for_all_requests();
+                    }
+                }
+            }
 
             void set_time_fast(
                 SingleSwitchProgramEnvironment& env,
@@ -207,6 +611,71 @@ namespace PokemonAutomation {
             // ---------------------------------------------------------------------------
             // Natalie battle
             // ---------------------------------------------------------------------------
+            static void select_battle_move_slot(VideoStream& stream, ProControllerContext& context,
+                BattleType battle_type, size_t target, const std::string& label) {
+                BattleMenuDetector commands(battle_type);
+                VideoOverlaySet overlays(stream.overlay());
+                commands.make_overlays(overlays);
+                overlays.add(COLOR_GREEN, {0.90, 0.48, 0.075, 0.505});
+                bool fight = false;
+                size_t confirmed = 0;
+                for (size_t check = 0; check < 30; check++) {
+                    context.wait_for_all_requests();
+                    auto frame = stream.video().snapshot();
+                    BattleMenuOption selected = frame ? commands.selected_option(frame) : BattleMenuOption::UNKNOWN;
+                    stream.log("[" + label + "] Command cursor=" + std::to_string((int)selected + 1) + "; target Battle=1.");
+                    if (selected == BattleMenuOption::BATTLE) {
+                        if (++confirmed >= 3) { fight = true; break; }
+                        pbf_wait(context, 100ms);
+                    } else {
+                        confirmed = 0;
+                        if (selected == BattleMenuOption::UNKNOWN) pbf_wait(context, 150ms);
+                        else pbf_press_dpad(context, DPAD_UP, 80ms, 250ms);
+                    }
+                }
+                if (!fight) OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                    label + ": Could not confirm Battle command; A not pressed.", stream);
+                pbf_press_button(context, BUTTON_A, 80ms, 500ms);
+                confirmed = 0;
+                size_t previous_move_count = 0, stable_move_count = 0;
+                for (size_t check = 0; check < 30; check++) {
+                    context.wait_for_all_requests();
+                    auto frame = stream.video().snapshot();
+                    const BattleMoveMenuState moves = frame ? detect_battle_move_menu(frame) : BattleMoveMenuState{};
+                    const int slot = (int)moves.selected_slot;
+                    VideoOverlaySet move_overlays(stream.overlay());
+                    for (size_t i = 0; i < moves.move_count; i++)
+                        move_overlays.add(moves.selected_slot == i + 1 ? COLOR_GREEN : COLOR_YELLOW, moves.buttons[i]);
+                    stream.log("[" + label + "] Available moves=" + std::to_string(moves.move_count) +
+                        "; selected slot=" + std::to_string(slot) + "/4; target=" + std::to_string(target) + ".");
+                    if (moves.move_count == previous_move_count && moves.move_count > 0) stable_move_count++;
+                    else { previous_move_count = moves.move_count; stable_move_count = 1; confirmed = 0; }
+                    if (moves.move_count > 0 && moves.move_count < target && stable_move_count >= 3) {
+                        OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                            label + ": Move slot " + std::to_string(target) + " is absent; no move confirmed.", stream);
+                    }
+                    if (slot == (int)target && stable_move_count >= 3) {
+                        if (++confirmed >= 3) {
+                            stream.log("[" + label + "] Move " + std::to_string(target) + " confirmed; using it.");
+                            pbf_press_button(context, BUTTON_A, 80ms, 3000ms);
+                            return;
+                        }
+                        pbf_wait(context, 100ms);
+                    } else {
+                        confirmed = 0;
+                        if (slot == 0 || slot == (int)target) pbf_wait(context, 150ms);
+                        else pbf_press_dpad(context, slot < (int)target ? DPAD_DOWN : DPAD_UP, 80ms, 250ms);
+                    }
+                    context.wait_for_all_requests();
+                }
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                    label + ": Could not confirm move " + std::to_string(target) + "; A not pressed.", stream);
+            }
+
+            static void select_natalie_move_three(VideoStream& stream, ProControllerContext& context) {
+                select_battle_move_slot(stream, context, BattleType::TRAINER, 3, "Natalie");
+            }
+
             void fight_Natalie(
                 VideoStream& stream,
                 ProControllerContext& context
@@ -275,58 +744,7 @@ namespace PokemonAutomation {
 
                         battle_menu_seen = true;
 
-                        // Open Fight menu.
-                        pbf_press_button(
-                            context,
-                            BUTTON_A,
-                            80ms,
-                            500ms
-                        );
-
-                        // Hard reset move cursor to top.
-                        pbf_press_dpad(
-                            context,
-                            DPAD_UP,
-                            80ms,
-                            150ms
-                        );
-
-                        pbf_press_dpad(
-                            context,
-                            DPAD_UP,
-                            80ms,
-                            150ms
-                        );
-
-                        pbf_press_dpad(
-                            context,
-                            DPAD_UP,
-                            80ms,
-                            150ms
-                        );
-
-                        // Move to move slot 3.
-                        pbf_press_dpad(
-                            context,
-                            DPAD_DOWN,
-                            80ms,
-                            150ms
-                        );
-
-                        pbf_press_dpad(
-                            context,
-                            DPAD_DOWN,
-                            80ms,
-                            250ms
-                        );
-
-                        // Use move slot 3.
-                        pbf_press_button(
-                            context,
-                            BUTTON_A,
-                            80ms,
-                            3000ms
-                        );
+                        select_natalie_move_three(stream, context);
 
                         break;
                     }
@@ -394,7 +812,8 @@ namespace PokemonAutomation {
                             5000ms
                         );
 
-                        return;
+                        OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                            "[AutoStory] Natalie battle timed out.", stream);
                     }
 
                     }
@@ -448,18 +867,22 @@ namespace PokemonAutomation {
 
                         // Mash through XP / level-up / dialog screens back to overworld.
                         OverworldWatcher overworld;
-                        run_until<ProControllerContext>(
+                        int cleanup_ret = run_until<ProControllerContext>(
                             stream, context,
                             [](ProControllerContext& ctx) {
                                 pbf_mash_button(ctx, BUTTON_B, 120000ms);
                             },
                             { {overworld} }
                         );
+                        if (cleanup_ret != 0) {
+                            OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                                "Starly battle: Overworld cleanup timed out.", stream);
+                        }
                         return;
                     }
                     default:
-                        stream.log("[AutoStory] Starly battle timed out.", COLOR_RED);
-                        return;
+                        OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                            "Starly battle timed out.", stream);
                     }
                 }
             }
@@ -467,126 +890,18 @@ namespace PokemonAutomation {
             // ---------------------------------------------------------------------------
             // Tristan battle
             // ---------------------------------------------------------------------------
-            void fight_tristan(
-                VideoStream& stream,
-                ProControllerContext& context
-            ) {
-                stream.log(
-                    "[AutoStory] Starting Tristan battle...",
-                    COLOR_BLUE
-                );
-
-                // Wait for battle transition to fully finish.
-                pbf_wait(context, 5000ms);
-
-                bool battle_menu_seen = false;
-
-                while (true) {
-
-                    context.wait_for_all_requests();
-
-                    BattleMenuWatcher battle_menu(BattleType::TRAINER);
-                    EndBattleWatcher end_battle;
-
-                    int ret = run_until<ProControllerContext>(
-                        stream,
-                        context,
-                        [](ProControllerContext& context) {
-                            // Mash through battle text continuously.
-                            pbf_mash_button(
-                                context,
-                                BUTTON_B,
-                                10000ms
-                            );
-                        },
-                        {
-                            {battle_menu},
-                            battle_menu_seen
-                                ? PeriodicInferenceCallback{end_battle}
-                                : PeriodicInferenceCallback{},
-                        }
-                    );
-
-                    switch (ret) {
-
-                        // -------------------------------------------------
-                        // Battle menu detected.
-                        // -------------------------------------------------
-                    case 0:
-                        battle_menu_seen = true;
-
-                        stream.log(
-                            "[AutoStory] Battle menu detected.",
-                            COLOR_BLUE
-                        );
-
-                        // Select Fight.
-                        pbf_press_button(
-                            context,
-                            BUTTON_A,
-                            120ms,
-                            500ms
-                        );
-
-                        // Select move slot 1 (Scratch).
-                        pbf_press_button(
-                            context,
-                            BUTTON_A,
-                            120ms,
-                            3000ms
-                        );
-
-                        break;
-
-                        // -------------------------------------------------
-                        // End battle detected.
-                        // -------------------------------------------------
-                    case 1:
-                        stream.log(
-                            "[AutoStory] Tristan battle complete.",
-                            COLOR_GREEN
-                        );
-
-                        pbf_mash_button(
-                            context,
-                            BUTTON_B,
-                            5000ms
-                        );
-
-                        return;
-
-                    default:
-                        stream.log(
-                            "[AutoStory] Tristan battle timeout.",
-                            COLOR_RED
-                        );
-
-                        return;
-                    }
-                }
-            }
-
-            // ---------------------------------------------------------------------------
-            // Catch 1 Pokemon
-            // ---------------------------------------------------------------------------
-
-            void catch_1_pokemon(
-                VideoStream& stream,
-                ProControllerContext& context
-            ) {
-                stream.log("[AutoStory] Starting catch_1_pokemon helper...", COLOR_BLUE);
-
+            static void encounter_one_wild_pokemon(VideoStream& stream, ProControllerContext& context) {
                 context.wait_for_all_requests();
                 pbf_wait(context, 1000ms);
 
-                BlackScreenWatcher battle_start;
-                BattleMenuWatcher battle_menu(BattleType::STANDARD, COLOR_YELLOW);
-                BattleDialogWatcher battle_dialog(COLOR_YELLOW);
-
                 bool encounter_found = false;
+                const auto deadline = std::chrono::steady_clock::now() + 180s;
 
                 // Wiggle left/right until battle starts.
-                while (!encounter_found) {
+                while (!encounter_found && std::chrono::steady_clock::now() < deadline) {
+                    BlackScreenWatcher battle_start;
+                    BattleMenuWatcher battle_menu(BattleType::STANDARD, COLOR_YELLOW);
+                    BattleDialogWatcher battle_dialog(COLOR_YELLOW);
 
                     // Turn left.
                     pbf_move_left_joystick(context, {-1, 0}, 120ms, 200ms);
@@ -629,6 +944,8 @@ namespace PokemonAutomation {
                     }
                 }
 
+                if (!encounter_found) OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                    "Wild encounter: Left/right wiggle did not find a battle within three minutes.", stream);
                 stream.log("[AutoStory] Wild battle detected!", COLOR_GREEN);
 
                 // Wait until the actual battle menu appears.
@@ -648,7 +965,8 @@ namespace PokemonAutomation {
                         "[AutoStory] Failed to detect battle menu.",
                         COLOR_RED
                     );
-                    return;
+                    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                            "[AutoStory] Failed to detect battle menu.", stream);
                 }
 
                 stream.log("[AutoStory] Battle menu detected.", COLOR_GREEN);
@@ -656,8 +974,170 @@ namespace PokemonAutomation {
                 context.wait_for_all_requests();
                 pbf_wait(context, 500ms);
 
+            }
+
+            static void confirm_battle_overworld(VideoStream& stream, ProControllerContext& context,
+                const std::string& label) {
+                OverworldDetector overworld;
+                ShortDialogDetector dialogue(COLOR_YELLOW);
+                BlackScreenDetector black;
+                VideoOverlaySet overlays(stream.overlay());
+                overworld.make_overlays(overlays);
+                dialogue.make_overlays(overlays);
+                black.make_overlays(overlays);
+                const auto deadline = std::chrono::steady_clock::now() + 180s;
+                auto quiet_since = std::chrono::steady_clock::now();
+                bool finished = false;
+                while (std::chrono::steady_clock::now() < deadline) {
+                    const auto frame = stream.video().snapshot();
+                    if (!frame) OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                        label + ": No video frame.", stream);
+                    const auto now = std::chrono::steady_clock::now();
+                    if (dialogue.detect(frame) || black.detect(frame) || !overworld.detect(frame)) {
+                        quiet_since = now;
+                    } else if (now - quiet_since >= 4s) {
+                        finished = true;
+                        break;
+                    }
+                    pbf_mash_button(context, BUTTON_B, 100ms);
+                    context.wait_for_all_requests();
+                }
+                if (!finished) OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                    label + ": Dialogue-free overworld not confirmed for four seconds.", stream);
+                context.wait_for_all_requests();
+            }
+
+            static void fight_using_move_slot(
+                VideoStream& stream, ProControllerContext& context,
+                BattleType battle_type, size_t move_slot, const std::string& label
+            ) {
+                stream.log(
+                    "[AutoStory] Starting " + label + " battle...",
+                    COLOR_BLUE
+                );
+
+                // Wait for battle transition to fully finish.
+                pbf_wait(context, 5000ms);
+
+                bool battle_menu_seen = false;
+                EndBattleWatcher end_battle;
+
+                while (true) {
+
+                    context.wait_for_all_requests();
+
+                    BattleMenuWatcher battle_menu(battle_type);
+
+                    int ret = run_until<ProControllerContext>(
+                        stream,
+                        context,
+                        [](ProControllerContext& context) {
+                            // Mash through battle text continuously.
+                            pbf_mash_button(
+                                context,
+                                BUTTON_B,
+                                120000ms
+                            );
+                        },
+                        {
+                            {battle_menu},
+                            battle_menu_seen
+                                ? PeriodicInferenceCallback{end_battle}
+                                : PeriodicInferenceCallback{},
+                        }
+                    );
+
+                    switch (ret) {
+
+                        // -------------------------------------------------
+                        // Battle menu detected.
+                        // -------------------------------------------------
+                    case 0:
+                        battle_menu_seen = true;
+
+                        stream.log(
+                            "[AutoStory] Battle menu detected.",
+                            COLOR_BLUE
+                        );
+
+                        select_battle_move_slot(stream, context, battle_type, move_slot, label);
+
+                        break;
+
+                        // -------------------------------------------------
+                        // End battle detected.
+                        // -------------------------------------------------
+                    case 1: {
+                        stream.log(
+                            "[AutoStory] " + label + " battle complete.",
+                            COLOR_GREEN
+                        );
+
+                        // Clear experience, level-up, move-learning and trainer
+                        // dialogue until the overworld is actually confirmed.
+                        OverworldWatcher overworld;
+                        int cleanup_ret = run_until<ProControllerContext>(stream, context,
+                            [](ProControllerContext& ctx) {
+                                pbf_mash_button(ctx, BUTTON_B, 120000ms);
+                            }, {{overworld}});
+                        if (cleanup_ret != 0) {
+                            OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                                label + ": Post-battle cleanup timed out.", stream);
+                        }
+                        context.wait_for_all_requests();
+                        confirm_battle_overworld(stream, context, label + " cleanup");
+                        return;
+                    }
+
+                    default:
+                        stream.log(
+                            "[AutoStory] " + label + " battle timeout.",
+                            COLOR_RED
+                        );
+
+                        OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                            "[AutoStory] " + label + " battle timeout.", stream);
+                    }
+                }
+            }
+
+            void fight_tristan(VideoStream& stream, ProControllerContext& context) {
+                // Chimchar learns Ember into slot 3 at level 6. Confirm the move
+                // cursor visually; missing slot 3 fails instead of using Scratch.
+                fight_using_move_slot(stream, context, BattleType::TRAINER, 3, "Tristan (Ember)");
+            }
+
+            void battle_1_pokemon(VideoStream& stream, ProControllerContext& context) {
+                stream.log("[Training] Finding one wild Pokemon using the catch encounter wiggle.", COLOR_BLUE);
+                encounter_one_wild_pokemon(stream, context);
+                // Use the same battle loop as Tristan, but Scratch is slot 1.
+                fight_using_move_slot(stream, context, BattleType::STANDARD, 1, "Training (Scratch)");
+                stream.log("[Training] Fight and level-up cleanup complete; verifying Potion healing.");
+                use_potion_first_pokemon(stream, context);
+                context.wait_for_all_requests();
+                stream.log("[Training] One wild battle completed; slot 1 healing verified.", COLOR_GREEN);
+            }
+
+            // ---------------------------------------------------------------------------
+            // Catch 1 Pokemon
+            // ---------------------------------------------------------------------------
+
+            void catch_1_pokemon(
+                VideoStream& stream,
+                ProControllerContext& context
+            ) {
+                stream.log("[AutoStory] Starting catch_1_pokemon helper...", COLOR_BLUE);
+
+                encounter_one_wild_pokemon(stream, context);
+
                 // Catch the pokemon.
                 stream.log("[AutoStory] Throwing Poke Ball (manual bag open)...", COLOR_BLUE);
+                ReceivePokemonDetector received_pokemon;
+                // Preserve exit-transition state from the ball outcome through
+                // receipt/experience cleanup; do not recreate it between phases.
+                EndBattleWatcher battle_ended;
+                bool caught = false;
+                bool exit_seen = false;
                 for (int throw_attempt = 0; throw_attempt < 10; throw_attempt++) {
                     // Open bag from battle menu (X), confirm first slot (ZL).
                     pbf_press_button(context, BUTTON_X, 160ms, 840ms);
@@ -668,25 +1148,23 @@ namespace PokemonAutomation {
                     // Wait to see if the battle menu comes back (ball failed)
                     // or if the battle ends (caught or fainted).
                     BattleMenuWatcher menu_back(BattleType::STANDARD, COLOR_YELLOW);
-                    EndBattleWatcher battle_ended;
-                    int throw_ret = wait_until(
-                        stream, context, 30s,
-                        {
-                            {menu_back},
-                            {battle_ended},
-                        }
+                    int throw_ret = run_until<ProControllerContext>(
+                        stream, context,
+                        [](ProControllerContext& ctx) {
+                            pbf_mash_button(ctx, BUTTON_B, 120000ms);
+                        },
+                        {{menu_back}, {received_pokemon}, {battle_ended}}
                     );
 
-                    if (throw_ret == 1) {
-                        // Battle ended - caught or fainted. Either way we're done.
-                        stream.log("[AutoStory] Battle ended after throw.", COLOR_GREEN);
+                    if (throw_ret == 1 || (throw_ret == 2 && received_pokemon.received())) {
+                        caught = true;
+                        exit_seen = throw_ret == 2;
+                        stream.log("[AutoStory] Pokemon receipt verified.", COLOR_GREEN);
                         break;
                     }
-                    // throw_ret == 0: menu came back, ball failed - try again.
-                    // throw_ret < 0: timed out - fall through to B mash cleanup.
-                    if (throw_ret < 0) {
-                        stream.log("[AutoStory] Throw timed out, proceeding to cleanup.", COLOR_ORANGE);
-                        break;
+                    if (throw_ret < 0 || throw_ret == 2) {
+                        OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                            "Catch failed: No verified Pokemon receipt before battle ended or timed out.", stream);
                     }
                     stream.log(
                         "[AutoStory] Ball failed, retrying (attempt " + std::to_string(throw_attempt + 2) + ")...",
@@ -696,11 +1174,27 @@ namespace PokemonAutomation {
 
                 context.wait_for_all_requests();
 
-                // Force clear any remaining text boxes / summaries.
-                pbf_mash_button(context, BUTTON_B, 15000ms);
-
+                if (!caught) {
+                    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                        "Catch failed: Exhausted ten ball attempts.", stream);
+                }
+                // Receipt alone is not an overworld return: clear experience,
+                // automatic move learning, dex registration and nickname screens
+                // until the same completed-black-transition watcher used in battles fires.
+                if (!exit_seen) {
+                    stream.log("[Catch cleanup] Receipt confirmed; waiting for battle exit transition.");
+                    const int cleanup_ret = run_until<ProControllerContext>(stream, context,
+                        [](ProControllerContext& ctx) { pbf_mash_button(ctx, BUTTON_B, 120000ms); },
+                        {{battle_ended}});
+                    if (cleanup_ret != 0) {
+                        OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                            "Catch cleanup: Battle exit transition did not finish.", stream);
+                    }
+                }
                 context.wait_for_all_requests();
-                pbf_wait(context, 2000ms);
+                stream.log("[Catch cleanup] Battle exit transition confirmed; checking stable overworld.");
+                confirm_battle_overworld(stream, context, "Catch cleanup");
+                stream.log("[Catch cleanup] Verified receipt, completed battle exit, and four seconds of clear overworld.", COLOR_GREEN);
             }
 
             // ---------------------------------------------------------------------------
@@ -977,584 +1471,89 @@ namespace PokemonAutomation {
             // specified steps, attempting to run from any battles that are encountered.
             // ---------------------------------------------------------------------------
             void walk_through_grass(
-                VideoStream& stream,
-                ProControllerContext& context,
-                int8_t x,
-                int8_t y,
-                size_t steps,
-                const std::string& direction_name,
-                BattleType battle_type
+                VideoStream& stream, ProControllerContext& context,
+                int8_t x, int8_t y, size_t steps, const std::string& direction_name,
+                BattleType battle_type, Milliseconds movement_duration,
+                OverworldMatchResult (*destination)(const ImageRGB32&)
             ) {
-                BlackScreenWatcher battle_start;
-                WhiteScreenOverWatcher white_screen(COLOR_YELLOW, {0.1, 0.1, 0.8, 0.8});
-                BattleMenuWatcher battle_menu(battle_type, COLOR_YELLOW);
-                BattleDialogWatcher battle_dialog(COLOR_YELLOW);
-
-                for (size_t step = 0; step < steps; step++) {
-
+                size_t movements = 0, confirmations = 0;
+                while (true) {
                     context.wait_for_all_requests();
-
-                    // Move.
-                    pbf_move_left_joystick(
-                        context,
-                        {(double)x, (double)y},
-                        200ms,
-                        0ms
-                    );
-
-                    context.wait_for_all_requests();
-
-                    // Check for battle.
-                    int battle_ret = wait_until(
-                        stream,
-                        context,
-                        2500ms,
-                        {
-                            {white_screen},
-                            {battle_start},
-                            {battle_dialog},
+                    // Destination checks happen before input and after each step/escape.
+                    // With no matcher, retain the original fixed-step behavior.
+                    VideoOverlaySet overlays(stream.overlay());
+                    OverworldMatchResult location;
+                    if (destination) {
+                        const auto frame = stream.video().snapshot();
+                        if (!frame) OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                            "Grass destination: No video frame.", stream);
+                        location = destination(*frame.frame);
+                        for (const auto& landmark : location.landmarks) {
+                            overlays.add(COLOR_CYAN, landmark.search);
+                            if (landmark.accepted) overlays.add(COLOR_GREEN, landmark.found);
+                            stream.log("[Grass destination] " + direction_name + " " + landmark.name +
+                                " score=" + std::to_string(landmark.score) +
+                                " margin=" + std::to_string(landmark.margin) +
+                                " accepted=" + std::to_string(landmark.accepted));
                         }
-                    );
-
-                    if (battle_ret >= 0) {
-
-                        stream.log(
-                            "[AutoStory] Battle detected during movement.",
-                            COLOR_ORANGE
-                        );
-
-                        // If battle_ret == 0/1 (black/white transition), wait for the
-                        // battle menu to fully appear before attempting to navigate.
-                        if (battle_ret == 0 || battle_ret == 1) {
-                            BattleMenuWatcher wait_for_menu(battle_type, COLOR_YELLOW);
-                            wait_until(stream, context, 10s, {{wait_for_menu}});
-                            context.wait_for_all_requests();
-                        }
-
-                        bool escaped = false;
-                        auto deadline = std::chrono::steady_clock::now() + 30s;
-
-                        while (std::chrono::steady_clock::now() < deadline) {
-
-                            // Advance any dialog / transition text.
-                            pbf_press_button(context, BUTTON_B, 40ms, 200ms);
-                            context.wait_for_all_requests();
-
-                            // Wait for the action-selection menu to be visible before navigating.
-                            BattleMenuWatcher menu_ready(battle_type, COLOR_YELLOW);
-                            if (wait_until(stream, context, 3s, {{menu_ready}}) != 0) {
-                                // Menu not yet visible, loop again.
-                                continue;
+                        stream.log("[Grass destination] located=" + std::to_string(location.located) +
+                            " at_target=" + std::to_string(location.at_target) +
+                            " screen-relative offset=(" + std::to_string(location.dx) +
+                            "," + std::to_string(location.dy) + ")");
+                        if (location.at_target) {
+                            if (++confirmations >= 3) {
+                                stream.log("[Grass] Destination confirmed; stopped " + direction_name +
+                                    " after " + std::to_string(movements) + "/" + std::to_string(steps) + " movements.", COLOR_GREEN);
+                                return;
                             }
-
-                            // Navigate to Run. Menu is 1x4 (Fight/Bag/Pokemon/Run) and wraps,
-                            // so pressing up once from Fight lands on Run.
-                            pbf_move_left_joystick(context, {0, -1}, 80ms, 80ms);
-
-                            // Select Run.
-                            pbf_press_button(context, BUTTON_A, 60ms, 0ms);
-                            context.wait_for_all_requests();
-
-                            // Watch for escape success or "can't escape" return to menu.
-                            EndBattleWatcher battle_end;
-                            BattleMenuWatcher back_to_menu(battle_type, COLOR_YELLOW);
-                            int run_result = wait_until(stream, context, 4s, {{battle_end}, {back_to_menu}});
-                            if (run_result == 0) {
-                                escaped = true;
-                                break;
-                            }
-                            // run_result == 1: failed to run, back at battle menu - retry.
-                            // run_result == -1: timed out - retry.
-                        }
-
-                    if (!escaped) {
-                        stream.log(
-                            "[AutoStory] Failed to run from battle.",
-                            COLOR_RED
-                        );
-                        pbf_press_button(context, BUTTON_HOME, 80ms, 1200ms);
-                        pbf_press_button(context, BUTTON_X, 80ms, 300ms);
-                        pbf_press_button(context, BUTTON_A, 80ms, 1200ms);
-                        throw OperationFailedException(
-                            ErrorReport::SEND_ERROR_REPORT,
-                            "Failed to run from battle.",
-                            stream
-                        );
-                    }
-
-                    // Wait until truly back in the overworld before the next step.
-                    OverworldWatcher overworld;
-                    wait_until(stream, context, 5s, {{overworld}});
-                }
-            }
-
-            stream.log(
-                "[AutoStory] Completed grass movement: " + direction_name,
-                COLOR_GREEN
-            );
-        }
-
-        // ---------------------------------------------------------------------------
-        // Helper function for 1st grass patch
-        // ---------------------------------------------------------------------------
-        void walk_right_until_on_path(VideoStream& stream, ProControllerContext& context, BattleType battle_type) {
-
-            BlackScreenWatcher battle_start;
-            BattleMenuWatcher battle_menu(battle_type, COLOR_YELLOW);
-            BattleDialogWatcher battle_dialog(COLOR_YELLOW);
-
-            for (size_t step = 0; step < 20; step++) {
-
-                context.wait_for_all_requests();
-                
-                // Move right (fixed step)
-                pbf_move_left_joystick(context, { +1, 0 }, 200ms, 0ms);
-                
-                context.wait_for_all_requests();
-
-                // Check for battle after movement
-                int battle_ret = wait_until(
-                    stream, context,
-                    2500ms,
-                    {
-                        {battle_start},  // 0
-                        {battle_menu},   // 1
-                        {battle_dialog}, // 2
-                    }
-                    );
-
-                if (battle_ret >= 0) {
-                    stream.log(
-                        "[AutoStory] Battle detected during movement.",
-                        COLOR_ORANGE
-                    );
-
-                    if (battle_ret == 0) {
-                        BattleMenuWatcher wait_for_menu(battle_type, COLOR_YELLOW);
-                        wait_until(stream, context, 10s, {{wait_for_menu}});
-                        context.wait_for_all_requests();
-                    }
-
-                    bool escaped = false;
-                    auto deadline = std::chrono::steady_clock::now() + 30s;
-
-                    while (std::chrono::steady_clock::now() < deadline) {
-                        pbf_press_button(context, BUTTON_B, 40ms, 200ms);
-                        context.wait_for_all_requests();
-
-                        BattleMenuWatcher menu_ready(battle_type, COLOR_YELLOW);
-                        if (wait_until(stream, context, 3s, {{menu_ready}}) != 0) {
+                            pbf_wait(context, 250ms);
                             continue;
                         }
-
-                        // Press up once to wrap from Fight to Run.
-                        pbf_move_left_joystick(context, { 0, 1 }, 80ms, 80ms);
-
-                        pbf_press_button(context, BUTTON_A, 60ms, 0ms);
-                        context.wait_for_all_requests();
-
-                        EndBattleWatcher battle_end;
-                        BattleMenuWatcher back_to_menu(battle_type, COLOR_YELLOW);
-                        int run_result = wait_until(stream, context, 4s, {{battle_end}, {back_to_menu}});
-                        if (run_result == 0) {
-                            escaped = true;
-                            break;
-                        }
+                        confirmations = 0;
                     }
-
-                    if (!escaped) {
-                        stream.log("[AutoStory] Failed to run from battle.", COLOR_RED);
-
-                        pbf_press_button(context, BUTTON_HOME, 80ms, 1200ms);
-                        pbf_press_button(context, BUTTON_X, 80ms, 300ms);
-                        pbf_press_button(context, BUTTON_A, 80ms, 1200ms);
-
-                        throw OperationFailedException(
-                            ErrorReport::SEND_ERROR_REPORT,
-                            "Failed to run from battle while moving right.",
-                            stream
-                        );
+                    if (movements >= steps) {
+                        if (destination) OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                            "Grass destination not confirmed within movement limit: " + direction_name, stream);
+                        stream.log("[Grass] Completed " + direction_name + " (" + std::to_string(steps) + " steps).", COLOR_GREEN);
+                        return;
                     }
-
-                    // Wait until truly back in the overworld before the next step.
-                    OverworldWatcher overworld;
-                    wait_until(stream, context, 5s, {{overworld}});
-
-                    continue;
-                }
-            }
-
-            stream.log("[AutoStory] Completed fixed right movement (18 steps).", COLOR_GREEN);
-        }
-
-        // ---------------------------------------------------------------------------
-        // Helper function to walk up through the second grass patch
-        // ---------------------------------------------------------------------------
-        void walk_up_through_grass_2(VideoStream& stream, ProControllerContext& context, BattleType battle_type) {
-
-            BlackScreenWatcher battle_start;
-            BattleMenuWatcher battle_menu(battle_type, COLOR_YELLOW);
-            BattleDialogWatcher battle_dialog(COLOR_YELLOW);
-
-            for (size_t step = 0; step < 18; step++) {
-
-                context.wait_for_all_requests();
-
-                // Move right (fixed step)
-                pbf_move_left_joystick(context, { 0, 1 }, 200ms, 0ms);
-
-                context.wait_for_all_requests();
-
-                // Check for battle after movement
-                int battle_ret = wait_until(
-                    stream, context,
-                    2500ms,
-                    {
-                        {battle_start},  // 0
-                        {battle_menu},   // 1
-                        {battle_dialog}, // 2
+                    int8_t move_x=x, move_y=y;
+                    Milliseconds duration=movement_duration;
+                    if (destination && location.located && !location.coarse &&
+                        std::abs(location.dx)<=0.10 && std::abs(location.dy)<=0.12) {
+                        // Small corrections prevent stepping past a narrow stop target.
+                        const bool horizontal=std::abs(location.dx)>=std::abs(location.dy)*9.0/16;
+                        const double error=horizontal ? location.dx : location.dy*9.0/16;
+                        duration=std::min(duration, std::abs(error)>0.03125 ? 80ms :
+                            std::abs(error)>0.015625 ? 40ms : 16ms);
+                        move_x=horizontal ? (location.dx>0 ? 1 : -1) : 0;
+                        move_y=horizontal ? 0 : (location.dy<0 ? 1 : -1);
+                        stream.log("[Grass destination] Correcting " + std::string(horizontal ? "horizontal" : "vertical") +
+                            " axis for " + std::to_string(duration.count()) + "ms.");
                     }
-                );
-
-                if (battle_ret >= 0) {
-                    stream.log(
-                        "[AutoStory] Battle detected during movement.",
-                        COLOR_ORANGE
-                    );
-
-                    if (battle_ret == 0) {
-                        BattleMenuWatcher wait_for_menu(battle_type, COLOR_YELLOW);
-                        wait_until(stream, context, 10s, {{wait_for_menu}});
-                        context.wait_for_all_requests();
-                    }
-
-                    bool escaped = false;
-                    auto deadline = std::chrono::steady_clock::now() + 30s;
-
-                    while (std::chrono::steady_clock::now() < deadline) {
-                        pbf_press_button(context, BUTTON_B, 40ms, 200ms);
-                        context.wait_for_all_requests();
-
-                        BattleMenuWatcher menu_ready(battle_type, COLOR_YELLOW);
-                        if (wait_until(stream, context, 3s, {{menu_ready}}) != 0) {
-                            continue;
-                        }
-
-                        // Press up once to wrap from Fight to Run.
-                        pbf_move_left_joystick(context, { 0, 1 }, 80ms, 80ms);
-
-                        pbf_press_button(context, BUTTON_A, 60ms, 0ms);
-                        context.wait_for_all_requests();
-
-                        EndBattleWatcher battle_end;
-                        BattleMenuWatcher back_to_menu(battle_type, COLOR_YELLOW);
-                        int run_result = wait_until(stream, context, 4s, {{battle_end}, {back_to_menu}});
-                        if (run_result == 0) {
-                            escaped = true;
-                            break;
-                        }
-                    }
-
-                    if (!escaped) {
-                        stream.log("[AutoStory] Failed to run from battle.", COLOR_RED);
-
-                        pbf_press_button(context, BUTTON_HOME, 80ms, 1200ms);
-                        pbf_press_button(context, BUTTON_X, 80ms, 300ms);
-                        pbf_press_button(context, BUTTON_A, 80ms, 1200ms);
-
-                        throw OperationFailedException(
-                            ErrorReport::SEND_ERROR_REPORT,
-                            "Failed to run from battle while moving up.",
-                            stream
-                        );
-                    }
-
-                    // Wait until truly back in the overworld before the next step.
-                    OverworldWatcher overworld;
-                    wait_until(stream, context, 5s, {{overworld}});
-
-                    continue;
-                }
-            }
-
-            stream.log("[AutoStory] Completed fixed up movement (18 steps).", COLOR_GREEN);
-        }
-        // ---------------------------------------------------------------------------
-        //  Helper function to walk right through the second grass patch
-        // ---------------------------------------------------------------------------
-        void walk_right_through_grass_2(VideoStream& stream, ProControllerContext& context, BattleType battle_type) {
-
-            BlackScreenWatcher battle_start;
-            BattleMenuWatcher battle_menu(battle_type, COLOR_YELLOW);
-            BattleDialogWatcher battle_dialog(COLOR_YELLOW);
-
-            for (size_t step = 0; step < 10; step++) {
-
-                context.wait_for_all_requests();
-
-                // Move right (fixed step)
-                pbf_move_left_joystick(context, { +1, 0 }, 200ms, 0ms);
-
-                context.wait_for_all_requests();
-
-                // Check for battle after movement
-                int battle_ret = wait_until(
-                        stream, context,
-                        2500ms,
-                        {
-                            {battle_start},  // 0
-                            {battle_menu},   // 1
-                            {battle_dialog}, // 2
-                        }
-                        );
-
-                    if (battle_ret >= 0) {
-                        stream.log(
-                            "[AutoStory] Battle detected during movement.",
-                            COLOR_ORANGE
-                        );
-
-                        if (battle_ret == 0) {
-                            BattleMenuWatcher wait_for_menu(battle_type, COLOR_YELLOW);
-                            wait_until(stream, context, 10s, {{wait_for_menu}});
-                            context.wait_for_all_requests();
-                        }
-
-                        bool escaped = false;
-                        auto deadline = std::chrono::steady_clock::now() + 30s;
-
-                        while (std::chrono::steady_clock::now() < deadline) {
-                            pbf_press_button(context, BUTTON_B, 40ms, 200ms);
-                            context.wait_for_all_requests();
-
-                            BattleMenuWatcher menu_ready(battle_type, COLOR_YELLOW);
-                            if (wait_until(stream, context, 3s, {{menu_ready}}) != 0) {
-                                continue;
-                            }
-
-                            // Press up once to wrap from Fight to Run.
-                            pbf_move_left_joystick(context, { 0, 1 }, 80ms, 80ms);
-
-                            pbf_press_button(context, BUTTON_A, 60ms, 0ms);
-                            context.wait_for_all_requests();
-
-                            EndBattleWatcher battle_end;
-                            BattleMenuWatcher back_to_menu(battle_type, COLOR_YELLOW);
-                            int run_result = wait_until(stream, context, 4s, {{battle_end}, {back_to_menu}});
-                            if (run_result == 0) {
-                                escaped = true;
-                                break;
-                            }
-                        }
-
-                        if (!escaped) {
-                            stream.log("[AutoStory] Failed to run from battle.", COLOR_RED);
-
-                            pbf_press_button(context, BUTTON_HOME, 80ms, 1200ms);
-                            pbf_press_button(context, BUTTON_X, 80ms, 300ms);
-                            pbf_press_button(context, BUTTON_A, 80ms, 1200ms);
-
-                            throw OperationFailedException(
-                                ErrorReport::SEND_ERROR_REPORT,
-                                "Failed to run from battle while moving right.",
-                                stream
-                            );
-                        }
-
-                        // Wait until truly back in the overworld before the next step.
-                        OverworldWatcher overworld;
-                        wait_until(stream, context, 5s, {{overworld}});
-
-                        continue;
-                    }
-                }
-
-                stream.log("[AutoStory] Completed fixed right movement (10 steps).", COLOR_GREEN);
-            }
-            // ---------------------------------------------------------------------------
-            // Helper function to walk left through the third grass patch
-            // ---------------------------------------------------------------------------
-            void walk_left_through_grass_3(VideoStream& stream, ProControllerContext& context, BattleType battle_type) {
-
-                BlackScreenWatcher battle_start;
-                BattleMenuWatcher battle_menu(battle_type, COLOR_YELLOW);
-                BattleDialogWatcher battle_dialog(COLOR_YELLOW);
-
-                for (size_t step = 0; step < 18; step++) {
-
+                    // Each movement gets fresh watcher state. A completed white
+                    // transition from a prior encounter must not trigger again.
+                    BlackScreenWatcher battle_start;
+                    WhiteScreenOverWatcher white_screen(COLOR_YELLOW, {0.1, 0.1, 0.8, 0.8});
+                    BattleMenuWatcher battle_menu(battle_type, COLOR_YELLOW);
+                    BattleDialogWatcher battle_dialog(COLOR_YELLOW);
+                    pbf_move_left_joystick(context, {(double)move_x, (double)move_y}, duration, 0ms);
+                    movements++;
                     context.wait_for_all_requests();
-
-                    // Move left (fixed step)
-                    pbf_move_left_joystick(context, { -1, 0 }, 200ms, 0ms);
-
-                    context.wait_for_all_requests();
-
-                    // Check for battle after movement
-                    int battle_ret = wait_until(
-                        stream, context,
-                        2500ms,
-                        {
-                            {battle_start},  // 0
-                            {battle_menu},   // 1
-                            {battle_dialog}, // 2
-                        }
-                        );
-
-                    if (battle_ret >= 0) {
-                        stream.log(
-                            "[AutoStory] Battle detected during movement.",
-                            COLOR_ORANGE
-                        );
-
-                        if (battle_ret == 0) {
-                            BattleMenuWatcher wait_for_menu(battle_type, COLOR_YELLOW);
-                            wait_until(stream, context, 10s, {{wait_for_menu}});
-                            context.wait_for_all_requests();
-                        }
-
-                        bool escaped = false;
-                        auto deadline = std::chrono::steady_clock::now() + 30s;
-
-                        while (std::chrono::steady_clock::now() < deadline) {
-                            pbf_press_button(context, BUTTON_B, 40ms, 200ms);
-                            context.wait_for_all_requests();
-
-                            BattleMenuWatcher menu_ready(battle_type, COLOR_YELLOW);
-                            if (wait_until(stream, context, 3s, {{menu_ready}}) != 0) {
-                                continue;
-                            }
-
-                            // Press up once to wrap from Fight to Run.
-                            pbf_move_left_joystick(context, { 0, 1 }, 80ms, 80ms);
-
-                            pbf_press_button(context, BUTTON_A, 60ms, 0ms);
-                            context.wait_for_all_requests();
-
-                            EndBattleWatcher battle_end;
-                            BattleMenuWatcher back_to_menu(battle_type, COLOR_YELLOW);
-                            int run_result = wait_until(stream, context, 4s, {{battle_end}, {back_to_menu}});
-                            if (run_result == 0) {
-                                escaped = true;
-                                break;
-                            }
-                        }
-
-                        if (!escaped) {
-                            stream.log("[AutoStory] Failed to run from battle.", COLOR_RED);
-
-                            pbf_press_button(context, BUTTON_HOME, 80ms, 1200ms);
-                            pbf_press_button(context, BUTTON_X, 80ms, 300ms);
-                            pbf_press_button(context, BUTTON_A, 80ms, 1200ms);
-
-                            throw OperationFailedException(
-                                ErrorReport::SEND_ERROR_REPORT,
-                                "Failed to run from battle while moving left.",
-                                stream
-                            );
-                        }
-
-                        // Wait until truly back in the overworld before the next step.
-                        OverworldWatcher overworld;
-                        wait_until(stream, context, 5s, {{overworld}});
-
-                        continue;
+                    int ret = wait_until(stream, context, 2500ms,
+                        {{white_screen}, {battle_start}, {battle_dialog}, {battle_menu}});
+                    if (ret >= 0) {
+                        confirmations = 0;
+                        stream.log("[Grass] " + direction_name + " step " + std::to_string(movements) +
+                            "/" + std::to_string(steps) + ": encounter trigger=" + std::to_string(ret) +
+                            "; using shared confirmed-Run escape.");
+                        escape_wild_battle(stream, context, battle_type);
+                        context.wait_for_all_requests();
+                        stream.log("[Grass] Escape confirmed; resuming " + direction_name + ".");
                     }
                 }
-
-                stream.log("[AutoStory] Completed fixed up movement (18 steps).", COLOR_GREEN);
             }
-            // ---------------------------------------------------------------------------
-            // Helper function to walk up through the third grass patch
-            // ---------------------------------------------------------------------------
-            void walk_up_through_grass_3(VideoStream& stream, ProControllerContext& context, BattleType battle_type) {
 
-                BlackScreenWatcher battle_start;
-                BattleMenuWatcher battle_menu(battle_type, COLOR_YELLOW);
-                BattleDialogWatcher battle_dialog(COLOR_YELLOW);
-
-                for (size_t step = 0; step < 18; step++) {
-
-                    context.wait_for_all_requests();
-
-                    // Move up (fixed step)
-                    pbf_move_left_joystick(context, { 0, 1 }, 200ms, 0ms);
-
-                    context.wait_for_all_requests();
-
-                    // Check for battle after movement
-                    int battle_ret = wait_until(
-                        stream, context,
-                        2500ms,
-                        {
-                            {battle_start},  // 0
-                            {battle_menu},   // 1
-                            {battle_dialog}, // 2
-                        }
-                        );
-
-                    if (battle_ret >= 0) {
-                        stream.log(
-                            "[AutoStory] Battle detected during movement.",
-                            COLOR_ORANGE
-                        );
-
-                        if (battle_ret == 0) {
-                            BattleMenuWatcher wait_for_menu(battle_type, COLOR_YELLOW);
-                            wait_until(stream, context, 10s, {{wait_for_menu}});
-                            context.wait_for_all_requests();
-                        }
-
-                        bool escaped = false;
-                        auto deadline = std::chrono::steady_clock::now() + 30s;
-
-                        while (std::chrono::steady_clock::now() < deadline) {
-                            pbf_press_button(context, BUTTON_B, 40ms, 200ms);
-                            context.wait_for_all_requests();
-
-                            BattleMenuWatcher menu_ready(battle_type, COLOR_YELLOW);
-                            if (wait_until(stream, context, 3s, {{menu_ready}}) != 0) {
-                                continue;
-                            }
-
-                            // Press up once to wrap from Fight to Run.
-                            pbf_move_left_joystick(context, { 0, 1 }, 80ms, 80ms);
-
-                            pbf_press_button(context, BUTTON_A, 60ms, 0ms);
-                            context.wait_for_all_requests();
-
-                            EndBattleWatcher battle_end;
-                            BattleMenuWatcher back_to_menu(battle_type, COLOR_YELLOW);
-                            int run_result = wait_until(stream, context, 4s, {{battle_end}, {back_to_menu}});
-                            if (run_result == 0) {
-                                escaped = true;
-                                break;
-                            }
-                        }
-
-                        if (!escaped) {
-                            stream.log("[AutoStory] Failed to run from battle.", COLOR_RED);
-
-                            pbf_press_button(context, BUTTON_HOME, 80ms, 1200ms);
-                            pbf_press_button(context, BUTTON_X, 80ms, 300ms);
-                            pbf_press_button(context, BUTTON_A, 80ms, 1200ms);
-
-                            throw OperationFailedException(
-                                ErrorReport::SEND_ERROR_REPORT,
-                                "Failed to run from battle while moving up.",
-                                stream
-                            );
-                        }
-
-                        // Wait until truly back in the overworld before the next step.
-                        OverworldWatcher overworld;
-                        wait_until(stream, context, 5s, {{overworld}});
-
-                        continue;
-                    }
-                }
-
-                stream.log("[AutoStory] Completed fixed up movement (18 steps).", COLOR_GREEN);
-            }
         }
     }
 }

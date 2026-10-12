@@ -102,12 +102,15 @@ struct OutsideHelpConfig{
     TorterraMove attacks[4];
 };
 
+enum class CheckpointSaveMode { REAL, FAKE };
+
 struct AutoStoryOptions{
     Language language;
     StarterChoice starter_choice;
     EventNotificationOption& notif_status_update;
     HelpMode help_mode;
     OutsideHelpConfig outside_help;
+    CheckpointSaveMode checkpoint_save_mode = CheckpointSaveMode::REAL;
 };
 
 
@@ -167,7 +170,8 @@ void checkpoint_save(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    CheckpointSaveMode save_mode = CheckpointSaveMode::REAL
 );
 
 //  Reload the game from the most recent backup save (auto-save).
@@ -188,8 +192,19 @@ void checkpoint_reattempt_loop(
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats,
     std::function<void(size_t attempt_number)>&& action,
-    bool save = true
+    bool save = true,
+    CheckpointSaveMode save_mode = CheckpointSaveMode::REAL
 );
+
+// Forward the explicit checkpoint save mode selected by AutoStory's options.
+inline void checkpoint_reattempt_loop(
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+    AutoStoryOptions options, AutoStoryStats& stats,
+    std::function<void(size_t attempt_number)>&& action, bool save = true
+){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        std::move(action), save, options.checkpoint_save_mode);
+}
 
 //  Execute every action in `actions` in order, repeated `times` times.
 void repeat(std::initializer_list<std::function<void()>> actions, size_t times);
@@ -306,6 +321,9 @@ bool use_escape_rope(
     ProControllerContext& context,
     int num_icons = 8
 );
+
+// Reuse the tutorial's verified Jubilife Center alignment and entry.
+void align_and_enter_jubilife_center(VideoStream& stream, ProControllerContext& context);
 
 //  Open the bag, navigate to the repel compartment tab, and use a repel.
 //  Returns false if the repel compartment tab could not be found.

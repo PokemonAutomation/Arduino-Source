@@ -54,7 +54,7 @@ namespace PokemonAutomation {
                 AutoStoryOptions options,
                 AutoStoryStats& stats
             ) {
-                checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+                checkpoint_reattempt_loop(env, context, options, stats,
                     [&](size_t /*attempt*/) {
                         jubilife_to_oreburgh_gate(env, env.console, context);
                         oreburgh_gate_nav(env, env.console, context);
@@ -87,9 +87,9 @@ namespace PokemonAutomation {
                 AutoStoryOptions options,
                 AutoStoryStats& stats
             ) {
-                checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+                checkpoint_reattempt_loop(env, context, options, stats,
                     [&](size_t /*attempt*/) {
-                        //oreburgh_gate_to_mine(env, env.console, context);
+                        oreburgh_gate_to_mine(env, env.console, context);
                         oreburgh_mine_nav(env.console, context);
                         // Standalone test entry points are not part of the checkpoint route.
                         // oreburgh_mine_first_leg_test(env.console, context);
@@ -125,7 +125,7 @@ namespace PokemonAutomation {
                 AutoStoryOptions options,
                 AutoStoryStats& stats
             ) {
-                checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+                checkpoint_reattempt_loop(env, context, options, stats,
                     [&](size_t /*attempt*/) {
                         //#. Oreburgh Gym navigation and battle
                         gym_Puzzle_01(env, env.console, context);
