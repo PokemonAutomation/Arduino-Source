@@ -15,12 +15,32 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
+// DIAGNOSTIC ONLY: Remove before pushing to production.
+// Starts at the post-catch save and runs only the rest of checkpoint 00.04.
+void diagnostic_checkpoint_0004_after_catch(
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+    AutoStoryOptions options, AutoStoryStats& stats
+);
+
 class AutoStory_Segment_00 : public AutoStory_Segment{
 public:
     virtual std::string name()       const override;
     virtual std::string start_text() const override;
     virtual std::string end_text()   const override;
     virtual void run_segment(
+        SingleSwitchProgramEnvironment& env,
+        ProControllerContext& context,
+        AutoStoryOptions options,
+        AutoStoryStats& stats
+    ) const override;
+};
+
+class AutoStory_Checkpoint_0000 : public AutoStory_Checkpoint{
+public:
+    virtual std::string name()       const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text()   const override;
+    virtual void run_checkpoint(
         SingleSwitchProgramEnvironment& env,
         ProControllerContext& context,
         AutoStoryOptions options,

@@ -107,6 +107,10 @@ bool save_game(
             // Return to overworld cleanly.
             pbf_mash_button(context, BUTTON_B, 1000ms);
 
+            // Drain R/confirm/B before detection; an earlier overworld frame
+            // must not report success while saving commands are still queued.
+            context.wait_for_all_requests();
+
             // Verify overworld. Generous timeout: save animation + fade can be slow.
             OverworldWatcher overworld;
             int ret = wait_until(
@@ -155,9 +159,13 @@ void checkpoint_save(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    AutoStoryStats& stats,
+    CheckpointSaveMode save_mode
 ){
-    bool success = fake_save_game(env, context);
+    const bool fake = save_mode == CheckpointSaveMode::FAKE;
+    env.console.log(fake ? "[Checkpoint save] DIAGNOSTIC FAKE mode: save is not verified."
+                         : "[Checkpoint save] REAL mode.");
+    bool success = fake ? fake_save_game(env, context) : save_game(env, context);
 
     stats.m_checkpoint++;
     env.update_stats();
@@ -165,7 +173,7 @@ void checkpoint_save(
     send_program_status_notification(
         env,
         notif_status_update,
-        success
+        fake ? "Diagnostic fake checkpoint save (not verified)." : success
             ? "Saved at checkpoint (verified)."
             : "Saved at checkpoint (blind fallback)."
     );
@@ -190,7 +198,8 @@ void checkpoint_reattempt_loop(
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats,
     std::function<void(size_t attempt_number)>&& action,
-    bool save
+    bool save,
+    CheckpointSaveMode save_mode
 ){
     static constexpr size_t MAX_ATTEMPTS = 20;
 
@@ -198,7 +207,7 @@ void checkpoint_reattempt_loop(
         try{
             if (i == 0){
                 if (save || stats.m_first_run){
-                    checkpoint_save(env, context, notif_status_update, stats);
+                    checkpoint_save(env, context, notif_status_update, stats, save_mode);
                 }
                 stats.m_first_run = false;
             }
@@ -848,157 +857,96 @@ bool fly_to(
 //
 // ---------------------------------------------------------------------------
 
-void use_potion_first_pokemon(
-    VideoStream & stream,
-    ProControllerContext & context
-) {
-    stream.log(
-        "[AutoStory] Starting arrow-based potion helper...",
-        COLOR_BLUE
-    );
-    pbf_press_button(
-        context,
-        BUTTON_X,
-        160ms,
-        1500ms
-    );
+// Slot 1's colored HP bar in the Bag. Read fill position rather than OCR.
+static double potion_hp_fraction(const ImageViewRGB32& frame) {
+    if (bag_pocket_position(frame) == 0) return -1;
+    const ImageViewRGB32 bar = extract_box_reference(frame, ImageFloatBox{0.137, 0.160, 0.202, 0.016});
+    size_t filled = 0;
+    for (size_t x = 0; x < bar.width(); x++) {
+        size_t color = 0;
+        for (size_t y = 0; y < bar.height(); y++) {
+            uint32_t p = bar.pixel(x, y);
+            int r = (p >> 16) & 255, g = (p >> 8) & 255, b = p & 255;
+            const bool green = g > r + 30 && g > b + 20;
+            const bool yellow = r > 150 && g > 120 && b < 100;
+            const bool red = r > 150 && r > g + 50 && r > b + 50;
+            color += green || yellow || red;
+        }
+        filled += color > bar.height() / 4;
+    }
+    return bar.width() ? (double)filled / bar.width() : -1;
+}
+
+static double confirmed_potion_hp(VideoStream& stream, ProControllerContext& context) {
+    double previous = -1;
+    size_t stable = 0;
+    for (size_t check = 0; check < 20; check++) {
+        context.wait_for_all_requests();
+        auto frame = stream.video().snapshot();
+        double hp = frame ? potion_hp_fraction(frame) : -1;
+        if (hp >= 0 && previous >= 0 && std::abs(hp - previous) <= 0.015) {
+            if (++stable >= 3) return hp;
+        } else stable = 0;
+        previous = hp;
+        pbf_wait(context, 150ms);
+    }
+    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+        "Potion: Slot 1 HP bar could not be confirmed.", stream);
+}
+
+void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context) {
+    OverlayBoxScope hp_overlay(stream.overlay(), COLOR_GREEN, {0.137, 0.160, 0.202, 0.016}, "");
+    BagItemTemplate potion;
+    potion.reference_path = "PokemonBDSP/Autostory/Bag_Potion.png";
+    potion.label = "Potion";
+    potion.reference_row = 1;
+    bool healed = false;
+    for (size_t dose = 0; dose < 3; dose++) {
+        stream.log("[Potion] Finding Bag/Medicine/Potion; dose " + std::to_string(dose + 1) + "/3.");
+        if (!find_bag_item(stream, context, potion, 1, 5, 64, std::chrono::seconds(45))) {
+            OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                "Potion: Could not verify Potion in the Medicine pocket.", stream);
+        }
+        const double before = confirmed_potion_hp(stream, context);
+        stream.log("[Potion] Slot 1 HP bar before use=" + std::to_string(before * 100) + "%.");
+        if (before >= 0.98) { healed = true; break; }
+        if (before <= 0.005) {
+            OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                "Potion: Slot 1 appears fainted; a Potion cannot revive it.", stream);
+        }
+        pbf_press_button(context, BUTTON_A, 80ms, 500ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 500ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
+        pbf_mash_button(context, BUTTON_B, 2000ms);
+        context.wait_for_all_requests();
+        OverworldWatcher overworld;
+        if (wait_until(stream, context, std::chrono::seconds(10), {{overworld}}) != 0) {
+            OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                "Potion: Did not return to the overworld after use.", stream);
+        }
+        // Reopen Bag to verify the result, including when the last Potion was used.
+        open_menu(stream, context, MenuCursorPosition::BAG, 5);
+        pbf_wait(context, 750ms);
+        context.wait_for_all_requests();
+        const double after = confirmed_potion_hp(stream, context);
+        stream.log("[Potion] Slot 1 HP bar after use=" + std::to_string(after * 100) + "%.");
+        if (after <= before + 0.005) {
+            OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                "Potion: Slot 1 HP did not increase; refusing to continue movement.", stream);
+        }
+        if (after >= 0.98) { healed = true; break; }
+        pbf_mash_button(context, BUTTON_B, 2000ms);
+        context.wait_for_all_requests();
+    }
+    if (!healed) OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+        "Potion: Full HP not confirmed after three uses.", stream);
+    pbf_mash_button(context, BUTTON_B, 2000ms);
     context.wait_for_all_requests();
-    pbf_wait(context, 1500ms);
-    // ------------------------------------------------------------
-    // Move from item pane to pokemon pane.
-    // ------------------------------------------------------------
-
-    pbf_press_dpad(
-        context,
-        DPAD_LEFT,
-        100ms,
-        500ms
-    );
-
-    context.wait_for_all_requests();
-    pbf_wait(context, 1000ms);
-
-    // ------------------------------------------------------------
-    // Select pokemon menu pokemon.
-    // ------------------------------------------------------------
-
-    pbf_press_button(
-        context,
-        BUTTON_A,
-        160ms,
-        1500ms
-    );
-
-    context.wait_for_all_requests();
-    pbf_wait(context, 1500ms);
-
-    // ------------------------------------------------------------
-    // Select first pokemon.
-    // ------------------------------------------------------------
-
-    pbf_press_button(
-        context,
-        BUTTON_A,
-        160ms,
-        1500ms
-    );
-
-    context.wait_for_all_requests();
-    pbf_wait(context, 1500ms);
-
-
-    // ------------------------------------------------------------
-    // Move from "Check summary" to "Restore".
-    // ------------------------------------------------------------
-
-    pbf_press_dpad(
-        context,
-        DPAD_DOWN,
-        80ms,
-        250ms
-    );
-
-    pbf_press_dpad(
-        context,
-        DPAD_DOWN,
-        80ms,
-        500ms
-    );
-
-    // ------------------------------------------------------------
-    // Mash A.
-    // ------------------------------------------------------------
-
-    stream.log(
-        "[AutoStory] Mashing A...",
-        COLOR_BLUE
-    );
-
-    pbf_mash_button(
-        context,
-        BUTTON_A,
-        3000ms
-    );
-
-    context.wait_for_all_requests();
-    pbf_wait(context, 1000ms);
-
-    // ------------------------------------------------------------
-    // Mash B to fully exit.
-    // ------------------------------------------------------------
-
-    stream.log(
-        "[AutoStory] Exiting menus...",
-        COLOR_BLUE
-    );
-
-    pbf_mash_button(
-        context,
-        BUTTON_B,
-        3000ms
-    );
-
-    context.wait_for_all_requests();
-    pbf_wait(context, 3000ms);
-    // ------------------------------------------------------------
-    // open menu and reset cursor to bag.
-    // ------------------------------------------------------------
-    stream.log(
-        "[AutoStory] Exiting menus...",
-        COLOR_BLUE
-    );
-
-    pbf_press_button(
-        context,
-        BUTTON_X,
-        160ms,
-        1500ms
-    );
-
-    context.wait_for_all_requests();
-    pbf_wait(context, 1000ms);
-
-    pbf_press_dpad(
-        context,
-        DPAD_RIGHT,
-        100ms,
-        500ms
-    );
-    context.wait_for_all_requests();
-    pbf_wait(context, 1000ms);
-    pbf_press_button(
-        context,
-        BUTTON_X,
-        160ms,
-        1500ms
-    );
-    context.wait_for_all_requests();
-    pbf_wait(context, 1000ms);
-
-    stream.log(
-        "[AutoStory] Potion helper complete.",
-        COLOR_GREEN
-    );
+    OverworldWatcher overworld;
+    if (wait_until(stream, context, std::chrono::seconds(10), {{overworld}}) != 0)
+        OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+            "Potion: Final overworld return not confirmed.", stream);
+    stream.log("[Potion] Slot 1 HP bar full and overworld confirmed.");
 }
 
 
