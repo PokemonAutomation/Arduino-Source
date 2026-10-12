@@ -93,7 +93,7 @@ void RawAudio2WorkingAudio::push_samples(size_t frames, const void* data){
         //  Convert to float. (if needed)
         const float* interleaved_floats;
         if (m_convert){
-            m_convert(data, block);
+            m_convert(data, block * channels());
             interleaved_floats = m_interleaved_floats.data();
         }else{
             interleaved_floats = (const float*)data;
