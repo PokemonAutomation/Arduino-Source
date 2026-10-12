@@ -72,6 +72,11 @@ private:
 public:
     JsonValue clone() const;
 
+    //  Structurally compare two values.
+    //  (Defined in JsonValue.cpp; requires the complete types of JsonArray/JsonObject.)
+    friend bool operator==(const JsonValue& x, const JsonValue& y);
+    friend bool operator!=(const JsonValue& x, const JsonValue& y);
+
 public:
     JsonValue() = default;
     JsonValue(bool x);

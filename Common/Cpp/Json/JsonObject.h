@@ -19,9 +19,19 @@ public:
     JsonObject(JsonObject&& x) = default;
     JsonObject& operator=(JsonObject&& x) = default;
 
-    //  TODO: implement == properly. For JsonValue as well.
+    //  Structurally compare two objects.
     friend bool operator==(const JsonObject& x, const JsonObject& y){
-        return x.dump() == y.dump();
+        if (x.m_data.size() != y.m_data.size()){
+            return false;
+        }
+        auto itx = x.m_data.cbegin();
+        auto ity = y.m_data.cbegin();
+        for (; itx != x.m_data.cend(); ++itx, ++ity){
+            if (itx->first != ity->first || !(itx->second == ity->second)){
+                return false;
+            }
+        }
+        return true;
     }
     friend bool operator!=(const JsonObject& x, const JsonObject& y){
         return !(x == y);
