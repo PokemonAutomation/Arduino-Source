@@ -1741,7 +1741,12 @@ bool activate_repel(
     pbf_wait(context, 1000ms);
 
     auto repel_tab_ref = std::make_shared<const ImageRGB32>(
-        RESOURCE_PATH() + "PokemonBDSP/AutoStory/Bag_RepelTab.png"
+        RESOURCE_PATH() + "PokemonBDSP/Autostory/Bag_RepelTab.png"
+    );
+    // A smaller reference covers capture-resize sampling differences without
+    // loosening the match threshold or changing shared image processing.
+    auto repel_tab_small_ref = std::make_shared<const ImageRGB32>(
+        RESOURCE_PATH() + "PokemonBDSP/Autostory/Bag_RepelTabSmall.png"
     );
     const ImageFloatBox repel_tab_box{0.735000, 0.055000, 0.045000, 0.080000};
     const double repel_tab_rmsd = 50.0;
@@ -1753,8 +1758,9 @@ bool activate_repel(
         context.wait_for_all_requests();
 
         ImageMatchWatcher watcher(repel_tab_ref, repel_tab_box, repel_tab_rmsd);
-        int ret = wait_until(stream, context, 400ms, {{watcher}});
-        if (ret == 0){
+        ImageMatchWatcher small_watcher(repel_tab_small_ref, repel_tab_box, repel_tab_rmsd);
+        int ret = wait_until(stream, context, 400ms, {{watcher}, {small_watcher}});
+        if (ret >= 0){
             stream.log("[AutoStory] activate_repel: repel tab found after "
                        + std::to_string(press) + " press(es).", COLOR_GREEN);
             found = true;
