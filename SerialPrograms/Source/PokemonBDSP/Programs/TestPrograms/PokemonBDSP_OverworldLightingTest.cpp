@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iomanip>
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -35,7 +36,7 @@ void OverworldLightingTest::program(SingleSwitchProgramEnvironment& env,ProContr
         (matcher.slug+"-"+std::to_string(std::time(nullptr)));
     std::filesystem::create_directories(output);
     std::ofstream csv(output/"results.csv");
-    if(!csv)OperationFailedException::fire(ErrorReport::NO_ERROR_REPORT,"Cannot create lighting-test results file.",env.console);
+    if(!csv)OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::NO_ERROR_REPORT,"Cannot create lighting-test results file.",env.console);
     csv<<"sample,hour,frame,landmark,score,margin,accepted,dx_screen,dy_screen,located,at_target,consensus_dx_screen,consensus_dy_screen,coarse\n";
     csv<<std::setprecision(8);
     int base=(int)(uint8_t)START_HOUR;
@@ -49,7 +50,7 @@ void OverworldLightingTest::program(SingleSwitchProgramEnvironment& env,ProContr
         context.wait_for_all_requests();
         for(int capture=1;capture<=5;capture++){
             auto snapshot=env.console.video().snapshot();
-            if(!snapshot)OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,"Lighting test: No video frame.",env.console);
+            if(!snapshot)OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,"Lighting test: No video frame.",env.console);
             const auto result=matcher.match(*snapshot.frame);
             VideoOverlaySet overlays(env.console.overlay());
             for(const auto& landmark:result.landmarks){
@@ -64,7 +65,7 @@ void OverworldLightingTest::program(SingleSwitchProgramEnvironment& env,ProContr
             }
             if(result.at_target)target_frames++;
             std::string name="hour-"+std::to_string(hour)+"-frame-"+std::to_string(capture)+".png";
-            if(!snapshot->save((output/name).string()))OperationFailedException::fire(ErrorReport::NO_ERROR_REPORT,"Lighting test: Screenshot save failed.",env.console);
+            if(!snapshot->save((output/name).string()))OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::NO_ERROR_REPORT,"Lighting test: Screenshot save failed.",env.console);
             csv.flush();
             pbf_wait(context,250ms);context.wait_for_all_requests();
         }

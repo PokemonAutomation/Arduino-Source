@@ -5,9 +5,11 @@
  *
  */
 
+#include "CommonFramework/GlobalAutoPaths.h"
 #include <cmath>
 #include <opencv2/imgproc.hpp>
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -42,7 +44,7 @@ namespace PokemonBDSP{
         for (size_t attempt = 0; attempt < 40; attempt++) {
             const VideoSnapshot frame = stream.video().snapshot();
             if (!frame) {
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     "Mart alignment: No video frame.", stream);
             }
             const ImageRGB32 small_frame = frame->scale_to(960, 540);
@@ -60,7 +62,7 @@ namespace PokemonBDSP{
             double runner_up;
             cv::minMaxLoc(competitors, nullptr, &runner_up);
             if (score < 0.93 || score - runner_up < 0.10) {
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     "Mart alignment: Emblem match missing or ambiguous.", stream);
             }
             // Reference emblem top-left at half resolution. The reference player
@@ -88,7 +90,7 @@ namespace PokemonBDSP{
             }
             context.wait_for_all_requests();
         }
-        OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Mart alignment: Could not reach the doorway reference position.", stream);
     }
 

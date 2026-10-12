@@ -8,6 +8,7 @@ public: OverworldLightingTest_Descriptor();
 };
 class OverworldLightingTest : public SingleSwitchProgramInstance{
 public:
+    using Descriptor = OverworldLightingTest_Descriptor;
     OverworldLightingTest();
     void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 private:

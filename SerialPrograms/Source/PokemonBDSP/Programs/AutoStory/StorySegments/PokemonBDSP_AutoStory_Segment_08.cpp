@@ -6,6 +6,7 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Globals.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
@@ -2319,7 +2320,7 @@ void checkpoint_0801(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!leave_gym(env.console, context)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "leave_gym: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "leave_gym: transition not detected.", env.console);
             }
         },
         true
@@ -2330,7 +2331,7 @@ void checkpoint_0802(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!heal_at_snowpoint_city_pokemon_center(env.console, context)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_at_snowpoint_city_pokemon_center: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "heal_at_snowpoint_city_pokemon_center: transition not detected.", env.console);
             }
         },
         false
@@ -2341,7 +2342,7 @@ void checkpoint_0803(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!heal_and_exit(env.console, context, "Snowpoint City")){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_and_exit_snowpoint_city: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "heal_and_exit_snowpoint_city: transition not detected.", env.console);
             }
         },
         false
@@ -2352,7 +2353,7 @@ void checkpoint_0804(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_to_lake_acuity(env.console, context)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_lake_acuity: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "go_to_lake_acuity: transition not detected.", env.console);
             }
         },
         false
@@ -2363,7 +2364,7 @@ void checkpoint_0805(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!talk_to_clint_then_go_veilstone(env.console, context)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "talk_to_clint_then_go_veilstone: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "talk_to_clint_then_go_veilstone: transition not detected.", env.console);
             }
         },
         false
@@ -2374,7 +2375,7 @@ void checkpoint_0806(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!heal_and_exit(env.console, context, "Veilstone City")){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_and_exit_veilstone_city: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "heal_and_exit_veilstone_city: transition not detected.", env.console);
             }
         },
         false
@@ -2385,7 +2386,7 @@ void checkpoint_0807(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!get_key_and_enter_warehouse(env.console, context)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "get_key_and_enter_warehouse: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "get_key_and_enter_warehouse: transition not detected.", env.console);
             }
         },
         false
@@ -2396,7 +2397,7 @@ void checkpoint_0808(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_through_warehouse(env.console, context)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_warehouse: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "go_through_warehouse: transition not detected.", env.console);
             }
         },
         false
@@ -2407,7 +2408,7 @@ void checkpoint_0809(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!heal_at_veilstone_pokemon_center(env.console, context)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_at_veilstone_pokemon_center: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "heal_at_veilstone_pokemon_center: transition not detected.", env.console);
             }
         },
         false
@@ -2418,7 +2419,7 @@ void checkpoint_0810(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!heal_and_exit(env.console, context, "Veilstone City")){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_and_exit_veilstone_city: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "heal_and_exit_veilstone_city: transition not detected.", env.console);
             }
         },
         false
@@ -2429,7 +2430,7 @@ void checkpoint_0811(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_to_galactic_hq(env.console, context)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_galactic_hq: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "go_to_galactic_hq: transition not detected.", env.console);
             }
         },
         false
@@ -2440,7 +2441,7 @@ void checkpoint_0812(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_through_galactic_hq(env.console, context, options)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_galactic_hq: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "go_through_galactic_hq: transition not detected.", env.console);
             }
         },
         false
@@ -2451,7 +2452,7 @@ void checkpoint_0813(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!fly_and_heal_at_oreburgh(env.console, context, options)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "fly_and_heal_at_oreburgh: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "fly_and_heal_at_oreburgh: transition not detected.", env.console);
             }
         },
         false
@@ -2462,7 +2463,7 @@ void checkpoint_0814(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!heal_and_exit(env.console, context, "Oreburgh City")){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_and_exit_oreburgh_city: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "heal_and_exit_oreburgh_city: transition not detected.", env.console);
             }
         },
         false
@@ -2473,7 +2474,7 @@ void checkpoint_0815(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_to_mount_coronet(env.console, context, options)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_mount_coronet: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "go_to_mount_coronet: transition not detected.", env.console);
             }
         },
         false
@@ -2484,7 +2485,7 @@ void checkpoint_0816(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_through_mount_coronet(env.console, context, options)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_mount_coronet: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "go_through_mount_coronet: transition not detected.", env.console);
             }
         },
         false
@@ -2495,7 +2496,7 @@ void checkpoint_0817(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!fly_and_heal_at_veilstone(env.console, context, options)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "fly_and_heal_at_veilstone: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "fly_and_heal_at_veilstone: transition not detected.", env.console);
             }
         },
         false
@@ -2506,7 +2507,7 @@ void checkpoint_0818(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!heal_and_exit(env.console, context, "Veilstone City")){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_and_exit_veilstone_city: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "heal_and_exit_veilstone_city: transition not detected.", env.console);
             }
         },
         false
@@ -2517,7 +2518,7 @@ void checkpoint_0819(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_to_house_south_veilstone(env.console, context, options)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_house_south_veilstone: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "go_to_house_south_veilstone: transition not detected.", env.console);
             }
         },
         false
@@ -2528,7 +2529,7 @@ void checkpoint_0820(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_through_house_south_veilstone(env.console, context, options)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_house_south_veilstone: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "go_through_house_south_veilstone: transition not detected.", env.console);
             }
         },
         false
@@ -2539,7 +2540,7 @@ void checkpoint_0821(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_to_house_west_sunyshore(env.console, context, options)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_house_west_sunyshore: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "go_to_house_west_sunyshore: transition not detected.", env.console);
             }
         },
         false
@@ -2550,7 +2551,7 @@ void checkpoint_0822(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_through_house_west_sunyshore(env.console, context, options)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_house_west_sunyshore: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "go_through_house_west_sunyshore: transition not detected.", env.console);
             }
         },
         false
@@ -2561,7 +2562,7 @@ void checkpoint_0823(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_to_sunyshore_lighthouse(env.console, context, options)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_sunyshore_lighthouse: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "go_to_sunyshore_lighthouse: transition not detected.", env.console);
             }
         },
         false
@@ -2572,7 +2573,7 @@ void checkpoint_0824(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!talk_to_volkner_at_the_lighthouse(env.console, context, options)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "talk_to_volkner_at_the_lighthouse: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "talk_to_volkner_at_the_lighthouse: transition not detected.", env.console);
             }
         },
         false
@@ -2588,7 +2589,7 @@ void checkpoint_0825(
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_to_sunyshore_gym(env.console, context, options)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_sunyshore_gym: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "go_to_sunyshore_gym: transition not detected.", env.console);
             }
         },
         false
@@ -2604,7 +2605,7 @@ void checkpoint_0826(
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_to_sunyshore_gym(env.console, context, options)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_sunyshore_gym: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "go_to_sunyshore_gym: transition not detected.", env.console);
             }
         },
         false

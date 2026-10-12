@@ -7,6 +7,7 @@
  */
 
 
+#include "CommonFramework/GlobalAutoPaths.h"
 #include <algorithm>
 #include <cmath>
 #include <chrono>
@@ -16,6 +17,7 @@
 #include "PokemonBDSP_Autostory_Segment_01_tools.h"
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -123,7 +125,7 @@ namespace PokemonAutomation {
                             "[AutoStory] Clown helper timed out finding dialog.",
                             COLOR_RED
                         );
-                        OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                             "[AutoStory] Clown helper timed out finding dialog.", stream);
                     }
 
@@ -281,7 +283,7 @@ namespace PokemonAutomation {
                 }
                 MenuWatcher menu_open;
                 if (wait_until(stream, context, 5s, {{menu_open}}) != 0) {
-                    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                         "Settings checkpoint: Main menu not detected.", stream);
                 }
                 stream.log("[Tutorial settings] Main menu detected; settling for 500ms before Options navigation.");
@@ -307,7 +309,7 @@ namespace PokemonAutomation {
                     if (wait_until(stream, context, 5s, {{back_to_menu}}) != 0) break;
                 }
                 if (!options_open) {
-                    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                         "Settings checkpoint: Options screen not detected.", stream);
                 }
                 stream.log("[Tutorial settings] Options screen detected.");
@@ -349,7 +351,7 @@ namespace PokemonAutomation {
                                 context.wait_for_all_requests();
                                 continue;
                             }
-                            OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                                 "Settings checkpoint: Unable to confirm expected row " + std::string(settings[row].label), stream);
                         }
                         // These are regular video-overlay boxes, so the existing
@@ -395,7 +397,7 @@ namespace PokemonAutomation {
                                     if (!check || !options_screen.detect(check) || check_y < 0 ||
                                         option_image_score(check, {0.08, check_y - 0.025, 0.24, 0.05}, label_reference, false) < 0.80 ||
                                         !autosave_off_highlight(check, check_y)) {
-                                        OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                                        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                                             "Autosave Off could not be confirmed. Stopping before movement.", stream);
                                     }
                                 }
@@ -417,7 +419,7 @@ namespace PokemonAutomation {
                         context.wait_for_all_requests();
                     }
                     if (!correct) {
-                        OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                             "Settings checkpoint: Could not apply " + std::string(settings[row].label), stream);
                     }
                     if (row + 1 < sizeof(settings) / sizeof(settings[0]))
@@ -433,7 +435,7 @@ namespace PokemonAutomation {
                 context.wait_for_all_requests();
                 OverworldWatcher overworld;
                 if (wait_until(stream, context, 10s, {{overworld}}) != 0) {
-                    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                         "Settings checkpoint: Did not return to the overworld after saving options.", stream);
                 }
                 // Reopen the saved Options screen and independently verify Autosave.
@@ -442,7 +444,7 @@ namespace PokemonAutomation {
                 context.wait_for_all_requests();
                 MenuWatcher verify_menu;
                 if (wait_until(stream, context, 5s, {{verify_menu}}) != 0) {
-                    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                         "Autosave verification: Main menu not detected.", stream);
                 }
                 bool reopened = false;
@@ -458,7 +460,7 @@ namespace PokemonAutomation {
                     pbf_press_dpad(context, DPAD_RIGHT, 80ms, 350ms);
                 }
                 if (!reopened) {
-                    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                         "Autosave verification: Could not reopen saved Options.", stream);
                 }
                 // Options starts on Text Speed; Autosave is seven rows below it.
@@ -472,7 +474,7 @@ namespace PokemonAutomation {
                     if (!check || !options_screen.detect(check) || check_y < 0 ||
                         option_image_score(check, {0.08, check_y - 0.025, 0.24, 0.05}, autosave_label, false) < 0.80 ||
                         !autosave_off_highlight(check, check_y)) {
-                        OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                             "Saved Autosave setting is not verified Off. Stopping before movement.", stream);
                     }
                     pbf_wait(context, 200ms);
@@ -489,7 +491,7 @@ namespace PokemonAutomation {
                 context.wait_for_all_requests();
                 OverworldWatcher verified_exit;
                 if (wait_until(stream, context, 10s, {{verified_exit}}) != 0) {
-                    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                         "Autosave verification: Could not return to the overworld.", stream);
                 }
                 // Report inferred values explicitly: these are visual matches,
@@ -580,8 +582,8 @@ namespace PokemonAutomation {
                     { date_reader }
                 );
                 if (ret < 0) {
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(
+                        ErrorReportMode::SEND_ERROR_REPORT,
                         "Failed to enter Date Change screen.",
                         env.console
                     );
@@ -633,7 +635,7 @@ namespace PokemonAutomation {
                         else pbf_press_dpad(context, DPAD_UP, 80ms, 250ms);
                     }
                 }
-                if (!fight) OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                if (!fight) OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     label + ": Could not confirm Battle command; A not pressed.", stream);
                 pbf_press_button(context, BUTTON_A, 80ms, 500ms);
                 confirmed = 0;
@@ -651,7 +653,7 @@ namespace PokemonAutomation {
                     if (moves.move_count == previous_move_count && moves.move_count > 0) stable_move_count++;
                     else { previous_move_count = moves.move_count; stable_move_count = 1; confirmed = 0; }
                     if (moves.move_count > 0 && moves.move_count < target && stable_move_count >= 3) {
-                        OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                             label + ": Move slot " + std::to_string(target) + " is absent; no move confirmed.", stream);
                     }
                     if (slot == (int)target && stable_move_count >= 3) {
@@ -668,7 +670,7 @@ namespace PokemonAutomation {
                     }
                     context.wait_for_all_requests();
                 }
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     label + ": Could not confirm move " + std::to_string(target) + "; A not pressed.", stream);
             }
 
@@ -812,7 +814,7 @@ namespace PokemonAutomation {
                             5000ms
                         );
 
-                        OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                             "[AutoStory] Natalie battle timed out.", stream);
                     }
 
@@ -875,13 +877,13 @@ namespace PokemonAutomation {
                             { {overworld} }
                         );
                         if (cleanup_ret != 0) {
-                            OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                                 "Starly battle: Overworld cleanup timed out.", stream);
                         }
                         return;
                     }
                     default:
-                        OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                             "Starly battle timed out.", stream);
                     }
                 }
@@ -944,7 +946,7 @@ namespace PokemonAutomation {
                     }
                 }
 
-                if (!encounter_found) OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                if (!encounter_found) OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     "Wild encounter: Left/right wiggle did not find a battle within three minutes.", stream);
                 stream.log("[AutoStory] Wild battle detected!", COLOR_GREEN);
 
@@ -965,7 +967,7 @@ namespace PokemonAutomation {
                         "[AutoStory] Failed to detect battle menu.",
                         COLOR_RED
                     );
-                    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                             "[AutoStory] Failed to detect battle menu.", stream);
                 }
 
@@ -990,7 +992,7 @@ namespace PokemonAutomation {
                 bool finished = false;
                 while (std::chrono::steady_clock::now() < deadline) {
                     const auto frame = stream.video().snapshot();
-                    if (!frame) OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                    if (!frame) OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                         label + ": No video frame.", stream);
                     const auto now = std::chrono::steady_clock::now();
                     if (dialogue.detect(frame) || black.detect(frame) || !overworld.detect(frame)) {
@@ -1002,7 +1004,7 @@ namespace PokemonAutomation {
                     pbf_mash_button(context, BUTTON_B, 100ms);
                     context.wait_for_all_requests();
                 }
-                if (!finished) OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                if (!finished) OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     label + ": Dialogue-free overworld not confirmed for four seconds.", stream);
                 context.wait_for_all_requests();
             }
@@ -1081,7 +1083,7 @@ namespace PokemonAutomation {
                                 pbf_mash_button(ctx, BUTTON_B, 120000ms);
                             }, {{overworld}});
                         if (cleanup_ret != 0) {
-                            OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                                 label + ": Post-battle cleanup timed out.", stream);
                         }
                         context.wait_for_all_requests();
@@ -1095,7 +1097,7 @@ namespace PokemonAutomation {
                             COLOR_RED
                         );
 
-                        OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                             "[AutoStory] " + label + " battle timeout.", stream);
                     }
                 }
@@ -1163,7 +1165,7 @@ namespace PokemonAutomation {
                         break;
                     }
                     if (throw_ret < 0 || throw_ret == 2) {
-                        OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                             "Catch failed: No verified Pokemon receipt before battle ended or timed out.", stream);
                     }
                     stream.log(
@@ -1175,7 +1177,7 @@ namespace PokemonAutomation {
                 context.wait_for_all_requests();
 
                 if (!caught) {
-                    OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                         "Catch failed: Exhausted ten ball attempts.", stream);
                 }
                 // Receipt alone is not an overworld return: clear experience,
@@ -1187,7 +1189,7 @@ namespace PokemonAutomation {
                         [](ProControllerContext& ctx) { pbf_mash_button(ctx, BUTTON_B, 120000ms); },
                         {{battle_ended}});
                     if (cleanup_ret != 0) {
-                        OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                             "Catch cleanup: Battle exit transition did not finish.", stream);
                     }
                 }
@@ -1459,8 +1461,8 @@ namespace PokemonAutomation {
                     return;
                 }
 
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
                     "Failed to find Pokemon Center exit black screen before Barry 1. Triggering checkpoint retry.",
                     stream
                 );
@@ -1485,7 +1487,7 @@ namespace PokemonAutomation {
                     OverworldMatchResult location;
                     if (destination) {
                         const auto frame = stream.video().snapshot();
-                        if (!frame) OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                        if (!frame) OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                             "Grass destination: No video frame.", stream);
                         location = destination(*frame.frame);
                         for (const auto& landmark : location.landmarks) {
@@ -1512,7 +1514,7 @@ namespace PokemonAutomation {
                         confirmations = 0;
                     }
                     if (movements >= steps) {
-                        if (destination) OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT,
+                        if (destination) OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                             "Grass destination not confirmed within movement limit: " + direction_name, stream);
                         stream.log("[Grass] Completed " + direction_name + " (" + std::to_string(steps) + " steps).", COLOR_GREEN);
                         return;

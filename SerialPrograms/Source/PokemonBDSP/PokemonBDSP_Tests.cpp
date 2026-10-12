@@ -3,6 +3,7 @@
  *  From: https://github.com/PokemonAutomation/
  */
 
+#include "CommonFramework/GlobalAutoPaths.h"
 #include <array>
 #include <map>
 #include <limits>

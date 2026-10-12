@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_AutoStoryTools_H
 #define PokemonAutomation_PokemonBDSP_AutoStoryTools_H
 
+#include "CommonFramework/GlobalAutoPaths.h"
 #include <array>
 #include <functional>
 #include <string>

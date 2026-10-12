@@ -6,6 +6,7 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -1436,7 +1437,7 @@ void checkpoint_0901(
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!enter_sunyshore_pokemon_center(env.console, context, options)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "enter_sunyshore_pokemon_center: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "enter_sunyshore_pokemon_center: transition not detected.", env.console);
             }
         },
         true
@@ -1452,7 +1453,7 @@ void checkpoint_0902(
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!heal_and_exit(env.console, context, "Sunyshore City")){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_and_exit_1: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "heal_and_exit_1: transition not detected.", env.console);
             }
         },
         false
@@ -1468,7 +1469,7 @@ void checkpoint_0903(
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_to_victory_road_pokemon_center(env.console, context, options)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_victory_road_pokemon_center: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "go_to_victory_road_pokemon_center: transition not detected.", env.console);
             }
         },
         false
@@ -1484,7 +1485,7 @@ void checkpoint_0904(
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!heal_and_exit(env.console, context, "Victory Road")){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_and_exit_2: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "heal_and_exit_2: transition not detected.", env.console);
             }
         },
         false
@@ -1500,7 +1501,7 @@ void checkpoint_0905(
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!enter_victory_road_cave(env.console, context, options)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "enter_victory_road_cave: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "enter_victory_road_cave: transition not detected.", env.console);
             }
         },
         false
@@ -1516,7 +1517,7 @@ void checkpoint_0906(
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_through_victory_road_cave(env.console, context, options)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_victory_road_cave: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "go_through_victory_road_cave: transition not detected.", env.console);
             }
         },
         false
@@ -1532,7 +1533,7 @@ void checkpoint_0907(
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!enter_elite_4_pokemon_center(env.console, context, options)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "enter_elite_4_pokemon_center: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "enter_elite_4_pokemon_center: transition not detected.", env.console);
             }
         },
         false
@@ -1548,7 +1549,7 @@ void checkpoint_0908(
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!ready_in_front_of_elite_4(env.console, context, options)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "ready_in_front_of_elite_4: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "ready_in_front_of_elite_4: transition not detected.", env.console);
             }
         },
         false
@@ -1564,7 +1565,7 @@ void checkpoint_0909(
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!get_into_the_elite_4_entrance(env.console, context, options)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "get_into_the_elite_4_entrance: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "get_into_the_elite_4_entrance: transition not detected.", env.console);
             }
         },
         true
@@ -1580,7 +1581,7 @@ void checkpoint_0910(
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!deal_with_aaron_elite_4(env.console, context, options)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "deal_with_aaron_elite_4: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "deal_with_aaron_elite_4: transition not detected.", env.console);
             }
         },
         false
@@ -1596,7 +1597,7 @@ void checkpoint_0911(
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!deal_with_bertha_elite_4(env.console, context, options)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "deal_with_bertha_elite_4: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "deal_with_bertha_elite_4: transition not detected.", env.console);
             }
         },
         false
@@ -1612,7 +1613,7 @@ void checkpoint_0912(
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!deal_with_flint_elite_4(env.console, context, options)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "deal_with_flint_elite_4: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "deal_with_flint_elite_4: transition not detected.", env.console);
             }
         },
         false
@@ -1628,7 +1629,7 @@ void checkpoint_0913(
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!deal_with_lucian_elite_4(env.console, context, options)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "deal_with_lucian_elite_4: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "deal_with_lucian_elite_4: transition not detected.", env.console);
             }
         },
         false
@@ -1644,7 +1645,7 @@ void checkpoint_0914(
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!deal_with_cynthia_and_finish(env.console, context, options)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "deal_with_cynthia_and_finish: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "deal_with_cynthia_and_finish: transition not detected.", env.console);
             }
         },
         false
