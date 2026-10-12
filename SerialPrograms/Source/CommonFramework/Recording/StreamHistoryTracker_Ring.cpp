@@ -23,8 +23,10 @@
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavutil/channel_layout.h>
+#include <libavutil/error.h>
 #include <libavutil/log.h>
 #include <libavutil/opt.h>
+#include <libavutil/rational.h>
 #include <libswresample/swresample.h>
 #include <libswscale/swscale.h>
 
@@ -299,6 +301,7 @@ struct StreamHistoryTracker_Ring::Impl{
         int target_height = 0;
         if (!get_target_video_size(input_width, input_height, target_width, target_height)){
             logger.log("Stream history: Unsupported input resolution. Disabling video.", COLOR_RED);
+            WriteSpinLock lg(lock, PA_CURRENT_FUNCTION);
             video_enabled = false;
             return;
         }
@@ -363,7 +366,42 @@ struct StreamHistoryTracker_Ring::Impl{
             avcodec_free_context(&ctx);
         }
         logger.log("Stream history: No usable H.264 encoder found. Disabling video.", COLOR_RED);
+        WriteSpinLock lg(lock, PA_CURRENT_FUNCTION);
         video_enabled = false;
+    }
+
+
+    //  Receive and store a single encoded video packet.
+    //  Returns 1 if a packet was stored, 0 if there is nothing to receive, -1 on
+    //  error (already logged).
+    int drain_one_video_packet(WallClock timestamp){
+        AVPacket* packet = av_packet_alloc();
+        if (packet == nullptr){
+            logger.log("Stream history: Failed to allocate video packet.", COLOR_RED);
+            return -1;
+        }
+        int err = avcodec_receive_packet(vctx, packet);
+        if (err == EAGAIN || err == AVERROR_EOF){
+            av_packet_free(&packet);
+            return 0;
+        }
+        if (err < 0){
+            av_packet_free(&packet);
+            logger.log("Stream history: Video packet failed: " + ffmpeg_error(err), COLOR_RED);
+            return -1;
+        }
+        auto ring_packet = std::make_shared<VideoRingPacket>();
+        ring_packet->timestamp = timestamp;
+        ring_packet->flags = (av_packet_get_flags(packet) & AV_PKT_FLAG_KEY) ? AV_PKT_FLAG_KEY : 0;
+        ring_packet->data.assign(packet->data, packet->data + packet->size);
+        av_packet_free(&packet);
+
+        int64_t added = (int64_t)ring_packet->data.size();
+        WriteSpinLock lg(lock, PA_CURRENT_FUNCTION);
+        video.push_back(std::move(ring_packet));
+        ring_bytes += added;
+        evict();
+        return 1;
     }
 
 
@@ -510,42 +548,28 @@ struct StreamHistoryTracker_Ring::Impl{
             frame->pict_type = AV_PICTURE_TYPE_I;
         }
 
-        int err = avcodec_send_frame(vctx, frame);
-        av_frame_free(&frame);
-        if (err < 0){
-            logger.log("Stream history: Video encode failed: " + ffmpeg_error(err), COLOR_RED);
-            return;
-        }
-
+        //  Send the frame. Some encoders (notably hardware ones) buffer input,
+        //  so a send can fail with EAGAIN while output packets are pending:
+        //  drain one packet and retry instead of giving up.
         while (true){
-            AVPacket* packet = av_packet_alloc();
-            if (packet == nullptr){
-                return;
-            }
-            err = avcodec_receive_packet(vctx, packet);
+            int err = avcodec_send_frame(vctx, frame);
             if (err == EAGAIN){
-                av_packet_free(&packet);
-                break;
+                if (drain_one_video_packet(vf->timestamp) <= 0){
+                    av_frame_free(&frame);
+                    return;
+                }
+                continue;
             }
             if (err < 0){
-                av_packet_free(&packet);
-                logger.log("Stream history: Video packet failed: " + ffmpeg_error(err), COLOR_RED);
-                break;
+                av_frame_free(&frame);
+                logger.log("Stream history: Video encode failed: " + ffmpeg_error(err), COLOR_RED);
+                return;
             }
-            auto ring_packet = std::make_shared<VideoRingPacket>();
-            ring_packet->timestamp = vf->timestamp;
-            ring_packet->flags = (av_packet_get_flags(packet) & AV_PKT_FLAG_KEY) ? AV_PKT_FLAG_KEY : 0;
-            ring_packet->data.assign(packet->data, packet->data + packet->size);
-            av_packet_free(&packet);
-
-            int64_t added = (int64_t)ring_packet->data.size();
-            {
-                WriteSpinLock lg(lock, PA_CURRENT_FUNCTION);
-                video.push_back(std::move(ring_packet));
-                ring_bytes += added;
-                evict();
-            }
+            av_frame_free(&frame);
+            break;
         }
+
+        while (drain_one_video_packet(vf->timestamp) > 0){}
     }
 
 
@@ -647,7 +671,6 @@ struct StreamHistoryTracker_Ring::Impl{
                 return;
             }
             swr = swr_alloc_set_opts2(
-                &swr,
                 &audio_layout, AV_SAMPLE_FMT_FLT, AUDIO_OUTPUT_RATE,
                 &in_layout,  AV_SAMPLE_FMT_FLT, audio_input_rate,
                 0, nullptr
@@ -824,7 +847,10 @@ struct StreamHistoryTracker_Ring::Impl{
                     //  The muxer only reads the packet data.
                     packet->data = const_cast<uint8_t*>(vp.data.data());
                     packet->size = (int)vp.data.size();
-                    packet->pts = us * video_stream->time_base.den / video_stream->time_base.num;
+                    packet->stream_index = video_stream->index;
+                    //  `us` counts microseconds (a 1/1000000 timebase); convert to
+                    //  the stream timebase.
+                    packet->pts = av_rescale_q(us, av_make_q(1, 1000000), video_stream->time_base);
                     packet->dts = packet->pts;
                     packet->flags = vp.flags;
                     if (av_interleaved_write_frame(format, packet) < 0){
@@ -840,6 +866,7 @@ struct StreamHistoryTracker_Ring::Impl{
                     //  The muxer only reads the packet data.
                     packet->data = const_cast<uint8_t*>(ap.data.data());
                     packet->size = (int)ap.data.size();
+                    packet->stream_index = audio_stream->index;
                     packet->pts = ap.first_sample - base_samples;
                     packet->dts = packet->pts;
                     packet->flags = 0;
@@ -881,14 +908,15 @@ struct StreamHistoryTracker_Ring::Impl{
             return false;
         }
 
-        //  Rewind the video to the last keyframe so the file decodes from the start.
+        //  Rewind the video to the first keyframe (the oldest decodable start
+        //  point) so the file decodes from the beginning. This loses at most one
+        //  keyframe interval (~2 s) from the head of the window; rewinding to
+        //  the *last* keyframe instead would discard almost the entire window.
         size_t video_start = 0;
-        if (!video.empty()){
-            for (size_t i = video.size(); i > 0; i--){
-                if (video[i - 1]->flags & AV_PKT_FLAG_KEY){
-                    video_start = i - 1;
-                    break;
-                }
+        for (size_t i = 0; i < video.size(); i++){
+            if (video[i]->flags & AV_PKT_FLAG_KEY){
+                video_start = i;
+                break;
             }
         }
 
