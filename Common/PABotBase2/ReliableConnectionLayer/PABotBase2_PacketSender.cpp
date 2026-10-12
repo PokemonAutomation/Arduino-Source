@@ -328,7 +328,9 @@ bool PacketSender::iterate_retransmits() noexcept{
 
         m_connection.unreliable_send(
             packet,
-            packet_bytes == 0 ? (size_t)256 : (size_t)packet_bytes
+            packet_bytes == 0
+                ? (size_t)256
+                : (size_t)packet_bytes
         );
         packet->magic_number = seqnum;
         return true;
@@ -349,9 +351,10 @@ bool PacketSender::enqueue_uncommitted_send_stream(const void* data, size_t byte
         return false;
     }
 
-    //  256 will overflow to 0 which is explicitly supported.
-    size_t max_packet_size = (uint8_t)(m_max_packet_size - 1);
-    max_packet_size++;
+    //  256 is explicitly supported and is expressed as 0.
+    size_t max_packet_size = m_max_packet_size == 0
+        ? 256
+        : m_max_packet_size;
 
     while (bytes > 0){
         //  No slots available.
