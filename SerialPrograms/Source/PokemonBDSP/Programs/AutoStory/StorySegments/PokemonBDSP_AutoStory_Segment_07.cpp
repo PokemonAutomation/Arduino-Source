@@ -1763,7 +1763,7 @@ static bool go_to_snowpoint_gym(
 
 
 void checkpoint_0701(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!leave_gym(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "leave_gym: transition not detected.", env.console);
@@ -1774,7 +1774,7 @@ void checkpoint_0701(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0702(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_to_the_library(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_the_library: transition not detected.", env.console);
@@ -1785,7 +1785,7 @@ void checkpoint_0702(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0703(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!drama_at_the_library(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "drama_at_the_library: transition not detected.", env.console);
@@ -1796,7 +1796,7 @@ void checkpoint_0703(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0704(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!talk_fly_and_enter_mount_coronet(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "talk_fly_and_enter_mount_coronet: transition not detected.", env.console);
@@ -1807,7 +1807,7 @@ void checkpoint_0704(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0705(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_through_mount_coronet(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_mount_coronet: transition not detected.", env.console);
@@ -1818,7 +1818,7 @@ void checkpoint_0705(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0706(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_through_route_216(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_route_216: transition not detected.", env.console);
@@ -1829,7 +1829,7 @@ void checkpoint_0706(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0707(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!heal_small_house_route_216(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_small_house_route_216: transition not detected.", env.console);
@@ -1840,7 +1840,7 @@ void checkpoint_0707(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0708(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!continue_through_route_216(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "continue_through_route_216: transition not detected.", env.console);
@@ -1851,7 +1851,7 @@ void checkpoint_0708(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0709(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!heal_at_snowpoint_pokemon_center(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_at_snowpoint_pokemon_center: transition not detected.", env.console);
@@ -1862,7 +1862,7 @@ void checkpoint_0709(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0710(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_to_house_south_veilstone(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_house_south_veilstone: transition not detected.", env.console);
@@ -1873,7 +1873,7 @@ void checkpoint_0710(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0711(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_through_house_south_veilstone(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_house_south_veilstone: transition not detected.", env.console);
@@ -1884,7 +1884,7 @@ void checkpoint_0711(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0712(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!walk_through_route_214(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "walk_through_route_214: transition not detected.", env.console);
@@ -1895,7 +1895,7 @@ void checkpoint_0712(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0713(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_through_lake_valor(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_lake_valor: transition not detected.", env.console);
@@ -1906,7 +1906,7 @@ void checkpoint_0713(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0714(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!heal_at_home(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_at_home: transition not detected.", env.console);
@@ -1917,7 +1917,7 @@ void checkpoint_0714(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0715(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_to_lake_verity(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_lake_verity: transition not detected.", env.console);
@@ -1928,7 +1928,7 @@ void checkpoint_0715(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0716(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!commander_mars_and_snowpoint(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "commander_mars_and_snowpoint: transition not detected.", env.console);
@@ -1939,7 +1939,7 @@ void checkpoint_0716(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0717(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!heal_at_snowpoint_pokemon_center(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_at_snowpoint_pokemon_center: transition not detected.", env.console);
@@ -1950,7 +1950,7 @@ void checkpoint_0717(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0718(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_to_snowpoint_gym(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_snowpoint_gym: transition not detected.", env.console);
@@ -1961,7 +1961,7 @@ void checkpoint_0718(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0719(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_to_snowpoint_gym(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_snowpoint_gym: transition not detected.", env.console);
