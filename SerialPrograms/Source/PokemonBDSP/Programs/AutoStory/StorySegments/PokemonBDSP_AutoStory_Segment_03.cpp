@@ -308,7 +308,7 @@ void Checkpoint_0301(
     AutoStoryOptions options,
     AutoStoryStats& stats
 ){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             // TODO: implement Segment 03 gameplay logic
             eterna_gym_to_jupiter(env.console, context);
@@ -338,7 +338,7 @@ void Checkpoint_0302(
     AutoStoryOptions options,
     AutoStoryStats& stats
 ) {
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/) {
             // TODO: implement Segment 03 gameplay logic
             jupiter_to_coronet(env.console, context);
@@ -368,7 +368,7 @@ void Checkpoint_0303(
     AutoStoryOptions options,
     AutoStoryStats& stats
 ) {
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/) {
             // TODO: implement Segment 03 gameplay logic
             coronet1(env.console, context);
@@ -398,7 +398,7 @@ void Checkpoint_0304(
     AutoStoryOptions options,
     AutoStoryStats& stats
 ) {
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/) {
             // TODO: implement Segment 03 gameplay logic
             coronet_to_heartholme(env.console, context);
@@ -428,7 +428,7 @@ void Checkpoint_0305(
 	AutoStoryOptions options,
 	AutoStoryStats& stats
 ) {
-	checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+	checkpoint_reattempt_loop(env, context, options, stats,
 		[&](size_t /*attempt*/) {
 			// TODO: implement Segment 03 gameplay logic
 			heartholme_to_lost_tower(env.console, context);
@@ -460,7 +460,7 @@ void Checkpoint_0306(
     AutoStoryOptions options,
     AutoStoryStats& stats
 ) {
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/) {
             // TODO: implement Segment 03 gameplay logic
             lost_tower_to_veilstone_gym(env.console, context);
@@ -489,7 +489,7 @@ void Checkpoint_0307(
     AutoStoryOptions options,
     AutoStoryStats& stats
 ) {
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/) {
             //#. Veilstone Gym navigation and battle
             gym_Puzzle_03(env.console, context);
