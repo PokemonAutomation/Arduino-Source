@@ -88,7 +88,7 @@ inline void mix_channels_Default<2, 1>(
     float i0o0 = matrix[0];
     float i1o0 = matrix[1];
     for (size_t s = 0; s < samples; s++){
-        out[out_stride * 0] = in[0] * i0o0 + in[1] * i1o0;
+        out[out_stride * 0] = in[in_stride * 0] * i0o0 + in[in_stride * 1] * i1o0;
         in++;
         out++;
     }
@@ -104,8 +104,8 @@ inline void mix_channels_Default<2, 2>(
     float i0o1 = matrix[2];
     float i1o1 = matrix[3];
     for (size_t s = 0; s < samples; s++){
-        float in0 = in[0];
-        float in1 = in[1];
+        float in0 = in[in_stride * 0];
+        float in1 = in[in_stride * 1];
         out[out_stride * 0] = in0 * i0o0 + in1 * i1o0;
         out[out_stride * 1] = in0 * i0o1 + in1 * i1o1;
         in++;
