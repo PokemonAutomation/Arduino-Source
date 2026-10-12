@@ -5,6 +5,7 @@
  *
  */
 
+#include "PokemonBDSP/Inference/PokemonBDSP_TransitionWatchers.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Globals.h"
