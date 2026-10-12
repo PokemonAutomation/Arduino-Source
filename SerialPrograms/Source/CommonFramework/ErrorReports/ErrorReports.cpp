@@ -104,7 +104,7 @@ ErrorReportOption::ErrorReportOption()
 
 SendableErrorReport::SendableErrorReport()
     : m_timestamp(now_to_filestring())
-    , m_directory(RUNTIME_BASE_PATH() + ERROR_PATH_UNSENT + "/" + m_timestamp + "/")
+    , m_directory(UNSENT_ERROR_REPORTS_PATH() + m_timestamp + "/")
     , m_processor(get_processor_name())
     , m_program(STATIC_GLOBALS.DEVELOPER_MODE
         ? PROGRAM_NAME + " (" + PROGRAM_VERSION + "-dev)"
@@ -293,9 +293,9 @@ void SendableErrorReport::save_report_json(Logger* logger) const{
 
 void SendableErrorReport::move_to_sent(){
 //    cout << "move_to_sent()" << endl;
-    QDir().mkdir(QString::fromStdString(ERROR_PATH_SENT));
+    QDir().mkpath(QString::fromStdString(SENT_ERROR_REPORTS_PATH()));
 
-    std::string new_directory = ERROR_PATH_SENT + "/" + m_timestamp + "/";
+    std::string new_directory = SENT_ERROR_REPORTS_PATH() + m_timestamp + "/";
 //    cout << "old: " << m_directory << endl;
 //    cout << "new: " << new_directory << endl;
     bool success = QDir().rename(
@@ -313,7 +313,7 @@ void SendableErrorReport::move_to_sent(){
 
 std::vector<std::string> SendableErrorReport::get_pending_reports(){
     std::vector<std::string> ret;
-    QDir dir(QString::fromStdString(ERROR_PATH_UNSENT));
+    QDir dir(QString::fromStdString(UNSENT_ERROR_REPORTS_PATH()));
     dir.setFilter(QDir::Filter::AllDirs);
     QFileInfoList list = dir.entryInfoList();
     for (const auto& item : list){
@@ -378,7 +378,7 @@ AsyncTask send_all_unsent_reports(Logger& logger, bool allow_prompt){
                     : "There are " + tostr_u_commas(reports.size()) + " error reports.<br><br>"
                       "Would you like to help make this program better by sending them to the developers?<br><br>"
                 ) +
-                make_text_url(ERROR_PATH_UNSENT, "View unsent error reports.")// + "<br><br>"
+                make_text_url(UNSENT_ERROR_REPORTS_PATH(), "View unsent error reports.")// + "<br><br>"
 //                "(You can change )"
             ),
             QMessageBox::Yes | QMessageBox::No,

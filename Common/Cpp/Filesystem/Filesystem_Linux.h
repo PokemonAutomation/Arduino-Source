@@ -6,6 +6,7 @@
 
 #include <unistd.h>
 #include <limits.h>
+#include <cstdlib>
 #include <vector>
 #include <sstream>
 #include <fstream>
@@ -98,6 +99,27 @@ Path application_install_path(){
 }
 Path application_scratch_path(){
     return current_path().string_slash_normalized() + "/";
+}
+Path application_user_data_path(){
+    //  XDG Base Directory Specification: $XDG_DATA_HOME if set, otherwise
+    //  ~/.local/share.
+    Path base;
+    {
+        const char* env = std::getenv("XDG_DATA_HOME");
+        if (env != nullptr && *env != '\0'){
+            base = Path(env);
+        }
+    }
+    if (base.empty()){
+        const char* env = std::getenv("HOME");
+        if (env != nullptr && *env != '\0'){
+            base = Path(env) / ".local" / "share";
+        }
+    }
+    if (base.empty()){
+        base = current_path();
+    }
+    return base / application_binary_name().stem().string();
 }
 
 

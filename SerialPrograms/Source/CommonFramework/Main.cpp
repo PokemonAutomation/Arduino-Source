@@ -118,6 +118,13 @@ int run_program(int argc, char *argv[]){
     logger.log("Starting Program...");
     logger.log("Current path: " + Filesystem::current_path().string_slash_normalized());
     logger.log("Executable path: " + Filesystem::application_binary_directory().string_slash_normalized());
+    //  Determine which storage location (local or user app) holds the newest
+    //  user setting JSON file, so that the settings are read from the right
+    //  place. The user can control this in the Global Settings panel (the
+    //  "Data Storage" section). When the setting is not in the JSON file yet,
+    //  the platform default location is used.
+    DETECT_SETTINGS_STORAGE_LOCATION();
+    logger.log("User data storage location: " + USER_DATA_STORAGE_LOCATION_DISPLAY_NAME(SETTINGS_STORAGE_LOCATION()));
     logger.log("Program setting folder: " + SETTINGS_PATH());
     logger.log("Program resources folder: " + RESOURCE_PATH());
 

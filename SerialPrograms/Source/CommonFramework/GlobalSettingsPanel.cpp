@@ -52,6 +52,8 @@ GlobalSettings& GlobalSettings::instance(){
 GlobalSettings::~GlobalSettings(){
     ENABLE_LIFETIME_SANITIZER0.remove_listener(*this);
     OPEN_BASE_FOLDER_BUTTON.remove_listener(static_cast<ButtonListener&>(*this));
+    USER_DATA_STORAGE.remove_listener(*this);
+    SCREENSHOTS_STORAGE.remove_listener(*this);
 }
 GlobalSettings::GlobalSettings()
     : BatchOption(LockMode::LOCK_WHILE_RUNNING)
@@ -59,6 +61,29 @@ GlobalSettings::GlobalSettings()
     , OPEN_BASE_FOLDER_BUTTON(
         "<b>Runtime Base Folder:</b>",
         "Open Folder"
+    )
+    , m_data_storage(
+        "<font size=4><b>Data Storage:</b> Choose where the program saves user data.</font>"
+    )
+    , USER_DATA_STORAGE(
+        "<b>User Data & Bug Reports Location:</b><br>"
+        "Where to save the user setting JSON file and bug (error) reports.",
+        {
+            {UserDataStorageLocation::USER_APP, "user_app", "User app"},
+            {UserDataStorageLocation::LOCAL,    "local",    "Local"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        DEFAULT_USER_DATA_STORAGE_LOCATION()
+    )
+    , SCREENSHOTS_STORAGE(
+        "<b>Screenshots Location:</b><br>"
+        "Where to save screenshots taken by the program.",
+        {
+            {UserDataStorageLocation::USER_APP, "user_app", "User app"},
+            {UserDataStorageLocation::LOCAL,    "local",    "Local"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        DEFAULT_USER_DATA_STORAGE_LOCATION()
     )
     , STATS_FILE(
         false,
@@ -190,6 +215,9 @@ GlobalSettings::GlobalSettings()
     )
 {
     PA_ADD_OPTION(OPEN_BASE_FOLDER_BUTTON);
+    PA_ADD_STATIC(m_data_storage);
+    PA_ADD_OPTION(USER_DATA_STORAGE);
+    PA_ADD_OPTION(SCREENSHOTS_STORAGE);
     PA_ADD_OPTION(CHECK_FOR_UPDATES);
     PA_ADD_OPTION(STATS_FILE);
     PA_ADD_OPTION(TEMP_FOLDER);
@@ -256,6 +284,8 @@ GlobalSettings::GlobalSettings()
     GlobalSettings::on_config_value_changed(this);
     ENABLE_LIFETIME_SANITIZER0.add_listener(*this);
     OPEN_BASE_FOLDER_BUTTON.add_listener(static_cast<ButtonListener&>(*this));
+    USER_DATA_STORAGE.add_listener(*this);
+    SCREENSHOTS_STORAGE.add_listener(*this);
 }
 
 JsonValue GlobalSettings::to_json() const{
@@ -277,6 +307,12 @@ void GlobalSettings::load_json(const JsonValue& json){
 
     STATIC_GLOBALS.load_json(json);
     BatchOption::load_json(json);
+
+    //  Make sure the user data storage locations in GlobalAutoPaths match the
+    //  loaded settings. If the storage options are not in the JSON file yet,
+    //  the options keep their platform defaults, and those are used.
+    SET_SETTINGS_STORAGE_LOCATION(USER_DATA_STORAGE);
+    SET_SCREENSHOTS_STORAGE_LOCATION(SCREENSHOTS_STORAGE);
 
     // cout << "DEVELOPER_MODE: " << STATIC_GLOBALS.DEVELOPER_MODE << endl;
     // cout << "INTERNAL_DEVELOPER_MODE: " << STATIC_GLOBALS.INTERNAL_DEVELOPER_MODE << endl;
@@ -311,6 +347,12 @@ void GlobalSettings::load_json(const JsonValue& json){
 
 
 void GlobalSettings::on_config_value_changed(void* object){
+    if (object == &USER_DATA_STORAGE){
+        SET_SETTINGS_STORAGE_LOCATION(USER_DATA_STORAGE);
+    }
+    if (object == &SCREENSHOTS_STORAGE){
+        SET_SCREENSHOTS_STORAGE_LOCATION(SCREENSHOTS_STORAGE);
+    }
     bool enabled = ENABLE_LIFETIME_SANITIZER0;
     if (enabled){
         global_logger_tagged().log("LifeTime Sanitizer: Enabled", COLOR_BLUE);

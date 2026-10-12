@@ -148,6 +148,12 @@ Path application_scratch_path(){
 
     return app_support_path.string() + "/";
 }
+Path application_user_data_path(){
+    //  On macOS, the user application data folder is the same as the
+    //  application's scratch folder: ~/Library/Application Support/<name>
+    //  (including the per-instance profile when one was requested).
+    return application_scratch_path();
+}
 
 
 
