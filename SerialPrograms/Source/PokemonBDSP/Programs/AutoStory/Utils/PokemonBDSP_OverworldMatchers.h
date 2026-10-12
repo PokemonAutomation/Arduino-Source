@@ -26,6 +26,8 @@ struct OverworldMatcher {
 };
 // Register additional functions here; each owns its landmarks and coordinate system.
 const std::vector<OverworldMatcher>& overworld_matchers();
+OverworldMatchResult match_jubilife_street_approach(const ImageRGB32& frame);
+OverworldMatchResult match_jubilife_plaza_approach(const ImageRGB32& frame);
 OverworldMatchResult match_poketch_landmarks(const ImageRGB32& frame);
 OverworldMatchResult match_oreburgh_mart(const ImageRGB32& frame);
 OverworldMatchResult match_jubilife_center_entrance(const ImageRGB32& frame);
