@@ -646,6 +646,7 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Recording/StreamHistoryTracker_Null.h
     Source/CommonFramework/Recording/StreamHistoryTracker_ParallelStreams.h
     Source/CommonFramework/Recording/StreamHistoryTracker_RecordOnTheFly.h
+    Source/CommonFramework/Recording/StreamHistoryTracker_Ring.h
     Source/CommonFramework/Recording/StreamHistoryTracker_SaveFrames.cpp
     Source/CommonFramework/Recording/StreamHistoryTracker_SaveFrames.h
     Source/CommonFramework/Recording/StreamRecorder.cpp
@@ -3061,3 +3062,11 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/ZeldaTotK/ZeldaTotK_Settings.cpp
     Source/VideoGames/ZeldaTotK/ZeldaTotK_Settings.h
 )
+
+# The ffmpeg-based stream history tracker is only compiled when requested
+# (CMake option PA_STREAM_HISTORY_FFMPEG; requires the ffmpeg shared libraries).
+if (PA_STREAM_HISTORY_FFMPEG)
+    list(APPEND LIBRARY_SOURCES
+        Source/CommonFramework/Recording/StreamHistoryTracker_Ring.cpp
+    )
+endif()

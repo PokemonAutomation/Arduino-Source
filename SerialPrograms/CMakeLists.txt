@@ -68,8 +68,17 @@ option(COMMAND_LINE_EXE "Build the optional executable" ON)
 # searched for.
 option(PA_CORE_ONLY "Build only the GUI-free core (basic microcontroller functions, no Qt, OpenCV, etc.)" OFF)
 
+# Keep stream history as an in-memory ring of encoded H.264 + AAC packets
+# (StreamHistoryTracker_Ring) and only write to storage when saving. Requires the
+# ffmpeg shared libraries, which must be provided per platform (see the
+# PA_STREAM_HISTORY_FFMPEG blocks in the WIN32 and POSIX sections below).
+option(PA_STREAM_HISTORY_FFMPEG "Stream history as in-memory H.264+AAC ring buffer (requires ffmpeg)" OFF)
+
 if(PA_CORE_ONLY)
     message(STATUS "PA_CORE_ONLY: building only the GUI-free core")
+    if(PA_STREAM_HISTORY_FFMPEG)
+        message(WARNING "PA_STREAM_HISTORY_FFMPEG has no effect when PA_CORE_ONLY=ON (GUI-free core build).")
+    endif()
     set(CMAKE_AUTOMOC OFF)
     set(CMAKE_AUTORCC OFF)
     set(CMAKE_AUTOUIC OFF)
@@ -342,6 +351,35 @@ if (WIN32)
         MAP_IMPORTED_CONFIG_MINSIZEREL      RELEASE
     )
 
+    if (PA_STREAM_HISTORY_FFMPEG)
+        #  ffmpeg shared libraries for the in-memory stream history ring.
+        #  Provide the headers under 3rdParty/ffmpeg/ (the ffmpeg "include" tree:
+        #  3rdParty/ffmpeg/libavcodec/avcodec.h, 3rdParty/ffmpeg/libavformat/..., etc.)
+        #  and the import libraries + DLLs in 3rdPartyBinaries/
+        #  (avcodec.lib/.dll, avformat.lib/.dll, avutil.lib/.dll, swscale.lib/.dll,
+        #  swresample.lib/.dll - e.g. from a gyan.dev shared build).
+        #  The DLLs placed in 3rdPartyBinaries/ are copied to the output directory
+        #  by the THIRD_PARTY_DLLS deploy step below. Requires ffmpeg >= 5.1.
+        foreach(FFMPEG_LIB IN ITEMS avcodec avformat avutil swscale swresample)
+            if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../3rdParty/ffmpeg/lib${FFMPEG_LIB}/${FFMPEG_LIB}.h")
+                message(FATAL_ERROR
+                    "PA_STREAM_HISTORY_FFMPEG=ON but 3rdParty/ffmpeg/lib${FFMPEG_LIB}/${FFMPEG_LIB}.h was not found. "
+                    "Install the ffmpeg headers into 3rdParty/ffmpeg/ and the import libraries into 3rdPartyBinaries/.")
+            endif()
+            if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/${FFMPEG_LIB}.lib")
+                message(FATAL_ERROR
+                    "PA_STREAM_HISTORY_FFMPEG=ON but 3rdPartyBinaries/${FFMPEG_LIB}.lib was not found. "
+                    "Install the ffmpeg import libraries + DLLs into 3rdPartyBinaries/.")
+            endif()
+            add_library(ffmpeg_${FFMPEG_LIB}_lib IMPORTED UNKNOWN)
+            set_target_properties(ffmpeg_${FFMPEG_LIB}_lib PROPERTIES
+                IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/${FFMPEG_LIB}.lib
+            )
+            target_link_libraries(SerialProgramsLib PRIVATE ffmpeg_${FFMPEG_LIB}_lib)
+        endforeach()
+        target_include_directories(SerialProgramsLib SYSTEM PRIVATE ../3rdParty/ffmpeg/)
+    endif()
+
     add_library(ONNX_lib IMPORTED UNKNOWN)
     target_include_directories(SerialProgramsLib SYSTEM PRIVATE ../3rdParty/ONNX/)
     set_target_properties(ONNX_lib PROPERTIES
@@ -567,6 +605,20 @@ else() # macOS and Linux
     target_link_directories(SerialProgramsLib PUBLIC ${OpenCV_LIBRARY_DIRS})
     target_link_libraries(SerialProgramsLib PUBLIC ${OpenCV_LINK_LIBRARIES})
 
+    if (PA_STREAM_HISTORY_FFMPEG)
+        #  ffmpeg for the in-memory stream history ring (requires ffmpeg >= 5.1).
+        #  Ubuntu:  sudo apt install libavcodec-dev libavformat-dev libavutil-dev
+        #           libswscale-dev libswresample-dev
+        #  macOS:   brew install ffmpeg
+        pkg_search_module(FFMPEG REQUIRED avcodec avformat avutil swscale swresample)
+        pkg_check_modules(FFMPEG_MIN_VERSION "libavcodec>=59")
+        if (NOT FFMPEG_MIN_VERSION_FOUND)
+            message(FATAL_ERROR "PA_STREAM_HISTORY_FFMPEG=ON requires ffmpeg >= 5.1 (libavcodec 59+).")
+        endif()
+        target_include_directories(SerialProgramsLib SYSTEM PRIVATE ${FFMPEG_INCLUDE_DIRS})
+        target_link_libraries(SerialProgramsLib PUBLIC ${FFMPEG_LINK_LIBRARIES})
+    endif()
+
     #we hope to use our own Tesseract build in future so we can rid that dependency
     #but right now to run on Linux and Mac we need to use external Tesseract library
     pkg_search_module(TESSERACT tesseract)
@@ -654,6 +706,12 @@ else() # macOS and Linux
     endif()
 endif()
 
+
+
+# Enable the ffmpeg-based stream history tracker (StreamHistoryTracker_Ring).
+if (PA_STREAM_HISTORY_FFMPEG)
+    target_compile_definitions(SerialProgramsLib PRIVATE PA_STREAM_HISTORY_FFMPEG)
+endif()
 
 
 #   Run-time CPU dispatching.
