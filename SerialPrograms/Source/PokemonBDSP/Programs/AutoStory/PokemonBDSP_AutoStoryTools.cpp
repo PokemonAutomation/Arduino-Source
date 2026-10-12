@@ -1,3 +1,4 @@
+#include "PokemonBDSP/Inference/PokemonBDSP_TransitionWatchers.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include <filesystem>
 /*  BDSP AutoStory Tools

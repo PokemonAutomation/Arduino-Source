@@ -7,6 +7,7 @@
  */
 
 
+#include "PokemonBDSP/Inference/PokemonBDSP_TransitionWatchers.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include <algorithm>
 #include <cmath>
