@@ -625,7 +625,7 @@ static bool go_to_canalave_gym(
 
 
 void checkpoint_0601(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             /*if (!test(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "test: transition not detected.", env.console);
@@ -639,7 +639,7 @@ void checkpoint_0601(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0602(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!enter_jubilife_pokemon_center(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "enter_jubilife_pokemon_center: transition not detected.", env.console);
@@ -650,7 +650,7 @@ void checkpoint_0602(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0603(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!heal_and_exit_jubilife_pokemon_center(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_and_exit_jubilife_pokemon_center: transition not detected.", env.console);
@@ -661,7 +661,7 @@ void checkpoint_0603(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0604(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!move_to_jubilife_west_exit(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "move_to_jubilife_west_exit: transition not detected.", env.console);
@@ -672,7 +672,7 @@ void checkpoint_0604(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0605(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_through_jubilife_west_exit(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_jubilife_west_exit: transition not detected.", env.console);
@@ -683,7 +683,7 @@ void checkpoint_0605(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0606(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_through_route_218(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_route_218: transition not detected.", env.console);
@@ -694,7 +694,7 @@ void checkpoint_0606(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0607(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_through_building_route_218(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_building_route_218: transition not detected.", env.console);
@@ -705,7 +705,7 @@ void checkpoint_0607(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0608(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_to_clint_and_pokemon_center(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_clint_and_pokemon_center: transition not detected.", env.console);
@@ -716,7 +716,7 @@ void checkpoint_0608(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0609(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!heal_and_exit_canalave_pokemon_center(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_and_exit_canalave_pokemon_center: transition not detected.", env.console);
@@ -727,7 +727,7 @@ void checkpoint_0609(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0610(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_to_canalave_gym(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_canalave_gym: transition not detected.", env.console);
@@ -738,7 +738,7 @@ void checkpoint_0610(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void checkpoint_0611(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+    checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/){
             if (!go_to_canalave_gym(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_canalave_gym: transition not detected.", env.console);
