@@ -1018,8 +1018,13 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer_x64_FMA3.cpp
     Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer_x64_SSE.cpp
     Source/Kernels/AudioPipeline/Kernels_AudioPipeline.h
+    Source/Kernels/AudioPipeline/Kernels_AudioPipeline_RoundTrip_TestInfra.cpp
+    Source/Kernels/AudioPipeline/Kernels_AudioPipeline_RoundTrip_TestInfra.h
+    Source/Kernels/AudioPipeline/Kernels_AudioPipeline_Tests.cpp
     Source/Kernels/AudioPipeline/Kernels_ChannelMixer.cpp
     Source/Kernels/AudioPipeline/Kernels_ChannelMixer.h
+    Source/Kernels/AudioPipeline/Kernels_ChannelMixer_TestInfra.cpp
+    Source/Kernels/AudioPipeline/Kernels_ChannelMixer_TestInfra.h
     Source/Kernels/AudioPipeline/Kernels_RawAudio2WorkingAudio.cpp
     Source/Kernels/AudioPipeline/Kernels_RawAudio2WorkingAudio.h
     Source/Kernels/AudioPipeline/Kernels_WorkingAudio2RawAudio.cpp

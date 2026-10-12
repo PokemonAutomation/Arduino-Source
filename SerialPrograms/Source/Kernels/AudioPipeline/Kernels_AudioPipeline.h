@@ -8,6 +8,9 @@
 #define PokemonAutomation_Kernels_AudioPipeline_H
 
 namespace PokemonAutomation{
+
+class UnitTestDatabase;
+
 namespace Kernels{
 namespace AudioPipeline{
 
@@ -84,6 +87,11 @@ private:
     const size_t m_sample_rate;
 };
 
+
+
+
+
+void add_tests(UnitTestDatabase& database);
 
 
 
