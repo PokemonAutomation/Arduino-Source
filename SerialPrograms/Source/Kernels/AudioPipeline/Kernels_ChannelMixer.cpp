@@ -28,6 +28,7 @@ ChannelMixer::ChannelMixer(
     , m_out_channels(out_channels)
     , m_buffer_size(buffer_size)
     , m_weight_matrix(std::move(weight_matrix))
+    , m_buffer(out_channels * buffer_size)
 {}
 
 void ChannelMixer::add_listener(WorkingAudioStreamListener& listener){
