@@ -7,6 +7,7 @@
 #include "Kernels_Tests.h"
 #include "AudioChannelInterleave/Kernels_AudioChannelInterleave.h"
 #include "AudioChannelMixer/Kernels_AudioChannelMixer.h"
+#include "AudioPipeline/Kernels_AudioPipeline.h"
 #include "AudioStreamConverter/Kernels_AudioStreamConverter.h"
 #include "BinaryMatrix/Kernels_BinaryMatrix_Tests.h"
 #include "ImageFilters/Kernels_ImageFilter_Tests.h"
@@ -21,6 +22,7 @@ namespace Kernels{
 void add_tests(UnitTestDatabase& database){
     AudioChannelInterleave::add_tests(database);
     AudioChannelMixer::add_tests(database);
+    AudioPipeline::add_tests(database);
     AudioStreamConverter::add_tests(database);
     add_tests_BinaryMatrix(database);
     add_tests_ImageFilters(database);
