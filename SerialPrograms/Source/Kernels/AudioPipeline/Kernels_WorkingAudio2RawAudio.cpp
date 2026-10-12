@@ -86,6 +86,9 @@ void WorkingAudio2RawAudio::add_listener(RawAudioStreamListener& listener){
 void WorkingAudio2RawAudio::remove_listener(RawAudioStreamListener& listener){
     m_listeners.remove(listener);
 }
+void WorkingAudio2RawAudio::set_multiplier(float multiplier){
+    m_multiplier.store(multiplier, std::memory_order_release);
+}
 
 void WorkingAudio2RawAudio::push_samples(size_t samples, size_t stride, const float* data){
     //  Single-channel float pass-through.

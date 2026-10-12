@@ -28,7 +28,12 @@ ChannelMixer::ChannelMixer(
     , m_out_channels(out_channels)
     , m_buffer_size(buffer_size)
     , m_weight_matrix(std::move(weight_matrix))
-{}
+    , m_buffer(out_channels * buffer_size)
+{
+    if (m_weight_matrix.size() != in_channels * out_channels){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Weight matrix size doesn't match.");
+    }
+}
 
 void ChannelMixer::add_listener(WorkingAudioStreamListener& listener){
     if (sample_rate() != listener.sample_rate()){
