@@ -835,6 +835,22 @@ if (WIN32)
     )
 endif() # end WIN32
 
+if (WIN32 OR DPP_FOUND)
+    # Deploy the CA bundle beside the executable for DPP certificate verification.
+    if (WIN32)
+        set(DPP_CERT_DIR "${WIN_DEPLOY_DIR}")
+    else()
+        set(DPP_CERT_DIR "$<TARGET_FILE_DIR:SerialPrograms>")
+    endif()
+    add_custom_command(
+        TARGET SerialPrograms POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${REPO_ROOT_DIR}/3rdPartyBinaries/dpp-cacert.pem"
+            "${DPP_CERT_DIR}/dpp-cacert.pem"
+        VERBATIM
+    )
+endif()
+
 set_target_properties(SerialPrograms PROPERTIES QT_QML_IMPORT_DEPENDENCIES "QtMultimedia")
 
 if (QT_MAJOR GREATER_EQUAL 6)
