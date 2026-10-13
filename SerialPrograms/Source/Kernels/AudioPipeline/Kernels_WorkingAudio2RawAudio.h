@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_Kernels_AudioPipeline_WorkingAudio2RawAudio_H
 #define PokemonAutomation_Kernels_AudioPipeline_WorkingAudio2RawAudio_H
 
+#include <atomic>
 #include <functional>
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Containers/AlignedVector.h"

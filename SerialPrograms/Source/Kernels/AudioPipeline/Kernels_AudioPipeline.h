@@ -24,6 +24,8 @@ enum class SampleFormat{
 
 class RawAudioStreamListener{
 public:
+    virtual ~RawAudioStreamListener() = default;
+
     RawAudioStreamListener(
         SampleFormat sample_type,
         size_t sample_rate,
@@ -57,6 +59,8 @@ private:
 
 class WorkingAudioStreamListener{
 public:
+    virtual ~WorkingAudioStreamListener() = default;
+
     WorkingAudioStreamListener(
         size_t sample_rate,
         size_t channels

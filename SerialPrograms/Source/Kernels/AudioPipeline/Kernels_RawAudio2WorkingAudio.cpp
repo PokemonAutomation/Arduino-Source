@@ -16,6 +16,25 @@ namespace AudioPipeline{
 
 
 
+namespace{
+
+
+size_t sample_format_size(SampleFormat sample_type){
+    switch (sample_type){
+    case SampleFormat::UINT8:   return sizeof(uint8_t);
+    case SampleFormat::SINT16:  return sizeof(int16_t);
+    case SampleFormat::SINT32:  return sizeof(int32_t);
+    case SampleFormat::FLOAT32: return sizeof(float);
+    default:;
+    }
+    return 0;
+}
+
+
+}
+
+
+
 template <typename Type>
 void RawAudio2WorkingAudio::set_converter(){
     m_convert = [this](const void* data, size_t samples){
@@ -87,13 +106,14 @@ void RawAudio2WorkingAudio::push_samples(size_t frames, const void* data){
         return;
     }
 
+    const size_t sample_size = sample_format_size(sample_type());
     while (frames > 0){
         size_t block = std::min(frames, m_buffer_size);
 
         //  Convert to float. (if needed)
         const float* interleaved_floats;
         if (m_convert){
-            m_convert(data, block);
+            m_convert(data, block * channels());
             interleaved_floats = m_interleaved_floats.data();
         }else{
             interleaved_floats = (const float*)data;
@@ -118,6 +138,7 @@ void RawAudio2WorkingAudio::push_samples(size_t frames, const void* data){
         );
 
         frames -= block;
+        data = (const char*)data + block * channels() * sample_size;
     }
 }
 

@@ -20,7 +20,7 @@ template <typename Type>
 size_t WorkingAudio2RawAudio::set_converter(){
     m_convert = [this](const void* data, size_t samples){
         Kernels::AudioStreamConverter::convert_to<Type>(
-            m_interleaved_floats.data(), (Type*)m_interleaved_raw.data(), samples,
+            (const float*)data, (Type*)m_interleaved_raw.data(), samples,
             m_multiplier.load(std::memory_order_acquire)
         );
     };
@@ -86,6 +86,9 @@ void WorkingAudio2RawAudio::add_listener(RawAudioStreamListener& listener){
 void WorkingAudio2RawAudio::remove_listener(RawAudioStreamListener& listener){
     m_listeners.remove(listener);
 }
+void WorkingAudio2RawAudio::set_multiplier(float multiplier){
+    m_multiplier.store(multiplier, std::memory_order_release);
+}
 
 void WorkingAudio2RawAudio::push_samples(size_t samples, size_t stride, const float* data){
     //  Single-channel float pass-through.
@@ -116,7 +119,7 @@ void WorkingAudio2RawAudio::push_samples(size_t samples, size_t stride, const fl
         //  Convert to output type. (if needed)
         const void* interleaved_raw;
         if (m_convert){
-            m_convert(interleaved_floats, block);
+            m_convert(interleaved_floats, block * channels());
             interleaved_raw = m_interleaved_raw.data();
         }else{
             interleaved_raw = interleaved_floats;
@@ -128,6 +131,7 @@ void WorkingAudio2RawAudio::push_samples(size_t samples, size_t stride, const fl
         );
 
         samples -= block;
+        data += block * stride;
     }
 }
 
