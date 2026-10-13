@@ -11,6 +11,11 @@
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels_AudioResampler_Tests.h"
+#include "Kernels_AudioResampler_BlockKernel_Default.h"
+#ifdef PA_AutoDispatch_arm64_20_M1
+#include "Common/Cpp/CpuId/CpuId.h"
+#include "Kernels_AudioResampler_BlockKernel_ARM64_NEON.h"
+#endif
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -140,6 +145,76 @@ UnitTestResult run_resampler_stream(
 
 
 
+#ifdef PA_AutoDispatch_arm64_20_M1
+
+
+
+//
+//  Runs run_block8_tap2_ARM64_NEON on a real weight table and random
+//  input and compares every output sample to run_block8_Default.
+//
+class ResamplerBlockNEONTest : public UnitTest{
+public:
+    ResamplerBlockNEONTest(
+        size_t in_sample_rate, size_t out_sample_rate,
+        uint32_t taps, double beta
+    )
+        : UnitTest(
+            "Kernels::AudioResampler - BlockNEON(" +
+            std::to_string(in_sample_rate) + "->" + std::to_string(out_sample_rate) +
+            ", " + std::to_string(taps) + " taps, beta " + std::to_string((int)beta) + ")"
+        )
+        , m_in_rate(in_sample_rate)
+        , m_out_rate(out_sample_rate)
+        , m_taps(taps)
+        , m_beta(beta)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        size_t period = m_out_rate / std::gcd(m_in_rate, m_out_rate);
+        size_t taps_padded = m_taps + (m_taps & 1);
+        WeightTable table(m_in_rate, m_out_rate, m_taps, m_beta, period + 128, taps_padded);
+
+        const uint32_t* index = table.in_sample_index();
+        AlignedVector<float> input(index[period + 7] + taps_padded + 64);
+        std::mt19937 generator(42);
+        std::uniform_real_distribution<float> distribution(-1.f, 1.f);
+        for (auto& x : input){
+            x = distribution(generator);
+        }
+
+        //  Start mid-period so the block reads wrap past the period
+        //  boundary into the table's extension.
+        size_t out_index = period / 2;
+        float out_neon[8];
+        float out_ref[8];
+        run_block8_tap2_ARM64_NEON(table, 0, input.data(), out_index, out_neon);
+        run_block8_Default(table, 0, input.data(), out_index, out_ref);
+        for (size_t c = 0; c < 8; c++){
+            if (out_neon[c] != out_ref[c]){
+                return "Mismatch at output " + std::to_string(c) + ": " +
+                    std::to_string(out_neon[c]) + " != " + std::to_string(out_ref[c]) + ".";
+            }
+        }
+
+        return true;
+    }
+
+
+private:
+    const size_t m_in_rate;
+    const size_t m_out_rate;
+    const uint32_t m_taps;
+    const double m_beta;
+};
+
+
+
+
+#endif
+
+
+
 }
 
 
@@ -206,6 +281,25 @@ void add_tests(UnitTestDatabase& database){
             combo.samples, combo.push, combo.taps, combo.beta
         );
     }
+
+#ifdef PA_AutoDispatch_arm64_20_M1
+    if (CPU_CAPABILITY_CURRENT.OK_M1){
+        const struct{ size_t in_rate; size_t out_rate; uint32_t taps; double beta; } neons[] = {
+            { 44100, 44100, 16, 9.0 },
+            { 44100, 48000, 16, 9.0 },
+            { 48000, 44100, 16, 9.0 },
+            { 88200, 44100, 16, 9.0 },
+            { 44100, 22050, 16, 9.0 },
+            { 32000, 44100, 16, 5.0 },
+            { 44100, 44100, 8, 9.0 },
+            { 44100, 44100, 9, 9.0 },
+            { 8000, 44100, 7, 9.0 },
+        };
+        for (auto& combo : neons){
+            database.add<ResamplerBlockNEONTest>(combo.in_rate, combo.out_rate, combo.taps, combo.beta);
+        }
+    }
+#endif
 }
 
 

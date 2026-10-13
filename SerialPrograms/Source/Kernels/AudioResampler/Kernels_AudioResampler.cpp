@@ -14,6 +14,9 @@
 #ifdef PA_AutoDispatch_x64_08_Nehalem
 #include "Kernels_AudioResampler_BlockKernel_x64_SSE2.h"
 #endif
+#ifdef PA_AutoDispatch_arm64_20_M1
+#include "Kernels_AudioResampler_BlockKernel_ARM64_NEON.h"
+#endif
 #include "Kernels_AudioResampler.h"
 
 namespace PokemonAutomation{
@@ -76,6 +79,18 @@ AudioResampler::KernelInfo AudioResampler::kernel_info(
         return info;
     }
 #endif
+#ifdef PA_AutoDispatch_arm64_20_M1
+    if (CPU_CAPABILITY_CURRENT.OK_M1){
+        //  The NEON block8_tap2 kernel is correct for any tap count
+        //  (the weight table pads the odd tap row with zeros).
+        info.kind = KernelKind::ARM64_NEON;
+        info.block_size = 8;
+        info.need_last = 7;
+        info.need_os = taps & 1;
+        info.min_taps = taps + (taps & 1);
+        return info;
+    }
+#endif
     return info;
 }
 AudioResampler::AudioResampler(
@@ -128,6 +143,11 @@ AudioResampler::AudioResampler(
         break;
     case KernelKind::AVX512_Down2:
         m_kernel = &run_block128_down2_x64_AVX512;
+        break;
+#endif
+#ifdef PA_AutoDispatch_arm64_20_M1
+    case KernelKind::ARM64_NEON:
+        m_kernel = &run_block8_tap2_ARM64_NEON;
         break;
 #endif
     case KernelKind::Default:

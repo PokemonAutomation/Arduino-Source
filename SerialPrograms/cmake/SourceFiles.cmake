@@ -1029,6 +1029,7 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/AudioPipeline/Kernels_RawAudio2WorkingAudio.h
     Source/Kernels/AudioPipeline/Kernels_WorkingAudio2RawAudio.cpp
     Source/Kernels/AudioPipeline/Kernels_WorkingAudio2RawAudio.h
+    Source/Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_ARM64_NEON.h
     Source/Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_Default.h
     Source/Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_SSE2.h
     Source/Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_FMA3.h

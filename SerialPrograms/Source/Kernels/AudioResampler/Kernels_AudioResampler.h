@@ -96,6 +96,7 @@ private:
         AVX512_POC,
         AVX512_Up,
         AVX512_Down2,
+        ARM64_NEON,
     };
     struct KernelInfo{
         KernelKind kind;
