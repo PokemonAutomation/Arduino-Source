@@ -1033,6 +1033,11 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_SSE2.h
     Source/Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_FMA3.h
     Source/Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_AVX512.h
+    Source/Kernels/AudioResampler/Kernels_AudioResampler.cpp
+    Source/Kernels/AudioResampler/Kernels_AudioResampler.h
+    Source/Kernels/AudioResampler/Kernels_AudioResampler_Tests.cpp
+    Source/Kernels/AudioResampler/Kernels_AudioResampler_Tests.h
+    Source/Kernels/AudioResampler/Kernels_AudioResampler_x64_AVX512.cpp
     Source/Kernels/AudioResampler/Kernels_AudioResampler_WeightTable.cpp
     Source/Kernels/AudioResampler/Kernels_AudioResampler_WeightTable.h
     Source/Kernels/AudioStreamConversion/AudioStreamConversion.cpp

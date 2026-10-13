@@ -705,6 +705,7 @@ SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_AVX512.cpp
     Source/Kernels/AudioChannelInterleave/Kernels_AudioChannelInterleave_x64_AVX512.cpp
     Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer_x64_AVX512.cpp
+    Source/Kernels/AudioResampler/Kernels_AudioResampler_x64_AVX512.cpp
     Source/Kernels/AudioStreamConverter/Kernels_AudioStreamConverter_Kernels_x64_AVX512.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.cpp
     Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range_x64_AVX512.cpp
