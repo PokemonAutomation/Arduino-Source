@@ -104,7 +104,7 @@ jobs:
           sudo apt update
           sudo apt install ccache clang-tools libopencv-dev libsystemd-dev
 
-          sudo apt install ./3rdPartyBinaries/libdpp-10.1.5-linux-x64.deb
+          sudo apt install ./3rdPartyBinaries/libdpp-10.1.6-linux-x64.deb
 
       - name: Install dependencies (Mac)
         if: startsWith(inputs.os, 'mac')
@@ -118,9 +118,9 @@ jobs:
           brew trust PA/libdpp
           FORMULA_DIR="$(brew --repo PA/libdpp)/Formula"
           mkdir -p "$FORMULA_DIR"
-          cp 3rdPartyBinaries/libdpp@10.1.5.rb "$FORMULA_DIR/"
+          cp 3rdPartyBinaries/libdpp@10.1.6.rb "$FORMULA_DIR/"
 
-          echo "LIBDPP_KEG=$(brew --cellar)/libdpp@10.1.5" >> $GITHUB_ENV
+          echo "LIBDPP_KEG=$(brew --cellar)/libdpp@10.1.6" >> $GITHUB_ENV
           echo "LIBDPP_DEPS_HASH=$(brew list --versions libsodium openssl@3 opus | shasum | cut -c1-16)" >> $GITHUB_ENV
 
       # Homebrew has no prebuilt bottle for our pinned libdpp formula, so `brew install` compiles
@@ -133,18 +133,18 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ${{env.LIBDPP_KEG}}
-          key: libdpp-${{inputs.os}}-${{hashFiles('Arduino-Source/3rdPartyBinaries/libdpp@10.1.5.rb')}}-${{env.LIBDPP_DEPS_HASH}}
+          key: libdpp-${{inputs.os}}-${{hashFiles('Arduino-Source/3rdPartyBinaries/libdpp@10.1.6.rb')}}-${{env.LIBDPP_DEPS_HASH}}
 
       - name: Install libdpp (Mac)
         if: startsWith(inputs.os, 'mac')
         run: |
           if [[ "${{steps.libdpp-cache.outputs.cache-hit}}" == "true" ]]; then
-            brew link libdpp@10.1.5
+            brew link libdpp@10.1.6
           else
-            brew install libdpp@10.1.5
+            brew install libdpp@10.1.6
           fi
           # CMake quietly builds without Discord integration when it can't find DPP, so check here.
-          pkg-config --exact-version=10.1.5 dpp
+          pkg-config --exact-version=10.1.6 dpp
 
       # Ninja needs the MSVC build environment (cl and link on PATH, INCLUDE, LIB, ...), which the
       # Visual Studio generator set up by itself. Run vcvars64.bat from the newest Visual Studio,

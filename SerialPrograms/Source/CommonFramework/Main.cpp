@@ -7,6 +7,7 @@
 #include "Common/Cpp/Logging/GlobalLogger.h"
 #include "Common/Cpp/Logging/MultiOutputLogger.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
+#include "Common/Cpp/Filesystem/FileIO.h"
 #include "Common/Cpp/Concurrency/Qt6.9ThreadBugWorkaround.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/FireForgetDispatcher.h"
@@ -94,6 +95,49 @@ int run_program(int argc, char *argv[]){
     QApplication application(argc, argv);
 #endif
 
+#ifdef PA_DPP
+    // Configure OpenSSL before DPP or background tasks create a TLS context.
+    std::string dpp_cert_message;
+    bool dpp_cert_error = false;
+    {
+        const std::string cert_env = qgetenv("SSL_CERT_FILE").toStdString();
+        const bool use_bundled_cert = cert_env.empty();
+        const std::string cert_path = use_bundled_cert
+            ? (Filesystem::application_binary_directory() / Filesystem::Path("dpp-cacert.pem")).string_slash_normalized()
+            : cert_env;
+        FileIO cert_file;
+        if (!cert_file.open(Filesystem::Path(cert_path), FileMode::READ | FileMode::BINARY)){
+            const std::string error = std::error_code(errno, std::generic_category()).message();
+            dpp_cert_error = true;
+            dpp_cert_message = "DPP CA certificate bundle cannot be read: " + cert_path +
+                " (" + error + "). Discord bot connections may fail.";
+        }else{
+            if (use_bundled_cert){
+                dpp_cert_error = !qputenv("SSL_CERT_FILE", cert_path.c_str());
+#ifdef _WIN32
+                // OpenSSL uses the release CRT even when Qt uses the debug CRT.
+                // Set both environment copies so OpenSSL can find the bundle.
+                const HMODULE crt = LoadLibraryExW(L"ucrtbase.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+                ScopeExit unload_crt([crt]{
+                    if (crt){
+                        FreeLibrary(crt);
+                    }
+                });
+                using PutEnv = int (__cdecl *)(const char*, const char*);
+                const PutEnv openssl_putenv = crt
+                    ? reinterpret_cast<PutEnv>(GetProcAddress(crt, "_putenv_s"))
+                    : nullptr;
+                dpp_cert_error = dpp_cert_error ||
+                    !openssl_putenv || openssl_putenv("SSL_CERT_FILE", cert_path.c_str()) != 0;
+#endif
+            }
+            dpp_cert_message = dpp_cert_error
+                ? "Failed to set SSL_CERT_FILE for DPP: " + cert_path
+                : "DPP CA certificate bundle: " + cert_path;
+        }
+    }
+#endif
+
     {
         const std::string qml_import_path =
             (Filesystem::application_binary_directory() / Filesystem::Path("qml")).string_slash_normalized();
@@ -117,6 +161,9 @@ int run_program(int argc, char *argv[]){
     logger.log("Executable path: " + Filesystem::application_binary_directory().string_slash_normalized());
     logger.log("Program setting folder: " + SETTINGS_PATH());
     logger.log("Program resources folder: " + RESOURCE_PATH());
+#ifdef PA_DPP
+    logger.log(dpp_cert_message, dpp_cert_error ? COLOR_RED : Color());
+#endif
 
     qRegisterMetaType<size_t>("size_t");
     qRegisterMetaType<uint8_t>("uint8_t");
