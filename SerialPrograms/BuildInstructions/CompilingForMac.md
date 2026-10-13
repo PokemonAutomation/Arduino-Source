@@ -154,19 +154,19 @@ brew install opencv
 DPP is a library for Discord integration. If you need discord webhooks for notification you need to install it.
 You can do this step after [Part 3: Download Codebase](#part-3-download-codebase).
 
-However we are using an old version of DPP (for compatibility and stability) that's not available directly on Homebrew. But you can simply tap one:
+We pin DPP to version 10.1.6 for compatibility and stability. To install this exact version, create a local Homebrew tap:
 
 ```shell
 brew tap-new --no-git <yourname>/libdpp # change <yourname> to any desired name, e.g. "my"
 ```
 Copy the formula into the tap:
 ```shell
-cp <SOURCE_DIR_ROOT>/3rdPartyBinaries/libdpp@10.1.5.rb $(brew --prefix)/Library/Taps/<yourname>/homebrew-libdpp/Formula/ # change <SOURCE_DIR_ROOT> to where *Arduino-Source* located
+cp <SOURCE_DIR_ROOT>/3rdPartyBinaries/libdpp@10.1.6.rb $(brew --prefix)/Library/Taps/<yourname>/homebrew-libdpp/Formula/ # change <SOURCE_DIR_ROOT> to where *Arduino-Source* located
 ```
 And then install it with:
 ```shell
 brew unlink libdpp # if you have already install the official one
-brew install libdpp@10.1.5
+brew install libdpp@10.1.6
 ```
 
 ### Verify Clang Version

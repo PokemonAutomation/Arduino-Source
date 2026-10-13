@@ -1,8 +1,8 @@
-class LibdppAT1015 < Formula
+class LibdppAT1016 < Formula
   desc "C++ Discord API Bot Library"
   homepage "https://github.com/brainboxdotcc/DPP"
-  url "https://github.com/brainboxdotcc/DPP/releases/download/v10.1.5/DPP-10.1.5.tar.gz"
-  sha256 "0446993c2bca5fc40882386804598b33652fc7ee466fa237f7846f2be0cb8a1e"
+  url "https://github.com/brainboxdotcc/DPP/releases/download/v10.1.6/DPP-10.1.6.tar.gz"
+  sha256 "65cf9e5fbc7b40e3fadaf742fa87da9cdede46651e35007c7b45cb765bfc17ba"
   license "Apache-2.0"
 
   depends_on "cmake" => :build
@@ -39,7 +39,7 @@ class LibdppAT1015 < Formula
         return 0;
       }
     EOS
-    system ENV.cxx, "-std=c++17", "-L#{lib}", "-I#{include}", "test.cpp", "-o", "test", "-ldpp"
+    system ENV.cxx, "-std=c++20", "-L#{lib}", "-I#{include}", "test.cpp", "-o", "test", "-ldpp"
     assert_equal "Invalid token.", shell_output("./test").strip
   end
 end
