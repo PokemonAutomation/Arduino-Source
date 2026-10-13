@@ -101,9 +101,11 @@ WeightTable::WeightTable(
                 continue;
             }
 
-            x *= downsample_scale;
-
-            double arg = std::numbers::pi * x;
+            //  The sinc argument is in output-sample units (the ideal
+            //  anti-aliasing lowpass), so scale x. The Kaiser window is
+            //  defined over the tap radius in input-sample units, so it
+            //  is evaluated on the unscaled x.
+            double arg = std::numbers::pi * x * downsample_scale;
             double sinc = std::sin(arg) / arg;
 //            cout << "sinc = " << sinc << endl;
 
