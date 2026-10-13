@@ -131,6 +131,7 @@ void WorkingAudio2RawAudio::push_samples(size_t samples, size_t stride, const fl
         );
 
         samples -= block;
+        data += block * stride;
     }
 }
 
