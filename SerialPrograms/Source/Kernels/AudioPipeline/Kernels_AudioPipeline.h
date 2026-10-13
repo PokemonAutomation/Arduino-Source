@@ -7,6 +7,8 @@
 #ifndef PokemonAutomation_Kernels_AudioPipeline_H
 #define PokemonAutomation_Kernels_AudioPipeline_H
 
+#include <cstddef>
+
 namespace PokemonAutomation{
 
 class UnitTestDatabase;

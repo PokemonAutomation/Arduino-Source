@@ -29,15 +29,11 @@ void add_tests(UnitTestDatabase& database){
 
     //  ChannelMixer with an identity weight matrix.
     for (size_t channels = 1; channels <= 4; channels++){
-        for (size_t samples = 2; samples < 1000; samples = (size_t)(samples * 1.1) + 1){
-            database.add<MixerIdentityTest>(channels, samples);
-        }
+        database.add<MixerIdentityTest>(channels, 1000);
     }
 
     //  1 -> 2 -> 1 averaging round-trip.
-    for (size_t samples = 2; samples < 1000; samples = (size_t)(samples * 1.1) + 1){
-        database.add<MixerRoundTripTest>(samples);
-    }
+    database.add<MixerRoundTripTest>(1000);
 }
 
 

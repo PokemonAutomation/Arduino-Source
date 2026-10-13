@@ -96,8 +96,10 @@ UnitTestResult run_round_trip(SampleFormat sample_type, size_t channels, size_t 
 
     const size_t sample_rate = 44100;
 
-    RawAudio2WorkingAudio raw2working(sample_type, sample_rate, channels);
-    WorkingAudio2RawAudio working2raw(sample_type, sample_rate, channels, 1.0f);
+    //  Small buffer so the sample-size sweep hits multiple chunks.
+    const size_t buffer_size = 256;
+    RawAudio2WorkingAudio raw2working(sample_type, sample_rate, channels, buffer_size);
+    WorkingAudio2RawAudio working2raw(sample_type, sample_rate, channels, 1.0f, buffer_size);
     RecordingRawAudioListener<Type> output(sample_type, sample_rate, channels, samples * channels);
     raw2working.add_listener(working2raw);
     working2raw.add_listener(output);
