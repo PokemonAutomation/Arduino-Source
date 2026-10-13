@@ -87,8 +87,11 @@ public:
         , m_failed_tests(0)
     {}
 
-    //  Returns true if tests failed.
-    bool run();
+    //  Run all the unit tests.
+    //  If `augment_color_distortions` is true, also run each image test under different color
+    //  distortion augmentation to widen the test coverage, if there is corresponding
+    //  distortion data in the test folder.
+    bool run(bool augment_color_distortions);
 
 
 private:

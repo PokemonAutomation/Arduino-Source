@@ -9,6 +9,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/MemoryUtilization/MemoryUtilization.h"
 #include "Common/Cpp/Concurrency/ReverseLockGuard.h"
+#include "TestImageDistortionManager.h"
 #include "ParallelUnitTestRunner.h"
 
 //#include <iostream>
@@ -85,6 +86,19 @@ void UnitTestRunner::add_test(std::shared_ptr<const UnitTest> test){
     }
 
     m_cv.notify_all();
+}
+
+void UnitTestRunner::enable_test_image_distortions(const std::string& test_repo_path){
+    initialize_test_image_distortions(test_repo_path);
+    const TestImageDistortionManager& manager = *test_image_distortion_manager();
+
+    std::string labels;
+    for (size_t c = 0; c < manager.num_test_distortions(); c++){
+        labels += c == 0 ? "" : ", ";
+        labels += manager.test_distortion_label(c);
+    }
+    m_logger.log("Test image distortions enabled. Tests with labeled test images also run with: " + labels);
+    m_test_image_distortions = true;
 }
 
 void UnitTestRunner::run(){
@@ -184,49 +198,49 @@ void UnitTestRunner::dispatch_test(const std::string& name){
     {
         ReverseLockGuard<Mutex> lg(m_lock);
         node.task = m_thread_pool.dispatch_now_blocking([this, iter_current]{
-            const UnitTest& test = *iter_current->second.test;
-            UnitTestResult result;
-            try{
-                m_logger.log("Starting: " + test.name());
-                result = test.run(m_logger, *this);
-            }catch (Exception& e){
-                result = UnitTestResult(UnitTestResult::FAILED, e.to_str());
-            }catch (std::bad_alloc&){
-                result = UnitTestResult::OOM;
-            }catch (std::exception& e){
-                result = UnitTestResult(UnitTestResult::FAILED, e.what());
-            }catch (...){
-                result = UnitTestResult(UnitTestResult::FAILED, "Unknown exception.");
+            const std::shared_ptr<const UnitTest>& test = iter_current->second.test;
+
+            //  The distortion labels to run the test with. "" runs it on its images as they are.
+            //  The runs happen one after another on this thread, so changing the test's label
+            //  between them is safe.
+            std::vector<std::string> labels{""};
+            if (m_test_image_distortions){
+                const TestImageDistortionManager& manager = *test_image_distortion_manager();
+                const size_t distortions = manager.num_applicable_distortions(test->image_paths());
+                for (size_t c = 0; c < distortions; c++){
+                    labels.emplace_back(manager.test_distortion_label(c));
+                }
             }
 
-            switch (result.result){
-            case UnitTestResult::NOT_RUN:
-            case UnitTestResult::PASSED:
-                m_logger.log("Passed: " + test.name(), COLOR_BLUE);
-                break;
-            case UnitTestResult::FAILED:
-                m_logger.log("Failed: " + test.name() + ", Message: " + result.message, COLOR_RED);
-                break;
-            case UnitTestResult::SKIPPED:
-                m_logger.log("Skipped: " + test.name(), COLOR_ORANGE);
-                break;
-            case UnitTestResult::OOM:
-                m_logger.log("Out-of-Memory: " + test.name(), COLOR_ORANGE);
-                break;
-            }
+            for (const std::string& label : labels){
+                //  Once cancelled, skip the remaining distortion runs. The test itself still
+                //  runs once, as it always did after being dispatched.
+                if (!label.empty() && cancelled()){
+                    break;
+                }
+                if (m_test_image_distortions){
+                    test->set_distortion_label(label);
+                }
+                UnitTestResult result = run_test(*test);
 
-            m_listeners.run_method(
-                &Listener::on_test_finished,
-                std::move(iter_current->second.test),
-                std::move(result)
-            );
+                //  Pass a copy of the test pointer, not a moved one: the test must stay alive for its
+                //  next run and for the resource accounting below.
+                m_listeners.run_method(
+                    &Listener::on_test_finished,
+                    test,
+                    std::move(result)
+                );
+            }
+            if (m_test_image_distortions){
+                test->set_distortion_label("");
+            }
 
             {
                 std::lock_guard<Mutex> lg(m_lock);
+                m_current_memory -= test->memory();
+                m_current_threads -= test->threads();
                 auto node = m_currently_running.extract(iter_current);
                 m_completed.insert(std::move(node));
-                m_current_memory -= test.memory();
-                m_current_threads -= test.threads();
             }
             m_cv.notify_all();
         });
@@ -236,6 +250,40 @@ void UnitTestRunner::dispatch_test(const std::string& name){
     m_test_by_per_thread_memory.erase(entry.iter_density);
     m_test_by_name.erase(iter);
 //    cout << "dispatch_test() - end" << endl;
+}
+
+UnitTestResult UnitTestRunner::run_test(const UnitTest& test){
+    const std::string name = test.name_with_distortion();
+    UnitTestResult result;
+    try{
+        m_logger.log("Starting: " + name);
+        result = test.run(m_logger, *this);
+    }catch (Exception& e){
+        result = UnitTestResult(UnitTestResult::FAILED, e.to_str());
+    }catch (std::bad_alloc&){
+        result = UnitTestResult::OOM;
+    }catch (std::exception& e){
+        result = UnitTestResult(UnitTestResult::FAILED, e.what());
+    }catch (...){
+        result = UnitTestResult(UnitTestResult::FAILED, "Unknown exception.");
+    }
+
+    switch (result.result){
+    case UnitTestResult::NOT_RUN:
+    case UnitTestResult::PASSED:
+        m_logger.log("Passed: " + name, COLOR_BLUE);
+        break;
+    case UnitTestResult::FAILED:
+        m_logger.log("Failed: " + name + ", Message: " + result.message, COLOR_RED);
+        break;
+    case UnitTestResult::SKIPPED:
+        m_logger.log("Skipped: " + name, COLOR_ORANGE);
+        break;
+    case UnitTestResult::OOM:
+        m_logger.log("Out-of-Memory: " + name, COLOR_ORANGE);
+        break;
+    }
+    return result;
 }
 
 

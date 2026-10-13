@@ -24,6 +24,10 @@ namespace PokemonAutomation{
 class UnitTestRunner final : public CancellableScope{
 public:
     struct Listener{
+        //  Called after each run of a test.
+        //  If test image distortions is enabled, a test can run several times,
+        //  once per distortion. During this call, `test->distortion_label()` is the
+        //  label of the run that finished, so use `test->name_with_distortion()` to name it.
         virtual void on_test_finished(
             std::shared_ptr<const UnitTest> test,
             UnitTestResult result
@@ -64,14 +68,26 @@ public:
         size_t max_threads = 0
     );
 
+    // Add a unit test instance.
     template <typename TestType, class... Args>
     void add_test(Args&&... args){
         add_test(std::make_shared<const TestType>(std::forward<Args>(args)...));
     }
+    // Add a unit test instance.
     void add_test(std::shared_ptr<const UnitTest> test);
+
+    //  Initialize the image distortion augmentation on each supported image unit test.
+    //
+    //  After called, it will load distortion resources from the test folder. During `run()`,
+    //  it will check if a test has color distortion augmentation available and run the
+    //  test with different distortions it after the basic unit test is run.
+    //
+    //  Throws if the calibration data can't be loaded.
+    void enable_test_image_distortions(const std::string& test_repo_path);
 
 
 public:
+    // Main function to run the all tests added by `add_test()`.
     void run();
 
     virtual bool cancel(std::exception_ptr reason) noexcept override;
@@ -80,10 +96,16 @@ public:
 private:
     void dispatch_test(const std::string& name);
 
+    //  Run `test` once with its current distortion label, log the result and return it.
+    //  Exceptions thrown by the test are turned into a failed (or out-of-memory) result.
+    UnitTestResult run_test(const UnitTest& test);
+
 
 private:
     Logger& m_logger;
     ThreadPool& m_thread_pool;
+
+    bool m_test_image_distortions = false;
 
     uint64_t m_max_memory = 0;
     size_t m_max_threads = 1;
