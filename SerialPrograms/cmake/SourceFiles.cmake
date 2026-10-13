@@ -1002,6 +1002,7 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/Algorithm/Kernels_Algorithm_DisjointSet.h
     Source/Kernels/AudioChannelInterleave/Kernels_AudioChannelInterleave.cpp
     Source/Kernels/AudioChannelInterleave/Kernels_AudioChannelInterleave.h
+    Source/Kernels/AudioChannelInterleave/Kernels_AudioChannelInterleave_ARM64_NEON.cpp
     Source/Kernels/AudioChannelInterleave/Kernels_AudioChannelInterleave_TestInfra.cpp
     Source/Kernels/AudioChannelInterleave/Kernels_AudioChannelInterleave_TestInfra.h
     Source/Kernels/AudioChannelInterleave/Kernels_AudioChannelInterleave_Default.cpp
