@@ -29,7 +29,7 @@ Test::Test(
     , m_in_channels(in_channels)
     , m_out_channels(out_channels)
     , m_samples(samples)
-    , m_convert0(convert1)
+    , m_convert0(convert0)
     , m_convert1(convert1)
 {}
 
