@@ -1010,6 +1010,7 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/AudioChannelInterleave/Kernels_AudioChannelInterleave_x64_AVX512.cpp
     Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer.cpp
     Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer.h
+    Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer_ARM64_NEON.cpp
     Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer_Default.cpp
     Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer_Default.h
     Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer_TestInfra.cpp
