@@ -87,7 +87,7 @@ jobs:
         if: startsWith(inputs.os, 'mac')
         run: |
           cd Arduino-Source
-          brew install opencv@4 onnxruntime
+          brew install opencv@4 onnxruntime pkg-config ffmpeg
 
           brew tap-new --no-git PA/libdpp
           brew trust PA/libdpp
@@ -95,7 +95,10 @@ jobs:
           mkdir -p "$FORMULA_DIR"
           cp 3rdPartyBinaries/libdpp@10.1.5.rb "$FORMULA_DIR/"
           brew install libdpp@10.1.5
-          brew install ffmpeg
+
+          # Fix the system pipeline database so `pkg_search_module` passes safely
+          echo "PKG_CONFIG_PATH=/opt/homebrew/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CMAKE_PREFIX_PATH=/opt/homebrew:$CMAKE_PREFIX_PATH" >> $GITHUB_ENV
 
       - name: Generate binaries
         run: |
