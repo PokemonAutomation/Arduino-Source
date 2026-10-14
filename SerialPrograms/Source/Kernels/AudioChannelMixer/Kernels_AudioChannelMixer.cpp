@@ -49,6 +49,15 @@ void add_tests_x64_AVX512(UnitTestDatabase& database);
 
 
 
+void mix_channels_ARM64_NEON(
+    c_ptr<float> matrix, size_t samples,
+    size_t out_channels, size_t out_stride, r_ptr<float> out,
+    size_t in_channels, size_t in_stride, c_ptr<float> in
+);
+void add_tests_ARM64_NEON(UnitTestDatabase& database);
+
+
+
 
 
 void mix_channels(
@@ -74,6 +83,12 @@ void mix_channels(
         return;
     }
 #endif
+#ifdef PA_AutoDispatch_arm64_20_M1
+    if (CPU_CAPABILITY_CURRENT.OK_M1){
+        mix_channels_ARM64_NEON(matrix, samples, out_channels, out_stride, out, in_channels, in_stride, in);
+        return;
+    }
+#endif
 
     mix_channels_Default(matrix, samples, out_channels, out_stride, out, in_channels, in_stride, in);
     return;
@@ -96,6 +111,11 @@ void add_tests(UnitTestDatabase& database){
 #ifdef PA_AutoDispatch_x64_17_Skylake
     if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
         add_tests_x64_AVX512(database);
+    }
+#endif
+#ifdef PA_AutoDispatch_arm64_20_M1
+    if (CPU_CAPABILITY_CURRENT.OK_M1){
+        add_tests_ARM64_NEON(database);
     }
 #endif
 }
