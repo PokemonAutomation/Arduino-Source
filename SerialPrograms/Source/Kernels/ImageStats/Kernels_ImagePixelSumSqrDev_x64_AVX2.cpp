@@ -11,6 +11,8 @@
 #include "Kernels/Kernels_x64_AVX2.h"
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h"
 #include "Kernels_ImagePixelSumSqrDev.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "Kernels_ImagePixelSumSqrDev_TestInfra.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -171,6 +173,44 @@ void sum_sqr_deviation_x64_AVX2<SumSquareMode::ARBITRATE_ALPHAS>(
     const uint32_t* img, size_t img_bytes_per_line,
     uint32_t background
 );
+
+
+class Test_SumSqrDeviation_x64_AVX2 : public Test_SumSqrDeviation{
+public:
+    Test_SumSqrDeviation_x64_AVX2(
+        SumSquareMode mode,
+        size_t width, size_t height,
+        SumSqrDeviationConvert convert
+    )
+        : Test_SumSqrDeviation(
+            "x64_AVX2",
+            mode,
+            width, height,
+            convert
+        )
+    {}
+};
+void add_tests_sum_sqr_deviation_x64_AVX2(UnitTestDatabase& database){
+    auto add_all_modes = [&](size_t width, size_t height){
+        database.add<Test_SumSqrDeviation_x64_AVX2>(
+            SumSquareMode::REFERENCE_ALPHA, width, height,
+            (SumSqrDeviationConvert)sum_sqr_deviation_x64_AVX2<SumSquareMode::REFERENCE_ALPHA>
+        );
+        database.add<Test_SumSqrDeviation_x64_AVX2>(
+            SumSquareMode::USE_BACKGROUND, width, height,
+            (SumSqrDeviationConvert)sum_sqr_deviation_x64_AVX2<SumSquareMode::USE_BACKGROUND>
+        );
+        database.add<Test_SumSqrDeviation_x64_AVX2>(
+            SumSquareMode::ARBITRATE_ALPHAS, width, height,
+            (SumSqrDeviationConvert)sum_sqr_deviation_x64_AVX2<SumSquareMode::ARBITRATE_ALPHAS>
+        );
+    };
+    for (size_t width : kTestWidths){
+        add_all_modes(width, (width % 5) + 1);
+    }
+    add_all_modes(0, 0);
+    add_all_modes(64, 0);
+}
 
 
 

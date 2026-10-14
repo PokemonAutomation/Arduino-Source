@@ -1142,15 +1142,21 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr.h
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_arm64_NEON.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_Default.cpp
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_TestInfra.cpp
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_TestInfra.h
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX2.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX512.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev.h
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_Default.cpp
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_TestInfra.cpp
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_TestInfra.h
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX2.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX512.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_SSE41.cpp
+    Source/Kernels/ImageStats/Kernels_ImageStats_Tests.cpp
+    Source/Kernels/ImageStats/Kernels_ImageStats_Tests.h
     Source/Kernels/KaiserWindow/Kernels_KaiserWindow.cpp
     Source/Kernels/KaiserWindow/Kernels_KaiserWindow.h
     Source/Kernels/Kernels_Alignment.h

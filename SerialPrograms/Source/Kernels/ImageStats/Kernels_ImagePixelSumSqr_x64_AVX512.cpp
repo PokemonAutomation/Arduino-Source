@@ -10,6 +10,8 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Kernels_x64_AVX512.h"
 #include "Kernels_ImagePixelSumSqr.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "Kernels_ImagePixelSumSqr_TestInfra.h"
 
 #include <iostream>
 using std::cout;
@@ -155,6 +157,27 @@ void pixel_sum_sqr_x64_AVX512(
         image = (const uint32_t*)((const char*)image + image_bytes_per_row);
         alpha = (const uint32_t*)((const char*)alpha + alpha_bytes_per_row);
     }
+}
+
+
+class Test_PixelSumSqr_x64_AVX512 : public Test_PixelSumSqr{
+public:
+    Test_PixelSumSqr_x64_AVX512(
+        size_t width, size_t height
+    )
+        : Test_PixelSumSqr(
+            "x64_AVX512",
+            width, height,
+            pixel_sum_sqr_x64_AVX512
+        )
+    {}
+};
+void add_tests_pixel_sum_sqr_x64_AVX512(UnitTestDatabase& database){
+    for (size_t width : kTestWidths){
+        database.add<Test_PixelSumSqr_x64_AVX512>(width, (width % 5) + 1);
+    }
+    database.add<Test_PixelSumSqr_x64_AVX512>(0, 0);
+    database.add<Test_PixelSumSqr_x64_AVX512>(64, 0);
 }
 
 

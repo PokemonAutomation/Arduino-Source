@@ -11,6 +11,8 @@
 #include "Kernels/Kernels_x64_SSE41.h"
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h"
 #include "Kernels_ImagePixelSumSqr.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "Kernels_ImagePixelSumSqr_TestInfra.h"
 
 #include <iostream>
 using std::cout;
@@ -137,6 +139,27 @@ void pixel_sum_sqr_x64_SSE41(
         image = (const uint32_t*)((const char*)image + image_bytes_per_row);
         alpha = (const uint32_t*)((const char*)alpha + alpha_bytes_per_row);
     }
+}
+
+
+class Test_PixelSumSqr_x64_SSE41 : public Test_PixelSumSqr{
+public:
+    Test_PixelSumSqr_x64_SSE41(
+        size_t width, size_t height
+    )
+        : Test_PixelSumSqr(
+            "x64_SSE41",
+            width, height,
+            pixel_sum_sqr_x64_SSE41
+        )
+    {}
+};
+void add_tests_pixel_sum_sqr_x64_SSE41(UnitTestDatabase& database){
+    for (size_t width : kTestWidths){
+        database.add<Test_PixelSumSqr_x64_SSE41>(width, (width % 5) + 1);
+    }
+    database.add<Test_PixelSumSqr_x64_SSE41>(0, 0);
+    database.add<Test_PixelSumSqr_x64_SSE41>(64, 0);
 }
 
 
