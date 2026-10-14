@@ -10,6 +10,8 @@
 #include "Kernels_AbsFFT_BaseTransform_x86_SSE41.h"
 #include "Kernels_AbsFFT_TwiddleTable.tpp"
 #include "Kernels_AbsFFT_FullTransform.tpp"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "Kernels_AbsFFT_TestInfra.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -28,6 +30,28 @@ void fft_abs_x86_SSE41(int k, float* abs, float* real, const float* weights){
         fft_abs<Context_x86_SSE41, false>(table, k, abs, real, nullptr);
     }else{
         fft_abs<Context_x86_SSE41, true>(table, k, abs, real, weights);
+    }
+}
+
+
+
+void fft_abs_Default(int k, float* abs, float* real, const float* weights);
+
+class Test_x86_SSE41 : public Test{
+public:
+    Test_x86_SSE41(int k, bool use_weights)
+        : Test(
+            "x86_SSE41",
+            k, use_weights,
+            fft_abs_Default,
+            fft_abs_x86_SSE41
+        )
+    {}
+};
+void add_tests_x86_SSE41(UnitTestDatabase& database){
+    for (int k = 1; k <= 16; k++){
+        database.add<Test_x86_SSE41>(k, false);
+        database.add<Test_x86_SSE41>(k, true);
     }
 }
 

@@ -5,6 +5,7 @@
  */
 
 #include "Kernels_Tests.h"
+#include "AbsFFT/Kernels_AbsFFT.h"
 #include "AudioChannelInterleave/Kernels_AudioChannelInterleave.h"
 #include "AudioChannelMixer/Kernels_AudioChannelMixer.h"
 #include "AudioPipeline/Kernels_AudioPipeline.h"
@@ -22,6 +23,7 @@ namespace Kernels{
 
 
 void add_tests(UnitTestDatabase& database){
+    AbsFFT::add_tests(database);
     AudioChannelInterleave::add_tests(database);
     AudioChannelMixer::add_tests(database);
     AudioPipeline::add_tests(database);
