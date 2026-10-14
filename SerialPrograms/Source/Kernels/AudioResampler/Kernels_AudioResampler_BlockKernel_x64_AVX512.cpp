@@ -34,7 +34,7 @@ namespace{
 //    - 1 x misaligned 512-bit load
 //
 template <int input_loads>
-void run_block128_x64_AVX512(
+PA_FORCE_INLINE void run_block128_x64_AVX512(
     const WeightTable& table,
     size_t in_index, const float* in_samples,
     size_t out_index, float* out_samples
