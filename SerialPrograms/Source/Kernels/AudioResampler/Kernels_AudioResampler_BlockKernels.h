@@ -123,6 +123,42 @@ void run_block128_down2_x64_AVX512(
 
 
 
+//
+//  Dispatch descriptor for a block kernel.
+//
+//  `sample_block` is the number of consecutive output samples the kernel
+//  produces. `tap_block` is the number of weight table rows it may read.
+//  The implied overshoots at the caller are:
+//    - Input reads may extend `sample_block - 1` samples past the last
+//      window's start.
+//    - Weight reads may extend `tap_block - 1` rows past the tap count.
+//
+struct BlockKernel{
+    void (*fp)(
+        const WeightTable& table,
+        size_t in_index, const float* in_samples,
+        size_t out_index, float* out_samples
+    );
+    size_t sample_block;
+    size_t tap_block;
+};
+
+
+//
+//  Picks the fastest block kernel for the rate ratio and tap count on the
+//  current CPU. The returned kernel is valid for any out_index wrapped to
+//  the table period, provided the table was constructed with
+//  min_samples >= period + sample_block and
+//  min_taps >= taps + tap_block - 1.
+//
+BlockKernel get_block_kernel(
+    size_t in_sample_rate,
+    size_t out_sample_rate,
+    uint32_t taps
+);
+
+
+
 }
 }
 }
