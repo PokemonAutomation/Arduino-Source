@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Compiler.h"
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "Kernels_AudioResampler_BlockKernels.h"
 
