@@ -357,7 +357,9 @@ if (WIN32)
         #  3rdParty/ffmpeg/libavcodec/avcodec.h, 3rdParty/ffmpeg/libavformat/..., etc.)
         #  and the import libraries + DLLs in 3rdPartyBinaries/
         #  (avcodec.lib/.dll, avformat.lib/.dll, avutil.lib/.dll, swscale.lib/.dll,
-        #  swresample.lib/.dll - e.g. from a gyan.dev shared build).
+        #  swresample.lib/.dll - use an LGPL shared build; the project is
+        #  LGPL-only, so use e.g. the gyan.dev "...-lgpl-shared" release or
+        #  BtbN's "win64-lgpl-shared", not the GPL build).
         #  The DLLs placed in 3rdPartyBinaries/ are copied to the output directory
         #  by the THIRD_PARTY_DLLS deploy step below. Requires ffmpeg >= 5.1.
         foreach(FFMPEG_LIB IN ITEMS avcodec avformat avutil swscale swresample)

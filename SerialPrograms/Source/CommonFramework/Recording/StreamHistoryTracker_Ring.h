@@ -2,7 +2,8 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  Implement by keeping an in-memory ring of *encoded* H.264 video packets
+ *  Implement by keeping an in-memory ring of *encoded* video packets
+ *  (hardware H.264, with ffmpeg's built-in LGPL MPEG-4 as a fallback)
  *  and AAC audio packets. Nothing is written to storage until save() is
  *  called, at which point the ring is muxed into a single MP4/MKV file.
  *
