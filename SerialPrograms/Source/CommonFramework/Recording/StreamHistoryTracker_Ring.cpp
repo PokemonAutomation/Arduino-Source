@@ -19,6 +19,7 @@
 
 #include <cerrno>
 #include <cctype>
+#include <cstring>
 #include <deque>
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -27,6 +28,7 @@
 #include <libavutil/log.h>
 #include <libavutil/opt.h>
 #include <libavutil/rational.h>
+#include <libavutil/version.h>
 #include <libswresample/swresample.h>
 #include <libswscale/swscale.h>
 
@@ -84,6 +86,20 @@ std::string ffmpeg_error(int errnum){
     char buffer[AV_ERROR_MAX_STRING_SIZE] = {};
     av_strerror(errnum, buffer, sizeof(buffer));
     return buffer;
+}
+
+
+//  ffmpeg 8.0 (libavutil 61+) changed av_channel_layout_default() to return
+//  void and added av_channel_layout_check(); older releases return 0 on
+//  success. This helper initializes a layout and works against both.
+bool init_channel_layout(AVChannelLayout& layout, int channels){
+    av_channel_layout_uninit(&layout);
+#if LIBAVUTIL_VERSION_MAJOR >= 61
+    av_channel_layout_default(&layout, channels);
+    return av_channel_layout_check(&layout) > 0;
+#else
+    return av_channel_layout_default(&layout, channels) >= 0;
+#endif
 }
 
 
@@ -283,12 +299,13 @@ struct StreamHistoryTracker_Ring::Impl{
         actx->sample_rate = AUDIO_OUTPUT_RATE;
         actx->time_base = av_make_q(1, AUDIO_OUTPUT_RATE);
         actx->bit_rate = (audio_channels >= 2 ? 96000 : 64000);
-        // 1. Clear any existing configuration to prevent layout memory leaks
-        av_channel_layout_uninit(&actx->ch_layout);
-
-        // 2. Initialize the default layout (Returns void, cannot be used in a condition)
-        av_channel_layout_default(&actx->ch_layout, (int)audio_channels);
-        if (av_channel_layout_check(&actx->ch_layout) <= 0
+        //  The AAC stream configuration (AudioSpecificConfig) must land in the
+        //  container header: with this flag the encoder emits raw AAC frames +
+        //  extradata, which is what both the MP4 and MKV muxers need. Without
+        //  it the packets would be ADTS and mux_to_file() would fail to set up
+        //  the audio stream.
+        actx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+        if (!init_channel_layout(actx->ch_layout, (int)audio_channels)
             || avcodec_open2(actx, codec, nullptr) < 0
         ){
             logger.log("Stream history: Failed to open AAC encoder. Disabling audio.", COLOR_RED);
@@ -297,7 +314,9 @@ struct StreamHistoryTracker_Ring::Impl{
             have_audio = false;
             return;
         }
-        av_channel_layout_default(&audio_layout, (int)audio_channels);
+        //  The resampler and encoded frames use the same layout as the encoder
+        //  (which just opened successfully with this channel count).
+        init_channel_layout(audio_layout, (int)audio_channels);
         logger.log(
             "Stream history: audio = AAC " + std::to_string(audio_channels) + "ch @ 48 kHz ("
             + std::to_string(actx->bit_rate / 1000) + " kbps)."
@@ -333,13 +352,14 @@ struct StreamHistoryTracker_Ring::Impl{
             ctx->max_b_frames = 0;
             ctx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 
-            // Prefer NV12; otherwise take the first format the encoder supports.
-            AVPixelFormat preferred = AV_PIX_FMT_NONE;
-
-            // 1. Use the new API to retrieve the list of supported pixel formats
-            const enum AVPixelFormat *pix_fmts = nullptr;
-            int ret = avcodec_get_supported_config(ctx, codec, AV_CODEC_CONFIG_PIX_FORMAT, 0, (const void**)&pix_fmts, nullptr);
             //  Prefer NV12; otherwise take the first format the encoder supports.
+#if LIBAVCODEC_VERSION_MAJOR >= 61
+            //  ffmpeg 7.0+ removed AVCodec.pix_fmts; query the encoder instead.
+            //  (out_num_configs is optional; out_configs points at a
+            //  list terminated by AV_PIX_FMT_NONE, or is NULL when every
+            //  format is supported.)
+            const enum AVPixelFormat* pix_fmts = nullptr;
+            int ret = avcodec_get_supported_config(ctx, codec, AV_CODEC_CONFIG_PIX_FORMAT, 0, (const void**)&pix_fmts, nullptr);
             if (ret >= 0 && pix_fmts != nullptr){
                 AVPixelFormat preferred = AV_PIX_FMT_NONE;
                 for (int i = 0; pix_fmts[i] != AV_PIX_FMT_NONE; i++){
@@ -354,6 +374,22 @@ struct StreamHistoryTracker_Ring::Impl{
                 }
                 ctx->pix_fmt = preferred;
             }
+#else
+            if (codec->pix_fmts != nullptr){
+                AVPixelFormat preferred = AV_PIX_FMT_NONE;
+                for (int i = 0; codec->pix_fmts[i] != AV_PIX_FMT_NONE; i++){
+                    AVPixelFormat format = (AVPixelFormat)codec->pix_fmts[i];
+                    if (format == AV_PIX_FMT_NV12){
+                        preferred = AV_PIX_FMT_NV12;
+                        break;
+                    }
+                    if (preferred == AV_PIX_FMT_NONE){
+                        preferred = format;
+                    }
+                }
+                ctx->pix_fmt = preferred;
+            }
+#endif
             int err = avcodec_open2(ctx, codec, nullptr);
             if (err == 0){
                 vctx = ctx;
@@ -674,29 +710,34 @@ struct StreamHistoryTracker_Ring::Impl{
         //  1. Resample to 48 kHz (same channel count) and accumulate.
         if (swr == nullptr){
             AVChannelLayout in_layout = {};
-            // Set up the default channel layouts (these return void)
-            av_channel_layout_default(&in_layout, (int)audio_channels);
-            av_channel_layout_default(&audio_layout, (int)audio_channels);
-            if (av_channel_layout_check(&in_layout) <= 0
-                || av_channel_layout_check(&audio_layout) <= 0
+            if (!init_channel_layout(in_layout, (int)audio_channels)
+                || !init_channel_layout(audio_layout, (int)audio_channels)
             ){
                 logger.log("Stream history: Failed to set audio channel layout. Disabling audio.", COLOR_RED);
-                av_channel_layout_uninit(&in_layout);
-                av_channel_layout_uninit(&audio_layout);
                 have_audio = false;
                 return;
             }
+#if LIBSWRESAMPLE_VERSION_MAJOR >= 7
+            //  ffmpeg 8.0 (swresample 7+) allocates through a pointer to the
+            //  context and returns 0 on success; older releases return the
+            //  context directly.
             int ret = swr_alloc_set_opts2(
                 &swr,
                 &audio_layout, AV_SAMPLE_FMT_FLT, AUDIO_OUTPUT_RATE,
                 &in_layout,  AV_SAMPLE_FMT_FLT, audio_input_rate,
                 0, nullptr
             );
-
-            // Free local layout copies now that swr has copied them internally
             av_channel_layout_uninit(&in_layout);
-
             if (ret < 0 || swr == nullptr){
+#else
+            swr = swr_alloc_set_opts2(
+                &audio_layout, AV_SAMPLE_FMT_FLT, AUDIO_OUTPUT_RATE,
+                &in_layout,  AV_SAMPLE_FMT_FLT, audio_input_rate,
+                0, nullptr
+            );
+            av_channel_layout_uninit(&in_layout);
+            if (swr == nullptr){
+#endif
                 logger.log("Stream history: Failed to create audio resampler. Disabling audio.", COLOR_RED);
                 have_audio = false;
                 return;
@@ -730,8 +771,10 @@ struct StreamHistoryTracker_Ring::Impl{
             frame->sample_rate = AUDIO_OUTPUT_RATE;
             frame->nb_samples = AUDIO_FRAME_SAMPLES;
             int ret = av_channel_layout_copy(&frame->ch_layout, &audio_layout);
-            if (ret < 0) {
-                logger.log("Stream history: Failed to copy/allocate layout properties.", COLOR_RED);
+            if (ret < 0){
+                av_frame_free(&frame);
+                logger.log("Stream history: Failed to copy audio channel layout. Disabling audio.", COLOR_RED);
+                have_audio = false;
                 return;
             }
             if (av_frame_get_buffer(frame, 0) < 0){
@@ -817,6 +860,15 @@ struct StreamHistoryTracker_Ring::Impl{
         }
         const char* muxer = (extension == "mkv") ? "matroska" : "mp4";
 
+        //  For MP4, put the moov atom (the file index) at the front so the
+        //  file can start playing and seeking immediately instead of waiting
+        //  for the reader to scan the whole file. The muxer does one fast
+        //  rewrite pass at av_write_trailer() time; fine for local files.
+        AVDictionary* muxer_options = nullptr;
+        if (extension != "mkv"){
+            av_dict_set(&muxer_options, "movflags", "+faststart", 0);
+        }
+
         AVFormatContext* format = nullptr;
         if (avformat_alloc_output_context2(&format, nullptr, muxer, filename.c_str()) < 0
             || format == nullptr
@@ -852,11 +904,13 @@ struct StreamHistoryTracker_Ring::Impl{
             audio_stream->time_base = av_make_q(1, AUDIO_OUTPUT_RATE);
         }
 
-        if (avformat_write_header(format, nullptr) < 0){
+        if (avformat_write_header(format, &muxer_options) < 0){
             logger.log("Stream history: Failed to write file header for '" + filename + "'.", COLOR_RED);
+            av_dict_free(&muxer_options);
             avformat_free_context(format);
             return false;
         }
+        av_dict_free(&muxer_options);
 
         bool ok = true;
         AVPacket* packet = av_packet_alloc();
