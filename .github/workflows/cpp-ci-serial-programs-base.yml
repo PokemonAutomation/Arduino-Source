@@ -77,10 +77,14 @@ jobs:
         run: |
           cd Arduino-Source
           sudo apt update
-          sudo apt upgrade 
-          sudo apt install clang-tools libopencv-dev libsystemd-dev
-          sudo apt install libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libswresample-dev
+          # 1. Install dependencies + explicit pkg-config (DO NOT USE sudo apt upgrade)
+          sudo apt install -y pkg-config clang-tools libopencv-dev libsystemd-dev
+          sudo apt install -y libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libswresample-dev
 
+          # 2. Inject Linux multiarch database paths so pkg_search_module passes (Crucial)
+          echo "PKG_CONFIG_PATH=/usr/lib/x64_linux_gnu/pkgconfig:/usr/share/pkgconfig:/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          
+          # 3. Complete your custom local dependency setup
           sudo apt install ./3rdPartyBinaries/libdpp-10.1.5-linux-x64.deb
 
       - name: Install dependencies (Mac)
@@ -98,7 +102,6 @@ jobs:
 
           # Fix the system pipeline database so `pkg_search_module` passes safely
           echo "PKG_CONFIG_PATH=/opt/homebrew/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
-          echo "CMAKE_PREFIX_PATH=/opt/homebrew:$CMAKE_PREFIX_PATH" >> $GITHUB_ENV
 
       - name: Generate binaries
         run: |
