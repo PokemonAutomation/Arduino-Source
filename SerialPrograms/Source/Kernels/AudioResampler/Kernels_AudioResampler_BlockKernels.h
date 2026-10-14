@@ -82,6 +82,39 @@ void run_block8_tap4_ARM64_NEON(
 
 
 //
+//  8 outputs. Fast byte-permute path (the NEON equivalent of the AVX512
+//  fast kernels): gathers the input samples with TBL byte permutes
+//  instead of transposing the tap rows.
+//  Upsampling only (in_rate <= out_rate): the index deltas between the
+//  first and last column of each 4-column group must fit in a 4-float
+//  window.
+//  Read overshoot: 3 input samples.
+//
+void run_block8_up_ARM64_NEON(
+    const WeightTable& table,
+    size_t in_index, const float* in_samples,
+    size_t out_index, float* out_samples
+);
+
+
+
+//
+//  8 outputs. Fast byte-permute path (the NEON equivalent of the AVX512
+//  fast kernels).
+//  Downsampling by no more than 2x (in_rate <= 2 x out_rate): the index
+//  deltas between the first and last column of each 4-column group must
+//  fit in an 8-float window.
+//  Read overshoot: 7 input samples.
+//
+void run_block8_down2_ARM64_NEON(
+    const WeightTable& table,
+    size_t in_index, const float* in_samples,
+    size_t out_index, float* out_samples
+);
+
+
+
+//
 //  16 outputs. Any rate ratio.
 //  Tap count must be a multiple of 4, or the table must be zero-padded
 //  with min_taps to taps + 3 rows.
