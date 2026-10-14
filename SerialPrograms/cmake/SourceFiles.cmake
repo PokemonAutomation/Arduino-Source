@@ -996,6 +996,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/AbsFFT/Kernels_AbsFFT_FullTransform.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_FullTransform.tpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Reductions.h
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_TestInfra.cpp
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_TestInfra.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.tpp
     Source/Kernels/Algorithm/Kernels_Algorithm_DisjointSet.cpp

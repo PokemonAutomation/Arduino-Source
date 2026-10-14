@@ -5,7 +5,9 @@
  */
 
 #include <stddef.h>
+#include "Common/Compiler.h"
 #include "Common/Cpp/CpuId/CpuId.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels_AbsFFT.h"
 
 namespace PokemonAutomation{
@@ -18,6 +20,10 @@ void fft_abs_Default(int k, float* abs, float* real, const float* weights);
 void fft_abs_x86_SSE41(int k, float* abs, float* real, const float* weights);
 void fft_abs_x86_AVX2(int k, float* abs, float* real, const float* weights);
 void fft_abs_x86_AVX512(int k, float* abs, float* real, const float* weights);
+
+void add_tests_x86_SSE41(UnitTestDatabase& database);
+void add_tests_x86_AVX2(UnitTestDatabase& database);
+void add_tests_x86_AVX512(UnitTestDatabase& database);
 
 
 void fft_abs(int k, float* abs, float* real, const float* weights){
@@ -50,6 +56,31 @@ void fft_abs(int k, float* abs, float* real, const float* weights){
     }
 #endif
     fft_abs_Default(k, abs, real, weights);
+}
+
+
+
+//
+//  Register the tests for the ISAs this binary can run. Each ISA checks its
+//  results against the Default path, which is the source of truth, so the
+//  Default path itself gets no tests.
+//
+void add_tests(UnitTestDatabase& database){
+#ifdef PA_AutoDispatch_x64_08_Nehalem
+    if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
+        add_tests_x86_SSE41(database);
+    }
+#endif
+#ifdef PA_AutoDispatch_x64_13_Haswell
+    if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
+        add_tests_x86_AVX2(database);
+    }
+#endif
+#ifdef PA_AutoDispatch_x64_17_Skylake
+    if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
+        add_tests_x86_AVX512(database);
+    }
+#endif
 }
 
 

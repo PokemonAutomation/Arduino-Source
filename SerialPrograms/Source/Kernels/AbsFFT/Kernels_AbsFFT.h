@@ -9,6 +9,9 @@
 
 
 namespace PokemonAutomation{
+
+class UnitTestDatabase;
+
 namespace Kernels{
 namespace AbsFFT{
 
@@ -25,6 +28,10 @@ namespace AbsFFT{
 //  This operation is destructive on "real" even though it is an input.
 //
 void fft_abs(int k, float* abs, float* real, const float* weights = nullptr);
+
+
+
+void add_tests(UnitTestDatabase& database);
 
 
 
