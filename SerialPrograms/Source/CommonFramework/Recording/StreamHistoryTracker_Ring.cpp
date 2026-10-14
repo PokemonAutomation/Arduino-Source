@@ -430,7 +430,7 @@ struct StreamHistoryTracker_Ring::Impl{
             return -1;
         }
         int err = avcodec_receive_packet(vctx, packet);
-        if (err == EAGAIN || err == AVERROR_EOF){
+        if (err == AVERROR(EAGAIN) || err == AVERROR_EOF){
             av_packet_free(&packet);
             return 0;
         }
@@ -602,7 +602,7 @@ struct StreamHistoryTracker_Ring::Impl{
         //  drain one packet and retry instead of giving up.
         while (true){
             int err = avcodec_send_frame(vctx, frame);
-            if (err == EAGAIN){
+            if (err == AVERROR(EAGAIN)){
                 if (drain_one_video_packet(vf->timestamp) <= 0){
                     av_frame_free(&frame);
                     return;
@@ -812,7 +812,7 @@ struct StreamHistoryTracker_Ring::Impl{
                     return;
                 }
                 err = avcodec_receive_packet(actx, packet);
-                if (err == EAGAIN){
+                if (err == AVERROR(EAGAIN)){
                     av_packet_free(&packet);
                     break;
                 }
