@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_ComputerPrograms_UnitTestRunner_H
 #define PokemonAutomation_ComputerPrograms_UnitTestRunner_H
 
+#include <atomic>
 #include "Common/Cpp/TestRunners/ParallelUnitTestRunner.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
@@ -74,6 +75,7 @@ private:
     TextEditOption FAILED_TESTS;
 
     ProgramEnvironment* m_env = nullptr;
+    std::atomic<uint64_t> m_total_failed;
 };
 
 

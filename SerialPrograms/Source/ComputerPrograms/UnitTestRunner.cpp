@@ -209,8 +209,13 @@ void UnitTestRunner::on_config_value_changed(void* object){
         for (const auto& test : UNIT_TESTS_ALL()){
             if (test.first.contains(name)){
                 count++;
-                TESTS_TO_RUN.append(test.first + "\n");
+                if (count <= 1000){
+                    TESTS_TO_RUN.append(test.first + "\n");
+                }
             }
+        }
+        if (count > 1000){
+            TESTS_TO_RUN.append("<" + tostr_u_commas(count - 1000) + " more...>\n");
         }
         TESTS_TO_RUN.set_label("<b>Tests to Run: " + tostr_u_commas(count) + "</b>");
     }
@@ -218,6 +223,7 @@ void UnitTestRunner::on_config_value_changed(void* object){
 
 
 void UnitTestRunner::program(ProgramEnvironment& env, CancellableScope& scope){
+    m_total_failed.store(0, std::memory_order_release);
     PASSED_TESTS.set("");
     FAILED_TESTS.set("");
 
@@ -284,21 +290,39 @@ void UnitTestRunner::on_test_finished(
     case UnitTestResult::NOT_RUN:
         stats.skipped++;
         break;
-    case UnitTestResult::PASSED:
-        stats.passed++;
-        PASSED_TESTS.append(test->name() + "\n");
+    case UnitTestResult::PASSED:{
+        uint64_t passed = stats.passed.fetch_add(1) + 1;
+        if (passed <= 1000){
+            PASSED_TESTS.append(test->name() + "\n");
+        }else if (passed == 1001){
+            PASSED_TESTS.append("<more not shown...>\n");
+        }
         break;
-    case UnitTestResult::FAILED:
+    }
+    case UnitTestResult::FAILED:{
+        uint64_t failed = m_total_failed.fetch_add(1) + 1;
         stats.failed++;
+        if (failed <= 1000){
+            FAILED_TESTS.append("FAILED: " + test->name() + "\n");
+        }else if (failed == 1001){
+            FAILED_TESTS.append("<more not shown...>\n");
+        }
         FAILED_TESTS.append("FAILED: " + test->name() + "\n");
         break;
+    }
     case UnitTestResult::SKIPPED:
         stats.skipped++;
         break;
-    case UnitTestResult::OOM:
+    case UnitTestResult::OOM:{
+        uint64_t failed = m_total_failed.fetch_add(1) + 1;
         stats.oom++;
-        FAILED_TESTS.append("OOM: " + test->name() + "\n");
+        if (failed <= 1000){
+            FAILED_TESTS.append("OOM: " + test->name() + "\n");
+        }else if (failed == 1001){
+            FAILED_TESTS.append("<more not shown...>\n");
+        }
         break;
+    }
     }
     m_env->update_stats();
 }

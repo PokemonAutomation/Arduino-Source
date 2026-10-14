@@ -126,9 +126,9 @@
 //#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h"
 // #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h"
 // #include "Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.h"
-//#include "Kernels/Kernels_x64_SSE41.h"
-//#include "Kernels/Kernels_x64_AVX2.h"
-//#include "Kernels/Kernels_x64_AVX512.h"
+#include "Kernels/Kernels_x64_SSE41.h"
+#include "Kernels/Kernels_x64_AVX2.h"
+#include "Kernels/Kernels_x64_AVX512.h"
 //#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h"
 //#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h"
 //#include "Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512.h"
@@ -148,10 +148,22 @@
 #include "CommonTools/OCR/OCR_TextMatcher.h"
 #include "Integrations/PybindSwitchController.h"
 #include "Common/Cpp/TestRunners/ParallelUnitTestRunner.h"
+#include "Kernels/KaiserWindow/Kernels_KaiserWindow.h"
+#include "Kernels/Kernels_Alignment.h"
+#include "Kernels/AudioResampler/Kernels_AudioResampler_WeightTable.h"
+#include "Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_Default.h"
+#include "Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_SSE2.h"
+#include "Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_FMA3.h"
+#include "Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_AVX512.h"
+#include "Kernels/AudioStreamConverter/Kernels_AudioStreamConverter.h"
+#include "Kernels/AudioChannelInterleave/Kernels_AudioChannelInterleave.h"
+#include "Kernels/AudioChannelMixer/Kernels_AudioChannelMixer.h"
+#include "Kernels/AudioPipeline/Kernels_AudioPipeline.h"
+
 
 //#include <opencv2/core.hpp>
-#include <onnxruntime_cxx_api.h>
-#include <random>
+//#include <onnxruntime_cxx_api.h>
+//#include <random>
 
 
 #include <iostream>
@@ -369,12 +381,6 @@ void stress_test(Logger& logger, CancellableScope& scope){
 std::mutex print_lock;
 
 
-
-
-
-
-
-
 class SampleTest : public UnitTest{
 public:
     SampleTest(std::string name)
@@ -388,6 +394,50 @@ public:
 
 
 };
+
+
+using namespace AudioResampler;
+
+#if 0
+class ResampleTile{
+    static constexpr size_t TAPS = 4;
+
+public:
+    ResampleTile()
+        : m_period_index(0)
+    {}
+
+    void push_1(){
+
+    }
+
+
+private:
+    size_t m_taps;
+    size_t m_period_index;
+    float m_buffer[8];
+
+};
+#endif
+
+
+
+PA_FORCE_INLINE void convert_s16_to_f32_block32_x64_AVX512(){
+
+}
+
+
+
+class AudioPipelineTree{
+public:
+
+
+private:
+
+};
+
+using namespace Kernels::AudioPipeline;
+
 
 
 
@@ -412,7 +462,267 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
     [[maybe_unused]] Logger& logger = env.logger();
 
+#if 0
+    int16_t in[] = {1, 2, 3, 4, 5, 6};
+    float out[6];
 
+    convert_from_s16_Default(2, 3, 3, out, in);
+
+    for (size_t c = 0; c < 6; c++){
+        cout << out[c] << ", ";
+    }
+#endif
+
+#if 0
+    float weights[] = {
+        1, 2, 3,
+        4, 5, 6
+    };
+
+    float out[20];
+    float in[30];
+
+    for (size_t c = 0; c < 30; c++){
+        in[c] = c;
+    }
+
+    convolve_channels_Default(
+        weights, 10,
+        2, 10, out,
+        3, 10, in
+    );
+
+    for (size_t r = 0; r < 2; r++){
+        for (size_t c = 0; c < 10; c++){
+            cout << out[c + 10*r] << ", ";
+        }
+        cout << endl;
+    }
+#endif
+
+
+#if 1
+    {
+        alignas(64) float s[8];
+        for (size_t c = 0; c < 8; c++){
+            s[c] = c;
+        }
+
+        __m128 r0, r1;
+
+        transposef32x4x2(
+            s + 0,
+            s + 2,
+            s + 4,
+            s + 6,
+            r0, r1
+        );
+
+
+        print(r0);
+        print(r1);
+        cout << "-------------" << endl;
+    }
+    {
+        alignas(64) float s[32];
+        for (size_t c = 0; c < 32; c++){
+            s[c] = c;
+        }
+
+        __m256 r0, r1, r2, r3;
+
+        transposef32x8x4(
+            s + 0,
+            s + 4,
+            s + 8,
+            s + 12,
+            s + 16,
+            s + 20,
+            s + 24,
+            s + 28,
+            r0, r1, r2, r3
+        );
+
+
+        print(r0);
+        print(r1);
+        print(r2);
+        print(r3);
+        cout << "-------------" << endl;
+    }
+    {
+        alignas(64) float s[128];
+        for (size_t c = 0; c < 128; c++){
+            s[c] = c;
+        }
+
+        __m512 r0, r1, r2, r3, r4, r5, r6, r7;
+
+        transposef32x16x8(
+            s + 8 *  0,
+            s + 8 *  1,
+            s + 8 *  2,
+            s + 8 *  3,
+            s + 8 *  4,
+            s + 8 *  5,
+            s + 8 *  6,
+            s + 8 *  7,
+            s + 8 *  8,
+            s + 8 *  9,
+            s + 8 * 10,
+            s + 8 * 11,
+            s + 8 * 12,
+            s + 8 * 13,
+            s + 8 * 14,
+            s + 8 * 15,
+            r0, r1, r2, r3, r4, r5, r6, r7
+        );
+
+
+        print(r0);
+        print(r1);
+        print(r2);
+        print(r3);
+        print(r4);
+        print(r5);
+        print(r6);
+        print(r7);
+        cout << "-------------" << endl;
+    }
+#endif
+
+#if 0
+
+    uint32_t taps = 16;
+
+    WeightTable table0(10, 16, taps, 9, 128, 8);
+    for (size_t c = 0; c < 8; c++){
+        cout << table0.in_sample_index()[c] << ", ";
+    }
+    cout << endl;
+    for (size_t tap_index = 0; tap_index < taps; tap_index++){
+        for (size_t c = 0; c < 8; c++){
+            cout << table0.tap_start(tap_index)[c] << ", ";
+        }
+        cout << endl;
+    }
+
+    WeightTable table1(16, 10, taps, 9, 128, 8);
+    for (size_t c = 0; c < 5; c++){
+        cout << table1.in_sample_index()[c] << ", ";
+    }
+    cout << endl;
+    for (size_t tap_index = 0; tap_index < taps; tap_index++){
+        for (size_t c = 0; c < 5; c++){
+            cout << table1.tap_start(tap_index)[c] << ", ";
+        }
+        cout << endl;
+    }
+
+
+    float in[128];
+    float out[128] = {};
+
+    for (size_t c = 0; c < 128; c++){
+        in[c] = c;
+    }
+
+#if 0
+    run_block8_Default(
+        table0,
+        0, in,
+        0, out
+    );
+    run_block8_Default(
+        table0,
+        0, in + 5,
+        0, out + 8
+    );
+    run_block8_Default(
+        table0,
+        0, in + 5*2,
+        0, out + 8*2
+    );
+    run_block8_Default(
+        table0,
+        0, in + 5*3,
+        0, out + 8*3
+    );
+#endif
+#if 0
+    run_block8_Default(
+        table1,
+        0, in,
+        0, out
+    );
+    run_block8_Default(
+        table1,
+        0, in + 8*1,
+        0, out + 5*1
+    );
+    run_block8_Default(
+        table1,
+        0, in + 8*2,
+        0, out + 5*2
+    );
+    run_block8_Default(
+        table1,
+        0, in + 8*3,
+        0, out + 5*3
+    );
+#endif
+#if 1
+    run_block8_tap2_x64_SSE2(
+        table0,
+        0, in,
+        0, out
+    );
+#endif
+#if 0
+    run_block16_tap4_x64_FMA3(
+        table0,
+        0, in,
+        0, out
+    );
+#endif
+#if 0
+    run_block128_x64_AVX512<1>(
+        table0,
+        0, in,
+        0, out
+    );
+#endif
+#if 0
+    run_block32_tap8_x64_AVX512(
+        table0,
+        0, in,
+        0, out
+    );
+#endif
+    for (size_t c = 0; c < 32; c++){
+        cout << out[c] << endl;
+    }
+    cout << "-----------" << endl;
+
+#if 0
+    run_block8_Default(
+        table1,
+        0, out,
+        0, in
+    );
+
+    for (size_t c = 0; c < 16; c++){
+        cout << in[c] << endl;
+    }
+#endif
+
+
+#endif
+
+
+
+
+#if 0
     UnitTestRunner runner(scope, logger, GlobalThreadPools::computation_normal());
 
     runner.add_test<SampleTest>("test0");
@@ -422,7 +732,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     runner.add_test<SampleTest>("test4");
 
     runner.run();
-
+#endif
 
 //    cout << random_u32(100, 115) << endl;
 
