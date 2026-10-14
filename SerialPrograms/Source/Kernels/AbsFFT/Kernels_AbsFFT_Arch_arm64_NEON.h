@@ -45,15 +45,15 @@ static PA_FORCE_INLINE void cmul_pp(
     vtype& Xr, vtype& Xi,
     vtype Wr, vtype Wi
 ){
-    vtype t0 = vmulq_f32(Xi, Wi);
+    vtype t0 = vnegq_f32(vmulq_f32(Xi, Wi));
     vtype t1 = vmulq_f32(Xr, Wi);
-    Xr = vsubq_f32(vmulq_f32(Xr, Wr), t0);
-    Xi = vaddq_f32(vmulq_f32(Xi, Wr), t1);
+    Xr = vmlaq_f32(t0, Xr, Wr);
+    Xi = vmlaq_f32(t1, Xi, Wr);
 }
 
 
 static PA_FORCE_INLINE vtype abs(vtype r, vtype i){
-    vtype r0 = vaddq_f32(vmulq_f32(r, r), vmulq_f32(i, i));
+    vtype r0 = vmlaq_f32(vmulq_f32(r, r), i, i);
     return vsqrtq_f32(r0);
 }
 static PA_FORCE_INLINE void swap_odd(vtype& L, vtype& H){
