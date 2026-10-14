@@ -41,19 +41,27 @@ static PA_FORCE_INLINE vtype vsub(vtype x, vtype y){
 static PA_FORCE_INLINE vtype vmul(vtype x, vtype y){
     return vmulq_f32(x, y);
 }
+//  Complex multiply of two packed (re/im) pairs:
+//      Xr*Wr - Xi*Wi  /  Xi*Wr + Xr*Wi
+//  Written as plain vector expressions (same structure as the other ISAs).
+//  Both GCC and Clang contract the mul/add pairs into FMA instructions
+//  (FMLA/FMLS), matching the _mm256_fmadd/_mm256_fmsub structure of the
+//  AVX2/AVX512 paths. Note that the explicit vmlaq_f32/vmlsq_f32 intrinsics
+//  are *not* reliable here: GCC 13 expands them back into mul + add.
 static PA_FORCE_INLINE void cmul_pp(
     vtype& Xr, vtype& Xi,
     vtype Wr, vtype Wi
 ){
-    vtype t0 = vnegq_f32(vmulq_f32(Xi, Wi));
-    vtype t1 = vmulq_f32(Xr, Wi);
-    Xr = vmlaq_f32(t0, Xr, Wr);
-    Xi = vmlaq_f32(t1, Xi, Wr);
+    vtype t0 = vmul(Xi, Wi);
+    vtype t1 = vmul(Xr, Wi);
+    Xr = vsub(vmul(Xr, Wr), t0);
+    Xi = vadd(vmul(Xi, Wr), t1);
 }
 
 
 static PA_FORCE_INLINE vtype abs(vtype r, vtype i){
-    vtype r0 = vmlaq_f32(vmulq_f32(r, r), i, i);
+    //  sqrt(r*r + i*i) - the mul/add contracts into an FMA.
+    vtype r0 = vadd(vmul(r, r), vmul(i, i));
     return vsqrtq_f32(r0);
 }
 static PA_FORCE_INLINE void swap_odd(vtype& L, vtype& H){
