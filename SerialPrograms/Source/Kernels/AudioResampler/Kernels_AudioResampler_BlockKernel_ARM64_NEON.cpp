@@ -24,7 +24,7 @@ namespace{
 
 //
 //  Opcount Ratios (per tap, per 4 outputs):
-//    - 1 x MUL + 1 x ADD
+//    - 1 x FMA
 //    - 1/2 x shuffle
 //    - 1 x aligned 128-bit load
 //    - 1 x misaligned 128-bit load
@@ -104,17 +104,17 @@ void run_block8_tap4_ARM64_NEON(
             b0, b1, b2, b3
         );
 
-        r0 = vaddq_f32(r0, vmulq_f32(a0, vld1q_f32(tap_weights + tap_stride*0 + 0)));
-        r1 = vaddq_f32(r1, vmulq_f32(b0, vld1q_f32(tap_weights + tap_stride*0 + 4)));
+        r0 = vfmaq_f32(r0, a0, vld1q_f32(tap_weights + tap_stride*0 + 0));
+        r1 = vfmaq_f32(r1, b0, vld1q_f32(tap_weights + tap_stride*0 + 4));
 
-        r0 = vaddq_f32(r0, vmulq_f32(a1, vld1q_f32(tap_weights + tap_stride*1 + 0)));
-        r1 = vaddq_f32(r1, vmulq_f32(b1, vld1q_f32(tap_weights + tap_stride*1 + 4)));
+        r0 = vfmaq_f32(r0, a1, vld1q_f32(tap_weights + tap_stride*1 + 0));
+        r1 = vfmaq_f32(r1, b1, vld1q_f32(tap_weights + tap_stride*1 + 4));
 
-        r0 = vaddq_f32(r0, vmulq_f32(a2, vld1q_f32(tap_weights + tap_stride*2 + 0)));
-        r1 = vaddq_f32(r1, vmulq_f32(b2, vld1q_f32(tap_weights + tap_stride*2 + 4)));
+        r0 = vfmaq_f32(r0, a2, vld1q_f32(tap_weights + tap_stride*2 + 0));
+        r1 = vfmaq_f32(r1, b2, vld1q_f32(tap_weights + tap_stride*2 + 4));
 
-        r0 = vaddq_f32(r0, vmulq_f32(a3, vld1q_f32(tap_weights + tap_stride*3 + 0)));
-        r1 = vaddq_f32(r1, vmulq_f32(b3, vld1q_f32(tap_weights + tap_stride*3 + 4)));
+        r0 = vfmaq_f32(r0, a3, vld1q_f32(tap_weights + tap_stride*3 + 0));
+        r1 = vfmaq_f32(r1, b3, vld1q_f32(tap_weights + tap_stride*3 + 4));
 
         tap_weights += tap_stride*4;
         in_samples += 4;
