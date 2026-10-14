@@ -235,110 +235,110 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         // return;
     }
 
-    if (AUTO_SAVING != AutoSave::NoAutoSave){
-        save_game(env, context, true);
-    }
-
-    const size_t max_num_sandwiches = EGG_SANDWICH.MAX_NUM_SANDWICHES;
-    m_num_sandwich_spent = 0;
-    m_num_kept = 0;
-    size_t consecutive_failures = 0;
-    while (true){
-        m_saved_after_fetched_eggs = false;
-        m_in_critical_to_save_stage = false;
-
-        // Do one iteration of the outmost loop of egg auto:
-        // - Start at Aera Zero flying spot
-        // - Go to front area of the observation station to start picnic
-        // - Make sandwich to gain egg power
-        // - Go to picnic basket to fetch eggs
-        // - Go on ride to hatch eggs
-
-        env.update_stats();
-        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-
-        // Recoverable loop to fetch eggs:
-        int num_party_eggs = -1;
-        while (true){
-            try{
-                num_party_eggs = fetch_eggs_full_routine(env, context);
-                break;
-            }catch (OperationFailedException& e){
-                if (handle_recoverable_error(
-                    env, context,
-                    NOTIFICATION_ERROR_RECOVERABLE,
-                    e,
-                    consecutive_failures
-                )){
-                    throw;
-                }
-            } // end try catch
-        } // end recoverable loop to fetch eggs:
-
-        // Recoverable loop to hatch eggs
-        bool game_already_resetted = false;
-        while (true){
-            try{
-                hatch_eggs_full_routine(env, context, num_party_eggs);
-                consecutive_failures = 0;
-                break;
-            }catch (ProgramFinishedException&){
-                env.update_stats();
-                GO_HOME_WHEN_DONE.run_end_of_program(context);
-                send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
-                return;
-            }catch (OperationFailedException& e){
-                if (handle_recoverable_error(
-                    env, context,
-                    NOTIFICATION_ERROR_RECOVERABLE,
-                    e, consecutive_failures
-                )){
-                    throw;
-                }
-                // After resetting the game, we don't know how many eggs in party
-                num_party_eggs = -1;
-
-                // If there is no save during egg hatching, then the game is reset to before fetching eggs
-                // So we need to break out of the recoverable hatch egg routine loop
-                if (m_saved_after_fetched_eggs == false){
-                    env.log("No save during egg hatching routine. After this reset, we should start the egg fetching routine now.");
-                    game_already_resetted = true;
-                    break;
-                }
-            } // end try catch
-        } // end recoverable loop to hatch eggs
-
-        // If the program can't save-reload, then we cannot reload spent sandwich ingredients
-        if (AUTO_SAVING == AutoSave::NoAutoSave){
-            m_num_sandwich_spent++;
-        }else if (m_saved_after_fetched_eggs){
-            env.log("Game already saved during egg hatching routine, so we cannot reset game to reset sandwich.");
-            // If we save after fetching eggs, then the save solidifies spent sandwich ingredients.
-            m_num_sandwich_spent++;
-
-            env.log("Saving game here so that we can reset sandwich later");
+    try{
+        if (AUTO_SAVING != AutoSave::NoAutoSave){
             save_game(env, context, true);
-        }else if (game_already_resetted == false){
-            // Nothing found in this iteration
-            env.log("Resetting game since nothing found, saving sandwich ingredients.");
-            reset_game(env.program_info(), env.console, context);
-        }else{ // game_already_resetted == true
-            env.log("Game reset back to egg fetching routine.");
         }
 
-        if (m_num_sandwich_spent >= max_num_sandwiches){
-            env.console.overlay().add_log("Max sandwich count: " + std::to_string(max_num_sandwiches), COLOR_PURPLE);
-            env.log("Max num sandwiches reached: " + std::to_string(max_num_sandwiches), COLOR_PURPLE);
-            break;
-        }
+        const size_t max_num_sandwiches = EGG_SANDWICH.MAX_NUM_SANDWICHES;
+        m_num_sandwich_spent = 0;
+        m_num_kept = 0;
+        size_t consecutive_failures = 0;
+        while (true){
+            m_saved_after_fetched_eggs = false;
+            m_in_critical_to_save_stage = false;
 
-        if (STOP_AFTER_CURRENT.should_stop()){
-            env.log("Round completed. Stopping program...");
-            env.console.overlay().add_log("Round complete", COLOR_WHITE);
-            throw ProgramFinishedException();
-        }
-        // end of one full picnic->hatch iteration
-    } // end the full egg autonomous loop
+            // Do one iteration of the outmost loop of egg auto:
+            // - Start at Aera Zero flying spot
+            // - Go to front area of the observation station to start picnic
+            // - Make sandwich to gain egg power
+            // - Go to picnic basket to fetch eggs
+            // - Go on ride to hatch eggs
+
+            env.update_stats();
+            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+
+            // Recoverable loop to fetch eggs:
+            int num_party_eggs = -1;
+            while (true){
+                try{
+                    num_party_eggs = fetch_eggs_full_routine(env, context);
+                    break;
+                }catch (OperationFailedException& e){
+                    if (handle_recoverable_error(
+                        env, context,
+                        NOTIFICATION_ERROR_RECOVERABLE,
+                        e,
+                        consecutive_failures
+                    )){
+                        throw;
+                    }
+                } // end try catch
+            } // end recoverable loop to fetch eggs:
+
+            // Recoverable loop to hatch eggs
+            bool game_already_resetted = false;
+            while (true){
+                try{
+                    hatch_eggs_full_routine(env, context, num_party_eggs);
+                    consecutive_failures = 0;
+                    break;
+                }catch (OperationFailedException& e){
+                    if (handle_recoverable_error(
+                        env, context,
+                        NOTIFICATION_ERROR_RECOVERABLE,
+                        e, consecutive_failures
+                    )){
+                        throw;
+                    }
+                    // After resetting the game, we don't know how many eggs in party
+                    num_party_eggs = -1;
+
+                    // If there is no save during egg hatching, then the game is reset to before fetching eggs
+                    // So we need to break out of the recoverable hatch egg routine loop
+                    if (m_saved_after_fetched_eggs == false){
+                        env.log("No save during egg hatching routine. After this reset, we should start the egg fetching routine now.");
+                        game_already_resetted = true;
+                        break;
+                    }
+                } // end try catch
+            } // end recoverable loop to hatch eggs
+
+            // If the program can't save-reload, then we cannot reload spent sandwich ingredients
+            if (AUTO_SAVING == AutoSave::NoAutoSave){
+                m_num_sandwich_spent++;
+            }else if (m_saved_after_fetched_eggs){
+                env.log("Game already saved during egg hatching routine, so we cannot reset game to reset sandwich.");
+                // If we save after fetching eggs, then the save solidifies spent sandwich ingredients.
+                m_num_sandwich_spent++;
+
+                env.log("Saving game here so that we can reset sandwich later");
+                save_game(env, context, true);
+            }else if (game_already_resetted == false){
+                // Nothing found in this iteration
+                env.log("Resetting game since nothing found, saving sandwich ingredients.");
+                reset_game(env.program_info(), env.console, context);
+            }else{ // game_already_resetted == true
+                env.log("Game reset back to egg fetching routine.");
+            }
+
+            if (m_num_sandwich_spent >= max_num_sandwiches){
+                env.console.overlay().add_log("Max sandwich count: " + std::to_string(max_num_sandwiches), COLOR_PURPLE);
+                env.log("Max num sandwiches reached: " + std::to_string(max_num_sandwiches), COLOR_PURPLE);
+                break;
+            }
+
+            if (STOP_AFTER_CURRENT.should_stop()){
+                env.log("Round completed. Stopping program...");
+                env.console.overlay().add_log("Round complete", COLOR_WHITE);
+                throw ProgramFinishedException();
+            }
+            // end of one full picnic->hatch iteration
+        } // end the full egg autonomous loop
+    }catch (ProgramFinishedException&){
+        // Stopped early (stop button, stop after current egg box, no box space, or max keepers).
+        // Fall through to the shared end-of-program handling below.
+    }
 
     env.update_stats();
     GO_HOME_WHEN_DONE.run_end_of_program(context);
