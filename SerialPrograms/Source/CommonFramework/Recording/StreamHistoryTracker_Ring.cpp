@@ -21,18 +21,33 @@
 #include <cctype>
 #include <cstring>
 #include <deque>
+//  ffmpeg's public API headers do not carry their own `extern "C"` guards,
+//  so from C++ every ffmpeg declaration would be C++ name-mangled and the
+//  symbols would not resolve against the ffmpeg shared libraries at link
+//  time. Wrapping the includes in extern "C" gives them C linkage (and is
+//  harmless on platforms whose ffmpeg headers do have their own guards).
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavutil/channel_layout.h>
-#include <libavutil/error.h>
+#include <libavutil/version.h>
+#if LIBAVUTIL_VERSION_MAJOR >= 61
+#include <libavutil/error.h>    //  ffmpeg 8.0 renamed err.h to error.h
+#else
+#include <libavutil/err.h>
+#endif
 #include <libavutil/log.h>
 #include <libavutil/opt.h>
 #include <libavutil/rational.h>
-#include <libavutil/version.h>
 #include <libswresample/swresample.h>
 #include <libswscale/swscale.h>
 }
+
+//  MSVC's <cerrno> does not define EAGAIN; ffmpeg's send/receive API reports
+//  "no data" as AVERROR(EAGAIN), which needs it. POSIX defines it as 11.
+#ifndef EAGAIN
+#define EAGAIN 11
+#endif
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
@@ -842,14 +857,16 @@ struct StreamHistoryTracker_Ring::Impl{
 
     bool mux_to_file(
         const std::string& filename,
-        const std::deque<std::shared_ptr<const VideoRingPacket>>& video,
-        size_t video_start,
-        const std::deque<std::shared_ptr<const AudioRingPacket>>& audio,
-        size_t audio_start,
+        const std::deque<std::shared_ptr<const VideoRingPacket>>& p_video,
+        size_t p_video_start,
+        const std::deque<std::shared_ptr<const AudioRingPacket>>& p_audio,
+        size_t p_audio_start,
         WallClock start_ts
     ){
-        bool have_video = (video_start < video.size()) && (vctx != nullptr);
-        bool have_audio = (audio_start < audio.size()) && (actx != nullptr);
+        //  Parameter names use the p_ prefix: the ring deques and start
+        //  indices have the same names as Impl members (C4458 under /W4).
+        bool have_video = (p_video_start < p_video.size()) && (vctx != nullptr);
+        bool have_audio_stream = (p_audio_start < p_audio.size()) && (actx != nullptr);
 
         //  MP4 unless the requested filename asks for Matroska.
         std::string extension;
@@ -893,7 +910,7 @@ struct StreamHistoryTracker_Ring::Impl{
             }
             video_stream->time_base = vctx->time_base;
         }
-        if (have_audio){
+        if (have_audio_stream){
             audio_stream = avformat_new_stream(format, nullptr);
             if (audio_stream == nullptr
                 || avcodec_parameters_from_context(audio_stream->codecpar, actx) < 0
@@ -920,8 +937,8 @@ struct StreamHistoryTracker_Ring::Impl{
             ok = false;
         }else{
             if (have_video){
-                for (size_t i = video_start; i < video.size() && ok; i++){
-                    const VideoRingPacket& vp = *video[i];
+                for (size_t i = p_video_start; i < p_video.size() && ok; i++){
+                    const VideoRingPacket& vp = *p_video[i];
                     int64_t us = std::chrono::duration_cast<std::chrono::microseconds>(
                         vp.timestamp - start_ts
                     ).count();
@@ -940,10 +957,10 @@ struct StreamHistoryTracker_Ring::Impl{
                     }
                 }
             }
-            if (have_audio){
-                int64_t base_samples = audio[audio_start]->first_sample;
-                for (size_t i = audio_start; i < audio.size() && ok; i++){
-                    const AudioRingPacket& ap = *audio[i];
+            if (have_audio_stream){
+                int64_t base_samples = p_audio[p_audio_start]->first_sample;
+                for (size_t i = p_audio_start; i < p_audio.size() && ok; i++){
+                    const AudioRingPacket& ap = *p_audio[i];
                     //  The muxer only reads the packet data.
                     packet->data = const_cast<uint8_t*>(ap.data.data());
                     packet->size = (int)ap.data.size();
@@ -976,15 +993,15 @@ struct StreamHistoryTracker_Ring::Impl{
         logger.log("Saving stream history (in-memory encoded ring)...", COLOR_BLUE);
 
         //  Fast snapshot: the deques only hold shared_ptr's (the packet bytes are
-        //  shared, not copied).
-        std::deque<std::shared_ptr<const VideoRingPacket>> video;
-        std::deque<std::shared_ptr<const AudioRingPacket>> audio;
+        //  shared, not copied). Local names avoid C4458 (/W4) member shadowing.
+        std::deque<std::shared_ptr<const VideoRingPacket>> video_snapshot;
+        std::deque<std::shared_ptr<const AudioRingPacket>> audio_snapshot;
         {
             WriteSpinLock lg(lock, PA_CURRENT_FUNCTION);
-            video = this->video;
-            audio = this->audio;
+            video_snapshot = this->video;
+            audio_snapshot = this->audio;
         }
-        if (video.empty() && audio.empty()){
+        if (video_snapshot.empty() && audio_snapshot.empty()){
             logger.log("Cannot save stream history: Nothing was recorded.", COLOR_RED);
             return false;
         }
@@ -993,33 +1010,33 @@ struct StreamHistoryTracker_Ring::Impl{
         //  point) so the file decodes from the beginning. This loses at most one
         //  keyframe interval (~2 s) from the head of the window; rewinding to
         //  the *last* keyframe instead would discard almost the entire window.
-        size_t video_start = 0;
-        for (size_t i = 0; i < video.size(); i++){
-            if (video[i]->flags & AV_PKT_FLAG_KEY){
-                video_start = i;
+        size_t video_start_index = 0;
+        for (size_t i = 0; i < video_snapshot.size(); i++){
+            if (video_snapshot[i]->flags & AV_PKT_FLAG_KEY){
+                video_start_index = i;
                 break;
             }
         }
 
         WallClock start_ts;
-        if (!video.empty()){
-            start_ts = video[video_start]->timestamp;
+        if (!video_snapshot.empty()){
+            start_ts = video_snapshot[video_start_index]->timestamp;
         }else{
-            start_ts = audio.front()->timestamp;
+            start_ts = audio_snapshot.front()->timestamp;
         }
 
         //  Trim the audio to the same start point.
         size_t audio_start = 0;
-        if (!video.empty() && !audio.empty()){
-            while (audio_start < audio.size() && audio[audio_start]->timestamp < start_ts){
+        if (!video_snapshot.empty() && !audio_snapshot.empty()){
+            while (audio_start < audio_snapshot.size() && audio_snapshot[audio_start]->timestamp < start_ts){
                 audio_start++;
             }
-            if (audio_start >= audio.size()){
-                audio.clear();
+            if (audio_start >= audio_snapshot.size()){
+                audio_snapshot.clear();
             }
         }
 
-        bool ok = mux_to_file(filename, video, video_start, audio, audio_start, start_ts);
+        bool ok = mux_to_file(filename, video_snapshot, video_start_index, audio_snapshot, audio_start, start_ts);
         logger.log(
             ok ? "Stream history saved to '" + filename + "'."
                : "Failed to save stream history to '" + filename + "'.",

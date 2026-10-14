@@ -630,13 +630,31 @@ else() # macOS and Linux
         #  Ubuntu:  sudo apt install libavcodec-dev libavformat-dev libavutil-dev
         #           libswscale-dev libswresample-dev
         #  macOS:   brew install ffmpeg
-        pkg_check_modules(FFMPEG REQUIRED avcodec avformat avutil swscale swresample)
-        pkg_check_modules(FFMPEG_MIN_VERSION "libavcodec>=59")
+        #  The pkg-config module names are not consistent across platforms:
+        #  Homebrew ships avcodec.pc, avformat.pc, ... while Debian/Ubuntu ship
+        #  libavcodec.pc, libavformat.pc, ... - so try both namings.
+        pkg_check_modules(FFMPEG_SHORT_NAMES avcodec avformat avutil swscale swresample)
+        pkg_check_modules(FFMPEG_LIB_NAMES libavcodec libavformat libavutil libswscale libswresample)
+        if (FFMPEG_SHORT_NAMES_FOUND)
+            set(FFMPEG_PC FFMPEG_SHORT_NAMES)
+            set(FFMPEG_VERSION_MODULE "avcodec>=59")
+        elseif (FFMPEG_LIB_NAMES_FOUND)
+            set(FFMPEG_PC FFMPEG_LIB_NAMES)
+            set(FFMPEG_VERSION_MODULE "libavcodec>=59")
+        else ()
+            message(FATAL_ERROR
+                "PA_STREAM_HISTORY_FFMPEG=ON but no ffmpeg development packages were found via pkg-config "
+                "(neither 'avcodec avformat avutil swscale swresample' nor 'libavcodec libavformat libavutil libswscale libswresample'). "
+                "Ubuntu: sudo apt install libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libswresample-dev. "
+                "macOS: brew install ffmpeg.")
+        endif()
+        pkg_check_modules(FFMPEG_MIN_VERSION ${FFMPEG_VERSION_MODULE})
         if (NOT FFMPEG_MIN_VERSION_FOUND)
             message(FATAL_ERROR "PA_STREAM_HISTORY_FFMPEG=ON requires ffmpeg >= 5.1 (libavcodec 59+).")
         endif()
-        target_include_directories(SerialProgramsLib SYSTEM PRIVATE ${FFMPEG_INCLUDE_DIRS})
-        target_link_libraries(SerialProgramsLib PRIVATE ${FFMPEG_LIBRARIES})
+        target_include_directories(SerialProgramsLib SYSTEM PRIVATE ${${FFMPEG_PC}_INCLUDE_DIRS})
+        target_link_directories(SerialProgramsLib PUBLIC ${${FFMPEG_PC}_LIBRARY_DIRS})
+        target_link_libraries(SerialProgramsLib PRIVATE ${${FFMPEG_PC}_LIBRARIES})
     endif()
 
     #we hope to use our own Tesseract build in future so we can rid that dependency
