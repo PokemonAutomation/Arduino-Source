@@ -131,10 +131,12 @@ PA_FORCE_INLINE float32x4_t gather_group_down2(
 PA_FORCE_INLINE float32x4_t gather_group_up(
     float32x4_t window, uint8x16_t idx
 ){
+    //  vtbl2_u8 takes the table pair as a uint8x8x2_t, same as GCC.
     uint8x16_t u8window = vreinterpretq_u8_f32(window);
+    uint8x8x2_t tab{ vget_low_u8(u8window), vget_high_u8(u8window) };
     return vreinterpretq_f32_u8(vcombine_u8(
-        vtbl2_u8(vget_low_u8(idx),   vget_low_u8(u8window), vget_high_u8(u8window)),
-        vtbl2_u8(vget_high_u8(idx),  vget_low_u8(u8window), vget_high_u8(u8window))));
+        vtbl2_u8(tab, vget_low_u8(idx)),
+        vtbl2_u8(tab, vget_high_u8(idx))));
 }
 
 
@@ -143,6 +145,8 @@ PA_FORCE_INLINE float32x4_t gather_group_down2(
 ){
     uint8x16_t u8tab0 = vreinterpretq_u8_f32(tab0);
     uint8x16_t u8tab1 = vreinterpretq_u8_f32(tab1);
+    uint8x8x2_t lo_tab{ vget_low_u8(u8tab0), vget_high_u8(u8tab0) };
+    uint8x8x2_t hi_tab{ vget_low_u8(u8tab1), vget_high_u8(u8tab1) };
     uint8x8_t sixteen = vdup_n_u8(16);
     uint8x8_t lo = vget_low_u8(idx);
     uint8x8_t hi = vget_high_u8(idx);
@@ -152,12 +156,12 @@ PA_FORCE_INLINE float32x4_t gather_group_down2(
     //  gather is exact in the lanes the vbsl keeps.
     uint8x8_t out_lo = vbsl_u8(
         vcge_u8(lo, sixteen),
-        vtbl2_u8(vsub_u8(lo, sixteen), vget_low_u8(u8tab1), vget_high_u8(u8tab1)),
-        vtbl2_u8(lo,                   vget_low_u8(u8tab0), vget_high_u8(u8tab0)));
+        vtbl2_u8(hi_tab, vsub_u8(lo, sixteen)),
+        vtbl2_u8(lo_tab, lo));
     uint8x8_t out_hi = vbsl_u8(
         vcge_u8(hi, sixteen),
-        vtbl2_u8(vsub_u8(hi, sixteen), vget_low_u8(u8tab1), vget_high_u8(u8tab1)),
-        vtbl2_u8(hi,                   vget_low_u8(u8tab0), vget_high_u8(u8tab0)));
+        vtbl2_u8(hi_tab, vsub_u8(hi, sixteen)),
+        vtbl2_u8(lo_tab, hi));
     return vreinterpretq_f32_u8(vcombine_u8(out_lo, out_hi));
 }
 
