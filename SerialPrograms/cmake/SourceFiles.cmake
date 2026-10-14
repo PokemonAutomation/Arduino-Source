@@ -1064,7 +1064,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h
-    Source/Kernels/BinaryImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x16_x64_AVX2.h
@@ -1096,20 +1095,15 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixCore.tpp
     Source/Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixCore.h
     Source/Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixCore.tpp
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.cpp
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.h
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_ARM64_NEON.cpp
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Default.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines_ARM64_NEON.h
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines_Default.h
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines_x64_AVX2.h
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines_x64_AVX512.h
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines_x64_SSE42.h
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX2.cpp
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.cpp
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.cpp
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Green_Default.cpp
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Misc.cpp
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Misc.h
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Misc_Default.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Tests.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Tests.h
     Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness.cpp

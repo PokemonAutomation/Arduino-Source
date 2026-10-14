@@ -1,4 +1,4 @@
-/*  Image Filters Basic (Default)
+/*  Image Filters Misc (Default)
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -10,7 +10,6 @@
 
 namespace PokemonAutomation{
 namespace Kernels{
-
 
 class ImageFilter_Green_Default{
 public:
@@ -38,7 +37,6 @@ public:
 
         ret &= (green >= red + m_rgb_gap) && (green >= blue + m_rgb_gap);
 
-
         m_count += ret;
         out[0] = ret ? pixel : m_replacement_color;
     }
@@ -52,7 +50,6 @@ private:
     size_t m_count;
 };
 
-
 size_t filter_green_Default(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
@@ -62,30 +59,6 @@ size_t filter_green_Default(
     filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
     return filter.count();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
 }
