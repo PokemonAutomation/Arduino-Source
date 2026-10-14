@@ -660,6 +660,7 @@ endif()
 
 if (ARCH_FLAGS_09_Nehalem)
 SET_SOURCE_FILES_PROPERTIES(
+    Source/Kernels/AudioChannelInterleave/Kernels_AudioChannelInterleave_x64_SSE.cpp
     Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer_x64_SSE.cpp
     Source/Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_SSE2.cpp
     Source/Kernels/AudioStreamConversion/AudioStreamConversion_Core_x86_SSE41.cpp
