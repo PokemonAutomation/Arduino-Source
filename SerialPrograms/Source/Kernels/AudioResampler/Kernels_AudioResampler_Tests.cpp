@@ -109,6 +109,7 @@ bool within_ulp_tolerance(float got, float want, int64_t& ulp_diff){
 void add_tests_x64_SSE2(UnitTestDatabase& database);
 void add_tests_x64_FMA3(UnitTestDatabase& database);
 void add_tests_x64_AVX512(UnitTestDatabase& database);
+void add_tests_ARM64_NEON(UnitTestDatabase& database);
 
 
 
@@ -211,6 +212,11 @@ void add_tests(UnitTestDatabase& database){
 #ifdef PA_AutoDispatch_x64_17_Skylake
     if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
         add_tests_x64_AVX512(database);
+    }
+#endif
+#ifdef PA_AutoDispatch_arm64_20_M1
+    if (CPU_CAPABILITY_CURRENT.OK_M1){
+        add_tests_ARM64_NEON(database);
     }
 #endif
 }
