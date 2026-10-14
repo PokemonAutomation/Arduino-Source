@@ -69,11 +69,11 @@ void run_block8_tap2_x64_SSE2(
 
 //
 //  8 outputs. Any rate ratio.
-//  Tap count must be a multiple of 2, or the table must be zero-padded
-//  with min_taps to taps + 1 rows.
-//  Read overshoot: 1 input sample.
+//  Tap count must be a multiple of 4, or the table must be zero-padded
+//  with min_taps to taps + 3 rows.
+//  Read overshoot: 3 input samples.
 //
-void run_block8_tap2_ARM64_NEON(
+void run_block8_tap4_ARM64_NEON(
     const WeightTable& table,
     size_t in_index, const float* in_samples,
     size_t out_index, float* out_samples
