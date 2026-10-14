@@ -666,7 +666,6 @@ SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/AudioStreamConversion/AudioStreamConversion_Core_x86_SSE41.cpp
     Source/Kernels/AudioStreamConverter/Kernels_AudioStreamConverter_Kernels_x64_SSE41.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_SSE41.cpp
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.cpp
     Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness_x64_SSE42.cpp
     Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range_x64_SSE42.cpp
     Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean_x64_SSE42.cpp
@@ -688,7 +687,6 @@ SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer_x64_FMA3.cpp
     Source/Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_FMA3.cpp
     Source/Kernels/AudioStreamConverter/Kernels_AudioStreamConverter_Kernels_x64_AVX2.cpp
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX2.cpp
     Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness_x64_AVX2.cpp
     Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range_x64_AVX2.cpp
     Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean_x64_AVX2.cpp
@@ -710,7 +708,6 @@ SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/AudioChannelMixer/Kernels_AudioChannelMixer_x64_AVX512.cpp
     Source/Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_AVX512.cpp
     Source/Kernels/AudioStreamConverter/Kernels_AudioStreamConverter_Kernels_x64_AVX512.cpp
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.cpp
     Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range_x64_AVX512.cpp
     Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean_x64_AVX512.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX512.cpp

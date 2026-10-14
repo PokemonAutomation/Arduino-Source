@@ -1,27 +1,20 @@
-/*  Image Filters Basic
+/*  Image Filters Misc
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/CpuId/CpuId.h"
-//#include "Kernels_ImageFilter_Basic_Routines.h"
-#include "Kernels_ImageFilter_Basic.h"
+#include "Kernels_ImageFilter_Misc.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
-
-
-
-
 
 size_t filter_green_Default(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
     uint32_t replacement, uint8_t rgb_gap
 );
-
 
 size_t filter_green(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
@@ -36,8 +29,6 @@ size_t filter_green(
         out, out_bytes_per_row, replacement, rgb_gap
     );
 }
-
-
 
 }
 }
