@@ -21,6 +21,7 @@
 #include <cctype>
 #include <cstring>
 #include <deque>
+extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavutil/channel_layout.h>
@@ -31,6 +32,7 @@
 #include <libavutil/version.h>
 #include <libswresample/swresample.h>
 #include <libswscale/swscale.h>
+}
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
