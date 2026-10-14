@@ -99,8 +99,9 @@ jobs:
           sudo apt install ccache clang-tools libopencv-dev libsystemd-dev
           sudo apt install libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libswresample-dev
 
-          # 2. Inject Linux multiarch database paths so pkg_search_module passes (Crucial)
-          echo "PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig:/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          # # Update this line to use a clean list of multiarch paths
+          # LINUX_PATHS="/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig:/usr/local/lib/pkgconfig"
+          # echo "PKG_CONFIG_PATH=$LINUX_PATHS:$PKG_CONFIG_PATH" >> $GITHUB_ENV
           
           # 3. Complete your custom local dependency setup
           sudo apt install ./3rdPartyBinaries/libdpp-10.1.5-linux-x64.deb
