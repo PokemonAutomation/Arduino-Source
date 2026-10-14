@@ -370,7 +370,7 @@ void ProgramSession::run_program(){
             send_program_finished_notification(
                 *env, m_instance->NOTIFICATION_PROGRAM_FINISH,
                 e.message(),
-                *e.screenshot()
+                e.screenshot_view()
             );
         }catch (InvalidConnectionStateException& e){
             logger().log("Program stopped due to connection issue.", COLOR_RED);
