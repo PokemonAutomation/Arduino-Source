@@ -91,18 +91,46 @@ PA_FORCE_INLINE uint8x16_t build_group_byte_index(
 
 
 //
-//  TBL: gather 4 floats by byte index from 2 x 128-bit table registers.
-//  The intrinsic name differs between compilers:
-//  GCC: vqtbl2q_u8(tab, idx); Clang/MSVC: vtbl2q_u8(idx, tab0, tab1).
+//  TBL gathers of 4 floats by byte index.
 //
-PA_FORCE_INLINE float32x4_t gather_group(
+//  up: all byte indices are below 16, so one 128-bit table register
+//  holds the whole window (TBL1Q).
+//
+//  down2: byte indices reach 31, so the 8-float window needs 2 x
+//  128-bit table registers. GCC's TBL intrinsic (vqtbl2q_u8) takes
+//  the pair directly; Clang has no 2-register-table intrinsic, so
+//  gather each 128-bit half with TBL1Q and select. Out-of-range TBL
+//  indices clamp to the last table byte, so the clamped index makes
+//  each half gather produce the right byte for every lane, and the
+//  vbsl picks the right half per byte.
+//
+PA_FORCE_INLINE float32x4_t gather_group_up(
+    float32x4_t tab, uint8x16_t idx
+){
+#if defined(__GNUC__) && !defined(__clang__)
+    return vreinterpretq_f32_u8(vqtbl1q_u8(vreinterpretq_u8_f32(tab), idx));
+#else
+    return vreinterpretq_f32_u8(vtbl1q_u8(idx, vreinterpretq_u8_f32(tab)));
+#endif
+}
+
+
+PA_FORCE_INLINE float32x4_t gather_group_down2(
     float32x4_t tab0, float32x4_t tab1, uint8x16_t idx
 ){
 #if defined(__GNUC__) && !defined(__clang__)
     uint8x16x2_t tab{ vreinterpretq_u8_f32(tab0), vreinterpretq_u8_f32(tab1) };
     return vreinterpretq_f32_u8(vqtbl2q_u8(tab, idx));
 #else
-    return vreinterpretq_f32_u8(vtbl2q_u8(idx, vreinterpretq_u8_f32(tab0), vreinterpretq_u8_f32(tab1)));
+    uint8x16_t u8tab0 = vreinterpretq_u8_f32(tab0);
+    uint8x16_t u8tab1 = vreinterpretq_u8_f32(tab1);
+    //  Bytes of idx >= 16 clamp to the last byte of u8tab0 in the
+    //  low gather, and bytes of idx < 16 saturate to 0 in the high
+    //  gather, so both gathers are wrong only where the vbsl discards
+    //  them.
+    uint8x16_t lo = vtbl1q_u8(idx, u8tab0);
+    uint8x16_t hi = vtbl1q_u8(vsubq_u8(idx, vdupq_n_u8(16)), u8tab1);
+    return vreinterpretq_f32_u8(vbslq_u8(vcgeq_u8(idx, vdupq_n_u8(16)), hi, lo));
 #endif
 }
 
@@ -159,23 +187,23 @@ PA_FORCE_INLINE void run_block32_permute_ARM64_NEON(
     do{
         float32x4_t i0, i1, i2, i3, i4, i5, i6, i7;
         if constexpr (input_loads == 1){
-            i0 = gather_group(vld1q_f32(in0 + tap), vld1q_f32(in0 + tap), idx0);
-            i1 = gather_group(vld1q_f32(in1 + tap), vld1q_f32(in1 + tap), idx1);
-            i2 = gather_group(vld1q_f32(in2 + tap), vld1q_f32(in2 + tap), idx2);
-            i3 = gather_group(vld1q_f32(in3 + tap), vld1q_f32(in3 + tap), idx3);
-            i4 = gather_group(vld1q_f32(in4 + tap), vld1q_f32(in4 + tap), idx4);
-            i5 = gather_group(vld1q_f32(in5 + tap), vld1q_f32(in5 + tap), idx5);
-            i6 = gather_group(vld1q_f32(in6 + tap), vld1q_f32(in6 + tap), idx6);
-            i7 = gather_group(vld1q_f32(in7 + tap), vld1q_f32(in7 + tap), idx7);
+            i0 = gather_group_up(vld1q_f32(in0 + tap), idx0);
+            i1 = gather_group_up(vld1q_f32(in1 + tap), idx1);
+            i2 = gather_group_up(vld1q_f32(in2 + tap), idx2);
+            i3 = gather_group_up(vld1q_f32(in3 + tap), idx3);
+            i4 = gather_group_up(vld1q_f32(in4 + tap), idx4);
+            i5 = gather_group_up(vld1q_f32(in5 + tap), idx5);
+            i6 = gather_group_up(vld1q_f32(in6 + tap), idx6);
+            i7 = gather_group_up(vld1q_f32(in7 + tap), idx7);
         }else{
-            i0 = gather_group(vld1q_f32(in0 + tap + 0), vld1q_f32(in0 + tap + 4), idx0);
-            i1 = gather_group(vld1q_f32(in1 + tap + 0), vld1q_f32(in1 + tap + 4), idx1);
-            i2 = gather_group(vld1q_f32(in2 + tap + 0), vld1q_f32(in2 + tap + 4), idx2);
-            i3 = gather_group(vld1q_f32(in3 + tap + 0), vld1q_f32(in3 + tap + 4), idx3);
-            i4 = gather_group(vld1q_f32(in4 + tap + 0), vld1q_f32(in4 + tap + 4), idx4);
-            i5 = gather_group(vld1q_f32(in5 + tap + 0), vld1q_f32(in5 + tap + 4), idx5);
-            i6 = gather_group(vld1q_f32(in6 + tap + 0), vld1q_f32(in6 + tap + 4), idx6);
-            i7 = gather_group(vld1q_f32(in7 + tap + 0), vld1q_f32(in7 + tap + 4), idx7);
+            i0 = gather_group_down2(vld1q_f32(in0 + tap + 0), vld1q_f32(in0 + tap + 4), idx0);
+            i1 = gather_group_down2(vld1q_f32(in1 + tap + 0), vld1q_f32(in1 + tap + 4), idx1);
+            i2 = gather_group_down2(vld1q_f32(in2 + tap + 0), vld1q_f32(in2 + tap + 4), idx2);
+            i3 = gather_group_down2(vld1q_f32(in3 + tap + 0), vld1q_f32(in3 + tap + 4), idx3);
+            i4 = gather_group_down2(vld1q_f32(in4 + tap + 0), vld1q_f32(in4 + tap + 4), idx4);
+            i5 = gather_group_down2(vld1q_f32(in5 + tap + 0), vld1q_f32(in5 + tap + 4), idx5);
+            i6 = gather_group_down2(vld1q_f32(in6 + tap + 0), vld1q_f32(in6 + tap + 4), idx6);
+            i7 = gather_group_down2(vld1q_f32(in7 + tap + 0), vld1q_f32(in7 + tap + 4), idx7);
         }
         r0 = vfmaq_f32(r0, i0, vld1q_f32(tap_weights + 4*0));
         r1 = vfmaq_f32(r1, i1, vld1q_f32(tap_weights + 4*1));
