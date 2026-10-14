@@ -74,11 +74,13 @@ option(PA_CORE_ONLY "Build only the GUI-free core (basic microcontroller functio
 # listing, so every file would be recompiled on every run.
 option(PA_ASSEMBLY_LISTINGS "Write an assembly listing of every source file to Assembly/ (MSVC and clang-cl only)" ON)
 
-# Keep stream history as an in-memory ring of encoded H.264 + AAC packets
-# (StreamHistoryTracker_Ring) and only write to storage when saving. Requires the
-# ffmpeg shared libraries, which must be provided per platform (see the
-# PA_STREAM_HISTORY_FFMPEG blocks in the WIN32 and POSIX sections below).
-option(PA_STREAM_HISTORY_FFMPEG "Stream history as in-memory H.264+AAC ring buffer (requires ffmpeg)" ON)
+# Keep stream history as an in-memory ring of encoded video (hardware H.264,
+# with the built-in MPEG-4 encoder as a fallback so no GPL dependency is
+# needed) + AAC packets (StreamHistoryTracker_Ring) and only write to storage
+# when saving. Requires the ffmpeg shared libraries, which must be provided
+# per platform (see the PA_STREAM_HISTORY_FFMPEG blocks in the WIN32 and
+# POSIX sections below).
+option(PA_STREAM_HISTORY_FFMPEG "Stream history as in-memory encoded video+AAC ring buffer (requires ffmpeg)" ON)
 
 if(PA_CORE_ONLY)
     message(STATUS "PA_CORE_ONLY: building only the GUI-free core")
