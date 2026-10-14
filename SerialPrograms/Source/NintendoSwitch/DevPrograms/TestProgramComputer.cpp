@@ -126,9 +126,9 @@
 //#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h"
 // #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h"
 // #include "Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.h"
-#include "Kernels/Kernels_x64_SSE41.h"
-#include "Kernels/Kernels_x64_AVX2.h"
-#include "Kernels/Kernels_x64_AVX512.h"
+//#include "Kernels/Kernels_x64_SSE41.h"
+//#include "Kernels/Kernels_x64_AVX2.h"
+//#include "Kernels/Kernels_x64_AVX512.h"
 //#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h"
 //#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h"
 //#include "Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512.h"
@@ -151,10 +151,10 @@
 #include "Kernels/KaiserWindow/Kernels_KaiserWindow.h"
 #include "Kernels/Kernels_Alignment.h"
 #include "Kernels/AudioResampler/Kernels_AudioResampler_WeightTable.h"
-#include "Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_Default.h"
-#include "Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_SSE2.h"
-#include "Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_FMA3.h"
-#include "Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_AVX512.h"
+//#include "Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_Default.h"
+//#include "Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_SSE2.h"
+//#include "Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_FMA3.h"
+//#include "Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_AVX512.h"
 #include "Kernels/AudioStreamConverter/Kernels_AudioStreamConverter.h"
 #include "Kernels/AudioChannelInterleave/Kernels_AudioChannelInterleave.h"
 #include "Kernels/AudioChannelMixer/Kernels_AudioChannelMixer.h"
@@ -422,10 +422,6 @@ private:
 
 
 
-PA_FORCE_INLINE void convert_s16_to_f32_block32_x64_AVX512(){
-
-}
-
 
 
 class AudioPipelineTree{
@@ -501,7 +497,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 #endif
 
 
-#if 1
+#if 0
     {
         alignas(64) float s[8];
         for (size_t c = 0; c < 8; c++){
