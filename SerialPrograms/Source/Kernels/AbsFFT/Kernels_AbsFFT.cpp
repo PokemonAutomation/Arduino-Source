@@ -20,10 +20,12 @@ void fft_abs_Default(int k, float* abs, float* real, const float* weights);
 void fft_abs_x86_SSE41(int k, float* abs, float* real, const float* weights);
 void fft_abs_x86_AVX2(int k, float* abs, float* real, const float* weights);
 void fft_abs_x86_AVX512(int k, float* abs, float* real, const float* weights);
+void fft_abs_arm64_NEON(int k, float* abs, float* real, const float* weights);
 
 void add_tests_x86_SSE41(UnitTestDatabase& database);
 void add_tests_x86_AVX2(UnitTestDatabase& database);
 void add_tests_x86_AVX512(UnitTestDatabase& database);
+void add_tests_arm64_NEON(UnitTestDatabase& database);
 
 
 void fft_abs(int k, float* abs, float* real, const float* weights){
@@ -55,6 +57,12 @@ void fft_abs(int k, float* abs, float* real, const float* weights){
         return;
     }
 #endif
+#ifdef PA_AutoDispatch_arm64_20_M1
+    if (CPU_CAPABILITY_CURRENT.OK_M1){
+        fft_abs_arm64_NEON(k, abs, real, weights);
+        return;
+    }
+#endif
     fft_abs_Default(k, abs, real, weights);
 }
 
@@ -79,6 +87,11 @@ void add_tests(UnitTestDatabase& database){
 #ifdef PA_AutoDispatch_x64_17_Skylake
     if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
         add_tests_x86_AVX512(database);
+    }
+#endif
+#ifdef PA_AutoDispatch_arm64_20_M1
+    if (CPU_CAPABILITY_CURRENT.OK_M1){
+        add_tests_arm64_NEON(database);
     }
 #endif
 }
