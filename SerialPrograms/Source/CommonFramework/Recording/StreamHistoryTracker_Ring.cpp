@@ -21,21 +21,12 @@
 #include <cctype>
 #include <cstring>
 #include <deque>
-//  ffmpeg's public API headers do not carry their own `extern "C"` guards,
-//  so from C++ every ffmpeg declaration would be C++ name-mangled and the
-//  symbols would not resolve against the ffmpeg shared libraries at link
-//  time. Wrapping the includes in extern "C" gives them C linkage (and is
-//  harmless on platforms whose ffmpeg headers do have their own guards).
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavutil/channel_layout.h>
 #include <libavutil/version.h>
-#if LIBAVUTIL_VERSION_MAJOR >= 61
-#include <libavutil/error.h>    //  ffmpeg 8.0 renamed err.h to error.h
-#else
-#include <libavutil/err.h>
-#endif
+#include <libavutil/error.h>
 #include <libavutil/log.h>
 #include <libavutil/opt.h>
 #include <libavutil/rational.h>
@@ -534,7 +525,7 @@ struct StreamHistoryTracker_Ring::Impl{
             src_width = rgb_image.width();
             src_height = rgb_image.height();
             src_planes[0] = (const uint8_t*)rgb_image.bits();
-            src_strides[0] = rgb_image.bytesPerLine();
+            src_strides[0] = (int)rgb_image.bytesPerLine();
         }
 
         if (vctx == nullptr){
