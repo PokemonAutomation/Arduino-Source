@@ -72,7 +72,7 @@ option(PA_CORE_ONLY "Build only the GUI-free core (basic microcontroller functio
 # (StreamHistoryTracker_Ring) and only write to storage when saving. Requires the
 # ffmpeg shared libraries, which must be provided per platform (see the
 # PA_STREAM_HISTORY_FFMPEG blocks in the WIN32 and POSIX sections below).
-option(PA_STREAM_HISTORY_FFMPEG "Stream history as in-memory H.264+AAC ring buffer (requires ffmpeg)" OFF)
+option(PA_STREAM_HISTORY_FFMPEG "Stream history as in-memory H.264+AAC ring buffer (requires ffmpeg)" ON)
 
 if(PA_CORE_ONLY)
     message(STATUS "PA_CORE_ONLY: building only the GUI-free core")
