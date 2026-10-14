@@ -41,30 +41,38 @@ static PA_FORCE_INLINE vtype vsub(vtype x, vtype y){
 static PA_FORCE_INLINE vtype vmul(vtype x, vtype y){
     return vmulq_f32(x, y);
 }
-//  Complex multiply of two packed (re/im) pairs. Mirrors the AVX2/AVX512
-//  structure:
-//      Xr = Xr*Wr - Xi*Wi   (x86: _mm256_fmsub_ps)
-//      Xi = Xi*Wr + Xr*Wi   (x86: _mm256_fmadd_ps)
-//  The vfmsq/vfmaq spellings (as opposed to vmlsq/vmlaq) expand to the
-//  __builtin_aarch64_fma* builtins, which both GCC and Clang keep as real
-//  FMLA/FMLS instructions; GCC 13 decomposes the vmlaq/vmlsq builtins back
-//  into mul + add, so the vf* spellings are the portable "guaranteed FMA"
-//  form. The operand order is (addend, factor, factor), so the sign of the
-//  first part is handled by a negate, exactly matching the x86 rounding.
+//  Complex multiply of two packed (re/im) pairs:
+//      Xr*Wr - Xi*Wi   /   Xi*Wr + Xr*Wi
+//  Fused with the vfmsq/vfmaq spellings (as opposed to vmlsq/vmlaq),
+//  which expand to the __builtin_aarch64_fma* builtins that both GCC and
+//  Clang keep as real FMLA/FMLS instructions; GCC 13 decomposes the
+//  vmlaq/vmlsq builtins back into mul + add.
+//  The accumulate form is used (first product pre-rounded, second
+//  product fused): it takes 4 instructions with no negation, which is
+//  also how the compiler naturally contracts the scalar Default path,
+//  so NEON stays bit-exact with it. (The x86 fmsub-shaped alternative,
+//  pre-rounded Xi*Wi with the fused Xr*Wr, needs a negate and differs
+//  from this by a ULP or so in edge cases.)
+//  t0/t1 are reused as the output registers; Xr/Xi are still the
+//  originals when the FMAs run.
 static PA_FORCE_INLINE void cmul_pp(
     vtype& Xr, vtype& Xi,
     vtype Wr, vtype Wi
 ){
-    vtype t0 = vmulq_f32(Xi, Wi);
-    vtype t1 = vmulq_f32(Xr, Wi);
-    Xr = vnegq_f32(vfmsq_f32(t0, Xr, Wr));
-    Xi = vfmaq_f32(t1, Xi, Wr);
+    vtype t0 = vmulq_f32(Xr, Wr);
+    vtype t1 = vmulq_f32(Xi, Wr);
+    t0 = vfmsq_f32(t0, Xi, Wi);
+    t1 = vfmaq_f32(t1, Xr, Wi);
+    Xr = t0;
+    Xi = t1;
 }
 
 
 static PA_FORCE_INLINE vtype abs(vtype r, vtype i){
     //  sqrt(r*r + i*i), with the mul/add contracted into an FMA
-    //  (x86: _mm256_fmadd_ps(r, r, i*i)).
+    //  (x86: _mm256_fmadd_ps(r, r, i*i); the two products play swapped
+    //  roles here, as in cmul_pp, so it can differ from x86 by a ULP
+    //  in edge cases).
     vtype r0 = vfmaq_f32(vmulq_f32(r, r), i, i);
     return vsqrtq_f32(r0);
 }
