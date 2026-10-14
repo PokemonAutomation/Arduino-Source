@@ -1042,6 +1042,7 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/AudioStreamConversion/AudioStreamConversion_Core_x86_SSE41.cpp
     Source/Kernels/AudioStreamConverter/Kernels_AudioStreamConverter.cpp
     Source/Kernels/AudioStreamConverter/Kernels_AudioStreamConverter.h
+    Source/Kernels/AudioStreamConverter/Kernels_AudioStreamConverter_Kernels_ARM64_NEON.cpp
     Source/Kernels/AudioStreamConverter/Kernels_AudioStreamConverter_Kernels_Default.cpp
     Source/Kernels/AudioStreamConverter/Kernels_AudioStreamConverter_Kernels_x64_SSE41.cpp
     Source/Kernels/AudioStreamConverter/Kernels_AudioStreamConverter_Kernels_x64_AVX2.cpp

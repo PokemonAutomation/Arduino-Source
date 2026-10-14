@@ -46,6 +46,14 @@ void add_tests_x64_AVX512(UnitTestDatabase& database);
 
 
 
+template <typename ExternalType>
+void convert_from_ARM64_NEON(r_ptr<float> native, c_ptr<ExternalType> ext, size_t samples);
+template <typename ExternalType>
+void convert_to_ARM64_NEON(c_ptr<float> native, r_ptr<ExternalType> ext, size_t samples, float multiplier);
+void add_tests_ARM64_NEON(UnitTestDatabase& database);
+
+
+
 
 
 template <typename ExternalType>
@@ -65,6 +73,12 @@ void convert_from(r_ptr<float> native, c_ptr<ExternalType> ext, size_t samples){
 #ifdef PA_AutoDispatch_x64_08_Nehalem
     if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
         convert_from_x64_SSE41(native, ext, samples);
+        return;
+    }
+#endif
+#ifdef PA_AutoDispatch_arm64_20_M1
+    if (CPU_CAPABILITY_CURRENT.OK_M1){
+        convert_from_ARM64_NEON(native, ext, samples);
         return;
     }
 #endif
@@ -88,6 +102,12 @@ void convert_to(c_ptr<float> native, r_ptr<ExternalType> ext, size_t samples, fl
 #ifdef PA_AutoDispatch_x64_08_Nehalem
     if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
         convert_to_x64_SSE41(native, ext, samples, multiplier);
+        return;
+    }
+#endif
+#ifdef PA_AutoDispatch_arm64_20_M1
+    if (CPU_CAPABILITY_CURRENT.OK_M1){
+        convert_to_ARM64_NEON(native, ext, samples, multiplier);
         return;
     }
 #endif
@@ -123,6 +143,11 @@ void add_tests(UnitTestDatabase& database){
 #ifdef PA_AutoDispatch_x64_17_Skylake
     if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
         add_tests_x64_AVX512(database);
+    }
+#endif
+#ifdef PA_AutoDispatch_arm64_20_M1
+    if (CPU_CAPABILITY_CURRENT.OK_M1){
+        add_tests_ARM64_NEON(database);
     }
 #endif
 }
