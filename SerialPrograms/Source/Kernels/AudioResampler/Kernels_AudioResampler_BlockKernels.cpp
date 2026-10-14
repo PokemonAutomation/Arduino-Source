@@ -15,8 +15,7 @@ namespace AudioResampler{
 
 BlockKernel get_block_kernel(
     size_t in_sample_rate,
-    size_t out_sample_rate,
-    uint32_t taps
+    size_t out_sample_rate
 ){
 #ifdef PA_AutoDispatch_x64_17_Skylake
     if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){

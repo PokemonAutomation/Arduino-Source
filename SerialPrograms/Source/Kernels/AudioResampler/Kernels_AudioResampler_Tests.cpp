@@ -199,7 +199,7 @@ UnitTestResult BlockDispatchTest::run(Logger& logger, CancellableScope& scope) c
     (void)logger;
     (void)scope;
 
-    BlockKernel bk = get_block_kernel(m_in_rate, m_out_rate, m_taps);
+    BlockKernel bk = get_block_kernel(m_in_rate, m_out_rate);
     if (bk.fp == nullptr){
         return "get_block_kernel returned a null function pointer.";
     }
@@ -245,9 +245,9 @@ UnitTestResult BlockDispatchTest::run(Logger& logger, CancellableScope& scope) c
 
 
 void add_tests(UnitTestDatabase& database){
-    //  Dispatch choices across rate ratios and tap counts. Odd tap counts
-    //  exercise the unrolls' final partial group reading the table's zero
-    //  padded rows.
+    //  Dispatch choices across rate ratios, with a spread of tap counts
+    //  for the table itself. Odd tap counts exercise the unrolls' final
+    //  partial group reading the table's zero padded rows.
     const struct{
         size_t in_rate;
         size_t out_rate;
