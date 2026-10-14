@@ -41,27 +41,31 @@ static PA_FORCE_INLINE vtype vsub(vtype x, vtype y){
 static PA_FORCE_INLINE vtype vmul(vtype x, vtype y){
     return vmulq_f32(x, y);
 }
-//  Complex multiply of two packed (re/im) pairs:
-//      Xr*Wr - Xi*Wi  /  Xi*Wr + Xr*Wi
-//  Written as plain vector expressions (same structure as the other ISAs).
-//  Both GCC and Clang contract the mul/add pairs into FMA instructions
-//  (FMLA/FMLS), matching the _mm256_fmadd/_mm256_fmsub structure of the
-//  AVX2/AVX512 paths. Note that the explicit vmlaq_f32/vmlsq_f32 intrinsics
-//  are *not* reliable here: GCC 13 expands them back into mul + add.
+//  Complex multiply of two packed (re/im) pairs. Mirrors the AVX2/AVX512
+//  structure:
+//      Xr = Xr*Wr - Xi*Wi   (x86: _mm256_fmsub_ps)
+//      Xi = Xi*Wr + Xr*Wi   (x86: _mm256_fmadd_ps)
+//  The vfmsq/vfmaq spellings (as opposed to vmlsq/vmlaq) expand to the
+//  __builtin_aarch64_fma* builtins, which both GCC and Clang keep as real
+//  FMLA/FMLS instructions; GCC 13 decomposes the vmlaq/vmlsq builtins back
+//  into mul + add, so the vf* spellings are the portable "guaranteed FMA"
+//  form. The operand order is (addend, factor, factor), so the sign of the
+//  first part is handled by a negate, exactly matching the x86 rounding.
 static PA_FORCE_INLINE void cmul_pp(
     vtype& Xr, vtype& Xi,
     vtype Wr, vtype Wi
 ){
-    vtype t0 = vmul(Xi, Wi);
-    vtype t1 = vmul(Xr, Wi);
-    Xr = vsub(vmul(Xr, Wr), t0);
-    Xi = vadd(vmul(Xi, Wr), t1);
+    vtype t0 = vmulq_f32(Xi, Wi);
+    vtype t1 = vmulq_f32(Xr, Wi);
+    Xr = vnegq_f32(vfmsq_f32(t0, Xr, Wr));
+    Xi = vfmaq_f32(t1, Xi, Wr);
 }
 
 
 static PA_FORCE_INLINE vtype abs(vtype r, vtype i){
-    //  sqrt(r*r + i*i) - the mul/add contracts into an FMA.
-    vtype r0 = vadd(vmul(r, r), vmul(i, i));
+    //  sqrt(r*r + i*i), with the mul/add contracted into an FMA
+    //  (x86: _mm256_fmadd_ps(r, r, i*i)).
+    vtype r0 = vfmaq_f32(vmulq_f32(r, r), i, i);
     return vsqrtq_f32(r0);
 }
 static PA_FORCE_INLINE void swap_odd(vtype& L, vtype& H){
