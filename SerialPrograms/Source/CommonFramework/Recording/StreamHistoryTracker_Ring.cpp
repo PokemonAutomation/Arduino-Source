@@ -35,6 +35,7 @@
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "CommonFramework/Recording/StreamHistoryOption.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
@@ -152,8 +153,8 @@ int qt_pixel_format_to_av_pix_fmt(QVideoFrameFormat::PixelFormat format){
     case QVideoFrameFormat::Format_YUV420P:  return AV_PIX_FMT_YUV420P;
     case QVideoFrameFormat::Format_YUYV:     return AV_PIX_FMT_YUYV422;
     case QVideoFrameFormat::Format_P010:     return AV_PIX_FMT_P010;
-    case QVideoFrameFormat::Format_RGB32:    return AV_PIX_FMT_BGRA;
-    case QVideoFrameFormat::Format_ARGB32:   return AV_PIX_FMT_BGRA;
+    case QVideoFrameFormat::Format_XRGB8888:    return AV_PIX_FMT_BGRA;
+    case QVideoFrameFormat::Format_ARGB8888:   return AV_PIX_FMT_BGRA;
     default:                                 return AV_PIX_FMT_NONE;
     }
 }
@@ -282,7 +283,12 @@ struct StreamHistoryTracker_Ring::Impl{
         actx->sample_rate = AUDIO_OUTPUT_RATE;
         actx->time_base = av_make_q(1, AUDIO_OUTPUT_RATE);
         actx->bit_rate = (audio_channels >= 2 ? 96000 : 64000);
-        if (av_channel_layout_default(&actx->ch_layout, (int)audio_channels) < 0
+        // 1. Clear any existing configuration to prevent layout memory leaks
+        av_channel_layout_uninit(&actx->ch_layout);
+
+        // 2. Initialize the default layout (Returns void, cannot be used in a condition)
+        av_channel_layout_default(&actx->ch_layout, (int)audio_channels);
+        if (av_channel_layout_check(&actx->ch_layout) <= 0
             || avcodec_open2(actx, codec, nullptr) < 0
         ){
             logger.log("Stream history: Failed to open AAC encoder. Disabling audio.", COLOR_RED);
@@ -326,11 +332,18 @@ struct StreamHistoryTracker_Ring::Impl{
             ctx->gop_size = (int)(target_fps * 2);
             ctx->max_b_frames = 0;
             ctx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+
+            // Prefer NV12; otherwise take the first format the encoder supports.
+            AVPixelFormat preferred = AV_PIX_FMT_NONE;
+
+            // 1. Use the new API to retrieve the list of supported pixel formats
+            const enum AVPixelFormat *pix_fmts = nullptr;
+            int ret = avcodec_get_supported_config(ctx, codec, AV_CODEC_CONFIG_PIX_FORMAT, 0, (const void**)&pix_fmts, nullptr);
             //  Prefer NV12; otherwise take the first format the encoder supports.
-            if (codec->pix_fmts != nullptr){
+            if (ret >= 0 && pix_fmts != nullptr){
                 AVPixelFormat preferred = AV_PIX_FMT_NONE;
-                for (int i = 0; codec->pix_fmts[i] != AV_PIX_FMT_NONE; i++){
-                    AVPixelFormat format = (AVPixelFormat)codec->pix_fmts[i];
+                for (int i = 0; pix_fmts[i] != AV_PIX_FMT_NONE; i++){
+                    AVPixelFormat format = pix_fmts[i];
                     if (format == AV_PIX_FMT_NV12){
                         preferred = AV_PIX_FMT_NV12;
                         break;
@@ -390,7 +403,7 @@ struct StreamHistoryTracker_Ring::Impl{
         }
         auto ring_packet = std::make_shared<VideoRingPacket>();
         ring_packet->timestamp = timestamp;
-        ring_packet->flags = (av_packet_get_flags(packet) & AV_PKT_FLAG_KEY) ? AV_PKT_FLAG_KEY : 0;
+        ring_packet->flags = (packet->flags & AV_PKT_FLAG_KEY) ? AV_PKT_FLAG_KEY : 0;
         ring_packet->data.assign(packet->data, packet->data + packet->size);
         av_packet_free(&packet);
 
@@ -450,10 +463,10 @@ struct StreamHistoryTracker_Ring::Impl{
             src_format = AV_PIX_FMT_NV12;
             src_width = qframe.width();
             src_height = qframe.height();
-            src_planes[0] = (const uint8_t*)qframe.bits();
-            src_planes[1] = src_planes[0] + (size_t)src_height * (size_t)qframe.bytesPerLine();
-            src_strides[0] = qframe.bytesPerLine();
-            src_strides[1] = qframe.bytesPerLine();
+            src_planes[0] = (const uint8_t*)qframe.bits(0);
+            src_planes[1] = (const uint8_t*)qframe.bits(1); // Accurate way to get the UV plane
+            src_strides[0] = qframe.bytesPerLine(0);
+            src_strides[1] = qframe.bytesPerLine(1);
         }else{
             rgb_image = qframe.toImage().convertToFormat(QImage::Format_RGB888);
             unmap_if_needed();
@@ -661,19 +674,29 @@ struct StreamHistoryTracker_Ring::Impl{
         //  1. Resample to 48 kHz (same channel count) and accumulate.
         if (swr == nullptr){
             AVChannelLayout in_layout = {};
-            if (av_channel_layout_default(&in_layout, (int)audio_channels) < 0
-                || av_channel_layout_default(&audio_layout, (int)audio_channels) < 0
+            // Set up the default channel layouts (these return void)
+            av_channel_layout_default(&in_layout, (int)audio_channels);
+            av_channel_layout_default(&audio_layout, (int)audio_channels);
+            if (av_channel_layout_check(&in_layout) <= 0
+                || av_channel_layout_check(&audio_layout) <= 0
             ){
                 logger.log("Stream history: Failed to set audio channel layout. Disabling audio.", COLOR_RED);
+                av_channel_layout_uninit(&in_layout);
+                av_channel_layout_uninit(&audio_layout);
                 have_audio = false;
                 return;
             }
-            swr = swr_alloc_set_opts2(
+            int ret = swr_alloc_set_opts2(
+                &swr,
                 &audio_layout, AV_SAMPLE_FMT_FLT, AUDIO_OUTPUT_RATE,
                 &in_layout,  AV_SAMPLE_FMT_FLT, audio_input_rate,
                 0, nullptr
             );
-            if (swr == nullptr){
+
+            // Free local layout copies now that swr has copied them internally
+            av_channel_layout_uninit(&in_layout);
+
+            if (ret < 0 || swr == nullptr){
                 logger.log("Stream history: Failed to create audio resampler. Disabling audio.", COLOR_RED);
                 have_audio = false;
                 return;
@@ -706,7 +729,11 @@ struct StreamHistoryTracker_Ring::Impl{
             frame->format = AV_SAMPLE_FMT_FLT;
             frame->sample_rate = AUDIO_OUTPUT_RATE;
             frame->nb_samples = AUDIO_FRAME_SAMPLES;
-            av_frame_set_channel_layout(frame, &audio_layout);
+            int ret = av_channel_layout_copy(&frame->ch_layout, &audio_layout);
+            if (ret < 0) {
+                logger.log("Stream history: Failed to copy/allocate layout properties.", COLOR_RED);
+                return;
+            }
             if (av_frame_get_buffer(frame, 0) < 0){
                 av_frame_free(&frame);
                 logger.log("Stream history: Failed to allocate audio frame buffer. Disabling audio.", COLOR_RED);
