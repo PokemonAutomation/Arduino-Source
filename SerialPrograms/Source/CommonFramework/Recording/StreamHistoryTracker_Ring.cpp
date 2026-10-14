@@ -2,7 +2,8 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  Implement by keeping an in-memory ring of *encoded* H.264 video packets
+ *  Implement by keeping an in-memory ring of *encoded* video packets
+ *  (hardware H.264, with ffmpeg's built-in LGPL MPEG-4 as a fallback)
  *  and AAC audio packets. Nothing is written to storage until save() is
  *  called, at which point the ring is muxed into a single MP4/MKV file.
  *
@@ -18,7 +19,6 @@
 
 #include <cerrno>
 #include <cctype>
-#include <cstring>
 #include <deque>
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -139,7 +139,7 @@ bool get_target_video_size(int input_width, int input_height, int& out_width, in
         return false;
     }
     int target_height = input_height * target_width / input_width;
-    //  H.264 requires even dimensions.
+    //  H.264 (and the mpeg4 fallback) require even dimensions.
     out_width = target_width & ~1;
     out_height = target_height & ~1;
     return (out_width >= 16 && out_height >= 16);
@@ -159,7 +159,10 @@ int qt_pixel_format_to_av_pix_fmt(QVideoFrameFormat::PixelFormat format){
 }
 
 
-//  Ordered by preference: hardware encoders first, then libx264.
+//  Ordered by preference: hardware encoders first, then ffmpeg's built-in
+//  (LGPL) MPEG-4 Part 2 encoder as a last resort. Every candidate in this
+//  list ships in an LGPL ffmpeg build; GPL components (libx264) are
+//  deliberately not candidates.
 const char* const VIDEO_ENCODER_CANDIDATES[] = {
 #ifdef _WIN32
     "h264_qsv",           "h264_nvenc",           "h264_amf",
@@ -168,7 +171,7 @@ const char* const VIDEO_ENCODER_CANDIDATES[] = {
 #else
     "h264_v4l2m2m",
 #endif
-    "libx264",
+    "mpeg4",
 };
 
 
@@ -338,11 +341,6 @@ struct StreamHistoryTracker_Ring::Impl{
                 }
                 ctx->pix_fmt = preferred;
             }
-            if (strcmp(name, "libx264") == 0){
-                av_opt_set(ctx->priv_data, "preset", "veryfast", 0);
-                av_opt_set(ctx->priv_data, "tune", "zerolatency", 0);
-                av_opt_set(ctx->priv_data, "bframes", "0", 0);
-            }
             int err = avcodec_open2(ctx, codec, nullptr);
             if (err == 0){
                 vctx = ctx;
@@ -365,7 +363,7 @@ struct StreamHistoryTracker_Ring::Impl{
             );
             avcodec_free_context(&ctx);
         }
-        logger.log("Stream history: No usable H.264 encoder found. Disabling video.", COLOR_RED);
+        logger.log("Stream history: No usable video encoder found. Disabling video.", COLOR_RED);
         WriteSpinLock lg(lock, PA_CURRENT_FUNCTION);
         video_enabled = false;
     }
