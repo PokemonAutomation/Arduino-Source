@@ -6,6 +6,8 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels_ImagePixelSumSqr.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "Kernels_ImagePixelSumSqr_TestInfra.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -75,6 +77,27 @@ void pixel_sum_sqr_Default(
         image = (const uint32_t*)((const char*)image + image_bytes_per_row);
         alpha = (const uint32_t*)((const char*)alpha + alpha_bytes_per_row);
     }
+}
+
+
+class Test_PixelSumSqr_Default : public Test_PixelSumSqr{
+public:
+    Test_PixelSumSqr_Default(
+        size_t width, size_t height
+    )
+        : Test_PixelSumSqr(
+            "Default",
+            width, height,
+            pixel_sum_sqr_Default
+        )
+    {}
+};
+void add_tests_pixel_sum_sqr_Default(UnitTestDatabase& database){
+    for (size_t width : kTestWidths){
+        database.add<Test_PixelSumSqr_Default>(width, (width % 5) + 1);
+    }
+    database.add<Test_PixelSumSqr_Default>(0, 0);
+    database.add<Test_PixelSumSqr_Default>(64, 0);
 }
 
 

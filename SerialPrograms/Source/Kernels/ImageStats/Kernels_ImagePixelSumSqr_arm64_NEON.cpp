@@ -11,6 +11,8 @@
 #include "Kernels/Kernels_arm64_NEON.h"
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_arm64_NEON.h"
 #include "Kernels_ImagePixelSumSqr.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "Kernels_ImagePixelSumSqr_TestInfra.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -161,6 +163,27 @@ void pixel_sum_sqr_arm64_NEON(
         image = (const uint32_t*)((const char*)image + image_bytes_per_row);
         alpha = (const uint32_t*)((const char*)alpha + alpha_bytes_per_row);
     }
+}
+
+
+class Test_PixelSumSqr_arm64_NEON : public Test_PixelSumSqr{
+public:
+    Test_PixelSumSqr_arm64_NEON(
+        size_t width, size_t height
+    )
+        : Test_PixelSumSqr(
+            "arm64_NEON",
+            width, height,
+            pixel_sum_sqr_arm64_NEON
+        )
+    {}
+};
+void add_tests_pixel_sum_sqr_arm64_NEON(UnitTestDatabase& database){
+    for (size_t width : kTestWidths){
+        database.add<Test_PixelSumSqr_arm64_NEON>(width, (width % 5) + 1);
+    }
+    database.add<Test_PixelSumSqr_arm64_NEON>(0, 0);
+    database.add<Test_PixelSumSqr_arm64_NEON>(64, 0);
 }
 
 
