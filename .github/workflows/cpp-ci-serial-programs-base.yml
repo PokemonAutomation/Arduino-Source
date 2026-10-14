@@ -81,8 +81,9 @@ jobs:
           sudo apt install -y pkg-config clang-tools libopencv-dev libsystemd-dev
           sudo apt install -y libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libswresample-dev
 
-          # 2. Inject Linux multiarch database paths so pkg_search_module passes (Crucial)
-          echo "PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig:/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          # # Update this line to use a clean list of multiarch paths
+          # LINUX_PATHS="/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig:/usr/local/lib/pkgconfig"
+          # echo "PKG_CONFIG_PATH=$LINUX_PATHS:$PKG_CONFIG_PATH" >> $GITHUB_ENV
           
           # 3. Complete your custom local dependency setup
           sudo apt install ./3rdPartyBinaries/libdpp-10.1.5-linux-x64.deb
@@ -100,15 +101,10 @@ jobs:
           cp 3rdPartyBinaries/libdpp@10.1.5.rb "$FORMULA_DIR/"
           brew install libdpp@10.1.5
 
-          # 1. Define the correct Homebrew pkgconfig paths
-          # This catches both standard homebrew packages and keg-only links
-          BREW_PKG_CONFIG="/opt/homebrew/lib/pkgconfig:/opt/homebrew/opt/ffmpeg/lib/pkgconfig:/opt/homebrew/opt/opencv/lib/pkgconfig"
-
-          # 2. Export them IMMEDIATELY for this step (in case CMake runs in this block)
-          export PKG_CONFIG_PATH="$BREW_PKG_CONFIG:$PKG_CONFIG_PATH"
-
-          # 3. Inject them into GITHUB_ENV for all subsequent steps
-          echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          # # Guide pkg-config straight to Homebrew's internal FFmpeg/OpenCV structures
+          # BREW_PATHS="/opt/homebrew/lib/pkgconfig:/opt/homebrew/opt/ffmpeg/lib/pkgconfig:/opt/homebrew/opt/opencv/lib/pkgconfig"
+          
+          # echo "PKG_CONFIG_PATH=$BREW_PATHS:${{ env.PKG_CONFIG_PATH }}" >> $GITHUB_ENV
 
       - name: Generate binaries
         run: |
