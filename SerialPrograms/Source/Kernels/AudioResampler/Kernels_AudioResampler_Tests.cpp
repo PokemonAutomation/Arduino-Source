@@ -245,8 +245,9 @@ UnitTestResult BlockDispatchTest::run(Logger& logger, CancellableScope& scope) c
 
 
 void add_tests(UnitTestDatabase& database){
-    //  Dispatch choices across rate ratios and tap counts, including odd
-    //  taps that only the Default kernel (or the tap2 unroll) can take.
+    //  Dispatch choices across rate ratios and tap counts. Odd tap counts
+    //  exercise the unrolls' final partial group reading the table's zero
+    //  padded rows.
     const struct{
         size_t in_rate;
         size_t out_rate;

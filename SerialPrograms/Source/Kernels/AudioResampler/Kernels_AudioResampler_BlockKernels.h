@@ -149,7 +149,10 @@ struct BlockKernel{
 //  current CPU. The returned kernel is valid for any out_index wrapped to
 //  the table period, provided the table was constructed with
 //  min_samples >= period + sample_block and
-//  min_taps >= taps + tap_block - 1.
+//  min_taps >= taps + tap_block - 1 (the WeightTable constructor zero
+//  pads the extra tap rows, which the unrolls' final partial group may
+//  read). It is the caller's responsibility to honor the implied
+//  overshoots when staging input.
 //
 BlockKernel get_block_kernel(
     size_t in_sample_rate,

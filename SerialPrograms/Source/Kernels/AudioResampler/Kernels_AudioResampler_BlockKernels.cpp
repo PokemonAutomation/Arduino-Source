@@ -30,23 +30,17 @@ BlockKernel get_block_kernel(
         if (in_sample_rate <= 2 * out_sample_rate){
             return {run_block128_down2_x64_AVX512, 128, 1};
         }
-        if (taps % 8 == 0){
-            return {run_block32_tap8_x64_AVX512, 32, 8};
-        }
+        return {run_block32_tap8_x64_AVX512, 32, 8};
     }
 #endif
 #ifdef PA_AutoDispatch_x64_13_Haswell
     if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
-        if (taps % 4 == 0){
-            return {run_block16_tap4_x64_FMA3, 16, 4};
-        }
+        return {run_block16_tap4_x64_FMA3, 16, 4};
     }
 #endif
 #ifdef PA_AutoDispatch_x64_08_Nehalem
     if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
-        if (taps % 2 == 0){
-            return {run_block8_tap2_x64_SSE2, 8, 2};
-        }
+        return {run_block8_tap2_x64_SSE2, 8, 2};
     }
 #endif
     return {run_block8_Default, 8, 1};
