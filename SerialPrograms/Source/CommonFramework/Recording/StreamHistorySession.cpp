@@ -16,7 +16,7 @@
 
 #if defined(PA_STREAM_HISTORY_FFMPEG)
 #include "StreamHistoryTracker_Ring.h"
-using StreamHistoryTracker = StreamHistoryTracker_Ring;
+using StreamHistoryTracker = PokemonAutomation::StreamHistoryTracker_Ring;
 #elif (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
 #include "StreamHistoryTracker_SaveFrames.h"
 //#include "StreamHistoryTracker_RecordOnTheFly.h"
