@@ -4,6 +4,8 @@
  *
  */
 
+#include <cstdlib>
+
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
@@ -333,13 +335,34 @@ void UnitTestRunner::on_test_finished(
 
 
 bool CommandLineUnitTestRunner::run(){
+    //  CI debug hooks: PA_TEST_FILTER narrows the run to tests whose name
+    //  contains the substring, and PA_TEST_MAX_THREADS caps the worker
+    //  threads (1 = fully serialized, synchronous output).
+    const char* filter_env = std::getenv("PA_TEST_FILTER");
+    const std::string filter = filter_env ? filter_env : "";
+    size_t max_threads = 0;
+    const char* threads_env = std::getenv("PA_TEST_MAX_THREADS");
+    if (threads_env && *threads_env){
+        max_threads = std::stoul(threads_env);
+    }
+
     PokemonAutomation::UnitTestRunner runner(
         m_logger,
-        GlobalThreadPools::computation_normal()
+        GlobalThreadPools::computation_normal(),
+        0,
+        max_threads
     );
     runner.add_listener(*this);
+    size_t filtered_out = 0;
     for (const auto& test : UNIT_TESTS_ALL()){
-        runner.add_test(test.second);
+        if (filter.empty() || test.second->name().find(filter) != std::string::npos){
+            runner.add_test(test.second);
+        }else{
+            filtered_out++;
+        }
+    }
+    if (!filter.empty()){
+        m_logger.log("Test filter: " + filter + " (" + std::to_string(filtered_out) + " tests excluded)");
     }
     runner.run();
 
