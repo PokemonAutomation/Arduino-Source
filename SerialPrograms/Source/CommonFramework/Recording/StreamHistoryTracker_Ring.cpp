@@ -455,8 +455,8 @@ struct StreamHistoryTracker_Ring::Impl{
             int ret = avcodec_get_supported_config(ctx, codec, AV_CODEC_CONFIG_PIX_FORMAT, 0, (const void**)&pix_fmts, nullptr);
             if (ret >= 0 && pix_fmts != nullptr){
                 AVPixelFormat preferred = AV_PIX_FMT_NONE;
-                for (int i = 0; pix_fmts[i] != AV_PIX_FMT_NONE; i++){
-                    AVPixelFormat format = pix_fmts[i];
+                for (int j = 0; pix_fmts[j] != AV_PIX_FMT_NONE; j++){
+                    AVPixelFormat format = pix_fmts[j];
                     if (format == AV_PIX_FMT_NV12){
                         preferred = AV_PIX_FMT_NV12;
                         break;
