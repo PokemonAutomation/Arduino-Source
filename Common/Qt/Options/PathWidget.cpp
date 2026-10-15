@@ -59,12 +59,14 @@ PathCellWidget::PathCellWidget(QWidget& parent, PathCell& value)
 
 void PathCellWidget::browse_file(){
     QString current_path = m_line_edit->text();
-    QString file_path = QFileDialog::getOpenFileName(
-        this,
-        "Select File",
-        current_path,
-        QString::fromStdString(m_value.filter_string())
-    );
+    QString file_path = m_value.is_directory()
+        ? QFileDialog::getExistingDirectory(this, "Select Directory", current_path)
+        : QFileDialog::getOpenFileName(
+            this,
+            "Select File",
+            current_path,
+            QString::fromStdString(m_value.filter_string())
+        );
 
     if (!file_path.isEmpty()){
         m_line_edit->setText(file_path);
@@ -149,12 +151,14 @@ PathOptionWidget::PathOptionWidget(QWidget& parent, PathOption& value)
 
 void PathOptionWidget::browse_file(){
     QString current_path = m_line_edit->text();
-    QString file_path = QFileDialog::getOpenFileName(
-        this,
-        "Select File",
-        current_path,
-        QString::fromStdString(m_value.filter_string())
-    );
+    QString file_path = m_value.is_directory()
+        ? QFileDialog::getExistingDirectory(this, "Select Directory", current_path)
+        : QFileDialog::getOpenFileName(
+            this,
+            "Select File",
+            current_path,
+            QString::fromStdString(m_value.filter_string())
+        );
 
     if (!file_path.isEmpty()){
         m_line_edit->setText(file_path);

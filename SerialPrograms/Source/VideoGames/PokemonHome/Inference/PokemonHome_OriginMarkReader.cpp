@@ -406,6 +406,13 @@ void add_tests_OriginMarkReader(UnitTestDatabase& database){
     database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/wurmple_Regular.png", OriginMark::BDSP);
     database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", OriginMark::GAMEBOYADVANCE);
     database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", OriginMark::GAMEBOYADVANCE);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/Farfetchd-fast-ball.png", OriginMark::GALAR);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/Machamp-gigaton-ball.png", OriginMark::LA);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/Machoke-gigaton-ball.png", OriginMark::LA);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/Machop-gigaton-ball.png", OriginMark::LA);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/Magnemite-gigaton-ball.png", OriginMark::LA);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/Magneton-gigaton-ball.png", OriginMark::LA);
+    database.add<Test_OriginMarkReader>("PokemonHome/SummaryScreen/Slowpoke-fast-ball.png", OriginMark::GALAR);
 }
 
 

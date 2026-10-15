@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonHome_TestDatabaseGenerator_H
 #define PokemonAutomation_PokemonHome_TestDatabaseGenerator_H
 
+#include "Common/Cpp/Options/PathOption.h"
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -31,7 +32,7 @@ public:
     ) override;
 
 private:
-    StringOption DIRECTORY;
+    PathOption DIRECTORY;
     StringOption PRINT_DIRECTORY;
     BooleanCheckBoxOption RENAME_FILES;
 };

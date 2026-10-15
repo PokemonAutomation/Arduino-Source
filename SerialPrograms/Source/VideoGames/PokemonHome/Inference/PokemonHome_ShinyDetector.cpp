@@ -101,6 +101,13 @@ void add_tests_ShinyDetector(UnitTestDatabase& database){
     database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/wurmple_Regular.png", false);
     database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", false);
     database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/Farfetchd-fast-ball.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/Machamp-gigaton-ball.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/Machoke-gigaton-ball.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/Machop-gigaton-ball.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/Magnemite-gigaton-ball.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/Magneton-gigaton-ball.png", false);
+    database.add<Test_ShinyDetector>("PokemonHome/SummaryScreen/Slowpoke-fast-ball.png", true);
 }
 
 

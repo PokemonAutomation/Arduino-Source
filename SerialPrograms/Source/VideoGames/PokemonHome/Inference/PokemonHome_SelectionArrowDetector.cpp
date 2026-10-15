@@ -202,6 +202,13 @@ void add_tests_SelectionArrowDetector(UnitTestDatabase& database){
     database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/wurmple_Regular.png", std::nullopt);
     database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", std::nullopt);
     database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/Farfetchd-fast-ball.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/Machamp-gigaton-ball.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/Machoke-gigaton-ball.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/Machop-gigaton-ball.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/Magnemite-gigaton-ball.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/Magneton-gigaton-ball.png", std::nullopt);
+    database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/Slowpoke-fast-ball.png", std::nullopt);
 }
 
 }

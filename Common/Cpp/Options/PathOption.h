@@ -20,12 +20,14 @@ public:
         LockMode lock_while_program_is_running,
         std::string default_value,
         std::string filter_string, // e.g. "*.json"
-        std::string placeholder_text
+        std::string placeholder_text,
+        bool is_directory = false
     );
 
     const std::string& placeholder_text() const;
     const std::string default_value() const;
     const std::string& filter_string() const;
+    bool is_directory() const;
 
 
     bool is_locked() const;
@@ -58,7 +60,8 @@ public:
         LockMode lock_while_program_is_running,
         std::string default_value,
         std::string filter_string,
-        std::string placeholder_text
+        std::string placeholder_text,
+        bool is_directory = false
     );
 
     const std::string& label() const{ return m_label; }

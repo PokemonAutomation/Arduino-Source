@@ -101,6 +101,13 @@ void add_tests_AlphaDetector(UnitTestDatabase& database){
     database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/wurmple_Regular.png", false);
     database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", false);
     database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/Farfetchd-fast-ball.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/Machamp-gigaton-ball.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/Machoke-gigaton-ball.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/Machop-gigaton-ball.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/Magnemite-gigaton-ball.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/Magneton-gigaton-ball.png", false);
+    database.add<Test_AlphaDetector>("PokemonHome/SummaryScreen/Slowpoke-fast-ball.png", false);
 }
 
 
