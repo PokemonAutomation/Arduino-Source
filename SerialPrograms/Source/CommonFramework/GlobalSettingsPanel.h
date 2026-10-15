@@ -14,6 +14,7 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/ButtonOption.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Options/WallpaperOption.h"
 #include "CommonFramework/Panels/OptionsPanel.h"
 #include "CommonFramework/ResourceDownload/SettingsResourceDownloadOptions.h"
@@ -79,6 +80,9 @@ public:
     Pimpl<CheckForUpdatesOption> CHECK_FOR_UPDATES;
 
     ButtonOption OPEN_BASE_FOLDER_BUTTON;
+    SectionDividerOption m_data_storage;
+    EnumDropdownOption<UserDataStorageLocation> USER_DATA_STORAGE;
+    EnumDropdownOption<UserDataStorageLocation> SCREENSHOTS_STORAGE;
     StringOption STATS_FILE;
     FolderInputOption TEMP_FOLDER;
 

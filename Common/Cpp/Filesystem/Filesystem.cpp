@@ -73,6 +73,15 @@ Path current_path(){
     return std::filesystem::current_path();
 }
 
+std::filesystem::file_time_type last_write_time(const Path& path){
+    std::error_code ec;
+    std::filesystem::file_time_type time = std::filesystem::last_write_time(path.stdpath(), ec);
+    if (ec){
+        return std::filesystem::file_time_type::min();
+    }
+    return time;
+}
+
 Path application_binary_name(){
     return application_binary_path().filename();
 }
