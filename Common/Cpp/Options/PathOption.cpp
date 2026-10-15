@@ -17,6 +17,7 @@ struct PathCell::Data{
     const std::string m_default;
     const std::string m_filter_string;
     const std::string m_placeholder_text;
+    const bool m_is_directory;
 
     std::atomic<bool> m_locked;
 
@@ -26,11 +27,13 @@ struct PathCell::Data{
     Data(
         std::string default_value,
         std::string filter_string,
-        std::string placeholder_text
+        std::string placeholder_text,
+        bool is_directory
     )
         : m_default(std::move(default_value))
         , m_filter_string(std::move(filter_string))
         , m_placeholder_text(std::move(placeholder_text))
+        , m_is_directory(is_directory)
         , m_current(m_default)
     {}
 };
@@ -41,10 +44,11 @@ PathCell::PathCell(
     LockMode lock_while_program_is_running,
     std::string default_value,
     std::string filter_string,
-    std::string placeholder_text
+    std::string placeholder_text,
+    bool is_directory
 )
     : UiState<PathCell, ConfigOption>(lock_while_program_is_running)
-    , m_data(CONSTRUCT_TOKEN, std::move(default_value), std::move(filter_string), std::move(placeholder_text))
+    , m_data(CONSTRUCT_TOKEN, std::move(default_value), std::move(filter_string), std::move(placeholder_text), is_directory)
 {}
 
 const std::string& PathCell::placeholder_text() const{
@@ -55,6 +59,9 @@ const std::string PathCell::default_value() const{
 }
 const std::string& PathCell::filter_string() const{
     return m_data->m_filter_string;
+}
+bool PathCell::is_directory() const{
+    return m_data->m_is_directory;
 }
 
 
@@ -110,13 +117,15 @@ PathOption::PathOption(
     LockMode lock_while_program_is_running,
     std::string default_value,
     std::string filter_string,
-    std::string placeholder_text
+    std::string placeholder_text,
+    bool is_directory
 )
      : UiState<PathOption, PathCell>(
         lock_while_program_is_running,
         default_value,
         filter_string,
-        placeholder_text
+        placeholder_text,
+        is_directory
     )
      , m_label(std::move(label))
 {}

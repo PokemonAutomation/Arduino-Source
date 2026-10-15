@@ -55,11 +55,12 @@ TestDatabaseGenerator_Descriptor::TestDatabaseGenerator_Descriptor()
 
 TestDatabaseGenerator::TestDatabaseGenerator()
     : DIRECTORY(
-        false,
         "<b>Screenshot Directory:</b>",
         LockMode::LOCK_WHILE_RUNNING,
         "",
-        "Path to a directory containing PNG screenshots."
+        "",
+        "Path to a directory containing PNG screenshots.",
+        true
     )
     , PRINT_DIRECTORY(
         false,
