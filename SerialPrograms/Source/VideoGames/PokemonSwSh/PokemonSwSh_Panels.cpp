@@ -109,7 +109,6 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- General ----");
     ret.emplace_back(make_SingleSwitchProgram<MassRelease>());
     ret.emplace_back(make_SingleSwitchProgram<SurpriseTrade>());
-    ret.emplace_back(make_SingleSwitchProgram<TradeBot>());
     ret.emplace_back(make_SingleSwitchProgram<ClothingBuyer>());
     ret.emplace_back(make_SingleSwitchProgram<AutonomousBallThrower>());
     ret.emplace_back(make_SingleSwitchProgram<DexRecFinder>());
@@ -185,8 +184,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- Public Betas ----");
     ret.emplace_back(make_SingleSwitchProgram<DailyHighlightRNG>());
 
-#if 0
+#if 1
     ret.emplace_back("---- Deprecated Programs ----");
+    ret.emplace_back(make_SingleSwitchProgram<TradeBot>());
 #endif
 
     if (STATIC_GLOBALS.DEVELOPER_MODE){

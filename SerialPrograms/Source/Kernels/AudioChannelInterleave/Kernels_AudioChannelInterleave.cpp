@@ -140,6 +140,11 @@ void channel_interleave(
 
 void add_tests(UnitTestDatabase& database){
     add_tests_Default(database);
+#ifdef PA_AutoDispatch_x64_08_Nehalem
+    if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
+        add_tests_x64_SSE(database);
+    }
+#endif
 #ifdef PA_AutoDispatch_x64_13_Haswell
     if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
         add_tests_x64_AVX2(database);
@@ -148,11 +153,6 @@ void add_tests(UnitTestDatabase& database){
 #ifdef PA_AutoDispatch_x64_17_Skylake
     if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
         add_tests_x64_AVX512(database);
-    }
-#endif
-#ifdef PA_AutoDispatch_x64_08_Nehalem
-    if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
-        add_tests_x64_SSE(database);
     }
 #endif
 #ifdef PA_AutoDispatch_arm64_20_M1
