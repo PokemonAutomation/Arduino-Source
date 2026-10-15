@@ -21,6 +21,7 @@
 #include <cctype>
 #include <cstring>
 #include <deque>
+#include <mutex>
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -208,6 +209,44 @@ const char* const VIDEO_ENCODER_CANDIDATES[] = {
     "mpeg4",
 };
 
+//  A hardware encoder whose avcodec_send_frame() hard-failed at runtime has
+//  broken its GPU driver: calling into the context again - even to release
+//  it - can crash the driver (observed: 0xC0000005 access violation in
+//  atidxx64.dll during avcodec_free_context() on a Ryzen 5 5625U iGPU).
+//  Such encoders are "poisoned" for the rest of the process: the failed
+//  context is deliberately leaked (a bounded, one-time leak) and the encoder
+//  is never initialized again.
+std::mutex poisoned_encoder_mutex;
+std::string poisoned_encoder;
+
+//  Abandons 'ctx' after an encoder failure. Hardware encoder contexts are
+//  leaked, not freed, because releasing a context whose driver is already
+//  broken can crash the process inside the driver; the CPU fallback (mpeg4)
+//  is released normally. The encoder is remembered as poisoned so that later
+//  sessions do not re-initialize it (which would re-break the driver and
+//  leak another device).
+void abandon_video_encoder(Logger& logger, const char* name, AVCodecContext*& ctx){
+    if (ctx == nullptr){
+        return;
+    }
+    if (std::strcmp(name, "mpeg4") == 0){
+        avcodec_free_context(&ctx);
+    }else{
+        {
+            std::lock_guard<std::mutex> lg(poisoned_encoder_mutex);
+            poisoned_encoder = name;
+        }
+        logger.log(
+            "Stream history: leaking the failed '"
+            + std::string(name) + "' video encoder context; releasing it can"
+            + " crash the GPU driver, and it will not be used again in this"
+            + " process.",
+            COLOR_YELLOW
+        );
+    }
+    ctx = nullptr;
+}
+
 
 }  // namespace
 
@@ -252,12 +291,11 @@ struct StreamHistoryTracker_Ring::Impl{
 
     //  Encoder candidate rotation. A hardware encoder can open successfully
     //  and still fail on every frame (e.g. its GPU device cannot allocate
-    //  textures); after a few consecutive hard failures the current candidate
-    //  is abandoned and the next one is tried, so the recording still gets
-    //  video. Candidates that have failed (at open or at runtime) are not
-    //  retried. Only the worker thread touches these.
+    //  textures); after a hard failure from avcodec_send_frame() the current
+    //  candidate is abandoned and the next one is tried, so the recording
+    //  still gets video. Candidates that have failed (at open or at runtime)
+    //  are not retried. Only the worker thread touches these.
     size_t video_encoder_index = 0;
-    int video_send_failures = 0;
 
     //  Audio encoder + resampler (used by on_samples).
     AVCodecContext* actx = nullptr;
@@ -371,6 +409,19 @@ struct StreamHistoryTracker_Ring::Impl{
         size_t bitrate_kbps = get_target_bitrate_kbps();
         for (size_t i = video_encoder_index; i < CANDIDATE_COUNT; i++){
             const char* name = VIDEO_ENCODER_CANDIDATES[i];
+            {
+                std::lock_guard<std::mutex> lg(poisoned_encoder_mutex);
+                if (poisoned_encoder == name){
+                    logger.log(
+                        "Stream history: skipping video encoder '"
+                        + std::string(name) + "' (it failed at runtime earlier"
+                        + " in this process).",
+                        COLOR_YELLOW
+                    );
+                    video_encoder_index = i + 1;
+                    continue;
+                }
+            }
             const AVCodec* codec = avcodec_find_encoder_by_name(name);
             if (codec == nullptr){
                 video_encoder_index = i + 1;
@@ -436,7 +487,6 @@ struct StreamHistoryTracker_Ring::Impl{
             if (err == 0){
                 vctx = ctx;
                 video_encoder_index = i + 1;
-                video_send_failures = 0;
                 video_width = target_width;
                 video_height = target_height;
                 video_start = WallClock::min();
@@ -455,7 +505,7 @@ struct StreamHistoryTracker_Ring::Impl{
                 + ffmpeg_error(err),
                 COLOR_YELLOW
             );
-            avcodec_free_context(&ctx);
+            abandon_video_encoder(logger, name, ctx);
         }
         logger.log("Stream history: No usable video encoder found. Disabling video.", COLOR_RED);
         WriteSpinLock lg(lock, PA_CURRENT_FUNCTION);
@@ -657,27 +707,22 @@ struct StreamHistoryTracker_Ring::Impl{
             }
             if (err < 0){
                 av_frame_free(&frame);
-                //  Hardware encoders can open fine and still fail on every
-                //  frame (e.g. their GPU device cannot allocate textures).
-                //  After a few consecutive hard failures, fall back to the
-                //  next candidate so the recording still gets video.
-                if (++video_send_failures >= 3){
-                    logger.log(
-                        "Stream history: video encoder '"
-                        + std::string(VIDEO_ENCODER_CANDIDATES[video_encoder_index - 1])
-                        + "' failed repeatedly; falling back to the next candidate.",
-                        COLOR_YELLOW
-                    );
-                    avcodec_free_context(&vctx);
-                    vctx = nullptr;
-                    video_send_failures = 0;
-                    init_video_encoder(qframe.width(), qframe.height());
-                }else{
-                    logger.log("Stream history: Video encode failed: " + ffmpeg_error(err), COLOR_RED);
-                }
+                //  Fall back immediately. A hardware encoder that hard-fails
+                //  at runtime has a broken GPU driver; every further call
+                //  into it - including releasing the context - risks crashing
+                //  the process inside the driver.
+                const char* failed = VIDEO_ENCODER_CANDIDATES[video_encoder_index - 1];
+                logger.log(
+                    "Stream history: video encoder '" + std::string(failed)
+                    + "' failed at runtime ("
+                    + ffmpeg_error(err)
+                    + "); falling back to the next candidate.",
+                    COLOR_YELLOW
+                );
+                abandon_video_encoder(logger, failed, vctx);
+                init_video_encoder(qframe.width(), qframe.height());
                 return;
             }
-            video_send_failures = 0;
             av_frame_free(&frame);
             break;
         }
