@@ -39,7 +39,7 @@ BBQSoloFarmer_Descriptor::BBQSoloFarmer_Descriptor()
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PanelDeprecation::NOT_DEPRECATED,
         {
-            "Tesseract",
+            "PaddleOCRDetection",
         }
     )
 {}
