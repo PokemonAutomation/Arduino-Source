@@ -53,7 +53,19 @@ private:
 
     enum class LivingDexStyle{
         SORTED_BY_FORMS,
-        SORTED_BY_SPECIES
+        SORTED_BY_SPECIES,
+        AJP_FINAL_FORM,
+        AJP_FINAL_FORM_FORM,
+        AJP_LIVING,
+        AJP_LIVING_FORM,
+        AJP_LIVING_FORM_LITE,
+        POKEPC_FULLY_SORTED,
+        POKEPC_FULLY_SORTED_MINIMAL,
+        POKEPC_GROUPED_BALANCED,
+        POKEPC_GROUPED_REGION,
+        POKEPC_SORTED_SPECIES,
+        POKEPC_SORTED_SPECIES_MINIMAL,
+        POKEPC_SPECIES_FIRST,
     };
 
     // Checks if the given pokemon is viable for the living dex entry. 

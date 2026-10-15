@@ -96,6 +96,18 @@ BoxSorterLivingDex::BoxSorterLivingDex()
         {
             {LivingDexStyle::SORTED_BY_FORMS, "sorted_by_forms", "Sorted by Forms"},
             {LivingDexStyle::SORTED_BY_SPECIES, "sorted_by_species", "Sorted by Species"},
+            {LivingDexStyle::AJP_FINAL_FORM, "ajp_final_form", "AJP Final Form"},
+            {LivingDexStyle::AJP_FINAL_FORM_FORM, "ajp_final_form_form", "AJP Final Form Form"},
+            {LivingDexStyle::AJP_LIVING, "ajp_living", "AJP Living"},
+            {LivingDexStyle::AJP_LIVING_FORM, "ajp_living_form", "AJP Living Form"},
+            {LivingDexStyle::AJP_LIVING_FORM_LITE, "ajp_living_form_lite", "AJP Living Form Lite"},
+            {LivingDexStyle::POKEPC_FULLY_SORTED, "pokepc_fully_sorted", "PokePC Fully Sorted"},
+            {LivingDexStyle::POKEPC_FULLY_SORTED_MINIMAL, "pokepc_fully_sorted_minimal", "PokePC Fully Sorted (Minimal)"},
+            {LivingDexStyle::POKEPC_GROUPED_BALANCED, "pokepc_grouped_balanced", "PokePC Grouped Balanced"},
+            {LivingDexStyle::POKEPC_GROUPED_REGION, "pokepc_grouped_region", "PokePC Grouped by Region"},
+            {LivingDexStyle::POKEPC_SORTED_SPECIES, "pokepc_sorted_species", "PokePC Sorted by Species"},
+            {LivingDexStyle::POKEPC_SORTED_SPECIES_MINIMAL, "pokepc_sorted_species_minimal", "PokePC Sorted by Species (Minimal)"},
+            {LivingDexStyle::POKEPC_SPECIES_FIRST, "pokepc_species_first", "PokePC Species First"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         LivingDexStyle::SORTED_BY_FORMS
@@ -340,6 +352,42 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
             break;
         case LivingDexStyle::SORTED_BY_SPECIES:
             path = RESOURCE_PATH() + "PokemonHome/DexTemplates/living_dex_by_species.json";
+            break;
+        case LivingDexStyle::AJP_FINAL_FORM:
+            path = RESOURCE_PATH() + "PokemonHome/DexTemplates/ajp_final_form.json";
+            break;
+        case LivingDexStyle::AJP_FINAL_FORM_FORM:
+            path = RESOURCE_PATH() + "PokemonHome/DexTemplates/ajp_final_form_form.json";
+            break;
+        case LivingDexStyle::AJP_LIVING:
+            path = RESOURCE_PATH() + "PokemonHome/DexTemplates/ajp_living.json";
+            break;
+        case LivingDexStyle::AJP_LIVING_FORM:
+            path = RESOURCE_PATH() + "PokemonHome/DexTemplates/ajp_living_form.json";
+            break;
+        case LivingDexStyle::AJP_LIVING_FORM_LITE:
+            path = RESOURCE_PATH() + "PokemonHome/DexTemplates/ajp_living_form_lite.json";
+            break;
+        case LivingDexStyle::POKEPC_FULLY_SORTED:
+            path = RESOURCE_PATH() + "PokemonHome/DexTemplates/pokepc_fully_sorted.json";
+            break;
+        case LivingDexStyle::POKEPC_FULLY_SORTED_MINIMAL:
+            path = RESOURCE_PATH() + "PokemonHome/DexTemplates/pokepc_fully_sorted_minimal.json";
+            break;
+        case LivingDexStyle::POKEPC_GROUPED_BALANCED:
+            path = RESOURCE_PATH() + "PokemonHome/DexTemplates/pokepc_grouped_balanced.json";
+            break;
+        case LivingDexStyle::POKEPC_GROUPED_REGION:
+            path = RESOURCE_PATH() + "PokemonHome/DexTemplates/pokepc_grouped_region.json";
+            break;
+        case LivingDexStyle::POKEPC_SORTED_SPECIES:
+            path = RESOURCE_PATH() + "PokemonHome/DexTemplates/pokepc_sorted_species.json";
+            break;
+        case LivingDexStyle::POKEPC_SORTED_SPECIES_MINIMAL:
+            path = RESOURCE_PATH() + "PokemonHome/DexTemplates/pokepc_sorted_species_minimal.json";
+            break;
+        case LivingDexStyle::POKEPC_SPECIES_FIRST:
+            path = RESOURCE_PATH() + "PokemonHome/DexTemplates/pokepc_species_first.json";
             break;
         default:
             throw InternalProgramError(
