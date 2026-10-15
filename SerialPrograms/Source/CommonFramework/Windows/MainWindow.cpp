@@ -502,18 +502,24 @@ void MainWindow::update_wallpaper(){
     const QString surface = QStringLiteral("rgba(%1, %2, %3, 215)")
         .arg(surface_color.red()).arg(surface_color.green()).arg(surface_color.blue());
     const QString stylesheet = QString::fromLatin1(
-        "QLabel, QLabel:disabled { background-color: transparent; }"
-        "QWidget[backgroundContainer=\"true\"] { background-color: transparent; }"
-        "QWidget#backgroundSidebarBody { background-color: transparent; }"
+        // Shared wallpaper surfaces: apply the same translucent theme color.
         "QWidget#backgroundProgramSelect { background-color: %1; }"
+        "QGroupBox#backgroundSupportBox { background-color: %1; }"
+        "QWidget#backgroundProgramHeader { background-color: %1; }"
+        "QWidget#backgroundScrollContents { background-color: %1; }"
+
+        // Shared layout containers and viewports: reveal the wallpaper surfaces.
+        "QWidget#backgroundSidebarBody { background-color: transparent; }"
         "QListWidget#backgroundProgramList { background-color: transparent; }"
         "QWidget#backgroundProgramListViewport { background-color: transparent; }"
-        "QGroupBox#backgroundSupportBox { background-color: %1; }"
         "QWidget#backgroundPanelRoot { background-color: transparent; }"
-        "QWidget#backgroundProgramHeader { background-color: %1; }"
         "QScrollArea#backgroundScrollArea { background-color: transparent; border: none; }"
         "QWidget#backgroundScrollViewport { background-color: transparent; }"
-        "QWidget#backgroundScrollContents { background-color: %1; }"
+
+        // QDarkStyle compatibility: its global QWidget background makes these containers opaque.
+        "QLabel, QLabel:disabled { background-color: transparent; }"
+        "QGroupBox, QGroupBox:disabled { background-color: transparent; }"
+        "QWidget[backgroundContainer=\"true\"] { background-color: transparent; }"
     ).arg(surface);
     if (centralwidget->styleSheet() != stylesheet){
         centralwidget->setStyleSheet(stylesheet);
