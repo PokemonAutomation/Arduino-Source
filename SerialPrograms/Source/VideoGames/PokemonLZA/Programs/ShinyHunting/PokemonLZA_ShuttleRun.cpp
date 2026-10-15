@@ -147,7 +147,7 @@ void route_wild_zone_3_tower(SingleSwitchProgramEnvironment& env, ProControllerC
         if (face_east || face_south){
             // if facing east or south, run backward
             pbf_move_left_joystick(context, {0, -1}, 500ms, 200ms);
-        } else if (face_west || face_north){
+        }else if (face_west || face_north){
             // if facing west or north, run forward
             pbf_move_left_joystick(context, {0, +1}, 500ms, 200ms);
         }else{

@@ -156,7 +156,7 @@ std::string create_overlay_info(const CollectedPokemonInfo& pokemon){
     std::string overlay_log = std::string(dex_str) + " " + display_name;
     if(pokemon.gender == StatsHuntGenderFilter::Male){
         overlay_log += " " + UNICODE_MALE;
-    } else if (pokemon.gender == StatsHuntGenderFilter::Female){
+    }else if (pokemon.gender == StatsHuntGenderFilter::Female){
         overlay_log += " " + UNICODE_FEMALE;
     }
     if (pokemon.shiny){

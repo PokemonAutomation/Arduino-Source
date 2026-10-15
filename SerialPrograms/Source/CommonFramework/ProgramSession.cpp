@@ -537,7 +537,7 @@ bool ProgramSession::download_prereqs(CancellableScope& scope){
             // cout << download_ptr->get_name() << endl;
 
             auto download_ptr = global_download_manager.add_to_download_list(resource_slug);
-            if (!download_ptr) {
+            if (!download_ptr){
                 std::cerr << "Error: Null download pointer for " << resource_slug << std::endl;
                 continue;
             }
@@ -557,7 +557,7 @@ bool ProgramSession::download_prereqs(CancellableScope& scope){
         report_error(e.message());
     }catch(InternalProgramError& e){
         report_error(e.message());
-    }catch (const std::exception& e) {
+    }catch (const std::exception& e){
         std::string message = std::string(e.what()) + "Report this as an error.";
         report_error(message);
     }catch(...){

@@ -64,7 +64,7 @@ ImageRGB32 OpenCV_load_image(const std::string& filename){
     }
 
     if (img.type() != CV_8UC4){
-        switch (img.channels()) {
+        switch (img.channels()){
         case 3: // BGR or RGB (OpenCV type 16)
             // This adds a 100% opaque alpha channel (A=255) automatically
             cv::cvtColor(img, img, cv::COLOR_BGR2BGRA);

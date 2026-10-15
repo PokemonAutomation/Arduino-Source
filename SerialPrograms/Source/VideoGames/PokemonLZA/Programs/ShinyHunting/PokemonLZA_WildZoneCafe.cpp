@@ -144,7 +144,7 @@ void do_one_cafe_trip(
             if (travel_status == FastTravelState::SUCCESS){
                 env.log("Fast travel back to cafe");
                 return;
-            } else if (travel_status == FastTravelState::NOT_AT_FLY_SPOT){
+            }else if (travel_status == FastTravelState::NOT_AT_FLY_SPOT){
                 stats.errors++;
                 env.update_stats();
                 OperationFailedExceptionWithScreenshot::fire(

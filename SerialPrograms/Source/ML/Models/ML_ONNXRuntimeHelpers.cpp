@@ -190,11 +190,11 @@ Ort::Session create_session(
                 write_cache_flag_file(model_cache_path, file_hash);
             }
             return session;
-        }catch (const Ort::Exception& e) {
+        }catch (const Ort::Exception& e){
             logger.log("GPU Session creation failed: " + std::string(e.what()));
             logger.log("Falling back cleanly to CPU execution...");
             // Do not throw yet. Fall through to the CPU execution block below
-        } catch (...) {
+        } catch (...){
             logger.log("Unknown GPU initialization failure. Falling back cleanly to CPU...");
         }
     }
@@ -210,11 +210,11 @@ Ort::Session create_session(
         logger.log("Ort::Session created");
         return session;
     }
-    catch (const Ort::Exception& e) {
+    catch (const Ort::Exception& e){
         logger.log("CRITICAL: CPU fallback failed completely: " + std::string(e.what()));
         throw MLModelSessionCreationError(&logger, model_path);
     }
-    catch (...) {
+    catch (...){
         logger.log("CRITICAL: Unknown failure during CPU session fallback.");
         throw MLModelSessionCreationError(&logger, model_path);
     }

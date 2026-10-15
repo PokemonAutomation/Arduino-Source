@@ -126,7 +126,7 @@ void ProgramResourceDownloadTableWidget::add_download(std::shared_ptr<ResourceDo
 
     m_layout->addWidget(download_widget);
 
-    if (m_layout->count() > 0) {
+    if (m_layout->count() > 0){
         this->show();
     }
 }
@@ -136,15 +136,15 @@ void ProgramResourceDownloadTableWidget::remove_all_downloads(){
     QLayout* current_layout = layout();
     if (!current_layout) return;
 
-    while (current_layout->count() > 0) {
+    while (current_layout->count() > 0){
         QLayoutItem* item = current_layout->takeAt(0); // Always take the current front item
-        if (QWidget* widget = item->widget()) {
+        if (QWidget* widget = item->widget()){
             widget->deleteLater();
         }
         delete item;
     }
 
-    if (m_layout->count() == 0) {
+    if (m_layout->count() == 0){
         this->hide();
     }
 }

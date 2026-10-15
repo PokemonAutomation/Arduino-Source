@@ -109,8 +109,8 @@ void ComputerProgramWidget::all_downloads_done(){
     }, Qt::QueuedConnection);
 }
 
-ProgramResourceDownloadTableWidget* ComputerProgramWidget::ensure_downloads_table() {
-    if (!m_internal_lazy_downloads_table) {
+ProgramResourceDownloadTableWidget* ComputerProgramWidget::ensure_downloads_table(){
+    if (!m_internal_lazy_downloads_table){
         m_internal_lazy_downloads_table = new ProgramResourceDownloadTableWidget(*this);
         m_internal_lazy_downloads_table->setVisible(false);
         m_layout->addWidget(m_internal_lazy_downloads_table);

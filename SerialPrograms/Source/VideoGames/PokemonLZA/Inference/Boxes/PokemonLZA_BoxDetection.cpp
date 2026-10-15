@@ -568,23 +568,23 @@ public:
             expected_something_in_cell = false;
             expected_shiny = false;
             expected_alpha = false;
-        } else if (status_word == "Regular"){
+        }else if (status_word == "Regular"){
             expected_something_in_cell = true;
             expected_shiny = false;
             expected_alpha = false;
-        } else if (status_word == "Shiny"){
+        }else if (status_word == "Shiny"){
             expected_something_in_cell = true;
             expected_shiny = true;
             expected_alpha = false;
-        } else if (status_word == "Alpha"){
+        }else if (status_word == "Alpha"){
             expected_something_in_cell = true;
             expected_shiny = false;
             expected_alpha = true;
-        } else if (status_word == "ShinyAlpha"){
+        }else if (status_word == "ShinyAlpha"){
             expected_something_in_cell = true;
             expected_shiny = true;
             expected_alpha = true;
-        } else{
+        }else{
             std::stringstream ss;
             ss << "Error: second-to-last word must be 'Empty', 'Shiny', 'Alpha', or 'ShinyAlpha', got '" << status_word << "'." << endl;
             return ss.str();
@@ -598,7 +598,7 @@ public:
 
         if (dex_info_word == "None"){
             expect_dex_detection = false;
-        } else if (dex_info_word.size() >= 2 && (dex_info_word[0] == 'L' || dex_info_word[0] == 'H')){
+        }else if (dex_info_word.size() >= 2 && (dex_info_word[0] == 'L' || dex_info_word[0] == 'H')){
             expect_dex_detection = true;
             expected_dex_type = (dex_info_word[0] == 'L') ? DexType::LUMIOSE : DexType::HYPERSPACE;
 
@@ -610,7 +610,7 @@ public:
                 return ss.str();
             }
             expected_dex_number = static_cast<uint16_t>(dex_num_int);
-        } else{
+        }else{
             std::stringstream ss;
             ss << "Error: last word must be 'None', 'L<number>', or 'H<number>', got '" << dex_info_word << "'." << endl;
             return ss.str();

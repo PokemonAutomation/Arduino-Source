@@ -108,7 +108,7 @@ std::optional<int64_t> Utility::sanitize_optional_integer_input(const dpp::param
     const auto& value_variant = params[index].second;
 
     // Check if the parameter was omitted
-    if (std::holds_alternative<std::monostate>(value_variant)) {
+    if (std::holds_alternative<std::monostate>(value_variant)){
         return std::nullopt;
     }
 

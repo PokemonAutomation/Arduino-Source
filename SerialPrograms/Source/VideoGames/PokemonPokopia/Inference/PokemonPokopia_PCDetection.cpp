@@ -293,7 +293,7 @@ bool RecipeIconDetector::detect(const ImageViewRGB32& screen){
     bool found = false;
     m_recipe_type = RecipeType::NOT_RECIPE;
 
-    for (const auto& matcher_info : matchers) {
+    for (const auto& matcher_info : matchers){
         found = match_template_by_waterfill(
             screen.size(),
             extract_box_reference(screen, m_arrow_box),
@@ -306,7 +306,7 @@ bool RecipeIconDetector::detect(const ImageViewRGB32& screen){
                 return true;
             }
         );
-        if (found) {
+        if (found){
             m_recipe_type = matcher_info.second;
             break;
         }

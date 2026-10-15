@@ -104,7 +104,7 @@ void ItemDuplication::program(SingleSwitchProgramEnvironment& env, ProController
             { mail_selection_arrow }
         );
 
-        if (ret < 0) {
+        if (ret < 0){
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
@@ -125,7 +125,7 @@ void ItemDuplication::program(SingleSwitchProgramEnvironment& env, ProController
             { farfetchd_held_item }
         );
 
-        if (ret2 < 0) {
+        if (ret2 < 0){
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
@@ -144,7 +144,7 @@ void ItemDuplication::program(SingleSwitchProgramEnvironment& env, ProController
             { item_description }
         );
 
-        if (ret3 < 0) {
+        if (ret3 < 0){
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
@@ -163,7 +163,7 @@ void ItemDuplication::program(SingleSwitchProgramEnvironment& env, ProController
             { confirmation_arrow }
         );
 
-        if (ret4 < 0) {
+        if (ret4 < 0){
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(
@@ -187,7 +187,7 @@ void ItemDuplication::program(SingleSwitchProgramEnvironment& env, ProController
             { mail_confirmation_arrow }
         );
 
-        if (ret5 < 0) {
+        if (ret5 < 0){
             stats.errors++;
             env.update_stats();
             OperationFailedExceptionWithScreenshot::fire(

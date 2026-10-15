@@ -213,7 +213,7 @@ template<class Tile> int test_binary_matrix_tile_t(){
                         if (gt_test(shift_x, shift_y, x, y)){
                             gt = dst_tile.get_bit(x, y) || get_src_bit_test(shift_x, shift_y, x, y);
                             // cout << "set the source bit with ||" << endl;
-                        } else{
+                        }else{
                             // cout << "Use the original dest bit" << endl;
                             gt = dst_tile.get_bit(x, y);
                         }

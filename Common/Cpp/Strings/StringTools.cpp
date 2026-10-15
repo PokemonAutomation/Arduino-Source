@@ -91,7 +91,7 @@ std::string capitalize(const std::string& str){
     for (size_t i = 0; i < result.size(); i++){
         if (std::isspace(result[i])){
             new_word = true;
-        } else if (new_word){
+        }else if (new_word){
             result[i] = (char)std::toupper(result[i]);
             new_word = false;
         }
@@ -108,7 +108,7 @@ std::string uncapitalize(const std::string& str){
     for (size_t i = 0; i < result.size(); i++){
         if (std::isspace(result[i])){
             new_word = true;
-        } else if (new_word){
+        }else if (new_word){
             result[i] = (char)std::tolower(result[i]);
             new_word = false;
         }

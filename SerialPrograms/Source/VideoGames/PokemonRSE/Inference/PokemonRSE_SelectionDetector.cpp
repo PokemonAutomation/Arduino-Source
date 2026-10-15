@@ -42,15 +42,15 @@ public:
     }
 
 
-    static const SelectionArrowMatcher& emerald_matcher() {
+    static const SelectionArrowMatcher& emerald_matcher(){
         static SelectionArrowMatcher matcher("PokemonRSE/SelectionArrowEmerald.png");
         return matcher;
     }
-    static const SelectionArrowMatcher& ruby_sapphire_jpn_matcher() {
+    static const SelectionArrowMatcher& ruby_sapphire_jpn_matcher(){
         static SelectionArrowMatcher matcher("PokemonRSE/SelectionArrowRubySapphireJpn.png");
         return matcher;
     }
-    static const SelectionArrowMatcher& emerald_jpn_matcher() {
+    static const SelectionArrowMatcher& emerald_jpn_matcher(){
         static SelectionArrowMatcher matcher("PokemonRSE/SelectionArrowEmeraldJpn.png");
         return matcher;
     }
@@ -64,7 +64,7 @@ void SelectionArrowDetector::make_overlays(VideoOverlaySet& items) const {
     const BoxOption& GAME_BOX = GameSettings::instance().GAME_BOX;
     items.add(m_color, GAME_BOX.inner_to_outer(m_box));
 }
-bool SelectionArrowDetector::detect(const ImageViewRGB32& screen) {
+bool SelectionArrowDetector::detect(const ImageViewRGB32& screen){
     const BoxOption& GAME_BOX = GameSettings::instance().GAME_BOX;
     ImageViewRGB32 game_screen = extract_box_reference(screen, GAME_BOX);
     ImageViewRGB32 image = extract_box_reference(game_screen, m_box);
@@ -112,7 +112,7 @@ void SelectionBorderDetector::make_overlays(VideoOverlaySet& items) const {
     const BoxOption& GAME_BOX = GameSettings::instance().GAME_BOX;
     items.add(m_color, GAME_BOX.inner_to_outer(m_box));
 }
-bool SelectionBorderDetector::detect(const ImageViewRGB32& screen) {
+bool SelectionBorderDetector::detect(const ImageViewRGB32& screen){
     const BoxOption& GAME_BOX = GameSettings::instance().GAME_BOX;
     ImageViewRGB32 game_screen = extract_box_reference(screen, GAME_BOX);
     ImageViewRGB32 image = extract_box_reference(game_screen, m_box);
@@ -141,27 +141,27 @@ bool SelectionBorderDetector::detect(const ImageViewRGB32& screen) {
 SelectionSlotDetector::SelectionSlotDetector(Color color, const std::vector<SlotCandidate>& candidates) 
     : m_color(color)
 {
-    for (const auto& candidate : candidates) {
+    for (const auto& candidate : candidates){
         double slot_y = candidate.y;
         double width = (candidate.indicator == SelectionIndicator::ARROW) ? SELECTION_ARROW_BOX_WIDTH : SELECTION_BORDER_BOX_WIDTH;
         double height = (candidate.indicator == SelectionIndicator::BORDER) ? SELECTION_BORDER_BOX_HEIGHT : SELECTION_ARROW_BOX_HEIGHT;
         ImageFloatBox box(candidate.x, slot_y, width, height);
 
-        if (candidate.indicator == SelectionIndicator::ARROW) {
+        if (candidate.indicator == SelectionIndicator::ARROW){
             m_detectors.emplace_back(std::make_unique<SelectionArrowDetector>(color, box));
-        } else if (candidate.indicator == SelectionIndicator::BORDER) {
+        }else if (candidate.indicator == SelectionIndicator::BORDER){
             m_detectors.emplace_back(std::make_unique<SelectionBorderDetector>(color, box));
         }
     }
 }
 void SelectionSlotDetector::make_overlays(VideoOverlaySet& items) const {
-    for (const auto& detector : m_detectors) {
+    for (const auto& detector : m_detectors){
         detector->make_overlays(items);
     }
 }
-bool SelectionSlotDetector::detect(const ImageViewRGB32& screen) {
-    for (auto& detector : m_detectors) {
-        if (detector->detect(screen)) {
+bool SelectionSlotDetector::detect(const ImageViewRGB32& screen){
+    for (auto& detector : m_detectors){
+        if (detector->detect(screen)){
             return true;
         }
     }

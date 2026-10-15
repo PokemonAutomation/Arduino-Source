@@ -219,7 +219,7 @@ void reset_and_perform_blind_sequence(
         context.wait_for_all_requests();
         int ret = run_until<ProControllerContext>(
             console, context,
-            [language, target, seed_button, extra_button, timings, safari_zone, console_type](ProControllerContext& context) {
+            [language, target, seed_button, extra_button, timings, safari_zone, console_type](ProControllerContext& context){
                 perform_blind_sequence(context, language, target, seed_button, extra_button, timings, safari_zone, console_type);
             },
             { update_detector, user_selection_detector },
@@ -270,7 +270,7 @@ void reset_and_detect_copyright_text(ConsoleHandle& console, ProControllerContex
         context.wait_for_all_requests();
         int ret = run_until<ProControllerContext>(
             console, context,
-            [](ProControllerContext& context) {
+            [](ProControllerContext& context){
                 pbf_press_button(context, BUTTON_A, 80ms, 9920ms);
             },
             { update_detector, user_selection_detector, blackscreen_detector }

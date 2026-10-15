@@ -368,7 +368,7 @@ void overworld_navigation(
                                 ssf_press_left_joystick(context, {x, y}, 0ms, Seconds(seconds_realign));
                                 if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
                                     pbf_wait(context, Seconds(seconds_realign));
-                                } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
+                                }else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
                                     for (size_t j = 0; j < 5 * seconds_realign; j++){
                                         pbf_press_button(context, BUTTON_A, 160ms, 40ms);
                                     }

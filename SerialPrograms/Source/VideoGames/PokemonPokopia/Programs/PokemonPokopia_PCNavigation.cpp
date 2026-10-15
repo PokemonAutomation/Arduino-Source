@@ -299,7 +299,7 @@ bool generic_navigate_to_target_routine(
     const std::vector<ImageFloatBox>& option_boxes,
     int target_index,
     SelectionArrowType arrow_type
-) {
+){
     WallClock deadline = current_time() + 30s;
     while (current_time() < deadline){
         int current_index = get_current_selector_index(console, option_boxes, arrow_type);
@@ -309,22 +309,22 @@ bool generic_navigate_to_target_routine(
         if (current_index == target_index){
             console.log("Selector on target");
             return true;
-        } else {
+        }else{
             int item_count = int(option_boxes.size());
             int delta = target_index - current_index;
             if (std::abs(delta) > item_count / 2){
                 if (delta > 0){
                     delta = delta - item_count;
-                } else {
+                }else{
                     delta = delta + item_count;
                 }
             }
-            if (delta > 0) {
-                for (int i = 0; i < delta; i++) {
+            if (delta > 0){
+                for (int i = 0; i < delta; i++){
                     pbf_press_dpad(context, (arrow_type == SelectionArrowType::DOWN) ? DPAD_RIGHT : DPAD_DOWN, 160ms, 240ms);
                 }
-            } else {
-                for (int i = 0; i < -delta; i++) {
+            }else{
+                for (int i = 0; i < -delta; i++){
                     pbf_press_dpad(context, (arrow_type == SelectionArrowType::DOWN) ? DPAD_LEFT : DPAD_UP, 160ms, 240ms);
                 }
             }
@@ -342,7 +342,7 @@ bool generic_navigate_to_target(
     const std::vector<ImageFloatBox>& option_boxes,
     int target_index,
     SelectionArrowType arrow_type
-) {
+){
     WallClock deadline = current_time() + 30s;
     while (current_time() < deadline){
         if (generic_navigate_to_target_routine(console, context, option_boxes, target_index, arrow_type)){
@@ -483,7 +483,7 @@ void access_pc_from_overworld(ConsoleHandle& console, ProControllerContext& cont
                     if (ret == 0){
                         console.log("Successfully navigated up to main PC menu from stamp card");
                         return;
-                    } else {
+                    }else{
                         console.log("Failed to navigate up to main PC menu from stamp card");
                         pbf_mash_button(context, BUTTON_B, 10s);
                         break;
@@ -512,7 +512,7 @@ void access_pc_from_overworld(ConsoleHandle& console, ProControllerContext& cont
                                 );
                             }
                             return;
-                        } else if (ret == 1){
+                        }else if (ret == 1){
                             console.log("Successfully redeemed stamps and navigated up to stamp card menu");
                             if (stop_on_stamp_card){
                                 return;
@@ -632,7 +632,7 @@ void generic_select_and_open(
     int target_index,
     SelectionArrowType arrow_type,
     bool move_parallel
-) {
+){
     SelectionArrowWatcher target_selector(
         COLOR_YELLOW, &console.overlay(),
         arrow_type,
@@ -878,7 +878,7 @@ void move_to_next_stamp(ConsoleHandle& console, ProControllerContext& context, S
             2s,
             {replace_stamp_selection_watcher}
         );
-        if (ret != 0) {
+        if (ret != 0){
             console.log("Failed to detect selector after moving to next stamp");
             OperationFailedExceptionWithScreenshot::fire(
                 ErrorReportMode::SEND_ERROR_REPORT,
@@ -887,7 +887,7 @@ void move_to_next_stamp(ConsoleHandle& console, ProControllerContext& context, S
             );
         }
         ImageFloatBox new_selector_location = replace_stamp_selection_watcher.last_detected();
-        if (std::abs(new_selector_location.x - current_selector_location.x) > 0.01 && std::abs(new_selector_location.y - current_selector_location.y) > 0.01) {
+        if (std::abs(new_selector_location.x - current_selector_location.x) > 0.01 && std::abs(new_selector_location.y - current_selector_location.y) > 0.01){
             console.log("Selector moved to next stamp");
             return;
         }

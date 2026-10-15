@@ -276,7 +276,7 @@ void BerrySession::add_berries(
         pbf_press_button(context, BUTTON_MINUS, 100ms, 500ms);
         pbf_press_button(context, BUTTON_MINUS, 100ms, 700ms);
         context.wait_for_all_requests();
-    } else if (all_normal_berries && !move_topdown){
+    }else if (all_normal_berries && !move_topdown){
         // Press minus button once to change to normal berry-only menu
         pbf_press_button(context, BUTTON_MINUS, 100ms, 700ms);
         context.wait_for_all_requests();

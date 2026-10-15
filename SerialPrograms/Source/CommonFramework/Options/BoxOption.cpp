@@ -73,14 +73,14 @@ void BoxOption::on_config_value_changed(void* object){
         double* targets[] = { &x_coord, &y_coord, &width_coord, &height_coord };
         size_t limit = std::min(all_coords.size(), size_t(4));
 
-        for (size_t i = 0; i < limit; ++i) {
+        for (size_t i = 0; i < limit; ++i){
             const auto& s = all_coords[i];
             char* endptr;
             // Parses directly from the buffer without locale or exception overhead
             double value = std::strtod(s.data(), &endptr);
             
             // Validate that at least some characters were parsed successfully
-            if (endptr != s.data()) {
+            if (endptr != s.data()){
                 *targets[i] = value;
             }
         }

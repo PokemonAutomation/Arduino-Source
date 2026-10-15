@@ -75,7 +75,7 @@ void DownloadThread::start_download_thread(){
         }catch(OperationFailedException&){
             success = false;
             m_hooks.report_failed();
-        }catch (const std::exception& e) {
+        }catch (const std::exception& e){
             std::string error_msg = "DownloadThread::start_download_thread: " + std::string(e.what());
             success = false;
             m_hooks.report_exception_caught(error_msg.c_str());

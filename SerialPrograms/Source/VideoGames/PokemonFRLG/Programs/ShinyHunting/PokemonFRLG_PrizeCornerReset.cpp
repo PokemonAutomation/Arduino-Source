@@ -125,9 +125,9 @@ void PrizeCornerReset::on_config_value_changed(void* object){
 std::string PrizeCornerReset::check_amount_redeemed(uint16_t slot_num, uint32_t redeem_num) const{
     if (slot_num == 4 && redeem_num != 1){ //Only 1 Porygon in both FR and LG
         return "Error: Cannot redeem more than 1 Porygon per reset due to coin case limit.";
-    } else if (slot_num == 3 && redeem_num > 2){ //2 Dratini LG or 1 Scyther FR
+    }else if (slot_num == 3 && redeem_num > 2){ //2 Dratini LG or 1 Scyther FR
         return "Error: Maximum redemption of 2 Dratini in LG or 1 Scyther in FR per reset due to coin case limit.";
-    } else if (slot_num == 2 && redeem_num > 3){ //Max of 3 for both games
+    }else if (slot_num == 2 && redeem_num > 3){ //Max of 3 for both games
         return "Error: Maximum redemption of 3 Dratini/Pinsir due to coin case limit.";
     } //Abra/Clefairy will run out of party space first before coins.
     return "";

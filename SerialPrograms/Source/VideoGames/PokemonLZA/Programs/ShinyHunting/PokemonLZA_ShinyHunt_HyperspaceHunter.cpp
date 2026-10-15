@@ -360,7 +360,7 @@ void ShinyHunt_HyperspaceHunter::program(SingleSwitchProgramEnvironment& env, Pr
 
     if (HUNT_METHOD == HuntMethod::FLY_SPOT_RESET){
         use_fly_spot_reset(env, context);
-    } else if (HUNT_METHOD == HuntMethod::SHUTTLE_RUN){
+    }else if (HUNT_METHOD == HuntMethod::SHUTTLE_RUN){
         use_shuttle_run(env, context);
     }
     

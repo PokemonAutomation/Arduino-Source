@@ -68,7 +68,7 @@ std::vector<uint16_t> parse_seed_list(ConsoleHandle& console, std::string seed_l
 
 int16_t seed_position_in_list(uint16_t seed, std::vector<uint16_t> list){
     for (size_t i=0; i<list.size(); i++){
-        if (seed == list[i]) {
+        if (seed == list[i]){
             return int16_t(i);
         }
     }
@@ -127,7 +127,7 @@ RngTimings prepare_timings(
     Language LANGUAGE
 ){
     double modified_ingame_advances = INGAME_ADVANCES + calibrations.ingame_offset + fixed_advances_offset(target);
-    if (modified_ingame_advances < 0) {
+    if (modified_ingame_advances < 0){
         throw UserSetupError(console, "In-game advances cannot be negative. Check your in-game advances and calibration.");
     }
 
@@ -145,7 +145,7 @@ RngTimings prepare_timings(
     uint64_t TEACHY_TV_BUFFER = safari_zone ? 20000 : 12000; // Safari zone targets need extra time to walk to the right position
 
     bool should_use_teachy_tv = USE_TEACHY_TV && (modified_ingame_advances > TEACHY_TV_BUFFER); // don't use Teachy TV for short in-game advance targets
-    if (should_use_teachy_tv) {
+    if (should_use_teachy_tv){
         TEACHY_ADVANCES = uint64_t((int)std::floor((modified_ingame_advances - TEACHY_TV_BUFFER + 7500) / 313) * 313);
     }
 
@@ -545,7 +545,7 @@ bool update_history(
     
     std::vector<int64_t> uncal_advances; // hit advance - calibrations
     std::vector<AdvRngState> hits;
-    for(auto hit : search_hits) {
+    for(auto hit : search_hits){
         uncal_advances.emplace_back(int64_t(std::round(hit.advance - calibrations.csf_offset - calibrations.ingame_offset)));
         hits.emplace_back(hit);
     }

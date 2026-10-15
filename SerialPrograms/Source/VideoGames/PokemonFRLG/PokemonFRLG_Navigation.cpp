@@ -417,13 +417,13 @@ BattleResult spam_first_move(ConsoleHandle& console, ProControllerContext& conte
     uint16_t errors = 0;
     uint16_t times_moved = 0;
     while (true){
-        if (errors > 5) {
+        if (errors > 5){
             OperationFailedExceptionWithScreenshot::fire(
                 ErrorReportMode::SEND_ERROR_REPORT,
                 "spam_first_move(): Failed to use move 5 times.",
                 console
             );  
-        } else if (times_moved > 50){
+        }else if (times_moved > 50){
             OperationFailedExceptionWithScreenshot::fire(
                 ErrorReportMode::SEND_ERROR_REPORT,
                 "spam_first_move(): More than 50 move uses detected.",
@@ -464,7 +464,7 @@ BattleResult spam_first_move(ConsoleHandle& console, ProControllerContext& conte
             );
             if (ret2 < 0){
                 times_moved++;
-            } else {
+            }else{
                 console.log("Out of PP, fleeing battle.");
                 pbf_mash_button(context, BUTTON_B, 2000ms);
                 flee_battle(console, context);
@@ -512,13 +512,13 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context){
         context.wait_for_all_requests();
         int ret = run_until<ProControllerContext>(
             console, context,
-            [](ProControllerContext& context) {
+            [](ProControllerContext& context){
                 pbf_wait(context, 1000ms);
                 pbf_mash_button(context, BUTTON_B, 9000ms);
             },
             { battle_menu }
         );
-        if (ret < 0) {
+        if (ret < 0){
             errors++;
             console.log("flee_battle(): Failed to detect battle menu. Attempt " + std::to_string(errors) + "/5", COLOR_RED);
             continue;
@@ -535,7 +535,7 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context){
             { {ran_away} }
         );
 
-        if (ret2 == 0) {
+        if (ret2 == 0){
             console.log("Running away...");
         }
         else {
@@ -546,14 +546,14 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context){
 
         int ret3 = run_until<ProControllerContext>(
             console, context,
-            [](ProControllerContext& context) {
+            [](ProControllerContext& context){
                 pbf_press_button(context, BUTTON_A, 320ms, 640ms);
                 pbf_wait(context, 5000ms);
                 context.wait_for_all_requests();
             },
             { battle_over, battle_menu }
         );
-        if (ret3 == 0) {
+        if (ret3 == 0){
             console.log("Successfully fled the battle.");
             return;
         }
@@ -601,7 +601,7 @@ bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, boo
         if (first_attempt){
             ret = run_until<ProControllerContext>(
                 console, context,
-                [](ProControllerContext& context) {
+                [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_B, 20000ms);
                 },
                 { battle_exited }
@@ -609,7 +609,7 @@ bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, boo
         }else{
             ret = run_until<ProControllerContext>(
                 console, context,
-                [deadline, rejected_first_box](ProControllerContext& context) {
+                [deadline, rejected_first_box](ProControllerContext& context){
                     pbf_wait(context, 1000ms); // give the watchers a chance to detect something
                     while (current_time() < deadline){
                         pbf_press_button(context, rejected_first_box ? BUTTON_A : BUTTON_B, 200ms, 1800ms);
@@ -629,7 +629,7 @@ bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, boo
             context.wait_for_all_requests(); 
             ret2 = run_until<ProControllerContext>(
                 console, context,
-                [](ProControllerContext& context) {
+                [](ProControllerContext& context){
                     pbf_wait(context, 2000ms);
                 },
                 { evolution_started }
@@ -679,7 +679,7 @@ bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, boo
             context.wait_for_all_requests();
             ret2 = run_until<ProControllerContext>(
                 console, context,
-                [](ProControllerContext& context) {
+                [](ProControllerContext& context){
                     pbf_press_button(context, BUTTON_PLUS, 200ms, 800ms);
                     pbf_press_button(context, BUTTON_PLUS, 200ms, 800ms);
                     pbf_press_button(context, BUTTON_PLUS, 200ms, 800ms);
@@ -729,9 +729,9 @@ void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext
         case 0:
             if (menu_context == StartMenuContext::SAFARI_ZONE){
                 ret = move_cursor_to_position(console, context, SelectionArrowPositionSafariMenu::POKEMON);
-            } else if (menu_context == StartMenuContext::NO_DEX){
+            }else if (menu_context == StartMenuContext::NO_DEX){
                 ret = move_cursor_to_position(console, context, SelectionArrowPositionNoDexMenu::POKEMON);
-            } else {
+            }else{
                 ret = move_cursor_to_position(console, context, SelectionArrowPositionStartMenu::POKEMON);
             }
 
@@ -741,7 +741,7 @@ void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext
                 context.wait_for_all_requests();
                 pbf_mash_button(context, BUTTON_B, 2000ms);
                 start_menu_is_open = false;
-            } else {
+            }else{
                 console.log("Navigated to POKEMON on the start menu");
                 context.wait_for_all_requests();
                 pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
@@ -810,9 +810,9 @@ void open_bag_from_overworld(ConsoleHandle& console, ProControllerContext& conte
         case 0:
             if (menu_context == StartMenuContext::SAFARI_ZONE){
                 ret = move_cursor_to_position(console, context, SelectionArrowPositionSafariMenu::BAG);
-            } else if (menu_context == StartMenuContext::NO_DEX){
+            }else if (menu_context == StartMenuContext::NO_DEX){
                 ret = move_cursor_to_position(console, context, SelectionArrowPositionNoDexMenu::BAG);
-            } else {
+            }else{
                 ret = move_cursor_to_position(console, context, SelectionArrowPositionStartMenu::BAG);
             }
 
@@ -822,7 +822,7 @@ void open_bag_from_overworld(ConsoleHandle& console, ProControllerContext& conte
                 context.wait_for_all_requests();
                 pbf_mash_button(context, BUTTON_B, 2000ms);
                 start_menu_is_open = false;
-            } else {
+            }else{
                 console.log("Navigated to BAG on the start menu");
                 context.wait_for_all_requests();
                 pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
@@ -971,7 +971,7 @@ void open_fly_map_from_overworld(ConsoleHandle& console, ProControllerContext& c
         context.wait_for_all_requests();
         int ret = run_until<ProControllerContext>(
             console, context,
-            [](ProControllerContext& context) {
+            [](ProControllerContext& context){
                 pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
             },
             { fly_user_selected }
@@ -1089,7 +1089,7 @@ void fly_from_kanto_map(ConsoleHandle& console, ProControllerContext& context, K
         context.wait_for_all_requests();
         int ret = run_until<ProControllerContext>(
             console, context,
-            [](ProControllerContext& context) {
+            [](ProControllerContext& context){
                 // walk up to counter and initiate dialog
                 pbf_mash_button(context, BUTTON_A, 5000ms);
             },
@@ -1099,7 +1099,7 @@ void fly_from_kanto_map(ConsoleHandle& console, ProControllerContext& context, K
         pbf_wait(context, 8000ms);
         context.wait_for_all_requests();
 
-        if (ret == 0) {
+        if (ret == 0){
             console.log("Fly initiated.");
             return;
         }else{
@@ -1205,7 +1205,7 @@ bool in_overworld(
     context.wait_for_all_requests();
     int ret = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             for (int i = 0; i < 3; i++){
                 pbf_press_button(context, BUTTON_PLUS, 200ms, 1800ms);
                 pbf_mash_button(context, BUTTON_B, 500ms);
@@ -1305,7 +1305,7 @@ int auto_catch(
             context.wait_for_all_requests();
             int ret = run_until<ProControllerContext>(
                 console, context,
-                [](ProControllerContext& context) {
+                [](ProControllerContext& context){
                     for (int i = 0; i < 60; i++){
                         pbf_press_button(context, BUTTON_B, 200ms, 300ms);
                     }
@@ -1356,7 +1356,7 @@ int auto_catch(
         BagWatcher bag_open(COLOR_RED);
         int ret2 = run_until<ProControllerContext>(
             console, context,
-            [](ProControllerContext& context) {
+            [](ProControllerContext& context){
                 for (int i = 0; i < 5; i++){
                     pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
                 }
@@ -1551,7 +1551,7 @@ int fish_encounter(ConsoleHandle& console, ProControllerContext& context, Second
             console.log("Fishing dialog detected.");
             pbf_press_button(context, BUTTON_B, 200ms, 200ms);
             context.wait_for_all_requests();
-        } else if (ret == 1 || ret == 2 || ret == 3){
+        }else if (ret == 1 || ret == 2 || ret == 3){
             console.log("Battle entered.");
             break;
         }

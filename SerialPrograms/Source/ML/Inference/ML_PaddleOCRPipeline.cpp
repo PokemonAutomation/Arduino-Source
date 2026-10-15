@@ -122,17 +122,17 @@ void PaddleOCRPipeline::load_dictionary(const Filesystem::Path& path){
         std::error_code ec;
         const auto absolute_path = Filesystem::absolute(path);
 
-        if (!ec) {
+        if (!ec){
             m_logger.log("[OCR-INFO] Absolute dictionary path: " +
                         absolute_path.string());
 
             m_logger.log("[OCR-INFO] Dictionary exists: " +
                         std::string(Filesystem::exists(absolute_path) ? "true" : "false"));
 
-            if (Filesystem::exists(absolute_path)) {
+            if (Filesystem::exists(absolute_path)){
                 const auto file_size = Filesystem::file_size(absolute_path, ec);
 
-                if (!ec) {
+                if (!ec){
                     m_logger.log("[OCR-INFO] Dictionary file size: " +
                                 std::to_string(file_size) + " bytes");
                 }
@@ -142,17 +142,17 @@ void PaddleOCRPipeline::load_dictionary(const Filesystem::Path& path){
 
     std::ifstream fs_file(path.stdpath());
 
-    if (!fs_file.is_open()) {
+    if (!fs_file.is_open()){
         m_logger.log("[OCR-ERROR] Failed to open dictionary: " + path.string());
         throw FileException(nullptr, PA_CURRENT_FUNCTION, "PaddleOCRPipeline::load_dictionary(): Failed to open dictionary.", path.string());
     }
 
     std::string line;
-    while (std::getline(fs_file, line)) {
+    while (std::getline(fs_file, line)){
         m_dictionary.push_back(line);
     }
 
-    if (fs_file.bad()) {
+    if (fs_file.bad()){
         m_logger.log("[OCR-ERROR] I/O error while reading dictionary: " + path.string());
     }
 
@@ -167,7 +167,7 @@ void PaddleOCRPipeline::load_dictionary(const Filesystem::Path& path){
 std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     const int debug_image_index = m_debug_image_index.fetch_add(1, std::memory_order_relaxed) + 1;
 
-    if (image.width() == 0 || image.height() == 0) {
+    if (image.width() == 0 || image.height() == 0){
         m_logger.log("[OCR-DEBUG] Input was an empty image.");
         return "";
     }
@@ -354,10 +354,10 @@ std::string PaddleOCRPipeline::recognize_line(const cv::Mat& cropped_image){
 
         size_t nan_count = 0;
         size_t subnormal_count = 0;
-        for (float val : input_buffer) {
-            if (std::isnan(val)) {
+        for (float val : input_buffer){
+            if (std::isnan(val)){
                 nan_count++;
-            } else if (val != 0.0f && std::fpclassify(val) == FP_SUBNORMAL) {
+            }else if (val != 0.0f && std::fpclassify(val) == FP_SUBNORMAL){
                 subnormal_count++;
             }
         }
@@ -381,7 +381,7 @@ std::string PaddleOCRPipeline::recognize_line(const cv::Mat& cropped_image){
     const char* output_names[] = {m_output_name.c_str()};  
 
     try{
-        if (debugging) {
+        if (debugging){
             m_logger.log("[OCR-DEBUG] Calling m_rec_session.Run() now...");
         }
 
@@ -409,7 +409,7 @@ std::string PaddleOCRPipeline::recognize_line(const cv::Mat& cropped_image){
 }
 
 
-cv::Mat crop_to_text_region_with_padding(const cv::Mat& image, int debug_image_index) {
+cv::Mat crop_to_text_region_with_padding(const cv::Mat& image, int debug_image_index){
     // get a binary image, for cropping purposes
     cv::Mat binary = get_binary_image(image);
 
@@ -522,7 +522,7 @@ cv::Mat get_binary_image(const cv::Mat& image){
 
 
 void add_vertical_padding(cv::Mat& image, const cv::Mat& binary_tight_crop, int debug_image_index){
-    if (image.empty()) {
+    if (image.empty()){
         return;
     }
 
@@ -559,7 +559,7 @@ bool is_horizontal_line(const cv::Mat& binary, int debug_image_index){
     int h = binary.rows;
     int w = binary.cols;
     constexpr float min_ratio = 4.0f;
-    if (h <= 0 || (float)w / h < min_ratio) {
+    if (h <= 0 || (float)w / h < min_ratio){
         return false;
     }
 
@@ -568,13 +568,13 @@ bool is_horizontal_line(const cv::Mat& binary, int debug_image_index){
     std::vector<cv::Vec4i> hierarchy;
     cv::findContours(binary, contours, hierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
-    for (size_t i = 0; i < contours.size(); ++i) {
+    for (size_t i = 0; i < contours.size(); ++i){
         if (STATIC_GLOBALS.PADDLE_OCR_DEBUG_IMAGE){
             cv::Mat contour_image = binary(cv::boundingRect(contours[i])).clone();
             cv::imwrite(std::to_string(debug_image_index) + "-contour_image-" + std::to_string(i) + ".png", contour_image);
         }
 
-        if (!is_line_shape(binary, contours[i])) {
+        if (!is_line_shape(binary, contours[i])){
             // cout << "Input image is likely NOT a horizontal line." << endl;
 
             return false;
@@ -592,7 +592,7 @@ bool is_line_shape(const cv::Mat& binary, const std::vector<cv::Point>& contour)
     double area = cv::countNonZero(cropped_binary);
     
     // Safety check to avoid division by zero on tiny noise artifacts
-    if (area <= 0) {
+    if (area <= 0){
         return false;
     }
 
@@ -623,7 +623,7 @@ bool is_line_shape(const cv::Mat& binary, const std::vector<cv::Point>& contour)
 }
 
 void add_horizontal_padding(cv::Mat& image, int debug_image_index){
-    if (image.empty()) {
+    if (image.empty()){
         return;
     }
 
@@ -632,7 +632,7 @@ void add_horizontal_padding(cv::Mat& image, int debug_image_index){
     constexpr float min_ratio = 0.8f;
 
     // add horizontal padding to tall/narrow characters
-    if (h > 0 && (float)w / h < min_ratio) {
+    if (h > 0 && (float)w / h < min_ratio){
         int target_w = static_cast<int>(std::ceil(min_ratio * h));
 
         int left = (target_w - w) / 2;
@@ -659,8 +659,8 @@ void add_horizontal_padding(cv::Mat& image, int debug_image_index){
 
 
 
-cv::Scalar estimate_background_color(const cv::Mat& image) {
-    if (image.empty() || image.type() != CV_8UC3) {
+cv::Scalar estimate_background_color(const cv::Mat& image){
+    if (image.empty() || image.type() != CV_8UC3){
         return cv::Scalar(255, 255, 255);
     }
 
@@ -713,7 +713,7 @@ std::string PaddleOCRPipeline::decode_CTC(float* data, const std::vector<int64_t
                 ", Dictionary Size: " + std::to_string(dict.size()));
     }
 
-    if (dict.empty()) {
+    if (dict.empty()){
         m_logger.log("[OCR-CTC-ERROR] FATAL: Dictionary payload array is empty! Parsing loops will fail to resolve text indicators.");
     }
 
@@ -729,7 +729,7 @@ std::string PaddleOCRPipeline::decode_CTC(float* data, const std::vector<int64_t
             // Index 1 from the model maps to the 1st line of your .txt file (Vector index 0)
             size_t dict_idx = argmax - 1; 
             if (dict_idx < dict.size()){
-                if (debugging) {
+                if (debugging){
                     m_logger.log("[OCR-CTC-DEBUG] Step " + std::to_string(i) + 
                                ": Predicted Argmax = " + std::to_string(argmax) + 
                                " -> Target Dict Index = " + std::to_string(dict_idx) +
@@ -746,7 +746,7 @@ std::string PaddleOCRPipeline::decode_CTC(float* data, const std::vector<int64_t
         last_index = argmax;
     }
 
-    if (debugging) {
+    if (debugging){
         m_logger.log("[OCR-CTC-DEBUG] Complete loop execution tracking finish. Resulting string extraction: '" + text + "'");
     }
 

@@ -388,7 +388,7 @@ typename std::vector<std::pair<Key, Value>>::const_iterator lower_bound(
 ){
     return std::lower_bound(
         sorted_vector.begin(), sorted_vector.end(), target,
-        [](const std::pair<Key, Value>& element, const Key& key) {
+        [](const std::pair<Key, Value>& element, const Key& key){
             return element.first < key;
         }
     );
@@ -400,7 +400,7 @@ typename std::vector<std::pair<Key, Value>>::const_iterator upper_bound(
 ){
     return std::upper_bound(
         sorted_vector.begin(), sorted_vector.end(), target,
-        [](const Key& key, const std::pair<Key, Value>& element) {
+        [](const Key& key, const std::pair<Key, Value>& element){
             return key < element.first;
         }
     );
@@ -567,7 +567,7 @@ bool is_square_sparkle(const Kernels::Waterfill::WaterfillObject& object, double
     std::sort(
         edge_pixels.begin(),
         edge_pixels.end(),
-        [](const auto& a, const auto& b) {
+        [](const auto& a, const auto& b){
             return a.first < b.first;
         }
     );

@@ -202,10 +202,10 @@ bool SelectionDialogDetector::detect(const ImageViewRGB32& screen){
 }
 
 
-static std::vector<SlotCandidate> confirm_candidates(ConfirmSlot slot, ConfirmPosition position) {
+static std::vector<SlotCandidate> confirm_candidates(ConfirmSlot slot, ConfirmPosition position){
     double offset = SELECTION_SLOT_OFFSETS[(int)slot];
 
-    switch (position) {
+    switch (position){
     case ConfirmPosition::STANDARD:
         return {
             { 0.69, 0.45 + offset, SelectionIndicator::ARROW  },
@@ -271,7 +271,7 @@ private:
     bool m_expected;
 };
 
-void add_tests_SelectionDialogDetector(UnitTestDatabase& database) {
+void add_tests_SelectionDialogDetector(UnitTestDatabase& database){
     // Switch 1/2
     
     /*
@@ -316,7 +316,7 @@ private:
     bool m_expected;
 };
 
-void add_tests_ConfirmSlotDetector(UnitTestDatabase& database) {
+void add_tests_ConfirmSlotDetector(UnitTestDatabase& database){
     // Switch 1/2
 
     /*

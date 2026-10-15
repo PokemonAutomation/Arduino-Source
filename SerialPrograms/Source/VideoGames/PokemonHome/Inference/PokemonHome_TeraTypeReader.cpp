@@ -198,7 +198,7 @@ void find_tera_type_symbol_candidates(
                     iter0->second.merge_assume_no_overlap(iter1->second);
                     iter1 = objmap.erase(iter1);
                     changed = true;
-                } else{
+                }else{
                     ++iter1;
                 }
             }

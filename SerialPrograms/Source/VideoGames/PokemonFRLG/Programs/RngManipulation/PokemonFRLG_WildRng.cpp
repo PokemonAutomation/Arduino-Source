@@ -520,7 +520,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
             PokemonFRLG_WildEncounter encounter = reader.read_encounter(env.logger(), LANGUAGE, screen, SAFARI_ZONE_POKEMON_SUBSET);
 
             catch_result = auto_catch_safari(env.console, context, LANGUAGE, safari_balls_remaining, encounter.name);
-        } else{
+        }else{
             catch_result = auto_catch(env.console, context, MAX_BALL_THROWS);
         }
 
@@ -531,7 +531,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
                 safari_zone ? "auto_catch_safari() encountered an error." : "auto_catch() encountered an error."
             );
             continue;
-        } else if (catch_result == 0){
+        }else if (catch_result == 0){
             env.log("Failed catch.");
             continue;
         }

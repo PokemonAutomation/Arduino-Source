@@ -278,7 +278,7 @@ void leave_zone_and_reset_spawns(
             // we were in the zone and now successfully travel back to entrance
             env.log("Leave zone successfully by fast travel");
             return;
-        } else if (travel_status == FastTravelState::NOT_AT_FLY_SPOT){
+        }else if (travel_status == FastTravelState::NOT_AT_FLY_SPOT){
             // we cannot fast travel at current location. This means we are actually outside
             // the wild zone!
             // Assume we are still outside the entrance, probably due to the mashing A to enter

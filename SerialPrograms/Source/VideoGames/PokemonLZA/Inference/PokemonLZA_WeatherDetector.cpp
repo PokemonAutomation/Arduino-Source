@@ -334,15 +334,15 @@ bool WeatherIconDetector::detect(const ImageViewRGB32& screen){
             std::min(candidate.width(), candidate.height()) <= 12
             ? 2 : 1;
 
-        for (int dy = -search_radius; dy <= search_radius; dy++) {
-            for (int dx = -search_radius; dx <= search_radius; dx++) {
-                if (dx == 0 && dy == 0) {
+        for (int dy = -search_radius; dy <= search_radius; dy++){
+            for (int dx = -search_radius; dx <= search_radius; dx++){
+                if (dx == 0 && dy == 0){
                     continue;
                 }
 
                 ImageViewRGB32 shifted = extract_box_reference(screen, check.box, dx, dy);
                 if (shifted.width() != candidate.width() ||
-                    shifted.height() != candidate.height()) {
+                    shifted.height() != candidate.height()){
                     continue;
                 }
 

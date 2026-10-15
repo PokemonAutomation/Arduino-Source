@@ -235,7 +235,7 @@ bool StarterRng::walk_to_rival_battle(SingleSwitchProgramEnvironment& env, ProCo
     context.wait_for_all_requests();
     int ret =  run_until<ProControllerContext>(
         env.console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             for (int i=0; i<5; i++){
                 ssf_press_left_joystick(context, {0, -1}, 0ms, 20000ms, 0ms);
                 ssf_mash1_button(context, BUTTON_B, 20000ms); 
@@ -278,7 +278,7 @@ bool StarterRng::auto_battle_rival(
     context.wait_for_all_requests();
     int ret1 = run_until<ProControllerContext>(
         env.console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 30s);
         },
         { battle_ready }
@@ -298,7 +298,7 @@ bool StarterRng::auto_battle_rival(
     context.wait_for_all_requests();
     int ret2 = run_until<ProControllerContext>(
         env.console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 30s);
         },
         { battle_ready }
@@ -318,7 +318,7 @@ bool StarterRng::auto_battle_rival(
     context.wait_for_all_requests();
     int ret3 = run_until<ProControllerContext>(
         env.console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_A, 300s);
         },
         { player_won, player_lost }
@@ -346,7 +346,7 @@ bool StarterRng::auto_battle_rival(
     context.wait_for_all_requests();
     int ret4 = run_until<ProControllerContext>(
         env.console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             for(int i=0; i<60; i++){
                 pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
             }
@@ -394,7 +394,7 @@ bool StarterRng::walk_to_route1_from_lab(SingleSwitchProgramEnvironment& env, Pr
     context.wait_for_all_requests();
     int ret = run_until<ProControllerContext>(
         env.console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             pbf_move_left_joystick(context, {0, -1}, 10s, 0ms);
         },
         { black_screen }
@@ -425,7 +425,7 @@ bool StarterRng::walk_to_route1_from_home(SingleSwitchProgramEnvironment& env, P
     context.wait_for_all_requests();
     int ret = run_until<ProControllerContext>(
         env.console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             pbf_move_left_joystick(context, {0, -1}, 1000ms, 300ms);
             pbf_move_left_joystick(context, {-1, 0}, 900ms, 300ms);
             pbf_move_left_joystick(context, {0, -1}, 1000ms, 300ms);
@@ -500,7 +500,7 @@ int StarterRng::autolevel_on_route1(
             context.wait_for_all_requests();
             ret3 = run_until<ProControllerContext>(
                 env.console, context,
-                [](ProControllerContext& context) {
+                [](ProControllerContext& context){
                     for (int i=0; i<5; i++){
                         pbf_press_button(context, BUTTON_B, 200ms, 1800ms);
                     }

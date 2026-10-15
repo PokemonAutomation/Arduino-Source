@@ -187,7 +187,7 @@ void DailyHighlightRNG::interact_with_trader(SingleSwitchProgramEnvironment& env
     while (true){
         context.wait_for_all_requests();
         int ret = wait_until(env.console, context, 1000ms, { y_comm_icon_detector, triangle_detector, arrow_detector });
-        if (ret == 2) {
+        if (ret == 2){
             return;
         }
         if (tries >= 10){

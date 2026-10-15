@@ -112,7 +112,7 @@ void download_file_to_disk(
     
     // 1. Initialize QSaveFile
     QSaveFile file(QString::fromStdString(file_path));
-    if (!file.open(QIODevice::WriteOnly)) {
+    if (!file.open(QIODevice::WriteOnly)){
         throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, 
             "Could not open save file: " + file_path);
     }
@@ -126,7 +126,7 @@ void download_file_to_disk(
 
     // Progress Bar Logic. and check for Cancel
     QObject::connect(reply, &QNetworkReply::downloadProgress, 
-        [reply, &scope, expected_size, progress_callback](qint64 bytesReceived, qint64 bytesTotal) {
+        [reply, &scope, expected_size, progress_callback](qint64 bytesReceived, qint64 bytesTotal){
 
             if (scope.cancelled()){
                 reply->abort();
@@ -140,7 +140,7 @@ void download_file_to_disk(
     );
 
     // 3. Stream chunks directly to the temporary file
-    QObject::connect(reply, &QNetworkReply::readyRead, [&file, reply]() {
+    QObject::connect(reply, &QNetworkReply::readyRead, [&file, reply](){
         file.write(reply->readAll());
     });
 
@@ -153,18 +153,18 @@ void download_file_to_disk(
     loop.exec();
 
     // // Final check for remaining data
-    if (reply->bytesAvailable() > 0) {
+    if (reply->bytesAvailable() > 0){
         file.write(reply->readAll());
     }
 
     // 5. Finalize the transaction
-    if (reply->error() == QNetworkReply::NoError) {
+    if (reply->error() == QNetworkReply::NoError){
         // This moves the temporary file to the final destination 'file_path'
-        if (!file.commit()) {
+        if (!file.commit()){
             throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, 
                 "Failed to commit file to disk: " + file_path);
         }
-    } else {
+    }else{
         if (scope.cancelled()){
             logger.log("Download cancelled by user.");
             throw OperationCancelledException();

@@ -299,7 +299,7 @@ void travel_to_surf_spot(SingleSwitchProgramEnvironment& env, ProControllerConte
         context.wait_for_all_requests();
         int ret = run_until<ProControllerContext>(
             env.console, context,
-            [](ProControllerContext& context) {
+            [](ProControllerContext& context){
                 // walk up to counter and initiate dialog
                 ssf_press_left_joystick(context, {-1, 0}, 0ms, 10000ms);
                 ssf_mash1_button(context, BUTTON_A, 10000ms);
@@ -356,7 +356,7 @@ void use_dig(SingleSwitchProgramEnvironment& env, ProControllerContext& context)
         context.wait_for_all_requests();
         int ret = run_until<ProControllerContext>(
             env.console, context,
-            [](ProControllerContext& context) {
+            [](ProControllerContext& context){
                 pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
             },
             { teleporter_selected }
@@ -647,17 +647,17 @@ EvTrainer::EvTrainerBattleResult EvTrainer::handle_wild_battle(SingleSwitchProgr
         flee_battle(env.console, context);
     }else{
         BattleResult ret = spam_first_move(env.console, context);
-        if (ret == BattleResult::playerfainted) {
+        if (ret == BattleResult::playerfainted){
             stats.times_fainted++;
             res.should_heal = true;
             //TODO: handle exiting the battle in case the player can't escape (low speed, no Smoke Ball)
             pbf_mash_button(context, BUTTON_B, 5000ms);
             context.wait_for_all_requests();
-        } else if (ret == BattleResult::unknown){ // battle fled (no EV gain)
+        }else if (ret == BattleResult::unknown){ // battle fled (no EV gain)
             // continue;
-        } else if (ret == BattleResult::outofpp){
+        }else if (ret == BattleResult::outofpp){
             res.should_heal = true;
-        } else if (ret == BattleResult::opponentfainted){
+        }else if (ret == BattleResult::opponentfainted){
             stats.hp_evs  += ev_yield.hp;
             stats.atk_evs += ev_yield.attack;
             stats.def_evs += ev_yield.defense;

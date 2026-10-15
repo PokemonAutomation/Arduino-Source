@@ -215,7 +215,7 @@ void reach_bench(SingleSwitchProgramEnvironment& env, ProControllerContext& cont
         Location::MAGENTA_POKEMON_CENTER, false, true
     );
 
-    if (result != FastTravelState::SUCCESS) {
+    if (result != FastTravelState::SUCCESS){
         env.log(
             "Fast travel to Magenta failed. State = "
             + std::to_string((int)result)
@@ -253,13 +253,13 @@ void reach_gate(
 }
 
 void warp_wild_zone_14(SingleSwitchProgramEnvironment& env, ProControllerContext& context
-) {
+){
     FastTravelState result = open_map_and_fly_to(
         env.console, context, Language::English,
         Location::WILD_ZONE_14, false, true
     );
 
-    if (result != FastTravelState::SUCCESS) {
+    if (result != FastTravelState::SUCCESS){
         OperationFailedExceptionWithScreenshot::fire(
             ErrorReportMode::SEND_ERROR_REPORT,
             "Failed to fast travel to Wild Zone 14.",
@@ -336,7 +336,7 @@ void ShinyHunt_HelioptileHunter::program(SingleSwitchProgramEnvironment& env, Pr
                     move_map_cursor_from_entrance_to_zone(env.console, context, Location::WILD_ZONE_14);
                     FastTravelState result = fly_from_map(env.console, context);
 
-                    switch (result) {
+                    switch (result){
                     case FastTravelState::SUCCESS:
                         wait_until_overworld(env.console, context);
                         break;

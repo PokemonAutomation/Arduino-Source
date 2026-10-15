@@ -20,7 +20,7 @@ namespace Filesystem{
 Path application_binary_path(){
     char buffer[PATH_MAX];
     ssize_t count = readlink("/proc/self/exe", buffer, PATH_MAX);
-    if (count != -1) {
+    if (count != -1){
         return Path(std::string(buffer, count));
     }
     return Path();
@@ -48,7 +48,7 @@ Path application_install_path(){
                 std::string line;
                 while (std::getline(mount_info, line)){
                     size_t dash_sep = line.find(" - ");
-                    if (dash_sep == std::string::npos) {
+                    if (dash_sep == std::string::npos){
                         continue;
                     }
 
@@ -58,7 +58,7 @@ Path application_install_path(){
                         std::string pre_str = line.substr(0, dash_sep);
                         std::stringstream ss(pre_str);
                         std::string token;
-                        while (ss >> token) {
+                        while (ss >> token){
                             pre.push_back(token);
                         }
                     }
@@ -69,7 +69,7 @@ Path application_install_path(){
                         std::string post_str = line.substr(dash_sep + 3);
                         std::stringstream ss(post_str);
                         std::string token;
-                        while (ss >> token) {
+                        while (ss >> token){
                             post.push_back(token);
                         }
                     }

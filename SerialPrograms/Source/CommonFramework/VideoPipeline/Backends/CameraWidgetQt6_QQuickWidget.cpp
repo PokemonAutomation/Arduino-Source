@@ -194,7 +194,7 @@ QWidget* CameraVideoSource::make_display_QtWidget(QWidget* parent){
         qml_sink, [this, qml_sink](const QVideoFrame& frame){
             WallClock now = current_time();
 
-            QMetaObject::invokeMethod(qml_sink, [qml_sink, frame]() {
+            QMetaObject::invokeMethod(qml_sink, [qml_sink, frame](){
                 qml_sink->setVideoFrame(frame);
             }, Qt::QueuedConnection);
 

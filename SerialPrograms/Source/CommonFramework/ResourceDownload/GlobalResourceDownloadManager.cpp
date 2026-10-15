@@ -60,10 +60,10 @@ void GlobalResourceDownloadManager::remove_from_download_list(const std::string&
         std::lock_guard<Mutex> lg(m_queue_lock);
 
         // std::erase_if modifies the vector in-place
-        std::erase_if(m_download_queue, [&](auto& download_ptr) {
+        std::erase_if(m_download_queue, [&](auto& download_ptr){
             if (!download_ptr) return false;
             
-            if (download_ptr->get_name() == resource_slug) {
+            if (download_ptr->get_name() == resource_slug){
                 // Move the download_ptr out of the m_download_queue and into our temporary vector
                 // This prevents immediate destruction of download_ptr, while
                 // it's still removed from m_download_queue.
@@ -117,8 +117,8 @@ void GlobalResourceDownloadManager::cancel_downloads(){
     // which then triggers GlobalResourceDownloadManager::remove_from_download_list(), which is 
     // done under a lock.
     // This prevents a deadlock.
-    for (auto& download : downloads_to_cancel) {
-        if (download) {
+    for (auto& download : downloads_to_cancel){
+        if (download){
             download->cancel_download(); 
         }
     }

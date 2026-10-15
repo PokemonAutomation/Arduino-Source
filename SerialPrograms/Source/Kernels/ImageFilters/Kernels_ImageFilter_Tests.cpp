@@ -98,7 +98,7 @@ public:
                         cout << "Error: wrong filter result: old color " << color.to_string() << ", (x,y) = "
                             << x << ", " << y << ", should be in range but not found by the function" << endl;
                         ++error_count;
-                    } else if (in_range == false && new_color != color){
+                    }else if (in_range == false && new_color != color){
                         cout << "Error: wrong filter result: old color " << color.to_string() << ", (x,y) = "
                             << x << ", " << y << ", should not be changed by the function" << endl;
                         ++error_count;
@@ -108,7 +108,7 @@ public:
                         cout << "Error: wrong inverse filter result: old color " << color.to_string() << ", (x,y) = "
                             << x << ", " << y << ", should not be changed by the function" << endl;
                         ++error_count;
-                    } else if (in_range == false && new_color_2 != COLOR_WHITE){
+                    }else if (in_range == false && new_color_2 != COLOR_WHITE){
                         cout << "Error: wrong inverse filter result: old color " << color.to_string() << ", (x,y) = "
                             << x << ", " << y << ", should not be in range but not found by the function" << endl;
                         ++error_count;
@@ -218,7 +218,7 @@ public:
                             << ", dist2 " << color_dist2 << ", max dist2 " << max_dist2
                             << ", should be in range but not found by the function" << endl;
                         ++error_count;
-                    } else if (in_range == false && new_color != color){
+                    }else if (in_range == false && new_color != color){
                         cout << "Error: wrong filter result: old color " << color.to_string()
                             << ", (x,y) = (" << x << ", " << y << ")"
                             << ", dist2 " << color_dist2 << ", max dist2 " << max_dist2
@@ -232,7 +232,7 @@ public:
                             << ", dist2 " << color_dist2 << ", max dist2 " << max_dist2
                             << ", should not be changed by the function" << endl;
                         ++error_count;
-                    } else if (in_range == false && new_color_2 != COLOR_WHITE){
+                    }else if (in_range == false && new_color_2 != COLOR_WHITE){
                         cout << "Error: wrong inverse filter result: old color " << color.to_string()
                             << ", (x,y) = (" << x << ", " << y << ")"
                             << ", dist2 " << color_dist2 << ", max dist2 " << max_dist2
@@ -348,7 +348,7 @@ public:
                         cout << "Error: wrong filter result: old color " << color.to_string() << ", (x,y) = "
                             << x << ", " << y << ", should be black due to in range but not so" << endl;
                         ++error_count;
-                    } else if (in_range == false && new_color != COLOR_WHITE){
+                    }else if (in_range == false && new_color != COLOR_WHITE){
                         cout << "Error: wrong filter result: old color " << color.to_string() << ", (x,y) = "
                             << x << ", " << y << ", should be white due to out of range but not so" << endl;
                         ++error_count;
@@ -358,7 +358,7 @@ public:
                         cout << "Error: wrong inverse filter result: old color " << color.to_string() << ", (x,y) = "
                             << x << ", " << y << ", should be white due to in range but not so" << endl;
                         ++error_count;
-                    } else if (in_range == false && new_color_2 != COLOR_BLACK){
+                    }else if (in_range == false && new_color_2 != COLOR_BLACK){
                         cout << "Error: wrong inverse filter result: old color " << color.to_string() << ", (x,y) = "
                             << x << ", " << y << ", should be black due to out of range but not so" << endl;
                         ++error_count;
@@ -455,7 +455,7 @@ public:
                         cout << "Error: wrong filter(replace_zero_bits) result: old color " << color.to_string() << ", (x,y) = "
                             << x << ", " << y << ", should not be changed due to being one bit but not so" << endl;
                         ++error_count;
-                    } else if (!in_range && new_color != replacement_color){
+                    }else if (!in_range && new_color != replacement_color){
                         cout << "Error: wrong filter(replace_zero_bits) result: old color " << color.to_string() << ", (x,y) = "
                             << x << ", " << y << ", should be changed due to being zero bit but not so" << endl;
                         ++error_count;
@@ -465,7 +465,7 @@ public:
                         cout << "Error: wrong filter(replace_one_bits) result: old color " << color.to_string() << ", (x,y) = "
                             << x << ", " << y << ", should be changed due to being one bit but not so" << endl;
                         ++error_count;
-                    } else if (!in_range && new_color_2 != color){
+                    }else if (!in_range && new_color_2 != color){
                         cout << "Error: wrong filter(replace_one_bits) result: old color " << color.to_string() << ", (x,y) = "
                             << x << ", " << y << ", should not be changed due to being zero bit but not so" << endl;
                         ++error_count;
@@ -548,7 +548,7 @@ public:
                             << ", dist2 " << color_dist2 << ", max dist2 " << max_dist2
                             << ", should be in range but not set on matrix" << endl;
                         ++error_count;
-                    } else if (in_range == false && matrix.get(x, y) == true){
+                    }else if (in_range == false && matrix.get(x, y) == true){
                         cout << "Error: wrong filter result: old color " << color.to_string()
                             << ", (x,y) = (" << x << ", " << y << ")"
                             << ", dist2 " << color_dist2 << ", max dist2 " << max_dist2

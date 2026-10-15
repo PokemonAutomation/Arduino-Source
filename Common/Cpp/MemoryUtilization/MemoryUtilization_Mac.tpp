@@ -48,7 +48,7 @@ void analyze_vm_regions(){
         if (kr == KERN_INVALID_ADDRESS){
             // Reached the end of the address space
             break;
-        } else if (kr != KERN_SUCCESS){
+        }else if (kr != KERN_SUCCESS){
             std::cerr << "mach_vm_region failed with error: " << kr << std::endl;
             break;
         }

@@ -91,7 +91,7 @@ SparseRegion<Type>::SparseRegion(const std::string& str, bool inclusive_end){
     std::string token;
     std::vector<std::string> tokens;
 
-    while (std::getline(stream, token, ' ')) {
+    while (std::getline(stream, token, ' ')){
         *this |= Region<Type>::parse_str(token, inclusive_end);
     }
 }

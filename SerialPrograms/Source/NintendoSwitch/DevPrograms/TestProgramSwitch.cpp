@@ -448,7 +448,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     };
     bool weather_detected[sizeof(weather)/sizeof(weather[0])] = {};
 
-    for (size_t i = 0; i < sizeof(weather)/sizeof(weather[0]); i++) {
+    for (size_t i = 0; i < sizeof(weather)/sizeof(weather[0]); i++){
         const auto& entry = weather[i];
         WeatherIconDetector detector(entry.type, &overlay);
 
@@ -468,7 +468,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
     cout << endl;
     cout << "Weather Summary:" << endl;
-    for (size_t i = 0; i < sizeof(weather)/sizeof(weather[0]); i++) {
+    for (size_t i = 0; i < sizeof(weather)/sizeof(weather[0]); i++){
         cout << weather[i].name
             << ": "
             << (weather_detected[i] ? "MATCH" : "NO MATCH")

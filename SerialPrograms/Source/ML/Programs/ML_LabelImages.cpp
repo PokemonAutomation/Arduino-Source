@@ -707,7 +707,7 @@ void LabelImages::select_prev_annotation(){
 
     if (m_selected_obj_idx >= m_annotations.size()){
         m_selected_obj_idx = m_annotations.size() - 1;
-    } else if (m_selected_obj_idx == 0){
+    }else if (m_selected_obj_idx == 0){
         m_selected_obj_idx = m_annotations.size() - 1;
     }else{
         m_selected_obj_idx--;
@@ -727,7 +727,7 @@ void LabelImages::select_next_annotation(){
 
     if (m_selected_obj_idx >= m_annotations.size()){
         m_selected_obj_idx = 0;
-    } else if (m_selected_obj_idx + 1 == m_annotations.size()){
+    }else if (m_selected_obj_idx + 1 == m_annotations.size()){
         m_selected_obj_idx = 0;
     }else{
         m_selected_obj_idx++;
@@ -756,7 +756,7 @@ void LabelImages::on_config_value_changed(void* object){
             FORM_LABEL.set_visibility(ConfigOptionState::ENABLED);
             CUSTOM_SET_LABEL.set_visibility(ConfigOptionState::HIDDEN);
             MANUAL_LABEL.set_visibility(ConfigOptionState::HIDDEN);
-        } else if (value == 1){
+        }else if (value == 1){
             FORM_LABEL.set_visibility(ConfigOptionState::HIDDEN);
             CUSTOM_SET_LABEL.set_visibility(ConfigOptionState::ENABLED);
             MANUAL_LABEL.set_visibility(ConfigOptionState::HIDDEN);
@@ -1115,7 +1115,7 @@ void LabelImages::on_mouse_release(double x, double y){
     if ((rel_x == 0 && rel_y == 0) || (rel_x < 0.0015 && rel_y < 0.0015 && duration < std::chrono::milliseconds(150))){
         if (m_control_pressed.load(std::memory_order_relaxed)){
             add_segmentation_inclusion_point(x, y);
-        } else if (m_shift_pressed.load(std::memory_order_relaxed)){
+        }else if (m_shift_pressed.load(std::memory_order_relaxed)){
             add_segmentation_exclusion_point(x, y);
         }else{
             // normal mouse clicking

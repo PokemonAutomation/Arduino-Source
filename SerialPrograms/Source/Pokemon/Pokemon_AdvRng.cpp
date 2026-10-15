@@ -190,7 +190,7 @@ AdvPokemonResult reroll_unown(uint8_t unownform, uint16_t seed, uint64_t advance
     }
 }
 
-uint8_t slot_number_from_roll(uint8_t roll, size_t size, bool super_rod) {
+uint8_t slot_number_from_roll(uint8_t roll, size_t size, bool super_rod){
     switch(size){
         case 12:    // grass
         if (roll < 20){
@@ -349,7 +349,7 @@ AdvWildPokemonResult wild_pokemon_from_state(AdvRngState state, std::vector<AdvE
     int unownform = slot_to_unownform(slot);
 
     uint8_t diff = slot.maxlevel - slot.minlevel;
-    if (slot.maxlevel < slot.minlevel) {
+    if (slot.maxlevel < slot.minlevel){
         diff = 0;
     }
     uint8_t level = slot.minlevel + (level_roll % (diff + 1));

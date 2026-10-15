@@ -79,8 +79,8 @@ void SettingsResourceDownloadTable::add_resource_download_rows(){
 
 void SettingsResourceDownloadTable::connect_row_with_download(const std::string& resource_slug, std::shared_ptr<ResourceDownload>& download_ptr){
 
-    for (const auto& row_ptr : m_resource_rows) {
-        if (row_ptr->get_resource_slug() == resource_slug) {
+    for (const auto& row_ptr : m_resource_rows){
+        if (row_ptr->get_resource_slug() == resource_slug){
             // download_ptr->add_listener(*row_ptr);
             row_ptr->connect_with_download(download_ptr);
             return; 

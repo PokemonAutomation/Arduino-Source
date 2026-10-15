@@ -189,9 +189,9 @@ std::string BoxPageInfoWatcher::info_str() const{
 
     if (is_shiny && is_alpha){
         return "Shiny Alpha";
-    } else if (is_shiny){
+    }else if (is_shiny){
         return "Shiny";
-    } else if (is_alpha){
+    }else if (is_alpha){
         return "Alpha";
     }
     return "Regular";

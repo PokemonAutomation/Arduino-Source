@@ -149,7 +149,7 @@ void StatsReader::read_gender(
     }else if (num_blue_pixels > threshold){
         stats.gender = SummaryGender::Male;
         logger.log("Detected male gender.", COLOR_GREEN);
-    } else {
+    }else{
         stats.gender = SummaryGender::Genderless;
         logger.log("No gender detected.", COLOR_GREEN);
     }

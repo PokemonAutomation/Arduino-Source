@@ -45,11 +45,11 @@ const std::string& STARTUP_PROFILE(){
 
 
 // Helper function to safely get the current executable's name on macOS
-std::string get_macos_executable_name() {
+std::string get_macos_executable_name(){
     char path_buffer[PROC_PIDPATHINFO_MAXSIZE];
     pid_t pid = getpid();
 
-    if (proc_pidpath(pid, path_buffer, sizeof(path_buffer)) > 0) {
+    if (proc_pidpath(pid, path_buffer, sizeof(path_buffer)) > 0){
         Filesystem::Path full_path(path_buffer);
         return full_path.filename().string(); // Returns the binary name (e.g., "SerialPrograms")
     }
@@ -68,7 +68,7 @@ std::string get_macos_executable_name() {
 Path application_binary_path(){
     char buffer[PATH_MAX];
     uint32_t size = sizeof(buffer);
-    if (_NSGetExecutablePath(buffer, &size) == 0) {
+    if (_NSGetExecutablePath(buffer, &size) == 0){
         return std::filesystem::canonical(std::filesystem::path(buffer));
     }
     return Path();
@@ -76,8 +76,8 @@ Path application_binary_path(){
 
 
 
-std::filesystem::path CFString_to_path(CFStringRef cfString) {
-    if (!cfString) {
+std::filesystem::path CFString_to_path(CFStringRef cfString){
+    if (!cfString){
         return {};
     }
 
@@ -88,7 +88,7 @@ std::filesystem::path CFString_to_path(CFStringRef cfString) {
     std::vector<char> buffer(maxLength);
 
     // 3. Extract the file system representation directly into the buffer
-    if (CFStringGetFileSystemRepresentation(cfString, buffer.data(), buffer.size())) {
+    if (CFStringGetFileSystemRepresentation(cfString, buffer.data(), buffer.size())){
         return std::filesystem::path(buffer.data());
     }
 
@@ -97,7 +97,7 @@ std::filesystem::path CFString_to_path(CFStringRef cfString) {
     CFIndex maxSize = CFStringGetMaximumSizeForEncoding(length, kCFStringEncodingUTF8) + 1;
     std::vector<char> fallbackBuffer(maxSize);
 
-    if (CFStringGetCString(cfString, fallbackBuffer.data(), fallbackBuffer.size(), kCFStringEncodingUTF8)) {
+    if (CFStringGetCString(cfString, fallbackBuffer.data(), fallbackBuffer.size(), kCFStringEncodingUTF8)){
         return std::filesystem::path(fallbackBuffer.data());
     }
 
@@ -127,9 +127,9 @@ Path application_scratch_path(){
     const char* home_env = std::getenv("HOME");
     Filesystem::Path app_support_path;
 
-    if (home_env != nullptr) {
+    if (home_env != nullptr){
         app_support_path = Filesystem::Path(home_env);
-    } else {
+    }else{
         app_support_path = Filesystem::current_path();
     }
 
@@ -138,7 +138,7 @@ Path application_scratch_path(){
     app_support_path = app_support_path / "Library" / "Application Support" / app_name;
 
     // 3. Append your profile path
-    if (!g_startup_profile.empty()) {
+    if (!g_startup_profile.empty()){
         app_support_path /= "Profiles";
         app_support_path /= g_startup_profile;
     }

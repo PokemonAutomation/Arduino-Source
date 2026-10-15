@@ -480,7 +480,7 @@ bool HeldItemFarmerSafariZone::run_safari_zone(SingleSwitchProgramEnvironment& e
                 "auto_catch_safari() encountered an error.",
                 env.console
             );
-        } else if (catch_result == 1){
+        }else if (catch_result == 1){
             env.log("Target Pokemon caught!");
             caught = true;
             stats.target_pokemon_caught++;

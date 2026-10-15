@@ -20,7 +20,7 @@ namespace PokemonRSE{
 
 
 static double menu_bottom_box_y(StartMenuState state){
-    switch (state) {
+    switch (state){
     case StartMenuState::FULL:
         return 0.94;
     case StartMenuState::PRE_POKENAV:
@@ -67,9 +67,9 @@ constexpr int8_t START_MENU_ROWS[5][9] = {
     /* SAFARI      */ {   1,   2,   3,  -1,   4,  -1,   5,   6,   0 },
 };
 
-static std::vector<SlotCandidate> start_menu_slot_candidates(StartMenuSlot slot, StartMenuState state) {
+static std::vector<SlotCandidate> start_menu_slot_candidates(StartMenuSlot slot, StartMenuState state){
     int8_t row = START_MENU_ROWS[(int)state][(int)slot];
-    if (row == -1) {
+    if (row == -1){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid StartMenuSlot for StartMenuState");
     }
     double offset = SELECTION_SLOT_OFFSETS[row];
@@ -114,7 +114,7 @@ private:
     bool m_expected;
 };
 
-void add_tests_StartMenuDetector(UnitTestDatabase & database) {
+void add_tests_StartMenuDetector(UnitTestDatabase & database){
     // Switch 1/2
 
     /*
@@ -166,7 +166,7 @@ private:
     bool m_expected;
 };
 
-void add_tests_StartMenuSlotDetector(UnitTestDatabase & database) {
+void add_tests_StartMenuSlotDetector(UnitTestDatabase & database){
     // Switch 1/2
 
     /*

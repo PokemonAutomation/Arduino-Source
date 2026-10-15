@@ -313,7 +313,7 @@ private:
             if (actual > 0){
                 m_consecutive_errors.store(0, std::memory_order_release);
                 on_unreliable_recv(buffer, actual);
-            } else if (actual < 0){
+            }else if (actual < 0){
                 // Read error occurred
                 int error = errno;
                 process_error("read serial POSIX() failed. Error = " + std::to_string(error));

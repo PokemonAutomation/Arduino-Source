@@ -134,7 +134,7 @@ void SettingsResourceDownloadRow::update_table_label(bool success){
 
 SettingsResourceDownloadRow::~SettingsResourceDownloadRow(){
     // cout << "~SettingsResourceDownloadRow" << endl;
-    if (m_data->m_download_ptr) {
+    if (m_data->m_download_ptr){
         m_data->m_download_ptr->remove_listener(*this); 
     }
     m_data->m_pre_download_thread.wait_and_ignore_exceptions();

@@ -280,11 +280,11 @@ bool route_hyperspace_wild_zone(
         // We use "+12" because the 5-star Hyperspace burns about 6 Cal per sec and per reset. So we want
         // to have enough time to build up `ready_to_stop_counter` to have value 2 when we reach min_calorie.
         ready_to_stop_counter++;
-    } else if (ready_to_stop_counter >= 2 && calorie_number <= min_calorie){
+    }else if (ready_to_stop_counter >= 2 && calorie_number <= min_calorie){
         // We've built up the ready_to_stop_counter so we can stop immidiately when detected calorie is lower
         // than the threshodl.
         return true;
-    } else if (ready_to_stop_counter > 0 && calorie_number > min_calorie + 12){
+    }else if (ready_to_stop_counter > 0 && calorie_number > min_calorie + 12){
         ready_to_stop_counter--;
     }
     return false;

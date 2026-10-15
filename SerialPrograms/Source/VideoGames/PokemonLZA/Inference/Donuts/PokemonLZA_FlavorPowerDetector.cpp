@@ -222,7 +222,7 @@ std::string FlavorPowerDetector::detect_power(const ImageViewRGB32& screen){
 
         if (base_string.empty()){
             base_string = current_base;
-        } else if (base_string != current_base){
+        }else if (base_string != current_base){
             all_same_except_last = false;
             break;
         }

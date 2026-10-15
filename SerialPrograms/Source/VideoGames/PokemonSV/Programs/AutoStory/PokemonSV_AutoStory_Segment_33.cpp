@@ -468,7 +468,7 @@ GameTitle get_game_title(SingleSwitchProgramEnvironment& env, ProControllerConte
             game_title = GameTitle::SCARLET;
             env.console.log("Game title detected: Scarlet");
             break;
-        } else if (is_solid(bottom_stats, {0.367816, 0.0746615, 0.5575230}, 0.15, 25)){
+        }else if (is_solid(bottom_stats, {0.367816, 0.0746615, 0.5575230}, 0.15, 25)){
             game_title = GameTitle::VIOLET;
             env.console.log("Game title detected: Violet");
             break;

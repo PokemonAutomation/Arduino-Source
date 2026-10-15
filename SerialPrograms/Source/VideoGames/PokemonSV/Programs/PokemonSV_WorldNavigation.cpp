@@ -681,7 +681,7 @@ void walk_forward_until_dialog(
             ssf_press_left_joystick(context, {x, y}, 0ms, timeout);
             if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
                 pbf_wait(context, timeout);
-            } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
+            }else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
                 pbf_mash_button(context, BUTTON_A, timeout);
                 // for (size_t j = 0; j < seconds_timeout; j++){
                 //     pbf_press_button(context, BUTTON_A, 160ms, 840ms);

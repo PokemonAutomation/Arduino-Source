@@ -213,7 +213,7 @@ bool BoxSorterLivingDex::is_viable_for_dex(
         return false;
     }
 
-    if (entry.has_gender_difference) {
+    if (entry.has_gender_difference){
         if (entry.slug.ends_with("-female") && pokemonInfo.gender != StatsHuntGenderFilter::Female){
             return false;
         }
@@ -253,7 +253,7 @@ bool BoxSorterLivingDex::is_viable_for_dex(
         if (box_idx != 0){
             dest_cursor = BoxCursor(starting_box + box_idx, 0, 0);
             nav_cursor = move_cursor_to(env, context, nav_cursor, dest_cursor, GAME_DELAY);
-        } else{
+        }else{
             env.log("Moving the cursor to the first slot on the page.");
             if (!go_to_first_slot(env, context, VIDEO_DELAY)){
                 throw UserSetupError(
@@ -531,7 +531,7 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
         env.log("Could not find a pokemon for " + entry.slug + " in the living dex boxes, looking in reject boxes for a valid match.");
 
         for (size_t j = 0; j < reject_boxes_data.size(); j++){
-            if (!reject_boxes_data[j].has_value()) {
+            if (!reject_boxes_data[j].has_value()){
                 continue;
             }
 

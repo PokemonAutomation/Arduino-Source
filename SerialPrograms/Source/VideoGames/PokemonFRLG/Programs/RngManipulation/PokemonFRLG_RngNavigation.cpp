@@ -45,7 +45,7 @@ void go_to_summary(ConsoleHandle& console, ProControllerContext& context, int fr
     context.wait_for_all_requests();
     int ret = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
             for (int i=0; i<3; i++){
                 pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
@@ -56,7 +56,7 @@ void go_to_summary(ConsoleHandle& console, ProControllerContext& context, int fr
 
     if (ret < 0){
         console.log("go_to_summary(): failed to open the summary.");
-    } else {
+    }else{
         console.log("Summary opened.");
     }
 }
@@ -85,7 +85,7 @@ AdvObservedPokemon read_summary(
     context.wait_for_all_requests();
     int ret2 = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             for (int i=0; i<5; i++){
                 pbf_press_dpad(context, DPAD_RIGHT, 200ms, 1800ms);
             }
@@ -183,7 +183,7 @@ bool use_rare_candy(
     context.wait_for_all_requests();
     int ret = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             for (int i=0; i<5; i++){
                 pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
             }
@@ -209,7 +209,7 @@ bool use_rare_candy(
     context.wait_for_all_requests();
     int ret2 = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             for (int i=0; i<30; i++){
                 pbf_press_button(context, BUTTON_A, 200ms, 800ms);
             }
@@ -248,7 +248,7 @@ bool use_rare_candy(
         context.wait_for_all_requests();
         int ret3 = run_until<ProControllerContext>(
             console, context,
-            [](ProControllerContext& context) {
+            [](ProControllerContext& context){
                 pbf_wait(context, 1000ms);
                 for (int i=0; i<15; i++){
                     pbf_press_button(context, BUTTON_B, 200ms, 1800ms);
@@ -289,7 +289,7 @@ void hatch_togepi_egg(ConsoleHandle& console, ProControllerContext& context){
     console.log("Hatching Togepi egg...");
     int ret = run_until<ProControllerContext>(
         console, context,
-        [deadline](ProControllerContext& context) {
+        [deadline](ProControllerContext& context){
             // cycle back and forth
             while (current_time() < deadline){
                 pbf_move_left_joystick(context, {-1, 0}, 400ms, 0ms);
@@ -321,7 +321,7 @@ void hatch_daycare_egg(ConsoleHandle& console, ProControllerContext& context){
     console.log("Hatching Day Care egg...");
     int ret = run_until<ProControllerContext>(
         console, context,
-        [deadline](ProControllerContext& context) {
+        [deadline](ProControllerContext& context){
             // cycle back and forth
             while (current_time() < deadline){
                 pbf_move_left_joystick(context, {+1, 0}, 1700ms, 30ms);
@@ -352,7 +352,7 @@ void travel_from_celio_to_kanto(ConsoleHandle& console, ProControllerContext& co
     WhiteDialogWatcher dialog_detected(COLOR_RED);
     int ret = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             // walk down
             pbf_move_left_joystick(context, {0, -1}, 15000ms, 0ms);
 
@@ -374,7 +374,7 @@ void travel_from_celio_to_kanto(ConsoleHandle& console, ProControllerContext& co
     context.wait_for_all_requests();
     int ret2 = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             // walk down to the sailor and initiate dialog
             ssf_press_left_joystick(context, {0, -1}, 0ms, 20000ms);
             ssf_mash1_button(context, BUTTON_A, 20000ms);
@@ -393,7 +393,7 @@ void travel_from_celio_to_kanto(ConsoleHandle& console, ProControllerContext& co
     context.wait_for_all_requests();
     int ret3 = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             // select vermilion (default option) and take ferry
             pbf_mash_button(context, BUTTON_A, 20000ms);
         },
@@ -612,7 +612,7 @@ void daycare_steps(ConsoleHandle& console, ProControllerContext& context){
     context.wait_for_all_requests();
     int ret = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
             for (int i=0; i<20; i++){
                 pbf_move_left_joystick(context, {-1, 0}, 2700ms, 300ms);
@@ -653,7 +653,7 @@ bool walk_from_daycare_to_pond(ConsoleHandle& console, ProControllerContext& con
     context.wait_for_all_requests();
     int ret = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             ssf_press_left_joystick(context, {0, -1}, 0ms, 10000ms);
             ssf_mash1_button(context, BUTTON_A, 10000ms);
         },
@@ -689,7 +689,7 @@ bool smash_daycare_rock(ConsoleHandle& console, ProControllerContext& context){
     context.wait_for_all_requests();
     int ret = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             ssf_mash1_button(context, BUTTON_A, 10000ms);
         },
         { rock_dialog }
@@ -722,7 +722,7 @@ void egg_pickup(ConsoleHandle& console, ProControllerContext& context){
     context.wait_for_all_requests();
     int ret = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 5000ms);
         },
         { dialogue_cleared }
@@ -740,7 +740,7 @@ void egg_pickup(ConsoleHandle& console, ProControllerContext& context){
     context.wait_for_all_requests();
     ret = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             for (int i=0; i<12; i++){
                 pbf_press_button(context, BUTTON_A, 200ms, 800ms);
             }
@@ -764,7 +764,7 @@ void egg_pickup(ConsoleHandle& console, ProControllerContext& context){
     context.wait_for_all_requests();
     ret = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 10000ms);
         },
         { dialogue_over }
@@ -793,7 +793,7 @@ bool walk_from_daycare_man_to_pond(ConsoleHandle& console, ProControllerContext&
     context.wait_for_all_requests();
     int ret = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             ssf_press_left_joystick(context, {0, -1}, 0ms, 10000ms);
             ssf_mash1_button(context, BUTTON_A, 10000ms);
         },

@@ -255,7 +255,7 @@ void export_image_annotations_to_yolo_dataset(
                 if (it == label_indices.end()){
                     if (label.ends_with("-male")){
                         it = label_indices.find(label.substr(0, label.size()-5));
-                    } else if(label.ends_with("-female")){
+                    }else if(label.ends_with("-female")){
                         it = label_indices.find(label.substr(0, label.size()-7));
                     }
                 }

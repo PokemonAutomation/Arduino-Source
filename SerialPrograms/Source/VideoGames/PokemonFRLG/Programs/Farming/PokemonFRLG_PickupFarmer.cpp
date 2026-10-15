@@ -309,17 +309,17 @@ void PickupFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCon
             shiny_found = false;
 
             BattleResult ret2 = spam_first_move(env.console, context);
-            if (ret2 == BattleResult::playerfainted) {
+            if (ret2 == BattleResult::playerfainted){
                 stats.times_fainted++;
                 out_of_pp = true; // triggers a healing trip
                 //TODO: handle exiting the battle in case the player can't escape (due to low speed stat)
                 pbf_mash_button(context, BUTTON_B, 5000ms);
                 context.wait_for_all_requests();
-            } else if (ret2 == BattleResult::unknown){ // battle fled (no EV gain)
+            }else if (ret2 == BattleResult::unknown){ // battle fled (no EV gain)
                 // continue;
-            } else if (ret2 == BattleResult::outofpp){
+            }else if (ret2 == BattleResult::outofpp){
                 out_of_pp = true;
-            } else if (ret2 == BattleResult::opponentfainted){
+            }else if (ret2 == BattleResult::opponentfainted){
                 stats.encounters++;
                 encounters_since_item_check++;
                 bool move_learned = exit_wild_battle(env.console, context, !!STOP_ON_MOVE_LEARN, !!PREVENT_EVOLUTION);

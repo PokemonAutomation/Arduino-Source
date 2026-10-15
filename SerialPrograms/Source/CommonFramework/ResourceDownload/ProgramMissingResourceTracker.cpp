@@ -52,19 +52,19 @@ void ProgramMissingResourceTracker::remove_resource(const std::string& resource_
     std::lock_guard<Mutex> lg(m_lock);
 
     // this requires C++20
-    std::erase_if(m_missing_resources, [&](const auto& download_ptr) {
+    std::erase_if(m_missing_resources, [&](const auto& download_ptr){
         return download_ptr->get_name() == resource_slug;
     });
 
 }
 
-void ProgramMissingResourceTracker::finalize_initial_batch() {
+void ProgramMissingResourceTracker::finalize_initial_batch(){
     std::lock_guard<Mutex> lg(m_lock);
     m_is_accepting_jobs = false;
 
     // Handles the edge case where everything finished before we even stopped adding jobs
-    if (m_missing_resources.empty()) {
-        if (!m_failed) {
+    if (m_missing_resources.empty()){
+        if (!m_failed){
             fulfill_promise(true);
         }
     }
@@ -77,7 +77,7 @@ void ProgramMissingResourceTracker::check_if_all_downloads_done(){
     // checking m_is_accepting_jobs covers for the case where Download 1 finishes before Download 2 is added. 
     // this prevents the completion event from firing prematurely
     if (m_missing_resources.empty() && !m_is_accepting_jobs){
-        if (!m_failed) {
+        if (!m_failed){
             fulfill_promise(true);
         }
     }
@@ -98,16 +98,16 @@ void ProgramMissingResourceTracker::cancel_downloads(){
     // which then triggers ProgramMissingResourceTracker::remove_resource(), which is 
     // done under a lock.
     // This prevents a deadlock.
-    for (auto& download : downloads_to_cancel) {
-        if (download) {
+    for (auto& download : downloads_to_cancel){
+        if (download){
             download->cancel_download(); 
         }
     }
 
 }
 
-void ProgramMissingResourceTracker::fulfill_promise(bool value) {
-    std::call_once(m_fulfill_flag, [this, value]() {
+void ProgramMissingResourceTracker::fulfill_promise(bool value){
+    std::call_once(m_fulfill_flag, [this, value](){
         m_promise.set_value(value);
     });
 }
