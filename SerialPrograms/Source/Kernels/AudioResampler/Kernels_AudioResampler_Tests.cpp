@@ -423,6 +423,10 @@ void add_tests(UnitTestDatabase& database){
         { 8000, 44100, 1, 4000, 100, 8, 9.0 },
         { 90000, 20000, 1, 4000, 250, 4, 9.0 },
         { 128000, 8000, 1, 4000, 250, 8, 9.0 },
+        //  Odd tap count: on the unrolling kernels the final partial
+        //  group reads the zero-padded tap row's input samples, which is
+        //  what taps_allocated() in need() accounts for.
+        { 44100, 22050, 1, 4000, 250, 3, 9.0 },
     };
     for (auto& combo : combos){
         database.add<ResamplerStreamTest>(
