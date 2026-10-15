@@ -55,6 +55,14 @@ BossSlotOption::BossSlotOption()
 {}
 
 
+MaxLairTouchDateIntervalOption::MaxLairTouchDateIntervalOption()
+    : PokemonSwSh::TouchDateIntervalOption(
+        "<b>Rollover Prevention:</b><br>Prevent any Wild Area raid dens from rolling over by touching the date every this many hours. Set to zero to disable date touching.",
+        LockMode::UNLOCK_WHILE_RUNNING
+    )
+{}
+
+
 
 
 }

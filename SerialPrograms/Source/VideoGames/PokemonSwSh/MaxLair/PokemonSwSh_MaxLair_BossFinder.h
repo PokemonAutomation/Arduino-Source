@@ -49,7 +49,7 @@ private:
     MaxLairInternal::BossActionTable BOSS_LIST;
     MaxLairInternal::HostingSettings HOSTING;
 
-    TouchDateIntervalOption TOUCH_DATE_INTERVAL;
+    MaxLairInternal::MaxLairTouchDateIntervalOption TOUCH_DATE_INTERVAL;
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationOption NOTIFICATION_SHINY;
