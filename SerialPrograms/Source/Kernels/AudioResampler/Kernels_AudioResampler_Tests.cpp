@@ -144,7 +144,7 @@ UnitTestResult BlockKernelTest::run(Logger& logger, CancellableScope& scope) con
         m_out_index + m_block + 64,
         m_taps
     );
-    if (m_out_index >= table.period()){
+    if (m_out_index >= table.period_out()){
         return "out_index must wrap to the period.";
     }
 
@@ -152,8 +152,7 @@ UnitTestResult BlockKernelTest::run(Logger& logger, CancellableScope& scope) con
     //  sample i, so the kernel's in_index is 0 (k = 0 periods in).
     //  The index columns keep counting past the period, so a block that
     //  wraps the period reads samples up to about period_in + block + taps.
-    const size_t period_in = m_in_rate / std::gcd(m_in_rate, m_out_rate);
-    AlignedVector<float> input(period_in + m_block + m_taps + 128);
+    AlignedVector<float> input(table.period_in() + m_block + m_taps + 128);
     std::mt19937 generator(42);
     std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
     for (size_t i = 0; i < input.size(); i++){

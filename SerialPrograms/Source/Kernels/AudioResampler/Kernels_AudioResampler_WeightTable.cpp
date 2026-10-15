@@ -48,9 +48,10 @@ WeightTable::WeightTable(
 //    size_t in_period = in_sample_rate / gcd;
 //    size_t out_period = out_sample_rate / gcd;
     size_t period = out_sample_rate / gcd;
-    m_period = period;
-
-    size_t width = std::max(period, min_samples);
+    m_period_out = period;
+    m_period_in = in_sample_rate / gcd;
+    m_samples_allocated = std::max(period, min_samples);
+    const size_t width = m_samples_allocated;
 
     //  Calculate the starting input indices.
     {
@@ -70,16 +71,16 @@ WeightTable::WeightTable(
     m_tap_stride = Kernels::align_int_up<CACHE_WAY>(m_tap_stride);
 
     //  Extra padding to break superalignment.
-    size_t taps_in_table = std::max<size_t>(taps, min_taps);
-    m_tap_stride += 4096 / taps_in_table;
+    m_taps_allocated = std::max<size_t>(taps, min_taps);
+    m_tap_stride += 4096 / m_taps_allocated;
 
     //  Round up to min alignment.
     m_tap_stride = Kernels::align_int_up<PA_ALIGNMENT>(m_tap_stride);
     m_tap_stride /= sizeof(float);
 
 
-    m_data = AlignedVector<float>(taps_in_table * m_tap_stride);
-    memset(m_data.data(), 0, taps_in_table * m_tap_stride * sizeof(float));
+    m_data = AlignedVector<float>(m_taps_allocated * m_tap_stride);
+    memset(m_data.data(), 0, m_taps_allocated * m_tap_stride * sizeof(float));
 //    cout << "items = " << taps * m_tap_stride << endl;
 
     for (uint32_t tap_index = 0; tap_index < taps; tap_index++){
