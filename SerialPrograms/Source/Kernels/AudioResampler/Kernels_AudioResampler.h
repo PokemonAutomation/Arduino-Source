@@ -60,6 +60,20 @@ public:
 
 
 private:
+    //  Input samples a block starting at wrapped index wr needs, including
+    //  the kernel's reads past the last window. The kernel's implied input
+    //  overshoot is sample_block - 1 samples past the last window's start.
+    size_t need(size_t wr) const;
+
+    //  Emit one block over per-channel input bases and advance the
+    //  per-push stream progress (out / wr / cursor / out_off).
+    //  in_base(c) is the input base pointer of channel c.
+    template <typename InBase>
+    size_t emit_block(
+        size_t in_index, InBase in_base,
+        size_t& out, size_t& wr, size_t& cursor, size_t& out_off
+    );
+
     void flush(size_t count);
 
 
