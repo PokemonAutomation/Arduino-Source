@@ -977,10 +977,12 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/AbsFFT/Kernels_AbsFFT.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch.h
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch_arm64_NEON.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch_Default.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch_x86_AVX2.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch_x86_AVX512.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch_x86_SSE41.h
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_BaseTransform_arm64_NEON.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_BaseTransform_x86_AVX2.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_BaseTransform_x86_AVX512.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_BaseTransform_x86_SSE41.h
@@ -989,6 +991,7 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/AbsFFT/Kernels_AbsFFT_ComplexScalar.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_ComplexToAbs.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_ComplexVector.h
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_arm64_NEON.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_Default.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_AVX2.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_AVX512.cpp
