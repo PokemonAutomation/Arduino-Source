@@ -21,18 +21,53 @@
 #include <cctype>
 #include <cstring>
 #include <deque>
+#include <type_traits>
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavutil/channel_layout.h>
 #include <libavutil/version.h>
-#include <libavutil/error.h>
+#if __has_include(<libavutil/error.h>)
+#include <libavutil/error.h>    //  ffmpeg 8.0 renamed err.h to error.h
+#else
+#include <libavutil/err.h>
+#endif
 #include <libavutil/log.h>
 #include <libavutil/opt.h>
 #include <libavutil/rational.h>
 #include <libswresample/swresample.h>
 #include <libswscale/swscale.h>
+
+    //  Probe types for the ffmpeg API-generation checks below. They must be
+    //  declared with C language linkage (i.e. inside this extern "C" block)
+    //  to match decltype() of the functions declared above - C++ language
+    //  linkage would make std::is_same fail even for identical signatures.
+    using PaSwrAllocSetOpts2NewT = int (*)(SwrContext**, const AVChannelLayout*, AVSampleFormat, int,
+                                           const AVChannelLayout*, AVSampleFormat, int, int, void*);
+    using PaChannelLayoutDefaultNewT = void (*)(AVChannelLayout*, int);
 }
+
+//  ffmpeg has changed several API signatures between releases (5.1 - 8.x).
+//  Which generation of the API the installed headers declare cannot be
+//  inferred reliably from the LIBAV*_VERSION_MAJOR macros - distributions
+//  ship different ffmpeg versions (with different major numbers and
+//  different API generations), so the ring detects the actual API at
+//  compile time from the declarations above. Each generation-specific call
+//  is routed through a function template that is only instantiated when it
+//  is actually taken, because non-dependent names/expressions in a
+//  discarded if-constexpr branch are still looked up and checked.
+//  (The one exception, avcodec_get_supported_config(), is not declared at
+//  all in older headers, so that split is a preprocessor version gate that
+//  removes the code entirely instead.)
+
+//  Newer ffmpeg: av_channel_layout_default() returns void (validate the
+//  result with av_channel_layout_check() instead).
+static constexpr bool kChannelLayoutDefaultReturnsVoid =
+    std::is_same_v<decltype(&av_channel_layout_default), PaChannelLayoutDefaultNewT>;
+//  Newer ffmpeg: swr_alloc_set_opts2() takes a pointer to the context and
+//  returns 0 on success, instead of returning the context directly.
+static constexpr bool kSwrAllocSetOpts2TakesContextPtr =
+    std::is_same_v<decltype(&swr_alloc_set_opts2), PaSwrAllocSetOpts2NewT>;
 
 //  MSVC's <cerrno> does not define EAGAIN; ffmpeg's send/receive API reports
 //  "no data" as AVERROR(EAGAIN), which needs it. POSIX defines it as 11.
@@ -97,17 +132,66 @@ std::string ffmpeg_error(int errnum){
 }
 
 
-//  ffmpeg 8.0 (libavutil 61+) changed av_channel_layout_default() to return
-//  void and added av_channel_layout_check(); older releases return 0 on
-//  success. This helper initializes a layout and works against both.
-bool init_channel_layout(AVChannelLayout& layout, int channels){
+//  Initializes the layout with the given channel count, working against
+//  both API generations. The generation-specific calls go through
+//  function templates (non-type template parameters) so that they are
+//  only instantiated when their branch is actually taken.
+template <auto ChannelLayoutDefault, auto ChannelLayoutCheck>
+static bool init_channel_layout_new_api(AVChannelLayout& layout, int channels){
     av_channel_layout_uninit(&layout);
-#if LIBAVUTIL_VERSION_MAJOR >= 61
-    av_channel_layout_default(&layout, channels);
-    return av_channel_layout_check(&layout) > 0;
-#else
-    return av_channel_layout_default(&layout, channels) >= 0;
-#endif
+    ChannelLayoutDefault(&layout, channels);
+    return ChannelLayoutCheck(&layout) > 0;
+}
+template <auto ChannelLayoutDefault>
+static bool init_channel_layout_old_api(AVChannelLayout& layout, int channels){
+    av_channel_layout_uninit(&layout);
+    return ChannelLayoutDefault(&layout, channels) >= 0;
+}
+static bool init_channel_layout(AVChannelLayout& layout, int channels){
+    if constexpr (kChannelLayoutDefaultReturnsVoid){
+        return init_channel_layout_new_api<av_channel_layout_default, av_channel_layout_check>(layout, channels);
+    } else {
+        return init_channel_layout_old_api<av_channel_layout_default>(layout, channels);
+    }
+}
+
+//  Creates the 48 kHz resampler against whichever swresample generation is
+//  installed. (Older releases: swr_alloc_set_opts2() takes an AVDictionary**
+//  and returns the context; newer ones take a SwrContext** and return 0 on
+//  success.)
+template <auto SwrAllocSetOpts2>
+static bool make_audio_resampler_new_api(SwrContext*& swr,
+                                         const AVChannelLayout& out_layout, int out_rate,
+                                         const AVChannelLayout& in_layout, int in_rate){
+    int ret = SwrAllocSetOpts2(
+        &swr,
+        &out_layout, AV_SAMPLE_FMT_FLT, out_rate,
+        &in_layout,  AV_SAMPLE_FMT_FLT, in_rate,
+        0, nullptr
+    );
+    return ret == 0 && swr != nullptr;
+}
+template <auto SwrAllocSetOpts2>
+static bool make_audio_resampler_old_api(SwrContext*& swr,
+                                         const AVChannelLayout& out_layout, int out_rate,
+                                         const AVChannelLayout& in_layout, int in_rate){
+    AVDictionary* options = nullptr;    //  consumed (freed) by the call on both paths
+    swr = SwrAllocSetOpts2(
+        &options,
+        &out_layout, AV_SAMPLE_FMT_FLT, out_rate,
+        &in_layout,  AV_SAMPLE_FMT_FLT, in_rate,
+        0, nullptr
+    );
+    return swr != nullptr;
+}
+static bool make_audio_resampler(SwrContext*& swr,
+                                 const AVChannelLayout& out_layout, int out_rate,
+                                 const AVChannelLayout& in_layout, int in_rate){
+    if constexpr (kSwrAllocSetOpts2TakesContextPtr){
+        return make_audio_resampler_new_api<swr_alloc_set_opts2>(swr, out_layout, out_rate, in_layout, in_rate);
+    } else {
+        return make_audio_resampler_old_api<swr_alloc_set_opts2>(swr, out_layout, out_rate, in_layout, in_rate);
+    }
 }
 
 
@@ -362,7 +446,12 @@ struct StreamHistoryTracker_Ring::Impl{
 
             //  Prefer NV12; otherwise take the first format the encoder supports.
 #if LIBAVCODEC_VERSION_MAJOR >= 61
-            //  ffmpeg 7.0+ removed AVCodec.pix_fmts; query the encoder instead.
+            //  ffmpeg 7.0+ (libavcodec 61+) removed AVCodec.pix_fmts; query the
+            //  encoder instead. This split is a preprocessor version gate
+            //  (rather than compile-time detection) because
+            //  avcodec_get_supported_config() is not declared at all in older
+            //  headers, and names in discarded if-constexpr branches are still
+            //  looked up.
             //  (out_num_configs is optional; out_configs points at a
             //  list terminated by AV_PIX_FMT_NONE, or is NULL when every
             //  format is supported.)
@@ -725,27 +814,9 @@ struct StreamHistoryTracker_Ring::Impl{
                 have_audio = false;
                 return;
             }
-#if LIBSWRESAMPLE_VERSION_MAJOR >= 7
-            //  ffmpeg 8.0 (swresample 7+) allocates through a pointer to the
-            //  context and returns 0 on success; older releases return the
-            //  context directly.
-            int ret = swr_alloc_set_opts2(
-                &swr,
-                &audio_layout, AV_SAMPLE_FMT_FLT, AUDIO_OUTPUT_RATE,
-                &in_layout,  AV_SAMPLE_FMT_FLT, audio_input_rate,
-                0, nullptr
-            );
+            bool swr_created = make_audio_resampler(swr, audio_layout, AUDIO_OUTPUT_RATE, in_layout, audio_input_rate);
             av_channel_layout_uninit(&in_layout);
-            if (ret < 0 || swr == nullptr){
-#else
-            swr = swr_alloc_set_opts2(
-                &audio_layout, AV_SAMPLE_FMT_FLT, AUDIO_OUTPUT_RATE,
-                &in_layout,  AV_SAMPLE_FMT_FLT, audio_input_rate,
-                0, nullptr
-            );
-            av_channel_layout_uninit(&in_layout);
-            if (swr == nullptr){
-#endif
+            if (!swr_created){
                 logger.log("Stream history: Failed to create audio resampler. Disabling audio.", COLOR_RED);
                 have_audio = false;
                 return;

@@ -652,6 +652,7 @@ else() # macOS and Linux
         if (NOT FFMPEG_MIN_VERSION_FOUND)
             message(FATAL_ERROR "PA_STREAM_HISTORY_FFMPEG=ON requires ffmpeg >= 5.1 (libavcodec 59+).")
         endif()
+        message(STATUS "PA stream-history ring: ffmpeg found via pkg-config module set '${FFMPEG_PC}' (version ${${FFMPEG_PC}_VERSION}).")
         target_include_directories(SerialProgramsLib SYSTEM PRIVATE ${${FFMPEG_PC}_INCLUDE_DIRS})
         target_link_directories(SerialProgramsLib PUBLIC ${${FFMPEG_PC}_LIBRARY_DIRS})
         target_link_libraries(SerialProgramsLib PRIVATE ${${FFMPEG_PC}_LIBRARIES})
