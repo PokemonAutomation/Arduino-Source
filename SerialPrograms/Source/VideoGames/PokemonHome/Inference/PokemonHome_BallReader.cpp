@@ -4,7 +4,9 @@
  *
  */
 
-#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include <algorithm>
+#include <map>
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
@@ -12,6 +14,7 @@
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "VideoGames/PokemonHome/Resources/PokemonHome_PokeballSprites.h"
 #include "PokemonHome_BallReader.h"
 #include "Tests/TestUtils.h"
@@ -20,16 +23,212 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonHome{
 
+namespace{
+    constexpr double MAX_BALL_ALPHA = 0.40;
 
+    ImageViewRGB32 crop_ball_sprite(const ImageViewRGB32& image, double min_distance_squared){
+        ImageStats border = image_border_stats(image);
+        ImagePixelBox box = ImageMatch::enclosing_rectangle_with_pixel_filter(
+            image,
+            [&](Color pixel){
+                double r = (double)pixel.red() - border.average.r;
+                double g = (double)pixel.green() - border.average.g;
+                double b = (double)pixel.blue() - border.average.b;
+                return r*r + g*g + b*b >= min_distance_squared;
+            }
+        );
+        return extract_box_reference(image, box);
+    }
+}
+
+
+
+class PokeballSpriteMatcher::SimilarBallGroupMatcher{
+    struct PairMatchers{
+        PairMatchers(size_t first, size_t second, ImageRGB32 a, ImageRGB32 b)
+            : first(first), second(second)
+            , a(std::move(a), {1, 128})
+            , b(std::move(b), {1, 128})
+        {}
+        size_t first;
+        size_t second;
+        ImageMatch::WeightedExactImageMatcher a;
+        ImageMatch::WeightedExactImageMatcher b;
+    };
+
+public:
+    SimilarBallGroupMatcher(
+        const SimilarBallGroup& config,
+        const std::map<std::string, ImageRGB32>& cleaned_sprites
+    )
+        : m_config(config)
+    {
+        if (config.slugs.size() < 2 || config.comparison_width == 0 || config.comparison_height == 0
+            || config.min_detail_pixels < 2 || config.min_pixel_distance <= 0
+            || config.crop_distance <= 0 || config.coarse_spread < 0
+            || config.max_detail_alpha < 0 || config.detail_spread < 0
+        ){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid similar ball group.");
+        }
+
+        std::vector<ImageRGB32> sprites;
+        for (const std::string& slug : config.slugs){
+            auto iter = cleaned_sprites.find(slug);
+            if (iter == cleaned_sprites.end()){
+                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid similar ball group member: " + slug);
+            }
+            ImageViewRGB32 trimmed = ImageMatch::trim_image_alpha(iter->second);
+            sprites.emplace_back(trimmed.scale_to(config.comparison_width, config.comparison_height));
+        }
+
+        for (size_t i = 0; i < sprites.size(); i++){
+            for (size_t j = 0; j < i; j++){
+                ImageRGB32 a = sprites[j].copy();
+                ImageRGB32 b = sprites[i].copy();
+                size_t detail_pixels = 0;
+                for (size_t y = 0; y < config.comparison_height; y++){
+                    for (size_t x = 0; x < config.comparison_width; x++){
+                        Color first(a.pixel(x, y)), second(b.pixel(x, y));
+                        double r = (double)first.red() - second.red();
+                        double g = (double)first.green() - second.green();
+                        double blue = (double)first.blue() - second.blue();
+                        if (first.alpha() == 255 && second.alpha() == 255
+                            && r*r + g*g + blue*blue >= config.min_pixel_distance * config.min_pixel_distance
+                        ){
+                            detail_pixels++;
+                        }else{
+                            a.pixel(x, y) = 0;
+                            b.pixel(x, y) = 0;
+                        }
+                    }
+                }
+                if (detail_pixels >= config.min_detail_pixels){
+                    m_pairs.emplace_back(std::make_unique<PairMatchers>(j, i, std::move(a), std::move(b)));
+                }
+            }
+        }
+    }
+
+    double coarse_spread() const{ return m_config.coarse_spread; }
+
+    bool contains(const std::string& slug) const{
+        return std::find(m_config.slugs.begin(), m_config.slugs.end(), slug) != m_config.slugs.end();
+    }
+
+    std::string winner(const ImageViewRGB32& image) const{
+        ImageViewRGB32 crop = crop_ball_sprite(image, m_config.crop_distance * m_config.crop_distance);
+        std::vector<size_t> wins(m_config.slugs.size(), 0);
+        for (const auto& pair : m_pairs){
+            double a = pair->a.diff(crop);
+            double b = pair->b.diff(crop);
+            if (a <= m_config.max_detail_alpha && b - a > m_config.detail_spread){
+                wins[pair->first]++;
+            }
+            if (b <= m_config.max_detail_alpha && a - b > m_config.detail_spread){
+                wins[pair->second]++;
+            }
+        }
+        for (size_t i = 0; i < wins.size(); i++){
+            if (wins[i] == m_config.slugs.size() - 1){
+                return m_config.slugs[i];
+            }
+        }
+        return "";
+    }
+
+private:
+    SimilarBallGroup m_config;
+    std::vector<std::unique_ptr<PairMatchers>> m_pairs;
+};
 
 
 PokeballSpriteMatcher::PokeballSpriteMatcher(double min_euclidean_distance)
+    : PokeballSpriteMatcher(
+        {
+            SimilarBallGroup{
+                .slugs = {"heavy-ball-pla", "leaden-ball", "gigaton-ball"},
+            },
+            SimilarBallGroup{
+                .slugs = {"fast-ball", "poke-ball"},
+            },
+        },
+        min_euclidean_distance
+    )
+{}
+PokeballSpriteMatcher::PokeballSpriteMatcher(
+    const std::vector<SimilarBallGroup>& groups, double min_euclidean_distance
+)
     : CroppedImageDictionaryMatcher({1, 128})
     , m_min_euclidean_distance_squared(min_euclidean_distance * min_euclidean_distance)
 {
+    std::map<std::string, ImageRGB32> cleaned_sprites;
     for (const auto& item : PokemonHome::ALL_POKEBALL_SPRITES()){
-        add(item.first, remove_white_border(item.second.sprite));
+        ImageRGB32 sprite = remove_white_border(item.second.sprite);
+        add(item.first, sprite);
+        cleaned_sprites.emplace(item.first, std::move(sprite));
     }
+    std::vector<std::string> grouped_slugs;
+    for (const SimilarBallGroup& group : groups){
+        for (const std::string& slug : group.slugs){
+            if (std::find(grouped_slugs.begin(), grouped_slugs.end(), slug) != grouped_slugs.end()){
+                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Overlapping similar ball groups: " + slug);
+            }
+            grouped_slugs.emplace_back(slug);
+        }
+        m_similar_groups.emplace_back(std::make_unique<SimilarBallGroupMatcher>(group, cleaned_sprites));
+    }
+}
+PokeballSpriteMatcher::~PokeballSpriteMatcher() = default;
+
+ImageMatch::ImageMatchResult PokeballSpriteMatcher::match(const ImageViewRGB32& image, double alpha_spread) const{
+    double coarse_spread = alpha_spread;
+    for (const auto& group : m_similar_groups){
+        coarse_spread = std::max(coarse_spread, group->coarse_spread());
+    }
+
+    ImageMatch::ImageMatchResult coarse = CroppedImageDictionaryMatcher::match(image, coarse_spread);
+    if (coarse.results.empty()){
+        return coarse;
+    }
+    ImageMatch::ImageMatchResult result = coarse;
+    result.clear_beyond_spread(alpha_spread);
+    const double best_alpha = coarse.results.begin()->first;
+    if (best_alpha <= MAX_BALL_ALPHA){
+        for (const auto& group : m_similar_groups){
+            bool plausible = false;
+            for (const auto& item : coarse.results){
+                if (group->contains(item.second) && item.first <= MAX_BALL_ALPHA
+                    && item.first <= best_alpha + group->coarse_spread()
+                ){
+                    plausible = true;
+                    break;
+                }
+            }
+            if (!plausible){
+                continue;
+            }
+
+            std::string winner = group->winner(image);
+            auto selected = std::find_if(coarse.results.begin(), coarse.results.end(), [&](const auto& item){
+                return item.second == winner && item.first <= MAX_BALL_ALPHA
+                    && item.first <= best_alpha + group->coarse_spread();
+            });
+            if (selected == coarse.results.end()){
+                continue;
+            }
+
+            for (auto iter = result.results.begin(); iter != result.results.end();){
+                if (group->contains(iter->second)){
+                    iter = result.results.erase(iter);
+                }else{
+                    ++iter;
+                }
+            }
+            result.add(selected->first, winner);
+        }
+    }
+    result.clear_beyond_spread(alpha_spread);
+    return result;
 }
 ImageRGB32 PokeballSpriteMatcher::remove_white_border(const ImageViewRGB32& image){
     using namespace Kernels::Waterfill;
@@ -58,19 +257,8 @@ ImageRGB32 PokeballSpriteMatcher::remove_white_border(const ImageViewRGB32& imag
     return ret;
 }
 auto PokeballSpriteMatcher::get_crop_candidates(const ImageViewRGB32& image) const -> std::vector<ImageViewRGB32>{
-    ImageStats border = image_border_stats(image);
-    ImagePixelBox box = ImageMatch::enclosing_rectangle_with_pixel_filter(
-        image,
-        [&](Color pixel){
-            double r = (double)pixel.red() - border.average.r;
-            double g = (double)pixel.green() - border.average.g;
-            double b = (double)pixel.blue() - border.average.b;
-            bool stop = r*r + g*g + b*b >= m_min_euclidean_distance_squared;
-            return stop;
-        }
-    );
     std::vector<ImageViewRGB32> ret;
-    ret.emplace_back(extract_box_reference(image, box));
+    ret.emplace_back(crop_ball_sprite(image, m_min_euclidean_distance_squared));
     return ret;
 }
 
@@ -79,7 +267,7 @@ auto PokeballSpriteMatcher::get_crop_candidates(const ImageViewRGB32& image) con
 
 
 
-const double BallReader::MAX_ALPHA = 0.40;
+const double BallReader::MAX_ALPHA = MAX_BALL_ALPHA;
 const double BallReader::ALPHA_SPREAD = 0.02;
 
 
