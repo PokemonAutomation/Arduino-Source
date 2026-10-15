@@ -64,6 +64,31 @@ private:
 
 
 
+//
+//  Runs one block of the kernel chosen by get_block_kernel() on
+//  deterministic input and compares every output sample, in ULPs, to a
+//  scalar reference. This validates that the dispatch result is a kernel
+//  that is actually valid for the rate ratio and tap count.
+//
+class BlockDispatchTest : public UnitTest{
+public:
+    BlockDispatchTest(
+        size_t in_sample_rate,
+        size_t out_sample_rate,
+        uint32_t taps
+    );
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override;
+
+
+private:
+    const size_t m_in_rate;
+    const size_t m_out_rate;
+    const uint32_t m_taps;
+};
+
+
+
 }
 }
 }

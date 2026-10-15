@@ -182,7 +182,94 @@ UnitTestResult BlockKernelTest::run(Logger& logger, CancellableScope& scope) con
 
 
 
+BlockDispatchTest::BlockDispatchTest(
+    size_t in_sample_rate,
+    size_t out_sample_rate,
+    uint32_t taps
+)
+    : UnitTest(
+        "Kernels::AudioResampler - Dispatch(" + std::to_string(in_sample_rate) +
+        "->" + std::to_string(out_sample_rate) + ", " +
+        std::to_string(taps) + " taps)"
+      )
+    , m_in_rate(in_sample_rate)
+    , m_out_rate(out_sample_rate)
+    , m_taps(taps)
+{}
+UnitTestResult BlockDispatchTest::run(Logger& logger, CancellableScope& scope) const{
+    (void)logger;
+    (void)scope;
+
+    BlockKernel bk = get_block_kernel(m_in_rate, m_out_rate);
+    if (bk.fp == nullptr){
+        return "get_block_kernel returned a null function pointer.";
+    }
+
+    //  Table sized exactly to the kernel's documented requirements.
+    const size_t period = m_out_rate / std::gcd(m_in_rate, m_out_rate);
+    WeightTable table(
+        m_in_rate, m_out_rate, m_taps, 9.0,
+        period + bk.sample_block,
+        m_taps + bk.tap_block - 1
+    );
+
+    //  The kernel's input reads may extend sample_block - 1 samples past
+    //  the last window's start.
+    const uint32_t* index = table.in_sample_index();
+    AlignedVector<float> input(index[bk.sample_block - 1] + m_taps + bk.sample_block + 64);
+    std::mt19937 generator(42);
+    std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
+    for (size_t i = 0; i < input.size(); i++){
+        input[i] = distribution(generator);
+    }
+
+    AlignedVector<float> got(bk.sample_block);
+    bk.fp(table, 0, input.data(), 0, got.data());
+
+    AlignedVector<float> want = reference_lanes(table, input.data(), 0, bk.sample_block);
+
+    for (size_t c = 0; c < bk.sample_block; c++){
+        int64_t ulp = 0;
+        if (!within_ulp_tolerance(got[c], want[c], ulp)){
+            return "Dispatched kernel disagrees; max diff " +
+                std::to_string(std::fabs(got[c] - want[c])) +
+                " at output " + std::to_string(c) +
+                "; got[" + std::to_string(c) + "] = " + std::to_string(got[c]) +
+                ", want[" + std::to_string(c) + "] = " + std::to_string(want[c]) +
+                " (" + std::to_string(ulp) + " ULP)";
+        }
+    }
+
+    return true;
+}
+
+
+
 void add_tests(UnitTestDatabase& database){
+    //  Dispatch choices across rate ratios, with a spread of tap counts
+    //  for the table itself. Odd tap counts exercise the unrolls' final
+    //  partial group reading the table's zero padded rows.
+    const struct{
+        size_t in_rate;
+        size_t out_rate;
+        uint32_t taps;
+    } dispatch_combos[] = {
+        { 44100, 44100, 16 },
+        { 44100, 48000, 16 },
+        { 48000, 44100, 16 },
+        { 44100, 88200, 16 },
+        { 88200, 44100, 16 },
+        { 96000, 44100, 16 },
+        { 44100, 22050, 8 },
+        { 90000, 20000, 4 },
+        { 8000, 44100, 3 },
+    };
+    for (auto& combo : dispatch_combos){
+        database.add<BlockDispatchTest>(
+            combo.in_rate, combo.out_rate, combo.taps
+        );
+    }
+
     //  The Default kernel doubles as the reference for the SIMD variants.
     database.add<BlockKernelTest>(
         "Default", run_block8_Default,
