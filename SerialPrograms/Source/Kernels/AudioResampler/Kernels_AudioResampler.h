@@ -66,12 +66,12 @@ private:
     size_t need(size_t wr) const;
 
     //  Emit one block over per-channel input bases and advance the
-    //  per-push stream progress (out / wr / cursor / out_off).
+    //  per-push stream progress (out / wr / periods / cursor / out_off).
     //  in_base(c) is the input base pointer of channel c.
     template <typename InBase>
     size_t emit_block(
         size_t in_index, InBase in_base,
-        size_t& out, size_t& wr, size_t& cursor, size_t& out_off
+        size_t& out, size_t& wr, size_t& periods, size_t& cursor, size_t& out_off
     );
 
     void flush(size_t count);
@@ -82,11 +82,17 @@ private:
     const uint32_t m_taps;
     //  The dispatched block kernel.
     const BlockKernel m_block;
-    //  Input samples per output period (in_sample_rate / gcd).
-    const size_t m_period_in;
     //  The weight table, built from the block's sizes; it extends its
     //  allocations for the kernel's implied overshoots.
     WeightTable m_table;
+    //  Extended output period: the smallest multiple of the table's period
+    //  that is >= sample_block, so a block wraps it at most once and
+    //  advancing the wrapped index is a compare-and-subtract, not a
+    //  modulo.
+    const size_t m_period_prime;
+    //  Input samples per extended period (m_table.period_in() times the
+    //  period extension).
+    const size_t m_period_in_prime;
     //  Floats per channel in m_buffer. At least the requested buffer size,
     //  rounded up so a block never straddles the channel boundary.
     const size_t m_buffer_stride;
