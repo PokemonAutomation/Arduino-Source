@@ -386,6 +386,13 @@ void add_tests_SummaryReader(UnitTestDatabase& database){
     database.add<Test_SummaryReader_Numbers>("PokemonHome/SummaryScreen/wurmple_Regular.png", 265, 843926, 1);
     database.add<Test_SummaryReader_Numbers>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", 14, 40419, 8);
     database.add<Test_SummaryReader_Numbers>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", 14, 40419, 8);
+    database.add<Test_SummaryReader_Numbers>("PokemonHome/SummaryScreen/Farfetchd-fast-ball.png", 83, 801876, 1);
+    database.add<Test_SummaryReader_Numbers>("PokemonHome/SummaryScreen/Machamp-gigaton-ball.png", 68, 611957, 100);
+    database.add<Test_SummaryReader_Numbers>("PokemonHome/SummaryScreen/Machoke-gigaton-ball.png", 67, 611957, 100);
+    database.add<Test_SummaryReader_Numbers>("PokemonHome/SummaryScreen/Machop-gigaton-ball.png", 66, 611957, 100);
+    database.add<Test_SummaryReader_Numbers>("PokemonHome/SummaryScreen/Magnemite-gigaton-ball.png", 81, 611957, 100);
+    database.add<Test_SummaryReader_Numbers>("PokemonHome/SummaryScreen/Magneton-gigaton-ball.png", 82, 611957, 100);
+    database.add<Test_SummaryReader_Numbers>("PokemonHome/SummaryScreen/Slowpoke-fast-ball.png", 79, 801876, 48);
     //Text
     database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/annihilape_Regular.png", "Hardy", "Inner Focus", Language::English);
     database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/bidoof_Regular.png", "Lonely", "Simple", Language::English);
@@ -431,6 +438,13 @@ void add_tests_SummaryReader(UnitTestDatabase& database){
     database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/wurmple_Regular.png", "Sassy", "Shield Dust", Language::English);
     database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", "Gentle", "Shed Skin", Language::English);
     database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", "Gentle", "Shed Skin", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/Farfetchd-fast-ball.png", "Jolly", "Steadfast", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/Machamp-gigaton-ball.png", "Mild", "", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/Machoke-gigaton-ball.png", "Hardy", "", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/Machop-gigaton-ball.png", "Hasty", "", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/Magnemite-gigaton-ball.png", "Hardy", "", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/Magneton-gigaton-ball.png", "Timid", "", Language::English);
+    database.add<Test_SummaryReader_Text>("PokemonHome/SummaryScreen/Slowpoke-fast-ball.png", "Sassy", "Regenerator", Language::English);
     //OT Name
     database.add<Test_SummaryReader_OtName>("PokemonHome/SummaryScreen/annihilape_Regular.png", "da1t0n", Language::English);
     database.add<Test_SummaryReader_OtName>("PokemonHome/SummaryScreen/bidoof_Regular.png", "h1karu", Language::English);
@@ -476,6 +490,13 @@ void add_tests_SummaryReader(UnitTestDatabase& database){
     database.add<Test_SummaryReader_OtName>("PokemonHome/SummaryScreen/wurmple_Regular.png", "r0n", Language::English);
     database.add<Test_SummaryReader_OtName>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", "da1t0n", Language::English);
     database.add<Test_SummaryReader_OtName>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", "da1t0n", Language::English);
+    database.add<Test_SummaryReader_OtName>("PokemonHome/SummaryScreen/Farfetchd-fast-ball.png", "1javy", Language::English);
+    database.add<Test_SummaryReader_OtName>("PokemonHome/SummaryScreen/Machamp-gigaton-ball.png", "1javy", Language::English);
+    database.add<Test_SummaryReader_OtName>("PokemonHome/SummaryScreen/Machoke-gigaton-ball.png", "1javy", Language::English);
+    database.add<Test_SummaryReader_OtName>("PokemonHome/SummaryScreen/Machop-gigaton-ball.png", "1javy", Language::English);
+    database.add<Test_SummaryReader_OtName>("PokemonHome/SummaryScreen/Magnemite-gigaton-ball.png", "1javy", Language::English);
+    database.add<Test_SummaryReader_OtName>("PokemonHome/SummaryScreen/Magneton-gigaton-ball.png", "1javy", Language::English);
+    database.add<Test_SummaryReader_OtName>("PokemonHome/SummaryScreen/Slowpoke-fast-ball.png", "1javy", Language::English);
     // Language of Origin
     database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/annihilape_Regular.png", "ENG");
     database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/bidoof_Regular.png", "ENG");
@@ -521,6 +542,13 @@ void add_tests_SummaryReader(UnitTestDatabase& database){
     database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/wurmple_Regular.png", "FRA");
     database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", "ENG");
     database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/Farfetchd-fast-ball.png", "ES-ES");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/Machamp-gigaton-ball.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/Machoke-gigaton-ball.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/Machop-gigaton-ball.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/Magnemite-gigaton-ball.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/Magneton-gigaton-ball.png", "ENG");
+    database.add<Test_SummaryReader_LanguageOfOrigin>("PokemonHome/SummaryScreen/Slowpoke-fast-ball.png", "ENG");
 }
     
 

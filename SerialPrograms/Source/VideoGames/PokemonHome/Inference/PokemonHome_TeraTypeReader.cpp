@@ -370,6 +370,13 @@ void add_tests_TeraTypeReader(UnitTestDatabase& database){
     database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/wurmple_Regular.png", PokemonTeraType::NONE);
     database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", PokemonTeraType::NONE);
     database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/Farfetchd-fast-ball.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/Machamp-gigaton-ball.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/Machoke-gigaton-ball.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/Machop-gigaton-ball.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/Magnemite-gigaton-ball.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/Magneton-gigaton-ball.png", PokemonTeraType::NONE);
+    database.add<Test_TeraTypeReader>("PokemonHome/SummaryScreen/Slowpoke-fast-ball.png", PokemonTeraType::NONE);
 }
 
 }

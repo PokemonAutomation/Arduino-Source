@@ -389,6 +389,13 @@ void add_tests_BallReader(UnitTestDatabase& database){
     database.add<Test_BallReader>("PokemonHome/SummaryScreen/wurmple_Regular.png", "premier-ball");
     database.add<Test_BallReader>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", "poke-ball");
     database.add<Test_BallReader>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", "poke-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/Farfetchd-fast-ball.png", "fast-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/Machamp-gigaton-ball.png", "gigaton-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/Machoke-gigaton-ball.png", "gigaton-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/Machop-gigaton-ball.png", "gigaton-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/Magnemite-gigaton-ball.png", "gigaton-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/Magneton-gigaton-ball.png", "gigaton-ball");
+    database.add<Test_BallReader>("PokemonHome/SummaryScreen/Slowpoke-fast-ball.png", "fast-ball");
 }
 
 

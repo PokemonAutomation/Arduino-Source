@@ -249,6 +249,13 @@ void add_tests_ButtonDetector(UnitTestDatabase& database){
     database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/wurmple_Regular.png", ButtonType::ButtonB);
     database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", ButtonType::ButtonB);
     database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/Farfetchd-fast-ball.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/Machamp-gigaton-ball.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/Machoke-gigaton-ball.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/Machop-gigaton-ball.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/Magnemite-gigaton-ball.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/Magneton-gigaton-ball.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/Slowpoke-fast-ball.png", ButtonType::ButtonB);
 }
 
 }

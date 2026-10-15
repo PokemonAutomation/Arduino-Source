@@ -101,6 +101,13 @@ void add_tests_BoxViewDetector(UnitTestDatabase& database){
     database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/wurmple_Regular.png", false);
     database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", false);
     database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/Farfetchd-fast-ball.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/Machamp-gigaton-ball.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/Machoke-gigaton-ball.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/Machop-gigaton-ball.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/Magnemite-gigaton-ball.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/Magneton-gigaton-ball.png", false);
+    database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/Slowpoke-fast-ball.png", false);
 }
 
 }

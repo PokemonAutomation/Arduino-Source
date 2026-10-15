@@ -160,6 +160,13 @@ void add_tests_GigantamaxDetector(UnitTestDatabase& database){
     database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/wurmple_Regular.png", false);
     database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", false);
     database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/Farfetchd-fast-ball.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/Machamp-gigaton-ball.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/Machoke-gigaton-ball.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/Machop-gigaton-ball.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/Magnemite-gigaton-ball.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/Magneton-gigaton-ball.png", false);
+    database.add<Test_GigantamaxDetector>("PokemonHome/SummaryScreen/Slowpoke-fast-ball.png", false);
 }
 
 

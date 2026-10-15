@@ -140,6 +140,13 @@ void add_tests_BoxGenderDetector(UnitTestDatabase& database){
     database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/wurmple_Regular.png", Pokemon::StatsHuntGenderFilter::Female);
     database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-NV12.png", Pokemon::StatsHuntGenderFilter::Female);
     database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/GBA-Origin-ElgatoHD60Pro-YUYV.png", Pokemon::StatsHuntGenderFilter::Female);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/Farfetchd-fast-ball.png", Pokemon::StatsHuntGenderFilter::Female);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/Machamp-gigaton-ball.png", Pokemon::StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/Machoke-gigaton-ball.png", Pokemon::StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/Machop-gigaton-ball.png", Pokemon::StatsHuntGenderFilter::Male);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/Magnemite-gigaton-ball.png", Pokemon::StatsHuntGenderFilter::Genderless);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/Magneton-gigaton-ball.png", Pokemon::StatsHuntGenderFilter::Genderless);
+    database.add<Test_BoxGenderDetector>("PokemonHome/SummaryScreen/Slowpoke-fast-ball.png", Pokemon::StatsHuntGenderFilter::Female);
 }
 
 
