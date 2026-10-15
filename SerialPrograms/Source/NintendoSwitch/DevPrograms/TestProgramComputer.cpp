@@ -591,7 +591,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
     uint32_t taps = 16;
 
-    WeightTable table0(10, 16, taps, 9, 128, 8);
+    WeightTable table0(10, 16, taps, 9, 8, 1);
     for (size_t c = 0; c < 8; c++){
         cout << table0.in_sample_index()[c] << ", ";
     }
@@ -603,7 +603,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
         cout << endl;
     }
 
-    WeightTable table1(16, 10, taps, 9, 128, 8);
+    WeightTable table1(16, 10, taps, 9, 8, 1);
     for (size_t c = 0; c < 5; c++){
         cout << table1.in_sample_index()[c] << ", ";
     }

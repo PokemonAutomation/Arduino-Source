@@ -46,7 +46,8 @@ public:
         size_t in_sample_rate,
         size_t out_sample_rate,
         uint32_t taps,
-        size_t block,
+        size_t sample_block,
+        size_t tap_block,
         size_t out_index
     );
 
@@ -59,6 +60,7 @@ private:
     const size_t m_out_rate;
     const uint32_t m_taps;
     const size_t m_block;
+    const size_t m_tap_block;
     const size_t m_out_index;
 };
 
@@ -86,6 +88,8 @@ private:
     const size_t m_out_rate;
     const uint32_t m_taps;
 };
+
+
 
 
 
