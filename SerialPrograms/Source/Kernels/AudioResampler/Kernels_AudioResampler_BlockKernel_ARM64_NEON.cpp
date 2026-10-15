@@ -93,7 +93,10 @@ PA_FORCE_INLINE uint8x16_t build_group_byte_index(
 //
 //  TBL gathers of 4 floats by byte index.
 //
-//  GCC's 128-bit TBL intrinsics cover both windows in one instruction:
+//  The 128-bit TBL intrinsics cover both windows in one instruction on
+//  every compiler. Both GCC and Clang name them after the instruction
+//  mnemonics (VQTB1Q / VQTB2Q): vqtbl1q_u8 and vqtbl2q_u8 - the
+//  "vtbl1q_u8" / "vtbl2q_u8" spellings do not exist in either header.
 //  up needs a single 16-byte table, down2 a 32-byte one.
 //
 PA_FORCE_INLINE float32x4_t gather_group_up(
