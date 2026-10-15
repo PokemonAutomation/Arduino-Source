@@ -96,76 +96,17 @@ PA_FORCE_INLINE uint8x16_t build_group_byte_index(
 //  GCC's 128-bit TBL intrinsics cover both windows in one instruction:
 //  up needs a single 16-byte table, down2 a 32-byte one.
 //
-//  Clang's arm_neon.h has no 128-bit table intrinsics at all, so the
-//  Clang path builds the 16 result bytes out of 64-bit vtbl2_u8
-//  gathers:
-//
-//  up: the up contract (in_rate <= out_rate) keeps every byte index
-//  below 16, so both 8-byte result halves gather from the same
-//  16-byte window.
-//
-//  down2: byte indices reach 31, so each 8-byte index half may point
-//  at either 16-byte table half. Each half is gathered from both
-//  table halves, with the index clamped for the high one; TBL
-//  out-of-range indices clamp to the last table byte, so each gather
-//  is exact in the lanes the vbsl keeps.
-//
-#if defined(__GNUC__) && !defined(__clang__)
-
 PA_FORCE_INLINE float32x4_t gather_group_up(
     float32x4_t tab, uint8x16_t idx
 ){
     return vreinterpretq_f32_u8(vqtbl1q_u8(vreinterpretq_u8_f32(tab), idx));
 }
-
-
 PA_FORCE_INLINE float32x4_t gather_group_down2(
     float32x4_t tab0, float32x4_t tab1, uint8x16_t idx
 ){
     uint8x16x2_t tab{ vreinterpretq_u8_f32(tab0), vreinterpretq_u8_f32(tab1) };
     return vreinterpretq_f32_u8(vqtbl2q_u8(tab, idx));
 }
-
-#else
-
-PA_FORCE_INLINE float32x4_t gather_group_up(
-    float32x4_t window, uint8x16_t idx
-){
-    //  vtbl2_u8 takes the table pair as a uint8x8x2_t, same as GCC.
-    uint8x16_t u8window = vreinterpretq_u8_f32(window);
-    uint8x8x2_t tab{ vget_low_u8(u8window), vget_high_u8(u8window) };
-    return vreinterpretq_f32_u8(vcombine_u8(
-        vtbl2_u8(tab, vget_low_u8(idx)),
-        vtbl2_u8(tab, vget_high_u8(idx))));
-}
-
-
-PA_FORCE_INLINE float32x4_t gather_group_down2(
-    float32x4_t tab0, float32x4_t tab1, uint8x16_t idx
-){
-    uint8x16_t u8tab0 = vreinterpretq_u8_f32(tab0);
-    uint8x16_t u8tab1 = vreinterpretq_u8_f32(tab1);
-    uint8x8x2_t lo_tab{ vget_low_u8(u8tab0), vget_high_u8(u8tab0) };
-    uint8x8x2_t hi_tab{ vget_low_u8(u8tab1), vget_high_u8(u8tab1) };
-    uint8x8_t sixteen = vdup_n_u8(16);
-    uint8x8_t lo = vget_low_u8(idx);
-    uint8x8_t hi = vget_high_u8(idx);
-    //  The unclamped gather is right where idx < 16, and the
-    //  clamped high-half gather is right where idx >= 16; TBL
-    //  out-of-range indices clamp to the last table byte, so each
-    //  gather is exact in the lanes the vbsl keeps.
-    uint8x8_t out_lo = vbsl_u8(
-        vcge_u8(lo, sixteen),
-        vtbl2_u8(hi_tab, vsub_u8(lo, sixteen)),
-        vtbl2_u8(lo_tab, lo));
-    uint8x8_t out_hi = vbsl_u8(
-        vcge_u8(hi, sixteen),
-        vtbl2_u8(hi_tab, vsub_u8(hi, sixteen)),
-        vtbl2_u8(lo_tab, hi));
-    return vreinterpretq_f32_u8(vcombine_u8(out_lo, out_hi));
-}
-
-#endif
 
 
 template <int input_loads>
