@@ -30,6 +30,7 @@ extern "C" {
 #include <libavutil/version.h>
 #include <libavutil/log.h>
 #include <libavutil/opt.h>
+#include <libavutil/pixdesc.h>
 #include <libavutil/rational.h>
 #include <libswresample/swresample.h>
 #include <libswscale/swscale.h>
@@ -219,12 +220,16 @@ const char* const VIDEO_ENCODER_CANDIDATES[] = {
 std::mutex poisoned_encoder_mutex;
 std::string poisoned_encoder;
 
-//  Abandons 'ctx' after an encoder failure. Hardware encoder contexts are
-//  leaked, not freed, because releasing a context whose driver is already
-//  broken can crash the process inside the driver; the CPU fallback (mpeg4)
-//  is released normally. The encoder is remembered as poisoned so that later
-//  sessions do not re-initialize it (which would re-break the driver and
-//  leak another device).
+//  Abandons 'ctx' after a runtime encoder failure (the context has already
+//  pushed frames into a possibly-broken GPU driver). Hardware encoder
+//  contexts are leaked, not freed, because releasing a context whose driver
+//  is already broken can crash the process inside the driver (observed:
+//  0xC0000005 access violation in atidxx64.dll on a Ryzen 5 5625U iGPU); the
+//  CPU fallback (mpeg4) is released normally. The encoder is remembered as
+//  poisoned so that later sessions do not re-initialize it (which would
+//  re-break the driver and leak another device). Encoder contexts that
+//  merely fail to open are released normally - the driver was never
+//  exercised through them.
 void abandon_video_encoder(Logger& logger, const char* name, AVCodecContext*& ctx){
     if (ctx == nullptr){
         return;
@@ -440,7 +445,14 @@ struct StreamHistoryTracker_Ring::Impl{
             ctx->max_b_frames = 0;
             ctx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 
-            //  Prefer NV12; otherwise take the first format the encoder supports.
+            //  Pick the input pixel format: prefer NV12 (supported by all the
+            //  hardware encoders and cheap to scale to), otherwise take the
+            //  first format the encoder advertises. If no list can be
+            //  determined at all, use YUV420P, which every encoder in the
+            //  candidate list supports; some encoders (mpeg4) reject being
+            //  opened without an explicit pixel format.
+            AVPixelFormat preferred = AV_PIX_FMT_NONE;
+            const enum AVPixelFormat* pix_fmts = nullptr;
 #if LIBAVCODEC_VERSION_MAJOR >= 61
             //  ffmpeg 7.0+ (libavcodec 61+) removed AVCodec.pix_fmts; query the
             //  encoder instead. This split is a preprocessor version gate
@@ -448,14 +460,20 @@ struct StreamHistoryTracker_Ring::Impl{
             //  avcodec_get_supported_config() is not declared in every header
             //  version this project supports (5.1-7.0), and names in discarded
             //  if-constexpr branches are still looked up.
-            //  (out_num_configs is optional; out_configs points at a
-            //  list terminated by AV_PIX_FMT_NONE, or is NULL when every
-            //  format is supported.)
-            const enum AVPixelFormat* pix_fmts = nullptr;
-            int ret = avcodec_get_supported_config(ctx, codec, AV_CODEC_CONFIG_PIX_FORMAT, 0, (const void**)&pix_fmts, nullptr);
-            if (ret >= 0 && pix_fmts != nullptr){
-                AVPixelFormat preferred = AV_PIX_FMT_NONE;
-                for (int j = 0; pix_fmts[j] != AV_PIX_FMT_NONE; j++){
+            //  (out_num_configs is optional; out_configs points at a list
+            //  terminated by AV_PIX_FMT_NONE, or is NULL when every format is
+            //  supported, in which case the YUV420P default below applies.)
+            int ret = avcodec_get_supported_config(
+                ctx, codec, AV_CODEC_CONFIG_PIX_FORMAT, 0, (const void**)&pix_fmts, nullptr
+            );
+            if (ret < 0){
+                pix_fmts = nullptr;
+            }
+#else
+            pix_fmts = codec->pix_fmts;
+#endif
+            if (pix_fmts != nullptr){
+                for (size_t j = 0; pix_fmts[j] != AV_PIX_FMT_NONE; j++){
                     AVPixelFormat format = pix_fmts[j];
                     if (format == AV_PIX_FMT_NV12){
                         preferred = AV_PIX_FMT_NV12;
@@ -465,24 +483,11 @@ struct StreamHistoryTracker_Ring::Impl{
                         preferred = format;
                     }
                 }
-                ctx->pix_fmt = preferred;
             }
-#else
-            if (codec->pix_fmts != nullptr){
-                AVPixelFormat preferred = AV_PIX_FMT_NONE;
-                for (int i = 0; codec->pix_fmts[i] != AV_PIX_FMT_NONE; i++){
-                    AVPixelFormat format = (AVPixelFormat)codec->pix_fmts[i];
-                    if (format == AV_PIX_FMT_NV12){
-                        preferred = AV_PIX_FMT_NV12;
-                        break;
-                    }
-                    if (preferred == AV_PIX_FMT_NONE){
-                        preferred = format;
-                    }
-                }
-                ctx->pix_fmt = preferred;
+            if (preferred == AV_PIX_FMT_NONE){
+                preferred = AV_PIX_FMT_YUV420P;
             }
-#endif
+            ctx->pix_fmt = preferred;
             int err = avcodec_open2(ctx, codec, nullptr);
             if (err == 0){
                 vctx = ctx;
@@ -494,6 +499,8 @@ struct StreamHistoryTracker_Ring::Impl{
                 last_pts_us = -1;
                 logger.log(
                     "Stream history: video encoder = " + std::string(name)
+                    + " ("
+                    + std::string(av_get_pix_fmt_name(ctx->pix_fmt)) + ")"
                     + " at " + std::to_string(target_width) + "x" + std::to_string(target_height)
                     + ", " + std::to_string(bitrate_kbps) + " kbps."
                 );
@@ -505,7 +512,10 @@ struct StreamHistoryTracker_Ring::Impl{
                 + ffmpeg_error(err),
                 COLOR_YELLOW
             );
-            abandon_video_encoder(logger, name, ctx);
+            //  The encoder never opened, so no device was ever exercised;
+            //  releasing the context is safe (unlike a context that failed at
+            //  runtime - see abandon_video_encoder()).
+            avcodec_free_context(&ctx);
         }
         logger.log("Stream history: No usable video encoder found. Disabling video.", COLOR_RED);
         WriteSpinLock lg(lock, PA_CURRENT_FUNCTION);
