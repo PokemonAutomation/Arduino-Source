@@ -374,9 +374,9 @@ struct StreamHistoryTracker_Ring::Impl{
             //  ffmpeg 7.0+ (libavcodec 61+) removed AVCodec.pix_fmts; query the
             //  encoder instead. This split is a preprocessor version gate
             //  (rather than compile-time detection) because
-            //  avcodec_get_supported_config() is not declared at all in older
-            //  headers, and names in discarded if-constexpr branches are still
-            //  looked up.
+            //  avcodec_get_supported_config() is not declared in every header
+            //  version this project supports (5.1-7.0), and names in discarded
+            //  if-constexpr branches are still looked up.
             //  (out_num_configs is optional; out_configs points at a
             //  list terminated by AV_PIX_FMT_NONE, or is NULL when every
             //  format is supported.)
