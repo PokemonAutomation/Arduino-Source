@@ -243,11 +243,21 @@ struct StreamHistoryTracker_Ring::Impl{
     int sws_in_format = AV_PIX_FMT_NONE;
     int sws_width = 0;
     int sws_height = 0;
+    int sws_out_format = AV_PIX_FMT_NONE;
     int video_width = 0;
     int video_height = 0;
     int64_t last_keyframe_us = -VIDEO_KEYFRAME_INTERVAL_US;
     int64_t last_pts_us = -1;
     WallClock video_start = WallClock::min();
+
+    //  Encoder candidate rotation. A hardware encoder can open successfully
+    //  and still fail on every frame (e.g. its GPU device cannot allocate
+    //  textures); after a few consecutive hard failures the current candidate
+    //  is abandoned and the next one is tried, so the recording still gets
+    //  video. Candidates that have failed (at open or at runtime) are not
+    //  retried. Only the worker thread touches these.
+    size_t video_encoder_index = 0;
+    int video_send_failures = 0;
 
     //  Audio encoder + resampler (used by on_samples).
     AVCodecContext* actx = nullptr;
@@ -342,6 +352,13 @@ struct StreamHistoryTracker_Ring::Impl{
 
 
     void init_video_encoder(int input_width, int input_height){
+        constexpr size_t CANDIDATE_COUNT = sizeof(VIDEO_ENCODER_CANDIDATES)/sizeof(VIDEO_ENCODER_CANDIDATES[0]);
+        //  Candidates before video_encoder_index already failed; once past
+        //  the last one, video was disabled when it did.
+        if (video_encoder_index >= CANDIDATE_COUNT){
+            return;
+        }
+
         int target_width = 0;
         int target_height = 0;
         if (!get_target_video_size(input_width, input_height, target_width, target_height)){
@@ -352,13 +369,16 @@ struct StreamHistoryTracker_Ring::Impl{
         }
 
         size_t bitrate_kbps = get_target_bitrate_kbps();
-        for (const char* name : VIDEO_ENCODER_CANDIDATES){
+        for (size_t i = video_encoder_index; i < CANDIDATE_COUNT; i++){
+            const char* name = VIDEO_ENCODER_CANDIDATES[i];
             const AVCodec* codec = avcodec_find_encoder_by_name(name);
             if (codec == nullptr){
+                video_encoder_index = i + 1;
                 continue;
             }
             AVCodecContext* ctx = avcodec_alloc_context3(codec);
             if (ctx == nullptr){
+                video_encoder_index = i + 1;
                 continue;
             }
             ctx->width = target_width;
@@ -415,6 +435,8 @@ struct StreamHistoryTracker_Ring::Impl{
             int err = avcodec_open2(ctx, codec, nullptr);
             if (err == 0){
                 vctx = ctx;
+                video_encoder_index = i + 1;
+                video_send_failures = 0;
                 video_width = target_width;
                 video_height = target_height;
                 video_start = WallClock::min();
@@ -427,6 +449,7 @@ struct StreamHistoryTracker_Ring::Impl{
                 );
                 return;
             }
+            video_encoder_index = i + 1;
             logger.log(
                 "Stream history: Video encoder '" + std::string(name) + "' failed to open: "
                 + ffmpeg_error(err),
@@ -550,8 +573,10 @@ struct StreamHistoryTracker_Ring::Impl{
             }
         }
 
-        //  (Re)build the scaler if the input changed.
-        if (src_format != sws_in_format || src_width != sws_width || src_height != sws_height){
+        //  (Re)build the scaler if the input changed, or if the encoder's
+        //  preferred pixel format changed (e.g. after an encoder fallback).
+        if (src_format != sws_in_format || src_width != sws_width || src_height != sws_height
+            || vctx->pix_fmt != sws_out_format){
             if (sws != nullptr){
                 sws_freeContext(sws);
                 sws = nullptr;
@@ -569,6 +594,7 @@ struct StreamHistoryTracker_Ring::Impl{
             sws_in_format = src_format;
             sws_width = src_width;
             sws_height = src_height;
+            sws_out_format = vctx->pix_fmt;
         }
 
         AVFrame* frame = av_frame_alloc();
@@ -631,9 +657,27 @@ struct StreamHistoryTracker_Ring::Impl{
             }
             if (err < 0){
                 av_frame_free(&frame);
-                logger.log("Stream history: Video encode failed: " + ffmpeg_error(err), COLOR_RED);
+                //  Hardware encoders can open fine and still fail on every
+                //  frame (e.g. their GPU device cannot allocate textures).
+                //  After a few consecutive hard failures, fall back to the
+                //  next candidate so the recording still gets video.
+                if (++video_send_failures >= 3){
+                    logger.log(
+                        "Stream history: video encoder '"
+                        + std::string(VIDEO_ENCODER_CANDIDATES[video_encoder_index - 1])
+                        + "' failed repeatedly; falling back to the next candidate.",
+                        COLOR_YELLOW
+                    );
+                    avcodec_free_context(&vctx);
+                    vctx = nullptr;
+                    video_send_failures = 0;
+                    init_video_encoder(qframe.width(), qframe.height());
+                }else{
+                    logger.log("Stream history: Video encode failed: " + ffmpeg_error(err), COLOR_RED);
+                }
                 return;
             }
+            video_send_failures = 0;
             av_frame_free(&frame);
             break;
         }
