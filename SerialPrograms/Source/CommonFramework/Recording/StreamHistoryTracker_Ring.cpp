@@ -439,7 +439,19 @@ struct StreamHistoryTracker_Ring::Impl{
             }
             ctx->width = target_width;
             ctx->height = target_height;
-            ctx->time_base = av_make_q(1, 1000000);
+            //  Milliseconds as the video timebase: the mpeg4 encoder rejects
+            //  a timebase denominator above 65535 (the 16-bit
+            //  time_incr_length of the MPEG-4 Part 2 standard) with EINVAL,
+            //  and the hardware H.264 wrappers accept any timebase; the
+            //  muxer derives packet timestamps from the ring's microsecond
+            //  WallClock timestamps anyway, so this choice only affects
+            //  what the encoders see.
+            ctx->time_base = av_make_q(1, 1000);
+            //  The frame rate must be set explicitly: the h264_amf wrapper
+            //  passes it to the AMD driver, which rejects - and tears down
+            //  its D3D11 device for - a missing/zero frame rate ("unexpected
+            //  frame rate" followed by AMF_NO_DEVICE).
+            ctx->framerate = av_make_q((int)target_fps, 1);
             ctx->bit_rate = (int64_t)bitrate_kbps * 1000;
             ctx->gop_size = (int)(target_fps * 2);
             ctx->max_b_frames = 0;
@@ -698,7 +710,8 @@ struct StreamHistoryTracker_Ring::Impl{
         if (force_keyframe){
             last_keyframe_us = pts_us;
         }
-        frame->pts = pts_us;
+        //  The video timebase is 1/1000 (milliseconds); see init_video_encoder.
+        frame->pts = pts_us / 1000;
         if (force_keyframe){
             frame->pict_type = AV_PICTURE_TYPE_I;
         }
