@@ -59,6 +59,7 @@ GroupWidget::GroupWidget(QWidget& parent, GroupOption& value)
 
     {
         m_expand_text = new QWidget(m_group_box);
+        m_expand_text->setProperty("backgroundContainer", true);
         m_expand_text->setLayout(new QVBoxLayout());
         m_expand_text->layout()->addWidget(new QLabel("<font color=\"orange\">(double click to expand)</font>", this));
         m_expand_text->setVisible(false);
@@ -87,6 +88,7 @@ void GroupWidget::make_options(){
     QVBoxLayout* group_layout = static_cast<QVBoxLayout*>(m_group_box->layout());
 
     m_options_holder = new QWidget(m_group_box);
+    m_options_holder->setProperty("backgroundContainer", true);
     group_layout->addWidget(m_options_holder);
     QVBoxLayout* options_layout = new QVBoxLayout(m_options_holder);
     options_layout->setContentsMargins(0, 0, 0, 0);
