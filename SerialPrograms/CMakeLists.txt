@@ -363,10 +363,10 @@ if (WIN32)
         #  LGPL-only, so use e.g. the gyan.dev "...-lgpl-shared" release or
         #  BtbN's "win64-lgpl-shared", not the GPL build).
         #  The DLLs placed in 3rdPartyBinaries/ are copied to the output directory
-        #  by the THIRD_PARTY_DLLS deploy step below. Requires ffmpeg >= 7.1
-        #  (libavcodec 61+): the ring uses the ffmpeg 7.x API generation
-        #  (void av_channel_layout_default(), swr_alloc_set_opts2() taking a
-        #  SwrContext**).
+        #  by the THIRD_PARTY_DLLS deploy step below. Requires ffmpeg >= 5.1:
+        #  the ring uses the ffmpeg 5.1 API generation (the channel layout API,
+        #  i.e. void av_channel_layout_default(), and swr_alloc_set_opts2() taking
+        #  a SwrContext**), both introduced in 5.1 with signatures unchanged since.
         foreach(FFMPEG_LIB IN ITEMS avcodec avformat avutil swscale swresample)
             if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../3rdParty/ffmpeg/lib${FFMPEG_LIB}/${FFMPEG_LIB}.h")
                 message(FATAL_ERROR
@@ -384,23 +384,36 @@ if (WIN32)
             )
             target_link_libraries(SerialProgramsLib PRIVATE ffmpeg_${FFMPEG_LIB}_lib)
         endforeach()
-        #  Enforce the minimum ffmpeg version from the vendored headers
-        #  (libavcodec 61+ = ffmpeg 7.x; 5.1-7.0 have the pre-7.1 API generation).
-        set(FFMPEG_VERSION_MAJOR_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/../3rdParty/ffmpeg/libavcodec/version_major.h")
-        if (NOT EXISTS "${FFMPEG_VERSION_MAJOR_HEADER}")
-            set(FFMPEG_VERSION_MAJOR_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/../3rdParty/ffmpeg/libavcodec/version.h")
-        endif()
-        file(STRINGS "${FFMPEG_VERSION_MAJOR_HEADER}" FFMPEG_VERSION_LINE REGEX "LIBAVCODEC_VERSION_MAJOR")
-        if (FFMPEG_VERSION_LINE MATCHES "LIBAVCODEC_VERSION_MAJOR +([0-9]+)")
-            if (CMAKE_MATCH_1 LESS 61)
-                message(FATAL_ERROR
-                    "PA_STREAM_HISTORY_FFMPEG=ON requires ffmpeg >= 7.1 (libavcodec 61+), "
-                    "but 3rdParty/ffmpeg/ provides libavcodec ${CMAKE_MATCH_1}. "
-                    "Update the vendored ffmpeg headers in 3rdParty/ffmpeg/ and the import libraries in 3rdPartyBinaries/.")
-            endif()
+        #  Enforce the minimum ffmpeg generation from the vendored headers.
+        #  The ring requires the ffmpeg 5.1 API generation: the channel layout
+        #  API (av_channel_layout_default() and friends) and swr_alloc_set_opts2()
+        #  were both introduced in ffmpeg 5.1, with signatures unchanged since.
+        #  libavcodec's major version alone cannot tell 5.x apart from 4.x
+        #  (both are libavcodec 58), so detect the 5.1 API in the headers
+        #  instead of comparing version numbers.
+        set(FFMPEG_51_API_OK TRUE)
+        if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../3rdParty/ffmpeg/libavutil/channel_layout.h")
+            set(FFMPEG_51_API_OK FALSE)
         else()
+            file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/../3rdParty/ffmpeg/libavutil/channel_layout.h"
+                FFMPEG_51_LINES REGEX "av_channel_layout_default")
+            if (FFMPEG_51_LINES STREQUAL "")
+                set(FFMPEG_51_API_OK FALSE)
+            endif()
+        endif()
+        if (FFMPEG_51_API_OK)
+            file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/../3rdParty/ffmpeg/libswresample/swresample.h"
+                FFMPEG_51_LINES REGEX "swr_alloc_set_opts2")
+            if (FFMPEG_51_LINES STREQUAL "")
+                set(FFMPEG_51_API_OK FALSE)
+            endif()
+        endif()
+        if (NOT FFMPEG_51_API_OK)
             message(FATAL_ERROR
-                "PA_STREAM_HISTORY_FFMPEG=ON but LIBAVCODEC_VERSION_MAJOR could not be determined from 3rdParty/ffmpeg/libavcodec/.")
+                "PA_STREAM_HISTORY_FFMPEG=ON requires ffmpeg >= 5.1 "
+                "(the channel layout API and swr_alloc_set_opts2()), "
+                "but 3rdParty/ffmpeg/ does not look like ffmpeg 5.1 or newer. "
+                "Update the vendored ffmpeg headers in 3rdParty/ffmpeg/ and the import libraries in 3rdPartyBinaries/.")
         endif()
         target_include_directories(SerialProgramsLib SYSTEM PRIVATE ../3rdParty/ffmpeg/)
     endif()
@@ -631,8 +644,10 @@ else() # macOS and Linux
     target_link_libraries(SerialProgramsLib PUBLIC ${OpenCV_LINK_LIBRARIES})
 
     if (PA_STREAM_HISTORY_FFMPEG)
-        #  ffmpeg for the in-memory stream history ring (requires ffmpeg >= 7.1,
-        #  libavcodec 61+ - the ring uses the ffmpeg 7.x API generation).
+        #  ffmpeg for the in-memory stream history ring (requires ffmpeg >= 5.1 -
+        #  the ring uses the ffmpeg 5.1 API generation: the channel layout API
+        #  (av_channel_layout_default()) and swr_alloc_set_opts2(), both
+        #  introduced in 5.1 with signatures unchanged since).
         #  Ubuntu:  sudo apt install libavcodec-dev libavformat-dev libavutil-dev
         #           libswscale-dev libswresample-dev
         #  macOS:   brew install ffmpeg
@@ -643,10 +658,8 @@ else() # macOS and Linux
         pkg_check_modules(FFMPEG_LIB_NAMES libavcodec libavformat libavutil libswscale libswresample)
         if (FFMPEG_SHORT_NAMES_FOUND)
             set(FFMPEG_PC FFMPEG_SHORT_NAMES)
-            set(FFMPEG_VERSION_MODULE "avcodec>=61")
         elseif (FFMPEG_LIB_NAMES_FOUND)
             set(FFMPEG_PC FFMPEG_LIB_NAMES)
-            set(FFMPEG_VERSION_MODULE "libavcodec>=61")
         else ()
             message(FATAL_ERROR
                 "PA_STREAM_HISTORY_FFMPEG=ON but no ffmpeg development packages were found via pkg-config "
@@ -654,9 +667,27 @@ else() # macOS and Linux
                 "Ubuntu: sudo apt install libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libswresample-dev. "
                 "macOS: brew install ffmpeg.")
         endif()
-        pkg_check_modules(FFMPEG_MIN_VERSION ${FFMPEG_VERSION_MODULE})
-        if (NOT FFMPEG_MIN_VERSION_FOUND)
-            message(FATAL_ERROR "PA_STREAM_HISTORY_FFMPEG=ON requires ffmpeg >= 7.1 (libavcodec 61+).")
+        #  libavcodec's major version cannot tell ffmpeg 5.x apart from 4.x
+        #  (both are libavcodec 58), so detect the 5.1 API generation in the
+        #  headers found by pkg-config instead of comparing version numbers.
+        set(FFMPEG_51_API_OK FALSE)
+        foreach (FFMPEG_INC_DIR IN LISTS ${FFMPEG_PC}_INCLUDE_DIRS)
+            if (EXISTS "${FFMPEG_INC_DIR}/libavutil/channel_layout.h"
+                AND EXISTS "${FFMPEG_INC_DIR}/libswresample/swresample.h")
+                file(STRINGS "${FFMPEG_INC_DIR}/libavutil/channel_layout.h" FFMPEG_51_LINES REGEX "av_channel_layout_default")
+                file(STRINGS "${FFMPEG_INC_DIR}/libswresample/swresample.h" FFMPEG_51_LINES_SWR REGEX "swr_alloc_set_opts2")
+                if (NOT FFMPEG_51_LINES STREQUAL "" AND NOT FFMPEG_51_LINES_SWR STREQUAL "")
+                    set(FFMPEG_51_API_OK TRUE)
+                    break()
+                endif()
+            endif()
+        endforeach()
+        if (NOT FFMPEG_51_API_OK)
+            message(FATAL_ERROR
+                "PA_STREAM_HISTORY_FFMPEG=ON requires ffmpeg >= 5.1 "
+                "(the channel layout API and swr_alloc_set_opts2()), "
+                "but the ffmpeg development packages found via pkg-config "
+                "(version ${${FFMPEG_PC}_VERSION}) do not provide the ffmpeg 5.1 API generation.")
         endif()
         message(STATUS "PA stream-history ring: ffmpeg found via pkg-config module set '${FFMPEG_PC}' (version ${${FFMPEG_PC}_VERSION}).")
         target_include_directories(SerialProgramsLib SYSTEM PRIVATE ${${FFMPEG_PC}_INCLUDE_DIRS})
