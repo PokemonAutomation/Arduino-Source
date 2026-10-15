@@ -26,11 +26,15 @@ TimeRollbackHoursOption::TimeRollbackHoursOption()
 
 
 TouchDateIntervalOption::TouchDateIntervalOption()
-    : SimpleIntegerOption<uint8_t>(
+    : TouchDateIntervalOption(
         "<b>Rollover Prevention:</b><br>Prevent a date-skip by touching the date every this many hours. If set to zero, this feature is disabled.",
-        LockMode::LOCK_WHILE_RUNNING,
-        4, 0, 11
+        LockMode::LOCK_WHILE_RUNNING
     )
+{}
+
+
+TouchDateIntervalOption::TouchDateIntervalOption(std::string label, LockMode lock_mode)
+    : SimpleIntegerOption<uint8_t>(std::move(label), lock_mode, 4, 0, 11)
 {
     reset_state();
 }

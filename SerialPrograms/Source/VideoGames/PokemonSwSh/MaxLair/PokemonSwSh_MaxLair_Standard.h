@@ -54,7 +54,7 @@ private:
     MaxLairInternal::Consoles CONSOLES;
     MaxLairInternal::HostingSettings HOSTING;
 
-    TouchDateIntervalOption TOUCH_DATE_INTERVAL;
+    MaxLairInternal::MaxLairTouchDateIntervalOption TOUCH_DATE_INTERVAL;
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationOption NOTIFICATION_SHINY;

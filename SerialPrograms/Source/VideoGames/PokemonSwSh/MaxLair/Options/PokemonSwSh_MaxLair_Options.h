@@ -11,6 +11,7 @@
 #include "Common/Compiler.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "VideoGames/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Stats.h"
+#include "VideoGames/PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -36,6 +37,12 @@ public:
 class BossSlotOption : public IntegerEnumDropdownOption{
 public:
     BossSlotOption();
+};
+
+
+class MaxLairTouchDateIntervalOption : public PokemonSwSh::TouchDateIntervalOption{
+public:
+    MaxLairTouchDateIntervalOption();
 };
 
 

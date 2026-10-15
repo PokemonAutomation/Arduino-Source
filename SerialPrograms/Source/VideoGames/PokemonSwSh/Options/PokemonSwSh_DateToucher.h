@@ -25,6 +25,7 @@ public:
 class TouchDateIntervalOption : public SimpleIntegerOption<uint8_t>{
 public:
     TouchDateIntervalOption();
+    TouchDateIntervalOption(std::string label, LockMode lock_mode);
 
     virtual void reset_state() override final;
 
