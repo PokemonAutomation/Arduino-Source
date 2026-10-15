@@ -43,6 +43,22 @@ BlockKernel get_block_kernel(
         return {run_block8_tap2_x64_SSE2, 8, 2};
     }
 #endif
+#ifdef PA_AutoDispatch_arm64_20_M1
+    if (CPU_CAPABILITY_CURRENT.OK_M1){
+        //  The byte-permute kernels handle any tap count. The index delta
+        //  within a 4-output group bounds how many input lanes each load
+        //  must span: 3 for upsampling (in <= out) and 7 for downsampling
+        //  up to 2x. Stronger downsampling falls back to the 4x4
+        //  transpose.
+        if (in_sample_rate <= out_sample_rate){
+            return {run_block32_up_ARM64_NEON, 32, 1};
+        }
+        if (in_sample_rate <= 2 * out_sample_rate){
+            return {run_block32_down2_ARM64_NEON, 32, 1};
+        }
+        return {run_block8_tap4_ARM64_NEON, 8, 4};
+    }
+#endif
     return {run_block8_Default, 8, 1};
 }
 

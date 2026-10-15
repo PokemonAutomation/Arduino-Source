@@ -65,6 +65,147 @@ PA_FORCE_INLINE void transposef32x4x4(
 
 
 
+//
+//  Byte-permute fast path: the NEON equivalent of the AVX512 fast
+//  kernels. Instead of transposing the tap rows into the output
+//  columns, build one TBL byte-index register per 4-output group and
+//  gather the input samples directly from the 128-bit table window.
+//
+//  The TBL byte index is the 4-byte input index converted to byte
+//  granularity: each 32-bit delta is multiplied by 0x04040404 and
+//  0x03020100 is added, so word c holds [4d, 4d+1, 4d+2, 4d+3] and
+//  picks out the 4 bytes of input sample d_c for the 4 output lanes.
+//
+//  Per-group input windows:
+//    - run_block32_up:      1 x misaligned 128-bit load (4-float window)
+//    - run_block32_down2:   2 x misaligned 128-bit loads (8-float window)
+//
+PA_FORCE_INLINE uint8x16_t build_group_byte_index(
+    const uint32_t* index, uint32_t base
+){
+    uint32x4_t d = vsubq_u32(vld1q_u32(index), vdupq_n_u32(base));
+    //  d < 16, so the replicated bytes never carry into each other.
+    uint32x4_t b = vmlaq_u32(vdupq_n_u32(0x03020100u), d, vdupq_n_u32(0x04040404u));
+    return vreinterpretq_u8_u32(b);
+}
+
+
+//
+//  TBL gathers of 4 floats by byte index.
+//
+//  The 128-bit TBL intrinsics cover both windows in one instruction on
+//  every compiler. Both GCC and Clang name them after the instruction
+//  mnemonics (VQTB1Q / VQTB2Q): vqtbl1q_u8 and vqtbl2q_u8 - the
+//  "vtbl1q_u8" / "vtbl2q_u8" spellings do not exist in either header.
+//  up needs a single 16-byte table, down2 a 32-byte one.
+//
+PA_FORCE_INLINE float32x4_t gather_group_up(
+    float32x4_t tab, uint8x16_t idx
+){
+    return vreinterpretq_f32_u8(vqtbl1q_u8(vreinterpretq_u8_f32(tab), idx));
+}
+PA_FORCE_INLINE float32x4_t gather_group_down2(
+    float32x4_t tab0, float32x4_t tab1, uint8x16_t idx
+){
+    uint8x16x2_t tab{ vreinterpretq_u8_f32(tab0), vreinterpretq_u8_f32(tab1) };
+    return vreinterpretq_f32_u8(vqtbl2q_u8(tab, idx));
+}
+
+
+template <int input_loads>
+PA_FORCE_INLINE void run_block32_permute_ARM64_NEON(
+    const WeightTable& table,
+    size_t in_index, const float* in_samples,
+    size_t out_index, float* out_samples
+){
+    in_samples -= in_index;
+
+    const uint32_t* index = table.in_sample_index() + out_index;
+
+    //
+    //  The index deltas of each 4-column group, relative to the group's
+    //  first column, are the TBL byte indices.
+    //
+    const uint8x16_t idx0 = build_group_byte_index(index + 4*0, index[4*0]);
+    const uint8x16_t idx1 = build_group_byte_index(index + 4*1, index[4*1]);
+    const uint8x16_t idx2 = build_group_byte_index(index + 4*2, index[4*2]);
+    const uint8x16_t idx3 = build_group_byte_index(index + 4*3, index[4*3]);
+    const uint8x16_t idx4 = build_group_byte_index(index + 4*4, index[4*4]);
+    const uint8x16_t idx5 = build_group_byte_index(index + 4*5, index[4*5]);
+    const uint8x16_t idx6 = build_group_byte_index(index + 4*6, index[4*6]);
+    const uint8x16_t idx7 = build_group_byte_index(index + 4*7, index[4*7]);
+
+    //
+    //  Each group's input window starts at its first column.
+    //
+    const float* in0 = in_samples + index[4*0];
+    const float* in1 = in_samples + index[4*1];
+    const float* in2 = in_samples + index[4*2];
+    const float* in3 = in_samples + index[4*3];
+    const float* in4 = in_samples + index[4*4];
+    const float* in5 = in_samples + index[4*5];
+    const float* in6 = in_samples + index[4*6];
+    const float* in7 = in_samples + index[4*7];
+
+    float32x4_t r0 = vdupq_n_f32(0.0f);
+    float32x4_t r1 = vdupq_n_f32(0.0f);
+    float32x4_t r2 = vdupq_n_f32(0.0f);
+    float32x4_t r3 = vdupq_n_f32(0.0f);
+    float32x4_t r4 = vdupq_n_f32(0.0f);
+    float32x4_t r5 = vdupq_n_f32(0.0f);
+    float32x4_t r6 = vdupq_n_f32(0.0f);
+    float32x4_t r7 = vdupq_n_f32(0.0f);
+
+    const float* tap_weights = table.tap_start(0) + out_index;
+    size_t tap_stride = table.tap_stride();
+
+    size_t tap = 0;
+    size_t stop = table.taps();
+    do{
+        float32x4_t i0, i1, i2, i3, i4, i5, i6, i7;
+        if constexpr (input_loads == 1){
+            i0 = gather_group_up(vld1q_f32(in0 + tap), idx0);
+            i1 = gather_group_up(vld1q_f32(in1 + tap), idx1);
+            i2 = gather_group_up(vld1q_f32(in2 + tap), idx2);
+            i3 = gather_group_up(vld1q_f32(in3 + tap), idx3);
+            i4 = gather_group_up(vld1q_f32(in4 + tap), idx4);
+            i5 = gather_group_up(vld1q_f32(in5 + tap), idx5);
+            i6 = gather_group_up(vld1q_f32(in6 + tap), idx6);
+            i7 = gather_group_up(vld1q_f32(in7 + tap), idx7);
+        }else{
+            i0 = gather_group_down2(vld1q_f32(in0 + tap + 0), vld1q_f32(in0 + tap + 4), idx0);
+            i1 = gather_group_down2(vld1q_f32(in1 + tap + 0), vld1q_f32(in1 + tap + 4), idx1);
+            i2 = gather_group_down2(vld1q_f32(in2 + tap + 0), vld1q_f32(in2 + tap + 4), idx2);
+            i3 = gather_group_down2(vld1q_f32(in3 + tap + 0), vld1q_f32(in3 + tap + 4), idx3);
+            i4 = gather_group_down2(vld1q_f32(in4 + tap + 0), vld1q_f32(in4 + tap + 4), idx4);
+            i5 = gather_group_down2(vld1q_f32(in5 + tap + 0), vld1q_f32(in5 + tap + 4), idx5);
+            i6 = gather_group_down2(vld1q_f32(in6 + tap + 0), vld1q_f32(in6 + tap + 4), idx6);
+            i7 = gather_group_down2(vld1q_f32(in7 + tap + 0), vld1q_f32(in7 + tap + 4), idx7);
+        }
+        r0 = vfmaq_f32(r0, i0, vld1q_f32(tap_weights + 4*0));
+        r1 = vfmaq_f32(r1, i1, vld1q_f32(tap_weights + 4*1));
+        r2 = vfmaq_f32(r2, i2, vld1q_f32(tap_weights + 4*2));
+        r3 = vfmaq_f32(r3, i3, vld1q_f32(tap_weights + 4*3));
+        r4 = vfmaq_f32(r4, i4, vld1q_f32(tap_weights + 4*4));
+        r5 = vfmaq_f32(r5, i5, vld1q_f32(tap_weights + 4*5));
+        r6 = vfmaq_f32(r6, i6, vld1q_f32(tap_weights + 4*6));
+        r7 = vfmaq_f32(r7, i7, vld1q_f32(tap_weights + 4*7));
+        tap_weights += tap_stride;
+        tap += 1;
+    }while (tap < stop);
+
+    vst1q_f32(out_samples + 4*0, r0);
+    vst1q_f32(out_samples + 4*1, r1);
+    vst1q_f32(out_samples + 4*2, r2);
+    vst1q_f32(out_samples + 4*3, r3);
+    vst1q_f32(out_samples + 4*4, r4);
+    vst1q_f32(out_samples + 4*5, r5);
+    vst1q_f32(out_samples + 4*6, r6);
+    vst1q_f32(out_samples + 4*7, r7);
+}
+
+
+
 }
 
 
@@ -126,6 +267,28 @@ void run_block8_tap4_ARM64_NEON(
 }
 
 
+void run_block32_up_ARM64_NEON(
+    const WeightTable& table,
+    size_t in_index, const float* in_samples,
+    size_t out_index, float* out_samples
+){
+    run_block32_permute_ARM64_NEON<1>(
+        table, in_index, in_samples, out_index, out_samples
+    );
+}
+
+
+void run_block32_down2_ARM64_NEON(
+    const WeightTable& table,
+    size_t in_index, const float* in_samples,
+    size_t out_index, float* out_samples
+){
+    run_block32_permute_ARM64_NEON<2>(
+        table, in_index, in_samples, out_index, out_samples
+    );
+}
+
+
 
 void add_tests_ARM64_NEON(UnitTestDatabase& database){
     database.add<BlockKernelTest>(
@@ -145,6 +308,39 @@ void add_tests_ARM64_NEON(UnitTestDatabase& database){
     database.add<BlockKernelTest>(
         "NEON", run_block8_tap4_ARM64_NEON,
         48000, 44100, 8, 8, 140
+    );
+
+    database.add<BlockKernelTest>(
+        "NEON_Up", run_block32_up_ARM64_NEON,
+        44100, 48000, 16, 32, 0
+    );
+    //  The block straddles the table period (160) into the continuing
+    //  index columns.
+    database.add<BlockKernelTest>(
+        "NEON_Up", run_block32_up_ARM64_NEON,
+        44100, 48000, 16, 32, 130
+    );
+    database.add<BlockKernelTest>(
+        "NEON_Up", run_block32_up_ARM64_NEON,
+        44100, 88200, 16, 32, 0
+    );
+
+    database.add<BlockKernelTest>(
+        "NEON_Down2", run_block32_down2_ARM64_NEON,
+        48000, 44100, 16, 32, 0
+    );
+    //  The block straddles the table period (147) into the continuing
+    //  index columns.
+    database.add<BlockKernelTest>(
+        "NEON_Down2", run_block32_down2_ARM64_NEON,
+        48000, 44100, 16, 32, 116
+    );
+    //  Downsampling just past the 2x boundary (in_rate = 2.0045 x
+    //  out_rate): the 4-column index deltas still fit in the 8-float
+    //  windows.
+    database.add<BlockKernelTest>(
+        "NEON_Down2", run_block32_down2_ARM64_NEON,
+        88200, 44000, 16, 32, 0
     );
 }
 
