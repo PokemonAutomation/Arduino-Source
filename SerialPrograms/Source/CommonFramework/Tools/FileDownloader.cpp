@@ -27,7 +27,7 @@
 namespace PokemonAutomation{
 namespace FileDownloader{
 
-std::string download_file(Logger& logger, const std::string& url){
+std::string download_file(Logger& logger, const std::string& url, std::chrono::seconds overall_timeout){
 //    cout << "download_file()" << endl;
     QNetworkAccessManager network_access_manager;
     QByteArray downloaded_data;
@@ -57,6 +57,19 @@ std::string download_file(Logger& logger, const std::string& url){
     request.setTransferTimeout(std::chrono::seconds(5));
     reply.reset(network_access_manager.get(request));
 
+    //  Deadline for the whole request, including the connection phase
+    //  (setTransferTimeout() above only limits data transfer). Without
+    //  this, a connection that stalls would block loop.exec() forever.
+    QTimer overall_timer;
+    if (overall_timeout.count() > 0){
+        overall_timer.setSingleShot(true);
+        QObject::connect(
+            &overall_timer, &QTimer::timeout,
+            &loop, [&loop]{ loop.exit(); }
+        );
+        overall_timer.start((int)overall_timeout.count());
+    }
+
 #if 0
     QTimer timer;
     timer.singleShot(
@@ -72,11 +85,18 @@ std::string download_file(Logger& logger, const std::string& url){
 //    cout << "loop.exec() - enter" << endl;
     loop.exec();
 //    cout << "loop.exec() - exit" << endl;
+    overall_timer.stop();
 
     if (!reply){
         std::string str = "QNetworkReply is null.";
 //        logger.log(str, COLOR_RED);
         throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, str);
+    }else if (overall_timeout.count() > 0 && reply->isRunning()){
+        //  The overall deadline elapsed while the request (typically the
+        //  connection) was still in progress.
+        reply->abort();
+        throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT,
+            "Timed out after " + std::to_string(overall_timeout.count()) + " seconds downloading " + url + ".");
     }else if (reply->error() == QNetworkReply::NoError){
 //        QString contents = QString::fromUtf8(reply->readAll());
 //        qDebug() << contents;
@@ -179,8 +199,8 @@ void download_file_to_disk(
     reply->deleteLater();
 }
 
-JsonValue download_json_file(Logger& logger, const std::string& url){
-    std::string downloaded_data = download_file(logger, url);
+JsonValue download_json_file(Logger& logger, const std::string& url, std::chrono::seconds overall_timeout){
+    std::string downloaded_data = download_file(logger, url, overall_timeout);
     return parse_json(downloaded_data);
 }
 

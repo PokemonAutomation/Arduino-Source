@@ -204,9 +204,14 @@ void check_new_version(Logger& logger){
     logger.log("Checking for new version...");
     JsonValue json;
     try{
+        //  This runs on the UI thread (panel switching / on_idle), so the
+        //  request gets a hard deadline: setTransferTimeout() only covers
+        //  data transfer, and a connection that stalls would otherwise
+        //  freeze the UI until the OS gives up on the TCP attempt.
         json = FileDownloader::download_json_file(
             logger,
-            "https://raw.githubusercontent.com/PokemonAutomation/ComputerControl/master/LatestVersion.json"
+            "https://raw.githubusercontent.com/PokemonAutomation/ComputerControl/master/LatestVersion.json",
+            std::chrono::seconds(3)
         );
     }catch (OperationFailedException&){
         return;
