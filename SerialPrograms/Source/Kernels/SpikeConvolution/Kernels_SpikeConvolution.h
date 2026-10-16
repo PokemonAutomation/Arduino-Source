@@ -10,6 +10,9 @@
 #include <stddef.h>
 
 namespace PokemonAutomation{
+
+class UnitTestDatabase;
+
 namespace Kernels{
 namespace SpikeConvolution{
 
@@ -23,6 +26,10 @@ void compute_spike_kernel(
     float* out, const float* in, size_t lengthI,
     const float* kernel, size_t lengthK
 );
+
+
+
+void add_tests(UnitTestDatabase& database);
 
 
 

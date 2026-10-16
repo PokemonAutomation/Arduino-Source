@@ -8,6 +8,8 @@
 
 #include <immintrin.h>
 #include "Kernels_SpikeConvolution_Routines.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "Kernels_SpikeConvolution_TestInfra.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -57,6 +59,27 @@ void compute_spike_kernel_x86_AVX512(
     const float* kernel, size_t lengthK
 ){
     compute_spike_kernel<Context_x86_AVX512>(out, in, lengthI, kernel, lengthK);
+}
+
+
+
+void compute_spike_kernel_Default(float* out, const float* in, size_t lengthI, const float* kernel, size_t lengthK);
+
+class Test_x86_AVX512 : public Test{
+public:
+    Test_x86_AVX512(size_t lengthK)
+        : Test(
+            "x86_AVX512",
+            lengthK,
+            compute_spike_kernel_Default,
+            compute_spike_kernel_x86_AVX512
+        )
+    {}
+};
+void add_tests_x86_AVX512(UnitTestDatabase& database){
+    for (size_t lengthK = 1; lengthK <= 32; lengthK++){
+        database.add<Test_x86_AVX512>(lengthK);
+    }
 }
 
 
