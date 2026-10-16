@@ -1189,6 +1189,7 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/SpikeConvolution/Kernels_SpikeConvolution.cpp
     Source/Kernels/SpikeConvolution/Kernels_SpikeConvolution.h
     Source/Kernels/SpikeConvolution/Kernels_SpikeConvolution_Core_Default.cpp
+    Source/Kernels/SpikeConvolution/Kernels_SpikeConvolution_Core_arm64_NEON.cpp
     Source/Kernels/SpikeConvolution/Kernels_SpikeConvolution_Core_x86_AVX2.cpp
     Source/Kernels/SpikeConvolution/Kernels_SpikeConvolution_Core_x86_AVX512.cpp
     Source/Kernels/SpikeConvolution/Kernels_SpikeConvolution_Core_x86_SSE41.cpp
