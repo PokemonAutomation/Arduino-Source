@@ -179,7 +179,67 @@ public:
             rowsT[r] = T.data() + 16 + r * m_width;
         }
         float ref = compute_scale_Default(m_width, m_height, rowsA.data(), rowsT.data());
-        std::string line = "PROBE ref=" + std::to_string(ref) + " sse=";
+        //
+        //  Portable lane-by-lane emulation of the SSE4.1 algorithm: same
+        //  prefix / 4xVL main loop / tail split, same per-lane math, and
+        //  the PSHUFB tail zero-fill semantics (unused lanes are zero).
+        //  If this matches the SSE kernel, the algorithm itself is wrong;
+        //  if it does not, the compiler/ISA is.
+        //
+        double em_at = 0.0, em_a2 = 0.0;
+        for (size_t r = 0; r < m_height; r++){
+            const float* a = rowsA[r];
+            const float* t = rowsT[r];
+            size_t length = m_width;
+            float at0 = 0.0f, as0 = 0.0f;
+            size_t align = (size_t)t % 16;
+            if (align){
+                align /= 4;
+                a -= (ptrdiff_t)align;
+                t -= (ptrdiff_t)align;
+                size_t keep = 4 - align;
+                for (size_t i = 0; i < 4; i++){
+                    float av = (i < keep) ? a[i] : 0.0f;
+                    float tv = (i < keep) ? t[i] : 0.0f;
+                    at0 += av * tv;
+                    as0 += av * av;
+                }
+                a += 4;
+                t += 4;
+                length -= 4 - align;
+            }
+            size_t lc = length / 16;
+            for (size_t c = 0; c < lc; c++){
+                for (size_t i = 0; i < 64; i++){
+                    at0 += a[i] * t[i];
+                    as0 += a[i] * a[i];
+                }
+                a += 16;
+                t += 16;
+            }
+            length %= 16;
+            while (length >= 4){
+                for (size_t i = 0; i < 4; i++){
+                    at0 += a[i] * t[i];
+                    as0 += a[i] * a[i];
+                }
+                a += 4;
+                t += 4;
+                length -= 4;
+            }
+            if (length){
+                for (size_t i = 0; i < 4; i++){
+                    float av = (i < length) ? a[i] : 0.0f;
+                    float tv = (i < length) ? t[i] : 0.0f;
+                    at0 += av * tv;
+                    as0 += av * av;
+                }
+            }
+            em_at += at0;
+            em_a2 += as0;
+        }
+        float emu = (float)(em_at / em_a2);
+        std::string line = "PROBE ref=" + std::to_string(ref) + " emu=" + std::to_string(emu) + " sse=";
         float first = 0.0f;
         bool all_same = true;
         float mn = 1e38f, mx = -1e38f;
