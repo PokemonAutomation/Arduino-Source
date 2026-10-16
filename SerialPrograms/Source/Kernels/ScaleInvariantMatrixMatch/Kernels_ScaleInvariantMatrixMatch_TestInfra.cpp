@@ -149,16 +149,18 @@ UnitTestResult Test::run(Logger& logger, CancellableScope& scope) const{
     //  re-computation of the plain scale from the raw data.
     //
     auto debug_info = [this, &A, &T, &rowsA, &rowsT, n]() -> std::string{
-        char buf[512];
+        char buf[768];
         double dAT = 0.0, dA2 = 0.0;
         for (size_t c = HEAD_PAD; c < HEAD_PAD + n; c++){
             dAT += (double)A[c] * (double)T[c];
             dA2 += (double)A[c] * (double)A[c];
         }
         std::snprintf(buf, sizeof(buf),
-            " [fns scale=%p/%p scaleW=%p/%p error=%p/%p errorW=%p/%p"
+            " [wh=%zux%zu weights=%d"
+            " fns scale=%p/%p scaleW=%p/%p error=%p/%p errorW=%p/%p"
             " A=%p T=%p row0A=%p row0T=%p alignA=%zu alignT=%zu"
             " canaryBot=%llx canaryTop=%llx dScale=%.9g]",
+            m_width, m_height, (int)m_use_weights,
             (const void*)m_scale0, (const void*)m_scale1,
             (const void*)m_scaleW0, (const void*)m_scaleW1,
             (const void*)m_error0, (const void*)m_error1,
