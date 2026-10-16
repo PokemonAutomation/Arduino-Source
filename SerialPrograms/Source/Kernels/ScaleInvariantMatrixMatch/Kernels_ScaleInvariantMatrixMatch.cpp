@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/CpuId/CpuId.h"
 
 namespace PokemonAutomation{
