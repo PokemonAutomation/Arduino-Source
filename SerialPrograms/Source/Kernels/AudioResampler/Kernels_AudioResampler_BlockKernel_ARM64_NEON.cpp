@@ -293,54 +293,54 @@ void run_block32_down2_ARM64_NEON(
 void add_tests_ARM64_NEON(UnitTestDatabase& database){
     database.add<BlockKernelTest>(
         "NEON", run_block8_tap4_ARM64_NEON,
-        48000, 44100, 16, 8, 0
+        48000, 44100, 16, 8, 4, 0
     );
     //  The block straddles the table period (147) into the continuing
     //  index columns.
     database.add<BlockKernelTest>(
         "NEON", run_block8_tap4_ARM64_NEON,
-        48000, 44100, 16, 8, 140
+        48000, 44100, 16, 8, 4, 140
     );
     database.add<BlockKernelTest>(
         "NEON", run_block8_tap4_ARM64_NEON,
-        44100, 88200, 16, 8, 0
+        44100, 88200, 16, 8, 4, 0
     );
     database.add<BlockKernelTest>(
         "NEON", run_block8_tap4_ARM64_NEON,
-        48000, 44100, 8, 8, 140
+        48000, 44100, 8, 8, 4, 140
     );
 
     database.add<BlockKernelTest>(
         "NEON_Up", run_block32_up_ARM64_NEON,
-        44100, 48000, 16, 32, 0
+        44100, 48000, 16, 32, 1, 0
     );
     //  The block straddles the table period (160) into the continuing
     //  index columns.
     database.add<BlockKernelTest>(
         "NEON_Up", run_block32_up_ARM64_NEON,
-        44100, 48000, 16, 32, 130
+        44100, 48000, 16, 32, 1, 130
     );
     database.add<BlockKernelTest>(
         "NEON_Up", run_block32_up_ARM64_NEON,
-        44100, 88200, 16, 32, 0
+        44100, 88200, 16, 32, 1, 0
     );
 
     database.add<BlockKernelTest>(
         "NEON_Down2", run_block32_down2_ARM64_NEON,
-        48000, 44100, 16, 32, 0
+        48000, 44100, 16, 32, 1, 0
     );
     //  The block straddles the table period (147) into the continuing
     //  index columns.
     database.add<BlockKernelTest>(
         "NEON_Down2", run_block32_down2_ARM64_NEON,
-        48000, 44100, 16, 32, 116
+        48000, 44100, 16, 32, 1, 116
     );
     //  Downsampling just past the 2x boundary (in_rate = 2.0045 x
     //  out_rate): the 4-column index deltas still fit in the 8-float
     //  windows.
     database.add<BlockKernelTest>(
         "NEON_Down2", run_block32_down2_ARM64_NEON,
-        88200, 44000, 16, 32, 0
+        88200, 44000, 16, 32, 1, 0
     );
 }
 

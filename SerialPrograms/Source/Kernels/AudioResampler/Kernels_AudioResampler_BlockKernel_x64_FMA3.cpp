@@ -130,21 +130,21 @@ void run_block16_tap4_x64_FMA3(
 void add_tests_x64_FMA3(UnitTestDatabase& database){
     database.add<BlockKernelTest>(
         "FMA3", run_block16_tap4_x64_FMA3,
-        48000, 44100, 16, 16, 0
+        48000, 44100, 16, 16, 4, 0
     );
     //  The block straddles the table period (147) into the continuing
     //  index columns.
     database.add<BlockKernelTest>(
         "FMA3", run_block16_tap4_x64_FMA3,
-        48000, 44100, 16, 16, 139
+        48000, 44100, 16, 16, 4, 139
     );
     database.add<BlockKernelTest>(
         "FMA3", run_block16_tap4_x64_FMA3,
-        44100, 88200, 16, 16, 0
+        44100, 88200, 16, 16, 4, 0
     );
     database.add<BlockKernelTest>(
         "FMA3", run_block16_tap4_x64_FMA3,
-        48000, 44100, 8, 16, 139
+        48000, 44100, 8, 16, 4, 139
     );
 }
 
