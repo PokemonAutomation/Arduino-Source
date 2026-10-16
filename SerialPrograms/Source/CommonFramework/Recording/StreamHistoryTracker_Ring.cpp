@@ -302,6 +302,18 @@ struct StreamHistoryTracker_Ring::Impl{
     //  are not retried. Only the worker thread touches these.
     size_t video_encoder_index = 0;
 
+    //  Codec parameter snapshots for muxing, owned by Impl, guarded by
+    //  `lock`. ffmpeg is not thread-safe on a live AVCodecContext, and
+    //  mux_to_file() runs on the caller's thread while the video worker and
+    //  the audio pipeline thread keep encoding into vctx/actx, so the muxer
+    //  must never read those contexts directly (a torn read of, e.g., the
+    //  lazily-populated hardware-encoder extradata crashes the mp4 muxer).
+    //  Each snapshot is refreshed on its encoder's own thread whenever the
+    //  encoder state changes.
+    AVCodecParameters* video_params = nullptr;
+    AVRational video_time_base = {1, 1000};
+    AVCodecParameters* audio_params = nullptr;
+
     //  Audio encoder + resampler (used by on_samples).
     AVCodecContext* actx = nullptr;
     SwrContext* swr = nullptr;
@@ -348,6 +360,8 @@ struct StreamHistoryTracker_Ring::Impl{
     ~Impl(){
         if (sws != nullptr) sws_freeContext(sws);
         if (swr != nullptr) swr_free(&swr);
+        if (video_params != nullptr) avcodec_parameters_free(&video_params);
+        if (audio_params != nullptr) avcodec_parameters_free(&audio_params);
         if (vctx != nullptr) avcodec_free_context(&vctx);
         if (actx != nullptr) avcodec_free_context(&actx);
     }
@@ -504,6 +518,14 @@ struct StreamHistoryTracker_Ring::Impl{
             if (err == 0){
                 vctx = ctx;
                 video_encoder_index = i + 1;
+                {
+                    WriteSpinLock lg(lock, PA_CURRENT_FUNCTION);
+                    //  New encoder: the old snapshot (if any) no longer
+                    //  matches what the ring will hold going forward;
+                    //  drain_one_video_packet() refreshes it on the first
+                    //  encoded packet.
+                    avcodec_parameters_free(&video_params);
+                }
                 video_width = target_width;
                 video_height = target_height;
                 video_start = WallClock::min();
@@ -562,6 +584,21 @@ struct StreamHistoryTracker_Ring::Impl{
 
         int64_t added = (int64_t)ring_packet->data.size();
         WriteSpinLock lg(lock, PA_CURRENT_FUNCTION);
+        //  Refresh the mux-time parameter snapshot on this (the encoder's)
+        //  thread whenever the encoder state changes; the hardware encoders
+        //  populate their extradata lazily, sometimes only after the first
+        //  encoded packet. mux_to_file() must not read the live context.
+        if (video_params == nullptr
+            || video_params->extradata_size != vctx->extradata_size
+        ){
+            if (video_params == nullptr){
+                video_params = avcodec_parameters_alloc();
+            }
+            if (video_params != nullptr){
+                avcodec_parameters_from_context(video_params, vctx);
+                video_time_base = vctx->time_base;
+            }
+        }
         video.push_back(std::move(ring_packet));
         ring_bytes += added;
         evict();
@@ -945,6 +982,19 @@ struct StreamHistoryTracker_Ring::Impl{
                 int64_t added = (int64_t)ring_packet->data.size();
                 {
                     WriteSpinLock lg(lock, PA_CURRENT_FUNCTION);
+                    //  Refresh the audio parameter snapshot on this (the
+                    //  encoder's) thread; see the video counterpart in
+                    //  drain_one_video_packet().
+                    if (audio_params == nullptr
+                        || audio_params->extradata_size != actx->extradata_size
+                    ){
+                        if (audio_params == nullptr){
+                            audio_params = avcodec_parameters_alloc();
+                        }
+                        if (audio_params != nullptr){
+                            avcodec_parameters_from_context(audio_params, actx);
+                        }
+                    }
                     audio.push_back(std::move(ring_packet));
                     ring_bytes += added;
                     evict();
@@ -964,8 +1014,11 @@ struct StreamHistoryTracker_Ring::Impl{
     ){
         //  Parameter names use the p_ prefix: the ring deques and start
         //  indices have the same names as Impl members (C4458 under /W4).
-        bool have_video = (p_video_start < p_video.size()) && (vctx != nullptr);
-        bool have_audio_stream = (p_audio_start < p_audio.size()) && (actx != nullptr);
+        //  No live vctx/actx checks here: the codec state for muxing comes
+        //  from the video_params/audio_params snapshots (captured on the
+        //  encoder threads; ffmpeg is not thread-safe on a live context).
+        bool have_video = (p_video_start < p_video.size());
+        bool have_audio_stream = (p_audio_start < p_audio.size());
 
         //  MP4 unless the requested filename asks for Matroska.
         std::string extension;
@@ -997,30 +1050,90 @@ struct StreamHistoryTracker_Ring::Impl{
 
         AVStream* video_stream = nullptr;
         AVStream* audio_stream = nullptr;
+        AVCodecParameters* vpar = nullptr;
+        AVCodecParameters* apar = nullptr;
+        AVRational vtb = {1, 1000};
+        {
+            ReadSpinLock lg(lock, PA_CURRENT_FUNCTION);
+            if (have_video){
+                if (video_params == nullptr || video_params->extradata == nullptr){
+                    logger.log("Stream history: Failed to set up video stream (missing encoder state?).", COLOR_RED);
+                    avformat_free_context(format);
+                    return false;
+                }
+                vpar = avcodec_parameters_alloc();
+                if (vpar == nullptr
+                    || avcodec_parameters_copy(vpar, video_params) < 0
+                    || vpar->extradata == nullptr
+                ){
+                    logger.log("Stream history: Failed to copy the video codec parameters.", COLOR_RED);
+                    avcodec_parameters_free(&vpar);
+                    avformat_free_context(format);
+                    return false;
+                }
+                vtb = video_time_base;
+                char hex[9] = {0};
+                const char* digits = "0123456789abcdef";
+                for (int b = 0; b < 4 && b < video_params->extradata_size; b++){
+                    uint8_t byte = video_params->extradata[b];
+                    hex[2 * b] = digits[byte >> 4];
+                    hex[2 * b + 1] = digits[byte & 0xF];
+                }
+                logger.log(
+                    "Stream history: muxing video (extradata "
+                    + std::to_string(video_params->extradata_size) + " bytes, "
+                    + std::string(hex) + ").",
+                    COLOR_CYAN
+                );
+            }
+            if (have_audio_stream){
+                if (audio_params == nullptr || audio_params->extradata == nullptr){
+                    logger.log("Stream history: Failed to set up audio stream (missing encoder state?).", COLOR_RED);
+                    avcodec_parameters_free(&vpar);
+                    avformat_free_context(format);
+                    return false;
+                }
+                apar = avcodec_parameters_alloc();
+                if (apar == nullptr
+                    || avcodec_parameters_copy(apar, audio_params) < 0
+                    || apar->extradata == nullptr
+                ){
+                    logger.log("Stream history: Failed to copy the audio codec parameters.", COLOR_RED);
+                    avcodec_parameters_free(&vpar);
+                    avcodec_parameters_free(&apar);
+                    avformat_free_context(format);
+                    return false;
+                }
+            }
+        }
         if (have_video){
             video_stream = avformat_new_stream(format, nullptr);
             if (video_stream == nullptr
-                || avcodec_parameters_from_context(video_stream->codecpar, vctx) < 0
-                || vctx->extradata == nullptr
+                || avcodec_parameters_copy(video_stream->codecpar, vpar) < 0
             ){
                 logger.log("Stream history: Failed to set up video stream (missing encoder state?).", COLOR_RED);
+                avcodec_parameters_free(&vpar);
+                avcodec_parameters_free(&apar);
                 avformat_free_context(format);
                 return false;
             }
-            video_stream->time_base = vctx->time_base;
+            video_stream->time_base = vtb;
         }
         if (have_audio_stream){
             audio_stream = avformat_new_stream(format, nullptr);
             if (audio_stream == nullptr
-                || avcodec_parameters_from_context(audio_stream->codecpar, actx) < 0
-                || actx->extradata == nullptr
+                || avcodec_parameters_copy(audio_stream->codecpar, apar) < 0
             ){
                 logger.log("Stream history: Failed to set up audio stream (missing encoder state?).", COLOR_RED);
+                avcodec_parameters_free(&vpar);
+                avcodec_parameters_free(&apar);
                 avformat_free_context(format);
                 return false;
             }
             audio_stream->time_base = av_make_q(1, AUDIO_OUTPUT_RATE);
         }
+        avcodec_parameters_free(&vpar);
+        avcodec_parameters_free(&apar);
 
         if (avformat_write_header(format, &muxer_options) < 0){
             logger.log("Stream history: Failed to write file header for '" + filename + "'.", COLOR_RED);
