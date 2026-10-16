@@ -140,13 +140,47 @@ UnitTestResult Test::run(Logger& logger, CancellableScope& scope) const{
 
     char value0[32];
     char value1[32];
+
+    //
+    //  Debug context appended to every failure: the function pointer
+    //  addresses actually stored in this Test object, the data pointers and
+    //  row alignment, the aligned_malloc canaries around the A buffer
+    //  (0xEA097BE64BD0187D bottom / 0xC72BF73F0559CFE4 top), and a double
+    //  re-computation of the plain scale from the raw data.
+    //
+    auto debug_info = [this, &A, &T, &rowsA, &rowsT, n]() -> std::string{
+        char buf[512];
+        double dAT = 0.0, dA2 = 0.0;
+        for (size_t c = HEAD_PAD; c < HEAD_PAD + n; c++){
+            dAT += (double)A[c] * (double)T[c];
+            dA2 += (double)A[c] * (double)A[c];
+        }
+        std::snprintf(buf, sizeof(buf),
+            " [fns scale=%p/%p scaleW=%p/%p error=%p/%p errorW=%p/%p"
+            " A=%p T=%p row0A=%p row0T=%p alignA=%zu alignT=%zu"
+            " canaryBot=%llx canaryTop=%llx dScale=%.9g]",
+            (const void*)m_scale0, (const void*)m_scale1,
+            (const void*)m_scaleW0, (const void*)m_scaleW1,
+            (const void*)m_error0, (const void*)m_error1,
+            (const void*)m_errorW0, (const void*)m_errorW1,
+            (const void*)A.data(), (const void*)T.data(),
+            (const void*)rowsA.data(), (const void*)rowsT.data(),
+            (size_t)A.data() % 16, (size_t)T.data() % 16,
+            (unsigned long long)*(const unsigned long long*)(A.data() - 1),
+            (unsigned long long)*(const unsigned long long*)(A.data() + n + HEAD_PAD + TAIL_PAD),
+            dA2 != 0.0 ? dAT / dA2 : 0.0
+        );
+        return std::string(buf);
+    };
+
     auto mismatch = [&](const char* fn, float r0, float r1, double magnitude) -> UnitTestResult{
         std::snprintf(value0, sizeof(value0), "%.9g", (double)r0);
         std::snprintf(value1, sizeof(value1), "%.9g", (double)r1);
         return std::string(fn) + ": default=" + value0 + " isa=" + value1 +
             " (" + std::to_string(ulp_distance(r0, r1)) + " ulps, abs " +
             std::to_string(std::fabs((double)r0 - (double)r1)) + " vs tolerance " +
-            std::to_string(ABS_TOLERANCE * std::fmax(1.0, magnitude)) + ")";
+            std::to_string(ABS_TOLERANCE * std::fmax(1.0, magnitude)) + ")" +
+            debug_info();
     };
 
     //
