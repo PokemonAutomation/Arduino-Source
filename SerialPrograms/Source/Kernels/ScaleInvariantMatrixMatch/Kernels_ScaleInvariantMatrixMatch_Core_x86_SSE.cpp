@@ -162,7 +162,7 @@ public:
         , m_height(height)
     {}
     UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        scope.throw_if_cancelled();
+        (void)scope;
         const size_t n = m_width * m_height;
         AlignedVector<float> A(n + 16 + 15);
         AlignedVector<float> T(n + 16 + 15);
