@@ -10,6 +10,8 @@
 #include "Kernels/Kernels_x64_SSE41.h"
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h"
 #include "Kernels_ScaleInvariantMatrixMatch_Routines.h"
+#include <random>
+#include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels_ScaleInvariantMatrixMatch_TestInfra.h"
 
@@ -145,6 +147,64 @@ public:
         )
     {}
 };
+
+//
+//  DIAG: calls the SSE kernel repeatedly on identical data to check whether
+//  its result is deterministic (a miscompilation of fixed code) or varies
+//  from call to call (an uninitialized-memory read). Always passes; the
+//  values are only reported to the log.
+//
+class Probe_x86_SSE : public UnitTest{
+public:
+    Probe_x86_SSE(size_t width, size_t height)
+        : UnitTest("Kernels::ScaleInvariantMatrixMatch - x86_SSE_PROBE(w=" + std::to_string(width) + ", h=" + std::to_string(height) + ")")
+        , m_width(width)
+        , m_height(height)
+    {}
+    UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        const size_t n = m_width * m_height;
+        AlignedVector<float> A(n + 16 + 15);
+        AlignedVector<float> T(n + 16 + 15);
+        AlignedVector<const float*> rowsA(m_height);
+        AlignedVector<const float*> rowsT(m_height);
+        std::mt19937 gen((unsigned int)(m_width * 1000003u + m_height * 7919u));
+        std::uniform_real_distribution<float> data(-1.0f, 1.0f);
+        for (size_t c = 16; c < 16 + n; c++){
+            A[c] = data(gen);
+            T[c] = data(gen);
+        }
+        for (size_t r = 0; r < m_height; r++){
+            rowsA[r] = A.data() + 16 + r * m_width;
+            rowsT[r] = T.data() + 16 + r * m_width;
+        }
+        float ref = compute_scale_Default(m_width, m_height, rowsA.data(), rowsT.data());
+        std::string line = "PROBE ref=" + std::to_string(ref) + " sse=";
+        float first = 0.0f;
+        bool all_same = true;
+        float mn = 1e38f, mx = -1e38f;
+        for (int i = 0; i < 64; i++){
+            float v = compute_scale_min4_x86_SSE(m_width, m_height, rowsA.data(), rowsT.data());
+            if (i == 0){
+                first = v;
+            }
+            if (v != first){
+                all_same = false;
+            }
+            if (v < mn){ mn = v; }
+            if (v > mx){ mx = v; }
+            if (i < 8){
+                line += std::to_string(v) + " ";
+            }
+        }
+        line += "... all_same=" + std::to_string(all_same ? 1 : 0) + " min=" + std::to_string(mn) + " max=" + std::to_string(mx);
+        logger.log(line);
+        return true;
+    }
+private:
+    size_t m_width;
+    size_t m_height;
+};
+
 void add_tests_x86_SSE(UnitTestDatabase& database){
     //  The kernel requires a minimum row width (the partial-row loads span up to
     //  a full vector); sizes below that are not registered for this ISA.
@@ -152,6 +212,9 @@ void add_tests_x86_SSE(UnitTestDatabase& database){
         if (kTestSizes[i][0] < 4){
             continue;
         }
+    database.add<Probe_x86_SSE>(8, 33);
+    database.add<Probe_x86_SSE>(4, 1);
+    database.add<Probe_x86_SSE>(8, 1);
         for (bool use_weights : { false, true }){
             database.add<Test_x86_SSE>(kTestSizes[i][0], kTestSizes[i][1], use_weights);
         }
