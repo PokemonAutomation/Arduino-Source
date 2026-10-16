@@ -25,6 +25,10 @@ void add_tests_x86_AVX2 (UnitTestDatabase& database);
 void add_tests_x86_AVX512(UnitTestDatabase& database);
 void add_tests_arm64_NEON(UnitTestDatabase& database);
 
+void add_tests_x86_SSE41(UnitTestDatabase& database);
+void add_tests_x86_AVX2 (UnitTestDatabase& database);
+void add_tests_x86_AVX512(UnitTestDatabase& database);
+
 
 void compute_spike_kernel(
     float* out, const float* in, size_t lengthI,
