@@ -186,7 +186,7 @@ struct SumATA2{
         }
         if (length){
             vtype a0, t0, w0;
-            Context::load3_partial_front(length, a0, A, t0, TW, w0, W);
+            Context::load3_partial_front(length, a0, ptrA, t0, ptrT, w0, ptrW);
             a0 = Context::vmul(a0, w0);
             sum_as0 = Context::vpma(a0, a0, sum_as0);
             sum_at0 = Context::vpma(a0, t0, sum_at0);
@@ -345,7 +345,7 @@ struct SumError{
         }
         if (length){
             vtype a0, t0, w0;
-            Context::load3_partial_front(length, a0, A, t0, TW, w0, W);
+            Context::load3_partial_front(length, a0, ptrA, t0, ptrT, w0, ptrW);
             a0 = Context::vmul(scale, a0);
             a0 = Context::vpms(a0, w0, t0);
             sum0 = Context::vpma(a0, a0, sum0);
