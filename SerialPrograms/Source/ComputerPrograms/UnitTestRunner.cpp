@@ -307,7 +307,6 @@ void UnitTestRunner::on_test_finished(
         }else if (failed == 1001){
             FAILED_TESTS.append("<more not shown...>\n");
         }
-        FAILED_TESTS.append("FAILED: " + test->name() + "\n");
         break;
     }
     case UnitTestResult::SKIPPED:
