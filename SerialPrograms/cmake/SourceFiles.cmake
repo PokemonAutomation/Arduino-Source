@@ -506,6 +506,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQt.h
     Source/CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQtThread.cpp
     Source/CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQtThread.h
+    Source/CommonFramework/AudioPipeline/ChannelMixer.cpp
+    Source/CommonFramework/AudioPipeline/ChannelMixer.h
     Source/CommonFramework/AudioPipeline/IO/AudioFileLoader.cpp
     Source/CommonFramework/AudioPipeline/IO/AudioFileLoader.h
     Source/CommonFramework/AudioPipeline/IO/AudioSink.cpp
@@ -1031,6 +1033,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/AudioPipeline/Kernels_AudioPipeline_Tests.cpp
     Source/Kernels/AudioPipeline/Kernels_ChannelMixer.cpp
     Source/Kernels/AudioPipeline/Kernels_ChannelMixer.h
+    Source/Kernels/AudioPipeline/Kernels_ChannelMixer_Matrix_TestInfra.cpp
+    Source/Kernels/AudioPipeline/Kernels_ChannelMixer_Matrix_TestInfra.h
     Source/Kernels/AudioPipeline/Kernels_ChannelMixer_TestInfra.cpp
     Source/Kernels/AudioPipeline/Kernels_ChannelMixer_TestInfra.h
     Source/Kernels/AudioPipeline/Kernels_RawAudio2WorkingAudio.cpp
