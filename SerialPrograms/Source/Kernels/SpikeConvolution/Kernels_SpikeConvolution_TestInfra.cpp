@@ -74,7 +74,7 @@ UnitTestResult Test::run(Logger& logger, CancellableScope& scope) const{
         AlignedVector<float> out0(lengthO + OUTPUT_PAD);
         AlignedVector<float> out1(lengthO + OUTPUT_PAD);
 
-        std::mt19937 generator(lengthI * 1000003u + m_lengthK * 7919u);
+        std::mt19937 generator((unsigned int)(lengthI * 1000003u + m_lengthK * 7919u));
         std::uniform_int_distribution<int> data_distribution(-MAX_DATA, MAX_DATA);
         std::uniform_int_distribution<int> weight_distribution(-MAX_WEIGHT, MAX_WEIGHT);
         for (size_t c = 0; c < lengthI; c++){
