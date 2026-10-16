@@ -366,6 +366,7 @@ stages:
           cp "$SRC_DIR/IconResource/SerialPrograms.png" "$APP_DIR/usr/share/icons/hicolor/256x256/apps/"
           cp "$SRC_DIR/IconResource/SerialPrograms.appdata.xml" "$APP_DIR/usr/share/metainfo/"
           cp "$BUILD_DIR/SerialPrograms" "$APP_DIR/usr/bin"
+          cp "$SRC_DIR/3rdPartyBinaries/dpp-cacert.pem" "$APP_DIR/usr/bin/"
 
           echo "=== Extracting Discord Social SDK ==="
           DISCORD_ZIP="$SRC_DIR/3rdPartyBinaries/discord_social_sdk_linux.zip"
