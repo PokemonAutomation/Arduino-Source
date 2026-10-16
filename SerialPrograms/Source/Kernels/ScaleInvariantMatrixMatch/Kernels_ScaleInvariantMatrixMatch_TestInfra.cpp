@@ -142,13 +142,87 @@ UnitTestResult Test::run(Logger& logger, CancellableScope& scope) const{
     char value1[32];
 
     //
+    //  DIAG: re-generates the expected data with a fresh generator (same
+    //  seed) and reports the first mismatch in each buffer, so failures
+    //  can say whether the buffer contents were wrong right after the
+    //  fill or only later (i.e. written to by something else).
+    //
+    auto verify_bufs = [this, &A, &T, &W, &TW, &rowsA, &rowsT, &rowsW, &rowsTW, n](const char* tag) -> std::string{
+        char out[512];
+        out[0] = 0;
+        if (n == 0){
+            return "";
+        }
+        unsigned int seed = (unsigned int)(m_width * 1000003u + m_height * 7919u + (m_use_weights ? 2654435761u : 0u));
+        std::mt19937 gen(seed);
+        std::uniform_real_distribution<float> data_distribution(-1.0f, 1.0f);
+        std::uniform_real_distribution<float> weight_distribution(0.0f, 1.0f);
+        for (size_t c = HEAD_PAD; c < HEAD_PAD + n; c++){
+            float ea = data_distribution(gen);
+            float et = data_distribution(gen);
+            float ew = 0.0f, etw = 0.0f;
+            if (m_use_weights){
+                ew = weight_distribution(gen);
+                etw = et * ew;
+            }
+            if (A[c] != ea){
+                std::snprintf(out, sizeof(out), " %s: A[%zu]=%g want %g",
+                    tag, c - HEAD_PAD, (double)A[c], (double)ea);
+                return std::string(out);
+            }
+            if (T[c] != et){
+                std::snprintf(out, sizeof(out), " %s: T[%zu]=%g want %g",
+                    tag, c - HEAD_PAD, (double)T[c], (double)et);
+                return std::string(out);
+            }
+            if (m_use_weights){
+                if (W[c] != ew){
+                    std::snprintf(out, sizeof(out), " %s: W[%zu]=%g want %g",
+                        tag, c - HEAD_PAD, (double)W[c], (double)ew);
+                    return std::string(out);
+                }
+                if (TW[c] != etw){
+                    std::snprintf(out, sizeof(out), " %s: TW[%zu]=%g want %g",
+                        tag, c - HEAD_PAD, (double)TW[c], (double)etw);
+                    return std::string(out);
+                }
+            }
+        }
+        for (size_t r = 0; r < m_height; r++){
+            if (rowsA[r] != A.data() + HEAD_PAD + r * m_width ||
+                rowsT[r] != T.data() + HEAD_PAD + r * m_width){
+                std::snprintf(out, sizeof(out),
+                    " %s: rowptr A[%zu]=%p T[%zu]=%p wantA=%p wantT=%p",
+                    tag, r, (const void*)rowsA[r], r, (const void*)rowsT[r],
+                    (const void*)(A.data() + HEAD_PAD + r * m_width),
+                    (const void*)(T.data() + HEAD_PAD + r * m_width));
+                return std::string(out);
+            }
+            if (m_use_weights){
+                if (rowsW[r] != W.data() + HEAD_PAD + r * m_width ||
+                    rowsTW[r] != TW.data() + HEAD_PAD + r * m_width){
+                    std::snprintf(out, sizeof(out),
+                        " %s: rowptr W[%zu]=%p TW[%zu]=%p wantW=%p wantTW=%p",
+                        tag, r, (const void*)rowsW[r], r, (const void*)rowsTW[r],
+                        (const void*)(W.data() + HEAD_PAD + r * m_width),
+                        (const void*)(TW.data() + HEAD_PAD + r * m_width));
+                    return std::string(out);
+                }
+            }
+        }
+        return "";
+    };
+    std::string diag_fill = verify_bufs("postfill");
+    std::string diag_context = diag_fill;
+
+    //
     //  Debug context appended to every failure: the function pointer
     //  addresses actually stored in this Test object, the data pointers and
     //  row alignment, the aligned_malloc canaries around the A buffer
     //  (0xEA097BE64BD0187D bottom / 0xC72BF73F0559CFE4 top), and a double
     //  re-computation of the plain scale from the raw data.
     //
-    auto debug_info = [this, &A, &T, &rowsA, &rowsT, n]() -> std::string{
+    auto debug_info = [this, &A, &T, &rowsA, &rowsT, n, &diag_context]() -> std::string{
         char buf[768];
         double dAT = 0.0, dA2 = 0.0;
         for (size_t c = HEAD_PAD; c < HEAD_PAD + n; c++){
@@ -172,7 +246,9 @@ UnitTestResult Test::run(Logger& logger, CancellableScope& scope) const{
             (unsigned long long)*(const unsigned long long*)(A.data() + n + HEAD_PAD + TAIL_PAD),
             dA2 != 0.0 ? dAT / dA2 : 0.0
         );
-        return std::string(buf);
+        std::string s = std::string(buf);
+        s += diag_context;
+        return s;
     };
 
     auto mismatch = [&](const char* fn, float r0, float r1, double magnitude) -> UnitTestResult{
@@ -208,6 +284,7 @@ UnitTestResult Test::run(Logger& logger, CancellableScope& scope) const{
         return mismatch("compute_error", e0, e1, magE);
 
     if (m_use_weights){
+        diag_context += verify_bufs("preweighted");
         //
         //  Weighted compute_scale: s = sum((A * W) * (T * W)) / sum((A * W)^2).
         //
