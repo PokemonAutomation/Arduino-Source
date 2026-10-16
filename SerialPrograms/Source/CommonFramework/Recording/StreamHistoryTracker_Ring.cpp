@@ -1297,9 +1297,34 @@ struct StreamHistoryTracker_Ring::Impl{
         avcodec_parameters_free(&vpar);
         avcodec_parameters_free(&apar);
 
+        //  The lavf encoding docs require the caller to provide an opened IO
+        //  context (format->pb) before avformat_write_header() for muxers
+        //  that aren't AVFMT_NOFILE: avformat_write_header() does not open
+        //  format->url itself, and the muxer's write_header() dereferences
+        //  s->pb (crashing on the NULL pointer). Opened here, just before the
+        //  header, so the setup-failure paths above never leak a file handle;
+        //  the success path closes it below. avio_open2() leaves the
+        //  non-AVIO options (like movflags) in muxer_options for
+        //  avformat_write_header().
+        if (format->pb == nullptr && (format->flags & AVFMT_NOFILE) == 0){
+            if (avio_open2(
+                &format->pb,
+                filename.c_str(),
+                AVIO_FLAG_WRITE,
+                &format->interrupt_callback,
+                &muxer_options
+            ) < 0 || format->pb == nullptr
+            ){
+                logger.log("Stream history: Failed to open '" + filename + "' for writing.", COLOR_RED);
+                av_dict_free(&muxer_options);
+                avformat_free_context(format);
+                return false;
+            }
+        }
         if (avformat_write_header(format, &muxer_options) < 0){
             logger.log("Stream history: Failed to write file header for '" + filename + "'.", COLOR_RED);
             av_dict_free(&muxer_options);
+            avio_closep(&format->pb);
             avformat_free_context(format);
             return false;
         }
