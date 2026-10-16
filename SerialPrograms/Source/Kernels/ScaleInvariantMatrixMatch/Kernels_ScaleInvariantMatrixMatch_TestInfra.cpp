@@ -21,11 +21,20 @@ namespace ScaleInvariantMatrixMatch{
 
 //
 //  Head padding (in floats) before the first row of the matrices. The
-//  SSE4.1 implementation back-reads up to 3 floats (VL - 1) before a row
-//  start to handle unaligned row prefixes, so with this padding those
-//  reads always stay inside the allocation.
+//  current ISAs do not read before a row start, but the padding keeps the
+//  first row away from the very start of the allocation in case a future
+//  ISA does (e.g. an SSE4.1-style back-read of up to VL - 1 floats).
 //
 static constexpr size_t HEAD_PAD = 16;
+//
+//  Tail padding after the last row. The SSE4.1 partial-tail load
+//  (PSHUFB-based `load_f32_no_read_past_end`) always reads a full 16-byte
+//  word, which extends up to VL - 1 floats past the end of the row even
+//  though only the first `length` lanes are used. 15 floats (VL - 1 for
+//  the widest supported ISA) keeps those reads inside the allocation for
+//  the last row.
+//
+static constexpr size_t TAIL_PAD = 15;
 
 //
 //  A result passes if it is within 4096 ULPs of the Default result, or
@@ -94,8 +103,8 @@ UnitTestResult Test::run(Logger& logger, CancellableScope& scope) const{
     //  [0, 1]. TW = T * W is precomputed with the same float rounding
     //  that production uses.
     //
-    AlignedVector<float> A(n + HEAD_PAD);
-    AlignedVector<float> T(n + HEAD_PAD);
+    AlignedVector<float> A(n + HEAD_PAD + TAIL_PAD);
+    AlignedVector<float> T(n + HEAD_PAD + TAIL_PAD);
     AlignedVector<const float*> rowsA(m_height);
     AlignedVector<const float*> rowsT(m_height);
     AlignedVector<float> W;
@@ -103,8 +112,8 @@ UnitTestResult Test::run(Logger& logger, CancellableScope& scope) const{
     AlignedVector<const float*> rowsW;
     AlignedVector<const float*> rowsTW;
     if (m_use_weights){
-        W = AlignedVector<float>(n + HEAD_PAD);
-        TW = AlignedVector<float>(n + HEAD_PAD);
+        W = AlignedVector<float>(n + HEAD_PAD + TAIL_PAD);
+        TW = AlignedVector<float>(n + HEAD_PAD + TAIL_PAD);
         rowsW = AlignedVector<const float*>(m_height);
         rowsTW = AlignedVector<const float*>(m_height);
     }

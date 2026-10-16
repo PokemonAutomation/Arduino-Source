@@ -152,7 +152,12 @@ public:
     {}
 };
 void add_tests_x86_AVX2(UnitTestDatabase& database){
+    //  The kernel requires a minimum row width (the partial-row loads span up to
+    //  a full vector); sizes below that are not registered for this ISA.
     for (size_t i = 0; i < sizeof(kTestSizes) / sizeof(kTestSizes[0]); i++){
+        if (kTestSizes[i][0] < 8){ 
+            continue;
+        }
         for (bool use_weights : { false, true }){
             database.add<Test_x86_AVX2>(kTestSizes[i][0], kTestSizes[i][1], use_weights);
         }
