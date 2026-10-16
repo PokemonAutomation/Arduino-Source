@@ -252,6 +252,122 @@ void abandon_video_encoder(Logger& logger, const char* name, AVCodecContext*& ct
     ctx = nullptr;
 }
 
+//  MP4 (ISO BMFF) stores H.264 as AVCC: an avcC configuration record in the
+//  stream header and NAL units with 4-byte big-endian length prefixes in the
+//  samples. The h264_amf wrapper (with AV_CODEC_FLAG_GLOBAL_HEADER) instead
+//  produces Annex B (00 00 00 01 start codes) for both, and the MP4 muxer
+//  shipped with the vendored ffmpeg crashes on that form; the other
+//  hardware encoders (nvenc, qsv) produce AVCC natively. These two
+//  conversions turn the AMF output into the standard AVCC form so that the
+//  muxer always sees what it expects.
+
+//  Walks the NAL units of an Annex B H.264 byte stream and re-emits them
+//  with 4-byte big-endian length prefixes. Returns false if no NAL unit is
+//  found.
+bool h264_annexb_to_avcc(const uint8_t* in, size_t in_size, std::vector<uint8_t>& out){
+    out.clear();
+    const uint8_t* p = in;
+    const uint8_t* end = in + in_size;
+    bool found_any = false;
+    while (p < end){
+        const uint8_t* nal_start = nullptr;
+        for (const uint8_t* q = p; q + 2 < end; q++){
+            if (q[0] == 0 && q[1] == 0 && q[2] == 1){
+                nal_start = q + 3;
+                break;
+            }
+        }
+        if (nal_start == nullptr){
+            break;    //  No start code left; stop at any trailing garbage.
+        }
+        const uint8_t* nal_end = nal_start;
+        for (const uint8_t* q = nal_start; q + 2 < end; q++){
+            if (q[0] == 0 && q[1] == 0 && q[2] == 1){
+                nal_end = q;
+                break;
+            }
+        }
+        if (nal_end == nal_start){
+            nal_end = end;    //  The last NAL unit runs to the end of the buffer.
+        }
+        size_t nal_size = (size_t)(nal_end - nal_start);
+        if (nal_size == 0){
+            break;
+        }
+        found_any = true;
+        out.push_back((uint8_t)(nal_size >> 24));
+        out.push_back((uint8_t)(nal_size >> 16));
+        out.push_back((uint8_t)(nal_size >> 8));
+        out.push_back((uint8_t)(nal_size));
+        out.insert(out.end(), nal_start, nal_end);
+        p = nal_end;
+    }
+    return found_any;
+}
+
+//  Builds the MP4 avcC configuration record from an Annex B H.264 extradata
+//  (SPS/PPS NAL units with start codes). Returns false if no SPS is found.
+bool h264_avcc_from_annexb_extradata(const uint8_t* in, size_t in_size, std::vector<uint8_t>& out){
+    out.clear();
+    std::vector<uint8_t> sps;
+    std::vector<uint8_t> pps;
+    const uint8_t* p = in;
+    const uint8_t* end = in + in_size;
+    while (p < end){
+        const uint8_t* nal_start = nullptr;
+        for (const uint8_t* q = p; q + 2 < end; q++){
+            if (q[0] == 0 && q[1] == 0 && q[2] == 1){
+                nal_start = q + 3;
+                break;
+            }
+        }
+        if (nal_start == nullptr){
+            break;
+        }
+        const uint8_t* nal_end = nal_start;
+        for (const uint8_t* q = nal_start; q + 2 < end; q++){
+            if (q[0] == 0 && q[1] == 0 && q[2] == 1){
+                nal_end = q;
+                break;
+            }
+        }
+        if (nal_end == nal_start){
+            nal_end = end;
+        }
+        if (nal_start < nal_end){
+            int type = nal_start[0] & 0x1F;
+            if (type == 7 && sps.empty()){
+                sps.assign(nal_start, nal_end);    //  SPS NAL unit.
+            }else if (type == 8 && pps.empty()){
+                pps.assign(nal_start, nal_end);    //  PPS NAL unit.
+            }
+        }
+        p = nal_end;
+    }
+    if (sps.size() < 5){
+        return false;
+    }
+    //  avcC: configurationVersion=1, profile_idc, profile_compatibility,
+    //  level_idc, 4 reserved bits + lengthSizeMinusOne, 3 reserved bits +
+    //  numOfSequenceParameterSets, then the SPS and PPS with 16-bit lengths.
+    out.push_back(0x01);
+    out.push_back(sps[1]);
+    out.push_back(sps[2]);
+    out.push_back(sps[3]);
+    out.push_back(sps[4]);
+    out.push_back(0xFF);
+    out.push_back(0xE0);
+    out.push_back(0x01);
+    out.push_back((uint8_t)(sps.size() >> 8));
+    out.push_back((uint8_t)(sps.size() & 0xFF));
+    out.insert(out.end(), sps.begin(), sps.end());
+    out.push_back(0x01);
+    out.push_back((uint8_t)(pps.size() >> 8));
+    out.push_back((uint8_t)(pps.size() & 0xFF));
+    out.insert(out.end(), pps.begin(), pps.end());
+    return true;
+}
+
 
 }  // namespace
 
@@ -1053,10 +1169,18 @@ struct StreamHistoryTracker_Ring::Impl{
         AVCodecParameters* vpar = nullptr;
         AVCodecParameters* apar = nullptr;
         AVRational vtb = {1, 1000};
+        bool video_annexb = false;
         {
             ReadSpinLock lg(lock, PA_CURRENT_FUNCTION);
             if (have_video){
-                if (video_params == nullptr || video_params->extradata == nullptr){
+                //  Only H.264 needs extradata (the avcC record); the other
+                //  candidates (MPEG-4 Part 2) carry their stream
+                //  configuration in-band.
+                const bool needs_extradata = (video_params != nullptr
+                    && video_params->codec_id == AV_CODEC_ID_H264);
+                if (video_params == nullptr
+                    || (needs_extradata && video_params->extradata == nullptr)
+                ){
                     logger.log("Stream history: Failed to set up video stream (missing encoder state?).", COLOR_RED);
                     avformat_free_context(format);
                     return false;
@@ -1064,9 +1188,14 @@ struct StreamHistoryTracker_Ring::Impl{
                 vpar = avcodec_parameters_alloc();
                 if (vpar == nullptr
                     || avcodec_parameters_copy(vpar, video_params) < 0
-                    || vpar->extradata == nullptr
                 ){
                     logger.log("Stream history: Failed to copy the video codec parameters.", COLOR_RED);
+                    avcodec_parameters_free(&vpar);
+                    avformat_free_context(format);
+                    return false;
+                }
+                if (needs_extradata && vpar->extradata == nullptr){
+                    logger.log("Stream history: Failed to set up video stream (missing encoder state?).", COLOR_RED);
                     avcodec_parameters_free(&vpar);
                     avformat_free_context(format);
                     return false;
@@ -1085,6 +1214,39 @@ struct StreamHistoryTracker_Ring::Impl{
                     + std::string(hex) + ").",
                     COLOR_CYAN
                 );
+                //  MP4 stores H.264 as AVCC (avcC header + NAL units with
+                //  4-byte length prefixes). The h264_amf wrapper emits
+                //  Annex B instead, and the MP4 muxer of the vendored ffmpeg
+                //  crashes on that form, so convert the extradata here and
+                //  the ring packets below.
+                video_annexb = (std::string(muxer) == "mp4"
+                    && vpar->extradata_size >= 4
+                    && vpar->extradata[0] == 0 && vpar->extradata[1] == 0
+                    && vpar->extradata[2] == 0 && vpar->extradata[3] == 1);
+                if (video_annexb){
+                    std::vector<uint8_t> avcc;
+                    if (!h264_avcc_from_annexb_extradata(
+                        vpar->extradata, (size_t)vpar->extradata_size, avcc
+                    )
+                    ){
+                        logger.log("Stream history: Failed to convert the H.264 extradata from Annex B to AVCC.", COLOR_RED);
+                        avcodec_parameters_free(&vpar);
+                        avformat_free_context(format);
+                        return false;
+                    }
+                    uint8_t* new_extradata = (uint8_t*)av_mallocz(avcc.size() + AV_INPUT_BUFFER_PADDING_SIZE);
+                    if (new_extradata == nullptr){
+                        logger.log("Stream history: Failed to allocate the converted H.264 extradata.", COLOR_RED);
+                        avcodec_parameters_free(&vpar);
+                        avformat_free_context(format);
+                        return false;
+                    }
+                    memcpy(new_extradata, avcc.data(), avcc.size());
+                    av_free(vpar->extradata);
+                    vpar->extradata = new_extradata;
+                    vpar->extradata_size = (int)avcc.size();
+                    logger.log("Stream history: converted H.264 Annex-B extradata to AVCC for MP4.", COLOR_CYAN);
+                }
             }
             if (have_audio_stream){
                 if (audio_params == nullptr || audio_params->extradata == nullptr){
@@ -1149,14 +1311,28 @@ struct StreamHistoryTracker_Ring::Impl{
             ok = false;
         }else{
             if (have_video){
+                //  When the ring holds Annex B H.264 (the h264_amf wrapper),
+                //  each packet is rewritten with 4-byte NAL length prefixes;
+                //  the converted buffer must outlive the write call.
+                std::vector<uint8_t> converted_data;
                 for (size_t i = p_video_start; i < p_video.size() && ok; i++){
                     const VideoRingPacket& vp = *p_video[i];
                     int64_t us = std::chrono::duration_cast<std::chrono::microseconds>(
                         vp.timestamp - start_ts
                     ).count();
-                    //  The muxer only reads the packet data.
-                    packet->data = const_cast<uint8_t*>(vp.data.data());
-                    packet->size = (int)vp.data.size();
+                    if (video_annexb){
+                        if (!h264_annexb_to_avcc(vp.data.data(), vp.data.size(), converted_data)){
+                            logger.log("Stream history: Failed to convert a video packet from Annex B to AVCC.", COLOR_RED);
+                            ok = false;
+                            break;
+                        }
+                        packet->data = converted_data.data();
+                        packet->size = (int)converted_data.size();
+                    }else{
+                        //  The muxer only reads the packet data.
+                        packet->data = const_cast<uint8_t*>(vp.data.data());
+                        packet->size = (int)vp.data.size();
+                    }
                     packet->stream_index = video_stream->index;
                     //  `us` counts microseconds (a 1/1000000 timebase); convert to
                     //  the stream timebase.
