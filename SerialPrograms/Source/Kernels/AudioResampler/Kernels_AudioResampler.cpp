@@ -146,24 +146,24 @@ void AudioResampler::push_samples(size_t samples, size_t stride, const float* da
 
     //  The per-push division and modulo are amortized over the whole
     //  chunk; the per-block progress below uses neither.
-    size_t out = m_out_count;
-    size_t wr = out % period_prime;
-    size_t periods = out / period_prime;
+    size_t out_index = m_out_index;
+    size_t wr = out_index % period_prime;
+    size_t periods = out_index / period_prime;
 
     //  Absolute input position of the next output's window start.
     size_t cursor = index[wr] + periods * m_period_in_prime;
-    const size_t pushed_end = m_in_cursor + samples;
+    const size_t pushed_end = m_in_index + samples;
 
     //  When downsampling by a lot the cursor jumps past the pushed data.
     //  Drop the leading samples that no window will read.
     size_t n = samples;
-    if (cursor > m_in_cursor){
-        size_t skip = std::min(n, cursor - m_in_cursor);
+    if (cursor > m_in_index){
+        size_t skip = std::min(n, cursor - m_in_index);
         data += skip;
         n -= skip;
-        m_in_cursor += skip;
+        m_in_index += skip;
         if (n == 0){
-            m_in_cursor = pushed_end;
+            m_in_index = pushed_end;
             m_carry_avail = 0;
             return;
         }
@@ -171,9 +171,10 @@ void AudioResampler::push_samples(size_t samples, size_t stride, const float* da
 
     //  `carry` is the count of input samples in the carry buffers, which
     //  hold [cursor, cursor + carry). When negative the data pointer leads
-    //  the cursor by -carry samples. The data starts at absolute position S.
-    size_t S = m_in_cursor;
-    ptrdiff_t carry = (ptrdiff_t)S - (ptrdiff_t)cursor;
+    //  the cursor by -carry samples. The data starts at absolute position
+    //  in_index.
+    size_t in_index = m_in_index;
+    ptrdiff_t carry = (ptrdiff_t)in_index - (ptrdiff_t)cursor;
 
     //  Upper bound on the outputs this push can produce. With extreme
     //  upsampling the cursor barely advances between blocks, so this keeps
@@ -190,7 +191,7 @@ void AudioResampler::push_samples(size_t samples, size_t stride, const float* da
             [&](size_t c){
                 return m_carry[c].data();
             },
-            out, wr, periods, cursor, out_off
+            out_index, wr, periods, cursor, out_off
         );
         if ((ptrdiff_t)consumed < carry){
             for (size_t c = 0; c < channels; c++){
@@ -204,7 +205,7 @@ void AudioResampler::push_samples(size_t samples, size_t stride, const float* da
         return consumed;
     };
 
-    while (out - m_out_count < out_limit){
+    while (out_index - m_out_index < out_limit){
         const size_t need_w = need(wr);
 
         //  Not enough input to complete the next block.
@@ -220,17 +221,18 @@ void AudioResampler::push_samples(size_t samples, size_t stride, const float* da
             //  window-start span can exceed the remaining data (strong
             //  downsampling), so only advance as far as the data allows;
             //  the reconciliation below drops whatever is now in the past.
-            const size_t in_index = S - periods * m_period_in_prime;
+            //  Rewind the data base to the extended-period origin.
+            const size_t rewind = in_index - periods * m_period_in_prime;
             const size_t consumed = emit_block(
-                in_index,
+                rewind,
                 [&](size_t c){
                     return data + c * stride;
                 },
-                out, wr, periods, cursor, out_off
+                out_index, wr, periods, cursor, out_off
             );
             const size_t advance = std::min(consumed, n);
             data += advance;
-            S += advance;
+            in_index += advance;
             n -= advance;
         } else {
             //  The window straddles the carry and the data. Copy the rest of
@@ -244,7 +246,7 @@ void AudioResampler::push_samples(size_t samples, size_t stride, const float* da
                 );
             }
             data += k;
-            S += k;
+            in_index += k;
             n -= k;
             carry = (ptrdiff_t)need_w;
             emit_carry_block();
@@ -255,13 +257,13 @@ void AudioResampler::push_samples(size_t samples, size_t stride, const float* da
         //  samples that now sit before the cursor, and re-derive how far
         //  the data leads or lags the cursor (the carry buffers only hold
         //  [cursor, cursor + carry) when carry > 0).
-        if (S < cursor){
-            const size_t skip = std::min(n, cursor - S);
+        if (in_index < cursor){
+            const size_t skip = std::min(n, cursor - in_index);
             data += skip;
-            S += skip;
+            in_index += skip;
             n -= skip;
         }
-        carry = (ptrdiff_t)S - (ptrdiff_t)cursor;
+        carry = (ptrdiff_t)in_index - (ptrdiff_t)cursor;
     }
 
     //  Save the unprocessed input tail in the carry buffers.
@@ -293,8 +295,8 @@ void AudioResampler::push_samples(size_t samples, size_t stride, const float* da
         flush(out_off);
     }
 
-    m_out_count = out;
-    m_in_cursor = pushed_end;
+    m_out_index = out_index;
+    m_in_index = pushed_end;
     m_carry_avail = (carry > 0) ? (size_t)carry : 0;
 }
 

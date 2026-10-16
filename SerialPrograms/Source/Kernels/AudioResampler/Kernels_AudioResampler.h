@@ -107,8 +107,8 @@ private:
     ListenerSet<AudioPipeline::WorkingAudioStreamListener> m_listeners;
 
     //  Stream state.
-    size_t m_out_count = 0;  //  Absolute index of the next output to produce.
-    size_t m_in_cursor = 0;  //  Absolute index of the next input to be pushed.
+    size_t m_in_index = 0;   //  Absolute index of the next input to be pushed.
+    size_t m_out_index = 0;  //  Absolute index of the next output to produce.
     size_t m_carry_avail = 0;  //  Unprocessed input samples in the carries.
 };
 
