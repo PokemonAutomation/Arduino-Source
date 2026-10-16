@@ -22,10 +22,12 @@ public:
         size_t out_sample_rate,
         uint32_t taps,
         double beta,
+
         //  The block kernel's input block size in output samples. The
         //  index/weight allocation is extended so a block starting at any
         //  position of the extended period stays in bounds.
         size_t sample_block,
+
         //  The block kernel's tap group size. The tap allocation is
         //  extended so the kernel's final partial tap group stays in
         //  bounds.
