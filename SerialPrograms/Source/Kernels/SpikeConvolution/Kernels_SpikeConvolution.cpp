@@ -4,7 +4,9 @@
  *
  */
 
+#include "Common/Compiler.h"
 #include "Common/Cpp/CpuId/CpuId.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels_SpikeConvolution.h"
 
 namespace PokemonAutomation{
@@ -16,6 +18,10 @@ void compute_spike_kernel_Default   (float* out, const float* in, size_t lengthI
 void compute_spike_kernel_x86_SSE41 (float* out, const float* in, size_t lengthI, const float* kernel, size_t lengthK);
 void compute_spike_kernel_x86_AVX2  (float* out, const float* in, size_t lengthI, const float* kernel, size_t lengthK);
 void compute_spike_kernel_x86_AVX512(float* out, const float* in, size_t lengthI, const float* kernel, size_t lengthK);
+
+void add_tests_x86_SSE41(UnitTestDatabase& database);
+void add_tests_x86_AVX2 (UnitTestDatabase& database);
+void add_tests_x86_AVX512(UnitTestDatabase& database);
 
 
 void compute_spike_kernel(
@@ -38,6 +44,25 @@ void compute_spike_kernel(
     }
 #endif
     return compute_spike_kernel_Default(out, in, lengthI, kernel, lengthK);
+}
+
+
+void add_tests(UnitTestDatabase& database){
+#ifdef PA_AutoDispatch_x64_08_Nehalem
+    if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
+        add_tests_x86_SSE41(database);
+    }
+#endif
+#ifdef PA_AutoDispatch_x64_13_Haswell
+    if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
+        add_tests_x86_AVX2(database);
+    }
+#endif
+#ifdef PA_AutoDispatch_x64_17_Skylake
+    if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
+        add_tests_x86_AVX512(database);
+    }
+#endif
 }
 
 
