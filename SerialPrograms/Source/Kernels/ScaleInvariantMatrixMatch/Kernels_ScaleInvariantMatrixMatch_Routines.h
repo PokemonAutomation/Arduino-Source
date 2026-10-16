@@ -98,7 +98,7 @@ struct SumATA2{
         if constexpr (VECTOR_LENGTH > 1){
             if (length){
                 vtype a0, t0;
-                Context::load2_partial_front(length, a0, ptrT, t0, ptrA);
+                Context::load2_partial_front(length, a0, ptrA, t0, ptrT);
                 sum_at0 = Context::vpma(a0, t0, sum_at0);
                 sum_as0 = Context::vpma(a0, a0, sum_as0);
             }
@@ -271,7 +271,7 @@ struct SumError{
         }
         if (length){
             vtype a0, t0;
-            Context::load2_partial_front(length, a0, ptrT, t0, ptrA);
+            Context::load2_partial_front(length, a0, ptrA, t0, ptrT);
             a0 = Context::vpms(scale, a0, t0);
             sum0 = Context::vpma(a0, a0, sum0);
         }
