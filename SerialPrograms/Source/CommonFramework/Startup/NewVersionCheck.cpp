@@ -211,7 +211,7 @@ void check_new_version(Logger& logger){
         json = FileDownloader::download_json_file(
             logger,
             "https://raw.githubusercontent.com/PokemonAutomation/ComputerControl/master/LatestVersion.json",
-            std::chrono::seconds(10)
+            std::chrono::seconds(3)
         );
     }catch (OperationFailedException&){
         return;

@@ -24,7 +24,11 @@ namespace FileDownloader{
 //  data transfer, so without it a connection that stalls would block
 //  this call forever). std::chrono::seconds(0) (the default) imposes no
 //  overall limit.
-std::string download_file(Logger& logger, const std::string& url, std::chrono::seconds overall_timeout = std::chrono::seconds(0));
+std::string download_file(
+    Logger& logger,
+    const std::string& url,
+    std::chrono::seconds overall_timeout = std::chrono::seconds(0)
+);
 
 //  Throws OperationFailedException if failed to download.
 void download_file_to_disk(
@@ -38,7 +42,11 @@ void download_file_to_disk(
 
 //  Throws OperationFailedException if failed to download.
 //  Returns empty value if invalid JSON.
-JsonValue download_json_file(Logger& logger, const std::string& url, std::chrono::seconds overall_timeout = std::chrono::seconds(0));
+JsonValue download_json_file(
+    Logger& logger,
+    const std::string& url,
+    std::chrono::seconds overall_timeout = std::chrono::seconds(0)
+);
 
 
 }
