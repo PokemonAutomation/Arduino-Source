@@ -81,10 +81,10 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_SingleSwitchProgram<StaticRng>());
     ret.emplace_back(make_SingleSwitchProgram<WildRng>());
     ret.emplace_back(make_SingleSwitchProgram<RoamingLegendaryRng>());
+    ret.emplace_back(make_SingleSwitchProgram<EggRng>());
 
     if (IS_BETA_VERSION || STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Untested/Beta/WIP ----");
-        ret.emplace_back(make_SingleSwitchProgram<EggRng>());
         ret.emplace_back(make_SingleSwitchProgram<EliteFourFarmer>());
     }
 
