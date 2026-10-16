@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/CpuId/CpuId.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -80,6 +81,10 @@ float compute_error_min4_x86_SSE    (size_t width, size_t height, float scale, f
 float compute_error_min8_x86_AVX2   (size_t width, size_t height, float scale, float const* const* A, float const* const* TW, float const* const* W);
 float compute_error_min16_x86_AVX512(size_t width, size_t height, float scale, float const* const* A, float const* const* TW, float const* const* W);
 
+void add_tests_x86_SSE(UnitTestDatabase& database);
+void add_tests_x86_AVX2(UnitTestDatabase& database);
+void add_tests_x86_AVX512(UnitTestDatabase& database);
+
 float compute_error(
     size_t width, size_t height,
     float scale,
@@ -126,6 +131,30 @@ float compute_error(
     }
 #endif
     return compute_error_Default(width, height, scale, A, TW, W);
+}
+
+
+// 
+//  Register the tests for the ISAs this binary can run. Each ISA checks its
+//  results against the Default path, which is the source of truth, so the
+//  Default path itself gets no tests.
+// 
+void add_tests(UnitTestDatabase& database){
+#ifdef PA_AutoDispatch_x64_08_Nehalem
+    if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
+        add_tests_x86_SSE(database);
+    }
+#endif
+#ifdef PA_AutoDispatch_x64_13_Haswell
+    if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
+        add_tests_x86_AVX2(database);
+    }
+#endif
+#ifdef PA_AutoDispatch_x64_17_Skylake
+    if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
+        add_tests_x86_AVX512(database);
+    }
+#endif
 }
 
 

@@ -10,6 +10,8 @@
 #include "Kernels/Kernels_x64_AVX2.h"
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h"
 #include "Kernels_ScaleInvariantMatrixMatch_Routines.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "Kernels_ScaleInvariantMatrixMatch_TestInfra.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -122,6 +124,39 @@ float compute_error_min8_x86_AVX2(
     float const* const* W
 ){
     return compute_error<SumError<Context_x86_AVX2>>(width, height, scale, A, TW, W);
+}
+
+
+
+float compute_scale_Default(size_t width, size_t height, float const* const* A, float const* const* T);
+float compute_scale_Default(size_t width, size_t height, float const* const* A, float const* const* TW, float const* const* W);
+float compute_error_Default(size_t width, size_t height, float scale, float const* const* A, float const* const* T);
+float compute_error_Default(size_t width, size_t height, float scale, float const* const* A, float const* const* TW, float const* const* W);
+
+class Test_x86_AVX2 : public Test{
+public:
+    Test_x86_AVX2(size_t width, size_t height, bool use_weights)
+        : Test(
+            "x86_AVX2",
+            width, height,
+            use_weights,
+            compute_scale_Default,
+            compute_scale_min8_x86_AVX2,
+            compute_scale_Default,
+            compute_scale_min8_x86_AVX2,
+            compute_error_Default,
+            compute_error_min8_x86_AVX2,
+            compute_error_Default,
+            compute_error_min8_x86_AVX2
+        )
+    {}
+};
+void add_tests_x86_AVX2(UnitTestDatabase& database){
+    for (size_t i = 0; i < sizeof(kTestSizes) / sizeof(kTestSizes[0]); i++){
+        for (bool use_weights : { false, true }){
+            database.add<Test_x86_AVX2>(kTestSizes[i][0], kTestSizes[i][1], use_weights);
+        }
+    }
 }
 
 
