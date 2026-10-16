@@ -1033,8 +1033,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/AudioPipeline/Kernels_AudioPipeline_Tests.cpp
     Source/Kernels/AudioPipeline/Kernels_ChannelMixer.cpp
     Source/Kernels/AudioPipeline/Kernels_ChannelMixer.h
-    Source/Kernels/AudioPipeline/Kernels_ChannelMixer_Matrix_TestInfra.cpp
-    Source/Kernels/AudioPipeline/Kernels_ChannelMixer_Matrix_TestInfra.h
     Source/Kernels/AudioPipeline/Kernels_ChannelMixer_TestInfra.cpp
     Source/Kernels/AudioPipeline/Kernels_ChannelMixer_TestInfra.h
     Source/Kernels/AudioPipeline/Kernels_RawAudio2WorkingAudio.cpp

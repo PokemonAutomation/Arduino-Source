@@ -8,6 +8,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Common/Qt/QtThreadPool_Tests.h"
+#include "CommonFramework/AudioPipeline/ChannelMixer.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
@@ -40,6 +41,7 @@ UnitTestDatabase make_UNIT_TESTS_ALL(){
 
     add_tests_QtEventThreadPool(ret, GlobalThreadPools::computation_normal());
     add_tests_BlackBorderDetector(ret);
+    add_tests_ChannelMixerMatrix(ret);
     OCR::add_tests(ret);
     Kernels::add_tests(ret);
     NintendoSwitch::add_tests_CheckOnlineDetector(ret);

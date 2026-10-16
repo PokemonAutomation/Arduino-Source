@@ -10,6 +10,7 @@
 #define PokemonAutomation_AudioPipeline_ChannelMixer_H
 
 class QAudioFormat;
+class UnitTestDatabase;
 
 namespace PokemonAutomation{
 
@@ -47,15 +48,21 @@ namespace PokemonAutomation{
 //  An empty vector is returned on failure:
 //    - Either format has a non-positive channel count, or
 //    - Either format's channel layout is unknown (channelConfig() == ChannelConfigUnknown).
-//  FFmpeg does not guess per-channel identities, so a channel that exists in the frame
-//  but has no position in its config contributes nothing (its matrix row is all zeros),
-//  and an output channel with no position receives nothing (its column is all zeros).
+//  A channel that exists in the frame but has no position in its config contributes
+//  nothing (its matrix row is all zeros), and an output channel with no position
+//  receives nothing (its column is all zeros).
 //
-//  No renormalization is applied: FFmpeg's automatic rematrix uses these fixed
-//  coefficients, so a full-scale multichannel source can exceed full-scale in a narrow
-//  downmix.
+//  No renormalization is applied: the standard coefficients are fixed, so a full-scale
+//  multichannel source can exceed full-scale in a narrow downmix.
 //
 std::vector<float> build_channel_mixer_matrix(const QAudioFormat& input, const QAudioFormat& output);
+
+
+
+//
+//  Registers unit tests for build_channel_mixer_matrix.
+//
+void add_tests_ChannelMixerMatrix(UnitTestDatabase& database);
 
 
 
