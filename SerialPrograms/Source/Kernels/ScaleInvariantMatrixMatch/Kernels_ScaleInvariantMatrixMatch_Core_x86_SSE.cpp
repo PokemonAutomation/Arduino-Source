@@ -146,7 +146,7 @@ public:
             compute_error_min4_x86_SSE
         )
     {}
-};
+};
 
 //
 //  DIAG: calls the SSE kernel repeatedly on identical data to check whether
@@ -162,6 +162,7 @@ public:
         , m_height(height)
     {}
     UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        scope.throw_if_cancelled();
         const size_t n = m_width * m_height;
         AlignedVector<float> A(n + 16 + 15);
         AlignedVector<float> T(n + 16 + 15);
