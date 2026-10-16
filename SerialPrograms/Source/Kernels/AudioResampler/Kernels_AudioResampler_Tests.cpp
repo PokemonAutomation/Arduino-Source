@@ -171,11 +171,25 @@ UnitTestResult run_resampler_stream(
         return "No output produced.";
     }
 
-    //  How many outputs should have been produced? The last windows can't
-    //  complete if they don't fit in the pushed input, which costs up to the
-    //  window span in input samples - scaled to the output rate.
+    //  Reference: out_c[o] = sum_t weight[t][o] x in_c[round(o * in/out) + t].
+    //  The reference only reads index/weight columns 0..got - 1, so the
+    //  block size is got itself and the tap group 1.
+    WeightTable reference(in_rate, out_rate, taps, beta, got, 1);
+    const uint32_t* ref_index = reference.in_sample_index();
+
+    //  How many outputs should have been produced? The resampler may be
+    //  holding back the unprocessed input tail: at most the next block's
+    //  window span plus its taps plus the kernel's read overshoot
+    //  (block - 1) input samples, scaled to the output rate. The span
+    //  grows with the dispatched block size (up to 128 samples on the
+    //  wide permute kernels), so bound it exactly from the table.
+    const size_t block = resampler.block_size();
+    size_t max_span = 0;
+    for (size_t wr = 0; wr < reference.period_out(); wr++){
+        max_span = std::max(max_span, (size_t)(ref_index[wr + block - 1] - ref_index[wr]));
+    }
     const double expected = (double)samples * out_rate / in_rate;
-    const double tail = ((double)taps + 32.0) * out_rate / in_rate + 256.0;
+    const double tail = ((double)max_span + taps + block) * out_rate / in_rate + 32.0;
     if ((double)got > expected + 2.0){
         return "Produced " + std::to_string(got) + " outputs, expected at most " +
             std::to_string((size_t)expected) + ".";
@@ -184,12 +198,6 @@ UnitTestResult run_resampler_stream(
         return "Produced only " + std::to_string(got) + " outputs, expected at least " +
             std::to_string((size_t)(expected - tail)) + ".";
     }
-
-    //  Reference: out_c[o] = sum_t weight[t][o] x in_c[round(o * in/out) + t].
-    //  The reference only reads index/weight columns 0..got - 1, so the
-    //  block size is got itself and the tap group 1.
-    WeightTable reference(in_rate, out_rate, taps, beta, got, 1);
-    const uint32_t* ref_index = reference.in_sample_index();
 
     double max_diff = 0;
     size_t first_bad = 0;
