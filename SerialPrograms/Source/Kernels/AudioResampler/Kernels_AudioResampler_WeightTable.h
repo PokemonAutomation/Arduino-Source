@@ -35,34 +35,42 @@ public:
     size_t taps() const{
         return m_taps;
     }
+
+    //  Input samples per output period (in_sample_rate / gcd).
+    size_t period_in() const{
+        return m_period_in;
+    }
+
     //  Output samples per period (out_sample_rate / gcd).
     size_t period_out() const{
         return m_period_out;
     }
+
     //  The extended output period: the smallest multiple of period_out()
     //  that is >= the sample block, so a block wraps it at most once.
     size_t period_prime() const{
         return m_period_prime;
     }
-    //  Input samples per output period (in_sample_rate / gcd).
-    size_t period_in() const{
-        return m_period_in;
-    }
+
     //  Tap rows in the table (the requested taps, zero-padded for the
     //  kernel's tap group).
     size_t taps_allocated() const{
         return m_taps_allocated;
     }
+
     //  Index entries (and weight columns) in the table.
     size_t samples_allocated() const{
         return m_samples_allocated;
     }
+
     const uint32_t* in_sample_index() const{
         return m_index.data();
     }
+
     const float* tap_start(size_t tap_index) const{
         return m_data.data() + tap_index * m_tap_stride;
     }
+
     size_t tap_stride() const{
         return m_tap_stride;
     }
@@ -76,9 +84,9 @@ private:
 
 private:
     size_t m_taps;
+    size_t m_period_in;
     size_t m_period_out;
     size_t m_period_prime;
-    size_t m_period_in;
     size_t m_taps_allocated;
     size_t m_samples_allocated;
     size_t m_tap_stride;

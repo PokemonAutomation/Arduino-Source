@@ -45,14 +45,13 @@ WeightTable::WeightTable(
 //    cout << "window_shift = " << window_shift << endl;
 
     size_t gcd = std::gcd(in_sample_rate, out_sample_rate);
-//    size_t in_period = in_sample_rate / gcd;
-//    size_t out_period = out_sample_rate / gcd;
-    size_t period = out_sample_rate / gcd;
-    m_period_out = period;
     m_period_in = in_sample_rate / gcd;
+    m_period_out = out_sample_rate / gcd;
+
     //  The smallest multiple of the period that is >= sample_block, so a
     //  block wraps it at most once.
-    m_period_prime = period * ((sample_block + period - 1) / period);
+    m_period_prime = (sample_block + m_period_out - 1) / m_period_out * m_period_out;
+
     m_samples_allocated = m_period_prime + sample_block;
     m_taps_allocated = taps + tap_block - 1;
 
