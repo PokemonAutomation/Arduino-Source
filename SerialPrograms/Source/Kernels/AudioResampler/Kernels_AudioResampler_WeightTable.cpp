@@ -27,8 +27,8 @@ WeightTable::WeightTable(
     size_t out_sample_rate,
     uint32_t taps,
     double beta,
-    size_t min_samples,
-    size_t min_taps
+    size_t sample_block,
+    size_t tap_block
 )
     : m_taps(taps)
 {
@@ -45,17 +45,20 @@ WeightTable::WeightTable(
 //    cout << "window_shift = " << window_shift << endl;
 
     size_t gcd = std::gcd(in_sample_rate, out_sample_rate);
-//    size_t in_period = in_sample_rate / gcd;
-//    size_t out_period = out_sample_rate / gcd;
-    size_t period = out_sample_rate / gcd;
-    m_period = period;
+    m_period_in = in_sample_rate / gcd;
+    m_period_out = out_sample_rate / gcd;
 
-    size_t width = std::max(period, min_samples);
+    //  The smallest multiple of the period that is >= sample_block, so a
+    //  block wraps it at most once.
+    m_period_prime = (sample_block + m_period_out - 1) / m_period_out * m_period_out;
+
+    m_samples_allocated = m_period_prime + sample_block;
+    m_taps_allocated = taps + tap_block - 1;
 
     //  Calculate the starting input indices.
     {
-        m_index = AlignedVector<uint32_t>(width);
-        for (size_t c = 0; c < width; c++){
+        m_index = AlignedVector<uint32_t>(m_samples_allocated);
+        for (size_t c = 0; c < m_samples_allocated; c++){
             m_index[c] = (uint32_t)std::round(c * ratio);
 //            cout << "target = " << target << endl;
 //            cout << center << ",";
@@ -63,23 +66,22 @@ WeightTable::WeightTable(
 //        cout << endl;
     }
 
-    m_tap_stride = width * sizeof(float);
+    m_tap_stride = m_samples_allocated * sizeof(float);
 
     //  Round up to the cache way.
     constexpr size_t CACHE_WAY = 4096;
     m_tap_stride = Kernels::align_int_up<CACHE_WAY>(m_tap_stride);
 
     //  Extra padding to break superalignment.
-    size_t taps_in_table = std::max<size_t>(taps, min_taps);
-    m_tap_stride += 4096 / taps_in_table;
+    m_tap_stride += 4096 / m_taps_allocated;
 
     //  Round up to min alignment.
     m_tap_stride = Kernels::align_int_up<PA_ALIGNMENT>(m_tap_stride);
     m_tap_stride /= sizeof(float);
 
 
-    m_data = AlignedVector<float>(taps_in_table * m_tap_stride);
-    memset(m_data.data(), 0, taps_in_table * m_tap_stride * sizeof(float));
+    m_data = AlignedVector<float>(m_taps_allocated * m_tap_stride);
+    memset(m_data.data(), 0, m_taps_allocated * m_tap_stride * sizeof(float));
 //    cout << "items = " << taps * m_tap_stride << endl;
 
     for (uint32_t tap_index = 0; tap_index < taps; tap_index++){
@@ -88,7 +90,7 @@ WeightTable::WeightTable(
 //        cout << "-----------------" << endl;
 //        cout << "tap_shift = " << tap_shift << endl;
 
-        for (size_t c = 0; c < width; c++){
+        for (size_t c = 0; c < m_samples_allocated; c++){
             double in_index = m_index[c] + tap_shift;
             double x = in_index - c * ratio;
 //            cout << "in[" << in_index << "]: x = " << x << endl;

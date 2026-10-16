@@ -112,21 +112,21 @@ void run_block8_tap2_x64_SSE2(
 void add_tests_x64_SSE2(UnitTestDatabase& database){
     database.add<BlockKernelTest>(
         "SSE2", run_block8_tap2_x64_SSE2,
-        48000, 44100, 16, 8, 0
+        48000, 44100, 16, 8, 2, 0
     );
     //  The block straddles the table period (147) into the continuing
     //  index columns.
     database.add<BlockKernelTest>(
         "SSE2", run_block8_tap2_x64_SSE2,
-        48000, 44100, 16, 8, 140
+        48000, 44100, 16, 8, 2, 140
     );
     database.add<BlockKernelTest>(
         "SSE2", run_block8_tap2_x64_SSE2,
-        44100, 88200, 16, 8, 0
+        44100, 88200, 16, 8, 2, 0
     );
     database.add<BlockKernelTest>(
         "SSE2", run_block8_tap2_x64_SSE2,
-        48000, 44100, 8, 8, 140
+        48000, 44100, 8, 8, 2, 140
     );
 }
 

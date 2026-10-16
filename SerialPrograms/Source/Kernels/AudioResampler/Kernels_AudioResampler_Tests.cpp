@@ -120,7 +120,8 @@ BlockKernelTest::BlockKernelTest(
     size_t in_sample_rate,
     size_t out_sample_rate,
     uint32_t taps,
-    size_t block,
+    size_t sample_block,
+    size_t tap_block,
     size_t out_index
 )
     : UnitTest(
@@ -132,7 +133,8 @@ BlockKernelTest::BlockKernelTest(
     , m_in_rate(in_sample_rate)
     , m_out_rate(out_sample_rate)
     , m_taps(taps)
-    , m_block(block)
+    , m_block(sample_block)
+    , m_tap_block(tap_block)
     , m_out_index(out_index)
 {}
 UnitTestResult BlockKernelTest::run(Logger& logger, CancellableScope& scope) const{
@@ -141,10 +143,9 @@ UnitTestResult BlockKernelTest::run(Logger& logger, CancellableScope& scope) con
 
     WeightTable table(
         m_in_rate, m_out_rate, m_taps, 9.0,
-        m_out_index + m_block + 64,
-        m_taps
+        m_block, m_tap_block
     );
-    if (m_out_index >= table.period()){
+    if (m_out_index >= table.period_out()){
         return "out_index must wrap to the period.";
     }
 
@@ -152,8 +153,7 @@ UnitTestResult BlockKernelTest::run(Logger& logger, CancellableScope& scope) con
     //  sample i, so the kernel's in_index is 0 (k = 0 periods in).
     //  The index columns keep counting past the period, so a block that
     //  wraps the period reads samples up to about period_in + block + taps.
-    const size_t period_in = m_in_rate / std::gcd(m_in_rate, m_out_rate);
-    AlignedVector<float> input(period_in + m_block + m_taps + 128);
+    AlignedVector<float> input(table.period_in() + m_block + m_taps + 128);
     std::mt19937 generator(42);
     std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
     for (size_t i = 0; i < input.size(); i++){
@@ -205,12 +205,10 @@ UnitTestResult BlockDispatchTest::run(Logger& logger, CancellableScope& scope) c
         return "get_block_kernel returned a null function pointer.";
     }
 
-    //  Table sized exactly to the kernel's documented requirements.
-    const size_t period = m_out_rate / std::gcd(m_in_rate, m_out_rate);
+    //  Table sized exactly to the kernel's block.
     WeightTable table(
         m_in_rate, m_out_rate, m_taps, 9.0,
-        period + bk.sample_block,
-        m_taps + bk.tap_block - 1
+        bk.sample_block, bk.tap_block
     );
 
     //  The kernel's input reads may extend sample_block - 1 samples past
@@ -273,17 +271,17 @@ void add_tests(UnitTestDatabase& database){
     //  The Default kernel doubles as the reference for the SIMD variants.
     database.add<BlockKernelTest>(
         "Default", run_block8_Default,
-        48000, 44100, 16, 8, 0
+        48000, 44100, 16, 8, 1, 0
     );
     //  The block straddles the table period (147) into the continuing
     //  index columns.
     database.add<BlockKernelTest>(
         "Default", run_block8_Default,
-        48000, 44100, 16, 8, 140
+        48000, 44100, 16, 8, 1, 140
     );
     database.add<BlockKernelTest>(
         "Default", run_block8_Default,
-        96000, 44100, 16, 8, 0
+        96000, 44100, 16, 8, 1, 0
     );
 
 #ifdef PA_AutoDispatch_x64_08_Nehalem

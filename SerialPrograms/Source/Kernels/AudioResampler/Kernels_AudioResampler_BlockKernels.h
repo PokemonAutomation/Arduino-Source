@@ -28,11 +28,11 @@ namespace AudioResampler{
 //  period.
 //
 //  Each kernel processes a fixed block size. Fixed blocks can overshoot
-//  the end of the table in both dimensions, so the weight table must be
-//  constructed with min_samples / min_taps large enough for the block
-//  plus the kernel's read overshoot (documented per kernel). The extra
-//  input samples read past the block's last window are never used for
-//  the outputs and only need to be valid memory.
+//  the end of the table in both dimensions, so construct the weight
+//  table with the kernel's sample_block / tap_block; the constructor
+//  extends the allocations for the block. The extra input samples read
+//  past the block's last window are never used for the outputs and only
+//  need to be valid memory.
 //
 //  The definitions are non-inline, one per ISA translation unit. The x64
 //  kernels are only defined when the matching PA_AutoDispatch_x64_* macro
@@ -55,8 +55,7 @@ void run_block8_Default(
 
 //
 //  8 outputs. Any rate ratio.
-//  Tap count must be a multiple of 2, or the table must be zero-padded
-//  with min_taps to taps + 1 rows.
+//  Tap group of 2 (the table zero-pads to taps + 1 rows).
 //  Read overshoot: 1 input sample.
 //
 void run_block8_tap2_x64_SSE2(
@@ -69,8 +68,7 @@ void run_block8_tap2_x64_SSE2(
 
 //
 //  8 outputs. Any rate ratio.
-//  Tap count must be a multiple of 4, or the table must be zero-padded
-//  with min_taps to taps + 3 rows.
+//  Tap group of 4 (the table zero-pads to taps + 3 rows).
 //  Read overshoot: 3 input samples.
 //
 void run_block8_tap4_ARM64_NEON(
@@ -116,8 +114,7 @@ void run_block32_down2_ARM64_NEON(
 
 //
 //  16 outputs. Any rate ratio.
-//  Tap count must be a multiple of 4, or the table must be zero-padded
-//  with min_taps to taps + 3 rows.
+//  Tap group of 4 (the table zero-pads to taps + 3 rows).
 //  Read overshoot: 3 input samples.
 //
 void run_block16_tap4_x64_FMA3(
@@ -130,8 +127,7 @@ void run_block16_tap4_x64_FMA3(
 
 //
 //  32 outputs. Any rate ratio.
-//  Tap count must be a multiple of 8, or the table must be zero-padded
-//  with min_taps to taps + 7 rows.
+//  Tap group of 8 (the table zero-pads to taps + 7 rows).
 //  Read overshoot: 7 input samples.
 //
 void run_block32_tap8_x64_AVX512(
@@ -194,12 +190,11 @@ struct BlockKernel{
 //
 //  Picks the fastest block kernel for the rate ratio on the current CPU.
 //  The returned kernel is valid for any out_index wrapped to the table
-//  period, provided the table was constructed with
-//  min_samples >= period + sample_block and
-//  min_taps >= taps + tap_block - 1 (the WeightTable constructor zero
-//  pads the extra tap rows, which the unrolls' final partial group may
-//  read). It is the caller's responsibility to honor the implied
-//  overshoots when staging input.
+//  period, provided the table was constructed with the kernel's
+//  sample_block and tap_block (the WeightTable constructor extends the
+//  allocations, zero padding the extra tap rows, which the unrolls'
+//  final partial group may read). It is the caller's responsibility to
+//  honor the implied overshoots when staging input.
 //
 BlockKernel get_block_kernel(
     size_t in_sample_rate,

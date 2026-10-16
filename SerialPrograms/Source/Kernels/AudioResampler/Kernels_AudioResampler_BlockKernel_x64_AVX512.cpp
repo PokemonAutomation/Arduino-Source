@@ -328,39 +328,39 @@ void add_tests_x64_AVX512(UnitTestDatabase& database){
     //  Transpose POC: strong downsampling (in > 2 x out).
     database.add<BlockKernelTest>(
         "AVX512_POC", run_block32_tap8_x64_AVX512,
-        96000, 44100, 16, 32, 0
+        96000, 44100, 16, 32, 8, 0
     );
     //  The block straddles the table period (147) into the continuing
     //  index columns.
     database.add<BlockKernelTest>(
         "AVX512_POC", run_block32_tap8_x64_AVX512,
-        96000, 44100, 16, 32, 119
+        96000, 44100, 16, 32, 8, 119
     );
     //  Permute fast path: upsampling. The period (160) barely exceeds the
     //  block, so a nonzero out_index straddles it.
     database.add<BlockKernelTest>(
         "AVX512_Up", run_block128_up_x64_AVX512,
-        44100, 48000, 16, 128, 0
+        44100, 48000, 16, 128, 1, 0
     );
     database.add<BlockKernelTest>(
         "AVX512_Up", run_block128_up_x64_AVX512,
-        44100, 48000, 16, 128, 50
+        44100, 48000, 16, 128, 1, 50
     );
     //  Permute fast path: downsampling by just past the 2x boundary:
     //  the 16-column index deltas still fit the 32-lane permute.
     database.add<BlockKernelTest>(
         "AVX512_Down2", run_block128_down2_x64_AVX512,
-        88200, 44000, 16, 128, 0
+        88200, 44000, 16, 128, 1, 0
     );
     database.add<BlockKernelTest>(
         "AVX512_Down2", run_block128_down2_x64_AVX512,
-        88200, 44000, 16, 128, 150
+        88200, 44000, 16, 128, 1, 150
     );
     //  The block straddles the table period (441) into the continuing
     //  index columns.
     database.add<BlockKernelTest>(
         "AVX512_Down2", run_block128_down2_x64_AVX512,
-        88000, 44100, 16, 128, 350
+        88000, 44100, 16, 128, 1, 350
     );
 }
 
