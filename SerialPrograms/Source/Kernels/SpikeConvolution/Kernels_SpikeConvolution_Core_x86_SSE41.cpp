@@ -23,16 +23,13 @@ struct Context_x86_SSE41{
         return _mm_set1_ps(x);
     }
     static PA_FORCE_INLINE __m128 load_partial(const float* ptr, size_t length){
-        //  Stage through a zeroed local so that bytes before "ptr" are
-        //  never read: "in" may be exactly "lengthI" floats long and sit
-        //  on a page boundary, where a pre-read would cross into an
-        //  invalid page. (The AVX2/AVX512 contexts use masked loads,
-        //  which have the same property.)
-        float tmp[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-        for (size_t i = 0; i < length; i++){
-            tmp[i] = ptr[i];
-        }
-        return _mm_loadu_ps(tmp);
+        //  Use the page-aware generic load: it picks the side of the
+        //  16-byte window that stays inside the page of "ptr", so the
+        //  out-of-bounds bytes (zero-filled lanes only) never cross into
+        //  an invalid page. "ptr" always points inside "in", whose page
+        //  is therefore mapped on both sides.
+        PartialWordAccess_x64_SSE41 access(length * sizeof(float));
+        return _mm_castsi128_ps(access.load(ptr));
     }
     static PA_FORCE_INLINE void store_partial(float* ptr, __m128 x, size_t length){
         PartialWordAccess_x64_SSE41 access(length * sizeof(float));
