@@ -187,9 +187,8 @@ void add_tests_arm64_NEON(UnitTestDatabase& database){
         if (kTestSizes[i][0] < 4){
             continue;
         }
-        for (bool use_weights : { false, true }){
-            database.add<Test_arm64_NEON>(kTestSizes[i][0], kTestSizes[i][1], use_weights);
-        }
+        database.add<Test_arm64_NEON>(kTestSizes[i][0], kTestSizes[i][1], false);
+        database.add<Test_arm64_NEON>(kTestSizes[i][0], kTestSizes[i][1], true);
     }
 }
 
