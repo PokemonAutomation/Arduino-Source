@@ -30,17 +30,29 @@ jobs:
       - name: Set variables
         shell: bash
         run: |
-          if [[ "${{inputs.compiler}}" == "clang" ]]; then
-            if [[ "${{inputs.os}}" == windows* ]]; then
-              CMAKE_ADDITIONAL_FLAGS="-T ClangCL"
-            elif [[ "${{inputs.os}}" == ubuntu* ]]; then
-              CMAKE_ADDITIONAL_FLAGS="-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=RelWithDebInfo"
+          BUILD_PARALLEL=10
+          if [[ "${{inputs.os}}" == windows* ]]; then
+            # Build with Ninja: ccache can't wrap the compiler under the Visual Studio generator.
+            # "Ninja Multi-Config" keeps Visual Studio's output layout (bin/RelWithDebInfo/).
+            # ccache also can't cache /Zi (debug info written to a shared PDB) or /FAs listings,
+            # so embed the debug info in each object file with /Z7 (the linker still writes the
+            # PDB) and turn the listings off.
+            echo "CMAKE_GENERATOR=Ninja Multi-Config" >> $GITHUB_ENV
+            CMAKE_ADDITIONAL_FLAGS="-DCMAKE_POLICY_DEFAULT_CMP0141=NEW -DCMAKE_MSVC_DEBUG_INFORMATION_FORMAT=Embedded -DPA_ASSEMBLY_LISTINGS=OFF"
+            if [[ "${{inputs.compiler}}" == "clang" ]]; then
+              CMAKE_ADDITIONAL_FLAGS="$CMAKE_ADDITIONAL_FLAGS -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl"
+            else
+              CMAKE_ADDITIONAL_FLAGS="$CMAKE_ADDITIONAL_FLAGS -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl"
             fi
+            # Visual Studio ran about one compile per core (/MP). Keep Ninja near that instead of
+            # 10 at once, so memory use stays close to what the runner handled before.
+            BUILD_PARALLEL=$(( $(nproc) + 2 ))
+          elif [[ "${{inputs.compiler}}" == "clang" && "${{inputs.os}}" == ubuntu* ]]; then
+            CMAKE_ADDITIONAL_FLAGS="-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=RelWithDebInfo"
           fi
-          if [[ "${{inputs.os}}" != windows* ]]; then
-            CMAKE_ADDITIONAL_FLAGS="$CMAKE_ADDITIONAL_FLAGS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
-          fi
+          CMAKE_ADDITIONAL_FLAGS="$CMAKE_ADDITIONAL_FLAGS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
           echo "CMAKE_ADDITIONAL_FLAGS=$CMAKE_ADDITIONAL_FLAGS" >> $GITHUB_ENV
+          echo "BUILD_PARALLEL=$BUILD_PARALLEL" >> $GITHUB_ENV
 
           if [[ "${{inputs.os}}" == windows* ]]; then
             UPLOAD_FOLDER="Arduino-Source/SerialPrograms/bin/RelWithDebInfo"
@@ -125,16 +137,44 @@ jobs:
           # CMake quietly builds without Discord integration when it can't find DPP, so check here.
           pkg-config --exact-version=10.1.5 dpp
 
+      # Ninja needs the MSVC build environment (cl and link on PATH, INCLUDE, LIB, ...), which the
+      # Visual Studio generator set up by itself. Run vcvars64.bat from the newest Visual Studio,
+      # the one that generator used, and pass every variable it adds or changes to later steps.
+      - name: Set up MSVC environment (Windows)
+        if: startsWith(inputs.os, 'windows')
+        shell: pwsh
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          $vcvars = cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" >nul && set"
+          if ($LASTEXITCODE -ne 0) { throw "vcvars64.bat failed with exit code $LASTEXITCODE" }
+          foreach ($line in $vcvars) {
+            if ($line -notmatch '^([^=]+)=(.*)$') { continue }
+            $name = $Matches[1]
+            $value = $Matches[2]
+            if ($name -eq 'Path' -and '${{inputs.compiler}}' -eq 'clang') {
+              # Find Visual Studio's own clang-cl, the one its ClangCL toolset used, before any
+              # other LLVM install on the runner.
+              $value = "$vs\VC\Tools\Llvm\x64\bin;$value"
+            }
+            if ([Environment]::GetEnvironmentVariable($name) -ne $value) {
+              "$name=$value" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+              [Environment]::SetEnvironmentVariable($name, $value)
+            }
+          }
+          if (-not (Get-Command cl -ErrorAction SilentlyContinue)) { throw "cl.exe isn't on PATH after vcvars64.bat" }
+          Get-Command cl, link, clang-cl, ninja, cmake -ErrorAction SilentlyContinue | Format-Table Name, Version, Source -AutoSize
+
       # Keep compiler outputs between runs, so a build only recompiles what a change affects.
       # Only pushes to main save the cache: every PR restores main's latest one, and PR runs don't
       # fill the repo's 10 GB cache quota with entries that no other run can read.
-      # Not used on Windows: ccache can't cache MSVC builds that write debug info to a PDB (/Zi).
+      # max-size is only a cap: evict-old-files drops everything this build didn't use, so each
+      # saved cache is about one build's worth. Windows has the largest, since /Z7 puts the debug
+      # info in every object file.
       - name: Set up ccache
-        if: ${{!startsWith(inputs.os, 'windows')}}
         uses: hendrikmuhs/ccache-action@v1.2.24
         with:
           key: ${{inputs.os}}-${{inputs.compiler}}
-          max-size: 2G
+          max-size: 5G
           evict-old-files: job
           save: ${{github.ref == 'refs/heads/main'}}
 
@@ -144,7 +184,7 @@ jobs:
           mkdir bin
           cd bin
           cmake .. -DQT_MAJOR:STRING=6 ${{env.CMAKE_ADDITIONAL_FLAGS}}
-          cmake --build . --config RelWithDebInfo --parallel 10
+          cmake --build . --config RelWithDebInfo --parallel ${{env.BUILD_PARALLEL}}
 
       - name: Prepare upload build
         if: inputs.upload-build
