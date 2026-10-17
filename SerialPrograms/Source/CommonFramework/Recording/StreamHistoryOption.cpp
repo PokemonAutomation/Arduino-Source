@@ -110,10 +110,14 @@ StreamHistoryOption::StreamHistoryOption()
     PA_ADD_OPTION(HISTORY_SECONDS);
     PA_ADD_OPTION(RESOLUTION);
     PA_ADD_OPTION(VIDEO_FPS);
-    PA_ADD_OPTION(JPEG_QUALITY);
+
+#if defined(PA_STREAM_HISTORY_FFMPEG)
     // PA_ADD_OPTION(ENCODING_MODE);
-    // PA_ADD_OPTION(VIDEO_QUALITY);
+    PA_ADD_OPTION(VIDEO_QUALITY);
     // PA_ADD_OPTION(VIDEO_BITRATE);
+#else
+    PA_ADD_OPTION(JPEG_QUALITY);  // only used by StreamHistoryTracker_SaveFrames.
+#endif
 
     StreamHistoryOption::on_config_value_changed(this);
 
