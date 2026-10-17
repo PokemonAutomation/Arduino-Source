@@ -205,12 +205,18 @@ jobs:
             echo "https://github.com/${{github.repository_owner}}/Packages/commit/$(git -C Arduino-Source/Packages rev-parse HEAD)"
           } > ${{env.UPLOAD_FOLDER}}/version.txt
 
+      # Leave out files only the build itself uses: the static libraries (SerialProgramsLib.lib
+      # alone is over 2 GB with /Z7 debug info) and the incremental-link file (.ilk), which Ninja
+      # writes next to the exe.
       - name: Upload Build
         uses: actions/upload-artifact@v7
         if: inputs.upload-build
         with:
           name: Serial Programs (os=${{inputs.os}} - compiler=${{inputs.compiler}})
-          path: ${{env.UPLOAD_FOLDER}}
+          path: |
+            ${{env.UPLOAD_FOLDER}}
+            !${{env.UPLOAD_FOLDER}}/*.lib
+            !${{env.UPLOAD_FOLDER}}/*.ilk
 
       - name: Upload Executable Only
         uses: actions/upload-artifact@v7
