@@ -1,5 +1,9 @@
 name: Check for Tabs
-on: [push, pull_request]
+# Pushes to other branches are checked by their pull requests.
+on:
+  push:
+    branches: [main]
+  pull_request:
 
 jobs:
   no-tabs:

@@ -30,14 +30,29 @@ jobs:
       - name: Set variables
         shell: bash
         run: |
-          if [[ "${{inputs.compiler}}" == "clang" ]]; then
-            if [[ "${{inputs.os}}" == windows* ]]; then
-              CMAKE_ADDITIONAL_FLAGS="-T ClangCL"
-            elif [[ "${{inputs.os}}" == ubuntu* ]]; then
-              CMAKE_ADDITIONAL_FLAGS="-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=RelWithDebInfo"
+          BUILD_PARALLEL=10
+          if [[ "${{inputs.os}}" == windows* ]]; then
+            # Build with Ninja: ccache can't wrap the compiler under the Visual Studio generator.
+            # "Ninja Multi-Config" keeps Visual Studio's output layout (bin/RelWithDebInfo/).
+            # ccache also can't cache /Zi (debug info written to a shared PDB) or /FAs listings,
+            # so embed the debug info in each object file with /Z7 (the linker still writes the
+            # PDB) and turn the listings off.
+            echo "CMAKE_GENERATOR=Ninja Multi-Config" >> $GITHUB_ENV
+            CMAKE_ADDITIONAL_FLAGS="-DCMAKE_POLICY_DEFAULT_CMP0141=NEW -DCMAKE_MSVC_DEBUG_INFORMATION_FORMAT=Embedded -DPA_ASSEMBLY_LISTINGS=OFF"
+            if [[ "${{inputs.compiler}}" == "clang" ]]; then
+              CMAKE_ADDITIONAL_FLAGS="$CMAKE_ADDITIONAL_FLAGS -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl"
+            else
+              CMAKE_ADDITIONAL_FLAGS="$CMAKE_ADDITIONAL_FLAGS -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl"
             fi
+            # Visual Studio ran about one compile per core (/MP). Keep Ninja near that instead of
+            # 10 at once, so memory use stays close to what the runner handled before.
+            BUILD_PARALLEL=$(( $(nproc) + 2 ))
+          elif [[ "${{inputs.compiler}}" == "clang" && "${{inputs.os}}" == ubuntu* ]]; then
+            CMAKE_ADDITIONAL_FLAGS="-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=RelWithDebInfo"
           fi
+          CMAKE_ADDITIONAL_FLAGS="$CMAKE_ADDITIONAL_FLAGS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
           echo "CMAKE_ADDITIONAL_FLAGS=$CMAKE_ADDITIONAL_FLAGS" >> $GITHUB_ENV
+          echo "BUILD_PARALLEL=$BUILD_PARALLEL" >> $GITHUB_ENV
 
           if [[ "${{inputs.os}}" == windows* ]]; then
             UPLOAD_FOLDER="Arduino-Source/SerialPrograms/bin/RelWithDebInfo"
@@ -71,13 +86,14 @@ jobs:
           aqtsource: 'git+https://github.com/miurahr/aqtinstall'
           version: '6.10.2'
           modules: 'qtmultimedia qtserialport'
+          cache: true
 
       - name: Install dependencies (Ubuntu)
         if: startsWith(inputs.os, 'ubuntu')
         run: |
           cd Arduino-Source
           sudo apt update
-          sudo apt install clang-tools libopencv-dev libsystemd-dev
+          sudo apt install ccache clang-tools libopencv-dev libsystemd-dev
 
           sudo apt install ./3rdPartyBinaries/libdpp-10.1.5-linux-x64.deb
 
@@ -85,22 +101,100 @@ jobs:
         if: startsWith(inputs.os, 'mac')
         run: |
           cd Arduino-Source
-          brew install opencv@4 onnxruntime
+          # libsodium, openssl@3, opus and pkgconf are libdpp's dependencies, installed here so
+          # their versions can go into the libdpp cache key below.
+          brew install opencv@4 onnxruntime ccache libsodium openssl@3 opus pkgconf
 
           brew tap-new --no-git PA/libdpp
           brew trust PA/libdpp
           FORMULA_DIR="$(brew --repo PA/libdpp)/Formula"
           mkdir -p "$FORMULA_DIR"
           cp 3rdPartyBinaries/libdpp@10.1.5.rb "$FORMULA_DIR/"
-          brew install libdpp@10.1.5
+
+          echo "LIBDPP_KEG=$(brew --cellar)/libdpp@10.1.5" >> $GITHUB_ENV
+          echo "LIBDPP_DEPS_HASH=$(brew list --versions libsodium openssl@3 opus | shasum | cut -c1-16)" >> $GITHUB_ENV
+
+      # Homebrew has no prebuilt bottle for our pinned libdpp formula, so `brew install` compiles
+      # DPP from source: about 4 minutes on Apple Silicon and 13 on Intel. Cache the installed keg
+      # instead. The key includes the versions of the libraries libdpp links against, so when
+      # Homebrew updates one of them, libdpp is rebuilt against it rather than restored.
+      - name: Cache libdpp (Mac)
+        id: libdpp-cache
+        if: startsWith(inputs.os, 'mac')
+        uses: actions/cache@v6
+        with:
+          path: ${{env.LIBDPP_KEG}}
+          key: libdpp-${{inputs.os}}-${{hashFiles('Arduino-Source/3rdPartyBinaries/libdpp@10.1.5.rb')}}-${{env.LIBDPP_DEPS_HASH}}
+
+      - name: Install libdpp (Mac)
+        if: startsWith(inputs.os, 'mac')
+        run: |
+          if [[ "${{steps.libdpp-cache.outputs.cache-hit}}" == "true" ]]; then
+            brew link libdpp@10.1.5
+          else
+            brew install libdpp@10.1.5
+          fi
+          # CMake quietly builds without Discord integration when it can't find DPP, so check here.
+          pkg-config --exact-version=10.1.5 dpp
+
+      # Ninja needs the MSVC build environment (cl and link on PATH, INCLUDE, LIB, ...), which the
+      # Visual Studio generator set up by itself. Run vcvars64.bat from the newest Visual Studio,
+      # the one that generator used, and pass every variable it adds or changes to later steps.
+      - name: Set up MSVC environment (Windows)
+        if: startsWith(inputs.os, 'windows')
+        shell: pwsh
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          $vcvars = cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" >nul && set"
+          if ($LASTEXITCODE -ne 0) { throw "vcvars64.bat failed with exit code $LASTEXITCODE" }
+          foreach ($line in $vcvars) {
+            if ($line -notmatch '^([^=]+)=(.*)$') { continue }
+            $name = $Matches[1]
+            $value = $Matches[2]
+            if ($name -eq 'Path' -and '${{inputs.compiler}}' -eq 'clang') {
+              # Find Visual Studio's own clang-cl, the one its ClangCL toolset used, before any
+              # other LLVM install on the runner.
+              $value = "$vs\VC\Tools\Llvm\x64\bin;$value"
+            }
+            if ([Environment]::GetEnvironmentVariable($name) -ne $value) {
+              "$name=$value" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+              [Environment]::SetEnvironmentVariable($name, $value)
+            }
+          }
+          if (-not (Get-Command cl -ErrorAction SilentlyContinue)) { throw "cl.exe isn't on PATH after vcvars64.bat" }
+          Get-Command cl, link, clang-cl, ninja, cmake -ErrorAction SilentlyContinue | Format-Table Name, Version, Source -AutoSize
+
+      # Keep compiler outputs between runs, so a build only recompiles what a change affects.
+      # Only pushes to main save the cache: every PR restores main's latest one, and PR runs don't
+      # fill the repo's 10 GB cache quota with entries that no other run can read.
+      # max-size is only a cap: evict-old-files drops everything this build didn't use, so each
+      # saved cache is about one build's worth. Windows has the largest, since /Z7 puts the debug
+      # info in every object file.
+      # On Windows, install the action's own ccache: the runner's Strawberry Perl puts an older
+      # ccache (4.9.1) on PATH, which the default install: detect would use instead.
+      - name: Set up ccache
+        uses: hendrikmuhs/ccache-action@v1.2.24
+        with:
+          key: ${{inputs.os}}-${{inputs.compiler}}
+          max-size: 5G
+          evict-old-files: job
+          save: ${{github.ref == 'refs/heads/main'}}
+          install: ${{startsWith(inputs.os, 'windows') && 'binary' || 'detect'}}
 
       - name: Generate binaries
+        env:
+          # Depend mode: on a cache miss, ccache hashes the include files the compiler reports
+          # (-MD or /showIncludes) instead of running the preprocessor a second time, which the
+          # ccache manual says makes a miss much cheaper. In the first runs with ccache, where
+          # every file missed, compiling took 10-40% longer than before on Linux and macOS, and
+          # about twice as long on Windows.
+          CCACHE_DEPEND: 1
         run: |
           cd Arduino-Source/SerialPrograms
           mkdir bin
           cd bin
           cmake .. -DQT_MAJOR:STRING=6 ${{env.CMAKE_ADDITIONAL_FLAGS}}
-          cmake --build . --config RelWithDebInfo --parallel 10
+          cmake --build . --config RelWithDebInfo --parallel ${{env.BUILD_PARALLEL}}
 
       - name: Prepare upload build
         if: inputs.upload-build
@@ -111,12 +205,18 @@ jobs:
             echo "https://github.com/${{github.repository_owner}}/Packages/commit/$(git -C Arduino-Source/Packages rev-parse HEAD)"
           } > ${{env.UPLOAD_FOLDER}}/version.txt
 
+      # Leave out files only the build itself uses: the static libraries (SerialProgramsLib.lib
+      # alone is over 2 GB with /Z7 debug info) and the incremental-link file (.ilk), which Ninja
+      # writes next to the exe.
       - name: Upload Build
         uses: actions/upload-artifact@v7
         if: inputs.upload-build
         with:
           name: Serial Programs (os=${{inputs.os}} - compiler=${{inputs.compiler}})
-          path: ${{env.UPLOAD_FOLDER}}
+          path: |
+            ${{env.UPLOAD_FOLDER}}
+            !${{env.UPLOAD_FOLDER}}/*.lib
+            !${{env.UPLOAD_FOLDER}}/*.ilk
 
       - name: Upload Executable Only
         uses: actions/upload-artifact@v7
@@ -192,11 +292,25 @@ jobs:
           )
           EOF
 
-          files=$(jq -r '.[].file' SerialPrograms/bin/compile_commands.json)
-          echo "$files" | xargs --max-args=100 clang-query -p SerialPrograms/bin/ -f query.txt >> clang-query-output.txt
+          # Run one batch of files per core. clang-query parses every file it's given before
+          # matching and keeps all those ASTs in memory, so keep batches small. Each batch writes
+          # its own file so the output of batches running at the same time can't interleave.
+          # A file compiled into more than one target has one entry per target, and clang-query
+          # already checks every entry of each file it's given, so list each file only once.
+          mkdir clang-query-batches
+          status=0
+          jq -r '.[].file' SerialPrograms/bin/compile_commands.json | sort -u |
+            xargs --delimiter='\n' --max-args=10 --max-procs="$(nproc)" \
+              sh -c 'clang-query -p SerialPrograms/bin/ -f query.txt "$@" > "$(mktemp clang-query-batches/XXXXXX)"' sh ||
+            status=$?
+          cat clang-query-batches/* > clang-query-output.txt
           echo "Clang query output (begin)"
           cat clang-query-output.txt
           echo "Clang query output (end)"
+          if [[ $status -ne 0 ]]; then
+            echo "::error::clang-query failed on some files (xargs exit code $status). See the output above."
+            exit 1
+          fi
           if grep --silent "Match #" clang-query-output.txt; then
             echo "::error Forbidden code detected! It can be one of the following:"
             echo "::error - std::filesystem::path created from std::string. More information https://discord.com/channels/695809740428673034/1462210406616531259/1462567541825339635"

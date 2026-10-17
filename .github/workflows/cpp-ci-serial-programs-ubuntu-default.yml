@@ -19,5 +19,7 @@ jobs:
     with:
       os: ubuntu-26.04
       compiler: default
+      # clang-query checks the source, not the compiled code, so it only needs to run in one
+      # job. This is the fastest Linux build (GCC with no optimization).
       run-clang-query: true
       run-tests: true
