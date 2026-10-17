@@ -30,7 +30,6 @@ extern "C" {
 #include <libavutil/error.h>
 #include <libavutil/version.h>
 #include <libavutil/log.h>
-#include <libavutil/opt.h>
 #include <libavutil/pixdesc.h>
 #include <libavutil/rational.h>
 #include <libswresample/swresample.h>
