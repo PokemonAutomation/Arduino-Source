@@ -63,7 +63,7 @@ private:
     //  Input samples a block starting at wrapped index wr needs, including
     //  the kernel's reads past the last window. The kernel's implied input
     //  overshoot is sample_block - 1 samples past the last window's start.
-    size_t need(size_t wr) const;
+    size_t input_samples_needed(size_t wr) const;
 
     //  Emit one block over per-channel input bases and advance the
     //  per-push stream progress (out / wr / periods / cursor / out_off).
@@ -80,27 +80,34 @@ private:
 private:
     const size_t m_out_rate;
     const uint32_t m_taps;
+
     //  The dispatched block kernel.
     const BlockKernel m_block;
+
     //  The weight table, built from the block's sizes; it extends its
     //  allocations for the kernel's implied overshoots.
     WeightTable m_table;
+
+    //  Input samples per extended period (m_table.period_in() times the
+    //  period extension).
+    const size_t m_period_in_extended;
+
     //  Extended output period: the smallest multiple of the table's period
     //  that is >= sample_block, so a block wraps it at most once and
     //  advancing the wrapped index is a compare-and-subtract, not a
     //  modulo.
-    const size_t m_period_prime;
-    //  Input samples per extended period (m_table.period_in() times the
-    //  period extension).
-    const size_t m_period_in_prime;
+    const size_t m_period_out_extended;
+
     //  Floats per channel in m_buffer. At least the requested buffer size,
     //  rounded up so a block never straddles the channel boundary.
     const size_t m_buffer_stride;
     AlignedVector<float> m_buffer;
     size_t m_carry_capacity = 0;
+
     //  Per-channel buffers for the input samples that don't line up with a
     //  kernel block. The carry always starts at the next window's start.
     std::vector<AlignedVector<float>> m_carry;
+
     //  The largest multiple of the block size that fits in the buffer.
     const size_t m_flush_at;
 

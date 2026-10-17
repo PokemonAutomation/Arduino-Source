@@ -35,8 +35,8 @@ AudioResampler::AudioResampler(
         in_sample_rate, out_sample_rate, taps, beta,
         m_block.sample_block, m_block.tap_block
     )
-    , m_period_prime(m_table.period_prime())
-    , m_period_in_prime(m_table.period_in() * (m_period_prime / m_table.period_out()))
+    , m_period_in_extended(m_table.period_in() * (m_table.period_out_extended() / m_table.period_out()))
+    , m_period_out_extended(m_table.period_out_extended())
     , m_buffer_stride(std::max(buffer_size, m_block.sample_block))
     , m_buffer(channels * m_buffer_stride)
     , m_flush_at((buffer_size / m_block.sample_block) * m_block.sample_block)
@@ -56,15 +56,15 @@ AudioResampler::AudioResampler(
 
 
     //  Size the carry buffers. push_samples() never stages more than
-    //  need(wr) input samples for the block at wrapped index wr - both the
-    //  loop gate and the tail save bound against it - and need() already
-    //  includes the kernel's implied read overshoots, so the max over all
-    //  positions is an exact worst case and needs no slack.
-    size_t max_need = 0;
+    //  input_samples_needed(wr) input samples for the block at wrapped index wr
+    //  - both the loop gate and the tail save bound against it - and need()
+    //  already includes the kernel's implied read overshoots, so the max over
+    //  all positions is an exact worst case and needs no slack.
+    size_t max_input_samples_needed = 0;
     for (size_t wr = 0; wr < m_table.period_out(); wr++){
-        max_need = std::max(max_need, need(wr));
+        max_input_samples_needed = std::max(max_input_samples_needed, input_samples_needed(wr));
     }
-    m_carry_capacity = max_need;
+    m_carry_capacity = max_input_samples_needed;
     m_carry.reserve(channels);
     for (size_t c = 0; c < channels; c++){
         m_carry.emplace_back(m_carry_capacity);
@@ -94,7 +94,7 @@ void AudioResampler::flush(size_t count){
     );
 }
 
-size_t AudioResampler::need(size_t wr) const{
+size_t AudioResampler::input_samples_needed(size_t wr) const{
     const uint32_t* index = m_table.in_sample_index();
     const size_t block = m_block.sample_block;
     //  taps_allocated() bounds the kernel's input reads: the unrolls'
@@ -125,9 +125,9 @@ size_t AudioResampler::emit_block(
     size_t consumed = index[wr + block] - index[wr];
     out += block;
     wr += block;
-    //  block <= m_period_prime, so this wraps at most once.
-    if (wr >= m_period_prime){
-        wr -= m_period_prime;
+    //  block <= m_period_out_extended, so this wraps at most once.
+    if (wr >= m_period_out_extended){
+        wr -= m_period_out_extended;
         periods += 1;
     }
     cursor += consumed;
@@ -140,18 +140,18 @@ void AudioResampler::push_samples(size_t samples, size_t stride, const float* da
     }
 
     const uint32_t* index = m_table.in_sample_index();
-    const size_t period_prime = m_period_prime;
+    const size_t period_out_extended = m_period_out_extended;
     const size_t block = m_block.sample_block;
     const size_t channels = this->channels();
 
     //  The per-push division and modulo are amortized over the whole
     //  chunk; the per-block progress below uses neither.
     size_t out_index = m_out_index;
-    size_t wr = out_index % period_prime;
-    size_t periods = out_index / period_prime;
+    size_t wr = out_index % period_out_extended;
+    size_t periods = out_index / period_out_extended;
 
     //  Absolute input position of the next output's window start.
-    size_t cursor = index[wr] + periods * m_period_in_prime;
+    size_t cursor = index[wr] + periods * m_period_in_extended;
     const size_t pushed_end = m_in_index + samples;
 
     //  When downsampling by a lot the cursor jumps past the pushed data.
@@ -206,7 +206,7 @@ void AudioResampler::push_samples(size_t samples, size_t stride, const float* da
     };
 
     while (out_index - m_out_index < out_limit){
-        const size_t need_w = need(wr);
+        const size_t need_w = input_samples_needed(wr);
 
         //  Not enough input to complete the next block.
         if ((ptrdiff_t)carry + (ptrdiff_t)n < (ptrdiff_t)need_w){
@@ -222,7 +222,7 @@ void AudioResampler::push_samples(size_t samples, size_t stride, const float* da
             //  downsampling), so only advance as far as the data allows;
             //  the reconciliation below drops whatever is now in the past.
             //  Rewind the data base to the extended-period origin.
-            const size_t rewind = in_index - periods * m_period_in_prime;
+            const size_t rewind = in_index - periods * m_period_in_extended;
             const size_t consumed = emit_block(
                 rewind,
                 [&](size_t c){
