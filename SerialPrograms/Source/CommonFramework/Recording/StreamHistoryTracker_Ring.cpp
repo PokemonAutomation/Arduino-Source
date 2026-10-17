@@ -1319,7 +1319,14 @@ struct StreamHistoryTracker_Ring::Impl{
                 avformat_free_context(format);
                 return false;
             }
-            video_stream->time_base = vtb;
+            //  Matroska's write_header() rewrites every stream timebase to 1/1000
+            //  (its native TimestampScale is milliseconds) but leaves the packet
+            //  timestamps submitted by the caller untouched, so .mkv packets must
+            //  be stamped in milliseconds. The MP4 muxer rescales from the stream
+            //  timebase itself, so the encoder's own timebase is kept there.
+            video_stream->time_base = (std::string(muxer) == "matroska")
+                ? av_make_q(1, 1000)
+                : vtb;
         }
         if (have_audio_stream){
             audio_stream = avformat_new_stream(format, nullptr);
@@ -1332,7 +1339,11 @@ struct StreamHistoryTracker_Ring::Impl{
                 avformat_free_context(format);
                 return false;
             }
-            audio_stream->time_base = av_make_q(1, AUDIO_OUTPUT_RATE);
+            //  Same as above: Matroska needs millisecond timestamps, while MP4
+            //  handles the native 1/48000 (sample count) timebase just fine.
+            audio_stream->time_base = (std::string(muxer) == "matroska")
+                ? av_make_q(1, 1000)
+                : av_make_q(1, AUDIO_OUTPUT_RATE);
         }
         avcodec_parameters_free(&vpar);
         avcodec_parameters_free(&apar);
@@ -1375,27 +1386,53 @@ struct StreamHistoryTracker_Ring::Impl{
         if (packet == nullptr){
             ok = false;
         }else{
-            if (have_video){
-                //  When the ring holds Annex B H.264 (the h264_amf wrapper),
-                //  each packet is rewritten with 4-byte NAL length prefixes;
-                //  the converted buffer must outlive the write call.
-                std::vector<uint8_t> converted_data;
-                //  The MP4 muxer requires strictly increasing dts per stream, but the
-                //  ring packets are stamped with the wall-clock time of the frame they
-                //  were drained from, and a hardware encoder can emit several packets
-                //  for one frame (or flush two or more at once), so consecutive
-                //  packets can share a timestamp. Bump a non-increasing dts to
-                //  last+1 (1 ms at the 1/1000 video timebase) instead of failing the
-                //  whole save.
-                int64_t last_video_dts = -1;
-                for (size_t i = p_video_start; i < p_video.size() && ok; i++){
-                    const VideoRingPacket& vp = *p_video[i];
-                    if (vp.data.empty()){
-                        continue;    //  Nothing to write.
-                    }
-                    int64_t us = std::chrono::duration_cast<std::chrono::microseconds>(
-                        vp.timestamp - start_ts
+            //  When the ring holds Annex B H.264 (the h264_amf wrapper),
+            //  each packet is rewritten with 4-byte NAL length prefixes;
+            //  the converted buffer must outlive the write call.
+            std::vector<uint8_t> converted_data;
+            //  The muxers require strictly increasing dts per stream, but the
+            //  ring packets are stamped with the wall-clock time of the frame they
+            //  were drained from, and a hardware encoder can emit several packets
+            //  for one frame (or flush two or more at once), so consecutive
+            //  packets can share a timestamp. Bump a non-increasing dts to
+            //  last+1 (1 ms at the timebases used here) instead of failing the
+            //  whole save.
+            int64_t last_video_dts = -1;
+            int64_t last_audio_dts = -1;
+            int64_t audio_base_samples =
+                have_audio_stream ? p_audio[p_audio_start]->first_sample : 0;
+            size_t vi = p_video_start;
+            size_t ai = p_audio_start;
+            //  Submit the packets in timestamp order, alternating between the two
+            //  streams. Writing one whole stream before the other would lay the
+            //  Matroska clusters out of time order (all of the audio after all of
+            //  the video), which breaks sequential players.
+            for (;;){
+                while (have_video && vi < p_video.size() && p_video[vi]->data.empty()){
+                    vi++;    //  Nothing to write.
+                }
+                while (have_audio_stream && ai < p_audio.size() && p_audio[ai]->data.empty()){
+                    ai++;
+                }
+                bool have_next_video = (have_video && vi < p_video.size());
+                bool have_next_audio = (have_audio_stream && ai < p_audio.size());
+                if (!have_next_video && !have_next_audio){
+                    break;
+                }
+                //  Both timestamps in microseconds (the common comparison unit).
+                int64_t video_us = INT64_MAX;
+                int64_t audio_us = INT64_MAX;
+                if (have_next_video){
+                    video_us = std::chrono::duration_cast<std::chrono::microseconds>(
+                        p_video[vi]->timestamp - start_ts
                     ).count();
+                }
+                if (have_next_audio){
+                    audio_us = (p_audio[ai]->first_sample - audio_base_samples)
+                        * 1000000 / (int64_t)AUDIO_OUTPUT_RATE;
+                }
+                if (have_next_video && video_us <= audio_us){
+                    const VideoRingPacket& vp = *p_video[vi];
                     if (video_annexb){
                         if (!h264_annexb_to_avcc(vp.data.data(), vp.data.size(), converted_data)){
                             logger.log("Stream history: Failed to convert a video packet from Annex B to AVCC.", COLOR_RED);
@@ -1410,10 +1447,10 @@ struct StreamHistoryTracker_Ring::Impl{
                         packet->size = (int)vp.data.size();
                     }
                     packet->stream_index = video_stream->index;
-                    //  `us` counts microseconds (a 1/1000000 timebase); convert to
-                    //  the stream timebase, keeping the dts strictly increasing
-                    //  (see the note above the loop).
-                    int64_t dts = av_rescale_q(us, av_make_q(1, 1000000), video_stream->time_base);
+                    //  `video_us` counts microseconds (a 1/1000000 timebase);
+                    //  convert to the stream timebase, keeping the dts strictly
+                    //  increasing (see the note above the loop).
+                    int64_t dts = av_rescale_q(video_us, av_make_q(1, 1000000), video_stream->time_base);
                     if (dts <= last_video_dts){
                         dts = last_video_dts + 1;
                     }
@@ -1424,24 +1461,36 @@ struct StreamHistoryTracker_Ring::Impl{
                     if (av_interleaved_write_frame(format, packet) < 0){
                         logger.log("Stream history: Failed writing video data.", COLOR_RED);
                         ok = false;
+                        break;
                     }
-                }
-            }
-            if (have_audio_stream){
-                int64_t base_samples = p_audio[p_audio_start]->first_sample;
-                for (size_t i = p_audio_start; i < p_audio.size() && ok; i++){
-                    const AudioRingPacket& ap = *p_audio[i];
+                    vi++;
+                }else{
+                    const AudioRingPacket& ap = *p_audio[ai];
                     //  The muxer only reads the packet data.
                     packet->data = const_cast<uint8_t*>(ap.data.data());
                     packet->size = (int)ap.data.size();
                     packet->stream_index = audio_stream->index;
-                    packet->pts = ap.first_sample - base_samples;
-                    packet->dts = packet->pts;
+                    //  Sample counts use the 1/48000 timebase; rescale to the
+                    //  stream timebase (1/48000 for MP4, 1/1000 for MKV),
+                    //  keeping the dts strictly increasing.
+                    int64_t dts = av_rescale_q(
+                        ap.first_sample - audio_base_samples,
+                        av_make_q(1, AUDIO_OUTPUT_RATE),
+                        audio_stream->time_base
+                    );
+                    if (dts <= last_audio_dts){
+                        dts = last_audio_dts + 1;
+                    }
+                    last_audio_dts = dts;
+                    packet->pts = dts;
+                    packet->dts = dts;
                     packet->flags = 0;
                     if (av_interleaved_write_frame(format, packet) < 0){
                         logger.log("Stream history: Failed writing audio data.", COLOR_RED);
                         ok = false;
+                        break;
                     }
+                    ai++;
                 }
             }
             av_packet_free(&packet);
