@@ -8,6 +8,7 @@
 #include <bit>
 #include <cmath>
 #include <cstdint>
+#include <cstring>
 #include <numeric>
 #include <random>
 #include "Common/Cpp/CpuId/CpuId.h"
@@ -15,6 +16,7 @@
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels_AudioResampler_BlockKernels.h"
 #include "Kernels_AudioResampler_Tests.h"
+#include "Kernels_AudioResampler.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -96,6 +98,133 @@ bool within_ulp_tolerance(float got, float want, int64_t& ulp_diff){
     const float scale = std::max(std::max(std::fabs(got), std::fabs(want)), 1.0f);
     const float ulp = std::nextafterf(scale, INFINITY) - scale;
     return std::fabs(got - want) <= 32.0f * ulp;
+}
+
+
+class RecordingWorkingAudioListener : public AudioPipeline::WorkingAudioStreamListener{
+public:
+    RecordingWorkingAudioListener(size_t sample_rate, size_t channels, size_t capacity)
+        : AudioPipeline::WorkingAudioStreamListener(sample_rate, channels)
+        , m_capacity(capacity)
+        , m_data(capacity * channels)
+    {}
+
+    virtual void push_samples(size_t samples, size_t stride, const float* data) override{
+        for (size_t c = 0; c < channels(); c++){
+            memcpy(
+                m_data.data() + c * m_capacity + m_write,
+                data + c * stride,
+                samples * sizeof(float)
+            );
+        }
+        m_write += samples;
+    }
+
+    const AlignedVector<float>& data() const{
+        return m_data;
+    }
+    size_t written() const{
+        return m_write;
+    }
+    size_t capacity_per_channel() const{
+        return m_capacity;
+    }
+
+
+private:
+    const size_t m_capacity;
+    AlignedVector<float> m_data;
+    size_t m_write = 0;
+};
+
+
+
+UnitTestResult run_resampler_stream(
+    size_t in_rate, size_t out_rate, size_t channels,
+    size_t samples, size_t push, uint32_t taps, double beta
+){
+    //  Generate random input.
+    AlignedVector<float> input(samples * channels);
+    std::mt19937 generator(42);
+    std::uniform_real_distribution<float> distribution(-1.f, 1.f);
+    for (size_t c = 0; c < input.size(); c++){
+        input[c] = distribution(generator);
+    }
+
+    //  Small output buffer so a single push flushes multiple times.
+    AudioResampler resampler(in_rate, out_rate, channels, 512, taps, beta);
+    size_t capacity = samples * out_rate / in_rate + 4096;
+    RecordingWorkingAudioListener output(out_rate, channels, capacity);
+    resampler.add_listener(output);
+
+    //  Push the input in chunks. The input is channel-planar: channel c is
+    //  the block [c * samples, (c + 1) * samples).
+    size_t offset = 0;
+    while (offset < samples){
+        size_t chunk = std::min(push, samples - offset);
+        resampler.push_samples(chunk, samples, input.data() + offset);
+        offset += chunk;
+    }
+
+    const size_t got = output.written();
+    if (got == 0){
+        return "No output produced.";
+    }
+
+    //  Reference: out_c[o] = sum_t weight[t][o] x in_c[round(o * in/out) + t].
+    //  The reference only reads index/weight columns 0..got - 1, so the
+    //  block size is got itself and the tap group 1.
+    WeightTable reference(in_rate, out_rate, taps, beta, got, 1);
+    const uint32_t* ref_index = reference.in_sample_index();
+
+    //  How many outputs should have been produced? The resampler may be
+    //  holding back the unprocessed input tail: at most the next block's
+    //  window span plus its taps plus the kernel's read overshoot
+    //  (block - 1) input samples, scaled to the output rate. The span
+    //  grows with the dispatched block size (up to 128 samples on the
+    //  wide permute kernels), so bound it exactly from the table.
+    const size_t block = resampler.block_size();
+    size_t max_span = 0;
+    for (size_t wr = 0; wr < reference.period_out(); wr++){
+        max_span = std::max(max_span, (size_t)(ref_index[wr + block - 1] - ref_index[wr]));
+    }
+    const double expected = (double)samples * out_rate / in_rate;
+    const double tail = ((double)max_span + taps + block) * out_rate / in_rate + 32.0;
+    if ((double)got > expected + 2.0){
+        return "Produced " + std::to_string(got) + " outputs, expected at most " +
+            std::to_string((size_t)expected) + ".";
+    }
+    if ((double)got < expected - tail){
+        return "Produced only " + std::to_string(got) + " outputs, expected at least " +
+            std::to_string((size_t)(expected - tail)) + ".";
+    }
+
+    double max_diff = 0;
+    size_t first_bad = 0;
+    for (size_t o = 0; o < got; o++){
+        const uint32_t in_base = ref_index[o];
+        for (size_t c = 0; c < channels; c++){
+            const float* in = input.data() + c * samples;
+            float acc = 0;
+            for (uint32_t t = 0; t < taps; t++){
+                acc += reference.tap_start(t)[o] * in[in_base + t];
+            }
+            float diff = output.data()[c * capacity + o] - acc;
+            if (diff < 0){
+                diff = -diff;
+            }
+            if (diff > max_diff){
+                max_diff = diff;
+                first_bad = o * channels + c;
+            }
+        }
+    }
+    if (max_diff > 1e-5f){
+        return "Max diff " + std::to_string(max_diff) + " at output " +
+            std::to_string(first_bad) + ".";
+    }
+
+    return true;
 }
 
 
@@ -243,7 +372,77 @@ UnitTestResult BlockDispatchTest::run(Logger& logger, CancellableScope& scope) c
 
 
 
+ResamplerStreamTest::ResamplerStreamTest(
+    size_t in_sample_rate,
+    size_t out_sample_rate,
+    size_t channels,
+    size_t samples,
+    size_t push_size,
+    uint32_t taps,
+    double beta
+)
+    : UnitTest(
+        "Kernels::AudioResampler - Stream(" +
+        std::to_string(in_sample_rate) + "->" + std::to_string(out_sample_rate) +
+        ", " + std::to_string(channels) + "ch, " + std::to_string(samples) +
+        " samples, " + std::to_string(push_size) + " push, " +
+        std::to_string(taps) + " taps, beta " + std::to_string((int)beta) + ")"
+    )
+    , m_in_rate(in_sample_rate)
+    , m_out_rate(out_sample_rate)
+    , m_channels(channels)
+    , m_samples(samples)
+    , m_push(push_size)
+    , m_taps(taps)
+    , m_beta(beta)
+{}
+UnitTestResult ResamplerStreamTest::run(Logger& logger, CancellableScope& scope) const{
+    return run_resampler_stream(
+        m_in_rate, m_out_rate, m_channels,
+        m_samples, m_push, m_taps, m_beta
+    );
+}
+
+
+
 void add_tests(UnitTestDatabase& database){
+    struct Combo{
+        size_t in_rate;
+        size_t out_rate;
+        size_t channels;
+        size_t samples;
+        size_t push;
+        uint32_t taps;
+        double beta;
+    };
+    //  1:1, upsample, downsample, strong downsampling and irrational
+    //  ratios, with chunk sizes that stress the carry buffer on either
+    //  side of the block size. The strong-downsampling combos stress the
+    //  case where a block's window-start span exceeds the staged input.
+    const Combo combos[] = {
+        { 44100, 44100, 1, 4000, 100, 16, 9.0 },
+        { 44100, 44100, 2, 4000, 250, 16, 9.0 },
+        { 44100, 48000, 1, 4000, 100, 16, 9.0 },
+        { 48000, 44100, 1, 4000, 250, 16, 9.0 },
+        { 44100, 88200, 2, 4000, 4096, 16, 9.0 },
+        { 88200, 44100, 2, 4000, 4096, 16, 9.0 },
+        { 32000, 44100, 1, 4000, 7, 16, 5.0 },
+        { 44100, 22050, 8, 4000, 250, 8, 9.0 },
+        { 8000, 44100, 1, 4000, 100, 8, 9.0 },
+        { 90000, 20000, 1, 4000, 250, 4, 9.0 },
+        { 128000, 8000, 1, 4000, 250, 8, 9.0 },
+        //  Odd tap count: on the unrolling kernels the final partial
+        //  group reads the zero-padded tap row's input samples, which is
+        //  what taps_allocated() in need() accounts for.
+        { 44100, 22050, 1, 4000, 250, 3, 9.0 },
+    };
+    for (auto& combo : combos){
+        database.add<ResamplerStreamTest>(
+            combo.in_rate, combo.out_rate, combo.channels,
+            combo.samples, combo.push, combo.taps, combo.beta
+        );
+    }
+
     //  Dispatch choices across rate ratios, with a spread of tap counts
     //  for the table itself. Odd tap counts exercise the unrolls' final
     //  partial group reading the table's zero padded rows.

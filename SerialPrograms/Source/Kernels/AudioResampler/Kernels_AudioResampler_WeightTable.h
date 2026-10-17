@@ -50,8 +50,8 @@ public:
 
     //  The extended output period: the smallest multiple of period_out()
     //  that is >= the sample block, so a block wraps it at most once.
-    size_t period_prime() const{
-        return m_period_prime;
+    size_t period_out_extended() const{
+        return m_period_out_extended;
     }
 
     //  Tap rows in the table (the requested taps, zero-padded for the
@@ -88,7 +88,7 @@ private:
     size_t m_taps;
     size_t m_period_in;
     size_t m_period_out;
-    size_t m_period_prime;
+    size_t m_period_out_extended;
     size_t m_taps_allocated;
     size_t m_samples_allocated;
     size_t m_tap_stride;

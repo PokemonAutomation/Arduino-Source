@@ -50,9 +50,9 @@ WeightTable::WeightTable(
 
     //  The smallest multiple of the period that is >= sample_block, so a
     //  block wraps it at most once.
-    m_period_prime = (sample_block + m_period_out - 1) / m_period_out * m_period_out;
+    m_period_out_extended = (sample_block + m_period_out - 1) / m_period_out * m_period_out;
 
-    m_samples_allocated = m_period_prime + sample_block;
+    m_samples_allocated = m_period_out_extended + sample_block;
     m_taps_allocated = taps + tap_block - 1;
 
     //  Calculate the starting input indices.
