@@ -22,8 +22,18 @@ struct SumATA2{
     using vtype = typename Context::vtype;
     static constexpr size_t VECTOR_LENGTH = sizeof(vtype) / sizeof(float);
 
-    vtype sum_AT = Context::vzero();
-    vtype sum_A2 = Context::vzero();
+    vtype sum_AT;
+    vtype sum_A2;
+
+    // An explicit default constructor is required: with only non-static data
+    // member initializers, the implicit default constructor does not zero the
+    // accumulators at -O0 on x86, leaving stale stack contents in the lanes
+    // (observed with gcc and Apple clang; the user-defined constructor of
+    // SumError initializes correctly under the same conditions).
+    PA_FORCE_INLINE SumATA2()
+        : sum_AT(Context::vzero())
+        , sum_A2(Context::vzero())
+    {}
 
     PA_FORCE_INLINE float scale() const{
         return Context::vreduce(sum_AT) / Context::vreduce(sum_A2);
@@ -205,10 +215,11 @@ struct SumError{
     static constexpr size_t VECTOR_LENGTH = sizeof(vtype) / sizeof(float);
 
     vtype scale;
-    vtype sum = Context::vzero();
+    vtype sum;
 
     PA_FORCE_INLINE SumError(float p_scale)
         : scale(Context::vset(p_scale))
+        , sum(Context::vzero())
     {}
 
     PA_FORCE_INLINE float sum_sqr() const{
