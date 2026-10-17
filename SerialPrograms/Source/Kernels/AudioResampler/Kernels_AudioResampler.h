@@ -39,7 +39,7 @@ public:
         size_t out_sample_rate,
         size_t channels,
         size_t buffer_size = 4096 + 256, //  4k + break super-alignment
-        uint32_t taps = 16,
+        uint32_t taps = 32,
         double beta = 9.0
     );
 
