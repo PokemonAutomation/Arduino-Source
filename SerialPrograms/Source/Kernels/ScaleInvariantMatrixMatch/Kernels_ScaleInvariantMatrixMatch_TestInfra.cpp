@@ -189,6 +189,12 @@ UnitTestResult Test::run(Logger& logger, CancellableScope& scope) const{
         alignas(64) const float* krowsT[1] = { kT + 4 };
         std::cout << "[DIAG] known-data s1 (expect 0.33333333)="
             << m_scale1(4, 1, krowsA, krowsT) << std::endl;
+        std::cout << "[DIAG] s0 (this run)=" << s0 << std::endl;
+        float simm_diag_scale41(const float* A, const float* T);
+        std::cout << "[DIAG] diag on test row:" << std::endl;
+        simm_diag_scale41(rowsA[0], rowsT[0]);
+        std::cout << "[DIAG] diag on known data:" << std::endl;
+        simm_diag_scale41(kA + 4, kT + 4);
     }
 
     double mag = std::fmax(std::fabs((double)s0), std::fabs((double)s1));

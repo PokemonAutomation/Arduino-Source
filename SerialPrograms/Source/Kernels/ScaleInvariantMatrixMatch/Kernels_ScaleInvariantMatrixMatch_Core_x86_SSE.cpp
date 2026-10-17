@@ -94,6 +94,33 @@ float compute_scale_min4_x86_SSE(
 ){
     return compute_scale<SumATA2<Context_x86_SSE41>>(width, height, A, T);
 }
+
+//  TEMPORARY DIAGNOSTIC (remove before merge)
+float simm_diag_scale41(const float* A, const float* T){
+    using Ctx = Context_x86_SSE41;
+    Kernels::print(_mm_set1_ps(42.0f)); // sanity: print() works
+    SumATA2<Ctx> sum;
+    std::cout << "[DIAG2] after ctor sum_AT:" << std::endl;
+    Kernels::print(sum.sum_AT);
+    std::cout << "[DIAG2] after ctor sum_A2:" << std::endl;
+    Kernels::print(sum.sum_A2);
+    const __m128* pA = (const __m128*)A;
+    const __m128* pT = (const __m128*)T;
+    std::cout << "[DIAG2] pA[0]:" << std::endl;
+    Kernels::print(pA[0]);
+    std::cout << "[DIAG2] pT[0]:" << std::endl;
+    Kernels::print(pT[0]);
+    std::cout << "[DIAG2] manual vpma(pA[0], pT[0], 0):" << std::endl;
+    Kernels::print(Ctx::vpma(pA[0], pT[0], Ctx::vzero()));
+    sum.accumulate(4, A, T);
+    std::cout << "[DIAG2] after accumulate sum_AT:" << std::endl;
+    Kernels::print(sum.sum_AT);
+    std::cout << "[DIAG2] after accumulate sum_A2:" << std::endl;
+    Kernels::print(sum.sum_A2);
+    float r = sum.scale();
+    std::cout << "[DIAG2] scale=" << r << std::endl;
+    return r;
+}
 float compute_scale_min4_x86_SSE(
     size_t width, size_t height,
     float const* const* A,
