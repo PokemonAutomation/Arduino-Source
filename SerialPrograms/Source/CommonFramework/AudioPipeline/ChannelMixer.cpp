@@ -14,7 +14,7 @@ namespace PokemonAutomation{
 
 namespace{
 
-using P = QAudioFormat::AudioChannelPosition;
+using AudioChannelPosition = QAudioFormat::AudioChannelPosition;
 
 
 //
@@ -33,25 +33,25 @@ enum class MixFamily{
 
 
 
-MixFamily mix_family(P position){
+MixFamily mix_family(AudioChannelPosition position){
     switch (position){
-    case P::FrontLeft:
-    case P::FrontLeftOfCenter:
+    case AudioChannelPosition::FrontLeft:
+    case AudioChannelPosition::FrontLeftOfCenter:
         return MixFamily::LEFT_FRONT;
-    case P::FrontRight:
-    case P::FrontRightOfCenter:
+    case AudioChannelPosition::FrontRight:
+    case AudioChannelPosition::FrontRightOfCenter:
         return MixFamily::RIGHT_FRONT;
-    case P::FrontCenter:
+    case AudioChannelPosition::FrontCenter:
         return MixFamily::CENTER;
-    case P::BackLeft:
-    case P::SideLeft:
+    case AudioChannelPosition::BackLeft:
+    case AudioChannelPosition::SideLeft:
         return MixFamily::LEFT_SURROUND;
-    case P::BackRight:
-    case P::SideRight:
+    case AudioChannelPosition::BackRight:
+    case AudioChannelPosition::SideRight:
         return MixFamily::RIGHT_SURROUND;
-    case P::LFE:
+    case AudioChannelPosition::LFE:
         return MixFamily::LFE;
-    case P::LFE2:
+    case AudioChannelPosition::LFE2:
         return MixFamily::LFE2;
     default:
         return MixFamily::OTHER;
@@ -67,7 +67,7 @@ MixFamily mix_family(P position){
 //  destination layout has no channel of that family.
 //
 float mix_gain(
-    P in, P out,
+    AudioChannelPosition in, AudioChannelPosition out,
     const std::vector<bool>& in_has,
     const std::vector<bool>& out_has,
     const std::vector<size_t>& out_family_count,
@@ -120,7 +120,7 @@ float mix_gain(
         }
     }
     //  Center upmix: e.g. 2.0 -> 5.1: C <- 0.7 * (L + R) / 2
-    if (out_family == MixFamily::CENTER && !in_has[P::FrontCenter]){
+    if (out_family == MixFamily::CENTER && !in_has[AudioChannelPosition::FrontCenter]){
         if (in_family == MixFamily::LEFT_FRONT || in_family == MixFamily::RIGHT_FRONT){
             return 0.35f;
         }
@@ -137,21 +137,21 @@ float mix_gain(
 //
 //  Returns false only when the format has a non-positive channel count.
 //
-bool resolve_positions(const QAudioFormat& format, std::vector<P>& out){
+bool resolve_positions(const QAudioFormat& format, std::vector<AudioChannelPosition>& out){
     const int count = format.channelCount();
     if (count <= 0){
         return false;
     }
-    out.assign(count, P::UnknownPosition);
+    out.assign(count, AudioChannelPosition::UnknownPosition);
     const quint32 config = format.channelConfig();
     if (config == QAudioFormat::ChannelConfigUnknown){
         return true;
     }
     for (int p = 1; p < QAudioFormat::NChannelPositions; p++){
         if (config & (1u << p)){
-            int offset = format.channelOffset((P)p);
+            int offset = format.channelOffset((AudioChannelPosition)p);
             if (offset >= 0 && offset < count){
-                out[offset] = (P)p;
+                out[offset] = (AudioChannelPosition)p;
             }
         }
     }
@@ -165,7 +165,7 @@ bool resolve_positions(const QAudioFormat& format, std::vector<P>& out){
 
 
 std::vector<float> build_channel_mixer_matrix(const QAudioFormat& input, const QAudioFormat& output){
-    std::vector<P> in_positions, out_positions;
+    std::vector<AudioChannelPosition> in_positions, out_positions;
     if (!resolve_positions(input, in_positions) || !resolve_positions(output, out_positions)){
         return {};
     }
@@ -177,19 +177,19 @@ std::vector<float> build_channel_mixer_matrix(const QAudioFormat& input, const Q
 
     const size_t in_count = in_positions.size();
     const size_t out_count = out_positions.size();
-    const bool in_mono = in_count == 1 && in_positions[0] == P::FrontCenter;
-    const bool out_mono = out_count == 1 && out_positions[0] == P::FrontCenter;
+    const bool in_mono = in_count == 1 && in_positions[0] == AudioChannelPosition::FrontCenter;
+    const bool out_mono = out_count == 1 && out_positions[0] == AudioChannelPosition::FrontCenter;
 
     const size_t np = QAudioFormat::NChannelPositions;
     std::vector<bool> in_has(np, false), out_has(np, false);
     std::vector<size_t> out_family_count(8, 0);
-    for (P p : in_positions){
-        if (p != P::UnknownPosition){
+    for (AudioChannelPosition p : in_positions){
+        if (p != AudioChannelPosition::UnknownPosition){
             in_has[p] = true;
         }
     }
-    for (P p : out_positions){
-        if (p != P::UnknownPosition){
+    for (AudioChannelPosition p : out_positions){
+        if (p != AudioChannelPosition::UnknownPosition){
             out_has[p] = true;
             out_family_count[(size_t)mix_family(p)]++;
         }
@@ -197,13 +197,13 @@ std::vector<float> build_channel_mixer_matrix(const QAudioFormat& input, const Q
 
     std::vector<float> matrix(in_count * out_count, 0.0f);
     for (size_t o = 0; o < out_count; o++){
-        const P out_position = out_positions[o];
-        if (out_position == P::UnknownPosition){
+        const AudioChannelPosition out_position = out_positions[o];
+        if (out_position == AudioChannelPosition::UnknownPosition){
             continue;
         }
         for (size_t i = 0; i < in_count; i++){
-            const P in_position = in_positions[i];
-            if (in_position == P::UnknownPosition){
+            const AudioChannelPosition in_position = in_positions[i];
+            if (in_position == AudioChannelPosition::UnknownPosition){
                 continue;
             }
             matrix[i + in_count * o] = mix_gain(
