@@ -22,6 +22,7 @@
 #include <cstring>
 #include <deque>
 #include <mutex>
+#include <set>
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -231,7 +232,7 @@ const char* const VIDEO_ENCODER_CANDIDATES[] = {
 //  context is deliberately leaked (a bounded, one-time leak) and the encoder
 //  is never initialized again.
 std::mutex poisoned_encoder_mutex;
-std::string poisoned_encoder;
+std::set<std::string> poisoned_encoders;
 
 //  Abandons 'ctx' after a runtime encoder failure (the context has already
 //  pushed frames into a possibly-broken GPU driver). Hardware encoder
@@ -252,7 +253,7 @@ void abandon_video_encoder(Logger& logger, const char* name, AVCodecContext*& ct
     }else{
         {
             std::lock_guard<std::mutex> lg(poisoned_encoder_mutex);
-            poisoned_encoder = name;
+            poisoned_encoders.insert(name);
         }
         logger.log(
             "Stream history: leaking the failed '"
@@ -581,7 +582,7 @@ struct StreamHistoryTracker_Ring::Impl{
             const char* name = VIDEO_ENCODER_CANDIDATES[i];
             {
                 std::lock_guard<std::mutex> lg(poisoned_encoder_mutex);
-                if (poisoned_encoder == name){
+                if (poisoned_encoders.count(name) != 0){
                     logger.log(
                         "Stream history: skipping video encoder '"
                         + std::string(name) + "' (it failed at runtime earlier"
