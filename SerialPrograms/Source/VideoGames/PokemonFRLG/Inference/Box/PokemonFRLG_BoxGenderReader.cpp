@@ -71,6 +71,8 @@ private:
 void add_tests_BoxGenderReader(UnitTestDatabase& database){
     using Gender = Pokemon::StatsHuntGenderFilter;
     database.add<Test_BoxGenderReader>("PokemonFRLG/Box/Arcanine_M_100_White.png", Gender::Male);
+    database.add<Test_BoxGenderReader>("PokemonFRLG/Box/BoxHand_Closed_Gold.png", Gender::Female);
+    database.add<Test_BoxGenderReader>("PokemonFRLG/Box/BoxHand_Closed_White.png", Gender::Male);
     database.add<Test_BoxGenderReader>("PokemonFRLG/Box/BoxHand_Gold_HD60Pro_NV12.png", Gender::Male);
     database.add<Test_BoxGenderReader>("PokemonFRLG/Box/BoxHand_Gold_HD60Pro_YUYV.png", Gender::Male);
     database.add<Test_BoxGenderReader>("PokemonFRLG/Box/BoxHand_White_HD60Pro_NV12.png", Gender::Male);

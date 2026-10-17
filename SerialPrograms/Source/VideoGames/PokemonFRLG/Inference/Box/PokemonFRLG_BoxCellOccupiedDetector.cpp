@@ -54,6 +54,8 @@ private:
 
 void add_tests_BoxCellOccupiedDetector(UnitTestDatabase& database){
     database.add<Test_BoxCellOccupiedDetector>("PokemonFRLG/Box/Arcanine_M_100_White.png", true);
+    database.add<Test_BoxCellOccupiedDetector>("PokemonFRLG/Box/BoxHand_Closed_Gold.png", true);
+    database.add<Test_BoxCellOccupiedDetector>("PokemonFRLG/Box/BoxHand_Closed_White.png", true);
     database.add<Test_BoxCellOccupiedDetector>("PokemonFRLG/Box/BoxHand_Gold_HD60Pro_NV12.png", true);
     database.add<Test_BoxCellOccupiedDetector>("PokemonFRLG/Box/BoxHand_Gold_HD60Pro_YUYV.png", true);
     database.add<Test_BoxCellOccupiedDetector>("PokemonFRLG/Box/BoxHand_White_HD60Pro_NV12.png", true);

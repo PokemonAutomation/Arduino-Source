@@ -31,6 +31,7 @@ enum class BoxSelectionLocation{
 struct BoxSelection{
     BoxSelectionMode mode;
     BoxSelectionLocation location;
+    bool closed = false;
     // Zero-based coordinates in the 5-row, 6-column grid. Only valid for Grid.
     size_t row = 0;
     size_t column = 0;

@@ -38,9 +38,10 @@ struct HandStyle{
     bool inverted;
     uint32_t min_color;
     uint32_t max_color;
+    bool closed = false;
 };
 
-const HandStyle* hand_styles(){
+const auto& hand_styles(){
     static const HandStyle styles[] = {
         {{"PokemonFRLG/Box/SelectionHand_White.png", Color(180, 180, 180), Color(255, 255, 255)},
             BoxSelectionMode::Normal, false, 0xffb4b4b4, 0xffffffff},
@@ -50,6 +51,10 @@ const HandStyle* hand_styles(){
             BoxSelectionMode::Relocate, false, 0xffb47800, 0xffffff96},
         {{"PokemonFRLG/Box/SelectionHand_Gold_Inverted.png", Color(180, 120, 0), Color(255, 255, 150)},
             BoxSelectionMode::Relocate, true, 0xffb47800, 0xffffff96},
+        {{"PokemonFRLG/Box/SelectionHand_Closed_White.png", Color(180, 180, 180), Color(255, 255, 255)},
+            BoxSelectionMode::Normal, false, 0xffb4b4b4, 0xffffffff, true},
+        {{"PokemonFRLG/Box/SelectionHand_Closed_Gold.png", Color(180, 120, 0), Color(255, 255, 150)},
+            BoxSelectionMode::Relocate, false, 0xffb47800, 0xffffff96, true},
     };
     return styles;
 }
@@ -67,15 +72,16 @@ std::optional<BoxSelection> selection_at(const ImageFloatBox& hand, const HandSt
 
     const double center_x = hand.x + hand.width / 2;
     const double center_y = hand.y + hand.height / 2;
-    if (style.inverted){
+    // Closed hands keep their shape when carrying a Pokemon onto a top button.
+    if (style.inverted || (style.closed && center_y < BOX_TILE_GRID_HAND_CENTER_Y_SPLIT)){
         if (center_y > MAX_TOP_BUTTON_HAND_CENTER_Y){
             return std::nullopt;
         }
         return BoxSelection{style.mode, center_x < PARTY_CLOSE_BUTTON_HAND_CENTER_X_SPLIT
-            ? BoxSelectionLocation::OpenPartyButton : BoxSelectionLocation::CloseBoxButton};
+            ? BoxSelectionLocation::OpenPartyButton : BoxSelectionLocation::CloseBoxButton, style.closed};
     }
     if (center_y < BOX_TILE_GRID_HAND_CENTER_Y_SPLIT){
-        return BoxSelection{style.mode, BoxSelectionLocation::BoxTile};
+        return BoxSelection{style.mode, BoxSelectionLocation::BoxTile, style.closed};
     }
 
     const int column = (int)std::lround((center_x - FIRST_GRID_HAND_CENTER_X) / GRID_COLUMN_SPACING);
@@ -83,11 +89,12 @@ std::optional<BoxSelection> selection_at(const ImageFloatBox& hand, const HandSt
     if (column < 0 || column >= GRID_COLUMNS || row < 0 || row >= GRID_ROWS){
         return std::nullopt;
     }
-    return BoxSelection{style.mode, BoxSelectionLocation::Grid, (size_t)row, (size_t)column};
+    return BoxSelection{style.mode, BoxSelectionLocation::Grid, style.closed, (size_t)row, (size_t)column};
 }
 
 std::string selection_string(const BoxSelection& selection){
     std::string result = selection.mode == BoxSelectionMode::Normal ? "Normal " : "Relocate ";
+    result += selection.closed ? "Closed " : "Open ";
     switch (selection.location){
     case BoxSelectionLocation::Grid:
         return result + "Grid(" + std::to_string(selection.row) + ", " + std::to_string(selection.column) + ")";
@@ -116,9 +123,7 @@ std::optional<BoxSelection> BoxSelectionModeDetector::detect(const ImageViewRGB3
     const size_t min_area = std::max<size_t>(1, size_t(screen_rel_size_2 * min_area_1080p));
     double best_rmsd = 50;
     std::optional<BoxSelection> best;
-    const HandStyle* styles = hand_styles();
-    for (size_t i = 0; i < 4; i++){
-        const HandStyle& style = styles[i];
+    for (const HandStyle& style : hand_styles()){
         match_template_by_waterfill(
             game_screen.size(), region, style.matcher,
             {{style.min_color, style.max_color}}, {min_area, SIZE_MAX}, best_rmsd,
@@ -147,11 +152,11 @@ class Test_BoxSelectionModeDetector : public UnitTest{
 public:
     Test_BoxSelectionModeDetector(
         const std::string& image, BoxSelectionMode mode, BoxSelectionLocation location,
-        size_t row = 0, size_t column = 0
+        size_t row = 0, size_t column = 0, bool closed = false
     )
         : UnitTest("PokemonFRLG::BoxSelectionModeDetector - " + image)
         , m_image(UNIT_TEST_RESOURCE_PATH() + image)
-        , m_expected{mode, location, row, column}
+        , m_expected{mode, location, closed, row, column}
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
@@ -161,6 +166,7 @@ public:
             return "Expected: " + selection_string(m_expected) + ", received no hand.";
         }
         if (result->mode != m_expected.mode || result->location != m_expected.location
+            || result->closed != m_expected.closed
             || result->row != m_expected.row || result->column != m_expected.column){
             return "Expected: " + selection_string(m_expected) + ", received: " + selection_string(*result);
         }
@@ -176,6 +182,8 @@ void add_tests_BoxSelectionModeDetector(UnitTestDatabase& database){
     using Mode = BoxSelectionMode;
     using Location = BoxSelectionLocation;
     database.add<Test_BoxSelectionModeDetector>("PokemonFRLG/Box/Arcanine_M_100_White.png", Mode::Normal, Location::Grid, 0, 4);
+    database.add<Test_BoxSelectionModeDetector>("PokemonFRLG/Box/BoxHand_Closed_Gold.png", Mode::Relocate, Location::Grid, 0, 2, true);
+    database.add<Test_BoxSelectionModeDetector>("PokemonFRLG/Box/BoxHand_Closed_White.png", Mode::Normal, Location::OpenPartyButton, 0, 0, true);
     database.add<Test_BoxSelectionModeDetector>("PokemonFRLG/Box/BoxHand_Gold_HD60Pro_NV12.png", Mode::Relocate, Location::Grid, 0, 0);
     database.add<Test_BoxSelectionModeDetector>("PokemonFRLG/Box/BoxHand_Gold_HD60Pro_YUYV.png", Mode::Relocate, Location::Grid, 0, 0);
     database.add<Test_BoxSelectionModeDetector>("PokemonFRLG/Box/BoxHand_White_HD60Pro_NV12.png", Mode::Normal, Location::Grid, 0, 0);
