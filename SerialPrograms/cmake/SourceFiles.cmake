@@ -1638,6 +1638,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonBDSP/Resources/PokemonBDSP_NameDatabase.h
     Source/VideoGames/PokemonFRLG/Inference/Box/PokemonFRLG_BoxCellOccupiedDetector.cpp
     Source/VideoGames/PokemonFRLG/Inference/Box/PokemonFRLG_BoxCellOccupiedDetector.h
+    Source/VideoGames/PokemonFRLG/Inference/Box/PokemonFRLG_BoxCellReader.cpp
+    Source/VideoGames/PokemonFRLG/Inference/Box/PokemonFRLG_BoxCellReader.h
     Source/VideoGames/PokemonFRLG/Inference/Box/PokemonFRLG_BoxGenderReader.cpp
     Source/VideoGames/PokemonFRLG/Inference/Box/PokemonFRLG_BoxGenderReader.h
     Source/VideoGames/PokemonFRLG/Inference/Box/PokemonFRLG_BoxSelectionModeDetector.cpp
