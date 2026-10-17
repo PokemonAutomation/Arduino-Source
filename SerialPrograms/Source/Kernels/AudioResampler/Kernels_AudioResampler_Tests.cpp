@@ -443,6 +443,20 @@ void add_tests(UnitTestDatabase& database){
         );
     }
 
+    //  A spread of tap counts across the supported range on the 1:1 combo
+    //  (16 taps is the first combo above): counts below the kernels' tap
+    //  blocks are zero padded, odd counts exercise the unrolls' final
+    //  partial group, and the wide counts stress the carry sizing and the
+    //  Kaiser window width.
+    const uint32_t sweep_taps[] = { 1, 2, 3, 4, 5, 8, 32, 48, 63, 64 };
+    for (uint32_t taps : sweep_taps){
+        database.add<ResamplerStreamTest>(44100, 44100, 1, 4000, 100, taps, 9.0);
+    }
+    //  Degenerate and wide tap counts on the strongest upsampling combo,
+    //  where the tap count dominates the next block's input requirement.
+    database.add<ResamplerStreamTest>(8000, 44100, 1, 4000, 100, 1, 9.0);
+    database.add<ResamplerStreamTest>(8000, 44100, 1, 4000, 100, 64, 9.0);
+
     //  Dispatch choices across rate ratios, with a spread of tap counts
     //  for the table itself. Odd tap counts exercise the unrolls' final
     //  partial group reading the table's zero padded rows.
@@ -460,6 +474,11 @@ void add_tests(UnitTestDatabase& database){
         { 44100, 22050, 8 },
         { 90000, 20000, 4 },
         { 8000, 44100, 3 },
+        //  The tap extremes across the kernel families.
+        { 44100, 44100, 1 },
+        { 44100, 48000, 64 },
+        { 88200, 44100, 32 },
+        { 128000, 8000, 64 },
     };
     for (auto& combo : dispatch_combos){
         database.add<BlockDispatchTest>(
@@ -467,10 +486,19 @@ void add_tests(UnitTestDatabase& database){
         );
     }
 
-    //  The Default kernel doubles as the reference for the SIMD variants.
+    //  The Default kernel doubles as the reference for the SIMD variants,
+    //  with the tap extremes alongside the standard count.
+    database.add<BlockKernelTest>(
+        "Default", run_block8_Default,
+        48000, 44100, 1, 8, 1, 0
+    );
     database.add<BlockKernelTest>(
         "Default", run_block8_Default,
         48000, 44100, 16, 8, 1, 0
+    );
+    database.add<BlockKernelTest>(
+        "Default", run_block8_Default,
+        48000, 44100, 64, 8, 1, 0
     );
     //  The block straddles the table period (147) into the continuing
     //  index columns.
