@@ -216,7 +216,7 @@ void AudioResampler::push_samples(size_t samples, size_t stride, const float* da
         if (carry >= 0 && (size_t)carry >= need_w){
             //  The carry alone holds the full window.
             emit_carry_block();
-        } else if (carry <= 0){
+        }else if (carry <= 0){
             //  The window starts at or before the data start. The block's
             //  window-start span can exceed the remaining data (strong
             //  downsampling), so only advance as far as the data allows;
@@ -234,7 +234,7 @@ void AudioResampler::push_samples(size_t samples, size_t stride, const float* da
             data += advance;
             in_index += advance;
             n -= advance;
-        } else {
+        }else{
             //  The window straddles the carry and the data. Copy the rest of
             //  the window into the carry and run the block on it.
             const size_t k = need_w - (size_t)carry;
