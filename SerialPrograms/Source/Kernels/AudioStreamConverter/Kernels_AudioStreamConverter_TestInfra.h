@@ -52,6 +52,12 @@ public:
     static std::string typestr();
 
 private:
+    static std::string make_name(
+        const std::string& arch_str,
+        size_t samples,
+        float from_multiplier,
+        float to_multiplier
+    );
     size_t m_samples;
     ConvertFrom<Type> m_convert_from;
     ConvertTo<Type> m_convert_to;

@@ -4,12 +4,12 @@
  *
  */
 
-#include <cstdio>
 #include <limits>
 #include <random>
 #include <type_traits>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Kernels_AudioPipeline_RoundTrip_TestInfra.h"
 #include "Kernels_RawAudio2WorkingAudio.h"
 #include "Kernels_WorkingAudio2RawAudio.h"
@@ -142,26 +142,26 @@ RoundTripTest::RoundTripTest(
     size_t samples,
     float from_multiplier
 )
-    : UnitTest(
-        [&]{
-            std::string name = "Kernels::AudioPipeline - RoundTrip_" + sample_typestr(sample_type) +
-                "(" + std::to_string(channels) + "ch x " + std::to_string(samples) + ")";
-            if (from_multiplier != 1.0f){
-                char mults[64];
-                std::snprintf(
-                    mults, sizeof(mults), " [from %.4g / to %.4g]",
-                    from_multiplier, 1.0f / from_multiplier
-                );
-                name += mults;
-            }
-            return name;
-        }()
-    )
+    : UnitTest(make_name(sample_type, channels, samples, from_multiplier))
     , m_sample_type(sample_type)
     , m_channels(channels)
     , m_samples(samples)
     , m_from_multiplier(from_multiplier)
 {}
+std::string RoundTripTest::make_name(
+    SampleFormat sample_type,
+    size_t channels,
+    size_t samples,
+    float from_multiplier
+){
+    std::string name = "Kernels::AudioPipeline - RoundTrip_" + sample_typestr(sample_type) +
+        "(" + std::to_string(channels) + "ch x " + std::to_string(samples) + ")";
+    if (from_multiplier != 1.0f){
+        name += " [from " + tostr_default(from_multiplier) +
+            " / to " + tostr_default(1.0f / from_multiplier) + "]";
+    }
+    return name;
+}
 UnitTestResult RoundTripTest::run(Logger& logger, CancellableScope& scope) const{
     switch (m_sample_type){
     case SampleFormat::UINT8:

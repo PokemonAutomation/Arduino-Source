@@ -37,6 +37,13 @@ public:
 
 
 private:
+    static std::string make_name(
+        SampleFormat sample_type,
+        size_t channels,
+        size_t samples,
+        float from_multiplier
+    );
+
     const SampleFormat m_sample_type;
     const size_t m_channels;
     const size_t m_samples;

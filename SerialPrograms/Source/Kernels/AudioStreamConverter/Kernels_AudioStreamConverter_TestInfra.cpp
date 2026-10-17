@@ -6,9 +6,9 @@
 
 #include <type_traits>
 #include <random>
-#include <cstdio>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Kernels_AudioStreamConverter_TestInfra.h"
 
 namespace PokemonAutomation{
@@ -27,21 +27,7 @@ Test<Type>::Test(
     float from_multiplier,
     float to_multiplier
 )
-    : UnitTest(
-        [&]{
-            std::string name = "Kernels::AudioStreamConverter - " + typestr() + "_" + arch_str +
-                "(" + std::to_string(samples) + ")";
-            if (from_multiplier != 1.0f || to_multiplier != 1.0f){
-                char mults[64];
-                std::snprintf(
-                    mults, sizeof(mults), " [from %.4g / to %.4g]",
-                    from_multiplier, to_multiplier
-                );
-                name += mults;
-            }
-            return name;
-        }()
-    )
+    : UnitTest(make_name(arch_str, samples, from_multiplier, to_multiplier))
     , m_samples(samples)
     , m_convert_from(convert_from)
     , m_convert_to(convert_to)
@@ -90,6 +76,21 @@ UnitTestResult Test<Type>::run(Logger& logger, CancellableScope& scope) const{
     }
 
     return true;
+}
+template <typename Type>
+std::string Test<Type>::make_name(
+    const std::string& arch_str,
+    size_t samples,
+    float from_multiplier,
+    float to_multiplier
+){
+    std::string name = "Kernels::AudioStreamConverter - " + typestr() + "_" + arch_str +
+        "(" + std::to_string(samples) + ")";
+    if (from_multiplier != 1.0f || to_multiplier != 1.0f){
+        name += " [from " + tostr_default(from_multiplier) +
+            " / to " + tostr_default(to_multiplier) + "]";
+    }
+    return name;
 }
 template <typename Type>
 std::string Test<Type>::typestr(){
