@@ -208,13 +208,19 @@ int qt_pixel_format_to_av_pix_fmt(QVideoFrameFormat::PixelFormat format){
 }
 
 
-//  Ordered by preference: hardware encoders first, then ffmpeg's built-in
-//  (LGPL) MPEG-4 Part 2 encoder as a last resort. Every candidate in this
-//  list ships in an LGPL ffmpeg build; GPL components (libx264) are
-//  deliberately not candidates.
+//  Ordered by preference: the GPU vendors' hardware encoders first, then
+//  (Windows) the OS-native Media Foundation H.264 encoder, then ffmpeg's
+//  built-in (LGPL) MPEG-4 Part 2 encoder as a last resort. Every candidate
+//  in this list ships in an LGPL ffmpeg build; GPL components (libx264)
+//  are deliberately not candidates.
 const char* const VIDEO_ENCODER_CANDIDATES[] = {
 #ifdef _WIN32
-    "h264_qsv",           "h264_nvenc",           "h264_amf",
+    //  h264_mf: the OS-native Media Foundation H.264 encoder (typically the
+    //  built-in Microsoft encoder). Present on essentially all Windows 8+
+    //  and compiled into the vendored build; when none of the GPU vendors'
+    //  encoders is available this yields real, universally playable H.264
+    //  instead of MPEG-4 Part 2.
+    "h264_qsv",           "h264_nvenc",           "h264_amf",           "h264_mf",
 #elif defined(__APPLE__)
     "h264_videotoolbox",
 #else
@@ -234,8 +240,9 @@ std::mutex poisoned_encoder_mutex;
 std::set<std::string> poisoned_encoders;
 
 //  Abandons 'ctx' after a runtime encoder failure (the context has already
-//  pushed frames into a possibly-broken GPU driver). Hardware encoder
-//  contexts are leaked, not freed, because releasing a context whose driver
+//  pushed frames into a possibly-broken device driver). Device-backed
+//  encoder contexts (the hardware wrappers and Media Foundation) are
+//  leaked, not freed, because releasing a context whose driver
 //  is already broken can crash the process inside the driver (observed:
 //  0xC0000005 access violation in atidxx64.dll on a Ryzen 5 5625U iGPU); the
 //  CPU fallback (mpeg4) is released normally. The encoder is remembered as
