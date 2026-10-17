@@ -170,6 +170,8 @@ jobs:
       # max-size is only a cap: evict-old-files drops everything this build didn't use, so each
       # saved cache is about one build's worth. Windows has the largest, since /Z7 puts the debug
       # info in every object file.
+      # On Windows, install the action's own ccache: the runner's Strawberry Perl puts an older
+      # ccache (4.9.1) on PATH, which the default install: detect would use instead.
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2.24
         with:
@@ -177,8 +179,16 @@ jobs:
           max-size: 5G
           evict-old-files: job
           save: ${{github.ref == 'refs/heads/main'}}
+          install: ${{startsWith(inputs.os, 'windows') && 'binary' || 'detect'}}
 
       - name: Generate binaries
+        env:
+          # Depend mode: on a cache miss, ccache hashes the include files the compiler reports
+          # (-MD or /showIncludes) instead of running the preprocessor a second time, which the
+          # ccache manual says makes a miss much cheaper. In the first runs with ccache, where
+          # every file missed, compiling took 10-40% longer than before on Linux and macOS, and
+          # about twice as long on Windows.
+          CCACHE_DEPEND: 1
         run: |
           cd Arduino-Source/SerialPrograms
           mkdir bin
