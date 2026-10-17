@@ -140,7 +140,6 @@ void AudioResampler::push_samples(size_t samples, size_t stride, const float* da
     }
 
     const uint32_t* index = m_table.in_sample_index();
-    const size_t period_out_extended = m_period_out_extended;
     const size_t block = m_block.sample_block;
     const size_t channels = this->channels();
 
