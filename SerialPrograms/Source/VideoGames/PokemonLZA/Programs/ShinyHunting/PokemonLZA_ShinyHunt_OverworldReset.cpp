@@ -72,6 +72,10 @@ ShinyHunt_OverworldReset::ShinyHunt_OverworldReset()
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
+    , MOVEMENT_GROUP(
+        "Movement After Loading",
+        LockMode::UNLOCK_WHILE_RUNNING
+    )
     , MOVEMENT(
         "<b>Movement:</b><br>"
         "Move the player after entering the game to close gap. ",
@@ -119,12 +123,13 @@ ShinyHunt_OverworldReset::ShinyHunt_OverworldReset()
     })
 {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
-    PA_ADD_OPTION(MOVEMENT);
     PA_ADD_OPTION(RESET_DELAY);
+    PA_ADD_OPTION(MOVEMENT_GROUP);
+    MOVEMENT_GROUP.PA_ADD_OPTION(MOVEMENT);
+    MOVEMENT_GROUP.PA_ADD_OPTION(RUN_DIRECTION);
+    MOVEMENT_GROUP.PA_ADD_OPTION(RUN_DURATION);
+    MOVEMENT_GROUP.PA_ADD_OPTION(ROLLS);
     PA_ADD_OPTION(ROTATE_CAMERA);
-    PA_ADD_OPTION(RUN_DIRECTION);
-    PA_ADD_OPTION(RUN_DURATION);
-    PA_ADD_OPTION(ROLLS);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 
