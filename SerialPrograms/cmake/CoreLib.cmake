@@ -64,7 +64,11 @@ if (WIN32)
         file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Assembly/CoreLib)
         target_compile_options(CoreLib PRIVATE /FAs /FaAssembly/CoreLib/)
     endif()
-    target_compile_options(CoreLib PRIVATE /MP /W4 /WX /external:anglebrackets /external:W0 /utf-8)
+    target_compile_options(CoreLib PRIVATE /W4 /WX /external:W0 /utf-8)
+    if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        # cl only: clang-cl ignores these, and /WX turns its unused-argument warning into an error.
+        target_compile_options(CoreLib PRIVATE /MP /external:anglebrackets)
+    endif()
     target_compile_options(CoreLib PRIVATE /wd5054)  # Deprecated enum arithemtic
     target_compile_options(CoreLib PRIVATE /wd4505)  # unreferenced local function has been removed
 
