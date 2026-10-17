@@ -499,16 +499,38 @@ struct StreamHistoryTracker_Ring::Impl{
         actx->sample_rate = AUDIO_OUTPUT_RATE;
         actx->time_base = av_make_q(1, AUDIO_OUTPUT_RATE);
         actx->bit_rate = (audio_channels >= 2 ? 96000 : 64000);
+        actx->frame_size = AUDIO_FRAME_SAMPLES;
+        //  The AAC encoder requires the sample format to be set explicitly;
+        //  avcodec_open2() fails with EINVAL ("Invalid audio sample format")
+        //  if it is left at AV_SAMPLE_FMT_NONE. The encoder works in planar
+        //  float, so on_samples() de-interleaves the accumulated (packed)
+        //  resampler output into the frame's planes.
+        actx->sample_fmt = AV_SAMPLE_FMT_FLTP;
         //  The AAC stream configuration (AudioSpecificConfig) must land in the
         //  container header: with this flag the encoder emits raw AAC frames +
         //  extradata, which is what both the MP4 and MKV muxers need. Without
         //  it the packets would be ADTS and mux_to_file() would fail to set up
         //  the audio stream.
         actx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
-        if (!init_channel_layout(actx->ch_layout, (int)audio_channels)
-            || avcodec_open2(actx, codec, nullptr) < 0
-        ){
-            logger.log("Stream history: Failed to open AAC encoder. Disabling audio.", COLOR_RED);
+        if (!init_channel_layout(actx->ch_layout, (int)audio_channels)){
+            logger.log(
+                "Stream history: Failed to initialize the AAC channel layout ("
+                + std::to_string((int)audio_channels) + " channels). Disabling audio.",
+                COLOR_RED
+            );
+            avcodec_free_context(&actx);
+            actx = nullptr;
+            have_audio = false;
+            return;
+        }
+        int open_err = avcodec_open2(actx, codec, nullptr);
+        if (open_err < 0){
+            logger.log(
+                "Stream history: Failed to open AAC encoder: "
+                + ffmpeg_error(open_err)
+                + ". Disabling audio.",
+                COLOR_RED
+            );
             avcodec_free_context(&actx);
             actx = nullptr;
             have_audio = false;
@@ -1036,7 +1058,7 @@ struct StreamHistoryTracker_Ring::Impl{
                 have_audio = false;
                 return;
             }
-            frame->format = AV_SAMPLE_FMT_FLT;
+            frame->format = AV_SAMPLE_FMT_FLTP;
             frame->sample_rate = AUDIO_OUTPUT_RATE;
             frame->nb_samples = AUDIO_FRAME_SAMPLES;
             int ret = av_channel_layout_copy(&frame->ch_layout, &audio_layout);
@@ -1052,11 +1074,16 @@ struct StreamHistoryTracker_Ring::Impl{
                 have_audio = false;
                 return;
             }
-            memcpy(
-                frame->data[0],
-                audio_acc.data(),
-                (size_t)AUDIO_FRAME_SAMPLES * audio_channels * sizeof(float)
-            );
+            //  The encoder works in planar float (one plane per channel), but
+            //  the resampler output was accumulated packed/interleaved, so
+            //  de-interleave into the frame's planes.
+            const float* acc = audio_acc.data();
+            for (size_t ch = 0; ch < audio_channels; ch++){
+                float* plane = (float*)frame->data[ch];
+                for (size_t i = 0; i < AUDIO_FRAME_SAMPLES; i++){
+                    plane[i] = acc[i * audio_channels + ch];
+                }
+            }
             frame->pts = audio_samples_total;
             audio_samples_total += AUDIO_FRAME_SAMPLES;
             {
