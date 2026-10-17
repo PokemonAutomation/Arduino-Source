@@ -174,19 +174,21 @@ UnitTestResult Test::run(Logger& logger, CancellableScope& scope) const{
             << " A.data%64=" << ((size_t)A.data() % 64)
             << " rowsA[0]%16=" << ((size_t)rowsA[0] % 16)
             << std::endl;
-        hexdump(A.data(), 12, "[DIAG] A[0..12)");
-        hexdump(T.data(), 12, "[DIAG] T[0..12)");
-        float s1_pad = 0.0f, s1_zero = 0.0f;
-        for (int rep = 0; rep < 2; rep++){
-            float fill = (rep == 0) ? -12345.0f : 0.0f;
-            for (size_t c = 0; c < HEAD_PAD; c++){ A[c] = fill; T[c] = fill; }
-            for (size_t c = HEAD_PAD + n; c < HEAD_PAD + n + TAIL_PAD; c++){ A[c] = fill; T[c] = fill; }
+        hexdump(A.data() + HEAD_PAD, 4, "[DIAG] row A");
+        hexdump(T.data() + HEAD_PAD, 4, "[DIAG] row T");
+        for (int i = 0; i < 6; i++){
             float s1x = m_scale1(m_width, m_height, rowsA.data(), rowsT.data());
-            if (rep == 0){ s1_pad = s1x; }else{ s1_zero = s1x; }
+            std::cout << "[DIAG] s1 repeat#" << i << "=" << s1x << std::endl;
         }
-        std::cout << "[DIAG] s0=" << s0 << " s1=" << s1
-            << " s1(pad=-12345)=" << s1_pad
-            << " s1(pad=0)=" << s1_zero << std::endl;
+        float e0x = m_error0(m_width, m_height, s0, rowsA.data(), rowsT.data());
+        float e1x = m_error1(m_width, m_height, s0, rowsA.data(), rowsT.data());
+        std::cout << "[DIAG] e0=" << e0x << " e1=" << e1x << std::endl;
+        alignas(64) float kA[16] = { 1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        alignas(64) float kT[16] = { 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        alignas(64) const float* krowsA[1] = { kA + 4 };
+        alignas(64) const float* krowsT[1] = { kT + 4 };
+        std::cout << "[DIAG] known-data s1 (expect 0.33333333)="
+            << m_scale1(4, 1, krowsA, krowsT) << std::endl;
     }
 
     double mag = std::fmax(std::fabs((double)s0), std::fabs((double)s1));
