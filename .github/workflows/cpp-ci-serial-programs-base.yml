@@ -37,6 +37,9 @@ jobs:
               CMAKE_ADDITIONAL_FLAGS="-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=RelWithDebInfo"
             fi
           fi
+          if [[ "${{inputs.os}}" != windows* ]]; then
+            CMAKE_ADDITIONAL_FLAGS="$CMAKE_ADDITIONAL_FLAGS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
+          fi
           echo "CMAKE_ADDITIONAL_FLAGS=$CMAKE_ADDITIONAL_FLAGS" >> $GITHUB_ENV
 
           if [[ "${{inputs.os}}" == windows* ]]; then
@@ -71,13 +74,14 @@ jobs:
           aqtsource: 'git+https://github.com/miurahr/aqtinstall'
           version: '6.10.2'
           modules: 'qtmultimedia qtserialport'
+          cache: true
 
       - name: Install dependencies (Ubuntu)
         if: startsWith(inputs.os, 'ubuntu')
         run: |
           cd Arduino-Source
           sudo apt update
-          sudo apt install clang-tools libopencv-dev libsystemd-dev
+          sudo apt install ccache clang-tools libopencv-dev libsystemd-dev
 
           sudo apt install ./3rdPartyBinaries/libdpp-10.1.5-linux-x64.deb
 
@@ -85,14 +89,54 @@ jobs:
         if: startsWith(inputs.os, 'mac')
         run: |
           cd Arduino-Source
-          brew install opencv@4 onnxruntime
+          # libsodium, openssl@3, opus and pkgconf are libdpp's dependencies, installed here so
+          # their versions can go into the libdpp cache key below.
+          brew install opencv@4 onnxruntime ccache libsodium openssl@3 opus pkgconf
 
           brew tap-new --no-git PA/libdpp
           brew trust PA/libdpp
           FORMULA_DIR="$(brew --repo PA/libdpp)/Formula"
           mkdir -p "$FORMULA_DIR"
           cp 3rdPartyBinaries/libdpp@10.1.5.rb "$FORMULA_DIR/"
-          brew install libdpp@10.1.5
+
+          echo "LIBDPP_KEG=$(brew --cellar)/libdpp@10.1.5" >> $GITHUB_ENV
+          echo "LIBDPP_DEPS_HASH=$(brew list --versions libsodium openssl@3 opus | shasum | cut -c1-16)" >> $GITHUB_ENV
+
+      # Homebrew has no prebuilt bottle for our pinned libdpp formula, so `brew install` compiles
+      # DPP from source: about 4 minutes on Apple Silicon and 13 on Intel. Cache the installed keg
+      # instead. The key includes the versions of the libraries libdpp links against, so when
+      # Homebrew updates one of them, libdpp is rebuilt against it rather than restored.
+      - name: Cache libdpp (Mac)
+        id: libdpp-cache
+        if: startsWith(inputs.os, 'mac')
+        uses: actions/cache@v6
+        with:
+          path: ${{env.LIBDPP_KEG}}
+          key: libdpp-${{inputs.os}}-${{hashFiles('Arduino-Source/3rdPartyBinaries/libdpp@10.1.5.rb')}}-${{env.LIBDPP_DEPS_HASH}}
+
+      - name: Install libdpp (Mac)
+        if: startsWith(inputs.os, 'mac')
+        run: |
+          if [[ "${{steps.libdpp-cache.outputs.cache-hit}}" == "true" ]]; then
+            brew link libdpp@10.1.5
+          else
+            brew install libdpp@10.1.5
+          fi
+          # CMake quietly builds without Discord integration when it can't find DPP, so check here.
+          pkg-config --exact-version=10.1.5 dpp
+
+      # Keep compiler outputs between runs, so a build only recompiles what a change affects.
+      # Only pushes to main save the cache: every PR restores main's latest one, and PR runs don't
+      # fill the repo's 10 GB cache quota with entries that no other run can read.
+      # Not used on Windows: ccache can't cache MSVC builds that write debug info to a PDB (/Zi).
+      - name: Set up ccache
+        if: ${{!startsWith(inputs.os, 'windows')}}
+        uses: hendrikmuhs/ccache-action@v1.2.24
+        with:
+          key: ${{inputs.os}}-${{inputs.compiler}}
+          max-size: 2G
+          evict-old-files: job
+          save: ${{github.ref == 'refs/heads/main'}}
 
       - name: Generate binaries
         run: |
@@ -192,11 +236,25 @@ jobs:
           )
           EOF
 
-          files=$(jq -r '.[].file' SerialPrograms/bin/compile_commands.json)
-          echo "$files" | xargs --max-args=100 clang-query -p SerialPrograms/bin/ -f query.txt >> clang-query-output.txt
+          # Run one batch of files per core. clang-query parses every file it's given before
+          # matching and keeps all those ASTs in memory, so keep batches small. Each batch writes
+          # its own file so the output of batches running at the same time can't interleave.
+          # A file compiled into more than one target has one entry per target, and clang-query
+          # already checks every entry of each file it's given, so list each file only once.
+          mkdir clang-query-batches
+          status=0
+          jq -r '.[].file' SerialPrograms/bin/compile_commands.json | sort -u |
+            xargs --delimiter='\n' --max-args=10 --max-procs="$(nproc)" \
+              sh -c 'clang-query -p SerialPrograms/bin/ -f query.txt "$@" > "$(mktemp clang-query-batches/XXXXXX)"' sh ||
+            status=$?
+          cat clang-query-batches/* > clang-query-output.txt
           echo "Clang query output (begin)"
           cat clang-query-output.txt
           echo "Clang query output (end)"
+          if [[ $status -ne 0 ]]; then
+            echo "::error::clang-query failed on some files (xargs exit code $status). See the output above."
+            exit 1
+          fi
           if grep --silent "Match #" clang-query-output.txt; then
             echo "::error Forbidden code detected! It can be one of the following:"
             echo "::error - std::filesystem::path created from std::string. More information https://discord.com/channels/695809740428673034/1462210406616531259/1462567541825339635"
