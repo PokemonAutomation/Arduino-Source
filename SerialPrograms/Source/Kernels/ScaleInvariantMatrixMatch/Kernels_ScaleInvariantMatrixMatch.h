@@ -8,6 +8,9 @@
 #define PokemonAutomation_Kernels_ScaleInvariantMatrixMatch_H
 
 namespace PokemonAutomation{
+
+class UnitTestDatabase;
+
 namespace Kernels{
 namespace ScaleInvariantMatrixMatch{
 
@@ -53,6 +56,8 @@ float compute_error(
 );
 
 
+
+void add_tests(UnitTestDatabase& database);
 
 
 

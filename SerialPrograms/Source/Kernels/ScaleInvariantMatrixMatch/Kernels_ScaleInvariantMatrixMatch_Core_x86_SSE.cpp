@@ -10,6 +10,8 @@
 #include "Kernels/Kernels_x64_SSE41.h"
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h"
 #include "Kernels_ScaleInvariantMatrixMatch_Routines.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "Kernels_ScaleInvariantMatrixMatch_TestInfra.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -116,6 +118,43 @@ float compute_error_min4_x86_SSE(
     float const* const* W
 ){
     return compute_error<SumError<Context_x86_SSE41>>(width, height, scale, A, TW, W);
+}
+
+
+
+float compute_scale_Default(size_t width, size_t height, float const* const* A, float const* const* T);
+float compute_scale_Default(size_t width, size_t height, float const* const* A, float const* const* TW, float const* const* W);
+float compute_error_Default(size_t width, size_t height, float scale, float const* const* A, float const* const* T);
+float compute_error_Default(size_t width, size_t height, float scale, float const* const* A, float const* const* TW, float const* const* W);
+
+class Test_x86_SSE : public Test{
+public:
+    Test_x86_SSE(size_t width, size_t height, bool use_weights)
+        : Test(
+            "x86_SSE",
+            width, height,
+            use_weights,
+            compute_scale_Default,
+            compute_scale_min4_x86_SSE,
+            compute_scale_Default,
+            compute_scale_min4_x86_SSE,
+            compute_error_Default,
+            compute_error_min4_x86_SSE,
+            compute_error_Default,
+            compute_error_min4_x86_SSE
+        )
+    {}
+};
+void add_tests_x86_SSE(UnitTestDatabase& database){
+    //  The kernel requires a minimum row width (the partial-row loads span up to
+    //  a full vector); sizes below that are not registered for this ISA.
+    for (size_t i = 0; i < sizeof(kTestSizes) / sizeof(kTestSizes[0]); i++){
+        if (kTestSizes[i][0] < 4){
+            continue;
+        }
+        database.add<Test_x86_SSE>(kTestSizes[i][0], kTestSizes[i][1], false);
+        database.add<Test_x86_SSE>(kTestSizes[i][0], kTestSizes[i][1], true);
+    }
 }
 
 

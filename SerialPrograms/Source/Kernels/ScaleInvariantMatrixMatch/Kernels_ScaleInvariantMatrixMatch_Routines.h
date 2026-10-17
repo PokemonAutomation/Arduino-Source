@@ -22,8 +22,18 @@ struct SumATA2{
     using vtype = typename Context::vtype;
     static constexpr size_t VECTOR_LENGTH = sizeof(vtype) / sizeof(float);
 
-    vtype sum_AT = Context::vzero();
-    vtype sum_A2 = Context::vzero();
+    vtype sum_AT;
+    vtype sum_A2;
+
+    // An explicit default constructor is required: with only non-static data
+    // member initializers, the implicit default constructor does not zero the
+    // accumulators at -O0 on x86, leaving stale stack contents in the lanes
+    // (observed with gcc and Apple clang; the user-defined constructor of
+    // SumError initializes correctly under the same conditions).
+    PA_FORCE_INLINE SumATA2()
+        : sum_AT(Context::vzero())
+        , sum_A2(Context::vzero())
+    {}
 
     PA_FORCE_INLINE float scale() const{
         return Context::vreduce(sum_AT) / Context::vreduce(sum_A2);
@@ -98,7 +108,7 @@ struct SumATA2{
         if constexpr (VECTOR_LENGTH > 1){
             if (length){
                 vtype a0, t0;
-                Context::load2_partial_front(length, a0, ptrT, t0, ptrA);
+                Context::load2_partial_front(length, a0, ptrA, t0, ptrT);
                 sum_at0 = Context::vpma(a0, t0, sum_at0);
                 sum_as0 = Context::vpma(a0, a0, sum_as0);
             }
@@ -186,7 +196,7 @@ struct SumATA2{
         }
         if (length){
             vtype a0, t0, w0;
-            Context::load3_partial_front(length, a0, A, t0, TW, w0, W);
+            Context::load3_partial_front(length, a0, ptrA, t0, ptrT, w0, ptrW);
             a0 = Context::vmul(a0, w0);
             sum_as0 = Context::vpma(a0, a0, sum_as0);
             sum_at0 = Context::vpma(a0, t0, sum_at0);
@@ -205,10 +215,11 @@ struct SumError{
     static constexpr size_t VECTOR_LENGTH = sizeof(vtype) / sizeof(float);
 
     vtype scale;
-    vtype sum = Context::vzero();
+    vtype sum;
 
     PA_FORCE_INLINE SumError(float p_scale)
         : scale(Context::vset(p_scale))
+        , sum(Context::vzero())
     {}
 
     PA_FORCE_INLINE float sum_sqr() const{
@@ -271,7 +282,7 @@ struct SumError{
         }
         if (length){
             vtype a0, t0;
-            Context::load2_partial_front(length, a0, ptrT, t0, ptrA);
+            Context::load2_partial_front(length, a0, ptrA, t0, ptrT);
             a0 = Context::vpms(scale, a0, t0);
             sum0 = Context::vpma(a0, a0, sum0);
         }
@@ -345,7 +356,7 @@ struct SumError{
         }
         if (length){
             vtype a0, t0, w0;
-            Context::load3_partial_front(length, a0, A, t0, TW, w0, W);
+            Context::load3_partial_front(length, a0, ptrA, t0, ptrT, w0, ptrW);
             a0 = Context::vmul(scale, a0);
             a0 = Context::vpms(a0, w0, t0);
             sum0 = Context::vpma(a0, a0, sum0);

@@ -1188,6 +1188,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Core_x86_AVX512.cpp
     Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Core_x86_SSE.cpp
     Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Routines.h
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_TestInfra.cpp
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_TestInfra.h
     Source/Kernels/SpikeConvolution/Kernels_SpikeConvolution.cpp
     Source/Kernels/SpikeConvolution/Kernels_SpikeConvolution.h
     Source/Kernels/SpikeConvolution/Kernels_SpikeConvolution_Core_Default.cpp
