@@ -68,6 +68,12 @@ option(COMMAND_LINE_EXE "Build the optional executable" ON)
 # searched for.
 option(PA_CORE_ONLY "Build only the GUI-free core (basic microcontroller functions, no Qt, OpenCV, etc.)" OFF)
 
+# With MSVC or clang-cl, write an assembly listing (/FAs) of every source file to
+# Assembly/ in the build folder, to check the code the compiler generates, e.g. for
+# the SIMD kernels. CI turns this off: ccache can't cache a compile that writes a
+# listing, so every file would be recompiled on every run.
+option(PA_ASSEMBLY_LISTINGS "Write an assembly listing of every source file to Assembly/ (MSVC and clang-cl only)" ON)
+
 if(PA_CORE_ONLY)
     message(STATUS "PA_CORE_ONLY: building only the GUI-free core")
     set(CMAKE_AUTOMOC OFF)
@@ -388,7 +394,10 @@ if (WIN32)
         PA_SOCIAL_SDK
     )
 
-    target_compile_options(SerialProgramsLib PRIVATE /FAs /FaAssembly/ /MP /W4 /WX /external:anglebrackets /external:W0 /utf-8)
+    if(PA_ASSEMBLY_LISTINGS)
+        target_compile_options(SerialProgramsLib PRIVATE /FAs /FaAssembly/)
+    endif()
+    target_compile_options(SerialProgramsLib PRIVATE /MP /W4 /WX /external:anglebrackets /external:W0 /utf-8)
     target_compile_options(SerialProgramsLib PRIVATE /wd5054)  # Deprecated enum arithemtic
     target_compile_options(SerialProgramsLib PRIVATE /wd4505)  # unreferenced local function has been removed
 
@@ -397,7 +406,9 @@ if (WIN32)
     set(ARCH_FLAGS_17_Skylake       /arch:AVX512)
     set(ARCH_FLAGS_19_IceLake       /arch:AVX512)
 
-    if(CMAKE_GENERATOR_TOOLSET MATCHES "ClangCL")
+    # clang-cl, whether from Visual Studio's ClangCL toolset (-T ClangCL) or from another
+    # generator such as Ninja, where CMAKE_GENERATOR_TOOLSET is empty.
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         target_compile_options(SerialProgramsLib PRIVATE -Wno-unused-function)
         target_compile_options(SerialProgramsLib PRIVATE -march=nehalem)
         set(ARCH_FLAGS_09_Nehalem       -march=nehalem)
