@@ -1254,6 +1254,29 @@ struct StreamHistoryTracker_Ring::Impl{
                     + std::string(hex) + ").",
                     COLOR_CYAN
                 );
+                //  Log the first bytes of the first ring packet too: the
+                //  packet form must match the extradata form (every known
+                //  hardware encoder emits both as Annex B, mpeg4 in-band). If
+                //  an encoder ever mixed the forms, the MP4 save would be a
+                //  silent blank file; this makes the mismatch visible.
+                for (size_t i = p_video_start; i < p_video.size(); i++){
+                    const std::vector<uint8_t>& d = p_video[i]->data;
+                    if (d.empty()){
+                        continue;
+                    }
+                    char phex[9] = {0};
+                    for (size_t b = 0; b < 4 && b < d.size(); b++){
+                        uint8_t byte = d[b];
+                        phex[2 * b] = digits[byte >> 4];
+                        phex[2 * b + 1] = digits[byte & 0xF];
+                    }
+                    logger.log(
+                        "Stream history: first video packet starts with "
+                        + std::string(phex) + " (same form as the extradata).",
+                        COLOR_CYAN
+                    );
+                    break;
+                }
                 //  MP4 stores H.264 as AVCC (avcC header + NAL units with
                 //  4-byte length prefixes). The h264_amf wrapper emits
                 //  Annex B instead, and the MP4 muxer of the vendored ffmpeg
