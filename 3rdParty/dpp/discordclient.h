@@ -228,7 +228,7 @@ public:
 	 */
 	bool is_active() const;
 
-	voiceconn& request();
+	voiceconn& request(bool session_invalid = true);
 
 	/**
 	 * @brief Create websocket object and connect it.
@@ -242,9 +242,10 @@ public:
 
 	/**
 	 * @brief Disconnect from the currently connected voice channel
+	 * @param close Whether to close connection
 	 * @return reference to self
 	 */
-	voiceconn& disconnect();
+	voiceconn& disconnect(bool close = true);
 
 	/**
 	 * @brief Reassigns the owner to the given discord_client.
@@ -558,10 +559,8 @@ public:
 	 * other object, along with the seq number.
 	 *
 	 * @param old Previous connection to resume from
-	 * @param sequence Sequence number of previous session
-	 * @param session_id Session ID of previous session
 	 */
-	explicit discord_client(discord_client& old, uint64_t sequence, const std::string& session_id);
+	explicit discord_client(discord_client& old);
 
 	/**
 	 * @brief Destroy the discord client object

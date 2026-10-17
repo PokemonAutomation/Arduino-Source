@@ -2,6 +2,10 @@
 #include <QDir>
 #include <QApplication>
 #include <QFileInfo>
+#include <QFile>
+#ifdef _WIN32
+#include <QLibrary>
+#endif
 //#include <QTextStream>
 #include <QMessageBox>
 #include "Common/Cpp/Logging/LastLogTracker.h"
@@ -97,6 +101,42 @@ int run_program(int argc, char *argv[]){
     QApplication application(argc, argv);
 #endif
 
+#ifdef PA_DPP
+    // Configure OpenSSL before DPP or background tasks create a TLS context.
+    QString dpp_cert_message;
+    bool dpp_cert_error = false;
+    {
+        const bool use_bundled_cert = qEnvironmentVariableIsEmpty("SSL_CERT_FILE");
+        const QString cert_path = use_bundled_cert
+            ? QDir(QCoreApplication::applicationDirPath()).filePath("dpp-cacert.pem")
+            : qEnvironmentVariable("SSL_CERT_FILE");
+        QFile cert_file(cert_path);
+        if (!cert_file.open(QIODevice::ReadOnly)){
+            dpp_cert_error = true;
+            dpp_cert_message = "DPP CA certificate bundle cannot be read: " + cert_path +
+                " (" + cert_file.errorString() + "). Discord bot connections may fail.";
+        }else{
+            if (use_bundled_cert){
+                const QByteArray cert_path_bytes = cert_path.toLocal8Bit();
+                dpp_cert_error = !qputenv("SSL_CERT_FILE", cert_path_bytes);
+#ifdef _WIN32
+                // OpenSSL uses the release CRT even when Qt uses the debug CRT.
+                // Set both environment copies so OpenSSL can find the bundle.
+                using PutEnv = int (*)(const char*, const char*);
+                const PutEnv openssl_putenv = reinterpret_cast<PutEnv>(
+                    QLibrary::resolve("ucrtbase", "_putenv_s")
+                );
+                dpp_cert_error = dpp_cert_error ||
+                    !openssl_putenv || openssl_putenv("SSL_CERT_FILE", cert_path_bytes.constData()) != 0;
+#endif
+            }
+            dpp_cert_message = dpp_cert_error
+                ? "Failed to set SSL_CERT_FILE for DPP: " + cert_path
+                : "DPP CA certificate bundle: " + cert_path;
+        }
+    }
+#endif
+
     {
         QString bin_dir = QCoreApplication::applicationDirPath();
         QString qml_import_path = QDir(bin_dir).filePath("qml");
@@ -120,6 +160,9 @@ int run_program(int argc, char *argv[]){
     logger.log("Executable path: " + Filesystem::application_binary_directory().string_slash_normalized());
     logger.log("Program setting folder: " + SETTINGS_PATH());
     logger.log("Program resources folder: " + RESOURCE_PATH());
+#ifdef PA_DPP
+    logger.log(dpp_cert_message.toStdString(), dpp_cert_error ? COLOR_RED : Color());
+#endif
 
     qRegisterMetaType<size_t>("size_t");
     qRegisterMetaType<uint8_t>("uint8_t");
