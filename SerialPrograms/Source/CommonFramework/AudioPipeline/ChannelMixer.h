@@ -45,9 +45,14 @@ namespace PokemonAutomation{
 //    - Top, bottom, and back-center channels never mix (dropped in downmix, silent in
 //      upmix).
 //
+//  When a format's channel layout is unknown (channelConfig() == ChannelConfigUnknown),
+//  the standard layout for the channel count is assumed: 1 = mono, 2 = stereo,
+//  3 = 2.1, 4 = 3.1, 5 = 5.0, 6 = 5.1, 7 = 7.0, 8 = 7.1.
+//
 //  An empty vector is returned on failure:
 //    - Either format has a non-positive channel count, or
-//    - Either format's channel layout is unknown (channelConfig() == ChannelConfigUnknown).
+//    - Either format's channel layout is unknown and its channel count has no standard
+//      fallback layout.
 //  A channel that exists in the frame but has no position in its config contributes
 //  nothing (its matrix row is all zeros), and an output channel with no position
 //  receives nothing (its column is all zeros).
