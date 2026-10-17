@@ -4,6 +4,7 @@
  *
  */
 
+#include <cstdio>
 #include <limits>
 #include <random>
 #include <type_traits>
@@ -70,7 +71,7 @@ std::string sample_typestr(SampleFormat sample_type){
 
 
 template <typename Type>
-UnitTestResult run_round_trip(SampleFormat sample_type, size_t channels, size_t samples){
+UnitTestResult run_round_trip(SampleFormat sample_type, size_t channels, size_t samples, float from_multiplier){
     //  Generate random input.
     AlignedVector<Type> input(samples * channels);
     std::mt19937 generator(42);
@@ -98,8 +99,14 @@ UnitTestResult run_round_trip(SampleFormat sample_type, size_t channels, size_t 
 
     //  Small buffer so the sample-size sweep hits multiple chunks.
     const size_t buffer_size = 256;
-    RawAudio2WorkingAudio raw2working(sample_type, sample_rate, channels, buffer_size);
-    WorkingAudio2RawAudio working2raw(sample_type, sample_rate, channels, 1.0f, buffer_size);
+    RawAudio2WorkingAudio raw2working(
+        sample_type, sample_rate, channels,
+        from_multiplier, buffer_size
+    );
+    WorkingAudio2RawAudio working2raw(
+        sample_type, sample_rate, channels,
+        1.0f / from_multiplier, buffer_size
+    );
     RecordingRawAudioListener<Type> output(sample_type, sample_rate, channels, samples * channels);
     raw2working.add_listener(working2raw);
     working2raw.add_listener(output);
@@ -132,26 +139,39 @@ UnitTestResult run_round_trip(SampleFormat sample_type, size_t channels, size_t 
 RoundTripTest::RoundTripTest(
     SampleFormat sample_type,
     size_t channels,
-    size_t samples
+    size_t samples,
+    float from_multiplier
 )
     : UnitTest(
-        "Kernels::AudioPipeline - RoundTrip_" + sample_typestr(sample_type) +
-        "(" + std::to_string(channels) + "ch x " + std::to_string(samples) + ")"
+        [&]{
+            std::string name = "Kernels::AudioPipeline - RoundTrip_" + sample_typestr(sample_type) +
+                "(" + std::to_string(channels) + "ch x " + std::to_string(samples) + ")";
+            if (from_multiplier != 1.0f){
+                char mults[64];
+                std::snprintf(
+                    mults, sizeof(mults), " [from %.4g / to %.4g]",
+                    from_multiplier, 1.0f / from_multiplier
+                );
+                name += mults;
+            }
+            return name;
+        }()
     )
     , m_sample_type(sample_type)
     , m_channels(channels)
     , m_samples(samples)
+    , m_from_multiplier(from_multiplier)
 {}
 UnitTestResult RoundTripTest::run(Logger& logger, CancellableScope& scope) const{
     switch (m_sample_type){
     case SampleFormat::UINT8:
-        return run_round_trip<uint8_t>(m_sample_type, m_channels, m_samples);
+        return run_round_trip<uint8_t>(m_sample_type, m_channels, m_samples, m_from_multiplier);
     case SampleFormat::SINT16:
-        return run_round_trip<int16_t>(m_sample_type, m_channels, m_samples);
+        return run_round_trip<int16_t>(m_sample_type, m_channels, m_samples, m_from_multiplier);
     case SampleFormat::SINT32:
-        return run_round_trip<int32_t>(m_sample_type, m_channels, m_samples);
+        return run_round_trip<int32_t>(m_sample_type, m_channels, m_samples, m_from_multiplier);
     case SampleFormat::FLOAT32:
-        return run_round_trip<float>(m_sample_type, m_channels, m_samples);
+        return run_round_trip<float>(m_sample_type, m_channels, m_samples, m_from_multiplier);
     default:
         throw InternalProgramError(&logger, PA_CURRENT_FUNCTION, "Unknown sample type.");
     }

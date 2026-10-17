@@ -15,7 +15,7 @@ namespace AudioStreamConverter{
 
 
 template <typename ExternalType>
-void convert_from_Default(r_ptr<float> native, c_ptr<ExternalType> ext, size_t samples);
+void convert_from_Default(r_ptr<float> native, c_ptr<ExternalType> ext, size_t samples, float multiplier);
 template <typename ExternalType>
 void convert_to_Default(c_ptr<float> native, r_ptr<ExternalType> ext, size_t samples, float multiplier);
 void add_tests_Default(UnitTestDatabase& database);
@@ -23,9 +23,9 @@ void add_tests_Default(UnitTestDatabase& database);
 
 
 template <>
-void convert_from_Default<uint8_t>(r_ptr<float> native, c_ptr<uint8_t> ext, size_t samples){
+void convert_from_Default<uint8_t>(r_ptr<float> native, c_ptr<uint8_t> ext, size_t samples, float multiplier){
     for (size_t c = 0; c < samples; c++){
-        native[c] = ((int)ext[c] - 128) * (1.0f / 128.0f);
+        native[c] = ((int)ext[c] - 128) * (1.0f / 128.0f) * multiplier;
     }
 }
 template <>
@@ -38,9 +38,9 @@ void convert_to_Default<uint8_t>(c_ptr<float> native, r_ptr<uint8_t> ext, size_t
     }
 }
 template <>
-void convert_from_Default<int16_t>(r_ptr<float> native, c_ptr<int16_t> ext, size_t samples){
+void convert_from_Default<int16_t>(r_ptr<float> native, c_ptr<int16_t> ext, size_t samples, float multiplier){
     for (size_t c = 0; c < samples; c++){
-        native[c] = (float)ext[c] * (1.0f / 32768.0f);
+        native[c] = (float)ext[c] * (1.0f / 32768.0f) * multiplier;
     }
 }
 template <>
@@ -55,9 +55,9 @@ void convert_to_Default<int16_t>(c_ptr<float> native, r_ptr<int16_t> ext, size_t
     }
 }
 template <>
-void convert_from_Default<int32_t>(r_ptr<float> native, c_ptr<int32_t> ext, size_t samples){
+void convert_from_Default<int32_t>(r_ptr<float> native, c_ptr<int32_t> ext, size_t samples, float multiplier){
     for (size_t c = 0; c < samples; c++){
-        native[c] = (float)ext[c] * (1.0f / 2147483648.0f);
+        native[c] = (float)ext[c] * (1.0f / 2147483648.0f) * multiplier;
     }
 }
 template <>
@@ -82,20 +82,29 @@ void convert_to_Default<int32_t>(c_ptr<float> native, r_ptr<int32_t> ext, size_t
 template <typename Type>
 class Test_Default : public Test<Type>{
 public:
-    Test_Default(size_t samples)
+    Test_Default(size_t samples, float from_multiplier, float to_multiplier)
         : Test<Type>(
             "Default",
             samples,
             (ConvertFrom<Type>)convert_from_Default<Type>,
-            (ConvertTo<Type>)convert_to_Default<Type>
+            (ConvertTo<Type>)convert_to_Default<Type>,
+            from_multiplier,
+            to_multiplier
         )
     {}
 };
 void add_tests_Default(UnitTestDatabase& database){
+    //  The multipliers are reciprocals so the round trip stays in the
+    //  native range (and exact in binary): from scales the floats down,
+    //  to scales them back up.
+    const float from_multipliers[] = { 1.0f, 0.5f, 0.25f };
     for (size_t samples = 2; samples < 1000; samples = (size_t)(samples * 1.1) + 1){
-        database.add<Test_Default<uint8_t>>(samples);
-        database.add<Test_Default<int16_t>>(samples);
-        database.add<Test_Default<int32_t>>(samples);
+        for (float from_multiplier : from_multipliers){
+            float to_multiplier = 1.0f / from_multiplier;
+            database.add<Test_Default<uint8_t>>(samples, from_multiplier, to_multiplier);
+            database.add<Test_Default<int16_t>>(samples, from_multiplier, to_multiplier);
+            database.add<Test_Default<int32_t>>(samples, from_multiplier, to_multiplier);
+        }
     }
 }
 

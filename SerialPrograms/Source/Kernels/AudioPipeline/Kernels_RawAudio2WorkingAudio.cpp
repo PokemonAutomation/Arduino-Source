@@ -39,7 +39,8 @@ template <typename Type>
 void RawAudio2WorkingAudio::set_converter(){
     m_convert = [this](const void* data, size_t samples){
         Kernels::AudioStreamConverter::convert_from<Type>(
-            m_interleaved_floats.data(), (const Type*)data, samples
+            m_interleaved_floats.data(), (const Type*)data, samples,
+            m_multiplier.load(std::memory_order_acquire)
         );
     };
 }
@@ -49,9 +50,11 @@ RawAudio2WorkingAudio::RawAudio2WorkingAudio(
     SampleFormat sample_type,
     size_t sample_rate,
     size_t channels,
+    float multiplier,
     size_t buffer_size
 )
     : RawAudioStreamListener(sample_type, sample_rate, channels)
+    , m_multiplier(multiplier)
     , m_buffer_size(buffer_size)
 {
     //  Single-channel float is pass-through.
@@ -94,6 +97,9 @@ void RawAudio2WorkingAudio::add_listener(WorkingAudioStreamListener& listener){
 }
 void RawAudio2WorkingAudio::remove_listener(WorkingAudioStreamListener& listener){
     m_listeners.remove(listener);
+}
+void RawAudio2WorkingAudio::set_multiplier(float multiplier){
+    m_multiplier.store(multiplier, std::memory_order_release);
 }
 
 void RawAudio2WorkingAudio::push_samples(size_t frames, const void* data){
