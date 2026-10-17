@@ -116,6 +116,8 @@ private:
     //  Stream state.
     size_t m_in_index = 0;   //  Absolute index of the next input to be pushed.
     size_t m_out_index = 0;  //  Absolute index of the next output to produce.
+    size_t m_wr = 0;         //  m_out_index within the extended output period.
+    size_t m_periods = 0;    //  Extended output periods m_out_index spans.
     size_t m_carry_avail = 0;  //  Unprocessed input samples in the carries.
 };
 

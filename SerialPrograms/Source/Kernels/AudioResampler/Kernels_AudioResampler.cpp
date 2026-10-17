@@ -144,11 +144,13 @@ void AudioResampler::push_samples(size_t samples, size_t stride, const float* da
     const size_t block = m_block.sample_block;
     const size_t channels = this->channels();
 
-    //  The per-push division and modulo are amortized over the whole
-    //  chunk; the per-block progress below uses neither.
+    //  wr and periods decompose m_out_index over the extended output
+    //  period. They are carried across calls and only the block loop
+    //  below mutates them, so the push is division- and modulo-free
+    //  throughout.
     size_t out_index = m_out_index;
-    size_t wr = out_index % period_out_extended;
-    size_t periods = out_index / period_out_extended;
+    size_t wr = m_wr;
+    size_t periods = m_periods;
 
     //  Absolute input position of the next output's window start.
     size_t cursor = index[wr] + periods * m_period_in_extended;
@@ -296,6 +298,8 @@ void AudioResampler::push_samples(size_t samples, size_t stride, const float* da
     }
 
     m_out_index = out_index;
+    m_wr = wr;
+    m_periods = periods;
     m_in_index = pushed_end;
     m_carry_avail = (carry > 0) ? (size_t)carry : 0;
 }
