@@ -45,9 +45,13 @@ const auto& hand_styles(){
     static const HandStyle styles[] = {
         {{"PokemonFRLG/Box/SelectionHand_White.png", Color(180, 180, 180), Color(255, 255, 255)},
             BoxSelectionMode::Normal, false, 0xffb4b4b4, 0xffffffff},
+        {{"PokemonFRLG/Box/SelectionHand_White2.png", Color(180, 180, 180), Color(255, 255, 255)},
+            BoxSelectionMode::Normal, false, 0xffb4b4b4, 0xffffffff},
         {{"PokemonFRLG/Box/SelectionHand_White_Inverted.png", Color(180, 180, 180), Color(255, 255, 255)},
             BoxSelectionMode::Normal, true, 0xffb4b4b4, 0xffffffff},
         {{"PokemonFRLG/Box/SelectionHand_Gold.png", Color(180, 120, 0), Color(255, 255, 150)},
+            BoxSelectionMode::Relocate, false, 0xffb47800, 0xffffff96},
+        {{"PokemonFRLG/Box/SelectionHand_Gold2.png", Color(180, 120, 0), Color(255, 255, 150)},
             BoxSelectionMode::Relocate, false, 0xffb47800, 0xffffff96},
         {{"PokemonFRLG/Box/SelectionHand_Gold_Inverted.png", Color(180, 120, 0), Color(255, 255, 150)},
             BoxSelectionMode::Relocate, true, 0xffb47800, 0xffffff96},
@@ -189,7 +193,9 @@ void add_tests_BoxSelectionModeDetector(UnitTestDatabase& database){
     database.add<Test_BoxSelectionModeDetector>("PokemonFRLG/Box/BoxHand_White_HD60Pro_NV12.png", Mode::Normal, Location::Grid, 0, 0);
     database.add<Test_BoxSelectionModeDetector>("PokemonFRLG/Box/BoxHand_White_HD60Pro_YUYV.png", Mode::Normal, Location::Grid, 0, 0);
     database.add<Test_BoxSelectionModeDetector>("PokemonFRLG/Box/BoxSelection_Gold.png", Mode::Relocate, Location::BoxTile);
+    database.add<Test_BoxSelectionModeDetector>("PokemonFRLG/Box/BoxSelection_Gold2.png", Mode::Relocate, Location::Grid, 2, 4);
     database.add<Test_BoxSelectionModeDetector>("PokemonFRLG/Box/BoxSelection_White.png", Mode::Normal, Location::BoxTile);
+    database.add<Test_BoxSelectionModeDetector>("PokemonFRLG/Box/BoxSelection_White2.png", Mode::Normal, Location::Grid, 2, 4);
     database.add<Test_BoxSelectionModeDetector>("PokemonFRLG/Box/Caterpie_F_4_White.png", Mode::Normal, Location::Grid, 0, 5);
     database.add<Test_BoxSelectionModeDetector>("PokemonFRLG/Box/CloseSelection_Gold.png", Mode::Relocate, Location::CloseBoxButton);
     database.add<Test_BoxSelectionModeDetector>("PokemonFRLG/Box/CloseSelection_White.png", Mode::Normal, Location::CloseBoxButton);

@@ -165,7 +165,9 @@ void add_tests_BoxCellReader(UnitTestDatabase& database){
     database.add<Test_BoxCellReader_Name>("PokemonFRLG/Box/BoxHand_White_HD60Pro_NV12.png", "farfetch-d");
     database.add<Test_BoxCellReader_Name>("PokemonFRLG/Box/BoxHand_White_HD60Pro_YUYV.png", "farfetch-d");
     database.add<Test_BoxCellReader_Name>("PokemonFRLG/Box/BoxSelection_Gold.png", "");
+    database.add<Test_BoxCellReader_Name>("PokemonFRLG/Box/BoxSelection_Gold2.png", "raichu");
     database.add<Test_BoxCellReader_Name>("PokemonFRLG/Box/BoxSelection_White.png", "");
+    database.add<Test_BoxCellReader_Name>("PokemonFRLG/Box/BoxSelection_White2.png", "raichu");
     database.add<Test_BoxCellReader_Name>("PokemonFRLG/Box/Caterpie_F_4_White.png", "caterpie");
     database.add<Test_BoxCellReader_Name>("PokemonFRLG/Box/CloseSelection_Gold.png", "");
     database.add<Test_BoxCellReader_Name>("PokemonFRLG/Box/CloseSelection_White.png", "");
@@ -184,7 +186,9 @@ void add_tests_BoxCellReader(UnitTestDatabase& database){
     database.add<Test_BoxCellReader_Level>("PokemonFRLG/Box/BoxHand_White_HD60Pro_NV12.png", 33);
     database.add<Test_BoxCellReader_Level>("PokemonFRLG/Box/BoxHand_White_HD60Pro_YUYV.png", 33);
     database.add<Test_BoxCellReader_Level>("PokemonFRLG/Box/BoxSelection_Gold.png", -1);
+    database.add<Test_BoxCellReader_Level>("PokemonFRLG/Box/BoxSelection_Gold2.png", 100);
     database.add<Test_BoxCellReader_Level>("PokemonFRLG/Box/BoxSelection_White.png", -1);
+    database.add<Test_BoxCellReader_Level>("PokemonFRLG/Box/BoxSelection_White2.png", 100);
     database.add<Test_BoxCellReader_Level>("PokemonFRLG/Box/Caterpie_F_4_White.png", 4);
     database.add<Test_BoxCellReader_Level>("PokemonFRLG/Box/CloseSelection_Gold.png", -1);
     database.add<Test_BoxCellReader_Level>("PokemonFRLG/Box/CloseSelection_White.png", -1);

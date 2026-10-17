@@ -78,7 +78,9 @@ void add_tests_BoxGenderReader(UnitTestDatabase& database){
     database.add<Test_BoxGenderReader>("PokemonFRLG/Box/BoxHand_White_HD60Pro_NV12.png", Gender::Male);
     database.add<Test_BoxGenderReader>("PokemonFRLG/Box/BoxHand_White_HD60Pro_YUYV.png", Gender::Male);
     database.add<Test_BoxGenderReader>("PokemonFRLG/Box/BoxSelection_Gold.png", Gender::Genderless);
+    database.add<Test_BoxGenderReader>("PokemonFRLG/Box/BoxSelection_Gold2.png", Gender::Male);
     database.add<Test_BoxGenderReader>("PokemonFRLG/Box/BoxSelection_White.png", Gender::Genderless);
+    database.add<Test_BoxGenderReader>("PokemonFRLG/Box/BoxSelection_White2.png", Gender::Male);
     database.add<Test_BoxGenderReader>("PokemonFRLG/Box/Caterpie_F_4_White.png", Gender::Female);
     database.add<Test_BoxGenderReader>("PokemonFRLG/Box/CloseSelection_Gold.png", Gender::Genderless);
     database.add<Test_BoxGenderReader>("PokemonFRLG/Box/CloseSelection_White.png", Gender::Genderless);
