@@ -20,24 +20,34 @@ namespace AudioPipeline{
 
 //
 //  Pushes random samples through a RawAudio2WorkingAudio node and a
-//  WorkingAudio2RawAudio node (with a 1.0f multiplier), then compares the
-//  resulting raw samples to the input.
+//  WorkingAudio2RawAudio node (with reciprocal multipliers, so the
+//  round trip is lossless), then compares the resulting raw samples
+//  to the input.
 //
 class RoundTripTest : public UnitTest{
 public:
     RoundTripTest(
         SampleFormat sample_type,
         size_t channels,
-        size_t samples
+        size_t samples,
+        float from_multiplier = 1.0f
     );
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override;
 
 
 private:
+    static std::string make_name(
+        SampleFormat sample_type,
+        size_t channels,
+        size_t samples,
+        float from_multiplier
+    );
+
     const SampleFormat m_sample_type;
     const size_t m_channels;
     const size_t m_samples;
+    const float m_from_multiplier;
 };
 
 

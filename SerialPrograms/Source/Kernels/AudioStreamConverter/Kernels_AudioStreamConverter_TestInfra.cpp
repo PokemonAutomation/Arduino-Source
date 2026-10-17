@@ -8,6 +8,7 @@
 #include <random>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Kernels_AudioStreamConverter_TestInfra.h"
 
 namespace PokemonAutomation{
@@ -22,15 +23,16 @@ Test<Type>::Test(
     const std::string& arch_str,
     size_t samples,
     ConvertFrom<Type> convert_from,
-    ConvertTo<Type> convert_to
+    ConvertTo<Type> convert_to,
+    float from_multiplier,
+    float to_multiplier
 )
-    : UnitTest(
-        "Kernels::AudioStreamConverter - " + typestr() + "_" + arch_str +
-        "(" + std::to_string(samples) + ")"
-    )
+    : UnitTest(make_name(arch_str, samples, from_multiplier, to_multiplier))
     , m_samples(samples)
     , m_convert_from(convert_from)
     , m_convert_to(convert_to)
+    , m_from_multiplier(from_multiplier)
+    , m_to_multiplier(to_multiplier)
 {}
 template <typename Type>
 UnitTestResult Test<Type>::run(Logger& logger, CancellableScope& scope) const{
@@ -62,8 +64,8 @@ UnitTestResult Test<Type>::run(Logger& logger, CancellableScope& scope) const{
         }
     }
 
-    m_convert_from(native.data(), ext0.data(), m_samples);
-    m_convert_to(native.data(), ext1.data(), m_samples, 1.0f);
+    m_convert_from(native.data(), ext0.data(), m_samples, m_from_multiplier);
+    m_convert_to(native.data(), ext1.data(), m_samples, m_to_multiplier);
 
     //  Check for errors.
     for (size_t c = 0; c < m_samples; c++){
@@ -74,6 +76,21 @@ UnitTestResult Test<Type>::run(Logger& logger, CancellableScope& scope) const{
     }
 
     return true;
+}
+template <typename Type>
+std::string Test<Type>::make_name(
+    const std::string& arch_str,
+    size_t samples,
+    float from_multiplier,
+    float to_multiplier
+){
+    std::string name = "Kernels::AudioStreamConverter - " + typestr() + "_" + arch_str +
+        "(" + std::to_string(samples) + ")";
+    if (from_multiplier != 1.0f || to_multiplier != 1.0f){
+        name += " [from " + tostr_default(from_multiplier) +
+            " / to " + tostr_default(to_multiplier) + "]";
+    }
+    return name;
 }
 template <typename Type>
 std::string Test<Type>::typestr(){
