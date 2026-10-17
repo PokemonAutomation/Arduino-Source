@@ -9,6 +9,7 @@
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
@@ -69,6 +70,8 @@ private:
     MillisecondsOption RESET_DELAY;
     BooleanCheckBoxOption ROTATE_CAMERA;
 
+    //  Holds MOVEMENT, RUN_DIRECTION, RUN_DURATION and ROLLS in one box in the UI.
+    GroupOption MOVEMENT_GROUP;
     EnumDropdownOption<Movement> MOVEMENT;
     EnumDropdownOption<RunDirection> RUN_DIRECTION;
     MillisecondsOption RUN_DURATION;
