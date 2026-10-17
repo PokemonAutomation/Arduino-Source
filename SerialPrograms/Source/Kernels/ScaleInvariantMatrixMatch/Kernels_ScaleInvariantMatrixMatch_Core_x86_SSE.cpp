@@ -273,13 +273,13 @@ void add_tests_x86_SSE(UnitTestDatabase& database){
         if (kTestSizes[i][0] < 4){
             continue;
         }
-    database.add<Probe_x86_SSE>(8, 33);
-    database.add<Probe_x86_SSE>(4, 1);
-    database.add<Probe_x86_SSE>(8, 1);
         for (bool use_weights : { false, true }){
             database.add<Test_x86_SSE>(kTestSizes[i][0], kTestSizes[i][1], use_weights);
         }
     }
+    database.add<Probe_x86_SSE>(8, 33);
+    database.add<Probe_x86_SSE>(4, 1);
+    database.add<Probe_x86_SSE>(8, 1);
 }
 
 
