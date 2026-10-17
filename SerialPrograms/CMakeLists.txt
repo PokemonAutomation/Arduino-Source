@@ -68,8 +68,19 @@ option(COMMAND_LINE_EXE "Build the optional executable" ON)
 # searched for.
 option(PA_CORE_ONLY "Build only the GUI-free core (basic microcontroller functions, no Qt, OpenCV, etc.)" OFF)
 
+# Keep stream history as an in-memory ring of encoded video (hardware H.264,
+# with the built-in MPEG-4 encoder as a fallback so no GPL dependency is
+# needed) + AAC packets (StreamHistoryTracker_Ring) and only write to storage
+# when saving. Requires the ffmpeg shared libraries, which must be provided
+# per platform (see the PA_STREAM_HISTORY_FFMPEG blocks in the WIN32 and
+# POSIX sections below).
+option(PA_STREAM_HISTORY_FFMPEG "Stream history as in-memory encoded video+AAC ring buffer (requires ffmpeg)" ON)
+
 if(PA_CORE_ONLY)
     message(STATUS "PA_CORE_ONLY: building only the GUI-free core")
+    if(PA_STREAM_HISTORY_FFMPEG)
+        message(WARNING "PA_STREAM_HISTORY_FFMPEG has no effect when PA_CORE_ONLY=ON (GUI-free core build).")
+    endif()
     set(CMAKE_AUTOMOC OFF)
     set(CMAKE_AUTORCC OFF)
     set(CMAKE_AUTOUIC OFF)
@@ -342,6 +353,71 @@ if (WIN32)
         MAP_IMPORTED_CONFIG_MINSIZEREL      RELEASE
     )
 
+    if (PA_STREAM_HISTORY_FFMPEG)
+        #  ffmpeg shared libraries for the in-memory stream history ring.
+        #  Provide the headers under 3rdParty/ffmpeg/ (the ffmpeg "include" tree:
+        #  3rdParty/ffmpeg/libavcodec/avcodec.h, 3rdParty/ffmpeg/libavformat/..., etc.)
+        #  and the import libraries + DLLs in 3rdPartyBinaries/
+        #  (avcodec.lib/.dll, avformat.lib/.dll, avutil.lib/.dll, swscale.lib/.dll,
+        #  swresample.lib/.dll - use an LGPL shared build; the project is
+        #  LGPL-only, so use e.g. the gyan.dev "...-lgpl-shared" release or
+        #  BtbN's "win64-lgpl-shared", not the GPL build).
+        #  The DLLs placed in 3rdPartyBinaries/ are copied to the output directory
+        #  by the THIRD_PARTY_DLLS deploy step below. Requires ffmpeg >= 5.1:
+        #  the ring uses the ffmpeg 5.1 API generation (the channel layout API,
+        #  i.e. void av_channel_layout_default(), and swr_alloc_set_opts2() taking
+        #  a SwrContext**), both introduced in 5.1 with signatures unchanged since.
+        foreach(FFMPEG_LIB IN ITEMS avcodec avformat avutil swscale swresample)
+            if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../3rdParty/ffmpeg/lib${FFMPEG_LIB}/${FFMPEG_LIB}.h")
+                message(FATAL_ERROR
+                    "PA_STREAM_HISTORY_FFMPEG=ON but 3rdParty/ffmpeg/lib${FFMPEG_LIB}/${FFMPEG_LIB}.h was not found. "
+                    "Install the ffmpeg headers into 3rdParty/ffmpeg/ and the import libraries into 3rdPartyBinaries/.")
+            endif()
+            if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/${FFMPEG_LIB}.lib")
+                message(FATAL_ERROR
+                    "PA_STREAM_HISTORY_FFMPEG=ON but 3rdPartyBinaries/${FFMPEG_LIB}.lib was not found. "
+                    "Install the ffmpeg import libraries + DLLs into 3rdPartyBinaries/.")
+            endif()
+            add_library(ffmpeg_${FFMPEG_LIB}_lib IMPORTED UNKNOWN)
+            set_target_properties(ffmpeg_${FFMPEG_LIB}_lib PROPERTIES
+                IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/${FFMPEG_LIB}.lib
+            )
+            target_link_libraries(SerialProgramsLib PRIVATE ffmpeg_${FFMPEG_LIB}_lib)
+        endforeach()
+        #  Enforce the minimum ffmpeg generation from the vendored headers.
+        #  The ring requires the ffmpeg 5.1 API generation: the channel layout
+        #  API (av_channel_layout_default() and friends) and swr_alloc_set_opts2()
+        #  were both introduced in ffmpeg 5.1, with signatures unchanged since.
+        #  libavcodec's major version alone cannot tell 5.x apart from 4.x
+        #  (both are libavcodec 58), so detect the 5.1 API in the headers
+        #  instead of comparing version numbers.
+        set(FFMPEG_51_API_OK TRUE)
+        if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../3rdParty/ffmpeg/libavutil/channel_layout.h")
+            set(FFMPEG_51_API_OK FALSE)
+        else()
+            file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/../3rdParty/ffmpeg/libavutil/channel_layout.h"
+                FFMPEG_51_LINES REGEX "av_channel_layout_default")
+            if (FFMPEG_51_LINES STREQUAL "")
+                set(FFMPEG_51_API_OK FALSE)
+            endif()
+        endif()
+        if (FFMPEG_51_API_OK)
+            file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/../3rdParty/ffmpeg/libswresample/swresample.h"
+                FFMPEG_51_LINES REGEX "swr_alloc_set_opts2")
+            if (FFMPEG_51_LINES STREQUAL "")
+                set(FFMPEG_51_API_OK FALSE)
+            endif()
+        endif()
+        if (NOT FFMPEG_51_API_OK)
+            message(FATAL_ERROR
+                "PA_STREAM_HISTORY_FFMPEG=ON requires ffmpeg >= 5.1 "
+                "(the channel layout API and swr_alloc_set_opts2()), "
+                "but 3rdParty/ffmpeg/ does not look like ffmpeg 5.1 or newer. "
+                "Update the vendored ffmpeg headers in 3rdParty/ffmpeg/ and the import libraries in 3rdPartyBinaries/.")
+        endif()
+        target_include_directories(SerialProgramsLib SYSTEM PRIVATE ../3rdParty/ffmpeg/)
+    endif()
+
     add_library(ONNX_lib IMPORTED UNKNOWN)
     target_include_directories(SerialProgramsLib SYSTEM PRIVATE ../3rdParty/ONNX/)
     set_target_properties(ONNX_lib PROPERTIES
@@ -567,6 +643,58 @@ else() # macOS and Linux
     target_link_directories(SerialProgramsLib PUBLIC ${OpenCV_LIBRARY_DIRS})
     target_link_libraries(SerialProgramsLib PUBLIC ${OpenCV_LINK_LIBRARIES})
 
+    if (PA_STREAM_HISTORY_FFMPEG)
+        #  ffmpeg for the in-memory stream history ring (requires ffmpeg >= 5.1 -
+        #  the ring uses the ffmpeg 5.1 API generation: the channel layout API
+        #  (av_channel_layout_default()) and swr_alloc_set_opts2(), both
+        #  introduced in 5.1 with signatures unchanged since).
+        #  Ubuntu:  sudo apt install libavcodec-dev libavformat-dev libavutil-dev
+        #           libswscale-dev libswresample-dev
+        #  macOS:   brew install ffmpeg
+        #  The pkg-config module names are not consistent across platforms:
+        #  Homebrew ships avcodec.pc, avformat.pc, ... while Debian/Ubuntu ship
+        #  libavcodec.pc, libavformat.pc, ... - so try both namings.
+        pkg_check_modules(FFMPEG_SHORT_NAMES avcodec avformat avutil swscale swresample)
+        pkg_check_modules(FFMPEG_LIB_NAMES libavcodec libavformat libavutil libswscale libswresample)
+        if (FFMPEG_SHORT_NAMES_FOUND)
+            set(FFMPEG_PC FFMPEG_SHORT_NAMES)
+        elseif (FFMPEG_LIB_NAMES_FOUND)
+            set(FFMPEG_PC FFMPEG_LIB_NAMES)
+        else ()
+            message(FATAL_ERROR
+                "PA_STREAM_HISTORY_FFMPEG=ON but no ffmpeg development packages were found via pkg-config "
+                "(neither 'avcodec avformat avutil swscale swresample' nor 'libavcodec libavformat libavutil libswscale libswresample'). "
+                "Ubuntu: sudo apt install libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libswresample-dev. "
+                "macOS: brew install ffmpeg.")
+        endif()
+        #  libavcodec's major version cannot tell ffmpeg 5.x apart from 4.x
+        #  (both are libavcodec 58), so detect the 5.1 API generation in the
+        #  headers found by pkg-config instead of comparing version numbers.
+        set(FFMPEG_51_API_OK FALSE)
+        foreach (FFMPEG_INC_DIR IN LISTS ${FFMPEG_PC}_INCLUDE_DIRS)
+            if (EXISTS "${FFMPEG_INC_DIR}/libavutil/channel_layout.h"
+                AND EXISTS "${FFMPEG_INC_DIR}/libswresample/swresample.h")
+                file(STRINGS "${FFMPEG_INC_DIR}/libavutil/channel_layout.h" FFMPEG_51_LINES REGEX "av_channel_layout_default")
+                file(STRINGS "${FFMPEG_INC_DIR}/libswresample/swresample.h" FFMPEG_51_LINES_SWR REGEX "swr_alloc_set_opts2")
+                if (NOT FFMPEG_51_LINES STREQUAL "" AND NOT FFMPEG_51_LINES_SWR STREQUAL "")
+                    set(FFMPEG_51_API_OK TRUE)
+                    break()
+                endif()
+            endif()
+        endforeach()
+        if (NOT FFMPEG_51_API_OK)
+            message(FATAL_ERROR
+                "PA_STREAM_HISTORY_FFMPEG=ON requires ffmpeg >= 5.1 "
+                "(the channel layout API and swr_alloc_set_opts2()), "
+                "but the ffmpeg development packages found via pkg-config "
+                "(version ${${FFMPEG_PC}_VERSION}) do not provide the ffmpeg 5.1 API generation.")
+        endif()
+        message(STATUS "PA stream-history ring: ffmpeg found via pkg-config module set '${FFMPEG_PC}' (version ${${FFMPEG_PC}_VERSION}).")
+        target_include_directories(SerialProgramsLib SYSTEM PRIVATE ${${FFMPEG_PC}_INCLUDE_DIRS})
+        target_link_directories(SerialProgramsLib PUBLIC ${${FFMPEG_PC}_LIBRARY_DIRS})
+        target_link_libraries(SerialProgramsLib PRIVATE ${${FFMPEG_PC}_LIBRARIES})
+    endif()
+
     #we hope to use our own Tesseract build in future so we can rid that dependency
     #but right now to run on Linux and Mac we need to use external Tesseract library
     pkg_search_module(TESSERACT tesseract)
@@ -654,6 +782,12 @@ else() # macOS and Linux
     endif()
 endif()
 
+
+
+# Enable the ffmpeg-based stream history tracker (StreamHistoryTracker_Ring).
+if (PA_STREAM_HISTORY_FFMPEG)
+    target_compile_definitions(SerialProgramsLib PRIVATE PA_STREAM_HISTORY_FFMPEG)
+endif()
 
 
 #   Run-time CPU dispatching.

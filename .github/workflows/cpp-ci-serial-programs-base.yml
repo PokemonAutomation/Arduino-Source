@@ -77,8 +77,8 @@ jobs:
         run: |
           cd Arduino-Source
           sudo apt update
-          sudo apt upgrade 
-          sudo apt install clang-tools libopencv-dev libsystemd-dev
+          sudo apt install -y pkg-config clang-tools libopencv-dev libsystemd-dev
+          sudo apt install -y libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libswresample-dev
 
           sudo apt install ./3rdPartyBinaries/libdpp-10.1.5-linux-x64.deb
 
@@ -86,7 +86,7 @@ jobs:
         if: startsWith(inputs.os, 'mac')
         run: |
           cd Arduino-Source
-          brew install opencv@4 onnxruntime
+          brew install opencv@4 onnxruntime pkg-config ffmpeg
 
           brew tap-new --no-git PA/libdpp
           brew trust PA/libdpp
