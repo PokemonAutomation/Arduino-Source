@@ -272,7 +272,7 @@ void AudioResampler::push_samples(size_t samples, size_t stride, const float* da
             const size_t skip = (size_t)(-carry);
             if (n <= skip){
                 n = 0;
-            } else {
+            }else{
                 data += skip;
                 n -= skip;
                 carry = 0;
