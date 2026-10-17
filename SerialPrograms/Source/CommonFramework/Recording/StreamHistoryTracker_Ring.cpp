@@ -344,20 +344,20 @@ bool h264_avcc_from_annexb_extradata(const uint8_t* in, size_t in_size, std::vec
         }
         p = nal_end;
     }
-    if (sps.size() < 5){
+    if (sps.size() < 4){
         return false;
     }
     //  avcC: configurationVersion=1, profile_idc, profile_compatibility,
-    //  level_idc, 4 reserved bits + lengthSizeMinusOne, 3 reserved bits +
-    //  numOfSequenceParameterSets, then the SPS and PPS with 16-bit lengths.
+    //  level_idc, 6 reserved bits + lengthSizeMinusOne (3 => 4-byte NAL
+    //  unit lengths), 3 reserved bits + numOfSequenceParameterSets (1),
+    //  then the SPS with its 16-bit length, numOfPictureParameterSets (1),
+    //  and the PPS with its 16-bit length.
     out.push_back(0x01);
     out.push_back(sps[1]);
     out.push_back(sps[2]);
     out.push_back(sps[3]);
-    out.push_back(sps[4]);
     out.push_back(0xFF);
-    out.push_back(0xE0);
-    out.push_back(0x01);
+    out.push_back(0xE1);
     out.push_back((uint8_t)(sps.size() >> 8));
     out.push_back((uint8_t)(sps.size() & 0xFF));
     out.insert(out.end(), sps.begin(), sps.end());
