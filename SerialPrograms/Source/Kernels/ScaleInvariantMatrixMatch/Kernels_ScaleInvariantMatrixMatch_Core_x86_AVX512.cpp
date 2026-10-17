@@ -150,9 +150,8 @@ void add_tests_x86_AVX512(UnitTestDatabase& database){
         if (kTestSizes[i][0] < 16){
             continue;
         }
-        for (bool use_weights : { false, true }){
-            database.add<Test_x86_AVX512>(kTestSizes[i][0], kTestSizes[i][1], use_weights);
-        }
+        database.add<Test_x86_AVX512>(kTestSizes[i][0], kTestSizes[i][1], false);
+        database.add<Test_x86_AVX512>(kTestSizes[i][0], kTestSizes[i][1], true);
     }
 }
 
