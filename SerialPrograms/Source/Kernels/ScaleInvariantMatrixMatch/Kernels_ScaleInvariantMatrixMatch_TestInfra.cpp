@@ -7,6 +7,7 @@
 #include <bit>
 #include <cmath>
 #include <cstdio>
+#include <iostream>
 #include <random>
 #include "Common/Compiler.h"
 #include "Common/Cpp/CancellableScope.h"
@@ -154,6 +155,40 @@ UnitTestResult Test::run(Logger& logger, CancellableScope& scope) const{
     //
     float s0 = m_scale0(m_width, m_height, rowsA.data(), rowsT.data());
     float s1 = m_scale1(m_width, m_height, rowsA.data(), rowsT.data());
+
+    //  TEMPORARY DIAGNOSTIC (remove before merge): decode which bytes the
+    //  ISA path reads for the smallest registered size.
+    if (m_width == 4 && m_height == 1 && !m_use_weights){
+        auto hexdump = [](const float* p, int n, const char* label){
+            std::cout << label << " [" << (size_t)p << "]: ";
+            const unsigned char* b = (const unsigned char*)p;
+            char line[160]; int o = 0;
+            for (int i = 0; i < n * 4; i++)
+                o += std::snprintf(line + o, sizeof(line) - o, "%02x ", b[i]);
+            std::cout << line << std::endl;
+        };
+        std::cout << "[DIAG] " << m_width << "x" << m_height << ": A.data=" << (size_t)A.data()
+            << " T.data=" << (size_t)T.data()
+            << " rowsA[0]=" << (size_t)rowsA[0]
+            << " rowsT[0]=" << (size_t)rowsT[0]
+            << " A.data%64=" << ((size_t)A.data() % 64)
+            << " rowsA[0]%16=" << ((size_t)rowsA[0] % 16)
+            << std::endl;
+        hexdump(A.data(), 12, "[DIAG] A[0..12)");
+        hexdump(T.data(), 12, "[DIAG] T[0..12)");
+        float s1_pad = 0.0f, s1_zero = 0.0f;
+        for (int rep = 0; rep < 2; rep++){
+            float fill = (rep == 0) ? -12345.0f : 0.0f;
+            for (size_t c = 0; c < HEAD_PAD; c++){ A[c] = fill; T[c] = fill; }
+            for (size_t c = HEAD_PAD + n; c < HEAD_PAD + n + TAIL_PAD; c++){ A[c] = fill; T[c] = fill; }
+            float s1x = m_scale1(m_width, m_height, rowsA.data(), rowsT.data());
+            if (rep == 0){ s1_pad = s1x; }else{ s1_zero = s1x; }
+        }
+        std::cout << "[DIAG] s0=" << s0 << " s1=" << s1
+            << " s1(pad=-12345)=" << s1_pad
+            << " s1(pad=0)=" << s1_zero << std::endl;
+    }
+
     double mag = std::fmax(std::fabs((double)s0), std::fabs((double)s1));
     if (!within_tolerance(s0, s1, mag))
         return mismatch("compute_scale", s0, s1, mag);
