@@ -10,7 +10,11 @@
 #include "Kernels/Kernels_x64_SSE41.h"
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h"
 #include "Kernels_ScaleInvariantMatrixMatch_Routines.h"
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
 #include <random>
+#include <vector>
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels_ScaleInvariantMatrixMatch_TestInfra.h"
@@ -243,6 +247,15 @@ public:
         float first = 0.0f;
         bool all_same = true;
         float mn = 1e38f, mx = -1e38f;
+        const size_t bufsz = n + 16 + 15;
+        //  Full byte snapshots (canaries included) so we can detect and
+        //  fingerprint any concurrent write into this test's memory.
+        std::vector<uint8_t> sa((const uint8_t*)A.data() - 16, (const uint8_t*)A.data() - 16 + bufsz * 4 + 32);
+        std::vector<uint8_t> st((const uint8_t*)T.data() - 16, (const uint8_t*)T.data() - 16 + bufsz * 4 + 32);
+        std::vector<uint8_t> sra(rowsA.data(), rowsA.data() + m_height);
+        std::vector<uint8_t> srt(rowsT.data(), rowsT.data() + m_height);
+        int first_dirty = -1;
+        std::string dirty_info;
         for (int i = 0; i < 64; i++){
             float v = compute_scale_min4_x86_SSE(m_width, m_height, rowsA.data(), rowsT.data());
             if (i == 0){
@@ -256,9 +269,45 @@ public:
             if (i < 8){
                 line += std::to_string(v) + " ";
             }
+            if (first_dirty == -1){
+                char msg[512];
+                msg[0] = 0;
+                auto* ca = (const uint8_t*)A.data() - 16;
+                auto* ct = (const uint8_t*)T.data() - 16;
+                for (size_t b = 0; b < sa.size(); b++){
+                    if (ca[b] != sa[b]){
+                        snprintf(msg, sizeof msg, "A+%zd was %02x now %02x", (ptrdiff_t)(A.data()) + (ptrdiff_t)b - 16, sa[b], ca[b]);
+                        break;
+                    }
+                }
+                if (msg[0] == 0){
+                    for (size_t b = 0; b < st.size(); b++){
+                        if (ct[b] != st[b]){
+                            snprintf(msg, sizeof msg, "T+%zd was %02x now %02x", (ptrdiff_t)(T.data()) + (ptrdiff_t)b - 16, st[b], ct[b]);
+                            break;
+                        }
+                    }
+                }
+                if (msg[0] == 0){
+                    auto* cra = (const uint8_t*)rowsA.data();
+                    auto* crt = (const uint8_t*)rowsT.data();
+                    for (size_t b = 0; b < sra.size(); b++){
+                        if (cra[b] != sra[b] || crt[b] != srt[b]){
+                            snprintf(msg, sizeof msg, "rows+%zu", b);
+                            break;
+                        }
+                    }
+                }
+                if (msg[0]){
+                    first_dirty = i;
+                    dirty_info = " dirty_at_call=" + std::to_string(i) + " " + msg + " v=" + std::to_string(v);
+                    break;
+                }
+            }
         }
-        line += "... all_same=" + std::to_string(all_same ? 1 : 0) + " min=" + std::to_string(mn) + " max=" + std::to_string(mx);
+        line += "... all_same=" + std::to_string(all_same ? 1 : 0) + " min=" + std::to_string(mn) + " max=" + std::to_string(mx) + dirty_info;
         logger.log(line);
+        logger.log(std::string("PROBE addrs A=") + std::to_string((size_t)(uintptr_t)A.data()) + " T=" + std::to_string((size_t)(uintptr_t)T.data()) + " rowsA=" + std::to_string((size_t)(uintptr_t)rowsA.data()) + " rowsT=" + std::to_string((size_t)(uintptr_t)rowsT.data()));
         return true;
     }
 private:
