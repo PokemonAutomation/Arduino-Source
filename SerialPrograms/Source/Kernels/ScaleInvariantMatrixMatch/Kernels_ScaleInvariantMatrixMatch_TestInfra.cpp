@@ -7,7 +7,6 @@
 #include <bit>
 #include <cmath>
 #include <cstdio>
-#include <iostream>
 #include <random>
 #include "Common/Compiler.h"
 #include "Common/Cpp/CancellableScope.h"
@@ -155,48 +154,6 @@ UnitTestResult Test::run(Logger& logger, CancellableScope& scope) const{
     //
     float s0 = m_scale0(m_width, m_height, rowsA.data(), rowsT.data());
     float s1 = m_scale1(m_width, m_height, rowsA.data(), rowsT.data());
-
-    //  TEMPORARY DIAGNOSTIC (remove before merge): decode which bytes the
-    //  ISA path reads for the smallest registered size.
-    if (m_width == 4 && m_height == 1 && !m_use_weights){
-        auto hexdump = [](const float* p, int n, const char* label){
-            std::cout << label << " [" << (size_t)p << "]: ";
-            const unsigned char* b = (const unsigned char*)p;
-            char line[160]; int o = 0;
-            for (int i = 0; i < n * 4; i++)
-                o += std::snprintf(line + o, sizeof(line) - o, "%02x ", b[i]);
-            std::cout << line << std::endl;
-        };
-        std::cout << "[DIAG] " << m_width << "x" << m_height << ": A.data=" << (size_t)A.data()
-            << " T.data=" << (size_t)T.data()
-            << " rowsA[0]=" << (size_t)rowsA[0]
-            << " rowsT[0]=" << (size_t)rowsT[0]
-            << " A.data%64=" << ((size_t)A.data() % 64)
-            << " rowsA[0]%16=" << ((size_t)rowsA[0] % 16)
-            << std::endl;
-        hexdump(A.data() + HEAD_PAD, 4, "[DIAG] row A");
-        hexdump(T.data() + HEAD_PAD, 4, "[DIAG] row T");
-        for (int i = 0; i < 6; i++){
-            float s1x = m_scale1(m_width, m_height, rowsA.data(), rowsT.data());
-            std::cout << "[DIAG] s1 repeat#" << i << "=" << s1x << std::endl;
-        }
-        float e0x = m_error0(m_width, m_height, s0, rowsA.data(), rowsT.data());
-        float e1x = m_error1(m_width, m_height, s0, rowsA.data(), rowsT.data());
-        std::cout << "[DIAG] e0=" << e0x << " e1=" << e1x << std::endl;
-        alignas(64) float kA[16] = { 1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-        alignas(64) float kT[16] = { 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-        alignas(64) const float* krowsA[1] = { kA + 4 };
-        alignas(64) const float* krowsT[1] = { kT + 4 };
-        std::cout << "[DIAG] known-data s1 (expect 0.33333333)="
-            << m_scale1(4, 1, krowsA, krowsT) << std::endl;
-        std::cout << "[DIAG] s0 (this run)=" << s0 << std::endl;
-        float simm_diag_scale41(const float* A, const float* T);
-        std::cout << "[DIAG] diag on test row:" << std::endl;
-        simm_diag_scale41(rowsA[0], rowsT[0]);
-        std::cout << "[DIAG] diag on known data:" << std::endl;
-        simm_diag_scale41(kA + 4, kT + 4);
-    }
-
     double mag = std::fmax(std::fabs((double)s0), std::fabs((double)s1));
     if (!within_tolerance(s0, s1, mag))
         return mismatch("compute_scale", s0, s1, mag);
