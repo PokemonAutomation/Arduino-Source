@@ -118,7 +118,20 @@ static bool make_audio_resampler(SwrContext*& swr,
         &in_layout,  AV_SAMPLE_FMT_FLT, in_rate,
         0, nullptr
     );
-    return ret == 0 && swr != nullptr;
+    if (ret != 0 || swr == nullptr){
+        return false;
+    }
+    //  swr_alloc_set_opts2() only allocates and fills in the options; the
+    //  context must be initialized before swr_convert() will use it (an
+    //  uninitialized context logs "Context has not been initialized" and
+    //  swr_convert() fails on every call).
+    ret = swr_init(swr);
+    if (ret < 0){
+        swr_free(&swr);
+        swr = nullptr;
+        return false;
+    }
+    return true;
 }
 
 
