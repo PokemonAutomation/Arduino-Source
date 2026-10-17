@@ -37,6 +37,7 @@ public:
 public:
     void cancel_all_commands();
     void replace_on_next_command();
+    bool wait_for_all_commands_cancelled(Milliseconds timeout);
 
     void wait_for_all(Cancellable* cancellable);
 

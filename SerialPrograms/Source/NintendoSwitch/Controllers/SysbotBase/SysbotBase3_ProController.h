@@ -64,6 +64,11 @@ public:
 public:
     virtual void cancel_all_commands() override;
     virtual void replace_on_next_command() override;
+    virtual bool wait_for_all_commands_cancelled(Milliseconds timeout) override{
+        //  sys-botbase does not ack cancels.
+        cancel_all_commands();
+        return false;
+    }
 
     virtual void wait_for_all(Cancellable* cancellable) override;
 

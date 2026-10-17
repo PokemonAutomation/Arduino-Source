@@ -112,23 +112,17 @@ public:
     //  ever releasing it during the transition.
     virtual void replace_on_next_command() = 0;
 
-    //  Unlike the two functions above, this one blocks:
-    //  Cancel all commands (`cancel_all_commands()`), then wait at most `timeout` for
-    //  the device to confirm that it is in the neutral state.
+    //  Same as "cancel_all_commands()", but unlike the two functions above,
+    //  this one blocks until the device acks the cancel or until "timeout".
     //
-    //  `cancel_all_commands()` only starts the cancellation: it returns as soon as the
-    //  cancel request is handed to the connection, and the host marks its command
-    //  queue empty at that moment, so waiting for the queue proves nothing. Instead this
-    //  queues a 10 ms neutral no-op after the cancel and waits for the device to report
-    //  that the no-op finished. Commands are delivered in order, so that report means
-    //  the device has processed the cancel and is holding the neutral state.
+    //  Returns true if the device has received the cancel. Commands issued
+    //  after this returns are queued behind the cancel, so the controller is
+    //  immediately usable.
+    //  Returns false on timeout or if the controller cannot confirm cancels.
     //
-    //  Returns true if confirmed; false on timeout (e.g. the Switch is asleep and the
-    //  device can't execute commands) or if the controller is not ready.
-    //  Thread-safe: may be called while another thread is issuing commands or waiting on
-    //  this controller. The timeout covers waiting for the device; a command that
-    //  another thread is in the middle of issuing is allowed to finish first.
-    bool wait_for_all_commands_cancelled(Milliseconds timeout);
+    //  Commands issued from other threads while this is running may land
+    //  after the cancel and are not cancelled.
+    virtual bool wait_for_all_commands_cancelled(Milliseconds timeout) = 0;
 
 
 public:

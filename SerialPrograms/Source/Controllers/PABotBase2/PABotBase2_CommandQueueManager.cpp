@@ -81,6 +81,37 @@ CommandQueueManager::CancelResult CommandQueueManager::send_cancel() noexcept{
     m_logger.log("cancel_all_commands() - Buffer Full", COLOR_RED);
     return CancelResult::BUFFER_FULL;
 }
+bool CommandQueueManager::wait_for_cancel(WallDuration timeout){
+    WallClock deadline = current_time() + timeout;
+    {
+        std::unique_lock<Mutex> lg(m_lock);
+
+        //  If "send_cancel()" hit a full buffer, the cancel hasn't been sent
+        //  yet. Keep retrying as the device acks what's in flight.
+        while (m_pending_special == PABB2_MESSAGE_OPCODE_CQ_CANCEL &&
+            !try_push_pending_specials()
+        ){
+            WallClock now = current_time();
+            if (now >= deadline){
+                m_logger.log("wait_for_cancel(): Timed out sending the cancel.", COLOR_RED);
+                return false;
+            }
+            lg.unlock();
+            m_connection.wait_for_pending(deadline - now);
+            lg.lock();
+        }
+    }
+    m_cv.notify_all();
+
+    //  The device acks a packet once it lands in its receive buffer. Commands
+    //  are processed in order, so anything sent after this is behind the cancel.
+    WallClock now = current_time();
+    if (m_connection.wait_for_pending(now < deadline ? deadline - now : WallDuration::zero())){
+        return true;
+    }
+    m_logger.log("wait_for_cancel(): Timed out waiting for the device to ack the cancel.", COLOR_RED);
+    return false;
+}
 CommandQueueManager::CancelResult CommandQueueManager::send_replace_on_next() noexcept{
     bool success;
     {

@@ -71,18 +71,14 @@ public:
     void wait_for_all_requests();
 
     // Drop every queued command that has not executed yet, return to the neutral
-    // state (no buttons pressed, sticks centered), and wait for the device to confirm
-    // it, for at most `timeout_millis`. The controller stays usable afterwards.
+    // state (no buttons pressed, sticks centered), and wait at most `timeout_millis`
+    // for the device to acknowledge that it received the cancel. Commands pushed
+    // after this returns are queued behind the cancel, so the controller is
+    // immediately usable.
     //
-    // Confirmation (see `AbstractController::wait_for_all_commands_cancelled()`) works by
-    // queueing a short neutral no-op after the cancel and waiting for the device to
-    // report that the no-op finished. The serial protocol delivers messages in order,
-    // so that report means the device has processed the cancel and is holding the
-    // neutral state.
-    //
-    // Returns true if confirmed, false on timeout or if the controller is not ready.
-    // The timeout covers waiting for the device; if another thread is in the middle
-    // of issuing a command on this controller, that call is allowed to finish first.
+    // Returns true if acknowledged, false on timeout or if the controller is not ready.
+    // Commands pushed from other threads while this is running may land after the
+    // cancel and are not cancelled.
     bool wait_for_all_commands_cancelled(uint64_t timeout_millis);
 
 public:
