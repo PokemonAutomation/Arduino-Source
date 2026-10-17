@@ -132,24 +132,52 @@ float mix_gain(
 
 
 //
+//  The standard layout assumed when the channel config is unknown but the channel count
+//  is a common one: 1 = mono, 2 = stereo, 3 = 2.1, 4 = 3.1, 5 = 5.0, 6 = 5.1, 7 = 7.0,
+//  8 = 7.1.
+//
+QAudioFormat::ChannelConfig fallback_channel_config(int channel_count){
+    switch (channel_count){
+    case 1: return QAudioFormat::ChannelConfig::ChannelConfigMono;
+    case 2: return QAudioFormat::ChannelConfig::ChannelConfigStereo;
+    case 3: return QAudioFormat::ChannelConfig::ChannelConfig2Dot1;
+    case 4: return QAudioFormat::ChannelConfig::ChannelConfig3Dot1;
+    case 5: return QAudioFormat::ChannelConfig::ChannelConfigSurround5Dot0;
+    case 6: return QAudioFormat::ChannelConfig::ChannelConfigSurround5Dot1;
+    case 7: return QAudioFormat::ChannelConfig::ChannelConfigSurround7Dot0;
+    case 8: return QAudioFormat::ChannelConfig::ChannelConfigSurround7Dot1;
+    default: return QAudioFormat::ChannelConfig::ChannelConfigUnknown;
+    }
+}
+
+
+
+//
 //  Maps each interleaved channel index of `format` to its position. Unknown channels
 //  (present in the frame but not named by the config) stay UnknownPosition.
 //
-//  Returns false only when the format has a non-positive channel count.
+//  Returns false when the format has a non-positive channel count, or when its channel
+//  layout is unknown and its channel count has no standard fallback layout.
 //
 bool resolve_positions(const QAudioFormat& format, std::vector<AudioChannelPosition>& out){
     const int count = format.channelCount();
     if (count <= 0){
         return false;
     }
-    out.assign(count, AudioChannelPosition::UnknownPosition);
-    const quint32 config = format.channelConfig();
-    if (config == QAudioFormat::ChannelConfigUnknown){
-        return true;
+    //  A copy, since channelOffset() consults the format's own config.
+    QAudioFormat effective = format;
+    if (effective.channelConfig() == QAudioFormat::ChannelConfigUnknown){
+        const QAudioFormat::ChannelConfig fallback = fallback_channel_config(count);
+        if (fallback == QAudioFormat::ChannelConfigUnknown){
+            return false;
+        }
+        effective.setChannelConfig(fallback);
     }
+    out.assign(count, AudioChannelPosition::UnknownPosition);
+    const quint32 config = effective.channelConfig();
     for (int p = 1; p < QAudioFormat::NChannelPositions; p++){
         if (config & (1u << p)){
-            int offset = format.channelOffset((AudioChannelPosition)p);
+            int offset = effective.channelOffset((AudioChannelPosition)p);
             if (offset >= 0 && offset < count){
                 out[offset] = (AudioChannelPosition)p;
             }
@@ -167,11 +195,6 @@ bool resolve_positions(const QAudioFormat& format, std::vector<AudioChannelPosit
 std::vector<float> build_channel_mixer_matrix(const QAudioFormat& input, const QAudioFormat& output){
     std::vector<AudioChannelPosition> in_positions, out_positions;
     if (!resolve_positions(input, in_positions) || !resolve_positions(output, out_positions)){
-        return {};
-    }
-    const bool in_unknown = input.channelConfig() == QAudioFormat::ChannelConfigUnknown;
-    const bool out_unknown = output.channelConfig() == QAudioFormat::ChannelConfigUnknown;
-    if (in_unknown || out_unknown){
         return {};
     }
 
@@ -221,15 +244,15 @@ namespace{
 
 //
 //  Builds a channel mixer matrix from a pair of QAudioFormat channel configs and verifies
-//  that it matches the expected matrix. A config of 0 means "no channel layout"
-//  (channel count only, all positions unknown), which must fail with an empty matrix.
+//  that it matches the expected matrix. A config of 0 means "no channel layout" with the
+//  given channel count, which uses the standard fallback layout when one exists.
 //
 class MixerMatrixTest : public UnitTest{
 public:
     MixerMatrixTest(
         const std::string& name,
-        uint32_t in_config,
-        uint32_t out_config,
+        uint32_t in_config, uint32_t in_unknown_count,
+        uint32_t out_config, uint32_t out_unknown_count,
         std::vector<float> expected
     );
 
@@ -238,18 +261,20 @@ public:
 
 private:
     uint32_t m_in_config;
+    uint32_t m_in_unknown_count;
     uint32_t m_out_config;
+    uint32_t m_out_unknown_count;
     std::vector<float> m_expected;
 };
 
 
 
-void apply_config(QAudioFormat& format, uint32_t config){
+void apply_config(QAudioFormat& format, uint32_t config, uint32_t unknown_count){
     format.setSampleFormat(QAudioFormat::SampleFormat::Float);
     format.setSampleRate(48000);
     if (config == QAudioFormat::ChannelConfigUnknown){
         //  No channel layout: channel count only, all positions unknown.
-        format.setChannelCount(6);
+        format.setChannelCount(unknown_count);
         return;
     }
     format.setChannelConfig(QAudioFormat::ChannelConfig(config));
@@ -264,20 +289,22 @@ void apply_config(QAudioFormat& format, uint32_t config){
 
 MixerMatrixTest::MixerMatrixTest(
     const std::string& name,
-    uint32_t in_config,
-    uint32_t out_config,
+    uint32_t in_config, uint32_t in_unknown_count,
+    uint32_t out_config, uint32_t out_unknown_count,
     std::vector<float> expected
 )
     : UnitTest("CommonFramework::AudioPipeline - " + name)
     , m_in_config(in_config)
+    , m_in_unknown_count(in_unknown_count)
     , m_out_config(out_config)
+    , m_out_unknown_count(out_unknown_count)
     , m_expected(std::move(expected))
 {}
 
 UnitTestResult MixerMatrixTest::run(Logger&, CancellableScope&) const{
     QAudioFormat in_format, out_format;
-    apply_config(in_format, m_in_config);
-    apply_config(out_format, m_out_config);
+    apply_config(in_format, m_in_config, m_in_unknown_count);
+    apply_config(out_format, m_out_config, m_out_unknown_count);
 
     std::vector<float> actual = build_channel_mixer_matrix(in_format, out_format);
 
@@ -300,22 +327,22 @@ void add_tests_ChannelMixerMatrix(UnitTestDatabase& database){
     //  Channel mixer matrix builder (industry-standard coefficients).
     using CC = QAudioFormat::ChannelConfig;
     database.add<MixerMatrixTest>(
-        "MixerMatrix(Mono->Stereo)", CC::ChannelConfigMono, CC::ChannelConfigStereo,
+        "MixerMatrix(Mono->Stereo)", CC::ChannelConfigMono, 0, CC::ChannelConfigStereo, 0,
         std::vector<float>{1.0f, 1.0f}
     );
     database.add<MixerMatrixTest>(
-        "MixerMatrix(Stereo->Mono)", CC::ChannelConfigStereo, CC::ChannelConfigMono,
+        "MixerMatrix(Stereo->Mono)", CC::ChannelConfigStereo, 0, CC::ChannelConfigMono, 0,
         std::vector<float>{0.5f, 0.5f}
     );
     database.add<MixerMatrixTest>(
-        "MixerMatrix(3.0->Stereo)", CC::ChannelConfig3Dot0, CC::ChannelConfigStereo,
+        "MixerMatrix(3.0->Stereo)", CC::ChannelConfig3Dot0, 0, CC::ChannelConfigStereo, 0,
         std::vector<float>{
             1.0f, 0.0f, 0.7f,
             0.0f, 1.0f, 0.7f
         }
     );
     database.add<MixerMatrixTest>(
-        "MixerMatrix(Stereo->3.0)", CC::ChannelConfigStereo, CC::ChannelConfig3Dot0,
+        "MixerMatrix(Stereo->3.0)", CC::ChannelConfigStereo, 0, CC::ChannelConfig3Dot0, 0,
         std::vector<float>{
             1.0f, 0.0f,
             0.0f, 1.0f,
@@ -323,14 +350,14 @@ void add_tests_ChannelMixerMatrix(UnitTestDatabase& database){
         }
     );
     database.add<MixerMatrixTest>(
-        "MixerMatrix(5.1->Stereo)", CC::ChannelConfigSurround5Dot1, CC::ChannelConfigStereo,
+        "MixerMatrix(5.1->Stereo)", CC::ChannelConfigSurround5Dot1, 0, CC::ChannelConfigStereo, 0,
         std::vector<float>{
             1.0f, 0.0f, 0.7f, 0.0f, 0.7f, 0.0f,
             0.0f, 1.0f, 0.7f, 0.0f, 0.0f, 0.7f
         }
     );
     database.add<MixerMatrixTest>(
-        "MixerMatrix(Stereo->5.1)", CC::ChannelConfigStereo, CC::ChannelConfigSurround5Dot1,
+        "MixerMatrix(Stereo->5.1)", CC::ChannelConfigStereo, 0, CC::ChannelConfigSurround5Dot1, 0,
         std::vector<float>{
             1.0f, 0.0f,
             0.0f, 1.0f,
@@ -341,18 +368,18 @@ void add_tests_ChannelMixerMatrix(UnitTestDatabase& database){
         }
     );
     database.add<MixerMatrixTest>(
-        "MixerMatrix(5.1->Mono)", CC::ChannelConfigSurround5Dot1, CC::ChannelConfigMono,
+        "MixerMatrix(5.1->Mono)", CC::ChannelConfigSurround5Dot1, 0, CC::ChannelConfigMono, 0,
         std::vector<float>{0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f}
     );
     database.add<MixerMatrixTest>(
-        "MixerMatrix(2.1->Stereo)", CC::ChannelConfig2Dot1, CC::ChannelConfigStereo,
+        "MixerMatrix(2.1->Stereo)", CC::ChannelConfig2Dot1, 0, CC::ChannelConfigStereo, 0,
         std::vector<float>{
             1.0f, 0.0f, 0.0f,
             0.0f, 1.0f, 0.0f
         }
     );
     database.add<MixerMatrixTest>(
-        "MixerMatrix(7.1->5.1)", CC::ChannelConfigSurround7Dot1, CC::ChannelConfigSurround5Dot1,
+        "MixerMatrix(7.1->5.1)", CC::ChannelConfigSurround7Dot1, 0, CC::ChannelConfigSurround5Dot1, 0,
         std::vector<float>{
             1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
             0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
@@ -363,7 +390,7 @@ void add_tests_ChannelMixerMatrix(UnitTestDatabase& database){
         }
     );
     database.add<MixerMatrixTest>(
-        "MixerMatrix(5.1->3.0)", CC::ChannelConfigSurround5Dot1, CC::ChannelConfig3Dot0,
+        "MixerMatrix(5.1->3.0)", CC::ChannelConfigSurround5Dot1, 0, CC::ChannelConfig3Dot0, 0,
         std::vector<float>{
             1.0f, 0.0f, 0.0f, 0.0f, 0.7f, 0.0f,
             0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.7f,
@@ -371,7 +398,7 @@ void add_tests_ChannelMixerMatrix(UnitTestDatabase& database){
         }
     );
     database.add<MixerMatrixTest>(
-        "MixerMatrix(5.1->2.1)", CC::ChannelConfigSurround5Dot1, CC::ChannelConfig2Dot1,
+        "MixerMatrix(5.1->2.1)", CC::ChannelConfigSurround5Dot1, 0, CC::ChannelConfig2Dot1, 0,
         std::vector<float>{
             1.0f, 0.0f, 0.7f, 0.0f, 0.7f, 0.0f,
             0.0f, 1.0f, 0.7f, 0.0f, 0.0f, 0.7f,
@@ -379,7 +406,7 @@ void add_tests_ChannelMixerMatrix(UnitTestDatabase& database){
         }
     );
     database.add<MixerMatrixTest>(
-        "MixerMatrix(5.1->7.1)", CC::ChannelConfigSurround5Dot1, CC::ChannelConfigSurround7Dot1,
+        "MixerMatrix(5.1->7.1)", CC::ChannelConfigSurround5Dot1, 0, CC::ChannelConfigSurround7Dot1, 0,
         std::vector<float>{
             1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
             0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
@@ -396,15 +423,63 @@ void add_tests_ChannelMixerMatrix(UnitTestDatabase& database){
         identity_5_1[c + 6 * c] = 1.0f;
     }
     database.add<MixerMatrixTest>(
-        "MixerMatrix(5.1->5.1)", CC::ChannelConfigSurround5Dot1, CC::ChannelConfigSurround5Dot1,
+        "MixerMatrix(5.1->5.1)", CC::ChannelConfigSurround5Dot1, 0, CC::ChannelConfigSurround5Dot1, 0,
         identity_5_1
     );
+
+    //  Unknown channel layouts assume the standard layout for the channel count.
     database.add<MixerMatrixTest>(
-        "MixerMatrix(UnknownIn->Stereo)", 0, CC::ChannelConfigStereo,
+        "MixerMatrix(UnknownIn1->Stereo)", 0, 1, CC::ChannelConfigStereo, 0,
+        std::vector<float>{1.0f, 1.0f}
+    );
+    database.add<MixerMatrixTest>(
+        "MixerMatrix(UnknownIn2->Stereo)", 0, 2, CC::ChannelConfigStereo, 0,
+        std::vector<float>{1.0f, 0.0f, 0.0f, 1.0f}
+    );
+    database.add<MixerMatrixTest>(
+        "MixerMatrix(UnknownIn3->Stereo)", 0, 3, CC::ChannelConfigStereo, 0,
+        std::vector<float>{
+            1.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f
+        }
+    );
+    database.add<MixerMatrixTest>(
+        "MixerMatrix(UnknownIn6->Stereo)", 0, 6, CC::ChannelConfigStereo, 0,
+        std::vector<float>{
+            1.0f, 0.0f, 0.7f, 0.0f, 0.7f, 0.0f,
+            0.0f, 1.0f, 0.7f, 0.0f, 0.0f, 0.7f
+        }
+    );
+    database.add<MixerMatrixTest>(
+        "MixerMatrix(UnknownIn8->5.1)", 0, 8, CC::ChannelConfigSurround5Dot1, 0,
+        std::vector<float>{
+            1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.7f, 0.0f,
+            0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.7f
+        }
+    );
+    database.add<MixerMatrixTest>(
+        "MixerMatrix(Stereo->UnknownOut6)", CC::ChannelConfigStereo, 0, 0, 6,
+        std::vector<float>{
+            1.0f, 0.0f,
+            0.0f, 1.0f,
+            0.35f, 0.35f,
+            0.0f, 0.0f,
+            0.0f, 0.0f,
+            0.0f, 0.0f
+        }
+    );
+
+    //  Channel counts with no standard fallback layout must fail.
+    database.add<MixerMatrixTest>(
+        "MixerMatrix(UnknownIn10->Stereo)", 0, 10, CC::ChannelConfigStereo, 0,
         std::vector<float>{}
     );
     database.add<MixerMatrixTest>(
-        "MixerMatrix(Stereo->UnknownOut)", CC::ChannelConfigStereo, 0,
+        "MixerMatrix(Stereo->UnknownOut10)", CC::ChannelConfigStereo, 0, 0, 10,
         std::vector<float>{}
     );
 }
