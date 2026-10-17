@@ -34,7 +34,8 @@ bool operator==(const CollectedPokemonInfo& lhs, const CollectedPokemonInfo& rhs
            lhs.secondary_type == rhs.secondary_type &&
            lhs.tera_type == rhs.tera_type &&
            lhs.origin_mark == rhs.origin_mark &&
-           lhs.language_of_origin == rhs.language_of_origin;
+           lhs.language_of_origin == rhs.language_of_origin &&
+           lhs.level == rhs.level;
 }
 
 
@@ -53,6 +54,11 @@ bool operator<(const std::optional<CollectedPokemonInfo>& lhs, const std::option
             if (lhs->dex_number != rhs->dex_number){
                 // we use (boolean != reverse) to apply the reverse effect
                 return (lhs->dex_number < rhs->dex_number) != preference.reverse;
+            }
+            break;
+        case SortingRuleType::Level:
+            if (lhs->level != rhs->level){
+                return (lhs->level < rhs->level) != preference.reverse;
             }
             break;
         case SortingRuleType::Shiny:
@@ -128,6 +134,7 @@ std::ostream& operator<<(std::ostream& os, const std::optional<CollectedPokemonI
         // NOTE edit when adding new struct members
         os << "(";
         os << "dex: " << pokemon->dex_number << " " << pokemon->name_slug << " ";
+        os << "level:" << (unsigned)pokemon->level << " ";
         os << "shiny:" << (pokemon->shiny ? "true" : "false") << " ";
         os << "gmax:" << (pokemon->gmax ? "true" : "false") << " ";
         os << "alpha:" << (pokemon->alpha ? "true" : "false") << " ";
@@ -186,6 +193,7 @@ void save_boxes_data_to_json(const std::vector<std::optional<CollectedPokemonInf
             // NOTE edit when adding new struct members
             pokemon["name"] = current_pokemon->name_slug;
             pokemon["dex"] = current_pokemon->dex_number;
+            pokemon["level"] = current_pokemon->level;
             pokemon["shiny"] = current_pokemon->shiny;
             pokemon["gmax"] = current_pokemon->gmax;
             pokemon["alpha"] = current_pokemon->alpha;
