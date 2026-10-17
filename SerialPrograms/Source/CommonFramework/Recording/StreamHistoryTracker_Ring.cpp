@@ -1340,8 +1340,19 @@ struct StreamHistoryTracker_Ring::Impl{
                 //  each packet is rewritten with 4-byte NAL length prefixes;
                 //  the converted buffer must outlive the write call.
                 std::vector<uint8_t> converted_data;
+                //  The MP4 muxer requires strictly increasing dts per stream, but the
+                //  ring packets are stamped with the wall-clock time of the frame they
+                //  were drained from, and a hardware encoder can emit several packets
+                //  for one frame (or flush two or more at once), so consecutive
+                //  packets can share a timestamp. Bump a non-increasing dts to
+                //  last+1 (1 ms at the 1/1000 video timebase) instead of failing the
+                //  whole save.
+                int64_t last_video_dts = -1;
                 for (size_t i = p_video_start; i < p_video.size() && ok; i++){
                     const VideoRingPacket& vp = *p_video[i];
+                    if (vp.data.empty()){
+                        continue;    //  Nothing to write.
+                    }
                     int64_t us = std::chrono::duration_cast<std::chrono::microseconds>(
                         vp.timestamp - start_ts
                     ).count();
@@ -1360,9 +1371,15 @@ struct StreamHistoryTracker_Ring::Impl{
                     }
                     packet->stream_index = video_stream->index;
                     //  `us` counts microseconds (a 1/1000000 timebase); convert to
-                    //  the stream timebase.
-                    packet->pts = av_rescale_q(us, av_make_q(1, 1000000), video_stream->time_base);
-                    packet->dts = packet->pts;
+                    //  the stream timebase, keeping the dts strictly increasing
+                    //  (see the note above the loop).
+                    int64_t dts = av_rescale_q(us, av_make_q(1, 1000000), video_stream->time_base);
+                    if (dts <= last_video_dts){
+                        dts = last_video_dts + 1;
+                    }
+                    last_video_dts = dts;
+                    packet->pts = dts;
+                    packet->dts = dts;
                     packet->flags = vp.flags;
                     if (av_interleaved_write_frame(format, packet) < 0){
                         logger.log("Stream history: Failed writing video data.", COLOR_RED);
