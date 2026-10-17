@@ -397,7 +397,12 @@ if (WIN32)
     if(PA_ASSEMBLY_LISTINGS)
         target_compile_options(SerialProgramsLib PRIVATE /FAs /FaAssembly/)
     endif()
-    target_compile_options(SerialProgramsLib PRIVATE /MP /W4 /WX /external:anglebrackets /external:W0 /utf-8)
+    target_compile_options(SerialProgramsLib PRIVATE /W4 /WX /external:W0 /utf-8)
+    if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        # cl only: clang-cl ignores these, and /WX turns its unused-argument warning into an
+        # error. (Visual Studio's ClangCL toolset never passed them on to clang-cl.)
+        target_compile_options(SerialProgramsLib PRIVATE /MP /external:anglebrackets)
+    endif()
     target_compile_options(SerialProgramsLib PRIVATE /wd5054)  # Deprecated enum arithemtic
     target_compile_options(SerialProgramsLib PRIVATE /wd4505)  # unreferenced local function has been removed
 
