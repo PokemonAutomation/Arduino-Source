@@ -1713,6 +1713,8 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonFRLG/PokemonFRLG_Settings.h
     Source/VideoGames/PokemonFRLG/PokemonFRLG_Tests.cpp
     Source/VideoGames/PokemonFRLG/PokemonFRLG_Tests.h
+    Source/VideoGames/PokemonFRLG/Programs/BoxOrganization/PokemonFRLG_BoxOrganization.cpp
+    Source/VideoGames/PokemonFRLG/Programs/BoxOrganization/PokemonFRLG_BoxOrganization.h
     Source/VideoGames/PokemonFRLG/Programs/Farming/PokemonFRLG_EliteFourFarmer.cpp
     Source/VideoGames/PokemonFRLG/Programs/Farming/PokemonFRLG_EliteFourFarmer.h
     Source/VideoGames/PokemonFRLG/Programs/Farming/PokemonFRLG_EvTrainer.cpp
