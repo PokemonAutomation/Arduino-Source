@@ -176,7 +176,7 @@ void convert_from_ARM64_NEON<float>(r_ptr<float> native, c_ptr<float> ext, size_
         samples -= 4;
     }
     if (samples > 0){
-        convert_from_Default(native, ext, samples, vdupq_n_f32(multiplier));
+        convert_from_Default(native, ext, samples, multiplier);
     }
 }
 template <>
@@ -190,7 +190,7 @@ void convert_to_ARM64_NEON<float>(c_ptr<float> native, r_ptr<float> ext, size_t 
         samples -= 4;
     }
     if (samples > 0){
-        convert_to_Default(native, ext, samples, vdupq_n_f32(multiplier));
+        convert_to_Default(native, ext, samples, multiplier);
     }
 }
 
