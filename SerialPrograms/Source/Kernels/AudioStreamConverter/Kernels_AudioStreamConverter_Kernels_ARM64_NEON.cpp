@@ -168,7 +168,7 @@ void convert_to_ARM64_NEON<int32_t>(c_ptr<float> native, r_ptr<int32_t> ext, siz
 template <>
 void convert_from_ARM64_NEON<float>(r_ptr<float> native, c_ptr<float> ext, size_t samples, float multiplier){
     while (samples >= 4){
-        float32x4_t x = vld1q_f32(native);
+        float32x4_t x = vld1q_f32(ext);
         vst1q_f32(native, vmulq_f32(x, vdupq_n_f32(multiplier)));
 
         native += 4;
