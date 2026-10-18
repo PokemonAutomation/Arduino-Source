@@ -16,6 +16,7 @@
 #include "Kernels/AudioStreamConverter/Kernels_AudioStreamConverter_Kernels_Default.h"
 #include "Kernels_RawAudio2WorkingAudio.h"
 #include "Kernels_WorkingAudio2RawAudio.h"
+#include "Common/Cpp/CpuId/CpuId.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -77,12 +78,42 @@ public:
         working2raw.add_listener(listener);
         raw2working.push_samples(2, ext0.data());
 
+        //  8-sample dispatcher round trip (one full SIMD iteration).
+        const uint8_t eight[8] = { 0, 255, 95, 203, 7, 250, 128, 33 };
+        AlignedVector<float> n8(8), n8b(8);
+        AlignedVector<uint8_t> e8(8);
+        Kernels::AudioStreamConverter::convert_from<uint8_t>(n8.data(), eight, 8, 1.0f);
+        Kernels::AudioStreamConverter::convert_to<uint8_t>(n8.data(), e8.data(), 8, 1.0f);
+        std::string eightstr = " eight_out=";
+        for (size_t i = 0; i < 8; i++){
+            if (i > 0){
+                eightstr += " ";
+            }
+            eightstr += std::to_string(e8[i]);
+        }
+        std::string n8str = " n8=";
+        for (size_t i = 0; i < 4; i++){
+            if (i > 0){
+                n8str += " ";
+            }
+            n8str += hexf(n8[i]);
+        }
+
+#if defined(PA_ARCH_x86)
+        std::string capstr = " caps[nehalem=" + std::to_string(CPU_CAPABILITY_CURRENT.OK_08_Nehalem) +
+            " haswell=" + std::to_string(CPU_CAPABILITY_CURRENT.OK_13_Haswell) +
+            " skylake=" + std::to_string(CPU_CAPABILITY_CURRENT.OK_17_Skylake) + "]";
+#else
+        std::string capstr = " caps[non-x86]";
+#endif
+
         return "DIAG from_default[0]=" + hexf(native[0]) +
             " to_default[0]=" + std::to_string(ext1[0]) +
             " from_dispatched[0]=" + hexf(native2[0]) +
             " to_dispatched[0]=" + std::to_string(ext2[0]) +
             " pipeline[0]=" + std::to_string(pipeline_out[0]) +
-            " pipeline[1]=" + std::to_string(pipeline_out[1]);
+            " pipeline[1]=" + std::to_string(pipeline_out[1]) +
+            n8str + eightstr + capstr;
     }
 };
 
