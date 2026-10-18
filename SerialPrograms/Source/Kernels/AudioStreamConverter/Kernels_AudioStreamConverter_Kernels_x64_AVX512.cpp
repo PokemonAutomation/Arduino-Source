@@ -44,7 +44,7 @@ PA_FORCE_INLINE __m512i convert_to_u8(__m512 x, float multiplier){
 PA_FORCE_INLINE __m128i pack_u8_bytes(__m512i x){
     x = _mm512_sub_epi32(x, _mm512_set1_epi32(128));
     __m128i y = _mm512_cvtepi32_epi8(x);
-    return _mm_add_epi8(y, _mm_set1_epi8(128));
+    return _mm_add_epi8(y, _mm_set1_epi8(-128));
 }
 PA_FORCE_INLINE __m512 convert_from_s16(__m512i x, float multiplier){
     return _mm512_mul_ps(
