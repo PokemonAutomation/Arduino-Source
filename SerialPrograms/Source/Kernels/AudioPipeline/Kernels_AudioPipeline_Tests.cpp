@@ -20,10 +20,12 @@ void add_tests(UnitTestDatabase& database){
     //  Raw -> Working -> Raw round-trip.
     for (size_t channels = 1; channels <= 4; channels++){
         for (size_t samples = 2; samples < 1000; samples = (size_t)(samples * 1.1) + 1){
-            database.add<RoundTripTest>(SampleFormat::UINT8, channels, samples);
-            database.add<RoundTripTest>(SampleFormat::SINT16, channels, samples);
-            database.add<RoundTripTest>(SampleFormat::SINT32, channels, samples);
-            database.add<RoundTripTest>(SampleFormat::FLOAT32, channels, samples);
+            for (float multiplier = 0.1f; multiplier <= 1.0f; multiplier += 0.1f){
+                database.add<RoundTripTest>(SampleFormat::UINT8, channels, samples, multiplier);
+                database.add<RoundTripTest>(SampleFormat::SINT16, channels, samples, multiplier);
+                database.add<RoundTripTest>(SampleFormat::SINT32, channels, samples, multiplier);
+                database.add<RoundTripTest>(SampleFormat::FLOAT32, channels, samples, multiplier);
+            }
         }
     }
 

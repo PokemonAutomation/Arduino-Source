@@ -15,7 +15,7 @@ namespace AudioStreamConverter{
 
 
 template <typename ExternalType>
-void convert_from_Default(r_ptr<float> native, c_ptr<ExternalType> ext, size_t samples);
+void convert_from_Default(r_ptr<float> native, c_ptr<ExternalType> ext, size_t samples, float multiplier);
 template <typename ExternalType>
 void convert_to_Default(c_ptr<float> native, r_ptr<ExternalType> ext, size_t samples, float multiplier);
 void add_tests_Default(UnitTestDatabase& database);
@@ -23,7 +23,7 @@ void add_tests_Default(UnitTestDatabase& database);
 
 
 template <typename ExternalType>
-void convert_from_x64_SSE41(r_ptr<float> native, c_ptr<ExternalType> ext, size_t samples);
+void convert_from_x64_SSE41(r_ptr<float> native, c_ptr<ExternalType> ext, size_t samples, float multiplier);
 template <typename ExternalType>
 void convert_to_x64_SSE41(c_ptr<float> native, r_ptr<ExternalType> ext, size_t samples, float multiplier);
 void add_tests_x64_SSE41(UnitTestDatabase& database);
@@ -31,7 +31,7 @@ void add_tests_x64_SSE41(UnitTestDatabase& database);
 
 
 template <typename ExternalType>
-void convert_from_x64_AVX2(r_ptr<float> native, c_ptr<ExternalType> ext, size_t samples);
+void convert_from_x64_AVX2(r_ptr<float> native, c_ptr<ExternalType> ext, size_t samples, float multiplier);
 template <typename ExternalType>
 void convert_to_x64_AVX2(c_ptr<float> native, r_ptr<ExternalType> ext, size_t samples, float multiplier);
 void add_tests_x64_AVX2(UnitTestDatabase& database);
@@ -39,7 +39,7 @@ void add_tests_x64_AVX2(UnitTestDatabase& database);
 
 
 template <typename ExternalType>
-void convert_from_x64_AVX512(r_ptr<float> native, c_ptr<ExternalType> ext, size_t samples);
+void convert_from_x64_AVX512(r_ptr<float> native, c_ptr<ExternalType> ext, size_t samples, float multiplier);
 template <typename ExternalType>
 void convert_to_x64_AVX512(c_ptr<float> native, r_ptr<ExternalType> ext, size_t samples, float multiplier);
 void add_tests_x64_AVX512(UnitTestDatabase& database);
@@ -47,7 +47,7 @@ void add_tests_x64_AVX512(UnitTestDatabase& database);
 
 
 template <typename ExternalType>
-void convert_from_ARM64_NEON(r_ptr<float> native, c_ptr<ExternalType> ext, size_t samples);
+void convert_from_ARM64_NEON(r_ptr<float> native, c_ptr<ExternalType> ext, size_t samples, float multiplier);
 template <typename ExternalType>
 void convert_to_ARM64_NEON(c_ptr<float> native, r_ptr<ExternalType> ext, size_t samples, float multiplier);
 void add_tests_ARM64_NEON(UnitTestDatabase& database);
@@ -57,36 +57,42 @@ void add_tests_ARM64_NEON(UnitTestDatabase& database);
 
 
 template <typename ExternalType>
-void convert_from(r_ptr<float> native, c_ptr<ExternalType> ext, size_t samples){
+void convert_from(
+    r_ptr<float> native, c_ptr<ExternalType> ext,
+    size_t samples, float multiplier
+){
 #ifdef PA_AutoDispatch_x64_17_Skylake
     if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
-        convert_from_x64_AVX512(native, ext, samples);
+        convert_from_x64_AVX512(native, ext, samples, multiplier);
         return;
     }
 #endif
 #ifdef PA_AutoDispatch_x64_13_Haswell
     if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
-        convert_from_x64_AVX2(native, ext, samples);
+        convert_from_x64_AVX2(native, ext, samples, multiplier);
         return;
     }
 #endif
 #ifdef PA_AutoDispatch_x64_08_Nehalem
     if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
-        convert_from_x64_SSE41(native, ext, samples);
+        convert_from_x64_SSE41(native, ext, samples, multiplier);
         return;
     }
 #endif
 #ifdef PA_AutoDispatch_arm64_20_M1
     if (CPU_CAPABILITY_CURRENT.OK_M1){
-        convert_from_ARM64_NEON(native, ext, samples);
+        convert_from_ARM64_NEON(native, ext, samples, multiplier);
         return;
     }
 #endif
-    convert_from_Default(native, ext, samples);
+    convert_from_Default(native, ext, samples, multiplier);
     return;
 }
 template <typename ExternalType>
-void convert_to(c_ptr<float> native, r_ptr<ExternalType> ext, size_t samples, float multiplier){
+void convert_to(
+    c_ptr<float> native, r_ptr<ExternalType> ext,
+    size_t samples, float multiplier
+){
 #ifdef PA_AutoDispatch_x64_17_Skylake
     if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
         convert_to_x64_AVX512(native, ext, samples, multiplier);
@@ -117,9 +123,9 @@ void convert_to(c_ptr<float> native, r_ptr<ExternalType> ext, size_t samples, fl
 
 
 
-template void convert_from<uint8_t>(r_ptr<float> native, c_ptr<uint8_t> ext, size_t samples);
-template void convert_from<int16_t>(r_ptr<float> native, c_ptr<int16_t> ext, size_t samples);
-template void convert_from<int32_t>(r_ptr<float> native, c_ptr<int32_t> ext, size_t samples);
+template void convert_from<uint8_t>(r_ptr<float> native, c_ptr<uint8_t> ext, size_t samples, float multiplier);
+template void convert_from<int16_t>(r_ptr<float> native, c_ptr<int16_t> ext, size_t samples, float multiplier);
+template void convert_from<int32_t>(r_ptr<float> native, c_ptr<int32_t> ext, size_t samples, float multiplier);
 template void convert_to<uint8_t>(c_ptr<float> native, r_ptr<uint8_t> ext, size_t samples, float multiplier);
 template void convert_to<int16_t>(c_ptr<float> native, r_ptr<int16_t> ext, size_t samples, float multiplier);
 template void convert_to<int32_t>(c_ptr<float> native, r_ptr<int32_t> ext, size_t samples, float multiplier);

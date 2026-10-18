@@ -28,7 +28,8 @@ public:
     RoundTripTest(
         SampleFormat sample_type,
         size_t channels,
-        size_t samples
+        size_t samples,
+        float multiplier
     );
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override;
@@ -38,6 +39,7 @@ private:
     const SampleFormat m_sample_type;
     const size_t m_channels;
     const size_t m_samples;
+    const float m_multiplier;
 };
 
 

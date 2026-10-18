@@ -20,9 +20,15 @@ namespace AudioStreamConverter{
 
 
 template <typename ExternalType>
-using ConvertFrom = void (*)(r_ptr<float> native, c_ptr<ExternalType> ext, size_t samples);
+using ConvertFrom = void (*)(
+    r_ptr<float> native, c_ptr<ExternalType> ext,
+    size_t samples, float multiplier
+);
 template <typename ExternalType>
-using ConvertTo = void (*)(c_ptr<float> native, r_ptr<ExternalType> ext, size_t samples, float multiplier);
+using ConvertTo = void (*)(
+    c_ptr<float> native, r_ptr<ExternalType> ext,
+    size_t samples, float multiplier
+);
 
 
 
@@ -41,6 +47,7 @@ public:
     Test(
         const std::string& arch_str,
         size_t samples,
+        float multiplier,
         ConvertFrom<Type> convert_from,
         ConvertTo<Type> convert_to
     );
@@ -51,6 +58,7 @@ public:
 
 private:
     size_t m_samples;
+    float m_multiplier;
     ConvertFrom<Type> m_convert_from;
     ConvertTo<Type> m_convert_to;
 };
