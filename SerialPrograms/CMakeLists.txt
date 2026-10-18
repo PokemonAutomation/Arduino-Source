@@ -63,6 +63,11 @@ find_package(Threads REQUIRED)
 # Define a toggle option (ON by default)
 option(COMMAND_LINE_EXE "Build the optional executable" ON)
 
+# Build the _pa_core Python (pybind11) module; see Source/PythonBindings/README.md.
+# OFF by default because it needs a Python interpreter with development headers
+# and pybind11 (a system package or `pip install pybind11`).
+option(PA_PYTHON_BINDINGS "Build the _pa_core Python module (Switch controller)" OFF)
+
 # Build only the GUI-free core: CoreLib and SerialProgramsCommandLine. This needs
 # no Qt, OpenCV, ONNX Runtime, Tesseract, DPP or Discord SDK, so none of them are
 # searched for.
@@ -83,6 +88,9 @@ if(PA_CORE_ONLY)
     include(cmake/CoreLib.cmake)
     if(COMMAND_LINE_EXE)
         include(Source/CommandLine/CommandLineExecutable.cmake)
+    endif()
+    if(PA_PYTHON_BINDINGS)
+        include(Source/PythonBindings/PythonBindings.cmake)
     endif()
     return()
 endif()
@@ -870,4 +878,9 @@ endif()
 if(COMMAND_LINE_EXE)
     # Add command-line executable (GUI-free) from subdirectory
     include(Source/CommandLine/CommandLineExecutable.cmake)
+endif()
+
+if(PA_PYTHON_BINDINGS)
+    # Python bindings (GUI-free) from subdirectory
+    include(Source/PythonBindings/PythonBindings.cmake)
 endif()
