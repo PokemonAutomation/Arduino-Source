@@ -31,10 +31,11 @@ PA_FORCE_INLINE float32x4_t convert_from_u8(uint32x4_t x, float multiplier){
     );
 }
 PA_FORCE_INLINE int32x4_t convert_to_u8(float32x4_t x, float multiplier){
-    const float32x4_t SCALE = vdupq_n_f32(multiplier * 128.f);
+    const float32x4_t SCALE = vdupq_n_f32(multiplier);
+    x = vmulq_f32(x, SCALE);
     x = vminq_f32(x, vdupq_n_f32(127.0f / 128.0f));
     x = vmaxq_f32(x, vdupq_n_f32(-1.0f));
-    x = vaddq_f32(vmulq_f32(x, SCALE), SCALE);
+    x = vaddq_f32(vmulq_f32(x, vdupq_n_f32(128.f)), vdupq_n_f32(128.f));
     return vcvtnq_s32_f32(x);
 }
 PA_FORCE_INLINE float32x4_t convert_from_s16(int32x4_t x, float multiplier){
