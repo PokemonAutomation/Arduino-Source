@@ -52,14 +52,21 @@ UnitTestResult Test<Type>::run(Logger& logger, CancellableScope& scope) const{
 
     std::mt19937 generator(42);
 
-    std::uniform_int_distribution<long long> distribution(
-        std::numeric_limits<Type>::min(),
-        std::numeric_limits<Type>::max()
-    );
-    ext0[0] = std::numeric_limits<Type>::min();
-    ext0[1] = std::numeric_limits<Type>::max();
-    for (size_t c = 2; c < m_samples; c++){
-        ext0[c] = (Type)distribution(generator);
+    if constexpr (std::is_same_v<Type, float>){
+        std::uniform_real_distribution<float> distribution(-1.0, +1.0);
+        for (size_t c = 0; c < m_samples; c++){
+            ext0[c] = (Type)distribution(generator);
+        }
+    }else{
+        std::uniform_int_distribution<long long> distribution(
+            std::numeric_limits<Type>::min(),
+            std::numeric_limits<Type>::max()
+        );
+        ext0[0] = std::numeric_limits<Type>::min();
+        ext0[1] = std::numeric_limits<Type>::max();
+        for (size_t c = 2; c < m_samples; c++){
+            ext0[c] = (Type)distribution(generator);
+        }
     }
 
     m_convert_from(native.data(), ext0.data(), m_samples, m_multiplier);
@@ -71,6 +78,12 @@ UnitTestResult Test<Type>::run(Logger& logger, CancellableScope& scope) const{
             //  int32_t is lossy due to round-off.
             int64_t diff = int64_t(ext0[c]) - ext1[c];
             if (std::abs(diff) > 16384){
+                return "Mismatch at " + std::to_string(c) + ": " +
+                    std::to_string(ext0[c]) + " != " + std::to_string(ext1[c]);
+            }
+        }else if constexpr (std::is_same_v<Type, float>){
+            float diff = ext0[c] - ext1[c];
+            if (std::abs(diff) > 0.000001){
                 return "Mismatch at " + std::to_string(c) + ": " +
                     std::to_string(ext0[c]) + " != " + std::to_string(ext1[c]);
             }
@@ -93,6 +106,8 @@ std::string Test<Type>::typestr(){
         return "s16";
     }else if constexpr (std::is_same_v<Type, int32_t>){
         return "s32";
+    }else if constexpr (std::is_same_v<Type, float>){
+        return "f32";
     }else{
         static_assert(false);
     }
@@ -102,6 +117,7 @@ std::string Test<Type>::typestr(){
 template class Test<uint8_t>;
 template class Test<int16_t>;
 template class Test<int32_t>;
+template class Test<float>;
 
 
 
