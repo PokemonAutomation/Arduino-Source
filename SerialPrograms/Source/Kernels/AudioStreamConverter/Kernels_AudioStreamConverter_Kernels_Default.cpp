@@ -93,6 +93,17 @@ public:
         )
     {}
 };
+template <typename Type>
+class Test_to_arb_Default : public ToArbitraryTest<Type>{
+public:
+    Test_to_arb_Default(size_t samples)
+        : ToArbitraryTest<Type>(
+            "to_arb_Default",
+            samples,
+            (ConvertTo<Type>)convert_to_Default<Type>
+        )
+    {}
+};
 void add_tests_Default(UnitTestDatabase& database){
     //  The multipliers are reciprocals so the round trip stays in the
     //  native range (and exact in binary): from scales the floats down,
@@ -106,6 +117,12 @@ void add_tests_Default(UnitTestDatabase& database){
             database.add<Test_Default<int32_t>>(samples, from_multiplier, to_multiplier);
         }
     }
+    for (size_t samples = 2; samples < 1000; samples = (size_t)(samples * 1.1) + 1){
+        database.add<Test_to_arb_Default<uint8_t>>(samples);
+        database.add<Test_to_arb_Default<int16_t>>(samples);
+        database.add<Test_to_arb_Default<int32_t>>(samples);
+    }
+
 }
 
 

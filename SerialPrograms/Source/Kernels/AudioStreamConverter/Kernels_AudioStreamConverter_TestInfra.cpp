@@ -10,6 +10,7 @@
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Kernels_AudioStreamConverter_TestInfra.h"
+#include "Kernels_AudioStreamConverter_Kernels_Default.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -109,6 +110,66 @@ std::string Test<Type>::typestr(){
 template class Test<uint8_t>;
 template class Test<int16_t>;
 template class Test<int32_t>;
+
+
+
+
+template <typename Type>
+ToArbitraryTest<Type>::ToArbitraryTest(
+    const std::string& arch_str,
+    size_t samples,
+    ConvertTo<Type> convert_to
+)
+    : UnitTest(
+        "Kernels::AudioStreamConverter - " + Test<Type>::typestr() + "_" + arch_str +
+            "(" + std::to_string(samples) + ")"
+    )
+    , m_samples(samples)
+    , m_convert_to(convert_to)
+{}
+template <typename Type>
+UnitTestResult ToArbitraryTest<Type>::run(Logger& logger, CancellableScope& scope) const{
+    if (m_samples < 2){
+        throw InternalProgramError(&logger, PA_CURRENT_FUNCTION, "Test size is too small.");
+    }
+
+    AlignedVector<float> native(m_samples);
+    AlignedVector<Type> ext_ref(m_samples);
+    AlignedVector<Type> ext1(m_samples);
+
+    std::mt19937 generator(42);
+    std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
+    for (size_t c = 0; c < m_samples; c++){
+        native[c] = distribution(generator);
+    }
+    //  Fixed edge values: full scale, just past the clamp, and out of range.
+    native[0] = -1.0f;
+    native[1] = 1.0f;
+    if (m_samples >= 3){
+        native[2] = -1.5f;
+    }
+    if (m_samples >= 4){
+        native[3] = 1.5f;
+    }
+
+    convert_to_Default<Type>(native.data(), ext_ref.data(), m_samples, 1.0f);
+    m_convert_to(native.data(), ext1.data(), m_samples, 1.0f);
+
+    for (size_t c = 0; c < m_samples; c++){
+        if (ext_ref[c] != ext1[c]){
+            return "Mismatch at " + std::to_string(c) + " (input " +
+                tostr_default(native[c]) + "): " +
+                std::to_string(ext_ref[c]) + " != " + std::to_string(ext1[c]);
+        }
+    }
+
+    return true;
+}
+
+
+template class ToArbitraryTest<uint8_t>;
+template class ToArbitraryTest<int16_t>;
+template class ToArbitraryTest<int32_t>;
 
 
 

@@ -51,6 +51,10 @@ PA_FORCE_INLINE __m128i convert_to_s16(__m128 x, float multiplier){
     x = _mm_mul_ps(x, _mm_set1_ps(multiplier * 32768.f));
     x = _mm_min_ps(x, _mm_set1_ps(32767.f));
     x = _mm_max_ps(x, _mm_set1_ps(-32768.f));
+    //  Round half away from zero like the Default path: offset by
+    //  +/-0.5, then truncate.
+    __m128 positive = _mm_cmpgt_ps(x, _mm_setzero_ps());
+    x = _mm_add_ps(x, _mm_blendv_ps(_mm_set1_ps(-0.5f), _mm_set1_ps(0.5f), positive));
     return _mm_cvttps_epi32(x);
 }
 PA_FORCE_INLINE __m128 convert_from_s32(__m128i x, float multiplier){
@@ -63,6 +67,10 @@ PA_FORCE_INLINE __m128i convert_to_s32(__m128 x, float multiplier){
     x = _mm_mul_ps(x, _mm_set1_ps(multiplier * 2147483648.f));
     x = _mm_min_ps(x, _mm_set1_ps(2147483520.f)); // 2^31 - 128
     x = _mm_max_ps(x, _mm_set1_ps(-2147483648.f));
+    //  Round half away from zero like the Default path: offset by
+    //  +/-0.5, then truncate.
+    __m128 positive = _mm_cmpgt_ps(x, _mm_setzero_ps());
+    x = _mm_add_ps(x, _mm_blendv_ps(_mm_set1_ps(-0.5f), _mm_set1_ps(0.5f), positive));
     return _mm_cvttps_epi32(x);
 }
 
@@ -77,26 +85,15 @@ void convert_to_x64_SSE41(c_ptr<float> native, r_ptr<ExternalType> ext, size_t s
 
 template <>
 void convert_from_x64_SSE41<uint8_t>(r_ptr<float> native, c_ptr<uint8_t> ext, size_t samples, float multiplier){
-    //  16 samples per iteration so that the 16-byte load stays in bounds;
-    //  anything smaller is handled by the scalar tail.
-    while (samples >= 16){
-        __m128i x = _mm_loadu_si128((const __m128i*)ext);
-        _mm_storeu_ps(native, convert_from_u8(
-            _mm_cvtepu8_epi32(x), multiplier
-        ));
-        _mm_storeu_ps(native + 4, convert_from_u8(
-            _mm_cvtepu8_epi32(_mm_srli_si128(x, 4)), multiplier
-        ));
-        _mm_storeu_ps(native + 8, convert_from_u8(
-            _mm_cvtepu8_epi32(_mm_srli_si128(x, 8)), multiplier
-        ));
-        _mm_storeu_ps(native + 12, convert_from_u8(
-            _mm_cvtepu8_epi32(_mm_srli_si128(x, 12)), multiplier
-        ));
+    while (samples >= 4){
+        //  _mm_loadu_si32 reads exactly the 4 bytes of this iteration;
+        //  wider loads would read past the end of short buffers.
+        __m128i x = _mm_cvtepu8_epi32(_mm_loadu_si32(ext));
+        _mm_storeu_ps(native, convert_from_u8(x, multiplier));
 
-        native += 16;
-        ext += 16;
-        samples -= 16;
+        native += 4;
+        ext += 4;
+        samples -= 4;
     }
     if (samples > 0){
         convert_from_Default(native, ext, samples, multiplier);
@@ -121,20 +118,15 @@ void convert_to_x64_SSE41<uint8_t>(c_ptr<float> native, r_ptr<uint8_t> ext, size
 }
 template <>
 void convert_from_x64_SSE41<int16_t>(r_ptr<float> native, c_ptr<int16_t> ext, size_t samples, float multiplier){
-    //  8 samples per iteration: a 4-sample iteration with a 16-byte load
-    //  would read past the end of short buffers.
-    while (samples >= 8){
-        __m128i x = _mm_loadu_si128((const __m128i*)ext);
-        _mm_storeu_ps(native, convert_from_s16(
-            _mm_cvtepi16_epi32(x), multiplier
-        ));
-        _mm_storeu_ps(native + 4, convert_from_s16(
-            _mm_cvtepi16_epi32(_mm_srli_si128(x, 8)), multiplier
-        ));
+    while (samples >= 4){
+        //  _mm_loadl_epi64 reads exactly the 8 bytes of this iteration;
+        //  wider loads would read past the end of short buffers.
+        __m128i x = _mm_cvtepi16_epi32(_mm_loadl_epi64((const __m128i*)ext));
+        _mm_storeu_ps(native, convert_from_s16(x, multiplier));
 
-        native += 8;
-        ext += 8;
-        samples -= 8;
+        native += 4;
+        ext += 4;
+        samples -= 4;
     }
     if (samples > 0){
         convert_from_Default(native, ext, samples, multiplier);
@@ -220,6 +212,18 @@ public:
         )
     {}
 };
+template <typename Type>
+class Test_to_arb_x64_SSE41 : public ToArbitraryTest<Type>{
+public:
+    Test_to_arb_x64_SSE41(size_t samples)
+        : ToArbitraryTest<Type>(
+            "to_arb_x64_SSE41",
+            samples,
+            (ConvertTo<Type>)convert_to_x64_SSE41<Type>
+        )
+    {}
+};
+
 void add_tests_x64_SSE41(UnitTestDatabase& database){
     const float from_multipliers[] = { 1.0f, 0.5f, 0.25f };
     for (size_t samples = 2; samples < 1000; samples = (size_t)(samples * 1.1) + 1){
@@ -235,6 +239,12 @@ void add_tests_x64_SSE41(UnitTestDatabase& database){
             database.add<Test_to_x64_SSE41<int32_t>>(samples, from_multiplier, to_multiplier);
         }
     }
+    for (size_t samples = 2; samples < 1000; samples = (size_t)(samples * 1.1) + 1){
+        database.add<Test_to_arb_x64_SSE41<uint8_t>>(samples);
+        database.add<Test_to_arb_x64_SSE41<int16_t>>(samples);
+        database.add<Test_to_arb_x64_SSE41<int32_t>>(samples);
+    }
+
 }
 
 

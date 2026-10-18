@@ -48,6 +48,10 @@ PA_FORCE_INLINE __m256i convert_to_s16(__m256 x, float multiplier){
     x = _mm256_mul_ps(x, _mm256_set1_ps(multiplier * 32768.f));
     x = _mm256_min_ps(x, _mm256_set1_ps(32767.f));
     x = _mm256_max_ps(x, _mm256_set1_ps(-32768.f));
+    //  Round half away from zero like the Default path: offset by
+    //  +/-0.5, then truncate.
+    __m256 positive = _mm256_cmp_ps(x, _mm256_setzero_ps(), _CMP_GT_OQ);
+    x = _mm256_add_ps(x, _mm256_blendv_ps(_mm256_set1_ps(-0.5f), _mm256_set1_ps(0.5f), positive));
     return _mm256_cvttps_epi32(x);
 }
 PA_FORCE_INLINE __m256 convert_from_s32(__m256i x, float multiplier){
@@ -60,6 +64,10 @@ PA_FORCE_INLINE __m256i convert_to_s32(__m256 x, float multiplier){
     x = _mm256_mul_ps(x, _mm256_set1_ps(multiplier * 2147483648.f));
     x = _mm256_min_ps(x, _mm256_set1_ps(2147483520.f)); // 2^31 - 128
     x = _mm256_max_ps(x, _mm256_set1_ps(-2147483648.f));
+    //  Round half away from zero like the Default path: offset by
+    //  +/-0.5, then truncate.
+    __m256 positive = _mm256_cmp_ps(x, _mm256_setzero_ps(), _CMP_GT_OQ);
+    x = _mm256_add_ps(x, _mm256_blendv_ps(_mm256_set1_ps(-0.5f), _mm256_set1_ps(0.5f), positive));
     return _mm256_cvttps_epi32(x);
 }
 
@@ -217,6 +225,18 @@ public:
         )
     {}
 };
+template <typename Type>
+class Test_to_arb_x64_AVX2 : public ToArbitraryTest<Type>{
+public:
+    Test_to_arb_x64_AVX2(size_t samples)
+        : ToArbitraryTest<Type>(
+            "to_arb_x64_AVX2",
+            samples,
+            (ConvertTo<Type>)convert_to_x64_AVX2<Type>
+        )
+    {}
+};
+
 void add_tests_x64_AVX2(UnitTestDatabase& database){
     const float from_multipliers[] = { 1.0f, 0.5f, 0.25f };
     for (size_t samples = 2; samples < 1000; samples = (size_t)(samples * 1.1) + 1){
@@ -232,6 +252,12 @@ void add_tests_x64_AVX2(UnitTestDatabase& database){
             database.add<Test_to_x64_AVX2<int32_t>>(samples, from_multiplier, to_multiplier);
         }
     }
+    for (size_t samples = 2; samples < 1000; samples = (size_t)(samples * 1.1) + 1){
+        database.add<Test_to_arb_x64_AVX2<uint8_t>>(samples);
+        database.add<Test_to_arb_x64_AVX2<int16_t>>(samples);
+        database.add<Test_to_arb_x64_AVX2<int32_t>>(samples);
+    }
+
 }
 
 

@@ -49,6 +49,7 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override;
 
+public:
     static std::string typestr();
 
 private:
@@ -63,6 +64,29 @@ private:
     ConvertTo<Type> m_convert_to;
     float m_from_multiplier;
     float m_to_multiplier;
+};
+
+
+
+
+//  Compares a `to` kernel against the Default (reference) implementation on
+//  random float inputs.  The round-trip tests only feed grid-aligned values
+//  (the output of `from`), which cannot expose differences in rounding or
+//  clamping.
+template <typename Type>
+class ToArbitraryTest : public UnitTest{
+public:
+    ToArbitraryTest(
+        const std::string& arch_str,
+        size_t samples,
+        ConvertTo<Type> convert_to
+    );
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override;
+
+private:
+    size_t m_samples;
+    ConvertTo<Type> m_convert_to;
 };
 
 

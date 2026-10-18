@@ -50,6 +50,13 @@ PA_FORCE_INLINE int16x4_t convert_to_s16(float32x4_t x, float multiplier){
     x = vmulq_f32(x, vdupq_n_f32(multiplier * 32768.f));
     x = vminq_f32(x, vdupq_n_f32(32767.f));
     x = vmaxq_f32(x, vdupq_n_f32(-32768.f));
+    //  Round half away from zero like the Default path: offset by
+    //  +/-0.5, then truncate.
+    x = vaddq_f32(x, vbslq_f32(
+        vcgtq_f32(x, vdupq_n_f32(0.0f)),
+        vdupq_n_f32(0.5f),
+        vdupq_n_f32(-0.5f)
+    ));
     return vqmovn_s32(vcvtq_s32_f32(x));
 }
 PA_FORCE_INLINE float32x4_t convert_from_s32(int32x4_t x, float multiplier){
@@ -62,6 +69,13 @@ PA_FORCE_INLINE int32x4_t convert_to_s32(float32x4_t x, float multiplier){
     x = vmulq_f32(x, vdupq_n_f32(multiplier * 2147483648.f));
     x = vminq_f32(x, vdupq_n_f32(2147483520.f)); // 2^31 - 128
     x = vmaxq_f32(x, vdupq_n_f32(-2147483648.f));
+    //  Round half away from zero like the Default path: offset by
+    //  +/-0.5, then truncate.
+    x = vaddq_f32(x, vbslq_f32(
+        vcgtq_f32(x, vdupq_n_f32(0.0f)),
+        vdupq_n_f32(0.5f),
+        vdupq_n_f32(-0.5f)
+    ));
     return vcvtq_s32_f32(x);
 }
 
@@ -200,6 +214,18 @@ public:
         )
     {}
 };
+template <typename Type>
+class Test_to_arb_ARM64_NEON : public ToArbitraryTest<Type>{
+public:
+    Test_to_arb_ARM64_NEON(size_t samples)
+        : ToArbitraryTest<Type>(
+            "to_arb_ARM64_NEON",
+            samples,
+            (ConvertTo<Type>)convert_to_ARM64_NEON<Type>
+        )
+    {}
+};
+
 void add_tests_ARM64_NEON(UnitTestDatabase& database){
     const float from_multipliers[] = { 1.0f, 0.5f, 0.25f };
     for (size_t samples = 2; samples < 1000; samples = (size_t)(samples * 1.1) + 1){
@@ -215,6 +241,12 @@ void add_tests_ARM64_NEON(UnitTestDatabase& database){
             database.add<Test_to_ARM64_NEON<int32_t>>(samples, from_multiplier, to_multiplier);
         }
     }
+    for (size_t samples = 2; samples < 1000; samples = (size_t)(samples * 1.1) + 1){
+        database.add<Test_to_arb_ARM64_NEON<uint8_t>>(samples);
+        database.add<Test_to_arb_ARM64_NEON<int16_t>>(samples);
+        database.add<Test_to_arb_ARM64_NEON<int32_t>>(samples);
+    }
+
 }
 
 
