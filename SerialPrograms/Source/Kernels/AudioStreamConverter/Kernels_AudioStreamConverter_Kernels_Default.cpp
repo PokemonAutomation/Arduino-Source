@@ -76,6 +76,18 @@ void convert_to_Default<int32_t>(c_ptr<float> native, r_ptr<int32_t> ext, size_t
         ext[c] = (int32_t)x;
     }
 }
+template <>
+void convert_from_Default<float>(r_ptr<float> native, c_ptr<float> ext, size_t samples, float multiplier){
+    for (size_t c = 0; c < samples; c++){
+        native[c] = ext[c] * multiplier;
+    }
+}
+template <>
+void convert_to_Default<float>(c_ptr<float> native, r_ptr<float> ext, size_t samples, float multiplier){
+    for (size_t c = 0; c < samples; c++){
+        ext[c] = native[c] * multiplier;
+    }
+}
 
 
 
@@ -100,6 +112,7 @@ void add_tests_Default(UnitTestDatabase& database){
             database.add<Test_Default<uint8_t>>(samples, multiplier);
             database.add<Test_Default<int16_t>>(samples, multiplier);
             database.add<Test_Default<int32_t>>(samples, multiplier);
+            database.add<Test_Default<float>>(samples, multiplier);
         }
     }
 }

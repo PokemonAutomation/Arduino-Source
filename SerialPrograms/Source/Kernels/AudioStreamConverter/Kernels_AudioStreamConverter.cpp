@@ -126,9 +126,11 @@ void convert_to(
 template void convert_from<uint8_t>(r_ptr<float> native, c_ptr<uint8_t> ext, size_t samples, float multiplier);
 template void convert_from<int16_t>(r_ptr<float> native, c_ptr<int16_t> ext, size_t samples, float multiplier);
 template void convert_from<int32_t>(r_ptr<float> native, c_ptr<int32_t> ext, size_t samples, float multiplier);
+template void convert_from<float>(r_ptr<float> native, c_ptr<float> ext, size_t samples, float multiplier);
 template void convert_to<uint8_t>(c_ptr<float> native, r_ptr<uint8_t> ext, size_t samples, float multiplier);
 template void convert_to<int16_t>(c_ptr<float> native, r_ptr<int16_t> ext, size_t samples, float multiplier);
 template void convert_to<int32_t>(c_ptr<float> native, r_ptr<int32_t> ext, size_t samples, float multiplier);
+template void convert_to<float>(c_ptr<float> native, r_ptr<float> ext, size_t samples, float multiplier);
 
 
 

@@ -175,6 +175,36 @@ void convert_to_x64_AVX2<int32_t>(c_ptr<float> native, r_ptr<int32_t> ext, size_
         convert_to_Default(native, ext, samples, multiplier);
     }
 }
+template <>
+void convert_from_x64_AVX2<float>(r_ptr<float> native, c_ptr<float> ext, size_t samples, float multiplier){
+    while (samples >= 8){
+        __m256 x = _mm256_loadu_ps(ext);
+        x = _mm256_mul_ps(x, _mm256_set1_ps(multiplier));
+        _mm256_storeu_ps(native, x);
+
+        native += 8;
+        ext += 8;
+        samples -= 8;
+    }
+    if (samples > 0){
+        convert_from_Default(native, ext, samples, multiplier);
+    }
+}
+template <>
+void convert_to_x64_AVX2<float>(c_ptr<float> native, r_ptr<float> ext, size_t samples, float multiplier){
+    while (samples >= 8){
+        __m256 x = _mm256_loadu_ps(native);
+        x = _mm256_mul_ps(x, _mm256_set1_ps(multiplier));
+        _mm256_storeu_ps(ext, x);
+
+        native += 8;
+        ext += 8;
+        samples -= 8;
+    }
+    if (samples > 0){
+        convert_to_Default(native, ext, samples, multiplier);
+    }
+}
 
 
 
@@ -217,6 +247,9 @@ void add_tests_x64_AVX2(UnitTestDatabase& database){
 
             database.add<Test_from_x64_AVX2<int32_t>>(samples, multiplier);
             database.add<Test_to_x64_AVX2<int32_t>>(samples, multiplier);
+
+            database.add<Test_from_x64_AVX2<float>>(samples, multiplier);
+            database.add<Test_to_x64_AVX2<float>>(samples, multiplier);
         }
     }
 }

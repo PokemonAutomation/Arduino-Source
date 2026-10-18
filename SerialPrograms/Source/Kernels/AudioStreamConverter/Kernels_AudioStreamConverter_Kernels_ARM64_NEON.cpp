@@ -24,18 +24,19 @@ namespace AudioStreamConverter{
 
 PA_FORCE_INLINE float32x4_t convert_from_u8(uint32x4_t x, float multiplier){
     const float32x4_t SCALE0 = vdupq_n_f32(multiplier * (1.f / 128.f));
-    const float32x4_t SCALE1 = vdupq_n_f32(multiplier * 1.f);
-    return vsubq_f32(
-        vmulq_f32(vcvtq_f32_u32(x), SCALE0),
-        SCALE1
-    );
+    const float32x4_t SCALE1 = vdupq_n_f32(multiplier * -1.f);
+    //  The multiply and add are fused into a single FMA. The vfmaq
+    //  (accumulate) spelling lowers to a real FMLA/FMLS in both GCC and
+    //  Clang; GCC 13 decomposes the vmlsq spelling back into mul + add.
+    return vfmaq_f32(SCALE1, vcvtq_f32_u32(x), SCALE0);
 }
 PA_FORCE_INLINE int32x4_t convert_to_u8(float32x4_t x, float multiplier){
     const float32x4_t SCALE = vdupq_n_f32(multiplier);
     x = vmulq_f32(x, SCALE);
     x = vminq_f32(x, vdupq_n_f32(127.0f / 128.0f));
     x = vmaxq_f32(x, vdupq_n_f32(-1.0f));
-    x = vaddq_f32(vmulq_f32(x, vdupq_n_f32(128.f)), vdupq_n_f32(128.f));
+    //  Fused into a single FMA, as above.
+    x = vfmaq_f32(vdupq_n_f32(128.f), x, vdupq_n_f32(128.f));
     return vcvtnq_s32_f32(x);
 }
 PA_FORCE_INLINE float32x4_t convert_from_s16(int32x4_t x, float multiplier){
@@ -164,6 +165,34 @@ void convert_to_ARM64_NEON<int32_t>(c_ptr<float> native, r_ptr<int32_t> ext, siz
         convert_to_Default(native, ext, samples, multiplier);
     }
 }
+template <>
+void convert_from_ARM64_NEON<float>(r_ptr<float> native, c_ptr<float> ext, size_t samples, float multiplier){
+    while (samples >= 4){
+        float32x4_t x = vld1q_f32(ext);
+        vst1q_f32(native, vmulq_f32(x, vdupq_n_f32(multiplier)));
+
+        native += 4;
+        ext += 4;
+        samples -= 4;
+    }
+    if (samples > 0){
+        convert_from_Default(native, ext, samples, multiplier);
+    }
+}
+template <>
+void convert_to_ARM64_NEON<float>(c_ptr<float> native, r_ptr<float> ext, size_t samples, float multiplier){
+    while (samples >= 4){
+        float32x4_t x = vld1q_f32(native);
+        vst1q_f32(ext, vmulq_f32(x, vdupq_n_f32(multiplier)));
+
+        native += 4;
+        ext += 4;
+        samples -= 4;
+    }
+    if (samples > 0){
+        convert_to_Default(native, ext, samples, multiplier);
+    }
+}
 
 
 
@@ -203,6 +232,9 @@ void add_tests_ARM64_NEON(UnitTestDatabase& database){
 
             database.add<Test_from_ARM64_NEON<int32_t>>(samples, multiplier);
             database.add<Test_to_ARM64_NEON<int32_t>>(samples, multiplier);
+
+            database.add<Test_from_ARM64_NEON<float>>(samples, multiplier);
+            database.add<Test_to_ARM64_NEON<float>>(samples, multiplier);
         }
     }
 }

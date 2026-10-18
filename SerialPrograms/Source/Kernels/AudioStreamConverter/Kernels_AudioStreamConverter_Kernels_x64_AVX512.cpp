@@ -182,6 +182,42 @@ void convert_to_x64_AVX512<int32_t>(c_ptr<float> native, r_ptr<int32_t> ext, siz
         _mm512_mask_storeu_epi32(ext, mask, convert_to_s32(x, multiplier));
     }
 }
+template <>
+void convert_from_x64_AVX512<float>(r_ptr<float> native, c_ptr<float> ext, size_t samples, float multiplier){
+    while (samples > 16){
+        __m512 x = _mm512_loadu_ps(ext);
+        x = _mm512_mul_ps(x, _mm512_set1_ps(multiplier));
+        _mm512_storeu_ps(native, x);
+
+        native += 16;
+        ext += 16;
+        samples -= 16;
+    }
+    {
+        __mmask16 mask = ((uint32_t)1 << samples) - 1;
+        __m512 x = _mm512_maskz_loadu_ps(mask, ext);
+        x = _mm512_mul_ps(x, _mm512_set1_ps(multiplier));
+        _mm512_mask_storeu_ps(native, mask, x);
+    }
+}
+template <>
+void convert_to_x64_AVX512<float>(c_ptr<float> native, r_ptr<float> ext, size_t samples, float multiplier){
+    while (samples > 16){
+        __m512 x = _mm512_loadu_ps(native);
+        x = _mm512_mul_ps(x, _mm512_set1_ps(multiplier));
+        _mm512_storeu_ps(ext, x);
+
+        native += 16;
+        ext += 16;
+        samples -= 16;
+    }
+    {
+        __mmask16 mask = ((uint32_t)1 << samples) - 1;
+        __m512 x = _mm512_maskz_loadu_ps(mask, native);
+        x = _mm512_mul_ps(x, _mm512_set1_ps(multiplier));
+        _mm512_mask_storeu_ps(ext, mask, x);
+    }
+}
 
 
 
@@ -224,6 +260,9 @@ void add_tests_x64_AVX512(UnitTestDatabase& database){
 
             database.add<Test_from_x64_AVX512<int32_t>>(samples, multiplier);
             database.add<Test_to_x64_AVX512<int32_t>>(samples, multiplier);
+
+            database.add<Test_from_x64_AVX512<float>>(samples, multiplier);
+            database.add<Test_to_x64_AVX512<float>>(samples, multiplier);
         }
     }
 }
