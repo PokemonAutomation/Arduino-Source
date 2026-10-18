@@ -43,7 +43,7 @@ PA_FORCE_INLINE float32x4_t convert_from_s16(int32x4_t x, float multiplier){
 }
 PA_FORCE_INLINE int16x4_t convert_to_s16(float32x4_t x, float multiplier){
     const float32x4_t SCALE = vdupq_n_f32(multiplier * 32768.f));
-    x = vmulq_f32(x, vdupq_n_f32(SCALE));
+    x = vmulq_f32(x, SCALE);
     x = vminq_f32(x, vdupq_n_f32(32767.f));
     x = vmaxq_f32(x, vdupq_n_f32(-32768.f));
     return vqmovn_s32(vcvtq_s32_f32(x));
@@ -54,7 +54,7 @@ PA_FORCE_INLINE float32x4_t convert_from_s32(int32x4_t x, float multiplier){
 }
 PA_FORCE_INLINE int32x4_t convert_to_s32(float32x4_t x, float multiplier){
     const float32x4_t SCALE = vdupq_n_f32(multiplier * 2147483648.f));
-    x = vmulq_f32(x, SCALE;
+    x = vmulq_f32(x, SCALE);
     x = vminq_f32(x, vdupq_n_f32(2147483520.f)); // 2^31 - 128
     x = vmaxq_f32(x, vdupq_n_f32(-2147483648.f));
     return vcvtq_s32_f32(x);
