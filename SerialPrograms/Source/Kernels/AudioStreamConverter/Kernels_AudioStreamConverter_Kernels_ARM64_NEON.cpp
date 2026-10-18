@@ -165,6 +165,34 @@ void convert_to_ARM64_NEON<int32_t>(c_ptr<float> native, r_ptr<int32_t> ext, siz
         convert_to_Default(native, ext, samples, multiplier);
     }
 }
+template <>
+void convert_from_ARM64_NEON<float>(r_ptr<float> native, c_ptr<float> ext, size_t samples, float multiplier){
+    while (samples >= 4){
+        float32x4_t x = vld1q_f32(ext);
+        vst1q_f32(native, vmulq_f32(x, vdupq_n_f32(multiplier)));
+
+        native += 4;
+        ext += 4;
+        samples -= 4;
+    }
+    if (samples > 0){
+        convert_from_Default(native, ext, samples, multiplier);
+    }
+}
+template <>
+void convert_to_ARM64_NEON<float>(c_ptr<float> native, r_ptr<float> ext, size_t samples, float multiplier){
+    while (samples >= 4){
+        float32x4_t x = vld1q_f32(native);
+        vst1q_f32(ext, vmulq_f32(x, vdupq_n_f32(multiplier)));
+
+        native += 4;
+        ext += 4;
+        samples -= 4;
+    }
+    if (samples > 0){
+        convert_to_Default(native, ext, samples, multiplier);
+    }
+}
 
 
 
@@ -204,6 +232,9 @@ void add_tests_ARM64_NEON(UnitTestDatabase& database){
 
             database.add<Test_from_ARM64_NEON<int32_t>>(samples, multiplier);
             database.add<Test_to_ARM64_NEON<int32_t>>(samples, multiplier);
+
+            database.add<Test_from_ARM64_NEON<float>>(samples, multiplier);
+            database.add<Test_to_ARM64_NEON<float>>(samples, multiplier);
         }
     }
 }

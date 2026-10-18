@@ -24,9 +24,15 @@ namespace AudioStreamConverter{
 
 
 template <typename ExternalType>
-void convert_from_Default(r_ptr<float> native, c_ptr<ExternalType> ext, size_t samples, float multiplier);
+void convert_from_Default(
+    r_ptr<float> native, c_ptr<ExternalType> ext,
+    size_t samples, float multiplier
+);
 template <typename ExternalType>
-void convert_to_Default(c_ptr<float> native, r_ptr<ExternalType> ext, size_t samples, float multiplier);
+void convert_to_Default(
+    c_ptr<float> native, r_ptr<ExternalType> ext,
+    size_t samples, float multiplier
+);
 
 
 

@@ -163,6 +163,36 @@ void convert_to_x64_SSE41<int32_t>(c_ptr<float> native, r_ptr<int32_t> ext, size
         convert_to_Default(native, ext, samples, multiplier);
     }
 }
+template <>
+void convert_from_x64_SSE41<float>(r_ptr<float> native, c_ptr<float> ext, size_t samples, float multiplier){
+    while (samples >= 4){
+        __m128 x = _mm_loadu_ps(ext);
+        x = _mm_mul_ps(x, _mm_set1_ps(multiplier));
+        _mm_storeu_ps(native, x);
+
+        native += 4;
+        ext += 4;
+        samples -= 4;
+    }
+    if (samples > 0){
+        convert_from_Default(native, ext, samples, multiplier);
+    }
+}
+template <>
+void convert_to_x64_SSE41<float>(c_ptr<float> native, r_ptr<float> ext, size_t samples, float multiplier){
+    while (samples >= 4){
+        __m128 x = _mm_loadu_ps(native);
+        x = _mm_mul_ps(x, _mm_set1_ps(multiplier));
+        _mm_storeu_ps(ext, x);
+
+        native += 4;
+        ext += 4;
+        samples -= 4;
+    }
+    if (samples > 0){
+        convert_to_Default(native, ext, samples, multiplier);
+    }
+}
 
 
 
@@ -205,6 +235,9 @@ void add_tests_x64_SSE41(UnitTestDatabase& database){
 
             database.add<Test_from_x64_SSE41<int32_t>>(samples, multiplier);
             database.add<Test_to_x64_SSE41<int32_t>>(samples, multiplier);
+
+            database.add<Test_from_x64_SSE41<float>>(samples, multiplier);
+            database.add<Test_to_x64_SSE41<float>>(samples, multiplier);
         }
     }
 }
