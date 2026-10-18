@@ -366,11 +366,10 @@ if (WIN32)
         #  and the import libraries + DLLs in 3rdPartyBinaries/
         #  (avcodec.lib/.dll, avformat.lib/.dll, avutil.lib/.dll, swscale.lib/.dll,
         #  swresample.lib/.dll - use an LGPL shared build; the project is
-        #  LGPL-only, so use e.g. the gyan.dev "...-lgpl-shared" release or
-        #  BtbN's "win64-lgpl-shared", not the GPL build).
+        #  LGPL-only, using BtbN's "win64-lgpl-shared", not the GPL build).
         #  The DLLs placed in 3rdPartyBinaries/ are copied to the output directory
         #  by the THIRD_PARTY_DLLS deploy step below. Requires ffmpeg >= 5.1:
-        #  the ring uses the ffmpeg 5.1 API generation (the channel layout API,
+        #  stream history uses the ffmpeg 5.1 API generation (the channel layout API,
         #  i.e. void av_channel_layout_default(), and swr_alloc_set_opts2() taking
         #  a SwrContext**), both introduced in 5.1 with signatures unchanged since.
         foreach(FFMPEG_LIB IN ITEMS avcodec avformat avutil swscale swresample)
