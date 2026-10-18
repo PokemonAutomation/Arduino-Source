@@ -22,25 +22,22 @@ namespace AudioStreamConverter{
 
 
 
-PA_FORCE_INLINE __m256 convert_from_u8(__m256i x){
-    return _mm256_fmadd_ps(
-        _mm256_cvtepi32_ps(x),
-        _mm256_set1_ps(1.f / 128.f),
-        _mm256_set1_ps(-1.f)
-    );
+PA_FORCE_INLINE __m256 convert_from_u8(__m256i x, float multiplier){
+    const __m256 SCALE0 = _mm256_set1_ps(multiplier * (1.f / 128.f));
+    const __m256 SCALE1 = _mm256_set1_ps(multiplier * -1.f);
+    return _mm256_fmadd_ps(_mm256_cvtepi32_ps(x), SCALE0, SCALE1);
 }
 PA_FORCE_INLINE __m256i convert_to_u8(__m256 x, float multiplier){
-    const __m256 SCALE = _mm256_set1_ps(multiplier * 128.f);
+    const __m256 SCALE = _mm256_set1_ps(multiplier);
+    x = _mm256_mul_ps(x, SCALE);
     x = _mm256_min_ps(x, _mm256_set1_ps(127.0f / 128.0f));
     x = _mm256_max_ps(x, _mm256_set1_ps(-1.0f));
-    x = _mm256_fmadd_ps(x, SCALE, SCALE);
+    x = _mm256_fmadd_ps(x, _mm256_set1_ps(128.f), _mm256_set1_ps(128.f));
     return _mm256_cvtps_epi32(x);
 }
-PA_FORCE_INLINE __m256 convert_from_s16(__m256i x){
-    return _mm256_mul_ps(
-        _mm256_cvtepi32_ps(x),
-        _mm256_set1_ps(1.0f / 32768.0f)
-    );
+PA_FORCE_INLINE __m256 convert_from_s16(__m256i x, float multiplier){
+    const __m256 SCALE = _mm256_set1_ps(multiplier * (1.0f / 32768.0f));
+    return _mm256_mul_ps(_mm256_cvtepi32_ps(x), SCALE);
 }
 PA_FORCE_INLINE __m256i convert_to_s16(__m256 x, float multiplier){
     x = _mm256_mul_ps(x, _mm256_set1_ps(multiplier * 32768.f));
@@ -48,11 +45,9 @@ PA_FORCE_INLINE __m256i convert_to_s16(__m256 x, float multiplier){
     x = _mm256_max_ps(x, _mm256_set1_ps(-32768.f));
     return _mm256_cvtps_epi32(x);
 }
-PA_FORCE_INLINE __m256 convert_from_s32(__m256i x){
-    return _mm256_mul_ps(
-        _mm256_cvtepi32_ps(x),
-        _mm256_set1_ps(1.0f / 2147483648.0f)
-    );
+PA_FORCE_INLINE __m256 convert_from_s32(__m256i x, float multiplier){
+    const __m256 SCALE = _mm256_set1_ps(multiplier * (1.0f / 2147483648.0f));
+    return _mm256_mul_ps(_mm256_cvtepi32_ps(x), SCALE);
 }
 PA_FORCE_INLINE __m256i convert_to_s32(__m256 x, float multiplier){
     x = _mm256_mul_ps(x, _mm256_set1_ps(multiplier * 2147483648.f));
@@ -64,26 +59,26 @@ PA_FORCE_INLINE __m256i convert_to_s32(__m256 x, float multiplier){
 
 
 template <typename ExternalType>
-void convert_from_x64_AVX2(r_ptr<float> native, c_ptr<ExternalType> ext, size_t samples);
+void convert_from_x64_AVX2(r_ptr<float> native, c_ptr<ExternalType> ext, size_t samples, float multiplier);
 template <typename ExternalType>
 void convert_to_x64_AVX2(c_ptr<float> native, r_ptr<ExternalType> ext, size_t samples, float multiplier);
 
 
 
 template <>
-void convert_from_x64_AVX2<uint8_t>(r_ptr<float> native, c_ptr<uint8_t> ext, size_t samples){
+void convert_from_x64_AVX2<uint8_t>(r_ptr<float> native, c_ptr<uint8_t> ext, size_t samples, float multiplier){
     while (samples >= 8){
         __m256i x = _mm256_cvtepu8_epi32(
             _mm_loadl_epi64((const __m128i*)ext)
         );
-        _mm256_storeu_ps(native, convert_from_u8(x));
+        _mm256_storeu_ps(native, convert_from_u8(x, multiplier));
 
         native += 8;
         ext += 8;
         samples -= 8;
     }
     if (samples > 0){
-        convert_from_Default(native, ext, samples);
+        convert_from_Default(native, ext, samples, multiplier);
     }
 }
 template <>
@@ -112,19 +107,19 @@ void convert_to_x64_AVX2<uint8_t>(c_ptr<float> native, r_ptr<uint8_t> ext, size_
     }
 }
 template <>
-void convert_from_x64_AVX2<int16_t>(r_ptr<float> native, c_ptr<int16_t> ext, size_t samples){
+void convert_from_x64_AVX2<int16_t>(r_ptr<float> native, c_ptr<int16_t> ext, size_t samples, float multiplier){
     while (samples >= 8){
         __m256i x = _mm256_cvtepi16_epi32(
             _mm_loadu_si128((const __m128i*)ext)
         );
-        _mm256_storeu_ps(native, convert_from_s16(x));
+        _mm256_storeu_ps(native, convert_from_s16(x, multiplier));
 
         native += 8;
         ext += 8;
         samples -= 8;
     }
     if (samples > 0){
-        convert_from_Default(native, ext, samples);
+        convert_from_Default(native, ext, samples, multiplier);
     }
 }
 template <>
@@ -153,17 +148,17 @@ void convert_to_x64_AVX2<int16_t>(c_ptr<float> native, r_ptr<int16_t> ext, size_
     }
 }
 template <>
-void convert_from_x64_AVX2<int32_t>(r_ptr<float> native, c_ptr<int32_t> ext, size_t samples){
+void convert_from_x64_AVX2<int32_t>(r_ptr<float> native, c_ptr<int32_t> ext, size_t samples, float multiplier){
     while (samples >= 8){
         __m256i x = _mm256_loadu_si256((const __m256i*)ext);
-        _mm256_storeu_ps(native, convert_from_s32(x));
+        _mm256_storeu_ps(native, convert_from_s32(x, multiplier));
 
         native += 8;
         ext += 8;
         samples -= 8;
     }
     if (samples > 0){
-        convert_from_Default(native, ext, samples);
+        convert_from_Default(native, ext, samples, multiplier);
     }
 }
 template <>
@@ -190,10 +185,10 @@ void convert_to_x64_AVX2<int32_t>(c_ptr<float> native, r_ptr<int32_t> ext, size_
 template <typename Type>
 class Test_from_x64_AVX2 : public Test<Type>{
 public:
-    Test_from_x64_AVX2(size_t samples)
+    Test_from_x64_AVX2(size_t samples, float multiplier)
         : Test<Type>(
             "from_x64_AVX2",
-            samples,
+            samples, multiplier,
             (ConvertFrom<Type>)convert_from_x64_AVX2<Type>,
             (ConvertTo<Type>)convert_to_Default<Type>
         )
@@ -202,10 +197,10 @@ public:
 template <typename Type>
 class Test_to_x64_AVX2 : public Test<Type>{
 public:
-    Test_to_x64_AVX2(size_t samples)
+    Test_to_x64_AVX2(size_t samples, float multiplier)
         : Test<Type>(
             "to_x64_AVX2",
-            samples,
+            samples, multiplier,
             (ConvertFrom<Type>)convert_from_Default<Type>,
             (ConvertTo<Type>)convert_to_x64_AVX2<Type>
         )
@@ -213,14 +208,16 @@ public:
 };
 void add_tests_x64_AVX2(UnitTestDatabase& database){
     for (size_t samples = 2; samples < 1000; samples = (size_t)(samples * 1.1) + 1){
-        database.add<Test_from_x64_AVX2<uint8_t>>(samples);
-        database.add<Test_to_x64_AVX2<uint8_t>>(samples);
+        for (float multiplier = 0.1f; multiplier <= 1.0f; multiplier += 0.1f){
+            database.add<Test_from_x64_AVX2<uint8_t>>(samples, multiplier);
+            database.add<Test_to_x64_AVX2<uint8_t>>(samples, multiplier);
 
-        database.add<Test_from_x64_AVX2<int16_t>>(samples);
-        database.add<Test_to_x64_AVX2<int16_t>>(samples);
+            database.add<Test_from_x64_AVX2<int16_t>>(samples, multiplier);
+            database.add<Test_to_x64_AVX2<int16_t>>(samples, multiplier);
 
-        database.add<Test_from_x64_AVX2<int32_t>>(samples);
-        database.add<Test_to_x64_AVX2<int32_t>>(samples);
+            database.add<Test_from_x64_AVX2<int32_t>>(samples, multiplier);
+            database.add<Test_to_x64_AVX2<int32_t>>(samples, multiplier);
+        }
     }
 }
 

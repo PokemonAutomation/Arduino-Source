@@ -7,8 +7,14 @@
 #include <type_traits>
 #include <random>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Kernels_AudioStreamConverter_TestInfra.h"
+
+//  REMOVE
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -21,14 +27,16 @@ template <typename Type>
 Test<Type>::Test(
     const std::string& arch_str,
     size_t samples,
+    float multiplier,
     ConvertFrom<Type> convert_from,
     ConvertTo<Type> convert_to
 )
     : UnitTest(
         "Kernels::AudioStreamConverter - " + typestr() + "_" + arch_str +
-        "(" + std::to_string(samples) + ")"
+        "(" + std::to_string(samples) + ", m=" + tostr_default(multiplier) + ")"
     )
     , m_samples(samples)
+    , m_multiplier(multiplier)
     , m_convert_from(convert_from)
     , m_convert_to(convert_to)
 {}
@@ -50,27 +58,29 @@ UnitTestResult Test<Type>::run(Logger& logger, CancellableScope& scope) const{
     );
     ext0[0] = std::numeric_limits<Type>::min();
     ext0[1] = std::numeric_limits<Type>::max();
-    if constexpr (std::is_same_v<Type, int32_t>){
-        ext0[0] &= 0xfffff000;
-        ext0[1] &= 0xfffff000;
-    }
     for (size_t c = 2; c < m_samples; c++){
         ext0[c] = (Type)distribution(generator);
-        //  Truncate some precision so the round-trip is lossless.
-        if constexpr (std::is_same_v<Type, int32_t>){
-            ext0[c] &= 0xfffff000;
-        }
     }
 
-    m_convert_from(native.data(), ext0.data(), m_samples);
-    m_convert_to(native.data(), ext1.data(), m_samples, 1.0f);
+    m_convert_from(native.data(), ext0.data(), m_samples, m_multiplier);
+    m_convert_to(native.data(), ext1.data(), m_samples, 1.0f / m_multiplier);
 
     //  Check for errors.
     for (size_t c = 0; c < m_samples; c++){
-        if (ext0[c] != ext1[c]){
-            return "Mismatch at " + std::to_string(c) + ": " +
-                std::to_string(ext0[c]) + " != " + std::to_string(ext1[c]);
+        if constexpr (std::is_same_v<Type, int32_t>){
+            //  int32_t is lossy due to round-off.
+            int64_t diff = int64_t(ext0[c]) - ext1[c];
+            if (std::abs(diff) > 16384){
+                return "Mismatch at " + std::to_string(c) + ": " +
+                    std::to_string(ext0[c]) + " != " + std::to_string(ext1[c]);
+            }
+        }else{
+            if (ext0[c] != ext1[c]){
+                return "Mismatch at " + std::to_string(c) + ": " +
+                    std::to_string(ext0[c]) + " != " + std::to_string(ext1[c]);
+            }
         }
+
     }
 
     return true;
