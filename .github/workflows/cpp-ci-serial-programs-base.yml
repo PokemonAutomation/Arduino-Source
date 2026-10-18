@@ -34,11 +34,13 @@ jobs:
           if [[ "${{inputs.os}}" == windows* ]]; then
             # Build with Ninja: ccache can't wrap the compiler under the Visual Studio generator.
             # "Ninja Multi-Config" keeps Visual Studio's output layout (bin/RelWithDebInfo/).
-            # ccache also can't cache /Zi (debug info written to a shared PDB) or /FAs listings,
-            # so embed the debug info in each object file with /Z7 (the linker still writes the
-            # PDB) and turn the listings off.
+            # ccache also can't cache /FAs listings, so turn them off.
+            # CI needs no debug info, so keep RelWithDebInfo's optimization but leave out its
+            # debug info: with policy CMP0141, an empty CMAKE_MSVC_DEBUG_INFORMATION_FORMAT
+            # drops /Zi, and linking without /debug writes no PDB. Release builds made outside
+            # CI keep their debug info.
             echo "CMAKE_GENERATOR=Ninja Multi-Config" >> $GITHUB_ENV
-            CMAKE_ADDITIONAL_FLAGS="-DCMAKE_POLICY_DEFAULT_CMP0141=NEW -DCMAKE_MSVC_DEBUG_INFORMATION_FORMAT=Embedded -DPA_ASSEMBLY_LISTINGS=OFF"
+            CMAKE_ADDITIONAL_FLAGS="-DCMAKE_POLICY_DEFAULT_CMP0141=NEW -DCMAKE_MSVC_DEBUG_INFORMATION_FORMAT= -DCMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO=/INCREMENTAL:NO -DPA_ASSEMBLY_LISTINGS=OFF"
             if [[ "${{inputs.compiler}}" == "clang" ]]; then
               CMAKE_ADDITIONAL_FLAGS="$CMAKE_ADDITIONAL_FLAGS -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl"
             else
@@ -48,7 +50,8 @@ jobs:
             # 10 at once, so memory use stays close to what the runner handled before.
             BUILD_PARALLEL=$(( $(nproc) + 2 ))
           elif [[ "${{inputs.compiler}}" == "clang" && "${{inputs.os}}" == ubuntu* ]]; then
-            CMAKE_ADDITIONAL_FLAGS="-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=RelWithDebInfo"
+            # RelWithDebInfo's -O2 without its -g: CI doesn't use the debug info.
+            CMAKE_ADDITIONAL_FLAGS="-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=RelWithDebInfo '-DCMAKE_C_FLAGS_RELWITHDEBINFO=-O2 -DNDEBUG' '-DCMAKE_CXX_FLAGS_RELWITHDEBINFO=-O2 -DNDEBUG'"
           fi
           CMAKE_ADDITIONAL_FLAGS="$CMAKE_ADDITIONAL_FLAGS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
           echo "CMAKE_ADDITIONAL_FLAGS=$CMAKE_ADDITIONAL_FLAGS" >> $GITHUB_ENV
@@ -168,8 +171,7 @@ jobs:
       # Only pushes to main save the cache: every PR restores main's latest one, and PR runs don't
       # fill the repo's 10 GB cache quota with entries that no other run can read.
       # max-size is only a cap: evict-old-files drops everything this build didn't use, so each
-      # saved cache is about one build's worth. Windows has the largest, since /Z7 puts the debug
-      # info in every object file.
+      # saved cache is about one build's worth.
       # On Windows, install the action's own ccache: the runner's Strawberry Perl puts an older
       # ccache (4.9.1) on PATH, which the default install: detect would use instead.
       - name: Set up ccache
@@ -205,9 +207,8 @@ jobs:
             echo "https://github.com/${{github.repository_owner}}/Packages/commit/$(git -C Arduino-Source/Packages rev-parse HEAD)"
           } > ${{env.UPLOAD_FOLDER}}/version.txt
 
-      # Leave out files only the build itself uses: the static libraries (SerialProgramsLib.lib
-      # alone is over 2 GB with /Z7 debug info) and the incremental-link file (.ilk), which Ninja
-      # writes next to the exe.
+      # Leave out the static libraries, which only the build itself uses. With debug info,
+      # SerialProgramsLib.lib alone was over 1 GB uncompressed.
       - name: Upload Build
         uses: actions/upload-artifact@v7
         if: inputs.upload-build
@@ -216,7 +217,6 @@ jobs:
           path: |
             ${{env.UPLOAD_FOLDER}}
             !${{env.UPLOAD_FOLDER}}/*.lib
-            !${{env.UPLOAD_FOLDER}}/*.ilk
 
       - name: Upload Executable Only
         uses: actions/upload-artifact@v7
