@@ -36,7 +36,15 @@ PA_FORCE_INLINE __m512i convert_to_u8(__m512 x, float multiplier){
     x = _mm512_min_ps(x, _mm512_set1_ps(127.0f / 128.0f));
     x = _mm512_max_ps(x, _mm512_set1_ps(-1.0f));
     x = _mm512_fmadd_ps(x, _mm512_set1_ps(128.0f), _mm512_set1_ps(128.5f));
-    return _mm512_cvtps_epi32(x);
+    return _mm512_cvttps_epi32(x);
+}
+//  VPMOVQB saturates int32 lane values above 127, which would clamp the
+//  upper half of the uint8 range.  Shift the [0, 255] values into signed
+//  byte range first, then add the 128 back in byte lanes (modulo 256).
+PA_FORCE_INLINE __m128i pack_u8_bytes(__m512i x){
+    x = _mm512_sub_epi32(x, _mm512_set1_epi32(128));
+    __m128i y = _mm512_cvtepi32_epi8(x);
+    return _mm_add_epi8(y, _mm_set1_epi8(128));
 }
 PA_FORCE_INLINE __m512 convert_from_s16(__m512i x, float multiplier){
     return _mm512_mul_ps(
@@ -48,7 +56,7 @@ PA_FORCE_INLINE __m512i convert_to_s16(__m512 x, float multiplier){
     x = _mm512_mul_ps(x, _mm512_set1_ps(multiplier * 32768.f));
     x = _mm512_min_ps(x, _mm512_set1_ps(32767.f));
     x = _mm512_max_ps(x, _mm512_set1_ps(-32768.f));
-    return _mm512_cvtps_epi32(x);
+    return _mm512_cvttps_epi32(x);
 }
 PA_FORCE_INLINE __m512 convert_from_s32(__m512i x, float multiplier){
     return _mm512_mul_ps(
@@ -60,7 +68,7 @@ PA_FORCE_INLINE __m512i convert_to_s32(__m512 x, float multiplier){
     x = _mm512_mul_ps(x, _mm512_set1_ps(multiplier * 2147483648.f));
     x = _mm512_min_ps(x, _mm512_set1_ps(2147483520.f)); // 2^31 - 128
     x = _mm512_max_ps(x, _mm512_set1_ps(-2147483648.f));
-    return _mm512_cvtps_epi32(x);
+    return _mm512_cvttps_epi32(x);
 }
 
 
@@ -99,7 +107,7 @@ void convert_to_x64_AVX512<uint8_t>(c_ptr<float> native, r_ptr<uint8_t> ext, siz
         __m512 x = _mm512_loadu_ps(native);
         _mm_storeu_si128(
             (__m128i*)ext,
-            _mm512_cvtepi32_epi8(convert_to_u8(x, multiplier))
+            pack_u8_bytes(convert_to_u8(x, multiplier))
         );
 
         native += 16;
@@ -111,7 +119,7 @@ void convert_to_x64_AVX512<uint8_t>(c_ptr<float> native, r_ptr<uint8_t> ext, siz
         __m512 x = _mm512_maskz_loadu_ps(mask, native);
         _mm_mask_storeu_epi8(
             (__m128i*)ext, mask,
-            _mm512_cvtepi32_epi8(convert_to_u8(x, multiplier))
+            pack_u8_bytes(convert_to_u8(x, multiplier))
         );
     }
 }

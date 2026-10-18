@@ -36,7 +36,7 @@ PA_FORCE_INLINE __m256i convert_to_u8(__m256 x, float multiplier){
     x = _mm256_min_ps(x, _mm256_set1_ps(127.0f / 128.0f));
     x = _mm256_max_ps(x, _mm256_set1_ps(-1.0f));
     x = _mm256_fmadd_ps(x, _mm256_set1_ps(128.0f), _mm256_set1_ps(128.5f));
-    return _mm256_cvtps_epi32(x);
+    return _mm256_cvttps_epi32(x);
 }
 PA_FORCE_INLINE __m256 convert_from_s16(__m256i x, float multiplier){
     return _mm256_mul_ps(
@@ -48,7 +48,7 @@ PA_FORCE_INLINE __m256i convert_to_s16(__m256 x, float multiplier){
     x = _mm256_mul_ps(x, _mm256_set1_ps(multiplier * 32768.f));
     x = _mm256_min_ps(x, _mm256_set1_ps(32767.f));
     x = _mm256_max_ps(x, _mm256_set1_ps(-32768.f));
-    return _mm256_cvtps_epi32(x);
+    return _mm256_cvttps_epi32(x);
 }
 PA_FORCE_INLINE __m256 convert_from_s32(__m256i x, float multiplier){
     return _mm256_mul_ps(
@@ -60,7 +60,7 @@ PA_FORCE_INLINE __m256i convert_to_s32(__m256 x, float multiplier){
     x = _mm256_mul_ps(x, _mm256_set1_ps(multiplier * 2147483648.f));
     x = _mm256_min_ps(x, _mm256_set1_ps(2147483520.f)); // 2^31 - 128
     x = _mm256_max_ps(x, _mm256_set1_ps(-2147483648.f));
-    return _mm256_cvtps_epi32(x);
+    return _mm256_cvttps_epi32(x);
 }
 
 

@@ -39,7 +39,7 @@ PA_FORCE_INLINE __m128i convert_to_u8(__m128 x, float multiplier){
     x = _mm_min_ps(x, _mm_set1_ps(127.0f / 128.0f));
     x = _mm_max_ps(x, _mm_set1_ps(-1.0f));
     x = _mm_add_ps(_mm_mul_ps(x, _mm_set1_ps(128.0f)), _mm_set1_ps(128.5f));
-    return _mm_cvtps_epi32(x);
+    return _mm_cvttps_epi32(x);
 }
 PA_FORCE_INLINE __m128 convert_from_s16(__m128i x, float multiplier){
     return _mm_mul_ps(
@@ -51,7 +51,7 @@ PA_FORCE_INLINE __m128i convert_to_s16(__m128 x, float multiplier){
     x = _mm_mul_ps(x, _mm_set1_ps(multiplier * 32768.f));
     x = _mm_min_ps(x, _mm_set1_ps(32767.f));
     x = _mm_max_ps(x, _mm_set1_ps(-32768.f));
-    return _mm_cvtps_epi32(x);
+    return _mm_cvttps_epi32(x);
 }
 PA_FORCE_INLINE __m128 convert_from_s32(__m128i x, float multiplier){
     return _mm_mul_ps(
@@ -63,7 +63,7 @@ PA_FORCE_INLINE __m128i convert_to_s32(__m128 x, float multiplier){
     x = _mm_mul_ps(x, _mm_set1_ps(multiplier * 2147483648.f));
     x = _mm_min_ps(x, _mm_set1_ps(2147483520.f)); // 2^31 - 128
     x = _mm_max_ps(x, _mm_set1_ps(-2147483648.f));
-    return _mm_cvtps_epi32(x);
+    return _mm_cvttps_epi32(x);
 }
 
 
@@ -77,15 +77,26 @@ void convert_to_x64_SSE41(c_ptr<float> native, r_ptr<ExternalType> ext, size_t s
 
 template <>
 void convert_from_x64_SSE41<uint8_t>(r_ptr<float> native, c_ptr<uint8_t> ext, size_t samples, float multiplier){
-    while (samples >= 4){
-        __m128i x = _mm_cvtepu8_epi32(
-            _mm_loadl_epi64((const __m128i*)ext)
-        );
-        _mm_storeu_ps(native, convert_from_u8(x, multiplier));
+    //  16 samples per iteration so that the 16-byte load stays in bounds;
+    //  anything smaller is handled by the scalar tail.
+    while (samples >= 16){
+        __m128i x = _mm_loadu_si128((const __m128i*)ext);
+        _mm_storeu_ps(native, convert_from_u8(
+            _mm_cvtepu8_epi32(x), multiplier
+        ));
+        _mm_storeu_ps(native + 4, convert_from_u8(
+            _mm_cvtepu8_epi32(_mm_srli_si128(x, 4)), multiplier
+        ));
+        _mm_storeu_ps(native + 8, convert_from_u8(
+            _mm_cvtepu8_epi32(_mm_srli_si128(x, 8)), multiplier
+        ));
+        _mm_storeu_ps(native + 12, convert_from_u8(
+            _mm_cvtepu8_epi32(_mm_srli_si128(x, 12)), multiplier
+        ));
 
-        native += 4;
-        ext += 4;
-        samples -= 4;
+        native += 16;
+        ext += 16;
+        samples -= 16;
     }
     if (samples > 0){
         convert_from_Default(native, ext, samples, multiplier);
@@ -110,15 +121,20 @@ void convert_to_x64_SSE41<uint8_t>(c_ptr<float> native, r_ptr<uint8_t> ext, size
 }
 template <>
 void convert_from_x64_SSE41<int16_t>(r_ptr<float> native, c_ptr<int16_t> ext, size_t samples, float multiplier){
-    while (samples >= 4){
-        __m128i x = _mm_cvtepi16_epi32(
-            _mm_loadu_si128((const __m128i*)ext)
-        );
-        _mm_storeu_ps(native, convert_from_s16(x, multiplier));
+    //  8 samples per iteration: a 4-sample iteration with a 16-byte load
+    //  would read past the end of short buffers.
+    while (samples >= 8){
+        __m128i x = _mm_loadu_si128((const __m128i*)ext);
+        _mm_storeu_ps(native, convert_from_s16(
+            _mm_cvtepi16_epi32(x), multiplier
+        ));
+        _mm_storeu_ps(native + 4, convert_from_s16(
+            _mm_cvtepi16_epi32(_mm_srli_si128(x, 8)), multiplier
+        ));
 
-        native += 4;
-        ext += 4;
-        samples -= 4;
+        native += 8;
+        ext += 8;
+        samples -= 8;
     }
     if (samples > 0){
         convert_from_Default(native, ext, samples, multiplier);
