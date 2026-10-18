@@ -4,6 +4,7 @@
  *
  */
 
+#include <cstring>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Kernels/AudioStreamConverter/Kernels_AudioStreamConverter.h"
@@ -59,11 +60,6 @@ RawAudio2WorkingAudio::RawAudio2WorkingAudio(
     , m_multiplier(multiplier)
     , m_buffer_size(buffer_size)
 {
-    //  Single-channel float is pass-through.
-    if (sample_type == SampleFormat::FLOAT32 && channels == 1){
-        return;
-    }
-
     switch (sample_type){
     case SampleFormat::UINT8:
         set_converter<uint8_t>();
@@ -73,6 +69,23 @@ RawAudio2WorkingAudio::RawAudio2WorkingAudio(
         break;
     case SampleFormat::SINT32:
         set_converter<int32_t>();
+        break;
+    case SampleFormat::FLOAT32:
+        //  Float is already the working type, so there is no type
+        //  conversion, only the gain. (AudioStreamConverter has no float
+        //  specialization; float->float is a plain scale.)
+        m_convert = [this](const void* data, size_t samples){
+            float multiplier = m_multiplier.load(std::memory_order_acquire);
+            const float* in = (const float*)data;
+            float* out = m_interleaved_floats.data();
+            if (multiplier == 1.0f){
+                std::memcpy(out, in, samples * sizeof(float));
+            }else{
+                for (size_t i = 0; i < samples; i++){
+                    out[i] = in[i] * multiplier;
+                }
+            }
+        };
         break;
     default:;
     }
@@ -105,8 +118,9 @@ void RawAudio2WorkingAudio::set_multiplier(float multiplier){
 }
 
 void RawAudio2WorkingAudio::push_samples(size_t frames, const void* data){
-    //  Single-channel float pass-through.
-    if (sample_type() == SampleFormat::FLOAT32 && channels() == 1){
+    //  Single-channel float pass-through. (Zero-copy, no gain.)
+    if (sample_type() == SampleFormat::FLOAT32 && channels() == 1 &&
+        m_multiplier.load(std::memory_order_acquire) == 1.0f){
         m_listeners.run_method(
             &WorkingAudioStreamListener::push_samples,
             frames, 0, (const float*)data

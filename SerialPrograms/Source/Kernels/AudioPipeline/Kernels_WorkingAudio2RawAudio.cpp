@@ -4,6 +4,7 @@
  *
  */
 
+#include <cstring>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Kernels/AudioStreamConverter/Kernels_AudioStreamConverter.h"
@@ -41,11 +42,6 @@ WorkingAudio2RawAudio::WorkingAudio2RawAudio(
     , m_multiplier(multiplier)
     , m_buffer_size(buffer_size)
 {
-    //  Single-channel float is pass-through.
-    if (sample_type == SampleFormat::FLOAT32 && channels == 1){
-        return;
-    }
-
     size_t sample_size = sizeof(float);
     switch (sample_type){
     case SampleFormat::UINT8:
@@ -56,6 +52,23 @@ WorkingAudio2RawAudio::WorkingAudio2RawAudio(
         break;
     case SampleFormat::SINT32:
         sample_size = set_converter<int32_t>();
+        break;
+    case SampleFormat::FLOAT32:
+        //  Float is already the working type, so there is no type
+        //  conversion, only the gain. (AudioStreamConverter has no float
+        //  specialization; float->float is a plain scale.)
+        m_convert = [this](const void* data, size_t samples){
+            float multiplier = m_multiplier.load(std::memory_order_acquire);
+            const float* in = (const float*)data;
+            float* out = (float*)m_interleaved_raw.data();
+            if (multiplier == 1.0f){
+                std::memcpy(out, in, samples * sizeof(float));
+            }else{
+                for (size_t i = 0; i < samples; i++){
+                    out[i] = in[i] * multiplier;
+                }
+            }
+        };
         break;
     default:;
     }
@@ -91,8 +104,9 @@ void WorkingAudio2RawAudio::set_multiplier(float multiplier){
 }
 
 void WorkingAudio2RawAudio::push_samples(size_t samples, size_t stride, const float* data){
-    //  Single-channel float pass-through.
-    if (m_sample_type == SampleFormat::FLOAT32 && channels() == 1){
+    //  Single-channel float pass-through. (Zero-copy, no gain.)
+    if (m_sample_type == SampleFormat::FLOAT32 && channels() == 1 &&
+        m_multiplier.load(std::memory_order_acquire) == 1.0f){
         m_listeners.run_method(
             &RawAudioStreamListener::push_samples,
             samples, (const float*)data
@@ -131,7 +145,7 @@ void WorkingAudio2RawAudio::push_samples(size_t samples, size_t stride, const fl
         );
 
         samples -= block;
-        data += block * stride;
+        data += block;
     }
 }
 
