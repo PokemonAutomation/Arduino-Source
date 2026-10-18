@@ -24,18 +24,19 @@ namespace AudioStreamConverter{
 
 PA_FORCE_INLINE float32x4_t convert_from_u8(uint32x4_t x, float multiplier){
     const float32x4_t SCALE0 = vdupq_n_f32(multiplier * (1.f / 128.f));
-    const float32x4_t SCALE1 = vdupq_n_f32(multiplier * 1.f);
-    return vsubq_f32(
-        vmulq_f32(vcvtq_f32_u32(x), SCALE0),
-        SCALE1
-    );
+    const float32x4_t SCALE1 = vdupq_n_f32(multiplier * -1.f);
+    //  The multiply and add are fused into a single FMA. The vfmaq
+    //  (accumulate) spelling lowers to a real FMLA/FMLS in both GCC and
+    //  Clang; GCC 13 decomposes the vmlsq spelling back into mul + add.
+    return vfmaq_f32(SCALE1, vcvtq_f32_u32(x), SCALE0);
 }
 PA_FORCE_INLINE int32x4_t convert_to_u8(float32x4_t x, float multiplier){
     const float32x4_t SCALE = vdupq_n_f32(multiplier);
     x = vmulq_f32(x, SCALE);
     x = vminq_f32(x, vdupq_n_f32(127.0f / 128.0f));
     x = vmaxq_f32(x, vdupq_n_f32(-1.0f));
-    x = vaddq_f32(vmulq_f32(x, vdupq_n_f32(128.f)), vdupq_n_f32(128.f));
+    //  Fused into a single FMA, as above.
+    x = vfmaq_f32(vdupq_n_f32(128.f), x, vdupq_n_f32(128.f));
     return vcvtnq_s32_f32(x);
 }
 PA_FORCE_INLINE float32x4_t convert_from_s16(int32x4_t x, float multiplier){
