@@ -1,6 +1,0 @@
-
-[serial]
-pyserial>=3.5
-
-[test]
-pytest>=7
