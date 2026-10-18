@@ -4,7 +4,6 @@
  *
  */
 
-#include <cstring>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Kernels/AudioStreamConverter/Kernels_AudioStreamConverter.h"
@@ -54,21 +53,8 @@ WorkingAudio2RawAudio::WorkingAudio2RawAudio(
         sample_size = set_converter<int32_t>();
         break;
     case SampleFormat::FLOAT32:
-        //  Float is already the working type, so there is no type
-        //  conversion, only the gain. (AudioStreamConverter has no float
-        //  specialization; float->float is a plain scale.)
-        m_convert = [this](const void* data, size_t samples){
-            float multiplier = m_multiplier.load(std::memory_order_acquire);
-            const float* in = (const float*)data;
-            float* out = (float*)m_interleaved_raw.data();
-            if (multiplier == 1.0f){
-                std::memcpy(out, in, samples * sizeof(float));
-            }else{
-                for (size_t i = 0; i < samples; i++){
-                    out[i] = in[i] * multiplier;
-                }
-            }
-        };
+        //  Float is already the working type, so the conversion is just the gain.
+        sample_size = set_converter<float>();
         break;
     default:;
     }
