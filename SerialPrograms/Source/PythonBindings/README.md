@@ -77,6 +77,8 @@ If `port` is omitted, every port from `list_serial_ports()` is tried in turn.
 
 ## Running the unit tests
 
+Pytest must be installed: `pip install pytest`
+
 ```sh
 cd SerialPrograms/Source/PythonBindings  # starting from the root Arduino-Source
 python -m pytest
