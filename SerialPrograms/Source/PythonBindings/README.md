@@ -24,37 +24,63 @@ device, using the `NintendoSwitch::PybindSwitchProController` class from CoreLib
 - `tests/` — pytest suite (pure-Python parts always run; compiled-module tests
   skip when `_pa_core` is not built).
 
-## Building the module
+## Building the pybind module
 
 Requires a Python 3.10+ with development headers and pybind11 (a system package
-or `pip install pybind11`). If neither is found, CMake downloads a pinned
+or `pip install pybind11`). If pybind11 is not found, CMake downloads a pinned
 pybind11 release.
 
+Run the following commands:
+
 ```sh
-cd SerialPrograms
+cd SerialPrograms  # starting from the root Arduino-Source
 mkdir bin && cd bin
-cmake .. -DPA_PYTHON_BINDINGS=ON [-DPA_CORE_ONLY=ON] [-DPython_EXECUTABLE=$(which python3)]
+cmake .. -DPA_PYTHON_BINDINGS=ON -DPA_CORE_ONLY=ON
 cmake --build . --target _pa_core
 ```
 
-`-DPA_CORE_ONLY=ON` builds only the GUI-free core (CoreLib,
-SerialProgramsCommandLine and the module) — the fast path; without it the
-module is built alongside the full GUI program.
+Note: If cmake has issues with finding python, you can use the command:
 
-After the build, `_pa_core` is copied into `pokemon_automation/`, so the
-package works straight from the source tree. To install it for a project:
+`cmake .. -DPA_PYTHON_BINDINGS=ON -DPA_CORE_ONLY=ON -DPython_EXECUTABLE=$(which python3)`
+
+However, note that the `$(which ...)` command does not work in Windows.
+
+`-DPA_CORE_ONLY=ON` builds only the GUI-free core (CoreLib,
+SerialProgramsCommandLine and the module) — the fast path; without it, the
+module is built alongside the full GUI program, meaning that you would have
+to configure your build to include Qt and other libraries.
+
+## Installing the pybind module
+
+After the build, `_pa_core` is copied into 
+`SerialPrograms/Source/PythonBindings/pokemon_automation/`.
+
+To install it for a project:
 
 ```sh
-pip install -e SerialPrograms/Source/PythonBindings
+pip install -e SerialPrograms/Source/PythonBindings  # starting from the root Arduino-Source
 ```
 
-## Usage
+## Running the test file
+
+`selftest.py` will connect to the Switch via PABotBase2 and send a few simple commands.
+
+Run the following commands:
+
+```sh
+cd SerialPrograms/Source/PythonBindings # starting from the root Arduino-Source
+python -m pokemon_automation.selftest [port]
+```
+
+If `port` is omitted, every port from `list_serial_ports()` is tried in turn.
+
+## More example usage
 
 ```python
 from pokemon_automation import SwitchController, list_serial_ports
 
 print(list_serial_ports())
-with SwitchController("/dev/ttyACM0") as sw:
+with SwitchController("/dev/ttyACM0") as sw:  # connects to the Switch via port /dev/ttyACM0
     print(sw.status())            # device name and firmware version
     sw.press("A")                 # tap A (80 ms hold, 80 ms release)
     sw.press("L+R", hold_ms=200)  # press L and R together
@@ -66,18 +92,18 @@ with SwitchController("/dev/ttyACM0") as sw:
 ```
 
 Commands are queued on the microcontroller and return as soon as they are
-scheduled, mirroring the `pbf_*()` functions of the main program. Call
-`flush()` to wait for execution, and `cancel_all_and_wait()` (thread-safe) to
+scheduled, mirroring the `pbf_*()` functions of the main program. 
+
+- `flush()`: to wait for all queued commands to execute. 
+- `cancel_all_and_wait()`: (thread-safe) to
 drop the queue, release all inputs and wait for the device to confirm the
-neutral state — e.g. from an emergency-stop thread. `close()` does this for
-you before dropping the connection.
+neutral state — e.g. from an emergency-stop thread. 
+- `close()`: runs `cancel_all_and_wait()`, then drops the connection.
+- `press()`: presses the buttons on the Switch
+- `stick()`: moves the left or right stick on the Switch
+- `hold()`: simulatenously holds/presses any combination of buttons, d-pad and sticks.
 
-Run the tests:
-
-```sh
-cd SerialPrograms/Source/PythonBindings
-python -m pytest
-```
+See `controller.py` for more details.
 
 ## Notes
 
