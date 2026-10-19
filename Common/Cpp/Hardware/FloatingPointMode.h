@@ -12,8 +12,14 @@
  *  35-185 s, and under 5 s with flush-to-zero.
  *
  *  With flush-to-zero, the CPU treats denormal inputs as zero and rounds denormal
- *  results to zero. OCR, image matching and model inference don't need values
- *  that small.
+ *  results to zero. Model inference doesn't need values that small.
+ *
+ *  This program turns it on only while ONNX Runtime runs a model:
+ *  - on ONNX Runtime's own thread pool, with `SetGlobalDenormalAsZero()` in
+ *    ML/Models/ML_OrtEnv.cpp, and
+ *  - on the thread that calls `Run()`, for the length of the call, with
+ *    `FlushDenormalsToZeroScope`.
+ *  All other code keeps the default floating-point behavior.
  *
  *  The mode belongs to each thread:
  *  - x86-64: the FTZ and DAZ bits of MXCSR, which control SSE and AVX math.
@@ -59,7 +65,8 @@ inline void set_floating_point_control(uint64_t value){
 }
 
 // Turn on flush-to-zero for denormal floats on the current thread, until the
-// thread ends or the mode is changed again.
+// thread ends or the mode is changed again. Prefer `FlushDenormalsToZeroScope`,
+// which restores the previous mode.
 inline void enable_flush_denormals_to_zero(){
 #if defined(__x86_64__) || defined(_M_X64)
     //  0x8000: FTZ, flush denormal results to zero.
@@ -73,9 +80,9 @@ inline void enable_flush_denormals_to_zero(){
 
 
 // Turn on flush-to-zero on the current thread for this object's lifetime, then
-// restore the previous mode. For code that may run on threads this program
-// doesn't own, like an ONNX Runtime `Run()` call: ONNX Runtime runs part of
-// each inference on the calling thread.
+// restore the previous mode. Wrap each ONNX Runtime `Run()` call in one: ONNX
+// Runtime runs part of each inference on the calling thread, which can be any
+// thread in this program, and its own thread pool doesn't cover that part.
 class FlushDenormalsToZeroScope{
 public:
     FlushDenormalsToZeroScope(const FlushDenormalsToZeroScope&) = delete;
