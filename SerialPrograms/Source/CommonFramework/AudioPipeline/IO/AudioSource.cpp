@@ -4,97 +4,14 @@
  *
  */
 
-#include <QtGlobal>
-#if QT_VERSION_MAJOR == 5
-#include <QAudioInput>
-using NativeAudioSource = QAudioInput;
-#elif QT_VERSION_MAJOR == 6
-#include <QAudioSource>
-using NativeAudioSource = QAudioSource;
-#endif
-
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/Time.h"
-//#include "Common/Cpp/StreamConverters.h"
 #include "CommonFramework/AudioPipeline/AudioStream.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
-#include "AudioFileLoader.h"
+#include "AudioInputDevice.h"
+#include "AudioInputFile.h"
 #include "AudioSource.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
-
 namespace PokemonAutomation{
-
-
-
-class AudioInputFile final : public QObject{
-public:
-    AudioInputFile(
-        Logger& logger, AudioStreamToFloat& reader,
-        const std::string& file, const QAudioFormat& format
-    )
-         : m_reader(reader)
-    {
-        logger.log("AudioInputFile(): " + dump_audio_format(format));
-        m_source = std::make_unique<AudioFileLoader>(nullptr, file, format);
-        connect(
-            m_source.get(), &AudioFileLoader::bufferReady,
-            this, [this](const char* data, size_t len){
-                m_reader.push_bytes(data, len);
-            }
-        );
-        m_source->start();
-    }
-
-private:
-    AudioStreamToFloat& m_reader;
-    std::unique_ptr<AudioFileLoader> m_source;
-};
-
-class AudioInputDevice final : public QIODevice{
-public:
-    AudioInputDevice(
-        Logger& logger, AudioStreamToFloat& reader,
-        const NativeAudioInfo& device, const QAudioFormat& format
-    )
-         : m_reader(reader)
-    {
-        logger.log("AudioInputDevice(): " + dump_audio_format(format));
-        if (!device.isFormatSupported(format)){
-//            throw InternalProgramError(&logger, PA_CURRENT_FUNCTION, "Format not supported: " + dump_audio_format(format));
-            logger.log("Format not supported: " + dump_audio_format(format), COLOR_RED);
-            return;
-        }
-        m_source = std::make_unique<NativeAudioSource>(device, format);
-
-        this->open(QIODevice::ReadWrite | QIODevice::Unbuffered);
-
-        WallClock start = current_time();
-        m_source->start(this);
-        WallClock end = current_time();
-        double seconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / 1000.;
-        logger.log("Done starting audio... " + tostr_fixed(seconds, 3) + " seconds", COLOR_CYAN);
-    }
-    ~AudioInputDevice(){
-        if (m_source){
-            m_source->stop();
-        }
-    }
-
-    virtual bool isSequential() const override { return true; }
-    virtual qint64 readData(char* data, qint64 maxlen) override { return 0; }
-    virtual qint64 writeData(const char* data, qint64 len) override{
-        m_reader.push_bytes(data, len);
-        return len;
-    }
-
-private:
-    AudioStreamToFloat& m_reader;
-    std::unique_ptr<NativeAudioSource> m_source;
-};
 
 
 

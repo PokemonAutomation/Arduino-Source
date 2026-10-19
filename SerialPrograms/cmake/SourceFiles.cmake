@@ -510,6 +510,10 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/AudioPipeline/ChannelMixer.h
     Source/CommonFramework/AudioPipeline/IO/AudioFileLoader.cpp
     Source/CommonFramework/AudioPipeline/IO/AudioFileLoader.h
+    Source/CommonFramework/AudioPipeline/IO/AudioInputDevice.cpp
+    Source/CommonFramework/AudioPipeline/IO/AudioInputDevice.h
+    Source/CommonFramework/AudioPipeline/IO/AudioInputFile.cpp
+    Source/CommonFramework/AudioPipeline/IO/AudioInputFile.h
     Source/CommonFramework/AudioPipeline/IO/AudioSink.cpp
     Source/CommonFramework/AudioPipeline/IO/AudioSink.h
     Source/CommonFramework/AudioPipeline/IO/AudioSource.cpp
