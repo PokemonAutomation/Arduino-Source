@@ -52,7 +52,7 @@ to configure your build to include Qt and other libraries.
 
 ## Installing the pybind module
 
-After the build, `_pa_core` is copied into 
+After the build, `_pa_core` is copied into
 `SerialPrograms/Source/PythonBindings/pokemon_automation/`.
 
 To install it for a project:
@@ -61,7 +61,7 @@ To install it for a project:
 pip install -e SerialPrograms/Source/PythonBindings  # starting from the root Arduino-Source
 ```
 
-## Running the test file
+## Hardware self-test
 
 `selftest.py` will connect to the Switch via PABotBase2 and send a few simple commands.
 
@@ -69,10 +69,20 @@ Run the following commands:
 
 ```sh
 cd SerialPrograms/Source/PythonBindings # starting from the root Arduino-Source
-python -m pokemon_automation.selftest [port]
+python -m pokemon_automation.selftest               # try every candidate port in turn
+python -m pokemon_automation.selftest /dev/ttyACM0  # or pass a specific port
 ```
 
 If `port` is omitted, every port from `list_serial_ports()` is tried in turn.
+
+## Running the unit tests
+
+```sh
+cd SerialPrograms/Source/PythonBindings  # starting from the root Arduino-Source
+python -m pytest
+```
+
+The tests that need the compiled module are skipped when `_pa_core` has not been built.
 
 ## More example usage
 
@@ -92,16 +102,17 @@ with SwitchController("/dev/ttyACM0") as sw:  # connects to the Switch via port 
 ```
 
 Commands are queued on the microcontroller and return as soon as they are
-scheduled, mirroring the `pbf_*()` functions of the main program. 
+scheduled, mirroring the `pbf_*()` functions of the main program.
 
-- `flush()`: to wait for all queued commands to execute. 
+- `flush()`: to wait for all queued commands to execute.
 - `cancel_all_and_wait()`: (thread-safe) to
 drop the queue, release all inputs and wait for the device to confirm the
-neutral state — e.g. from an emergency-stop thread. 
+neutral state — e.g. from an emergency-stop thread.
 - `close()`: runs `cancel_all_and_wait()`, then drops the connection.
 - `press()`: presses the buttons on the Switch
 - `stick()`: moves the left or right stick on the Switch
-- `hold()`: simulatenously holds/presses any combination of buttons, d-pad and sticks.
+- `hold()`: simultaneously holds/presses any combination of buttons, d-pad and sticks.
+- `wait()`: queues a pause with nothing pressed.
 
 See `controller.py` for more details.
 
