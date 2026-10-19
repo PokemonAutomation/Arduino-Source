@@ -59,11 +59,6 @@ RawAudio2WorkingAudio::RawAudio2WorkingAudio(
     , m_multiplier(multiplier)
     , m_buffer_size(buffer_size)
 {
-    //  Single-channel float is pass-through.
-    if (sample_type == SampleFormat::FLOAT32 && channels == 1){
-        return;
-    }
-
     switch (sample_type){
     case SampleFormat::UINT8:
         set_converter<uint8_t>();
@@ -73,6 +68,10 @@ RawAudio2WorkingAudio::RawAudio2WorkingAudio(
         break;
     case SampleFormat::SINT32:
         set_converter<int32_t>();
+        break;
+    case SampleFormat::FLOAT32:
+        //  Float is already the working type, so the conversion is just the gain.
+        set_converter<float>();
         break;
     default:;
     }
@@ -105,8 +104,9 @@ void RawAudio2WorkingAudio::set_multiplier(float multiplier){
 }
 
 void RawAudio2WorkingAudio::push_samples(size_t frames, const void* data){
-    //  Single-channel float pass-through.
-    if (sample_type() == SampleFormat::FLOAT32 && channels() == 1){
+    //  Single-channel float pass-through. (Zero-copy, no gain.)
+    if (sample_type() == SampleFormat::FLOAT32 && channels() == 1 &&
+        m_multiplier.load(std::memory_order_acquire) == 1.0f){
         m_listeners.run_method(
             &WorkingAudioStreamListener::push_samples,
             frames, 0, (const float*)data

@@ -127,6 +127,15 @@ UnitTestResult run_round_trip(
                 return "Mismatch at " + std::to_string(c) + ": " +
                     std::to_string(input[c]) + " != " + std::to_string(output.data()[c]);
             }
+        }else if constexpr (std::is_same_v<Type, float>){
+            //  The gain round-trip (x * m * (1/m)) is not exactly x in
+            //  floating point; allow a few ULPs of round-off.
+            float diff = input[c] - output.data()[c];
+            if (std::abs(diff) > 1e-4f){
+                return "Mismatch at " + std::to_string(c) + ": " +
+                    tostr_default(input[c]) + " != " + tostr_default(output.data()[c]) +
+                    " (diff " + tostr_default(diff) + ").";
+            }
         }else{
             if (input[c] != output.data()[c]){
                 return "Mismatch at " + std::to_string(c) + ": " +
