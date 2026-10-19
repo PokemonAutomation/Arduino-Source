@@ -67,8 +67,10 @@ with SwitchController("/dev/ttyACM0") as sw:
 
 Commands are queued on the microcontroller and return as soon as they are
 scheduled, mirroring the `pbf_*()` functions of the main program. Call
-`flush()` to wait for execution, and `cancel_all_commands()` (thread-safe) to
-drop the queue and release all inputs — e.g. from an emergency-stop thread.
+`flush()` to wait for execution, and `cancel_all_and_wait()` (thread-safe) to
+drop the queue, release all inputs and wait for the device to confirm the
+neutral state — e.g. from an emergency-stop thread. `close()` does this for
+you before dropping the connection.
 
 Run the tests:
 

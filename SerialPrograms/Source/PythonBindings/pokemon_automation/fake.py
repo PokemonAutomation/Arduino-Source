@@ -19,6 +19,8 @@ class FakeController:
         self.ready = ready
         self.log: list[tuple[str, tuple[Any, ...]]] = []
         self.cancel_count = 0
+        # Tests can set this to False to simulate a device that does not acknowledge in time.
+        self.confirm_cancel = True
         self._lock = threading.Lock()
 
     # -- _pa_core.Controller interface --------------------------------------
@@ -38,9 +40,12 @@ class FakeController:
     def wait_for_all_requests(self) -> None:
         pass
 
-    def cancel_all_commands(self) -> None:
+    def cancel_all_and_wait(self, timeout_ms: int = 500) -> bool:
+        """Counts the call in `cancel_count`. Returns `confirm_cancel`, which tests can
+        set to False to simulate a device that does not acknowledge in time."""
         with self._lock:
             self.cancel_count += 1
+        return self.confirm_cancel
 
     def _record(self, name: str, *args: Any) -> None:
         with self._lock:

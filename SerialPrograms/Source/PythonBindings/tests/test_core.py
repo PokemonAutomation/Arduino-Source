@@ -57,4 +57,4 @@ def test_unreachable_port():
         c.push_button(0, 10, 10, core.BUTTONS["A"])
     # These are safe no-ops when not ready.
     c.wait_for_all_requests()
-    c.cancel_all_commands()
+    assert c.cancel_all_and_wait(100) is False

@@ -2,8 +2,9 @@
 
 Commands are queued on the microcontroller and return immediately, like the
 `pbf_*()` functions in the main C++ program. Call `flush()` to wait until
-everything queued so far has executed, and `cancel_all_commands()` to drop
-anything still queued and release all inputs.
+everything queued so far has executed, and `cancel_all_and_wait()` to drop
+anything still queued and release all inputs (waiting for the device to confirm
+the neutral state).
 
 Example:
     from pokemon_automation import SwitchController
@@ -36,7 +37,7 @@ class ControllerBackend(Protocol):
     def current_status(self) -> str: ...
     def controller_name(self) -> str: ...
     def wait_for_all_requests(self) -> None: ...
-    def cancel_all_commands(self) -> None: ...
+    def cancel_all_and_wait(self, timeout_ms: int = ...) -> bool: ...
     def wait(self, duration_ms: int) -> None: ...
     def push_button(self, delay_ms: int, hold_ms: int, release_ms: int, bitfield: int) -> None: ...
     def push_dpad(self, delay_ms: int, hold_ms: int, release_ms: int, position: int) -> None: ...
@@ -172,22 +173,29 @@ class SwitchController:
         self._require_open()
         self._backend.wait_for_all_requests()
 
-    def cancel_all_commands(self) -> None:
-        """Drop every queued command and return the controller to the neutral state.
+    def cancel_all_and_wait(self, timeout_ms: int = 500) -> bool:
+        """Cancel every queued command and return the controller to the neutral state.
 
-        Asynchronous: the device is told to cancel, but this does not wait for it
-        to confirm the neutral state. Thread-safe: may be called from another
-        thread while commands are being sent (emergency stop).
+        Waits up to `timeout_ms` for the device to acknowledge the cancel. Returns
+        True if acknowledged, False on timeout (or if the controller is not ready).
+        Thread-safe: may be called from another thread while commands are being sent
+        (emergency stop).
         """
         self._require_open()
-        self._backend.cancel_all_commands()
+        return self._backend.cancel_all_and_wait(int(timeout_ms))
 
     # ---- lifecycle -------------------------------------------------------------
 
     def close(self) -> None:
-        """Drop the connection. Queued commands may still complete on the device;
-        call `cancel_all_commands()` first to stop it."""
+        """Stop the device (cancelling queued commands and waiting briefly for the
+        neutral state) and drop the connection."""
+        if self._closed:
+            return
         self._closed = True
+        try:
+            self._backend.cancel_all_and_wait(500)
+        except Exception:  # noqa: BLE001 - best effort: the connection is dropped anyway
+            pass
 
     def __enter__(self) -> SwitchController:
         return self

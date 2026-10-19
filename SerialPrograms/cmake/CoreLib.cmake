@@ -91,3 +91,17 @@ else() # macOS and Linux
         target_compile_options(CoreLib PRIVATE -march=nehalem)
     endif()
 endif()
+
+# miniz is a third-party library: compile it with warnings off so that its own
+# code (and its header, which it includes from its own directory, so no SYSTEM
+# include directory can shield it) can never trip -Werror / /WX, regardless of
+# which compiler or compiler version is used.
+if (WIN32)
+    set(MINIZ_WARNING_FLAGS "/W0")
+else()
+    set(MINIZ_WARNING_FLAGS "-w")
+endif()
+set_source_files_properties(
+    ../3rdParty-Core/miniz-3.1.1/miniz.c
+    PROPERTIES COMPILE_OPTIONS "${MINIZ_WARNING_FLAGS}"
+)

@@ -4,7 +4,8 @@
 
 If `port` is omitted, every port from `list_serial_ports()` is tried in turn.
 The test connects, prints the device status, presses HOME and a d-pad step,
-waits for the device to confirm, and cancels. It only presses HOME and the d-pad.
+waits for the device to confirm, and cancels with confirmation. It only
+presses HOME and the d-pad.
 """
 
 from __future__ import annotations
@@ -26,7 +27,7 @@ def try_port(port: str) -> bool:
             sw.press("right", hold_ms=100)
             sw.wait(500)
             sw.flush()
-            sw.cancel_all_commands()
+            print("  cancel confirmed:", sw.cancel_all_and_wait(500))
         print("Self-test OK.")
         return True
     except Exception as e:  # noqa: BLE001 - a self-test reports, it does not crash

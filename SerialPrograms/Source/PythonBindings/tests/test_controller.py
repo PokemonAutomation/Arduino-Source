@@ -112,17 +112,23 @@ def test_validation():
 def test_flush_and_cancel():
     sw, fake = make()
     sw.flush()
-    sw.cancel_all_commands()
+    assert sw.cancel_all_and_wait() is True
     assert fake.cancel_count == 1
+    fake.confirm_cancel = False
+    assert sw.cancel_all_and_wait() is False
+    assert fake.cancel_count == 2
 
 
 def test_close():
     sw, fake = make()
     sw.close()
+    assert fake.cancel_count == 1  # close() stops the device first
     with pytest.raises(RuntimeError, match="closed"):
         sw.press("A")
     with pytest.raises(RuntimeError, match="closed"):
         sw.flush()
+    sw.close()  # idempotent
+    assert fake.cancel_count == 1
 
 
 def test_context_manager():

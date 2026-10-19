@@ -218,10 +218,15 @@ PYBIND11_MODULE(_pa_core, m){
         .def("wait_for_all_requests", &PybindSwitchProController::wait_for_all_requests,
              "Block until every command queued so far has been executed by the device.",
              py::call_guard<py::gil_scoped_release>())
-        .def("cancel_all_commands", &PybindSwitchProController::cancel_all_commands,
-             "Cancel every command that has not executed yet, clearing the device's "
-             "command queue and returning the controller to the neutral state. "
-             "Asynchronous: does not wait for the device to reach the neutral state.")
+        .def("cancel_all_and_wait", &PybindSwitchProController::cancel_all_and_wait,
+             py::arg("timeout_ms") = 500,
+             "Cancel every command that has not executed yet, clear the device's command "
+             "queue, return the controller to the neutral state (no buttons pressed, "
+             "sticks centered), and wait up to `timeout_ms` for the device to "
+             "acknowledge. Returns True if acknowledged, False on timeout or if the "
+             "controller is not ready. Thread-safe: may be called from another thread, "
+             "e.g. as an emergency stop.",
+             py::call_guard<py::gil_scoped_release>())
         .def("wait", &PybindSwitchProController::wait,
              py::arg("duration_ms"),
              "Queue a pause of `duration_ms` with nothing pressed.",
