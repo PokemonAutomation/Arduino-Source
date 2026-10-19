@@ -68,6 +68,25 @@ option(COMMAND_LINE_EXE "Build the optional executable" ON)
 # and pybind11 (a system package or `pip install pybind11`).
 option(PA_PYTHON_BINDINGS "Build the _pa_core Python module (Switch controller)" OFF)
 
+# miniz is a third-party library compiled into every target that uses
+# CORE_LIBRARY_SOURCES (CoreLib in both build modes, SerialProgramsLib in the
+# full build): compile it with warnings off so its own code (and its header,
+# which it includes from its own directory, so no SYSTEM include directory can
+# shield it) can never trip -Werror / /WX, regardless of compiler or compiler
+# version. Must run before the PA_CORE_ONLY early return below; source
+# properties are global, so setting it once covers every target.
+if (MSVC)
+    set_source_files_properties(
+        ../3rdParty-Core/miniz-3.1.1/miniz.c
+        PROPERTIES COMPILE_OPTIONS "/W0"
+    )
+else()
+    set_source_files_properties(
+        ../3rdParty-Core/miniz-3.1.1/miniz.c
+        PROPERTIES COMPILE_OPTIONS "-w"
+    )
+endif()
+
 # Build only the GUI-free core: CoreLib and SerialProgramsCommandLine. This needs
 # no Qt, OpenCV, ONNX Runtime, Tesseract, DPP or Discord SDK, so none of them are
 # searched for.
