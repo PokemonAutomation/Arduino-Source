@@ -22,6 +22,17 @@ class AudioSource;
 class AudioSink;
 class AudioFloatToFFT;
 
+namespace Kernels{
+namespace AudioPipeline{
+class RawAudio2WorkingAudio;
+class WorkingAudio2RawAudio;
+class ChannelMixer;
+}
+namespace AudioResampler{
+class AudioResampler;
+}
+}
+
 
 class AudioPassthroughPairQt final : public QObject, public AudioPassthroughPair{
 public:
@@ -61,6 +72,17 @@ private:
 
     void init_audio_sink();
 
+    //  New pipeline tree (runs in parallel with the legacy reader / sink /
+    //  FFT path until the endpoints switch over). All of these are only
+    //  touched while holding m_lock; the producing thread only ever sees
+    //  them through the node listener sets, where ListenerSet::remove
+    //  blocks on in-flight pushes so rebuilds never race a live push.
+    //  The tails of both branches are open for now: the sink encoder's raw
+    //  output and the FFT resampler's output go nowhere yet.
+    void teardown_tree();
+    void build_tree(float input_volume);
+    void rebuild_sink_branch();
+
 
 private:
     Logger& m_logger;
@@ -74,6 +96,16 @@ private:
     AudioChannelFormat m_input_format;
     std::unique_ptr<AudioSource> m_reader;
     std::unique_ptr<SampleListener> m_sample_listener;      //  Attaches to "m_reader".
+
+    //  New pipeline tree. The decoder attaches to m_reader's raw stream and
+    //  the branch heads attach to the decoder (sink head before FFT head).
+    //  Declared after m_reader so the nodes die before the reader does.
+    std::unique_ptr<Kernels::AudioPipeline::RawAudio2WorkingAudio> m_source_decoder;
+    std::unique_ptr<Kernels::AudioPipeline::ChannelMixer> m_sink_mixer;          //  Source channels -> sink channels.
+    std::unique_ptr<Kernels::AudioResampler::AudioResampler> m_sink_resampler;
+    std::unique_ptr<Kernels::AudioPipeline::WorkingAudio2RawAudio> m_sink_encoder;
+    std::unique_ptr<Kernels::AudioPipeline::ChannelMixer> m_fft_mixer;           //  Source channels -> 1 channel.
+    std::unique_ptr<Kernels::AudioResampler::AudioResampler> m_fft_resampler;
 
     AudioDeviceInfo m_output_device;
     float m_file_input_multiplier = 1.0;

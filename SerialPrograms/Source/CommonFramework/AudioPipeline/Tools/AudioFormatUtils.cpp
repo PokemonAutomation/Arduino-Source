@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <QAudio>
 #include <QAudioFormat>
 #include "AudioFormatUtils.h"
 #include "AudioNormalization.h"
@@ -13,6 +14,19 @@
 
 
 namespace PokemonAutomation{
+
+
+float convertAudioVolumeFromSlider(double volume){
+    volume = std::max(volume, 0.0);
+    volume = std::min(volume, 1.0);
+    // The slider bar value is in the log scale because log scale matches human sound
+    // perception.
+    float linearVolume = QAudio::convertVolume(
+        (float)volume,
+        QAudio::LogarithmicVolumeScale, QAudio::LinearVolumeScale
+    );
+    return linearVolume;
+}
 
 
 std::string dump_audio_format(const QAudioFormat& format){

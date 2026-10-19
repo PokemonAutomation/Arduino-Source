@@ -45,6 +45,44 @@ void AudioSource::remove_listener(AudioFloatStreamListener& listener){
     auto scope_check = m_sanitizer.check_scope();
     m_listeners.remove(listener);
 }
+size_t AudioSource::raw_sample_rate() const{
+    if (m_input_file){
+        return m_input_file->sample_rate();
+    }
+    if (m_input_device){
+        return m_input_device->sample_rate();
+    }
+    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "No audio input.");
+}
+size_t AudioSource::raw_channels() const{
+    if (m_input_file){
+        return m_input_file->channels();
+    }
+    if (m_input_device){
+        return m_input_device->channels();
+    }
+    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "No audio input.");
+}
+void AudioSource::add_raw_listener(Kernels::AudioPipeline::RawAudioStreamListener& listener){
+    auto scope_check = m_sanitizer.check_scope();
+    if (m_input_file){
+        m_input_file->add_listener(listener);
+    }else if (m_input_device){
+        m_input_device->add_listener(listener);
+    }else{
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "No audio input.");
+    }
+}
+void AudioSource::remove_raw_listener(Kernels::AudioPipeline::RawAudioStreamListener& listener){
+    auto scope_check = m_sanitizer.check_scope();
+    if (m_input_file){
+        m_input_file->remove_listener(listener);
+    }else if (m_input_device){
+        m_input_device->remove_listener(listener);
+    }else{
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "No audio input.");
+    }
+}
 
 
 AudioSource::~AudioSource(){}
@@ -74,6 +112,7 @@ AudioSource::AudioSource(Logger& logger, const AudioDeviceInfo& device, AudioCha
 
 void AudioSource::init(AudioChannelFormat format, AudioSampleFormat stream_format, float volume_multiplier){
     auto scope_check = m_sanitizer.check_scope();
+    m_stream_format = stream_format;
     switch (format){
     case AudioChannelFormat::MONO_48000:
         m_sample_rate = 48000;

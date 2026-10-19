@@ -26,11 +26,22 @@ class AudioStreamToFloat;
 class AudioInputFile;
 class AudioInputDevice;
 
+namespace Kernels{namespace AudioPipeline{class RawAudioStreamListener;}}
+
 
 class AudioSource{
 public:
     void add_listener(AudioFloatStreamListener& listener);
     void remove_listener(AudioFloatStreamListener& listener);
+
+    //  Raw stream (pre-conversion) access. The raw stream is the source's
+    //  native frame-aligned output, before AudioStreamToFloat applies the
+    //  preset's rate/channels and the input volume.
+    AudioSampleFormat raw_sample_format() const{ return m_stream_format; }
+    size_t raw_sample_rate() const;
+    size_t raw_channels() const;
+    void add_raw_listener(Kernels::AudioPipeline::RawAudioStreamListener& listener);
+    void remove_raw_listener(Kernels::AudioPipeline::RawAudioStreamListener& listener);
 
 public:
     ~AudioSource();
@@ -54,6 +65,7 @@ private:
     size_t m_sample_rate;
     size_t m_channels;
     size_t m_multiplier;
+    AudioSampleFormat m_stream_format;
 
     SpinLock m_lock;
 

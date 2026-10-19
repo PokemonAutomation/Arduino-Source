@@ -24,18 +24,7 @@ namespace PokemonAutomation{
 
 // Slider bar volume: [0, 100], in log scale
 // Volume value passed to AudioDisplayWidget (and the audio thread it manages): [0.f, 1.f], linear scale
-float convertAudioVolumeFromSlider(double volume){
-    volume = std::max(volume, 0.0);
-    volume = std::min(volume, 1.0);
-    // The slider bar value is in the log scale because log scale matches human sound
-    // perception.
-    float linearVolume = QAudio::convertVolume(
-        (float)volume,
-        QAudio::LogarithmicVolumeScale, QAudio::LinearVolumeScale
-    );
-    return linearVolume;
-}
-
+// (convertAudioVolumeFromSlider now lives in Tools/AudioFormatUtils.)
 
 const char* audio_error_to_str(QAudio::Error error){
     switch (error){
