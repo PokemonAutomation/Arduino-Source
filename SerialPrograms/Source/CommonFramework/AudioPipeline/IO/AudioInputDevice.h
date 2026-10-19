@@ -1,0 +1,99 @@
+/*  Audio Input Device
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#ifndef PokemonAutomation_AudioPipeline_AudioInputDevice_H
+#define PokemonAutomation_AudioPipeline_AudioInputDevice_H
+
+#include <QtGlobal>
+#if QT_VERSION_MAJOR == 5
+#include <QAudioInput>
+using NativeAudioSource = QAudioInput;
+#elif QT_VERSION_MAJOR == 6
+#include <QAudioSource>
+using NativeAudioSource = QAudioSource;
+#else
+#error "Unknown Qt version."
+#endif
+
+#include <memory>
+#include <QIODevice>
+#include "Common/Cpp/ListenerSet.h"
+#include "Common/Cpp/LifetimeSanitizer.h"
+#include "Common/Cpp/StreamConverters.h"
+#include "Kernels/AudioPipeline/Kernels_AudioPipeline.h"
+#include "CommonFramework/AudioPipeline/AudioInfo.h"
+
+class QAudioFormat;
+
+namespace PokemonAutomation{
+
+class Logger;
+class AudioStreamToFloat;
+
+
+//
+//  Raw audio input from a capture device (QAudioSource / QAudioInput).
+//
+//  Feeds the legacy AudioStreamToFloat reader and, in parallel, emits the raw
+//  stream to RawAudioStreamListener children (root of the new pipeline tree).
+//  Qt makes no contract about the frame alignment of the chunks that the
+//  audio backend writes into the QIODevice, so the raw output goes through the
+//  same MisalignedStreamConverter / ObjectStreamListener byte-reassembly
+//  pattern that AudioStreamToFloat uses. In practice the backends emit
+//  whole-frame chunks, so no splicing happens in the common case.
+//
+class AudioInputDevice final
+    : public QIODevice
+    , private MisalignedStreamConverter
+    , private ObjectStreamListener
+{
+public:
+    ~AudioInputDevice();
+
+    AudioInputDevice(
+        Logger& logger, AudioStreamToFloat& reader,
+        const NativeAudioInfo& device, const QAudioFormat& format
+    );
+
+    Kernels::AudioPipeline::SampleFormat sample_type() const{
+        return m_sample_type;
+    }
+    size_t sample_rate() const{
+        return m_sample_rate;
+    }
+    size_t channels() const{
+        return m_channels;
+    }
+
+    void add_listener(Kernels::AudioPipeline::RawAudioStreamListener& listener);
+    void remove_listener(Kernels::AudioPipeline::RawAudioStreamListener& listener);
+
+
+    virtual bool isSequential() const override { return true; }
+    virtual qint64 readData(char* data, qint64 maxlen) override { return 0; }
+    virtual qint64 writeData(const char* data, qint64 len) override;
+
+
+protected:
+    //  MisalignedStreamConverter: raw pass-through (in and out are the same size).
+    virtual void convert(void* out, const void* in, size_t count) override;
+    //  ObjectStreamListener: aligned frames out to the raw listeners.
+    virtual void on_objects(const void* data, size_t objects) override;
+
+
+private:
+    AudioStreamToFloat& m_reader;
+    std::unique_ptr<NativeAudioSource> m_source;
+    Kernels::AudioPipeline::SampleFormat m_sample_type;
+    size_t m_sample_rate;
+    size_t m_channels;
+    size_t m_frame_bytes;
+    ListenerSet<Kernels::AudioPipeline::RawAudioStreamListener> m_listeners;
+    LifetimeSanitizer m_sanitizer;
+};
+
+}
+#endif
