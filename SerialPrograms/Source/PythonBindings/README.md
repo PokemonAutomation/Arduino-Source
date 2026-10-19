@@ -19,7 +19,7 @@ device, using the `NintendoSwitch::PybindSwitchProController` class from CoreLib
   - `fake.py` — `FakeController`: the same backend interface without hardware,
     for unit tests.
   - `devices.py` — `list_serial_ports()`.
-  - `selftest.py` — `python -m pokemon_automation.selftest [port]`: connect to
+  - `controller_test.py` — `python -m pokemon_automation.controller_test [port]`: connect to
     a real device and send a few commands.
 - `tests/` — pytest suite (pure-Python parts always run; compiled-module tests
   skip when `_pa_core` is not built).
@@ -61,19 +61,25 @@ To install it for a project:
 pip install -e SerialPrograms/Source/PythonBindings  # starting from the root Arduino-Source
 ```
 
-## Hardware self-test
+## Controller test
 
-`selftest.py` will connect to the Switch via PABotBase2 and send a few simple commands.
+`controller_test.py` will connect to the Switch via PABotBase2 and send a few simple commands.
+
+Ensure your microcontroller is connected to your computer, and has the correct firmware flashed onto it, and is ready to connect to the Switch (e.g. Switch in the Change Grip/controller menu for the Pico W and ESP32, or that the USB cable is connecting the microcontroller to the Switch dock for the ESP32-S3).
+
+The easiest way to do a proper setup is to establish the connection to the Switch in the Computer Control program first, while noting the port used. Follow the [setup guide](https://pokemonautomation.github.io/SetupGuide/index.html) if you're not familiar with the Computer Control setup. Then, disconnect the microcontroller by either shutting down the Computer Control program, or by setting the port to "none". Note: in order for the microcontroller to connect to the Switch via this python module, the microcontroller must NOT be connected to the Computer Control program.
 
 Run the following commands:
 
 ```sh
 cd SerialPrograms/Source/PythonBindings # starting from the root Arduino-Source
-python -m pokemon_automation.selftest               # try every candidate port in turn
-python -m pokemon_automation.selftest /dev/ttyACM0  # or pass a specific port
+python -m pokemon_automation.controller_test               # try every candidate port in turn
+python -m pokemon_automation.controller_test /dev/ttyACM0  # or pass a specific port
 ```
 
-If `port` is omitted, every port from `list_serial_ports()` is tried in turn.
+If `port` is omitted, every port from `list_serial_ports()` is tried in turn. 
+
+`port` examples: "/dev/cu.usbserial-0001" on macOS, "/dev/ttyACM0" on Linux, or "COM3" on Windows.
 
 ## Running the unit tests
 
