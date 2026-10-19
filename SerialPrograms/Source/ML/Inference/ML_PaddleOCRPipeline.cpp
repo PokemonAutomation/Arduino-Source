@@ -10,6 +10,7 @@
 #include <limits>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
+#include "Common/Cpp/Hardware/FloatingPointMode.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -385,7 +386,9 @@ std::string PaddleOCRPipeline::recognize_line(const cv::Mat& cropped_image){
             m_logger.log("[OCR-DEBUG] Calling m_rec_session.Run() now...");
         }
 
-        // 5. Run the recognition session
+        // 5. Run the recognition session. The large recognition models produce denormal
+        //    floats, which are very slow on Intel CPUs (see FloatingPointMode.h).
+        FlushDenormalsToZeroScope flush_denormals;
         auto outputs = m_rec_session.Run(
             Ort::RunOptions{nullptr}, 
             input_names,   // char** 
