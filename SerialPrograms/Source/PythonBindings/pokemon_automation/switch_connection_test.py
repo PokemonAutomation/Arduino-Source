@@ -1,6 +1,6 @@
-"""Controller test: connect to the Switch via PABotBase2 and send a few simple commands.
+"""Switch connection test: connect to the Switch via PABotBase2 and send a few simple commands.
 
-    python -m pokemon_automation.controller_test [port]
+    python -m pokemon_automation.switch_connection_test [port]
 
 If `port` is omitted, every port from `list_serial_ports()` is tried in turn.
 The test connects, prints the device status, presses HOME and a d-pad step,
@@ -36,7 +36,7 @@ def try_port(port: str) -> bool:
 
 
 def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(prog="python -m pokemon_automation.controller_test", description=__doc__,
+    p = argparse.ArgumentParser(prog="python -m pokemon_automation.switch_connection_test", description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("port", nargs="?", help="Controller serial port. Omit to try every candidate port.")
     args = p.parse_args(argv)

@@ -19,7 +19,7 @@ device, using the `NintendoSwitch::PybindSwitchProController` class from CoreLib
   - `fake.py` — `FakeController`: the same backend interface without hardware,
     for unit tests.
   - `devices.py` — `list_serial_ports()`.
-  - `controller_test.py` — `python -m pokemon_automation.controller_test [port]`: connect to
+  - `switch_connection_test.py` — `python -m pokemon_automation.switch_connection_test [port]`: connect to
     a real device and send a few commands.
 - `tests/` — pytest suite (pure-Python parts always run; compiled-module tests
   skip when `_pa_core` is not built).
@@ -61,9 +61,9 @@ To install it for a project:
 pip install -e SerialPrograms/Source/PythonBindings  # starting from the root Arduino-Source
 ```
 
-## Controller test
+## Switch Connection test
 
-`controller_test.py` will connect to the Switch via PABotBase2 and send a few simple commands.
+`switch_connection_test.py` will connect to the Switch via PABotBase2 and send a few simple commands.
 
 Ensure your microcontroller is connected to your computer, and has the correct firmware flashed onto it, and is ready to connect to the Switch (e.g. Switch in the Change Grip/controller menu for the Pico W and ESP32, or that the USB cable is connecting the microcontroller to the Switch dock for the ESP32-S3).
 
@@ -73,8 +73,8 @@ Run the following commands:
 
 ```sh
 cd SerialPrograms/Source/PythonBindings # starting from the root Arduino-Source
-python -m pokemon_automation.controller_test               # try every candidate port in turn
-python -m pokemon_automation.controller_test /dev/ttyACM0  # or pass a specific port
+python -m pokemon_automation.switch_connection_test               # try every candidate port in turn
+python -m pokemon_automation.switch_connection_test /dev/ttyACM0  # or pass a specific port
 ```
 
 If `port` is omitted, every port from `list_serial_ports()` is tried in turn. 
