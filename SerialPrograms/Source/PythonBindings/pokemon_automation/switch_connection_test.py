@@ -29,6 +29,8 @@ def try_port(port: str) -> bool:
             sw.press("right", hold_ms=100)
             sw.press("left", hold_ms=100)
             sw.press("left", hold_ms=100)
+            sw.stick("right", [1, 0], duration_ms=2000)
+            sw.stick("right", [-1, 0], duration_ms=2000)
             sw.wait(500)
             sw.flush()
             print("  cancel confirmed:", sw.cancel_all_and_wait(500))
