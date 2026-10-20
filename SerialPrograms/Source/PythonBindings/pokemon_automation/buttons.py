@@ -83,7 +83,7 @@ _DIRECTION_VECTORS: dict[str, tuple[int, int]] = {
     "UP_LEFT": (-1, 1),
 }
 
-ButtonsArg = str | Sequence[str] | None
+ButtonsArg = str | Sequence[str] | None  # both Buttons and D-pad inputs allowed. see the keys for BUTTON_BITS, BUTTON_ALIASES, _DIRECTION_VECTORS above for valid strings
 StickArg = str | Sequence[float] | None
 
 
@@ -142,7 +142,7 @@ def parse_buttons(buttons: ButtonsArg) -> ParsedButtons:
     (e.g. "up+down").
     """
     bitfield = 0
-    dx = dy = 0
+    dx = dy = 0  # dx, dy represents the current overall DPAD position. starts neutral
     seen_dpad: list[str] = []
     for raw in _split(buttons):
         name = raw.strip()
@@ -152,7 +152,7 @@ def parse_buttons(buttons: ButtonsArg) -> ParsedButtons:
             bitfield |= BUTTON_BITS[key]
             continue
         if key in _DIRECTION_VECTORS:
-            vx, vy = _DIRECTION_VECTORS[key]
+            vx, vy = _DIRECTION_VECTORS[key]  # vectors of current DPAD being parsed
             if (vx and dx and vx != dx) or (vy and dy and vy != dy):
                 raise ValueError(f"Contradictory d-pad directions: {seen_dpad + [name]}")
             dx = vx or dx
