@@ -34,12 +34,11 @@ DEFAULT_RELEASE_MS = 80
 class ControllerBackend(Protocol):
     """The `_pa_core.Controller` methods used here. `fake.FakeController` implements it too.
 
-    C++ reference: `_pa_core.Controller` is a 1:1 binding of
-    `NintendoSwitch::PybindSwitchProController`
+    C++ reference: `_pa_core.Controller` is a pybind defined in PythonBindings_Module.cpp
+    It, in turn, is a 1:1 binding of `NintendoSwitch::PybindSwitchProController`
     (SerialPrograms/Source/Integrations/PybindSwitchProController.h), which wraps the
     device-side command queue of `AbstractController`
-    (SerialPrograms/Source/Controllers/Controller.h). The binding itself is in
-    SerialPrograms/Source/PythonBindings/PythonBindings_Module.cpp.
+    (SerialPrograms/Source/Controllers/Controller.h).
     """
 
     def wait_for_ready(self, timeout_ms: int = ...) -> bool: ...
