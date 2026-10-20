@@ -23,8 +23,12 @@ def try_port(port: str) -> bool:
             print(f"Connected to {port}")
             print(f"  status:  {sw.status()}")
             print(f"  name:    {sw.name() or '(unknown)'}")
-            sw.press("HOME")
+            sw.press("A")  # initial button press to wake up the connection
+            sw.press("HOME", hold_ms=200, release_ms=1000)
             sw.press("right", hold_ms=100)
+            sw.press("right", hold_ms=100)
+            sw.press("left", hold_ms=100)
+            sw.press("left", hold_ms=100)
             sw.wait(500)
             sw.flush()
             print("  cancel confirmed:", sw.cancel_all_and_wait(500))
