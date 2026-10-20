@@ -43,9 +43,24 @@ public:
         return m_count.load(std::memory_order_acquire);
     }
 
-    //  Add a new listener. This is always safe as it will never fail unless it
-    //  throws. Deadlocking is not possible since there's only one local lock.
+    //  Add a new listener to the back of the call order. This is always safe
+    //  as it will never fail unless it throws. Deadlocking is not possible
+    //  since there's only one local lock.
     void add(ListenerType& listener);
+
+    //  Add a new listener to the front of the call order, so it fires before
+    //  all existing listeners. This has the same safety guarantees as add().
+    //  If the listener is already present, this is a no-op and the call order
+    //  is not changed.
+    void push_front(ListenerType& listener);
+
+    //  Add a new listener to the back of the call order, so it fires after all
+    //  existing listeners. Equivalent to add().
+    //
+    //  This is defined inline here so it can be inlined into callsites.
+    void push_back(ListenerType& listener){
+        add(listener);
+    }
 
     //  Remove a listener. This will block if the listener being removed is
     //  running a callback from this class.
@@ -123,6 +138,11 @@ private:
     std::list<Node> m_list;
     std::map<ListenerType*, typename std::list<Node>::iterator> m_listeners;
 
+    //  Shared implementation of add()/push_front()/push_back(). Inserts
+    //  "listener" at position "pos" in the call order. If the listener is
+    //  already present, this is a no-op and the call order is not changed.
+    void insert(ListenerType& listener, std::list<Node>::iterator pos, const char* label);
+
 #ifdef PA_DEBUG_ListenerSet
     LifetimeSanitizer m_sanitizer;
 #endif
@@ -144,12 +164,20 @@ ListenerSet<ListenerType>::ListenerSet(bool suppress_lock_prints)
 
 template <typename ListenerType>
 void ListenerSet<ListenerType>::add(ListenerType& listener){
+    insert(listener, m_list.end(), "ListenerSet::add()");
+}
+template <typename ListenerType>
+void ListenerSet<ListenerType>::push_front(ListenerType& listener){
+    insert(listener, m_list.begin(), "ListenerSet::push_front()");
+}
+template <typename ListenerType>
+void ListenerSet<ListenerType>::insert(ListenerType& listener, std::list<Node>::iterator pos, const char* label){
 #ifdef PA_DEBUG_ListenerSet
     auto scope = m_sanitizer.check_scope();
 #endif
-    WriteSpinLock lg(m_lock, m_suppress_lock_prints ? nullptr : "ListenerSet::add()");
+    WriteSpinLock lg(m_lock, m_suppress_lock_prints ? nullptr : label);
 
-    auto iter = m_list.emplace(m_list.end(), *this, listener);
+    auto iter = m_list.emplace(pos, *this, listener);
     try{
         auto ret = m_listeners.emplace(
             std::piecewise_construct,
