@@ -83,8 +83,19 @@ _DIRECTION_VECTORS: dict[str, tuple[int, int]] = {
     "UP_LEFT": (-1, 1),
 }
 
-ButtonsArg = str | Sequence[str] | None  # both Buttons and D-pad inputs allowed. see the keys for BUTTON_BITS, BUTTON_ALIASES, _DIRECTION_VECTORS above for valid strings
+ButtonsArg = str | Sequence[str] | None
+"""
+ButtonsArg
+- accepts both Buttons and D-pad inputs (see above for the exact strings). 
+- validated by `parse_buttons()`
+"""
+
 StickArg = str | Sequence[float] | None
+"""
+StickArg
+- Accepts a direction name ("up", "down_left", "neutral") or an (x, y) pair. 
+- validated by `parse_stick()`
+"""
 
 
 def _normalize_name(name: str) -> str:
@@ -141,22 +152,22 @@ def parse_buttons(buttons: ButtonsArg) -> ParsedButtons:
     Raises ValueError for unknown names or contradictory d-pad directions
     (e.g. "up+down").
     """
-    bitfield = 0
-    dx = dy = 0  # dx, dy represents the current overall DPAD position. starts neutral
+    buttonstate_bitfield = 0
+    dpad_x = dpad_y = 0  # dpad_x, dpad_y represents the current overall DPAD position. starts neutral
     seen_dpad: list[str] = []
     for raw in _split(buttons):
         name = raw.strip()
         key = name.upper() if name in ("+", "-") else _normalize_name(name)
         key = BUTTON_ALIASES.get(key, key)
-        if key in BUTTON_BITS:
-            bitfield |= BUTTON_BITS[key]
+        if key in BUTTON_BITS:  # parse as button
+            buttonstate_bitfield |= BUTTON_BITS[key]
             continue
-        if key in _DIRECTION_VECTORS:
+        if key in _DIRECTION_VECTORS:  # parse as dpad
             vx, vy = _DIRECTION_VECTORS[key]  # vectors of current DPAD being parsed
-            if (vx and dx and vx != dx) or (vy and dy and vy != dy):
+            if (vx and dpad_x and vx != dpad_x) or (vy and dpad_y and vy != dpad_y):  # check for contradictory dpad directions
                 raise ValueError(f"Contradictory d-pad directions: {seen_dpad + [name]}")
-            dx = vx or dx
-            dy = vy or dy
+            dpad_x = vx or dpad_x  # update dpad_x with vx, unless it's 0 
+            dpad_y = vy or dpad_y  # update dpad_y with vy, unless it's 0 
             seen_dpad.append(name)
             continue
         raise ValueError(
@@ -164,11 +175,11 @@ def parse_buttons(buttons: ButtonsArg) -> ParsedButtons:
             f"d-pad: {', '.join(DPAD_POSITIONS)}."
         )
     dpad = DPAD_NONE
-    if dx or dy:
+    if dpad_x or dpad_y:
         for direction, (vx, vy) in _DIRECTION_VECTORS.items():
-            if (vx, vy) == (dx, dy):
+            if (vx, vy) == (dpad_x, dpad_y):
                 dpad = DPAD_POSITIONS[direction]
-    return ParsedButtons(bitfield, dpad)
+    return ParsedButtons(buttonstate_bitfield, dpad)
 
 
 def parse_stick(position: StickArg) -> tuple[float, float]:
@@ -180,7 +191,7 @@ def parse_stick(position: StickArg) -> tuple[float, float]:
     """
     if position is None:
         return (0.0, 0.0)
-    if isinstance(position, str):
+    if isinstance(position, str):  # parse as string
         key = _normalize_name(position)
         if key in ("NEUTRAL", "CENTER", "NONE"):
             return (0.0, 0.0)
@@ -191,7 +202,8 @@ def parse_stick(position: StickArg) -> tuple[float, float]:
             )
         vx, vy = _DIRECTION_VECTORS[key]
         length = math.hypot(vx, vy)
-        return (vx / length, vy / length)
+        return (vx / length, vy / length) # normalize to [-1, 1]
+    # else parse as (x, y) pair
     values = list(position)
     if len(values) != 2:
         raise ValueError(f"A stick position needs exactly two numbers [x, y], got {position!r}.")

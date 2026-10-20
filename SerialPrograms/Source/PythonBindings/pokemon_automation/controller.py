@@ -33,7 +33,8 @@ DEFAULT_RELEASE_MS = 80
 #  (the C++ issue_buttons()/issue_dpad() take explicit durations).
 
 
-class ControllerBackend(Protocol):
+class ControllerBackend(Protocol):  
+    # Note: This is a Protocol. So, it does't affect runtime at all, it's just to provide type hints
     """The `_pa_core.Controller` methods used here. `fake.FakeController` implements it too.
 
     C++ reference: `_pa_core.Controller` is a pybind defined in PythonBindings_Module.cpp
