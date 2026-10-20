@@ -313,10 +313,15 @@ void AudioPassthroughPairQt::rebuild_sink_branch(){
             m_sink_resampler->add_listener(*head);
             head = m_sink_resampler.get();
         }
-        //  INTERLEAVE_RL_96000 plays channel 1 as the left channel; the
-        //  input reinterpretation preserves the physical channel order, so
-        //  the sink branch swaps the two channels. (The FFT pair-average is
-        //  order-invariant.)
+        //  INTERLEAVE_RL_96000 plays the card's channel 1 (the odd physical
+        //  samples) as the left channel; the input reinterpretation preserves
+        //  the physical order, so the sink branch swaps the two channels.
+        //  (The FFT pair-average is order-invariant.)
+        //  Qt channel configs can't express a reversed channel order, so the
+        //  swap matrix is literal for now; once the format encodes the
+        //  card's channel mapping (dropdown rewrite),
+        //  build_channel_mixer_matrix will derive it and this special case
+        //  goes away.
         bool swap_channels =
             m_input_format == AudioChannelFormat::INTERLEAVE_RL_96000
             && raw_channels == 2 && sink_channels == 2;
