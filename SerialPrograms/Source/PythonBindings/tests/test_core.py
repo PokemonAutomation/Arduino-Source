@@ -1,5 +1,12 @@
 #  Tests for the compiled `_pa_core` module. They are skipped when the module
 #  has not been built (it is built with -DPA_PYTHON_BINDINGS=ON).
+#
+#  C++ reference: `_pa_core` is built from
+#  SerialPrograms/Source/PythonBindings/PythonBindings_Module.cpp and wraps
+#  `NintendoSwitch::PybindSwitchProController`
+#  (SerialPrograms/Source/Integrations/PybindSwitchProController.h); the
+#  BUTTONS / DPAD_POSITIONS dicts it exposes are generated from the enums in
+#  SerialPrograms/Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h.
 import pytest
 
 core = pytest.importorskip("pokemon_automation._pa_core")

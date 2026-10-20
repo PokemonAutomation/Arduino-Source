@@ -52,5 +52,8 @@ def test_sticks():
 
 
 def test_matches_cpp_enum():
+    #  C++ side: `enum Button` / `enum DpadPosition` in
+    #  SerialPrograms/Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h,
+    #  exposed by the module (SerialPrograms/Source/PythonBindings/PythonBindings_Module.cpp).
     core = pytest.importorskip("pokemon_automation._pa_core")
     btn.check_against_core(dict(core.BUTTONS), dict(core.DPAD_POSITIONS))

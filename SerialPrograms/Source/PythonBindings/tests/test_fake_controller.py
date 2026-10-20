@@ -1,3 +1,8 @@
+#  SwitchController on top of a FakeController (no hardware, no compiled module).
+#  The assertions check the exact backend calls, which mirror the C++ interface of
+#  `NintendoSwitch::PybindSwitchProController`
+#  (SerialPrograms/Source/Integrations/PybindSwitchProController.h), bound by
+#  SerialPrograms/Source/PythonBindings/PythonBindings_Module.cpp.
 import pytest
 
 from pokemon_automation import BUTTON_BITS, DPAD_NONE, DPAD_POSITIONS, FakeController, SwitchController

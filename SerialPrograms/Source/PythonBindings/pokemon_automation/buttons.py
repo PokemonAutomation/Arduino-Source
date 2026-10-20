@@ -11,9 +11,12 @@ Everything a caller types to describe an input is parsed here:
 - Joystick positions: a direction name ("up", "down_left", ...) or an (x, y) pair
   in [-1, 1] with +x = right and +y = up. "neutral"/"center" means (0, 0).
 
-The button bit values match `NintendoSwitch::Button` in
-Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h. When the
-compiled module is available, `check_against_core()` verifies that they still agree.
+The button bit values match `NintendoSwitch::Button` and the d-pad values
+match `NintendoSwitch::DpadPosition` in
+SerialPrograms/Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h.
+When the compiled module is available, `check_against_core()` verifies that
+they still agree (the module exposes both enums, built by
+SerialPrograms/Source/PythonBindings/PythonBindings_Module.cpp).
 """
 
 from __future__ import annotations
@@ -22,7 +25,9 @@ import math
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-# Bit positions from NintendoSwitch_ControllerButtons.h.
+# Bit positions, mirroring the C++ `enum Button` in
+# SerialPrograms/Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h.
+# Do not edit by hand; tests/test_buttons.py checks these against the C++ enum.
 BUTTON_BITS: dict[str, int] = {
     "Y": 1 << 0,
     "B": 1 << 1,
@@ -51,7 +56,9 @@ BUTTON_ALIASES: dict[str, str] = {
     "RS": "RCLICK",
 }
 
-# D-pad positions from `NintendoSwitch::DpadPosition`: 0 = up, clockwise, 8 = none.
+# D-pad positions, mirroring the C++ `enum DpadPosition` in
+# SerialPrograms/Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h:
+# 0 = up, clockwise, 8 = none.
 DPAD_POSITIONS: dict[str, int] = {
     "UP": 0,
     "UP_RIGHT": 1,
@@ -197,8 +204,10 @@ def parse_stick(position: StickArg) -> tuple[float, float]:
 def check_against_core(core_buttons: dict[str, int], core_dpad: dict[str, int]) -> None:
     """Raise AssertionError if `BUTTON_BITS` / `DPAD_POSITIONS` disagree with the C++ enums.
 
-    `core_buttons` / `core_dpad` are `_pa_core.BUTTONS` / `_pa_core.DPAD_POSITIONS`,
-    generated from `NintendoSwitch::Button` / `DpadPosition`.
+    `core_buttons` / `core_dpad` are `_pa_core.BUTTONS` / `_pa_core.DPAD_POSITIONS`:
+    the module (SerialPrograms/Source/PythonBindings/PythonBindings_Module.cpp)
+    generates them from the C++ enums in
+    SerialPrograms/Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h.
     """
     for name, bit in BUTTON_BITS.items():
         if core_buttons.get(name) != bit:
