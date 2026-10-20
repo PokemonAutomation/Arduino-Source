@@ -85,6 +85,7 @@ file(GLOB CORE_LIBRARY_SOURCES
     ../Common/Cpp/Filesystem/Filesystem_Linux.h
     ../Common/Cpp/Filesystem/Filesystem_Mac.h
     ../Common/Cpp/Filesystem/Filesystem_Windows.h
+    ../Common/Cpp/Hardware/FloatingPointMode.h
     ../Common/Cpp/Hardware/Hardware.cpp
     ../Common/Cpp/Hardware/Hardware.h
     ../Common/Cpp/Hardware/Hardware_arm64_Linux.tpp

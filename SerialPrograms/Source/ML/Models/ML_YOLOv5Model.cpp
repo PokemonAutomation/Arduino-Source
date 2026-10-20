@@ -13,6 +13,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/dnn.hpp>
 #include "3rdParty/ONNX/OnnxToolsPA.h"
+#include "Common/Cpp/Hardware/FloatingPointMode.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "ML/Models/ML_ONNXRuntimeHelpers.h"
@@ -219,6 +220,7 @@ void YOLOv5Session::run(const cv::Mat& input_image, std::vector<YOLOv5Session::D
     const char* input_name_c = m_input_names[0].data();
     const char* output_name_c = m_output_names[0].data();
     // auto start = std::chrono::steady_clock::now();
+    FlushDenormalsToZeroScope flush_denormals;  //  Denormals are slow on Intel CPUs (see FloatingPointMode.h).
     m_session.Run(m_run_options, &input_name_c, &input_tensor, 1, &output_name_c, &output_tensor, 1);
     // auto end = std::chrono::steady_clock::now();
     // auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();

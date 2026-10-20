@@ -11,6 +11,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Hardware/FloatingPointMode.h"
 #include "Common/Cpp/Rectangle.tpp"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/GlobalAutoPaths.h"
@@ -279,6 +280,8 @@ std::vector<PaddleOCRTextBox> PaddleOCRDetector::detect(const cv::Mat& image_bgr
 
     std::vector<Ort::Value> outputs;
     try{
+        //  Denormal floats are very slow on Intel CPUs (see FloatingPointMode.h).
+        FlushDenormalsToZeroScope flush_denormals;
         outputs = m_session.Run(
             Ort::RunOptions{nullptr},
             input_names, &input_tensor, 1,
