@@ -126,8 +126,8 @@ void mix_channels_x64_AVX512<2, 1>(
     }
     {
         __mmask16 mask = ((uint32_t)1 << samples) - 1;
-        __m512 out0 = _mm512_mul_ps(i0o0, _mm512_maskz_loadu_ps(mask, in + in_stride*0));
-        out0 = _mm512_fmadd_ps(i1o0, _mm512_loadu_ps(in + in_stride * 1), out0);
+        __m512 out0 = _mm512_mul_ps(i0o0, _mm512_maskz_loadu_ps(mask, in + in_stride * 0));
+        out0 = _mm512_fmadd_ps(i1o0, _mm512_maskz_loadu_ps(mask, in + in_stride * 1), out0);
         _mm512_mask_storeu_ps(out, mask, out0);
     }
 }
