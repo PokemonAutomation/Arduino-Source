@@ -10,6 +10,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
+#include "Common/Cpp/Containers/GuardPageBuffer.h"
 #include "Kernels_AudioPipeline_RoundTrip_TestInfra.h"
 #include "Kernels_RawAudio2WorkingAudio.h"
 #include "Kernels_WorkingAudio2RawAudio.h"
@@ -82,8 +83,9 @@ UnitTestResult run_round_trip(
     size_t samples,
     float multiplier
 ){
-    //  Generate random input.
-    AlignedVector<Type> input(samples * channels);
+    //  Generate random input. It ends right before a guard page, so a read
+    //  past the end faults.
+    GuardPageBuffer<Type> input(samples * channels);
     std::mt19937 generator(42);
     if constexpr (std::is_same_v<Type, float>){
         //  Random integer values, all exactly representable.

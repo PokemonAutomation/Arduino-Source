@@ -11,7 +11,10 @@
  *  the rare run where the heap happens to end there.
  *
  *  Because the end is pinned to a page boundary, the start is only aligned to
- *  alignof(Object). Don't use it to test code that needs aligned pointers.
+ *  alignof(Object) unless you ask for more. With a larger alignment, the start
+ *  is rounded down to it, which leaves a gap of up to alignment - 1 bytes
+ *  between the end of the data and the guard page when the size is not a
+ *  multiple of the alignment. Reads and writes into that gap are not caught.
  *
  *  Every buffer maps at least two pages, so this is not for production code.
  *
@@ -27,18 +30,25 @@ namespace PokemonAutomation{
 
 
 //  Maps enough pages for "bytes" bytes, followed by one no-access page.
-//  data() points to the first byte. The last byte sits right before the
-//  guard page. The memory starts out zeroed. Throws std::bad_alloc on failure.
+//  data() points to the first byte and is a multiple of "alignment" (a power
+//  of two). The data ends right before the guard page when "bytes" is a
+//  multiple of "alignment". The memory starts out zeroed. Throws
+//  std::bad_alloc on failure.
 class GuardPageMemory{
 public:
     ~GuardPageMemory();
+    GuardPageMemory(GuardPageMemory&& x) noexcept;
+    void operator=(GuardPageMemory&& x) noexcept;
     GuardPageMemory(const GuardPageMemory&) = delete;
     void operator=(const GuardPageMemory&) = delete;
 
 public:
-    GuardPageMemory(size_t bytes);
+    GuardPageMemory(size_t bytes, size_t alignment = 1);
 
     void* data() const{ return m_data; }
+
+private:
+    void release() noexcept;
 
 private:
     void* m_base;
@@ -57,8 +67,8 @@ class GuardPageBuffer{
     );
 
 public:
-    GuardPageBuffer(size_t size)
-        : m_memory(size * sizeof(Object))
+    GuardPageBuffer(size_t size, size_t alignment = alignof(Object))
+        : m_memory(size * sizeof(Object), alignment)
         , m_size(size)
     {}
 

@@ -13,6 +13,7 @@
 #include <random>
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
+#include "Common/Cpp/Containers/GuardPageBuffer.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels_AudioResampler_BlockKernels.h"
 #include "Kernels_AudioResampler_Tests.h"
@@ -143,8 +144,9 @@ UnitTestResult run_resampler_stream(
     size_t in_rate, size_t out_rate, size_t channels,
     size_t samples, size_t push, uint32_t taps, double beta
 ){
-    //  Generate random input.
-    AlignedVector<float> input(samples * channels);
+    //  Generate random input. It ends right before a guard page, so a read
+    //  past the end faults.
+    GuardPageBuffer<float> input(samples * channels);
     std::mt19937 generator(42);
     std::uniform_real_distribution<float> distribution(-1.f, 1.f);
     for (size_t c = 0; c < input.size(); c++){
@@ -282,14 +284,15 @@ UnitTestResult BlockKernelTest::run(Logger& logger, CancellableScope& scope) con
     //  sample i, so the kernel's in_index is 0 (k = 0 periods in).
     //  The index columns keep counting past the period, so a block that
     //  wraps the period reads samples up to about period_in + block + taps.
-    AlignedVector<float> input(table.period_in() + m_block + m_taps + 128);
+    //  The input and the output both end right before a guard page.
+    GuardPageBuffer<float> input(table.period_in() + m_block + m_taps + 128);
     std::mt19937 generator(42);
     std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
     for (size_t i = 0; i < input.size(); i++){
         input[i] = distribution(generator);
     }
 
-    AlignedVector<float> got(m_block);
+    GuardPageBuffer<float> got(m_block);
     m_kernel_fn(table, 0, input.data(), m_out_index, got.data());
 
     AlignedVector<float> want = reference_lanes(table, input.data(), m_out_index, m_block);
@@ -341,16 +344,17 @@ UnitTestResult BlockDispatchTest::run(Logger& logger, CancellableScope& scope) c
     );
 
     //  The kernel's input reads may extend sample_block - 1 samples past
-    //  the last window's start.
+    //  the last window's start. The input and the output both end right
+    //  before a guard page.
     const uint32_t* index = table.in_sample_index();
-    AlignedVector<float> input(index[bk.sample_block - 1] + m_taps + bk.sample_block + 64);
+    GuardPageBuffer<float> input(index[bk.sample_block - 1] + m_taps + bk.sample_block + 64);
     std::mt19937 generator(42);
     std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
     for (size_t i = 0; i < input.size(); i++){
         input[i] = distribution(generator);
     }
 
-    AlignedVector<float> got(bk.sample_block);
+    GuardPageBuffer<float> got(bk.sample_block);
     bk.fp(table, 0, input.data(), 0, got.data());
 
     AlignedVector<float> want = reference_lanes(table, input.data(), 0, bk.sample_block);

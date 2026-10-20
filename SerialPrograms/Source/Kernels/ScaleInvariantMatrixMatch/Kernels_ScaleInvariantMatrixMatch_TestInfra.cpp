@@ -11,6 +11,7 @@
 #include "Common/Compiler.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
+#include "Common/Cpp/Containers/GuardPageBuffer.h"
 #include "Kernels_ScaleInvariantMatrixMatch_TestInfra.h"
 
 namespace PokemonAutomation{
@@ -27,14 +28,9 @@ namespace ScaleInvariantMatrixMatch{
 //
 static constexpr size_t HEAD_PAD = 16;
 //
-//  Tail padding after the last row. The SSE4.1 partial-tail load
-//  (PSHUFB-based `load_f32_no_read_past_end`) always reads a full 16-byte
-//  word, which extends up to VL - 1 floats past the end of the row even
-//  though only the first `length` lanes are used. 15 floats (VL - 1 for
-//  the widest supported ISA) keeps those reads inside the allocation for
-//  the last row.
+//  There is no tail padding: the last row ends right before a guard page,
+//  so a read past the end of the matrix faults on every run.
 //
-static constexpr size_t TAIL_PAD = 15;
 
 //
 //  A result passes if it is within 4096 ULPs of the Default result, or
@@ -103,17 +99,20 @@ UnitTestResult Test::run(Logger& logger, CancellableScope& scope) const{
     //  [0, 1]. TW = T * W is precomputed with the same float rounding
     //  that production uses.
     //
-    AlignedVector<float> A(n + HEAD_PAD + TAIL_PAD);
-    AlignedVector<float> T(n + HEAD_PAD + TAIL_PAD);
+    //  Each matrix ends right before a guard page. The kernels align their
+    //  loads to T and step A and W by the same offset, so every matrix must
+    //  have the same alignment. Equal sizes give them that.
+    //
+    const size_t weighted_size = m_use_weights ? n + HEAD_PAD : 0;
+    GuardPageBuffer<float> A(n + HEAD_PAD);
+    GuardPageBuffer<float> T(n + HEAD_PAD);
     AlignedVector<const float*> rowsA(m_height);
     AlignedVector<const float*> rowsT(m_height);
-    AlignedVector<float> W;
-    AlignedVector<float> TW;
+    GuardPageBuffer<float> W(weighted_size);
+    GuardPageBuffer<float> TW(weighted_size);
     AlignedVector<const float*> rowsW;
     AlignedVector<const float*> rowsTW;
     if (m_use_weights){
-        W = AlignedVector<float>(n + HEAD_PAD + TAIL_PAD);
-        TW = AlignedVector<float>(n + HEAD_PAD + TAIL_PAD);
         rowsW = AlignedVector<const float*>(m_height);
         rowsTW = AlignedVector<const float*>(m_height);
     }

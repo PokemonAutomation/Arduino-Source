@@ -5,7 +5,7 @@
  */
 
 #include <random>
-#include "Common/Cpp/Containers/AlignedVector.tpp"
+#include "Common/Cpp/Containers/GuardPageBuffer.h"
 #include "Kernels_AudioChannelInterleave_TestInfra.h"
 
 namespace PokemonAutomation{
@@ -32,9 +32,11 @@ Test::Test(
 UnitTestResult Test::run(Logger& logger, CancellableScope& scope) const{
     size_t total = m_channels * m_samples;
 
-    AlignedVector<float> interleaved0(total);
-    AlignedVector<float> interleaved1(total);
-    AlignedVector<float> strided(total);
+    //  Every buffer ends right before a guard page, so a kernel that reads or
+    //  writes past the end faults on every run.
+    GuardPageBuffer<float> interleaved0(total);
+    GuardPageBuffer<float> interleaved1(total);
+    GuardPageBuffer<float> strided(total);
 
     std::mt19937 generator(42);
 

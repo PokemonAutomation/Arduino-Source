@@ -8,7 +8,7 @@
 #include <random>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/Containers/AlignedVector.tpp"
+#include "Common/Cpp/Containers/GuardPageBuffer.h"
 #include "Kernels_AudioStreamConverter_TestInfra.h"
 
 //  REMOVE
@@ -46,9 +46,11 @@ UnitTestResult Test<Type>::run(Logger& logger, CancellableScope& scope) const{
         throw InternalProgramError(&logger, PA_CURRENT_FUNCTION, "Test size is too small.");
     }
 
-    AlignedVector<Type> ext0(m_samples);
-    AlignedVector<Type> ext1(m_samples);
-    AlignedVector<float> native(m_samples);
+    //  Every buffer ends right before a guard page, so a kernel that reads or
+    //  writes past the end faults on every run.
+    GuardPageBuffer<Type> ext0(m_samples);
+    GuardPageBuffer<Type> ext1(m_samples);
+    GuardPageBuffer<float> native(m_samples);
 
     std::mt19937 generator(42);
 

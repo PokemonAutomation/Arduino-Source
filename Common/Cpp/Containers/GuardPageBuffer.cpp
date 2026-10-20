@@ -5,6 +5,7 @@
  */
 
 #include <new>
+#include "Common/Cpp/Exceptions.h"
 #include "GuardPageBuffer.h"
 
 #ifdef _WIN32
@@ -31,15 +32,49 @@ static size_t page_size(){
 
 
 GuardPageMemory::~GuardPageMemory(){
+    release();
+}
+GuardPageMemory::GuardPageMemory(GuardPageMemory&& x) noexcept
+    : m_base(x.m_base)
+    , m_mapped_bytes(x.m_mapped_bytes)
+    , m_data(x.m_data)
+{
+    x.m_base = nullptr;
+    x.m_mapped_bytes = 0;
+    x.m_data = nullptr;
+}
+void GuardPageMemory::operator=(GuardPageMemory&& x) noexcept{
+    if (this == &x){
+        return;
+    }
+    release();
+    m_base = x.m_base;
+    m_mapped_bytes = x.m_mapped_bytes;
+    m_data = x.m_data;
+    x.m_base = nullptr;
+    x.m_mapped_bytes = 0;
+    x.m_data = nullptr;
+}
+void GuardPageMemory::release() noexcept{
+    if (m_base == nullptr){
+        return;
+    }
 #ifdef _WIN32
     VirtualFree(m_base, 0, MEM_RELEASE);
 #else
     munmap(m_base, m_mapped_bytes);
 #endif
+    m_base = nullptr;
 }
-GuardPageMemory::GuardPageMemory(size_t bytes){
+
+GuardPageMemory::GuardPageMemory(size_t bytes, size_t alignment){
+    if (alignment == 0 || (alignment & (alignment - 1)) != 0){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Alignment must be a power of two.");
+    }
+
+    //  Room for the data plus the worst-case rounding of its start.
     size_t page = page_size();
-    size_t data_pages = (bytes + page - 1) / page;
+    size_t data_pages = (bytes + alignment - 1 + page - 1) / page;
     m_mapped_bytes = (data_pages + 1) * page;
 
 #ifdef _WIN32
@@ -65,7 +100,7 @@ GuardPageMemory::GuardPageMemory(size_t bytes){
     }
 #endif
 
-    m_data = guard - bytes;
+    m_data = (void*)((size_t)(guard - bytes) & ~(alignment - 1));
 }
 
 
