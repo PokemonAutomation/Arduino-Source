@@ -27,6 +27,10 @@ Ort::ThreadingOptions make_ort_threading_options(){
         ret.SetGlobalInterOpNumThreads(threads);
     }
     ret.SetGlobalSpinControl(0);
+    //  Flush denormal floats to zero on ONNX Runtime's own threads: the big models produce
+    //  them, and they are very slow on Intel CPUs. ONNX Runtime only supports this on x86;
+    //  see Common/Cpp/Hardware/FloatingPointMode.h.
+    ret.SetGlobalDenormalAsZero();
     return ret;
 }
 

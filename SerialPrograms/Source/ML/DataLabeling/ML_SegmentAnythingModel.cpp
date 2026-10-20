@@ -17,6 +17,7 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 #include "3rdParty/ONNX/OnnxToolsPA.h"
+#include "Common/Cpp/Hardware/FloatingPointMode.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
@@ -65,6 +66,7 @@ void SAMEmbedderSession::run(const cv::Mat& input_image, std::vector<float>& mod
     const char* input_name_c = input_names[0].data();
     const char* output_name_c = output_names[0].data();
     auto start = std::chrono::steady_clock::now();
+    FlushDenormalsToZeroScope flush_denormals;  //  Denormals are slow on Intel CPUs (see FloatingPointMode.h).
     session.Run(run_options, &input_name_c, &input_tensor, 1, &output_name_c, &output_tensor, 1);
     auto end = std::chrono::steady_clock::now();
     auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
@@ -169,6 +171,7 @@ void SAMSession::run(
     }
 
     auto start = std::chrono::steady_clock::now();
+    FlushDenormalsToZeroScope flush_denormals;  //  Denormals are slow on Intel CPUs (see FloatingPointMode.h).
     session.Run(run_options, input_names_c.data(), input_tensors.data(), SAM_N_INPUT_TENSORS,
         output_names_c.data(), output_tensors.data(), SAM_N_OUTPUT_TENSORS);
     auto end = std::chrono::steady_clock::now();
