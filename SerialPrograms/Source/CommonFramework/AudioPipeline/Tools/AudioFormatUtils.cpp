@@ -16,7 +16,7 @@
 namespace PokemonAutomation{
 
 
-float convertAudioVolumeFromSlider(double volume){
+float convert_audio_volume_from_slider(double volume){
     volume = std::max(volume, 0.0);
     volume = std::min(volume, 1.0);
     // The slider bar value is in the log scale because log scale matches human sound

@@ -24,7 +24,7 @@ namespace PokemonAutomation{
 
 // Slider bar volume: [0, 100], in log scale
 // Volume value passed to AudioDisplayWidget (and the audio thread it manages): [0.f, 1.f], linear scale
-// (convertAudioVolumeFromSlider now lives in Tools/AudioFormatUtils.)
+// (convert_audio_volume_from_slider now lives in Tools/AudioFormatUtils.)
 
 const char* audio_error_to_str(QAudio::Error error){
     switch (error){
@@ -86,7 +86,7 @@ public:
                 COLOR_RED
             );
         }
-        m_sink.setVolume(convertAudioVolumeFromSlider(volume));
+        m_sink.setVolume(convert_audio_volume_from_slider(volume));
         add_listener(*this);
     }
     ~AudioOutputDevice(){
@@ -95,7 +95,7 @@ public:
 
     void set_volume(double volume){
         auto scope_check = m_sanitizer.check_scope();
-        double absolute = convertAudioVolumeFromSlider(volume);
+        double absolute = convert_audio_volume_from_slider(volume);
         m_logger.log("Volume set to: Slider = " + tostr_default(volume) + " -> Absolute = " + tostr_default(absolute));
         m_sink.setVolume(absolute);
     }

@@ -292,7 +292,7 @@ void AudioPassthroughPairQt::rebuild_sink_branch(){
     m_sink_encoder.reset(new Kernels::AudioPipeline::WorkingAudio2RawAudio(
         to_sample_format(sample_format),
         sink_rate, sink_channels,
-        convertAudioVolumeFromSlider(m_output_volume)
+        convert_audio_volume_from_slider(m_output_volume)
     ));
     head = m_sink_encoder.get();
     if (raw_rate != sink_rate){
@@ -546,7 +546,7 @@ void AudioPassthroughPairQt::set_sink_volume(double volume){
             m_writer->set_volume(volume);
         }
         if (m_sink_encoder){
-            m_sink_encoder->set_multiplier(convertAudioVolumeFromSlider(volume));
+            m_sink_encoder->set_multiplier(convert_audio_volume_from_slider(volume));
         }
     });
 }
