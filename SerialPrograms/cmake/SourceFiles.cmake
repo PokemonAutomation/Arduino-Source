@@ -53,6 +53,8 @@ file(GLOB CORE_LIBRARY_SOURCES
     ../Common/Cpp/Containers/CircularBuffer.h
     ../Common/Cpp/Containers/FixedLimitVector.h
     ../Common/Cpp/Containers/FixedLimitVector.tpp
+    ../Common/Cpp/Containers/GuardPageBuffer.cpp
+    ../Common/Cpp/Containers/GuardPageBuffer.h
     ../Common/Cpp/Containers/Pimpl.h
     ../Common/Cpp/Containers/Pimpl.tpp
     ../Common/Cpp/CpuId/CpuId.cpp
