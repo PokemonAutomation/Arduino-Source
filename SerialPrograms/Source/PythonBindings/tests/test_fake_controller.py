@@ -48,13 +48,11 @@ def test_push_button_combined_and_custom_durations():
     assert (delay, hold, release) == (250, 200, 50)
 
 
-def test_push_dpad_repeat():
+def test_push_dpad():
     sw, fake = make()
-    sw.push_dpad("up", repeat=3, hold_ms=100)
-    args = fake.arguments("push_dpad")
-    assert len(args) == 3
-    for delay, hold, release, position in args:
-        assert position == DPAD_POSITIONS["UP"] and hold == 100
+    sw.push_dpad("up", hold_ms=100)
+    (delay, hold, release, position), = fake.arguments("push_dpad")
+    assert position == DPAD_POSITIONS["UP"] and hold == 100 and delay == 100 + release
 
 
 def test_push_button_rejects_dpad():
@@ -137,8 +135,6 @@ def test_validation():
     sw, fake = make()
     with pytest.raises(ValueError):
         sw.push_button("A", hold_ms=-1)
-    with pytest.raises(ValueError):
-        sw.push_button("A", repeat=0)
     with pytest.raises(ValueError):
         sw.push_button("Q")
     with pytest.raises(ValueError):

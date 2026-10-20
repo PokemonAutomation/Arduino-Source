@@ -14,7 +14,7 @@ Example:
     with SwitchController("/dev/cu.usbserial-0001") as sw:
         sw.push_button("A")                              # tap A
         sw.push_button("L+R", hold_ms=200)               # press L and R together
-        sw.push_dpad("up", repeat=2)                     # d-pad up twice
+        sw.push_dpad("up")                               # d-pad up
         sw.push_left_joystick("up", duration_ms=1500)     # walk forward
         sw.controller_state(2000, buttons="B", left="up")  # run forward
         sw.wait_for_all_requests()
@@ -120,8 +120,8 @@ class SwitchController:
     # ---- commands -------------------------------------------------------------
 
     def push_button(self, buttons: btn.ButtonsArg, hold_ms: int = DEFAULT_HOLD_MS,
-                    release_ms: int = DEFAULT_RELEASE_MS, repeat: int = 1) -> None:
-        """Tap a button combination (d-pad directions not accepted) `repeat` times.
+                    release_ms: int = DEFAULT_RELEASE_MS) -> None:
+        """Tap a button combination (d-pad directions not accepted).
 
         `buttons`: "A", "L+R", ["ZL", "B"], ... (see `pokemon_automation.buttons`).
         For d-pad input use `push_dpad()`; to hold buttons and d-pad together use
@@ -134,8 +134,6 @@ class SwitchController:
         `delay = hold + release` runs commands back to back, the same convention as the
         C++ class docs.
         """
-        if repeat < 1:
-            raise ValueError(f"repeat must be at least 1, got {repeat}.")
         _check_nonnegative(hold_ms=hold_ms, release_ms=release_ms)
         self._require_open()
         parsed = btn.parse_buttons(buttons)
@@ -146,13 +144,12 @@ class SwitchController:
             )
         if not parsed.has_buttons:
             raise ValueError("push_button() needs at least one button.")
-        self._repeat_commands(hold_ms, release_ms, repeat,
-                              lambda delay, hold, release: self._backend.push_button(
-                                  delay, hold, release, parsed.bitfield))
+        with self._lock:
+            self._backend.push_button(hold_ms + release_ms, hold_ms, release_ms, parsed.bitfield)
 
     def push_dpad(self, position: btn.ButtonsArg, hold_ms: int = DEFAULT_HOLD_MS,
-                  release_ms: int = DEFAULT_RELEASE_MS, repeat: int = 1) -> None:
-        """Tap a d-pad direction `repeat` times.
+                  release_ms: int = DEFAULT_RELEASE_MS) -> None:
+        """Tap a d-pad direction.
 
         `position`: "up", "up+right" (or "UP_RIGHT"), ["up", "right"], ...
         For buttons use `push_button()`; to hold buttons and d-pad together use
@@ -163,8 +160,6 @@ class SwitchController:
         `PybindSwitchProController::push_dpad()`
         (SerialPrograms/Source/Integrations/PybindSwitchProController.h).
         """
-        if repeat < 1:
-            raise ValueError(f"repeat must be at least 1, got {repeat}.")
         _check_nonnegative(hold_ms=hold_ms, release_ms=release_ms)
         self._require_open()
         parsed = btn.parse_buttons(position)
@@ -175,9 +170,8 @@ class SwitchController:
             )
         if not parsed.has_dpad:
             raise ValueError("push_dpad() needs at least one d-pad direction.")
-        self._repeat_commands(hold_ms, release_ms, repeat,
-                              lambda delay, hold, release: self._backend.push_dpad(
-                                  delay, hold, release, parsed.dpad))
+        with self._lock:
+            self._backend.push_dpad(hold_ms + release_ms, hold_ms, release_ms, parsed.dpad)
 
     def controller_state(self, duration_ms: int = 500, buttons: btn.ButtonsArg = None, *,
                          left: btn.StickArg = None, right: btn.StickArg = None) -> None:
@@ -228,13 +222,6 @@ class SwitchController:
         x, y = btn.parse_stick(position)
         with self._lock:
             send(duration_ms + release_ms, duration_ms, release_ms, x, y)
-
-    def _repeat_commands(self, hold_ms: int, release_ms: int, repeat: int, send) -> None:
-        """Queue `send(delay, hold, release)` `repeat` times, back to back."""
-        delay = hold_ms + release_ms
-        with self._lock:
-            for _ in range(repeat):
-                send(delay, hold_ms, release_ms)
 
     def wait(self, duration_ms: int) -> None:
         """Queue a pause of `duration_ms` with nothing pressed."""

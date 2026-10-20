@@ -103,7 +103,7 @@ with SwitchController("/dev/ttyACM0") as sw:  # connects to the Switch via port 
     print(sw.current_status())                # device name and firmware version
     sw.push_button("A")                       # tap A (80 ms hold, 80 ms release)
     sw.push_button("L+R", hold_ms=200)        # press L and R together
-    sw.push_dpad("up", repeat=2)              # d-pad up twice
+    sw.push_dpad("up")                        # d-pad up
     sw.push_left_joystick("up", duration_ms=1500)     # walk forward
     sw.controller_state(2000, buttons="B", left="up")  # run forward
     sw.wait(300)
