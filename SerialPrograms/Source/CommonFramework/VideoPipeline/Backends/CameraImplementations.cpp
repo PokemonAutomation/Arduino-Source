@@ -19,6 +19,12 @@
 #include "CameraWidgetQt6.h"
 #include "CameraWidgetQt6.5.h"
 #include "CameraWidgetQt6_QQuickWidget.h"
+#if defined(__linux__)
+#include "CameraWidgetQt6_QML.h"
+#include "CameraWidgetQt6_QVideoWidget.h"
+#include "CameraWidgetOpenCV_QOpenGLWidget.h"
+#include "CameraWidgetOpenCV.h"
+#endif
 
 
 namespace PokemonAutomation{
@@ -56,7 +62,30 @@ struct CameraBackends{
             "qt6.5-QGraphicsScene", "Qt6.5: QGraphicsScene",
             std::make_unique<CameraQt65QMediaCaptureSession::CameraBackend>()
         );
-#ifdef _WIN32
+#if defined(__linux__)
+        //  The other Qt backends tear under Wayland.
+        m_backends.emplace_back(
+            "qt6-QQuickWidget", "Qt6: QQuickWidget",
+            std::make_unique<CameraQt6_QQuickWidget::CameraBackend>()
+        );
+
+        m_backends.emplace_back(
+            "qt6-QML", "Qt6: QML VideoOutput",
+            std::make_unique<CameraQt6QML::CameraBackend>()
+        );
+        m_backends.emplace_back(
+            "qt6-QVideoWidget", "Qt6: QOpenGLWidget",
+            std::make_unique<CameraQt6QVideoWidget::CameraBackend>()
+        );
+        m_backends.emplace_back(
+            "opencv-QOpenGLWidget", "OpenCV: QOpenGLWidget",
+            std::make_unique<CameraOpenCV_QOpenGLWidget::CameraBackend>()
+        );
+        m_backends.emplace_back(
+            "opencv-QWidget", "OpenCV: QWidget (CPU)",
+            std::make_unique<CameraOpenCV::CameraBackend>()
+        );
+#elif defined(_WIN32)
         m_backends.emplace_back(
             "qt6-QQuickWidget", "Qt6: QQuickWidget",
             std::make_unique<CameraQt6_QQuickWidget::CameraBackend>()

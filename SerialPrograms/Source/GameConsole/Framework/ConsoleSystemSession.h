@@ -123,8 +123,10 @@ private:
     TaggedLogger m_logger;
     ConsoleSystemOption& m_option;
 
-    VideoSession m_video;
+    //  Audio must be constructed before video. Some USB capture cards cannot
+    //  start their audio stream once their video stream is running.
     AudioSession m_audio;
+    VideoSession m_video;
     VideoOverlaySession m_overlay;
 
     struct ControllerEntry{

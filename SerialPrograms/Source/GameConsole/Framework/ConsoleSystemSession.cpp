@@ -59,8 +59,8 @@ ConsoleSystemSession::ConsoleSystemSession(
     , m_console_number(console_number)
     , m_logger(global_logger_raw(), "Console " + std::to_string(console_number))
     , m_option(option)
-    , m_video(m_logger, option.m_video)
     , m_audio(m_logger, option.m_audio)
+    , m_video(m_logger, option.m_video)
     , m_overlay(m_logger, option.m_overlay)
     , m_controllers(option.m_controllers.size())
     , m_history(m_logger)
@@ -114,8 +114,9 @@ void ConsoleSystemSession::load_json(const JsonValue& json){
     std::lock_guard<Mutex> lg(m_lock);
 
     m_option.load_json(json);
-    m_video.load(m_option.m_video);
+    //  Audio before video. See the member declarations.
     m_audio.load(m_option.m_audio);
+    m_video.load(m_option.m_video);
     m_overlay.load(m_option.m_overlay);
 
     size_t c = 0;

@@ -9,6 +9,7 @@
 
 #include <QVideoFrame>
 #include "Common/Cpp/Time.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonFramework/VideoPipeline/VideoFormats.h"
 
 namespace PokemonAutomation{
@@ -45,6 +46,14 @@ public:
     }
 };
 
+
+QVideoFrame deep_copy_frame(const QVideoFrame& frame);
+
+void report_video_path_stats(
+    Logger& logger, const char* backend,
+    const QVideoFrame& src, bool copy_ok,
+    WallClock copy_start, WallClock copy_end
+);
 
 }
 #endif

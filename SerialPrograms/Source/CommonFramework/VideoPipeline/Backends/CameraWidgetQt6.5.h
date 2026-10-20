@@ -15,6 +15,7 @@
 #include <QCameraDevice>
 #include <QMediaCaptureSession>
 #include <QVideoFrame>
+#include "VideoFrameQt.h"
 #include <QVideoWidget>
 #include <QGraphicsView>
 #include <QGraphicsVideoItem>

@@ -578,7 +578,7 @@ else() # macOS and Linux
     endif() # end Linux
 
     # Find OpenCV
-    pkg_search_module(OpenCV REQUIRED opencv4 opencv)
+    pkg_search_module(OpenCV REQUIRED opencv5 opencv4 opencv)
     target_include_directories(SerialProgramsLib SYSTEM PRIVATE ${OpenCV_INCLUDE_DIRS}) # "SYSTEM" to suppress warnings
     target_link_directories(SerialProgramsLib PUBLIC ${OpenCV_LIBRARY_DIRS})
     target_link_libraries(SerialProgramsLib PUBLIC ${OpenCV_LINK_LIBRARIES})

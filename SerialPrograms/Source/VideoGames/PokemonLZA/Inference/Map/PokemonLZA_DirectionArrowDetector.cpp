@@ -11,6 +11,10 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 //#include "Tests/TestUtils.h"
 #include <opencv2/opencv.hpp>
+#if CV_VERSION_MAJOR >= 5
+//  OpenCV 5 moved minAreaRect()/boxPoints() out of imgproc into their own header.
+#include <opencv2/geometry.hpp>
+#endif
 #include <cmath>
 #include <sstream>
 
