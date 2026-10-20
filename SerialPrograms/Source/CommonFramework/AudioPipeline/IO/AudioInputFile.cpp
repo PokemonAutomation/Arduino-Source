@@ -42,17 +42,18 @@ Kernels::AudioPipeline::SampleFormat sample_format_of(const QAudioFormat& format
 }
 
 
-//  The 96 kHz capture-card presets load the file as a physical 1ch x 96000
-//  stream that is really the card's two 48 kHz channels, so the raw listener
-//  output is that same byte stream reinterpreted as 2ch x 48000 (aligned to
-//  2-sample stereo-frame boundaries). Every other format passes through with
-//  its physical frame size.
-bool is_96k_mono_reinterpret(const QAudioFormat& format){
-    return format.channelCount() == 1 && format.sampleRate() == 96000;
+//  When the preset says the physical 1ch x 96000 stream is really the
+//  card's two 48 kHz channels, the raw listener output is that same byte
+//  stream reinterpreted as 2ch x 48000 (aligned to 2-sample stereo-frame
+//  boundaries). Every other case passes through with the physical frame
+//  size.
+bool is_96k_mono_reinterpret(const QAudioFormat& format, bool reinterpret_96k_mono_as_stereo){
+    return reinterpret_96k_mono_as_stereo
+        && format.channelCount() == 1 && format.sampleRate() == 96000;
 }
 
-size_t raw_output_frame_bytes(const QAudioFormat& format){
-    return format.bytesPerFrame() * (is_96k_mono_reinterpret(format) ? 2 : 1);
+size_t raw_output_frame_bytes(const QAudioFormat& format, bool reinterpret_96k_mono_as_stereo){
+    return format.bytesPerFrame() * (is_96k_mono_reinterpret(format, reinterpret_96k_mono_as_stereo) ? 2 : 1);
 }
 
 
@@ -62,22 +63,24 @@ size_t raw_output_frame_bytes(const QAudioFormat& format){
 
 AudioInputFile::AudioInputFile(
     Logger& logger, AudioStreamToFloat& reader,
-    const std::string& file, const QAudioFormat& format
+    const std::string& file, const QAudioFormat& format,
+    bool reinterpret_96k_mono_as_stereo
 )
     : MisalignedStreamConverter(
-        raw_output_frame_bytes(format), raw_output_frame_bytes(format),
+        raw_output_frame_bytes(format, reinterpret_96k_mono_as_stereo),
+        raw_output_frame_bytes(format, reinterpret_96k_mono_as_stereo),
         RAW_BUFFER_CAPACITY
       )
-    , ObjectStreamListener(raw_output_frame_bytes(format))
+    , ObjectStreamListener(raw_output_frame_bytes(format, reinterpret_96k_mono_as_stereo))
     , m_reader(reader)
     , m_source(std::make_unique<AudioFileLoader>(nullptr, file, format))
     , m_sample_type(sample_format_of(format))
     , m_sample_rate(format.sampleRate())
     , m_channels(format.channelCount())
     , m_frame_bytes(format.bytesPerFrame())
-    , m_out_sample_rate(is_96k_mono_reinterpret(format) ? 48000 : format.sampleRate())
-    , m_out_channels(is_96k_mono_reinterpret(format) ? 2 : format.channelCount())
-    , m_out_frame_bytes(raw_output_frame_bytes(format))
+    , m_out_sample_rate(is_96k_mono_reinterpret(format, reinterpret_96k_mono_as_stereo) ? 48000 : format.sampleRate())
+    , m_out_channels(is_96k_mono_reinterpret(format, reinterpret_96k_mono_as_stereo) ? 2 : format.channelCount())
+    , m_out_frame_bytes(raw_output_frame_bytes(format, reinterpret_96k_mono_as_stereo))
 {
     MisalignedStreamConverter::add_listener(*this);
 

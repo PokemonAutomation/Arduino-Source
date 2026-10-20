@@ -16,7 +16,6 @@
 #include "Kernels/AudioPipeline/Kernels_RawAudio2WorkingAudio.h"
 #include "Kernels/AudioPipeline/Kernels_WorkingAudio2RawAudio.h"
 #include "Kernels/AudioPipeline/Kernels_ChannelMixer.h"
-#include "Kernels/AudioPipeline/Kernels_AudioChannelInterleaver.h"
 #include "Kernels/AudioResampler/Kernels_AudioResampler.h"
 #include <QAudioFormat>
 #if QT_VERSION_MAJOR == 5
@@ -163,7 +162,6 @@ void AudioPassthroughPairQt::teardown_tree(){
     m_sink_mixer.reset();
     m_sink_resampler.reset();
     m_sink_encoder.reset();
-    m_sink_interleaver.reset();
     m_fft_mixer.reset();
     m_fft_resampler.reset();
     m_source_decoder.reset();
@@ -174,8 +172,9 @@ void AudioPassthroughPairQt::build_tree(float input_volume){
     if (!m_reader || m_input_format == AudioChannelFormat::NONE){
         return;
     }
-    //  For the 96 kHz presets, m_reader already reports the reinterpreted
-    //  2ch x 48000 stream (AudioInputFile / AudioInputDevice apply it).
+    //  For the INTERLEAVE_96000 presets, m_reader reports the reinterpreted
+    //  2ch x 48000 stream; MONO_96000 keeps the physical 1ch x 96000 shape
+    //  (AudioInputFile / AudioInputDevice apply it).
     size_t raw_rate = m_reader->raw_sample_rate();
     size_t raw_channels = m_reader->raw_channels();
 
@@ -280,8 +279,6 @@ void AudioPassthroughPairQt::rebuild_sink_branch(){
     //  so it runs before the FFT head.
     if (m_sink_mixer){
         m_source_decoder->remove_listener(*m_sink_mixer);
-    }else if (m_sink_interleaver){
-        m_source_decoder->remove_listener(*m_sink_interleaver);
     }else if (m_sink_resampler){
         m_source_decoder->remove_listener(*m_sink_resampler);
     }else if (m_sink_encoder){
@@ -290,7 +287,6 @@ void AudioPassthroughPairQt::rebuild_sink_branch(){
     m_sink_mixer.reset();
     m_sink_resampler.reset();
     m_sink_encoder.reset();
-    m_sink_interleaver.reset();
 
     Kernels::AudioPipeline::WorkingAudioStreamListener* head = nullptr;
     m_sink_encoder.reset(new Kernels::AudioPipeline::WorkingAudio2RawAudio(
@@ -299,51 +295,43 @@ void AudioPassthroughPairQt::rebuild_sink_branch(){
         convertAudioVolumeFromSlider(m_output_volume)
     ));
     head = m_sink_encoder.get();
-    if (raw_channels == 2 && sink_channels == 1 && sink_rate == 2 * raw_rate){
-        //  The 96 kHz mono output: the physical device expects the two 48
-        //  kHz channels interleaved back into a 1ch x 96000 stream.
-        m_sink_interleaver.reset(new Kernels::AudioPipeline::AudioChannelInterleaver(raw_rate));
-        m_sink_interleaver->add_listener(*head);
-        head = m_sink_interleaver.get();
-    }else{
-        if (raw_rate != sink_rate){
-            m_sink_resampler.reset(new Kernels::AudioResampler::AudioResampler(
-                raw_rate, sink_rate, sink_channels
-            ));
-            m_sink_resampler->add_listener(*head);
-            head = m_sink_resampler.get();
+    if (raw_rate != sink_rate){
+        m_sink_resampler.reset(new Kernels::AudioResampler::AudioResampler(
+            raw_rate, sink_rate, sink_channels
+        ));
+        m_sink_resampler->add_listener(*head);
+        head = m_sink_resampler.get();
+    }
+    //  INTERLEAVE_RL_96000 plays the card's channel 1 (the odd physical
+    //  samples) as the left channel; the input reinterpretation preserves
+    //  the physical order, so the sink branch swaps the two channels.
+    //  (The FFT pair-average is order-invariant.)
+    //  Qt channel configs can't express a reversed channel order, so the
+    //  swap matrix is literal for now; once the format encodes the
+    //  card's channel mapping (dropdown rewrite),
+    //  build_channel_mixer_matrix will derive it and this special case
+    //  goes away.
+    bool swap_channels =
+        m_input_format == AudioChannelFormat::INTERLEAVE_RL_96000
+        && raw_channels == 2 && sink_channels == 2;
+    if (raw_channels != sink_channels || swap_channels){
+        std::vector<float> matrix;
+        if (swap_channels){
+            //  out = [in 1, in 0]; weight(in i -> out o) at index i + in_ch * o.
+            matrix = {0.0f, 1.0f, 1.0f, 0.0f};
+        }else{
+            matrix = build_channel_mixer_matrix(
+                channel_format(raw_channels), channel_format(sink_channels)
+            );
         }
-        //  INTERLEAVE_RL_96000 plays the card's channel 1 (the odd physical
-        //  samples) as the left channel; the input reinterpretation preserves
-        //  the physical order, so the sink branch swaps the two channels.
-        //  (The FFT pair-average is order-invariant.)
-        //  Qt channel configs can't express a reversed channel order, so the
-        //  swap matrix is literal for now; once the format encodes the
-        //  card's channel mapping (dropdown rewrite),
-        //  build_channel_mixer_matrix will derive it and this special case
-        //  goes away.
-        bool swap_channels =
-            m_input_format == AudioChannelFormat::INTERLEAVE_RL_96000
-            && raw_channels == 2 && sink_channels == 2;
-        if (raw_channels != sink_channels || swap_channels){
-            std::vector<float> matrix;
-            if (swap_channels){
-                //  out = [in 1, in 0]; weight(in i -> out o) at index i + in_ch * o.
-                matrix = {0.0f, 1.0f, 1.0f, 0.0f};
-            }else{
-                matrix = build_channel_mixer_matrix(
-                    channel_format(raw_channels), channel_format(sink_channels)
-                );
-            }
-            if (matrix.size() != raw_channels * sink_channels){
-                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "No channel mixer matrix.");
-            }
-            m_sink_mixer.reset(new Kernels::AudioPipeline::ChannelMixer(
-                raw_rate, raw_channels, sink_channels, std::move(matrix)
-            ));
-            m_sink_mixer->add_listener(*head);
-            head = m_sink_mixer.get();
+        if (matrix.size() != raw_channels * sink_channels){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "No channel mixer matrix.");
         }
+        m_sink_mixer.reset(new Kernels::AudioPipeline::ChannelMixer(
+            raw_rate, raw_channels, sink_channels, std::move(matrix)
+        ));
+        m_sink_mixer->add_listener(*head);
+        head = m_sink_mixer.get();
     }
     m_source_decoder->push_front_listener(*head);
 }
@@ -494,8 +482,6 @@ void AudioPassthroughPairQt::clear_audio_sink(){
         if (m_source_decoder){
             if (m_sink_mixer){
                 m_source_decoder->remove_listener(*m_sink_mixer);
-            }else if (m_sink_interleaver){
-                m_source_decoder->remove_listener(*m_sink_interleaver);
             }else if (m_sink_resampler){
                 m_source_decoder->remove_listener(*m_sink_resampler);
             }else if (m_sink_encoder){
@@ -505,7 +491,6 @@ void AudioPassthroughPairQt::clear_audio_sink(){
         m_sink_mixer.reset();
         m_sink_resampler.reset();
         m_sink_encoder.reset();
-        m_sink_interleaver.reset();
     });
 }
 void AudioPassthroughPairQt::set_audio_sink(const AudioDeviceInfo& device, double volume){

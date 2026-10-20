@@ -8,7 +8,6 @@
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Kernels_ChannelMixer_TestInfra.h"
 #include "Kernels_ChannelMixer.h"
-#include "Kernels_AudioChannelInterleaver.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -181,72 +180,6 @@ UnitTestResult MixerRoundTripTest::run(Logger& logger, CancellableScope& scope) 
 
 
 
-InterleaverTest::InterleaverTest(size_t samples)
-    : UnitTest(
-        "Kernels::AudioPipeline - Interleaver_2to1_48k(" + std::to_string(samples) + ")"
-    )
-    , m_samples(samples)
-{}
-namespace{
-
-//  Like RecordingWorkingAudioListener, but appends across pushes instead of
-//  overwriting the same buffer (which is all the mixer tests ever do).
-class AccumulatingWorkingAudioListener : public WorkingAudioStreamListener{
-public:
-    AccumulatingWorkingAudioListener(size_t sample_rate)
-        : WorkingAudioStreamListener(sample_rate, 1)
-    {}
-
-    virtual void push_samples(size_t samples, size_t stride, const float* data) override{
-        for (size_t s = 0; s < samples; s++){
-            m_data.push_back(data[s]);
-        }
-    }
-
-    const std::vector<float>& data() const{
-        return m_data;
-    }
-
-
-private:
-    std::vector<float> m_data;
-};
-
-}
-
-UnitTestResult InterleaverTest::run(Logger& logger, CancellableScope& scope) const{
-    const size_t in_rate = 48000;
-    AlignedVector<float> input = make_random_input(2, m_samples);
-
-    AudioChannelInterleaver interleaver(in_rate);
-    AccumulatingWorkingAudioListener output(interleaver.out_sample_rate());
-    interleaver.add_listener(output);
-
-    //  Push in two chunks with a stride larger than the chunk to exercise
-    //  the channel-strided input layout across chunk boundaries.
-    const size_t first = m_samples / 2;
-    interleaver.push_samples(first, m_samples, input.data());
-    interleaver.push_samples(m_samples - first, m_samples, input.data() + first);
-
-    if (output.data().size() != 2 * m_samples){
-        return "Received " + std::to_string(output.data().size()) + " samples, expected " +
-            std::to_string(2 * m_samples) + ".";
-    }
-
-    for (size_t s = 0; s < m_samples; s++){
-        float expected_l = input[s];
-        float expected_r = input[m_samples + s];
-        float actual_l = output.data()[2 * s + 0];
-        float actual_r = output.data()[2 * s + 1];
-        if (expected_l != actual_l || expected_r != actual_r){
-            return std::string("Mismatch at ") + std::to_string(s) + ": " +
-                std::to_string(expected_l) + "/" + std::to_string(expected_r) +
-                " != " + std::to_string(actual_l) + "/" + std::to_string(actual_r);
-        }
-    }
-
-    return true;
-}
 
 
 

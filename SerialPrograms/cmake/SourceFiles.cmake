@@ -1035,8 +1035,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/AudioPipeline/Kernels_AudioPipeline_RoundTrip_TestInfra.cpp
     Source/Kernels/AudioPipeline/Kernels_AudioPipeline_RoundTrip_TestInfra.h
     Source/Kernels/AudioPipeline/Kernels_AudioPipeline_Tests.cpp
-    Source/Kernels/AudioPipeline/Kernels_AudioChannelInterleaver.cpp
-    Source/Kernels/AudioPipeline/Kernels_AudioChannelInterleaver.h
     Source/Kernels/AudioPipeline/Kernels_ChannelMixer.cpp
     Source/Kernels/AudioPipeline/Kernels_ChannelMixer.h
     Source/Kernels/AudioPipeline/Kernels_ChannelMixer_TestInfra.cpp

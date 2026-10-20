@@ -92,7 +92,13 @@ AudioSource::AudioSource(Logger& logger, const std::string& file, AudioChannelFo
     set_sample_format_to_float(native_format);
     set_format(native_format, format);
     init(format, AudioSampleFormat::FLOAT32, volume_multiplier);
-    m_input_file = std::make_unique<AudioInputFile>(logger, *m_reader, file, native_format);
+    //  Only the interleaved presets misreport the card's two 48 kHz
+    //  channels as a 1ch x 96000 stream; MONO_96000 is a true 96 kHz mono
+    //  stream and keeps that shape.
+    const bool reinterpret_96k =
+        format == AudioChannelFormat::INTERLEAVE_LR_96000
+        || format == AudioChannelFormat::INTERLEAVE_RL_96000;
+    m_input_file = std::make_unique<AudioInputFile>(logger, *m_reader, file, native_format, reinterpret_96k);
 }
 AudioSource::AudioSource(Logger& logger, const AudioDeviceInfo& device, AudioChannelFormat format, float volume_multiplier){
     NativeAudioInfo native_info = device.native_info();
@@ -107,7 +113,10 @@ AudioSource::AudioSource(Logger& logger, const AudioDeviceInfo& device, AudioCha
     }
 
     init(format, stream_format, volume_multiplier);
-    m_input_device = std::make_unique<AudioInputDevice>(logger, *m_reader, native_info, native_format);
+    const bool reinterpret_96k =
+        format == AudioChannelFormat::INTERLEAVE_LR_96000
+        || format == AudioChannelFormat::INTERLEAVE_RL_96000;
+    m_input_device = std::make_unique<AudioInputDevice>(logger, *m_reader, native_info, native_format, reinterpret_96k);
 }
 
 void AudioSource::init(AudioChannelFormat format, AudioSampleFormat stream_format, float volume_multiplier){

@@ -34,13 +34,16 @@ class AudioFileLoader;
 //  frame size, so for ordinary formats the raw output is frame-aligned by
 //  construction and is passed to the listeners as-is.
 //
-//  The 96 kHz capture-card presets load the file as a physical 1ch x 96000
-//  stream that is really two 48 kHz channels, so the raw output reinterprets
-//  that stream as 2ch x 48000 from the start: the byte stream is the same,
-//  only the (rate, channels) framing changes, and the MisalignedStreamConverter
-//  reassembler aligns the listener output to 2-sample stereo-frame boundaries.
-//  This reinterpretation is temporary: the format dropdown rewrite will
-//  request 48 kHz stereo directly, at which point it goes away.
+//  The INTERLEAVE_96000 presets load the file as a physical 1ch x 96000
+//  stream that is really two 48 kHz channels (a misreporting capture card),
+//  so when "reinterpret_96k_mono_as_stereo" is set the raw output
+//  reinterprets that stream as 2ch x 48000 from the start: the byte stream
+//  is the same, only the (rate, channels) framing changes, and the
+//  MisalignedStreamConverter reassembler aligns the listener output to
+//  2-sample stereo-frame boundaries. MONO_96000 is a true 96 kHz mono
+//  stream and keeps that shape through the whole pipeline. This
+//  reinterpretation is temporary: the format dropdown rewrite will request
+//  48 kHz stereo directly, at which point it goes away.
 //
 class AudioInputFile final
     : public QObject
@@ -52,7 +55,8 @@ public:
 
     AudioInputFile(
         Logger& logger, AudioStreamToFloat& reader,
-        const std::string& file, const QAudioFormat& format
+        const std::string& file, const QAudioFormat& format,
+        bool reinterpret_96k_mono_as_stereo
     );
 
     Kernels::AudioPipeline::SampleFormat sample_type() const{
