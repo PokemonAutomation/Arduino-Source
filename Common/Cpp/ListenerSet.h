@@ -43,24 +43,21 @@ public:
         return m_count.load(std::memory_order_acquire);
     }
 
-    //  Add a new listener to the back of the call order. This is always safe
-    //  as it will never fail unless it throws. Deadlocking is not possible
-    //  since there's only one local lock.
-    void add(ListenerType& listener);
+    //
+    //  Add a new listener. This is always safe as it will never fail unless it
+    //  throws. Deadlocking is not possible since there's only one local lock.
+    //
 
     //  Add a new listener to the front of the call order, so it fires before
-    //  all existing listeners. This has the same safety guarantees as add().
-    //  If the listener is already present, this is a no-op and the call order
-    //  is not changed.
+    //  all existing listeners.
     void push_front(ListenerType& listener);
 
     //  Add a new listener to the back of the call order, so it fires after all
-    //  existing listeners. Equivalent to add().
-    //
-    //  This is defined inline here so it can be inlined into callsites.
-    void push_back(ListenerType& listener){
-        add(listener);
-    }
+    //  existing listeners.
+    void push_back(ListenerType& listener);
+
+    //  Same as "push_back()".
+    void add(ListenerType& listener);
 
     //  Remove a listener. This will block if the listener being removed is
     //  running a callback from this class.
@@ -95,13 +92,6 @@ public:
 
 
 private:
-    //  Optimization. Keep an atomic version of the count. This will let us
-    //  skip the lock when there are no listeners.
-    std::atomic<size_t> m_count;
-
-    const bool m_suppress_lock_prints;
-    mutable SpinLock m_lock;
-
     //  The data structure here is (formerly) an intrusive map where the nodes
     //  form a linked-list. The map provides a fast way to add/remove listeners
     //  while the linked-list is the main method of iterating the listeners.
@@ -135,13 +125,23 @@ private:
 #endif
         {}
     };
-    std::list<Node> m_list;
-    std::map<ListenerType*, typename std::list<Node>::iterator> m_listeners;
 
     //  Shared implementation of add()/push_front()/push_back(). Inserts
     //  "listener" at position "pos" in the call order. If the listener is
     //  already present, this is a no-op and the call order is not changed.
     void insert(ListenerType& listener, std::list<Node>::iterator pos, const char* label);
+
+
+private:
+    //  Optimization. Keep an atomic version of the count. This will let us
+    //  skip the lock when there are no listeners.
+    std::atomic<size_t> m_count;
+
+    const bool m_suppress_lock_prints;
+    mutable SpinLock m_lock;
+
+    std::list<Node> m_list;
+    std::map<ListenerType*, typename std::list<Node>::iterator> m_listeners;
 
 #ifdef PA_DEBUG_ListenerSet
     LifetimeSanitizer m_sanitizer;
@@ -162,14 +162,6 @@ ListenerSet<ListenerType>::ListenerSet(bool suppress_lock_prints)
     : m_suppress_lock_prints(suppress_lock_prints)
 {}
 
-template <typename ListenerType>
-void ListenerSet<ListenerType>::add(ListenerType& listener){
-    insert(listener, m_list.end(), "ListenerSet::add()");
-}
-template <typename ListenerType>
-void ListenerSet<ListenerType>::push_front(ListenerType& listener){
-    insert(listener, m_list.begin(), "ListenerSet::push_front()");
-}
 template <typename ListenerType>
 void ListenerSet<ListenerType>::insert(ListenerType& listener, std::list<Node>::iterator pos, const char* label){
 #ifdef PA_DEBUG_ListenerSet
@@ -193,6 +185,18 @@ void ListenerSet<ListenerType>::insert(ListenerType& listener, std::list<Node>::
         throw;
     }
     m_count.store(m_listeners.size(), std::memory_order_release);
+}
+template <typename ListenerType>
+void ListenerSet<ListenerType>::push_front(ListenerType& listener){
+    insert(listener, m_list.begin(), "ListenerSet::push_front()");
+}
+template <typename ListenerType>
+void ListenerSet<ListenerType>::push_back(ListenerType& listener){
+    insert(listener, m_list.end(), "ListenerSet::push_back()");
+}
+template <typename ListenerType>
+void ListenerSet<ListenerType>::add(ListenerType& listener){
+    insert(listener, m_list.end(), "ListenerSet::add()");
 }
 template <typename ListenerType>
 void ListenerSet<ListenerType>::remove(ListenerType& listener) noexcept{
