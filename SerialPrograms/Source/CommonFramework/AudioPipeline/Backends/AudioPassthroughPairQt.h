@@ -27,6 +27,7 @@ namespace AudioPipeline{
 class RawAudio2WorkingAudio;
 class WorkingAudio2RawAudio;
 class ChannelMixer;
+class AudioChannelInterleaver;
 }
 namespace AudioResampler{
 class AudioResampler;
@@ -100,10 +101,13 @@ private:
     //  New pipeline tree. The decoder attaches to m_reader's raw stream and
     //  the branch heads attach to the decoder (sink head before FFT head).
     //  Declared after m_reader so the nodes die before the reader does.
+    //  (For the 96 kHz presets, m_reader already emits the two 48 kHz
+    //  channels reinterpreted from the physical 1ch x 96000 stream.)
     std::unique_ptr<Kernels::AudioPipeline::RawAudio2WorkingAudio> m_source_decoder;
     std::unique_ptr<Kernels::AudioPipeline::ChannelMixer> m_sink_mixer;          //  Source channels -> sink channels.
     std::unique_ptr<Kernels::AudioResampler::AudioResampler> m_sink_resampler;
     std::unique_ptr<Kernels::AudioPipeline::WorkingAudio2RawAudio> m_sink_encoder;
+    std::unique_ptr<Kernels::AudioPipeline::AudioChannelInterleaver> m_sink_interleaver;  //  2ch x R -> 1ch x 2R (96 kHz mono output).
     std::unique_ptr<Kernels::AudioPipeline::ChannelMixer> m_fft_mixer;           //  Source channels -> 1 channel.
     std::unique_ptr<Kernels::AudioResampler::AudioResampler> m_fft_resampler;
 

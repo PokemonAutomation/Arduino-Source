@@ -340,6 +340,11 @@ void add_tests(UnitTestDatabase& database){
 
     //  1 -> 2 -> 1 averaging round-trip.
     database.add<MixerRoundTripTest>(1000);
+
+    //  2ch x R -> 1ch x 2R interleaver (inverse of the 96 kHz reinterpretation).
+    for (size_t samples = 2; samples < 1000; samples = (size_t)(samples * 1.1) + 1){
+        database.add<InterleaverTest>(samples);
+    }
 }
 
 

@@ -52,6 +52,24 @@ private:
 
 
 
+//
+//  Pushes random stereo samples through an AudioChannelInterleaver and
+//  verifies the 1ch x 2R output is the exact even/odd interleave of the
+//  two channels (the inverse of the 96 kHz input reinterpretation).
+//
+class InterleaverTest : public UnitTest{
+public:
+    InterleaverTest(size_t samples);
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override;
+
+
+private:
+    const size_t m_samples;
+};
+
+
+
 
 }
 }
