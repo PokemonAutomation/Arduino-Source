@@ -181,9 +181,6 @@ UnitTestResult MixerRoundTripTest::run(Logger& logger, CancellableScope& scope) 
 
 
 
-
-
-
 }
 }
 }

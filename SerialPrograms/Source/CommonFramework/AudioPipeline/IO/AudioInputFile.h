@@ -71,7 +71,5 @@ private:
     LifetimeSanitizer m_sanitizer;
 };
 
-
-
 }
 #endif
