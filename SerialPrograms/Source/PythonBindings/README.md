@@ -14,7 +14,8 @@ device, using the `NintendoSwitch::PybindSwitchProController` class from CoreLib
   Qt, OpenCV, ONNX Runtime or Tesseract).
 - `pokemon_automation/` — the Python package on top of it:
   - `controller.py` — `SwitchController`: the user-facing API, with button names
-    instead of bitfields (`press("L+R")`, `stick("left", "up")`, ...).
+    instead of bitfields (`push_button("L+R")`, `push_dpad("up")`, ...). Its
+    command methods match the names of `_pa_core.Controller`.
   - `buttons.py` — parsing of button / d-pad / stick names into bitfields.
   - `fake.py` — `FakeController`: the same backend interface without hardware,
     for unit tests.
@@ -99,28 +100,33 @@ from pokemon_automation import SwitchController, list_serial_ports
 
 print(list_serial_ports())
 with SwitchController("/dev/ttyACM0") as sw:  # connects to the Switch via port /dev/ttyACM0
-    print(sw.status())            # device name and firmware version
-    sw.press("A")                 # tap A (80 ms hold, 80 ms release)
-    sw.press("L+R", hold_ms=200)  # press L and R together
-    sw.press("up", repeat=2)      # d-pad up twice
-    sw.stick("left", "up", duration_ms=1500)   # walk forward
-    sw.hold("B", left="up", duration_ms=2000)  # run forward
+    print(sw.current_status())                # device name and firmware version
+    sw.push_button("A")                       # tap A (80 ms hold, 80 ms release)
+    sw.push_button("L+R", hold_ms=200)        # press L and R together
+    sw.push_dpad("up", repeat=2)              # d-pad up twice
+    sw.push_left_joystick("up", duration_ms=1500)     # walk forward
+    sw.controller_state(2000, buttons="B", left="up")  # run forward
     sw.wait(300)
-    sw.flush()                    # block until the device executed everything
+    sw.wait_for_all_requests()                # block until the device executed everything
 ```
 
 Commands are queued on the microcontroller and return as soon as they are
-scheduled, mirroring the `pbf_*()` functions of the main program.
+scheduled, mirroring the `pbf_*()` functions of the main program. The command
+methods of `SwitchController` match the names of the backend they wrap
+(`_pa_core.Controller`, and with it the C++
+`PybindSwitchProController` methods):
 
-- `flush()`: to wait for all queued commands to execute.
+- `push_button()`: taps buttons on the Switch.
+- `push_dpad()`: taps a d-pad direction.
+- `push_left_joystick()` / `push_right_joystick()`: moves a stick.
+- `controller_state()`: simultaneously holds/presses any combination of buttons,
+  d-pad and sticks.
+- `wait()`: queues a pause with nothing pressed.
+- `wait_for_all_requests()`: to wait for all queued commands to execute.
 - `cancel_all_and_wait()`: (thread-safe) to
 drop the queue, release all inputs and wait for the device to confirm the
 neutral state — e.g. from an emergency-stop thread.
 - `close()`: runs `cancel_all_and_wait()`, then drops the connection.
-- `press()`: presses the buttons on the Switch
-- `stick()`: moves the left or right stick on the Switch
-- `hold()`: simultaneously holds/presses any combination of buttons, d-pad and sticks.
-- `wait()`: queues a pause with nothing pressed.
 
 See `controller.py` for more details.
 

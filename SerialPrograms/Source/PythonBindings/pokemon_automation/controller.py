@@ -1,21 +1,23 @@
 """High-level Nintendo Switch controller API on top of `_pa_core.Controller`.
 
-Commands are queued on the microcontroller and return immediately, like the
-`pbf_*()` functions in the main C++ program. Call `flush()` to wait until
-everything queued so far has executed, and `cancel_all_and_wait()` to drop
-anything still queued and release all inputs (waiting for the device to confirm
-the neutral state).
+The command methods carry the same names as the backend they wrap
+(`_pa_core.Controller`, a 1:1 binding of `NintendoSwitch::PybindSwitchProController`),
+but take button names instead of bitfields. Commands are queued on the
+microcontroller and return immediately, like the `pbf_*()` functions in the main
+C++ program. Call `wait_for_all_requests()` to wait until everything queued so
+far has executed, and `cancel_all_and_wait()` to drop anything still queued and
+release all inputs (waiting for the device to confirm the neutral state).
 
 Example:
     from pokemon_automation import SwitchController
 
     with SwitchController("/dev/cu.usbserial-0001") as sw:
-        sw.press("A")                          # tap A
-        sw.press("L+R", hold_ms=200)           # press L and R together
-        sw.press("up", repeat=2)               # d-pad up twice
-        sw.stick("left", "up", duration_ms=1500)   # walk forward
-        sw.hold("B", left="up", duration_ms=2000)  # run forward
-        sw.flush()
+        sw.push_button("A")                              # tap A
+        sw.push_button("L+R", hold_ms=200)               # press L and R together
+        sw.push_dpad("up", repeat=2)                     # d-pad up twice
+        sw.push_left_joystick("up", duration_ms=1500)     # walk forward
+        sw.controller_state(2000, buttons="B", left="up")  # run forward
+        sw.wait_for_all_requests()
 """
 
 from __future__ import annotations
@@ -100,7 +102,7 @@ class SwitchController:
         self._require_open()
         return self._backend.is_ready()
 
-    def status(self) -> str:
+    def current_status(self) -> str:
         """The connection status text: device name and firmware version, or the
         error message if the connection failed.
 
@@ -110,22 +112,25 @@ class SwitchController:
         self._require_open()
         return self._backend.current_status()
 
-    def name(self) -> str:
+    def controller_name(self) -> str:
         """Name of the active controller implementation, e.g. "Nintendo Switch: Pro Controller"."""
         self._require_open()
         return self._backend.controller_name()
 
     # ---- commands -------------------------------------------------------------
 
-    def press(self, buttons: btn.ButtonsArg, hold_ms: int = DEFAULT_HOLD_MS,
-              release_ms: int = DEFAULT_RELEASE_MS, repeat: int = 1) -> None:
-        """Tap a button combination (and/or one d-pad direction) `repeat` times.
+    def push_button(self, buttons: btn.ButtonsArg, hold_ms: int = DEFAULT_HOLD_MS,
+                    release_ms: int = DEFAULT_RELEASE_MS, repeat: int = 1) -> None:
+        """Tap a button combination (d-pad directions not accepted) `repeat` times.
 
-        `buttons`: "A", "L+R", ["ZL", "up"], ... (see `pokemon_automation.buttons`).
+        `buttons`: "A", "L+R", ["ZL", "B"], ... (see `pokemon_automation.buttons`).
+        For d-pad input use `push_dpad()`; to hold buttons and d-pad together use
+        `controller_state()`.
 
-        C++: maps to `issue_buttons()` / `issue_dpad()` / `issue_full_controller_state()`
-        on `AbstractController` (SerialPrograms/Source/Controllers/Controller.h), via
-        `PybindSwitchProController` (SerialPrograms/Source/Integrations/PybindSwitchProController.h).
+        C++: `AbstractController::issue_buttons()`
+        (SerialPrograms/Source/Controllers/Controller.h), via
+        `PybindSwitchProController::push_button()`
+        (SerialPrograms/Source/Integrations/PybindSwitchProController.h).
         `delay = hold + release` runs commands back to back, the same convention as the
         C++ class docs.
         """
@@ -134,26 +139,57 @@ class SwitchController:
         _check_nonnegative(hold_ms=hold_ms, release_ms=release_ms)
         self._require_open()
         parsed = btn.parse_buttons(buttons)
-        if not parsed.has_buttons and not parsed.has_dpad:
-            raise ValueError("press() needs at least one button or d-pad direction.")
-        b = self._backend
-        delay = hold_ms + release_ms
-        with self._lock:
-            for _ in range(repeat):
-                if parsed.has_buttons and not parsed.has_dpad:
-                    b.push_button(delay, hold_ms, release_ms, parsed.bitfield)
-                elif parsed.has_dpad and not parsed.has_buttons:
-                    b.push_dpad(delay, hold_ms, release_ms, parsed.dpad)
-                else:
-                    # Buttons and d-pad held together: one full state, then release.
-                    b.controller_state(hold_ms, parsed.bitfield, parsed.dpad, 0.0, 0.0, 0.0, 0.0)
-                    b.wait(release_ms)
+        if parsed.has_dpad:
+            raise ValueError(
+                f"push_button() only accepts buttons, but {buttons!r} includes a d-pad direction. "
+                "Use push_dpad() for d-pad input or controller_state() to combine them."
+            )
+        if not parsed.has_buttons:
+            raise ValueError("push_button() needs at least one button.")
+        self._repeat_commands(hold_ms, release_ms, repeat,
+                              lambda delay, hold, release: self._backend.push_button(
+                                  delay, hold, release, parsed.bitfield))
 
-    def hold(self, buttons: btn.ButtonsArg = None, duration_ms: int = 500, *,
-             left: btn.StickArg = None, right: btn.StickArg = None) -> None:
+    def push_dpad(self, position: btn.ButtonsArg, hold_ms: int = DEFAULT_HOLD_MS,
+                  release_ms: int = DEFAULT_RELEASE_MS, repeat: int = 1) -> None:
+        """Tap a d-pad direction `repeat` times.
+
+        `position`: "up", "up+right" (or "UP_RIGHT"), ["up", "right"], ...
+        For buttons use `push_button()`; to hold buttons and d-pad together use
+        `controller_state()`.
+
+        C++: `AbstractController::issue_dpad()`
+        (SerialPrograms/Source/Controllers/Controller.h), via
+        `PybindSwitchProController::push_dpad()`
+        (SerialPrograms/Source/Integrations/PybindSwitchProController.h).
+        """
+        if repeat < 1:
+            raise ValueError(f"repeat must be at least 1, got {repeat}.")
+        _check_nonnegative(hold_ms=hold_ms, release_ms=release_ms)
+        self._require_open()
+        parsed = btn.parse_buttons(position)
+        if parsed.has_buttons:
+            raise ValueError(
+                f"push_dpad() only accepts d-pad directions, but {position!r} includes buttons. "
+                "Use push_button() for buttons or controller_state() to combine them."
+            )
+        if not parsed.has_dpad:
+            raise ValueError("push_dpad() needs at least one d-pad direction.")
+        self._repeat_commands(hold_ms, release_ms, repeat,
+                              lambda delay, hold, release: self._backend.push_dpad(
+                                  delay, hold, release, parsed.dpad))
+
+    def controller_state(self, duration_ms: int = 500, buttons: btn.ButtonsArg = None, *,
+                         left: btn.StickArg = None, right: btn.StickArg = None) -> None:
         """Hold any combination of buttons, d-pad and sticks for `duration_ms`.
 
-        Everything not specified is released for the whole hold.
+        `buttons` may mix buttons and d-pad directions ("ZL+up"). Everything not
+        specified is released for the whole hold. The state is released when the
+        next queued command executes; queue a `wait()` afterwards for a gap.
+
+        C++: `AbstractController::issue_full_controller_state()`
+        (SerialPrograms/Source/Controllers/Controller.h), via
+        `PybindSwitchProController::controller_state()`.
         """
         _check_nonnegative(duration_ms=duration_ms)
         self._require_open()
@@ -166,19 +202,39 @@ class SwitchController:
                 left_x, left_y, right_x, right_y
             )
 
-    def stick(self, side: str, position: btn.StickArg, duration_ms: int = 500,
-              release_ms: int = 0) -> None:
-        """Tilt the "left" or "right" stick to `position` for `duration_ms`."""
+    def push_left_joystick(self, position: btn.StickArg, duration_ms: int = 500,
+                          release_ms: int = 0) -> None:
+        """Tilt the left stick to `position` for `duration_ms`.
+
+        C++: `AbstractController::issue_left_joystick()`
+        (SerialPrograms/Source/Controllers/Controller.h), via
+        `PybindSwitchProController::push_left_joystick()`.
+        """
+        self._push_joystick(self._backend.push_left_joystick, position, duration_ms, release_ms)
+
+    def push_right_joystick(self, position: btn.StickArg, duration_ms: int = 500,
+                           release_ms: int = 0) -> None:
+        """Tilt the right stick to `position` for `duration_ms`.
+
+        C++: `AbstractController::issue_right_joystick()`
+        (SerialPrograms/Source/Controllers/Controller.h), via
+        `PybindSwitchProController::push_right_joystick()`.
+        """
+        self._push_joystick(self._backend.push_right_joystick, position, duration_ms, release_ms)
+
+    def _push_joystick(self, send, position: btn.StickArg, duration_ms: int, release_ms: int) -> None:
         _check_nonnegative(duration_ms=duration_ms, release_ms=release_ms)
-        if side not in ("left", "right"):
-            raise ValueError('side must be "left" or "right", got ' + repr(side))
         self._require_open()
         x, y = btn.parse_stick(position)
         with self._lock:
-            if side == "left":
-                self._backend.push_left_joystick(duration_ms + release_ms, duration_ms, release_ms, x, y)
-            else:
-                self._backend.push_right_joystick(duration_ms + release_ms, duration_ms, release_ms, x, y)
+            send(duration_ms + release_ms, duration_ms, release_ms, x, y)
+
+    def _repeat_commands(self, hold_ms: int, release_ms: int, repeat: int, send) -> None:
+        """Queue `send(delay, hold, release)` `repeat` times, back to back."""
+        delay = hold_ms + release_ms
+        with self._lock:
+            for _ in range(repeat):
+                send(delay, hold_ms, release_ms)
 
     def wait(self, duration_ms: int) -> None:
         """Queue a pause of `duration_ms` with nothing pressed."""
@@ -187,7 +243,7 @@ class SwitchController:
         if duration_ms > 0:
             self._backend.wait(duration_ms)
 
-    def flush(self) -> None:
+    def wait_for_all_requests(self) -> None:
         """Block until every queued command has executed on the device.
 
         C++: `PybindSwitchProController::wait_for_all_requests()` ->

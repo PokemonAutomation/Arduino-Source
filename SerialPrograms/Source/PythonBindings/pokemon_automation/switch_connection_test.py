@@ -3,9 +3,9 @@
     python -m pokemon_automation.switch_connection_test [port]
 
 If `port` is omitted, every port from `list_serial_ports()` is tried in turn.
-The test connects, prints the device status, presses HOME and a d-pad step,
-waits for the device to confirm, and cancels with confirmation. It only
-presses HOME and the d-pad.
+The test connects, prints the device status, presses some buttons and d-pad
+steps, moves the right stick, waits for the device to confirm, and cancels with
+confirmation.
 """
 
 from __future__ import annotations
@@ -21,18 +21,18 @@ def try_port(port: str) -> bool:
     try:
         with SwitchController(port, timeout_s=5.0) as sw:
             print(f"Connected to {port}")
-            print(f"  status:  {sw.status()}")
-            print(f"  name:    {sw.name() or '(unknown)'}")
-            sw.press("A")  # initial button press to wake up the connection
-            sw.press("HOME", hold_ms=200, release_ms=1000)
-            sw.press("right", hold_ms=100)
-            sw.press("right", hold_ms=100)
-            sw.press("left", hold_ms=100)
-            sw.press("left", hold_ms=100)
-            sw.stick("right", [1, 0], duration_ms=2000)
-            sw.stick("right", [-1, 0], duration_ms=2000)
+            print(f"  status:  {sw.current_status()}")
+            print(f"  name:    {sw.controller_name() or '(unknown)'}")
+            sw.push_button("A")  # initial button press to wake up the connection
+            sw.push_button("HOME", hold_ms=200, release_ms=1000)
+            sw.push_dpad("right", hold_ms=100)
+            sw.push_dpad("right", hold_ms=100)
+            sw.push_dpad("left", hold_ms=100)
+            sw.push_dpad("left", hold_ms=100)
+            sw.push_right_joystick([1, 0], duration_ms=2000)
+            sw.push_right_joystick([-1, 0], duration_ms=2000)
             sw.wait(500)
-            sw.flush()
+            sw.wait_for_all_requests()
             print("  cancel confirmed:", sw.cancel_all_and_wait(500))
         print("Self-test OK.")
         return True
