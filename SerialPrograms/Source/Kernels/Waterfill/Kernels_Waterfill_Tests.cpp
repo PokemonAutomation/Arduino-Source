@@ -24,6 +24,7 @@
 #include "Kernels/Waterfill/Kernels_Waterfill_Core_64xH_Default.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Routines.h"
 #include "Kernels_Waterfill_Tests.h"
+#include "Tests/GuardPageImage.h"
 #include "Tests/TestUtils.h"
 
 #include <iostream>
@@ -44,7 +45,10 @@ public:
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        //  Copy the test image into guard-page memory with packed rows, so a
+        //  kernel that reads or writes past the last pixel faults.
+        ImageRGB32 file_image(m_image);
+        GuardPageImageRGB32 image(file_image);
 
         const size_t width = image.width();
         const size_t height = image.height();
