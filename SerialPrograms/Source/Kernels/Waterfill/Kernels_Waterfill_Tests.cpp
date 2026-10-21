@@ -105,7 +105,7 @@ private:
     //  `matrix_type` and the waterfill function `find_objects_inplace`. Return them
     //  sorted by position, then by area.
     static std::vector<Waterfill::WaterfillObject> find_sorted_objects(
-        const ImageRGB32& image,
+        const GuardPageImageRGB32& image,
         BinaryMatrixType matrix_type,
         WaterfillImplementation::FindObjects find_objects_inplace
     ){
