@@ -11,6 +11,7 @@
 #include <QPermissions>
 #endif
 #endif
+#include "Common/Compiler.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonFramework/GlobalAutoPaths.h"
@@ -32,14 +33,14 @@ void set_permissions(QObject& object){
     switch(qApp->checkPermission(camera_permission)){
     case Qt::PermissionStatus::Undetermined:
         cout << "Camera permission undetermined" << endl;
-        qApp->requestPermission(camera_permission, &object, [](const QPermission &permission){
+        qApp->requestPermission(camera_permission, &object, [](const QPermission& permission){
             cout << "camera request is ready!" << endl;
         });
         cout << "Requested Camera permission" << endl;
         break;
     case Qt::PermissionStatus::Denied:
         cout << "No camera permission found" << endl;
-        qApp->requestPermission(camera_permission, &object, [](const QPermission &permission){
+        qApp->requestPermission(camera_permission, &object, [](const QPermission& permission){
             cout << "camera request is ready!" << endl;
         });
         cout << "Requested Camera permission" << endl;
@@ -53,14 +54,14 @@ void set_permissions(QObject& object){
     switch(qApp->checkPermission(microphone_permission)){
     case Qt::PermissionStatus::Undetermined:
         cout << "Microphone permission undetermined" << endl;
-        qApp->requestPermission(microphone_permission, &object, [](const QPermission &permission){
+        qApp->requestPermission(microphone_permission, &object, [](const QPermission& permission){
             cout << "Microphone request is ready!" << endl;
         });
         cout << "Requested microphone permission" << endl;
         break;
     case Qt::PermissionStatus::Denied:
         cout << "No microphone permission found" << endl;
-        qApp->requestPermission(microphone_permission, &object, [](const QPermission &permission){
+        qApp->requestPermission(microphone_permission, &object, [](const QPermission& permission){
             cout << "Microphone request is ready!" << endl;
         });
         cout << "Requested microphone permission" << endl;
