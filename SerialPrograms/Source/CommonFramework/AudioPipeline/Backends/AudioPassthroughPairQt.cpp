@@ -53,11 +53,11 @@ Kernels::AudioPipeline::SampleFormat to_sample_format(AudioSampleFormat format){
 //  (1 = mono, 2 = stereo L+R). Enough for build_channel_mixer_matrix().
 QAudioFormat channel_format(size_t channels){
     QAudioFormat format;
-    format.setChannelCount(channels);
+    format.setChannelCount((int)channels);
     format.setChannelConfig(
         channels == 1
-        ? QAudioFormat::ChannelConfig::ChannelConfigMono
-        : QAudioFormat::ChannelConfig::ChannelConfigStereo
+            ? QAudioFormat::ChannelConfig::ChannelConfigMono
+            : QAudioFormat::ChannelConfig::ChannelConfigStereo
     );
     return format;
 }
@@ -499,34 +499,31 @@ void AudioPassthroughPairQt::set_audio_sink(const AudioDeviceInfo& device, doubl
     });
 }
 void AudioPassthroughPairQt::init_audio_sink(){
-    auto scope_check = m_sanitizer.check_scope();
+    //  Must be called under the lock.
+
 //    cout << "AudioPassthroughPairQt::init_audio_sink()" << endl;
-    QMetaObject::invokeMethod(this, [this]{
-        auto scope_check = m_sanitizer.check_scope();
-        AudioChannelFormat output_format = m_input_format;
-        switch (output_format){
-        case AudioChannelFormat::NONE:
-            return;
-        case AudioChannelFormat::MONO_48000:
-        case AudioChannelFormat::MONO_96000:
-        case AudioChannelFormat::DUAL_44100:
-        case AudioChannelFormat::DUAL_48000:
-            break;
-        case AudioChannelFormat::INTERLEAVE_LR_96000:
-        case AudioChannelFormat::INTERLEAVE_RL_96000:
-            output_format = AudioChannelFormat::DUAL_48000;
-            break;
-        default:
-            m_logger.log(std::string("Invalid AudioFormat: ") + AUDIO_FORMAT_LABELS[(size_t)output_format], COLOR_RED);
-            return;
-        }
-        if (m_output_device){
-            m_writer.reset(new AudioSink(m_logger, m_output_device, output_format, m_output_volume));
-        }
-        //  Keep the tree's sink branch in sync with the legacy writer above.
-        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-        rebuild_sink_branch();
-    });
+    auto scope_check = m_sanitizer.check_scope();
+    AudioChannelFormat output_format = m_input_format;
+    switch (output_format){
+    case AudioChannelFormat::NONE:
+        return;
+    case AudioChannelFormat::MONO_48000:
+    case AudioChannelFormat::MONO_96000:
+    case AudioChannelFormat::DUAL_44100:
+    case AudioChannelFormat::DUAL_48000:
+        break;
+    case AudioChannelFormat::INTERLEAVE_LR_96000:
+    case AudioChannelFormat::INTERLEAVE_RL_96000:
+        output_format = AudioChannelFormat::DUAL_48000;
+        break;
+    default:
+        m_logger.log(std::string("Invalid AudioFormat: ") + AUDIO_FORMAT_LABELS[(size_t)output_format], COLOR_RED);
+        return;
+    }
+    if (m_output_device){
+        m_writer.reset(new AudioSink(m_logger, m_output_device, output_format, m_output_volume));
+    }
+    rebuild_sink_branch();
 }
 
 
