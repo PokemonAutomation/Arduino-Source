@@ -30,7 +30,7 @@ def list_serial_ports() -> list[str]:
             ports = [f"COM{i}" for i in range(1, 64)]
     if sys.platform == "darwin":
         ports = [p for p in ports if not p.startswith("/dev/tty.")]
-    ports = [p for p in ports if not any(w in p.lower() for w in _IGNORED_PORT_WORDS)]
+    ports = [p for p in ports if not any(w in p.lower() for w in _IGNORED_PORT_WORDS)] # filter out devices contained within _IGNORED_PORT_WORDS
     # USB-serial adapters first.
     ports.sort(key=lambda p: (not any(w in p.lower() for w in ("usb", "uart", "acm", "com")), p))
     return ports
