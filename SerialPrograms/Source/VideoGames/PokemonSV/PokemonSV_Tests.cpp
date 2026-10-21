@@ -465,6 +465,13 @@ public:
         }
         return success;
     }
+    virtual void reroll_quest(BBQuests quest) override{
+        events.push_back("reroll");
+        auto iter = std::find(panel.begin(), panel.end(), quest);
+        if (iter != panel.end()){
+            *iter = next_new_quest();
+        }
+    }
     virtual void quest_completed() override{
         events.push_back("completed");
     }
@@ -515,6 +522,7 @@ struct BBQRoundsScenario{
     std::vector<std::pair<BBQuests, BBQuests>> also_completes;
     std::set<BBQuests> never_completes;
     std::vector<BBQuests> new_quests;
+    BBQOption::OutOfRetries out_of_retries = BBQOption::OutOfRetries::Skip;
     uint64_t expected_completed = 0;
     std::string expected;
 };
@@ -534,6 +542,7 @@ public:
             options.NUM_EGGS.set(0);
             options.OUT_OF_EGGS.set(BBQOption::OOEggs::Stop);
         }
+        options.OUT_OF_RETRIES.set(m_scenario.out_of_retries);
 
         SimulatedBBQGameActions game;
         game.panel = m_scenario.panel;
@@ -664,6 +673,24 @@ void add_tests_BBQFarmerRounds(UnitTestDatabase& database){
                 "read process read do read do completed end "
                 "read process read do completed read do completed end "
                 "read process read do completed end",
+        },
+        {
+            // sneak-up is rerolled to photo-polar, which round 2 attempts.
+            .name = "out of retries with reroll replaces the failed quest",
+            .num_quests = 3,
+            .never_completes = {BBQuests::sneak_up},
+            .out_of_retries = BBQOption::OutOfRetries::Reroll,
+            .expected_completed = 5,
+            .expected = "read process read do completed read do completed read do reroll end " + round_of_3 + " end",
+        },
+        {
+            .name = "out of retries with stop stops at once",
+            .num_quests = 3,
+            .panel = {BBQuests::sneak_up, BBQuests::make_tm, BBQuests::auto_10},
+            .never_completes = {BBQuests::sneak_up},
+            .out_of_retries = BBQOption::OutOfRetries::Stop,
+            .expected_completed = 0,
+            .expected = "read process read do",
         },
     };
     for (const BBQRoundsScenario& scenario : scenarios){

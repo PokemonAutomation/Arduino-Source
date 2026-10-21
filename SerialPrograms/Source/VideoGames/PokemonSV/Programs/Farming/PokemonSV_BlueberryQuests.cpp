@@ -355,38 +355,6 @@ private:
     const BBQOption& m_options;
 };
 
-void reroll_slot(
-    const ProgramInfo& info,
-    VideoStream& stream, ProControllerContext& context,
-    const BBQOption& BBQ_OPTIONS,
-    std::vector<BBQuests>& quest_list,
-    size_t slot
-){
-    ConsoleBBQRerollActions actions(info, stream, context, BBQ_OPTIONS);
-    switch (reroll_quest(stream.logger(), actions, quest_list, slot)){
-    case BBQRerollResult::Rerolled:
-        return;
-    case BBQRerollResult::PanelNotOpened:
-        OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::SEND_ERROR_REPORT,
-            "Unable to open the quest panel to reroll a quest.",
-            stream
-        );
-    case BBQRerollResult::MenuNotFound:
-        OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::SEND_ERROR_REPORT,
-            "Unable to open the reroll menu for quest " + std::to_string(slot + 1) + ". No BP was spent.",
-            stream
-        );
-    case BBQRerollResult::NotReplaced:
-        //Most likely out of BP, which is not a program error.
-        OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::NO_ERROR_REPORT,
-            "Quest " + std::to_string(slot + 1) + " was not replaced after rerolling it. Check that there is enough BP.",
-            stream
-        );
-    }
-}
 
 //This does not handle out of BP.
 void reroll_all_slots(
@@ -459,6 +427,39 @@ BBQRerollResult reroll_quest(
     return BBQRerollResult::NotReplaced;
 }
 
+void reroll_quest_slot(
+    const ProgramInfo& info,
+    VideoStream& stream, ProControllerContext& context,
+    const BBQOption& BBQ_OPTIONS,
+    std::vector<BBQuests>& quest_list,
+    size_t slot
+){
+    ConsoleBBQRerollActions actions(info, stream, context, BBQ_OPTIONS);
+    switch (reroll_quest(stream.logger(), actions, quest_list, slot)){
+    case BBQRerollResult::Rerolled:
+        return;
+    case BBQRerollResult::PanelNotOpened:
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
+            "Unable to open the quest panel to reroll a quest.",
+            stream
+        );
+    case BBQRerollResult::MenuNotFound:
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
+            "Unable to open the reroll menu for quest " + std::to_string(slot + 1) + ". No BP was spent.",
+            stream
+        );
+    case BBQRerollResult::NotReplaced:
+        //Most likely out of BP, which is not a program error.
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::NO_ERROR_REPORT,
+            "Quest " + std::to_string(slot + 1) + " was not replaced after rerolling it. Check that there is enough BP.",
+            stream
+        );
+    }
+}
+
 BBQuestPlan plan_quests(
     Logger& logger,
     const BBQOption& BBQ_OPTIONS,
@@ -505,7 +506,7 @@ std::vector<BBQuests> process_quest_list(
     //Each reroll updates the panel the next one checks against.
     std::vector<BBQuests> panel = quest_list;
     for (size_t slot : plan.reroll_slots){
-        reroll_slot(info, stream, context, BBQ_OPTIONS, panel, slot);
+        reroll_quest_slot(info, stream, context, BBQ_OPTIONS, panel, slot);
     }
     if (plan.reroll_all){
         stream.log("No possible quests! Rerolling all quests.");

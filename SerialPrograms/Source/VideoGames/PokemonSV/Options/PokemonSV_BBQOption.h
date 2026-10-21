@@ -85,6 +85,12 @@ public:
         KeepGoing,
     };
 
+    enum class OutOfRetries{
+        Skip,
+        Reroll,
+        Stop,
+    };
+
     OCR::LanguageOCROption& LANGUAGE;
 
     SimpleIntegerOption<uint64_t> NUM_QUESTS;
@@ -109,6 +115,7 @@ public:
     TeraFarmerCatchOnWin CATCH_ON_WIN;
 
     SimpleIntegerOption<uint8_t> NUM_RETRIES;
+    EnumDropdownOption<OutOfRetries> OUT_OF_RETRIES;
 
     BooleanCheckBoxOption FIX_TIME_WHEN_DONE;
 

@@ -192,6 +192,16 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
         "<b>Number of Retries:</b><br>Reattempt a quest this many times if it fails.",
         LockMode::UNLOCK_WHILE_RUNNING, 1, 0, 5
     )
+    , OUT_OF_RETRIES(
+        "<b>Out of Retries:</b><br>When a quest fails all its retries, do the selected option.",
+        {
+            {OutOfRetries::Skip,    "skip",     "Skip Quest - Not attempted again while it stays on the panel"},
+            {OutOfRetries::Reroll,  "reroll",   "Reroll Quest - Costs BP"},
+            {OutOfRetries::Stop,    "stop",     "Stop Program"},
+        },
+        LockMode::UNLOCK_WHILE_RUNNING,
+        OutOfRetries::Skip
+    )
     , FIX_TIME_WHEN_DONE(
         "<b>Fix Time when Done:</b><br>Fix the time after the program finishes.",
         LockMode::UNLOCK_WHILE_RUNNING, false
@@ -212,6 +222,7 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
     PA_ADD_OPTION(BATTLE_AI);
     PA_ADD_OPTION(CATCH_ON_WIN);
     PA_ADD_OPTION(NUM_RETRIES);
+    PA_ADD_OPTION(OUT_OF_RETRIES);
     PA_ADD_OPTION(FIX_TIME_WHEN_DONE);
 }
 

@@ -129,6 +129,16 @@ BBQRerollResult reroll_quest(
     size_t slot
 );
 
+//Reroll the quest in `slot` of `quests` on the console, with reroll_quest(). Stops the program
+//if the reroll fails.
+void reroll_quest_slot(
+    const ProgramInfo& info,
+    VideoStream& stream, ProControllerContext& context,
+    const BBQOption& BBQ_OPTIONS,
+    std::vector<BBQuests>& quests,
+    size_t slot
+);
+
 //Determine which quests are possible and which quests are not. (ex. no eggs, reroll egg hatcher.)
 //Quests not possible are removed from the list. If the list is empty, then reroll all items.
 std::vector<BBQuests> process_quest_list(

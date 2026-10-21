@@ -147,7 +147,18 @@ void run_bbq_rounds(Logger& logger, const BBQOption& options, BBQGameActions& ga
                     num_completed_quests++;
                 }else{
                     logger.log("Quest did not complete successfully.");
-                    failed_quests.insert(current_quest);
+                    switch (options.OUT_OF_RETRIES){
+                    case BBQOption::OutOfRetries::Skip:
+                        failed_quests.insert(current_quest);
+                        break;
+                    case BBQOption::OutOfRetries::Reroll:
+                        logger.log("Reroll selected. Rerolling the failed quest.");
+                        game.reroll_quest(current_quest);
+                        break;
+                    case BBQOption::OutOfRetries::Stop:
+                        logger.log("Stop selected. Stopping program.", COLOR_RED);
+                        return;
+                    }
                 }
             }else{
                 //Note: This doesn't account for case such as "sneak up" being added and then completed alongside the next quest
@@ -190,6 +201,15 @@ public:
     }
     virtual bool do_quest(BBQuests quest, uint8_t& eggs_hatched) override{
         return process_and_do_quest(m_env, m_env.console, m_context, m_options, quest, eggs_hatched);
+    }
+    virtual void reroll_quest(BBQuests quest) override{
+        std::vector<BBQuests> quests = PokemonSV::read_quests(m_env.program_info(), m_env.console, m_context, m_options);
+        auto iter = std::find(quests.begin(), quests.end(), quest);
+        if (iter == quests.end()){
+            m_env.log("Failed quest is no longer on the panel. Not rerolling.");
+            return;
+        }
+        reroll_quest_slot(m_env.program_info(), m_env.console, m_context, m_options, quests, iter - quests.begin());
     }
     virtual void quest_completed() override{
         m_stats.questsCompleted++;

@@ -43,6 +43,10 @@ public:
     // Increments `eggs_hatched` when the quest hatches eggs.
     virtual bool do_quest(BBQuests quest, uint8_t& eggs_hatched) = 0;
 
+    // Reroll a quest that failed all its attempts, if it is still on the
+    // panel. Spends BP.
+    virtual void reroll_quest(BBQuests quest) = 0;
+
     // Progress reporting only: a quest was counted as completed. Lets stats
     // update after every quest instead of once per round.
     virtual void quest_completed() = 0;
@@ -55,7 +59,8 @@ public:
 
 // Run rounds of quests until NUM_QUESTS have been completed, or until
 // eggs run out when OUT_OF_EGGS is Stop, or until every doable quest on the
-// panel is one that already failed all its attempts.
+// panel is one that already failed all its attempts, or until a quest fails
+// all its attempts when OUT_OF_RETRIES is Stop.
 void run_bbq_rounds(Logger& logger, const BBQOption& options, BBQGameActions& game);
 
 
