@@ -74,6 +74,7 @@ static std::vector<std::unique_ptr<AutoStory_Checkpoint>> make_checkpoint_list()
     checkpoint_list.emplace_back(std::make_unique<AutoStory_checkpoint_0203>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_checkpoint_0204>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_checkpoint_0205>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_checkpoint_0206>());
 
     //Segment 03
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0301>());
@@ -349,6 +350,8 @@ BDSPAutoStory::BDSPAutoStory()
     , DIAGNOSTIC_FAKE_CHECKPOINT_SAVE(
           "<b>Diagnostic only: Fake checkpoint saves</b><br>"
           "Use the fake save helper instead of normal checkpoint saving. "
+          "Use an existing in-game save at the selected starting checkpoint or segment. "
+          "Any failure reloads that save and reruns the entire selected range from its start. "
           "Checkpoint saves are not verified in this mode. Remove before pushing to production.",
           LockMode::LOCK_WHILE_RUNNING, false)
     , STORY_SECTION(
@@ -711,42 +714,53 @@ void BDSPAutoStory::program(
         DIAGNOSTIC_FAKE_CHECKPOINT_SAVE ? CheckpointSaveMode::FAKE : CheckpointSaveMode::REAL
     };
 
-    // DIAGNOSTIC ONLY: Remove this branch before pushing to production.
-    if (DIAGNOSTIC_POST_CATCH_ONLY && ENABLE_ADVANCED_MODE &&
-        STORY_SECTION == StorySection::TUTORIAL && START_CHECKPOINT_TUTORIAL.slug() == "4"){
-        env.log("Diagnostic only: Running checkpoint 00.04 after catch.");
-        diagnostic_checkpoint_0004_after_catch(env, context, options, stats);
-        env.log("Diagnostic continuation: Running checkpoint 00.05.");
-        AutoStory_Checkpoint_0005().run_checkpoint(env, context, options, stats);
-        send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
-        return;
-    }
-
-    const bool tutorial = STORY_SECTION == StorySection::TUTORIAL;
-    const auto& segments = ALL_SEGMENTS();
-
-    if (ENABLE_ADVANCED_MODE){
-        size_t start = std::stoul((tutorial ? START_CHECKPOINT_TUTORIAL : START_CHECKPOINT_MAINSTORY).slug());
-        size_t end   = std::stoul((tutorial ? END_CHECKPOINT_TUTORIAL : END_CHECKPOINT_MAINSTORY).slug());
-
-        env.log("Starting AutoStory from checkpoint " + std::to_string(start) +
-                " to " + std::to_string(end));
-
-        const auto& checkpoints = ALL_CHECKPOINTS();
-
-        for (size_t i = start; i <= end && i < checkpoints.size(); i++){
-            env.log("Running Checkpoint: " + std::to_string(i));
-            checkpoints[i]->run_checkpoint(env, context, options, stats);
+    const bool fake_saves = options.checkpoint_save_mode == CheckpointSaveMode::FAKE;
+    if (fake_saves) options.checkpoint_retry_scope = CheckpointRetryScope::DEFER_TO_SELECTED_RANGE;
+    auto run_selected_range = [&](size_t attempt){
+        if (attempt > 0) env.log("[Fake saves] Reloaded initial save; restarting the entire selected range from its start.");
+        // DIAGNOSTIC ONLY: Remove this branch before pushing to production.
+        if (DIAGNOSTIC_POST_CATCH_ONLY && ENABLE_ADVANCED_MODE &&
+            STORY_SECTION == StorySection::TUTORIAL && START_CHECKPOINT_TUTORIAL.slug() == "4"){
+            env.log("Diagnostic only: Running checkpoint 00.04 after catch.");
+            diagnostic_checkpoint_0004_after_catch(env, context, options, stats);
+            env.log("Diagnostic continuation: Running checkpoint 00.05.");
+            AutoStory_Checkpoint_0005().run_checkpoint(env, context, options, stats);
+            return;
         }
 
+        const bool tutorial = STORY_SECTION == StorySection::TUTORIAL;
+        const auto& segments = ALL_SEGMENTS();
+
+        if (ENABLE_ADVANCED_MODE){
+            size_t start = std::stoul((tutorial ? START_CHECKPOINT_TUTORIAL : START_CHECKPOINT_MAINSTORY).slug());
+            size_t end   = std::stoul((tutorial ? END_CHECKPOINT_TUTORIAL : END_CHECKPOINT_MAINSTORY).slug());
+
+            env.log("Starting AutoStory from checkpoint " + std::to_string(start) +
+                    " to " + std::to_string(end));
+
+            const auto& checkpoints = ALL_CHECKPOINTS();
+
+            for (size_t i = start; i <= end && i < checkpoints.size(); i++){
+                env.log("Running Checkpoint: " + std::to_string(i));
+                checkpoints[i]->run_checkpoint(env, context, options, stats);
+            }
+
+        }else{
+            size_t start = std::stoul((tutorial ? START_SEGMENT : START_SEGMENT_MAINSTORY).slug());
+            size_t end   = std::stoul((tutorial ? END_SEGMENT : END_SEGMENT_MAINSTORY).slug());
+
+            for (size_t i = start; i <= end && i < segments.size(); i++){
+                env.log("Running Segment: " + std::to_string(i));
+                segments[i]->run_segment(env, context, options, stats);
+            }
+        }
+    };
+    if (fake_saves){
+        checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+            std::move(run_selected_range), true, CheckpointSaveMode::FAKE,
+            CheckpointRetryScope::SELECTED_RANGE);
     }else{
-        size_t start = std::stoul((tutorial ? START_SEGMENT : START_SEGMENT_MAINSTORY).slug());
-        size_t end   = std::stoul((tutorial ? END_SEGMENT : END_SEGMENT_MAINSTORY).slug());
-
-        for (size_t i = start; i <= end && i < segments.size(); i++){
-            env.log("Running Segment: " + std::to_string(i));
-            segments[i]->run_segment(env, context, options, stats);
-        }
+        run_selected_range(0);
     }
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);

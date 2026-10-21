@@ -25,10 +25,10 @@ namespace PokemonBDSP{
 ShortDialogDetector::ShortDialogDetector(Color color)
     : m_color(color)
 //    , m_bottom(0.50, 0.91, 0.29, 0.05)
-    , m_left_white(0.21, 0.835, 0.008, 0.12)
+    , m_left_white(0.221, 0.860, 0.002, 0.025)
     , m_left(0.18, 0.835, 0.02, 0.12)
-    , m_right_white(0.785, 0.835, 0.008, 0.12)
-    , m_right_white_low(0.785, 0.915, 0.008, 0.04)
+    , m_right_white(0.798, 0.860, 0.002, 0.025)
+    , m_right_white_low(0.790, 0.915, 0.002, 0.025)
     , m_right(0.822, 0.835, 0.02, 0.12)
 {}
 void ShortDialogDetector::make_overlays(VideoOverlaySet& items) const{

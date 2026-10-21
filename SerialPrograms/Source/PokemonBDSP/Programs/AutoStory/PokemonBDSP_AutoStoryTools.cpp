@@ -24,6 +24,8 @@
 #include "CommonTools/VisualDetectors/ImageMatchDetector.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_ShopDetectors.h"
+#include "CommonTools/OCR/OCR_Routines.h"
+#include <cctype>
 #include "CommonTools/Images/ImageFilter.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
 
@@ -202,13 +204,14 @@ void checkpoint_reattempt_loop(
     AutoStoryStats& stats,
     std::function<void(size_t attempt_number)>&& action,
     bool save,
-    CheckpointSaveMode save_mode
+    CheckpointSaveMode save_mode,
+    CheckpointRetryScope retry_scope
 ){
     static constexpr size_t MAX_ATTEMPTS = 20;
 
     for (size_t i = 0;; i++){
         try{
-            if (i == 0){
+            if (i == 0 && retry_scope != CheckpointRetryScope::SELECTED_RANGE){
                 if (save || stats.m_first_run){
                     checkpoint_save(env, context, notif_status_update, stats, save_mode);
                 }
@@ -219,6 +222,7 @@ void checkpoint_reattempt_loop(
             return; // success
 
         }catch (OperationFailedException& e){
+            if (retry_scope == CheckpointRetryScope::DEFER_TO_SELECTED_RANGE) throw;
             env.console.log("checkpoint_reattempt_loop: attempt " + std::to_string(i) + " failed: " + e.message(), COLOR_RED);
             stats.m_reset++;
             env.update_stats();
@@ -227,7 +231,7 @@ void checkpoint_reattempt_loop(
                 throw;
             }
 
-            if (save){
+            if (save || retry_scope == CheckpointRetryScope::SELECTED_RANGE){
                 env.console.log("Resetting game from HOME before retry...", COLOR_ORANGE);
                 bool ok = reset_game_from_home(env, env.console, context, true, 1000ms);
                 if (!ok){
@@ -375,7 +379,7 @@ static const char* shop_item_slug(ShopItem item){
     }
 }
 
-// {MaxRepel, 2, 4}, {FullRestore, 0, 3} â†’ "4 Max repel, 3 Full restore"
+// {MaxRepel, 2, 4}, {FullRestore, 0, 3} → "4 Max repel, 3 Full restore"
 static std::string make_buy_label(const std::vector<ItemToBuy>& items){
     std::string label;
     for (size_t i = 0; i < items.size(); i++){
@@ -408,7 +412,7 @@ bool buy_items(
     context.wait_for_all_requests();
 
 
-    // â”€â”€ Coordinate constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Coordinate constants ─────────────────────────────────────────────────
 
     // Area where the selection arrow appears at the vendor greeting menu (Buy/Sell/Leave).
     static const ImageFloatBox VENDOR_ARROW_BOX{0.630000, 0.550000, 0.070000, 0.120000};
@@ -423,13 +427,13 @@ bool buy_items(
     static constexpr size_t MAX_OUTER       = 50;
     static constexpr size_t MAX_ITEM_SEARCH = 50;  // max iterations per item before giving up
 
-    // â”€â”€ Outer state machine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Outer state machine ──────────────────────────────────────────────────
     for (size_t outer = 0; outer < MAX_OUTER; outer++){
         SelectionArrowFinder  arrow_vendor(stream.overlay(), VENDOR_ARROW_BOX, COLOR_GREEN);
         ShopBuyingWindowWatcher buying_window;
         ShortDialogWatcher    dialog(COLOR_RED);
 
-        // case 0: no detectors fired â€” press A in a for-loop (5 presses) while watching.
+        // case 0: no detectors fired — press A in a for-loop (5 presses) while watching.
         stream.log("Starting to loop over items");
         int state = run_until<ProControllerContext>(
             stream, context,
@@ -446,12 +450,12 @@ bool buy_items(
 
         switch (state){
 
-        case 0:  // case 1: SelectionArrow at vendor menu â†’ press A to choose "Buy"
+        case 0:  // case 1: SelectionArrow at vendor menu → press A to choose "Buy"
             stream.log("Found the selection arrow, pressing A to enter the buying window...", COLOR_GREEN);
             pbf_press_button(context, BUTTON_A, 80ms, 500ms);
             break;
 
-        case 1:  // case 2: buying window open â†’ buy each requested item
+        case 1:  // case 2: buying window open → buy each requested item
         stream.log("Found the buying window, searching for the right item...", COLOR_GREEN);
         {
             bool buying_failed = false;
@@ -486,7 +490,7 @@ bool buy_items(
 
                     switch (sub){
 
-                    case 0:  // YES/NO confirmation arrow â†’ confirm purchase
+                    case 0:  // YES/NO confirmation arrow → confirm purchase
                         stream.log("Found the confirmation to buy arrow, pressing A to buy", COLOR_GREEN);
                     {
                         context.wait_for_all_requests();
@@ -506,7 +510,7 @@ bool buy_items(
 
                     case 1:  // quantity window
                         if (!hover_confirmed){
-                            // Quantity window appeared before we confirmed the right item â€”
+                            // Quantity window appeared before we confirmed the right item —
                             // an earlier A press accidentally opened the wrong item's selector.
                             // Press B to go back to the list and continue searching.
                             stream.log("Unexpected quantity window (wrong item), pressing B...", COLOR_YELLOW);
@@ -527,14 +531,14 @@ bool buy_items(
                         pbf_wait(context, 1000ms);
                         break;
 
-                    case 2:  // correct item highlighted â†’ press A to open quantity selector
+                    case 2:  // correct item highlighted → press A to open quantity selector
                         stream.log("Found the right item, pressing A to buy a certain quantity...", COLOR_GREEN);
                         hover_confirmed = true;
                         pbf_press_button(context, BUTTON_A, 80ms, 300ms);
                         pbf_wait(context, 1000ms);
                         break;
 
-                    default:  // outline not found or wrong item â†’ advance to next row
+                    default:  // outline not found or wrong item → advance to next row
                         stream.log("Not on the right item, moving...", COLOR_GREEN);
                         pbf_press_dpad(context, DPAD_DOWN, 80ms, 300ms);
                         pbf_wait(context, 300ms);
@@ -557,7 +561,7 @@ bool buy_items(
             break;
         }
 
-        case 2:  // case 3: unexpected ShortDialog â†’ press B until back in buying window
+        case 2:  // case 3: unexpected ShortDialog → press B until back in buying window
         {
             ShopBuyingWindowWatcher back_in_shop;
             run_until<ProControllerContext>(
@@ -570,7 +574,7 @@ bool buy_items(
             break;
         }
 
-        default:  // outer default: unrecognised state â†’ press B to recover
+        default:  // outer default: unrecognised state → press B to recover
             pbf_press_button(context, BUTTON_B, 80ms, 3000ms);
             break;
         }
@@ -1031,14 +1035,24 @@ void open_menu(
     // }
 
     MenuCursorPosition cur = MenuCursorPosition::UNKNOWN;
+    bool menu_confirmed_open = false;
     for (size_t attempt = 1; attempt <= 3; attempt++){
         stream.log("[Open menu] Open and detect attempt " + std::to_string(attempt) + "/3.");
         try {
             // A late-opening menu may already be visible after a timeout.
             // Check before pressing X again, since X would close that menu.
-            MenuWatcher already_open;
-            if (wait_until(stream, context, 100ms, {{already_open}}) < 0){
-                overworld_to_menu(stream, context);
+            if (!menu_confirmed_open){
+                MenuWatcher already_open;
+                if (wait_until(stream, context, 300ms, {{already_open}}) < 0){
+                    overworld_to_menu(stream, context);
+                }else{
+                    stream.log("[Open menu] Menu already visible; skipping X.");
+                }
+                menu_confirmed_open = true;
+            }else{
+                // Cursor detection retries send no input that could close the
+                // confirmed menu. Keep observing it instead of toggling X.
+                stream.log("[Open menu] Retrying cursor detection in the open menu.");
             }
             pbf_wait(context, 1000ms);
             context.wait_for_all_requests();
@@ -1280,6 +1294,71 @@ static double bag_row_patch_score(
 //     }
 //     return dark < names.width() * names.height() * 0.001;
 // }
+
+size_t bag_clear_tab_count(const ImageViewRGB32& frame){
+    if (!frame || bag_pocket_position(frame)==0) return 0;
+    static const std::vector<std::shared_ptr<const ImageRGB32>> references=[] {
+        std::vector<std::shared_ptr<const ImageRGB32>> refs;
+        for (const char* name : {"Normal","NormalMedium","NormalSmall","Alternate","AlternateMedium","AlternateSmall","Selected","SelectedMedium","SelectedSmall","SelectedBlue","SelectedBlueMedium","SelectedBlueSmall"})
+            refs.emplace_back(std::make_shared<const ImageRGB32>(
+                RESOURCE_PATH()+"PokemonBDSP/Autostory/BagTabs/"+name+".png"));
+        return refs;
+    }();
+    size_t clear=0;
+    for (size_t tab=0;tab<8;tab++) {
+        const double x=.570+tab*.0421;
+        // A selected tab has a thin red outline. The NEW marker fills the
+        // interior of this upper-left patch, which the outline leaves white.
+        auto badge=extract_box_reference(frame,ImageFloatBox(x+.007,.074,.006,.014));
+        size_t red=0;
+        for (size_t y=0;y<badge.height();y++) for (size_t bx=0;bx<badge.width();bx++) {
+            const uint32_t pixel=badge.pixel(bx,y);
+            int rr=(pixel>>16)&255,gg=(pixel>>8)&255,bb=pixel&255;
+            red+=rr>150 && rr>gg+60 && rr>bb+60;
+        }
+        if (badge.width()*badge.height() && (double)red/(badge.width()*badge.height())>.45) continue;
+        const ImageFloatBox box{x,.06,.038,.072};
+        for (const auto& reference : references) {
+            ImageMatchDetector detector(reference,box,50.0);
+            if (detector.detect(frame)) {clear++;break;}
+        }
+    }
+    return clear;
+}
+
+bool clear_new_item_flags(VideoStream& stream, ProControllerContext& context, int num_icons){
+    stream.log("[Bag NEW flags] Opening bag to verify all eight tabs.");
+    open_menu(stream,context,MenuCursorPosition::BAG,num_icons);
+    pbf_wait(context,1000ms);
+    auto all_clear=[&]() {
+        context.wait_for_all_requests();
+        size_t confirmed=0;
+        for (size_t check=0;check<3;check++) {
+            const auto frame=stream.video().snapshot();
+            const size_t count=frame?bag_clear_tab_count(*frame.frame):0;
+            stream.log("[Bag NEW flags] Clear tabs: "+std::to_string(count)+"/8.");
+            if (count!=8) return false;
+            confirmed++;
+            pbf_wait(context,150ms);
+            context.wait_for_all_requests();
+        }
+        return confirmed==3;
+    };
+    bool cleared=all_clear();
+    for (size_t pocket=0;pocket<32 && !cleared;pocket++) {
+        if (pocket) pbf_press_dpad(context,DPAD_RIGHT,80ms,300ms);
+        // Pause on each selection so its NEW banner has time to clear.
+        // Keep three cumulative seconds of Down input per pocket.
+        for (size_t tap=0;tap<12;tap++) pbf_press_dpad(context,DPAD_DOWN,250ms,100ms);
+        cleared=all_clear();
+    }
+    pbf_press_dpad(context,DPAD_UP,3000ms,250ms);
+    pbf_mash_button(context,BUTTON_B,2000ms);
+    context.wait_for_all_requests();
+    stream.log(cleared?"[Bag NEW flags] All eight tabs clear; bag closed.":
+        "[Bag NEW flags] Full pocket pass did not clear all eight tabs; bag closed.",cleared?COLOR_GREEN:COLOR_ORANGE);
+    return cleared;
+}
 
 int bag_pocket_position(const ImageViewRGB32& frame){
     if (!frame) return 0;
@@ -1736,9 +1815,16 @@ bool use_escape_rope(
 bool activate_repel(
     VideoStream& stream,
     ProControllerContext& context,
-    int num_icons
+    int num_icons,
+    int repel_type
 ){
-    stream.log("Activating repel");
+    static const char* const slugs[]={"repel","super-repel","max-repel"};
+    if (repel_type<0 || repel_type>2) {
+        stream.log("activate_repel: type must be 0 (Repel), 1 (Super Repel), or 2 (Max Repel).",COLOR_RED);
+        return false;
+    }
+    const std::string slug=slugs[repel_type];
+    stream.log("Activating "+slug);
     open_menu(stream, context, MenuCursorPosition::BAG, num_icons);
     context.wait_for_all_requests();
     pbf_wait(context, 1000ms);
@@ -1751,6 +1837,14 @@ bool activate_repel(
     auto repel_tab_small_ref = std::make_shared<const ImageRGB32>(
         RESOURCE_PATH() + "PokemonBDSP/Autostory/Bag_RepelTabSmall.png"
     );
+    // Obtaining Honey adds a NEW badge to the same selected Other Items tab.
+    // Keep the original references and threshold for the earlier route stages.
+    auto repel_tab_honey_ref = std::make_shared<const ImageRGB32>(
+        RESOURCE_PATH() + "PokemonBDSP/Autostory/Bag_RepelTabHoney.png"
+    );
+    auto repel_tab_honey_small_ref = std::make_shared<const ImageRGB32>(
+        RESOURCE_PATH() + "PokemonBDSP/Autostory/Bag_RepelTabHoneySmall.png"
+    );
     const ImageFloatBox repel_tab_box{0.735000, 0.055000, 0.045000, 0.080000};
     const double repel_tab_rmsd = 50.0;
 
@@ -1762,7 +1856,9 @@ bool activate_repel(
 
         ImageMatchWatcher watcher(repel_tab_ref, repel_tab_box, repel_tab_rmsd);
         ImageMatchWatcher small_watcher(repel_tab_small_ref, repel_tab_box, repel_tab_rmsd);
-        int ret = wait_until(stream, context, 400ms, {{watcher}, {small_watcher}});
+        ImageMatchWatcher honey_watcher(repel_tab_honey_ref, repel_tab_box, repel_tab_rmsd);
+        ImageMatchWatcher honey_small_watcher(repel_tab_honey_small_ref, repel_tab_box, repel_tab_rmsd);
+        int ret = wait_until(stream, context, 400ms, {{watcher}, {small_watcher}, {honey_watcher}, {honey_small_watcher}});
         if (ret >= 0){
             stream.log("[AutoStory] activate_repel: repel tab found after "
                        + std::to_string(press) + " press(es).", COLOR_GREEN);
@@ -1782,12 +1878,55 @@ bool activate_repel(
         return false;
     }
 
+    // Reuse the Bag cursor/name geometry and existing Tesseract backend. A later
+    // save may contain all three Repels and unrelated Other Items in any order.
+    bool item_found=false;
+    size_t confirmed=0;
+    size_t unknown_cursor=0;
+    for (size_t scan=0;scan<256;scan++) {
+        context.wait_for_all_requests();
+        const auto frame=stream.video().snapshot();
+        if (!frame || bag_list_is_empty(*frame.frame)) break;
+        const int cursor=bag_cursor_position(*frame.frame);
+        if (!cursor) {
+            if (++unknown_cursor>=3) break;
+            pbf_wait(context,200ms);
+            continue;
+        }
+        unknown_cursor=0;
+        // Use the existing Tesseract entry point directly so item selection
+        // does not depend on the optional Paddle/ONNX runtime configuration.
+        const std::string text=OCR::tesseract_ocr_read(Language::English,
+            extract_box_reference(*frame.frame,bag_list_name_box(cursor)));
+        std::string normalized;
+        for (unsigned char ch:text) if (std::isalpha(ch)) normalized.push_back((char)std::tolower(ch));
+        static const char* const names[]={"repel","superrepel","maxrepel"};
+        if (normalized==names[repel_type]) {
+            if (++confirmed>=2) {item_found=true;break;}
+            pbf_wait(context,150ms);
+        } else {
+            confirmed=0;
+            // Search both directions so a non-wrapping list opened halfway
+            // down still reaches items above the initial cursor position.
+            pbf_press_dpad(context,scan<128 ? DPAD_DOWN : DPAD_UP,80ms,300ms);
+        }
+    }
+    if (!item_found) {
+        stream.log("activate_repel: requested item not confirmed: "+slug,COLOR_RED);
+        pbf_mash_button(context,BUTTON_B,2000ms);
+        context.wait_for_all_requests();
+        return false;
+    }
+    stream.log("[AutoStory] activate_repel: selected item confirmed: "+slug,COLOR_GREEN);
+
     context.wait_for_all_requests();
     pbf_wait(context, 400ms);
     pbf_press_button(context, BUTTON_A, 80ms, 300ms);
     context.wait_for_all_requests();
 
-    const ImageFloatBox repel_item_box{0.720000, 0.100000, 0.070000, 0.150000};
+    // The Use-item popup follows the selected row, which may be anywhere
+    // in a later save's list. Exclude the Bag list cursor on the left.
+    const ImageFloatBox repel_item_box{0.700000, 0.100000, 0.280000, 0.650000};
     SelectionArrowFinder arrow_finder(stream.overlay(), repel_item_box, COLOR_GREEN);
     int arrow_ret = wait_until(stream, context, 2000ms, {{arrow_finder}});
     if (arrow_ret != 0){
@@ -1819,8 +1958,11 @@ void use_HM(
         {{arrow}}
     );
     if (ret != 0){
-        stream.log("Using " + label + ": selection arrow not found.", COLOR_RED);
-        return;
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
+            "Using " + label + ": HM confirmation arrow not found; stopping before further movement.",
+            stream
+        );
     }
 
     stream.log("Using " + label + ": selection arrow found, confirming.", COLOR_GREEN);

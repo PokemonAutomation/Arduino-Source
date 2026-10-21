@@ -104,6 +104,9 @@ struct OutsideHelpConfig{
 };
 
 enum class CheckpointSaveMode { REAL, FAKE };
+// Real saves retry one checkpoint. Fake-save runs own one retry loop around
+// the selected range; inner checkpoints propagate failures to that owner.
+enum class CheckpointRetryScope { CHECKPOINT, SELECTED_RANGE, DEFER_TO_SELECTED_RANGE };
 
 struct AutoStoryOptions{
     Language language;
@@ -112,6 +115,7 @@ struct AutoStoryOptions{
     HelpMode help_mode;
     OutsideHelpConfig outside_help;
     CheckpointSaveMode checkpoint_save_mode = CheckpointSaveMode::REAL;
+    CheckpointRetryScope checkpoint_retry_scope = CheckpointRetryScope::CHECKPOINT;
 };
 
 
@@ -186,6 +190,8 @@ void reload_backup_save(
 //  If save=true (default): save the game before the first attempt, then run
 //  `action(attempt_number)`. On failure, reset from HOME and retry.
 //  If save=false: skip the hard save. On failure, reload from backup save and retry.
+//  SELECTED_RANGE skips the entry save and owns HOME resets for the range.
+//  DEFER_TO_SELECTED_RANGE lets an inner failure reach that outer retry loop.
 //  Throws a fatal error after too many consecutive failures.
 void checkpoint_reattempt_loop(
     SingleSwitchProgramEnvironment& env,
@@ -194,7 +200,8 @@ void checkpoint_reattempt_loop(
     AutoStoryStats& stats,
     std::function<void(size_t attempt_number)>&& action,
     bool save = true,
-    CheckpointSaveMode save_mode = CheckpointSaveMode::REAL
+    CheckpointSaveMode save_mode = CheckpointSaveMode::REAL,
+    CheckpointRetryScope retry_scope = CheckpointRetryScope::CHECKPOINT
 );
 
 // Forward the explicit checkpoint save mode selected by AutoStory's options.
@@ -204,7 +211,7 @@ inline void checkpoint_reattempt_loop(
     std::function<void(size_t attempt_number)>&& action, bool save = true
 ){
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
-        std::move(action), save, options.checkpoint_save_mode);
+        std::move(action), save, options.checkpoint_save_mode, options.checkpoint_retry_scope);
 }
 
 //  Execute every action in `actions` in order, repeated `times` times.
@@ -248,6 +255,21 @@ void mash_until_dialogue_ends(
     Milliseconds timeout = std::chrono::seconds(60)
 );
 
+// Scripted trainer battle: choose a 1-based move position each turn, then
+// confirm the default target with A and clear narration with B. No target steering.
+// A single position is reused for the whole battle. A list is consumed in
+// order, then its final position is reused. Empty lists and slots outside 1-4 fail.
+// post_battle_dialogue_cleanup must be chosen explicitly: false returns after
+// the completed battle-exit transition; true also clears post-fight NPC dialogue.
+// Examples:
+//   fight_trainer_using_moves(stream, context, 2, "Grunt", false);
+//   const std::vector<size_t> moves{2, 1, 3};
+//   fight_trainer_using_moves(stream, context, moves, "Gym leader", true);
+void fight_trainer_using_moves(VideoStream& stream, ProControllerContext& context,
+    size_t move, const std::string& label, bool post_battle_dialogue_cleanup);
+void fight_trainer_using_moves(VideoStream& stream, ProControllerContext& context,
+    const std::vector<size_t>& moves, const std::string& label, bool post_battle_dialogue_cleanup);
+
 // A full Bag screenshot with the desired item highlighted. Paths are relative
 // to RESOURCE_PATH(); quantities and selection borders are excluded.
 struct BagItemTemplate {
@@ -273,6 +295,13 @@ struct BagItemRowMatch {
 // Pocket positions 1-8: Medicine, Balls, Battle Items, Berries, Other Items,
 // TMs, Treasures, Key Items. Zero means the selected tab is uncertain.
 int bag_pocket_position(const ImageViewRGB32& frame);
+// Count normal, unobscured pocket icons; NEW badges prevent a tab match.
+size_t bag_clear_tab_count(const ImageViewRGB32& frame);
+// Open bag, scan with 250ms Down / 100ms rest (3s cumulative Down per pocket)
+// until all 8 tabs match,
+// then restore the top of the item list and close the bag.
+// Returns false after four bounded pocket passes.
+bool clear_new_item_flags(VideoStream& stream, ProControllerContext& context, int num_icons=8);
 bool bag_list_is_empty(const ImageViewRGB32& frame);
 int bag_cursor_position(const ImageViewRGB32& frame);
 std::array<BagItemRowMatch, 7> match_bag_item_rows(
@@ -328,11 +357,13 @@ void align_and_enter_jubilife_center(VideoStream& stream, ProControllerContext& 
 
 //  Open the bag, navigate to the repel compartment tab, and use a repel.
 //  Returns false if the repel compartment tab could not be found.
-//  num_icons: 5 (early-game layout) or 8 (late-game layout).
+//  num_icons: early/late menu layout (preserved for existing callers).
+//  repel_type: 0=Repel, 1=Super Repel, 2=Max Repel. English item names.
 bool activate_repel(
     VideoStream& stream,
     ProControllerContext& context,
-    int num_icons = 8
+    int num_icons = 8,
+    int repel_type = 0
 );
 
 //  Press A until the any HM selection arrow appears, confirm with A, then mash B for 3 s.
