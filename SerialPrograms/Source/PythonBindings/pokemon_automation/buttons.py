@@ -9,9 +9,9 @@ Everything a caller types to describe an input is parsed here:
   "UP-RIGHT", "UPRIGHT"). Listing "UP" and "RIGHT" together also means up-right.
 - Combinations: a list (["L", "R"]) or a "+"-joined string ("L+R", "ZL+A").
 - Joystick positions: an (x, y) pair in [-1, 1] with +x = right and +y = up.
-  `parse_stick()` additionally accepts a direction name ("up", "down_left", ...) and
-  "neutral"/"center" for convenience; `parse_stick_position()` (used by
-  push_left_joystick() / push_right_joystick()) accepts only the (x, y) pair.
+  push_left_joystick() / push_right_joystick() take the x and y numbers directly;
+  `parse_stick()` (used for `controller_state()`'s left/right) additionally accepts
+  a direction name ("up", "down_left", ...) and "neutral"/"center" for convenience.
 
 The button bit values match `NintendoSwitch::Button` and the d-pad values
 match `NintendoSwitch::DpadPosition` in
@@ -97,13 +97,6 @@ StickArg = str | Sequence[float] | None
 StickArg
 - Accepts a direction name ("up", "down_left", "neutral") or an (x, y) pair. 
 - validated by `parse_stick()`
-"""
-
-StickCoords = Sequence[float]
-"""
-StickCoords
-- A strict (x, y) pair in [-1, 1], no direction names.
-- validated by `parse_stick_position()` (used by push_left_joystick() / push_right_joystick())
 """
 
 
@@ -216,7 +209,7 @@ def parse_stick(position: StickArg) -> tuple[float, float]:
     return _parse_stick_pair(position)
 
 
-def _parse_stick_pair(values: StickCoords) -> tuple[float, float]:
+def _parse_stick_pair(values: Sequence[float]) -> tuple[float, float]:
     """Parse an (x, y) pair into floats in [-1, 1]. Raises ValueError otherwise."""
     values = list(values)
     if len(values) != 2:
@@ -225,23 +218,6 @@ def _parse_stick_pair(values: StickCoords) -> tuple[float, float]:
     if not (-1.0 <= x <= 1.0 and -1.0 <= y <= 1.0):
         raise ValueError(f"Stick coordinates must be within [-1, 1], got ({x}, {y}).")
     return (x, y)
-
-
-def parse_stick_position(position: StickCoords) -> tuple[float, float]:
-    """Parse a strict (x, y) joystick position, as used by push_left_joystick() /
-    push_right_joystick().
-
-    Unlike `parse_stick()`, direction names (and None) are not allowed: pass an
-    (x, y) pair in [-1, 1] with +x = right and +y = up.
-    """
-    if position is None:
-        raise ValueError("joystick_position must be an (x, y) pair, got None.")
-    if isinstance(position, str):
-        raise ValueError(
-            f"joystick_position must be an (x, y) pair, not a string (got {position!r}). "
-            "Direction names are not accepted here."
-        )
-    return _parse_stick_pair(position)
 
 
 def check_against_core(core_buttons: dict[str, int], core_dpad: dict[str, int]) -> None:

@@ -9,7 +9,6 @@
 
 #include <stdint.h>
 #include <string>
-#include <tuple>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -123,27 +122,21 @@ public:
 
     //  Equivalent to `pbf_move_left_joystick()`: move the left joystick towards a
     //  2D direction.
-    //  joystick_position: (x, y) in [-1.0, 1.0] with +x = right and +y = up.
+    //  x, y: in [-1.0, 1.0] with +x = right and +y = up.
     //  delay_ms: how long to wait before the next command may start, milliseconds.
     //  hold_ms: how long the joystick is pushed, milliseconds.
     //  release_ms: how long the joystick stays released before the same joystick can
     //  be used again, milliseconds.
-    void push_left_joystick(
-        const std::tuple<double, double>& joystick_position,
-        uint64_t delay_ms, uint64_t hold_ms, uint64_t release_ms
-    );
+    void push_left_joystick(double x, double y, uint64_t delay_ms, uint64_t hold_ms, uint64_t release_ms);
 
     //  Equivalent to `pbf_move_right_joystick()`: move the right joystick towards a
     //  2D direction.
-    //  joystick_position: (x, y) in [-1.0, 1.0] with +x = right and +y = up.
+    //  x, y: in [-1.0, 1.0] with +x = right and +y = up.
     //  delay_ms: how long to wait before the next command may start, milliseconds.
     //  hold_ms: how long the joystick is pushed, milliseconds.
     //  release_ms: how long the joystick stays released before the same joystick can
     //  be used again, milliseconds.
-    void push_right_joystick(
-        const std::tuple<double, double>& joystick_position,
-        uint64_t delay_ms, uint64_t hold_ms, uint64_t release_ms
-    );
+    void push_right_joystick(double x, double y, uint64_t delay_ms, uint64_t hold_ms, uint64_t release_ms);
 
     //  Equivalent to `pbf_controller_state()`: set the entire controller state at
     //  once and hold it for `duration_ms`. Everything not specified is released.

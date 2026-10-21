@@ -67,11 +67,11 @@ class FakeController:
     def push_dpad(self, dpad_position: int, delay_ms: int, hold_ms: int, release_ms: int) -> None:
         self._record("push_dpad", dpad_position, delay_ms, hold_ms, release_ms)
 
-    def push_left_joystick(self, joystick_position: tuple[float, float], delay_ms: int, hold_ms: int, release_ms: int) -> None:
-        self._record("push_left_joystick", joystick_position, delay_ms, hold_ms, release_ms)
+    def push_left_joystick(self, x: float, y: float, delay_ms: int, hold_ms: int, release_ms: int) -> None:
+        self._record("push_left_joystick", x, y, delay_ms, hold_ms, release_ms)
 
-    def push_right_joystick(self, joystick_position: tuple[float, float], delay_ms: int, hold_ms: int, release_ms: int) -> None:
-        self._record("push_right_joystick", joystick_position, delay_ms, hold_ms, release_ms)
+    def push_right_joystick(self, x: float, y: float, delay_ms: int, hold_ms: int, release_ms: int) -> None:
+        self._record("push_right_joystick", x, y, delay_ms, hold_ms, release_ms)
 
     def controller_state(
         self,

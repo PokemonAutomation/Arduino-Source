@@ -248,18 +248,16 @@ PYBIND11_MODULE(_pa_core, m){
              "`release_ms` have the same meaning as in push_button().",
              py::call_guard<py::gil_scoped_release>())
         .def("push_left_joystick", &PybindSwitchProController::push_left_joystick,
-             py::arg("joystick_position"), py::arg("delay_ms"), py::arg("hold_ms"), py::arg("release_ms"),
+             py::arg("x"), py::arg("y"), py::arg("delay_ms"), py::arg("hold_ms"), py::arg("release_ms"),
              "Like pbf_move_left_joystick(), with an extra `delay_ms`: queue the left stick "
-             "being held at `joystick_position` (an (x, y) tuple in [-1.0, 1.0] with +x = "
-             "right and +y = up). `delay_ms` / `hold_ms` / `release_ms` have the same "
-             "meaning as in push_button().",
+             "being held at (x, y), in [-1.0, 1.0] with +x = right and +y = up. `delay_ms` / "
+             "`hold_ms` / `release_ms` have the same meaning as in push_button().",
              py::call_guard<py::gil_scoped_release>())
         .def("push_right_joystick", &PybindSwitchProController::push_right_joystick,
-             py::arg("joystick_position"), py::arg("delay_ms"), py::arg("hold_ms"), py::arg("release_ms"),
+             py::arg("x"), py::arg("y"), py::arg("delay_ms"), py::arg("hold_ms"), py::arg("release_ms"),
              "Like pbf_move_right_joystick(), with an extra `delay_ms`: queue the right "
-             "stick being held at `joystick_position` (an (x, y) tuple in [-1.0, 1.0] with "
-             "+x = right and +y = up). `delay_ms` / `hold_ms` / `release_ms` have the same "
-             "meaning as in push_button().",
+             "stick being held at (x, y), in [-1.0, 1.0] with +x = right and +y = up. "
+             "`delay_ms` / `hold_ms` / `release_ms` have the same meaning as in push_button().",
              py::call_guard<py::gil_scoped_release>())
         .def("controller_state", &PybindSwitchProController::controller_state,
              py::arg("button_bitfield"), py::arg("dpad_position"),

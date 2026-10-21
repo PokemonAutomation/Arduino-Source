@@ -111,29 +111,19 @@ def test_controller_state_mixed_combination():
 
 
 def test_push_left_joystick():
-    """A stick (x, y) pair is forwarded to push_left_joystick as a single joystick_position tuple with delay = hold + release."""
+    """Separate x, y arguments are forwarded to push_left_joystick with delay = hold + release."""
     sw, fake = make()
-    sw.push_left_joystick((0.0, 1.0), hold_ms=1500)
-    (joystick_position, delay, hold, release), = fake.arguments("push_left_joystick")
-    assert joystick_position == (0.0, 1.0) and hold == 1500 and delay == 1500 + release
-
-
-def test_push_left_joystick_rejects_string():
-    """push_left_joystick() does not accept direction-name strings, only (x, y) coordinates."""
-    sw, fake = make()
-    with pytest.raises(ValueError, match="joystick_position"):
-        sw.push_left_joystick("up")
-    with pytest.raises(ValueError):
-        sw.push_left_joystick(None)
-    assert fake.commands() == []
+    sw.push_left_joystick(0.0, 1.0, hold_ms=1500)
+    (x, y, delay, hold, release), = fake.arguments("push_left_joystick")
+    assert (x, y) == (0.0, 1.0) and hold == 1500 and delay == 1500 + release
 
 
 def test_push_right_joystick():
-    """A raw [x, y] stick position is forwarded to push_right_joystick with the requested hold and release."""
+    """x, y are forwarded to push_right_joystick with the requested hold and release."""
     sw, fake = make()
-    sw.push_right_joystick([0.5, -0.5], hold_ms=300, release_ms=100)
-    (joystick_position, delay, hold, release), = fake.arguments("push_right_joystick")
-    assert joystick_position == (0.5, -0.5) and hold == 300 and release == 100 and delay == 400
+    sw.push_right_joystick(0.5, -0.5, hold_ms=300, release_ms=100)
+    (x, y, delay, hold, release), = fake.arguments("push_right_joystick")
+    assert (x, y) == (0.5, -0.5) and hold == 300 and release == 100 and delay == 400
 
 
 def test_controller_state_combination():

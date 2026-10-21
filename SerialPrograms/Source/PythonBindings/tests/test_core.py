@@ -72,6 +72,13 @@ def test_unreachable_port():
     # Commands on a not-ready controller raise RuntimeError, they do not crash.
     with pytest.raises(RuntimeError):
         c.push_button(core.BUTTONS["A"], 0, 10, 10)
+
+
+def test_push_joystick_rejects_string():
+    """The module's x/y arguments are numbers: a direction-name string is rejected with TypeError."""
+    c = core.Controller("nonexistent-port-xyz")
+    with pytest.raises(TypeError):
+        c.push_left_joystick("up", 0.0, 0, 10, 0)
     # These are safe no-ops when not ready.
     c.wait_for_all_requests()
     assert c.cancel_all_and_wait(100) is False

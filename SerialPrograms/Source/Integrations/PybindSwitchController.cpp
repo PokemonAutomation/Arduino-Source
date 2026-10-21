@@ -178,30 +178,24 @@ void PybindSwitchProController::push_dpad(uint8_t dpad_position, uint64_t delay_
         (DpadPosition)dpad_position
     );
 }
-void PybindSwitchProController::push_left_joystick(
-    const std::tuple<double, double>& joystick_position,
-    uint64_t delay_ms, uint64_t hold_ms, uint64_t release_ms
-){
+void PybindSwitchProController::push_left_joystick(double x, double y, uint64_t delay_ms, uint64_t hold_ms, uint64_t release_ms){
     PybindSwitchProControllerInternal* internal = (PybindSwitchProControllerInternal*)m_internals;
     internal->controller().issue_left_joystick(
         nullptr,
         Milliseconds(delay_ms),
         Milliseconds(hold_ms),
         Milliseconds(release_ms),
-        JoystickPosition(std::get<0>(joystick_position), std::get<1>(joystick_position))
+        JoystickPosition(x, y)
     );
 }
-void PybindSwitchProController::push_right_joystick(
-    const std::tuple<double, double>& joystick_position,
-    uint64_t delay_ms, uint64_t hold_ms, uint64_t release_ms
-){
+void PybindSwitchProController::push_right_joystick(double x, double y, uint64_t delay_ms, uint64_t hold_ms, uint64_t release_ms){
     PybindSwitchProControllerInternal* internal = (PybindSwitchProControllerInternal*)m_internals;
     internal->controller().issue_right_joystick(
         nullptr,
         Milliseconds(delay_ms),
         Milliseconds(hold_ms),
         Milliseconds(release_ms),
-        JoystickPosition(std::get<0>(joystick_position), std::get<1>(joystick_position))
+        JoystickPosition(x, y)
     );
 }
 void PybindSwitchProController::controller_state(

@@ -19,7 +19,7 @@ Quick start:
     with SwitchController("/dev/cu.usbserial-0001") as sw:
         sw.push_button("A")
         sw.push_dpad("up+right")
-        sw.push_left_joystick((0.0, 1.0), hold_ms=1500)
+        sw.push_left_joystick(0.0, 1.0, hold_ms=1500)
         sw.wait_for_all_requests()
 """
 
@@ -32,7 +32,6 @@ from .buttons import (
     check_against_core,
     parse_buttons,
     parse_stick,
-    parse_stick_position,
 )
 from .controller import SwitchController
 from .devices import list_serial_ports
@@ -50,7 +49,6 @@ __all__ = [
     "list_serial_ports",
     "parse_buttons",
     "parse_stick",
-    "parse_stick_position",
 ]
 
 __version__ = "0.1.0"
