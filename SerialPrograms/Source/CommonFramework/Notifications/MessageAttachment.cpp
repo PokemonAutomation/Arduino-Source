@@ -4,8 +4,7 @@
  *
  */
 
-#include <QDir>
-#include <QFile>
+#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -39,16 +38,14 @@ PendingFileSend::~PendingFileSend(){
         return;
     }
 
-    QFile file(QString::fromStdString(m_filepath));
-    file.remove();
+    Filesystem::remove(Filesystem::Path(m_filepath));
 }
 PendingFileSend::PendingFileSend(const std::string& file, bool keep_file)
     : m_keep_file(keep_file)
     , m_extend_lifetime(false)
     , m_filepath(file)
 {
-    QFileInfo info(QString::fromStdString(file));
-    m_filename = info.fileName().toStdString();
+    m_filename = Filesystem::Path(file).filename().string();
 }
 PendingFileSend::PendingFileSend(Logger& logger, const ImageAttachment& image)
     : m_keep_file(image.keep_file)
@@ -80,7 +77,7 @@ PendingFileSend::PendingFileSend(Logger& logger, const ImageAttachment& image)
         m_filepath = SCREENSHOTS_PATH() + m_filename;
     }else{
         m_filepath = GlobalSettings::instance().TEMP_FOLDER;
-        QDir().mkdir(QString::fromStdString(m_filepath));
+        Filesystem::create_directories(Filesystem::Path(m_filepath));
         m_filepath += m_filename;
     }
 

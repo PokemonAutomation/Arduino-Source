@@ -4,7 +4,7 @@
  *
  */
 
-#include <QDir>
+#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
@@ -101,9 +101,8 @@ void GenerateNameOCRDataPokedex::dump_images(
     std::string path = "PokemonNameOCR/";
     path += language_data(LANGUAGE).code;
 
-    QDir dir(QString::fromStdString(path));
-    if (!dir.exists()){
-        dir.mkpath(".");
+    if (!Filesystem::exists(Filesystem::Path(path))){
+        Filesystem::create_directories(Filesystem::Path(path));
     }
 
     path += "/";

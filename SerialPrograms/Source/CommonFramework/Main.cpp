@@ -137,8 +137,8 @@ int run_program(int argc, char *argv[]){
 //    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 //#endif
 
-    QDir().mkpath(QString::fromStdString(SETTINGS_PATH()));
-    QDir().mkpath(QString::fromStdString(SCREENSHOTS_PATH()));
+    Filesystem::create_directories(Filesystem::Path(SETTINGS_PATH()));
+    Filesystem::create_directories(Filesystem::Path(SCREENSHOTS_PATH()));
 
 
 

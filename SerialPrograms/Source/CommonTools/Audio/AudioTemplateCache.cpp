@@ -4,9 +4,8 @@
  *
  */
 
-#include <QFileInfo>
-#include <QString>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
@@ -33,7 +32,7 @@ const AudioTemplate* AudioTemplateCache::get_nothrow_internal(const std::string&
     }
 
     std::string full_path = full_path_no_ext + ".wav";
-    if (!QFileInfo::exists(QString::fromStdString(full_path))){
+    if (!Filesystem::exists(Filesystem::Path(full_path))){
         full_path = full_path_no_ext + ".mp3";
     }
 

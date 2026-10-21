@@ -4,7 +4,7 @@
  *
  */
 
-#include <QDir>
+#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -71,9 +71,8 @@ void GenerateIVCheckerOCR::program(SingleSwitchProgramEnvironment& env, ProContr
     std::string path = "IVCheckerOCR/";
     path += language_data(LANGUAGE).code;
 
-    QDir dir(QString::fromStdString(path));
-    if (!dir.exists()){
-        dir.mkpath(".");
+    if (!Filesystem::exists(Filesystem::Path(path))){
+        Filesystem::create_directories(Filesystem::Path(path));
     }
     path += "/";
 

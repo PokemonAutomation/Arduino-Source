@@ -10,13 +10,14 @@
 #include <vector>
 #include <deque>
 #include <QIODevice>
-#include <QFile>
 #include <QAudioFormat>
 #include <QAudioBuffer>
 #include <QThread>
 #include <QMediaCaptureSession>
 #include <QMediaRecorder>
 #include "Common/Cpp/LifetimeSanitizer.h"
+#include "Common/Cpp/Filesystem/FileIO.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
@@ -83,13 +84,13 @@ public:
 
     bool write(Logger& logger, const std::string& filename) const{
 //        cout << "write()" << endl;
-        QFile file(QString::fromStdString(filename));
-        if (!file.open(QFile::WriteOnly)){
+        FileIO file(Filesystem::Path(filename), FileMode::WRITE);
+        if (!file.is_open()){
             logger.log("Failed to write file: " + filename, COLOR_RED);
             return false;
         }
         for (const std::vector<char>& block : m_blocks){
-            if ((size_t)file.write(block.data(), block.size()) != block.size()){
+            if (file.write(block.data(), block.size()) != block.size()){
                 logger.log("Failed to write file: " + filename, COLOR_RED);
                 return false;
             }

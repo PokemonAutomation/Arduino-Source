@@ -4,8 +4,8 @@
  *
  */
 
-#include <QFile>
-#include <QSaveFile>
+#include "Common/Cpp/Filesystem/FileIO.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Time.h"
 #include "StatsDatabase.h"
 
@@ -135,19 +135,18 @@ std::string StatSet::to_str() const{
 }
 
 void StatSet::save_to_file(const std::string& filepath){
-    QFile file(QString::fromStdString(filepath));
-    if (file.open(QIODevice::WriteOnly)){
+    FileIO file(Filesystem::Path(filepath), FileMode::WRITE);
+    if (file.is_open()){
         std::string data = to_str();
-        file.write(data.c_str(), data.size());
+        file.write(data);
     }
 }
 void StatSet::open_from_file(const std::string& filepath){
-    QFile file(QString::fromStdString(filepath));
-    if (!file.open(QIODevice::ReadOnly)){
+    std::string str;
+    if (!file_to_string(filepath, str)){
         return;
     }
 
-    std::string str = file.readAll().data();
     load_from_string(str.c_str());
 }
 
@@ -156,11 +155,10 @@ bool StatSet::update_file(
     const std::string& identifier,
     StatsTracker& tracker
 ){
-    QFile file(QString::fromStdString(filepath));
-    while (!file.open(QIODevice::ReadWrite)){
+    std::string data;
+    if (!file_to_string(filepath, data)){
         return false;
     }
-    std::string data = file.readAll().data();
 
     StatSet set;
     set.load_from_string(data.c_str());
@@ -168,11 +166,12 @@ bool StatSet::update_file(
     set[identifier] += tracker;
 
     data = set.to_str();
-    file.seek(0);
-    file.write(data.c_str(), data.size());
-    file.resize(data.size());
+    FileIO file(Filesystem::Path(filepath), FileMode::WRITE);
+    if (!file.is_open()){
+        return false;
+    }
 
-    return true;
+    return file.write(data.data(), data.size()) == data.size();
 }
 
 

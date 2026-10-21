@@ -10,7 +10,6 @@
 #define PokemonAutomation_StreamHistoryTracker_RecordOnTheFly_H
 
 #include <QCoreApplication>
-#include <QFileInfo>
 #include <QUrl>
 #include <QAudioBufferInput>
 #include <QVideoFrameInput>
@@ -18,6 +17,7 @@
 #include <QMediaRecorder>
 #include <QMediaCaptureSession>
 #include "Common/Cpp/LifetimeSanitizer.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinPause.h"
@@ -143,10 +143,12 @@ StreamHistoryTracker::StreamHistoryTracker(
     );
 #endif
 
-    QFileInfo file(QString::fromStdString("capture-" + now_to_filestring() + ".mp4"));
 #if 1
+    const std::string capture_filename = "capture-" + now_to_filestring() + ".mp4";
     m_recorder.setOutputLocation(
-        QUrl::fromLocalFile(file.absoluteFilePath())
+        QUrl::fromLocalFile(QString::fromStdString(
+            Filesystem::absolute(Filesystem::Path(capture_filename)).string_slash_normalized()
+        ))
     );
 #else
     m_recorder.setOutputDevice(&m_stream);
