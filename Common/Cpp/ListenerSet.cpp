@@ -78,6 +78,7 @@ struct TestListener{
 //
 struct BlockingListener{
     std::atomic<bool> entered{false};
+    std::atomic<bool> finished{false};
     std::atomic<bool> release{false};
 
     void ping(){
@@ -85,6 +86,10 @@ struct BlockingListener{
         while (!release.load(std::memory_order_acquire)){
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
+        //  Set inside the callback, before the node's lock is released:
+        //  any remove() that returns has waited on that lock, so it is
+        //  guaranteed to observe a finished callback.
+        finished.store(true, std::memory_order_release);
     }
 };
 
@@ -341,12 +346,8 @@ public:
         ListenerSet<BlockingListener> set(true);
         set.add(b);
 
-        std::atomic<bool> callback_done{false};
-        std::atomic<bool> callback_done_when_remove_returned{false};
-
         std::thread runner([&]{
             set.run_method(&BlockingListener::ping);
-            callback_done.store(true, std::memory_order_release);
         });
         while (!b.entered.load(std::memory_order_acquire)){
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -355,10 +356,6 @@ public:
         //  remove() must block until the running callback finishes.
         std::thread remover([&]{
             set.remove(b);
-            callback_done_when_remove_returned.store(
-                callback_done.load(std::memory_order_acquire),
-                std::memory_order_release
-            );
         });
 
         //  Give the remover time to start and block on the node's lock.
@@ -368,7 +365,7 @@ public:
             "the listener should still be registered while remove() waits for its callback"
         );
         c.expect(
-            !callback_done.load(std::memory_order_acquire),
+            !b.finished.load(std::memory_order_acquire),
             "the callback should still be running"
         );
 
@@ -376,8 +373,11 @@ public:
         runner.join();
         remover.join();
 
+        //  remove() can only acquire the node's lock after the callback
+        //  released it, and "finished" is stored inside the callback,
+        //  so by the time remove() returns the callback has completed.
         c.expect(
-            callback_done_when_remove_returned.load(std::memory_order_acquire),
+            b.finished.load(std::memory_order_acquire),
             "remove() should only return after the callback finished"
         );
         c.expect(set.empty(), "the set should be empty after remove()");
