@@ -525,6 +525,7 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/AudioPipeline/Spectrum/AudioSpectrumHolder.h
     Source/CommonFramework/AudioPipeline/Spectrum/FFTStreamer.cpp
     Source/CommonFramework/AudioPipeline/Spectrum/FFTStreamer.h
+    Source/CommonFramework/AudioPipeline/Spectrum/FFTStreamer_Tests.cpp
     Source/CommonFramework/AudioPipeline/Spectrum/Spectrograph.cpp
     Source/CommonFramework/AudioPipeline/Spectrum/Spectrograph.h
     Source/CommonFramework/AudioPipeline/Tools/AudioFormatUtils.cpp
