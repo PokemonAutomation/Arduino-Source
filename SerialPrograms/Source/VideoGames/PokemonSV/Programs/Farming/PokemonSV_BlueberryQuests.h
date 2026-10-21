@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_BlueberryQuests_H
 #define PokemonAutomation_PokemonSV_BlueberryQuests_H
 
+#include <optional>
 #include <vector>
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
@@ -80,6 +81,52 @@ BBQuestPlan plan_quests(
     const BBQOption& BBQ_OPTIONS,
     const std::vector<BBQuests>& quest_list,
     uint8_t eggs_hatched
+);
+
+//The steps of rerolling one quest on the quest panel. They are injected so that the reroll
+//(which quest it pays for, when it gives up) runs in tests without a Switch.
+class BBQRerollActions{
+public:
+    virtual ~BBQRerollActions() = default;
+
+    //Open the quest panel from the overworld. Returns false if it did not open.
+    virtual bool open_panel() = 0;
+
+    //Press A on the quest under the cursor, which opens its reroll menu. Returns the slot of
+    //the quest the menu opened next to, or nothing if no menu was seen.
+    virtual std::optional<size_t> open_reroll_menu() = 0;
+
+    //Close the reroll menu without rerolling.
+    virtual void close_reroll_menu() = 0;
+
+    //Move the cursor down this many slots, or up if negative.
+    virtual void move_cursor(int slots) = 0;
+
+    //Choose to reroll in the open menu. This spends BP.
+    virtual void confirm_reroll() = 0;
+
+    //Close the quest panel and return to the overworld.
+    virtual void close_panel() = 0;
+
+    //Open the quest panel and read the quests on it, as read_quests() does.
+    virtual std::vector<BBQuests> read_quests() = 0;
+};
+
+enum class BBQRerollResult{
+    Rerolled,       //The quest in the slot was replaced.
+    PanelNotOpened, //Nothing was spent.
+    MenuNotFound,   //Nothing was spent.
+    NotReplaced,    //The reroll was confirmed, but the slot still shows the same quest.
+};
+
+//Reroll the quest in `slot` of `quests`, the quests last read from the panel. Only pays once
+//the reroll menu is open next to that slot, then reads the panel again to check the quest was
+//replaced. On Rerolled, `quests[slot]` is updated to the new quest.
+BBQRerollResult reroll_quest(
+    Logger& logger,
+    BBQRerollActions& actions,
+    std::vector<BBQuests>& quests,
+    size_t slot
 );
 
 //Determine which quests are possible and which quests are not. (ex. no eggs, reroll egg hatcher.)

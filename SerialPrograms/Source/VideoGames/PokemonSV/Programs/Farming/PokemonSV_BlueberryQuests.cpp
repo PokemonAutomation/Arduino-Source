@@ -22,6 +22,7 @@
 #include "VideoGames/PokemonSV/PokemonSV_Settings.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "VideoGames/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
+#include "VideoGames/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "VideoGames/PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "VideoGames/PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
 #include "VideoGames/PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
@@ -271,8 +272,8 @@ bool plan_from_exclusions(
     return quest_in_table;
 }
 
-//Open the quest panel from the overworld, with the cursor on the top quest.
-void open_quest_panel(VideoStream& stream, ProControllerContext& context){
+//Open the quest panel from the overworld. Returns false if it did not open.
+bool open_quest_panel(VideoStream& stream, ProControllerContext& context){
     WhiteButtonWatcher panel(COLOR_BLUE, WhiteButton::ButtonB, {0.484, 0.117, 0.022, 0.037});
     int result = run_until<ProControllerContext>(
         stream, context,
@@ -289,29 +290,102 @@ void open_quest_panel(VideoStream& stream, ProControllerContext& context){
         stream.log("Found quest panel.");
     }
     context.wait_for_all_requests();
+    return result == 0;
 }
+
+class ConsoleBBQRerollActions : public BBQRerollActions{
+public:
+    ConsoleBBQRerollActions(
+        const ProgramInfo& info,
+        VideoStream& stream, ProControllerContext& context,
+        const BBQOption& BBQ_OPTIONS
+    )
+        : m_info(info), m_stream(stream), m_context(context), m_options(BBQ_OPTIONS)
+    {}
+
+    virtual bool open_panel() override{
+        return open_quest_panel(m_stream, m_context);
+    }
+    virtual std::optional<size_t> open_reroll_menu() override{
+        //The menu opens next to the quest, with an arrow on its top choice. Slots are 0.177
+        //apart; the boxes for the top 3 slots were checked on a Switch, the 4th is spaced
+        //the same way.
+        GradientArrowWatcher slot0(COLOR_RED, GradientArrowType::RIGHT, {0.475, 0.218, 0.070, 0.095});
+        GradientArrowWatcher slot1(COLOR_RED, GradientArrowType::RIGHT, {0.475, 0.395, 0.070, 0.095});
+        GradientArrowWatcher slot2(COLOR_RED, GradientArrowType::RIGHT, {0.475, 0.572, 0.070, 0.095});
+        GradientArrowWatcher slot3(COLOR_RED, GradientArrowType::RIGHT, {0.475, 0.749, 0.070, 0.095});
+        pbf_press_button(m_context, BUTTON_A, 160ms, 400ms);
+        m_context.wait_for_all_requests();
+        int ret = wait_until(
+            m_stream, m_context, std::chrono::seconds(3),
+            {slot0, slot1, slot2, slot3}
+        );
+        if (ret < 0){
+            return std::nullopt;
+        }
+        return (size_t)ret;
+    }
+    virtual void close_reroll_menu() override{
+        pbf_press_button(m_context, BUTTON_B, 160ms, 400ms);
+        m_context.wait_for_all_requests();
+    }
+    virtual void move_cursor(int slots) override{
+        for (int i = 0; i < std::abs(slots); i++){
+            pbf_press_dpad(m_context, slots > 0 ? DPAD_DOWN : DPAD_UP, 160ms, 160ms);
+            pbf_wait(m_context, 800ms);
+        }
+        m_context.wait_for_all_requests();
+    }
+    virtual void confirm_reroll() override{
+        pbf_press_button(m_context, BUTTON_A, 160ms, 400ms);
+        pbf_wait(m_context, 800ms);
+        m_context.wait_for_all_requests();
+    }
+    virtual void close_panel() override{
+        press_Bs_to_back_to_overworld(m_info, m_stream, m_context);
+    }
+    virtual std::vector<BBQuests> read_quests() override{
+        return PokemonSV::read_quests(m_info, m_stream, m_context, m_options);
+    }
+
+private:
+    const ProgramInfo& m_info;
+    VideoStream& m_stream;
+    ProControllerContext& m_context;
+    const BBQOption& m_options;
+};
 
 void reroll_slot(
     const ProgramInfo& info,
     VideoStream& stream, ProControllerContext& context,
+    const BBQOption& BBQ_OPTIONS,
+    std::vector<BBQuests>& quest_list,
     size_t slot
 ){
-    open_quest_panel(stream, context);
-
-    //Move cursor down to quest
-    for (size_t i = 0; i < slot; i++){
-        pbf_press_dpad(context, DPAD_DOWN, 160ms, 160ms);
-        pbf_wait(context, 800ms);
-        context.wait_for_all_requests();
+    ConsoleBBQRerollActions actions(info, stream, context, BBQ_OPTIONS);
+    switch (reroll_quest(stream.logger(), actions, quest_list, slot)){
+    case BBQRerollResult::Rerolled:
+        return;
+    case BBQRerollResult::PanelNotOpened:
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
+            "Unable to open the quest panel to reroll a quest.",
+            stream
+        );
+    case BBQRerollResult::MenuNotFound:
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
+            "Unable to open the reroll menu for quest " + std::to_string(slot + 1) + ". No BP was spent.",
+            stream
+        );
+    case BBQRerollResult::NotReplaced:
+        //Most likely out of BP, which is not a program error.
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::NO_ERROR_REPORT,
+            "Quest " + std::to_string(slot + 1) + " was not replaced after rerolling it. Check that there is enough BP.",
+            stream
+        );
     }
-
-    //Reroll
-    pbf_press_button(context, BUTTON_A, 160ms, 400ms);
-    pbf_press_button(context, BUTTON_A, 160ms, 400ms);
-    pbf_wait(context, 800ms);
-    context.wait_for_all_requests();
-
-    press_Bs_to_back_to_overworld(info, stream, context);
 }
 
 //This does not handle out of BP.
@@ -335,6 +409,54 @@ void reroll_all_slots(
     press_Bs_to_back_to_overworld(info, stream, context);
 }
 
+}
+
+BBQRerollResult reroll_quest(
+    Logger& logger,
+    BBQRerollActions& actions,
+    std::vector<BBQuests>& quests,
+    size_t slot
+){
+    if (!actions.open_panel()){
+        return BBQRerollResult::PanelNotOpened;
+    }
+
+    //The cursor is not always on the top quest when the panel opens; it can be left where it
+    //was. So open the menu wherever the cursor is, see which quest it opened next to, and move
+    //from there. Moving can drop a press, so this is tried a few times.
+    bool menu_on_slot = false;
+    for (int attempt = 0; attempt < 3 && !menu_on_slot; attempt++){
+        std::optional<size_t> menu_slot = actions.open_reroll_menu();
+        if (!menu_slot){
+            //Without a menu, B would close the panel instead, so stop here.
+            break;
+        }
+        if (*menu_slot == slot){
+            menu_on_slot = true;
+            break;
+        }
+        logger.log("Reroll menu opened on quest " + std::to_string(*menu_slot + 1) + ". Moving to quest " + std::to_string(slot + 1) + ".");
+        actions.close_reroll_menu();
+        actions.move_cursor((int)slot - (int)*menu_slot);
+    }
+    if (!menu_on_slot){
+        actions.close_panel();
+        return BBQRerollResult::MenuNotFound;
+    }
+    actions.confirm_reroll();
+    actions.close_panel();
+
+    //A read can miss the quest in the slot, so read up to 3 times before deciding it is
+    //still the old quest.
+    for (int read = 0; read < 3; read++){
+        std::vector<BBQuests> after = actions.read_quests();
+        if (slot < after.size() && after[slot] != quests[slot] && after[slot] != BBQuests::UnableToDetect){
+            logger.log("Quest " + std::to_string(slot + 1) + " rerolled.");
+            quests[slot] = after[slot];
+            return BBQRerollResult::Rerolled;
+        }
+    }
+    return BBQRerollResult::NotReplaced;
 }
 
 BBQuestPlan plan_quests(
@@ -381,7 +503,7 @@ std::vector<BBQuests> process_quest_list(
     BBQuestPlan plan = plan_quests(stream.logger(), BBQ_OPTIONS, quest_list, eggs_hatched);
 
     for (size_t slot : plan.reroll_slots){
-        reroll_slot(info, stream, context, slot);
+        reroll_slot(info, stream, context, BBQ_OPTIONS, quest_list, slot);
     }
     if (plan.reroll_all){
         stream.log("No possible quests! Rerolling all quests.");
