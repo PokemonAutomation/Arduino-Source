@@ -20,9 +20,11 @@ namespace PokemonBDSP{
 ShortDialogDetector::ShortDialogDetector(Color color)
     : m_color(color)
 //    , m_bottom(0.50, 0.91, 0.29, 0.05)
-    , m_left_white(0.21, 0.835, 0.008, 0.12)
+    // Preserve the established inner-margin samples. detect() checks an
+    // alternate blank margin when a long Gardenia reward line overlaps one.
+    , m_left_white(0.221, 0.86, 0.002, 0.025)
     , m_left(0.18, 0.835, 0.02, 0.12)
-    , m_right_white(0.785, 0.835, 0.008, 0.12)
+    , m_right_white(0.798, 0.86, 0.002, 0.025)
     , m_right(0.822, 0.835, 0.02, 0.12)
 {}
 void ShortDialogDetector::make_overlays(VideoOverlaySet& items) const{
@@ -36,12 +38,16 @@ bool ShortDialogDetector::detect(const ImageViewRGB32& screen){
     ImageStats left_white = image_stats(extract_box_reference(screen, m_left_white));
 //    cout << left_white.average << left_white.stddev << endl;
     if (!is_white(left_white)){
-        return false;
+        left_white=image_stats(extract_box_reference(screen,ImageFloatBox{.208,.86,.002,.025}));
+        if (!is_white(left_white)) return false;
     }
     ImageStats right_white = image_stats(extract_box_reference(screen, m_right_white));
 //    cout << right_white.average << right_white.stddev << endl;
     if (!is_white(right_white)){
-        return false;
+        // Gardenia's opening reward line can reach this strip. Retain the
+        // same white test in a second blank margin, below that long line.
+        right_white=image_stats(extract_box_reference(screen,ImageFloatBox{.790,.915,.002,.025}));
+        if (!is_white(right_white)) return false;
     }
 //    ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
 //    if (!is_white(bottom)){

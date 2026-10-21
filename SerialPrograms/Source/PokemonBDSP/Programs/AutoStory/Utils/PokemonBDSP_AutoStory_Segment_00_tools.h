@@ -27,12 +27,25 @@ namespace PokemonAutomation {
             // Time / setup helpers
             // ---------------------------------------------------------------------------
 
+            // Shared visual alignment and dialogue cleanup used by story routes.
+            void clear_post_battle_dialogue(VideoStream& stream, ProControllerContext& context,
+                Button button = BUTTON_B, Milliseconds quiet_period = Milliseconds(3000),
+                const char* instruction_card = nullptr);
+            void align_to_overworld_landmarks(VideoStream& stream, ProControllerContext& context,
+                OverworldMatchResult (*matcher)(const ImageRGB32&), const std::string& label, bool allow_story_start = false, bool horizontal_first = false,
+                bool search_down_first = false,
+                OverworldMatchResult (*entry_matcher)(const ImageRGB32&) = nullptr,
+                bool* entry_detected = nullptr,
+                double arrival_tolerance_x = 0, double arrival_tolerance_y = 0,
+                double moderate_entry_confidence = 0);
+
             void verify_tutorial_settings(VideoStream& stream, ProControllerContext& context);
 
             void set_time_fast(
                 SingleSwitchProgramEnvironment& env,
                 ProControllerContext& context,
-                const DateTime& target
+                const DateTime& target,
+                bool preserve_date = false    // Keep current year/month/day; set only target time.
             );
 
             // ---------------------------------------------------------------------------
@@ -43,6 +56,10 @@ namespace PokemonAutomation {
                 VideoStream& stream,
                 ProControllerContext& context
             );
+
+            // Select the requested 1-based move slot using visual cursor confirmation.
+            void fight_trainer_using_move_slot(VideoStream& stream, ProControllerContext& context,
+                size_t move_slot, const std::string& label);
 
             void fight_tristan(
                 VideoStream& stream,

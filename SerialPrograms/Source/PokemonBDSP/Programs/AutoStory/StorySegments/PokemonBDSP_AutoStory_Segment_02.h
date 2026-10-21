@@ -42,7 +42,7 @@ public:
 };
 
 // start: first badge acquired
-// end:   second Gym Badge acquired (Eterna City)
+// end:   Floaroma central house exit, facing south, Repel inactive
 void checkpoint_0201(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
@@ -50,11 +50,12 @@ void checkpoint_0201(
     AutoStoryStats& stats
 );
 
+// Save/retry boundary at the central Floaroma house exit, matching 02.01 end.
 class AutoStory_checkpoint_0202 : public AutoStory_Checkpoint {
 public:
-    virtual std::string name()       const override;
+    virtual std::string name() const override;
     virtual std::string start_text() const override;
-    virtual std::string end_text()   const override;
+    virtual std::string end_text() const override;
     virtual void run_checkpoint(
         SingleSwitchProgramEnvironment& env,
         ProControllerContext& context,
@@ -63,14 +64,6 @@ public:
     ) const override;
 };
 
-// start: first badge acquired
-// end:   second Gym Badge acquired (Eterna City)
-void checkpoint_0202(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats
-);
 class AutoStory_checkpoint_0203 : public AutoStory_Checkpoint {
 public:
     virtual std::string name()       const override;
@@ -92,7 +85,6 @@ void checkpoint_0203(
     AutoStoryOptions options,
     AutoStoryStats& stats
 );
-
 class AutoStory_checkpoint_0204 : public AutoStory_Checkpoint {
 public:
     virtual std::string name()       const override;
@@ -131,6 +123,28 @@ public:
 // start: first badge acquired
 // end:   second Gym Badge acquired (Eterna City)
 void checkpoint_0205(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
+);
+
+class AutoStory_checkpoint_0206 : public AutoStory_Checkpoint {
+public:
+    virtual std::string name()       const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text()   const override;
+    virtual void run_checkpoint(
+        SingleSwitchProgramEnvironment& env,
+        ProControllerContext& context,
+        AutoStoryOptions options,
+        AutoStoryStats& stats
+    ) const override;
+};
+
+// start: first badge acquired
+// end:   second Gym Badge acquired (Eterna City)
+void checkpoint_0206(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
