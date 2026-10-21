@@ -13,6 +13,7 @@ core = pytest.importorskip("pokemon_automation._pa_core")
 
 
 def test_buttons_dict():
+    """The module's BUTTONS dict matches the C++ Button enum bit positions for a sample of buttons, including third-party controller bits."""
     # A sample of the C++ `NintendoSwitch::Button` enum, straight from the module.
     assert core.BUTTONS["A"] == 1 << 2
     assert core.BUTTONS["PLUS"] == 1 << 9
@@ -23,6 +24,7 @@ def test_buttons_dict():
 
 
 def test_dpad_positions_dict():
+    """The module's DPAD_POSITIONS dict matches the C++ DpadPosition enum order (0 = up, clockwise, 8 = none)."""
     assert core.DPAD_POSITIONS == {
         "UP": 0, "UP_RIGHT": 1, "RIGHT": 2, "DOWN_RIGHT": 3,
         "DOWN": 4, "DOWN_LEFT": 5, "LEFT": 6, "UP_LEFT": 7, "NONE": 8,
@@ -30,11 +32,13 @@ def test_dpad_positions_dict():
 
 
 def test_python_constants_match_cpp():
+    """The pure-Python constants in buttons.py agree with the C++-generated values in the module."""
     from pokemon_automation import buttons as btn
     btn.check_against_core(dict(core.BUTTONS), dict(core.DPAD_POSITIONS))
 
 
 def test_log_functions():
+    """log() lines are retrievable through recent_logs(), and set_log_file() raises RuntimeError for a path that cannot be opened."""
     core.log("hello from python")
     assert any("hello from python" in line for line in core.recent_logs(10))
     with pytest.raises(RuntimeError):
@@ -43,6 +47,7 @@ def test_log_functions():
 
 
 def test_log_file(tmp_path):
+    """set_log_file() routes log lines to a file on disk (and "" disables it again)."""
     log_file = tmp_path / "pa_core.log"
     core.set_log_file(str(log_file))
     try:
@@ -54,6 +59,7 @@ def test_log_file(tmp_path):
 
 
 def test_unreachable_port():
+    """The not-ready path of the C++ Controller: an unreachable port never becomes ready, the status reports the error, commands raise RuntimeError instead of crashing, and wait_for_all_requests()/cancel_all_and_wait() are safe no-ops."""
     c = core.Controller("nonexistent-port-xyz")
     assert not c.wait_for_ready(500)
     assert not c.is_ready()

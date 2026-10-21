@@ -6,6 +6,7 @@ from pokemon_automation import buttons as btn
 
 
 def test_single_and_combined_buttons():
+    """Single button names, "+"-joined strings and lists all parse to the right bitfield, with no d-pad set."""
     assert btn.parse_buttons("A").bitfield == btn.BUTTON_BITS["A"]
     both = btn.parse_buttons("L+R")
     assert both.bitfield == btn.BUTTON_BITS["L"] | btn.BUTTON_BITS["R"]
@@ -14,6 +15,7 @@ def test_single_and_combined_buttons():
 
 
 def test_aliases_and_plus_minus():
+    """Aliases (START/SELECT, L3, ...) resolve to their buttons, and a lone "+" or "-" is the PLUS/MINUS button, not a separator."""
     assert btn.parse_buttons("+").bitfield == btn.BUTTON_BITS["PLUS"]
     assert btn.parse_buttons("-").bitfield == btn.BUTTON_BITS["MINUS"]
     assert btn.parse_buttons("start").bitfield == btn.BUTTON_BITS["PLUS"]
@@ -22,6 +24,7 @@ def test_aliases_and_plus_minus():
 
 
 def test_dpad():
+    """D-pad direction names (including diagonals and mixed spellings) map to the right DpadPosition, can be combined with buttons, and None means no d-pad."""
     assert btn.parse_buttons("up").dpad == btn.DPAD_POSITIONS["UP"]
     assert btn.parse_buttons("up+right").dpad == btn.DPAD_POSITIONS["UP_RIGHT"]
     assert btn.parse_buttons("down-left").dpad == btn.DPAD_POSITIONS["DOWN_LEFT"]
@@ -32,6 +35,7 @@ def test_dpad():
 
 
 def test_invalid_buttons():
+    """Unknown button names and contradictory d-pad directions raise ValueError; None parses as no input at all."""
     with pytest.raises(ValueError, match="Unknown button"):
         btn.parse_buttons("Q")
     with pytest.raises(ValueError, match="Contradictory"):
@@ -40,6 +44,7 @@ def test_invalid_buttons():
 
 
 def test_sticks():
+    """parse_stick() maps direction names to unit vectors (diagonals normalized to length 1), passes raw [x, y] pairs through, and rejects out-of-range or unknown values."""
     assert btn.parse_stick("up") == (0.0, 1.0)
     assert btn.parse_stick("neutral") == (0.0, 0.0)
     x, y = btn.parse_stick("down_right")
@@ -52,6 +57,7 @@ def test_sticks():
 
 
 def test_matches_cpp_enum():
+    """The constants in buttons.py still agree with the C++ enums as exposed by the compiled module (skips when it is not built)."""
     #  C++ side: `enum Button` / `enum DpadPosition` in
     #  SerialPrograms/Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h,
     #  exposed by the module (SerialPrograms/Source/PythonBindings/PythonBindings_Module.cpp).
