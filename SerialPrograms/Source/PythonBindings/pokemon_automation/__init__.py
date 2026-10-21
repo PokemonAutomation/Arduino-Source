@@ -19,7 +19,7 @@ Quick start:
     with SwitchController("/dev/cu.usbserial-0001") as sw:
         sw.push_button("A")
         sw.push_dpad("up+right")
-        sw.push_left_joystick("up", duration_ms=1500)
+        sw.push_left_joystick("up", hold_ms=1500)
         sw.wait_for_all_requests()
 """
 

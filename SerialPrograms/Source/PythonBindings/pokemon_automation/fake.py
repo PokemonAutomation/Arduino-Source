@@ -61,11 +61,11 @@ class FakeController:
     def wait(self, duration_ms: int) -> None:
         self._record("wait", duration_ms)
 
-    def push_button(self, delay_ms: int, hold_ms: int, release_ms: int, bitfield: int) -> None:
-        self._record("push_button", delay_ms, hold_ms, release_ms, bitfield)
+    def push_button(self, delay_ms: int, hold_ms: int, release_ms: int, button_bitfield: int) -> None:
+        self._record("push_button", delay_ms, hold_ms, release_ms, button_bitfield)
 
-    def push_dpad(self, delay_ms: int, hold_ms: int, release_ms: int, position: int) -> None:
-        self._record("push_dpad", delay_ms, hold_ms, release_ms, position)
+    def push_dpad(self, delay_ms: int, hold_ms: int, release_ms: int, dpad_position: int) -> None:
+        self._record("push_dpad", delay_ms, hold_ms, release_ms, dpad_position)
 
     def push_left_joystick(self, delay_ms: int, hold_ms: int, release_ms: int, x: float, y: float) -> None:
         self._record("push_left_joystick", delay_ms, hold_ms, release_ms, x, y)
@@ -76,14 +76,14 @@ class FakeController:
     def controller_state(
         self,
         duration_ms: int,
-        buttons: int,
-        dpad: int,
+        button_bitfield: int,
+        dpad_position: int,
         left_x: float,
         left_y: float,
         right_x: float,
         right_y: float,
     ) -> None:
-        self._record("controller_state", duration_ms, buttons, dpad, left_x, left_y, right_x, right_y)
+        self._record("controller_state", duration_ms, button_bitfield, dpad_position, left_x, left_y, right_x, right_y)
 
     # -- test helpers ---------------------------------------------------------
 
