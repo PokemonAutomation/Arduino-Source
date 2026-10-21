@@ -221,74 +221,55 @@ std::vector<BBQuests> read_quests(
     return quest_list;
 }
 
-BBQuestPlan plan_quests(
-    Logger& logger,
-    const BBQOption& BBQ_OPTIONS,
-    const std::vector<BBQuests>& quest_list,
-    uint8_t eggs_hatched
-){
-    BBQuestPlan plan;
-    std::vector<std::unique_ptr<BBQuestTableRow>> exclusions_table = BBQ_OPTIONS.QUEST_EXCLUSIONS.copy_snapshot();
+namespace{
 
-    logger.log("Processing quests.");
-    for (size_t slot = 0; slot < quest_list.size(); slot++){
-        const BBQuests n = quest_list[slot];
-        if (not_possible_quests.contains(n)){
-            logger.log("Quest not possible");
-            continue;
-        }
-        //Check eggs remaining.
-        if (n == BBQuests::hatch_egg && eggs_hatched >= BBQ_OPTIONS.NUM_EGGS){
-            logger.log("Out of eggs! Quest not possible.");
-            switch (BBQ_OPTIONS.OUT_OF_EGGS){
-            case BBQOption::OOEggs::Reroll:
-                logger.log("Reroll selected. Rerolling Egg quest. New quest will be run in the next batch of quests.");
-                //logger.log("Warning: This does not handle/check being out of BP!", COLOR_RED);
-                plan.reroll_slots.push_back(slot);
-                break;
-            case BBQOption::OOEggs::KeepGoing:
-                logger.log("Keep Going selected. Ignoring quest.");
-                break;
-            default:
-                //This case is handled in BBQSoloFarmer.
-                throw InternalProgramError(&logger, PA_CURRENT_FUNCTION, "OOEggs is Stop in process_quest_list().");
-            }
-            continue;
-        }
-        bool quest_in_table = false;
-        for (const std::unique_ptr<BBQuestTableRow>& row : exclusions_table){
-            if (n != row->quest){
-                continue;
-            }
-            logger.log("Quest found in inclusions/exclusions table.");
-            quest_in_table = true;
-            switch (row->action){
-            case BBQAction::run:
-                logger.log("Run selected. Adding quest to list.");
-                plan.to_do.push_back(n);
-                break;
-            case BBQAction::reroll:
-                logger.log("Reroll selected. Rerolling quest. New quest will be run in the next batch of quests.");
-                plan.reroll_slots.push_back(slot);
-                break;
-            case BBQAction::skip:
-                logger.log("Skip selected. Skipping quest.");
-                break;
-            }
-        }
-        if (!quest_in_table){
-            logger.log("Quest not in inclusion/exclusions table. Adding to list.");
-            plan.to_do.push_back(n);
-        }
+//Out of eggs, the egg quest cannot be done. OUT_OF_EGGS decides what happens to it.
+void plan_out_of_eggs(Logger& logger, const BBQOption& BBQ_OPTIONS, size_t slot, BBQuestPlan& plan){
+    switch (BBQ_OPTIONS.OUT_OF_EGGS){
+    case BBQOption::OOEggs::Reroll:
+        logger.log("Reroll selected. Rerolling Egg quest. New quest will be run in the next batch of quests.");
+        //logger.log("Warning: This does not handle/check being out of BP!", COLOR_RED);
+        plan.reroll_slots.push_back(slot);
+        break;
+    case BBQOption::OOEggs::KeepGoing:
+        logger.log("Keep Going selected. Ignoring quest.");
+        break;
+    default:
+        //This case is handled in BBQSoloFarmer.
+        throw InternalProgramError(&logger, PA_CURRENT_FUNCTION, "OOEggs is Stop in process_quest_list().");
     }
-
-    //Check that quests_to_do is not empty (after completing all quests on the list, be sure to erase it.
-    //Lag might be a problem in multi - look into making slots like menu-left navigation
-    plan.reroll_all = plan.reroll_slots.empty() && plan.to_do.empty();
-    return plan;
 }
 
-namespace{
+//Apply each exclusions table row for the quest, in table order. Returns false if no row is for it.
+bool plan_from_exclusions(
+    Logger& logger,
+    const std::vector<std::unique_ptr<BBQuestTableRow>>& exclusions_table,
+    BBQuests quest, size_t slot,
+    BBQuestPlan& plan
+){
+    bool quest_in_table = false;
+    for (const std::unique_ptr<BBQuestTableRow>& row : exclusions_table){
+        if (quest != row->quest){
+            continue;
+        }
+        logger.log("Quest found in inclusions/exclusions table.");
+        quest_in_table = true;
+        switch (row->action){
+        case BBQAction::run:
+            logger.log("Run selected. Adding quest to list.");
+            plan.to_do.push_back(quest);
+            break;
+        case BBQAction::reroll:
+            logger.log("Reroll selected. Rerolling quest. New quest will be run in the next batch of quests.");
+            plan.reroll_slots.push_back(slot);
+            break;
+        case BBQAction::skip:
+            logger.log("Skip selected. Skipping quest.");
+            break;
+        }
+    }
+    return quest_in_table;
+}
 
 //Open the quest panel from the overworld, with the cursor on the top quest.
 void open_quest_panel(VideoStream& stream, ProControllerContext& context){
@@ -310,6 +291,84 @@ void open_quest_panel(VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
 }
 
+void reroll_slot(
+    const ProgramInfo& info,
+    VideoStream& stream, ProControllerContext& context,
+    size_t slot
+){
+    open_quest_panel(stream, context);
+
+    //Move cursor down to quest
+    for (size_t i = 0; i < slot; i++){
+        pbf_press_dpad(context, DPAD_DOWN, 160ms, 160ms);
+        pbf_wait(context, 800ms);
+        context.wait_for_all_requests();
+    }
+
+    //Reroll
+    pbf_press_button(context, BUTTON_A, 160ms, 400ms);
+    pbf_press_button(context, BUTTON_A, 160ms, 400ms);
+    pbf_wait(context, 800ms);
+    context.wait_for_all_requests();
+
+    press_Bs_to_back_to_overworld(info, stream, context);
+}
+
+//This does not handle out of BP.
+void reroll_all_slots(
+    const ProgramInfo& info,
+    VideoStream& stream, ProControllerContext& context,
+    size_t slots
+){
+    open_quest_panel(stream, context);
+
+    for (size_t i = 0; i < slots; i++){
+        pbf_press_button(context, BUTTON_A, 160ms, 400ms);
+        pbf_press_button(context, BUTTON_A, 160ms, 400ms); //Yes.
+        pbf_wait(context, 800ms);
+        context.wait_for_all_requests();
+        pbf_press_dpad(context, DPAD_DOWN, 160ms, 160ms);
+        pbf_wait(context, 800ms);
+        context.wait_for_all_requests();
+    }
+    //Close quest panel - mash b
+    press_Bs_to_back_to_overworld(info, stream, context);
+}
+
+}
+
+BBQuestPlan plan_quests(
+    Logger& logger,
+    const BBQOption& BBQ_OPTIONS,
+    const std::vector<BBQuests>& quest_list,
+    uint8_t eggs_hatched
+){
+    BBQuestPlan plan;
+    std::vector<std::unique_ptr<BBQuestTableRow>> exclusions_table = BBQ_OPTIONS.QUEST_EXCLUSIONS.copy_snapshot();
+
+    logger.log("Processing quests.");
+    for (size_t slot = 0; slot < quest_list.size(); slot++){
+        const BBQuests n = quest_list[slot];
+        if (not_possible_quests.contains(n)){
+            logger.log("Quest not possible");
+            continue;
+        }
+        //Check eggs remaining.
+        if (n == BBQuests::hatch_egg && eggs_hatched >= BBQ_OPTIONS.NUM_EGGS){
+            logger.log("Out of eggs! Quest not possible.");
+            plan_out_of_eggs(logger, BBQ_OPTIONS, slot, plan);
+            continue;
+        }
+        if (!plan_from_exclusions(logger, exclusions_table, n, slot, plan)){
+            logger.log("Quest not in inclusion/exclusions table. Adding to list.");
+            plan.to_do.push_back(n);
+        }
+    }
+
+    //Check that quests_to_do is not empty (after completing all quests on the list, be sure to erase it.
+    //Lag might be a problem in multi - look into making slots like menu-left navigation
+    plan.reroll_all = plan.reroll_slots.empty() && plan.to_do.empty();
+    return plan;
 }
 
 std::vector<BBQuests> process_quest_list(
@@ -322,43 +381,17 @@ std::vector<BBQuests> process_quest_list(
     BBQuestPlan plan = plan_quests(stream.logger(), BBQ_OPTIONS, quest_list, eggs_hatched);
 
     for (size_t slot : plan.reroll_slots){
-        open_quest_panel(stream, context);
-
-        //Move cursor down to quest
-        for (size_t i = 0; i < slot; i++){
-            pbf_press_dpad(context, DPAD_DOWN, 160ms, 160ms);
-            pbf_wait(context, 800ms);
-            context.wait_for_all_requests();
-        }
-
-        //Reroll
-        pbf_press_button(context, BUTTON_A, 160ms, 400ms);
-        pbf_press_button(context, BUTTON_A, 160ms, 400ms);
-        pbf_wait(context, 800ms);
-        context.wait_for_all_requests();
-
-        press_Bs_to_back_to_overworld(info, stream, context);
+        reroll_slot(info, stream, context, slot);
     }
-
     if (plan.reroll_all){
         stream.log("No possible quests! Rerolling all quests.");
-
-        //Open quest panel and reroll all quests.
-        //This does not handle out of BP.
-        open_quest_panel(stream, context);
-
-        for (string::size_type i = 0; i < quest_list.size(); i++){
-            pbf_press_button(context, BUTTON_A, 160ms, 400ms);
-            pbf_press_button(context, BUTTON_A, 160ms, 400ms); //Yes.
-            pbf_wait(context, 800ms);
-            context.wait_for_all_requests();
-            pbf_press_dpad(context, DPAD_DOWN, 160ms, 160ms);
-            pbf_wait(context, 800ms);
-            context.wait_for_all_requests();
-        }
-        //Close quest panel - mash b
-        press_Bs_to_back_to_overworld(info, stream, context);
+        reroll_all_slots(info, stream, context, quest_list.size());
     }
+
+    //Disabled since 2025-05, when the exclusions table gained its reroll action. Before that,
+    //nothing doable stopped the program here, because it usually meant the game language
+    //option did not match the game and no quest could be read. Now all quests are rerolled
+    //above instead, which also covers a panel of only excluded quests.
     /*
     if (plan.reroll_all){
         OperationFailedExceptionWithScreenshot::fire(
