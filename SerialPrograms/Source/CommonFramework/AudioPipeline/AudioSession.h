@@ -20,6 +20,7 @@
 #include "Common/Cpp/Concurrency/Watchdog.h"
 #include "AudioFeed.h"
 #include "AudioPassthroughPair.h"
+#include "AudioStream.h"
 #include "Spectrum/FFTStreamer.h"
 #include "Spectrum/AudioSpectrumHolder.h"
 #include "AudioOption.h"

@@ -1,21 +1,11 @@
-/*  FFT Streamer - FFT Migration Gate Tests
+/*  FFT Streamer - FFT Gate Tests
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  These tests exist to gate the switch of AudioPassthroughPairQt's FFT
- *  endpoint from the legacy path (AudioStreamToFloat -> AudioFloatToFFT)
- *  to the pipeline tree (RawAudio2WorkingAudio -> mixer/resampler ->
- *  WorkingAudioToFFT). Each test has two parts:
- *
- *   1. Self-contained invariants of the tree path (reported rate,
- *      finiteness, tone peaks at their exact bins, tones dominating the
- *      noise floor). These hold on their own and remain valid after the
- *      legacy path is deleted.
- *
- *   2. Legacy-diff checks, which quantify (and, in the no-op DUAL_48000
- *      case, prove bit-exactness of) the migration while the legacy
- *      path still exists. These are slated for removal together with
- *      AudioFloatToFFT.
+ *  Self-contained invariants of the pipeline tree's FFT path
+ *  (RawAudio2WorkingAudio -> mixer/resampler -> WorkingAudioToFFT):
+ *  the reported rate, finiteness, the input tones peaking at their
+ *  exact bins, and the tones dominating the noise floor.
  *
  */
 
@@ -30,7 +20,6 @@
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "CommonFramework/AudioPipeline/AudioConstants.h"
-#include "CommonFramework/AudioPipeline/AudioStream.h"
 #include "Kernels/AudioPipeline/Kernels_RawAudio2WorkingAudio.h"
 #include "Kernels/AudioPipeline/Kernels_ChannelMixer.h"
 #include "Kernels/AudioResampler/Kernels_AudioResampler.h"
@@ -83,61 +72,6 @@ private:
     std::vector<size_t> m_rates;
     std::vector<std::shared_ptr<const AlignedVector<float>>> m_ffts;
 };
-
-
-
-//  Records the legacy interleaved float stream.
-class RecordingFloatListener : public AudioFloatStreamListener{
-public:
-    explicit RecordingFloatListener(size_t spf)
-        : AudioFloatStreamListener(spf)
-    {}
-    virtual void on_samples(const float* data, size_t frames) override{
-        const size_t count = frames * expected_samples_per_frame;
-        for (size_t c = 0; c < count; c++){
-            m_samples.emplace_back(data[c]);
-        }
-        m_frames += frames;
-    }
-    const AlignedVector<float>& samples() const{
-        return m_samples;
-    }
-    size_t frames() const{
-        return m_frames;
-    }
-
-private:
-    AlignedVector<float> m_samples;
-    size_t m_frames = 0;
-};
-
-
-
-//  Legacy path: raw bytes -> AudioStreamToFloat -> AudioFloatToFFT
-//  (as built by make_FFT_streamer for the preset).
-RecordingFFTListener run_legacy(
-    const AlignedVector<float>& raw,
-    size_t samples_per_frame,
-    AudioChannelFormat format
-){
-    AudioStreamToFloat reader(AudioSampleFormat::FLOAT32, samples_per_frame, 1.0f, false);
-    RecordingFloatListener capture(samples_per_frame);
-    reader.add_listener(capture);
-    reader.push_bytes(raw.data(), raw.size() * sizeof(float));
-
-    std::unique_ptr<AudioFloatToFFT> runner = make_FFT_streamer(format);
-    RecordingFFTListener recorder;
-    runner->add_listener(recorder);
-
-    //  Feed in odd-sized chunks to exercise the ring-buffer block logic.
-    size_t done = 0;
-    while (done < capture.frames()){
-        size_t chunk = std::min((size_t)997, capture.frames() - done);
-        runner->on_samples(capture.samples().data() + done * samples_per_frame, chunk);
-        done += chunk;
-    }
-    return recorder;
-}
 
 
 
@@ -203,11 +137,10 @@ size_t peak_bin(const AlignedVector<float>& fft, size_t center, size_t window){
 
 
 
-//  Self-contained invariants of the tree path, independent of the legacy
-//  path: every FFT reports the expected rate, all bins are finite, each
-//  input tone peaks at its exact bin, and each tone dominates the noise
-//  floor (measured on content-free bins far from the tones). An empty
-//  string means the invariants hold.
+//  Invariants of the FFT path: every FFT reports the expected rate, all
+//  bins are finite, each input tone peaks at its exact bin, and each tone
+//  dominates the noise floor (measured on content-free bins far from the
+//  tones). An empty string means the invariants hold.
 std::string check_invariants(
     const std::vector<std::shared_ptr<const AlignedVector<float>>>& ffts,
     const std::vector<size_t>& rates,
@@ -252,13 +185,12 @@ std::string check_invariants(
 
 
 //
-//  DUAL_48000: the no-op case. The tree's FFT output must be
-//  bit-identical to the legacy path's, FFT by FFT, bin by bin.
+//  DUAL_48000: the no-op case (no mixer rate change, no resampler).
 //
 class FFTGateDual48000Test : public UnitTest{
 public:
     FFTGateDual48000Test()
-        : UnitTest("AudioPipeline - FFTGate_Dual48000_BitExact")
+        : UnitTest("AudioPipeline - FFTGate_Dual48000")
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
@@ -277,36 +209,12 @@ public:
 
         RecordingFFTListener tree = run_tree(raw, 2, rate, rate);
 
-        //  Self-contained invariants (survive legacy removal). The ring
-        //  buffer is zero pre-filled, so the leading FFTs (0..3) contain
-        //  zero padding; the invariants start at the first full window.
+        //  The ring buffer is zero pre-filled, so the leading FFTs (0..3)
+        //  contain zero padding; the invariants start at the first full
+        //  window.
         std::string error = check_invariants(tree.ffts(), tree.rates(), rate, 4, tone_bins);
         if (!error.empty()){
             return error;
-        }
-
-        //  [Legacy-diff: remove with AudioFloatToFFT] The switch gate: on
-        //  the no-op 48 kHz case the tree must match the legacy path
-        //  bit-for-bit.
-        RecordingFFTListener legacy = run_legacy(raw, 2, AudioChannelFormat::DUAL_48000);
-
-        if (legacy.ffts().size() != tree.ffts().size()){
-            return "FFT count mismatch: legacy = " + std::to_string(legacy.ffts().size())
-                + ", tree = " + std::to_string(tree.ffts().size()) + ".";
-        }
-        for (size_t k = 0; k < legacy.ffts().size(); k++){
-            if (tree.ffts()[k]->size() != legacy.ffts()[k]->size()){
-                return "FFT " + std::to_string(k) + " size mismatch: "
-                    + std::to_string(tree.ffts()[k]->size()) + " != " + std::to_string(legacy.ffts()[k]->size()) + ".";
-            }
-            for (size_t b = 0; b < legacy.ffts()[k]->size(); b++){
-                float legacy_value = (*legacy.ffts()[k])[b];
-                float tree_value = (*tree.ffts()[k])[b];
-                if (legacy_value != tree_value){
-                    return "FFT " + std::to_string(k) + ", bin " + std::to_string(b) + " differs: legacy = "
-                        + tostr_default(legacy_value) + ", tree = " + tostr_default(tree_value) + ".";
-                }
-            }
         }
 
         return true;
@@ -316,10 +224,8 @@ public:
 
 
 //
-//  DUAL_44100: the tree resamples to 48 kHz (the legacy path FFTs at
-//  44.1 kHz), so the outputs are expected to differ; the invariants
-//  above verify the tree path on its own, and the legacy-diff below
-//  quantifies the amplitude delta the migration introduces.
+//  DUAL_44100: the tree resamples the 44.1 kHz source up to 48 kHz; the
+//  invariants verify the resampled FFTs on their own.
 //
 class FFTGateDual44100Test : public UnitTest{
 public:
@@ -332,7 +238,6 @@ public:
         const size_t fft_rate = 48000;
         const size_t n = 16384;
         const std::vector<size_t> tone_bins = {172, 600};   //  4031.25 / 14062.5 Hz at 48 kHz (14062.5 * 2048 / 48000 = 600).
-        const size_t tone_bin_44k = 187;   //  4031.25 * 2048 / 44100 ~= 187.2.
 
         std::mt19937 generator(42);
         AlignedVector<float> l = make_signal(n, raw_rate, 4031.25, 14062.5, generator);
@@ -345,42 +250,12 @@ public:
 
         RecordingFFTListener tree = run_tree(raw, 2, raw_rate, fft_rate);
 
-        //  Self-contained invariants (survive legacy removal). The ring
-        //  buffer is zero pre-filled and the resampler has a short
-        //  transient, so the invariants start at the first full
+        //  The ring buffer is zero pre-filled and the resampler has a
+        //  short transient, so the invariants start at the first full
         //  window.
         std::string error = check_invariants(tree.ffts(), tree.rates(), fft_rate, 4, tone_bins);
         if (!error.empty()){
             return error;
-        }
-
-        //  [Legacy-diff: remove with AudioFloatToFFT] The legacy
-        //  pair-averaging decimator attenuates the 4031.25 Hz tone by
-        //  |cos(pi * f / 44100)| ~= 0.959, while the tree's resampler
-        //  passes it at ~unity gain, so the tree peak should be slightly
-        //  larger.
-        RecordingFFTListener legacy = run_legacy(raw, 2, AudioChannelFormat::DUAL_44100);
-        if (legacy.ffts().size() < 4){
-            return "Legacy path produced too few FFTs (" + std::to_string(legacy.ffts().size()) + ").";
-        }
-        for (size_t k = 0; k < legacy.ffts().size(); k++){
-            if (!std::isfinite((*legacy.ffts()[k])[0])){
-                return "Non-finite value in legacy FFT " + std::to_string(k) + ".";
-            }
-        }
-        size_t legacy_peak_bin = peak_bin(*legacy.ffts()[3], tone_bin_44k, 2);
-        if (legacy_peak_bin != tone_bin_44k){
-            return "Legacy FFT 3: tone peak at bin " + std::to_string(legacy_peak_bin)
-                + ", expected " + std::to_string(tone_bin_44k) + ".";
-        }
-        float tree_peak = (*tree.ffts()[3])[tone_bins[0]];
-        float legacy_peak = (*legacy.ffts()[3])[tone_bin_44k];
-        if (legacy_peak <= 0.0f){
-            return "Legacy tone peak is not positive (" + tostr_default(legacy_peak) + ").";
-        }
-        double ratio = tree_peak / legacy_peak;
-        if (ratio < 0.90 || ratio > 1.20){
-            return "Tree / legacy tone amplitude ratio out of range: " + tostr_default((float)ratio) + ".";
         }
 
         return true;
@@ -391,8 +266,7 @@ public:
 
 //
 //  MONO_96000: the tree decimates the 96 kHz mono stream to 48 kHz with
-//  the resampler (the legacy path pair-averages the 2-sample frames);
-//  both FFT at 48 kHz, so the tones land in the same bins on both sides.
+//  the resampler; the invariants verify the decimated FFTs on their own.
 //
 class FFTGateMono96000Test : public UnitTest{
 public:
@@ -403,7 +277,7 @@ public:
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         const size_t raw_rate = 96000;
         const size_t fft_rate = 48000;
-        const size_t n = 16384;   //  Even, so the legacy 2-sample framing loses nothing.
+        const size_t n = 16384;
         const std::vector<size_t> tone_bins = {172, 600};   //  4031.25 / 14062.5 Hz at 48 kHz (14062.5 * 2048 / 48000 = 600).
 
         std::mt19937 generator(42);
@@ -411,36 +285,12 @@ public:
 
         RecordingFFTListener tree = run_tree(raw, 1, raw_rate, fft_rate);
 
-        //  Self-contained invariants (survive legacy removal). The ring
-        //  buffer is zero pre-filled and the resampler has a short
-        //  transient, so the invariants start at the first full
+        //  The ring buffer is zero pre-filled and the resampler has a
+        //  short transient, so the invariants start at the first full
         //  window.
         std::string error = check_invariants(tree.ffts(), tree.rates(), fft_rate, 4, tone_bins);
         if (!error.empty()){
             return error;
-        }
-
-        //  [Legacy-diff: remove with AudioFloatToFFT] The legacy
-        //  pair-averaging decimator attenuates the 4031.25 Hz tone by
-        //  |cos(pi * f / 96000)| ~= 0.991; the tree's resampler passes
-        //  it at ~unity gain, so the two peaks should be within 5%.
-        RecordingFFTListener legacy = run_legacy(raw, 2, AudioChannelFormat::MONO_96000);
-        if (legacy.ffts().size() < 4){
-            return "Legacy path produced too few FFTs (" + std::to_string(legacy.ffts().size()) + ").";
-        }
-        size_t legacy_peak_bin = peak_bin(*legacy.ffts()[3], tone_bins[0], 2);
-        if (legacy_peak_bin != tone_bins[0]){
-            return "Legacy FFT 3: tone peak at bin " + std::to_string(legacy_peak_bin)
-                + ", expected " + std::to_string(tone_bins[0]) + ".";
-        }
-        float tree_peak = (*tree.ffts()[3])[tone_bins[0]];
-        float legacy_peak = (*legacy.ffts()[3])[tone_bins[0]];
-        if (legacy_peak <= 0.0f){
-            return "Legacy tone peak is not positive (" + tostr_default(legacy_peak) + ").";
-        }
-        double ratio = tree_peak / legacy_peak;
-        if (ratio < 0.95 || ratio > 1.05){
-            return "Tree / legacy tone amplitude ratio out of range: " + tostr_default((float)ratio) + ".";
         }
 
         return true;
