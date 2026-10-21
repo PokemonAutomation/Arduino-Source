@@ -232,32 +232,42 @@ PYBIND11_MODULE(_pa_core, m){
              "Queue a pause of `duration_ms` with nothing pressed.",
              py::call_guard<py::gil_scoped_release>())
         .def("push_button", &PybindSwitchProController::push_button,
-             py::arg("delay_ms"), py::arg("hold_ms"), py::arg("release_ms"), py::arg("button_bitfield"),
-             "Queue a press of every button in `button_bitfield` (see `BUTTONS`). `delay_ms` is "
-             "how long to wait before the press may start, `hold_ms` how long the buttons "
-             "stay down, `release_ms` how long they stay up before the same button can be "
-             "pressed again. D-pad directions are not part of `button_bitfield`; use push_dpad().",
+             py::arg("button_bitfield"), py::arg("delay_ms"), py::arg("hold_ms"), py::arg("release_ms"),
+             "Like pbf_press_button(), with an extra `delay_ms`: queue a press of every "
+             "button in `button_bitfield` (see `BUTTONS`). `delay_ms` is how long to wait "
+             "before the next command may start, `hold_ms` how long the buttons stay down, "
+             "`release_ms` how long they stay up before the same button can be used again. "
+             "`delay_ms = hold_ms + release_ms` runs commands back to back, like "
+             "pbf_press_button(). D-pad directions are not part of `button_bitfield`; use "
+             "push_dpad().",
              py::call_guard<py::gil_scoped_release>())
         .def("push_dpad", &PybindSwitchProController::push_dpad,
-             py::arg("delay_ms"), py::arg("hold_ms"), py::arg("release_ms"), py::arg("dpad_position"),
-             "Queue a d-pad press in direction `dpad_position` (see `DPAD_POSITIONS`). "
-             "`delay_ms` / `hold_ms` / `release_ms` have the same meaning as in push_button().",
+             py::arg("dpad_position"), py::arg("delay_ms"), py::arg("hold_ms"), py::arg("release_ms"),
+             "Like pbf_press_dpad(), with an extra `delay_ms`: queue a d-pad press in "
+             "direction `dpad_position` (see `DPAD_POSITIONS`). `delay_ms` / `hold_ms` / "
+             "`release_ms` have the same meaning as in push_button().",
              py::call_guard<py::gil_scoped_release>())
         .def("push_left_joystick", &PybindSwitchProController::push_left_joystick,
-             py::arg("delay_ms"), py::arg("hold_ms"), py::arg("release_ms"), py::arg("x"), py::arg("y"),
-             "Queue the left stick being held at (x, y), in [-1.0, 1.0] with +x = right "
-             "and +y = up. `delay_ms` / `hold_ms` / `release_ms` have the same meaning as in push_button().",
+             py::arg("joystick_position"), py::arg("delay_ms"), py::arg("hold_ms"), py::arg("release_ms"),
+             "Like pbf_move_left_joystick(), with an extra `delay_ms`: queue the left stick "
+             "being held at `joystick_position` (an (x, y) tuple in [-1.0, 1.0] with +x = "
+             "right and +y = up). `delay_ms` / `hold_ms` / `release_ms` have the same "
+             "meaning as in push_button().",
              py::call_guard<py::gil_scoped_release>())
         .def("push_right_joystick", &PybindSwitchProController::push_right_joystick,
-             py::arg("delay_ms"), py::arg("hold_ms"), py::arg("release_ms"), py::arg("x"), py::arg("y"),
-             "Queue the right stick being held at (x, y), in [-1.0, 1.0] with +x = right "
-             "and +y = up. `delay_ms` / `hold_ms` / `release_ms` have the same meaning as in push_button().",
+             py::arg("joystick_position"), py::arg("delay_ms"), py::arg("hold_ms"), py::arg("release_ms"),
+             "Like pbf_move_right_joystick(), with an extra `delay_ms`: queue the right "
+             "stick being held at `joystick_position` (an (x, y) tuple in [-1.0, 1.0] with "
+             "+x = right and +y = up). `delay_ms` / `hold_ms` / `release_ms` have the same "
+             "meaning as in push_button().",
              py::call_guard<py::gil_scoped_release>())
         .def("controller_state", &PybindSwitchProController::controller_state,
-             py::arg("duration_ms"), py::arg("button_bitfield"), py::arg("dpad_position"),
+             py::arg("button_bitfield"), py::arg("dpad_position"),
              py::arg("left_x"), py::arg("left_y"), py::arg("right_x"), py::arg("right_y"),
-             "Queue the entire controller state (buttons, d-pad, both sticks) being held "
-             "for `duration_ms`; everything not specified is released. This is the most "
-             "direct way to hold arbitrary combinations, e.g. B while moving the left stick.",
+             py::arg("duration_ms"),
+             "Like pbf_controller_state(): queue the entire controller state (buttons, "
+             "d-pad, both sticks) being held for `duration_ms`; everything not specified "
+             "is released. This is the most direct way to hold arbitrary combinations, "
+             "e.g. B while moving the left stick.",
              py::call_guard<py::gil_scoped_release>());
 }

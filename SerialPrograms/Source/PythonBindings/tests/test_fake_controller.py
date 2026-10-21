@@ -40,7 +40,7 @@ def test_push_button_single_button():
     sw, fake = make()
     sw.push_button("A")
     assert fake.commands() == ["push_button"]
-    (delay, hold, release, bitfield), = fake.arguments("push_button")
+    (bitfield, delay, hold, release), = fake.arguments("push_button")
     assert bitfield == BUTTON_BITS["A"]
     assert delay == hold + release and hold == 80 and release == 80
 
@@ -49,7 +49,7 @@ def test_push_button_combined_and_custom_durations():
     """A combination is OR-ed into one bitfield and custom hold/release durations are forwarded, with delay = hold + release."""
     sw, fake = make()
     sw.push_button("L+R", hold_ms=200, release_ms=50)
-    (delay, hold, release, bitfield), = fake.arguments("push_button")
+    (bitfield, delay, hold, release), = fake.arguments("push_button")
     assert bitfield == BUTTON_BITS["L"] | BUTTON_BITS["R"]
     assert (delay, hold, release) == (250, 200, 50)
 
@@ -58,7 +58,7 @@ def test_push_dpad():
     """A d-pad direction is forwarded as push_dpad with the C++ DpadPosition value and the requested timing."""
     sw, fake = make()
     sw.push_dpad("up", hold_ms=100)
-    (delay, hold, release, position), = fake.arguments("push_dpad")
+    (position, delay, hold, release), = fake.arguments("push_dpad")
     assert position == DPAD_POSITIONS["UP"] and hold == 100 and delay == 100 + release
 
 
@@ -99,11 +99,11 @@ def test_push_dpad_needs_something():
 
 
 def test_controller_state_mixed_combination():
-    """Buttons and d-pad held together go out as a single controller_state with the right bitfield, d-pad position and neutral sticks."""
+    """Buttons and d-pad held together go out as a single controller_state with the right bitfield, d-pad position, neutral sticks and duration last."""
     sw, fake = make()
-    sw.controller_state(60, buttons="ZL+up")
+    sw.controller_state("ZL+up", duration_ms=60)
     assert fake.commands() == ["controller_state"]
-    (duration, buttons, dpad, left_x, left_y, right_x, right_y), = fake.arguments("controller_state")
+    (buttons, dpad, left_x, left_y, right_x, right_y, duration), = fake.arguments("controller_state")
     assert duration == 60
     assert buttons == BUTTON_BITS["ZL"]
     assert dpad == DPAD_POSITIONS["UP"]
@@ -111,26 +111,36 @@ def test_controller_state_mixed_combination():
 
 
 def test_push_left_joystick():
-    """A stick direction name becomes an (x, y) pair, forwarded to push_left_joystick with delay = hold + release."""
+    """A stick (x, y) pair is forwarded to push_left_joystick as a single joystick_position tuple with delay = hold + release."""
     sw, fake = make()
-    sw.push_left_joystick("up", hold_ms=1500)
-    (delay, hold, release, x, y), = fake.arguments("push_left_joystick")
-    assert (x, y) == (0.0, 1.0) and hold == 1500 and delay == 1500 + release
+    sw.push_left_joystick((0.0, 1.0), hold_ms=1500)
+    (joystick_position, delay, hold, release), = fake.arguments("push_left_joystick")
+    assert joystick_position == (0.0, 1.0) and hold == 1500 and delay == 1500 + release
+
+
+def test_push_left_joystick_rejects_string():
+    """push_left_joystick() does not accept direction-name strings, only (x, y) coordinates."""
+    sw, fake = make()
+    with pytest.raises(ValueError, match="joystick_position"):
+        sw.push_left_joystick("up")
+    with pytest.raises(ValueError):
+        sw.push_left_joystick(None)
+    assert fake.commands() == []
 
 
 def test_push_right_joystick():
     """A raw [x, y] stick position is forwarded to push_right_joystick with the requested hold and release."""
     sw, fake = make()
     sw.push_right_joystick([0.5, -0.5], hold_ms=300, release_ms=100)
-    (delay, hold, release, x, y), = fake.arguments("push_right_joystick")
-    assert (x, y) == (0.5, -0.5) and delay == 400
+    (joystick_position, delay, hold, release), = fake.arguments("push_right_joystick")
+    assert joystick_position == (0.5, -0.5) and hold == 300 and release == 100 and delay == 400
 
 
 def test_controller_state_combination():
     """Buttons and both sticks can be held at once via controller_state, with everything not specified left neutral."""
     sw, fake = make()
-    sw.controller_state(2000, buttons="B", left="up", right=[1.0, 0.0])
-    (duration, buttons, dpad, left_x, left_y, right_x, right_y), = fake.arguments("controller_state")
+    sw.controller_state("B", left="up", right=[1.0, 0.0], duration_ms=2000)
+    (buttons, dpad, left_x, left_y, right_x, right_y, duration), = fake.arguments("controller_state")
     assert duration == 2000
     assert buttons == BUTTON_BITS["B"]
     assert dpad == DPAD_NONE

@@ -61,29 +61,29 @@ class FakeController:
     def wait(self, duration_ms: int) -> None:
         self._record("wait", duration_ms)
 
-    def push_button(self, delay_ms: int, hold_ms: int, release_ms: int, button_bitfield: int) -> None:
-        self._record("push_button", delay_ms, hold_ms, release_ms, button_bitfield)
+    def push_button(self, button_bitfield: int, delay_ms: int, hold_ms: int, release_ms: int) -> None:
+        self._record("push_button", button_bitfield, delay_ms, hold_ms, release_ms)
 
-    def push_dpad(self, delay_ms: int, hold_ms: int, release_ms: int, dpad_position: int) -> None:
-        self._record("push_dpad", delay_ms, hold_ms, release_ms, dpad_position)
+    def push_dpad(self, dpad_position: int, delay_ms: int, hold_ms: int, release_ms: int) -> None:
+        self._record("push_dpad", dpad_position, delay_ms, hold_ms, release_ms)
 
-    def push_left_joystick(self, delay_ms: int, hold_ms: int, release_ms: int, x: float, y: float) -> None:
-        self._record("push_left_joystick", delay_ms, hold_ms, release_ms, x, y)
+    def push_left_joystick(self, joystick_position: tuple[float, float], delay_ms: int, hold_ms: int, release_ms: int) -> None:
+        self._record("push_left_joystick", joystick_position, delay_ms, hold_ms, release_ms)
 
-    def push_right_joystick(self, delay_ms: int, hold_ms: int, release_ms: int, x: float, y: float) -> None:
-        self._record("push_right_joystick", delay_ms, hold_ms, release_ms, x, y)
+    def push_right_joystick(self, joystick_position: tuple[float, float], delay_ms: int, hold_ms: int, release_ms: int) -> None:
+        self._record("push_right_joystick", joystick_position, delay_ms, hold_ms, release_ms)
 
     def controller_state(
         self,
-        duration_ms: int,
         button_bitfield: int,
         dpad_position: int,
         left_x: float,
         left_y: float,
         right_x: float,
         right_y: float,
+        duration_ms: int,
     ) -> None:
-        self._record("controller_state", duration_ms, button_bitfield, dpad_position, left_x, left_y, right_x, right_y)
+        self._record("controller_state", button_bitfield, dpad_position, left_x, left_y, right_x, right_y, duration_ms)
 
     # -- test helpers ---------------------------------------------------------
 

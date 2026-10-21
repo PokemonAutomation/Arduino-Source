@@ -738,7 +738,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 #if 0
     PybindSwitchProController controller("COM3");
     controller.wait_for_ready(5000);
-    controller.push_button(1000, 200, 800, BUTTON_X);
+    controller.push_button(BUTTON_X, 1000, 200, 800);
     controller.wait_for_all_requests();
 #endif
 

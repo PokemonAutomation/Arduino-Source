@@ -896,7 +896,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #if 0
     {
         PybindSwitchProController controller("COM12");
-        controller.push_button(1000, 200, 800, BUTTON_B);
+        controller.push_button(BUTTON_B, 1000, 200, 800);
         controller.wait_for_all_requests();
     }
 #endif

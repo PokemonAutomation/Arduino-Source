@@ -9,6 +9,7 @@
 
 #include <stdint.h>
 #include <string>
+#include <tuple>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -80,87 +81,85 @@ public:
     bool cancel_all_and_wait(uint64_t timeout_ms);
 
 public:
-    //  Commands. These throw InvalidConnectionStateException if the controller is not
-    //  ready, and block only if the device's command queue is full.
+    //  Commands. These line up with the PBF API (`pbf_*()`) in
+    //  SerialPrograms/Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h
+    //  (input first, then the timing), without the `context` parameter (Python
+    //  does not need it). The `push_*()` commands additionally take a `delay_ms`
+    //  that `pbf_*()` does not expose; `pbf_*()` always uses delay = hold + release
+    //  (back to back), which is what `delay_ms = hold_ms + release_ms` gives here.
     //
-    //  `delay` is how long to wait before the next command may start, `hold` how long
-    //  the input is held, and `release` how long it must stay released before the same
-    //  button can be used again. `delay = hold + release` runs commands back to back
-    //  like `pbf_press_button()`; `delay < hold` overlaps them, e.g. to hold a button
-    //  while moving a stick.
+    //  `delay_ms` is how long to wait before the next command may start, `hold_ms`
+    //  how long the input is held, and `release_ms` how long it stays released
+    //  before the same input can be used again. `duration_ms` is the total hold
+    //  time.
+    //
+    //  These throw InvalidConnectionStateException if the controller is not
+    //  ready, and block only if the device's command queue is full.
 
-    // Send a wait command to the controller. Nothing is pressed during the wait time.
-    // duration: wait duration, milliseconds.
-    // If the controller is not ready, it throws InvalidConnectionStateException.
-    // The function will block only if the device's command queue is full.
+    //  Equivalent to `pbf_wait()`: send a wait command to the controller. Nothing is
+    //  pressed during the wait time.
+    //  duration_ms: wait duration, milliseconds.
     void wait(uint64_t duration_ms);
 
-    // Send a button press command to the controller. It will press all buttons in
-    // `button_bitfield` simultaneously. D-pad buttons are excluded and should be called via
-    // `push_dpad()`.
-    // delay: how long to wait before the next command may start.
-    // hold: how long the button press is held, milliseconds.
-    // release: how long the buttons stay released before the same button can be used again,
-    // milliseconds.
-    // button_bitfield: values from `NintendoSwitch::Button`.
-    //
-    // `delay = hold + release` runs commands back to back like `pbf_press_button()`;
-    // `delay < hold` overlaps commands, e.g. to hold a button while moving a stick.
-    // If the controller is not ready, it throws InvalidConnectionStateException.
-    // The function will block only if the device's command queue is full.
-    void push_button(uint64_t delay_ms, uint64_t hold_ms, uint64_t release_ms, uint32_t button_bitfield);
-    // Send a D-pad press command to the controller. It will press one or two D-pad buttons to
-    // indicate a direction to the game.
-    // delay: how long to wait before the next command may start.
-    // hold: how long the button press is held, milliseconds.
-    // release: how long the buttons stay released before the same button can be used again,
-    // milliseconds.
-    // dpad_position: `NintendoSwitch::DpadPosition` values (0 = up, clockwise to 7 = up-left, 8 = none).
-    //
-    // `delay = hold + release` runs commands back to back like `pbf_press_button()`;
-    // `delay < hold` overlaps commands, e.g. to hold a button while moving a stick.
-    // If the controller is not ready, it throws InvalidConnectionStateException.
-    // The function will block only if the device's command queue is full.
-    void push_dpad(uint64_t delay_ms, uint64_t hold_ms, uint64_t release_ms, uint8_t dpad_position);
-    // Send a left joystick push command to the controller.
-    // delay: how long to wait before the next command may start.
-    // hold: how long the joystick is pushed, milliseconds.
-    // release: how long the joystick stay released before the same the joystick can be used again,
-    // milliseconds.
-    // x, y: in [-1.0, 1.0] with +x = right and +y = up.
-    //
-    // `delay = hold + release` runs commands back to back like `pbf_press_button()`;
-    // `delay < hold` overlaps commands, e.g. to hold a button while moving a stick.
-    // If the controller is not ready, it throws InvalidConnectionStateException.
-    // The function will block only if the device's command queue is full.
-    void push_left_joystick(uint64_t delay_ms, uint64_t hold_ms, uint64_t release_ms, double x, double y);
-    // Send a right joystick push command to the controller.
-    // delay: how long to wait before the next command may start.
-    // hold: how long the joystick is pushed, milliseconds.
-    // release: how long the joystick stay released before the same the joystick can be used again,
-    // milliseconds.
-    // x, y: in [-1.0, 1.0] with +x = right and +y = up.
-    //
-    // `delay = hold + release` runs commands back to back like `pbf_press_button()`;
-    // `delay < hold` overlaps commands, e.g. to hold a button while moving a stick.
-    // If the controller is not ready, it throws InvalidConnectionStateException.
-    // The function will block only if the device's command queue is full.
-    void push_right_joystick(uint64_t delay_ms, uint64_t hold_ms, uint64_t release_ms, double x, double y);
+    //  Equivalent to `pbf_press_button()`: send a button press command to the
+    //  controller. It will press all buttons in `button_bitfield` simultaneously.
+    //  D-pad buttons are excluded and should be called via `push_dpad()`.
+    //  button_bitfield: values from `NintendoSwitch::Button`.
+    //  delay_ms: how long to wait before the next command may start, milliseconds.
+    //  hold_ms: how long the button press is held, milliseconds.
+    //  release_ms: how long the buttons stay released before the same button can be
+    //  used again, milliseconds.
+    void push_button(uint32_t button_bitfield, uint64_t delay_ms, uint64_t hold_ms, uint64_t release_ms);
 
-    // Set the entire controller state at once and hold it for `duration`.
-    // Everything not specified is released. This is the most direct way to hold
-    // arbitrary combinations, e.g. running (B + left stick) while turning the camera.
-    // duration: how long to hold the buttons/joysticks, milliseconds.
-    // button_bitfield: one or more non-D-pad buttons, values from `NintendoSwitch::Button`.
-    // dpad_position: `NintendoSwitch::DpadPosition` values (0 = up, clockwise to 7 = up-left, 8 = none).
-    // left_x, left_y: in [-1.0, 1.0] with +x = right and +y = up.
-    // right_x, right_y: in [-1.0, 1.0] with +x = right and +y = up.
+    //  Equivalent to `pbf_press_dpad()`: send a D-pad press command to the
+    //  controller. It will press one or two D-pad buttons to indicate a direction
+    //  to the game.
+    //  dpad_position: `NintendoSwitch::DpadPosition` values (0 = up, clockwise to 7 = up-left, 8 = none).
+    //  delay_ms: how long to wait before the next command may start, milliseconds.
+    //  hold_ms: how long the button press is held, milliseconds.
+    //  release_ms: how long the buttons stay released before the same button can be
+    //  used again, milliseconds.
+    void push_dpad(uint8_t dpad_position, uint64_t delay_ms, uint64_t hold_ms, uint64_t release_ms);
+
+    //  Equivalent to `pbf_move_left_joystick()`: move the left joystick towards a
+    //  2D direction.
+    //  joystick_position: (x, y) in [-1.0, 1.0] with +x = right and +y = up.
+    //  delay_ms: how long to wait before the next command may start, milliseconds.
+    //  hold_ms: how long the joystick is pushed, milliseconds.
+    //  release_ms: how long the joystick stays released before the same joystick can
+    //  be used again, milliseconds.
+    void push_left_joystick(
+        const std::tuple<double, double>& joystick_position,
+        uint64_t delay_ms, uint64_t hold_ms, uint64_t release_ms
+    );
+
+    //  Equivalent to `pbf_move_right_joystick()`: move the right joystick towards a
+    //  2D direction.
+    //  joystick_position: (x, y) in [-1.0, 1.0] with +x = right and +y = up.
+    //  delay_ms: how long to wait before the next command may start, milliseconds.
+    //  hold_ms: how long the joystick is pushed, milliseconds.
+    //  release_ms: how long the joystick stays released before the same joystick can
+    //  be used again, milliseconds.
+    void push_right_joystick(
+        const std::tuple<double, double>& joystick_position,
+        uint64_t delay_ms, uint64_t hold_ms, uint64_t release_ms
+    );
+
+    //  Equivalent to `pbf_controller_state()`: set the entire controller state at
+    //  once and hold it for `duration_ms`. Everything not specified is released.
+    //  This is the most direct way to hold arbitrary combinations, e.g. running
+    //  (B + left stick) while turning the camera.
+    //  button_bitfield: one or more non-D-pad buttons, values from `NintendoSwitch::Button`.
+    //  dpad_position: `NintendoSwitch::DpadPosition` values (0 = up, clockwise to 7 = up-left, 8 = none).
+    //  left_x, left_y: in [-1.0, 1.0] with +x = right and +y = up.
+    //  right_x, right_y: in [-1.0, 1.0] with +x = right and +y = up.
+    //  duration_ms: how long to hold the buttons/d-pad/joysticks, milliseconds.
     void controller_state(
-        uint64_t duration_ms,
         uint32_t button_bitfield,
         uint8_t dpad_position,
         double left_x, double left_y,
-        double right_x, double right_y
+        double right_x, double right_y,
+        uint64_t duration_ms
     );
 
 private:

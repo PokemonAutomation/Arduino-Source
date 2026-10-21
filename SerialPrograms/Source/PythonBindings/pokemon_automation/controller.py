@@ -15,8 +15,8 @@ Example:
         sw.push_button("A")                              # tap A
         sw.push_button("L+R", hold_ms=200)               # press L and R together
         sw.push_dpad("up")                               # d-pad up
-        sw.push_left_joystick("up", hold_ms=1500)     # walk forward
-        sw.controller_state(2000, buttons="B", left="up")  # run forward
+        sw.push_left_joystick((0.0, 1.0), hold_ms=1500)  # walk forward
+        sw.controller_state("B", left="up", duration_ms=2000)  # run forward
         sw.wait_for_all_requests()
 """
 
@@ -51,13 +51,14 @@ class ControllerBackend(Protocol):
     def wait_for_all_requests(self) -> None: ...
     def cancel_all_and_wait(self, timeout_ms: int = ...) -> bool: ...
     def wait(self, duration_ms: int) -> None: ...
-    def push_button(self, delay_ms: int, hold_ms: int, release_ms: int, button_bitfield: int) -> None: ...
-    def push_dpad(self, delay_ms: int, hold_ms: int, release_ms: int, dpad_position: int) -> None: ...
-    def push_left_joystick(self, delay_ms: int, hold_ms: int, release_ms: int, x: float, y: float) -> None: ...
-    def push_right_joystick(self, delay_ms: int, hold_ms: int, release_ms: int, x: float, y: float) -> None: ...
+    def push_button(self, button_bitfield: int, delay_ms: int, hold_ms: int, release_ms: int) -> None: ...
+    def push_dpad(self, dpad_position: int, delay_ms: int, hold_ms: int, release_ms: int) -> None: ...
+    def push_left_joystick(self, joystick_position: tuple[float, float], delay_ms: int, hold_ms: int, release_ms: int) -> None: ...
+    def push_right_joystick(self, joystick_position: tuple[float, float], delay_ms: int, hold_ms: int, release_ms: int) -> None: ...
     def controller_state(
-        self, duration_ms: int, button_bitfield: int, dpad_position: int,
+        self, button_bitfield: int, dpad_position: int,
         left_x: float, left_y: float, right_x: float, right_y: float,
+        duration_ms: int,
     ) -> None: ...
 
 
@@ -132,8 +133,9 @@ class SwitchController:
         (SerialPrograms/Source/Controllers/Controller.h), via
         `PybindSwitchProController::push_button()`
         (SerialPrograms/Source/Integrations/PybindSwitchProController.h).
-        `delay = hold + release` runs commands back to back, the same convention as the
-        C++ class docs.
+        Queued back to back, the same timing `pbf_press_button()` uses
+        (delay = hold + release); the backend's `delay_ms` is available by
+        calling the `_pa_core.Controller` directly.
         """
         _check_nonnegative(hold_ms=hold_ms, release_ms=release_ms)
         self._require_open()
@@ -146,7 +148,7 @@ class SwitchController:
         if not parsed.has_buttons:
             raise ValueError("push_button() needs at least one button.")
         with self._lock:
-            self._backend.push_button(hold_ms + release_ms, hold_ms, release_ms, parsed.bitfield)
+            self._backend.push_button(parsed.bitfield, hold_ms + release_ms, hold_ms, release_ms)
 
     def push_dpad(self, position: btn.ButtonsArg, hold_ms: int = DEFAULT_HOLD_MS,
                   release_ms: int = DEFAULT_RELEASE_MS) -> None:
@@ -172,19 +174,16 @@ class SwitchController:
         if not parsed.has_dpad:
             raise ValueError("push_dpad() needs at least one d-pad direction.")
         with self._lock:
-            self._backend.push_dpad(hold_ms + release_ms, hold_ms, release_ms, parsed.dpad)
+            self._backend.push_dpad(parsed.dpad, hold_ms + release_ms, hold_ms, release_ms)
 
-    def controller_state(self, duration_ms: int = 500, buttons: btn.ButtonsArg = None, *,
-                         left: btn.StickArg = None, right: btn.StickArg = None) -> None:
+    def controller_state(self, buttons: btn.ButtonsArg = None, *,
+                         left: btn.StickArg = None, right: btn.StickArg = None,
+                         duration_ms: int = 500) -> None:
         """Hold any combination of buttons, d-pad and sticks for `duration_ms`.
 
         `buttons` may mix buttons and d-pad directions ("ZL+up"). Everything not
-        specified is released for the whole hold. The state is released when the
-        next queued command executes; queue a `wait()` afterwards for a gap.
-
-        C++: `AbstractController::issue_full_controller_state()`
-        (SerialPrograms/Source/Controllers/Controller.h), via
-        `PybindSwitchProController::controller_state()`.
+        specified is released for the whole hold. The argument order matches
+        `pbf_controller_state()`: buttons/d-pad first, sticks, then duration.
         """
         _check_nonnegative(duration_ms=duration_ms)
         self._require_open()
@@ -193,36 +192,43 @@ class SwitchController:
         right_x, right_y = btn.parse_stick(right) if right is not None else (0.0, 0.0)
         with self._lock:
             self._backend.controller_state(
-                duration_ms, parsed.bitfield, parsed.dpad,
-                left_x, left_y, right_x, right_y
+                parsed.bitfield, parsed.dpad,
+                left_x, left_y, right_x, right_y,
+                duration_ms
             )
 
-    def push_left_joystick(self, position: btn.StickArg, hold_ms: int = 500,
+    def push_left_joystick(self, joystick_position: btn.StickCoords, hold_ms: int = 500,
                           release_ms: int = 0) -> None:
-        """Tilt the left stick to `position` for `hold_ms`.
+        """Tilt the left stick to `joystick_position`, an (x, y) pair in [-1, 1]
+        with +x = right and +y = up, for `hold_ms`.
+
+        Direction-name strings are not accepted: pass coordinates, e.g. (0.0, 1.0).
 
         C++: `AbstractController::issue_left_joystick()`
         (SerialPrograms/Source/Controllers/Controller.h), via
         `PybindSwitchProController::push_left_joystick()`.
         """
-        self._push_joystick(self._backend.push_left_joystick, position, hold_ms, release_ms)
+        self._push_joystick(self._backend.push_left_joystick, joystick_position, hold_ms, release_ms)
 
-    def push_right_joystick(self, position: btn.StickArg, hold_ms: int = 500,
+    def push_right_joystick(self, joystick_position: btn.StickCoords, hold_ms: int = 500,
                            release_ms: int = 0) -> None:
-        """Tilt the right stick to `position` for `hold_ms`.
+        """Tilt the right stick to `joystick_position`, an (x, y) pair in [-1, 1]
+        with +x = right and +y = up, for `hold_ms`.
+
+        Direction-name strings are not accepted: pass coordinates, e.g. (0.0, 1.0).
 
         C++: `AbstractController::issue_right_joystick()`
         (SerialPrograms/Source/Controllers/Controller.h), via
         `PybindSwitchProController::push_right_joystick()`.
         """
-        self._push_joystick(self._backend.push_right_joystick, position, hold_ms, release_ms)
+        self._push_joystick(self._backend.push_right_joystick, joystick_position, hold_ms, release_ms)
 
-    def _push_joystick(self, send, position: btn.StickArg, hold_ms: int, release_ms: int) -> None:
+    def _push_joystick(self, send, joystick_position: btn.StickCoords, hold_ms: int, release_ms: int) -> None:
         _check_nonnegative(hold_ms=hold_ms, release_ms=release_ms)
         self._require_open()
-        x, y = btn.parse_stick(position)
+        x, y = btn.parse_stick_position(joystick_position)
         with self._lock:
-            send(hold_ms + release_ms, hold_ms, release_ms, x, y)
+            send((x, y), hold_ms + release_ms, hold_ms, release_ms)
 
     def wait(self, duration_ms: int) -> None:
         """Queue a pause of `duration_ms` with nothing pressed."""
