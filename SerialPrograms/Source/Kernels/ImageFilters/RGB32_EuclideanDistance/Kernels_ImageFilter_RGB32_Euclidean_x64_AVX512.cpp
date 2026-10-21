@@ -47,7 +47,7 @@ public:
         __m512i sum_sqr = _mm512_add_epi32(r, g);
         sum_sqr = _mm512_add_epi32(sum_sqr, b);
 
-        return _mm512_cmpgt_epi32_mask(m_distance_squared, sum_sqr);
+        return _mm512_cmple_epu32_mask(sum_sqr, m_distance_squared);
     }
 
 private:
