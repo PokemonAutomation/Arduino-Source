@@ -225,8 +225,8 @@ std::vector<BBQuests> process_quest_list(
     const ProgramInfo& info,
     VideoStream& stream, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS,
-    std::vector<BBQuests>& quest_list,
-    uint8_t& eggs_hatched
+    const std::vector<BBQuests>& quest_list,
+    uint8_t eggs_hatched
 ){
     std::vector<BBQuests> quests_to_do;
     bool rerolled = false;
