@@ -518,8 +518,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/AudioPipeline/IO/AudioInputDevice.h
     Source/CommonFramework/AudioPipeline/IO/AudioInputFile.cpp
     Source/CommonFramework/AudioPipeline/IO/AudioInputFile.h
-    Source/CommonFramework/AudioPipeline/IO/AudioSink.cpp
-    Source/CommonFramework/AudioPipeline/IO/AudioSink.h
+    Source/CommonFramework/AudioPipeline/IO/AudioOutputDevice.cpp
+    Source/CommonFramework/AudioPipeline/IO/AudioOutputDevice.h
     Source/CommonFramework/AudioPipeline/IO/AudioSource.cpp
     Source/CommonFramework/AudioPipeline/IO/AudioSource.h
     Source/CommonFramework/AudioPipeline/Spectrum/AudioSpectrumHolder.cpp
