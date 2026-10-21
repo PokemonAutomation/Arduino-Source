@@ -111,17 +111,27 @@ def test_controller_state_mixed_combination():
 
 
 def test_push_left_joystick():
-    """Separate x, y arguments are forwarded to push_left_joystick with delay = hold + release."""
+    """An (x, y) tuple is forwarded to the backend as separate x, y arguments, with delay = hold + release."""
     sw, fake = make()
-    sw.push_left_joystick(0.0, 1.0, hold_ms=1500)
+    sw.push_left_joystick((0.0, 1.0), hold_ms=1500)
     (x, y, delay, hold, release), = fake.arguments("push_left_joystick")
     assert (x, y) == (0.0, 1.0) and hold == 1500 and delay == 1500 + release
 
 
-def test_push_right_joystick():
-    """x, y are forwarded to push_right_joystick with the requested hold and release."""
+def test_push_left_joystick_rejects_string():
+    """push_left_joystick() wants an (x, y) tuple, not a direction-name string."""
     sw, fake = make()
-    sw.push_right_joystick(0.5, -0.5, hold_ms=300, release_ms=100)
+    with pytest.raises(ValueError, match="not a string"):
+        sw.push_left_joystick("up")
+    with pytest.raises(ValueError):
+        sw.push_left_joystick(None)
+    assert fake.commands() == []
+
+
+def test_push_right_joystick():
+    """A [x, y] list is accepted too, forwarded with the requested hold and release."""
+    sw, fake = make()
+    sw.push_right_joystick([0.5, -0.5], hold_ms=300, release_ms=100)
     (x, y, delay, hold, release), = fake.arguments("push_right_joystick")
     assert (x, y) == (0.5, -0.5) and hold == 300 and release == 100 and delay == 400
 

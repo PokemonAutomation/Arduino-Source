@@ -9,9 +9,10 @@ Everything a caller types to describe an input is parsed here:
   "UP-RIGHT", "UPRIGHT"). Listing "UP" and "RIGHT" together also means up-right.
 - Combinations: a list (["L", "R"]) or a "+"-joined string ("L+R", "ZL+A").
 - Joystick positions: an (x, y) pair in [-1, 1] with +x = right and +y = up.
-  push_left_joystick() / push_right_joystick() take the x and y numbers directly;
-  `parse_stick()` (used for `controller_state()`'s left/right) additionally accepts
-  a direction name ("up", "down_left", ...) and "neutral"/"center" for convenience.
+  push_left_joystick() / push_right_joystick() take the pair as a single
+  argument (validated by `parse_stick_pair()`); `parse_stick()` additionally
+  accepts a direction name ("up", "down_left", ...) and "neutral"/"center"
+  for the left/right arguments of controller_state().
 
 The button bit values match `NintendoSwitch::Button` and the d-pad values
 match `NintendoSwitch::DpadPosition` in
@@ -206,12 +207,23 @@ def parse_stick(position: StickArg) -> tuple[float, float]:
         length = math.hypot(vx, vy)
         return (vx / length, vy / length) # normalize to [-1, 1]
     # else parse as (x, y) pair
-    return _parse_stick_pair(position)
+    return parse_stick_pair(position)
 
 
-def _parse_stick_pair(values: Sequence[float]) -> tuple[float, float]:
-    """Parse an (x, y) pair into floats in [-1, 1]. Raises ValueError otherwise."""
-    values = list(values)
+def parse_stick_pair(position: Sequence[float]) -> tuple[float, float]:
+    """Parse an (x, y) stick position into (float, float) in [-1, 1], +y = up.
+
+    Used by `parse_stick()` (for pairs) and by `push_left_joystick()` /
+    `push_right_joystick()`. Direction-name strings (and None) are not
+    accepted here: pass exactly two numbers.
+    """
+    if position is None:
+        raise ValueError("A stick position must be an (x, y) pair, got None.")
+    if isinstance(position, str):
+        raise ValueError(
+            f"A stick position must be an (x, y) pair, not a string (got {position!r})."
+        )
+    values = list(position)
     if len(values) != 2:
         raise ValueError(f"A stick position needs exactly two numbers [x, y], got {values!r}.")
     x, y = float(values[0]), float(values[1])

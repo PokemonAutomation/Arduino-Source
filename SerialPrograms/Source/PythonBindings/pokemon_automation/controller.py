@@ -15,7 +15,7 @@ Example:
         sw.push_button("A")                              # tap A
         sw.push_button("L+R", hold_ms=200)               # press L and R together
         sw.push_dpad("up")                               # d-pad up
-        sw.push_left_joystick(0.0, 1.0, hold_ms=1500)  # walk forward
+        sw.push_left_joystick((0.0, 1.0), hold_ms=1500)  # walk forward
         sw.controller_state("B", left="up", duration_ms=2000)  # run forward
         sw.wait_for_all_requests()
 """
@@ -23,6 +23,7 @@ Example:
 from __future__ import annotations
 
 import threading
+from collections.abc import Sequence
 from typing import Protocol
 
 from . import _core, buttons as btn
@@ -197,33 +198,38 @@ class SwitchController:
                 duration_ms
             )
 
-    def push_left_joystick(self, x: float, y: float, hold_ms: int = 500,
+    def push_left_joystick(self, joystick_position: Sequence[float], hold_ms: int = 500,
                           release_ms: int = 0) -> None:
-        """Tilt the left stick to (x, y) for `hold_ms`.
+        """Tilt the left stick to `joystick_position`, an (x, y) tuple in [-1, 1]
+        with +x = right and +y = up, for `hold_ms`; e.g. (0.0, 1.0) is up.
 
-        `x`, `y`: in [-1, 1] with +x = right and +y = up; e.g. (0.0, 1.0) is up.
+        The pair is unpacked and passed to the backend as separate x, y
+        arguments (`_pa_core` keeps the C++ signature).
 
         C++: `AbstractController::issue_left_joystick()`
         (SerialPrograms/Source/Controllers/Controller.h), via
         `PybindSwitchProController::push_left_joystick()`.
         """
-        self._push_joystick(self._backend.push_left_joystick, x, y, hold_ms, release_ms)
+        self._push_joystick(self._backend.push_left_joystick, joystick_position, hold_ms, release_ms)
 
-    def push_right_joystick(self, x: float, y: float, hold_ms: int = 500,
+    def push_right_joystick(self, joystick_position: Sequence[float], hold_ms: int = 500,
                            release_ms: int = 0) -> None:
-        """Tilt the right stick to (x, y) for `hold_ms`.
+        """Tilt the right stick to `joystick_position`, an (x, y) tuple in [-1, 1]
+        with +x = right and +y = up, for `hold_ms`; e.g. (0.0, 1.0) is up.
 
-        `x`, `y`: in [-1, 1] with +x = right and +y = up; e.g. (0.0, 1.0) is up.
+        The pair is unpacked and passed to the backend as separate x, y
+        arguments (`_pa_core` keeps the C++ signature).
 
         C++: `AbstractController::issue_right_joystick()`
         (SerialPrograms/Source/Controllers/Controller.h), via
         `PybindSwitchProController::push_right_joystick()`.
         """
-        self._push_joystick(self._backend.push_right_joystick, x, y, hold_ms, release_ms)
+        self._push_joystick(self._backend.push_right_joystick, joystick_position, hold_ms, release_ms)
 
-    def _push_joystick(self, send, x: float, y: float, hold_ms: int, release_ms: int) -> None:
+    def _push_joystick(self, send, joystick_position: Sequence[float], hold_ms: int, release_ms: int) -> None:
         _check_nonnegative(hold_ms=hold_ms, release_ms=release_ms)
         self._require_open()
+        x, y = btn.parse_stick_pair(joystick_position)
         with self._lock:
             send(x, y, hold_ms + release_ms, hold_ms, release_ms)
 
