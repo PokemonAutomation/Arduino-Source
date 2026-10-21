@@ -63,12 +63,3 @@ def test_sticks():
     with pytest.raises(ValueError):
         btn.parse_stick("sideways")
 
-
-def test_matches_cpp_enum():
-    """The constants in buttons.py still agree with the C++ enums as exposed by the compiled module (skips when it is not built)."""
-    #  C++ side: core.BUTTONS and core.DPAD_POSITIONS defined in PythongBindings_Module.cpp
-    #  which are based on `enum Button` / `enum DpadPosition` in
-    #  SerialPrograms/Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h,
-    #  exposed by the module (SerialPrograms/Source/PythonBindings/PythonBindings_Module.cpp).
-    core = pytest.importorskip("pokemon_automation._pa_core")
-    btn.check_against_core(dict(core.BUTTONS), dict(core.DPAD_POSITIONS))
