@@ -13,6 +13,7 @@
 #include <QNetworkReply>
 #include <QObject>
 #include <QTimer>
+#include <QSslError>
 #include <QSaveFile>
 #include <QFileInfo>
 #include <QDir>
@@ -33,21 +34,31 @@ std::string download_file(Logger& logger, const std::string& url, std::chrono::s
     QByteArray downloaded_data;
     std::unique_ptr<QNetworkReply> reply;
     QEventLoop loop;
+    QList<QSslError> ssl_errors;
 
     QObject::connect(
         &network_access_manager, &QNetworkAccessManager::finished,
         &loop, [&downloaded_data, &loop](QNetworkReply* reply){
 //            cout << "QNetworkAccessManager::finished" << endl;
-            downloaded_data = reply->readAll();
+            //  Only read on success: reading from a reply whose connection
+            //  already failed logs a spurious "QIODevice::read ... device
+            //  not open" warning.
+            if (reply->error() == QNetworkReply::NoError){
+                downloaded_data = reply->readAll();
+            }
 //            reply->deleteLater();
             loop.exit();
         }
     );
     QObject::connect(
         &network_access_manager, &QNetworkAccessManager::sslErrors,
-        &loop, [&downloaded_data, &loop](QNetworkReply* reply){
+        &loop, [&ssl_errors, &loop](QNetworkReply* reply, const QList<QSslError>& errors){
 //            cout << "QNetworkAccessManager::sslErrors" << endl;
-            downloaded_data = reply->readAll();
+            //  Record the SSL errors and bail out; the handshake has already
+            //  failed, so don't read from the reply. Note: at this point the
+            //  reply is still marked as running, so this must be reported as
+            //  an SSL error (see below), not as a timeout.
+            ssl_errors = errors;
 //            reply->deleteLater();
             loop.exit();
         }
@@ -90,6 +101,21 @@ std::string download_file(Logger& logger, const std::string& url, std::chrono::s
     if (!reply){
         std::string str = "QNetworkReply is null.";
 //        logger.log(str, COLOR_RED);
+        throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, str);
+    }else if (!ssl_errors.isEmpty()){
+        //  The TLS handshake failed (missing or expired certificate,
+        //  untrusted root CA, MITM proxy, ...). This branch must come
+        //  before the isRunning() check below: when sslErrors() fires,
+        //  the reply is still marked as running, so without this check an
+        //  SSL failure would be misreported as a timeout.
+        reply->abort();
+        std::string str = "SSL error downloading " + url + ": ";
+        for (int i = 0; i < ssl_errors.size(); i++){
+            if (i != 0){
+                str += "; ";
+            }
+            str += ssl_errors.at(i).errorString().toStdString();
+        }
         throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, str);
     }else if (overall_timeout.count() > 0 && reply->isRunning()){
         //  The overall deadline elapsed while the request (typically the
