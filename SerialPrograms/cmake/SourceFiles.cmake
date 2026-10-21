@@ -107,6 +107,7 @@ file(GLOB CORE_LIBRARY_SOURCES
     ../Common/Cpp/LifetimeSanitizer.cpp
     ../Common/Cpp/LifetimeSanitizer.h
     ../Common/Cpp/ListenerSet.h
+    ../Common/Cpp/ListenerSet.cpp
     ../Common/Cpp/Logging/AbstractLogger.h
     ../Common/Cpp/Logging/FileLogger.cpp
     ../Common/Cpp/Logging/FileLogger.h
