@@ -438,7 +438,10 @@ public:
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         const size_t in_rate = 44100;
         const size_t out_rate = 48000;
-        const size_t n = 16384;
+        //  Long stream: the resampler holds back a tail carry (less than a
+        //  kernel block; up to ~128 outputs on x86 AVX-512) that is never
+        //  flushed, so the relative slack must dwarf that.
+        const size_t n = 65536;
 
         std::vector<float> l = make_tone(n, in_rate, 4031.25, 0.5f);
         std::vector<float> r = make_tone(n, in_rate, 14062.5, 0.4f);
@@ -487,7 +490,9 @@ public:
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         const size_t in_rate = 96000;
         const size_t out_rate = 48000;
-        const size_t n = 16384;
+        //  Long stream: see the note in SinkGateResampleUpTest about the
+        //  unflushed tail carry.
+        const size_t n = 65536;
 
         std::vector<float> m = make_tone(n, in_rate, 4031.25, 0.5f);
         std::vector<char> raw = interleave_bytes({m});
