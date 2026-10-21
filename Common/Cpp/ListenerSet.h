@@ -28,6 +28,7 @@
 
 namespace PokemonAutomation{
 
+class UnitTestDatabase;
 
 
 template <typename ListenerType>
@@ -205,6 +206,8 @@ void ListenerSet<ListenerType>::insert(ListenerType& listener, bool front, const
             m_head->sanitizer.check_usage();
 #endif
             m_head->prev = &node;
+        }else{
+            m_tail = &node;
         }
         m_head = &node;
     }else{
@@ -437,6 +440,7 @@ void ListenerSet<ListenerType>::run_on_all(Lambda&& lambda){
     }
 }
 
+void add_tests_ListenerSet(UnitTestDatabase& database);
 
 
 

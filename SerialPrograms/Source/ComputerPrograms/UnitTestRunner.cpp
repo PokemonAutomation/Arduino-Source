@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
@@ -41,6 +42,7 @@ UnitTestDatabase make_UNIT_TESTS_ALL(){
 
     add_tests_QtEventThreadPool(ret, GlobalThreadPools::computation_normal());
     add_tests_BlackBorderDetector(ret);
+    add_tests_ListenerSet(ret);
     add_tests_ChannelMixerMatrix(ret);
     OCR::add_tests(ret);
     Kernels::add_tests(ret);
