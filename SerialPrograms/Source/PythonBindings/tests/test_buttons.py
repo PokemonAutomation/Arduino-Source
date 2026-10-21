@@ -6,7 +6,9 @@ from pokemon_automation import buttons as btn
 
 
 def test_single_and_combined_buttons():
-    """Single button names, "+"-joined strings and lists all parse to the right bitfield, with no d-pad set."""
+    """tests parse_buttons():
+    Ensures that single button names, "+"-joined strings and lists all parse to the right bitfield, with no d-pad set.
+    """
     assert btn.parse_buttons("A").bitfield == btn.BUTTON_BITS["A"]
     both = btn.parse_buttons("L+R")
     assert both.bitfield == btn.BUTTON_BITS["L"] | btn.BUTTON_BITS["R"]
@@ -15,7 +17,9 @@ def test_single_and_combined_buttons():
 
 
 def test_aliases_and_plus_minus():
-    """Aliases (START/SELECT, L3, ...) resolve to their buttons, and a lone "+" or "-" is the PLUS/MINUS button, not a separator."""
+    """tests parse_buttons():
+    Aliases (START/SELECT, L3, ...) resolve to their buttons, and a lone "+" or "-" is the PLUS/MINUS button, not a separator.
+    """
     assert btn.parse_buttons("+").bitfield == btn.BUTTON_BITS["PLUS"]
     assert btn.parse_buttons("-").bitfield == btn.BUTTON_BITS["MINUS"]
     assert btn.parse_buttons("start").bitfield == btn.BUTTON_BITS["PLUS"]
@@ -24,7 +28,9 @@ def test_aliases_and_plus_minus():
 
 
 def test_dpad():
-    """D-pad direction names (including diagonals and mixed spellings) map to the right DpadPosition, can be combined with buttons, and None means no d-pad."""
+    """tests parse_buttons():
+    D-pad direction names (including diagonals and mixed spellings) map to the right DpadPosition, can be combined with buttons, and None means no d-pad.
+    """
     assert btn.parse_buttons("up").dpad == btn.DPAD_POSITIONS["UP"]
     assert btn.parse_buttons("up+right").dpad == btn.DPAD_POSITIONS["UP_RIGHT"]
     assert btn.parse_buttons("down-left").dpad == btn.DPAD_POSITIONS["DOWN_LEFT"]
@@ -35,7 +41,9 @@ def test_dpad():
 
 
 def test_invalid_buttons():
-    """Unknown button names and contradictory d-pad directions raise ValueError; None parses as no input at all."""
+    """tests parse_buttons():
+    Unknown button names and contradictory d-pad directions raise ValueError; None parses as no input at all.
+    """
     with pytest.raises(ValueError, match="Unknown button"):
         btn.parse_buttons("Q")
     with pytest.raises(ValueError, match="Contradictory"):
