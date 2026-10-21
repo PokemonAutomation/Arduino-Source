@@ -155,15 +155,7 @@ int run_program(int argc, char *argv[]){
 
     //  Read program settings from json file: SerialPrograms-Settings.json.
     try{
-        if (!migrate_settings(logger, application.applicationName().toStdString() + "-Settings.json")){
-            return 1;
-        }
-
         PERSISTENT_SETTINGS().read();
-
-        if (!migrate_stats(logger)){
-            return 1;
-        }
     }catch (const FileException& error){
         logger.log(error.message(), COLOR_RED);
     }catch (const ParseException& error){
