@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
+#include <format>
 #include <memory>
 #include <random>
 #include <string>
@@ -213,9 +214,8 @@ std::string hex(uint32_t x){
     return buffer;
 }
 std::string describe_case(double max_distance, size_t width, size_t height){
-    char buffer[64];
-    std::snprintf(buffer, sizeof(buffer), "max distance %g, %zux%zu", max_distance, width, height);
-    return buffer;
+    //  std::format uses the same "g" presentation for doubles as %g.
+    return std::format("max distance {}, {}x{}", max_distance, width, height);
 }
 std::string describe_pixel(uint32_t pixel, size_t x, size_t y, uint32_t limit){
     return "pixel " + hex(pixel) + " at (" + std::to_string(x) + ", " + std::to_string(y) +
