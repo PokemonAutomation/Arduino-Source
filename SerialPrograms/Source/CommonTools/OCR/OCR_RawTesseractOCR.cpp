@@ -5,10 +5,10 @@
  */
 
 #include <memory>
-#include <QFile>
 #include <QDir>
 #include "3rdParty/TesseractPA/TesseractPA.h"
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Logging/Logger.h"
@@ -28,8 +28,7 @@ bool tesseract_language_available(Language language){
     path += "Tesseract/";
     path += language_data(language).code;
     path += ".traineddata";
-    QFile file(QString::fromStdString(path));
-    return file.exists();
+    return Filesystem::exists(Filesystem::Path(path));
 }
 
 

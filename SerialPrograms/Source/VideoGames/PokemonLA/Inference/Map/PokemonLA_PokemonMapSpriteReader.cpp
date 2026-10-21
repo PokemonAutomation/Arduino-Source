@@ -18,11 +18,9 @@
 #include <vector>
 #include <map>
 #include <iostream>
-#include <QString>
-#include <QFileInfo>
-#include <QDir>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
@@ -1020,12 +1018,11 @@ public:
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        const QString full_path(QString::fromStdString(m_image));
-        const QFileInfo fileinfo(full_path);
-        const QString filename = fileinfo.fileName();
-        const QDir parent_dir = fileinfo.dir();
+        const Filesystem::Path image_path(m_image);
+        const std::string filename = image_path.filename().string();
+        const Filesystem::Path parent_dir = image_path.parent_path();
 
-        const std::string base_name = fileinfo.baseName().toStdString();
+        const std::string base_name = image_path.stem().string();
 
         const std::vector<std::string> filename_words = parse_words(base_name);
         MapRegion region = MapRegion::NONE;
@@ -1052,23 +1049,23 @@ public:
             return 1;
         }
 
-        const QString mmo_revealed_image_path = parent_dir.filePath("_" + filename);
-        const QString mmo_revealed_txt_path = parent_dir.filePath("_" + fileinfo.baseName() + ".txt");
+        const std::string mmo_revealed_image_path = (parent_dir / Filesystem::Path("_" + filename)).string();
+        const std::string mmo_revealed_txt_path = (parent_dir / Filesystem::Path("_" + base_name + ".txt")).string();
 
         ImageRGB32 question_mark_image(m_image);
-        ImageRGB32 sprite_image(mmo_revealed_image_path.toStdString());
+        ImageRGB32 sprite_image(mmo_revealed_image_path);
 
         if (!question_mark_image){
             cerr << "Error: cannot load MMO question mark image file " << m_image << endl;
             return "Error: cannot load MMO question mark image file " + m_image;
         }
         if (!sprite_image){
-            cerr << "Error: cannot load MMO revealed sprites image file " << mmo_revealed_image_path.toStdString() << endl;
-            return "Error: cannot load MMO revealed sprites image file " + mmo_revealed_image_path.toStdString();
+            cerr << "Error: cannot load MMO revealed sprites image file " << mmo_revealed_image_path << endl;
+            return "Error: cannot load MMO revealed sprites image file " + mmo_revealed_image_path;
         }
 
         std::vector<std::string> target_sprites;
-        if (load_slug_list(mmo_revealed_txt_path.toStdString(), target_sprites) == false){
+        if (load_slug_list(mmo_revealed_txt_path, target_sprites) == false){
             return false;
         }
 

@@ -5,7 +5,8 @@
  */
 
 #include <cmath>
-#include <QFile>
+#include "Common/Cpp/Filesystem/FileIO.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Strings/Unicode.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
@@ -305,13 +306,13 @@ std::string MultiLanguageJoinTracker::dump() const{
 }
 void MultiLanguageJoinTracker::dump(const std::string& filename) const{
     std::string str = dump();
-    QFile file(QString::fromStdString(filename));
-    if (!file.open(QIODevice::WriteOnly)){
+    FileIO file(Filesystem::Path(filename), FileMode::WRITE);
+    if (!file.is_open()){
         return;
     }
     std::string bom = "\xef\xbb\xbf";
-    file.write(bom.c_str(), bom.size());
-    file.write(str.c_str(), str.size());
+    file.write(bom);
+    file.write(str);
 }
 
 

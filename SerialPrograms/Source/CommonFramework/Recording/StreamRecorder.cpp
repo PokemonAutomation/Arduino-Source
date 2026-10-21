@@ -6,9 +6,8 @@
 
 #include <QtConfig>
 #if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
-#include <QFileInfo>
-#include <QDir>
 #include <QUrl>
+#include "Common/Cpp/Filesystem/Filesystem.h"
 #include <QAudioFormat>
 #include <QMediaFormat>
 #include <QCoreApplication>
@@ -77,7 +76,7 @@ StreamRecording::StreamRecording(
     }
 
 #ifndef PA_STREAM_HISTORY_LOCAL_BUFFER
-    QDir().mkdir(QString::fromStdString(m_filename));
+    Filesystem::create_directories(Filesystem::Path(m_filename));
 #endif
     if (has_video){
         m_filename += now_to_filestring() + ".mp4";
@@ -98,7 +97,7 @@ StreamRecording::~StreamRecording(){
     wait();
 #ifndef PA_STREAM_HISTORY_LOCAL_BUFFER
     if (!m_filename.empty()){
-        QDir().remove(QString::fromStdString(m_filename));
+        Filesystem::remove(Filesystem::Path(m_filename));
     }
 #endif
 }
@@ -117,9 +116,10 @@ bool StreamRecording::stop_and_save(const std::string& filename){
 #ifdef PA_STREAM_HISTORY_LOCAL_BUFFER
     return m_write_buffer.write(m_logger, filename);
 #else
-    bool ret = QDir().rename(QString::fromStdString(m_filename), QString::fromStdString(filename));
+    std::error_code ec;
+    Filesystem::rename(Filesystem::Path(m_filename), Filesystem::Path(filename), ec);
     m_filename.clear();
-    return ret;
+    return !ec;
 #endif
 }
 
@@ -318,9 +318,10 @@ void StreamRecording::internal_run(){
 #ifdef PA_STREAM_HISTORY_LOCAL_BUFFER
     m_recorder->setOutputDevice(&m_write_buffer);
 #else
-    QFileInfo file(QString::fromStdString(m_filename));
     m_recorder->setOutputLocation(
-        QUrl::fromLocalFile(file.absoluteFilePath())
+        QUrl::fromLocalFile(QString::fromStdString(
+            Filesystem::absolute(Filesystem::Path(m_filename)).string_slash_normalized()
+        ))
     );
 #endif
 
@@ -459,7 +460,7 @@ StreamRecording2::StreamRecording2(
     }
 
 #ifndef PA_STREAM_HISTORY_LOCAL_BUFFER
-    QDir().mkdir(QString::fromStdString(m_filename));
+    Filesystem::create_directories(Filesystem::Path(m_filename));
 #endif
     if (has_video){
         m_filename += now_to_filestring() + ".mp4";
@@ -485,9 +486,10 @@ StreamRecording2::StreamRecording2(
 #ifdef PA_STREAM_HISTORY_LOCAL_BUFFER
     m_recorder->setOutputDevice(&m_write_buffer);
 #else
-    QFileInfo file(QString::fromStdString(m_filename));
     m_recorder->setOutputLocation(
-        QUrl::fromLocalFile(file.absoluteFilePath())
+        QUrl::fromLocalFile(QString::fromStdString(
+            Filesystem::absolute(Filesystem::Path(m_filename)).string_slash_normalized()
+        ))
     );
 #endif
 
@@ -510,7 +512,7 @@ StreamRecording2::~StreamRecording2(){
 #endif
 
 #ifndef PA_STREAM_HISTORY_LOCAL_BUFFER
-    cout << QDir().remove(QString::fromStdString(m_filename)) << endl;
+    cout << Filesystem::remove(Filesystem::Path(m_filename)) << endl;
 #endif
 }
 
@@ -723,9 +725,10 @@ bool StreamRecording2::stop_and_save(const std::string& filename){
 #ifdef PA_STREAM_HISTORY_LOCAL_BUFFER
     return m_write_buffer.write(m_logger, filename);
 #else
-    bool ret = QDir().rename(QString::fromStdString(m_filename), QString::fromStdString(filename));
+    std::error_code ec;
+    Filesystem::rename(Filesystem::Path(m_filename), Filesystem::Path(filename), ec);
     m_filename.clear();
-    return ret;
+    return !ec;
 #endif
 }
 

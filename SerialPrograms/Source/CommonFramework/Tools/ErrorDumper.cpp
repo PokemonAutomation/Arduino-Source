@@ -4,7 +4,7 @@
  *
  */
 
-#include <QDir>
+#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
@@ -30,7 +30,7 @@ std::string dump_image_alone(
     static Mutex lock;
     std::lock_guard<Mutex> lg(lock);
 
-    QDir().mkdir(ERROR_PATH().c_str());
+    Filesystem::create_directories(Filesystem::Path(ERROR_PATH()));
     std::string name = ERROR_PATH() + now_to_filestring();
     name += "-";
     name += label;
