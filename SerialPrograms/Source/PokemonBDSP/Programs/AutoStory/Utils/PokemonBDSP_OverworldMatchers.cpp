@@ -547,12 +547,13 @@ double overworld_entry_confidence(const OverworldMatchResult& result,
 }
 OverworldMatchResult match_galactic_hq_jupiter(const ImageRGB32& frame){
     // The supplied reference is the interaction pose directly north of Jupiter.
-    // Confirm both red chair groups and the stairs before facing south to talk.
+    // Confirm the table-facing chair sides, adjacent table edges, and stairs.
+    // Exclude the NPC-facing chair edges where Buneary can overlap the reference.
     const std::vector<LandmarkConfig> configs{
-        {"LeftChairs","PokemonBDSP/Autostory/GalacticHQ/AboveLeftChairs.png",
-            {334.0/1920,756.0/1080,156.0/1920,228.0/1080},{0,.40,.45,.60},.93,.20},
-        {"RightChairs","PokemonBDSP/Autostory/GalacticHQ/AboveRightChairs.png",
-            {1238.0/1920,756.0/1080,164.0/1920,230.0/1080},{.50,.40,.50,.60},.93,.20},
+        {"LeftChairs","PokemonBDSP/Autostory/GalacticHQ/AboveLeftChairTableEdge.png",
+            {300.0/1920,780.0/1080,156.0/1920,206.0/1080},{0,.40,.45,.60},.93,.20},
+        {"RightChairs","PokemonBDSP/Autostory/GalacticHQ/AboveRightChairTableEdge.png",
+            {1286.0/1920,780.0/1080,154.0/1920,206.0/1080},{.50,.40,.50,.60},.93,.20},
         {"StairBoundary","PokemonBDSP/Autostory/GalacticHQ/AboveStairs.png",
             {424.0/1920,310.0/1080,214.0/1920,198.0/1080},{0,0,1,.85},.93,.20}
     };
@@ -569,6 +570,9 @@ OverworldMatchResult match_galactic_hq_jupiter(const ImageRGB32& frame){
         auto approach=std::vector<LandmarkConfig>{configs[0],configs[1]};
         approach[0].path="PokemonBDSP/Autostory/GalacticHQ/LeftChairs.png";
         approach[1].path="PokemonBDSP/Autostory/GalacticHQ/RightChairs.png";
+        // Retain the original geometry for the old-row guide-only references.
+        approach[0].target={334.0/1920,756.0/1080,156.0/1920,228.0/1080};
+        approach[1].target={1238.0/1920,756.0/1080,164.0/1920,230.0/1080};
         for (auto& chair:approach){chair.threshold=.95;chair.margin=.25;}
         auto coarse=match_landmarks(frame,approach,2,1.0/128,POSITION_TOLERANCE_Y,true);
         if (coarse.located){
@@ -611,6 +615,74 @@ OverworldMatchResult match_galactic_hq_cut(const ImageRGB32& frame){
     // its column; the watched Up/A loop owns the final north interaction.
     result.dy=0;
     result.at_target=result.located && !result.coarse && std::abs(result.dx)<=1.0/128;
+    return result;
+}
+
+OverworldMatchResult match_eterna_cycle_shop_entrance(const ImageRGB32& frame){
+    const std::vector<LandmarkConfig> configs{
+        {"Shop sign","PokemonBDSP/Autostory/EternaBikeShop/eterna_cycle_shop_entrance-0.png",{555.0/1920,350.0/1080,100.0/1920,120.0/1080},{0,0.1,0.65,0.75},.93,.20},
+        {"Shop roof braces","PokemonBDSP/Autostory/EternaBikeShop/ShopRoofBraces.png",{680.0/1920,145.0/1080,470.0/1920,36.0/1080},{0,0,.95,.75},.93,.20}
+    };
+    return match_landmarks(frame,configs,2,1.0/128,POSITION_TOLERANCE_Y,true);
+}
+
+OverworldMatchResult match_eterna_cycle_shop_interior(const ImageRGB32& frame){
+    // Entry mat view: fixed wall tools and register, clear of NPCs/Pokemon.
+    // This identifies the room; it is not the counter interaction position.
+    const std::vector<LandmarkConfig> configs{
+        {"Shop wall tools","PokemonBDSP/Autostory/EternaBikeShop/InteriorWallTools.png",{920.0/1920,20.0/1080,350.0/1920,150.0/1080},{.15,0,.60,.55},.93,.20},
+        {"Shop register","PokemonBDSP/Autostory/EternaBikeShop/InteriorRegister.png",{760.0/1920,160.0/1080,120.0/1920,145.0/1080},{.20,0,.55,.65},.93,.20}
+    };
+    auto result=match_landmarks(frame,configs,2,1.0/128,POSITION_TOLERANCE_Y,true);
+    if (result.located) return result;
+    const std::vector<LandmarkConfig> north_configs{
+        {"Shop wall tools","PokemonBDSP/Autostory/EternaBikeShop/InteriorNorthWallTools.png",{928.0/1920,84.0/1080,350.0/1920,150.0/1080},{.15,0,.60,.55},.93,.20},
+        {"Shop register","PokemonBDSP/Autostory/EternaBikeShop/InteriorNorthRegister.png",{754.0/1920,230.0/1080,120.0/1920,145.0/1080},{.20,0,.55,.65},.93,.20}
+    };
+    return match_landmarks(frame,north_configs,2,1.0/128,POSITION_TOLERANCE_Y,true);
+}
+
+OverworldMatchResult match_eterna_cycle_shop_reward(const ImageRGB32& frame){
+    // Reward returns the player outside on the bicycle, at a separate pose.
+    const std::vector<LandmarkConfig> configs{
+        {"Shop sign","PokemonBDSP/Autostory/EternaBikeShop/reward-sign.png",{580.0/1920,330.0/1080,100.0/1920,120.0/1080},{0,.1,.65,.75},.93,.20},
+        {"Shop post","PokemonBDSP/Autostory/EternaBikeShop/reward-post.png",{1020.0/1920,350.0/1080,100.0/1920,106.0/1080},{.3,.1,.65,.75},.93,.20}
+    };
+    return match_landmarks(frame,configs,2,1.0/128,POSITION_TOLERANCE_Y,true);
+}
+
+OverworldMatchResult match_eterna_cycle_shop_counter(const ImageRGB32& frame){
+    const std::vector<LandmarkConfig> configs{
+        {"Red frame","PokemonBDSP/Autostory/EternaBikeShop/eterna_cycle_shop_counter-0.png",{620.0/1920,65.0/1080,390.0/1920,240.0/1080},{0.1,0,0.65,0.55},.93,.20},
+        {"Counter detail","PokemonBDSP/Autostory/EternaBikeShop/eterna_cycle_shop_counter-1.png",{1110.0/1920,486.0/1080,86.0/1920,38.0/1080},{0.3,0.15,0.65,0.65},.93,.20}
+    };
+    return match_landmarks(frame,configs,2,1.0/128,POSITION_TOLERANCE_Y,true);
+}
+
+OverworldMatchResult match_cycling_road_north_entry(const ImageRGB32& frame){
+    const std::vector<LandmarkConfig> configs{
+        {"Route sign","PokemonBDSP/Autostory/CyclingRoad/cycling_road_north_entry-0.png",{696.0/1920,270.0/1080,140.0/1920,110.0/1080},{0,0,0.65,0.65},.93,.20},
+        {"Left bridge cap","PokemonBDSP/Autostory/CyclingRoad/cycling_road_north_entry-1.png",{194.0/1920,568.0/1080,160.0/1920,160.0/1080},{0,0.2,0.5,0.8},.93,.20},
+        {"Right bridge cap","PokemonBDSP/Autostory/CyclingRoad/cycling_road_north_entry-2.png",{1180.0/1920,540.0/1080,300.0/1920,280.0/1080},{0.5,0.2,0.5,0.8},.93,.20}
+    };
+    return match_landmarks(frame,configs,3,1.0/128,POSITION_TOLERANCE_Y,true);
+}
+
+OverworldMatchResult match_galactic_hq_exterior(const ImageRGB32& frame){
+    const std::vector<LandmarkConfig> configs{
+        {"HQ sign","PokemonBDSP/Autostory/GalacticHQ/galactic_hq_exterior-0.png",{660.0/1920,615.0/1080,118.0/1920,124.0/1080},{0,0.2,0.65,0.8},.93,.20},
+        {"HQ doorway lintel","PokemonBDSP/Autostory/GalacticHQ/galactic_hq_exterior-1.png",{874.0/1920,350.0/1080,172.0/1920,78.0/1080},{0.2,0,0.6,0.7},.93,.20}
+    };
+    return match_landmarks(frame,configs,2,1.0/128,POSITION_TOLERANCE_Y,true);
+}
+
+OverworldMatchResult match_eterna_center_departure(const ImageRGB32& frame){
+    // Center-exit pose in the recorded Center->Mart and bicycle-shop route.
+    // Reuse the existing shadow/appearance-aware Center identification.
+    auto result=match_eterna_center_entrance(frame);
+    result.dy-=.070463;
+    result.at_target=result.located && !result.coarse &&
+        std::abs(result.dx)<=1.0/128 && std::abs(result.dy)<=POSITION_TOLERANCE_Y;
     return result;
 }
 

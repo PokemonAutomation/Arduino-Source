@@ -8,6 +8,10 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include <chrono>
+#include <functional>
+#include "CommonFramework/Globals.h"
+#include "CommonTools/VisualDetectors/ImageMatchDetector.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
@@ -40,6 +44,99 @@ namespace PokemonBDSP{
             return;
         }
         pbf_press_button(context,button,hold,release);
+    }
+
+    static void segment03_finish_transition(VideoStream& stream, ProControllerContext& context,
+        const std::string& label) {
+        BlackScreenWatcher visible(COLOR_RED,{0.1,0.1,0.8,0.8},
+            100,10,BlackScreenWatcher::FinderType::GONE,500ms);
+        if (wait_until(stream,context,30s,{{visible}}) != 0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                label+": Transition did not finish.",stream);
+        pbf_wait(context,500ms);
+        context.wait_for_all_requests();
+    }
+
+    // Stationary destination confirmation: do not steer during an NPC reward
+    // scene or declare arrival from a fade that has only just started.
+    static void segment03_confirm_location(VideoStream& stream, ProControllerContext& context,
+        OverworldMatchResult (*matcher)(const ImageRGB32&), const std::string& label,
+        size_t observations = 20, bool advance_dialogue = false, bool require_target = false) {
+        context.wait_for_all_requests();
+        size_t confirmations=0;
+        for (size_t observation=0;observation<observations;observation++) {
+            const auto frame=stream.video().snapshot();
+            const auto match=frame ? matcher(*frame.frame) : OverworldMatchResult{};
+            if (require_target ? match.at_target : match.located) {
+                if (++confirmations>=3) { stream.log("["+label+"] Scene confirmed.",COLOR_GREEN); return; }
+                pbf_wait(context,250ms);
+            } else {
+                confirmations=0;
+                if (advance_dialogue) pbf_press_button(context,BUTTON_A,150ms,500ms);
+                else pbf_wait(context,500ms);
+            }
+            context.wait_for_all_requests();
+        }
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            label+": Expected scene not confirmed.",stream);
+    }
+
+    // Watch the approach itself, cancelling queued movement as soon as the
+    // trainer speaks or a battle starts. The existing battle engine owns combat.
+    static void segment03_expected_encounter(VideoStream& stream, ProControllerContext& context,
+        const std::string& label, const std::function<void(ProControllerContext&)>& approach) {
+        context.wait_for_all_requests();
+        ShortDialogWatcher dialogue;
+        StartBattleDetector starting(stream.overlay());
+        BattleMenuWatcher menu(BattleType::TRAINER);
+        if (run_until<ProControllerContext>(stream,context,
+            [&](ProControllerContext& ctx) { approach(ctx); pbf_wait(ctx,45000ms); },
+            {{dialogue},{starting},{menu}}) < 0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                label+": Expected trainer encounter did not start.",stream);
+        stream.log("["+label+"] Encounter detected; route movement cancelled.");
+        segment03_route_battle(stream,context,label,false);
+    }
+
+    static void segment03_wait_image(VideoStream& stream, ProControllerContext& context,
+        const std::string& resource, const ImageFloatBox& box, const std::string& label) {
+        auto reference=std::make_shared<ImageRGB32>(RESOURCE_PATH()+resource);
+        ImageMatchWatcher ready(reference,box,25.0,false,250ms);
+        if (wait_until(stream,context,5s,{{ready}}) != 0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                label+": Visual confirmation missing.",stream);
+    }
+
+    static void segment03_register_bike(VideoStream& stream, ProControllerContext& context) {
+        if (!clear_new_item_flags(stream,context))
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Eterna Bike: Could not clear reward flags.",stream);
+        BagItemTemplate bike;
+        bike.reference_path="PokemonBDSP/Autostory/EternaBikeShop/BikeBag.png";
+        bike.label="Bike";
+        bike.reference_row=4;
+        if (!find_bag_item(stream,context,bike,8))
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Eterna Bike: Bike selection not confirmed.",stream);
+        pbf_press_button(context,BUTTON_A,150ms,500ms);
+        context.wait_for_all_requests();
+        segment03_wait_image(stream,context,"PokemonBDSP/Autostory/EternaBikeShop/BikePopup.png",
+            {.79,.44,.15,.05},"Bike Register menu");
+        pbf_press_dpad(context,DPAD_DOWN,80ms,250ms);
+        pbf_press_button(context,BUTTON_A,150ms,500ms);
+        context.wait_for_all_requests();
+        segment03_wait_image(stream,context,"PokemonBDSP/Autostory/EternaBikeShop/BikeRegisterWheel.png",
+            {.475,.375,.05,.085},"Bike registration wheel");
+        pbf_press_dpad(context,DPAD_RIGHT,80ms,250ms);
+        pbf_press_button(context,BUTTON_A,150ms,500ms);
+        context.wait_for_all_requests();
+        segment03_wait_image(stream,context,"PokemonBDSP/Autostory/EternaBikeShop/BikeRegistered.png",
+            {.605,.365,.075,.11},"Registered Bike icon");
+        segment03_wait_image(stream,context,"PokemonBDSP/Autostory/EternaBikeShop/BikeRegistered.png",
+            {.285,.835,.32,.048},"Bike registration confirmation");
+        pbf_mash_button(context,BUTTON_B,2000ms);
+        context.wait_for_all_requests();
+        stream.log("[Eterna Bike] Registration confirmed; preserving the reward's mounted state.",COLOR_GREEN);
     }
 
     // Stop at the completed doorway transition, rather than spending the
@@ -76,8 +173,7 @@ namespace PokemonBDSP{
             },{{transition}});
         if (result!=0) OperationFailedExceptionWithScreenshot::fire(
             ErrorReportMode::SEND_ERROR_REPORT,label+": Doorway transition not confirmed.",stream);
-        pbf_wait(context,500ms);
-        context.wait_for_all_requests();
+        segment03_finish_transition(stream,context,label);
     }
 
     void eterna_gym_to_jupiter(VideoStream& stream, ProControllerContext& context) {
@@ -297,6 +393,8 @@ namespace PokemonBDSP{
             },{{hq_leaving}}) != 0)
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                 "Galactic HQ: Exit transition not confirmed.",stream);
+        segment03_finish_transition(stream,context,"Galactic HQ exit");
+        segment03_confirm_location(stream,context,match_galactic_hq_exterior,"Galactic HQ exterior");
         // Clamp against the uncut front bush; checkpoint 03.02 starts here.
         pbf_move_left_joystick(context,{0,-1},350ms,500ms);
         context.wait_for_all_requests();
@@ -316,7 +414,9 @@ namespace PokemonBDSP{
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                 "Eterna Mart: Could not buy 3 Escape Ropes.",stream);
         segment03_doorway(stream,context,false,5000ms,"Eterna Mart exit");
-        clear_new_item_flags(stream,context);
+        if (!clear_new_item_flags(stream,context))
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Eterna Mart: Could not clear purchase flags.",stream);
 
         // Retrace to the Center column, then use its doorway to normalize the
         // position. Do not reverse the time spent loading the Mart interior.
@@ -324,20 +424,51 @@ namespace PokemonBDSP{
         pbf_move_left_joystick(context,{-1,0},587ms,100ms);
         segment03_doorway(stream,context,true,5000ms,"Eterna Center return after Mart");
         segment03_doorway(stream,context,false,5000ms,"Eterna Center exit after Mart");
+        align_to_overworld_landmarks(stream,context,match_eterna_center_departure,
+            "Eterna Center departure after Mart",false,true);
+    }
+
+    static void segment03_enter_cycle_shop(VideoStream& stream, ProControllerContext& context) {
+        context.wait_for_all_requests();
+        auto frame=stream.video().snapshot();
+        if (frame && match_eterna_cycle_shop_interior(*frame.frame).located) {
+            segment03_confirm_location(stream,context,match_eterna_cycle_shop_interior,
+                "Eterna bicycle shop interior");
+            return;
+        }
+        bool entered=false;
+        // Watch the entire approach AND the locator. A fade cancels all queued
+        // input, even if the doorway is crossed before alignment has finished.
+        BlackScreenWatcher entering;
+        const int result=run_until<ProControllerContext>(stream,context,
+            [&](ProControllerContext& ctx) {
+                pbf_move_left_joystick(ctx,{0,-1},1514ms,0ms);
+                pbf_wait(ctx,177ms);
+                pbf_move_left_joystick(ctx,{1,0},587ms,0ms);
+                pbf_wait(ctx,522ms);
+                pbf_move_left_joystick(ctx,{1,0},144ms,0ms);
+                pbf_wait(ctx,439ms);
+                align_to_overworld_landmarks(stream,ctx,match_eterna_cycle_shop_entrance,
+                    "Eterna bicycle shop entrance",false,true,false,
+                    match_eterna_cycle_shop_interior,&entered);
+                if (!entered) {
+                    pbf_move_left_joystick(ctx,{0,1},4000ms,0ms);
+                    pbf_wait(ctx,3000ms);
+                }
+            },{{entering}});
+        if (result!=0 && !entered)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Eterna bicycle shop: Entry transition not detected.",stream);
+        segment03_finish_transition(stream,context,"Eterna bicycle shop entrance");
+        segment03_confirm_location(stream,context,match_eterna_cycle_shop_interior,
+            "Eterna bicycle shop interior");
+        stream.log("[Eterna bicycle shop] Interior confirmed; outdoor alignment stopped.",COLOR_GREEN);
     }
 
     void jupiter_to_coronet(VideoStream& stream, ProControllerContext& context) {
         // Continue from 03.01 outside HQ, directly in front of the Cut bush.
-        segment03_route_press(stream,context, BUTTON_A, 232ms, 0ms);
-        pbf_wait(context, 314ms);
-        segment03_route_press(stream,context, BUTTON_A, 199ms, 0ms);
-        pbf_wait(context, 129ms);
-        segment03_route_press(stream,context, BUTTON_A, 163ms, 0ms);
-        pbf_wait(context, 116ms);
-        segment03_route_press(stream,context, BUTTON_A, 174ms, 0ms);
-        pbf_wait(context, 173ms);
-        segment03_route_press(stream,context, BUTTON_A, 165ms, 0ms);
-        pbf_wait(context, 4174ms);
+        use_HM(stream,context,"Galactic HQ exit Cut");
+        clear_post_battle_dialogue(stream,context,BUTTON_A,6000ms);
         pbf_move_left_joystick(context, {0.000000, -1.000000}, 1413ms, 0ms);
         pbf_wait(context, 182ms);
         pbf_move_left_joystick(context, {-1.000000, -0.000000}, 712ms, 0ms);
@@ -346,146 +477,46 @@ namespace PokemonBDSP{
         pbf_wait(context, 27ms);
         pbf_move_left_joystick(context, {1.000000, -0.000000}, 745ms, 0ms);
         pbf_wait(context, 868ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 866ms, 0ms);
+        align_to_overworld_landmarks(stream,context,match_eterna_center_entrance,
+            "Eterna Center after Jupiter",false,true);
+        segment03_doorway(stream,context,true,4000ms,"Eterna Center entrance after Jupiter");
         if (!heal_pokemon(stream,context,"Eterna after Jupiter")) OperationFailedExceptionWithScreenshot::fire(
             ErrorReportMode::SEND_ERROR_REPORT,"Eterna Center exit not confirmed.",stream);
+        segment03_finish_transition(stream,context,"Eterna Center heal exit");
+        align_to_overworld_landmarks(stream,context,match_eterna_center_departure,
+            "Eterna Center departure to Mart",false,true);
         eterna_mart_escape_ropes(stream,context);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1514ms, 0ms);
-        pbf_wait(context, 177ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 587ms, 0ms);
-        pbf_wait(context, 522ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 144ms, 0ms);
-        pbf_wait(context, 439ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1078ms, 0ms);
-        pbf_wait(context, 3295ms);
+        segment03_enter_cycle_shop(stream,context);
         pbf_move_left_joystick(context, {0.000000, 1.000000}, 505ms, 0ms);
         pbf_wait(context, 405ms);
         pbf_move_left_joystick(context, {-1.000000, -0.000000}, 568ms, 0ms);
         pbf_wait(context, 403ms);
         pbf_move_left_joystick(context, {0.000000, 1.000000}, 642ms, 0ms);
         pbf_wait(context, 14ms);
-        segment03_route_press(stream,context, BUTTON_A, 186ms, 0ms);
-        pbf_wait(context, 612ms);
-        segment03_route_press(stream,context, BUTTON_A, 211ms, 0ms);
-        pbf_wait(context, 190ms);
-        segment03_route_press(stream,context, BUTTON_A, 168ms, 0ms);
-        pbf_wait(context, 376ms);
-        segment03_route_press(stream,context, BUTTON_A, 198ms, 0ms);
-        pbf_wait(context, 122ms);
-        segment03_route_press(stream,context, BUTTON_A, 158ms, 0ms);
-        pbf_wait(context, 242ms);
-        segment03_route_press(stream,context, BUTTON_A, 174ms, 0ms);
-        pbf_wait(context, 472ms);
-        segment03_route_press(stream,context, BUTTON_A, 126ms, 0ms);
-        pbf_wait(context, 8007ms);
-        segment03_route_press(stream,context, BUTTON_A, 168ms, 0ms);
-        pbf_wait(context, 83ms);
-        segment03_route_press(stream,context, BUTTON_A, 143ms, 0ms);
-        pbf_wait(context, 1005ms);
-        segment03_route_press(stream,context, BUTTON_A, 101ms, 0ms);
-        pbf_wait(context, 268ms);
-        segment03_route_press(stream,context, BUTTON_A, 109ms, 0ms);
-        pbf_wait(context, 123ms);
-        segment03_route_press(stream,context, BUTTON_A, 112ms, 0ms);
-        pbf_wait(context, 539ms);
-        segment03_route_press(stream,context, BUTTON_A, 147ms, 0ms);
-        pbf_wait(context, 518ms);
-        segment03_route_press(stream,context, BUTTON_A, 160ms, 0ms);
-        pbf_wait(context, 484ms);
-        segment03_route_press(stream,context, BUTTON_A, 185ms, 0ms);
-        pbf_wait(context, 613ms);
-        segment03_route_press(stream,context, BUTTON_A, 168ms, 0ms);
-        pbf_wait(context, 526ms);
-        segment03_route_press(stream,context, BUTTON_A, 192ms, 0ms);
-        pbf_wait(context, 755ms);
-        segment03_route_press(stream,context, BUTTON_A, 196ms, 0ms);
-        pbf_wait(context, 962ms);
-        segment03_route_press(stream,context, BUTTON_A, 253ms, 0ms);
-        pbf_wait(context, 323ms);
-        segment03_route_press(stream,context, BUTTON_A, 277ms, 0ms);
-        pbf_wait(context, 506ms);
-        segment03_route_press(stream,context, BUTTON_A, 253ms, 0ms);
-        pbf_wait(context, 313ms);
-        segment03_route_press(stream,context, BUTTON_A, 170ms, 0ms);
-        pbf_wait(context, 481ms);
-        segment03_route_press(stream,context, BUTTON_A, 196ms, 0ms);
-        pbf_wait(context, 737ms);
-        segment03_route_press(stream,context, BUTTON_A, 211ms, 0ms);
-        pbf_wait(context, 589ms);
-        segment03_route_press(stream,context, BUTTON_A, 211ms, 0ms);
-        pbf_wait(context, 296ms);
-        segment03_route_press(stream,context, BUTTON_A, 144ms, 0ms);
-        pbf_wait(context, 588ms);
-        segment03_route_press(stream,context, BUTTON_A, 189ms, 0ms);
-        pbf_wait(context, 425ms);
-        segment03_route_press(stream,context, BUTTON_A, 210ms, 0ms);
-        pbf_wait(context, 422ms);
-        segment03_route_press(stream,context, BUTTON_A, 193ms, 0ms);
-        pbf_wait(context, 1007ms);
-        segment03_route_press(stream,context, BUTTON_A, 235ms, 0ms);
-        pbf_wait(context, 333ms);
-        segment03_route_press(stream,context, BUTTON_A, 198ms, 0ms);
-        pbf_wait(context, 5044ms);
-        segment03_route_press(stream,context, BUTTON_A, 208ms, 0ms);
-        pbf_wait(context, 2822ms);
-        segment03_route_press(stream,context, BUTTON_A, 210ms, 0ms);
-        pbf_wait(context, 4173ms);
-        segment03_route_press(stream,context, BUTTON_A, 119ms, 0ms);
-        pbf_wait(context, 482ms);
-        segment03_route_press(stream,context, BUTTON_B, 204ms, 0ms);
-        pbf_wait(context, 1087ms);
-        segment03_route_press(stream,context, BUTTON_X, 180ms, 0ms);
-        pbf_wait(context, 1306ms);
-        segment03_route_press(stream,context, BUTTON_A, 141ms, 0ms);
-        pbf_wait(context, 1456ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 285ms, 0ms);
-        pbf_wait(context, 741ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 206ms, 0ms);
-        pbf_wait(context, 209ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 194ms, 0ms);
-        pbf_wait(context, 869ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 181ms, 0ms);
-        pbf_wait(context, 306ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 188ms, 0ms);
-        pbf_wait(context, 361ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 154ms, 0ms);
-        pbf_wait(context, 1911ms);
-        segment03_route_press(stream,context, BUTTON_Y, 156ms, 0ms);
-        pbf_wait(context, 2929ms);
-        pbf_move_right_joystick(context, {1.000000, -0.000000}, 205ms, 0ms);
-        pbf_wait(context, 898ms);
-        pbf_move_right_joystick(context, {-1.000000, -0.000000}, 255ms, 0ms);
-        pbf_wait(context, 469ms);
-        segment03_route_press(stream,context, BUTTON_A, 196ms, 0ms);
-        pbf_wait(context, 508ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 177ms, 0ms);
-        pbf_wait(context, 274ms);
-        segment03_route_press(stream,context, BUTTON_A, 182ms, 0ms);
-        pbf_wait(context, 1400ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 207ms, 0ms);
-        pbf_wait(context, 663ms);
-        segment03_route_press(stream,context, BUTTON_A, 163ms, 0ms);
-        pbf_wait(context, 1097ms);
-        segment03_route_press(stream,context, BUTTON_B, 178ms, 0ms);
-        pbf_wait(context, 742ms);
-        segment03_route_press(stream,context, BUTTON_B, 182ms, 0ms);
-        pbf_wait(context, 872ms);
-        segment03_route_press(stream,context, BUTTON_B, 171ms, 0ms);
-        pbf_wait(context, 774ms);
-        if (!clear_new_item_flags(stream,context)) OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::SEND_ERROR_REPORT,"New reward flags could not be cleared before continuing.",stream);
+        segment03_confirm_location(stream,context,match_eterna_cycle_shop_counter,
+            "Eterna bicycle shop counter",20,false,true);
+        pbf_press_button(context,BUTTON_A,150ms,500ms);
+        // The reward scene returns us outside already mounted. Wait for that
+        // positive destination instead of replaying a fixed dialogue burst.
+        segment03_confirm_location(stream,context,match_eterna_cycle_shop_reward,
+            "Eterna bicycle reward complete",180,true);
+        segment03_register_bike(stream,context);
         pbf_move_left_joystick(context, {-1.000000, -0.000000}, 733ms, 0ms);
         pbf_wait(context, 316ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 3280ms, 0ms);
-        pbf_wait(context, 1944ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1789ms, 0ms);
-        pbf_wait(context, 1848ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 3291ms, 0ms);
-        pbf_wait(context, 2531ms);
-        segment03_route_battle(stream,context,"Cycling Road first trainer");
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 676ms, 0ms);
-        pbf_wait(context, 2016ms);
-        segment03_route_battle(stream,context,"Cycling Road second trainer");
+        segment03_doorway(stream,context,false,3280ms,"Cycling Road north gate entrance");
+        segment03_doorway(stream,context,false,1789ms,"Cycling Road north gate exit");
+        align_to_overworld_landmarks(stream,context,match_cycling_road_north_entry,
+            "Cycling Road north entrance",false,true);
+        segment03_expected_encounter(stream,context,"Cycling Road Axel",
+            [](ProControllerContext& ctx) {
+                pbf_move_left_joystick(ctx,{0,-1},3291ms,0ms);
+                pbf_wait(ctx,2531ms);
+            });
+        segment03_expected_encounter(stream,context,"Cycling Road Nicole",
+            [](ProControllerContext& ctx) {
+                pbf_move_left_joystick(ctx,{1,0},676ms,0ms);
+                pbf_wait(ctx,2016ms);
+            });
         pbf_move_left_joystick(context, {-1.000000, -0.000000}, 145ms, 0ms);
         pbf_wait(context, 1136ms);
         pbf_move_left_joystick(context, {-1.000000, -0.000000}, 424ms, 0ms);
@@ -570,18 +601,22 @@ namespace PokemonBDSP{
         pbf_wait(context, 372ms);
         segment03_route_press(stream,context, BUTTON_B, 162ms, 0ms);
         pbf_wait(context, 4324ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 360ms, 0ms);
-        pbf_wait(context, 188ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 944ms, 0ms);
-        pbf_wait(context, 161ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 388ms, 0ms);
-        pbf_wait(context, 39ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 2236ms, 0ms);
-        pbf_wait(context, 1820ms);
-        segment03_route_battle(stream,context,"Route 207 Camper");
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 2758ms, 0ms);
-        pbf_wait(context, 94ms);
-        segment03_route_battle(stream,context,"Route 207 Hiker");
+        segment03_expected_encounter(stream,context,"Route 207 Camper",
+            [](ProControllerContext& ctx) {
+        pbf_move_left_joystick(ctx, {0.000000, -1.000000}, 360ms, 0ms);
+        pbf_wait(ctx, 188ms);
+        pbf_move_left_joystick(ctx, {1.000000, -0.000000}, 944ms, 0ms);
+        pbf_wait(ctx, 161ms);
+        pbf_move_left_joystick(ctx, {0.000000, -1.000000}, 388ms, 0ms);
+        pbf_wait(ctx, 39ms);
+        pbf_move_left_joystick(ctx, {1.000000, -0.000000}, 2236ms, 0ms);
+        pbf_wait(ctx, 1820ms);
+            });
+        segment03_expected_encounter(stream,context,"Route 207 Hiker",
+            [](ProControllerContext& ctx) {
+                pbf_move_left_joystick(ctx,{1,0},2758ms,0ms);
+                pbf_wait(ctx,94ms);
+            });
         context.wait_for_all_requests();
     }
     void coronet1(VideoStream& stream, ProControllerContext& context) {
