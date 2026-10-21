@@ -9,10 +9,11 @@ Everything a caller types to describe an input is parsed here:
   "UP-RIGHT", "UPRIGHT"). Listing "UP" and "RIGHT" together also means up-right.
 - Combinations: a list (["L", "R"]) or a "+"-joined string ("L+R", "ZL+A").
 - Joystick positions: an (x, y) pair in [-1, 1] with +x = right and +y = up.
-  push_left_joystick() / push_right_joystick() take the pair as a single
+  push_left_joystick() / push_right_joystick() and the left_joystick /
+  right_joystick arguments of controller_state() take the pair as a single
   argument (validated by `parse_stick_pair()`); `parse_stick()` additionally
-  accepts a direction name ("up", "down_left", ...) and "neutral"/"center"
-  for the left/right arguments of controller_state().
+  accepts a direction name ("up", "down_left", ...) and "neutral"/"center",
+  for use when a direction name is more readable than coordinates.
 
 The button bit values match `NintendoSwitch::Button` and the d-pad values
 match `NintendoSwitch::DpadPosition` in
@@ -210,11 +211,12 @@ def parse_stick(position: StickArg) -> tuple[float, float]:
     return parse_stick_pair(position)
 
 
-def parse_stick_pair(position: Sequence[float]) -> tuple[float, float]:
+def parse_stick_pair(position: tuple[float, float]) -> tuple[float, float]:
     """Parse an (x, y) stick position into (float, float) in [-1, 1], +y = up.
 
     Used by `parse_stick()` (for pairs) and by `push_left_joystick()` /
-    `push_right_joystick()`. Direction-name strings (and None) are not
+    `push_right_joystick()` and the left_joystick / right_joystick arguments
+    of `controller_state()`. Direction-name strings (and None) are not
     accepted here: pass exactly two numbers.
     """
     if position is None:

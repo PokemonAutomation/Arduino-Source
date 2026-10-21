@@ -16,14 +16,13 @@ Example:
         sw.push_button("L+R", hold_ms=200)               # press L and R together
         sw.push_dpad("up")                               # d-pad up
         sw.push_left_joystick((0.0, 1.0), hold_ms=1500)  # walk forward
-        sw.controller_state("B", left="up", duration_ms=2000)  # run forward
+        sw.controller_state("B", left_joystick=(0.0, 1.0), duration_ms=2000)  # run forward
         sw.wait_for_all_requests()
 """
 
 from __future__ import annotations
 
 import threading
-from collections.abc import Sequence
 from typing import Protocol
 
 from . import _core, buttons as btn
@@ -178,19 +177,26 @@ class SwitchController:
             self._backend.push_dpad(parsed.dpad, hold_ms + release_ms, hold_ms, release_ms)
 
     def controller_state(self, buttons: btn.ButtonsArg = None, *,
-                         left: btn.StickArg = None, right: btn.StickArg = None,
+                         left_joystick: tuple[float, float] | None = None,
+                         right_joystick: tuple[float, float] | None = None,
                          duration_ms: int = 500) -> None:
         """Hold any combination of buttons, d-pad and sticks for `duration_ms`.
 
-        `buttons` may mix buttons and d-pad directions ("ZL+up"). Everything not
-        specified is released for the whole hold. The argument order matches
-        `pbf_controller_state()`: buttons/d-pad first, sticks, then duration.
+        `buttons` may mix buttons and d-pad directions ("ZL+up").
+        `left_joystick` / `right_joystick` are (x, y) tuples in [-1, 1].
+        -x=left, x=0=neutral, +x=right. -y=down, y=0=neutral, +y=up.
+        e.g. (0.0, 1.0) is up. None (the default) releases that stick. The
+        argument order matches `pbf_controller_state()`: buttons/d-pad first,
+        sticks, then duration.
+
+        The stick tuples are unpacked and passed to the backend as separate
+        x, y arguments (`_pa_core` keeps the C++ signature).
         """
         _check_nonnegative(duration_ms=duration_ms)
         self._require_open()
         parsed = btn.parse_buttons(buttons)
-        left_x, left_y = btn.parse_stick(left) if left is not None else (0.0, 0.0)
-        right_x, right_y = btn.parse_stick(right) if right is not None else (0.0, 0.0)
+        left_x, left_y = btn.parse_stick_pair(left_joystick) if left_joystick is not None else (0.0, 0.0)
+        right_x, right_y = btn.parse_stick_pair(right_joystick) if right_joystick is not None else (0.0, 0.0)
         with self._lock:
             self._backend.controller_state(
                 parsed.bitfield, parsed.dpad,
@@ -198,7 +204,7 @@ class SwitchController:
                 duration_ms
             )
 
-    def push_left_joystick(self, joystick_position: Sequence[float], hold_ms: int = 500,
+    def push_left_joystick(self, joystick_position: tuple[float, float], hold_ms: int = 500,
                           release_ms: int = 0) -> None:
         """Tilt the left stick to `joystick_position`, an (x, y) tuple in [-1, 1] for `hold_ms`
         -x=left, x=0=neutral, +x=right. -y=down, y=0=neutral, +y=up. e.g. (0.0, 1.0) is up.
@@ -212,7 +218,7 @@ class SwitchController:
         """
         self._push_joystick(self._backend.push_left_joystick, joystick_position, hold_ms, release_ms)
 
-    def push_right_joystick(self, joystick_position: Sequence[float], hold_ms: int = 500,
+    def push_right_joystick(self, joystick_position: tuple[float, float], hold_ms: int = 500,
                            release_ms: int = 0) -> None:
         """Tilt the right stick to `joystick_position`, an (x, y) tuple in [-1, 1] for `hold_ms`
         -x=left, x=0=neutral, +x=right. -y=down, y=0=neutral, +y=up. e.g. (0.0, 1.0) is up.
@@ -226,7 +232,7 @@ class SwitchController:
         """
         self._push_joystick(self._backend.push_right_joystick, joystick_position, hold_ms, release_ms)
 
-    def _push_joystick(self, send, joystick_position: Sequence[float], hold_ms: int, release_ms: int) -> None:
+    def _push_joystick(self, send, joystick_position: tuple[float, float], hold_ms: int, release_ms: int) -> None:
         _check_nonnegative(hold_ms=hold_ms, release_ms=release_ms)
         self._require_open()
         x, y = btn.parse_stick_pair(joystick_position)

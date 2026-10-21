@@ -98,6 +98,14 @@ def test_push_dpad_needs_something():
     assert fake.commands() == []
 
 
+def test_controller_state_rejects_string_stick():
+    """controller_state() takes (x, y) tuples for its sticks, not direction-name strings."""
+    sw, fake = make()
+    with pytest.raises(ValueError, match="not a string"):
+        sw.controller_state("B", left_joystick="up", duration_ms=2000)
+    assert fake.commands() == []
+
+
 def test_controller_state_mixed_combination():
     """Buttons and d-pad held together go out as a single controller_state with the right bitfield, d-pad position, neutral sticks and duration last."""
     sw, fake = make()
@@ -139,7 +147,7 @@ def test_push_right_joystick():
 def test_controller_state_combination():
     """Buttons and both sticks can be held at once via controller_state, with everything not specified left neutral."""
     sw, fake = make()
-    sw.controller_state("B", left="up", right=[1.0, 0.0], duration_ms=2000)
+    sw.controller_state("B", left_joystick=(0.0, 1.0), right_joystick=(1.0, 0.0), duration_ms=2000)
     (buttons, dpad, left_x, left_y, right_x, right_y, duration), = fake.arguments("controller_state")
     assert duration == 2000
     assert buttons == BUTTON_BITS["B"]
