@@ -17,6 +17,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <algorithm>
 #include <iostream>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
