@@ -16,7 +16,7 @@ Example:
         sw.push_button("L+R", hold_ms=200)               # press L and R together
         sw.push_dpad("up")                               # d-pad up
         sw.push_left_joystick((0.0, 1.0), hold_ms=1500)  # walk forward
-        sw.controller_state("B", left_joystick=(0.0, 1.0), duration_ms=2000)  # run forward
+        sw.controller_state("B", "up", left_joystick=(0.0, 1.0), duration_ms=2000)  # run forward
         sw.wait_for_all_requests()
 """
 
@@ -150,11 +150,11 @@ class SwitchController:
         with self._lock:
             self._backend.push_button(parsed.bitfield, hold_ms + release_ms, hold_ms, release_ms)
 
-    def push_dpad(self, position: btn.ButtonsArg, hold_ms: int = DEFAULT_HOLD_MS,
+    def push_dpad(self, dpad: btn.ButtonsArg, hold_ms: int = DEFAULT_HOLD_MS,
                   release_ms: int = DEFAULT_RELEASE_MS) -> None:
         """Tap a d-pad direction.
 
-        `position`: "up", "up+right" (or "UP_RIGHT"), ["up", "right"], ...
+        `dpad`: "up", "up+right" (or "UP_RIGHT"), ["up", "right"], ...
         For buttons use `push_button()`; to hold buttons and d-pad together use
         `controller_state()`.
 
@@ -165,10 +165,10 @@ class SwitchController:
         """
         _check_nonnegative(hold_ms=hold_ms, release_ms=release_ms)
         self._require_open()
-        parsed = btn.parse_buttons(position)
+        parsed = btn.parse_buttons(dpad)
         if parsed.has_buttons:
             raise ValueError(
-                f"push_dpad() only accepts d-pad directions, but {position!r} includes buttons. "
+                f"push_dpad() only accepts d-pad directions, but {dpad!r} includes buttons. "
                 "Use push_button() for buttons or controller_state() to combine them."
             )
         if not parsed.has_dpad:
@@ -176,30 +176,43 @@ class SwitchController:
         with self._lock:
             self._backend.push_dpad(parsed.dpad, hold_ms + release_ms, hold_ms, release_ms)
 
-    def controller_state(self, buttons: btn.ButtonsArg = None, *,
+    def controller_state(self, buttons: btn.ButtonsArg = None, dpad: btn.ButtonsArg = None, *,
                          left_joystick: tuple[float, float] | None = None,
                          right_joystick: tuple[float, float] | None = None,
                          duration_ms: int = 500) -> None:
         """Hold any combination of buttons, d-pad and sticks for `duration_ms`.
 
-        `buttons` may mix buttons and d-pad directions ("ZL+up").
+        `buttons`: button names only ("A", "L+R"), or None to release all buttons.
+        `dpad`: d-pad directions only ("up", "up+right", ["up", "right"]), or None
+        to release the d-pad. The argument order matches `pbf_controller_state()`
+        and the C++ backend: buttons, d-pad, sticks, then duration.
+
         `left_joystick` / `right_joystick` are (x, y) tuples in [-1, 1].
         -x=left, x=0=neutral, +x=right. -y=down, y=0=neutral, +y=up.
-        e.g. (0.0, 1.0) is up. None (the default) releases that stick. The
-        argument order matches `pbf_controller_state()`: buttons/d-pad first,
-        sticks, then duration.
+        e.g. (0.0, 1.0) is up. None (the default) releases that stick.
 
         The stick tuples are unpacked and passed to the backend as separate
         x, y arguments (`_pa_core` keeps the C++ signature).
         """
         _check_nonnegative(duration_ms=duration_ms)
         self._require_open()
-        parsed = btn.parse_buttons(buttons)
+        parsed_buttons = btn.parse_buttons(buttons)
+        if parsed_buttons.has_dpad:
+            raise ValueError(
+                f"controller_state(): the buttons argument must not include d-pad "
+                f"directions ({buttons!r}). Use the dpad argument instead."
+            )
+        parsed_dpad = btn.parse_buttons(dpad)
+        if parsed_dpad.has_buttons:
+            raise ValueError(
+                f"controller_state(): the dpad argument must not include buttons "
+                f"({dpad!r}). Use the buttons argument instead."
+            )
         left_x, left_y = btn.parse_stick_pair(left_joystick) if left_joystick is not None else (0.0, 0.0)
         right_x, right_y = btn.parse_stick_pair(right_joystick) if right_joystick is not None else (0.0, 0.0)
         with self._lock:
             self._backend.controller_state(
-                parsed.bitfield, parsed.dpad,
+                parsed_buttons.bitfield, parsed_dpad.dpad,
                 left_x, left_y, right_x, right_y,
                 duration_ms
             )

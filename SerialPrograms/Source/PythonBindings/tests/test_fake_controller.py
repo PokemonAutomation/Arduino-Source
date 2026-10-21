@@ -106,10 +106,20 @@ def test_controller_state_rejects_string_stick():
     assert fake.commands() == []
 
 
-def test_controller_state_mixed_combination():
-    """Buttons and d-pad held together go out as a single controller_state with the right bitfield, d-pad position, neutral sticks and duration last."""
+def test_controller_state_rejects_mixed_arguments():
+    """The buttons argument rejects d-pad directions (and vice versa), pointing at the other argument."""
     sw, fake = make()
-    sw.controller_state("ZL+up", duration_ms=60)
+    with pytest.raises(ValueError, match="dpad argument"):
+        sw.controller_state("ZL+up", duration_ms=60)
+    with pytest.raises(ValueError, match="buttons argument"):
+        sw.controller_state(None, "B", duration_ms=60)
+    assert fake.commands() == []
+
+
+def test_controller_state_mixed_combination():
+    """Buttons and d-pad held via separate arguments go out as a single controller_state with the right bitfield, d-pad position, neutral sticks and duration last."""
+    sw, fake = make()
+    sw.controller_state("ZL", "up", duration_ms=60)
     assert fake.commands() == ["controller_state"]
     (buttons, dpad, left_x, left_y, right_x, right_y, duration), = fake.arguments("controller_state")
     assert duration == 60
