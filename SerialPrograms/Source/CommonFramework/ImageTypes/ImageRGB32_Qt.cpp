@@ -4,6 +4,7 @@
  *
  */
 
+#include <QImageReader>
 #include <iostream>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Logging/Logger.h"
@@ -47,6 +48,11 @@ ImageRGB32 QImage_to_ImageRGB32(QImage image){
 
 
 ImageRGB32 QImage_load_image(const std::string& filename){
+#if QT_VERSION_MAJOR == 6
+    //  Qt 6's default allocation limit for image readers is too small for the
+    //  large composite sprite sheets loaded from disk.
+    QImageReader::setAllocationLimit(0);
+#endif
     QImage image(QString::fromStdString(filename));
     if (image.isNull()){
         throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to open image.", filename);

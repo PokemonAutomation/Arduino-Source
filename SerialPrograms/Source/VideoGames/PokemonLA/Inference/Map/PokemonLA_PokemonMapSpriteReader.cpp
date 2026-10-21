@@ -731,9 +731,6 @@ double compute_MMO_sprite_gradient_distance(const ImageViewRGB32& gradient_templ
     score = std::sqrt(score / num_gradients);
 #endif
 
-    // output.save("test_distance_alignment_" + QString::number(count) + ".png");
-    // count++;
-
     return score;
 }
 
