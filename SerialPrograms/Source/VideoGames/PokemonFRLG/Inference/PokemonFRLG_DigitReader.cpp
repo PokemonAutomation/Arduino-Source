@@ -11,6 +11,7 @@
 #include <string>
 #include <opencv2/imgproc.hpp>
 #include "Common/Cpp/Color.h" // needed for COLOR_RED, COLOR_ORANGE
+#include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
@@ -34,7 +35,8 @@ namespace PokemonFRLG{
 
 // ---------------------------------------------------------------------------
 // Template store: loads 10 digit matchers from a resource sub-directory.
-// Results are cached in a static map keyed by template type.
+// Results are cached in a static map keyed by template type. Several threads
+// can read digits at the same time, so a lock guards the map.
 // Supports:
 // - StatBox (yellow stat boxes): PokemonFRLG/Digits/
 // - LevelBox (lilac level box): PokemonFRLG/LevelDigits/
@@ -83,8 +85,16 @@ struct DigitTemplates{
         }
     }
 
+    //  Return the templates of "template_type", and load them on the first call.
+    //  Threads can call this at the same time (for example the unit tests,
+    //  which run in parallel). Without the lock, two threads can insert into
+    //  the map at once, which corrupts it and crashes. The returned reference
+    //  stays valid after the unlock, because map entries never move and are
+    //  never removed.
     static const DigitTemplates& get(DigitTemplateType template_type){
+        static Mutex lock;
         static std::map<DigitTemplateType, DigitTemplates> cache;
+        std::lock_guard<Mutex> lg(lock);
         auto it = cache.find(template_type);
         if (it == cache.end()){
             it = cache.emplace(template_type, DigitTemplates(template_type)).first;
