@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 class Logger;
 class AudioSource;
 class AudioSink;
-class AudioFloatToFFT;
+class WorkingAudioToFFT;
 
 namespace Kernels{
 namespace AudioPipeline{
@@ -72,13 +72,15 @@ private:
 
     void init_audio_sink();
 
-    //  New pipeline tree (runs in parallel with the legacy reader / sink /
-    //  FFT path until the endpoints switch over). All of these are only
-    //  touched while holding m_lock; the producing thread only ever sees
-    //  them through the node listener sets, where ListenerSet::remove
-    //  blocks on in-flight pushes so rebuilds never race a live push.
-    //  The tails of both branches are open for now: the sink encoder's raw
-    //  output and the FFT resampler's output go nowhere yet.
+    //  New pipeline tree. The FFT endpoint has switched over: the FFT
+    //  branch feeds m_fft_node, and m_fft_listener forwards its FFTs to
+    //  the pair's FFTListener set. The sink endpoint still runs through
+    //  the legacy reader / sink path; the sink branch's encoder output
+    //  goes nowhere until it switches over.
+    //  All of these are only touched while holding m_lock; the producing
+    //  thread only ever sees them through the node listener sets, where
+    //  ListenerSet::remove blocks on in-flight pushes so rebuilds never
+    //  race a live push.
     void teardown_tree();
     void teardown_sink_branch();
     void build_tree(float input_volume);
@@ -110,6 +112,7 @@ private:
     std::unique_ptr<Kernels::AudioPipeline::WorkingAudio2RawAudio> m_sink_encoder;
     std::unique_ptr<Kernels::AudioPipeline::ChannelMixer> m_fft_mixer;           //  Source channels -> 1 channel.
     std::unique_ptr<Kernels::AudioResampler::AudioResampler> m_fft_resampler;
+    std::unique_ptr<WorkingAudioToFFT> m_fft_node;                              //  The tree's FFT endpoint.
 
     AudioDeviceInfo m_output_device;
     float m_file_input_multiplier = 1.0;
@@ -117,8 +120,7 @@ private:
     double m_output_volume = 1.0;
     std::unique_ptr<AudioSink> m_writer;
 
-    std::unique_ptr<AudioFloatToFFT> m_fft_runner;
-    std::unique_ptr<InternalFFTListener> m_fft_listener;    //  Attaches to m_fft_runner"".
+    std::unique_ptr<InternalFFTListener> m_fft_listener;    //  Attaches to m_fft_node.
 
     ListenerSet<AudioFloatStreamListener> m_stream_listeners;
     ListenerSet<FFTListener> m_fft_listeners;
