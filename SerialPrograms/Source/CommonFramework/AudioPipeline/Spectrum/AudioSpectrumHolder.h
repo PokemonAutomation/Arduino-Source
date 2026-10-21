@@ -9,6 +9,7 @@
 
 #include <deque>
 #include <fstream>
+#include <list>
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
