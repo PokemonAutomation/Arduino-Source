@@ -52,9 +52,9 @@ public:
     ~PybindSwitchProController();
 
     // Block until the device handshake finishes and a Switch controller has been
-    // created, or `timeout_millis` passes.
+    // created, or `timeout_ms` passes.
     // Returns true if the controller is ready to receive commands.
-    bool wait_for_ready(uint64_t timeout_millis);
+    bool wait_for_ready(uint64_t timeout_ms);
 
     bool is_ready() const;
 
@@ -71,13 +71,13 @@ public:
     void wait_for_all_requests();
 
     // Drop every queued command that has not executed yet, return to the neutral
-    // state (no buttons pressed, sticks centered), and wait at most `timeout_millis`
+    // state (no buttons pressed, sticks centered), and wait at most `timeout_ms`
     // for the device to acknowledge that it received the cancel.
     //
     // Returns true if acknowledged, false on timeout or if the controller is not ready.
     // Commands pushed from other threads while this is running may land after the
     // cancel and are not cancelled.
-    bool cancel_all_and_wait(uint64_t timeout_millis);
+    bool cancel_all_and_wait(uint64_t timeout_ms);
 
 public:
     //  Commands. These throw InvalidConnectionStateException if the controller is not
@@ -93,35 +93,35 @@ public:
     // duration: wait duration, milliseconds.
     // If the controller is not ready, it throws InvalidConnectionStateException.
     // The function will block only if the device's command queue is full.
-    void wait(uint64_t duration);
+    void wait(uint64_t duration_ms);
 
     // Send a button press command to the controller. It will press all buttons in
-    // `bitfield` simultaneously. D-pad buttons are excluded and should be called via
+    // `button_bitfield` simultaneously. D-pad buttons are excluded and should be called via
     // `push_dpad()`.
     // delay: how long to wait before the next command may start.
     // hold: how long the button press is held, milliseconds.
     // release: how long the buttons stay released before the same button can be used again,
     // milliseconds.
-    // bitfield: values from `NintendoSwitch::Button`.
+    // button_bitfield: values from `NintendoSwitch::Button`.
     //
     // `delay = hold + release` runs commands back to back like `pbf_press_button()`;
     // `delay < hold` overlaps commands, e.g. to hold a button while moving a stick.
     // If the controller is not ready, it throws InvalidConnectionStateException.
     // The function will block only if the device's command queue is full.
-    void push_button(uint64_t delay, uint64_t hold, uint64_t release, uint32_t bitfield);
+    void push_button(uint64_t delay_ms, uint64_t hold_ms, uint64_t release_ms, uint32_t button_bitfield);
     // Send a D-pad press command to the controller. It will press one or two D-pad buttons to
     // indicate a direction to the game.
     // delay: how long to wait before the next command may start.
     // hold: how long the button press is held, milliseconds.
     // release: how long the buttons stay released before the same button can be used again,
     // milliseconds.
-    // position: `NintendoSwitch::DpadPosition` values (0 = up, clockwise to 7 = up-left, 8 = none).
+    // dpad_position: `NintendoSwitch::DpadPosition` values (0 = up, clockwise to 7 = up-left, 8 = none).
     //
     // `delay = hold + release` runs commands back to back like `pbf_press_button()`;
     // `delay < hold` overlaps commands, e.g. to hold a button while moving a stick.
     // If the controller is not ready, it throws InvalidConnectionStateException.
     // The function will block only if the device's command queue is full.
-    void push_dpad(uint64_t delay, uint64_t hold, uint64_t release, uint8_t position);
+    void push_dpad(uint64_t delay_ms, uint64_t hold_ms, uint64_t release_ms, uint8_t dpad_position);
     // Send a left joystick push command to the controller.
     // delay: how long to wait before the next command may start.
     // hold: how long the joystick is pushed, milliseconds.
@@ -133,7 +133,7 @@ public:
     // `delay < hold` overlaps commands, e.g. to hold a button while moving a stick.
     // If the controller is not ready, it throws InvalidConnectionStateException.
     // The function will block only if the device's command queue is full.
-    void push_left_joystick(uint64_t delay, uint64_t hold, uint64_t release, double x, double y);
+    void push_left_joystick(uint64_t delay_ms, uint64_t hold_ms, uint64_t release_ms, double x, double y);
     // Send a right joystick push command to the controller.
     // delay: how long to wait before the next command may start.
     // hold: how long the joystick is pushed, milliseconds.
@@ -145,7 +145,7 @@ public:
     // `delay < hold` overlaps commands, e.g. to hold a button while moving a stick.
     // If the controller is not ready, it throws InvalidConnectionStateException.
     // The function will block only if the device's command queue is full.
-    void push_right_joystick(uint64_t delay, uint64_t hold, uint64_t release, double x, double y);
+    void push_right_joystick(uint64_t delay_ms, uint64_t hold_ms, uint64_t release_ms, double x, double y);
 
     // Set the entire controller state at once and hold it for `duration`.
     // Everything not specified is released. This is the most direct way to hold
@@ -156,7 +156,7 @@ public:
     // left_x, left_y: in [-1.0, 1.0] with +x = right and +y = up.
     // right_x, right_y: in [-1.0, 1.0] with +x = right and +y = up.
     void controller_state(
-        uint64_t duration,
+        uint64_t duration_ms,
         uint32_t button_bitfield,
         uint8_t dpad_position,
         double left_x, double left_y,

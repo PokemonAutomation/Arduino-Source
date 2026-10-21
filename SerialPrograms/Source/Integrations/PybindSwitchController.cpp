@@ -36,9 +36,9 @@ public:
         m_connection->remove_status_listener(*this);
     }
 
-    bool wait_for_ready(uint64_t timeout_millis){
+    bool wait_for_ready(uint64_t timeout_ms){
         std::unique_lock<Mutex> lg(m_lock);
-        m_cv.wait_for(lg, Milliseconds(timeout_millis), [this]{
+        m_cv.wait_for(lg, Milliseconds(timeout_ms), [this]{
             return m_connected;
         });
         return controller_if_ready() != nullptr;
@@ -116,9 +116,9 @@ PybindSwitchProController::~PybindSwitchProController(){
     delete (PybindSwitchProControllerInternal*)m_internals;
 }
 
-bool PybindSwitchProController::wait_for_ready(uint64_t timeout_millis){
+bool PybindSwitchProController::wait_for_ready(uint64_t timeout_ms){
     PybindSwitchProControllerInternal* internal = (PybindSwitchProControllerInternal*)m_internals;
-    return internal->wait_for_ready(timeout_millis);
+    return internal->wait_for_ready(timeout_ms);
 }
 
 bool PybindSwitchProController::is_ready() const{
@@ -145,56 +145,56 @@ void PybindSwitchProController::wait_for_all_requests(){
     }
     controller->wait_for_all(nullptr);
 }
-bool PybindSwitchProController::cancel_all_and_wait(uint64_t timeout_millis){
+bool PybindSwitchProController::cancel_all_and_wait(uint64_t timeout_ms){
     PybindSwitchProControllerInternal* internal = (PybindSwitchProControllerInternal*)m_internals;
     ProController* controller = internal->controller_if_ready();
     if (controller == nullptr){
         internal->m_logger.log("Controller is not ready.", COLOR_RED);
         return false;
     }
-    return controller->cancel_all_and_wait(Milliseconds(timeout_millis));
+    return controller->cancel_all_and_wait(Milliseconds(timeout_ms));
 }
 void PybindSwitchProController::wait(uint64_t duration){
     PybindSwitchProControllerInternal* internal = (PybindSwitchProControllerInternal*)m_internals;
     internal->controller().issue_nop(nullptr, Milliseconds(duration));
 }
-void PybindSwitchProController::push_button(uint64_t delay, uint64_t hold, uint64_t release, uint32_t bitfield){
+void PybindSwitchProController::push_button(uint64_t delay_ms, uint64_t hold_ms, uint64_t release_ms, uint32_t button_bitfield){
     PybindSwitchProControllerInternal* internal = (PybindSwitchProControllerInternal*)m_internals;
     internal->controller().issue_buttons(
         nullptr,
-        Milliseconds(delay),
-        Milliseconds(hold),
-        Milliseconds(release),
-        (Button)bitfield
+        Milliseconds(delay_ms),
+        Milliseconds(hold_ms),
+        Milliseconds(release_ms),
+        (Button)button_bitfield
     );
 }
-void PybindSwitchProController::push_dpad(uint64_t delay, uint64_t hold, uint64_t release, uint8_t position){
+void PybindSwitchProController::push_dpad(uint64_t delay_ms, uint64_t hold_ms, uint64_t release_ms, uint8_t dpad_position){
     PybindSwitchProControllerInternal* internal = (PybindSwitchProControllerInternal*)m_internals;
     internal->controller().issue_dpad(
         nullptr,
-        Milliseconds(delay),
-        Milliseconds(hold),
-        Milliseconds(release),
-        (DpadPosition)position
+        Milliseconds(delay_ms),
+        Milliseconds(hold_ms),
+        Milliseconds(release_ms),
+        (DpadPosition)dpad_position
     );
 }
-void PybindSwitchProController::push_left_joystick(uint64_t delay, uint64_t hold, uint64_t release, double x, double y){
+void PybindSwitchProController::push_left_joystick(uint64_t delay_ms, uint64_t hold_ms, uint64_t release_ms, double x, double y){
     PybindSwitchProControllerInternal* internal = (PybindSwitchProControllerInternal*)m_internals;
     internal->controller().issue_left_joystick(
         nullptr,
-        Milliseconds(delay),
-        Milliseconds(hold),
-        Milliseconds(release),
+        Milliseconds(delay_ms),
+        Milliseconds(hold_ms),
+        Milliseconds(release_ms),
         {x, y}
     );
 }
-void PybindSwitchProController::push_right_joystick(uint64_t delay, uint64_t hold, uint64_t release, double x, double y){
+void PybindSwitchProController::push_right_joystick(uint64_t delay_ms, uint64_t hold_ms, uint64_t release_ms, double x, double y){
     PybindSwitchProControllerInternal* internal = (PybindSwitchProControllerInternal*)m_internals;
     internal->controller().issue_right_joystick(
         nullptr,
-        Milliseconds(delay),
-        Milliseconds(hold),
-        Milliseconds(release),
+        Milliseconds(delay_ms),
+        Milliseconds(hold_ms),
+        Milliseconds(release_ms),
         {x, y}
     );
 }

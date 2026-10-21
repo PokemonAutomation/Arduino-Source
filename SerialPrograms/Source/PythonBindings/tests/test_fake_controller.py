@@ -113,7 +113,7 @@ def test_controller_state_mixed_combination():
 def test_push_left_joystick():
     """A stick direction name becomes an (x, y) pair, forwarded to push_left_joystick with delay = duration + release."""
     sw, fake = make()
-    sw.push_left_joystick("up", duration_ms=1500)
+    sw.push_left_joystick("up", hold_ms=1500)
     (delay, hold, release, x, y), = fake.arguments("push_left_joystick")
     assert (x, y) == (0.0, 1.0) and hold == 1500 and delay == 1500 + release
 
@@ -121,7 +121,7 @@ def test_push_left_joystick():
 def test_push_right_joystick():
     """A raw [x, y] stick position is forwarded to push_right_joystick with the requested duration and release."""
     sw, fake = make()
-    sw.push_right_joystick([0.5, -0.5], duration_ms=300, release_ms=100)
+    sw.push_right_joystick([0.5, -0.5], hold_ms=300, release_ms=100)
     (delay, hold, release, x, y), = fake.arguments("push_right_joystick")
     assert (x, y) == (0.5, -0.5) and delay == 400
 
