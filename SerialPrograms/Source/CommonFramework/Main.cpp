@@ -1,7 +1,5 @@
 
-#include <QDir>
 #include <QApplication>
-#include <QFileInfo>
 //#include <QTextStream>
 #include <QMessageBox>
 #include "Common/Cpp/Logging/LastLogTracker.h"
@@ -60,12 +58,16 @@ namespace PokemonAutomation{
 Q_DECLARE_METATYPE(std::string)
 
 void set_working_directory(){
-    QString application_dir_path = qApp->applicationDirPath();
-    if (application_dir_path.endsWith(".app/Contents/MacOS")){
+    const std::string app_dir = Filesystem::application_binary_directory().string_slash_normalized();
+    const std::string bundle_dir = "/Contents/MacOS";
+    const std::string bundle_suffix = ".app" + bundle_dir;
+    if (app_dir.size() > bundle_suffix.size() &&
+        app_dir.compare(app_dir.size() - bundle_suffix.size(), bundle_suffix.size(), bundle_suffix) == 0){
         // a macOS bundle. Change working directory to the folder that hosts the .app folder.
-        QString app_bundle_path = application_dir_path.chopped(15);
-        QString base_folder_path = QFileInfo(app_bundle_path).dir().absolutePath();
-        QDir::setCurrent(base_folder_path);
+        const std::string app_bundle_path = app_dir.substr(0, app_dir.size() - bundle_dir.size());
+        const Filesystem::Path base_folder_path = Filesystem::Path(app_bundle_path).parent_path();
+        std::error_code ec;
+        Filesystem::set_current_path(base_folder_path, ec);
     }
 }
 
@@ -98,9 +100,9 @@ int run_program(int argc, char *argv[]){
 #endif
 
     {
-        QString bin_dir = QCoreApplication::applicationDirPath();
-        QString qml_import_path = QDir(bin_dir).filePath("qml");
-        qputenv("QML_IMPORT_PATH", qml_import_path.toLocal8Bit());
+        const std::string qml_import_path =
+            (Filesystem::application_binary_directory() / Filesystem::Path("qml")).string_slash_normalized();
+        qputenv("QML_IMPORT_PATH", qml_import_path.c_str());
     }
 
     GlobalOutputRedirector redirect_stdout(std::cout, "stdout", Color());

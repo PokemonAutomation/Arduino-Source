@@ -12,6 +12,7 @@
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Strings/StringTools.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "ML_AnnotationIO.h"
 #include "ML_SegmentAnythingModelConstants.h"
@@ -22,8 +23,6 @@
 #include <map>
 #include <sstream>
 #include <algorithm>
-#include <QDirIterator>
-#include <QDir>
 #include <QMessageBox>
 
 
@@ -76,17 +75,23 @@ bool load_image_embedding(const std::string& image_filepath, std::vector<float>&
 
 
 std::vector<std::string> find_images_in_folder(const std::string& folder_path, bool recursive){
-    QDir image_dir(folder_path.c_str());
-    if (!image_dir.exists()){
+    const Filesystem::Path folder = Filesystem::absolute(Filesystem::Path(folder_path));
+    if (!Filesystem::exists(folder)){
         std::cerr << "Error: input image folder path " << folder_path << " does not exist." << std::endl;
         return {};
     }
 
-    auto flag = recursive ? QDirIterator::Subdirectories : QDirIterator::NoIteratorFlags;
-    QDirIterator image_file_iter(image_dir.absolutePath(), {"*.png", "*.jpg", "*.jpeg"}, QDir::Files, flag);
     std::vector<std::string> all_image_paths;
-    while (image_file_iter.hasNext()){
-        all_image_paths.emplace_back(image_file_iter.next().toStdString());
+    for (const Filesystem::Path& image_file : Filesystem::list_directory(folder, recursive)){
+        if (!Filesystem::is_regular_file(image_file)){
+            continue;
+        }
+        const std::string extension = image_file.extension().string();
+        if (StringTools::ends_with_ci(extension, ".png") ||
+            StringTools::ends_with_ci(extension, ".jpg") ||
+            StringTools::ends_with_ci(extension, ".jpeg")){
+            all_image_paths.emplace_back(image_file.string_slash_normalized());
+        }
     }
     std::cout << "Found " << all_image_paths.size() << " images " << (recursive ? "recursively " : "") << 
         "in folder " << folder_path << std::endl;

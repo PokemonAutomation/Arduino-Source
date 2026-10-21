@@ -4,7 +4,8 @@
  *
  */
 
-#include <QDirIterator>
+#include "Common/Cpp/Filesystem/Filesystem.h"
+#include "Common/Cpp/Strings/StringTools.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Concurrency/Backends/ThreadPool_Default.h"
 #include "CommonFramework/GlobalAutoPaths.h"
@@ -62,22 +63,31 @@ TrainingSession::TrainingSession(
 
     logger.log("Parsing training data in: " + m_directory);
 
-    QDirIterator iter(QString::fromStdString(m_directory), QDir::AllDirs);
-    while (iter.hasNext()){
-        iter.next();
-        QString sample_directory = iter.fileName() + "/";
+    const std::vector<Filesystem::Path> sample_dirs =
+        Filesystem::list_directory(Filesystem::Path(m_directory));
+    for (const Filesystem::Path& sample_dir : sample_dirs){
+        if (!Filesystem::is_directory(sample_dir)){
+            continue;
+        }
+        const std::string sample_directory = sample_dir.filename().string() + "/";
         for (size_t c = 1; c < (size_t)Language::EndOfList; c++){
             Language language = (Language)c;
             const std::string& code = language_data(language).code;
-            QString folder = sample_directory + QString::fromStdString(code) + "/";
-            QDirIterator iter1(QString::fromStdString(m_directory) + folder, QStringList() << "*.png", QDir::Files);
-            while (iter1.hasNext()){
-                iter1.next();
+            const std::string folder = sample_directory + code + "/";
+            const std::vector<Filesystem::Path> png_files =
+                Filesystem::list_directory(Filesystem::Path(m_directory + folder));
+            for (const Filesystem::Path& png_file : png_files){
+                if (!Filesystem::is_regular_file(png_file)){
+                    continue;
+                }
+                if (!StringTools::ends_with_ci(png_file.extension().string(), ".png")){
+                    continue;
+                }
 //                QString file = iter.next();
                 m_samples[language].emplace_back(
                     TrainingSample{
-                        OCR::extract_name(iter1.fileName().toStdString()),
-                        (folder + iter1.fileName()).toStdString()
+                        OCR::extract_name(png_file.filename().string()),
+                        folder + png_file.filename().string()
                     }
                 );
                 m_total_samples++;

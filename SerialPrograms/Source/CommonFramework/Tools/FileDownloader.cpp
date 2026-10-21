@@ -14,9 +14,8 @@
 #include <QObject>
 #include <QTimer>
 #include <QSslError>
-#include <QSaveFile>
-#include <QFileInfo>
-#include <QDir>
+#include "Common/Cpp/Filesystem/FileIO.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "FileDownloader.h"
@@ -152,15 +151,15 @@ void download_file_to_disk(
     QNetworkAccessManager network_access_manager;
     QEventLoop loop;
 
-    // ensure the directory exists
-    QString filePath = QString::fromStdString(file_path);
-    QFileInfo fileInfo(filePath);
-    QString dirPath = fileInfo.absolutePath();
-    QDir().mkpath(dirPath);
-    
-    // 1. Initialize QSaveFile
-    QSaveFile file(QString::fromStdString(file_path));
-    if (!file.open(QIODevice::WriteOnly)){
+    //  ensure the directory exists
+    const Filesystem::Path save_path(file_path);
+    Filesystem::create_directories(save_path.parent_path());
+
+    //  1. Write to a unique temporary file in the same directory, then
+    //     rename it onto the destination on success (atomic save).
+    const Filesystem::Path save_temp_path = Filesystem::unique_temp_path(save_path);
+    FileIO file(save_temp_path, FileMode::WRITE | FileMode::BINARY);
+    if (!file.is_open()){
         throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, 
             "Could not open save file: " + file_path);
     }
@@ -189,7 +188,8 @@ void download_file_to_disk(
 
     // 3. Stream chunks directly to the temporary file
     QObject::connect(reply, &QNetworkReply::readyRead, [&file, reply](){
-        file.write(reply->readAll());
+        QByteArray data = reply->readAll();
+        file.write(data.constData(), data.size());
     });
 
     // 4. Handle completion and errors
@@ -202,23 +202,28 @@ void download_file_to_disk(
 
     // // Final check for remaining data
     if (reply->bytesAvailable() > 0){
-        file.write(reply->readAll());
+        QByteArray data = reply->readAll();
+        file.write(data.constData(), data.size());
     }
+    file.close();
 
     // 5. Finalize the transaction
     if (reply->error() == QNetworkReply::NoError){
-        // This moves the temporary file to the final destination 'file_path'
-        if (!file.commit()){
+        //  This moves the temporary file to the final destination 'file_path'
+        std::error_code ec;
+        Filesystem::rename(save_temp_path, save_path, ec);
+        if (ec){
+            Filesystem::remove(save_temp_path);
             throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, 
                 "Failed to commit file to disk: " + file_path);
         }
     }else{
+        Filesystem::remove(save_temp_path);
         if (scope.cancelled()){
             logger.log("Download cancelled by user.");
             throw OperationCancelledException();
         }else{
             QString error_string = reply->errorString();
-            // QSaveFile automatically deletes the temp file if commit() isn't called
             throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, 
                 "Network Error: " + error_string.toStdString());
         }

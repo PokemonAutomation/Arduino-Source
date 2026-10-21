@@ -5,8 +5,6 @@
  *  Run Segment Anything Model (SAM) to segment objects on images
  */
 
-#include <QDir>
-#include <QDirIterator>
 #include <atomic>
 #include <format>
 #include <fstream>

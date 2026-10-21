@@ -23,6 +23,7 @@
 #define PokemonAutomation_Filesystem_Filesystem_H
 
 #include <cstdint>
+#include <vector>
 #include "FilePath.h"
 
 namespace PokemonAutomation{
@@ -65,6 +66,41 @@ void rename(const Path& old_path, const Path& new_path, std::error_code& ec);
 
 //  The current working directory.
 Path current_path();
+
+//  Change the current working directory.
+void set_current_path(const Path& path);
+void set_current_path(const Path& path, std::error_code& ec);
+
+//  The path relative to the current working directory.
+//  If no relative path can be formed (e.g. different drives on Windows),
+//  return the absolute path and set `ec`. Execute `ec.clear()` if a relative path was formed.
+Path relative(const Path& path, std::error_code& ec);
+
+//  Whether the path is a directory.
+bool is_directory(const Path& path);
+
+//  Whether the path is a regular file.
+bool is_regular_file(const Path& path);
+
+//  List the entries (files and directories) directly inside the directory at `path`.
+//  Hidden entries (names starting with '.') are excluded. If `recursive` is true,
+//  entries in all subdirectories are also listed.
+//  Entries are returned sorted by name, case-insensitively.
+//  Returns an empty list if `path` does not exist, is not a directory,
+//  or cannot be read (matches Qt's QDir::entryInfoList behavior of failing silently).
+std::vector<Path> list_directory(const Path& path, bool recursive = false);
+
+//  Whether the current user can read the file/directory at `path`.
+bool is_readable(const Path& path);
+
+//  Whether the current user can write the file/directory at `path`.
+bool is_writable(const Path& path);
+
+//  A unique temporary file path in the same directory as `path`, for atomic writes
+//  (write to the temporary path, then rename() onto `path`).
+//  No file is created; the caller is responsible for creating it and for
+//  deleting it if the operation fails.
+Path unique_temp_path(const Path& path);
 
 //  The path to the actual binary that is running.
 Path application_binary_name();

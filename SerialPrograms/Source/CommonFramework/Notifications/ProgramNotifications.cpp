@@ -4,7 +4,6 @@
  *
  */
 
-#include <QFile>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
