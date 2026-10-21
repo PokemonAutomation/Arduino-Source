@@ -185,11 +185,9 @@ void AudioPassthroughPairQt::build_tree(float input_volume){
     m_reader->add_raw_listener(*m_source_decoder);
 
     //  FFT branch: source channels -> 1 channel, source rate -> FFT rate.
-    //  (48 kHz everywhere except DUAL_44100, matching make_FFT_streamer().)
-    size_t fft_rate = 48000;
-    if (m_input_format == AudioChannelFormat::DUAL_44100){
-        fft_rate = 44100;
-    }
+    //  The tree runs the FFT at 48 kHz for all inputs (the post-migration
+    //  standard); a 44.1 kHz source is resampled up here.
+    const size_t fft_rate = 48000;
     Kernels::AudioPipeline::WorkingAudioStreamListener* head = nullptr;
     if (raw_rate != fft_rate){
         m_fft_resampler.reset(new Kernels::AudioResampler::AudioResampler(raw_rate, fft_rate, 1));
