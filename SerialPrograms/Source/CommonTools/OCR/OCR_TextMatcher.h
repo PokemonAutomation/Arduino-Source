@@ -37,6 +37,38 @@ size_t levenshtein_distance(const StringType& x, const StringType& y);
 template <typename StringType>
 size_t levenshtein_distance_substring(const StringType& substring, const StringType& fullstring);
 
+// Calculate weighted Levenshtein (edit) distance between x and y, with a
+// per-pair substitution cost and a per-character cost for the part of x that
+// lies outside the matched region (pre/postfix).
+//
+// Edit costs:
+//   - Substitute x[i] with y[j]: substitution_cost(x[i], y[j]) (identical
+//     characters cost 0; the function is not called for them).
+//   - Delete a character of x / insert a character of y inside the matched
+//     region: 1.0 each.
+//   - Skip a character of x before/after the matched region (pre/postfix):
+//     prepostfix_cost each (0.0 = free, i.e. substring match; 1.0 = full
+//     string). Values above 1.0 behave like 1.0, since a skipped character
+//     can always be charged as a 1.0 deletion instead.
+//
+// The whole of y must be explained; only x may have skipped context. All
+// costs must be non-negative. The result is the minimum total cost, in the
+// same units as the costs (so fractional, when the costs are fractional).
+//
+// Example:
+//   x = "xxcatxx", y = "cat", prepostfix_cost = 0.25, unit substitution
+//   Result: 1.0 (the four context characters, 0.25 each)
+//
+//   x = "kitten", y = "sitten", prepostfix_cost = 1.0,
+//   substitution_cost('k', 's') = 0.25, 1.0 otherwise
+//   Result: 0.25
+
+double levenshtein_distance(
+    double prepostfix_cost,
+    double (*substitution_cost)(char32_t ch0, char32_t ch1),
+    const std::u32string& x, const std::u32string& y
+);
+
 // Calculate probability that a match of 'matched' characters out of 'total' occurred by random chance.
 // This uses the binomial cumulative distribution function (CDF) to determine statistical significance.
 // Mathematically equivalent to:
