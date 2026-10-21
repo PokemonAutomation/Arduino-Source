@@ -109,9 +109,6 @@ public:
                     listener->on_samples(data, frames);
                 }
             }
-            if (parent.m_fft_runner){
-                parent.m_fft_runner->on_samples(data, frames);
-            }
         }
         m_parent.m_stream_listeners.run_method(
             &AudioFloatStreamListener::on_samples,
@@ -128,10 +125,10 @@ public:
     InternalFFTListener(AudioPassthroughPairQt& parent)
         : m_parent(parent)
     {
-        parent.m_fft_runner->add_listener(*this);
+        parent.m_fft_node->add_listener(*this);
     }
     ~InternalFFTListener(){
-        m_parent.m_fft_runner->remove_listener(*this);
+        m_parent.m_fft_node->remove_listener(*this);
     }
     virtual void on_fft(size_t sample_rate, std::shared_ptr<const AlignedVector<float>> fft_output) override{
         m_parent.m_fft_listeners.run_method(
@@ -156,14 +153,21 @@ private:
 
 
 void AudioPassthroughPairQt::teardown_tree(){
+    //  Destroy the tree's leaves first and propagate toward the root:
+    //  the FFT listener is registered on m_fft_node, and the branch
+    //  heads are registered on the decoder. Detaching the decoder from
+    //  the reader's raw stream first quiesces the tree, so none of the
+    //  destructions below can ever race an in-flight push.
     if (m_source_decoder){
         m_reader->remove_raw_listener(*m_source_decoder);
     }
+    m_fft_listener.reset();
+    m_fft_node.reset();
+    m_fft_mixer.reset();
+    m_fft_resampler.reset();
     m_sink_mixer.reset();
     m_sink_resampler.reset();
     m_sink_encoder.reset();
-    m_fft_mixer.reset();
-    m_fft_resampler.reset();
     m_source_decoder.reset();
 }
 
@@ -202,11 +206,14 @@ void AudioPassthroughPairQt::build_tree(float input_volume){
 
     //  FFT branch: source channels -> 1 channel, source rate -> FFT rate.
     //  The tree runs the FFT at 48 kHz for all inputs (the post-migration
-    //  standard); a 44.1 kHz source is resampled up here.
+    //  standard); a 44.1 kHz source is resampled up here. The branch ends
+    //  in m_fft_node, the tree's FFT endpoint.
     const size_t fft_rate = 48000;
-    Kernels::AudioPipeline::WorkingAudioStreamListener* head = nullptr;
+    m_fft_node.reset(new WorkingAudioToFFT(fft_rate));
+    Kernels::AudioPipeline::WorkingAudioStreamListener* head = m_fft_node.get();
     if (raw_rate != fft_rate){
         m_fft_resampler.reset(new Kernels::AudioResampler::AudioResampler(raw_rate, fft_rate, 1));
+        m_fft_resampler->add_listener(*head);
         head = m_fft_resampler.get();
     }
     if (raw_channels != 1){
@@ -219,14 +226,10 @@ void AudioPassthroughPairQt::build_tree(float input_volume){
         m_fft_mixer.reset(new Kernels::AudioPipeline::ChannelMixer(
             raw_rate, raw_channels, 1, std::move(matrix)
         ));
-        if (head){
-            m_fft_mixer->add_listener(*head);
-        }
+        m_fft_mixer->add_listener(*head);
         head = m_fft_mixer.get();
     }
-    if (head){
-        m_source_decoder->add_listener(*head);
-    }
+    m_source_decoder->add_listener(*head);
 
     //  The sink branch may have been created by the init_audio_sink() call
     //  that ran earlier in the same locked scope (which found no decoder
@@ -364,8 +367,6 @@ void AudioPassthroughPairQt::reset(
         auto scope_check = m_sanitizer.check_scope();
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_reader){
-            m_fft_listener.reset();
-            m_fft_runner.reset();
             m_writer.reset();
             m_sample_listener.reset();
             teardown_tree();
@@ -378,9 +379,8 @@ void AudioPassthroughPairQt::reset(
         m_output_device = output;
         m_output_volume = output_volume;
         init_audio_sink();
-        m_fft_runner = make_FFT_streamer(m_input_format);
-        m_fft_listener.reset(new InternalFFTListener(*this));
         build_tree(m_file_input_multiplier);
+        m_fft_listener.reset(new InternalFFTListener(*this));
     });
 }
 void AudioPassthroughPairQt::reset(
@@ -393,8 +393,6 @@ void AudioPassthroughPairQt::reset(
         auto scope_check = m_sanitizer.check_scope();
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_reader){
-            m_fft_listener.reset();
-            m_fft_runner.reset();
             m_writer.reset();
             m_sample_listener.reset();
             teardown_tree();
@@ -408,9 +406,8 @@ void AudioPassthroughPairQt::reset(
             m_reader.reset(new AudioSource(m_logger, input, m_input_format, m_device_input_multiplier));
             m_sample_listener.reset(new SampleListener(*this, m_reader->samples_per_frame()));
             init_audio_sink();
-            m_fft_runner = make_FFT_streamer(m_input_format);
-            m_fft_listener.reset(new InternalFFTListener(*this));
             build_tree(m_device_input_multiplier);
+            m_fft_listener.reset(new InternalFFTListener(*this));
         }
     });
 }
@@ -420,8 +417,6 @@ void AudioPassthroughPairQt::clear_audio_source(){
         auto scope_check = m_sanitizer.check_scope();
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_reader){
-            m_fft_listener.reset();
-            m_fft_runner.reset();
             m_sample_listener.reset();
             teardown_tree();
             m_reader.reset();
@@ -435,8 +430,6 @@ void AudioPassthroughPairQt::set_audio_source(const std::string& file){
         auto scope_check = m_sanitizer.check_scope();
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_reader){
-            m_fft_listener.reset();
-            m_fft_runner.reset();
             m_writer.reset();
             m_sample_listener.reset();
             teardown_tree();
@@ -447,9 +440,8 @@ void AudioPassthroughPairQt::set_audio_source(const std::string& file){
         m_reader.reset(new AudioSource(m_logger, file, m_input_format, m_file_input_multiplier));
         m_sample_listener.reset(new SampleListener(*this, m_reader->samples_per_frame()));
         init_audio_sink();
-        m_fft_runner = make_FFT_streamer(m_input_format);
-        m_fft_listener.reset(new InternalFFTListener(*this));
         build_tree(m_file_input_multiplier);
+        m_fft_listener.reset(new InternalFFTListener(*this));
     });
 }
 void AudioPassthroughPairQt::set_audio_source(const AudioDeviceInfo& device, AudioChannelFormat format){
@@ -458,8 +450,6 @@ void AudioPassthroughPairQt::set_audio_source(const AudioDeviceInfo& device, Aud
         auto scope_check = m_sanitizer.check_scope();
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_reader){
-            m_fft_listener.reset();
-            m_fft_runner.reset();
             m_writer.reset();
             m_sample_listener.reset();
             teardown_tree();
@@ -471,9 +461,8 @@ void AudioPassthroughPairQt::set_audio_source(const AudioDeviceInfo& device, Aud
             m_reader.reset(new AudioSource(m_logger, device, m_input_format, m_device_input_multiplier));
             m_sample_listener.reset(new SampleListener(*this, m_reader->samples_per_frame()));
             init_audio_sink();
-            m_fft_runner = make_FFT_streamer(m_input_format);
-            m_fft_listener.reset(new InternalFFTListener(*this));
             build_tree(m_device_input_multiplier);
+            m_fft_listener.reset(new InternalFFTListener(*this));
         }
     });
 }
