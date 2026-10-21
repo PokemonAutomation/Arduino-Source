@@ -80,6 +80,7 @@ private:
     //  The tails of both branches are open for now: the sink encoder's raw
     //  output and the FFT resampler's output go nowhere yet.
     void teardown_tree();
+    void teardown_sink_branch();
     void build_tree(float input_volume);
     void rebuild_sink_branch();
 

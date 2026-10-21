@@ -168,6 +168,22 @@ void AudioPassthroughPairQt::teardown_tree(){
 }
 
 
+void AudioPassthroughPairQt::teardown_sink_branch(){
+    if (m_source_decoder){
+        if (m_sink_mixer){
+            m_source_decoder->remove_listener(*m_sink_mixer);
+        }else if (m_sink_resampler){
+            m_source_decoder->remove_listener(*m_sink_resampler);
+        }else if (m_sink_encoder){
+            m_source_decoder->remove_listener(*m_sink_encoder);
+        }
+    }
+    m_sink_mixer.reset();
+    m_sink_resampler.reset();
+    m_sink_encoder.reset();
+}
+
+
 void AudioPassthroughPairQt::build_tree(float input_volume){
     if (!m_reader || m_input_format == AudioChannelFormat::NONE){
         return;
@@ -275,16 +291,7 @@ void AudioPassthroughPairQt::rebuild_sink_branch(){
     //  Detach the old sink head; the FFT head stays attached, and the new
     //  sink head is pushed to the front of the decoder's listener set below
     //  so it runs before the FFT head.
-    if (m_sink_mixer){
-        m_source_decoder->remove_listener(*m_sink_mixer);
-    }else if (m_sink_resampler){
-        m_source_decoder->remove_listener(*m_sink_resampler);
-    }else if (m_sink_encoder){
-        m_source_decoder->remove_listener(*m_sink_encoder);
-    }
-    m_sink_mixer.reset();
-    m_sink_resampler.reset();
-    m_sink_encoder.reset();
+    teardown_sink_branch();
 
     Kernels::AudioPipeline::WorkingAudioStreamListener* head = nullptr;
     m_sink_encoder.reset(new Kernels::AudioPipeline::WorkingAudio2RawAudio(
@@ -477,18 +484,7 @@ void AudioPassthroughPairQt::clear_audio_sink(){
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_writer.reset();
         m_output_device = AudioDeviceInfo();
-        if (m_source_decoder){
-            if (m_sink_mixer){
-                m_source_decoder->remove_listener(*m_sink_mixer);
-            }else if (m_sink_resampler){
-                m_source_decoder->remove_listener(*m_sink_resampler);
-            }else if (m_sink_encoder){
-                m_source_decoder->remove_listener(*m_sink_encoder);
-            }
-        }
-        m_sink_mixer.reset();
-        m_sink_resampler.reset();
-        m_sink_encoder.reset();
+        teardown_sink_branch();
     });
 }
 void AudioPassthroughPairQt::set_audio_sink(const AudioDeviceInfo& device, double volume){
