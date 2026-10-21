@@ -4,6 +4,7 @@
  *
  */
 
+#include <set>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -74,11 +75,39 @@ BBQSoloFarmer::BBQSoloFarmer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
+namespace{
+
+// Forget the failed quests that are gone from the panel, so a quest that
+// comes back later gets its attempts again. The first 3 slots are always
+// read, as UnableToDetect when OCR fails, but a 4th slot is only there when
+// OCR reads it. So only a read of 4 known quests proves a quest is gone; a
+// missed read must not give a failing quest new attempts.
+void forget_quests_gone_from_panel(std::set<BBQuests>& failed_quests, const std::vector<BBQuests>& panel){
+    if (panel.size() < 4 || std::find(panel.begin(), panel.end(), BBQuests::UnableToDetect) != panel.end()){
+        return;
+    }
+    std::erase_if(failed_quests, [&](BBQuests quest){
+        return std::find(panel.begin(), panel.end(), quest) == panel.end();
+    });
+}
+
+}
+
 void run_bbq_rounds(Logger& logger, const BBQOption& options, BBQGameActions& game){
     std::vector<BBQuests> quest_list; //all quests
     std::vector<BBQuests> quests_to_do; //do-able quests
     uint8_t eggs_hatched = 0; //Track eggs
     uint64_t num_completed_quests = 0;
+
+    // Quests that failed every attempt do_quest() made. A failed quest stays
+    // on the panel, so without this it gets NUM_RETRIES more attempts every
+    // round, forever, e.g. a sneak-up whose target does not spawn.
+    std::set<BBQuests> failed_quests;
+    auto read_panel = [&](){
+        std::vector<BBQuests> panel = game.read_quests();
+        forget_quests_gone_from_panel(failed_quests, panel);
+        return panel;
+    };
 
     while (num_completed_quests < options.NUM_QUESTS){
         if (options.OUT_OF_EGGS == BBQOption::OOEggs::Stop && eggs_hatched >= options.NUM_EGGS){
@@ -88,8 +117,19 @@ void run_bbq_rounds(Logger& logger, const BBQOption& options, BBQGameActions& ga
 
         //Get and reroll quests until we can at least one
         while (quests_to_do.size() < 1){
-            quest_list = game.read_quests();
+            quest_list = read_panel();
             quests_to_do = game.process_quest_list(quest_list, eggs_hatched);
+
+            // Rerolling costs BP and the failed quests may be doable another
+            // time, so stop instead of spending BP to replace them.
+            const bool found_doable = !quests_to_do.empty();
+            std::erase_if(quests_to_do, [&](BBQuests quest){
+                return failed_quests.contains(quest);
+            });
+            if (found_doable && quests_to_do.empty()){
+                logger.log("Every doable quest on the panel failed all its attempts. Stopping program.", COLOR_RED);
+                return;
+            }
 
             //Clear out the regular quest list.
             quest_list.clear();
@@ -97,7 +137,7 @@ void run_bbq_rounds(Logger& logger, const BBQOption& options, BBQGameActions& ga
 
         for (auto current_quest : quests_to_do){
             //Check if quest was already completed (ex. 500 meters completed while navigating to take a photo)
-            quest_list = game.read_quests();
+            quest_list = read_panel();
             if (std::find(quest_list.begin(), quest_list.end(), current_quest) != quest_list.end()){
                 logger.log("Current quest exists on list. Doing quest.");
                 bool questSuccess = game.do_quest(current_quest, eggs_hatched);
@@ -107,6 +147,7 @@ void run_bbq_rounds(Logger& logger, const BBQOption& options, BBQGameActions& ga
                     num_completed_quests++;
                 }else{
                     logger.log("Quest did not complete successfully.");
+                    failed_quests.insert(current_quest);
                 }
             }else{
                 //Note: This doesn't account for case such as "sneak up" being added and then completed alongside the next quest

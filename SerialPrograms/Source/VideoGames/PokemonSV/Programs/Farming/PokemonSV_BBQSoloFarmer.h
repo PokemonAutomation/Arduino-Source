@@ -54,7 +54,8 @@ public:
 };
 
 // Run rounds of quests until NUM_QUESTS have been completed, or until
-// eggs run out when OUT_OF_EGGS is Stop.
+// eggs run out when OUT_OF_EGGS is Stop, or until every doable quest on the
+// panel is one that already failed all its attempts.
 void run_bbq_rounds(Logger& logger, const BBQOption& options, BBQGameActions& game);
 
 

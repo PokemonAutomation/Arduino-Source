@@ -5,6 +5,7 @@
  */
 
 #include <algorithm>
+#include <set>
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Inference/PokemonSV_WhiteButtonDetector.h"
 #include "Inference/Boxes/PokemonSV_BoxDetection.h"
@@ -55,6 +56,15 @@ public:
     // Completing the first quest also completes the second, e.g. walking
     // 500 meters while navigating to a photo target.
     std::vector<std::pair<BBQuests, BBQuests>> also_completes;
+    // Attempts at these always fail, e.g. a target that never spawns.
+    std::set<BBQuests> never_completes;
+    // New quests are drawn from this list in turn, skipping any that are
+    // already on the panel.
+    std::vector<BBQuests> new_quests = {
+        BBQuests::photo_canyon, BBQuests::photo_coastal, BBQuests::photo_polar,
+        BBQuests::photo_savanna, BBQuests::catch_any, BBQuests::catch_normal,
+        BBQuests::catch_fire, BBQuests::catch_water, BBQuests::catch_grass,
+    };
 
     std::vector<std::string> events;
 
@@ -84,7 +94,8 @@ public:
     }
     virtual bool do_quest(BBQuests quest, uint8_t&) override{
         events.push_back("do");
-        const bool success = m_next_outcome < outcomes.size() ? outcomes[m_next_outcome++] : true;
+        const bool success = !never_completes.contains(quest)
+            && (m_next_outcome < outcomes.size() ? outcomes[m_next_outcome++] : true);
         if (success){
             complete(quest);
             for (const auto& [done, extra] : also_completes){
@@ -110,16 +121,9 @@ private:
         }
     }
 
-    // New quests come from a fixed rotation of doable blue quests, skipping
-    // any that are already on the panel.
     BBQuests next_new_quest(){
-        static const BBQuests ROTATION[] = {
-            BBQuests::photo_canyon, BBQuests::photo_coastal, BBQuests::photo_polar,
-            BBQuests::photo_savanna, BBQuests::catch_any, BBQuests::catch_normal,
-            BBQuests::catch_fire, BBQuests::catch_water, BBQuests::catch_grass,
-        };
         while (true){
-            BBQuests quest = ROTATION[m_next_new_quest++ % std::size(ROTATION)];
+            BBQuests quest = new_quests[m_next_new_quest++ % new_quests.size()];
             if (std::find(panel.begin(), panel.end(), quest) == panel.end()){
                 return quest;
             }
@@ -150,6 +154,8 @@ struct BBQRoundsScenario{
     std::vector<BBQuests> panel = {BBQuests::make_tm, BBQuests::auto_10, BBQuests::sneak_up};
     std::vector<bool> outcomes;
     std::vector<std::pair<BBQuests, BBQuests>> also_completes;
+    std::set<BBQuests> never_completes;
+    std::vector<BBQuests> new_quests;
     uint64_t expected_completed = 0;
     std::string expected;
 };
@@ -174,6 +180,10 @@ public:
         game.panel = m_scenario.panel;
         game.outcomes = m_scenario.outcomes;
         game.also_completes = m_scenario.also_completes;
+        game.never_completes = m_scenario.never_completes;
+        if (!m_scenario.new_quests.empty()){
+            game.new_quests = m_scenario.new_quests;
+        }
 
         NullLogger logger;
         run_bbq_rounds(logger, options, game);
@@ -245,6 +255,56 @@ void add_tests_BBQFarmerRounds(UnitTestDatabase& database){
             .stop_when_out_of_eggs = true,
             .expected_completed = 0,
             .expected = "",
+        },
+        {
+            // sneak-up fails in round 1 and is still on the panel in round 2,
+            // where only the two new quests are attempted.
+            .name = "failed quest is not attempted again",
+            .num_quests = 4,
+            .never_completes = {BBQuests::sneak_up},
+            .expected_completed = 4,
+            .expected =
+                "read process read do completed read do completed read do end "
+                "read process read do completed read do completed end",
+        },
+        {
+            .name = "stops when only failed quests are doable",
+            .num_quests = 3,
+            .panel = {BBQuests::sneak_up, BBQuests::pickup_10, BBQuests::catch_flying},
+            .never_completes = {BBQuests::sneak_up},
+            .expected_completed = 0,
+            .expected = "read process read do end read process",
+        },
+        {
+            // sneak-up fails, then leaves the panel along with make-tm. Round 2
+            // reads a full panel without it, and its replacement for
+            // photo-canyon brings it back. Round 3 attempts it again.
+            .name = "failed quest that leaves a full panel is attempted again",
+            .num_quests = 5,
+            .panel = {BBQuests::sneak_up, BBQuests::make_tm, BBQuests::pickup_10, BBQuests::catch_flying},
+            .outcomes = {false},
+            .also_completes = {{BBQuests::make_tm, BBQuests::sneak_up}},
+            .new_quests = {BBQuests::auto_10, BBQuests::photo_canyon, BBQuests::sneak_up},
+            .expected_completed = 5,
+            .expected =
+                "read process read do read do completed end "
+                "read process read do completed read do completed end "
+                "read process read do completed read do completed end",
+        },
+        {
+            // As above with 3 slots. A 4th quest could have been missed by
+            // OCR, so the read does not prove sneak-up left: it stays failed.
+            .name = "failed quest missing from a 3-slot panel stays failed",
+            .num_quests = 4,
+            .panel = {BBQuests::sneak_up, BBQuests::make_tm, BBQuests::pickup_10},
+            .outcomes = {false},
+            .also_completes = {{BBQuests::make_tm, BBQuests::sneak_up}},
+            .new_quests = {BBQuests::auto_10, BBQuests::photo_canyon, BBQuests::sneak_up},
+            .expected_completed = 4,
+            .expected =
+                "read process read do read do completed end "
+                "read process read do completed read do completed end "
+                "read process read do completed end",
         },
     };
     for (const BBQRoundsScenario& scenario : scenarios){
