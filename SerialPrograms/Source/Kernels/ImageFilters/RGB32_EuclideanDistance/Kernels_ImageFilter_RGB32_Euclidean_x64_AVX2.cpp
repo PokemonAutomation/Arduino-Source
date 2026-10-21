@@ -47,7 +47,7 @@ public:
         __m256i sum_sqr = _mm256_add_epi32(r, g);
         sum_sqr = _mm256_add_epi32(sum_sqr, b);
 
-        return _mm256_cmpgt_epi32(m_distance_squared, sum_sqr);
+        return _mm256_cmpeq_epi32(_mm256_min_epu32(sum_sqr, m_distance_squared), sum_sqr);
     }
 
 private:

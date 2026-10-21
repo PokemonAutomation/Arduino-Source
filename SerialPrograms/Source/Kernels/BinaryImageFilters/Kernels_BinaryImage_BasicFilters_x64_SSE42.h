@@ -188,7 +188,7 @@ private:
         __m128i sum_sqr = _mm_add_epi32(r, g);
         sum_sqr = _mm_add_epi32(sum_sqr, b);
 
-        __m128i cmp = _mm_cmpgt_epi32(m_distance_squared, sum_sqr);
+        __m128i cmp = _mm_cmpeq_epi32(_mm_min_epu32(sum_sqr, m_distance_squared), sum_sqr);
         return _mm_movemask_ps(_mm_castsi128_ps(cmp));
     }
 
