@@ -43,6 +43,7 @@
 #include "VideoGames/PokemonSV/Programs/Farming/PokemonSV_BlueberryCatchPhoto.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_Terarium.h"
 #include "PokemonSV_BBQLogger.h"
+#include "PokemonSV_BBQSnapshot.h"
 #include "PokemonSV_BlueberryQuests.h"
 
 #include<vector>
@@ -431,6 +432,10 @@ bool process_and_do_quest(
         std::vector<BBQuests> quest_list = read_quests(env.program_info(), console, context, BBQ_OPTIONS);
         if (std::find(quest_list.begin(), quest_list.end(), current_quest) != quest_list.end()){
             console.log("Current quest exists on list. Quest did not complete.");
+            save_bbq_snapshot(
+                console.logger(), console.video().snapshot(),
+                bbq_snapshot_directory(), current_quest, "verification-failed"
+            );
             quest_attempts++;
         }else{
             console.log("Current quest was not found. Quest completed!");
