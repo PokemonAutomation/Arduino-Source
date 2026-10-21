@@ -228,8 +228,9 @@ void AudioPassthroughPairQt::build_tree(float input_volume){
         m_source_decoder->add_listener(*head);
     }
 
-    //  The sink branch may have been created by the init_audio_sink() event
-    //  queued before this one (which found no decoder yet); build it now.
+    //  The sink branch may have been created by the init_audio_sink() call
+    //  that ran earlier in the same locked scope (which found no decoder
+    //  yet); build it now.
     rebuild_sink_branch();
 }
 
