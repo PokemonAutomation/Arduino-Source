@@ -65,6 +65,23 @@ std::vector<BBQuests> read_quests(
     const BBQOption& BBQ_OPTIONS
 );
 
+//What to do with the quests read from the panel. Slot 0 is the top quest on the panel.
+struct BBQuestPlan{
+    std::vector<BBQuests> to_do;        //Quests to attempt, in panel order.
+    std::vector<size_t> reroll_slots;   //Slots to reroll, in panel order.
+    bool reroll_all = false;            //Nothing to do and nothing rerolled: reroll every slot.
+};
+//Decide what to do with each quest from the options alone, without touching the game, so
+//the decision can be tested. Quests not possible are left out. Out-of-egg hatch quests and
+//quests set to reroll in the exclusions table are rerolled. A quest with several table rows
+//gets the action of each row, in table order.
+BBQuestPlan plan_quests(
+    Logger& logger,
+    const BBQOption& BBQ_OPTIONS,
+    const std::vector<BBQuests>& quest_list,
+    uint8_t eggs_hatched
+);
+
 //Determine which quests are possible and which quests are not. (ex. no eggs, reroll egg hatcher.)
 //Quests not possible are removed from the list. If the list is empty, then reroll all items.
 std::vector<BBQuests> process_quest_list(
