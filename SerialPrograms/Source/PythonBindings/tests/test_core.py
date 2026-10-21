@@ -13,7 +13,9 @@ core = pytest.importorskip("pokemon_automation._pa_core")
 
 
 def test_buttons_dict():
-    """The module's BUTTONS dict matches the C++ Button enum bit positions for a sample of buttons, including third-party controller bits."""
+    """The module's BUTTONS dict matches the C++ Button enum bit positions for a sample of buttons, including third-party controller bits.
+    It checks the module against hardcoded protocol values (e.g. A == 1<<2, PLUS == 1<<9)
+    """
     # A sample of the C++ `NintendoSwitch::Button` enum, straight from the module.
     assert core.BUTTONS["A"] == 1 << 2
     assert core.BUTTONS["PLUS"] == 1 << 9
@@ -24,7 +26,9 @@ def test_buttons_dict():
 
 
 def test_dpad_positions_dict():
-    """The module's DPAD_POSITIONS dict matches the C++ DpadPosition enum order (0 = up, clockwise, 8 = none)."""
+    """The module's DPAD_POSITIONS dict matches the C++ DpadPosition enum order (0 = up, clockwise, 8 = none).
+    It checks the module against hardcoded protocol values.
+    """
     assert core.DPAD_POSITIONS == {
         "UP": 0, "UP_RIGHT": 1, "RIGHT": 2, "DOWN_RIGHT": 3,
         "DOWN": 4, "DOWN_LEFT": 5, "LEFT": 6, "UP_LEFT": 7, "NONE": 8,
