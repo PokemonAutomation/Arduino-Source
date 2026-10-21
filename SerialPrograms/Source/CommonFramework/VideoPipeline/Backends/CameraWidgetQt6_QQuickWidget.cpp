@@ -4,7 +4,8 @@
  *
  */
 
-#include <QTemporaryFile>
+#include <QByteArray>
+#include <QUrl>
 #include <QCamera>
 #include <QPainter>
 #include <QVideoSink>
@@ -233,13 +234,10 @@ CameraVideoDisplay::CameraVideoDisplay(QWidget* parent)
         "}\n"
     );
 
-    QTemporaryFile file;
-    if (file.open()){
-        file.write(qml.toUtf8());
-        file.close();
-        this->setSource(QUrl::fromLocalFile(file.fileName()));
-    }
-
+    //  Load the QML from memory via a data URL, instead of writing a temporary file.
+    //  The QML engine reads the base64 payload directly; nothing touches the disk.
+    const QByteArray base64 = qml.toUtf8().toBase64();
+    this->setSource(QUrl(QStringLiteral("data:text/qml;base64,") + QString::fromLatin1(base64)));
 }
 
 
