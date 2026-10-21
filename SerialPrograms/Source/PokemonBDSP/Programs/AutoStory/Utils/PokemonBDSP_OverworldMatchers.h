@@ -53,6 +53,13 @@ OverworldMatchResult match_eterna_center_entrance(const ImageRGB32& frame);
 OverworldMatchResult match_eterna_gym_entrance(const ImageRGB32& frame);
 OverworldMatchResult match_galactic_hq_cut(const ImageRGB32& frame);
 OverworldMatchResult match_galactic_hq_jupiter(const ImageRGB32& frame);
+OverworldMatchResult match_eterna_cycle_shop_entrance(const ImageRGB32& frame);
+OverworldMatchResult match_eterna_cycle_shop_interior(const ImageRGB32& frame);
+OverworldMatchResult match_eterna_cycle_shop_reward(const ImageRGB32& frame);
+OverworldMatchResult match_eterna_cycle_shop_counter(const ImageRGB32& frame);
+OverworldMatchResult match_cycling_road_north_entry(const ImageRGB32& frame);
+OverworldMatchResult match_galactic_hq_exterior(const ImageRGB32& frame);
+OverworldMatchResult match_eterna_center_departure(const ImageRGB32& frame);
 OverworldMatchResult match_eterna_gym_statues(const ImageRGB32& frame);
 // Two unique, agreeing landmarks close to the doorway; this confidence only
 // authorizes a watched entry attempt, never proves the interior location.
