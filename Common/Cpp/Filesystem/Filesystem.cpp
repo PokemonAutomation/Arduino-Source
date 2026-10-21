@@ -184,10 +184,10 @@ std::vector<Path> list_directory(const Path& path, bool recursive){
 
 #ifdef _WIN32
 bool is_readable(const Path& path){
-    return _waccess(path.stdpath().c_str(), _R_OK) == 0;
+    return _waccess(path.stdpath().c_str(), 4) == 0;
 }
 bool is_writable(const Path& path){
-    return _waccess(path.stdpath().c_str(), _W_OK) == 0;
+    return _waccess(path.stdpath().c_str(), 2) == 0;
 }
 #else
 bool is_readable(const Path& path){
