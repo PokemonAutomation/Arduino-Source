@@ -44,6 +44,7 @@ MenuDetector::MenuDetector(Color color, bool skip_new_banner)
     , m_panel_right(0.835, 0.125, 0.015, 0.460)
     , m_footer(0.050, 0.963, 0.600, 0.025)
     , m_confirm_button(0.736, 0.960, 0.022, 0.038)
+    , m_confirm_button_with_swap(0.653, 0.960, 0.022, 0.038)
     , m_save_button(0.835, 0.960, 0.024, 0.038)
     , m_close_button(0.915, 0.960, 0.024, 0.038)
     , m_save_heading(0.920, 0.755, 0.070, 0.040)
@@ -63,6 +64,7 @@ void MenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_panel_right);
     items.add(m_color, m_footer);
     items.add(m_color, m_confirm_button);
+    items.add(m_color, m_confirm_button_with_swap);
     items.add(m_color, m_save_button);
     items.add(m_color, m_close_button);
     items.add(m_color, m_save_heading);
@@ -104,7 +106,14 @@ bool MenuDetector::detect_menu_chrome(const ImageViewRGB32& screen) const{
         footer.average.g < footer.average.r + 20 || footer.stddev.sum() > 60){
         return false;
     }
-    for (const ImageFloatBox& box : {m_confirm_button, m_save_button, m_close_button, m_save_shortcut}){
+    // Unlocking the Swap prompt shifts A Confirm left. Require the same
+    // button contrast at either documented footer position, with all other
+    // panel, footer and Save checks unchanged.
+    if (!has_menu_button(extract_box_reference(screen, m_confirm_button)) &&
+        !has_menu_button(extract_box_reference(screen, m_confirm_button_with_swap))){
+        return false;
+    }
+    for (const ImageFloatBox& box : {m_save_button, m_close_button, m_save_shortcut}){
         if (!has_menu_button(extract_box_reference(screen, box))){
             return false;
         }
@@ -116,6 +125,86 @@ bool MenuDetector::detect_menu_chrome(const ImageViewRGB32& screen) const{
         heading.stddev.sum() > 30 &&
         background.average.g > background.average.r + 40 &&
         background.average.b > background.average.r + 40 && background.stddev.sum() < 90;
+}
+
+static std::string fmt(double value){
+    char buffer[32];
+    snprintf(buffer, sizeof(buffer), "%.3f", value);
+    return buffer;
+}
+static std::string describe_stats(const ImageStats& stats){
+    return "avg=(" + fmt(stats.average.r) + "," + fmt(stats.average.g) + "," + fmt(stats.average.b) +
+        ") stddev_sum=" + fmt(stats.stddev.sum());
+}
+static std::string describe_button(const ImageViewRGB32& patch){
+    size_t dark = 0;
+    size_t light = 0;
+    for (size_t y = 0; y < patch.height(); y++){
+        for (size_t x = 0; x < patch.width(); x++){
+            const uint32_t pixel = patch.pixel(x, y);
+            const int r = (pixel >> 16) & 0xff;
+            const int g = (pixel >> 8) & 0xff;
+            const int b = pixel & 0xff;
+            const int low = std::min(r, std::min(g, b));
+            const int high = std::max(r, std::max(g, b));
+            if (high - low < 35){
+                dark += high < 160;
+                light += low > 200;
+            }
+        }
+    }
+    const double pixels = (double)patch.width() * patch.height();
+    const double dark_ratio = pixels > 0 ? dark / pixels : 0;
+    const double light_ratio = pixels > 0 ? light / pixels : 0;
+    return "dark=" + fmt(dark_ratio) + " (need>=0.150) light=" + fmt(light_ratio) + " (need>=0.080)";
+}
+
+std::string MenuDetector::debug_report(const ImageViewRGB32& screen) const{
+    std::string report = "MenuDetector report (" + std::to_string(screen.width()) + "x" +
+        std::to_string(screen.height()) + "):\n";
+    auto line = [&](const std::string& name, bool ok, const std::string& detail){
+        report += std::string("  [") + (ok ? "SEEN   " : "MISSING") + "] " + name + ": " + detail + "\n";
+    };
+    const std::pair<const char*, const ImageFloatBox*> panels[] = {
+        {"panel top", &m_panel_top}, {"panel left", &m_panel_left}, {"panel right", &m_panel_right},
+    };
+    for (const auto& panel : panels){
+        const ImageStats stats = image_stats(extract_box_reference(screen, *panel.second));
+        line(panel.first, is_white(stats), describe_stats(stats));
+    }
+    const ImageStats footer = image_stats(extract_box_reference(screen, m_footer));
+    const bool footer_ok = !(footer.average.b < footer.average.r + 35 ||
+        footer.average.g < footer.average.r + 20 || footer.stddev.sum() > 60);
+    line("footer (need b>=r+35, g>=r+20, stddev<=60)", footer_ok, describe_stats(footer));
+    const std::pair<const char*, const ImageFloatBox*> buttons[] = {
+        {"confirm button (without Swap)", &m_confirm_button},
+        {"confirm button (with Swap)", &m_confirm_button_with_swap},
+        {"save button", &m_save_button},
+        {"close button", &m_close_button}, {"save shortcut", &m_save_shortcut},
+    };
+    for (const auto& button : buttons){
+        const ImageViewRGB32 patch = extract_box_reference(screen, *button.second);
+        line(button.first, has_menu_button(patch), describe_button(patch));
+    }
+    const ImageStats heading = image_stats(extract_box_reference(screen, m_save_heading));
+    const ImageStats background = image_stats(extract_box_reference(screen, m_save_background));
+    line("save heading (need rgb>180, stddev>30)",
+        heading.average.r > 180 && heading.average.g > 180 && heading.average.b > 180 && heading.stddev.sum() > 30,
+        describe_stats(heading));
+    line("save background (need g,b>=r+40, stddev<90)",
+        background.average.g > background.average.r + 40 && background.average.b > background.average.r + 40 &&
+        background.stddev.sum() < 90,
+        describe_stats(background));
+    line("chrome overall", detect_menu_chrome(screen), "");
+
+    const ImageFloatBox* stripes[] = {&m_line0, &m_line1, &m_line2, &m_line3, &m_line4};
+    for (size_t c = 0; c < 5; c++){
+        const ImageStats stats = image_stats(extract_box_reference(screen, *stripes[c]));
+        line("legacy stripe " + std::to_string(c), is_white(stats), describe_stats(stats));
+    }
+    const ImageStats cross = image_stats(extract_box_reference(screen, m_cross));
+    line("legacy cross (need stddev>=100)", cross.stddev.sum() >= 100, describe_stats(cross));
+    return report;
 }
 
 bool MenuDetector::detect(const ImageViewRGB32& screen){

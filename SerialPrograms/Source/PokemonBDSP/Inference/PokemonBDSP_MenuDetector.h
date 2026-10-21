@@ -31,6 +31,9 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) override;
 
+    //  Multi-line description of every check: what passed, what failed, and the measured values.
+    std::string debug_report(const ImageViewRGB32& screen) const;
+
 private:
     bool detect_menu_chrome(const ImageViewRGB32& screen) const;
 
@@ -46,6 +49,7 @@ private:
     ImageFloatBox m_panel_right;
     ImageFloatBox m_footer;
     ImageFloatBox m_confirm_button;
+    ImageFloatBox m_confirm_button_with_swap;
     ImageFloatBox m_save_button;
     ImageFloatBox m_close_button;
     ImageFloatBox m_save_heading;
