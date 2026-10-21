@@ -36,9 +36,9 @@ namespace{
 
 struct TeraEncounterScenario{
     std::string name;
-    bool shiny;
-    int encounter_watcher_result;   //  0: battle menu, 1: audio, -1: route finished first
-    bool battle_menu_detected;      //  The route's own wait saw the battle menu.
+    bool shiny = false;
+    int encounter_watcher_result;       //  0: battle menu, 1: audio, -1: route finished first
+    bool battle_menu_detected = false;  //  The route's own wait saw the battle menu.
     TeraEncounterAction expected;
 };
 
@@ -69,15 +69,15 @@ private:
 void add_tests_TeraEncounterAction(UnitTestDatabase& database){
     using enum TeraEncounterAction;
     const std::vector<TeraEncounterScenario> scenarios{
-        {"timeout recovers without battle",             false, -1, false, Recover},
-        {"audio alone is not entry",                    false,  1, false, Recover},
-        {"unknown callback is not entry",               false,  2, false, Recover},
-        {"encounter watcher menu battles",              false,  0, false, Battle},
-        {"route wait menu battles",                     false, -1, true,  Battle},
-        {"audio then route wait menu battles",          false,  1, true,  Battle},
-        {"both menus battle",                           false,  0, true,  Battle},
-        {"shiny stops without entry",                   true,  -1, false, StopForShiny},
-        {"shiny stops before battle",                   true,   0, true,  StopForShiny},
+        {.name = "timeout recovers without battle", .encounter_watcher_result = -1, .expected = Recover},
+        {.name = "audio alone is not entry", .encounter_watcher_result = 1, .expected = Recover},
+        {.name = "unknown callback is not entry", .encounter_watcher_result = 2, .expected = Recover},
+        {.name = "encounter watcher menu battles", .encounter_watcher_result = 0, .expected = Battle},
+        {.name = "route wait menu battles", .encounter_watcher_result = -1, .battle_menu_detected = true, .expected = Battle},
+        {.name = "audio then route wait menu battles", .encounter_watcher_result = 1, .battle_menu_detected = true, .expected = Battle},
+        {.name = "both menus battle", .encounter_watcher_result = 0, .battle_menu_detected = true, .expected = Battle},
+        {.name = "shiny stops without entry", .shiny = true, .encounter_watcher_result = -1, .expected = StopForShiny},
+        {.name = "shiny stops before battle", .shiny = true, .encounter_watcher_result = 0, .battle_menu_detected = true, .expected = StopForShiny},
     };
     for (const TeraEncounterScenario& scenario : scenarios){
         database.add<Test_TeraEncounterAction>(scenario);
