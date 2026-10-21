@@ -5,7 +5,6 @@
  */
 
 #include <random>
-#include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Common/Cpp/Containers/GuardPageBuffer.h"
 #include "Kernels_AudioChannelMixer_TestInfra.h"
 
@@ -36,12 +35,12 @@ Test::Test(
 
 UnitTestResult Test::run(Logger& logger, CancellableScope& scope) const{
     std::vector<float> matrix(m_in_channels * m_out_channels);
-    AlignedVector<float> out0(m_samples * m_out_channels);
 
-    //  The input and the output of the kernel under test end right before a
-    //  guard page. A tail that reads or writes past the end then faults on
-    //  every run, not just when the heap happens to end there.
+    //  The input and both outputs end right before a guard page. A tail that
+    //  reads or writes past the end then faults on every run, not just when
+    //  the heap happens to end there.
     GuardPageBuffer<float> in(m_samples * m_in_channels);
+    GuardPageBuffer<float> out0(m_samples * m_out_channels);
     GuardPageBuffer<float> out1(m_samples * m_out_channels);
 
     std::mt19937 generator(42);

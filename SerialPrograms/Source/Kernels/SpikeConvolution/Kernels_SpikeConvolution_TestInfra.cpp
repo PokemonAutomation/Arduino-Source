@@ -10,7 +10,6 @@
 #include <random>
 #include "Common/Compiler.h"
 #include "Common/Cpp/CancellableScope.h"
-#include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Common/Cpp/Containers/GuardPageBuffer.h"
 #include "Kernels_SpikeConvolution_TestInfra.h"
 
@@ -39,13 +38,6 @@ static constexpr int MAX_WEIGHT = 8;
 static constexpr size_t MAX_LENGTH_I = 1000;
 
 //
-//  Extra room in the Default output buffer: the kernel may write up to
-//  PA_ALIGNMENT/sizeof(float) - 1 = 15 floats past the valid outputs
-//  (padding of the final vector).
-//
-static constexpr size_t OUTPUT_PAD = 16;
-
-//
 //  The documented size of "out": the valid outputs rounded up to 16 floats.
 //
 static size_t output_capacity(size_t lengthO){
@@ -71,15 +63,16 @@ Test::Test(
 
 UnitTestResult Test::run(Logger& logger, CancellableScope& scope) const{
     //
-    //  "in", "kernel" and the output of the implementation under test each
-    //  end right before a guard page. A read past the end of "in" or
-    //  "kernel", or a write past the documented end of "out", faults on
-    //  every run. The buffers are mapped once for the longest input. Each
-    //  input length puts its data at the end of them.
+    //  "in", "kernel" and both outputs each end right before a guard page.
+    //  A read past the end of "in" or "kernel", or a write past the
+    //  documented end of "out", faults on every run. The buffers are mapped
+    //  once for the longest input. Each input length puts its data at the
+    //  end of them.
     //
     const size_t max_capacityO = output_capacity(MAX_LENGTH_I - m_lengthK + 1);
     GuardPageBuffer<float> in_buffer(MAX_LENGTH_I);
     GuardPageBuffer<float> kernel(m_lengthK);
+    GuardPageBuffer<float> out0_buffer(max_capacityO, PA_ALIGNMENT);
     GuardPageBuffer<float> out1_buffer(max_capacityO, PA_ALIGNMENT);
 
     for (size_t lengthI = m_lengthK; lengthI <= MAX_LENGTH_I; lengthI++){
@@ -89,15 +82,16 @@ UnitTestResult Test::run(Logger& logger, CancellableScope& scope) const{
 
         //
         //  Fresh random data for each (K, N), with a deterministic seed.
-        //  "in" holds exactly lengthI floats. "out1" holds exactly
-        //  capacityO floats and starts 64-byte aligned (both capacities
-        //  are multiples of 16 floats). It starts as NaN, so an output the
-        //  implementation never writes shows up as a mismatch.
+        //  "in" holds exactly lengthI floats. "out0" and "out1" each hold
+        //  exactly capacityO floats and start 64-byte aligned (both
+        //  capacities are multiples of 16 floats). They start as NaN, so an
+        //  output that an implementation never writes shows up as a mismatch.
         //
         float* in = in_buffer.data() + MAX_LENGTH_I - lengthI;
+        float* out0 = out0_buffer.data() + max_capacityO - capacityO;
         float* out1 = out1_buffer.data() + max_capacityO - capacityO;
+        std::fill(out0, out0 + capacityO, std::numeric_limits<float>::quiet_NaN());
         std::fill(out1, out1 + capacityO, std::numeric_limits<float>::quiet_NaN());
-        AlignedVector<float> out0(lengthO + OUTPUT_PAD);
 
         std::mt19937 generator((unsigned int)(lengthI * 1000003u + m_lengthK * 7919u));
         std::uniform_int_distribution<int> data_distribution(-MAX_DATA, MAX_DATA);
@@ -109,7 +103,7 @@ UnitTestResult Test::run(Logger& logger, CancellableScope& scope) const{
             kernel[c] = (float)weight_distribution(generator);
         }
 
-        m_conv0(out0.data(), in, lengthI, kernel.data(), m_lengthK);
+        m_conv0(out0, in, lengthI, kernel.data(), m_lengthK);
         m_conv1(out1, in, lengthI, kernel.data(), m_lengthK);
 
         //
