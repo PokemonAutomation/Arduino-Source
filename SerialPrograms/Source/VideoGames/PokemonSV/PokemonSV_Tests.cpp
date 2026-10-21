@@ -25,11 +25,64 @@
 #include "Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "Inference/Picnics/PokemonSV_SandwichRecipeDetector.h"
 #include "Inference/Picnics/PokemonSV_SandwichHandDetector.h"
+#include "Programs/Farming/PokemonSV_BlueberryQuests.h"
 #include "PokemonSV_Tests.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
+
+namespace{
+
+struct TeraEncounterScenario{
+    std::string name;
+    bool shiny;
+    int encounter_watcher_result;   //  0: battle menu, 1: audio, -1: route finished first
+    bool battle_menu_detected;      //  The route's own wait saw the battle menu.
+    TeraEncounterAction expected;
+};
+
+class Test_TeraEncounterAction : public UnitTest{
+public:
+    Test_TeraEncounterAction(TeraEncounterScenario scenario)
+        : UnitTest("PokemonSV::TeraEncounterAction - " + scenario.name)
+        , m_scenario(std::move(scenario))
+    {}
+
+    virtual UnitTestResult run(Logger&, CancellableScope&) const override{
+        const TeraEncounterAction actual = tera_encounter_action(
+            m_scenario.shiny, m_scenario.encounter_watcher_result, m_scenario.battle_menu_detected
+        );
+        if (actual != m_scenario.expected){
+            return "Expected action " + std::to_string((int)m_scenario.expected)
+                + ", got " + std::to_string((int)actual) + ".";
+        }
+        return true;
+    }
+
+private:
+    const TeraEncounterScenario m_scenario;
+};
+
+}
+
+void add_tests_TeraEncounterAction(UnitTestDatabase& database){
+    using enum TeraEncounterAction;
+    const std::vector<TeraEncounterScenario> scenarios{
+        {"timeout recovers without battle",             false, -1, false, Recover},
+        {"audio alone is not entry",                    false,  1, false, Recover},
+        {"unknown callback is not entry",               false,  2, false, Recover},
+        {"encounter watcher menu battles",              false,  0, false, Battle},
+        {"route wait menu battles",                     false, -1, true,  Battle},
+        {"audio then route wait menu battles",          false,  1, true,  Battle},
+        {"both menus battle",                           false,  0, true,  Battle},
+        {"shiny stops without entry",                   true,  -1, false, StopForShiny},
+        {"shiny stops before battle",                   true,   0, true,  StopForShiny},
+    };
+    for (const TeraEncounterScenario& scenario : scenarios){
+        database.add<Test_TeraEncounterAction>(scenario);
+    }
+}
 
 
 
@@ -54,6 +107,7 @@ void add_tests(UnitTestDatabase& database){
     add_tests_TeraTypeReader(database);
     add_tests_NormalBattleMenus(database);
     add_tests_LetsGoKillDetector(database);
+    add_tests_TeraEncounterAction(database);
 }
 
 

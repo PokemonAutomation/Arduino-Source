@@ -110,6 +110,20 @@ void quest_sneak_up(
     const BBQOption& BBQ_OPTIONS
 );
 
+//What a Tera route does once its encounter attempt has ended.
+enum class TeraEncounterAction{
+    StopForShiny,
+    Battle,
+    Recover,
+};
+//The route can run out of time without reaching a battle (e.g. the target did not spawn).
+//Battle commands sent outside a battle would wander the overworld, so only a battle menu seen
+//by the encounter watcher (callback 0) or by the route's own wait counts as entry.
+//A shiny always stops the program, even without entry, so it is never lost.
+TeraEncounterAction tera_encounter_action(
+    bool shiny, int encounter_watcher_result, bool battle_menu_detected
+);
+
 //Kill a tera pokemon
 void quest_wild_tera(
     const ProgramInfo& info,
