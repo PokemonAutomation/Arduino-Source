@@ -71,12 +71,24 @@ Path application_binary_name();
 Path application_binary_path();
 Path application_binary_directory();
 
+//  The last modification time of a file or directory.
+//  If the path does not exist or the time cannot be determined,
+//  return the earliest possible time.
+std::filesystem::file_time_type last_write_time(const Path& path);
+
 //  Path to where the application is installed.
 //  All immutable resources are relative to this.
 Path application_install_path();
 
 //  Path to where the application saves its output/settings.
 Path application_scratch_path();
+
+//  Path to the folder where the application stores user data in the user's
+//  account (the "User App" storage location). e.g.
+//  - Windows: %APPDATA%/<binary name>
+//  - macOS: ~/Library/Application Support/<binary name>
+//  - Linux: $XDG_DATA_HOME/<binary name> (or ~/.local/share/<binary name>)
+Path application_user_data_path();
 
 
 // Set a profile for program settings (/UserSettings/PROFILE_NAME/) on MacOS.

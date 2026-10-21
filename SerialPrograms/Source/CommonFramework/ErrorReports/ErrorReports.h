@@ -24,11 +24,13 @@ class AsyncTask;
 class StreamHistorySession;
 
 
-// Filename constants for error report components
+// Folder name constants for error report components
 extern const std::string& ERROR_LOGS_NAME;        // "Logs.log" - The log file in each error report
 extern const std::string& ERROR_DUMP_NAME;        // "Minidump.dmp" - The minidump file if available
-extern const std::string& ERROR_PATH_UNSENT;      // "ErrorReportsLocal" - Directory path for unsent error reports
-extern const std::string& ERROR_PATH_SENT;        // "ErrorReportsSent" - Directory path for sent error reports
+extern const std::string& ERROR_PATH_UNSENT;      // "ErrorReportsLocal" - Folder name for unsent error reports
+extern const std::string& ERROR_PATH_SENT;        // "ErrorReportsSent" - Folder name for sent error reports
+// For the full paths of these folders, use UNSENT_ERROR_REPORTS_PATH() /
+// SENT_ERROR_REPORTS_PATH() from CommonFramework/GlobalAutoPaths.h.
 
 
 

@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Json/JsonValue.h"
 //#include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
@@ -42,6 +43,10 @@ void PersistentSettings::write() const{
     root["99-Panels"] = panels.clone();
 
     try{
+        //  Make sure the folder that holds the setting JSON file exists
+        //  (it may have been created at a different storage location, or the
+        //  user may have switched the storage location while running).
+        Filesystem::create_directories(Filesystem::Path(PROGRAM_SETTING_JSON_PATH()).parent_path());
         root.dump(PROGRAM_SETTING_JSON_PATH());
     }catch (FileException&){}
 }
