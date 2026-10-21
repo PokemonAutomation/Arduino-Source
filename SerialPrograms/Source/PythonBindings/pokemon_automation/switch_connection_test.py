@@ -29,8 +29,8 @@ def try_port(port: str) -> bool:
             sw.push_dpad("right", hold_ms=100)
             sw.push_dpad("left", hold_ms=100)
             sw.push_dpad("left", hold_ms=100)
-            sw.push_right_joystick((1.0, 0.0), hold_ms=2000)  # hold the right joystick to the right
-            sw.push_right_joystick((-1.0, 0.0), hold_ms=2000) # hold the right joystick to the left
+            sw.push_right_joystick(joystick_position=(1.0, 0.0), hold_ms=2000)  # hold the right joystick to the right
+            sw.push_right_joystick(joystick_position=(-1.0, 0.0), hold_ms=2000) # hold the right joystick to the left
             sw.controller_state(duration_ms=2000, buttons="B", left="up")  # hold B, while pushing up the left joystick
             sw.wait(500)
             sw.wait_for_all_requests()

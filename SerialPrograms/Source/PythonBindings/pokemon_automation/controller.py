@@ -200,8 +200,8 @@ class SwitchController:
 
     def push_left_joystick(self, joystick_position: Sequence[float], hold_ms: int = 500,
                           release_ms: int = 0) -> None:
-        """Tilt the left stick to `joystick_position`, an (x, y) tuple in [-1, 1]
-        with +x = right and +y = up, for `hold_ms`; e.g. (0.0, 1.0) is up.
+        """Tilt the left stick to `joystick_position`, an (x, y) tuple in [-1, 1] for `hold_ms`
+        -x=left, x=0=neutral, +x=right. -y=down, y=0=neutral, +y=up. e.g. (0.0, 1.0) is up.
 
         The pair is unpacked and passed to the backend as separate x, y
         arguments (`_pa_core` keeps the C++ signature).
@@ -214,8 +214,8 @@ class SwitchController:
 
     def push_right_joystick(self, joystick_position: Sequence[float], hold_ms: int = 500,
                            release_ms: int = 0) -> None:
-        """Tilt the right stick to `joystick_position`, an (x, y) tuple in [-1, 1]
-        with +x = right and +y = up, for `hold_ms`; e.g. (0.0, 1.0) is up.
+        """Tilt the right stick to `joystick_position`, an (x, y) tuple in [-1, 1] for `hold_ms`
+        -x=left, x=0=neutral, +x=right. -y=down, y=0=neutral, +y=up. e.g. (0.0, 1.0) is up.
 
         The pair is unpacked and passed to the backend as separate x, y
         arguments (`_pa_core` keeps the C++ signature).
