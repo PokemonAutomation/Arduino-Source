@@ -2386,6 +2386,8 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonSV/Inference/PokemonSV_AuctionItemNameReader.h
     Source/VideoGames/PokemonSV/Inference/PokemonSV_BagDetector.cpp
     Source/VideoGames/PokemonSV/Inference/PokemonSV_BagDetector.h
+    Source/VideoGames/PokemonSV/Inference/PokemonSV_BlueberryPointsReader.cpp
+    Source/VideoGames/PokemonSV/Inference/PokemonSV_BlueberryPointsReader.h
     Source/VideoGames/PokemonSV/Inference/PokemonSV_BlueberryQuestDetector.cpp
     Source/VideoGames/PokemonSV/Inference/PokemonSV_BlueberryQuestDetector.h
     Source/VideoGames/PokemonSV/Inference/PokemonSV_BlueberryQuestReader.cpp
