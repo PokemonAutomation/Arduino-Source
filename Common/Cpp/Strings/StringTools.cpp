@@ -5,6 +5,7 @@
  */
 
 #include <stdint.h>
+#include <cctype>
 #include <stdexcept>
 #include <vector>
 #include "StringTools.h"
@@ -114,6 +115,21 @@ std::string uncapitalize(const std::string& str){
         }
     }
     return result;
+}
+
+
+bool ends_with_ci(const std::string& str, const std::string& suffix){
+    if (suffix.size() > str.size()){
+        return false;
+    }
+    for (size_t i = 0; i < suffix.size(); i++){
+        char a = str[str.size() - suffix.size() + i];
+        char b = suffix[i];
+        if (std::tolower((unsigned char)a) != std::tolower((unsigned char)b)){
+            return false;
+        }
+    }
+    return true;
 }
 
 

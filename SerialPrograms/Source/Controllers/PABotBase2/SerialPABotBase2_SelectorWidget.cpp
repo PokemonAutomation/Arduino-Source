@@ -4,7 +4,7 @@
  *
  */
 
-#include <QFileInfo>
+#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "SerialPABotBase2_Descriptor.h"
 #include "SerialPABotBase2_SelectorWidget.h"
 
@@ -43,12 +43,11 @@ bool filter_serial_port(const QSerialPortInfo& port){
 #endif
 
 #if defined(__linux__)
-    const QString path = port.systemLocation();
+    const std::string path = port.systemLocation().toStdString();
 
-    QFileInfo file(path);
     // Exclude devices that don't have Read/Write access
-    if (!(file.isReadable() && file.isWritable()))
-    {
+    if (!Filesystem::is_readable(Filesystem::Path(path)) ||
+        !Filesystem::is_writable(Filesystem::Path(path))){
         return false;
     }
 #endif

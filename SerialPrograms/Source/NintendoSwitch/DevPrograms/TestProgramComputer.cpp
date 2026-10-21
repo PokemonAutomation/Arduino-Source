@@ -15,7 +15,6 @@
 #include <fstream>
 #include <condition_variable>
 #include <QImage>
-#include <QDir>
 #include <QDateTime>
 #include <QGuiApplication>
 #include <QScreen>

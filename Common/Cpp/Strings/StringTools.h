@@ -39,6 +39,9 @@ std::string capitalize(const std::string& str);
 // Uncapitalize each word in str. Words are separated by space characters.
 std::string uncapitalize(const std::string& str);
 
+// Whether str ends with suffix, case-insensitively.
+bool ends_with_ci(const std::string& str, const std::string& suffix);
+
 
 }
 }
