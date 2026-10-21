@@ -242,10 +242,11 @@ void plan_out_of_eggs(Logger& logger, const BBQOption& BBQ_OPTIONS, size_t slot,
 }
 
 //Apply each exclusions table row for the quest, in table order. Returns false if no row is for it.
+//A quest the program cannot do is never run, but can still be rerolled or skipped.
 bool plan_from_exclusions(
     Logger& logger,
     const std::vector<std::unique_ptr<BBQuestTableRow>>& exclusions_table,
-    BBQuests quest, size_t slot,
+    BBQuests quest, size_t slot, bool possible,
     BBQuestPlan& plan
 ){
     bool quest_in_table = false;
@@ -257,6 +258,10 @@ bool plan_from_exclusions(
         quest_in_table = true;
         switch (row->action){
         case BBQAction::run:
+            if (!possible){
+                logger.log("Run selected, but this quest is not possible. Skipping quest.");
+                break;
+            }
             logger.log("Run selected. Adding quest to list.");
             plan.to_do.push_back(quest);
             break;
@@ -468,11 +473,14 @@ BBQuestPlan plan_quests(
     BBQuestPlan plan;
     std::vector<std::unique_ptr<BBQuestTableRow>> exclusions_table = BBQ_OPTIONS.QUEST_EXCLUSIONS.copy_snapshot();
 
+    //The first quest not possible that has no table row, to reroll if nothing else can be done.
+    std::optional<size_t> not_possible_slot;
+
     logger.log("Processing quests.");
     for (size_t slot = 0; slot < quest_list.size(); slot++){
         const BBQuests n = quest_list[slot];
-        if (not_possible_quests.contains(n)){
-            logger.log("Quest not possible");
+        if (n == BBQuests::UnableToDetect){
+            logger.log("Quest not detected.");
             continue;
         }
         //Check eggs remaining.
@@ -481,15 +489,32 @@ BBQuestPlan plan_quests(
             plan_out_of_eggs(logger, BBQ_OPTIONS, slot, plan);
             continue;
         }
-        if (!plan_from_exclusions(logger, exclusions_table, n, slot, plan)){
-            logger.log("Quest not in inclusion/exclusions table. Adding to list.");
-            plan.to_do.push_back(n);
+        const bool possible = !not_possible_quests.contains(n);
+        if (plan_from_exclusions(logger, exclusions_table, n, slot, possible, plan)){
+            continue;
         }
+        if (!possible){
+            logger.log("Quest not possible.");
+            if (!not_possible_slot){
+                not_possible_slot = slot;
+            }
+            continue;
+        }
+        logger.log("Quest not in inclusion/exclusions table. Adding to list.");
+        plan.to_do.push_back(n);
     }
 
     //Check that quests_to_do is not empty (after completing all quests on the list, be sure to erase it.
     //Lag might be a problem in multi - look into making slots like menu-left navigation
-    plan.reroll_all = plan.reroll_slots.empty() && plan.to_do.empty();
+    if (plan.reroll_slots.empty() && plan.to_do.empty()){
+        if (not_possible_slot){
+            //Rerolling one quest costs less BP than rerolling all of them.
+            logger.log("No possible quests! Rerolling a quest that is not possible.");
+            plan.reroll_slots.push_back(*not_possible_slot);
+        }else{
+            plan.reroll_all = true;
+        }
+    }
     return plan;
 }
 

@@ -245,9 +245,41 @@ void add_tests_BBQuestPlan(UnitTestDatabase& database){
             .expected_to_do = {make_tm},
         },
         {
-            .name = "nothing doable rerolls all",
-            .quests = {pickup_10, auto_10, catch_flying},
+            // One quest costs less BP to reroll than all of them.
+            .name = "nothing doable rerolls the first quest not possible",
+            .quests = {auto_10, pickup_10, catch_flying},
+            .expected_reroll_slots = {1},
+        },
+        {
+            .name = "nothing doable and nothing not possible rerolls all",
+            .quests = {auto_10, sneak_up},
+            .extra_exclusions = {{sneak_up, BBQAction::skip}},
             .expected_reroll_all = true,
+        },
+        {
+            // An undetected quest is not known to be impossible.
+            .name = "an undetected quest is not rerolled alone",
+            .quests = {UnableToDetect, auto_10},
+            .expected_reroll_all = true,
+        },
+        {
+            .name = "a skipped quest not possible is not rerolled",
+            .quests = {pickup_10, auto_10, catch_flying},
+            .extra_exclusions = {{pickup_10, BBQAction::skip}},
+            .expected_reroll_slots = {2},
+        },
+        {
+            .name = "a reroll row rerolls a quest not possible",
+            .quests = {make_tm, sneak_up, pickup_10},
+            .extra_exclusions = {{pickup_10, BBQAction::reroll}},
+            .expected_to_do = {make_tm, sneak_up},
+            .expected_reroll_slots = {2},
+        },
+        {
+            .name = "a run row does not run a quest not possible",
+            .quests = {make_tm, pickup_10},
+            .extra_exclusions = {{pickup_10, BBQAction::run}},
+            .expected_to_do = {make_tm},
         },
         {
             // The reroll replaces a quest, so the next read has something new.

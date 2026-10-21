@@ -17,7 +17,7 @@ const EnumDropdownDatabase<BBQuests>& BBQuests_database(){
     static EnumDropdownDatabase<BBQuests> database{
         {BBQuests::auto_10,         "auto-10",          "Defeat 10 wild Pokemon using Auto Battle!"},
         {BBQuests::make_tm,         "make-tm",          "Make yourself a TM!"},
-        //{BBQuests::pickup_10,       "pickup-10",        "Pick up items on the ground 10 times!"},
+        {BBQuests::pickup_10,       "pickup-10",        "Pick up items on the ground 10 times!"},
         {BBQuests::sneak_up,        "sneak-up",         "Successfully sneak up on 1 Pokemon and surprise them with a battle!"},
         {BBQuests::photo_fly,       "photo-fly",        "Take a photo of a wild Pokemon in flight!"},
         {BBQuests::photo_swim,      "photo-swim",       "Take a photo of a wild Pokemon that is swimming!"},
@@ -110,8 +110,9 @@ BBQuestTable::BBQuestTable()
         "Exclude the quests in the table. If you want to skip a quest, select it below. "
         "(Quests can be explicitly included, but this is not necessary.) "
         "Do not exclude too many quests, as rerolling costs BP. "
-        "The program will automatically reroll all quests if none are possible, but will not handle being out of BP. "
-        "Does not include egg hatching or pickup quests, as eggs are handled in other options and pickup is not possible. ",
+        "If no quest is possible, the program rerolls one quest it cannot do, or all quests if there is none. "
+        "Quests the program cannot do, such as pickup, are never run, but can be rerolled or skipped here. "
+        "Does not include egg hatching, as eggs are handled in other options. ",
         //"Duplicates of the same quest",
         //duplicates will work in table order. might lead to weird behavior like rerolling and then marking a quest as complete.
         //won't break the program though.

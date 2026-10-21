@@ -73,9 +73,11 @@ struct BBQuestPlan{
     bool reroll_all = false;            //Nothing to do and nothing rerolled: reroll every slot.
 };
 //Decide what to do with each quest from the options alone, without touching the game, so
-//the decision can be tested. Quests not possible are left out. Out-of-egg hatch quests and
-//quests set to reroll in the exclusions table are rerolled. A quest with several table rows
-//gets the action of each row, in table order.
+//the decision can be tested. Quests not possible are left out, unless the exclusions table
+//rerolls them. Out-of-egg hatch quests and quests set to reroll in the exclusions table are
+//rerolled. A quest with several table rows gets the action of each row, in table order. With
+//nothing to do and nothing rerolled, the first quest not possible and not in the table is
+//rerolled, or else every quest.
 BBQuestPlan plan_quests(
     Logger& logger,
     const BBQOption& BBQ_OPTIONS,
