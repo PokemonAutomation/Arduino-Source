@@ -74,7 +74,47 @@ BBQSoloFarmer::BBQSoloFarmer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
+namespace{
+
+// When nothing on the panel is doable, the farmer rerolls it and reads it
+// again. If no blue quest can ever be doable, that loop never ends, so the
+// settings are checked before starting.
+// A quest is done if any exclusion row says run, matching process_quest_list().
+bool exclusions_leave_a_blue_quest(const BBQOption& options){
+    const std::vector<std::unique_ptr<BBQuestTableRow>> exclusions = options.QUEST_EXCLUSIONS.copy_snapshot();
+    for (BBQuests quest : blue_quests){
+        if (not_possible_quests.contains(quest)){
+            continue;
+        }
+        bool in_table = false;
+        bool run = false;
+        for (const std::unique_ptr<BBQuestTableRow>& row : exclusions){
+            if (row->quest == quest){
+                in_table = true;
+                run = run || row->action == BBQAction::run;
+            }
+        }
+        if (!in_table || run){
+            return true;
+        }
+    }
+    return false;
+}
+
+// Valid settings can still produce a panel with nothing doable, which the
+// next reroll fixes. If only 3 of the 31 blue quests are doable, a panel has
+// nothing doable 73% of the time, and 30 such panels in a row happen with
+// probability 0.008%. More than that means rerolling does not help: the game
+// language is wrong so no quest is read, or there is no BP left to reroll.
+const size_t MAX_READS_WITHOUT_DOABLE_QUEST = 30;
+
+}
+
 void run_bbq_rounds(Logger& logger, const BBQOption& options, BBQGameActions& game){
+    if (!exclusions_leave_a_blue_quest(options)){
+        throw UserSetupError(logger, "The quest exclusions table skips or rerolls every blue quest the program can do.");
+    }
+
     std::vector<BBQuests> quest_list; //all quests
     std::vector<BBQuests> quests_to_do; //do-able quests
     uint8_t eggs_hatched = 0; //Track eggs
@@ -87,7 +127,15 @@ void run_bbq_rounds(Logger& logger, const BBQOption& options, BBQGameActions& ga
         }
 
         //Get and reroll quests until we can at least one
+        size_t reads_without_doable_quest = 0;
         while (quests_to_do.size() < 1){
+            if (reads_without_doable_quest++ == MAX_READS_WITHOUT_DOABLE_QUEST){
+                throw UserSetupError(
+                    logger,
+                    "No doable quest after " + std::to_string(MAX_READS_WITHOUT_DOABLE_QUEST) +
+                    " quest panel reads. Check the game language and that you have BP to reroll."
+                );
+            }
             quest_list = game.read_quests();
             quests_to_do = game.process_quest_list(quest_list, eggs_hatched);
 
