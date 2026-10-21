@@ -26,6 +26,7 @@
 #include "Inference/Picnics/PokemonSV_SandwichRecipeDetector.h"
 #include "Inference/Picnics/PokemonSV_SandwichHandDetector.h"
 #include "Options/PokemonSV_BBQuests.h"
+#include "Programs/Farming/PokemonSV_BBQLogger.h"
 #include "PokemonSV_Tests.h"
 
 namespace PokemonAutomation{
@@ -61,9 +62,84 @@ public:
     }
 };
 
+class BBQTestLogger : public Logger{
+public:
+    virtual void log(const std::string& message, Color) override{
+        messages.push_back(message);
+    }
+    std::vector<std::string> messages;
+};
+
+class Test_BBQDiagnosticLogs : public UnitTest{
+public:
+    Test_BBQDiagnosticLogs(const std::string& scenario)
+        : UnitTest("PokemonSV::BBQDiagnosticLogs - " + scenario), m_scenario(scenario)
+    {}
+
+    virtual UnitTestResult run(Logger&, CancellableScope&) const override{
+        BBQTestLogger logger;
+        std::vector<std::string> expected;
+        const BBQAttemptLog::Clock::time_point start{};
+        if (m_scenario == "board"){
+            BBQLogger(logger).board(true,
+                {BBQuests::photo_swim, BBQuests::sneak_up, BBQuests::auto_10});
+            BBQLogger(logger).board(false, {BBQuests::UnableToDetect});
+            BBQLogger(logger).board(true, {});
+            expected = {
+                "BBQ event=board panel_detected=1 quests=photo-swim,sneak-up,auto-10",
+                "BBQ event=board panel_detected=0 quests=unknown",
+                "BBQ event=board panel_detected=1 quests=",
+            };
+        }else if (m_scenario == "success"){
+            BBQAttemptLog attempt_log(logger, BBQuests::make_tm, 1, 2, start);
+            attempt_log.route_return(start + std::chrono::milliseconds(2000));
+            attempt_log.result(true, start + std::chrono::milliseconds(2500));
+            expected = {
+                "BBQ quest=make-tm attempt=1 limit=2 event=start",
+                "BBQ quest=make-tm attempt=1 limit=2 event=route_return elapsed_ms=2000 elapsed=\"2.000 seconds\"",
+                "BBQ quest=make-tm attempt=1 limit=2 event=result outcome=absent_from_board verification_ms=500 verification=\"0.500 seconds\" total_ms=2500 total=\"2.500 seconds\"",
+            };
+        }else if (m_scenario == "retry-exhausted"){
+            BBQLogger(logger).battle_entry_timeout(BBQuests::catch_any);
+            BBQAttemptLog attempt_log(logger, BBQuests::catch_any, 2, 2, start);
+            attempt_log.route_return(start + std::chrono::milliseconds(3345));
+            attempt_log.result(false, start + std::chrono::milliseconds(4110));
+            BBQLogger(logger).retry_exhausted(BBQuests::catch_any);
+            expected = {
+                "BBQ quest=catch-any event=battle_entry outcome=timeout",
+                "BBQ quest=catch-any attempt=2 limit=2 event=start",
+                "BBQ quest=catch-any attempt=2 limit=2 event=route_return elapsed_ms=3345 elapsed=\"3.345 seconds\"",
+                "BBQ quest=catch-any attempt=2 limit=2 event=result outcome=still_on_board verification_ms=765 verification=\"0.765 seconds\" total_ms=4110 total=\"4.110 seconds\"",
+                "BBQ quest=catch-any event=retry_exhausted recovery=skip_current_batch",
+            };
+        }else if (m_scenario == "long-duration"){
+            BBQAttemptLog attempt_log(logger, BBQuests::UnableToDetect, 256, 256, start);
+            attempt_log.route_return(start + std::chrono::milliseconds(120000));
+            attempt_log.result(false, start + std::chrono::milliseconds(120000));
+            expected = {
+                "BBQ quest=unknown attempt=256 limit=256 event=start",
+                "BBQ quest=unknown attempt=256 limit=256 event=route_return elapsed_ms=120000 elapsed=\"2.000 minutes\"",
+                "BBQ quest=unknown attempt=256 limit=256 event=result outcome=still_on_board verification_ms=0 verification=\"0.000 seconds\" total_ms=120000 total=\"2.000 minutes\"",
+            };
+        }else{
+            return "Unknown BBQ log test scenario.";
+        }
+        if (logger.messages != expected){
+            return "Unexpected BBQ diagnostic log sequence for " + m_scenario;
+        }
+        return true;
+    }
+
+private:
+    const std::string m_scenario;
+};
+
 }
 
 void add_tests(UnitTestDatabase& database){
+    for (const char* scenario : {"board", "success", "retry-exhausted", "long-duration"}){
+        database.add<Test_BBQDiagnosticLogs>(scenario);
+    }
     database.add<Test_BBQuestsSlugs>();
     add_tests_WhiteButtonDetector(database);
     add_tests_BoxInfoDetector(database);

@@ -42,6 +42,7 @@
 #include "VideoGames/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h"
 #include "VideoGames/PokemonSV/Programs/Farming/PokemonSV_BlueberryCatchPhoto.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_Terarium.h"
+#include "PokemonSV_BBQLogger.h"
 #include "PokemonSV_BlueberryQuests.h"
 
 #include<vector>
@@ -123,6 +124,8 @@ std::vector<BBQuests> read_quests(
     if (fourth_quest != ""){
         quest_list.push_back(BBQuests_string_to_enum(fourth_quest));
     }
+
+    BBQLogger(stream.logger()).board(result == 0, quest_list);
 
     //Close quest list
     pbf_mash_button(context, BUTTON_B, 800ms);
@@ -323,6 +326,8 @@ bool process_and_do_quest(
     int quest_attempts = 0;
 
     while (!quest_completed){
+        BBQAttemptLog attempt_log(console.logger(), current_quest, quest_attempts + 1,
+            (unsigned)BBQ_OPTIONS.NUM_RETRIES + 1);
         switch (current_quest){
         case BBQuests::make_tm:
             quest_make_tm(env.program_info(), console, context);
@@ -421,6 +426,7 @@ bool process_and_do_quest(
             break;
         }
 
+        attempt_log.route_return();
         //Validate quest was completed by checking list
         std::vector<BBQuests> quest_list = read_quests(env.program_info(), console, context, BBQ_OPTIONS);
         if (std::find(quest_list.begin(), quest_list.end(), current_quest) != quest_list.end()){
@@ -436,7 +442,9 @@ bool process_and_do_quest(
             quest_completed = true;
         }
 
+        attempt_log.result(quest_completed);
         if (quest_attempts > BBQ_OPTIONS.NUM_RETRIES){
+            BBQLogger(console.logger()).retry_exhausted(current_quest);
             console.log("Failed to complete a quest multiple times. Skipping it for now.", COLOR_RED);
             break;
         }

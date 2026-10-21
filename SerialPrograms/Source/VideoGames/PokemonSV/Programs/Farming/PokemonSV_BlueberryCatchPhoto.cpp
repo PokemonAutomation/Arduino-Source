@@ -27,6 +27,7 @@
 #include "VideoGames/PokemonSV/Programs/PokemonSV_WorldNavigation.h"
 #include "VideoGames/PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_Terarium.h"
+#include "PokemonSV_BBQLogger.h"
 
 #include<vector>
 #include "PokemonSV_BlueberryCatchPhoto.h"
@@ -920,6 +921,7 @@ void quest_catch(
             );
             if (ret2 != 0){
                 console.log("Did not enter battle. Did target spawn?");
+                BBQLogger(console.logger()).battle_entry_timeout(current_quest);
             }
         },
         {
