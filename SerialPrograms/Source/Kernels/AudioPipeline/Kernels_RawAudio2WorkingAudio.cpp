@@ -87,14 +87,22 @@ RawAudio2WorkingAudio::RawAudio2WorkingAudio(
     }
 }
 
-void RawAudio2WorkingAudio::add_listener(WorkingAudioStreamListener& listener){
+void RawAudio2WorkingAudio::validate_listener(const WorkingAudioStreamListener& listener) const{
     if (sample_rate() != listener.sample_rate()){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Sample rate doesn't match.");
     }
     if (channels() != listener.channels()){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Channel count doesn't match.");
     }
+}
+
+void RawAudio2WorkingAudio::add_listener(WorkingAudioStreamListener& listener){
+    validate_listener(listener);
     m_listeners.add(listener);
+}
+void RawAudio2WorkingAudio::push_front_listener(WorkingAudioStreamListener& listener){
+    validate_listener(listener);
+    m_listeners.push_front(listener);
 }
 void RawAudio2WorkingAudio::remove_listener(WorkingAudioStreamListener& listener){
     m_listeners.remove(listener);

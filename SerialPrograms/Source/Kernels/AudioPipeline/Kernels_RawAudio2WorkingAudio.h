@@ -31,6 +31,8 @@ public:
     );
 
     void add_listener(WorkingAudioStreamListener& listener);
+    //  Attaches "listener" before all existing listeners (call order).
+    void push_front_listener(WorkingAudioStreamListener& listener);
     void remove_listener(WorkingAudioStreamListener& listener);
 
     void set_multiplier(float multiplier);
@@ -39,6 +41,8 @@ public:
 
 
 private:
+    void validate_listener(const WorkingAudioStreamListener& listener) const;
+
     template <typename Type>
     void set_converter();
 

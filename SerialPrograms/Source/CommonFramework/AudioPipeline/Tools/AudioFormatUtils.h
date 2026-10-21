@@ -18,6 +18,10 @@ std::string dump_audio_format(const QAudioFormat& format);
 
 void set_sample_format_to_float(QAudioFormat& format);
 
+// Slider bar volume: [0, 100], in log scale
+// Volume value passed to AudioDisplayWidget (and the audio thread it manages): [0.f, 1.f], linear scale
+float convert_audio_volume_from_slider(double volume);
+
 void convert_samples_to_float(const QAudioFormat& format, const char* data, size_t len, float* out);
 
 // Compute sum of the sample buffer.

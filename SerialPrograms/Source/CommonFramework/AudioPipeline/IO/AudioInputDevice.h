@@ -45,6 +45,16 @@ class AudioStreamToFloat;
 //  pattern that AudioStreamToFloat uses. In practice the backends emit
 //  whole-frame chunks, so no splicing happens in the common case.
 //
+//  The INTERLEAVE_96000 presets open the device as a physical 1ch x 96000
+//  stream that is really the card's two 48 kHz channels (a misreporting
+//  capture card), so when "reinterpret_96k_mono_as_stereo" is set the raw
+//  output is that same byte stream reinterpreted as 2ch x 48000: only the
+//  (rate, channels) framing changes, aligned to 2-sample stereo-frame
+//  boundaries. MONO_96000 is a true 96 kHz mono stream and keeps that shape
+//  through the whole pipeline; every other format passes through unchanged.
+//  This reinterpretation is temporary: the format dropdown rewrite will
+//  request 48 kHz stereo directly, at which point it goes away.
+//
 class AudioInputDevice final
     : public QIODevice
     , private MisalignedStreamConverter
@@ -55,17 +65,19 @@ public:
 
     AudioInputDevice(
         Logger& logger, AudioStreamToFloat& reader,
-        const NativeAudioInfo& device, const QAudioFormat& format
+        const NativeAudioInfo& device, const QAudioFormat& format,
+        bool reinterpret_96k_mono_as_stereo
     );
 
     Kernels::AudioPipeline::SampleFormat sample_type() const{
         return m_sample_type;
     }
+    //  The raw listener output shape (the 96 kHz reinterpretation applied).
     size_t sample_rate() const{
-        return m_sample_rate;
+        return m_out_sample_rate;
     }
     size_t channels() const{
-        return m_channels;
+        return m_out_channels;
     }
 
     void add_listener(Kernels::AudioPipeline::RawAudioStreamListener& listener);
@@ -91,6 +103,9 @@ private:
     size_t m_sample_rate;
     size_t m_channels;
     size_t m_frame_bytes;
+    size_t m_out_sample_rate;
+    size_t m_out_channels;
+    size_t m_out_frame_bytes;
     ListenerSet<Kernels::AudioPipeline::RawAudioStreamListener> m_listeners;
     LifetimeSanitizer m_sanitizer;
 };
