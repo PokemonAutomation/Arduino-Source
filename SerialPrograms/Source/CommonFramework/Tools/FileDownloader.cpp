@@ -78,11 +78,8 @@ std::string download_file(Logger& logger, const std::string& url, std::chrono::s
             &overall_timer, &QTimer::timeout,
             &loop, [&loop]{ loop.exit(); }
         );
-        //  QTimer::start() expects milliseconds, but overall_timeout.count()
-        //  is in the duration's unit (seconds here). Cast explicitly, or a
-        //  3s deadline becomes 3ms and aborts every request almost instantly.
         overall_timer.start(
-            std::chrono::duration_cast<std::chrono::milliseconds>(overall_timeout).count()
+            (int)std::chrono::duration_cast<std::chrono::milliseconds>(overall_timeout).count()
         );
     }
 
