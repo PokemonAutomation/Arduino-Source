@@ -26,13 +26,13 @@ using namespace std::chrono_literals;
 
 bool parse_ip_and_port(const std::string& str, QHostAddress& address, int& port){
     //  IPv4
-    QStringList parts = QString::fromStdString(str).split(":");
-    if (parts.size() != 2){
+    const size_t colon = str.find(':');
+    if (colon == std::string::npos || str.find(':', colon + 1) != std::string::npos){
         return false;
     }
-    address = QHostAddress(parts[0]);
+    address = QHostAddress(QString::fromStdString(str.substr(0, colon)));
     bool ok;
-    port = parts[1].toUInt(&ok);
+    port = QString::fromStdString(str.substr(colon + 1)).toUInt(&ok);
     if (!ok){
         return false;
     }
