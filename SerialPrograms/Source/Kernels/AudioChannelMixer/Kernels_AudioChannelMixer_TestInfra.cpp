@@ -5,7 +5,7 @@
  */
 
 #include <random>
-#include "Common/Cpp/Containers/AlignedVector.tpp"
+#include "Common/Cpp/Containers/GuardPageBuffer.h"
 #include "Kernels_AudioChannelMixer_TestInfra.h"
 
 namespace PokemonAutomation{
@@ -35,9 +35,13 @@ Test::Test(
 
 UnitTestResult Test::run(Logger& logger, CancellableScope& scope) const{
     std::vector<float> matrix(m_in_channels * m_out_channels);
-    AlignedVector<float> in(m_samples * m_in_channels);
-    AlignedVector<float> out0(m_samples * m_out_channels);
-    AlignedVector<float> out1(m_samples * m_out_channels);
+
+    //  The input and both outputs end right before a guard page. A tail that
+    //  reads or writes past the end then faults on every run, not just when
+    //  the heap happens to end there.
+    GuardPageBuffer<float> in(m_samples * m_in_channels);
+    GuardPageBuffer<float> out0(m_samples * m_out_channels);
+    GuardPageBuffer<float> out1(m_samples * m_out_channels);
 
     std::mt19937 generator(42);
 
@@ -63,7 +67,7 @@ UnitTestResult Test::run(Logger& logger, CancellableScope& scope) const{
     );
 
     //  Check for errors.
-    for (size_t c = 0; c < m_samples; c++){
+    for (size_t c = 0; c < m_samples * m_out_channels; c++){
         if (out0[c] != out1[c]){
             return "Mismatch at " + std::to_string(c) + ": " +
                 std::to_string(out0[c]) + " != " + std::to_string(out1[c]);

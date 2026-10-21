@@ -17,6 +17,7 @@
 #endif
 //#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64xH_Default.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
+#include "Tests/GuardPageImage.h"
 #include "Kernels_BinaryMatrix_Tests.h"
 
 #include <functional>
@@ -348,7 +349,10 @@ public:
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        //  Copy the test image into guard-page memory with packed rows, so a
+        //  kernel that reads or writes past the last pixel faults.
+        ImageRGB32 file_image(m_image);
+        GuardPageImageRGB32 image(file_image);
 
         if (test_binary_matrix_tile() != 0){
             return false;

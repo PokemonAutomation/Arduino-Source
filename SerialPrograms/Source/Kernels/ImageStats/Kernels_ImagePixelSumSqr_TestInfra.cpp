@@ -5,7 +5,7 @@
  */
 
 #include <random>
-#include "Common/Cpp/Containers/AlignedVector.tpp"
+#include "Common/Cpp/Containers/GuardPageBuffer.h"
 #include "Kernels_ImagePixelSumSqr_TestInfra.h"
 
 namespace PokemonAutomation{
@@ -28,8 +28,10 @@ Test_PixelSumSqr::Test_PixelSumSqr(
 {}
 
 UnitTestResult Test_PixelSumSqr::run(Logger& logger, CancellableScope& scope) const{
-    AlignedVector<uint32_t> image(m_width * m_height);
-    AlignedVector<uint32_t> alpha(m_width * m_height);
+    //  Both images end right before a guard page, so a kernel that reads past
+    //  the last row faults on every run.
+    GuardPageBuffer<uint32_t> image(m_width * m_height);
+    GuardPageBuffer<uint32_t> alpha(m_width * m_height);
 
     std::mt19937 generator(42);
     std::uniform_int_distribution<uint32_t> distribution;

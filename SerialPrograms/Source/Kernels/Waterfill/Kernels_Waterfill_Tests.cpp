@@ -15,6 +15,7 @@
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "Kernels_Waterfill_Tests.h"
+#include "Tests/GuardPageImage.h"
 #include "Tests/TestUtils.h"
 
 
@@ -70,7 +71,10 @@ public:
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        //  Copy the test image into guard-page memory with packed rows, so a
+        //  kernel that reads or writes past the last pixel faults.
+        ImageRGB32 file_image(m_image);
+        GuardPageImageRGB32 image(file_image);
 
         std::vector<Waterfill::WaterfillObject> expected = find_sorted_objects(
             image, BinaryMatrixType::i64x4_Default, Waterfill::find_objects_inplace_64x4_Default

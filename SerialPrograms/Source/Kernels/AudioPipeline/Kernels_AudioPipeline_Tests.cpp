@@ -9,6 +9,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
+#include "Common/Cpp/Containers/GuardPageBuffer.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels_AudioPipeline.h"
 #include "Kernels_RawAudio2WorkingAudio.h"
@@ -87,8 +88,9 @@ private:
 
 
 
-AlignedVector<float> random_float_input(size_t total_samples, uint32_t seed){
-    AlignedVector<float> input(total_samples);
+//  The buffer ends right before a guard page, so a read past the end faults.
+GuardPageBuffer<float> random_float_input(size_t total_samples, uint32_t seed){
+    GuardPageBuffer<float> input(total_samples);
     std::mt19937 generator(seed);
     //  Integer values, all exactly representable in float.
     std::uniform_int_distribution<long long> distribution(-128, 128);
@@ -125,7 +127,7 @@ public:
         const size_t sample_rate = 44100;
         const size_t buffer_size = 256; //  Small buffer so the sweep hits multiple chunks.
 
-        AlignedVector<float> input = random_float_input(m_samples * m_channels, 42);
+        GuardPageBuffer<float> input = random_float_input(m_samples * m_channels, 42);
         RawAudio2WorkingAudio raw2working(
             SampleFormat::FLOAT32, sample_rate, m_channels, m_multiplier, buffer_size
         );
@@ -182,7 +184,7 @@ public:
         const size_t buffer_size = 256; //  Small buffer so the sweep hits multiple chunks.
 
         //  Working format: channel-strided, one block per channel.
-        AlignedVector<float> input = random_float_input(m_samples * m_channels, 42);
+        GuardPageBuffer<float> input = random_float_input(m_samples * m_channels, 42);
         WorkingAudio2RawAudio working2raw(
             SampleFormat::FLOAT32, sample_rate, m_channels, m_multiplier, buffer_size
         );
@@ -237,7 +239,10 @@ public:
         const size_t buffer_size = 256;
 
         std::vector<float> gains = {1.0f, 0.5f, 1.0f};
-        std::vector<AlignedVector<float>> inputs(3, random_float_input(batch, 42));
+        std::vector<GuardPageBuffer<float>> inputs;
+        for (size_t b = 0; b < gains.size(); b++){
+            inputs.emplace_back(random_float_input(batch, 42));
+        }
 
         //  RawAudio2WorkingAudio.
         {

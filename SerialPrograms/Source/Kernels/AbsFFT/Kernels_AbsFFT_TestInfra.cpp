@@ -11,7 +11,7 @@
 #include <cstdio>
 #include <random>
 #include "Common/Compiler.h"
-#include "Common/Cpp/Containers/AlignedVector.tpp"
+#include "Common/Cpp/Containers/GuardPageBuffer.h"
 #include "Kernels_AbsFFT_TestInfra.h"
 
 namespace PokemonAutomation{
@@ -96,11 +96,16 @@ UnitTestResult Test::run(Logger& logger, CancellableScope& scope) const{
     //  Random input with a fixed seed. fft_abs() is destructive on "real",
     //  so each run gets its own copy of the same data.
     //
-    AlignedVector<float> real0(length);
-    AlignedVector<float> real1(length);
-    AlignedVector<float> abs0(half_length);
-    AlignedVector<float> abs1(half_length);
-    AlignedVector<float> weights(length);
+    //  Every buffer ends right before a guard page, so a read or write past
+    //  the end faults on every run. "real" and "abs" must be aligned to 64
+    //  bytes. Their sizes are powers of two, so for all but the smallest
+    //  transforms they still end exactly at the guard page.
+    //
+    GuardPageBuffer<float> real0(length, PA_ALIGNMENT);
+    GuardPageBuffer<float> real1(length, PA_ALIGNMENT);
+    GuardPageBuffer<float> abs0(half_length, PA_ALIGNMENT);
+    GuardPageBuffer<float> abs1(half_length, PA_ALIGNMENT);
+    GuardPageBuffer<float> weights(length);
 
     std::mt19937 generator(42);
     std::uniform_int_distribution<int> sample_distribution(-10000, 10000);

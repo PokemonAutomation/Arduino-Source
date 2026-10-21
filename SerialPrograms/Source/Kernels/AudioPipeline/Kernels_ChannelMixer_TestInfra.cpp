@@ -6,6 +6,7 @@
 
 #include <random>
 #include "Common/Cpp/Containers/AlignedVector.tpp"
+#include "Common/Cpp/Containers/GuardPageBuffer.h"
 #include "Kernels_ChannelMixer_TestInfra.h"
 #include "Kernels_ChannelMixer.h"
 
@@ -58,9 +59,10 @@ private:
 
 
 
-//  Random integer samples, all exactly representable in a float.
-AlignedVector<float> make_random_input(size_t channels, size_t samples){
-    AlignedVector<float> input(channels * samples);
+//  Random integer samples, all exactly representable in a float. The buffer
+//  ends right before a guard page, so a read past the end faults.
+GuardPageBuffer<float> make_random_input(size_t channels, size_t samples){
+    GuardPageBuffer<float> input(channels * samples);
     std::mt19937 generator(42);
     std::uniform_int_distribution<long long> distribution(-128, 128);
     for (size_t c = 0; c < input.size(); c++){
@@ -90,7 +92,7 @@ UnitTestResult MixerIdentityTest::run(Logger& logger, CancellableScope& scope) c
         matrix[c + m_channels * c] = 1.0f;
     }
 
-    AlignedVector<float> input = make_random_input(m_channels, m_samples);
+    GuardPageBuffer<float> input = make_random_input(m_channels, m_samples);
 
     const size_t sample_rate = 44100;
 
@@ -135,7 +137,7 @@ UnitTestResult MixerRoundTripTest::run(Logger& logger, CancellableScope& scope) 
     //  2 -> 1: Average the two channels.
     std::vector<float> average_matrix{0.5f, 0.5f};
 
-    AlignedVector<float> input = make_random_input(1, m_samples);
+    GuardPageBuffer<float> input = make_random_input(1, m_samples);
 
     const size_t sample_rate = 44100;
 

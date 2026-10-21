@@ -21,6 +21,7 @@
 #include "Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range.h"
 #include "Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean.h"
 #include "Kernels_ImageFilter_Tests.h"
+#include "Tests/GuardPageImage.h"
 #include "Tests/TestUtils.h"
 
 #include <iostream>
@@ -41,7 +42,10 @@ public:
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        //  Copy the test image into guard-page memory with packed rows, so a
+        //  kernel that reads or writes past the last pixel faults.
+        ImageRGB32 file_image(m_image);
+        GuardPageImageRGB32 image(file_image);
 
         const size_t width = image.width(), height = image.height();
         cout << "Testing filter_rgb32_range(), image size " << width << " x " << height << endl;
@@ -53,8 +57,8 @@ public:
         const uint32_t mins = uint32_t(min_color);
         const uint32_t maxs = uint32_t(max_color);
 
-        ImageRGB32 image_out(image.width(), image.height());
-        ImageRGB32 image_out_2(image.width(), image.height());
+        GuardPageImageRGB32 image_out(image.width(), image.height());
+        GuardPageImageRGB32 image_out_2(image.width(), image.height());
         size_t pixels_in_range = 0;
 
         const bool replace_color_within_range = true;
@@ -159,7 +163,10 @@ public:
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        //  Copy the test image into guard-page memory with packed rows, so a
+        //  kernel that reads or writes past the last pixel faults.
+        ImageRGB32 file_image(m_image);
+        GuardPageImageRGB32 image(file_image);
 
         const size_t width = image.width();
         const size_t height = image.height();
@@ -171,8 +178,8 @@ public:
         double max_dist = 50.0;
         size_t max_dist2 = size_t(max_dist * max_dist);
 
-        ImageRGB32 image_out(image.width(), image.height());
-        ImageRGB32 image_out_2(image.width(), image.height());
+        GuardPageImageRGB32 image_out(image.width(), image.height());
+        GuardPageImageRGB32 image_out_2(image.width(), image.height());
         size_t pixels_in_range = 0;
 
         const bool replace_color_within_range = true;
@@ -286,7 +293,10 @@ public:
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        //  Copy the test image into guard-page memory with packed rows, so a
+        //  kernel that reads or writes past the last pixel faults.
+        ImageRGB32 file_image(m_image);
+        GuardPageImageRGB32 image(file_image);
 
         const size_t width = image.width();
         const size_t height = image.height();
@@ -303,8 +313,8 @@ public:
         const uint32_t mins = uint32_t(min_color);
         const uint32_t maxs = uint32_t(max_color);
 
-        ImageRGB32 image_out(image.width(), image.height());
-        ImageRGB32 image_out_2(image.width(), image.height());
+        GuardPageImageRGB32 image_out(image.width(), image.height());
+        GuardPageImageRGB32 image_out_2(image.width(), image.height());
         size_t pixels_in_range = 0;
 
         const bool in_range_black = true;
@@ -411,7 +421,10 @@ public:
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        //  Copy the test image into guard-page memory with packed rows, so a
+        //  kernel that reads or writes past the last pixel faults.
+        ImageRGB32 file_image(m_image);
+        GuardPageImageRGB32 image(file_image);
 
         const size_t width = image.width(), height = image.height();
         cout << "Image width " << width << " height " << height << endl;
@@ -423,8 +436,8 @@ public:
         compress_rgb32_to_binary_range(
             image.data(), image.bytes_per_row(), *binary_matrix, mins, maxs
         );
-        ImageRGB32 new_image = image.copy();
-        ImageRGB32 new_image_2 = image.copy();
+        GuardPageImageRGB32 new_image(file_image);
+        GuardPageImageRGB32 new_image_2(file_image);
 
         Color replacement_color = COLOR_WHITE;
         bool replace_zero_bits = true;
@@ -507,7 +520,10 @@ public:
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+        //  Copy the test image into guard-page memory with packed rows, so a
+        //  kernel that reads or writes past the last pixel faults.
+        ImageRGB32 file_image(m_image);
+        GuardPageImageRGB32 image(file_image);
 
         const size_t width = image.width();
         const size_t height = image.height();
