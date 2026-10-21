@@ -34,3 +34,8 @@ Keeping the original frame dimensions is intentional: testing an already-cropped
 number would not catch regression of the production crop into the suffix.
 These two four-digit balances do not establish accuracy for all balance widths,
 UI languages or capture formats.
+
+The `PokemonSV::BlueberryQuestDetector` tests read the quest slots of the same
+frames with Traditional Chinese OCR: catch-any, sneak-up and auto-10 in 6750.png,
+and photo-swim, sneak-up and auto-10 in 6740.png. The fourth slot is empty and
+must read as nothing.

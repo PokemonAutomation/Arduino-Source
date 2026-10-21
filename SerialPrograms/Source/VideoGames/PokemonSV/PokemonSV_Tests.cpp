@@ -29,6 +29,7 @@
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Inference/PokemonSV_BlueberryPointsReader.h"
+#include "Inference/PokemonSV_BlueberryQuestDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -62,6 +63,71 @@ private:
     const size_t m_width, m_height;
 };
 
+// One quest slot on a full frame of the quest panel.
+struct BlueberryQuestScenario{
+    std::string image;
+    Language language;
+    BlueberryQuestDetector::QuestPosition position;
+    std::string expected_slug;
+    size_t width;
+    size_t height;
+};
+
+class Test_BlueberryQuestDetector : public UnitTest{
+public:
+    Test_BlueberryQuestDetector(BlueberryQuestScenario scenario)
+        : UnitTest(
+            "PokemonSV::BlueberryQuestDetector - " + scenario.image
+            + " - slot " + std::to_string((int)scenario.position + 1)
+            + " - " + std::to_string(scenario.width)
+        )
+        , m_scenario(std::move(scenario))
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope&) const override{
+        ImageRGB32 reference(UNIT_TEST_RESOURCE_PATH() + m_scenario.image);
+        ImageRGB32 image = reference.scale_to(m_scenario.width, m_scenario.height);
+        BlueberryQuestDetector detector(logger, COLOR_RED, m_scenario.language, m_scenario.position);
+        const std::string actual = detector.detect_quest(image);
+        if (actual != m_scenario.expected_slug){
+            return "Expected quest " + m_scenario.expected_slug + ", read \"" + actual + "\"";
+        }
+        return true;
+    }
+
+private:
+    const BlueberryQuestScenario m_scenario;
+};
+
+}
+
+void add_tests_BlueberryQuestDetector(UnitTestDatabase& database){
+    using enum BlueberryQuestDetector::QuestPosition;
+    // The second frame is the first after rerolling the first quest. Singleplayer
+    // without a red quest shows 3 quests, so the fourth slot reads as nothing.
+    const struct{
+        std::string image;
+        std::string slugs[4];
+    } panels[] = {
+        {"PokemonSV/BlueberryPoints/6750.png", {"catch-any", "sneak-up", "auto-10", ""}},
+        {"PokemonSV/BlueberryPoints/6740.png", {"photo-swim", "sneak-up", "auto-10", ""}},
+    };
+    const BlueberryQuestDetector::QuestPosition positions[] = {FIRST, SECOND, THIRD, FOURTH};
+    const std::pair<size_t, size_t> sizes[] = {{1920, 1080}, {1280, 720}};
+    for (const auto& panel : panels){
+        for (size_t slot = 0; slot < 4; slot++){
+            for (const auto& [width, height] : sizes){
+                database.add<Test_BlueberryQuestDetector>(BlueberryQuestScenario{
+                    .image = panel.image,
+                    .language = Language::ChineseTraditional,
+                    .position = positions[slot],
+                    .expected_slug = panel.slugs[slot],
+                    .width = width,
+                    .height = height,
+                });
+            }
+        }
+    }
 }
 
 void add_tests(UnitTestDatabase& database){
@@ -71,6 +137,7 @@ void add_tests(UnitTestDatabase& database){
 
     database.add<Test_BlueberryPoints>("PokemonSV/BlueberryPoints/6740.png", 6740, 1920, 1080);
     database.add<Test_BlueberryPoints>("PokemonSV/BlueberryPoints/6740.png", 6740, 1280, 720);
+    add_tests_BlueberryQuestDetector(database);
 
     add_tests_WhiteButtonDetector(database);
     add_tests_BoxInfoDetector(database);
