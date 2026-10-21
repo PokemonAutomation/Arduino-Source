@@ -144,7 +144,7 @@ double binomial_coefficient_double(size_t degree, size_t index){
         index = degree - index;
     }
 
-    return row[index];
+    return (double)row[index];
 }
 
 
@@ -217,7 +217,7 @@ StringMatchResult match_substring(
 
 
     for (const auto& item : database){
-        double token_length = item.first.size();
+        size_t token_length = item.first.size();
 
         size_t distance = levenshtein_distance_substring(item.first, normalized);
 
