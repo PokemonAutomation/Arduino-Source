@@ -74,6 +74,17 @@ BBQSoloFarmer::BBQSoloFarmer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
+namespace{
+
+// Whether a round that took the completed count from previous_completed
+// to completed crossed a nonzero multiple of the save interval.
+bool bbq_save_due(uint64_t previous_completed, uint64_t completed, uint64_t interval){
+    return interval != 0 && completed > previous_completed
+        && completed / interval > previous_completed / interval;
+}
+
+}
+
 void run_bbq_rounds(Logger& logger, const BBQOption& options, BBQGameActions& game){
     std::vector<BBQuests> quest_list; //all quests
     std::vector<BBQuests> quests_to_do; //do-able quests
@@ -95,6 +106,7 @@ void run_bbq_rounds(Logger& logger, const BBQOption& options, BBQGameActions& ga
             quest_list.clear();
         }
 
+        const uint64_t completed_before_round = num_completed_quests;
         for (auto current_quest : quests_to_do){
             //Check if quest was already completed (ex. 500 meters completed while navigating to take a photo)
             quest_list = game.read_quests();
@@ -120,7 +132,8 @@ void run_bbq_rounds(Logger& logger, const BBQOption& options, BBQGameActions& ga
         quests_to_do.clear();
 
         uint64_t temp_save_num_option = options.SAVE_NUM_QUESTS;
-        game.end_round(temp_save_num_option != 0 && num_completed_quests % temp_save_num_option == 0);
+        // A round can cross a milestone without ending at an exact multiple.
+        game.end_round(bbq_save_due(completed_before_round, num_completed_quests, temp_save_num_option));
     }
 }
 

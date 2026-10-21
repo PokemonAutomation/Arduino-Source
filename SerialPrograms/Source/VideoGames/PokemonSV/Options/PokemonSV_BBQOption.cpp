@@ -151,7 +151,7 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
         1000
     )
     , SAVE_NUM_QUESTS(
-        "<b>Save and reset the game after attempting this many quests:</b><br>This preserves progress and prevents potential game lags from long runs.<br>0 disables this option.",
+        "<b>Save and reset the game after completing this many quests:</b><br>This preserves progress and prevents potential game lags from long runs.<br>0 disables this option.",
         LockMode::UNLOCK_WHILE_RUNNING, 50
     )
     , INVERTED_FLIGHT(

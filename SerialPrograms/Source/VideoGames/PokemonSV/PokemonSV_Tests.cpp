@@ -233,11 +233,29 @@ void add_tests_BBQFarmerRounds(UnitTestDatabase& database){
             .expected = "read process " + round_of_3 + " end",
         },
         {
-            .name = "saves at exact multiples",
+            .name = "saves at each milestone",
             .num_quests = 6,
             .save_num_quests = 3,
             .expected_completed = 6,
             .expected = round_of_3 + " end(save) " + round_of_3 + " end(save)",
+        },
+        {
+            // 0 -> 3 crosses the milestone at 2 without landing on it.
+            .name = "saves when a round skips past a milestone",
+            .num_quests = 6,
+            .save_num_quests = 2,
+            .expected_completed = 6,
+            .expected = round_of_3 + " end(save) " + round_of_3 + " end(save)",
+        },
+        {
+            // Round 1 completes nothing. It must not save, even though the
+            // count (0) is a multiple of the interval.
+            .name = "round without completions does not save",
+            .num_quests = 3,
+            .save_num_quests = 2,
+            .outcomes = {false, false, false},
+            .expected_completed = 3,
+            .expected = "read process read do read do read do end " + round_of_3 + " end(save)",
         },
         {
             .name = "stops when out of eggs",
