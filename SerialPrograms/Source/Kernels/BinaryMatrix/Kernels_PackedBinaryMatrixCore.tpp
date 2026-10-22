@@ -300,13 +300,20 @@ PackedBinaryMatrixCore<Tile> PackedBinaryMatrixCore<Tile>::submatrix(
     }
 
 #if 1
+    //  Clear the bits past the right and bottom edges, which came from outside the
+    //  box. Skip an edge that ends at a tile boundary: `clear_padding()` with 0 bits
+    //  would clear the whole last column or row of tiles.
     size_t wbits = width % TILE_WIDTH;
-    for (size_t r = 0; r < tile_height; r++){
-        ret.tile(tile_width - 1, r).clear_padding(wbits, TILE_HEIGHT);
+    if (wbits != 0){
+        for (size_t r = 0; r < tile_height; r++){
+            ret.tile(tile_width - 1, r).clear_padding(wbits, TILE_HEIGHT);
+        }
     }
     size_t hbits = height % TILE_HEIGHT;
-    for (size_t c = 0; c < tile_width; c++){
-        ret.tile(c, tile_height - 1).clear_padding(TILE_WIDTH, hbits);
+    if (hbits != 0){
+        for (size_t c = 0; c < tile_width; c++){
+            ret.tile(c, tile_height - 1).clear_padding(TILE_WIDTH, hbits);
+        }
     }
 #endif
 
