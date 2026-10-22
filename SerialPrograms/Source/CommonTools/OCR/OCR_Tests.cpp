@@ -277,35 +277,36 @@ double fuzz_substitution_cost(char32_t ch0, char32_t ch1){
 }
 
 //  Independent reference implementation: tries every possible matched region
-//  [s, e) of x. The region must align x[s..e) fully with y (1.0 per
-//  in-region insertion/deletion), and the context on both sides costs
-//  prepostfix_cost per character.
+//  [s, e) of input. The region must align input[s..e) fully with
+//  match_target (1.0 per in-region insertion/deletion), and the context on
+//  both sides costs prepostfix_cost per character.
 double brute_force_weighted_levenshtein(
     double prepostfix_cost,
-    const std::u32string& x, const std::u32string& y
+    const std::u32string& match_target, const std::u32string& input
 ){
-    const size_t xlen = x.size();
-    const size_t ylen = y.size();
+    const size_t target_len = match_target.size();
+    const size_t input_len = input.size();
     const double context_cost = std::min(prepostfix_cost, 1.0);
 
-    double best = (double)ylen + (double)xlen * context_cost;    //  Empty region.
+    double best = (double)target_len + (double)input_len * context_cost;    //  Empty region.
 
-    for (size_t s = 0; s <= xlen; s++){
-        for (size_t e = s; e <= xlen; e++){
+    for (size_t s = 0; s <= input_len; s++){
+        for (size_t e = s; e <= input_len; e++){
             const size_t len = e - s;
 
-            //  cost[i][j] = cost of aligning x[s+i..e) with y[j..ylen).
-            std::vector<std::vector<double>> cost(len + 1, std::vector<double>(ylen + 1, 0.0));
+            //  cost[i][j] = cost of aligning input[s+i..e) with
+            //  match_target[j..target_len).
+            std::vector<std::vector<double>> cost(len + 1, std::vector<double>(target_len + 1, 0.0));
             for (size_t i = 0; i <= len; i++){
-                cost[i][ylen] = (double)(len - i);    //  Delete the rest of the region.
+                cost[i][target_len] = (double)(len - i);    //  Delete the rest of the region.
             }
-            for (size_t j = 0; j <= ylen; j++){
-                cost[len][j] = (double)(ylen - j);    //  Insert the rest of y.
+            for (size_t j = 0; j <= target_len; j++){
+                cost[len][j] = (double)(target_len - j);    //  Insert the rest of match_target.
             }
             for (size_t i = len; i-- > 0;){
-                const char32_t ch0 = x[s + i];
-                for (size_t j = ylen; j-- > 0;){
-                    const char32_t ch1 = y[j];
+                const char32_t ch0 = input[s + i];
+                for (size_t j = target_len; j-- > 0;){
+                    const char32_t ch1 = match_target[j];
                     double sub = cost[i + 1][j + 1];
                     if (ch0 != ch1){
                         sub += g_fuzz_sub_cost[fuzz_alpha_index(ch0)][fuzz_alpha_index(ch1)];
@@ -317,7 +318,9 @@ double brute_force_weighted_levenshtein(
                 }
             }
 
-            best = std::min(best, (double)(s + xlen - e) * context_cost + cost[0][0]);
+            best = std::min(
+                best, (double)(s + input_len - e) * context_cost + cost[0][0]
+            );
         }
     }
 
@@ -355,25 +358,33 @@ public:
         //  1. Unit substitution cost: free context must reproduce the
         //     substring variant, and unit context the full-string variant.
         for (size_t i = 0; i < pairs.size(); i++){
-            const std::u32string& x = pairs[i].first;
-            const std::u32string& y = pairs[i].second;
+            const std::u32string& input = pairs[i].first;
+            const std::u32string& match_target = pairs[i].second;
 
-            double free_context = levenshtein_distance(0.0, unit_substitution_cost, x, y);
-            double free_context_expected = (double)levenshtein_distance_substring(y, x);
+            double free_context = levenshtein_distance(
+                0.0, unit_substitution_cost, match_target, input
+            );
+            double free_context_expected = (double)levenshtein_distance_substring(
+                match_target, input
+            );
             if (free_context != free_context_expected){
                 logger.log(
-                    "Free-context mismatch: x = " + utf32_to_str(x) + ", y = " + utf32_to_str(y) +
+                    "Free-context mismatch: input = " + utf32_to_str(input) +
+                    ", match_target = " + utf32_to_str(match_target) +
                     " (got " + std::to_string(free_context) + ", expected " +
                     std::to_string(free_context_expected) + ")"
                 );
                 return false;
             }
 
-            double full_context = levenshtein_distance(1.0, unit_substitution_cost, x, y);
-            double full_context_expected = (double)levenshtein_distance(x, y);
+            double full_context = levenshtein_distance(
+                1.0, unit_substitution_cost, match_target, input
+            );
+            double full_context_expected = (double)levenshtein_distance(input, match_target);
             if (full_context != full_context_expected){
                 logger.log(
-                    "Full-context mismatch: x = " + utf32_to_str(x) + ", y = " + utf32_to_str(y) +
+                    "Full-context mismatch: input = " + utf32_to_str(input) +
+                    ", match_target = " + utf32_to_str(match_target) +
                     " (got " + std::to_string(full_context) + ", expected " +
                     std::to_string(full_context_expected) + ")"
                 );
@@ -382,32 +393,32 @@ public:
         }
 
         //  2. A cheap "looks-alike" substitution: only k -> s differs.
-        if (levenshtein_distance(1.0, kitten_substitution_cost, U"kitten", U"sitten") != 0.25){
+        if (levenshtein_distance(1.0, kitten_substitution_cost, U"sitten", U"kitten") != 0.25){
             return UnitTestResult("Expected 0.25 for kitten -> sitten with k -> s costing 0.25.");
         }
 
         //  3. Context costs: 4 context characters around "cat" in "xxcatxx".
-        if (levenshtein_distance(0.0, unit_substitution_cost, U"xxcatxx", U"cat") != 0.0
-            || levenshtein_distance(0.25, unit_substitution_cost, U"xxcatxx", U"cat") != 1.0
-            || levenshtein_distance(1.0, unit_substitution_cost, U"xxcatxx", U"cat") != 4.0){
+        if (levenshtein_distance(0.0, unit_substitution_cost, U"cat", U"xxcatxx") != 0.0
+            || levenshtein_distance(0.25, unit_substitution_cost, U"cat", U"xxcatxx") != 1.0
+            || levenshtein_distance(1.0, unit_substitution_cost, U"cat", U"xxcatxx") != 4.0){
             return UnitTestResult("Context costs for xxcatxx / cat were not 0 / 1.0 / 4.0.");
         }
 
         //  4. Context costs above 1.0 behave like 1.0 (skipping a character
         //     is never more expensive than deleting it in the region).
-        if (levenshtein_distance(5.0, unit_substitution_cost, U"xxcatxx", U"cat") != 4.0){
+        if (levenshtein_distance(5.0, unit_substitution_cost, U"cat", U"xxcatxx") != 4.0){
             return UnitTestResult("Context cost 5.0 should behave like 1.0.");
         }
 
         //  5. Empty strings.
-        if (levenshtein_distance(0.0, unit_substitution_cost, U"", U"abc") != 3.0
-            || levenshtein_distance(0.5, unit_substitution_cost, U"", U"abc") != 3.0){
-            return UnitTestResult("Empty x must cost len(y) insertions.");
+        if (levenshtein_distance(0.0, unit_substitution_cost, U"abc", U"") != 3.0
+            || levenshtein_distance(0.5, unit_substitution_cost, U"abc", U"") != 3.0){
+            return UnitTestResult("Empty input must cost len(match_target) insertions.");
         }
-        if (levenshtein_distance(0.0, unit_substitution_cost, U"abc", U"") != 0.0
-            || levenshtein_distance(0.5, unit_substitution_cost, U"abc", U"") != 1.5
-            || levenshtein_distance(2.0, unit_substitution_cost, U"abc", U"") != 3.0){
-            return UnitTestResult("Empty y must cost len(x) context.");
+        if (levenshtein_distance(0.0, unit_substitution_cost, U"", U"abc") != 0.0
+            || levenshtein_distance(0.5, unit_substitution_cost, U"", U"abc") != 1.5
+            || levenshtein_distance(2.0, unit_substitution_cost, U"", U"abc") != 3.0){
+            return UnitTestResult("Empty match_target must cost len(input) context.");
         }
 
         //  6. Identical characters cost 0 without calling the cost function
@@ -425,13 +436,13 @@ public:
         //     variant it costs 2.0, not the 42.0 substitution.
         g_counting_sub_calls = 0;
         g_counting_equal_calls = 0;
-        if (levenshtein_distance(0.0, counting_substitution_cost, U"abc", U"abd") != 1.0
+        if (levenshtein_distance(0.0, counting_substitution_cost, U"abd", U"abc") != 1.0
             || g_counting_equal_calls != 0){
             return UnitTestResult("Substring variant of abc -> abd should cost 1.0 (free suffix).");
         }
         g_counting_sub_calls = 0;
         g_counting_equal_calls = 0;
-        if (levenshtein_distance(1.0, counting_substitution_cost, U"abc", U"abd") != 2.0
+        if (levenshtein_distance(1.0, counting_substitution_cost, U"abd", U"abc") != 2.0
             || g_counting_equal_calls != 0){
             return UnitTestResult("Full-string variant of abc -> abd should decompose into delete + insert.");
         }
@@ -469,23 +480,28 @@ public:
                 }
             }
 
-            std::u32string x, y;
+            std::u32string match_target, input;
             for (size_t i = 0; i < string_length(rng); i++){
-                x += FUZZ_ALPHABET[alpha_index(rng)];
+                match_target += FUZZ_ALPHABET[alpha_index(rng)];
             }
             for (size_t i = 0; i < string_length(rng); i++){
-                y += FUZZ_ALPHABET[alpha_index(rng)];
+                input += FUZZ_ALPHABET[alpha_index(rng)];
             }
             const double context = CONTEXTS[context_index(rng)];
 
-            const double expected = brute_force_weighted_levenshtein(context, x, y);
-            const double actual = levenshtein_distance(context, fuzz_substitution_cost, x, y);
+            const double expected = brute_force_weighted_levenshtein(
+                context, match_target, input
+            );
+            const double actual = levenshtein_distance(
+                context, fuzz_substitution_cost, match_target, input
+            );
             const double tolerance = 1e-9 * std::max(1.0, std::max(expected, actual));
             if (std::abs(actual - expected) > tolerance){
                 logger.log(
                     "Fuzz mismatch (trial " + std::to_string(trial) + ", context = " +
-                    std::to_string(context) + "): x = " + utf32_to_str(x) + ", y = " +
-                    utf32_to_str(y) + ", expected = " + std::to_string(expected) +
+                    std::to_string(context) + "): match_target = " +
+                    utf32_to_str(match_target) + ", input = " + utf32_to_str(input) +
+                    ", expected = " + std::to_string(expected) +
                     ", got = " + std::to_string(actual)
                 );
                 return false;

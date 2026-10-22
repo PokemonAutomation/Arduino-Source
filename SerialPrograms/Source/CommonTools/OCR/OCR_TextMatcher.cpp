@@ -105,44 +105,45 @@ size_t levenshtein_distance_substring(const StringType& substring, const StringT
 double levenshtein_distance(
     double prepostfix_cost,
     double (*substitution_cost)(char32_t ch0, char32_t ch1),
-    const std::u32string& x, const std::u32string& y
+    const std::u32string& match_target, const std::u32string& input
 ){
-    const size_t xlen = x.size();
-    const size_t ylen = y.size();
+    const size_t target_len = match_target.size();
+    const size_t input_len = input.size();
 
     //  A skipped character can always be charged as a mid-string deletion
-    //  (cost 1.0) instead, by growing the matched region to the whole of x,
-    //  so context costs above 1.0 behave like 1.0.
+    //  (cost 1.0) instead, by growing the matched region to the whole of
+    //  input, so context costs above 1.0 behave like 1.0.
     const double context_cost = std::min(prepostfix_cost, 1.0);
 
-    std::vector<double> v0(ylen + 1);
-    std::vector<double> v1(ylen + 1);
+    std::vector<double> v0(target_len + 1);
+    std::vector<double> v1(target_len + 1);
 
-    for (size_t j = 0; j <= ylen; j++){
-        v0[j] = (double)j;    //  y[0..j) must be inserted.
+    for (size_t j = 0; j <= target_len; j++){
+        v0[j] = (double)j;    //  match_target[0..j) must be inserted.
     }
 
-    //  The match ends before the first character of x: all of x is context.
-    double best = v0[ylen] + (double)xlen * context_cost;
+    //  The match ends before the first character of input: all of input is
+    //  context.
+    double best = v0[target_len] + (double)input_len * context_cost;
 
-    for (size_t i = 0; i < xlen; i++){
-        v1[0] = v0[0] + context_cost;    //  x[0..i+1) is skipped as prefix.
+    for (size_t i = 0; i < input_len; i++){
+        v1[0] = v0[0] + context_cost;    //  input[0..i+1) is skipped as prefix.
 
-        const char32_t ch0 = x[i];
-        for (size_t j = 0; j < ylen; j++){
+        const char32_t ch0 = input[i];
+        for (size_t j = 0; j < target_len; j++){
             const double delete_cost = v0[j + 1] + 1.0;
             const double insert_cost = v1[j] + 1.0;
             double sub_cost = v0[j];
-            if (ch0 != y[j]){
-                sub_cost += substitution_cost(ch0, y[j]);
+            if (ch0 != match_target[j]){
+                sub_cost += substitution_cost(ch0, match_target[j]);
             }
             v1[j + 1] = std::min({delete_cost, insert_cost, sub_cost});
         }
 
         std::swap(v0, v1);
 
-        //  The match ends after x[i]: the rest of x is context.
-        best = std::min(best, v0[ylen] + (double)(xlen - i - 1) * context_cost);
+        //  The match ends after input[i]: the rest of input is context.
+        best = std::min(best, v0[target_len] + (double)(input_len - i - 1) * context_cost);
     }
 
     return best;
