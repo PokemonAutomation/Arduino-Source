@@ -35,7 +35,7 @@ encoding), from the session that did the audio pipeline migration.
 | #1668 | Sink-side cleanups: dead per-output-device format enumeration removed (duplicate collapse now first-occurrence-wins per display name); `AudioFloatToStream` (float→raw) deleted; gate tests made self-contained. |
 | #1674 | `AudioFormat` (Pimpl wrapper over `QAudioFormat`) and `WorkingAudio2WorkingAudio` (all-in-one mix + resample node); `ChannelMixer` / `AudioResampler` moved to the `WorkingAudioNode` base. |
 | #1676 | Tree simplified onto the all-in-one node (one `WorkingAudio2WorkingAudio` per branch, direct connection when no conversion is needed). Also fixed a latent OOB write in `ChannelMixer::push_samples` for pushes larger than its buffer (it now chunks internally). |
-| #1671 (rebased) | **This path**: per-listener `add_listener(const AudioFormat&, WorkingAudioStreamListener&)` on the pair/session; `StreamHistorySession` now consumes it next to its legacy interface. |
+| #1671 | **This path**: per-listener `add_listener(const AudioFormat&, WorkingAudioStreamListener&)` on the pair/session; `StreamHistorySession` now consumes it next to its legacy interface. |
 
 ## Architecture
 
@@ -94,8 +94,9 @@ void remove_working_stream_listener(Kernels::AudioPipeline::WorkingAudioStreamLi
   that is about to be destroyed. The entries survive source changes:
   `build_tree()` rebuilds each node for the new source shape, so a
   persistent listener keeps working across input changes.
-- WAV file input is native rate/channels (#1673); compressed formats still
-  decode to 48k/2ch. Either way the node adapts automatically.
+- WAV file input is native rate/channels (#1673, in review); compressed
+  formats still decode to 48k/2ch. Either way the node adapts
+  automatically.
 
 ## `StreamHistorySession` (state of the transition)
 
