@@ -12,6 +12,7 @@
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
+#include "RGB32_Range/Kernels_ImageFilter_RGB32_Range.h"
 #include "Tests/GuardPageImage.h"
 #include "Kernels_ImageFilter_Tests.h"
 
@@ -201,6 +202,36 @@ std::string describe(const ColorRange& range){
     return std::format("range [{:08x}, {:08x}]", range.mins, range.maxs);
 }
 
+//  Check one result of `filter_rgb32_range()` on `image`: the number of pixels in range
+//  that it returned, and its output image. Return a description of the first problem, or
+//  an empty string if there is none.
+std::string check_filter_result(
+    const GuardPageImageRGB32& image, const GuardPageImageRGB32& output, size_t count,
+    const ColorRange& range, bool replace_color_within_range
+){
+    const size_t expected_count = count_in_range(image, range);
+    if (count != expected_count){
+        return std::format("counted {} pixels in range but should be {}", count, expected_count);
+    }
+    return find_wrong_pixel(image, output, [&](uint32_t pixel){
+        return in_range(pixel, range) == replace_color_within_range ? REPLACEMENT_COLOR : pixel;
+    });
+}
+
+//  Same as `check_filter_result()`, for one result of `to_blackwhite_rgb32_range()`.
+std::string check_blackwhite_result(
+    const GuardPageImageRGB32& image, const GuardPageImageRGB32& output, size_t count,
+    const ColorRange& range, bool in_range_black
+){
+    const size_t expected_count = count_in_range(image, range);
+    if (count != expected_count){
+        return std::format("counted {} pixels in range but should be {}", count, expected_count);
+    }
+    return find_wrong_pixel(image, output, [&](uint32_t pixel){
+        return in_range(pixel, range) == in_range_black ? BLACK : WHITE;
+    });
+}
+
 
 
 //  Check one implementation of `filter_rgb32_range()` and `to_blackwhite_rgb32_range()`
@@ -230,7 +261,6 @@ public:
 
         for (const ColorRange& range : RANGES){
             scope.throw_if_cancelled();
-            const size_t expected_count = count_in_range(image, range);
 
             for (bool replace_color_within_range : {true, false}){
                 const size_t count = m_implementation.filter(
@@ -239,18 +269,12 @@ public:
                     REPLACEMENT_COLOR, replace_color_within_range,
                     range.mins, range.maxs
                 );
-                const std::string error = find_wrong_pixel(image, output, [&](uint32_t pixel){
-                    return in_range(pixel, range) == replace_color_within_range ? REPLACEMENT_COLOR : pixel;
-                });
-                const std::string name = std::format(
-                    "filter_rgb32_range(), {}, replace_color_within_range = {}",
-                    describe(range), replace_color_within_range
-                );
-                if (count != expected_count){
-                    return std::format("Error: {}: counted {} pixels in range but should be {}.", name, count, expected_count);
-                }
+                const std::string error = check_filter_result(image, output, count, range, replace_color_within_range);
                 if (!error.empty()){
-                    return std::format("Error: {}: {}.", name, error);
+                    return std::format(
+                        "Error: filter_rgb32_range(), {}, replace_color_within_range = {}: {}.",
+                        describe(range), replace_color_within_range, error
+                    );
                 }
             }
 
@@ -261,18 +285,12 @@ public:
                     in_range_black,
                     range.mins, range.maxs
                 );
-                const std::string error = find_wrong_pixel(image, output, [&](uint32_t pixel){
-                    return in_range(pixel, range) == in_range_black ? BLACK : WHITE;
-                });
-                const std::string name = std::format(
-                    "to_blackwhite_rgb32_range(), {}, in_range_black = {}",
-                    describe(range), in_range_black
-                );
-                if (count != expected_count){
-                    return std::format("Error: {}: counted {} pixels in range but should be {}.", name, count, expected_count);
-                }
+                const std::string error = check_blackwhite_result(image, output, count, range, in_range_black);
                 if (!error.empty()){
-                    return std::format("Error: {}: {}.", name, error);
+                    return std::format(
+                        "Error: to_blackwhite_rgb32_range(), {}, in_range_black = {}: {}.",
+                        describe(range), in_range_black, error
+                    );
                 }
             }
         }
@@ -281,6 +299,90 @@ public:
 
 private:
     RangeFilterImplementation m_implementation;
+    std::string m_image;
+};
+
+
+
+//  Check the overloads of `filter_rgb32_range()` and `to_blackwhite_rgb32_range()` that
+//  run several filters in one call, like `MountDetector` in PokemonLA does. They call the
+//  single-filter versions through the CPU dispatch, so this test runs once, not once per
+//  implementation. There is one filter for each of `RANGES` and each flag value, so the
+//  test also checks that each filter uses its own range and flag.
+class Test_ImageFilterRGB32RangeMultiple : public UnitTest{
+public:
+    Test_ImageFilterRGB32RangeMultiple(const std::string& image)
+        : UnitTest("Kernels::ImageFilterRGB32Range - multiple filters - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        const ImageRGB32 file_image(m_image);
+        const GuardPageImageRGB32 image(file_image);
+
+        struct FilterSetting{
+            ColorRange range;
+            bool flag;
+        };
+        std::vector<FilterSetting> settings;
+        std::vector<std::unique_ptr<GuardPageImageRGB32>> outputs;
+        for (const ColorRange& range : RANGES){
+            for (bool flag : {true, false}){
+                settings.push_back({range, flag});
+                outputs.emplace_back(std::make_unique<GuardPageImageRGB32>(image.width(), image.height()));
+            }
+        }
+
+        std::vector<FilterRgb32RangeFilter> filters;
+        for (size_t c = 0; c < settings.size(); c++){
+            filters.emplace_back(
+                outputs[c]->data(), outputs[c]->bytes_per_row(),
+                REPLACEMENT_COLOR, settings[c].flag,
+                settings[c].range.mins, settings[c].range.maxs
+            );
+        }
+        filter_rgb32_range(
+            image.data(), image.bytes_per_row(), image.width(), image.height(),
+            filters.data(), filters.size()
+        );
+        for (size_t c = 0; c < settings.size(); c++){
+            const std::string error = check_filter_result(
+                image, *outputs[c], filters[c].pixels_in_range, settings[c].range, settings[c].flag
+            );
+            if (!error.empty()){
+                return std::format(
+                    "Error: filter_rgb32_range() with {} filters, {}, replace_color_within_range = {}: {}.",
+                    filters.size(), describe(settings[c].range), settings[c].flag, error
+                );
+            }
+        }
+
+        std::vector<ToBlackWhiteRgb32RangeFilter> blackwhite_filters;
+        for (size_t c = 0; c < settings.size(); c++){
+            blackwhite_filters.emplace_back(
+                outputs[c]->data(), outputs[c]->bytes_per_row(),
+                settings[c].range.mins, settings[c].range.maxs, settings[c].flag
+            );
+        }
+        to_blackwhite_rgb32_range(
+            image.data(), image.bytes_per_row(), image.width(), image.height(),
+            blackwhite_filters.data(), blackwhite_filters.size()
+        );
+        for (size_t c = 0; c < settings.size(); c++){
+            const std::string error = check_blackwhite_result(
+                image, *outputs[c], blackwhite_filters[c].pixels_in_range, settings[c].range, settings[c].flag
+            );
+            if (!error.empty()){
+                return std::format(
+                    "Error: to_blackwhite_rgb32_range() with {} filters, {}, in_range_black = {}: {}.",
+                    blackwhite_filters.size(), describe(settings[c].range), settings[c].flag, error
+                );
+            }
+        }
+        return true;
+    }
+
+private:
     std::string m_image;
 };
 
@@ -396,6 +498,7 @@ void add_tests_ImageFilters(UnitTestDatabase& database){
         "OCR/german-nature-sanft.png",                                              //  511 x 91
     };
 
+    database.add<Test_ImageFilterRGB32RangeMultiple>(images[2]);
     for (const std::string& image : images){
         for (const RangeFilterImplementation& implementation : range_filters){
             database.add<Test_ImageFilterRGB32Range>(implementation, image);
