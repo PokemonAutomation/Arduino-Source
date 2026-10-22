@@ -66,6 +66,10 @@ std::unique_ptr<StatsTracker> WildRng_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
+WildRng::~WildRng(){
+    GAME_LOCATION.remove_listener(*this);
+}
+
 WildRng::WildRng()
     : m_calibration_displays(
         "<font size=4><b>Calibration Displays</b></font> — These will update automatically as the program runs"
@@ -156,6 +160,13 @@ WildRng::WildRng()
     , m_program_settings(
         "<font size=4><b>Program Settings</b></font>"
     )
+    , AUTO_CATCH_SHINY(
+        "<b>Auto Catch Shiny:</b><br>"
+        "Attempt to catch shinies in the Safari Zone using the optimal catching strategy.<br>"
+        "If the catch fails, reset and keep hunting.",
+        LockMode::LOCK_WHILE_RUNNING,
+        false
+    )
     , USE_TEACHY_TV(
         "<b>Use Teachy TV:</b>"
         "<br>Opens the Teachy TV to quickly advance the RNG at 313x speed.<br>"
@@ -228,6 +239,7 @@ WildRng::WildRng()
     PA_ADD_OPTION(SEED);
     PA_ADD_OPTION(ADVANCES);
     PA_ADD_OPTION(m_program_settings);
+    PA_ADD_OPTION(AUTO_CATCH_SHINY);
     PA_ADD_OPTION(USE_TEACHY_TV);
     PA_ADD_OPTION(SEED_RADIUS);
     PA_ADD_OPTION(MAX_RESETS);
@@ -237,9 +249,22 @@ WildRng::WildRng()
     PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
+
+    WildRng::on_config_value_changed(this);
+    GAME_LOCATION.add_listener(*this);
 }
 
+void WildRng::on_config_value_changed(void* object){
+    AUTO_CATCH_SHINY.set_visibility(in_safari_zone() ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+}
 
+bool WildRng::in_safari_zone() const{
+    const std::string& loc_slug = GAME_LOCATION.slug();
+    return loc_slug == "safari_zone_area_1_east"
+        || loc_slug == "safari_zone_area_2_north"
+        || loc_slug == "safari_zone_area_3_west"
+        || loc_slug == "safari_zone_entrance";
+}
 
 void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     /*
@@ -311,12 +336,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
     PokemonFRLG_RngTarget TARGET = PokemonFRLG_RngTarget::sweetscent;
 
-    bool safari_zone = (
-        loc_slug == "safari_zone_area_1_east"  || 
-        loc_slug == "safari_zone_area_2_north" || 
-        loc_slug == "safari_zone_area_3_west"  || 
-        loc_slug == "safari_zone_entrance"
-    );
+    const bool safari_zone = in_safari_zone();
     switch (ENCOUNTER_TYPE){
         case EncounterType::rocksmash:
             TARGET = PokemonFRLG_RngTarget::rocksmash;
@@ -503,7 +523,10 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
             if (TAKE_VIDEO){
                 pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
             }
-            break;
+
+            if (!AUTO_CATCH_SHINY || !safari_zone){
+                break;
+            }
         }
 
         int catch_result = 0;
@@ -534,6 +557,11 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         }else if (catch_result == 0){
             env.log("Failed catch.");
             continue;
+        }
+
+        if (shiny_found){
+            env.log("Shiny caught!");
+            break;
         }
 
         go_to_summary(env.console, context, 0, safari_zone ? StartMenuContext::SAFARI_ZONE : StartMenuContext::STANDARD);
