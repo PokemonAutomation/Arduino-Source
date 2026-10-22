@@ -4,6 +4,7 @@
  *
  */
 
+#include <memory>
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Kernels/AudioResampler/Kernels_AudioResampler.h"
 #include "Kernels_ChannelMixer.h"

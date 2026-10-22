@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_AudioStreamConverters_H
 #define PokemonAutomation_AudioStreamConverters_H
 
-#include <memory>
 #include <vector>
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Kernels_AudioPipeline.h"
 
