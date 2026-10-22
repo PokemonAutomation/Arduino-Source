@@ -26,8 +26,8 @@ set_target_properties(CoreLib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 # instead, so builds never reach out to the network on their own.
 set(PYBIND11_FINDPYTHON ON)
 find_package(Python 3.10 REQUIRED COMPONENTS Interpreter Development.Module)
-find_package(pybind11 CONFIG QUIET)
-if (NOT pybind11_FOUND)
+find_package(pybind11 CONFIG QUIET)  # search standard system directories for pybind
+if (NOT pybind11_FOUND)  ## next, search pip folder for pybind
     execute_process(
         COMMAND "${Python_EXECUTABLE}" -m pybind11 --cmakedir
         OUTPUT_VARIABLE PYBIND11_PIP_CMAKE_DIR
