@@ -78,6 +78,7 @@ private:
 //  Tree path: raw bytes -> RawAudio2WorkingAudio -> [mixer] -> [resampler]
 //  -> WorkingAudioToFFT, mirroring AudioPassthroughPairQt::build_tree().
 RecordingFFTListener run_tree(
+    Logger& logger,
     const AlignedVector<float>& raw,
     size_t raw_channels,
     size_t raw_rate,
@@ -93,7 +94,7 @@ RecordingFFTListener run_tree(
     std::unique_ptr<Kernels::AudioPipeline::ChannelMixer> mixer;
     Kernels::AudioPipeline::WorkingAudioStreamListener* head = &fft;
     if (raw_rate != fft_rate){
-        resampler.reset(new Kernels::AudioResampler::AudioResampler(raw_rate, fft_rate, 1));
+        resampler.reset(new Kernels::AudioResampler::AudioResampler(logger, raw_rate, fft_rate, 1));
         resampler->add_listener(*head);
         head = resampler.get();
     }
@@ -207,7 +208,7 @@ public:
             raw[2 * i + 1] = r[i];
         }
 
-        RecordingFFTListener tree = run_tree(raw, 2, rate, rate);
+        RecordingFFTListener tree = run_tree(logger, raw, 2, rate, rate);
 
         //  The ring buffer is zero pre-filled, so the leading FFTs (0..3)
         //  contain zero padding; the invariants start at the first full
@@ -248,7 +249,7 @@ public:
             raw[2 * i + 1] = r[i];
         }
 
-        RecordingFFTListener tree = run_tree(raw, 2, raw_rate, fft_rate);
+        RecordingFFTListener tree = run_tree(logger, raw, 2, raw_rate, fft_rate);
 
         //  The ring buffer is zero pre-filled and the resampler has a
         //  short transient, so the invariants start at the first full
@@ -283,7 +284,7 @@ public:
         std::mt19937 generator(42);
         AlignedVector<float> raw = make_signal(n, raw_rate, 4031.25, 14062.5, generator);
 
-        RecordingFFTListener tree = run_tree(raw, 1, raw_rate, fft_rate);
+        RecordingFFTListener tree = run_tree(logger, raw, 1, raw_rate, fft_rate);
 
         //  The ring buffer is zero pre-filled and the resampler has a
         //  short transient, so the invariants start at the first full

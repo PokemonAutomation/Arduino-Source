@@ -207,7 +207,14 @@ void AudioPassthroughPairQt::build_tree(float input_volume){
     m_fft_node.reset(new WorkingAudioToFFT(fft_rate));
     Kernels::AudioPipeline::WorkingAudioStreamListener* head = m_fft_node.get();
     if (raw_rate != fft_rate){
-        m_fft_resampler.reset(new Kernels::AudioResampler::AudioResampler(raw_rate, fft_rate, 1));
+        m_fft_resampler.reset(
+            new Kernels::AudioResampler::AudioResampler(
+                m_logger,
+                raw_rate,
+                fft_rate,
+                1
+            )
+        );
         m_fft_resampler->add_listener(*head);
         head = m_fft_resampler.get();
     }
@@ -266,7 +273,10 @@ void AudioPassthroughPairQt::rebuild_sink_branch(){
     head = m_sink_encoder.get();
     if (raw_rate != sink_rate){
         m_sink_resampler.reset(new Kernels::AudioResampler::AudioResampler(
-            raw_rate, sink_rate, sink_channels
+            m_logger,
+            raw_rate,
+            sink_rate,
+            sink_channels
         ));
         m_sink_resampler->add_listener(*head);
         head = m_sink_resampler.get();
