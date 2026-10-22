@@ -573,7 +573,10 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context){
     }
 }
 
-bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, bool stop_on_move_learn, bool prevent_evolution){
+WildBattleExitResult exit_wild_battle(
+    Logger& logger, WildBattleExitActions& actions,
+    bool stop_on_move_learn, bool prevent_evolution
+){
     // For move learning, there are two dialog selection boxes in a row
     // we need to decline the first one and accept the second one, so mashing B won't work
     // The first one will occur after an Advance Battle Dialog
@@ -584,119 +587,177 @@ bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, boo
     bool move_learned = false;
     while (true){
         if (errors > 5 || loops > 5){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::SEND_ERROR_REPORT,
-                "exit_wild_battle(): Failed to exit battle.",
-                console
-            );
+            return WildBattleExitResult::Failed;
         }
 
-        BlackScreenWatcher battle_exited(COLOR_RED);    
-        AdvanceBattleDialogWatcher advance_dialog(COLOR_RED);
-        BattleLearnDialogWatcher move_learn_select(COLOR_RED);
+        WildBattleExitEvent event = first_attempt
+            ? actions.mash_b_until_battle_exited()
+            : actions.press_until_dialog(rejected_first_box ? BUTTON_A : BUTTON_B);
 
-        context.wait_for_all_requests();
-        WallClock deadline = current_time() + 30s;
-        int ret;
-        if (first_attempt){
-            ret = run_until<ProControllerContext>(
-                console, context,
-                [](ProControllerContext& context){
-                    pbf_mash_button(context, BUTTON_B, 20000ms);
-                },
-                { battle_exited }
-            );
-        }else{
-            ret = run_until<ProControllerContext>(
-                console, context,
-                [deadline, rejected_first_box](ProControllerContext& context){
-                    pbf_wait(context, 1000ms); // give the watchers a chance to detect something
-                    while (current_time() < deadline){
-                        pbf_press_button(context, rejected_first_box ? BUTTON_A : BUTTON_B, 200ms, 1800ms);
-                    }
-                },
-                { battle_exited, advance_dialog, move_learn_select }
-            );
-        }
-
-        BattleDialogWatcher evolution_started(COLOR_RED);
-        StartMenuWatcher start_menu_open(COLOR_RED);
-        int ret2;
-
-        switch (ret){
-        case 0:
+        switch (event){
+        case WildBattleExitEvent::BattleExited:
             // check for the evolution screen
-            context.wait_for_all_requests(); 
-            ret2 = run_until<ProControllerContext>(
-                console, context,
-                [](ProControllerContext& context){
-                    pbf_wait(context, 2000ms);
-                },
-                { evolution_started }
-            );
-
-            if (ret2 == 0){
-                console.log("Evolution detected.");
+            if (actions.evolution_started()){
+                logger.log("Evolution detected.");
                 if (!prevent_evolution){
                     // make sure B isn't pressed too soon, which would cancel the evolution
-                    pbf_wait(context, 20000ms);
+                    actions.wait_for_evolution();
                 }
                 rejected_first_box = false;
                 continue; // press B as in other cases, and handle any move learning loops that might come up
             }
-            console.log("Battle exited.");
-            return move_learned;
-        case 1:
-            console.log("Battle Advance arrow detected.");
-            pbf_press_button(context, BUTTON_B, 200ms, 800ms);
+            logger.log("Battle exited.");
+            return move_learned ? WildBattleExitResult::ExitedAfterMoveLearn : WildBattleExitResult::Exited;
+        case WildBattleExitEvent::AdvanceDialog:
+            logger.log("Battle Advance arrow detected.");
+            actions.advance_dialog();
             rejected_first_box = false;
             continue;
-        case 2:
+        case WildBattleExitEvent::MoveLearnPrompt:
             if (stop_on_move_learn){
-                console.log("Move learn detected.");
-                return true;
+                logger.log("Move learn detected.");
+                return WildBattleExitResult::StoppedOnMoveLearn;
             }else if (rejected_first_box){
                 loops++;
-                console.log("Declined to learn new move.");
-                pbf_press_button(context, BUTTON_A, 200ms, 0ms);
+                logger.log("Declined to learn new move.");
+                actions.answer_move_prompt(BUTTON_A);
             }else{
-                pbf_press_button(context, BUTTON_B, 200ms, 0ms);
+                actions.answer_move_prompt(BUTTON_B);
                 rejected_first_box = true;
                 move_learned = true;
             }
             continue;
-        default:
+        case WildBattleExitEvent::None:
             if (first_attempt){
-                console.log("Loop detected.");
+                logger.log("Loop detected.");
                 first_attempt = false;
                 continue;
             }
-            console.log("Failed to detect expected battle dialogs.");
+            logger.log("Failed to detect expected battle dialogs.");
             errors++;
-            // attempt to exit any screen that might be open (party, bag, etc)
-            pbf_mash_button(context, BUTTON_B, 500ms);
-            // overworld detection: look for the start menu
-            context.wait_for_all_requests();
-            ret2 = run_until<ProControllerContext>(
-                console, context,
-                [](ProControllerContext& context){
-                    pbf_press_button(context, BUTTON_PLUS, 200ms, 800ms);
-                    pbf_press_button(context, BUTTON_PLUS, 200ms, 800ms);
-                    pbf_press_button(context, BUTTON_PLUS, 200ms, 800ms);
-                },
-                { start_menu_open }
-            );
-            if (ret2 == 0){
-                pbf_mash_button(context, BUTTON_B, 500ms);
-                context.wait_for_all_requests();
-                console.log("Battle exited.");
-                return move_learned;
+            if (actions.return_to_overworld()){
+                logger.log("Battle exited.");
+                return move_learned ? WildBattleExitResult::ExitedAfterMoveLearn : WildBattleExitResult::Exited;
             }
-            context.wait_for_all_requests();
             rejected_first_box = false;
             continue;
         }
     }
+}
+
+namespace{
+
+class ConsoleWildBattleExitActions : public WildBattleExitActions{
+public:
+    ConsoleWildBattleExitActions(ConsoleHandle& console, ProControllerContext& context)
+        : m_console(console), m_context(context)
+    {}
+
+    virtual WildBattleExitEvent mash_b_until_battle_exited() override{
+        BlackScreenWatcher battle_exited(COLOR_RED);
+        m_context.wait_for_all_requests();
+        int ret = run_until<ProControllerContext>(
+            m_console, m_context,
+            [](ProControllerContext& context){
+                pbf_mash_button(context, BUTTON_B, 20000ms);
+            },
+            { battle_exited }
+        );
+        return ret == 0 ? WildBattleExitEvent::BattleExited : WildBattleExitEvent::None;
+    }
+    virtual WildBattleExitEvent press_until_dialog(Button button) override{
+        BlackScreenWatcher battle_exited(COLOR_RED);
+        AdvanceBattleDialogWatcher advance_dialog(COLOR_RED);
+        BattleLearnDialogWatcher move_learn_select(COLOR_RED);
+        m_context.wait_for_all_requests();
+        WallClock deadline = current_time() + 30s;
+        int ret = run_until<ProControllerContext>(
+            m_console, m_context,
+            [deadline, button](ProControllerContext& context){
+                pbf_wait(context, 1000ms); // give the watchers a chance to detect something
+                while (current_time() < deadline){
+                    pbf_press_button(context, button, 200ms, 1800ms);
+                }
+            },
+            { battle_exited, advance_dialog, move_learn_select }
+        );
+        switch (ret){
+        case 0:
+            return WildBattleExitEvent::BattleExited;
+        case 1:
+            return WildBattleExitEvent::AdvanceDialog;
+        case 2:
+            return WildBattleExitEvent::MoveLearnPrompt;
+        default:
+            return WildBattleExitEvent::None;
+        }
+    }
+    virtual bool evolution_started() override{
+        BattleDialogWatcher evolution_started(COLOR_RED);
+        m_context.wait_for_all_requests();
+        int ret = run_until<ProControllerContext>(
+            m_console, m_context,
+            [](ProControllerContext& context){
+                pbf_wait(context, 2000ms);
+            },
+            { evolution_started }
+        );
+        return ret == 0;
+    }
+    virtual void wait_for_evolution() override{
+        pbf_wait(m_context, 20000ms);
+    }
+    virtual void advance_dialog() override{
+        pbf_press_button(m_context, BUTTON_B, 200ms, 800ms);
+    }
+    virtual void answer_move_prompt(Button button) override{
+        pbf_press_button(m_context, button, 200ms, 0ms);
+    }
+    virtual bool return_to_overworld() override{
+        StartMenuWatcher start_menu_open(COLOR_RED);
+        // attempt to exit any screen that might be open (party, bag, etc)
+        pbf_mash_button(m_context, BUTTON_B, 500ms);
+        // overworld detection: look for the start menu
+        m_context.wait_for_all_requests();
+        int ret = run_until<ProControllerContext>(
+            m_console, m_context,
+            [](ProControllerContext& context){
+                pbf_press_button(context, BUTTON_PLUS, 200ms, 800ms);
+                pbf_press_button(context, BUTTON_PLUS, 200ms, 800ms);
+                pbf_press_button(context, BUTTON_PLUS, 200ms, 800ms);
+            },
+            { start_menu_open }
+        );
+        if (ret == 0){
+            pbf_mash_button(m_context, BUTTON_B, 500ms);
+        }
+        m_context.wait_for_all_requests();
+        return ret == 0;
+    }
+
+private:
+    ConsoleHandle& m_console;
+    ProControllerContext& m_context;
+};
+
+}
+
+bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, bool stop_on_move_learn, bool prevent_evolution){
+    ConsoleWildBattleExitActions actions(console, context);
+    switch (exit_wild_battle(console.logger(), actions, stop_on_move_learn, prevent_evolution)){
+    case WildBattleExitResult::Exited:
+        return false;
+    case WildBattleExitResult::ExitedAfterMoveLearn:
+    case WildBattleExitResult::StoppedOnMoveLearn:
+        return true;
+    case WildBattleExitResult::Failed:
+        break;
+    }
+    OperationFailedExceptionWithScreenshot::fire(
+        ErrorReportMode::SEND_ERROR_REPORT,
+        "exit_wild_battle(): Failed to exit battle.",
+        console
+    );
 }
 
 void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext& context, StartMenuContext menu_context){
