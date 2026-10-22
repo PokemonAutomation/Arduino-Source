@@ -19,7 +19,7 @@
  *    CommandLineTests repo (https://github.com/PokemonAutomation/CommandLineTests) next to
  *    the program.
  *  - Each module registers its test cases in an `add_tests(UnitTestDatabase&)` function, and
- *    ComputerPrograms/UnitTestRunner.cpp collects all of them.
+ *    ComputerPrograms/ComputerPrograms_UnitTestRunner.cpp collects all of them.
  *  - The tests are run in parallel by `ParallelUnitTestRunner`, within memory and thread limits.
  *
  *  Capture card distortions:

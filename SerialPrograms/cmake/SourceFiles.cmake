@@ -884,8 +884,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonTools/VisualDetectors/ImageMatchDetector.h
     Source/ComputerPrograms/ComputerProgram.cpp
     Source/ComputerPrograms/ComputerProgram.h
-    Source/ComputerPrograms/UnitTestRunner.cpp
-    Source/ComputerPrograms/UnitTestRunner.h
+    Source/ComputerPrograms/ComputerPrograms_UnitTestRunner.cpp
+    Source/ComputerPrograms/ComputerPrograms_UnitTestRunner.h
     Source/ComputerPrograms/Framework/ComputerProgramSession.cpp
     Source/ComputerPrograms/Framework/ComputerProgramSession.h
     Source/ComputerPrograms/Framework/ComputerProgramWidget.cpp
