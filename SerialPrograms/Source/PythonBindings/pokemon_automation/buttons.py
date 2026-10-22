@@ -90,13 +90,13 @@ _DIRECTION_VECTORS: dict[str, tuple[int, int]] = {
 ButtonsArg = str | Sequence[str] | None
 """
 ButtonsArg
-- accepts both Buttons and D-pad inputs (see above for the exact strings). 
+- can be either Button or D-pad inputs (see above for the exact strings). 
 - validated by `parse_buttons()`
 """
 
 StickArg = str | Sequence[float] | None
 """
-StickArg
+StickArg (currently unused)
 - Accepts a direction name ("up", "down_left", "neutral") or an (x, y) pair. 
 - validated by `parse_stick()`
 """
@@ -212,7 +212,7 @@ def parse_stick(position: StickArg) -> tuple[float, float]:
 
 
 def parse_stick_pair(position: tuple[float, float]) -> tuple[float, float]:
-    """Parse an (x, y) stick position into (float, float) in [-1, 1], +y = up.
+    """Parse an (x, y) stick position into (float, float) in [-1, 1]
 
     Used by `parse_stick()` (for pairs) and by `push_left_joystick()` /
     `push_right_joystick()` and the left_joystick / right_joystick arguments
