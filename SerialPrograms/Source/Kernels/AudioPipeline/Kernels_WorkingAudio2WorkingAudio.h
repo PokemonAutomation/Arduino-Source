@@ -7,11 +7,10 @@
 #ifndef PokemonAutomation_AudioStreamConverters_H
 #define PokemonAutomation_AudioStreamConverters_H
 
+#include <memory>
 #include <vector>
 #include "Common/Cpp/Containers/Pimpl.h"
-#include "Kernels/AudioResampler/Kernels_AudioResampler.h"
 #include "Kernels_AudioPipeline.h"
-#include "Kernels_ChannelMixer.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
