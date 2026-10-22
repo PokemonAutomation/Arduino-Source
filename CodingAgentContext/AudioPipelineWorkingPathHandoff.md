@@ -10,12 +10,17 @@ encoding), from the session that did the audio pipeline migration.
   channel mixer. Use them; let ffmpeg do only what it does for video (decode/encode/
   mux).
 - Audio is exposed to consumers through a **`WorkingAudioStreamListener` path**
-  (added in PR #1671). Subscribe with
-  `AudioSession::add_working_stream_listener(listener)` /
-  `remove_working_stream_listener(listener)`.
-- The legacy `AudioFloatStreamListener` path still exists but has **no consumers**
-  left. It is being kept in place (punted) until #1563 moves off of it. Once that
-  is done, remove it per the checklist at the bottom.
+  (added in PR #1671, reworked onto #1674's all-in-one node). Subscribe with
+  `AudioSession::add_working_stream_listener(format, listener)` /
+  `remove_working_stream_listener(listener)`, where `format` is the shape you
+  want delivered (sample rate + channel count; the channel layout in
+  `format.native_format()` drives the channel mixing). The pair builds a
+  `WorkingAudio2WorkingAudio` node per listener (mix + resample, source shape
+  -> your shape), so you get the converted stream for free.
+- The legacy `AudioFloatStreamListener` path still exists and still has one
+  consumer (`StreamHistorySession`'s old interface, kept next to the new one
+  until #1563 switches off it). Once that is done, remove it per the
+  checklist at the bottom.
 
 ## What's already in main (the migration)
 
@@ -28,7 +33,9 @@ encoding), from the session that did the audio pipeline migration.
 | #1658 | Playback endpoint switched to the tree; `IO/AudioOutputDevice` (raw `RawAudioStreamListener` → `QAudioSink`); `AudioSink` deleted. Volume rides the sink encoder's multiplier (device opens at full volume). |
 | #1665 | Sink opens in its **native** format (no more forced 44.1/48k presets); tree resamples/mixes/converts to it. |
 | #1668 | Sink-side cleanups: dead per-output-device format enumeration removed (duplicate collapse now first-occurrence-wins per display name); `AudioFloatToStream` (float→raw) deleted; gate tests made self-contained. |
-| #1671 | **This path**: `WorkingAudioStreamListener` listener API on the pair/session; `StreamHistorySession` now consumes it. |
+| #1674 | `AudioFormat` (Pimpl wrapper over `QAudioFormat`) and `WorkingAudio2WorkingAudio` (all-in-one mix + resample node); `ChannelMixer` / `AudioResampler` moved to the `WorkingAudioNode` base. |
+| #1676 | Tree simplified onto the all-in-one node (one `WorkingAudio2WorkingAudio` per branch, direct connection when no conversion is needed). Also fixed a latent OOB write in `ChannelMixer::push_samples` for pushes larger than its buffer (it now chunks internally). |
+| #1671 (rebased) | **This path**: per-listener `add_listener(const AudioFormat&, WorkingAudioStreamListener&)` on the pair/session; `StreamHistorySession` now consumes it next to its legacy interface. |
 
 ## Architecture
 
@@ -37,10 +44,10 @@ AudioSession (UI thread)  ── audio() on ConsoleSystemSession
 └─ AudioPassthroughPairQtThread → AudioPassthroughPairQt (event thread, SpinLock m_lock)
    ├─ m_reader: AudioSource
    │   ├─ raw stream  → m_source_decoder (RawAudio2WorkingAudio)   [tree root]
-   │   │                ├─ sink branch:  [mixer/swap] → [resampler] → m_sink_encoder → m_sink_device (QAudioSink)
-   │   │                ├─ FFT branch:   [mixer 0.5/0.5] → [resampler] → m_fft_node (WorkingAudioToFFT) → InternalFFTListener
-   │   │                └─ working tap:  InternalWorkingListener → m_working_listeners   ← THE NEW PATH
-   │   └─ float stream → SampleListener → m_stream_listeners (legacy, PUNTED, no consumers)
+   │   │                ├─ sink branch:  [m_sink_conv: WorkingAudio2WorkingAudio] → m_sink_encoder → m_sink_device (QAudioSink)
+   │   │                ├─ FFT branch:   [m_fft_conv: WorkingAudio2WorkingAudio] → m_fft_node (WorkingAudioToFFT) → InternalFFTListener
+   │   │                └─ per working listener: [its WorkingAudio2WorkingAudio node] → internal forwarder → YOUR listener   ← THE NEW PATH
+   │   └─ float stream → SampleListener → m_stream_listeners (legacy, one consumer: StreamHistorySession's old interface, PUNTED)
    └─ m_fft_listeners (AudioSession itself is an FFTListener)
 ```
 
@@ -55,30 +62,65 @@ AudioSession (UI thread)  ── audio() on ConsoleSystemSession
 
 ```cpp
 //  AudioSession (thread-safe; safe to call from any thread)
-void add_working_stream_listener(Kernels::AudioPipeline::WorkingAudioStreamListener&);
+void add_working_stream_listener(
+    const AudioFormat& format,
+    Kernels::AudioPipeline::WorkingAudioStreamListener& listener);
 void remove_working_stream_listener(Kernels::AudioPipeline::WorkingAudioStreamListener&);
 ```
 
 - Tap point: the source decoder's output — the tree's working float stream.
-- Data layout: **split (planar) channels**. `push_samples(samples, stride, data)`:
-  channel `c` starts at `data[c * stride]` and runs `samples` floats. `stride` is the
-  per-channel buffer length (≥ `samples`); it is `0` for the single-channel float
-  pass-through. Interleaved: `out[i*ch + c] = data[c*stride + i]`.
-- Shape = the source's **physical** rate/channels, with the **input volume already
-  applied**. For device presets: MONO_48000 → 48k/1ch, DUAL_44100 → 44.1k/2ch,
-  DUAL_48000 → 48k/2ch, MONO_96000 → 96k/1ch, INTERLEAVE_LR/RL_96000 → 48k/2ch
-  (the card's 1ch×96k reinterpreted as two 48k channels). File input currently
-  delivers 48k/2ch (the loader still forces it); a follow-up PR makes file input
-  native rate/channels — this path adapts automatically (the tap is rebuilt with the
-  tree), nothing for you to handle.
-- The capture-card `INTERLEAVE_RL_96000` channel swap is **not** applied on this path
-  (physical channel order); `StreamHistorySession` applies it itself.
-- The pair's listener set does not validate shapes (the per-tree tap node does), so a
-  persistent listener with a nominal `(rate, channels)` base is safe across input
-  changes — derive the live shape from `AudioChannelFormat` state callbacks if you
-  need it.
+- The pair builds one `WorkingAudio2WorkingAudio` node per attached listener
+  (source shape -> `format`), plus an internal forwarder carrying the
+  requested shape as its nominal one (the node validates its listeners
+  against that; **your listener's own nominal (rate, channels) is never
+  validated** — it's metadata, pick anything sensible).
+- Data layout: **split (planar) channels** in the requested shape.
+  `push_samples(samples, stride, data)`: channel `c` starts at
+  `data[c * stride]` and runs `samples` floats. `stride` is the
+  per-channel buffer length (≥ `samples`); it is `0` for the
+  single-channel float pass-through. Interleaved:
+  `out[i*ch + c] = data[c*stride + i]`.
+- The requested shape is **fixed at attach time**. If the shape you want
+  follows the input preset (like the history session's), re-attach on input
+  change: `post_input_change` -> remove + add with the new format. A
+  consumer that requests one fixed shape (like a video encoder targeting
+  48 kHz stereo) never has to.
+- The input volume is already applied (it rides the source decoder).
+- The capture-card `INTERLEAVE_RL_96000` channel swap **is applied** by the
+  pair (literal swap matrix in the node, same as the sink branch), when the
+  source is the RL preset and the requested shape is 2 channels.
+- Re-adding a listener (e.g. with a new format) rebuilds its node; the
+  remove quiesces in-flight pushes first, so no push can run through a node
+  that is about to be destroyed. The entries survive source changes:
+  `build_tree()` rebuilds each node for the new source shape, so a
+  persistent listener keeps working across input changes.
+- WAV file input is native rate/channels (#1673); compressed formats still
+  decode to 48k/2ch. Either way the node adapts automatically.
 
-## The resampler (you already have one)
+## `StreamHistorySession` (state of the transition)
+
+It now implements **both** listener interfaces:
+
+- `AudioFloatStreamListener::on_samples` — the legacy pass-through, kept
+  exactly as it was. Attached via `add_stream_listener` in
+  `ConsoleSystemSession`.
+- `WorkingAudioStreamListener::push_samples` — the new path. Attached via
+  `add_working_stream_listener(preset's physical shape, ...)` at
+  `start()`, re-attached in `post_input_change()` (old-shape attach removed
+  first, so no push in the old shape can race the shape update). It
+  re-interleaves the planar working stream at the active preset's physical
+  shape — the shape its tracker records at (the tracker's audio shape was
+  corrected in the same PR: DUAL_44100 now 2 ch @ 44.1 kHz, MONO_96000 now
+  1 ch @ 96 kHz).
+
+While both are attached, the tracker is fed by **both** paths (double-record);
+the legacy feed is shape-inconsistent with the corrected tracker shape. That
+is inert today (the active tracker's audio is `#if 0`) — when #1563 switches
+the video encoder over, drop the legacy attach (`add_stream_listener` /
+`remove_stream_listener` in `ConsoleSystemSession`) and the double-feed goes
+away with it.
+
+## The resampler & mixer kernels (if you ever own the chain yourself)
 
 ```cpp
 //  Kernels/AudioResampler/Kernels_AudioResampler.h
@@ -102,16 +144,30 @@ AudioResampler(Logger&, size_t in_rate, size_t out_rate, size_t channels,
   dual-mono; stereo→mono is 0.5/0.5). `SinkPipeline_Tests.cpp::run_tree()` shows the
   exact construction/attachment pattern for chains of these nodes.
 
-**Suggested shape for #1563:** own a small chain in the encoding component —
-your `WorkingAudioStreamListener` → optional `ChannelMixer` → `AudioResampler`
-(source rate → your target rate) → your ffmpeg audio encoder input. These are plain
-thread-affine kernel objects (no Qt, no locks needed if only one producer feeds
-them), exactly as the gate tests use them.
+## Suggested shape for #1563
+
+Just attach your encoder's listener to the requested shape — the pair does
+the mixing and resampling for you:
+
+```cpp
+AudioFormat target;
+target.native_format().setSampleRate(48000);
+target.native_format().setChannelCount(2);
+target.native_format().setChannelConfig(QAudioFormat::ChannelConfigStereo);
+audio_session.add_working_stream_listener(target, my_encoder_listener);
+```
+
+Your `WorkingAudioStreamListener` then receives 48 kHz / 2 ch planar float
+regardless of the input source, and can feed the ffmpeg audio encoder
+directly. No manual `ChannelMixer` / `AudioResampler` chain needed (those
+kernels are what you'd use to own the chain yourself, e.g. for a custom
+target layout).
 
 ## Legacy float path — removal checklist (after #1563 is off it)
 
-The legacy reader still runs with no consumers; remove all of it in one cleanup PR:
-
+The legacy reader still runs with one consumer (the history session's old
+interface, which is dropped when #1563 switches); remove all of it in one
+cleanup PR:
 - `AudioStream.h/.cpp`: `AudioFloatStreamListener`, `AudioStreamToFloat`.
 - `IO/AudioSource.{h,cpp}`: `m_reader`, `m_listeners`, `InternalListener`,
   `add_listener(AudioFloatStreamListener&)`, `samples_per_frame()`, `m_multiplier`,
