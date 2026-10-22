@@ -8,6 +8,7 @@
 #define PokemonAutomation_AudioPipeline_AudioPassthroughPairQt_H
 
 #include <memory>
+#include <map>
 //#include <set>
 #include <QObject>
 #include "Common/Cpp/ListenerSet.h"
@@ -27,6 +28,7 @@ namespace AudioPipeline{
 class RawAudio2WorkingAudio;
 class WorkingAudio2RawAudio;
 class WorkingAudio2WorkingAudio;
+class WorkingAudioStreamListener;
 }
 }
 
@@ -38,6 +40,9 @@ public:
 
     virtual void add_listener(FFTListener& listener) override;
     virtual void remove_listener(FFTListener& listener) override;
+
+    virtual void add_listener(const AudioFormat& format, Kernels::AudioPipeline::WorkingAudioStreamListener& listener) override;
+    virtual void remove_listener(Kernels::AudioPipeline::WorkingAudioStreamListener& listener) override;
 
 
 public:
@@ -66,6 +71,18 @@ public:
 private:
     class SampleListener;
     class InternalFFTListener;
+    class InternalWorkingListener;
+
+    //  One entry per attached working-stream listener: the requested format
+    //  plus the conversion node (source shape -> requested shape) and the
+    //  forwarder that carries the requested shape as its nominal one. The
+    //  node attaches to m_source_decoder; the forwarder attaches to the node.
+    //  All of these are only touched while holding m_lock.
+    struct WorkingListenerEntry{
+        AudioFormat m_format;
+        std::unique_ptr<Kernels::AudioPipeline::WorkingAudio2WorkingAudio> m_node;
+        std::unique_ptr<InternalWorkingListener> m_forwarder;
+    };
 
     void init_audio_sink();
 
@@ -81,6 +98,9 @@ private:
     void teardown_sink_branch();
     void build_tree(float input_volume);
     void rebuild_sink_branch();
+
+    void build_working_entry(WorkingListenerEntry& entry, Kernels::AudioPipeline::WorkingAudioStreamListener& listener);
+    void detach_working_entry(WorkingListenerEntry& entry);
 
 
 private:
@@ -107,6 +127,12 @@ private:
     std::unique_ptr<Kernels::AudioPipeline::WorkingAudio2RawAudio> m_sink_encoder;
     std::unique_ptr<Kernels::AudioPipeline::WorkingAudio2WorkingAudio> m_fft_conv;   //  Source shape -> 48 kHz mono (mix + resample).
     std::unique_ptr<WorkingAudioToFFT> m_fft_node;                              //  The tree's FFT endpoint.
+
+    //  Per-listener working-stream conversion nodes. The entries survive
+    //  tree rebuilds (the listeners stay attached across input changes);
+    //  their nodes are rebuilt for each new source shape in build_tree()
+    //  and detached in teardown_tree().
+    std::map<Kernels::AudioPipeline::WorkingAudioStreamListener*, WorkingListenerEntry> m_working_entries;
 
     AudioDeviceInfo m_output_device;
     float m_file_input_multiplier = 1.0;

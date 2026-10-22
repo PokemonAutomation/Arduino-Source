@@ -30,6 +30,7 @@ bool ConsoleSystemSession::try_shutdown() noexcept{
     m_video.remove_state_listener(m_history);
     m_video.remove_state_listener(m_history);
     m_audio.remove_stream_listener(m_history);
+    m_audio.remove_working_stream_listener(m_history);
     m_audio.remove_state_listener(m_history);
 
     m_overlay.remove_stat(*m_main_thread_utilization);
@@ -77,6 +78,7 @@ ConsoleSystemSession::ConsoleSystemSession(
     }
 
     update_status();
+    m_history.set_audio_session(m_audio);
     m_history.start(m_audio.input_format(), m_video.current_source() != nullptr);
 
     try{

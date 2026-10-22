@@ -13,12 +13,14 @@
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
 #include "CommonFramework/VideoPipeline/VideoSession.h"
+#include "Kernels/AudioPipeline/Kernels_AudioPipeline.h"
 
 namespace PokemonAutomation{
 
 
 class StreamHistorySession
     : public AudioFloatStreamListener
+    , public Kernels::AudioPipeline::WorkingAudioStreamListener
     , public VideoFrameListener
     , public AudioSession::StateListener
     , public VideoSession::StateListener
@@ -29,8 +31,17 @@ public:
     void start(AudioChannelFormat format, bool has_video);
     bool save(const std::string& filename) const;
 
+    //  The audio session this session's working-stream listener attaches to
+    //  (set before start(); used to re-attach on input changes).
+    void set_audio_session(AudioSession& session);
+
 public:
+    //  Legacy float stream (kept until the remaining float consumers
+    //  migrate; see the audio pipeline hand-off doc).
     virtual void on_samples(const float* data, size_t frames) override;
+    //  Working stream, delivered in the shape requested at attach time
+    //  (the active preset's physical shape), split (planar) channels.
+    virtual void push_samples(size_t samples, size_t stride, const float* data) override;
     virtual void on_frame(std::shared_ptr<const VideoFrame> frame) override;
 
 public:
@@ -46,6 +57,11 @@ public:
 private:
     void clear();
     void initialize();
+
+    //  Attaches this session to the audio session's working stream at the
+    //  active preset's physical shape (removing any prior attach first).
+    //  Must be called with no locks held.
+    void attach_working_listener();
 
 private:
     struct Data;

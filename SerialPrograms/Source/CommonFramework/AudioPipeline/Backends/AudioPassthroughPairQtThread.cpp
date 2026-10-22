@@ -35,6 +35,18 @@ void AudioPassthroughPairQtThread::remove_listener(FFTListener& listener){
     AudioPassthroughPairQt* body = m_body;
     body->remove_listener(listener);
 }
+void AudioPassthroughPairQtThread::add_listener(
+    const AudioFormat& format, Kernels::AudioPipeline::WorkingAudioStreamListener& listener
+){
+    auto scope_check = m_sanitizer.check_scope();
+    AudioPassthroughPairQt* body = m_body;
+    body->add_listener(format, listener);
+}
+void AudioPassthroughPairQtThread::remove_listener(Kernels::AudioPipeline::WorkingAudioStreamListener& listener){
+    auto scope_check = m_sanitizer.check_scope();
+    AudioPassthroughPairQt* body = m_body;
+    body->remove_listener(listener);
+}
 
 
 AudioPassthroughPairQtThread::AudioPassthroughPairQtThread(Logger& logger)
