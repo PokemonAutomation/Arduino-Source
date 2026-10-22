@@ -27,6 +27,9 @@ public:
     virtual void add_listener(FFTListener& listener) override;
     virtual void remove_listener(FFTListener& listener) override;
 
+    virtual void add_listener(const AudioFormat& format, Kernels::AudioPipeline::WorkingAudioStreamListener& listener) override;
+    virtual void remove_listener(Kernels::AudioPipeline::WorkingAudioStreamListener& listener) override;
+
 public:
     AudioPassthroughPairQtThread(Logger& logger);
     ~AudioPassthroughPairQtThread();

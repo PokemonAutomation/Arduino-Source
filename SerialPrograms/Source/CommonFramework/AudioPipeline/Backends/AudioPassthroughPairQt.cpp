@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -67,6 +68,46 @@ QAudioFormat channel_format(size_t channels){
 }
 
 
+//
+//  Per-listener working-stream conversion.
+//
+//  (Defined before the first use: remove_listener() destroys a
+//  WorkingListenerEntry - and with it the unique_ptr<InternalWorkingListener>
+//  in it - at its call site, so the type must be complete there.)
+//  Each attached working-stream listener gets its own
+//  WorkingAudio2WorkingAudio node (source shape -> the listener's requested
+//  shape) attached to the source decoder, plus an InternalWorkingListener
+//  forwarder that carries the requested shape as its nominal one (the node
+//  validates its listeners against it; the user's listener may have any
+//  nominal shape of its own).
+//
+//  The entries in m_working_entries survive tree rebuilds: when the input
+//  changes, build_tree() rebuilds each node for the new source shape, and
+//  teardown_tree() detaches them. All of these methods require the caller
+//  to hold m_lock. Detaching blocks on in-flight pushes, so no push can
+//  ever run through a node or forwarder that is about to be destroyed.
+//
+
+class AudioPassthroughPairQt::InternalWorkingListener final : public Kernels::AudioPipeline::WorkingAudioStreamListener{
+public:
+    InternalWorkingListener(
+        Kernels::AudioPipeline::WorkingAudioStreamListener& target,
+        size_t sample_rate, size_t channels
+    )
+        : Kernels::AudioPipeline::WorkingAudioStreamListener(sample_rate, channels)
+        , m_target(target)
+    {}
+    //  The pair always detaches this from its node before destroying it
+    //  (detach_working_entry). "m_target" is the user's listener, owned by
+    //  the caller; it outlives the attach by contract.
+    virtual void push_samples(size_t samples, size_t stride, const float* data) override{
+        m_target.push_samples(samples, stride, data);
+    }
+
+private:
+    Kernels::AudioPipeline::WorkingAudioStreamListener& m_target;
+};
+
 
 void AudioPassthroughPairQt::add_listener(AudioFloatStreamListener& listener){
     auto scope_check = m_sanitizer.check_scope();
@@ -85,6 +126,25 @@ void AudioPassthroughPairQt::remove_listener(FFTListener& listener){
     auto scope_check = m_sanitizer.check_scope();
     WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     m_fft_listeners.remove(listener);
+}
+void AudioPassthroughPairQt::add_listener(
+    const AudioFormat& format, Kernels::AudioPipeline::WorkingAudioStreamListener& listener
+){
+    auto scope_check = m_sanitizer.check_scope();
+    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
+    WorkingListenerEntry& entry = m_working_entries[&listener];
+    entry.m_format = format;
+    build_working_entry(entry, listener);
+}
+void AudioPassthroughPairQt::remove_listener(Kernels::AudioPipeline::WorkingAudioStreamListener& listener){
+    auto scope_check = m_sanitizer.check_scope();
+    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
+    auto iter = m_working_entries.find(&listener);
+    if (iter == m_working_entries.end()){
+        return;
+    }
+    detach_working_entry(iter->second);
+    m_working_entries.erase(iter);
 }
 
 
@@ -133,6 +193,69 @@ private:
 };
 
 
+
+
+void AudioPassthroughPairQt::build_working_entry(
+    WorkingListenerEntry& entry, Kernels::AudioPipeline::WorkingAudioStreamListener& listener
+){
+    if (!m_source_decoder || m_input_format == AudioChannelFormat::NONE){
+        return;
+    }
+    //  Re-adding with a new format: detach the old node first.
+    if (entry.m_node){
+        detach_working_entry(entry);
+    }
+
+    const size_t raw_rate = m_reader->raw_sample_rate();
+    const size_t raw_channels = m_reader->raw_channels();
+    const size_t out_rate = entry.m_format.sample_rate();
+    const size_t out_channels = entry.m_format.channels();
+    if (out_rate == 0 || out_channels == 0){
+        m_logger.log("Working listener: invalid requested format; not attached.", COLOR_RED);
+        return;
+    }
+
+    //  INTERLEAVE_RL_96000 plays the card's channel 1 (the odd physical
+    //  samples) as the left channel; the input reinterpretation preserves
+    //  the physical order, so the swap is applied to the matrix (the same
+    //  special case the sink branch uses).
+    std::vector<float> matrix;
+    if (m_input_format == AudioChannelFormat::INTERLEAVE_RL_96000
+        && raw_channels == 2 && out_channels == 2){
+        //  out = [in 1, in 0]; weight(in i -> out o) at index i + in_ch * o.
+        matrix = {0.0f, 1.0f, 1.0f, 0.0f};
+    }else{
+        matrix = build_channel_mixer_matrix(
+            channel_format(raw_channels), entry.m_format.native_format()
+        );
+    }
+    if (matrix.size() != raw_channels * out_channels){
+        m_logger.log("Working listener: no channel mixer matrix for this conversion; not attached.", COLOR_RED);
+        return;
+    }
+
+    entry.m_node.reset(new Kernels::AudioPipeline::WorkingAudio2WorkingAudio(
+        m_logger, raw_rate, out_rate, raw_channels, out_channels, std::move(matrix)
+    ));
+    entry.m_forwarder.reset(new InternalWorkingListener(listener, out_rate, out_channels));
+    entry.m_node->add_listener(*entry.m_forwarder);
+    m_source_decoder->add_listener(*entry.m_node);
+}
+
+
+void AudioPassthroughPairQt::detach_working_entry(WorkingListenerEntry& entry){
+    if (entry.m_forwarder && entry.m_node){
+        entry.m_node->remove_listener(*entry.m_forwarder);
+    }
+    if (entry.m_node && m_source_decoder){
+        m_source_decoder->remove_listener(*entry.m_node);
+    }
+    entry.m_forwarder.reset();
+    entry.m_node.reset();
+}
+
+
+
 //
 //  The new pipeline tree.
 //
@@ -151,6 +274,9 @@ void AudioPassthroughPairQt::teardown_tree(){
     //  destructions below can ever race an in-flight push.
     if (m_source_decoder){
         m_reader->remove_raw_listener(*m_source_decoder);
+    }
+    for (auto& entry : m_working_entries){
+        detach_working_entry(entry.second);
     }
     m_fft_listener.reset();
     m_fft_node.reset();
@@ -193,6 +319,12 @@ void AudioPassthroughPairQt::build_tree(float input_volume){
         raw_rate, raw_channels, input_volume
     ));
     m_reader->add_raw_listener(*m_source_decoder);
+
+    //  Rebuild the per-listener working-stream conversion nodes for the new
+    //  source shape (the entries themselves survive the rebuild).
+    for (auto& entry : m_working_entries){
+        build_working_entry(entry.second, *entry.first);
+    }
 
     //  FFT branch: source channels -> 1 channel, source rate -> FFT rate.
     //  The tree runs the FFT at 48 kHz for all inputs (the post-migration

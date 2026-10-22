@@ -34,6 +34,14 @@ void AudioSession::add_stream_listener(AudioFloatStreamListener& listener){
 void AudioSession::remove_stream_listener(AudioFloatStreamListener& listener){
     m_devices->remove_listener(listener);
 }
+void AudioSession::add_working_stream_listener(
+    const AudioFormat& format, Kernels::AudioPipeline::WorkingAudioStreamListener& listener
+){
+    m_devices->add_listener(format, listener);
+}
+void AudioSession::remove_working_stream_listener(Kernels::AudioPipeline::WorkingAudioStreamListener& listener){
+    m_devices->remove_listener(listener);
+}
 void AudioSession::add_spectrum_listener(AudioSpectrumHolder::Listener& listener){
     m_spectrum_holder.add_listener(listener);
 }

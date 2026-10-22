@@ -45,6 +45,11 @@ public:
     void add_stream_listener(AudioFloatStreamListener& listener);
     void remove_stream_listener(AudioFloatStreamListener& listener);
 
+    //  Attach a listener that receives the working audio stream (float)
+    //  converted to the requested format. See AudioPassthroughPair.
+    void add_working_stream_listener(const AudioFormat& format, Kernels::AudioPipeline::WorkingAudioStreamListener& listener);
+    void remove_working_stream_listener(Kernels::AudioPipeline::WorkingAudioStreamListener& listener);
+
     void add_spectrum_listener(AudioSpectrumHolder::Listener& listener);
     void remove_spectrum_listener(AudioSpectrumHolder::Listener& listener);
 
