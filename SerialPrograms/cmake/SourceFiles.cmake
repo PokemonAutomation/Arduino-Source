@@ -1050,6 +1050,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/AudioPipeline/Kernels_RawAudio2WorkingAudio.h
     Source/Kernels/AudioPipeline/Kernels_WorkingAudio2RawAudio.cpp
     Source/Kernels/AudioPipeline/Kernels_WorkingAudio2RawAudio.h
+    Source/Kernels/AudioPipeline/Kernels_WorkingAudio2WorkingAudio.cpp
+    Source/Kernels/AudioPipeline/Kernels_WorkingAudio2WorkingAudio.h
     Source/Kernels/AudioResampler/Kernels_AudioResampler.cpp
     Source/Kernels/AudioResampler/Kernels_AudioResampler.h
     Source/Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_Default.cpp

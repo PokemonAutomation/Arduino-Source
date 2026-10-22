@@ -10,6 +10,10 @@
 #include "Kernels/AudioChannelInterleave/Kernels_AudioChannelInterleave.h"
 #include "Kernels_RawAudio2WorkingAudio.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace Kernels{
 namespace AudioPipeline{

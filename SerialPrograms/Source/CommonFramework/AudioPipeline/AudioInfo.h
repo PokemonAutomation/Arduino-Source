@@ -14,15 +14,8 @@
 
 class QAudioFormat;
 
-#if QT_VERSION_MAJOR == 5
-class QAudioDeviceInfo;
-using NativeAudioInfo = QAudioDeviceInfo;
-#elif QT_VERSION_MAJOR == 6
 class QAudioDevice;
 using NativeAudioInfo = QAudioDevice;
-#else
-#error "Unknown Qt version."
-#endif
 
 
 
@@ -54,8 +47,25 @@ extern const char* AUDIO_FORMAT_LABELS[];
 //  Convert our audio format enum to QAudioFormat.
 void set_format(QAudioFormat& native_format, AudioChannelFormat format);
 
+AudioSampleFormat get_sample_format(const QAudioFormat& native_format);
 
-AudioSampleFormat get_sample_format(QAudioFormat& native_format);
+
+
+class AudioFormat{
+public:
+    AudioFormat();
+    AudioFormat(QAudioFormat native_format);
+
+    AudioSampleFormat sample_format() const;
+    size_t sample_rate() const;
+    size_t channels() const;
+
+    const QAudioFormat& native_format() const;
+    QAudioFormat& native_format();
+
+private:
+    Pimpl<QAudioFormat> m_native_format;
+};
 
 
 

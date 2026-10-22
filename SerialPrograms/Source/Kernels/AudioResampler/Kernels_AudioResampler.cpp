@@ -29,8 +29,7 @@ AudioResampler::AudioResampler(
     uint32_t taps,
     double beta
 )
-    : AudioPipeline::WorkingAudioStreamListener(in_sample_rate, channels)
-    , m_out_rate(out_sample_rate)
+    : AudioPipeline::WorkingAudioNode(in_sample_rate, out_sample_rate, channels, channels)
     , m_taps(taps)
     , m_block(get_block_kernel(in_sample_rate, out_sample_rate))
     , m_table(
@@ -81,7 +80,7 @@ AudioResampler::AudioResampler(
 }
 
 void AudioResampler::add_listener(AudioPipeline::WorkingAudioStreamListener& listener){
-    if (m_out_rate != listener.sample_rate()){
+    if (out_sample_rate() != listener.sample_rate()){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Sample rate doesn't match.");
     }
     if (this->channels() != listener.channels()){
@@ -190,7 +189,7 @@ void AudioResampler::push_samples(size_t samples, size_t stride, const float* da
     //  upsampling the cursor barely advances between blocks, so this keeps
     //  the block loops from running away.
     const size_t available = (pushed_end > cursor) ? (pushed_end - cursor) : 0;
-    const size_t out_limit = available * m_out_rate / this->sample_rate() + block;
+    const size_t out_limit = available * out_sample_rate() / this->sample_rate() + block;
 
     size_t out_off = 0;
 

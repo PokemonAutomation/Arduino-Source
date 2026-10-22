@@ -18,7 +18,7 @@ namespace AudioPipeline{
 
 
 
-class ChannelMixer : public WorkingAudioStreamListener{
+class ChannelMixer : public WorkingAudioNode{
 public:
     ~ChannelMixer();
     ChannelMixer(
@@ -29,15 +29,13 @@ public:
         size_t buffer_size = 4096 + 256 //  4k + break super-alignment
     );
 
-    void add_listener(WorkingAudioStreamListener& listener);
-    void remove_listener(WorkingAudioStreamListener& listener);
+    virtual void add_listener(WorkingAudioStreamListener& listener) override;
+    virtual void remove_listener(WorkingAudioStreamListener& listener) override;
 
     virtual void push_samples(size_t samples, size_t stride, const float* data) override;
 
 
 private:
-    size_t m_in_channels;
-    size_t m_out_channels;
     size_t m_buffer_size;
     std::vector<float> m_weight_matrix;
     AlignedVector<float> m_buffer;
