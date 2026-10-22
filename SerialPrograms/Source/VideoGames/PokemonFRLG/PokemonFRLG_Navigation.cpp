@@ -1440,6 +1440,7 @@ int auto_catch_safari(
             return 0;
         }
 
+        catch_detector.clear();
         int ret = wait_until(
             console, context,
             std::chrono::milliseconds(2000),
