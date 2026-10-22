@@ -62,14 +62,17 @@ bool AudioFileLoader::start(){
             return false;
         }
 
-        const int wavSampleRate = m_wavFile->audioFormat().sampleRate();
-        if (wavSampleRate != m_audioFormat.sampleRate()){
-            std::cout << "Error: we don't interpolate wav file sample rate " << wavSampleRate << " to " << 
-                m_audioFormat.sampleRate() << " during playback" << std::endl;
+        const QAudioFormat& wavAudioFormat = m_wavFile->audioFormat();
+        if (wavAudioFormat.channelCount() > 2){
+            std::cout << "Error: audio file input supports 1 or 2 channels; the wav file has "
+                << wavAudioFormat.channelCount() << " channels." << std::endl;
             return false;
         }
 
-
+        //  The loader streams the wav's native format: the caller
+        //  (AudioInputFile) sets m_audioFormat to the file's own format
+        //  (probed from the header), so m_frames_per_timeout paces the timer
+        //  at the file's sample rate and the raw bytes are emitted as-is.
         buildTimer();
         connect(m_timer, &QTimer::timeout, this, &AudioFileLoader::sendBufferFromWavFileOnTimer);
         
@@ -109,6 +112,17 @@ std::tuple<const char*, size_t> AudioFileLoader::loadFullAudio(){
     if (has_extension(m_filename, "wav")){
         // Use WavFile to load unencoded samples:
         if (!initWavFile()){
+            return std::make_tuple<const char*, size_t>(nullptr, 0);
+        }
+
+        //  The batch API converts the sample type and channels to the
+        //  requested format, but not the sample rate: its consumer
+        //  (loadAudioTemplate) assumes the returned data is at the requested
+        //  rate.
+        if (m_wavFile->audioFormat().sampleRate() != m_audioFormat.sampleRate()){
+            std::cout << "Error: loadFullAudio() requires the wav file's sample rate ("
+                << m_wavFile->audioFormat().sampleRate() << ") to match the requested sample rate ("
+                << m_audioFormat.sampleRate() << "); it does not resample." << std::endl;
             return std::make_tuple<const char*, size_t>(nullptr, 0);
         }
 
@@ -163,11 +177,11 @@ bool AudioFileLoader::initWavFile(){
 
     std::cout << "Wav file audio format: " << dump_audio_format(m_wavFile->audioFormat());
 
-    if (m_audioFormat.sampleRate() != m_wavFile->audioFormat().sampleRate()){
-        std::cout << "Error: WavFile sample rate " << m_wavFile->audioFormat().sampleRate() <<
-            " does not match required " << m_audioFormat.sampleRate() << std::endl;
-        return false;
-    }
+    //  The wav's native rate / channels / sample type are the stream's
+    //  format: the caller (AudioInputFile) probes the header and sets
+    //  m_audioFormat to the file's own format, so the raw bytes stream
+    //  through unconverted at the file's rate. (loadFullAudio() keeps the
+    //  "convert to the requested format" behavior for its batch consumer.)
 
     return true;
 }
@@ -213,8 +227,9 @@ void AudioFileLoader::sendBufferFromWavFileOnTimer(){
         return;
     }
 
-    const auto bufferPtrLen = convertRawWavSamples();
-    emit bufferReady(std::get<0>(bufferPtrLen), std::get<1>(bufferPtrLen));
+    //  The file's native format is the stream's format, so the raw bytes are
+    //  emitted as-is (no conversion).
+    emit bufferReady(m_rawBuffer.data(), (size_t)wavBytesRead);
 }
 
 std::pair<const char*, size_t> AudioFileLoader::convertRawWavSamples(){

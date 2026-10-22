@@ -23,6 +23,12 @@ class AudioStreamToFloat;
 class AudioFileLoader;
 
 
+//  Probes a .wav file's native audio format (sample rate, channel count,
+//  sample type) by reading its header. Returns false if the file cannot be
+//  opened or is not a supported WAV (PCM 8/16/32-bit or IEEE-float).
+bool probe_wav_native_format(const std::string& filename, QAudioFormat& out_format);
+
+
 //
 //  Raw audio input from a file (.wav via WavFile, compressed formats via
 //  QAudioDecoder).
