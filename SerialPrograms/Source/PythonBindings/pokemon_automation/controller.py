@@ -125,17 +125,18 @@ class SwitchController:
                     release_ms: int = DEFAULT_RELEASE_MS) -> None:
         """Tap a button combination (d-pad directions not accepted).
 
-        `buttons`: "A", "L+R", ["ZL", "B"], ... (see `pokemon_automation.buttons`).
-        For d-pad input use `push_dpad()`; to hold buttons and d-pad together use
+        `buttons`: May be a single button, or multiple buttons. e.g. "A", "L+R", ["ZL", "B"], ...
+        For d-pad input use `push_dpad()`; to hold buttons and d-pad together, use
         `controller_state()`.
+        
+        This function does not allow for overlapping button presses. For that, use controller_state().
+        However, the pybind backend does expose `delay_ms`. If this is set to less than `hold_ms`, one may
+        also overlap button presses, similar to the functions in NintendoSwitch_Commands_Superscalar.h
 
         C++: `AbstractController::issue_buttons()`
         (SerialPrograms/Source/Controllers/Controller.h), via
         `PybindSwitchProController::push_button()`
         (SerialPrograms/Source/Integrations/PybindSwitchProController.h).
-        Queued back to back, the same timing `pbf_press_button()` uses
-        (delay = hold + release); the backend's `delay_ms` is available by
-        calling the `_pa_core.Controller` directly.
         """
         _check_nonnegative(hold_ms=hold_ms, release_ms=release_ms)
         self._require_open()
@@ -154,8 +155,9 @@ class SwitchController:
                   release_ms: int = DEFAULT_RELEASE_MS) -> None:
         """Tap a d-pad direction.
 
-        `dpad`: "up", "up+right" (or "UP_RIGHT"), ["up", "right"], ...
-        For buttons use `push_button()`; to hold buttons and d-pad together use
+        `dpad`: May be a single direction, or multiple directions as long as they are not contradictory.
+        e.g. "up", "up+right" (or "UP_RIGHT"), ["up", "right"], 
+        For buttons use `push_button()`; to hold buttons and d-pad together, use
         `controller_state()`.
 
         C++: `AbstractController::issue_dpad()`
@@ -182,17 +184,12 @@ class SwitchController:
                          duration_ms: int = 500) -> None:
         """Hold any combination of buttons, d-pad and sticks for `duration_ms`.
 
-        `buttons`: button names only ("A", "L+R"), or None to release all buttons.
-        `dpad`: d-pad directions only ("up", "up+right", ["up", "right"]), or None
-        to release the d-pad. The argument order matches `pbf_controller_state()`
-        and the C++ backend: buttons, d-pad, sticks, then duration.
-
-        `left_joystick` / `right_joystick` are (x, y) tuples in [-1, 1].
+        * `buttons`: button names only ("A", "L+R"), or None to release all buttons.
+        * `dpad`: d-pad directions only (e.g. "up", "up+right", ["up", "right"]), or None
+        to release the d-pad.
+        * `left_joystick` / `right_joystick` are (x, y) tuples in [-1, 1].
         -x=left, x=0=neutral, +x=right. -y=down, y=0=neutral, +y=up.
         e.g. (0.0, 1.0) is up. None (the default) releases that stick.
-
-        The stick tuples are unpacked and passed to the backend as separate
-        x, y arguments (`_pa_core` keeps the C++ signature).
         """
         _check_nonnegative(duration_ms=duration_ms)
         self._require_open()
@@ -219,11 +216,8 @@ class SwitchController:
 
     def push_left_joystick(self, joystick_position: tuple[float, float], hold_ms: int = 500,
                           release_ms: int = 0) -> None:
-        """Tilt the left stick to `joystick_position`, an (x, y) tuple in [-1, 1] for `hold_ms`
+        """Tilt the left stick to `joystick_position`, an (x, y) tuple in [-1, 1], for `hold_ms`
         -x=left, x=0=neutral, +x=right. -y=down, y=0=neutral, +y=up. e.g. (0.0, 1.0) is up.
-
-        The pair is unpacked and passed to the backend as separate x, y
-        arguments (`_pa_core` keeps the C++ signature).
 
         C++: `AbstractController::issue_left_joystick()`
         (SerialPrograms/Source/Controllers/Controller.h), via
@@ -233,11 +227,8 @@ class SwitchController:
 
     def push_right_joystick(self, joystick_position: tuple[float, float], hold_ms: int = 500,
                            release_ms: int = 0) -> None:
-        """Tilt the right stick to `joystick_position`, an (x, y) tuple in [-1, 1] for `hold_ms`
+        """Tilt the right stick to `joystick_position`, an (x, y) tuple in [-1, 1], for `hold_ms`
         -x=left, x=0=neutral, +x=right. -y=down, y=0=neutral, +y=up. e.g. (0.0, 1.0) is up.
-
-        The pair is unpacked and passed to the backend as separate x, y
-        arguments (`_pa_core` keeps the C++ signature).
 
         C++: `AbstractController::issue_right_joystick()`
         (SerialPrograms/Source/Controllers/Controller.h), via
