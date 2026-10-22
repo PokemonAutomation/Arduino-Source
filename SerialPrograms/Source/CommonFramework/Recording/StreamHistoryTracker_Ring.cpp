@@ -276,10 +276,15 @@ void abandon_video_encoder(Logger& logger, const char* name, AVCodecContext*& ct
 //  stream header and NAL units with 4-byte big-endian length prefixes in the
 //  samples. The h264_amf wrapper (with AV_CODEC_FLAG_GLOBAL_HEADER) instead
 //  produces Annex B (00 00 00 01 start codes) for both, and the MP4 muxer
-//  shipped with the vendored ffmpeg crashes on that form; the other
-//  hardware encoders (nvenc, qsv) produce AVCC natively. These two
-//  conversions turn the AMF output into the standard AVCC form so that the
-//  muxer always sees what it expects.
+//  shipped with the vendored ffmpeg crashes on that form. The other
+//  hardware wrappers emit Annex B as well (verified in the ffmpeg 8.1
+//  sources: qsv and videotoolbox pass the driver's start-coded SPS/PPS and
+//  bitstream through without any conversion; the only unverified case is
+//  nvenc's driver-produced SPS/PPS payload, whose form the mux-time log
+//  lines report). These two conversions turn Annex B output into the
+//  standard AVCC form so that the muxer always sees what it expects; the
+//  detection is content-based (it sniffs the extradata bytes), so an
+//  encoder that emitted AVCC directly would pass through unconverted.
 
 //  Walks the NAL units of an Annex B H.264 byte stream and re-emits them
 //  with 4-byte big-endian length prefixes. Returns false if no NAL unit is
@@ -1137,6 +1142,11 @@ struct StreamHistoryTracker_Ring::Impl{
                     break;
                 }
                 auto ring_packet = std::make_shared<AudioRingPacket>();
+                //  Back-date to the start of the AUDIO_FRAME_US of samples this
+                //  packet contains, so the timestamp lines up with the audio
+                //  that was actually captured. This keeps audio aligned with
+                //  video in the ring (eviction) and in save() (which trims the
+                //  audio to the video's start point).
                 ring_packet->timestamp = now - std::chrono::microseconds(AUDIO_FRAME_US);
                 ring_packet->first_sample = audio_samples_total - AUDIO_FRAME_SAMPLES;
                 ring_packet->data.assign(packet->data, packet->data + packet->size);
