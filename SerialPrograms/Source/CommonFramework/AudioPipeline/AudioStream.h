@@ -63,30 +63,6 @@ private:
 
 
 
-//  Convert a stream of float samples to raw audio.
-class AudioFloatToStream : public AudioFloatStreamListener{
-public:
-    void add_listener(ObjectStreamListener& listener);
-    void remove_listener(ObjectStreamListener& listener);
-
-public:
-    AudioFloatToStream(AudioSampleFormat output_format, size_t samples_per_frame);
-    virtual ~AudioFloatToStream();
-    virtual void on_samples(const float* data, size_t frames) override;
-
-private:
-    AudioSampleFormat m_format;
-    size_t m_samples_per_frame;
-    size_t m_sample_size;
-    size_t m_frame_size;
-    size_t m_buffer_size;
-    AlignedVector<char> m_buffer;
-    ListenerSet<ObjectStreamListener> m_listeners;
-
-    LifetimeSanitizer m_sanitizer;
-};
-
-
 
 }
 #endif

@@ -2,20 +2,16 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  These tests gate the switch of the playback endpoint from the legacy
- *  converter chain (AudioStreamToFloat -> AudioFloatToStream) to the
- *  pipeline tree's sink branch (RawAudio2WorkingAudio -> [resampler] ->
- *  [mixer] -> WorkingAudio2RawAudio). Everything runs on plain kernel
- *  objects, so no audio I/O is involved:
+ *  Self-contained invariants for the pipeline tree's sink branch
+ *  (RawAudio2WorkingAudio -> [resampler] -> [mixer] -> WorkingAudio2RawAudio).
+ *  Everything runs on plain kernel objects, so no audio I/O is involved:
  *
  *   1. No-op cases (same rate, channel count, and sample format on both
- *      sides): the tree's raw output must match the legacy converter
- *      chain's bit-for-bit (float) or within 1 LSB (sint16).
+ *      sides): the tree's raw output must be bit-identical to the input
+ *      (float), or within 1 LSB of a plain-scalar reference (sint16).
  *
- *   2. Resampled / mixed cases, which the legacy path has no equivalent
- *      for (it forced the device to the input format instead of
- *      converting): self-contained invariants — output length, tone
- *      amplitudes, and the upmix / downmix channel behavior.
+ *   2. Resampled / mixed cases: output length, tone amplitudes, and the
+ *      upmix / downmix channel behavior.
  *
  */
 
@@ -33,7 +29,6 @@
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "CommonFramework/AudioPipeline/AudioInfo.h"
-#include "CommonFramework/AudioPipeline/AudioStream.h"
 #include "CommonFramework/AudioPipeline/ChannelMixer.h"
 #include "Kernels/AudioPipeline/Kernels_RawAudio2WorkingAudio.h"
 #include "Kernels/AudioPipeline/Kernels_WorkingAudio2RawAudio.h"
@@ -149,26 +144,16 @@ float measure_amplitude(const std::vector<float>& interleaved, size_t channels, 
 
 
 
-//  Records the raw byte stream. Implements both listener interfaces so it
-//  can sit at the end of the legacy chain (AudioFloatToStream) and the end
-//  of the tree chain (WorkingAudio2RawAudio).
-class RecordingRawListener
-    : public ObjectStreamListener
-    , public Kernels::AudioPipeline::RawAudioStreamListener
-{
+//  Records the raw byte stream at the end of the tree chain.
+class RecordingRawListener : public Kernels::AudioPipeline::RawAudioStreamListener{
 public:
     RecordingRawListener(AudioSampleFormat format, size_t rate, size_t channels)
-        : ObjectStreamListener(sample_size(format) * channels)
-        , Kernels::AudioPipeline::RawAudioStreamListener(to_kernels_format(format), rate, channels)
+        : Kernels::AudioPipeline::RawAudioStreamListener(to_kernels_format(format), rate, channels)
+        , m_frame_bytes(sample_size(format) * channels)
     {}
-    virtual void on_objects(const void* data, size_t objects) override{
-        const char* bytes = (const char*)data;
-        const size_t count = objects * object_size;
-        m_bytes.insert(m_bytes.end(), bytes, bytes + count);
-    }
     virtual void push_samples(size_t frames, const void* data) override{
         const char* bytes = (const char*)data;
-        const size_t count = frames * object_size;
+        const size_t count = frames * m_frame_bytes;
         m_bytes.insert(m_bytes.end(), bytes, bytes + count);
     }
     const std::vector<char>& bytes() const{
@@ -176,64 +161,9 @@ public:
     }
 
 private:
+    const size_t m_frame_bytes;
     std::vector<char> m_bytes;
 };
-
-
-
-//  Records the legacy interleaved float stream.
-class RecordingFloatListener : public AudioFloatStreamListener{
-public:
-    explicit RecordingFloatListener(size_t spf)
-        : AudioFloatStreamListener(spf)
-    {}
-    virtual void on_samples(const float* data, size_t frames) override{
-        const size_t count = frames * expected_samples_per_frame;
-        for (size_t c = 0; c < count; c++){
-            m_samples.push_back(data[c]);
-        }
-        m_frames += frames;
-    }
-    const std::vector<float>& samples() const{
-        return m_samples;
-    }
-    size_t frames() const{
-        return m_frames;
-    }
-
-private:
-    std::vector<float> m_samples;
-    size_t m_frames = 0;
-};
-
-
-
-//  Legacy path: raw bytes -> AudioStreamToFloat -> AudioFloatToStream ->
-//  raw bytes, exactly the converter chain AudioSink used to run.
-std::vector<char> run_legacy(
-    const std::vector<char>& raw,
-    size_t rate,
-    AudioSampleFormat in_format, size_t in_spf,
-    AudioSampleFormat out_format, size_t out_spf
-){
-    AudioStreamToFloat reader(in_format, in_spf, 1.0f, false);
-    RecordingFloatListener capture(in_spf);
-    reader.add_listener(capture);
-    reader.push_bytes(raw.data(), raw.size());
-
-    AudioFloatToStream writer(out_format, out_spf);
-    RecordingRawListener out(out_format, rate, out_spf);
-    writer.add_listener(out);
-
-    //  Feed in odd-sized chunks to exercise the block logic.
-    size_t done = 0;
-    while (done < capture.frames()){
-        size_t chunk = std::min((size_t)997, capture.frames() - done);
-        writer.on_samples(capture.samples().data() + done * out_spf, chunk);
-        done += chunk;
-    }
-    return out.bytes();
-}
 
 
 
@@ -302,8 +232,8 @@ std::vector<char> run_tree(
 
 
 //
-//  No-op case: 2ch x 48000 FLOAT32 in, same out. The tree's raw output
-//  must be bit-identical to the legacy converter chain's.
+//  No-op case: 2ch x 48000 FLOAT32 in, same out. The tree must pass the
+//  raw bytes through bit-identically.
 //
 class SinkGateDual48000Test : public UnitTest{
 public:
@@ -320,23 +250,21 @@ public:
         std::vector<float> r = make_noisy_tones(n, rate, 4031.25, 14062.5, generator);
         std::vector<char> raw = interleave_bytes({l, r});
 
-        std::vector<char> legacy = run_legacy(raw, 48000, AudioSampleFormat::FLOAT32, 2, AudioSampleFormat::FLOAT32, 2);
         std::vector<char> tree = run_tree(
             logger, raw,
             AudioSampleFormat::FLOAT32, rate, 2,
             AudioSampleFormat::FLOAT32, rate, 2
         );
 
-        if (legacy.size() != raw.size() || tree.size() != raw.size()){
+        if (tree.size() != raw.size()){
             return "Length mismatch: raw = " + std::to_string(raw.size())
-                + ", legacy = " + std::to_string(legacy.size())
                 + ", tree = " + std::to_string(tree.size()) + " bytes.";
         }
-        if (std::memcmp(legacy.data(), tree.data(), tree.size()) != 0){
+        if (std::memcmp(raw.data(), tree.data(), tree.size()) != 0){
             for (size_t c = 0; c < tree.size(); c++){
-                if (legacy[c] != tree[c]){
+                if (raw[c] != tree[c]){
                     return "First differing byte at " + std::to_string(c)
-                        + ": legacy = " + tostr_default((int)legacy[c])
+                        + ": raw = " + tostr_default((int)raw[c])
                         + ", tree = " + tostr_default((int)tree[c]) + ".";
                 }
             }
@@ -349,7 +277,8 @@ public:
 
 
 //
-//  No-op case: 1ch x 48000 FLOAT32 in, same out.
+//  No-op case: 1ch x 48000 FLOAT32 in, same out. Bit-identical pass-
+//  through, as the dual case above.
 //
 class SinkGateMono48000Test : public UnitTest{
 public:
@@ -365,23 +294,21 @@ public:
         std::vector<float> m = make_noisy_tones(n, rate, 4031.25, 14062.5, generator);
         std::vector<char> raw = interleave_bytes({m});
 
-        std::vector<char> legacy = run_legacy(raw, 48000, AudioSampleFormat::FLOAT32, 1, AudioSampleFormat::FLOAT32, 1);
         std::vector<char> tree = run_tree(
             logger, raw,
             AudioSampleFormat::FLOAT32, rate, 1,
             AudioSampleFormat::FLOAT32, rate, 1
         );
 
-        if (legacy.size() != raw.size() || tree.size() != raw.size()){
+        if (tree.size() != raw.size()){
             return "Length mismatch: raw = " + std::to_string(raw.size())
-                + ", legacy = " + std::to_string(legacy.size())
                 + ", tree = " + std::to_string(tree.size()) + " bytes.";
         }
-        if (std::memcmp(legacy.data(), tree.data(), tree.size()) != 0){
+        if (std::memcmp(raw.data(), tree.data(), tree.size()) != 0){
             for (size_t c = 0; c < tree.size(); c++){
-                if (legacy[c] != tree[c]){
+                if (raw[c] != tree[c]){
                     return "First differing byte at " + std::to_string(c)
-                        + ": legacy = " + tostr_default((int)legacy[c])
+                        + ": raw = " + tostr_default((int)raw[c])
                         + ", tree = " + tostr_default((int)tree[c]) + ".";
                 }
             }
@@ -395,8 +322,9 @@ public:
 
 //
 //  No-op shape, different sample format: FLOAT32 in, SINT16 out, same
-//  rate / channels. The two converter kernels are allowed to differ by
-//  at most 1 LSB per sample (rounding / clamping policy).
+//  rate / channels. Every converter variant (scalar or SIMD) must agree
+//  with the plain-scalar reference — x * 32768, clamped to int16 —
+//  within 1 LSB per sample (rounding / clamping policy).
 //
 class SinkGateSint16NoOpTest : public UnitTest{
 public:
@@ -413,27 +341,27 @@ public:
         std::vector<float> r = make_noisy_tones(n, rate, 4031.25, 14062.5, generator);
         std::vector<char> raw = interleave_bytes({l, r});
 
-        std::vector<char> legacy = run_legacy(raw, 48000, AudioSampleFormat::FLOAT32, 2, AudioSampleFormat::SINT16, 2);
         std::vector<char> tree = run_tree(
             logger, raw,
             AudioSampleFormat::FLOAT32, rate, 2,
             AudioSampleFormat::SINT16, rate, 2
         );
-
-        if (legacy.size() != tree.size()){
-            return "Length mismatch: legacy = " + std::to_string(legacy.size())
+        if (tree.size() != raw.size() / 2){
+            return "Length mismatch: raw = " + std::to_string(raw.size())
                 + ", tree = " + std::to_string(tree.size()) + " bytes.";
         }
 
-        std::vector<int16_t> legacy_samples(legacy.size() / sizeof(int16_t));
         std::vector<int16_t> tree_samples(tree.size() / sizeof(int16_t));
-        std::memcpy(legacy_samples.data(), legacy.data(), legacy.size());
         std::memcpy(tree_samples.data(), tree.data(), tree.size());
 
         for (size_t c = 0; c < tree_samples.size(); c++){
-            if (std::abs((int)tree_samples[c] - (int)legacy_samples[c]) > 1){
-                return "Sample " + std::to_string(c) + " differs by more than 1 LSB: legacy = "
-                    + std::to_string(legacy_samples[c]) + ", tree = " + std::to_string(tree_samples[c]) + ".";
+            const float x = (c % 2 == 0) ? l[c / 2] : r[c / 2];
+            float v = x * 32768.0f;
+            v = std::clamp(v, -32768.0f, 32767.0f);
+            const int ref = (int)std::lround((double)v);
+            if (std::abs((int)tree_samples[c] - ref) > 1){
+                return "Sample " + std::to_string(c) + " differs from the scalar reference by more than 1 LSB: reference = "
+                    + std::to_string(ref) + ", tree = " + std::to_string(tree_samples[c]) + ".";
             }
         }
 
