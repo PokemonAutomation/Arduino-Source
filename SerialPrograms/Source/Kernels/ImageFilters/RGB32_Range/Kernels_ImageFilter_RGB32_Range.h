@@ -52,6 +52,7 @@ struct FilterRgb32RangeFilter{
         , invert(p_invert)
         , mins(p_mins)
         , maxs(p_maxs)
+        , pixels_in_range(0)
     {}
 };
 void filter_rgb32_range(
@@ -94,6 +95,7 @@ struct ToBlackWhiteRgb32RangeFilter{
         , mins(p_mins)
         , maxs(p_maxs)
         , in_range_black(p_in_range_black)
+        , pixels_in_range(0)
     {}
 };
 void to_blackwhite_rgb32_range(
