@@ -10,31 +10,11 @@
 #include <string>
 #include <set>
 #include <map>
-#include <QString>
 #include "OCR_StringMatchResult.h"
 
 namespace PokemonAutomation{
 namespace OCR{
 
-
-// Calculate Levenshtein (edit) distance between two strings.
-// This is the minimum number of single-character edits (insertions, deletions, substitutions)
-// needed to transform string x into string y.
-size_t levenshtein_distance(const QString& x, const QString& y);
-
-// Calculate minimum edit distance to find 'substring' anywhere within 'fullstring'.
-// This is a variant of Levenshtein distance that allows the match to start/end anywhere
-// in fullstring without penalty.
-//
-// Example:
-//   substring = "cat"
-//   fullstring = "the cat ran"
-//   Result: 0 (exact substring match found)
-//
-//   substring = "cet"
-//   fullstring = "the cat ran"
-//   Result: 1 (one substitution: e->a)
-size_t levenshtein_distance_substring(const QString& substring, const QString& fullstring);
 
 // Calculate Levenshtein (edit) distance between two strings.
 // This is the minimum number of single-character edits (insertions, deletions, substitutions)

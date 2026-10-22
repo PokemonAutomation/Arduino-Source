@@ -79,7 +79,7 @@ FileLogger& global_file_logger(){
     static FileLogger logger(
         GlobalThreadPools::unlimited_normal(),
         FileLoggerConfig{
-            .file_path = USER_FILE_PATH() + QCoreApplication::applicationName().toStdString() + ".log",
+            .file_path = USER_FILE_PATH() + Filesystem::application_binary_name().stem().string() + ".log",
         }
     );
     return logger;

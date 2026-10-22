@@ -4,6 +4,7 @@
  *
  */
 
+#include <algorithm>
 #include <cmath>
 #include <vector>
 #include "Common/Cpp/Exceptions.h"
@@ -33,71 +34,6 @@ void print(const std::vector<size_t>& v){
     cout << str << endl;
 }
 
-
-size_t levenshtein_distance(const QString& x, const QString& y){
-    size_t xlen = x.size();
-    size_t ylen = y.size();
-
-    std::vector<size_t> v0(ylen + 1);
-    std::vector<size_t> v1(ylen + 1);
-
-    for (size_t i = 0; i <= ylen; i++){
-        v0[i] = i;
-    }
-
-    for (size_t i = 0; i < xlen; i++){
-        v1[0] = i + 1;
-
-        for (size_t j = 0; j < ylen; j++){
-            size_t delete_cost = v0[j + 1] + 1;
-            size_t insert_cost = v1[j] + 1;
-            size_t sub_cost = v0[j];
-            if (x[(int)i] != y[(int)j]){
-                sub_cost += 1;
-            }
-            v1[j + 1] = std::min({delete_cost, insert_cost, sub_cost});
-        }
-
-        std::swap(v0, v1);
-    }
-
-    return v0[ylen];
-}
-size_t levenshtein_distance_substring(const QString& substring, const QString& fullstring){
-    size_t xlen = fullstring.size();
-    size_t ylen = substring.size();
-
-    std::vector<size_t> v0(ylen + 1);
-    std::vector<size_t> v1(ylen + 1);
-
-    for (size_t i = 0; i <= ylen; i++){
-        v0[i] = i;
-    }
-//    print(v0);
-
-    size_t min = ylen;
-
-    for (size_t i = 0; i < xlen; i++){
-        v1[0] = 0;
-
-        for (size_t j = 0; j < ylen; j++){
-            size_t delete_cost = v0[j + 1] + 1;
-            size_t insert_cost = v1[j] + 1;
-            size_t sub_cost = v0[j];
-            if (fullstring[(int)i] != substring[(int)j]){
-                sub_cost += 1;
-            }
-            v1[j + 1] = std::min({delete_cost, insert_cost, sub_cost});
-        }
-
-        std::swap(v0, v1);
-
-        min = std::min(min, v0[ylen]);
-//        print(v0);
-    }
-
-    return min;
-}
 
 template <typename StringType>
 size_t levenshtein_distance(const StringType& x, const StringType& y){
@@ -208,7 +144,7 @@ double binomial_coefficient_double(size_t degree, size_t index){
         index = degree - index;
     }
 
-    return row[index];
+    return (double)row[index];
 }
 
 
@@ -281,7 +217,7 @@ StringMatchResult match_substring(
 
 
     for (const auto& item : database){
-        double token_length = item.first.size();
+        size_t token_length = item.first.size();
 
         size_t distance = levenshtein_distance_substring(item.first, normalized);
 
