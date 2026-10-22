@@ -19,7 +19,7 @@ namespace PokemonAutomation{
 
 class Logger;
 class AudioSource;
-class AudioSink;
+class AudioOutputDevice;
 class WorkingAudioToFFT;
 
 namespace Kernels{
@@ -72,11 +72,10 @@ private:
 
     void init_audio_sink();
 
-    //  New pipeline tree. The FFT endpoint has switched over: the FFT
-    //  branch feeds m_fft_node, and m_fft_listener forwards its FFTs to
-    //  the pair's FFTListener set. The sink endpoint still runs through
-    //  the legacy reader / sink path; the sink branch's encoder output
-    //  goes nowhere until it switches over.
+    //  New pipeline tree. Both endpoints have switched over: the FFT
+    //  branch feeds m_fft_node (m_fft_listener forwards its FFTs to the
+    //  pair's FFTListener set), and the sink branch's encoder pushes raw
+    //  bytes to m_sink_device, the open output device.
     //  All of these are only touched while holding m_lock; the producing
     //  thread only ever sees them through the node listener sets, where
     //  ListenerSet::remove blocks on in-flight pushes so rebuilds never
@@ -118,7 +117,8 @@ private:
     float m_file_input_multiplier = 1.0;
     float m_device_input_multiplier = 1.0;
     double m_output_volume = 1.0;
-    std::unique_ptr<AudioSink> m_writer;
+    std::unique_ptr<AudioOutputDevice> m_sink_device;   //  Attaches to m_sink_encoder.
+
 
     std::unique_ptr<InternalFFTListener> m_fft_listener;    //  Attaches to m_fft_node.
 

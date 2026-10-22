@@ -6,12 +6,14 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
+#include "CommonFramework/AudioPipeline/AudioStream.h"
 #include "CommonFramework/AudioPipeline/ChannelMixer.h"
 #include "CommonFramework/AudioPipeline/IO/AudioSource.h"
-#include "CommonFramework/AudioPipeline/IO/AudioSink.h"
+#include "CommonFramework/AudioPipeline/IO/AudioOutputDevice.h"
 #include "CommonFramework/AudioPipeline/Spectrum/FFTStreamer.h"
 #include "Kernels/AudioPipeline/Kernels_RawAudio2WorkingAudio.h"
 #include "Kernels/AudioPipeline/Kernels_WorkingAudio2RawAudio.h"
@@ -63,6 +65,33 @@ QAudioFormat channel_format(size_t channels){
 }
 
 
+//  The sink endpoint's rate / channel shape for an output preset. The
+//  INTERLEAVE_96000 presets are remapped to DUAL_48000 before this is
+//  called; returns false for NONE.
+bool sink_shape(AudioChannelFormat format, size_t& rate, size_t& channels){
+    switch (format){
+    case AudioChannelFormat::MONO_48000:
+        rate = 48000;
+        channels = 1;
+        return true;
+    case AudioChannelFormat::DUAL_44100:
+        rate = 44100;
+        channels = 2;
+        return true;
+    case AudioChannelFormat::DUAL_48000:
+        rate = 48000;
+        channels = 2;
+        return true;
+    case AudioChannelFormat::MONO_96000:
+        rate = 96000;
+        channels = 1;
+        return true;
+    default:
+        return false;
+    }
+}
+
+
 }
 
 
@@ -100,16 +129,6 @@ public:
         m_parent.m_reader->remove_listener(*this);
     }
     virtual void on_samples(const float* data, size_t frames) override{
-        {
-            AudioPassthroughPairQt& parent = m_parent;
-            WriteSpinLock lg(parent.m_lock);
-            if (parent.m_writer){
-                AudioFloatStreamListener* listener = parent.m_writer->float_stream_listener();
-                if (listener){
-                    listener->on_samples(data, frames);
-                }
-            }
-        }
         m_parent.m_stream_listeners.run_method(
             &AudioFloatStreamListener::on_samples,
             data, frames
@@ -165,9 +184,7 @@ void AudioPassthroughPairQt::teardown_tree(){
     m_fft_node.reset();
     m_fft_mixer.reset();
     m_fft_resampler.reset();
-    m_sink_mixer.reset();
-    m_sink_resampler.reset();
-    m_sink_encoder.reset();
+    teardown_sink_branch();
     m_source_decoder.reset();
 }
 
@@ -181,6 +198,11 @@ void AudioPassthroughPairQt::teardown_sink_branch(){
         }else if (m_sink_encoder){
             m_source_decoder->remove_listener(*m_sink_encoder);
         }
+    }
+    //  Detach the device from the encoder's listener set before the
+    //  encoder is destroyed; remove blocks on in-flight pushes.
+    if (m_sink_encoder && m_sink_device){
+        m_sink_encoder->remove_listener(*m_sink_device);
     }
     m_sink_mixer.reset();
     m_sink_resampler.reset();
@@ -242,9 +264,9 @@ void AudioPassthroughPairQt::rebuild_sink_branch(){
     if (!m_reader || !m_source_decoder){
         return;
     }
-    //  The sink branch mirrors the legacy writer: it exists only when the
-    //  output device is open and actually accepts the target format.
-    if (!m_writer || !m_writer->float_stream_listener()){
+    //  The sink branch exists only when the output device is open and
+    //  actually accepts the target format.
+    if (!m_sink_device){
         return;
     }
 
@@ -259,24 +281,7 @@ void AudioPassthroughPairQt::rebuild_sink_branch(){
     }
     size_t sink_rate;
     size_t sink_channels;
-    switch (output_format){
-    case AudioChannelFormat::MONO_48000:
-        sink_rate = 48000;
-        sink_channels = 1;
-        break;
-    case AudioChannelFormat::DUAL_44100:
-        sink_rate = 44100;
-        sink_channels = 2;
-        break;
-    case AudioChannelFormat::DUAL_48000:
-        sink_rate = 48000;
-        sink_channels = 2;
-        break;
-    case AudioChannelFormat::MONO_96000:
-        sink_rate = 96000;
-        sink_channels = 1;
-        break;
-    default:
+    if (!sink_shape(output_format, sink_rate, sink_channels)){
         return;
     }
 
@@ -343,6 +348,9 @@ void AudioPassthroughPairQt::rebuild_sink_branch(){
         head = m_sink_mixer.get();
     }
     m_source_decoder->push_front_listener(*head);
+
+    //  The branch's open tail: raw bytes to the output device.
+    m_sink_encoder->add_listener(*m_sink_device);
 }
 
 
@@ -367,9 +375,9 @@ void AudioPassthroughPairQt::reset(
         auto scope_check = m_sanitizer.check_scope();
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_reader){
-            m_writer.reset();
-            m_sample_listener.reset();
             teardown_tree();
+            m_sink_device.reset();
+            m_sample_listener.reset();
             m_reader.reset();
             m_input_format = AudioChannelFormat::NONE;
         }
@@ -393,9 +401,9 @@ void AudioPassthroughPairQt::reset(
         auto scope_check = m_sanitizer.check_scope();
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_reader){
-            m_writer.reset();
-            m_sample_listener.reset();
             teardown_tree();
+            m_sink_device.reset();
+            m_sample_listener.reset();
             m_reader.reset();
             m_input_format = AudioChannelFormat::NONE;
         }
@@ -430,9 +438,9 @@ void AudioPassthroughPairQt::set_audio_source(const std::string& file){
         auto scope_check = m_sanitizer.check_scope();
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_reader){
-            m_writer.reset();
-            m_sample_listener.reset();
             teardown_tree();
+            m_sink_device.reset();
+            m_sample_listener.reset();
             m_reader.reset();
             m_input_format = AudioChannelFormat::NONE;
         }
@@ -450,9 +458,9 @@ void AudioPassthroughPairQt::set_audio_source(const AudioDeviceInfo& device, Aud
         auto scope_check = m_sanitizer.check_scope();
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_reader){
-            m_writer.reset();
-            m_sample_listener.reset();
             teardown_tree();
+            m_sink_device.reset();
+            m_sample_listener.reset();
             m_reader.reset();
             m_input_format = AudioChannelFormat::NONE;
         }
@@ -472,9 +480,9 @@ void AudioPassthroughPairQt::clear_audio_sink(){
     QMetaObject::invokeMethod(this, [this]{
         auto scope_check = m_sanitizer.check_scope();
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-        m_writer.reset();
         m_output_device = AudioDeviceInfo();
         teardown_sink_branch();
+        m_sink_device.reset();
     });
 }
 void AudioPassthroughPairQt::set_audio_sink(const AudioDeviceInfo& device, double volume){
@@ -482,7 +490,8 @@ void AudioPassthroughPairQt::set_audio_sink(const AudioDeviceInfo& device, doubl
     QMetaObject::invokeMethod(this, [this, device, volume]{
         auto scope_check = m_sanitizer.check_scope();
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-        m_writer.reset();
+        teardown_sink_branch();
+        m_sink_device.reset();
         m_output_device = device;
         m_output_volume = volume;
         init_audio_sink();
@@ -511,7 +520,40 @@ void AudioPassthroughPairQt::init_audio_sink(){
         return;
     }
     if (m_output_device){
-        m_writer.reset(new AudioSink(m_logger, m_output_device, output_format, m_output_volume));
+        //  Open the device in the input format, as the legacy AudioSink did:
+        //  the native preferred format with its rate / channel count forced
+        //  to the output format's, keeping the native sample format (falling
+        //  back to float when it isn't one we can convert to). The output
+        //  volume is applied by the sink branch's encoder, so the device
+        //  stays at full volume.
+        NativeAudioInfo native_info = m_output_device.native_info();
+        QAudioFormat target_format = native_info.preferredFormat();
+        set_format(target_format, output_format);
+        AudioSampleFormat sample_format = get_sample_format(target_format);
+        if (sample_format == AudioSampleFormat::INVALID){
+            sample_format = AudioSampleFormat::FLOAT32;
+            set_sample_format_to_float(target_format);
+        }
+        m_logger.log("AudioOutputDevice(): Target: " + dump_audio_format(target_format));
+        m_logger.log("AudioOutputDevice(): Native: " + dump_audio_format(native_info.preferredFormat()));
+        if (!native_info.isFormatSupported(target_format)){
+            m_logger.log(
+                "Audio output device does not support the requested audio format. Audio output is disabled. "
+                "Try setting the output device to the same sample rate and channel count as the input device "
+                "in your OS sound settings.",
+                COLOR_RED
+            );
+            return;
+        }
+        size_t sink_rate;
+        size_t sink_channels;
+        if (!sink_shape(output_format, sink_rate, sink_channels)){
+            return;
+        }
+        m_sink_device.reset(new AudioOutputDevice(
+            m_logger, native_info, target_format,
+            to_sample_format(sample_format), sink_rate, sink_channels
+        ));
     }
     rebuild_sink_branch();
 }
@@ -523,11 +565,10 @@ void AudioPassthroughPairQt::set_sink_volume(double volume){
         auto scope_check = m_sanitizer.check_scope();
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_output_volume = volume;
-        if (m_writer){
-            m_writer->set_volume(volume);
-        }
         if (m_sink_encoder){
-            m_sink_encoder->set_multiplier(convert_audio_volume_from_slider(volume));
+            float absolute = convert_audio_volume_from_slider(volume);
+            m_logger.log("Volume set to: Slider = " + tostr_default(volume) + " -> Absolute = " + tostr_default(absolute));
+            m_sink_encoder->set_multiplier(absolute);
         }
     });
 }
