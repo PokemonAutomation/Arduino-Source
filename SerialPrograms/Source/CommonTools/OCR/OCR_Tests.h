@@ -24,6 +24,9 @@ void add_tests_number_waterfill_OCR(UnitTestDatabase& database);
 // through `ocr_read()` with a multi-line page segmentation mode.
 void add_tests_multiline_OCR(UnitTestDatabase& database);
 
+// Pure-logic tests of the weighted Levenshtein distance in OCR_TextMatcher.
+void add_tests_text_matcher(UnitTestDatabase& database);
+
 
 
 }
