@@ -4,608 +4,406 @@
  *
  */
 
-#include "Common/Cpp/Color.h"
-#include "Common/Cpp/Time.h"
+#include <format>
+#include <memory>
+#include "Common/Cpp/CancellableScope.h"
+#include "Common/Cpp/CpuId/CpuId.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
-#ifdef PA_AutoDispatch_arm64_20_M1
-#include "Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x8_arm64_NEON.h"
-#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_arm64_NEON.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Core_64x8_arm64_NEON.h"
-#endif
-//#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64xH_Default.h"
-#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
-#include "Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range.h"
-#include "Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean.h"
-#include "Kernels_ImageFilter_Tests.h"
 #include "Tests/GuardPageImage.h"
-#include "Tests/TestUtils.h"
+#include "Kernels_ImageFilter_Tests.h"
 
-#include <iostream>
-using std::cout;
-using std::cerr;
-using std::endl;
-using std::flush;
 namespace PokemonAutomation{
 namespace Kernels{
 
+
+//  The range filter implementations, defined in RGB32_Range/Kernels_ImageFilter_RGB32_Range_*.cpp.
+//  `filter_rgb32_range()` and `to_blackwhite_rgb32_range()` in Kernels_ImageFilter_RGB32_Range.cpp
+//  declare the same functions and call the best one for the CPU. These tests call them directly,
+//  so that every implementation this CPU supports is tested.
+size_t filter_rgb32_range_Default(
+    const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
+    uint32_t* out, size_t out_bytes_per_row,
+    uint32_t replacement, bool replace_color_within_range,
+    uint32_t mins, uint32_t maxs
+);
+size_t to_blackwhite_rgb32_range_Default(
+    const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
+    uint32_t* out, size_t out_bytes_per_row,
+    bool in_range_black,
+    uint32_t mins, uint32_t maxs
+);
+size_t filter_rgb32_range_x64_SSE42(
+    const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
+    uint32_t* out, size_t out_bytes_per_row,
+    uint32_t replacement, bool replace_color_within_range,
+    uint32_t mins, uint32_t maxs
+);
+size_t to_blackwhite_rgb32_range_x64_SSE42(
+    const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
+    uint32_t* out, size_t out_bytes_per_row,
+    bool in_range_black,
+    uint32_t mins, uint32_t maxs
+);
+size_t filter_rgb32_range_x64_AVX2(
+    const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
+    uint32_t* out, size_t out_bytes_per_row,
+    uint32_t replacement, bool replace_color_within_range,
+    uint32_t mins, uint32_t maxs
+);
+size_t to_blackwhite_rgb32_range_x64_AVX2(
+    const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
+    uint32_t* out, size_t out_bytes_per_row,
+    bool in_range_black,
+    uint32_t mins, uint32_t maxs
+);
+size_t filter_rgb32_range_x64_AVX512(
+    const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
+    uint32_t* out, size_t out_bytes_per_row,
+    uint32_t replacement, bool replace_color_within_range,
+    uint32_t mins, uint32_t maxs
+);
+size_t to_blackwhite_rgb32_range_x64_AVX512(
+    const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
+    uint32_t* out, size_t out_bytes_per_row,
+    bool in_range_black,
+    uint32_t mins, uint32_t maxs
+);
+size_t filter_rgb32_range_arm64_NEON(
+    const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
+    uint32_t* out, size_t out_bytes_per_row,
+    uint32_t replacement, bool replace_color_within_range,
+    uint32_t mins, uint32_t maxs
+);
+size_t to_blackwhite_rgb32_range_arm64_NEON(
+    const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
+    uint32_t* out, size_t out_bytes_per_row,
+    bool in_range_black,
+    uint32_t mins, uint32_t maxs
+);
+
+//  The filter_by_mask() implementations, one per binary matrix type, defined in
+//  BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_*.cpp. `filter_by_mask()` in
+//  Kernels_BinaryImage_BasicFilters.cpp declares the same functions and calls the one for
+//  the matrix type.
+void filter_by_mask_64x4_Default      (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
+void filter_by_mask_64x8_x64_SSE42    (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
+void filter_by_mask_64x16_x64_AVX2    (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
+void filter_by_mask_64x32_x64_AVX512  (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
+void filter_by_mask_64x64_x64_AVX512  (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
+void filter_by_mask_64x8_arm64_NEON   (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
+
+
+namespace{
+
+//  One range filter implementation to test: its name in the test name, and its two functions.
+struct RangeFilterImplementation{
+    using Filter = size_t (*)(
+        const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
+        uint32_t* out, size_t out_bytes_per_row,
+        uint32_t replacement, bool replace_color_within_range,
+        uint32_t mins, uint32_t maxs
+    );
+    using ToBlackWhite = size_t (*)(
+        const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
+        uint32_t* out, size_t out_bytes_per_row,
+        bool in_range_black,
+        uint32_t mins, uint32_t maxs
+    );
+
+    std::string name;
+    Filter filter;
+    ToBlackWhite to_blackwhite;
+};
+
+//  One filter_by_mask() implementation to test: its name in the test name, the binary
+//  matrix type it works on, and the function.
+struct FilterByMaskImplementation{
+    using Function = void (*)(
+        const PackedBinaryMatrix_IB& matrix,
+        uint32_t* image, size_t bytes_per_row,
+        uint32_t replace_with, bool replace_if_zero
+    );
+
+    std::string name;
+    BinaryMatrixType matrix_type;
+    Function filter_by_mask;
+};
+
+
+//  An ARGB color range: a pixel is in range if each of its A, R, G and B bytes is within
+//  the bytes of `mins` and `maxs`.
+struct ColorRange{
+    uint32_t mins;
+    uint32_t maxs;
+};
+
+//  The ranges to test. Each has pixels both in and out of range on every test image. The
+//  bounds include 0x00, 0x7f, 0x80 and 0xff, the edges of signed and unsigned bytes.
+constexpr ColorRange RANGES[] = {
+    {0xff000000, 0xff8080ff},
+    {0xff204060, 0xffe0c0ff},
+    {0xff60607f, 0xffc8c8c8},
+    {0xffa0a0a0, 0xffffffff},
+};
+
+constexpr uint32_t REPLACEMENT_COLOR = 0x13572468;
+constexpr uint32_t BLACK = 0xff000000;
+constexpr uint32_t WHITE = 0xffffffff;
+
+//  Whether `pixel` is in `range`. For example, 0xff7f3080 is in the range
+//  [0xff000000, 0xff8080ff], but 0xff813080 is not, since its R (0x81) is above 0x80.
+bool in_range(uint32_t pixel, const ColorRange& range){
+    for (int shift = 0; shift < 32; shift += 8){
+        const uint32_t value = (pixel >> shift) & 0xff;
+        if (value < ((range.mins >> shift) & 0xff) || value > ((range.maxs >> shift) & 0xff)){
+            return false;
+        }
+    }
+    return true;
+}
+
+size_t count_in_range(const GuardPageImageRGB32& image, const ColorRange& range){
+    size_t count = 0;
+    for (size_t y = 0; y < image.height(); y++){
+        for (size_t x = 0; x < image.width(); x++){
+            count += in_range(image.pixel(x, y), range);
+        }
+    }
+    return count;
+}
+
+//  Compare each pixel of `output` with `expected_pixel(<the input pixel>)`. Return a
+//  description of the first wrong pixel, or an empty string if all pixels are right.
+template <typename ExpectedPixel>
+std::string find_wrong_pixel(
+    const GuardPageImageRGB32& input, const GuardPageImageRGB32& output,
+    ExpectedPixel expected_pixel
+){
+    for (size_t y = 0; y < input.height(); y++){
+        for (size_t x = 0; x < input.width(); x++){
+            const uint32_t pixel = input.pixel(x, y);
+            const uint32_t expected = expected_pixel(pixel);
+            if (output.pixel(x, y) != expected){
+                return std::format(
+                    "pixel ({}, {}) is {:08x}: got {:08x} but should be {:08x}",
+                    x, y, pixel, output.pixel(x, y), expected
+                );
+            }
+        }
+    }
+    return "";
+}
+
+std::string describe(const ColorRange& range){
+    return std::format("range [{:08x}, {:08x}]", range.mins, range.maxs);
+}
+
+
+
+//  Check one implementation of `filter_rgb32_range()` and `to_blackwhite_rgb32_range()`
+//  on a real image, for each of `RANGES`, against `in_range()`:
+//  - `filter_rgb32_range()` copies the image, but replaces the pixels in range (or the
+//    pixels out of range) with `REPLACEMENT_COLOR`.
+//  - `to_blackwhite_rgb32_range()` makes the pixels in range black and the others white
+//    (or the opposite).
+//  Both must return the number of pixels in range. The input and output are guard-page
+//  images, so the test also crashes if the implementation reads or writes past the last
+//  pixel.
 class Test_ImageFilterRGB32Range : public UnitTest{
 public:
     Test_ImageFilterRGB32Range(
+        const RangeFilterImplementation& implementation,
         const std::string& image
     )
-        : UnitTest("Kernels::ImageFilterRGB32Range - " + image)
+        : UnitTest("Kernels::ImageFilterRGB32Range - " + implementation.name + " - " + image)
+        , m_implementation(implementation)
         , m_image(UNIT_TEST_RESOURCE_PATH() + image)
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        //  Copy the test image into guard-page memory with packed rows, so a
-        //  kernel that reads or writes past the last pixel faults.
-        ImageRGB32 file_image(m_image);
-        GuardPageImageRGB32 image(file_image);
+        const ImageRGB32 file_image(m_image);
+        const GuardPageImageRGB32 image(file_image);
+        GuardPageImageRGB32 output(image.width(), image.height());
 
-        const size_t width = image.width(), height = image.height();
-        cout << "Testing filter_rgb32_range(), image size " << width << " x " << height << endl;
+        for (const ColorRange& range : RANGES){
+            scope.throw_if_cancelled();
+            const size_t expected_count = count_in_range(image, range);
 
-        Color min_color(0, 0, 0);
-        Color max_color(63, 63, 63);
-        // Color max_color(238, 24, 42);
+            for (bool replace_color_within_range : {true, false}){
+                const size_t count = m_implementation.filter(
+                    image.data(), image.bytes_per_row(), image.width(), image.height(),
+                    output.data(), output.bytes_per_row(),
+                    REPLACEMENT_COLOR, replace_color_within_range,
+                    range.mins, range.maxs
+                );
+                const std::string error = find_wrong_pixel(image, output, [&](uint32_t pixel){
+                    return in_range(pixel, range) == replace_color_within_range ? REPLACEMENT_COLOR : pixel;
+                });
+                const std::string name = std::format(
+                    "filter_rgb32_range(), {}, replace_color_within_range = {}",
+                    describe(range), replace_color_within_range
+                );
+                if (count != expected_count){
+                    return std::format("Error: {}: counted {} pixels in range but should be {}.", name, count, expected_count);
+                }
+                if (!error.empty()){
+                    return std::format("Error: {}: {}.", name, error);
+                }
+            }
 
-        const uint32_t mins = uint32_t(min_color);
-        const uint32_t maxs = uint32_t(max_color);
-
-        GuardPageImageRGB32 image_out(image.width(), image.height());
-        GuardPageImageRGB32 image_out_2(image.width(), image.height());
-        size_t pixels_in_range = 0;
-
-        const bool replace_color_within_range = true;
-        auto time_start = current_time();
-        // auto new_image = filter_rgb32_range(image, mins, maxs, COLOR_WHITE, replace_color_within_range);
-        pixels_in_range = Kernels::filter_rgb32_range(
-            image.data(), image.bytes_per_row(), image.width(), image.height(),
-            image_out.data(), image_out.bytes_per_row(),
-            (uint32_t)COLOR_WHITE, replace_color_within_range,
-            mins, maxs
-        );
-        auto time_end = current_time();
-        auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(time_end - time_start).count();
-        auto ms = ns / 1000000.;
-        cout << "One filter time: " << ms << " ms" << endl;
-
-        size_t pixels_in_range_2 = Kernels::filter_rgb32_range(
-            image.data(), image.bytes_per_row(), image.width(), image.height(),
-            image_out_2.data(), image_out_2.bytes_per_row(),
-            (uint32_t)COLOR_WHITE, !replace_color_within_range,
-            mins, maxs
-        );
-
-        TEST_RESULT_EQUAL_STR(pixels_in_range, pixels_in_range_2);
-
-        size_t actual_num_pixels_in_range = 0;
-        size_t error_count = 0;
-        for (size_t y = 0; y < height; y++){
-            for (size_t x = 0; x < width; x++){
-                const Color color(image.pixel(x, y));
-                const Color new_color(image_out.pixel(x, y));
-                const Color new_color_2(image_out_2.pixel(x, y));
-                bool in_range = (min_color.alpha() <= color.alpha() && color.alpha() <= max_color.alpha());
-                in_range = in_range && (min_color.red() <= color.red() && color.red() <= max_color.red());
-                in_range = in_range && (min_color.green() <= color.green() && color.green() <= max_color.green());
-                in_range = in_range && (min_color.blue() <= color.blue() && color.blue() <= max_color.blue());
-                actual_num_pixels_in_range += in_range;
-                if (error_count < 10){
-                    // Print first 10 errors:
-                    if (in_range && new_color != COLOR_WHITE){
-                        cout << "Error: wrong filter result: old color " << color.to_string() << ", (x,y) = "
-                            << x << ", " << y << ", should be in range but not found by the function" << endl;
-                        ++error_count;
-                    }else if (in_range == false && new_color != color){
-                        cout << "Error: wrong filter result: old color " << color.to_string() << ", (x,y) = "
-                            << x << ", " << y << ", should not be changed by the function" << endl;
-                        ++error_count;
-                    }
-
-                    if (in_range && new_color_2 != color){
-                        cout << "Error: wrong inverse filter result: old color " << color.to_string() << ", (x,y) = "
-                            << x << ", " << y << ", should not be changed by the function" << endl;
-                        ++error_count;
-                    }else if (in_range == false && new_color_2 != COLOR_WHITE){
-                        cout << "Error: wrong inverse filter result: old color " << color.to_string() << ", (x,y) = "
-                            << x << ", " << y << ", should not be in range but not found by the function" << endl;
-                        ++error_count;
-                    }
+            for (bool in_range_black : {true, false}){
+                const size_t count = m_implementation.to_blackwhite(
+                    image.data(), image.bytes_per_row(), image.width(), image.height(),
+                    output.data(), output.bytes_per_row(),
+                    in_range_black,
+                    range.mins, range.maxs
+                );
+                const std::string error = find_wrong_pixel(image, output, [&](uint32_t pixel){
+                    return in_range(pixel, range) == in_range_black ? BLACK : WHITE;
+                });
+                const std::string name = std::format(
+                    "to_blackwhite_rgb32_range(), {}, in_range_black = {}",
+                    describe(range), in_range_black
+                );
+                if (count != expected_count){
+                    return std::format("Error: {}: counted {} pixels in range but should be {}.", name, count, expected_count);
+                }
+                if (!error.empty()){
+                    return std::format("Error: {}: {}.", name, error);
                 }
             }
         }
-        cout << "Found " << actual_num_pixels_in_range << " pixels in range" << endl;
-        if (pixels_in_range != actual_num_pixels_in_range){
-            cout << "Error: wrong pixels in range: " << pixels_in_range << " actual: " << actual_num_pixels_in_range << endl;
-            return false;
-        }
-
-        if (error_count){
-            return false;
-        }
-
-        // We try to wait for three seconds:
-        const size_t num_iters = size_t(3000 / ms);
-        time_start = current_time();
-        for (size_t i = 0; i < num_iters; i++){
-            Kernels::filter_rgb32_range(
-                image.data(), image.bytes_per_row(), image.width(), image.height(),
-                image_out.data(), image_out.bytes_per_row(),
-                (uint32_t)COLOR_WHITE, replace_color_within_range,
-                mins, maxs
-            );
-        }
-        time_end = current_time();
-        ms = (double)std::chrono::duration_cast<Milliseconds>(time_end - time_start).count();
-        cout << "Running " << num_iters << " iters, avg filter time: " << ms / num_iters << " ms" << endl;
-
         return true;
-    };
+    }
 
 private:
-    std::string m_image;
-};
-
-
-class Test_ImageFilterRGB32Euclidean : public UnitTest{
-public:
-    Test_ImageFilterRGB32Euclidean(
-        const std::string& image
-    )
-        : UnitTest("Kernels::ImageFilterRGB32Euclidean - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
-    {}
-
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        //  Copy the test image into guard-page memory with packed rows, so a
-        //  kernel that reads or writes past the last pixel faults.
-        ImageRGB32 file_image(m_image);
-        GuardPageImageRGB32 image(file_image);
-
-        const size_t width = image.width();
-        const size_t height = image.height();
-        cout << "Testing test_kernels_FilterRGB32Euclidean(), image size " << width << " x " << height << endl;
-
-        Color middle_color = Color(image.pixel(width / 2, height / 2));
-        cout << "Expected color: " << middle_color.to_string() << endl;
-
-        double max_dist = 50.0;
-        size_t max_dist2 = size_t(max_dist * max_dist);
-
-        GuardPageImageRGB32 image_out(image.width(), image.height());
-        GuardPageImageRGB32 image_out_2(image.width(), image.height());
-        size_t pixels_in_range = 0;
-
-        const bool replace_color_within_range = true;
-        auto time_start = current_time();
-        pixels_in_range = Kernels::filter_rgb32_euclidean(
-            image.data(), image.bytes_per_row(), image.width(), image.height(),
-            image_out.data(), image_out.bytes_per_row(),
-            (uint32_t)COLOR_WHITE, replace_color_within_range,
-            uint32_t(middle_color), max_dist
-        );
-        auto time_end = current_time();
-        auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(time_end - time_start).count();
-        auto ms = ns / 1000000.;
-        cout << "One filter time: " << ms << " ms" << endl;
-
-        size_t pixels_in_range_2 = Kernels::filter_rgb32_euclidean(
-            image.data(), image.bytes_per_row(), image.width(), image.height(),
-            image_out_2.data(), image_out_2.bytes_per_row(),
-            (uint32_t)COLOR_WHITE, !replace_color_within_range,
-            uint32_t(middle_color), max_dist
-        );
-
-        TEST_RESULT_EQUAL_STR(pixels_in_range, pixels_in_range_2);
-
-        size_t actual_num_pixels_in_range = 0;
-        size_t error_count = 0;
-        for (size_t y = 0; y < height; y++){
-            for (size_t x = 0; x < width; x++){
-                const Color color(image.pixel(x, y));
-                const Color new_color(image_out.pixel(x, y));
-                const Color new_color_2(image_out_2.pixel(x, y));
-                int red_dif = (color.red() - middle_color.red());
-                int green_dif = (color.green() - middle_color.green());
-                int blue_dif = (color.blue() - middle_color.blue());
-                size_t color_dist2 = red_dif * red_dif + green_dif * green_dif + blue_dif * blue_dif;
-                bool in_range = color_dist2 <= max_dist2;
-                actual_num_pixels_in_range += in_range;
-                if (error_count < 10){
-                    // Print first 10 errors:
-                    if (in_range && new_color != COLOR_WHITE){
-                        cout << "Error: wrong filter result: old color " << color.to_string()
-                            << ", (x,y) = (" << x << ", " << y << ")"
-                            << ", dist2 " << color_dist2 << ", max dist2 " << max_dist2
-                            << ", should be in range but not found by the function" << endl;
-                        ++error_count;
-                    }else if (in_range == false && new_color != color){
-                        cout << "Error: wrong filter result: old color " << color.to_string()
-                            << ", (x,y) = (" << x << ", " << y << ")"
-                            << ", dist2 " << color_dist2 << ", max dist2 " << max_dist2
-                            << ", should not be changed by the function" << endl;
-                        ++error_count;
-                    }
-
-                    if (in_range && new_color_2 != color){
-                        cout << "Error: wrong inverse filter result: old color " << color.to_string()
-                            << ", (x,y) = (" << x << ", " << y << ")"
-                            << ", dist2 " << color_dist2 << ", max dist2 " << max_dist2
-                            << ", should not be changed by the function" << endl;
-                        ++error_count;
-                    }else if (in_range == false && new_color_2 != COLOR_WHITE){
-                        cout << "Error: wrong inverse filter result: old color " << color.to_string()
-                            << ", (x,y) = (" << x << ", " << y << ")"
-                            << ", dist2 " << color_dist2 << ", max dist2 " << max_dist2
-                            << ", should not be in range but not found by the function" << endl;
-                        ++error_count;
-                    }
-                }
-            }
-        }
-        cout << "Found " << actual_num_pixels_in_range << " pixels in range" << endl;
-        if (pixels_in_range != actual_num_pixels_in_range){
-            cout << "Error: wrong pixels in range: " << pixels_in_range << " actual: " << actual_num_pixels_in_range << endl;
-            return false;
-        }
-
-        if (error_count){
-            return false;
-        }
-
-        // We try to wait for three seconds:
-        const size_t num_iters = size_t(3000 / ms);
-        time_start = current_time();
-        for (size_t i = 0; i < num_iters; i++){
-            pixels_in_range = Kernels::filter_rgb32_euclidean(
-                image.data(), image.bytes_per_row(), image.width(), image.height(),
-                image_out.data(), image_out.bytes_per_row(),
-                (uint32_t)COLOR_WHITE, replace_color_within_range,
-                uint32_t(middle_color), max_dist
-            );
-        }
-        time_end = current_time();
-        ms = (double)std::chrono::duration_cast<Milliseconds>(time_end - time_start).count();
-        cout << "Running " << num_iters << " iters, avg filter time: " << ms / num_iters << " ms" << endl;
-
-        return true;
-        
-    };
-
-private:
-    std::string m_image;
-};
-
-
-class Test_ImageToBlackWhiteRGB32Range : public UnitTest{
-public:
-    Test_ImageToBlackWhiteRGB32Range(
-        const std::string& image
-    )
-        : UnitTest("Kernels::ImageToBlackWhiteRGB32Range - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
-    {}
-
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        //  Copy the test image into guard-page memory with packed rows, so a
-        //  kernel that reads or writes past the last pixel faults.
-        ImageRGB32 file_image(m_image);
-        GuardPageImageRGB32 image(file_image);
-
-        const size_t width = image.width();
-        const size_t height = image.height();
-        cout << "Testing to_black_white_rgb32_range(), image size " << width << " x " << height << endl;
-
-        Color min_color(0, 0, 0);
-        // Color min_color(0);
-
-        Color max_color(63, 63, 63);
-        // Color max_color(255, 255, 255);
-        // Color max_color(238, 24, 42);
-        cout << "min color: " << min_color.to_string() << " max color: " << max_color.to_string() << endl;
-
-        const uint32_t mins = uint32_t(min_color);
-        const uint32_t maxs = uint32_t(max_color);
-
-        GuardPageImageRGB32 image_out(image.width(), image.height());
-        GuardPageImageRGB32 image_out_2(image.width(), image.height());
-        size_t pixels_in_range = 0;
-
-        const bool in_range_black = true;
-        auto time_start = current_time();
-        // auto new_image = filter_rgb32_range(image, mins, maxs, COLOR_WHITE, replace_color_within_range);
-        pixels_in_range = Kernels::to_blackwhite_rgb32_range(
-            image.data(), image.bytes_per_row(), image.width(), image.height(),
-            image_out.data(), image_out.bytes_per_row(),
-            in_range_black,
-            mins, maxs
-        );
-        auto time_end = current_time();
-        auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(time_end - time_start).count();
-        auto ms = ns / 1000000.;
-        cout << "One filter time: " << ms << " ms" << endl;
-
-        size_t pixels_in_range_2 = Kernels::to_blackwhite_rgb32_range(
-            image.data(), image.bytes_per_row(), image.width(), image.height(),
-            image_out_2.data(), image_out_2.bytes_per_row(),
-            !in_range_black,
-            mins, maxs
-        );
-
-        TEST_RESULT_EQUAL_STR(pixels_in_range, pixels_in_range_2);
-
-        size_t actual_num_pixels_in_range = 0;
-        size_t error_count = 0;
-        for (size_t y = 0; y < height; y++){
-            for (size_t x = 0; x < width; x++){
-                const Color color(image.pixel(x, y));
-                const Color new_color(image_out.pixel(x, y));
-                const Color new_color_2(image_out_2.pixel(x, y));
-                bool in_range = (min_color.alpha() <= color.alpha() && color.alpha() <= max_color.alpha());
-                in_range = in_range && (min_color.red() <= color.red() && color.red() <= max_color.red());
-                in_range = in_range && (min_color.green() <= color.green() && color.green() <= max_color.green());
-                in_range = in_range && (min_color.blue() <= color.blue() && color.blue() <= max_color.blue());
-                actual_num_pixels_in_range += in_range;
-                if (error_count < 10){
-                    // Print first 10 errors:
-                    if (in_range && new_color != COLOR_BLACK){
-                        cout << "Error: wrong filter result: old color " << color.to_string() << ", (x,y) = "
-                            << x << ", " << y << ", should be black due to in range but not so" << endl;
-                        ++error_count;
-                    }else if (in_range == false && new_color != COLOR_WHITE){
-                        cout << "Error: wrong filter result: old color " << color.to_string() << ", (x,y) = "
-                            << x << ", " << y << ", should be white due to out of range but not so" << endl;
-                        ++error_count;
-                    }
-
-                    if (in_range && new_color_2 != COLOR_WHITE){
-                        cout << "Error: wrong inverse filter result: old color " << color.to_string() << ", (x,y) = "
-                            << x << ", " << y << ", should be white due to in range but not so" << endl;
-                        ++error_count;
-                    }else if (in_range == false && new_color_2 != COLOR_BLACK){
-                        cout << "Error: wrong inverse filter result: old color " << color.to_string() << ", (x,y) = "
-                            << x << ", " << y << ", should be black due to out of range but not so" << endl;
-                        ++error_count;
-                    }
-                }
-            }
-        }
-        cout << "Found " << actual_num_pixels_in_range << " pixels in range" << endl;
-        if (pixels_in_range != actual_num_pixels_in_range){
-            cout << "Error: wrong pixels in range: " << pixels_in_range << " actual: " << actual_num_pixels_in_range << endl;
-            return false;
-        }
-
-        if (error_count){
-            return false;
-        }
-
-        // We try to wait for three seconds:
-        const size_t num_iters = size_t(3000 / ms);
-        time_start = current_time();
-        for (size_t i = 0; i < num_iters; i++){
-            Kernels::to_blackwhite_rgb32_range(
-                image.data(), image.bytes_per_row(), image.width(), image.height(),
-                image_out.data(), image_out.bytes_per_row(),
-                in_range_black,
-                mins, maxs
-            );
-        }
-        time_end = current_time();
-        ms = (double)std::chrono::duration_cast<Milliseconds>(time_end - time_start).count();
-        cout << "Running " << num_iters << " iters, avg filter time: " << ms / num_iters << " ms" << endl;
-
-        return true;
-
-    };
-
-private:
+    RangeFilterImplementation m_implementation;
     std::string m_image;
 };
 
 
 
+//  Check one `filter_by_mask()` implementation on a real image, for each of `RANGES`.
+//  The mask is a binary matrix of the implementation's type with a 1 bit for each pixel
+//  in range. It is made one bit at a time with `PackedBinaryMatrix_IB::set()`, so it does
+//  not depend on the SIMD code of `compress_rgb32_to_binary_range()`. Then
+//  `filter_by_mask()` must replace the pixels with 0 bits (or the pixels with 1 bits) with
+//  `REPLACEMENT_COLOR`, and keep the other pixels. The image is a guard-page image, so the
+//  test also crashes if the implementation reads or writes past the last pixel.
 class Test_ImageFilterByMask : public UnitTest{
 public:
     Test_ImageFilterByMask(
+        const FilterByMaskImplementation& implementation,
         const std::string& image
     )
-        : UnitTest("Kernels::ImageFilterByMask - " + image)
+        : UnitTest("Kernels::ImageFilterByMask - " + implementation.name + " - " + image)
+        , m_implementation(implementation)
         , m_image(UNIT_TEST_RESOURCE_PATH() + image)
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        //  Copy the test image into guard-page memory with packed rows, so a
-        //  kernel that reads or writes past the last pixel faults.
-        ImageRGB32 file_image(m_image);
-        GuardPageImageRGB32 image(file_image);
+        const ImageRGB32 file_image(m_image);
+        const GuardPageImageRGB32 image(file_image);
 
-        const size_t width = image.width(), height = image.height();
-        cout << "Image width " << width << " height " << height << endl;
-
-        const Color min_color(0, 0, 0), max_color(63, 63, 63);
-        const uint32_t mins = uint32_t(min_color), maxs = uint32_t(max_color);
-
-        auto binary_matrix = make_PackedBinaryMatrix(get_BinaryMatrixType(), width, height);
-        compress_rgb32_to_binary_range(
-            image.data(), image.bytes_per_row(), *binary_matrix, mins, maxs
-        );
-        GuardPageImageRGB32 new_image(file_image);
-        GuardPageImageRGB32 new_image_2(file_image);
-
-        Color replacement_color = COLOR_WHITE;
-        bool replace_zero_bits = true;
-
-        auto time_start = current_time();
-        filter_by_mask(*binary_matrix, new_image.data(), new_image.bytes_per_row(), uint32_t(replacement_color), replace_zero_bits);
-        auto time_end = current_time();
-        auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(time_end - time_start).count();
-        auto ms = ns / 1000000.;
-        cout << "One Filter by mask call. time: " << ms << " ms" << endl;
-
-        filter_by_mask(*binary_matrix, new_image_2.data(), new_image_2.bytes_per_row(), uint32_t(replacement_color), !replace_zero_bits);
-
-        size_t error_count = 0;
-
-        for (size_t y = 0; y < height; y++){
-            for (size_t x = 0; x < width; x++){
-                const Color color(image.pixel(x, y));
-                const Color new_color(new_image.pixel(x, y));
-                const Color new_color_2(new_image_2.pixel(x, y));
-                bool in_range = (min_color.alpha() <= color.alpha() && color.alpha() <= max_color.alpha());
-                in_range = in_range && (min_color.red() <= color.red() && color.red() <= max_color.red());
-                in_range = in_range && (min_color.green() <= color.green() && color.green() <= max_color.green());
-                in_range = in_range && (min_color.blue() <= color.blue() && color.blue() <= max_color.blue());
-
-                if (error_count <= 10){
-                    if (in_range && new_color != color){
-                        cout << "Error: wrong filter(replace_zero_bits) result: old color " << color.to_string() << ", (x,y) = "
-                            << x << ", " << y << ", should not be changed due to being one bit but not so" << endl;
-                        ++error_count;
-                    }else if (!in_range && new_color != replacement_color){
-                        cout << "Error: wrong filter(replace_zero_bits) result: old color " << color.to_string() << ", (x,y) = "
-                            << x << ", " << y << ", should be changed due to being zero bit but not so" << endl;
-                        ++error_count;
-                    }
-
-                    if (in_range && new_color_2 != replacement_color){
-                        cout << "Error: wrong filter(replace_one_bits) result: old color " << color.to_string() << ", (x,y) = "
-                            << x << ", " << y << ", should be changed due to being one bit but not so" << endl;
-                        ++error_count;
-                    }else if (!in_range && new_color_2 != color){
-                        cout << "Error: wrong filter(replace_one_bits) result: old color " << color.to_string() << ", (x,y) = "
-                            << x << ", " << y << ", should not be changed due to being zero bit but not so" << endl;
-                        ++error_count;
-                    }
-                }
-            }
-        }
-
-        if (error_count){
-            return false;
-        }
-
-        // We try to wait for three seconds:
-        const size_t num_iters = size_t(3000 / ms);
-        time_start = current_time();
-        for (size_t i = 0; i < num_iters; i++){
-            filter_by_mask(*binary_matrix, new_image.data(), new_image.bytes_per_row(), uint32_t(replacement_color), replace_zero_bits);
-        }
-        time_end = current_time();
-        ms = (double)std::chrono::duration_cast<Milliseconds>(time_end - time_start).count();
-        cout << "Running " << num_iters << " iters, avg filter time: " << ms / num_iters << " ms" << endl;
-
-        return true;
-
-    };
-
-private:
-    std::string m_image;
-};
-
-
-class Test_CompressRGB32ToBinaryEuclidean : public UnitTest{
-public:
-    Test_CompressRGB32ToBinaryEuclidean(
-        const std::string& image
-    )
-        : UnitTest("Kernels::CompressRGB32ToBinaryEuclidean - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
-    {}
-
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        //  Copy the test image into guard-page memory with packed rows, so a
-        //  kernel that reads or writes past the last pixel faults.
-        ImageRGB32 file_image(m_image);
-        GuardPageImageRGB32 image(file_image);
-
-        const size_t width = image.width();
-        const size_t height = image.height();
-        cout << "Testing test_kernels_CompressRGB32ToBinaryEuclidean(), image size " << width << " x " << height << endl;
-
-        Color middle_color = Color(image.pixel(width / 2, height / 2));
-        cout << "Expected color: " << middle_color.to_string() << endl;
-
-        double max_dist = 50.0;
-        size_t max_dist2 = size_t(max_dist * max_dist);
-
-        PackedBinaryMatrix matrix(image.width(), image.height());
-
-        auto time_start = current_time();
-        Kernels::compress_rgb32_to_binary_euclidean(
-            image.data(), image.bytes_per_row(), matrix,
-            uint32_t(middle_color), max_dist
-        );
-        auto time_end = current_time();
-        auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(time_end - time_start).count();
-        auto ms = ns / 1000000.;
-        cout << "One filter time: " << ms << " ms" << endl;
-
-        size_t error_count = 0;
-        for (size_t y = 0; y < height; y++){
-            for (size_t x = 0; x < width; x++){
-                const Color color(image.pixel(x, y));
-                int red_dif = (color.red() - middle_color.red());
-                int green_dif = (color.green() - middle_color.green());
-                int blue_dif = (color.blue() - middle_color.blue());
-                size_t color_dist2 = red_dif * red_dif + green_dif * green_dif + blue_dif * blue_dif;
-                bool in_range = color_dist2 <= max_dist2;
-                if (error_count < 10){
-                    // Print first 10 errors:
-                    if (in_range && matrix.get(x, y) == false){
-                        cout << "Error: wrong filter result: old color " << color.to_string()
-                            << ", (x,y) = (" << x << ", " << y << ")"
-                            << ", dist2 " << color_dist2 << ", max dist2 " << max_dist2
-                            << ", should be in range but not set on matrix" << endl;
-                        ++error_count;
-                    }else if (in_range == false && matrix.get(x, y) == true){
-                        cout << "Error: wrong filter result: old color " << color.to_string()
-                            << ", (x,y) = (" << x << ", " << y << ")"
-                            << ", dist2 " << color_dist2 << ", max dist2 " << max_dist2
-                            << ", should not be in range but set on matrix" << endl;
-                        ++error_count;
-                    }
-                }
-            }
-        }
-        if (error_count){
-            return false;
-        }
-
-        // We try to wait for three seconds:
-        const size_t num_iters = size_t(3000 / ms);
-        time_start = current_time();
-        for (size_t i = 0; i < num_iters; i++){
-            Kernels::compress_rgb32_to_binary_euclidean(
-                image.data(), image.bytes_per_row(), matrix,
-                uint32_t(middle_color), max_dist
+        for (const ColorRange& range : RANGES){
+            scope.throw_if_cancelled();
+            std::unique_ptr<PackedBinaryMatrix_IB> mask = make_PackedBinaryMatrix(
+                m_implementation.matrix_type, image.width(), image.height()
             );
-        }
-        time_end = current_time();
-        ms = (double)std::chrono::duration_cast<Milliseconds>(time_end - time_start).count();
-        cout << "Running " << num_iters << " iters, avg filter time: " << ms / num_iters << " ms" << endl;
+            for (size_t y = 0; y < image.height(); y++){
+                for (size_t x = 0; x < image.width(); x++){
+                    mask->set(x, y, in_range(image.pixel(x, y), range));
+                }
+            }
 
+            for (bool replace_if_zero : {true, false}){
+                GuardPageImageRGB32 filtered(file_image);
+                m_implementation.filter_by_mask(
+                    *mask, filtered.data(), filtered.bytes_per_row(),
+                    REPLACEMENT_COLOR, replace_if_zero
+                );
+                //  The mask bit is 1 if the pixel is in range. The pixel is replaced if
+                //  that bit is 0 and `replace_if_zero` is true, or if it is 1 and
+                //  `replace_if_zero` is false.
+                const std::string error = find_wrong_pixel(image, filtered, [&](uint32_t pixel){
+                    return in_range(pixel, range) != replace_if_zero ? REPLACEMENT_COLOR : pixel;
+                });
+                if (!error.empty()){
+                    return std::format(
+                        "Error: mask of {}, replace_if_zero = {}: {}.",
+                        describe(range), replace_if_zero, error
+                    );
+                }
+            }
+        }
         return true;
-    };
+    }
 
 private:
+    FilterByMaskImplementation m_implementation;
     std::string m_image;
 };
 
+}
 
 
 
-
+//  Add a test for each image and each range filter and filter_by_mask() implementation
+//  that this build has and this CPU supports, including Default.
 void add_tests_ImageFilters(UnitTestDatabase& database){
+    std::vector<RangeFilterImplementation> range_filters{
+        {"Default", filter_rgb32_range_Default, to_blackwhite_rgb32_range_Default},
+    };
+    std::vector<FilterByMaskImplementation> mask_filters{
+        {"64x4_Default", BinaryMatrixType::i64x4_Default, filter_by_mask_64x4_Default},
+    };
+#ifdef PA_AutoDispatch_x64_08_Nehalem
+    if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
+        range_filters.push_back({"x64_SSE42", filter_rgb32_range_x64_SSE42, to_blackwhite_rgb32_range_x64_SSE42});
+        mask_filters.push_back({"64x8_x64_SSE42", BinaryMatrixType::i64x8_x64_SSE42, filter_by_mask_64x8_x64_SSE42});
+    }
+#endif
+#ifdef PA_AutoDispatch_x64_13_Haswell
+    if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
+        range_filters.push_back({"x64_AVX2", filter_rgb32_range_x64_AVX2, to_blackwhite_rgb32_range_x64_AVX2});
+        mask_filters.push_back({"64x16_x64_AVX2", BinaryMatrixType::i64x16_x64_AVX2, filter_by_mask_64x16_x64_AVX2});
+    }
+#endif
+#ifdef PA_AutoDispatch_x64_17_Skylake
+    if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
+        range_filters.push_back({"x64_AVX512", filter_rgb32_range_x64_AVX512, to_blackwhite_rgb32_range_x64_AVX512});
+        mask_filters.push_back({"64x32_x64_AVX512", BinaryMatrixType::i64x32_x64_AVX512, filter_by_mask_64x32_x64_AVX512});
+        mask_filters.push_back({"64x64_x64_AVX512", BinaryMatrixType::i64x64_x64_AVX512, filter_by_mask_64x64_x64_AVX512});
+    }
+#endif
+#ifdef PA_AutoDispatch_arm64_20_M1
+    if (CPU_CAPABILITY_CURRENT.OK_M1){
+        range_filters.push_back({"arm64_NEON", filter_rgb32_range_arm64_NEON, to_blackwhite_rgb32_range_arm64_NEON});
+        mask_filters.push_back({"64x8_arm64_NEON", BinaryMatrixType::arm64x8_x64_NEON, filter_by_mask_64x8_arm64_NEON});
+    }
+#endif
 
+    //  Images in the CommandLineTests repo. Their widths cover every remainder mod 4, and
+    //  no width or height is a multiple of 8, so the leftover pixels after the SIMD loops
+    //  and the binary matrix tiles at the right and bottom edges are tested too.
+    const std::vector<std::string> images{
+        "NintendoSwitch/Switch2/ghostassassin/system_settings_display_dark.png",    //  1916 x 1078
+        "OCR/Lv.1-0.png",                                                           //  237 x 77
+        "PokemonSwSh/SelectionArrowFinder/mac_neon_error_1.png",                    //  106 x 410
+        "OCR/german-nature-sanft.png",                                              //  511 x 91
+    };
 
-
+    for (const std::string& image : images){
+        for (const RangeFilterImplementation& implementation : range_filters){
+            database.add<Test_ImageFilterRGB32Range>(implementation, image);
+        }
+        for (const FilterByMaskImplementation& implementation : mask_filters){
+            database.add<Test_ImageFilterByMask>(implementation, image);
+        }
+    }
 }
 
 
