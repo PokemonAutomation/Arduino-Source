@@ -6,6 +6,9 @@
 
 #include <random>
 #include <vector>
+#include <memory>
+#include <cstring>
+#include <QAudioFormat>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
@@ -16,6 +19,10 @@
 #include "Kernels_WorkingAudio2RawAudio.h"
 #include "Kernels_AudioPipeline_RoundTrip_TestInfra.h"
 #include "Kernels_ChannelMixer_TestInfra.h"
+#include "CommonFramework/AudioPipeline/ChannelMixer.h"
+#include "Kernels/AudioResampler/Kernels_AudioResampler.h"
+#include "Kernels_ChannelMixer.h"
+#include "Kernels_WorkingAudio2WorkingAudio.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -310,6 +317,220 @@ public:
 
 
 
+//
+//  WorkingAudio2WorkingAudio vs. the hand-wired chain of the same kernels.
+//
+//  The all-in-one node orders its internals by channel count:
+//    - in_channels >= out_channels: mixer (at the input rate) -> resampler,
+//    - in_channels <  out_channels: resampler (at the input channel count) ->
+//      mixer (at the output rate).
+//  Identical input is fed through the node and through that exact hand-wired
+//  chain, and the outputs are asserted bit-identical. The two orderings are
+//  mathematically equivalent (both are LTI - mixing and FIR resampling
+//  commute), so this pins the node's wiring, the shared matrix construction
+//  and the stride forwarding.
+//
+class Working2WorkingOrderTest : public UnitTest{
+public:
+    Working2WorkingOrderTest(size_t in_rate, size_t out_rate, size_t in_ch, size_t out_ch)
+        : UnitTest(
+            "Kernels::AudioPipeline - Working2WorkingOrder(" +
+            std::to_string(in_rate) + "->" + std::to_string(out_rate) + "Hz, " +
+            std::to_string(in_ch) + "ch->" + std::to_string(out_ch) + "ch)"
+        )
+        , m_in_rate(in_rate)
+        , m_out_rate(out_rate)
+        , m_in_ch(in_ch)
+        , m_out_ch(out_ch)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        const size_t frames = 8192;
+
+        //  Planar input: channel c lives at [c * frames .. c * frames + frames).
+        AlignedVector<float> input(m_in_ch * frames);
+        std::mt19937 generator(42);
+        std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
+        for (size_t c = 0; c < m_in_ch; c++){
+            for (size_t i = 0; i < frames; i++){
+                input[c * frames + i] = distribution(generator);
+            }
+        }
+
+        auto channel_format = [](size_t channels){
+            QAudioFormat format;
+            format.setChannelCount((int)channels);
+            format.setChannelConfig(
+                channels == 1
+                    ? QAudioFormat::ChannelConfig::ChannelConfigMono
+                    : QAudioFormat::ChannelConfig::ChannelConfigStereo
+            );
+            return format;
+        };
+        const QAudioFormat in_format = channel_format(m_in_ch);
+        const QAudioFormat out_format = channel_format(m_out_ch);
+
+        //  The node under test.
+        std::vector<float> node_matrix = build_channel_mixer_matrix(in_format, out_format);
+        if (node_matrix.size() != m_in_ch * m_out_ch){
+            return "No channel mixer matrix for this conversion.";
+        }
+        WorkingAudio2WorkingAudio node(
+            logger, m_in_rate, m_out_rate, m_in_ch, m_out_ch, node_matrix
+        );
+        RecordingWorkingAudioListener node_output(m_out_rate, m_out_ch, frames * 2);
+        node.add_listener(node_output);
+
+        //  The hand-wired chain, in the node's internal ordering.
+        std::vector<float> chain_matrix = build_channel_mixer_matrix(in_format, out_format);
+        std::unique_ptr<ChannelMixer> chain_mixer;
+        std::unique_ptr<AudioResampler::AudioResampler> chain_resampler;
+        WorkingAudioNode* chain_head = nullptr;
+        WorkingAudioNode* chain_tail = nullptr;
+        if (m_in_ch >= m_out_ch){
+            chain_mixer.reset(new ChannelMixer(
+                m_in_rate, m_in_ch, m_out_ch, chain_matrix
+            ));
+            chain_head = chain_mixer.get();
+            if (m_in_rate != m_out_rate){
+                chain_resampler.reset(new AudioResampler::AudioResampler(
+                    logger, m_in_rate, m_out_rate, m_out_ch
+                ));
+                chain_mixer->add_listener(*chain_resampler);
+                chain_tail = chain_resampler.get();
+            }else{
+                chain_tail = chain_mixer.get();
+            }
+        }else{
+            chain_mixer.reset(new ChannelMixer(
+                m_out_rate, m_in_ch, m_out_ch, chain_matrix
+            ));
+            chain_tail = chain_mixer.get();
+            if (m_in_rate != m_out_rate){
+                chain_resampler.reset(new AudioResampler::AudioResampler(
+                    logger, m_in_rate, m_out_rate, m_in_ch
+                ));
+                chain_resampler->add_listener(*chain_tail);
+                chain_head = chain_resampler.get();
+            }else{
+                chain_head = chain_mixer.get();
+            }
+        }
+        RecordingWorkingAudioListener chain_output(m_out_rate, m_out_ch, frames * 2);
+        chain_tail->add_listener(chain_output);
+
+        //  Feed both in two chunks, each with a padded stride (stride >
+        //  samples exercises the channel-block layout handling).
+        size_t offset = 0;
+        const size_t chunk_sizes[] = {5000, frames - 5000};
+        for (size_t chunk : chunk_sizes){
+            AlignedVector<float> padded(m_in_ch * (chunk + 3));
+            for (size_t c = 0; c < m_in_ch; c++){
+                for (size_t i = 0; i < chunk; i++){
+                    padded[c * (chunk + 3) + i] = input[c * frames + offset + i];
+                }
+            }
+            node.push_samples(chunk, chunk + 3, padded.data());
+            chain_head->push_samples(chunk, chunk + 3, padded.data());
+            offset += chunk;
+        }
+
+        const size_t written = node_output.frames_written();
+        if (written == 0){
+            return "No output was produced.";
+        }
+        if (written != chain_output.frames_written()){
+            return "Frame count mismatch: node wrote " + std::to_string(written) +
+                " frames, chain wrote " + std::to_string(chain_output.frames_written()) + ".";
+        }
+        const auto& a = node_output.data();
+        const auto& b = chain_output.data();
+        const size_t count = written * m_out_ch;
+        if (std::memcmp(a.data(), b.data(), count * sizeof(float)) != 0){
+            for (size_t i = 0; i < count; i++){
+                if (a[i] != b[i]){
+                    return "Mismatch at " + std::to_string(i) + ": " + tostr_default(a[i]) +
+                        " != " + tostr_default(b[i]) + ".";
+                }
+            }
+            return "Bit-level mismatch with equal values (sign of zero or NaN payload).";
+        }
+
+        return true;
+    }
+
+
+private:
+    const size_t m_in_rate;
+    const size_t m_out_rate;
+    const size_t m_in_ch;
+    const size_t m_out_ch;
+};
+
+
+
+//
+//  ChannelMixer with pushes larger than its internal buffer.
+//
+//  mix_channels() strides the output buffer at the buffer size, so
+//  push_samples() must chunk larger pushes internally. An identity mix
+//  must pass every sample through unchanged, regardless of how the
+//  push is split up.
+//
+class MixerOverBufferPushTest : public UnitTest{
+public:
+    MixerOverBufferPushTest(size_t channels, size_t samples)
+        : UnitTest(
+            "Kernels::AudioPipeline - MixerOverBufferPush(" +
+            std::to_string(channels) + "ch x " + std::to_string(samples) + ")"
+        )
+        , m_channels(channels)
+        , m_samples(samples)
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        std::vector<float> matrix(m_channels * m_channels, 0.0f);
+        for (size_t c = 0; c < m_channels; c++){
+            matrix[c + m_channels * c] = 1.0f;
+        }
+
+        GuardPageBuffer<float> input = random_float_input(m_samples * m_channels, 42);
+
+        const size_t sample_rate = 44100;
+        ChannelMixer mixer(sample_rate, m_channels, m_channels, std::move(matrix));
+        RecordingWorkingAudioListener listener(sample_rate, m_channels, m_samples);
+        mixer.add_listener(listener);
+
+        //  A single push larger than the mixer's internal buffer (4096 + 256).
+        mixer.push_samples(m_samples, m_samples, input.data());
+
+        if (listener.frames_written() != m_samples){
+            return "Received " + std::to_string(listener.frames_written()) + " frames, expected " +
+                std::to_string(m_samples) + ".";
+        }
+
+        for (size_t i = 0; i < m_samples; i++){
+            for (size_t c = 0; c < m_channels; c++){
+                float expected = input[c * m_samples + i];
+                if (expected != listener.data()[i * m_channels + c]){
+                    return "Mismatch at (" + std::to_string(i) + ", " + std::to_string(c) + "): " +
+                        tostr_default(expected) + " != " +
+                        tostr_default(listener.data()[i * m_channels + c]) + ".";
+                }
+            }
+        }
+
+        return true;
+    }
+
+
+private:
+    const size_t m_channels;
+    const size_t m_samples;
+};
+
+
+
 void add_tests(UnitTestDatabase& database){
     //  Raw -> Working -> Raw round-trip.
     for (size_t channels = 1; channels <= 4; channels++){
@@ -345,6 +566,20 @@ void add_tests(UnitTestDatabase& database){
 
     //  1 -> 2 -> 1 averaging round-trip.
     database.add<MixerRoundTripTest>(1000);
+
+    //  Pushes larger than the mixer's internal buffer get chunked.
+    for (size_t channels = 1; channels <= 3; channels++){
+        database.add<MixerOverBufferPushTest>(channels, 10000);
+    }
+
+    //  WorkingAudio2WorkingAudio vs. the hand-wired chain: both internal
+    //  orderings (mix -> resample, resample -> mix), plus the mix-only and
+    //  identity-matrix + resample cases.
+    database.add<Working2WorkingOrderTest>(44100, 48000, 2, 1);
+    database.add<Working2WorkingOrderTest>(44100, 48000, 1, 2);
+    database.add<Working2WorkingOrderTest>(48000, 48000, 2, 1);
+    database.add<Working2WorkingOrderTest>(48000, 48000, 1, 2);
+    database.add<Working2WorkingOrderTest>(48000, 44100, 2, 2);
 }
 
 

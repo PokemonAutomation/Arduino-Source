@@ -4,6 +4,7 @@
  *
  */
 
+#include <algorithm>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Kernels/AudioChannelMixer/Kernels_AudioChannelMixer.h"
@@ -47,16 +48,23 @@ void ChannelMixer::remove_listener(WorkingAudioStreamListener& listener){
 }
 
 void ChannelMixer::push_samples(size_t samples, size_t stride, const float* data){
-    AudioChannelMixer::mix_channels(
-        m_weight_matrix.data(),
-        samples,
-        out_channels(), m_buffer_size, m_buffer.data(),
-        in_channels(), stride, data
-    );
-    m_listeners.run_method(
-        &WorkingAudioStreamListener::push_samples,
-        samples, m_buffer_size, m_buffer.data()
-    );
+    //  mix_channels() strides the output buffer at m_buffer_size, so it can
+    //  mix at most m_buffer_size samples per call; chunk larger pushes.
+    while (samples > 0){
+        const size_t block = std::min(samples, m_buffer_size);
+        AudioChannelMixer::mix_channels(
+            m_weight_matrix.data(),
+            block,
+            out_channels(), m_buffer_size, m_buffer.data(),
+            in_channels(), stride, data
+        );
+        m_listeners.run_method(
+            &WorkingAudioStreamListener::push_samples,
+            block, m_buffer_size, m_buffer.data()
+        );
+        data += block;
+        samples -= block;
+    }
 }
 
 
