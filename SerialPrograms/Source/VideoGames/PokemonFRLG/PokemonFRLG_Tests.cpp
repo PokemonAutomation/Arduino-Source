@@ -7,6 +7,11 @@
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/StaticGlobals.h"
+#include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
+#include "Inference/Box/PokemonFRLG_BoxCellOccupiedDetector.h"
+#include "Inference/Box/PokemonFRLG_BoxCellReader.h"
+#include "Inference/Box/PokemonFRLG_BoxGenderReader.h"
+#include "Inference/Box/PokemonFRLG_BoxSelectionModeDetector.h"
 #include "Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
 #include "Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "Inference/Dialogs/PokemonFRLG_PrizeSelectDetector.h"
@@ -20,18 +25,22 @@
 #include "Inference/PokemonFRLG_TrainerIdReader.h"
 #include "Inference/PokemonFRLG_WildEncounterReader.h"
 #include "Tests/TestUtils.h"
+#include "Programs/BoxOrganization/PokemonFRLG_BoxSorter_Tests.h"
 #include "PokemonFRLG_Tests.h"
 
 #include <fstream>
-#include <sstream>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
 
-
 void add_tests(UnitTestDatabase& database){
+    add_tests_BoxSorter(database);
     add_tests_AdvanceWhiteDialogDetector(database);
+    add_tests_BoxSelectionModeDetector(database);
+    add_tests_BoxGenderReader(database);
+    add_tests_BoxCellOccupiedDetector(database);
+    add_tests_BoxCellReader(database);
     add_tests_SelectionDialogDetector(database);
     add_tests_ShinySymbolDetector(database);
     add_tests_PrizeSelectDetector(database);
