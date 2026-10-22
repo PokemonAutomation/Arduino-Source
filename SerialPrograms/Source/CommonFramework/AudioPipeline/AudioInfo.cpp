@@ -5,6 +5,7 @@
  */
 
 #include <map>
+#include <set>
 #include <QtGlobal>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Time.h"
@@ -260,48 +261,6 @@ std::vector<AudioChannelFormat> supported_input_formats(int& preferred_index, co
 //    cout << "supported formats = " << ret.size() << endl;
     return ret;
 }
-std::vector<AudioChannelFormat> supported_output_formats(int& preferred_index, const NativeAudioInfo& info){
-    QAudioFormat preferred_format = info.preferredFormat();
-    int preferred_channels = preferred_format.channelCount();
-    int preferred_rate = preferred_format.sampleRate();
-
-    std::vector<AudioChannelFormat> ret;
-    preferred_index = -1;
-
-    {
-        QAudioFormat format = preferred_format;
-        set_format(format, AudioChannelFormat::MONO_48000);
-        if (info.isFormatSupported(format)){
-            if (format.channelCount() == preferred_channels && format.sampleRate() == preferred_rate){
-                preferred_index = (int)ret.size();
-            }
-            ret.emplace_back(AudioChannelFormat::MONO_48000);
-        }
-    }
-    {
-        QAudioFormat format = preferred_format;
-        set_format(format, AudioChannelFormat::DUAL_44100);
-        if (info.isFormatSupported(format)){
-            if (format.channelCount() == preferred_channels && format.sampleRate() == preferred_rate){
-                preferred_index = (int)ret.size();
-            }
-            ret.emplace_back(AudioChannelFormat::DUAL_44100);
-        }
-    }
-    {
-        QAudioFormat format = preferred_format;
-        set_format(format, AudioChannelFormat::DUAL_48000);
-        if (info.isFormatSupported(format)){
-            if (format.channelCount() == preferred_channels && format.sampleRate() == preferred_rate){
-                preferred_index = (int)ret.size();
-            }
-            ret.emplace_back(AudioChannelFormat::DUAL_48000);
-        }
-    }
-
-    return ret;
-}
-
 
 
 
@@ -435,7 +394,7 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_output_devices(){
         data.display_name = std::move(name);
         data.info = std::move(device);
 
-        data.supported_formats = supported_output_formats(data.preferred_format_index, data.info);
+        data.preferred_format_index = -1;
 
     }
 #elif QT_VERSION_MAJOR == 6
@@ -453,7 +412,7 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_output_devices(){
         data.display_name = std::move(name);
         data.info = std::move(device);
 
-        data.supported_formats = supported_output_formats(data.preferred_format_index, data.info);
+        data.preferred_format_index = -1;
     }
 #endif
 
@@ -462,18 +421,13 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_output_devices(){
         return list;
     }
 
-    //  Get map of greatest format counts.
-    std::map<std::string, size_t> most_formats;
-    for (AudioDeviceInfo& device : list){
-        size_t& count = most_formats[device.display_name()];
-        count = std::max(count, device.supported_formats().size());
-    }
-
-    //  Keep only devices with the most # of formats. Duplicates allowed.
+    //  Collapse duplicates: keep the first device per display name. (The
+    //  old "most supported formats" ranking is obsolete now that the sink
+    //  adapts to the device's native format.)
+    std::set<std::string> seen;
     std::vector<AudioDeviceInfo> ret;
     for (AudioDeviceInfo& device : list){
-        auto iter = most_formats.find(device.display_name());
-        if (device.supported_formats().size() >= iter->second){
+        if (seen.insert(device.display_name()).second){
             ret.emplace_back(std::move(device));
         }
     }
