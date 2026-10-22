@@ -68,6 +68,46 @@ QAudioFormat channel_format(size_t channels){
 }
 
 
+//
+//  Per-listener working-stream conversion.
+//
+//  (Defined before the first use: remove_listener() destroys a
+//  WorkingListenerEntry - and with it the unique_ptr<InternalWorkingListener>
+//  in it - at its call site, so the type must be complete there.)
+//  Each attached working-stream listener gets its own
+//  WorkingAudio2WorkingAudio node (source shape -> the listener's requested
+//  shape) attached to the source decoder, plus an InternalWorkingListener
+//  forwarder that carries the requested shape as its nominal one (the node
+//  validates its listeners against it; the user's listener may have any
+//  nominal shape of its own).
+//
+//  The entries in m_working_entries survive tree rebuilds: when the input
+//  changes, build_tree() rebuilds each node for the new source shape, and
+//  teardown_tree() detaches them. All of these methods require the caller
+//  to hold m_lock. Detaching blocks on in-flight pushes, so no push can
+//  ever run through a node or forwarder that is about to be destroyed.
+//
+
+class AudioPassthroughPairQt::InternalWorkingListener final : public Kernels::AudioPipeline::WorkingAudioStreamListener{
+public:
+    InternalWorkingListener(
+        Kernels::AudioPipeline::WorkingAudioStreamListener& target,
+        size_t sample_rate, size_t channels
+    )
+        : Kernels::AudioPipeline::WorkingAudioStreamListener(sample_rate, channels)
+        , m_target(target)
+    {}
+    //  The pair always detaches this from its node before destroying it
+    //  (detach_working_entry). "m_target" is the user's listener, owned by
+    //  the caller; it outlives the attach by contract.
+    virtual void push_samples(size_t samples, size_t stride, const float* data) override{
+        m_target.push_samples(samples, stride, data);
+    }
+
+private:
+    Kernels::AudioPipeline::WorkingAudioStreamListener& m_target;
+};
+
 
 void AudioPassthroughPairQt::add_listener(AudioFloatStreamListener& listener){
     auto scope_check = m_sanitizer.check_scope();
@@ -153,42 +193,6 @@ private:
 };
 
 
-//
-//  Per-listener working-stream conversion.
-//
-//  Each attached working-stream listener gets its own
-//  WorkingAudio2WorkingAudio node (source shape -> the listener's requested
-//  shape) attached to the source decoder, plus an InternalWorkingListener
-//  forwarder that carries the requested shape as its nominal one (the node
-//  validates its listeners against it; the user's listener may have any
-//  nominal shape of its own).
-//
-//  The entries in m_working_entries survive tree rebuilds: when the input
-//  changes, build_tree() rebuilds each node for the new source shape, and
-//  teardown_tree() detaches them. All of these methods require the caller
-//  to hold m_lock. Detaching blocks on in-flight pushes, so no push can
-//  ever run through a node or forwarder that is about to be destroyed.
-//
-
-class AudioPassthroughPairQt::InternalWorkingListener final : public Kernels::AudioPipeline::WorkingAudioStreamListener{
-public:
-    InternalWorkingListener(
-        Kernels::AudioPipeline::WorkingAudioStreamListener& target,
-        size_t sample_rate, size_t channels
-    )
-        : Kernels::AudioPipeline::WorkingAudioStreamListener(sample_rate, channels)
-        , m_target(target)
-    {}
-    //  The pair always detaches this from its node before destroying it
-    //  (detach_working_entry). "m_target" is the user's listener, owned by
-    //  the caller; it outlives the attach by contract.
-    virtual void push_samples(size_t samples, size_t stride, const float* data) override{
-        m_target.push_samples(samples, stride, data);
-    }
-
-private:
-    Kernels::AudioPipeline::WorkingAudioStreamListener& m_target;
-};
 
 
 void AudioPassthroughPairQt::build_working_entry(
