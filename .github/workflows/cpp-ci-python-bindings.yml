@@ -38,7 +38,7 @@ jobs:
           cd Arduino-Source/SerialPrograms
           mkdir bin
           cd bin
-          cmake .. -DPA_CORE_ONLY=ON -DPA_PYTHON_BINDINGS=ON
+          cmake .. -DPA_CORE_ONLY=ON -DPA_PYTHON_BINDINGS=ON -DPython_EXECUTABLE=/tmp/pa-build-venv/bin/python
           cmake --build . --config RelWithDebInfo --parallel 10
 
       - name: Run the Python tests
