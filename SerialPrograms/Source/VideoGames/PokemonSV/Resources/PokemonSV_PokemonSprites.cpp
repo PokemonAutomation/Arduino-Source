@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImageReader>
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
 #include "PokemonSV_PokemonSprites.h"
@@ -14,17 +13,11 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 const SpriteDatabase& ALL_POKEMON_SPRITES(){
-#if QT_VERSION_MAJOR == 6
-    QImageReader::setAllocationLimit(0);
-#endif
     static const SpriteDatabase database("PokemonSV/PokemonSprites.png", "PokemonSV/PokemonSprites.json");
     return database;
 }
 
 const SpriteDatabase& ALL_POKEMON_SILHOUETTES(){
-#if QT_VERSION_MAJOR == 6
-    QImageReader::setAllocationLimit(0);
-#endif
     static const SpriteDatabase database("PokemonSV/PokemonSilhouettes.png", "PokemonSV/PokemonSprites.json");
     return database;
 }

@@ -72,7 +72,7 @@ void VSSeekerReactionTracker::make_overlays(VideoOverlaySet& items) const{
 }
 bool VSSeekerReactionTracker::process_frame(const ImageViewRGB32& frame, WallClock){
     ImageViewRGB32 cropped = extract_box_reference(frame, m_box);
-    m_dimensions = QSize((int)cropped.width(), (int)cropped.height());
+    m_dimensions = Resolution(cropped.width(), cropped.height());
     m_bubbles = find_seeker_bubbles(cropped);
 //        cout << exclamation_marks.size() << endl;
 
