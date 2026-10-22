@@ -1168,7 +1168,7 @@ void heal_at_pokecenter(ConsoleHandle& console, ProControllerContext& context){
             );
         }
 
-        AdvanceWhiteDialogWatcher dialog(COLOR_RED);
+        WhiteDialogWatcher dialog(COLOR_RED);
 
         context.wait_for_all_requests();
         int ret = run_until<ProControllerContext>(
