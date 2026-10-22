@@ -82,3 +82,23 @@ def test_push_joystick_rejects_string():
     # These are safe no-ops when not ready.
     c.wait_for_all_requests()
     assert c.cancel_all_and_wait(100) is False
+
+
+def test_empty_port():
+    """An empty port name opens no connection: querying is safe, commands raise, and destruction is safe."""
+    c = core.Controller("")
+    assert not c.wait_for_ready(200)
+    assert not c.is_ready()
+    assert c.current_status()
+    assert c.cancel_all_and_wait(100) is False
+    with pytest.raises(RuntimeError):
+        c.push_button(core.BUTTONS["A"], 0, 10, 10)
+    del c
+
+
+def test_destroy_while_connecting():
+    """Destroying the controller while its connection is still establishing is safe: the
+    connection thread is joined before the internals are destroyed."""
+    for _ in range(5):
+        c = core.Controller("nonexistent-port-xyz")
+        del c

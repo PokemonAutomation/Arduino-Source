@@ -3,6 +3,9 @@
 #  C++ interface of `NintendoSwitch::PybindSwitchProController`
 #  (SerialPrograms/Source/Integrations/PybindSwitchProController.h), bound by
 #  SerialPrograms/Source/PythonBindings/PythonBindings_Module.cpp.
+import threading
+import time
+
 import pytest
 
 from pokemon_automation import BUTTON_BITS, DPAD_NONE, DPAD_POSITIONS, FakeController, SwitchController
@@ -19,6 +22,12 @@ def test_requires_port_or_backend():
     """Constructing a SwitchController without a port or backend raises ValueError."""
     with pytest.raises(ValueError):
         SwitchController()
+
+
+def test_empty_port_rejected():
+    """An empty port string is rejected like no port at all."""
+    with pytest.raises(ValueError, match="non-empty"):
+        SwitchController("")
 
 
 def test_not_ready_raises():
@@ -209,6 +218,31 @@ def test_close():
         sw.wait_for_all_requests()
     sw.close()  # idempotent
     assert fake.cancel_count == 1
+
+
+def test_command_while_closing_is_rejected():
+    """close() flags the controller before the cancel finishes, so a command that starts
+    while the cancel is in flight is rejected instead of being queued after it."""
+    fake = FakeController()
+    sw = SwitchController(backend=fake)
+    cancelling = threading.Event()
+    cancel_calls = 0
+
+    def slow_cancel(timeout_ms: int = 500) -> bool:
+        nonlocal cancel_calls
+        cancel_calls += 1
+        cancelling.set()
+        time.sleep(0.05)
+        return True
+
+    fake.cancel_all_and_wait = slow_cancel
+    t = threading.Thread(target=sw.close)
+    t.start()
+    assert cancelling.wait(1.0)
+    with pytest.raises(RuntimeError, match="closed"):
+        sw.push_button("A")
+    t.join()
+    assert cancel_calls == 1
 
 
 def test_context_manager():

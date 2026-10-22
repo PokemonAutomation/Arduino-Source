@@ -83,8 +83,8 @@ class SwitchController:
     def __init__(self, port: str | None = None, *, timeout_s: float = 10.0,
                  backend: ControllerBackend | None = None):
         if backend is None:
-            if port is None:
-                raise ValueError("Either port or backend is required.")
+            if not port:
+                raise ValueError("Either a non-empty port or a backend is required.")
             backend = _core.core().Controller(port)
         self._backend = backend
         self._lock = threading.Lock()
@@ -149,6 +149,7 @@ class SwitchController:
         if not parsed.has_buttons:
             raise ValueError("push_button() needs at least one button.")
         with self._lock:
+            self._require_open()  # close() may have run while we were parsing
             self._backend.push_button(parsed.bitfield, hold_ms + release_ms, hold_ms, release_ms)
 
     def push_dpad(self, dpad: btn.ButtonsArg, hold_ms: int = DEFAULT_HOLD_MS,
@@ -176,6 +177,7 @@ class SwitchController:
         if not parsed.has_dpad:
             raise ValueError("push_dpad() needs at least one d-pad direction.")
         with self._lock:
+            self._require_open()  # close() may have run while we were parsing
             self._backend.push_dpad(parsed.dpad, hold_ms + release_ms, hold_ms, release_ms)
 
     def controller_state(self, buttons: btn.ButtonsArg = None, dpad: btn.ButtonsArg = None, *,
@@ -208,6 +210,7 @@ class SwitchController:
         left_x, left_y = btn.parse_stick_pair(left_joystick) if left_joystick is not None else (0.0, 0.0)
         right_x, right_y = btn.parse_stick_pair(right_joystick) if right_joystick is not None else (0.0, 0.0)
         with self._lock:
+            self._require_open()  # close() may have run while we were parsing
             self._backend.controller_state(
                 parsed_buttons.bitfield, parsed_dpad.dpad,
                 left_x, left_y, right_x, right_y,
@@ -241,6 +244,7 @@ class SwitchController:
         self._require_open()
         x, y = btn.parse_stick_pair(joystick_position)
         with self._lock:
+            self._require_open()  # close() may have run while we were parsing
             send(x, y, hold_ms + release_ms, hold_ms, release_ms)
 
     def wait(self, duration_ms: int) -> None:
@@ -248,7 +252,9 @@ class SwitchController:
         _check_nonnegative(duration_ms=duration_ms)
         self._require_open()
         if duration_ms > 0:
-            self._backend.wait(duration_ms)
+            with self._lock:
+                self._require_open()  # close() may have run while we were parsing
+                self._backend.wait(duration_ms)
 
     def wait_for_all_requests(self) -> None:
         """Block until every queued command has executed on the device.
@@ -278,10 +284,16 @@ class SwitchController:
 
     def close(self) -> None:
         """Stop the device (cancelling queued commands and waiting briefly for the
-        neutral state) and drop the connection."""
-        if self._closed:
-            return
-        self._closed = True
+        neutral state) and drop the connection.
+
+        The closed flag is set under the command lock before the cancel starts, so
+        commands that start while the cancel is in flight are rejected instead of
+        being queued after it.
+        """
+        with self._lock:
+            if self._closed:
+                return
+            self._closed = True
         try:
             self._backend.cancel_all_and_wait(500)
         except Exception:  # noqa: BLE001 - best effort: the connection is dropped anyway
