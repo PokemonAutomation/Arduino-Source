@@ -141,6 +141,7 @@ private:
 
 
 UnitTestResult run_resampler_stream(
+    Logger& logger,
     size_t in_rate, size_t out_rate, size_t channels,
     size_t samples, size_t push, uint32_t taps, double beta
 ){
@@ -154,7 +155,7 @@ UnitTestResult run_resampler_stream(
     }
 
     //  Small output buffer so a single push flushes multiple times.
-    AudioResampler resampler(in_rate, out_rate, channels, 512, taps, beta);
+    AudioResampler resampler(logger, in_rate, out_rate, channels, 512, taps, beta);
     size_t capacity = samples * out_rate / in_rate + 4096;
     RecordingWorkingAudioListener output(out_rate, channels, capacity);
     resampler.add_listener(output);
@@ -402,6 +403,7 @@ ResamplerStreamTest::ResamplerStreamTest(
 {}
 UnitTestResult ResamplerStreamTest::run(Logger& logger, CancellableScope& scope) const{
     return run_resampler_stream(
+        logger,
         m_in_rate, m_out_rate, m_channels,
         m_samples, m_push, m_taps, m_beta
     );

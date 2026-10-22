@@ -65,33 +65,6 @@ QAudioFormat channel_format(size_t channels){
 }
 
 
-//  The sink endpoint's rate / channel shape for an output preset. The
-//  INTERLEAVE_96000 presets are remapped to DUAL_48000 before this is
-//  called; returns false for NONE.
-bool sink_shape(AudioChannelFormat format, size_t& rate, size_t& channels){
-    switch (format){
-    case AudioChannelFormat::MONO_48000:
-        rate = 48000;
-        channels = 1;
-        return true;
-    case AudioChannelFormat::DUAL_44100:
-        rate = 44100;
-        channels = 2;
-        return true;
-    case AudioChannelFormat::DUAL_48000:
-        rate = 48000;
-        channels = 2;
-        return true;
-    case AudioChannelFormat::MONO_96000:
-        rate = 96000;
-        channels = 1;
-        return true;
-    default:
-        return false;
-    }
-}
-
-
 }
 
 
@@ -234,7 +207,14 @@ void AudioPassthroughPairQt::build_tree(float input_volume){
     m_fft_node.reset(new WorkingAudioToFFT(fft_rate));
     Kernels::AudioPipeline::WorkingAudioStreamListener* head = m_fft_node.get();
     if (raw_rate != fft_rate){
-        m_fft_resampler.reset(new Kernels::AudioResampler::AudioResampler(raw_rate, fft_rate, 1));
+        m_fft_resampler.reset(
+            new Kernels::AudioResampler::AudioResampler(
+                m_logger,
+                raw_rate,
+                fft_rate,
+                1
+            )
+        );
         m_fft_resampler->add_listener(*head);
         head = m_fft_resampler.get();
     }
@@ -264,35 +244,17 @@ void AudioPassthroughPairQt::rebuild_sink_branch(){
     if (!m_reader || !m_source_decoder){
         return;
     }
-    //  The sink branch exists only when the output device is open and
-    //  actually accepts the target format.
+    //  The sink branch exists only when the output device is open; it
+    //  plays in the device's native format (as opened by
+    //  init_audio_sink), and this branch resamples / mixes / converts
+    //  the working input to that shape.
     if (!m_sink_device){
         return;
     }
 
-    AudioChannelFormat output_format = m_input_format;
-    switch (output_format){
-    case AudioChannelFormat::INTERLEAVE_LR_96000:
-    case AudioChannelFormat::INTERLEAVE_RL_96000:
-        output_format = AudioChannelFormat::DUAL_48000;
-        break;
-    default:
-        break;
-    }
-    size_t sink_rate;
-    size_t sink_channels;
-    if (!sink_shape(output_format, sink_rate, sink_channels)){
-        return;
-    }
-
-    NativeAudioInfo native_info = m_output_device.native_info();
-    QAudioFormat target_format = native_info.preferredFormat();
-    set_format(target_format, output_format);
-    AudioSampleFormat sample_format = get_sample_format(target_format);
-    if (sample_format == AudioSampleFormat::INVALID){
-        sample_format = AudioSampleFormat::FLOAT32;
-        set_sample_format_to_float(target_format);
-    }
+    const size_t sink_rate = m_sink_device->sample_rate();
+    const size_t sink_channels = m_sink_device->channels();
+    const Kernels::AudioPipeline::SampleFormat sink_sample_format = m_sink_device->sample_type();
 
     size_t raw_rate = m_reader->raw_sample_rate();
     size_t raw_channels = m_reader->raw_channels();
@@ -304,14 +266,17 @@ void AudioPassthroughPairQt::rebuild_sink_branch(){
 
     Kernels::AudioPipeline::WorkingAudioStreamListener* head = nullptr;
     m_sink_encoder.reset(new Kernels::AudioPipeline::WorkingAudio2RawAudio(
-        to_sample_format(sample_format),
+        sink_sample_format,
         sink_rate, sink_channels,
         convert_audio_volume_from_slider(m_output_volume)
     ));
     head = m_sink_encoder.get();
     if (raw_rate != sink_rate){
         m_sink_resampler.reset(new Kernels::AudioResampler::AudioResampler(
-            raw_rate, sink_rate, sink_channels
+            m_logger,
+            raw_rate,
+            sink_rate,
+            sink_channels
         ));
         m_sink_resampler->add_listener(*head);
         head = m_sink_resampler.get();
@@ -502,59 +467,53 @@ void AudioPassthroughPairQt::init_audio_sink(){
 
 //    cout << "AudioPassthroughPairQt::init_audio_sink()" << endl;
     auto scope_check = m_sanitizer.check_scope();
-    AudioChannelFormat output_format = m_input_format;
-    switch (output_format){
-    case AudioChannelFormat::NONE:
-        return;
-    case AudioChannelFormat::MONO_48000:
-    case AudioChannelFormat::MONO_96000:
-    case AudioChannelFormat::DUAL_44100:
-    case AudioChannelFormat::DUAL_48000:
-        break;
-    case AudioChannelFormat::INTERLEAVE_LR_96000:
-    case AudioChannelFormat::INTERLEAVE_RL_96000:
-        output_format = AudioChannelFormat::DUAL_48000;
-        break;
-    default:
-        m_logger.log(std::string("Invalid AudioFormat: ") + AUDIO_FORMAT_LABELS[(size_t)output_format], COLOR_RED);
+    if (m_input_format == AudioChannelFormat::NONE){
         return;
     }
-    if (m_output_device){
-        //  Open the device in the input format, as the legacy AudioSink did:
-        //  the native preferred format with its rate / channel count forced
-        //  to the output format's, keeping the native sample format (falling
-        //  back to float when it isn't one we can convert to). The output
-        //  volume is applied by the sink branch's encoder, so the device
-        //  stays at full volume.
-        NativeAudioInfo native_info = m_output_device.native_info();
-        QAudioFormat target_format = native_info.preferredFormat();
-        set_format(target_format, output_format);
-        AudioSampleFormat sample_format = get_sample_format(target_format);
-        if (sample_format == AudioSampleFormat::INVALID){
+    if (!m_output_device){
+        return;
+    }
+
+    //  Open the device in its native format, as-is: the preferred rate,
+    //  channel count, and sample format of the device. The tree's sink
+    //  branch resamples / mixes / converts the working input to that
+    //  shape. The output volume is applied by the branch's encoder, so
+    //  the device stays at full volume.
+    NativeAudioInfo native_info = m_output_device.native_info();
+    QAudioFormat target_format = native_info.preferredFormat();
+    AudioSampleFormat sample_format = get_sample_format(target_format);
+    if (sample_format == AudioSampleFormat::INVALID){
+        //  The native sample format isn't one we can convert to; fall
+        //  back to a supported one we can.
+        QAudioFormat float_format = target_format;
+        set_sample_format_to_float(float_format);
+        if (native_info.isFormatSupported(float_format)){
+            target_format = float_format;
             sample_format = AudioSampleFormat::FLOAT32;
-            set_sample_format_to_float(target_format);
+        }else{
+            QAudioFormat sint16_format = target_format;
+            sint16_format.setSampleFormat(QAudioFormat::SampleFormat::Int16);
+            if (native_info.isFormatSupported(sint16_format)){
+                target_format = sint16_format;
+                sample_format = AudioSampleFormat::SINT16;
+            }else{
+                m_logger.log(
+                    "Audio output device's native sample format is not supported, "
+                    "and neither float nor 16-bit is. Audio output is disabled.",
+                    COLOR_RED
+                );
+                return;
+            }
         }
-        m_logger.log("AudioOutputDevice(): Target: " + dump_audio_format(target_format));
-        m_logger.log("AudioOutputDevice(): Native: " + dump_audio_format(native_info.preferredFormat()));
-        if (!native_info.isFormatSupported(target_format)){
-            m_logger.log(
-                "Audio output device does not support the requested audio format. Audio output is disabled. "
-                "Try setting the output device to the same sample rate and channel count as the input device "
-                "in your OS sound settings.",
-                COLOR_RED
-            );
-            return;
-        }
-        size_t sink_rate;
-        size_t sink_channels;
-        if (!sink_shape(output_format, sink_rate, sink_channels)){
-            return;
-        }
-        m_sink_device.reset(new AudioOutputDevice(
-            m_logger, native_info, target_format,
-            to_sample_format(sample_format), sink_rate, sink_channels
-        ));
     }
+    m_logger.log("AudioOutputDevice(): Target: " + dump_audio_format(target_format));
+    m_logger.log("AudioOutputDevice(): Native: " + dump_audio_format(native_info.preferredFormat()));
+    m_sink_device.reset(new AudioOutputDevice(
+        m_logger, native_info, target_format,
+        to_sample_format(sample_format),
+        (size_t)target_format.sampleRate(),
+        (size_t)target_format.channelCount()
+    ));
     rebuild_sink_branch();
 }
 

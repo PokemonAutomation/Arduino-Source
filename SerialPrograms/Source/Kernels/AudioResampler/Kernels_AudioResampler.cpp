@@ -8,6 +8,7 @@
 #include <cstring>
 #include <numeric>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Kernels_AudioResampler_BlockKernels.h"
 #include "Kernels_AudioResampler.h"
@@ -20,6 +21,7 @@ namespace AudioResampler{
 
 AudioResampler::~AudioResampler() = default;
 AudioResampler::AudioResampler(
+    Logger& logger,
     size_t in_sample_rate,
     size_t out_sample_rate,
     size_t channels,
@@ -41,17 +43,24 @@ AudioResampler::AudioResampler(
     , m_buffer(channels * m_buffer_stride)
     , m_flush_at((buffer_size / m_block.sample_block) * m_block.sample_block)
 {
+    logger.log(
+        "Initializing AudioResampler: " + tostr_u_commas(in_sample_rate) +
+        " -> " + tostr_u_commas(out_sample_rate) +
+        ", channels = " + tostr_u_commas(channels),
+        COLOR_PURPLE
+    );
+
     if (in_sample_rate == 0 || out_sample_rate == 0){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid sample rate.");
+        throw InternalProgramError(&logger, PA_CURRENT_FUNCTION, "Invalid sample rate.");
     }
     if (channels == 0){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid channel count.");
+        throw InternalProgramError(&logger, PA_CURRENT_FUNCTION, "Invalid channel count.");
     }
     if (buffer_size == 0){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid buffer size.");
+        throw InternalProgramError(&logger, PA_CURRENT_FUNCTION, "Invalid buffer size.");
     }
     if (taps == 0){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid tap count.");
+        throw InternalProgramError(&logger, PA_CURRENT_FUNCTION, "Invalid tap count.");
     }
 
 

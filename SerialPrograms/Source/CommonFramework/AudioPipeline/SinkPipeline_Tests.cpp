@@ -241,6 +241,7 @@ std::vector<char> run_legacy(
 //  -> WorkingAudio2RawAudio, mirroring AudioPassthroughPairQt::
 //  rebuild_sink_branch().
 std::vector<char> run_tree(
+    Logger& logger,
     const std::vector<char>& raw,
     AudioSampleFormat in_format, size_t in_rate, size_t in_channels,
     AudioSampleFormat out_format, size_t out_rate, size_t out_channels
@@ -258,7 +259,14 @@ std::vector<char> run_tree(
     std::unique_ptr<Kernels::AudioPipeline::ChannelMixer> mixer;
     Kernels::AudioPipeline::WorkingAudioStreamListener* head = &encoder;
     if (in_rate != out_rate){
-        resampler.reset(new Kernels::AudioResampler::AudioResampler(in_rate, out_rate, out_channels));
+        resampler.reset(
+            new Kernels::AudioResampler::AudioResampler(
+                logger,
+                in_rate,
+                out_rate,
+                out_channels
+            )
+        );
         resampler->add_listener(*head);
         head = resampler.get();
     }
@@ -313,7 +321,11 @@ public:
         std::vector<char> raw = interleave_bytes({l, r});
 
         std::vector<char> legacy = run_legacy(raw, 48000, AudioSampleFormat::FLOAT32, 2, AudioSampleFormat::FLOAT32, 2);
-        std::vector<char> tree = run_tree(raw, AudioSampleFormat::FLOAT32, rate, 2, AudioSampleFormat::FLOAT32, rate, 2);
+        std::vector<char> tree = run_tree(
+            logger, raw,
+            AudioSampleFormat::FLOAT32, rate, 2,
+            AudioSampleFormat::FLOAT32, rate, 2
+        );
 
         if (legacy.size() != raw.size() || tree.size() != raw.size()){
             return "Length mismatch: raw = " + std::to_string(raw.size())
@@ -354,7 +366,11 @@ public:
         std::vector<char> raw = interleave_bytes({m});
 
         std::vector<char> legacy = run_legacy(raw, 48000, AudioSampleFormat::FLOAT32, 1, AudioSampleFormat::FLOAT32, 1);
-        std::vector<char> tree = run_tree(raw, AudioSampleFormat::FLOAT32, rate, 1, AudioSampleFormat::FLOAT32, rate, 1);
+        std::vector<char> tree = run_tree(
+            logger, raw,
+            AudioSampleFormat::FLOAT32, rate, 1,
+            AudioSampleFormat::FLOAT32, rate, 1
+        );
 
         if (legacy.size() != raw.size() || tree.size() != raw.size()){
             return "Length mismatch: raw = " + std::to_string(raw.size())
@@ -398,7 +414,11 @@ public:
         std::vector<char> raw = interleave_bytes({l, r});
 
         std::vector<char> legacy = run_legacy(raw, 48000, AudioSampleFormat::FLOAT32, 2, AudioSampleFormat::SINT16, 2);
-        std::vector<char> tree = run_tree(raw, AudioSampleFormat::FLOAT32, rate, 2, AudioSampleFormat::SINT16, rate, 2);
+        std::vector<char> tree = run_tree(
+            logger, raw,
+            AudioSampleFormat::FLOAT32, rate, 2,
+            AudioSampleFormat::SINT16, rate, 2
+        );
 
         if (legacy.size() != tree.size()){
             return "Length mismatch: legacy = " + std::to_string(legacy.size())
@@ -448,7 +468,8 @@ public:
         std::vector<char> raw = interleave_bytes({l, r});
 
         std::vector<char> out = run_tree(
-            raw, AudioSampleFormat::FLOAT32, in_rate, 2,
+            logger, raw,
+            AudioSampleFormat::FLOAT32, in_rate, 2,
             AudioSampleFormat::FLOAT32, out_rate, 2
         );
         const size_t out_samples = out.size() / sizeof(float);
@@ -498,7 +519,8 @@ public:
         std::vector<char> raw = interleave_bytes({m});
 
         std::vector<char> out = run_tree(
-            raw, AudioSampleFormat::FLOAT32, in_rate, 1,
+            logger, raw,
+            AudioSampleFormat::FLOAT32, in_rate, 1,
             AudioSampleFormat::FLOAT32, out_rate, 1
         );
         const size_t out_samples = out.size() / sizeof(float);
@@ -542,7 +564,8 @@ public:
         std::vector<char> raw = interleave_bytes({m});
 
         std::vector<char> out = run_tree(
-            raw, AudioSampleFormat::FLOAT32, rate, 1,
+            logger, raw,
+            AudioSampleFormat::FLOAT32, rate, 1,
             AudioSampleFormat::FLOAT32, rate, 2
         );
         if (out.size() != raw.size() * 2){
@@ -591,7 +614,8 @@ public:
         std::vector<char> raw = interleave_bytes({l, r});
 
         std::vector<char> out = run_tree(
-            raw, AudioSampleFormat::FLOAT32, rate, 2,
+            logger, raw,
+            AudioSampleFormat::FLOAT32, rate, 2,
             AudioSampleFormat::FLOAT32, rate, 1
         );
         if (out.size() != raw.size() / 2){

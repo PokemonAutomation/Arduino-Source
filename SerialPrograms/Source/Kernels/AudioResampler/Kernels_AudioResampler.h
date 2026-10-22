@@ -9,6 +9,7 @@
 
 #include <cstddef>
 #include <vector>
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Containers/AlignedVector.h"
 #include "Kernels/AudioPipeline/Kernels_AudioPipeline.h"
@@ -35,6 +36,7 @@ class AudioResampler : public AudioPipeline::WorkingAudioStreamListener{
 public:
     ~AudioResampler();
     AudioResampler(
+        Logger& logger,
         size_t in_sample_rate,
         size_t out_sample_rate,
         size_t channels,
