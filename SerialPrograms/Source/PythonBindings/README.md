@@ -34,8 +34,11 @@ installation instructions — it is not downloaded automatically.
 Run the following commands:
 
 ```sh
-cd SerialPrograms  # starting from the root Arduino-Source
-mkdir -p bin && cd bin
+# starting from the root Arduino-Source
+cd SerialPrograms
+# create the build folder and cd into it
+mkdir -p bin
+cd bin
 cmake .. -DPA_PYTHON_BINDINGS=ON -DPA_CORE_ONLY=ON
 cmake --build . --target _pa_core
 ```
@@ -59,7 +62,8 @@ After the build, `_pa_core` is copied into
 To install it for a project:
 
 ```sh
-pip install -e SerialPrograms/Source/PythonBindings  # starting from the root Arduino-Source
+# starting from the root Arduino-Source
+pip install -e SerialPrograms/Source/PythonBindings
 ```
 
 ## Example usage: Switch Connection test
@@ -87,7 +91,8 @@ If `port` is omitted, every port from `list_serial_ports()` is tried in turn.
 Pytest must be installed: `pip install pytest`
 
 ```sh
-cd SerialPrograms/Source/PythonBindings  # starting from the root Arduino-Source
+# starting from the root Arduino-Source
+cd SerialPrograms/Source/PythonBindings
 python -m pytest
 ```
 
