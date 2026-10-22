@@ -149,7 +149,7 @@ def test_push_left_joystick_rejects_string():
 def test_push_right_joystick():
     """A [x, y] list is accepted too, forwarded with the requested hold and release."""
     sw, fake = make()
-    sw.push_right_joystick(joystick_position=(0.5, -0.5), hold_ms=300, release_ms=100)
+    sw.push_right_joystick(joystick_position=[0.5, -0.5], hold_ms=300, release_ms=100)
     (x, y, delay, hold, release), = fake.arguments("push_right_joystick")
     assert (x, y) == (0.5, -0.5) and hold == 300 and release == 100 and delay == 400
 

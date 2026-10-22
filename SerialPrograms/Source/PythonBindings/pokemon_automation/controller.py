@@ -267,7 +267,7 @@ class SwitchController:
         Thread-safe: may be called from another thread while commands are being sent
         (emergency stop).
 
-        C++: `PybindSwitchProController::cancel_all_and_wait(timeout_millis)`
+        C++: `PybindSwitchProController::cancel_all_and_wait(timeout_ms)`
         (SerialPrograms/Source/Integrations/PybindSwitchProController.h) ->
         `AbstractController::cancel_all_and_wait()` (SerialPrograms/Source/Controllers/Controller.h).
         """

@@ -35,7 +35,7 @@ Run the following commands:
 
 ```sh
 cd SerialPrograms  # starting from the root Arduino-Source
-mkdir bin && cd bin
+mkdir -p bin && cd bin
 cmake .. -DPA_PYTHON_BINDINGS=ON -DPA_CORE_ONLY=ON
 cmake --build . --target _pa_core
 ```
@@ -91,7 +91,7 @@ cd SerialPrograms/Source/PythonBindings  # starting from the root Arduino-Source
 python -m pytest
 ```
 
-Running pytest, it will look insid `pyproject.toml`, then run the all tests
+Running pytest, it will look inside `pyproject.toml`, then run all the tests
 within the `tests` folder.
 The tests that need the compiled module are skipped when `_pa_core` has not been built.
 
@@ -129,9 +129,9 @@ This mirrors the `pbf_*()` functions of the C++ program.
 
 Example 1: 
 ```py
-push_left_joystick(..., duration=10s)
-push_left_joystick(..., duration=10s)
-push_left_joystick(..., duration=10s)
+push_left_joystick(..., hold_ms=10000)
+push_left_joystick(..., hold_ms=10000)
+push_left_joystick(..., hold_ms=10000)
 do_something_else()
 ```
 
@@ -144,9 +144,9 @@ executing on the microcontroller, you need to use `wait_for_all_requests()`.
 
 Example 2:
 ```py
-push_left_joystick(..., duration=10s)
-push_left_joystick(..., duration=10s)
-push_left_joystick(..., duration=10s)
+push_left_joystick(..., hold_ms=10000)
+push_left_joystick(..., hold_ms=10000)
+push_left_joystick(..., hold_ms=10000)
 wait_for_all_requests()  # waits for the above, then runs do_something_else() below
 do_something_else()
 ```
