@@ -36,7 +36,14 @@ public:
         }
     }
     ~PybindSwitchProControllerInternal(){
-        m_connection->remove_status_listener(*this);
+        if (m_connection){
+            m_connection->remove_status_listener(*this);
+            //  The connection's destructor joins the connection thread, which may still be
+            //  inside post_connection_ready() and touching our members (m_controller,
+            //  m_procon, m_lock, m_cv, ...). Destroy the connection now, before any of
+            //  our own members are destroyed.
+            m_connection.reset();
+        }
     }
 
     bool wait_for_ready(uint64_t timeout_ms){
