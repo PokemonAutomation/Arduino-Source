@@ -115,7 +115,7 @@ void set_format(QAudioFormat& native_format, AudioChannelFormat format){
     }
 }
 
-AudioSampleFormat get_sample_format(QAudioFormat& native_format){
+AudioSampleFormat get_sample_format(const QAudioFormat& native_format){
 #if QT_VERSION_MAJOR == 5
     if (native_format.sampleType() == QAudioFormat::SampleType::Float){
         return AudioSampleFormat::FLOAT32;
@@ -145,6 +145,34 @@ AudioSampleFormat get_sample_format(QAudioFormat& native_format){
 #error "Unknown Qt version."
 #endif
 }
+
+
+
+AudioFormat::AudioFormat()
+    : m_native_format(CONSTRUCT_TOKEN)
+{}
+AudioFormat::AudioFormat(QAudioFormat native_format)
+    : m_native_format(CONSTRUCT_TOKEN, std::move(native_format))
+{}
+
+AudioSampleFormat AudioFormat::sample_format() const{
+    return get_sample_format(*m_native_format);
+}
+size_t AudioFormat::sample_rate() const{
+    return m_native_format->sampleRate();
+}
+size_t AudioFormat::channels() const{
+    return m_native_format->channelCount();
+}
+
+const QAudioFormat& AudioFormat::native_format() const{
+    return *m_native_format;
+}
+QAudioFormat& AudioFormat::native_format(){
+    return *m_native_format;
+}
+
+
 
 
 std::string format_to_str(const QAudioFormat& format){

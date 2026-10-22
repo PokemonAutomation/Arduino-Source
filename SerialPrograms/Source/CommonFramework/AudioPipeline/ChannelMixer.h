@@ -4,15 +4,16 @@
  *
  */
 
-#include <vector>
-
 #ifndef PokemonAutomation_AudioPipeline_ChannelMixer_H
 #define PokemonAutomation_AudioPipeline_ChannelMixer_H
 
+#include <vector>
+
 class QAudioFormat;
-class UnitTestDatabase;
 
 namespace PokemonAutomation{
+
+class UnitTestDatabase;
 
 
 //

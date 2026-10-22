@@ -23,9 +23,7 @@ ChannelMixer::ChannelMixer(
     std::vector<float> weight_matrix,
     size_t buffer_size
 )
-    : WorkingAudioStreamListener(sample_rate, in_channels)
-    , m_in_channels(in_channels)
-    , m_out_channels(out_channels)
+    : WorkingAudioNode(sample_rate, sample_rate, in_channels, out_channels)
     , m_buffer_size(buffer_size)
     , m_weight_matrix(std::move(weight_matrix))
     , m_buffer(out_channels * buffer_size)
@@ -36,10 +34,10 @@ ChannelMixer::ChannelMixer(
 }
 
 void ChannelMixer::add_listener(WorkingAudioStreamListener& listener){
-    if (sample_rate() != listener.sample_rate()){
+    if (out_sample_rate() != listener.sample_rate()){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Sample rate doesn't match.");
     }
-    if (m_out_channels != listener.channels()){
+    if (out_channels() != listener.channels()){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Channel count doesn't match.");
     }
     m_listeners.add(listener);
@@ -52,8 +50,8 @@ void ChannelMixer::push_samples(size_t samples, size_t stride, const float* data
     AudioChannelMixer::mix_channels(
         m_weight_matrix.data(),
         samples,
-        m_out_channels, m_buffer_size, m_buffer.data(),
-        m_in_channels, stride, data
+        out_channels(), m_buffer_size, m_buffer.data(),
+        in_channels(), stride, data
     );
     m_listeners.run_method(
         &WorkingAudioStreamListener::push_samples,
