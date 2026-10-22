@@ -17,8 +17,7 @@
 #include "CommonFramework/AudioPipeline/Spectrum/FFTStreamer.h"
 #include "Kernels/AudioPipeline/Kernels_RawAudio2WorkingAudio.h"
 #include "Kernels/AudioPipeline/Kernels_WorkingAudio2RawAudio.h"
-#include "Kernels/AudioPipeline/Kernels_ChannelMixer.h"
-#include "Kernels/AudioResampler/Kernels_AudioResampler.h"
+#include "Kernels/AudioPipeline/Kernels_WorkingAudio2WorkingAudio.h"
 #include <QAudioFormat>
 #if QT_VERSION_MAJOR == 5
 #include <QAudioDeviceInfo>
@@ -155,8 +154,7 @@ void AudioPassthroughPairQt::teardown_tree(){
     }
     m_fft_listener.reset();
     m_fft_node.reset();
-    m_fft_mixer.reset();
-    m_fft_resampler.reset();
+    m_fft_conv.reset();
     teardown_sink_branch();
     m_source_decoder.reset();
 }
@@ -164,10 +162,8 @@ void AudioPassthroughPairQt::teardown_tree(){
 
 void AudioPassthroughPairQt::teardown_sink_branch(){
     if (m_source_decoder){
-        if (m_sink_mixer){
-            m_source_decoder->remove_listener(*m_sink_mixer);
-        }else if (m_sink_resampler){
-            m_source_decoder->remove_listener(*m_sink_resampler);
+        if (m_sink_conv){
+            m_source_decoder->remove_listener(*m_sink_conv);
         }else if (m_sink_encoder){
             m_source_decoder->remove_listener(*m_sink_encoder);
         }
@@ -177,8 +173,7 @@ void AudioPassthroughPairQt::teardown_sink_branch(){
     if (m_sink_encoder && m_sink_device){
         m_sink_encoder->remove_listener(*m_sink_device);
     }
-    m_sink_mixer.reset();
-    m_sink_resampler.reset();
+    m_sink_conv.reset();
     m_sink_encoder.reset();
 }
 
@@ -205,33 +200,22 @@ void AudioPassthroughPairQt::build_tree(float input_volume){
     //  in m_fft_node, the tree's FFT endpoint.
     const size_t fft_rate = 48000;
     m_fft_node.reset(new WorkingAudioToFFT(fft_rate));
-    Kernels::AudioPipeline::WorkingAudioStreamListener* head = m_fft_node.get();
-    if (raw_rate != fft_rate){
-        m_fft_resampler.reset(
-            new Kernels::AudioResampler::AudioResampler(
-                m_logger,
-                raw_rate,
-                fft_rate,
-                1
-            )
-        );
-        m_fft_resampler->add_listener(*head);
-        head = m_fft_resampler.get();
-    }
-    if (raw_channels != 1){
-        auto matrix = build_channel_mixer_matrix(
+    if (raw_rate == fft_rate && raw_channels == 1){
+        //  No conversion needed: feed the FFT node directly.
+        m_source_decoder->add_listener(*m_fft_node);
+    }else{
+        std::vector<float> matrix = build_channel_mixer_matrix(
             channel_format(raw_channels), channel_format(1)
         );
-        if (matrix.empty()){
+        if (matrix.size() != raw_channels){
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "No channel mixer matrix.");
         }
-        m_fft_mixer.reset(new Kernels::AudioPipeline::ChannelMixer(
-            raw_rate, raw_channels, 1, std::move(matrix)
+        m_fft_conv.reset(new Kernels::AudioPipeline::WorkingAudio2WorkingAudio(
+            m_logger, raw_rate, fft_rate, raw_channels, 1, std::move(matrix)
         ));
-        m_fft_mixer->add_listener(*head);
-        head = m_fft_mixer.get();
+        m_fft_conv->add_listener(*m_fft_node);
+        m_source_decoder->add_listener(*m_fft_conv);
     }
-    m_source_decoder->add_listener(*head);
 
     //  The sink branch may have been created by the init_audio_sink() call
     //  that ran earlier in the same locked scope (which found no decoder
@@ -264,23 +248,11 @@ void AudioPassthroughPairQt::rebuild_sink_branch(){
     //  so it runs before the FFT head.
     teardown_sink_branch();
 
-    Kernels::AudioPipeline::WorkingAudioStreamListener* head = nullptr;
     m_sink_encoder.reset(new Kernels::AudioPipeline::WorkingAudio2RawAudio(
         sink_sample_format,
         sink_rate, sink_channels,
         convert_audio_volume_from_slider(m_output_volume)
     ));
-    head = m_sink_encoder.get();
-    if (raw_rate != sink_rate){
-        m_sink_resampler.reset(new Kernels::AudioResampler::AudioResampler(
-            m_logger,
-            raw_rate,
-            sink_rate,
-            sink_channels
-        ));
-        m_sink_resampler->add_listener(*head);
-        head = m_sink_resampler.get();
-    }
     //  INTERLEAVE_RL_96000 plays the card's channel 1 (the odd physical
     //  samples) as the left channel; the input reinterpretation preserves
     //  the physical order, so the sink branch swaps the two channels.
@@ -293,7 +265,10 @@ void AudioPassthroughPairQt::rebuild_sink_branch(){
     bool swap_channels =
         m_input_format == AudioChannelFormat::INTERLEAVE_RL_96000
         && raw_channels == 2 && sink_channels == 2;
-    if (raw_channels != sink_channels || swap_channels){
+    if (raw_rate == sink_rate && raw_channels == sink_channels && !swap_channels){
+        //  No conversion needed: feed the encoder directly.
+        m_source_decoder->push_front_listener(*m_sink_encoder);
+    }else{
         std::vector<float> matrix;
         if (swap_channels){
             //  out = [in 1, in 0]; weight(in i -> out o) at index i + in_ch * o.
@@ -306,13 +281,12 @@ void AudioPassthroughPairQt::rebuild_sink_branch(){
         if (matrix.size() != raw_channels * sink_channels){
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "No channel mixer matrix.");
         }
-        m_sink_mixer.reset(new Kernels::AudioPipeline::ChannelMixer(
-            raw_rate, raw_channels, sink_channels, std::move(matrix)
+        m_sink_conv.reset(new Kernels::AudioPipeline::WorkingAudio2WorkingAudio(
+            m_logger, raw_rate, sink_rate, raw_channels, sink_channels, std::move(matrix)
         ));
-        m_sink_mixer->add_listener(*head);
-        head = m_sink_mixer.get();
+        m_sink_conv->add_listener(*m_sink_encoder);
+        m_source_decoder->push_front_listener(*m_sink_conv);
     }
-    m_source_decoder->push_front_listener(*head);
 
     //  The branch's open tail: raw bytes to the output device.
     m_sink_encoder->add_listener(*m_sink_device);

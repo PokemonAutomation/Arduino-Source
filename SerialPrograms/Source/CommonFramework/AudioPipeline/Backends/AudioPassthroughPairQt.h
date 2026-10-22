@@ -26,10 +26,7 @@ namespace Kernels{
 namespace AudioPipeline{
 class RawAudio2WorkingAudio;
 class WorkingAudio2RawAudio;
-class ChannelMixer;
-}
-namespace AudioResampler{
-class AudioResampler;
+class WorkingAudio2WorkingAudio;
 }
 }
 
@@ -106,11 +103,9 @@ private:
     //  channels reinterpreted from the physical 1ch x 96000 stream;
     //  MONO_96000 keeps the physical shape.)
     std::unique_ptr<Kernels::AudioPipeline::RawAudio2WorkingAudio> m_source_decoder;
-    std::unique_ptr<Kernels::AudioPipeline::ChannelMixer> m_sink_mixer;          //  Source channels -> sink channels.
-    std::unique_ptr<Kernels::AudioResampler::AudioResampler> m_sink_resampler;
+    std::unique_ptr<Kernels::AudioPipeline::WorkingAudio2WorkingAudio> m_sink_conv;  //  Source shape -> sink shape (mix + resample).
     std::unique_ptr<Kernels::AudioPipeline::WorkingAudio2RawAudio> m_sink_encoder;
-    std::unique_ptr<Kernels::AudioPipeline::ChannelMixer> m_fft_mixer;           //  Source channels -> 1 channel.
-    std::unique_ptr<Kernels::AudioResampler::AudioResampler> m_fft_resampler;
+    std::unique_ptr<Kernels::AudioPipeline::WorkingAudio2WorkingAudio> m_fft_conv;   //  Source shape -> 48 kHz mono (mix + resample).
     std::unique_ptr<WorkingAudioToFFT> m_fft_node;                              //  The tree's FFT endpoint.
 
     AudioDeviceInfo m_output_device;
