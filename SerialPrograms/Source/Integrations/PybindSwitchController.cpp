@@ -30,7 +30,10 @@ public:
         , m_descriptor(name)
         , m_connection(m_descriptor.open_connection(m_logger))
     {
-        m_connection->add_status_listener(*this);
+        //  open_connection() returns nullptr for an empty port name.
+        if (m_connection){
+            m_connection->add_status_listener(*this);
+        }
     }
     ~PybindSwitchProControllerInternal(){
         m_connection->remove_status_listener(*this);
@@ -85,9 +88,8 @@ public:
     ProController& controller(){
         ProController* procon = controller_if_ready();
         if (procon == nullptr){
-            throw InvalidConnectionStateException(
-                "Controller is not ready: " + m_connection->status_text()
-            );
+            std::string status = m_connection ? m_connection->status_text() : "No connection.";
+            throw InvalidConnectionStateException("Controller is not ready: " + status);
         }
         return *procon;
     }
@@ -127,7 +129,7 @@ bool PybindSwitchProController::is_ready() const{
 }
 std::string PybindSwitchProController::current_status() const{
     PybindSwitchProControllerInternal* internal = (PybindSwitchProControllerInternal*)m_internals;
-    return internal->m_connection->raw_status_text();
+    return internal->m_connection ? internal->m_connection->raw_status_text() : "No connection.";
 }
 std::string PybindSwitchProController::controller_name() const{
     PybindSwitchProControllerInternal* internal = (PybindSwitchProControllerInternal*)m_internals;
