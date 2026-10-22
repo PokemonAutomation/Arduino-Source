@@ -197,14 +197,13 @@ void add_tests_ExitWildBattle(UnitTestDatabase& database){
             .expected_idle_seconds = 20,
         },
         {
-            // After an evolution nothing ends the battle again, so the overworld is only
-            // checked after mashing B and then pressing B until the deadline: over a minute
-            // in which the player stands still.
+            // After an evolution nothing ends the battle again, so the overworld is checked
+            // right after mashing B, without pressing B until the deadline first.
             .name = "evolution",
             .events = {BattleExited},
             .evolutions = {true},
-            .expected_steps = "mash-B evolution? wait mash-B press-B overworld?",
-            .expected_idle_seconds = 70,
+            .expected_steps = "mash-B evolution? wait mash-B overworld?",
+            .expected_idle_seconds = 40,
         },
         {
             // Mashing B right away cancels the evolution.
@@ -212,30 +211,31 @@ void add_tests_ExitWildBattle(UnitTestDatabase& database){
             .events = {BattleExited},
             .evolutions = {true},
             .prevent_evolution = true,
-            .expected_steps = "mash-B evolution? mash-B press-B overworld?",
-            .expected_idle_seconds = 50,
+            .expected_steps = "mash-B evolution? mash-B overworld?",
+            .expected_idle_seconds = 20,
         },
         {
-            // A move to learn after the evolution is found by pressing B.
+            // A move to learn after the evolution keeps the overworld from being found, so it
+            // goes back to pressing B, which finds the move-learn prompt.
             .name = "evolution then new move is declined",
             .events = {BattleExited, MoveLearnPrompt, MoveLearnPrompt},
             .evolutions = {true},
             .overworld_misses = 1,
             .expected_result = WildBattleExitResult::ExitedAfterMoveLearn,
             .expected_steps =
-                "mash-B evolution? wait mash-B "
-                "press-B answer-B press-A answer-A press-A overworld? press-B overworld?",
-            .expected_idle_seconds = 100,
+                "mash-B evolution? wait mash-B overworld? "
+                "press-B answer-B press-A answer-A press-A overworld?",
+            .expected_idle_seconds = 70,
         },
         {
-            // If the overworld is not found after the evolution, it keeps pressing B.
+            // If the overworld is not found after the evolution, it goes back to pressing B.
             .name = "evolution and overworld not found",
             .events = {BattleExited},
             .evolutions = {true},
             .overworld_misses = 100,
             .expected_result = WildBattleExitResult::Failed,
             .expected_steps =
-                "mash-B evolution? wait mash-B "
+                "mash-B evolution? wait mash-B overworld? "
                 "press-B overworld? press-B overworld? press-B overworld? "
                 "press-B overworld? press-B overworld? press-B overworld?",
             .expected_idle_seconds = 220,
