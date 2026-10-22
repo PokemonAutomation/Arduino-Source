@@ -4,6 +4,7 @@
  *
  */
 
+#include <algorithm>
 #include <map>
 #include <set>
 #include <QtGlobal>
@@ -173,6 +174,315 @@ QAudioFormat& AudioFormat::native_format(){
 }
 
 
+namespace{
+
+
+//  The semantic content of a QAudioFormat for the input pipeline: rate,
+//  channel count, channel layout, sample format. (Sample size / type /
+//  byte order are derived or irrelevant here.)
+bool audio_format_equal(const QAudioFormat& a, const QAudioFormat& b){
+    return a.sampleRate() == b.sampleRate()
+        && a.channelCount() == b.channelCount()
+        && a.channelConfig() == b.channelConfig()
+        && a.sampleFormat() == b.sampleFormat();
+}
+
+bool audio_format_valid(const QAudioFormat& format){
+    return format.sampleRate() > 0
+        && format.channelCount() > 0
+        && format.sampleFormat() != QAudioFormat::SampleFormat::Unknown;
+}
+
+
+//  "44100" -> "44,100"
+std::string format_rate_comma(size_t rate){
+    const std::string digits = std::to_string(rate);
+    std::string out;
+    size_t placed = 0;
+    for (size_t i = digits.size(); i-- > 0;){
+        if (placed > 0 && (placed % 3) == 0){
+            out += ',';
+        }
+        out += digits[i];
+        placed++;
+    }
+    std::reverse(out.begin(), out.end());
+    return out;
+}
+
+
+//
+//  The standard layout name for a channel count, when the channel config
+//  is the standard one for that count (or unknown, in which case the
+//  pipeline assumes the standard layout anyway). Mirrors
+//  fallback_channel_config() in ChannelMixer.cpp. Returns "" for
+//  non-standard layouts and channel counts with no standard layout.
+//
+QAudioFormat::ChannelConfig standard_channel_config(size_t channels){
+    switch (channels){
+    case 1: return QAudioFormat::ChannelConfig::ChannelConfigMono;
+    case 2: return QAudioFormat::ChannelConfig::ChannelConfigStereo;
+    case 3: return QAudioFormat::ChannelConfig::ChannelConfig2Dot1;
+    case 4: return QAudioFormat::ChannelConfig::ChannelConfig3Dot1;
+    case 5: return QAudioFormat::ChannelConfig::ChannelConfigSurround5Dot0;
+    case 6: return QAudioFormat::ChannelConfig::ChannelConfigSurround5Dot1;
+    case 7: return QAudioFormat::ChannelConfig::ChannelConfigSurround7Dot0;
+    case 8: return QAudioFormat::ChannelConfig::ChannelConfigSurround7Dot1;
+    default: return QAudioFormat::ChannelConfig::ChannelConfigUnknown;
+    }
+}
+
+
+const char* standard_layout_name(size_t channels, QAudioFormat::ChannelConfig config){
+    const QAudioFormat::ChannelConfig standard = standard_channel_config(channels);
+    if (standard == QAudioFormat::ChannelConfigUnknown
+        || (config != QAudioFormat::ChannelConfigUnknown && config != standard)){
+        return "";
+    }
+    switch (channels){
+    case 1: return "Mono";
+    case 2: return "Stereo";
+    case 3: return "2.1";
+    case 4: return "3.1";
+    case 5: return "5.0";
+    case 6: return "5.1";
+    case 7: return "7.0";
+    case 8: return "7.1";
+    default: return "";
+    }
+}
+
+
+}
+
+
+
+AudioInputChoice::AudioInputChoice(){}
+AudioInputChoice::AudioInputChoice(AudioFormat format)
+    : m_format(format)
+    , m_physical(format)
+{}
+AudioInputChoice AudioInputChoice::reinterpreted(
+    AudioFormat format, AudioFormat physical, bool swap_channels
+){
+    AudioInputChoice choice;
+    choice.m_format = std::move(format);
+    choice.m_physical = std::move(physical);
+    choice.m_reinterpreted = true;
+    choice.m_swap_channels = swap_channels;
+    return choice;
+}
+bool AudioInputChoice::is_valid() const{
+    return audio_format_valid(m_format.native_format());
+}
+AudioInputChoice::operator bool() const{
+    return is_valid();
+}
+const AudioFormat& AudioInputChoice::format() const{
+    return m_format;
+}
+const AudioFormat& AudioInputChoice::physical_format() const{
+    return m_physical;
+}
+bool AudioInputChoice::is_reinterpreted() const{
+    return m_reinterpreted;
+}
+bool AudioInputChoice::swap_channels() const{
+    return m_swap_channels;
+}
+std::string AudioInputChoice::display_name() const{
+    const QAudioFormat& format = m_format.native_format();
+    if (!audio_format_valid(format)){
+        return "";
+    }
+    std::string name = std::to_string(format.channelCount()) + " x "
+        + format_rate_comma((size_t)format.sampleRate()) + " Hz";
+    std::string layout;
+    if (m_reinterpreted){
+        layout = m_swap_channels ? "Interleaved Stereo R/L" : "Interleaved Stereo L/R";
+    }else{
+        layout = standard_layout_name((size_t)format.channelCount(), format.channelConfig());
+    }
+    if (!layout.empty()){
+        name += " (" + layout + ")";
+    }
+    return name;
+}
+
+
+AudioInputChoiceList input_choices(std::vector<AudioFormat> supported, const AudioFormat& preferred){
+    AudioInputChoiceList ret;
+
+    //  1. Drop invalid entries.
+    std::vector<AudioFormat> valid;
+    for (const AudioFormat& format : supported){
+        if (audio_format_valid(format.native_format())){
+            valid.emplace_back(format);
+        }
+    }
+
+    //  2. Collapse duplicates by (rate, channels, channel config). When
+    //  several sample formats are supported for the same shape, the
+    //  preferred sample format wins; otherwise the first seen does.
+    std::vector<AudioFormat> deduped;
+    for (const AudioFormat& format : valid){
+        bool found = false;
+        for (AudioFormat& kept : deduped){
+            const QAudioFormat& k = kept.native_format();
+            const QAudioFormat& f = format.native_format();
+            if (k.sampleRate() == f.sampleRate()
+                && k.channelCount() == f.channelCount()
+                && k.channelConfig() == f.channelConfig()){
+                found = true;
+                if (audio_format_equal(f, preferred.native_format())){
+                    kept = format;
+                }
+                break;
+            }
+        }
+        if (!found){
+            deduped.emplace_back(format);
+        }
+    }
+
+    //  3. Sort by sample rate, then channel count, then config.
+    std::sort(deduped.begin(), deduped.end(), [](const AudioFormat& a, const AudioFormat& b){
+        const QAudioFormat& x = a.native_format();
+        const QAudioFormat& y = b.native_format();
+        if (x.sampleRate() != y.sampleRate()){
+            return x.sampleRate() < y.sampleRate();
+        }
+        if (x.channelCount() != y.channelCount()){
+            return x.channelCount() < y.channelCount();
+        }
+        return x.channelConfig() < y.channelConfig();
+    });
+
+    for (const AudioFormat& format : deduped){
+        ret.choices.emplace_back(format);
+    }
+
+    //  4. The misreporting capture-card case: the only supported format is
+    //  1ch x 96000, which is physically two 48 kHz channels interleaved.
+    //  Offer the reinterpretations in addition to the native choice.
+    if (ret.choices.size() == 1){
+        const QAudioFormat& only = ret.choices[0].format().native_format();
+        if (only.channelCount() == 1 && only.sampleRate() == 96000){
+            const QAudioFormat physical = only;
+            QAudioFormat logical;
+            //  The channel count must be set before the channel config:
+            //  QAudioFormat::setChannelCount() resets the config.
+            logical.setSampleRate(48000);
+            logical.setSampleFormat(physical.sampleFormat());
+            logical.setChannelCount(2);
+            logical.setChannelConfig(QAudioFormat::ChannelConfig::ChannelConfigStereo);
+            ret.choices.emplace_back(
+                AudioInputChoice::reinterpreted(AudioFormat(logical), AudioFormat(physical), false)
+            );
+            ret.choices.emplace_back(
+                AudioInputChoice::reinterpreted(AudioFormat(logical), AudioFormat(physical), true)
+            );
+        }
+    }
+
+    //  5. The preferred entry: exact match, otherwise the first.
+    ret.preferred_index = 0;
+    for (size_t i = 0; i < ret.choices.size(); i++){
+        if (audio_format_equal(ret.choices[i].format().native_format(), preferred.native_format())){
+            ret.preferred_index = i;
+            break;
+        }
+    }
+
+    return ret;
+}
+
+
+
+//
+//  QAudioDevice (Qt6) does not enumerate full formats, only
+//  isFormatSupported() / preferredFormat() / supportedSampleFormats(), so
+//  the supported list is probed over the standard grid of sample rates
+//  and channel counts. For each (rate, channels) shape the device's
+//  sample formats are tried in the order: preferred first, then the rest
+//  of supportedSampleFormats() (or common defaults when that is empty),
+//  and the first supported one is kept.
+//
+std::vector<AudioFormat> enumerate_supported_formats(const NativeAudioInfo& info){
+    std::vector<AudioFormat> supported;
+
+    const QAudioFormat& preferred = info.preferredFormat();
+
+    std::vector<QAudioFormat::SampleFormat> sample_formats(
+        info.supportedSampleFormats().begin(), info.supportedSampleFormats().end()
+    );
+    if (sample_formats.empty()){
+        sample_formats = {
+            preferred.sampleFormat(),
+            QAudioFormat::SampleFormat::Int16,
+            QAudioFormat::SampleFormat::Float,
+            QAudioFormat::SampleFormat::Int32,
+            QAudioFormat::SampleFormat::UInt8,
+        };
+    }
+    //  The preferred sample format wins ties: move it to the front.
+    if (preferred.sampleFormat() != QAudioFormat::SampleFormat::Unknown){
+        sample_formats.erase(
+            std::remove(
+                sample_formats.begin(), sample_formats.end(),
+                preferred.sampleFormat()
+            ),
+            sample_formats.end()
+        );
+        sample_formats.insert(sample_formats.begin(), preferred.sampleFormat());
+    }
+
+    for (int rate : {8000, 11025, 16000, 22050, 32000, 44100, 48000, 88200, 96000, 176400, 192000}){
+        for (int channels : {1, 2, 3, 4, 5, 6, 7, 8}){
+            for (QAudioFormat::SampleFormat sample_format : sample_formats){
+                QAudioFormat candidate;
+                candidate.setSampleRate(rate);
+                candidate.setSampleFormat(sample_format);
+                candidate.setChannelCount(channels);
+                candidate.setChannelConfig(standard_channel_config((size_t)channels));
+                if (info.isFormatSupported(candidate)){
+                    supported.emplace_back(candidate);
+                    break;
+                }
+            }
+        }
+    }
+
+    if (supported.empty()){
+        //  Backends that reject everything (or report no sample formats)
+        //  still get an entry so there is always a selection.
+        supported.emplace_back(preferred);
+    }
+
+    return supported;
+}
+
+
+AudioInputChoiceList build_input_choices(const NativeAudioInfo& info, const std::string& display_name){
+    AudioInputChoiceList ret = input_choices(
+        enumerate_supported_formats(info), AudioFormat(info.preferredFormat())
+    );
+
+    //  A misreporting card's preferred format is the physical
+    //  1ch x 96000; the sensible default is the L/R reinterpretation
+    //  (R/L for MiraBox, whose physical channel order is reversed).
+    const QAudioFormat& preferred = info.preferredFormat();
+    if (ret.choices.size() == 3
+        && ret.choices[2].is_reinterpreted()
+        && ret.choices[2].swap_channels()
+        && preferred.channelCount() == 1 && preferred.sampleRate() == 96000){
+        ret.preferred_index = display_name.find("MiraBox") != std::string::npos ? 2 : 1;
+    }
+
+    return ret;
+}
+
+
 
 
 std::string format_to_str(const QAudioFormat& format){
@@ -299,6 +609,9 @@ struct AudioDeviceInfo::Data{
     std::vector<AudioChannelFormat> supported_formats;
     int preferred_format_index;
 
+    std::vector<AudioInputChoice> supported_choices;
+    size_t preferred_choice_index = 0;
+
 #if QT_VERSION_MAJOR == 5
     QAudioDeviceInfo info;
 #elif QT_VERSION_MAJOR == 6
@@ -340,6 +653,13 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
 
         data.supported_formats = supported_input_formats(data.preferred_format_index, data.info, data.display_name);
 //        cout << "data.supported_formats = " << data.supported_formats.size() << endl;
+
+        {
+            AudioInputChoiceList choices =
+                build_input_choices(data.info, data.display_name);
+            data.supported_choices = std::move(choices.choices);
+            data.preferred_choice_index = choices.preferred_index;
+        }
     }
 #elif QT_VERSION_MAJOR == 6
     for (NativeAudioInfo& device : QMediaDevices::audioInputs()){
@@ -351,6 +671,13 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
         data.info = std::move(device);
 
         data.supported_formats = supported_input_formats(data.preferred_format_index, data.info, data.display_name);
+
+        {
+            AudioInputChoiceList choices =
+                build_input_choices(data.info, data.display_name);
+            data.supported_choices = std::move(choices.choices);
+            data.preferred_choice_index = choices.preferred_index;
+        }
     }
 #endif
 
@@ -504,6 +831,12 @@ const std::vector<AudioChannelFormat>& AudioDeviceInfo::supported_formats() cons
 }
 int AudioDeviceInfo::preferred_format_index() const{
     return m_body->preferred_format_index;
+}
+const std::vector<AudioInputChoice>& AudioDeviceInfo::supported_choices() const{
+    return m_body->supported_choices;
+}
+size_t AudioDeviceInfo::preferred_choice_index() const{
+    return m_body->preferred_choice_index;
 }
 QAudioFormat AudioDeviceInfo::preferred_format() const{
     QAudioFormat format = native_info().preferredFormat();
