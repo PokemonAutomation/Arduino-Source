@@ -21,8 +21,9 @@
 # position-independent.
 set_target_properties(CoreLib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
-# pybind11: prefer an installed copy (a system package or `pip install pybind11`),
-# and download a pinned release only as a fallback.
+# pybind11: use an installed copy (a system package or `pip install pybind11`).
+# It is deliberately NOT downloaded here: configure fails with instructions
+# instead, so builds never reach out to the network on their own.
 set(PYBIND11_FINDPYTHON ON)
 find_package(Python 3.10 REQUIRED COMPONENTS Interpreter Development.Module)
 find_package(pybind11 CONFIG QUIET)
@@ -38,14 +39,12 @@ if (NOT pybind11_FOUND)
     endif()
 endif()
 if (NOT pybind11_FOUND)
-    message(STATUS "Python bindings: pybind11 not found, downloading it")
-    include(FetchContent)
-    FetchContent_Declare(
-        pybind11
-        GIT_REPOSITORY https://github.com/pybind/pybind11.git
-        GIT_TAG v3.0.1
+    message(FATAL_ERROR
+        "Python bindings: pybind11 was not found for ${Python_EXECUTABLE} (${Python_VERSION}).\n"
+        "This build does not download pybind11 automatically. Install it and reconfigure, e.g.:\n"
+        "    \"${Python_EXECUTABLE}\" -m pip install pybind11\n"
+        "or use a system package (Debian/Ubuntu: `sudo apt install pybind11-dev`, macOS: `brew install pybind11`)."
     )
-    FetchContent_MakeAvailable(pybind11)
 endif()
 message(STATUS "Python bindings: building _pa_core for ${Python_EXECUTABLE} (${Python_VERSION})")
 

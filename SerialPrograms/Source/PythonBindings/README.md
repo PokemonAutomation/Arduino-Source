@@ -28,8 +28,8 @@ device, using the `NintendoSwitch::PybindSwitchProController` class from CoreLib
 ## Building the pybind module
 
 Requires a Python 3.10+ with development headers and pybind11 (a system package
-or `pip install pybind11`). If pybind11 is not found, CMake downloads a pinned
-pybind11 release.
+or `pip install pybind11`). If pybind11 is not found, CMake fails with
+installation instructions — it is not downloaded automatically.
 
 Run the following commands:
 
