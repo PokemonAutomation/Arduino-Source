@@ -6,7 +6,7 @@
 
 
 #include "CommonFramework/Logging/Logger.h"
-#include "ComputerPrograms/UnitTestRunner.h"
+#include "ComputerPrograms/ComputerPrograms_UnitTestRunner.h"
 #include "CommandLineTests.h"
 
 #include <iostream>
