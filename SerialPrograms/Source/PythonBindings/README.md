@@ -62,7 +62,7 @@ To install it for a project:
 pip install -e SerialPrograms/Source/PythonBindings  # starting from the root Arduino-Source
 ```
 
-## Switch Connection test
+## Example usage: Switch Connection test
 
 `switch_connection_test.py` will connect to the Switch via PABotBase2 and send a few simple commands.
 
@@ -91,46 +91,67 @@ cd SerialPrograms/Source/PythonBindings  # starting from the root Arduino-Source
 python -m pytest
 ```
 
+Running pytest, it will look insid `pyproject.toml`, then run the all tests
+within the `tests` folder.
 The tests that need the compiled module are skipped when `_pa_core` has not been built.
 
-## More example usage
+## Controller Commands
+The command methods of `SwitchController` match the names of the backend they wrap
+(`_pa_core.Controller` from PythonBindings_Module.cpp, and with it the C++ 
+`PybindSwitchProController` methods). Here's a brief description of some of the
+controller functions:
 
-```python
-from pokemon_automation import SwitchController, list_serial_ports
-
-print(list_serial_ports())
-with SwitchController("/dev/ttyACM0") as sw:  # connects to the Switch via port /dev/ttyACM0
-    print(sw.current_status())                # device name and firmware version
-    sw.push_button("A")                       # tap A (80 ms hold, 80 ms release)
-    sw.push_button("L+R", hold_ms=200)        # press L and R together
-    sw.push_dpad("up")                        # d-pad up
-    sw.push_left_joystick((0.0, 1.0), hold_ms=1500)  # walk forward
-    sw.controller_state("B", "up", left_joystick=(0.0, 1.0), duration_ms=2000)  # run forward
-    sw.wait(300)
-    sw.wait_for_all_requests()                # block until the device executed everything
-```
-
-Commands are queued on the microcontroller and return as soon as they are
-scheduled, mirroring the `pbf_*()` functions of the main program. The command
-methods of `SwitchController` match the names of the backend they wrap
-(`_pa_core.Controller`, and with it the C++
-`PybindSwitchProController` methods):
-
-- `push_button()`: taps buttons on the Switch.
-- `push_dpad()`: taps a d-pad direction.
-- `push_left_joystick()` / `push_right_joystick()`: moves a stick.
+Controller commands: queued on the microcontroller and return as soon as they are
+scheduled.
+- `push_button()`: presses button(s) on the Switch.
+- `push_dpad()`: presses the d-pad.
+- `push_left_joystick()` / `push_right_joystick()`: moves the joystick.
 - `controller_state()`: simultaneously holds/presses any combination of buttons,
   d-pad and sticks.
-- `wait()`: queues a pause with nothing pressed.
-- `wait_for_all_requests()`: to wait for all queued commands to execute.
-- `cancel_all_and_wait()`: (thread-safe) to
-drop the queue, release all inputs and wait for the device to confirm the
-neutral state — e.g. from an emergency-stop thread.
+- `wait()`: queues a pause, with nothing pressed.
+
+Other commands:
+- `wait_for_all_requests()`: Blocks code execution until all the queued commands have been executed.
+- `cancel_all_and_wait()`: Drops all commands queued on the microcontroller, release all inputs and 
+waits for the device to confirm the neutral state — e.g. from an emergency-stop thread.
 - `close()`: runs `cancel_all_and_wait()`, then drops the connection.
 
 See `controller.py` for more details.
 
-## Notes
+See `switch_connection_test.py` for example usage.
+
+## Notes on the command queue
+
+As mentioned above, commands are queued on the microcontroller and return as soon as they are
+scheduled. i.e. the main program doesn't pause or wait for the physical button press to finish
+before moving to the next line of code. It hands the command to the microcontroller and instantly moves on.
+This mirrors the `pbf_*()` functions of the C++ program. 
+
+Example 1: 
+```py
+push_left_joystick(..., duration=10s)
+push_left_joystick(..., duration=10s)
+push_left_joystick(..., duration=10s)
+do_something_else()
+```
+
+Suppose you have 3 calls to `push_left_joystick()`, where you push the joystick
+for 10 seconds each. The above 3 commands will be queued onto the microcontroller,
+then immediately move onto `do_something_else()`, even when the above 3 commands
+have not yet finished executing on the microcontroller. If you want
+`do_something_else()` to only start once the three commands have finished
+executing on the microcontroller, you need to use `wait_for_all_requests()`.
+
+Example 2:
+```py
+push_left_joystick(..., duration=10s)
+push_left_joystick(..., duration=10s)
+push_left_joystick(..., duration=10s)
+wait_for_all_requests()  # waits for the above, then runs do_something_else() below
+do_something_else()
+```
+
+## Other Notes
 
 - All durations are milliseconds.
 - C++ `PokemonAutomation::Exception`s surface as Python `RuntimeError`s.
