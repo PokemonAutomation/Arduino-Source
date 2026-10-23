@@ -5,6 +5,12 @@
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 
 namespace PokemonAutomation { namespace NintendoSwitch { namespace PokemonBDSP {
+// Reuse the Oreburgh Gate down/right entry search. Returns at fade start;
+// caller owns destination-specific fade completion and interior confirmation.
+// north_fallback preserves Oreburgh's final north sweep when explicitly set.
+void enter_cave_with_down_right_search(VideoStream& stream, ProControllerContext& context,
+    const std::string& label, Milliseconds north_fallback = Milliseconds(0));
+
 // Shared confirmed-Run escape: verifies exit transition or main menu.
 void escape_wild_battle(VideoStream& stream, ProControllerContext& context,
     BattleType battle_type = BattleType::STANDARD,

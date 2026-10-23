@@ -36,6 +36,34 @@ namespace PokemonAutomation {
     namespace NintendoSwitch {
         namespace PokemonBDSP {
 
+// Extracted from the Segment 01 Oreburgh Gate approach. Both callers use
+// the same bounded down/right search and cancel queued input at the black fade.
+// Oreburgh preserves its original north sweep; Coronet uses only down/right.
+void enter_cave_with_down_right_search(VideoStream& stream, ProControllerContext& context,
+    const std::string& label, Milliseconds north_fallback) {
+    context.wait_for_all_requests();
+    for (size_t attempt=0;attempt<3;attempt++) {
+        BlackScreenWatcher black_screen;
+        const int result=run_until<ProControllerContext>(stream,context,
+            [north_fallback](ProControllerContext& ctx) {
+                for (size_t i=0;i<10;i++) {
+                    pbf_press_button(ctx,BUTTON_DOWN,180ms,0ms);
+                    pbf_press_button(ctx,BUTTON_RIGHT,180ms,0ms);
+                    pbf_press_button(ctx,BUTTON_RIGHT,180ms,0ms);
+                }
+                if (north_fallback>0ms)
+                    pbf_move_left_joystick(ctx,{0,1},north_fallback,0ms);
+            },{{black_screen}});
+        context.wait_for_all_requests();
+        if (result==0) {
+            stream.log(label+": Black screen detected.");
+            return;
+        }
+    }
+    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+        label+": No black screen after 3 attempts.",stream);
+}
+
             static bool mine_confirm_escape_via_menu(
                 VideoStream& stream,
                 ProControllerContext& context,

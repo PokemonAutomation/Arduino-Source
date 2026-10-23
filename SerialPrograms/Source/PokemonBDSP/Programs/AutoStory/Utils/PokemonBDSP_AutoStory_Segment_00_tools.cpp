@@ -1303,9 +1303,10 @@ namespace PokemonAutomation {
                     } else if (result.located) {
                         confirmations = 0;
                         missing = 0;
-                        // A temporarily obscured third Jupiter anchor must not
-                        // move us away from an otherwise aligned position.
-                        if (matcher==match_galactic_hq_jupiter && result.coarse &&
+                        // Wait at an aligned pose while strict visual support
+                        // recovers, rather than stepping away under a cloud.
+                        if ((matcher==match_galactic_hq_jupiter ||
+                            matcher==match_route208_hannah_departure || matcher==match_route208_stair_top) && result.coarse &&
                             std::abs(result.dx)<=1.0/128 && std::abs(result.dy)<=1.0/54){
                             pbf_wait(context,500ms);
                             context.wait_for_all_requests();
@@ -1343,7 +1344,9 @@ namespace PokemonAutomation {
                             result.dy < -1.0/54;
                         const bool jupiter_anchor_horizontal=matcher==match_galactic_hq_jupiter &&
                             !jupiter_row_recovery && result.coarse && std::abs(result.dx)>1.0/128;
-                        const bool horizontal = !gym_row_recovery && !jupiter_row_recovery && (jupiter_anchor_horizontal || coarse_horizontal || plaza_anchor_horizontal || eterna_anchor_horizontal || gym_anchor_horizontal || (!result.coarse &&
+                        // Stay south of the Contest Hall wall/sign before crossing to Fantina.
+                        const bool contest_row_recovery=matcher==match_hearthome_contest_fantina && result.dy>1.0/54;
+                        const bool horizontal = !contest_row_recovery && !gym_row_recovery && !jupiter_row_recovery && (jupiter_anchor_horizontal || coarse_horizontal || plaza_anchor_horizontal || eterna_anchor_horizontal || gym_anchor_horizontal || (!result.coarse &&
                             ((horizontal_first && std::abs(result.dx)>1.0/128) ||
                              std::abs(result.dx)>=std::abs(result.dy)*9.0/16)));
                         if (coarse_horizontal) stream.log("[" + label +
@@ -1372,11 +1375,22 @@ namespace PokemonAutomation {
                         pbf_wait(context, 500ms);
                     } else {
                         confirmations = 0;
-                        if (matcher==match_galactic_hq_jupiter){
-                            // Blind room-wide sweeps can enter the nearby stairs.
-                            // Reobserve in place, then fail if no anchors recover.
-                            if (++missing>6) OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                label+": Chair/stair anchors missing; no blind search near stairs.",stream);
+                        if (matcher==match_hearthome_center_entrance || matcher==match_hearthome_contest_fantina){
+                            // Do not sweep into a different doorway or around the Hall's
+                            // side when a cloud, NPC or fade hides the required anchors.
+                            if (++missing>20) OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                                label+": Scene anchors missing; stationary reacquisition exhausted.",stream);
+                            pbf_wait(context,500ms);
+                            context.wait_for_all_requests();
+                            continue;
+                        }
+                        if (matcher==match_galactic_hq_jupiter || matcher==match_route208_stair_top){
+                            // Blind sweeps can enter nearby stairs. The outdoor
+                            // rock pose gets ten seconds for a cloud to pass.
+                            const bool stair_rocks=matcher==match_route208_stair_top;
+                            if (++missing>(stair_rocks ? 20 : 6)) OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                                label+(stair_rocks ? ": Rock anchors missing; no blind search near stairs." :
+                                    ": Chair/stair anchors missing; no blind search near stairs."),stream);
                             pbf_wait(context,500ms);
                             context.wait_for_all_requests();
                             continue;
