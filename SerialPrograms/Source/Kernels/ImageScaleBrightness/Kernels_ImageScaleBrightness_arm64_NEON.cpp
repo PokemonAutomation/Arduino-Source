@@ -60,10 +60,11 @@ PA_FORCE_INLINE void scale_brightness_arm64_NEON_four_pixels_per_channel_scale(
         g_f32x4 = vmulq_n_f32(g_f32x4, g_scale);
         r_f32x4 = vmulq_n_f32(r_f32x4, r_scale);
 
-        // Convert each float32 back to uint32
-        b_u32x4 = vcvtq_u32_f32(b_f32x4);
-        g_u32x4 = vcvtq_u32_f32(g_f32x4);
-        r_u32x4 = vcvtq_u32_f32(r_f32x4);
+        // Convert each float32 back to uint32, rounding to the nearest integer with ties
+        // to even, like _mm_cvtps_epi32() on x86
+        b_u32x4 = vcvtnq_u32_f32(b_f32x4);
+        g_u32x4 = vcvtnq_u32_f32(g_f32x4);
+        r_u32x4 = vcvtnq_u32_f32(r_f32x4);
 
         // Clamp against 255
         b_u32x4 = vminq_u32(b_u32x4, max_brightness_u32x4);
@@ -87,9 +88,12 @@ PA_FORCE_INLINE void scale_brightness_arm64_NEON_four_pixels_per_channel_scale(
         r *= r_scale;
         g *= g_scale;
         b *= b_scale;
-        uint32_t r_u32 = std::min((uint32_t)r, (uint32_t)255);
-        uint32_t g_u32 = std::min((uint32_t)g, (uint32_t)255);
-        uint32_t b_u32 = std::min((uint32_t)b, (uint32_t)255);
+        //  Round to the nearest integer, like the vector loop above. Adding 0.5 rounds
+        //  an exact tie like 50.5 up, while the vector loop rounds it to even. That
+        //  1-unit difference at ties is fine.
+        uint32_t r_u32 = std::min((uint32_t)(r + 0.5f), (uint32_t)255);
+        uint32_t g_u32 = std::min((uint32_t)(g + 0.5f), (uint32_t)255);
+        uint32_t b_u32 = std::min((uint32_t)(b + 0.5f), (uint32_t)255);
 
         pixel &= 0xff000000;
         pixel |= r_u32 << 16;
