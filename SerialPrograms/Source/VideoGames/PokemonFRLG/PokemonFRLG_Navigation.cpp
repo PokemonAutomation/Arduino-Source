@@ -585,6 +585,7 @@ WildBattleExitResult exit_wild_battle(
     bool first_attempt = true;
     bool rejected_first_box = false;
     bool move_learned = false;
+    bool evolved = false;
     while (true){
         if (errors > 5 || loops > 5){
             return WildBattleExitResult::Failed;
@@ -599,6 +600,7 @@ WildBattleExitResult exit_wild_battle(
             // check for the evolution screen
             if (actions.evolution_started()){
                 logger.log("Evolution detected.");
+                evolved = true;
                 if (!prevent_evolution){
                     // make sure B isn't pressed too soon, which would cancel the evolution
                     actions.wait_for_evolution();
@@ -628,6 +630,18 @@ WildBattleExitResult exit_wild_battle(
             }
             continue;
         case WildBattleExitEvent::None:
+            // An evolution ends on the overworld without another black screen, so nothing above
+            // can see that it is over. Check for the overworld now, instead of pressing B for
+            // another 30 seconds first.
+            if (evolved){
+                evolved = false;
+                first_attempt = false;
+                if (actions.return_to_overworld()){
+                    logger.log("Battle exited.");
+                    return move_learned ? WildBattleExitResult::ExitedAfterMoveLearn : WildBattleExitResult::Exited;
+                }
+                continue;
+            }
             if (first_attempt){
                 logger.log("Loop detected.");
                 first_attempt = false;
@@ -677,6 +691,9 @@ public:
                 pbf_wait(context, 1000ms); // give the watchers a chance to detect something
                 while (current_time() < deadline){
                     pbf_press_button(context, button, 200ms, 1800ms);
+                    // Presses are queued, so without this the loop queues a minute of them
+                    // before the deadline and keeps pressing long after it.
+                    context.wait_for_all_requests();
                 }
             },
             { battle_exited, advance_dialog, move_learn_select }
