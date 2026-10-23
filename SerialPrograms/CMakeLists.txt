@@ -959,7 +959,9 @@ if (WIN32)
         endif()
     endif()
 
-    # Copy the ffmpeg shared DLLs if missing/different
+    # Copy the ffmpeg shared DLLs to WIN_DEPLOY_DIR if missing/different
+    # The top-level THIRD_PARTY_DLLS glob doesn't see the dlls within this subfolder,
+    # so we need to do this separately.
     if (PA_STREAM_HISTORY_FFMPEG)
         file(GLOB FFMPEG_DLLS "${FFMPEG_DLL_DIR}/*.dll")
         foreach(DLL IN LISTS FFMPEG_DLLS)
