@@ -171,7 +171,7 @@ void filter_rgb32_range(
             image, bytes_per_row, width, height,
             filter[c].data, filter[c].bytes_per_row,
             filter[c].replacement,
-            filter[c].pixels_in_range,
+            filter[c].invert,
             filter[c].mins,
             filter[c].maxs
         );
