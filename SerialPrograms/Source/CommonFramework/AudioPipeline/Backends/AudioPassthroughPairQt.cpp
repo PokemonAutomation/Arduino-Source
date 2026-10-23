@@ -449,6 +449,15 @@ void AudioPassthroughPairQt::reset(
     auto scope_check = m_sanitizer.check_scope();
     QMetaObject::invokeMethod(this, [this, file, output, output_volume]{
         auto scope_check = m_sanitizer.check_scope();
+        std::unique_ptr<AudioSource> source;
+        if (!file.empty()){
+            source.reset(new AudioSource(
+                m_logger,
+                file,
+                AudioChannelFormat::DUAL_48000,
+                m_file_input_multiplier
+            ));
+        }
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_reader){
             teardown_tree();
@@ -458,13 +467,15 @@ void AudioPassthroughPairQt::reset(
             m_input_format = AudioChannelFormat::NONE;
         }
         m_input_format = AudioChannelFormat::DUAL_48000;
-        m_reader.reset(new AudioSource(m_logger, file, m_input_format, m_file_input_multiplier));
-        m_sample_listener.reset(new SampleListener(*this, m_reader->samples_per_frame()));
-        m_output_device = output;
-        m_output_volume = output_volume;
-        init_audio_sink();
-        build_tree(m_file_input_multiplier);
-        m_fft_listener.reset(new InternalFFTListener(*this));
+        if (source){
+            m_reader = std::move(source);
+            m_sample_listener.reset(new SampleListener(*this, m_reader->samples_per_frame()));
+            m_output_device = output;
+            m_output_volume = output_volume;
+            init_audio_sink();
+            build_tree(m_file_input_multiplier);
+            m_fft_listener.reset(new InternalFFTListener(*this));
+        }
     });
 }
 void AudioPassthroughPairQt::reset(
@@ -475,6 +486,15 @@ void AudioPassthroughPairQt::reset(
 //    cout << "AudioPassthroughPairQt::reset(): " << output.display_name() << endl;
     QMetaObject::invokeMethod(this, [this, format, output, output_volume, input]{
         auto scope_check = m_sanitizer.check_scope();
+        std::unique_ptr<AudioSource> source;
+        if (input && format != AudioChannelFormat::NONE){
+            source.reset(new AudioSource(
+                m_logger,
+                input,
+                format,
+                m_device_input_multiplier
+            ));
+        }
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_reader){
             teardown_tree();
@@ -486,8 +506,8 @@ void AudioPassthroughPairQt::reset(
         m_input_format = format;
         m_output_device = output;
         m_output_volume = output_volume;
-        if (input && format != AudioChannelFormat::NONE){
-            m_reader.reset(new AudioSource(m_logger, input, m_input_format, m_device_input_multiplier));
+        if (source){
+            m_reader = std::move(source);
             m_sample_listener.reset(new SampleListener(*this, m_reader->samples_per_frame()));
             init_audio_sink();
             build_tree(m_device_input_multiplier);
@@ -512,6 +532,15 @@ void AudioPassthroughPairQt::set_audio_source(const std::string& file){
     auto scope_check = m_sanitizer.check_scope();
     QMetaObject::invokeMethod(this, [this, file]{
         auto scope_check = m_sanitizer.check_scope();
+        std::unique_ptr<AudioSource> source;
+        if (!file.empty()){
+            source.reset(new AudioSource(
+                m_logger,
+                file,
+                AudioChannelFormat::DUAL_48000,
+                m_file_input_multiplier
+            ));
+        }
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_reader){
             teardown_tree();
@@ -521,17 +550,28 @@ void AudioPassthroughPairQt::set_audio_source(const std::string& file){
             m_input_format = AudioChannelFormat::NONE;
         }
         m_input_format = AudioChannelFormat::DUAL_48000;
-        m_reader.reset(new AudioSource(m_logger, file, m_input_format, m_file_input_multiplier));
-        m_sample_listener.reset(new SampleListener(*this, m_reader->samples_per_frame()));
-        init_audio_sink();
-        build_tree(m_file_input_multiplier);
-        m_fft_listener.reset(new InternalFFTListener(*this));
+        if (source){
+            m_reader = std::move(source);
+            m_sample_listener.reset(new SampleListener(*this, m_reader->samples_per_frame()));
+            init_audio_sink();
+            build_tree(m_file_input_multiplier);
+            m_fft_listener.reset(new InternalFFTListener(*this));
+        }
     });
 }
 void AudioPassthroughPairQt::set_audio_source(const AudioDeviceInfo& device, AudioChannelFormat format){
     auto scope_check = m_sanitizer.check_scope();
     QMetaObject::invokeMethod(this, [this, format, device]{
         auto scope_check = m_sanitizer.check_scope();
+        std::unique_ptr<AudioSource> source;
+        if (device && format != AudioChannelFormat::NONE){
+            source.reset(new AudioSource(
+                m_logger,
+                device,
+                m_input_format,
+                m_device_input_multiplier
+            ));
+        }
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_reader){
             teardown_tree();
@@ -541,8 +581,8 @@ void AudioPassthroughPairQt::set_audio_source(const AudioDeviceInfo& device, Aud
             m_input_format = AudioChannelFormat::NONE;
         }
         m_input_format = format;
-        if (device){
-            m_reader.reset(new AudioSource(m_logger, device, m_input_format, m_device_input_multiplier));
+        if (source){
+            m_reader = std::move(source);
             m_sample_listener.reset(new SampleListener(*this, m_reader->samples_per_frame()));
             init_audio_sink();
             build_tree(m_device_input_multiplier);
