@@ -28,6 +28,14 @@ class AudioFileLoader;
 //  opened or is not a supported WAV (PCM 8/16/32-bit or IEEE-float).
 bool probe_wav_native_format(const std::string& filename, QAudioFormat& out_format);
 
+//  Probes the native output format of a compressed audio file (.mp3, .ogg,
+//  .flac, ...) by starting a throwaway QAudioDecoder without a target
+//  format and reading the format off the first decoded buffer: that is
+//  the format the decoder will produce for this file. Returns false if no
+//  decode backend is available, the file cannot be opened, or no buffer
+//  arrives within 3 seconds.
+bool probe_decoded_native_format(const std::string& filename, QAudioFormat& out_format);
+
 
 //
 //  Raw audio input from a file (.wav via WavFile, compressed formats via

@@ -16,8 +16,12 @@
 #include <fstream>
 #include <vector>
 #include <QAudioFormat>
+#include <QAudioDecoder>
+#include <QEventLoop>
+#include <QTimer>
 #include "Common/Cpp/TestRunners/UnitTest.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "CommonFramework/AudioPipeline/IO/AudioFileLoader.h"
 #include "CommonFramework/AudioPipeline/IO/AudioInputFile.h"
@@ -333,6 +337,144 @@ public:
 
 
 
+//  The mp3 fixture for the decoded-native tests (two sines, 440 Hz left /
+//  660 Hz right, 44100 Hz stereo, 2 s, 64 kbps), in the CommandLineTests
+//  repo next to the program (like the test images).
+std::string decoded_probe_fixture(){
+    return UNIT_TEST_RESOURCE_PATH() + "CommonFramework/AudioPipeline/decoded_probe_44100_2ch.mp3";
+}
+
+
+class DecodedNativeProbeTest : public UnitTest{
+public:
+    DecodedNativeProbeTest()
+        : UnitTest("AudioFileLoader - ProbeDecodedNative_Mp3")
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope&) const override{
+        //  The fixture (two 44100 Hz sines, one per channel):
+        //  the decoder's native output for it is 44100 Hz stereo float.
+        const std::string fixture = decoded_probe_fixture();
+        if (!std::filesystem::exists(std::filesystem::path(fixture))){
+            return "Missing mp3 fixture: " + fixture + ".";
+        }
+        if (!QAudioDecoder(nullptr).isSupported()){
+            return UnitTestResult(
+                UnitTestResult::SKIPPED,
+                "No audio decode backend (Qt Multimedia media plugin missing or failing to load)."
+            );
+        }
+
+        QAudioFormat format;
+        if (!probe_decoded_native_format(fixture, format)){
+            return "probe_decoded_native_format() failed on the mp3 fixture.";
+        }
+        if (format.sampleRate() != 44100 || format.channelCount() != 2
+            || format.sampleFormat() != QAudioFormat::SampleFormat::Float){
+            return "Unexpected native decoded format: " + dump_audio_format(format) + ".";
+        }
+
+        //  A nonexistent file must fail the probe, not crash or hang.
+        QAudioFormat unused;
+        if (probe_decoded_native_format("/nonexistent/pa_decoded_probe_missing.mp3", unused)){
+            return "probe_decoded_native_format() should fail on a missing file.";
+        }
+
+        return true;
+    }
+};
+
+
+//
+//  Full decode path with the native target: AudioFileLoader given the probed
+//  format as its target (an identity conversion for QAudioDecoder) must
+//  stream the file at its native 44100 Hz pace: about 2 s of stereo float,
+//  both channels carrying the fixture's tones, with the channel separation
+//  intact.
+//
+class DecodedNativePlaybackTest : public UnitTest{
+public:
+    DecodedNativePlaybackTest()
+        : UnitTest("AudioFileLoader - DecodedNative_44100Playback")
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope&) const override{
+        const std::string fixture = decoded_probe_fixture();
+        if (!std::filesystem::exists(std::filesystem::path(fixture))){
+            return "Missing mp3 fixture: " + fixture + ".";
+        }
+        if (!QAudioDecoder(nullptr).isSupported()){
+            return UnitTestResult(
+                UnitTestResult::SKIPPED,
+                "No audio decode backend (Qt Multimedia media plugin missing or failing to load)."
+            );
+        }
+
+        QAudioFormat native;
+        if (!probe_decoded_native_format(fixture, native)){
+            return "probe_decoded_native_format() failed on the mp3 fixture.";
+        }
+        if (native.sampleRate() != 44100 || native.channelCount() != 2
+            || native.sampleFormat() != QAudioFormat::SampleFormat::Float){
+            return "Unexpected native decoded format: " + dump_audio_format(native) + ".";
+        }
+
+        //  The loader streams the decoded file at the native pace.
+        AudioFileLoader loader(nullptr, fixture, native);
+        if (!loader.start()){
+            return "AudioFileLoader::start() failed.";
+        }
+
+        QEventLoop loop;
+        std::vector<float> interleaved;
+        QObject::connect(&loader, &AudioFileLoader::bufferReady, &loader,
+            [&](const char* data, size_t len){
+                const auto* frames = reinterpret_cast<const float*>(data);
+                interleaved.insert(interleaved.end(), frames, frames + len / sizeof(float));
+            });
+        QObject::connect(&loader, &AudioFileLoader::finished, &loader, [&loop]{
+            loop.quit();
+        });
+        QTimer timeout;
+        timeout.setSingleShot(true);
+        QObject::connect(&timeout, &QTimer::timeout, &loop, &QEventLoop::quit);
+        timeout.start(15000);
+        loop.exec();
+        timeout.stop();
+
+        const size_t frame_count = interleaved.size() / 2;
+        if (frame_count > 88200 + 4000 || frame_count < 88200 - 4000){
+            return "Expected about 88200 frames (2 s at 44100 Hz), got "
+                + std::to_string(frame_count) + ".";
+        }
+
+        //  Both channels carry the fixture's tones, and they are different
+        //  tones (440 Hz left, 660 Hz right): the |L-R| energy must stay
+        //  well above the L energy if the channels are kept separate.
+        double el = 0, er = 0, elr = 0;
+        for (size_t i = 0; i < frame_count; i++){
+            const float l = interleaved[2 * i];
+            const float r = interleaved[2 * i + 1];
+            el += l * l;
+            er += r * r;
+            const float d = l - r;
+            elr += d * d;
+        }
+        if (el < 1.0 || er < 1.0){
+            return "A channel is silent: L energy " + std::to_string(el)
+                + ", R energy " + std::to_string(er) + ".";
+        }
+        if (elr < 1.5 * el){
+            return "Channel separation was lost: |L-R| energy " + std::to_string(elr)
+                + " is below 1.5x the L energy " + std::to_string(el) + ".";
+        }
+
+        return true;
+    }
+};
+
+
+
 }
 
 
@@ -344,6 +486,8 @@ void add_tests_AudioFileLoader(UnitTestDatabase& database){
     database.add<LoadFullNativePassthroughTest>();
     database.add<LoadFullS16ToFloatTest>();
     database.add<LoadFullRateMismatchTest>();
+    database.add<DecodedNativeProbeTest>();
+    database.add<DecodedNativePlaybackTest>();
 }
 
 

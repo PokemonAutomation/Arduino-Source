@@ -37,9 +37,10 @@ class AudioDecoderWorker;
 // sample type): the caller is expected to set `audioFormat` to the file's own
 // format (see probe_wav_native_format()), so the timer paces at the file's rate
 // and the raw bytes are emitted unconverted.
-// For .mp3 (and other compressed formats) the loader asks QAudioDecoder to
-// decode to the `audioFormat` target, and the decoded bytes are emitted at that
-// target's rate.
+// For .mp3 (and other compressed formats) the caller probes the decoder's
+// native output format (see probe_decoded_native_format()) and sets
+// `audioFormat` to it, so QAudioDecoder decodes to that format (an identity
+// conversion) and the decoded bytes are emitted at the file's native rate.
 // loadFullAudio() is the batch "convert to the requested format" API: it
 // converts the sample type and channels to `audioFormat`, but not the sample
 // rate, which must already match (its consumer, loadAudioTemplate, assumes the

@@ -6,6 +6,11 @@
 
 #include <memory>
 #include <QString>
+#include <QUrl>
+#include <QAudioBuffer>
+#include <QAudioDecoder>
+#include <QEventLoop>
+#include <QTimer>
 #include "3rdParty/QtWavFile/WavFile.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/AudioPipeline/AudioInfo.h"
@@ -55,6 +60,69 @@ bool probe_wav_native_format(const std::string& filename, QAudioFormat& out_form
     }
     return true;
 }
+
+
+#if QT_VERSION_MAJOR == 6
+bool probe_decoded_native_format(const std::string& filename, QAudioFormat& out_format){
+    //  A QAudioDecoder started without a target format decodes in the
+    //  source's native format, and the first decoded buffer carries that
+    //  format. The probe runs a nested event loop on the calling thread
+    //  until the first buffer, an error, or a 3 s timeout. The decoder is
+    //  throwaway: only its output format is kept.
+    QAudioDecoder decoder(nullptr);
+    if (!decoder.isSupported()){
+        return false;
+    }
+    decoder.setSource(QUrl::fromLocalFile(QString::fromStdString(filename)));
+
+    QEventLoop loop;
+    bool got_format = false;
+    QObject::connect(
+        &decoder, &QAudioDecoder::bufferReady,
+        &decoder, [&decoder, &out_format, &got_format, &loop]{
+            const QAudioBuffer buffer = decoder.read();
+            if (buffer.isValid() && buffer.format().isValid()){
+                out_format = buffer.format();
+                got_format = true;
+            }
+            loop.quit();
+        }
+    );
+    QObject::connect(
+        &decoder, QOverload<QAudioDecoder::Error>::of(&QAudioDecoder::error),
+        &decoder, [&loop](QAudioDecoder::Error){
+            loop.quit();
+        }
+    );
+    QObject::connect(
+        &decoder, &QAudioDecoder::finished,
+        &decoder, [&loop]{
+            loop.quit();
+        }
+    );
+
+    QTimer timer;
+    timer.setSingleShot(true);
+    QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
+    decoder.start();
+    timer.start(3000);
+    loop.exec();
+    timer.stop();
+    decoder.stop();
+    decoder.deleteLater();
+
+    return got_format;
+}
+#else
+bool probe_decoded_native_format(const std::string& filename, QAudioFormat& out_format){
+    //  Qt 5's QAudioDecoder API does not expose the decoded buffer's
+    //  format, so the probe cannot run there: the caller falls back to
+    //  the legacy 48k stereo float target.
+    (void) filename;
+    (void) out_format;
+    return false;
+}
+#endif
 
 
 
