@@ -24,7 +24,7 @@ namespace PokemonAutomation{
 
 class AudioDecoderWorker;
 
-// Load .wav and .mp3 audio from disk and optionally play at desired sample rate.
+// Load .wav and .mp3 audio from disk and play at the file's sample rate.
 
 // Note: for ease of implementation this class saves all the decoded raw samples to
 // memory before sending them out when `start()` is called. For a large audio file this
@@ -32,13 +32,18 @@ class AudioDecoderWorker;
 // is to load recorded audio for testing and developing audio inference programs.
 // So the input audio files should be small.
 // You can also call `loadFullAudio()` to load the audio directly into memory.
-// The loader tries to convert the audio data into the format specified as `audioFormat`
-// in the constructor. For .mp3 files this conversion is done by QtAudioDecoder, while
-// for .wav files the converion is done in `AudioFileLoader`.
-// Currently we hard code the code to only return float data because that's the rest of
-// the audio pipeline uses.
-// For .wav file the format conversion is not fully implement: we cannot convert sampling
-// rate during playback (after 'start()' called), but support it in `loadFullAudio()`.
+//
+// For .wav files the loader streams the file's native format (rate, channels,
+// sample type): the caller is expected to set `audioFormat` to the file's own
+// format (see probe_wav_native_format()), so the timer paces at the file's rate
+// and the raw bytes are emitted unconverted.
+// For .mp3 (and other compressed formats) the loader asks QAudioDecoder to
+// decode to the `audioFormat` target, and the decoded bytes are emitted at that
+// target's rate.
+// loadFullAudio() is the batch "convert to the requested format" API: it
+// converts the sample type and channels to `audioFormat`, but not the sample
+// rate, which must already match (its consumer, loadAudioTemplate, assumes the
+// returned data is at the requested rate).
 class AudioFileLoader: public QObject{
     Q_OBJECT
 

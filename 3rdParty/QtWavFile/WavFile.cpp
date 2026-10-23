@@ -136,7 +136,8 @@ bool WavFile::readHeader()
             || memcmp(&header.riff.descriptor.id, "RIFX", 4) == 0)
             && memcmp(&header.riff.type, "WAVE", 4) == 0
             && memcmp(&header.wave.descriptor.id, "fmt ", 4) == 0
-            && (header.wave.audioFormat == 1 || header.wave.audioFormat == 0)) {
+            && (header.wave.audioFormat == 1 || header.wave.audioFormat == 0
+                || header.wave.audioFormat == 3)) {  //  3 = IEEE-float
 
             // Read off remaining header information
             DATAHeader dataHeader;
@@ -175,7 +176,11 @@ bool WavFile::readHeader()
 #if QT_VERSION_MAJOR == 5            
             m_fileFormat.setCodec("audio/pcm");
             m_fileFormat.setSampleSize(qFromLittleEndian<quint16>(header.wave.bitsPerSample));
-            m_fileFormat.setSampleType(bps == 8 ? QAudioFormat::UnSignedInt : QAudioFormat::SignedInt);
+            if (header.wave.audioFormat == 3){
+                m_fileFormat.setSampleType(QAudioFormat::Float);
+            }else{
+                m_fileFormat.setSampleType(bps == 8 ? QAudioFormat::UnSignedInt : QAudioFormat::SignedInt);
+            }
 #elif QT_VERSION_MAJOR == 6
             const int bitsPerSample = qFromLittleEndian<quint16>(header.wave.bitsPerSample);
             if (bitsPerSample == 8 && bps == 8){
@@ -183,10 +188,16 @@ bool WavFile::readHeader()
             } else if (bitsPerSample == 16 && bps != 8){
                 m_fileFormat.setSampleFormat(QAudioFormat::SampleFormat::Int16);
             } else if (bitsPerSample == 32 && bps != 8){
-                m_fileFormat.setSampleFormat(QAudioFormat::SampleFormat::Int32);
+                //  Audio format tag 3 is IEEE-float; tag 1 (PCM) is int32.
+                if (header.wave.audioFormat == 3){
+                    m_fileFormat.setSampleFormat(QAudioFormat::SampleFormat::Float);
+                }else{
+                    m_fileFormat.setSampleFormat(QAudioFormat::SampleFormat::Int32);
+                }
             } else {
-                std::cout << "Error: wav file uses sample type that Qt6 audio format does not support: bits per sample: " << 
-                    bitsPerSample << ", " << (bps == 8 ? "unsigned" : "signed") << std::endl;
+                std::cout << "Error: wav file uses an unsupported sample type: "
+                    << bitsPerSample << " bits per sample (PCM 8/16/32-bit and IEEE-float are supported; 24-bit is not)."
+                    << std::endl;
                 result = false;
             }
 #endif

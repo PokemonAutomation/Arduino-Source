@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/AudioPipeline/AudioStream.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "AudioInputDevice.h"
@@ -89,9 +90,25 @@ AudioSource::~AudioSource(){}
 
 AudioSource::AudioSource(Logger& logger, const std::string& file, AudioChannelFormat format, float volume_multiplier){
     QAudioFormat native_format;
-    set_sample_format_to_float(native_format);
-    set_format(native_format, format);
-    init(format, AudioSampleFormat::FLOAT32, volume_multiplier);
+    if (has_extension(file, "wav") && probe_wav_native_format(file, native_format)){
+        //  Native WAV: the stream is the file's own format (rate, channels,
+        //  sample type). The tree's decoder / resampler / mixer convert it to
+        //  the sink's format; no 96k reinterpretation for files.
+        m_stream_format = get_sample_format(native_format);
+    }else{
+        //  Compressed formats are decoded by QAudioDecoder to a fixed target:
+        //  float @ 48k stereo (per the preset). An unreadable .wav falls
+        //  through here too; the loader logs the open failure.
+        set_sample_format_to_float(native_format);
+        set_format(native_format, format);
+        m_stream_format = AudioSampleFormat::FLOAT32;
+    }
+    m_sample_rate = (size_t)native_format.sampleRate();
+    m_channels = (size_t)native_format.channelCount();
+    m_multiplier = 1;
+    m_reader.reset(new AudioStreamToFloat(m_stream_format, m_channels, volume_multiplier, false));
+    m_internal_listener = std::make_unique<InternalListener>(*this);
+    m_reader->add_listener(*m_internal_listener);
     m_input_file = std::make_unique<AudioInputFile>(logger, *m_reader, file, native_format);
 }
 AudioSource::AudioSource(Logger& logger, const AudioDeviceInfo& device, AudioChannelFormat format, float volume_multiplier){

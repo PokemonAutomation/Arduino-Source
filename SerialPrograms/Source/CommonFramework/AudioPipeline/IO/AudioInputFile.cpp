@@ -5,6 +5,8 @@
  */
 
 #include <memory>
+#include <QString>
+#include "3rdParty/QtWavFile/WavFile.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/AudioPipeline/AudioInfo.h"
 #include "CommonFramework/AudioPipeline/AudioStream.h"
@@ -36,6 +38,22 @@ Kernels::AudioPipeline::SampleFormat sample_format_of(const QAudioFormat& format
 }
 
 
+}
+
+
+
+bool probe_wav_native_format(const std::string& filename, QAudioFormat& out_format){
+    WavFile wav_file;
+    if (!wav_file.open(QString::fromStdString(filename))){
+        return false;
+    }
+    out_format = wav_file.audioFormat();
+    wav_file.close();
+    if (out_format.channelCount() < 1 || out_format.sampleRate() < 1
+        || out_format.sampleFormat() == QAudioFormat::SampleFormat::Unknown){
+        return false;
+    }
+    return true;
 }
 
 
