@@ -77,6 +77,7 @@ bool probe_decoded_native_format(const std::string& filename, QAudioFormat& out_
 
     QEventLoop loop;
     bool got_format = false;
+    bool finished_without_audio = false;
     QObject::connect(
         &decoder, &QAudioDecoder::bufferReady,
         &decoder, [&decoder, &out_format, &got_format, &loop]{
@@ -96,7 +97,8 @@ bool probe_decoded_native_format(const std::string& filename, QAudioFormat& out_
     );
     QObject::connect(
         &decoder, &QAudioDecoder::finished,
-        &decoder, [&loop]{
+        &decoder, [&finished_without_audio, &loop]{
+            finished_without_audio = true;
             loop.quit();
         }
     );
@@ -111,7 +113,20 @@ bool probe_decoded_native_format(const std::string& filename, QAudioFormat& out_
     decoder.stop();
     decoder.deleteLater();
 
-    return got_format;
+    if (got_format){
+        return true;
+    }
+    if (decoder.error() != QAudioDecoder::NoError){
+        std::cout << "probe_decoded_native_format: decoder error for " << filename
+            << ": " << decoder.errorString().toStdString() << std::endl;
+    }else if (finished_without_audio){
+        std::cout << "probe_decoded_native_format: decoder finished without producing any audio for "
+            << filename << " (the decoder found no usable audio in the file)." << std::endl;
+    }else{
+        std::cout << "probe_decoded_native_format: no decoded buffer within 3 s for " << filename
+            << std::endl;
+    }
+    return false;
 }
 #else
 bool probe_decoded_native_format(const std::string& filename, QAudioFormat& out_format){

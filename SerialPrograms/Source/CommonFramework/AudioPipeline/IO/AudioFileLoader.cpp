@@ -97,6 +97,11 @@ bool AudioFileLoader::start(){
     // files this is OK.
     connect(m_audioDecoderWorker, &AudioDecoderWorker::finished, this, [&](){
         std::cout << "Audio decoder finishes decoding. Start playing audio at desired sample rate" << std::endl;
+        if (m_rawBuffer.empty()){
+            std::cout << "Error: audio decoder produced no audio data for " << m_filename
+                << " (the decoder could not find usable audio in the file; nothing to play)." << std::endl;
+            return;
+        }
         buildTimer();
         connect(m_timer, &QTimer::timeout, this, &AudioFileLoader::sendDecodedBufferOnTimer);
     });
@@ -164,6 +169,10 @@ std::tuple<const char*, size_t> AudioFileLoader::loadFullAudio(){
 
     // Block the current thread until the m_audioDecoderWorker errored or finished.
     loop.exec();
+    if (m_rawBuffer.empty()){
+        std::cout << "Error: audio decoder produced no audio data for " << m_filename
+            << " (the decoder could not find usable audio in the file)." << std::endl;
+    }
     
 //    m_audioDecoderThread.quit();
 //    m_audioDecoderThread.wait();
