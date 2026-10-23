@@ -391,38 +391,6 @@ if (WIN32)
         MAP_IMPORTED_CONFIG_MINSIZEREL      RELEASE
     )
 
-    if (PA_STREAM_HISTORY_FFMPEG)
-        #  ffmpeg shared libraries for the in-memory stream history ring.
-        #  Provide the headers under 3rdParty/ffmpeg/ (the ffmpeg "include" tree:
-        #  3rdParty/ffmpeg/libavcodec/avcodec.h, 3rdParty/ffmpeg/libavformat/..., etc.)
-        #  and the import libraries + DLLs in 3rdPartyBinaries/
-        #  (avcodec.lib/.dll, avformat.lib/.dll, avutil.lib/.dll, swscale.lib/.dll,
-        #  swresample.lib/.dll - use an LGPL shared build; the project is
-        #  LGPL-only, using BtbN's "win64-lgpl-shared", not the GPL build).
-        #  The DLLs placed in 3rdPartyBinaries/ are copied to the output directory
-        #  by the THIRD_PARTY_DLLS deploy step below. The ffmpeg >= 5.1
-        #  API-generation check and the include dir are applied in the shared
-        #  block after the WIN32/else() split, via FFMPEG_INC_DIRS.
-        set(FFMPEG_INC_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/../3rdParty/ffmpeg)
-        foreach(FFMPEG_LIB IN ITEMS avcodec avformat avutil swscale swresample)
-            if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../3rdParty/ffmpeg/lib${FFMPEG_LIB}/${FFMPEG_LIB}.h")
-                message(FATAL_ERROR
-                    "PA_STREAM_HISTORY_FFMPEG=ON but 3rdParty/ffmpeg/lib${FFMPEG_LIB}/${FFMPEG_LIB}.h was not found. "
-                    "Install the ffmpeg headers into 3rdParty/ffmpeg/ and the import libraries into 3rdPartyBinaries/.")
-            endif()
-            if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/${FFMPEG_LIB}.lib")
-                message(FATAL_ERROR
-                    "PA_STREAM_HISTORY_FFMPEG=ON but 3rdPartyBinaries/${FFMPEG_LIB}.lib was not found. "
-                    "Install the ffmpeg import libraries + DLLs into 3rdPartyBinaries/.")
-            endif()
-            add_library(ffmpeg_${FFMPEG_LIB}_lib IMPORTED UNKNOWN)
-            set_target_properties(ffmpeg_${FFMPEG_LIB}_lib PROPERTIES
-                IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/${FFMPEG_LIB}.lib
-            )
-            target_link_libraries(SerialProgramsLib PRIVATE ffmpeg_${FFMPEG_LIB}_lib)
-        endforeach()
-    endif()
-
     add_library(ONNX_lib IMPORTED UNKNOWN)
     target_include_directories(SerialProgramsLib SYSTEM PRIVATE ../3rdParty/ONNX/)
     set_target_properties(ONNX_lib PROPERTIES
@@ -449,6 +417,25 @@ if (WIN32)
         MAP_IMPORTED_CONFIG_RELWITHDEBINFO  RELEASE
         MAP_IMPORTED_CONFIG_MINSIZEREL      RELEASE
     )
+
+    #  ffmpeg import libraries for the in-memory stream history ring
+    #  (PA_STREAM_HISTORY_FFMPEG). The .lib files are checked in unzipped under
+    #  3rdPartyBinaries/ffmpeg/ (LGPL shared build - see the README there), and
+    #  the matching .dll files start zipped in
+    #  3rdPartyBinaries/ffmpeg/ffmpeg-n9.0-win64-lgpl-shared-9.0.zip and are
+    #  extracted + deployed by the step at the bottom of this file.
+    #  The ffmpeg >= 5.1 API-generation check and the include dir are applied
+    #  in the shared block after the WIN32/else() split, via FFMPEG_INC_DIRS.
+    if (PA_STREAM_HISTORY_FFMPEG)
+        set(FFMPEG_INC_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/../3rdParty/ffmpeg)
+        foreach(FFMPEG_LIB IN ITEMS avcodec avformat avutil swscale swresample)
+            add_library(ffmpeg_${FFMPEG_LIB}_lib IMPORTED UNKNOWN)
+            set_target_properties(ffmpeg_${FFMPEG_LIB}_lib PROPERTIES
+                IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/ffmpeg/${FFMPEG_LIB}.lib
+            )
+            target_link_libraries(SerialProgramsLib PRIVATE ffmpeg_${FFMPEG_LIB}_lib)
+        endforeach()
+    endif()
 
     target_link_libraries(
         SerialProgramsLib PRIVATE
@@ -875,6 +862,11 @@ if (WIN32)
     set(DPP_DEBUG_DLL "${REPO_ROOT_DIR}/3rdPartyBinaries/dpp_debug/dpp.dll")
     set(DPP_RELEASE_DLL "${REPO_ROOT_DIR}/3rdPartyBinaries/dpp_release/dpp.dll")
 
+    if (PA_STREAM_HISTORY_FFMPEG)
+        set(FFMPEG_ZIP "${REPO_ROOT_DIR}/3rdPartyBinaries/ffmpeg/ffmpeg-n9.0-win64-lgpl-shared-9.0.zip")
+        set(FFMPEG_DLL_DIR "${REPO_ROOT_DIR}/3rdPartyBinaries/ffmpeg")
+    endif()
+
     # Copy QML library dependencies.
     get_target_property(_qt_widgets_location Qt6::Widgets LOCATION)
     get_filename_component(_qt_bin_dir "${_qt_widgets_location}" DIRECTORY)
@@ -952,6 +944,31 @@ if (WIN32)
             COMMAND ${CMAKE_COMMAND} -E tar xf "${OPENCV_RELEASE_ZIP}"
             WORKING_DIRECTORY "${REPO_ROOT_DIR}/3rdPartyBinaries"
         )
+    endif()
+
+    # Extract the ffmpeg shared DLLs if missing (only the .dll files start
+    # zipped; the .lib files are checked in unzipped)
+    if (PA_STREAM_HISTORY_FFMPEG)
+        file(GLOB FFMPEG_DLLS_EXTRACTED "${FFMPEG_DLL_DIR}/*.dll")
+        if (NOT FFMPEG_DLLS_EXTRACTED)
+            message(STATUS "ffmpeg shared DLLs not found, extracting from ${FFMPEG_ZIP}...")
+            execute_process(
+                COMMAND ${CMAKE_COMMAND} -E tar xf "${FFMPEG_ZIP}"
+                WORKING_DIRECTORY "${FFMPEG_DLL_DIR}"
+            )
+        endif()
+    endif()
+
+    # Copy the ffmpeg shared DLLs if missing/different
+    if (PA_STREAM_HISTORY_FFMPEG)
+        file(GLOB FFMPEG_DLLS "${FFMPEG_DLL_DIR}/*.dll")
+        foreach(DLL IN LISTS FFMPEG_DLLS)
+            get_filename_component(DLL_NAME "${DLL}" NAME)
+            add_custom_command(
+                TARGET SerialPrograms POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different "${DLL}" "${WIN_DEPLOY_DIR}/${DLL_NAME}"
+            )
+        endforeach()
     endif()
 
     # Copy 3rd party DLLs if missing/different
