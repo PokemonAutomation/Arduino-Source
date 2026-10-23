@@ -347,6 +347,38 @@ if(NOT EXISTS "${DEST_DIR}/Scripts")
     )
 endif()
 
+#  Verify that the ffmpeg headers in FFMPEG_INC_DIRS provide the ffmpeg 5.1
+#  API generation the stream history ring uses:
+#  av_channel_layout_default() (the channel layout API) and
+#  swr_alloc_set_opts2(), both introduced in 5.1 with signatures
+#  unchanged since. libavcodec's major version cannot tell 4.x from
+#  5.x (both are libavcodec 58), so grep the symbols instead of
+#  comparing version numbers.
+function(pa_check_ffmpeg_51_api FFMPEG_INC_DIRS)
+    set(FFMPEG_51_API_OK FALSE)
+    foreach (FFMPEG_INC_DIR IN LISTS FFMPEG_INC_DIRS)
+        if (EXISTS "${FFMPEG_INC_DIR}/libavutil/channel_layout.h"
+                AND EXISTS "${FFMPEG_INC_DIR}/libswresample/swresample.h")
+            file(STRINGS "${FFMPEG_INC_DIR}/libavutil/channel_layout.h"
+                    FFMPEG_51_LINES REGEX "av_channel_layout_default")
+            file(STRINGS "${FFMPEG_INC_DIR}/libswresample/swresample.h"
+                    FFMPEG_51_LINES_SWR REGEX "swr_alloc_set_opts2")
+            if (NOT FFMPEG_51_LINES STREQUAL ""
+                    AND NOT FFMPEG_51_LINES_SWR STREQUAL "")
+                set(FFMPEG_51_API_OK TRUE)
+                break()
+            endif()
+        endif()
+    endforeach()
+    if (NOT FFMPEG_51_API_OK)
+        message(FATAL_ERROR
+            "PA_STREAM_HISTORY_FFMPEG=ON requires ffmpeg >= 5.1 "
+            "(the channel layout API and swr_alloc_set_opts2()), "
+            "but the ffmpeg headers in ${FFMPEG_INC_DIRS} do not "
+            "provide the ffmpeg 5.1 API generation.")
+    endif()
+endfunction()
+
 if (WIN32)
     add_library(OpenCV_lib IMPORTED UNKNOWN)
     target_include_directories(SerialProgramsLib SYSTEM PRIVATE ../3rdParty/opencv-4.12.0/)
@@ -368,10 +400,10 @@ if (WIN32)
         #  swresample.lib/.dll - use an LGPL shared build; the project is
         #  LGPL-only, using BtbN's "win64-lgpl-shared", not the GPL build).
         #  The DLLs placed in 3rdPartyBinaries/ are copied to the output directory
-        #  by the THIRD_PARTY_DLLS deploy step below. Requires ffmpeg >= 5.1:
-        #  stream history uses the ffmpeg 5.1 API generation (the channel layout API,
-        #  i.e. void av_channel_layout_default(), and swr_alloc_set_opts2() taking
-        #  a SwrContext**), both introduced in 5.1 with signatures unchanged since.
+        #  by the THIRD_PARTY_DLLS deploy step below. The ffmpeg >= 5.1
+        #  API-generation check and the include dir are applied in the shared
+        #  block after the WIN32/else() split, via FFMPEG_INC_DIRS.
+        set(FFMPEG_INC_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/../3rdParty/ffmpeg)
         foreach(FFMPEG_LIB IN ITEMS avcodec avformat avutil swscale swresample)
             if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../3rdParty/ffmpeg/lib${FFMPEG_LIB}/${FFMPEG_LIB}.h")
                 message(FATAL_ERROR
@@ -389,38 +421,6 @@ if (WIN32)
             )
             target_link_libraries(SerialProgramsLib PRIVATE ffmpeg_${FFMPEG_LIB}_lib)
         endforeach()
-        #  Enforce the minimum ffmpeg generation from the vendored headers.
-        #  The ring requires the ffmpeg 5.1 API generation: the channel layout
-        #  API (av_channel_layout_default() and friends) and swr_alloc_set_opts2()
-        #  were both introduced in ffmpeg 5.1, with signatures unchanged since.
-        #  libavcodec's major version alone cannot tell 5.x apart from 4.x
-        #  (both are libavcodec 58), so detect the 5.1 API in the headers
-        #  instead of comparing version numbers.
-        set(FFMPEG_51_API_OK TRUE)
-        if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../3rdParty/ffmpeg/libavutil/channel_layout.h")
-            set(FFMPEG_51_API_OK FALSE)
-        else()
-            file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/../3rdParty/ffmpeg/libavutil/channel_layout.h"
-                FFMPEG_51_LINES REGEX "av_channel_layout_default")
-            if (FFMPEG_51_LINES STREQUAL "")
-                set(FFMPEG_51_API_OK FALSE)
-            endif()
-        endif()
-        if (FFMPEG_51_API_OK)
-            file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/../3rdParty/ffmpeg/libswresample/swresample.h"
-                FFMPEG_51_LINES REGEX "swr_alloc_set_opts2")
-            if (FFMPEG_51_LINES STREQUAL "")
-                set(FFMPEG_51_API_OK FALSE)
-            endif()
-        endif()
-        if (NOT FFMPEG_51_API_OK)
-            message(FATAL_ERROR
-                "PA_STREAM_HISTORY_FFMPEG=ON requires ffmpeg >= 5.1 "
-                "(the channel layout API and swr_alloc_set_opts2()), "
-                "but 3rdParty/ffmpeg/ does not look like ffmpeg 5.1 or newer. "
-                "Update the vendored ffmpeg headers in 3rdParty/ffmpeg/ and the import libraries in 3rdPartyBinaries/.")
-        endif()
-        target_include_directories(SerialProgramsLib SYSTEM PRIVATE ../3rdParty/ffmpeg/)
     endif()
 
     add_library(ONNX_lib IMPORTED UNKNOWN)
@@ -660,9 +660,8 @@ else() # macOS and Linux
 
     if (PA_STREAM_HISTORY_FFMPEG)
         #  ffmpeg for the in-memory stream history ring (requires ffmpeg >= 5.1 -
-        #  the ring uses the ffmpeg 5.1 API generation: the channel layout API
-        #  (av_channel_layout_default()) and swr_alloc_set_opts2(), both
-        #  introduced in 5.1 with signatures unchanged since).
+        #  the API-generation check and the include dir are applied in the shared
+        #  block after the WIN32/else() split, via FFMPEG_INC_DIRS).
         #  Ubuntu:  sudo apt install libavcodec-dev libavformat-dev libavutil-dev
         #           libswscale-dev libswresample-dev
         #  macOS:   brew install ffmpeg
@@ -682,30 +681,8 @@ else() # macOS and Linux
                 "Ubuntu: sudo apt install libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libswresample-dev. "
                 "macOS: brew install ffmpeg.")
         endif()
-        #  libavcodec's major version cannot tell ffmpeg 5.x apart from 4.x
-        #  (both are libavcodec 58), so detect the 5.1 API generation in the
-        #  headers found by pkg-config instead of comparing version numbers.
-        set(FFMPEG_51_API_OK FALSE)
-        foreach (FFMPEG_INC_DIR IN LISTS ${FFMPEG_PC}_INCLUDE_DIRS)
-            if (EXISTS "${FFMPEG_INC_DIR}/libavutil/channel_layout.h"
-                AND EXISTS "${FFMPEG_INC_DIR}/libswresample/swresample.h")
-                file(STRINGS "${FFMPEG_INC_DIR}/libavutil/channel_layout.h" FFMPEG_51_LINES REGEX "av_channel_layout_default")
-                file(STRINGS "${FFMPEG_INC_DIR}/libswresample/swresample.h" FFMPEG_51_LINES_SWR REGEX "swr_alloc_set_opts2")
-                if (NOT FFMPEG_51_LINES STREQUAL "" AND NOT FFMPEG_51_LINES_SWR STREQUAL "")
-                    set(FFMPEG_51_API_OK TRUE)
-                    break()
-                endif()
-            endif()
-        endforeach()
-        if (NOT FFMPEG_51_API_OK)
-            message(FATAL_ERROR
-                "PA_STREAM_HISTORY_FFMPEG=ON requires ffmpeg >= 5.1 "
-                "(the channel layout API and swr_alloc_set_opts2()), "
-                "but the ffmpeg development packages found via pkg-config "
-                "(version ${${FFMPEG_PC}_VERSION}) do not provide the ffmpeg 5.1 API generation.")
-        endif()
         message(STATUS "PA stream-history ring: ffmpeg found via pkg-config module set '${FFMPEG_PC}' (version ${${FFMPEG_PC}_VERSION}).")
-        target_include_directories(SerialProgramsLib SYSTEM PRIVATE ${${FFMPEG_PC}_INCLUDE_DIRS})
+        set(FFMPEG_INC_DIRS ${${FFMPEG_PC}_INCLUDE_DIRS})
         target_link_directories(SerialProgramsLib PUBLIC ${${FFMPEG_PC}_LIBRARY_DIRS})
         target_link_libraries(SerialProgramsLib PRIVATE ${${FFMPEG_PC}_LIBRARIES})
     endif()
@@ -802,6 +779,8 @@ endif()
 # Enable the ffmpeg-based stream history tracker (StreamHistoryTracker_Ring).
 if (PA_STREAM_HISTORY_FFMPEG)
     target_compile_definitions(SerialProgramsLib PRIVATE PA_STREAM_HISTORY_FFMPEG)
+    target_include_directories(SerialProgramsLib SYSTEM PRIVATE ${FFMPEG_INC_DIRS})
+    pa_check_ffmpeg_51_api(${FFMPEG_INC_DIRS})
 endif()
 
 
