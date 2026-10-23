@@ -31,9 +31,10 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class WildRng : public SingleSwitchProgramInstance{
+class WildRng : public SingleSwitchProgramInstance, private ConfigOption::Listener{
 public:
     using Descriptor = WildRng_Descriptor;
+    ~WildRng();
     WildRng();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
     virtual void start_program_border_check(
@@ -42,6 +43,8 @@ public:
     ) override{}
 
 private:
+    virtual void on_config_value_changed(void* object) override;
+    bool in_safari_zone() const;
 
     enum class GameVersion{
         firered,
@@ -76,6 +79,7 @@ private:
     SimpleIntegerOption<uint64_t>ADVANCES;
 
     SectionDividerOption m_program_settings;
+    BooleanCheckBoxOption AUTO_CATCH_SHINY;
     BooleanCheckBoxOption USE_TEACHY_TV;
     SimpleIntegerOption<uint16_t> SEED_RADIUS;
     SimpleIntegerOption<uint64_t> MAX_RESETS;
