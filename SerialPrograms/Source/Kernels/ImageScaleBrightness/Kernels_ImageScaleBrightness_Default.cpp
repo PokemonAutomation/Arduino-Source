@@ -25,9 +25,12 @@ PA_FORCE_INLINE void scale_brightness_Default(
         g *= scaleG;
         b *= scaleB;
 
-        uint32_t r_u32 = std::min((uint32_t)r, (uint32_t)255);
-        uint32_t g_u32 = std::min((uint32_t)g, (uint32_t)255);
-        uint32_t b_u32 = std::min((uint32_t)b, (uint32_t)255);
+        //  Round to the nearest integer, like the SIMD versions. Adding 0.5 rounds an
+        //  exact tie like 50.5 up, while the SIMD code rounds it to even. That 1-unit
+        //  difference at ties is fine.
+        uint32_t r_u32 = std::min((uint32_t)(r + 0.5f), (uint32_t)255);
+        uint32_t g_u32 = std::min((uint32_t)(g + 0.5f), (uint32_t)255);
+        uint32_t b_u32 = std::min((uint32_t)(b + 0.5f), (uint32_t)255);
 
         pixel &= 0xff000000;
         pixel |= r_u32 << 16;
