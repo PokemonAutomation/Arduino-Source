@@ -35,14 +35,19 @@ class WorkingAudioStreamListener;
 
 class AudioPassthroughPairQt final : public QObject, public AudioPassthroughPair{
 public:
+    using RawAudio2WorkingAudio = Kernels::AudioPipeline::RawAudio2WorkingAudio;
+    using WorkingAudio2RawAudio = Kernels::AudioPipeline::WorkingAudio2RawAudio;
+    using WorkingAudio2WorkingAudio = Kernels::AudioPipeline::WorkingAudio2WorkingAudio;
+    using WorkingAudioStreamListener = Kernels::AudioPipeline::WorkingAudioStreamListener;
+
     virtual void add_listener(AudioFloatStreamListener& listener) override;
     virtual void remove_listener(AudioFloatStreamListener& listener) override;
 
     virtual void add_listener(FFTListener& listener) override;
     virtual void remove_listener(FFTListener& listener) override;
 
-    virtual void add_listener(const AudioFormat& format, Kernels::AudioPipeline::WorkingAudioStreamListener& listener) override;
-    virtual void remove_listener(Kernels::AudioPipeline::WorkingAudioStreamListener& listener) override;
+    virtual void add_listener(const AudioFormat& format, WorkingAudioStreamListener& listener) override;
+    virtual void remove_listener(WorkingAudioStreamListener& listener) override;
 
 
 public:
@@ -80,7 +85,7 @@ private:
     //  All of these are only touched while holding m_lock.
     struct WorkingListenerEntry{
         AudioFormat m_format;
-        std::unique_ptr<Kernels::AudioPipeline::WorkingAudio2WorkingAudio> m_node;
+        std::unique_ptr<WorkingAudio2WorkingAudio> m_node;
         std::unique_ptr<InternalWorkingListener> m_forwarder;
     };
 
@@ -99,7 +104,7 @@ private:
     void build_tree(float input_volume);
     void rebuild_sink_branch();
 
-    void build_working_entry(WorkingListenerEntry& entry, Kernels::AudioPipeline::WorkingAudioStreamListener& listener);
+    void build_working_entry(WorkingListenerEntry& entry, WorkingAudioStreamListener& listener);
     void detach_working_entry(WorkingListenerEntry& entry);
 
 
@@ -114,7 +119,7 @@ private:
 
     AudioChannelFormat m_input_format;
     std::unique_ptr<AudioSource> m_reader;
-    std::unique_ptr<SampleListener> m_sample_listener;      //  Attaches to "m_reader".
+    std::unique_ptr<SampleListener> m_sample_listener;  //  Attaches to "m_reader".
 
     //  New pipeline tree. The decoder attaches to m_reader's raw stream and
     //  the branch heads attach to the decoder (sink head before FFT head).
@@ -122,23 +127,23 @@ private:
     //  (For the INTERLEAVE_96000 presets, m_reader emits the two 48 kHz
     //  channels reinterpreted from the physical 1ch x 96000 stream;
     //  MONO_96000 keeps the physical shape.)
-    std::unique_ptr<Kernels::AudioPipeline::RawAudio2WorkingAudio> m_source_decoder;
-    std::unique_ptr<Kernels::AudioPipeline::WorkingAudio2WorkingAudio> m_sink_conv;  //  Source shape -> sink shape (mix + resample).
-    std::unique_ptr<Kernels::AudioPipeline::WorkingAudio2RawAudio> m_sink_encoder;
-    std::unique_ptr<Kernels::AudioPipeline::WorkingAudio2WorkingAudio> m_fft_conv;   //  Source shape -> 48 kHz mono (mix + resample).
-    std::unique_ptr<WorkingAudioToFFT> m_fft_node;                              //  The tree's FFT endpoint.
+    std::unique_ptr<RawAudio2WorkingAudio> m_source_decoder;
+    std::unique_ptr<WorkingAudio2WorkingAudio> m_sink_conv;     //  Source shape -> sink shape (mix + resample).
+    std::unique_ptr<WorkingAudio2RawAudio> m_sink_encoder;
+    std::unique_ptr<WorkingAudio2WorkingAudio> m_fft_conv;      //  Source shape -> 48 kHz mono (mix + resample).
+    std::unique_ptr<WorkingAudioToFFT> m_fft_node;              //  The tree's FFT endpoint.
 
     //  Per-listener working-stream conversion nodes. The entries survive
     //  tree rebuilds (the listeners stay attached across input changes);
     //  their nodes are rebuilt for each new source shape in build_tree()
     //  and detached in teardown_tree().
-    std::map<Kernels::AudioPipeline::WorkingAudioStreamListener*, WorkingListenerEntry> m_working_entries;
+    std::map<WorkingAudioStreamListener*, WorkingListenerEntry> m_working_entries;
 
     AudioDeviceInfo m_output_device;
     float m_file_input_multiplier = 1.0;
     float m_device_input_multiplier = 1.0;
     double m_output_volume = 1.0;
-    std::unique_ptr<AudioOutputDevice> m_sink_device;   //  Attaches to m_sink_encoder.
+    std::unique_ptr<AudioOutputDevice> m_sink_device;       //  Attaches to m_sink_encoder.
 
 
     std::unique_ptr<InternalFFTListener> m_fft_listener;    //  Attaches to m_fft_node.

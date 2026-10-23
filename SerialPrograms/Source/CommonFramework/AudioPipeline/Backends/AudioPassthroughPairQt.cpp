@@ -126,16 +126,14 @@ void AudioPassthroughPairQt::remove_listener(AudioFloatStreamListener& listener)
 }
 void AudioPassthroughPairQt::add_listener(FFTListener& listener){
     auto scope_check = m_sanitizer.check_scope();
-    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     m_fft_listeners.add(listener);
 }
 void AudioPassthroughPairQt::remove_listener(FFTListener& listener){
     auto scope_check = m_sanitizer.check_scope();
-    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     m_fft_listeners.remove(listener);
 }
 void AudioPassthroughPairQt::add_listener(
-    const AudioFormat& format, Kernels::AudioPipeline::WorkingAudioStreamListener& listener
+    const AudioFormat& format, WorkingAudioStreamListener& listener
 ){
     auto scope_check = m_sanitizer.check_scope();
     WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
@@ -143,7 +141,7 @@ void AudioPassthroughPairQt::add_listener(
     entry.m_format = format;
     build_working_entry(entry, listener);
 }
-void AudioPassthroughPairQt::remove_listener(Kernels::AudioPipeline::WorkingAudioStreamListener& listener){
+void AudioPassthroughPairQt::remove_listener(WorkingAudioStreamListener& listener){
     auto scope_check = m_sanitizer.check_scope();
     WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     auto iter = m_working_entries.find(&listener);
