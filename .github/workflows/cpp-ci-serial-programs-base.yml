@@ -288,14 +288,47 @@ jobs:
 
       - name: Run clang query
         if: inputs.run-clang-query
-        run : |
+        shell: bash
+        run: |
           cd Arduino-Source
 
+          # Both rules share one matcher and one traversal of each translation unit.
           cat << 'EOF' > query.txt
-          match cxxConstructExpr(
-            isExpansionInFileMatching("SerialPrograms/"),
-            hasDeclaration(cxxConstructorDecl(ofClass(hasName("std::filesystem::path")))),
-            hasArgument(0, hasType(asString("std::string")))
+          let convertedView expr(
+            ignoringParenImpCasts(ignoringImplicit(equalsBoundNode("snapshot_view")))
+          )
+          let storedView expr(ignoringParenImpCasts(ignoringImplicit(
+            expr(anyOf(
+              convertedView,
+              initListExpr(has(convertedView)),
+              explicitCastExpr(hasSourceExpression(convertedView))
+            ))
+          )))
+          match expr(
+            anyOf(
+              cxxConstructExpr(
+                hasDeclaration(cxxConstructorDecl(ofClass(hasName("std::filesystem::path")))),
+                hasArgument(0, hasType(asString("std::string")))
+              ).bind("path_from_string"),
+              cxxMemberCallExpr(
+                callee(cxxConversionDecl(
+                  ofClass(hasName("PokemonAutomation::VideoSnapshot")),
+                  returns(hasDeclaration(cxxRecordDecl(hasName("PokemonAutomation::ImageViewRGB32"))))
+                )),
+                expr().bind("snapshot_view"),
+                anyOf(
+                  hasAncestor(varDecl(hasInitializer(storedView))),
+                  hasAncestor(fieldDecl(hasInClassInitializer(storedView))),
+                  hasAncestor(returnStmt(hasReturnValue(storedView))),
+                  hasAncestor(cxxConstructorDecl(forEachConstructorInitializer(withInitializer(storedView)))),
+                  hasAncestor(cxxOperatorCallExpr(
+                    hasOverloadedOperatorName("="),
+                    hasArgument(1, storedView)
+                  ))
+                )
+              )
+            ),
+            isExpansionInFileMatching("SerialPrograms[/\\]")
           )
           EOF
 
@@ -308,7 +341,7 @@ jobs:
           status=0
           jq -r '.[].file' SerialPrograms/bin/compile_commands.json | sort -u |
             xargs --delimiter='\n' --max-args=10 --max-procs="$(nproc)" \
-              sh -c 'clang-query -p SerialPrograms/bin/ -f query.txt "$@" > "$(mktemp clang-query-batches/XXXXXX)"' sh ||
+              sh -c 'clang-query -p SerialPrograms/bin/ -f query.txt "$@" > "$(mktemp clang-query-batches/XXXXXX)" 2>&1' sh ||
             status=$?
           cat clang-query-batches/* > clang-query-output.txt
           echo "Clang query output (begin)"

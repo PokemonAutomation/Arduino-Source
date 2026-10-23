@@ -122,8 +122,7 @@ ImageFloatBox OliveDetector::get_olive_floatbox(VideoStream& stream, ProControll
     for (size_t i = 0; i < MAX_ATTEMPTS; i++){
         context.wait_for_all_requests();
         auto snapshot = stream.video().snapshot();
-        const ImageViewRGB32& screen = snapshot;
-        ImageFloatBox olive_box = get_olive_floatbox(screen, context, rgb_gap, box);
+        ImageFloatBox olive_box = get_olive_floatbox(snapshot, context, rgb_gap, box);
         if (olive_box.x == 0 && olive_box.y == 0){
             // Olive not detected. try again. may have been obscured by the player's head/hat
             context.wait_for(Milliseconds(2000));
