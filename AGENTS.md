@@ -34,6 +34,10 @@ Programs live in:
 - `SerialPrograms/Source/VideoGames/`
 - `SerialPrograms/Source/Pokemon/` (not yet moved into `VideoGames/`)
 - `SerialPrograms/Source/PokemonBDSP/` (not yet moved into `VideoGames/`)
+- Console-generic (non-game-specific) programs under `SerialPrograms/Source/NintendoSwitch/`:
+  its `Inference/`, `Options/`, `Programs/`, and `DevPrograms/` subfolders are programs;
+  the rest of that folder (`Commands/`, `Controllers/`, `Framework/`, console state/handles, ...)
+  is infra.
 
 Infra has a much higher quality standard than programs because of its large blast radius,
 and it requires strict human review. New AI-generated code must meet that bar; filler and
