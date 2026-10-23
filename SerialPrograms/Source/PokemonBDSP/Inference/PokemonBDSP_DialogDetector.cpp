@@ -47,10 +47,21 @@ bool ShortDialogDetector::detect(const ImageViewRGB32& screen){
     }
     ImageStats right_white = image_stats(extract_box_reference(screen, m_right_white));
 //    cout << right_white.average << right_white.stddev << endl;
-    //  A long first line runs into m_right_white (Rowan's "Now, go on, and
-    //  leap into the world of Pokemon!"). Check below that line as well.
-    if (!is_white(right_white) && !is_white(image_stats(extract_box_reference(screen, m_right_white_low)))){
-        return false;
+    // Long dialogue can overlap the primary right-hand margin.
+    // Check the lower margin for Rowan and Gardenia, then a third
+    // region for Buneary's longer second dialogue line.
+    if (!is_white(right_white)){
+        right_white = image_stats(extract_box_reference(screen, m_right_white_low));
+
+        if (!is_white(right_white)){
+            right_white = image_stats(extract_box_reference(
+                screen, ImageFloatBox(0.790, 0.940, 0.002, 0.018)
+            ));
+
+            if (!is_white(right_white)){
+                return false;
+            }
+        }
     }
 //    ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
 //    if (!is_white(bottom)){

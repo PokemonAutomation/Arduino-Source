@@ -297,8 +297,8 @@ struct BagItemRowMatch {
 int bag_pocket_position(const ImageViewRGB32& frame);
 // Count normal, unobscured pocket icons; NEW badges prevent a tab match.
 size_t bag_clear_tab_count(const ImageViewRGB32& frame);
-// Open bag, scan with 250ms Down / 100ms rest (3s cumulative Down per pocket)
-// until all 8 tabs match,
+// Open bag, pause 1s on the initial selection in each pocket, then scan
+// with 80ms Down taps / 1s rest until all 8 tabs match,
 // then restore the top of the item list and close the bag.
 // Returns false after four bounded pocket passes.
 bool clear_new_item_flags(VideoStream& stream, ProControllerContext& context, int num_icons=8);

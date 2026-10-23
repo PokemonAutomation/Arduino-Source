@@ -113,11 +113,9 @@ namespace PokemonAutomation{
                 stream.log("[Oreburgh Gate entry] Cave visible; continuing the route.", COLOR_GREEN);
             }
 
-            enum class RepelRenewalChoice { YES, NO };
-
             // Call at a safe walking point, away from trainer/NPC prompts.
-            static void force_repel_expiry(VideoStream& stream, ProControllerContext& context,
-                RepelRenewalChoice choice, bool north_south = false) {
+            void force_repel_expiry(VideoStream& stream, ProControllerContext& context,
+                RepelRenewalChoice choice, bool north_south, bool require_expiry) {
                 context.wait_for_all_requests();
                 stream.log(std::string("[Repel expiry] Wiggling ") +
                     (north_south ? "north/south" : "west/east") + " until expiry; renewal response=" +
@@ -147,6 +145,9 @@ namespace PokemonAutomation{
                         if (remaining > 0ms) pbf_wait(ctx, remaining);
                     }, {{expired}});
                 if (result != 0) {
+                    if (require_expiry)
+                        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                            "Repel renewal: Required expiry prompt not observed within calibrated limit.",stream);
                     stream.log("[Repel expiry] Calibrated 44.913s limit reached without an expiry prompt; checking clear overworld before continuing.", COLOR_ORANGE);
                 }
                 // Renewal has a gap before the final used-Repel message. A single
