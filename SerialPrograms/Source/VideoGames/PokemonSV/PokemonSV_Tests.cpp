@@ -45,12 +45,12 @@ public:
 struct BBQuestPlanScenario{
     std::string name;
     std::vector<BBQuests> quests;
-    std::vector<std::pair<BBQuests, BBQAction>> extra_exclusions;
+    std::vector<std::pair<BBQuests, BBQAction>> extra_exclusions = {};
     uint8_t num_eggs = 1;
     uint8_t eggs_hatched = 0;
     BBQOption::OOEggs out_of_eggs = BBQOption::OOEggs::Reroll;
-    std::vector<BBQuests> expected_to_do;
-    std::vector<size_t> expected_reroll_slots;
+    std::vector<BBQuests> expected_to_do = {};
+    std::vector<size_t> expected_reroll_slots = {};
     bool expected_reroll_all = false;
 };
 
