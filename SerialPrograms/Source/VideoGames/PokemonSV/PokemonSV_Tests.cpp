@@ -51,10 +51,10 @@ class SimulatedBBQGameActions : public BBQGameActions{
 public:
     std::vector<BBQuests> panel;
     // Each attempt returns the next outcome; once exhausted, attempts succeed.
-    std::vector<bool> outcomes;
+    std::vector<bool> outcomes = {};
     // Completing the first quest also completes the second, e.g. walking
     // 500 meters while navigating to a photo target.
-    std::vector<std::pair<BBQuests, BBQuests>> also_completes;
+    std::vector<std::pair<BBQuests, BBQuests>> also_completes = {};
 
     std::vector<std::string> events;
 
@@ -148,8 +148,8 @@ struct BBQRoundsScenario{
     uint64_t save_num_quests = 0;
     bool stop_when_out_of_eggs = false;
     std::vector<BBQuests> panel = {BBQuests::make_tm, BBQuests::auto_10, BBQuests::sneak_up};
-    std::vector<bool> outcomes;
-    std::vector<std::pair<BBQuests, BBQuests>> also_completes;
+    std::vector<bool> outcomes = {};
+    std::vector<std::pair<BBQuests, BBQuests>> also_completes = {};
     uint64_t expected_completed = 0;
     std::string expected;
 };
