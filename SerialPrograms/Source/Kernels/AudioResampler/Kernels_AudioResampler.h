@@ -8,6 +8,7 @@
 #define PokemonAutomation_Kernels_AudioResampler_H
 
 #include <cstddef>
+#include <memory>
 #include <vector>
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/ListenerSet.h"
@@ -82,9 +83,10 @@ private:
     //  The dispatched block kernel.
     const BlockKernel m_block;
 
-    //  The weight table, built from the block's sizes; it extends its
-    //  allocations for the kernel's implied overshoots.
-    WeightTable m_table;
+    //  The weight table, shared from the process-wide resampler table
+    //  cache (see Kernels_AudioResampler.cpp); it extends its allocations
+    //  for the kernel's implied overshoots.
+    std::shared_ptr<WeightTable> m_table;
 
     //  Input samples per extended period (m_table.period_in() times the
     //  period extension).

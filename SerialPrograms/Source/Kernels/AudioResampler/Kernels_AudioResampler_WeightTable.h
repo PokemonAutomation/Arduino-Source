@@ -38,6 +38,16 @@ public:
         return m_taps;
     }
 
+    //  The block sizes the table was built for. A table built for larger
+    //  blocks is valid for smaller ones (the block sizes only extend the
+    //  allocations, not the weights).
+    size_t sample_block() const{
+        return m_sample_block;
+    }
+    size_t tap_block() const{
+        return m_tap_block;
+    }
+
     //  Input samples per output period (in_sample_rate / gcd).
     size_t period_in() const{
         return m_period_in;
@@ -86,6 +96,8 @@ private:
 
 private:
     size_t m_taps;
+    size_t m_sample_block;
+    size_t m_tap_block;
     size_t m_period_in;
     size_t m_period_out;
     size_t m_period_out_extended;
