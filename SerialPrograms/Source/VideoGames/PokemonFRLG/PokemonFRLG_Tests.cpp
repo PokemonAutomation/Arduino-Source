@@ -104,8 +104,8 @@ private:
 
 struct WildBattleExitScenario{
     std::string name;
-    std::vector<WildBattleExitEvent> events;
-    std::vector<bool> evolutions;
+    std::vector<WildBattleExitEvent> events = {};
+    std::vector<bool> evolutions = {};
     int overworld_misses = 0;
     bool stop_on_move_learn = false;
     bool prevent_evolution = false;
