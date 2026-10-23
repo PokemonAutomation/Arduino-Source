@@ -65,10 +65,13 @@ Qt > 6.8.3 on Windows can crash when raw `std::thread`s coexist with Qt event lo
 ("thread adoption" bug: QTBUG-131892, see project issue #570; see
 `Common/Cpp/Concurrency/Qt6.9ThreadBugWorkaround.h`). Therefore:
 
-- Don't use `std::thread` manually. Use `Common/Cpp/Concurrency/Thread` (RAII, auto-joins)
-  for worker threads, or better, run tasks on a thread pool:
-  `Common/Cpp/Concurrency/ThreadPool.h`, or the app-level pools in
-  `SerialPrograms/Source/CommonFramework/Tools/GlobalThreadPools.h`.
+- Don't use `std::thread` manually, and don't use `Common/Cpp/Concurrency/Thread`
+  directly either: `Thread` leaks the thread (a consequence of the Qt adoption-bug
+  workaround), so only the thread pool implementations are allowed to use it. Pools
+  reuse their worker threads, which keeps the leaked-thread count down to the peak
+  number of concurrent tasks (the pools still leak all of their threads on exit).
+  Run all background work on a thread pool: `Common/Cpp/Concurrency/ThreadPool.h`,
+  or the app-level pools in `SerialPrograms/Source/CommonFramework/Tools/GlobalThreadPools.h`.
 - Don't use `std::mutex` / `std::condition_variable` directly. Use the
   `PokemonAutomation::Mutex` / `ConditionVariable` wrappers in `Common/Cpp/Concurrency/`.
 - `std::async` is banned (it may spawn a new thread under the hood).
