@@ -10,9 +10,9 @@
 #include <immintrin.h>
 #include "Common/Compiler.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -51,7 +51,12 @@ PA_FORCE_INLINE void scale_brightness_x64_AVX512(
         pi = _mm512_cvtps_epi32(pf);
         pixel = _mm512_cvtepi32_epi8(pi);
 
+#ifdef MSVC
+        //  COMPILER-BUG-MSVC: Miscompiled without mask.
+        _mm512_mask_storeu_epi32((__m512i*)image, mask, _mm512_castsi128_si512(pixel));
+#else
         _mm_mask_storeu_epi32((__m128i*)image, mask, pixel);
+#endif
     }
 }
 void scale_brightness_x64_AVX512(
