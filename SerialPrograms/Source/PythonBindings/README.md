@@ -77,9 +77,13 @@ The easiest way to do a proper setup is to establish the connection to the Switc
 Run the following commands:
 
 ```sh
-cd SerialPrograms/Source/PythonBindings # starting from the root Arduino-Source
-python -m pokemon_automation.switch_connection_test               # try every candidate port in turn
-python -m pokemon_automation.switch_connection_test /dev/ttyACM0  # or pass a specific port
+# starting from the root Arduino-Source
+cd SerialPrograms/Source/PythonBindings
+# try every candidate port in turn
+python -m pokemon_automation.switch_connection_test
+
+# OR pass a specific port
+python -m pokemon_automation.switch_connection_test /dev/ttyACM0
 ```
 
 If `port` is omitted, every port from `list_serial_ports()` is tried in turn. 
