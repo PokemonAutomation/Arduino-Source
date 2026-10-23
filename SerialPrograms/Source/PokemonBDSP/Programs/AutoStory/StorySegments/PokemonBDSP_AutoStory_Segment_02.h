@@ -15,6 +15,11 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
+// Reused at safe walking points to synchronize Repel expiration and renewal.
+enum class RepelRenewalChoice { YES, NO };
+void force_repel_expiry(VideoStream& stream, ProControllerContext& context,
+    RepelRenewalChoice choice, bool north_south=false, bool require_expiry=false);
+
 class AutoStory_Segment_02 : public AutoStory_Segment{
 public:
     virtual std::string name()       const override;

@@ -1347,9 +1347,10 @@ bool clear_new_item_flags(VideoStream& stream, ProControllerContext& context, in
     bool cleared=all_clear();
     for (size_t pocket=0;pocket<32 && !cleared;pocket++) {
         if (pocket) pbf_press_dpad(context,DPAD_RIGHT,80ms,300ms);
-        // Pause on each selection so its NEW banner has time to clear.
-        // Keep three cumulative seconds of Down input per pocket.
-        for (size_t tap=0;tap<12;tap++) pbf_press_dpad(context,DPAD_DOWN,250ms,100ms);
+        // Let the initial selection and each subsequent item clear its NEW
+        // flag. Short taps avoid skipping rows through held-button repeat.
+        pbf_wait(context,1000ms);
+        for (size_t tap=0;tap<12;tap++) pbf_press_dpad(context,DPAD_DOWN,80ms,1000ms);
         cleared=all_clear();
     }
     pbf_press_dpad(context,DPAD_UP,3000ms,250ms);
@@ -1534,8 +1535,6 @@ bool find_bag_item(
 //         *reference, bag_list_name_box(item.reference_row)
 //     ).copy();
     ImageMatchDetector bag(reference, ImageFloatBox(0.055, 0.012, 0.044, 0.045), 35.0, true);
-    ImageMatchDetector selected_icon(reference, item.icon_box, item.max_icon_rmsd, true);
-    ImageMatchDetector selected_name(reference, item.name_box, item.max_name_rmsd, true);
     const auto deadline = std::chrono::steady_clock::now() + search_timeout;
 
     open_menu(stream, context, MenuCursorPosition::BAG, num_icons);
@@ -1584,7 +1583,6 @@ bool find_bag_item(
         for (size_t pass = 0; pass < 3 && !empty; pass++){
             size_t matching_frames = 0;
             size_t missing_cursor = 0;
-            size_t failed_confirmation = 0;
             size_t unchanged_pages = 0;
             ImageRGB32 previous_page;
             stream.log(
@@ -1641,6 +1639,7 @@ bool find_bag_item(
                     return false;
                 }
                 if (cursor == 0){
+                    matching_frames = 0;
                     if (bag_list_is_empty(frame)){
                         empty = true;
                         break;
@@ -1657,8 +1656,9 @@ bool find_bag_item(
                 if (target != 0){
                     previous_page = ImageRGB32();
                     unchanged_pages = 0;
-                    if (target == cursor && selected_icon.detect(frame) &&
-                        (!item.check_name || selected_name.detect(frame))){
+                    // A unique list sprite/name match with the cursor on that
+                    // row is sufficient; do not depend on the detail panel.
+                    if (target == cursor){
                         if (++matching_frames >= 3){
                             stream.log("[Bag search] Item and cursor confirmed in row " +
                                 std::to_string(cursor) + ".", COLOR_GREEN);
@@ -1669,16 +1669,6 @@ bool find_bag_item(
                         continue;
                     }
                     matching_frames = 0;
-                    if (target == cursor){
-                        if (++failed_confirmation < 3){
-                            pbf_wait(context, 150ms);
-                            context.wait_for_all_requests();
-                            continue;
-                        }
-                        stream.log("[Bag search] Selected-item confirmation failed.", COLOR_ORANGE);
-                        return false;
-                    }
-                    failed_confirmation = 0;
                     const size_t count = plan_bag_item_move(cursor, target).presses;
                     stream.log("[Bag search] Moving " + std::string(target > cursor ? "down " : "up ") +
                         std::to_string(count) + " time(s), then checking again.");

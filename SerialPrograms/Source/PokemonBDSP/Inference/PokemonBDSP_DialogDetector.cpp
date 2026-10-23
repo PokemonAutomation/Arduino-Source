@@ -47,7 +47,14 @@ bool ShortDialogDetector::detect(const ImageViewRGB32& screen){
         // Gardenia's opening reward line can reach this strip. Retain the
         // same white test in a second blank margin, below that long line.
         right_white=image_stats(extract_box_reference(screen,ImageFloatBox{.790,.915,.002,.025}));
-        if (!is_white(right_white)) return false;
+        if (!is_white(right_white)){
+            // Buneary's long second line reaches the inner strip, while the
+            // outer strip can land on the tinted border. The blank lower
+            // margin must pass the same uniform-white test; retain both
+            // edge-variation checks below and the existing left margin.
+            right_white=image_stats(extract_box_reference(screen,ImageFloatBox{.790,.940,.002,.018}));
+            if (!is_white(right_white)) return false;
+        }
     }
 //    ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
 //    if (!is_white(bottom)){

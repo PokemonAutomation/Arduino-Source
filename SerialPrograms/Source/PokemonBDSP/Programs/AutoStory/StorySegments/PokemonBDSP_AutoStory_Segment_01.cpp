@@ -262,35 +262,8 @@ namespace PokemonAutomation {
                 pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 8000ms, 0ms);
                 pbf_wait(context, 200ms);
                 context.wait_for_all_requests();
-                bool black_screen_found = false;
-                for (size_t attempt = 0; attempt < 3 && !black_screen_found; attempt++) {
-                    BlackScreenWatcher black_screen;
-                    int ret = run_until<ProControllerContext>(
-                        stream, context,
-                        [](ProControllerContext& context) {
-                            for (size_t i = 0; i < 10; i++) {
-                                pbf_press_button(context, BUTTON_DOWN, 180ms, 0ms);
-                                pbf_press_button(context, BUTTON_RIGHT, 180ms, 0ms);
-                                pbf_press_button(context, BUTTON_RIGHT, 180ms, 0ms);
-                            }
-                            pbf_move_left_joystick(context, { 0, 1 }, 10000ms, 0ms);
-                        },
-                        { black_screen }
-                    );
-                    if (ret == 0) {
-                        stream.log("Black screen detected.");
-                        black_screen_found = true;
-                    }
-                }
-                context.wait_for_all_requests();
-
-                if (!black_screen_found) {
-                    OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReportMode::SEND_ERROR_REPORT,
-                        "jubilife_to_oreburgh_gate: No black screen after 3 attempts.",
-                        stream
-                    );
-                }
+                enter_cave_with_down_right_search(stream,context,
+                    "jubilife_to_oreburgh_gate",10000ms);
             }
             void oreburgh_gate_nav(SingleSwitchProgramEnvironment& env,
                 VideoStream& stream, ProControllerContext& context) {

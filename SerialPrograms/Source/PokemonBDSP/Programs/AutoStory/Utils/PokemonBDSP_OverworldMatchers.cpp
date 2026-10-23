@@ -18,7 +18,7 @@ static cv::Mat gray_image(const ImageRGB32& image){
         const_cast<uint32_t*>(image.data()),image.bytes_per_row());
     cv::Mat gray; cv::cvtColor(pixels,gray,cv::COLOR_BGRA2GRAY); return gray;
 }
-// Opt-in only for the outdoor Cut anchors. Divide out slow local lighting
+// Opt-in for selected outdoor structural anchors. Divide out slow local lighting
 // changes so a moving cloud does not alter the printed sign/emblem structure.
 static cv::Mat normalize_landmark_illumination(const cv::Mat& gray){
     cv::Mat pixels,background,normalized;
@@ -411,6 +411,217 @@ OverworldMatchResult match_eterna_center_entrance(const ImageRGB32& frame){
     }
     return best;
 }
+OverworldMatchResult match_route208_stair_top(const ImageRGB32& frame){
+    // Native screenshot 20261022-213928168268: centered above the east stairs.
+    // The isolated upper rock and lower rock pair must both agree before descent.
+    OverworldMatchResult best;
+    double best_score=-1;
+    // Stationary hourly captures supply lighting appearances, not new goals.
+    // Both physical rock groups still need the same confidence and agreement.
+    const char* references[][2]={
+        {"PokemonBDSP/Autostory/Route208Stairs/UpperRock.png","PokemonBDSP/Autostory/Route208Stairs/LowerRocks.png"},
+        {"PokemonBDSP/Autostory/Route208Stairs/Hour0Frame1Upper.png","PokemonBDSP/Autostory/Route208Stairs/Hour0Frame1Lower.png"},
+        {"PokemonBDSP/Autostory/Route208Stairs/Hour4Frame1Upper.png","PokemonBDSP/Autostory/Route208Stairs/Hour4Frame1Lower.png"},
+        {"PokemonBDSP/Autostory/Route208Stairs/Hour17Frame1Upper.png","PokemonBDSP/Autostory/Route208Stairs/Hour17Frame1Lower.png"},
+        {"PokemonBDSP/Autostory/Route208Stairs/Hour11Frame3Upper.png","PokemonBDSP/Autostory/Route208Stairs/Hour11Frame3Lower.png"},
+        {"PokemonBDSP/Autostory/Route208Stairs/Hour15Frame1Upper.png","PokemonBDSP/Autostory/Route208Stairs/Hour15Frame1Lower.png"},
+        {"PokemonBDSP/Autostory/Route208Stairs/Hour11Frame5Upper.png","PokemonBDSP/Autostory/Route208Stairs/Hour11Frame5Lower.png"},
+        {"PokemonBDSP/Autostory/Route208Stairs/Hour15Frame3Upper.png","PokemonBDSP/Autostory/Route208Stairs/Hour15Frame3Lower.png"},
+    };
+    for (const auto& reference:references){
+    for (double scale : {.90,.95,1.0,1.05,1.10}){
+        std::vector<LandmarkConfig> configs={
+            {"Stair-top upper rock",reference[0],
+                {170.0/1920,350.0/1080,120.0/1920,120.0/1080},{0,0,1,1},.93,.20},
+            {"Stair-top lower rock pair",reference[1],
+                {240.0/1920,425.0/1080,130.0/1920,180.0/1080},{0,0,1,1},.93,.20}
+        };
+        for (auto& config:configs){
+            const double w=config.target.width,h=config.target.height;
+            config.target.width*=scale;config.target.height*=scale;
+            config.target.x+=(w-config.target.width)/2;
+            config.target.y+=(h-config.target.height)/2;
+        }
+        auto candidate=match_landmarks(frame,configs,2,1.0/128,POSITION_TOLERANCE_Y,true);
+        double score=1;
+        for (const auto& landmark:candidate.landmarks) score=std::min(score,landmark.score);
+        if ((candidate.located && !best.located) ||
+            (candidate.located==best.located && score>best_score)){
+            best=std::move(candidate);best_score=score;
+        }
+    }
+    }
+    if (best.located) return best;
+    const char* approaches[][2]={
+        {"PokemonBDSP/Autostory/Route208Stairs/Approach0507Upper.png","PokemonBDSP/Autostory/Route208Stairs/Approach0507Lower.png"},
+        {"PokemonBDSP/Autostory/Route208Stairs/Approach0538Upper.png","PokemonBDSP/Autostory/Route208Stairs/Approach0538Lower.png"},
+        {"PokemonBDSP/Autostory/Route208Stairs/Approach0549Upper.png","PokemonBDSP/Autostory/Route208Stairs/Approach0549Lower.png"},
+        // The eastern cliff pose changes rock perspective and the local shadow
+        // pattern. These real-run appearances guide acquisition only: retain
+        // .92 acquisition NCC/.20 uniqueness and two-rock offset agreement.
+        // Arrival still requires the original .93 strict reference bank.
+        {"PokemonBDSP/Autostory/Route208Stairs/ApproachLive01Upper.png","PokemonBDSP/Autostory/Route208Stairs/ApproachLive01Lower.png"},
+        {"PokemonBDSP/Autostory/Route208Stairs/ApproachLive02Upper.png","PokemonBDSP/Autostory/Route208Stairs/ApproachLive02Lower.png"},
+        {"PokemonBDSP/Autostory/Route208Stairs/ApproachLive03Upper.png","PokemonBDSP/Autostory/Route208Stairs/ApproachLive03Lower.png"},
+        {"PokemonBDSP/Autostory/Route208Stairs/ApproachLive04Upper.png","PokemonBDSP/Autostory/Route208Stairs/ApproachLive04Lower.png"},
+        {"PokemonBDSP/Autostory/Route208Stairs/ApproachLive05Upper.png","PokemonBDSP/Autostory/Route208Stairs/ApproachLive05Lower.png"},
+        {"PokemonBDSP/Autostory/Route208Stairs/ApproachLive06Upper.png","PokemonBDSP/Autostory/Route208Stairs/ApproachLive06Lower.png"},
+        {"PokemonBDSP/Autostory/Route208Stairs/ApproachLive07Upper.png","PokemonBDSP/Autostory/Route208Stairs/ApproachLive07Lower.png"},
+        {"PokemonBDSP/Autostory/Route208Stairs/ApproachLive08Upper.png","PokemonBDSP/Autostory/Route208Stairs/ApproachLive08Lower.png"},
+        {"PokemonBDSP/Autostory/Route208Stairs/ApproachLive09Upper.png","PokemonBDSP/Autostory/Route208Stairs/ApproachLive09Lower.png"},
+    };
+    for (const auto& reference:approaches){
+        for (double scale : {.90,.925,.95,.975,1.0,1.025,1.05,1.075,1.10}){
+            std::vector<LandmarkConfig> configs={
+                {"Stair-top approach upper rock",reference[0],
+                    {170.0/1920,350.0/1080,120.0/1920,120.0/1080},{0,0,.50,.85},.92,.20},
+                {"Stair-top approach lower rock pair",reference[1],
+                    {240.0/1920,425.0/1080,130.0/1920,180.0/1080},{0,0,.50,.85},.92,.20}
+            };
+            for (auto& config:configs){
+                const double w=config.target.width,h=config.target.height;
+                config.target.width*=scale;config.target.height*=scale;
+                config.target.x+=(w-config.target.width)/2;
+                config.target.y+=(h-config.target.height)/2;
+            }
+            auto candidate=match_landmarks(frame,configs,2,1.0/128,POSITION_TOLERANCE_Y,true);
+            candidate.coarse=true;candidate.at_target=false;
+            const double score=std::min(candidate.landmarks[0].score,candidate.landmarks[1].score);
+            if (candidate.located && (!best.located || score>best_score)){
+                best=std::move(candidate);best_score=score;
+            }
+        }
+    }
+    return best;
+}
+OverworldMatchResult match_route208_hannah_departure(const ImageRGB32& frame){
+    OverworldMatchResult best;
+    double best_score=-1;
+    for (int appearance : {0,865,930,965,978}){
+        for (double scale : {.90,.95,1.0,1.05,1.10}){
+            std::vector<LandmarkConfig> configs={
+                {"Field stair foot","PokemonBDSP/Autostory/Route208Hannah/StairFoot.png",
+                    {225.0/1920,275.0/1080,250.0/1920,110.0/1080},{0,0,1,1},.93,.20,LandmarkFeatures::LOCAL_CONTRAST},
+                {"Field sign frame","PokemonBDSP/Autostory/Route208Hannah/TreeSign.png",
+                    {1000.0/1920,125.0/1080,100.0/1920,80.0/1080},{0,0,1,1},.93,.20},
+                {"Field house sign frame","PokemonBDSP/Autostory/Route208Hannah/HouseSign.png",
+                    {1440.0/1920,110.0/1080,110.0/1920,110.0/1080},{0,0,1,1},.93,.20}
+            };
+            if (appearance){
+                // Recorded dodges stand farther east, with the stairs clipped.
+                // These agreeing signs guide acquisition only; the successful
+                // departure reference above alone may confirm arrival.
+                configs.erase(configs.begin());
+                configs[0].path=appearance==865 ? "PokemonBDSP/Autostory/Route208Hannah/FieldSign865.png" :
+                    appearance==930 ? "PokemonBDSP/Autostory/Route208Hannah/FieldSign930.png" : appearance==965 ? "PokemonBDSP/Autostory/Route208Hannah/FieldSign965.png" : "PokemonBDSP/Autostory/Route208Hannah/FieldSign978.png";
+                configs[1].path=appearance==865 ? "PokemonBDSP/Autostory/Route208Hannah/HouseSign865.png" :
+                    appearance==930 ? "PokemonBDSP/Autostory/Route208Hannah/HouseSign930.png" : appearance==965 ? "PokemonBDSP/Autostory/Route208Hannah/HouseSign965.png" : "PokemonBDSP/Autostory/Route208Hannah/HouseSign978.png";
+            }
+            for (auto& config:configs){
+                const double w=config.target.width,h=config.target.height;
+                config.target.width*=scale;config.target.height*=scale;
+                config.target.x+=(w-config.target.width)/2;
+                config.target.y+=(h-config.target.height)/2;
+            }
+            auto candidate=match_landmarks(frame,configs,2,1.0/128,POSITION_TOLERANCE_Y,true);
+            if (appearance){candidate.coarse=true;candidate.at_target=false;}
+            double score=1;
+            size_t accepted=0;
+            for (const auto& landmark:candidate.landmarks) if (landmark.accepted) {score=std::min(score,landmark.score);accepted++;}
+            if (!accepted) score=-1;
+            if ((candidate.located && !best.located) ||
+                (candidate.located && best.located && !candidate.coarse && best.coarse) ||
+                (candidate.located==best.located && candidate.coarse==best.coarse && score>best_score)){
+                best=std::move(candidate);best_score=score;
+            }
+        }
+    }
+    return best;
+}
+OverworldMatchResult match_hearthome_center_entrance(const ImageRGB32& frame){
+    // Stop on the street, south of the trigger tile. The roof emblem and
+    // orange awning must agree; a ball-shaped interior display is not enough.
+    OverworldMatchResult best;
+    double best_score=-1;
+    for (const char* ball : {"PokemonBDSP/Autostory/HearthomeCenter/Ball.png",
+        "PokemonBDSP/Autostory/HearthomeCenter/BallLive.png"}){
+    for (double scale : {.90,.925,.95,.975,1.0,1.025,1.05,1.075,1.10}){
+        const double w=112.0/1920*scale,h=108.0/1080*scale;
+        const double aw=220.0/1920*scale,ah=50.0/1080*scale;
+        auto candidate=match_landmarks(frame,{
+            {"Hearthome Center roof ball",ball,
+                {.5-w/2,170.0/1080-h/2,w,h},{0,0,1,.65},.95,.20},
+            {"Hearthome Center orange awning","PokemonBDSP/Autostory/HearthomeCenter/Awning.png",
+                {962.0/1920-aw/2,256.0/1080-ah/2,aw,ah},{0,0,1,.65},.95,.20}
+        },2,1.0/128,POSITION_TOLERANCE_Y,true);
+        double score=1;
+        for (const auto& anchor:candidate.landmarks) score=std::min(score,anchor.score);
+        if ((candidate.located && !best.located) ||
+            (candidate.located==best.located && score>best_score)){
+            best=std::move(candidate);best_score=score;
+        }
+    }
+    }
+    return best;
+}
+OverworldMatchResult match_hearthome_center_interior(const ImageRGB32& frame){
+    // Three observed entry-camera angles. Perspective changes the machine
+    // and register independently, so require a pair from the same real view.
+    struct View { const char* machine; const char* desk; ImageFloatBox a,b; };
+    const View views[]={
+        {"InteriorMachine.png","InteriorRegister.png",{660.0/1920,160.0/1080,220.0/1920,185.0/1080},
+            {1150.0/1920,155.0/1080,140.0/1920,175.0/1080}},
+        {"EntryRightMachine.png","EntryRightRegister.png",{390.0/1920,160.0/1080,240.0/1920,185.0/1080},
+            {905.0/1920,155.0/1080,130.0/1920,175.0/1080}},
+        {"EntryLeftMachine.png","EntryLeftRegister.png",{1045.0/1920,160.0/1080,240.0/1920,185.0/1080},
+            {1550.0/1920,220.0/1080,155.0/1920,110.0/1080}}
+    };
+    OverworldMatchResult best;
+    double best_score=-1;
+    for (const auto& view:views){
+        const std::string machine="PokemonBDSP/Autostory/HearthomeCenter/"+std::string(view.machine);
+        const std::string desk="PokemonBDSP/Autostory/HearthomeCenter/"+std::string(view.desk);
+        for (double scale : {.90,.95,1.0,1.05,1.10}){
+            auto a=view.a,b=view.b;
+            a.x=.5+(a.x-.5)*scale;a.y=.5+(a.y-.5)*scale;a.width*=scale;a.height*=scale;
+            b.x=.5+(b.x-.5)*scale;b.y=.5+(b.y-.5)*scale;b.width*=scale;b.height*=scale;
+            auto candidate=match_landmarks(frame,{
+                {"Center healing machine",machine.c_str(),a,{0,0,1,.8},.93,.20},
+                {"Center register",desk.c_str(),b,{0,0,1,.8},.93,.20}
+            },2,POSITION_TOLERANCE_X,POSITION_TOLERANCE_Y,true);
+            double score=1;
+            for (const auto& anchor:candidate.landmarks) score=std::min(score,anchor.score);
+            if ((candidate.located && !best.located) ||
+                (candidate.located==best.located && score>best_score)){
+                best=std::move(candidate);best_score=score;
+            }
+        }
+    }
+    return best;
+}
+OverworldMatchResult match_hearthome_contest_fantina(const ImageRGB32& frame){
+    // Fantina stands in front of the blue Contest Hall doors. Approach from
+    // the south; the dress and the door above her must move together.
+    OverworldMatchResult best;
+    double best_score=-1;
+    for (double scale : {.90,.95,1.0,1.05,1.10}){
+        const double w=190.0/1920*scale,h=180.0/1080*scale;
+        const double dw=220.0/1920*scale,dh=70.0/1080*scale;
+        auto candidate=match_landmarks(frame,{
+            {"Fantina pink dress","PokemonBDSP/Autostory/HearthomeContest/Fantina.png",
+                {.5-w/2,410.0/1080-h/2,w,h},{0,.1,1,.8},.93,.15},
+            {"Contest Hall blue door","PokemonBDSP/Autostory/HearthomeContest/BlueDoor.png",
+                {930.0/1920-dw/2,285.0/1080-dh/2,dw,dh},{0,.05,1,.8},.93,.15}
+        },2,1.0/128,1.0/54,true);
+        double score=1;
+        for (const auto& anchor:candidate.landmarks) score=std::min(score,anchor.score);
+        if ((candidate.located && !best.located) ||
+            (candidate.located==best.located && score>best_score)){
+            best=std::move(candidate);best_score=score;
+        }
+    }
+    return best;
+}
 OverworldMatchResult match_eterna_gym_entrance(const ImageRGB32& frame){
     // Recorded centered doorway pose. All three stationary landmarks must agree
     // before entering; two can guide acquisition without confirming arrival.
@@ -644,11 +855,24 @@ OverworldMatchResult match_eterna_cycle_shop_interior(const ImageRGB32& frame){
 
 OverworldMatchResult match_eterna_cycle_shop_reward(const ImageRGB32& frame){
     // Reward returns the player outside on the bicycle, at a separate pose.
+    // Reuse the stable roof braces; the nearby post changes appearance/shading.
     const std::vector<LandmarkConfig> configs{
         {"Shop sign","PokemonBDSP/Autostory/EternaBikeShop/reward-sign.png",{580.0/1920,330.0/1080,100.0/1920,120.0/1080},{0,.1,.65,.75},.93,.20},
-        {"Shop post","PokemonBDSP/Autostory/EternaBikeShop/reward-post.png",{1020.0/1920,350.0/1080,100.0/1920,106.0/1080},{.3,.1,.65,.75},.93,.20}
+        {"Shop roof braces","PokemonBDSP/Autostory/EternaBikeShop/ShopRoofBraces.png",{706.0/1920,128.0/1080,470.0/1920,36.0/1080},{0,0,.95,.75},.93,.20}
     };
     return match_landmarks(frame,configs,2,1.0/128,POSITION_TOLERANCE_Y,true);
+}
+
+OverworldMatchResult match_eterna_bike_riding_card(const ImageRGB32& frame){
+    // Fixed UI card: require both the blue illustration and B Close prompt.
+    // Small search boxes tolerate capture offsets without matching other menus.
+    const std::vector<LandmarkConfig> configs{
+        {"Blue Bike illustration","PokemonBDSP/Autostory/EternaBikeShop/BikeRidingBlueFeature.png",
+            {104.0/1920,314.0/1080,520.0/1920,450.0/1080},{.035,.26,.32,.48},.93,.20,LandmarkFeatures::BLUE_FRACTION},
+        {"B Close prompt","PokemonBDSP/Autostory/EternaBikeShop/BikeRidingClosePrompt.png",
+            {1570.0/1920,730.0/1080,160.0/1920,60.0/1080},{.79,.65,.14,.10},.93,.20}
+    };
+    return match_landmarks(frame,configs,2,1.0/64,1.0/54,true);
 }
 
 OverworldMatchResult match_eterna_cycle_shop_counter(const ImageRGB32& frame){
@@ -659,14 +883,133 @@ OverworldMatchResult match_eterna_cycle_shop_counter(const ImageRGB32& frame){
     return match_landmarks(frame,configs,2,1.0/128,POSITION_TOLERANCE_Y,true);
 }
 
-OverworldMatchResult match_cycling_road_north_entry(const ImageRGB32& frame){
-    const std::vector<LandmarkConfig> configs{
-        {"Route sign","PokemonBDSP/Autostory/CyclingRoad/cycling_road_north_entry-0.png",{696.0/1920,270.0/1080,140.0/1920,110.0/1080},{0,0,0.65,0.65},.93,.20},
-        {"Left bridge cap","PokemonBDSP/Autostory/CyclingRoad/cycling_road_north_entry-1.png",{194.0/1920,568.0/1080,160.0/1920,160.0/1080},{0,0.2,0.5,0.8},.93,.20},
-        {"Right bridge cap","PokemonBDSP/Autostory/CyclingRoad/cycling_road_north_entry-2.png",{1180.0/1920,540.0/1080,300.0/1920,280.0/1080},{0.5,0.2,0.5,0.8},.93,.20}
-    };
-    return match_landmarks(frame,configs,3,1.0/128,POSITION_TOLERANCE_Y,true);
+// Two stationary architectural features confirm the intended gate interior.
+// The doorway and west window avoid the moving player, NPCs and localized text.
+OverworldMatchResult match_cycling_road_south_gate_interior(const ImageRGB32& frame){
+    return match_landmarks(frame,{
+        {"Gate north doorway","PokemonBDSP/Autostory/CyclingRoadSouthGate/NorthDoorway.png",{630.0/1920,118.0/1080,220.0/1920,270.0/1080},{.15,0,.70,.55},.93,.20},
+        {"Gate west window","PokemonBDSP/Autostory/CyclingRoadSouthGate/WestWindow.png",{302.0/1920,140.0/1080,157.0/1920,145.0/1080},{.05,0,.35,.55},.93,.20}
+    },2,POSITION_TOLERANCE_X,POSITION_TOLERANCE_Y);
 }
+OverworldMatchResult match_cycling_road_bridge_approach(const ImageRGB32& frame){
+    // Use the actual bridge entrance: cyan right rail with a broad metal deck
+    // immediately to its left. Neither the Route 206 sign nor gate is involved.
+    OverworldMatchResult best;
+    if (!frame) return best;
+    cv::Mat pixels((int)frame.height(),(int)frame.width(),CV_8UC4,
+        const_cast<uint32_t*>(frame.data()),frame.bytes_per_row());
+    cv::Mat small,bgr,hsv,cyan;
+    cv::resize(pixels,small,cv::Size(960,540),0,0,cv::INTER_AREA);
+    cv::cvtColor(small,bgr,cv::COLOR_BGRA2BGR);
+    cv::cvtColor(bgr,hsv,cv::COLOR_BGR2HSV);
+    // Hue/saturation retain the cyan rail under the recorded moving shadows.
+    cv::inRange(hsv,cv::Scalar(78,95,55),cv::Scalar(105,255,255),cyan);
+    cv::morphologyEx(cyan,cyan,cv::MORPH_CLOSE,cv::Mat::ones(3,3,CV_8U));
+    const int w=hsv.cols,h=hsv.rows;
+    std::vector<std::vector<cv::Point>> contours;
+    cv::findContours(cyan,contours,cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
+    double best_support=0;
+    bool ambiguous=false;
+    for (const auto& contour:contours){
+        const auto rail=cv::boundingRect(contour);
+        if (rail.x<w*.25 || rail.x>w*.85 || rail.height<h*.10) continue;
+        // A left-hand rail has grass/cliff on this side and fails the deck test.
+        const int left=std::max(0,rail.x-(int)(w*.22));
+        const int right=rail.x-(int)(w*.02);
+        if (right-left<w*.12) continue;
+        const int begin=std::max(0,rail.y+(int)(h*.035));
+        const int end=std::min(h-(int)(h*.05),rail.y+(int)(h*.24));
+        const int sustained=std::max(3,(int)(h*.018));
+        int deck_y=-1;
+        double deck_support=0;
+        for (int y=begin;y<end;y++){
+            bool supported=true;
+            double total=0;
+            // Both halves must see the same broad deck edge, not a flower,
+            // narrow painted line or one white patch beside a cyan object.
+            for (int half=0;half<2;half++){
+                int neutral=0;
+                const int x0=left+(right-left)*half/2;
+                const int x1=left+(right-left)*(half+1)/2;
+                for (int row=y;row<y+sustained;row++)
+                    for (int x=x0;x<x1;x++){
+                        const auto p=hsv.at<cv::Vec3b>(row,x);
+                        // Shadowed metal remains low-saturation; the grass edge
+                        // and paired rail reject unrelated dark neutral panels.
+                        neutral+=p[1]<=80 && p[2]>=60;
+                    }
+                const double fraction=(double)neutral/((x1-x0)*sustained);
+                if (fraction<.72) supported=false;
+                total+=fraction/2;
+            }
+            if (supported){deck_y=y;deck_support=total;break;}
+        }
+        if (deck_y<0 || deck_y<h*.15) continue;
+        // The entrance is a grass-to-metal boundary. A road panel or sky
+        // behind an unrelated cyan object cannot stand in for this edge.
+        int grass=0;
+        const int above_begin=std::max(0,deck_y-(int)(h*.05));
+        const int above_end=deck_y-(int)(h*.02);
+        if (above_end<=above_begin) continue;
+        for (int row=above_begin;row<above_end;row++)
+            for (int x=left;x<right;x++){
+                const auto p=hsv.at<cv::Vec3b>(row,x);
+                grass+=p[0]>=25 && p[0]<=85 && p[1]>=60 && p[2]>=30;
+            }
+        if ((double)grass/((right-left)*(above_end-above_begin))<.45) continue;
+        // Measure the inner rail boundary at deck height, rather than using
+        // the cliff wall or the rail cap's perspective-dependent bounding box.
+        double inner=0,ink=0;size_t rows=0;
+        const int measure_begin=std::max(deck_y+(int)(h*.015),(int)(h*.52));
+        const int measure_end=std::min(h,measure_begin+(int)(h*.02));
+        for (int y=measure_begin;y<measure_end;y++){
+            for (int x=rail.x;x<std::min(w,rail.x+rail.width);x++){
+                if (cyan.at<unsigned char>(y,x)) {
+                    int last=x,count=0;
+                    for (int edge=x;edge<std::min(w,rail.x+rail.width);edge++)
+                        if (cyan.at<unsigned char>(y,edge)){last=edge;++count;}
+                    const int width=last-x+1;
+                    if (width>=w*.008 && width<=w*.055 && (double)count/width>=.80) {
+                        inner+=x;ink+=(double)count/width;++rows;
+                    }
+                    break;
+                }
+            }
+        }
+        if (rows<3 || rows<(measure_end-measure_begin)*.75) continue;
+        inner/=rows;
+        OverworldMatchResult candidate;
+        candidate.located=true;
+        candidate.dx=inner/w-.55;
+        candidate.dy=(double)deck_y/h-.36;
+        // Park on the upper white platform beside the right rail. The user
+        // demonstrated this stationary pose in the 12:33:35 recording; the
+        // downhill section starts well beyond it. Measure the rail at wheel
+        // height, not at its distant cap or the offset cliff wall.
+        candidate.at_target=std::abs(candidate.dx)<=.012 &&
+            std::abs(candidate.dy)<=1.0/54;
+        OverworldLandmarkResult rail_anchor;
+        rail_anchor.name="Bridge right rail inner edge";
+        rail_anchor.accepted=true;rail_anchor.score=ink/rows;
+        rail_anchor.dx=candidate.dx;rail_anchor.dy=candidate.dy;
+        rail_anchor.search={.25,0,.68,1};
+        rail_anchor.found={(double)inner/w,(double)rail.y/h,(double)rail.width/w,(double)rail.height/h};
+        OverworldLandmarkResult deck_anchor;
+        deck_anchor.name="Bridge deck leading edge";
+        deck_anchor.accepted=true;deck_anchor.score=deck_support;
+        deck_anchor.dx=candidate.dx;deck_anchor.dy=candidate.dy;
+        deck_anchor.search={0,(double)begin/h,(double)right/w,(double)(end-begin)/h};
+        deck_anchor.found={(double)left/w,(double)deck_y/h,(double)(right-left)/w,(double)sustained/h};
+        candidate.landmarks={rail_anchor,deck_anchor};
+        const double support=ink/rows+deck_support;
+        if (best.located && (std::abs(best.dx-candidate.dx)>AGREEMENT_X ||
+            std::abs(best.dy-candidate.dy)>AGREEMENT_Y)) ambiguous=true;
+        if (support>best_support){best_support=support;best=std::move(candidate);}
+    }
+    if (ambiguous){best.located=false;best.at_target=false;}
+    return best;
+}
+
 
 OverworldMatchResult match_galactic_hq_exterior(const ImageRGB32& frame){
     const std::vector<LandmarkConfig> configs{
@@ -1282,6 +1625,11 @@ const std::vector<OverworldMatcher>& overworld_matchers(){    static const std::
         {"oreburgh-mart","Oreburgh Mart emblem",match_oreburgh_mart},
         {"jubilife-center","Jubilife Pokemon Center entrance",match_jubilife_center_entrance},
         {"eterna-center","Eterna Pokemon Center doorway",match_eterna_center_entrance},
+        {"hearthome-center","Hearthome Pokemon Center doorway",match_hearthome_center_entrance},
+        {"hearthome-center-interior","Hearthome Pokemon Center interior",match_hearthome_center_interior},
+        {"hearthome-fantina","Fantina outside the Hearthome Contest Hall",match_hearthome_contest_fantina},
+        {"route208-stair-top","Route 208 stair-top rocks",match_route208_stair_top},
+        {"route208-hannah-departure","Route 208 field after Hannah",match_route208_hannah_departure},
         {"eterna-gym","Eterna Gym doorway",match_eterna_gym_entrance},
         {"galactic-hq-jupiter","Galactic HQ Jupiter interaction",match_galactic_hq_jupiter},
         {"eterna-gym-statues","Eterna Gym interior statues",match_eterna_gym_statues},
