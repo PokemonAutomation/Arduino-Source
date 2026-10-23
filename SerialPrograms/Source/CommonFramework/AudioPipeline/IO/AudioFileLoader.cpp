@@ -63,8 +63,12 @@ bool AudioFileLoader::start(){
         }
 
         const QAudioFormat& wavAudioFormat = m_wavFile->audioFormat();
-        if (wavAudioFormat.channelCount() > 2){
-            std::cout << "Error: audio file input supports 1 or 2 channels; the wav file has "
+        //  Up to 8 channels: that is the range with a standard channel
+        //  layout (the mixer's fallback_channel_config), which is what the
+        //  tree's mix matrix is built from. Beyond that the tree cannot
+        //  mix the input, so the file is rejected up front.
+        if (wavAudioFormat.channelCount() > 8){
+            std::cout << "Error: audio file input supports up to 8 channels; the wav file has "
                 << wavAudioFormat.channelCount() << " channels." << std::endl;
             return false;
         }

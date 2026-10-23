@@ -51,16 +51,23 @@ Kernels::AudioPipeline::SampleFormat to_sample_format(AudioSampleFormat format){
 }
 
 
-//  QAudioFormat with just a channel count and the standard layout for it
-//  (1 = mono, 2 = stereo L+R). Enough for build_channel_mixer_matrix().
+//  QAudioFormat with a channel count and, for 1 and 2 channels, the
+//  standard layout (mono, stereo L+R). For more channels the config is
+//  left unknown: resolve_positions() then falls back to the standard
+//  layout for that count (2.1, 3.1, 5.0, 5.1, 7.0, 7.1). Enough for
+//  build_channel_mixer_matrix(). (Setting a channel config also resets
+//  the channel count in Qt, so the count goes first and the config is
+//  only set where it matches the count.)
 QAudioFormat channel_format(size_t channels){
     QAudioFormat format;
     format.setChannelCount((int)channels);
-    format.setChannelConfig(
-        channels == 1
-            ? QAudioFormat::ChannelConfig::ChannelConfigMono
-            : QAudioFormat::ChannelConfig::ChannelConfigStereo
-    );
+    if (channels <= 2){
+        format.setChannelConfig(
+            channels == 1
+                ? QAudioFormat::ChannelConfig::ChannelConfigMono
+                : QAudioFormat::ChannelConfig::ChannelConfigStereo
+        );
+    }
     return format;
 }
 
