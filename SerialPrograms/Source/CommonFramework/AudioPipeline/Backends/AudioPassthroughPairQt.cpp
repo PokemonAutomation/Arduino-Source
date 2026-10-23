@@ -568,7 +568,7 @@ void AudioPassthroughPairQt::set_audio_source(const AudioDeviceInfo& device, Aud
             source.reset(new AudioSource(
                 m_logger,
                 device,
-                m_input_format,
+                format,
                 m_device_input_multiplier
             ));
         }
