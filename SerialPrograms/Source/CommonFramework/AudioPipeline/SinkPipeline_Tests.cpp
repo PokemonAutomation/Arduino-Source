@@ -16,19 +16,29 @@
  */
 
 #include <algorithm>
+#include <atomic>
 #include <cmath>
 #include <cstdint>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
+#include <filesystem>
 #include <numbers>
 #include <random>
+#include <thread>
 #include <vector>
+#include <QAudioDecoder>
 #include <QAudioFormat>
+#include <QCoreApplication>
+#include <QEventLoop>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/TestRunners/UnitTest.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/AudioPipeline/AudioInfo.h"
+#include "CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQt.h"
 #include "CommonFramework/AudioPipeline/ChannelMixer.h"
 #include "Kernels/AudioPipeline/Kernels_RawAudio2WorkingAudio.h"
 #include "Kernels/AudioPipeline/Kernels_WorkingAudio2RawAudio.h"
@@ -582,6 +592,63 @@ public:
 
 //
 //  Multichannel (5.1) file input: 6ch x 48000 in, 1ch / 2ch out, same
+//  Regression gate for the mp3-probe deadlock: the file source's
+//  constructor probes the decoder on a nested event loop, and events
+//  queued on the pair's thread are dispatched during that loop. A
+//  queued set_audio_sink must be able to take the pair's lock then, so
+//  the source has to be constructed outside the lock (a regression
+//  here deadlocks; the watchdog aborts the run instead of hanging it).
+class SinkGateFileSourceNoDeadlockTest : public UnitTest{
+public:
+    SinkGateFileSourceNoDeadlockTest()
+        : UnitTest("AudioPipeline - SinkGate_FileSource_NoDeadlock")
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope&) const override{
+        const std::string fixture =
+            UNIT_TEST_RESOURCE_PATH() + "CommonFramework/AudioPipeline/decoded_probe_44100_2ch.mp3";
+        if (!std::filesystem::exists(std::filesystem::path(fixture))){
+            return "Missing mp3 fixture: " + fixture + ".";
+        }
+        if (!QAudioDecoder(nullptr).isSupported()){
+            return UnitTestResult(
+                UnitTestResult::SKIPPED,
+                "No audio decode backend (Qt Multimedia media plugin missing or failing to load)."
+            );
+        }
+
+        std::atomic<bool> finished{false};
+        std::thread watchdog([&finished]{
+            for (int i = 0; i < 300 && !finished.load(std::memory_order_relaxed); i++){
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
+            if (!finished.load(std::memory_order_relaxed)){
+                std::fprintf(stderr, "SinkGate_FileSource_NoDeadlock: still running after 30 s: deadlock, aborting.\n");
+                std::abort();
+            }
+        });
+
+        AudioPassthroughPairQt pair(logger);
+        QMetaObject::invokeMethod(
+            &pair,
+            [&pair]{
+                pair.set_audio_sink(AudioDeviceInfo(), 1.0);
+            },
+            Qt::QueuedConnection
+        );
+        //  Must complete: the probe runs before the lock is taken, so the
+        //  queued sink event above can run through while it decodes.
+        pair.set_audio_source(fixture);
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 500);
+
+        finished.store(true, std::memory_order_relaxed);
+        watchdog.join();
+        return true;
+    }
+};
+
+
+
 //  rate, so the tree is a plain mix. The input format carries no channel
 //  config, so the matrix must come from the standard 5.1 fallback layout
 //  (resolve_positions), and the mix must match a scalar reference
@@ -665,6 +732,7 @@ void add_tests_SinkPipeline(UnitTestDatabase& database){
     database.add<SinkGateUpmixTest>();
     database.add<SinkGateDownmixTest>();
     database.add<SinkGateMultichannel51Test>();
+    database.add<SinkGateFileSourceNoDeadlockTest>();
 }
 
 
