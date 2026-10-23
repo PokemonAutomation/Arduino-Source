@@ -194,23 +194,6 @@ bool audio_format_valid(const QAudioFormat& format){
 }
 
 
-//  "44100" -> "44,100"
-std::string format_rate_comma(size_t rate){
-    const std::string digits = std::to_string(rate);
-    std::string out;
-    size_t placed = 0;
-    for (size_t i = digits.size(); i-- > 0;){
-        if (placed > 0 && (placed % 3) == 0){
-            out += ',';
-        }
-        out += digits[i];
-        placed++;
-    }
-    std::reverse(out.begin(), out.end());
-    return out;
-}
-
-
 //
 //  The standard layout name for a channel count, when the channel config
 //  is the standard one for that count (or unknown, in which case the
@@ -296,7 +279,7 @@ std::string AudioInputChoice::display_name() const{
         return "";
     }
     std::string name = std::to_string(format.channelCount()) + " x "
-        + format_rate_comma((size_t)format.sampleRate()) + " Hz";
+        + tostr_u_commas(format.sampleRate()) + " Hz";
     std::string layout;
     if (m_reinterpreted){
         layout = m_swap_channels ? "Interleaved Stereo R/L" : "Interleaved Stereo L/R";
