@@ -29,9 +29,10 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class GiftRng : public SingleSwitchProgramInstance{
+class GiftRng : public SingleSwitchProgramInstance, private ConfigOption::Listener{
 public:
     using Descriptor = GiftRng_Descriptor;
+    ~GiftRng();
     GiftRng();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
     virtual void start_program_border_check(
@@ -40,6 +41,8 @@ public:
     ) override{}
 
 private:
+    virtual void on_config_value_changed(void* object) override;
+
     enum class GameVersion{
         firered,
         leafgreen

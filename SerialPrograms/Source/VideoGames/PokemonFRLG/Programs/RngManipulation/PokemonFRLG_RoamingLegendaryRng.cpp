@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Strings/StringTools.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -58,6 +59,10 @@ struct RoamingLegendaryRng_Descriptor::Stats : public StatsTracker{
 };
 std::unique_ptr<StatsTracker> RoamingLegendaryRng_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
+}
+
+RoamingLegendaryRng::~RoamingLegendaryRng(){
+    SEED.remove_listener(*this);
 }
 
 RoamingLegendaryRng::RoamingLegendaryRng()
@@ -207,6 +212,15 @@ RoamingLegendaryRng::RoamingLegendaryRng()
     PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
+
+    SEED.add_listener(*this);
+}
+
+void RoamingLegendaryRng::on_config_value_changed(void* object){
+    if (object == &SEED){
+        SEED.set(StringTools::strip(static_cast<std::string>(SEED)));
+        return;
+    }
 }
 
 

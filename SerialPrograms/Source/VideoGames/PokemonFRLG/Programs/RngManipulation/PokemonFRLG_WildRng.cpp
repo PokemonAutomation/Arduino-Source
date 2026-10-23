@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Strings/StringTools.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Language.h"
@@ -68,6 +69,7 @@ std::unique_ptr<StatsTracker> WildRng_Descriptor::make_stats() const{
 
 WildRng::~WildRng(){
     GAME_LOCATION.remove_listener(*this);
+    SEED.remove_listener(*this);
 }
 
 WildRng::WildRng()
@@ -252,9 +254,17 @@ WildRng::WildRng()
 
     WildRng::on_config_value_changed(this);
     GAME_LOCATION.add_listener(*this);
+    SEED.add_listener(*this);
 }
 
+
+
 void WildRng::on_config_value_changed(void* object){
+    if (object == &SEED){
+        SEED.set(StringTools::strip(static_cast<std::string>(SEED)));
+        return;
+    }
+
     AUTO_CATCH_SHINY.set_visibility(in_safari_zone() ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
 }
 
