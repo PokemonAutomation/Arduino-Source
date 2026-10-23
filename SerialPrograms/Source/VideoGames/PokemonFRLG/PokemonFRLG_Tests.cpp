@@ -20,6 +20,7 @@
 #include "Inference/PokemonFRLG_TrainerIdReader.h"
 #include "Inference/PokemonFRLG_WildEncounterReader.h"
 #include "Tests/TestUtils.h"
+#include "PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_Tests.h"
 
 #include <fstream>
@@ -28,6 +29,233 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
+
+
+namespace{
+
+class NullLogger : public Logger{
+public:
+    virtual void log(const std::string&, Color) override{}
+};
+
+std::string button_name(Button button){
+    return button == BUTTON_A ? "A" : button == BUTTON_B ? "B" : "?";
+}
+
+// Steps that return scripted events, and record what exit_wild_battle() asked for.
+class ScriptedWildBattleExit : public WildBattleExitActions{
+public:
+    // Returned by the press steps in turn; None once used up. Mashing B only watches for the
+    // battle to end, so it takes the next event only if that is BattleExited.
+    std::vector<WildBattleExitEvent> events;
+    // Returned by evolution_started() in turn; false once used up.
+    std::vector<bool> evolutions;
+    // How many overworld checks fail before one finds it.
+    int overworld_misses = 0;
+
+    std::vector<std::string> steps;
+    // Seconds spent in steps that ran to their timeout, and waiting for an evolution: time in
+    // which the player sees nothing happen.
+    int idle_seconds = 0;
+
+    virtual WildBattleExitEvent mash_b_until_battle_exited() override{
+        steps.push_back("mash-B");
+        if (m_next_event < events.size() && events[m_next_event] == WildBattleExitEvent::BattleExited){
+            return events[m_next_event++];
+        }
+        idle_seconds += 20;
+        return WildBattleExitEvent::None;
+    }
+    virtual WildBattleExitEvent press_until_dialog(Button button) override{
+        steps.push_back("press-" + button_name(button));
+        WildBattleExitEvent event = next_event();
+        if (event == WildBattleExitEvent::None){
+            idle_seconds += 30;
+        }
+        return event;
+    }
+    virtual bool evolution_started() override{
+        steps.push_back("evolution?");
+        return m_next_evolution < evolutions.size() && evolutions[m_next_evolution++];
+    }
+    virtual void wait_for_evolution() override{
+        steps.push_back("wait");
+        idle_seconds += 20;
+    }
+    virtual void advance_dialog() override{
+        steps.push_back("advance");
+    }
+    virtual void answer_move_prompt(Button button) override{
+        steps.push_back("answer-" + button_name(button));
+    }
+    virtual bool return_to_overworld() override{
+        steps.push_back("overworld?");
+        return overworld_misses-- <= 0;
+    }
+
+private:
+    WildBattleExitEvent next_event(){
+        return m_next_event < events.size() ? events[m_next_event++] : WildBattleExitEvent::None;
+    }
+
+    size_t m_next_event = 0;
+    size_t m_next_evolution = 0;
+};
+
+struct WildBattleExitScenario{
+    std::string name;
+    std::vector<WildBattleExitEvent> events = {};
+    std::vector<bool> evolutions = {};
+    int overworld_misses = 0;
+    bool stop_on_move_learn = false;
+    bool prevent_evolution = false;
+    WildBattleExitResult expected_result = WildBattleExitResult::Exited;
+    std::string expected_steps;
+    int expected_idle_seconds = 0;
+};
+
+std::string result_name(WildBattleExitResult result){
+    switch (result){
+    case WildBattleExitResult::Exited:                 return "Exited";
+    case WildBattleExitResult::ExitedAfterMoveLearn:   return "ExitedAfterMoveLearn";
+    case WildBattleExitResult::StoppedOnMoveLearn:     return "StoppedOnMoveLearn";
+    case WildBattleExitResult::Failed:                 return "Failed";
+    }
+    return "?";
+}
+
+class Test_ExitWildBattle : public UnitTest{
+public:
+    Test_ExitWildBattle(WildBattleExitScenario scenario)
+        : UnitTest("PokemonFRLG::ExitWildBattle - " + scenario.name)
+        , m_scenario(std::move(scenario))
+    {}
+
+    virtual UnitTestResult run(Logger&, CancellableScope&) const override{
+        ScriptedWildBattleExit actions;
+        actions.events = m_scenario.events;
+        actions.evolutions = m_scenario.evolutions;
+        actions.overworld_misses = m_scenario.overworld_misses;
+
+        NullLogger logger;
+        const WildBattleExitResult result = exit_wild_battle(
+            logger, actions, m_scenario.stop_on_move_learn, m_scenario.prevent_evolution
+        );
+        if (result != m_scenario.expected_result){
+            return "Expected " + result_name(m_scenario.expected_result) + ", got " + result_name(result);
+        }
+        std::string steps;
+        for (const std::string& step : actions.steps){
+            if (!steps.empty()){
+                steps += ' ';
+            }
+            steps += step;
+        }
+        if (steps != m_scenario.expected_steps){
+            return "Expected steps: " + m_scenario.expected_steps + "\nActual steps:   " + steps;
+        }
+        if (actions.idle_seconds != m_scenario.expected_idle_seconds){
+            return "Expected " + std::to_string(m_scenario.expected_idle_seconds) + " idle seconds, got "
+                + std::to_string(actions.idle_seconds);
+        }
+        return true;
+    }
+
+private:
+    const WildBattleExitScenario m_scenario;
+};
+
+void add_tests_ExitWildBattle(UnitTestDatabase& database){
+    using enum WildBattleExitEvent;
+    const WildBattleExitScenario scenarios[] = {
+        {
+            .name = "battle exits",
+            .events = {BattleExited},
+            .expected_steps = "mash-B evolution?",
+        },
+        {
+            // Mashing B did not end the battle, so it presses B until a dialog shows.
+            .name = "dialog is advanced",
+            .events = {AdvanceDialog, BattleExited},
+            .expected_steps = "mash-B press-B advance press-B evolution?",
+            .expected_idle_seconds = 20,
+        },
+        {
+            // Decline "forget a move?" with B, then confirm "stop learning?" with A.
+            .name = "new move is declined",
+            .events = {MoveLearnPrompt, MoveLearnPrompt, BattleExited},
+            .expected_result = WildBattleExitResult::ExitedAfterMoveLearn,
+            .expected_steps = "mash-B press-B answer-B press-A answer-A press-A evolution?",
+            .expected_idle_seconds = 20,
+        },
+        {
+            .name = "stops at a new move when asked",
+            .events = {MoveLearnPrompt},
+            .stop_on_move_learn = true,
+            .expected_result = WildBattleExitResult::StoppedOnMoveLearn,
+            .expected_steps = "mash-B press-B",
+            .expected_idle_seconds = 20,
+        },
+        {
+            // After an evolution nothing ends the battle again, so the overworld is only
+            // checked after mashing B and then pressing B until the deadline: over a minute
+            // in which the player stands still.
+            .name = "evolution",
+            .events = {BattleExited},
+            .evolutions = {true},
+            .expected_steps = "mash-B evolution? wait mash-B press-B overworld?",
+            .expected_idle_seconds = 70,
+        },
+        {
+            // Mashing B right away cancels the evolution.
+            .name = "prevented evolution",
+            .events = {BattleExited},
+            .evolutions = {true},
+            .prevent_evolution = true,
+            .expected_steps = "mash-B evolution? mash-B press-B overworld?",
+            .expected_idle_seconds = 50,
+        },
+        {
+            // A move to learn after the evolution is found by pressing B.
+            .name = "evolution then new move is declined",
+            .events = {BattleExited, MoveLearnPrompt, MoveLearnPrompt},
+            .evolutions = {true},
+            .overworld_misses = 1,
+            .expected_result = WildBattleExitResult::ExitedAfterMoveLearn,
+            .expected_steps =
+                "mash-B evolution? wait mash-B "
+                "press-B answer-B press-A answer-A press-A overworld? press-B overworld?",
+            .expected_idle_seconds = 100,
+        },
+        {
+            // If the overworld is not found after the evolution, it keeps pressing B.
+            .name = "evolution and overworld not found",
+            .events = {BattleExited},
+            .evolutions = {true},
+            .overworld_misses = 100,
+            .expected_result = WildBattleExitResult::Failed,
+            .expected_steps =
+                "mash-B evolution? wait mash-B "
+                "press-B overworld? press-B overworld? press-B overworld? "
+                "press-B overworld? press-B overworld? press-B overworld?",
+            .expected_idle_seconds = 220,
+        },
+        {
+            .name = "gives up when the overworld is not found",
+            .overworld_misses = 100,
+            .expected_result = WildBattleExitResult::Failed,
+            .expected_steps =
+                "mash-B press-B overworld? press-B overworld? press-B overworld? "
+                "press-B overworld? press-B overworld? press-B overworld?",
+            .expected_idle_seconds = 200,
+        },
+    };
+    for (const WildBattleExitScenario& scenario : scenarios){
+        database.add<Test_ExitWildBattle>(scenario);
+    }
+}
+
+}
 
 
 void add_tests(UnitTestDatabase& database){
@@ -46,6 +274,7 @@ void add_tests(UnitTestDatabase& database){
     add_tests_EliteFourRoomDetector(database);
     add_tests_HallOfFameSavingDetector(database);
     add_tests_BattleMoveSelectionArrow(database);
+    add_tests_ExitWildBattle(database);
 }
 
 
