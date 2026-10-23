@@ -121,13 +121,18 @@ struct AudioInputChoiceList{
 //
 //   - entries with the same (rate, channels, channel config) are collapsed
 //     to one; when several sample formats are supported for the same shape,
-//     the preferred sample format wins, otherwise the first seen does.
-//   - the result is sorted by sample rate, then channel count.
+//     the highest quality sample format wins: float > int32 > int16 > uint8.
+//   - the result is sorted by channel count (descending), then sample rate
+//     (descending); the reinterpreted capture-card choices, when present,
+//     stay appended after the native choices.
 //   - when the only supported format is 1ch x 96000 (the misreporting
 //     capture-card case), two reinterpreted 2ch x 48000 choices are
 //     appended after it (L/R first, then R/L).
-//   - preferred_index is the index of the exact match of "preferred", or 0
-//     when there is no match (or the list is empty).
+//   - preferred_index is the index of the exact match of "preferred"; when
+//     there is no match (preferred invalid or unsupported) it is the
+//     highest-scoring choice, where score = type x channel x sqrt(rate)
+//     with float 1.0 / int32 0.9 / int16 0.5 / uint8 0.1, 2ch 2.0 /
+//     Nch 2 - 1/N, and sqrt(rate). Empty list keeps 0.
 //
 AudioInputChoiceList input_choices(std::vector<AudioFormat> supported, const AudioFormat& preferred);
 

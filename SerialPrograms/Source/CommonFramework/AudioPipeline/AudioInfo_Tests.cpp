@@ -204,25 +204,27 @@ public:
         if (list.choices.size() != 3){
             return "Expected 3 choices after dedup, got " + std::to_string(list.choices.size()) + ".";
         }
-        if (list.choices[0].display_name() != "2 x 44,100 Hz (Stereo)"
-            || list.choices[1].display_name() != "1 x 48,000 Hz (Mono)"
-            || list.choices[2].display_name() != "2 x 48,000 Hz (Stereo)"){
-            return "Choices are not sorted by rate, then channel count: ["
+        //  Display order: channel count desc, then sample rate desc.
+        if (list.choices[0].display_name() != "2 x 48,000 Hz (Stereo)"
+            || list.choices[1].display_name() != "2 x 44,100 Hz (Stereo)"
+            || list.choices[2].display_name() != "1 x 48,000 Hz (Mono)"){
+            return "Choices are not sorted by channel count desc, then sample rate desc: ["
                 + list.choices[0].display_name() + ", "
                 + list.choices[1].display_name() + ", "
                 + list.choices[2].display_name() + "].";
         }
 
-        //  The preferred sample format wins the duplicate collapse.
-        if (list.choices[2].format().sample_format() != AudioSampleFormat::FLOAT32){
-            return "The preferred sample format should win the duplicate collapse.";
+        //  The higher quality sample format wins the duplicate collapse.
+        if (list.choices[0].format().sample_format() != AudioSampleFormat::FLOAT32){
+            return "float should beat int16 in the duplicate collapse.";
         }
-        if (list.preferred_index != 2){
-            return "preferred_index should point at the exact match (48k stereo float), got "
+        if (list.preferred_index != 0){
+            return "preferred_index should point at the exact match (48k stereo float, index 0), got "
                 + std::to_string(list.preferred_index) + ".";
         }
 
-        //  No preferred sample format present: the first seen wins.
+        //  No preferred match: the higher quality sample format still
+        //  wins the collapse, and the fallback score picks the only entry.
         const AudioFormat preferred_elsewhere = make_format(44100, 1, QAudioFormat::ChannelConfig::ChannelConfigMono);
         AudioInputChoiceList list2 = input_choices({
             make_format(48000, 2, QAudioFormat::ChannelConfig::ChannelConfigStereo),
@@ -231,11 +233,37 @@ public:
         if (list2.choices.size() != 1){
             return "Expected 1 choice, got " + std::to_string(list2.choices.size()) + ".";
         }
-        if (list2.choices[0].format().sample_format() != AudioSampleFormat::SINT16){
-            return "Without a preferred match, the first seen sample format should win.";
+        if (list2.choices[0].format().sample_format() != AudioSampleFormat::FLOAT32){
+            return "float should beat int16 in the duplicate collapse regardless of the preferred format.";
         }
         if (list2.preferred_index != 0){
-            return "preferred_index should default to 0 without a match.";
+            return "preferred_index should fall back to the only entry without a match.";
+        }
+
+        //  No preferred match: preferred_index falls back to the highest
+        //  quality score, not the first entry. 2ch x 48000 float
+        //  (1.0 x 2.0 x sqrt(48000)) beats 8ch x 48000 float
+        //  (1.0 x 1.875 x sqrt(48000)) and 1ch x 44100 int16
+        //  (0.5 x 1.0 x sqrt(44100)).
+        AudioInputChoiceList list3 = input_choices({
+            make_format(44100, 1, QAudioFormat::ChannelConfig::ChannelConfigMono),
+            make_format(48000, 8, QAudioFormat::ChannelConfig::ChannelConfigSurround7Dot1, QAudioFormat::SampleFormat::Float),
+            make_format(48000, 2, QAudioFormat::ChannelConfig::ChannelConfigStereo, QAudioFormat::SampleFormat::Float),
+        }, make_format(32000, 1, QAudioFormat::ChannelConfig::ChannelConfigMono));
+        if (list3.choices.size() != 3){
+            return "Expected 3 choices, got " + std::to_string(list3.choices.size()) + ".";
+        }
+        if (list3.choices[0].display_name() != "8 x 48,000 Hz (7.1)"
+            || list3.choices[1].display_name() != "2 x 48,000 Hz (Stereo)"
+            || list3.choices[2].display_name() != "1 x 44,100 Hz (Mono)"){
+            return "Choices are not sorted by channel count desc, then sample rate desc: ["
+                + list3.choices[0].display_name() + ", "
+                + list3.choices[1].display_name() + ", "
+                + list3.choices[2].display_name() + "].";
+        }
+        if (list3.preferred_index != 1){
+            return "Without a preferred match, the highest-scoring choice should win (2ch x 48000 float, index 1), got "
+                + std::to_string(list3.preferred_index) + ".";
         }
 
         return true;
@@ -286,15 +314,20 @@ public:
             }
         }
 
-        //  Preferred index: exact match wins, otherwise the first.
+        //  Preferred index: exact match wins; without a match the
+        //  highest-scoring choice.
         if (list.preferred_index != 0){
             return "A 1ch x 96000 preferred format should match the native entry (index 0).";
         }
+        //  No match: the L/R reinterpretation scores highest
+        //  (0.5 x 2.0 x sqrt(48000) > 0.5 x 1.0 x sqrt(96000)), and the
+        //  tie with R/L keeps the earlier index.
         AudioInputChoiceList bogus = input_choices(
             {card}, make_format(44100, 2, QAudioFormat::ChannelConfig::ChannelConfigStereo)
         );
-        if (bogus.preferred_index != 0){
-            return "A non-matching preferred format should fall back to index 0.";
+        if (bogus.preferred_index != 1){
+            return "A non-matching preferred format should fall back to the highest-scoring choice (L/R, index 1), got "
+                + std::to_string(bogus.preferred_index) + ".";
         }
         AudioInputChoiceList logical_match = input_choices(
             {card}, make_format(48000, 2, QAudioFormat::ChannelConfig::ChannelConfigStereo)
@@ -313,7 +346,7 @@ public:
         }
         if (mixed.choices[0].display_name() != "2 x 48,000 Hz (Stereo)"
             || mixed.choices[1].display_name() != "1 x 96,000 Hz (Mono)"){
-            return "Mixed device should list the native entries sorted by rate.";
+            return "Mixed device should list the native entries sorted by channel count desc, then sample rate desc.";
         }
 
         //  ...and the rule is specific to 1ch x 96000.

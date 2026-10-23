@@ -5,6 +5,7 @@
  */
 
 #include <algorithm>
+#include <cmath>
 #include <map>
 #include <set>
 #include <QtGlobal>
@@ -236,6 +237,43 @@ const char* standard_layout_name(size_t channels, QAudioFormat::ChannelConfig co
 }
 
 
+//  Sample-format quality ranking used to collapse duplicate shapes:
+//  float > int32 > int16 > uint8 (higher wins).
+int choice_type_priority(QAudioFormat::SampleFormat sample_format){
+    switch (sample_format){
+    case QAudioFormat::SampleFormat::Float: return 4;
+    case QAudioFormat::SampleFormat::Int32: return 3;
+    case QAudioFormat::SampleFormat::Int16: return 2;
+    case QAudioFormat::SampleFormat::UInt8: return 1;
+    default: return 0;
+    }
+}
+
+
+//  Fallback quality score for the choice list, used to pick
+//  preferred_index when the device's preferred format is not among the
+//  choices: score = type x channel x sqrt(rate), with
+//      type:    float 1.0, int32 0.9, int16 0.5, uint8 0.1
+//      channel: 2ch 2.0, Nch 2 - 1/N
+//      rate:    sqrt(rate)
+//  so our usual float stereo 48k / 44.1k shapes rank at the top while
+//  higher quality unusual formats still climb.
+double choice_score(const QAudioFormat& format){
+    double type_score = 0.0;
+    switch (format.sampleFormat()){
+    case QAudioFormat::SampleFormat::Float: type_score = 1.0; break;
+    case QAudioFormat::SampleFormat::Int32: type_score = 0.9; break;
+    case QAudioFormat::SampleFormat::Int16: type_score = 0.5; break;
+    case QAudioFormat::SampleFormat::UInt8: type_score = 0.1; break;
+    default: break;
+    }
+    const int channels = format.channelCount();
+    const double channel_score =
+        (channels == 2) ? 2.0 : 2.0 - 1.0 / static_cast<double>(channels);
+    return type_score * channel_score * std::sqrt(static_cast<double>(format.sampleRate()));
+}
+
+
 }
 
 
@@ -306,7 +344,7 @@ AudioInputChoiceList input_choices(std::vector<AudioFormat> supported, const Aud
 
     //  2. Collapse duplicates by (rate, channels, channel config). When
     //  several sample formats are supported for the same shape, the
-    //  preferred sample format wins; otherwise the first seen does.
+    //  highest quality sample format wins: float > int32 > int16 > uint8.
     std::vector<AudioFormat> deduped;
     for (const AudioFormat& format : valid){
         bool found = false;
@@ -317,7 +355,7 @@ AudioInputChoiceList input_choices(std::vector<AudioFormat> supported, const Aud
                 && k.channelCount() == f.channelCount()
                 && k.channelConfig() == f.channelConfig()){
                 found = true;
-                if (audio_format_equal(f, preferred.native_format())){
+                if (choice_type_priority(f.sampleFormat()) > choice_type_priority(k.sampleFormat())){
                     kept = format;
                 }
                 break;
@@ -328,15 +366,16 @@ AudioInputChoiceList input_choices(std::vector<AudioFormat> supported, const Aud
         }
     }
 
-    //  3. Sort by sample rate, then channel count, then config.
+    //  3. Sort for display: channel count descending, then sample rate
+    //  descending, then channel config (deterministic tiebreak).
     std::sort(deduped.begin(), deduped.end(), [](const AudioFormat& a, const AudioFormat& b){
         const QAudioFormat& x = a.native_format();
         const QAudioFormat& y = b.native_format();
-        if (x.sampleRate() != y.sampleRate()){
-            return x.sampleRate() < y.sampleRate();
-        }
         if (x.channelCount() != y.channelCount()){
-            return x.channelCount() < y.channelCount();
+            return x.channelCount() > y.channelCount();
+        }
+        if (x.sampleRate() != y.sampleRate()){
+            return x.sampleRate() > y.sampleRate();
         }
         return x.channelConfig() < y.channelConfig();
     });
@@ -368,13 +407,27 @@ AudioInputChoiceList input_choices(std::vector<AudioFormat> supported, const Aud
         }
     }
 
-    //  5. The preferred entry: exact match, otherwise the first.
+    //  5. The preferred entry: the exact match of "preferred"; when there
+    //  is no match (preferred invalid or unsupported), the choice with the
+    //  highest quality score, ties keeping the earlier index.
     ret.preferred_index = 0;
+    bool have_match = false;
+    size_t best_index = 0;
+    double best_score = -1.0;
     for (size_t i = 0; i < ret.choices.size(); i++){
         if (audio_format_equal(ret.choices[i].format().native_format(), preferred.native_format())){
             ret.preferred_index = i;
+            have_match = true;
             break;
         }
+        const double score = choice_score(ret.choices[i].format().native_format());
+        if (score > best_score){
+            best_score = score;
+            best_index = i;
+        }
+    }
+    if (!have_match && !ret.choices.empty()){
+        ret.preferred_index = best_index;
     }
 
     return ret;
@@ -386,39 +439,22 @@ AudioInputChoiceList input_choices(std::vector<AudioFormat> supported, const Aud
 //  QAudioDevice (Qt6) does not enumerate full formats, only
 //  isFormatSupported() / preferredFormat() / supportedSampleFormats(), so
 //  the supported list is probed over the standard grid of sample rates
-//  and channel counts. For each (rate, channels) shape the device's
-//  sample formats are tried in the order: preferred first, then the rest
-//  of supportedSampleFormats() (or common defaults when that is empty),
-//  and the first supported one is kept.
+//  and channel counts. For each (rate, channels) shape the sample
+//  formats are tried in fixed quality order (float, int32, int16,
+//  uint8) and the first supported one is kept, so our preferred types
+//  beat the device's preferred sample format.
 //
 std::vector<AudioFormat> enumerate_supported_formats(const NativeAudioInfo& info){
     std::vector<AudioFormat> supported;
 
     const QAudioFormat& preferred = info.preferredFormat();
 
-    std::vector<QAudioFormat::SampleFormat> sample_formats(
-        info.supportedSampleFormats().begin(), info.supportedSampleFormats().end()
-    );
-    if (sample_formats.empty()){
-        sample_formats = {
-            preferred.sampleFormat(),
-            QAudioFormat::SampleFormat::Int16,
-            QAudioFormat::SampleFormat::Float,
-            QAudioFormat::SampleFormat::Int32,
-            QAudioFormat::SampleFormat::UInt8,
-        };
-    }
-    //  The preferred sample format wins ties: move it to the front.
-    if (preferred.sampleFormat() != QAudioFormat::SampleFormat::Unknown){
-        sample_formats.erase(
-            std::remove(
-                sample_formats.begin(), sample_formats.end(),
-                preferred.sampleFormat()
-            ),
-            sample_formats.end()
-        );
-        sample_formats.insert(sample_formats.begin(), preferred.sampleFormat());
-    }
+    const QAudioFormat::SampleFormat sample_formats[] = {
+        QAudioFormat::SampleFormat::Float,
+        QAudioFormat::SampleFormat::Int32,
+        QAudioFormat::SampleFormat::Int16,
+        QAudioFormat::SampleFormat::UInt8,
+    };
 
     for (int rate : {8000, 11025, 16000, 22050, 32000, 44100, 48000, 88200, 96000, 176400, 192000}){
         for (int channels : {1, 2, 3, 4, 5, 6, 7, 8}){
