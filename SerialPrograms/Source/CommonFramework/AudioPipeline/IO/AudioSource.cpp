@@ -88,7 +88,12 @@ void AudioSource::remove_raw_listener(Kernels::AudioPipeline::RawAudioStreamList
 
 AudioSource::~AudioSource(){}
 
-AudioSource::AudioSource(Logger& logger, const std::string& file, AudioChannelFormat format, float volume_multiplier){
+AudioSource::AudioSource(
+    Logger& logger,
+    const std::string& file,
+    AudioChannelFormat format,
+    float volume_multiplier
+){
     QAudioFormat native_format;
     if (has_extension(file, "wav") && probe_wav_native_format(file, native_format)){
         //  Native WAV: the stream is the file's own format (rate, channels,
@@ -120,7 +125,12 @@ AudioSource::AudioSource(Logger& logger, const std::string& file, AudioChannelFo
     m_reader->add_listener(*m_internal_listener);
     m_input_file = std::make_unique<AudioInputFile>(logger, *m_reader, file, native_format);
 }
-AudioSource::AudioSource(Logger& logger, const AudioDeviceInfo& device, AudioChannelFormat format, float volume_multiplier){
+AudioSource::AudioSource(
+    Logger& logger,
+    const AudioDeviceInfo& device,
+    AudioChannelFormat format,
+    float volume_multiplier
+){
     NativeAudioInfo native_info = device.native_info();
     QAudioFormat native_format = native_info.preferredFormat();
 

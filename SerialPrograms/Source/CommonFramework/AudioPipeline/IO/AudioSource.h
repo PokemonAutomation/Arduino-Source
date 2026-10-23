@@ -47,10 +47,20 @@ public:
     ~AudioSource();
 
     //  Read from an audio file. (i.e. .wav or .mp3)
-    AudioSource(Logger& logger, const std::string& file, AudioChannelFormat format, float volume_multiplier);
+    AudioSource(
+        Logger& logger,
+        const std::string& file,
+        AudioChannelFormat format,
+        float volume_multiplier
+    );
 
     //  Read from an audio input device. (i.e. capture card)
-    AudioSource(Logger& logger, const AudioDeviceInfo& device, AudioChannelFormat format, float volume_multiplier);
+    AudioSource(
+        Logger& logger,
+        const AudioDeviceInfo& device,
+        AudioChannelFormat format,
+        float volume_multiplier
+    );
 
     size_t sample_rate() const{ return m_sample_rate; }
     size_t channels() const{ return m_channels; }

@@ -134,7 +134,10 @@ struct AudioInputChoiceList{
 //     with float 1.0 / int32 0.9 / int16 0.5 / uint8 0.1, 2ch 2.0 /
 //     Nch 2 - 1/N, and sqrt(rate). Empty list keeps 0.
 //
-AudioInputChoiceList input_choices(std::vector<AudioFormat> supported, const AudioFormat& preferred);
+AudioInputChoiceList input_choices(
+    std::vector<AudioFormat> supported,
+    const AudioFormat& preferred
+);
 
 
 
