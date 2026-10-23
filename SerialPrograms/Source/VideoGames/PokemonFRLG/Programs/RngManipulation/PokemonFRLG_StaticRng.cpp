@@ -126,8 +126,7 @@ StaticRng::StaticRng()
         false,
         "<b>Target Seed:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        "70FE", "70FE",
-        true
+        "70FE", "70FE"
     )
     , ADVANCES(
         "<b>Advances:</b><br>The total number of RNG advances for your target.",

@@ -183,8 +183,7 @@ EggRng::EggRng()
         false,
         "<b>Held Seed:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        "70FE", "70FE",
-        true
+        "70FE", "70FE"
         )
     , HELD_ADVANCES(
         "<b>Held Advances:</b><br>The total number of RNG advances for your held target.",
@@ -196,8 +195,7 @@ EggRng::EggRng()
         false,
         "<b>Pickup Seed:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        "70FE", "70FE",
-        true
+        "70FE", "70FE"
         )
     , PICKUP_ADVANCES(
         "<b>Pickup Advances:</b><br>The total number of RNG advances for your pickup target.",
