@@ -19,9 +19,9 @@
 #include <QAudioDecoder>
 #include <QEventLoop>
 #include <QTimer>
-#include <QtGlobal>
 #include "Common/Cpp/TestRunners/UnitTest.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "CommonFramework/AudioPipeline/IO/AudioFileLoader.h"
 #include "CommonFramework/AudioPipeline/IO/AudioInputFile.h"
@@ -337,10 +337,11 @@ public:
 
 
 
-//  The committed mp3 fixture for the decoded-native tests: two sines
-//  (440 Hz left, 660 Hz right), 44100 Hz stereo, 2 s, 64 kbps.
-std::filesystem::path decoded_probe_fixture(){
-    return std::filesystem::path(__FILE__).parent_path() / "testdata" / "decoded_probe_44100_2ch.mp3";
+//  The mp3 fixture for the decoded-native tests (two sines, 440 Hz left /
+//  660 Hz right, 44100 Hz stereo, 2 s, 64 kbps), in the CommandLineTests
+//  repo next to the program (like the test images).
+std::string decoded_probe_fixture(){
+    return UNIT_TEST_RESOURCE_PATH() + "CommonFramework/AudioPipeline/decoded_probe_44100_2ch.mp3";
 }
 
 
@@ -351,11 +352,11 @@ public:
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope&) const override{
-        //  A committed mp3 fixture (two 44100 Hz sines, one per channel):
+        //  The fixture (two 44100 Hz sines, one per channel):
         //  the decoder's native output for it is 44100 Hz stereo float.
-        const std::filesystem::path fixture = decoded_probe_fixture();
-        if (!std::filesystem::exists(fixture)){
-            return "Missing mp3 fixture: " + fixture.string() + ".";
+        const std::string fixture = decoded_probe_fixture();
+        if (!std::filesystem::exists(std::filesystem::path(fixture))){
+            return "Missing mp3 fixture: " + fixture + ".";
         }
         if (!QAudioDecoder(nullptr).isSupported()){
             return UnitTestResult(
@@ -365,7 +366,7 @@ public:
         }
 
         QAudioFormat format;
-        if (!probe_decoded_native_format(fixture.string(), format)){
+        if (!probe_decoded_native_format(fixture, format)){
             return "probe_decoded_native_format() failed on the mp3 fixture.";
         }
         if (format.sampleRate() != 44100 || format.channelCount() != 2
@@ -398,9 +399,9 @@ public:
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope&) const override{
-        const std::filesystem::path fixture = decoded_probe_fixture();
-        if (!std::filesystem::exists(fixture)){
-            return "Missing mp3 fixture: " + fixture.string() + ".";
+        const std::string fixture = decoded_probe_fixture();
+        if (!std::filesystem::exists(std::filesystem::path(fixture))){
+            return "Missing mp3 fixture: " + fixture + ".";
         }
         if (!QAudioDecoder(nullptr).isSupported()){
             return UnitTestResult(
@@ -410,7 +411,7 @@ public:
         }
 
         QAudioFormat native;
-        if (!probe_decoded_native_format(fixture.string(), native)){
+        if (!probe_decoded_native_format(fixture, native)){
             return "probe_decoded_native_format() failed on the mp3 fixture.";
         }
         if (native.sampleRate() != 44100 || native.channelCount() != 2
@@ -419,7 +420,7 @@ public:
         }
 
         //  The loader streams the decoded file at the native pace.
-        AudioFileLoader loader(nullptr, fixture.string(), native);
+        AudioFileLoader loader(nullptr, fixture, native);
         if (!loader.start()){
             return "AudioFileLoader::start() failed.";
         }
