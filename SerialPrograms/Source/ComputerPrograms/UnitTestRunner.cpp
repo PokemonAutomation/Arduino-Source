@@ -9,6 +9,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Common/Qt/QtThreadPool_Tests.h"
+#include "CommonFramework/AudioPipeline/AudioInfo_Tests.h"
 #include "CommonFramework/AudioPipeline/ChannelMixer.h"
 #include "CommonFramework/AudioPipeline/SinkPipeline_Tests.h"
 #include "CommonFramework/AudioPipeline/IO/AudioFileLoader_Tests.h"
@@ -46,6 +47,7 @@ UnitTestDatabase make_UNIT_TESTS_ALL(){
     add_tests_QtEventThreadPool(ret, GlobalThreadPools::computation_normal());
     add_tests_BlackBorderDetector(ret);
     add_tests_ListenerSet(ret);
+    add_tests_AudioInfo(ret);
     add_tests_ChannelMixerMatrix(ret);
     add_tests_FFTStreamer(ret);
     add_tests_SinkPipeline(ret);

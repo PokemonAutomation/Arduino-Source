@@ -68,6 +68,78 @@ private:
 };
 
 
+//
+//  An entry in the audio input format dropdown. It carries the shape the
+//  pipeline consumes ("format") and, for misreporting capture cards, how
+//  that shape relates to what the device physically emits
+//  ("physical_format").
+//
+//  Normal presets are native choices with physical == format. Some capture
+//  cards only expose a 1ch x 96000 stream although they actually deliver
+//  two 48 kHz channels interleaved; for those, in addition to the native
+//  choice, two reinterpreted choices read the same physical stream as
+//  2ch x 48000: "Interleaved Stereo L/R" (the physical channel order) and
+//  "Interleaved Stereo R/L" (swapped).
+//
+class AudioInputChoice{
+public:
+    AudioInputChoice();                     //  invalid
+    AudioInputChoice(AudioFormat format);    //  native: physical == format
+
+    static AudioInputChoice reinterpreted(
+        AudioFormat format, AudioFormat physical, bool swap_channels
+    );
+
+    bool is_valid() const;
+    explicit operator bool() const;
+
+    const AudioFormat& format() const;          //  what the pipeline consumes
+    const AudioFormat& physical_format() const; //  what the device emits
+    bool is_reinterpreted() const;
+    bool swap_channels() const;
+
+    //  "<channels> x <sample rate> Hz (<layout>)", e.g. "2 x 48,000 Hz
+    //  (Stereo)" or "1 x 96,000 Hz (Mono)"; the layout name is only present
+    //  for standard layouts (Mono, Stereo, 2.1, 3.1, 5.0, 5.1, 7.0, 7.1).
+    std::string display_name() const;
+
+private:
+    AudioFormat m_format;
+    AudioFormat m_physical;
+    bool m_reinterpreted = false;
+    bool m_swap_channels = false;
+};
+
+struct AudioInputChoiceList{
+    std::vector<AudioInputChoice> choices;
+    size_t preferred_index = 0;
+};
+
+//
+//  Builds the input format choices for a device from its supported formats
+//  (any order, duplicates allowed) and its preferred format:
+//
+//   - entries with the same (rate, channels, channel config) are collapsed
+//     to one; when several sample formats are supported for the same shape,
+//     the highest quality sample format wins: float > int32 > int16 > uint8.
+//   - the result is sorted by channel count (descending), then sample rate
+//     (descending); the reinterpreted capture-card choices, when present,
+//     stay appended after the native choices.
+//   - when the only supported format is 1ch x 96000 (the misreporting
+//     capture-card case), two reinterpreted 2ch x 48000 choices are
+//     appended after it (L/R first, then R/L).
+//   - preferred_index is the index of the exact match of "preferred"; when
+//     there is no match (preferred invalid or unsupported) it is the
+//     highest-scoring choice, where score = type x channel x sqrt(rate)
+//     with float 1.0 / int32 0.9 / int16 0.5 / uint8 0.1, 2ch 2.0 /
+//     Nch 2 - 1/N, and sqrt(rate). Empty list keeps 0.
+//
+AudioInputChoiceList input_choices(
+    std::vector<AudioFormat> supported,
+    const AudioFormat& preferred
+);
+
+
 
 
 class AudioDeviceInfo{
@@ -88,6 +160,12 @@ public:
     const std::vector<AudioChannelFormat>& supported_formats() const;
     int preferred_format_index() const;
     QAudioFormat preferred_format() const;
+
+    //  The device-driven format list (see input_choices()). Populated for
+    //  input devices only; empty for output devices (the sink opens in its
+    //  native format).
+    const std::vector<AudioInputChoice>& supported_choices() const;
+    size_t preferred_choice_index() const;
 
     const NativeAudioInfo& native_info() const;
 
