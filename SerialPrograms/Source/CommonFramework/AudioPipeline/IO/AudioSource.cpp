@@ -96,12 +96,21 @@ AudioSource::AudioSource(Logger& logger, const std::string& file, AudioChannelFo
         //  the sink's format; no 96k reinterpretation for files.
         m_stream_format = get_sample_format(native_format);
     }else{
-        //  Compressed formats are decoded by QAudioDecoder to a fixed target:
-        //  float @ 48k stereo (per the preset). An unreadable .wav falls
-        //  through here too; the loader logs the open failure.
-        set_sample_format_to_float(native_format);
-        set_format(native_format, format);
-        m_stream_format = AudioSampleFormat::FLOAT32;
+        //  Compressed formats: probe the decoder's native output format
+        //  and stream the file at its own rate / channels / sample type,
+        //  like the native WAV path (the tree's decoder / resampler /
+        //  mixer convert it to the sink's format). If the probe fails
+        //  (no decode backend, unreadable file), fall back to the legacy
+        //  48k stereo float target per the preset; the loader logs the
+        //  decode failure as before. An unreadable .wav falls through
+        //  here too.
+        if (probe_decoded_native_format(file, native_format)){
+            m_stream_format = get_sample_format(native_format);
+        }else{
+            set_sample_format_to_float(native_format);
+            set_format(native_format, format);
+            m_stream_format = AudioSampleFormat::FLOAT32;
+        }
     }
     m_sample_rate = (size_t)native_format.sampleRate();
     m_channels = (size_t)native_format.channelCount();
