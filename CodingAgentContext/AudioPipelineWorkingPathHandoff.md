@@ -36,6 +36,10 @@ encoding), from the session that did the audio pipeline migration.
 | #1674 | `AudioFormat` (Pimpl wrapper over `QAudioFormat`) and `WorkingAudio2WorkingAudio` (all-in-one mix + resample node); `ChannelMixer` / `AudioResampler` moved to the `WorkingAudioNode` base. |
 | #1676 | Tree simplified onto the all-in-one node (one `WorkingAudio2WorkingAudio` per branch, direct connection when no conversion is needed). Also fixed a latent OOB write in `ChannelMixer::push_samples` for pushes larger than its buffer (it now chunks internally). |
 | #1671 | **This path**: per-listener `add_listener(const AudioFormat&, WorkingAudioStreamListener&)` on the pair/session; `StreamHistorySession` now consumes it next to its legacy interface. |
+| #1673 | **Native WAV file input**: `AudioSource` probes the WAV header (`probe_wav_native_format`), the loader streams the file's own rate / channels / sample type, and the tree converts to the sink's format. Gate tests in `IO/AudioFileLoader_Tests.cpp`. |
+| #1680 (in review) | Multichannel WAV file input (up to 8 channels — the `fallback_channel_config` range); `channel_format(n)` no longer forces the stereo config on counts above 2, so `resolve_positions()` uses the standard layout (5.1 etc.) for the mix matrix. |
+| #1683 (in review) | **Compressed file input at native format** (.mp3 etc. no longer forced to 48k/2ch float): `probe_decoded_native_format()` (throwaway `QAudioDecoder`, format read off the first decoded buffer); probe failure falls back to the legacy 48k stereo float target. `loadFullAudio()` (batch template loading) keeps its convert-to-requested-format behavior. |
+| #1678 (in review) | `AudioInputChoice` foundation: device-driven input choices (`AudioDeviceInfo::supported_choices()` / `preferred_choice_index()`) generalizing the 7 legacy presets; nothing consumes it yet — the pipeline still takes `AudioChannelFormat`. Steps B–D of the enum replacement are not started. |
 
 ## Architecture
 
@@ -94,9 +98,10 @@ void remove_working_stream_listener(Kernels::AudioPipeline::WorkingAudioStreamLi
   that is about to be destroyed. The entries survive source changes:
   `build_tree()` rebuilds each node for the new source shape, so a
   persistent listener keeps working across input changes.
-- WAV file input is native rate/channels (#1673, in review); compressed
-  formats still decode to 48k/2ch. Either way the node adapts
-  automatically.
+- File input is native end-to-end: WAVs stream at the file's own rate / channels /
+  sample type (up to 8ch, #1673 + #1680), and compressed formats are probed to
+  their decoded native format (typically 44.1k stereo float for mp3, #1683).
+  Either way the node adapts automatically.
 
 ## `StreamHistorySession` (state of the transition)
 
@@ -186,7 +191,13 @@ cleanup PR:
 - `pa-build` (CMake + Ninja, Qt 6.10.2 aarch64, `-Wall -Wextra -Wpedantic -Werror`;
   incremental after the first build), then `pa-test .` (full command-line suite,
   ~18.2k tests; exit 0 on success).
+- This aarch64 host has a partial gstreamer install; Qt 6.10 picks its
+  QtMultimedia media backend at startup with no fallback, prefers the gstreamer
+  plugin, and that plugin fails to load — so `QAudioDecoder` (the audio-file
+  tests) is unsupported unless you run the suite with
+  `QT_MEDIA_BACKEND=ffmpeg`.
 - The command-line suite does no real audio I/O: device/sink behavior is verified
   `-Werror` + CI (x86) + live hardware. Gate tests
-  (`SinkPipeline_Tests.cpp`, `Spectrum/FFTStreamer_Tests.cpp`) pin the kernel math.
+  (`SinkPipeline_Tests.cpp`, `Spectrum/FFTStreamer_Tests.cpp`,
+  `IO/AudioFileLoader_Tests.cpp`) pin the kernel math.
 - Audio-tree source files are CRLF; keep them that way when editing.
