@@ -21,19 +21,15 @@ namespace MaxLairInternal{
 
 
 
-#if 1
-LobbyDetector::LobbyDetector(bool invert)
-    : VisualInferenceCallback("LobbyDetector")
+LobbyDetector::LobbyDetector(Color color, bool invert)
+    : m_color(color)
     , m_invert(invert)
     , m_pink (0.575, 0.035, 0.050, 0.100)
     , m_white(0.800, 0.200, 0.150, 0.100)
 {}
 void LobbyDetector::make_overlays(VideoOverlaySet& items) const{
-    items.add(COLOR_RED, m_pink);
-    items.add(COLOR_RED, m_white);
-}
-bool LobbyDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    return detect(frame);
+    items.add(m_color, m_pink);
+    items.add(m_color, m_white);
 }
 bool LobbyDetector::detect(const ImageViewRGB32& screen){
     ImageStats stats0 = image_stats(extract_box_reference(screen, m_pink));
@@ -48,7 +44,6 @@ bool LobbyDetector::detect(const ImageViewRGB32& screen){
     }
     return !m_invert;
 }
-#endif
 
 
 LobbyDoneConnecting::LobbyDoneConnecting()

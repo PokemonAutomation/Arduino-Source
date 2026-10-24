@@ -136,6 +136,30 @@ bool SelectionArrowFinder::process_frame(const ImageViewRGB32& frame, WallClock 
     return !m_arrow_boxes.empty();
 }
 
+SelectionArrowDetector::SelectionArrowDetector(VideoOverlay& overlay, const ImageFloatBox& box)
+    : m_overlay(overlay)
+    , m_box(box)
+{}
+void SelectionArrowDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(COLOR_YELLOW, m_box);
+}
+bool SelectionArrowDetector::detect(const ImageViewRGB32& screen){
+    const double screen_scale = screen.height() / 1080.0;
+    // Smallest arrow takes at least 600 pixels on 1920x1080 screen.
+    const size_t min_arrow_area = size_t(600.0 * screen_scale * screen_scale);
+    std::vector<ImagePixelBox> arrows = find_selection_arrows(
+        extract_box_reference(screen, m_box),
+        min_arrow_area
+    );
+
+    m_arrow_boxes.clear();
+    for (const ImagePixelBox& mark : arrows){
+        m_last_detection.emplace_back(translate_to_parent(screen, m_box, mark));
+        m_arrow_boxes.emplace_back(m_overlay, m_last_detection.back(), COLOR_MAGENTA);
+    }
+    return !m_arrow_boxes.empty();
+}
+
 
 
 BattleMoveArrowFinder::BattleMoveArrowFinder(VideoOverlay& overlay)

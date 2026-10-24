@@ -103,7 +103,7 @@ bool start_adventure(
     }
 
     //  Press A until you're not in the lobby anymore.
-    LobbyDetector lobby_detector(true);
+    LobbyWatcher lobby_detector(COLOR_RED, true);
     int result = run_until<ProControllerContext>(
         stream, context,
         [](ProControllerContext& context){

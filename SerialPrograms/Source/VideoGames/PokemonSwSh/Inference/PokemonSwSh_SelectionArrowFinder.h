@@ -20,6 +20,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
+//  Deprecated
 class SelectionArrowFinder : public VisualInferenceCallback{
 public:
     SelectionArrowFinder(VideoOverlay& overlay, const ImageFloatBox& box);
@@ -38,6 +39,34 @@ protected:
     ImageFloatBox m_box;
     std::vector<ImageFloatBox> m_last_detection;
     std::deque<OverlayBoxScope> m_arrow_boxes;
+};
+
+class SelectionArrowDetector : public StaticScreenDetector{
+public:
+    SelectionArrowDetector(VideoOverlay& overlay, const ImageFloatBox& box);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+    const std::vector<ImageFloatBox>& last_detection() const{
+        return m_last_detection;
+    }
+
+protected:
+    VideoOverlay& m_overlay;
+    ImageFloatBox m_box;
+    std::vector<ImageFloatBox> m_last_detection;
+    std::deque<OverlayBoxScope> m_arrow_boxes;
+};
+class SelectionArrowWatcher : public DetectorToFinder<SelectionArrowDetector>{
+public:
+    SelectionArrowWatcher(
+        VideoOverlay& overlay,
+        const ImageFloatBox& box,
+        Milliseconds hold = Milliseconds(250)
+    )
+         : DetectorToFinder("SelectionArrowWatcher", hold, overlay, box)
+    {}
 };
 
 
