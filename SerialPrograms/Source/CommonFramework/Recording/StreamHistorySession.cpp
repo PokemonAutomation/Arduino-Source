@@ -185,20 +185,25 @@ void StreamHistorySession::initialize(){
 
 //    cout << "video = " << data.m_has_video << endl;
 
-    //  The tracker is constructed at the input source's working-stream
+    //  The tracker's audio shape is the input source's working-stream
     //  shape (what the tree delivers through the working listener), i.e.
     //  the resolved input choice's logical shape: the preset's framing,
     //  with the capture-card 96 kHz reinterpretation applied for the
     //  reinterpreted choices. No choice (file input or no input) records
-    //  at no shape. The ffmpeg ring ignores this shape - its
-    //  working-stream attach is a fixed 48 kHz / stereo - and uses it only
-    //  to gate whether audio is enabled.
+    //  at no shape.
     const AudioInputChoice& choice = data.m_audio_choice;
+#if defined(PA_STREAM_HISTORY_FFMPEG)
+    //  The ring ignores the shape entirely: it records at a fixed 48 kHz /
+    //  stereo (see attach_working_listener()), so the choice only gates
+    //  whether audio is captured at all.
+    data.m_current.reset(new StreamHistoryTracker(data.m_logger, data.m_window, static_cast<bool>(choice), data.m_has_video));
+#else
     const size_t channels = choice ? choice.format().channels() : 0;
     const size_t rate = choice ? choice.format().sample_rate() : 0;
     data.m_active_channels = channels;
     data.m_active_rate = rate;
     data.m_current.reset(new StreamHistoryTracker(data.m_logger, data.m_window, channels, rate, data.m_has_video));
+#endif
 }
 void StreamHistorySession::pre_input_change(){
 //    cout << "pre_input_change()" << endl;
