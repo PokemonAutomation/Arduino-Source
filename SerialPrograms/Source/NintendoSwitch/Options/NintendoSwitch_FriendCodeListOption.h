@@ -14,9 +14,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-//  A list of Switch friend codes, one per line. The state is plain text held
-//  by TextEditOption, so the UI is the generic TextEditWidget from the infra
-//  (Common/Qt/Options) - no Qt code in the program.
+//  A list of Switch friend codes, one per line.
 class FriendCodeListOption : public TextEditOption{
 public:
     FriendCodeListOption(std::string label, std::vector<std::string> default_lines);
