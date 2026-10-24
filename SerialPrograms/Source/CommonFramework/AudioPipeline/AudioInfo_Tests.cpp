@@ -396,6 +396,125 @@ public:
 
 
 
+class ResolveInputChoiceTest : public UnitTest{
+public:
+    ResolveInputChoiceTest()
+        : UnitTest("AudioInfo - ResolveInputChoice")
+    {}
+
+    virtual UnitTestResult run(Logger&, CancellableScope&) const override{
+        const QAudioFormat::ChannelConfig stereo = QAudioFormat::ChannelConfig::ChannelConfigStereo;
+        const QAudioFormat::ChannelConfig mono = QAudioFormat::ChannelConfig::ChannelConfigMono;
+        const QAudioFormat::SampleFormat float32 = QAudioFormat::SampleFormat::Float;
+        const QAudioFormat::SampleFormat int16 = QAudioFormat::SampleFormat::Int16;
+
+        //  A full-featured device: native choices only.
+        std::vector<AudioInputChoice> device = {
+            AudioInputChoice(make_format(48000, 2, stereo, float32)),
+            AudioInputChoice(make_format(44100, 2, stereo, int16)),
+            AudioInputChoice(make_format(48000, 1, mono, int16)),
+            AudioInputChoice(make_format(96000, 1, mono, int16)),
+        };
+
+        //  The native presets resolve to the native choice with the
+        //  preset's (rate, channels) shape, in the choice's own sample
+        //  format.
+        AudioInputChoice got = resolve_input_choice(device, AudioChannelFormat::MONO_48000);
+        if (!got || got.format().native_format() != device[2].format().native_format()){
+            return "MONO_48000 should resolve to the native 1ch x 48000 entry.";
+        }
+        got = resolve_input_choice(device, AudioChannelFormat::DUAL_44100);
+        if (!got || got.format().native_format() != device[1].format().native_format()){
+            return "DUAL_44100 should resolve to the native 2ch x 44100 entry.";
+        }
+        got = resolve_input_choice(device, AudioChannelFormat::DUAL_48000);
+        if (!got || got.format().native_format() != device[0].format().native_format()){
+            return "DUAL_48000 should resolve to the native 2ch x 48000 entry.";
+        }
+        got = resolve_input_choice(device, AudioChannelFormat::MONO_96000);
+        if (!got || got.format().native_format() != device[3].format().native_format()){
+            return "MONO_96000 should resolve to the native 1ch x 96000 entry.";
+        }
+
+        //  A device that supports 1ch x 96000 plus other formats has no
+        //  reinterpreted entries of its own; the INTERLEAVE presets build
+        //  them from the native 96k entry, in the physical sample format.
+        for (AudioChannelFormat preset : {
+            AudioChannelFormat::INTERLEAVE_LR_96000,
+            AudioChannelFormat::INTERLEAVE_RL_96000,
+        }){
+            const bool want_swap = preset == AudioChannelFormat::INTERLEAVE_RL_96000;
+            got = resolve_input_choice(device, preset);
+            if (!got || !got.is_reinterpreted() || got.swap_channels() != want_swap){
+                return "INTERLEAVE presets should build a reinterpreted choice with the matching swap.";
+            }
+            const QAudioFormat& logical = got.format().native_format();
+            if (logical.sampleRate() != 48000 || logical.channelCount() != 2
+                || logical.channelConfig() != stereo || logical.sampleFormat() != int16){
+                return "The built reinterpreted choice should be 2ch x 48000 stereo in the physical sample format.";
+            }
+            if (got.physical_format().native_format() != device[3].format().native_format()){
+                return "The built reinterpreted choice's physical format should be the native 1ch x 96000 entry.";
+            }
+        }
+
+        //  The misreporting card: native 1ch x 96000 plus the two
+        //  reinterpreted choices from input_choices().
+        AudioInputChoiceList card = input_choices(
+            {make_format(96000, 1, mono, int16)}, make_format(96000, 1, mono, int16)
+        );
+        got = resolve_input_choice(card.choices, AudioChannelFormat::MONO_96000);
+        if (!got || got.is_reinterpreted()
+            || got.format().native_format() != card.choices[0].format().native_format()){
+            return "MONO_96000 on the card should resolve to the native entry, not the reinterpreted ones.";
+        }
+        got = resolve_input_choice(card.choices, AudioChannelFormat::INTERLEAVE_LR_96000);
+        if (!got || !got.is_reinterpreted() || got.swap_channels()
+            || got.format().native_format() != card.choices[1].format().native_format()){
+            return "INTERLEAVE_LR_96000 on the card should resolve to the L/R reinterpretation.";
+        }
+        got = resolve_input_choice(card.choices, AudioChannelFormat::INTERLEAVE_RL_96000);
+        if (!got || !got.is_reinterpreted() || !got.swap_channels()
+            || got.format().native_format() != card.choices[2].format().native_format()){
+            return "INTERLEAVE_RL_96000 on the card should resolve to the R/L reinterpretation.";
+        }
+
+        //  The reinterpreted entries must never satisfy a native preset,
+        //  and shapes the device does not offer stay invalid.
+        if (resolve_input_choice(card.choices, AudioChannelFormat::DUAL_48000)){
+            return "DUAL_48000 should not resolve to the card's reinterpreted 2ch x 48000 entries.";
+        }
+        if (resolve_input_choice(card.choices, AudioChannelFormat::MONO_48000)){
+            return "MONO_48000 should stay invalid on a 1ch x 96000-only card.";
+        }
+
+        //  No 96k support at all: the INTERLEAVE presets stay invalid.
+        std::vector<AudioInputChoice> no_96k = {
+            AudioInputChoice(make_format(48000, 2, stereo, float32)),
+            AudioInputChoice(make_format(44100, 2, stereo, int16)),
+        };
+        if (resolve_input_choice(no_96k, AudioChannelFormat::INTERLEAVE_LR_96000)
+            || resolve_input_choice(no_96k, AudioChannelFormat::INTERLEAVE_RL_96000)){
+            return "The INTERLEAVE presets should stay invalid without 1ch x 96000 support.";
+        }
+
+        //  NONE / END_LIST never resolve.
+        if (resolve_input_choice(device, AudioChannelFormat::NONE)
+            || resolve_input_choice(device, AudioChannelFormat::END_LIST)){
+            return "NONE / END_LIST should never resolve.";
+        }
+
+        //  An empty choice list never resolves.
+        if (resolve_input_choice({}, AudioChannelFormat::DUAL_48000)){
+            return "An empty choice list should never resolve.";
+        }
+
+        return true;
+    }
+};
+
+
+
 }
 
 
@@ -406,6 +525,7 @@ void add_tests_AudioInfo(UnitTestDatabase& database){
     database.add<InputChoicesSortDedupeTest>();
     database.add<InputChoicesCardQuirkTest>();
     database.add<InputChoicesEmptyTest>();
+    database.add<ResolveInputChoiceTest>();
 }
 
 

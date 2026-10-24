@@ -27,7 +27,11 @@ class StreamHistorySession
 public:
     ~StreamHistorySession();
     StreamHistorySession(Logger& logger);
-    void start(AudioChannelFormat format, bool has_video);
+    //  "device" / "format" are the audio session's active input state:
+    //  the tracker's shape and the working-stream attach shape are derived
+    //  from the resolved input choice (invalid when there is no device
+    //  input, i.e. file input or no input at all).
+    void start(const AudioDeviceInfo& device, AudioChannelFormat format, bool has_video);
     bool save(const std::string& filename) const;
 
     //  The audio session this session's working-stream listener attaches to

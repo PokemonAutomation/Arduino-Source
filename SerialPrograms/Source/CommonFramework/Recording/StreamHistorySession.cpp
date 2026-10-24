@@ -37,7 +37,10 @@ struct StreamHistorySession::Data{
     Logger& m_logger;
     mutable SpinLock m_lock;
     std::chrono::seconds m_window;
-    AudioChannelFormat m_audio_format;
+    //  The resolved input choice for the active device input (invalid
+    //  when there is no device input). Drives both the tracker's shape
+    //  and the working-stream attach shape.
+    AudioInputChoice m_audio_choice;
     bool m_has_video;
     //  The active input's physical working-stream shape (what the tree
     //  delivers through the working listener, and what the tracker records
@@ -52,7 +55,6 @@ struct StreamHistorySession::Data{
     Data(Logger& logger)
         : m_logger(logger)
         , m_window(GlobalSettings::instance().STREAM_HISTORY->HISTORY_SECONDS)
-        , m_audio_format(AudioChannelFormat::NONE)
         , m_has_video(false)
     {}
 };
@@ -68,12 +70,18 @@ StreamHistorySession::StreamHistorySession(Logger& logger)
     : Kernels::AudioPipeline::WorkingAudioStreamListener(48000, 2)
     , m_data(CONSTRUCT_TOKEN, logger)
 {}
-void StreamHistorySession::start(AudioChannelFormat format, bool has_video){
+void StreamHistorySession::start(
+    const AudioDeviceInfo& device, AudioChannelFormat format, bool has_video
+){
     Data& data = *m_data;
+    AudioInputChoice choice =
+        device
+            ? resolve_input_choice(device.supported_choices(), format)
+            : AudioInputChoice();
     {
         WriteSpinLock lg(data.m_lock);
         if (!data.m_current){
-            data.m_audio_format = format;
+            data.m_audio_choice = choice;
             data.m_has_video = has_video;
             initialize();
         }
@@ -164,49 +172,18 @@ void StreamHistorySession::initialize(){
 
 //    cout << "video = " << data.m_has_video << endl;
 
-    //  The tracker's audio shape is the input source's physical working-
-    //  stream shape (what the tree delivers through the working listener),
-    //  not the preset's legacy framing. (DUAL_44100 was previously
-    //  misreported as mono; MONO_96000 was previously framed as 2-sample
-    //  frames at 48000.)
-    switch (data.m_audio_format){
-    case AudioChannelFormat::NONE:
-        data.m_active_channels = 0;
-        data.m_active_rate = 0;
-        data.m_current.reset(new StreamHistoryTracker(data.m_logger, data.m_window, 0, 0, data.m_has_video));
-        return;
-    case AudioChannelFormat::MONO_48000:
-        data.m_active_channels = 1;
-        data.m_active_rate = 48000;
-        data.m_current.reset(new StreamHistoryTracker(data.m_logger, data.m_window, 1, 48000, data.m_has_video));
-        return;
-    case AudioChannelFormat::DUAL_44100:
-        data.m_active_channels = 2;
-        data.m_active_rate = 44100;
-        data.m_current.reset(new StreamHistoryTracker(data.m_logger, data.m_window, 2, 44100, data.m_has_video));
-        return;
-    case AudioChannelFormat::DUAL_48000:
-        data.m_active_channels = 2;
-        data.m_active_rate = 48000;
-        data.m_current.reset(new StreamHistoryTracker(data.m_logger, data.m_window, 2, 48000, data.m_has_video));
-        return;
-    case AudioChannelFormat::MONO_96000:
-        data.m_active_channels = 1;
-        data.m_active_rate = 96000;
-        data.m_current.reset(new StreamHistoryTracker(data.m_logger, data.m_window, 1, 96000, data.m_has_video));
-        return;
-    case AudioChannelFormat::INTERLEAVE_LR_96000:
-    case AudioChannelFormat::INTERLEAVE_RL_96000:
-        data.m_active_channels = 2;
-        data.m_active_rate = 48000;
-        data.m_current.reset(new StreamHistoryTracker(data.m_logger, data.m_window, 2, 48000, data.m_has_video));
-        return;
-    default:
-        throw InternalProgramError(
-            nullptr, PA_CURRENT_FUNCTION,
-            "Invalid AudioFormat: " + std::to_string((size_t)data.m_audio_format)
-        );
-    }
+    //  The tracker's audio shape is the input source's working-stream
+    //  shape (what the tree delivers through the working listener), i.e.
+    //  the resolved input choice's logical shape: the preset's framing,
+    //  with the capture-card 96 kHz reinterpretation applied for the
+    //  reinterpreted choices. No choice (file input or no input) records
+    //  at no shape.
+    const AudioInputChoice& choice = data.m_audio_choice;
+    const size_t channels = choice ? choice.format().channels() : 0;
+    const size_t rate = choice ? choice.format().sample_rate() : 0;
+    data.m_active_channels = channels;
+    data.m_active_rate = rate;
+    data.m_current.reset(new StreamHistoryTracker(data.m_logger, data.m_window, channels, rate, data.m_has_video));
 }
 void StreamHistorySession::pre_input_change(){
 //    cout << "pre_input_change()" << endl;
@@ -230,11 +207,10 @@ void StreamHistorySession::post_input_change(const std::string& file, const Audi
     }
     {
         WriteSpinLock lg(data.m_lock);
-        if (device){
-            data.m_audio_format = format;
-        }else{
-            data.m_audio_format = AudioChannelFormat::NONE;
-        }
+        data.m_audio_choice =
+            device
+                ? resolve_input_choice(device.supported_choices(), format)
+                : AudioInputChoice();
         initialize();
     }
     attach_working_listener();
@@ -242,21 +218,21 @@ void StreamHistorySession::post_input_change(const std::string& file, const Audi
 void StreamHistorySession::attach_working_listener(){
     Data& data = *m_data;
     AudioSession* audio_session;
-    AudioChannelFormat target;
+    AudioInputChoice target;
     {
         WriteSpinLock lg(data.m_lock);
         audio_session = data.m_audio_session;
-        target = data.m_audio_format;
+        target = data.m_audio_choice;
     }
-    if (!audio_session || target == AudioChannelFormat::NONE){
+    if (!audio_session || !target){
         return;
     }
     //  The remove quiesces any in-flight pushes in the old shape (and is a
     //  no-op if not attached yet); the node is then built for the new one.
     audio_session->remove_working_stream_listener(*this);
-    QAudioFormat native_format;
-    set_format(native_format, target);
-    audio_session->add_working_stream_listener(AudioFormat(native_format), *this);
+    audio_session->add_working_stream_listener(
+        AudioFormat(target.format().native_format()), *this
+    );
 }
 void StreamHistorySession::pre_shutdown(){
 //    cout << "pre_shutdown()" << endl;

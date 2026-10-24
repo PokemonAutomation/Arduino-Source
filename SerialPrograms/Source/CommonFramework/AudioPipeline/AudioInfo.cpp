@@ -237,6 +237,26 @@ double choice_score(const QAudioFormat& format){
 }
 
 
+//  The reinterpreted 2ch x 48000 view of a physical 1ch x 96000 stream,
+//  in the physical sample format.
+AudioInputChoice reinterpreted_96k_choice(
+    const AudioFormat& physical_96k_mono, bool swap_channels
+){
+    const QAudioFormat& physical = physical_96k_mono.native_format();
+    QAudioFormat logical;
+    //  The channel count must be set before the channel config:
+    //  QAudioFormat::setChannelCount() resets the config.
+    logical.setSampleRate(48000);
+    logical.setSampleFormat(physical.sampleFormat());
+    logical.setChannelCount(2);
+    logical.setChannelConfig(QAudioFormat::ChannelConfig::ChannelConfigStereo);
+    return AudioInputChoice::reinterpreted(
+        AudioFormat(logical), AudioFormat(physical), swap_channels
+    );
+}
+
+
+
 }
 
 
@@ -353,20 +373,8 @@ AudioInputChoiceList input_choices(std::vector<AudioFormat> supported, const Aud
     if (ret.choices.size() == 1){
         const QAudioFormat& only = ret.choices[0].format().native_format();
         if (only.channelCount() == 1 && only.sampleRate() == 96000){
-            const QAudioFormat physical = only;
-            QAudioFormat logical;
-            //  The channel count must be set before the channel config:
-            //  QAudioFormat::setChannelCount() resets the config.
-            logical.setSampleRate(48000);
-            logical.setSampleFormat(physical.sampleFormat());
-            logical.setChannelCount(2);
-            logical.setChannelConfig(QAudioFormat::ChannelConfig::ChannelConfigStereo);
-            ret.choices.emplace_back(
-                AudioInputChoice::reinterpreted(AudioFormat(logical), AudioFormat(physical), false)
-            );
-            ret.choices.emplace_back(
-                AudioInputChoice::reinterpreted(AudioFormat(logical), AudioFormat(physical), true)
-            );
+            ret.choices.emplace_back(reinterpreted_96k_choice(ret.choices[0].format(), false));
+            ret.choices.emplace_back(reinterpreted_96k_choice(ret.choices[0].format(), true));
         }
     }
 
@@ -394,6 +402,59 @@ AudioInputChoiceList input_choices(std::vector<AudioFormat> supported, const Aud
     }
 
     return ret;
+}
+
+
+AudioInputChoice resolve_input_choice(
+    const std::vector<AudioInputChoice>& choices,
+    AudioChannelFormat format
+){
+    const auto find_shape = [&choices](size_t rate, size_t channels){
+        for (const AudioInputChoice& choice : choices){
+            //  Reinterpreted entries must never satisfy a native preset:
+            //  a 1ch x 96000 card's reinterpreted 2ch x 48000 choices are
+            //  not "2ch x 48000" in the native sense.
+            if (choice.is_reinterpreted()){
+                continue;
+            }
+            const AudioFormat& shape = choice.format();
+            if (shape.sample_rate() == rate && shape.channels() == channels){
+                return choice;
+            }
+        }
+        return AudioInputChoice();
+    };
+    switch (format){
+    case AudioChannelFormat::MONO_48000:
+        return find_shape(48000, 1);
+    case AudioChannelFormat::DUAL_44100:
+        return find_shape(44100, 2);
+    case AudioChannelFormat::DUAL_48000:
+        return find_shape(48000, 2);
+    case AudioChannelFormat::MONO_96000:
+        return find_shape(96000, 1);
+    case AudioChannelFormat::INTERLEAVE_LR_96000:
+    case AudioChannelFormat::INTERLEAVE_RL_96000:
+    {
+        const bool swap = format == AudioChannelFormat::INTERLEAVE_RL_96000;
+        for (const AudioInputChoice& choice : choices){
+            if (choice.is_reinterpreted() && choice.swap_channels() == swap){
+                return choice;
+            }
+        }
+        //  The device supports 1ch x 96000 but its choice list carries no
+        //  reinterpreted entry (other formats are supported too): build
+        //  the reinterpreted choice from the native entry, as the legacy
+        //  preset path did.
+        AudioInputChoice native_96k = find_shape(96000, 1);
+        if (native_96k){
+            return reinterpreted_96k_choice(native_96k.format(), swap);
+        }
+        return AudioInputChoice();
+    }
+    default:
+        return AudioInputChoice();
+    }
 }
 
 

@@ -43,15 +43,15 @@ class Logger;
 //  In practice the backends emit whole-frame chunks, so no splicing happens
 //  in the common case.
 //
-//  The INTERLEAVE_96000 presets open the device as a physical 1ch x 96000
-//  stream that is really the card's two 48 kHz channels (a misreporting
-//  capture card), so when "reinterpret_96k_mono_as_stereo" is set the raw
-//  output is that same byte stream reinterpreted as 2ch x 48000: only the
-//  (rate, channels) framing changes, aligned to 2-sample stereo-frame
-//  boundaries. MONO_96000 is a true 96 kHz mono stream and keeps that shape
-//  through the whole pipeline; every other format passes through unchanged.
-//  This reinterpretation is temporary: the format dropdown rewrite will
-//  request 48 kHz stereo directly, at which point it goes away.
+//  The reinterpreted input choices (INTERLEAVE_LR/RL_96000) open the
+//  device as a physical 1ch x 96000 stream that is really the card's two
+//  48 kHz channels (a misreporting capture card), so when
+//  "reinterpret_96k_mono_as_stereo" is set (the choice's is_reinterpreted())
+//  the raw output is that same byte stream reinterpreted as 2ch x 48000:
+//  only the (rate, channels) framing changes, aligned to 2-sample
+//  stereo-frame boundaries. The MONO_96000 native choice is a true 96 kHz
+//  mono stream and keeps that shape through the whole pipeline; every other
+//  native choice passes through unchanged.
 //
 class AudioInputDevice final
     : public QIODevice
