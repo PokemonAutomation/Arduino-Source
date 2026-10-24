@@ -82,7 +82,7 @@ struct CodeEntryDelays{
     CodeEntryDelays() = default;
     CodeEntryDelays(const CodeboardTimingsOption& option)
         : reordering(option.REORDERING)
-        , hold(option.HOLD)
+        , hold(option.HOLD0)
         , cool(option.COOLDOWN)
         , press_delay(option.PRESS_DELAY)
         , move_delay(option.MOVE_DELAY)
