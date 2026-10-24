@@ -14,6 +14,28 @@ namespace PokemonAutomation{
 namespace Kernels{
 namespace AudioPipeline{
 
+namespace{
+
+//  The matrix is laid out weight(in i -> out o) at index i + in_channels * o;
+//  it can only be the identity for a square one. The matrices that reach
+//  this node are program-generated, so exact float comparison is safe.
+bool is_identity(const std::vector<float>& matrix, size_t channels){
+    if (matrix.size() != channels * channels){
+        return false;
+    }
+    for (size_t i = 0; i < channels; i++){
+        for (size_t o = 0; o < channels; o++){
+            const float w = matrix[i + channels * o];
+            if ((i == o ? w != 1.0f : w != 0.0f)){
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+}
+
 
 struct WorkingAudio2WorkingAudio::Data{
     WorkingAudioNode* head = nullptr;
@@ -21,6 +43,10 @@ struct WorkingAudio2WorkingAudio::Data{
 
     std::unique_ptr<ChannelMixer> mixer;
     std::unique_ptr<AudioResampler::AudioResampler> resampler;
+
+    //  Only in use when the chain is empty (same rate, same channel
+    //  count, identity matrix): the node itself is the pass-through.
+    ListenerSet<WorkingAudioStreamListener> listeners;
 };
 
 
@@ -36,16 +62,24 @@ WorkingAudio2WorkingAudio::WorkingAudio2WorkingAudio(
     : WorkingAudioNode(in_sample_rate, out_sample_rate, in_channels, out_channels)
     , m_data(CONSTRUCT_TOKEN)
 {
+    std::vector<WorkingAudioNode*> nodes;
+
     Data& self = *m_data;
+    //  A square identity matrix is a no-op, so the mixer is only needed
+    //  when the channel counts differ or the matrix actually mixes.
+    const bool need_mixer = in_channels != out_channels
+        || !is_identity(weight_matrix, in_channels);
     if (in_channels >= out_channels){
-        self.mixer.reset(new ChannelMixer(
-            in_sample_rate,
-            in_channels, out_channels,
-            std::move(weight_matrix),
-            buffer_size
-        ));
-        self.head = self.mixer.get();
-        self.tail = self.mixer.get();
+        //  Mix first (at the input rate), then resample.
+        if (need_mixer){
+            self.mixer.reset(new ChannelMixer(
+                in_sample_rate,
+                in_channels, out_channels,
+                std::move(weight_matrix),
+                buffer_size
+            ));
+            nodes.emplace_back(self.mixer.get());
+        }
         if (in_sample_rate != out_sample_rate){
             self.resampler.reset(new AudioResampler::AudioResampler(
                 logger,
@@ -53,17 +87,10 @@ WorkingAudio2WorkingAudio::WorkingAudio2WorkingAudio(
                 out_channels,
                 buffer_size
             ));
-            self.tail = self.resampler.get();
+            nodes.emplace_back(self.resampler.get());
         }
     }else{
-        self.mixer.reset(new ChannelMixer(
-            out_sample_rate,
-            in_channels, out_channels,
-            std::move(weight_matrix),
-            buffer_size
-        ));
-        self.head = self.mixer.get();
-        self.tail = self.mixer.get();
+        //  Resample first (at the cheaper input channel count), then mix.
         if (in_sample_rate != out_sample_rate){
             self.resampler.reset(new AudioResampler::AudioResampler(
                 logger,
@@ -71,23 +98,61 @@ WorkingAudio2WorkingAudio::WorkingAudio2WorkingAudio(
                 in_channels,
                 buffer_size
             ));
-            self.head = self.resampler.get();
+            nodes.emplace_back(self.resampler.get());
+        }
+        if (need_mixer){
+            self.mixer.reset(new ChannelMixer(
+                out_sample_rate,
+                in_channels, out_channels,
+                std::move(weight_matrix),
+                buffer_size
+            ));
+            nodes.emplace_back(self.mixer.get());
         }
     }
-    if (self.head != self.tail){
-        self.head->add_listener(*self.tail);
+    populate_pointers(nodes);
+}
+
+void WorkingAudio2WorkingAudio::populate_pointers(const std::vector<WorkingAudioNode*>& nodes){
+    Data& self = *m_data;
+    for (size_t c = 0; c < nodes.size(); c++){
+        if (c > 0){
+            nodes[c - 1]->add_listener(*nodes[c]);
+        }
+    }
+    if (!nodes.empty()){
+        self.head = nodes.front();
+        self.tail = nodes.back();
     }
 }
 
 void WorkingAudio2WorkingAudio::add_listener(WorkingAudioStreamListener& listener){
-    m_data->tail->add_listener(listener);
+    Data& self = *m_data;
+    if (self.tail){
+        self.tail->add_listener(listener);
+    }else{
+        self.listeners.add(listener);
+    }
 }
 void WorkingAudio2WorkingAudio::remove_listener(WorkingAudioStreamListener& listener){
-    m_data->tail->remove_listener(listener);
+    Data& self = *m_data;
+    if (self.tail){
+        self.tail->remove_listener(listener);
+    }else{
+        self.listeners.remove(listener);
+    }
 }
 
 void WorkingAudio2WorkingAudio::push_samples(size_t samples, size_t stride, const float* data){
-    m_data->head->push_samples(samples, stride, data);
+    Data& self = *m_data;
+    if (self.head){
+        self.head->push_samples(samples, stride, data);
+    }else{
+        self.listeners.run_method(
+            &WorkingAudioStreamListener::push_samples,
+            samples, stride, data
+        );
+    }
 }
 
 

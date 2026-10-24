@@ -573,13 +573,15 @@ void add_tests(UnitTestDatabase& database){
     }
 
     //  WorkingAudio2WorkingAudio vs. the hand-wired chain: both internal
-    //  orderings (mix -> resample, resample -> mix), plus the mix-only and
-    //  identity-matrix + resample cases.
+    //  orderings (mix -> resample, resample -> mix), plus the mix-only,
+    //  identity-matrix + resample and pure pass-through (identity matrix,
+    //  same rate) cases.
     database.add<Working2WorkingOrderTest>(44100, 48000, 2, 1);
     database.add<Working2WorkingOrderTest>(44100, 48000, 1, 2);
     database.add<Working2WorkingOrderTest>(48000, 48000, 2, 1);
     database.add<Working2WorkingOrderTest>(48000, 48000, 1, 2);
     database.add<Working2WorkingOrderTest>(48000, 44100, 2, 2);
+    database.add<Working2WorkingOrderTest>(48000, 48000, 2, 2);
 }
 
 
