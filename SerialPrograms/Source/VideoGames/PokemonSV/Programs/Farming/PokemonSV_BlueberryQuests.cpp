@@ -643,12 +643,26 @@ void quest_travel_500(const ProgramInfo& info, VideoStream& stream, ProControlle
     context.wait_for_all_requests();
 }
 
+TeraEncounterAction tera_encounter_action(
+    bool shiny, int encounter_watcher_result, bool battle_menu_detected
+){
+    if (shiny){
+        return TeraEncounterAction::StopForShiny;
+    }
+    //Callback 1 is the audio side of the encounter watcher. It does not see the battle menu.
+    if (encounter_watcher_result == 0 || battle_menu_detected){
+        return TeraEncounterAction::Battle;
+    }
+    return TeraEncounterAction::Recover;
+}
+
 void quest_tera_self_defeat(
     const ProgramInfo& info,
     ConsoleHandle& console, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS
 ){
     EncounterWatcher encounter_watcher(console, COLOR_RED);
+    bool battle_menu_detected = false;
     console.log("Quest: Tera-self and defeat any wild.");
     //Navigate to target and start battle
     int ret = run_until<ProControllerContext>(
@@ -679,7 +693,8 @@ void quest_tera_self_defeat(
                 std::chrono::seconds(15),
                 { battle_menu }
             );
-            if (ret2 != 0){
+            battle_menu_detected = ret2 == 0;
+            if (!battle_menu_detected){
                 console.log("Did not enter battle. Did Kleavor spawn?");
             }
         },
@@ -690,18 +705,20 @@ void quest_tera_self_defeat(
         );
     encounter_watcher.throw_if_no_sound();
 
-    if (ret >= 0){
-        console.log("Battle menu detected.");
-    }
-
-    bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
-    if (is_shiny){
+    switch (tera_encounter_action((bool)encounter_watcher.shiny_screenshot(), ret, battle_menu_detected)){
+    case TeraEncounterAction::StopForShiny:
         console.log("Shiny detected!");
         pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 5000ms);
         throw ProgramFinishedException();
-    }else{
+    case TeraEncounterAction::Battle:{
+        console.log("Battle menu detected.");
         bool tera_self = true;
         wild_battle_tera(info, console, context, tera_self);
+        break;
+    }
+    case TeraEncounterAction::Recover:
+        console.log("Battle entry not confirmed. Skipping battle handling.");
+        break;
     }
     pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
     return_to_plaza(info, console, context);
@@ -861,6 +878,7 @@ void quest_wild_tera(
     const BBQOption& BBQ_OPTIONS
 ){
     EncounterWatcher encounter_watcher(console, COLOR_RED);
+    bool battle_menu_detected = false;
     console.log("Quest: Defeat a wild tera.");
     //Navigate to target and start battle
     int ret = run_until<ProControllerContext>(
@@ -899,7 +917,8 @@ void quest_wild_tera(
                 std::chrono::seconds(15),
                 { battle_menu }
             );
-            if (ret2 != 0){
+            battle_menu_detected = ret2 == 0;
+            if (!battle_menu_detected){
                 console.log("Did not enter battle.");
             }
         },
@@ -910,18 +929,20 @@ void quest_wild_tera(
     );
     encounter_watcher.throw_if_no_sound();
 
-    if (ret >= 0){
-        console.log("Battle menu detected.");
-    }
-
-    bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
-    if (is_shiny){
+    switch (tera_encounter_action((bool)encounter_watcher.shiny_screenshot(), ret, battle_menu_detected)){
+    case TeraEncounterAction::StopForShiny:
         console.log("Shiny detected!");
         pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 5000ms);
         throw ProgramFinishedException();
-    }else{
+    case TeraEncounterAction::Battle:{
+        console.log("Battle menu detected.");
         bool tera_self = false;
         wild_battle_tera(info, console, context, tera_self);
+        break;
+    }
+    case TeraEncounterAction::Recover:
+        console.log("Battle entry not confirmed. Skipping battle handling.");
+        break;
     }
     return_to_plaza(info, console, context);
 
