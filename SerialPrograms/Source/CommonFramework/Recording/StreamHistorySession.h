@@ -19,8 +19,7 @@ namespace PokemonAutomation{
 
 
 class StreamHistorySession
-    : public AudioFloatStreamListener
-    , public Kernels::AudioPipeline::WorkingAudioStreamListener
+    : public Kernels::AudioPipeline::WorkingAudioStreamListener
     , public VideoFrameListener
     , public AudioSession::StateListener
     , public VideoSession::StateListener
@@ -36,9 +35,6 @@ public:
     void set_audio_session(AudioSession& session);
 
 public:
-    //  Legacy float stream (kept until the remaining float consumers
-    //  migrate; see the audio pipeline hand-off doc).
-    virtual void on_samples(const float* data, size_t frames) override;
     //  Working stream, delivered in the shape requested at attach time
     //  (the active preset's physical shape), split (planar) channels.
     virtual void push_samples(size_t samples, size_t stride, const float* data) override;
