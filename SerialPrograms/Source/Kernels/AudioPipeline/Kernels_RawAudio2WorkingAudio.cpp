@@ -8,6 +8,7 @@
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Kernels/AudioStreamConverter/Kernels_AudioStreamConverter.h"
 #include "Kernels/AudioChannelInterleave/Kernels_AudioChannelInterleave.h"
+#include "Kernels/Kernels_Alignment.h"
 #include "Kernels_RawAudio2WorkingAudio.h"
 
 //#include <iostream>
@@ -63,6 +64,12 @@ RawAudio2WorkingAudio::RawAudio2WorkingAudio(
     , m_multiplier(multiplier)
     , m_buffer_size(buffer_size)
 {
+    //  Round the buffer up to PA_ALIGNMENT bytes so that channels beyond
+    //  channel 0 start aligned for the SIMD kernels.
+    m_buffer_size =
+        align_int_up<PA_ALIGNMENT>(buffer_size * sample_format_size(sample_type))
+        / sample_format_size(sample_type);
+
     switch (sample_type){
     case SampleFormat::UINT8:
         set_converter<uint8_t>();
@@ -82,12 +89,12 @@ RawAudio2WorkingAudio::RawAudio2WorkingAudio(
 
     //  Only allocate the interleaved buffer if we need to convert types.
     if (m_convert != nullptr){
-        m_interleaved_floats = AlignedVector<float>(channels * buffer_size);
+        m_interleaved_floats = AlignedVector<float>(channels * m_buffer_size);
     }
 
     //  Only allocate the split buffer if we need to split channels.
     if (channels != 1){
-        m_split_floats = AlignedVector<float>(channels * buffer_size);
+        m_split_floats = AlignedVector<float>(channels * m_buffer_size);
     }
 }
 
