@@ -145,7 +145,7 @@ bool AudioPerSpectrumDetectorBase::process_spectrums(
 
         found = matcher_score <= threshold;
 
-        uint64_t curStamp = m_matcher->latestTimestamp();
+        uint64_t curStamp = m_matcher->latest_timestamp();
 
 #ifdef PA_DEBUG_FORCE_PLA_SOUND
         if (debug_count % 300 > 300 - 5){
@@ -164,9 +164,9 @@ bool AudioPerSpectrumDetectorBase::process_spectrums(
             m_last_error = std::min(m_last_error, matcher_score);
 
             std::ostringstream os;
-            os << m_audio_name << " found, score " << matcher_score << "/" << threshold << ", scale: " << m_matcher->lastMatchedScale();
+            os << m_audio_name << " found, score " << matcher_score << "/" << threshold << ", scale: " << m_matcher->last_matched_scale();
             m_logger.log(os.str(), COLOR_BLUE);
-            audio_feed.add_overlay(curStamp+1-m_matcher->numMatchedWindows(), curStamp+1, m_detection_color);
+            audio_feed.add_overlay(curStamp+1-m_matcher->num_matched_windows(), curStamp+1, m_detection_color);
 
             // Since the target audio is found, no need to check detection on the rest of the spectrums in `new_spectrums`.
 

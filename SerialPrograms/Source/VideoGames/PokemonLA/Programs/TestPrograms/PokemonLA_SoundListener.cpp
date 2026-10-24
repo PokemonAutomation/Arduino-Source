@@ -171,7 +171,7 @@ void search_alpha_roar_from_audio_dump(){
         // match!
         float minScore = FLT_MAX;
         std::vector<AudioSpectrum> new_spectrums;
-        size_t numStreamWindows = std::max(matcher.numMatchedWindows(), audio.num_windows());
+        size_t numStreamWindows = std::max(matcher.num_matched_windows(), audio.num_windows());
         for (size_t audioIdx = 0; audioIdx < numStreamWindows; audioIdx++){
             new_spectrums.clear();
             AlignedVector<float> freqVector(audio.num_frequencies());
