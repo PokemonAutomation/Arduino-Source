@@ -539,30 +539,29 @@ OverworldMatchResult match_route208_hannah_departure(const ImageRGB32& frame){
     return best;
 }
 OverworldMatchResult match_hearthome_center_entrance(const ImageRGB32& frame){
-    // Stop on the street, south of the trigger tile. The roof emblem and
-    // orange awning must agree; a ball-shaped interior display is not enough.
-    OverworldMatchResult best;
-    double best_score=-1;
-    for (const char* ball : {"PokemonBDSP/Autostory/HearthomeCenter/Ball.png",
-        "PokemonBDSP/Autostory/HearthomeCenter/BallLive.png"}){
-    for (double scale : {.90,.925,.95,.975,1.0,1.025,1.05,1.075,1.10}){
-        const double w=112.0/1920*scale,h=108.0/1080*scale;
-        const double aw=220.0/1920*scale,ah=50.0/1080*scale;
-        auto candidate=match_landmarks(frame,{
-            {"Hearthome Center roof ball",ball,
-                {.5-w/2,170.0/1080-h/2,w,h},{0,0,1,.65},.95,.20},
-            {"Hearthome Center orange awning","PokemonBDSP/Autostory/HearthomeCenter/Awning.png",
-                {962.0/1920-aw/2,256.0/1080-ah/2,aw,ah},{0,0,1,.65},.95,.20}
-        },2,1.0/128,POSITION_TOLERANCE_Y,true);
-        double score=1;
-        for (const auto& anchor:candidate.landmarks) score=std::min(score,anchor.score);
-        if ((candidate.located && !best.located) ||
-            (candidate.located==best.located && score>best_score)){
-            best=std::move(candidate);best_score=score;
+    // Real stationary hourly views cover daylight, night, dusk and cloud edges.
+    // The target is Kevin's street pose below the door; entry remains watched.
+    struct Reference { const char* ball; const char* awning; double ball_width,ball_height; };
+    const Reference references[]={
+        {"PokemonBDSP/Autostory/HearthomeCenter/Lighting00Ball.png","PokemonBDSP/Autostory/HearthomeCenter/Lighting00Awning.png",144.0/1920,128.0/1080},
+        {"PokemonBDSP/Autostory/HearthomeCenter/Lighting01Ball.png","PokemonBDSP/Autostory/HearthomeCenter/Lighting01Awning.png",144.0/1920,128.0/1080},
+        {"PokemonBDSP/Autostory/HearthomeCenter/Lighting02Ball.png","PokemonBDSP/Autostory/HearthomeCenter/Lighting02Awning.png",144.0/1920,128.0/1080},
+        {"PokemonBDSP/Autostory/HearthomeCenter/Lighting03Ball.png","PokemonBDSP/Autostory/HearthomeCenter/Lighting03Awning.png",144.0/1920,128.0/1080},
+        {"PokemonBDSP/Autostory/HearthomeCenter/Lighting04Ball.png","PokemonBDSP/Autostory/HearthomeCenter/Lighting04Awning.png",112.0/1920,108.0/1080}
+    };
+    std::vector<LandmarkConfig> variants;
+    for (const auto& reference:references){
+        for (double scale : {.90,.925,.95,.975,1.0,1.025,1.05,1.075,1.10}){
+            const double w=reference.ball_width*scale,h=reference.ball_height*scale;
+            const double aw=272.0/1920*scale,ah=80.0/1080*scale;
+            variants.push_back({"Hearthome Center roof ball",reference.ball,
+                {972.0/1920-w/2,208.0/1080-h/2,w,h},{0,0,1,.65},.95,.20});
+            variants.push_back({"Hearthome Center orange awning",reference.awning,
+                {968.0/1920-aw/2,308.0/1080-ah/2,aw,ah},{0,0,1,.65},.95,.20});
         }
     }
-    }
-    return best;
+    return match_lighting_pair(frame,variants,"Hearthome Center roof ball",
+        "Hearthome Center orange awning",1.0/128);
 }
 OverworldMatchResult match_hearthome_center_interior(const ImageRGB32& frame){
     // Three observed entry-camera angles. Perspective changes the machine
@@ -600,28 +599,62 @@ OverworldMatchResult match_hearthome_center_interior(const ImageRGB32& frame){
     return best;
 }
 OverworldMatchResult match_hearthome_contest_fantina(const ImageRGB32& frame){
-    // Fantina stands in front of the blue Contest Hall doors. Approach from
-    // the south; the dress and the door above her must move together.
-    OverworldMatchResult best;
-    double best_score=-1;
-    for (double scale : {.90,.95,1.0,1.05,1.10}){
-        const double w=190.0/1920*scale,h=180.0/1080*scale;
-        const double dw=220.0/1920*scale,dh=70.0/1080*scale;
-        auto candidate=match_landmarks(frame,{
-            {"Fantina pink dress","PokemonBDSP/Autostory/HearthomeContest/Fantina.png",
-                {.5-w/2,410.0/1080-h/2,w,h},{0,.1,1,.8},.93,.15},
-            {"Contest Hall blue door","PokemonBDSP/Autostory/HearthomeContest/BlueDoor.png",
-                {930.0/1920-dw/2,285.0/1080-dh/2,dw,dh},{0,.05,1,.8},.93,.15}
-        },2,1.0/128,1.0/54,true);
-        double score=1;
-        for (const auto& anchor:candidate.landmarks) score=std::min(score,anchor.score);
-        if ((candidate.located && !best.located) ||
-            (candidate.located==best.located && score>best_score)){
-            best=std::move(candidate);best_score=score;
+    // Static sign rim above localized text and roof emblem; Fantina can move.
+    // Hourly captures vary the sign illumination. The roof remains reliable.
+    const char* signs[] = {
+        "PokemonBDSP/Autostory/HearthomeContest/SignRim.png",
+        "PokemonBDSP/Autostory/HearthomeContest/RimLighting00Sign.png",
+        "PokemonBDSP/Autostory/HearthomeContest/RimLighting01Sign.png",
+        "PokemonBDSP/Autostory/HearthomeContest/RimLighting02Sign.png",
+        "PokemonBDSP/Autostory/HearthomeContest/RimLighting03Sign.png",
+        "PokemonBDSP/Autostory/HearthomeContest/RimLighting04Sign.png",
+        "PokemonBDSP/Autostory/HearthomeContest/RimLighting05Sign.png",
+        "PokemonBDSP/Autostory/HearthomeContest/RimLighting06Sign.png",
+        "PokemonBDSP/Autostory/HearthomeContest/RimLighting07Sign.png",
+        "PokemonBDSP/Autostory/HearthomeContest/RimLighting08Sign.png",
+        "PokemonBDSP/Autostory/HearthomeContest/RimLighting09Sign.png",
+        "PokemonBDSP/Autostory/HearthomeContest/RimLighting10Sign.png"
+    };
+    std::vector<LandmarkConfig> variants;
+    for (double scale : {.90,.925,.95,.975,1.0,1.025,1.05,1.075,1.10}){
+        const double sw=162.0/1920*scale,sh=62.0/1080*scale;
+        const double rw=136.0/1920*scale,rh=98.0/1080*scale;
+        for (const char* sign : signs){
+            variants.push_back({"Contest Hall sign frame",sign,
+                {595.0/1920-sw/2,467.0/1080-sh/2,sw,sh},{0,.15,.75,.65},.93,.15});
+        }
+        variants.push_back({"Contest Hall roof emblem","PokemonBDSP/Autostory/HearthomeContest/RoofEmblem.png",
+            {940.0/1920-rw/2,175.0/1080-rh/2,rw,rh},{.1,0,.8,.65},.93,.15});
+    }
+    return match_lighting_pair(frame,variants,"Contest Hall sign frame",
+        "Contest Hall roof emblem",1.0/128);
+}
+OverworldMatchResult match_hearthome_gym_entrance(const ImageRGB32& frame){
+    // Wider fixed facade distinguishes the window bays at night. Real hourly
+    // references cover the illuminated windows; cursor, NPCs and text stay out.
+    const char* facades[] = {
+        "PokemonBDSP/Autostory/HearthomeGym/LeftFacade.png",
+        "PokemonBDSP/Autostory/HearthomeGym/Lighting00Facade.png",
+        "PokemonBDSP/Autostory/HearthomeGym/Lighting01Facade.png",
+        "PokemonBDSP/Autostory/HearthomeGym/Lighting02Facade.png",
+        "PokemonBDSP/Autostory/HearthomeGym/Lighting03Facade.png",
+        "PokemonBDSP/Autostory/HearthomeGym/Lighting04Facade.png"
+    };
+    std::vector<LandmarkConfig> variants;
+    for (double scale : {.90,.925,.95,.975,1.0,1.025,1.05,1.075,1.10}){
+        const double aw=160.0/1920*scale,ah=84.0/1080*scale;
+        const double fw=218.0/1920*scale,fh=222.0/1080*scale;
+        variants.push_back({"Hearthome Gym doorway arch","PokemonBDSP/Autostory/HearthomeGym/DoorArch.png",
+            {966.0/1920-aw/2,236.0/1080-ah/2,aw,ah},{.15,0,.75,.65},.93,.20});
+        for (const char* facade : facades){
+            variants.push_back({"Hearthome Gym left facade",facade,
+                {719.0/1920-fw/2,315.0/1080-fh/2,fw,fh},{0,0,.55,.65},.93,.20});
         }
     }
-    return best;
+    return match_lighting_pair(frame,variants,"Hearthome Gym doorway arch",
+        "Hearthome Gym left facade",1.0/128);
 }
+
 OverworldMatchResult match_eterna_gym_entrance(const ImageRGB32& frame){
     // Recorded centered doorway pose. All three stationary landmarks must agree
     // before entering; two can guide acquisition without confirming arrival.
@@ -1627,7 +1660,8 @@ const std::vector<OverworldMatcher>& overworld_matchers(){    static const std::
         {"eterna-center","Eterna Pokemon Center doorway",match_eterna_center_entrance},
         {"hearthome-center","Hearthome Pokemon Center doorway",match_hearthome_center_entrance},
         {"hearthome-center-interior","Hearthome Pokemon Center interior",match_hearthome_center_interior},
-        {"hearthome-fantina","Fantina outside the Hearthome Contest Hall",match_hearthome_contest_fantina},
+        {"hearthome-fantina","Hearthome Contest Hall sign + roof emblem (Fantina)",match_hearthome_contest_fantina},
+        {"hearthome-gym","Hearthome Gym doorway (arch + facade)",match_hearthome_gym_entrance},
         {"route208-stair-top","Route 208 stair-top rocks",match_route208_stair_top},
         {"route208-hannah-departure","Route 208 field after Hannah",match_route208_hannah_departure},
         {"eterna-gym","Eterna Gym doorway",match_eterna_gym_entrance},

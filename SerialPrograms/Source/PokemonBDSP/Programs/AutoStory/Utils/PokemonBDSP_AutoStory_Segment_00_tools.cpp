@@ -1236,7 +1236,9 @@ namespace PokemonAutomation {
                 OverworldMatchResult (*entry_matcher)(const ImageRGB32&),
                 bool* entry_detected,
                 double arrival_tolerance_x, double arrival_tolerance_y,
-                double moderate_entry_confidence) {
+                double moderate_entry_confidence, bool* rock_acquisition_timed_out) {
+                if (rock_acquisition_timed_out) *rock_acquisition_timed_out=false;
+                auto missing_rocks_since=std::chrono::steady_clock::time_point::max();
                 if (entry_detected) *entry_detected=false;
                 context.wait_for_all_requests();
                 pbf_wait(context, 500ms);
@@ -1276,6 +1278,8 @@ namespace PokemonAutomation {
                             label + ": Unexpected dialogue/battle during alignment.", stream);
                     }
                     const auto result = matcher(*frame.frame);
+                    if (result.located)
+                        missing_rocks_since=std::chrono::steady_clock::time_point::max();
                     VideoOverlaySet overlays(stream.overlay());
                     for (const auto& landmark : result.landmarks) {
                         overlays.add(COLOR_CYAN, landmark.search);
@@ -1346,9 +1350,17 @@ namespace PokemonAutomation {
                             !jupiter_row_recovery && result.coarse && std::abs(result.dx)>1.0/128;
                         // Stay south of the Contest Hall wall/sign before crossing to Fantina.
                         const bool contest_row_recovery=matcher==match_hearthome_contest_fantina && result.dy>1.0/54;
+                        // Keep the stair approach horizontal-first until close to
+                        // its column. Recorded fine poses otherwise spent repeated
+                        // 16ms sideways turns while a larger vertical error waited.
+                        // Fine correction changes axis priority, never arrival gates.
+                        const bool stair_fine_correction=matcher==match_route208_stair_top &&
+                            !result.coarse && std::abs(result.dx)<=1.0/64;
                         const bool horizontal = !contest_row_recovery && !gym_row_recovery && !jupiter_row_recovery && (jupiter_anchor_horizontal || coarse_horizontal || plaza_anchor_horizontal || eterna_anchor_horizontal || gym_anchor_horizontal || (!result.coarse &&
-                            ((horizontal_first && std::abs(result.dx)>1.0/128) ||
+                            ((horizontal_first && !stair_fine_correction && std::abs(result.dx)>1.0/128) ||
                              std::abs(result.dx)>=std::abs(result.dy)*9.0/16)));
+                        if (stair_fine_correction && horizontal_first && !horizontal && std::abs(result.dx)>1.0/128)
+                            stream.log("["+label+"] Near stair column; correcting the larger vertical error first.");
                         if (coarse_horizontal) stream.log("[" + label +
                             "] Both landmarks agree on a large horizontal offset; correcting the street lane first.");
                         const double error = horizontal ? result.dx : result.dy*9.0/16;
@@ -1385,12 +1397,26 @@ namespace PokemonAutomation {
                             continue;
                         }
                         if (matcher==match_galactic_hq_jupiter || matcher==match_route208_stair_top){
-                            // Blind sweeps can enter nearby stairs. The outdoor
-                            // rock pose gets ten seconds for a cloud to pass.
+                            // Keep generic missing-anchor behavior unchanged. Route208's
+                            // explicit caller can instead request its recorded recovery.
                             const bool stair_rocks=matcher==match_route208_stair_top;
-                            if (++missing>(stair_rocks ? 20 : 6)) OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                label+(stair_rocks ? ": Rock anchors missing; no blind search near stairs." :
-                                    ": Chair/stair anchors missing; no blind search near stairs."),stream);
+                            if (stair_rocks && rock_acquisition_timed_out) {
+                                const auto now=std::chrono::steady_clock::now();
+                                if (missing_rocks_since==std::chrono::steady_clock::time_point::max())
+                                    missing_rocks_since=now;
+                                // Matcher processing can take seconds per observation;
+                                // measure real elapsed time rather than counting waits.
+                                if (now-missing_rocks_since>=10s) {
+                                    context.wait_for_all_requests();
+                                    *rock_acquisition_timed_out=true;
+                                    stream.log("["+label+"] Rock acquisition timed out after 10s; handing off to the requested cliff recovery.");
+                                    return;
+                                }
+                            } else if (++missing>(stair_rocks ? 20 : 6)) {
+                                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                                    label+(stair_rocks ? ": Rock anchors missing; no blind search near stairs." :
+                                        ": Chair/stair anchors missing; no blind search near stairs."),stream);
+                            }
                             pbf_wait(context,500ms);
                             context.wait_for_all_requests();
                             continue;
