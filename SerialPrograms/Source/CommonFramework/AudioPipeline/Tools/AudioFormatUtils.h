@@ -26,7 +26,7 @@ void convert_samples_to_float(const QAudioFormat& format, const char* data, size
 
 // Compute sum of the sample buffer.
 // Used to debug whether the audio stream is always the same values or always zeros.
-float audio_sample_sum(const QAudioFormat& format, const char* data, size_t len);
+
 
 }
 
