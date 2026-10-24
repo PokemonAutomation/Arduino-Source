@@ -40,9 +40,6 @@ public:
     using WorkingAudio2WorkingAudio = Kernels::AudioPipeline::WorkingAudio2WorkingAudio;
     using WorkingAudioStreamListener = Kernels::AudioPipeline::WorkingAudioStreamListener;
 
-    virtual void add_listener(AudioFloatStreamListener& listener) override;
-    virtual void remove_listener(AudioFloatStreamListener& listener) override;
-
     virtual void add_listener(FFTListener& listener) override;
     virtual void remove_listener(FFTListener& listener) override;
 
@@ -74,7 +71,6 @@ public:
 
 
 private:
-    class SampleListener;
     class InternalFFTListener;
     class InternalWorkingListener;
 
@@ -119,7 +115,6 @@ private:
 
     AudioChannelFormat m_input_format;
     std::unique_ptr<AudioSource> m_reader;
-    std::unique_ptr<SampleListener> m_sample_listener;  //  Attaches to "m_reader".
 
     //  New pipeline tree. The decoder attaches to m_reader's raw stream and
     //  the branch heads attach to the decoder (sink head before FFT head).
@@ -148,7 +143,6 @@ private:
 
     std::unique_ptr<InternalFFTListener> m_fft_listener;    //  Attaches to m_fft_node.
 
-    ListenerSet<AudioFloatStreamListener> m_stream_listeners;
     ListenerSet<FFTListener> m_fft_listeners;
 
     LifetimeSanitizer m_sanitizer;

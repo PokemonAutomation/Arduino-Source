@@ -9,7 +9,6 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Time.h"
-#include "CommonFramework/AudioPipeline/AudioStream.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "AudioInputDevice.h"
 
@@ -21,7 +20,6 @@ namespace{
 
 
 //  Frames of raw audio buffered before the raw listeners are notified.
-//  (Matches AudioStreamToFloat's AUDIO_BUFFER_SIZE.)
 const size_t RAW_BUFFER_CAPACITY = 4096;
 
 
@@ -62,7 +60,7 @@ size_t raw_output_frame_bytes(const QAudioFormat& format, bool reinterpret_96k_m
 
 
 AudioInputDevice::AudioInputDevice(
-    Logger& logger, AudioStreamToFloat& reader,
+    Logger& logger,
     const NativeAudioInfo& device, const QAudioFormat& format,
     bool reinterpret_96k_mono_as_stereo
 )
@@ -72,7 +70,6 @@ AudioInputDevice::AudioInputDevice(
         RAW_BUFFER_CAPACITY
       )
     , ObjectStreamListener(raw_output_frame_bytes(format, reinterpret_96k_mono_as_stereo))
-    , m_reader(reader)
     , m_sample_type(sample_format_of(format))
     , m_sample_rate(format.sampleRate())
     , m_channels(format.channelCount())
@@ -124,7 +121,6 @@ void AudioInputDevice::remove_listener(Kernels::AudioPipeline::RawAudioStreamLis
 }
 
 qint64 AudioInputDevice::writeData(const char* data, qint64 len){
-    m_reader.push_bytes(data, len);
     MisalignedStreamConverter::push_bytes(data, len);
     return len;
 }

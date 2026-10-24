@@ -11,7 +11,6 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
-#include "CommonFramework/AudioPipeline/AudioStream.h"
 #include "CommonFramework/AudioPipeline/ChannelMixer.h"
 #include "CommonFramework/AudioPipeline/IO/AudioSource.h"
 #include "CommonFramework/AudioPipeline/IO/AudioOutputDevice.h"
@@ -116,14 +115,6 @@ private:
 };
 
 
-void AudioPassthroughPairQt::add_listener(AudioFloatStreamListener& listener){
-    auto scope_check = m_sanitizer.check_scope();
-    m_stream_listeners.add(listener);
-}
-void AudioPassthroughPairQt::remove_listener(AudioFloatStreamListener& listener){
-    auto scope_check = m_sanitizer.check_scope();
-    m_stream_listeners.remove(listener);
-}
 void AudioPassthroughPairQt::add_listener(FFTListener& listener){
     auto scope_check = m_sanitizer.check_scope();
     m_fft_listeners.add(listener);
@@ -153,28 +144,6 @@ void AudioPassthroughPairQt::remove_listener(WorkingAudioStreamListener& listene
 }
 
 
-
-class AudioPassthroughPairQt::SampleListener final : public AudioFloatStreamListener{
-public:
-    SampleListener(AudioPassthroughPairQt& parent, size_t samples_per_frame)
-        : AudioFloatStreamListener(samples_per_frame)
-        , m_parent(parent)
-    {
-        parent.m_reader->add_listener(*this);
-    }
-    ~SampleListener(){
-        m_parent.m_reader->remove_listener(*this);
-    }
-    virtual void on_samples(const float* data, size_t frames) override{
-        m_parent.m_stream_listeners.run_method(
-            &AudioFloatStreamListener::on_samples,
-            data, frames
-        );
-    }
-
-private:
-    AudioPassthroughPairQt& m_parent;
-};
 
 class AudioPassthroughPairQt::InternalFFTListener final : public FFTListener{
 public:
@@ -454,22 +423,19 @@ void AudioPassthroughPairQt::reset(
             source.reset(new AudioSource(
                 m_logger,
                 file,
-                AudioChannelFormat::DUAL_48000,
-                m_file_input_multiplier
+                AudioChannelFormat::DUAL_48000
             ));
         }
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_reader){
             teardown_tree();
             m_sink_device.reset();
-            m_sample_listener.reset();
             m_reader.reset();
             m_input_format = AudioChannelFormat::NONE;
         }
         m_input_format = AudioChannelFormat::DUAL_48000;
         if (source){
             m_reader = std::move(source);
-            m_sample_listener.reset(new SampleListener(*this, m_reader->samples_per_frame()));
             m_output_device = output;
             m_output_volume = output_volume;
             init_audio_sink();
@@ -491,15 +457,13 @@ void AudioPassthroughPairQt::reset(
             source.reset(new AudioSource(
                 m_logger,
                 input,
-                format,
-                m_device_input_multiplier
+                format
             ));
         }
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_reader){
             teardown_tree();
             m_sink_device.reset();
-            m_sample_listener.reset();
             m_reader.reset();
             m_input_format = AudioChannelFormat::NONE;
         }
@@ -508,7 +472,6 @@ void AudioPassthroughPairQt::reset(
         m_output_volume = output_volume;
         if (source){
             m_reader = std::move(source);
-            m_sample_listener.reset(new SampleListener(*this, m_reader->samples_per_frame()));
             init_audio_sink();
             build_tree(m_device_input_multiplier);
             m_fft_listener.reset(new InternalFFTListener(*this));
@@ -521,7 +484,6 @@ void AudioPassthroughPairQt::clear_audio_source(){
         auto scope_check = m_sanitizer.check_scope();
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_reader){
-            m_sample_listener.reset();
             teardown_tree();
             m_reader.reset();
             m_input_format = AudioChannelFormat::NONE;
@@ -537,22 +499,19 @@ void AudioPassthroughPairQt::set_audio_source(const std::string& file){
             source.reset(new AudioSource(
                 m_logger,
                 file,
-                AudioChannelFormat::DUAL_48000,
-                m_file_input_multiplier
+                AudioChannelFormat::DUAL_48000
             ));
         }
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_reader){
             teardown_tree();
             m_sink_device.reset();
-            m_sample_listener.reset();
             m_reader.reset();
             m_input_format = AudioChannelFormat::NONE;
         }
         m_input_format = AudioChannelFormat::DUAL_48000;
         if (source){
             m_reader = std::move(source);
-            m_sample_listener.reset(new SampleListener(*this, m_reader->samples_per_frame()));
             init_audio_sink();
             build_tree(m_file_input_multiplier);
             m_fft_listener.reset(new InternalFFTListener(*this));
@@ -568,22 +527,19 @@ void AudioPassthroughPairQt::set_audio_source(const AudioDeviceInfo& device, Aud
             source.reset(new AudioSource(
                 m_logger,
                 device,
-                format,
-                m_device_input_multiplier
+                format
             ));
         }
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_reader){
             teardown_tree();
             m_sink_device.reset();
-            m_sample_listener.reset();
             m_reader.reset();
             m_input_format = AudioChannelFormat::NONE;
         }
         m_input_format = format;
         if (source){
             m_reader = std::move(source);
-            m_sample_listener.reset(new SampleListener(*this, m_reader->samples_per_frame()));
             init_audio_sink();
             build_tree(m_device_input_multiplier);
             m_fft_listener.reset(new InternalFFTListener(*this));

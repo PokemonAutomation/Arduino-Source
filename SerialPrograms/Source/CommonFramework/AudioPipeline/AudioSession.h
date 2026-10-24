@@ -20,7 +20,6 @@
 #include "Common/Cpp/Concurrency/Watchdog.h"
 #include "AudioFeed.h"
 #include "AudioPassthroughPair.h"
-#include "AudioStream.h"
 #include "Spectrum/FFTStreamer.h"
 #include "Spectrum/AudioSpectrumHolder.h"
 #include "AudioOption.h"
@@ -41,9 +40,6 @@ public:
     };
     void add_state_listener(StateListener& listener);
     void remove_state_listener(StateListener& listener);
-
-    void add_stream_listener(AudioFloatStreamListener& listener);
-    void remove_stream_listener(AudioFloatStreamListener& listener);
 
     //  Attach a listener that receives the working audio stream (float)
     //  converted to the requested format. See AudioPassthroughPair.

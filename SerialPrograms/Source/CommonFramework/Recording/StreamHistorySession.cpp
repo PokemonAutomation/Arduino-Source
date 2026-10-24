@@ -150,7 +150,6 @@ void StreamHistorySession::clear(){
     Data& data = *m_data;
     data.m_logger.log("Clearing stream history...", COLOR_ORANGE);
     data.m_current.reset();
-//    expected_samples_per_frame = 0;
 //    data.m_audio_format = AudioChannelFormat::NONE;
 //    data.m_has_video = false;
 }

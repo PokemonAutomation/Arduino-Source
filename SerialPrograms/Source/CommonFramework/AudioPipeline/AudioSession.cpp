@@ -28,12 +28,6 @@ void AudioSession::add_state_listener(StateListener& listener){
 void AudioSession::remove_state_listener(StateListener& listener){
     m_listeners.remove(listener);
 }
-void AudioSession::add_stream_listener(AudioFloatStreamListener& listener){
-    m_devices->add_listener(listener);
-}
-void AudioSession::remove_stream_listener(AudioFloatStreamListener& listener){
-    m_devices->remove_listener(listener);
-}
 void AudioSession::add_working_stream_listener(
     const AudioFormat& format, Kernels::AudioPipeline::WorkingAudioStreamListener& listener
 ){
