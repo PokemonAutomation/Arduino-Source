@@ -446,14 +446,13 @@ struct StreamHistoryTracker_Ring::Impl{
     Impl(
         Logger& p_logger,
         std::chrono::seconds p_window,
-        size_t p_audio_samples_per_frame,
-        size_t p_audio_frames_per_second,
+        bool p_has_audio,
         bool p_has_video
     )
         : logger(p_logger)
         , window(p_window)
         , has_video(p_has_video)
-        , have_audio(p_audio_samples_per_frame > 0 && p_audio_frames_per_second > 0)
+        , have_audio(p_has_audio)
         , target_fps(get_target_fps())
         , frame_interval(std::chrono::microseconds(1000000 / target_fps))
         , video_enabled(p_has_video)
@@ -1557,15 +1556,13 @@ StreamHistoryTracker_Ring::~StreamHistoryTracker_Ring(){
 StreamHistoryTracker_Ring::StreamHistoryTracker_Ring(
     Logger& logger,
     std::chrono::seconds window,
-    size_t audio_samples_per_frame,
-    size_t audio_frames_per_second,
+    bool has_audio,
     bool has_video
 )
     : m_impl(std::make_unique<Impl>(
         logger,
         window,
-        audio_samples_per_frame,
-        audio_frames_per_second,
+        has_audio,
         has_video
     ))
 {}
