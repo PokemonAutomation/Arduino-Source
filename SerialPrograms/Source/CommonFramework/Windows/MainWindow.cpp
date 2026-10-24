@@ -194,7 +194,7 @@ MainWindow::MainWindow(QWidget* parent)
             this, [](const QString&){
                 std::string str;
                 str += PROGRAM_NAME + " Computer-Control Programs<br>";
-                str += "Copyright: 2020 - 2025<br>";
+                str += "Copyright: 2020 - 2027<br>";
                 str += "Version: " + PROGRAM_VERSION + "<br>";
                 str += "<br>";
                 str += "Framework: Qt " + std::to_string(QT_VERSION_MAJOR);
