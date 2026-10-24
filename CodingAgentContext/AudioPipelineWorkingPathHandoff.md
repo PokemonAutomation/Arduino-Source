@@ -17,10 +17,18 @@ encoding), from the session that did the audio pipeline migration.
   `format.native_format()` drives the channel mixing). The pair builds a
   `WorkingAudio2WorkingAudio` node per listener (mix + resample, source shape
   -> your shape), so you get the converted stream for free.
-- The legacy `AudioFloatStreamListener` path still exists and still has one
-  consumer (`StreamHistorySession`'s old interface, kept next to the new one
-  until #1563 switches off it). Once that is done, remove it per the
-  checklist at the bottom.
+- The legacy `AudioFloatStreamListener` path is gone (#1698): `AudioStream`
+  and all the float listener plumbing were deleted, and `StreamHistorySession`
+  consumes only the `WorkingAudioStreamListener` path.
+- The fixed input-format presets (`AudioChannelFormat`) are being replaced by
+  the device-driven `AudioInputChoice` in four steps: #1678 (Step A: the
+  device's `supported_choices()` list) and #1707 (Step B: the pipeline opens
+  the device through a choice) are in main; #1711 (Step C: session state,
+  options/JSON persistence, and the format dropdown run on choices) is open;
+  Step D deletes the preset enum, `set_format`, and `AUDIO_FORMAT_LABELS`.
+  Note: no duplicate-device filtering in `all_input_devices()` is needed —
+  the Windows winMM/MMDevice shadow entries were a Qt5 artifact (QTBUG-75781),
+  fixed in Qt6, and no longer observed on Windows.
 
 ## What's already in main (the migration)
 
@@ -37,9 +45,12 @@ encoding), from the session that did the audio pipeline migration.
 | #1676 | Tree simplified onto the all-in-one node (one `WorkingAudio2WorkingAudio` per branch, direct connection when no conversion is needed). Also fixed a latent OOB write in `ChannelMixer::push_samples` for pushes larger than its buffer (it now chunks internally). |
 | #1671 | **This path**: per-listener `add_listener(const AudioFormat&, WorkingAudioStreamListener&)` on the pair/session; `StreamHistorySession` now consumes it next to its legacy interface. |
 | #1673 | **Native WAV file input**: `AudioSource` probes the WAV header (`probe_wav_native_format`), the loader streams the file's own rate / channels / sample type, and the tree converts to the sink's format. Gate tests in `IO/AudioFileLoader_Tests.cpp`. |
-| #1680 (in review) | Multichannel WAV file input (up to 8 channels — the `fallback_channel_config` range); `channel_format(n)` no longer forces the stereo config on counts above 2, so `resolve_positions()` uses the standard layout (5.1 etc.) for the mix matrix. |
-| #1683 (in review) | **Compressed file input at native format** (.mp3 etc. no longer forced to 48k/2ch float): `probe_decoded_native_format()` (throwaway `QAudioDecoder`, format read off the first decoded buffer); probe failure falls back to the legacy 48k stereo float target. `loadFullAudio()` (batch template loading) keeps its convert-to-requested-format behavior. Gate tests + their mp3 fixture live in the CommandLineTests repo (`CommonFramework/AudioPipeline/`, CLT PR #32), found via `UNIT_TEST_RESOURCE_PATH()`. |
-| #1678 (in review) | `AudioInputChoice` foundation: device-driven input choices (`AudioDeviceInfo::supported_choices()` / `preferred_choice_index()`) generalizing the 7 legacy presets; nothing consumes it yet — the pipeline still takes `AudioChannelFormat`. Steps B–D of the enum replacement are not started. |
+| #1680 | Multichannel WAV file input (up to 8 channels — the `fallback_channel_config` range); `channel_format(n)` no longer forces the stereo config on counts above 2, so `resolve_positions()` uses the standard layout (5.1 etc.) for the mix matrix. |
+| #1683 | **Compressed file input at native format** (.mp3 etc. no longer forced to 48k/2ch float): `probe_decoded_native_format()` (throwaway `QAudioDecoder`, format read off the first decoded buffer); probe failure falls back to the legacy 48k stereo float target. `loadFullAudio()` (batch template loading) keeps its convert-to-requested-format behavior. Gate tests + their mp3 fixture live in the CommandLineTests repo (`CommonFramework/AudioPipeline/`, CLT PR #32), found via `UNIT_TEST_RESOURCE_PATH()`. |
+| #1678 | Step A of the preset replacement: `AudioInputChoice` foundation — device-driven input choices (`AudioDeviceInfo::supported_choices()` / `preferred_choice_index()`) generalizing the 7 legacy presets. |
+| #1695 / #1698 | `StreamHistorySession` moved onto the `WorkingAudioStreamListener` path; the legacy float stream path (and `AudioStream`) removed. |
+| #1707 | Step B: the pipeline is choice-driven — the device source opens through a resolved `AudioInputChoice` (`AudioSource`, pair, session, history). |
+| #1711 (open) | Step C: session state / options / JSON and the UI run on choices — `input_choice()` / `set_input_choice()`, `sanitize_choice()`, the format dropdown built from `supported_choices()` display names; `resolve_input_choice()` (the Step B preset→choice bridge) removed. |
 
 ## Architecture
 
@@ -51,7 +62,6 @@ AudioSession (UI thread)  ── audio() on ConsoleSystemSession
    │   │                ├─ sink branch:  [m_sink_conv: WorkingAudio2WorkingAudio] → m_sink_encoder → m_sink_device (QAudioSink)
    │   │                ├─ FFT branch:   [m_fft_conv: WorkingAudio2WorkingAudio] → m_fft_node (WorkingAudioToFFT) → InternalFFTListener
    │   │                └─ per working listener: [its WorkingAudio2WorkingAudio node] → internal forwarder → YOUR listener   ← THE NEW PATH
-   │   └─ float stream → SampleListener → m_stream_listeners (legacy, one consumer: StreamHistorySession's old interface, PUNTED)
    └─ m_fft_listeners (AudioSession itself is an FFTListener)
 ```
 
@@ -103,28 +113,16 @@ void remove_working_stream_listener(Kernels::AudioPipeline::WorkingAudioStreamLi
   their decoded native format (typically 44.1k stereo float for mp3, #1683).
   Either way the node adapts automatically.
 
-## `StreamHistorySession` (state of the transition)
+## `StreamHistorySession`
 
-It now implements **both** listener interfaces:
-
-- `AudioFloatStreamListener::on_samples` — the legacy pass-through, kept
-  exactly as it was. Attached via `add_stream_listener` in
-  `ConsoleSystemSession`.
-- `WorkingAudioStreamListener::push_samples` — the new path. Attached via
-  `add_working_stream_listener(preset's physical shape, ...)` at
-  `start()`, re-attached in `post_input_change()` (old-shape attach removed
-  first, so no push in the old shape can race the shape update). It
-  re-interleaves the planar working stream at the active preset's physical
-  shape — the shape its tracker records at (the tracker's audio shape was
-  corrected in the same PR: DUAL_44100 now 2 ch @ 44.1 kHz, MONO_96000 now
-  1 ch @ 96 kHz).
-
-While both are attached, the tracker is fed by **both** paths (double-record);
-the legacy feed is shape-inconsistent with the corrected tracker shape. That
-is inert today (the active tracker's audio is `#if 0`) — when #1563 switches
-the video encoder over, drop the legacy attach (`add_stream_listener` /
-`remove_stream_listener` in `ConsoleSystemSession`) and the double-feed goes
-away with it.
+It consumes the `WorkingAudioStreamListener` path only (the legacy float
+interface was removed in #1698): attached via
+`add_working_stream_listener(choice.format(), ...)` at `start()`, re-attached
+in `post_input_change()` (the old-shape attach is removed first, so no push
+in the old shape can race the shape update). It re-interleaves the planar
+working stream at the active input choice's shape — the shape its tracker
+records at (the tracker's audio shape was corrected in #1695: DUAL_44100 now
+2 ch @ 44.1 kHz, MONO_96000 now 1 ch @ 96 kHz).
 
 ## The resampler & mixer kernels (if you ever own the chain yourself)
 
@@ -169,22 +167,12 @@ directly. No manual `ChannelMixer` / `AudioResampler` chain needed (those
 kernels are what you'd use to own the chain yourself, e.g. for a custom
 target layout).
 
-## Legacy float path — removal checklist (after #1563 is off it)
+## Legacy float path — removed
 
-The legacy reader still runs with one consumer (the history session's old
-interface, which is dropped when #1563 switches); remove all of it in one
-cleanup PR:
-- `AudioStream.h/.cpp`: `AudioFloatStreamListener`, `AudioStreamToFloat`.
-- `IO/AudioSource.{h,cpp}`: `m_reader`, `m_listeners`, `InternalListener`,
-  `add_listener(AudioFloatStreamListener&)`, `samples_per_frame()`, `m_multiplier`,
-  and the preset switch in `init()` (the raw-shape accessors
-  `raw_sample_rate()/raw_channels()/raw_sample_format()` stay).
-- `Backends/AudioPassthroughPairQt.{h,cpp}`: `SampleListener`, `m_sample_listener`,
-  `m_stream_listeners`, the float `add/remove_listener` overloads (and every
-  `m_sample_listener.reset()` in the lifecycle paths).
-- `AudioPassthroughPair.h` + `AudioPassthroughPairQtThread.{h,cpp}`: the float
-  listener overloads.
-- `AudioSession.{h,cpp}`: `add_stream_listener` / `remove_stream_listener`.
+Done in #1698 after #1695: `AudioStream.h/.cpp` is gone, as is the float
+listener plumbing in `AudioSource`, the pair backends, and `AudioSession`
+(`add_stream_listener` / `remove_stream_listener` no longer exist). Only the
+raw stream and the working stream paths remain.
 
 ## Build & test
 
