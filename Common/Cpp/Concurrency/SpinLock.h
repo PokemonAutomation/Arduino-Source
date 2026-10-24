@@ -13,41 +13,6 @@
 namespace PokemonAutomation{
 
 
-#if 0
-class SpinLock{
-public:
-    SpinLock() : m_locked(false) {}
-
-    void spin_acquire();
-    void spin_acquire(const char* label);
-
-    void unlock(){
-        m_locked.store(false, std::memory_order_release);
-    }
-
-private:
-    std::atomic<bool> m_locked;
-};
-class SpinLockGuard{
-public:
-    SpinLockGuard(const SpinLockGuard&) = delete;
-    void operator=(const SpinLockGuard&) = delete;
-
-    SpinLockGuard(SpinLock& lock, const char* label = "(unnamed lock)")
-        : m_lock(lock)
-    {
-        lock.spin_acquire(label);
-    }
-    ~SpinLockGuard(){
-        m_lock.unlock();
-    }
-
-private:
-    SpinLock& m_lock;
-};
-#endif
-
-
 
 //
 //  This is a simple multi-reader/single-writer (MRSW) spin lock.
@@ -64,6 +29,9 @@ public:
         //  Optimization: Assume unlocked
         size_t state = 0;
         if (m_readers.compare_exchange_weak(state, 1)){
+            return;
+        }
+        if (state != (size_t)-1 && m_readers.compare_exchange_weak(state, state + 1)){
             return;
         }
 

@@ -19,6 +19,14 @@ namespace PokemonAutomation{
         _mm_pause();
     }
 }
+#elif __aarch64__ || __arm64__
+//  The ARM "yield" hint, equivalent to x86's "pause": it tells the processor
+//  that the current thread is in a spin-wait loop.
+namespace PokemonAutomation{
+    PA_FORCE_INLINE void pause(){
+        __asm__ volatile ("yield");
+    }
+}
 #else
 namespace PokemonAutomation{
     PA_FORCE_INLINE void pause(){}
