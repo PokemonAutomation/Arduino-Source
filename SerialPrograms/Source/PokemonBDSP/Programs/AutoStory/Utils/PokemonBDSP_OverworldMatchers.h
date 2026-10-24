@@ -53,6 +53,7 @@ OverworldMatchResult match_eterna_center_entrance(const ImageRGB32& frame);
 OverworldMatchResult match_hearthome_center_entrance(const ImageRGB32& frame);
 OverworldMatchResult match_hearthome_center_interior(const ImageRGB32& frame);
 OverworldMatchResult match_hearthome_contest_fantina(const ImageRGB32& frame);
+OverworldMatchResult match_hearthome_gym_entrance(const ImageRGB32& frame);
 OverworldMatchResult match_route208_stair_top(const ImageRGB32& frame);
 OverworldMatchResult match_route208_hannah_departure(const ImageRGB32& frame);
 OverworldMatchResult match_eterna_gym_entrance(const ImageRGB32& frame);
