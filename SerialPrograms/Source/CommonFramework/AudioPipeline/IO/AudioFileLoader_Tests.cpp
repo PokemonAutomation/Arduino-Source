@@ -293,7 +293,9 @@ public:
                 + " bytes, got " + std::to_string(std::get<1>(ret)) + ".";
         }
         const float* out = (const float*)std::get<0>(ret);
-        const float rcp = 1.0f / 32767.0f;
+        //  The pipeline-wide convention (AudioStreamConverter::convert_from):
+        //  int16 is scaled by 1/32768, not 1/32767.
+        const float rcp = 1.0f / 32768.0f;
         for (size_t c = 0; c < samples.size(); c++){
             const float expected = (float)samples[c] * rcp;
             if (out[c] != expected){
