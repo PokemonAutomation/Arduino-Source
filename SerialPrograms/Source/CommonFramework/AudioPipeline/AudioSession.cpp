@@ -4,7 +4,9 @@
  *
  */
 
+#include <QAudioFormat>
 #include "Common/Cpp/Logging/AbstractLogger.h"
+#include "Common/Cpp/Containers/Pimpl.tpp"   //  Pimpl<QAudioFormat> (AudioFormat) instantiations
 #include "CommonFramework/GlobalServices.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "Backends/AudioPassthroughPairQtThread.h"
