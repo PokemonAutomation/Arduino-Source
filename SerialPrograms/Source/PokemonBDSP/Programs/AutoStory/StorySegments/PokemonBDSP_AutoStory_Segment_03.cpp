@@ -886,12 +886,12 @@ namespace PokemonBDSP{
         force_repel_expiry(stream,context,RepelRenewalChoice::NO,false,true);
 
         // Either Hiker may interrupt the crossing. Resume toward the east
-        // wall after each fight; finish only after a complete approach and
-        // sight-line sweep has no remaining encounter. Trainer names and a
-        // fixed battle count cannot distinguish the one- and two-fight routes.
-        bool bridge_sweep_clear=false;
+        // wall after each fight. The wiggles are one encounter-triggering
+        // attempt: once started, do not restart or finish them after an
+        // interruption. Keep the resumed east approach watched for a later Hiker.
+        bool bridge_approach_clear=false,bridge_wiggle_started=false;
         size_t bridge_battles=0,approach_dialogues=0;
-        for (size_t pass=0;pass<6 && !bridge_sweep_clear;pass++) {
+        for (size_t pass=0;pass<6 && !bridge_approach_clear;pass++) {
             ShortDialogWatcher dialogue;
             StartBattleDetector starting(stream.overlay());
             BattleMenuWatcher menu(BattleType::TRAINER);
@@ -901,15 +901,22 @@ namespace PokemonBDSP{
                     ctx.wait_for_all_requests();
                     pbf_wait(ctx,3000ms);
                     ctx.wait_for_all_requests();
-                    for (size_t pair=0;pair<8;pair++) {
-                        pbf_move_left_joystick(ctx,{0,1},500ms,150ms);
-                        pbf_move_left_joystick(ctx,{0,-1},500ms,150ms);
-                        ctx.wait_for_all_requests();
+                    if (!bridge_wiggle_started) {
+                        // Mark before the first input: an encounter during
+                        // this set fulfills its purpose and consumes the set.
+                        bridge_wiggle_started=true;
+                        for (size_t pair=0;pair<8;pair++) {
+                            pbf_move_left_joystick(ctx,{0,1},500ms,150ms);
+                            pbf_move_left_joystick(ctx,{0,-1},500ms,150ms);
+                            ctx.wait_for_all_requests();
+                        }
+                    } else {
+                        stream.log("[Route 208 bridge] Wiggle set already used; continuing watched east approach without repeating it.");
                     }
                     pbf_wait(ctx,2500ms);
                 },{{dialogue},{starting},{menu}});
             if (engaged<0) {
-                bridge_sweep_clear=true;
+                bridge_approach_clear=true;
                 break;
             }
             if (engaged==0) {
@@ -946,10 +953,10 @@ namespace PokemonBDSP{
             pbf_wait(context,500ms);
             context.wait_for_all_requests();
         }
-        if (!bridge_sweep_clear)
+        if (!bridge_approach_clear)
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "Route 208 bridge: Watched crossing/sight-line sweep did not clear.",stream);
-        stream.log("[Route 208 bridge] Full east approach and sight-line sweep clear after " +
+                "Route 208 bridge: Watched east approach did not clear.",stream);
+        stream.log("[Route 208 bridge] Full east approach clear after " +
             std::to_string(bridge_battles) + " battle(s); continuing toward the stairs.",COLOR_GREEN);
         pbf_move_left_joystick(context, {1.000000, -0.000000}, 421ms, 0ms);
         pbf_wait(context, 178ms);
@@ -959,34 +966,61 @@ namespace PokemonBDSP{
         pbf_wait(context, 298ms);
         // Fixed eastward travel can stop beyond the stair column. Center above
         // the stairs using the native left-rock pose before moving south.
+        bool rock_acquisition_timed_out=false;
         align_to_overworld_landmarks(stream,context,match_route208_stair_top,
-            "Route 208 stair-top rocks",false,true);
+            "Route 208 stair-top rocks",false,true,false,nullptr,nullptr,0,0,0,
+            &rock_acquisition_timed_out);
         if (!activate_repel(stream,context,5))
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                 "Route 208 stair top: Repel activation failed.",stream);
         context.wait_for_all_requests();
-        // Reach the southern hedge below the honey tree before heading east.
-        // The former 2s descent could leave the player level with its trunk,
-        // consuming the eastward hold against the tree on attempts3 and4.
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 2800ms, 0ms);
-        pbf_wait(context, 643ms);
+        if (rock_acquisition_timed_out) {
+            stream.log("[Route 208 stair fallback] Using east 2000ms, southwest 1500ms, then south trial 1650ms.");
+            // Keep the recorded inputs explicit for review and calibration.
+            // Watch this whole recovery phase; cancel its remaining inputs if
+            // a transition or battle starts before the gate approach.
+            BlackScreenWatcher fallback_black;
+            WhiteScreenWatcher fallback_white;
+            BattleMenuWatcher fallback_battle(BattleType::TRAINER);
+            const int fallback_interrupted=run_until<ProControllerContext>(stream,context,
+                [&](ProControllerContext& ctx) {
+                    // East: clamp against the cliff edge.
+                    pbf_move_left_joystick(ctx,{1,0},2000ms,0ms);
+                    ctx.wait_for_all_requests();
+                    // Southwest: drag toward the stair column.
+                    pbf_move_left_joystick(ctx,{-1,-1},1500ms,0ms);
+                    ctx.wait_for_all_requests();
+                    // South: user-requested 1650ms trial; recovery may start farther down the stairs.
+                    pbf_move_left_joystick(ctx,{0,-1},1650ms,0ms);
+                    pbf_wait(ctx,643ms);
+                    ctx.wait_for_all_requests();
+                },{{fallback_black},{fallback_white},{fallback_battle}});
+            if (fallback_interrupted>=0)
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "Route 208 stair fallback: Unexpected transition or battle before west gate approach.",stream);
+        } else {
+            // Pass just above the honey tree, between the southern trainer
+            // and Hannah to the north. Calibrate this 1825ms trial from video.
+            pbf_move_left_joystick(context, {0.000000, -1.000000}, 1825ms, 0ms);
+            pbf_wait(context, 643ms);
+        }
         // Entry may occur during an earlier approach leg. Once a fade is
         // caught, skip the remaining outdoor approach rather than replaying it
         // inside the gatehouse. The existing watcher cancels at black/white,
         // waits for GONE500ms, then settles for2s before the next input.
         bool hearthome_gate_entered=segment03_cycling_move(stream,context,
-            1,0,3500ms,443ms,"Hearthome west gate approach");
+            1,0,rock_acquisition_timed_out ?3422ms:3500ms,443ms,"Hearthome west gate approach");
         if (!hearthome_gate_entered)
             hearthome_gate_entered=segment03_cycling_move(stream,context,
-                0,1,250ms,405ms,"Hearthome west gate doorway alignment");
+                0,1,rock_acquisition_timed_out ?241ms:250ms,405ms,"Hearthome west gate doorway alignment");
         if (!hearthome_gate_entered)
             hearthome_gate_entered=segment03_cycling_move(stream,context,
-                1,0,600ms,1617ms,"Hearthome west gate entrance",true);
+                1,0,rock_acquisition_timed_out ?633ms:600ms,1617ms,"Hearthome west gate entrance",true);
         if (!hearthome_gate_entered)
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                 "Hearthome west gate: Interior transition not confirmed.",stream);
         if (!segment03_cycling_move(stream,context,
-            1,0,1800ms,1588ms,"Hearthome west gate exit",true))
+            1,0,rock_acquisition_timed_out ?1743ms:1800ms,1588ms,"Hearthome west gate exit",true))
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                 "Hearthome west gate: Exterior transition not confirmed.",stream);
         OverworldWatcher hearthome_outside;
@@ -1032,24 +1066,26 @@ namespace PokemonBDSP{
         BlackScreenWatcher center_transition;
         const int center_entry=run_until<ProControllerContext>(stream,context,
             [&](ProControllerContext& ctx) {
-                pbf_move_left_joystick(ctx, {1.000000, -0.000000}, 3448ms, 0ms);
+                pbf_move_left_joystick(ctx, {1.000000, -0.000000}, 3500ms, 0ms);
                 pbf_wait(ctx, 437ms);
-                pbf_move_left_joystick(ctx, {0.000000, 1.000000}, 2292ms, 0ms);
+                // Clear the northbound lamp column before crossing the plaza.
+                pbf_move_left_joystick(ctx, {-1.000000, -0.000000}, 250ms, 0ms);
+                pbf_move_left_joystick(ctx, {0.000000, 1.000000}, 3000ms, 0ms);
                 pbf_wait(ctx, 1582ms);
-                pbf_move_left_joystick(ctx, {-1.000000, -0.000000}, 1125ms, 0ms);
+                pbf_move_left_joystick(ctx, {-1.000000, -0.000000}, 1150ms, 0ms);
                 pbf_wait(ctx, 334ms);
                 // Repel expired before this travel; no blind response inputs remain.
-                pbf_move_left_joystick(ctx, {-1.000000, -0.000000}, 2228ms, 0ms);
+                pbf_move_left_joystick(ctx, {-1.000000, -0.000000}, 2250ms, 0ms);
                 pbf_wait(ctx, 304ms);
-                pbf_move_left_joystick(ctx, {0.000000, -1.000000}, 279ms, 0ms);
+                pbf_move_left_joystick(ctx, {0.000000, -1.000000}, 300ms, 0ms);
                 pbf_wait(ctx, 174ms);
-                pbf_move_left_joystick(ctx, {-1.000000, -0.000000}, 498ms, 0ms);
-                pbf_move_left_joystick(ctx, {-1.000000, 1.000000}, 76ms, 0ms);
-                pbf_move_left_joystick(ctx, {0.000000, 1.000000}, 1452ms, 0ms);
+                pbf_move_left_joystick(ctx, {-1.000000, -0.000000}, 500ms, 0ms);
+                pbf_move_left_joystick(ctx, {-1.000000, 1.000000}, 100ms, 0ms);
+                pbf_move_left_joystick(ctx, {0.000000, 1.000000}, 1800ms, 0ms);
                 pbf_wait(ctx, 21ms);
-                pbf_move_left_joystick(ctx, {1.000000, -0.000000}, 648ms, 0ms);
                 pbf_wait(ctx, 221ms);
-                pbf_move_left_joystick(ctx, {-1.000000, -0.000000}, 1161ms, 0ms);
+                pbf_move_left_joystick(ctx, {-1.000000, -0.000000}, 500ms, 0ms);
+                pbf_move_left_joystick(ctx, {0.000000, 1.000000}, 250ms, 0ms);
                 pbf_wait(ctx, 59ms);
                 align_to_overworld_landmarks(stream,ctx,match_hearthome_center_entrance,
                     "Hearthome Center exterior alignment",false,true,false,

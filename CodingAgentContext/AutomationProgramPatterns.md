@@ -230,3 +230,14 @@ These are user-selected standing budgets. Recording this rule does not itself im
 ## Building-entry locators: watch transitions throughout (Kevin, 2026-10-21)
 
 For future building-entry work, use a BlackScreenWatcher alongside the visual locator throughout the approach and alignment. If a transition starts early, cancel remaining outdoor movement/search, wait for the fade to finish, and confirm the intended interior before continuing. Also recognize an already-visible intended interior so entry is not replayed. A black screen alone does not identify the building. Reuse existing matching/transition helpers, preserve shared gates, and keep route sequencing in its owning segment.
+
+## Recording review timing (Kevin, 2026-10-24)
+
+While Kevin is recording, do not make any queries or inspections: no OBS,
+SerialPrograms, logs, processes, Git, screenshots, or recording-file checks.
+Do not open, probe, seek, decode, extract frames from, or review an active video.
+Kevin suspects these activities may contribute to system instability.
+Treat recording as active until Kevin explicitly confirms it has stopped;
+do not query the system to determine whether it has stopped. Resume checks
+only after that confirmation. Do not stop or otherwise control recording
+without separate explicit authorization.
