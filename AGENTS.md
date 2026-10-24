@@ -1,14 +1,12 @@
 # AGENTS.md
 
 Guidance for AI coding agents working in this repository.
-For project background and for how to write a new automation program, see also
-`CodingAgentContext/ProjectOverview.md` and `CodingAgentContext/AutomationProgramPatterns.md`.
+For how to write a new automation program, see also `CodingAgentContext/AutomationProgramPatterns.md`.
 
 ## What this project is
 
-Open-source C++ application (Qt 6 desktop GUI) that automates Pokémon (and other) games on
-Nintendo Switch using Arduino-based controller hardware, computer vision, OCR, and machine
-learning. Tech stack: C++23, Qt 6.10, OpenCV, ONNX Runtime, Tesseract.
+Open-source application that automates Pokémon (and other) games on Nintendo Switch using
+Arduino-based controller hardware, computer vision, OCR, and machine learning.
 
 ## Repo layout
 
@@ -16,11 +14,12 @@ learning. Tech stack: C++23, Qt 6.10, OpenCV, ONNX Runtime, Tesseract.
   project; keep it Qt-free except documented seams). `Common/Qt` holds Qt-specific helpers.
 - `SerialPrograms/` — the application: `SerialPrograms/Source` (code), `SerialPrograms/cmake`
   (CMake modules), `SerialPrograms/bin` (build output).
-- `Packages/` — downloadable resources and test data (`Packages/DownloadedResources`), plus
-  firmware and tooling.
+- `Packages/` — **not part of this repo**: the separate `PokemonAutomation/Packages` repo
+  (downloadable resources in `Packages/DownloadedResources`, firmware, tooling). CMake clones
+  it into `Packages/` automatically at configure time if it is missing (`clone_packages`).
 - `3rdParty/`, `3rdParty-Core/` — vendored dependencies (compiled as external includes; MSVC
   builds use `/external:W0`).
-- `CodingAgentContext/` — agent-facing notes: project overview and program-writing patterns.
+- `CodingAgentContext/` — agent-facing notes on writing new automation programs.
 - Test images/fixtures live in a **separate repo**: `PokemonAutomation/CommandLineTests`.
   At test time it is checked out next to the program; `GlobalAutoPaths` detects the
   `CommandLineTests/` (or `UnitTestResources/`) folder and loads test files relative to it.
@@ -63,7 +62,7 @@ Use the wrappers in `Common/Cpp/Filesystem/` instead: `Filesystem::` functions, 
 `FileIO`, `file_to_string()`. Rationale is documented in the header comment of
 `Common/Cpp/Filesystem/FilePath.h`.
 
-### Concurrency (Qt 6.9 thread bug on Windows)
+### Concurrency (Qt thread-adoption bug on Windows)
 
 Qt > 6.8.3 on Windows can crash when raw `std::thread`s coexist with Qt event loops
 ("thread adoption" bug: QTBUG-131892, see project issue #570; see
@@ -99,6 +98,14 @@ migrate a file to the wrappers when you're already touching it and it's straight
 
 - CMake >= 3.24, C++23. Dependencies: Qt 6.10.2 (with `qtmultimedia` + `qtserialport`),
   OpenCV 4, ONNX Runtime, Tesseract. Linux CI builds with Ninja; Windows with MSVC.
+- Configure/build from `SerialPrograms/` with the CMake presets in
+  `SerialPrograms/CMakePresets.json` (Ninja, C++23, automoc on), e.g. `cmake --preset default`
+  then `cmake --build --preset default`; platform-specific setup is documented in
+  `SerialPrograms/BuildInstructions/`.
+- `-DPA_CORE_ONLY=ON` builds only the GUI-free core (no Qt/OpenCV) — a quick way to
+  compile-check `Common/Cpp` changes.
+- New source files must be added to the explicit list in
+  `SerialPrograms/cmake/SourceFiles.cmake`; they are not picked up automatically.
 - MSVC builds pass `/W4 /WX` — **every compiler warning is an error** (clang-cl, GCC, and
   clang also build in CI with strict flags).
 - No tab characters in source (CI has a "Check for Tabs" job).
@@ -111,11 +118,9 @@ migrate a file to the wrappers when you're already touching it and it's straight
     Windows/Linux; `~/Library/Application Support/SerialPrograms/DownloadedResources` on macOS).
   - Headless Linux: `QT_QPA_PLATFORM=offscreen` and
     `TESSDATA_PREFIX=<bin>/Resources/Tesseract`.
-- Test framework: test classes derive `UnitTest` (`Common/Cpp/TestRunners/UnitTest.h`),
-  implement `run()` returning a `UnitTestResult`; cases are registered with
-  `database.add<TestClass>(...)` inside each module's `add_tests(UnitTestDatabase&)` and run
-  in parallel by `ParallelUnitTestRunner` under memory/thread limits. The GUI "Unit Test
-  Runner" program runs the same tests.
+- Test framework: test classes derive `UnitTest` (`Common/Cpp/TestRunners/UnitTest.h`) and are
+  collected via per-module `add_tests(UnitTestDatabase&)` — see
+  `SerialPrograms/Source/Tests/CommandLineTests.h`.
 
 ## Conventions
 
