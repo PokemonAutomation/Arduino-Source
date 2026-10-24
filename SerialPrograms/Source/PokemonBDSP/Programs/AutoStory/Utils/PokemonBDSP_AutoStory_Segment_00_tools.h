@@ -37,7 +37,8 @@ namespace PokemonAutomation {
                 OverworldMatchResult (*entry_matcher)(const ImageRGB32&) = nullptr,
                 bool* entry_detected = nullptr,
                 double arrival_tolerance_x = 0, double arrival_tolerance_y = 0,
-                double moderate_entry_confidence = 0);
+                double moderate_entry_confidence = 0,
+                bool* rock_acquisition_timed_out = nullptr);
 
             void verify_tutorial_settings(VideoStream& stream, ProControllerContext& context);
 
