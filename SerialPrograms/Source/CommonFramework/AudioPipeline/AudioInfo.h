@@ -83,11 +83,13 @@ private:
 //
 class AudioInputChoice{
 public:
-    AudioInputChoice();                     //  invalid
-    AudioInputChoice(AudioFormat format);    //  native: physical == format
+    ~AudioInputChoice();
     AudioInputChoice(const AudioInputChoice& x);
     AudioInputChoice& operator=(const AudioInputChoice& x);
-    ~AudioInputChoice();
+
+public:
+    AudioInputChoice();                     //  invalid
+    AudioInputChoice(AudioFormat format);   //  native: physical == format
 
     static AudioInputChoice reinterpreted(
         AudioFormat format, AudioFormat physical, bool swap_channels
@@ -103,9 +105,6 @@ public:
     bool is_reinterpreted() const;
     bool swap_channels() const;
 
-    //  "<channels> x <sample rate> Hz (<layout>)", e.g. "2 x 48,000 Hz
-    //  (Stereo)" or "1 x 96,000 Hz (Mono)"; the layout name is only present
-    //  for standard layouts (Mono, Stereo, 2.1, 3.1, 5.0, 5.1, 7.0, 7.1).
     std::string display_name() const;
 
 private:
@@ -120,25 +119,8 @@ struct AudioInputChoiceList{
     size_t preferred_index = 0;
 };
 
-//
 //  Builds the input format choices for a device from its supported formats
-//  (any order, duplicates allowed) and its preferred format:
-//
-//   - entries with the same (rate, channels, channel config) are collapsed
-//     to one; when several sample formats are supported for the same shape,
-//     the highest quality sample format wins: float > int32 > int16 > uint8.
-//   - the result is sorted by channel count (descending), then sample rate
-//     (descending); the reinterpreted capture-card choices, when present,
-//     stay appended after the native choices.
-//   - when the only supported format is 1ch x 96000 (the misreporting
-//     capture-card case), two reinterpreted 2ch x 48000 choices are
-//     appended after it (L/R first, then R/L).
-//   - preferred_index is the index of the exact match of "preferred"; when
-//     there is no match (preferred invalid or unsupported) it is the
-//     highest-scoring choice, where score = type x channel x sqrt(rate)
-//     with float 1.0 / int32 0.9 / int16 0.5 / uint8 0.1, 2ch 2.0 /
-//     Nch 2 - 1/N, and sqrt(rate). Empty list keeps 0.
-//
+//  (any order, duplicates allowed) and its preferred format.
 AudioInputChoiceList input_choices(
     std::vector<AudioFormat> supported,
     const AudioFormat& preferred

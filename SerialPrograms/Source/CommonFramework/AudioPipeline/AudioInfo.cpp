@@ -261,18 +261,15 @@ AudioInputChoice reinterpreted_96k_choice(
 
 
 
+AudioInputChoice::~AudioInputChoice() = default;
+AudioInputChoice::AudioInputChoice(const AudioInputChoice& x) = default;
+AudioInputChoice& AudioInputChoice::operator=(const AudioInputChoice& x) = default;
+
 AudioInputChoice::AudioInputChoice(){}
 AudioInputChoice::AudioInputChoice(AudioFormat format)
     : m_format(format)
     , m_physical(format)
 {}
-//  The copy constructor / assignment / destructor are user-provided (here,
-//  where Pimpl.tpp and the full QAudioFormat type are available) so that
-//  translation units passing an AudioInputChoice by value never have to
-//  instantiate the Pimpl<QAudioFormat> members themselves.
-AudioInputChoice::AudioInputChoice(const AudioInputChoice& x) = default;
-AudioInputChoice& AudioInputChoice::operator=(const AudioInputChoice& x) = default;
-AudioInputChoice::~AudioInputChoice() = default;
 bool AudioInputChoice::operator==(const AudioInputChoice& x) const{
     if (is_valid() != x.is_valid()){
         return false;
