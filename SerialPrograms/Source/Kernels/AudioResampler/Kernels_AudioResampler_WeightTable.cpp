@@ -31,6 +31,8 @@ WeightTable::WeightTable(
     size_t tap_block
 )
     : m_taps(taps)
+    , m_sample_block(sample_block)
+    , m_tap_block(tap_block)
 {
     using namespace Kernels::KaiserWindow;
 
