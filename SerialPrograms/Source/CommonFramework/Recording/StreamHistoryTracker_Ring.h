@@ -31,11 +31,10 @@ public:
     StreamHistoryTracker_Ring(
         Logger& logger,
         std::chrono::seconds window,
-        //  The input preset's framing; for this tracker it only gates
-        //  whether audio is enabled at all (audio is always recorded as
-        //  48 kHz stereo, see push_samples()).
-        size_t audio_samples_per_frame,
-        size_t audio_frames_per_second,
+        //  Whether audio is captured at all; this tracker records it at a
+        //  fixed 48 kHz / stereo shape, independent of the input's format
+        //  (see push_samples()).
+        bool has_audio,
         bool has_video
     );
     void set_window(std::chrono::seconds window);
