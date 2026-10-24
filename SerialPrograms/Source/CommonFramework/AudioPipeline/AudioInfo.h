@@ -32,21 +32,6 @@ enum class AudioSampleFormat{
 size_t sample_size(AudioSampleFormat format);
 
 
-enum class AudioChannelFormat{
-    NONE,
-    MONO_48000,
-    DUAL_44100,
-    DUAL_48000,
-    MONO_96000,
-    INTERLEAVE_LR_96000,
-    INTERLEAVE_RL_96000,
-    END_LIST,
-};
-extern const char* AUDIO_FORMAT_LABELS[];
-
-//  Convert our audio format enum to QAudioFormat.
-void set_format(QAudioFormat& native_format, AudioChannelFormat format);
-
 AudioSampleFormat get_sample_format(const QAudioFormat& native_format);
 
 
@@ -74,7 +59,7 @@ private:
 //  that shape relates to what the device physically emits
 //  ("physical_format").
 //
-//  Normal presets are native choices with physical == format. Some capture
+//  Native choices have physical == format. Some capture
 //  cards only expose a 1ch x 96000 stream although they actually deliver
 //  two 48 kHz channels interleaved; for those, in addition to the native
 //  choice, two reinterpreted choices read the same physical stream as
@@ -143,10 +128,6 @@ public:
 
     const std::string& display_name() const;
     const std::string& device_name() const;
-
-    const std::vector<AudioChannelFormat>& supported_formats() const;
-    int preferred_format_index() const;
-    QAudioFormat preferred_format() const;
 
     //  The device-driven format list (see input_choices()). Populated for
     //  input devices only; empty for output devices (the sink opens in its

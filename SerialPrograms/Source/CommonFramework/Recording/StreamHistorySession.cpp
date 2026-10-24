@@ -154,8 +154,6 @@ void StreamHistorySession::clear(){
     Data& data = *m_data;
     data.m_logger.log("Clearing stream history...", COLOR_ORANGE);
     data.m_current.reset();
-//    data.m_audio_format = AudioChannelFormat::NONE;
-//    data.m_has_video = false;
 }
 void StreamHistorySession::initialize(){
     if (!GlobalSettings::instance().STREAM_HISTORY->enabled()){

@@ -28,16 +28,6 @@ namespace PokemonAutomation{
 
 
 
-const char* AUDIO_FORMAT_LABELS[] = {
-    "(none)",
-    "1 x 48,000 Hz (Mono)",
-    "2 x 44,100 Hz (Stereo)",
-    "2 x 48,000 Hz (Stereo)",
-    "1 x 96,000 Hz (Mono)",
-    "1 x 96,000 Hz (Interleaved Stereo L/R)",
-    "1 x 96,000 Hz (Interleaved Stereo R/L)",
-};
-
 size_t sample_size(AudioSampleFormat format){
     switch (format){
     case AudioSampleFormat::UINT8:
@@ -54,47 +44,6 @@ size_t sample_size(AudioSampleFormat format){
 }
 
 
-
-void set_format(QAudioFormat& native_format, AudioChannelFormat format){
-    switch (format){
-    case AudioChannelFormat::MONO_48000:
-        if (native_format.channelConfig() != QAudioFormat::ChannelConfigMono){
-            native_format.setChannelConfig(QAudioFormat::ChannelConfigMono);
-        }
-        if (native_format.sampleRate() != 48000){
-            native_format.setSampleRate(48000);
-        }
-        break;
-    case AudioChannelFormat::DUAL_44100:
-        if (native_format.channelConfig() != QAudioFormat::ChannelConfigStereo){
-            native_format.setChannelConfig(QAudioFormat::ChannelConfigStereo);
-        }
-        if (native_format.sampleRate() != 44100){
-            native_format.setSampleRate(44100);
-        }
-        break;
-    case AudioChannelFormat::DUAL_48000:
-        if (native_format.channelConfig() != QAudioFormat::ChannelConfigStereo){
-            native_format.setChannelConfig(QAudioFormat::ChannelConfigStereo);
-        }
-        if (native_format.sampleRate() != 48000){
-            native_format.setSampleRate(48000);
-        }
-        break;
-    case AudioChannelFormat::MONO_96000:
-    case AudioChannelFormat::INTERLEAVE_LR_96000:
-    case AudioChannelFormat::INTERLEAVE_RL_96000:
-        if (native_format.channelConfig() != QAudioFormat::ChannelConfigMono){
-            native_format.setChannelConfig(QAudioFormat::ChannelConfigMono);
-        }
-        if (native_format.sampleRate() != 96000){
-            native_format.setSampleRate(96000);
-        }
-        break;
-    default:
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid AudioFormat: " + std::to_string((size_t)format));
-    }
-}
 
 AudioSampleFormat get_sample_format(const QAudioFormat& native_format){
     switch (native_format.sampleFormat()){
@@ -505,119 +454,11 @@ std::string format_to_str(const QAudioFormat& format){
 }
 
 
-//  Return a list of our formats that are supported by this device.
-//  "preferred_index" is set to the index of the list that is preferred by the device.
-//  If no preferred format matches our formats, -1 is returned.
-std::vector<AudioChannelFormat> supported_input_formats(
-    int& preferred_index,
-    const NativeAudioInfo& info,
-    const std::string& display_name
-){
-    QAudioFormat preferred_format = info.preferredFormat();
-
-    std::string str = display_name + "\n";
-    str += format_to_str(preferred_format);
-    global_logger_tagged().log(str);
-
-//    preferred_format.setSampleSize(16);
-//    preferred_format.setSampleType(QAudioFormat::SampleType::SignedInt);
-
-    int preferred_channels = preferred_format.channelCount();
-    int preferred_rate = preferred_format.sampleRate();
-
-#if 0
-    cout << "display_name = " << display_name << endl;
-    cout << "channelCount = " << preferred_format.channelCount() << endl;
-    cout << "sampleRate = " << preferred_format.sampleRate() << endl;
-    cout << "sampleFormat = " << (int)preferred_format.sampleFormat() << endl;
-    cout << "preferred_format = " << info.isFormatSupported(preferred_format) << endl;
-
-    for (const QAudioFormat::SampleFormat& format : info.supportedSampleFormats()){
-        cout << "supported format: " << (int)format << endl;
-    }
-#endif
-
-#if 0
-#if QT_VERSION_MAJOR == 6 || (QT_VERSION_MAJOR == 5 && __GNUC__)
-    //  On Qt6, "QAudioFormat::preferredFormat()" always returns stereo 44.1 kHz.
-    //  Unlike Qt5, it does not return the native format of the device
-    //  This actually makes it kind of impossible to figure out what the correct
-    //  format we need to use to give proper stereo. So instead, we just assume
-    //  mono 96000 which will be the case for standard capture cards.
-    preferred_channels = 1;
-    preferred_rate = 96000;
-#endif
-#endif
-
-    std::vector<AudioChannelFormat> ret;
-    preferred_index = -1;
-
-//    bool stereo = false;
-    {
-        QAudioFormat format = preferred_format;
-        set_format(format, AudioChannelFormat::MONO_48000);
-        if (info.isFormatSupported(format)){
-            if (format.channelCount() == preferred_channels && format.sampleRate() == preferred_rate){
-                preferred_index = (int)ret.size();
-            }
-            ret.emplace_back(AudioChannelFormat::MONO_48000);
-        }
-    }
-#if 1
-    {
-        QAudioFormat format = preferred_format;
-        set_format(format, AudioChannelFormat::DUAL_44100);
-        if (info.isFormatSupported(format)){
-            if (format.channelCount() == preferred_channels && format.sampleRate() == preferred_rate){
-                preferred_index = (int)ret.size();
-            }
-            ret.emplace_back(AudioChannelFormat::DUAL_44100);
-//            stereo = true;
-        }
-    }
-    {
-        QAudioFormat format = preferred_format;
-        set_format(format, AudioChannelFormat::DUAL_48000);
-        if (info.isFormatSupported(format)){
-            if (format.channelCount() == preferred_channels && format.sampleRate() == preferred_rate){
-                preferred_index = (int)ret.size();
-            }
-            ret.emplace_back(AudioChannelFormat::DUAL_48000);
-//            stereo = true;
-        }
-    }
-#endif
-
-    {
-        QAudioFormat format = preferred_format;
-        set_format(format, AudioChannelFormat::INTERLEAVE_LR_96000);
-        if (info.isFormatSupported(format)){
-            if (format.channelCount() == preferred_channels && format.sampleRate() == preferred_rate){
-                preferred_index = (int)ret.size();
-                if (display_name.find("MiraBox") != std::string::npos){
-                    preferred_index += 2;
-                }else{
-                    preferred_index += 1;
-                }
-            }
-            ret.emplace_back(AudioChannelFormat::MONO_96000);
-            ret.emplace_back(AudioChannelFormat::INTERLEAVE_LR_96000);
-            ret.emplace_back(AudioChannelFormat::INTERLEAVE_RL_96000);
-        }
-    }
-
-//    cout << "supported formats = " << ret.size() << endl;
-    return ret;
-}
-
 
 
 struct AudioDeviceInfo::Data{
     std::string device_name;    //  For serialization
     std::string display_name;
-
-    std::vector<AudioChannelFormat> supported_formats;
-    int preferred_format_index;
 
     std::vector<AudioInputChoice> supported_choices;
     size_t preferred_choice_index = 0;
@@ -629,23 +470,12 @@ struct AudioDeviceInfo::Data{
 #endif
 };
 std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
-    //  The device list that Qt provides above will include duplicates on Windows
-    //  due to Windows having a shadow device (winMM) that seems to be able to
-    //  resample to all formats.
-    //
-    //  https://bugreports.qt.io/browse/QTBUG-75781
-    //
-    //  What we need to do here it so try to de-dupe the list while keeping the
-    //  ones that actually support the formats we need the best.
-
-    //  To do this, for all duplicates we first determine if any of the have a
-    //  preferred format that matches a format that we want. If there is, we
-    //  immediately throw out all the dupes that don't have a preferred format.
-    //  This eliminates all the winMM devices if the primary can be used instead.
-    //
-    //  Then we throw away all the ones that have fewer supported formats than
-    //  the most. Identical (but different) devices will likely have identical
-    //  names and format support. They won't be deduped.
+    //  Devices that share a display name are deduped: keep the one that
+    //  exposes the most input choices. (Windows used to add a winMM shadow
+    //  device per input, QTBUG-75781 — a Qt5-era artifact that no longer
+    //  occurs on Qt6 — which is why the rule favors the richer entry.
+    //  Identical (but different) devices will likely have identical names
+    //  and choice lists, so they are kept.)
 
     std::vector<AudioDeviceInfo> list;
 
@@ -658,8 +488,6 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
         data.device_name = device.id().toStdString();
         data.display_name = device.description().toStdString();
         data.info = std::move(device);
-
-        data.supported_formats = supported_input_formats(data.preferred_format_index, data.info, data.display_name);
 
         {
             AudioInputChoiceList choices =
@@ -678,26 +506,18 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
         return list;
     }
 
-    //  Get map of best devices.
+    //  Keep only devices that expose the most input choices per display
+    //  name. Duplicates allowed.
     std::map<std::string, size_t> best_devices;
     for (const AudioDeviceInfo& device : list){
         size_t& best_score = best_devices[device.display_name()];
-        size_t current_score = device.supported_formats().size();
-        if (device.preferred_format_index() >= 0){
-            current_score += 100;
-        }
-        best_score = std::max(best_score, current_score);
+        best_score = std::max(best_score, device.supported_choices().size());
     }
 
-    //  Keep only devices with the most # of formats. Duplicates allowed.
     std::vector<AudioDeviceInfo> ret;
     for (AudioDeviceInfo& device : list){
         size_t best_score = best_devices.find(device.display_name())->second;
-        size_t current_score = device.supported_formats().size();
-        if (device.preferred_format_index() >= 0){
-            current_score += 100;
-        }
-        if (current_score >= best_score || show_all_devices){
+        if (device.supported_choices().size() >= best_score || show_all_devices){
             ret.emplace_back(std::move(device));
         }
     }
@@ -705,20 +525,10 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
     return ret;
 }
 std::vector<AudioDeviceInfo> AudioDeviceInfo::all_output_devices(){
-    //  The device list that Qt provides above will include duplicates on Windows
-    //  due to Windows having a shadow device (winMM) that seems to be able to
-    //  resample to all formats.
-    //
-    //  https://bugreports.qt.io/browse/QTBUG-75781
-    //
-    //  What we need to do here it so try to de-dupe the list while keeping the
-    //  ones that actually support the formats we need the best.
-
-    //  To do this, for all duplicates we throw away the ones that have fewer
-    //  supported formats than the most. Identical (but different) devices will
-    //  likely have identical names and format support. They won't be deduped.
-    //
-    //  This method will keep the winMM device which we want for audio output.
+    //  Devices that share a display name are deduped: keep the first one.
+    //  (Windows used to add a winMM shadow device per output, QTBUG-75781 —
+    //  a Qt5-era artifact that no longer occurs on Qt6. Identical (but
+    //  different) devices will likely have identical names, so they are kept.)
 
     std::vector<AudioDeviceInfo> list;
 
@@ -735,8 +545,6 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_output_devices(){
         data.device_name = device.id().toStdString();
         data.display_name = std::move(name);
         data.info = std::move(device);
-
-        data.preferred_format_index = -1;
     }
 
     bool show_all_devices = GlobalSettings::instance().AUDIO_PIPELINE->SHOW_ALL_DEVICES;
@@ -794,25 +602,11 @@ const std::string& AudioDeviceInfo::display_name() const{
 const std::string& AudioDeviceInfo::device_name() const{
     return m_body->device_name;
 }
-const std::vector<AudioChannelFormat>& AudioDeviceInfo::supported_formats() const{
-    return m_body->supported_formats;
-}
-int AudioDeviceInfo::preferred_format_index() const{
-    return m_body->preferred_format_index;
-}
 const std::vector<AudioInputChoice>& AudioDeviceInfo::supported_choices() const{
     return m_body->supported_choices;
 }
 size_t AudioDeviceInfo::preferred_choice_index() const{
     return m_body->preferred_choice_index;
-}
-QAudioFormat AudioDeviceInfo::preferred_format() const{
-    QAudioFormat format = native_info().preferredFormat();
-    int index = preferred_format_index();
-    if (index >= 0){
-        set_format(format, supported_formats()[index]);
-    }
-    return format;
 }
 const NativeAudioInfo& AudioDeviceInfo::native_info() const{
     return m_body->info;
