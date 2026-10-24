@@ -286,6 +286,17 @@ jobs:
           cd Arduino-Source/SerialPrograms/bin
           ./SerialPrograms.app/Contents/MacOS/SerialPrograms --command-line-test-mode
 
+      # The list of files that passed clang-query, from the latest run on this branch or on main.
+      # See .github/scripts/clang-query-cached.py. Unlike ccache, every run saves it: it is only
+      # about 100 KB, and a PR's next push then checks only the files that changed since.
+      - name: Restore clang query cache
+        if: inputs.run-clang-query
+        uses: actions/cache/restore@v6
+        with:
+          path: Arduino-Source/clang-query-passed.txt
+          key: clang-query-${{github.run_id}}-${{github.run_attempt}}
+          restore-keys: clang-query-
+
       - name: Run clang query
         if: inputs.run-clang-query
         shell: bash
@@ -332,23 +343,17 @@ jobs:
           )
           EOF
 
-          # Run one batch of files per core. clang-query parses every file it's given before
-          # matching and keeps all those ASTs in memory, so keep batches small. Each batch writes
-          # its own file so the output of batches running at the same time can't interleave.
-          # A file compiled into more than one target has one entry per target, and clang-query
-          # already checks every entry of each file it's given, so list each file only once.
-          mkdir clang-query-batches
+          # Check each source file in batches, one batch per core, and skip the files that passed
+          # before with the same file, headers, compile command, query and tools.
           status=0
-          jq -r '.[].file' SerialPrograms/bin/compile_commands.json | sort -u |
-            xargs --delimiter='\n' --max-args=10 --max-procs="$(nproc)" \
-              sh -c 'clang-query -p SerialPrograms/bin/ -f query.txt "$@" > "$(mktemp clang-query-batches/XXXXXX)" 2>&1' sh ||
+          python3 .github/scripts/clang-query-cached.py --build-dir SerialPrograms/bin \
+            --query query.txt --cache clang-query-passed.txt --output clang-query-output.txt ||
             status=$?
-          cat clang-query-batches/* > clang-query-output.txt
           echo "Clang query output (begin)"
           cat clang-query-output.txt
           echo "Clang query output (end)"
           if [[ $status -ne 0 ]]; then
-            echo "::error::clang-query failed on some files (xargs exit code $status). See the output above."
+            echo "::error::clang-query failed on some files (exit code $status). See the output above."
             exit 1
           fi
           if grep --silent "Match #" clang-query-output.txt; then
@@ -358,6 +363,13 @@ jobs:
             echo "::error You can read more about the exact error with the artifact below."
             exit 1
           fi
+
+      - name: Save clang query cache
+        if: always() && inputs.run-clang-query && hashFiles('Arduino-Source/clang-query-passed.txt') != ''
+        uses: actions/cache/save@v6
+        with:
+          path: Arduino-Source/clang-query-passed.txt
+          key: clang-query-${{github.run_id}}-${{github.run_attempt}}
 
       - name: Upload Clang query output
         uses: actions/upload-artifact@v7
