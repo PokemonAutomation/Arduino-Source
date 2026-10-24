@@ -31,18 +31,18 @@ class AudioDecoderWorker;
 // is problematic as it will consume lots of memory. But the purpose of this functionality
 // is to load recorded audio for testing and developing audio inference programs.
 // So the input audio files should be small.
-// You can also call `loadFullAudio()` to load the audio directly into memory.
+// You can also call `load_full_audio()` to load the audio directly into memory.
 //
 // For .wav files the loader streams the file's native format (rate, channels,
-// sample type): the caller is expected to set `audioFormat` to the file's own
+// sample type): the caller is expected to set `audio_format` to the file's own
 // format (see probe_wav_native_format()), so the timer paces at the file's rate
 // and the raw bytes are emitted unconverted.
 // For .mp3 (and other compressed formats) the caller probes the decoder's
 // native output format (see probe_decoded_native_format()) and sets
-// `audioFormat` to it, so QAudioDecoder decodes to that format (an identity
+// `audio_format` to it, so QAudioDecoder decodes to that format (an identity
 // conversion) and the decoded bytes are emitted at the file's native rate.
-// loadFullAudio() is the batch "convert to the requested format" API: it
-// converts the sample type and channels to `audioFormat`, but not the sample
+// load_full_audio() is the batch "convert to the requested format" API: it
+// converts the sample type and channels to `audio_format`, but not the sample
 // rate, which must already match (its consumer, loadAudioTemplate, assumes the
 // returned data is at the requested rate).
 class AudioFileLoader: public QObject{
@@ -52,14 +52,14 @@ public:
     AudioFileLoader(
         QObject* parent,
         const std::string& filename,
-        const QAudioFormat& audioFormat
+        const QAudioFormat& audio_format
     );
     virtual ~AudioFileLoader();
 
     // Start loading and decoding audio samples.
-    // Send the sample buffers at the desired speed determined by sample rate in `audioFormat` passed
+    // Send the sample buffers at the desired speed determined by sample rate in `audio_format` passed
     // to the constructor.
-    // Retrieve sample buffer by connecting to signal `bufferReady` from the same thread.
+    // Retrieve sample buffer by connecting to signal `buffer_ready` from the same thread.
     // See comments of the class full more details.
     bool start();
 
@@ -67,55 +67,55 @@ public:
     // the decoded audio data. If loading fails, the returned pointer is nullptr.
     // Note: this is a blocking operation.
     // See comments of the class full more details.
-    std::tuple<const char*, size_t> loadFullAudio();
+    std::tuple<const char*, size_t> load_full_audio();
 
-    const QAudioFormat& audioFormat() const { return m_audioFormat; }
+    const QAudioFormat& audio_format() const { return m_audio_format; }
 
 signals:
     // Send audio sample buffer at time interval `m_timer_interval_ms` after `start()` called
     // Pass raw pointer. So must be connected to objects in the same thread!
-    void bufferReady(const char* data, size_t len);
+    void buffer_ready(const char* data, size_t len);
 
     // When finished sending decoded audio frames after `start()` called
     void finished();
 
     // Used privately to launch audio decoder woker in a separate thread.
-    void runAudioDecoderAsync();
+    void run_audio_decoder_async();
 
 private:
-    void buildTimer();
+    void build_timer();
     
-    bool initWavFile();
+    bool init_wav_file();
 
-    // Send audio samples decoded from m_audioDecoder on m_timer.
-    void sendDecodedBufferOnTimer();
+    // Send audio samples decoded from m_audio_decoder on m_timer.
+    void send_decoded_buffer_on_timer();
 
-    // Convert raw samples read from m_wavFile (stored in m_rawBuffer) into
+    // Convert raw samples read from m_wav_file (stored in m_raw_buffer) into
     // float type and return the pointer and length of the converted data.
-    std::pair<const char*, size_t> convertRawWavSamples();
+    std::pair<const char*, size_t> convert_raw_wav_samples();
 
-    // Send audio samples read fomr m_wavFile on m_timer.
-    void sendBufferFromWavFileOnTimer();
+    // Send audio samples read fomr m_wav_file on m_timer.
+    void send_buffer_from_wav_file_on_timer();
 
 private:
     std::string m_filename;
 
-    QAudioFormat m_audioFormat;
+    QAudioFormat m_audio_format;
 
-    AudioDecoderWorker* m_audioDecoderWorker = nullptr;
+    AudioDecoderWorker* m_audio_decoder_worker = nullptr;
 //    QThread m_audioDecoderThread;
 
-    WavFile* m_wavFile = nullptr;
+    WavFile* m_wav_file = nullptr;
 
-    // Buffer to store raw audio data from m_wavFile or output from m_audioDecoderWorker
-    std::vector<char> m_rawBuffer;
+    // Buffer to store raw audio data from m_wav_file or output from m_audio_decoder_worker
+    std::vector<char> m_raw_buffer;
 
-    // Since m_wavFile only reads raw audio file, we need to do sample type conversion ourselves.
+    // Since m_wav_file only reads raw audio file, we need to do sample type conversion ourselves.
     // Therefore we need a buffer to store converted audio samples.
-    std::vector<float> m_floatBuffer;
+    std::vector<float> m_float_buffer;
 
-    // When reading m_rawBuffer, which index to start reading.
-    size_t m_bufferNext = 0;
+    // When reading m_raw_buffer, which index to start reading.
+    size_t m_buffer_next = 0;
 
     // To playback the decoded audio frames at sample rate, we need a timer.
     QTimer* m_timer = nullptr;
@@ -139,8 +139,8 @@ public:
     AudioDecoderWorker(
         QObject* parent,
         const std::string& filename,
-        const QAudioFormat& audioFormat,
-        std::vector<char>& decodedBuffer
+        const QAudioFormat& audio_format,
+        std::vector<char>& decoded_buffer
     );
     virtual ~AudioDecoderWorker();
 
@@ -148,7 +148,7 @@ public:
         QMetaObject::invokeMethod(this, &AudioDecoderWorker::internal_start);
     }
 
-    bool startSucceeded(){ return m_startSucceeded; }
+    bool start_succeeded(){ return m_start_succeeded; }
 
     void stop(){
         QMetaObject::invokeMethod(this, &AudioDecoderWorker::internal_stop);
@@ -163,23 +163,23 @@ public slots:
     void internal_start();
     void internal_stop();
 
-    // Read decoded buffer sent from m_audioDecoder and store it into m_decodedBuffer.
-    void readAudioDecoderBuffer();
+    // Read decoded buffer sent from m_audio_decoder and store it into m_decoded_buffer.
+    void read_audio_decoder_buffer();
 
 private:
-    // Handle error from m_audioDecoder.
-    void handleAudioDecoderError();
+    // Handle error from m_audio_decoder.
+    void handle_audio_decoder_error();
 
 private:
 
     std::string m_filename;
-    QAudioFormat m_audioFormat;
+    QAudioFormat m_audio_format;
 
-    QAudioDecoder* m_audioDecoder = nullptr;
+    QAudioDecoder* m_audio_decoder = nullptr;
 
-    std::vector<char>& m_decodedBuffer;
+    std::vector<char>& m_decoded_buffer;
 
-    bool m_startSucceeded = true;
+    bool m_start_succeeded = true;
 };
 
 

@@ -27,66 +27,66 @@ namespace PokemonAutomation{
 AudioFileLoader::AudioFileLoader(
     QObject* parent,
     const std::string& filename,
-    const QAudioFormat& audioFormat
+    const QAudioFormat& audio_format
 ):
-    QObject(parent), m_filename(filename), m_audioFormat(audioFormat) {}
+    QObject(parent), m_filename(filename), m_audio_format(audio_format) {}
 
 AudioFileLoader::~AudioFileLoader(){
-    if (m_audioDecoderWorker){
-        m_audioDecoderWorker->stop();
+    if (m_audio_decoder_worker){
+        m_audio_decoder_worker->stop();
     }
 
-    GlobalThreadPools::qt_event_threadpool().remove_object(m_audioDecoderWorker);
+    GlobalThreadPools::qt_event_threadpool().remove_object(m_audio_decoder_worker);
 //    m_audioDecoderThread.quit();
 //    m_audioDecoderThread.wait();
 
-//    if (m_audioDecoderWorker){
-//        delete m_audioDecoderWorker;
-        m_audioDecoderWorker = nullptr;
+//    if (m_audio_decoder_worker){
+//        delete m_audio_decoder_worker;
+        m_audio_decoder_worker = nullptr;
 //    }
 
-    if (m_wavFile){
-        m_wavFile->close();
-        delete m_wavFile;
-        m_wavFile = nullptr;
+    if (m_wav_file){
+        m_wav_file->close();
+        delete m_wav_file;
+        m_wav_file = nullptr;
     }
 }
 
 bool AudioFileLoader::start(){
 
-    m_frames_per_timeout = m_audioFormat.sampleRate() * m_timer_interval_ms / 1000;
+    m_frames_per_timeout = m_audio_format.sampleRate() * m_timer_interval_ms / 1000;
 
     if (has_extension(m_filename, "wav")){
         // Use WavFile to load unencoded samples:
-        if (!initWavFile()){
+        if (!init_wav_file()){
             return false;
         }
 
-        const QAudioFormat& wavAudioFormat = m_wavFile->audioFormat();
+        const QAudioFormat& wav_audio_format = m_wav_file->audioFormat();
         //  Up to 8 channels: that is the range with a standard channel
         //  layout (the mixer's fallback_channel_config), which is what the
         //  tree's mix matrix is built from. Beyond that the tree cannot
         //  mix the input, so the file is rejected up front.
-        if (wavAudioFormat.channelCount() > 8){
+        if (wav_audio_format.channelCount() > 8){
             std::cout << "Error: audio file input supports up to 8 channels; the wav file has "
-                << wavAudioFormat.channelCount() << " channels." << std::endl;
+                << wav_audio_format.channelCount() << " channels." << std::endl;
             return false;
         }
 
         //  The loader streams the wav's native format: the caller
-        //  (AudioInputFile) sets m_audioFormat to the file's own format
+        //  (AudioInputFile) sets m_audio_format to the file's own format
         //  (probed from the header), so m_frames_per_timeout paces the timer
         //  at the file's sample rate and the raw bytes are emitted as-is.
-        buildTimer();
-        connect(m_timer, &QTimer::timeout, this, &AudioFileLoader::sendBufferFromWavFileOnTimer);
+        build_timer();
+        connect(m_timer, &QTimer::timeout, this, &AudioFileLoader::send_buffer_from_wav_file_on_timer);
         
         return true;
     }
 
     // Use QAudioDecoder to decode compressed audio file:
-    m_audioDecoderWorker = static_cast<AudioDecoderWorker*>(
+    m_audio_decoder_worker = static_cast<AudioDecoderWorker*>(
         GlobalThreadPools::qt_event_threadpool().add_object([this]{
-            return std::make_unique<AudioDecoderWorker>(nullptr, m_filename, m_audioFormat, m_rawBuffer);
+            return std::make_unique<AudioDecoderWorker>(nullptr, m_filename, m_audio_format, m_raw_buffer);
         })
     );
 
@@ -95,32 +95,32 @@ bool AudioFileLoader::start(){
     // Note: here we save all the decoded raw samples to memory before sending them out.
     // For a large audio file this is problematic, will consume lots of memory. But for small audio
     // files this is OK.
-    connect(m_audioDecoderWorker, &AudioDecoderWorker::finished, this, [&](){
+    connect(m_audio_decoder_worker, &AudioDecoderWorker::finished, this, [&](){
         std::cout << "Audio decoder finishes decoding. Start playing audio at desired sample rate" << std::endl;
-        if (m_rawBuffer.empty()){
+        if (m_raw_buffer.empty()){
             std::cout << "Error: audio decoder produced no audio data for " << m_filename
                 << " (the decoder could not find usable audio in the file; nothing to play)." << std::endl;
             return;
         }
-        buildTimer();
-        connect(m_timer, &QTimer::timeout, this, &AudioFileLoader::sendDecodedBufferOnTimer);
+        build_timer();
+        connect(m_timer, &QTimer::timeout, this, &AudioFileLoader::send_decoded_buffer_on_timer);
     });
 
-    emit m_audioDecoderWorker->start();
+    emit m_audio_decoder_worker->start();
 
-    return m_audioDecoderWorker->startSucceeded();
+    return m_audio_decoder_worker->start_succeeded();
 }
 
-void AudioFileLoader::buildTimer(){
+void AudioFileLoader::build_timer(){
     m_timer = new QTimer(this);
     m_timer->setTimerType(Qt::PreciseTimer);
     m_timer->start((int)m_timer_interval_ms);
 }
 
-std::tuple<const char*, size_t> AudioFileLoader::loadFullAudio(){
+std::tuple<const char*, size_t> AudioFileLoader::load_full_audio(){
     if (has_extension(m_filename, "wav")){
         // Use WavFile to load unencoded samples:
-        if (!initWavFile()){
+        if (!init_wav_file()){
             return std::make_tuple<const char*, size_t>(nullptr, 0);
         }
 
@@ -128,95 +128,95 @@ std::tuple<const char*, size_t> AudioFileLoader::loadFullAudio(){
         //  requested format, but not the sample rate: its consumer
         //  (loadAudioTemplate) assumes the returned data is at the requested
         //  rate.
-        if (m_wavFile->audioFormat().sampleRate() != m_audioFormat.sampleRate()){
-            std::cout << "Error: loadFullAudio() requires the wav file's sample rate ("
-                << m_wavFile->audioFormat().sampleRate() << ") to match the requested sample rate ("
-                << m_audioFormat.sampleRate() << "); it does not resample." << std::endl;
+        if (m_wav_file->audioFormat().sampleRate() != m_audio_format.sampleRate()){
+            std::cout << "Error: load_full_audio() requires the wav file's sample rate ("
+                << m_wav_file->audioFormat().sampleRate() << ") to match the requested sample rate ("
+                << m_audio_format.sampleRate() << "); it does not resample." << std::endl;
             return std::make_tuple<const char*, size_t>(nullptr, 0);
         }
 
-        const size_t numBytes = m_wavFile->size() - m_wavFile->pos();
-        m_rawBuffer.resize(numBytes);
-        const size_t bytesRead = m_wavFile->read(m_rawBuffer.data(), numBytes);
-        if (bytesRead != numBytes){
-            std::cout << "Error: failed to read all bytes from wav file: " << bytesRead << " < " << numBytes << std::endl;
+        const size_t num_bytes = m_wav_file->size() - m_wav_file->pos();
+        m_raw_buffer.resize(num_bytes);
+        const size_t bytes_read = m_wav_file->read(m_raw_buffer.data(), num_bytes);
+        if (bytes_read != num_bytes){
+            std::cout << "Error: failed to read all bytes from wav file: " << bytes_read << " < " << num_bytes << std::endl;
         }
-        return convertRawWavSamples();
+        return convert_raw_wav_samples();
     }
 
     // Use QAudioDecoder to decode compressed audio file:
-    m_audioDecoderWorker = static_cast<AudioDecoderWorker*>(
+    m_audio_decoder_worker = static_cast<AudioDecoderWorker*>(
         GlobalThreadPools::qt_event_threadpool().add_object([this]{
-            return std::make_unique<AudioDecoderWorker>(nullptr, m_filename, m_audioFormat, m_rawBuffer);
+            return std::make_unique<AudioDecoderWorker>(nullptr, m_filename, m_audio_format, m_raw_buffer);
         })
     );
-//    m_audioDecoderWorker = new AudioDecoderWorker(nullptr, m_filename, m_audioFormat, m_rawBuffer);
-//    m_audioDecoderWorker->moveToThread(&m_audioDecoderThread);
+//    m_audio_decoder_worker = new AudioDecoderWorker(nullptr, m_filename, m_audio_format, m_raw_buffer);
+//    m_audio_decoder_worker->moveToThread(&m_audioDecoderThread);
 
-    connect(this, &AudioFileLoader::runAudioDecoderAsync, m_audioDecoderWorker, &AudioDecoderWorker::start);
-//    connect(&m_audioDecoderThread, &QThread::finished, m_audioDecoderWorker, &QObject::deleteLater);
+    connect(this, &AudioFileLoader::run_audio_decoder_async, m_audio_decoder_worker, &AudioDecoderWorker::start);
+//    connect(&m_audioDecoderThread, &QThread::finished, m_audio_decoder_worker, &QObject::deleteLater);
 
     QEventLoop loop;
-    connect(m_audioDecoderWorker, &AudioDecoderWorker::errored, &loop, &QEventLoop::quit);
-    connect(m_audioDecoderWorker, &AudioDecoderWorker::finished, &loop, &QEventLoop::quit);
+    connect(m_audio_decoder_worker, &AudioDecoderWorker::errored, &loop, &QEventLoop::quit);
+    connect(m_audio_decoder_worker, &AudioDecoderWorker::finished, &loop, &QEventLoop::quit);
 
-    // m_audioDecoderThread takes care of m_audioDecoderWorker via finished -> deleteLater connection.
-    // So we don't hold the pointer m_audioDecoderWorker anymore.
-    m_audioDecoderWorker = nullptr;
+    // m_audioDecoderThread takes care of m_audio_decoder_worker via finished -> deleteLater connection.
+    // So we don't hold the pointer m_audio_decoder_worker anymore.
+    m_audio_decoder_worker = nullptr;
 
 //    m_audioDecoderThread.start();
-    emit runAudioDecoderAsync();
+    emit run_audio_decoder_async();
 
-    // Block the current thread until the m_audioDecoderWorker errored or finished.
+    // Block the current thread until the m_audio_decoder_worker errored or finished.
     loop.exec();
-    if (m_rawBuffer.empty()){
+    if (m_raw_buffer.empty()){
         std::cout << "Error: audio decoder produced no audio data for " << m_filename
             << " (the decoder could not find usable audio in the file)." << std::endl;
     }
     
 //    m_audioDecoderThread.quit();
 //    m_audioDecoderThread.wait();
-    GlobalThreadPools::qt_event_threadpool().remove_object(m_audioDecoderWorker);
-    return std::make_tuple<const char*, size_t>(m_rawBuffer.data(), m_rawBuffer.size());
+    GlobalThreadPools::qt_event_threadpool().remove_object(m_audio_decoder_worker);
+    return std::make_tuple<const char*, size_t>(m_raw_buffer.data(), m_raw_buffer.size());
 }
 
-bool AudioFileLoader::initWavFile(){
+bool AudioFileLoader::init_wav_file(){
     std::cout << "Initialize WavFile on " << m_filename << std::endl;
-    m_wavFile = new WavFile(this);
-    if (m_wavFile->open(QString::fromStdString(m_filename)) == false){
+    m_wav_file = new WavFile(this);
+    if (m_wav_file->open(QString::fromStdString(m_filename)) == false){
         std::cout << "Error: WavFile cannot open file " << m_filename << std::endl;
         return false;
     }
 
-    std::cout << "Wav file audio format: " << dump_audio_format(m_wavFile->audioFormat());
+    std::cout << "Wav file audio format: " << dump_audio_format(m_wav_file->audioFormat());
 
     //  The wav's native rate / channels / sample type are the stream's
     //  format: the caller (AudioInputFile) probes the header and sets
-    //  m_audioFormat to the file's own format, so the raw bytes stream
-    //  through unconverted at the file's rate. (loadFullAudio() keeps the
+    //  m_audio_format to the file's own format, so the raw bytes stream
+    //  through unconverted at the file's rate. (load_full_audio() keeps the
     //  "convert to the requested format" behavior for its batch consumer.)
 
     return true;
 }
 
 
-void AudioFileLoader::sendDecodedBufferOnTimer(){
-    const int bytesPerFrame = m_audioFormat.bytesPerFrame();
-    const size_t bytesToSend = bytesPerFrame * m_frames_per_timeout;
+void AudioFileLoader::send_decoded_buffer_on_timer(){
+    const int bytes_per_frame = m_audio_format.bytesPerFrame();
+    const size_t bytes_to_send = bytes_per_frame * m_frames_per_timeout;
 
-    const auto& buffer = m_rawBuffer;
+    const auto& buffer = m_raw_buffer;
 
-    const size_t m_bufferEnd = std::min(m_bufferNext + bytesToSend, buffer.size());
+    const size_t buffer_end = std::min(m_buffer_next + bytes_to_send, buffer.size());
 
-//    const float* floatData = reinterpret_cast<const float*>(buffer.data() + m_bufferNext);
-    // std::cout << "Timer: " << floatData[0] << " " << floatData[1] << "... " << buffer.size() << " " << m_bufferNext << std::endl;
+//    const float* float_data = reinterpret_cast<const float*>(buffer.data() + m_buffer_next);
+    // std::cout << "Timer: " << float_data[0] << " " << float_data[1] << "... " << buffer.size() << " " << m_buffer_next << std::endl;
 
-    const size_t sentLen = m_bufferEnd - m_bufferNext;
-    emit bufferReady(buffer.data() + m_bufferNext, sentLen);
+    const size_t sent_len = buffer_end - m_buffer_next;
+    emit buffer_ready(buffer.data() + m_buffer_next, sent_len);
 
-    m_bufferNext = m_bufferEnd;
+    m_buffer_next = buffer_end;
 
-    if (m_bufferEnd == buffer.size()){
+    if (buffer_end == buffer.size()){
         if (m_timer){
             m_timer->stop();
         }
@@ -224,15 +224,15 @@ void AudioFileLoader::sendDecodedBufferOnTimer(){
     }
 }
 
-void AudioFileLoader::sendBufferFromWavFileOnTimer(){
-    const QAudioFormat& wavAudioFormat = m_wavFile->audioFormat();
-    const int wavBytesPerFrame = wavAudioFormat.bytesPerFrame();
-    const int wavBytesToRead = (int)(wavBytesPerFrame * m_frames_per_timeout);
-    m_rawBuffer.resize(wavBytesToRead);
-    const int64_t wavBytesRead = m_wavFile->read(m_rawBuffer.data(), wavBytesToRead);
-    m_rawBuffer.resize(wavBytesRead);
+void AudioFileLoader::send_buffer_from_wav_file_on_timer(){
+    const QAudioFormat& wav_audio_format = m_wav_file->audioFormat();
+    const int wav_bytes_per_frame = wav_audio_format.bytesPerFrame();
+    const int wav_bytes_to_read = (int)(wav_bytes_per_frame * m_frames_per_timeout);
+    m_raw_buffer.resize(wav_bytes_to_read);
+    const int64_t wav_bytes_read = m_wav_file->read(m_raw_buffer.data(), wav_bytes_to_read);
+    m_raw_buffer.resize(wav_bytes_read);
 
-    if (wavBytesRead == 0){
+    if (wav_bytes_read == 0){
         if (m_timer){
             m_timer->stop();
         }
@@ -242,86 +242,86 @@ void AudioFileLoader::sendBufferFromWavFileOnTimer(){
 
     //  The file's native format is the stream's format, so the raw bytes are
     //  emitted as-is (no conversion).
-    emit bufferReady(m_rawBuffer.data(), (size_t)wavBytesRead);
+    emit buffer_ready(m_raw_buffer.data(), (size_t)wav_bytes_read);
 }
 
-std::pair<const char*, size_t> AudioFileLoader::convertRawWavSamples(){
-    const QAudioFormat& wavAudioFormat = m_wavFile->audioFormat();
+std::pair<const char*, size_t> AudioFileLoader::convert_raw_wav_samples(){
+    const QAudioFormat& wav_audio_format = m_wav_file->audioFormat();
 
-    const size_t wavBytesRead = m_rawBuffer.size();
+    const size_t wav_bytes_read = m_raw_buffer.size();
     
     // Simple case, the target audio format is the same as the format used in the wav file.
-    if (m_audioFormat == wavAudioFormat){
-        return {m_rawBuffer.data(), wavBytesRead};
+    if (m_audio_format == wav_audio_format){
+        return {m_raw_buffer.data(), wav_bytes_read};
     }
 
     // Now we need to convert the audio samples to the target format:
 
-    const size_t wavBytesPerFrame = wavAudioFormat.bytesPerFrame();
-    const size_t wavNumChannels = wavAudioFormat.channelCount();
-    const size_t wavBytesPerSample = wavBytesPerFrame / wavNumChannels;
-    const size_t framesRead = wavBytesRead / wavBytesPerFrame;
-    const size_t samplesRead = wavBytesRead / wavBytesPerSample;
+    const size_t wav_bytes_per_frame = wav_audio_format.bytesPerFrame();
+    const size_t wav_num_channels = wav_audio_format.channelCount();
+    const size_t wav_bytes_per_sample = wav_bytes_per_frame / wav_num_channels;
+    const size_t frames_read = wav_bytes_read / wav_bytes_per_frame;
+    const size_t samples_read = wav_bytes_read / wav_bytes_per_sample;
 
-    // m_floatBuffer holds the converted float-type samples
+    // m_float_buffer holds the converted float-type samples
     // TODO: design a general format conversion method
-    m_floatBuffer.resize(samplesRead);
-    convert_samples_to_float(wavAudioFormat, m_rawBuffer.data(), wavBytesRead, m_floatBuffer.data());
+    m_float_buffer.resize(samples_read);
+    convert_samples_to_float(wav_audio_format, m_raw_buffer.data(), wav_bytes_read, m_float_buffer.data());
     
-    if (m_audioFormat.channelCount() == wavAudioFormat.channelCount()){
+    if (m_audio_format.channelCount() == wav_audio_format.channelCount()){
         return {
-            reinterpret_cast<const char*>(m_floatBuffer.data()),
-            m_floatBuffer.size() * sizeof(float)
+            reinterpret_cast<const char*>(m_float_buffer.data()),
+            m_float_buffer.size() * sizeof(float)
         };
     }
     
-    if(m_audioFormat.channelCount() == 1){
+    if(m_audio_format.channelCount() == 1){
         // Input wav file has stereo or more channels, but output format is mono,
         // average L and R channel samples per frame:
-        for (size_t i = 0; i < framesRead; i++){
-            m_floatBuffer[i] = (m_floatBuffer[2*i] + m_floatBuffer[2*i+1]) / 2.0f;
+        for (size_t i = 0; i < frames_read; i++){
+            m_float_buffer[i] = (m_float_buffer[2*i] + m_float_buffer[2*i+1]) / 2.0f;
         }
-        return {reinterpret_cast<const char*>(m_floatBuffer.data()), framesRead * sizeof(float)};
+        return {reinterpret_cast<const char*>(m_float_buffer.data()), frames_read * sizeof(float)};
     }
     
-    if(wavAudioFormat.channelCount() == 1){
+    if(wav_audio_format.channelCount() == 1){
         // Input wav is mono but output format is stereo,
         // Duplicate samples for each channel:
-        m_floatBuffer.resize(samplesRead * m_audioFormat.channelCount());
-        for (size_t i = samplesRead; i-- > 0;){
-            const float v = m_floatBuffer[i];
-            for (int j = m_audioFormat.channelCount()-1; j >= 0; j--){
-                m_floatBuffer[m_audioFormat.channelCount()*i+j] = v;
+        m_float_buffer.resize(samples_read * m_audio_format.channelCount());
+        for (size_t i = samples_read; i-- > 0;){
+            const float v = m_float_buffer[i];
+            for (int j = m_audio_format.channelCount()-1; j >= 0; j--){
+                m_float_buffer[m_audio_format.channelCount()*i+j] = v;
             }
         }
         return {
-            reinterpret_cast<const char*>(m_floatBuffer.data()),
-            framesRead * m_audioFormat.channelCount() * sizeof(float)
+            reinterpret_cast<const char*>(m_float_buffer.data()),
+            frames_read * m_audio_format.channelCount() * sizeof(float)
         };
     }
     
     std::cout << "Error format conversion" << std::endl;
-    std::cout << "Wav file format: " << dump_audio_format(wavAudioFormat);
-    std::cout << "Audio format to convert to: " << dump_audio_format(m_audioFormat);
-    return {reinterpret_cast<const char*>(m_floatBuffer.data()), 0};
+    std::cout << "Wav file format: " << dump_audio_format(wav_audio_format);
+    std::cout << "Audio format to convert to: " << dump_audio_format(m_audio_format);
+    return {reinterpret_cast<const char*>(m_float_buffer.data()), 0};
 }
 
 
 AudioDecoderWorker::AudioDecoderWorker(
     QObject* parent,
     const std::string& filename,
-    const QAudioFormat& audioFormat,
-    std::vector<char>& decodedBuffer
+    const QAudioFormat& audio_format,
+    std::vector<char>& decoded_buffer
 ):
-    QObject(parent), m_filename(filename), m_audioFormat(audioFormat), m_decodedBuffer(decodedBuffer){}
+    QObject(parent), m_filename(filename), m_audio_format(audio_format), m_decoded_buffer(decoded_buffer){}
 
 
 void AudioDecoderWorker::internal_start(){
-    m_audioDecoder = new QAudioDecoder(this);
+    m_audio_decoder = new QAudioDecoder(this);
 
 #if 0
     connect(
-        m_audioDecoder, &QAudioDecoder::bufferAvailableChanged,
+        m_audio_decoder, &QAudioDecoder::bufferAvailableChanged,
         this, [](bool available){
             std::cout << "QAudioDecoder::bufferAvailableChanged(): " << available << std::endl;
         }
@@ -330,7 +330,7 @@ void AudioDecoderWorker::internal_start(){
 
 #if QT_VERSION_MAJOR == 5
     connect(
-        m_audioDecoder, &QAudioDecoder::stateChanged,
+        m_audio_decoder, &QAudioDecoder::stateChanged,
         this, [this](QAudioDecoder::State state){
             std::cout << "QAudioDecoder::stateChanged(): " << (int)state << std::endl;
             emit this->finished();
@@ -338,20 +338,20 @@ void AudioDecoderWorker::internal_start(){
     );
 #endif
 
-    // Whenever a new buffer of audo frames decoded, save them by calling readAudioDecoderBuffer().
-    connect(m_audioDecoder, &QAudioDecoder::bufferReady, this, &AudioDecoderWorker::readAudioDecoderBuffer);
+    // Whenever a new buffer of audo frames decoded, save them by calling read_audio_decoder_buffer().
+    connect(m_audio_decoder, &QAudioDecoder::bufferReady, this, &AudioDecoderWorker::read_audio_decoder_buffer);
 
     // When the decoder finishes decoding the entire file, launch a timer to send decoded audio
     // frames to outside at desired frame rate.
     // Note: here we save all the decoded raw samples to memory before sending them out.
     // For a large audio file this is problematic, will consume lots of memory. But for small audio
     // files this is OK.
-    connect(m_audioDecoder, &QAudioDecoder::finished, this, &AudioDecoderWorker::finished);
+    connect(m_audio_decoder, &QAudioDecoder::finished, this, &AudioDecoderWorker::finished);
 
-    m_audioDecoder->setAudioFormat(m_audioFormat);
-    if (m_audioDecoder->error() != QAudioDecoder::NoError){
-        handleAudioDecoderError();
-        m_startSucceeded = false;
+    m_audio_decoder->setAudioFormat(m_audio_format);
+    if (m_audio_decoder->error() != QAudioDecoder::NoError){
+        handle_audio_decoder_error();
+        m_start_succeeded = false;
         return;
     }
 
@@ -359,21 +359,21 @@ void AudioDecoderWorker::internal_start(){
     // defaultServiceProvider::requestService(): no service found for - "org.qt-project.qt.audiodecode"
     // The QAudioDecoder object does not have a valid service
     // For solution, see https://stackoverflow.com/questions/22783381/qaudiodecoder-no-service-found
-    connect(m_audioDecoder, QOverload<QAudioDecoder::Error>::of(&QAudioDecoder::error), this, [&](QAudioDecoder::Error){
-        handleAudioDecoderError();
+    connect(m_audio_decoder, QOverload<QAudioDecoder::Error>::of(&QAudioDecoder::error), this, [&](QAudioDecoder::Error){
+        handle_audio_decoder_error();
     });
 
-    // m_audioDecoder->setSourceDevice(&m_file);
+    // m_audio_decoder->setSourceDevice(&m_file);
 #if QT_VERSION_MAJOR == 5
-    m_audioDecoder->setSourceFilename(QString::fromStdString(m_filename));
+    m_audio_decoder->setSourceFilename(QString::fromStdString(m_filename));
 #elif QT_VERSION_MAJOR == 6
-    m_audioDecoder->setSource(QUrl::fromLocalFile(QString::fromStdString(m_filename)));
+    m_audio_decoder->setSource(QUrl::fromLocalFile(QString::fromStdString(m_filename)));
 #endif
 
-    m_audioDecoder->start();
+    m_audio_decoder->start();
     std::cout << "Start audio decoder." << std::endl;
 
-    m_startSucceeded = true;
+    m_start_succeeded = true;
     return;
 }
 
@@ -382,58 +382,58 @@ AudioDecoderWorker::~AudioDecoderWorker(){
 }
 
 void AudioDecoderWorker::internal_stop(){
-    if (m_audioDecoder){
-        m_audioDecoder->stop();
+    if (m_audio_decoder){
+        m_audio_decoder->stop();
     }
 }
 
-void AudioDecoderWorker::readAudioDecoderBuffer(){
-    if (m_audioDecoder == nullptr){
+void AudioDecoderWorker::read_audio_decoder_buffer(){
+    if (m_audio_decoder == nullptr){
         return;
     }
 
-    const QAudioBuffer& buffer = m_audioDecoder->read();
-    size_t oldSize = m_decodedBuffer.size();
-    m_decodedBuffer.resize(oldSize + buffer.byteCount());
-    memcpy(m_decodedBuffer.data() + oldSize, buffer.data<char>(), buffer.byteCount());
+    const QAudioBuffer& buffer = m_audio_decoder->read();
+    size_t old_size = m_decoded_buffer.size();
+    m_decoded_buffer.resize(old_size + buffer.byteCount());
+    memcpy(m_decoded_buffer.data() + old_size, buffer.data<char>(), buffer.byteCount());
 
 #ifdef DEBUG_AUDIO_DECODER_WORKER
     std::cout << "Read QAudioBuffer (size " << buffer.byteCount() << ") from audio decoder, cur pos " <<
-        m_audioDecoder->position() << " ms, total length " << m_audioDecoder->duration() << " ms, " << 
-        "buffer length now " << m_decodedBuffer.size() << std::endl;
+        m_audio_decoder->position() << " ms, total length " << m_audio_decoder->duration() << " ms, " << 
+        "buffer length now " << m_decoded_buffer.size() << std::endl;
 #endif
 }
 
 
-void AudioDecoderWorker::handleAudioDecoderError(){
-    if (m_audioDecoder){
-        QAudioDecoder::Error error = m_audioDecoder->error();
-        std::string errorStr;
+void AudioDecoderWorker::handle_audio_decoder_error(){
+    if (m_audio_decoder){
+        QAudioDecoder::Error error = m_audio_decoder->error();
+        std::string error_str;
         switch(error){
         case QAudioDecoder::ResourceError:
-            errorStr = "ResourceError";
+            error_str = "ResourceError";
             break;
         case QAudioDecoder::AccessDeniedError:
-            errorStr = "AccessDeniedError";
+            error_str = "AccessDeniedError";
             break;
         case QAudioDecoder::FormatError:
-            errorStr = "FormatError";
+            error_str = "FormatError";
             break;
 #if QT_VERSION_MAJOR == 5
         case QAudioDecoder::ServiceMissingError:
-            errorStr = "ServiceMissingError";
+            error_str = "ServiceMissingError";
             break;
 #elif QT_VERSION_MAJOR == 6
         case QAudioDecoder::NotSupportedError:
-            errorStr = "NotSupportedError";
+            error_str = "NotSupportedError";
             break;
 #endif
         default:
-            errorStr = "UnownError";
+            error_str = "UnownError";
         }
 
         std::cout << "QAudioDecoder error when loading file: " << m_filename << ", " <<
-            errorStr << ": " << m_audioDecoder->errorString().toStdString() << std::endl;
+            error_str << ": " << m_audio_decoder->errorString().toStdString() << std::endl;
 
         emit errored();
     }

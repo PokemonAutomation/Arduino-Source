@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 //
 //  Registers the WAV-native file input tests: WavFile header parsing
 //  (PCM 8/16/32-bit and IEEE-float), probe_wav_native_format(), and
-//  AudioFileLoader::loadFullAudio()'s batch conversion. The test WAVs are
+//  AudioFileLoader::load_full_audio()'s batch conversion. The test WAVs are
 //  generated on the fly in the system temp directory; no audio I/O is
 //  involved.
 //
