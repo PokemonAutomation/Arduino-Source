@@ -2424,6 +2424,8 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonSV/Options/PokemonSV_BattleMoveTable.h
     Source/VideoGames/PokemonSV/Options/PokemonSV_BBQOption.cpp
     Source/VideoGames/PokemonSV/Options/PokemonSV_BBQOption.h
+    Source/VideoGames/PokemonSV/Options/PokemonSV_BBQuests.cpp
+    Source/VideoGames/PokemonSV/Options/PokemonSV_BBQuests.h
     Source/VideoGames/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.cpp
     Source/VideoGames/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.h
     Source/VideoGames/PokemonSV/Options/PokemonSV_EncounterActionsTable.cpp

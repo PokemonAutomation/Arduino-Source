@@ -27,7 +27,6 @@
 #include "VideoGames/PokemonSV/Programs/PokemonSV_WorldNavigation.h"
 #include "VideoGames/PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_Terarium.h"
-#include "PokemonSV_BlueberryQuests.h"
 
 #include<vector>
 #include "PokemonSV_BlueberryCatchPhoto.h"
