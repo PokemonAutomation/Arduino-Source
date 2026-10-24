@@ -55,7 +55,7 @@ void AudioSource::remove_raw_listener(Kernels::AudioPipeline::RawAudioStreamList
 }
 
 
-AudioSource::~AudioSource(){}
+AudioSource::~AudioSource() = default;
 
 AudioSource::AudioSource(
     Logger& logger,
@@ -103,6 +103,7 @@ AudioSource::AudioSource(
         stream_format = AudioSampleFormat::FLOAT32;
     }
     m_stream_format = stream_format;
+
     //  Only the interleaved presets misreport the card's two 48 kHz
     //  channels as a 1ch x 96000 stream; MONO_96000 is a true 96 kHz mono
     //  stream and keeps that shape. This is a capture-card hardware quirk,
@@ -111,7 +112,13 @@ AudioSource::AudioSource(
     const bool reinterpret_96k =
         format == AudioChannelFormat::INTERLEAVE_LR_96000
         || format == AudioChannelFormat::INTERLEAVE_RL_96000;
-    m_input_device = std::make_unique<AudioInputDevice>(logger, native_info, native_format, reinterpret_96k);
+
+    m_input_device = std::make_unique<AudioInputDevice>(
+        logger,
+        native_info,
+        native_format,
+        reinterpret_96k
+    );
 }
 
 
