@@ -59,6 +59,7 @@ public:
 class EggRng : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
     using Descriptor = EggRng_Descriptor;
+    ~EggRng();
     EggRng();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
     virtual void start_program_border_check(

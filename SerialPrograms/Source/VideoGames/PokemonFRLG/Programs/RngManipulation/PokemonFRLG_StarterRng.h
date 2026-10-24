@@ -30,9 +30,10 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class StarterRng : public SingleSwitchProgramInstance{
+class StarterRng : public SingleSwitchProgramInstance, private ConfigOption::Listener{
 public:
     using Descriptor = StarterRng_Descriptor;
+    ~StarterRng();
     StarterRng();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
     virtual void start_program_border_check(
@@ -41,6 +42,8 @@ public:
     ) override{}
 
 private:
+    virtual void on_config_value_changed(void* object) override;
+
     enum class Starter{
         bulbasaur,
         squirtle,
