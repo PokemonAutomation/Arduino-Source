@@ -43,7 +43,7 @@ class AudioDecoderWorker;
 // conversion) and the decoded bytes are emitted at the file's native rate.
 // load_full_audio() is the batch "convert to the requested format" API: it
 // converts the sample type and channels to `audio_format`, but not the sample
-// rate, which must already match (its consumer, loadAudioTemplate, assumes the
+// rate, which must already match (its consumer, load_audio_template, assumes the
 // returned data is at the requested rate).
 class AudioFileLoader: public QObject{
     Q_OBJECT

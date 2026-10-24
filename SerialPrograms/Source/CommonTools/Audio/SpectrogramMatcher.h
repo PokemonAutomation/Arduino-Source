@@ -35,7 +35,7 @@ public:
     };
 
     // audioTemplate: the audio template for the audio stream to match against.
-    //  Use AudioTemplate::loadAudioTemplate() to load a template from disk, or
+    //  Use AudioTemplate::load_audio_template() to load a template from disk, or
     //  use AudioTemplateCache::instance().get_throw(audioResourceRelativePath, sample_rate) to get one from cache.
     // mode: which type of spectrogram filtering to use before the actual match.
     // sample_rate: audio sample rate.

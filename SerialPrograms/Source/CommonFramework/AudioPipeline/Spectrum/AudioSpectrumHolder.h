@@ -72,7 +72,7 @@ public:
 public:
     // Development usage: save the FFT results to disk so that it can be examined
     // and edited to be used as samples for future audio matching.
-    void saveAudioFrequenciesToDisk(bool enable);
+    void save_audio_frequencies_to_disk(bool enable);
 
 
 private:
@@ -96,9 +96,9 @@ private:
     std::unique_ptr<Spectrograph> m_spectrograph;
 
     // The timestamp of each window that's been visualized.
-    std::vector<uint64_t> m_freqVisStamps;
-    // The index of the next window in m_freqVisBlocks.
-    size_t m_nextFFTWindowIndex = 0;
+    std::vector<uint64_t> m_freq_vis_stamps;
+    // The index of the next window in m_freq_vis_blocks.
+    size_t m_next_fft_window_index = 0;
 
     // record the past FFT output frequencies to serve as the interface
     // of audio inference for automation programs.
@@ -110,8 +110,8 @@ private:
     size_t m_spectrum_stamp_start = 0;
 
     // Develop purpose: used to save received frequencies to disk
-    bool m_saveFreqToDisk = false;
-    std::ofstream m_freqStream;
+    bool m_save_freq_to_disk = false;
+    std::ofstream m_freq_stream;
 
     // The inference boxes <box starting stamp, box end stamp, box color>
     // to highlight FFT windows on spectrogram. Used to tell user which part
