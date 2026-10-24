@@ -71,13 +71,9 @@ StreamHistorySession::StreamHistorySession(Logger& logger)
     , m_data(CONSTRUCT_TOKEN, logger)
 {}
 void StreamHistorySession::start(
-    const AudioDeviceInfo& device, AudioChannelFormat format, bool has_video
+    const AudioInputChoice& choice, bool has_video
 ){
     Data& data = *m_data;
-    AudioInputChoice choice =
-        device
-            ? resolve_input_choice(device.supported_choices(), format)
-            : AudioInputChoice();
     {
         WriteSpinLock lg(data.m_lock);
         if (!data.m_current){
@@ -191,7 +187,7 @@ void StreamHistorySession::pre_input_change(){
     WriteSpinLock lg(data.m_lock);
     clear();
 }
-void StreamHistorySession::post_input_change(const std::string& file, const AudioDeviceInfo& device, AudioChannelFormat format){
+void StreamHistorySession::post_input_change(const std::string& file, const AudioDeviceInfo& device, const AudioInputChoice& choice){
 //    cout << "post_input_change()" << endl;
     Data& data = *m_data;
     AudioSession* audio_session;
@@ -207,10 +203,7 @@ void StreamHistorySession::post_input_change(const std::string& file, const Audi
     }
     {
         WriteSpinLock lg(data.m_lock);
-        data.m_audio_choice =
-            device
-                ? resolve_input_choice(device.supported_choices(), format)
-                : AudioInputChoice();
+        data.m_audio_choice = choice;
         initialize();
     }
     attach_working_listener();

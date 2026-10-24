@@ -85,6 +85,9 @@ class AudioInputChoice{
 public:
     AudioInputChoice();                     //  invalid
     AudioInputChoice(AudioFormat format);    //  native: physical == format
+    AudioInputChoice(const AudioInputChoice& x);
+    AudioInputChoice& operator=(const AudioInputChoice& x);
+    ~AudioInputChoice();
 
     static AudioInputChoice reinterpreted(
         AudioFormat format, AudioFormat physical, bool swap_channels
@@ -92,6 +95,8 @@ public:
 
     bool is_valid() const;
     explicit operator bool() const;
+
+    bool operator==(const AudioInputChoice& x) const;
 
     const AudioFormat& format() const;          //  what the pipeline consumes
     const AudioFormat& physical_format() const; //  what the device emits
@@ -137,21 +142,6 @@ struct AudioInputChoiceList{
 AudioInputChoiceList input_choices(
     std::vector<AudioFormat> supported,
     const AudioFormat& preferred
-);
-
-//
-//  Resolves a legacy preset (AudioChannelFormat) to one of the device's
-//  input choices: the native choice with the preset's (rate, channels)
-//  shape, or, for INTERLEAVE_LR/RL_96000, the reinterpreted 2ch x 48000
-//  choice with the matching channel order. When the device's choice list
-//  carries no reinterpreted entry but does support 1ch x 96000, the
-//  reinterpreted choice is built from that native entry, matching the
-//  behavior of the legacy preset path. Returns an invalid choice when the
-//  device does not offer the preset's shape (and for NONE / END_LIST).
-//
-AudioInputChoice resolve_input_choice(
-    const std::vector<AudioInputChoice>& choices,
-    AudioChannelFormat format
 );
 
 

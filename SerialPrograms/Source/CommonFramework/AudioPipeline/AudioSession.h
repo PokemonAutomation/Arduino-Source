@@ -33,7 +33,7 @@ class AudioSession final : public AudioFeed, private FFTListener, private Watchd
 public:
     struct StateListener{
         virtual void pre_input_change(){}
-        virtual void post_input_change(const std::string& file, const AudioDeviceInfo& device, AudioChannelFormat format){}
+        virtual void post_input_change(const std::string& file, const AudioDeviceInfo& device, const AudioInputChoice& choice){}
         virtual void post_output_change(const AudioDeviceInfo& device){}
         virtual void post_volume_change(double volume){}
         virtual void post_display_change(AudioOption::AudioDisplayType display){}
@@ -58,7 +58,7 @@ public:
     void load(const AudioOption& option);
 
     std::pair<std::string, AudioDeviceInfo> input_device() const;
-    AudioChannelFormat input_format() const;
+    AudioInputChoice input_choice() const;
 
     AudioDeviceInfo output_device() const;
     double output_volume() const;
@@ -69,7 +69,7 @@ public:
     void clear_audio_input();
     void set_audio_input(std::string file);
     void set_audio_input(AudioDeviceInfo info);
-    void set_format(AudioChannelFormat format);
+    void set_input_choice(const AudioInputChoice& choice);
 
     void clear_audio_output();
     void set_audio_output(AudioDeviceInfo info);
@@ -88,7 +88,7 @@ private:
     virtual void on_fft(size_t sample_rate, std::shared_ptr<const AlignedVector<float>> fft_output) override;
     virtual void on_watchdog_timeout() override;
 
-    bool sanitize_format();
+    bool sanitize_choice();
 
     void signal_pre_input_change();
     void signal_post_input_change();
