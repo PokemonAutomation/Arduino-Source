@@ -32,6 +32,12 @@ from dataclasses import dataclass
 # Bit positions, mirroring the C++ `enum Button` in
 # SerialPrograms/Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h.
 # Do not edit by hand; tests/test_buttons.py checks these against the C++ enum.
+# 
+# Why we define these dictionaries in python instead of using the C++ enum directly:
+# - allows this package to be usable without the compiled pybind module. e.g. running unit tests
+# - enables IDE syntax highlighting, type checking, since IDEs can't look inside the
+# compiled pybind binary
+# - drift between the C++ and the dictionaries is prevented with tests/test_buttons.py checks
 BUTTON_BITS: dict[str, int] = {
     "Y": 1 << 0,
     "B": 1 << 1,
