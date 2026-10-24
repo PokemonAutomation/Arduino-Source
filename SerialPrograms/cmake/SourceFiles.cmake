@@ -536,11 +536,6 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/AudioPipeline/Tools/AudioFormatUtils.cpp
     Source/CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h
     Source/CommonFramework/AudioPipeline/Tools/AudioNormalization.h
-    Source/CommonFramework/AudioPipeline/Tools/TimeSampleBuffer.cpp
-    Source/CommonFramework/AudioPipeline/Tools/TimeSampleBuffer.h
-    Source/CommonFramework/AudioPipeline/Tools/TimeSampleBufferReader.cpp
-    Source/CommonFramework/AudioPipeline/Tools/TimeSampleBufferReader.h
-    Source/CommonFramework/AudioPipeline/Tools/TimeSampleWriter.h
     Source/CommonFramework/AudioPipeline/UI/AudioDisplayWidget.cpp
     Source/CommonFramework/AudioPipeline/UI/AudioDisplayWidget.h
     Source/CommonFramework/AudioPipeline/UI/AudioSelectorWidget.cpp
@@ -1067,10 +1062,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/AudioResampler/Kernels_AudioResampler_Tests.h
     Source/Kernels/AudioResampler/Kernels_AudioResampler_WeightTable.cpp
     Source/Kernels/AudioResampler/Kernels_AudioResampler_WeightTable.h
-    Source/Kernels/AudioStreamConversion/AudioStreamConversion.cpp
-    Source/Kernels/AudioStreamConversion/AudioStreamConversion.h
-    Source/Kernels/AudioStreamConversion/AudioStreamConversion_Core_Default.cpp
-    Source/Kernels/AudioStreamConversion/AudioStreamConversion_Core_x86_SSE41.cpp
     Source/Kernels/AudioStreamConverter/Kernels_AudioStreamConverter.cpp
     Source/Kernels/AudioStreamConverter/Kernels_AudioStreamConverter.h
     Source/Kernels/AudioStreamConverter/Kernels_AudioStreamConverter_Kernels_ARM64_NEON.cpp
