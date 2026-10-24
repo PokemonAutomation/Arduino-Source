@@ -9,9 +9,9 @@ far has executed, and `cancel_all_and_wait()` to drop anything still queued and
 release all inputs (waiting for the device to confirm the neutral state).
 
 Example:
-    from pokemon_automation import SwitchController
+    from pokemon_automation import SwitchProController
 
-    with SwitchController("/dev/cu.usbserial-0001") as sw:
+    with SwitchProController("/dev/cu.usbserial-0001") as sw:
         sw.push_button("A")                              # tap A
         sw.push_button("L+R", hold_ms=200)               # press L and R together
         sw.push_dpad("up")                               # d-pad up
@@ -68,7 +68,7 @@ def _check_nonnegative(**kwargs: int) -> None:
             raise ValueError(f"{name} must not be negative, got {value}.")
 
 
-class SwitchController:
+class SwitchProController:
     """A Switch controller on a PABotBase2 device (ESP32/Pico running PA firmware).
 
     `port` is the serial port, e.g. "/dev/cu.usbserial-0001" on macOS,
@@ -299,7 +299,7 @@ class SwitchController:
         except Exception:  # noqa: BLE001 - best effort: the connection is dropped anyway
             pass
 
-    def __enter__(self) -> SwitchController:
+    def __enter__(self) -> SwitchProController:
         return self
 
     def __exit__(self, *exc: object) -> None:

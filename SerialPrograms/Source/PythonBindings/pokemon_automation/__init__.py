@@ -8,15 +8,15 @@ Layers (each built on the one below):
   SerialPrograms/Source/Integrations/PybindSwitchProController.h). Build it
   from SerialPrograms with `-DPA_PYTHON_BINDINGS=ON` (see the README next to
   this package).
-- `SwitchController`: the Python API on top of it, with button names instead of
+- `SwitchProController`: the Python API on top of it, with button names instead of
   bitfields. `fake.FakeController` implements the same backend interface for
   testing without hardware.
 
 Quick start:
-    from pokemon_automation import SwitchController, list_serial_ports
+    from pokemon_automation import SwitchProController, list_serial_ports
 
     print(list_serial_ports())
-    with SwitchController("/dev/cu.usbserial-0001") as sw:
+    with SwitchProController("/dev/cu.usbserial-0001") as sw:
         sw.push_button("A")
         sw.push_dpad("up+right")
         sw.push_left_joystick((0.0, 1.0), hold_ms=1500)
@@ -34,7 +34,7 @@ from .buttons import (
     parse_stick,
     parse_stick_pair,
 )
-from .controller import SwitchController
+from .controller import SwitchProController
 from .devices import list_serial_ports
 from .fake import FakeController
 
@@ -45,7 +45,7 @@ __all__ = [
     "DPAD_POSITIONS",
     "FakeController",
     "ParsedButtons",
-    "SwitchController",
+    "SwitchProController",
     "check_against_core",
     "list_serial_ports",
     "parse_buttons",

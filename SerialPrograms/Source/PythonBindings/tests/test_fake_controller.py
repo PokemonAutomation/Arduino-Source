@@ -1,4 +1,4 @@
-#  SwitchController on top of a FakeController (no hardware, no compiled module).
+#  SwitchProController on top of a FakeController (no hardware, no compiled module).
 #  The command names match the backend (`_pa_core.Controller`), which mirrors the
 #  C++ interface of `NintendoSwitch::PybindSwitchProController`
 #  (SerialPrograms/Source/Integrations/PybindSwitchProController.h), bound by
@@ -8,33 +8,33 @@ import time
 
 import pytest
 
-from pokemon_automation import BUTTON_BITS, DPAD_NONE, DPAD_POSITIONS, FakeController, SwitchController
+from pokemon_automation import BUTTON_BITS, DPAD_NONE, DPAD_POSITIONS, FakeController, SwitchProController
 
 
 def make():
-    """Create a SwitchController on a fresh FakeController and return both, so tests can inspect the recorded commands."""
+    """Create a SwitchProController on a fresh FakeController and return both, so tests can inspect the recorded commands."""
     fake = FakeController()
-    sw = SwitchController(backend=fake)
+    sw = SwitchProController(backend=fake)
     return sw, fake
 
 
 def test_requires_port_or_backend():
-    """Constructing a SwitchController without a port or backend raises ValueError."""
+    """Constructing a SwitchProController without a port or backend raises ValueError."""
     with pytest.raises(ValueError):
-        SwitchController()
+        SwitchProController()
 
 
 def test_empty_port_rejected():
     """An empty port string is rejected like no port at all."""
     with pytest.raises(ValueError, match="non-empty"):
-        SwitchController("")
+        SwitchProController("")
 
 
 def test_not_ready_raises():
     """The constructor raises RuntimeError when the backend is not ready within the timeout."""
     fake = FakeController(ready=False)
     with pytest.raises(RuntimeError, match="not ready"):
-        SwitchController(backend=fake, timeout_s=0.1)
+        SwitchProController(backend=fake, timeout_s=0.1)
 
 
 def test_status_and_name_match_backend():
@@ -224,7 +224,7 @@ def test_command_while_closing_is_rejected():
     """close() flags the controller before the cancel finishes, so a command that starts
     while the cancel is in flight is rejected instead of being queued after it."""
     fake = FakeController()
-    sw = SwitchController(backend=fake)
+    sw = SwitchProController(backend=fake)
     cancelling = threading.Event()
     cancel_calls = 0
 
@@ -248,7 +248,7 @@ def test_command_while_closing_is_rejected():
 def test_context_manager():
     """The context manager closes the controller on exit; commands after that raise."""
     fake = FakeController()
-    with SwitchController(backend=fake) as sw:
+    with SwitchProController(backend=fake) as sw:
         sw.push_button("A")
     with pytest.raises(RuntimeError, match="closed"):
         sw.push_button("A")

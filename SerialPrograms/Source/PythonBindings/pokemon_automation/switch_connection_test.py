@@ -14,12 +14,12 @@ import argparse
 import sys
 
 from . import _core, devices
-from .controller import SwitchController
+from .controller import SwitchProController
 
 
 def try_port(port: str) -> bool:
     try:
-        with SwitchController(port, timeout_s=5.0) as sw:
+        with SwitchProController(port, timeout_s=5.0) as sw:
             print(f"Connected to {port}")
             print(f"  status:  {sw.current_status()}")
             print(f"  name:    {sw.controller_name() or '(unknown)'}")

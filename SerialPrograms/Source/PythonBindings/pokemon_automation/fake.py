@@ -1,7 +1,7 @@
 """A fake controller for testing without hardware.
 
 `FakeController` implements the same interface as `_pa_core.Controller` and
-records every command it receives, so `SwitchController` and friends can be
+records every command it receives, so `SwitchProController` and friends can be
 exercised in unit tests. It needs no compiled module.
 
 C++ reference: the interface it mirrors is the binding of

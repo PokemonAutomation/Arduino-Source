@@ -3,7 +3,7 @@
 A basic Python interface for the microcontroller, built with [pybind11](https://github.com/pybind/pybind11).
 It lets Python act as a Nintendo Switch controller through a PABotBase2 serial
 device, using the `NintendoSwitch::PybindSwitchProController` class from CoreLib
-(`Source/Integrations/PybindSwitchController.h`).
+(`Source/Integrations/PybindSwitchProController.h`).
 
 ## Layout
 
@@ -13,7 +13,7 @@ device, using the `NintendoSwitch::PybindSwitchProController` class from CoreLib
 - `PythonBindings.cmake` — builds the module (linked against CoreLib only: no
   Qt, OpenCV, ONNX Runtime or Tesseract).
 - `pokemon_automation/` — the Python package on top of it:
-  - `controller.py` — `SwitchController`: the user-facing API, with button names
+  - `controller.py` — `SwitchProController`: the user-facing API, with button names
     instead of bitfields (`push_button("L+R")`, `push_dpad("up")`, ...). Its
     command methods match the names of `_pa_core.Controller`.
   - `buttons.py` — parsing of button / d-pad / stick names into bitfields.
@@ -105,7 +105,7 @@ within the `tests` folder.
 The tests that need the compiled module are skipped when `_pa_core` has not been built.
 
 ## Controller Commands
-The command methods of `SwitchController` match the names of the backend they wrap
+The command methods of `SwitchProController` match the names of the backend they wrap
 (`_pa_core.Controller` from PythonBindings_Module.cpp, and with it the C++ 
 `PybindSwitchProController` methods). Here's a brief description of some of the
 controller functions:
