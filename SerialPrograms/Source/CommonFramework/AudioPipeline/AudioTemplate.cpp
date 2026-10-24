@@ -33,40 +33,40 @@ AudioTemplate& AudioTemplate::operator=(const AudioTemplate&) = default;
 
 AudioTemplate::AudioTemplate(){}
 AudioTemplate::AudioTemplate(size_t frequencies, size_t windows)
-    : m_numWindows(windows)
-    , m_numFrequencies(frequencies)
+    : m_num_windows(windows)
+    , m_num_frequencies(frequencies)
     , m_bytes_per_spectrum(Kernels::align_int_up<PA_ALIGNMENT>(frequencies * sizeof(float)))
     , m_spectrogram(windows * (m_bytes_per_spectrum / sizeof(float)))
 {}
 
 
-AudioTemplate loadAudioTemplate(const std::string& filename, size_t sample_rate){
-    QAudioFormat outputAudioFormat;
-    outputAudioFormat.setChannelCount(1);
+AudioTemplate load_audio_template(const std::string& filename, size_t sample_rate){
+    QAudioFormat output_audio_format;
+    output_audio_format.setChannelCount(1);
 #if QT_VERSION_MAJOR == 5
-    outputAudioFormat.setCodec("audio/pcm");
+    output_audio_format.setCodec("audio/pcm");
 #endif
-    outputAudioFormat.setSampleRate((int)sample_rate);
-    set_sample_format_to_float(outputAudioFormat);
+    output_audio_format.setSampleRate((int)sample_rate);
+    set_sample_format_to_float(output_audio_format);
 
     AudioTemplate audio_template;
 
     GlobalThreadPools::qt_worker_threadpool().run_and_wait([&]{
-        AudioFileLoader loader(nullptr, filename, outputAudioFormat);
+        AudioFileLoader loader(nullptr, filename, output_audio_format);
         const auto ret = loader.load_full_audio();
         const float* data = reinterpret_cast<const float*>(std::get<0>(ret));
-        size_t numSamples = std::get<1>(ret) / sizeof(float);
-    //    cout << "numSamples = " << numSamples << endl;
+        size_t num_samples = std::get<1>(ret) / sizeof(float);
+    //    cout << "num_samples = " << num_samples << endl;
 
         if (data == nullptr){
             return;
         }
 
-        size_t numFrequencies = NUM_FFT_SAMPLES / 2;
+        size_t num_frequencies = NUM_FFT_SAMPLES / 2;
         AlignedVector<float> input_buffer(NUM_FFT_SAMPLES);
-        AlignedVector<float> output_buffer(numFrequencies);
+        AlignedVector<float> output_buffer(num_frequencies);
 
-        size_t numWindows = 0;
+        size_t num_windows = 0;
 
         const float* kaiser_weights = GlobalSettings::instance().AUDIO_PIPELINE->USE_KAISER_WINDOW
             ? Kernels::KaiserWindow::get_kaiser_window_k(FFT_LENGTH_POWER_OF_TWO)
@@ -75,25 +75,25 @@ AudioTemplate loadAudioTemplate(const std::string& filename, size_t sample_rate)
         // If sample count < FFT input requirement, we pad zeros in the end to do one FFT.
         // Otherwise, we don't pad zeros and compute FFT as much as possible using fixed
         // window step.
-        if (numSamples < NUM_FFT_SAMPLES){
-            numWindows = 1;
-            audio_template = AudioTemplate(numFrequencies, 1);
+        if (num_samples < NUM_FFT_SAMPLES){
+            num_windows = 1;
+            audio_template = AudioTemplate(num_frequencies, 1);
 
             memset(input_buffer.data(), 0, sizeof(float) * NUM_FFT_SAMPLES);
-            memcpy(input_buffer.data(), data, sizeof(float) * numSamples);
+            memcpy(input_buffer.data(), data, sizeof(float) * num_samples);
             Kernels::AbsFFT::fft_abs(
                 FFT_LENGTH_POWER_OF_TWO,
                 output_buffer.data(),
                 input_buffer.data(),
                 kaiser_weights
             );
-            memcpy(audio_template.getWindow(0), output_buffer.data(), sizeof(float) * numFrequencies);
+            memcpy(audio_template.get_window(0), output_buffer.data(), sizeof(float) * num_frequencies);
         }else{
-            numWindows = (numSamples - NUM_FFT_SAMPLES) / FFT_SLIDING_WINDOW_STEP + 1;
-            audio_template = AudioTemplate(numFrequencies, numWindows);
+            num_windows = (num_samples - NUM_FFT_SAMPLES) / FFT_SLIDING_WINDOW_STEP + 1;
+            audio_template = AudioTemplate(num_frequencies, num_windows);
 
-            for (size_t i = 0, start = 0; start+NUM_FFT_SAMPLES <= numSamples; i++, start += FFT_SLIDING_WINDOW_STEP){
-                assert(i < numWindows);
+            for (size_t i = 0, start = 0; start+NUM_FFT_SAMPLES <= num_samples; i++, start += FFT_SLIDING_WINDOW_STEP){
+                assert(i < num_windows);
                 memcpy(input_buffer.data(), data + start, sizeof(float) * NUM_FFT_SAMPLES);
                 Kernels::AbsFFT::fft_abs(
                     FFT_LENGTH_POWER_OF_TWO,
@@ -101,13 +101,13 @@ AudioTemplate loadAudioTemplate(const std::string& filename, size_t sample_rate)
                     input_buffer.data(),
                     kaiser_weights
                 );
-                memcpy(audio_template.getWindow(i), output_buffer.data(), sizeof(float) * numFrequencies);
+                memcpy(audio_template.get_window(i), output_buffer.data(), sizeof(float) * num_frequencies);
             }
         }
 
 
         std::stringstream ss;
-        ss << "Built audio template with sample rate " << sample_rate << ", " << numWindows << " windows and " << numFrequencies <<
+        ss << "Built audio template with sample rate " << sample_rate << ", " << num_windows << " windows and " << num_frequencies <<
             " frequencies from " << filename;
         global_logger_tagged().log(ss.str());
     });

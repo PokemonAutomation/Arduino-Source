@@ -156,8 +156,8 @@ void search_alpha_roar_from_audio_dump(){
         const auto& path = file_list[fileIdx];
         std::ostringstream os;
         os << "File " << fileIdx << "/" << file_list.size() << " " << path << " ";
-        AudioTemplate audio = loadAudioTemplate(path);
-        if (audio.numWindows() == 0){
+        AudioTemplate audio = load_audio_template(path);
+        if (audio.num_windows() == 0){
             os << "Fail" << std::endl;
             fout << os.str();
             std::cout << os.str() << std::flush;
@@ -166,18 +166,18 @@ void search_alpha_roar_from_audio_dump(){
 
         // audio.scale(2.0);
 
-        os << "#W " << audio.numWindows() << " ";
+        os << "#W " << audio.num_windows() << " ";
 
         // match!
         float minScore = FLT_MAX;
         std::vector<AudioSpectrum> new_spectrums;
-        size_t numStreamWindows = std::max(matcher.numMatchedWindows(), audio.numWindows());
+        size_t numStreamWindows = std::max(matcher.num_matched_windows(), audio.num_windows());
         for (size_t audioIdx = 0; audioIdx < numStreamWindows; audioIdx++){
             new_spectrums.clear();
-            AlignedVector<float> freqVector(audio.numFrequencies());
-            if (audioIdx < audio.numWindows()){
-                const float * freq = audio.getWindow(audioIdx);
-                memcpy(freqVector.data(), freq, sizeof(float) * audio.numFrequencies());
+            AlignedVector<float> freqVector(audio.num_frequencies());
+            if (audioIdx < audio.num_windows()){
+                const float * freq = audio.get_window(audioIdx);
+                memcpy(freqVector.data(), freq, sizeof(float) * audio.num_frequencies());
             }else{
                 // add zero-freq window
             }

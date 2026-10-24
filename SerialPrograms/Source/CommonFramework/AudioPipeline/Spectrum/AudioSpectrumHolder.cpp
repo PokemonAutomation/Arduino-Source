@@ -27,7 +27,7 @@ AudioSpectrumHolder::AudioSpectrumHolder()
 //    , m_num_freq_visualization_blocks(384)
 //    , m_freq_visualization_block_boundaries(m_num_freq_visualization_blocks + 1)
 //    , m_spectrograph(m_num_freq_visualization_blocks, m_num_freq_windows)
-    , m_freqVisStamps(m_num_freq_windows)
+    , m_freq_vis_stamps(m_num_freq_windows)
 {
     // We will display frequencies in log scale, so need to convert
     // log scale: 0, 1/m_numFreqVisBlocks, 2/m_numFreqVisBlocks, ..., 1.0
@@ -40,10 +40,10 @@ AudioSpectrumHolder::AudioSpectrumHolder()
 
     boundaries[0] = 1;
     for (size_t i = 1; i < blocks - 1; i++){
-//        const float logValue = i / (float)m_numFreqVisBlocks;
-//        float linearValue = (std::exp(logValue * LOG_SCALE_MAX) - 1.f) / 10.f;
-//        linearValue = std::max(std::min(linearValue, 1.0f), 0.0f);
-//        boundaries[i] = std::min(size_t(linearValue * m_num_freqs + 0.5), m_num_freqs);
+//        const float log_value = i / (float)m_numFreqVisBlocks;
+//        float linear_value = (std::exp(log_value * LOG_SCALE_MAX) - 1.f) / 10.f;
+//        linear_value = std::max(std::min(linear_value, 1.0f), 0.0f);
+//        boundaries[i] = std::min(size_t(linear_value * m_num_freqs + 0.5), m_num_freqs);
 
         //  (384 / 8 = 48) give us 48 bars per octave.
         const float x = (float)i / blocks;
@@ -91,7 +91,7 @@ AudioSpectrumHolder::AudioSpectrumHolder()
 //    }
 //    cout << endl;
 
-    // saveAudioFrequenciesToDisk(true);
+    // save_audio_frequencies_to_disk(true);
 
     m_spectrograph.reset(new Spectrograph(blocks, m_num_freq_windows));
     m_last_spectrum.timestamp = current_time();
@@ -111,7 +111,7 @@ void AudioSpectrumHolder::clear(){
     {
         std::lock_guard<Mutex> lg(m_state_lock);
 
-        m_freqVisStamps.assign(m_freqVisStamps.size(), SIZE_MAX);
+        m_freq_vis_stamps.assign(m_freq_vis_stamps.size(), SIZE_MAX);
 
         {
             // update m_spectrum_stamp_start in case the audio widget is used
@@ -138,7 +138,7 @@ void AudioSpectrumHolder::clear(){
 
 
 // TODO: move this to a common lib folder:
-PA_FORCE_INLINE uint32_t jetColorMap(float v){
+PA_FORCE_INLINE uint32_t jet_color_map(float v){
     if (v <= 0.f){
         return combine_rgb(0,0,0);
     }else if (v < 0.125f){
@@ -179,7 +179,7 @@ void AudioSpectrumHolder::push_spectrum(
             }
 
             // std::cout << "Load FFT output , stamp " << spectrum->stamp << std::endl;
-            m_freqVisStamps[m_nextFFTWindowIndex] = stamp;
+            m_freq_vis_stamps[m_next_fft_window_index] = stamp;
         }
 
         //  Scale the by the square root of the transform length.
@@ -222,19 +222,19 @@ void AudioSpectrumHolder::push_spectrum(
             mag = mag * VISUAL_JITTER_DECAY + (1 - VISUAL_JITTER_DECAY) * m_last_spectrum.values[i];
 
             m_last_spectrum.values[i] = mag;
-            m_last_spectrum.colors[i] = jetColorMap(mag);
+            m_last_spectrum.colors[i] = jet_color_map(mag);
             previous = mag;
         }
 //        cout << "AudioSpectrumHolder::push_spectrum" << endl;
         m_spectrograph->push_spectrum(m_last_spectrum.colors.data());
-        m_nextFFTWindowIndex = (m_nextFFTWindowIndex+1) % m_num_freq_windows;
-//        std::cout << "Computed FFT! "  << magSum << std::endl;
+        m_next_fft_window_index = (m_next_fft_window_index+1) % m_num_freq_windows;
+//        std::cout << "Computed FFT! "  << mag_sum << std::endl;
 
-        if (m_saveFreqToDisk){
+        if (m_save_freq_to_disk){
             for (size_t i = 0; i < m_num_freqs; i++){
-                m_freqStream << output[i] << " ";
+                m_freq_stream << output[i] << " ";
             }
-            m_freqStream << std::endl;
+            m_freq_stream << std::endl;
         }
     }
     m_listeners.run_method(&Listener::state_changed);
@@ -252,12 +252,12 @@ void AudioSpectrumHolder::add_overlay(
         // Now try to remove old overlays that are no longer showed on the spectrogram view.
 
         // get the timestamp of the oldest window in the display history.
-        uint64_t oldestStamp = m_freqVisStamps[m_nextFFTWindowIndex];
+        uint64_t oldest_stamp = m_freq_vis_stamps[m_next_fft_window_index];
         // SIZE_MAX means this slot is not yet assigned an FFT window
-        if (oldestStamp != SIZE_MAX){
+        if (oldest_stamp != SIZE_MAX){
             // Note: in this file we never consider the case that stamp may overflow.
             // It requires on the order of 1e10 years to overflow if we have about 25ms per stamp.
-            while(!m_overlay.empty() && std::get<1>(m_overlay.back()) <= oldestStamp){
+            while(!m_overlay.empty() && std::get<1>(m_overlay.back()) <= oldest_stamp){
                 m_overlay.pop_back();
             }
         }
@@ -308,24 +308,24 @@ AudioSpectrumHolder::SpectrographSnapshot AudioSpectrumHolder::get_spectrograph(
 
     //  The oldest window on the spectrogram view has the oldest timestamp,
     //  and its position is left most on the spectrogram, assigning a window ID of 0.
-    size_t oldestStamp = m_freqVisStamps[m_nextFFTWindowIndex];
-    size_t oldestWindowID = 0;
+    size_t oldest_stamp = m_freq_vis_stamps[m_next_fft_window_index];
+    size_t oldest_window_id = 0;
     //  When the audio stream starts coming in, the history of the spectrogram
     //  is not fully filled. So the oldest stamp may not be the leftmost one on the display.
     //  Here we use the validity of the time stamp to find the real oldest one.
-    for (; oldestWindowID < m_num_freq_windows; oldestWindowID++){
-        if (oldestStamp != SIZE_MAX){
+    for (; oldest_window_id < m_num_freq_windows; oldest_window_id++){
+        if (oldest_stamp != SIZE_MAX){
             // it's a window with valid stamp
             break;
         }
-        oldestStamp = m_freqVisStamps[(m_nextFFTWindowIndex+oldestWindowID) % m_num_freq_windows];
+        oldest_stamp = m_freq_vis_stamps[(m_next_fft_window_index+oldest_window_id) % m_num_freq_windows];
     }
-    if (oldestStamp == SIZE_MAX){
+    if (oldest_stamp == SIZE_MAX){
         // we have no valid windows in the spectrogram, so no overlays to render:
         return ret;
     }
-    size_t newestStamp = m_freqVisStamps[(m_nextFFTWindowIndex + m_num_freq_windows - 1) % m_num_freq_windows];
-    // size_t newestWindowID = m_num_freq_windows - 1;
+    size_t newest_stamp = m_freq_vis_stamps[(m_next_fft_window_index + m_num_freq_windows - 1) % m_num_freq_windows];
+    // size_t newest_window_id = m_num_freq_windows - 1;
 
     for (const auto& box : m_overlay){
         const size_t starting_stamp = std::get<0>(box);
@@ -336,14 +336,14 @@ AudioSpectrumHolder::SpectrographSnapshot AudioSpectrumHolder::get_spectrograph(
         }
 
         // std::cout << "Render overlay at (" << starting_stamp << ", " << end_stamp
-        //     << ") oldestStamp " << oldestStamp << " wID " << oldestWindowID << " newest stamp " << newestStamp << std::endl;
+        //     << ") oldest_stamp " << oldest_stamp << " w_id " << oldest_window_id << " newest stamp " << newest_stamp << std::endl;
 
-        if (end_stamp <= oldestStamp || starting_stamp > newestStamp){
+        if (end_stamp <= oldest_stamp || starting_stamp > newest_stamp){
             continue;
         }
 
         ret.overlays.emplace_back(
-            starting_stamp - oldestStamp + oldestWindowID,
+            starting_stamp - oldest_stamp + oldest_window_id,
             end_stamp - starting_stamp,
             color
         );
@@ -352,16 +352,16 @@ AudioSpectrumHolder::SpectrographSnapshot AudioSpectrumHolder::get_spectrograph(
 }
 
 
-void AudioSpectrumHolder::saveAudioFrequenciesToDisk(bool enable){
+void AudioSpectrumHolder::save_audio_frequencies_to_disk(bool enable){
     std::lock_guard<Mutex> lg(m_state_lock);
     if (enable){
-        if (m_saveFreqToDisk == false){
-            m_saveFreqToDisk = enable;
-            m_freqStream.open("./frequencies.txt");
+        if (m_save_freq_to_disk == false){
+            m_save_freq_to_disk = enable;
+            m_freq_stream.open("./frequencies.txt");
         }
-    }else if (m_saveFreqToDisk){
-        m_saveFreqToDisk = enable;
-        m_freqStream.close();
+    }else if (m_save_freq_to_disk){
+        m_save_freq_to_disk = enable;
+        m_freq_stream.close();
     }
 }
 

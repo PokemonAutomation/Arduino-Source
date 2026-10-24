@@ -126,7 +126,7 @@ std::tuple<const char*, size_t> AudioFileLoader::load_full_audio(){
 
         //  The batch API converts the sample type and channels to the
         //  requested format, but not the sample rate: its consumer
-        //  (loadAudioTemplate) assumes the returned data is at the requested
+        //  (load_audio_template) assumes the returned data is at the requested
         //  rate.
         if (m_wav_file->audioFormat().sampleRate() != m_audio_format.sampleRate()){
             std::cout << "Error: load_full_audio() requires the wav file's sample rate ("

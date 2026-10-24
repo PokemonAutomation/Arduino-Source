@@ -188,7 +188,7 @@ AudioSelectorWidget::AudioSelectorWidget(QWidget& parent, AudioSession& session)
     if (GlobalSettings::instance().AUDIO_PIPELINE->SHOW_RECORD_FREQUENCIES){
         connect(m_record_button, &QPushButton::clicked, this, [this](bool){
             m_record_is_on = !m_record_is_on;
-            m_session.spectrums().saveAudioFrequenciesToDisk(m_record_is_on);
+            m_session.spectrums().save_audio_frequencies_to_disk(m_record_is_on);
             if (m_record_is_on){
                 m_record_button->setText("Stop recording");
             }else{

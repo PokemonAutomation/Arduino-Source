@@ -36,8 +36,8 @@ const AudioTemplate* AudioTemplateCache::get_nothrow_internal(const std::string&
         full_path = full_path_no_ext + ".mp3";
     }
 
-    AudioTemplate audio_template = loadAudioTemplate(full_path, (int)sample_rate);
-    if (audio_template.numFrequencies() == 0){
+    AudioTemplate audio_template = load_audio_template(full_path, (int)sample_rate);
+    if (audio_template.num_frequencies() == 0){
         return nullptr;
     }
 
