@@ -31,6 +31,9 @@ public:
     StreamHistoryTracker_Ring(
         Logger& logger,
         std::chrono::seconds window,
+        //  The input preset's framing; for this tracker it only gates
+        //  whether audio is enabled at all (audio is always recorded as
+        //  48 kHz stereo, see push_samples()).
         size_t audio_samples_per_frame,
         size_t audio_frames_per_second,
         bool has_video
@@ -40,7 +43,13 @@ public:
     bool save(const std::string& filename) const;
 
 public:
-    void on_samples(const float* data, size_t frames);
+    //  Audio input: split (planar) float at the tracker's fixed 48 kHz /
+    //  stereo shape, delivered by the audio pipeline's working stream
+    //  (StreamHistorySession attaches the listener at that shape). Channel
+    //  c starts at data[c * stride] and runs for samples (stride is the
+    //  per-channel buffer length, 0 for the single-channel pass-through).
+    //  Called on the audio pipeline's producing thread.
+    void push_samples(size_t samples, size_t stride, const float* data);
     void on_frame(std::shared_ptr<const VideoFrame> frame);
 
 private:
