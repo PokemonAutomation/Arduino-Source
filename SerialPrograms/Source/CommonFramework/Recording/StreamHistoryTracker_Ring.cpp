@@ -9,7 +9,8 @@
  *
  *  Video is encoded on a dedicated worker thread (frames that arrive faster
  *  than the encoder can keep up are dropped, like the JPEG-based tracker).
- *  Audio is resampled to 48 kHz and encoded inline in on_samples() (AAC
+ *  Audio arrives already mixed + resampled to 48 kHz stereo from the audio
+ *  pipeline's working stream and is encoded inline in push_samples() (AAC
  *  encoding of 1024 samples takes well under a millisecond).
  *
  *  Only compiled when PA_STREAM_HISTORY_FFMPEG is defined (CMake option
@@ -32,7 +33,6 @@ extern "C" {
 #include <libavutil/log.h>
 #include <libavutil/pixdesc.h>
 #include <libavutil/rational.h>
-#include <libswresample/swresample.h>
 #include <libswscale/swscale.h>
 }
 
@@ -105,33 +105,6 @@ static bool init_channel_layout(AVChannelLayout& layout, int channels){
     av_channel_layout_uninit(&layout);
     av_channel_layout_default(&layout, channels);
     return av_channel_layout_check(&layout) > 0;
-}
-
-//  Creates the 48 kHz resampler. swr_alloc_set_opts2() takes a SwrContext**
-//  and returns 0 on success.
-static bool make_audio_resampler(SwrContext*& swr,
-                                 const AVChannelLayout& out_layout, int out_rate,
-                                 const AVChannelLayout& in_layout, int in_rate){
-    int ret = swr_alloc_set_opts2(
-        &swr,
-        &out_layout, AV_SAMPLE_FMT_FLT, out_rate,
-        &in_layout,  AV_SAMPLE_FMT_FLT, in_rate,
-        0, nullptr
-    );
-    if (ret != 0 || swr == nullptr){
-        return false;
-    }
-    //  swr_alloc_set_opts2() only allocates and fills in the options; the
-    //  context must be initialized before swr_convert() will use it (an
-    //  uninitialized context logs "Context has not been initialized" and
-    //  swr_convert() fails on every call).
-    ret = swr_init(swr);
-    if (ret < 0){
-        swr_free(&swr);
-        swr = nullptr;
-        return false;
-    }
-    return true;
 }
 
 
@@ -405,9 +378,11 @@ struct StreamHistoryTracker_Ring::Impl{
     std::chrono::seconds window;
     bool has_video;
 
-    //  Audio configuration, as declared by the session.
-    size_t audio_channels;
-    int audio_input_rate;
+    //  Audio configuration. The working stream is attached at a fixed
+    //  48 kHz / stereo shape, so the audio is always 2 channels regardless
+    //  of the input preset (the pipeline tree's mixer upmixes mono to
+    //  dual-mono).
+    size_t audio_channels = 2;
     bool have_audio;
 
     //  Video frame throttling (same scheme as StreamHistoryTracker_SaveFrames).
@@ -455,12 +430,11 @@ struct StreamHistoryTracker_Ring::Impl{
     AVRational video_time_base = {1, 1000};
     AVCodecParameters* audio_params = nullptr;
 
-    //  Audio encoder + resampler (used by on_samples).
+    //  Audio encoder (used by push_samples).
     AVCodecContext* actx = nullptr;
-    SwrContext* swr = nullptr;
     AVChannelLayout audio_layout = {};
     int64_t audio_samples_total = 0;
-    std::vector<float> audio_acc;    //  Resampled interleaved float @ 48 kHz.
+    std::vector<float> audio_acc;    //  Interleaved float @ 48 kHz, accumulated from the planar working stream.
 
     //  Video worker thread.
     AsyncTask worker;
@@ -479,8 +453,6 @@ struct StreamHistoryTracker_Ring::Impl{
         : logger(p_logger)
         , window(p_window)
         , has_video(p_has_video)
-        , audio_channels(p_audio_samples_per_frame)
-        , audio_input_rate((int)p_audio_frames_per_second)
         , have_audio(p_audio_samples_per_frame > 0 && p_audio_frames_per_second > 0)
         , target_fps(get_target_fps())
         , frame_interval(std::chrono::microseconds(1000000 / target_fps))
@@ -500,7 +472,6 @@ struct StreamHistoryTracker_Ring::Impl{
 
     ~Impl(){
         if (sws != nullptr) sws_freeContext(sws);
-        if (swr != nullptr) swr_free(&swr);
         if (video_params != nullptr) avcodec_parameters_free(&video_params);
         if (audio_params != nullptr) avcodec_parameters_free(&audio_params);
         if (vctx != nullptr) avcodec_free_context(&vctx);
@@ -523,13 +494,14 @@ struct StreamHistoryTracker_Ring::Impl{
         }
         actx->sample_rate = AUDIO_OUTPUT_RATE;
         actx->time_base = av_make_q(1, AUDIO_OUTPUT_RATE);
-        actx->bit_rate = (audio_channels >= 2 ? 96000 : 64000);
+        actx->bit_rate = 96000;
         actx->frame_size = AUDIO_FRAME_SAMPLES;
         //  The AAC encoder requires the sample format to be set explicitly;
         //  avcodec_open2() fails with EINVAL ("Invalid audio sample format")
         //  if it is left at AV_SAMPLE_FMT_NONE. The encoder works in planar
-        //  float, so on_samples() de-interleaves the accumulated (packed)
-        //  resampler output into the frame's planes.
+        //  float; push_samples() accumulates the planar working stream
+        //  packed/interleaved, and the encode loop de-interleaves it into
+        //  the frame's planes.
         actx->sample_fmt = AV_SAMPLE_FMT_FLTP;
         //  The AAC stream configuration (AudioSpecificConfig) must land in the
         //  container header: with this flag the encoder emits raw AAC frames +
@@ -561,8 +533,8 @@ struct StreamHistoryTracker_Ring::Impl{
             have_audio = false;
             return;
         }
-        //  The resampler and encoded frames use the same layout as the encoder
-        //  (which just opened successfully with this channel count).
+        //  The encoded frames use the same layout as the encoder (which
+        //  just opened successfully with this channel count).
         init_channel_layout(audio_layout, (int)audio_channels);
         logger.log(
             "Stream history: audio = AAC " + std::to_string(audio_channels) + "ch @ 48 kHz ("
@@ -1021,58 +993,24 @@ struct StreamHistoryTracker_Ring::Impl{
     }
 
 
-    void on_samples(const float* data, size_t frames){
-        if (!have_audio || frames == 0 || data == nullptr){
+    void push_samples(size_t samples, size_t stride, const float* data){
+        if (!have_audio || samples == 0 || data == nullptr){
             return;
         }
         WallClock now = current_time();
 
-        //  DUAL_44100 is declared to us as 1ch @ 44100 Hz, but the pipeline
-        //  delivers interleaved stereo frames (2 samples/frame). Take the left
-        //  channel so we actually resample a mono stream. (All the other formats
-        //  have stride == channel count.)
-        std::vector<float> mono_scratch;
-        const float* in_data = data;
-        if (audio_channels == 1 && audio_input_rate == 44100){
-            mono_scratch.resize(frames);
-            for (size_t i = 0; i < frames; i++){
-                mono_scratch[i] = data[i * 2];
+        //  The audio pipeline's per-listener node delivers the working
+        //  stream already mixed + resampled to this tracker's fixed
+        //  48 kHz / stereo attach shape, with split (planar) channels:
+        //  channel c starts at data[c * stride] and runs for samples
+        //  (stride is the per-channel buffer length, 0 for the
+        //  single-channel pass-through). Interleave into the accumulator
+        //  for the encode loop below.
+        audio_acc.reserve(audio_acc.size() + samples * audio_channels);
+        for (size_t i = 0; i < samples; i++){
+            for (size_t ch = 0; ch < audio_channels; ch++){
+                audio_acc.push_back(data[ch * stride + i]);
             }
-            in_data = mono_scratch.data();
-        }
-
-        //  1. Resample to 48 kHz (same channel count) and accumulate.
-        if (swr == nullptr){
-            AVChannelLayout in_layout = {};
-            if (!init_channel_layout(in_layout, (int)audio_channels)
-                || !init_channel_layout(audio_layout, (int)audio_channels)
-            ){
-                logger.log("Stream history: Failed to set audio channel layout. Disabling audio.", COLOR_RED);
-                have_audio = false;
-                return;
-            }
-            bool swr_created = make_audio_resampler(swr, audio_layout, AUDIO_OUTPUT_RATE, in_layout, audio_input_rate);
-            av_channel_layout_uninit(&in_layout);
-            if (!swr_created){
-                logger.log("Stream history: Failed to create audio resampler. Disabling audio.", COLOR_RED);
-                have_audio = false;
-                return;
-            }
-        }
-
-        const uint8_t* in_planes[1] = { (const uint8_t*)in_data };
-        int in_samples = (int)frames;
-        int out_capacity = in_samples * 5 / 4 + AUDIO_FRAME_SAMPLES + 64;    //  per channel
-        std::vector<uint8_t> out_buffer((size_t)out_capacity * audio_channels * sizeof(float));
-        uint8_t* out_planes[1] = { out_buffer.data() };
-        int out_samples = swr_convert(swr, out_planes, out_capacity, in_planes, in_samples);
-        if (out_samples > 0){
-            const float* out_floats = (const float*)out_planes[0];
-            audio_acc.insert(
-                audio_acc.end(),
-                out_floats,
-                out_floats + (size_t)out_samples * audio_channels
-            );
         }
 
         //  2. Encode each complete AAC frame.
@@ -1639,8 +1577,8 @@ void StreamHistoryTracker_Ring::set_window(std::chrono::seconds window){
     data.evict();
 }
 
-void StreamHistoryTracker_Ring::on_samples(const float* data, size_t frames){
-    m_impl->on_samples(data, frames);
+void StreamHistoryTracker_Ring::push_samples(size_t samples, size_t stride, const float* data){
+    m_impl->push_samples(samples, stride, data);
 }
 
 void StreamHistoryTracker_Ring::on_frame(std::shared_ptr<const VideoFrame> frame){
