@@ -389,7 +389,7 @@ public:
         WorkingAudioNode* chain_tail = nullptr;
         if (m_in_ch >= m_out_ch){
             chain_mixer.reset(new ChannelMixer(
-                m_in_rate, m_in_ch, m_out_ch, chain_matrix
+                logger, m_in_rate, m_in_ch, m_out_ch, chain_matrix
             ));
             chain_head = chain_mixer.get();
             if (m_in_rate != m_out_rate){
@@ -403,7 +403,7 @@ public:
             }
         }else{
             chain_mixer.reset(new ChannelMixer(
-                m_out_rate, m_in_ch, m_out_ch, chain_matrix
+                logger, m_out_rate, m_in_ch, m_out_ch, chain_matrix
             ));
             chain_tail = chain_mixer.get();
             if (m_in_rate != m_out_rate){
@@ -497,7 +497,7 @@ public:
         GuardPageBuffer<float> input = random_float_input(m_samples * m_channels, 42);
 
         const size_t sample_rate = 44100;
-        ChannelMixer mixer(sample_rate, m_channels, m_channels, std::move(matrix));
+        ChannelMixer mixer(logger, sample_rate, m_channels, m_channels, std::move(matrix));
         RecordingWorkingAudioListener listener(sample_rate, m_channels, m_samples);
         mixer.add_listener(listener);
 

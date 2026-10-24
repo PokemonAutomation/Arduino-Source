@@ -222,7 +222,7 @@ std::vector<char> run_tree(
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "No channel mixer matrix.");
         }
         mixer.reset(new Kernels::AudioPipeline::ChannelMixer(
-            in_rate, in_channels, out_channels, std::move(matrix)
+            logger, in_rate, in_channels, out_channels, std::move(matrix)
         ));
         mixer->add_listener(*head);
         head = mixer.get();

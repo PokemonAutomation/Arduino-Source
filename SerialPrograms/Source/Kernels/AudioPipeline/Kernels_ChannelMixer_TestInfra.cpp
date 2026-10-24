@@ -96,7 +96,7 @@ UnitTestResult MixerIdentityTest::run(Logger& logger, CancellableScope& scope) c
 
     const size_t sample_rate = 44100;
 
-    ChannelMixer mixer(sample_rate, m_channels, m_channels, std::move(matrix));
+    ChannelMixer mixer(logger, sample_rate, m_channels, m_channels, std::move(matrix));
     RecordingWorkingAudioListener listener(sample_rate, m_channels);
     mixer.add_listener(listener);
 
@@ -141,8 +141,8 @@ UnitTestResult MixerRoundTripTest::run(Logger& logger, CancellableScope& scope) 
 
     const size_t sample_rate = 44100;
 
-    ChannelMixer mixer0(sample_rate, 1, 2, duplicate_matrix);
-    ChannelMixer mixer1(sample_rate, 2, 1, average_matrix);
+    ChannelMixer mixer0(logger, sample_rate, 1, 2, duplicate_matrix);
+    ChannelMixer mixer1(logger, sample_rate, 2, 1, average_matrix);
     RecordingWorkingAudioListener middle(sample_rate, 2);
     RecordingWorkingAudioListener output(sample_rate, 1);
     mixer0.add_listener(mixer1);
