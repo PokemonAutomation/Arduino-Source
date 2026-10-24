@@ -86,7 +86,7 @@ private:
     //  The weight table, shared from the process-wide resampler table
     //  cache (see Kernels_AudioResampler.cpp); it extends its allocations
     //  for the kernel's implied overshoots.
-    std::shared_ptr<WeightTable> m_table;
+    std::shared_ptr<const WeightTable> m_table;
 
     //  Input samples per extended period (m_table.period_in() times the
     //  period extension).

@@ -60,7 +60,7 @@ public:
         return cache;
     }
 
-    std::shared_ptr<WeightTable> get_table(
+    std::shared_ptr<const WeightTable> get_table(
         size_t in_sample_rate,
         size_t out_sample_rate,
         uint32_t taps,
@@ -102,7 +102,7 @@ public:
 
 private:
     SpinLockMRSW m_lock;
-    std::map<ResamplerTableKey, std::shared_ptr<WeightTable>> m_tables;
+    std::map<ResamplerTableKey, std::shared_ptr<const WeightTable>> m_tables;
 };
 
 }
