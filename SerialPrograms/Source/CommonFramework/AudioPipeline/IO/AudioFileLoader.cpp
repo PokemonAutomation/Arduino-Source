@@ -328,16 +328,6 @@ void AudioDecoderWorker::internal_start(){
     );
 #endif
 
-#if QT_VERSION_MAJOR == 5
-    connect(
-        m_audio_decoder, &QAudioDecoder::stateChanged,
-        this, [this](QAudioDecoder::State state){
-            std::cout << "QAudioDecoder::stateChanged(): " << (int)state << std::endl;
-            emit this->finished();
-        }
-    );
-#endif
-
     // Whenever a new buffer of audo frames decoded, save them by calling read_audio_decoder_buffer().
     connect(m_audio_decoder, &QAudioDecoder::bufferReady, this, &AudioDecoderWorker::read_audio_decoder_buffer);
 
@@ -355,20 +345,11 @@ void AudioDecoderWorker::internal_start(){
         return;
     }
 
-    // Using Qt5, there may be errors about:
-    // defaultServiceProvider::requestService(): no service found for - "org.qt-project.qt.audiodecode"
-    // The QAudioDecoder object does not have a valid service
-    // For solution, see https://stackoverflow.com/questions/22783381/qaudiodecoder-no-service-found
     connect(m_audio_decoder, QOverload<QAudioDecoder::Error>::of(&QAudioDecoder::error), this, [&](QAudioDecoder::Error){
         handle_audio_decoder_error();
     });
 
-    // m_audio_decoder->setSourceDevice(&m_file);
-#if QT_VERSION_MAJOR == 5
-    m_audio_decoder->setSourceFilename(QString::fromStdString(m_filename));
-#elif QT_VERSION_MAJOR == 6
     m_audio_decoder->setSource(QUrl::fromLocalFile(QString::fromStdString(m_filename)));
-#endif
 
     m_audio_decoder->start();
     std::cout << "Start audio decoder." << std::endl;
@@ -419,15 +400,9 @@ void AudioDecoderWorker::handle_audio_decoder_error(){
         case QAudioDecoder::FormatError:
             error_str = "FormatError";
             break;
-#if QT_VERSION_MAJOR == 5
-        case QAudioDecoder::ServiceMissingError:
-            error_str = "ServiceMissingError";
-            break;
-#elif QT_VERSION_MAJOR == 6
         case QAudioDecoder::NotSupportedError:
             error_str = "NotSupportedError";
             break;
-#endif
         default:
             error_str = "UnownError";
         }

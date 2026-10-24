@@ -43,9 +43,6 @@ AudioTemplate::AudioTemplate(size_t frequencies, size_t windows)
 AudioTemplate load_audio_template(const std::string& filename, size_t sample_rate){
     QAudioFormat output_audio_format;
     output_audio_format.setChannelCount(1);
-#if QT_VERSION_MAJOR == 5
-    output_audio_format.setCodec("audio/pcm");
-#endif
     output_audio_format.setSampleRate((int)sample_rate);
     set_sample_format_to_float(output_audio_format);
 

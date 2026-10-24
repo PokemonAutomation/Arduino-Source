@@ -6,16 +6,12 @@
 
 #include <algorithm>
 #include <cmath>
-#include <map>
-#include <set>
-#include <QtGlobal>
 #include <QAudioDevice>
 #include <QMediaDevices>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 #include "AudioInfo.h"
@@ -463,20 +459,9 @@ struct AudioDeviceInfo::Data{
     std::vector<AudioInputChoice> supported_choices;
     size_t preferred_choice_index = 0;
 
-#if QT_VERSION_MAJOR == 5
-    QAudioDeviceInfo info;
-#elif QT_VERSION_MAJOR == 6
     QAudioDevice info;
-#endif
 };
 std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
-    //  Devices that share a display name are deduped: keep the one that
-    //  exposes the most input choices. (Windows used to add a winMM shadow
-    //  device per input, QTBUG-75781 — a Qt5-era artifact that no longer
-    //  occurs on Qt6 — which is why the rule favors the richer entry.
-    //  Identical (but different) devices will likely have identical names
-    //  and choice lists, so they are kept.)
-
     std::vector<AudioDeviceInfo> list;
 
     WallClock start = current_time();
@@ -501,35 +486,9 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
     double seconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / 1000.;
     global_logger_tagged().log("Done querying audio inputs... " + tostr_fixed(seconds, 3) + " seconds", COLOR_CYAN);
 
-    bool show_all_devices = GlobalSettings::instance().AUDIO_PIPELINE->SHOW_ALL_DEVICES;
-    if (show_all_devices){
-        return list;
-    }
-
-    //  Keep only devices that expose the most input choices per display
-    //  name. Duplicates allowed.
-    std::map<std::string, size_t> best_devices;
-    for (const AudioDeviceInfo& device : list){
-        size_t& best_score = best_devices[device.display_name()];
-        best_score = std::max(best_score, device.supported_choices().size());
-    }
-
-    std::vector<AudioDeviceInfo> ret;
-    for (AudioDeviceInfo& device : list){
-        size_t best_score = best_devices.find(device.display_name())->second;
-        if (device.supported_choices().size() >= best_score || show_all_devices){
-            ret.emplace_back(std::move(device));
-        }
-    }
-
-    return ret;
+    return list;
 }
 std::vector<AudioDeviceInfo> AudioDeviceInfo::all_output_devices(){
-    //  Devices that share a display name are deduped: keep the first one.
-    //  (Windows used to add a winMM shadow device per output, QTBUG-75781 —
-    //  a Qt5-era artifact that no longer occurs on Qt6. Identical (but
-    //  different) devices will likely have identical names, so they are kept.)
-
     std::vector<AudioDeviceInfo> list;
 
     for (NativeAudioInfo& device : QMediaDevices::audioOutputs()){
@@ -547,23 +506,7 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_output_devices(){
         data.info = std::move(device);
     }
 
-    bool show_all_devices = GlobalSettings::instance().AUDIO_PIPELINE->SHOW_ALL_DEVICES;
-    if (show_all_devices){
-        return list;
-    }
-
-    //  Collapse duplicates: keep the first device per display name. (The
-    //  old "most supported formats" ranking is obsolete now that the sink
-    //  adapts to the device's native format.)
-    std::set<std::string> seen;
-    std::vector<AudioDeviceInfo> ret;
-    for (AudioDeviceInfo& device : list){
-        if (seen.insert(device.display_name()).second){
-            ret.emplace_back(std::move(device));
-        }
-    }
-
-    return ret;
+    return list;
 }
 
 

@@ -19,13 +19,6 @@
 #include "Kernels/AudioPipeline/Kernels_WorkingAudio2RawAudio.h"
 #include "Kernels/AudioPipeline/Kernels_WorkingAudio2WorkingAudio.h"
 #include <QAudioFormat>
-#if QT_VERSION_MAJOR == 5
-#include <QAudioDeviceInfo>
-#elif QT_VERSION_MAJOR == 6
-#include <QAudioDevice>
-#else
-#error "Unsupported Qt version."
-#endif
 #include "AudioPassthroughPairQt.h"
 
 //#include <iostream>

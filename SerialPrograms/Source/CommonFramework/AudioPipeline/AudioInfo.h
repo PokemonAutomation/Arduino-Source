@@ -9,7 +9,6 @@
 
 #include <string>
 #include <vector>
-#include <QtConfig>
 #include "Common/Cpp/Containers/Pimpl.h"
 
 class QAudioFormat;
