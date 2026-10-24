@@ -19,6 +19,14 @@ uint64_t x86_rdtsc(){
     __asm__ volatile ("rdtsc" : "=a" (lo), "=d" (hi));
     return ((uint64_t)hi << 32) | lo;
 }
+#elif defined PA_ARCH_arm64
+//  The ARM equivalent of rdtsc: the generic timer's virtual counter. It can be
+//  read in user space without entering the kernel.
+uint64_t x86_rdtsc(){
+    uint64_t value;
+    __asm__ volatile ("mrs %0, cntvct_el0" : "=r" (value));
+    return value;
+}
 #else
 #define PA_NO_RDTSC
 #endif
@@ -28,6 +36,7 @@ uint64_t x86_rdtsc(){
 #include "SpinLock.h"
 
 #include <iostream>
+#include <thread>
 using std::cout;
 using std::endl;
 
@@ -78,22 +87,37 @@ void SpinLock::spin_acquire(const char* label){
 void SpinLockMRSW::internal_acquire_read() noexcept{
 //    cout << "SpinLockMRSW::internal_acquire_read()" << endl;
 
+    //  Yield to the OS every 1000 failed iterations (but not immediately).
+    size_t failed_iterations = 0;
     while (true){
         size_t state = m_readers.load(std::memory_order_acquire);
         if (state != (size_t)-1 && m_readers.compare_exchange_weak(state, state + 1)){
             return;
         }
         pause();
+        if (++failed_iterations >= 1000){
+            std::this_thread::yield();
+            failed_iterations = 0;
+        }
     }
 }
 void SpinLockMRSW::internal_acquire_write() noexcept{
 //    cout << "SpinLockMRSW::internal_acquire_write()" << endl;
 
+    //  Yield to the OS every 1000 failed iterations (but not immediately).
+    size_t failed_iterations = 0;
     size_t state;
-    do{
+    while (true){
         pause();
         state = m_readers.load(std::memory_order_acquire);
-    }while (state != 0 || !m_readers.compare_exchange_weak(state, (size_t)-1));
+        if (state == 0 && m_readers.compare_exchange_weak(state, (size_t)-1)){
+            return;
+        }
+        if (++failed_iterations >= 1000){
+            std::this_thread::yield();
+            failed_iterations = 0;
+        }
+    }
 }
 void SpinLockMRSW::internal_acquire_read(const char* label) noexcept{
 //    cout << "SpinLockMRSW::internal_acquire_read()" << endl;
@@ -102,6 +126,8 @@ void SpinLockMRSW::internal_acquire_read(const char* label) noexcept{
     internal_acquire_read();
 #else
     uint64_t start = x86_rdtsc();
+    //  Yield to the OS every 1000 failed iterations (but not immediately).
+    size_t failed_iterations = 0;
     while (true){
         size_t state = m_readers.load(std::memory_order_acquire);
         if (state != (size_t)-1 && m_readers.compare_exchange_weak(state, state + 1)){
@@ -114,6 +140,10 @@ void SpinLockMRSW::internal_acquire_read(const char* label) noexcept{
             }catch (...){}
             start = x86_rdtsc();
         }
+        if (++failed_iterations >= 1000){
+            std::this_thread::yield();
+            failed_iterations = 0;
+        }
     }
 #endif
 }
@@ -124,8 +154,10 @@ void SpinLockMRSW::internal_acquire_write(const char* label) noexcept{
     internal_acquire_write();
 #else
     uint64_t start = x86_rdtsc();
+    //  Yield to the OS every 1000 failed iterations (but not immediately).
+    size_t failed_iterations = 0;
     size_t state;
-    do{
+    while (true){
         pause();
         if (x86_rdtsc() - start > 10000000000){
             try{
@@ -134,7 +166,14 @@ void SpinLockMRSW::internal_acquire_write(const char* label) noexcept{
             start = x86_rdtsc();
         }
         state = m_readers.load(std::memory_order_acquire);
-    }while (state != 0 || !m_readers.compare_exchange_weak(state, (size_t)-1));
+        if (state == 0 && m_readers.compare_exchange_weak(state, (size_t)-1)){
+            return;
+        }
+        if (++failed_iterations >= 1000){
+            std::this_thread::yield();
+            failed_iterations = 0;
+        }
+    }
 #endif
 }
 
