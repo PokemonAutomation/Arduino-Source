@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Detect_Lobby_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Detect_Lobby_H
 
+#include "CommonTools/VisualDetector.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/VisualDetectors/FrozenImageDetector.h"
 
@@ -16,23 +17,26 @@ namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
-#if 1
-class LobbyDetector  : public VisualInferenceCallback{
+class LobbyDetector  : public StaticScreenDetector{
 public:
-    LobbyDetector(bool invert);
-
-    bool detect(const ImageViewRGB32& screen);
+    LobbyDetector(Color color, bool invert);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override final;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
 
 private:
+    Color m_color;
     bool m_invert;
     ImageFloatBox m_pink;
     ImageFloatBox m_white;
 };
-#endif
+class LobbyWatcher : public DetectorToFinder<LobbyDetector>{
+public:
+    LobbyWatcher(Color color, bool invert)
+         : DetectorToFinder("LobbyWatcher", std::chrono::milliseconds(250), color, invert)
+    {}
+};
 
 
 class LobbyDoneConnecting  : public VisualInferenceCallback{
