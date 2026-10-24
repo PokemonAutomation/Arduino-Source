@@ -1,17 +1,22 @@
 
+#include <cerrno>
 #include <QApplication>
-#include <QFileInfo>
-#include <QFile>
-#ifdef _WIN32
-#include <QLibrary>
-#endif
 //#include <QTextStream>
 #include <QMessageBox>
+#include <system_error>
+#if defined(_WIN32) && defined(PA_DPP)
+// DPP uses Winsock2; exclude the legacy Winsock declarations from Windows.h.
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <Windows.h>
+#endif
 #include "Common/Cpp/Logging/LastLogTracker.h"
 #include "Common/Cpp/Logging/FileLogger.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
 #include "Common/Cpp/Logging/MultiOutputLogger.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
+#include "Common/Cpp/Filesystem/FileIO.h"
 #include "Common/Cpp/Concurrency/Qt6.9ThreadBugWorkaround.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/FireForgetDispatcher.h"
@@ -106,31 +111,38 @@ int run_program(int argc, char *argv[]){
 
 #ifdef PA_DPP
     // Configure OpenSSL before DPP or background tasks create a TLS context.
-    QString dpp_cert_message;
+    std::string dpp_cert_message;
     bool dpp_cert_error = false;
     {
-        const bool use_bundled_cert = qEnvironmentVariableIsEmpty("SSL_CERT_FILE");
-        const QString cert_path = use_bundled_cert
-            ? QDir(QCoreApplication::applicationDirPath()).filePath("dpp-cacert.pem")
-            : qEnvironmentVariable("SSL_CERT_FILE");
-        QFile cert_file(cert_path);
-        if (!cert_file.open(QIODevice::ReadOnly)){
+        const std::string cert_env = qgetenv("SSL_CERT_FILE").toStdString();
+        const bool use_bundled_cert = cert_env.empty();
+        const std::string cert_path = use_bundled_cert
+            ? (Filesystem::application_binary_directory() / Filesystem::Path("dpp-cacert.pem")).string_slash_normalized()
+            : cert_env;
+        FileIO cert_file;
+        if (!cert_file.open(Filesystem::Path(cert_path), FileMode::READ | FileMode::BINARY)){
+            const std::string error = std::error_code(errno, std::generic_category()).message();
             dpp_cert_error = true;
             dpp_cert_message = "DPP CA certificate bundle cannot be read: " + cert_path +
-                " (" + cert_file.errorString() + "). Discord bot connections may fail.";
+                " (" + error + "). Discord bot connections may fail.";
         }else{
             if (use_bundled_cert){
-                const QByteArray cert_path_bytes = cert_path.toLocal8Bit();
-                dpp_cert_error = !qputenv("SSL_CERT_FILE", cert_path_bytes);
+                dpp_cert_error = !qputenv("SSL_CERT_FILE", cert_path.c_str());
 #ifdef _WIN32
                 // OpenSSL uses the release CRT even when Qt uses the debug CRT.
                 // Set both environment copies so OpenSSL can find the bundle.
-                using PutEnv = int (*)(const char*, const char*);
-                const PutEnv openssl_putenv = reinterpret_cast<PutEnv>(
-                    QLibrary::resolve("ucrtbase", "_putenv_s")
-                );
+                const HMODULE crt = LoadLibraryExW(L"ucrtbase.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+                ScopeExit unload_crt([crt]{
+                    if (crt){
+                        FreeLibrary(crt);
+                    }
+                });
+                using PutEnv = int (__cdecl *)(const char*, const char*);
+                const PutEnv openssl_putenv = crt
+                    ? reinterpret_cast<PutEnv>(GetProcAddress(crt, "_putenv_s"))
+                    : nullptr;
                 dpp_cert_error = dpp_cert_error ||
-                    !openssl_putenv || openssl_putenv("SSL_CERT_FILE", cert_path_bytes.constData()) != 0;
+                    !openssl_putenv || openssl_putenv("SSL_CERT_FILE", cert_path.c_str()) != 0;
 #endif
             }
             dpp_cert_message = dpp_cert_error
@@ -164,7 +176,7 @@ int run_program(int argc, char *argv[]){
     logger.log("Program setting folder: " + SETTINGS_PATH());
     logger.log("Program resources folder: " + RESOURCE_PATH());
 #ifdef PA_DPP
-    logger.log(dpp_cert_message.toStdString(), dpp_cert_error ? COLOR_RED : Color());
+    logger.log(dpp_cert_message, dpp_cert_error ? COLOR_RED : Color());
 #endif
 
     qRegisterMetaType<size_t>("size_t");
