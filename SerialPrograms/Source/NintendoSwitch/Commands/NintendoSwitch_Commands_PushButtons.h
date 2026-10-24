@@ -3,11 +3,7 @@
  *  From: https://github.com/PokemonAutomation/
  *
  *  The functions to send Switch commands to the micro controller.
- *  The timing of the commands are measured in ticks. One second is 125 ticks.
- *
- *  **New** Overloads have been added that use milliseconds instead of ticks.
- *  If the underlying controller doesn't support millisecond precision, it will
- *  be rounded up to whatever granularity it does support.
+ *  The timing of the commands are measured in milliseconds.
  *
  *  You should use these functions (instead of ssf_*) whenever possible since
  *  these are cleaner and easier to use/understand.
@@ -27,50 +23,50 @@ namespace NintendoSwitch{
 using namespace std::chrono_literals;
 
 
-//  Wait for this many ticks on the Switch.
+//  Wait for this duration on the Switch.
 void pbf_wait           (ProControllerContext& context, Milliseconds duration);
 
-//  Press a Switch controller button (excluding D-Pad). Hold the button for `hold_ticks`, then release it for `release_ticks`.
+//  Press a Switch controller button (excluding D-Pad). Hold the button for `hold`, then release it for `release`.
 //  The buttons are defined in NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h. Examples include BUTTON_A, BUTTON_ZL.
 //  The buttons also include clicking joysticks: BUTTON_LCLICK, BUTTON_RCLICK.
 //  D-Pad buttons and directional movements of joysticks are controlled by separate functions.
 void pbf_press_button       (ProControllerContext& context, Button button, Milliseconds hold, Milliseconds release);
 
-//  Press a Switch controller D-Pad button. Hold the button for `hold_ticks`, then release it for `release_ticks`.
+//  Press a Switch controller D-Pad button. Hold the button for `hold`, then release it for `release`.
 //  The buttons are defined in NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h. Examples include DPAD_DOWN, DPAD_UP_RIGHT.
 void pbf_press_dpad     (ProControllerContext& context, DpadPosition position, Milliseconds hold, Milliseconds release);
 
-//  Move left joystick towards a 2D direction. Hold the direction for `hold_ticks`, then release it for `release_ticks`.
-//  The direction is specified by (x, y):
-//  x = 0 : left
-//  x = 128 : neutral
-//  x = 255 : right
-//  y = 0 : up
-//  y = 128 : neutral
-//  y = 255 : down
-//  Example: move the joystick fully left: (x, y) = (0, 128)
-//           move the joystick upper-right: (x, y) = (255, 0)
+//  Move left joystick towards a 2D direction. Hold the direction for `hold`, then release it for `release`.
+//  The direction is specified by a JoystickPosition (x, y) with floating point values:
+//  x = -1 : left
+//  x = 0 : neutral
+//  x = +1 : right
+//  y = -1 : up
+//  y = 0 : neutral
+//  y = +1 : down
+//  Values outside of [-1, +1] are scaled back into the unit circle before being sent.
+//  Example: move the joystick fully left: (x, y) = (-1, 0)
+//           move the joystick upper-right: (x, y) = (+1, -1)
 void pbf_move_left_joystick     (ProControllerContext& context, const JoystickPosition& position, Milliseconds hold, Milliseconds release);
 
-//  Move right joystick towards a 2D direction. Hold the direction for `hold_ticks`, then release it for `release_ticks`.
-//  The direction is specified by (x, y):
-//  x = 0 : left
-//  x = 128 : neutral
-//  x = 255 : right
-//  y = 0 : up
-//  y = 128 : neutral
-//  y = 255 : down
-//  Example: move the joystick fully left: (x, y) = (0, 128)
-//           move the joystick upper-right: (x, y) = (255, 0)
-//void pbf_move_right_joystick(ProControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks);
+//  Move right joystick towards a 2D direction. Hold the direction for `hold`, then release it for `release`.
+//  The direction is specified by a JoystickPosition (x, y) with floating point values:
+//  x = -1 : left
+//  x = 0 : neutral
+//  x = +1 : right
+//  y = -1 : up
+//  y = 0 : neutral
+//  y = +1 : down
+//  Values outside of [-1, +1] are scaled back into the unit circle before being sent.
+//  Example: move the joystick fully left: (x, y) = (-1, 0)
+//           move the joystick upper-right: (x, y) = (+1, -1)
 void pbf_move_right_joystick    (ProControllerContext& context, const JoystickPosition& position, Milliseconds hold, Milliseconds release);
 
-//  Mash a Switch controller button (excluding D-Pad) repeatedly for `ticks` ticks.
-//  The buttons are defined in Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h. Examples include BUTTON_A, BUTTON_ZL.
+//  Mash a Switch controller button (excluding D-Pad) repeatedly for `duration`.
+//  The buttons are defined in NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h. Examples include BUTTON_A, BUTTON_ZL.
 //  The buttons also include clicking joysticks: BUTTON_LCLICK, BUTTON_RCLICK.
 void pbf_mash_button            (ProControllerContext& context, Button button, Milliseconds duration);
 
-//void start_program_flash        (ProControllerContext& context, uint16_t ticks);
 void grip_menu_connect_go_home  (ProControllerContext& context);
 
 
