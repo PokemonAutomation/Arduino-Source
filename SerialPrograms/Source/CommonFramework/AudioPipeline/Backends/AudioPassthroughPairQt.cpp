@@ -443,37 +443,26 @@ void AudioPassthroughPairQt::reset(
     });
 }
 void AudioPassthroughPairQt::reset(
-    const AudioDeviceInfo& input, AudioChannelFormat format,
+    const AudioDeviceInfo& input, const AudioInputChoice& choice,
     const AudioDeviceInfo& output, double output_volume
 ){
     auto scope_check = m_sanitizer.check_scope();
 //    cout << "AudioPassthroughPairQt::reset(): " << output.display_name() << endl;
-    QMetaObject::invokeMethod(this, [this, format, output, output_volume, input]{
+    QMetaObject::invokeMethod(this, [this, choice, output, output_volume, input]{
         auto scope_check = m_sanitizer.check_scope();
         std::unique_ptr<AudioSource> source;
-        AudioInputChoice choice;
-        if (input && format != AudioChannelFormat::NONE){
-            choice = resolve_input_choice(input.supported_choices(), format);
-            if (!choice){
-                m_logger.log(
-                    "Audio input format cannot be resolved for " + input.display_name()
-                    + "; audio input is disabled.",
-                    COLOR_RED
-                );
-            }else{
-                source.reset(new AudioSource(
-                    m_logger,
-                    input,
-                    choice
-                ));
-            }
+        if (input && choice){
+            source.reset(new AudioSource(
+                m_logger,
+                input,
+                choice
+            ));
         }
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_reader){
             teardown_tree();
             m_sink_device.reset();
             m_reader.reset();
-            m_input_choice = AudioInputChoice();
         }
         m_input_choice = choice;
         m_output_device = output;
@@ -524,34 +513,23 @@ void AudioPassthroughPairQt::set_audio_source(const std::string& file){
         }
     });
 }
-void AudioPassthroughPairQt::set_audio_source(const AudioDeviceInfo& device, AudioChannelFormat format){
+void AudioPassthroughPairQt::set_audio_source(const AudioDeviceInfo& device, const AudioInputChoice& choice){
     auto scope_check = m_sanitizer.check_scope();
-    QMetaObject::invokeMethod(this, [this, format, device]{
+    QMetaObject::invokeMethod(this, [this, choice, device]{
         auto scope_check = m_sanitizer.check_scope();
         std::unique_ptr<AudioSource> source;
-        AudioInputChoice choice;
-        if (device && format != AudioChannelFormat::NONE){
-            choice = resolve_input_choice(device.supported_choices(), format);
-            if (!choice){
-                m_logger.log(
-                    "Audio input format cannot be resolved for " + device.display_name()
-                    + "; audio input is disabled.",
-                    COLOR_RED
-                );
-            }else{
-                source.reset(new AudioSource(
-                    m_logger,
-                    device,
-                    choice
-                ));
-            }
+        if (device && choice){
+            source.reset(new AudioSource(
+                m_logger,
+                device,
+                choice
+            ));
         }
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_reader){
             teardown_tree();
             m_sink_device.reset();
             m_reader.reset();
-            m_input_choice = AudioInputChoice();
         }
         m_input_choice = choice;
         if (source){
