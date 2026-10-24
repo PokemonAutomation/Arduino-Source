@@ -4,9 +4,7 @@
  *
  */
 
-#include <QAudioFormat>
 #include "Common/Cpp/Logging/AbstractLogger.h"
-#include "Common/Cpp/Containers/Pimpl.tpp"   //  Pimpl<QAudioFormat> (AudioFormat) instantiations
 #include "CommonFramework/GlobalServices.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "Backends/AudioPassthroughPairQtThread.h"
@@ -70,7 +68,7 @@ void AudioSession::save(AudioOption& option) const{
     std::lock_guard<Mutex> lg(m_lock);
     option.m_input_file     = m_option.m_input_file;
     option.m_input_device   = m_option.m_input_device;
-    option.m_input_format   = m_option.m_input_format;
+    option.m_input_choice   = m_option.m_input_choice;
     option.m_output_device  = m_option.m_output_device;
     option.m_volume         = m_option.m_volume;
     option.m_display_type   = m_option.m_display_type;
@@ -82,16 +80,16 @@ void AudioSession::load(const AudioOption& option){
 
         m_option.m_input_file       = option.m_input_file;
         m_option.m_input_device     = option.m_input_device;
-        m_option.m_input_format     = option.m_input_format;
+        m_option.m_input_choice     = option.m_input_choice;
         m_option.m_output_device    = option.m_output_device;
         m_option.m_volume           = option.m_volume;
         m_option.m_display_type     = option.m_display_type;
 
         if (!m_option.m_input_file.empty()){
-            sanitize_format();
+            sanitize_choice();
             m_devices->set_audio_source(m_option.m_input_file);
-        }else if (sanitize_format()){
-            m_devices->set_audio_source(m_option.m_input_device, m_option.m_input_format);
+        }else if (sanitize_choice()){
+            m_devices->set_audio_source(m_option.m_input_device, m_option.m_input_choice);
         }else{
             m_devices->clear_audio_source();
         }
@@ -108,9 +106,9 @@ std::pair<std::string, AudioDeviceInfo> AudioSession::input_device() const{
     std::lock_guard<Mutex> lg(m_lock);
     return {m_option.input_file(), m_option.m_input_device};
 }
-AudioChannelFormat AudioSession::input_format() const{
+AudioInputChoice AudioSession::input_choice() const{
     std::lock_guard<Mutex> lg(m_lock);
-    return m_option.m_input_format;
+    return m_option.m_input_choice;
 }
 AudioDeviceInfo AudioSession::output_device() const{
     std::lock_guard<Mutex> lg(m_lock);
@@ -147,7 +145,7 @@ void AudioSession::set_audio_input(std::string file){
     std::lock_guard<Mutex> lg(m_lock);
     signal_pre_input_change();
     m_option.m_input_file = std::move(file);
-    sanitize_format();
+    m_option.m_input_choice = AudioInputChoice();
     m_devices->set_audio_source(m_option.m_input_file);
     signal_post_input_change();
 }
@@ -157,23 +155,23 @@ void AudioSession::set_audio_input(AudioDeviceInfo info){
     signal_pre_input_change();
     m_option.m_input_file.clear();
     m_option.m_input_device = std::move(info);
-    m_option.m_input_format = AudioChannelFormat::NONE;
-    if (sanitize_format()){
-        m_devices->set_audio_source(info, m_option.m_input_format);
+    m_option.m_input_choice = AudioInputChoice();
+    if (sanitize_choice()){
+        m_devices->set_audio_source(info, m_option.m_input_choice);
     }else{
         m_devices->clear_audio_source();
     }
     signal_post_input_change();
 }
-void AudioSession::set_format(AudioChannelFormat format){
+void AudioSession::set_input_choice(const AudioInputChoice& choice){
     std::lock_guard<Mutex> lg(m_lock);
     signal_pre_input_change();
-    m_option.m_input_format = format;
-    if (sanitize_format()){
+    m_option.m_input_choice = choice;
+    if (sanitize_choice()){
         if (!m_option.m_input_file.empty()){
             m_devices->set_audio_source(m_option.m_input_file);
         }else{
-            m_devices->set_audio_source(m_option.m_input_device, m_option.m_input_format);
+            m_devices->set_audio_source(m_option.m_input_device, m_option.m_input_choice);
         }
     }else{
         m_devices->clear_audio_source();
@@ -216,38 +214,30 @@ void AudioSession::set_display(AudioOption::AudioDisplayType display){
     m_listeners.run_method(&StateListener::post_display_change, m_option.m_display_type);
 }
 
-bool AudioSession::sanitize_format(){
+bool AudioSession::sanitize_choice(){
     if (!m_option.m_input_file.empty()){
-        m_option.m_input_format = AudioChannelFormat::NONE;
+        m_option.m_input_choice = AudioInputChoice();
         return true;
     }
     AudioDeviceInfo& info = m_option.m_input_device;
-    const std::vector<AudioChannelFormat>& supported_formats = info.supported_formats();
-    int preferred_index = info.preferred_format_index();
-    if (supported_formats.empty() || preferred_index < 0){
-//        cout << "supported_formats = " << supported_formats.size() << endl;
-//        cout << "preferred_index = " << preferred_index << endl;
+    const std::vector<AudioInputChoice>& choices = info.supported_choices();
+    const size_t preferred_index = info.preferred_choice_index();
+    if (choices.empty()){
         m_logger.log("No supported formats for this input device.", COLOR_RED);
-        m_option.m_input_format = AudioChannelFormat::NONE;
+        m_option.m_input_choice = AudioInputChoice();
         return false;
     }
-    if (m_option.m_input_format == AudioChannelFormat::NONE){
+    if (!m_option.m_input_choice){
         m_logger.log("No format set. Resetting to default...", COLOR_ORANGE);
     }else{
-        for (AudioChannelFormat supported_format : supported_formats){
-            if (m_option.m_input_format == supported_format){
-                //  The preset must also resolve to one of the device's
-                //  input choices; the pipeline opens the device through
-                //  that choice, not through the preset directly.
-                if (resolve_input_choice(info.supported_choices(), m_option.m_input_format)){
-                    return true;
-                }
-                break;
+        for (const AudioInputChoice& choice : choices){
+            if (choice == m_option.m_input_choice){
+                return true;
             }
         }
         m_logger.log("Desired format not supported. Resetting to default...", COLOR_RED);
     }
-    m_option.m_input_format = supported_formats[preferred_index];
+    m_option.m_input_choice = choices[preferred_index];
     return true;
 }
 void AudioSession::signal_pre_input_change(){
@@ -258,7 +248,7 @@ void AudioSession::signal_post_input_change(){
         &StateListener::post_input_change,
         m_option.input_file(),
         m_option.input_device(),
-        m_option.input_format()
+        m_option.m_input_choice
     );
 }
 void AudioSession::signal_post_output_change(){
@@ -280,7 +270,7 @@ void AudioSession::reset(){
     }else{
 //        cout << "AudioSession::reset() - device: " << m_option.m_inputDevice.display_name() << endl;
         m_devices->reset(
-            m_option.m_input_device, m_option.m_input_format,
+            m_option.m_input_device, m_option.m_input_choice,
             m_option.m_output_device, m_option.m_volume
         );
     }

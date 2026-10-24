@@ -59,15 +59,14 @@ void AudioOption::load_json(const JsonValue& json){
         }
     }
     str = obj->get_string(JSON_INPUT_FORMAT);
-    if (str != nullptr){
-        for (AudioChannelFormat format : m_input_device.supported_formats()){
-            if (AUDIO_FORMAT_LABELS[(size_t)format] == *str){
-                m_input_format = format;
+    if (str != nullptr && !str->empty()){
+        for (const AudioInputChoice& choice : m_input_device.supported_choices()){
+            if (choice.display_name() == *str){
+                m_input_choice = choice;
                 break;
             }
         }
     }
-//    cout << AUDIO_FORMAT_LABELS[(size_t)m_inputFormat] << endl;
     str = obj->get_string(JSON_OUTPUT_DEVICE);
     if (str != nullptr){
         m_output_device = AudioDeviceInfo(*str);
@@ -88,7 +87,7 @@ JsonValue AudioOption::to_json() const{
     JsonObject root;
     root[JSON_INPUT_FILE] = m_input_file;
     root[JSON_INPUT_DEVICE] = m_input_device.device_name();
-    root[JSON_INPUT_FORMAT] = AUDIO_FORMAT_LABELS[(size_t)m_input_format];
+    root[JSON_INPUT_FORMAT] = m_input_choice.display_name();
     root[JSON_OUTPUT_DEVICE] = m_output_device.device_name();
     root[JSON_AUDIO_VIS] = audioDisplayTypeToString(m_display_type);
     root[JSON_AUDIO_VOLUME] = m_volume;

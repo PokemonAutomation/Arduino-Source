@@ -261,11 +261,27 @@ AudioInputChoice reinterpreted_96k_choice(
 
 
 
+AudioInputChoice::~AudioInputChoice() = default;
+AudioInputChoice::AudioInputChoice(const AudioInputChoice& x) = default;
+AudioInputChoice& AudioInputChoice::operator=(const AudioInputChoice& x) = default;
+
 AudioInputChoice::AudioInputChoice(){}
 AudioInputChoice::AudioInputChoice(AudioFormat format)
     : m_format(format)
     , m_physical(format)
 {}
+bool AudioInputChoice::operator==(const AudioInputChoice& x) const{
+    if (is_valid() != x.is_valid()){
+        return false;
+    }
+    if (!is_valid()){
+        return true;
+    }
+    return is_reinterpreted() == x.is_reinterpreted()
+        && swap_channels() == x.swap_channels()
+        && m_format.native_format() == x.m_format.native_format()
+        && m_physical.native_format() == x.m_physical.native_format();
+}
 AudioInputChoice AudioInputChoice::reinterpreted(
     AudioFormat format, AudioFormat physical, bool swap_channels
 ){
@@ -404,58 +420,6 @@ AudioInputChoiceList input_choices(std::vector<AudioFormat> supported, const Aud
     return ret;
 }
 
-
-AudioInputChoice resolve_input_choice(
-    const std::vector<AudioInputChoice>& choices,
-    AudioChannelFormat format
-){
-    const auto find_shape = [&choices](size_t rate, size_t channels){
-        for (const AudioInputChoice& choice : choices){
-            //  Reinterpreted entries must never satisfy a native preset:
-            //  a 1ch x 96000 card's reinterpreted 2ch x 48000 choices are
-            //  not "2ch x 48000" in the native sense.
-            if (choice.is_reinterpreted()){
-                continue;
-            }
-            const AudioFormat& shape = choice.format();
-            if (shape.sample_rate() == rate && shape.channels() == channels){
-                return choice;
-            }
-        }
-        return AudioInputChoice();
-    };
-    switch (format){
-    case AudioChannelFormat::MONO_48000:
-        return find_shape(48000, 1);
-    case AudioChannelFormat::DUAL_44100:
-        return find_shape(44100, 2);
-    case AudioChannelFormat::DUAL_48000:
-        return find_shape(48000, 2);
-    case AudioChannelFormat::MONO_96000:
-        return find_shape(96000, 1);
-    case AudioChannelFormat::INTERLEAVE_LR_96000:
-    case AudioChannelFormat::INTERLEAVE_RL_96000:
-    {
-        const bool swap = format == AudioChannelFormat::INTERLEAVE_RL_96000;
-        for (const AudioInputChoice& choice : choices){
-            if (choice.is_reinterpreted() && choice.swap_channels() == swap){
-                return choice;
-            }
-        }
-        //  The device supports 1ch x 96000 but its choice list carries no
-        //  reinterpreted entry (other formats are supported too): build
-        //  the reinterpreted choice from the native entry, as the legacy
-        //  preset path did.
-        AudioInputChoice native_96k = find_shape(96000, 1);
-        if (native_96k){
-            return reinterpreted_96k_choice(native_96k.format(), swap);
-        }
-        return AudioInputChoice();
-    }
-    default:
-        return AudioInputChoice();
-    }
-}
 
 
 
