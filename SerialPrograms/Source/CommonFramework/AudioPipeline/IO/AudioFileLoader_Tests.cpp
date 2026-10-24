@@ -318,7 +318,7 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         const std::vector<int16_t> samples = {0, 1, 0, 1};
-        const std::string path = temp_wav_path("s16_44100_2ch");
+        const std::string path = temp_wav_path("s16_44100_2ch_rate_mismatch");
         write_wav_file(path, 1, 2, 44100, 16, to_bytes(samples));
 
         QAudioFormat target;

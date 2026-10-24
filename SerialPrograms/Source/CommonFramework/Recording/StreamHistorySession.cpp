@@ -65,8 +65,7 @@ StreamHistorySession::StreamHistorySession(Logger& logger)
     //  The working-stream nominal shape is metadata only: the pair's
     //  per-listener forwarder carries the shape actually requested, and
     //  nothing validates this one.
-    : AudioFloatStreamListener(1)
-    , Kernels::AudioPipeline::WorkingAudioStreamListener(48000, 2)
+    : Kernels::AudioPipeline::WorkingAudioStreamListener(48000, 2)
     , m_data(CONSTRUCT_TOKEN, logger)
 {}
 void StreamHistorySession::start(AudioChannelFormat format, bool has_video){
@@ -113,13 +112,6 @@ bool StreamHistorySession::save(const std::string& filename) const{
 //    return saver.save();
 
     return tracker->save(filename);
-}
-void StreamHistorySession::on_samples(const float* samples, size_t frames){
-    Data& data = *m_data;
-    WriteSpinLock lg(data.m_lock);
-    if (data.m_current){
-        data.m_current->on_samples(samples, frames);
-    }
 }
 void StreamHistorySession::push_samples(size_t samples, size_t stride, const float* data){
     Data& state = *m_data;
@@ -177,42 +169,35 @@ void StreamHistorySession::initialize(){
     //  stream shape (what the tree delivers through the working listener),
     //  not the preset's legacy framing. (DUAL_44100 was previously
     //  misreported as mono; MONO_96000 was previously framed as 2-sample
-    //  frames at 48000.) "expected_samples_per_frame" keeps the legacy
-    //  framing values for the AudioFloatStreamListener path.
+    //  frames at 48000.)
     switch (data.m_audio_format){
     case AudioChannelFormat::NONE:
-        expected_samples_per_frame = 0;
         data.m_active_channels = 0;
         data.m_active_rate = 0;
         data.m_current.reset(new StreamHistoryTracker(data.m_logger, data.m_window, 0, 0, data.m_has_video));
         return;
     case AudioChannelFormat::MONO_48000:
-        expected_samples_per_frame = 1;
         data.m_active_channels = 1;
         data.m_active_rate = 48000;
         data.m_current.reset(new StreamHistoryTracker(data.m_logger, data.m_window, 1, 48000, data.m_has_video));
         return;
     case AudioChannelFormat::DUAL_44100:
-        expected_samples_per_frame = 2;
         data.m_active_channels = 2;
         data.m_active_rate = 44100;
         data.m_current.reset(new StreamHistoryTracker(data.m_logger, data.m_window, 2, 44100, data.m_has_video));
         return;
     case AudioChannelFormat::DUAL_48000:
-        expected_samples_per_frame = 2;
         data.m_active_channels = 2;
         data.m_active_rate = 48000;
         data.m_current.reset(new StreamHistoryTracker(data.m_logger, data.m_window, 2, 48000, data.m_has_video));
         return;
     case AudioChannelFormat::MONO_96000:
-        expected_samples_per_frame = 2;
         data.m_active_channels = 1;
         data.m_active_rate = 96000;
         data.m_current.reset(new StreamHistoryTracker(data.m_logger, data.m_window, 1, 96000, data.m_has_video));
         return;
     case AudioChannelFormat::INTERLEAVE_LR_96000:
     case AudioChannelFormat::INTERLEAVE_RL_96000:
-        expected_samples_per_frame = 2;
         data.m_active_channels = 2;
         data.m_active_rate = 48000;
         data.m_current.reset(new StreamHistoryTracker(data.m_logger, data.m_window, 2, 48000, data.m_has_video));
