@@ -234,7 +234,13 @@ bool AudioSession::sanitize_format(){
     }else{
         for (AudioChannelFormat supported_format : supported_formats){
             if (m_option.m_input_format == supported_format){
-                return true;
+                //  The preset must also resolve to one of the device's
+                //  input choices; the pipeline opens the device through
+                //  that choice, not through the preset directly.
+                if (resolve_input_choice(info.supported_choices(), m_option.m_input_format)){
+                    return true;
+                }
+                break;
             }
         }
         m_logger.log("Desired format not supported. Resetting to default...", COLOR_RED);

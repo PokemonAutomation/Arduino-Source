@@ -78,7 +78,10 @@ ConsoleSystemSession::ConsoleSystemSession(
 
     update_status();
     m_history.set_audio_session(m_audio);
-    m_history.start(m_audio.input_format(), m_video.current_source() != nullptr);
+    m_history.start(
+        m_audio.input_device().second, m_audio.input_format(),
+        m_video.current_source() != nullptr
+    );
 
     try{
         m_overlay.add_stat(m_memory_usage->m_system);

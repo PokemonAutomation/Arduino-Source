@@ -38,18 +38,22 @@ public:
 public:
     ~AudioSource();
 
-    //  Read from an audio file. (i.e. .wav or .mp3)
+    //  Read from an audio file. (i.e. .wav or .mp3) The stream is the
+    //  file's native format (rate, channels, sample type); the tree's
+    //  decoder / resampler / mixer convert it to the sink's format.
     AudioSource(
         Logger& logger,
-        const std::string& file,
-        AudioChannelFormat format
+        const std::string& file
     );
 
-    //  Read from an audio input device. (i.e. capture card)
+    //  Read from an audio input device. (i.e. capture card) The device is
+    //  opened in the choice's physical format; the raw stream is the
+    //  choice's logical format (the 96 kHz reinterpretation for
+    //  misreporting capture cards, when the choice carries it).
     AudioSource(
         Logger& logger,
         const AudioDeviceInfo& device,
-        AudioChannelFormat format
+        const AudioInputChoice& choice
     );
 
 private:

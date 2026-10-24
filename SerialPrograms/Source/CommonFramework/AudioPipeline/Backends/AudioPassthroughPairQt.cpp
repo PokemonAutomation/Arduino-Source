@@ -172,7 +172,7 @@ private:
 void AudioPassthroughPairQt::build_working_entry(
     WorkingListenerEntry& entry, Kernels::AudioPipeline::WorkingAudioStreamListener& listener
 ){
-    if (!m_source_decoder || m_input_format == AudioChannelFormat::NONE){
+    if (!m_source_decoder){
         return;
     }
     //  Re-adding with a new format: detach the old node first.
@@ -189,12 +189,13 @@ void AudioPassthroughPairQt::build_working_entry(
         return;
     }
 
-    //  INTERLEAVE_RL_96000 plays the card's channel 1 (the odd physical
+    //  A reinterpreted input choice with reversed channel order
+    //  (INTERLEAVE_RL_96000) plays the card's channel 1 (the odd physical
     //  samples) as the left channel; the input reinterpretation preserves
     //  the physical order, so the swap is applied to the matrix (the same
     //  special case the sink branch uses).
     std::vector<float> matrix;
-    if (m_input_format == AudioChannelFormat::INTERLEAVE_RL_96000
+    if (m_input_choice.swap_channels()
         && raw_channels == 2 && out_channels == 2){
         //  out = [in 1, in 0]; weight(in i -> out o) at index i + in_ch * o.
         matrix = {0.0f, 1.0f, 1.0f, 0.0f};
@@ -279,11 +280,11 @@ void AudioPassthroughPairQt::teardown_sink_branch(){
 
 
 void AudioPassthroughPairQt::build_tree(float input_volume){
-    if (!m_reader || m_input_format == AudioChannelFormat::NONE){
+    if (!m_reader){
         return;
     }
-    //  For the INTERLEAVE_96000 presets, m_reader reports the reinterpreted
-    //  2ch x 48000 stream; MONO_96000 keeps the physical 1ch x 96000 shape
+    //  For reinterpreted input choices, m_reader reports the reinterpreted
+    //  2ch x 48000 stream; native choices keep the physical shape
     //  (AudioInputFile / AudioInputDevice apply it).
     size_t raw_rate = m_reader->raw_sample_rate();
     size_t raw_channels = m_reader->raw_channels();
@@ -359,17 +360,16 @@ void AudioPassthroughPairQt::rebuild_sink_branch(){
         sink_rate, sink_channels,
         convert_audio_volume_from_slider(m_output_volume)
     ));
-    //  INTERLEAVE_RL_96000 plays the card's channel 1 (the odd physical
+    //  A reinterpreted input choice with reversed channel order
+    //  (INTERLEAVE_RL_96000) plays the card's channel 1 (the odd physical
     //  samples) as the left channel; the input reinterpretation preserves
     //  the physical order, so the sink branch swaps the two channels.
     //  (The FFT pair-average is order-invariant.)
     //  Qt channel configs can't express a reversed channel order, so the
-    //  swap matrix is literal for now; once the format encodes the
-    //  card's channel mapping (dropdown rewrite),
-    //  build_channel_mixer_matrix will derive it and this special case
-    //  goes away.
+    //  swap matrix stays literal; the choice now carries the card's
+    //  channel mapping (swap_channels()), which drives this special case.
     bool swap_channels =
-        m_input_format == AudioChannelFormat::INTERLEAVE_RL_96000
+        m_input_choice.swap_channels()
         && raw_channels == 2 && sink_channels == 2;
     if (raw_rate == sink_rate && raw_channels == sink_channels && !swap_channels){
         //  No conversion needed: feed the encoder directly.
@@ -422,8 +422,7 @@ void AudioPassthroughPairQt::reset(
         if (!file.empty()){
             source.reset(new AudioSource(
                 m_logger,
-                file,
-                AudioChannelFormat::DUAL_48000
+                file
             ));
         }
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
@@ -431,9 +430,8 @@ void AudioPassthroughPairQt::reset(
             teardown_tree();
             m_sink_device.reset();
             m_reader.reset();
-            m_input_format = AudioChannelFormat::NONE;
         }
-        m_input_format = AudioChannelFormat::DUAL_48000;
+        m_input_choice = AudioInputChoice();
         if (source){
             m_reader = std::move(source);
             m_output_device = output;
@@ -453,21 +451,31 @@ void AudioPassthroughPairQt::reset(
     QMetaObject::invokeMethod(this, [this, format, output, output_volume, input]{
         auto scope_check = m_sanitizer.check_scope();
         std::unique_ptr<AudioSource> source;
+        AudioInputChoice choice;
         if (input && format != AudioChannelFormat::NONE){
-            source.reset(new AudioSource(
-                m_logger,
-                input,
-                format
-            ));
+            choice = resolve_input_choice(input.supported_choices(), format);
+            if (!choice){
+                m_logger.log(
+                    "Audio input format cannot be resolved for " + input.display_name()
+                    + "; audio input is disabled.",
+                    COLOR_RED
+                );
+            }else{
+                source.reset(new AudioSource(
+                    m_logger,
+                    input,
+                    choice
+                ));
+            }
         }
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_reader){
             teardown_tree();
             m_sink_device.reset();
             m_reader.reset();
-            m_input_format = AudioChannelFormat::NONE;
+            m_input_choice = AudioInputChoice();
         }
-        m_input_format = format;
+        m_input_choice = choice;
         m_output_device = output;
         m_output_volume = output_volume;
         if (source){
@@ -486,7 +494,7 @@ void AudioPassthroughPairQt::clear_audio_source(){
         if (m_reader){
             teardown_tree();
             m_reader.reset();
-            m_input_format = AudioChannelFormat::NONE;
+            m_input_choice = AudioInputChoice();
         }
     });
 }
@@ -498,8 +506,7 @@ void AudioPassthroughPairQt::set_audio_source(const std::string& file){
         if (!file.empty()){
             source.reset(new AudioSource(
                 m_logger,
-                file,
-                AudioChannelFormat::DUAL_48000
+                file
             ));
         }
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
@@ -507,9 +514,8 @@ void AudioPassthroughPairQt::set_audio_source(const std::string& file){
             teardown_tree();
             m_sink_device.reset();
             m_reader.reset();
-            m_input_format = AudioChannelFormat::NONE;
         }
-        m_input_format = AudioChannelFormat::DUAL_48000;
+        m_input_choice = AudioInputChoice();
         if (source){
             m_reader = std::move(source);
             init_audio_sink();
@@ -523,21 +529,31 @@ void AudioPassthroughPairQt::set_audio_source(const AudioDeviceInfo& device, Aud
     QMetaObject::invokeMethod(this, [this, format, device]{
         auto scope_check = m_sanitizer.check_scope();
         std::unique_ptr<AudioSource> source;
+        AudioInputChoice choice;
         if (device && format != AudioChannelFormat::NONE){
-            source.reset(new AudioSource(
-                m_logger,
-                device,
-                format
-            ));
+            choice = resolve_input_choice(device.supported_choices(), format);
+            if (!choice){
+                m_logger.log(
+                    "Audio input format cannot be resolved for " + device.display_name()
+                    + "; audio input is disabled.",
+                    COLOR_RED
+                );
+            }else{
+                source.reset(new AudioSource(
+                    m_logger,
+                    device,
+                    choice
+                ));
+            }
         }
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_reader){
             teardown_tree();
             m_sink_device.reset();
             m_reader.reset();
-            m_input_format = AudioChannelFormat::NONE;
+            m_input_choice = AudioInputChoice();
         }
-        m_input_format = format;
+        m_input_choice = choice;
         if (source){
             m_reader = std::move(source);
             init_audio_sink();
@@ -574,7 +590,7 @@ void AudioPassthroughPairQt::init_audio_sink(){
 
 //    cout << "AudioPassthroughPairQt::init_audio_sink()" << endl;
     auto scope_check = m_sanitizer.check_scope();
-    if (m_input_format == AudioChannelFormat::NONE){
+    if (!m_reader){
         return;
     }
     if (!m_output_device){

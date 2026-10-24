@@ -113,15 +113,17 @@ private:
     //  Objects lower on this list attach to and hold references to those
     //  higher on the list.
 
-    AudioChannelFormat m_input_format;
+    //  The resolved input choice for the active device source (invalid
+    //  when no device source is attached; file sources have no choice).
+    AudioInputChoice m_input_choice;
     std::unique_ptr<AudioSource> m_reader;
 
     //  New pipeline tree. The decoder attaches to m_reader's raw stream and
     //  the branch heads attach to the decoder (sink head before FFT head).
     //  Declared after m_reader so the nodes die before the reader does.
-    //  (For the INTERLEAVE_96000 presets, m_reader emits the two 48 kHz
+    //  (For reinterpreted input choices, m_reader emits the two 48 kHz
     //  channels reinterpreted from the physical 1ch x 96000 stream;
-    //  MONO_96000 keeps the physical shape.)
+    //  native choices keep the physical shape.)
     std::unique_ptr<RawAudio2WorkingAudio> m_source_decoder;
     std::unique_ptr<WorkingAudio2WorkingAudio> m_sink_conv;     //  Source shape -> sink shape (mix + resample).
     std::unique_ptr<WorkingAudio2RawAudio> m_sink_encoder;
