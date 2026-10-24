@@ -36,6 +36,11 @@ public:
 
 
 private:
+    //  Walk the list of nodes and attach the next one to the previous
+    //  one; sets m_data's head / tail.
+    void populate_pointers(const std::vector<WorkingAudioNode*>& nodes);
+
+private:
     struct Data;
     Pimpl<Data> m_data;
 };
