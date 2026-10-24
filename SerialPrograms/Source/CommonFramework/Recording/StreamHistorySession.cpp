@@ -46,8 +46,9 @@ struct StreamHistorySession::Data{
     AudioInputChoice m_audio_choice;
     bool m_has_video;
     //  The active input's physical working-stream shape (what the tree
-    //  delivers through the working listener, and what the tracker records
-    //  at). Set in initialize().
+    //  delivers through the working listener in the non-ffmpeg builds,
+    //  where the tracker records at the delivered shape; the ffmpeg ring
+    //  records a fixed 48 kHz stereo). Set in initialize().
     size_t m_active_channels = 0;
     size_t m_active_rate = 0;
     std::vector<float> m_interleaved;
@@ -127,15 +128,23 @@ bool StreamHistorySession::save(const std::string& filename) const{
 void StreamHistorySession::push_samples(size_t samples, size_t stride, const float* data){
     Data& state = *m_data;
     WriteSpinLock lg(state.m_lock);
-    if (!state.m_current || samples == 0 || state.m_active_channels == 0){
+    if (!state.m_current || samples == 0){
         return;
     }
+#if defined(PA_STREAM_HISTORY_FFMPEG)
+    //  The ring tracker consumes the planar working stream directly at its
+    //  fixed 48 kHz / stereo attach shape; nothing to convert here.
+    state.m_current->push_samples(samples, stride, data);
+#else
     //  The working stream is split (planar) channels: channel "c" starts at
     //  "data[c * stride]" and runs for "samples" samples. (stride may be 0
     //  for the single-channel pass-through.) Re-interleave for the tracker.
     //  The capture card's RL channel swap (INTERLEAVE_RL_96000) is already
     //  applied by the pair's conversion node matrix, the same way as for
     //  the sink branch.
+    if (state.m_active_channels == 0){
+        return;
+    }
     const size_t channels = state.m_active_channels;
     state.m_interleaved.resize(samples * channels);
     for (size_t i = 0; i < samples; i++){
@@ -144,6 +153,7 @@ void StreamHistorySession::push_samples(size_t samples, size_t stride, const flo
         }
     }
     state.m_current->on_samples(state.m_interleaved.data(), samples);
+#endif
 }
 void StreamHistorySession::on_frame(std::shared_ptr<const VideoFrame> frame){
     Data& data = *m_data;
@@ -175,12 +185,14 @@ void StreamHistorySession::initialize(){
 
 //    cout << "video = " << data.m_has_video << endl;
 
-    //  The tracker's audio shape is the input source's working-stream
+    //  The tracker is constructed at the input source's working-stream
     //  shape (what the tree delivers through the working listener), i.e.
     //  the resolved input choice's logical shape: the preset's framing,
     //  with the capture-card 96 kHz reinterpretation applied for the
     //  reinterpreted choices. No choice (file input or no input) records
-    //  at no shape.
+    //  at no shape. The ffmpeg ring ignores this shape - its
+    //  working-stream attach is a fixed 48 kHz / stereo - and uses it only
+    //  to gate whether audio is enabled.
     const AudioInputChoice& choice = data.m_audio_choice;
     const size_t channels = choice ? choice.format().channels() : 0;
     const size_t rate = choice ? choice.format().sample_rate() : 0;
@@ -233,9 +245,23 @@ void StreamHistorySession::attach_working_listener(){
     //  The remove quiesces any in-flight pushes in the old shape (and is a
     //  no-op if not attached yet); the node is then built for the new one.
     audio_session->remove_working_stream_listener(*this);
+#if defined(PA_STREAM_HISTORY_FFMPEG)
+    //  The ring tracker encodes AAC at 48 kHz stereo: request that fixed
+    //  shape and the pair's per-listener node mixes + resamples every input
+    //  preset into it (mono upmixes to dual-mono). The shape never changes
+    //  with the input, so on input changes this just rebuilds the same node
+    //  (this session remains the listener; it forwards to whichever tracker
+    //  is current).
+    QAudioFormat target_format;
+    target_format.setSampleRate(48000);
+    target_format.setChannelCount(2);
+    target_format.setChannelConfig(QAudioFormat::ChannelConfigStereo);
+    audio_session->add_working_stream_listener(AudioFormat(target_format), *this);
+#else
     audio_session->add_working_stream_listener(
         AudioFormat(target.format().native_format()), *this
     );
+#endif
 }
 void StreamHistorySession::pre_shutdown(){
 //    cout << "pre_shutdown()" << endl;
