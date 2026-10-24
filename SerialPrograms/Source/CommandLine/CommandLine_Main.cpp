@@ -87,7 +87,7 @@ int main(int argc, char* argv[]){
 
             for (int i = 0; i < 30; i++){
                 // Push A button: delay=0ms, hold=50ms, release=50ms, button=BUTTON_A
-                controller.push_button(0, 50, 50, static_cast<uint32_t>(BUTTON_A));
+                controller.push_button(static_cast<uint32_t>(BUTTON_A), 0, 50, 50);
             }
 
             // Wait for all button commands to complete

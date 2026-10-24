@@ -63,6 +63,30 @@ find_package(Threads REQUIRED)
 # Define a toggle option (ON by default)
 option(COMMAND_LINE_EXE "Build the optional executable" ON)
 
+# Build the _pa_core Python (pybind11) module; see Source/PythonBindings/README.md.
+# OFF by default because it needs a Python interpreter with development headers
+# and pybind11 (a system package or `pip install pybind11`).
+option(PA_PYTHON_BINDINGS "Build the _pa_core Python module (Switch controller)" OFF)
+
+# miniz is a third-party library compiled into every target that uses
+# CORE_LIBRARY_SOURCES (CoreLib in both build modes, SerialProgramsLib in the
+# full build): compile it with warnings off so its own code (and its header,
+# which it includes from its own directory, so no SYSTEM include directory can
+# shield it) can never trip -Werror / /WX, regardless of compiler or compiler
+# version. Must run before the PA_CORE_ONLY early return below; source
+# properties are global, so setting it once covers every target.
+if (MSVC)
+    set_source_files_properties(
+        ../3rdParty-Core/miniz-3.1.1/miniz.c
+        PROPERTIES COMPILE_OPTIONS "/W0"
+    )
+else()
+    set_source_files_properties(
+        ../3rdParty-Core/miniz-3.1.1/miniz.c
+        PROPERTIES COMPILE_OPTIONS "-w"
+    )
+endif()
+
 # Build only the GUI-free core: CoreLib and SerialProgramsCommandLine. This needs
 # no Qt, OpenCV, ONNX Runtime, Tesseract, DPP or Discord SDK, so none of them are
 # searched for.
@@ -83,6 +107,9 @@ if(PA_CORE_ONLY)
     include(cmake/CoreLib.cmake)
     if(COMMAND_LINE_EXE)
         include(Source/CommandLine/CommandLineExecutable.cmake)
+    endif()
+    if(PA_PYTHON_BINDINGS)
+        include(Source/PythonBindings/PythonBindings.cmake)
     endif()
     return()
 endif()
@@ -282,13 +309,6 @@ endfunction()
 # Apply common properties to both targets
 apply_common_target_properties(SerialProgramsLib)
 apply_common_target_properties(SerialPrograms)
-
-if(MSVC)
-    set_source_files_properties("../3rdParty-Core/miniz-3.1.1/miniz.c" PROPERTIES COMPILE_FLAGS "/W0")
-else()
-    # For GCC/Clang
-    set_source_files_properties("../3rdParty-Core/miniz-3.1.1/miniz.c" PROPERTIES COMPILE_FLAGS "-w")
-endif()
 
 # REPO_ROOT_DIR: the root folder of the git repository, "Arduino-Source/"
 set(PACKAGES_DIR "${REPO_ROOT_DIR}/Packages")
@@ -870,4 +890,9 @@ endif()
 if(COMMAND_LINE_EXE)
     # Add command-line executable (GUI-free) from subdirectory
     include(Source/CommandLine/CommandLineExecutable.cmake)
+endif()
+
+if(PA_PYTHON_BINDINGS)
+    # Python bindings (GUI-free) from subdirectory
+    include(Source/PythonBindings/PythonBindings.cmake)
 endif()
