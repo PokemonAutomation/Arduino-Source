@@ -105,9 +105,11 @@ void IsolatedHuntPrototype::program(SingleSwitchProgramEnvironment& env, ProCont
         throw UserSetupError(env.logger(), "Start in the overworld at the selected anchor.");
     }
 
+    // Stop audio inference before destroying the tracker captured by its kill callback.
+    std::unique_ptr<LetsGoEncounterBotTracker> encounters;
     OverworldSensors sensors(env.logger(), env.console, context);
     OverworldBattleTracker battle_tracker(env.logger(), sensors);
-    LetsGoEncounterBotTracker encounters(env, env.console, stats, sensors.lets_go_kill);
+    encounters = std::make_unique<LetsGoEncounterBotTracker>(env, env.console, stats, sensors.lets_go_kill);
     std::string stop_reason;
     NormalBattleMenuWatcher battle_menu(COLOR_RED);
     int result = run_until<ProControllerContext>(
@@ -174,11 +176,11 @@ void IsolatedHuntPrototype::program(SingleSwitchProgramEnvironment& env, ProCont
         sensors.throw_if_no_sound();
         stats.m_encounters++;
         env.update_stats();
-        encounters.encounter_rate_tracker().report_encounter();
+        encounters->encounter_rate_tracker().report_encounter();
         bool caught = false, should_save = false;
         try{
             process_battle(caught, should_save, env, ENCOUNTER_OPTIONS, env.console, context,
-                battle_tracker, encounters.encounter_frequencies(), stats.m_shinies, LANGUAGE);
+                battle_tracker, encounters->encounter_frequencies(), stats.m_shinies, LANGUAGE);
         }catch (ProgramFinishedException&){
             env.console.log("Prototype stopped by encounter policy. Leaving the battle for inspection.", COLOR_BLUE);
             send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
