@@ -40,7 +40,8 @@ public:
 
 public:
     //  Working stream, delivered in the shape requested at attach time
-    //  (the active preset's physical shape), split (planar) channels.
+    //  (48 kHz stereo for the ffmpeg ring, the active preset's physical
+    //  shape otherwise), split (planar) channels.
     virtual void push_samples(size_t samples, size_t stride, const float* data) override;
     virtual void on_frame(std::shared_ptr<const VideoFrame> frame) override;
 
