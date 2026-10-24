@@ -74,8 +74,19 @@ option(PA_CORE_ONLY "Build only the GUI-free core (basic microcontroller functio
 # listing, so every file would be recompiled on every run.
 option(PA_ASSEMBLY_LISTINGS "Write an assembly listing of every source file to Assembly/ (MSVC and clang-cl only)" ON)
 
+# Keep stream history as an in-memory ring of encoded video (hardware H.264,
+# with the built-in MPEG-4 encoder as a fallback so no GPL dependency is
+# needed) + AAC packets (StreamHistoryTracker_Ring) and only write to storage
+# when saving. Requires the ffmpeg shared libraries, which must be provided
+# per platform (see the PA_STREAM_HISTORY_FFMPEG blocks in the WIN32 and
+# POSIX sections below).
+option(PA_STREAM_HISTORY_FFMPEG "Stream history as in-memory encoded video+AAC ring buffer (requires ffmpeg)" ON)
+
 if(PA_CORE_ONLY)
     message(STATUS "PA_CORE_ONLY: building only the GUI-free core")
+    if(PA_STREAM_HISTORY_FFMPEG)
+        message(WARNING "PA_STREAM_HISTORY_FFMPEG has no effect when PA_CORE_ONLY=ON (GUI-free core build).")
+    endif()
     set(CMAKE_AUTOMOC OFF)
     set(CMAKE_AUTORCC OFF)
     set(CMAKE_AUTOUIC OFF)
@@ -336,6 +347,38 @@ if(NOT EXISTS "${DEST_DIR}/Scripts")
     )
 endif()
 
+#  Verify that the ffmpeg headers in FFMPEG_INC_DIRS provide the ffmpeg 5.1
+#  API generation the stream history ring uses:
+#  av_channel_layout_default() (the channel layout API) and
+#  swr_alloc_set_opts2(), both introduced in 5.1 with signatures
+#  unchanged since. libavcodec's major version cannot tell 4.x from
+#  5.x (both are libavcodec 58), so grep the symbols instead of
+#  comparing version numbers.
+function(pa_check_ffmpeg_51_api FFMPEG_INC_DIRS)
+    set(FFMPEG_51_API_OK FALSE)
+    foreach (FFMPEG_INC_DIR IN LISTS FFMPEG_INC_DIRS)
+        if (EXISTS "${FFMPEG_INC_DIR}/libavutil/channel_layout.h"
+                AND EXISTS "${FFMPEG_INC_DIR}/libswresample/swresample.h")
+            file(STRINGS "${FFMPEG_INC_DIR}/libavutil/channel_layout.h"
+                    FFMPEG_51_LINES REGEX "av_channel_layout_default")
+            file(STRINGS "${FFMPEG_INC_DIR}/libswresample/swresample.h"
+                    FFMPEG_51_LINES_SWR REGEX "swr_alloc_set_opts2")
+            if (NOT FFMPEG_51_LINES STREQUAL ""
+                    AND NOT FFMPEG_51_LINES_SWR STREQUAL "")
+                set(FFMPEG_51_API_OK TRUE)
+                break()
+            endif()
+        endif()
+    endforeach()
+    if (NOT FFMPEG_51_API_OK)
+        message(FATAL_ERROR
+            "PA_STREAM_HISTORY_FFMPEG=ON requires ffmpeg >= 5.1 "
+            "(the channel layout API and swr_alloc_set_opts2()), "
+            "but the ffmpeg headers in ${FFMPEG_INC_DIRS} do not "
+            "provide the ffmpeg 5.1 API generation.")
+    endif()
+endfunction()
+
 if (WIN32)
     add_library(OpenCV_lib IMPORTED UNKNOWN)
     target_include_directories(SerialProgramsLib SYSTEM PRIVATE ../3rdParty/opencv-4.12.0/)
@@ -374,6 +417,25 @@ if (WIN32)
         MAP_IMPORTED_CONFIG_RELWITHDEBINFO  RELEASE
         MAP_IMPORTED_CONFIG_MINSIZEREL      RELEASE
     )
+
+    #  ffmpeg import libraries for the in-memory stream history ring
+    #  (PA_STREAM_HISTORY_FFMPEG). The .lib files are checked in unzipped under
+    #  3rdPartyBinaries/ffmpeg/ (LGPL shared build - see the README there), and
+    #  the matching .dll files start zipped in
+    #  3rdPartyBinaries/ffmpeg/ffmpeg-n9.0-win64-lgpl-shared-9.0.zip and are
+    #  extracted + deployed by the step at the bottom of this file.
+    #  The ffmpeg >= 5.1 API-generation check and the include dir are applied
+    #  in the shared block after the WIN32/else() split, via FFMPEG_INC_DIRS.
+    if (PA_STREAM_HISTORY_FFMPEG)
+        set(FFMPEG_INC_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/../3rdParty/ffmpeg)
+        foreach(FFMPEG_LIB IN ITEMS avcodec avformat avutil swscale swresample)
+            add_library(ffmpeg_${FFMPEG_LIB}_lib IMPORTED UNKNOWN)
+            set_target_properties(ffmpeg_${FFMPEG_LIB}_lib PROPERTIES
+                IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/ffmpeg/${FFMPEG_LIB}.lib
+            )
+            target_link_libraries(SerialProgramsLib PRIVATE ffmpeg_${FFMPEG_LIB}_lib)
+        endforeach()
+    endif()
 
     target_link_libraries(
         SerialProgramsLib PRIVATE
@@ -583,6 +645,35 @@ else() # macOS and Linux
     target_link_directories(SerialProgramsLib PUBLIC ${OpenCV_LIBRARY_DIRS})
     target_link_libraries(SerialProgramsLib PUBLIC ${OpenCV_LINK_LIBRARIES})
 
+    if (PA_STREAM_HISTORY_FFMPEG)
+        #  ffmpeg for the in-memory stream history ring (requires ffmpeg >= 5.1 -
+        #  the API-generation check and the include dir are applied in the shared
+        #  block after the WIN32/else() split, via FFMPEG_INC_DIRS).
+        #  Ubuntu:  sudo apt install libavcodec-dev libavformat-dev libavutil-dev
+        #           libswscale-dev libswresample-dev
+        #  macOS:   brew install ffmpeg
+        #  The pkg-config module names are not consistent across platforms:
+        #  Homebrew ships avcodec.pc, avformat.pc, ... while Debian/Ubuntu ship
+        #  libavcodec.pc, libavformat.pc, ... - so try both namings.
+        pkg_check_modules(FFMPEG_SHORT_NAMES avcodec avformat avutil swscale swresample)
+        pkg_check_modules(FFMPEG_LIB_NAMES libavcodec libavformat libavutil libswscale libswresample)
+        if (FFMPEG_SHORT_NAMES_FOUND)
+            set(FFMPEG_PC FFMPEG_SHORT_NAMES)
+        elseif (FFMPEG_LIB_NAMES_FOUND)
+            set(FFMPEG_PC FFMPEG_LIB_NAMES)
+        else ()
+            message(FATAL_ERROR
+                "PA_STREAM_HISTORY_FFMPEG=ON but no ffmpeg development packages were found via pkg-config "
+                "(neither 'avcodec avformat avutil swscale swresample' nor 'libavcodec libavformat libavutil libswscale libswresample'). "
+                "Ubuntu: sudo apt install libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libswresample-dev. "
+                "macOS: brew install ffmpeg.")
+        endif()
+        message(STATUS "PA stream-history ring: ffmpeg found via pkg-config module set '${FFMPEG_PC}' (version ${${FFMPEG_PC}_VERSION}).")
+        set(FFMPEG_INC_DIRS ${${FFMPEG_PC}_INCLUDE_DIRS})
+        target_link_directories(SerialProgramsLib PUBLIC ${${FFMPEG_PC}_LIBRARY_DIRS})
+        target_link_libraries(SerialProgramsLib PRIVATE ${${FFMPEG_PC}_LIBRARIES})
+    endif()
+
     #we hope to use our own Tesseract build in future so we can rid that dependency
     #but right now to run on Linux and Mac we need to use external Tesseract library
     pkg_search_module(TESSERACT tesseract)
@@ -670,6 +761,14 @@ else() # macOS and Linux
     endif()
 endif()
 
+
+
+# Enable the ffmpeg-based stream history tracker (StreamHistoryTracker_Ring).
+if (PA_STREAM_HISTORY_FFMPEG)
+    target_compile_definitions(SerialProgramsLib PRIVATE PA_STREAM_HISTORY_FFMPEG)
+    target_include_directories(SerialProgramsLib SYSTEM PRIVATE ${FFMPEG_INC_DIRS})
+    pa_check_ffmpeg_51_api(${FFMPEG_INC_DIRS})
+endif()
 
 
 #   Run-time CPU dispatching.
@@ -763,6 +862,11 @@ if (WIN32)
     set(DPP_DEBUG_DLL "${REPO_ROOT_DIR}/3rdPartyBinaries/dpp_debug/dpp.dll")
     set(DPP_RELEASE_DLL "${REPO_ROOT_DIR}/3rdPartyBinaries/dpp_release/dpp.dll")
 
+    if (PA_STREAM_HISTORY_FFMPEG)
+        set(FFMPEG_ZIP "${REPO_ROOT_DIR}/3rdPartyBinaries/ffmpeg/ffmpeg-n9.0-win64-lgpl-shared-9.0.zip")
+        set(FFMPEG_DLL_DIR "${REPO_ROOT_DIR}/3rdPartyBinaries/ffmpeg")
+    endif()
+
     # Copy QML library dependencies.
     get_target_property(_qt_widgets_location Qt6::Widgets LOCATION)
     get_filename_component(_qt_bin_dir "${_qt_widgets_location}" DIRECTORY)
@@ -840,6 +944,33 @@ if (WIN32)
             COMMAND ${CMAKE_COMMAND} -E tar xf "${OPENCV_RELEASE_ZIP}"
             WORKING_DIRECTORY "${REPO_ROOT_DIR}/3rdPartyBinaries"
         )
+    endif()
+
+    # Extract the ffmpeg shared DLLs if missing (only the .dll files start
+    # zipped; the .lib files are checked in unzipped)
+    if (PA_STREAM_HISTORY_FFMPEG)
+        file(GLOB FFMPEG_DLLS_EXTRACTED "${FFMPEG_DLL_DIR}/*.dll")
+        if (NOT FFMPEG_DLLS_EXTRACTED)
+            message(STATUS "ffmpeg shared DLLs not found, extracting from ${FFMPEG_ZIP}...")
+            execute_process(
+                COMMAND ${CMAKE_COMMAND} -E tar xf "${FFMPEG_ZIP}"
+                WORKING_DIRECTORY "${FFMPEG_DLL_DIR}"
+            )
+        endif()
+    endif()
+
+    # Copy the ffmpeg shared DLLs to WIN_DEPLOY_DIR if missing/different
+    # The top-level THIRD_PARTY_DLLS glob doesn't see the dlls within this subfolder,
+    # so we need to do this separately.
+    if (PA_STREAM_HISTORY_FFMPEG)
+        file(GLOB FFMPEG_DLLS "${FFMPEG_DLL_DIR}/*.dll")
+        foreach(DLL IN LISTS FFMPEG_DLLS)
+            get_filename_component(DLL_NAME "${DLL}" NAME)
+            add_custom_command(
+                TARGET SerialPrograms POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different "${DLL}" "${WIN_DEPLOY_DIR}/${DLL_NAME}"
+            )
+        endforeach()
     endif()
 
     # Copy 3rd party DLLs if missing/different
