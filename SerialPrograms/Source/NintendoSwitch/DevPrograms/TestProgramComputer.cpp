@@ -59,7 +59,6 @@
 #include "Kernels/AudioStreamConversion/AudioStreamConversion.h"
 #include "Common/Cpp/StreamConverters.h"
 #include "CommonFramework/AudioPipeline/AudioConstants.h"
-#include "CommonFramework/AudioPipeline/AudioStream.h"
 #include "3rdParty-Core/nlohmann/json.hpp"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"

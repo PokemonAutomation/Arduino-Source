@@ -2,9 +2,9 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *      AudioSource represents an audio input stream. Once constructed,
- *  it spits out the float samples. Listeners can attach themselves to this
- *  class to receive these audio frames.
+ *      AudioSource represents an audio input stream. Once constructed, it
+ *  emits the raw frame-aligned stream to its RawAudioStreamListener
+ *  children (root of the pipeline tree).
  *
  */
 
@@ -12,17 +12,12 @@
 #define PokemonAutomation_AudioPipeline_AudioSource_H
 
 #include <memory>
-#include <set>
-#include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/LifetimeSanitizer.h"
-#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/AudioPipeline/AudioInfo.h"
-#include "CommonFramework/AudioPipeline/AudioStream.h"
 
 namespace PokemonAutomation{
 
 class Logger;
-class AudioStreamToFloat;
 class AudioInputFile;
 class AudioInputDevice;
 
@@ -31,12 +26,9 @@ namespace Kernels{namespace AudioPipeline{class RawAudioStreamListener;}}
 
 class AudioSource{
 public:
-    void add_listener(AudioFloatStreamListener& listener);
-    void remove_listener(AudioFloatStreamListener& listener);
-
     //  Raw stream (pre-conversion) access. The raw stream is the source's
-    //  native frame-aligned output, before AudioStreamToFloat applies the
-    //  preset's rate/channels and the input volume.
+    //  native frame-aligned output, before the pipeline tree applies any
+    //  conversion (resample / mix / sample-type / volume).
     AudioSampleFormat raw_sample_format() const{ return m_stream_format; }
     size_t raw_sample_rate() const;
     size_t raw_channels() const;
@@ -50,42 +42,21 @@ public:
     AudioSource(
         Logger& logger,
         const std::string& file,
-        AudioChannelFormat format,
-        float volume_multiplier
+        AudioChannelFormat format
     );
 
     //  Read from an audio input device. (i.e. capture card)
     AudioSource(
         Logger& logger,
         const AudioDeviceInfo& device,
-        AudioChannelFormat format,
-        float volume_multiplier
+        AudioChannelFormat format
     );
 
-    size_t sample_rate() const{ return m_sample_rate; }
-    size_t channels() const{ return m_channels; }
-    size_t samples_per_frame() const{ return m_channels * m_multiplier; }
-
 private:
-    void init(AudioChannelFormat format, AudioSampleFormat stream_format, float volume_multiplier);
-
-private:
-    class InternalListener;
-
-    size_t m_sample_rate;
-    size_t m_channels;
-    size_t m_multiplier;
     AudioSampleFormat m_stream_format;
-
-    SpinLock m_lock;
-
-    std::unique_ptr<InternalListener> m_internal_listener;
-    std::unique_ptr<AudioStreamToFloat> m_reader;
 
     std::unique_ptr<AudioInputFile> m_input_file;
     std::unique_ptr<AudioInputDevice> m_input_device;
-
-    ListenerSet<AudioFloatStreamListener> m_listeners;
 
     LifetimeSanitizer m_sanitizer;
 };

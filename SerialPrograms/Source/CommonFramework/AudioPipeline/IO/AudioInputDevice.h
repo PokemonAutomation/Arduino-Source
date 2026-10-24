@@ -31,19 +31,17 @@ class QAudioFormat;
 namespace PokemonAutomation{
 
 class Logger;
-class AudioStreamToFloat;
 
 
 //
 //  Raw audio input from a capture device (QAudioSource / QAudioInput).
-//
-//  Feeds the legacy AudioStreamToFloat reader and, in parallel, emits the raw
-//  stream to RawAudioStreamListener children (root of the new pipeline tree).
+//  Emits the raw stream to RawAudioStreamListener children (root of the new
+//  pipeline tree).
 //  Qt makes no contract about the frame alignment of the chunks that the
-//  audio backend writes into the QIODevice, so the raw output goes through the
-//  same MisalignedStreamConverter / ObjectStreamListener byte-reassembly
-//  pattern that AudioStreamToFloat uses. In practice the backends emit
-//  whole-frame chunks, so no splicing happens in the common case.
+//  audio backend writes into the QIODevice, so the raw output goes through a
+//  MisalignedStreamConverter / ObjectStreamListener byte-reassembly step.
+//  In practice the backends emit whole-frame chunks, so no splicing happens
+//  in the common case.
 //
 //  The INTERLEAVE_96000 presets open the device as a physical 1ch x 96000
 //  stream that is really the card's two 48 kHz channels (a misreporting
@@ -64,7 +62,7 @@ public:
     ~AudioInputDevice();
 
     AudioInputDevice(
-        Logger& logger, AudioStreamToFloat& reader,
+        Logger& logger,
         const NativeAudioInfo& device, const QAudioFormat& format,
         bool reinterpret_96k_mono_as_stereo
     );
@@ -97,7 +95,6 @@ protected:
 
 
 private:
-    AudioStreamToFloat& m_reader;
     std::unique_ptr<NativeAudioSource> m_source;
     Kernels::AudioPipeline::SampleFormat m_sample_type;
     size_t m_sample_rate;

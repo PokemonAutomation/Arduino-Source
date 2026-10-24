@@ -11,7 +11,6 @@
 
 namespace PokemonAutomation{
 
-struct AudioFloatStreamListener;
 struct FFTListener;
 
 namespace Kernels{
@@ -32,9 +31,6 @@ class WorkingAudioStreamListener;
 //
 class AudioPassthroughPair{
 public:
-    virtual void add_listener(AudioFloatStreamListener& listener) = 0;
-    virtual void remove_listener(AudioFloatStreamListener& listener) = 0;
-
     virtual void add_listener(FFTListener& listener) = 0;
     virtual void remove_listener(FFTListener& listener) = 0;
 

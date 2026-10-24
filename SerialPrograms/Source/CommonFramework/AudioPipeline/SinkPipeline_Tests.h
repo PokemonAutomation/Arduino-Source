@@ -14,12 +14,11 @@ namespace PokemonAutomation{
 
 
 //
-//  Registers the sink gate tests: raw-byte comparisons between the
+//  Registers the sink gate tests: self-contained invariants for the
 //  pipeline tree's sink branch (RawAudio2WorkingAudio -> [resampler] ->
-//  [mixer] -> WorkingAudio2RawAudio) and the legacy converter chain
-//  (AudioStreamToFloat -> AudioFloatToStream), plus self-contained
-//  invariants for the resampled / mixed shapes the legacy path never
-//  produced (it opened the device in the input's format instead).
+//  [mixer] -> WorkingAudio2RawAudio) - no-op bit-exactness, 1-LSB sint16
+//  against a plain-scalar reference, and the resampled / mixed shapes
+//  (output length, tone amplitudes, upmix / downmix channel behavior).
 //
 void add_tests_SinkPipeline(UnitTestDatabase& database);
 

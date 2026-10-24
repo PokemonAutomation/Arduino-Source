@@ -15,16 +15,6 @@
 namespace PokemonAutomation{
 
 
-void AudioPassthroughPairQtThread::add_listener(AudioFloatStreamListener& listener){
-    auto scope_check = m_sanitizer.check_scope();
-    AudioPassthroughPairQt* body = m_body;
-    body->add_listener(listener);
-}
-void AudioPassthroughPairQtThread::remove_listener(AudioFloatStreamListener& listener){
-    auto scope_check = m_sanitizer.check_scope();
-    AudioPassthroughPairQt* body = m_body;
-    body->remove_listener(listener);
-}
 void AudioPassthroughPairQtThread::add_listener(FFTListener& listener){
     auto scope_check = m_sanitizer.check_scope();
     AudioPassthroughPairQt* body = m_body;

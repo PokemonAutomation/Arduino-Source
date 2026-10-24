@@ -38,6 +38,23 @@ const char* AUDIO_FORMAT_LABELS[] = {
     "1 x 96,000 Hz (Interleaved Stereo R/L)",
 };
 
+size_t sample_size(AudioSampleFormat format){
+    switch (format){
+    case AudioSampleFormat::UINT8:
+        return sizeof(uint8_t);
+    case AudioSampleFormat::SINT16:
+        return sizeof(int16_t);
+    case AudioSampleFormat::SINT32:
+        return sizeof(int32_t);
+    case AudioSampleFormat::FLOAT32:
+        return sizeof(float);
+    default:
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid AudioSampleFormat: " + std::to_string((size_t)format));
+    }
+}
+
+
+
 void set_format(QAudioFormat& native_format, AudioChannelFormat format){
     switch (format){
     case AudioChannelFormat::MONO_48000:
