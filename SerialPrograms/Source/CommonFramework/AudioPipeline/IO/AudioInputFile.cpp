@@ -152,7 +152,7 @@ AudioInputFile::AudioInputFile(
 {
     logger.log("AudioInputFile(): " + dump_audio_format(format));
     connect(
-        m_source.get(), &AudioFileLoader::bufferReady,
+        m_source.get(), &AudioFileLoader::buffer_ready,
         this, [this](const char* data, size_t len){
             on_buffer_ready(data, len);
         }

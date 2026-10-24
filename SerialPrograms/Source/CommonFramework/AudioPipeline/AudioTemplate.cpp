@@ -53,7 +53,7 @@ AudioTemplate loadAudioTemplate(const std::string& filename, size_t sample_rate)
 
     GlobalThreadPools::qt_worker_threadpool().run_and_wait([&]{
         AudioFileLoader loader(nullptr, filename, outputAudioFormat);
-        const auto ret = loader.loadFullAudio();
+        const auto ret = loader.load_full_audio();
         const float* data = reinterpret_cast<const float*>(std::get<0>(ret));
         size_t numSamples = std::get<1>(ret) / sizeof(float);
     //    cout << "numSamples = " << numSamples << endl;
