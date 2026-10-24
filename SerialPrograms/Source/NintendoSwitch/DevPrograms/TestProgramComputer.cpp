@@ -56,9 +56,6 @@
 #include "Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.h"
 #include "Kernels/SpikeConvolution/Kernels_SpikeConvolution.h"
 #include "VideoGames/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
-#include "Kernels/AudioStreamConversion/AudioStreamConversion.h"
-#include "Common/Cpp/StreamConverters.h"
-#include "CommonFramework/AudioPipeline/AudioConstants.h"
 #include "3rdParty-Core/nlohmann/json.hpp"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
@@ -1985,25 +1982,6 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 
 
-#if 0
-    int16_t in[4] = {1, 1, 2, -2};
-    print_u8((uint8_t*)in, 8);
-
-
-
-    AudioSourceReader reader(AudioSampleFormat::SINT16, 1, false);
-    AudioListener listener(1);
-    reader += listener;
-
-
-//    reader.push_bytes(in, 8);
-    reader.push_bytes((char*)in + 0, 5);
-    reader.push_bytes((char*)in + 5, 3);
-#endif
-
-
-
-//    AudioStreamReader2 reader(2, AudioSampleFormat::SINT16);
 
 
 
@@ -2028,23 +2006,6 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    cout << buffer << endl;
 //    cout << reader.dump() << endl;
 #endif
-
-#if 0
-    float f[10];
-    uint8_t i[10] = {};
-    i[0] = 1;
-    i[1] = 255;
-    i[2] = 0;
-    i[3] = 123;
-    i[9] = 123;
-
-    Kernels::AudioStreamConversion::convert_audio_uint8_to_float(f, i, 10);
-    print(f, 10);
-    memset(i, 0, sizeof(i));
-    Kernels::AudioStreamConversion::convert_audio_float_to_uint8(i, f, 10);
-    print_u8(i, 10);
-#endif
-
 
 #if 0
     union{
