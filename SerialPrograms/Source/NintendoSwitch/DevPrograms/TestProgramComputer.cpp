@@ -56,7 +56,6 @@
 #include "Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.h"
 #include "Kernels/SpikeConvolution/Kernels_SpikeConvolution.h"
 #include "VideoGames/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
-#include "CommonFramework/AudioPipeline/AudioConstants.h"
 #include "3rdParty-Core/nlohmann/json.hpp"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
@@ -1983,25 +1982,6 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 
 
-#if 0
-    int16_t in[4] = {1, 1, 2, -2};
-    print_u8((uint8_t*)in, 8);
-
-
-
-    AudioSourceReader reader(AudioSampleFormat::SINT16, 1, false);
-    AudioListener listener(1);
-    reader += listener;
-
-
-//    reader.push_bytes(in, 8);
-    reader.push_bytes((char*)in + 0, 5);
-    reader.push_bytes((char*)in + 5, 3);
-#endif
-
-
-
-//    AudioStreamReader2 reader(2, AudioSampleFormat::SINT16);
 
 
 
