@@ -47,7 +47,7 @@ private:
 
 public:
     BooleanCheckBoxOption REORDERING;
-    MillisecondsOption HOLD;
+    MillisecondsOption HOLD0;
     MillisecondsOption COOLDOWN;
     MillisecondsOption PRESS_DELAY;
     MillisecondsOption MOVE_DELAY;
