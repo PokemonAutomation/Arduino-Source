@@ -51,6 +51,7 @@
 #include "Programs/General/PokemonSV_StatsResetEventBattle.h"
 
 #include "Programs/ShinyHunting/PokemonSV_ShinyHunt-AreaZeroPlatform.h"
+#include "Programs/ShinyHunting/PokemonSV_IsolatedHuntPrototype.h"
 #include "Programs/ShinyHunting/PokemonSV_ShinyHunt-Scatterbug.h"
 
 #include "Programs/AutoStory/PokemonSV_AutoStory.h"
@@ -140,6 +141,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- Shiny Hunting ----");
     ret.emplace_back(make_SingleSwitchProgram<ShinyHuntAreaZeroPlatform>());
+    ret.emplace_back(make_SingleSwitchProgram<IsolatedHuntPrototype>());
     ret.emplace_back(make_SingleSwitchProgram< ShinyHuntScatterbug>());
 
     ret.emplace_back("---- Story Automation ----");

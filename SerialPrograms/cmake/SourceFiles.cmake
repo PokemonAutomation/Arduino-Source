@@ -2677,6 +2677,8 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonSV/Programs/ShinyHunting/PokemonSV_LetsGoTools.h
     Source/VideoGames/PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-AreaZeroPlatform.cpp
     Source/VideoGames/PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-AreaZeroPlatform.h
+    Source/VideoGames/PokemonSV/Programs/ShinyHunting/PokemonSV_IsolatedHuntPrototype.cpp
+    Source/VideoGames/PokemonSV/Programs/ShinyHunting/PokemonSV_IsolatedHuntPrototype.h
     Source/VideoGames/PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-Scatterbug.cpp
     Source/VideoGames/PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-Scatterbug.h
     Source/VideoGames/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHost.cpp
