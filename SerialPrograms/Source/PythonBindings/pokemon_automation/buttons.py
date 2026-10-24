@@ -2,9 +2,8 @@
 
 Everything a caller types to describe an input is parsed here:
 
-- Buttons: "A", "B", "X", "Y", "L", "R", "ZL", "ZR", "PLUS" ("+", "START"),
-  "MINUS" ("-", "SELECT"), "HOME", "CAPTURE", "LCLICK" ("L3", "LS"),
-  "RCLICK" ("R3", "RS"). Case-insensitive.
+- Buttons: "A", "B", "X", "Y", "L", "R", "ZL", "ZR", "PLUS", "MINUS",
+  "HOME", "CAPTURE", "LCLICK", "RCLICK". Case-insensitive.
 - D-pad: "UP", "DOWN", "LEFT", "RIGHT" and diagonals such as "UP_RIGHT" (also
   "UP-RIGHT", "UPRIGHT"). Listing "UP" and "RIGHT" together also means up-right.
 - Combinations: a list (["L", "R"]) or a "+"-joined string ("L+R", "ZL+A").
@@ -53,17 +52,6 @@ BUTTON_BITS: dict[str, int] = {
     "RCLICK": 1 << 11,
     "HOME": 1 << 12,
     "CAPTURE": 1 << 13,
-}
-
-BUTTON_ALIASES: dict[str, str] = {
-    "+": "PLUS",
-    "START": "PLUS",
-    "-": "MINUS",
-    "SELECT": "MINUS",
-    "L3": "LCLICK",
-    "LS": "LCLICK",
-    "R3": "RCLICK",
-    "RS": "RCLICK",
 }
 
 # D-pad positions, mirroring the C++ `enum DpadPosition` in
@@ -123,11 +111,7 @@ def _split(buttons: ButtonsArg) -> list[str]:
     if buttons is None:
         return []
     if isinstance(buttons, str):
-        text = buttons.strip()
-        # A lone "+" or "-" is the PLUS/MINUS button, not a separator.
-        if text in ("+", "-"):
-            return [text]
-        return [part for part in text.replace(",", "+").split("+") if part.strip()]
+        return [part for part in buttons.strip().replace(",", "+").split("+") if part.strip()]
     ret: list[str] = []
     for item in buttons:
         ret.extend(_split(item))
@@ -167,8 +151,7 @@ def parse_buttons(buttons: ButtonsArg) -> ParsedButtons:
     seen_dpad: list[str] = []
     for raw in _split(buttons):
         name = raw.strip()
-        key = name.upper() if name in ("+", "-") else _normalize_name(name)
-        key = BUTTON_ALIASES.get(key, key)
+        key = _normalize_name(name)
         if key in BUTTON_BITS:  # parse as button
             buttonstate_bitfield |= BUTTON_BITS[key]
             continue

@@ -16,15 +16,19 @@ def test_single_and_combined_buttons():
     assert btn.parse_buttons(["zl", "a"]).bitfield == btn.BUTTON_BITS["ZL"] | btn.BUTTON_BITS["A"]
 
 
-def test_aliases_and_plus_minus():
+def test_plus_minus_no_longer_buttons():
     """tests parse_buttons():
-    Aliases (START/SELECT, L3, ...) resolve to their buttons, and a lone "+" or "-" is the PLUS/MINUS button, not a separator.
+    "+" and "-" no longer resolve to PLUS/MINUS: a lone "+" parses to no input
+    (it is a separator), while "-" and former alias names ("start", "L3") are unknown buttons.
     """
-    assert btn.parse_buttons("+").bitfield == btn.BUTTON_BITS["PLUS"]
-    assert btn.parse_buttons("-").bitfield == btn.BUTTON_BITS["MINUS"]
-    assert btn.parse_buttons("start").bitfield == btn.BUTTON_BITS["PLUS"]
-    assert btn.parse_buttons("L3").bitfield == btn.BUTTON_BITS["LCLICK"]
-    assert btn.parse_buttons(["A", "+"]).bitfield == btn.BUTTON_BITS["A"] | btn.BUTTON_BITS["PLUS"]
+    assert not btn.parse_buttons("+").has_buttons
+    assert btn.parse_buttons("A+").bitfield == btn.BUTTON_BITS["A"]
+    with pytest.raises(ValueError, match="Unknown button"):
+        btn.parse_buttons("-")
+    with pytest.raises(ValueError, match="Unknown button"):
+        btn.parse_buttons("start")
+    with pytest.raises(ValueError, match="Unknown button"):
+        btn.parse_buttons("L3")
 
 
 def test_dpad():

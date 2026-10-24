@@ -24,7 +24,6 @@ Quick start:
 """
 
 from .buttons import (
-    BUTTON_ALIASES,
     BUTTON_BITS,
     DPAD_NONE,
     DPAD_POSITIONS,
@@ -39,7 +38,6 @@ from .devices import list_serial_ports
 from .fake import FakeController
 
 __all__ = [
-    "BUTTON_ALIASES",
     "BUTTON_BITS",
     "DPAD_NONE",
     "DPAD_POSITIONS",
