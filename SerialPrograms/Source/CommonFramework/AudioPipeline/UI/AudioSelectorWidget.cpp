@@ -127,10 +127,10 @@ AudioSelectorWidget::AudioSelectorWidget(QWidget& parent, AudioSession& session)
     connect(
         m_audio_format_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
         this, [this](int index){
-            if (index < 0 || index >= (int)m_input_formats.size()){
+            if (index < 0 || index >= (int)m_input_choices.size()){
                 return;
             }
-            m_session.set_format(m_input_formats[index]);
+            m_session.set_input_choice(m_input_choices[index]);
         }
     );
     connect(
@@ -236,12 +236,12 @@ void AudioSelectorWidget::build_output_list(const AudioDeviceInfo& device){
 void AudioSelectorWidget::refresh_all(){
     auto input = m_session.input_device();
     refresh_input_device(input.first, input.second);
-    refresh_formats(input.first, input.second, m_session.input_format());
+    refresh_formats(input.first, input.second, m_session.input_choice());
     refresh_output_device(m_session.output_device());
     refresh_volume(m_session.output_volume());
     refresh_display(m_session.display_type());
 }
-void AudioSelectorWidget::refresh_formats(const std::string& file, const AudioDeviceInfo& device, AudioChannelFormat format){
+void AudioSelectorWidget::refresh_formats(const std::string& file, const AudioDeviceInfo& device, const AudioInputChoice& choice){
 //    cout << "AudioSelectorWidget::refresh_formats()" << endl;
     if (!file.empty() || !device){
         m_audio_format_box->clear();
@@ -249,12 +249,12 @@ void AudioSelectorWidget::refresh_formats(const std::string& file, const AudioDe
     }
 //    cout << "AudioSelectorWidget::refresh_formats() - inside" << endl;
 
-    m_input_formats = device.supported_formats();
+    m_input_choices = device.supported_choices();
     m_audio_format_box->clear();
     int index = -1;
-    for (size_t c = 0; c < m_input_formats.size(); c++){
-        m_audio_format_box->addItem(AUDIO_FORMAT_LABELS[(size_t)m_input_formats[c]]);
-        if (format == m_input_formats[c]){
+    for (size_t c = 0; c < m_input_choices.size(); c++){
+        m_audio_format_box->addItem(QString::fromStdString(m_input_choices[c].display_name()));
+        if (m_input_choices[c] == choice){
             index = (int)c;
         }
     }
@@ -317,11 +317,11 @@ void AudioSelectorWidget::refresh_display(AudioOption::AudioDisplayType display)
 }
 
 
-void AudioSelectorWidget::post_input_change(const std::string& file, const AudioDeviceInfo& device, AudioChannelFormat format){
+void AudioSelectorWidget::post_input_change(const std::string& file, const AudioDeviceInfo& device, const AudioInputChoice& choice){
 //    cout << "AudioSelectorWidget::input_changed()" << endl;
-    QMetaObject::invokeMethod(this, [this, device, file, format]{
+    QMetaObject::invokeMethod(this, [this, device, file, choice]{
         refresh_input_device(file, device);
-        refresh_formats(file, device, format);
+        refresh_formats(file, device, choice);
     });
 }
 void AudioSelectorWidget::post_output_change(const AudioDeviceInfo& device){
