@@ -29,6 +29,7 @@ public:
     std::vector<std::string> list() const;
 
 public:
+    virtual JsonValue to_json() const override;
     virtual void load_json(const JsonValue& json) override;
 };
 

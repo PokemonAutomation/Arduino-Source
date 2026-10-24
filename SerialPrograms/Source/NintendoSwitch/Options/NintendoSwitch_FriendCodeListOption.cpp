@@ -80,25 +80,28 @@ std::vector<std::string> FriendCodeListOption::list() const{
     }
     return ret;
 }
+JsonValue FriendCodeListOption::to_json() const{
+    JsonArray list;
+    for (const std::string& line : lines()){
+        list.push_back(line);
+    }
+    return list;
+}
 void FriendCodeListOption::load_json(const JsonValue& json){
-    //  Legacy format: an array of lines.
-    const JsonArray* array = json.to_array();
-    if (array != nullptr){
-        std::string text;
-        for (const JsonValue& item : *array){
-            const std::string* str = item.to_string();
-            if (str == nullptr){
-                continue;
-            }
-            if (!text.empty()){
-                text += '\n';
-            }
-            text += *str;
-        }
-        set(std::move(text));
+    //  The settings are stored as an array of lines, one entry per line.
+    const JsonArray* list = json.to_array();
+    if (list == nullptr){
         return;
     }
-    TextEditOption::load_json(json);
+    std::vector<std::string> lines;
+    for (const auto& line : *list){
+        const std::string* str = line.to_string();
+        if (str == nullptr || str->empty()){
+            continue;
+        }
+        lines.emplace_back(*str);
+    }
+    set(join_lines(lines));
 }
 
 
