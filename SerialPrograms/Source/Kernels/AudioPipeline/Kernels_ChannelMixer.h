@@ -8,6 +8,7 @@
 #define PokemonAutomation_Kernels_AudioPipeline_ChannelMixer_H
 
 #include <vector>
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Containers/AlignedVector.h"
 #include "Kernels_AudioPipeline.h"
@@ -22,6 +23,7 @@ class ChannelMixer : public WorkingAudioNode{
 public:
     ~ChannelMixer();
     ChannelMixer(
+        Logger& logger,
         size_t sample_rate,
         size_t in_channels,
         size_t out_channels,

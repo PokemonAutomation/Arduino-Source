@@ -10,6 +10,10 @@
 #include "Kernels_ChannelMixer.h"
 #include "Kernels_WorkingAudio2WorkingAudio.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace Kernels{
 namespace AudioPipeline{
@@ -73,6 +77,7 @@ WorkingAudio2WorkingAudio::WorkingAudio2WorkingAudio(
         //  Mix first (at the input rate), then resample.
         if (need_mixer){
             self.mixer.reset(new ChannelMixer(
+                logger,
                 in_sample_rate,
                 in_channels, out_channels,
                 std::move(weight_matrix),
@@ -102,6 +107,7 @@ WorkingAudio2WorkingAudio::WorkingAudio2WorkingAudio(
         }
         if (need_mixer){
             self.mixer.reset(new ChannelMixer(
+                logger,
                 out_sample_rate,
                 in_channels, out_channels,
                 std::move(weight_matrix),
@@ -110,10 +116,15 @@ WorkingAudio2WorkingAudio::WorkingAudio2WorkingAudio(
             nodes.emplace_back(self.mixer.get());
         }
     }
-    populate_pointers(nodes);
+    populate_pointers(logger, nodes);
 }
 
-void WorkingAudio2WorkingAudio::populate_pointers(const std::vector<WorkingAudioNode*>& nodes){
+void WorkingAudio2WorkingAudio::populate_pointers(
+    Logger& logger,
+    const std::vector<WorkingAudioNode*>& nodes
+){
+    logger.log("WorkingAudio2WorkingAudio: Nodes = " + std::to_string(nodes.size()));
+
     Data& self = *m_data;
     for (size_t c = 0; c < nodes.size(); c++){
         if (c > 0){

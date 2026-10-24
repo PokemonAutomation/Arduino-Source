@@ -101,7 +101,10 @@ RecordingFFTListener run_tree(
     if (raw_channels != 1){
         //  build_channel_mixer_matrix(stereo -> mono) is {0.5, 0.5}.
         mixer.reset(new Kernels::AudioPipeline::ChannelMixer(
-            raw_rate, raw_channels, 1, std::vector<float>{0.5f, 0.5f}
+            logger,
+            raw_rate,
+            raw_channels, 1,
+            std::vector<float>{0.5f, 0.5f}
         ));
         mixer->add_listener(*head);
         head = mixer.get();

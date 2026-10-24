@@ -138,7 +138,7 @@ AudioResampler::AudioResampler(
     logger.log(
         "Initializing AudioResampler: " + tostr_u_commas(in_sample_rate) +
         " -> " + tostr_u_commas(out_sample_rate) +
-        ", channels = " + tostr_u_commas(channels),
+        " Hz, channels = " + tostr_u_commas(channels),
         COLOR_PURPLE
     );
 

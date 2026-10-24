@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Kernels/AudioChannelMixer/Kernels_AudioChannelMixer.h"
 #include "Kernels_ChannelMixer.h"
@@ -18,6 +19,7 @@ namespace AudioPipeline{
 
 ChannelMixer::~ChannelMixer() = default;
 ChannelMixer::ChannelMixer(
+    Logger& logger,
     size_t sample_rate,
     size_t in_channels,
     size_t out_channels,
@@ -32,6 +34,12 @@ ChannelMixer::ChannelMixer(
     if (m_weight_matrix.size() != in_channels * out_channels){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Weight matrix size doesn't match.");
     }
+    logger.log(
+        "Initializing ChannelMixer: " + tostr_u_commas(in_channels) +
+        " -> " + tostr_u_commas(out_channels) +
+        " x " + tostr_u_commas(sample_rate) + " Hz",
+        COLOR_PURPLE
+    );
 }
 
 void ChannelMixer::add_listener(WorkingAudioStreamListener& listener){
