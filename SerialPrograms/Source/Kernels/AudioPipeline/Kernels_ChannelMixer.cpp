@@ -9,6 +9,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Kernels/AudioChannelMixer/Kernels_AudioChannelMixer.h"
+#include "Kernels/Kernels_Alignment.h"
 #include "Kernels_ChannelMixer.h"
 
 namespace PokemonAutomation{
@@ -27,9 +28,13 @@ ChannelMixer::ChannelMixer(
     size_t buffer_size
 )
     : WorkingAudioNode(sample_rate, sample_rate, in_channels, out_channels)
-    , m_buffer_size(buffer_size)
+    //  Round the buffer up to PA_ALIGNMENT bytes so that channels beyond
+    //  channel 0 start aligned for the SIMD kernels.
+    , m_buffer_size(
+        align_int_up<PA_ALIGNMENT>(buffer_size * sizeof(float)) / sizeof(float)
+    )
     , m_weight_matrix(std::move(weight_matrix))
-    , m_buffer(out_channels * buffer_size)
+    , m_buffer(out_channels * m_buffer_size)
 {
     if (m_weight_matrix.size() != in_channels * out_channels){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Weight matrix size doesn't match.");

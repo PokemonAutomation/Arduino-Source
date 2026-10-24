@@ -8,6 +8,7 @@
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Kernels/AudioStreamConverter/Kernels_AudioStreamConverter.h"
 #include "Kernels/AudioChannelInterleave/Kernels_AudioChannelInterleave.h"
+#include "Kernels/Kernels_Alignment.h"
 #include "Kernels_WorkingAudio2RawAudio.h"
 
 namespace PokemonAutomation{
@@ -59,14 +60,18 @@ WorkingAudio2RawAudio::WorkingAudio2RawAudio(
     default:;
     }
 
+    //  Round the buffer up to PA_ALIGNMENT bytes so that channels beyond
+    //  channel 0 start aligned for the SIMD kernels.
+    m_buffer_size = align_int_up<PA_ALIGNMENT>(buffer_size * sample_size) / sample_size;
+
     //  Only allocate the interleaved buffer if we need to convert types.
     if (m_convert != nullptr){
-        m_interleaved_raw = AlignedVector<char>(channels * buffer_size * sample_size);
+        m_interleaved_raw = AlignedVector<char>(channels * m_buffer_size * sample_size);
     }
 
     //  Only allocate the split buffer if we need to split channels.
     if (channels != 1){
-        m_interleaved_floats = AlignedVector<float>(channels * buffer_size);
+        m_interleaved_floats = AlignedVector<float>(channels * m_buffer_size);
     }
 }
 

@@ -13,6 +13,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
+#include "Kernels/Kernels_Alignment.h"
 #include "Kernels_AudioResampler_BlockKernels.h"
 #include "Kernels_AudioResampler.h"
 
@@ -131,9 +132,16 @@ AudioResampler::AudioResampler(
     )
     , m_period_in_extended(m_table->period_in() * (m_table->period_out_extended() / m_table->period_out()))
     , m_period_out_extended(m_table->period_out_extended())
-    , m_buffer_stride(std::max(buffer_size, m_block.sample_block))
+    //  Round the buffer up to PA_ALIGNMENT bytes (after the max, so the
+    //  result is aligned whichever of the two is larger) so that channels
+    //  beyond channel 0 start aligned for the SIMD kernels.
+    , m_buffer_stride(
+        align_int_up<PA_ALIGNMENT>(
+            std::max(buffer_size, m_block.sample_block) * sizeof(float)
+        ) / sizeof(float)
+    )
     , m_buffer(channels * m_buffer_stride)
-    , m_flush_at((buffer_size / m_block.sample_block) * m_block.sample_block)
+    , m_flush_at((m_buffer_stride / m_block.sample_block) * m_block.sample_block)
 {
     logger.log(
         "Initializing AudioResampler: " + tostr_u_commas(in_sample_rate) +
