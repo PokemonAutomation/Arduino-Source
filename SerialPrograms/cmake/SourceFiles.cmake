@@ -1350,8 +1350,6 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h
     Source/NintendoSwitch/Options/TurboMacroTable.cpp
     Source/NintendoSwitch/Options/TurboMacroTable.h
-    Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.cpp
-    Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.h
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch2_DateSkippers.cpp
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.cpp
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.h

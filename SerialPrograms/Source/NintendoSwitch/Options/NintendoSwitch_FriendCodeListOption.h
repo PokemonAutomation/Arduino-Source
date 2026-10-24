@@ -8,43 +8,31 @@
 #define PokemonAutomation_NintendoSwitch_FriendCodeListOption_H
 
 #include <vector>
-#include "Common/Cpp/Concurrency/SpinLock.h"
-#include "Common/Cpp/Options/ConfigOption.h"
+#include "Common/Cpp/Options/TextEditOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class FriendCodeListOption : public UiState<FriendCodeListOption, ConfigOption>{
+//  A list of Switch friend codes, one per line.
+class FriendCodeListOption : public TextEditOption{
 public:
     FriendCodeListOption(std::string label, std::vector<std::string> default_lines);
 
     static std::string parse(const std::string& line);
 
-    void set(const std::string& text);
+    //  The current text split into lines.
     std::vector<std::string> lines() const;
+    //  The lines that parse to a valid 12-digit code, formatted as "SW-XXXX-XXXX-XXXX".
     std::vector<std::string> list() const;
 
-
 public:
-    virtual void restore_defaults() override;
     virtual JsonValue to_json() const override;
     virtual void load_json(const JsonValue& json) override;
-
-
-private:
-    friend class FriendCodeListWidget;
-    const std::string m_label;
-    const std::vector<std::string> m_default;
-
-    mutable SpinLock m_lock;
-    std::vector<std::string> m_lines;
 };
-
 
 
 
 }
 }
 #endif
-

@@ -4,56 +4,36 @@
  *
  */
 
-#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonValue.h"
 #include "NintendoSwitch_FriendCodeListOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+namespace{
+std::string join_lines(const std::vector<std::string>& lines){
+    std::string ret;
+    for (const std::string& line : lines){
+        if (!ret.empty()){
+            ret += '\n';
+        }
+        ret += line;
+    }
+    return ret;
+}
+}
+
 
 FriendCodeListOption::FriendCodeListOption(std::string label, std::vector<std::string> default_lines)
-    : m_label(std::move(label))
-    , m_default(std::move(default_lines))
-    , m_lines(m_default)
+    : TextEditOption(
+        std::move(label),
+        LockMode::LOCK_WHILE_RUNNING,
+        join_lines(default_lines),
+        ""
+    )
 {}
-
-void FriendCodeListOption::restore_defaults(){
-    {
-        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-        m_lines = m_default;
-    }
-    report_value_changed(this);
-}
-JsonValue FriendCodeListOption::to_json() const{
-    JsonArray list;
-    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-    for (const std::string& line : m_lines){
-        list.push_back(line);
-    }
-    return list;
-}
-void FriendCodeListOption::load_json(const JsonValue& json){
-    const JsonArray* list = json.to_array();
-    if (list == nullptr){
-        return;
-    }
-    std::vector<std::string> lines;
-    for (const auto& line : *list){
-        const std::string* str = line.to_string();
-        if (str == nullptr || str->empty()){
-            continue;
-        }
-        lines.emplace_back(*str);
-    }
-    {
-        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-        m_lines = std::move(lines);
-    }
-    report_value_changed(this);
-}
-
 
 
 std::string FriendCodeListOption::parse(const std::string& line){
@@ -65,34 +45,26 @@ std::string FriendCodeListOption::parse(const std::string& line){
     }
     return code;
 }
-void FriendCodeListOption::set(const std::string& text){
-    std::vector<std::string> lines;
+std::vector<std::string> FriendCodeListOption::lines() const{
+    const std::string text = *this;
+    std::vector<std::string> ret;
     std::string line;
     for (char ch : text){
         if (ch == '\n'){
-            lines.emplace_back(std::move(line));
+            ret.emplace_back(std::move(line));
             line.clear();
             continue;
         }
         line += ch;
     }
     if (line.size() > 0){
-        lines.emplace_back(std::move(line));
+        ret.emplace_back(std::move(line));
     }
-    {
-        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-        m_lines = std::move(lines);
-    }
-    report_value_changed(this);
-}
-std::vector<std::string> FriendCodeListOption::lines() const{
-    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-    return m_lines;
+    return ret;
 }
 std::vector<std::string> FriendCodeListOption::list() const{
-    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     std::vector<std::string> ret;
-    for (const auto& item : m_lines){
+    for (const std::string& item : lines()){
         std::string line = parse(item);
         if (line.size() != 12){
             continue;
@@ -108,19 +80,31 @@ std::vector<std::string> FriendCodeListOption::list() const{
     }
     return ret;
 }
-
-
+JsonValue FriendCodeListOption::to_json() const{
+    JsonArray list;
+    for (const std::string& line : lines()){
+        list.push_back(line);
+    }
+    return list;
+}
+void FriendCodeListOption::load_json(const JsonValue& json){
+    //  The settings are stored as an array of lines, one entry per line.
+    const JsonArray* list = json.to_array();
+    if (list == nullptr){
+        return;
+    }
+    std::vector<std::string> lines;
+    for (const auto& line : *list){
+        const std::string* str = line.to_string();
+        if (str == nullptr || str->empty()){
+            continue;
+        }
+        lines.emplace_back(*str);
+    }
+    set(join_lines(lines));
+}
 
 
 
 }
 }
-
-
-
-
-
-
-
-
-
