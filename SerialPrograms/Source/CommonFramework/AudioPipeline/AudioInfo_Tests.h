@@ -15,10 +15,9 @@ namespace PokemonAutomation{
 
 //
 //  Registers the tests for AudioInputChoice / input_choices(): the
-//  device-driven input format list that replaces the fixed
-//  AudioChannelFormat preset enum (display naming, dedup / sort, the
-//  1ch x 96000 misreporting capture-card reinterpretation, and the
-//  preferred-index rules).
+//  device-driven input format list (display naming, dedup / sort, the
+//  1ch x 96000 misreporting capture-card reinterpretation, the
+//  preferred-index rules, and choice equality).
 //
 void add_tests_AudioInfo(UnitTestDatabase& database);
 

@@ -3,8 +3,7 @@
  *  From: https://github.com/PokemonAutomation/
  *
  *  Gate tests for the device-driven input format list
- *  (AudioInputChoice / input_choices) that replaces the fixed
- *  AudioChannelFormat preset enum. Pure data tests: no audio I/O.
+ *  (AudioInputChoice / input_choices). Pure data tests: no audio I/O.
  *
  */
 
