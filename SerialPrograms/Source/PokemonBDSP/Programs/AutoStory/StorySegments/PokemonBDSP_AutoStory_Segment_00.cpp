@@ -303,7 +303,7 @@ namespace PokemonAutomation {
         }
         // ---------------------------------------------------------------------------
         // End of Segment 00 - 01
-		// Standing in front lake varity ready to enter lake Verity for starter selection.
+        // Standing in front lake varity ready to enter lake Verity for starter selection.
         // ---------------------------------------------------------------------------
         // ---------------------------------------------------------------------------
         //  Segment 00-02 begins
