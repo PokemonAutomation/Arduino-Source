@@ -58,7 +58,7 @@ program is usually in #automation-chat and #automation-help.
 - New contributors are asked to have at most two PRs open at any time; **drafts count**
   toward that limit. Work that is stacked on not-yet-merged work can live in your fork
   until it is ready.
-- The limit is for ramping up: currently it lifts after your third merged PR.
+- The limit is for ramping up: It lifts once you become a regular and trusted contributor.
 
 ## Using AI
 
