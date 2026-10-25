@@ -86,13 +86,13 @@ public:
         std::string category, std::string display_name,
         std::string doc_link,
         std::string description,
+        PanelQualityStanding standing,
         ProgramControllerClass controller_class,
         FeedbackType feedback,
         AllowCommandsWhenRunning allow_commands_while_running,
         size_t min_switches,
         size_t max_switches,
         size_t default_switches,
-        PanelDeprecation deprecation = PanelDeprecation::NOT_DEPRECATED,
         std::vector<std::string> required_resources = {}
     );
 

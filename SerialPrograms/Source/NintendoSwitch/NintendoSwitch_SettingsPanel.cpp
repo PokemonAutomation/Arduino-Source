@@ -17,9 +17,10 @@ namespace NintendoSwitch{
 ConsoleSettings_Descriptor::ConsoleSettings_Descriptor()
     : OptionsPanelDescriptor(
         "NintendoSwitch:GlobalSettings",
-        "Nintendo Switch", "Framework Settings",
+        "Nintendo Switch", "Nintendo Switch Settings",
         "Programs/NintendoSwitch/FrameworkSettings.html",
-        "Switch Framework Settings"
+        "Switch Framework Settings",
+        PanelQualityStanding::OFFICIAL
     )
 {}
 

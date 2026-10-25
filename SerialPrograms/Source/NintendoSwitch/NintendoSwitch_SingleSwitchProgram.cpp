@@ -46,7 +46,7 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     ProgramControllerClass controller_class,
     FeedbackType feedback,
     AllowCommandsWhenRunning allow_commands_while_running,
-    PanelDeprecation deprecation,
+    PanelQualityStanding standing,
     std::vector<std::string> required_resources
 )
     : GameConsole::ConsoleProgramDescriptor(
@@ -54,11 +54,11 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description),
-        controller_class,
+        standing,
         GameConsole::pick_color(controller_class),
+        controller_class,
         feedback,
         allow_commands_while_running,
-        deprecation,
         std::move(required_resources)
     )
 {}

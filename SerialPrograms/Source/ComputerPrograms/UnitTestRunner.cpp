@@ -98,7 +98,8 @@ UnitTestRunner_Descriptor::UnitTestRunner_Descriptor()
         "Nintendo Switch",
         "Unit Test Runner",
         "",
-        "UI to run unit tests."
+        "UI to run unit tests.",
+        PanelQualityStanding::OFFICIAL
     )
 {}
 class UnitTestRunner_Descriptor::Stats : public StatsTracker{

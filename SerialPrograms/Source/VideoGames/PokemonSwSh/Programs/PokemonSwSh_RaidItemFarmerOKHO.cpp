@@ -30,6 +30,7 @@ RaidItemFarmerOHKO_Descriptor::RaidItemFarmerOHKO_Descriptor()
         STRING_POKEMON + " SwSh", "Raid Item Farmer (OHKO)",
         "Programs/PokemonSwSh/RaidItemFarmerOHKO.html",
         "Farm items from raids that can be OHKO'ed. (requires multiple Switches)",
+        PanelQualityStanding::OFFICIAL_BELOW_STANDARDS,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,

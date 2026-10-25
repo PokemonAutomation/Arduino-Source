@@ -37,13 +37,13 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
     std::string category, std::string display_name,
     std::string doc_link,
     std::string description,
+    PanelQualityStanding standing,
     ProgramControllerClass controller_class,
     FeedbackType feedback,
     AllowCommandsWhenRunning allow_commands_while_running,
     size_t min_switches,
     size_t max_switches,
     size_t default_switches,
-    PanelDeprecation deprecation,
     std::vector<std::string> required_resources
 )
     : GameConsole::MultiConsoleProgramDescriptor(
@@ -51,14 +51,14 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description),
-        controller_class,
+        standing,
         GameConsole::pick_color(controller_class),
+        controller_class,
         feedback,
         allow_commands_while_running,
         min_switches,
         max_switches,
         default_switches,
-        deprecation,
         std::move(required_resources)
     )
 {}

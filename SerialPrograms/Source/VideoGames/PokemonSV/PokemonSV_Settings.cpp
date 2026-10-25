@@ -95,7 +95,8 @@ GameSettings_Descriptor::GameSettings_Descriptor()
         "PokemonSV:GlobalSettings",
         STRING_POKEMON + " SV", "Game Settings",
         "Programs/PokemonSV/PokemonSettings.html",
-        "Global " + STRING_POKEMON + " Scarlet and Violet Settings"
+        "Global " + STRING_POKEMON + " Scarlet and Violet Settings",
+        PanelQualityStanding::OFFICIAL
     )
 {}
 

@@ -38,7 +38,7 @@ AutoItemPrinter_Descriptor::AutoItemPrinter_Descriptor()
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PanelDeprecation::DEPRECATED
+        PanelQualityStanding::DEPRECATED
     )
 {}
 struct AutoItemPrinter_Descriptor::Stats : public StatsTracker{

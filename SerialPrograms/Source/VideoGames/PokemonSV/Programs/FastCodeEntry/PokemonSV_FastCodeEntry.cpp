@@ -32,6 +32,7 @@ FastCodeEntry_Descriptor::FastCodeEntry_Descriptor()
         STRING_POKEMON + " SV", "Fast Code Entry (FCE)",
         "Programs/PokemonSV/FastCodeEntry.html",
         "Quickly enter a 4, 6, or 8 digit link code.",
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,

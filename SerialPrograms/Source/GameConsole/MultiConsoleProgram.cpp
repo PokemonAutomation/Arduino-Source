@@ -66,14 +66,14 @@ MultiConsoleProgramDescriptor::MultiConsoleProgramDescriptor(
     std::string category, std::string display_name,
     std::string doc_link,
     std::string description,
-    ProgramControllerClass controller_class,
+    PanelQualityStanding standing,
     Color color,
+    ProgramControllerClass controller_class,
     FeedbackType feedback,
     AllowCommandsWhenRunning allow_commands_while_running,
     size_t min_consoles,
     size_t max_consoles,
     size_t default_consoles,
-    PanelDeprecation deprecation,
     std::vector<std::string> required_resources
 )
     : ProgramDescriptor(
@@ -81,8 +81,8 @@ MultiConsoleProgramDescriptor::MultiConsoleProgramDescriptor(
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description),
+        standing,
         color,
-        deprecation,
         true,
         std::move(required_resources)
     )

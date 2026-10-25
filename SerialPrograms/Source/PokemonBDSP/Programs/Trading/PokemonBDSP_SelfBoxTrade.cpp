@@ -25,6 +25,7 @@ SelfBoxTrade_Descriptor::SelfBoxTrade_Descriptor()
         STRING_POKEMON + " BDSP", "Self Box Trade",
         "Programs/PokemonBDSP/SelfBoxTrade.html",
         "Trade boxes of " + STRING_POKEMON + " between two local Switches.",
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,

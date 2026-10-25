@@ -111,6 +111,7 @@ TeraMultiFarmer_Descriptor::TeraMultiFarmer_Descriptor()
         STRING_POKEMON + " SV", "Tera Multi-Farmer",
         "Programs/PokemonSV/TeraMultiFarmer.html",
         "Farm items and " + STRING_POKEMON + " from your own Tera raid using multiple Switches.",
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,

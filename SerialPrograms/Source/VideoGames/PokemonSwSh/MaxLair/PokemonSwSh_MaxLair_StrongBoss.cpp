@@ -35,6 +35,7 @@ MaxLairStrongBoss_Descriptor::MaxLairStrongBoss_Descriptor()
         STRING_POKEMON + " SwSh", "Max Lair - Strong Boss",
         "Programs/PokemonSwSh/MaxLair-StrongBoss.html",
         "Auto Max Lair 2.0 - Run Dynamax Adventures and intelligently reset to keep paths that have high win rates.",
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,

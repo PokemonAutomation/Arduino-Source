@@ -118,7 +118,8 @@ GameSettings_Descriptor::GameSettings_Descriptor()
         "PokemonLA:GlobalSettings",
         STRING_POKEMON + " LA", "Game Settings",
         "Programs/PokemonLA/PokemonSettings.html",
-        "Global " + STRING_POKEMON + " Legends Arceus Settings"
+        "Global " + STRING_POKEMON + " Legends Arceus Settings",
+        PanelQualityStanding::OFFICIAL
     )
 {}
 

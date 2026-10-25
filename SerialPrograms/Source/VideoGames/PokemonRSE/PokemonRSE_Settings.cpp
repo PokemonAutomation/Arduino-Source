@@ -143,7 +143,8 @@ GameSettings_Descriptor::GameSettings_Descriptor()
         "PokemonRSE:GlobalSettings",
         STRING_POKEMON + " RSE", "Game Settings",
         "Programs/PokemonRSE/RSESettings.html",
-        "Global " + STRING_POKEMON + " Ruby, Sapphire, and Emerald Settings"
+        "Global " + STRING_POKEMON + " Ruby, Sapphire, and Emerald Settings",
+        PanelQualityStanding::OFFICIAL
     )
 {}
 

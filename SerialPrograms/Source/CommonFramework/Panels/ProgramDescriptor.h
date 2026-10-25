@@ -39,8 +39,8 @@ public:
         std::string category, std::string display_name,
         std::string doc_link,
         std::string description,
+        PanelQualityStanding standing,
         Color color,
-        PanelDeprecation deprecation,
         bool restore_defaults_button,
         std::vector<std::string> required_resources
     );

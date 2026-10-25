@@ -38,7 +38,8 @@ GameSettings_Descriptor::GameSettings_Descriptor()
         "PokemonPokopia:GlobalSettings",
         STRING_POKEMON + " Pokopia", "Game Settings",
         "Programs/PokemonPokopia/PokemonSettings.html",
-        "Global " + STRING_POKEMON + " Pokopia Settings"
+        "Global " + STRING_POKEMON + " Pokopia Settings",
+        PanelQualityStanding::OFFICIAL
     )
 {}
 

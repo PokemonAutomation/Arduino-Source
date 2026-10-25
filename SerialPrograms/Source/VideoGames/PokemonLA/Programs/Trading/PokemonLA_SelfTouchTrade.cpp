@@ -30,6 +30,7 @@ SelfTouchTrade_Descriptor::SelfTouchTrade_Descriptor()
         STRING_POKEMON + " LA", "Self Touch Trade",
         "Programs/PokemonLA/SelfTouchTrade.html",
         "Repeatedly trade " + STRING_POKEMON + " between two local Switches to fill up research.",
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,

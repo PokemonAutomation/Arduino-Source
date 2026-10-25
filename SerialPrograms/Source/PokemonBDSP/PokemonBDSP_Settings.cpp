@@ -175,7 +175,8 @@ GameSettings_Descriptor::GameSettings_Descriptor()
         "PokemonBDSP:GlobalSettings",
         STRING_POKEMON + " BDSP", "Game Settings",
         "Programs/PokemonBDSP/PokemonSettings.html",
-        "Global " + STRING_POKEMON + " Brilliant Diamond and Shing Pearl Settings"
+        "Global " + STRING_POKEMON + " Brilliant Diamond and Shing Pearl Settings",
+        PanelQualityStanding::OFFICIAL
     )
 {}
 

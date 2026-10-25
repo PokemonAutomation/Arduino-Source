@@ -80,7 +80,8 @@ GameSettings_Descriptor::GameSettings_Descriptor()
         "PokemonLGPE:GlobalSettings",
         STRING_POKEMON + " LGPE", "Game Settings",
         "Programs/PokemonLGPE/PokemonSettings.html",
-        "Global " + STRING_POKEMON + " Let's Go Settings"
+        "Global " + STRING_POKEMON + " Let's Go Settings",
+        PanelQualityStanding::OFFICIAL
     )
 {}
 

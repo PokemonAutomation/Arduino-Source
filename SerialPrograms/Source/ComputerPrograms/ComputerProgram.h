@@ -23,7 +23,7 @@ public:
         std::string category, std::string display_name,
         std::string doc_link,
         std::string description,
-        PanelDeprecation deprecation = PanelDeprecation::NOT_DEPRECATED
+        PanelQualityStanding standing
     );
 
     virtual std::unique_ptr<PanelSession> make_panel() const override;

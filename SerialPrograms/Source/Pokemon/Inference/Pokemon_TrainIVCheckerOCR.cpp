@@ -20,7 +20,8 @@ TrainIVCheckerOCR_Descriptor::TrainIVCheckerOCR_Descriptor()
         "PokemonSwSh:TrainIVCheckerOCR",
         STRING_POKEMON, "Train IV Checker OCR",
         "",
-        "Train IV Checker OCR"
+        "Train IV Checker OCR",
+        PanelQualityStanding::OFFICIAL
     )
 {}
 

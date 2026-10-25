@@ -51,11 +51,11 @@ ConsoleProgramDescriptor::ConsoleProgramDescriptor(
     std::string category, std::string display_name,
     std::string doc_link,
     std::string description,
-    ProgramControllerClass controller_class,
+    PanelQualityStanding standing,
     Color color,
+    ProgramControllerClass controller_class,
     FeedbackType feedback,
     AllowCommandsWhenRunning allow_commands_while_running,
-    PanelDeprecation deprecation,
     std::vector<std::string> required_resources
 )
     : ProgramDescriptor(
@@ -63,8 +63,8 @@ ConsoleProgramDescriptor::ConsoleProgramDescriptor(
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description),
+        standing,
         color,
-        deprecation,
         true,
         std::move(required_resources)
     )

@@ -64,7 +64,8 @@ GameSettings_Descriptor::GameSettings_Descriptor()
         "ZeldaTotK:GlobalSettings",
         "Zelda: TotK", "Tears of the Kingdom Settings",
         "Programs/ZeldaTotK/TotKSettings.html",
-        "Global Zelda: Tears of the Kingom Settings"
+        "Global Zelda: Tears of the Kingom Settings",
+        PanelQualityStanding::OFFICIAL
     )
 {}
 
