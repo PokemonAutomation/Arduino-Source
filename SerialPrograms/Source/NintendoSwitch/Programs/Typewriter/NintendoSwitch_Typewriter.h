@@ -33,6 +33,9 @@ public:
 private:
     TextEditOption TEXT;
     KeyboardLayoutOption KEYBOARD_LAYOUT;
+    MillisecondsOption DELAY;
+    MillisecondsOption HOLD;
+    MillisecondsOption COOLDOWN;
 };
 
 

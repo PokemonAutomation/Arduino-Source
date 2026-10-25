@@ -184,9 +184,9 @@ void add_tests_TypewriterTextMapping(UnitTestDatabase& database){
     //
     //  Unsupported characters.
     //
-    add_case(database, KeyboardLayout::QWERTY, std::string(1, (char)0xe9), {}, true);  //  é
-    add_case(database, KeyboardLayout::QWERTY, std::string(1, (char)0x01), {}, true);  //  control char
-    add_case(database, KeyboardLayout::QWERTY, std::string(1, (char)0x7f), {}, true);  //  DEL
+    add_case(database, KeyboardLayout::QWERTY, std::string(1, (uint8_t)0xe9), {}, true);  //  é
+    add_case(database, KeyboardLayout::QWERTY, std::string(1, (uint8_t)0x01), {}, true);  //  control char
+    add_case(database, KeyboardLayout::QWERTY, std::string(1, (uint8_t)0x7f), {}, true);  //  DEL
 
     //
     //  AZERTY: letters use the physical US position, digits need Shift,
@@ -204,7 +204,7 @@ void add_tests_TypewriterTextMapping(UnitTestDatabase& database){
     add_case(database, KeyboardLayout::AZERTY, "#", {}, true);
     add_case(database, KeyboardLayout::AZERTY, "@", {}, true);
     add_case(database, KeyboardLayout::AZERTY, "[", {}, true);
-    add_case(database, KeyboardLayout::AZERTY, std::string(1, (char)0xe9), {}, true);  //  é
+    add_case(database, KeyboardLayout::AZERTY, std::string(1, (uint8_t)0xe9), {}, true);  //  é
 }
 
 

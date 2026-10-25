@@ -6,7 +6,6 @@
 
 #include <string>
 #include "Common/Cpp/Exceptions.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_Typewriter.h"
 #include "NintendoSwitch_TypewriterTextMapping.h"
 
@@ -46,15 +45,35 @@ Typewriter::Typewriter()
         "The layout the Switch's physical keyboard is configured for "
         "(i.e. the Switch's language)."
     )
+    , DELAY(
+        "<b>Delay:</b><br>Delay between key presses.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        "24 ms"
+    )
+    , HOLD(
+        "<b>Hold:</b><br>Duration to hold each key press down.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        "40 ms"
+    )
+    , COOLDOWN(
+        "<b>Cooldown:</b><br>Do not reuse a key until this long after it is released.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        "24 ms"
+    )
 {
     PA_ADD_OPTION(TEXT);
     PA_ADD_OPTION(KEYBOARD_LAYOUT);
+    PA_ADD_OPTION(DELAY);
+    PA_ADD_OPTION(HOLD);
+    PA_ADD_OPTION(COOLDOWN);
 }
 
 
 
 
 void Typewriter::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+    using namespace std::chrono_literals;
+
     StandardHid::KeyboardContext context(scope, env.console.controller<StandardHid::Keyboard>());
 
     std::string text = TEXT;
@@ -70,15 +89,18 @@ void Typewriter::program(SingleSwitchProgramEnvironment& env, CancellableScope& 
     std::vector<std::vector<KeyboardKey>> chords =
         text_to_key_chords(KEYBOARD_LAYOUT.get(), text);
 
-    Milliseconds delay = ConsoleSettings::instance().KEYBOARD_CONTROLLER_TIMINGS.TIME_UNIT;
-    Milliseconds hold = ConsoleSettings::instance().KEYBOARD_CONTROLLER_TIMINGS.HOLD;
-    Milliseconds cool = ConsoleSettings::instance().KEYBOARD_CONTROLLER_TIMINGS.COOLDOWN;
+    Milliseconds delay = DELAY;
+    Milliseconds hold = HOLD;
+    Milliseconds cool = COOLDOWN;
 
     for (const std::vector<KeyboardKey>& keys : chords){
         if (keys.size() == 1){
             context->issue_key(&context, delay, hold, cool, keys[0]);
         }else{
             context->issue_keys(&context, delay, hold, cool, keys);
+        }
+        if (keys.size() > 1){
+            context->issue_barrier(&context);
         }
     }
 
