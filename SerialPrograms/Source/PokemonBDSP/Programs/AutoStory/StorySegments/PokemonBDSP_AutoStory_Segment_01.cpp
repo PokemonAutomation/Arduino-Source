@@ -11,9 +11,6 @@
 #include <array>
 #include <cmath>
 #include <memory>
-#include <QCoreApplication>
-#include <QDir>
-#include <QFileInfo>
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTools/ImageDiff.h"
@@ -35,24 +32,8 @@ namespace PokemonAutomation {
     namespace NintendoSwitch {
         namespace PokemonBDSP {
 
-            // Prefer the source Packages resources when running a development build.
-            // Installed builds continue to use their bundled Resources directory.
             static const std::string& mine_navigation_resource_path() {
-                static const std::string path = [] {
-                    QDir directory(QCoreApplication::applicationDirPath());
-                    for (size_t level = 0; level < 5; level++) {
-                        const QString candidate = directory.filePath(
-                            "Packages/Resources/PokemonBDSP/Autostory/Oreburg_mine_nav/"
-                        );
-                        if (QFileInfo(candidate).isDir()) {
-                            return QDir::cleanPath(candidate).toStdString() + "/";
-                        }
-                        if (!directory.cdUp()) {
-                            break;
-                        }
-                    }
-                    return RESOURCE_PATH() + "PokemonBDSP/Autostory/Oreburg_mine_nav/";
-                }();
+                static const std::string path = RESOURCE_PATH() + "PokemonBDSP/Autostory/Oreburg_mine_nav/";
                 return path;
             }
 

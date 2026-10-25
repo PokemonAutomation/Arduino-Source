@@ -10,9 +10,6 @@
 #include <array>
 #include <cmath>
 #include <memory>
-#include <QCoreApplication>
-#include <QDir>
-#include <QFileInfo>
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTools/ImageDiff.h"
