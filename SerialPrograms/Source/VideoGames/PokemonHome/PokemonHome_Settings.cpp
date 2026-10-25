@@ -33,7 +33,8 @@ GameSettings_Descriptor::GameSettings_Descriptor()
         "PokemonHome:GlobalSettings",
         STRING_POKEMON + " Home", STRING_POKEMON + " Settings",
         "Programs/PokemonHome/PokemonSettings.html",
-        "Global " + STRING_POKEMON + " Settings"
+        "Global " + STRING_POKEMON + " Settings",
+        PanelQualityStanding::OFFICIAL
     )
 {}
 

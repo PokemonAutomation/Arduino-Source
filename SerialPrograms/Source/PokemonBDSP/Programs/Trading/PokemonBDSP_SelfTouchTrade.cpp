@@ -25,6 +25,7 @@ SelfTouchTrade_Descriptor::SelfTouchTrade_Descriptor()
         STRING_POKEMON + " BDSP", "Self Touch Trade",
         "Programs/PokemonBDSP/SelfTouchTrade.html",
         "Touch trade boxes of " + STRING_POKEMON + " between two local Switches.",
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,

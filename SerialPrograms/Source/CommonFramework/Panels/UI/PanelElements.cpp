@@ -298,7 +298,8 @@ void populate_panel_widget(
 ){
     panel.setObjectName(QString::fromUtf8("backgroundPanelRoot"));
 
-    if (descriptor.deprecation() == PanelDeprecation::DEPRECATED){
+    switch (descriptor.standing()){
+    case PanelQualityStanding::DEPRECATED:{
         QMessageBox box;
         box.warning(
             nullptr,
@@ -308,6 +309,19 @@ void populate_panel_widget(
                 "and no longer maintained. Please consider using a newer alternative."
             )
         );
+    }
+    case PanelQualityStanding::UNMAINTAINED:{
+        QMessageBox box;
+        box.warning(
+            nullptr,
+            "Reliability Notice",
+            QString::fromStdString(
+                "The program \"" + descriptor.display_name() + "\" is no longer "
+                "maintained and may not meet our quality standards."
+            )
+        );
+    }
+    default:;
     }
 
     QVBoxLayout* layout = new QVBoxLayout(&panel);

@@ -53,7 +53,7 @@ public:
         ProgramControllerClass controller_class,
         FeedbackType feedback,
         AllowCommandsWhenRunning allow_commands_while_running,
-        PanelDeprecation deprecation = PanelDeprecation::NOT_DEPRECATED,
+        PanelQualityStanding standing = PanelQualityStanding::UNCATEGORIZED,
         std::vector<std::string> required_resources = {}
     );
 

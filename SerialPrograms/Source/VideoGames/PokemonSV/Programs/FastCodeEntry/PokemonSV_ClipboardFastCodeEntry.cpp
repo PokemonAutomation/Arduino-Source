@@ -31,6 +31,7 @@ ClipboardFastCodeEntry_Descriptor::ClipboardFastCodeEntry_Descriptor()
         STRING_POKEMON + " SV", "Clipboard Fast Code Entry (C-FCE)",
         "Programs/PokemonSV/ClipboardFastCodeEntry.html",
         "Automatically enter a 4, 6, or 8 digit link code from your clipboard.",
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,

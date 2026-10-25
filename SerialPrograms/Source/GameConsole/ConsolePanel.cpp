@@ -14,12 +14,12 @@ namespace GameConsole{
 
 
 ConsolePanelDescriptor::ConsolePanelDescriptor(
-    Color color,
     std::string identifier,
     std::string category, std::string display_name,
     std::string doc_link,
     std::string description,
-    PanelDeprecation deprecation,
+    PanelQualityStanding standing,
+    Color color,
     bool restore_defaults_button,
     size_t num_controllers
 )
@@ -28,8 +28,8 @@ ConsolePanelDescriptor::ConsolePanelDescriptor(
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description),
+        standing,
         color,
-        deprecation,
         restore_defaults_button
     )
     , m_num_controllers(num_controllers)

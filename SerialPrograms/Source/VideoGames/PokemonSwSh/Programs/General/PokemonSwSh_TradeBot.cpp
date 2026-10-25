@@ -32,7 +32,7 @@ TradeBot_Descriptor::TradeBot_Descriptor()
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PanelDeprecation::DEPRECATED
+        PanelQualityStanding::DEPRECATED
     )
 {}
 

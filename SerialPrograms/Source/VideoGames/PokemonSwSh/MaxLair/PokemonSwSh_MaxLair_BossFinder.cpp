@@ -29,6 +29,7 @@ MaxLairBossFinder_Descriptor::MaxLairBossFinder_Descriptor()
         STRING_POKEMON + " SwSh", "Max Lair - Boss Finder",
         "Programs/PokemonSwSh/MaxLair-BossFinder.html",
         "Auto Max Lair 2.0 - Run adventures until you find the boss you want. Once you find your boss, switch to the other programs to shiny hunt it.",
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,

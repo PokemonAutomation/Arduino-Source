@@ -29,6 +29,7 @@ SelfBoxTrade_Descriptor::SelfBoxTrade_Descriptor()
         STRING_POKEMON + " LZA", "Self Box Trade",
         "Programs/PokemonLZA/SelfBoxTrade.html",
         "Trade boxes across two Switches.",
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,

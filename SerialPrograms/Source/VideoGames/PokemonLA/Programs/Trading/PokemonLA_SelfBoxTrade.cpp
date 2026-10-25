@@ -29,6 +29,7 @@ SelfBoxTrade_Descriptor::SelfBoxTrade_Descriptor()
         STRING_POKEMON + " LA", "Self Box Trade",
         "Programs/PokemonLA/SelfBoxTrade.html",
         "Trade boxes across two Switches.",
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,

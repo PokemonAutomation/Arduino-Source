@@ -15,8 +15,8 @@ PanelDescriptor::PanelDescriptor(
     std::string category, std::string display_name,
     std::string doc_link,
     std::string description,
+    PanelQualityStanding standing,
     Color color,
-    PanelDeprecation deprecation,
     bool restore_defaults_button
 )
     : m_identifier(std::move(identifier))
@@ -24,8 +24,8 @@ PanelDescriptor::PanelDescriptor(
     , m_display_name(std::move(display_name))
     , m_doc_link(std::move(doc_link))
     , m_description(std::move(description))
+    , m_standing(standing)
     , m_color(color)
-    , m_deprecation(deprecation)
     , m_restore_defaults_button(restore_defaults_button)
 {}
 std::unique_ptr<PanelSession> PanelDescriptor::make_panel() const{

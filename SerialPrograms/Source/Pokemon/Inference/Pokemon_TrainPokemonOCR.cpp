@@ -24,7 +24,8 @@ TrainPokemonOCR_Descriptor::TrainPokemonOCR_Descriptor()
         "PokemonSwSh:TrainPokemonNameOCR",
         STRING_POKEMON, "Train " + STRING_POKEMON + " Name OCR",
         "",
-        "Train " + STRING_POKEMON + " Name OCR"
+        "Train " + STRING_POKEMON + " Name OCR",
+        PanelQualityStanding::OFFICIAL
     )
 {}
 

@@ -340,7 +340,8 @@ GlobalSettings_Descriptor::GlobalSettings_Descriptor()
         "",
         "Global Settings", "Global Settings",
         "",
-        "Global Settings"
+        "Global Settings",
+        PanelQualityStanding::OFFICIAL
     )
 {}
 GlobalSettings_Descriptor::Wrapper& GlobalSettings_Descriptor::instance(){
