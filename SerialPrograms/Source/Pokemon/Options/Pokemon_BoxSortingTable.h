@@ -29,6 +29,7 @@ enum class SortingRuleType
     Nature,
     Language_of_Origin,
     Ability,
+    Level,
 };
 
 struct SortingRule

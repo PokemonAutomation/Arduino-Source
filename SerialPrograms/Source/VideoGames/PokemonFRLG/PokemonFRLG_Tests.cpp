@@ -19,6 +19,7 @@
 #include "Inference/PokemonFRLG_StatsReader.h"
 #include "Inference/PokemonFRLG_TrainerIdReader.h"
 #include "Inference/PokemonFRLG_WildEncounterReader.h"
+#include "Programs/BoxOrganization/PokemonFRLG_BoxSorter_Tests.h"
 #include "Tests/TestUtils.h"
 #include "PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_Tests.h"
@@ -259,6 +260,7 @@ void add_tests_ExitWildBattle(UnitTestDatabase& database){
 
 
 void add_tests(UnitTestDatabase& database){
+    add_tests_BoxSorter(database);
     add_tests_AdvanceWhiteDialogDetector(database);
     add_tests_SelectionDialogDetector(database);
     add_tests_ShinySymbolDetector(database);
