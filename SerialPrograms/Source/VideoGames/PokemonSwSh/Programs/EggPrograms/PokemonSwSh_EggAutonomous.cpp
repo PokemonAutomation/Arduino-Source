@@ -920,6 +920,12 @@ bool EggAutonomous::process_hatched_pokemon(
                 if (m_num_pokemon_kept >= MAX_KEEPERS){
                     env.log("Max keepers reached. Stopping program...");
                     env.console.overlay().add_log("Max Keepers reached.", COLOR_WHITE);
+                    // Stopping here skips the save at the end of the batch, so save now
+                    // or the last kept pokemon is lost if the game is reset.
+                    if (AUTO_SAVING != AutoSave::NoAutoSave){
+                        menus_to_mainmenu(env.console, context);
+                        save_game(env.console, context);
+                    }
                     return true;
                 }
                 break;
