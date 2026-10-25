@@ -2,9 +2,10 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  Maps printable ASCII characters to the raw HID key press(es) needed to
- *  type that character on a physical keyboard with a given layout. The
- *  layout is the one configured in the Switch's language settings.
+ *  Maps text characters (printable ASCII, tab, and newline) to the raw HID
+ *  key press(es) needed to type that character on a physical keyboard with a
+ *  given layout. The layout is the one configured in the Switch's language
+ *  settings.
  *
  *  Characters that cannot be typed on a given layout are simply absent
  *  from that layout's map.
@@ -14,6 +15,7 @@
 #define PokemonAutomation_NintendoSwitch_TypewriterTextMapping_H
 
 #include <map>
+#include <string>
 #include <vector>
 #include "ControllerInput/Keyboard/KeyboardHidButtons.h"
 #include "NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_KeyboardEntryMappings.h"
@@ -78,6 +80,23 @@ void control_flags_to_keys(ControlFlag flags, std::vector<KeyboardKey>& keys);
 const std::map<char, TextKeyMapping>& TEXT_TO_HID_KEY(KeyboardLayout layout);
 const std::map<char, TextKeyMapping>& TEXT_TO_HID_KEY_QWERTY();
 const std::map<char, TextKeyMapping>& TEXT_TO_HID_KEY_AZERTY();
+
+
+//  Converts "text" into the ordered list of key chords that types it on the
+//  given layout. Each chord is the set of keys pressed simultaneously: the
+//  modifier keys (in modifier-byte order) followed by the main key.
+//
+//  - Tab types Tab; a newline types Enter.
+//  - A carriage return is only valid as the first half of a CRLF pair
+//    (Windows line endings), in which case the \r is ignored and the \n types
+//    the Enter. A lone \r is an error.
+//
+//  Throws OperationFailedException (NO_ERROR_REPORT) if the text contains a
+//  character that cannot be typed on this layout.
+std::vector<std::vector<KeyboardKey>> text_to_key_chords(
+    KeyboardLayout layout,
+    const std::string& text
+);
 
 
 

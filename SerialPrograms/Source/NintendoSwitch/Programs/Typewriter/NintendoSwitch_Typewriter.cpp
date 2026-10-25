@@ -4,9 +4,8 @@
  *
  */
 
-#include <cstdio>
 #include <string>
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "Common/Cpp/Exceptions.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_Typewriter.h"
 #include "NintendoSwitch_TypewriterTextMapping.h"
@@ -36,7 +35,8 @@ Typewriter_Descriptor::Typewriter_Descriptor()
 Typewriter::Typewriter()
     : TEXT(
         "<b>Text to Type:</b><br>"
-        "Plain ASCII text. Newline characters press Enter.",
+        "Plain ASCII text. Tab presses Tab and newlines press Enter. "
+        "Windows (CRLF) line endings are accepted.",
         LockMode::LOCK_WHILE_RUNNING,
         "",
         "Text to type into the Switch"
@@ -54,22 +54,6 @@ Typewriter::Typewriter()
 
 
 
-static std::string char_to_display(char ch){
-    if (ch == '\n'){
-        return "newline";
-    }
-    unsigned char uch = (unsigned char)ch;
-    if (uch >= 0x20 && uch <= 0x7e){
-        return std::string(1, ch);
-    }
-    char buffer[8];
-    std::snprintf(buffer, sizeof(buffer), "0x%02x", uch);
-    return std::string(buffer);
-}
-
-
-
-
 void Typewriter::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     StandardHid::KeyboardContext context(scope, env.console.controller<StandardHid::Keyboard>());
 
@@ -81,40 +65,16 @@ void Typewriter::program(SingleSwitchProgramEnvironment& env, CancellableScope& 
         );
     }
 
-    KeyboardLayout layout = KEYBOARD_LAYOUT.get();
-    const std::map<char, TextKeyMapping>& mapping = TEXT_TO_HID_KEY(layout);
-
-    //  Check the whole text up front, so we don't type half the text and
+    //  Converts the whole text up front, so we don't type half the text and
     //  then fail on an unsupported character.
-    std::string reason;
-    if (layout == KeyboardLayout::AZERTY){
-        reason = "On a French keyboard this character requires the AltGr "
-                 "key, which this program does not support.";
-    }else{
-        reason = "Only printable ASCII characters are supported.";
-    }
-    for (char ch : text){
-        if (mapping.find(ch) == mapping.end()){
-            throw_and_log<OperationFailedException>(
-                env.console,
-                ErrorReportMode::NO_ERROR_REPORT,
-                std::string("Unsupported character for the ") +
-                (layout == KeyboardLayout::QWERTY ? "QWERTY" : "AZERTY") +
-                " keyboard layout: \"" + char_to_display(ch) + "\". " +
-                reason + " Please use plain ASCII text."
-            );
-        }
-    }
+    std::vector<std::vector<KeyboardKey>> chords =
+        text_to_key_chords(KEYBOARD_LAYOUT.get(), text);
 
     Milliseconds delay = ConsoleSettings::instance().KEYBOARD_CONTROLLER_TIMINGS.TIME_UNIT;
     Milliseconds hold = ConsoleSettings::instance().KEYBOARD_CONTROLLER_TIMINGS.HOLD;
     Milliseconds cool = ConsoleSettings::instance().KEYBOARD_CONTROLLER_TIMINGS.COOLDOWN;
 
-    for (char ch : text){
-        TextKeyMapping m = mapping.at(ch);
-        std::vector<KeyboardKey> keys;
-        control_flags_to_keys(m.control_flags, keys);
-        keys.push_back(m.key);
+    for (const std::vector<KeyboardKey>& keys : chords){
         if (keys.size() == 1){
             context->issue_key(&context, delay, hold, cool, keys[0]);
         }else{

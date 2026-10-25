@@ -10,7 +10,10 @@
  *  Shift) on a given layout are simply absent from that layout's map.
  */
 
+#include <cstdio>
+#include <string>
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "NintendoSwitch_TypewriterTextMapping.h"
 
 namespace PokemonAutomation{
@@ -62,6 +65,85 @@ void control_flags_to_keys(ControlFlag flags, std::vector<KeyboardKey>& keys){
     if ((flags & CONTROL_RIGHT_META) != CONTROL_NONE){
         keys.push_back(KeyboardKey::KEY_RIGHT_META);
     }
+}
+
+
+
+static std::string char_to_display(char ch){
+    if (ch == '\n'){
+        return "newline";
+    }
+    if (ch == '\t'){
+        return "tab";
+    }
+    if (ch == '\r'){
+        return "carriage return";
+    }
+    unsigned char uch = (unsigned char)ch;
+    if (uch >= 0x20 && uch <= 0x7e){
+        return std::string(1, ch);
+    }
+    char buffer[8];
+    std::snprintf(buffer, sizeof(buffer), "0x%02x", uch);
+    return std::string(buffer);
+}
+
+
+
+std::vector<std::vector<KeyboardKey>> text_to_key_chords(
+    KeyboardLayout layout,
+    const std::string& text
+){
+    const std::map<char, TextKeyMapping>& mapping = TEXT_TO_HID_KEY(layout);
+
+    std::vector<std::vector<KeyboardKey>> chords;
+    chords.reserve(text.size());
+
+    for (size_t i = 0; i < text.size(); i++){
+        char ch = text[i];
+        if (ch == '\r'){
+            //  A carriage return is only valid as the first half of a CRLF
+            //  pair (Windows line endings); the \n types the Enter.
+            if (i + 1 == text.size() || text[i + 1] != '\n'){
+                throw OperationFailedException(
+                    ErrorReportMode::NO_ERROR_REPORT,
+                    "Unsupported character: \"" + char_to_display(ch) +
+                    "\". A standalone carriage return is not supported; "
+                    "line endings must be CRLF."
+                );
+            }
+            continue;
+        }
+
+        auto iter = mapping.find(ch);
+        if (iter == mapping.end()){
+            std::string reason;
+            if ((unsigned char)ch >= 0x20 && (unsigned char)ch <= 0x7e){
+                //  A printable ASCII character this layout can't type:
+                //  it requires AltGr on a French keyboard.
+                reason = "On a French keyboard this character requires the "
+                         "AltGr key, which this program does not support.";
+            }else{
+                reason = "Only ASCII characters are supported, limited to "
+                         "printable characters, tab, and newline. Please use "
+                         "plain ASCII text.";
+            }
+            throw OperationFailedException(
+                ErrorReportMode::NO_ERROR_REPORT,
+                std::string("Unsupported character for the ") +
+                (layout == KeyboardLayout::QWERTY ? "QWERTY" : "AZERTY") +
+                " keyboard layout: \"" + char_to_display(ch) + "\". " +
+                reason
+            );
+        }
+
+        std::vector<KeyboardKey> keys;
+        control_flags_to_keys(iter->second.control_flags, keys);
+        keys.push_back(iter->second.key);
+        chords.emplace_back(std::move(keys));
+    }
+
+    return chords;
 }
 
 
@@ -173,7 +255,8 @@ const std::map<char, TextKeyMapping>& TEXT_TO_HID_KEY_QWERTY(){
         {'/',  {KeyboardKey::KEY_SLASH}},
         {'?',  {KeyboardKey::KEY_SLASH, CONTROL_LEFT_SHIFT}},
 
-        //  Newline
+        //  Control characters
+        {'\t', {KeyboardKey::KEY_TAB}},
         {'\n', {KeyboardKey::KEY_ENTER}},
     };
     return map;
@@ -290,7 +373,8 @@ const std::map<char, TextKeyMapping>& TEXT_TO_HID_KEY_AZERTY(){
         {'/',  {KeyboardKey::KEY_DOT, CONTROL_LEFT_SHIFT}},
         {'~',  {KeyboardKey::KEY_GRAVE, CONTROL_LEFT_SHIFT}},
 
-        //  Newline
+        //  Control characters
+        {'\t', {KeyboardKey::KEY_TAB}},
         {'\n', {KeyboardKey::KEY_ENTER}},
     };
     return map;

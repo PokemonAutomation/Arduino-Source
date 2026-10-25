@@ -1387,6 +1387,8 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboMacro.h
     Source/NintendoSwitch/Programs/Typewriter/NintendoSwitch_Typewriter.cpp
     Source/NintendoSwitch/Programs/Typewriter/NintendoSwitch_Typewriter.h
+    Source/NintendoSwitch/Programs/Typewriter/NintendoSwitch_Typewriter_Tests.cpp
+    Source/NintendoSwitch/Programs/Typewriter/NintendoSwitch_Typewriter_Tests.h
     Source/NintendoSwitch/Programs/Typewriter/NintendoSwitch_TypewriterTextMapping.cpp
     Source/NintendoSwitch/Programs/Typewriter/NintendoSwitch_TypewriterTextMapping.h
     Source/PanelLists.cpp
