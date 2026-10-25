@@ -85,7 +85,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_SingleSwitchProgram<EggRng>());
 
     if (IS_BETA_VERSION || STATIC_GLOBALS.DEVELOPER_MODE){
-        ret.emplace_back("---- Untested/Beta/WIP ----");
+//        ret.emplace_back("---- Untested/Beta/WIP ----");
     }
 
     if (STATIC_GLOBALS.DEVELOPER_MODE){
