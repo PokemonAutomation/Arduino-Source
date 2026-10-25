@@ -38,7 +38,17 @@ program is usually in #automation-chat and #automation-help.
   there, so assume the strictest flags apply.
 - Unit tests are welcome for logic changes (the test suite runs in CI and in the GUI's
   "Unit Test Runner" program).
-- If you tested on real hardware, say so in the PR description: what you ran, and for how
+- Tests are strongly recommended for new inference classes. Include images that should
+  be detected and, where practical, images that should not be detected.
+- Tests are especially important when changing an existing inference class to fix a
+  detection problem. You likely already have an image that demonstrates the failure.
+  Add it as a regression test that fails before the fix and passes afterward, so the
+  same problem can be caught if it returns. Run the existing tests for the affected
+  inference code to check that the change preserves other expected behavior.
+- Test images are stored in the separate
+  [CommandLineTests repository](https://github.com/PokemonAutomation/CommandLineTests).
+  Add images there and the corresponding test code and test cases in this repository.
+- If you also tested on real hardware, say so in the PR description: what you ran, and for how
   long.
 
 ## Limits and Response Time
