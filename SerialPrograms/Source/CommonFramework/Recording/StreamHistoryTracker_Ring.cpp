@@ -109,6 +109,7 @@ static bool init_channel_layout(AVChannelLayout& layout, int channels){
 }
 
 
+//  The configured target FPS (falls back to 10 for unknown settings).
 size_t get_target_fps(){
     const StreamHistoryOption& settings = GlobalSettings::instance().STREAM_HISTORY;
     switch (settings.VIDEO_FPS){
@@ -122,6 +123,8 @@ size_t get_target_fps(){
 }
 
 
+//  The target video bitrate in kbps: the configured fixed value (clamped to
+//  100-8000) or the quality preset's value.
 size_t get_target_bitrate_kbps(){
     const StreamHistoryOption& settings = GlobalSettings::instance().STREAM_HISTORY;
     if (settings.ENCODING_MODE == StreamHistoryOption::EncodingMode::FIXED_BITRATE){
@@ -142,6 +145,8 @@ size_t get_target_bitrate_kbps(){
 }
 
 
+//  Resolves the configured output resolution (match input / 720p / 1080p)
+//  to even H.264-compatible dimensions, preserving the input aspect ratio.
 bool get_target_video_size(int input_width, int input_height, int& out_width, int& out_height){
     const StreamHistoryOption& settings = GlobalSettings::instance().STREAM_HISTORY;
     int target_width;
@@ -169,6 +174,8 @@ bool get_target_video_size(int input_width, int input_height, int& out_width, in
 }
 
 
+//  Maps the capture pipeline's Qt pixel formats to ffmpeg's (AV_PIX_FMT_NONE
+//  when unsupported).
 int qt_pixel_format_to_av_pix_fmt(QVideoFrameFormat::PixelFormat format){
     switch (format){
     case QVideoFrameFormat::Format_NV12:     return AV_PIX_FMT_NV12;
@@ -444,6 +451,9 @@ struct StreamHistoryTracker_Ring::Data{
     ConditionVariable m_cv;
     std::deque<std::shared_ptr<const VideoFrame>> m_pending_frames;
 
+    //  Initializes the audio encoder (if enabled) and starts the video
+    //  worker thread (if enabled); the video encoder itself is opened
+    //  lazily on the first frame.
     Data(
         Logger& p_logger,
         std::chrono::seconds p_window,
@@ -470,6 +480,8 @@ struct StreamHistoryTracker_Ring::Data{
         }
     }
 
+    //  Releases the ffmpeg resources (the worker thread is already stopped
+    //  by ~StreamHistoryTracker_Ring()).
     ~Data(){
         if (m_sws != nullptr) sws_freeContext(m_sws);
         if (m_video_params != nullptr) avcodec_parameters_free(&m_video_params);
@@ -479,6 +491,9 @@ struct StreamHistoryTracker_Ring::Data{
     }
 
 
+    //  Allocates + opens the AAC encoder (FLTP, 48 kHz, 1024-sample frames,
+    //  96 kbps, stream config in the container header) at the tracker's
+    //  fixed channel count; any failure disables audio (m_have_audio).
     void init_audio_encoder(){
         const AVCodec* codec = avcodec_find_encoder(AV_CODEC_ID_AAC);
         if (codec == nullptr){
@@ -543,6 +558,10 @@ struct StreamHistoryTracker_Ring::Data{
     }
 
 
+    //  Tries the encoder candidates from m_video_encoder_index (skipping
+    //  poisoned ones) and opens the first that works: sets m_vctx, resets
+    //  the per-encoder state, and frees the old parameter snapshot. If none
+    //  work, video is disabled (m_video_enabled).
     void init_video_encoder(int input_width, int input_height){
         constexpr size_t CANDIDATE_COUNT = sizeof(VIDEO_ENCODER_CANDIDATES)/sizeof(VIDEO_ENCODER_CANDIDATES[0]);
         //  Candidates before m_video_encoder_index already failed; once past
@@ -741,6 +760,8 @@ struct StreamHistoryTracker_Ring::Data{
     }
 
 
+    //  The worker thread: blocks on m_pending_frames, encodes each frame in
+    //  order, and exits on shutdown once the queue is drained.
     void worker_loop(){
         while (true){
             std::shared_ptr<const VideoFrame> frame;
@@ -758,6 +779,12 @@ struct StreamHistoryTracker_Ring::Data{
     }
 
 
+    //  Converts one frame to the encoder's pixel format (NV12 direct,
+    //  everything else through RGB), (re)building the scaler as needed,
+    //  then feeds it to the encoder: wall-clock-derived pts, a forced
+    //  keyframe every VIDEO_KEYFRAME_INTERVAL_US, and an EAGAIN
+    //  drain-and-retry. A hard send failure abandons the (possibly broken)
+    //  encoder and opens the next candidate.
     void encode_video_frame(const std::shared_ptr<const VideoFrame>& vf){
         if (!m_video_enabled || vf == nullptr || !vf->frame.isValid()){
             return;
@@ -961,6 +988,8 @@ struct StreamHistoryTracker_Ring::Data{
     }
 
 
+    //  Throttles the incoming frames to the target FPS and queues them for
+    //  the worker thread, dropping the oldest queued frame when full.
     void on_frame(std::shared_ptr<const VideoFrame> frame){
         if (!m_has_video || frame == nullptr || frame->timestamp == WallClock::min()){
             return;
@@ -1004,6 +1033,9 @@ struct StreamHistoryTracker_Ring::Data{
     }
 
 
+    //  Interleaves the planar 48 kHz input into m_audio_acc, then for every
+    //  complete 1024-sample frame: encodes AAC, stores the packet in the
+    //  ring (back-dated to the start of its samples), and evicts.
     void push_samples(size_t samples, size_t stride, const float* data){
         if (!m_have_audio || samples == 0 || data == nullptr){
             return;
@@ -1497,6 +1529,8 @@ struct StreamHistoryTracker_Ring::Data{
     }
 
 
+    //  Snapshots the ring, rewinds the video to its first keyframe, trims
+    //  the audio to the same start point, and muxes both to the file.
     bool save(const std::string& filename) const{
         m_logger.log("Saving stream history (in-memory encoded ring)...", COLOR_BLUE);
 
@@ -1558,6 +1592,8 @@ struct StreamHistoryTracker_Ring::Data{
 
 
 
+//  Stops the video worker thread before Data (and its ffmpeg contexts) is
+//  destroyed.
 StreamHistoryTracker_Ring::~StreamHistoryTracker_Ring(){
     if (m_data->m_worker){
         m_data->m_stopping = true;
