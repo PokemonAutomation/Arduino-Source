@@ -7,16 +7,8 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioInputDevice_H
 #define PokemonAutomation_AudioPipeline_AudioInputDevice_H
 
-#include <QtGlobal>
-#if QT_VERSION_MAJOR == 5
-#include <QAudioInput>
-using NativeAudioSource = QAudioInput;
-#elif QT_VERSION_MAJOR == 6
 #include <QAudioSource>
 using NativeAudioSource = QAudioSource;
-#else
-#error "Unknown Qt version."
-#endif
 
 #include <memory>
 #include <QIODevice>

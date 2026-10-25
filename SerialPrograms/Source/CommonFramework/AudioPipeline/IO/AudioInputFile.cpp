@@ -61,7 +61,6 @@ bool probe_wav_native_format(const std::string& filename, QAudioFormat& out_form
 }
 
 
-#if QT_VERSION_MAJOR == 6
 bool probe_decoded_native_format(const std::string& filename, QAudioFormat& out_format){
     //  A QAudioDecoder started without a target format decodes in the
     //  source's native format, and the first decoded buffer carries that
@@ -127,16 +126,6 @@ bool probe_decoded_native_format(const std::string& filename, QAudioFormat& out_
     }
     return false;
 }
-#else
-bool probe_decoded_native_format(const std::string& filename, QAudioFormat& out_format){
-    //  Qt 5's QAudioDecoder API does not expose the decoded buffer's
-    //  format, so the probe cannot run there: the caller falls back to
-    //  the legacy 48k stereo float target.
-    (void) filename;
-    (void) out_format;
-    return false;
-}
-#endif
 
 
 
