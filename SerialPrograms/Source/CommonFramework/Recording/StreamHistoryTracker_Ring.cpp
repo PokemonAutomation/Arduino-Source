@@ -937,7 +937,18 @@ struct StreamHistoryTracker_Ring::Impl{
         if (latest == WallClock::min()){
             return;
         }
-        WallClock threshold = latest - window;
+        //  Keep one extra keyframe interval of headroom: save() starts the
+        //  file at the first keyframe in the ring, and keyframes arrive only
+        //  every VIDEO_KEYFRAME_INTERVAL_US. Evicting at "latest - window"
+        //  would let the first keyframe fall up to a full interval after the
+        //  window's start point, so the saved file would cover only
+        //  "window - interval" of the most recent seconds. With the
+        //  headroom, the ring always contains a keyframe at or before
+        //  "latest - window", so the saved file always covers the most
+        //  recent "window" seconds (it may start up to one keyframe
+        //  interval earlier).
+        WallClock threshold =
+            latest - window - std::chrono::microseconds(VIDEO_KEYFRAME_INTERVAL_US);
         while (!video.empty() && (video.front()->timestamp < threshold || ring_bytes > MAX_RING_BYTES)){
             ring_bytes -= (int64_t)video.front()->data.size();
             video.pop_front();
@@ -1503,9 +1514,11 @@ struct StreamHistoryTracker_Ring::Impl{
         }
 
         //  Rewind the video to the first keyframe (the oldest decodable start
-        //  point) so the file decodes from the beginning. This loses at most one
-        //  keyframe interval (~2 s) from the head of the window; rewinding to
-        //  the *last* keyframe instead would discard almost the entire window.
+        //  point) so the file decodes from the beginning. Because evict() keeps
+        //  one extra keyframe interval of headroom, this keyframe is at or
+        //  before the window's start point, so the file always covers the most
+        //  recent "window" seconds; it may start up to one keyframe interval
+        //  (~2 s) earlier than that.
         size_t video_start_index = 0;
         for (size_t i = 0; i < video_snapshot.size(); i++){
             if (video_snapshot[i]->flags & AV_PKT_FLAG_KEY){
