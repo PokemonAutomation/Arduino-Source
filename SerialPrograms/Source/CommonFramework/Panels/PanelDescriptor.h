@@ -62,8 +62,8 @@ private:
     const std::string m_display_name;
     const std::string m_doc_link;
     const std::string m_description;
-    const Color m_color;
     const PanelQualityStanding m_standing;
+    const Color m_color;
     const bool m_restore_defaults_button;
 };
 
