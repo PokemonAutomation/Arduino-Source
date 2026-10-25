@@ -188,8 +188,7 @@ void AudioPassthroughPairQt::build_working_entry(
     //  the physical order, so the swap is applied to the matrix (the same
     //  special case the sink branch uses).
     std::vector<float> matrix;
-    if (m_input_choice.swap_channels()
-        && raw_channels == 2 && out_channels == 2){
+    if (m_input_choice.swap_channels() && raw_channels == 2 && out_channels == 2){
         //  out = [in 1, in 0]; weight(in i -> out o) at index i + in_ch * o.
         matrix = {0.0f, 1.0f, 1.0f, 0.0f};
     }else{
@@ -203,7 +202,10 @@ void AudioPassthroughPairQt::build_working_entry(
     }
 
     entry.m_node.reset(new Kernels::AudioPipeline::WorkingAudio2WorkingAudio(
-        m_logger, raw_rate, out_rate, raw_channels, out_channels, std::move(matrix)
+        m_logger,
+        raw_rate, out_rate,
+        raw_channels, out_channels,
+        std::move(matrix)
     ));
     entry.m_forwarder.reset(new InternalWorkingListener(listener, out_rate, out_channels));
     entry.m_node->add_listener(*entry.m_forwarder);
@@ -311,7 +313,10 @@ void AudioPassthroughPairQt::build_tree(float input_volume){
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "No channel mixer matrix.");
         }
         m_fft_conv.reset(new Kernels::AudioPipeline::WorkingAudio2WorkingAudio(
-            m_logger, raw_rate, fft_rate, raw_channels, 1, std::move(matrix)
+            m_logger,
+            raw_rate, fft_rate,
+            raw_channels, 1,
+            std::move(matrix)
         ));
         m_fft_conv->add_listener(*m_fft_node);
         m_source_decoder->add_listener(*m_fft_conv);
@@ -381,7 +386,10 @@ void AudioPassthroughPairQt::rebuild_sink_branch(){
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "No channel mixer matrix.");
         }
         m_sink_conv.reset(new Kernels::AudioPipeline::WorkingAudio2WorkingAudio(
-            m_logger, raw_rate, sink_rate, raw_channels, sink_channels, std::move(matrix)
+            m_logger,
+            raw_rate, sink_rate,
+            raw_channels, sink_channels,
+            std::move(matrix)
         ));
         m_sink_conv->add_listener(*m_sink_encoder);
         m_source_decoder->push_front_listener(*m_sink_conv);

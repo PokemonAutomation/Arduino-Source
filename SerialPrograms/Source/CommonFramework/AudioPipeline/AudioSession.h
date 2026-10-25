@@ -31,6 +31,8 @@ class Logger;
 
 class AudioSession final : public AudioFeed, private FFTListener, private WatchdogCallback{
 public:
+    using WorkingAudioStreamListener = Kernels::AudioPipeline::WorkingAudioStreamListener;
+
     struct StateListener{
         virtual void pre_input_change(){}
         virtual void post_input_change(const std::string& file, const AudioDeviceInfo& device, const AudioInputChoice& choice){}
@@ -43,8 +45,8 @@ public:
 
     //  Attach a listener that receives the working audio stream (float)
     //  converted to the requested format. See AudioPassthroughPair.
-    void add_working_stream_listener(const AudioFormat& format, Kernels::AudioPipeline::WorkingAudioStreamListener& listener);
-    void remove_working_stream_listener(Kernels::AudioPipeline::WorkingAudioStreamListener& listener);
+    void add_working_stream_listener(const AudioFormat& format, WorkingAudioStreamListener& listener);
+    void remove_working_stream_listener(WorkingAudioStreamListener& listener);
 
     void add_spectrum_listener(AudioSpectrumHolder::Listener& listener);
     void remove_spectrum_listener(AudioSpectrumHolder::Listener& listener);

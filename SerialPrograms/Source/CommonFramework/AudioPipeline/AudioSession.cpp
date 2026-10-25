@@ -29,11 +29,11 @@ void AudioSession::remove_state_listener(StateListener& listener){
     m_listeners.remove(listener);
 }
 void AudioSession::add_working_stream_listener(
-    const AudioFormat& format, Kernels::AudioPipeline::WorkingAudioStreamListener& listener
+    const AudioFormat& format, WorkingAudioStreamListener& listener
 ){
     m_devices->add_listener(format, listener);
 }
-void AudioSession::remove_working_stream_listener(Kernels::AudioPipeline::WorkingAudioStreamListener& listener){
+void AudioSession::remove_working_stream_listener(WorkingAudioStreamListener& listener){
     m_devices->remove_listener(listener);
 }
 void AudioSession::add_spectrum_listener(AudioSpectrumHolder::Listener& listener){
