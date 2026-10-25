@@ -1,4 +1,4 @@
-﻿/*  Stats Reader
+/*  Stats Reader
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -107,7 +107,14 @@ bool StatsReader::read_name(
 
     if (!result.results.empty()){
         stats.name = result.results.begin()->second.token;
-        return true;
+        if (stats.name != "nidoran-f" && stats.name != "nidoran-m"){
+            return true;
+        }
+        stats.name = read_nidoran_symbol(preprocess_for_ocr(name_box, 3, 1), DARK_TEXT_FILTERS());
+        if (!stats.name.empty() && (subset.empty() || subset.contains(stats.name))){
+            return true;
+        }
+        stats.name.clear();
     }
     logger.log("Failed to read species name.", COLOR_RED);
     if (save_debug_images){
@@ -522,6 +529,7 @@ void add_tests_StatsReader(UnitTestDatabase& database){
     database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/horsea_3_deu.png");
     database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/magikarp_1_spa.png");
     database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/moltres_1_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/nidoran_m_eng.png");
     database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/pidgey_1_ita.png");
     database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/venonat_4k_eng.png");
     database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/abra_1_deu.png");

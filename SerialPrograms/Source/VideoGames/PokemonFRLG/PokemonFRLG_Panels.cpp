@@ -16,6 +16,8 @@
 #include "Programs/Farming/PokemonFRLG_NuggetBridgeFarmer.h"
 #include "Programs/Farming/PokemonFRLG_PickupFarmer.h"
 #include "Programs/Farming/PokemonFRLG_EvTrainer.h"
+#include "Programs/BoxOrganization/PokemonFRLG_BoxSorter.h"
+#include "Programs/BoxOrganization/PokemonFRLG_BoxSorterLivingDex.h"
 #include "Programs/ShinyHunting/PokemonFRLG_GiftReset.h"
 #include "Programs/ShinyHunting/PokemonFRLG_LegendaryReset.h"
 #include "Programs/ShinyHunting/PokemonFRLG_LegendaryRunAway.h"
@@ -35,6 +37,7 @@
 #include "Programs/TestPrograms/PokemonFRLG_ReadBattleLevelUp.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadTrainerId.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadEncounter.h"
+#include "Programs/TestPrograms/PokemonFRLG_ReadBoxInfo.h"
 #include "Programs/TestPrograms/PokemonFRLG_SafariOptimalActionTest.h"
 
 namespace PokemonAutomation{
@@ -85,6 +88,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     if (IS_BETA_VERSION || STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Untested/Beta/WIP ----");
+        ret.emplace_back(make_SingleSwitchProgram<BoxSorter>());
+        ret.emplace_back(make_SingleSwitchProgram<BoxSorterLivingDex>());
         ret.emplace_back(make_SingleSwitchProgram<EliteFourFarmer>());
     }
 
@@ -95,6 +100,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
         ret.emplace_back(make_SingleSwitchProgram<ReadBattleLevelUp>());
         ret.emplace_back(make_SingleSwitchProgram<ReadTrainerId>());
         ret.emplace_back(make_SingleSwitchProgram<ReadEncounter>());
+        ret.emplace_back(make_SingleSwitchProgram<ReadBoxInfo>());
         ret.emplace_back(make_SingleSwitchProgram<SafariOptimalActionTest>());
     }
 
