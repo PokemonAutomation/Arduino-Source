@@ -1,6 +1,6 @@
 #include "PokemonBDSP/Inference/PokemonBDSP_TransitionWatchers.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include <filesystem>
+#include "Common/Cpp/Filesystem/Filesystem.h"
 /*  BDSP AutoStory Tools
  *
  *  From: https://github.com/PokemonAutomation/
@@ -1005,8 +1005,7 @@ void open_menu(
             std::string path = ref_dir + "/" + ICON_NAMES[i] + ".png";
             // These templates are optional. The dark-pixel cursor detector
             // remains available when a template is not packaged.
-            std::error_code file_error;
-            if (!std::filesystem::is_regular_file(path, file_error)){
+            if (!Filesystem::is_regular_file(path)){
                 continue;
             }
             // Previously constructed the image before checking its availability.

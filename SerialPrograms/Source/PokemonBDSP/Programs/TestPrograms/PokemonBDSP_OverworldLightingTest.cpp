@@ -1,6 +1,13 @@
+/*  Overworld Matcher Lighting Test
+ *
+ *  From: https://github.com/PokemonAutomation/
+ */
+
 #include <ctime>
-#include <filesystem>
-#include <fstream>
+#include <sstream>
+#include "Common/Cpp/Filesystem/Filesystem.h"
+#include "Common/Cpp/Filesystem/FileIO.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include <iomanip>
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
@@ -32,11 +39,12 @@ OverworldLightingTest::OverworldLightingTest()
 {PA_ADD_OPTION(MATCHER);PA_ADD_OPTION(START_HOUR);PA_ADD_OPTION(SETTLE_SECONDS);}
 void OverworldLightingTest::program(SingleSwitchProgramEnvironment& env,ProControllerContext& context){
     const auto& matcher=overworld_matchers()[MATCHER.index()];
-    std::filesystem::path output=std::filesystem::path("Screenshots/OverworldLightingTest")/
+    Filesystem::Path output=Filesystem::Path(USER_FILE_PATH())/"Screenshots/OverworldLightingTest"/
         (matcher.slug+"-"+std::to_string(std::time(nullptr)));
-    std::filesystem::create_directories(output);
-    std::ofstream csv(output/"results.csv");
-    if(!csv)OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::NO_ERROR_REPORT,"Cannot create lighting-test results file.",env.console);
+    Filesystem::create_directories(output);
+    FileIO results(output/"results.csv",FileMode::WRITE);
+    std::ostringstream csv;
+    if(!results.is_open())OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::NO_ERROR_REPORT,"Cannot create lighting-test results file.",env.console);
     csv<<"sample,hour,frame,landmark,score,margin,accepted,dx_screen,dy_screen,located,at_target,consensus_dx_screen,consensus_dy_screen,coarse\n";
     csv<<std::setprecision(8);
     int base=(int)(uint8_t)START_HOUR;
@@ -66,7 +74,12 @@ void OverworldLightingTest::program(SingleSwitchProgramEnvironment& env,ProContr
             if(result.at_target)target_frames++;
             std::string name="hour-"+std::to_string(hour)+"-frame-"+std::to_string(capture)+".png";
             if(!snapshot->save((output/name).string()))OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::NO_ERROR_REPORT,"Lighting test: Screenshot save failed.",env.console);
-            csv.flush();
+            const std::string rows=csv.str();
+            if(results.write(rows)!=rows.size() || !results.flush()){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::NO_ERROR_REPORT,"Lighting test: CSV write failed.",env.console);
+            }
+            csv.str("");
+            csv.clear();
             pbf_wait(context,250ms);context.wait_for_all_requests();
         }
     }

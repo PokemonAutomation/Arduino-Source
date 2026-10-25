@@ -4,11 +4,11 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include <algorithm>
 #include <exception>
-#include <QCoreApplication>
-#include <QDir>
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
@@ -256,21 +256,17 @@ bool MenuWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp
 
 
 std::string menu_detector_test_folder(){
-    QDir directory(QCoreApplication::applicationDirPath());
-    for (size_t level = 0; level < 6; level++){
-        const QString folder = directory.filePath("Packages/Resources/PokemonBDSP/menu_detector");
-        if (QDir(folder).exists()){
-            return QDir(folder).absolutePath().toStdString();
-        }
-        if (!directory.cdUp()) break;
-    }
-    return RESOURCE_PATH() + "PokemonBDSP/menu_detector";
+    return UNIT_TEST_RESOURCE_PATH() + "PokemonBDSP/menu_detector";
 }
 
 bool run_menu_detector_tests(Logger& logger, const std::string& folder){
-    const QDir directory(QString::fromStdString(folder));
-    const auto files = directory.entryList({"*.png"}, QDir::Files, QDir::Name);
-    if (files.isEmpty()){
+    std::vector<Filesystem::Path> files;
+    for (const auto& path : Filesystem::list_directory(folder)){
+        if (Filesystem::is_regular_file(path) && path.extension().string() == ".png"){
+            files.push_back(path);
+        }
+    }
+    if (files.empty()){
         logger.log("[Menu tests] No PNG screenshots in " + folder, COLOR_RED);
         return false;
     }
@@ -283,19 +279,23 @@ bool run_menu_detector_tests(Logger& logger, const std::string& folder){
             ": detected=" + (actual ? "true" : "false") +
             ", expected=" + (expected ? "true" : "false"), success ? COLOR_GREEN : COLOR_RED);
     };
-    for (const QString& filename : files){
-        const bool expected = !filename.startsWith("non_menu_");
+    for (const auto& path : files){
+        const std::string filename = path.filename().string();
+        const bool expected = !filename.starts_with("non_menu_");
         try{
-            const ImageRGB32 image(directory.filePath(filename).toStdString());
+            const ImageRGB32 image(path.string());
             for (size_t width : {size_t(1920), size_t(1280), size_t(960)}){
                 const ImageRGB32 scaled = image.scale_to(width, width * 9 / 16);
                 MenuDetector detector;
                 check(detector.detect(scaled), expected,
-                    filename.toStdString() + " at " + std::to_string(width) + "px");
+                    filename + " at " + std::to_string(width) + "px");
             }
+        }catch (const FileException& error){
+            failed++;
+            logger.log("[FAIL] " + filename + ": " + error.to_str(), COLOR_RED);
         }catch (const std::exception& error){
             failed++;
-            logger.log("[FAIL] " + filename.toStdString() + ": " + error.what(), COLOR_RED);
+            logger.log("[FAIL] " + filename + ": " + error.what(), COLOR_RED);
         }
     }
     // Uniform bright/dark frames must not count as an open menu.
