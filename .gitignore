@@ -77,3 +77,9 @@ build_*/
 .cache/*
 Packages/*
 
+# Local agent context and working notes
+/.github/copilot-instructions.md
+/CodingAgentContext/
+/SerialPrograms/Source/PokemonBDSP/Programs/AutoStory/DIRECTORY_CLEANUP_SUMMARY.md
+/SerialPrograms/Source/PokemonBDSP/Programs/AutoStory/StorySegments/butters segment data.md
+/SerialPrograms/Source/PokemonBDSP/Programs/AutoStory/butters segment data.md
