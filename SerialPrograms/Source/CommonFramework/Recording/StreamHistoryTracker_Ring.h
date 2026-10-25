@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <string>
+#include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -52,8 +53,8 @@ public:
     void on_frame(std::shared_ptr<const VideoFrame> frame);
 
 private:
-    struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    struct Data;
+    Pimpl<Data> m_data;
 };
 
 

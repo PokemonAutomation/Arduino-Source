@@ -42,6 +42,7 @@ extern "C" {
 #define EAGAIN 11
 #endif
 
+#include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
@@ -372,7 +373,7 @@ bool h264_avcc_from_annexb_extradata(const uint8_t* in, size_t in_size, std::vec
 
 
 
-struct StreamHistoryTracker_Ring::Impl{
+struct StreamHistoryTracker_Ring::Data{
     Logger& logger;
     mutable SpinLock lock;    //  Protects the rings and the encoder state.
     std::chrono::seconds window;
@@ -443,7 +444,7 @@ struct StreamHistoryTracker_Ring::Impl{
     ConditionVariable cv;
     std::deque<std::shared_ptr<const VideoFrame>> pending_frames;
 
-    Impl(
+    Data(
         Logger& p_logger,
         std::chrono::seconds p_window,
         bool p_has_audio,
@@ -469,7 +470,7 @@ struct StreamHistoryTracker_Ring::Impl{
         }
     }
 
-    ~Impl(){
+    ~Data(){
         if (sws != nullptr) sws_freeContext(sws);
         if (video_params != nullptr) avcodec_parameters_free(&video_params);
         if (audio_params != nullptr) avcodec_parameters_free(&audio_params);
@@ -1132,7 +1133,7 @@ struct StreamHistoryTracker_Ring::Impl{
         const std::deque<std::shared_ptr<const AudioRingPacket>>& p_audio,
         size_t p_audio_start,
         WallClock start_ts
-    ){
+    ) const{
         //  Parameter names use the p_ prefix: the ring deques and start
         //  indices have the same names as Impl members (C4458 under /W4).
         //  No live vctx/actx checks here: the codec state for muxing comes
@@ -1496,7 +1497,7 @@ struct StreamHistoryTracker_Ring::Impl{
     }
 
 
-    bool save(const std::string& filename){
+    bool save(const std::string& filename) const{
         logger.log("Saving stream history (in-memory encoded ring)...", COLOR_BLUE);
 
         //  Fast snapshot: the deques only hold shared_ptr's (the packet bytes are
@@ -1558,11 +1559,10 @@ struct StreamHistoryTracker_Ring::Impl{
 
 
 StreamHistoryTracker_Ring::~StreamHistoryTracker_Ring(){
-    Impl& data = *m_impl;
-    if (data.worker){
-        data.stopping = true;
-        data.cv.notify_all();
-        data.worker.wait_and_ignore_exceptions();
+    if (m_data->worker){
+        m_data->stopping = true;
+        m_data->cv.notify_all();
+        m_data->worker.wait_and_ignore_exceptions();
     }
 }
 
@@ -1572,31 +1572,31 @@ StreamHistoryTracker_Ring::StreamHistoryTracker_Ring(
     bool has_audio,
     bool has_video
 )
-    : m_impl(std::make_unique<Impl>(
+    : m_data(
+        CONSTRUCT_TOKEN,
         logger,
         window,
         has_audio,
         has_video
-    ))
+    )
 {}
 
 void StreamHistoryTracker_Ring::set_window(std::chrono::seconds window){
-    Impl& data = *m_impl;
-    WriteSpinLock lg(data.lock, PA_CURRENT_FUNCTION);
-    data.window = window;
-    data.evict();
+    WriteSpinLock lg(m_data->lock, PA_CURRENT_FUNCTION);
+    m_data->window = window;
+    m_data->evict();
 }
 
 void StreamHistoryTracker_Ring::push_samples(size_t samples, size_t stride, const float* data){
-    m_impl->push_samples(samples, stride, data);
+    m_data->push_samples(samples, stride, data);
 }
 
 void StreamHistoryTracker_Ring::on_frame(std::shared_ptr<const VideoFrame> frame){
-    m_impl->on_frame(std::move(frame));
+    m_data->on_frame(std::move(frame));
 }
 
 bool StreamHistoryTracker_Ring::save(const std::string& filename) const{
-    return m_impl->save(filename);
+    return m_data->save(filename);
 }
 
 
