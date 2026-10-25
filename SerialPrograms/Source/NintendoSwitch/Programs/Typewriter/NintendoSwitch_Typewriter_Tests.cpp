@@ -190,7 +190,7 @@ void add_tests_TypewriterTextMapping(UnitTestDatabase& database){
 
     //
     //  AZERTY: letters use the physical US position, digits need Shift,
-    //  and the AltGr-only characters are rejected.
+    //  and the AltGr characters need the right Alt.
     //
     add_case(database, KeyboardLayout::AZERTY, "a", {{KeyboardKey::KEY_Q}}, false);
     add_case(database, KeyboardLayout::AZERTY, "A", {{KeyboardKey::KEY_LEFT_SHIFT, KeyboardKey::KEY_Q}}, false);
@@ -201,9 +201,72 @@ void add_tests_TypewriterTextMapping(UnitTestDatabase& database){
     add_case(database, KeyboardLayout::AZERTY, "*", {{KeyboardKey::KEY_BACKSLASH}}, false);
     add_case(database, KeyboardLayout::AZERTY, "\t", {{KeyboardKey::KEY_TAB}}, false);
     add_case(database, KeyboardLayout::AZERTY, "\r\n", {{KeyboardKey::KEY_ENTER}}, false);
-    add_case(database, KeyboardLayout::AZERTY, "#", {}, true);
-    add_case(database, KeyboardLayout::AZERTY, "@", {}, true);
-    add_case(database, KeyboardLayout::AZERTY, "[", {}, true);
+    add_case(database, KeyboardLayout::AZERTY, "#", {{KeyboardKey::KEY_RIGHT_ALT, KeyboardKey::KEY_3}}, false);
+    add_case(database, KeyboardLayout::AZERTY, "@", {{KeyboardKey::KEY_RIGHT_ALT, KeyboardKey::KEY_0}}, false);
+    add_case(database, KeyboardLayout::AZERTY, "[", {{KeyboardKey::KEY_RIGHT_ALT, KeyboardKey::KEY_5}}, false);
+    add_case(database, KeyboardLayout::AZERTY, "]", {{KeyboardKey::KEY_RIGHT_ALT, KeyboardKey::KEY_MINUS}}, false);
+    add_case(database, KeyboardLayout::AZERTY, "^", {{KeyboardKey::KEY_RIGHT_ALT, KeyboardKey::KEY_9}}, false);
+    add_case(database, KeyboardLayout::AZERTY, "\\", {{KeyboardKey::KEY_RIGHT_ALT, KeyboardKey::KEY_8}}, false);
+    add_case(database, KeyboardLayout::AZERTY, "|", {{KeyboardKey::KEY_RIGHT_ALT, KeyboardKey::KEY_6}}, false);
+    add_case(database, KeyboardLayout::AZERTY, "~", {{KeyboardKey::KEY_RIGHT_ALT, KeyboardKey::KEY_2}}, false);
+    add_case(database, KeyboardLayout::AZERTY, "\u0060", {{KeyboardKey::KEY_RIGHT_ALT, KeyboardKey::KEY_7}}, false);
+    add_case(database, KeyboardLayout::AZERTY, "{", {{KeyboardKey::KEY_RIGHT_ALT, KeyboardKey::KEY_4}}, false);
+    add_case(database, KeyboardLayout::AZERTY, "}", {{KeyboardKey::KEY_RIGHT_ALT, KeyboardKey::KEY_EQUAL}}, false);
+    add_case(database, KeyboardLayout::AZERTY, "<", {{KeyboardKey::KEY_102ND}}, false);
+    add_case(database, KeyboardLayout::AZERTY, ">", {{KeyboardKey::KEY_LEFT_SHIFT, KeyboardKey::KEY_102ND}}, false);
+    add_case(
+        database, KeyboardLayout::AZERTY, "a <b> {c} d#e f@g h[i] j^k\\l|m ~n\u0060 o{p}q}r<s>t\n",
+        {
+            {KeyboardKey::KEY_Q},                                 //  a
+            {KeyboardKey::KEY_SPACE},                             //   
+            {KeyboardKey::KEY_102ND},                             //  <
+            {KeyboardKey::KEY_B},                                 //  b
+            {KeyboardKey::KEY_LEFT_SHIFT, KeyboardKey::KEY_102ND}, //  >
+            {KeyboardKey::KEY_SPACE},                             //   
+            {KeyboardKey::KEY_RIGHT_ALT, KeyboardKey::KEY_4},     //  {
+            {KeyboardKey::KEY_C},                                 //  c
+            {KeyboardKey::KEY_RIGHT_ALT, KeyboardKey::KEY_EQUAL}, //  }
+            {KeyboardKey::KEY_SPACE},                             //   
+            {KeyboardKey::KEY_D},                                 //  d
+            {KeyboardKey::KEY_RIGHT_ALT, KeyboardKey::KEY_3},     //  #
+            {KeyboardKey::KEY_E},                                 //  e
+            {KeyboardKey::KEY_SPACE},                             //   
+            {KeyboardKey::KEY_F},                                 //  f
+            {KeyboardKey::KEY_RIGHT_ALT, KeyboardKey::KEY_0},     //  @
+            {KeyboardKey::KEY_G},                                 //  g
+            {KeyboardKey::KEY_SPACE},                             //   
+            {KeyboardKey::KEY_H},                                 //  h
+            {KeyboardKey::KEY_RIGHT_ALT, KeyboardKey::KEY_5},     //  [
+            {KeyboardKey::KEY_I},                                 //  i
+            {KeyboardKey::KEY_RIGHT_ALT, KeyboardKey::KEY_MINUS}, //  ]
+            {KeyboardKey::KEY_SPACE},                             //   
+            {KeyboardKey::KEY_J},                                 //  j
+            {KeyboardKey::KEY_RIGHT_ALT, KeyboardKey::KEY_9},     //  ^
+            {KeyboardKey::KEY_K},                                 //  k
+            {KeyboardKey::KEY_RIGHT_ALT, KeyboardKey::KEY_8},     //  backslash
+            {KeyboardKey::KEY_L},                                 //  l
+            {KeyboardKey::KEY_RIGHT_ALT, KeyboardKey::KEY_6},     //  |
+            {KeyboardKey::KEY_SEMICOLON},                         //  m
+            {KeyboardKey::KEY_SPACE},                             //   
+            {KeyboardKey::KEY_RIGHT_ALT, KeyboardKey::KEY_2},     //  ~
+            {KeyboardKey::KEY_N},                                 //  n
+            {KeyboardKey::KEY_RIGHT_ALT, KeyboardKey::KEY_7},     //  `
+            {KeyboardKey::KEY_SPACE},                             //   
+            {KeyboardKey::KEY_O},                                 //  o
+            {KeyboardKey::KEY_RIGHT_ALT, KeyboardKey::KEY_4},     //  {
+            {KeyboardKey::KEY_P},                                 //  p
+            {KeyboardKey::KEY_RIGHT_ALT, KeyboardKey::KEY_EQUAL}, //  }
+            {KeyboardKey::KEY_A},                                 //  q
+            {KeyboardKey::KEY_RIGHT_ALT, KeyboardKey::KEY_EQUAL}, //  }
+            {KeyboardKey::KEY_R},                                 //  r
+            {KeyboardKey::KEY_102ND},                             //  <
+            {KeyboardKey::KEY_S},                                 //  s
+            {KeyboardKey::KEY_LEFT_SHIFT, KeyboardKey::KEY_102ND}, //  >
+            {KeyboardKey::KEY_T},                                 //  t
+            {KeyboardKey::KEY_ENTER},                             //  \n
+        },
+        false
+    );
     add_case(database, KeyboardLayout::AZERTY, std::string(1, (uint8_t)0xe9), {}, true);  //  é
 }
 

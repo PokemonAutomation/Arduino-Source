@@ -117,23 +117,14 @@ std::vector<std::vector<KeyboardKey>> text_to_key_chords(
 
         auto iter = mapping.find(ch);
         if (iter == mapping.end()){
-            std::string reason;
-            if ((unsigned char)ch >= 0x20 && (unsigned char)ch <= 0x7e){
-                //  A printable ASCII character this layout can't type:
-                //  it requires AltGr on a French keyboard.
-                reason = "On a French keyboard this character requires the "
-                         "AltGr key, which this program does not support.";
-            }else{
-                reason = "Only ASCII characters are supported, limited to "
-                         "printable characters, tab, and newline. Please use "
-                         "plain ASCII text.";
-            }
             throw OperationFailedException(
                 ErrorReportMode::NO_ERROR_REPORT,
                 std::string("Unsupported character for the ") +
                 (layout == KeyboardLayout::QWERTY ? "QWERTY" : "AZERTY") +
-                " keyboard layout: \"" + char_to_display(ch) + "\". " +
-                reason
+                " keyboard layout: \"" + char_to_display(ch) + "\". "
+                "Only ASCII characters are supported, limited to "
+                "printable characters, tab, and newline. Please use "
+                "plain ASCII text."
             );
         }
 
@@ -271,10 +262,10 @@ const std::map<char, TextKeyMapping>& TEXT_TO_HID_KEY_QWERTY(){
 //  at the US "q" position, etc. This matches KEYBOARD_MAPPINGS_AZERTY in
 //  NintendoSwitch_KeyboardEntryMappings.cpp.
 //
-//  Note that some ASCII characters cannot be typed on a French keyboard
-//  with a single key press plus at most Shift: they require the AltGr
-//  (right Alt) key. These are intentionally absent from this map:
-//      #  <  >  @  [  ]  ^  `  {  }
+//  The character positions follow the standard modern French layout (the
+//  one Windows uses). The characters that require the AltGr key are typed
+//  with the right Alt, which is AltGr on a French keyboard, and the < > key
+//  is the ISO key to the left of Space (HID 102nd key).
 const std::map<char, TextKeyMapping>& TEXT_TO_HID_KEY_AZERTY(){
     static const std::map<char, TextKeyMapping> map{
         //  Letters
@@ -361,8 +352,6 @@ const std::map<char, TextKeyMapping>& TEXT_TO_HID_KEY_AZERTY(){
         {'+',  {KeyboardKey::KEY_EQUAL, CONTROL_LEFT_SHIFT}},
         {'$',  {KeyboardKey::KEY_RIGHT_BRACE}},
         {'*',  {KeyboardKey::KEY_BACKSLASH}},
-        {'\\', {KeyboardKey::KEY_BACKSLASH}},
-        {'|',  {KeyboardKey::KEY_BACKSLASH, CONTROL_LEFT_SHIFT}},
         {'%',  {KeyboardKey::KEY_APOSTROPHE, CONTROL_LEFT_SHIFT}},
         {'!',  {KeyboardKey::KEY_SLASH}},
         {',',  {KeyboardKey::KEY_M}},
@@ -371,7 +360,23 @@ const std::map<char, TextKeyMapping>& TEXT_TO_HID_KEY_AZERTY(){
         {'.',  {KeyboardKey::KEY_COMMA, CONTROL_LEFT_SHIFT}},
         {':',  {KeyboardKey::KEY_DOT}},
         {'/',  {KeyboardKey::KEY_DOT, CONTROL_LEFT_SHIFT}},
-        {'~',  {KeyboardKey::KEY_GRAVE, CONTROL_LEFT_SHIFT}},
+
+        //  AltGr (right Alt) characters, by physical key
+        {'~',  {KeyboardKey::KEY_2, CONTROL_RIGHT_ALT}},
+        {'#',  {KeyboardKey::KEY_3, CONTROL_RIGHT_ALT}},
+        {'{',  {KeyboardKey::KEY_4, CONTROL_RIGHT_ALT}},
+        {'[',  {KeyboardKey::KEY_5, CONTROL_RIGHT_ALT}},
+        {'|',  {KeyboardKey::KEY_6, CONTROL_RIGHT_ALT}},
+        {'`',  {KeyboardKey::KEY_7, CONTROL_RIGHT_ALT}},
+        {'\\', {KeyboardKey::KEY_8, CONTROL_RIGHT_ALT}},
+        {'^',  {KeyboardKey::KEY_9, CONTROL_RIGHT_ALT}},
+        {'@',  {KeyboardKey::KEY_0, CONTROL_RIGHT_ALT}},
+        {']',  {KeyboardKey::KEY_MINUS, CONTROL_RIGHT_ALT}},
+        {'}',  {KeyboardKey::KEY_EQUAL, CONTROL_RIGHT_ALT}},
+
+        //  The < > key, to the left of Space on an ISO keyboard
+        {'<',  {KeyboardKey::KEY_102ND}},
+        {'>',  {KeyboardKey::KEY_102ND, CONTROL_LEFT_SHIFT}},
 
         //  Control characters
         {'\t', {KeyboardKey::KEY_TAB}},
