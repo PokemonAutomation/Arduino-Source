@@ -66,7 +66,7 @@ inline constexpr void operator^=(ControlFlag& x, ControlFlag y){
 
 struct TextKeyMapping{
     KeyboardKey key;
-    ControlFlag control_flags;
+    ControlFlag control_flags = ControlFlag::CONTROL_NONE;
 };
 
 
