@@ -112,13 +112,13 @@ void Typewriter::program(SingleSwitchProgramEnvironment& env, CancellableScope& 
 
     for (char ch : text){
         TextKeyMapping m = mapping.at(ch);
-        if (m.shift){
-            context->issue_keys(
-                &context, delay, hold, cool,
-                {KeyboardKey::KEY_LEFT_SHIFT, m.key}
-            );
+        std::vector<KeyboardKey> keys;
+        control_flags_to_keys(m.control_flags, keys);
+        keys.push_back(m.key);
+        if (keys.size() == 1){
+            context->issue_key(&context, delay, hold, cool, keys[0]);
         }else{
-            context->issue_key(&context, delay, hold, cool, m.key);
+            context->issue_keys(&context, delay, hold, cool, keys);
         }
     }
 
