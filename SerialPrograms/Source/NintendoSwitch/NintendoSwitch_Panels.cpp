@@ -24,6 +24,7 @@
 #include "Programs/NintendoSwitch_FriendCodeAdder.h"
 #include "Programs/NintendoSwitch_FriendDelete.h"
 #include "Programs/NintendoSwitch_RecordKeyboardController.h"
+#include "Programs/Typewriter/NintendoSwitch_Typewriter.h"
 
 #include "Programs/NintendoSwitch_MenuStabilityTester.h"
 #include "DevPrograms/TestProgramComputer.h"
@@ -72,6 +73,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_SingleSwitchProgram<FriendCodeAdder>());
     ret.emplace_back(make_SingleSwitchProgram<FriendDelete>());
     ret.emplace_back(make_SingleSwitchProgram<RecordKeyboardController>());
+    ret.emplace_back(make_SingleSwitchProgram<Typewriter::Typewriter>());
 
     ret.emplace_back("---- Testing ----");
     ret.emplace_back(GameConsole::make_ConsolePanel<GameConsole::BoxDraw>());
