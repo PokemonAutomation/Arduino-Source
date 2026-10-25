@@ -494,6 +494,48 @@ OverworldMatchResult match_route208_stair_top(const ImageRGB32& frame){
     }
     return best;
 }
+OverworldMatchResult match_route208_lower_stair_lane(const ImageRGB32& frame){
+    // Successful 1825ms descent endpoint at video 230s (2026-10-24 15-38-06).
+    // Independent cliff/tree anchors must agree before movement is authorized.
+    OverworldMatchResult best;
+    double best_score=-1;
+    for (double scale : {.90,.95,1.0,1.05,1.10}){
+        std::vector<LandmarkConfig> configs={
+            {"Lower stair cliff corner","PokemonBDSP/Autostory/Route208LowerLane/CliffCorner.png",
+                {690.0/1920,540.0/1080,110.0/1920,150.0/1080},{0,0,1,1},.93,.20},
+            {"Honey tree","PokemonBDSP/Autostory/Route208LowerLane/HoneyTree.png",
+                {1510.0/1920,600.0/1080,100.0/1920,170.0/1080},{0,0,1,1},.93,.20}
+        };
+        for (auto& config:configs){
+            const double w=config.target.width,h=config.target.height;
+            config.target.width*=scale;config.target.height*=scale;
+            config.target.x+=(w-config.target.width)/2;
+            config.target.y+=(h-config.target.height)/2;
+        }
+        auto candidate=match_landmarks(frame,configs,2,1.0/128,POSITION_TOLERANCE_Y,true);
+        if (candidate.landmarks.size()!=2) continue;
+        const auto& cliff=candidate.landmarks[0];
+        const auto& tree=candidate.landmarks[1];
+        // Perspective changes anchor spacing farther down the field. Two strong
+        // anchors can authorize north-only recovery while bracketing the player.
+        // This cue never confirms arrival or authorizes east travel.
+        if (!candidate.located && cliff.accepted && tree.accepted &&
+            cliff.dy < -1.0/24 && tree.dy < -1.0/24 &&
+            std::abs(cliff.dy-tree.dy)<=AGREEMENT_Y &&
+            cliff.found.x+cliff.found.width<.5 && tree.found.x>.65){
+            candidate.located=true;candidate.coarse=true;candidate.at_target=false;
+            candidate.dx=0;candidate.dy=(cliff.dy+tree.dy)/2;
+        }
+        double score=1;
+        for (const auto& landmark:candidate.landmarks) score=std::min(score,landmark.score);
+        if ((candidate.located && !best.located) ||
+            (candidate.located && best.located && best.coarse && !candidate.coarse) ||
+            (candidate.located==best.located && candidate.coarse==best.coarse && score>best_score)){
+            best=std::move(candidate);best_score=score;
+        }
+    }
+    return best;
+}
 OverworldMatchResult match_route208_hannah_departure(const ImageRGB32& frame){
     OverworldMatchResult best;
     double best_score=-1;
