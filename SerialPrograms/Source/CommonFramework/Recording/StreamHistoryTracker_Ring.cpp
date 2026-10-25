@@ -374,42 +374,42 @@ bool h264_avcc_from_annexb_extradata(const uint8_t* in, size_t in_size, std::vec
 
 
 struct StreamHistoryTracker_Ring::Data{
-    Logger& logger;
-    mutable SpinLock lock;    //  Protects the rings and the encoder state.
-    std::chrono::seconds window;
-    bool has_video;
+    Logger& m_logger;
+    mutable SpinLock m_lock;    //  Protects the rings and the encoder state.
+    std::chrono::seconds m_window;
+    bool m_has_video;
 
     //  Audio configuration. The working stream is attached at a fixed
     //  48 kHz / stereo shape, so the audio is always 2 channels regardless
     //  of the input preset (the pipeline tree's mixer upmixes mono to
     //  dual-mono).
-    size_t audio_channels = 2;
-    bool have_audio;
+    size_t m_audio_channels = 2;
+    bool m_have_audio;
 
     //  Video frame throttling (same scheme as StreamHistoryTracker_SaveFrames).
-    size_t target_fps;
-    std::chrono::microseconds frame_interval;
-    WallClock next_frame_time = WallClock::min();
+    size_t m_target_fps;
+    std::chrono::microseconds m_frame_interval;
+    WallClock m_next_frame_time = WallClock::min();
 
     //  The ring.
-    std::deque<std::shared_ptr<const VideoRingPacket>> video;
-    std::deque<std::shared_ptr<const AudioRingPacket>> audio;
-    int64_t ring_bytes = 0;
+    std::deque<std::shared_ptr<const VideoRingPacket>> m_video;
+    std::deque<std::shared_ptr<const AudioRingPacket>> m_audio;
+    int64_t m_ring_bytes = 0;
 
     //  Video encoder (initialized on the worker thread at the first frame).
-    bool video_enabled;
-    bool logged_unsupported_format = false;
-    AVCodecContext* vctx = nullptr;
-    SwsContext* sws = nullptr;
-    int sws_in_format = AV_PIX_FMT_NONE;
-    int sws_width = 0;
-    int sws_height = 0;
-    int sws_out_format = AV_PIX_FMT_NONE;
-    int video_width = 0;
-    int video_height = 0;
-    int64_t last_keyframe_us = -VIDEO_KEYFRAME_INTERVAL_US;
-    int64_t last_pts_us = -1;
-    WallClock video_start = WallClock::min();
+    bool m_video_enabled;
+    bool m_logged_unsupported_format = false;
+    AVCodecContext* m_vctx = nullptr;
+    SwsContext* m_sws = nullptr;
+    int m_sws_in_format = AV_PIX_FMT_NONE;
+    int m_sws_width = 0;
+    int m_sws_height = 0;
+    int m_sws_out_format = AV_PIX_FMT_NONE;
+    int m_video_width = 0;
+    int m_video_height = 0;
+    int64_t m_last_keyframe_us = -VIDEO_KEYFRAME_INTERVAL_US;
+    int64_t m_last_pts_us = -1;
+    WallClock m_video_start = WallClock::min();
 
     //  Encoder candidate rotation. A hardware encoder can open successfully
     //  and still fail on every frame (e.g. its GPU device cannot allocate
@@ -417,32 +417,32 @@ struct StreamHistoryTracker_Ring::Data{
     //  candidate is abandoned and the next one is tried, so the recording
     //  still gets video. Candidates that have failed (at open or at runtime)
     //  are not retried. Only the worker thread touches these.
-    size_t video_encoder_index = 0;
+    size_t m_video_encoder_index = 0;
 
     //  Codec parameter snapshots for muxing, owned by Impl, guarded by
-    //  `lock`. ffmpeg is not thread-safe on a live AVCodecContext, and
+    //  `m_lock`. ffmpeg is not thread-safe on a live AVCodecContext, and
     //  mux_to_file() runs on the caller's thread while the video worker and
-    //  the audio pipeline thread keep encoding into vctx/actx, so the muxer
+    //  the audio pipeline thread keep encoding into m_vctx/m_actx, so the muxer
     //  must never read those contexts directly (a torn read of, e.g., the
     //  lazily-populated hardware-encoder extradata crashes the mp4 muxer).
     //  Each snapshot is refreshed on its encoder's own thread whenever the
     //  encoder state changes.
-    AVCodecParameters* video_params = nullptr;
-    AVRational video_time_base = {1, 1000};
-    AVCodecParameters* audio_params = nullptr;
+    AVCodecParameters* m_video_params = nullptr;
+    AVRational m_video_time_base = {1, 1000};
+    AVCodecParameters* m_audio_params = nullptr;
 
     //  Audio encoder (used by push_samples).
-    AVCodecContext* actx = nullptr;
-    AVChannelLayout audio_layout = {};
-    int64_t audio_samples_total = 0;
-    std::vector<float> audio_acc;    //  Interleaved float @ 48 kHz, accumulated from the planar working stream.
+    AVCodecContext* m_actx = nullptr;
+    AVChannelLayout m_audio_layout = {};
+    int64_t m_audio_samples_total = 0;
+    std::vector<float> m_audio_acc;    //  Interleaved float @ 48 kHz, accumulated from the planar working stream.
 
     //  Video worker thread.
-    AsyncTask worker;
-    std::atomic<bool> stopping{false};
-    Mutex queue_lock;
-    ConditionVariable cv;
-    std::deque<std::shared_ptr<const VideoFrame>> pending_frames;
+    AsyncTask m_worker;
+    std::atomic<bool> m_stopping{false};
+    Mutex m_queue_lock;
+    ConditionVariable m_cv;
+    std::deque<std::shared_ptr<const VideoFrame>> m_pending_frames;
 
     Data(
         Logger& p_logger,
@@ -450,140 +450,140 @@ struct StreamHistoryTracker_Ring::Data{
         bool p_has_audio,
         bool p_has_video
     )
-        : logger(p_logger)
-        , window(p_window)
-        , has_video(p_has_video)
-        , have_audio(p_has_audio)
-        , target_fps(get_target_fps())
-        , frame_interval(std::chrono::microseconds(1000000 / target_fps))
-        , video_enabled(p_has_video)
+        : m_logger(p_logger)
+        , m_window(p_window)
+        , m_has_video(p_has_video)
+        , m_have_audio(p_has_audio)
+        , m_target_fps(get_target_fps())
+        , m_frame_interval(std::chrono::microseconds(1000000 / m_target_fps))
+        , m_video_enabled(p_has_video)
     {
         av_log_set_level(AV_LOG_ERROR);
 
-        if (have_audio){
+        if (m_have_audio){
             init_audio_encoder();
         }
-        if (has_video){
-            worker = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
+        if (m_has_video){
+            m_worker = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
                 [this]{ worker_loop(); }
             );
         }
     }
 
     ~Data(){
-        if (sws != nullptr) sws_freeContext(sws);
-        if (video_params != nullptr) avcodec_parameters_free(&video_params);
-        if (audio_params != nullptr) avcodec_parameters_free(&audio_params);
-        if (vctx != nullptr) avcodec_free_context(&vctx);
-        if (actx != nullptr) avcodec_free_context(&actx);
+        if (m_sws != nullptr) sws_freeContext(m_sws);
+        if (m_video_params != nullptr) avcodec_parameters_free(&m_video_params);
+        if (m_audio_params != nullptr) avcodec_parameters_free(&m_audio_params);
+        if (m_vctx != nullptr) avcodec_free_context(&m_vctx);
+        if (m_actx != nullptr) avcodec_free_context(&m_actx);
     }
 
 
     void init_audio_encoder(){
         const AVCodec* codec = avcodec_find_encoder(AV_CODEC_ID_AAC);
         if (codec == nullptr){
-            logger.log("Stream history: AAC encoder not found in ffmpeg build. Disabling audio.", COLOR_RED);
-            have_audio = false;
+            m_logger.log("Stream history: AAC encoder not found in ffmpeg build. Disabling audio.", COLOR_RED);
+            m_have_audio = false;
             return;
         }
-        actx = avcodec_alloc_context3(codec);
-        if (actx == nullptr){
-            logger.log("Stream history: Failed to allocate AAC encoder. Disabling audio.", COLOR_RED);
-            have_audio = false;
+        m_actx = avcodec_alloc_context3(codec);
+        if (m_actx == nullptr){
+            m_logger.log("Stream history: Failed to allocate AAC encoder. Disabling audio.", COLOR_RED);
+            m_have_audio = false;
             return;
         }
-        actx->sample_rate = AUDIO_OUTPUT_RATE;
-        actx->time_base = av_make_q(1, AUDIO_OUTPUT_RATE);
-        actx->bit_rate = 96000;
-        actx->frame_size = AUDIO_FRAME_SAMPLES;
+        m_actx->sample_rate = AUDIO_OUTPUT_RATE;
+        m_actx->time_base = av_make_q(1, AUDIO_OUTPUT_RATE);
+        m_actx->bit_rate = 96000;
+        m_actx->frame_size = AUDIO_FRAME_SAMPLES;
         //  The AAC encoder requires the sample format to be set explicitly;
         //  avcodec_open2() fails with EINVAL ("Invalid audio sample format")
         //  if it is left at AV_SAMPLE_FMT_NONE. The encoder works in planar
         //  float; push_samples() accumulates the planar working stream
         //  packed/interleaved, and the encode loop de-interleaves it into
         //  the frame's planes.
-        actx->sample_fmt = AV_SAMPLE_FMT_FLTP;
+        m_actx->sample_fmt = AV_SAMPLE_FMT_FLTP;
         //  The AAC stream configuration (AudioSpecificConfig) must land in the
         //  container header: with this flag the encoder emits raw AAC frames +
         //  extradata, which is what both the MP4 and MKV muxers need. Without
         //  it the packets would be ADTS and mux_to_file() would fail to set up
         //  the audio stream.
-        actx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
-        if (!init_channel_layout(actx->ch_layout, (int)audio_channels)){
-            logger.log(
+        m_actx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+        if (!init_channel_layout(m_actx->ch_layout, (int)m_audio_channels)){
+            m_logger.log(
                 "Stream history: Failed to initialize the AAC channel layout ("
-                + std::to_string((int)audio_channels) + " channels). Disabling audio.",
+                + std::to_string((int)m_audio_channels) + " channels). Disabling audio.",
                 COLOR_RED
             );
-            avcodec_free_context(&actx);
-            actx = nullptr;
-            have_audio = false;
+            avcodec_free_context(&m_actx);
+            m_actx = nullptr;
+            m_have_audio = false;
             return;
         }
-        int open_err = avcodec_open2(actx, codec, nullptr);
+        int open_err = avcodec_open2(m_actx, codec, nullptr);
         if (open_err < 0){
-            logger.log(
+            m_logger.log(
                 "Stream history: Failed to open AAC encoder: "
                 + ffmpeg_error(open_err)
                 + ". Disabling audio.",
                 COLOR_RED
             );
-            avcodec_free_context(&actx);
-            actx = nullptr;
-            have_audio = false;
+            avcodec_free_context(&m_actx);
+            m_actx = nullptr;
+            m_have_audio = false;
             return;
         }
         //  The encoded frames use the same layout as the encoder (which
         //  just opened successfully with this channel count).
-        init_channel_layout(audio_layout, (int)audio_channels);
-        logger.log(
-            "Stream history: audio = AAC " + std::to_string(audio_channels) + "ch @ 48 kHz ("
-            + std::to_string(actx->bit_rate / 1000) + " kbps)."
+        init_channel_layout(m_audio_layout, (int)m_audio_channels);
+        m_logger.log(
+            "Stream history: audio = AAC " + std::to_string(m_audio_channels) + "ch @ 48 kHz ("
+            + std::to_string(m_actx->bit_rate / 1000) + " kbps)."
         );
     }
 
 
     void init_video_encoder(int input_width, int input_height){
         constexpr size_t CANDIDATE_COUNT = sizeof(VIDEO_ENCODER_CANDIDATES)/sizeof(VIDEO_ENCODER_CANDIDATES[0]);
-        //  Candidates before video_encoder_index already failed; once past
+        //  Candidates before m_video_encoder_index already failed; once past
         //  the last one, video was disabled when it did.
-        if (video_encoder_index >= CANDIDATE_COUNT){
+        if (m_video_encoder_index >= CANDIDATE_COUNT){
             return;
         }
 
         int target_width = 0;
         int target_height = 0;
         if (!get_target_video_size(input_width, input_height, target_width, target_height)){
-            logger.log("Stream history: Unsupported input resolution. Disabling video.", COLOR_RED);
-            WriteSpinLock lg(lock, PA_CURRENT_FUNCTION);
-            video_enabled = false;
+            m_logger.log("Stream history: Unsupported input resolution. Disabling video.", COLOR_RED);
+            WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
+            m_video_enabled = false;
             return;
         }
 
         size_t bitrate_kbps = get_target_bitrate_kbps();
-        for (size_t i = video_encoder_index; i < CANDIDATE_COUNT; i++){
+        for (size_t i = m_video_encoder_index; i < CANDIDATE_COUNT; i++){
             const char* name = VIDEO_ENCODER_CANDIDATES[i];
             {
                 std::lock_guard<std::mutex> lg(poisoned_encoder_mutex);
                 if (poisoned_encoders.count(name) != 0){
-                    logger.log(
+                    m_logger.log(
                         "Stream history: skipping video encoder '"
                         + std::string(name) + "' (it failed at runtime earlier"
                         + " in this process).",
                         COLOR_YELLOW
                     );
-                    video_encoder_index = i + 1;
+                    m_video_encoder_index = i + 1;
                     continue;
                 }
             }
             const AVCodec* codec = avcodec_find_encoder_by_name(name);
             if (codec == nullptr){
-                video_encoder_index = i + 1;
+                m_video_encoder_index = i + 1;
                 continue;
             }
             AVCodecContext* ctx = avcodec_alloc_context3(codec);
             if (ctx == nullptr){
-                video_encoder_index = i + 1;
+                m_video_encoder_index = i + 1;
                 continue;
             }
             ctx->width = target_width;
@@ -600,9 +600,9 @@ struct StreamHistoryTracker_Ring::Data{
             //  passes it to the AMD driver, which rejects - and tears down
             //  its D3D11 device for - a missing/zero frame rate ("unexpected
             //  frame rate" followed by AMF_NO_DEVICE).
-            ctx->framerate = av_make_q((int)target_fps, 1);
+            ctx->framerate = av_make_q((int)m_target_fps, 1);
             ctx->bit_rate = (int64_t)bitrate_kbps * 1000;
-            ctx->gop_size = (int)(target_fps * 2);
+            ctx->gop_size = (int)(m_target_fps * 2);
             ctx->max_b_frames = 0;
             ctx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 
@@ -651,22 +651,22 @@ struct StreamHistoryTracker_Ring::Data{
             ctx->pix_fmt = preferred;
             int err = avcodec_open2(ctx, codec, nullptr);
             if (err == 0){
-                vctx = ctx;
-                video_encoder_index = i + 1;
+                m_vctx = ctx;
+                m_video_encoder_index = i + 1;
                 {
-                    WriteSpinLock lg(lock, PA_CURRENT_FUNCTION);
+                    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
                     //  New encoder: the old snapshot (if any) no longer
                     //  matches what the ring will hold going forward;
                     //  drain_one_video_packet() refreshes it on the first
                     //  encoded packet.
-                    avcodec_parameters_free(&video_params);
+                    avcodec_parameters_free(&m_video_params);
                 }
-                video_width = target_width;
-                video_height = target_height;
-                video_start = WallClock::min();
-                last_keyframe_us = -VIDEO_KEYFRAME_INTERVAL_US;
-                last_pts_us = -1;
-                logger.log(
+                m_video_width = target_width;
+                m_video_height = target_height;
+                m_video_start = WallClock::min();
+                m_last_keyframe_us = -VIDEO_KEYFRAME_INTERVAL_US;
+                m_last_pts_us = -1;
+                m_logger.log(
                     "Stream history: video encoder = " + std::string(name)
                     + " ("
                     + std::string(av_get_pix_fmt_name(ctx->pix_fmt)) + ")"
@@ -675,8 +675,8 @@ struct StreamHistoryTracker_Ring::Data{
                 );
                 return;
             }
-            video_encoder_index = i + 1;
-            logger.log(
+            m_video_encoder_index = i + 1;
+            m_logger.log(
                 "Stream history: Video encoder '" + std::string(name) + "' failed to open: "
                 + ffmpeg_error(err),
                 COLOR_YELLOW
@@ -686,9 +686,9 @@ struct StreamHistoryTracker_Ring::Data{
             //  runtime - see abandon_video_encoder()).
             avcodec_free_context(&ctx);
         }
-        logger.log("Stream history: No usable video encoder found. Disabling video.", COLOR_RED);
-        WriteSpinLock lg(lock, PA_CURRENT_FUNCTION);
-        video_enabled = false;
+        m_logger.log("Stream history: No usable video encoder found. Disabling video.", COLOR_RED);
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
+        m_video_enabled = false;
     }
 
 
@@ -698,17 +698,17 @@ struct StreamHistoryTracker_Ring::Data{
     int drain_one_video_packet(WallClock timestamp){
         AVPacket* packet = av_packet_alloc();
         if (packet == nullptr){
-            logger.log("Stream history: Failed to allocate video packet.", COLOR_RED);
+            m_logger.log("Stream history: Failed to allocate video packet.", COLOR_RED);
             return -1;
         }
-        int err = avcodec_receive_packet(vctx, packet);
+        int err = avcodec_receive_packet(m_vctx, packet);
         if (err == AVERROR(EAGAIN) || err == AVERROR_EOF){
             av_packet_free(&packet);
             return 0;
         }
         if (err < 0){
             av_packet_free(&packet);
-            logger.log("Stream history: Video packet failed: " + ffmpeg_error(err), COLOR_RED);
+            m_logger.log("Stream history: Video packet failed: " + ffmpeg_error(err), COLOR_RED);
             return -1;
         }
         auto ring_packet = std::make_shared<VideoRingPacket>();
@@ -718,24 +718,24 @@ struct StreamHistoryTracker_Ring::Data{
         av_packet_free(&packet);
 
         int64_t added = (int64_t)ring_packet->data.size();
-        WriteSpinLock lg(lock, PA_CURRENT_FUNCTION);
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         //  Refresh the mux-time parameter snapshot on this (the encoder's)
         //  thread whenever the encoder state changes; the hardware encoders
         //  populate their extradata lazily, sometimes only after the first
         //  encoded packet. mux_to_file() must not read the live context.
-        if (video_params == nullptr
-            || video_params->extradata_size != vctx->extradata_size
+        if (m_video_params == nullptr
+            || m_video_params->extradata_size != m_vctx->extradata_size
         ){
-            if (video_params == nullptr){
-                video_params = avcodec_parameters_alloc();
+            if (m_video_params == nullptr){
+                m_video_params = avcodec_parameters_alloc();
             }
-            if (video_params != nullptr){
-                avcodec_parameters_from_context(video_params, vctx);
-                video_time_base = vctx->time_base;
+            if (m_video_params != nullptr){
+                avcodec_parameters_from_context(m_video_params, m_vctx);
+                m_video_time_base = m_vctx->time_base;
             }
         }
-        video.push_back(std::move(ring_packet));
-        ring_bytes += added;
+        m_video.push_back(std::move(ring_packet));
+        m_ring_bytes += added;
         evict();
         return 1;
     }
@@ -745,13 +745,13 @@ struct StreamHistoryTracker_Ring::Data{
         while (true){
             std::shared_ptr<const VideoFrame> frame;
             {
-                std::unique_lock<Mutex> queue_guard(queue_lock);
-                cv.wait(queue_guard, [this]{ return stopping.load() || !pending_frames.empty(); });
-                if (stopping.load() && pending_frames.empty()){
+                std::unique_lock<Mutex> queue_guard(m_queue_lock);
+                m_cv.wait(queue_guard, [this]{ return m_stopping.load() || !m_pending_frames.empty(); });
+                if (m_stopping.load() && m_pending_frames.empty()){
                     return;
                 }
-                frame = std::move(pending_frames.front());
-                pending_frames.pop_front();
+                frame = std::move(m_pending_frames.front());
+                m_pending_frames.pop_front();
             }
             encode_video_frame(frame);
         }
@@ -759,7 +759,7 @@ struct StreamHistoryTracker_Ring::Data{
 
 
     void encode_video_frame(const std::shared_ptr<const VideoFrame>& vf){
-        if (!video_enabled || vf == nullptr || !vf->frame.isValid()){
+        if (!m_video_enabled || vf == nullptr || !vf->frame.isValid()){
             return;
         }
 
@@ -796,9 +796,9 @@ struct StreamHistoryTracker_Ring::Data{
             rgb_image = qframe.toImage().convertToFormat(QImage::Format_RGB888);
             unmap_if_needed();
             if (rgb_image.isNull()){
-                if (!logged_unsupported_format){
-                    logger.log("Stream history: Could not convert video frame to RGB. Skipping.", COLOR_RED);
-                    logged_unsupported_format = true;
+                if (!m_logged_unsupported_format){
+                    m_logger.log("Stream history: Could not convert video frame to RGB. Skipping.", COLOR_RED);
+                    m_logged_unsupported_format = true;
                 }
                 return;
             }
@@ -809,9 +809,9 @@ struct StreamHistoryTracker_Ring::Data{
             src_strides[0] = (int)rgb_image.bytesPerLine();
         }
 
-        if (vctx == nullptr){
+        if (m_vctx == nullptr){
             init_video_encoder(qframe.width(), qframe.height());
-            if (!video_enabled){
+            if (!m_video_enabled){
                 unmap_if_needed();
                 return;
             }
@@ -819,26 +819,26 @@ struct StreamHistoryTracker_Ring::Data{
 
         //  (Re)build the scaler if the input changed, or if the encoder's
         //  preferred pixel format changed (e.g. after an encoder fallback).
-        if (src_format != sws_in_format || src_width != sws_width || src_height != sws_height
-            || vctx->pix_fmt != sws_out_format){
-            if (sws != nullptr){
-                sws_freeContext(sws);
-                sws = nullptr;
+        if (src_format != m_sws_in_format || src_width != m_sws_width || src_height != m_sws_height
+            || m_vctx->pix_fmt != m_sws_out_format){
+            if (m_sws != nullptr){
+                sws_freeContext(m_sws);
+                m_sws = nullptr;
             }
-            sws = sws_getContext(
+            m_sws = sws_getContext(
                 src_width, src_height, (AVPixelFormat)src_format,
-                video_width, video_height, vctx->pix_fmt,
+                m_video_width, m_video_height, m_vctx->pix_fmt,
                 SWS_BILINEAR, nullptr, nullptr, nullptr
             );
-            if (sws == nullptr){
-                logger.log("Stream history: Failed to create video scaler.", COLOR_RED);
+            if (m_sws == nullptr){
+                m_logger.log("Stream history: Failed to create video scaler.", COLOR_RED);
                 unmap_if_needed();
                 return;
             }
-            sws_in_format = src_format;
-            sws_width = src_width;
-            sws_height = src_height;
-            sws_out_format = vctx->pix_fmt;
+            m_sws_in_format = src_format;
+            m_sws_width = src_width;
+            m_sws_height = src_height;
+            m_sws_out_format = m_vctx->pix_fmt;
         }
 
         AVFrame* frame = av_frame_alloc();
@@ -846,9 +846,9 @@ struct StreamHistoryTracker_Ring::Data{
             unmap_if_needed();
             return;
         }
-        frame->format = vctx->pix_fmt;
-        frame->width = video_width;
-        frame->height = video_height;
+        frame->format = m_vctx->pix_fmt;
+        frame->width = m_video_width;
+        frame->height = m_video_height;
         if (av_frame_get_buffer(frame, 0) < 0){
             av_frame_free(&frame);
             unmap_if_needed();
@@ -856,31 +856,31 @@ struct StreamHistoryTracker_Ring::Data{
         }
 
         int scaled = sws_scale(
-            sws,
+            m_sws,
             src_planes, src_strides,
             0, src_height,
             frame->data, frame->linesize
         );
         unmap_if_needed();
-        if (scaled != video_height){
+        if (scaled != m_video_height){
             av_frame_free(&frame);
             return;
         }
 
         //  Timestamps + keyframe control.
-        if (video_start == WallClock::min()){
-            video_start = vf->timestamp;
+        if (m_video_start == WallClock::min()){
+            m_video_start = vf->timestamp;
         }
         int64_t pts_us = std::chrono::duration_cast<std::chrono::microseconds>(
-            vf->timestamp - video_start
+            vf->timestamp - m_video_start
         ).count();
-        if (pts_us < last_pts_us){
-            pts_us = last_pts_us;
+        if (pts_us < m_last_pts_us){
+            pts_us = m_last_pts_us;
         }
-        last_pts_us = pts_us;
-        bool force_keyframe = (pts_us - last_keyframe_us) >= VIDEO_KEYFRAME_INTERVAL_US;
+        m_last_pts_us = pts_us;
+        bool force_keyframe = (pts_us - m_last_keyframe_us) >= VIDEO_KEYFRAME_INTERVAL_US;
         if (force_keyframe){
-            last_keyframe_us = pts_us;
+            m_last_keyframe_us = pts_us;
         }
         //  The video timebase is 1/1000 (milliseconds); see init_video_encoder.
         frame->pts = pts_us / 1000;
@@ -892,7 +892,7 @@ struct StreamHistoryTracker_Ring::Data{
         //  so a send can fail with EAGAIN while output packets are pending:
         //  drain one packet and retry instead of giving up.
         while (true){
-            int err = avcodec_send_frame(vctx, frame);
+            int err = avcodec_send_frame(m_vctx, frame);
             if (err == AVERROR(EAGAIN)){
                 if (drain_one_video_packet(vf->timestamp) <= 0){
                     av_frame_free(&frame);
@@ -906,15 +906,15 @@ struct StreamHistoryTracker_Ring::Data{
                 //  at runtime has a broken GPU driver; every further call
                 //  into it - including releasing the context - risks crashing
                 //  the process inside the driver.
-                const char* failed = VIDEO_ENCODER_CANDIDATES[video_encoder_index - 1];
-                logger.log(
+                const char* failed = VIDEO_ENCODER_CANDIDATES[m_video_encoder_index - 1];
+                m_logger.log(
                     "Stream history: video encoder '" + std::string(failed)
                     + "' failed at runtime ("
                     + ffmpeg_error(err)
                     + "); falling back to the next candidate.",
                     COLOR_YELLOW
                 );
-                abandon_video_encoder(logger, failed, vctx);
+                abandon_video_encoder(m_logger, failed, m_vctx);
                 init_video_encoder(qframe.width(), qframe.height());
                 return;
             }
@@ -927,57 +927,57 @@ struct StreamHistoryTracker_Ring::Data{
 
 
     void evict(){
-        //  Must call under lock.
+        //  Must call under m_lock.
         WallClock latest = WallClock::min();
-        if (!video.empty()){
-            latest = video.back()->timestamp;
+        if (!m_video.empty()){
+            latest = m_video.back()->timestamp;
         }
-        if (!audio.empty() && audio.back()->timestamp > latest){
-            latest = audio.back()->timestamp;
+        if (!m_audio.empty() && m_audio.back()->timestamp > latest){
+            latest = m_audio.back()->timestamp;
         }
         if (latest == WallClock::min()){
             return;
         }
         //  Keep one extra keyframe interval of headroom: save() starts the
         //  file at the first keyframe in the ring, and keyframes arrive only
-        //  every VIDEO_KEYFRAME_INTERVAL_US. Evicting at "latest - window"
+        //  every VIDEO_KEYFRAME_INTERVAL_US. Evicting at "latest - m_window"
         //  would let the first keyframe fall up to a full interval after the
         //  window's start point, so the saved file would cover only
-        //  "window - interval" of the most recent seconds. With the
+        //  "m_window - interval" of the most recent seconds. With the
         //  headroom, the ring always contains a keyframe at or before
-        //  "latest - window", so the saved file always covers the most
+        //  "latest - m_window", so the saved file always covers the most
         //  recent "window" seconds (it may start up to one keyframe
         //  interval earlier).
         WallClock threshold =
-            latest - window - std::chrono::microseconds(VIDEO_KEYFRAME_INTERVAL_US);
-        while (!video.empty() && (video.front()->timestamp < threshold || ring_bytes > MAX_RING_BYTES)){
-            ring_bytes -= (int64_t)video.front()->data.size();
-            video.pop_front();
+            latest - m_window - std::chrono::microseconds(VIDEO_KEYFRAME_INTERVAL_US);
+        while (!m_video.empty() && (m_video.front()->timestamp < threshold || m_ring_bytes > MAX_RING_BYTES)){
+            m_ring_bytes -= (int64_t)m_video.front()->data.size();
+            m_video.pop_front();
         }
-        while (!audio.empty() && (audio.front()->timestamp < threshold || ring_bytes > MAX_RING_BYTES)){
-            ring_bytes -= (int64_t)audio.front()->data.size();
-            audio.pop_front();
+        while (!m_audio.empty() && (m_audio.front()->timestamp < threshold || m_ring_bytes > MAX_RING_BYTES)){
+            m_ring_bytes -= (int64_t)m_audio.front()->data.size();
+            m_audio.pop_front();
         }
     }
 
 
     void on_frame(std::shared_ptr<const VideoFrame> frame){
-        if (!has_video || frame == nullptr || frame->timestamp == WallClock::min()){
+        if (!m_has_video || frame == nullptr || frame->timestamp == WallClock::min()){
             return;
         }
         {
-            WriteSpinLock lg(lock, PA_CURRENT_FUNCTION);
-            if (!video_enabled){
+            WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
+            if (!m_video_enabled){
                 return;
             }
 
             //  Initialize on first frame.
-            if (next_frame_time == WallClock::min()){
-                next_frame_time = frame->timestamp;
+            if (m_next_frame_time == WallClock::min()){
+                m_next_frame_time = frame->timestamp;
             }
 
-            //  Don't save every frame: only save frames as per target_fps.
-            if (frame->timestamp < next_frame_time){
+            //  Don't save every frame: only save frames as per m_target_fps.
+            if (frame->timestamp < m_next_frame_time){
                 return;
             }
 
@@ -985,27 +985,27 @@ struct StreamHistoryTracker_Ring::Data{
             //  loop advances the schedule until it is once again ahead of the
             //  current timestamp. The resulting gap in the ring is fine because
             //  the muxer uses real timestamps.
-            while (next_frame_time <= frame->timestamp){
-                next_frame_time += frame_interval;
+            while (m_next_frame_time <= frame->timestamp){
+                m_next_frame_time += m_frame_interval;
             }
         }
 
         {
-            std::lock_guard<Mutex> queue_guard(queue_lock);
+            std::lock_guard<Mutex> queue_guard(m_queue_lock);
 
             //  Drop oldest if we are falling behind.
-            if (pending_frames.size() >= MAX_PENDING_FRAMES){
-                pending_frames.pop_front();
-                logger.log("Stream history worker thread lagging: Frame dropped.", COLOR_RED);
+            if (m_pending_frames.size() >= MAX_PENDING_FRAMES){
+                m_pending_frames.pop_front();
+                m_logger.log("Stream history worker thread lagging: Frame dropped.", COLOR_RED);
             }
-            pending_frames.emplace_back(std::move(frame));
+            m_pending_frames.emplace_back(std::move(frame));
         }
-        cv.notify_one();
+        m_cv.notify_one();
     }
 
 
     void push_samples(size_t samples, size_t stride, const float* data){
-        if (!have_audio || samples == 0 || data == nullptr){
+        if (!m_have_audio || samples == 0 || data == nullptr){
             return;
         }
         WallClock now = current_time();
@@ -1017,61 +1017,61 @@ struct StreamHistoryTracker_Ring::Data{
         //  (stride is the per-channel buffer length, 0 for the
         //  single-channel pass-through). Interleave into the accumulator
         //  for the encode loop below.
-        audio_acc.reserve(audio_acc.size() + samples * audio_channels);
+        m_audio_acc.reserve(m_audio_acc.size() + samples * m_audio_channels);
         for (size_t i = 0; i < samples; i++){
-            for (size_t ch = 0; ch < audio_channels; ch++){
-                audio_acc.push_back(data[ch * stride + i]);
+            for (size_t ch = 0; ch < m_audio_channels; ch++){
+                m_audio_acc.push_back(data[ch * stride + i]);
             }
         }
 
         //  2. Encode each complete AAC frame.
-        while (audio_acc.size() >= (size_t)AUDIO_FRAME_SAMPLES * audio_channels){
+        while (m_audio_acc.size() >= (size_t)AUDIO_FRAME_SAMPLES * m_audio_channels){
             AVFrame* frame = av_frame_alloc();
             if (frame == nullptr){
-                logger.log("Stream history: Failed to allocate audio frame. Disabling audio.", COLOR_RED);
-                have_audio = false;
+                m_logger.log("Stream history: Failed to allocate audio frame. Disabling audio.", COLOR_RED);
+                m_have_audio = false;
                 return;
             }
             frame->format = AV_SAMPLE_FMT_FLTP;
             frame->sample_rate = AUDIO_OUTPUT_RATE;
             frame->nb_samples = AUDIO_FRAME_SAMPLES;
-            int ret = av_channel_layout_copy(&frame->ch_layout, &audio_layout);
+            int ret = av_channel_layout_copy(&frame->ch_layout, &m_audio_layout);
             if (ret < 0){
                 av_frame_free(&frame);
-                logger.log("Stream history: Failed to copy audio channel layout. Disabling audio.", COLOR_RED);
-                have_audio = false;
+                m_logger.log("Stream history: Failed to copy audio channel layout. Disabling audio.", COLOR_RED);
+                m_have_audio = false;
                 return;
             }
             if (av_frame_get_buffer(frame, 0) < 0){
                 av_frame_free(&frame);
-                logger.log("Stream history: Failed to allocate audio frame buffer. Disabling audio.", COLOR_RED);
-                have_audio = false;
+                m_logger.log("Stream history: Failed to allocate audio frame buffer. Disabling audio.", COLOR_RED);
+                m_have_audio = false;
                 return;
             }
             //  The encoder works in planar float (one plane per channel), but
             //  the resampler output was accumulated packed/interleaved, so
             //  de-interleave into the frame's planes.
-            const float* acc = audio_acc.data();
-            for (size_t ch = 0; ch < audio_channels; ch++){
+            const float* acc = m_audio_acc.data();
+            for (size_t ch = 0; ch < m_audio_channels; ch++){
                 float* plane = (float*)frame->data[ch];
                 for (size_t i = 0; i < AUDIO_FRAME_SAMPLES; i++){
-                    plane[i] = acc[i * audio_channels + ch];
+                    plane[i] = acc[i * m_audio_channels + ch];
                 }
             }
-            frame->pts = audio_samples_total;
-            audio_samples_total += AUDIO_FRAME_SAMPLES;
+            frame->pts = m_audio_samples_total;
+            m_audio_samples_total += AUDIO_FRAME_SAMPLES;
             {
-                size_t chunk = (size_t)AUDIO_FRAME_SAMPLES * audio_channels;
-                std::vector<float>::iterator erase_end = audio_acc.begin();
+                size_t chunk = (size_t)AUDIO_FRAME_SAMPLES * m_audio_channels;
+                std::vector<float>::iterator erase_end = m_audio_acc.begin();
                 std::advance(erase_end, (std::vector<float>::difference_type)chunk);
-                audio_acc.erase(audio_acc.begin(), erase_end);
+                m_audio_acc.erase(m_audio_acc.begin(), erase_end);
             }
 
-            int err = avcodec_send_frame(actx, frame);
+            int err = avcodec_send_frame(m_actx, frame);
             av_frame_free(&frame);
             if (err < 0){
-                logger.log("Stream history: Audio encode failed: " + ffmpeg_error(err), COLOR_RED);
-                have_audio = false;
+                m_logger.log("Stream history: Audio encode failed: " + ffmpeg_error(err), COLOR_RED);
+                m_have_audio = false;
                 return;
             }
             while (true){
@@ -1079,15 +1079,15 @@ struct StreamHistoryTracker_Ring::Data{
                 if (packet == nullptr){
                     return;
                 }
-                err = avcodec_receive_packet(actx, packet);
+                err = avcodec_receive_packet(m_actx, packet);
                 if (err == AVERROR(EAGAIN)){
                     av_packet_free(&packet);
                     break;
                 }
                 if (err < 0){
                     av_packet_free(&packet);
-                    logger.log("Stream history: Audio packet failed: " + ffmpeg_error(err), COLOR_RED);
-                    have_audio = false;
+                    m_logger.log("Stream history: Audio packet failed: " + ffmpeg_error(err), COLOR_RED);
+                    m_have_audio = false;
                     break;
                 }
                 auto ring_packet = std::make_shared<AudioRingPacket>();
@@ -1097,28 +1097,28 @@ struct StreamHistoryTracker_Ring::Data{
                 //  video in the ring (eviction) and in save() (which trims the
                 //  audio to the video's start point).
                 ring_packet->timestamp = now - std::chrono::microseconds(AUDIO_FRAME_US);
-                ring_packet->first_sample = audio_samples_total - AUDIO_FRAME_SAMPLES;
+                ring_packet->first_sample = m_audio_samples_total - AUDIO_FRAME_SAMPLES;
                 ring_packet->data.assign(packet->data, packet->data + packet->size);
                 av_packet_free(&packet);
 
                 int64_t added = (int64_t)ring_packet->data.size();
                 {
-                    WriteSpinLock lg(lock, PA_CURRENT_FUNCTION);
+                    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
                     //  Refresh the audio parameter snapshot on this (the
                     //  encoder's) thread; see the video counterpart in
                     //  drain_one_video_packet().
-                    if (audio_params == nullptr
-                        || audio_params->extradata_size != actx->extradata_size
+                    if (m_audio_params == nullptr
+                        || m_audio_params->extradata_size != m_actx->extradata_size
                     ){
-                        if (audio_params == nullptr){
-                            audio_params = avcodec_parameters_alloc();
+                        if (m_audio_params == nullptr){
+                            m_audio_params = avcodec_parameters_alloc();
                         }
-                        if (audio_params != nullptr){
-                            avcodec_parameters_from_context(audio_params, actx);
+                        if (m_audio_params != nullptr){
+                            avcodec_parameters_from_context(m_audio_params, m_actx);
                         }
                     }
-                    audio.push_back(std::move(ring_packet));
-                    ring_bytes += added;
+                    m_audio.push_back(std::move(ring_packet));
+                    m_ring_bytes += added;
                     evict();
                 }
             }
@@ -1136,8 +1136,8 @@ struct StreamHistoryTracker_Ring::Data{
     ) const{
         //  Parameter names use the p_ prefix: the ring deques and start
         //  indices have the same names as Impl members (C4458 under /W4).
-        //  No live vctx/actx checks here: the codec state for muxing comes
-        //  from the video_params/audio_params snapshots (captured on the
+        //  No live m_vctx/m_actx checks here: the codec state for muxing comes
+        //  from the m_video_params/m_audio_params snapshots (captured on the
         //  encoder threads; ffmpeg is not thread-safe on a live context).
         bool have_video = (p_video_start < p_video.size());
         bool have_audio_stream = (p_audio_start < p_audio.size());
@@ -1166,7 +1166,7 @@ struct StreamHistoryTracker_Ring::Data{
         if (avformat_alloc_output_context2(&format, nullptr, muxer, filename.c_str()) < 0
             || format == nullptr
         ){
-            logger.log("Stream history: Failed to create output context for '" + filename + "'.", COLOR_RED);
+            m_logger.log("Stream history: Failed to create output context for '" + filename + "'.", COLOR_RED);
             return false;
         }
 
@@ -1177,46 +1177,46 @@ struct StreamHistoryTracker_Ring::Data{
         AVRational vtb = {1, 1000};
         bool video_annexb = false;
         {
-            ReadSpinLock lg(lock, PA_CURRENT_FUNCTION);
+            ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
             if (have_video){
                 //  Only H.264 needs extradata (the avcC record); the other
                 //  candidates (MPEG-4 Part 2) carry their stream
                 //  configuration in-band.
-                const bool needs_extradata = (video_params != nullptr
-                    && video_params->codec_id == AV_CODEC_ID_H264);
-                if (video_params == nullptr
-                    || (needs_extradata && video_params->extradata == nullptr)
+                const bool needs_extradata = (m_video_params != nullptr
+                    && m_video_params->codec_id == AV_CODEC_ID_H264);
+                if (m_video_params == nullptr
+                    || (needs_extradata && m_video_params->extradata == nullptr)
                 ){
-                    logger.log("Stream history: Failed to set up video stream (missing encoder state?).", COLOR_RED);
+                    m_logger.log("Stream history: Failed to set up video stream (missing encoder state?).", COLOR_RED);
                     avformat_free_context(format);
                     return false;
                 }
                 vpar = avcodec_parameters_alloc();
                 if (vpar == nullptr
-                    || avcodec_parameters_copy(vpar, video_params) < 0
+                    || avcodec_parameters_copy(vpar, m_video_params) < 0
                 ){
-                    logger.log("Stream history: Failed to copy the video codec parameters.", COLOR_RED);
+                    m_logger.log("Stream history: Failed to copy the video codec parameters.", COLOR_RED);
                     avcodec_parameters_free(&vpar);
                     avformat_free_context(format);
                     return false;
                 }
                 if (needs_extradata && vpar->extradata == nullptr){
-                    logger.log("Stream history: Failed to set up video stream (missing encoder state?).", COLOR_RED);
+                    m_logger.log("Stream history: Failed to set up video stream (missing encoder state?).", COLOR_RED);
                     avcodec_parameters_free(&vpar);
                     avformat_free_context(format);
                     return false;
                 }
-                vtb = video_time_base;
+                vtb = m_video_time_base;
                 char hex[9] = {0};
                 const char* digits = "0123456789abcdef";
-                for (int b = 0; b < 4 && b < video_params->extradata_size; b++){
-                    uint8_t byte = video_params->extradata[b];
+                for (int b = 0; b < 4 && b < m_video_params->extradata_size; b++){
+                    uint8_t byte = m_video_params->extradata[b];
                     hex[2 * b] = digits[byte >> 4];
                     hex[2 * b + 1] = digits[byte & 0xF];
                 }
-                logger.log(
+                m_logger.log(
                     "Stream history: muxing video (extradata "
-                    + std::to_string(video_params->extradata_size) + " bytes, "
+                    + std::to_string(m_video_params->extradata_size) + " bytes, "
                     + std::string(hex) + ").",
                     COLOR_CYAN
                 );
@@ -1236,7 +1236,7 @@ struct StreamHistoryTracker_Ring::Data{
                         phex[2 * b] = digits[byte >> 4];
                         phex[2 * b + 1] = digits[byte & 0xF];
                     }
-                    logger.log(
+                    m_logger.log(
                         "Stream history: first video packet starts with "
                         + std::string(phex) + " (same form as the extradata).",
                         COLOR_CYAN
@@ -1258,14 +1258,14 @@ struct StreamHistoryTracker_Ring::Data{
                         vpar->extradata, (size_t)vpar->extradata_size, avcc
                     )
                     ){
-                        logger.log("Stream history: Failed to convert the H.264 extradata from Annex B to AVCC.", COLOR_RED);
+                        m_logger.log("Stream history: Failed to convert the H.264 extradata from Annex B to AVCC.", COLOR_RED);
                         avcodec_parameters_free(&vpar);
                         avformat_free_context(format);
                         return false;
                     }
                     uint8_t* new_extradata = (uint8_t*)av_mallocz(avcc.size() + AV_INPUT_BUFFER_PADDING_SIZE);
                     if (new_extradata == nullptr){
-                        logger.log("Stream history: Failed to allocate the converted H.264 extradata.", COLOR_RED);
+                        m_logger.log("Stream history: Failed to allocate the converted H.264 extradata.", COLOR_RED);
                         avcodec_parameters_free(&vpar);
                         avformat_free_context(format);
                         return false;
@@ -1274,22 +1274,22 @@ struct StreamHistoryTracker_Ring::Data{
                     av_free(vpar->extradata);
                     vpar->extradata = new_extradata;
                     vpar->extradata_size = (int)avcc.size();
-                    logger.log("Stream history: converted H.264 Annex-B extradata to AVCC for MP4.", COLOR_CYAN);
+                    m_logger.log("Stream history: converted H.264 Annex-B extradata to AVCC for MP4.", COLOR_CYAN);
                 }
             }
             if (have_audio_stream){
-                if (audio_params == nullptr || audio_params->extradata == nullptr){
-                    logger.log("Stream history: Failed to set up audio stream (missing encoder state?).", COLOR_RED);
+                if (m_audio_params == nullptr || m_audio_params->extradata == nullptr){
+                    m_logger.log("Stream history: Failed to set up audio stream (missing encoder state?).", COLOR_RED);
                     avcodec_parameters_free(&vpar);
                     avformat_free_context(format);
                     return false;
                 }
                 apar = avcodec_parameters_alloc();
                 if (apar == nullptr
-                    || avcodec_parameters_copy(apar, audio_params) < 0
+                    || avcodec_parameters_copy(apar, m_audio_params) < 0
                     || apar->extradata == nullptr
                 ){
-                    logger.log("Stream history: Failed to copy the audio codec parameters.", COLOR_RED);
+                    m_logger.log("Stream history: Failed to copy the audio codec parameters.", COLOR_RED);
                     avcodec_parameters_free(&vpar);
                     avcodec_parameters_free(&apar);
                     avformat_free_context(format);
@@ -1302,7 +1302,7 @@ struct StreamHistoryTracker_Ring::Data{
             if (video_stream == nullptr
                 || avcodec_parameters_copy(video_stream->codecpar, vpar) < 0
             ){
-                logger.log("Stream history: Failed to set up video stream (missing encoder state?).", COLOR_RED);
+                m_logger.log("Stream history: Failed to set up video stream (missing encoder state?).", COLOR_RED);
                 avcodec_parameters_free(&vpar);
                 avcodec_parameters_free(&apar);
                 avformat_free_context(format);
@@ -1322,7 +1322,7 @@ struct StreamHistoryTracker_Ring::Data{
             if (audio_stream == nullptr
                 || avcodec_parameters_copy(audio_stream->codecpar, apar) < 0
             ){
-                logger.log("Stream history: Failed to set up audio stream (missing encoder state?).", COLOR_RED);
+                m_logger.log("Stream history: Failed to set up audio stream (missing encoder state?).", COLOR_RED);
                 avcodec_parameters_free(&vpar);
                 avcodec_parameters_free(&apar);
                 avformat_free_context(format);
@@ -1355,14 +1355,14 @@ struct StreamHistoryTracker_Ring::Data{
                 &muxer_options
             ) < 0 || format->pb == nullptr
             ){
-                logger.log("Stream history: Failed to open '" + filename + "' for writing.", COLOR_RED);
+                m_logger.log("Stream history: Failed to open '" + filename + "' for writing.", COLOR_RED);
                 av_dict_free(&muxer_options);
                 avformat_free_context(format);
                 return false;
             }
         }
         if (avformat_write_header(format, &muxer_options) < 0){
-            logger.log("Stream history: Failed to write file header for '" + filename + "'.", COLOR_RED);
+            m_logger.log("Stream history: Failed to write file header for '" + filename + "'.", COLOR_RED);
             av_dict_free(&muxer_options);
             avio_closep(&format->pb);
             avformat_free_context(format);
@@ -1424,7 +1424,7 @@ struct StreamHistoryTracker_Ring::Data{
                     const VideoRingPacket& vp = *p_video[vi];
                     if (video_annexb){
                         if (!h264_annexb_to_avcc(vp.data.data(), vp.data.size(), converted_data)){
-                            logger.log("Stream history: Failed to convert a video packet from Annex B to AVCC.", COLOR_RED);
+                            m_logger.log("Stream history: Failed to convert a video packet from Annex B to AVCC.", COLOR_RED);
                             ok = false;
                             break;
                         }
@@ -1448,7 +1448,7 @@ struct StreamHistoryTracker_Ring::Data{
                     packet->dts = dts;
                     packet->flags = vp.flags;
                     if (av_interleaved_write_frame(format, packet) < 0){
-                        logger.log("Stream history: Failed writing video data.", COLOR_RED);
+                        m_logger.log("Stream history: Failed writing video data.", COLOR_RED);
                         ok = false;
                         break;
                     }
@@ -1475,7 +1475,7 @@ struct StreamHistoryTracker_Ring::Data{
                     packet->dts = dts;
                     packet->flags = 0;
                     if (av_interleaved_write_frame(format, packet) < 0){
-                        logger.log("Stream history: Failed writing audio data.", COLOR_RED);
+                        m_logger.log("Stream history: Failed writing audio data.", COLOR_RED);
                         ok = false;
                         break;
                     }
@@ -1486,7 +1486,7 @@ struct StreamHistoryTracker_Ring::Data{
         }
 
         if (ok && av_write_trailer(format) < 0){
-            logger.log("Stream history: Failed writing file trailer.", COLOR_RED);
+            m_logger.log("Stream history: Failed writing file trailer.", COLOR_RED);
             ok = false;
         }
         if (format->pb != nullptr){
@@ -1498,19 +1498,19 @@ struct StreamHistoryTracker_Ring::Data{
 
 
     bool save(const std::string& filename) const{
-        logger.log("Saving stream history (in-memory encoded ring)...", COLOR_BLUE);
+        m_logger.log("Saving stream history (in-memory encoded ring)...", COLOR_BLUE);
 
         //  Fast snapshot: the deques only hold shared_ptr's (the packet bytes are
         //  shared, not copied). Local names avoid C4458 (/W4) member shadowing.
         std::deque<std::shared_ptr<const VideoRingPacket>> video_snapshot;
         std::deque<std::shared_ptr<const AudioRingPacket>> audio_snapshot;
         {
-            WriteSpinLock lg(lock, PA_CURRENT_FUNCTION);
-            video_snapshot = this->video;
-            audio_snapshot = this->audio;
+            WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
+            video_snapshot = this->m_video;
+            audio_snapshot = this->m_audio;
         }
         if (video_snapshot.empty() && audio_snapshot.empty()){
-            logger.log("Cannot save stream history: Nothing was recorded.", COLOR_RED);
+            m_logger.log("Cannot save stream history: Nothing was recorded.", COLOR_RED);
             return false;
         }
 
@@ -1547,7 +1547,7 @@ struct StreamHistoryTracker_Ring::Data{
         }
 
         bool ok = mux_to_file(filename, video_snapshot, video_start_index, audio_snapshot, audio_start, start_ts);
-        logger.log(
+        m_logger.log(
             ok ? "Stream history saved to '" + filename + "'."
                : "Failed to save stream history to '" + filename + "'.",
             ok ? COLOR_GREEN : COLOR_RED
@@ -1559,10 +1559,10 @@ struct StreamHistoryTracker_Ring::Data{
 
 
 StreamHistoryTracker_Ring::~StreamHistoryTracker_Ring(){
-    if (m_data->worker){
-        m_data->stopping = true;
-        m_data->cv.notify_all();
-        m_data->worker.wait_and_ignore_exceptions();
+    if (m_data->m_worker){
+        m_data->m_stopping = true;
+        m_data->m_cv.notify_all();
+        m_data->m_worker.wait_and_ignore_exceptions();
     }
 }
 
@@ -1582,8 +1582,8 @@ StreamHistoryTracker_Ring::StreamHistoryTracker_Ring(
 {}
 
 void StreamHistoryTracker_Ring::set_window(std::chrono::seconds window){
-    WriteSpinLock lg(m_data->lock, PA_CURRENT_FUNCTION);
-    m_data->window = window;
+    WriteSpinLock lg(m_data->m_lock, PA_CURRENT_FUNCTION);
+    m_data->m_window = window;
     m_data->evict();
 }
 
