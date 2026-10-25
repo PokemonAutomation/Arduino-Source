@@ -73,7 +73,7 @@ CodeboardTimingsOption::CodeboardTimingsOption(
             : std::to_string(unit.count() * 2) + " ms"
     )
     , COOLDOWN(
-        "<b>Cooldown:</b><br>Do not reuse a button until this long after it is reused.",
+        "<b>Cooldown:</b><br>Do not reuse a button until this long after it is released.",
         LockMode::UNLOCK_WHILE_RUNNING,
         std::to_string(unit.count() * 1) + " ms"
     )
@@ -155,7 +155,7 @@ KeyboardControllerTimingsOption::KeyboardControllerTimingsOption()
         "40 ms"
     )
     , COOLDOWN(
-        "<b>Cooldown:</b><br>Do not reuse a key until this long after it is reused.",
+        "<b>Cooldown:</b><br>Do not reuse a key until this long after it is released.",
         LockMode::UNLOCK_WHILE_RUNNING,
         "24 ms"
     )
