@@ -244,7 +244,7 @@ namespace PokemonAutomation {
                 walk_through_grass(stream, context, 1, 0, 5, "right through grass");
                 wait_for_dialogue(stream, context, "Dallas fight dialog)");
                 pbf_mash_button(context, BUTTON_B, 5000ms);
-				Barry_1_fight(env, stream, context);//fighting Dallas
+                Barry_1_fight(env, stream, context);//fighting Dallas
                 context.wait_for_all_requests();
                 walk_through_grass(stream, context, 1, 0, 5, "right through grass");
                 pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 600ms, 0ms);
