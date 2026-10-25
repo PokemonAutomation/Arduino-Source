@@ -129,8 +129,8 @@ namespace PokemonAutomation {
                 VideoStream& stream,
                 ProControllerContext& context
             );
-			// ---------------------------------------------------------------------------
-			// Helper function to navigate the poketech challenge clown dialogue.
+            // ---------------------------------------------------------------------------
+            // Helper function to navigate the poketech challenge clown dialogue.
             // Example usage
             // Move up and talk to clown.
             // clown_dialog_helper(
@@ -152,7 +152,7 @@ namespace PokemonAutomation {
             //    context,
             //    DPAD_RIGHT
             // );
-			// ----------------------------------------------------------------------------
+            // ----------------------------------------------------------------------------
             void clown_dialog_helper(
                 VideoStream& stream,
                 ProControllerContext& context,

@@ -1838,7 +1838,7 @@ namespace PokemonAutomation {
             }
 
             // ---------------------------------------------------------------------------
-			// Generic Movement Helper - Walk through grass in specified direction for 
+            // Generic Movement Helper - Walk through grass in specified direction for
             // specified steps, attempting to run from any battles that are encountered.
             // ---------------------------------------------------------------------------
             void walk_through_grass(

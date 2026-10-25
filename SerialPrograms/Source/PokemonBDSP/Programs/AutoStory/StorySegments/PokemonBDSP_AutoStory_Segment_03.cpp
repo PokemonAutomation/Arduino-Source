@@ -144,6 +144,48 @@ namespace PokemonBDSP{
     // remaining movement budget inside the next map.
     // Recorded Cycling Road movement may cross a gate before its budget ends.
     // Cancel at either fade color and resume only after that fade has cleared.
+    // Recover the successful descent endpoint before spending eastward travel.
+    // Correct height first, while still west of the honey-tree collision column.
+    static void segment03_align_lower_stair_lane(VideoStream& stream, ProControllerContext& context) {
+        size_t confirmations=0,missing=0;
+        for (size_t observation=0;observation<40;observation++) {
+            context.wait_for_all_requests();
+            const auto frame=stream.video().snapshot();
+            if (!frame)
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "Route 208 lower stair lane: No video frame.",stream);
+            const auto match=match_route208_lower_stair_lane(*frame.frame);
+            stream.log("[Route 208 lower stair lane] located="+std::to_string(match.located)+
+                ", target="+std::to_string(match.at_target)+
+                ", offset=("+std::to_string(match.dx)+","+std::to_string(match.dy)+")");
+            if (!match.located) {
+                confirmations=0;
+                if (++missing>6)
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "Route 208 lower stair lane: Cliff/tree anchors missing; no blind search.",stream);
+                pbf_wait(context,500ms);
+                continue;
+            }
+            missing=0;
+            if (match.at_target && !match.coarse) {
+                if (++confirmations>=3) return;
+                pbf_wait(context,250ms);
+                continue;
+            }
+            confirmations=0;
+            const bool vertical=match.coarse || std::abs(match.dy)>1.0/54;
+            const double error=vertical ? match.dy*9.0/16 : match.dx;
+            const auto duration=std::abs(error)>1.0/24 ? 80ms :
+                std::abs(error)>1.0/64 ? 40ms : 16ms;
+            pbf_move_left_joystick(context,
+                {vertical ? 0.0 : (error>0 ? 1.0 : -1.0),
+                 vertical ? (error<0 ? 1.0 : -1.0) : 0.0},duration,0ms);
+            pbf_wait(context,500ms);
+        }
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Route 208 lower stair lane: Could not confirm the safe descent endpoint.",stream);
+    }
+
     static bool segment03_cycling_move(VideoStream& stream, ProControllerContext& context,
         double x, double y, Milliseconds duration, Milliseconds rest,
         const std::string& label, bool require_transition = false) {
@@ -994,6 +1036,7 @@ namespace PokemonBDSP{
                     pbf_move_left_joystick(ctx,{0,-1},1650ms,0ms);
                     pbf_wait(ctx,643ms);
                     ctx.wait_for_all_requests();
+                    segment03_align_lower_stair_lane(stream,ctx);
                 },{{fallback_black},{fallback_white},{fallback_battle}});
             if (fallback_interrupted>=0)
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
@@ -1009,18 +1052,18 @@ namespace PokemonBDSP{
         // inside the gatehouse. The existing watcher cancels at black/white,
         // waits for GONE500ms, then settles for2s before the next input.
         bool hearthome_gate_entered=segment03_cycling_move(stream,context,
-            1,0,rock_acquisition_timed_out ?3422ms:3500ms,443ms,"Hearthome west gate approach");
+            1,0,3500ms,443ms,"Hearthome west gate approach");
         if (!hearthome_gate_entered)
             hearthome_gate_entered=segment03_cycling_move(stream,context,
-                0,1,rock_acquisition_timed_out ?241ms:250ms,405ms,"Hearthome west gate doorway alignment");
+                0,1,250ms,405ms,"Hearthome west gate doorway alignment");
         if (!hearthome_gate_entered)
             hearthome_gate_entered=segment03_cycling_move(stream,context,
-                1,0,rock_acquisition_timed_out ?633ms:600ms,1617ms,"Hearthome west gate entrance",true);
+                1,0,600ms,1617ms,"Hearthome west gate entrance",true);
         if (!hearthome_gate_entered)
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                 "Hearthome west gate: Interior transition not confirmed.",stream);
         if (!segment03_cycling_move(stream,context,
-            1,0,rock_acquisition_timed_out ?1743ms:1800ms,1588ms,"Hearthome west gate exit",true))
+            1,0,1800ms,1588ms,"Hearthome west gate exit",true))
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                 "Hearthome west gate: Exterior transition not confirmed.",stream);
         OverworldWatcher hearthome_outside;
@@ -1066,7 +1109,7 @@ namespace PokemonBDSP{
         BlackScreenWatcher center_transition;
         const int center_entry=run_until<ProControllerContext>(stream,context,
             [&](ProControllerContext& ctx) {
-                pbf_move_left_joystick(ctx, {1.000000, -0.000000}, 3500ms, 0ms);
+                pbf_move_left_joystick(ctx, {1.000000, -0.000000}, 3350ms, 0ms);
                 pbf_wait(ctx, 437ms);
                 // Clear the northbound lamp column before crossing the plaza.
                 pbf_move_left_joystick(ctx, {-1.000000, -0.000000}, 250ms, 0ms);
@@ -1120,20 +1163,38 @@ namespace PokemonBDSP{
         context.wait_for_all_requests();
         align_to_overworld_landmarks(stream,context,match_hearthome_contest_fantina,
             "Hearthome Contest Hall Fantina",false,true);
-        // Confirm the actual first interaction before clearing its text. Do not
-        // spend the old blind north/west holds against the side of the Hall.
-        pbf_move_left_joystick(context,{0,1},16ms,100ms);
-        pbf_press_button(context,BUTTON_A,194ms,277ms);
-        context.wait_for_all_requests();
+        // Repeat the existing short Up/A interaction within the 15s window.
+        // Dialogue cancels the remaining inputs before any text cleanup.
         ShortDialogWatcher fantina_dialogue;
-        if (wait_until(stream,context,15s,{{fantina_dialogue}})!=0)
+        BlackScreenWatcher fantina_black;
+        WhiteScreenWatcher fantina_white;
+        const int fantina_started=run_until<ProControllerContext>(stream,context,
+            [](ProControllerContext& ctx) {
+                constexpr auto pulse=16ms+100ms+194ms+277ms;
+                Milliseconds elapsed=0ms;
+                for (;elapsed+pulse<=15s;elapsed+=pulse) {
+                    pbf_move_left_joystick(ctx,{0,1},16ms,100ms);
+                    pbf_press_button(ctx,BUTTON_A,194ms,277ms);
+                    ctx.wait_for_all_requests();
+                }
+                pbf_wait(ctx,15s-elapsed);
+            },{{fantina_dialogue},{fantina_black},{fantina_white}});
+        if (fantina_started>0) {
+            // Fantina's opening camera cut fades to black before the text box.
+            // The watcher has cancelled Up/A; wait without further movement.
+            stream.log("[Hearthome Fantina] Opening fade detected; waiting for dialogue.");
+            segment03_finish_transition(stream,context,"Hearthome Fantina opening");
+            ShortDialogWatcher opening_dialogue;
+            if (wait_until(stream,context,15s,{{opening_dialogue}})!=0)
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "Hearthome Fantina: Opening fade was not followed by dialogue.",stream);
+        } else if (fantina_started!=0)
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                 "Hearthome Contest Hall: Fantina dialogue did not start.",stream);
         clear_post_battle_dialogue(stream,context,BUTTON_B);
         pbf_wait(context,2000ms);
         clear_post_battle_dialogue(stream,context,BUTTON_B);
-        // Preserve the separate north1179 Hall-entry phase and initial choice
-        // inputs. A failed doorway or absent conversation must not finish18.
+        // Keep Hall entry separate from Fantina's outdoor conversation.
         segment03_cycling_move(stream,context,0,1,1179ms,4268ms,
             "Hearthome Contest Hall entrance",true);
         pbf_press_button(context,BUTTON_A,181ms,219ms);
@@ -1142,20 +1203,44 @@ namespace PokemonBDSP{
         if (wait_until(stream,context,15s,{{contest_dialogue}})!=0)
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                 "Hearthome Contest Hall: Interior dialogue did not start.",stream);
-        pbf_press_button(context,BUTTON_A,195ms,123ms);
-        pbf_press_button(context,BUTTON_A,185ms,121ms);
-        pbf_press_button(context,BUTTON_A,170ms,805ms);
-        pbf_press_button(context,BUTTON_A,195ms,140ms);
-        pbf_press_button(context,BUTTON_A,102ms,218ms);
-        clear_post_battle_dialogue(stream,context,BUTTON_B);
-        pbf_wait(context,2000ms);
-        clear_post_battle_dialogue(stream,context,BUTTON_B);
-        context.wait_for_all_requests();
+        // Use Buneary's resumed-text and scene-clear checks, with B to clear.
+        bool contest_cleared=false;
+        for (size_t pass=0;pass<6 && !contest_cleared;pass++) {
+            mash_until_dialogue_ends(stream,context,BUTTON_B,60s);
+            context.wait_for_all_requests();
+            ShortDialogWatcher resumed_dialogue;
+            if (wait_until(stream,context,2000ms,{{resumed_dialogue}})==0) continue;
+            pbf_wait(context,6000ms);
+            context.wait_for_all_requests();
+            const auto frame=stream.video().snapshot();
+            OverworldDetector overworld;
+            ShortDialogDetector dialogue;
+            contest_cleared=frame && overworld.detect(*frame.frame) && !dialogue.detect(*frame.frame);
+        }
+        if (!contest_cleared)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Hearthome Contest Hall: Interior scene did not clear.",stream);
+        // Own the exit before handing off the checkpoint. The transition watcher
+        // cancels southward movement at the fade, leaving the fixed outdoor spawn.
+        if (!segment03_cycling_move(stream,context,0,-1,903ms,1455ms,
+            "Hearthome Contest Hall exit",true))
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Hearthome Contest Hall: Exit transition not confirmed.",stream);
+        OverworldWatcher hall_outside;
+        if (wait_until(stream,context,10s,{{hall_outside}})!=0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Hearthome Contest Hall: Overworld not ready after exit.",stream);
+        // The approach landmark view is not the post-exit doorway view.
+        // The watched south exit plus restored overworld completes this boundary.
+        stream.log("[Hearthome Contest Hall] Checkpoint complete: outside doorway, facing south.");
+        // End 03.04 / start 03.05: just outside the Hall, south-facing, Repel off.
     }
 
     void heartholme_to_lost_tower(VideoStream& stream, ProControllerContext& context) {
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 903ms, 0ms);
-        pbf_wait(context, 1455ms);
+        OverworldWatcher hall_start;
+        if (wait_until(stream,context,10s,{{hall_start}})!=0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Hearthome Contest Hall checkpoint start: Overworld not ready.",stream);
         pbf_move_left_joystick(context, {0.000000, -1.000000}, 1830ms, 0ms);
         pbf_wait(context, 144ms);
         pbf_move_left_joystick(context, {1.000000, -0.000000}, 1880ms, 0ms);
@@ -2071,7 +2156,7 @@ void Checkpoint_0303(
 }
 std::string AutoStory_Checkpoint_0304::name()       const { return "03.04 - Coronet to Hearthome"; }
 std::string AutoStory_Checkpoint_0304::start_text() const { return "Inside Mount Coronet near the east exit, after the first Cyrus meeting."; }
-std::string AutoStory_Checkpoint_0304::end_text()   const { return "Outside the Hearthome Contest Hall after the Keira/Johanna introduction."; }
+std::string AutoStory_Checkpoint_0304::end_text()   const { return "Just outside the Hearthome Contest Hall doorway, facing south with Repel inactive, after the Keira/Johanna introduction."; }
 
 void AutoStory_Checkpoint_0304::run_checkpoint(
     SingleSwitchProgramEnvironment& env,
@@ -2100,7 +2185,7 @@ void Checkpoint_0304(
     );
 }
 std::string AutoStory_Checkpoint_0305::name()       const { return "03.05 - Hearthome and Lost Tower"; }
-std::string AutoStory_Checkpoint_0305::start_text() const { return "Outside the Hearthome Contest Hall after the Keira/Johanna introduction."; }
+std::string AutoStory_Checkpoint_0305::start_text() const { return "Just outside the Hearthome Contest Hall doorway, facing south with Repel inactive, after the Keira/Johanna introduction."; }
 std::string AutoStory_Checkpoint_0305::end_text()   const { return "At the Lost Tower departure position after the tower gifts and recorded return path."; }
 
 void AutoStory_Checkpoint_0305::run_checkpoint(
@@ -2114,16 +2199,16 @@ void AutoStory_Checkpoint_0305::run_checkpoint(
 
 
 void Checkpoint_0305(
-	SingleSwitchProgramEnvironment& env,
-	ProControllerContext& context,
-	AutoStoryOptions options,
-	AutoStoryStats& stats
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats
 ) {
-	checkpoint_reattempt_loop(env, context, options, stats,
-		[&](size_t /*attempt*/) {
-			// Recorded route with feedback battle handling.
-			heartholme_to_lost_tower(env.console, context);
-			lost_tower(env.console, context);
+    checkpoint_reattempt_loop(env, context, options, stats,
+        [&](size_t /*attempt*/) {
+            // Recorded route with feedback battle handling.
+            heartholme_to_lost_tower(env.console, context);
+            lost_tower(env.console, context);
 
         },
 
