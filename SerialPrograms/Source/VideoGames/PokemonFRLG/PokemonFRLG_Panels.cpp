@@ -62,6 +62,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_SingleSwitchProgram<EvTrainer>());
     ret.emplace_back(make_SingleSwitchProgram<HeldItemFarmerSafariZone>());
     ret.emplace_back(make_SingleSwitchProgram<ItemDuplication>());
+    ret.emplace_back(make_SingleSwitchProgram<EliteFourFarmer>());
 
     //ret.emplace_back("---- General ----");
 
@@ -84,8 +85,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_SingleSwitchProgram<EggRng>());
 
     if (IS_BETA_VERSION || STATIC_GLOBALS.DEVELOPER_MODE){
-        ret.emplace_back("---- Untested/Beta/WIP ----");
-        ret.emplace_back(make_SingleSwitchProgram<EliteFourFarmer>());
+//        ret.emplace_back("---- Untested/Beta/WIP ----");
     }
 
     if (STATIC_GLOBALS.DEVELOPER_MODE){
