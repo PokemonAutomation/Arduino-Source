@@ -30,12 +30,21 @@ CollapsibleGroupBox* make_panel_header(
     const std::string& doc_link,
     const std::string& description
 );
+#if 0
 CollapsibleGroupBox* make_panel_header(
     QWidget& parent,
     const std::string& display_name,
     const std::string& doc_link,
     const std::string& description,
     ProgramControllerClass color_class
+);
+#endif
+CollapsibleGroupBox* make_panel_header(
+    QWidget& parent,
+    const std::string& display_name,
+    const std::string& doc_link,
+    const std::string& description,
+    PanelQualityStanding standing
 );
 
 
