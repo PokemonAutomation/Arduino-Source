@@ -358,7 +358,9 @@ struct StreamHistoryTracker_Ring::Data{
     AsyncTask m_worker;
     Mutex m_queue_lock;
     bool m_stopping = false;    //  Guarded by m_queue_lock.
+    bool m_encoding = false;    //  Guarded by m_queue_lock. A popped frame is being encoded.
     ConditionVariable m_cv;
+    ConditionVariable m_idle_cv;    //  Notified after each frame is encoded (wait_until_idle()).
     std::deque<std::shared_ptr<const VideoFrame>> m_pending_frames;
 
     //  Initializes the audio encoder (if enabled) and starts the video
@@ -719,9 +721,24 @@ struct StreamHistoryTracker_Ring::Data{
                 }
                 frame = std::move(m_pending_frames.front());
                 m_pending_frames.pop_front();
+                m_encoding = true;
             }
             encode_video_frame(frame);
+            {
+                std::lock_guard<Mutex> queue_guard(m_queue_lock);
+                m_encoding = false;
+            }
+            m_idle_cv.notify_all();
         }
+    }
+
+
+    //  Blocks until the queue is empty and no frame is being encoded.
+    void wait_until_idle(){
+        std::unique_lock<Mutex> queue_guard(m_queue_lock);
+        m_idle_cv.wait(queue_guard, [this]{
+            return m_stopping || (m_pending_frames.empty() && !m_encoding);
+        });
     }
 
 
@@ -1012,11 +1029,10 @@ struct StreamHistoryTracker_Ring::Data{
     //  Interleaves the planar 48 kHz input into m_audio_acc, then for every
     //  complete 1024-sample frame: encodes AAC, stores the packet in the
     //  ring (stamped with the capture time of its samples), and evicts.
-    void push_samples(size_t samples, size_t stride, const float* data){
+    void push_samples(size_t samples, size_t stride, const float* data, WallClock now){
         if (!m_have_audio || samples == 0 || data == nullptr){
             return;
         }
-        WallClock now = current_time();
 
         //  Keep the sample clock in line with the wall clock. The last sample
         //  of this delivery was captured at about "now"; if the sample count
@@ -1619,7 +1635,13 @@ void StreamHistoryTracker_Ring::set_window(std::chrono::seconds window){
 }
 
 void StreamHistoryTracker_Ring::push_samples(size_t samples, size_t stride, const float* data){
-    m_data->push_samples(samples, stride, data);
+    m_data->push_samples(samples, stride, data, current_time());
+}
+void StreamHistoryTracker_Ring::push_samples(size_t samples, size_t stride, const float* data, WallClock now){
+    m_data->push_samples(samples, stride, data, now);
+}
+void StreamHistoryTracker_Ring::wait_until_idle(){
+    m_data->wait_until_idle();
 }
 
 void StreamHistoryTracker_Ring::on_frame(std::shared_ptr<const VideoFrame> frame){
