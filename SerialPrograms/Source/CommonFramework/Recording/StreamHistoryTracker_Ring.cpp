@@ -147,6 +147,7 @@ size_t get_target_bitrate_kbps(){
 
 //  Resolves the configured output resolution (match input / 720p / 1080p)
 //  to even H.264-compatible dimensions, preserving the input aspect ratio.
+//  The inputs out_width, out_height are modified as a result.
 bool get_target_video_size(int input_width, int input_height, int& out_width, int& out_height){
     const StreamHistoryOption& settings = GlobalSettings::instance().STREAM_HISTORY;
     int target_width;
@@ -235,9 +236,9 @@ void abandon_video_encoder(Logger& logger, const char* name, AVCodecContext*& ct
     if (ctx == nullptr){
         return;
     }
-    if (std::strcmp(name, "mpeg4") == 0){
+    if (std::strcmp(name, "mpeg4") == 0){ // if mpeg4, release the encoder context
         avcodec_free_context(&ctx);
-    }else{
+    }else{  // if other encoders, add to poisoned_encoders. Do not release the encoder context
         {
             std::lock_guard<std::mutex> lg(poisoned_encoder_mutex);
             poisoned_encoders.insert(name);
@@ -253,29 +254,28 @@ void abandon_video_encoder(Logger& logger, const char* name, AVCodecContext*& ct
     ctx = nullptr;
 }
 
-//  MP4 (ISO BMFF) stores H.264 as AVCC: an avcC configuration record in the
-//  stream header and NAL units with 4-byte big-endian length prefixes in the
-//  samples. The h264_amf wrapper (with AV_CODEC_FLAG_GLOBAL_HEADER) instead
-//  produces Annex B (00 00 00 01 start codes) for both, and the MP4 muxer
-//  shipped with the vendored ffmpeg crashes on that form. The other
-//  hardware wrappers emit Annex B as well (verified in the ffmpeg 8.1
-//  sources: qsv and videotoolbox pass the driver's start-coded SPS/PPS and
-//  bitstream through without any conversion; the only unverified case is
-//  nvenc's driver-produced SPS/PPS payload, whose form the mux-time log
-//  lines report). These two conversions turn Annex B output into the
-//  standard AVCC form so that the muxer always sees what it expects; the
-//  detection is content-based (it sniffs the extradata bytes), so an
-//  encoder that emitted AVCC directly would pass through unconverted.
-
-//  Walks the NAL units of an Annex B H.264 byte stream and re-emits them
-//  with 4-byte big-endian length prefixes. Returns false if no NAL unit is
-//  found.
+// Converts H.264 video data from Annex B format to AVCC format.
+// Returns false if no NAL unit is found.
+//
+// In H.264 video streaming, individual packets of video data are called NAL 
+// (Network Abstraction Layer) units. 
+// • Annex B (Input): Separates NAL units using a "Start Code" delimiter 
+// (usually 0x00 0x00 0x01 or 0x00 0x00 0x00 0x01).
+// • AVCC (Output): Prefixes each NAL unit with a fixed-size length field
+// (usually 4 bytes) specifying exactly how many bytes follow. This is
+// commonly used in file containers like MP4, MKV, and FLV because it allows
+// the player to quickly skip from one packet to the next without scanning the data.
+// 
+// The hardware encoders (e.g. h264_amf, qsv, videotoolbox) produce video in the Annex
+// B format, so they must be converted to avcc, which is what the muxer expects.
 bool h264_annexb_to_avcc(const uint8_t* in, size_t in_size, std::vector<uint8_t>& out){
     out.clear();
     const uint8_t* p = in;
     const uint8_t* end = in + in_size;
     bool found_any = false;
     while (p < end){
+        // find start of NAL unit. 
+        // Looks for 3-byte Annex B start code: 0x00 0x00 0x01
         const uint8_t* nal_start = nullptr;
         for (const uint8_t* q = p; q + 2 < end; q++){
             if (q[0] == 0 && q[1] == 0 && q[2] == 1){
@@ -286,6 +286,10 @@ bool h264_annexb_to_avcc(const uint8_t* in, size_t in_size, std::vector<uint8_t>
         if (nal_start == nullptr){
             break;    //  No start code left; stop at any trailing garbage.
         }
+        
+        // find end of NAL unit
+        // scan forward until  you find the next start code
+        // if don't find another start code, assume this is the final packet
         const uint8_t* nal_end = nal_start;
         for (const uint8_t* q = nal_start; q + 2 < end; q++){
             if (q[0] == 0 && q[1] == 0 && q[2] == 1){
