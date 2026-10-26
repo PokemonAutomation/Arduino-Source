@@ -22,8 +22,10 @@
 #include <algorithm>
 #include <cerrno>
 #include <cmath>
+#include <cstring>
 #include <functional>
 #include <memory>
+#include <random>
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -176,7 +178,6 @@ private:
 constexpr int64_t CHUNK_MS = 10;
 constexpr int64_t FRAME_INTERVAL_MS = 100;
 constexpr int AUDIO_RATE = 48000;
-constexpr size_t CHUNK_SAMPLES = (size_t)(AUDIO_RATE * CHUNK_MS / 1000);
 constexpr int FRAME_WIDTH = 320;
 constexpr int FRAME_HEIGHT = 180;
 
@@ -184,6 +185,15 @@ constexpr int FRAME_HEIGHT = 180;
 //  in a saved file. Covers the AAC frame granularity and the millisecond
 //  rounding of the MKV timestamps.
 constexpr double SYNC_TOLERANCE_S = 0.03;
+
+//  Largest allowed deviation of the spacing between consecutive audio
+//  packets from one AAC frame (1024 samples), when the audio timeline must
+//  be continuous (no re-sync). Covers the millisecond rounding of MKV.
+constexpr double AUDIO_SPACING_TOLERANCE_S = 0.0011;
+
+//  The tracker re-syncs the audio to the clock past this much drift
+//  (AUDIO_RESYNC_THRESHOLD_US in StreamHistoryTracker_Ring.cpp).
+constexpr double AUDIO_RESYNC_THRESHOLD_S = 0.1;
 
 //  Packets an encoder may still be holding when save() runs (the hardware
 //  encoders pipeline several frames); those are not in the file.
@@ -217,13 +227,27 @@ std::string output_path(const std::string& name){
 //  and a 10 ms chunk of 48 kHz stereo audio per step (stamped with the
 //  time of its last sample). From "onset_ms" on, the frames are white
 //  instead of black and the audio is a 1 kHz tone instead of silence.
+enum class FrameFormat{
+    RGB32,  //  Converted through QImage by the tracker.
+    NV12,   //  The common capture card format; scaled directly from its planes.
+};
+
 struct FeedOptions{
     bool video = true;
     bool audio = true;
+    FrameFormat frame_format = FrameFormat::RGB32;
     int64_t onset_ms = -1;
     //  No audio is delivered in [gap_begin_ms, gap_end_ms).
     int64_t gap_begin_ms = -1;
     int64_t gap_end_ms = -1;
+    //  From this time on, the frames are twice as large in each dimension.
+    int64_t resize_ms = -1;
+    //  Each audio chunk is delivered a random 0 - audio_jitter_ms after its
+    //  last sample is captured (chunks stay in order).
+    int64_t audio_jitter_ms = 0;
+    //  Samples the audio device produces per second of real time, relative
+    //  to 48 kHz (1.001 = a device clock running 0.1% fast).
+    double audio_clock_scale = 1.0;
     //  Wait for the encoder after each frame (otherwise frames just queue).
     bool wait_for_encoder = true;
 };
@@ -234,21 +258,16 @@ public:
         : m_tracker(tracker)
         , m_options(options)
         , m_start(current_time())
-        , m_black(FRAME_WIDTH, FRAME_HEIGHT, QImage::Format_RGB32)
-        , m_white(FRAME_WIDTH, FRAME_HEIGHT, QImage::Format_RGB32)
-        , m_audio(2 * CHUNK_SAMPLES)
-    {
-        m_black.fill(Qt::black);
-        m_white.fill(Qt::white);
-    }
+        , m_last_delivery(m_start)
+        , m_random(12345)
+    {}
 
     void run_until(int64_t end_ms){
         for (; m_time_ms < end_ms; m_time_ms += CHUNK_MS){
-            bool onset = m_options.onset_ms >= 0 && m_time_ms >= m_options.onset_ms;
             if (m_options.video && m_time_ms % FRAME_INTERVAL_MS == 0){
                 m_tracker.on_frame(std::make_shared<const VideoFrame>(
                     m_start + std::chrono::milliseconds(m_time_ms),
-                    QVideoFrame(onset ? m_white : m_black)
+                    make_frame()
                 ));
                 if (m_options.wait_for_encoder){
                     m_tracker.wait_until_idle();
@@ -262,31 +281,75 @@ public:
     }
 
 private:
+    bool onset() const{
+        return m_options.onset_ms >= 0 && m_time_ms >= m_options.onset_ms;
+    }
+
+    QVideoFrame make_frame() const{
+        bool large = m_options.resize_ms >= 0 && m_time_ms >= m_options.resize_ms;
+        int width = large ? 2 * FRAME_WIDTH : FRAME_WIDTH;
+        int height = large ? 2 * FRAME_HEIGHT : FRAME_HEIGHT;
+        if (m_options.frame_format == FrameFormat::RGB32){
+            QImage image(width, height, QImage::Format_RGB32);
+            image.fill(onset() ? Qt::white : Qt::black);
+            return QVideoFrame(image);
+        }
+
+        //  NV12: a full-resolution luma plane, then a half-resolution plane
+        //  of interleaved chroma. Limited-range black or white, no color.
+        QVideoFrame frame(QVideoFrameFormat(QSize(width, height), QVideoFrameFormat::Format_NV12));
+        if (!frame.map(QVideoFrame::WriteOnly)){
+            return QVideoFrame();
+        }
+        for (int y = 0; y < height; y++){
+            std::memset(frame.bits(0) + (ptrdiff_t)y * frame.bytesPerLine(0), onset() ? 235 : 16, (size_t)width);
+        }
+        for (int y = 0; y < height / 2; y++){
+            std::memset(frame.bits(1) + (ptrdiff_t)y * frame.bytesPerLine(1), 128, (size_t)width);
+        }
+        frame.unmap();
+        return frame;
+    }
+
+    //  The device's sample count at a point in real time.
+    int64_t device_samples(int64_t time_ms) const{
+        return std::llround((double)time_ms * AUDIO_RATE / 1000 * m_options.audio_clock_scale);
+    }
+
     void push_audio_chunk(){
-        int64_t first_sample = m_time_ms * AUDIO_RATE / 1000;
-        int64_t onset_sample = m_options.onset_ms * AUDIO_RATE / 1000;
-        for (size_t i = 0; i < CHUNK_SAMPLES; i++){
+        //  The samples the device captures during this step. With a drifting
+        //  device clock, that is a sample more or less than 480 now
+        //  and then.
+        int64_t first_sample = device_samples(m_time_ms);
+        size_t samples = (size_t)(device_samples(m_time_ms + CHUNK_MS) - first_sample);
+        int64_t onset_sample = device_samples(m_options.onset_ms);
+        m_audio.resize(2 * samples);
+        for (size_t i = 0; i < samples; i++){
             int64_t sample = first_sample + (int64_t)i;
             float value = 0;
             if (m_options.onset_ms >= 0 && sample >= onset_sample){
                 value = (float)(0.5 * std::sin(2 * 3.14159265358979 * 1000 * (double)sample / AUDIO_RATE));
             }
-            m_audio[i] = value;                    //  Left.
-            m_audio[CHUNK_SAMPLES + i] = value;    //  Right.
+            m_audio[i] = value;              //  Left.
+            m_audio[samples + i] = value;    //  Right.
         }
-        m_tracker.push_samples(
-            CHUNK_SAMPLES, CHUNK_SAMPLES, m_audio.data(),
-            m_start + std::chrono::milliseconds(m_time_ms + CHUNK_MS)
-        );
+
+        WallClock delivery = m_start + std::chrono::milliseconds(m_time_ms + CHUNK_MS);
+        if (m_options.audio_jitter_ms > 0){
+            std::uniform_int_distribution<int64_t> latency(0, m_options.audio_jitter_ms);
+            delivery += std::chrono::milliseconds(latency(m_random));
+        }
+        m_last_delivery = std::max(m_last_delivery, delivery);
+        m_tracker.push_samples(samples, samples, m_audio.data(), m_last_delivery);
     }
 
 private:
     StreamHistoryTracker_Ring& m_tracker;
     FeedOptions m_options;
     WallClock m_start;
+    WallClock m_last_delivery;
+    std::mt19937 m_random;
     int64_t m_time_ms = 0;
-    QImage m_black;
-    QImage m_white;
     std::vector<float> m_audio;
 };
 
@@ -306,6 +369,9 @@ struct ProbedFile{
     double video_onset_s = -1;      //  First decoded frame that is no longer black.
 
     bool audio_timestamps_increasing = true;
+    //  Largest deviation of the spacing between consecutive audio packets
+    //  from one AAC frame.
+    double audio_max_spacing_error_s = 0;
     size_t audio_frames = 0;
     double audio_onset_s = -1;      //  First decoded sample of the tone.
 };
@@ -481,6 +547,13 @@ std::string probe_file(const std::string& path, ProbedFile& file){
             if (ts <= last_audio_ts){
                 file.audio_timestamps_increasing = false;
             }
+            if (last_audio_ts != INT64_MIN){
+                double spacing_s = (double)(ts - last_audio_ts) * av_q2d(audio_time_base);
+                file.audio_max_spacing_error_s = std::max(
+                    file.audio_max_spacing_error_s,
+                    std::fabs(spacing_s - 1024. / AUDIO_RATE)
+                );
+            }
             last_audio_ts = ts;
             if (avcodec_send_packet(context.audio, &packet) < 0){
                 error = "Failed to decode an audio packet.";
@@ -569,17 +642,14 @@ std::string check_range(const char* what, double value, double low, double high)
 
 
 
-std::string test_save(Logger& logger, const std::string& filename, bool video, bool audio){
-    StreamHistoryTracker_Ring tracker(logger, std::chrono::seconds(30), audio, video);
-    FeedOptions options;
-    options.video = video;
-    options.audio = audio;
+std::string test_save(Logger& logger, const std::string& filename, FeedOptions options){
+    StreamHistoryTracker_Ring tracker(logger, std::chrono::seconds(30), options.audio, options.video);
     Feeder feeder(tracker, options);
     feeder.run_until(5000);
 
     ProbedFile file;
-    std::string error = save_and_probe(tracker, filename, video, audio, file);
-    if (!error.empty() || !video){
+    std::string error = save_and_probe(tracker, filename, options.video, options.audio, file);
+    if (!error.empty() || !options.video){
         return error;
     }
     //  Nothing is evicted: the file runs from the first frame (0 s) to the
@@ -614,18 +684,18 @@ std::string test_eviction(Logger& logger){
     );
 }
 
-std::string test_sync(Logger& logger, const std::string& filename, bool audio_gap){
+//  Records until "end_ms" with the onset at "options.onset_ms", then checks
+//  that the tone starts within "tolerance_s" of the first white frame. With
+//  "continuous_audio", also checks that the audio packets are evenly spaced
+//  (the tracker never re-synced the audio to the clock).
+std::string test_sync(
+    Logger& logger, const std::string& filename,
+    FeedOptions options, int64_t end_ms,
+    double tolerance_s, bool continuous_audio
+){
     StreamHistoryTracker_Ring tracker(logger, std::chrono::seconds(30), true, true);
-    FeedOptions options;
-    options.onset_ms = 3000;
-    if (audio_gap){
-        //  A second of audio never arrives (e.g. a device underrun). The audio
-        //  after the gap must still line up with the video.
-        options.gap_begin_ms = 1500;
-        options.gap_end_ms = 2500;
-    }
     Feeder feeder(tracker, options);
-    feeder.run_until(5000);
+    feeder.run_until(end_ms);
 
     ProbedFile file;
     std::string error = save_and_probe(tracker, filename, true, true, file);
@@ -638,11 +708,25 @@ std::string test_sync(Logger& logger, const std::string& filename, bool audio_ga
     if (file.audio_onset_s < 0){
         return "The tone is not in the audio.";
     }
-    return check_range(
+    error = check_range(
         "The audio onset minus the video onset",
         file.audio_onset_s - file.video_onset_s,
-        -SYNC_TOLERANCE_S, SYNC_TOLERANCE_S
+        -tolerance_s, tolerance_s
     );
+    if (error.empty() && continuous_audio){
+        error = check_range(
+            "The largest audio packet spacing error",
+            file.audio_max_spacing_error_s,
+            0, AUDIO_SPACING_TOLERANCE_S
+        );
+    }
+    return error;
+}
+
+FeedOptions sync_options(){
+    FeedOptions options;
+    options.onset_ms = 3000;
+    return options;
 }
 
 std::string test_nothing_recorded(Logger& logger){
@@ -835,14 +919,87 @@ void add_tests_StreamHistory(UnitTestDatabase& database){
 
 #if defined(PA_STREAM_HISTORY_FFMPEG)
     //  StreamHistoryTracker_Ring, end to end.
-    database.add<RingTest>("Save MP4", [](Logger& logger){ return test_save(logger, "Save.mp4", true, true); });
-    database.add<RingTest>("Save MKV", [](Logger& logger){ return test_save(logger, "Save.mkv", true, true); });
-    database.add<RingTest>("Save video only", [](Logger& logger){ return test_save(logger, "SaveVideoOnly.mp4", true, false); });
-    database.add<RingTest>("Save audio only", [](Logger& logger){ return test_save(logger, "SaveAudioOnly.mp4", false, true); });
+    database.add<RingTest>("Save MP4", [](Logger& logger){
+        return test_save(logger, "Save.mp4", FeedOptions());
+    });
+    database.add<RingTest>("Save MKV", [](Logger& logger){
+        return test_save(logger, "Save.mkv", FeedOptions());
+    });
+    database.add<RingTest>("Save MP4 from NV12 frames", [](Logger& logger){
+        FeedOptions options;
+        options.frame_format = FrameFormat::NV12;
+        return test_save(logger, "SaveNV12.mp4", options);
+    });
+    database.add<RingTest>("Save video only", [](Logger& logger){
+        FeedOptions options;
+        options.audio = false;
+        return test_save(logger, "SaveVideoOnly.mp4", options);
+    });
+    database.add<RingTest>("Save audio only", [](Logger& logger){
+        FeedOptions options;
+        options.video = false;
+        return test_save(logger, "SaveAudioOnly.mp4", options);
+    });
+    database.add<RingTest>("Resolution change while recording", [](Logger& logger){
+        //  The scaler is rebuilt for the new input size; the encoder keeps
+        //  its size.
+        FeedOptions options;
+        options.resize_ms = 2500;
+        return test_save(logger, "ResolutionChange.mp4", options);
+    });
+    database.add<RingTest>("Resolution change while recording, NV12", [](Logger& logger){
+        FeedOptions options;
+        options.frame_format = FrameFormat::NV12;
+        options.resize_ms = 2500;
+        return test_save(logger, "ResolutionChangeNV12.mp4", options);
+    });
     database.add<RingTest>("Eviction", [](Logger& logger){ return test_eviction(logger); });
-    database.add<RingTest>("Sync MP4", [](Logger& logger){ return test_sync(logger, "Sync.mp4", false); });
-    database.add<RingTest>("Sync MKV", [](Logger& logger){ return test_sync(logger, "Sync.mkv", false); });
-    database.add<RingTest>("Sync after an audio gap", [](Logger& logger){ return test_sync(logger, "SyncAudioGap.mp4", true); });
+    database.add<RingTest>("Sync MP4", [](Logger& logger){
+        return test_sync(logger, "Sync.mp4", sync_options(), 5000, SYNC_TOLERANCE_S, true);
+    });
+    database.add<RingTest>("Sync MKV", [](Logger& logger){
+        return test_sync(logger, "Sync.mkv", sync_options(), 5000, SYNC_TOLERANCE_S, true);
+    });
+    database.add<RingTest>("Sync MP4 from NV12 frames", [](Logger& logger){
+        FeedOptions options = sync_options();
+        options.frame_format = FrameFormat::NV12;
+        return test_sync(logger, "SyncNV12.mp4", options, 5000, SYNC_TOLERANCE_S, true);
+    });
+    database.add<RingTest>("Sync after an audio gap", [](Logger& logger){
+        //  A second of audio never arrives (e.g. a device underrun). The
+        //  audio after the gap must still line up with the video.
+        FeedOptions options = sync_options();
+        options.gap_begin_ms = 1500;
+        options.gap_end_ms = 2500;
+        return test_sync(logger, "SyncAudioGap.mp4", options, 5000, SYNC_TOLERANCE_S, false);
+    });
+    database.add<RingTest>("Sync with audio delivery jitter", [](Logger& logger){
+        //  Audio arriving 0 - 50 ms late must not trigger a re-sync. Audio is
+        //  stamped by arrival, so the first chunk's latency offsets it.
+        FeedOptions options = sync_options();
+        options.audio_jitter_ms = 50;
+        return test_sync(logger, "SyncJitter.mp4", options, 5000, SYNC_TOLERANCE_S + 0.05, true);
+    });
+    database.add<RingTest>("Sync with a fast audio clock", [](Logger& logger){
+        //  A device clock 0.1% fast drifts 100 ms in 100 s. By 190 s the
+        //  audio would be 190 ms off without the re-sync.
+        FeedOptions options;
+        options.onset_ms = 190000;
+        options.audio_clock_scale = 1.001;
+        return test_sync(
+            logger, "SyncFastClock.mp4", options, 200000,
+            AUDIO_RESYNC_THRESHOLD_S + SYNC_TOLERANCE_S, false
+        );
+    });
+    database.add<RingTest>("Sync with a slow audio clock", [](Logger& logger){
+        FeedOptions options;
+        options.onset_ms = 190000;
+        options.audio_clock_scale = 0.999;
+        return test_sync(
+            logger, "SyncSlowClock.mp4", options, 200000,
+            AUDIO_RESYNC_THRESHOLD_S + SYNC_TOLERANCE_S, false
+        );
+    });
     database.add<RingTest>("Nothing recorded", [](Logger& logger){ return test_nothing_recorded(logger); });
     database.add<RingTest>("Unwritable path", [](Logger& logger){ return test_unwritable_path(logger); });
     database.add<RingTest>("Shutdown with queued frames", [](Logger& logger){ return test_shutdown(logger); });
