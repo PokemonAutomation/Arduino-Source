@@ -52,7 +52,6 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
         std::move(doc_link),
         std::move(description),
         standing,
-        GameConsole::pick_color(controller_class),
         controller_class,
         feedback,
         allow_commands_while_running,

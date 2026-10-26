@@ -40,7 +40,6 @@ public:
         std::string doc_link,
         std::string description,
         PanelQualityStanding standing,
-        Color color,
         bool restore_defaults_button
     );
     virtual ~PanelDescriptor() = default;

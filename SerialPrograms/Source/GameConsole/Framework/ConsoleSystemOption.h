@@ -22,11 +22,6 @@ namespace PokemonAutomation{
 namespace GameConsole{
 
 
-Color pick_color(ProgramControllerClass color_class);
-
-
-
-
 class ConsoleSystemOption final{
     static const std::string JSON_CAMERA;
     static const std::string JSON_VIDEO;

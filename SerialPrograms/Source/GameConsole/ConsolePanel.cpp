@@ -19,7 +19,6 @@ ConsolePanelDescriptor::ConsolePanelDescriptor(
     std::string doc_link,
     std::string description,
     PanelQualityStanding standing,
-    Color color,
     bool restore_defaults_button,
     size_t num_controllers
 )
@@ -29,7 +28,6 @@ ConsolePanelDescriptor::ConsolePanelDescriptor(
         std::move(doc_link),
         std::move(description),
         standing,
-        color,
         restore_defaults_button
     )
     , m_num_controllers(num_controllers)

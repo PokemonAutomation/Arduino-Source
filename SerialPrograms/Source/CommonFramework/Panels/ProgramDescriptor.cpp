@@ -18,7 +18,6 @@ ProgramDescriptor::ProgramDescriptor(
     std::string doc_link,
     std::string description,
     PanelQualityStanding standing,
-    Color color,
     bool restore_defaults_button,
     std::vector<std::string> required_resources
 )
@@ -28,7 +27,6 @@ ProgramDescriptor::ProgramDescriptor(
         std::move(doc_link),
         std::move(description),
         standing,
-        color,
         restore_defaults_button
     )
     , m_required_resources(std::move(required_resources))

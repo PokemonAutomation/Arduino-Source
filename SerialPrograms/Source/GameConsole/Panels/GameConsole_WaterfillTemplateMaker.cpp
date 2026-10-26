@@ -28,7 +28,6 @@ WaterfillTemplateMaker_Descriptor::WaterfillTemplateMaker_Descriptor()
         "",
         "Helper to make waterfill templates.",
         PanelQualityStanding::DEVELOPER,
-        Color(),
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::ENABLE_COMMANDS

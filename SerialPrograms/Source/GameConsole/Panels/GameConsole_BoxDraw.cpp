@@ -23,7 +23,6 @@ BoxDraw_Descriptor::BoxDraw_Descriptor()
         "",
         "Test box coordinates for development.",
         PanelQualityStanding::OFFICIAL,
-        Color(),
         false
     )
 {}

@@ -24,7 +24,6 @@ public:
             "Programs/NintendoSwitch/SwitchViewer.html",
             "View multiple consoles simultaneously. Use this to figure out your camera/audio/controller mappings.",
             PanelQualityStanding::OFFICIAL,
-            Color(),
             1, 4, 2,
             false
         )

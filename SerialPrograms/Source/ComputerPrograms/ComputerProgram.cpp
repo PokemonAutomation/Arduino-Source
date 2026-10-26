@@ -23,7 +23,6 @@ ComputerProgramDescriptor::ComputerProgramDescriptor(
         std::move(doc_link),
         std::move(description),
         standing,
-        COLOR_DARKCYAN,
         true,
         {}
     )

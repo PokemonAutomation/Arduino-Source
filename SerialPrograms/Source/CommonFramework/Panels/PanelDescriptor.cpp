@@ -38,7 +38,6 @@ PanelDescriptor::PanelDescriptor(
     std::string doc_link,
     std::string description,
     PanelQualityStanding standing,
-    Color color,
     bool restore_defaults_button
 )
     : m_identifier(std::move(identifier))

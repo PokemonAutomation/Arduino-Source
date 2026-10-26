@@ -45,7 +45,6 @@ LabelImages_Descriptor::LabelImages_Descriptor()
         "Programs/ML/LabelImages.html",
         "Label " + Pokemon::STRING_POKEMON + " on images",
         PanelQualityStanding::DEVELOPER,
-        Color(),
         false
     )
 {}

@@ -18,7 +18,6 @@ OptionsPanelDescriptor::OptionsPanelDescriptor(
     std::string doc_link,
     std::string description,
     PanelQualityStanding standing,
-    Color color,
     bool restore_defaults_button
 )
     : PanelDescriptor(
@@ -27,7 +26,6 @@ OptionsPanelDescriptor::OptionsPanelDescriptor(
         std::move(doc_link),
         std::move(description),
         standing,
-        color,
         restore_defaults_button
     )
 {}
