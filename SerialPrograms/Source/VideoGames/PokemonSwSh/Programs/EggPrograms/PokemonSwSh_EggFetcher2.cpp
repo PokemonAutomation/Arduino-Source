@@ -26,7 +26,7 @@ EggFetcher2_Descriptor::EggFetcher2_Descriptor()
         STRING_POKEMON + " SwSh", "Egg Fetcher 2",
         "Programs/PokemonSwSh/EggFetcher2.html",
         "Fetch eggs without hatching them.",
-        PanelQualityStanding::OFFICIAL,
+        PanelQualityStanding::OFFICIAL_BELOW_STANDARDS,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

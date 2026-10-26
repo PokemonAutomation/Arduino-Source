@@ -37,7 +37,7 @@ EggFetcherMultiple_Descriptor::EggFetcherMultiple_Descriptor()
         STRING_POKEMON + " SwSh", "Egg Fetcher Multiple",
         "Programs/PokemonSwSh/EggFetcherMultiple.html",
         "Fetch eggs from multiple species without hatching them.",
-        PanelQualityStanding::OFFICIAL,
+        PanelQualityStanding::OFFICIAL_BELOW_STANDARDS,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

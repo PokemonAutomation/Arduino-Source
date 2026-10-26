@@ -122,9 +122,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_SingleSwitchProgram<StowOnSideFarmer>());
     ret.emplace_back(make_SingleSwitchProgram<DailyHighlightFarmer>());
     ret.emplace_back(make_SingleSwitchProgram<PokeJobsFarmer>());
-    if (STATIC_GLOBALS.DEVELOPER_MODE){
-        ret.emplace_back(make_SingleSwitchProgram<WattTraderFarmer>());
-    }
+    ret.emplace_back(make_SingleSwitchProgram<DailyHighlightRNG>());
+    ret.emplace_back(make_SingleSwitchProgram<WattTraderFarmer>());
 
     ret.emplace_back("---- Den Hunting ----");
     ret.emplace_back(make_SingleSwitchProgram<PurpleBeamFinder>());
@@ -181,8 +180,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_MultiSwitchProgram<MaxLairStrongBoss>());
     ret.emplace_back(make_MultiSwitchProgram<MaxLairBossFinder>());
 
-    ret.emplace_back("---- Public Betas ----");
-    ret.emplace_back(make_SingleSwitchProgram<DailyHighlightRNG>());
+//    ret.emplace_back("---- Public Betas ----");
 
 #if 1
     ret.emplace_back("---- Deprecated Programs ----");
