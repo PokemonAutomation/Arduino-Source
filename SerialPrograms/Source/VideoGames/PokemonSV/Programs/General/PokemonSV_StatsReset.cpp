@@ -38,6 +38,7 @@ StatsReset_Descriptor::StatsReset_Descriptor()
         STRING_POKEMON + " SV", "Stats Reset",
         "Programs/PokemonSV/StatsReset.html",
         "Repeatedly catch static encounters until you get the stats you want.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

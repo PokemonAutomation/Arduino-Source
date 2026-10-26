@@ -24,6 +24,7 @@ AmitySquarePickUpFarmer_Descriptor::AmitySquarePickUpFarmer_Descriptor()
         STRING_POKEMON + " BDSP", "Amity Square Pick Up Farmer",
         "Programs/PokemonBDSP/AmitySquarePickUpFarmer.html",
         "Automatically fetch berries and stickers from the walking pokemon in Amity Square.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

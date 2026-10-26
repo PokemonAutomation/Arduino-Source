@@ -21,6 +21,7 @@ FastCodeEntry_Descriptor::FastCodeEntry_Descriptor()
         STRING_POKEMON + " SwSh", "Fast Code Entry (FCE)",
         "Programs/PokemonSwSh/FastCodeEntry.html",
         "Force your way into raids by entering 8-digit codes in under 1 second.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

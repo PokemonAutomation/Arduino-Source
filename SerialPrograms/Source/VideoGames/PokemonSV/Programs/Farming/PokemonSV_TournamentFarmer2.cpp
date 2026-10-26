@@ -34,6 +34,7 @@ TournamentFarmer2_Descriptor::TournamentFarmer2_Descriptor()
         STRING_POKEMON + " SV", "Tournament Farmer 2",
         "Programs/PokemonSV/TournamentFarmer2.html",
         "Farm the Academy Ace Tournament for money and prizes. (version 2)",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

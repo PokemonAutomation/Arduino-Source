@@ -18,6 +18,7 @@ TurboButton_Descriptor::TurboButton_Descriptor()
         "Nintendo Switch", "Turbo Button",
         "Programs/NintendoSwitch/TurboButton.html",
         "Mash a controller button. (similar to turbo controller)",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

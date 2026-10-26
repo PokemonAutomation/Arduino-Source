@@ -29,6 +29,7 @@ ShinyHuntAutonomousStrongSpawn_Descriptor::ShinyHuntAutonomousStrongSpawn_Descri
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Strong Spawn",
         "Programs/PokemonSwSh/ShinyHuntAutonomous-StrongSpawn.html",
         "Automatically hunt for shiny strong spawns using video feedback.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

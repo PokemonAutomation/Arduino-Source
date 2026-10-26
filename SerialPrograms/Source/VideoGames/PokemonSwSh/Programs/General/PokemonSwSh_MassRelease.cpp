@@ -23,6 +23,7 @@ MassRelease_Descriptor::MassRelease_Descriptor()
         STRING_POKEMON + " SwSh", "Mass Release",
         "Programs/PokemonSwSh/MassRelease.html",
         "Mass release boxes of " + STRING_POKEMON + ".",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

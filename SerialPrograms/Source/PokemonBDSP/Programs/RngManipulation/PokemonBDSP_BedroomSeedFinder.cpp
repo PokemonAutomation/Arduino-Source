@@ -31,10 +31,10 @@ BedroomSeedFinder_Descriptor::BedroomSeedFinder_Descriptor()
         STRING_POKEMON + " BDSP", "Bedroom Seed Finder",
         "",
         "Recover the RNG seed by watching the player character's blinks in their bedroom.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::ENABLE_COMMANDS
     )
 {}
 

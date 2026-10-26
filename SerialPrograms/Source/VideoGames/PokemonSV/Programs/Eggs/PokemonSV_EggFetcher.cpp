@@ -29,6 +29,7 @@ EggFetcher_Descriptor::EggFetcher_Descriptor()
         STRING_POKEMON + " SV", "Egg Fetcher",
         "Programs/PokemonSV/EggFetcher.html",
         "Automatically fetch eggs from a picnic.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

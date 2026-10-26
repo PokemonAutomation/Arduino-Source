@@ -47,6 +47,7 @@ EggAutonomous_Descriptor::EggAutonomous_Descriptor()
         STRING_POKEMON + " SV", "Egg Autonomous",
         "Programs/PokemonSV/EggAutonomous.html",
         "Automatically get meal power, fetch eggs from a picnic and hatch them.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

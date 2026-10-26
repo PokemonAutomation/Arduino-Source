@@ -41,6 +41,7 @@ TeraRoller_Descriptor::TeraRoller_Descriptor()
         STRING_POKEMON + " SV", "Tera Roller",
         "Programs/PokemonSV/TeraRoller.html",
         "Roll Tera raids to find shiny " + STRING_POKEMON + ".",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

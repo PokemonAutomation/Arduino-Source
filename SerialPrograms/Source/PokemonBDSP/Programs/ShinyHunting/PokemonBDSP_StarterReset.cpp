@@ -33,6 +33,7 @@ StarterReset_Descriptor::StarterReset_Descriptor()
         STRING_POKEMON + " BDSP", "Starter Reset",
         "Programs/PokemonBDSP/StarterReset.html",
         "Shiny hunt your starter " + STRING_POKEMON + ".",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

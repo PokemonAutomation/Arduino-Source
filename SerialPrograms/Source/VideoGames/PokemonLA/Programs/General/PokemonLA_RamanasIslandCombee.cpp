@@ -39,6 +39,7 @@ RamanasCombeeFinder_Descriptor::RamanasCombeeFinder_Descriptor()
         STRING_POKEMON + " LA", "Ramanas Combee Finder",
         "Programs/PokemonLA/RamanasCombeeFinder.html",
         "Check Ramanas Island Tree until a Combee is found.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

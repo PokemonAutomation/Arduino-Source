@@ -31,6 +31,7 @@ SidHelper_Descriptor::SidHelper_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "SID Helper",
         "Programs/PokemonFRLG/SidHelper.html",
         "Hit a specific RNG advance when starting a new game and determine the corresponding SID.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

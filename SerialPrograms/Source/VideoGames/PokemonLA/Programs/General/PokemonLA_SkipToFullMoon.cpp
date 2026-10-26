@@ -29,6 +29,7 @@ SkipToFullMoon_Descriptor::SkipToFullMoon_Descriptor()
         STRING_POKEMON + " LA", "Skip to Full Moon",
         "Programs/PokemonLA/SkipToFullMoon.html",
         "Skip nights until full moon.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

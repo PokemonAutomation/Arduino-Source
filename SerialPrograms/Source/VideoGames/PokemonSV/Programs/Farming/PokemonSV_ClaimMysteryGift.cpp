@@ -47,6 +47,7 @@ ClaimMysteryGift_Descriptor::ClaimMysteryGift_Descriptor()
         STRING_POKEMON + " SV", "Claim Mystery Gift",
         "Programs/PokemonSV/ClaimMysteryGift.html",
         "Claim the Mystery Gift in SV.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

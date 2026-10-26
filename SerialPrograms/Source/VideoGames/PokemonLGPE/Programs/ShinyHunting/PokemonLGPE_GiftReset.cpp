@@ -29,6 +29,7 @@ GiftReset_Descriptor::GiftReset_Descriptor()
         Pokemon::STRING_POKEMON + " LGPE", "Gift Reset",
         "Programs/PokemonLGPE/GiftReset.html",
         "Shiny hunt gift Pokemon by resetting the game.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::SpecializedController,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

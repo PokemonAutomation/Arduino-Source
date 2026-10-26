@@ -27,6 +27,7 @@ SurpriseTrade_Descriptor::SurpriseTrade_Descriptor()
         STRING_POKEMON + " SwSh", "Surprise Trade",
         "Programs/PokemonSwSh/SurpriseTrade.html",
         "Surprise trade away boxes of " + STRING_POKEMON,
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

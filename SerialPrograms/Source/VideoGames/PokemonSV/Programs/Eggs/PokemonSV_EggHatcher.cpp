@@ -31,6 +31,7 @@ EggHatcher_Descriptor::EggHatcher_Descriptor()
         STRING_POKEMON + " SV", "Egg Hatcher",
         "Programs/PokemonSV/EggHatcher.html",
         "Automatically hatch eggs from boxes.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

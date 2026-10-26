@@ -25,6 +25,7 @@ MultiGameFossil_Descriptor::MultiGameFossil_Descriptor()
         STRING_POKEMON + " SwSh", "Multi-Game Fossil Revive",
         "Programs/PokemonSwSh/MultiGameFossil.html",
         "Revive fossils. Supports multiple saves so you can go afk for longer than 5 hours.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

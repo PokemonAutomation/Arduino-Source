@@ -47,6 +47,7 @@ ShinyHuntAreaZeroPlatform_Descriptor::ShinyHuntAreaZeroPlatform_Descriptor()
         STRING_POKEMON + " SV", "Shiny Hunt - Area Zero Platform",
         "Programs/PokemonSV/ShinyHunt-AreaZeroPlatform.html",
         "Shiny hunt the isolated platform at the bottom of Area Zero.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

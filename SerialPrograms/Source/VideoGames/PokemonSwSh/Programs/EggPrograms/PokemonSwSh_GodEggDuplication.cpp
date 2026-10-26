@@ -27,6 +27,7 @@ GodEggDuplication_Descriptor::GodEggDuplication_Descriptor()
         STRING_POKEMON + " SwSh", "God Egg Duplication",
         "Programs/PokemonSwSh/GodEggDuplication.html",
         "Mass duplicate " + STRING_POKEMON + " with the God Egg.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

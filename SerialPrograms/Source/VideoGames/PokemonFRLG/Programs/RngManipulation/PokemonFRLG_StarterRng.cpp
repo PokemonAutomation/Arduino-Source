@@ -37,6 +37,7 @@ StarterRng_Descriptor::StarterRng_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Starter RNG",
         "Programs/PokemonFRLG/StarterRng.html",
         "Automatically calibrate timings to hit a specific RNG target for FRLG starters.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

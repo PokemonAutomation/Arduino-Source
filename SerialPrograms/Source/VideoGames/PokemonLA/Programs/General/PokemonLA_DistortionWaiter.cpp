@@ -29,6 +29,7 @@ DistortionWaiter_Descriptor::DistortionWaiter_Descriptor()
         STRING_POKEMON + " LA", "Distortion Waiter",
         "Programs/PokemonLA/DistortionWaiter.html",
         "Wait for a distortion to appear.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

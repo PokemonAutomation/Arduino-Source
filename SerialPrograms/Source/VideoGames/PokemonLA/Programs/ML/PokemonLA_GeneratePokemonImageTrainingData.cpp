@@ -64,6 +64,7 @@ GeneratePokemonImageTrainingData_Descriptor::GeneratePokemonImageTrainingData_De
         STRING_POKEMON + " LA", "Generate " + STRING_POKEMON + " Image Training Data",
         "Programs/PokemonLA/GeneratePokemonImageTrainingData.html",
         "Generate training images of " + STRING_POKEMON + " for machine learning purposes.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

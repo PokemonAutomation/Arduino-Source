@@ -33,6 +33,7 @@ ShinyHunt_FlySpotReset_Descriptor::ShinyHunt_FlySpotReset_Descriptor()
         "Fly Spot Reset",
         "Programs/PokemonLZA/ShinyHunt-FlySpotReset.html",
         "Shiny hunt by repeatedly fast traveling to a location to reset nearby " + STRING_POKEMON + " spawns.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions, FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
     )

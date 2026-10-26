@@ -25,6 +25,7 @@ PostKillCatcher_Descriptor::PostKillCatcher_Descriptor()
         "Programs/PokemonLZA/PostKillCatcher.html",
         "Save the game immediately after knocking out a " + STRING_POKEMON + ". "
         "Then use this program to repeatedly try to catch it by throwing a ball and resetting.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

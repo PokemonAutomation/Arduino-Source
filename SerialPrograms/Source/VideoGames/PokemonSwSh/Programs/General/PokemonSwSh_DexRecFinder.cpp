@@ -36,6 +36,7 @@ DexRecFinder_Descriptor::DexRecFinder_Descriptor()
         STRING_POKEMON + " SwSh", "Dex Rec Finder",
         "Programs/PokemonSwSh/DexRecFinder.html",
         "Search for a " + STRING_POKEDEX + " recommendation by date-spamming.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

@@ -46,6 +46,7 @@ BoxSorterLivingDex_Descriptor::BoxSorterLivingDex_Descriptor()
         STRING_POKEMON + " Home", "Box Sorter Living Dex",
         "Programs/PokemonHome/BoxSorterLivingDex.html",
         "Arrange boxes of " + STRING_POKEMON + " into living dex order.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

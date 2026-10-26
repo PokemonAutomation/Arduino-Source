@@ -30,6 +30,7 @@ LegendaryRunAway_Descriptor::LegendaryRunAway_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Legendary Run Away",
         "Programs/PokemonFRLG/LegendaryRunAway.html",
         "Shiny hunt legendary Pokemon using the run away method.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

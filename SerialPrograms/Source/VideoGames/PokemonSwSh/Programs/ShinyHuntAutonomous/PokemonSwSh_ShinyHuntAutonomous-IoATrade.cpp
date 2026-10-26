@@ -31,6 +31,7 @@ ShinyHuntAutonomousIoATrade_Descriptor::ShinyHuntAutonomousIoATrade_Descriptor()
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - IoA Trade",
         "Programs/PokemonSwSh/ShinyHuntAutonomous-IoATrade.html",
         "Hunt for shiny Isle of Armor trade using video feedback.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

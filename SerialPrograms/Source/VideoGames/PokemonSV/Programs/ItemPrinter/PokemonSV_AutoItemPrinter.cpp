@@ -35,10 +35,10 @@ AutoItemPrinter_Descriptor::AutoItemPrinter_Descriptor()
         STRING_POKEMON + " SV", "Auto Item Printer",
         "Programs/PokemonSV/AutoItemPrinter.html",
         "Automate the Item Printer for rare items.",
+        PanelQualityStanding::DEPRECATED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PanelQualityStanding::DEPRECATED
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct AutoItemPrinter_Descriptor::Stats : public StatsTracker{

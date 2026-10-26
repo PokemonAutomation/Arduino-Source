@@ -48,6 +48,7 @@ ItemPrinterRNG_Descriptor::ItemPrinterRNG_Descriptor()
         Pokemon::STRING_POKEMON + " SV", "Item Printer RNG",
         "Programs/PokemonSV/ItemPrinterRNG.html",
         "Farm the Item Printer using RNG Manipulation.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

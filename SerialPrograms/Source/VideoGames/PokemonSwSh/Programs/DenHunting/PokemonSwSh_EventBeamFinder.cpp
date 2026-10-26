@@ -25,6 +25,7 @@ EventBeamFinder_Descriptor::EventBeamFinder_Descriptor()
         STRING_POKEMON + " SwSh", "Event Beam Finder",
         "Programs/PokemonSwSh/EventBeamFinder.html",
         "Drop wishing pieces until you find an event den.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

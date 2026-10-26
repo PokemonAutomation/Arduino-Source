@@ -32,6 +32,7 @@ GimmighoulRoamingFarmer_Descriptor::GimmighoulRoamingFarmer_Descriptor()
         STRING_POKEMON + " SV", "Gimmighoul Roaming Farmer",
         "Programs/PokemonSV/GimmighoulRoamingFarmer.html",
         "Farm roaming Gimmighoul for coins.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

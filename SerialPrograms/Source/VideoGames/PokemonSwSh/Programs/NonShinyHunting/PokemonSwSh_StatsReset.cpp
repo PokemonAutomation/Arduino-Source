@@ -31,6 +31,7 @@ StatsReset_Descriptor::StatsReset_Descriptor()
         STRING_POKEMON + " SwSh", "Stats Reset",
         "Programs/PokemonSwSh/StatsReset.html",
         "Repeatedly receive gift " + STRING_POKEMON + " until you get the stats you want.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

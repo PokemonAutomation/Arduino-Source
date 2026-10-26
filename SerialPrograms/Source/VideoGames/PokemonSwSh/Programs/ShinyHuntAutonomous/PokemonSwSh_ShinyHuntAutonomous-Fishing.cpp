@@ -31,6 +31,7 @@ ShinyHuntAutonomousFishing_Descriptor::ShinyHuntAutonomousFishing_Descriptor()
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Fishing",
         "Programs/PokemonSwSh/ShinyHuntAutonomous-Fishing.html",
         "Automatically hunt for shiny fishing " + STRING_POKEMON + " using video feedback.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

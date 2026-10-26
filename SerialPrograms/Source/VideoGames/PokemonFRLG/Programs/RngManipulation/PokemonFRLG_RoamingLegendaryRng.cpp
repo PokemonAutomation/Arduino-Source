@@ -34,6 +34,7 @@ RoamingLegendaryRng_Descriptor::RoamingLegendaryRng_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Roaming Legendary RNG",
         "Programs/PokemonFRLG/RoamingLegendaryRng.html",
         "Automatically calibrate timings to hit a specific RNG target for FRLG Roaming Legendary " + STRING_POKEMON,
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

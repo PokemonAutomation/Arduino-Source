@@ -32,6 +32,7 @@ AutoHostRolling_Descriptor::AutoHostRolling_Descriptor()
         STRING_POKEMON + " SwSh", "Auto-Host Rolling",
         "Programs/PokemonSwSh/AutoHost-Rolling.html",
         "Roll N days, host, SR and repeat. Also supports hard-locks and soft-locks.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

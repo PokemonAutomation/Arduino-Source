@@ -27,6 +27,7 @@ ClothingBuyer_Descriptor::ClothingBuyer_Descriptor()
         STRING_POKEMON + " SV", "Clothing Buyer",
         "Programs/PokemonSV/ClothingBuyer.html",
         "Buy all the clothing in a store.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

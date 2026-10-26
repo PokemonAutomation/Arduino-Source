@@ -29,6 +29,7 @@ ShinyHuntMew_Descriptor::ShinyHuntMew_Descriptor()
         Pokemon::STRING_POKEMON + " RSE", "Shiny Hunt - Mew",
         "Programs/PokemonRSE/ShinyHuntMew.html",
         "Use the Run Away method to shiny hunt Mew in Emerald.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

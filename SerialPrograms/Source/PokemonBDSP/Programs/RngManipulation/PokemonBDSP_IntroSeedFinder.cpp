@@ -46,10 +46,10 @@ IntroSeedFinder_Descriptor::IntroSeedFinder_Descriptor()
         "",
         "Recover the RNG seed from the intro cutscene by watching Munchlax blink, so that the "
         "secret ID can be worked out from the trainer card afterwards.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::ENABLE_COMMANDS
     )
 {}
 

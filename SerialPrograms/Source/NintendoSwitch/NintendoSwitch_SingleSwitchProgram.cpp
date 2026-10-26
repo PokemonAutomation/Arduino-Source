@@ -43,10 +43,10 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     std::string category, std::string display_name,
     std::string doc_link,
     std::string description,
+    PanelQualityStanding standing,
     ProgramControllerClass controller_class,
     FeedbackType feedback,
     AllowCommandsWhenRunning allow_commands_while_running,
-    PanelQualityStanding standing,
     std::vector<std::string> required_resources
 )
     : GameConsole::ConsoleProgramDescriptor(

@@ -28,6 +28,7 @@ ShinyHuntFishing_Descriptor::ShinyHuntFishing_Descriptor()
         STRING_POKEMON + " BDSP", "Shiny Hunt - Fishing",
         "Programs/PokemonBDSP/ShinyHunt-Fishing.html",
         "Shiny hunt fishing " + STRING_POKEMON + ".",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

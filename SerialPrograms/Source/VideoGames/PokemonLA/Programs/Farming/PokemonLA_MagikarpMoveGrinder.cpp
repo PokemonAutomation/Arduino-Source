@@ -32,6 +32,7 @@ MagikarpMoveGrinder_Descriptor::MagikarpMoveGrinder_Descriptor()
         STRING_POKEMON + " LA", "Magikarp Move Grinder",
         "Programs/PokemonLA/MagikarpMoveGrinder.html",
         "grind status moves with any style against a Magikarp to finish " + STRING_POKEDEX + " research tasks.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

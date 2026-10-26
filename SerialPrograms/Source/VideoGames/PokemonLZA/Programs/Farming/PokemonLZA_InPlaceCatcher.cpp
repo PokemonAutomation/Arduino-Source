@@ -39,6 +39,7 @@ InPlaceCatcher_Descriptor::InPlaceCatcher_Descriptor()
         "Stand in one spot and catch everything that spawns nearby. "
         "Useful for filling up your boxes for the purpose of running Floette "
         "stats reset or to mass transfer " + Pokemon::STRING_POKEMON + " between saves via Box Trade.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

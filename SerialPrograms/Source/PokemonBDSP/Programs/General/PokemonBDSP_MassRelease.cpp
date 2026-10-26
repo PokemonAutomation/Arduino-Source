@@ -25,6 +25,7 @@ MassRelease_Descriptor::MassRelease_Descriptor()
         STRING_POKEMON + " BDSP", "Mass Release",
         "Programs/PokemonBDSP/MassRelease.html",
         "Mass release boxes of " + STRING_POKEMON + ".",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

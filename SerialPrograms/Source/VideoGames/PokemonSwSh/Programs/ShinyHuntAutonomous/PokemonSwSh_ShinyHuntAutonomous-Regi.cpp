@@ -28,6 +28,7 @@ ShinyHuntAutonomousRegi_Descriptor::ShinyHuntAutonomousRegi_Descriptor()
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Regi",
         "Programs/PokemonSwSh/ShinyHuntAutonomous-Regi.html",
         "Automatically hunt for shiny Regi using video feedback.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

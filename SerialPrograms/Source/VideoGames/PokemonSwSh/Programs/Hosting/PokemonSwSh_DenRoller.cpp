@@ -31,6 +31,7 @@ DenRoller_Descriptor::DenRoller_Descriptor()
         STRING_POKEMON + " SwSh", "Den Roller",
         "Programs/PokemonSwSh/DenRoller.html",
         "Roll den to the N'th day, SR and repeat.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

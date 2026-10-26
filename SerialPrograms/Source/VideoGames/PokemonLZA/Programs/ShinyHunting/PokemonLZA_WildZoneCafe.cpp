@@ -35,6 +35,7 @@ ShinyHunt_WildZoneCafe_Descriptor::ShinyHunt_WildZoneCafe_Descriptor()
         "Wild Zone Cafe",
         "Programs/PokemonLZA/ShinyHunt-WildZoneCafe.html",
         "Shiny hunt by repeatedly entering Wild Zone cafe.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions, FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
