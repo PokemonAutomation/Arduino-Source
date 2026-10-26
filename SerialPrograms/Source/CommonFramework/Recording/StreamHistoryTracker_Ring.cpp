@@ -275,7 +275,8 @@ bool h264_annexb_to_avcc(const uint8_t* in, size_t in_size, std::vector<uint8_t>
     bool found_any = false;
     while (p < end){
         // find start of NAL unit. 
-        // Looks for 3-byte Annex B start code: 0x00 0x00 0x01
+        // Looks for 3-byte Annex B start code: 0x00 0x00 0x01.
+        // this will also find the 4-byte start code: 00 00 00 01
         const uint8_t* nal_start = nullptr;
         for (const uint8_t* q = p; q + 2 < end; q++){
             if (q[0] == 0 && q[1] == 0 && q[2] == 1){
@@ -286,7 +287,7 @@ bool h264_annexb_to_avcc(const uint8_t* in, size_t in_size, std::vector<uint8_t>
         if (nal_start == nullptr){
             break;    //  No start code left; stop at any trailing garbage.
         }
-        
+
         // find end of NAL unit
         // scan forward until  you find the next start code
         // if don't find another start code, assume this is the final packet
@@ -505,6 +506,8 @@ struct StreamHistoryTracker_Ring::Data{
             m_have_audio = false;
             return;
         }
+
+        // allocate an AAC encoder context
         m_actx = avcodec_alloc_context3(codec);
         if (m_actx == nullptr){
             m_logger.log("Stream history: Failed to allocate AAC encoder. Disabling audio.", COLOR_RED);
@@ -528,6 +531,8 @@ struct StreamHistoryTracker_Ring::Data{
         //  it the packets would be ADTS and mux_to_file() would fail to set up
         //  the audio stream.
         m_actx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+
+        // init AAC channel layout
         if (!init_channel_layout(m_actx->ch_layout, (int)m_audio_channels)){
             m_logger.log(
                 "Stream history: Failed to initialize the AAC channel layout ("
@@ -539,6 +544,8 @@ struct StreamHistoryTracker_Ring::Data{
             m_have_audio = false;
             return;
         }
+
+        // open the AAC encoder
         int open_err = avcodec_open2(m_actx, codec, nullptr);
         if (open_err < 0){
             m_logger.log(
