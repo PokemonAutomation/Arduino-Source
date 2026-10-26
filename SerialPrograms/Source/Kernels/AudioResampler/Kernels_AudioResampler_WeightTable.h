@@ -34,10 +34,6 @@ public:
         size_t tap_block
     );
 
-    size_t taps() const{
-        return m_taps;
-    }
-
     //  The sample rates the table was built for.
     size_t in_sample_rate() const{
         return m_in_sample_rate;
@@ -45,6 +41,10 @@ public:
 
     size_t out_sample_rate() const{
         return m_out_sample_rate;
+    }
+
+    size_t taps() const{
+        return m_taps;
     }
 
     //  The block sizes the table was built for. A table built for larger
