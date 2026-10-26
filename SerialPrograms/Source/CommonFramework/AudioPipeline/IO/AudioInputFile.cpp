@@ -134,6 +134,7 @@ AudioInputFile::AudioInputFile(
     const std::string& file, const QAudioFormat& format
 )
     : m_source(std::make_unique<AudioFileLoader>(nullptr, file, format))
+    , m_stream_format(get_sample_format(format))
     , m_sample_type(sample_format_of(format))
     , m_sample_rate(format.sampleRate())
     , m_channels(format.channelCount())
@@ -150,22 +151,12 @@ AudioInputFile::AudioInputFile(
 }
 AudioInputFile::~AudioInputFile(){}
 
-void AudioInputFile::add_listener(Kernels::AudioPipeline::RawAudioStreamListener& listener){
-    auto scope_check = m_sanitizer.check_scope();
-    if (listener.sample_type() != m_sample_type){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Sample type doesn't match.");
-    }
-    if (listener.sample_rate() != m_sample_rate){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Sample rate doesn't match.");
-    }
-    if (listener.channels() != m_channels){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Channel count doesn't match.");
-    }
-    m_listeners.add(listener);
-}
-void AudioInputFile::remove_listener(Kernels::AudioPipeline::RawAudioStreamListener& listener){
-    auto scope_check = m_sanitizer.check_scope();
-    m_listeners.remove(listener);
+bool AudioInputFile::listener_shape_matches(
+    const Kernels::AudioPipeline::RawAudioStreamListener& listener
+) const{
+    return listener.sample_type() == m_sample_type
+        && listener.sample_rate() == m_sample_rate
+        && listener.channels() == m_channels;
 }
 
 void AudioInputFile::on_buffer_ready(const char* data, size_t len){

@@ -2,66 +2,65 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *      AudioSource represents an audio input stream. Once constructed, it
- *  emits the raw frame-aligned stream to its RawAudioStreamListener
- *  children (root of the pipeline tree).
+ *      AudioSource represents a running audio input stream. Once
+ *  constructed, it emits the raw frame-aligned stream to its
+ *  RawAudioStreamListener children (root of the pipeline tree).
+ *
+ *      The concrete subclasses are AudioInputFile (a file, .wav / .mp3 /
+ *  ...) and AudioInputDevice (a capture device). They are constructed from
+ *  an AudioSourceDescriptor (the input's state) on the pair's event thread
+ *  and owned by the pair.
  *
  */
 
 #ifndef PokemonAutomation_AudioPipeline_AudioSource_H
 #define PokemonAutomation_AudioPipeline_AudioSource_H
 
-#include <memory>
+#include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "CommonFramework/AudioPipeline/AudioInfo.h"
+#include "Kernels/AudioPipeline/Kernels_AudioPipeline.h"
 
 namespace PokemonAutomation{
-
-class Logger;
-class AudioInputFile;
-class AudioInputDevice;
-
-namespace Kernels{namespace AudioPipeline{class RawAudioStreamListener;}}
 
 
 class AudioSource{
 public:
-    //  Raw stream (pre-conversion) access. The raw stream is the source's
+    virtual ~AudioSource() = default;
+
+    //  Raw stream (pre-conversion) shape. The raw stream is the source's
     //  native frame-aligned output, before the pipeline tree applies any
     //  conversion (resample / mix / sample-type / volume).
-    AudioSampleFormat raw_sample_format() const{ return m_stream_format; }
-    size_t raw_sample_rate() const;
-    size_t raw_channels() const;
-    void add_raw_listener(Kernels::AudioPipeline::RawAudioStreamListener& listener);
-    void remove_raw_listener(Kernels::AudioPipeline::RawAudioStreamListener& listener);
+    virtual AudioSampleFormat raw_sample_format() const = 0;
+    virtual size_t raw_sample_rate() const = 0;
+    virtual size_t raw_channels() const = 0;
 
-public:
-    ~AudioSource();
+    //  Raw stream access. The listener's nominal shape (sample type, rate,
+    //  channel count) must match the raw stream's shape.
+    virtual void add_raw_listener(Kernels::AudioPipeline::RawAudioStreamListener& listener){
+        auto scope_check = m_sanitizer.check_scope();
+        if (!listener_shape_matches(listener)){
+            throw InternalProgramError(
+                nullptr, PA_CURRENT_FUNCTION,
+                "Listener shape doesn't match the raw stream's shape."
+            );
+        }
+        m_listeners.add(listener);
+    }
+    virtual void remove_raw_listener(Kernels::AudioPipeline::RawAudioStreamListener& listener){
+        auto scope_check = m_sanitizer.check_scope();
+        m_listeners.remove(listener);
+    }
 
-    //  Read from an audio file. (i.e. .wav or .mp3) The stream is the
-    //  file's native format (rate, channels, sample type); the tree's
-    //  decoder / resampler / mixer convert it to the sink's format.
-    AudioSource(
-        Logger& logger,
-        const std::string& file
-    );
+protected:
+    AudioSource() = default;
 
-    //  Read from an audio input device. (i.e. capture card) The device is
-    //  opened in the choice's physical format; the raw stream is the
-    //  choice's logical format (the 96 kHz reinterpretation for
-    //  misreporting capture cards, when the choice carries it).
-    AudioSource(
-        Logger& logger,
-        const AudioDeviceInfo& device,
-        const AudioInputChoice& choice
-    );
+    //  Does the listener's nominal shape (sample type, rate, channel
+    //  count) match this source's raw stream shape?
+    virtual bool listener_shape_matches(const Kernels::AudioPipeline::RawAudioStreamListener& listener) const = 0;
 
-private:
-    AudioSampleFormat m_stream_format;
-
-    std::unique_ptr<AudioInputFile> m_input_file;
-    std::unique_ptr<AudioInputDevice> m_input_device;
-
+    ListenerSet<Kernels::AudioPipeline::RawAudioStreamListener> m_listeners;
     LifetimeSanitizer m_sanitizer;
 };
 

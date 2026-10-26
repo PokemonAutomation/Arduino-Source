@@ -12,11 +12,10 @@ using NativeAudioSource = QAudioSource;
 
 #include <memory>
 #include <QIODevice>
-#include "Common/Cpp/ListenerSet.h"
-#include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/StreamConverters.h"
 #include "Kernels/AudioPipeline/Kernels_AudioPipeline.h"
 #include "CommonFramework/AudioPipeline/AudioInfo.h"
+#include "AudioSource.h"
 
 class QAudioFormat;
 
@@ -49,6 +48,7 @@ class AudioInputDevice final
     : public QIODevice
     , private MisalignedStreamConverter
     , private ObjectStreamListener
+    , public AudioSource
 {
 public:
     ~AudioInputDevice();
@@ -59,19 +59,16 @@ public:
         bool reinterpret_96k_mono_as_stereo
     );
 
-    Kernels::AudioPipeline::SampleFormat sample_type() const{
-        return m_sample_type;
+    virtual AudioSampleFormat raw_sample_format() const override{
+        return m_stream_format;
     }
     //  The raw listener output shape (the 96 kHz reinterpretation applied).
-    size_t sample_rate() const{
+    virtual size_t raw_sample_rate() const override{
         return m_out_sample_rate;
     }
-    size_t channels() const{
+    virtual size_t raw_channels() const override{
         return m_out_channels;
     }
-
-    void add_listener(Kernels::AudioPipeline::RawAudioStreamListener& listener);
-    void remove_listener(Kernels::AudioPipeline::RawAudioStreamListener& listener);
 
 
     virtual bool isSequential() const override { return true; }
@@ -87,7 +84,11 @@ protected:
 
 
 private:
+    virtual bool listener_shape_matches(const Kernels::AudioPipeline::RawAudioStreamListener& listener) const override;
+
+private:
     std::unique_ptr<NativeAudioSource> m_source;
+    AudioSampleFormat m_stream_format;
     Kernels::AudioPipeline::SampleFormat m_sample_type;
     size_t m_sample_rate;
     size_t m_channels;
@@ -95,8 +96,6 @@ private:
     size_t m_out_sample_rate;
     size_t m_out_channels;
     size_t m_out_frame_bytes;
-    ListenerSet<Kernels::AudioPipeline::RawAudioStreamListener> m_listeners;
-    LifetimeSanitizer m_sanitizer;
 };
 
 }

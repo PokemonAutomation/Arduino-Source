@@ -90,7 +90,7 @@ private:
     virtual void on_fft(size_t sample_rate, std::shared_ptr<const AlignedVector<float>> fft_output) override;
     virtual void on_watchdog_timeout() override;
 
-    bool sanitize_choice();
+    bool sanitize_input_source();
 
     void signal_pre_input_change();
     void signal_post_input_change();

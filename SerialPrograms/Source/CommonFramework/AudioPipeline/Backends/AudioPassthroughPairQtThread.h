@@ -32,17 +32,12 @@ public:
     ~AudioPassthroughPairQtThread();
 
     virtual void reset(
-        const std::string& file,
-        const AudioDeviceInfo& output, double output_volume
-    ) override;
-    virtual void reset(
-        const AudioDeviceInfo& input, const AudioInputChoice& choice,
+        const std::shared_ptr<const AudioSourceDescriptor>& input,
         const AudioDeviceInfo& output, double output_volume
     ) override;
 
     virtual void clear_audio_source() override;
-    virtual void set_audio_source(const std::string& file) override;
-    virtual void set_audio_source(const AudioDeviceInfo& device, const AudioInputChoice& choice) override;
+    virtual void set_audio_source(const std::shared_ptr<const AudioSourceDescriptor>& input) override;
 
     virtual void clear_audio_sink() override;
     virtual void set_audio_sink(const AudioDeviceInfo& device, double volume) override;

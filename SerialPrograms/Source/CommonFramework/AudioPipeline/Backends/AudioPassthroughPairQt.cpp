@@ -8,11 +8,15 @@
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "CommonFramework/AudioPipeline/ChannelMixer.h"
 #include "CommonFramework/AudioPipeline/IO/AudioSource.h"
+#include "CommonFramework/AudioPipeline/IO/AudioSourceDescriptor.h"
+#include "CommonFramework/AudioPipeline/IO/AudioInputFile.h"
+#include "CommonFramework/AudioPipeline/IO/AudioInputDevice.h"
 #include "CommonFramework/AudioPipeline/IO/AudioOutputDevice.h"
 #include "CommonFramework/AudioPipeline/Spectrum/FFTStreamer.h"
 #include "Kernels/AudioPipeline/Kernels_RawAudio2WorkingAudio.h"
@@ -61,6 +65,62 @@ QAudioFormat channel_format(size_t channels){
         );
     }
     return format;
+}
+
+
+//  Builds the running audio source from its descriptor. Runs on the event
+//  thread: the file probe drives a nested event loop, and the source's Qt
+//  objects have to live on this thread.
+std::unique_ptr<AudioSource> make_audio_source(
+    Logger& logger, const AudioSourceDescriptor& descriptor
+){
+    if (const std::string* path = descriptor.file_path(); path && !path->empty()){
+        QAudioFormat native_format;
+        if (has_extension(*path, "wav") && probe_wav_native_format(*path, native_format)){
+            //  Native WAV: the stream is the file's own format (rate, channels,
+            //  sample type). The tree's decoder / resampler / mixer convert it
+            //  to the sink's format; no 96k reinterpretation for files.
+        }else{
+            //  Compressed formats: probe the decoder's native output format
+            //  and stream the file at its own rate / channels / sample type,
+            //  like the native WAV path (the tree's decoder / resampler /
+            //  mixer convert it to the sink's format). If the probe fails
+            //  (no decode backend, unreadable file), fall back to the legacy
+            //  48k stereo float target; the loader logs the decode failure as
+            //  before. An unreadable .wav falls through here too.
+            if (!probe_decoded_native_format(*path, native_format)){
+                //  The channel count must be set before the channel config:
+                //  QAudioFormat::setChannelCount() resets the config.
+                native_format.setChannelCount(2);
+                native_format.setChannelConfig(QAudioFormat::ChannelConfig::ChannelConfigStereo);
+                native_format.setSampleRate(48000);
+                set_sample_format_to_float(native_format);
+            }
+        }
+        return std::make_unique<AudioInputFile>(logger, *path, native_format);
+    }
+    const AudioDeviceInfo* device = descriptor.input_device();
+    const AudioInputChoice* choice = descriptor.input_choice();
+    if (device && choice && *choice){
+        NativeAudioInfo native_info = device->native_info();
+
+        //  The device is opened in the choice's physical format: for the
+        //  reinterpreted capture-card choices this is the physical 1ch x
+        //  96000 stream; for native choices it is the choice itself.
+        QAudioFormat native_format = choice->physical_format().native_format();
+        if (choice->format().sample_format() == AudioSampleFormat::INVALID){
+            //  Defensive: the choices built from input_choices() always carry
+            //  a sample format the device supports.
+            set_sample_format_to_float(native_format);
+        }
+        return std::make_unique<AudioInputDevice>(
+            logger,
+            native_info,
+            native_format,
+            choice->is_reinterpreted()
+        );
+    }
+    return nullptr;
 }
 
 
@@ -413,65 +473,29 @@ AudioPassthroughPairQt::AudioPassthroughPairQt(Logger& logger)
 {}
 
 void AudioPassthroughPairQt::reset(
-    const std::string& file,
+    const std::shared_ptr<const AudioSourceDescriptor>& input,
     const AudioDeviceInfo& output, double output_volume
 ){
     auto scope_check = m_sanitizer.check_scope();
-    QMetaObject::invokeMethod(this, [this, file, output, output_volume]{
+//    cout << "AudioPassthroughPairQt::reset(): " << output.display_name() << endl;
+    QMetaObject::invokeMethod(this, [this, input, output, output_volume]{
         auto scope_check = m_sanitizer.check_scope();
-        std::unique_ptr<AudioSource> source;
-        if (!file.empty()){
-            source.reset(new AudioSource(
-                m_logger,
-                file
-            ));
-        }
+        std::unique_ptr<AudioSource> source =
+            input ? make_audio_source(m_logger, *input) : nullptr;
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_reader){
             teardown_tree();
             m_sink_device.reset();
             m_reader.reset();
         }
-        m_input_choice = AudioInputChoice();
+        const AudioInputChoice* choice = input ? input->input_choice() : nullptr;
+        m_input_choice = choice ? *choice : AudioInputChoice();
         if (source){
             m_reader = std::move(source);
             m_output_device = output;
             m_output_volume = output_volume;
             init_audio_sink();
-            build_tree(m_file_input_multiplier);
-            m_fft_listener.reset(new InternalFFTListener(*this));
-        }
-    });
-}
-void AudioPassthroughPairQt::reset(
-    const AudioDeviceInfo& input, const AudioInputChoice& choice,
-    const AudioDeviceInfo& output, double output_volume
-){
-    auto scope_check = m_sanitizer.check_scope();
-//    cout << "AudioPassthroughPairQt::reset(): " << output.display_name() << endl;
-    QMetaObject::invokeMethod(this, [this, choice, output, output_volume, input]{
-        auto scope_check = m_sanitizer.check_scope();
-        std::unique_ptr<AudioSource> source;
-        if (input && choice){
-            source.reset(new AudioSource(
-                m_logger,
-                input,
-                choice
-            ));
-        }
-        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-        if (m_reader){
-            teardown_tree();
-            m_sink_device.reset();
-            m_reader.reset();
-        }
-        m_input_choice = choice;
-        m_output_device = output;
-        m_output_volume = output_volume;
-        if (source){
-            m_reader = std::move(source);
-            init_audio_sink();
-            build_tree(m_device_input_multiplier);
+            build_tree(input->file_path() ? m_file_input_multiplier : m_device_input_multiplier);
             m_fft_listener.reset(new InternalFFTListener(*this));
         }
     });
@@ -488,60 +512,30 @@ void AudioPassthroughPairQt::clear_audio_source(){
         }
     });
 }
-void AudioPassthroughPairQt::set_audio_source(const std::string& file){
+void AudioPassthroughPairQt::set_audio_source(
+    const std::shared_ptr<const AudioSourceDescriptor>& input
+){
     auto scope_check = m_sanitizer.check_scope();
-    QMetaObject::invokeMethod(this, [this, file]{
+    QMetaObject::invokeMethod(this, [this, input]{
         auto scope_check = m_sanitizer.check_scope();
-        std::unique_ptr<AudioSource> source;
-        if (!file.empty()){
-            source.reset(new AudioSource(
-                m_logger,
-                file
-            ));
-        }
+        std::unique_ptr<AudioSource> source =
+            input ? make_audio_source(m_logger, *input) : nullptr;
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_reader){
             teardown_tree();
             m_sink_device.reset();
             m_reader.reset();
         }
-        m_input_choice = AudioInputChoice();
+        const AudioInputChoice* choice = input ? input->input_choice() : nullptr;
+        m_input_choice = choice ? *choice : AudioInputChoice();
         if (source){
             m_reader = std::move(source);
             init_audio_sink();
-            build_tree(m_file_input_multiplier);
+            build_tree(input->file_path() ? m_file_input_multiplier : m_device_input_multiplier);
             m_fft_listener.reset(new InternalFFTListener(*this));
         }
     });
 }
-void AudioPassthroughPairQt::set_audio_source(const AudioDeviceInfo& device, const AudioInputChoice& choice){
-    auto scope_check = m_sanitizer.check_scope();
-    QMetaObject::invokeMethod(this, [this, choice, device]{
-        auto scope_check = m_sanitizer.check_scope();
-        std::unique_ptr<AudioSource> source;
-        if (device && choice){
-            source.reset(new AudioSource(
-                m_logger,
-                device,
-                choice
-            ));
-        }
-        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-        if (m_reader){
-            teardown_tree();
-            m_sink_device.reset();
-            m_reader.reset();
-        }
-        m_input_choice = choice;
-        if (source){
-            m_reader = std::move(source);
-            init_audio_sink();
-            build_tree(m_device_input_multiplier);
-            m_fft_listener.reset(new InternalFFTListener(*this));
-        }
-    });
-}
-
 void AudioPassthroughPairQt::clear_audio_sink(){
     auto scope_check = m_sanitizer.check_scope();
     QMetaObject::invokeMethod(this, [this]{

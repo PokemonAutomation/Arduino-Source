@@ -70,6 +70,7 @@ AudioInputDevice::AudioInputDevice(
         RAW_BUFFER_CAPACITY
       )
     , ObjectStreamListener(raw_output_frame_bytes(format, reinterpret_96k_mono_as_stereo))
+    , m_stream_format(get_sample_format(format))
     , m_sample_type(sample_format_of(format))
     , m_sample_rate(format.sampleRate())
     , m_channels(format.channelCount())
@@ -102,22 +103,12 @@ AudioInputDevice::~AudioInputDevice(){
     }
 }
 
-void AudioInputDevice::add_listener(Kernels::AudioPipeline::RawAudioStreamListener& listener){
-    auto scope_check = m_sanitizer.check_scope();
-    if (listener.sample_type() != m_sample_type){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Sample type doesn't match.");
-    }
-    if (listener.sample_rate() != m_out_sample_rate){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Sample rate doesn't match.");
-    }
-    if (listener.channels() != m_out_channels){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Channel count doesn't match.");
-    }
-    m_listeners.add(listener);
-}
-void AudioInputDevice::remove_listener(Kernels::AudioPipeline::RawAudioStreamListener& listener){
-    auto scope_check = m_sanitizer.check_scope();
-    m_listeners.remove(listener);
+bool AudioInputDevice::listener_shape_matches(
+    const Kernels::AudioPipeline::RawAudioStreamListener& listener
+) const{
+    return listener.sample_type() == m_sample_type
+        && listener.sample_rate() == m_out_sample_rate
+        && listener.channels() == m_out_channels;
 }
 
 qint64 AudioInputDevice::writeData(const char* data, qint64 len){
@@ -131,7 +122,7 @@ void AudioInputDevice::convert(void* out, const void* in, size_t count){
 }
 
 void AudioInputDevice::on_objects(const void* data, size_t objects){
-    m_listeners.run_method(
+    AudioSource::m_listeners.run_method(
         &Kernels::AudioPipeline::RawAudioStreamListener::push_samples,
         objects, data
     );

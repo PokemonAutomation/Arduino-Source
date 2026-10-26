@@ -28,6 +28,25 @@ AudioOption::AudioDisplayType AudioOption::stringToAudioDisplayType(const std::s
     return AudioDisplayType::NO_DISPLAY;
 }
 
+std::string AudioOption::input_file() const{
+    if (const std::string* path = m_input_source ? m_input_source->file_path() : nullptr){
+        return *path;
+    }
+    return "";
+}
+AudioDeviceInfo AudioOption::input_device() const{
+    if (const AudioDeviceInfo* device = m_input_source ? m_input_source->input_device() : nullptr){
+        return *device;
+    }
+    return AudioDeviceInfo();
+}
+AudioInputChoice AudioOption::input_choice() const{
+    if (const AudioInputChoice* choice = m_input_source ? m_input_source->input_choice() : nullptr){
+        return *choice;
+    }
+    return AudioInputChoice();
+}
+
 std::string AudioOption::audioDisplayTypeToString(AudioOption::AudioDisplayType type){
     switch(type){
     case AudioDisplayType::FREQ_BARS:
@@ -47,23 +66,31 @@ void AudioOption::load_json(const JsonValue& json){
     if (obj == nullptr){
         return;
     }
+    m_input_source.reset();
     const std::string* str;
     str = obj->get_string(JSON_INPUT_FILE);
-    if (str != nullptr){
-        m_input_file = *str;
-    }
-    if (m_input_file.empty()){
-        str = obj->get_string(JSON_INPUT_DEVICE);
-        if (str != nullptr){
-            m_input_device = AudioDeviceInfo(*str);
-        }
-    }
-    str = obj->get_string(JSON_INPUT_FORMAT);
     if (str != nullptr && !str->empty()){
-        for (const AudioInputChoice& choice : m_input_device.supported_choices()){
-            if (choice.display_name() == *str){
-                m_input_choice = choice;
-                break;
+        m_input_source = std::make_shared<AudioSourceDescriptor_File>(*str);
+    }else{
+        str = obj->get_string(JSON_INPUT_DEVICE);
+        if (str != nullptr && !str->empty()){
+            AudioDeviceInfo device(*str);
+            const std::string* format_str = obj->get_string(JSON_INPUT_FORMAT);
+            if (format_str != nullptr && !format_str->empty()){
+                for (const AudioInputChoice& choice : device.supported_choices()){
+                    if (choice.display_name() == *format_str){
+                        m_input_source = std::make_shared<AudioSourceDescriptor_Device>(device, choice);
+                        break;
+                    }
+                }
+            }
+            if (!m_input_source){
+                //  Missing / unknown input format: remember the device with
+                //  an invalid choice; AudioSession::load() resolves it to the
+                //  preferred choice.
+                m_input_source = std::make_shared<AudioSourceDescriptor_Device>(
+                    device, AudioInputChoice()
+                );
             }
         }
     }
@@ -85,9 +112,9 @@ void AudioOption::load_json(const JsonValue& json){
 
 JsonValue AudioOption::to_json() const{
     JsonObject root;
-    root[JSON_INPUT_FILE] = m_input_file;
-    root[JSON_INPUT_DEVICE] = m_input_device.device_name();
-    root[JSON_INPUT_FORMAT] = m_input_choice.display_name();
+    root[JSON_INPUT_FILE] = input_file();
+    root[JSON_INPUT_DEVICE] = input_device().device_name();
+    root[JSON_INPUT_FORMAT] = input_choice().display_name();
     root[JSON_OUTPUT_DEVICE] = m_output_device.device_name();
     root[JSON_AUDIO_VIS] = audioDisplayTypeToString(m_display_type);
     root[JSON_AUDIO_VOLUME] = m_volume;

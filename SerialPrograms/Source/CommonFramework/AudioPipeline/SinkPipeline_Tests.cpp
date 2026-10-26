@@ -638,7 +638,7 @@ public:
         );
         //  Must complete: the probe runs before the lock is taken, so the
         //  queued sink event above can run through while it decodes.
-        pair.set_audio_source(fixture);
+        pair.set_audio_source(std::make_shared<AudioSourceDescriptor_File>(fixture));
         QCoreApplication::processEvents(QEventLoop::AllEvents, 500);
 
         finished.store(true, std::memory_order_relaxed);

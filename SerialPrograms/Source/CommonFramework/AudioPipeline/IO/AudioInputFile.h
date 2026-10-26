@@ -10,9 +10,8 @@
 #include <memory>
 #include <string>
 #include <QObject>
-#include "Common/Cpp/ListenerSet.h"
-#include "Common/Cpp/LifetimeSanitizer.h"
 #include "Kernels/AudioPipeline/Kernels_AudioPipeline.h"
+#include "AudioSource.h"
 
 class QAudioFormat;
 
@@ -44,7 +43,13 @@ bool probe_decoded_native_format(const std::string& filename, QAudioFormat& out_
 //  frame size, so the raw output is frame-aligned by construction and is
 //  passed to the listeners as-is.
 //
-class AudioInputFile final : public QObject{
+//  Must be constructed and destroyed on the Qt event thread (the loader's
+//  QObjects live on it).
+//
+class AudioInputFile final
+    : public QObject
+    , public AudioSource
+{
 public:
     ~AudioInputFile();
 
@@ -53,32 +58,29 @@ public:
         const std::string& file, const QAudioFormat& format
     );
 
-    Kernels::AudioPipeline::SampleFormat sample_type() const{
-        return m_sample_type;
+    virtual AudioSampleFormat raw_sample_format() const override{
+        return m_stream_format;
     }
-    size_t sample_rate() const{
+    virtual size_t raw_sample_rate() const override{
         return m_sample_rate;
     }
-    size_t channels() const{
+    virtual size_t raw_channels() const override{
         return m_channels;
     }
 
-    void add_listener(Kernels::AudioPipeline::RawAudioStreamListener& listener);
-    void remove_listener(Kernels::AudioPipeline::RawAudioStreamListener& listener);
-
-
 private:
+    virtual bool listener_shape_matches(const Kernels::AudioPipeline::RawAudioStreamListener& listener) const override;
+
     void on_buffer_ready(const char* data, size_t len);
 
 
 private:
     std::unique_ptr<AudioFileLoader> m_source;
+    AudioSampleFormat m_stream_format;
     Kernels::AudioPipeline::SampleFormat m_sample_type;
     size_t m_sample_rate;
     size_t m_channels;
     size_t m_frame_bytes;
-    ListenerSet<Kernels::AudioPipeline::RawAudioStreamListener> m_listeners;
-    LifetimeSanitizer m_sanitizer;
 };
 
 }
