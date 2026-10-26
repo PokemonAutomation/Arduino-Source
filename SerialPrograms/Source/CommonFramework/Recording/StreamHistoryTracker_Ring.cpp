@@ -1287,10 +1287,21 @@ struct StreamHistoryTracker_Ring::Data{
                 //  Annex B instead, and the MP4 muxer of the vendored ffmpeg
                 //  crashes on that form, so convert the extradata here and
                 //  the ring packets below.
-                video_annexb = (std::string(muxer) == "mp4"
-                    && vpar->extradata_size >= 4
-                    && vpar->extradata[0] == 0 && vpar->extradata[1] == 0
-                    && vpar->extradata[2] == 0 && vpar->extradata[3] == 1);
+                //  Annex B starts with a 4-byte (00 00 00 01) or 3-byte
+                //  (00 00 01) start code; AVCC starts with 01 (the avcC
+                //  configurationVersion). Only H.264 is converted: MPEG-4
+                //  Part 2 extradata also starts with a 00 00 01 start code.
+                const uint8_t* extradata = vpar->extradata;
+                int extradata_size = vpar->extradata_size;
+                video_annexb = std::string(muxer) == "mp4"
+                    && vpar->codec_id == AV_CODEC_ID_H264 && (
+                    (extradata_size >= 4
+                        && extradata[0] == 0 && extradata[1] == 0
+                        && extradata[2] == 0 && extradata[3] == 1)
+                    || (extradata_size >= 3
+                        && extradata[0] == 0 && extradata[1] == 0
+                        && extradata[2] == 1)
+                );
                 if (video_annexb){
                     std::vector<uint8_t> avcc;
                     if (!h264_avcc_from_annexb_extradata(
