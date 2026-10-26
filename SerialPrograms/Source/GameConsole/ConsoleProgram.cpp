@@ -52,7 +52,6 @@ ConsoleProgramDescriptor::ConsoleProgramDescriptor(
     std::string doc_link,
     std::string description,
     PanelQualityStanding standing,
-    Color color,
     ProgramControllerClass controller_class,
     FeedbackType feedback,
     AllowCommandsWhenRunning allow_commands_while_running,
@@ -64,7 +63,6 @@ ConsoleProgramDescriptor::ConsoleProgramDescriptor(
         std::move(doc_link),
         std::move(description),
         standing,
-        color,
         true,
         std::move(required_resources)
     )

@@ -24,7 +24,6 @@ public:
             "Programs/NintendoSwitch/VirtualConsole.html",
             "Play your console from your computer.",
             PanelQualityStanding::OFFICIAL,
-            Color(),
             false,
             1
         )
@@ -47,7 +46,6 @@ public:
             "Programs/NintendoSwitch/VirtualConsole.html",
             "Test multiple controllers at once.",
             PanelQualityStanding::OFFICIAL,
-            Color(),
             false,
             8
         )

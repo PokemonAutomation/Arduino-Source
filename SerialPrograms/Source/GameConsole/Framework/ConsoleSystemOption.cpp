@@ -15,24 +15,6 @@ namespace PokemonAutomation{
 namespace GameConsole{
 
 
-Color pick_color(ProgramControllerClass color_class){
-    switch (color_class){
-    case ProgramControllerClass::StandardController_NoRestrictions:
-        return COLOR_BLUE;
-    case ProgramControllerClass::StandardController_PerformanceClassSensitive:
-        return COLOR_DARKGREEN;
-    case ProgramControllerClass::StandardController_RequiresPrecision:
-        return COLOR_PURPLE;
-    case ProgramControllerClass::StandardController_WithRestrictions:
-        return COLOR_RED;
-    case ProgramControllerClass::SpecializedController:
-        return COLOR_MAGENTA;
-    default:
-        return Color();
-    }
-}
-
-
 const std::string ConsoleSystemOption::JSON_CAMERA      = "Camera";
 const std::string ConsoleSystemOption::JSON_VIDEO       = "Video";
 const std::string ConsoleSystemOption::JSON_AUDIO       = "Audio";

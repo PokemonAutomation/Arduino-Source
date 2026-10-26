@@ -20,7 +20,7 @@ ShinyEncounterTester_Descriptor::ShinyEncounterTester_Descriptor()
         STRING_POKEMON + " SwSh", "Shiny Encounter Tester",
         "",
         "Test the shiny encounter detector. Start this program just before an encounter.",
-        PanelQualityStanding::OFFICIAL,
+        PanelQualityStanding::DEVELOPER,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::ENABLE_COMMANDS

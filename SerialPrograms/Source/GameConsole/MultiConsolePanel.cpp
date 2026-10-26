@@ -17,7 +17,6 @@ MultiConsolePanelDescriptor::MultiConsolePanelDescriptor(
     std::string doc_link,
     std::string description,
     PanelQualityStanding standing,
-    Color color,
     size_t min_consoles,
     size_t max_consoles,
     size_t default_consoles,
@@ -29,7 +28,6 @@ MultiConsolePanelDescriptor::MultiConsolePanelDescriptor(
         std::move(doc_link),
         std::move(description),
         standing,
-        color,
         min_consoles,
         max_consoles,
         default_consoles,
@@ -45,7 +43,6 @@ MultiConsolePanelDescriptor::MultiConsolePanelDescriptor(
     std::string doc_link,
     std::string description,
     PanelQualityStanding standing,
-    Color color,
     size_t min_consoles,
     size_t max_consoles,
     size_t default_consoles,
@@ -58,7 +55,6 @@ MultiConsolePanelDescriptor::MultiConsolePanelDescriptor(
         std::move(doc_link),
         std::move(description),
         standing,
-        color,
         restore_defaults_button
     )
     , m_min_consoles(min_consoles)

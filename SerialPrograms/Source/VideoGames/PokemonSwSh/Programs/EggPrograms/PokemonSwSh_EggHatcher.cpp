@@ -27,7 +27,7 @@ EggHatcher_Descriptor::EggHatcher_Descriptor()
         STRING_POKEMON + " SwSh", "Egg Hatcher",
         "Programs/PokemonSwSh/EggHatcher.html",
         "Hatch eggs from boxes.",
-        PanelQualityStanding::OFFICIAL,
+        PanelQualityStanding::OFFICIAL_BELOW_STANDARDS,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

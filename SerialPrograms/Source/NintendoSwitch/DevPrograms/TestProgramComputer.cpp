@@ -178,7 +178,7 @@ TestProgramComputer_Descriptor::TestProgramComputer_Descriptor()
         "Computer", "Test Program (Computer)",
         "",
         "Test Program",
-        PanelQualityStanding::OFFICIAL_BETA
+        PanelQualityStanding::DEVELOPER
     )
 {}
 TestProgramComputer::TestProgramComputer()

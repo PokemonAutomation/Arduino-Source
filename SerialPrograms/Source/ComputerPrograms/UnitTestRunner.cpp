@@ -99,7 +99,7 @@ UnitTestRunner_Descriptor::UnitTestRunner_Descriptor()
         "Unit Test Runner",
         "",
         "UI to run unit tests.",
-        PanelQualityStanding::OFFICIAL
+        PanelQualityStanding::DEVELOPER
     )
 {}
 class UnitTestRunner_Descriptor::Stats : public StatsTracker{

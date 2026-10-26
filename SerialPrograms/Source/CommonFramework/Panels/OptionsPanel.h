@@ -31,7 +31,6 @@ public:
         std::string doc_link,
         std::string description,
         PanelQualityStanding standing,
-        Color color = Color(),
         bool restore_defaults_button = true
     );
 

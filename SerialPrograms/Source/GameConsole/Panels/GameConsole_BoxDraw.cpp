@@ -22,8 +22,7 @@ BoxDraw_Descriptor::BoxDraw_Descriptor()
         "Game Console", "Box Draw",
         "",
         "Test box coordinates for development.",
-        PanelQualityStanding::OFFICIAL,
-        Color(),
+        PanelQualityStanding::DEVELOPER,
         false
     )
 {}

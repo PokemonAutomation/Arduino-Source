@@ -25,7 +25,7 @@ SoundListener_Descriptor::SoundListener_Descriptor()
         STRING_POKEMON + " FRLG", "Sound Listener",
         "",
         "Test sound detectors listening to audio stream.",
-        PanelQualityStanding::OFFICIAL,
+        PanelQualityStanding::DEVELOPER,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::ENABLE_COMMANDS

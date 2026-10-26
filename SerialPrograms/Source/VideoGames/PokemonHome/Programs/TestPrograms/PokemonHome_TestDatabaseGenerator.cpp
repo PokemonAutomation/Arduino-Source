@@ -47,7 +47,7 @@ TestDatabaseGenerator_Descriptor::TestDatabaseGenerator_Descriptor()
         STRING_POKEMON + " Home", "Test Database Generator",
         "",
         "Run all Pokemon Home image readers and detectors against a directory of screenshots.",
-        PanelQualityStanding::OFFICIAL,
+        PanelQualityStanding::DEVELOPER,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

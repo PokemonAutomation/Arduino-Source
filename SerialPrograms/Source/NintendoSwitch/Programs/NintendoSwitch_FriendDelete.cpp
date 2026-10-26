@@ -18,7 +18,7 @@ FriendDelete_Descriptor::FriendDelete_Descriptor()
         "Nintendo Switch", "Friend Delete",
         "Programs/NintendoSwitch/FriendDelete.html",
         "Mass delete/block all those unwanted friends.",
-        PanelQualityStanding::OFFICIAL,
+        PanelQualityStanding::OFFICIAL_BELOW_STANDARDS,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

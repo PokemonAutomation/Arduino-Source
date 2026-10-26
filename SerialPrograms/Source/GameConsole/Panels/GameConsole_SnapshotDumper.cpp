@@ -29,8 +29,7 @@ SnapshotDumper_Descriptor::SnapshotDumper_Descriptor()
         "Game Console", "Snapshot Dumper",
         "Programs/NintendoSwitch/SnapshotDumper.html",
         "Periodically take screenshots.",
-        PanelQualityStanding::OFFICIAL,
-        Color(),
+        PanelQualityStanding::DEVELOPER,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::ENABLE_COMMANDS

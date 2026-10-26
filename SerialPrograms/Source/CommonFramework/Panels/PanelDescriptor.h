@@ -24,6 +24,7 @@ enum class PanelQualityStanding{
     THIRD_PARTY_UNVETTED,
     UNMAINTAINED,
     DEPRECATED,
+    DEVELOPER,
 //    UNCATEGORIZED,
 };
 
@@ -39,7 +40,6 @@ public:
         std::string doc_link,
         std::string description,
         PanelQualityStanding standing,
-        Color color,
         bool restore_defaults_button
     );
     virtual ~PanelDescriptor() = default;
@@ -55,6 +55,11 @@ public:
     bool restore_defaults_button() const{ return m_restore_defaults_button; }
 
     virtual std::unique_ptr<PanelSession> make_panel() const = 0;
+
+
+private:
+    static Color pick_color(PanelQualityStanding standing);
+
 
 private:
     const std::string m_identifier;

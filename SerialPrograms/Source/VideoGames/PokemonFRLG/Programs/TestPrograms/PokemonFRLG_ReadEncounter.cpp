@@ -29,7 +29,7 @@ ReadEncounter_Descriptor::ReadEncounter_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG",
         "Read Wild Encounter", "",
         "Read name and level of a wild encounter.",
-        PanelQualityStanding::OFFICIAL,
+        PanelQualityStanding::DEVELOPER,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
