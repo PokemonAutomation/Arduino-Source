@@ -52,6 +52,19 @@ public:
     void push_samples(size_t samples, size_t stride, const float* data);
     void on_frame(std::shared_ptr<const VideoFrame> frame);
 
+public:
+    //  For tests.
+
+    //  push_samples() with the capture time of the last sample given
+    //  explicitly instead of read from the clock, so that tests can drive
+    //  audio and video on one simulated timeline.
+    void push_samples(size_t samples, size_t stride, const float* data, WallClock now);
+
+    //  Blocks until every queued video frame has been encoded into the ring.
+    //  on_frame() only queues frames for the encoder thread (and drops the
+    //  oldest beyond a small backlog), so tests wait on this between frames.
+    void wait_until_idle();
+
 private:
     struct Data;
     Pimpl<Data> m_data;
