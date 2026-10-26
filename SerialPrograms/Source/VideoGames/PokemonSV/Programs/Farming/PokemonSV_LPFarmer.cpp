@@ -30,7 +30,7 @@ LPFarmer_Descriptor::LPFarmer_Descriptor()
         STRING_POKEMON + " SV", "LP Farmer",
         "Programs/PokemonSV/LPFarmer.html",
         "Farm LP by day skipping Tera raids.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

@@ -29,7 +29,7 @@ FriendSearchDisconnect_Descriptor::FriendSearchDisconnect_Descriptor()
         STRING_POKEMON + " SwSh", "Friend Search Disconnect",
         "Programs/PokemonSwSh/FriendSearchDisconnect.html",
         "Disconnect from the internet using the friend search method.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

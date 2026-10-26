@@ -51,7 +51,7 @@ DonutMaker_Descriptor::DonutMaker_Descriptor()
         "Donut Maker",
         "Programs/PokemonLZA/DonutMaker.html",
         "Make donuts and reset until desired flavor powers are found.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

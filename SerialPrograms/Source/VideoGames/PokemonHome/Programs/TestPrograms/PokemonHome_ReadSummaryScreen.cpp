@@ -25,7 +25,7 @@ ReadSummaryScreen_Descriptor::ReadSummaryScreen_Descriptor()
         STRING_POKEMON + " Home", "Read Summary Screen",
         "",
         "Read the current Pokemon summary screen in Pokemon Home and log the detected data.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

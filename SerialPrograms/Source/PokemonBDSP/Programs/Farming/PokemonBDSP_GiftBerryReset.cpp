@@ -57,7 +57,7 @@ GiftBerryReset_Descriptor::GiftBerryReset_Descriptor()
         STRING_POKEMON + " BDSP", "Gift Berry Reset",
         "Programs/PokemonBDSP/GiftBerryReset.html",
         "Reset the game in front of the NPC that gives rare berries in Pastoria City until a desired berry is received.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

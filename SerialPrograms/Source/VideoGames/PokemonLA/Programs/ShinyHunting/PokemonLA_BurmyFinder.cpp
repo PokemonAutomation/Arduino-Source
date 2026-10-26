@@ -46,7 +46,7 @@ BurmyFinder_Descriptor::BurmyFinder_Descriptor()
         STRING_POKEMON + " LA", "Burmy Hunter",
         "Programs/PokemonLA/BurmyHunter.html",
         "Check nearby trees for a possible Shiny, Alpha or Alpha Shiny Burmy",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

@@ -10,13 +10,10 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
-#include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
-#include "VideoGames/PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_LegendaryRunAway.h"
 
@@ -30,7 +27,7 @@ LegendaryRunAway_Descriptor::LegendaryRunAway_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Legendary Run Away",
         "Programs/PokemonFRLG/LegendaryRunAway.html",
         "Shiny hunt legendary Pokemon using the run away method.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

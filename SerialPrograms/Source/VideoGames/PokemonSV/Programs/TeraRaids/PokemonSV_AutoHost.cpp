@@ -46,7 +46,7 @@ AutoHost_Descriptor::AutoHost_Descriptor()
         STRING_POKEMON + " SV", "Auto-Host",
         "Programs/PokemonSV/AutoHost.html",
         "Auto-host a Tera raid.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

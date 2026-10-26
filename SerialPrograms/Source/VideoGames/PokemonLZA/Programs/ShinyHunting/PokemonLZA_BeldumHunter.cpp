@@ -34,7 +34,7 @@ BeldumHunter_Descriptor::BeldumHunter_Descriptor()
         STRING_POKEMON + " LZA", "Shiny Hunt - Beldum",
         "Programs/PokemonLZA/BeldumHunter.html",
         "Repeatedly enter Lysandre Labs to shiny hunt Beldum.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

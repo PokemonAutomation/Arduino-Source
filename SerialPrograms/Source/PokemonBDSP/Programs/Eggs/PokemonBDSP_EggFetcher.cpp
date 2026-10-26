@@ -25,7 +25,7 @@ EggFetcher_Descriptor::EggFetcher_Descriptor()
         STRING_POKEMON + " BDSP", "Egg Fetcher",
         "Programs/PokemonBDSP/EggFetcher.html",
         "Automatically fetch eggs from the daycare man.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

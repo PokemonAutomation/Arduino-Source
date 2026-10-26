@@ -27,7 +27,7 @@ DaySkipperEU_Descriptor::DaySkipperEU_Descriptor()
         STRING_POKEMON + " SwSh", "Day Skipper (EU)",
         "Programs/PokemonSwSh/DaySkipperEU.html",
         "A day skipper for EU date format that.  (Switch 1: ~7500 skips/hour, Switch 2: 5655 skips/hour)",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_WithRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

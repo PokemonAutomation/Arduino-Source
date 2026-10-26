@@ -36,7 +36,7 @@ TenacityCandyFarmer_Descriptor::TenacityCandyFarmer_Descriptor()
         "Programs/PokemonLA/TenacityCandyFarmer.html",
         "Attend Ingo's Path of Tenacity battles leading with a stats fully upgraded, max level, "
         "Modest nature Arceus with Legend Plate applied to grind exp, exp candies XL and evolution items.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

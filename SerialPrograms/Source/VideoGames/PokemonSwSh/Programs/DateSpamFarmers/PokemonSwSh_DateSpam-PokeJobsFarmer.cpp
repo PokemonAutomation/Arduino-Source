@@ -29,7 +29,7 @@ PokeJobsFarmer_Descriptor::PokeJobsFarmer_Descriptor()
         "Date Spam - " + STRING_POKEJOB + "s Farmer",
         "Programs/PokemonSwSh/DateSpam-PokeJobsFarmer.html",
         "Farm " + STRING_POKEJOB + "s.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

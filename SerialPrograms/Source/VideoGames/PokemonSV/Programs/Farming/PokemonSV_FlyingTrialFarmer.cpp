@@ -35,7 +35,7 @@ FlyingTrialFarmer_Descriptor::FlyingTrialFarmer_Descriptor()
         STRING_POKEMON + " SV", "Flying Trial Farmer",
         "Programs/PokemonSV/FlyingTrialFarmer.html",
         "Farm the flying trial for BP.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

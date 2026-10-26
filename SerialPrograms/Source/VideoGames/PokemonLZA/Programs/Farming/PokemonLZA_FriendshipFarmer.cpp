@@ -31,7 +31,7 @@ FriendshipFarmer_Descriptor::FriendshipFarmer_Descriptor()
         Pokemon::STRING_POKEMON + " LZA", "Friendship Farmer",
         "Programs/PokemonLZA/FriendshipFarmer.html",
         "Farm friendship for pokemon in your party using either the cafe or bench method.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

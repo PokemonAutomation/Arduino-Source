@@ -31,7 +31,7 @@ TestBoxCellInfo_Descriptor::TestBoxCellInfo_Descriptor()
         "",
         "Test program to check inference on pokemon info in box system. "
         "Move around on box cells while running the pokemon. Log overlay will show current selected cell and pokemon info of the cell.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::ENABLE_COMMANDS

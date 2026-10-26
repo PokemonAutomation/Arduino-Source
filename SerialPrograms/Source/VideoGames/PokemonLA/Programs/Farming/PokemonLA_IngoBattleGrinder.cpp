@@ -40,7 +40,7 @@ IngoBattleGrinder_Descriptor::IngoBattleGrinder_Descriptor()
         "Programs/PokemonLA/IngoBattleGrinder.html",
         "Attend Ingo's battles to grind exp and move related " + STRING_POKEDEX + " research tasks. "
         "Less effective than Ingo Move Grinder for " + STRING_POKEDEX + " research tasks but more effective for everything else.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

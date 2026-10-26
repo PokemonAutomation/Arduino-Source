@@ -31,7 +31,7 @@ WeatherFinder_Descriptor::WeatherFinder_Descriptor()
         STRING_POKEMON + " LZA", "Weather Finder",
         "Programs/PokemonLZA/WeatherFinder.html",
         "Reset the weather by siting on a bench until reach the desired value",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

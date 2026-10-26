@@ -28,7 +28,7 @@ GodEggItemDupe_Descriptor::GodEggItemDupe_Descriptor()
         STRING_POKEMON + " SwSh", "God Egg Item Duplication",
         "Programs/PokemonSwSh/GodEggItemDuplication.html",
         "Mass duplicate items with the God Egg.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

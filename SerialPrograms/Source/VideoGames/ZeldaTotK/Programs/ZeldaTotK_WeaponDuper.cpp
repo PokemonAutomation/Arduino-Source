@@ -21,7 +21,7 @@ WeaponDuper_Descriptor::WeaponDuper_Descriptor()
         "Zelda: TotK", "Weapon Duper",
         "Programs/ZeldaTotK/WeaponDuper.html",
         "Use a glitch to duplicate your weapons (Bows, Shields and Swords)",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

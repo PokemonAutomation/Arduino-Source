@@ -33,7 +33,7 @@ FroslassFinder_Descriptor::FroslassFinder_Descriptor()
         STRING_POKEMON + " LA", "Alpha Froslass Hunter",
         "Programs/PokemonLA/AlphaFroslassHunter.html",
         "Constantly reset to find a Alpha Froslass or any Shiny in the path.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

@@ -41,7 +41,7 @@ HeldItemFarmerSafariZone_Descriptor::HeldItemFarmerSafariZone_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Held Item Farmer - Safari Zone",
         "Programs/PokemonFRLG/HeldItemFarmer-SafariZone.html",
         "Farm held items from Chansey and Dragonair in the Safari Zone.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

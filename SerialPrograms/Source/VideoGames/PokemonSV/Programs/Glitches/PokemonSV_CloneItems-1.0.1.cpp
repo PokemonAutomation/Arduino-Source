@@ -40,7 +40,7 @@ CloneItems101_Descriptor::CloneItems101_Descriptor()
         STRING_POKEMON + " SV", "Clone Items (1.0.1)",
         "Programs/PokemonSV/CloneItems-101.html",
         "Clone items using the add-to-party glitch.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::UNMAINTAINED,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

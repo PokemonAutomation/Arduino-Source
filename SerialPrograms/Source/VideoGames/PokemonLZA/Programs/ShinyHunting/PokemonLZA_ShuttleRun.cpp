@@ -32,7 +32,7 @@ ShinyHunt_ShuttleRun_Descriptor::ShinyHunt_ShuttleRun_Descriptor()
         "Shuttle Run",
         "Programs/PokemonLZA/ShinyHunt-ShuttleRun.html",
         "Shiny hunt by repeatedly running back and forth between two points",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::THIRD_PARTY_UNVETTED,
         ProgramControllerClass::StandardController_NoRestrictions, FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
     )

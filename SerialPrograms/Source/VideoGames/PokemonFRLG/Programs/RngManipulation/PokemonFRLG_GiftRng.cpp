@@ -34,7 +34,7 @@ GiftRng_Descriptor::GiftRng_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Gift RNG",
         "Programs/PokemonFRLG/GiftRng.html",
         "Automatically calibrate timings to hit a specific RNG target for FRLG gift " + STRING_POKEMON,
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

@@ -35,7 +35,7 @@ ShinyHunt_HyperspaceHunter_Descriptor::ShinyHunt_HyperspaceHunter_Descriptor()
         "Hyperspace Hunter",
         "Programs/PokemonLZA/ShinyHunt-HyperspaceHunter.html",
         "Shiny hunt in Hyperspace Wild Zone using fly spot reset or shuttle run methods.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions, FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
     )

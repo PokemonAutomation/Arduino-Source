@@ -26,7 +26,7 @@ ShinyHuntOverworld_Descriptor::ShinyHuntOverworld_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Shiny Hunt - Overworld",
         "Programs/PokemonFRLG/ShinyHunt-Overworld.html",
         "Shiny hunt Overworld Pokemon.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

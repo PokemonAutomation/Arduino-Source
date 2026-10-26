@@ -81,7 +81,7 @@ EggRng_Descriptor::EggRng_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Egg RNG",
         "Programs/PokemonFRLG/EggRng.html",
         "Automatically calibrate timings to hit a specific RNG target for daycare eggs.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

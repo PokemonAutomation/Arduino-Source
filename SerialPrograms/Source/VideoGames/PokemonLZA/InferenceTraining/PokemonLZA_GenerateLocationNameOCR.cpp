@@ -34,7 +34,7 @@ GenerateLocationNameOCR_Descriptor::GenerateLocationNameOCR_Descriptor()
         STRING_POKEMON + " LZA", "Generate Location Name OCR Data",
         "",
         "Generate Location Name OCR data by iterating the fly spot list.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

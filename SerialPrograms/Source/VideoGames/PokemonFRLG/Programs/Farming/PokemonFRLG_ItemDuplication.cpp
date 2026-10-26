@@ -27,7 +27,7 @@ ItemDuplication_Descriptor::ItemDuplication_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Item Duplication",
         "Programs/PokemonFRLG/ItemDuplication.html",
         "Duplicate items using the Retro Mail glitch.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

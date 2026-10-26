@@ -29,7 +29,7 @@ ShinyHunt_SewerHunter_Descriptor::ShinyHunt_SewerHunter_Descriptor()
         "Sewer Hunter",
         "Programs/PokemonLZA/ShinyHunt-SewerHunter.html",
         "Shiny hunt in two sewer subzones",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions, FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
     )

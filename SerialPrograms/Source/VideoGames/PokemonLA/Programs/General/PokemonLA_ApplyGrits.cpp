@@ -32,7 +32,7 @@ ApplyGrits_Descriptor::ApplyGrits_Descriptor()
         STRING_POKEMON + " LA", "Apply Grits",
         "Programs/PokemonLA/ApplyGrits.html",
         "Use Grits items on " + STRING_POKEMON,
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

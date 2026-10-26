@@ -28,7 +28,7 @@ SandwichMaker_Descriptor::SandwichMaker_Descriptor()
         STRING_POKEMON + " SV", "Sandwich Maker",
         "Programs/PokemonSV/SandwichMaker.html",
         "Make a sandwich of your choice.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

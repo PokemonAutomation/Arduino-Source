@@ -22,7 +22,7 @@ Typewriter_Descriptor::Typewriter_Descriptor()
         "Nintendo Switch", "Typewriter",
         "Programs/NintendoSwitch/Typewriter.html",
         "Enter text into the Switch using the HID keyboard controller.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL_BETA,
         ProgramControllerClass::SpecializedController,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

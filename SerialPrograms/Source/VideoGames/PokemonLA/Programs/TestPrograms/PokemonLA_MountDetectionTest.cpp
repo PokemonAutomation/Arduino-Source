@@ -21,7 +21,7 @@ MountDetectionTest_Descriptor::MountDetectionTest_Descriptor()
         STRING_POKEMON + " LA", "Mount Detection Test",
         "",
         "Test the mount detection in the bottom right corner.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::ENABLE_COMMANDS

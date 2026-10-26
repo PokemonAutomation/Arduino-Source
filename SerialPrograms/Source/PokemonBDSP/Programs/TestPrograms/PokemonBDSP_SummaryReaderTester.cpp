@@ -30,7 +30,7 @@ SummaryReaderTester_Descriptor::SummaryReaderTester_Descriptor()
         "",
         "Read a " + STRING_POKEMON + "'s nature, gender and stats off its summary pages. "
         "Start on the Trainer Memo page.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

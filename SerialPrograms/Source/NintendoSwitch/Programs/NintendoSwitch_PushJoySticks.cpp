@@ -18,7 +18,7 @@ PushJoySticks_Descriptor::PushJoySticks_Descriptor()
         "Nintendo Switch", "Push Joy Sticks",
         "Programs/NintendoSwitch/PushJoySticks.html",
         "Push Joy Sticks continuously.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

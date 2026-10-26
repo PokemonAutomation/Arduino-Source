@@ -31,7 +31,7 @@ StaticRng_Descriptor::StaticRng_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Static RNG",
         "Programs/PokemonFRLG/StaticRng.html",
         "Automatically calibrate timings to hit a specific RNG target for FRLG static encounters.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

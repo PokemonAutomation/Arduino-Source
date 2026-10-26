@@ -24,7 +24,7 @@ enum class PanelQualityStanding{
     THIRD_PARTY_UNVETTED,
     UNMAINTAINED,
     DEPRECATED,
-    UNCATEGORIZED,
+//    UNCATEGORIZED,
 };
 
 

@@ -32,7 +32,7 @@ CrobatFinder_Descriptor::CrobatFinder_Descriptor()
         STRING_POKEMON + " LA", "Alpha Crobat Hunter",
         "Programs/PokemonLA/AlphaCrobatHunter.html",
         "Constantly reset the cave to find Shiny Alpha Crobat.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

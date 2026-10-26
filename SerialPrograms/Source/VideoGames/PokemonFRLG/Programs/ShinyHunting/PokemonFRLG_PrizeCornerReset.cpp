@@ -30,7 +30,7 @@ PrizeCornerReset_Descriptor::PrizeCornerReset_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Prize Corner Reset",
         "Programs/PokemonFRLG/PrizeCornerReset.html",
         "Redeem and soft reset for a shiny Game Corner prize.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

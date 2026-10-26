@@ -76,7 +76,7 @@ StatsResetEventBattle_Descriptor::StatsResetEventBattle_Descriptor()
         STRING_POKEMON + " SV", "Stats Reset - Event Battle",
         "Programs/PokemonSV/StatsResetEventBattle.html",
         "Repeatedly catch Bloodmoon Ursaluna or Pecharunt until you get the stats you want.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

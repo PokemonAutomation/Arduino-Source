@@ -66,7 +66,7 @@ JacintheInfiniteFarmer_Descriptor::JacintheInfiniteFarmer_Descriptor()
         STRING_POKEMON + " LZA", "Jacinthe Infinite Farmer",
         "Programs/PokemonLZA/JacintheInfiniteFarmer.html",
         "Farm Jacinthe Infinite for exp and money.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
