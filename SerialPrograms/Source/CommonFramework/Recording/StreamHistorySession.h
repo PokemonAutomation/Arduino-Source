@@ -59,6 +59,10 @@ public:
     virtual void post_resolution_change(Resolution resolution) override;
 
 private:
+    //  Drop the current tracker / build a new one for the current settings.
+    //  Must be called without the lock: building and destroying a tracker
+    //  opens encoders and starts or joins threads, and the audio and video
+    //  threads spin on the lock (push_samples(), on_frame()) meanwhile.
     void clear();
     void initialize();
 
