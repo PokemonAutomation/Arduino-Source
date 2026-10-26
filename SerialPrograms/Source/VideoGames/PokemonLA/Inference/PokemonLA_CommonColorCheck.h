@@ -5,8 +5,8 @@
  *  Several checks for commonly used color in LA. These checks are used by various inference detector classes.
  */
 
-#ifndef PokemonAutomation_PokemonLA_MapDetector_H
-#define PokemonAutomation_PokemonLA_MapDetector_H
+#ifndef PokemonAutomation_PokemonLA_CommonColorCheck_H
+#define PokemonAutomation_PokemonLA_CommonColorCheck_H
 
 namespace PokemonAutomation{
 

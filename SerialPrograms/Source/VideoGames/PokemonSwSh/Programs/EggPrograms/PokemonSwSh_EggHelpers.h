@@ -19,9 +19,9 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-#define GO_TO_LADY_DURATION         (508ms)
-#define TRAVEL_RIGHT_DURATION       (2400ms)
-#define END_BATCH_MASH_B_DURATION   (20000ms)
+constexpr Milliseconds GO_TO_LADY_DURATION         = 508ms;
+constexpr Milliseconds TRAVEL_RIGHT_DURATION       = 2400ms;
+constexpr Milliseconds END_BATCH_MASH_B_DURATION   = 20000ms;
 
 
 //  Collect egg.
