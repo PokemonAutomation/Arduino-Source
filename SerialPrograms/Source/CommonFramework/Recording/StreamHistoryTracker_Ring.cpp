@@ -451,8 +451,8 @@ struct StreamHistoryTracker_Ring::Data{
 
     //  Video worker thread.
     AsyncTask m_worker;
-    std::atomic<bool> m_stopping{false};
     Mutex m_queue_lock;
+    bool m_stopping = false;    //  Guarded by m_queue_lock.
     ConditionVariable m_cv;
     std::deque<std::shared_ptr<const VideoFrame>> m_pending_frames;
 
@@ -575,9 +575,14 @@ struct StreamHistoryTracker_Ring::Data{
     //  work, video is disabled (m_video_enabled).
     void init_video_encoder(int input_width, int input_height){
         constexpr size_t CANDIDATE_COUNT = sizeof(VIDEO_ENCODER_CANDIDATES)/sizeof(VIDEO_ENCODER_CANDIDATES[0]);
-        //  Candidates before m_video_encoder_index already failed; once past
-        //  the last one, video was disabled when it did.
+        //  Candidates before m_video_encoder_index already failed. Once past
+        //  the last one (e.g. the last candidate opened but then failed at
+        //  runtime), there is nothing left to try: disable video so the
+        //  caller never proceeds with a null m_vctx.
         if (m_video_encoder_index >= CANDIDATE_COUNT){
+            m_logger.log("Stream history: No usable video encoder left. Disabling video.", COLOR_RED);
+            WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
+            m_video_enabled = false;
             return;
         }
 
@@ -683,6 +688,7 @@ struct StreamHistoryTracker_Ring::Data{
             if (err == 0){
                 m_vctx = ctx;
                 m_video_encoder_index = i + 1;
+                size_t dropped_packets;
                 {
                     WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
                     //  New encoder: the old snapshot (if any) no longer
@@ -690,6 +696,22 @@ struct StreamHistoryTracker_Ring::Data{
                     //  drain_one_video_packet() refreshes it on the first
                     //  encoded packet.
                     avcodec_parameters_free(&m_video_params);
+                    //  The video packets already in the ring came from the
+                    //  previous encoder (after a runtime fallback) and cannot
+                    //  be muxed with the new encoder's parameters, so drop
+                    //  them. (Empty on the first initialization.)
+                    dropped_packets = m_video.size();
+                    for (const std::shared_ptr<const VideoRingPacket>& packet : m_video){
+                        m_ring_bytes -= (int64_t)packet->data.size();
+                    }
+                    m_video.clear();
+                }
+                if (dropped_packets != 0){
+                    m_logger.log(
+                        "Stream history: dropped " + std::to_string(dropped_packets)
+                        + " video packets from the previous encoder.",
+                        COLOR_YELLOW
+                    );
                 }
                 m_video_width = target_width;
                 m_video_height = target_height;
@@ -772,14 +794,16 @@ struct StreamHistoryTracker_Ring::Data{
 
 
     //  The worker thread: blocks on m_pending_frames, encodes each frame in
-    //  order, and exits on shutdown once the queue is drained.
+    //  order, and exits on shutdown (dropping any frames still queued).
     void worker_loop(){
         while (true){
             std::shared_ptr<const VideoFrame> frame;
             {
                 std::unique_lock<Mutex> queue_guard(m_queue_lock);
-                m_cv.wait(queue_guard, [this]{ return m_stopping.load() || !m_pending_frames.empty(); });
-                if (m_stopping.load() && m_pending_frames.empty()){
+                m_cv.wait(queue_guard, [this]{ return m_stopping || !m_pending_frames.empty(); });
+                if (m_stopping){
+                    //  Shutting down: drop any queued frames instead of
+                    //  encoding them (the ring is about to be destroyed).
                     return;
                 }
                 frame = std::move(m_pending_frames.front());
@@ -1607,7 +1631,12 @@ struct StreamHistoryTracker_Ring::Data{
 //  destroyed.
 StreamHistoryTracker_Ring::~StreamHistoryTracker_Ring(){
     if (m_data->m_worker){
-        m_data->m_stopping = true;
+        {
+            //  Set under the queue lock: otherwise the worker can check the
+            //  predicate, miss this notification, and then block forever.
+            std::lock_guard<Mutex> queue_guard(m_data->m_queue_lock);
+            m_data->m_stopping = true;
+        }
         m_data->m_cv.notify_all();
         m_data->m_worker.wait_and_ignore_exceptions();
     }
