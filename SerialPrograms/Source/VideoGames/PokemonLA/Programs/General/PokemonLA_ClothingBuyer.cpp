@@ -21,6 +21,7 @@ ClothingBuyer_Descriptor::ClothingBuyer_Descriptor()
         STRING_POKEMON + " LA", "Clothing Buyer",
         "Programs/PokemonLA/ClothingBuyer.html",
         "Buy out all the clothing in the store.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

@@ -31,6 +31,7 @@ WattTraderFarmer_Descriptor::WattTraderFarmer_Descriptor()
         STRING_POKEMON + " SwSh", "Date Spam - Watt Trader Farmer",
         "",
         "Buy as much stuff from a watt trader as possible - day skipping as needed to reroll items.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

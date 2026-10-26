@@ -56,6 +56,7 @@ EliteFourFarmer_Descriptor::EliteFourFarmer_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Elite Four Farmer",
         "Programs/PokemonFRLG/EliteFourFarmer.html",
         "Repeatedly beat the rematch Elite Four and Champion with a single Pokemon.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

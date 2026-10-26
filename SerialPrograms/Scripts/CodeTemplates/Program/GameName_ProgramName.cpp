@@ -22,10 +22,10 @@ ProgramName_Descriptor::ProgramName_Descriptor()
         "Game Name", "Program Name",
         "Programs/GameName/ProgramName.html",
         "<Description of this program>.",
+        PanelQualityStanding::UNCATEGORIZED,
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct ProgramName_Descriptor::Stats : public StatsTracker{

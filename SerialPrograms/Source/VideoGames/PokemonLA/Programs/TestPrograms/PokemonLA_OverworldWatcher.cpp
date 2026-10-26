@@ -26,10 +26,10 @@ OverworldWatcher_Descriptor::OverworldWatcher_Descriptor()
         "",
         "This is a test program that simply observes the game and labels things of interest. "
         "This program doesn't really do anything.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::ENABLE_COMMANDS
     )
 {}
 

@@ -50,8 +50,9 @@ ShinyHunt_HyperspaceLegendary_Descriptor::ShinyHunt_HyperspaceLegendary_Descript
         "Hyperspace Legendary",
         "Programs/PokemonLZA/ShinyHunt-HyperspaceLegendary.html",
         "Shiny hunt legendary " + STRING_POKEMON + " in Hyperspace.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions, FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS, {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

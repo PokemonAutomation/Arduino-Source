@@ -61,6 +61,7 @@ SafariOptimalActionTest_Descriptor::SafariOptimalActionTest_Descriptor()
         "Safari Optimal Action Test", "",
         "Start in a Safari Zone encounter with the Safari battle menu already visible. "
         "The program reads the encounter and attempts to execute the optimal actions until the Safari battle menu is no longer detected.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

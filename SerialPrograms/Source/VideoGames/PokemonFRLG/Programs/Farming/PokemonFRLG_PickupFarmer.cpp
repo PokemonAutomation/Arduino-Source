@@ -31,6 +31,7 @@ PickupFarmer_Descriptor::PickupFarmer_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Pickup Farmer",
         "Programs/PokemonFRLG/PickupFarmer.html",
         "Farms berries, nuggets, rare candies, PP-UP, and TM10 by battling wild encounters and periodically checking for picked-up items.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

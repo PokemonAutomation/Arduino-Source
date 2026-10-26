@@ -35,6 +35,7 @@ LeapGrinder_Descriptor::LeapGrinder_Descriptor()
         STRING_POKEMON + " LA", "Leap Grinder",
         "Programs/PokemonLA/LeapGrinder.html",
         "Shake trees and ores to grind tasks",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

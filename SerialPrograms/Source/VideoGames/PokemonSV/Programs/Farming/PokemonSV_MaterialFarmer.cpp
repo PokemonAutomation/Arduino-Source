@@ -31,6 +31,7 @@ MaterialFarmer_Descriptor::MaterialFarmer_Descriptor()
         STRING_POKEMON + " SV", "Material Farmer",
         "Programs/PokemonSV/MaterialFarmer.html",
         "Farm materials - Happiny dust from Chanseys/Blisseys, for Item Printer.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

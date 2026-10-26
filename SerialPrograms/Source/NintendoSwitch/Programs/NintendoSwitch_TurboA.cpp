@@ -21,6 +21,7 @@ TurboA_Descriptor::TurboA_Descriptor()
         "Nintendo Switch", "Turbo A",
         "Programs/NintendoSwitch/TurboA.html",
         "Endlessly mash A.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

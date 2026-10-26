@@ -30,6 +30,7 @@ ShinyHuntAutonomousSwordsOfJustice_Descriptor::ShinyHuntAutonomousSwordsOfJustic
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Swords Of Justice",
         "Programs/PokemonSwSh/ShinyHuntAutonomous-SwordsOfJustice.html",
         "Automatically hunt for shiny Sword of Justice using video feedback.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

@@ -27,6 +27,7 @@ StowOnSideFarmer_Descriptor::StowOnSideFarmer_Descriptor()
         STRING_POKEMON + " SwSh", "Date Spam - Stow-On-Side Farmer",
         "Programs/PokemonSwSh/DateSpam-StowOnSideFarmer.html",
         "Farm the Stow-on-Side items dealer.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

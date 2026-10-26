@@ -34,6 +34,7 @@ SoundListener_Descriptor::SoundListener_Descriptor()
         STRING_POKEMON + " LGPE", "Sound Listener",
         "",
         "Test sound detectors listening to audio stream.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::SpecializedController,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::ENABLE_COMMANDS

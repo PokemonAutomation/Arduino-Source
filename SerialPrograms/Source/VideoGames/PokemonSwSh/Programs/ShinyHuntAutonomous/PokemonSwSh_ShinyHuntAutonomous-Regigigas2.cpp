@@ -33,6 +33,7 @@ ShinyHuntAutonomousRegigigas2_Descriptor::ShinyHuntAutonomousRegigigas2_Descript
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Regigigas2",
         "Programs/PokemonSwSh/ShinyHuntAutonomous-Regigigas2.html",
         "Automatically hunt for shiny Regigigas using video feedback.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

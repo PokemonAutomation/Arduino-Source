@@ -40,6 +40,7 @@ WildRng_Descriptor::WildRng_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Wild RNG",
         "Programs/PokemonFRLG/WildRng.html",
         "Automatically calibrate timings to hit a specific RNG target for FRLG random wild encounters.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

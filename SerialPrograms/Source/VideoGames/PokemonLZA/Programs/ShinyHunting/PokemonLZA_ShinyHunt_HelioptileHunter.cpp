@@ -43,6 +43,7 @@ ShinyHunt_HelioptileHunter_Descriptor::ShinyHunt_HelioptileHunter_Descriptor()
         STRING_POKEMON + " LZA", "Helioptile Hunter",
         "Programs/PokemonLZA/ShinyHunt-HelioptileHunter.html",
         "Hunts for Helioptile in Wild Zone by entering and resetting, checking for the right weather.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

@@ -33,6 +33,7 @@ DailyItemFarmer_Descriptor::DailyItemFarmer_Descriptor()
         Pokemon::STRING_POKEMON + " LGPE", "Daily Item Farmer",
         "Programs/PokemonLGPE/DailyItemFarmer.html",
         "Farm daily item respawns (ex. fossils) by date-skipping.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::SpecializedController,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

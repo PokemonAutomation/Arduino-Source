@@ -29,6 +29,7 @@ LegendaryRunAwayEmerald_Descriptor::LegendaryRunAwayEmerald_Descriptor()
         Pokemon::STRING_POKEMON + " RSE", "Legendary Run Away (Emerald)",
         "Programs/PokemonRSE/LegendaryRunAwayEmerald.html",
         "Use the Run Away method to shiny hunt legendaries in Emerald.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

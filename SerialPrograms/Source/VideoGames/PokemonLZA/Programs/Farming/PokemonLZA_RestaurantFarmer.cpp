@@ -39,6 +39,7 @@ RestaurantFarmer_Descriptor::RestaurantFarmer_Descriptor()
         STRING_POKEMON + " LZA", "Restaurant Farmer",
         "Programs/PokemonLZA/RestaurantFarmer.html",
         "Farm the restaurants for exp, items, and money.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

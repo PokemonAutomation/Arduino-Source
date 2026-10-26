@@ -35,6 +35,7 @@ ShinyHuntAutonomousBerryTree_Descriptor::ShinyHuntAutonomousBerryTree_Descriptor
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Berry Tree",
         "Programs/PokemonSwSh/ShinyHuntAutonomous-BerryTree.html",
         "Automatically hunt for shiny berry tree " + STRING_POKEMON + " using video feedback.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

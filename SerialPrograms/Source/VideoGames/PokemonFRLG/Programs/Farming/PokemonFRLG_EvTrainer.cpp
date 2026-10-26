@@ -37,6 +37,7 @@ EvTrainer_Descriptor::EvTrainer_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "EV Trainer",
         "Programs/PokemonFRLG/EvTrainer.html",
         "Defeats wild encounters to train EVs.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

@@ -34,6 +34,7 @@ StatsResetMoltres_Descriptor::StatsResetMoltres_Descriptor()
         STRING_POKEMON + " SwSh", "Stats Reset - Moltres",
         "Programs/PokemonSwSh/StatsReset-Moltres.html",
         "Repeatedly catch moltres until you get the stats you want.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

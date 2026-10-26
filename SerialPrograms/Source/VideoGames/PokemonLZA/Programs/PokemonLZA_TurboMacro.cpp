@@ -31,6 +31,7 @@ LZA_TurboMacro_Descriptor::LZA_TurboMacro_Descriptor()
         "Turbo Macro",
         "Programs/NintendoSwitch/TurboMacro.html",
         "Create macros. Stops with specific trigger (e.g. shiny sound).",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

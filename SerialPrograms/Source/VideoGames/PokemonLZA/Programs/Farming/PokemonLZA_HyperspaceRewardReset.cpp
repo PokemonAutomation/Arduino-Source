@@ -35,6 +35,7 @@ HyperspaceRewardReset_Descriptor::HyperspaceRewardReset_Descriptor()
         STRING_POKEMON + " LZA", "Hyperspace Reward Reset",
         "Programs/PokemonLZA/HyperspaceRewardReset.html",
         "Reset in front of a Hyperspace Battle Zone trainer to receive a specific reward.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

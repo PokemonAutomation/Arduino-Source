@@ -29,10 +29,10 @@ TradeBot_Descriptor::TradeBot_Descriptor()
         STRING_POKEMON + " SwSh", "Trade Bot",
         "Programs/PokemonSwSh/TradeBot.html",
         "Surprise trade with a code for hosting giveaways.",
+        PanelQualityStanding::DEPRECATED,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PanelQualityStanding::DEPRECATED
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

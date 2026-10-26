@@ -34,10 +34,10 @@ BBQSoloFarmer_Descriptor::BBQSoloFarmer_Descriptor()
         STRING_POKEMON + " SV", "BBQ Farmer",
         "Programs/PokemonSV/BBQSoloFarmer.html",
         "Farm Blueberry Quests in the Terarium for BP.",
+        PanelQualityStanding::OFFICIAL_BETA,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PanelQualityStanding::OFFICIAL_BETA,
         {
             "PaddleOCRDetection",
         }

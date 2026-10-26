@@ -28,6 +28,7 @@ AutonomousBallThrower_Descriptor::AutonomousBallThrower_Descriptor()
         STRING_POKEMON + " SwSh", "Autonomous Ball Thrower",
         "Programs/PokemonSwSh/AutonomousBallThrower.html",
         "Repeatedly throw a ball and reset until you catch the pokemon.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

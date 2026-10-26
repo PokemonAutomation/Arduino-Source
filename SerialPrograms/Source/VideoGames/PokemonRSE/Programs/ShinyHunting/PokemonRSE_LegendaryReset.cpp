@@ -26,6 +26,7 @@ LegendaryReset_Descriptor::LegendaryReset_Descriptor()
         Pokemon::STRING_POKEMON + " RSE", "Legendary Reset",
         "Programs/PokemonRSE/LegendaryReset.html",
         "Shiny hunt legendary Pokemon using soft resets.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

@@ -377,10 +377,10 @@ AutoStory_Descriptor::AutoStory_Descriptor()
         STRING_POKEMON + " SV", "Auto Story",
         "Programs/PokemonSV/AutoStory.html",
         "Progress through the mainstory of SV.",
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PanelQualityStanding::OFFICIAL,
         {
             "PokemonSV/AreaZero",
         }

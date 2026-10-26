@@ -26,6 +26,7 @@ AutonomousBallThrower_Descriptor::AutonomousBallThrower_Descriptor()
         STRING_POKEMON + " SV", "Autonomous Ball Thrower",
         "Programs/PokemonSV/AutonomousBallThrower.html",
         "Repeatedly throw a ball until you catch the pokemon.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

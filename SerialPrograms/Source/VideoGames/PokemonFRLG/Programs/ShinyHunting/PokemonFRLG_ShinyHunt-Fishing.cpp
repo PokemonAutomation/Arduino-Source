@@ -35,6 +35,7 @@ ShinyHuntFishing_Descriptor::ShinyHuntFishing_Descriptor()
         "Shiny Hunt - Fishing",
         "Programs/PokemonFRLG/ShinyHunt-Fishing.html",
         "Automated fishing shiny hunt.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

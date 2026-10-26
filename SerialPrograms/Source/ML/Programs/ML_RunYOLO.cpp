@@ -29,10 +29,10 @@ RunYOLO_Descriptor::RunYOLO_Descriptor()
         "Nintendo Switch", "Run YOLO",
         "Programs/NintendoSwitch/RunYOLO.html",
         "Run YOLO object detection model.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::ENABLE_COMMANDS
     )
 {}
 

@@ -28,6 +28,7 @@ EggHatcher_Descriptor::EggHatcher_Descriptor()
         STRING_POKEMON + " BDSP", "Egg Hatcher",
         "Programs/PokemonBDSP/EggHatcher.html",
         "Hatch eggs from boxes.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

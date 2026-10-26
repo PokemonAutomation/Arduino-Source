@@ -29,6 +29,7 @@ AlolanTrade_Descriptor::AlolanTrade_Descriptor()
         Pokemon::STRING_POKEMON + " LGPE", "Alolan Trade",
         "Programs/PokemonLGPE/AlolanTrade.html",
         "Shiny hunt Alolan forms by trading in-game.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::SpecializedController,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

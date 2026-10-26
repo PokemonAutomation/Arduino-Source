@@ -21,6 +21,7 @@ BraviaryHeightGlitch_Descriptor::BraviaryHeightGlitch_Descriptor()
         STRING_POKEMON + " LA", "Braviary Height Glitch",
         "Programs/PokemonLA/BraviaryHeightGlitch.html",
         "Increase your height in place using the height glitch.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

@@ -36,6 +36,7 @@ StatsReset_Descriptor::StatsReset_Descriptor()
         STRING_POKEMON + " LZA", "Stats Reset",
         "Programs/PokemonLZA/StatsReset.html",
         "Repeatedly catch/receive " + STRING_POKEMON + " until you get the stats you want.",
+        PanelQualityStanding::UNCATEGORIZED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
