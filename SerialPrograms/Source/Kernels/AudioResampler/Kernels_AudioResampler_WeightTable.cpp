@@ -31,6 +31,8 @@ WeightTable::WeightTable(
     size_t tap_block
 )
     : m_taps(taps)
+    , m_in_sample_rate(in_sample_rate)
+    , m_out_sample_rate(out_sample_rate)
     , m_sample_block(sample_block)
     , m_tap_block(tap_block)
 {

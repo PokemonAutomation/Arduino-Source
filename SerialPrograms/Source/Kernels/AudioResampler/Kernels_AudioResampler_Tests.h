@@ -92,6 +92,33 @@ private:
 
 
 //
+//  Checks that WeightTable::time_shift() is the 1st-tap to median-tap
+//  distance in input-sample seconds, and that the table actually
+//  reconstructs at that shifted time: a delta at input sample p0 must
+//  produce, at every output sample c, the windowed sinc centered on
+//  input time p0 evaluated at c * in_rate / out_rate + (taps - 1) / 2
+//  input samples.
+//
+class WeightTableTimeShiftTest : public UnitTest{
+public:
+    WeightTableTimeShiftTest(
+        size_t in_sample_rate,
+        size_t out_sample_rate,
+        uint32_t taps
+    );
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override;
+
+
+private:
+    const size_t m_in_rate;
+    const size_t m_out_rate;
+    const uint32_t m_taps;
+};
+
+
+
+//
 //  Pushes random input through an AudioResampler in chunks and compares
 //  every produced output sample to a scalar reference computed from the
 //  weight table.
