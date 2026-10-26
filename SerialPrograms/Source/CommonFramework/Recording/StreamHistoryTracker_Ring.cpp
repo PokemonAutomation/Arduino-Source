@@ -71,7 +71,11 @@ constexpr int64_t MAX_RING_BYTES = 90 * 1024 * 1024;
 //  Audio is always resampled to 48 kHz and encoded as AAC (frame size 1024).
 constexpr int AUDIO_OUTPUT_RATE = 48000;
 constexpr int AUDIO_FRAME_SAMPLES = 1024;
-constexpr int64_t AUDIO_FRAME_US = 1000000LL * AUDIO_FRAME_SAMPLES / AUDIO_OUTPUT_RATE;
+
+//  The audio timeline follows the sample count, re-anchored to the wall clock
+//  whenever the two disagree by more than this (a gap in the delivered audio,
+//  e.g. a device underrun, or accumulated clock drift).
+constexpr int64_t AUDIO_RESYNC_THRESHOLD_US = 100000;
 
 //  Force a keyframe every 2 seconds so save() can rewind to a decodable point.
 constexpr int64_t VIDEO_KEYFRAME_INTERVAL_US = 2000000;
@@ -88,9 +92,29 @@ struct VideoRingPacket{
 
 struct AudioRingPacket{
     WallClock timestamp;
-    int64_t first_sample;    //  Cumulative samples (per channel) at the start of this frame.
     std::vector<uint8_t> data;
 };
+
+
+//  Deleter for the codec parameter copies that save() hands to mux_to_file().
+struct CodecParametersDeleter{
+    void operator()(AVCodecParameters* params) const{
+        avcodec_parameters_free(&params);
+    }
+};
+using CodecParametersPtr = std::unique_ptr<AVCodecParameters, CodecParametersDeleter>;
+
+//  Returns a copy of 'source', or null if 'source' is null or the copy fails.
+CodecParametersPtr copy_codec_parameters(const AVCodecParameters* source){
+    if (source == nullptr){
+        return nullptr;
+    }
+    CodecParametersPtr copy(avcodec_parameters_alloc());
+    if (copy == nullptr || avcodec_parameters_copy(copy.get(), source) < 0){
+        return nullptr;
+    }
+    return copy;
+}
 
 
 std::string ffmpeg_error(int errnum){
@@ -446,7 +470,12 @@ struct StreamHistoryTracker_Ring::Data{
     //  Audio encoder (used by push_samples).
     AVCodecContext* m_actx = nullptr;
     AVChannelLayout m_audio_layout = {};
-    int64_t m_audio_samples_total = 0;
+    int64_t m_audio_samples_total = 0;    //  Samples (per channel) sent to the encoder.
+    //  The audio sample clock: sample m_audio_anchor_sample was captured at
+    //  m_audio_anchor_time. Re-anchored on gaps; see push_samples().
+    bool m_audio_anchored = false;
+    int64_t m_audio_anchor_sample = 0;
+    WallClock m_audio_anchor_time;
     std::vector<float> m_audio_acc;    //  Interleaved float @ 48 kHz, accumulated from the planar working stream.
 
     //  Video worker thread.
@@ -745,13 +774,13 @@ struct StreamHistoryTracker_Ring::Data{
 
 
     //  Receive and store a single encoded video packet.
-    //  Returns 1 if a packet was stored, 0 if there is nothing to receive, -1 on
-    //  error (already logged).
-    int drain_one_video_packet(WallClock timestamp){
+    //  Returns 1 if a packet was stored, 0 if there is nothing to receive, or
+    //  the (negative) ffmpeg error if the encoder failed.
+    int drain_one_video_packet(){
         AVPacket* packet = av_packet_alloc();
         if (packet == nullptr){
             m_logger.log("Stream history: Failed to allocate video packet.", COLOR_RED);
-            return -1;
+            return 0;
         }
         int err = avcodec_receive_packet(m_vctx, packet);
         if (err == AVERROR(EAGAIN) || err == AVERROR_EOF){
@@ -760,11 +789,17 @@ struct StreamHistoryTracker_Ring::Data{
         }
         if (err < 0){
             av_packet_free(&packet);
-            m_logger.log("Stream history: Video packet failed: " + ffmpeg_error(err), COLOR_RED);
-            return -1;
+            return err;
         }
         auto ring_packet = std::make_shared<VideoRingPacket>();
-        ring_packet->timestamp = timestamp;
+        //  Stamp the packet with the capture time of the frame it encodes.
+        //  The encoder can hold several frames before emitting (the hardware
+        //  encoders pipeline their input), so the frame most recently sent is
+        //  not necessarily this packet's. The pts round-trips through the
+        //  encoder: milliseconds since m_video_start (see encode_video_frame()).
+        ring_packet->timestamp = m_video_start + std::chrono::milliseconds(
+            packet->pts != AV_NOPTS_VALUE ? packet->pts : m_last_pts_us / 1000
+        );
         ring_packet->flags = (packet->flags & AV_PKT_FLAG_KEY) ? AV_PKT_FLAG_KEY : 0;
         ring_packet->data.assign(packet->data, packet->data + packet->size);
         av_packet_free(&packet);
@@ -814,12 +849,31 @@ struct StreamHistoryTracker_Ring::Data{
     }
 
 
+    //  Abandons the current encoder after a hard failure at runtime (from
+    //  avcodec_send_frame() or avcodec_receive_packet()) and opens the next
+    //  candidate. A hardware encoder that hard-fails at runtime has a broken
+    //  GPU driver; every further call into it - including releasing the
+    //  context - risks crashing the process inside the driver.
+    void fall_back_video_encoder(int err, int input_width, int input_height){
+        const char* failed = VIDEO_ENCODER_CANDIDATES[m_video_encoder_index - 1];
+        m_logger.log(
+            "Stream history: video encoder '" + std::string(failed)
+            + "' failed at runtime ("
+            + ffmpeg_error(err)
+            + "); falling back to the next candidate.",
+            COLOR_YELLOW
+        );
+        abandon_video_encoder(m_logger, failed, m_vctx);
+        init_video_encoder(input_width, input_height);
+    }
+
+
     //  Converts one frame to the encoder's pixel format (NV12 direct,
     //  everything else through RGB), (re)building the scaler as needed,
     //  then feeds it to the encoder: wall-clock-derived pts, a forced
     //  keyframe every VIDEO_KEYFRAME_INTERVAL_US, and an EAGAIN
-    //  drain-and-retry. A hard send failure abandons the (possibly broken)
-    //  encoder and opens the next candidate.
+    //  drain-and-retry. A hard send or receive failure abandons the
+    //  (possibly broken) encoder and opens the next candidate.
     void encode_video_frame(const std::shared_ptr<const VideoFrame>& vf){
         if (!m_video_enabled || vf == nullptr || !vf->frame.isValid()){
             return;
@@ -956,7 +1010,13 @@ struct StreamHistoryTracker_Ring::Data{
         while (true){
             int err = avcodec_send_frame(m_vctx, frame);
             if (err == AVERROR(EAGAIN)){
-                if (drain_one_video_packet(vf->timestamp) <= 0){
+                int drained = drain_one_video_packet();
+                if (drained < 0){
+                    av_frame_free(&frame);
+                    fall_back_video_encoder(drained, qframe.width(), qframe.height());
+                    return;
+                }
+                if (drained == 0){
                     av_frame_free(&frame);
                     return;
                 }
@@ -964,27 +1024,23 @@ struct StreamHistoryTracker_Ring::Data{
             }
             if (err < 0){
                 av_frame_free(&frame);
-                //  Fall back immediately. A hardware encoder that hard-fails
-                //  at runtime has a broken GPU driver; every further call
-                //  into it - including releasing the context - risks crashing
-                //  the process inside the driver.
-                const char* failed = VIDEO_ENCODER_CANDIDATES[m_video_encoder_index - 1];
-                m_logger.log(
-                    "Stream history: video encoder '" + std::string(failed)
-                    + "' failed at runtime ("
-                    + ffmpeg_error(err)
-                    + "); falling back to the next candidate.",
-                    COLOR_YELLOW
-                );
-                abandon_video_encoder(m_logger, failed, m_vctx);
-                init_video_encoder(qframe.width(), qframe.height());
+                fall_back_video_encoder(err, qframe.width(), qframe.height());
                 return;
             }
             av_frame_free(&frame);
             break;
         }
 
-        while (drain_one_video_packet(vf->timestamp) > 0){}
+        while (true){
+            int drained = drain_one_video_packet();
+            if (drained < 0){
+                fall_back_video_encoder(drained, qframe.width(), qframe.height());
+                return;
+            }
+            if (drained == 0){
+                break;
+            }
+        }
     }
 
 
@@ -1068,14 +1124,46 @@ struct StreamHistoryTracker_Ring::Data{
     }
 
 
+    //  The capture time of audio sample 'sample' (per-channel count) on the
+    //  current sample clock.
+    WallClock audio_sample_time(int64_t sample) const{
+        return m_audio_anchor_time + std::chrono::duration_cast<WallClock::duration>(
+            std::chrono::nanoseconds((sample - m_audio_anchor_sample) * 1000000000 / AUDIO_OUTPUT_RATE)
+        );
+    }
+
+
     //  Interleaves the planar 48 kHz input into m_audio_acc, then for every
     //  complete 1024-sample frame: encodes AAC, stores the packet in the
-    //  ring (back-dated to the start of its samples), and evicts.
+    //  ring (stamped with the capture time of its samples), and evicts.
     void push_samples(size_t samples, size_t stride, const float* data){
         if (!m_have_audio || samples == 0 || data == nullptr){
             return;
         }
         WallClock now = current_time();
+
+        //  Keep the sample clock in line with the wall clock. The last sample
+        //  of this delivery was captured at about "now"; if the sample count
+        //  says otherwise by more than the threshold (audio went missing, or
+        //  the device clock drifted), re-anchor so that later packets land at
+        //  their real time instead of shifting all subsequent audio against
+        //  the video.
+        int64_t end_sample = m_audio_samples_total
+            + (int64_t)(m_audio_acc.size() / m_audio_channels)
+            + (int64_t)samples;
+        if (m_audio_anchored){
+            int64_t error_us = std::chrono::duration_cast<std::chrono::microseconds>(
+                now - audio_sample_time(end_sample)
+            ).count();
+            if (error_us > AUDIO_RESYNC_THRESHOLD_US || error_us < -AUDIO_RESYNC_THRESHOLD_US){
+                m_audio_anchored = false;
+            }
+        }
+        if (!m_audio_anchored){
+            m_audio_anchor_sample = end_sample;
+            m_audio_anchor_time = now;
+            m_audio_anchored = true;
+        }
 
         //  The audio pipeline's per-listener node delivers the working
         //  stream already mixed + resampled to this tracker's fixed
@@ -1158,13 +1246,18 @@ struct StreamHistoryTracker_Ring::Data{
                     break;
                 }
                 auto ring_packet = std::make_shared<AudioRingPacket>();
-                //  Back-date to the start of the AUDIO_FRAME_US of samples this
-                //  packet contains, so the timestamp lines up with the audio
-                //  that was actually captured. This keeps audio aligned with
-                //  video in the ring (eviction) and in save() (which trims the
-                //  audio to the video's start point).
-                ring_packet->timestamp = now - std::chrono::microseconds(AUDIO_FRAME_US);
-                ring_packet->first_sample = m_audio_samples_total - AUDIO_FRAME_SAMPLES;
+                //  Stamp with the capture time of the samples this packet
+                //  presents. The AAC encoder emits each packet a frame late,
+                //  and its pts (in samples, the encoder's 1/48000 timebase)
+                //  already accounts for that and for the encoder's priming.
+                //  This keeps audio aligned with video in the ring (eviction)
+                //  and in save() (which trims the audio to the video's start
+                //  point and muxes both streams by these timestamps).
+                ring_packet->timestamp = audio_sample_time(
+                    packet->pts != AV_NOPTS_VALUE
+                        ? packet->pts
+                        : m_audio_samples_total - AUDIO_FRAME_SAMPLES
+                );
                 ring_packet->data.assign(packet->data, packet->data + packet->size);
                 av_packet_free(&packet);
 
@@ -1199,7 +1292,13 @@ struct StreamHistoryTracker_Ring::Data{
         size_t p_video_start,
         const std::deque<std::shared_ptr<const AudioRingPacket>>& p_audio,
         size_t p_audio_start,
-        WallClock start_ts
+        WallClock start_ts,
+        //  Copies of the codec parameter snapshots, taken by save() under the
+        //  same lock as the packets so that they describe the same encoder
+        //  (owned by the caller; the video extradata may be rewritten here).
+        AVCodecParameters* vpar,
+        AVRational vtb,
+        const AVCodecParameters* apar
     ) const{
         //  Parameter names use the p_ prefix: the ring deques and start
         //  indices have the same names as Impl members (C4458 under /W4).
@@ -1239,51 +1338,32 @@ struct StreamHistoryTracker_Ring::Data{
 
         AVStream* video_stream = nullptr;
         AVStream* audio_stream = nullptr;
-        AVCodecParameters* vpar = nullptr;
-        AVCodecParameters* apar = nullptr;
-        AVRational vtb = {1, 1000};
         bool video_annexb = false;
         {
-            ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
             if (have_video){
                 //  Only H.264 needs extradata (the avcC record); the other
                 //  candidates (MPEG-4 Part 2) carry their stream
                 //  configuration in-band.
-                const bool needs_extradata = (m_video_params != nullptr
-                    && m_video_params->codec_id == AV_CODEC_ID_H264);
-                if (m_video_params == nullptr
-                    || (needs_extradata && m_video_params->extradata == nullptr)
-                ){
-                    m_logger.log("Stream history: Failed to set up video stream (missing encoder state?).", COLOR_RED);
-                    avformat_free_context(format);
-                    return false;
-                }
-                vpar = avcodec_parameters_alloc();
+                const bool needs_extradata = (vpar != nullptr
+                    && vpar->codec_id == AV_CODEC_ID_H264);
                 if (vpar == nullptr
-                    || avcodec_parameters_copy(vpar, m_video_params) < 0
+                    || (needs_extradata && vpar->extradata == nullptr)
                 ){
-                    m_logger.log("Stream history: Failed to copy the video codec parameters.", COLOR_RED);
-                    avcodec_parameters_free(&vpar);
-                    avformat_free_context(format);
-                    return false;
-                }
-                if (needs_extradata && vpar->extradata == nullptr){
                     m_logger.log("Stream history: Failed to set up video stream (missing encoder state?).", COLOR_RED);
-                    avcodec_parameters_free(&vpar);
+                    av_dict_free(&muxer_options);
                     avformat_free_context(format);
                     return false;
                 }
-                vtb = m_video_time_base;
                 char hex[9] = {0};
                 const char* digits = "0123456789abcdef";
-                for (int b = 0; b < 4 && b < m_video_params->extradata_size; b++){
-                    uint8_t byte = m_video_params->extradata[b];
+                for (int b = 0; b < 4 && b < vpar->extradata_size; b++){
+                    uint8_t byte = vpar->extradata[b];
                     hex[2 * b] = digits[byte >> 4];
                     hex[2 * b + 1] = digits[byte & 0xF];
                 }
                 m_logger.log(
                     "Stream history: muxing video (extradata "
-                    + std::to_string(m_video_params->extradata_size) + " bytes, "
+                    + std::to_string(vpar->extradata_size) + " bytes, "
                     + std::string(hex) + ").",
                     COLOR_CYAN
                 );
@@ -1326,14 +1406,14 @@ struct StreamHistoryTracker_Ring::Data{
                     )
                     ){
                         m_logger.log("Stream history: Failed to convert the H.264 extradata from Annex B to AVCC.", COLOR_RED);
-                        avcodec_parameters_free(&vpar);
+                        av_dict_free(&muxer_options);
                         avformat_free_context(format);
                         return false;
                     }
                     uint8_t* new_extradata = (uint8_t*)av_mallocz(avcc.size() + AV_INPUT_BUFFER_PADDING_SIZE);
                     if (new_extradata == nullptr){
                         m_logger.log("Stream history: Failed to allocate the converted H.264 extradata.", COLOR_RED);
-                        avcodec_parameters_free(&vpar);
+                        av_dict_free(&muxer_options);
                         avformat_free_context(format);
                         return false;
                     }
@@ -1345,20 +1425,9 @@ struct StreamHistoryTracker_Ring::Data{
                 }
             }
             if (have_audio_stream){
-                if (m_audio_params == nullptr || m_audio_params->extradata == nullptr){
+                if (apar == nullptr || apar->extradata == nullptr){
                     m_logger.log("Stream history: Failed to set up audio stream (missing encoder state?).", COLOR_RED);
-                    avcodec_parameters_free(&vpar);
-                    avformat_free_context(format);
-                    return false;
-                }
-                apar = avcodec_parameters_alloc();
-                if (apar == nullptr
-                    || avcodec_parameters_copy(apar, m_audio_params) < 0
-                    || apar->extradata == nullptr
-                ){
-                    m_logger.log("Stream history: Failed to copy the audio codec parameters.", COLOR_RED);
-                    avcodec_parameters_free(&vpar);
-                    avcodec_parameters_free(&apar);
+                    av_dict_free(&muxer_options);
                     avformat_free_context(format);
                     return false;
                 }
@@ -1370,8 +1439,7 @@ struct StreamHistoryTracker_Ring::Data{
                 || avcodec_parameters_copy(video_stream->codecpar, vpar) < 0
             ){
                 m_logger.log("Stream history: Failed to set up video stream (missing encoder state?).", COLOR_RED);
-                avcodec_parameters_free(&vpar);
-                avcodec_parameters_free(&apar);
+                av_dict_free(&muxer_options);
                 avformat_free_context(format);
                 return false;
             }
@@ -1390,8 +1458,7 @@ struct StreamHistoryTracker_Ring::Data{
                 || avcodec_parameters_copy(audio_stream->codecpar, apar) < 0
             ){
                 m_logger.log("Stream history: Failed to set up audio stream (missing encoder state?).", COLOR_RED);
-                avcodec_parameters_free(&vpar);
-                avcodec_parameters_free(&apar);
+                av_dict_free(&muxer_options);
                 avformat_free_context(format);
                 return false;
             }
@@ -1401,8 +1468,6 @@ struct StreamHistoryTracker_Ring::Data{
                 ? av_make_q(1, 1000)
                 : av_make_q(1, AUDIO_OUTPUT_RATE);
         }
-        avcodec_parameters_free(&vpar);
-        avcodec_parameters_free(&apar);
 
         //  The lavf encoding docs require the caller to provide an opened IO
         //  context (format->pb) before avformat_write_header() for muxers
@@ -1455,8 +1520,6 @@ struct StreamHistoryTracker_Ring::Data{
             //  whole save.
             int64_t last_video_dts = -1;
             int64_t last_audio_dts = -1;
-            int64_t audio_base_samples =
-                have_audio_stream ? p_audio[p_audio_start]->first_sample : 0;
             size_t vi = p_video_start;
             size_t ai = p_audio_start;
             //  Submit the packets in timestamp order, alternating between the two
@@ -1484,8 +1547,9 @@ struct StreamHistoryTracker_Ring::Data{
                     ).count();
                 }
                 if (have_next_audio){
-                    audio_us = (p_audio[ai]->first_sample - audio_base_samples)
-                        * 1000000 / (int64_t)AUDIO_OUTPUT_RATE;
+                    audio_us = std::chrono::duration_cast<std::chrono::microseconds>(
+                        p_audio[ai]->timestamp - start_ts
+                    ).count();
                 }
                 if (have_next_video && video_us <= audio_us){
                     const VideoRingPacket& vp = *p_video[vi];
@@ -1526,14 +1590,13 @@ struct StreamHistoryTracker_Ring::Data{
                     packet->data = const_cast<uint8_t*>(ap.data.data());
                     packet->size = (int)ap.data.size();
                     packet->stream_index = audio_stream->index;
-                    //  Sample counts use the 1/48000 timebase; rescale to the
-                    //  stream timebase (1/48000 for MP4, 1/1000 for MKV),
-                    //  keeping the dts strictly increasing.
-                    int64_t dts = av_rescale_q(
-                        ap.first_sample - audio_base_samples,
-                        av_make_q(1, AUDIO_OUTPUT_RATE),
-                        audio_stream->time_base
-                    );
+                    //  The packet's capture time relative to the file start,
+                    //  on the same clock as the video, so that a gap in the
+                    //  audio does not shift the later audio against the
+                    //  video. Rescale to the stream timebase (1/48000 for
+                    //  MP4, 1/1000 for MKV), keeping the dts strictly
+                    //  increasing.
+                    int64_t dts = av_rescale_q(audio_us, av_make_q(1, 1000000), audio_stream->time_base);
                     if (dts <= last_audio_dts){
                         dts = last_audio_dts + 1;
                     }
@@ -1573,10 +1636,20 @@ struct StreamHistoryTracker_Ring::Data{
         //  shared, not copied). Local names avoid C4458 (/W4) member shadowing.
         std::deque<std::shared_ptr<const VideoRingPacket>> video_snapshot;
         std::deque<std::shared_ptr<const AudioRingPacket>> audio_snapshot;
+        //  The codec parameters are copied in the same critical section as
+        //  the packets: an encoder fallback replaces both together (see
+        //  init_video_encoder()), and muxing one encoder's packets with
+        //  another's parameters produces a broken file.
+        CodecParametersPtr video_params;
+        CodecParametersPtr audio_params;
+        AVRational video_time_base;
         {
             WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
             video_snapshot = this->m_video;
             audio_snapshot = this->m_audio;
+            video_params = copy_codec_parameters(m_video_params);
+            audio_params = copy_codec_parameters(m_audio_params);
+            video_time_base = m_video_time_base;
         }
         if (video_snapshot.empty() && audio_snapshot.empty()){
             m_logger.log("Cannot save stream history: Nothing was recorded.", COLOR_RED);
@@ -1615,7 +1688,13 @@ struct StreamHistoryTracker_Ring::Data{
             }
         }
 
-        bool ok = mux_to_file(filename, video_snapshot, video_start_index, audio_snapshot, audio_start, start_ts);
+        bool ok = mux_to_file(
+            filename,
+            video_snapshot, video_start_index,
+            audio_snapshot, audio_start,
+            start_ts,
+            video_params.get(), video_time_base, audio_params.get()
+        );
         m_logger.log(
             ok ? "Stream history saved to '" + filename + "'."
                : "Failed to save stream history to '" + filename + "'.",
