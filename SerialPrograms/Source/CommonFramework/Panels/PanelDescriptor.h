@@ -57,7 +57,7 @@ public:
     virtual std::unique_ptr<PanelSession> make_panel() const = 0;
 
 
-private:
+public:
     static Color pick_color(PanelQualityStanding standing);
 
 

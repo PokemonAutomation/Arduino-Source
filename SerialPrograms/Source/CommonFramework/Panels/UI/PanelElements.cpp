@@ -61,6 +61,7 @@ CollapsibleGroupBox* make_panel_header(
 
     return header;
 }
+#if 0
 CollapsibleGroupBox* make_panel_header(
     QWidget& parent,
     const std::string& display_name,
@@ -100,6 +101,63 @@ CollapsibleGroupBox* make_panel_header(
     }
 
     QLabel* label = new QLabel(QString::fromStdString(text), header);
+    label->setWordWrap(true);
+    layout->addWidget(label);
+
+    return header;
+}
+#endif
+CollapsibleGroupBox* make_panel_header(
+    QWidget& parent,
+    const std::string& display_name,
+    const std::string& doc_link,
+    const std::string& description,
+    PanelQualityStanding standing
+){
+    CollapsibleGroupBox* header = make_panel_header(parent, display_name, doc_link, description);
+    QLayout* layout = header->widget()->layout();
+
+    std::string text;
+    switch (standing){
+    case PanelQualityStanding::OFFICIAL:
+        return header;
+
+    case PanelQualityStanding::OFFICIAL_BETA:
+        text = "(This program is in beta and may not be fully stable.)";
+        break;
+
+    case PanelQualityStanding::OFFICIAL_BELOW_STANDARDS:
+        text = "(This program does not our quality standards and may be difficult to use.)";
+        break;
+
+    case PanelQualityStanding::THIRD_PARTY:
+        text = "(This is a 3rd party program that has not been fully vetted against our quality standards.)";
+        break;
+
+    case PanelQualityStanding::THIRD_PARTY_UNVETTED:
+        text = "(This is an unvetted 3rd party program. We take no responsibility for what happens.)";
+        break;
+
+    case PanelQualityStanding::UNMAINTAINED:
+        text = "(This program is no longer maintained and may no longer be stable.)";
+        break;
+
+    case PanelQualityStanding::DEPRECATED:
+        text = "(This program is deprecated and will likely be removed in the future.)";
+        break;
+
+    case PanelQualityStanding::DEVELOPER:
+        text = "(This is a developer program.)";
+        break;
+
+    }
+
+    QLabel* label = new QLabel(
+        QString::fromStdString(
+            html_color_text(text, PanelDescriptor::pick_color(standing))
+        ),
+        header
+    );
     label->setWordWrap(true);
     layout->addWidget(label);
 
@@ -309,6 +367,7 @@ void populate_panel_widget(
                 "and no longer maintained. Please consider using a newer alternative."
             )
         );
+        break;
     }
     case PanelQualityStanding::UNMAINTAINED:{
         QMessageBox box;
@@ -320,6 +379,7 @@ void populate_panel_widget(
                 "maintained and may not meet our quality standards."
             )
         );
+        break;
     }
     default:;
     }
@@ -336,7 +396,7 @@ void populate_panel_widget(
             descriptor.display_name(),
             descriptor.doc_link(),
             descriptor.description(),
-            console_descriptor->controller_class()
+            console_descriptor->standing()
         );
     }else{
         header = make_panel_header(
