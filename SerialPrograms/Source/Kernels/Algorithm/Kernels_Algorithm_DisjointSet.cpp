@@ -3,8 +3,6 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
-
-#include <vector>
 #include <numeric>
 
 #include "Kernels_Algorithm_DisjointSet.h"

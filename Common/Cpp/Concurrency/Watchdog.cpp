@@ -7,7 +7,6 @@
 #include <iostream>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/SpinPause.h"
-#include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Watchdog.h"
 
 //using std::cout;

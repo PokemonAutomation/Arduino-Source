@@ -14,7 +14,6 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonPokopia/Inference/PokemonPokopia_ButtonDetector.h"
-#include "VideoGames/PokemonPokopia/Inference/PokemonPokopia_MovesDetection.h"
 #include "VideoGames/PokemonPokopia/Inference/PokemonPokopia_PCDetection.h"
 #include "VideoGames/PokemonPokopia/Inference/PokemonPokopia_SettingsScreenDetector.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"

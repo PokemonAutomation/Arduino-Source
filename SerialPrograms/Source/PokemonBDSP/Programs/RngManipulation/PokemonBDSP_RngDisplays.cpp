@@ -3,8 +3,6 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
-
-#include <cmath>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP_RngDisplays.h"

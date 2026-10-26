@@ -10,8 +10,6 @@
 #include <QWidget>
 #include "Common/Qt/UiStateQtWidget.h"
 #include "GameConsole/Framework/MultiConsolePanelSession.h"
-#include "GameConsole/MultiConsolePanel.h"
-
 namespace PokemonAutomation{
 namespace GameConsole{
 

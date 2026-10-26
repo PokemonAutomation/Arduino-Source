@@ -8,7 +8,6 @@
 #include <cmath>
 #include <cstdio>
 #include <random>
-#include "Common/Compiler.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Common/Cpp/Containers/GuardPageBuffer.h"

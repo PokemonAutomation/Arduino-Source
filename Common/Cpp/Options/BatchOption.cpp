@@ -6,7 +6,6 @@
 
 #include <string>
 #include <vector>
-#include "Common/Compiler.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Cpp/Json/JsonValue.h"

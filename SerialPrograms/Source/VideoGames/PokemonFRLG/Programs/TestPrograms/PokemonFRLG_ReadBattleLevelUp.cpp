@@ -6,7 +6,6 @@
 
 #include <chrono>
 #include <string>
-#include <optional>
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"

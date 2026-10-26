@@ -6,28 +6,20 @@
 
 #include "PokemonFRLG_WildEncounterReader.h"
 #include "Common/Cpp/Color.h"
-#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/ImageFilter.h"
-#include "CommonTools/Images/ImageManip.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
-#include "CommonTools/OCR/OCR_Routines.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG_OcrPreprocessing.h"
-#include "VideoGames/PokemonFRLG/PokemonFRLG_Tests.h"
-#include "VideoGames/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_EncountersDatabase.h"
 #include "Tests/TestUtils.h"
 #include "PokemonFRLG_DigitReader.h"
 #include <opencv2/imgproc.hpp>
-#include <sstream>
-
 namespace PokemonAutomation {
 namespace NintendoSwitch {
 namespace PokemonFRLG {

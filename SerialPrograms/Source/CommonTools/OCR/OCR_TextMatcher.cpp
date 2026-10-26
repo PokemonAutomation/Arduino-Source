@@ -9,7 +9,6 @@
 #include <vector>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "Common/Qt/StringToolsQt.h"
 #include "OCR_StringNormalization.h"
 #include "OCR_TextMatcher.h"
 

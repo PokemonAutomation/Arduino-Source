@@ -8,7 +8,6 @@
 #define PokemonAutomation_Sockets_AbstractClientSocket_H
 
 #include <string>
-#include "Common/Compiler.h"
 #include "Common/Cpp/ListenerSet.h"
 
 namespace PokemonAutomation{

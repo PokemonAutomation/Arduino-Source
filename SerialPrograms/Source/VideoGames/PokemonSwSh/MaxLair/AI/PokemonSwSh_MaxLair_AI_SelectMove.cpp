@@ -5,7 +5,6 @@
  */
 
 #include "VideoGames/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Matchup.h"
-#include "VideoGames/PokemonSwSh/Resources/PokemonSwSh_TypeMatchup.h"
 #include "VideoGames/PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"
 #include "PokemonSwSh_MaxLair_AI.h"
 #include "PokemonSwSh_MaxLair_AI_Tools.h"

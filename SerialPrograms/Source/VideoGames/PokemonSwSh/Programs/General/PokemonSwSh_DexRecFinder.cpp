@@ -18,7 +18,6 @@
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "VideoGames/PokemonSwSh/PokemonSwSh_Settings.h"
 #include "VideoGames/PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
-#include "VideoGames/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "VideoGames/PokemonSwSh/Resources/PokemonSwSh_NameDatabase.h"
 #include "PokemonSwSh_DexRecFinder.h"
 

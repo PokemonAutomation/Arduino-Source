@@ -5,7 +5,6 @@
  */
 
 #include <algorithm>
-#include <cmath>
 #include <opencv2/imgproc.hpp>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"

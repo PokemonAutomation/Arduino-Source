@@ -7,7 +7,6 @@
 
 
 #include <string>
-#include <sstream>
 #include <map>
 //#include <iostream>
 #include <opencv2/imgproc.hpp>

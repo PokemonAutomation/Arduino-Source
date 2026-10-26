@@ -8,8 +8,6 @@
 
 #ifndef PokemonAutomation_StreamHistoryTracker_Null_H
 #define PokemonAutomation_StreamHistoryTracker_Null_H
-
-#include "Common/Compiler.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 

@@ -6,7 +6,6 @@
 
 #include <utility>
 #include <cmath>
-#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "ImageViewRGB32.h"

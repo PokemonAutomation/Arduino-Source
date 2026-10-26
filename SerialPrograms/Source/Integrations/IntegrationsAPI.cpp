@@ -5,7 +5,6 @@
  */
 
 #include <memory>
-#include "Common/Compiler.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Integrations/ProgramTracker.h"

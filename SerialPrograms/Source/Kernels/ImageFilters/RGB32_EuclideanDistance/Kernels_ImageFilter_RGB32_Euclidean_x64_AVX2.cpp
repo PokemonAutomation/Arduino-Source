@@ -10,8 +10,6 @@
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines_x64_AVX2.h"
-#include "Kernels_ImageFilter_RGB32_Euclidean.h"
-
 namespace PokemonAutomation{
 namespace Kernels{
 

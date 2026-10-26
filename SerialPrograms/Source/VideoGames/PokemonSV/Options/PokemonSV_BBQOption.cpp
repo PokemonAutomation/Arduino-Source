@@ -3,8 +3,6 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
-
-#include <map>
 #include "PokemonSV_BBQOption.h"
 #include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
 

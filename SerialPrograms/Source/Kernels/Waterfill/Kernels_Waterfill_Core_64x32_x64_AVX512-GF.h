@@ -8,7 +8,6 @@
 #define PokemonAutomation_Kernels_Waterfill_Core_64x32_x64_AVX512GF_H
 
 #include "Kernels/Kernels_BitScan.h"
-#include "Kernels/Kernels_x64_AVX512.h"
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x32_x64_AVX512.h"
 #include "Kernels_Waterfill_Intrinsics_x64_AVX512.h"
 #include "Kernels_Waterfill_Intrinsics_x64_AVX512-GF.h"

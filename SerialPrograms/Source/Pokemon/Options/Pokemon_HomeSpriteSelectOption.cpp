@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "Pokemon/Resources/Pokemon_PokemonForms.h"
 #include "Pokemon/Resources/Pokemon_PokemonHomeSprites.h"
 #include "Pokemon_HomeSpriteSelectOption.h"

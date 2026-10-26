@@ -7,7 +7,6 @@
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "OCR_PaddleOCR.h"
 #include "OCR_RawTesseractOCR.h"

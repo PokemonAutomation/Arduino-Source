@@ -7,7 +7,6 @@
 #ifdef PA_AutoDispatch_x64_19_IceLake
 
 #include "Kernels/Kernels_BitScan.h"
-#include "Kernels/Kernels_x64_AVX512.h"
 #include "Kernels_Waterfill_Routines.h"
 #include "Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h"
 

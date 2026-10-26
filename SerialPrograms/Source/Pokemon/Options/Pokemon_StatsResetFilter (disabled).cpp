@@ -3,8 +3,6 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
-
-#include "Common/Compiler.h"
 #include "Pokemon_StatsResetFilter.h"
 #include "Pokemon_StatsHuntFilter.h"
 

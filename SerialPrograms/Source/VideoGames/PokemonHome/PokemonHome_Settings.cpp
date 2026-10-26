@@ -3,8 +3,6 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
-
-#include "CommonFramework/Globals.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonHome_Settings.h"
 

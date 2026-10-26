@@ -3,8 +3,6 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
-
-#include <map>
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "PokemonLA_WhiteObjectDetector.h"

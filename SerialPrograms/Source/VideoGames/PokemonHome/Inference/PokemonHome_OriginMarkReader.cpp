@@ -11,7 +11,6 @@
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/DetectedBoxes.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
-#include "CommonTools/ImageMatch/ExactImageMatcher.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "PokemonHome_OriginMarkReader.h"
 

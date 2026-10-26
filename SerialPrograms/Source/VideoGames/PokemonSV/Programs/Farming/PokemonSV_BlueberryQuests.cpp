@@ -6,7 +6,6 @@
 
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
@@ -24,7 +23,6 @@
 #include "VideoGames/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "VideoGames/PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "VideoGames/PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
-#include "VideoGames/PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "VideoGames/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_OverworldSensors.h"

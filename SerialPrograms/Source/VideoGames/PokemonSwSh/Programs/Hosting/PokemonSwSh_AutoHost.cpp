@@ -12,7 +12,6 @@
 #include "NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_NumberCodeEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonSwSh/PokemonSwSh_Settings.h"
-#include "VideoGames/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h"
 #include "VideoGames/PokemonSwSh/Inference/Dens/PokemonSwSh_RaidLobbyReader.h"
 #include "VideoGames/PokemonSwSh/Programs/PokemonSwSh_Internet.h"
 #include "PokemonSwSh_DenTools.h"

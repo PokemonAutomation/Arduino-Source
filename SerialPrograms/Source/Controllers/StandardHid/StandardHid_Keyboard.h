@@ -10,7 +10,6 @@
 #define PokemonAutomation_StandardHid_Keyboard_H
 
 #include <vector>
-#include "Common/Cpp/Containers/Pimpl.h"
 #include "ControllerInput/Keyboard/KeyboardHidButtons.h"
 #include "Controllers/Controller.h"
 

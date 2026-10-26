@@ -7,7 +7,6 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "CommonFramework/Globals.h"
 #include "PokemonLZA_DonutPowers.h"
 
 namespace PokemonAutomation{

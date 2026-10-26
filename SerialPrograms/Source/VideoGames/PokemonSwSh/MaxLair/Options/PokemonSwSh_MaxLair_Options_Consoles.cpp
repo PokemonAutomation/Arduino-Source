@@ -3,9 +3,6 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
-
-#include "Common/Compiler.h"
-#include "CommonFramework/Globals.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh_MaxLair_Options_Consoles.h"

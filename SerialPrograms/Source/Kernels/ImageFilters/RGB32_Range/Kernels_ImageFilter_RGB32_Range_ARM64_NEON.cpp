@@ -5,8 +5,6 @@
  */
 
 #ifdef PA_AutoDispatch_arm64_20_M1
-
-#include "Kernels/Kernels_arm64_NEON.h"
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_arm64_NEON.h"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines_ARM64_NEON.h"
