@@ -30,7 +30,7 @@ ReadBattleLevelUp_Descriptor::ReadBattleLevelUp_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG",
         "Read Battle Level-Up Stats", "",
         "Read stats from the relevant popup after leveling up during a battle.",
-        PanelQualityStanding::OFFICIAL,
+        PanelQualityStanding::DEVELOPER,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

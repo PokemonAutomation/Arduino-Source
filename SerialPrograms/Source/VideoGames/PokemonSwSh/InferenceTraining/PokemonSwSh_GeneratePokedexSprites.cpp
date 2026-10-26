@@ -30,7 +30,7 @@ GeneratePokedexSprites_Descriptor::GeneratePokedexSprites_Descriptor()
         STRING_POKEMON + " SwSh", "Generate " + STRING_POKEMON + " Sprite Data",
         "",
         "Generate " + STRING_POKEMON + " Sprite data by iterating the " + STRING_POKEDEX + ".",
-        PanelQualityStanding::OFFICIAL,
+        PanelQualityStanding::DEVELOPER,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

@@ -30,7 +30,7 @@ ReadTrainerId_Descriptor::ReadTrainerId_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG",
         "Read TID", "",
         "Read TID from the trainer card.",
-        PanelQualityStanding::OFFICIAL,
+        PanelQualityStanding::DEVELOPER,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
