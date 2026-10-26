@@ -28,7 +28,7 @@ LotoFarmer_Descriptor::LotoFarmer_Descriptor()
         STRING_POKEMON + " SwSh", "Date Spam - Loto Farmer",
         "Programs/PokemonSwSh/DateSpam-LotoFarmer.html",
         "Farm the Loto ID.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

@@ -23,7 +23,7 @@ ClothingBuyer_Descriptor::ClothingBuyer_Descriptor()
         STRING_POKEMON + " SwSh", "Clothing Buyer",
         "Programs/PokemonSwSh/ClothingBuyer.html",
         "Buy out all the clothing in a store.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

@@ -27,7 +27,7 @@ DaySkipperJPN7p8k_Descriptor::DaySkipperJPN7p8k_Descriptor()
         STRING_POKEMON + " SwSh", "Day Skipper (JPN) - 7.8k",
         "Programs/PokemonSwSh/DaySkipperJPN-7.8k.html",
         "A faster, but less reliable Japanese date skipper. (7800 skips/hour)",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_WithRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

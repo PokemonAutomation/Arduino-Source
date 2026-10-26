@@ -31,7 +31,7 @@ CloneItemsBoxCopy2_Descriptor::CloneItemsBoxCopy2_Descriptor()
         "Programs/PokemonBDSP/CloneItemsBoxCopy2.html",
         "With the menu glitch active, clone entire boxes of items at a time. "
         "<font color=\"red\">(The menu glitch can only be activated on version 1.1.0 - 1.1.3.)</font>",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

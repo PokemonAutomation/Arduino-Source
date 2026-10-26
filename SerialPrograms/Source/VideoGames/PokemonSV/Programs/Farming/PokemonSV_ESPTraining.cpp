@@ -29,7 +29,7 @@ ESPTraining_Descriptor::ESPTraining_Descriptor()
         STRING_POKEMON + " SV", "ESP Training",
         "Programs/PokemonSV/ESPTraining.html",
         "Clear the ESP Training to farm EV berries.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

@@ -47,7 +47,7 @@ RideCloner101_Descriptor::RideCloner101_Descriptor()
         STRING_POKEMON + " SV", "Ride Cloner (1.0.1)",
         "Programs/PokemonSV/RideCloner-101.html",
         "Clone your ride legendary (and its item) using the add-to-party glitch.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::UNMAINTAINED,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

@@ -27,7 +27,7 @@ BerryFarmer_Descriptor::BerryFarmer_Descriptor()
         STRING_POKEMON + " SwSh", "Date Spam - Berry Farmer",
         "Programs/PokemonSwSh/DateSpam-BerryFarmer.html",
         "Farm berries.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

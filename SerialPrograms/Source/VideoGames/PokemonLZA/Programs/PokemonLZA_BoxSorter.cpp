@@ -49,7 +49,7 @@ BoxSorter_Descriptor::BoxSorter_Descriptor()
         STRING_POKEMON + " Legends: Z-A", "Box Sorter",
         "Programs/PokemonLZA/BoxSorter.html",
         "Order boxes of " + STRING_POKEMON + ".",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

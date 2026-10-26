@@ -59,7 +59,7 @@ BoxSorter_Descriptor::BoxSorter_Descriptor()
         STRING_POKEMON + " Home", "Box Sorter",
         "Programs/PokemonHome/BoxSorter.html",
         "Order boxes of " + STRING_POKEMON + ".",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

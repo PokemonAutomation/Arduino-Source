@@ -28,7 +28,7 @@ ShinyHuntShaymin_Descriptor::ShinyHuntShaymin_Descriptor()
         STRING_POKEMON + " BDSP", "Shiny Hunt - Shaymin",
         "Programs/PokemonBDSP/ShinyHunt-Shaymin.html",
         "Shiny hunt Shaymin using the runaway method.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

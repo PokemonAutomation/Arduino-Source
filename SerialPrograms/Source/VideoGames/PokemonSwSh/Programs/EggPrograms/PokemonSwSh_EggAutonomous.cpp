@@ -52,7 +52,7 @@ EggAutonomous_Descriptor::EggAutonomous_Descriptor()
         STRING_POKEMON + " SwSh", "Egg Autonomous",
         "Programs/PokemonSwSh/EggAutonomous.html",
         "Automatically fetch+hatch eggs and keep all shinies.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

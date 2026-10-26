@@ -33,7 +33,7 @@ WigglytuffFarmer_Descriptor::WigglytuffFarmer_Descriptor()
         STRING_POKEMON + " LZA", "Wigglytuff Farmer",
         "Programs/PokemonLZA/WigglytuffFarmer.html",
         "Farm the Side Mission 157 (DLC) for money.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

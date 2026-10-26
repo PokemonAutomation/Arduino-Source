@@ -26,7 +26,7 @@ PoffinCooker_Descriptor::PoffinCooker_Descriptor()
         STRING_POKEMON + " BDSP", "Poffin Cooker",
         "Programs/PokemonBDSP/PoffinCooker.html",
         "Cook Poffins.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

@@ -204,7 +204,7 @@ AutoMultiSpawn_Descriptor::AutoMultiSpawn_Descriptor()
         STRING_POKEMON + " LA", "Auto Multi-Spawn",
         "Programs/PokemonLA/AutoMultiSpawn.html",
         "Advance a path in MultiSpawn shiny hunting method.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::UNMAINTAINED,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

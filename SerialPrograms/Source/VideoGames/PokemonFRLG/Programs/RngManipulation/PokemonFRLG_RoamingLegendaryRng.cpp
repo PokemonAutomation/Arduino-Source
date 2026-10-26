@@ -11,11 +11,8 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Language.h"
-#include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_RngNavigation.h"
 #include "PokemonFRLG_HardReset.h"
@@ -34,7 +31,7 @@ RoamingLegendaryRng_Descriptor::RoamingLegendaryRng_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Roaming Legendary RNG",
         "Programs/PokemonFRLG/RoamingLegendaryRng.html",
         "Automatically calibrate timings to hit a specific RNG target for FRLG Roaming Legendary " + STRING_POKEMON,
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

@@ -43,7 +43,7 @@ TeraSelfFarmer_Descriptor::TeraSelfFarmer_Descriptor()
         STRING_POKEMON + " SV", "Tera Self Farmer",
         "Programs/PokemonSV/TeraSelfFarmer.html",
         "Farm items and " + STRING_POKEMON + " from Tera raids. Can also hunt for shiny and high reward raids.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

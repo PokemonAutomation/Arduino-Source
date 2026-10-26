@@ -26,7 +26,7 @@ NuggetBridgeFarmer_Descriptor::NuggetBridgeFarmer_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Nugget Bridge Farmer",
         "Programs/PokemonFRLG/NuggetBridgeFarmer.html",
         "Farm the Nugget Bridge for money.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

@@ -34,7 +34,7 @@ ShinyHuntAutonomousOverworld_Descriptor::ShinyHuntAutonomousOverworld_Descriptor
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Overworld",
         "Programs/PokemonSwSh/ShinyHuntAutonomous-Overworld.html",
         "Automatically shiny hunt overworld " + STRING_POKEMON + " with video feedback.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

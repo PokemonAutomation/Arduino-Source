@@ -27,7 +27,7 @@ AutonomousBallThrower_Descriptor::AutonomousBallThrower_Descriptor()
         STRING_POKEMON + " BDSP", "Autonomous Ball Thrower",
         "Programs/PokemonBDSP/AutonomousBallThrower.html",
         "Repeatedly throw a ball and reset until you catch the pokemon.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

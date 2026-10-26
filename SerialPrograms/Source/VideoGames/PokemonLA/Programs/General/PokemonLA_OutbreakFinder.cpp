@@ -104,7 +104,7 @@ OutbreakFinder_Descriptor::OutbreakFinder_Descriptor()
         STRING_POKEMON + " LA", "Outbreak Finder",
         "Programs/PokemonLA/OutbreakFinder.html",
         "Search for an outbreak for a specific " + STRING_POKEMON,
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

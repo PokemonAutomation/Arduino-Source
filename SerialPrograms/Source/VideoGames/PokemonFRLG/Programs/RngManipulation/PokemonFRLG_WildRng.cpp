@@ -12,11 +12,8 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.h"
 #include "VideoGames/PokemonFRLG/Programs/PokemonFRLG_SafariOptimalAction.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
@@ -40,7 +37,7 @@ WildRng_Descriptor::WildRng_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Wild RNG",
         "Programs/PokemonFRLG/WildRng.html",
         "Automatically calibrate timings to hit a specific RNG target for FRLG random wild encounters.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

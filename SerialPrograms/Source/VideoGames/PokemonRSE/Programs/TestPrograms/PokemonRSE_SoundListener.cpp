@@ -4,18 +4,9 @@
  *
  */
 
-#include <float.h>
 #include <chrono>
-#include <map>
 #include <iostream>
-#include <fstream>
-#include <sstream>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Containers/AlignedVector.tpp"
-#include "CommonFramework/AudioPipeline/AudioFeed.h"
-#include "CommonFramework/AudioPipeline/AudioTemplate.h"
-#include "CommonTools/Audio/AudioTemplateCache.h"
-#include "CommonTools/Audio/SpectrogramMatcher.h"
 #include "CommonTools/Async/InferenceSession.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.h"
@@ -34,7 +25,7 @@ SoundListener_Descriptor::SoundListener_Descriptor()
         STRING_POKEMON + " RSE", "Sound Listener",
         "",
         "Test sound detectors listening to audio stream.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::ENABLE_COMMANDS

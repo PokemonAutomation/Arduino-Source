@@ -67,7 +67,7 @@ PokedexTasksReader_Descriptor::PokedexTasksReader_Descriptor()
         STRING_POKEMON + " LA", STRING_POKEDEX + " Tasks Reader",
         "Programs/PokemonLA/PokedexTasksReader.html",
         "Read all the tasks in your " + STRING_POKEDEX + " and output a file with the tasks you did.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

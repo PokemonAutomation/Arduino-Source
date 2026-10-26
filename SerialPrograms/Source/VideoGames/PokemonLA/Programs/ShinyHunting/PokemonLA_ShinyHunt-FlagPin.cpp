@@ -31,7 +31,7 @@ ShinyHuntFlagPin_Descriptor::ShinyHuntFlagPin_Descriptor()
         STRING_POKEMON + " LA", "Shiny Hunt - Flag Pin",
         "Programs/PokemonLA/ShinyHunt-FlagPin.html",
         "Repeatedly travel to a flag pin to shiny hunt " + STRING_POKEMON + " around it.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

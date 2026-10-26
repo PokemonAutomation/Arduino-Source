@@ -48,7 +48,7 @@ CramomaticRNG_Descriptor::CramomaticRNG_Descriptor()
         STRING_POKEMON + " SwSh", "Cram-o-matic RNG",
         "Programs/PokemonSwSh/CramomaticRNG.html",
         "Perform RNG manipulation to get rare balls from the Cram-o-matic.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

@@ -25,7 +25,7 @@ MoveBoxArrow_Descriptor::MoveBoxArrow_Descriptor()
         "Test program to move the box cursor to a specified location. "
         "Used for debugging box cursor movement. "
         "Start this program while in the box system view.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::ENABLE_COMMANDS

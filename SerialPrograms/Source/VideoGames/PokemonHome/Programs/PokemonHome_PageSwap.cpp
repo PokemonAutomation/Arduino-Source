@@ -22,7 +22,7 @@ PageSwap_Descriptor::PageSwap_Descriptor()
         STRING_POKEMON + " Home", STRING_POKEMON + " Home: Page Swap",
         "Programs/PokemonHome/PageSwap.html",
         "Swap 30 boxes (1 page) in " + STRING_POKEMON + " Home.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

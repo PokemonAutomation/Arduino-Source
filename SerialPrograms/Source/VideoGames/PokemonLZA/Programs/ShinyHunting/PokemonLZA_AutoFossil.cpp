@@ -49,7 +49,7 @@ AutoFossil_Descriptor::AutoFossil_Descriptor()
         STRING_POKEMON + " LZA", "Auto Fossil",
         "Programs/PokemonLZA/AutoFossil.html",
         "Automatically revive fossils.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

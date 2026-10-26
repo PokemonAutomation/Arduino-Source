@@ -38,7 +38,7 @@ NuggetFarmerHighlands_Descriptor::NuggetFarmerHighlands_Descriptor()
         STRING_POKEMON + " LA", "Nugget Farmer (Highlands)",
         "Programs/PokemonLA/NuggetFarmerHighlands.html",
         "Farm nuggets off the Miss Fortune sisters in the Coronet Highlands.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

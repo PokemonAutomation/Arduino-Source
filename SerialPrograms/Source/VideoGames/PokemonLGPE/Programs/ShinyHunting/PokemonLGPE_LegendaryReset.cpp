@@ -12,9 +12,7 @@
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon.h"
-#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "VideoGames/PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.h"
 #include "VideoGames/PokemonLGPE/Inference/Sounds/PokemonLGPE_ShinySoundDetector.h"
 #include "VideoGames/PokemonLGPE/Programs/PokemonLGPE_GameEntry.h"
@@ -30,7 +28,7 @@ LegendaryReset_Descriptor::LegendaryReset_Descriptor()
         Pokemon::STRING_POKEMON + " LGPE", "Legendary Reset",
         "Programs/PokemonLGPE/LegendaryReset.html",
         "Shiny hunt Legendary Pokemon by resetting the game.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::SpecializedController,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

@@ -31,7 +31,7 @@ ThreeSegmentDudunsparceFinder_Descriptor::ThreeSegmentDudunsparceFinder_Descript
         STRING_POKEMON + " SV", "Three-Segment Dudunsparce Finder",
         "Programs/PokemonSV/ThreeSegmentDudunsparceFinder.html",
         "Check whether a box of Dunsparce contain at least one that evolves into Three-Segment Dudunsparce.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL_BETA,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

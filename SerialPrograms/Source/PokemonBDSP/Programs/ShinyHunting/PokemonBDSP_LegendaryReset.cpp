@@ -28,7 +28,7 @@ LegendaryReset_Descriptor::LegendaryReset_Descriptor()
         STRING_POKEMON + " BDSP", "Legendary Reset",
         "Programs/PokemonBDSP/LegendaryReset.html",
         "Shiny hunt a standing legendary " + STRING_POKEMON + ".",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

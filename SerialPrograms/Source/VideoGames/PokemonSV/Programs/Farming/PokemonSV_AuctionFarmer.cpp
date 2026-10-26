@@ -47,7 +47,7 @@ AuctionFarmer_Descriptor::AuctionFarmer_Descriptor()
         STRING_POKEMON + " SV", "Auction Farmer",
         "Programs/PokemonSV/AuctionFarmer.html",
         "Check auctions and bid on items.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

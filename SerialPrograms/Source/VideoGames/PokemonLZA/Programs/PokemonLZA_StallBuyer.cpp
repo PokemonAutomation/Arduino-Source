@@ -65,7 +65,7 @@ StallBuyer_Descriptor::StallBuyer_Descriptor()
         STRING_POKEMON + " LZA", "Stall Buyer",
         "Programs/PokemonLZA/StallBuyer.html",
         "Buy berries or mints from stall.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

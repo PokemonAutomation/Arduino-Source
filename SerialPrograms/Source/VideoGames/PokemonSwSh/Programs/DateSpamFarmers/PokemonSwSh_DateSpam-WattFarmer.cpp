@@ -32,7 +32,7 @@ WattFarmer_Descriptor::WattFarmer_Descriptor()
         STRING_POKEMON + " SwSh", "Date Spam - Watt Farmer",
         "Programs/PokemonSwSh/DateSpam-WattFarmer.html",
         "Farm watts. (7.2 seconds/fetch, 1 million watts/hour with a tick-precise controller)",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

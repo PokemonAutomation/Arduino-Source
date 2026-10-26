@@ -31,7 +31,7 @@ MassAttachItems_Descriptor::MassAttachItems_Descriptor()
         STRING_POKEMON + " SV", "Mass Attach Items",
         "Programs/PokemonSV/MassAttachItems.html",
         "Mass attach items to " + STRING_POKEMON + ".",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

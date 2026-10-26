@@ -29,7 +29,7 @@ FossilRevival_Descriptor::FossilRevival_Descriptor()
         Pokemon::STRING_POKEMON + " LGPE", "Fossil Revival",
         "Programs/PokemonLGPE/FossilRevival.html",
         "Shiny hunt fossil Pokemon by reviving and resetting.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::SpecializedController,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

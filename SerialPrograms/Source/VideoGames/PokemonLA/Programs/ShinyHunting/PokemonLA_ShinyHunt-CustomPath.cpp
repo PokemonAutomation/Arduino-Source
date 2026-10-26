@@ -36,7 +36,7 @@ ShinyHuntCustomPath_Descriptor::ShinyHuntCustomPath_Descriptor()
         STRING_POKEMON + " LA", "Shiny Hunt - Custom Path",
         "Programs/PokemonLA/ShinyHunt-CustomPath.html",
         "Repeatedly travel on a custom path to shiny hunt " + STRING_POKEMON + " around it.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

@@ -23,7 +23,7 @@ FriendCodeAdder_Descriptor::FriendCodeAdder_Descriptor()
         "Nintendo Switch", "Friend Code Adder",
         "Programs/NintendoSwitch/FriendCodeAdder.html",
         "Add a list of friend codes.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

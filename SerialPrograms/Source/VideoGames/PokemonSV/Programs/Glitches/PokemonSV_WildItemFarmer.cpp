@@ -34,7 +34,7 @@ WildItemFarmer_Descriptor::WildItemFarmer_Descriptor()
         Pokemon::STRING_POKEMON + " SV", "Wild Item Farmer",
         "Programs/PokemonSV/WildItemFarmer.html",
         "Farm an item held by a wild " + Pokemon::STRING_POKEMON + ".",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::UNMAINTAINED,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

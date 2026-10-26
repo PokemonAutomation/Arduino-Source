@@ -32,7 +32,7 @@ MassRelease_Descriptor::MassRelease_Descriptor()
         STRING_POKEMON + " SV", "Mass Release",
         "Programs/PokemonSV/MassRelease.html",
         "Mass release boxes of " + STRING_POKEMON + ".",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

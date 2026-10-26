@@ -35,7 +35,7 @@ CloudIslandReset_Descriptor::CloudIslandReset_Descriptor()
         STRING_POKEMON + " Pokopia", "Cloud Island Reset",
         "Programs/PokemonPokopia/CloudIslandReset.html",
         "Reset the Cloud Island for Mew stamps and recipes.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

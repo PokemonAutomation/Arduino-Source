@@ -139,7 +139,7 @@ TestDudunsparceFormDetector_Descriptor::TestDudunsparceFormDetector_Descriptor()
         "Nintendo Switch", "Test Dudunsparce Form Detector",
         "",
         "Test ML model on Dudunsparce form in SV box system",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL_BETA,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::ENABLE_COMMANDS

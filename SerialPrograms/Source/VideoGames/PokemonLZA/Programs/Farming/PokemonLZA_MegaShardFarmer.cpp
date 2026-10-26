@@ -30,7 +30,7 @@ MegaShardFarmer_Descriptor::MegaShardFarmer_Descriptor()
         STRING_POKEMON + " LZA", "Mega Shard Farmer",
         "Programs/PokemonLZA/MegaShardFarmer.html",
         "Farm the mega shards behind Restaurant Le Yeah.",
-        PanelQualityStanding::UNCATEGORIZED,
+        PanelQualityStanding::OFFICIAL,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
