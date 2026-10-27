@@ -19,7 +19,6 @@
 #include "Common/Cpp/TestRunners/UnitTest.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
-#include "CommonFramework/AudioPipeline/AudioConstants.h"
 #include "Kernels/AudioPipeline/Kernels_RawAudio2WorkingAudio.h"
 #include "Kernels/AudioPipeline/Kernels_ChannelMixer.h"
 #include "Kernels/AudioResampler/Kernels_AudioResampler.h"

@@ -7,7 +7,6 @@
 #ifdef PA_AutoDispatch_x64_08_Nehalem
 
 #include <immintrin.h>
-#include "Kernels/Kernels_x64_SSE41.h"
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines_x64_SSE42.h"

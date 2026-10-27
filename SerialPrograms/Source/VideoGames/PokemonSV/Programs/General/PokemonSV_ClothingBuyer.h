@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PokemonSwSh_ClothingBuyer_H
-#define PokemonAutomation_PokemonSwSh_ClothingBuyer_H
+#ifndef PokemonAutomation_PokemonSV_ClothingBuyer_H
+#define PokemonAutomation_PokemonSV_ClothingBuyer_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"

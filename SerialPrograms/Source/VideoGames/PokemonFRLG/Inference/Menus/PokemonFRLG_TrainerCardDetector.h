@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PokemonFRLG_MapDetector_H
-#define PokemonAutomation_PokemonFRLG_MapDetector_H
+#ifndef PokemonAutomation_PokemonFRLG_TrainerCardDetector_H
+#define PokemonAutomation_PokemonFRLG_TrainerCardDetector_H
 
 #include <chrono>
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"

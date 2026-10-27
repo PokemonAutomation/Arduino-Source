@@ -8,7 +8,6 @@
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Notification.h"

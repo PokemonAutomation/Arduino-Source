@@ -6,7 +6,6 @@
 
 #include <array>
 #include <cmath>
-#include <map>
 #include <optional>
 #include <sstream>
 #include <vector>

@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Globals.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "PokemonLA_AvailablePokemon.h"
 

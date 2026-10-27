@@ -11,7 +11,6 @@
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/FireForgetDispatcher.h"
 #include "Common/Cpp/Concurrency/Watchdog.h"
-#include "Common/Cpp/Concurrency/PeriodicRunner.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/ImageResolution.h"
 #include "Common/Cpp/ScopeExit.h"

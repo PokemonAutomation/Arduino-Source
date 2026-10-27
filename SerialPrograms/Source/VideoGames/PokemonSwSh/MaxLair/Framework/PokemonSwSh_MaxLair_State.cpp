@@ -3,8 +3,6 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
-
-#include <map>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Pokemon/Pokemon_Types.h"
 #include "PokemonSwSh_MaxLair_State.h"

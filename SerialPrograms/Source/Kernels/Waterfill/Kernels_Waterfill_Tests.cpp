@@ -5,7 +5,6 @@
  */
 
 #include <algorithm>
-#include <tuple>
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"

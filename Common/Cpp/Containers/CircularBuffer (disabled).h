@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CircularBuffer_H
-#define PokemonAutomation_CircularBuffer_H
+#ifndef PokemonAutomation_CircularBuffer_disabled_H
+#define PokemonAutomation_CircularBuffer_disabled_H
 
 #include <stdint.h>
 #include "AlignedVector.h"

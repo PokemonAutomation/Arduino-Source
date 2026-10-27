@@ -21,8 +21,6 @@
 #include "VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_PartyHeldItemDetector.h"
 #include "VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_PartyMenuDetector.h"
 #include "VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
-#include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattleSelectionArrowDetector.h"
-#include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_PokedexRegisteredDetector.h"
 #include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_HeldItemFarmer-SafariZone.h"

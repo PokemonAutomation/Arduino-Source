@@ -3,9 +3,6 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
-
-#include "Common/Cpp/EarlyShutdown.h"
-#include "Common/Cpp/Logging/GlobalLogger.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "OptionsPanelSession.h"

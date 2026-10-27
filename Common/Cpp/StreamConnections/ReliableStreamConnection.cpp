@@ -3,8 +3,6 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
-
-#include "Common/CRC32/pabb_CRC32.h"
 //#include "Common/Cpp/PrettyPrint.h"
 //#include "Common/Cpp/Exceptions.h"
 #include "Common/PABotBase2/ConnectionLayer/PABotBase2_ConnectionDebug.h"

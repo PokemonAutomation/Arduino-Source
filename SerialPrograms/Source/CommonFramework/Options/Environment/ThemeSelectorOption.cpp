@@ -7,7 +7,6 @@
 #include <QFile>
 #include <QTextStream>
 #include <QApplication>
-#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "ThemeSelectorOption.h"
 

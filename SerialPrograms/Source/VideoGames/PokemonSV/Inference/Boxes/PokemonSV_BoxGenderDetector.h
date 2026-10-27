@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PokemonSwSh_BoxGenderDetector_H
-#define PokemonAutomation_PokemonSwSh_BoxGenderDetector_H
+#ifndef PokemonAutomation_PokemonSV_BoxGenderDetector_H
+#define PokemonAutomation_PokemonSV_BoxGenderDetector_H
 
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "Pokemon/Inference/Pokemon_BoxGenderDetector.h"

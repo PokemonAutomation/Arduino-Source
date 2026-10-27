@@ -18,7 +18,6 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
-#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "ML/Inference/ML_YOLOv5Detector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"

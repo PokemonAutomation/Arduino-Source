@@ -3,8 +3,6 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
-
-#include <cmath>
 #include "PokemonSwSh_PkmnLib_Stats.h"
 
 namespace PokemonAutomation{

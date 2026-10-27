@@ -8,8 +8,6 @@
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "Controllers/ControllerSession.h"
-#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
-#include "NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon.h"
 #include "ProgramTracker.h"
 
 //#include <iostream>

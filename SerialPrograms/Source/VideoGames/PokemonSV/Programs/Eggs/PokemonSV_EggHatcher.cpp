@@ -5,7 +5,6 @@
  */
 
 #include "CommonFramework/Exceptions/FatalProgramException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"

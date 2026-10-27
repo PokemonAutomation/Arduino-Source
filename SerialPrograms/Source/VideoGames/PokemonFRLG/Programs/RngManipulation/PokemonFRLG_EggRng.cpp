@@ -7,7 +7,6 @@
 #include <cmath>
 #include <algorithm>
 #include "Common/Cpp/Strings/StringTools.h"
-#include "CommonTools/Random.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"

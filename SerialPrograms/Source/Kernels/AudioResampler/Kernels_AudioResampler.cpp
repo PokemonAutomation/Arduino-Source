@@ -8,7 +8,6 @@
 #include <cstring>
 #include <map>
 #include <memory>
-#include <numeric>
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"

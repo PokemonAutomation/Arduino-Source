@@ -6,7 +6,6 @@
 
 #include <string.h>
 #include <cmath>
-#include <cassert>
 #include <algorithm>
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/AudioPipeline/AudioConstants.h"

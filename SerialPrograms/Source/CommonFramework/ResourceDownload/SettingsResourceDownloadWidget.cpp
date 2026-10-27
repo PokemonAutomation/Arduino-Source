@@ -8,8 +8,6 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include <QHBoxLayout>
-#include "CommonFramework/Logging/Logger.h"
-#include "Common/Cpp/Exceptions.h"
 #include "SettingsResourceDownloadWidget.h"
 
 #include <iostream>

@@ -3,8 +3,6 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
-
-#include <map>
 #include "Common/Cpp/Exceptions.h"
 #include "PokemonLA_Locations.h"
 

@@ -3,8 +3,6 @@
  *  From: https://github.com/PokemonAutomation/
  * 
  */
-
-#include <stdio.h>
 #include <chrono>
 #include <format>
 #include <sstream>

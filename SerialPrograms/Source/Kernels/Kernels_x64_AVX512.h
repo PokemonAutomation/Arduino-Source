@@ -70,6 +70,7 @@ inline void print(const __m512& x){
 
 
 
+#ifndef _mm512_setr_epi16
 #define _mm512_setr_epi16(  \
     e00, e01, e02, e03, e04, e05, e06, e07, \
     e08, e09, e10, e11, e12, e13, e14, e15, \
@@ -82,6 +83,8 @@ inline void print(const __m512& x){
         (uint16_t)(e16) | ((uint32_t)(e17) << 16), (uint16_t)(e18) | ((uint32_t)(e19) << 16), (uint16_t)(e20) | ((uint32_t)(e21) << 16), (uint16_t)(e22) | ((uint32_t)(e23) << 16),  \
         (uint16_t)(e24) | ((uint32_t)(e25) << 16), (uint16_t)(e26) | ((uint32_t)(e27) << 16), (uint16_t)(e28) | ((uint32_t)(e29) << 16), (uint16_t)(e30) | ((uint32_t)(e31) << 16)   \
     )
+#endif
+#ifndef _mm512_setr_epi8
 #define _mm512_setr_epi8(   \
     e00, e01, e02, e03, e04, e05, e06, e07, \
     e08, e09, e10, e11, e12, e13, e14, e15, \
@@ -102,6 +105,7 @@ inline void print(const __m512& x){
         (uint8_t)(e48) | ((uint8_t)(e49) << 8), (uint8_t)(e50) | ((uint8_t)(e51) << 8), (uint8_t)(e52) | ((uint8_t)(e53) << 8), (uint8_t)(e54) | ((uint8_t)(e55) << 8), \
         (uint8_t)(e56) | ((uint8_t)(e57) << 8), (uint8_t)(e58) | ((uint8_t)(e59) << 8), (uint8_t)(e60) | ((uint8_t)(e61) << 8), (uint8_t)(e62) | ((uint8_t)(e63) << 8)  \
     )
+#endif
 
 
 
