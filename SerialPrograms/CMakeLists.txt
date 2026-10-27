@@ -659,8 +659,10 @@ else() # macOS and Linux
         pkg_check_modules(FFMPEG_LIB_NAMES libavcodec libavformat libavutil libswscale libswresample)
         if (FFMPEG_SHORT_NAMES_FOUND)
             set(FFMPEG_PC FFMPEG_SHORT_NAMES)
+            set(FFMPEG_AVCODEC_MODULE avcodec)
         elseif (FFMPEG_LIB_NAMES_FOUND)
             set(FFMPEG_PC FFMPEG_LIB_NAMES)
+            set(FFMPEG_AVCODEC_MODULE libavcodec)
         else ()
             message(FATAL_ERROR
                 "PA_STREAM_HISTORY_FFMPEG=ON but no ffmpeg development packages were found via pkg-config "
@@ -668,7 +670,9 @@ else() # macOS and Linux
                 "Ubuntu: sudo apt install libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libswresample-dev. "
                 "macOS: brew install ffmpeg.")
         endif()
-        message(STATUS "PA stream-history ring: ffmpeg found via pkg-config module set '${FFMPEG_PC}' (version ${${FFMPEG_PC}_VERSION}).")
+        #  With several modules, pkg_check_modules() sets a version per module
+        #  (<prefix>_<module>_VERSION) and leaves <prefix>_VERSION empty.
+        message(STATUS "PA stream-history ring: ffmpeg found via pkg-config module set '${FFMPEG_PC}' (libavcodec ${${FFMPEG_PC}_${FFMPEG_AVCODEC_MODULE}_VERSION}).")
         set(FFMPEG_INC_DIRS ${${FFMPEG_PC}_INCLUDE_DIRS})
         target_link_directories(SerialProgramsLib PUBLIC ${${FFMPEG_PC}_LIBRARY_DIRS})
         target_link_libraries(SerialProgramsLib PRIVATE ${${FFMPEG_PC}_LIBRARIES})
@@ -864,7 +868,13 @@ if (WIN32)
 
     if (PA_STREAM_HISTORY_FFMPEG)
         set(FFMPEG_ZIP "${REPO_ROOT_DIR}/3rdPartyBinaries/ffmpeg/ffmpeg-n9.0-win64-lgpl-shared-9.0.zip")
-        set(FFMPEG_DLL_DIR "${REPO_ROOT_DIR}/3rdPartyBinaries/ffmpeg")
+        #  The DLLs are extracted into a folder named after the zip, so that a
+        #  new zip (a new ffmpeg version) is extracted afresh instead of the
+        #  DLLs of the previous version being reused.
+        get_filename_component(FFMPEG_ZIP_NAME "${FFMPEG_ZIP}" NAME_WLE)
+        set(FFMPEG_DLL_DIR "${REPO_ROOT_DIR}/3rdPartyBinaries/ffmpeg/${FFMPEG_ZIP_NAME}")
+        #  Re-run the configure step (and so the extraction) when the zip changes.
+        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${FFMPEG_ZIP}")
     endif()
 
     # Copy QML library dependencies.
@@ -947,16 +957,21 @@ if (WIN32)
     endif()
 
     # Extract the ffmpeg shared DLLs if missing (only the .dll files start
-    # zipped; the .lib files are checked in unzipped)
-    if (PA_STREAM_HISTORY_FFMPEG)
-        file(GLOB FFMPEG_DLLS_EXTRACTED "${FFMPEG_DLL_DIR}/*.dll")
-        if (NOT FFMPEG_DLLS_EXTRACTED)
-            message(STATUS "ffmpeg shared DLLs not found, extracting from ${FFMPEG_ZIP}...")
-            execute_process(
-                COMMAND ${CMAKE_COMMAND} -E tar xf "${FFMPEG_ZIP}"
-                WORKING_DIRECTORY "${FFMPEG_DLL_DIR}"
-            )
+    # zipped; the .lib files are checked in unzipped). The stamp file marks a
+    # completed extraction, so an interrupted one is redone.
+    if (PA_STREAM_HISTORY_FFMPEG AND NOT EXISTS "${FFMPEG_DLL_DIR}/.extracted")
+        message(STATUS "Extracting the ffmpeg shared DLLs from ${FFMPEG_ZIP}...")
+        file(REMOVE_RECURSE "${FFMPEG_DLL_DIR}")
+        file(MAKE_DIRECTORY "${FFMPEG_DLL_DIR}")
+        execute_process(
+            COMMAND ${CMAKE_COMMAND} -E tar xf "${FFMPEG_ZIP}"
+            WORKING_DIRECTORY "${FFMPEG_DLL_DIR}"
+            RESULT_VARIABLE FFMPEG_EXTRACT_RESULT
+        )
+        if (NOT FFMPEG_EXTRACT_RESULT EQUAL 0)
+            message(FATAL_ERROR "Failed to extract ${FFMPEG_ZIP}.")
         endif()
+        file(TOUCH "${FFMPEG_DLL_DIR}/.extracted")
     endif()
 
     # Copy the ffmpeg shared DLLs to WIN_DEPLOY_DIR if missing/different
