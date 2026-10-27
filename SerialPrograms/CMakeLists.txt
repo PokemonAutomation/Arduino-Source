@@ -868,13 +868,7 @@ if (WIN32)
 
     if (PA_STREAM_HISTORY_FFMPEG)
         set(FFMPEG_ZIP "${REPO_ROOT_DIR}/3rdPartyBinaries/ffmpeg/ffmpeg-n9.0-win64-lgpl-shared-9.0.zip")
-        #  The DLLs are extracted into a folder named after the zip, so that a
-        #  new zip (a new ffmpeg version) is extracted afresh instead of the
-        #  DLLs of the previous version being reused.
-        get_filename_component(FFMPEG_ZIP_NAME "${FFMPEG_ZIP}" NAME_WLE)
-        set(FFMPEG_DLL_DIR "${REPO_ROOT_DIR}/3rdPartyBinaries/ffmpeg/${FFMPEG_ZIP_NAME}")
-        #  Re-run the configure step (and so the extraction) when the zip changes.
-        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${FFMPEG_ZIP}")
+        set(FFMPEG_DLL_DIR "${REPO_ROOT_DIR}/3rdPartyBinaries/ffmpeg")
     endif()
 
     # Copy QML library dependencies.
@@ -957,21 +951,16 @@ if (WIN32)
     endif()
 
     # Extract the ffmpeg shared DLLs if missing (only the .dll files start
-    # zipped; the .lib files are checked in unzipped). The stamp file marks a
-    # completed extraction, so an interrupted one is redone.
-    if (PA_STREAM_HISTORY_FFMPEG AND NOT EXISTS "${FFMPEG_DLL_DIR}/.extracted")
-        message(STATUS "Extracting the ffmpeg shared DLLs from ${FFMPEG_ZIP}...")
-        file(REMOVE_RECURSE "${FFMPEG_DLL_DIR}")
-        file(MAKE_DIRECTORY "${FFMPEG_DLL_DIR}")
-        execute_process(
-            COMMAND ${CMAKE_COMMAND} -E tar xf "${FFMPEG_ZIP}"
-            WORKING_DIRECTORY "${FFMPEG_DLL_DIR}"
-            RESULT_VARIABLE FFMPEG_EXTRACT_RESULT
-        )
-        if (NOT FFMPEG_EXTRACT_RESULT EQUAL 0)
-            message(FATAL_ERROR "Failed to extract ${FFMPEG_ZIP}.")
+    # zipped; the .lib files are checked in unzipped)
+    if (PA_STREAM_HISTORY_FFMPEG)
+        file(GLOB FFMPEG_DLLS_EXTRACTED "${FFMPEG_DLL_DIR}/*.dll")
+        if (NOT FFMPEG_DLLS_EXTRACTED)
+            message(STATUS "ffmpeg shared DLLs not found, extracting from ${FFMPEG_ZIP}...")
+            execute_process(
+                COMMAND ${CMAKE_COMMAND} -E tar xf "${FFMPEG_ZIP}"
+                WORKING_DIRECTORY "${FFMPEG_DLL_DIR}"
+            )
         endif()
-        file(TOUCH "${FFMPEG_DLL_DIR}/.extracted")
     endif()
 
     # Copy the ffmpeg shared DLLs to WIN_DEPLOY_DIR if missing/different
