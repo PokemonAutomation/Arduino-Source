@@ -35,10 +35,10 @@ void AudioSourceDescriptor_Device::load_json(const JsonValue& json){
 
 std::unique_ptr<AudioSource> AudioSourceDescriptor_Device::make_AudioSource(
     Logger& logger,
-    AudioInputChoice format
+    const AudioInputChoice& format
 ) const{
 //    cout << "format = " << (int)format << endl;
-    return nullptr;
+    return std::make_unique<AudioSource_Device>(logger, m_info, format);
 }
 
 

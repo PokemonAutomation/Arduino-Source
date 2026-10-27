@@ -27,7 +27,7 @@ public:
 
     virtual std::unique_ptr<AudioSource> make_AudioSource(
         Logger& logger,
-        AudioInputChoice format
+        const AudioInputChoice& format
     ) const override;
 };
 

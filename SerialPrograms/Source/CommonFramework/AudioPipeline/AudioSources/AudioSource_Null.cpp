@@ -25,7 +25,7 @@ void AudioSourceDescriptor_Null::load_json(const JsonValue& json){
 
 std::unique_ptr<AudioSource> AudioSourceDescriptor_Null::make_AudioSource(
     Logger& logger,
-        AudioInputChoice format
+    const AudioInputChoice& format
 ) const{
     return nullptr;
 }
