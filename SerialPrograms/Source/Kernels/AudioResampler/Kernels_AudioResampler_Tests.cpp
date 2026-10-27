@@ -10,7 +10,6 @@
 #include <cstdint>
 #include <cstring>
 #include <numbers>
-#include <numeric>
 #include <random>
 #include <utility>
 #include "Common/Cpp/CpuId/CpuId.h"

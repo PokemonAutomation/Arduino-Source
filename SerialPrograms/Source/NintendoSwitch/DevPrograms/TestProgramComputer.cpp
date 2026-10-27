@@ -42,7 +42,6 @@
 #include "VideoGames/PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "VideoGames/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 #include "Pokemon/Inference/Pokemon_IvJudgeReader.h"
-#include "Kernels/Kernels_Alignment.h"
 #include "VideoGames/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
 #include "3rdParty-Core/nlohmann/json.hpp"
 #include "Common/Cpp/Json/JsonValue.h"
