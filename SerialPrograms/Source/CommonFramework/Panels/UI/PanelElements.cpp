@@ -127,7 +127,7 @@ CollapsibleGroupBox* make_panel_header(
         break;
 
     case PanelQualityStanding::OFFICIAL_BELOW_STANDARDS:
-        text = "(This program does not our quality standards and may be difficult to use.)";
+        text = "(This program does not meet our quality standards and may be difficult to use.)";
         break;
 
     case PanelQualityStanding::THIRD_PARTY:
