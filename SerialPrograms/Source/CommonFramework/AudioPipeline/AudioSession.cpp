@@ -214,7 +214,7 @@ bool AudioSession::sanitize_input_source(){
     if (source == nullptr){
         return false;
     }
-    if (source->file_path() != nullptr){
+    if (source->type == AudioSourceType::File){
         return true;
     }
     const AudioDeviceInfo& info = *source->input_device();
