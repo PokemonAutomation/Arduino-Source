@@ -6,7 +6,6 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Strings/Unicode.h"
-#include "Common/Qt/StringToolsQt.h"
 #include "OCR_StringMatchResult.h"
 
 namespace PokemonAutomation{

@@ -3,8 +3,6 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
-
-#include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh_OverworldMovement.h"

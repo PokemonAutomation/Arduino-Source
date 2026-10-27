@@ -6,7 +6,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include "Controllers/JoystickTools.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"

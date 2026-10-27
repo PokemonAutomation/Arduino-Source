@@ -6,7 +6,6 @@
 
 #include <string.h>
 #include <algorithm>
-#include "PABotBase2_ConnectionDebug.h"
 #include "PABotBase2FW_ReliableStreamConnection.h"
 
 #ifdef PABB2_SUPPORTS_PRINTF_LOGGING

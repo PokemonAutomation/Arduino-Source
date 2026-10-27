@@ -5,8 +5,6 @@
  *      This option is thread-safe.
  *
  */
-
-#include <limits>
 #include <atomic>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"

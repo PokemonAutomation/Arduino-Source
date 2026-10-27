@@ -24,13 +24,11 @@ language
 */
 
 #include <array>
-#include <map>
 #include <optional>
 #include <sstream>
 #include <algorithm>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
-#include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"

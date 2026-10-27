@@ -18,7 +18,6 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "ML_YOLOv5Detector.h"
 
 //#include <iostream>

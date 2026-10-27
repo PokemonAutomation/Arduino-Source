@@ -8,8 +8,6 @@
 #include <map>
 #include "Common/Cpp/Exceptions.h"
 #include "PokemonSV_ItemPrinterDatabase.h"
-#include <iostream>
-
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{

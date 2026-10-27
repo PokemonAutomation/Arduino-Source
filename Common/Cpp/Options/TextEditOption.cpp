@@ -3,8 +3,6 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
-
-#include <set>
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Concurrency/SpinLock.h"

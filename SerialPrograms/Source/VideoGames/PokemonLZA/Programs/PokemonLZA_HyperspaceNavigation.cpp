@@ -12,9 +12,6 @@
 #include "VideoGames/PokemonLZA/Inference/PokemonLZA_HyperspaceCalorieDetector.h"
 #include "VideoGames/PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA_HyperspaceNavigation.h"
-
-
-#include <atomic>
 #include <format>
 
 namespace PokemonAutomation {

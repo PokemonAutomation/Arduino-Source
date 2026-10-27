@@ -6,7 +6,6 @@
 
 #include <algorithm>
 #include <string>
-#include <map>
 #include "Common/Cpp/Exceptions.h"
 #include "PokemonLA_WeatherAndTime.h"
 

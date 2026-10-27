@@ -3,8 +3,6 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
-
-#include "Controllers/JoystickTools.h"
 #include "NintendoSwitch_Commands_Superscalar.h"
 //#include "NintendoSwitch_Messages_Superscalar.h"
 

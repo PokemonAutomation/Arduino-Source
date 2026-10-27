@@ -9,7 +9,6 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
-#include <numeric>
 #include <random>
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"

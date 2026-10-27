@@ -5,7 +5,6 @@
  */
 
 #include <stddef.h>
-#include "Common/Compiler.h"
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels_AbsFFT.h"

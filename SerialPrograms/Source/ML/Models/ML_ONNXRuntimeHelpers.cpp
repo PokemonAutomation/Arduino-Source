@@ -10,7 +10,6 @@
 #include <fstream>
 #include <onnxruntime_cxx_api.h>
 #include "3rdParty/ONNX/OnnxToolsPA.h"
-#include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "CommonFramework/Logging/Logger.h"

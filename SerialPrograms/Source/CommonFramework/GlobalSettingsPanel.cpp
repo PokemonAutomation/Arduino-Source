@@ -5,7 +5,6 @@
  */
 
 #include <iostream>
-#include <set>
 #ifdef QT_CORE_LIB
 #include <QDesktopServices>
 #include <QUrl>

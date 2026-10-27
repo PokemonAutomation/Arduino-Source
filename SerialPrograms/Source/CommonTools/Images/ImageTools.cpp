@@ -3,8 +3,6 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
-
-#include <cmath>
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/FloatPixel.h"

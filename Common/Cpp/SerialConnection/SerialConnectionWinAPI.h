@@ -10,7 +10,6 @@
 #include <string>
 #include <atomic>
 #include <windows.h>
-#include "Common/Compiler.h"
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"

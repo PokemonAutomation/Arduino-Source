@@ -7,7 +7,6 @@
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
-#include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"

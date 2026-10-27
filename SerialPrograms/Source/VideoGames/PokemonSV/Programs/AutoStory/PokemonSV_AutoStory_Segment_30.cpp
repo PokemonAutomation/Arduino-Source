@@ -6,8 +6,6 @@
 
 #include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_NoMinimapDetector.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
-
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"

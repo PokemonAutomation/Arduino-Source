@@ -9,8 +9,6 @@
 #include <immintrin.h>
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines_x64_SSE42.h"
-#include "Kernels_ImageFilter_RGB32_Euclidean.h"
-
 //#include <iostream>
 //using std::cout;
 //using std::endl;

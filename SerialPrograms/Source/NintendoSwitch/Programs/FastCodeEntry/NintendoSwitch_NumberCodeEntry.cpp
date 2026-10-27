@@ -8,7 +8,6 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
-#include "NintendoSwitch/Options/NintendoSwitch_CodeEntrySettingsOption.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
 #include "NintendoSwitch_CodeEntryTools.h"
 #include "NintendoSwitch_NumberCodeEntry.h"

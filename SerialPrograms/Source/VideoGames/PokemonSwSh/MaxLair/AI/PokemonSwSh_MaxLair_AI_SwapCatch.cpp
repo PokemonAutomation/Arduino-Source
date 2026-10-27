@@ -7,8 +7,6 @@
 #include <cstddef>
 #include "PokemonSwSh_MaxLair_AI.h"
 #include "PokemonSwSh_MaxLair_AI_Tools.h"
-#include "PokemonSwSh_MaxLair_AI_RentalBossMatchup.h"
-
 #include <iostream>
 using std::cout;
 using std::endl;

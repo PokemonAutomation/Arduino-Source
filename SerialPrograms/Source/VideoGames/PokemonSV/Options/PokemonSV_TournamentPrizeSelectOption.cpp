@@ -6,7 +6,6 @@
 
 #include "CommonFramework/Logging/Logger.h"
 #include "VideoGames/PokemonSV/Resources/PokemonSV_TournamentPrizeNames.h"
-#include "VideoGames/PokemonSV/Resources/PokemonSV_ItemSprites.h"
 #include "PokemonSV_TournamentPrizeSelectOption.h"
 
 namespace PokemonAutomation{

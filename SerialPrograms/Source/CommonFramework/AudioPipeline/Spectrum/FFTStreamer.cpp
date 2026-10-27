@@ -3,8 +3,6 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
-
-#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Kernels/KaiserWindow/Kernels_KaiserWindow.h"
 #include "Kernels/AbsFFT/Kernels_AbsFFT.h"

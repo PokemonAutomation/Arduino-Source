@@ -22,7 +22,6 @@
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinPause.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "Common/Cpp/Concurrency/Mutex.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 
 #include <iostream>
