@@ -12,6 +12,7 @@
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
+#include "Kernels/AudioPipeline/Kernels_AudioPipeline.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 #include "AudioInfo.h"
@@ -39,6 +40,17 @@ size_t sample_size(AudioSampleFormat format){
     }
 }
 
+
+Kernels::AudioPipeline::SampleFormat to_sample_format(AudioSampleFormat format){
+    switch (format){
+    case AudioSampleFormat::UINT8:   return Kernels::AudioPipeline::SampleFormat::UINT8;
+    case AudioSampleFormat::SINT16:  return Kernels::AudioPipeline::SampleFormat::SINT16;
+    case AudioSampleFormat::SINT32:  return Kernels::AudioPipeline::SampleFormat::SINT32;
+    case AudioSampleFormat::FLOAT32: return Kernels::AudioPipeline::SampleFormat::FLOAT32;
+    default:
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unsupported audio sample format.");
+    }
+}
 
 
 AudioSampleFormat get_sample_format(const QAudioFormat& native_format){
