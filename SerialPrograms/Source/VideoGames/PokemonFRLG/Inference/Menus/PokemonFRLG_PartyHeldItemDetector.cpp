@@ -5,6 +5,9 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
@@ -118,6 +121,48 @@ bool PartyHeldItemDetector::detect(const ImageViewRGB32& screen){
     return found;
 }
 
+
+class Test_PartyHeldItemDetector : public UnitTest{
+public:
+    Test_PartyHeldItemDetector(const std::string& image, PartySlot slot, bool expected)
+        : UnitTest("PokemonFRLG::PartyHeldItemDetector - " + image + " - slot " + std::to_string(static_cast<unsigned>(slot) + 1))
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_slot(slot)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger&, CancellableScope&) const override{
+        PartyHeldItemDetector detector(COLOR_RED, nullptr, m_slot);
+        ImageRGB32 image(m_image);
+        bool result = detector.detect(image);
+        if (result != m_expected){
+            return std::string("Expected held item = ") + (m_expected ? "true" : "false") +
+                ", got " + (result ? "true" : "false");
+        }
+        return true;
+    }
+
+private:
+    std::string m_image;
+    PartySlot m_slot;
+    bool m_expected;
+};
+
+void add_tests_PartyHeldItemDetector(UnitTestDatabase& database){
+    for (unsigned c = 0; c < 6; c++){
+        PartySlot slot = static_cast<PartySlot>(c);
+        database.add<Test_PartyHeldItemDetector>("PokemonFRLG/Party/Party_1.png", slot, false);
+        database.add<Test_PartyHeldItemDetector>("PokemonFRLG/Party/Party_2.png", slot, false);
+        database.add<Test_PartyHeldItemDetector>("PokemonFRLG/Party/Party_3.png", slot, false);
+        database.add<Test_PartyHeldItemDetector>("PokemonFRLG/Party/Party_4.png", slot, false);
+        database.add<Test_PartyHeldItemDetector>("PokemonFRLG/Party/Party_5.png", slot, false);
+        database.add<Test_PartyHeldItemDetector>("PokemonFRLG/Party/Party_6.png", slot, false);
+        database.add<Test_PartyHeldItemDetector>("PokemonFRLG/Party/JPN_Party.png", slot, false);
+        database.add<Test_PartyHeldItemDetector>("PokemonFRLG/Party/Party_6_With_Held_Items.png", slot, c == 0 || c == 3);
+        database.add<Test_PartyHeldItemDetector>("PokemonFRLG/Party/SPA_HeldItem.png", slot, c == 0);
+    }
+    database.add<Test_PartyHeldItemDetector>("PokemonFRLG/Party/JPN_HeldItem.png", PartySlot::ONE, true);
+}
 
 }
 }

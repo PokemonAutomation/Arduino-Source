@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonFRLG_PartyHeldItemDetector_H
 
 #include <chrono>
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/VisualDetector.h"
 #include "PokemonFRLG_PartySlot.h"
@@ -68,6 +69,8 @@ public:
     {}
 };
 
+
+void add_tests_PartyHeldItemDetector(UnitTestDatabase& database);
 
 }
 }

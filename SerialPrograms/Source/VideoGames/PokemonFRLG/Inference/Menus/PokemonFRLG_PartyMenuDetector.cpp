@@ -101,6 +101,46 @@ bool PartySlotDetector::detect(const ImageViewRGB32& screen){
 }
 
 
+class Test_PartyMenuDetector : public UnitTest{
+public:
+    Test_PartyMenuDetector(const std::string& image, bool expected)
+        : UnitTest("PokemonFRLG::PartyMenuDetector - " + image)
+        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run(Logger&, CancellableScope&) const override{
+        PartyMenuDetector detector(COLOR_RED);
+        ImageRGB32 image(m_image);
+        bool result = detector.detect(image);
+        if (result != m_expected){
+            return std::string("Expected party menu = ") + (m_expected ? "true" : "false") +
+                ", got " + (result ? "true" : "false");
+        }
+        return true;
+    }
+
+private:
+    std::string m_image;
+    bool m_expected;
+};
+
+void add_tests_PartyMenuDetector(UnitTestDatabase& database){
+    database.add<Test_PartyMenuDetector>("PokemonFRLG/Party/Party_1.png", true);
+    database.add<Test_PartyMenuDetector>("PokemonFRLG/Party/Party_2.png", true);
+    database.add<Test_PartyMenuDetector>("PokemonFRLG/Party/Party_3.png", true);
+    database.add<Test_PartyMenuDetector>("PokemonFRLG/Party/Party_4.png", true);
+    database.add<Test_PartyMenuDetector>("PokemonFRLG/Party/Party_5.png", true);
+    database.add<Test_PartyMenuDetector>("PokemonFRLG/Party/Party_6.png", true);
+    database.add<Test_PartyMenuDetector>("PokemonFRLG/Party/JPN_HeldItem.png", true);
+    database.add<Test_PartyMenuDetector>("PokemonFRLG/Party/Party_6_With_Held_Items.png", true);
+
+    // A dialog covers the normal detection region in these images.
+    database.add<Test_PartyMenuDetector>("PokemonFRLG/Party/JPN_Party.png", false);
+    database.add<Test_PartyMenuDetector>("PokemonFRLG/Party/SPA_HeldItem.png", false);
+}
+
+
 class Test_PartySlotDetector : public UnitTest{
 public:
     Test_PartySlotDetector(
