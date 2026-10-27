@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Json/JsonValue.h"
 #include "AudioSource_Null.h"
 
 namespace PokemonAutomation{

@@ -8,11 +8,12 @@
 #define PokemonAutomation_AudioPipeline_AudioSourceDescriptor_H
 
 #include <memory>
-#include "Common/Cpp/Json/JsonValue.h"
 #include "AudioInfo.h"
 
 namespace PokemonAutomation{
 
+class Logger;
+class JsonValue;
 class AudioSource;
 
 
