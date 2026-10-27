@@ -372,6 +372,8 @@ struct ProbedFile{
     //  Largest deviation of the spacing between consecutive audio packets
     //  from one AAC frame.
     double audio_max_spacing_error_s = 0;
+    //  Smallest spacing between consecutive audio packets.
+    double audio_min_spacing_s = 1e9;
     size_t audio_frames = 0;
     double audio_onset_s = -1;      //  First decoded sample of the tone.
 };
@@ -553,6 +555,7 @@ std::string probe_file(const std::string& path, ProbedFile& file){
                     file.audio_max_spacing_error_s,
                     std::fabs(spacing_s - 1024. / AUDIO_RATE)
                 );
+                file.audio_min_spacing_s = std::min(file.audio_min_spacing_s, spacing_s);
             }
             last_audio_ts = ts;
             if (avcodec_send_packet(context.audio, &packet) < 0){
@@ -685,7 +688,8 @@ std::string test_eviction(Logger& logger){
 }
 
 //  Records until "end_ms" with the onset at "options.onset_ms", then checks
-//  that the tone starts within "tolerance_s" of the first white frame. With
+//  that the tone starts within "tolerance_s" of the first white frame, and
+//  that no audio packets are squeezed closer than one AAC frame. With
 //  "continuous_audio", also checks that the audio packets are evenly spaced
 //  (the tracker never re-synced the audio to the clock).
 std::string test_sync(
@@ -713,6 +717,13 @@ std::string test_sync(
         file.audio_onset_s - file.video_onset_s,
         -tolerance_s, tolerance_s
     );
+    if (error.empty()){
+        error = check_range(
+            "The smallest audio packet spacing",
+            file.audio_min_spacing_s,
+            1024. / AUDIO_RATE - AUDIO_SPACING_TOLERANCE_S, 1e9
+        );
+    }
     if (error.empty() && continuous_audio){
         error = check_range(
             "The largest audio packet spacing error",
@@ -989,6 +1000,19 @@ void add_tests_StreamHistory(UnitTestDatabase& database){
         return test_sync(
             logger, "SyncFastClock.mp4", options, 200000,
             AUDIO_RESYNC_THRESHOLD_S + SYNC_TOLERANCE_S, false
+        );
+    });
+    database.add<RingTest>("Sync across a backwards audio re-sync", [](Logger& logger){
+        //  With the device clock 0.1% fast, the re-sync at about 100 s moves
+        //  the audio timeline 100 ms back, overlapping audio already in the
+        //  ring. The saved window (from about 80 s) includes it: the overlap
+        //  must be dropped, not squeezed into near-zero-length packets.
+        FeedOptions options;
+        options.onset_ms = 105000;
+        options.audio_clock_scale = 1.001;
+        return test_sync(
+            logger, "SyncBackwardsResync.mp4", options, 110000,
+            SYNC_TOLERANCE_S, false
         );
     });
     database.add<RingTest>("Sync with a slow audio clock", [](Logger& logger){
