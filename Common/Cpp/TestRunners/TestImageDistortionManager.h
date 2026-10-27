@@ -15,13 +15,7 @@
  *  For a test image with a known distortion label, the manager provides the color transform to
  *  other extreme distortions. So one test image can cover more of the measured color range.
  *
- *  How tests use it:
- *  1. The command line test runner calls `initialize_test_image_distortions()` when run with
- *     "--augment-color-distortions".
- *  2. Each `ImageUnitTest` (SerialPrograms/Source/Tests/ImageUnitTest.h) runs on its images as they
- *     are, then calls `num_applicable_distortions()` with its `image_paths()`. If it is not 0, it runs
- *     again once per test distortion `test_distortion_label(index)`, on its images re-colored with
- *     `transform()`.
+ *  It is used by SerialPrograms/Source/Tests/ImageUnitTest.cpp.
  */
 
 #ifndef PokemonAutomation_TestImageDistortionManager_H
@@ -72,9 +66,9 @@ public:
 
     //  The transform that makes the test image at `image_path` (relative to the test repo folder) look as if it was
     //  captured through the setup with label `distortion_label`: it undoes the distortion of the setup the
-    //  image was captured with and then applies the input label's.
+    //  image was captured with and then applies the distortion of `distortion_label`.
     //  Returns nullptr if the image should be used as it is: it isn't a test image with a known setup,
-    //  or it was captured with the input label's setup itself.
+    //  or it was captured with the `distortion_label` setup itself.
     //  Throws InternalProgramError if `distortion_label` isn't one of the test labels, or if
     //  `image_path` is an absolute path.
     const ColorTransform3x4* transform(const std::string& image_path, const std::string& distortion_label) const;
@@ -93,8 +87,13 @@ private:
     //  Images labeled "Unknown" are left out.
     std::map<std::string, std::string> m_image_labels;
 
-    //  distortion label -> the combined transform to each test distortion label, in the order of `m_test_distortion_labels`.
-    //  std::nullopt where the key label is one of the test labels, so the image stays as it is.
+    //  distortion label -> a transform vector of size `m_test_distortion_labels`.
+    //  For a key `distortion_label` , the vector of location `i` is the combined transform to transform pixels on an image captured
+    //  under distortion, `m_test_distortion_labels[i]` into pixels under distortion `distortion_label`.
+    //  The transform is "combined"  because it combines the transform that undistorts the image and the transform that re-distorts it to the
+    //  key distortion label.
+    //  One transform can be std::nullopt if the combined transform is just an identity transform, aka the source and target distortion
+    //  is the same.
     std::map<std::string, std::vector<std::optional<ColorTransform3x4>>> m_transforms;
 };
 

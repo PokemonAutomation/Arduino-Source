@@ -46,7 +46,8 @@ public:
 protected:
     //  The test itself, implemented by each image test. `images` are the test images in the order
     //  of `image_paths()`: as they are on the first call, then re-colored on the distortion calls.
-    //  An image that fails to load is passed as an empty image, so the test can report it.
+    //  If an image file is missing, `run()` throws FileException before calling this, which fails the test.
+    //  A file that exists but can't be decoded may be passed as an empty image.
     //  It can be called several times in one `run()`, so it must not keep state between calls.
     virtual UnitTestResult run_on_images(
         Logger& logger, CancellableScope& scope,

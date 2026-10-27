@@ -382,7 +382,7 @@ bool CommandLineUnitTestRunner::run(bool augment_color_distortions){
         "\n    Failed:  " + tostr_u_commas(m_failed_tests.load(std::memory_order_acquire)) +
         "\n    Skipped: " + tostr_u_commas(m_skipped_tests.load(std::memory_order_acquire))
     );
-    return m_failed_tests.load(std::memory_order_acquire) != 0;
+    return m_failed_tests.load(std::memory_order_acquire) > 0;
 }
 void CommandLineUnitTestRunner::on_test_finished(
     std::shared_ptr<const UnitTest> test,

@@ -89,10 +89,11 @@ public:
         , m_failed_tests(0)
     {}
 
-    //  Run all the unit tests.
+    //  Run all the unit tests. Return true if any test failed.
     //  If `augment_color_distortions` is true, also run each image test under different color
-    //  distortion augmentation to widen the test coverage, if there is corresponding
-    //  distortion data in the test folder.
+    //  distortion augmentation to widen the test coverage, using the distortion data in the
+    //  CaptureCardCalibration/ folder of the test repo. If that data can't be loaded, log the
+    //  error and return true without running any test.
     bool run(bool augment_color_distortions);
 
 
