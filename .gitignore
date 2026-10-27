@@ -13,6 +13,7 @@ discord_partner_sdk.dll
 opencv_world4120.dll
 opencv_world4120d.dll
 3rdPartyBinaries/ffmpeg/*.dll
+3rdPartyBinaries/ffmpeg/*/
 
 # macOS hidden system file
 .DS_Store
