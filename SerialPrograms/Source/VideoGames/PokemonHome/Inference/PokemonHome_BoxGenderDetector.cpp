@@ -27,10 +27,6 @@ namespace{
     ImageFloatBox GENDER_BOX{0.417, 0.097, 0.031, 0.046};
 }
 
-const ImageFloatBox& BoxGenderDetector::box(){
-    return GENDER_BOX;
-}
-
 void BoxGenderDetector::make_overlays(VideoOverlaySet& items){
     items.add(COLOR_RED, GENDER_BOX);
 }

@@ -60,6 +60,7 @@ bool GigantamaxDetector::detect(const ImageViewRGB32& screen){
 
     const std::vector<std::pair<uint32_t, uint32_t>> FILTERS = {
         {0xffc42058, 0xffffdceb},
+        {0xffc42058, 0xffffe8ff},
     };
 
     const bool found = match_template_by_waterfill(

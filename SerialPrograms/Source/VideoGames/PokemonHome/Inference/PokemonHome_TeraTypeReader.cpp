@@ -168,7 +168,7 @@ void find_tera_type_symbol_candidates(
     size_t max_area = (size_t)(image.width() * image.height() * max_area_ratio);
     std::vector<WaterfillObject> objects = find_objects_inplace(
         matrix,
-        (size_t)(20. * original_screen.total_pixels() / (1920 * 1080))
+        (size_t)(18. * original_screen.total_pixels() / (1920 * 1080))
     );
 
     std::map<size_t, WaterfillObject> objmap;
