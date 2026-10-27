@@ -4,6 +4,7 @@
  *
  */
 
+#include <QAudioFormat>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Logging/AbstractLogger.h"
@@ -18,7 +19,8 @@
 #include "Kernels/AudioPipeline/Kernels_RawAudio2WorkingAudio.h"
 #include "Kernels/AudioPipeline/Kernels_WorkingAudio2RawAudio.h"
 #include "Kernels/AudioPipeline/Kernels_WorkingAudio2WorkingAudio.h"
-#include <QAudioFormat>
+#include "CommonFramework/AudioPipeline/AudioSources/AudioSource_File.h"
+#include "CommonFramework/AudioPipeline/AudioSources/AudioSource_Device.h"
 #include "AudioPassthroughPairQt.h"
 
 //#include <iostream>
@@ -29,18 +31,6 @@ namespace PokemonAutomation{
 
 
 namespace{
-
-
-Kernels::AudioPipeline::SampleFormat to_sample_format(AudioSampleFormat format){
-    switch (format){
-    case AudioSampleFormat::UINT8:   return Kernels::AudioPipeline::SampleFormat::UINT8;
-    case AudioSampleFormat::SINT16:  return Kernels::AudioPipeline::SampleFormat::SINT16;
-    case AudioSampleFormat::SINT32:  return Kernels::AudioPipeline::SampleFormat::SINT32;
-    case AudioSampleFormat::FLOAT32: return Kernels::AudioPipeline::SampleFormat::FLOAT32;
-    default:
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unsupported audio sample format.");
-    }
-}
 
 
 //  QAudioFormat with a channel count and, for 1 and 2 channels, the
@@ -108,14 +98,6 @@ private:
 };
 
 
-void AudioPassthroughPairQt::add_listener(FFTListener& listener){
-    auto scope_check = m_sanitizer.check_scope();
-    m_fft_listeners.add(listener);
-}
-void AudioPassthroughPairQt::remove_listener(FFTListener& listener){
-    auto scope_check = m_sanitizer.check_scope();
-    m_fft_listeners.remove(listener);
-}
 void AudioPassthroughPairQt::add_listener(
     const AudioFormat& format, WorkingAudioStreamListener& listener
 ){
@@ -134,6 +116,14 @@ void AudioPassthroughPairQt::remove_listener(WorkingAudioStreamListener& listene
     }
     detach_working_entry(iter->second);
     m_working_entries.erase(iter);
+}
+void AudioPassthroughPairQt::add_listener(FFTListener& listener){
+    auto scope_check = m_sanitizer.check_scope();
+    m_fft_listeners.add(listener);
+}
+void AudioPassthroughPairQt::remove_listener(FFTListener& listener){
+    auto scope_check = m_sanitizer.check_scope();
+    m_fft_listeners.remove(listener);
 }
 
 
@@ -421,7 +411,7 @@ void AudioPassthroughPairQt::reset(
         auto scope_check = m_sanitizer.check_scope();
         std::unique_ptr<AudioSource> source;
         if (!file.empty()){
-            source.reset(new AudioSource(
+            source.reset(new AudioSource_File(
                 m_logger,
                 file
             ));
@@ -453,7 +443,7 @@ void AudioPassthroughPairQt::reset(
         auto scope_check = m_sanitizer.check_scope();
         std::unique_ptr<AudioSource> source;
         if (input && choice){
-            source.reset(new AudioSource(
+            source.reset(new AudioSource_Device(
                 m_logger,
                 input,
                 choice
@@ -494,7 +484,7 @@ void AudioPassthroughPairQt::set_audio_source(const std::string& file){
         auto scope_check = m_sanitizer.check_scope();
         std::unique_ptr<AudioSource> source;
         if (!file.empty()){
-            source.reset(new AudioSource(
+            source.reset(new AudioSource_File(
                 m_logger,
                 file
             ));
@@ -520,7 +510,7 @@ void AudioPassthroughPairQt::set_audio_source(const AudioDeviceInfo& device, con
         auto scope_check = m_sanitizer.check_scope();
         std::unique_ptr<AudioSource> source;
         if (device && choice){
-            source.reset(new AudioSource(
+            source.reset(new AudioSource_Device(
                 m_logger,
                 device,
                 choice

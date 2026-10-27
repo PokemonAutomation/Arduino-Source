@@ -19,6 +19,11 @@ using NativeAudioInfo = QAudioDevice;
 
 
 namespace PokemonAutomation{
+namespace Kernels{
+namespace AudioPipeline{
+    enum class SampleFormat;
+}
+}
 
 
 enum class AudioSampleFormat{
@@ -29,6 +34,8 @@ enum class AudioSampleFormat{
     FLOAT32,
 };
 size_t sample_size(AudioSampleFormat format);
+
+Kernels::AudioPipeline::SampleFormat to_sample_format(AudioSampleFormat format);
 
 
 AudioSampleFormat get_sample_format(const QAudioFormat& native_format);

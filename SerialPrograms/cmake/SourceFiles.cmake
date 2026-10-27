@@ -503,6 +503,14 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/AudioPipeline/AudioPipelineOptions.h
     Source/CommonFramework/AudioPipeline/AudioSession.cpp
     Source/CommonFramework/AudioPipeline/AudioSession.h
+    Source/CommonFramework/AudioPipeline/AudioSourceDescriptor.cpp
+    Source/CommonFramework/AudioPipeline/AudioSourceDescriptor.h
+    Source/CommonFramework/AudioPipeline/AudioSources/AudioSource_Device.cpp
+    Source/CommonFramework/AudioPipeline/AudioSources/AudioSource_Device.h
+    Source/CommonFramework/AudioPipeline/AudioSources/AudioSource_File.cpp
+    Source/CommonFramework/AudioPipeline/AudioSources/AudioSource_File.h
+    Source/CommonFramework/AudioPipeline/AudioSources/AudioSource_Null.cpp
+    Source/CommonFramework/AudioPipeline/AudioSources/AudioSource_Null.h
     Source/CommonFramework/AudioPipeline/AudioTemplate.cpp
     Source/CommonFramework/AudioPipeline/AudioTemplate.h
     Source/CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQt.cpp
@@ -521,7 +529,6 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/AudioPipeline/IO/AudioInputFile.h
     Source/CommonFramework/AudioPipeline/IO/AudioOutputDevice.cpp
     Source/CommonFramework/AudioPipeline/IO/AudioOutputDevice.h
-    Source/CommonFramework/AudioPipeline/IO/AudioSource.cpp
     Source/CommonFramework/AudioPipeline/IO/AudioSource.h
     Source/CommonFramework/AudioPipeline/Spectrum/AudioSpectrumHolder.cpp
     Source/CommonFramework/AudioPipeline/Spectrum/AudioSpectrumHolder.h

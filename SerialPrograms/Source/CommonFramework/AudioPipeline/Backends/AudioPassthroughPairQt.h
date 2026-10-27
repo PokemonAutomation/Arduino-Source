@@ -40,11 +40,11 @@ public:
     using WorkingAudio2WorkingAudio = Kernels::AudioPipeline::WorkingAudio2WorkingAudio;
     using WorkingAudioStreamListener = Kernels::AudioPipeline::WorkingAudioStreamListener;
 
-    virtual void add_listener(FFTListener& listener) override;
-    virtual void remove_listener(FFTListener& listener) override;
-
     virtual void add_listener(const AudioFormat& format, WorkingAudioStreamListener& listener) override;
     virtual void remove_listener(WorkingAudioStreamListener& listener) override;
+
+    virtual void add_listener(FFTListener& listener) override;
+    virtual void remove_listener(FFTListener& listener) override;
 
 
 public:
