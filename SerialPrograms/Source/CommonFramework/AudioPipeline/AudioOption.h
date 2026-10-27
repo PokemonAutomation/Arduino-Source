@@ -22,9 +22,7 @@ class AudioSelectorWidget;
 // TODO: if needed, can add state of FFT parameters (FFT length, sliding
 // window step, etc.) here.
 class AudioOption{
-    static const std::string JSON_INPUT_FILE;
-    static const std::string JSON_INPUT_DEVICE;
-    static const std::string JSON_INPUT_FORMAT;
+    static const std::string JSON_AUDIO_SOURCE;
     static const std::string JSON_OUTPUT_DEVICE;
     static const std::string JSON_AUDIO_VIS;
     static const std::string JSON_AUDIO_VOLUME;

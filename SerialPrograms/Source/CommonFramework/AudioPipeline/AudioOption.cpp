@@ -5,6 +5,7 @@
  */
 
 #include "Common/Compiler.h"
+#include "Common/Cpp/EnumStringMap.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "AudioOption.h"
@@ -12,10 +13,15 @@
 namespace PokemonAutomation{
 
 
-const std::string AudioOption::JSON_INPUT_FILE = "InputFile";
-const std::string AudioOption::JSON_INPUT_DEVICE = "InputDevice";
-const std::string AudioOption::JSON_INPUT_FORMAT = "InputFormat";
+const std::string AudioOption::JSON_AUDIO_SOURCE = "AudioSource";
 const std::string AudioOption::JSON_OUTPUT_DEVICE = "OutputDevice";
+
+
+const EnumStringMap<AudioSourceType> AUDIO_TYPE_STRINGS{
+    {AudioSourceType::None,   "None"},
+    {AudioSourceType::File,   "Audio File"},
+    {AudioSourceType::Device, "Audio Device"},
+};
 const std::string AudioOption::JSON_AUDIO_VIS = "AudioVisualization";
 const std::string AudioOption::JSON_AUDIO_VOLUME = "Volume";
 
@@ -67,33 +73,40 @@ void AudioOption::load_json(const JsonValue& json){
         return;
     }
     m_input_source.reset();
-    const std::string* str;
-    str = obj->get_string(JSON_INPUT_FILE);
-    if (str != nullptr && !str->empty()){
-        m_input_source = std::make_shared<AudioSourceDescriptor_File>(*str);
-    }else{
-        str = obj->get_string(JSON_INPUT_DEVICE);
-        if (str != nullptr && !str->empty()){
-            AudioDeviceInfo device(*str);
-            const std::string* format_str = obj->get_string(JSON_INPUT_FORMAT);
-            if (format_str != nullptr && !format_str->empty()){
-                for (const AudioInputChoice& choice : device.supported_choices()){
-                    if (choice.display_name() == *format_str){
-                        m_input_source = std::make_shared<AudioSourceDescriptor_Device>(device, choice);
+    const JsonValue* source = obj->get_value(JSON_AUDIO_SOURCE);
+    if (source != nullptr){
+        const JsonObject* source_obj = source->to_object();
+        if (source_obj != nullptr){
+            const std::string* type = source_obj->get_string("SourceType");
+            if (type != nullptr){
+                const AudioSourceType source_type =
+                    AUDIO_TYPE_STRINGS.get_enum(*type, AudioSourceType::None);
+                const JsonValue* params =
+                    source_obj->get_value(AUDIO_TYPE_STRINGS.get_string(source_type));
+                if (params != nullptr){
+                    switch (source_type){
+                    case AudioSourceType::File:
+                    {
+                        auto x = std::make_shared<AudioSourceDescriptor_File>();
+                        x->load_json(*params);
+                        m_input_source = std::move(x);
+                        break;
+                    }
+                    case AudioSourceType::Device:
+                    {
+                        auto x = std::make_shared<AudioSourceDescriptor_Device>();
+                        x->load_json(*params);
+                        m_input_source = std::move(x);
+                        break;
+                    }
+                    default:
                         break;
                     }
                 }
             }
-            if (!m_input_source){
-                //  Missing / unknown input format: remember the device with
-                //  an invalid choice; AudioSession::load() resolves it to the
-                //  preferred choice.
-                m_input_source = std::make_shared<AudioSourceDescriptor_Device>(
-                    device, AudioInputChoice()
-                );
-            }
         }
     }
+    const std::string* str;
     str = obj->get_string(JSON_OUTPUT_DEVICE);
     if (str != nullptr){
         m_output_device = AudioDeviceInfo(*str);
@@ -112,9 +125,14 @@ void AudioOption::load_json(const JsonValue& json){
 
 JsonValue AudioOption::to_json() const{
     JsonObject root;
-    root[JSON_INPUT_FILE] = input_file();
-    root[JSON_INPUT_DEVICE] = input_device().device_name();
-    root[JSON_INPUT_FORMAT] = input_choice().display_name();
+    if (m_input_source){
+        JsonObject source;
+        const std::string& type_str =
+            AUDIO_TYPE_STRINGS.get_string(m_input_source->type);
+        source["SourceType"] = type_str;
+        source[type_str] = m_input_source->to_json();
+        root[JSON_AUDIO_SOURCE] = std::move(source);
+    }
     root[JSON_OUTPUT_DEVICE] = m_output_device.device_name();
     root[JSON_AUDIO_VIS] = audioDisplayTypeToString(m_display_type);
     root[JSON_AUDIO_VOLUME] = m_volume;

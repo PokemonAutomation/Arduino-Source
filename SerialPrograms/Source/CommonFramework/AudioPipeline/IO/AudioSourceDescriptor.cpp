@@ -5,6 +5,8 @@
  */
 
 #include <memory>
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
@@ -16,6 +18,17 @@
 
 namespace PokemonAutomation{
 
+
+
+JsonValue AudioSourceDescriptor_File::to_json() const{
+    return m_path;
+}
+void AudioSourceDescriptor_File::load_json(const JsonValue& json){
+    const std::string* path = json.to_string();
+    if (path != nullptr){
+        m_path = *path;
+    }
+}
 
 
 std::unique_ptr<AudioSource> AudioSourceDescriptor_File::make_AudioSource(
@@ -49,6 +62,33 @@ std::unique_ptr<AudioSource> AudioSourceDescriptor_File::make_AudioSource(
     return std::make_unique<AudioInputFile>(logger, m_path, native_format);
 }
 
+
+
+JsonValue AudioSourceDescriptor_Device::to_json() const{
+    JsonObject obj;
+    obj["Device"] = m_device.device_name();
+    obj["InputFormat"] = m_choice.display_name();
+    return obj;
+}
+void AudioSourceDescriptor_Device::load_json(const JsonValue& json){
+    const JsonObject* obj = json.to_object();
+    if (obj == nullptr){
+        return;
+    }
+    const std::string* device_name = obj->get_string("Device");
+    if (device_name != nullptr && !device_name->empty()){
+        m_device = AudioDeviceInfo(*device_name);
+    }
+    const std::string* format = obj->get_string("InputFormat");
+    if (format != nullptr && !format->empty()){
+        for (const AudioInputChoice& choice : m_device.supported_choices()){
+            if (choice.display_name() == *format){
+                m_choice = choice;
+                break;
+            }
+        }
+    }
+}
 
 
 std::unique_ptr<AudioSource> AudioSourceDescriptor_Device::make_AudioSource(

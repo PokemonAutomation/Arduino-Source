@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <string>
+#include "Common/Cpp/Json/JsonValue.h"
 #include "CommonFramework/AudioPipeline/AudioInfo.h"
 
 namespace PokemonAutomation{
@@ -50,6 +51,12 @@ public:
     virtual bool operator==(const AudioSourceDescriptor& x) const = 0;
     virtual std::string display_name() const = 0;
 
+    //  (De)serialization of the descriptor's own state. The type itself is
+    //  keyed by "SourceType" in the containing JSON node (see
+    //  AudioOption::to_json / load_json).
+    virtual JsonValue to_json() const = 0;
+    virtual void load_json(const JsonValue& json) = 0;
+
     //  State accessors. For any given descriptor exactly one of file_path()
     //  / input_device() is non-null; input_choice() is non-null only for
     //  device descriptors.
@@ -85,6 +92,9 @@ public:
 
     virtual const std::string* file_path() const override{ return &m_path; }
 
+    virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
+
     virtual std::unique_ptr<AudioSource> make_AudioSource(Logger& logger) const override;
 
 private:
@@ -114,6 +124,9 @@ public:
 
     virtual const AudioDeviceInfo* input_device() const override{ return &m_device; }
     virtual const AudioInputChoice* input_choice() const override{ return &m_choice; }
+
+    virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
 
     virtual std::unique_ptr<AudioSource> make_AudioSource(Logger& logger) const override;
 
