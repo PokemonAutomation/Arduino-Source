@@ -18,6 +18,7 @@
  *
  */
 
+#include <atomic>
 #include <cerrno>
 #include <cctype>
 #include <cstring>
@@ -72,6 +73,7 @@ constexpr int64_t MAX_RING_BYTES = 90 * 1024 * 1024;
 //  Audio is always resampled to 48 kHz and encoded as AAC (frame size 1024).
 constexpr int AUDIO_OUTPUT_RATE = 48000;
 constexpr int AUDIO_FRAME_SAMPLES = 1024;
+constexpr int64_t AUDIO_FRAME_US = 1000000LL * AUDIO_FRAME_SAMPLES / AUDIO_OUTPUT_RATE;
 
 //  The audio timeline follows the sample count, re-anchored to the wall clock
 //  whenever the two disagree by more than this (a gap in the delivered audio,
@@ -115,6 +117,18 @@ CodecParametersPtr copy_codec_parameters(const AVCodecParameters* source){
         return nullptr;
     }
     return copy;
+}
+
+
+//  ffmpeg logs to stderr at AV_LOG_INFO by default, and probing the encoder
+//  candidates is noisy. The level is process-wide, so it is set once, when
+//  the first tracker is built, rather than reset by every tracker.
+void quiet_ffmpeg_logging_once(){
+    static const bool done = []{
+        av_log_set_level(AV_LOG_ERROR);
+        return true;
+    }();
+    (void)done;
 }
 
 
@@ -307,6 +321,7 @@ struct StreamHistoryTracker_Ring::Data{
     std::deque<std::shared_ptr<const VideoRingPacket>> m_video;
     std::deque<std::shared_ptr<const AudioRingPacket>> m_audio;
     int64_t m_ring_bytes = 0;
+    std::atomic<bool> m_reported_size_cap{false};
 
     //  Video encoder (initialized on the worker thread at the first frame).
     bool m_video_enabled;
@@ -362,6 +377,8 @@ struct StreamHistoryTracker_Ring::Data{
     ConditionVariable m_cv;
     ConditionVariable m_idle_cv;    //  Notified after each frame is encoded (wait_until_idle()).
     std::deque<std::shared_ptr<const VideoFrame>> m_pending_frames;
+    size_t m_dropped_frames = 0;    //  Guarded by m_queue_lock. Since the last report.
+    WallClock m_last_drop_report = WallClock::min();    //  Guarded by m_queue_lock.
 
     //  Initializes the audio encoder (if enabled) and starts the video
     //  worker thread (if enabled); the video encoder itself is opened
@@ -380,7 +397,7 @@ struct StreamHistoryTracker_Ring::Data{
         , m_frame_interval(std::chrono::microseconds(1000000 / m_target_fps))
         , m_video_enabled(p_has_video)
     {
-        av_log_set_level(AV_LOG_ERROR);
+        quiet_ffmpeg_logging_once();
 
         if (m_have_audio){
             init_audio_encoder();
@@ -683,25 +700,31 @@ struct StreamHistoryTracker_Ring::Data{
         av_packet_free(&packet);
 
         int64_t added = (int64_t)ring_packet->data.size();
-        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-        //  Refresh the mux-time parameter snapshot on this (the encoder's)
-        //  thread whenever the encoder state changes; the hardware encoders
-        //  populate their extradata lazily, sometimes only after the first
-        //  encoded packet. mux_to_file() must not read the live context.
-        if (m_video_params == nullptr
-            || m_video_params->extradata_size != m_vctx->extradata_size
-        ){
-            if (m_video_params == nullptr){
-                m_video_params = avcodec_parameters_alloc();
+        bool capped;
+        {
+            WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
+            //  Refresh the mux-time parameter snapshot on this (the encoder's)
+            //  thread whenever the encoder state changes; the hardware encoders
+            //  populate their extradata lazily, sometimes only after the first
+            //  encoded packet. mux_to_file() must not read the live context.
+            if (m_video_params == nullptr
+                || m_video_params->extradata_size != m_vctx->extradata_size
+            ){
+                if (m_video_params == nullptr){
+                    m_video_params = avcodec_parameters_alloc();
+                }
+                if (m_video_params != nullptr){
+                    avcodec_parameters_from_context(m_video_params, m_vctx);
+                    m_video_time_base = m_vctx->time_base;
+                }
             }
-            if (m_video_params != nullptr){
-                avcodec_parameters_from_context(m_video_params, m_vctx);
-                m_video_time_base = m_vctx->time_base;
-            }
+            m_video.push_back(std::move(ring_packet));
+            m_ring_bytes += added;
+            capped = evict();
         }
-        m_video.push_back(std::move(ring_packet));
-        m_ring_bytes += added;
-        evict();
+        if (capped){
+            report_size_cap();
+        }
         return 1;
     }
 
@@ -937,8 +960,10 @@ struct StreamHistoryTracker_Ring::Data{
     }
 
 
-    void evict(){
-        //  Must call under m_lock.
+    //  Drops the packets that fell out of the window (or past the memory
+    //  cap). Returns true if the memory cap dropped packets the window would
+    //  have kept. Must call under m_lock.
+    bool evict(){
         WallClock latest = WallClock::min();
         if (!m_video.empty()){
             latest = m_video.back()->timestamp;
@@ -947,7 +972,7 @@ struct StreamHistoryTracker_Ring::Data{
             latest = m_audio.back()->timestamp;
         }
         if (latest == WallClock::min()){
-            return;
+            return false;
         }
         //  Keep one extra keyframe interval of headroom: save() starts the
         //  file at the first keyframe in the ring, and keyframes arrive only
@@ -961,14 +986,33 @@ struct StreamHistoryTracker_Ring::Data{
         //  interval earlier).
         WallClock threshold =
             latest - m_window - std::chrono::microseconds(VIDEO_KEYFRAME_INTERVAL_US);
+        bool capped = false;
         while (!m_video.empty() && (m_video.front()->timestamp < threshold || m_ring_bytes > MAX_RING_BYTES)){
+            capped |= m_video.front()->timestamp >= threshold;
             m_ring_bytes -= (int64_t)m_video.front()->data.size();
             m_video.pop_front();
         }
         while (!m_audio.empty() && (m_audio.front()->timestamp < threshold || m_ring_bytes > MAX_RING_BYTES)){
+            capped |= m_audio.front()->timestamp >= threshold;
             m_ring_bytes -= (int64_t)m_audio.front()->data.size();
             m_audio.pop_front();
         }
+        return capped;
+    }
+
+    //  Logs (once per tracker) that the memory cap is shortening the history.
+    void report_size_cap(){
+        if (m_reported_size_cap.exchange(true)){
+            return;
+        }
+        m_logger.log(
+            "Stream history: the history reached its "
+            + std::to_string(MAX_RING_BYTES / (1024 * 1024))
+            + " MB memory limit, so saved videos will be shorter than the"
+            + " configured history length. Lower the video quality or the"
+            + " history length to keep the full history.",
+            COLOR_ORANGE
+        );
     }
 
 
@@ -1003,17 +1047,33 @@ struct StreamHistoryTracker_Ring::Data{
             }
         }
 
+        std::string drop_report;
         {
             std::lock_guard<Mutex> queue_guard(m_queue_lock);
 
-            //  Drop oldest if we are falling behind.
+            //  Drop oldest if we are falling behind. Reported at most every
+            //  10 seconds: when the encoder cannot keep up, this happens on
+            //  every frame.
             if (m_pending_frames.size() >= MAX_PENDING_FRAMES){
                 m_pending_frames.pop_front();
-                m_logger.log("Stream history worker thread lagging: Frame dropped.", COLOR_RED);
+                m_dropped_frames++;
+                WallClock now = current_time();
+                if (m_last_drop_report == WallClock::min()
+                    || now - m_last_drop_report >= std::chrono::seconds(10)
+                ){
+                    drop_report = "Stream history worker thread lagging: dropped "
+                        + std::to_string(m_dropped_frames) + " frame(s)"
+                        + (m_last_drop_report == WallClock::min() ? "." : " in the last 10+ seconds.");
+                    m_dropped_frames = 0;
+                    m_last_drop_report = now;
+                }
             }
             m_pending_frames.emplace_back(std::move(frame));
         }
         m_cv.notify_one();
+        if (!drop_report.empty()){
+            m_logger.log(drop_report, COLOR_RED);
+        }
     }
 
 
@@ -1154,6 +1214,7 @@ struct StreamHistoryTracker_Ring::Data{
                 av_packet_free(&packet);
 
                 int64_t added = (int64_t)ring_packet->data.size();
+                bool capped;
                 {
                     WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
                     //  Refresh the audio parameter snapshot on this (the
@@ -1171,7 +1232,10 @@ struct StreamHistoryTracker_Ring::Data{
                     }
                     m_audio.push_back(std::move(ring_packet));
                     m_ring_bytes += added;
-                    evict();
+                    capped = evict();
+                }
+                if (capped){
+                    report_size_cap();
                 }
             }
         }
@@ -1423,6 +1487,9 @@ struct StreamHistoryTracker_Ring::Data{
             //  whole save.
             int64_t last_video_dts = -1;
             int64_t last_audio_dts = -1;
+            //  Where the last written audio packet ends (microseconds).
+            int64_t audio_end_us = INT64_MIN;
+            size_t dropped_audio = 0;
             size_t vi = p_video_start;
             size_t ai = p_audio_start;
             //  Submit the packets in timestamp order, alternating between the two
@@ -1488,6 +1555,19 @@ struct StreamHistoryTracker_Ring::Data{
                     }
                     vi++;
                 }else{
+                    //  A backwards re-sync of the audio clock (the device
+                    //  clock running fast; see push_samples()) stamps the
+                    //  following audio up to the re-sync threshold earlier,
+                    //  overlapping audio already written. Drop the overlap:
+                    //  bumping it to strictly increasing timestamps would
+                    //  squeeze it into a burst of near-zero-length packets.
+                    //  (1 ms of slack for the timestamp rounding.)
+                    if (audio_end_us != INT64_MIN && audio_us < audio_end_us - 1000){
+                        dropped_audio++;
+                        ai++;
+                        continue;
+                    }
+                    audio_end_us = audio_us + AUDIO_FRAME_US;
                     const AudioRingPacket& ap = *p_audio[ai];
                     //  The muxer only reads the packet data.
                     packet->data = const_cast<uint8_t*>(ap.data.data());
@@ -1516,6 +1596,13 @@ struct StreamHistoryTracker_Ring::Data{
                 }
             }
             av_packet_free(&packet);
+            if (dropped_audio != 0){
+                m_logger.log(
+                    "Stream history: dropped " + std::to_string(dropped_audio)
+                    + " audio packets that overlapped after an audio clock re-sync.",
+                    COLOR_YELLOW
+                );
+            }
         }
 
         if (ok && av_write_trailer(format) < 0){
@@ -1642,7 +1729,7 @@ StreamHistoryTracker_Ring::StreamHistoryTracker_Ring(
 void StreamHistoryTracker_Ring::set_window(std::chrono::seconds window){
     WriteSpinLock lg(m_data->m_lock, PA_CURRENT_FUNCTION);
     m_data->m_window = window;
-    m_data->evict();
+    (void)m_data->evict();
 }
 
 void StreamHistoryTracker_Ring::push_samples(size_t samples, size_t stride, const float* data){
