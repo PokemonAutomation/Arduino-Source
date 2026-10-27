@@ -7,11 +7,11 @@
 #ifndef PokemonAutomation_PokemonBDSP_EggHatchFilter_H
 #define PokemonAutomation_PokemonBDSP_EggHatchFilter_H
 
-#include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Cpp/Options/EditableTableOption.h"
 #include "Pokemon/Pokemon_IVChecker.h"
 #include "Pokemon/Options/Pokemon_IVCheckerOption.h"
 #include "Pokemon/Inference/Pokemon_IVCheckerReader.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/EditableTableOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

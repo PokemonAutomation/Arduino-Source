@@ -8,11 +8,11 @@
 #define PokemonAutomation_CommonTools_Options_ScreenWatchWidget_H
 
 #include <QWidget>
+#include "Common/Qt/WidgetStackFixedAspectRatio.h"
+#include "Common/Qt/Options/ConfigWidget.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
-#include "Common/Qt/WidgetStackFixedAspectRatio.h"
-#include "Common/Qt/Options/ConfigWidget.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/UI/VideoOverlayWidget.h"
 #include "CommonTools/Options/ScreenWatchOption.h"

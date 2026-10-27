@@ -4,13 +4,13 @@
  *
  */
 
+#include <iostream>
+#include "OutputWindow.h"
+//#include <QStatusBar>
 #include <QCoreApplication>
 #include <QMenuBar>
-//#include <QStatusBar>
-#include "CommonFramework/PersistentSettings.h"
-#include "OutputWindow.h"
 
-#include <iostream>
+#include "CommonFramework/PersistentSettings.h"
 using std::cout;
 using std::endl;
 

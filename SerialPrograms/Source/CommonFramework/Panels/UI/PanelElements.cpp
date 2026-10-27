@@ -9,13 +9,13 @@
 #include <QScrollArea>
 #include <QLabel>
 #include <QPushButton>
-#include "Common/Cpp/ColoredText.h"
 #include "Common/Qt/Options/ConfigWidget.h"
+#include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Panels/PanelSession.h"
 #include "CommonFramework/ProgramSession.h"
-#include "GameConsole/ConsoleProgram.h"
 #include "PanelElements.h"
+#include "GameConsole/ConsoleProgram.h"
 
 //#include <iostream>
 //using std::cout;

@@ -8,8 +8,8 @@
 #define PokemonAutomation_FloatingPointWidget_H
 
 #include <QLineEdit>
-#include "Common/Cpp/Options/FloatingPointOption.h"
 #include "ConfigWidget.h"
+#include "Common/Cpp/Options/FloatingPointOption.h"
 
 namespace PokemonAutomation{
 

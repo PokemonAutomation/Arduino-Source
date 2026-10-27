@@ -7,9 +7,9 @@
  *
  */
 
-#include <QAudioFormat>
 #include <string>
 #include <vector>
+#include <QAudioFormat>
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/TestRunners/UnitTest.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"

@@ -6,9 +6,9 @@
  *
  */
 
-#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include <set>
 #include <string>
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

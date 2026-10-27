@@ -9,12 +9,12 @@
 #include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
 #include "RGB32_Range/Kernels_ImageFilter_RGB32_Range.h"
-#include "Tests/GuardPageImage.h"
 #include "Kernels_ImageFilter_Tests.h"
+#include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "Tests/GuardPageImage.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

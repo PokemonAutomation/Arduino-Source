@@ -4,11 +4,11 @@
  *
  */
 
+#include <iostream>
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels_BinaryImage_BasicFilters_Routines.h"
-#include "Kernels_BinaryImage_BasicFilters.h"
 
-#include <iostream>
+#include "Kernels_BinaryImage_BasicFilters.h"
 using std::cout;
 using std::endl;
 

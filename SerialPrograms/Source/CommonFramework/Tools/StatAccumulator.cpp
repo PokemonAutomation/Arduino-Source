@@ -6,11 +6,11 @@
 
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "StatAccumulator.h"
 
-#include <iostream>
+#include "StatAccumulator.h"
 using std::cout;
 using std::endl;
 

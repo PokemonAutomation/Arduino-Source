@@ -9,8 +9,8 @@
 #include <atomic>
 //#include <thread>
 #include <Windows.h>
-#include <processtopologyapi.h>
 #include <tlhelp32.h>
+#include <processtopologyapi.h>
 #include "Common/Cpp/SparseRegion.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Options/StaticTextOption.h"

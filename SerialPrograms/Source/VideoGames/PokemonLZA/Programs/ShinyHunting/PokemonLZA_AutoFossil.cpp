@@ -4,6 +4,7 @@
  *
  */
 
+#include <sstream>
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -11,6 +12,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "VideoGames/PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h"
@@ -21,10 +23,8 @@
 #include "VideoGames/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "VideoGames/PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "VideoGames/PokemonLZA/Programs/PokemonLZA_MenuNavigation.h"
-#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
-#include "PokemonLZA_AutoFossil.h"
 
-#include <sstream>
+#include "PokemonLZA_AutoFossil.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

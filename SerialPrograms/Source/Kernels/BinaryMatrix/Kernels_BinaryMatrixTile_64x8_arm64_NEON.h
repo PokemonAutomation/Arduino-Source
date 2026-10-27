@@ -7,12 +7,12 @@
 #ifndef PokemonAutomation_Kernels_BinaryMatrixTile_64x8_arm64_NEON_H
 #define PokemonAutomation_Kernels_BinaryMatrixTile_64x8_arm64_NEON_H
 
+#include <iostream>
 #include <arm_neon.h>
 #include "Common/Compiler.h"
 #include "Kernels_BinaryMatrixTile_Debugging.h"
-#include "Kernels_BinaryMatrix.h"
 
-#include <iostream>
+#include "Kernels_BinaryMatrix.h"
 using std::cout;
 using std::endl;
 

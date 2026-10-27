@@ -5,13 +5,13 @@
  */
 
 
+#include <iostream>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ResourceDownload/ResourceDownloadHelpers.h"
 #include "CommonFramework/ResourceDownload/ResourceDownload.h"
-#include "GlobalResourceDownloadManager.h"
 
-#include <iostream>
+#include "GlobalResourceDownloadManager.h"
 using std::cout;
 using std::endl;
 

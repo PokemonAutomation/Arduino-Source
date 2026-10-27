@@ -4,9 +4,9 @@
  *
  */
 
-#include "BusyPeriodicRunner.h"
-
 #include <iostream>
+
+#include "BusyPeriodicRunner.h"
 using std::cout;
 using std::endl;
 

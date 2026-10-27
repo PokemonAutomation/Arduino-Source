@@ -6,15 +6,15 @@
 
 #ifdef PA_AutoDispatch_x64_08_Nehalem
 
+#include <iostream>
 #include <smmintrin.h>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/Kernels_x64_SSE41.h"
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h"
 #include "Kernels_ImagePixelSumSqr.h"
-#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "Kernels_ImagePixelSumSqr_TestInfra.h"
 
-#include <iostream>
+#include "Kernels_ImagePixelSumSqr_TestInfra.h"
 using std::cout;
 using std::endl;
 

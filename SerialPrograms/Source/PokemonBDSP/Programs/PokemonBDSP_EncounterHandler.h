@@ -10,10 +10,10 @@
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "Pokemon/Pokemon_Notification.h"
-#include "VideoGames/PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonBDSP/Options/PokemonBDSP_EncounterBotCommon.h"
 #include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_EncounterDetection.h"
+#include "VideoGames/PokemonSwSh/ShinyHuntTracker.h"
 
 namespace PokemonAutomation{
     class ProgramEnvironment;

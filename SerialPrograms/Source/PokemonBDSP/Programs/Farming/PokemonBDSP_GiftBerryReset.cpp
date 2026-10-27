@@ -15,11 +15,11 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "Pokemon/Inference/Pokemon_BerryNameReader.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameEntry.h"
 #include "PokemonBDSP_GiftBerryReset.h"
-#include "Pokemon/Inference/Pokemon_BerryNameReader.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

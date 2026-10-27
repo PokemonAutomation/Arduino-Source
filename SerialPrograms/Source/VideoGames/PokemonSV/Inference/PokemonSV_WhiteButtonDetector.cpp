@@ -4,8 +4,8 @@
  *
  */
 
-#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"

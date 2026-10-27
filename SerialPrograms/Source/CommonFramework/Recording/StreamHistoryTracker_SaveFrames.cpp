@@ -7,7 +7,7 @@
  *
  */
 
-#include <opencv2/opencv.hpp>
+#include <iostream>
 // #include <QCoreApplication>
 // #include <QFileInfo>
 // #include <QUrl>
@@ -17,6 +17,7 @@
 // #include <QMediaRecorder>
 // #include <QMediaCaptureSession>
 // #include <QScopeGuard>
+#include <opencv2/opencv.hpp>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
@@ -24,9 +25,8 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Recording/StreamHistoryOption.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
-#include "StreamHistoryTracker_SaveFrames.h"
 
-#include <iostream>
+#include "StreamHistoryTracker_SaveFrames.h"
 using std::cout;
 using std::endl;
 

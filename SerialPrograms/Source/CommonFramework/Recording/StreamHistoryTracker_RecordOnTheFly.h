@@ -9,6 +9,7 @@
 #ifndef PokemonAutomation_StreamHistoryTracker_RecordOnTheFly_H
 #define PokemonAutomation_StreamHistoryTracker_RecordOnTheFly_H
 
+#include <iostream>
 #include <QCoreApplication>
 #include <QUrl>
 #include <QAudioBufferInput>
@@ -22,9 +23,8 @@
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinPause.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 
-#include <iostream>
+#include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 using std::cout;
 using std::endl;
 

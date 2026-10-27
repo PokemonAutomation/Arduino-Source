@@ -5,13 +5,13 @@
  */
 
 #include <cmath>
+#include <iostream>
 #include "Kernels/ImageStats/Kernels_ImagePixelSumSqr.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "ImageBoxes.h"
-#include "ImageStats.h"
 
-#include <iostream>
+#include "ImageStats.h"
 using std::cout;
 using std::endl;
 

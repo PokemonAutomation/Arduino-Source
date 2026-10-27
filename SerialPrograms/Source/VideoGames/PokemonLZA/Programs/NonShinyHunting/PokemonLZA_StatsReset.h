@@ -8,14 +8,14 @@
 #define PokemonAutomation_PokemonLZA_StatsReset_H
 
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_IvJudgeOption.h"
-#include "Common/Cpp/Options/TimeDurationOption.h"
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "VideoGames/PokemonLZA/Options/PokemonLZA_BattleAIOption.h"
 
 namespace PokemonAutomation{

@@ -11,9 +11,9 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "Tests/TestUtils.h"
 #include "VideoGames/PokemonHome/Inference/PokemonHome_ButtonDetector.h"
 #include "PokemonHome_BoxViewDetector.h"
-#include "Tests/TestUtils.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

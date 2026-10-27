@@ -7,8 +7,8 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QLabel>
-#include "Common/Cpp/Strings/StringTools.h"
 #include "BoxFloatWidget.h"
+#include "Common/Cpp/Strings/StringTools.h"
 
 //#include <iostream>
 //using std::cout;

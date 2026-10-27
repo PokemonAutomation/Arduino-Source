@@ -6,9 +6,9 @@
 
 #ifdef PA_AutoDispatch_08_Nehalem
 
+#include "Kernels_BinaryMatrix_Arch_x64_SSE42.h"
 #include "Kernels_PackedBinaryMatrixCore.tpp"
 #include "Kernels_SparseBinaryMatrixCore.tpp"
-#include "Kernels_BinaryMatrix_Arch_x64_SSE42.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

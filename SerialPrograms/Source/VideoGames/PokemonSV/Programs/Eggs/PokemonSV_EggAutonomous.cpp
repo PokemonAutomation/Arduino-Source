@@ -5,12 +5,12 @@
  */
 
 #include <cmath>
+#include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
-#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 //#include "CommonFramework/Exceptions/UnexpectedBattleException.h"
-#include "Common/Cpp/ColoredText.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"

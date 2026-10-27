@@ -4,6 +4,7 @@
  *
  */
 
+#include <iostream>
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "CommonFramework/GlobalAutoPaths.h"
@@ -12,12 +13,11 @@
 #include "CommonFramework/Tools/FileDownloader.h"
 #include "CommonFramework/Tools/FileUnzip.h"
 #include "CommonFramework/Tools/FileHash.h"
+
 #include "CommonFramework/Logging/Logger.h"
 
+
 #include "DownloadThread.h"
-
-
-#include <iostream>
 using std::cout;
 using std::endl;
 

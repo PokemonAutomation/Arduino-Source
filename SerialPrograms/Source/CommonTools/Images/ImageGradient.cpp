@@ -4,11 +4,11 @@
  *
  */
 
+#include <iostream>
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "ImageGradient.h"
 
-#include <iostream>
+#include "ImageGradient.h"
 using std::cout;
 using std::endl;
 

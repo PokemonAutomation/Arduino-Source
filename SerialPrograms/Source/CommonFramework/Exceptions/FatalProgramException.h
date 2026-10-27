@@ -8,8 +8,8 @@
 #define PokemonAutomation_FatalProgramException_H
 
 #include <memory>
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 
 namespace PokemonAutomation{
 

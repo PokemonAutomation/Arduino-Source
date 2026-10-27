@@ -5,11 +5,11 @@
  */
 
 #include <cmath>
-#include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "ColorClustering.h"
-
 #include <fstream>
 #include <iostream>
+
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "ColorClustering.h"
 using std::cout;
 using std::endl;
 

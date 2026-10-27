@@ -4,9 +4,9 @@
  *
  */
 
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "PokemonFRLG_LocationsDatabase.h"
 
 namespace PokemonAutomation{

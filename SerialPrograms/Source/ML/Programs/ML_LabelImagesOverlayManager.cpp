@@ -5,11 +5,11 @@
  *  Manages image overlay rendering for program LabelImages.
  */
 
-#include "Pokemon/Resources/Pokemon_PokemonForms.h"
+#include <iostream>
 #include "ML_LabelImagesOverlayManager.h"
 #include "ML_LabelImages.h"
 
-#include <iostream>
+#include "Pokemon/Resources/Pokemon_PokemonForms.h"
 using std::cout, std::endl;
 
 

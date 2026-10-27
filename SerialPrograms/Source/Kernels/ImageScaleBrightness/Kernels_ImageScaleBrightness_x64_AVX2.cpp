@@ -7,10 +7,10 @@
 #ifdef PA_AutoDispatch_x64_13_Haswell
 
 #include <stdint.h>
-#include <immintrin.h>
-#include "Common/Compiler.h"
-
 #include <iostream>
+#include <immintrin.h>
+
+#include "Common/Compiler.h"
 using std::cout;
 using std::endl;
 

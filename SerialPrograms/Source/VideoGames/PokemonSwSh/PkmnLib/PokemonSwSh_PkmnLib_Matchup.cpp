@@ -5,9 +5,9 @@
  */
 
 #include <cmath>
-#include "PokemonSwSh_PkmnLib_Matchup.h"
-
 #include <iostream>
+
+#include "PokemonSwSh_PkmnLib_Matchup.h"
 using std::cout;
 using std::endl;
 

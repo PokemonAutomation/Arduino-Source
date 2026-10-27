@@ -1,7 +1,9 @@
 
-#include <QApplication>
+#include <iostream>
 //#include <QTextStream>
+#include <QApplication>
 #include <QMessageBox>
+#include "Common/Qt/GlobalThreadPoolsQt.h"
 #include "Common/Cpp/Logging/LastLogTracker.h"
 #include "Common/Cpp/Logging/FileLogger.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
@@ -14,7 +16,6 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/ImageResolution.h"
 #include "Common/Cpp/ScopeExit.h"
-#include "Common/Qt/GlobalThreadPoolsQt.h"
 #include "StaticRegistration.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
@@ -23,27 +24,26 @@
 #include "GlobalSettingsPanel.h"
 #include "GlobalServices.h"
 #include "PersistentSettings.h"
-#include "Tests/CommandLineTests.h"
 #include "ErrorReports/ProgramDumper.h"
 #include "ErrorReports/ErrorReports.h"
 #include "Environment/HardwareValidation.h"
-#include "Integrations/DiscordSettingsOption.h"
-#include "Integrations/DiscordSocial/DiscordSocial.h"
-#include "Integrations/DppIntegration/DppClient.h"
 #include "Logging/Logger.h"
 #include "Logging/OutputRedirector.h"
-//#include "Tools/StatsDatabase.h"
-//#include "Windows/DpiScaler.h"
 #include "Startup/SetupSettings.h"
 #include "Startup/NewVersionCheck.h"
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
+//#include "Tools/StatsDatabase.h"
+//#include "Windows/DpiScaler.h"
+#include "Windows/MainWindow.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "ControllerInput/ControllerInput.h"
 #include "Controllers/SerialPort/SerialPortPollerQt.h"
-#include "Integrations/DiscordWebhook.h"
-#include "Windows/MainWindow.h"
+#include "Tests/CommandLineTests.h"
+#include "Integrations/DiscordSettingsOption.h"
+#include "Integrations/DiscordSocial/DiscordSocial.h"
+#include "Integrations/DppIntegration/DppClient.h"
 
-#include <iostream>
+#include "Integrations/DiscordWebhook.h"
 using std::cout;
 using std::endl;
 

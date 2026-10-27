@@ -7,11 +7,11 @@
 #ifndef PokemonAutomation_PokemonLGPE_DailyItemFarmer_H
 #define PokemonAutomation_PokemonLGPE_DailyItemFarmer_H
 
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
-#include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

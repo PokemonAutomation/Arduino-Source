@@ -4,20 +4,20 @@
  *
  */
 
+#include <fstream>
+#include <sstream>
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/StaticGlobals.h"
-#include "CommonTools/Images/SolidColorTest.h"
 //#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "PokemonLZA_FlavorPowerDetector.h"
-#include "PokemonLZA_FlavorPowerScreenDetector.h"
+#include "CommonTools/Images/SolidColorTest.h"
 #include "Tests/TestUtils.h"
 
-#include <fstream>
-#include <sstream>
+#include "PokemonLZA_FlavorPowerDetector.h"
+#include "PokemonLZA_FlavorPowerScreenDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

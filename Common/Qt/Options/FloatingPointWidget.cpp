@@ -7,9 +7,9 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
-#include "Common/Cpp/PrettyPrint.h"
 #include "ConfigWidget.h"
 #include "FloatingPointWidget.h"
+#include "Common/Cpp/PrettyPrint.h"
 
 //#include <iostream>
 //using std::cout;

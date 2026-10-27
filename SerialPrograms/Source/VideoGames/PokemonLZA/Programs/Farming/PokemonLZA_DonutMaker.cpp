@@ -4,6 +4,7 @@
  *
  */
 
+#include <format>
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -14,6 +15,7 @@
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "VideoGames/PokemonLZA/Inference/Donuts/PokemonLZA_DonutBerriesDetector.h"
 #include "VideoGames/PokemonLZA/Inference/Donuts/PokemonLZA_FlavorPowerDetector.h"
@@ -22,12 +24,10 @@
 #include "VideoGames/PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "VideoGames/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "VideoGames/PokemonLZA/Programs/PokemonLZA_GameEntry.h"
-#include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "VideoGames/PokemonLZA/Programs/PokemonLZA_FastTravelNavigation.h"
 #include "VideoGames/PokemonLZA/Programs/PokemonLZA_DonutBerrySession.h"
 #include "PokemonLZA_DonutMaker.h"
-#include <format>
 
 // After pressing + to send the berries to Ansha:
 // - A white button dialog window, pressing A to clear

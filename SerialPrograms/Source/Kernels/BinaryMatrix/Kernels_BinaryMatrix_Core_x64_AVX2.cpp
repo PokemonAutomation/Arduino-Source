@@ -6,9 +6,9 @@
 
 #ifdef PA_AutoDispatch_13_Haswell
 
+#include "Kernels_BinaryMatrix_Arch_x64_AVX2.h"
 #include "Kernels_PackedBinaryMatrixCore.tpp"
 #include "Kernels_SparseBinaryMatrixCore.tpp"
-#include "Kernels_BinaryMatrix_Arch_x64_AVX2.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

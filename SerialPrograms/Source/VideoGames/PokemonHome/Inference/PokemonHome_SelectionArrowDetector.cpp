@@ -5,10 +5,10 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "Tests/TestUtils.h"
 #include "PokemonHome_SelectionArrowDetector.h"
 

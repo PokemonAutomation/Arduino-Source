@@ -12,16 +12,16 @@
 #include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
 #include "Kernels_BinaryMatrixTile_64x4_Default.h"
+#include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #ifdef PA_AutoDispatch_arm64_20_M1
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_arm64_NEON.h"
 #include "Kernels_BinaryMatrixTile_64x8_arm64_NEON.h"
 #endif
-#include "Tests/GuardPageImage.h"
 #include "Kernels_BinaryMatrix_Tests.h"
+#include "Tests/GuardPageImage.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

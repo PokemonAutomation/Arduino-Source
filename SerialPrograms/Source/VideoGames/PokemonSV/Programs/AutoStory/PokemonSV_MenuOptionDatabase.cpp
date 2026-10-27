@@ -6,9 +6,9 @@
 
 #include <vector>
 #include <map>
+#include <iostream>
 #include "Common/Cpp/Exceptions.h"
 #include "PokemonSV_MenuOptionDatabase.h"
-#include <iostream>
 using std::cout;
 using std::endl;
 

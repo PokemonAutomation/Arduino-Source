@@ -9,9 +9,9 @@
 
 #include <stdint.h>
 #include <cstddef>
-#include "Common/Compiler.h"
-
 #include <iostream>
+
+#include "Common/Compiler.h"
 using std::cout;
 using std::endl;
 

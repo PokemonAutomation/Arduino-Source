@@ -8,17 +8,17 @@
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/PrettyPrint.h"
+#include "Kernels/AudioPipeline/Kernels_RawAudio2WorkingAudio.h"
+#include "Kernels/AudioPipeline/Kernels_WorkingAudio2RawAudio.h"
+#include "Kernels/AudioPipeline/Kernels_WorkingAudio2WorkingAudio.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include <QAudioFormat>
 #include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "CommonFramework/AudioPipeline/ChannelMixer.h"
 #include "CommonFramework/AudioPipeline/IO/AudioSource.h"
 #include "CommonFramework/AudioPipeline/IO/AudioOutputDevice.h"
 #include "CommonFramework/AudioPipeline/Spectrum/FFTStreamer.h"
-#include "Kernels/AudioPipeline/Kernels_RawAudio2WorkingAudio.h"
-#include "Kernels/AudioPipeline/Kernels_WorkingAudio2RawAudio.h"
-#include "Kernels/AudioPipeline/Kernels_WorkingAudio2WorkingAudio.h"
-#include <QAudioFormat>
 #include "AudioPassthroughPairQt.h"
 
 //#include <iostream>

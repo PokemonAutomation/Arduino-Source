@@ -11,8 +11,8 @@
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonTools/Options/LanguageOCROption.h"
-#include "VideoGames/PokemonLA/Options/PokemonLA_TradeCountTable.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
+#include "VideoGames/PokemonLA/Options/PokemonLA_TradeCountTable.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

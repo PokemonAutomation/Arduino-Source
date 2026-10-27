@@ -10,14 +10,14 @@
 #define PokemonAutomation_ClientSocket_POSIX_H
 
 #include <iostream>
+#include <cerrno>
+#include <cstring>
+#include <signal.h>
 #include <sys/socket.h>
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <cerrno>
-#include <cstring>
-#include <signal.h>
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"

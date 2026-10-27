@@ -4,6 +4,7 @@
  *
  */
 
+#include <iostream>
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/GlobalAutoPaths.h"
@@ -14,9 +15,8 @@
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "VideoGames/PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
-#include "PokemonLA_MountDetector.h"
 
-#include <iostream>
+#include "PokemonLA_MountDetector.h"
 using std::cout;
 using std::endl;
 

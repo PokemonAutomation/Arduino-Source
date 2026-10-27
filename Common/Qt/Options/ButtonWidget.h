@@ -10,8 +10,8 @@
 #include <QWidget>
 #include <QLabel>
 #include <QPushButton>
-#include "Common/Cpp/Options/ButtonOption.h"
 #include "ConfigWidget.h"
+#include "Common/Cpp/Options/ButtonOption.h"
 
 namespace PokemonAutomation{
 

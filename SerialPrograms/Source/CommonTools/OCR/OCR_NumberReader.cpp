@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <map>
+#include <iostream>
 #include "Common/Cpp/Strings/Unicode.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
@@ -19,9 +20,8 @@
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "OCR_Routines.h"
-#include "OCR_NumberReader.h"
 
-#include <iostream>
+#include "OCR_NumberReader.h"
 using std::cout;
 using std::endl;
 

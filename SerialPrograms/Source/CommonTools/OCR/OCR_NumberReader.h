@@ -9,8 +9,8 @@
 
 #include <stdint.h>
 #include <vector>
-#include "CommonFramework/Language.h"
 #include "Common/Cpp/Concurrency/ThreadPool.h"
+#include "CommonFramework/Language.h"
 
 namespace PokemonAutomation{
     class Logger;

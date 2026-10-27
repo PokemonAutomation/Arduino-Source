@@ -9,8 +9,8 @@
 
 #include <vector>
 #include <map>
-#include "CommonFramework/Language.h"
 #include "Common/Cpp/EnumStringMap.h"
+#include "CommonFramework/Language.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

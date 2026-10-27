@@ -5,8 +5,8 @@
  */
 
 #include <QAudioFormat>
-#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/StringToolsQt.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "AudioInputDevice.h"
 #include "AudioInputFile.h"

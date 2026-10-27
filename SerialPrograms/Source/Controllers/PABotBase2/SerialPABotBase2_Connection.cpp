@@ -14,9 +14,9 @@
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2_PacketProtocol.h"
+#include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "SerialPABotBase2_Connection.h"
 

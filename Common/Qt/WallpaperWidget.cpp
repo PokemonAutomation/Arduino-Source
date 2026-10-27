@@ -11,10 +11,10 @@
 #include <QPaintEvent>
 #include <QPainter>
 #include <QStyleOption>
+#include "WallpaperWidget.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
-#include "WallpaperWidget.h"
 
 namespace PokemonAutomation{
 

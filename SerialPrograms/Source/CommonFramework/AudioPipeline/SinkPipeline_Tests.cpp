@@ -36,14 +36,14 @@
 #include "Common/Cpp/TestRunners/UnitTest.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
-#include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/AudioPipeline/AudioInfo.h"
-#include "CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQt.h"
-#include "CommonFramework/AudioPipeline/ChannelMixer.h"
 #include "Kernels/AudioPipeline/Kernels_RawAudio2WorkingAudio.h"
 #include "Kernels/AudioPipeline/Kernels_WorkingAudio2RawAudio.h"
 #include "Kernels/AudioPipeline/Kernels_ChannelMixer.h"
 #include "Kernels/AudioResampler/Kernels_AudioResampler.h"
+#include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/AudioPipeline/AudioInfo.h"
+#include "CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQt.h"
+#include "CommonFramework/AudioPipeline/ChannelMixer.h"
 #include "SinkPipeline_Tests.h"
 
 namespace PokemonAutomation{

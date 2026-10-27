@@ -5,11 +5,11 @@
  */
 
 #include <string.h>
+#include <iostream>
 #include "Exceptions.h"
 #include "Containers/AlignedVector.tpp"
-#include "StreamConverters.h"
 
-#include <iostream>
+#include "StreamConverters.h"
 using std::cout;
 using std::endl;
 

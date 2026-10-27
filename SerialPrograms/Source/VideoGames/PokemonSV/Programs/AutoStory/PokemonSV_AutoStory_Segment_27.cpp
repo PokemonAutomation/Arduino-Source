@@ -4,11 +4,11 @@
  *
  */
 
-#include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_MenuNavigation.h"

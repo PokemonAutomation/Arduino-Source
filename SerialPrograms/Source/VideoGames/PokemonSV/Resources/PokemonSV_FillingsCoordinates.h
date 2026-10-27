@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_PokemonSV_FillingsCoordinates_H
 #define PokemonAutomation_PokemonSV_FillingsCoordinates_H
 
-#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include <vector>
 #include <map>
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

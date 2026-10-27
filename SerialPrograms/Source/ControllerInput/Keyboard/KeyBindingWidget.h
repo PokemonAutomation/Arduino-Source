@@ -8,8 +8,8 @@
 #define PokemonAutomation_Options_KeyBindingWidget_H
 
 #include <QLineEdit>
-#include "KeyBindingOption.h"
 #include "Common/Qt/Options/ConfigWidget.h"
+#include "KeyBindingOption.h"
 
 namespace PokemonAutomation{
 

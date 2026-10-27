@@ -7,12 +7,12 @@
 #include <algorithm>
 #include <cmath>
 #include <vector>
+#include <iostream>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "OCR_StringNormalization.h"
-#include "OCR_TextMatcher.h"
 
-#include <iostream>
+#include "OCR_TextMatcher.h"
 using std::cout;
 using std::endl;
 

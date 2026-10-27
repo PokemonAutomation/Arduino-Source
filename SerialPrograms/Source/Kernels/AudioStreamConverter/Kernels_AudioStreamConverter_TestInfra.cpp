@@ -6,13 +6,13 @@
 
 #include <type_traits>
 #include <random>
+#include <iostream>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Containers/GuardPageBuffer.h"
-#include "Kernels_AudioStreamConverter_TestInfra.h"
 
 //  REMOVE
-#include <iostream>
+#include "Kernels_AudioStreamConverter_TestInfra.h"
 using std::cout;
 using std::endl;
 

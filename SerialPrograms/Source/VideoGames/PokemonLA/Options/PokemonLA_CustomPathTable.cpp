@@ -4,23 +4,23 @@
  *
  */
 
+#include <iostream>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QPushButton>
 #include <QFileDialog>
-#include <QMessageBox>
 
 //#include "Common/Compiler.h"
-#include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Json/JsonValue.h"
-#include "Common/Cpp/Json/JsonObject.h"
-//#include "Common/Cpp/Json/JsonTools.h"
+#include <QMessageBox>
 #include "Common/Qt/Options/ConfigWidget.h"
+#include "Common/Cpp/Exceptions.h"
+//#include "Common/Cpp/Json/JsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
 //#include "CommonFramework/Globals.h"
-#include "PokemonLA_CustomPathTable.h"
+#include "Common/Cpp/Json/JsonObject.h"
 
-#include <iostream>
+#include "PokemonLA_CustomPathTable.h"
 using std::cout;
 using std::endl;
 
