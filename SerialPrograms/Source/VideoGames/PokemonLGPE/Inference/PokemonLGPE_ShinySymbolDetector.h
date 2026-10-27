@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PokemonRSE_ShinyNumberDetector_H
-#define PokemonAutomation_PokemonRSE_ShinyNumberDetector_H
+#ifndef PokemonAutomation_PokemonLGPE_ShinySymbolDetector_H
+#define PokemonAutomation_PokemonLGPE_ShinySymbolDetector_H
 
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"

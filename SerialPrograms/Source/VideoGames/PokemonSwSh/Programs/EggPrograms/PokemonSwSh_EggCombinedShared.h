@@ -20,6 +20,10 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+constexpr Milliseconds TRAVEL_TO_SPIN_SPOT_DURATION    = 300 * 8ms;
+//  constexpr Milliseconds TRAVEL_BACK_TO_LADY_DURATION = (30 + 260 + (580) + 120 + 120 * 0) * 8ms;
+constexpr Milliseconds TRAVEL_BACK_TO_LADY_DURATION    = (30 + 260 + (620) + 120 + 120 * 0) * 8ms;
+
 
 typedef struct{
     uint8_t fetches;
@@ -121,9 +125,6 @@ struct EggCombinedSession{
         return column;
     }
 
-#define TRAVEL_TO_SPIN_SPOT_DURATION    (300 * 8ms)
-//#define TRAVEL_BACK_TO_LADY_DURATION    (30 + 260 + (580) + 120 + 120 * 0)
-#define TRAVEL_BACK_TO_LADY_DURATION    ((30 + 260 + (620) + 120 + 120 * 0) * 8ms)
 
     void eggcombined2_run_batch(
         VideoStream& stream,

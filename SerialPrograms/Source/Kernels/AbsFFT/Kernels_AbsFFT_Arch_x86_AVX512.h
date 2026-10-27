@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_Kernels_AbsFFT_Arch_x86_AVX2_H
-#define PokemonAutomation_Kernels_AbsFFT_Arch_x86_AVX2_H
+#ifndef PokemonAutomation_Kernels_AbsFFT_Arch_x86_AVX512_H
+#define PokemonAutomation_Kernels_AbsFFT_Arch_x86_AVX512_H
 
 #include <immintrin.h>
 #include "Common/Compiler.h"
