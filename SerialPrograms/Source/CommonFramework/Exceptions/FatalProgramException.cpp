@@ -76,8 +76,8 @@ void FatalProgramException::send_fatal_error_notif_and_telemetry_report(
         error_report_mode(),
         message(),
         name(),
-        *m_screenshot,
-        &m_stream->history()
+        screenshot_view(),
+        m_stream ? &m_stream->history() : nullptr
     );
 }
 
