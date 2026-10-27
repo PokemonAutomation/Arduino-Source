@@ -6,9 +6,16 @@
 
 #include <QAudioFormat>
 #include <QFileDialog>
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/StringToolsQt.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "AudioSource_File.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -112,6 +119,10 @@ size_t AudioSource_File::raw_sample_rate() const{
 }
 size_t AudioSource_File::raw_channels() const{
     return m_input_file->channels();
+}
+
+float AudioSource_File::volume_multiplier() const{
+    return (float)GlobalSettings::instance().AUDIO_PIPELINE->FILE_VOLUME_SCALE;
 }
 
 

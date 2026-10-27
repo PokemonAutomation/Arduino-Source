@@ -11,10 +11,9 @@
 #include "Common/Cpp/Containers/GuardPageBuffer.h"
 #include "Kernels_AudioStreamConverter_TestInfra.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace Kernels{

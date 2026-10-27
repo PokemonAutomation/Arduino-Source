@@ -8,6 +8,7 @@
 #define PokemonAutomation_AudioPipeline_AudioPassthroughPair_H
 
 #include "AudioInfo.h"
+#include "AudioSourceDescriptor.h"
 
 namespace PokemonAutomation{
 
@@ -47,17 +48,17 @@ public:
     virtual ~AudioPassthroughPair() = default;
 
     virtual void reset(
-        const std::string& file,
-        const AudioDeviceInfo& output, double output_volume
-    ) = 0;
-    virtual void reset(
-        const AudioDeviceInfo& input, const AudioInputChoice& choice,
-        const AudioDeviceInfo& output, double output_volume
+        const std::shared_ptr<AudioSourceDescriptor>& descriptor,
+        const AudioInputChoice& format,
+        const AudioDeviceInfo& output,
+        double output_volume
     ) = 0;
 
     virtual void clear_audio_source() = 0;
-    virtual void set_audio_source(const std::string& file) = 0;
-    virtual void set_audio_source(const AudioDeviceInfo& device, const AudioInputChoice& choice) = 0;
+    virtual void set_audio_source(
+        const std::shared_ptr<AudioSourceDescriptor>& descriptor,
+        const AudioInputChoice& format
+    ) = 0;
 
     virtual void clear_audio_sink() = 0;
     virtual void set_audio_sink(const AudioDeviceInfo& device, double volume) = 0;

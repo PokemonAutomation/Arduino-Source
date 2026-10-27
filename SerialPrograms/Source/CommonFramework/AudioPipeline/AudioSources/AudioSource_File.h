@@ -34,7 +34,7 @@ public:
     virtual bool should_reload() const override{ return true; }
     virtual bool operator==(const AudioSourceDescriptor& x) const override;
     virtual std::string display_name() const override{
-        return "Display Image";
+        return "Play Audio File";
     }
 
     virtual void run_post_select() override;
@@ -73,6 +73,8 @@ public:
     }
     virtual size_t raw_sample_rate() const override;
     virtual size_t raw_channels() const override;
+
+    virtual float volume_multiplier() const override;
 
 
 private:

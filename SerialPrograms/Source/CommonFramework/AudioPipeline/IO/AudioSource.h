@@ -43,6 +43,8 @@ public:
 
     virtual size_t raw_sample_rate() const = 0;
     virtual size_t raw_channels() const = 0;
+
+    virtual float volume_multiplier() const = 0;
 };
 
 

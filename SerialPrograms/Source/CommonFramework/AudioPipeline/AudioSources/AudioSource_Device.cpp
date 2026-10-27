@@ -4,8 +4,9 @@
  *
  */
 
-//#include "CommonFramework/GlobalSettingsPanel.h"
-//#include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "AudioSource_Device.h"
 
@@ -37,6 +38,9 @@ std::unique_ptr<AudioSource> AudioSourceDescriptor_Device::make_AudioSource(
     Logger& logger,
     const AudioInputChoice& format
 ) const{
+    if (!format){
+        return nullptr;
+    }
 //    cout << "format = " << (int)format << endl;
     return std::make_unique<AudioSource_Device>(logger, m_info, format);
 }
@@ -47,18 +51,18 @@ std::unique_ptr<AudioSource> AudioSourceDescriptor_Device::make_AudioSource(
 AudioSource_Device::AudioSource_Device(
     Logger& logger,
     const AudioDeviceInfo& device,
-    const AudioInputChoice& choice
+    const AudioInputChoice& format
 ){
-    if (!choice){
+    if (!format){
         throw InternalProgramError(
             nullptr, PA_CURRENT_FUNCTION, "Invalid audio input choice."
         );
     }
 
     NativeAudioInfo native_info = device.native_info();
-    QAudioFormat native_format = choice.physical_format().native_format();
+    QAudioFormat native_format = format.physical_format().native_format();
 
-    m_stream_format = choice.format().sample_format();
+    m_stream_format = format.format().sample_format();
     if (m_stream_format == AudioSampleFormat::INVALID){
         //  Defensive: the choices built from input_choices() always carry
         //  a sample format the device supports.
@@ -70,7 +74,7 @@ AudioSource_Device::AudioSource_Device(
         logger,
         native_info,
         native_format,
-        choice.is_reinterpreted()
+        format.is_reinterpreted()
     );
 }
 
@@ -86,6 +90,10 @@ size_t AudioSource_Device::raw_sample_rate() const{
 }
 size_t AudioSource_Device::raw_channels() const{
     return m_input_device->channels();
+}
+
+float AudioSource_Device::volume_multiplier() const{
+    return (float)GlobalSettings::instance().AUDIO_PIPELINE->DEVICE_VOLUME_SCALE;
 }
 
 

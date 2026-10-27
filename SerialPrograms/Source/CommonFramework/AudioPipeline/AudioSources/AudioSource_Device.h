@@ -51,7 +51,7 @@ public:
     AudioSource_Device(
         Logger& logger,
         const AudioDeviceInfo& device,
-        const AudioInputChoice& choice
+        const AudioInputChoice& format
     );
 
     virtual void add_raw_listener(RawAudioStreamListener& listener) override;
@@ -64,6 +64,8 @@ public:
     }
     virtual size_t raw_sample_rate() const override;
     virtual size_t raw_channels() const override;
+
+    virtual float volume_multiplier() const override;
 
 
 private:

@@ -36,14 +36,15 @@
 #include "Common/Cpp/TestRunners/UnitTest.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
-#include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/AudioPipeline/AudioInfo.h"
-#include "CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQt.h"
-#include "CommonFramework/AudioPipeline/ChannelMixer.h"
 #include "Kernels/AudioPipeline/Kernels_RawAudio2WorkingAudio.h"
 #include "Kernels/AudioPipeline/Kernels_WorkingAudio2RawAudio.h"
 #include "Kernels/AudioPipeline/Kernels_ChannelMixer.h"
 #include "Kernels/AudioResampler/Kernels_AudioResampler.h"
+#include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/AudioPipeline/ChannelMixer.h"
+#include "CommonFramework/AudioPipeline/AudioInfo.h"
+#include "CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQt.h"
+#include "CommonFramework/AudioPipeline/AudioSources/AudioSource_File.h"
 #include "SinkPipeline_Tests.h"
 
 namespace PokemonAutomation{
@@ -638,7 +639,10 @@ public:
         );
         //  Must complete: the probe runs before the lock is taken, so the
         //  queued sink event above can run through while it decodes.
-        pair.set_audio_source(fixture);
+        pair.set_audio_source(
+            std::make_unique<AudioSourceDescriptor_File>(fixture),
+            AudioInputChoice()
+        );
         QCoreApplication::processEvents(QEventLoop::AllEvents, 500);
 
         finished.store(true, std::memory_order_relaxed);

@@ -8,6 +8,8 @@
 #include "CommonFramework/GlobalServices.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "Backends/AudioPassthroughPairQtThread.h"
+#include "AudioSources/AudioSource_File.h"
+#include "AudioSources/AudioSource_Device.h"
 #include "AudioPipelineOptions.h"
 #include "AudioSession.h"
 
@@ -87,9 +89,15 @@ void AudioSession::load(const AudioOption& option){
 
         if (!m_option.m_input_file.empty()){
             sanitize_choice();
-            m_devices->set_audio_source(m_option.m_input_file);
+            m_devices->set_audio_source(
+                std::make_unique<AudioSourceDescriptor_File>(m_option.m_input_file),
+                m_option.m_input_choice
+            );
         }else if (sanitize_choice()){
-            m_devices->set_audio_source(m_option.m_input_device, m_option.m_input_choice);
+            m_devices->set_audio_source(
+                std::make_unique<AudioSourceDescriptor_Device>(m_option.m_input_device),
+                m_option.m_input_choice
+            );
         }else{
             m_devices->clear_audio_source();
         }
@@ -146,7 +154,10 @@ void AudioSession::set_audio_input(std::string file){
     signal_pre_input_change();
     m_option.m_input_file = std::move(file);
     m_option.m_input_choice = AudioInputChoice();
-    m_devices->set_audio_source(m_option.m_input_file);
+    m_devices->set_audio_source(
+        std::make_unique<AudioSourceDescriptor_File>(m_option.m_input_file),
+        m_option.m_input_choice
+    );
     signal_post_input_change();
 }
 void AudioSession::set_audio_input(AudioDeviceInfo info){
@@ -157,7 +168,10 @@ void AudioSession::set_audio_input(AudioDeviceInfo info){
     m_option.m_input_device = std::move(info);
     m_option.m_input_choice = AudioInputChoice();
     if (sanitize_choice()){
-        m_devices->set_audio_source(info, m_option.m_input_choice);
+        m_devices->set_audio_source(
+            std::make_unique<AudioSourceDescriptor_Device>(m_option.m_input_device),
+            m_option.m_input_choice
+        );
     }else{
         m_devices->clear_audio_source();
     }
@@ -169,9 +183,15 @@ void AudioSession::set_input_choice(const AudioInputChoice& choice){
     m_option.m_input_choice = choice;
     if (sanitize_choice()){
         if (!m_option.m_input_file.empty()){
-            m_devices->set_audio_source(m_option.m_input_file);
+            m_devices->set_audio_source(
+                std::make_unique<AudioSourceDescriptor_File>(m_option.m_input_file),
+                m_option.m_input_choice
+            );
         }else{
-            m_devices->set_audio_source(m_option.m_input_device, m_option.m_input_choice);
+            m_devices->set_audio_source(
+                std::make_unique<AudioSourceDescriptor_Device>(m_option.m_input_device),
+                m_option.m_input_choice
+            );
         }
     }else{
         m_devices->clear_audio_source();
@@ -264,13 +284,15 @@ void AudioSession::reset(){
     if (!m_option.m_input_file.empty()){
 //        cout << "AudioSession::reset() - file: " << m_option.m_input_file << " - " << m_option.m_input_file.size() << endl;
         m_devices->reset(
-            m_option.m_input_file,
+            std::make_unique<AudioSourceDescriptor_File>(m_option.m_input_file),
+            m_option.m_input_choice,
             m_option.m_output_device, m_option.m_volume
         );
     }else{
 //        cout << "AudioSession::reset() - device: " << m_option.m_inputDevice.display_name() << endl;
         m_devices->reset(
-            m_option.m_input_device, m_option.m_input_choice,
+            std::make_unique<AudioSourceDescriptor_Device>(m_option.m_input_device),
+            m_option.m_input_choice,
             m_option.m_output_device, m_option.m_volume
         );
     }
