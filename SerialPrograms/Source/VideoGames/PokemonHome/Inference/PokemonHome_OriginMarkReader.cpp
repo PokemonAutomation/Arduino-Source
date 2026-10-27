@@ -7,11 +7,11 @@
 #include <map>
 #include <vector>
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/DetectedBoxes.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "Tests/ImageUnitTest.h"
 #include "PokemonHome_OriginMarkReader.h"
 
 namespace PokemonAutomation{
@@ -333,20 +333,22 @@ OriginMark OriginMarkReader::read_mark(const ImageViewRGB32& original_screen){
     return OriginMark::NONE;
 }
 
-class Test_OriginMarkReader : public UnitTest{
+class Test_OriginMarkReader : public ImageUnitTest{
 public:
 
     Test_OriginMarkReader(
         const std::string& image,
         OriginMark expected
     )
-        : UnitTest("PokemonHome::OriginMarkReader - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonHome::OriginMarkReader - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& image = images[0];
         OriginMark result = OriginMarkReader().read_mark(image);
 
         if (result == m_expected)
@@ -356,7 +358,6 @@ public:
     };
 
 private:
-    std::string m_image;
     OriginMark m_expected;
 };
 

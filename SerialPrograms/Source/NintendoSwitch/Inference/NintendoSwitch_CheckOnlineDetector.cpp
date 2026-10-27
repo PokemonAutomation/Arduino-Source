@@ -4,9 +4,9 @@
  *
  */
 
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "Tests/ImageUnitTest.h"
 #include "NintendoSwitch_CheckOnlineDetector.h"
 
 //#include <iostream>
@@ -101,22 +101,23 @@ bool CheckOnlineDetector::detect(const ImageViewRGB32& screen){
 }
 
 
-class Test_CheckOnlineDetector : public UnitTest{
+class Test_CheckOnlineDetector : public ImageUnitTest{
 public:
     Test_CheckOnlineDetector(const std::string& image, bool expected)
-        : UnitTest("NintendoSwitch::CheckOnlineDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("NintendoSwitch::CheckOnlineDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         CheckOnlineDetector detector{};
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     }
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

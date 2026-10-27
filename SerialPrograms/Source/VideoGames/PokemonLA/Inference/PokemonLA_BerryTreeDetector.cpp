@@ -14,11 +14,11 @@
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "Kernels/Algorithm/Kernels_Algorithm_DisjointSet.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
+#include "Tests/ImageUnitTest.h"
 #include "VideoGames/PokemonLA/PokemonLA_Locations.h"
 #include "PokemonLA_BerryTreeDetector.h"
 
@@ -394,25 +394,26 @@ bool BerryTreeDetector::process_frame(const ImageViewRGB32& frame, WallClock tim
 
 
 
-class Test_BerryTreeDetector : public UnitTest{
+class Test_BerryTreeDetector : public ImageUnitTest{
 public:
     Test_BerryTreeDetector(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonLA::BerryTreeDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonLA::BerryTreeDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         BerryTreeDetector detector;
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.process_frame(image, current_time()) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

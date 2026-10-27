@@ -9,10 +9,10 @@
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "Tests/ImageUnitTest.h"
 #include "PokemonSwSh_DialogTriangleDetector.h"
 
 //#include <iostream>
@@ -90,25 +90,26 @@ bool DialogTriangleDetector::detect(const ImageViewRGB32& screen){
 
 
 
-class Test_DialogTriangleDetector : public UnitTest{
+class Test_DialogTriangleDetector : public ImageUnitTest{
 public:
     Test_DialogTriangleDetector(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonSwSh::DialogTriangleDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSwSh::DialogTriangleDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         DialogTriangleDetector detector(COLOR_RED);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

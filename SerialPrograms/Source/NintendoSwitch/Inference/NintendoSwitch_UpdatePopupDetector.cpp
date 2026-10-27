@@ -6,11 +6,11 @@
 
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "Tests/ImageUnitTest.h"
 #include "GameConsole/Framework/ConsoleSystemSession.h"
 #include "NintendoSwitch_UpdatePopupDetector.h"
 //#include <iostream>
@@ -262,26 +262,27 @@ bool UpdatePopupDetector_Switch2::detect(const ImageViewRGB32& screen){
 }
 
 
-class Test_UpdatePopupDetector : public UnitTest{
+class Test_UpdatePopupDetector : public ImageUnitTest{
 public:
     Test_UpdatePopupDetector(const std::string& image, bool expected)
-        : UnitTest("NintendoSwitch::UpdatePopupDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("NintendoSwitch::UpdatePopupDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         GameConsole::ConsoleSystemOption option(1);
         GameConsole::ConsoleSystemSession session(option, false, 0, {});
         ConsoleHandle console(session);
 
         UpdatePopupDetector detector(console);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     }
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

@@ -10,10 +10,10 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
@@ -83,16 +83,18 @@ PokemonFRLG_WildEncounter WildEncounterReader::read_encounter(
 }
 
 
-class Test_WildEncounterReader : public UnitTest{
+class Test_WildEncounterReader : public ImageUnitTest{
 public:
     Test_WildEncounterReader(const std::string& image)
-        : UnitTest("PokemonFRLG::WildEncounterReader - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonFRLG::WildEncounterReader - " + image, {image})
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         const std::vector<std::string> words =
-                parse_words(Filesystem::Path(m_image).stem().string());
+                parse_words(Filesystem::Path(image_paths()[0]).stem().string());
         if (words.size() < 2){
             return "Error: filename must be <anything>_<language>_<species>.";
         }
@@ -105,7 +107,7 @@ public:
             return "Error: invalid language word in filename: " + language_word;
         }
 
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         WildEncounterReader reader;
         PokemonFRLG_WildEncounter encounter =
                 reader.read_encounter(logger, language, image, {});
@@ -113,9 +115,6 @@ public:
         TEST_RESULT_COMPONENT_EQUAL_STR(encounter.name, target_species, "species");
         return true;
     };
-
-private:
-    std::string m_image;
 };
 
 

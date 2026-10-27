@@ -6,11 +6,11 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
+#include "Tests/ImageUnitTest.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG_PartyHeldItemDetector.h"
 
@@ -130,21 +130,23 @@ bool PartyHeldItemDetector::detect(const ImageViewRGB32& screen){
 }
 
 
-class Test_PartyHeldItemDetector : public UnitTest{
+class Test_PartyHeldItemDetector : public ImageUnitTest{
 public:
     Test_PartyHeldItemDetector(
         const std::string& image, PartySlot slot, bool expected, Language language = Language::English
     )
-        : UnitTest("PokemonFRLG::PartyHeldItemDetector - " + image + " - slot " + std::to_string(static_cast<unsigned>(slot) + 1))
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonFRLG::PartyHeldItemDetector - " + image + " - slot " + std::to_string(static_cast<unsigned>(slot) + 1), {image})
         , m_slot(slot)
         , m_expected(expected)
         , m_language(language)
     {}
 
-    virtual UnitTestResult run(Logger&, CancellableScope&) const override{
+    virtual UnitTestResult run_on_images(
+        Logger&, CancellableScope&,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         PartyHeldItemDetector detector(COLOR_RED, nullptr, m_slot, m_language);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         bool result = detector.detect(image);
         if (result != m_expected){
             return std::string("Expected held item = ") + (m_expected ? "true" : "false") +
@@ -154,7 +156,6 @@ public:
     }
 
 private:
-    std::string m_image;
     PartySlot m_slot;
     bool m_expected;
     Language m_language;

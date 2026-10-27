@@ -10,9 +10,9 @@
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Tests/GuardPageImage.h"
+#include "Tests/ImageUnitTest.h"
 #include "RGB32_Range/Kernels_ImageFilter_RGB32_Range.h"
 #include "Kernels_ImageFilter_Tests.h"
 
@@ -243,19 +243,21 @@ std::string check_blackwhite_result(
 //  Both must return the number of pixels in range. The input and output are guard-page
 //  images, so the test also crashes if the implementation reads or writes past the last
 //  pixel.
-class Test_ImageFilterRGB32Range : public UnitTest{
+class Test_ImageFilterRGB32Range : public ImageUnitTest{
 public:
     Test_ImageFilterRGB32Range(
         const RangeFilterImplementation& implementation,
         const std::string& image
     )
-        : UnitTest("Kernels::ImageFilterRGB32Range - " + implementation.name + " - " + image)
+        : ImageUnitTest("Kernels::ImageFilterRGB32Range - " + implementation.name + " - " + image, {image})
         , m_implementation(implementation)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        const ImageRGB32 file_image(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& file_image = images[0];
         const GuardPageImageRGB32 image(file_image);
         GuardPageImageRGB32 output(image.width(), image.height());
 
@@ -299,7 +301,6 @@ public:
 
 private:
     RangeFilterImplementation m_implementation;
-    std::string m_image;
 };
 
 
@@ -309,15 +310,17 @@ private:
 //  single-filter versions through the CPU dispatch, so this test runs once, not once per
 //  implementation. There is one filter for each of `RANGES` and each flag value, so the
 //  test also checks that each filter uses its own range and flag.
-class Test_ImageFilterRGB32RangeMultiple : public UnitTest{
+class Test_ImageFilterRGB32RangeMultiple : public ImageUnitTest{
 public:
     Test_ImageFilterRGB32RangeMultiple(const std::string& image)
-        : UnitTest("Kernels::ImageFilterRGB32Range - multiple filters - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("Kernels::ImageFilterRGB32Range - multiple filters - " + image, {image})
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        const ImageRGB32 file_image(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& file_image = images[0];
         const GuardPageImageRGB32 image(file_image);
 
         struct FilterSetting{
@@ -381,9 +384,6 @@ public:
         }
         return true;
     }
-
-private:
-    std::string m_image;
 };
 
 
@@ -395,19 +395,21 @@ private:
 //  `filter_by_mask()` must replace the pixels with 0 bits (or the pixels with 1 bits) with
 //  `REPLACEMENT_COLOR`, and keep the other pixels. The image is a guard-page image, so the
 //  test also crashes if the implementation reads or writes past the last pixel.
-class Test_ImageFilterByMask : public UnitTest{
+class Test_ImageFilterByMask : public ImageUnitTest{
 public:
     Test_ImageFilterByMask(
         const FilterByMaskImplementation& implementation,
         const std::string& image
     )
-        : UnitTest("Kernels::ImageFilterByMask - " + implementation.name + " - " + image)
+        : ImageUnitTest("Kernels::ImageFilterByMask - " + implementation.name + " - " + image, {image})
         , m_implementation(implementation)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        const ImageRGB32 file_image(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& file_image = images[0];
         const GuardPageImageRGB32 image(file_image);
 
         for (const ColorRange& range : RANGES){
@@ -446,7 +448,6 @@ public:
 
 private:
     FilterByMaskImplementation m_implementation;
-    std::string m_image;
 };
 
 }

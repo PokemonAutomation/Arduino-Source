@@ -8,12 +8,12 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Images/ColorClustering.h"
+#include "Tests/ImageUnitTest.h"
 #include "Pokemon/Inference/Pokemon_ReadHpBar.h"
 #include "Pokemon/Inference/Pokemon_TypeReader.h"
 #include "VideoGames/PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"
@@ -548,25 +548,26 @@ bool BattleMenuReader::can_dmax(const ImageViewRGB32& screen) const{
 
 
 
-class Test_MaxLairBattleMenuDetector : public UnitTest{
+class Test_MaxLairBattleMenuDetector : public ImageUnitTest{
 public:
     Test_MaxLairBattleMenuDetector(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonSwSh::MaxLairBattleMenuDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSwSh::MaxLairBattleMenuDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         BattleMenuDetector detector;
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

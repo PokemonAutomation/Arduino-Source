@@ -32,6 +32,7 @@
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonTools/Resources/SpriteDatabase.h"
 #include "CommonTools/Images/ImageFilter.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "VideoGames/PokemonLA/Resources/PokemonLA_AvailablePokemon.h"
 #include "VideoGames/PokemonLA/Inference/Objects/PokemonLA_MMOQuestionMarkDetector.h"
@@ -1006,18 +1007,27 @@ MapSpriteMatchResult match_sprite_on_map(Logger& logger, const ImageViewRGB32& s
 
 
 
-class Test_MMOSpriteMatcher : public UnitTest{
+class Test_MMOSpriteMatcher : public ImageUnitTest{
 public:
     Test_MMOSpriteMatcher(
         const std::string& image
     )
-        : UnitTest("PokemonLA::MMOSpriteMatcher - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonLA::MMOSpriteMatcher - " + image, {image, revealed_image_path(image)})
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        const Filesystem::Path image_path(m_image);
-        const std::string filename = image_path.filename().string();
+    //  The test image with the MMO sprites revealed: the same file name with a leading "_", e.g.
+    //  ".../Mirelands/_MMO_Region_Mirelands_07.png" for ".../Mirelands/MMO_Region_Mirelands_07.png".
+    //  It is the second test image, so the distortion runs re-color it along with the first one.
+    static std::string revealed_image_path(const std::string& image){
+        const Filesystem::Path image_path(image);
+        return (image_path.parent_path() / Filesystem::Path("_" + image_path.filename().string())).string();
+    }
+
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const Filesystem::Path image_path(UNIT_TEST_RESOURCE_PATH() + image_paths()[0]);
         const Filesystem::Path parent_dir = image_path.parent_path();
 
         const std::string base_name = image_path.stem().string();
@@ -1047,19 +1057,18 @@ public:
             return 1;
         }
 
-        const std::string mmo_revealed_image_path = (parent_dir / Filesystem::Path("_" + filename)).string();
         const std::string mmo_revealed_txt_path = (parent_dir / Filesystem::Path("_" + base_name + ".txt")).string();
 
-        ImageRGB32 question_mark_image(m_image);
-        ImageRGB32 sprite_image(mmo_revealed_image_path);
+        const ImageRGB32& question_mark_image = images[0];
+        const ImageRGB32& sprite_image = images[1];
 
         if (!question_mark_image){
-            cerr << "Error: cannot load MMO question mark image file " << m_image << endl;
-            return "Error: cannot load MMO question mark image file " + m_image;
+            cerr << "Error: cannot load MMO question mark image file " << image_paths()[0] << endl;
+            return "Error: cannot load MMO question mark image file " + image_paths()[0];
         }
         if (!sprite_image){
-            cerr << "Error: cannot load MMO revealed sprites image file " << mmo_revealed_image_path << endl;
-            return "Error: cannot load MMO revealed sprites image file " + mmo_revealed_image_path;
+            cerr << "Error: cannot load MMO revealed sprites image file " << image_paths()[1] << endl;
+            return "Error: cannot load MMO revealed sprites image file " + image_paths()[1];
         }
 
         std::vector<std::string> target_sprites;
@@ -1149,9 +1158,6 @@ public:
 
         return true;
     };
-
-private:
-    std::string m_image;
 };
 
 

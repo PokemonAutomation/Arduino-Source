@@ -5,10 +5,10 @@
  */
 
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "PokemonHome_ButtonDetector.h"
 
@@ -157,21 +157,23 @@ bool ButtonDetector::detect(const ImageViewRGB32& screen){
     return found;
 }
 
-class Test_ButtonDetector : public UnitTest{
+class Test_ButtonDetector : public ImageUnitTest{
 public:
 
     Test_ButtonDetector(
         const std::string& image,
         std::optional<ButtonType> expected
     )
-        : UnitTest("PokemonHome::ButtonDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonHome::ButtonDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         DummyVideoOverlay video_overlay;
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         ImageFloatBox box(0.100, 0.956, 0.107, 0.041);
         ButtonDetector b_detector(COLOR_RED, ButtonType::ButtonB, box, &video_overlay);
         ButtonDetector plus_detector(COLOR_RED, ButtonType::ButtonPlus, box, &video_overlay);
@@ -200,7 +202,6 @@ public:
     };
 
 private:
-    std::string m_image;
     std::optional<ButtonType> m_expected;
 };
 

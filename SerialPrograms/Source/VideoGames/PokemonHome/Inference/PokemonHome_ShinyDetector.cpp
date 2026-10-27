@@ -5,8 +5,8 @@
  */
 
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "Tests/ImageUnitTest.h"
 #include "PokemonHome_ShinyDetector.h"
 
 namespace PokemonAutomation{
@@ -36,22 +36,23 @@ bool ShinyDetector::detect(const ImageViewRGB32& screen){
     return found;
 }
 
-class Test_ShinyDetector : public UnitTest{
+class Test_ShinyDetector : public ImageUnitTest{
 public:
     Test_ShinyDetector(const std::string& image, bool expected)
-        : UnitTest("PokemonHome::ShinyDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonHome::ShinyDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& image = images[0];
         ShinyDetector detector;
         return detector.detect(image) == m_expected;
     }
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

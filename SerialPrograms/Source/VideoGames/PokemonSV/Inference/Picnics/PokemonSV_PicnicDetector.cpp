@@ -5,8 +5,8 @@
  */
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "Tests/ImageUnitTest.h"
 #include "PokemonSV_PicnicDetector.h"
 
 //#include <iostream>
@@ -42,25 +42,26 @@ bool PicnicDetector::detect(const ImageViewRGB32& frame){
 
 
 
-class Test_PicnicDetector : public UnitTest{
+class Test_PicnicDetector : public ImageUnitTest{
 public:
     Test_PicnicDetector(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonSV::PicnicDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSV::PicnicDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         PicnicDetector detector;
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

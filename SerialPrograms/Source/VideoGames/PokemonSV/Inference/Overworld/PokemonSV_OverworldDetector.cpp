@@ -11,6 +11,7 @@
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/ExactImageMatcher.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "Tests/ImageUnitTest.h"
 #include "PokemonSV_OverworldDetector.h"
 
 //#include <iostream>
@@ -216,22 +217,23 @@ bool OverworldWatcher::process_frame(const VideoSnapshot& frame){
 }
 
 
-class Test_OverworldDetector : public UnitTest{
+class Test_OverworldDetector : public ImageUnitTest{
 public:
     Test_OverworldDetector(const std::string& image, bool expected)
-        : UnitTest("PokemonSV::OverworldDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSV::OverworldDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         OverworldDetector detector;
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     }
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

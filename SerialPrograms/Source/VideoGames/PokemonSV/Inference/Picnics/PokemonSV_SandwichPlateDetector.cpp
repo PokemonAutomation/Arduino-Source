@@ -8,10 +8,10 @@
 #include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/ImageFilter.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "VideoGames/PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h"
 #include "PokemonSV_SandwichPlateDetector.h"
@@ -132,15 +132,17 @@ bool SandwichPlateWatcher::process_frame(const ImageViewRGB32& screen, WallClock
 }
 
 
-class Test_SandwichPlateDetector : public UnitTest{
+class Test_SandwichPlateDetector : public ImageUnitTest{
 public:
     Test_SandwichPlateDetector(const std::string& image, std::vector<std::string> words)
-        : UnitTest("PokemonSV::SandwichPlateDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSV::SandwichPlateDetector - " + image, {image})
         , m_words(std::move(words))
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         if (m_words.size() < 4){
             return "Error: not enough number of words in the filename.";
         }
@@ -156,7 +158,7 @@ public:
         detectors.emplace_back(logger, COLOR_RED, language, SandwichPlateDetector::Side::RIGHT);
 
         std::string sides[3] = {"left", "middle", "right"};
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         for (int i = 0; i < 3; i++){
             bool is_yellow = detectors[i].is_label_yellow(image);
             std::string target = m_words[m_words.size() - 3 + i];
@@ -175,7 +177,6 @@ public:
     }
 
 private:
-    std::string m_image;
     std::vector<std::string> m_words;
 };
 

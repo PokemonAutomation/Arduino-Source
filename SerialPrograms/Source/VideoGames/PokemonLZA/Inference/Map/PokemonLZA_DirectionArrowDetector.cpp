@@ -7,11 +7,11 @@
 #include <cmath>
 #include <sstream>
 #include <opencv2/opencv.hpp>
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 //#include "Tests/TestUtils.h"
 #include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "Tests/ImageUnitTest.h"
 #include "PokemonLZA_DirectionArrowDetector.h"
 
 // #define DEBUG_DIRECTION_ARROW
@@ -339,21 +339,23 @@ bool DirectionArrowDetector::detect(const ImageViewRGB32& screen){
 }
 
 
-class Test_DirectionArrowDetector : public UnitTest{
+class Test_DirectionArrowDetector : public ImageUnitTest{
 public:
     Test_DirectionArrowDetector(const std::string& image, int target_angle)
-        : UnitTest("PokemonPLZA::DirectionArrowDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonPLZA::DirectionArrowDetector - " + image, {image})
         , m_target_angle(target_angle)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         if (m_target_angle < 0 || m_target_angle >= 360){
             return "Error: target angle must be in range [0, 360).";
         }
 
         DirectionArrowDetector detector(COLOR_RED);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         if (!detector.detect(image)){
             return "Error: detector failed to detect arrow in image.";
         }
@@ -374,7 +376,6 @@ public:
     }
 
 private:
-    std::string m_image;
     int m_target_angle;
 };
 

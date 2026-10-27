@@ -4,9 +4,9 @@
  *
  */
 
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "Tests/ImageUnitTest.h"
 #include "NintendoSwitch_FailedToConnectDetector.h"
 
 //#include <iostream>
@@ -58,22 +58,23 @@ bool FailedToConnectDetector::detect(const ImageViewRGB32& screen){
 }
 
 
-class Test_FailedToConnectDetector : public UnitTest{
+class Test_FailedToConnectDetector : public ImageUnitTest{
 public:
     Test_FailedToConnectDetector(const std::string& image, bool expected)
-        : UnitTest("NintendoSwitch::FailedToConnectDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("NintendoSwitch::FailedToConnectDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         FailedToConnectDetector detector{};
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     }
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 
