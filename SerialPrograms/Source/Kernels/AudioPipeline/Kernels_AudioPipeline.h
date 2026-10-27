@@ -105,6 +105,14 @@ public:
     virtual void add_listener(WorkingAudioStreamListener& listener) = 0;
     virtual void remove_listener(WorkingAudioStreamListener& listener) = 0;
 
+    //  time(output[0]) - time(input[0]), in seconds: how far into the
+    //  input stream the output stream's time 0 sits. Zero for nodes that
+    //  don't shift the time base; an AudioResampler returns its weight
+    //  table's median-tap shift.
+    virtual double time_shift() const{
+        return 0.0;
+    }
+
     size_t in_sample_rate() const{
         return WorkingAudioStreamListener::sample_rate();
     }

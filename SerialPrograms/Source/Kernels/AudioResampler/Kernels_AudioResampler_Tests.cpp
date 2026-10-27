@@ -9,11 +9,15 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
+#include <numbers>
+#include <numeric>
 #include <random>
+#include <utility>
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Common/Cpp/Containers/GuardPageBuffer.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "Kernels/KaiserWindow/Kernels_KaiserWindow.h"
 #include "Kernels_AudioResampler_BlockKernels.h"
 #include "Kernels_AudioResampler_Tests.h"
 #include "Kernels_AudioResampler.h"
@@ -410,6 +414,123 @@ UnitTestResult ResamplerStreamTest::run(Logger& logger, CancellableScope& scope)
 
 
 
+WeightTableTimeShiftTest::WeightTableTimeShiftTest(
+    size_t in_sample_rate,
+    size_t out_sample_rate,
+    uint32_t taps
+)
+    : UnitTest(
+        "Kernels::AudioResampler - TimeShift(" + std::to_string(in_sample_rate) +
+        "->" + std::to_string(out_sample_rate) + ", " +
+        std::to_string(taps) + " taps)"
+    )
+    , m_in_rate(in_sample_rate)
+    , m_out_rate(out_sample_rate)
+    , m_taps(taps)
+{}
+UnitTestResult WeightTableTimeShiftTest::run(Logger& logger, CancellableScope& scope) const{
+    (void)logger;
+    (void)scope;
+
+    WeightTable table(m_in_rate, m_out_rate, m_taps, 9.0, 8, 1);
+
+    //  The shift must be the 1st-tap to median-tap distance, in seconds
+    //  of the input stream.
+    const double want_shift = ((double)m_taps - 1.0) * 0.5 / (double)m_in_rate;
+    if (table.time_shift() != want_shift){
+        return "time_shift() = " + std::to_string(table.time_shift()) +
+            ", expected " + std::to_string(want_shift) + " seconds."
+        ;
+    }
+
+    //  The table must actually reconstruct at the shifted time: a delta
+    //  at input sample p0 produces, at output sample c, the windowed sinc
+    //  centered on input time p0 evaluated at the output's time,
+    //  c * ratio + (taps - 1) / 2 input samples (zero when p0 is outside
+    //  c's input window). The delta makes exactly one tap nonzero, so the
+    //  output is that tap's stored float weight, no accumulation error.
+    using namespace Kernels::KaiserWindow;
+    const double ratio = (double)m_in_rate / m_out_rate;
+    const double shift = ((double)m_taps - 1.0) * 0.5;
+    const double tap_radius = m_taps * 0.5;
+    const double scale = (m_in_rate > m_out_rate)
+        ? ((double)m_out_rate / m_in_rate)
+        : 1.0;
+    const double ibeta = bessel_i0(9.0);
+    auto weight_at = [&](double x)->double{
+        //  The table constructor's windowed sinc, in doubles.
+        if (x == 0.0){
+            return scale;
+        }
+        if (std::fabs(x) >= tap_radius){
+            return 0.0;
+        }
+        double arg = std::numbers::pi * x * scale;
+        double sinc = std::sin(arg) / arg;
+        double kaiser = x / tap_radius;
+        kaiser *= kaiser;
+        kaiser = 1 - kaiser;
+        kaiser = kaiser <= 0 ? 0 : std::sqrt(kaiser);
+        kaiser *= 9.0;
+        kaiser = bessel_i0(kaiser) / ibeta;
+        double w = kaiser * sinc * scale;
+        if (std::abs(w) < 1e-12){
+            w = 0;
+        }
+        return w;
+    };
+
+    //  Well inside the stream, away from the period's start edge.
+    const size_t p0 = table.period_in() * 4 + m_taps + 128;
+    AlignedVector<float> input(p0 + 1024);
+    memset(input.data(), 0, input.size() * sizeof(float));
+    input[p0] = 1.0f;
+
+    //  Output sample c from the table alone, with the resampler's
+    //  wrapped-period cursor arithmetic.
+    auto out_sample = [&](size_t c)->std::pair<float, size_t>{
+        const size_t poe = table.period_out_extended();
+        const size_t wr = c % poe;
+        const size_t periods = c / poe;
+        const size_t base = table.in_sample_index()[wr]
+            + periods * poe * table.period_in() / table.period_out();
+        float acc = 0.0f;
+        for (uint32_t t = 0; t < m_taps; t++){
+            acc += table.tap_start(t)[wr] * input[base + t];
+        }
+        return {acc, base};
+    };
+
+    const double center = ((double)p0 - shift) / ratio;
+    double max_diff = 0;
+    size_t first_bad = 0;
+    const double from = std::max(0.0, center - 32.0);
+    const double to = center + 32.0;
+    for (size_t c = (size_t)std::floor(from); c <= (size_t)std::ceil(to); c++){
+        const auto got_base = out_sample(c);
+        const double want = (got_base.second <= p0 && p0 < got_base.second + m_taps)
+            ? weight_at((double)p0 - (double)c * ratio - shift)
+            : 0.0;
+        const double diff = std::fabs((double)got_base.first - want);
+        if (diff > max_diff){
+            max_diff = diff;
+            first_bad = c;
+        }
+    }
+    if (max_diff > 1e-6){
+        return "Impulse response at output " + std::to_string(first_bad) +
+            " differs by " + std::to_string(max_diff) +
+            " from the windowed sinc centered on input time p0 evaluated at "
+            "c * ratio + (taps - 1) / 2; the table does not reconstruct at "
+            "time_shift()."
+        ;
+    }
+
+    return true;
+}
+
+
+
 void add_tests(UnitTestDatabase& database){
     struct Combo{
         size_t in_rate;
@@ -487,6 +608,30 @@ void add_tests(UnitTestDatabase& database){
     };
     for (auto& combo : dispatch_combos){
         database.add<BlockDispatchTest>(
+            combo.in_rate, combo.out_rate, combo.taps
+        );
+    }
+
+    //  The output time base is shifted (taps - 1) / 2 input samples past
+    //  the input time base (the median-tap alignment). Verify the
+    //  accessor's value and the actual alignment across ratios and tap
+    //  parities.
+    const struct{
+        size_t in_rate;
+        size_t out_rate;
+        uint32_t taps;
+    } timeshift_combos[] = {
+        { 44100, 44100, 16 },
+        { 44100, 44100, 31 },
+        { 44100, 48000, 16 },
+        { 48000, 44100, 31 },
+        { 88200, 44100, 32 },
+        { 44100, 88200, 3 },
+        { 8000, 44100, 8 },
+        { 128000, 8000, 64 },
+    };
+    for (auto& combo : timeshift_combos){
+        database.add<WeightTableTimeShiftTest>(
             combo.in_rate, combo.out_rate, combo.taps
         );
     }

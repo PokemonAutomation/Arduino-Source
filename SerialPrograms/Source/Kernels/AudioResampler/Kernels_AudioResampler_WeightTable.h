@@ -34,6 +34,15 @@ public:
         size_t tap_block
     );
 
+    //  The sample rates the table was built for.
+    size_t in_sample_rate() const{
+        return m_in_sample_rate;
+    }
+
+    size_t out_sample_rate() const{
+        return m_out_sample_rate;
+    }
+
     size_t taps() const{
         return m_taps;
     }
@@ -62,6 +71,17 @@ public:
     //  that is >= the sample block, so a block wraps it at most once.
     size_t period_out_extended() const{
         return m_period_out_extended;
+    }
+
+    //  time(output[0]) - time(input[0]), in seconds. Output sample c
+    //  reconstructs the input at c * in_rate / out_rate + (taps - 1) / 2
+    //  input samples: the window's time alignment sits at the median tap
+    //  (the midpoint between the two middle taps for even tap counts),
+    //  which is (taps - 1) / 2 input samples past the 1st tap, anchored
+    //  at the ideal output time. Positive: the output's time 0 is this
+    //  far into the input stream.
+    double time_shift() const{
+        return ((double)m_taps - 1.0) * 0.5 / (double)m_in_sample_rate;
     }
 
     //  Tap rows in the table (the requested taps, zero-padded for the
@@ -96,6 +116,8 @@ private:
 
 private:
     size_t m_taps;
+    size_t m_in_sample_rate;
+    size_t m_out_sample_rate;
     size_t m_sample_block;
     size_t m_tap_block;
     size_t m_period_in;

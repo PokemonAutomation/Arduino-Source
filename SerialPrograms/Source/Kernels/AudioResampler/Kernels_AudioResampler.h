@@ -56,6 +56,13 @@ public:
     virtual void add_listener(AudioPipeline::WorkingAudioStreamListener& listener) override;
     virtual void remove_listener(AudioPipeline::WorkingAudioStreamListener& listener) override;
 
+    //  The resampler's weight table shifts the output time base past the
+    //  input time base by (taps - 1) / 2 input samples (its median-tap
+    //  alignment); in seconds, via the table.
+    virtual double time_shift() const override{
+        return m_table->time_shift();
+    }
+
     virtual void push_samples(size_t samples, size_t stride, const float* data) override;
 
 
