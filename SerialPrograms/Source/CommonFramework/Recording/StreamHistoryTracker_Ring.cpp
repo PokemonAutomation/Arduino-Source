@@ -166,8 +166,11 @@ size_t get_target_fps(){
 //  100-8000) or the quality preset's value.
 size_t get_target_bitrate_kbps(){
     const StreamHistoryOption& settings = GlobalSettings::instance().STREAM_HISTORY;
+    //  Not reachable at the moment: ENCODING_MODE is not shown in the ffmpeg
+    //  builds (StreamHistoryOption), so it stays at FIXED_QUALITY.
     if (settings.ENCODING_MODE == StreamHistoryOption::EncodingMode::FIXED_BITRATE){
-        //  Clamp so that a pathological setting cannot blow past the ring cap.
+        //  Clamp to a sane range. (The ring's memory cap still applies: at
+        //  8000 kbps, MAX_RING_BYTES holds about 90 seconds.)
         uint32_t kbps = settings.VIDEO_BITRATE;
         if (kbps < 100) kbps = 100;
         if (kbps > 8000) kbps = 8000;
@@ -185,8 +188,8 @@ size_t get_target_bitrate_kbps(){
 
 
 //  Resolves the configured output resolution (match input / 720p / 1080p)
-//  to even H.264-compatible dimensions, preserving the input aspect ratio.
-//  The inputs out_width, out_height are modified as a result.
+//  to even H.264-compatible dimensions, preserving the input aspect ratio,
+//  into out_width / out_height. Returns false if the size is unusable.
 bool get_target_video_size(int input_width, int input_height, int& out_width, int& out_height){
     const StreamHistoryOption& settings = GlobalSettings::instance().STREAM_HISTORY;
     int target_width;
@@ -214,31 +217,17 @@ bool get_target_video_size(int input_width, int input_height, int& out_width, in
 }
 
 
-//  Maps the capture pipeline's Qt pixel formats to ffmpeg's (AV_PIX_FMT_NONE
-//  when unsupported).
-int qt_pixel_format_to_av_pix_fmt(QVideoFrameFormat::PixelFormat format){
-    switch (format){
-    case QVideoFrameFormat::Format_NV12:     return AV_PIX_FMT_NV12;
-    case QVideoFrameFormat::Format_YUV420P:  return AV_PIX_FMT_YUV420P;
-    case QVideoFrameFormat::Format_YUYV:     return AV_PIX_FMT_YUYV422;
-    case QVideoFrameFormat::Format_P010:     return AV_PIX_FMT_P010;
-    case QVideoFrameFormat::Format_XRGB8888:    return AV_PIX_FMT_BGRA;
-    case QVideoFrameFormat::Format_ARGB8888:   return AV_PIX_FMT_BGRA;
-    default:                                 return AV_PIX_FMT_NONE;
-    }
-}
-
-
-//  Ordered by preference: the GPU vendors' hardware encoders first, then
-//  (Windows) the OS-native Media Foundation H.264 encoder, then ffmpeg's
+//  Ordered by preference: the hardware encoders first, then (Windows) the
+//  OS-native Media Foundation H.264 encoder, then ffmpeg's
 //  built-in (LGPL) MPEG-4 Part 2 encoder as a last resort. Every candidate
 //  in this list ships in an LGPL ffmpeg build; GPL components (libx264)
 //  are deliberately not candidates.
 const char* const VIDEO_ENCODER_CANDIDATES[] = {
 #ifdef _WIN32
     //  h264_mf: the OS-native Media Foundation H.264 encoder (typically the
-    //  built-in Microsoft encoder). Present on essentially all Windows 8+
-    //  and compiled into the vendored build; when none of the GPU vendors'
+    //  built-in Microsoft encoder). Present on most Windows 8+ installs (not
+    //  on N editions without the Media Feature Pack) and compiled into the
+    //  vendored build; when none of the GPU vendors'
     //  encoders is available this yields real, universally playable H.264
     //  instead of MPEG-4 Part 2.
     "h264_qsv",           "h264_nvenc",           "h264_amf",           "h264_mf",
@@ -250,36 +239,32 @@ const char* const VIDEO_ENCODER_CANDIDATES[] = {
     "mpeg4",
 };
 
-//  A hardware encoder whose avcodec_send_frame() hard-failed at runtime has
-//  broken its GPU driver: calling into the context again - even to release
-//  it - can crash the driver (observed: 0xC0000005 access violation in
-//  atidxx64.dll during avcodec_free_context() on a Ryzen 5 5625U iGPU).
-//  Such encoders are "poisoned" for the rest of the process: the failed
-//  context is deliberately leaked (a bounded, one-time leak) and the encoder
-//  is never initialized again.
-std::mutex poisoned_encoder_mutex;
+//  A hardware encoder that hard-fails at runtime (avcodec_send_frame() or
+//  avcodec_receive_packet() returns an error other than EAGAIN/EOF) has
+//  likely broken its GPU driver: calling into the context again - even to
+//  release it - can crash the process inside the driver (observed:
+//  0xC0000005 access violation in atidxx64.dll during
+//  avcodec_free_context() on a Ryzen 5 5625U iGPU). Such encoders are
+//  "poisoned" for the rest of the process: the failed context is
+//  deliberately leaked (at most one per encoder) and the encoder is never
+//  initialized again, not even by later trackers.
+Mutex poisoned_encoder_mutex;
 std::set<std::string> poisoned_encoders;
 
-//  Abandons 'ctx' after a runtime encoder failure (the context has already
-//  pushed frames into a possibly-broken device driver). Device-backed
-//  encoder contexts (the hardware wrappers and Media Foundation) are
-//  leaked, not freed, because releasing a context whose driver
-//  is already broken can crash the process inside the driver (observed:
-//  0xC0000005 access violation in atidxx64.dll on a Ryzen 5 5625U iGPU); the
-//  CPU fallback (mpeg4) is released normally. The encoder is remembered as
-//  poisoned so that later sessions do not re-initialize it (which would
-//  re-break the driver and leak another device). Encoder contexts that
-//  merely fail to open are released normally - the driver was never
-//  exercised through them.
+//  Abandons 'ctx' after a runtime encoder failure (see above). The CPU
+//  fallback (mpeg4) has no device behind it and is released normally; every
+//  other candidate (the hardware wrappers and Media Foundation) is leaked and
+//  poisoned. Contexts that merely fail to open are released by
+//  init_video_encoder() instead: no device was exercised through them.
 void abandon_video_encoder(Logger& logger, const char* name, AVCodecContext*& ctx){
     if (ctx == nullptr){
         return;
     }
-    if (std::strcmp(name, "mpeg4") == 0){ // if mpeg4, release the encoder context
+    if (std::strcmp(name, "mpeg4") == 0){
         avcodec_free_context(&ctx);
-    }else{  // if other encoders, add to poisoned_encoders. Do not release the encoder context
+    }else{
         {
-            std::lock_guard<std::mutex> lg(poisoned_encoder_mutex);
+            std::lock_guard<Mutex> lg(poisoned_encoder_mutex);
             poisoned_encoders.insert(name);
         }
         logger.log(
@@ -299,9 +284,22 @@ void abandon_video_encoder(Logger& logger, const char* name, AVCodecContext*& ct
 
 
 
+//  Threads:
+//  - The encoder thread (worker_loop()) owns the video encoder and its state:
+//    m_vctx, m_sws*, m_video_width/height, m_video_start, m_last_*, and the
+//    encoder candidate index. Nothing else touches them.
+//  - The audio thread (push_samples()) owns the AAC encoder, the sample
+//    accumulator and the audio clock: m_actx, m_audio_acc, m_audio_*.
+//  - The video thread (on_frame()) throttles frames and queues them.
+//  - save() and set_window() can come from any thread.
+//  - m_lock guards what these threads share: the rings (m_video, m_audio,
+//    m_ring_bytes), the codec parameter copies (m_video_params,
+//    m_audio_params, m_video_time_base), m_window, m_next_frame_time, and
+//    m_video_enabled (written by the encoder thread, read by on_frame()).
+//  - m_queue_lock guards the frame queue and the encoder thread's flags.
 struct StreamHistoryTracker_Ring::Data{
     Logger& m_logger;
-    mutable SpinLock m_lock;    //  Protects the rings and the encoder state.
+    mutable SpinLock m_lock;    //  See "Threads" above.
     std::chrono::seconds m_window;
     bool m_has_video;
 
@@ -340,20 +338,22 @@ struct StreamHistoryTracker_Ring::Data{
 
     //  Encoder candidate rotation. A hardware encoder can open successfully
     //  and still fail on every frame (e.g. its GPU device cannot allocate
-    //  textures); after a hard failure from avcodec_send_frame() the current
-    //  candidate is abandoned and the next one is tried, so the recording
+    //  textures); after a hard failure from avcodec_send_frame() or
+    //  avcodec_receive_packet() the current candidate is abandoned and the
+    //  next one is tried, so the recording
     //  still gets video. Candidates that have failed (at open or at runtime)
     //  are not retried. Only the worker thread touches these.
     size_t m_video_encoder_index = 0;
 
-    //  Codec parameter snapshots for muxing, owned by Impl, guarded by
+    //  Codec parameter snapshots for muxing, owned by Data, guarded by
     //  `m_lock`. ffmpeg is not thread-safe on a live AVCodecContext, and
     //  mux_to_file() runs on the caller's thread while the video worker and
     //  the audio pipeline thread keep encoding into m_vctx/m_actx, so the muxer
     //  must never read those contexts directly (a torn read of, e.g., the
     //  lazily-populated hardware-encoder extradata crashes the mp4 muxer).
-    //  Each snapshot is refreshed on its encoder's own thread whenever the
-    //  encoder state changes.
+    //  Each snapshot is refreshed on its encoder's own thread when the first
+    //  packet arrives and whenever the extradata size changes (the hardware
+    //  encoders fill it in lazily).
     AVCodecParameters* m_video_params = nullptr;
     AVRational m_video_time_base = {1, 1000};
     AVCodecParameters* m_audio_params = nullptr;
@@ -523,7 +523,7 @@ struct StreamHistoryTracker_Ring::Data{
         for (size_t i = m_video_encoder_index; i < CANDIDATE_COUNT; i++){
             const char* name = VIDEO_ENCODER_CANDIDATES[i];
             {
-                std::lock_guard<std::mutex> lg(poisoned_encoder_mutex);
+                std::lock_guard<Mutex> lg(poisoned_encoder_mutex);
                 if (poisoned_encoders.count(name) != 0){
                     m_logger.log(
                         "Stream history: skipping video encoder '"
@@ -550,10 +550,10 @@ struct StreamHistoryTracker_Ring::Data{
             //  Milliseconds as the video timebase: the mpeg4 encoder rejects
             //  a timebase denominator above 65535 (the 16-bit
             //  time_incr_length of the MPEG-4 Part 2 standard) with EINVAL,
-            //  and the hardware H.264 wrappers accept any timebase; the
-            //  muxer derives packet timestamps from the ring's microsecond
-            //  WallClock timestamps anyway, so this choice only affects
-            //  what the encoders see.
+            //  and the hardware H.264 wrappers accept any timebase. The ring
+            //  timestamps are rebuilt from the encoder's output pts (see
+            //  drain_one_video_packet()), so the video timing in a saved file
+            //  is millisecond-precise.
             ctx->time_base = av_make_q(1, 1000);
             //  The frame rate must be set explicitly: the h264_amf wrapper
             //  passes it to the AMD driver, which rejects - and tears down
@@ -573,13 +573,15 @@ struct StreamHistoryTracker_Ring::Data{
             //  opened without an explicit pixel format.
             AVPixelFormat preferred = AV_PIX_FMT_NONE;
             const enum AVPixelFormat* pix_fmts = nullptr;
-#if LIBAVCODEC_VERSION_MAJOR >= 61
-            //  ffmpeg 7.0+ (libavcodec 61+) removed AVCodec.pix_fmts; query the
-            //  encoder instead. This split is a preprocessor version gate
-            //  (rather than compile-time detection) because
-            //  avcodec_get_supported_config() is not declared in every header
-            //  version this project supports (5.1-7.0), and names in discarded
-            //  if-constexpr branches are still looked up.
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
+            //  avcodec_get_supported_config() was added in libavcodec 61.13
+            //  (ffmpeg 7.1), which deprecated AVCodec.pix_fmts; ffmpeg 8.0
+            //  removed it. ffmpeg 7.0 is libavcodec 61.3, so it takes the
+            //  AVCodec.pix_fmts path below. This split is a preprocessor
+            //  version gate (rather than compile-time detection) because the
+            //  function is not declared in every header version this project
+            //  supports (5.1 and later), and names in discarded if-constexpr
+            //  branches are still looked up.
             //  (out_num_configs is optional; out_configs points at a list
             //  terminated by AV_PIX_FMT_NONE, or is NULL when every format is
             //  supported, in which case the YUV420P default below applies.)
@@ -816,7 +818,7 @@ struct StreamHistoryTracker_Ring::Data{
         const uint8_t* src_planes[4] = { nullptr, nullptr, nullptr, nullptr };
         int src_strides[4] = { 0, 0, 0, 0 };
         QImage rgb_image;
-        if (qt_pixel_format_to_av_pix_fmt(qframe.pixelFormat()) == AV_PIX_FMT_NV12){
+        if (qframe.pixelFormat() == QVideoFrameFormat::Format_NV12){
             src_format = AV_PIX_FMT_NV12;
             src_width = qframe.width();
             src_height = qframe.height();
@@ -906,8 +908,14 @@ struct StreamHistoryTracker_Ring::Data{
         int64_t pts_us = std::chrono::duration_cast<std::chrono::microseconds>(
             vf->timestamp - m_video_start
         ).count();
-        if (pts_us < m_last_pts_us){
-            pts_us = m_last_pts_us;
+        //  The encoders need strictly increasing pts (mpeg4 rejects a repeat
+        //  as a hard error, which would trigger an encoder fallback), and the
+        //  pts is in milliseconds. on_frame()'s throttling already keeps the
+        //  sent frames a frame interval apart; drop any frame that would still
+        //  not advance the pts (e.g. a capture timestamp going backwards).
+        if (m_last_pts_us >= 0 && pts_us / 1000 <= m_last_pts_us / 1000){
+            av_frame_free(&frame);
+            return;
         }
         m_last_pts_us = pts_us;
         bool force_keyframe = (pts_us - m_last_keyframe_us) >= VIDEO_KEYFRAME_INTERVAL_US;
@@ -975,15 +983,16 @@ struct StreamHistoryTracker_Ring::Data{
             return false;
         }
         //  Keep one extra keyframe interval of headroom: save() starts the
-        //  file at the first keyframe in the ring, and keyframes arrive only
-        //  every VIDEO_KEYFRAME_INTERVAL_US. Evicting at "latest - m_window"
-        //  would let the first keyframe fall up to a full interval after the
-        //  window's start point, so the saved file would cover only
-        //  "m_window - interval" of the most recent seconds. With the
-        //  headroom, the ring always contains a keyframe at or before
-        //  "latest - m_window", so the saved file always covers the most
-        //  recent "window" seconds (it may start up to one keyframe
-        //  interval earlier).
+        //  file at the first keyframe in the ring, and a keyframe is forced
+        //  on the first frame at least VIDEO_KEYFRAME_INTERVAL_US after the
+        //  previous one (so up to one frame interval later than that).
+        //  Evicting at "latest - m_window" would let the first keyframe fall
+        //  up to a full interval after the window's start point, shortening
+        //  the saved file by as much. With the headroom, the first keyframe
+        //  is at most one frame interval after "latest - m_window": the saved
+        //  file covers the most recent "window" seconds give or take a frame,
+        //  and may start up to one keyframe interval earlier. The memory cap
+        //  (MAX_RING_BYTES) can still shorten it.
         WallClock threshold =
             latest - m_window - std::chrono::microseconds(VIDEO_KEYFRAME_INTERVAL_US);
         bool capped = false;
@@ -1095,11 +1104,15 @@ struct StreamHistoryTracker_Ring::Data{
         }
 
         //  Keep the sample clock in line with the wall clock. The last sample
-        //  of this delivery was captured at about "now"; if the sample count
-        //  says otherwise by more than the threshold (audio went missing, or
-        //  the device clock drifted), re-anchor so that later packets land at
-        //  their real time instead of shifting all subsequent audio against
-        //  the video.
+        //  of this delivery is taken to have been captured at "now"; if the
+        //  sample count says otherwise by more than the threshold (audio went
+        //  missing, or the device clock drifted), re-anchor so that later
+        //  packets land at their real time instead of shifting all subsequent
+        //  audio against the video.
+        //  The working stream carries no capture times, so "now" is the
+        //  delivery time: any steady pipeline latency shows up as audio
+        //  slightly behind the video, and the first delivery's latency sets
+        //  the anchor.
         int64_t end_sample = m_audio_samples_total
             + (int64_t)(m_audio_acc.size() / m_audio_channels)
             + (int64_t)samples;
@@ -1131,7 +1144,7 @@ struct StreamHistoryTracker_Ring::Data{
             }
         }
 
-        //  2. Encode each complete AAC frame.
+        //  Encode each complete AAC frame.
         while (m_audio_acc.size() >= (size_t)AUDIO_FRAME_SAMPLES * m_audio_channels){
             AVFrame* frame = av_frame_alloc();
             if (frame == nullptr){
@@ -1156,7 +1169,7 @@ struct StreamHistoryTracker_Ring::Data{
                 return;
             }
             //  The encoder works in planar float (one plane per channel), but
-            //  the resampler output was accumulated packed/interleaved, so
+            //  the working stream was accumulated packed/interleaved, so
             //  de-interleave into the frame's planes.
             const float* acc = m_audio_acc.data();
             for (size_t ch = 0; ch < m_audio_channels; ch++){
@@ -1257,7 +1270,7 @@ struct StreamHistoryTracker_Ring::Data{
         const AVCodecParameters* apar
     ) const{
         //  Parameter names use the p_ prefix: the ring deques and start
-        //  indices have the same names as Impl members (C4458 under /W4).
+        //  indices have the same names as Data members (C4458 under /W4).
         //  No live m_vctx/m_actx checks here: the codec state for muxing comes
         //  from the m_video_params/m_audio_params snapshots (captured on the
         //  encoder threads; ffmpeg is not thread-safe on a live context).
@@ -1324,10 +1337,11 @@ struct StreamHistoryTracker_Ring::Data{
                     COLOR_CYAN
                 );
                 //  Log the first bytes of the first ring packet too: the
-                //  packet form must match the extradata form (every known
-                //  hardware encoder emits both as Annex B, mpeg4 in-band). If
-                //  an encoder ever mixed the forms, the MP4 save would be a
-                //  silent blank file; this makes the mismatch visible.
+                //  packet form must match the extradata form (Annex B for the
+                //  QSV, NVENC, AMF and Media Foundation wrappers, AVCC for
+                //  VideoToolbox, in-band for mpeg4). If an encoder ever mixed
+                //  the forms, the MP4 save would be a silent blank file; the
+                //  two logged prefixes make such a mismatch visible.
                 for (size_t i = p_video_start; i < p_video.size(); i++){
                     const std::vector<uint8_t>& d = p_video[i]->data;
                     if (d.empty()){
@@ -1341,16 +1355,16 @@ struct StreamHistoryTracker_Ring::Data{
                     }
                     m_logger.log(
                         "Stream history: first video packet starts with "
-                        + std::string(phex) + " (same form as the extradata).",
+                        + std::string(phex) + ".",
                         COLOR_CYAN
                     );
                     break;
                 }
                 //  MP4 stores H.264 as AVCC (avcC header + NAL units with
-                //  4-byte length prefixes). The h264_amf wrapper emits
-                //  Annex B instead, and the MP4 muxer of the vendored ffmpeg
-                //  crashes on that form, so convert the extradata here and
-                //  the ring packets below.
+                //  4-byte length prefixes). The QSV, NVENC, AMF and Media
+                //  Foundation wrappers emit Annex B instead, and the MP4 muxer
+                //  of the vendored ffmpeg crashes on that form, so convert the
+                //  extradata here and the ring packets below.
                 //  Annex B starts with a 4-byte (00 00 00 01) or 3-byte
                 //  (00 00 01) start code; AVCC starts with 01 (the avcC
                 //  configurationVersion). Only H.264 is converted: MPEG-4
@@ -1474,17 +1488,18 @@ struct StreamHistoryTracker_Ring::Data{
         if (packet == nullptr){
             ok = false;
         }else{
-            //  When the ring holds Annex B H.264 (the h264_amf wrapper),
-            //  each packet is rewritten with 4-byte NAL length prefixes;
-            //  the converted buffer must outlive the write call.
+            //  When the ring holds Annex B H.264, each packet is rewritten
+            //  with 4-byte NAL length prefixes; the converted buffer must
+            //  outlive the write call.
             std::vector<uint8_t> converted_data;
-            //  The muxers require strictly increasing dts per stream, but the
-            //  ring packets are stamped with the wall-clock time of the frame they
-            //  were drained from, and a hardware encoder can emit several packets
-            //  for one frame (or flush two or more at once), so consecutive
-            //  packets can share a timestamp. Bump a non-increasing dts to
-            //  last+1 (1 ms at the timebases used here) instead of failing the
-            //  whole save.
+            //  The muxers require strictly increasing dts per stream. The ring
+            //  timestamps normally increase (video: from the encoder's
+            //  millisecond pts; audio: from the sample clock), but rounding to
+            //  the stream timebase can still make two equal. Bump a
+            //  non-increasing dts to last+1 (one tick of the stream timebase:
+            //  1 ms for MKV and MP4 video, 1/48000 s for MP4 audio) instead of
+            //  failing the whole save. (Audio overlapping after a re-sync is
+            //  dropped instead; see below.)
             int64_t last_video_dts = -1;
             int64_t last_audio_dts = -1;
             //  Where the last written audio packet ends (microseconds).
@@ -1648,9 +1663,9 @@ struct StreamHistoryTracker_Ring::Data{
 
         //  Rewind the video to the first keyframe (the oldest decodable start
         //  point) so the file decodes from the beginning. Because evict() keeps
-        //  one extra keyframe interval of headroom, this keyframe is at or
-        //  before the window's start point, so the file always covers the most
-        //  recent "window" seconds; it may start up to one keyframe interval
+        //  one extra keyframe interval of headroom, the file covers the most
+        //  recent "window" seconds (give or take a frame, unless the memory
+        //  cap evicted more), and may start up to one keyframe interval
         //  (~2 s) earlier than that.
         size_t video_start_index = 0;
         for (size_t i = 0; i < video_snapshot.size(); i++){
