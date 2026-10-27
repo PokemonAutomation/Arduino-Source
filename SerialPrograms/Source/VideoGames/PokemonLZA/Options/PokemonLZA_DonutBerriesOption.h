@@ -7,10 +7,10 @@
 #ifndef PokemonAutomation_PokemonLZA_DonutBerriesOption_H
 #define PokemonAutomation_PokemonLZA_DonutBerriesOption_H
 
-#include "CommonTools/Options/StringSelectOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "CommonTools/Options/StringSelectOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

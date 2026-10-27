@@ -6,13 +6,13 @@
 
 #include <cmath>
 #include <vector>
+#include <iostream>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageDiff.h"
-#include "ExactImageDictionaryMatcher.h"
 
-#include <iostream>
+#include "ExactImageDictionaryMatcher.h"
 using std::cout;
 using std::endl;
 

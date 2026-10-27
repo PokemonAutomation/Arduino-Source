@@ -11,8 +11,8 @@
 #include "CommonFramework/VideoPipeline/Stats/MemoryUtilizationStats.h"
 #include "CommonFramework/VideoPipeline/Stats/CpuUtilizationStats.h"
 #include "CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.h"
-#include "Integrations/ProgramTracker.h"
 #include "ConsoleSystemSession.h"
+#include "Integrations/ProgramTracker.h"
 
 //#include <iostream>
 //using std::cout;

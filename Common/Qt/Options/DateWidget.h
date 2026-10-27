@@ -9,8 +9,8 @@
 
 #include <QWidget>
 #include <QDateTimeEdit>
-#include "Common/Cpp/Options/DateOption.h"
 #include "ConfigWidget.h"
+#include "Common/Cpp/Options/DateOption.h"
 
 namespace PokemonAutomation{
 

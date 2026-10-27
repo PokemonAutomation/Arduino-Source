@@ -4,13 +4,13 @@
  *
  */
 
+#include <iostream>
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonTools/Images/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "BlackBorderDetector.h"
+#include "CommonTools/Images/SolidColorTest.h"
 
-#include <iostream>
+#include "BlackBorderDetector.h"
 using std::cout;
 using std::endl;
 

@@ -9,8 +9,8 @@
 
 #include <map>
 #include "Common/Qt/NoWheelComboBox.h"
-#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "ConfigWidget.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 
 namespace PokemonAutomation{
 

@@ -9,9 +9,9 @@
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
-#include "CommonTools/Options/LanguageOCROption.h"
 #include "VideoGames/PokemonLZA/Options/PokemonLZA_DonutBerriesOption.h"
 
 namespace PokemonAutomation{

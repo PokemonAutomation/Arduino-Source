@@ -8,8 +8,8 @@
 #define PokemonAutomation_PokemonFRLG_SummaryDetector_H
 
 #include <chrono>
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "Common/Cpp/Color.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/VisualDetector.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"

@@ -4,12 +4,13 @@
  *
  */
 
+#include "Common/Qt/QtThreadPool_Tests.h"
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/TestRunners/TestImageDistortionManager.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "Common/Qt/QtThreadPool_Tests.h"
+#include "Kernels/Kernels_Tests.h"
 #include "CommonFramework/AudioPipeline/AudioInfo_Tests.h"
 #include "CommonFramework/AudioPipeline/ChannelMixer.h"
 #include "CommonFramework/AudioPipeline/SinkPipeline_Tests.h"
@@ -19,14 +20,13 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/VisualDetectors/BlackBorderDetector.h"
+#include "CommonTools/OCR/OCR_Tests.h"
+#include "ComputerPrograms_UnitTestRunner.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_CheckOnlineDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_FailedToConnectDetector.h"
+
 #include "NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h"
 #include "NintendoSwitch/Programs/Typewriter/NintendoSwitch_Typewriter_Tests.h"
-#include "ComputerPrograms_UnitTestRunner.h"
-
-#include "CommonTools/OCR/OCR_Tests.h"
-#include "Kernels/Kernels_Tests.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Tests.h"
 #include "VideoGames/PokemonRSE/PokemonRSE_Tests.h"
 #include "VideoGames/PokemonHome/PokemonHome_Tests.h"

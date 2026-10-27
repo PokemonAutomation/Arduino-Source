@@ -4,6 +4,7 @@
  *
  */
 
+#include <format>
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
@@ -30,9 +31,8 @@
 #include "VideoGames/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "VideoGames/PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "VideoGames/PokemonLZA/Programs/PokemonLZA_HyperspaceNavigation.h"
-#include "PokemonLZA_ShinyHunt_HyperspaceLegendary.h"
 
-#include <format>
+#include "PokemonLZA_ShinyHunt_HyperspaceLegendary.h"
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {

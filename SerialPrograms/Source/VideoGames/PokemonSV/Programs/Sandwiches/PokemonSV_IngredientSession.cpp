@@ -6,13 +6,13 @@
 
 #include <algorithm>
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
+#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "VideoGames/PokemonSV/Resources/PokemonSV_Ingredients.h"
 #include "PokemonSV_IngredientSession.h"
-#include "Common/Cpp/PrettyPrint.h"
 
 //#include <iostream>
 //using std::cout;

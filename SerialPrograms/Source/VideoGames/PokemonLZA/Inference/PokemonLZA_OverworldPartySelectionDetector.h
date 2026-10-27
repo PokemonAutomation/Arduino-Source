@@ -7,17 +7,17 @@
 #ifndef PokemonAutomation_PokemonLZA_OverworldPartySelectionDetector_H
 #define PokemonAutomation_PokemonLZA_OverworldPartySelectionDetector_H
 
+#include <array>
+#include <memory>
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/VisualDetector.h"
+
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "VideoGames/PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
-
-#include <array>
-#include <memory>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

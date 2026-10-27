@@ -10,8 +10,8 @@
 #include <chrono>
 //#include <atomic>
 #include <deque>
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "Common/Cpp/Color.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/VisualDetector.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"

@@ -30,10 +30,10 @@
 #include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 #include "CommonFramework/VideoPipeline/VideoPipelineOptions.h"
 #include "CommonFramework/ErrorReports/ErrorReports.h"
-#include "Integrations/DiscordSettingsOption.h"
+#include "GlobalSettingsPanel.h"
 //#include "CommonFramework/Environment/Environment.h"
 #include "Controllers/ControllerSettings.h"
-#include "GlobalSettingsPanel.h"
+#include "Integrations/DiscordSettingsOption.h"
 
 // #include <iostream>
 // using std::cout;

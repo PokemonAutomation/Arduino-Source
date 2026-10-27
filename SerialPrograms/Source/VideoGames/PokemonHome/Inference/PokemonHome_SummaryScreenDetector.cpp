@@ -7,9 +7,9 @@
 #include <string>
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "Tests/TestUtils.h"
 #include "VideoGames/PokemonHome/Inference/PokemonHome_ButtonDetector.h"
 #include "PokemonHome_SummaryScreenDetector.h"
-#include "Tests/TestUtils.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

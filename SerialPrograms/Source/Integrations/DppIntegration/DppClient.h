@@ -11,8 +11,8 @@
 #include <atomic>
 #include <Integrations/DppIntegration/DppCommandHandler.h>
 #include "Common/Cpp/Concurrency/AsyncTask.h"
-#include "CommonFramework/Notifications/MessageAttachment.h"
 #include "Common/Cpp/Options/ButtonOption.h"
+#include "CommonFramework/Notifications/MessageAttachment.h"
 
 namespace PokemonAutomation{
     class JsonObject;

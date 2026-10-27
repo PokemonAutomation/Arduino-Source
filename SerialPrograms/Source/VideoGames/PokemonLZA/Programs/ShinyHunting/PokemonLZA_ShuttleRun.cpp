@@ -4,10 +4,10 @@
  *
  */
 
+#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"

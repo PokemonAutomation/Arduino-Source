@@ -4,25 +4,25 @@
  *
  */
 
-#include "PokemonFRLG_StatsReader.h"
+#include <opencv2/imgproc.hpp>
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonTools/Images/ImageFilter.h"
-#include "CommonTools/OCR/OCR_NumberReader.h"
-#include "Pokemon/Inference/Pokemon_NameReader.h"
-#include "Pokemon/Inference/Pokemon_NatureReader.h"
-#include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
-#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "VideoGames/PokemonFRLG/PokemonFRLG_Tests.h"
+#include "CommonTools/Images/ImageFilter.h"
+#include "CommonTools/OCR/OCR_NumberReader.h"
 #include "Tests/TestUtils.h"
+#include "Pokemon/Inference/Pokemon_NameReader.h"
+#include "Pokemon/Inference/Pokemon_NatureReader.h"
+#include "PokemonFRLG_StatsReader.h"
+#include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
+#include "VideoGames/PokemonFRLG/PokemonFRLG_Tests.h"
 #include "PokemonFRLG_DigitReader.h"
 #include "PokemonFRLG_OcrPreprocessing.h"
-#include <opencv2/imgproc.hpp>
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {

@@ -5,9 +5,9 @@
  */
 
 #include "Common/Cpp/Color.h"
-#include "CommonTools/Images/SolidColorTest.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Images/SolidColorTest.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
 #include "VideoGames/PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
 #include "PokemonFRLG_StartMenuDetector.h"

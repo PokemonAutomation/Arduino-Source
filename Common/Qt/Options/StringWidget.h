@@ -8,8 +8,8 @@
 #define PokemonAutomation_Options_StringWidget_H
 
 #include <QLineEdit>
-#include "Common/Cpp/Options/StringOption.h"
 #include "ConfigWidget.h"
+#include "Common/Cpp/Options/StringOption.h"
 
 namespace PokemonAutomation{
 

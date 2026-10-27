@@ -8,6 +8,7 @@
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/Async/InterruptableCommands.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
@@ -21,7 +22,6 @@
 #include "VideoGames/PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "VideoGames/PokemonLZA/Programs/PokemonLZA_TrainerBattle.h"
 #include "PokemonLZA_JacintheInfiniteFarmer.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

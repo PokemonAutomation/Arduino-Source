@@ -11,9 +11,9 @@
 #include <map>
 #include <atomic>
 //#include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/Concurrency/SpinLock.h"
-
 #include <iostream>
+
+#include "Common/Cpp/Concurrency/SpinLock.h"
 //using std::cout;
 //using std::endl;
 

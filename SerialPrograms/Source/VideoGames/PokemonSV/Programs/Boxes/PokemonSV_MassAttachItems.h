@@ -9,9 +9,9 @@
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
-#include "CommonFramework/Notifications/EventNotificationsTable.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

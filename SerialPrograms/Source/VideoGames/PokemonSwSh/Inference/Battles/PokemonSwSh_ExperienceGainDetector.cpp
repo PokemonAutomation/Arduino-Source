@@ -4,12 +4,12 @@
  *
  */
 
+#include <iostream>
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
-#include "PokemonSwSh_ExperienceGainDetector.h"
 
-#include <iostream>
+#include "PokemonSwSh_ExperienceGainDetector.h"
 using std::cout;
 using std::endl;
 

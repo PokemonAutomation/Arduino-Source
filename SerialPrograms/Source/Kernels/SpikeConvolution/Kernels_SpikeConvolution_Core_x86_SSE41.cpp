@@ -6,9 +6,9 @@
 
 #ifdef PA_AutoDispatch_x64_08_Nehalem
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h"
 #include "Kernels_SpikeConvolution_Routines.h"
-#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels_SpikeConvolution_TestInfra.h"
 
 namespace PokemonAutomation{

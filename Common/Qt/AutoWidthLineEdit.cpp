@@ -5,8 +5,8 @@
  */
 
 
-#include "Common/Compiler.h"
 #include "AutoWidthLineEdit.h"
+#include "Common/Compiler.h"
 
 namespace PokemonAutomation{
 

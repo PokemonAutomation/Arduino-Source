@@ -8,8 +8,8 @@
 #define PokemonAutomation_VideoPipeline_QCameraThread_H
 
 #include <QCamera>
-#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Qt/GlobalThreadPoolsQt.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 
 //#include <iostream>
 //using std::cout;

@@ -9,8 +9,8 @@
 
 #include <QWidget>
 #include <QLabel>
-#include "Common/Cpp/Options/EditableTableOption.h"
 #include "ConfigWidget.h"
+#include "Common/Cpp/Options/EditableTableOption.h"
 
 namespace PokemonAutomation{
 

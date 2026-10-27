@@ -7,10 +7,10 @@
 #ifndef PokemonAutomation_PokemonLZA_ClothingBuyer_H
 #define PokemonAutomation_PokemonLZA_ClothingBuyer_H
 
-#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

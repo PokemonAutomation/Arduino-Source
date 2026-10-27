@@ -11,9 +11,9 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QTableWidget>
-#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/AutoHeightTable.h"
 #include "StaticTableWidget.h"
+#include "Common/Cpp/Json/JsonValue.h"
 
 //#include <iostream>
 //using std::cout;

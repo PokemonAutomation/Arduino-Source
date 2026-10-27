@@ -8,8 +8,8 @@
 #define PokemonAutomation_Options_CheckboxDropdownWidget_H
 
 #include "Common/Qt/CheckboxDropdown.h"
-#include "Common/Cpp/Options/CheckboxDropdownOption.h"
 #include "ConfigWidget.h"
+#include "Common/Cpp/Options/CheckboxDropdownOption.h"
 
 namespace PokemonAutomation{
 

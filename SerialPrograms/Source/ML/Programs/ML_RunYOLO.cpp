@@ -7,9 +7,9 @@
 
 //#include <iostream>
 //#include <filesystem>
-#include <QMessageBox>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
+#include <QMessageBox>
 //#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalAutoPaths.h"

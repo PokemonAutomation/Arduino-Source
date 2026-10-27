@@ -8,9 +8,9 @@
 #define PokemonAutomation_PokemonFRLG_PokemonSpriteReader_H
 
 #include <set>
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/ImageMatch/ExactImageDictionaryMatcher.h"
 #include "CommonTools/ImageMatch/CroppedImageDictionaryMatcher.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

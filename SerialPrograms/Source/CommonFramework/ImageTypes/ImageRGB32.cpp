@@ -5,8 +5,8 @@
  */
 
 #include <utility>
-#include "CompileTimeBackends.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
+#include "CompileTimeBackends.h"
 #include "ImageViewRGB32.h"
 #include "ImageRGB32.h"
 

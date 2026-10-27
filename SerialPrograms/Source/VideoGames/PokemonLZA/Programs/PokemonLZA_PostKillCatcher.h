@@ -8,8 +8,8 @@
 #define PokemonAutomation_PokemonLZA_PostKillCatcher_H
 
 #include "Common/Cpp/Options/TimeDurationOption.h"
-#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

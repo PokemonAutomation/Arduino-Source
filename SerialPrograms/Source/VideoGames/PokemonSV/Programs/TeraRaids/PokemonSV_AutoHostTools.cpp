@@ -4,10 +4,10 @@
  *
  */
 
+#include "Common/Qt/TimeQt.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "Common/Qt/TimeQt.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"

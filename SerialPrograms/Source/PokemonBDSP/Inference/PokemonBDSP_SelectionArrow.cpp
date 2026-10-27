@@ -7,9 +7,9 @@
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/ImageMatch/ExactImageMatcher.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonBDSP_SelectionArrow.h"
 
 //#include <iostream>

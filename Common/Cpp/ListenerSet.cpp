@@ -4,18 +4,18 @@
  *
  */
 
-#include "ListenerSet.h"
-#include "Concurrency/Mutex.h"
-#include "TestRunners/UnitTestDatabase.h"
-
 #include <algorithm>
 #include <atomic>
 #include <chrono>
+
 #include <map>
 #include <stdexcept>
 #include <string>
 #include <thread>
 #include <vector>
+#include "ListenerSet.h"
+#include "Concurrency/Mutex.h"
+#include "TestRunners/UnitTestDatabase.h"
 
 namespace PokemonAutomation{
 

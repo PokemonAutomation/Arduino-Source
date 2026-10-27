@@ -14,8 +14,8 @@
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h"
 #include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
+#include "PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h"
 #include "PokemonBDSP_EggAutonomousState.h"
 
 namespace PokemonAutomation{

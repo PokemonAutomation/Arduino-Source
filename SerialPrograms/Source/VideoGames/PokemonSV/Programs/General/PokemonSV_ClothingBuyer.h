@@ -8,11 +8,11 @@
 #define PokemonAutomation_PokemonSV_ClothingBuyer_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
-#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -7,9 +7,9 @@
 #include <algorithm>
 #include <cmath>
 #include "Common/Cpp/Time.h"
-#include "CommonTools/Random.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonTools/Random.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_RngNavigation.h"

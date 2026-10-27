@@ -4,9 +4,11 @@
  *
  */
 
+#include <fstream>
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/StaticGlobals.h"
+#include "Tests/TestUtils.h"
 #include "Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
 #include "Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "Inference/Dialogs/PokemonFRLG_PrizeSelectDetector.h"
@@ -19,11 +21,9 @@
 #include "Inference/PokemonFRLG_StatsReader.h"
 #include "Inference/PokemonFRLG_TrainerIdReader.h"
 #include "Inference/PokemonFRLG_WildEncounterReader.h"
-#include "Tests/TestUtils.h"
 #include "PokemonFRLG_Navigation.h"
-#include "PokemonFRLG_Tests.h"
 
-#include <fstream>
+#include "PokemonFRLG_Tests.h"
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{

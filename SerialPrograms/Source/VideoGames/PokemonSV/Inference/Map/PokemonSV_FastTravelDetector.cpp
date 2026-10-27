@@ -5,12 +5,12 @@
  */
 
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
+#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "PokemonSV_FastTravelDetector.h"
 
 // #include <iostream>

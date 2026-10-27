@@ -9,8 +9,8 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QComboBox>
-#include "CommonFramework/Globals.h"
 #include "Common/Qt/NoWheelComboBox.h"
+#include "CommonFramework/Globals.h"
 #include "LanguageOCRWidget.h"
 
 //#include <iostream>

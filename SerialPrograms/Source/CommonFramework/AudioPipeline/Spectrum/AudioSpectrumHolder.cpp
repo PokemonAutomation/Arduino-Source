@@ -7,12 +7,12 @@
 #include <string.h>
 #include <cmath>
 #include <algorithm>
+#include <iostream>
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/AudioPipeline/AudioConstants.h"
 #include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
-#include "AudioSpectrumHolder.h"
 
-#include <iostream>
+#include "AudioSpectrumHolder.h"
 using std::cout;
 using std::endl;
 

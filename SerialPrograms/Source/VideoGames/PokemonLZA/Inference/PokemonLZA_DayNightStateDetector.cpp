@@ -1,6 +1,6 @@
-#include "PokemonLZA_DayNightStateDetector.h"
-
 #include "CommonFramework/ImageTools/ImageStats.h"
+
+#include "PokemonLZA_DayNightStateDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

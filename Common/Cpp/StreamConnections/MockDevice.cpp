@@ -5,11 +5,11 @@
  */
 
 #include <string.h>
+#include <iostream>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2_ConnectionDebug.h"
-#include "MockDevice.h"
 
-#include <iostream>
+#include "MockDevice.h"
 using std::cout;
 using std::endl;
 

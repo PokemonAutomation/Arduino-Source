@@ -10,11 +10,12 @@
 #include "CommonFramework/Tools/ErrorDumper.h"
 //#include "CommonFramework/VideoPipeline/VideoFeed.h"
 //#include "CommonTools/Async/InterruptableCommands.h"
-#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 //#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 //#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
@@ -24,7 +25,6 @@
 #include "VideoGames/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "VideoGames/PokemonLZA/Programs/PokemonLZA_TrainerBattle.h"
 #include "PokemonLZA_RestaurantFarmer.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

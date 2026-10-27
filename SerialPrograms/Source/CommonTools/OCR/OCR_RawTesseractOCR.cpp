@@ -6,6 +6,7 @@
 
 #include <map>
 #include <memory>
+#include <iostream>
 #include "3rdParty/TesseractPA/TesseractPA.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
@@ -13,9 +14,8 @@
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "OCR_RawTesseractOCR.h"
 
-#include <iostream>
+#include "OCR_RawTesseractOCR.h"
 using std::cout;
 using std::endl;
 

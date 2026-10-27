@@ -14,8 +14,8 @@
 
 #include <QAudioSink>
 #include "Common/Cpp/LifetimeSanitizer.h"
-#include "CommonFramework/AudioPipeline/AudioInfo.h"
 #include "Kernels/AudioPipeline/Kernels_AudioPipeline.h"
+#include "CommonFramework/AudioPipeline/AudioInfo.h"
 
 namespace PokemonAutomation{
 

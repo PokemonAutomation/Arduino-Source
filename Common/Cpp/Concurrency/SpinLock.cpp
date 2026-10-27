@@ -33,10 +33,10 @@ uint64_t cpu_clock(){
 
 
 #include <thread>
-#include "SpinPause.h"
-#include "SpinLock.h"
-
 #include <iostream>
+#include "SpinPause.h"
+
+#include "SpinLock.h"
 using std::cout;
 using std::endl;
 

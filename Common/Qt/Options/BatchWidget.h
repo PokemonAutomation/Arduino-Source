@@ -8,8 +8,8 @@
 #define PokemonAutomation_Options_BatchWidget_H
 
 #include <QWidget>
-#include "Common/Cpp/Options/BatchOption.h"
 #include "ConfigWidget.h"
+#include "Common/Cpp/Options/BatchOption.h"
 
 namespace PokemonAutomation{
 

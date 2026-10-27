@@ -9,10 +9,10 @@
 
 #include <string>
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "Common/Cpp/Logging/AbstractLogger.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

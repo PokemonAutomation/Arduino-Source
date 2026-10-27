@@ -7,9 +7,9 @@
 #ifdef PA_DPP
 
 #include <set>
+#include "Common/Qt/StringToolsQt.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"

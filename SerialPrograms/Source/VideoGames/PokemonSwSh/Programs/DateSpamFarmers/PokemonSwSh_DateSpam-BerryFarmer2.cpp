@@ -6,9 +6,9 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Time.h"
+#include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"

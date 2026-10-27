@@ -7,14 +7,14 @@
 #ifndef PokemonAutomation_PokemonLZA_BoxDetection_H
 #define PokemonAutomation_PokemonLZA_BoxDetection_H
 
+#include <vector>
 #include "Common/Cpp/Color.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/VisualDetector.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
-#include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "VideoGames/PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 
-#include <vector>
+#include "VideoGames/PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 
 namespace PokemonAutomation{
     struct ProgramInfo;

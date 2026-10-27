@@ -14,8 +14,8 @@
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "PokemonFRLG_RngCalibration.h"
 #include "Pokemon/Pokemon_AdvRng.h"
+#include "PokemonFRLG_RngCalibration.h"
 
 
 namespace PokemonAutomation{

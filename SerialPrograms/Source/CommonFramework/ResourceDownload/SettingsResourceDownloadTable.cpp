@@ -4,16 +4,16 @@
  *
  */
 
+#include <iostream>
 #include "Common/Cpp/Exceptions.h"
 #include "ResourceDownload.h"
 #include "SettingsResourceDownloadRow.h"
-#include "SettingsResourceDownloadTable.h"
 
 // #include <filesystem>
 // #include <thread>
 // #include <unordered_set>
 
-#include <iostream>
+#include "SettingsResourceDownloadTable.h"
 using std::cout;
 using std::endl;
 

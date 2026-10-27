@@ -5,20 +5,20 @@
  */
 
 // #include <QVBoxLayout>
+#include <iostream>
 #include <QMessageBox>
-#include <QEventLoop>
 // #include <QFont>
 // #include <QObject>
 // #include <QPushButton>
 // #include <QPointer>
 // #include <QHBoxLayout>
 // #include "CommonFramework/Logging/Logger.h"
+#include <QEventLoop>
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/ProgramSession.h"
 // #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "ProgramResourceDownloadWidget.h"
+#include "CommonFramework/ProgramSession.h"
 
-#include <iostream>
+#include "ProgramResourceDownloadWidget.h"
 using std::cout;
 using std::endl;
 

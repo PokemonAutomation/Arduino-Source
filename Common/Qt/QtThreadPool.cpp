@@ -5,8 +5,8 @@
  */
 
 #include "Common/Cpp/Concurrency/Qt6.9ThreadBugWorkaround.h"
-#include "Common/Cpp/Concurrency/SpinPause.h"
 #include "QtThreadPool.h"
+#include "Common/Cpp/Concurrency/SpinPause.h"
 
 //#include <iostream>
 //using std::cout;

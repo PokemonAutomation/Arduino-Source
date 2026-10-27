@@ -8,9 +8,9 @@
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "Tests/TestUtils.h"
 #include "PokemonLZA_MapDetector.h"
 #include "PokemonLZA_MapIconDetector.h"
-#include "Tests/TestUtils.h"
 
 //#include <iostream>
 //using std::cout;

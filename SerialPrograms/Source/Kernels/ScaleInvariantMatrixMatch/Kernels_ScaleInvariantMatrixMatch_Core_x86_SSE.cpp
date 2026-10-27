@@ -7,10 +7,10 @@
 #ifdef PA_AutoDispatch_x64_08_Nehalem
 
 #include <immintrin.h>
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/Kernels_x64_SSE41.h"
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h"
 #include "Kernels_ScaleInvariantMatrixMatch_Routines.h"
-#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels_ScaleInvariantMatrixMatch_TestInfra.h"
 
 namespace PokemonAutomation{

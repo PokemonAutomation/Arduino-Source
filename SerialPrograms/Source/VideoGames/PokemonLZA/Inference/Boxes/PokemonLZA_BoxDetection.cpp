@@ -4,7 +4,10 @@
  *
  */
 
+#include <iostream>
 #include "Common/Cpp/Exceptions.h"
+#include "Kernels/Waterfill/Kernels_Waterfill.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
@@ -20,15 +23,12 @@
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
-#include "Kernels/Waterfill/Kernels_Waterfill.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "Tests/TestUtils.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "VideoGames/PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.h"
-#include "PokemonLZA_BoxDetection.h"
-#include "Tests/TestUtils.h"
 
-#include <iostream>
+#include "PokemonLZA_BoxDetection.h"
  //#include <sstream>
 using std::cout;
 using std::endl;

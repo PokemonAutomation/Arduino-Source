@@ -5,9 +5,9 @@
  */
 
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonTools/Images/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonPokopia_SettingsScreenDetector.h"
 
 namespace PokemonAutomation{

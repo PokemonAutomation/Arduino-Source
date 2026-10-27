@@ -8,9 +8,9 @@
 #define PokemonAutomation_PokemonFRLG_HeldItemFarmer_SafariZone_H
 
 #include "Common/Cpp/Options/ButtonOption.h"
-#include "CommonTools/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"

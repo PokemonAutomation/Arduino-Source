@@ -8,9 +8,9 @@
 #include "Common/Cpp/PrettyPrint.h"
 //#include "Common/Cpp/Exceptions.h"
 #include "Common/PABotBase2/PABotBase2CC_MessageDumper.h"
-#include "CommonTools/Random.h"
-//#include "PABotBase2_ConnectionDebug.h"
 #include "PABotBase2CC_ReliableStreamConnection.h"
+//#include "PABotBase2_ConnectionDebug.h"
+#include "CommonTools/Random.h"
 
 //#include <iostream>
 //using std::cout;

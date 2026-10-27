@@ -6,11 +6,11 @@
 
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Exceptions.h"
-#include "CommonTools/Images/SolidColorTest.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Images/SolidColorTest.h"
 #include "VideoGames/PokemonRSE/PokemonRSE_Settings.h"
 #include "PokemonRSE_StartMenuDetector.h"
 

@@ -4,17 +4,17 @@
  *
  */
 
+#include <iostream>
+#include <sstream>
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP_BasicCatcher.h"
 #include "PokemonBDSP_EncounterHandler.h"
+
 #include "PokemonBDSP_GameNavigation.h"
 #include "PokemonBDSP_RunFromBattle.h"
-
-#include <iostream>
-#include <sstream>
 using std::cout;
 using std::endl;
 

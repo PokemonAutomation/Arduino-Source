@@ -19,10 +19,10 @@
 #include "Kernels_WorkingAudio2RawAudio.h"
 #include "Kernels_AudioPipeline_RoundTrip_TestInfra.h"
 #include "Kernels_ChannelMixer_TestInfra.h"
-#include "CommonFramework/AudioPipeline/ChannelMixer.h"
 #include "Kernels/AudioResampler/Kernels_AudioResampler.h"
 #include "Kernels_ChannelMixer.h"
 #include "Kernels_WorkingAudio2WorkingAudio.h"
+#include "CommonFramework/AudioPipeline/ChannelMixer.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

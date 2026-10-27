@@ -8,8 +8,8 @@
 #define PokemonAutomation_Options_TextEditWidget_H
 
 #include <QWidget>
-#include "Common/Cpp/Options/TextEditOption.h"
 #include "ConfigWidget.h"
+#include "Common/Cpp/Options/TextEditOption.h"
 
 class QLabel;
 class QTextEdit;

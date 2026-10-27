@@ -6,13 +6,13 @@
 
 #include <cfloat>
 #include <sstream>
+#include <iostream>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "SpectrogramMatcher.h"
-#include "AudioPerSpectrumDetectorBase.h"
 
-#include <iostream>
+#include "AudioPerSpectrumDetectorBase.h"
 using std::cout;
 using std::endl;
 

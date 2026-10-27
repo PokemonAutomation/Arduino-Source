@@ -14,10 +14,10 @@
 #include "CommonTools/ImageMatch/ImageCropper.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/OCR/OCR_Routines.h"
-#include "VideoGames/PokemonSV/Resources/PokemonSV_Ingredients.h"
-#include "PokemonSV_SandwichIngredientDetector.h"
-
 #include "Tests/TestUtils.h"
+#include "VideoGames/PokemonSV/Resources/PokemonSV_Ingredients.h"
+
+#include "PokemonSV_SandwichIngredientDetector.h"
 
 //#include <iostream>
 //using std::cout;

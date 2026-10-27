@@ -12,9 +12,9 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/ImageFilter.h"
+#include "Tests/TestUtils.h"
 #include "PokemonSV_SandwichPlateDetector.h"
 #include "VideoGames/PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h"
-#include "Tests/TestUtils.h"
 // #include "CommonFramework/Tools/DebugDumper.h"
 
 //#include <iostream>

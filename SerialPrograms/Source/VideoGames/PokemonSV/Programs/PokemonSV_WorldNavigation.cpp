@@ -2,16 +2,21 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
-#include "CommonFramework/Exceptions/UnexpectedBattleException.h"
-#include "CommonTools/Async/InferenceRoutines.h"
+#include <array>
+#include <cmath>
+#include <sstream>
 //#include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include <cfloat>
+#include <iostream>
 //#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 //#include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.h"
-#include "NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 //#include "VideoGames/PokemonSV/PokemonSV_Settings.h"
+#include "CommonFramework/Exceptions/UnexpectedBattleException.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.h"
 #include "VideoGames/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "VideoGames/PokemonSV/Inference/Map/PokemonSV_MapDetector.h"
 #include "VideoGames/PokemonSV/Inference/Map/PokemonSV_MapMenuDetector.h"
@@ -22,17 +27,12 @@
 #include "VideoGames/PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.h"
 #include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "VideoGames/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
+
 #include "VideoGames/PokemonSV/Inference/PokemonSV_TutorialDetector.h"
 #include "VideoGames/PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "PokemonSV_ConnectToInternet.h"
 #include "PokemonSV_WorldNavigation.h"
-
-#include <array>
-#include <cmath>
-#include <sstream>
-#include <cfloat>
-#include <iostream>
 using std::cout;
 using std::endl;
 

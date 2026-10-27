@@ -4,10 +4,10 @@
  *
  */
 
+#include "Common/Qt/CodeValidator.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Json/JsonValue.h"
-#include "Common/Qt/CodeValidator.h"
 #include "FixedCodeOption.h"
 
 //#include <iostream>
