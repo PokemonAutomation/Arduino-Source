@@ -167,6 +167,13 @@ brew install sdl3
 
 SDL support is disabled by default. Enable it with `-DPA_SDL=ON` when configuring CMake.
 
+### Install FFmpeg
+
+FFmpeg is a software package for encoding audio and video. We need it to keep the recent video history in memory and save it as a video file. Install it by running in Terminal
+```
+brew install ffmpeg
+```
+
 ### Install DPP (optional)
 DPP is a library for Discord integration. If you need discord webhooks for notification you need to install it.
 You can do this step after [Part 3: Download Codebase](#part-3-download-codebase).
