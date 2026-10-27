@@ -34,7 +34,7 @@
 #include "Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h"
 #include "Pokemon/Inference/Pokemon_TrainPokemonOCR.h"
 
-#include "ComputerPrograms/UnitTestRunner.h"
+#include "ComputerPrograms/ComputerPrograms_UnitTestRunner.h"
 
 #ifdef PA_OFFICIAL
 #include "../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.h"

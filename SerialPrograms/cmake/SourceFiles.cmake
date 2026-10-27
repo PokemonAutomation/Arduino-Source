@@ -405,6 +405,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/StreamConnections/MockDevice.h
     ../Common/Cpp/TestRunners/ParallelUnitTestRunner.cpp
     ../Common/Cpp/TestRunners/ParallelUnitTestRunner.h
+    ../Common/Cpp/TestRunners/TestImageDistortionManager.cpp
+    ../Common/Cpp/TestRunners/TestImageDistortionManager.h
     ../Common/Cpp/TestRunners/UnitTest.h
     ../Common/Cpp/TestRunners/UnitTestDatabase.h
     ../Common/Cpp/ValueDebouncer.h
@@ -889,8 +891,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonTools/VisualDetectors/ImageMatchDetector.h
     Source/ComputerPrograms/ComputerProgram.cpp
     Source/ComputerPrograms/ComputerProgram.h
-    Source/ComputerPrograms/UnitTestRunner.cpp
-    Source/ComputerPrograms/UnitTestRunner.h
+    Source/ComputerPrograms/ComputerPrograms_UnitTestRunner.cpp
+    Source/ComputerPrograms/ComputerPrograms_UnitTestRunner.h
     Source/ComputerPrograms/Framework/ComputerProgramSession.cpp
     Source/ComputerPrograms/Framework/ComputerProgramSession.h
     Source/ComputerPrograms/Framework/ComputerProgramWidget.cpp
@@ -3101,6 +3103,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Tests/CommandLineTests.cpp
     Source/Tests/CommandLineTests.h
     Source/Tests/GuardPageImage.h
+    Source/Tests/ImageUnitTest.cpp
+    Source/Tests/ImageUnitTest.h
     Source/Tests/TestUtils.cpp
     Source/Tests/TestUtils.h
     Source/VideoGames/ZeldaTotK/Programs/ZeldaTotK_BowItemDuper.cpp
