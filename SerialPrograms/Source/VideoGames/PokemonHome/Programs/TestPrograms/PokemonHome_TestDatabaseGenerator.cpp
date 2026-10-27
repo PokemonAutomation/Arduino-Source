@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <chrono>
 #include <filesystem>
 #include <format>
 #include <fstream>
@@ -207,6 +208,11 @@ void TestDatabaseGenerator::program(
                         + "_" + (alpha ? "Alpha" : "Regular")
                         + (shiny ? "_Shiny" : "")
                         + "_" + ORIGIN_MARK_SLUGS().get_string(origin)
+                        + "_" + std::to_string(
+                            std::chrono::duration_cast<std::chrono::milliseconds>(
+                                std::chrono::system_clock::now().time_since_epoch())
+                            .count()
+                        )
                         + ".png";
                     const Filesystem::Path destination = path.parent_path() / new_name;
                     if (destination == path){
