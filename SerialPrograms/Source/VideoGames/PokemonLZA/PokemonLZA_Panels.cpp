@@ -7,27 +7,29 @@
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonLZA_Panels.h"
+
+#include "PokemonLZA_Settings.h"
 
 //  General
-#include "PokemonLZA_Panels.h"
-#include "PokemonLZA_Settings.h"
-#include "Programs/PokemonLZA_BoxSorter.h"
 #include "Programs/PokemonLZA_ClothingBuyer.h"
 #include "Programs/PokemonLZA_StallBuyer.h"
+#include "Programs/Trading/PokemonLZA_SelfBoxTrade.h"
+#include "Programs/PokemonLZA_PostKillCatcher.h"
+#include "Programs/PokemonLZA_BoxSorter.h"
+#include "Programs/NonShinyHunting/PokemonLZA_WeatherFinder.h"
+#include "Programs/Farming/PokemonLZA_HyperspaceRewardReset.h"
+#include "Programs/Farming/PokemonLZA_DonutMaker.h"
 
 //  Trading
-#include "Programs/PokemonLZA_PostKillCatcher.h"
 
 //  Farming
 #include "Programs/PokemonLZA_TurboMacro.h"
-#include "Programs/Trading/PokemonLZA_SelfBoxTrade.h"
-#include "Programs/Farming/PokemonLZA_DonutMaker.h"
 #include "Programs/Farming/PokemonLZA_RestaurantFarmer.h"
 #include "Programs/Farming/PokemonLZA_MegaShardFarmer.h"
 #include "Programs/Farming/PokemonLZA_JacintheInfiniteFarmer.h"
 #include "Programs/Farming/PokemonLZA_FriendshipFarmer.h"
 #include "Programs/Farming/PokemonLZA_InPlaceCatcher.h"
-#include "Programs/Farming/PokemonLZA_HyperspaceRewardReset.h"
 #include "Programs/Farming/PokemonLZA_WigglytuffFarmer.h"
 
 //  Shiny Hunting
@@ -46,7 +48,6 @@
 
 //  Non-Shiny Hunting
 #include "Programs/NonShinyHunting/PokemonLZA_StatsReset.h"
-#include "Programs/NonShinyHunting/PokemonLZA_WeatherFinder.h"
 
 //  Developer
 #include "Programs/TestPrograms/PokemonLZA_OverworldWatcher.h"

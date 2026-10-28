@@ -17,8 +17,8 @@
 #include "Programs/ShinyHunting/PokemonRSE_LegendaryRunAway-Emerald.h"
 #include "Programs/ShinyHunting/PokemonRSE_ShinyHunt-Deoxys.h"
 #include "Programs/ShinyHunting/PokemonRSE_ShinyHunt-Mew.h"
-
 #include "Programs/ShinyHunting/PokemonRSE_StarterReset.h"
+
 #include "Programs/TestPrograms/PokemonRSE_SoundListener.h"
 
 namespace PokemonAutomation{

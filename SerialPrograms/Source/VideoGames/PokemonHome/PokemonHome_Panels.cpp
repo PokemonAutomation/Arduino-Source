@@ -13,8 +13,8 @@
 #include "Programs/PokemonHome_PageSwap.h"
 #include "Programs/PokemonHome_BoxSorter.h"
 #include "Programs/PokemonHome_BoxSorterLivingDex.h"
-
 #include "Programs/PokemonHome_GenerateNameOCR.h"
+
 #include "Programs/TestPrograms/PokemonHome_ReadSummaryScreen.h"
 #include "Programs/TestPrograms/PokemonHome_TestDatabaseGenerator.h"
 

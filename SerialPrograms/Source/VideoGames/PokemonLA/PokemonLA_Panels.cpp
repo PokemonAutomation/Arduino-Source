@@ -7,16 +7,16 @@
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "Pokemon/Pokemon_Strings.h"
-
 #include "PokemonLA_Panels.h"
+
 #include "PokemonLA_Settings.h"
+
 #include "Programs/General/PokemonLA_BraviaryHeightGlitch.h"
 #include "Programs/General/PokemonLA_DistortionWaiter.h"
 #include "Programs/General/PokemonLA_OutbreakFinder.h"
 #include "Programs/General/PokemonLA_ClothingBuyer.h"
 #include "Programs/General/PokemonLA_SkipToFullMoon.h"
 #include "Programs/General/PokemonLA_PokedexTasksReader.h"
-
 #include "Programs/General/PokemonLA_RamanasIslandCombee.h"
 #include "Programs/General/PokemonLA_ApplyGrits.h"
 
@@ -26,7 +26,6 @@
 #include "Programs/Farming/PokemonLA_IngoMoveGrinder.h"
 #include "Programs/Farming/PokemonLA_MagikarpMoveGrinder.h"
 #include "Programs/Farming/PokemonLA_NuggetFarmerHighlands.h"
-
 #include "Programs/Farming/PokemonLA_TenacityCandyFarmer.h"
 #include "Programs/Farming/PokemonLA_LeapGrinder.h"
 
@@ -37,15 +36,14 @@
 #include "Programs/ShinyHunting/PokemonLA_BurmyFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_UnownFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.h"
-
 #include "Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.h"
 #include "Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.h"
+
 #include "Programs/TestPrograms/PokemonLA_MountDetectionTest.h"
 #include "Programs/TestPrograms/PokemonLA_OverworldWatcher.h"
-
 #include "Programs/TestPrograms/PokemonLA_FlagNavigationTest.h"
-
 #include "Programs/TestPrograms/PokemonLA_SoundListener.h"
+
 #include "Programs/ML/PokemonLA_GeneratePokemonImageTrainingData.h"
 
 namespace PokemonAutomation{
