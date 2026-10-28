@@ -4,9 +4,10 @@
  *
  */
 
-#include <vector>
+#include <deque>
 #include <sstream>
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
@@ -115,6 +116,7 @@ void find_sparkles(
     }
 }
 
+//
 //  Find all sparkle-shaped objects in one binary image and sort them into
 //  balls, stars, lines and squares.
 //
@@ -123,24 +125,32 @@ void find_sparkles(
 //  same pool, e.g. with `dispatch_now_blocking()`. If every pool thread is
 //  running one of these calls, all of them wait for a free thread that never
 //  comes, and the program freezes with the pool stuck at 100% per thread.
-//  `run_in_parallel()` is safe because the calling thread runs queued tasks
-//  itself while it waits.
+//
 ShinySparkleSetSwSh find_sparkles(size_t screen_area, WaterfillSession& session){
-    std::vector<WaterfillObject> objects;
+    ThreadPool& pool = GlobalThreadPools::computation_realtime();
+    SpinLock lock;
+    ShinySparkleSetSwSh sparkles;
+    std::deque<AsyncTask> tasks;
     auto finder = session.make_iterator(20);
     WaterfillObject object;
     while (finder->find_next(object, true)){
-        objects.emplace_back(std::move(object));
-    }
+        std::function<void()> func = [&, screen_area, object = std::move(object)]{
+            find_sparkles(
+                screen_area,
+                lock,
+                sparkles,
+                object
+            );
+        };
 
-    SpinLock lock;
-    ShinySparkleSetSwSh sparkles;
-    GlobalThreadPools::computation_realtime().run_in_parallel(
-        [&](size_t index){
-            find_sparkles(screen_area, lock, sparkles, objects[index]);
-        },
-        0, objects.size()
-    );
+        //  Try to dispatch. If thread pool is full, just run it instead.
+        AsyncTask task = pool.try_dispatch_now(func);
+        if (task){
+            tasks.emplace_back(std::move(task));
+        }else{
+            func();
+        }
+    }
     return sparkles;
 }
 void ShinySparkleSetSwSh::read_from_image(size_t screen_area, const ImageViewRGB32& image){
