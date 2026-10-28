@@ -69,8 +69,7 @@ public:
     AudioSpectrumHolder& spectrums(){ return m_spectrum_holder; }
 
     void clear_audio_input();
-    void set_audio_input(std::string file);
-    void set_audio_input(AudioDeviceInfo info);
+    void set_audio_input(const std::shared_ptr<AudioSourceDescriptor>& source);
     void set_input_choice(const AudioInputChoice& choice);
 
     void clear_audio_output();
