@@ -61,6 +61,19 @@ ItemDuplication::ItemDuplication()
         100,
         0
     )
+    , LANGUAGE(
+        "<b>Game Language:</b>",
+        {
+            Language::English,
+            Language::Japanese,
+            Language::Spanish,
+            Language::French,
+            Language::German,
+            Language::Italian,
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        true
+        )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -71,6 +84,7 @@ ItemDuplication::ItemDuplication()
 {
     PA_ADD_OPTION(STOP_AFTER_CURRENT);
 
+    PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(NUM_DUPLICATIONS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
 
@@ -87,7 +101,7 @@ void ItemDuplication::program(SingleSwitchProgramEnvironment& env, ProController
     ImageFloatBox mail_arrow_box{ 0.3670769231, 0.06373076639, 0.028, 0.077 };
     ImageFloatBox mail_confirmation_arrow_box{ 0.7289230769, 0.4604230588, 0.029, 0.076 };
     SelectionArrowWatcher mail_selection_arrow(COLOR_BLUE, &env.console.overlay(), mail_arrow_box);
-    PartyHeldItemWatcher farfetchd_held_item(COLOR_BLUE, &env.console.overlay(), PartySlot::ONE);
+    PartyHeldItemWatcher farfetchd_held_item(COLOR_BLUE, &env.console.overlay(), PartySlot::ONE, LANGUAGE);
     AdvanceWhiteDialogWatcher item_description(COLOR_BLUE);
     SelectionArrowWatcher confirmation_arrow(COLOR_BLUE, &env.console.overlay(), SelectionArrowPositionConfirmationMenu::YES);
     SelectionArrowWatcher mail_confirmation_arrow(COLOR_BLUE, &env.console.overlay(), mail_confirmation_arrow_box);

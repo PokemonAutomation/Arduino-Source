@@ -33,6 +33,24 @@ TestPartyInference_Descriptor::TestPartyInference_Descriptor()
     )
 {}
 
+TestPartyInference::TestPartyInference()
+    : LANGUAGE(
+        "<b>Game Language:</b>",
+        {
+            Language::English,
+            Language::Japanese,
+            Language::Spanish,
+            Language::French,
+            Language::German,
+            Language::Italian,
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        true
+    )
+{
+    PA_ADD_OPTION(LANGUAGE);
+}
+
 void TestPartyInference::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     VideoOverlaySet overlays(env.console.overlay());
     PartyMenuDetector menu_detector(COLOR_RED);
@@ -58,7 +76,7 @@ void TestPartyInference::program(SingleSwitchProgramEnvironment& env, Cancellabl
             empty_result = empty_detector.detect(screen) ? "yes" : "no";
         }
 
-        PartyHeldItemDetector held_item_detector(COLOR_YELLOW, nullptr, slot);
+        PartyHeldItemDetector held_item_detector(COLOR_YELLOW, nullptr, slot, LANGUAGE);
         held_item_detector.make_overlays(overlays);
         bool held_item = held_item_detector.detect(screen);
         env.log(
