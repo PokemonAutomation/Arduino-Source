@@ -35,7 +35,10 @@ public:
 
     struct StateListener{
         virtual void pre_input_change(){}
-        virtual void post_input_change(const std::string& file, const AudioDeviceInfo& device, const AudioInputChoice& choice){}
+        virtual void post_input_change(
+            const std::shared_ptr<const AudioSourceDescriptor>& source,
+            const AudioInputChoice& choice
+        ){}
         virtual void post_output_change(const AudioDeviceInfo& device){}
         virtual void post_volume_change(double volume){}
         virtual void post_display_change(AudioOption::AudioDisplayType display){}
@@ -59,7 +62,7 @@ public:
     void save(AudioOption& option) const;
     void load(const AudioOption& option);
 
-    std::pair<std::string, AudioDeviceInfo> input_device() const;
+    std::shared_ptr<const AudioSourceDescriptor> input_source() const;
     AudioInputChoice input_choice() const;
 
     AudioDeviceInfo output_device() const;
@@ -89,6 +92,7 @@ private:
     virtual void on_fft(size_t sample_rate, std::shared_ptr<const AlignedVector<float>> fft_output) override;
     virtual void on_watchdog_timeout() override;
 
+    void clear_file_source_if_empty();
     bool sanitize_choice();
 
     void signal_pre_input_change();

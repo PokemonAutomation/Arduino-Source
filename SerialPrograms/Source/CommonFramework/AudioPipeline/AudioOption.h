@@ -7,7 +7,9 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioOption_H
 #define PokemonAutomation_AudioPipeline_AudioOption_H
 
+#include <memory>
 #include "AudioInfo.h"
+#include "AudioSourceDescriptor.h"
 
 namespace PokemonAutomation{
 
@@ -20,8 +22,7 @@ class AudioSelectorWidget;
 // TODO: if needed, can add state of FFT parameters (FFT length, sliding
 // window step, etc.) here.
 class AudioOption{
-    static const std::string JSON_INPUT_FILE;
-    static const std::string JSON_INPUT_DEVICE;
+    static const std::string JSON_SOURCE_TYPE;
     static const std::string JSON_INPUT_FORMAT;
     static const std::string JSON_OUTPUT_DEVICE;
     static const std::string JSON_AUDIO_VIS;
@@ -39,20 +40,19 @@ public:
 public:
     AudioOption();
 
-    const std::string& input_file() const{ return m_input_file; }
-    const AudioDeviceInfo& input_device() const{ return m_input_device; }
+    //  The audio input source (a file, a capture device, or null for none).
+    std::shared_ptr<AudioSourceDescriptor> input_source() const{
+        return m_input_source;
+    }
+    void set_input_source(std::shared_ptr<AudioSourceDescriptor> source);
+
+    //  The input choice for a device source (the file / null sources ignore
+    //  it). (For now; the choice may move into the descriptor later.)
     AudioInputChoice input_choice() const{ return m_input_choice; }
 
     const AudioDeviceInfo& output_device() const{ return m_output_device; }
     AudioDisplayType display_type() const{ return m_display_type; }
     double volume() const{ return m_volume; }
-
-//    void set_input_file(std::string&& value){ m_input_file = std::move(value); }
-//    void set_input_device(AudioDeviceInfo&& value){ m_input_device = std::move(value); }
-//    void set_input_choice(AudioInputChoice value){ m_input_choice = value; }
-//    void set_output_device(AudioDeviceInfo&& value){ m_output_device = std::move(value); }
-//    void set_volume(double value){ m_volume = value; }
-//    void set_display_type(AudioDisplayType value){ m_display_type = value; }
 
 public:
     void load_json(const JsonValue& json);
@@ -60,8 +60,7 @@ public:
 
 private:
     friend class AudioSession;
-    std::string m_input_file;
-    AudioDeviceInfo m_input_device;
+    std::shared_ptr<AudioSourceDescriptor> m_input_source;
     AudioInputChoice m_input_choice;
     AudioDeviceInfo m_output_device;
     AudioDisplayType m_display_type = AudioDisplayType::FREQ_BARS;

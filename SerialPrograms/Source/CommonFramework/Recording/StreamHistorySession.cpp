@@ -185,7 +185,10 @@ void StreamHistorySession::pre_input_change(){
     WriteSpinLock lg(data.m_lock);
     clear();
 }
-void StreamHistorySession::post_input_change(const std::string& file, const AudioDeviceInfo& device, const AudioInputChoice& choice){
+void StreamHistorySession::post_input_change(
+    const std::shared_ptr<const AudioSourceDescriptor>& source,
+    const AudioInputChoice& choice
+){
 //    cout << "post_input_change()" << endl;
     Data& data = *m_data;
     AudioSession* audio_session;
