@@ -10,7 +10,6 @@
 #include "Backends/AudioPassthroughPairQtThread.h"
 #include "AudioSources/AudioSource_Null.h"
 #include "AudioSources/AudioSource_File.h"
-#include "AudioSources/AudioSource_Device.h"
 #include "AudioPipelineOptions.h"
 #include "AudioSession.h"
 
@@ -208,8 +207,8 @@ void AudioSession::clear_file_source_if_empty(){
 }
 bool AudioSession::sanitize_choice(){
     return m_option.m_input_source->sanitize_desired_format(
-		m_logger, m_option.m_input_choice
-	);
+        m_logger, m_option.m_input_choice
+    );
 }
 void AudioSession::signal_pre_input_change(){
     m_listeners.run_method(&StateListener::pre_input_change);
