@@ -4,10 +4,9 @@
  *
  */
 
-#include <deque>
+#include <vector>
 #include <sstream>
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
@@ -116,24 +115,32 @@ void find_sparkles(
     }
 }
 
+//  Find all sparkle-shaped objects in one binary image and sort them into
+//  balls, stars, lines and squares.
+//
+//  This already runs inside a `run_in_parallel()` task on the real-time pool
+//  (see `read_from_image()`), so it must not wait for a free thread in that
+//  same pool, e.g. with `dispatch_now_blocking()`. If every pool thread is
+//  running one of these calls, all of them wait for a free thread that never
+//  comes, and the program freezes with the pool stuck at 100% per thread.
+//  `run_in_parallel()` is safe because the calling thread runs queued tasks
+//  itself while it waits.
 ShinySparkleSetSwSh find_sparkles(size_t screen_area, WaterfillSession& session){
-    SpinLock lock;
-    ShinySparkleSetSwSh sparkles;
+    std::vector<WaterfillObject> objects;
     auto finder = session.make_iterator(20);
     WaterfillObject object;
-    std::deque<AsyncTask> tasks;
     while (finder->find_next(object, true)){
-        tasks.emplace_back(GlobalThreadPools::computation_realtime().dispatch_now_blocking(
-            [&, screen_area, object = std::move(object)]{
-                find_sparkles(
-                    screen_area,
-                    lock,
-                    sparkles,
-                    object
-                );
-            }
-        ));
+        objects.emplace_back(std::move(object));
     }
+
+    SpinLock lock;
+    ShinySparkleSetSwSh sparkles;
+    GlobalThreadPools::computation_realtime().run_in_parallel(
+        [&](size_t index){
+            find_sparkles(screen_area, lock, sparkles, objects[index]);
+        },
+        0, objects.size()
+    );
     return sparkles;
 }
 void ShinySparkleSetSwSh::read_from_image(size_t screen_area, const ImageViewRGB32& image){
