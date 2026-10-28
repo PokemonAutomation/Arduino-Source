@@ -60,6 +60,8 @@ public:
     // Send the sample buffers at the desired speed determined by sample rate in `audio_format` passed
     // to the constructor.
     // Retrieve sample buffer by connecting to signal `buffer_ready` from the same thread.
+    // Returns false if the file can't be opened or decoded from the start, e.g. a missing
+    // file. For a compressed file, this briefly waits for the decoder to start on its thread.
     // See comments of the class full more details.
     bool start();
 
@@ -78,9 +80,6 @@ signals:
 
     // When finished sending decoded audio frames after `start()` called
     void finished();
-
-    // Used privately to launch audio decoder woker in a separate thread.
-    void run_audio_decoder_async();
 
 private:
     void build_timer();
@@ -144,11 +143,11 @@ public:
     );
     virtual ~AudioDecoderWorker();
 
-    void start(){
-        QMetaObject::invokeMethod(this, &AudioDecoderWorker::internal_start);
-    }
-
-    bool start_succeeded(){ return m_start_succeeded; }
+    // Start decoding on the worker's thread. Returns whether the decoder
+    // started: false if it failed right away, e.g. for a missing file.
+    // This function works both on `AudioDecoderWorker`'s own Qt thread, and on
+    // another Qt thread. 
+    bool start();
 
     void stop(){
         QMetaObject::invokeMethod(this, &AudioDecoderWorker::internal_stop);
@@ -160,6 +159,9 @@ signals:
     void finished();
 
 public slots:
+    // Creates an QAudioDecoder to start decoding the file.
+    // Every Qt object (including this `AudioDecoderWorker` class) belongs to one thread, queried by `this->thread()`.
+    // Qt requires a child to be created on its parent’s thread. So internal_start() must run on the worker’s thread.
     void internal_start();
     void internal_stop();
 
@@ -179,7 +181,7 @@ private:
 
     std::vector<char>& m_decoded_buffer;
 
-    bool m_start_succeeded = true;
+    bool m_start_succeeded = false;
 };
 
 
