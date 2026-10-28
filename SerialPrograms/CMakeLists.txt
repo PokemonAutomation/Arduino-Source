@@ -348,11 +348,12 @@ if(NOT EXISTS "${DEST_DIR}/Scripts")
 endif()
 
 #  Verify that the ffmpeg headers in FFMPEG_INC_DIRS provide the ffmpeg 5.1
-#  API generation the stream history ring uses:
-#  av_channel_layout_default() (the channel layout API) and
-#  swr_alloc_set_opts2(), both introduced in 5.1 with signatures
-#  unchanged since. libavcodec's major version cannot tell 4.x from
-#  5.x (both are libavcodec 58), so grep the symbols instead of
+#  API generation: av_channel_layout_default() (the channel layout API,
+#  which the stream history ring uses) and swr_alloc_set_opts2(), both
+#  introduced in 5.1 with signatures unchanged since. (The ring no longer
+#  calls libswresample - the audio pipeline resamples - but the library is
+#  still required and linked.) libavcodec's major version cannot tell 5.0
+#  from 5.1 (both are libavcodec 59), so grep the symbols instead of
 #  comparing version numbers.
 function(pa_check_ffmpeg_51_api FFMPEG_INC_DIRS)
     set(FFMPEG_51_API_OK FALSE)

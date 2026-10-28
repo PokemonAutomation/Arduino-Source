@@ -182,7 +182,8 @@ constexpr int FRAME_WIDTH = 320;
 constexpr int FRAME_HEIGHT = 180;
 
 //  Allowed distance between the start of the tone and the first white frame
-//  in a saved file. Covers the AAC frame granularity and the millisecond
+//  in a saved file. Covers AAC pre-echo (the encoder smears some energy up
+//  to one frame, about 21 ms, ahead of the onset) and the millisecond
 //  rounding of the MKV timestamps.
 constexpr double SYNC_TOLERANCE_S = 0.03;
 
@@ -224,9 +225,12 @@ std::string output_path(const std::string& name){
 
 
 //  Feeds a tracker in 10 ms steps of simulated time: a frame every 100 ms
-//  and a 10 ms chunk of 48 kHz stereo audio per step (stamped with the
-//  time of its last sample). From "onset_ms" on, the frames are white
-//  instead of black and the audio is a 1 kHz tone instead of silence.
+//  and a 10 ms chunk of 48 kHz stereo audio per step. By default each chunk
+//  is 480 samples, delivered at the time of its last sample; with
+//  audio_clock_scale a chunk is a sample longer or shorter now and then,
+//  and with audio_jitter_ms it is delivered later. From "onset_ms" on, the
+//  frames are white instead of black and the audio is a 1 kHz tone instead
+//  of silence.
 enum class FrameFormat{
     RGB32,  //  Converted through QImage by the tracker.
     NV12,   //  The common capture card format; scaled directly from its planes.
@@ -677,8 +681,9 @@ std::string test_eviction(Logger& logger){
         return error;
     }
     //  The file starts at a keyframe at most one keyframe interval (2 s) plus
-    //  one frame before the window, and covers the window up to the rounding
-    //  of the keyframe spacing to whole frames.
+    //  one frame before the window (the upper bound), and covers the window
+    //  up to the rounding of the keyframe spacing to whole frames, less the
+    //  packets the encoder may still be holding (the lower bound).
     double interval = kept_frame_interval_s();
     return check_range(
         "The video length",

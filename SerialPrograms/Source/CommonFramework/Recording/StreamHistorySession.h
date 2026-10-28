@@ -27,10 +27,12 @@ class StreamHistorySession
 public:
     ~StreamHistorySession();
     StreamHistorySession(Logger& logger);
-    //  "device" / "format" are the audio session's active input state:
-    //  the tracker's shape and the working-stream attach shape are derived
-    //  from the resolved input choice (invalid when there is no device
-    //  input, i.e. file input or no input at all).
+    //  Starts recording (if no tracker exists yet) and attaches to the audio
+    //  session's working stream. "choice" is the resolved input choice of the
+    //  audio session's active input (invalid when there is no device input,
+    //  i.e. file input or no input at all): with the ffmpeg ring it only
+    //  decides whether audio is recorded; otherwise it also sets the shape
+    //  the tracker records and the working stream is attached at.
     void start(const AudioInputChoice& choice, bool has_video);
     bool save(const std::string& filename) const;
 
@@ -66,8 +68,9 @@ private:
     void clear();
     void initialize();
 
-    //  Attaches this session to the audio session's working stream at the
-    //  active preset's physical shape (removing any prior attach first).
+    //  Attaches this session to the audio session's working stream
+    //  (removing any prior attach first): at a fixed 48 kHz stereo for the
+    //  ffmpeg ring, at the active preset's physical shape otherwise.
     //  Must be called with no locks held.
     void attach_working_listener();
 
