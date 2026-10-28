@@ -15,9 +15,9 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "OCR_RawTesseractOCR.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace OCR{

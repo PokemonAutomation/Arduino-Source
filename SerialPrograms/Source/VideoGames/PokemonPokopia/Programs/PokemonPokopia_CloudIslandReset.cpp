@@ -8,6 +8,7 @@
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
@@ -16,7 +17,6 @@
 #include "VideoGames/PokemonPokopia/Inference/PokemonPokopia_ButtonDetector.h"
 #include "VideoGames/PokemonPokopia/Inference/PokemonPokopia_PCDetection.h"
 #include "VideoGames/PokemonPokopia/Inference/PokemonPokopia_SettingsScreenDetector.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
 
 #include "VideoGames/PokemonPokopia/Programs/PokemonPokopia_PCNavigation.h"
 #include "VideoGames/PokemonPokopia/Programs/PokemonPokopia_CloudIslandReset.h"

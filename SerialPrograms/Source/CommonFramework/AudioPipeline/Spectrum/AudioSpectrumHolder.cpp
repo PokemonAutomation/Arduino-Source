@@ -7,14 +7,14 @@
 #include <string.h>
 #include <cmath>
 #include <algorithm>
+#include <iostream>
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/AudioPipeline/AudioConstants.h"
 #include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 #include "AudioSpectrumHolder.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 

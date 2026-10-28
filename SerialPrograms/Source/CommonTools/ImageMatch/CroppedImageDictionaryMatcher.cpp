@@ -4,16 +4,16 @@
  *
  */
 
+#include <iostream>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Tools/DebugDumper.h"
-#include "ImageCropper.h"
 //#include "ImageDiff.h"
+#include "ImageCropper.h"
 #include "CroppedImageDictionaryMatcher.h"
 
-#include <iostream>
 //using std::cout;
 //using std::endl;
 

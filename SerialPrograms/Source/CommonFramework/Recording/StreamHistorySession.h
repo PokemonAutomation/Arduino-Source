@@ -11,9 +11,9 @@
 
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Containers/Pimpl.h"
+#include "Kernels/AudioPipeline/Kernels_AudioPipeline.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
 #include "CommonFramework/VideoPipeline/VideoSession.h"
-#include "Kernels/AudioPipeline/Kernels_AudioPipeline.h"
 
 namespace PokemonAutomation{
 

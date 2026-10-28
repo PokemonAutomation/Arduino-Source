@@ -9,8 +9,8 @@
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
-#include "PokemonLZA_SelectionArrowDetector.h"
 #include "Tests/TestUtils.h"
+#include "PokemonLZA_SelectionArrowDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

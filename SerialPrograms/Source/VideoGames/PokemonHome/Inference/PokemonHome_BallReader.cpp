@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <map>
 #include "Common/Cpp/Exceptions.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
@@ -14,10 +15,9 @@
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "Tests/TestUtils.h"
 #include "VideoGames/PokemonHome/Resources/PokemonHome_PokeballSprites.h"
 #include "PokemonHome_BallReader.h"
-#include "Tests/TestUtils.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -7,10 +7,10 @@
 #ifndef PokemonAutomation_PokemonRSE_SelectionDetector_H
 #define PokemonAutomation_PokemonRSE_SelectionDetector_H
 
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonTools/VisualDetector.h"
-
 #include <vector>
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+
+#include "CommonTools/VisualDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

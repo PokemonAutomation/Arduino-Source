@@ -8,6 +8,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include "Common/Qt/NoWheelComboBox.h"
+#include "PanelLists.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/ImageTypes/ImageRGB32_Qt.h"
@@ -15,9 +16,9 @@
 #include "CommonFramework/Panels/UI/PanelListWidget.h"
 #include "ML/ML_Panels.h"
 #include "NintendoSwitch/NintendoSwitch_Panels.h"
+#include "PokemonBDSP/PokemonBDSP_Panels.h"
 #include "VideoGames/PokemonSwSh/PokemonSwSh_Panels.h"
 #include "VideoGames/PokemonHome/PokemonHome_Panels.h"
-#include "PokemonBDSP/PokemonBDSP_Panels.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Panels.h"
 #include "VideoGames/PokemonLA/PokemonLA_Panels.h"
 #include "VideoGames/PokemonLGPE/PokemonLGPE_Panels.h"
@@ -26,7 +27,6 @@
 #include "VideoGames/PokemonLZA/PokemonLZA_Panels.h"
 #include "VideoGames/PokemonPokopia/PokemonPokopia_Panels.h"
 #include "VideoGames/ZeldaTotK/ZeldaTotK_Panels.h"
-#include "PanelLists.h"
 
 //#include <iostream>
 //using std::cout;

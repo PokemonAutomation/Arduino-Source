@@ -4,8 +4,8 @@
  * 
  */
 
-#include "Unicode.h"
 #include <cstdint>
+#include "Unicode.h"
 
 namespace PokemonAutomation{
 

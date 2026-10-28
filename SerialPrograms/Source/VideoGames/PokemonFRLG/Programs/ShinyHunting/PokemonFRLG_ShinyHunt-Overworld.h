@@ -7,12 +7,12 @@
 #ifndef PokemonAutomation_PokemonFRLG_ShinyHuntOverworld_H
 #define PokemonAutomation_PokemonFRLG_ShinyHuntOverworld_H
 
-#include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "VideoGames/PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 
 

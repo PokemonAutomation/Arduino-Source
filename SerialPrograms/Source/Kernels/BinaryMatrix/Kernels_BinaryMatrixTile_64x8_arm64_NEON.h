@@ -12,9 +12,9 @@
 #include "Kernels_BinaryMatrixTile_Debugging.h"
 #include "Kernels_BinaryMatrix.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace Kernels{

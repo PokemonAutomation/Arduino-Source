@@ -7,7 +7,6 @@
  *
  */
 
-#include <opencv2/opencv.hpp>
 // #include <QCoreApplication>
 // #include <QFileInfo>
 // #include <QUrl>
@@ -17,6 +16,7 @@
 // #include <QMediaRecorder>
 // #include <QMediaCaptureSession>
 // #include <QScopeGuard>
+#include <opencv2/opencv.hpp>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
@@ -26,9 +26,9 @@
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "StreamHistoryTracker_SaveFrames.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 
 namespace PokemonAutomation{

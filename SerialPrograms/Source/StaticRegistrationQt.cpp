@@ -4,8 +4,8 @@
  *
  */
 
-#include "CommonTools/Options/QtWidgets/ScreenWatchWidget.h"
 #include "StaticRegistration.h"
+#include "CommonTools/Options/QtWidgets/ScreenWatchWidget.h"
 
 //  Basic Options
 #include "Common/Qt/Options/BatchWidget.h"

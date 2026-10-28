@@ -9,8 +9,8 @@
 
 #include <vector>
 #include "Common/Cpp/Color.h"
-#include "CommonTools/VisualDetector.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonTools/VisualDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

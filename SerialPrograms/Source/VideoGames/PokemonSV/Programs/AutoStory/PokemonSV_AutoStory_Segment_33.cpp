@@ -4,17 +4,17 @@
  *
  */
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Notifications/ProgramInfo.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
-#include "CommonFramework/Notifications/ProgramInfo.h"
+
 #include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "VideoGames/PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h"
 #include "VideoGames/PokemonSV/Programs/Battles/PokemonSV_Battles.h"
-
-#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
-#include "CommonTools/Async/InferenceRoutines.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_MenuNavigation.h"

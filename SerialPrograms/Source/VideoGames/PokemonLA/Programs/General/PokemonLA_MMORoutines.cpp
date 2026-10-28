@@ -6,6 +6,7 @@
  *
  */
 
+#include <sstream>
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -22,7 +23,6 @@
 #include "VideoGames/PokemonLA/PokemonLA_Locations.h"
 #include "VideoGames/PokemonLA/PokemonLA_TravelLocations.h"
 #include "VideoGames/PokemonLA/Programs/PokemonLA_RegionNavigation.h"
-#include <sstream>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

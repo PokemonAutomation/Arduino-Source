@@ -6,13 +6,13 @@
 
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonTools/Async/InferenceRoutines.h"
-#include "VideoGames/PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
-#include "VideoGames/PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.h"
-#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
-#include "Pokemon/Pokemon_Strings.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "Pokemon/Pokemon_Strings.h"
+#include "VideoGames/PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
+#include "VideoGames/PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.h"
 #include "PokemonLZA_TurboMacro.h"
 
 //#include <iostream>

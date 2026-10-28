@@ -4,6 +4,8 @@
  *
  */
 
+#include <format>
+#include <iostream>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
@@ -15,13 +17,11 @@
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "CommonTools/OCR/OCR_SmallDictionaryMatcher.h"
-#include "CommonTools/Images/SolidColorTest.h"
-#include "PokemonLZA_FlavorPowerDetector.h"
 // #include "CommonTools/ImageMatch/ImageMatchResult.h"
 // #include "CommonTools/ImageMatch/CroppedImageDictionaryMatcher.h"
 
-#include <format>
-#include <iostream>
+#include "CommonTools/Images/SolidColorTest.h"
+#include "PokemonLZA_FlavorPowerDetector.h"
 using std::cout;
 using std::endl;
 

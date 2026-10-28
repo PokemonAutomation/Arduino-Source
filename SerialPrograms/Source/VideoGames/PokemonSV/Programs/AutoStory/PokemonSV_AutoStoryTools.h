@@ -8,11 +8,11 @@
 #define PokemonAutomation_PokemonSV_AutoStoryTools_H
 
 #include <functional>
-#include "ML/Inference/ML_YOLOv5Detector.h"
-#include "ML/Inference/ML_YOLONavigation.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "ML/Inference/ML_YOLOv5Detector.h"
+#include "ML/Inference/ML_YOLONavigation.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_WorldNavigation.h"
 

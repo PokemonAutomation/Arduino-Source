@@ -7,8 +7,10 @@
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/TestRunners/TestImageDistortionManager.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Common/Qt/QtThreadPool_Tests.h"
+#include "Kernels/Kernels_Tests.h"
 #include "CommonFramework/AudioPipeline/AudioInfo_Tests.h"
 #include "CommonFramework/AudioPipeline/ChannelMixer.h"
 #include "CommonFramework/AudioPipeline/SinkPipeline_Tests.h"
@@ -18,14 +20,14 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/VisualDetectors/BlackBorderDetector.h"
+#include "CommonTools/OCR/OCR_Tests.h"
+#include "ComputerPrograms_UnitTestRunner.h"
+
 #include "NintendoSwitch/Inference/NintendoSwitch_CheckOnlineDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_FailedToConnectDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h"
 #include "NintendoSwitch/Programs/Typewriter/NintendoSwitch_Typewriter_Tests.h"
-#include "UnitTestRunner.h"
 
-#include "CommonTools/OCR/OCR_Tests.h"
-#include "Kernels/Kernels_Tests.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Tests.h"
 #include "VideoGames/PokemonRSE/PokemonRSE_Tests.h"
 #include "VideoGames/PokemonHome/PokemonHome_Tests.h"
@@ -346,7 +348,25 @@ void UnitTestRunner::on_test_finished(
 
 
 
-bool CommandLineUnitTestRunner::run(){
+bool CommandLineUnitTestRunner::run(bool augment_color_distortions){
+    if (augment_color_distortions){
+        //  Load the distortion data before any test runs. Each `ImageUnitTest` checks the global
+        //  manager when it runs, and only runs with distortions if it is loaded.
+        try{
+            initialize_test_image_distortions(UNIT_TEST_RESOURCE_PATH());
+        }catch (Exception& e){
+            m_logger.log("Unable to load the test image distortions: " + e.to_str(), COLOR_RED);
+            return true;
+        }
+        const TestImageDistortionManager& manager = *test_image_distortion_manager();
+        std::string labels;
+        for (size_t c = 0; c < manager.num_test_distortions(); c++){
+            labels += c == 0 ? "" : ", ";
+            labels += manager.test_distortion_label(c);
+        }
+        m_logger.log("Color distortion augmentation enabled. Image tests with labeled images also run with: " + labels);
+    }
+
     PokemonAutomation::UnitTestRunner runner(
         m_logger,
         GlobalThreadPools::computation_normal()
@@ -363,7 +383,7 @@ bool CommandLineUnitTestRunner::run(){
         "\n    Failed:  " + tostr_u_commas(m_failed_tests.load(std::memory_order_acquire)) +
         "\n    Skipped: " + tostr_u_commas(m_skipped_tests.load(std::memory_order_acquire))
     );
-    return m_failed_tests.load(std::memory_order_acquire) != 0;
+    return m_failed_tests.load(std::memory_order_acquire) > 0;
 }
 void CommandLineUnitTestRunner::on_test_finished(
     std::shared_ptr<const UnitTest> test,

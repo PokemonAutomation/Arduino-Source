@@ -7,8 +7,8 @@
 #ifdef PA_AutoDispatch_x64_17_Skylake
 
 #include <immintrin.h>
-#include "Kernels_SpikeConvolution_Routines.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "Kernels_SpikeConvolution_Routines.h"
 #include "Kernels_SpikeConvolution_TestInfra.h"
 
 namespace PokemonAutomation{

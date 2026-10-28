@@ -4,12 +4,12 @@
  *
  */
 
+#include <iostream>
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
-#include "PokemonBDSP_BoxDetector.h"
 
-#include <iostream>
+#include "PokemonBDSP_BoxDetector.h"
 using std::cout;
 using std::endl;
 

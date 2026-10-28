@@ -8,8 +8,8 @@
 #define PokemonAutomation_PokemonSwSh_BoxEmptySlotDetector_H
 
 #include "Common/Cpp/Color.h"
-#include "CommonTools/VisualDetector.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonTools/VisualDetector.h"
 #include "PokemonSwSh_BoxEggDetector.h"
 // #include "CommonTools/ImageMatch/ExactImageDictionaryMatcher.h"
 // #include "CommonTools/ImageMatch/CroppedImageDictionaryMatcher.h"

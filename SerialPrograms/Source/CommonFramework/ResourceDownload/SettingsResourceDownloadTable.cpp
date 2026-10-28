@@ -9,13 +9,9 @@
 #include "SettingsResourceDownloadRow.h"
 #include "SettingsResourceDownloadTable.h"
 
-// #include <filesystem>
-// #include <thread>
-// #include <unordered_set>
-
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 

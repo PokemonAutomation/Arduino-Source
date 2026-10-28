@@ -4,8 +4,12 @@
  *
  */
 
-#include "Common/Cpp/CpuId/CpuId.h"
 
+#include <thread>
+#include <iostream>
+#include "Common/Cpp/CpuId/CpuId.h"
+#include "SpinPause.h"
+#include "SpinLock.h"
 
 #if 0
 #elif defined _WIN32 && defined PA_ARCH_x86
@@ -30,15 +34,6 @@ uint64_t cpu_clock(){
 #else
 #define PA_NO_CPU_CLOCK
 #endif
-
-
-#include <thread>
-#include "SpinPause.h"
-#include "SpinLock.h"
-
-#include <iostream>
-using std::cout;
-using std::endl;
 
 namespace PokemonAutomation{
 
@@ -96,7 +91,7 @@ void SpinLockMRSW::internal_acquire_read(const char* label) noexcept{
         }
         if (cpu_clock() - start > 10000000000){
             try{
-                cout << "Slow ReadSpinLock: " << label << endl;
+                std::cout << "Slow ReadSpinLock: " << label << std::endl;
             }catch (...){}
             start = cpu_clock();
         }
@@ -120,7 +115,7 @@ void SpinLockMRSW::internal_acquire_write(const char* label) noexcept{
         pause();
         if (cpu_clock() - start > 10000000000){
             try{
-                cout << "Slow WriteSpinLock: " << label << endl;
+                std::cout << "Slow WriteSpinLock: " << label << std::endl;
             }catch (...){}
             start = cpu_clock();
         }

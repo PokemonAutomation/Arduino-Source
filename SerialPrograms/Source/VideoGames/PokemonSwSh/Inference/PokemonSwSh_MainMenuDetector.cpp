@@ -4,10 +4,10 @@
  *
  */
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/Images/SolidColorTest.h"
-#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "PokemonSwSh_MainMenuDetector.h"
 
 //#include <iostream>

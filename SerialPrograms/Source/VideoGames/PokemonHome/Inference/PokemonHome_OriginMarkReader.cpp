@@ -6,12 +6,12 @@
 
 #include <map>
 #include <vector>
-#include "CommonTools/Images/WaterfillUtilities.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/DetectedBoxes.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "PokemonHome_OriginMarkReader.h"
 
 namespace PokemonAutomation{

@@ -11,8 +11,8 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
-#include "PokemonLZA_ButtonDetector.h"
 #include "Tests/TestUtils.h"
+#include "PokemonLZA_ButtonDetector.h"
 
 // using std::cout;
 // using std::endl;

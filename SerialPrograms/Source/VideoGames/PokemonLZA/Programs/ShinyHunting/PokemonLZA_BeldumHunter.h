@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonLZA_BeldumHunter_H
 #define PokemonAutomation_PokemonLZA_BeldumHunter_H
 
-#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "VideoGames/PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 

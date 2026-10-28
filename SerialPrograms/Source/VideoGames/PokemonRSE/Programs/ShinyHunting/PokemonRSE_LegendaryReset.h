@@ -7,11 +7,11 @@
 #ifndef PokemonAutomation_PokemonRSE_LegendaryReset_H
 #define PokemonAutomation_PokemonRSE_LegendaryReset_H
 
+#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
-#include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "VideoGames/PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 
 namespace PokemonAutomation{

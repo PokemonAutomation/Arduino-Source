@@ -4,11 +4,11 @@
  *
  */
 
+#include <iostream>
 #include "Common/Cpp/Filesystem/FileIO.h"
 #include "Common/Cpp/Time.h"
-#include "StatsDatabase.h"
 
-#include <iostream>
+#include "StatsDatabase.h"
 using std::cout;
 using std::endl;
 

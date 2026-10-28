@@ -4,6 +4,7 @@
  *
  */
 
+#include <iostream>
 #include "Common/Cpp/Color.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
@@ -16,7 +17,6 @@
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "WaterfillUtilities.h"
 
-#include <iostream>
 using std::cout;
 using std::endl;
 

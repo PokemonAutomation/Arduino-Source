@@ -10,12 +10,12 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "VideoGames/PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_EncounterHandler.h"
 #include "PokemonBDSP_ShinyHunt-Shaymin.h"
+#include "VideoGames/PokemonSwSh/ShinyHuntTracker.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

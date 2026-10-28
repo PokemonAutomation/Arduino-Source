@@ -4,13 +4,13 @@
  *
  */
 
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+
 #include "VideoGames/PokemonSV/Inference/PokemonSV_WhiteTriangleDetector.h"
 #include "VideoGames/PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
-#include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
-
-#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_WorldNavigation.h"

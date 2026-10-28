@@ -18,9 +18,19 @@
  *    Test files are loaded relative to `UNIT_TEST_RESOURCE_PATH()`, which finds the
  *    CommandLineTests repo (https://github.com/PokemonAutomation/CommandLineTests) next to
  *    the program.
- *  - Each module registers its test cases in an `add_tests(UnitTestDatabase&)` function, and
- *    ComputerPrograms/UnitTestRunner.cpp collects all of them.
- *  - The tests are run in parallel by `ParallelUnitTestRunner`, within memory and thread limits.
+ *  - Each module registers its test cases in an `add_tests_<Name>(UnitTestDatabase&)` function in
+ *    SerialPrograms/Source/ComputerPrograms/ComputerPrograms_UnitTestRunner.cpp.
+ *  - The tests are run in parallel by `UnitTestRunner` (Common/Cpp/TestRunners/ParallelUnitTestRunner.h),
+ *    within memory and thread limits.
+ *
+ *  Capture card distortions:
+ *  Pass "--augment-color-distortions" to run image tests with color distortion augmentation.
+ *  Each `ImageUnitTest` then also runs on its images re-colored like a few extreme capture card
+ *  setups, and fails if any of those runs fails. Its failure message names each failing setting, e.g.
+ *      [Win-MYPIN] Error: ...
+ *  This needs the CaptureCardCalibration/ folder of the CommandLineTests repo: if it can't be
+ *  loaded, no test runs and the program returns 1. See SerialPrograms/Source/Tests/ImageUnitTest.h
+ *  and Common/Cpp/TestRunners/TestImageDistortionManager.h.
  *
  *  The same tests can also be run from the GUI with the "Unit Test Runner" program, which can
  *  run a single test, the tests matching a substring, or all tests.
@@ -36,8 +46,10 @@ namespace PokemonAutomation{
 
 // Called by main() to run all the unit tests on command line, without launching any GUI.
 // This function is only called when GlobalSettings::COMMAND_LINE_TEST_MODE is true.
-// Return 0 if all tests are passed.
-int run_command_line_tests();
+// `augment_color_distortions` is set by the "--augment-color-distortions" argument: also run image tests
+// with color distortion augmentation, using the distortion data from the test repo.
+// Return 0 if all tests are passed, and 1 if any test failed or the distortion data can't be loaded.
+int run_command_line_tests(bool augment_color_distortions);
 
 
 

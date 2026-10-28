@@ -8,8 +8,8 @@
 #include <iostream>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonTools/Async/InferenceSession.h"
-#include "Pokemon/Pokemon_Strings.h"
 #include "NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonLGPE/Inference/Sounds/PokemonLGPE_ShinySoundDetector.h"
 #include "PokemonLGPE_SoundListener.h"
 

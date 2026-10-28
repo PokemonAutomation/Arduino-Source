@@ -6,8 +6,8 @@
 
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
-#include "VideoGames/PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h"
 #include "PokemonBDSP_PokeballSpriteMatcher.h"
+#include "VideoGames/PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

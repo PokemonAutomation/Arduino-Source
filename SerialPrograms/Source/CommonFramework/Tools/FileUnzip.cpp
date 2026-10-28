@@ -13,17 +13,14 @@
 #endif
 
 
+#include <filesystem>
+#include <fstream>
+#include <iostream>
 #include "miniz-3.1.1/miniz.h"
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "FileUnzip.h"
-#include <filesystem>
-#include <fstream>
-
-#include <iostream>
-using std::cout;
-using std::endl;
 
 namespace PokemonAutomation{
 
@@ -95,7 +92,7 @@ bool is_safe(const std::string& target_dir, const std::string& entry_name){
 
         return true;
     } catch (...){
-        cout << "target_dir path doesn't exist." << endl;
+        std::cout << "target_dir path doesn't exist." << std::endl;
         return false;
     }
 }

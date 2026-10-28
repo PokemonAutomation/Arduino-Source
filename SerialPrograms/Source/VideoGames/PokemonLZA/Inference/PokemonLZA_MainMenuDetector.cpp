@@ -8,8 +8,8 @@
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "PokemonLZA_MainMenuDetector.h"
 #include "Tests/TestUtils.h"
+#include "PokemonLZA_MainMenuDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -9,8 +9,8 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
-#include "PokemonHome_ButtonDetector.h"
 #include "Tests/TestUtils.h"
+#include "PokemonHome_ButtonDetector.h"
 
 //#include <iostream>
 //using std::cout;

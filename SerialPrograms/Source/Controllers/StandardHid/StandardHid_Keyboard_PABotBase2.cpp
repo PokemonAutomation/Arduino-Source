@@ -4,9 +4,9 @@
  *
  */
 
-#include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
-#include "Common/PABotBase2/Controllers/PABotBase2_Controller_HID_Keyboard.h"
 #include "Common/Cpp/ColoredText.h"
+#include "Common/PABotBase2/Controllers/PABotBase2_Controller_HID_Keyboard.h"
+#include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
 #include "StandardHid_Keyboard_PABotBase2.h"
 
 namespace PokemonAutomation{

@@ -6,8 +6,8 @@
 
 #include <algorithm>
 #include <utility>
-#include <QMenuBar>
 //#include <QStatusBar>
+#include <QMenuBar>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGroupBox>
@@ -18,11 +18,14 @@
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Logging/MultiOutputLogger.h"
+#include "Common/Cpp/Logging/GlobalLogger.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/CpuId/CpuId.h"
+#include "Common/Cpp/ColoredText.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "Common/Qt/UiStateQtWidget.h"
 #include "Common/Qt/WallpaperWidget.h"
+#include "PanelLists.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -30,17 +33,14 @@
 #include "CommonFramework/Startup/NewVersionCheck.h"
 #include "CommonFramework/Options/ResolutionOption.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
-#include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/Windows/DpiScaler.h"
-#include "PanelLists.h"
 #include "WindowTracker.h"
 #include "ButtonDiagram.h"
 #include "MainWindow.h"
 
-
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 

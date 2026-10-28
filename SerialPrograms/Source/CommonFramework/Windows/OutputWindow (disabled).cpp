@@ -4,15 +4,15 @@
  *
  */
 
+#include "OutputWindow.h"
+//#include <QStatusBar>
 #include <QCoreApplication>
 #include <QMenuBar>
-//#include <QStatusBar>
 #include "CommonFramework/PersistentSettings.h"
-#include "OutputWindow.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 

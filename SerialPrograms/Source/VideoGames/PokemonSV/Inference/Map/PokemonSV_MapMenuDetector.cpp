@@ -9,8 +9,8 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/Images/SolidColorTest.h"
-#include "PokemonSV_MapMenuDetector.h"
 #include "Tests/TestUtils.h"
+#include "PokemonSV_MapMenuDetector.h"
 
 //#include <iostream>
 //using std::cout;

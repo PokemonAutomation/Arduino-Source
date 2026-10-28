@@ -4,6 +4,7 @@
  *
  */
 
+#include <fstream>
 #include "Common/Cpp/Filesystem/FilePath.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
@@ -11,16 +12,15 @@
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
-#include "CommonTools/ImageMatch/ImageCropper.h"
 //#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "CommonTools/ImageMatch/ImageCropper.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "CommonTools/Images/SolidColorTest.h"
-#include "VideoGames/PokemonLZA/Resources/PokemonLZA_DonutBerries.h"
-#include "PokemonLZA_DonutBerriesDetector.h"
 #include "Tests/TestUtils.h"
+#include "VideoGames/PokemonLZA/Resources/PokemonLZA_DonutBerries.h"
 
-#include <fstream>
+#include "PokemonLZA_DonutBerriesDetector.h"
 //#include <iostream>
 //using std::cout;
 //using std::endl;

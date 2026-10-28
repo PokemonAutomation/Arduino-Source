@@ -9,8 +9,8 @@
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
-#include "VideoGames/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorRadial.h"
 #include "PokemonBDSP_ShinySparkleSet.h"
+#include "VideoGames/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorRadial.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
