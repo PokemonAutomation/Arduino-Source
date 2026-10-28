@@ -9,7 +9,7 @@
 
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "VideoGames/PokemonSV/Programs/Farming/PokemonSV_BlueberryQuests.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "VideoGames/PokemonSV/Options/PokemonSV_BBQOption.h"
 
 using namespace std;
@@ -18,6 +18,12 @@ namespace PokemonAutomation{
     struct ProgramInfo;
 namespace NintendoSwitch{
 namespace PokemonSV{
+
+enum class CameraAngle{
+    none,
+    up,
+    down
+};
 
 //Navigate to a photo target
 CameraAngle quest_photo_navi(

@@ -25,6 +25,7 @@
 #include "Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "Inference/Picnics/PokemonSV_SandwichRecipeDetector.h"
 #include "Inference/Picnics/PokemonSV_SandwichHandDetector.h"
+#include "Options/PokemonSV_BBQuests.h"
 #include "Programs/Farming/PokemonSV_BlueberryQuests.h"
 #include "PokemonSV_Tests.h"
 
@@ -84,9 +85,39 @@ void add_tests_TeraEncounterAction(UnitTestDatabase& database){
     }
 }
 
+namespace{
 
+class Test_BBQuestsSlugs : public UnitTest{
+public:
+    Test_BBQuestsSlugs()
+        : UnitTest("PokemonSV::BBQuests - slug round trip")
+    {}
+
+    virtual UnitTestResult run(Logger&, CancellableScope&) const override{
+        for (int c = 0; c < (int)BBQuests::UnableToDetect; c++){
+            const BBQuests quest = (BBQuests)c;
+            const std::string& slug = BBQuests_enum_to_string(quest);
+            if (slug.empty()){
+                return "Quest " + std::to_string(c) + " has no slug.";
+            }
+            if (BBQuests_string_to_enum(slug) != quest){
+                return "Slug " + slug + " does not map back to quest " + std::to_string(c) + ".";
+            }
+        }
+        if (!BBQuests_enum_to_string(BBQuests::UnableToDetect).empty()){
+            return "UnableToDetect must map to the empty slug.";
+        }
+        if (BBQuests_string_to_enum("not-a-quest") != BBQuests::UnableToDetect){
+            return "An unrecognized slug must map to UnableToDetect.";
+        }
+        return true;
+    }
+};
+
+}
 
 void add_tests(UnitTestDatabase& database){
+    database.add<Test_BBQuestsSlugs>();
     add_tests_WhiteButtonDetector(database);
     add_tests_BoxInfoDetector(database);
     add_tests_BoxEggDetector(database);

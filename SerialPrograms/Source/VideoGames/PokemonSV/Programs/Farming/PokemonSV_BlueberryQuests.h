@@ -18,14 +18,6 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-BBQuests BBQuests_string_to_enum(const std::string& token);
-
-enum class CameraAngle{
-    none,
-    up,
-    down
-};
-
 //Basic blue quests
 const std::set<BBQuests> blue_quests = {
     BBQuests::auto_10, BBQuests::make_tm, BBQuests::pickup_10, BBQuests::sneak_up, BBQuests::photo_fly, BBQuests::photo_swim, BBQuests::photo_canyon, BBQuests::photo_coastal, BBQuests::photo_polar, BBQuests::photo_savanna, BBQuests::tera_self_defeat, 
