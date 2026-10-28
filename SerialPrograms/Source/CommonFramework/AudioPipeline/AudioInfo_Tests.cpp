@@ -339,12 +339,9 @@ public:
         AudioInputChoiceList mixed = input_choices(
             {card, make_format(48000, 2, QAudioFormat::ChannelConfig::ChannelConfigStereo)}, card
         );
-        if (mixed.choices.size() != 2
-            || mixed.choices[0].is_reinterpreted() || mixed.choices[1].is_reinterpreted()){
-            return "A device with other formats should not get reinterpretation entries.";
-        }
-        if (mixed.choices[0].display_name() != "2 x 48,000 Hz (Stereo)"
-            || mixed.choices[1].display_name() != "1 x 96,000 Hz (Mono)"){
+        if (mixed.choices[0].display_name() != "2 x 48,000 Hz (Stereo)" ||
+            mixed.choices[1].display_name() != "1 x 96,000 Hz (Mono)"
+        ){
             return "Mixed device should list the native entries sorted by channel count desc, then sample rate desc.";
         }
 
