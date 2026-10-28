@@ -322,12 +322,12 @@ void AudioSelectorWidget::post_input_change(const std::string& file, const Audio
     QMetaObject::invokeMethod(this, [this, device, file, choice]{
         refresh_input_device(file, device);
         refresh_formats(file, device, choice);
-    });
+    }, Qt::QueuedConnection);   //  Queued due to potential recursive call to the same lock.
 }
 void AudioSelectorWidget::post_output_change(const AudioDeviceInfo& device){
     QMetaObject::invokeMethod(this, [this, device]{
         refresh_output_device(device);
-    });
+    }, Qt::QueuedConnection);   //  Queued due to potential recursive call to the same lock.
 }
 void AudioSelectorWidget::post_volume_change(double volume){
 //    if (m_slider_active.load(std::memory_order_acquire)){
