@@ -21,6 +21,16 @@ namespace PokemonAutomation{
 
 
 
+
+std::string AudioSourceDescriptor_File::path() const{
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
+    return m_path;
+}
+void AudioSourceDescriptor_File::set_path(std::string path){
+    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
+    m_path = std::move(path);
+}
+
 bool AudioSourceDescriptor_File::operator==(const AudioSourceDescriptor& x) const{
     if (typeid(*this) != typeid(x)){
         return false;
@@ -32,13 +42,9 @@ bool AudioSourceDescriptor_File::operator==(const AudioSourceDescriptor& x) cons
     return m_path == other_path;
 }
 
-std::string AudioSourceDescriptor_File::path() const{
-    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-    return m_path;
-}
-void AudioSourceDescriptor_File::set_path(std::string path){
-    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-    m_path = std::move(path);
+bool AudioSourceDescriptor_File::sanitize_desired_format(Logger& logger, AudioInputChoice& format) const{
+    format = AudioInputChoice();
+    return true;
 }
 
 void AudioSourceDescriptor_File::run_post_select(){

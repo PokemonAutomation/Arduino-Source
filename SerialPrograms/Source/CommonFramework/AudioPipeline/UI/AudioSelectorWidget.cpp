@@ -14,6 +14,8 @@
 #include "CommonFramework/Panels/ConsoleSettingsStretch.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
 #include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
+#include "CommonFramework/AudioPipeline/AudioSources/AudioSource_File.h"
+#include "CommonFramework/AudioPipeline/AudioSources/AudioSource_Device.h"
 #include "AudioDisplayWidget.h"
 #include "AudioSelectorWidget.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -117,10 +119,14 @@ AudioSelectorWidget::AudioSelectorWidget(QWidget& parent, AudioSession& session)
                 if (path.empty()){
                     m_session.clear_audio_input();
                 }else{
-                    m_session.set_audio_input(std::move(path));
+                    m_session.set_audio_input(std::make_unique<AudioSourceDescriptor_File>(
+                        std::move(path)
+                    ));
                 }
             }else{
-                m_session.set_audio_input(m_input_audios[index - 2]);
+                m_session.set_audio_input(std::make_unique<AudioSourceDescriptor_Device>(
+                    m_input_audios[index - 2]
+                ));
             }
         }
     );

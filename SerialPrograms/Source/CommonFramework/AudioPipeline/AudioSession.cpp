@@ -149,32 +149,23 @@ void AudioSession::clear_audio_input(){
     //  be displayed as a non-moving freq-bars or spectrum instead of black.
     m_spectrum_holder.clear();
 }
-void AudioSession::set_audio_input(std::string file){
+void AudioSession::set_audio_input(const std::shared_ptr<AudioSourceDescriptor>& source){
     std::lock_guard<Mutex> lg(m_lock);
+    m_logger.log("Setting audio input to: " + source->display_name());
     signal_pre_input_change();
-    m_option.m_input_file = std::move(file);
+    if (source->type == AudioSourceType::Device){
+        m_option.m_input_device = static_cast<AudioSourceDescriptor_Device*>(source.get())->device_info();
+    }else{
+        m_option.m_input_file = static_cast<AudioSourceDescriptor_File*>(source.get())->path();
+    }
     m_option.m_input_choice = AudioInputChoice();
-    m_devices->set_audio_source(
-        std::make_unique<AudioSourceDescriptor_File>(m_option.m_input_file),
-        m_option.m_input_choice
-    );
-    signal_post_input_change();
-}
-void AudioSession::set_audio_input(AudioDeviceInfo info){
-    std::lock_guard<Mutex> lg(m_lock);
-    m_logger.log("Setting audio input to: " + info.display_name());
-    signal_pre_input_change();
-    m_option.m_input_file.clear();
-    m_option.m_input_device = std::move(info);
-    m_option.m_input_choice = AudioInputChoice();
-    if (sanitize_choice()){
-        m_devices->set_audio_source(
-            std::make_unique<AudioSourceDescriptor_Device>(m_option.m_input_device),
-            m_option.m_input_choice
-        );
+
+    if (source->sanitize_desired_format(m_logger, m_option.m_input_choice)){
+        m_devices->set_audio_source(source, m_option.m_input_choice);
     }else{
         m_devices->clear_audio_source();
     }
+
     signal_post_input_change();
 }
 void AudioSession::set_input_choice(const AudioInputChoice& choice){
@@ -239,6 +230,7 @@ bool AudioSession::sanitize_choice(){
         m_option.m_input_choice = AudioInputChoice();
         return true;
     }
+
     AudioDeviceInfo& info = m_option.m_input_device;
     const std::vector<AudioInputChoice>& choices = info.supported_choices();
     const size_t preferred_index = info.preferred_choice_index();
