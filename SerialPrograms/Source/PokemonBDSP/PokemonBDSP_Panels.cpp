@@ -7,42 +7,42 @@
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 
+#include "PokemonBDSP_Panels.h"
+#include "PokemonBDSP_Settings.h"
+
 #include "Programs/General/PokemonBDSP_MassRelease.h"
 #include "Programs/General/PokemonBDSP_AutonomousBallThrower.h"
 
 #include "Programs/Trading/PokemonBDSP_SelfBoxTrade.h"
 #include "Programs/Trading/PokemonBDSP_SelfTouchTrade.h"
-
 #include "Programs/Farming/PokemonBDSP_MoneyFarmerRoute210.h"
 #include "Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.h"
 #include "Programs/Farming/PokemonBDSP_DoublesLeveling.h"
 #include "Programs/Farming/PokemonBDSP_AmitySquarePickUpFarmer.h"
+
 #include "Programs/Farming/PokemonBDSP_PoffinCooker.h"
 #include "Programs/Farming/PokemonBDSP_GiftBerryReset.h"
-
 #include "Programs/ShinyHunting/PokemonBDSP_StarterReset.h"
 #include "Programs/ShinyHunting/PokemonBDSP_LegendaryReset.h"
 #include "Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Overworld.h"
+
 #include "Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Fishing.h"
 #include "Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Shaymin.h"
-
 #include "Programs/Eggs/PokemonBDSP_EggFetcher.h"
+
 #include "Programs/Eggs/PokemonBDSP_EggHatcher.h"
 #include "Programs/Eggs/PokemonBDSP_EggAutonomous.h"
-
 #include "Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.3.h"
+
 #include "Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.2.h"
 #include "Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy2.h"
 
 #include "Programs/RngManipulation/PokemonBDSP_BedroomSeedFinder.h"
 #include "Programs/RngManipulation/PokemonBDSP_IntroSeedFinder.h"
-
 #include "Programs/TestPrograms/PokemonBDSP_ShinyEncounterTester.h"
+
 #include "Programs/TestPrograms/PokemonBDSP_SoundListener.h"
 #include "Programs/TestPrograms/PokemonBDSP_SummaryReaderTester.h"
-
-#include "PokemonBDSP_Panels.h"
-#include "PokemonBDSP_Settings.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

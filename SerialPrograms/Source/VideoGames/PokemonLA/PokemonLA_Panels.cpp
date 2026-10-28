@@ -8,45 +8,45 @@
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "Pokemon/Pokemon_Strings.h"
 
+#include "PokemonLA_Panels.h"
+#include "PokemonLA_Settings.h"
 #include "Programs/General/PokemonLA_BraviaryHeightGlitch.h"
 #include "Programs/General/PokemonLA_DistortionWaiter.h"
 #include "Programs/General/PokemonLA_OutbreakFinder.h"
 #include "Programs/General/PokemonLA_ClothingBuyer.h"
 #include "Programs/General/PokemonLA_SkipToFullMoon.h"
 #include "Programs/General/PokemonLA_PokedexTasksReader.h"
+
 #include "Programs/General/PokemonLA_RamanasIslandCombee.h"
 #include "Programs/General/PokemonLA_ApplyGrits.h"
 
 #include "Programs/Trading/PokemonLA_SelfBoxTrade.h"
 #include "Programs/Trading/PokemonLA_SelfTouchTrade.h"
-
 #include "Programs/Farming/PokemonLA_IngoBattleGrinder.h"
 #include "Programs/Farming/PokemonLA_IngoMoveGrinder.h"
 #include "Programs/Farming/PokemonLA_MagikarpMoveGrinder.h"
 #include "Programs/Farming/PokemonLA_NuggetFarmerHighlands.h"
+
 #include "Programs/Farming/PokemonLA_TenacityCandyFarmer.h"
 #include "Programs/Farming/PokemonLA_LeapGrinder.h"
 
 #include "Programs/ShinyHunting/PokemonLA_AutoMultiSpawn.h"
 #include "Programs/ShinyHunting/PokemonLA_GalladeFinder.h"
-
 #include "Programs/ShinyHunting/PokemonLA_CrobatFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_FroslassFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_BurmyFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_UnownFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.h"
+
 #include "Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.h"
 #include "Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.h"
-
 #include "Programs/TestPrograms/PokemonLA_MountDetectionTest.h"
 #include "Programs/TestPrograms/PokemonLA_OverworldWatcher.h"
+
 #include "Programs/TestPrograms/PokemonLA_FlagNavigationTest.h"
+
 #include "Programs/TestPrograms/PokemonLA_SoundListener.h"
-
 #include "Programs/ML/PokemonLA_GeneratePokemonImageTrainingData.h"
-
-#include "PokemonLA_Panels.h"
-#include "PokemonLA_Settings.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

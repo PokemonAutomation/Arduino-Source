@@ -6,56 +6,58 @@
 
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "Programs/QoLMacros/PokemonSwSh_FastCodeEntry.h"
+#include "PokemonSwSh_Panels.h"
 
+#include "PokemonSwSh_Settings.h"
+
+#include "Programs/QoLMacros/PokemonSwSh_FastCodeEntry.h"
 #include "Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.h"
 
 #include "Programs/General/PokemonSwSh_MassRelease.h"
 #include "Programs/General/PokemonSwSh_SurpriseTrade.h"
-
 #include "Programs/General/PokemonSwSh_TradeBot.h"
 #include "Programs/General/PokemonSwSh_ClothingBuyer.h"
 #include "Programs/General/PokemonSwSh_AutonomousBallThrower.h"
 #include "Programs/General/PokemonSwSh_DexRecFinder.h"
 #include "Programs/General/PokemonSwSh_BoxReorderNationalDex.h"
+
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-WattFarmer.h"
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-BerryFarmer.h"
-
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-BerryFarmer2.h"
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-LotoFarmer.h"
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-StowOnSideFarmer.h"
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-DailyHighlightFarmer.h"
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-PokeJobsFarmer.h"
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-WattTraderFarmer.h"
+
 #include "Programs/DenHunting/PokemonSwSh_PurpleBeamFinder.h"
 #include "Programs/DenHunting/PokemonSwSh_EventBeamFinder.h"
-
 #include "Programs/DenHunting/PokemonSwSh_DaySkipperJPN.h"
 #include "Programs/DenHunting/PokemonSwSh_DaySkipperEU.h"
 #include "Programs/DenHunting/PokemonSwSh_DaySkipperUS.h"
 #include "Programs/DenHunting/PokemonSwSh_DaySkipperJPN-7.8k.h"
+
 #include "Programs/Hosting/PokemonSwSh_DenRoller.h"
 #include "Programs/Hosting/PokemonSwSh_AutoHost-Rolling.h"
-
 #include "Programs/Hosting/PokemonSwSh_AutoHost-MultiGame.h"
+
 #include "Programs/NonShinyHunting/PokemonSwSh_StatsReset.h"
 #include "Programs/NonShinyHunting/PokemonSwSh_StatsReset-Calyrex.h"
-
 #include "Programs/NonShinyHunting/PokemonSwSh_StatsReset-Moltres.h"
 #include "Programs/NonShinyHunting/PokemonSwSh_StatsReset-Regi.h"
+
 #include "Programs/EggPrograms/PokemonSwSh_EggAutonomous.h"
 #include "Programs/EggPrograms/PokemonSwSh_EggFetcher2.h"
-
 #include "Programs/EggPrograms/PokemonSwSh_EggFetcherMultiple.h"
 #include "Programs/EggPrograms/PokemonSwSh_EggHatcher.h"
 #include "Programs/EggPrograms/PokemonSwSh_GodEggDuplication.h"
 #include "Programs/EggPrograms/PokemonSwSh_GodEggItemDupe.h"
+
 #include "Programs/ShinyHuntUnattended/PokemonSwSh_MultiGameFossil.h"
 #include "Programs/ShinyHuntUnattended/PokemonSwSh_CurryHunter.h"
 
 #include "Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Regi.h"
 #include "Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-SwordsOfJustice.h"
-
 #include "Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-StrongSpawn.h"
 #include "Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Regigigas2.h"
 #include "Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-IoATrade.h"
@@ -63,24 +65,22 @@
 #include "Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Whistling.h"
 #include "Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Fishing.h"
 #include "Programs/OverworldBot/PokemonSwSh_ShinyHuntAutonomous-Overworld.h"
+
 #include "Programs/RNG/PokemonSwSh_CramomaticRNG.h"
 #include "Programs/RNG/PokemonSwSh_DailyHighlightRNG.h"
-
 #include "Programs/RNG/PokemonSwSh_SeedFinder.h"
+
 #include "Programs/PokemonSwSh_SynchronizedSpinning.h"
 #include "Programs/PokemonSwSh_RaidItemFarmerOKHO.h"
 
 #include "MaxLair/PokemonSwSh_MaxLair_Standard.h"
 #include "MaxLair/PokemonSwSh_MaxLair_StrongBoss.h"
-
 #include "MaxLair/PokemonSwSh_MaxLair_BossFinder.h"
+
 #include "Programs/TestPrograms/PokemonSwSh_ShinyEncounterTester.h"
 #include "InferenceTraining/PokemonSwSh_GenerateIVCheckerOCR.h"
-
 #include "InferenceTraining/PokemonSwSh_GenerateNameOCRPokedex.h"
 #include "InferenceTraining/PokemonSwSh_GeneratePokedexSprites.h"
-#include "PokemonSwSh_Panels.h"
-#include "PokemonSwSh_Settings.h"
 
 
 namespace PokemonAutomation{

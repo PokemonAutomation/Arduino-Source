@@ -9,16 +9,18 @@
 #include "Pokemon/Pokemon_Strings.h"
 
 //  General
+#include "PokemonLZA_Panels.h"
+#include "PokemonLZA_Settings.h"
+#include "Programs/PokemonLZA_BoxSorter.h"
 #include "Programs/PokemonLZA_ClothingBuyer.h"
 #include "Programs/PokemonLZA_StallBuyer.h"
-#include "Programs/PokemonLZA_PostKillCatcher.h"
-#include "Programs/PokemonLZA_BoxSorter.h"
-#include "Programs/PokemonLZA_TurboMacro.h"
 
 //  Trading
-#include "Programs/Trading/PokemonLZA_SelfBoxTrade.h"
+#include "Programs/PokemonLZA_PostKillCatcher.h"
 
 //  Farming
+#include "Programs/PokemonLZA_TurboMacro.h"
+#include "Programs/Trading/PokemonLZA_SelfBoxTrade.h"
 #include "Programs/Farming/PokemonLZA_DonutMaker.h"
 #include "Programs/Farming/PokemonLZA_RestaurantFarmer.h"
 #include "Programs/Farming/PokemonLZA_MegaShardFarmer.h"
@@ -27,10 +29,10 @@
 #include "Programs/Farming/PokemonLZA_InPlaceCatcher.h"
 #include "Programs/Farming/PokemonLZA_HyperspaceRewardReset.h"
 #include "Programs/Farming/PokemonLZA_WigglytuffFarmer.h"
-#include "Programs/ShinyHunting/PokemonLZA_AutoFossil.h"
-#include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_BenchSit.h"
 
 //  Shiny Hunting
+#include "Programs/ShinyHunting/PokemonLZA_AutoFossil.h"
+#include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_BenchSit.h"
 #include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_OverworldReset.h"
 #include "Programs/ShinyHunting/PokemonLZA_BeldumHunter.h"
 #include "Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.h"
@@ -41,18 +43,16 @@
 #include "Programs/ShinyHunting/PokemonLZA_ShuttleRun.h"
 #include "Programs/ShinyHunting/PokemonLZA_SewerHunter.h"
 #include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_HelioptileHunter.h"
+
+//  Non-Shiny Hunting
 #include "Programs/NonShinyHunting/PokemonLZA_StatsReset.h"
 #include "Programs/NonShinyHunting/PokemonLZA_WeatherFinder.h"
 
-//  Non-Shiny Hunting
+//  Developer
 #include "Programs/TestPrograms/PokemonLZA_OverworldWatcher.h"
 #include "Programs/TestPrograms/PokemonLZA_MoveBoxArrow.h"
-
-//  Developer
 #include "Programs/TestPrograms/PokemonLZA_TestBoxCellInfo.h"
 #include "InferenceTraining/PokemonLZA_GenerateLocationNameOCR.h"
-#include "PokemonLZA_Panels.h"
-#include "PokemonLZA_Settings.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

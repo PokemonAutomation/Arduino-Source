@@ -6,17 +6,16 @@
 
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "ComputerPrograms/ComputerPrograms_UnitTestRunner.h"
+#include "NintendoSwitch_Panels.h"
+
+#include "NintendoSwitch_SettingsPanel.h"
 
 #include "GameConsole/Panels/GameConsole_VirtualConsole.h"
-
 #include "GameConsole/Panels/GameConsole_MultiConsoleViewer.h"
 #include "GameConsole/Panels/GameConsole_SnapshotDumper.h"
 #include "GameConsole/Panels/GameConsole_BoxDraw.h"
 #include "GameConsole/Panels/GameConsole_WaterfillTemplateMaker.h"
-#include "Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h"
 
-#include "Pokemon/Inference/Pokemon_TrainPokemonOCR.h"
 #include "Programs/NintendoSwitch_TurboA.h"
 #include "Programs/NintendoSwitch_TurboButton.h"
 #include "Programs/NintendoSwitch_TurboMacro.h"
@@ -25,16 +24,17 @@
 #include "Programs/NintendoSwitch_FriendCodeAdder.h"
 #include "Programs/NintendoSwitch_FriendDelete.h"
 #include "Programs/NintendoSwitch_RecordKeyboardController.h"
-
 #include "Programs/Typewriter/NintendoSwitch_Typewriter.h"
+
 #include "Programs/NintendoSwitch_MenuStabilityTester.h"
 #include "DevPrograms/TestProgramComputer.h"
 #include "DevPrograms/TestProgramSwitch.h"
 #include "DevPrograms/JoyconProgram.h"
 #include "DevPrograms/TestDudunsparceFormDetector.h"
-#include "NintendoSwitch_Panels.h"
+#include "Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h"
+#include "Pokemon/Inference/Pokemon_TrainPokemonOCR.h"
 
-#include "NintendoSwitch_SettingsPanel.h"
+#include "ComputerPrograms/ComputerPrograms_UnitTestRunner.h"
 
 #ifdef PA_OFFICIAL
 #include "../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.h"
