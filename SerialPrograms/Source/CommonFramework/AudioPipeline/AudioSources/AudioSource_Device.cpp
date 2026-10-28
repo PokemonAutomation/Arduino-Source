@@ -14,6 +14,19 @@ namespace PokemonAutomation{
 
 
 
+bool AudioSourceDescriptor_Device::operator==(const AudioSourceDescriptor& x) const{
+    if (typeid(*this) != typeid(x)){
+        return false;
+    }
+    return m_info == static_cast<const AudioSourceDescriptor_Device&>(x).m_info;
+}
+std::string AudioSourceDescriptor_Device::display_name() const{
+    return m_info.display_name();
+}
+
+std::vector<AudioInputChoice> AudioSourceDescriptor_Device::supported_formats() const{
+    return m_info.supported_choices();
+}
 bool AudioSourceDescriptor_Device::sanitize_desired_format(Logger& logger, AudioInputChoice& format) const{
     const std::vector<AudioInputChoice>& choices = m_info.supported_choices();
     const size_t preferred_index = m_info.preferred_choice_index();
@@ -36,15 +49,6 @@ bool AudioSourceDescriptor_Device::sanitize_desired_format(Logger& logger, Audio
     return true;
 }
 
-bool AudioSourceDescriptor_Device::operator==(const AudioSourceDescriptor& x) const{
-    if (typeid(*this) != typeid(x)){
-        return false;
-    }
-    return m_info == static_cast<const AudioSourceDescriptor_Device&>(x).m_info;
-}
-std::string AudioSourceDescriptor_Device::display_name() const{
-    return m_info.display_name();
-}
 
 JsonValue AudioSourceDescriptor_Device::to_json() const{
     return m_info.device_name();

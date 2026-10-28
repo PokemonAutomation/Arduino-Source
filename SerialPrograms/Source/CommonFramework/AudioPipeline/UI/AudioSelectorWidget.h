@@ -26,17 +26,20 @@ public:
     ~AudioSelectorWidget();
 
 private:
-    void build_input_list(const std::string& file, const AudioDeviceInfo& device);
+    void build_input_list(const std::shared_ptr<const AudioSourceDescriptor>& source);
     void build_output_list(const AudioDeviceInfo& device);
 
     void refresh_all();
-    void refresh_formats(const std::string& file, const AudioDeviceInfo& device, const AudioInputChoice& choice);
-    void refresh_input_device(const std::string& file, const AudioDeviceInfo& device);
+    void refresh_formats(const std::shared_ptr<const AudioSourceDescriptor>& source, const AudioInputChoice& choice);
+    void refresh_input_device(const std::shared_ptr<const AudioSourceDescriptor>& source);
     void refresh_output_device(const AudioDeviceInfo& device);
     void refresh_volume(double volume);
     void refresh_display(AudioOption::AudioDisplayType display);
 
-    virtual void post_input_change(const std::string& file, const AudioDeviceInfo& device, const AudioInputChoice& choice) override;
+    virtual void post_input_change(
+        const std::shared_ptr<const AudioSourceDescriptor>& source,
+        const AudioInputChoice& choice
+    ) override;
     virtual void post_output_change(const AudioDeviceInfo& device) override;
     virtual void post_volume_change(double volume) override;
     virtual void post_display_change(AudioOption::AudioDisplayType display) override;
