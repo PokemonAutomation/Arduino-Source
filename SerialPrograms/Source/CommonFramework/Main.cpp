@@ -281,7 +281,7 @@ int main(int argc, char *argv[]){
 //  Joining threads on Qt 6.9+ Windows will hang!
 //
 #ifdef PA_ENABLE_QT_ADOPTION_WORKAROUND
-    cout << "Qt6.9 bug workaround: std::quick_exit() to avoid thread join hangs." << endl;
+    std::cout << "Qt6.9 bug workaround: std::quick_exit() to avoid thread join hangs." << std::endl;
     std::quick_exit(ret);
 #endif
 
