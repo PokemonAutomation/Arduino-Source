@@ -10,8 +10,8 @@
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
-#include "Pokemon_NameSelectOption.h"
 #include "VideoGames/PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
+#include "Pokemon_NameSelectOption.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{

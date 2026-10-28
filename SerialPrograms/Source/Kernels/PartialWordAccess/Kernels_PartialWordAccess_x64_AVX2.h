@@ -8,8 +8,8 @@
 #define PokemonAutomation_Kernels_PartialWordAccess_x64_AVX2_H
 
 #include <stdint.h>
-#include <cstddef>
 #include <immintrin.h>
+#include <cstddef>
 #include "Common/Compiler.h"
 
 namespace PokemonAutomation{

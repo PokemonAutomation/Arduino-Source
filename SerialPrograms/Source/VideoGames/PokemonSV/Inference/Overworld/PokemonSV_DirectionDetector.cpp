@@ -14,8 +14,8 @@
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
-#include "PokemonSV_DirectionDetector.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_MenuNavigation.h"
+#include "PokemonSV_DirectionDetector.h"
 
 //#include <iostream>
 //using std::cout;

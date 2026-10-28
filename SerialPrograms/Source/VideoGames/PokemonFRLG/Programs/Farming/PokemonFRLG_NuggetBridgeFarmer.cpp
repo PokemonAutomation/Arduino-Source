@@ -13,8 +13,8 @@
 #include "VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
-#include "PokemonFRLG_NuggetBridgeFarmer.h"
 #include "VideoGames/PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
+#include "PokemonFRLG_NuggetBridgeFarmer.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -8,8 +8,8 @@
 #define PokemonAutomation_Kernels_arm64_NEON_H
 
 #include <stdint.h>
-#include <iostream>
 #include <arm_neon.h>
+#include <iostream>
 
 #include "Common/Compiler.h"
 

@@ -30,8 +30,8 @@
 #include "CommonFramework/Recording/StreamHistorySession.h"
 #include "ControllerInput/ControllerInput.h"
 #include "Controllers/ControllerSession.h"
-#include "ConsoleSystemOption.h"
 #include "Integrations/ProgramTrackerInterfaces.h"
+#include "ConsoleSystemOption.h"
 
 namespace PokemonAutomation{
     class MemoryUtilizationStats;

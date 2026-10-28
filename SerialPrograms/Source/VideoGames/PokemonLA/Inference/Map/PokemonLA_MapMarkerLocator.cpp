@@ -18,6 +18,7 @@
 #include "Tests/TestUtils.h"
 
 #include "PokemonLA_MapMarkerLocator.h"
+
 using std::cout;
 using std::endl;
 

@@ -5,7 +5,6 @@
  */
 
 #include <vector>
-#include <iostream>
 #include "Common/Cpp/Exceptions.h"
 #include "VideoGames/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Pokemon.h"
 #include "VideoGames/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Matchup.h"
@@ -14,8 +13,10 @@
 #include "PokemonSwSh_MaxLair_AI_PathMatchup.h"
 
 #include "PokemonSwSh_MaxLair_AI_RentalBossMatchup.h"
-using std::cout;
-using std::endl;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

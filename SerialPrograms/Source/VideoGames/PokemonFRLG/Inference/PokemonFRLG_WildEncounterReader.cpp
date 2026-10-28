@@ -16,8 +16,8 @@
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "Tests/TestUtils.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
-#include "PokemonFRLG_WildEncounterReader.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
+#include "PokemonFRLG_WildEncounterReader.h"
 #include "PokemonFRLG_OcrPreprocessing.h"
 #include "PokemonFRLG_DigitReader.h"
 namespace PokemonAutomation {

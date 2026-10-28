@@ -28,10 +28,10 @@
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "VideoGames/PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "VideoGames/PokemonSwSh/Programs/PokemonSwSh_BoxHelpers.h"
-#include "PokemonSwSh_EggHelpers.h"
-#include "PokemonSwSh_EggAutonomous.h"
 #include "VideoGames/PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
 #include "VideoGames/PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.h"
+#include "PokemonSwSh_EggHelpers.h"
+#include "PokemonSwSh_EggAutonomous.h"
 
 namespace PokemonAutomation{
 

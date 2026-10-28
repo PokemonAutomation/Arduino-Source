@@ -5,11 +5,12 @@
  */
 
 #include <cstddef>
-#include <iostream>
 #include "PokemonSwSh_MaxLair_AI.h"
 #include "PokemonSwSh_MaxLair_AI_Tools.h"
-using std::cout;
-using std::endl;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

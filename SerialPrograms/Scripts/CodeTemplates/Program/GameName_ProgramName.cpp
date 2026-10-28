@@ -4,12 +4,12 @@
  *
  */
 
-#include "GameName_ProgramName.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "GameName_ProgramName.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

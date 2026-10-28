@@ -9,8 +9,8 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSV_BoxRoutines.h"
 #include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
+#include "PokemonSV_BoxRoutines.h"
 #include "PokemonSV_BoxRelease.h"
 
 //#include <iostream>

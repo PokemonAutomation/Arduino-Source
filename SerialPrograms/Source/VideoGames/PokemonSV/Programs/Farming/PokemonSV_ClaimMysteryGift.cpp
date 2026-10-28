@@ -4,7 +4,6 @@
  *
  */
 
-#include <iostream>
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 //#include "CommonFramework/GlobalSettingsPanel.h"
@@ -29,8 +28,10 @@
 #include "VideoGames/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.h"
 
 #include "PokemonSV_ClaimMysteryGift.h"
-using std::cout;
-using std::endl;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 //#include <unordered_map>
 //#include <algorithm>
 

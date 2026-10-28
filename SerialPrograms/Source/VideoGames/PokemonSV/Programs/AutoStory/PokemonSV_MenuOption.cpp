@@ -9,8 +9,8 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "PokemonSV_MenuOption.h"
 #include "VideoGames/PokemonSV/Inference/PokemonSV_MenuOptionReader.h"
+#include "PokemonSV_MenuOption.h"
 
 //#include <iostream>
 // using std::cout;

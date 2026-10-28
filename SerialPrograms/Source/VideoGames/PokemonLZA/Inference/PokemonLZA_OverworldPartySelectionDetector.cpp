@@ -15,6 +15,7 @@
 #include "Tests/TestUtils.h"
 
 #include "PokemonLZA_OverworldPartySelectionDetector.h"
+
 using std::cout;
 using std::endl;
 

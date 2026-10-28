@@ -6,10 +6,10 @@
  */
 
 #include <iostream>
-#include "ML_LabelImagesOverlayManager.h"
-#include "ML_LabelImages.h"
-
 #include "Pokemon/Resources/Pokemon_PokemonForms.h"
+#include "ML_LabelImagesOverlayManager.h"
+
+#include "ML_LabelImages.h"
 using std::cout, std::endl;
 
 

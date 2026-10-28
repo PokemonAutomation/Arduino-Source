@@ -15,8 +15,8 @@
 #include "VideoGames/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "VideoGames/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h"
 #include "VideoGames/PokemonLA/Programs/PokemonLA_BattleRoutines.h"
-#include "PokemonLA_MagikarpMoveGrinder.h"
 #include "VideoGames/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
+#include "PokemonLA_MagikarpMoveGrinder.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

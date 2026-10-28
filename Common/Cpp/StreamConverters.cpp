@@ -6,8 +6,8 @@
 
 #include <string.h>
 #include <iostream>
-#include "Exceptions.h"
 #include "Containers/AlignedVector.tpp"
+#include "Exceptions.h"
 #include "StreamConverters.h"
 
 //using std::cout;

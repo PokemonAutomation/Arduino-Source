@@ -14,9 +14,9 @@
 #include "CommonFramework/Panels/ConsoleSettingsStretch.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
 #include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "AudioDisplayWidget.h"
 #include "AudioSelectorWidget.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 
 //#include <iostream>
 //using std::cout;

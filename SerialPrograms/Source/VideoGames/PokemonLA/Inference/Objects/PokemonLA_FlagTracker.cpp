@@ -13,6 +13,7 @@
 #include "Tests/TestUtils.h"
 
 #include "PokemonLA_FlagTracker.h"
+
 using std::cout;
 using std::endl;
 

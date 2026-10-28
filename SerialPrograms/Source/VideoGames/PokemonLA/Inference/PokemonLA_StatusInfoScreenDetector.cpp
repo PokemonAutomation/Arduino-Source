@@ -16,6 +16,7 @@
 #include "PokemonLA_CommonColorCheck.h"
 
 #include "PokemonLA_StatusInfoScreenDetector.h"
+
 using std::cout;
 using std::endl;
 

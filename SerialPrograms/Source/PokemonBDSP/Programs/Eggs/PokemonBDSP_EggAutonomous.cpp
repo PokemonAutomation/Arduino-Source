@@ -15,9 +15,9 @@
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameEntry.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameNavigation.h"
+#include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "PokemonBDSP_EggAutonomousState.h"
 #include "PokemonBDSP_EggAutonomous.h"
-#include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

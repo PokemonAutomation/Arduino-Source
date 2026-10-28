@@ -6,9 +6,9 @@
 
 #include <cstddef>
 #include "VideoGames/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
-#include "PokemonSwSh_MaxLair_AI_PathMatchup.h"
-
 #include "VideoGames/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Pokemon.h"
+
+#include "PokemonSwSh_MaxLair_AI_PathMatchup.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

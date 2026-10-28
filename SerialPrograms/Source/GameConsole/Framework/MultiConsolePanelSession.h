@@ -8,8 +8,8 @@
 #define PokemonAutomation_GameConsole_MultiConsolePanelSession_H
 
 #include "CommonFramework/Panels/PanelSession.h"
-#include "MultiConsoleSystemSession.h"
 #include "GameConsole/MultiConsolePanel.h"
+#include "MultiConsoleSystemSession.h"
 
 namespace PokemonAutomation{
 namespace GameConsole{

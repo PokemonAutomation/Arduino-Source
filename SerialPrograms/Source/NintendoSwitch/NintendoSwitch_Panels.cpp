@@ -14,9 +14,9 @@
 #include "GameConsole/Panels/GameConsole_SnapshotDumper.h"
 #include "GameConsole/Panels/GameConsole_BoxDraw.h"
 #include "GameConsole/Panels/GameConsole_WaterfillTemplateMaker.h"
-#include "NintendoSwitch_Panels.h"
+#include "Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h"
 
-#include "NintendoSwitch_SettingsPanel.h"
+#include "Pokemon/Inference/Pokemon_TrainPokemonOCR.h"
 #include "Programs/NintendoSwitch_TurboA.h"
 #include "Programs/NintendoSwitch_TurboButton.h"
 #include "Programs/NintendoSwitch_TurboMacro.h"
@@ -32,9 +32,9 @@
 #include "DevPrograms/TestProgramSwitch.h"
 #include "DevPrograms/JoyconProgram.h"
 #include "DevPrograms/TestDudunsparceFormDetector.h"
-#include "Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h"
+#include "NintendoSwitch_Panels.h"
 
-#include "Pokemon/Inference/Pokemon_TrainPokemonOCR.h"
+#include "NintendoSwitch_SettingsPanel.h"
 
 #ifdef PA_OFFICIAL
 #include "../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.h"

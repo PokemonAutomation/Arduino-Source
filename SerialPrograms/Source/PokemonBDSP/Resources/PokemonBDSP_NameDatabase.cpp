@@ -7,8 +7,8 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
-#include "PokemonBDSP_NameDatabase.h"
 #include "VideoGames/PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
+#include "PokemonBDSP_NameDatabase.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

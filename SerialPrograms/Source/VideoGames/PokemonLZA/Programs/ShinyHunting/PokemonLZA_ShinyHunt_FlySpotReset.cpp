@@ -15,8 +15,8 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "VideoGames/PokemonLZA/Inference/PokemonLZA_HyperspaceCalorieDetector.h"
 #include "VideoGames/PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
+#include "VideoGames/PokemonLZA/Inference/PokemonLZA_HyperspaceCalorieDetector.h"
 #include "VideoGames/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA_ShinyHunt_FlySpotReset.h"
 

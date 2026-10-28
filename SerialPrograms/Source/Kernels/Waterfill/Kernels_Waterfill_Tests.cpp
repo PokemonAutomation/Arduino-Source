@@ -11,11 +11,11 @@
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "Kernels_Waterfill_Tests.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Tests/GuardPageImage.h"
 #include "Tests/TestUtils.h"
+#include "Kernels_Waterfill_Tests.h"
 
 
 namespace PokemonAutomation{

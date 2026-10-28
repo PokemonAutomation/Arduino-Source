@@ -6,11 +6,12 @@
 
 #include <vector>
 #include <map>
-#include <iostream>
 #include "Common/Cpp/Exceptions.h"
 #include "PokemonSV_MenuOptionDatabase.h"
-using std::cout;
-using std::endl;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

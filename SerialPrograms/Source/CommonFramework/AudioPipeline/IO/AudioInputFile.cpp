@@ -5,7 +5,6 @@
  */
 
 #include <memory>
-#include "3rdParty/QtWavFile/WavFile.h"
 #include <QString>
 #include <QUrl>
 #include <QAudioBuffer>
@@ -13,6 +12,7 @@
 #include <QEventLoop>
 #include <QTimer>
 #include "Common/Cpp/Exceptions.h"
+#include "3rdParty/QtWavFile/WavFile.h"
 #include "CommonFramework/AudioPipeline/AudioInfo.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "AudioFileLoader.h"

@@ -17,6 +17,7 @@
 #include "CommonTools/Images/ImageFilter.h"
 
 #include "Pokemon_BoxGenderDetector.h"
+
 using std::cout;
 using std::endl;
 

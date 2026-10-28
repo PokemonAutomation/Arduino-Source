@@ -8,8 +8,8 @@
 #define PokemonAutomation_Kernels_PartialWordAccess_arm64_NEON_H
 
 #include <stdint.h>
-#include <cstddef>
 #include <arm_neon.h>
+#include <cstddef>
 #include "Common/Compiler.h"
 
 namespace PokemonAutomation{

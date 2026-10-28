@@ -5,8 +5,8 @@
  */
 
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "PokemonBDSP_IvJudgeReader.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
+#include "PokemonBDSP_IvJudgeReader.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -14,6 +14,7 @@
 #include "NintendoSwitch/Controllers/Joycon/NintendoSwitch_JoyconState.h"
 
 #include "NintendoSwitch_RecordKeyboardController.h"
+
 using std::cout;
 using std::endl;
 

@@ -4,7 +4,6 @@
  *
  */
 
-#include <iostream>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
@@ -17,8 +16,10 @@
 #include "Program/PokemonSwSh_MaxLair_Run_Adventure.h"
 
 #include "PokemonSwSh_MaxLair_Standard.h"
-using std::cout;
-using std::endl;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

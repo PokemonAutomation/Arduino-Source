@@ -4,7 +4,6 @@
  *
  */
 
-#include <iostream>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QLabel>
@@ -21,8 +20,10 @@
 #include "Common/Qt/Options/ConfigWidget.h"
 
 #include "PokemonLA_CustomPathTable.h"
-using std::cout;
-using std::endl;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -9,10 +9,10 @@
 
 #include <QMainWindow>
 #include "Common/Cpp/Options/ConfigOption.h"
+#include "PanelLists.h"
 #include "CommonFramework/Environment/SystemSleep.h"
 #include "CommonFramework/Panels/PanelTools.h"
 #include "CommonFramework/Panels/PanelSession.h"
-#include "PanelLists.h"
 
 class QVBoxLayout;
 class QLabel;

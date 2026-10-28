@@ -4,7 +4,6 @@
  *
  */
 
-#include <iostream>
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
@@ -14,8 +13,10 @@
 #include "CommonTools/Images/ImageFilter.h"
 
 #include "PokemonLGPE_ShinySymbolDetector.h"
-using std::cout;
-using std::endl;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -4,7 +4,6 @@
  *
  */
 
-#include <iostream>
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Json/JsonValue.h"
@@ -19,8 +18,10 @@
 #include "VideoGames/PokemonLZA/Inference/Map/PokemonLZA_LocationNameReader.h"
 
 #include "PokemonLZA_GenerateLocationNameOCR.h"
-using std::cout;
-using std::endl;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

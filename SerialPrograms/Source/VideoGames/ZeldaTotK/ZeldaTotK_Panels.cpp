@@ -6,15 +6,15 @@
 
 #include "CommonFramework/GlobalAutoPaths.h"
 //#include "CommonFramework/GlobalSettingsPanel.h"
-#include "ZeldaTotK_Panels.h"
+#include "Programs/ZeldaTotK_BowItemDuper.h"
 
 //#include "ZeldaTotK_Settings.h"
 
-#include "Programs/ZeldaTotK_BowItemDuper.h"
 #include "Programs/ZeldaTotK_MineruItemDuper.h"
 #include "Programs/ZeldaTotK_ParaglideItemDuper.h"
 #include "Programs/ZeldaTotK_SurfItemDuper.h"
 #include "Programs/ZeldaTotK_WeaponDuper.h"
+#include "ZeldaTotK_Panels.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

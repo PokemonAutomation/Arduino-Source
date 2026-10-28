@@ -14,9 +14,9 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QProgressBar>
+#include "CommonFramework/ResourceDownload/ResourceDownload.h"
 #include "ProgramMissingResourceTracker.h"
 #include "GlobalResourceDownloadManager.h"
-#include "CommonFramework/ResourceDownload/ResourceDownload.h"
 
 
 namespace PokemonAutomation{

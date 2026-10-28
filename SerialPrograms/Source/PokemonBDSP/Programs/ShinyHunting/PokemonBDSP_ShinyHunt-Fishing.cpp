@@ -14,8 +14,8 @@
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_EncounterHandler.h"
-#include "PokemonBDSP_ShinyHunt-Fishing.h"
 #include "VideoGames/PokemonSwSh/ShinyHuntTracker.h"
+#include "PokemonBDSP_ShinyHunt-Fishing.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

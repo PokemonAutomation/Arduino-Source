@@ -13,12 +13,12 @@
 #include <onnxruntime_cxx_api.h>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
-#include "3rdParty/ONNX/OnnxToolsPA.h"
 #include <QMessageBox>
 #include "Common/Cpp/Hardware/FloatingPointMode.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
+#include "3rdParty/ONNX/OnnxToolsPA.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "ML/Models/ML_ONNXRuntimeHelpers.h"

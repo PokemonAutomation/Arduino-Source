@@ -16,6 +16,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 
 #include "PokemonSwSh_BoxShinySymbolDetector.h"
+
 using std::cout;
 using std::endl;
 

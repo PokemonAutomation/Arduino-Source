@@ -18,9 +18,9 @@
 #include "Tests/TestUtils.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Pokemon/Inference/Pokemon_NatureReader.h"
-#include "PokemonFRLG_StatsReader.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Tests.h"
+#include "PokemonFRLG_StatsReader.h"
 #include "PokemonFRLG_DigitReader.h"
 #include "PokemonFRLG_OcrPreprocessing.h"
 

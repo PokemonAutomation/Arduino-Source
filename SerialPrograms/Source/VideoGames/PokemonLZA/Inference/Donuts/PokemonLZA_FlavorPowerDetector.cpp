@@ -5,7 +5,6 @@
  */
 
 #include <format>
-#include <iostream>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
@@ -22,8 +21,10 @@
 
 #include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonLZA_FlavorPowerDetector.h"
-using std::cout;
-using std::endl;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

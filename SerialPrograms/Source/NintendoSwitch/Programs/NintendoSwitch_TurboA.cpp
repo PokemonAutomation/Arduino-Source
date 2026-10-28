@@ -8,8 +8,8 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch_TurboA.h"
 #include "VideoGames/PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
+#include "NintendoSwitch_TurboA.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

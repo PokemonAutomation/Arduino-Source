@@ -9,9 +9,9 @@
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 //#include "VideoGames/PokemonSV/PokemonSV_Settings.h"
+#include "VideoGames/PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
 #include "PokemonSV_TradeRoutines.h"
 #include "PokemonSV_SelfBoxTrade.h"
-#include "VideoGames/PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

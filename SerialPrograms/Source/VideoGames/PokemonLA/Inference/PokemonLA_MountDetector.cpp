@@ -17,6 +17,7 @@
 #include "VideoGames/PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 
 #include "PokemonLA_MountDetector.h"
+
 using std::cout;
 using std::endl;
 

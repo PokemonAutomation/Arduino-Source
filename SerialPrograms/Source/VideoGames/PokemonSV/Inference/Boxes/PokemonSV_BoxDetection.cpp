@@ -18,6 +18,7 @@
 #include "PokemonSV_BoxShinyDetector.h"
 
 #include "PokemonSV_BoxDetection.h"
+
 using std::cout;
 using std::endl;;
 
