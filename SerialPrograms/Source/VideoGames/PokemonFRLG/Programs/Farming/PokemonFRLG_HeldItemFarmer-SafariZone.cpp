@@ -8,7 +8,6 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
-#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -25,9 +24,9 @@
 #include "VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
 #include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
-#include "PokemonFRLG_HeldItemFarmer-SafariZone.h"
 #include "VideoGames/PokemonFRLG/Programs/PokemonFRLG_SafariOptimalAction.h"
 #include "VideoGames/PokemonFRLG/Programs/PokemonFRLG_BattleMenuNavigation.h"
+#include "PokemonFRLG_HeldItemFarmer-SafariZone.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -396,7 +395,7 @@ bool HeldItemFarmerSafariZone::check_for_held_item(ConsoleHandle& console, ProCo
         open_party_menu_from_overworld(console, context, StartMenuContext::SAFARI_ZONE);
     }
 
-    PartyHeldItemDetector held_item_detector(COLOR_RED, &console.overlay(), static_cast<PartySlot>(party_count - 1));
+    PartyHeldItemDetector held_item_detector(COLOR_RED, &console.overlay(), static_cast<PartySlot>(party_count - 1), LANGUAGE);
     if (held_item_detector.detect(console.video().snapshot())){
         return true;
     }

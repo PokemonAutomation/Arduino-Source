@@ -8,6 +8,8 @@
 #define PokemonAutomation_PokemonFRLG_PartyHeldItemDetector_H
 
 #include <chrono>
+#include "Common/Cpp/TestRunners/UnitTest.h"
+#include "CommonFramework/Language.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/VisualDetector.h"
 #include "PokemonFRLG_PartySlot.h"
@@ -26,10 +28,11 @@ public:
     PartyHeldItemDetector(
         Color color,
         VideoOverlay* overlay,
-        PartySlot slot
+        PartySlot slot,
+        Language language = Language::English
     );
 
-    static ImageFloatBox box_for_slot(PartySlot slot);
+    static ImageFloatBox box_for_slot(PartySlot slot, Language language = Language::English);
 
     const ImageFloatBox& last_detected() const { return m_last_detected; }
 
@@ -62,12 +65,15 @@ public:
         Color color,
         VideoOverlay* overlay,
         PartySlot slot,
+        Language language,
         std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
     )
-        : DetectorToFinder("PartyHeldItemWatcher", hold_duration, color, overlay, box_for_slot(slot))
+        : DetectorToFinder("PartyHeldItemWatcher", hold_duration, color, overlay, slot, language)
     {}
 };
 
+
+void add_tests_PartyHeldItemDetector(UnitTestDatabase& database);
 
 }
 }

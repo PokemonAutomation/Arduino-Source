@@ -1803,6 +1803,8 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SafariOptimalActionTest.h
     Source/VideoGames/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.cpp
     Source/VideoGames/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.h
+    Source/VideoGames/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_TestPartyInference.cpp
+    Source/VideoGames/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_TestPartyInference.h
     Source/VideoGames/PokemonFRLG/Resources/PokemonFRLG_PokemonSprites.cpp
     Source/VideoGames/PokemonFRLG/Resources/PokemonFRLG_PokemonSprites.h
     Source/VideoGames/PokemonHome/Inference/PokemonHome_AlphaDetector.cpp
