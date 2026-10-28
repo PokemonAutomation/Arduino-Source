@@ -101,7 +101,11 @@ void AudioOption::load_json(const JsonValue& json){
 
 JsonValue AudioOption::to_json() const{
     JsonObject root;
-    switch (m_input_source->type){
+    AudioSourceType type = AudioSourceType::None;
+    if (m_input_source){
+        type = m_input_source->type;
+    }
+    switch (type){
     case AudioSourceType::None:
         break;
     case AudioSourceType::File:

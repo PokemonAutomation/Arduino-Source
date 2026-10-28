@@ -84,7 +84,6 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_SingleSwitchProgram<HyperspaceRewardReset>());
     ret.emplace_back(make_SingleSwitchProgram<DonutMaker>());
     if (IS_BETA_VERSION){
-        ret.emplace_back(make_SingleSwitchProgram<LZA_TurboMacro>());
     }
 
     ret.emplace_back("---- Farming ----");
@@ -107,6 +106,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_SingleSwitchProgram<ShinyHunt_SewerHunter>());
     ret.emplace_back(make_SingleSwitchProgram<ShinyHunt_HelioptileHunter>());
     ret.emplace_back(make_SingleSwitchProgram<ShinyHunt_HyperspaceLegendary>());
+    ret.emplace_back(make_SingleSwitchProgram<LZA_TurboMacro>());
     if (IS_BETA_VERSION){
         ret.emplace_back(make_SingleSwitchProgram<ShinyHunt_ShuttleRun>());
     }

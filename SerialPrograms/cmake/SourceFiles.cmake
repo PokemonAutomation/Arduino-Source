@@ -424,8 +424,6 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/GlobalThreadPoolsQt.cpp
     ../Common/Qt/GlobalThreadPoolsQt.h
     ../Common/Qt/NoWheelComboBox.h
-    ../Common/Qt/WallpaperWidget.cpp
-    ../Common/Qt/WallpaperWidget.h
     ../Common/Qt/Options/BatchWidget.cpp
     ../Common/Qt/Options/BatchWidget.h
     ../Common/Qt/Options/BooleanCheckBoxWidget.cpp
@@ -623,6 +621,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Options/NestedBoxDrawOption.h
     Source/CommonFramework/Options/QtWidget/LabelCellWidget.cpp
     Source/CommonFramework/Options/QtWidget/LabelCellWidget.h
+    Source/CommonFramework/Options/QtWidget/WallpaperWidget.cpp
+    Source/CommonFramework/Options/QtWidget/WallpaperWidget.h
     Source/CommonFramework/Options/ResolutionOption.cpp
     Source/CommonFramework/Options/ResolutionOption.h
     Source/CommonFramework/Options/ScreenshotFormatOption.h
