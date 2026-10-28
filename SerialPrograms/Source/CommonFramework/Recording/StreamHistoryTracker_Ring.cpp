@@ -2,7 +2,7 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  Implement by keeping an in-memory ring of *encoded* video packets
+ *  Implemented by keeping an in-memory ring of *encoded* video packets
  *  (hardware H.264, with ffmpeg's built-in LGPL MPEG-4 as a fallback)
  *  and AAC audio packets. Nothing is written to storage until save() is
  *  called, at which point the ring is muxed into a single MP4/MKV file.
@@ -286,17 +286,26 @@ void abandon_video_encoder(Logger& logger, const char* name, AVCodecContext*& ct
 
 //  Threads:
 //  - The encoder thread (worker_loop()) owns the video encoder and its state:
-//    m_vctx, m_sws*, m_video_width/height, m_video_start, m_last_*, and the
-//    encoder candidate index. Nothing else touches them.
+//    m_vctx, m_sws and the m_sws_* fields, m_video_width, m_video_height,
+//    m_video_start, m_last_keyframe_us, m_last_pts_us,
+//    m_logged_unsupported_format and m_video_encoder_index. Nothing else
+//    touches them.
 //  - The audio thread (push_samples()) owns the AAC encoder, the sample
-//    accumulator and the audio clock: m_actx, m_audio_acc, m_audio_*.
+//    accumulator and the audio clock: m_actx, m_audio_layout, m_have_audio,
+//    m_audio_acc, m_audio_samples_total, m_audio_anchored,
+//    m_audio_anchor_sample and m_audio_anchor_time.
 //  - The video thread (on_frame()) throttles frames and queues them.
 //  - save() and set_window() can come from any thread.
 //  - m_lock guards what these threads share: the rings (m_video, m_audio,
 //    m_ring_bytes), the codec parameter copies (m_video_params,
 //    m_audio_params, m_video_time_base), m_window, m_next_frame_time, and
 //    m_video_enabled (written by the encoder thread, read by on_frame()).
-//  - m_queue_lock guards the frame queue and the encoder thread's flags.
+//  - m_queue_lock guards the frame queue (m_pending_frames), the encoder
+//    thread's flags (m_stopping, m_encoding) and the dropped-frame report
+//    (m_dropped_frames, m_last_drop_report).
+//  - Fields set in the constructor and never changed afterwards (m_logger,
+//    m_has_video, m_audio_channels, m_target_fps, m_frame_interval) need
+//    no lock.
 struct StreamHistoryTracker_Ring::Data{
     Logger& m_logger;
     mutable SpinLock m_lock;    //  See "Threads" above.

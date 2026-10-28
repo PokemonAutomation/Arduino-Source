@@ -2,7 +2,7 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  Implement by keeping an in-memory ring of *encoded* video packets
+ *  Implemented by keeping an in-memory ring of *encoded* video packets
  *  (hardware H.264, with ffmpeg's built-in LGPL MPEG-4 as a fallback)
  *  and AAC audio packets. Nothing is written to storage until save() is
  *  called, at which point the ring is muxed into a single MP4/MKV file.
@@ -38,8 +38,15 @@ public:
         bool has_audio,
         bool has_video
     );
+    //  Changes the history length and evicts what falls outside it. Any
+    //  thread. (StreamHistorySession does not call it: it reads the history
+    //  length once and applies a new one only with a new tracker.)
     void set_window(std::chrono::seconds window);
 
+    //  Muxes the current history into an MP4 (or MKV, by the filename's
+    //  extension) file. Blocks until the file is written; any thread,
+    //  concurrently with the recording. Returns false (and logs) on failure
+    //  or if nothing was recorded.
     bool save(const std::string& filename) const;
 
 public:
@@ -47,9 +54,13 @@ public:
     //  stereo shape, delivered by the audio pipeline's working stream
     //  (StreamHistorySession attaches the listener at that shape). Channel
     //  c starts at data[c * stride] and runs for samples (stride is the
-    //  per-channel buffer length, 0 for the single-channel pass-through).
-    //  Called on the audio pipeline's producing thread.
+    //  per-channel buffer length). Encodes AAC inline. Called on the audio
+    //  pipeline's producing thread.
     void push_samples(size_t samples, size_t stride, const float* data);
+
+    //  Video input. Throttles the frames to the configured FPS and queues
+    //  them for the encoder thread (dropping the oldest when it falls
+    //  behind); returns without encoding. Called on the video thread.
     void on_frame(std::shared_ptr<const VideoFrame> frame);
 
 public:

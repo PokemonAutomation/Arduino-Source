@@ -41,8 +41,9 @@ struct StreamHistorySession::Data{
     mutable SpinLock m_lock;
     std::chrono::seconds m_window;
     //  The resolved input choice for the active device input (invalid
-    //  when there is no device input). Drives both the tracker's shape
-    //  and the working-stream attach shape.
+    //  when there is no device input). With the ffmpeg ring it only
+    //  decides whether audio is recorded; otherwise it drives both the
+    //  tracker's shape and the working-stream attach shape.
     AudioInputChoice m_audio_choice;
     bool m_has_video;
     //  The active input's physical working-stream shape (what the tree
