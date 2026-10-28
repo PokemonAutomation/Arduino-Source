@@ -7,8 +7,8 @@
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "Programs/Farming/PokemonFRLG_EliteFourFarmer.h"
 
+#include "Programs/Farming/PokemonFRLG_EliteFourFarmer.h"
 #include "Programs/Farming/PokemonFRLG_HeldItemFarmer-SafariZone.h"
 #include "Programs/Farming/PokemonFRLG_ItemDuplication.h"
 #include "Programs/Farming/PokemonFRLG_NuggetBridgeFarmer.h"
@@ -35,6 +35,7 @@
 #include "Programs/TestPrograms/PokemonFRLG_ReadTrainerId.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadEncounter.h"
 #include "Programs/TestPrograms/PokemonFRLG_SafariOptimalActionTest.h"
+
 #include "PokemonFRLG_Panels.h"
 #include "PokemonFRLG_Settings.h"
 

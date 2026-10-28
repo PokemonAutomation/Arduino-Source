@@ -8,9 +8,8 @@
 #define PokemonAutomation_Kernels_x64_SSE41_H
 
 #include <stdint.h>
-#include <smmintrin.h>
 #include <iostream>
-
+#include <smmintrin.h>
 #include "Common/Compiler.h"
 
 namespace PokemonAutomation{

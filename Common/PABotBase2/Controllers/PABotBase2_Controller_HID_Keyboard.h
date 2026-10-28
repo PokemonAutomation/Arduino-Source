@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PABotBase2_Controller_HID_Keyboard_H
 #define PokemonAutomation_PABotBase2_Controller_HID_Keyboard_H
 
-#include "../PABotBase2_MessageProtocol.h"
 #include "../../ControllerStates/StandardHid_Keyboard_State.h"
+#include "../PABotBase2_MessageProtocol.h"
 
 #if _WIN32
 #pragma pack(push, 1)

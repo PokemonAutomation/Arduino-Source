@@ -33,7 +33,6 @@
 #include "VideoGames/PokemonLA/Programs/PokemonLA_RegionNavigation.h"
 #include "VideoGames/PokemonLA/Programs/PokemonLA_TimeOfDayChange.h"
 #include "VideoGames/PokemonLA/PokemonLA_WeatherAndTime.h"
-
 #include "PokemonLA_AutoMultiSpawn.h"
 
 //#include <iostream>

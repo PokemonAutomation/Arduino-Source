@@ -14,7 +14,6 @@
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "Tests/TestUtils.h"
-
 #include "PokemonLA_BattleSpriteWatcher.h"
 
 //#include <iostream>

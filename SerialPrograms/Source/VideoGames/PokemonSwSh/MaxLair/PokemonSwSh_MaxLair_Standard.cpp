@@ -14,7 +14,6 @@
 #include "VideoGames/PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 #include "VideoGames/PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "Program/PokemonSwSh_MaxLair_Run_Adventure.h"
-
 #include "PokemonSwSh_MaxLair_Standard.h"
 
 //#include <iostream>

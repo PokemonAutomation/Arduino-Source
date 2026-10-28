@@ -11,7 +11,6 @@
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/Kernels_x64_AVX512.h"
 #include "Kernels_ImagePixelSumSqrDev.h"
-
 #include "Kernels_ImagePixelSumSqrDev_TestInfra.h"
 
 //#include <iostream>

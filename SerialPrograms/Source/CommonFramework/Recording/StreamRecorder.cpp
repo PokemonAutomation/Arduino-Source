@@ -22,6 +22,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 #include "CommonFramework/Recording/StreamHistoryOption.h"
+#include "StreamRecorder.h"
 
 
 //  This doesn't work yet. QMediaRecorder writes different bytes with
@@ -30,9 +31,6 @@
 //  spits out is not a valid .mp4 file.
 
 //#define PA_STREAM_HISTORY_LOCAL_BUFFER
-
-//  REMOVE
-#include "StreamRecorder.h"
 
 using std::cout;
 using std::endl;

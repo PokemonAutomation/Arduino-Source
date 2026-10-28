@@ -20,7 +20,6 @@
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "VideoGames/PokemonLA/PokemonLA_Locations.h"
-
 #include "PokemonLA_BerryTreeDetector.h"
 
 using std::cout;

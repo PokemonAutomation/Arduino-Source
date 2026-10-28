@@ -19,7 +19,6 @@
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
 #include "ML/Models/ML_ONNXRuntimeHelpers.h"
-
 #include "ML_PaddleOCRPipeline.h"
 
 using std::cout;

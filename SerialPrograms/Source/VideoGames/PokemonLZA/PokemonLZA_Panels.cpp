@@ -7,21 +7,20 @@
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "Programs/PokemonLZA_BoxSorter.h"
-
-#include "Programs/PokemonLZA_ClothingBuyer.h"
 
 //  General
+#include "Programs/PokemonLZA_ClothingBuyer.h"
 #include "Programs/PokemonLZA_StallBuyer.h"
 #include "Programs/PokemonLZA_PostKillCatcher.h"
+#include "Programs/PokemonLZA_BoxSorter.h"
 #include "Programs/PokemonLZA_TurboMacro.h"
-#include "Programs/Trading/PokemonLZA_SelfBoxTrade.h"
-#include "Programs/Farming/PokemonLZA_DonutMaker.h"
 
 //  Trading
-#include "Programs/Farming/PokemonLZA_RestaurantFarmer.h"
+#include "Programs/Trading/PokemonLZA_SelfBoxTrade.h"
 
 //  Farming
+#include "Programs/Farming/PokemonLZA_DonutMaker.h"
+#include "Programs/Farming/PokemonLZA_RestaurantFarmer.h"
 #include "Programs/Farming/PokemonLZA_MegaShardFarmer.h"
 #include "Programs/Farming/PokemonLZA_JacintheInfiniteFarmer.h"
 #include "Programs/Farming/PokemonLZA_FriendshipFarmer.h"

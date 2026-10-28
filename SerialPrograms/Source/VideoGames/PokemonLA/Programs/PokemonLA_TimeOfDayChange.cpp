@@ -9,7 +9,6 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "VideoGames/PokemonLA/Inference/Objects/PokemonLA_DialogYellowArrowDetector.h"
-
 #include "PokemonLA_TimeOfDayChange.h"
 
 //#include <iostream>

@@ -6,10 +6,10 @@
 
 #include <map>
 #include <memory>
+#include "3rdParty/TesseractPA/TesseractPA.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "3rdParty/TesseractPA/TesseractPA.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"

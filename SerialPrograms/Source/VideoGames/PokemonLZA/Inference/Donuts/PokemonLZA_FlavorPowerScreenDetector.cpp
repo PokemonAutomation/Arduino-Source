@@ -6,7 +6,7 @@
 
 #include <fstream>
 #include <sstream>
-#include "Common/Cpp/Filesystem/Filesystem.h"
+#include "Common/Cpp/Filesystem/FilePath.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Logging/Logger.h"
@@ -15,7 +15,6 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "Tests/TestUtils.h"
-
 #include "PokemonLZA_FlavorPowerDetector.h"
 #include "PokemonLZA_FlavorPowerScreenDetector.h"
 

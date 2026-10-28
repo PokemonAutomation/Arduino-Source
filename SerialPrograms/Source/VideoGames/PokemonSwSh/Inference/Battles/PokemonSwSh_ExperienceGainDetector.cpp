@@ -7,7 +7,6 @@
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
-
 #include "PokemonSwSh_ExperienceGainDetector.h"
 
 //#include <iostream>

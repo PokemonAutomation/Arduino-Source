@@ -14,7 +14,6 @@
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-
 #include "PokemonSwSh_BoxShinySymbolDetector.h"
 
 using std::cout;

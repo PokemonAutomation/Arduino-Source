@@ -4,21 +4,8 @@
  *
  */
 
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QLabel>
-#include <QPushButton>
-#include <QFileDialog>
-
-//#include "Common/Compiler.h"
-#include <QMessageBox>
-#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
-//#include "Common/Cpp/Json/JsonTools.h"
 #include "Common/Cpp/Json/JsonObject.h"
-//#include "CommonFramework/Globals.h"
-#include "Common/Qt/Options/ConfigWidget.h"
-
 #include "PokemonLA_CustomPathTable.h"
 
 //#include <iostream>

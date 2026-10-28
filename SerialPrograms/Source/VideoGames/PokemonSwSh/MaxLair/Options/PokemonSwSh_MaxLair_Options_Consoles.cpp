@@ -5,7 +5,6 @@
  */
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
-
 #include "PokemonSwSh_MaxLair_Options_Consoles.h"
 
 //#include <iostream>

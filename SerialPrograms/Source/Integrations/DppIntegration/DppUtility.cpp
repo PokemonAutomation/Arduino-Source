@@ -9,7 +9,7 @@
 #include "Common/Compiler.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
 #include "Common/Cpp/Logging/TaggedLogger.h"
-#include <Integrations/DppIntegration/DppUtility.h>
+#include "Integrations/DppIntegration/DppUtility.h"
 //#include "CommonFramework/GlobalSettingsPanel.h"
 
 //#include <iostream>

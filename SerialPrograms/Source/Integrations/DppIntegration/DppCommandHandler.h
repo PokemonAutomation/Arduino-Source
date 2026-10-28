@@ -11,7 +11,7 @@
 #include "CommonFramework/Notifications/MessageAttachment.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
-#include <Integrations/DppIntegration/DppUtility.h>
+#include "Integrations/DppIntegration/DppUtility.h"
 #include "Integrations/IntegrationsAPI.h"
 #include "Integrations/DiscordSettingsOption.h"
 

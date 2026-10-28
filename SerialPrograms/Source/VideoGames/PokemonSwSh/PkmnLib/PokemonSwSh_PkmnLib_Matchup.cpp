@@ -5,7 +5,6 @@
  */
 
 #include <cmath>
-
 #include "PokemonSwSh_PkmnLib_Matchup.h"
 
 //#include <iostream>

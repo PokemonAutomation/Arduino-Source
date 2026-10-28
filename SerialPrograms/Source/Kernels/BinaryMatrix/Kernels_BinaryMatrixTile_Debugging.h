@@ -9,7 +9,6 @@
 
 #include <cstdint>
 #include <string>
-
 #include <iostream>
 
 using std::cout;

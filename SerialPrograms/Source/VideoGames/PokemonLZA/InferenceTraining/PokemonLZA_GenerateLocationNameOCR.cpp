@@ -16,7 +16,6 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonLZA/Inference/Map/PokemonLZA_LocationNameReader.h"
-
 #include "PokemonLZA_GenerateLocationNameOCR.h"
 
 //#include <iostream>
