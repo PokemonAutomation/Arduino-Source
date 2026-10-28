@@ -46,10 +46,10 @@
 #include "CommonFramework/VideoPipeline/VideoSession.h"
 #include "ControllerInput/ControllerInput.h"
 #include "ControllerInput/Keyboard/KeyboardHidButtons.h"
-#include "GameConsole/ConsolePanel.h"
-#include "Pokemon/Options/Pokemon_HomeSpriteSelectOption.h"
 #include "ML/DataLabeling/ML_ObjectAnnotation.h"
 #include "ML/DataLabeling/ML_SegmentAnythingModel.h"
+#include "GameConsole/ConsolePanel.h"
+#include "Pokemon/Options/Pokemon_HomeSpriteSelectOption.h"
 
 namespace PokemonAutomation{
 namespace ML{

@@ -8,8 +8,8 @@
 #define PokemonAutomation_NintendoSwitch_SettingsPanel_H
 
 
-#include "NintendoSwitch_Settings.h"
 #include "CommonFramework/Panels/OptionsPanel.h"
+#include "NintendoSwitch_Settings.h"
 
 
 namespace PokemonAutomation{

@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_ColoredText_H
 #define PokemonAutomation_ColoredText_H
 
-#include "Common/Cpp/Color.h"
 #include <string>
+#include "Common/Cpp/Color.h"
 
 namespace PokemonAutomation{
 

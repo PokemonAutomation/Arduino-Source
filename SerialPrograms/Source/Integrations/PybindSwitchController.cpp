@@ -11,8 +11,8 @@
 #include "Common/Cpp/Logging/TaggedLogger.h"
 #include "Controllers/ControllerConnection.h"
 #include "Controllers/PABotBase2/SerialPABotBase2_Descriptor.h"
-#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "PybindSwitchController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 
 //#include <iostream>
 //using std::cout;

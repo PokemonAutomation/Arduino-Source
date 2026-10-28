@@ -4,6 +4,7 @@
  *
  */
 
+#include <array>
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -18,7 +19,6 @@
 #include "VideoGames/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "VideoGames/PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA_StallBuyer.h"
-#include <array>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

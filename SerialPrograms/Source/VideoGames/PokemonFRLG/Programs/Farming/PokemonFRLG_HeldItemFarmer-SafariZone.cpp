@@ -4,14 +4,16 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "Common/Cpp/Options/ButtonOption.h"
+#include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
@@ -24,10 +26,8 @@
 #include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_HeldItemFarmer-SafariZone.h"
-#include "Common/Cpp/Exceptions.h"
 #include "VideoGames/PokemonFRLG/Programs/PokemonFRLG_SafariOptimalAction.h"
 #include "VideoGames/PokemonFRLG/Programs/PokemonFRLG_BattleMenuNavigation.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

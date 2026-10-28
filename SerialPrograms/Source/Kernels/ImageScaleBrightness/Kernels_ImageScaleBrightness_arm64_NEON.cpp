@@ -8,12 +8,13 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include <arm_neon.h>
 #include <algorithm>
+#include <iostream>
+#include <arm_neon.h>
 #include "Common/Compiler.h"
 
-#include <iostream>
-using std::cout, std::endl;
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace Kernels{

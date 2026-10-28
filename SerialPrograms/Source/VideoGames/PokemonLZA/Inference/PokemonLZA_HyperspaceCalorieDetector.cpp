@@ -11,8 +11,8 @@
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "CommonTools/OCR/OCR_Routines.h"
-#include "PokemonLZA_HyperspaceCalorieDetector.h"
 #include "Tests/TestUtils.h"
+#include "PokemonLZA_HyperspaceCalorieDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

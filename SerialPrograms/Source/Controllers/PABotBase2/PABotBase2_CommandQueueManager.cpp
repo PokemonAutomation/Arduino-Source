@@ -5,8 +5,8 @@
  */
 
 #include <string.h>
-#include "Common/PABotBase2/PABotBase2CC_MessageDumper.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/PABotBase2/PABotBase2CC_MessageDumper.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "PABotBase2_CommandQueueManager.h"
 

@@ -8,14 +8,14 @@
 #define PokemonAutomation_PokemonLZA_HyperspaceCalorieDetector_H
 
 
+#include <list>
+#include <utility>
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
+
 #include "CommonTools/VisualDetector.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
-
-#include <list>
-#include <utility>
 
 namespace PokemonAutomation{
     class Logger;

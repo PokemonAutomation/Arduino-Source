@@ -5,8 +5,8 @@
  */
 
 #include <sstream>
-#include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "Common/Cpp/ColoredText.h"
+#include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"

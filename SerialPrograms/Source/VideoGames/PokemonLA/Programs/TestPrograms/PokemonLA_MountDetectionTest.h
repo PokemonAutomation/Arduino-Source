@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonLA_MountDetectionTest_H
 #define PokemonAutomation_PokemonLA_MountDetectionTest_H
 
-#include "VideoGames/PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "VideoGames/PokemonLA/Inference/PokemonLA_MountDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -8,8 +8,8 @@
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
-#include "PokemonHome_GigantamaxDetector.h"
 #include "Tests/TestUtils.h"
+#include "PokemonHome_GigantamaxDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

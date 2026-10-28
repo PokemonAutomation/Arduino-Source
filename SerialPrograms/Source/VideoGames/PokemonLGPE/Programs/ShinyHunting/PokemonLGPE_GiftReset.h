@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_PokemonLGPE_GiftReset_H
 #define PokemonAutomation_PokemonLGPE_GiftReset_H
 
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
-#include "CommonFramework/Notifications/EventNotificationsTable.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -8,8 +8,8 @@
 #include <sstream>
 #include <QAudio>
 #include <QAudioFormat>
-#include "AudioFormatUtils.h"
 #include "Kernels/AudioStreamConverter/Kernels_AudioStreamConverter.h"
+#include "AudioFormatUtils.h"
 
 
 

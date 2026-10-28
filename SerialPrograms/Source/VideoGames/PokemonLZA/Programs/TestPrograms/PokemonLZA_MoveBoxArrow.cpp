@@ -4,8 +4,8 @@
  *
  */
 
-#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h"
 #include "PokemonLZA_MoveBoxArrow.h"

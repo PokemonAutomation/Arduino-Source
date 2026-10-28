@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "ML/Inference/ML_PaddleOCRPipeline.h"

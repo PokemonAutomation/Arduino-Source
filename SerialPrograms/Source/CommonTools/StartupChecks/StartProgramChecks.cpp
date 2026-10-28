@@ -10,9 +10,9 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/VisualDetectors/BlackBorderDetector.h"
+#include "StartProgramChecks.h"
 #include "Controllers/ControllerTypes.h"
 #include "Controllers/Controller.h"
-#include "StartProgramChecks.h"
 
 namespace PokemonAutomation{
 namespace StartProgramChecks{

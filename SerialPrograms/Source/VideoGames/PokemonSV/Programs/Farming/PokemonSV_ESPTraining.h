@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_PokemonSV_ESPTraining_H
 #define PokemonAutomation_PokemonSV_ESPTraining_H
 
-#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"

@@ -13,9 +13,8 @@
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "ImageBoxes.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 

@@ -5,10 +5,10 @@
  */
 
 #include <algorithm>
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV_MenuOption.h"
 #include "VideoGames/PokemonSV/Inference/PokemonSV_MenuOptionReader.h"
 

@@ -1,6 +1,7 @@
 
-#include <QApplication>
+#include <iostream>
 //#include <QTextStream>
+#include <QApplication>
 #include <QMessageBox>
 #include "Common/Cpp/Logging/LastLogTracker.h"
 #include "Common/Cpp/Logging/FileLogger.h"
@@ -23,30 +24,25 @@
 #include "GlobalSettingsPanel.h"
 #include "GlobalServices.h"
 #include "PersistentSettings.h"
-#include "Tests/CommandLineTests.h"
 #include "ErrorReports/ProgramDumper.h"
 #include "ErrorReports/ErrorReports.h"
 #include "Environment/HardwareValidation.h"
-#include "Integrations/DiscordSettingsOption.h"
-#include "Integrations/DiscordSocial/DiscordSocial.h"
-#include "Integrations/DppIntegration/DppClient.h"
 #include "Logging/Logger.h"
 #include "Logging/OutputRedirector.h"
-//#include "Tools/StatsDatabase.h"
-//#include "Windows/DpiScaler.h"
 #include "Startup/SetupSettings.h"
 #include "Startup/NewVersionCheck.h"
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
+//#include "Tools/StatsDatabase.h"
+//#include "Windows/DpiScaler.h"
+#include "Windows/MainWindow.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "ControllerInput/ControllerInput.h"
 #include "Controllers/SerialPort/SerialPortPollerQt.h"
+#include "Tests/CommandLineTests.h"
+#include "Integrations/DiscordSettingsOption.h"
+#include "Integrations/DiscordSocial/DiscordSocial.h"
+#include "Integrations/DppIntegration/DppClient.h"
 #include "Integrations/DiscordWebhook.h"
-#include "Windows/MainWindow.h"
-
-#include <iostream>
-using std::cout;
-using std::endl;
-
 
 using namespace PokemonAutomation;
 
@@ -300,7 +296,7 @@ int main(int argc, char *argv[]){
     GlobalThreadPools::qt_worker_threadpool().stop();
     GlobalThreadPools::qt_event_threadpool().stop();
 
-    cout << "Exiting main()..." << endl;
+    std::cout << "Exiting main()..." << std::endl;
 
     return ret;
 }

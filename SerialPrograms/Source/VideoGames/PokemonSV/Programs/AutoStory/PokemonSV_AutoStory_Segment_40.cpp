@@ -4,12 +4,12 @@
  *
  */
 
-#include "VideoGames/PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h"
-#include "VideoGames/PokemonSV/Inference/PokemonSV_TutorialDetector.h"
-
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/Async/InferenceRoutines.h"
+
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "VideoGames/PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h"
+#include "VideoGames/PokemonSV/Inference/PokemonSV_TutorialDetector.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_WorldNavigation.h"
 #include "PokemonSV_AutoStoryTools.h"

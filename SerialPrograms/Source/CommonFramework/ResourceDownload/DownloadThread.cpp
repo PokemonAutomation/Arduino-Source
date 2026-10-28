@@ -4,22 +4,17 @@
  *
  */
 
+#include <iostream>
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/Tools/FileDownloader.h"
 #include "CommonFramework/Tools/FileUnzip.h"
 #include "CommonFramework/Tools/FileHash.h"
-#include "CommonFramework/Logging/Logger.h"
-
 #include "DownloadThread.h"
-
-
-#include <iostream>
-using std::cout;
-using std::endl;
 
 namespace PokemonAutomation{
 
@@ -53,7 +48,7 @@ void DownloadThread::start_download_thread(){
             m_hooks.on_finished(success);
         });
 
-        try {
+        try{
 
             // Logger& logger = global_logger_tagged();
             // throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, 
@@ -65,7 +60,7 @@ void DownloadThread::start_download_thread(){
 
             run_download(m_remote_metadata);
 
-            cout << "Done Download" << endl;
+            std::cout << "Done Download" << std::endl;
             success = true;
 
         }catch(OperationCancelledException&){
@@ -127,9 +122,12 @@ void DownloadThread::run_download(DownloadedResourceMetadata resource_metadata){
             );
         std::string expected_hash = resource_metadata.sha256;
         if (hash != expected_hash){
-            std::cerr << "current hash: " << hash << endl;
-            throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, 
-                "Downloaded file failed verification. SHA 256 hash did not match the expected value.");
+            std::cerr << "current hash: " << hash << std::endl;
+            throw_and_log<OperationFailedException>(
+                logger,
+                ErrorReportMode::NO_ERROR_REPORT,
+                "Downloaded file failed verification. SHA 256 hash did not match the expected value."
+            );
         }
 
         // Filesystem::Path p{zip_path};

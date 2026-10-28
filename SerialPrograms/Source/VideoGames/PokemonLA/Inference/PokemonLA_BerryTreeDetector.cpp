@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <sstream>
 #include <map>
+#include <iostream>
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
@@ -19,9 +20,8 @@
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "PokemonLA_BerryTreeDetector.h"
-#include "VideoGames/PokemonLA/PokemonLA_Locations.h"
 
-#include <iostream>
+#include "VideoGames/PokemonLA/PokemonLA_Locations.h"
 using std::cout;
 using std::endl;
 

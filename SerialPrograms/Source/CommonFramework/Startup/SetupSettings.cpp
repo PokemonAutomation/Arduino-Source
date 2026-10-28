@@ -17,9 +17,9 @@
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "SetupSettings.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 

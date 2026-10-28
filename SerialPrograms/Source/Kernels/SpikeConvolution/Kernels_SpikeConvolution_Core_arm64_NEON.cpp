@@ -7,8 +7,8 @@
 #ifdef PA_AutoDispatch_arm64_20_M1
 
 #include <arm_neon.h>
-#include "Kernels_SpikeConvolution_Routines.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "Kernels_SpikeConvolution_Routines.h"
 #include "Kernels_SpikeConvolution_TestInfra.h"
 
 namespace PokemonAutomation{

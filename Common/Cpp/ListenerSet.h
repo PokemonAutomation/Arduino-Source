@@ -10,12 +10,8 @@
 #include <exception>
 #include <map>
 #include <atomic>
-//#include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/Concurrency/SpinLock.h"
-
 #include <iostream>
-//using std::cout;
-//using std::endl;
+#include "Common/Cpp/Concurrency/SpinLock.h"
 
 
 //#define PA_DEBUG_ListenerSet

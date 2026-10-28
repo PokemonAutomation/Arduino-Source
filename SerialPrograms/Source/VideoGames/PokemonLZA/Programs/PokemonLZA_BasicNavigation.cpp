@@ -4,6 +4,7 @@
  *
  */
 
+#include <cmath>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -19,9 +20,8 @@
 #include "VideoGames/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h"
 #include "VideoGames/PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "VideoGames/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
-#include "PokemonLZA_BasicNavigation.h"
 
-#include <cmath>
+#include "PokemonLZA_BasicNavigation.h"
 
 namespace PokemonAutomation::NintendoSwitch::PokemonLZA{
 

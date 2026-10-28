@@ -6,11 +6,11 @@
 
 #ifdef PA_AutoDispatch_x64_08_Nehalem
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels_AbsFFT_Arch_x86_SSE41.h"
 #include "Kernels_AbsFFT_BaseTransform_x86_SSE41.h"
 #include "Kernels_AbsFFT_TwiddleTable.tpp"
 #include "Kernels_AbsFFT_FullTransform.tpp"
-#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels_AbsFFT_TestInfra.h"
 
 namespace PokemonAutomation{

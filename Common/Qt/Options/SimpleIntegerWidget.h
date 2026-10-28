@@ -8,8 +8,8 @@
 #define PokemonAutomation_SimpleIntegerWidget_H
 
 #include <QLineEdit>
-#include "ConfigWidget.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "ConfigWidget.h"
 
 namespace PokemonAutomation{
 

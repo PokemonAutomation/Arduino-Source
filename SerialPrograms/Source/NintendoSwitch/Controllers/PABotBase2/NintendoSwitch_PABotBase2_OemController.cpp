@@ -4,8 +4,8 @@
  *
  */
 
-#include "Common/PABotBase2/Controllers/PABotBase2_Controller_NS1_OemController.h"
 #include "Common/Cpp/ColoredText.h"
+#include "Common/PABotBase2/Controllers/PABotBase2_Controller_NS1_OemController.h"
 #include "Controllers/SerialPort/SerialPABotBase.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_PABotBase2_OemController.h"

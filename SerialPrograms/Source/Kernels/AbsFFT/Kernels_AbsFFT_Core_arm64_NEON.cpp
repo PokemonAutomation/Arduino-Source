@@ -6,11 +6,11 @@
 
 #ifdef PA_AutoDispatch_arm64_20_M1
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels_AbsFFT_Arch_arm64_NEON.h"
 #include "Kernels_AbsFFT_BaseTransform_arm64_NEON.h"
 #include "Kernels_AbsFFT_TwiddleTable.tpp"
 #include "Kernels_AbsFFT_FullTransform.tpp"
-#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels_AbsFFT_TestInfra.h"
 
 namespace PokemonAutomation{

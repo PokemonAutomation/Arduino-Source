@@ -3,11 +3,11 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
+#include <iostream>
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
-#include "PokemonSwSh_MaxLair_Options_Consoles.h"
 
-#include <iostream>
+#include "PokemonSwSh_MaxLair_Options_Consoles.h"
 using std::cout;
 using std::endl;
 

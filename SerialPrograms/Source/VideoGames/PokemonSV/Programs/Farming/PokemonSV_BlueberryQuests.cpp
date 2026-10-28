@@ -4,6 +4,7 @@
  *
  */
 
+#include<vector>
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
@@ -40,9 +41,8 @@
 #include "VideoGames/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h"
 #include "VideoGames/PokemonSV/Programs/Farming/PokemonSV_BlueberryCatchPhoto.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_Terarium.h"
-#include "PokemonSV_BlueberryQuests.h"
 
-#include<vector>
+#include "PokemonSV_BlueberryQuests.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -4,8 +4,8 @@
  *
  */
 
-#include <QImageReader>
 #include <iostream>
+#include <QImageReader>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "ImageRGB32_Qt.h"

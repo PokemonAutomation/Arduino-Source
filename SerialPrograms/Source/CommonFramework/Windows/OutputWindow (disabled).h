@@ -7,10 +7,10 @@
 #ifndef PokemonAutomation_TextWindow_H
 #define PokemonAutomation_TextWindow_H
 
+#include "ClientSource/Libraries/Logging.h"
 #include <QFile>
 #include <QTextEdit>
 #include <QMainWindow>
-#include "ClientSource/Libraries/Logging.h"
 #include "CommonFramework/Logging/Logger.h"
 
 namespace PokemonAutomation{

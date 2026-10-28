@@ -9,8 +9,8 @@
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "CommonTools/Options/LanguageOCROption.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "PokemonFRLG_RngDisplays.h"
 

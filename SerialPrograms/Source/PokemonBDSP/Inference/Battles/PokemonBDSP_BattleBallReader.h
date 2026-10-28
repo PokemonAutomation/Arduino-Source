@@ -9,8 +9,8 @@
 
 #include <string>
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonTools/ImageMatch/CroppedImageDictionaryMatcher.h"
 #include "CommonFramework/Tools/VideoStream.h"
+#include "CommonTools/ImageMatch/CroppedImageDictionaryMatcher.h"
 #include "Pokemon/Inference/Pokemon_PokeballNameReader.h"
 
 namespace PokemonAutomation{

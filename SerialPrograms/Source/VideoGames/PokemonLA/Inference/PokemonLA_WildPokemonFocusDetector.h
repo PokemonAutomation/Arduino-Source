@@ -11,8 +11,8 @@
 #include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "VideoGames/PokemonLA/Resources/PokemonLA_PokemonInfo.h"
 
 namespace PokemonAutomation{

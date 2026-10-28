@@ -8,10 +8,10 @@
 
 #include <immintrin.h>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/Kernels_x64_AVX2.h"
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h"
 #include "Kernels_ImagePixelSumSqrDev.h"
-#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels_ImagePixelSumSqrDev_TestInfra.h"
 
 namespace PokemonAutomation{

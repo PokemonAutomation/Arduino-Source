@@ -9,8 +9,8 @@
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonTools/VisualDetector.h"
-#include "VideoGames/PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "CommonTools/DetectedBoxes.h"
+#include "VideoGames/PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

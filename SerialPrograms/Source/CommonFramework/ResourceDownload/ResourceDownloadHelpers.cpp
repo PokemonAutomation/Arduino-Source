@@ -4,23 +4,19 @@
  *
  */
 
-#include "CommonFramework/Tools/FileDownloader.h"
-#include "Common/Cpp/Filesystem/Filesystem.h"
+#include <iostream>
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Filesystem/Filesystem.h"
+#include "CommonFramework/Tools/FileDownloader.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "ResourceDownloadHelpers.h"
 
-// #include <filesystem>
-// #include <thread>
-// #include <unordered_set>
-
-#include <iostream>
-using std::cout;
-using std::endl;
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -55,7 +51,7 @@ std::vector<DownloadedResourceMetadata> deserialize_resource_list_json(const Jso
         }
 
     }catch (ParseException&){
-        std::cerr << "JSON parsing error. Given JSON file doesn't match the expected format." << endl;
+        std::cerr << "JSON parsing error. Given JSON file doesn't match the expected format." << std::endl;
         // throw ParseException("JSON parsing error. Given JSON file doesn't match the expected format.");
         return std::vector<DownloadedResourceMetadata>();
     }
@@ -84,7 +80,7 @@ std::optional<uint16_t> get_resource_version_num(Filesystem::Path folder_path){
         uint16_t version_num = (uint16_t)obj.get_integer_throw("version");
         return version_num;
     }catch(...){
-        std::cerr << "Unable to determine the version number from version.json." << endl;
+        std::cerr << "Unable to determine the version number from version.json." << std::endl;
         return std::nullopt;
     }
 
@@ -125,7 +121,10 @@ ResourceVersionInfo get_local_version_info(const std::string& target_resource_sl
 }
 
 
-DownloadedResourceMetadata get_resource_metadata_from_resource_type(const std::string& target_resource_slug, const std::vector<DownloadedResourceMetadata>& resource_list){
+DownloadedResourceMetadata get_resource_metadata_from_resource_type(
+    const std::string& target_resource_slug,
+    const std::vector<DownloadedResourceMetadata>& resource_list
+){
 
     for (uint16_t index = 0; index < resource_list.size(); index++){
         const DownloadedResourceMetadata& metadata = resource_list[index];
@@ -145,7 +144,11 @@ DownloadedResourceMetadata get_expected_resource_metadata_from_resource_slug(con
     try{
         return get_resource_metadata_from_resource_type(target_resource_slug, expected_resource_download_list());
     }catch(OperationFailedException&){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "get_expected_resource_metadata_from_resource_slug: Unable to find target_resource_slug within resource_list. This shouldn't happen."); 
+        throw InternalProgramError(
+            nullptr,
+            PA_CURRENT_FUNCTION,
+            "get_expected_resource_metadata_from_resource_slug: Unable to find target_resource_slug within resource_list. This shouldn't happen."
+        );
     }
 }
 
@@ -200,7 +203,7 @@ DownloadedResourceMetadata get_remote_resource_metadata_from_resource_slug(const
     try{
         remote_resources = remote_resource_download_list();
     }catch(OperationFailedException&){
-        std::cerr << "get_remote_resource_metadata_from_resource_slug: Error" << endl;
+        std::cerr << "get_remote_resource_metadata_from_resource_slug: Error" << std::endl;
         throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, 
             "Error: Download failed. Failed to fetch the list of available downloads. Check your internet connection.");
     }
@@ -209,7 +212,7 @@ DownloadedResourceMetadata get_remote_resource_metadata_from_resource_slug(const
     try{
         return get_resource_metadata_from_resource_type(target_resource_slug, remote_resources);
     }catch(OperationFailedException&){
-        std::cerr << "get_remote_resource_metadata_from_resource_slug: Error" << endl;
+        std::cerr << "get_remote_resource_metadata_from_resource_slug: Error" << std::endl;
         throw_and_log<OperationFailedException>(logger, ErrorReportMode::NO_ERROR_REPORT, 
             "get_remote_resource_metadata_from_resource_slug: Unable to find " + target_resource_slug + " within resource_list. "
             "Likely caused by resource being no longer available for download. We recommend updating the Computer Control program.");

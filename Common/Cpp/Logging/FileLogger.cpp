@@ -4,14 +4,11 @@
  *
  */
 
+#include <iostream>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Filesystem/FilePath.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "FileLogger.h"
-#include <iostream>
-
-//using std::cout;
-//using std::endl;
 
 namespace PokemonAutomation{
 

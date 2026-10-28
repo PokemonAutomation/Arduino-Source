@@ -5,24 +5,24 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Kernels_BinaryImage_BasicFilters_Routines.h"
+//#include "Kernels_BinaryImage_BasicFilters_Routines.h"
 #include "Kernels_BinaryImage_BasicFilters.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace Kernels{
 
 
 
-void filter_by_mask_64x4_Default      (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
-void filter_by_mask_64x8_x64_SSE42    (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
-void filter_by_mask_64x16_x64_AVX2    (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
-void filter_by_mask_64x32_x64_AVX512  (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
-void filter_by_mask_64x64_x64_AVX512  (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
-void filter_by_mask_64x8_arm64_NEON    (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
+void filter_by_mask_64x4_Default    (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
+void filter_by_mask_64x8_x64_SSE42  (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
+void filter_by_mask_64x16_x64_AVX2  (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
+void filter_by_mask_64x32_x64_AVX512(const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
+void filter_by_mask_64x64_x64_AVX512(const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
+void filter_by_mask_64x8_arm64_NEON (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
 
 void filter_by_mask(
     const PackedBinaryMatrix_IB& matrix,

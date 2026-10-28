@@ -4,15 +4,15 @@
  *
  */
 
+#include <algorithm>
+#include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/ImageMatch/ExactImageMatcher.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
-#include "Kernels/Waterfill/Kernels_Waterfill.h"
-#include "Pokemon_TypeReader.h"
 
-#include <algorithm>
+#include "Pokemon_TypeReader.h"
 
 namespace PokemonAutomation {
 namespace Pokemon {

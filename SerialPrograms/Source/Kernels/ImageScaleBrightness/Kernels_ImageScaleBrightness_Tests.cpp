@@ -9,10 +9,10 @@
 #include <format>
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "Kernels_ImageScaleBrightness_Tests.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Tests/GuardPageImage.h"
-#include "Kernels_ImageScaleBrightness_Tests.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

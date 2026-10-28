@@ -5,8 +5,8 @@
  */
 
 #include <QWidget>
-#include "ConfigWidget.h"
 #include "Common/Cpp/Options/GroupOption.h"
+#include "ConfigWidget.h"
 
 #ifndef PokemonAutomation_Options_GroupWidget_H
 #define PokemonAutomation_Options_GroupWidget_H

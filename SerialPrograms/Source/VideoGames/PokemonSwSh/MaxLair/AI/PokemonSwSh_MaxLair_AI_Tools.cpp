@@ -5,15 +5,15 @@
  */
 
 #include <vector>
+#include <iostream>
 #include "Common/Cpp/Exceptions.h"
 #include "VideoGames/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Pokemon.h"
 #include "VideoGames/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Matchup.h"
 #include "VideoGames/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"
 #include "PokemonSwSh_MaxLair_AI_Tools.h"
 #include "PokemonSwSh_MaxLair_AI_PathMatchup.h"
-#include "PokemonSwSh_MaxLair_AI_RentalBossMatchup.h"
 
-#include <iostream>
+#include "PokemonSwSh_MaxLair_AI_RentalBossMatchup.h"
 using std::cout;
 using std::endl;
 

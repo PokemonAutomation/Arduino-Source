@@ -7,12 +7,12 @@
 #ifndef PokemonAutomation_PokemonLGPE_FossilRevival_H
 #define PokemonAutomation_PokemonLGPE_FossilRevival_H
 
+#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
-#include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

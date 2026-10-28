@@ -8,7 +8,6 @@
 #define PokemonAutomation_MainWindow_H
 
 #include <QMainWindow>
-#include "Common/Cpp/Logging/GlobalLogger.h"
 #include "Common/Cpp/Options/ConfigOption.h"
 #include "CommonFramework/Environment/SystemSleep.h"
 #include "CommonFramework/Panels/PanelTools.h"

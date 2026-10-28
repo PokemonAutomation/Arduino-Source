@@ -8,12 +8,12 @@
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "Tests/TestUtils.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonLZA_DialogDetector.h"
 
 //#include <iostream>

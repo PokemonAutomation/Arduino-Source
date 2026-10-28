@@ -10,11 +10,11 @@
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "PokemonFRLG_PartyMenuDetector.h"
 
 

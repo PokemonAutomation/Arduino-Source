@@ -13,9 +13,9 @@
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "Tests/TestUtils.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA_MapIconDetector.h"
-#include "Tests/TestUtils.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

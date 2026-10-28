@@ -4,6 +4,7 @@
  *
  */
 
+#include <iostream>
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/StaticGlobals.h"
@@ -13,7 +14,6 @@
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "WaterfillTemplateMatcher.h"
 
-#include <iostream>
 using std::cout;
 using std::endl;
 

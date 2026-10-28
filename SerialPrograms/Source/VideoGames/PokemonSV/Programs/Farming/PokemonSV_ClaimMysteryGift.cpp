@@ -4,31 +4,31 @@
  *
  */
 
-#include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include <iostream>
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
-//#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+//#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 //#include "CommonFramework/VideoPipeline/VideoFeed.h"
 //#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_SelectedSettingDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 //#include "VideoGames/PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 //#include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
+#include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_SaveGame.h"
-#include "VideoGames/PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 //#include "VideoGames/PokemonSV/Programs/PokemonSV_WorldNavigation.h"
+#include "VideoGames/PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "VideoGames/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.h"
 #include "VideoGames/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.h"
-#include "PokemonSV_ClaimMysteryGift.h"
 
-#include <iostream>
+#include "PokemonSV_ClaimMysteryGift.h"
 using std::cout;
 using std::endl;
 //#include <unordered_map>

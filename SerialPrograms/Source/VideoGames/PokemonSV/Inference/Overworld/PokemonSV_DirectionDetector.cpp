@@ -4,8 +4,9 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
+#include <cmath>
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
@@ -15,7 +16,6 @@
 #include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV_DirectionDetector.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_MenuNavigation.h"
-#include <cmath>
 
 //#include <iostream>
 //using std::cout;
