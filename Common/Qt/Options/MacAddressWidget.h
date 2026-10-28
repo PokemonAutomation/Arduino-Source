@@ -8,8 +8,8 @@
 #define PokemonAutomation_MacAddressWidget_H
 
 #include <QLineEdit>
-#include "ConfigWidget.h"
 #include "Common/Cpp/Options/MacAddressOption.h"
+#include "ConfigWidget.h"
 
 namespace PokemonAutomation{
 

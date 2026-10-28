@@ -3,7 +3,6 @@
 //#include <QTextStream>
 #include <QApplication>
 #include <QMessageBox>
-#include "Common/Qt/GlobalThreadPoolsQt.h"
 #include "Common/Cpp/Logging/LastLogTracker.h"
 #include "Common/Cpp/Logging/FileLogger.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
@@ -16,6 +15,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/ImageResolution.h"
 #include "Common/Cpp/ScopeExit.h"
+#include "Common/Qt/GlobalThreadPoolsQt.h"
 #include "StaticRegistration.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"

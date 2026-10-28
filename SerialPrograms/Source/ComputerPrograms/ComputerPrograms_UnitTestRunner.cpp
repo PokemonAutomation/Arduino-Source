@@ -4,12 +4,12 @@
  *
  */
 
-#include "Common/Qt/QtThreadPool_Tests.h"
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/TestRunners/TestImageDistortionManager.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "Common/Qt/QtThreadPool_Tests.h"
 #include "Kernels/Kernels_Tests.h"
 #include "CommonFramework/AudioPipeline/AudioInfo_Tests.h"
 #include "CommonFramework/AudioPipeline/ChannelMixer.h"

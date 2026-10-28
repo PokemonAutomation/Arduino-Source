@@ -3,12 +3,12 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
-#include "Common/Qt/CodeValidator.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "RandomCodeOption.h"
+#include "Common/Qt/CodeValidator.h"
 
 namespace PokemonAutomation{
 

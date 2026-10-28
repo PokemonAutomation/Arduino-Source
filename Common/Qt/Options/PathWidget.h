@@ -9,8 +9,8 @@
 
 #include <QLineEdit>
 #include <QPushButton>
-#include "ConfigWidget.h"
 #include "Common/Cpp/Options/PathOption.h"
+#include "ConfigWidget.h"
 
 namespace PokemonAutomation{
 

@@ -6,8 +6,8 @@
 
 #include <QAudioFormat>
 #include <QFileDialog>
-#include "Common/Qt/StringToolsQt.h"
 #include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"

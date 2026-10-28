@@ -6,9 +6,9 @@
 
 #include <QThread>
 #include <QApplication>
-#include "Redispatch.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
+#include "Redispatch.h"
 
 //#include <iostream>
 //using std::cout;

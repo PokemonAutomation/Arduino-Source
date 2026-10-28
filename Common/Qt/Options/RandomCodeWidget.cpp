@@ -8,9 +8,9 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/CodeValidator.h"
 #include "RandomCodeWidget.h"
-#include "Common/Cpp/Exceptions.h"
 
 namespace PokemonAutomation{
 

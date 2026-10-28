@@ -8,8 +8,8 @@
 #define PokemonAutomation_ColorWidget_H
 
 #include <QWidget>
-#include "ConfigWidget.h"
 #include "Common/Cpp/Options/ColorOption.h"
+#include "ConfigWidget.h"
 
 class QLabel;
 class QLineEdit;

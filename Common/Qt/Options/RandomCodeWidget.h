@@ -8,8 +8,8 @@
 #define PokemonAutomation_Options_RandomCodeWidget_H
 
 #include <QWidget>
-#include "ConfigWidget.h"
 #include "Common/Cpp/Options/RandomCodeOption.h"
+#include "ConfigWidget.h"
 
 class QLabel;
 class QLineEdit;

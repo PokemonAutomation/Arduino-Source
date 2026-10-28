@@ -8,8 +8,8 @@
 #define PokemonAutomation_Options_StaticTextWidget_H
 
 #include <QWidget>
-#include "ConfigWidget.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
+#include "ConfigWidget.h"
 
 class QLabel;
 

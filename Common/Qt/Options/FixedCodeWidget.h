@@ -8,8 +8,8 @@
 #define PokemonAutomation_Options_FixedCodeWidget_H
 
 #include <QWidget>
-#include "ConfigWidget.h"
 #include "Common/Cpp/Options/FixedCodeOption.h"
+#include "ConfigWidget.h"
 
 class QLineEdit;
 

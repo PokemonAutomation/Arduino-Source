@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_ConfigWidget_H
 #define PokemonAutomation_ConfigWidget_H
 
-#include "Common/Qt/UiStateQtWidget.h"
 #include "Common/Cpp/Options/ConfigOption.h"
+#include "Common/Qt/UiStateQtWidget.h"
 
 namespace PokemonAutomation{
 

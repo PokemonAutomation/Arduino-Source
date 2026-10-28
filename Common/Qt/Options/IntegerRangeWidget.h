@@ -8,8 +8,8 @@
 #define PokemonAutomation_IntegerRangeWidget_H
 
 #include <QLineEdit>
-#include "ConfigWidget.h"
 #include "Common/Cpp/Options/IntegerRangeOption.h"
+#include "ConfigWidget.h"
 
 namespace PokemonAutomation{
 

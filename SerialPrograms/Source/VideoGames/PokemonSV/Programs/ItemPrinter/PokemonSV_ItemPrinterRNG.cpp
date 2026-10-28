@@ -4,8 +4,8 @@
  *
  */
 
-#include "Common/Qt/TimeQt.h"
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Qt/TimeQt.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"

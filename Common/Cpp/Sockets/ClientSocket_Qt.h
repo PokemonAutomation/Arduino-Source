@@ -10,11 +10,11 @@
 #include <iostream>
 #include <QTcpSocket>
 //#include "Common/Cpp/Concurrency/SpinPause.h"
-#include "Common/Qt/QtThreadPool.h"
-#include "Common/Qt/GlobalThreadPoolsQt.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "AbstractClientSocket.h"
+#include "Common/Qt/QtThreadPool.h"
+#include "Common/Qt/GlobalThreadPoolsQt.h"
 
 //using std::cout;
 //using std::endl;

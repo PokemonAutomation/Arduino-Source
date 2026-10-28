@@ -4,8 +4,8 @@
  *
  */
 
-#include "CodeValidator.h"
 #include "Common/Cpp/Exceptions.h"
+#include "CodeValidator.h"
 
 namespace PokemonAutomation{
 

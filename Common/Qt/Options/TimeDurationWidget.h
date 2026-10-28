@@ -8,8 +8,8 @@
 #define PokemonAutomation_Options_TimeDurationWidget_H
 
 #include <QLineEdit>
-#include "ConfigWidget.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
+#include "ConfigWidget.h"
 
 class QLabel;
 

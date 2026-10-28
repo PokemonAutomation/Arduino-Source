@@ -8,8 +8,8 @@
 #define PokemonAutomation_BooleanCheckBoxWidget_H
 
 #include <QCheckBox>
-#include "ConfigWidget.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "ConfigWidget.h"
 
 namespace PokemonAutomation{
 

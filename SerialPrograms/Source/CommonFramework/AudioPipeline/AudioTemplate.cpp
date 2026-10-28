@@ -5,8 +5,8 @@
  */
 
 #include <sstream>
-#include "Common/Qt/GlobalThreadPoolsQt.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
+#include "Common/Qt/GlobalThreadPoolsQt.h"
 #include "Kernels/Kernels_Alignment.h"
 #include "Kernels/KaiserWindow/Kernels_KaiserWindow.h"
 #include "Kernels/AbsFFT/Kernels_AbsFFT.h"

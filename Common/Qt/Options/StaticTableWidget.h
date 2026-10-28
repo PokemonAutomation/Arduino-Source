@@ -8,8 +8,8 @@
 #define PokemonAutomation_Options_StaticTableWidget_H
 
 #include <QWidget>
-#include "ConfigWidget.h"
 #include "Common/Cpp/Options/StaticTableOption.h"
+#include "ConfigWidget.h"
 
 namespace PokemonAutomation{
 

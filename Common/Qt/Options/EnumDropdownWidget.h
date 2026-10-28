@@ -8,9 +8,9 @@
 #define PokemonAutomation_Options_EnumDropdownWidget_H
 
 #include <map>
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Qt/NoWheelComboBox.h"
 #include "ConfigWidget.h"
-#include "Common/Cpp/Options/EnumDropdownOption.h"
 
 namespace PokemonAutomation{
 

@@ -21,7 +21,6 @@
 #include <QGuiApplication>
 #include <QScreen>
 #include <QPixmap>
-#include "Common/Qt/TimeQt.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
@@ -35,11 +34,12 @@
 #include "Common/Cpp/Containers/CircularBuffer.h"
 #include "Common/Cpp/Sockets/ClientSocket.h"
 #include "Common/Cpp/Containers/SparseArray.h"
-#include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
 #include "Common/Cpp/Options/MacAddressOption.h"
 #include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2CC_ReliableStreamConnection.h"
 #include "Common/Cpp/StreamConnections/MockDevice.h"
 #include "Common/Cpp/TestRunners/ParallelUnitTestRunner.h"
+#include "Common/Qt/TimeQt.h"
+#include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
 #include "Kernels/ImageStats/Kernels_ImagePixelSumSqr.h"

@@ -8,8 +8,8 @@
 #define PokemonAutomation_BoxFloatWidget_H
 
 #include <QLineEdit>
-#include "ConfigWidget.h"
 #include "Common/Cpp/Options/BoxFloatOption.h"
+#include "ConfigWidget.h"
 
 namespace PokemonAutomation{
 

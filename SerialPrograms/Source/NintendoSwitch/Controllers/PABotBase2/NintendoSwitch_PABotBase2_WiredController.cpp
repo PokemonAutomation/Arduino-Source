@@ -4,9 +4,9 @@
  *
  */
 
-#include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
-#include "Common/PABotBase2/Controllers/PABotBase2_Controller_NS_WiredController.h"
 #include "Common/Cpp/ColoredText.h"
+#include "Common/PABotBase2/Controllers/PABotBase2_Controller_NS_WiredController.h"
+#include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
 #include "Controllers/JoystickTools.h"
 #include "NintendoSwitch_PABotBase2_WiredController.h"
 

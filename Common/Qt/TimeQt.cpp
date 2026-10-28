@@ -6,9 +6,9 @@
 
 #include <QDateTime>
 #include <QTimeZone>
-#include "TimeQt.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
+#include "TimeQt.h"
 
 namespace PokemonAutomation{
 
