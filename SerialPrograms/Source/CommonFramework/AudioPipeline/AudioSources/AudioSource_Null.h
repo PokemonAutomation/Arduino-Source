@@ -22,6 +22,9 @@ public:
     virtual bool operator==(const AudioSourceDescriptor& x) const override;
     virtual std::string display_name() const override;
 
+    virtual std::vector<AudioInputChoice> supported_formats() const override;
+    virtual bool sanitize_desired_format(Logger& logger, AudioInputChoice& format) const override;
+
     virtual JsonValue to_json() const override;
     virtual void load_json(const JsonValue& json) override;
 

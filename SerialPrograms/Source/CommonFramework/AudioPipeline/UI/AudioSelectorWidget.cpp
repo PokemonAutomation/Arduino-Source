@@ -208,16 +208,17 @@ AudioSelectorWidget::AudioSelectorWidget(QWidget& parent, AudioSession& session)
 
 
 
-void AudioSelectorWidget::build_input_list(const std::string& file, const AudioDeviceInfo& device){
+void AudioSelectorWidget::build_input_list(const std::shared_ptr<const AudioSourceDescriptor>& source){
     m_input_audios = AudioDeviceInfo::all_input_devices();
     m_audio_input_box->clear();
     m_audio_input_box->addItem("(none)");
     m_audio_input_box->addItem("Play Audio File");
-    size_t index = file.empty() ? 0 : 1;
+    bool is_device = source->type == AudioSourceType::Device;
+    size_t index = source->type == AudioSourceType::File ? 1 : 0;
     for (size_t c = 0; c < m_input_audios.size(); c++){
         const AudioDeviceInfo& audio = m_input_audios[c];
         m_audio_input_box->addItem(QString::fromStdString(audio.display_name()));
-        if (device == audio){
+        if (is_device && static_cast<const AudioSourceDescriptor_Device*>(source.get())->device_info() == audio){
             index = c + 2;
         }
     }
@@ -240,22 +241,23 @@ void AudioSelectorWidget::build_output_list(const AudioDeviceInfo& device){
 
 
 void AudioSelectorWidget::refresh_all(){
-    auto input = m_session.input_device();
-    refresh_input_device(input.first, input.second);
-    refresh_formats(input.first, input.second, m_session.input_choice());
+    refresh_input_device(m_session.input_source());
+    refresh_formats(m_session.input_source(), m_session.input_choice());
     refresh_output_device(m_session.output_device());
     refresh_volume(m_session.output_volume());
     refresh_display(m_session.display_type());
 }
-void AudioSelectorWidget::refresh_formats(const std::string& file, const AudioDeviceInfo& device, const AudioInputChoice& choice){
-//    cout << "AudioSelectorWidget::refresh_formats()" << endl;
-    if (!file.empty() || !device){
+void AudioSelectorWidget::refresh_formats(
+    const std::shared_ptr<const AudioSourceDescriptor>& source,
+    const AudioInputChoice& choice
+){
+    if (source == nullptr){
         m_audio_format_box->clear();
         return;
     }
-//    cout << "AudioSelectorWidget::refresh_formats() - inside" << endl;
 
-    m_input_choices = device.supported_choices();
+    m_input_choices = source->supported_formats();
+
     m_audio_format_box->clear();
     int index = -1;
     for (size_t c = 0; c < m_input_choices.size(); c++){
@@ -266,26 +268,31 @@ void AudioSelectorWidget::refresh_formats(const std::string& file, const AudioDe
     }
     m_audio_format_box->setCurrentIndex(index);
 }
-void AudioSelectorWidget::refresh_input_device(const std::string& file, const AudioDeviceInfo& device){
+void AudioSelectorWidget::refresh_input_device(const std::shared_ptr<const AudioSourceDescriptor>& source){
     if (m_input_audios.empty()){
-        build_input_list(file, device);
+        build_input_list(source);
         return;
     }
 
-    if (!file.empty()){
+    if (source == nullptr || source->type == AudioSourceType::None){
+        m_audio_input_box->setCurrentIndex(0);
+        return;
+    }
+
+    if (source->type == AudioSourceType::File){
         m_audio_input_box->setCurrentIndex(1);
         return;
     }
 
     //  See if it's in our cached list.
     for (size_t c = 0; c < m_input_audios.size(); c++){
-        if (device == m_input_audios[c]){
+        if (static_cast<const AudioSourceDescriptor_Device*>(source.get())->device_info() == m_input_audios[c]){
             m_audio_input_box->setCurrentIndex((int)c + 2);
             return;
         }
     }
 
-    build_input_list(file, device);
+    build_input_list(source);
 }
 void AudioSelectorWidget::refresh_output_device(const AudioDeviceInfo& device){
     if (m_output_audios.empty()){
@@ -323,11 +330,14 @@ void AudioSelectorWidget::refresh_display(AudioOption::AudioDisplayType display)
 }
 
 
-void AudioSelectorWidget::post_input_change(const std::string& file, const AudioDeviceInfo& device, const AudioInputChoice& choice){
-//    cout << "AudioSelectorWidget::input_changed()" << endl;
-    QMetaObject::invokeMethod(this, [this, device, file, choice]{
-        refresh_input_device(file, device);
-        refresh_formats(file, device, choice);
+void AudioSelectorWidget::post_input_change(
+    const std::shared_ptr<const AudioSourceDescriptor>& source,
+    const AudioInputChoice& choice
+){
+//    cout << "AudioSelectorWidget::input_changed(): " << source.get() << endl;
+    QMetaObject::invokeMethod(this, [this, source, choice]{
+        refresh_input_device(source);
+        refresh_formats(source, choice);
     }, Qt::QueuedConnection);   //  Queued due to potential recursive call to the same lock.
 }
 void AudioSelectorWidget::post_output_change(const AudioDeviceInfo& device){

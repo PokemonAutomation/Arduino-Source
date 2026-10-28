@@ -17,6 +17,15 @@ std::string AudioSourceDescriptor_Null::display_name() const{
     return "(none)";
 }
 
+
+std::vector<AudioInputChoice> AudioSourceDescriptor_Null::supported_formats() const{
+    return {};
+}
+bool AudioSourceDescriptor_Null::sanitize_desired_format(Logger& logger, AudioInputChoice& format) const{
+    format = AudioInputChoice();
+    return true;
+}
+
 JsonValue AudioSourceDescriptor_Null::to_json() const{
     return JsonValue();
 }

@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioSource_Device_H
 #define PokemonAutomation_AudioPipeline_AudioSource_Device_H
 
-#include "Kernels/AudioPipeline/Kernels_RawAudio2WorkingAudio.h"
 #include "CommonFramework/AudioPipeline/AudioSourceDescriptor.h"
 #include "CommonFramework/AudioPipeline/IO/AudioSource.h"
 #include "CommonFramework/AudioPipeline/IO/AudioInputDevice.h"
@@ -19,6 +18,10 @@ class AudioSourceDescriptor_Device : public AudioSourceDescriptor{
 public:
     AudioSourceDescriptor_Device()
         : AudioSourceDescriptor(AudioSourceType::Device)
+    {}
+    AudioSourceDescriptor_Device(const std::string& device_name)
+        : AudioSourceDescriptor(AudioSourceType::Device)
+        , m_info(std::move(device_name))
     {}
     AudioSourceDescriptor_Device(AudioDeviceInfo info)
         : AudioSourceDescriptor(AudioSourceType::Device)
@@ -34,6 +37,7 @@ public:
     virtual bool operator==(const AudioSourceDescriptor& x) const override;
     virtual std::string display_name() const override;
 
+    virtual std::vector<AudioInputChoice> supported_formats() const override;
     virtual bool sanitize_desired_format(Logger& logger, AudioInputChoice& format) const override;
 
     virtual JsonValue to_json() const override;

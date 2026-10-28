@@ -39,6 +39,7 @@ public:
     virtual bool operator==(const AudioSourceDescriptor& x) const = 0;
     virtual std::string display_name() const = 0;
 
+    virtual std::vector<AudioInputChoice> supported_formats() const = 0;
     virtual bool sanitize_desired_format(Logger& logger, AudioInputChoice& format) const = 0;
 
 public:

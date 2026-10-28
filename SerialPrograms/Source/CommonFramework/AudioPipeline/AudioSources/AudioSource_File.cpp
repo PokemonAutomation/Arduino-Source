@@ -42,6 +42,9 @@ bool AudioSourceDescriptor_File::operator==(const AudioSourceDescriptor& x) cons
     return m_path == other_path;
 }
 
+std::vector<AudioInputChoice> AudioSourceDescriptor_File::supported_formats() const{
+    return {};
+}
 bool AudioSourceDescriptor_File::sanitize_desired_format(Logger& logger, AudioInputChoice& format) const{
     format = AudioInputChoice();
     return true;
