@@ -24,6 +24,22 @@ namespace PokemonAutomation{
 
 class AudioDecoderWorker;
 
+
+//  Delete `decoder` (which must have no parent) without racing the decode
+//  backend's own threads.
+//  Qt's AVFoundation backend (the only one in Homebrew's macOS Qt, which is
+//  built without FFmpeg) reads and decodes the file on GCD queues that keep
+//  using the decoder until the end of the file. stop() does not wait for
+//  them, so deleting a decoder that is still decoding crashes on those queues
+//  (seen in Qt 6.9; the code is unchanged up to 6.12).
+//  If `running` (start() was called and neither finished() nor error() has
+//  been emitted yet), the decoder is left to decode to the end of the file:
+//  its buffers are read and dropped, and it deletes itself on finished() or
+//  error(). The event loop of the decoder's thread must keep running for that.
+//  Otherwise it is deleted right away.
+void delete_audio_decoder_when_done(QAudioDecoder* decoder, bool running);
+
+
 // Load .wav and .mp3 audio from disk and play at the file's sample rate.
 
 // Note: for ease of implementation this class saves all the decoded raw samples to
@@ -150,10 +166,6 @@ public:
 
     bool start_succeeded(){ return m_start_succeeded; }
 
-    void stop(){
-        QMetaObject::invokeMethod(this, &AudioDecoderWorker::internal_stop);
-    }
-
 signals:
     void errored();
 
@@ -161,7 +173,6 @@ signals:
 
 public slots:
     void internal_start();
-    void internal_stop();
 
     // Read decoded buffer sent from m_audio_decoder and store it into m_decoded_buffer.
     void read_audio_decoder_buffer();
@@ -176,6 +187,10 @@ private:
     QAudioFormat m_audio_format;
 
     QAudioDecoder* m_audio_decoder = nullptr;
+
+    // Whether m_audio_decoder has been started and has not finished or errored yet.
+    // Decides how the destructor deletes it: see delete_audio_decoder_when_done().
+    bool m_decoder_running = false;
 
     std::vector<char>& m_decoded_buffer;
 

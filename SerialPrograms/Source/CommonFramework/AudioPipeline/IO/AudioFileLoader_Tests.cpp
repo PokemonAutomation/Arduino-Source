@@ -346,6 +346,15 @@ std::string decoded_probe_fixture(){
     return UNIT_TEST_RESOURCE_PATH() + "CommonFramework/AudioPipeline/decoded_probe_44100_2ch.mp3";
 }
 
+//  The decoder's native output for the fixture is 44100 Hz stereo. Its
+//  sample type depends on the backend (float from FFmpeg and from
+//  AVFoundation since Qt 6.10, Int16 from AVFoundation in Qt 6.9), and the
+//  loader streams whichever it is, so any known sample type is accepted.
+bool is_fixture_native_format(const QAudioFormat& format){
+    return format.sampleRate() == 44100 && format.channelCount() == 2
+        && format.sampleFormat() != QAudioFormat::SampleFormat::Unknown;
+}
+
 
 class DecodedNativeProbeTest : public UnitTest{
 public:
@@ -355,7 +364,7 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope&) const override{
         //  The fixture (two 44100 Hz sines, one per channel):
-        //  the decoder's native output for it is 44100 Hz stereo float.
+        //  the decoder's native output for it is 44100 Hz stereo.
         const std::string fixture = decoded_probe_fixture();
         if (!std::filesystem::exists(std::filesystem::path(fixture))){
             return "Missing mp3 fixture: " + fixture + ".";
@@ -371,8 +380,7 @@ public:
         if (!probe_decoded_native_format(fixture, format)){
             return "probe_decoded_native_format() failed on the mp3 fixture.";
         }
-        if (format.sampleRate() != 44100 || format.channelCount() != 2
-            || format.sampleFormat() != QAudioFormat::SampleFormat::Float){
+        if (!is_fixture_native_format(format)){
             return "Unexpected native decoded format: " + dump_audio_format(format) + ".";
         }
 
@@ -390,8 +398,8 @@ public:
 //
 //  Full decode path with the native target: AudioFileLoader given the probed
 //  format as its target (an identity conversion for QAudioDecoder) must
-//  stream the file at its native 44100 Hz pace: about 2 s of stereo float,
-//  both channels carrying the fixture's tones, with the channel separation
+//  stream the file at its native 44100 Hz pace: about 2 s of stereo, both
+//  channels carrying the fixture's tones, with the channel separation
 //  intact.
 //
 class DecodedNativePlaybackTest : public UnitTest{
@@ -416,8 +424,7 @@ public:
         if (!probe_decoded_native_format(fixture, native)){
             return "probe_decoded_native_format() failed on the mp3 fixture.";
         }
-        if (native.sampleRate() != 44100 || native.channelCount() != 2
-            || native.sampleFormat() != QAudioFormat::SampleFormat::Float){
+        if (!is_fixture_native_format(native)){
             return "Unexpected native decoded format: " + dump_audio_format(native) + ".";
         }
 
@@ -431,8 +438,10 @@ public:
         std::vector<float> interleaved;
         QObject::connect(&loader, &AudioFileLoader::buffer_ready, &loader,
             [&](const char* data, size_t len){
-                const auto* frames = reinterpret_cast<const float*>(data);
-                interleaved.insert(interleaved.end(), frames, frames + len / sizeof(float));
+                //  The samples come in the native sample type.
+                const size_t old_size = interleaved.size();
+                interleaved.resize(old_size + len / native.bytesPerSample());
+                convert_samples_to_float(native, data, len, interleaved.data() + old_size);
             });
         QObject::connect(&loader, &AudioFileLoader::finished, &loader, [&loop]{
             loop.quit();

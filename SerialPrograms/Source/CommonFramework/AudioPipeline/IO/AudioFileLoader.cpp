@@ -24,6 +24,25 @@
 
 namespace PokemonAutomation{
 
+
+void delete_audio_decoder_when_done(QAudioDecoder* decoder, bool running){
+    if (!running){
+        delete decoder;
+        return;
+    }
+    //  Keep reading: the AVFoundation backend pauses decoding (and so never
+    //  finishes) while too many decoded buffers are waiting to be read.
+    QObject::connect(decoder, &QAudioDecoder::bufferReady, decoder, [decoder]{
+        decoder->read();
+    });
+    QObject::connect(decoder, &QAudioDecoder::finished, decoder, &QObject::deleteLater);
+    QObject::connect(
+        decoder, QOverload<QAudioDecoder::Error>::of(&QAudioDecoder::error),
+        decoder, &QObject::deleteLater
+    );
+}
+
+
 AudioFileLoader::AudioFileLoader(
     QObject* parent,
     const std::string& filename,
@@ -32,10 +51,8 @@ AudioFileLoader::AudioFileLoader(
     QObject(parent), m_filename(filename), m_audio_format(audio_format) {}
 
 AudioFileLoader::~AudioFileLoader(){
-    if (m_audio_decoder_worker){
-        m_audio_decoder_worker->stop();
-    }
-
+    //  The decoder is not stopped here: destroying the worker hands it to
+    //  delete_audio_decoder_when_done().
     GlobalThreadPools::qt_event_threadpool().remove_object(m_audio_decoder_worker);
 //    m_audioDecoderThread.quit();
 //    m_audioDecoderThread.wait();
@@ -336,7 +353,10 @@ void AudioDecoderWorker::internal_start(){
     // Note: here we save all the decoded raw samples to memory before sending them out.
     // For a large audio file this is problematic, will consume lots of memory. But for small audio
     // files this is OK.
-    connect(m_audio_decoder, &QAudioDecoder::finished, this, &AudioDecoderWorker::finished);
+    connect(m_audio_decoder, &QAudioDecoder::finished, this, [this](){
+        m_decoder_running = false;
+        emit finished();
+    });
 
     m_audio_decoder->setAudioFormat(m_audio_format);
     if (m_audio_decoder->error() != QAudioDecoder::NoError){
@@ -346,11 +366,14 @@ void AudioDecoderWorker::internal_start(){
     }
 
     connect(m_audio_decoder, QOverload<QAudioDecoder::Error>::of(&QAudioDecoder::error), this, [&](QAudioDecoder::Error){
+        m_decoder_running = false;
         handle_audio_decoder_error();
     });
 
     m_audio_decoder->setSource(QUrl::fromLocalFile(QString::fromStdString(m_filename)));
 
+    //  Set before start(): a backend may emit error() from inside start().
+    m_decoder_running = true;
     m_audio_decoder->start();
     std::cout << "Start audio decoder." << std::endl;
 
@@ -359,13 +382,15 @@ void AudioDecoderWorker::internal_start(){
 }
 
 AudioDecoderWorker::~AudioDecoderWorker(){
-    stop();
-}
-
-void AudioDecoderWorker::internal_stop(){
-    if (m_audio_decoder){
-        m_audio_decoder->stop();
+    if (m_audio_decoder == nullptr){
+        return;
     }
+    //  Take the decoder out of this worker, so a running decoder can outlive
+    //  it on this thread. Its buffers no longer go to m_decoded_buffer.
+    m_audio_decoder->setParent(nullptr);
+    m_audio_decoder->disconnect(this);
+    delete_audio_decoder_when_done(m_audio_decoder, m_decoder_running);
+    m_audio_decoder = nullptr;
 }
 
 void AudioDecoderWorker::read_audio_decoder_buffer(){

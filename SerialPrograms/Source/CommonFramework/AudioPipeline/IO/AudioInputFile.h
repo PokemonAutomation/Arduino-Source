@@ -30,9 +30,11 @@ bool probe_wav_native_format(const std::string& filename, QAudioFormat& out_form
 //  Probes the native output format of a compressed audio file (.mp3, .ogg,
 //  .flac, ...) by starting a throwaway QAudioDecoder without a target
 //  format and reading the format off the first decoded buffer: that is
-//  the format the decoder will produce for this file. Returns false if no
-//  decode backend is available, the file cannot be opened, or no buffer
-//  arrives within 3 seconds.
+//  the format the decoder will produce for this file. The sample type
+//  depends on the backend (e.g. float from FFmpeg, Int16 from AVFoundation
+//  in Qt 6.9). The probe decodes to the end of the file, up to 3 seconds,
+//  before it returns. Returns false if no decode backend is available, the
+//  file cannot be opened, or no buffer arrives within 3 seconds.
 bool probe_decoded_native_format(const std::string& filename, QAudioFormat& out_format);
 
 

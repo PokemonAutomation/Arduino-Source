@@ -53,38 +53,44 @@ bool probe_decoded_native_format(const std::string& filename, QAudioFormat& out_
     //  A QAudioDecoder started without a target format decodes in the
     //  source's native format, and the first decoded buffer carries that
     //  format. The probe runs a nested event loop on the calling thread
-    //  until the first buffer, an error, or a 3 s timeout. The decoder is
-    //  throwaway: only its output format is kept.
-    QAudioDecoder decoder(nullptr);
-    if (!decoder.isSupported()){
+    //  until the decoder reaches the end of the file, errors, or a 3 s
+    //  timeout. The decoder is throwaway: only the first buffer's format is
+    //  kept. It is not stopped after the first buffer, because a decoder
+    //  that is still decoding cannot be deleted safely (see
+    //  delete_audio_decoder_when_done()).
+    QAudioDecoder* decoder = new QAudioDecoder();
+    if (!decoder->isSupported()){
+        delete decoder;
         return false;
     }
-    decoder.setSource(QUrl::fromLocalFile(QString::fromStdString(filename)));
+    decoder->setSource(QUrl::fromLocalFile(QString::fromStdString(filename)));
 
     QEventLoop loop;
     bool got_format = false;
-    bool finished_without_audio = false;
+    bool running = true;
+    bool reached_end = false;
     QObject::connect(
-        &decoder, &QAudioDecoder::bufferReady,
-        &decoder, [&decoder, &out_format, &got_format, &loop]{
-            const QAudioBuffer buffer = decoder.read();
-            if (buffer.isValid() && buffer.format().isValid()){
+        decoder, &QAudioDecoder::bufferReady,
+        &loop, [decoder, &out_format, &got_format]{
+            const QAudioBuffer buffer = decoder->read();
+            if (!got_format && buffer.isValid() && buffer.format().isValid()){
                 out_format = buffer.format();
                 got_format = true;
             }
+        }
+    );
+    QObject::connect(
+        decoder, QOverload<QAudioDecoder::Error>::of(&QAudioDecoder::error),
+        &loop, [&running, &loop](QAudioDecoder::Error){
+            running = false;
             loop.quit();
         }
     );
     QObject::connect(
-        &decoder, QOverload<QAudioDecoder::Error>::of(&QAudioDecoder::error),
-        &decoder, [&loop](QAudioDecoder::Error){
-            loop.quit();
-        }
-    );
-    QObject::connect(
-        &decoder, &QAudioDecoder::finished,
-        &decoder, [&finished_without_audio, &loop]{
-            finished_without_audio = true;
+        decoder, &QAudioDecoder::finished,
+        &loop, [&running, &reached_end, &loop]{
+            running = false;
+            reached_end = true;
             loop.quit();
         }
     );
@@ -92,20 +98,29 @@ bool probe_decoded_native_format(const std::string& filename, QAudioFormat& out_
     QTimer timer;
     timer.setSingleShot(true);
     QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
-    decoder.start();
-    timer.start(3000);
-    loop.exec();
-    timer.stop();
-    decoder.stop();
-    decoder.deleteLater();
+    decoder->start();
+    //  A backend may emit error() from inside start(), and a quit() before
+    //  exec() is lost.
+    if (running){
+        timer.start(3000);
+        loop.exec();
+        timer.stop();
+    }
+
+    const QAudioDecoder::Error decode_error = decoder->error();
+    const std::string error_string = decoder->errorString().toStdString();
+
+    //  The handlers above point into this stack frame.
+    QObject::disconnect(decoder, nullptr, &loop, nullptr);
+    delete_audio_decoder_when_done(decoder, running);
 
     if (got_format){
         return true;
     }
-    if (decoder.error() != QAudioDecoder::NoError){
+    if (decode_error != QAudioDecoder::NoError){
         std::cout << "probe_decoded_native_format: decoder error for " << filename
-            << ": " << decoder.errorString().toStdString() << std::endl;
-    }else if (finished_without_audio){
+            << ": " << error_string << std::endl;
+    }else if (reached_end){
         std::cout << "probe_decoded_native_format: decoder finished without producing any audio for "
             << filename << " (the decoder found no usable audio in the file)." << std::endl;
     }else{
