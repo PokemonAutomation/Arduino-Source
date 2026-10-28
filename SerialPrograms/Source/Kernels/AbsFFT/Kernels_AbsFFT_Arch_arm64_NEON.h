@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_Kernels_AbsFFT_Arch_arm64_NEON_H
 #define PokemonAutomation_Kernels_AbsFFT_Arch_arm64_NEON_H
 
-#include <arm_neon.h>
 #include <cstddef>
+#include <arm_neon.h>
 #include "Common/Compiler.h"
 
 namespace PokemonAutomation{

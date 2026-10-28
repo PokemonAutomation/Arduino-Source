@@ -20,6 +20,7 @@
 #include <QGuiApplication>
 #include <QScreen>
 #include <QPixmap>
+#include "3rdParty-Core/nlohmann/json.hpp"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
@@ -38,7 +39,6 @@
 #include "Common/Cpp/StreamConnections/MockDevice.h"
 #include "Common/Cpp/TestRunners/ParallelUnitTestRunner.h"
 #include "Common/Qt/TimeQt.h"
-#include "3rdParty-Core/nlohmann/json.hpp"
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"

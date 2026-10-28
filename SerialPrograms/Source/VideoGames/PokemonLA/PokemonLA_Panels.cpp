@@ -7,6 +7,9 @@
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonLA_Panels.h"
+
+#include "PokemonLA_Settings.h"
 
 #include "Programs/General/PokemonLA_BraviaryHeightGlitch.h"
 #include "Programs/General/PokemonLA_DistortionWaiter.h"
@@ -19,7 +22,6 @@
 
 #include "Programs/Trading/PokemonLA_SelfBoxTrade.h"
 #include "Programs/Trading/PokemonLA_SelfTouchTrade.h"
-
 #include "Programs/Farming/PokemonLA_IngoBattleGrinder.h"
 #include "Programs/Farming/PokemonLA_IngoMoveGrinder.h"
 #include "Programs/Farming/PokemonLA_MagikarpMoveGrinder.h"
@@ -29,7 +31,6 @@
 
 #include "Programs/ShinyHunting/PokemonLA_AutoMultiSpawn.h"
 #include "Programs/ShinyHunting/PokemonLA_GalladeFinder.h"
-
 #include "Programs/ShinyHunting/PokemonLA_CrobatFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_FroslassFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_BurmyFinder.h"
@@ -44,9 +45,6 @@
 #include "Programs/TestPrograms/PokemonLA_SoundListener.h"
 
 #include "Programs/ML/PokemonLA_GeneratePokemonImageTrainingData.h"
-
-#include "PokemonLA_Panels.h"
-#include "PokemonLA_Settings.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -7,6 +7,9 @@
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonFRLG_Panels.h"
+
+#include "PokemonFRLG_Settings.h"
 
 #include "Programs/Farming/PokemonFRLG_EliteFourFarmer.h"
 #include "Programs/Farming/PokemonFRLG_HeldItemFarmer-SafariZone.h"
@@ -14,12 +17,14 @@
 #include "Programs/Farming/PokemonFRLG_NuggetBridgeFarmer.h"
 #include "Programs/Farming/PokemonFRLG_PickupFarmer.h"
 #include "Programs/Farming/PokemonFRLG_EvTrainer.h"
+
 #include "Programs/ShinyHunting/PokemonFRLG_GiftReset.h"
 #include "Programs/ShinyHunting/PokemonFRLG_LegendaryReset.h"
 #include "Programs/ShinyHunting/PokemonFRLG_LegendaryRunAway.h"
 #include "Programs/ShinyHunting/PokemonFRLG_PrizeCornerReset.h"
 #include "Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Fishing.h"
 #include "Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Overworld.h"
+
 #include "Programs/RngManipulation/PokemonFRLG_RngHelper.h"
 #include "Programs/RngManipulation/PokemonFRLG_SidHelper.h"
 #include "Programs/RngManipulation/PokemonFRLG_StarterRng.h"
@@ -28,16 +33,14 @@
 #include "Programs/RngManipulation/PokemonFRLG_WildRng.h"
 #include "Programs/RngManipulation/PokemonFRLG_RoamingLegendaryRng.h"
 #include "Programs/RngManipulation/PokemonFRLG_EggRng.h"
-#include "Programs/TestPrograms/PokemonFRLG_TestPartyInference.h"
+
 #include "Programs/TestPrograms/PokemonFRLG_SoundListener.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadStats.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadBattleLevelUp.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadTrainerId.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadEncounter.h"
 #include "Programs/TestPrograms/PokemonFRLG_SafariOptimalActionTest.h"
-
-#include "PokemonFRLG_Panels.h"
-#include "PokemonFRLG_Settings.h"
+#include "Programs/TestPrograms/PokemonFRLG_TestPartyInference.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

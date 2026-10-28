@@ -7,6 +7,9 @@
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 
+#include "PokemonBDSP_Panels.h"
+#include "PokemonBDSP_Settings.h"
+
 #include "Programs/General/PokemonBDSP_MassRelease.h"
 #include "Programs/General/PokemonBDSP_AutonomousBallThrower.h"
 
@@ -40,9 +43,6 @@
 #include "Programs/TestPrograms/PokemonBDSP_ShinyEncounterTester.h"
 #include "Programs/TestPrograms/PokemonBDSP_SoundListener.h"
 #include "Programs/TestPrograms/PokemonBDSP_SummaryReaderTester.h"
-
-#include "PokemonBDSP_Panels.h"
-#include "PokemonBDSP_Settings.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

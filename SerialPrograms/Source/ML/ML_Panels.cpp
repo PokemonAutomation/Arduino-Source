@@ -7,9 +7,9 @@
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Panels/PanelTools.h"
 #include "GameConsole/ConsolePanel.h"
-#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Programs/ML_LabelImages.h"
 #include "Programs/ML_RunYOLO.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "ML_Panels.h"
 
 
