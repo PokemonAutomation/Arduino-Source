@@ -32,6 +32,7 @@
 #include "VideoGames/PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_WorldNavigation.h"
 #include "VideoGames/PokemonSV/Inference/PokemonSV_BlueberryQuestDetector.h"
+#include "VideoGames/PokemonSV/Inference/PokemonSV_BlueberryPointsReader.h"
 #include "VideoGames/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
 #include "VideoGames/PokemonSV/Programs/Boxes/PokemonSV_BoxRelease.h"
 #include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h"
@@ -67,17 +68,12 @@ int read_BP(const ProgramInfo& info, VideoStream& stream, ProControllerContext& 
     context.wait_for_all_requests();
     
     VideoSnapshot screen = stream.video().snapshot();
-    ImageRGB32 BP_value = to_blackwhite_rgb32_range(
-        extract_box_reference(screen, ImageFloatBox(0.866, 0.019, 0.091, 0.041)),
-        true,
-        combine_rgb(198, 198, 198), combine_rgb(255, 255, 255)
-    );
 
     //Close panel
     pbf_mash_button(context, BUTTON_B, 800ms);
     context.wait_for_all_requests();
 
-    return OCR::read_number(stream.logger(), BP_value);
+    return read_BP_from_image(stream.logger(), screen);
 }
 
 std::vector<BBQuests> read_quests(
