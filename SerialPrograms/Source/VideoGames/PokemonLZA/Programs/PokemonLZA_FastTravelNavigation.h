@@ -9,7 +9,6 @@
 
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
-#include "PokemonLZA_BasicNavigation.h"
 #include "VideoGames/PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.h"
 #include "VideoGames/PokemonLZA/Inference/Map/PokemonLZA_MapDetector.h"
 #include "VideoGames/PokemonLZA/Inference/Map/PokemonLZA_LocationNameReader.h"
@@ -17,6 +16,7 @@
 #include "VideoGames/PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "VideoGames/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "VideoGames/PokemonLZA/Resources/PokemonLZA_Locations.h"
+#include "PokemonLZA_BasicNavigation.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

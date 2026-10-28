@@ -9,13 +9,14 @@
 #ifdef QT_CORE_LIB
 #include "Controllers/SerialPort/SerialPortPollerQt.h"
 #endif
-#include "SerialPABotBase2_Connection.h"
-#include "SerialPABotBase2_Descriptor.h"
 
 #include "Controllers/StandardHid/StandardHid_Keyboard_PABotBase2.h"
 #include "NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_ProController.h"
 #include "NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_Joycon.h"
 #include "NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_WiredController.h"
+
+#include "SerialPABotBase2_Connection.h"
+#include "SerialPABotBase2_Descriptor.h"
 
 //#include <iostream>
 //using std::cout;

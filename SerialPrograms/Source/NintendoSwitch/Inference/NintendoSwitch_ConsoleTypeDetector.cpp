@@ -6,9 +6,9 @@
 
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "NintendoSwitch_ConsoleTypeDetector.h"
-//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch_ConsoleTypeDetector.h"
 
 //#include <iostream>
 //using std::cout;

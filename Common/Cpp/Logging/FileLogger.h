@@ -11,12 +11,12 @@
 #define PokemonAutomation_Logging_FileLogger_H
 
 #include <deque>
-#include "AbstractLogger.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "Common/Cpp/Filesystem/FileIO.h"
+#include "AbstractLogger.h"
 
 namespace PokemonAutomation{
 

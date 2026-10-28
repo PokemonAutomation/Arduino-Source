@@ -4,7 +4,6 @@
  *
  */
 
-#include "Kernels_Tests.h"
 #include "AbsFFT/Kernels_AbsFFT.h"
 #include "AudioChannelInterleave/Kernels_AudioChannelInterleave.h"
 #include "AudioChannelMixer/Kernels_AudioChannelMixer.h"
@@ -19,6 +18,7 @@
 #include "ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.h"
 #include "SpikeConvolution/Kernels_SpikeConvolution.h"
 #include "Waterfill/Kernels_Waterfill_Tests.h"
+#include "Kernels_Tests.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

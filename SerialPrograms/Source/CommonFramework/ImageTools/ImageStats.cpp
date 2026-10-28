@@ -12,6 +12,7 @@
 #include "ImageBoxes.h"
 
 #include "ImageStats.h"
+
 using std::cout;
 using std::endl;
 

@@ -17,9 +17,9 @@
 #endif
 
 #ifdef PABB2_FIRMWARE
+#include "Tools/ResetListener.h"
 #include "PabbTime.h"
 #include "LocalMutex.h"
-#include "Tools/ResetListener.h"
 #else
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/Concurrency/Mutex.h"

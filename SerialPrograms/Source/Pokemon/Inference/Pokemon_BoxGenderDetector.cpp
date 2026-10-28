@@ -15,8 +15,8 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/ImageFilter.h"
-
 #include "Pokemon_BoxGenderDetector.h"
+
 using std::cout;
 using std::endl;
 

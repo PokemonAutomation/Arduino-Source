@@ -13,7 +13,6 @@
 #endif
 
 
-#include <iostream>
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
@@ -28,13 +27,14 @@
 #include "NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "VideoGames/PokemonSV/PokemonSV_Settings.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
+#include "VideoGames/PokemonSV/PokemonSV_Settings.h"
 #include "VideoGames/PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_WorldNavigation.h"
+
 #include "PokemonSV_AutoStory_Segment_00.h"
 #include "PokemonSV_AutoStory_Segment_01.h"
 #include "PokemonSV_AutoStory_Segment_02.h"
@@ -78,8 +78,10 @@
 #include "PokemonSV_AutoStory_Segment_40.h"
 
 #include "PokemonSV_AutoStory.h"
-using std::cout;
-using std::endl;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 //#include <unordered_map>
 //#include <algorithm>
 

@@ -4,18 +4,17 @@
  *
  */
 
-#include "StaticRegistration.h"
 #include "CommonTools/Options/QtWidgets/ScreenWatchWidget.h"
+#include "Common/Qt/Options/BatchWidget.h"
 
 //  Basic Options
-#include "Common/Qt/Options/BatchWidget.h"
 #include "Common/Qt/Options/BooleanCheckBoxWidget.h"
 #include "Common/Qt/Options/BoxFloatWidget.h"
 #include "Common/Qt/Options/ButtonWidget.h"
 #include "Common/Qt/Options/CheckboxDropdownWidget.h"
 #include "Common/Qt/Options/ColorWidget.h"
-//#include "Common/Qt/Options/ConfigWidget.h"
 #include "Common/Qt/Options/DateWidget.h"
+//#include "Common/Qt/Options/ConfigWidget.h"
 #include "Common/Qt/Options/EditableTableWidget.h"
 #include "Common/Qt/Options/EnumDropdownWidget.h"
 #include "Common/Qt/Options/FixedCodeWidget.h"
@@ -31,44 +30,45 @@
 #include "Common/Qt/Options/StringWidget.h"
 #include "Common/Qt/Options/TextEditWidget.h"
 #include "Common/Qt/Options/TimeDurationWidget.h"
+#include "CommonFramework/Options/QtWidget/LabelCellWidget.h"
 
 //  Common Framework
-#include "CommonFramework/Options/QtWidget/LabelCellWidget.h"
 #include "CommonFramework/Notifications/EventNotificationWidget.h"
 #include "CommonFramework/Panels/UI/PanelWidget.h"
 #include "CommonFramework/Panels/UI/OptionsPanelWidget.h"
-
-// Resource Download
 #include "CommonFramework/ResourceDownload/SettingsResourceDownloadWidget.h"
 
-//  Common Tools
+// Resource Download
 #include "CommonTools/Options/QtWidgets/StringSelectWidget.h"
+
+//  Common Tools
 #include "CommonTools/Options/QtWidgets/ScreenWatchWidget.h"
 #include "CommonTools/Options/QtWidgets/LanguageOCRWidget.h"
+#include "ComputerPrograms/Framework/ComputerProgramWidget.h"
 
 //  Computer Programs
-#include "ComputerPrograms/Framework/ComputerProgramWidget.h"
+#include "ControllerInput/Keyboard/KeyBindingWidget.h"
 
 //  Controllers
 //#include "Controllers/NullControllerWidget.h"
 #include "Controllers/ControllerSelectorWidget.h"
 #include "Controllers/PABotBase2/SerialPABotBase2_SelectorWidget.h"
-#include "ControllerInput/Keyboard/KeyBindingWidget.h"
+#include "GameConsole/UI/ConsoleSystemWidget.h"
 
 //  Consoles
-#include "GameConsole/UI/ConsoleSystemWidget.h"
 #include "GameConsole/UI/ConsolePanelWidget.h"
 #include "GameConsole/UI/ConsoleProgramWidget.h"
 #include "GameConsole/UI/MultiConsoleSystemWidget.h"
 #include "GameConsole/UI/MultiConsolePanelWidget.h"
 #include "GameConsole/UI/MultiConsoleProgramWidget.h"
+#include "NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h"
 
 //  Nintendo Switch
-#include "NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h"
+#include "VideoGames/PokemonLA/Options/QtWidgets/PokemonLA_CustomPathTableWidget.h"
 //#include "NintendoSwitch/Framework/UI/NintendoSwitch_SingleSwitchProgramWidget.h"
 
 //  Pokemon LA
-#include "VideoGames/PokemonLA/Options/QtWidgets/PokemonLA_CustomPathTableWidget.h"
+#include "StaticRegistration.h"
 
 namespace PokemonAutomation{
 

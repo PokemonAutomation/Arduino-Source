@@ -3,8 +3,8 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
-#include "PokemonSV_BBQOption.h"
 #include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
+#include "PokemonSV_BBQOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

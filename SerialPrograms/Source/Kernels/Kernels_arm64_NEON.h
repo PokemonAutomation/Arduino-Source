@@ -10,7 +10,6 @@
 #include <stdint.h>
 #include <iostream>
 #include <arm_neon.h>
-
 #include "Common/Compiler.h"
 
 namespace PokemonAutomation{

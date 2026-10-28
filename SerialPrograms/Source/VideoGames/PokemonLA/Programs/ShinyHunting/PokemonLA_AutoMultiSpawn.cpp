@@ -9,7 +9,6 @@
 #include <chrono>
 #include <iterator>
 #include <sstream>
-#include <iostream>
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -34,10 +33,11 @@
 #include "VideoGames/PokemonLA/Programs/PokemonLA_RegionNavigation.h"
 #include "VideoGames/PokemonLA/Programs/PokemonLA_TimeOfDayChange.h"
 #include "VideoGames/PokemonLA/PokemonLA_WeatherAndTime.h"
-
 #include "PokemonLA_AutoMultiSpawn.h"
-using std::cout;
-using std::endl;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

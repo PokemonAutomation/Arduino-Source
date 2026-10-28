@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonLA_OverworldDetector_H
 #define PokemonAutomation_PokemonLA_OverworldDetector_H
 
-#include "PokemonLA_MountDetector.h"
 #include "Objects/PokemonLA_ArcPhoneDetector.h"
+#include "PokemonLA_MountDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

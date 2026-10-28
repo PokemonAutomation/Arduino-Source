@@ -10,7 +10,6 @@
 #include <stdint.h>
 #include <iostream>
 #include <immintrin.h>
-
 #include "Common/Compiler.h"
 
 namespace PokemonAutomation{

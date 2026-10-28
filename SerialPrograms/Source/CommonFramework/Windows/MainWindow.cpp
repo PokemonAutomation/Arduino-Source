@@ -25,7 +25,6 @@
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "Common/Qt/UiStateQtWidget.h"
 #include "Common/Qt/WallpaperWidget.h"
-#include "PanelLists.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -36,6 +35,7 @@
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "WindowTracker.h"
 #include "ButtonDiagram.h"
+#include "PanelLists.h"
 #include "MainWindow.h"
 
 //#include <iostream>

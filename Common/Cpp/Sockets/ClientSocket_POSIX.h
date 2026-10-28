@@ -9,10 +9,10 @@
 #ifndef PokemonAutomation_ClientSocket_POSIX_H
 #define PokemonAutomation_ClientSocket_POSIX_H
 
+#include <signal.h>
 #include <iostream>
 #include <cerrno>
 #include <cstring>
-#include <signal.h>
 #include <sys/socket.h>
 #include <fcntl.h>
 #include <netinet/in.h>

@@ -7,13 +7,13 @@
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonPokopia_Panels.h"
+#include "Programs/PokemonPokopia_CloudIslandReset.h"
 
-#include "PokemonPokopia_Settings.h"
+#include "Programs/PokemonPokopia_DailyFarmer.h"
 
 // General
-#include "Programs/PokemonPokopia_CloudIslandReset.h"
-#include "Programs/PokemonPokopia_DailyFarmer.h"
+#include "PokemonPokopia_Panels.h"
+#include "PokemonPokopia_Settings.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -7,15 +7,12 @@
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSV_Panels.h"
-
-#include "PokemonSV_Settings.h"
-
 #include "Programs/General/PokemonSV_MassPurchase.h"
+
 #include "Programs/General/PokemonSV_ClothingBuyer.h"
+
 #include "Programs/General/PokemonSV_AutonomousBallThrower.h"
 #include "Programs/General/PokemonSV_SizeChecker.h"
-
 #include "Programs/Boxes/PokemonSV_MassRelease.h"
 #include "Programs/Boxes/PokemonSV_MassAttachItems.h"
 
@@ -24,6 +21,7 @@
 
 #include "Programs/Farming/PokemonSV_LPFarmer.h"
 #include "Programs/Farming/PokemonSV_GimmighoulChestFarmer.h"
+
 #include "Programs/Farming/PokemonSV_GimmighoulRoamingFarmer.h"
 #include "Programs/Farming/PokemonSV_AuctionFarmer.h"
 #include "Programs/Farming/PokemonSV_ESPTraining.h"
@@ -33,20 +31,19 @@
 #include "Programs/Farming/PokemonSV_BBQSoloFarmer.h"
 #include "Programs/Farming/PokemonSV_MaterialFarmer.h"
 #include "Programs/ItemPrinter/PokemonSV_ItemPrinterRNG.h"
-
 #include "Programs/Eggs/PokemonSV_EggFetcher.h"
 #include "Programs/Eggs/PokemonSV_EggHatcher.h"
-#include "Programs/Eggs/PokemonSV_EggAutonomous.h"
 
+#include "Programs/Eggs/PokemonSV_EggAutonomous.h"
 #include "Programs/TeraRaids/PokemonSV_AutoHost.h"
 #include "Programs/TeraRaids/PokemonSV_TeraRoller.h"
+
 #include "Programs/TeraRaids/PokemonSV_TeraSelfFarmer.h"
 #include "Programs/TeraRaids/PokemonSV_TeraMultiFarmer.h"
-
 #include "Programs/FastCodeEntry/PokemonSV_FastCodeEntry.h"
 #include "Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.h"
-#include "Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.h"
 
+#include "Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.h"
 #include "Programs/General/PokemonSV_StatsReset.h"
 #include "Programs/General/PokemonSV_StatsResetEventBattle.h"
 
@@ -58,13 +55,16 @@
 
 #include "Programs/Glitches/PokemonSV_WildItemFarmer.h"
 #include "Programs/Glitches/PokemonSV_RideCloner-1.0.1.h"
+
 #include "Programs/Glitches/PokemonSV_CloneItems-1.0.1.h"
+#include "Programs/ItemPrinter/PokemonSV_AutoItemPrinter.h"
+#include "Programs/TestPrograms/PokemonSV_SoundListener.h"
 
 //  Deprecated
-#include "Programs/ItemPrinter/PokemonSV_AutoItemPrinter.h"
-
-#include "Programs/TestPrograms/PokemonSV_SoundListener.h"
 #include "Programs/FormHunting/PokemonSV_ThreeSegmentDudunsparceFinder.h"
+
+#include "PokemonSV_Panels.h"
+#include "PokemonSV_Settings.h"
 
 #ifdef PA_OFFICIAL
 #include "../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.h"

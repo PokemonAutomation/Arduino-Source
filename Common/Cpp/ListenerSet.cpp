@@ -12,9 +12,9 @@
 #include <string>
 #include <thread>
 #include <vector>
-#include "ListenerSet.h"
 #include "Concurrency/Mutex.h"
 #include "TestRunners/UnitTestDatabase.h"
+#include "ListenerSet.h"
 
 namespace PokemonAutomation{
 

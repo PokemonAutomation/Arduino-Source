@@ -8,15 +8,15 @@
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonHome_Panels.h"
-
 #include "Programs/PokemonHome_PageSwap.h"
+
 #include "Programs/PokemonHome_BoxSorter.h"
 #include "Programs/PokemonHome_BoxSorterLivingDex.h"
-
 #include "Programs/PokemonHome_GenerateNameOCR.h"
+
 #include "Programs/TestPrograms/PokemonHome_ReadSummaryScreen.h"
 #include "Programs/TestPrograms/PokemonHome_TestDatabaseGenerator.h"
+#include "PokemonHome_Panels.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

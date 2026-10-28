@@ -8,10 +8,10 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch_FriendCodeAdder.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_NumberCodeEntry.h"
 #include "VideoGames/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h"
+#include "NintendoSwitch_FriendCodeAdder.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

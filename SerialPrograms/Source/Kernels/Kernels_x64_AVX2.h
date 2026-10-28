@@ -11,7 +11,6 @@
 #include <iostream>
 #include <immintrin.h>
 #include "Common/Compiler.h"
-
 #include "Kernels_x64_SSE41.h"
 
 namespace PokemonAutomation{

@@ -5,9 +5,8 @@
  */
 
 #include <vector>
-#include "ControllerInput.h"
-
 #include "Keyboard/GlobalKeyboardHidTracker.h"
+#include "ControllerInput.h"
 
 namespace PokemonAutomation{
 

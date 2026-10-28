@@ -6,9 +6,6 @@
 
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "PokemonBDSP_Panels.h"
-
-#include "PokemonBDSP_Settings.h"
 
 #include "Programs/General/PokemonBDSP_MassRelease.h"
 #include "Programs/General/PokemonBDSP_AutonomousBallThrower.h"
@@ -36,8 +33,6 @@
 #include "Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.3.h"
 #include "Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.2.h"
 #include "Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy2.h"
-//#include "Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy.h"
-//#include "Programs/Glitches/PokemonBDSP_CloneItemsMenuOverlap.h"
 
 #include "Programs/RngManipulation/PokemonBDSP_BedroomSeedFinder.h"
 #include "Programs/RngManipulation/PokemonBDSP_IntroSeedFinder.h"
@@ -45,6 +40,9 @@
 #include "Programs/TestPrograms/PokemonBDSP_ShinyEncounterTester.h"
 #include "Programs/TestPrograms/PokemonBDSP_SoundListener.h"
 #include "Programs/TestPrograms/PokemonBDSP_SummaryReaderTester.h"
+
+#include "PokemonBDSP_Panels.h"
+#include "PokemonBDSP_Settings.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

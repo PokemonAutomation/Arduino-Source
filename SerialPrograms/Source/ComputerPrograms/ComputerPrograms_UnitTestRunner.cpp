@@ -21,20 +21,21 @@
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/VisualDetectors/BlackBorderDetector.h"
 #include "CommonTools/OCR/OCR_Tests.h"
-#include "ComputerPrograms_UnitTestRunner.h"
 
 #include "NintendoSwitch/Inference/NintendoSwitch_CheckOnlineDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_FailedToConnectDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h"
 #include "NintendoSwitch/Programs/Typewriter/NintendoSwitch_Typewriter_Tests.h"
 
-#include "VideoGames/PokemonFRLG/PokemonFRLG_Tests.h"
-#include "VideoGames/PokemonRSE/PokemonRSE_Tests.h"
 #include "VideoGames/PokemonHome/PokemonHome_Tests.h"
 #include "VideoGames/PokemonSwSh/PokemonSwSh_Tests.h"
 #include "VideoGames/PokemonLA/PokemonLA_Tests.h"
 #include "VideoGames/PokemonSV/PokemonSV_Tests.h"
 #include "VideoGames/PokemonLZA/PokemonLZA_Tests.h"
+#include "VideoGames/PokemonFRLG/PokemonFRLG_Tests.h"
+#include "VideoGames/PokemonRSE/PokemonRSE_Tests.h"
+
+#include "ComputerPrograms_UnitTestRunner.h"
 
 namespace PokemonAutomation{
 namespace ComputerPrograms{

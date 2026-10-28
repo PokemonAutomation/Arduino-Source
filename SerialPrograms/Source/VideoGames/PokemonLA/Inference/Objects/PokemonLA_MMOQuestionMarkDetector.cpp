@@ -13,8 +13,8 @@
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "Tests/TestUtils.h"
-#include "PokemonLA_MMOQuestionMarkDetector.h"
 #include "VideoGames/PokemonLA/PokemonLA_Locations.h"
+#include "PokemonLA_MMOQuestionMarkDetector.h"
 
 using std::cout;
 using std::cerr;

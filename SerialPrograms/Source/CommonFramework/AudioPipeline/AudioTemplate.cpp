@@ -13,10 +13,10 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
-#include "AudioConstants.h"
-#include "AudioTemplate.h"
 #include "Tools/AudioFormatUtils.h"
 #include "IO/AudioFileLoader.h"
+#include "AudioConstants.h"
+#include "AudioTemplate.h"
 
 //#include <iostream>
 //using std::cout;

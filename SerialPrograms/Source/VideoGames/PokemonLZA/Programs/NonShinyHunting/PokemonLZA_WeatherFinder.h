@@ -8,7 +8,6 @@
 #ifndef PokemonAutomation_PokemonLZA_WeatherFinder_H
 #define PokemonAutomation_PokemonLZA_WeatherFinder_H
 
-#include <CommonFramework/GlobalSettingsPanel.h>
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"

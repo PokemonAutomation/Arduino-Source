@@ -12,8 +12,8 @@
 //#include "Pokemon/Pokemon_IvJudge.h"
 #include "Pokemon/Options/Pokemon_IvJudgeOption.h"
 #include "Pokemon/Inference/Pokemon_IvJudgeReader.h"
-#include "Pokemon_StatsHuntFilter.h"
 #include "Pokemon/Inference/Pokemon_NatureReader.h"
+#include "Pokemon_StatsHuntFilter.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{

@@ -16,10 +16,10 @@
 #include "VideoGames/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "VideoGames/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h"
 #include "VideoGames/PokemonLA/Programs/PokemonLA_BattleRoutines.h"
-#include "PokemonLA_IngoBattleGrinder.h"
 #include "VideoGames/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 #include "VideoGames/PokemonLA/Inference/Objects/PokemonLA_DialogEllipseDetector.h"
 #include "VideoGames/PokemonLA/Inference/PokemonLA_DialogDetector.h"
+#include "PokemonLA_IngoBattleGrinder.h"
 
 
 namespace PokemonAutomation{

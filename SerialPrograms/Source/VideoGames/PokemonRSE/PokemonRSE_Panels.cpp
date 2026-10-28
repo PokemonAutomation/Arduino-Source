@@ -7,19 +7,19 @@
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonRSE_Panels.h"
-
-#include "PokemonRSE_Settings.h"
-
 #include "Programs/ShinyHunting/PokemonRSE_AudioStarterReset.h"
+
 #include "Programs/ShinyHunting/PokemonRSE_GiftReset.h"
+
 #include "Programs/ShinyHunting/PokemonRSE_LegendaryReset.h"
 #include "Programs/ShinyHunting/PokemonRSE_LegendaryRunAway-Emerald.h"
 #include "Programs/ShinyHunting/PokemonRSE_ShinyHunt-Deoxys.h"
 #include "Programs/ShinyHunting/PokemonRSE_ShinyHunt-Mew.h"
-
 #include "Programs/ShinyHunting/PokemonRSE_StarterReset.h"
 #include "Programs/TestPrograms/PokemonRSE_SoundListener.h"
+
+#include "PokemonRSE_Panels.h"
+#include "PokemonRSE_Settings.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

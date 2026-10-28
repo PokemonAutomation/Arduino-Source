@@ -15,7 +15,6 @@
 #include <fstream>
 #include <condition_variable>
 #include <iostream>
-#include "3rdParty-Core/nlohmann/json.hpp"
 #include <QImage>
 #include <QDateTime>
 #include <QGuiApplication>
@@ -39,6 +38,7 @@
 #include "Common/Cpp/StreamConnections/MockDevice.h"
 #include "Common/Cpp/TestRunners/ParallelUnitTestRunner.h"
 #include "Common/Qt/TimeQt.h"
+#include "3rdParty-Core/nlohmann/json.hpp"
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
@@ -62,33 +62,33 @@
 #include "CommonTools/Images/ImageFilter.h"
 #include "Integrations/DiscordWebhook.h"
 #include "Integrations/PybindSwitchController.h"
-#include "TestProgramComputer.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Pokemon/Inference/Pokemon_IvJudgeReader.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "Pokemon/Pokemon_StatsCalculation.h"
 #include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinySparkleSet.h"
-#include "VideoGames/PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.h"
 #include "VideoGames/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "VideoGames/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
 #include "VideoGames/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"
 #include "VideoGames/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
-//#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
-#include "VideoGames/PokemonLA/Inference/PokemonLA_MountDetector.h"
-#include "VideoGames/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 #include "VideoGames/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
+//#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "VideoGames/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
+#include "VideoGames/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
+#include "VideoGames/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSelectMenu.h"
+#include "VideoGames/PokemonLA/Inference/PokemonLA_MountDetector.h"
+#include "VideoGames/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
+#include "VideoGames/PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.h"
 #include "VideoGames/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "VideoGames/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "VideoGames/PokemonSV/Programs/TeraRaids/PokemonSV_JoinTracker.h"
 #include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "VideoGames/PokemonSV/Inference/Map/PokemonSV_DestinationMarkerDetector.h"
-#include "VideoGames/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -106,20 +106,20 @@
 //#include "Kernels/ImageScaling/Kernels_ImageScaling_Default.h"
 //#include "Kernels/ImageScaling/Kernels_ImageScaling_x64_SSE41.h"
 #endif
-#include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
+#include "VideoGames/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
 //#include "Common/SerialPABotBase/LightweightWallClock_StdChrono.h"
+#include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "VideoGames/PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h"
 #include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "VideoGames/PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h"
 #include "VideoGames/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h"
-#include "VideoGames/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
-#include "VideoGames/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSelectMenu.h"
 #include "VideoGames/PokemonSV/Inference/PokemonSV_StatHexagonReader.h"
+#include "VideoGames/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterSeedCalc.h"
 //#include "Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_Default.h"
 //#include "Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_SSE2.h"
 //#include "Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_FMA3.h"
 //#include "Kernels/AudioResampler/Kernels_AudioResampler_BlockKernel_x64_AVX512.h"
-#include "VideoGames/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterSeedCalc.h"
+#include "VideoGames/PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.h"
 
 
 //#include <opencv2/core.hpp>
@@ -127,7 +127,8 @@
 //#include <random>
 
 
-#include "VideoGames/PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.h"
+#include "TestProgramComputer.h"
+
 using std::cout;
 using std::endl;
 

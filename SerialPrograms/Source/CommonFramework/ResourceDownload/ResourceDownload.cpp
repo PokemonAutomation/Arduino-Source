@@ -10,6 +10,7 @@
 #include "GlobalResourceDownloadManager.h"
 
 #include "ResourceDownload.h"
+
 using std::cout;
 using std::endl;
 

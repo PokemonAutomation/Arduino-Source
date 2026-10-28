@@ -8,9 +8,9 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <arm_neon.h>
 #include <algorithm>
 #include <iostream>
-#include <arm_neon.h>
 #include "Common/Compiler.h"
 
 using std::cout;

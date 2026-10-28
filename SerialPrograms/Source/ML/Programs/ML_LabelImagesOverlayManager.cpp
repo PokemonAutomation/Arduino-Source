@@ -5,13 +5,13 @@
  *  Manages image overlay rendering for program LabelImages.
  */
 
-#include <iostream>
+#include "Pokemon/Resources/Pokemon_PokemonForms.h"
 #include "ML_LabelImagesOverlayManager.h"
 #include "ML_LabelImages.h"
 
-#include "Pokemon/Resources/Pokemon_PokemonForms.h"
-using std::cout, std::endl;
-
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace ML{

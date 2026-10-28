@@ -18,10 +18,10 @@
 
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Concurrency/Watchdog.h"
-#include "AudioFeed.h"
-#include "AudioPassthroughPair.h"
 #include "Spectrum/FFTStreamer.h"
 #include "Spectrum/AudioSpectrumHolder.h"
+#include "AudioFeed.h"
+#include "AudioPassthroughPair.h"
 #include "AudioOption.h"
 
 namespace PokemonAutomation{

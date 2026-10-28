@@ -5,8 +5,8 @@
  */
 
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
-#include "NintendoSwitch_MultiSwitchProgram.h"
 #include "Framework/NintendoSwitch_MultiSwitchProgramSession.h"
+#include "NintendoSwitch_MultiSwitchProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

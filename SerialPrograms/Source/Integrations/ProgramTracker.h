@@ -16,9 +16,9 @@
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "CommonFramework/Globals.h"
 #include "Controllers/Joystick.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 #include "IntegrationsAPI.h"
 #include "ProgramTrackerInterfaces.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 
 namespace PokemonAutomation{
 

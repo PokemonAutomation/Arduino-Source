@@ -15,8 +15,8 @@
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "VideoGames/PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
-
 #include "PokemonLA_MountDetector.h"
+
 using std::cout;
 using std::endl;
 

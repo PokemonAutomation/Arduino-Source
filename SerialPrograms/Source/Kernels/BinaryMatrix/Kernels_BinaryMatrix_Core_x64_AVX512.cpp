@@ -6,9 +6,9 @@
 
 #ifdef PA_AutoDispatch_17_Skylake
 
+#include "Kernels_BinaryMatrix_Arch_x64_AVX512.h"
 #include "Kernels_PackedBinaryMatrixCore.tpp"
 #include "Kernels_SparseBinaryMatrixCore.tpp"
-#include "Kernels_BinaryMatrix_Arch_x64_AVX512.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

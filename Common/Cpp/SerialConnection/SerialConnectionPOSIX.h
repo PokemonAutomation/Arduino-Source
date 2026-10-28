@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_SerialConnectionPOSIX_H
 #define PokemonAutomation_SerialConnectionPOSIX_H
 
+#include <errno.h>
 #include <string>
 #include <atomic>
-#include <errno.h>
 #include <fcntl.h>
 #include <termios.h>
 #include <unistd.h>

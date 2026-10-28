@@ -5,11 +5,11 @@
  */
 
 #include <cmath>
-#include <iostream>
-
 #include "PokemonSwSh_PkmnLib_Matchup.h"
-using std::cout;
-using std::endl;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

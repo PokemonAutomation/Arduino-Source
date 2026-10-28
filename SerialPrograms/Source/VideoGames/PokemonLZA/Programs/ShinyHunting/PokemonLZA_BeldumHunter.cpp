@@ -18,8 +18,8 @@
 //#include "VideoGames/PokemonLZA/PokemonLZA_Settings.h"
 //#include "VideoGames/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 //#include "VideoGames/PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
-#include "VideoGames/PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "VideoGames/PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
+#include "VideoGames/PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "PokemonLZA_BeldumHunter.h"
 
 namespace PokemonAutomation{

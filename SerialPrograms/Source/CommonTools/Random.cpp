@@ -5,8 +5,8 @@
  */
 
 #include <chrono>
-#include "Common/CRC32/pabb_CRC32.h"
 #include "Common/Cpp/Exceptions.h"
+#include "Common/CRC32/pabb_CRC32.h"
 #include "Random.h"
 
 namespace PokemonAutomation{

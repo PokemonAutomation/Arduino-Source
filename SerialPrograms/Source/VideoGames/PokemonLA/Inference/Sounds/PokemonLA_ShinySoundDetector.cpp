@@ -6,8 +6,8 @@
 
 #include "CommonTools/Audio/SpectrogramMatcher.h"
 #include "CommonTools/Audio/AudioTemplateCache.h"
-#include "GameConsole/Framework/ConsoleSystemSession.h"
 #include "Tests/TestUtils.h"
+#include "GameConsole/Framework/ConsoleSystemSession.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "VideoGames/PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA_ShinySoundDetector.h"

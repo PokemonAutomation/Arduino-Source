@@ -4,7 +4,6 @@
  *
  */
 
-#include <iostream>
 #include <sstream>
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
@@ -12,11 +11,12 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP_BasicCatcher.h"
 #include "PokemonBDSP_EncounterHandler.h"
-
 #include "PokemonBDSP_GameNavigation.h"
 #include "PokemonBDSP_RunFromBattle.h"
-using std::cout;
-using std::endl;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -8,14 +8,14 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "ControllerTypeStrings.h"
-#include "ControllerStateTable.h"
 
-#include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
+//#include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProControllerTable.h"
 #include "NintendoSwitch/Controllers/Joycon/NintendoSwitch_JoyconTable.h"
-
 #include "NintendoSwitch/Options/TurboMacroTable.h"
+
+#include "ControllerTypeStrings.h"
+#include "ControllerStateTable.h"
 
 //#include <iostream>
 //using std::cout;

@@ -4,7 +4,6 @@
  *
  */
 
-#include <iostream>
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
@@ -16,10 +15,11 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV_BoxGenderDetector.h"
 #include "PokemonSV_BoxShinyDetector.h"
-
 #include "PokemonSV_BoxDetection.h"
-using std::cout;
-using std::endl;;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

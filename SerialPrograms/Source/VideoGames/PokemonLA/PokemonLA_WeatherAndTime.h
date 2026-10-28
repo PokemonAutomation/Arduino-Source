@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_PokemonLA_WeatherAndTime_H
 #define PokemonAutomation_PokemonLA_WeatherAndTime_H
 
+#include <stdint.h>
 #include <array>
 #include <string>
-#include <stdint.h>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

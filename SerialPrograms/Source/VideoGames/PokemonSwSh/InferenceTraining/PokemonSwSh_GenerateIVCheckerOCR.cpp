@@ -8,8 +8,8 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSwSh_GenerateIVCheckerOCR.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
+#include "PokemonSwSh_GenerateIVCheckerOCR.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
