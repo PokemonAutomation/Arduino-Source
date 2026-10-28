@@ -26,7 +26,6 @@ TestPartyInference_Descriptor::TestPartyInference_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG",
         "Test Party Inference", "",
         "Start on the party menu. Log party menu detection, empty slots, and held items from one snapshot.",
-        PanelQualityStanding::DEVELOPER,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
