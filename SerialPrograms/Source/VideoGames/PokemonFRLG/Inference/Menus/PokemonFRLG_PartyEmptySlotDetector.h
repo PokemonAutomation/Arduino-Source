@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonFRLG_PartyEmptySlotDetector_H
 
 #include <chrono>
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/VisualDetector.h"
 #include "PokemonFRLG_PartySlot.h"
@@ -31,6 +32,8 @@ private:
     Color m_color;
     ImageFloatBox m_box;
 };
+
+void add_tests_PartyEmptySlotDetector(UnitTestDatabase& database);
 
 }
 }

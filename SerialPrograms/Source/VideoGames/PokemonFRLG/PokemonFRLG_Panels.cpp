@@ -30,6 +30,7 @@
 #include "Programs/RngManipulation/PokemonFRLG_WildRng.h"
 #include "Programs/RngManipulation/PokemonFRLG_RoamingLegendaryRng.h"
 #include "Programs/RngManipulation/PokemonFRLG_EggRng.h"
+#include "Programs/TestPrograms/PokemonFRLG_TestPartyInference.h"
 #include "Programs/TestPrograms/PokemonFRLG_SoundListener.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadStats.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadBattleLevelUp.h"
@@ -96,6 +97,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
         ret.emplace_back(make_SingleSwitchProgram<ReadTrainerId>());
         ret.emplace_back(make_SingleSwitchProgram<ReadEncounter>());
         ret.emplace_back(make_SingleSwitchProgram<SafariOptimalActionTest>());
+        ret.emplace_back(make_SingleSwitchProgram<TestPartyInference>());
     }
 
     return ret;

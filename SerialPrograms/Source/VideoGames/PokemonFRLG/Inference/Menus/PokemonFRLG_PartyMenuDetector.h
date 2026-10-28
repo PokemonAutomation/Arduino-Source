@@ -78,6 +78,7 @@ public:
 };
 
 
+void add_tests_PartyMenuDetector(UnitTestDatabase& database);
 void add_tests_PartySlotDetector(UnitTestDatabase& database);
 }
 }
