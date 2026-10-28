@@ -46,7 +46,7 @@ void AudioSourceDescriptor_File::run_post_select(){
 //        return;
 //    }
     std::string path = QFileDialog::getOpenFileName(
-        nullptr, "Open image file", ".", "*.png *.jpg"
+        nullptr, "Open audio file", ".", "*.wav *.mp3"
     ).toStdString();
     set_path(std::move(path));
 }
@@ -68,6 +68,10 @@ std::unique_ptr<AudioSource> AudioSourceDescriptor_File::make_AudioSource(
     const AudioInputChoice& format
 ) const{
 //    cout << "make_AudioSource: " << m_path << endl;
+    if (m_path.empty()){
+        //  E.g. the user cancelled the file dialog: no source.
+        return nullptr;
+    }
     return std::make_unique<AudioSource_File>(logger, m_path);
 }
 
