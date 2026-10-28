@@ -213,8 +213,8 @@ void AudioSelectorWidget::build_input_list(const std::shared_ptr<const AudioSour
     m_audio_input_box->clear();
     m_audio_input_box->addItem("(none)");
     m_audio_input_box->addItem("Play Audio File");
-    bool is_device = source->type == AudioSourceType::Device;
-    size_t index = source->type == AudioSourceType::File ? 1 : 0;
+    bool is_device = source && source->type == AudioSourceType::Device;
+    size_t index = source && source->type == AudioSourceType::File ? 1 : 0;
     for (size_t c = 0; c < m_input_audios.size(); c++){
         const AudioDeviceInfo& audio = m_input_audios[c];
         m_audio_input_box->addItem(QString::fromStdString(audio.display_name()));

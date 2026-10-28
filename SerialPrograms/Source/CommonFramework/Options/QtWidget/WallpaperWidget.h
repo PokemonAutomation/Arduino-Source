@@ -8,6 +8,8 @@
 #define PokemonAutomation_WallpaperWidget_H
 
 #include <cstdint>
+#include <QImage>
+#include <QWidget>
 #include "CommonFramework/Options/WallpaperOption.h"
 
 class QPaintEvent;
