@@ -108,8 +108,8 @@ void OperationFailedExceptionWithScreenshot::send_recoverable_error_notif_and_te
         error_report_mode(),
         message(),
         name(),
-        *m_screenshot,
-        &m_stream->history()
+        screenshot_view(),
+        m_stream ? &m_stream->history() : nullptr
     );
 }
 
@@ -123,8 +123,8 @@ void OperationFailedExceptionWithScreenshot::send_fatal_error_notif_and_telemetr
         error_report_mode(),
         message(),
         name(),
-        *m_screenshot,
-        &m_stream->history()
+        screenshot_view(),
+        m_stream ? &m_stream->history() : nullptr
     );
 }
 
