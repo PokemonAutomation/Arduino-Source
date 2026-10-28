@@ -15,9 +15,9 @@ bool h264_annexb_to_avcc(const uint8_t* in, size_t in_size, std::vector<uint8_t>
     const uint8_t* end = in + in_size;
     bool found_any = false;
     while (p < end){
-        // find start of NAL unit. 
-        // Looks for 3-byte Annex B start code: 0x00 0x00 0x01.
-        // this will also find the 4-byte start code: 00 00 00 01
+        //  Find the start of the NAL unit: the first 3-byte start code
+        //  (00 00 01). This also finds a 4-byte start code (00 00 00 01),
+        //  whose last three bytes are the same.
         const uint8_t* nal_start = nullptr;
         for (const uint8_t* q = p; q + 2 < end; q++){
             if (q[0] == 0 && q[1] == 0 && q[2] == 1){
@@ -29,9 +29,8 @@ bool h264_annexb_to_avcc(const uint8_t* in, size_t in_size, std::vector<uint8_t>
             break;    //  No start code left; stop at any trailing garbage.
         }
 
-        // find end of NAL unit
-        // scan forward until  you find the next start code
-        // if don't find another start code, assume this is the final packet
+        //  Find the end of the NAL unit: scan forward to the next start code.
+        //  If there is none, this is the last NAL unit in the buffer.
         const uint8_t* nal_end = nal_start;
         for (const uint8_t* q = nal_start; q + 2 < end; q++){
             if (q[0] == 0 && q[1] == 0 && q[2] == 1){
