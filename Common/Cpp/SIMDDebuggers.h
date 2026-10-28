@@ -8,8 +8,8 @@
 #define PokemonAutomation_SIMDDebuggers_H
 
 #include <stdint.h>
-#include <emmintrin.h>
 #include <iostream>
+#include <emmintrin.h>
 
 using std::cout;
 using std::endl;

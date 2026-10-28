@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PABotBase2_Controller_NS_WiredController_H
 #define PokemonAutomation_PABotBase2_Controller_NS_WiredController_H
 
-#include "../../ControllerStates/NintendoSwitch_WiredController_State.h"
 #include "../PABotBase2_MessageProtocol.h"
+#include "../../ControllerStates/NintendoSwitch_WiredController_State.h"
 
 #if _WIN32
 #pragma pack(push, 1)

@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PABotBase2_Controller_NS1_OemController_H
 #define PokemonAutomation_PABotBase2_Controller_NS1_OemController_H
 
-#include "../../ControllerStates/NintendoSwitch_OemController_State.h"
 #include "../PABotBase2_MessageProtocol.h"
+#include "../../ControllerStates/NintendoSwitch_OemController_State.h"
 
 #if _WIN32
 #pragma pack(push, 1)
