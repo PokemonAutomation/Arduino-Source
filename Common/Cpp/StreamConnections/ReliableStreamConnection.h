@@ -7,9 +7,6 @@
 #ifndef PokemonAutomation_ReliableStreamConnection_H
 #define PokemonAutomation_ReliableStreamConnection_H
 
-#include "Common/PABotBase2/ConnectionLayer/PABotBase2_PacketSender.h"
-#include "Common/PABotBase2/ConnectionLayer/PABotBase2_PacketParser.h"
-#include "Common/PABotBase2/ConnectionLayer/PABotBase2_StreamCoalescer.h"
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
@@ -18,6 +15,9 @@
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "Common/Cpp/StreamConnections/PushingStreamConnections.h"
+#include "Common/PABotBase2/ConnectionLayer/PABotBase2_PacketSender.h"
+#include "Common/PABotBase2/ConnectionLayer/PABotBase2_PacketParser.h"
+#include "Common/PABotBase2/ConnectionLayer/PABotBase2_StreamCoalescer.h"
 
 namespace PokemonAutomation{
 

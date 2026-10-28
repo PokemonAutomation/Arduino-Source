@@ -5,13 +5,12 @@
  */
 
 #include <cmath>
-#include <fstream>
-#include <iostream>
-
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "ColorClustering.h"
-using std::cout;
-using std::endl;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 

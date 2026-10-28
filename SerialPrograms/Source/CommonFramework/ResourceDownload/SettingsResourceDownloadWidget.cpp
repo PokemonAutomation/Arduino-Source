@@ -9,8 +9,8 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include <QHBoxLayout>
-
 #include "SettingsResourceDownloadWidget.h"
+
 using std::cout;
 using std::endl;
 

@@ -5,8 +5,8 @@
  */
 
 #include "CommonFramework/Tools/GlobalThreadPools.h"
-#include "VideoOverlaySession.h"
 #include "ControllerInput/Keyboard/GlobalKeyboardHidTracker.h"
+#include "VideoOverlaySession.h"
 
 //#include <iostream>
 //using std::cout;

@@ -4,8 +4,8 @@
  *
  */
 
-#include "PeriodicRunner.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "PeriodicRunner.h"
 
 //#include <iostream>
 //using std::cout;

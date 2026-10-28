@@ -11,15 +11,15 @@
 #include <QPermissions>
 #endif
 #endif
-#include <iostream>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-
 #include "SetupSettings.h"
-using std::cout;
-using std::endl;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 

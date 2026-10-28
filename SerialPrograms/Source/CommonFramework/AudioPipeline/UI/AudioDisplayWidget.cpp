@@ -9,8 +9,8 @@
 #include <QPaintEvent>
 #include <QPainter>
 #include "CommonFramework/ImageTypes/ImageRGB32_Qt.h"
-
 #include "AudioDisplayWidget.h"
+
 using std::cout;
 using std::endl;
 

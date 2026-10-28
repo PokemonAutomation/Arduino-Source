@@ -6,17 +6,17 @@
 
 #ifdef PA_AutoDispatch_x64_13_Haswell
 
-#include <iostream>
 #include <smmintrin.h>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/Kernels_x64_AVX2.h"
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h"
 #include "Kernels_ImagePixelSumSqr.h"
-
 #include "Kernels_ImagePixelSumSqr_TestInfra.h"
-using std::cout;
-using std::endl;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace Kernels{

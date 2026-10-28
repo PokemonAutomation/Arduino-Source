@@ -9,8 +9,8 @@
 
 #include <stdint.h>
 #include <iostream>
-
 #include <emmintrin.h>
+
 using std::cout;
 using std::endl;
 

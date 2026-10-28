@@ -7,12 +7,12 @@
 #ifdef PA_AutoDispatch_x64_13_Haswell
 
 #include <stdint.h>
-#include <iostream>
 #include <immintrin.h>
-
 #include "Common/Compiler.h"
-using std::cout;
-using std::endl;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace Kernels{

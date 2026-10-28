@@ -8,10 +8,10 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QCheckBox>
-
 #include "ButtonWidget.h"
-using std::cout;
-using std::endl;
+
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 

@@ -4,11 +4,11 @@
  *
  */
 
-#include <iostream>
-
 #include "BusyPeriodicRunner.h"
-using std::cout;
-using std::endl;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 

@@ -12,8 +12,8 @@
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
-
 #include "WaterfillTemplateMatcher.h"
+
 using std::cout;
 using std::endl;
 

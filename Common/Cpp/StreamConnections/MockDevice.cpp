@@ -7,9 +7,9 @@
 #include <string.h>
 #include <iostream>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2_ConnectionDebug.h"
 #include "MockDevice.h"
 
-#include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2_ConnectionDebug.h"
 using std::cout;
 using std::endl;
 

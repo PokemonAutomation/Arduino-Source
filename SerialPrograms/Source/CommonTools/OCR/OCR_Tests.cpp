@@ -6,21 +6,21 @@
 
 #include <cmath>
 #include <random>
-#include <iostream>
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Common/Cpp/Strings/Unicode.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
+#include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "OCR_Routines.h"
 #include "OCR_StringNormalization.h"
-
 #include "OCR_TextMatcher.h"
 #include "OCR_Tests.h"
-#include "Pokemon/Inference/Pokemon_NameReader.h"
-using std::cout;
-using std::endl;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace OCR{

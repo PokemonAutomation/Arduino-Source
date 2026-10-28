@@ -7,7 +7,6 @@
  *
  */
 
-#include <iostream>
 // #include <QCoreApplication>
 // #include <QFileInfo>
 // #include <QUrl>
@@ -25,10 +24,11 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Recording/StreamHistoryOption.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
-
 #include "StreamHistoryTracker_SaveFrames.h"
-using std::cout;
-using std::endl;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 
 namespace PokemonAutomation{

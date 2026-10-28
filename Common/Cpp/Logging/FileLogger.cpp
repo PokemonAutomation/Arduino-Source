@@ -10,9 +10,6 @@
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "FileLogger.h"
 
-//using std::cout;
-//using std::endl;
-
 namespace PokemonAutomation{
 
 

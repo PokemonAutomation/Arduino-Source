@@ -12,8 +12,8 @@
 #include "CommonFramework/Tools/DebugDumper.h"
 //#include "ImageDiff.h"
 #include "ImageCropper.h"
-
 #include "CroppedImageDictionaryMatcher.h"
+
 //using std::cout;
 //using std::endl;
 

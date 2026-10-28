@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <atomic>
 #include <chrono>
-
 #include <map>
 #include <stdexcept>
 #include <string>

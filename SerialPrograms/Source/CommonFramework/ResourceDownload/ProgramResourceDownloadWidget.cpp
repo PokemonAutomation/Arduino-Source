@@ -4,23 +4,14 @@
  *
  */
 
-// #include <QVBoxLayout>
-#include <iostream>
 #include <QMessageBox>
-// #include <QFont>
-// #include <QObject>
-// #include <QPushButton>
-// #include <QPointer>
-// #include <QHBoxLayout>
-// #include "CommonFramework/Logging/Logger.h"
 #include <QEventLoop>
-#include "Common/Cpp/Exceptions.h"
-// #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramSession.h"
-
 #include "ProgramResourceDownloadWidget.h"
-using std::cout;
-using std::endl;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 

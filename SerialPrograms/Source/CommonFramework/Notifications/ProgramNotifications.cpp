@@ -14,10 +14,10 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
-#include "ProgramNotifications.h"
 #include "Integrations/DiscordSettingsOption.h"
 #include "Integrations/DiscordWebhook.h"
 #include "Integrations/DppIntegration/DppClient.h"
+#include "ProgramNotifications.h"
 
 //#include <iostream>
 //using std::cout;

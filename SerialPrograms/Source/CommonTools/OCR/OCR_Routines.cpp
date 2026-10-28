@@ -4,7 +4,6 @@
  *
  */
 
-#include <iostream>
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -12,12 +11,11 @@
 #include "OCR_PaddleOCR.h"
 #include "OCR_RawTesseractOCR.h"
 #include "OCR_DictionaryMatcher.h"
-
 #include "OCR_Routines.h"
-using std::cout;
-using std::endl;
 
-
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace OCR{

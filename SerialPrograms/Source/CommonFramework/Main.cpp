@@ -42,11 +42,7 @@
 #include "Integrations/DiscordSettingsOption.h"
 #include "Integrations/DiscordSocial/DiscordSocial.h"
 #include "Integrations/DppIntegration/DppClient.h"
-
 #include "Integrations/DiscordWebhook.h"
-using std::cout;
-using std::endl;
-
 
 using namespace PokemonAutomation;
 
@@ -300,7 +296,7 @@ int main(int argc, char *argv[]){
     GlobalThreadPools::qt_worker_threadpool().stop();
     GlobalThreadPools::qt_event_threadpool().stop();
 
-    cout << "Exiting main()..." << endl;
+    std::cout << "Exiting main()..." << std::endl;
 
     return ret;
 }

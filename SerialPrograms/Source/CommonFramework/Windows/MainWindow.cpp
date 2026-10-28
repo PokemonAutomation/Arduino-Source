@@ -6,7 +6,6 @@
 
 #include <algorithm>
 #include <utility>
-#include <iostream>
 //#include <QStatusBar>
 #include <QMenuBar>
 #include <QHBoxLayout>
@@ -19,6 +18,7 @@
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Logging/MultiOutputLogger.h"
+#include "Common/Cpp/Logging/GlobalLogger.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "Common/Cpp/ColoredText.h"
@@ -36,11 +36,11 @@
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "WindowTracker.h"
 #include "ButtonDiagram.h"
-
-
 #include "MainWindow.h"
-using std::cout;
-using std::endl;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 

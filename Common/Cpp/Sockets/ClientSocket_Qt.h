@@ -12,9 +12,9 @@
 //#include "Common/Cpp/Concurrency/SpinPause.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
-#include "AbstractClientSocket.h"
 #include "Common/Qt/QtThreadPool.h"
 #include "Common/Qt/GlobalThreadPoolsQt.h"
+#include "AbstractClientSocket.h"
 
 //using std::cout;
 //using std::endl;

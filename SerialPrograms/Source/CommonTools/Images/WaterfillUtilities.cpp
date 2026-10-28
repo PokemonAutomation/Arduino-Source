@@ -15,8 +15,8 @@
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
-
 #include "WaterfillUtilities.h"
+
 using std::cout;
 using std::endl;
 

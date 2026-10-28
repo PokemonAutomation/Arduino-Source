@@ -7,9 +7,9 @@
 #include <sstream>
 #include <iostream>
 #include "CommonFramework/StaticGlobals.h"
-
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "SolidColorTest.h"
+
 using std::cout;
 using std::endl;
 

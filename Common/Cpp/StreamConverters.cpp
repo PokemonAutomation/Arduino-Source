@@ -8,10 +8,10 @@
 #include <iostream>
 #include "Exceptions.h"
 #include "Containers/AlignedVector.tpp"
-
 #include "StreamConverters.h"
-using std::cout;
-using std::endl;
+
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 

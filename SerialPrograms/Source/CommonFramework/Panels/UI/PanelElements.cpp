@@ -14,8 +14,8 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Panels/PanelSession.h"
 #include "CommonFramework/ProgramSession.h"
-#include "PanelElements.h"
 #include "GameConsole/ConsoleProgram.h"
+#include "PanelElements.h"
 
 //#include <iostream>
 //using std::cout;

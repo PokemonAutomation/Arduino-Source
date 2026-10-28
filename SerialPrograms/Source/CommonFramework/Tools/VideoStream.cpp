@@ -7,9 +7,9 @@
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Recording/StreamHistorySession.h"
-#include "VideoStream.h"
 #include "CommonTools/InferencePivots/VisualInferencePivot.h"
 #include "CommonTools/InferencePivots/AudioInferencePivot.h"
+#include "VideoStream.h"
 
 namespace PokemonAutomation{
 

@@ -5,7 +5,6 @@
  */
 
 #include <cmath>
-#include <iostream>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/ImageStats/Kernels_ImagePixelSumSqr.h"
@@ -13,10 +12,10 @@
 #include "Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
-
 #include "ImageDiff.h"
-using std::cout;
-using std::endl;
+
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace ImageMatch{
