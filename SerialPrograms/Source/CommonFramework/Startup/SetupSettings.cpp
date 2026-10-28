@@ -4,6 +4,7 @@
  *
  */
 
+#include <iostream>
 #include <QMessageBox>
 #include <QApplication>
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
@@ -17,9 +18,8 @@
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "SetupSettings.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
