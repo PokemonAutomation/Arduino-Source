@@ -39,6 +39,8 @@ public:
     virtual bool operator==(const AudioSourceDescriptor& x) const = 0;
     virtual std::string display_name() const = 0;
 
+    virtual bool sanitize_desired_format(Logger& logger, AudioInputChoice& format) const = 0;
+
 public:
     //  After user selects a new video source on the UI, call this function to
     //  do some optional additional stuff, e.g. open a file selection dialog

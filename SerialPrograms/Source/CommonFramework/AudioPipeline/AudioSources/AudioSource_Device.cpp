@@ -14,6 +14,28 @@ namespace PokemonAutomation{
 
 
 
+bool AudioSourceDescriptor_Device::sanitize_desired_format(Logger& logger, AudioInputChoice& format) const{
+    const std::vector<AudioInputChoice>& choices = m_info.supported_choices();
+    const size_t preferred_index = m_info.preferred_choice_index();
+    if (choices.empty()){
+        logger.log("No supported formats for this input device.", COLOR_RED);
+        format = AudioInputChoice();
+        return false;
+    }
+    if (!format){
+        logger.log("No format set. Resetting to default...", COLOR_ORANGE);
+    }else{
+        for (const AudioInputChoice& choice : choices){
+            if (choice == format){
+                return true;
+            }
+        }
+        logger.log("Desired format not supported. Resetting to default...", COLOR_RED);
+    }
+    format = choices[preferred_index];
+    return true;
+}
+
 bool AudioSourceDescriptor_Device::operator==(const AudioSourceDescriptor& x) const{
     if (typeid(*this) != typeid(x)){
         return false;
