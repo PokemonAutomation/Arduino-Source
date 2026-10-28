@@ -116,23 +116,40 @@ void find_sparkles(
     }
 }
 
+//
+//  Find all sparkle-shaped objects in one binary image and sort them into
+//  balls, stars, lines and squares.
+//
+//  This already runs inside a `run_in_parallel()` task on the real-time pool
+//  (see `read_from_image()`), so it must not wait for a free thread in that
+//  same pool, e.g. with `dispatch_now_blocking()`. If every pool thread is
+//  running one of these calls, all of them wait for a free thread that never
+//  comes, and the program freezes with the pool stuck at 100% per thread.
+//
 ShinySparkleSetSwSh find_sparkles(size_t screen_area, WaterfillSession& session){
+    ThreadPool& pool = GlobalThreadPools::computation_realtime();
     SpinLock lock;
     ShinySparkleSetSwSh sparkles;
+    std::deque<AsyncTask> tasks;
     auto finder = session.make_iterator(20);
     WaterfillObject object;
-    std::deque<AsyncTask> tasks;
     while (finder->find_next(object, true)){
-        tasks.emplace_back(GlobalThreadPools::computation_realtime().dispatch_now_blocking(
-            [&, screen_area, object = std::move(object)]{
-                find_sparkles(
-                    screen_area,
-                    lock,
-                    sparkles,
-                    object
-                );
-            }
-        ));
+        std::function<void()> func = [&, screen_area, object = std::move(object)]{
+            find_sparkles(
+                screen_area,
+                lock,
+                sparkles,
+                object
+            );
+        };
+
+        //  Try to dispatch. If thread pool is full, just run it instead.
+        AsyncTask task = pool.try_dispatch_now(func);
+        if (task){
+            tasks.emplace_back(std::move(task));
+        }else{
+            func();
+        }
     }
     return sparkles;
 }
