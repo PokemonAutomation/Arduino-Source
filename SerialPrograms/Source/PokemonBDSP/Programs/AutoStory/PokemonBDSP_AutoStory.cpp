@@ -285,7 +285,7 @@ static const StringSelectDatabase& section_database(bool checkpoints, bool tutor
         return db;
     }();
     return checkpoints ? (tutorial ? tutorial_checkpoints : main_checkpoints)
-                       : (tutorial ? tutorial_segments : main_segments);
+        : (tutorial ? tutorial_segments : main_segments);
 }
 
 // ---------------------------------------------------------------------------
@@ -293,11 +293,16 @@ static const StringSelectDatabase& section_database(bool checkpoints, bool tutor
 // ---------------------------------------------------------------------------
 
 BDSPAutoStory_Descriptor::BDSPAutoStory_Descriptor()
-    : SingleSwitchProgramDescriptor(
-          "PokemonBDSP:AutoStory", "Pokemon BDSP", "Auto Story", "Programs/PokemonBDSP/AutoStory.html",
-          "Automatically completes BDSP story segments.", PanelQualityStanding::THIRD_PARTY_UNVETTED,
-          ProgramControllerClass::StandardController_NoRestrictions, FeedbackType::REQUIRED,
-          AllowCommandsWhenRunning::DISABLE_COMMANDS, {"Tesseract"}){
+    : SingleSwitchProgramDescriptor("PokemonBDSP:AutoStory",
+        "Pokemon BDSP",
+        "Auto Story",
+        "Programs/PokemonBDSP/AutoStory.html",
+        "Automatically completes BDSP story segments.",
+        PanelQualityStanding::THIRD_PARTY_UNVETTED,
+        ProgramControllerClass::StandardController_NoRestrictions,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
+        {"Tesseract"}){
 }
 
 
@@ -332,179 +337,186 @@ BDSPAutoStory::~BDSPAutoStory(){
 
 BDSPAutoStory::BDSPAutoStory()
     : SingleSwitchProgramInstance()
-      // DIAGNOSTIC ONLY: Remove before pushing to production.
-      ,
-      DIAGNOSTIC_POST_CATCH_ONLY(
-          "<b>Diagnostic only: Run 00.04 after catch through 00.05</b><br>"
-          "Start at the saved position immediately after catching the second Pokemon. "
-          "Applies only in advanced Tutorial mode when Start Checkpoint is 00.04. Runs its post-catch part, then 00.05. Other starting checkpoints run normally. "
-          "Remove before pushing to production.",
-          LockMode::LOCK_WHILE_RUNNING, false)
-      // DIAGNOSTIC ONLY: Remove before pushing to production.
-      ,
-      DIAGNOSTIC_FAKE_CHECKPOINT_SAVE(
-          "<b>Diagnostic only: Fake checkpoint saves</b><br>"
-          "Use the fake save helper instead of normal checkpoint saving. "
-          "Use an existing in-game save at the selected starting checkpoint or segment. "
-          "Any failure reloads that save and reruns the entire selected range from its start. "
-          "Checkpoint saves are not verified in this mode. Remove before pushing to production.",
-          LockMode::LOCK_WHILE_RUNNING, false),
-      STORY_SECTION(
-          "<b>Story Section:</b>",
-          {{StorySection::TUTORIAL, "tutorial", "Tutorial"}, {StorySection::MAIN_STORY, "main-story", "Main Story"}},
-          LockMode::LOCK_WHILE_RUNNING, StorySection::TUTORIAL),
-      MAINSTORY_NOTE("", "Return your maxed starter from Pokemon HOME before starting Main Story. "
-                         "Use the required moveset and the starting position shown below."),
-      ENABLE_ADVANCED_MODE("<b>Advanced mode:</b><br>"
-                           "Use checkpoints instead of segments.",
-                           LockMode::UNLOCK_WHILE_RUNNING, false),
-      START_CHECKPOINT_TUTORIAL("<b>Start Checkpoint:</b>", section_database(true, true), LockMode::LOCK_WHILE_RUNNING,
-                                "0"),
-      END_CHECKPOINT_TUTORIAL("<b>End Checkpoint:</b>", section_database(true, true), LockMode::UNLOCK_WHILE_RUNNING,
-                              "5")
+    // DIAGNOSTIC ONLY: Remove before pushing to production.
+    , DIAGNOSTIC_POST_CATCH_ONLY(
+        "<b>Diagnostic only: Run 00.04 after catch through 00.05</b><br>"
+        "Start at the saved position immediately after catching the second Pokemon. "
+        "Applies only in advanced Tutorial mode when Start Checkpoint is 00.04. Runs its post-catch part, then 00.05. Other starting checkpoints run normally. "
+        "Remove before pushing to production.",
+        LockMode::LOCK_WHILE_RUNNING,
+        false)
+    // DIAGNOSTIC ONLY: Remove before pushing to production.
+    , DIAGNOSTIC_FAKE_CHECKPOINT_SAVE(
+        "<b>Diagnostic only: Fake checkpoint saves</b><br>"
+        "Use the fake save helper instead of normal checkpoint saving. "
+        "Use an existing in-game save at the selected starting checkpoint or segment. "
+        "Any failure reloads that save and reruns the entire selected range from its start. "
+        "Checkpoint saves are not verified in this mode. Remove before pushing to production.",
+        LockMode::LOCK_WHILE_RUNNING,
+        false)
+    , STORY_SECTION("<b>Story Section:</b>",
+        {{StorySection::TUTORIAL, "tutorial", "Tutorial"}, {StorySection::MAIN_STORY, "main-story", "Main Story"}},
+        LockMode::LOCK_WHILE_RUNNING,
+        StorySection::TUTORIAL)
+    , MAINSTORY_NOTE("",
+        "Return your maxed starter from Pokemon HOME before starting Main Story. "
+        "Use the required moveset and the starting position shown below.")
+    , ENABLE_ADVANCED_MODE("<b>Advanced mode:</b><br>"
+        "Use checkpoints instead of segments.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false)
+    , START_CHECKPOINT_TUTORIAL("<b>Start Checkpoint:</b>",
+        section_database(true, true),
+        LockMode::LOCK_WHILE_RUNNING,
+        "0")
+    , END_CHECKPOINT_TUTORIAL("<b>End Checkpoint:</b>",
+        section_database(true, true),
+        LockMode::UNLOCK_WHILE_RUNNING,
+        "5")
 
-      ,
-      START_DESCRIPTION_SEGMENT("<b>Start:</b><br>", ""), END_DESCRIPTION_SEGMENT("<b>End:</b><br>", "")
+    , START_DESCRIPTION_SEGMENT("<b>Start:</b><br>", "")
+    , END_DESCRIPTION_SEGMENT("<b>End:</b><br>", "")
 
-      ,
-      START_DESCRIPTION_CHECKPOINT("<b>Start:</b><br>", ""), END_DESCRIPTION_CHECKPOINT("<b>End:</b><br>", "")
+    , START_DESCRIPTION_CHECKPOINT("<b>Start:</b><br>", "")
+    , END_DESCRIPTION_CHECKPOINT("<b>End:</b><br>", "")
 
-      ,
-      START_CHECKPOINT_MAINSTORY("<b>Start Checkpoint (Main):</b>", section_database(true, false),
-                                 LockMode::LOCK_WHILE_RUNNING, "6")
+    , START_CHECKPOINT_MAINSTORY("<b>Start Checkpoint (Main):</b>",
+        section_database(true, false),
+        LockMode::LOCK_WHILE_RUNNING,
+        "6")
 
-      ,
-      END_CHECKPOINT_MAINSTORY("<b>End Checkpoint (Main):</b>", section_database(true, false),
-                               LockMode::UNLOCK_WHILE_RUNNING, std::to_string(ALL_CHECKPOINTS().size() - 1))
+    , END_CHECKPOINT_MAINSTORY("<b>End Checkpoint (Main):</b>",
+        section_database(true, false),
+        LockMode::UNLOCK_WHILE_RUNNING,
+        std::to_string(ALL_CHECKPOINTS().size() - 1))
 
-      ,
-      START_SEGMENT("<b>Start Segment:</b>", section_database(false, true), LockMode::LOCK_WHILE_RUNNING, "0")
+    , START_SEGMENT("<b>Start Segment:</b>", section_database(false, true), LockMode::LOCK_WHILE_RUNNING, "0")
 
-      ,
-      END_SEGMENT("<b>End Segment:</b>", section_database(false, true), LockMode::UNLOCK_WHILE_RUNNING, "0")
+    , END_SEGMENT("<b>End Segment:</b>", section_database(false, true), LockMode::UNLOCK_WHILE_RUNNING, "0")
 
-      ,
-      START_SEGMENT_MAINSTORY("<b>Start Segment:</b>", section_database(false, false), LockMode::LOCK_WHILE_RUNNING,
-                              "1"),
-      END_SEGMENT_MAINSTORY("<b>End Segment:</b>", section_database(false, false), LockMode::LOCK_WHILE_RUNNING,
-                            std::to_string(ALL_SEGMENTS().size() - 1)),
-      STARTERCHOICE("<b>Starter Pokemon:</b>",
-                    {
-                        {StarterChoice::TURTWIG, "turtwig", "Turtwig"},
-                        {StarterChoice::CHIMCHAR, "chimchar", "Chimchar"},
-                        {StarterChoice::PIPLUP, "piplup", "Piplup"},
-                    },
-                    LockMode::LOCK_WHILE_RUNNING, StarterChoice::CHIMCHAR)
+    , START_SEGMENT_MAINSTORY("<b>Start Segment:</b>",
+        section_database(false, false),
+        LockMode::LOCK_WHILE_RUNNING,
+        "1")
+    , END_SEGMENT_MAINSTORY("<b>End Segment:</b>",
+        section_database(false, false),
+        LockMode::LOCK_WHILE_RUNNING,
+        std::to_string(ALL_SEGMENTS().size() - 1))
+    , STARTERCHOICE("<b>Starter Pokemon:</b>",
+        {
+            {StarterChoice::TURTWIG, "turtwig", "Turtwig"},
+            {StarterChoice::CHIMCHAR, "chimchar", "Chimchar"},
+            {StarterChoice::PIPLUP, "piplup", "Piplup"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        StarterChoice::CHIMCHAR)
 
-      ,
-      STARTER_SHINY("<b>Shiny Starter:</b>", LockMode::LOCK_WHILE_RUNNING, false)
+    , STARTER_SHINY("<b>Shiny Starter:</b>", LockMode::LOCK_WHILE_RUNNING, false)
 
-      ,
-      CATCH_LEGENDARY("<b>Catch Box Legendary:</b>", LockMode::LOCK_WHILE_RUNNING, false)
+    , CATCH_LEGENDARY("<b>Catch Box Legendary:</b>", LockMode::LOCK_WHILE_RUNNING, false)
 
-      ,
-      HELP_MODE("<b>Help Mode:</b>",
-                {
-                    {HelpMode::NO_OUTSIDE_HELP, "no_outside_help", "No Outside Help"},
-                    {HelpMode::OUTSIDE_HELP, "outside_help", "Outside Help"},
-                },
-                LockMode::LOCK_WHILE_RUNNING, HelpMode::NO_OUTSIDE_HELP)
+    , HELP_MODE("<b>Help Mode:</b>",
+        {
+            {HelpMode::NO_OUTSIDE_HELP, "no_outside_help", "No Outside Help"},
+            {HelpMode::OUTSIDE_HELP, "outside_help", "Outside Help"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        HelpMode::NO_OUTSIDE_HELP)
 
-      ,
-      OUTSIDE_HELP_POKEMON("<b>Pokemon:</b>",
-                           {
-                               {OutsideHelpPokemon::TORTERRA, "torterra", "Torterra"},
-                           },
-                           LockMode::LOCK_WHILE_RUNNING, OutsideHelpPokemon::TORTERRA)
+    , OUTSIDE_HELP_POKEMON("<b>Pokemon:</b>",
+        {
+            {OutsideHelpPokemon::TORTERRA, "torterra", "Torterra"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        OutsideHelpPokemon::TORTERRA)
 
-      ,
-      OUTSIDE_HELP_ATTACK_1("<b>Attack 1:</b>",
-                            {
-                                {TorterraMove::EARTHQUAKE, "earthquake", "Earthquake"},
-                                {TorterraMove::WOOD_HAMMER, "wood_hammer", "Wood Hammer"},
-                                {TorterraMove::RAZOR_LEAF, "razor_leaf", "Razor Leaf"},
-                                {TorterraMove::CRUNCH, "crunch", "Crunch"},
-                                {TorterraMove::GIGA_DRAIN, "giga_drain", "Giga Drain"},
-                                {TorterraMove::IRON_TAIL, "iron_tail", "Iron Tail"},
-                                {TorterraMove::ROCK_TOMB, "rock_tomb", "Rock Tomb"},
-                                {TorterraMove::FACADE, "facade", "Facade"},
-                                {TorterraMove::STONE_EDGE, "stone_edge", "Stone Edge"},
-                                {TorterraMove::ROCK_SLIDE, "rock_slide", "Rock Slide"},
-                                {TorterraMove::BULLDOZE, "bulldoze", "Bulldoze"},
-                                {TorterraMove::STRENGTH, "strength", "Strength"},
-                                {TorterraMove::ROCK_SMASH, "rock_smash", "Rock Smash"},
-                                {TorterraMove::ROCK_CLIMB, "rock_climb", "Rock Climb"},
-                            },
-                            LockMode::LOCK_WHILE_RUNNING, TorterraMove::EARTHQUAKE)
+    , OUTSIDE_HELP_ATTACK_1("<b>Attack 1:</b>",
+        {
+            {TorterraMove::EARTHQUAKE, "earthquake", "Earthquake"},
+            {TorterraMove::WOOD_HAMMER, "wood_hammer", "Wood Hammer"},
+            {TorterraMove::RAZOR_LEAF, "razor_leaf", "Razor Leaf"},
+            {TorterraMove::CRUNCH, "crunch", "Crunch"},
+            {TorterraMove::GIGA_DRAIN, "giga_drain", "Giga Drain"},
+            {TorterraMove::IRON_TAIL, "iron_tail", "Iron Tail"},
+            {TorterraMove::ROCK_TOMB, "rock_tomb", "Rock Tomb"},
+            {TorterraMove::FACADE, "facade", "Facade"},
+            {TorterraMove::STONE_EDGE, "stone_edge", "Stone Edge"},
+            {TorterraMove::ROCK_SLIDE, "rock_slide", "Rock Slide"},
+            {TorterraMove::BULLDOZE, "bulldoze", "Bulldoze"},
+            {TorterraMove::STRENGTH, "strength", "Strength"},
+            {TorterraMove::ROCK_SMASH, "rock_smash", "Rock Smash"},
+            {TorterraMove::ROCK_CLIMB, "rock_climb", "Rock Climb"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        TorterraMove::EARTHQUAKE)
 
-      ,
-      OUTSIDE_HELP_ATTACK_2("<b>Attack 2:</b>",
-                            {
-                                {TorterraMove::EARTHQUAKE, "earthquake", "Earthquake"},
-                                {TorterraMove::WOOD_HAMMER, "wood_hammer", "Wood Hammer"},
-                                {TorterraMove::RAZOR_LEAF, "razor_leaf", "Razor Leaf"},
-                                {TorterraMove::CRUNCH, "crunch", "Crunch"},
-                                {TorterraMove::GIGA_DRAIN, "giga_drain", "Giga Drain"},
-                                {TorterraMove::IRON_TAIL, "iron_tail", "Iron Tail"},
-                                {TorterraMove::ROCK_TOMB, "rock_tomb", "Rock Tomb"},
-                                {TorterraMove::FACADE, "facade", "Facade"},
-                                {TorterraMove::STONE_EDGE, "stone_edge", "Stone Edge"},
-                                {TorterraMove::ROCK_SLIDE, "rock_slide", "Rock Slide"},
-                                {TorterraMove::BULLDOZE, "bulldoze", "Bulldoze"},
-                                {TorterraMove::STRENGTH, "strength", "Strength"},
-                                {TorterraMove::ROCK_SMASH, "rock_smash", "Rock Smash"},
-                                {TorterraMove::ROCK_CLIMB, "rock_climb", "Rock Climb"},
-                            },
-                            LockMode::LOCK_WHILE_RUNNING, TorterraMove::ROCK_SLIDE)
+    , OUTSIDE_HELP_ATTACK_2("<b>Attack 2:</b>",
+        {
+            {TorterraMove::EARTHQUAKE, "earthquake", "Earthquake"},
+            {TorterraMove::WOOD_HAMMER, "wood_hammer", "Wood Hammer"},
+            {TorterraMove::RAZOR_LEAF, "razor_leaf", "Razor Leaf"},
+            {TorterraMove::CRUNCH, "crunch", "Crunch"},
+            {TorterraMove::GIGA_DRAIN, "giga_drain", "Giga Drain"},
+            {TorterraMove::IRON_TAIL, "iron_tail", "Iron Tail"},
+            {TorterraMove::ROCK_TOMB, "rock_tomb", "Rock Tomb"},
+            {TorterraMove::FACADE, "facade", "Facade"},
+            {TorterraMove::STONE_EDGE, "stone_edge", "Stone Edge"},
+            {TorterraMove::ROCK_SLIDE, "rock_slide", "Rock Slide"},
+            {TorterraMove::BULLDOZE, "bulldoze", "Bulldoze"},
+            {TorterraMove::STRENGTH, "strength", "Strength"},
+            {TorterraMove::ROCK_SMASH, "rock_smash", "Rock Smash"},
+            {TorterraMove::ROCK_CLIMB, "rock_climb", "Rock Climb"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        TorterraMove::ROCK_SLIDE)
 
-      ,
-      OUTSIDE_HELP_ATTACK_3("<b>Attack 3:</b>",
-                            {
-                                {TorterraMove::EARTHQUAKE, "earthquake", "Earthquake"},
-                                {TorterraMove::WOOD_HAMMER, "wood_hammer", "Wood Hammer"},
-                                {TorterraMove::RAZOR_LEAF, "razor_leaf", "Razor Leaf"},
-                                {TorterraMove::CRUNCH, "crunch", "Crunch"},
-                                {TorterraMove::GIGA_DRAIN, "giga_drain", "Giga Drain"},
-                                {TorterraMove::IRON_TAIL, "iron_tail", "Iron Tail"},
-                                {TorterraMove::ROCK_TOMB, "rock_tomb", "Rock Tomb"},
-                                {TorterraMove::FACADE, "facade", "Facade"},
-                                {TorterraMove::STONE_EDGE, "stone_edge", "Stone Edge"},
-                                {TorterraMove::ROCK_SLIDE, "rock_slide", "Rock Slide"},
-                                {TorterraMove::BULLDOZE, "bulldoze", "Bulldoze"},
-                                {TorterraMove::STRENGTH, "strength", "Strength"},
-                                {TorterraMove::ROCK_SMASH, "rock_smash", "Rock Smash"},
-                                {TorterraMove::ROCK_CLIMB, "rock_climb", "Rock Climb"},
-                            },
-                            LockMode::LOCK_WHILE_RUNNING, TorterraMove::WOOD_HAMMER)
+    , OUTSIDE_HELP_ATTACK_3("<b>Attack 3:</b>",
+        {
+            {TorterraMove::EARTHQUAKE, "earthquake", "Earthquake"},
+            {TorterraMove::WOOD_HAMMER, "wood_hammer", "Wood Hammer"},
+            {TorterraMove::RAZOR_LEAF, "razor_leaf", "Razor Leaf"},
+            {TorterraMove::CRUNCH, "crunch", "Crunch"},
+            {TorterraMove::GIGA_DRAIN, "giga_drain", "Giga Drain"},
+            {TorterraMove::IRON_TAIL, "iron_tail", "Iron Tail"},
+            {TorterraMove::ROCK_TOMB, "rock_tomb", "Rock Tomb"},
+            {TorterraMove::FACADE, "facade", "Facade"},
+            {TorterraMove::STONE_EDGE, "stone_edge", "Stone Edge"},
+            {TorterraMove::ROCK_SLIDE, "rock_slide", "Rock Slide"},
+            {TorterraMove::BULLDOZE, "bulldoze", "Bulldoze"},
+            {TorterraMove::STRENGTH, "strength", "Strength"},
+            {TorterraMove::ROCK_SMASH, "rock_smash", "Rock Smash"},
+            {TorterraMove::ROCK_CLIMB, "rock_climb", "Rock Climb"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        TorterraMove::WOOD_HAMMER)
 
-      ,
-      OUTSIDE_HELP_ATTACK_4("<b>Attack 4:</b>",
-                            {
-                                {TorterraMove::EARTHQUAKE, "earthquake", "Earthquake"},
-                                {TorterraMove::WOOD_HAMMER, "wood_hammer", "Wood Hammer"},
-                                {TorterraMove::RAZOR_LEAF, "razor_leaf", "Razor Leaf"},
-                                {TorterraMove::CRUNCH, "crunch", "Crunch"},
-                                {TorterraMove::GIGA_DRAIN, "giga_drain", "Giga Drain"},
-                                {TorterraMove::IRON_TAIL, "iron_tail", "Iron Tail"},
-                                {TorterraMove::ROCK_TOMB, "rock_tomb", "Rock Tomb"},
-                                {TorterraMove::FACADE, "facade", "Facade"},
-                                {TorterraMove::STONE_EDGE, "stone_edge", "Stone Edge"},
-                                {TorterraMove::ROCK_SLIDE, "rock_slide", "Rock Slide"},
-                                {TorterraMove::BULLDOZE, "bulldoze", "Bulldoze"},
-                                {TorterraMove::STRENGTH, "strength", "Strength"},
-                                {TorterraMove::ROCK_SMASH, "rock_smash", "Rock Smash"},
-                                {TorterraMove::ROCK_CLIMB, "rock_climb", "Rock Climb"},
-                            },
-                            LockMode::LOCK_WHILE_RUNNING, TorterraMove::CRUNCH)
+    , OUTSIDE_HELP_ATTACK_4("<b>Attack 4:</b>",
+        {
+            {TorterraMove::EARTHQUAKE, "earthquake", "Earthquake"},
+            {TorterraMove::WOOD_HAMMER, "wood_hammer", "Wood Hammer"},
+            {TorterraMove::RAZOR_LEAF, "razor_leaf", "Razor Leaf"},
+            {TorterraMove::CRUNCH, "crunch", "Crunch"},
+            {TorterraMove::GIGA_DRAIN, "giga_drain", "Giga Drain"},
+            {TorterraMove::IRON_TAIL, "iron_tail", "Iron Tail"},
+            {TorterraMove::ROCK_TOMB, "rock_tomb", "Rock Tomb"},
+            {TorterraMove::FACADE, "facade", "Facade"},
+            {TorterraMove::STONE_EDGE, "stone_edge", "Stone Edge"},
+            {TorterraMove::ROCK_SLIDE, "rock_slide", "Rock Slide"},
+            {TorterraMove::BULLDOZE, "bulldoze", "Bulldoze"},
+            {TorterraMove::STRENGTH, "strength", "Strength"},
+            {TorterraMove::ROCK_SMASH, "rock_smash", "Rock Smash"},
+            {TorterraMove::ROCK_CLIMB, "rock_climb", "Rock Climb"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        TorterraMove::CRUNCH)
 
-      ,
-      NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(30)),
-      NOTIFICATIONS({
-          &NOTIFICATION_STATUS_UPDATE,
-          &NOTIFICATION_PROGRAM_FINISH,
-          &NOTIFICATION_ERROR_RECOVERABLE,
-          &NOTIFICATION_ERROR_FATAL,
-      })
+    , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(30))
+    , NOTIFICATIONS({
+        &NOTIFICATION_STATUS_UPDATE,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_RECOVERABLE,
+        &NOTIFICATION_ERROR_FATAL,
+    })
 
 {
     // -----------------------------------------------------------------------
@@ -632,17 +644,17 @@ void BDSPAutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     AutoStoryOptions options{Language::English,
-                             STARTERCHOICE,
-                             NOTIFICATION_STATUS_UPDATE,
-                             (HelpMode)HELP_MODE,
-                             OutsideHelpConfig{(OutsideHelpPokemon)OUTSIDE_HELP_POKEMON,
-                                               {
-                                                   (TorterraMove)OUTSIDE_HELP_ATTACK_1,
-                                                   (TorterraMove)OUTSIDE_HELP_ATTACK_2,
-                                                   (TorterraMove)OUTSIDE_HELP_ATTACK_3,
-                                                   (TorterraMove)OUTSIDE_HELP_ATTACK_4,
-                                               }},
-                             DIAGNOSTIC_FAKE_CHECKPOINT_SAVE ? CheckpointSaveMode::FAKE : CheckpointSaveMode::REAL};
+        STARTERCHOICE,
+        NOTIFICATION_STATUS_UPDATE,
+        (HelpMode)HELP_MODE,
+        OutsideHelpConfig{(OutsideHelpPokemon)OUTSIDE_HELP_POKEMON,
+            {
+                (TorterraMove)OUTSIDE_HELP_ATTACK_1,
+                (TorterraMove)OUTSIDE_HELP_ATTACK_2,
+                (TorterraMove)OUTSIDE_HELP_ATTACK_3,
+                (TorterraMove)OUTSIDE_HELP_ATTACK_4,
+            }},
+        DIAGNOSTIC_FAKE_CHECKPOINT_SAVE ? CheckpointSaveMode::FAKE : CheckpointSaveMode::REAL};
 
     const bool fake_saves = options.checkpoint_save_mode == CheckpointSaveMode::FAKE;
     if (fake_saves){
@@ -689,8 +701,14 @@ void BDSPAutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         }
     };
     if (fake_saves){
-        checkpoint_reattempt_loop(env, context, options.notif_status_update, stats, std::move(run_selected_range), true,
-                                  CheckpointSaveMode::FAKE, CheckpointRetryScope::SELECTED_RANGE);
+        checkpoint_reattempt_loop(env,
+            context,
+            options.notif_status_update,
+            stats,
+            std::move(run_selected_range),
+            true,
+            CheckpointSaveMode::FAKE,
+            CheckpointRetryScope::SELECTED_RANGE);
     }else{
         run_selected_range(0);
     }
