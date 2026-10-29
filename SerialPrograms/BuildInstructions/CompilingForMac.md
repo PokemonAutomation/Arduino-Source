@@ -94,10 +94,24 @@ brew install cmake
 
 ### Install Qt6
 
-We use Qt6 software library to build UI (windows, panels, buttons...) for **SerialPrograms**. Install it by running in Terminal
+We use Qt6 software library to build UI (windows, panels, buttons...) for **SerialPrograms**. It also plays and decodes audio.
+
+Our current Qt version is Qt 6.10.2 with its Multimedia and Serial Port modules, including a shipped FFmpeg for fast video encode/decode.
+Please don't use Homebrew to install Qt directly (`brew install qt6`). It is a different Qt version, and on Mac its Multimedia module is buggy and built without FFmpeg.
+
+We install Qt with aqtinstall, a tool that downloads Qt from Qt's official servers.
+Install aqtinstall by running in Terminal
 ```
-brew install qt6
+brew install aqtinstall
 ```
+Then install Qt by running in Terminal
+```
+aqt install-qt mac desktop 6.10.2 clang_64 -m qtmultimedia qtserialport --outputdir ~/Qt
+```
+This puts Qt in the folder `~/Qt/6.10.2/macos` (about 1.7 GB). It works on both Intel and Apple Silicon Macs.
+
+> Note: if you installed Qt with Homebrew before, you can leave it installed.
+The compile steps below tell CMake to use the Qt in `~/Qt`.
 
 ### Install Tesseract
 
@@ -247,9 +261,9 @@ This makes a new folder called "build_mac" in "Arduino-Source" and moves the Ter
 
 Execute the command in Terminal:
 ```
-cmake ../SerialPrograms/ -DCMAKE_BUILD_TYPE:STRING=Release -Wall
+cmake ../SerialPrograms/ -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/6.10.2/macos -Wall
 ```
-This command uses CMake to configure our code to prepare for compilation. If successful, it should print texts like
+This command uses CMake to configure our code to prepare for compilation. `-DCMAKE_PREFIX_PATH` tells CMake where the Qt you installed is. If successful, it should print texts like
 ```
 ...
 -- Configuring done
@@ -308,11 +322,23 @@ mkdir -p build_mac; cd build_mac
 
 ### Package updating
 In rare cases when we add new software library dependencies, just follow the guide to install those new libraries.
-If we upgrade our Qt dependency to a higher Qt version, use Homebrew to upgrade it by running the following command in Terminal:
 
+If we upgrade our Qt dependency to a higher Qt version, install the new version with aqtinstall, the same way as in [Install Qt6](#install-qt6).
+For example, for Qt 6.11.0 run in Terminal:
 ```
-brew upgrade qt6
+aqt install-qt mac desktop 6.11.0 clang_64 -m qtmultimedia qtserialport --outputdir ~/Qt
 ```
+
+### Switching to a different Qt
+
+CMake remembers which Qt it used the first time it configured "build_mac".
+So when you switch Qt (from Homebrew's Qt to the Qt in `~/Qt`, or to a newer Qt version), start a new "build_mac" folder.
+In the "Arduino-Source" folder, run in Terminal
+```
+rm -rf build_mac
+```
+to delete the old "build_mac" folder. Then follow [Part 4: Compile the Program](#part-4-compile-the-program) again,
+with the new Qt version in the `-DCMAKE_PREFIX_PATH` part of the CMake command.
 
 
 
